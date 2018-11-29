@@ -1,7 +1,7 @@
 package Hailo::Engine::Scored;
 our $AUTHORITY = 'cpan:AVAR';
-$Hailo::Engine::Scored::VERSION = '0.74';
-use v5.28.0;
+$Hailo::Engine::Scored::VERSION = '0.75';
+use v5.10.0;
 use Moose;
 use List::Util qw<sum>;
 use List::MoreUtils qw<any>;

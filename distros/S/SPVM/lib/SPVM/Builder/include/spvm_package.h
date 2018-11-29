@@ -14,6 +14,7 @@ enum {
   SPVM_PACKAGE_C_FLAG_IS_ANON = 2,
   SPVM_PACKAGE_C_FLAG_IS_POINTER = 4,
   SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB = 8,
+  SPVM_PACKAGE_C_FLAG_IS_PUBLIC = 16,
 };
 
 extern const char* const SPVM_PACKAGE_C_CATEGORY_NAMES[];
@@ -28,7 +29,6 @@ struct SPVM_package {
   SPVM_HASH* sub_name_symtable;
   SPVM_LIST* fields;
   SPVM_HASH* field_symtable;
-  SPVM_LIST* object_field_indexes;
   SPVM_SUB* sub_destructor;
   SPVM_LIST* info_package_var_ids;
   SPVM_HASH* info_package_var_id_symtable;
@@ -60,6 +60,7 @@ struct SPVM_package {
   int32_t flag;
   int32_t category;
   const char* name;
+  SPVM_OP* op_begin_sub;
 };
 
 SPVM_PACKAGE* SPVM_PACKAGE_new(SPVM_COMPILER* compiler);

@@ -9,7 +9,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '4.04';
+$VERSION = '4.05';
 
 our $DEBUG = 0;
 
@@ -94,7 +94,7 @@ sub open_store {
         # had been created and no version exists, assume it is
         # version 1.
         #
-        if( -e $record_index_directory ) {
+        if( -e "$directory/STORE_INDEX" ) {
             die "A database was found in $directory with no version information and is assumed to be an old format. Please run the record_store_convert program.";
         }
         $version = $VERSION;
@@ -544,10 +544,6 @@ sub open_silo {
         close $fh;
     }
 
-    unless( -w "$directory/0" ){
-        die "Data::RecordStore::Silo->open_silo Error operning record store. $directory/0 exists but is not writeable";
-    }
-
     my $silo = bless [
         $directory,
         $record_size,
@@ -592,7 +588,7 @@ sub get_record {
 
     die "Data::RecordStore::Silo->get_record : index $id out of bounds for silo $self->[DIRECTORY]. Silo has entry count of ".$self->entry_count if $id > $self->entry_count || $id < 1;
 
-    my( $f_idx, $fh, $file, $file_id ) = $self->_fh( $id );
+    my( $f_idx, $fh, $file, $file_id ) = $self->_fh( $id, 'readonly' );
 
     sysseek( $fh, $self->[RECORD_SIZE] * $f_idx, SEEK_SET );
     my $srv = sysread $fh, my $data, $self->[RECORD_SIZE];
@@ -638,6 +634,7 @@ sub last_entry {
 
 sub push {
     my( $self, $data ) = @_;
+    
     my $next_id = $self->next_id;
 
     # the problem is that the second file has stuff in it not sure how
@@ -695,7 +692,7 @@ sub _copy_record {
 
     die "Data::RecordStore::Silo->_copy_record : to_index $to_idx out of bounds. Store has entry count of ".$self->entry_count if $to_idx >= $self->entry_count || $to_idx < 0;
 
-    my( $from_file_idx, $fh_from ) = $self->_fh($from_idx+1);
+    my( $from_file_idx, $fh_from ) = $self->_fh($from_idx+1,'readonly');
     my( $to_file_idx, $fh_to ) = $self->_fh($to_idx+1);
     sysseek $fh_from, $self->[RECORD_SIZE] * ($from_file_idx), SEEK_SET;
     my $srv = sysread $fh_from, my $data, $self->[RECORD_SIZE];
@@ -771,14 +768,18 @@ sub _ensure_entry_count {
 #   which number file this is (0 is the first)
 #
 sub _fh {
-    my( $self, $id ) = @_;
-
+    my( $self, $id, $readonly ) = @_;
     my @files = $self->_files;
 
     my $f_idx = int( ($id-1) / $self->[FILE_MAX_RECORDS] );
 
     my $file = $files[$f_idx];
-    CORE::open( my $fh, "+<", "$self->[DIRECTORY]/$file" ) or die "Data::RecordStore::Silo->_fh unable to open '$self->[DIRECTORY]/$file' : $! $?";
+    my $fh;
+    if( $readonly ) {
+      CORE::open( $fh, "<", "$self->[DIRECTORY]/$file" ) or die "Data::RecordStore::Silo->_fh unable to open '$self->[DIRECTORY]/$file' : $! $?";
+    } else {
+      CORE::open( $fh, "+<", "$self->[DIRECTORY]/$file" ) or die "Data::RecordStore::Silo->_fh unable to open '$self->[DIRECTORY]/$file' : $! $?";
+    }
     binmode $fh; # for windows
 
     (($id - ($f_idx*$self->[FILE_MAX_RECORDS])) - 1,$fh,"$self->[DIRECTORY]/$file",$f_idx);
@@ -1414,6 +1415,6 @@ Removes the file for this record store entirely from the file system.
        and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 4.04  (November, 2018))
+       Version 4.05  (November, 2018))
 
 =cut

@@ -26,7 +26,7 @@ struct SPVM_sub {
   SPVM_OP* op_sub;
   SPVM_OP* op_name;
   SPVM_OP* op_block;
-  SPVM_OP* op_constant;
+  SPVM_OP* op_inline;
   SPVM_LIST* object_arg_ids;
   SPVM_LIST* mys;
   SPVM_LIST* captures;
@@ -60,6 +60,14 @@ struct SPVM_sub {
   int32_t ref_vars_alloc_length;
   int32_t return_runtime_type;
   int8_t have_vaarg;
+  int8_t is_package_var_setter;
+  int8_t is_package_var_getter;
+  int8_t is_field_setter;
+  int8_t is_field_getter;
+  int8_t is_simple_constructor;
+  int8_t is_constant;
+  int8_t is_begin;
+  const char* accessor_original_name;
 };
 
 SPVM_SUB* SPVM_SUB_new(SPVM_COMPILER* compiler);

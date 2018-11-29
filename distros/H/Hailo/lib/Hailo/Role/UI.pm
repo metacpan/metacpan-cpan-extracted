@@ -1,7 +1,7 @@
 package Hailo::Role::UI;
 our $AUTHORITY = 'cpan:AVAR';
-$Hailo::Role::UI::VERSION = '0.74';
-use v5.28.0;
+$Hailo::Role::UI::VERSION = '0.75';
+use v5.10.0;
 use Moose::Role;
 use namespace::clean -except => 'meta';
 

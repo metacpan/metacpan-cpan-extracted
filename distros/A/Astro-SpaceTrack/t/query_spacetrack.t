@@ -66,263 +66,324 @@ SKIP: {
     is_error $st, spacetrack => 'fubar',
 	404, 'Fetch a non-existent catalog entry';
 
-    is_success $st, spacetrack => 'inmarsat',
-	'Fetch a catalog entry';
+    SKIP: {
+	is_success_or_skip $st, spacetrack => 'inmarsat',
+	    'Fetch a catalog entry', 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, retrieve => 25544, 'Retrieve ISS orbital elements';
+    SKIP: {
+	is_success_or_skip $st, retrieve => 25544,
+	    'Retrieve ISS orbital elements', 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, file => 't/file.dat',
-	'Retrieve orbital elements specified by file';
+    SKIP: {
+	is_success_or_skip $st, file => 't/file.dat',
+	    'Retrieve orbital elements specified by file', 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, retrieve => '25544-25546',
-	'Retrieve a range of orbital elements';
+    SKIP: {
+	is_success_or_skip $st, retrieve => '25544-25546',
+	    'Retrieve a range of orbital elements', 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_name => 'zarya', "Search for name 'zarya'";
+    SKIP: {
+	is_success_or_skip $st, search_name => 'zarya',
+	    "Search for name 'zarya'", 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_name => -notle => 'zarya',
-	"Search for name 'zarya', but only retrieve search results";
+    SKIP: {
+	is_success_or_skip $st, search_name => -notle => 'zarya',
+	    "Search for name 'zarya', but only retrieve search results",
+	    3;
 
-    is $st->content_type(), 'search', "Content type is 'search'";
+	is $st->content_type(), 'search', "Content type is 'search'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_id => '98067A', "Search for ID '98067A'";
+    SKIP: {
+	is_success_or_skip $st, search_id => '98067A',
+	    "Search for ID '98067A'", 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_id => -notle => '98067A',
-	"Search for ID '98067A', but only retrieve search results";
+    SKIP: {
+	is_success_or_skip $st, search_id => -notle => '98067A',
+	    "Search for ID '98067A', but only retrieve search results",
+	    3;
 
-    is $st->content_type(), 'search', "Content type is 'search'";
+	is $st->content_type(), 'search', "Content type is 'search'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_oid => 25544, "Search for OID 25544";
+    SKIP: {
+	is_success_or_skip $st, search_oid => 25544,
+	    "Search for OID 25544", 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_oid => -notle => 25544,
-	"Search for OID 25544, but only retrieve search results";
+    SKIP: {
+	is_success_or_skip $st, search_oid => -notle => 25544,
+	    "Search for OID 25544, but only retrieve search results",
+	    3;
 
-    is $st->content_type(), 'search', "Content type is 'search'";
+	is $st->content_type(), 'search', "Content type is 'search'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_decay => '2010-1-10',
-	'Search for bodies decayed January 10 2010';
+    SKIP: {
+	is_success_or_skip $st, search_decay => '2010-1-10',
+	    'Search for bodies decayed January 10 2010', 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_decay => -notle => '2010-1-10',
-	'Search for bodies decayed Jan 10 2010, but only retrieve search results';
+    SKIP: {
+	is_success_or_skip $st, search_decay => -notle => '2010-1-10',
+	    'Search for bodies decayed Jan 10 2010, but only retrieve search results',
+	    3;
 
-    is $st->content_type(), 'search', "Content type is 'search'";
+	is $st->content_type(), 'search', "Content type is 'search'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_date => $search_date,
-	"Search for date '$search_date'";
+    SKIP: {
+	is_success_or_skip $st, search_date => $search_date,
+	    "Search for date '$search_date'", 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, search_date => -notle => $search_date,
-	"Search for date '$search_date', but only retrieve search results";
+    SKIP: {
+	is_success_or_skip $st, search_date => -notle => $search_date,
+	    "Search for date '$search_date', but only retrieve search results",
+	    3;
 
-    is $st->content_type(), 'search', "Content type is 'search'";
+	is $st->content_type(), 'search', "Content type is 'search'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, retrieve => -start_epoch => $start_epoch, 25544,
-	"Retrieve ISS orbital elements for epoch $start_epoch";
+    SKIP: {
+	is_success_or_skip $st, retrieve => -start_epoch => $start_epoch, 25544,
+	    "Retrieve ISS orbital elements for epoch $start_epoch", 3;
 
-    is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, 'box_score', 'Retrieve satellite box score';
+    SKIP: {
+	is_success_or_skip $st, 'box_score', 'Retrieve satellite box score', 3;
 
-    is $st->content_type(), 'box_score',
-	"Content type is 'box_score'";
+	is $st->content_type(), 'box_score',
+	    "Content type is 'box_score'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, spacetrack_query_v2 => qw{ basicspacedata query
-	class tle_latest NORAD_CAT_ID 25544 },
-	'Get ISS data via general query';
+    SKIP: {
+	is_success_or_skip $st, spacetrack_query_v2 =>
+	    qw{ basicspacedata query class tle_latest NORAD_CAT_ID 25544 },
+	    'Get ISS data via general query', 3;
 
-    is $st->content_type(), 'orbit',
-	"Content type is 'orbit'";
+	is $st->content_type(), 'orbit',
+	    "Content type is 'orbit'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, spacetrack_query_v2 => qw{ basicspacedata modeldef
-	class tle_latest },
-	'Get tle_latest model definition';
+    SKIP: {
+	is_success_or_skip $st, spacetrack_query_v2 =>
+	    qw{ basicspacedata modeldef class tle_latest },
+	    'Get tle_latest model definition', 3;
 
-    is $st->content_type(), 'modeldef',
-	"Content type is 'modeldef'";
+	is $st->content_type(), 'modeldef',
+	    "Content type is 'modeldef'";
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, 'country_names', 'Retrieve country names';
+    SKIP: {
+	is_success_or_skip $st, 'country_names', 'Retrieve country names', 3;
 
-    is $st->content_type(), 'country_names',
-	q{Content type is 'country_names'};
+	is $st->content_type(), 'country_names',
+	    q{Content type is 'country_names'};
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
-    is_success $st, 'launch_sites', 'Retrieve launch sites';
+    SKIP: {
+	is_success_or_skip $st, 'launch_sites', 'Retrieve launch sites', 3;
 
-    is $st->content_type(), 'launch_sites',
-	q{Content type is 'launch_sites'};
+	is $st->content_type(), 'launch_sites',
+	    q{Content type is 'launch_sites'};
 
-    is $st->content_source(), 'spacetrack',
-	"Content source is 'spacetrack'";
+	is $st->content_source(), 'spacetrack',
+	    "Content source is 'spacetrack'";
 
-    is $st->content_interface(), $desired_content_interface,
-	"Content version is $desired_content_interface";
+	is $st->content_interface(), $desired_content_interface,
+	    "Content version is $desired_content_interface";
+    }
 
     SKIP: {
 	my $skip;
 	$skip = site_check 'celestrak.com'
-	    and skip $skip, 1;
+	    and skip $skip, 13;
 
-	is_success $st, celestrak => 'stations', 'Fetch Celestrak stations';
+	SKIP: {
+	    is_success_or_skip $st, celestrak => 'stations',
+		'Fetch Celestrak stations', 3;
 
-	is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-	is $st->content_source(), 'spacetrack', "Content source is 'spacetrack'";
+	    is $st->content_source(), 'spacetrack',
+		"Content source is 'spacetrack'";
 
-	is $st->content_interface(), $desired_content_interface,
-	    "Content version is $desired_content_interface";
+	    is $st->content_interface(), $desired_content_interface,
+		"Content version is $desired_content_interface";
+	}
 
 	$st->set( fallback => 1 );
 
-	is_success $st, celestrak => 'stations',
-	    'Fetch Celestrak stations with fallback';
+	SKIP: {
 
-	is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	    is_success_or_skip $st, celestrak => 'stations',
+		'Fetch Celestrak stations with fallback', 3;
 
-	is $st->content_source(), 'spacetrack', "Content source is 'spacetrack'";
+	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-	is $st->content_interface(), $desired_content_interface,
-	    "Content version is $desired_content_interface";
+	    is $st->content_source(), 'spacetrack',
+		"Content source is 'spacetrack'";
+
+	    is $st->content_interface(), $desired_content_interface,
+		"Content version is $desired_content_interface";
+	}
 
 	$st->set( username => undef, password => undef );
 
-	is_success $st, celestrak => 'stations',
-	    'Fetch Celestrak stations with fallback, without account';
+	SKIP: {
 
-	is $st->content_type(), 'orbit', "Content type is 'orbit'";
+	    is_success_or_skip $st, celestrak => 'stations',
+		'Fetch Celestrak stations with fallback, without account', 3;
 
-	is $st->content_source(), 'celestrak', "Content source is 'celestrak'";
+	    is $st->content_type(), 'orbit', "Content type is 'orbit'";
 
-	not_defined $st->content_interface(),
-	    'Content version is not defined';
+	    is $st->content_source(), 'celestrak',
+		"Content source is 'celestrak'";
+
+	    not_defined $st->content_interface(),
+		'Content version is not defined';
+	}
 
 	$st->set( fallback => 0 );
 

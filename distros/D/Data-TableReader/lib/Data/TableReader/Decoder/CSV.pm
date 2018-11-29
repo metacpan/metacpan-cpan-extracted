@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::CSV;
-$Data::TableReader::Decoder::CSV::VERSION = '0.007';
+$Data::TableReader::Decoder::CSV::VERSION = '0.008';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -7,11 +7,14 @@ use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
 our @csv_probe_modules= qw( Text::CSV_XS Text::CSV );
+our %csv_probe_modules= ( 'Text::CSV_XS' => 1.06, 'Text::CSV' => 1.91 );
 our $default_csv_module;
 sub default_csv_module {
 	$default_csv_module ||= do {
-		eval "require $_" && return $_ for @csv_probe_modules;
-		croak "No CSV parser available; install one of: ".join(', ', @csv_probe_modules);
+		eval "use $_ $csv_probe_modules{$_}; 1" && return $_
+			for @csv_probe_modules;
+		croak "No CSV parser available or sufficient version; install one of: "
+			.join(', ', map "$_ >= $csv_probe_modules{$_}", @csv_probe_modules);
 	};
 }
 
@@ -200,7 +203,7 @@ Data::TableReader::Decoder::CSV - Access rows of a comma-delimited text file
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

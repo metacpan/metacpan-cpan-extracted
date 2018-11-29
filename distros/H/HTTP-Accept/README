@@ -1,0 +1,64 @@
+NAME
+
+    HTTP::Accept - Parse the HTTP header 'Accept'
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+        use HTTP::Accept;
+        
+        my $header         = 'text/html, application/json;q=0.5';
+        my $accept_header  = HTTP::Accept->new( $header );
+        
+        # returns text/html
+        my $use_accept     = $accept_header->match( qw(text/html application/json) );
+
+ATTRIBUTES
+
+ string
+
+    The header string as passed to new.
+
+ values
+
+    The given media types in the prioritized order.
+
+      Header                            | Values
+      ----------------------------------+----------------------------
+      text/html, application/json;q=0.5 | text/html, application/json
+      application/json;q=0.5, text/html | text/html, application/*
+      application/*;q=0.5, text/html    | text/html, application/*
+      */*                               | */*
+
+METHODS
+
+ new
+
+        my $header         = 'text/html, application/json;q=0.5';
+        my $accept_header  = HTTP::Accept->new( $header );
+
+ match
+
+        # header: 'text/html, application/json;q=0.5'
+        my $accept = $accept_header->match('text/html');                     # text/html
+        my $accept = $accept_header->match('application/json');              # application/json
+        my $accept = $accept_header->match('application/json', 'text/html'); # text/html
+        my $accept = $accept_header->match();                                # empty string
+        my $accept = $accept_header->match(undef);                           # empty string
+        my $accept = $accept_header->match('image/png');                     # empty string
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -34,7 +34,9 @@ use Data::Radius::Util qw(is_enum_type);
 #  $coderef->($value, $attr, $dictionary)
 my %decode_map = (
     string      => \&decode_string,
+    string_tag  => \&decode_string_tag,
     integer     => \&decode_int,
+    integer_tag => \&decode_int_tag,
     byte        => \&decode_byte,
     short       => \&decode_short,
     signed      => \&decode_signed,
@@ -56,10 +58,36 @@ if (!defined inet_pton(AF_INET6, '::1')) {
 }
 
 sub decode_string   { $_[0] }
+
+sub decode_string_tag {
+    my $value = shift;
+    # https://tools.ietf.org/html/rfc2868#section-3.3
+    # If the Tag field is greater than 0x1F, it SHOULD be
+    # interpreted as the first byte of the following String field
+    return if (length($value) < 1);
+
+    my $tag = unpack('C', substr($value, 0, 1));
+    if ($tag > 0x1F) {
+        return ($value, undef);
+    }
+    return (substr($value, 1), $tag);
+}
+
 sub decode_int      { unpack('N', $_[0]) }
 sub decode_byte     { unpack('C', $_[0]) }
 sub decode_short    { unpack('S>', $_[0]) }
 sub decode_signed   { unpack('l>', $_[0]) }
+
+sub decode_int_tag {
+    my $value = shift;
+    # https://tools.ietf.org/html/rfc6158#section-3.2.2
+    # when integer values are tagged, the value portion is reduced to three bytes
+
+    # replace tag by 0 to make unpack() value work
+    my $tag = unpack('C', substr($value, 0, 1, "\x00"));
+    return (unpack('N', $value), $tag);
+}
+
 sub decode_ipaddr   { inet_ntop(AF_INET, $_[0]) }
 sub decode_ipv6addr { inet_ntop(AF_INET6, $_[0]) }
 
@@ -135,8 +163,9 @@ sub decode_tlv {
 sub decode {
     my ($attr, $value, $dict) = @_;
 
-    my $decoded = $decode_map{ $attr->{type} }->($value, $attr, $dict);
-    return $decoded;
+    my $decoder = $attr->{type} . ($attr->{has_tag} ? '_tag' : '');
+    my ($decoded, $tag) = $decode_map{ $decoder }->($value, $attr, $dict);
+    return wantarray ? ($decoded, $tag) : $decoded;
 }
 
 1;

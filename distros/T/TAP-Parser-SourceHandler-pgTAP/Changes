@@ -1,5 +1,11 @@
 Revision history for Perl extension TAP::Parser::SourceHandler::pgTAP.
 
+3.34  2018-11-28T03:04:53Z
+     - Added function-checksum tests to the output of `pg_tapgen`, thanks to
+       Marc Cousin (PR #17).
+     - Released a Docker image: https://hub.docker.com/r/itheory/pg_prove/.
+     - Converted URLs in documentation to HTTPS.
+
 3.33  2017-03-04T23:40:01Z
      - Added trigger-testing functions to the output of `pg_tapgen`, thanks to
        Rodolphe Quiédeville (PR #11).

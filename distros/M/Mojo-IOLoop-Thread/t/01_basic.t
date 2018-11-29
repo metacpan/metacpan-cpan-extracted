@@ -4,6 +4,7 @@ use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
 use Test::More;
+use Time::HiRes qw(sleep);
 
 BEGIN {
     BAIL_OUT("OS unsupported\n")
@@ -171,6 +172,7 @@ $subprocess->run(
     $s->progress(20);
     $s->progress({percentage => 45});
     $s->progress({percentage => 90}, {long_data => [1 .. 1e5]});
+    for (1..3) { sleep(0.5); $s->progress('PNR $_')};
     'yay';
   },
   sub {
@@ -179,15 +181,21 @@ $subprocess->run(
     $result = \@res;
   }
 );
+my $pcount = 0;
 $subprocess->on(
   progress => sub {
     my ($subprocess, @args) = @_;
-    push @progress, \@args;
+    if ( $args[0] =~ /^PNR/ ) {
+      $pcount++;
+    } else {
+      push @progress, \@args;
+    }
   }
 );
 Mojo::IOLoop->start;
 ok !$fail, 'no error';
 is_deeply $result, ['yay'], 'correct result';
+is($pcount, 3, 'correct progress count');
 is_deeply \@progress,
   [[20], [{percentage => 45}], [{percentage => 90}, {long_data => [1 .. 1e5]}]],
   'correct progress';

@@ -2,8 +2,8 @@ NAME
     Perinci::Examples - Various examples of Rinci metadata
 
 VERSION
-    This document describes version 0.80 of Perinci::Examples (from Perl
-    distribution Perinci-Examples), released on 2017-07-11.
+    This document describes version 0.810 of Perinci::Examples (from Perl
+    distribution Perinci-Examples), released on 2018-11-29.
 
 DESCRIPTION
     This distribution contains an odd mix of various functions, variables,
@@ -26,7 +26,7 @@ FUNCTIONS
   arg_default
     Usage:
 
-     arg_default(%args) -> [status, msg, result, meta]
+     arg_default(%args) -> [status, msg, payload, meta]
 
     Demonstrate argument default value from default and/or schema.
 
@@ -73,7 +73,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -82,7 +82,7 @@ FUNCTIONS
   call_gen_array
     Usage:
 
-     call_gen_array(%args) -> [status, msg, result, meta]
+     call_gen_array(%args) -> [status, msg, payload, meta]
 
     Call gen_array().
 
@@ -101,7 +101,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -110,7 +110,7 @@ FUNCTIONS
   call_randlog
     Usage:
 
-     call_randlog(%args) -> [status, msg, result, meta]
+     call_randlog(%args) -> [status, msg, payload, meta]
 
     Call randlog().
 
@@ -137,7 +137,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -146,7 +146,7 @@ FUNCTIONS
   delay
     Usage:
 
-     delay(%args) -> [status, msg, result, meta]
+     delay(%args) -> [status, msg, payload, meta]
 
     Sleep, by default for 10 seconds.
 
@@ -169,7 +169,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -178,7 +178,7 @@ FUNCTIONS
   dies
     Usage:
 
-     dies() -> [status, msg, result, meta]
+     dies() -> [status, msg, payload, meta]
 
     Dies tragically.
 
@@ -193,7 +193,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -202,7 +202,7 @@ FUNCTIONS
   err
     Usage:
 
-     err(%args) -> [status, msg, result, meta]
+     err(%args) -> [status, msg, payload, meta]
 
     Return error response.
 
@@ -219,7 +219,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -228,7 +228,7 @@ FUNCTIONS
   gen_array
     Usage:
 
-     gen_array(%args) -> [status, msg, result, meta]
+     gen_array(%args) -> [status, msg, payload, meta]
 
     Generate an array of specified length.
 
@@ -247,7 +247,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -256,7 +256,7 @@ FUNCTIONS
   gen_hash
     Usage:
 
-     gen_hash(%args) -> [status, msg, result, meta]
+     gen_hash(%args) -> [status, msg, payload, meta]
 
     Generate a hash with specified number of pairs.
 
@@ -275,7 +275,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -284,7 +284,7 @@ FUNCTIONS
   gen_random_bytes
     Usage:
 
-     gen_random_bytes(%args) -> [status, msg, result, meta]
+     gen_random_bytes(%args) -> [status, msg, payload, meta]
 
     Generate random bytes of specified length.
 
@@ -303,7 +303,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -312,7 +312,7 @@ FUNCTIONS
   gen_sample_data
     Usage:
 
-     gen_sample_data(%args) -> [status, msg, result, meta]
+     gen_sample_data(%args) -> [status, msg, payload, meta]
 
     Generate sample data of various form.
 
@@ -343,7 +343,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -352,7 +352,7 @@ FUNCTIONS
   merge_hash
     Usage:
 
-     merge_hash(%args) -> [status, msg, result, meta]
+     merge_hash(%args) -> [status, msg, payload, meta]
 
     Merge two hashes.
 
@@ -383,7 +383,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -392,7 +392,7 @@ FUNCTIONS
   multi_status
     Usage:
 
-     multi_status(%args) -> [status, msg, result, meta]
+     multi_status(%args) -> [status, msg, payload, meta]
 
     Example for result metadata property `results`.
 
@@ -412,7 +412,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -421,7 +421,7 @@ FUNCTIONS
   noop
     Usage:
 
-     noop(%args) -> [status, msg, result, meta]
+     noop(%args) -> [status, msg, payload, meta]
 
     Do nothing, return original argument.
 
@@ -446,7 +446,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -455,7 +455,7 @@ FUNCTIONS
   noop2
     Usage:
 
-     noop2(%args) -> [status, msg, result, meta]
+     noop2(%args) -> [status, msg, payload, meta]
 
     Just like noop, but accepts several arguments.
 
@@ -496,7 +496,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -505,7 +505,7 @@ FUNCTIONS
   randlog
     Usage:
 
-     randlog(%args) -> [status, msg, result, meta]
+     randlog(%args) -> [status, msg, payload, meta]
 
     Produce some random Log::Any log messages.
 
@@ -530,7 +530,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -539,7 +539,7 @@ FUNCTIONS
   return_args
     Usage:
 
-     return_args(%args) -> [status, msg, result, meta]
+     return_args(%args) -> [status, msg, payload, meta]
 
     Return arguments.
 
@@ -560,7 +560,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -569,7 +569,7 @@ FUNCTIONS
   sum
     Usage:
 
-     sum(%args) -> [status, msg, result, meta]
+     sum(%args) -> [status, msg, payload, meta]
 
     Sum numbers in array.
 
@@ -577,24 +577,15 @@ FUNCTIONS
 
     *   First example:
 
-         sum(array => [1, 2, 3]); # -> [200, "OK", 6, {}]
+         sum(array => [1, 2, 3]); # -> 6
 
     *   Second example, using argv:
 
-         sum( array => [1.1, 2.1, 3.1], round => 1); # -> [200, "OK", 6, {}]
+         sum( array => [1.1, 2.1, 3.1], round => 1); # -> 6
 
     *   Third example, invalid arguments:
 
-         sum(array => ["a"]);
-
-        Result:
-
-         [
-           400,
-           "Argument 'array' fails validation: \@[0]: Not of type decimal number",
-           undef,
-           {},
-         ]
+         sum(array => ["a"]); # ERROR 400
 
     This function can be used to test passing nonscalar (array) arguments.
 
@@ -615,7 +606,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -624,7 +615,7 @@ FUNCTIONS
   test_args_as_array
     Usage:
 
-     test_args_as_array($a0, $a1, $a2) -> [status, msg, result, meta]
+     test_args_as_array($a0, $a1, $a2) -> [status, msg, payload, meta]
 
     This function's metadata sets "args_as" property to "array". This means
     it wants to accept argument as an array, like a regular Perl subroutine
@@ -645,7 +636,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -654,7 +645,7 @@ FUNCTIONS
   test_args_as_arrayref
     Usage:
 
-     test_args_as_arrayref([$a0, $a1, $a2]) -> [status, msg, result, meta]
+     test_args_as_arrayref([$a0, $a1, $a2]) -> [status, msg, payload, meta]
 
     This function's metadata sets "args_as" property to "arrayref". This is
     just like "array", except the whole argument list is passed in $_[0].
@@ -674,7 +665,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -683,7 +674,7 @@ FUNCTIONS
   test_args_as_hashref
     Usage:
 
-     test_args_as_hashref(\%args) -> [status, msg, result, meta]
+     test_args_as_hashref(\%args) -> [status, msg, payload, meta]
 
     This function's metadata sets "args_as" property to "hashref". This is
     just like "hash", except the whole argument hash is passed in $_[0].
@@ -701,7 +692,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -710,7 +701,7 @@ FUNCTIONS
   test_binary
     Usage:
 
-     test_binary(%args) -> [status, msg, result, meta]
+     test_binary(%args) -> [status, msg, payload, meta]
 
     Accept and send binary data.
 
@@ -757,7 +748,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -766,7 +757,7 @@ FUNCTIONS
   test_common_opts
     Usage:
 
-     test_common_opts(%args) -> [status, msg, result, meta]
+     test_common_opts(%args) -> [status, msg, payload, meta]
 
     This function has arguments with the same name as Perinci::CmdLine
     common options.
@@ -810,7 +801,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -819,7 +810,7 @@ FUNCTIONS
   test_completion
     Usage:
 
-     test_completion(%args) -> [status, msg, result, meta]
+     test_completion(%args) -> [status, msg, payload, meta]
 
     Do nothing, return args.
 
@@ -932,7 +923,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -941,7 +932,7 @@ FUNCTIONS
   test_dry_run
     Usage:
 
-     test_dry_run() -> [status, msg, result, meta]
+     test_dry_run() -> [status, msg, payload, meta]
 
     Will return 'wet' if not run under dry run mode, or 'dry' if dry run.
 
@@ -965,7 +956,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -995,7 +986,7 @@ FUNCTIONS
   test_validate_args
     Usage:
 
-     test_validate_args(%args) -> [status, msg, result, meta]
+     test_validate_args(%args) -> [status, msg, payload, meta]
 
     Does nothing, only here to test # VALIDATE_ARGS.
 
@@ -1014,7 +1005,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -1023,7 +1014,7 @@ FUNCTIONS
   undescribed_args
     Usage:
 
-     undescribed_args(%args) -> [status, msg, result, meta]
+     undescribed_args(%args) -> [status, msg, payload, meta]
 
     This function has several undescribed args.
 
@@ -1047,7 +1038,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -1077,8 +1068,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
-    by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012,
+    2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

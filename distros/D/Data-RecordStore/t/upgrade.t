@@ -71,6 +71,7 @@ sub test_suite {
     diag "Testing $old_version_store";
     my $new_version_store = tempdir( CLEANUP => 1 )."/new_version";
 
+    my $source_dir = "$base/$old_version_store";
 
     $id = 1;
     if( $old_version_store eq '4.03' ) {
@@ -78,12 +79,20 @@ sub test_suite {
       my $out;
       open( STDERR, ">>", \$out );
       
-      Data::RecordStore::Converter::convert( "$base/$old_version_store", $new_version_store );
+      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
       like( $out, qr/already at version/, 'warning message for trying to convert store that didnt need it' );
       close $out;
+
+      ok( Data::RecordStore::open_store( $source_dir ), "able to open correct version" );
     }
     elsif( $old_version_store eq '3.22' ) {
-      Data::RecordStore::Converter::convert( "$base/$old_version_store", $new_version_store );
+      eval {
+        Data::RecordStore::open_store( $source_dir );
+        fail( "was able to open store with older version" );
+      };
+      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
+
+      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
       my $store = Data::RecordStore::open_store( $new_version_store );
 
       #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";
@@ -131,7 +140,13 @@ sub test_suite {
       }
     } 
     elsif( $old_version_store eq '3.00' ) {
-      Data::RecordStore::Converter::convert( "$base/$old_version_store", $new_version_store );
+      eval {
+        Data::RecordStore::open_store( $source_dir );
+        fail( "was able to open store with older version" );
+      };
+      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
+
+      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
       my $store = Data::RecordStore::open_store( $new_version_store );
 
       is( $store->entry_count, 49, 'converted store has 49 entries' );
@@ -183,7 +198,14 @@ sub test_suite {
       
     }
     elsif( $old_version_store eq '2.03' ) {
-      Data::RecordStore::Converter::convert( "$base/$old_version_store", $new_version_store );
+      eval {
+        Data::RecordStore::open_store( $source_dir );
+        fail( "was able to open store with older version" );
+      };
+      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
+
+
+      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
       my $store = Data::RecordStore::open_store( $new_version_store );
 
       is( $store->entry_count, 49, 'converted store has 49 entries' );
@@ -234,7 +256,15 @@ sub test_suite {
       }
     }
     elsif( $old_version_store eq '1.07' ) {
-      Data::RecordStore::Converter::convert( "$base/$old_version_store", $new_version_store );
+
+      eval {
+        Data::RecordStore::open_store( $source_dir );
+        fail( "was able to open store with older version" );
+      };
+      like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
+
+
+      Data::RecordStore::Converter::convert( $source_dir, $new_version_store );
       my $store = Data::RecordStore::open_store( $new_version_store );
 
       #the store created was touched up manually, the last few blank entries not created by the creation program. Make them match and update the tests.";

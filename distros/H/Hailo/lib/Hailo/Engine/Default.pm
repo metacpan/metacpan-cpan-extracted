@@ -1,7 +1,7 @@
 package Hailo::Engine::Default;
 our $AUTHORITY = 'cpan:AVAR';
-$Hailo::Engine::Default::VERSION = '0.74';
-use v5.28.0;
+$Hailo::Engine::Default::VERSION = '0.75';
+use v5.10.0;
 use Moose;
 use MooseX::Types::Moose ':all';
 use List::Util qw<min first shuffle>;

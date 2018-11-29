@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-08-11'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,6 +20,7 @@ Perinci::CmdLine::cryp->new(
     subcommands => {
         "dump-cryp-config" => { url=>"${prefix}dump_cryp_config" },
         arbit => { url=>"${prefix}arbit" },
+        'collect-orderbooks' => { url=>"${prefix}collect_orderbooks" },
         opportunities => { url=>"${prefix}show_opportunities" },
         'check-orders' => { url=>"${prefix}check_orders" },
         'order-pairs' => { url=>"${prefix}list_order_pairs" },
@@ -42,7 +43,7 @@ cryp-arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.006 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-08-11.
+This document describes version 0.008 of cryp-arbit (from Perl distribution App-cryp-arbit), released on 2018-11-29.
 
 =head1 SYNOPSIS
 
@@ -55,13 +56,21 @@ can be shared between cryp-* family of scripts):
  ; db_password = yourpass         ; optional, will be searched in ~/.my.cnf
 
  [exchange/indodax]
- key = ...
- secret = ...
+ api_key = ...
+ api_secret = ...<
 
- [exchange/gdax]
- key = ...
- secret = ...
- passphrase = ...
+ [exchange/coinbase-pro]
+ api_key = ...
+ api_secret = ...
+ api_passphrase = ...
+
+=head2 Collecting orderbooks
+
+To collect orderbooks (for e.g. backtesting data later):
+
+ % cryp-arbit collect-orderbooks
+
+=head2 Performing arbitrage
 
 Then to test:
 
@@ -125,6 +134,14 @@ Check the orders that have been created.
 This subcommand will check the orders that have been created previously by
 C<arbit> subcommand. It will update the order status and filled size (if still
 open). It will cancel (give up) the orders if deemed too old.
+
+
+=head2 B<collect-orderbooks>
+
+Collect orderbooks into the database.
+
+This utility collect orderbooks from exchanges and put it into the database. The
+data can be used later e.g. for backtesting.
 
 
 =head2 B<dump-cryp-config>
@@ -445,6 +462,83 @@ the arbitrage transaction will be recorded.
 
 =back
 
+=head2 Options for subcommand collect-orderbooks
+
+=over
+
+=item B<--accounts-json>=I<s>
+
+Cryptoexchange accounts (JSON-encoded).
+
+See C<--accounts>.
+
+=item B<--accounts>=I<s@>
+
+Cryptoexchange accounts.
+
+There should at least be two accounts, on at least two different
+cryptoexchanges. If not specified, all accounts listed on the configuration file
+will be included. Note that it's possible to include two or more accounts on the
+same cryptoexchange.
+
+
+Can be specified multiple times.
+
+=item B<--base-currencies-json>=I<s>
+
+Target (crypto)currencies to arbitrate (JSON-encoded).
+
+See C<--base-currency>.
+
+=item B<--base-currency>=I<s@>
+
+Target (crypto)currencies to arbitrate.
+
+If not specified, will list all supported pairs on all the exchanges and include
+the base cryptocurrencies that are listed on at least 2 different exchanges (for
+arbitrage possibility).
+
+
+Can be specified multiple times.
+
+=item B<--db-name>=I<s>*
+
+=item B<--db-password>=I<s>
+
+=item B<--db-username>=I<s>
+
+=item B<--frequency>=I<s>
+
+How many seconds to wait between rounds (in seconds).
+
+Default value:
+
+ 30
+
+=item B<--quote-currencies-json>=I<s>
+
+The currencies to exchange (buy/sell) the target currencies (JSON-encoded).
+
+See C<--quote-currency>.
+
+=item B<--quote-currency>=I<s@>
+
+The currencies to exchange (buy/sell) the target currencies.
+
+You can have fiat currencies as the quote currencies, to buy/sell the target
+(base) currencies during arbitrage. For example, to arbitrage LTC against USD
+and IDR, `base_currencies` is ['BTC'] and `quote_currencies` is ['USD', 'IDR'].
+
+You can also arbitrage cryptocurrencies against other cryptocurrency (usually
+BTC, "the USD of cryptocurrencies"). For example, to arbitrage XMR and LTC
+against BTC, `base_currencies` is ['XMR', 'LTC'] and `quote_currencies` is
+['BTC'].
+
+
+Can be specified multiple times.
+
+=back
+
 =head2 Options for subcommand opportunities
 
 =over
@@ -729,6 +823,16 @@ List of available configuration parameters:
  db_password (see --db-password)
  db_username (see --db-username)
  max_order_age (see --max-order-age)
+
+=head2 Configuration for subcommand collect-orderbooks
+
+ accounts (see --accounts)
+ base_currencies (see --base-currency)
+ db_name (see --db-name)
+ db_password (see --db-password)
+ db_username (see --db-username)
+ frequency (see --frequency)
+ quote_currencies (see --quote-currency)
 
 =head2 Configuration for subcommand dump-cryp-config
 

@@ -12,6 +12,28 @@ Revision history for HTTP::DAV
 
 =end text
 
+=head2 v0.49 (released 2018/11/28):
+
+=over 4
+
+=item * B<bug fixes>
+
+Fixed perl shebang line in C<dave> script, for ExtUtils::MakeMaker to correctly
+replace it. Closes C<RT#127819>.
+
+Fixed C<propfind> response handling to also consider successful an HTTP 207
+status code. Closes C<RT#127591>.
+
+Fixed C<clone()> method to properly respect the class name. Closes C<RT#123528>.
+Thanks to Ricardo Signes for the patch.
+
+=item * B<documentation fixes>
+
+Fixed various pod issues raised by Debian contributor C<fsfs@debian.org>.
+Closes C<RT#119878>.
+
+=back
+
 =head2 v0.48 (released 2015/03/26):
 
 =over 4

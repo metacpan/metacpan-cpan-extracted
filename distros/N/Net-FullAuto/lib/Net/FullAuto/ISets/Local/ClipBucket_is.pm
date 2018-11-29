@@ -218,7 +218,10 @@ if ($b==1) {
          'git clone https://github.com/php/php-src.git','__display__');
       ($stdout,$stderr)=$handle->cwd('php-src');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git checkout PHP-7.1.21','__display__');
+         'wget -qO- http://php.net/downloads.php','__display__');
+      $stdout=~s/^.*?Current Stable.*?PHP\s+(.*?)\s+.*$/$1/s;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout PHP-$stdout",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -396,12 +399,12 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v fdk-aac.pc /usr/lib64/pkgconfig','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      my $lame_tar='lame-3.99.5.tar.gz';
-      my $lame_md5='84835b313d4a8b68f5349816d33e07ce';
+      my $lame_tar='lame-3.100.tar.gz';
+      my $lame_md5='83e260acbe4389b54fe08e0bdbf7cddb';
       foreach my $count (1..3) {
          ($stdout,$stderr)=$handle->cmd($sudo.
             'wget --random-wait --progress=dot '.
-            'http://downloads.sourceforge.net/project/lame/lame/3.99/'.
+            'https://downloads.sourceforge.net/project/lame/lame/3.100/'.
             $lame_tar,'__display__');
          ($stdout,$stderr)=$handle->cmd($sudo.
             "md5sum -c - <<<\"$lame_md5 $lame_tar\"",
@@ -425,8 +428,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      my $libogg_tar='libogg-1.3.0.tar.gz';
-      my $libogg_md5='0a7eb40b86ac050db3a789ab65fe21c2';
+      my $libogg_tar='libogg-1.3.3.tar.gz';
+      my $libogg_md5='1eda7efc22a97d08af98265107d65f95';
       foreach my $count (1..3) {
          ($stdout,$stderr)=$handle->cmd($sudo.
             'wget --random-wait --progress=dot '.
@@ -536,8 +539,8 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'cp -v sdl2.pc /usr/lib64/pkgconfig',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
-      my $libvorbis_tar='libvorbis-1.3.3.tar.gz';
-      my $libvorbis_md5='6b1a36f0d72332fae5130688e65efe1f';
+      my $libvorbis_tar='libvorbis-1.3.6.tar.gz';
+      my $libvorbis_md5='d3190649b26572d44cd1e4f553943b31';
       foreach my $count (1..3) {
          ($stdout,$stderr)=$handle->cmd($sudo.
             'wget --random-wait --progress=dot '.
@@ -640,6 +643,7 @@ END
       ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
    } 
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
+   # svn checkout svn://svn.mplayerhq.hu/mplayer/trunk mplayer  open port 3690
    ($stdout,$stderr)=$handle->cmd($sudo.
       'export PATH=/usr/local/bin/:$PATH;which flvtool2');
    if ($stdout!~/\/FLV/) {
@@ -652,10 +656,10 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'export PATH=/usr/local/bin/:$PATH;which mediainfo');
    if ($stdout!~/\/mediainfo/) {
-      my $mediainfo_tar='MediaInfo_CLI_0.7.92.1_GNU_FromSource.tar.gz';
+      my $mediainfo_tar='MediaInfo_CLI_18.08.1_GNU_FromSource.tar.xz';
       ($stdout,$stderr)=$handle->cmd($sudo.
          "wget --random-wait --progress=dot ".
-         "https://mediaarea.net/download/binary/mediainfo/0.7.92.1/".
+         "https://mediaarea.net/download/binary/mediainfo/18.08.1/".
          $mediainfo_tar,300,
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.

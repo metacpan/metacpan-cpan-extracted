@@ -1,7 +1,7 @@
 package Perinci::Examples::CmdLineSrc;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.80'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.810'; # VERSION
 
 use 5.010;
 use strict;
@@ -225,7 +225,7 @@ Perinci::Examples::CmdLineSrc - Examples for using cmdline_src function property
 
 =head1 VERSION
 
-This document describes version 0.80 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2017-07-11.
+This document describes version 0.810 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2018-11-29.
 
 =head1 FUNCTIONS
 
@@ -234,7 +234,7 @@ This document describes version 0.80 of Perinci::Examples::CmdLineSrc (from Perl
 
 Usage:
 
- cmdline_src_file(%args) -> [status, msg, result, meta]
+ cmdline_src_file(%args) -> [status, msg, payload, meta]
 
 This function has args with cmdline_src=file.
 
@@ -255,7 +255,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -266,7 +266,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_invalid_arg_type(%args) -> [status, msg, result, meta]
+ cmdline_src_invalid_arg_type(%args) -> [status, msg, payload, meta]
 
 This function has non-str/non-array arg with cmdline_src.
 
@@ -285,7 +285,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -296,7 +296,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_multi_stdin(%args) -> [status, msg, result, meta]
+ cmdline_src_multi_stdin(%args) -> [status, msg, payload, meta]
 
 This function has multiple args with cmdline_src stdin/stdin_or_files.
 
@@ -317,7 +317,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -328,7 +328,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_multi_stdin_line(%args) -> [status, msg, result, meta]
+ cmdline_src_multi_stdin_line(%args) -> [status, msg, payload, meta]
 
 This function has several stdin_line arguments.
 
@@ -353,7 +353,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -364,7 +364,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_array(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_array(%args) -> [status, msg, payload, meta]
 
 This function has arg with cmdline_src=stdin.
 
@@ -383,7 +383,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -394,7 +394,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_line(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_line(%args) -> [status, msg, payload, meta]
 
 This function has a single stdin_line argument.
 
@@ -415,7 +415,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -426,7 +426,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_or_args_array(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_or_args_array(%args) -> [status, msg, payload, meta]
 
 This function has array arg with cmdline_src=stdin_or_args.
 
@@ -445,7 +445,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -456,7 +456,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_or_file_array(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_or_file_array(%args) -> [status, msg, payload, meta]
 
 This function has array arg with cmdline_src=stdin_or_file.
 
@@ -475,7 +475,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -486,7 +486,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_or_file_str(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_or_file_str(%args) -> [status, msg, payload, meta]
 
 This function has str arg with cmdline_src=stdin_or_file.
 
@@ -505,7 +505,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -516,7 +516,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_or_files_array(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_or_files_array(%args) -> [status, msg, payload, meta]
 
 This function has array arg with cmdline_src=stdin_or_files.
 
@@ -535,7 +535,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -546,7 +546,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_or_files_str(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_or_files_str(%args) -> [status, msg, payload, meta]
 
 This function has str arg with cmdline_src=stdin_or_files.
 
@@ -565,7 +565,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -576,7 +576,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_stdin_str(%args) -> [status, msg, result, meta]
+ cmdline_src_stdin_str(%args) -> [status, msg, payload, meta]
 
 This function has arg with cmdline_src=stdin.
 
@@ -595,7 +595,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -606,7 +606,7 @@ Return value:  (any)
 
 Usage:
 
- cmdline_src_unknown(%args) -> [status, msg, result, meta]
+ cmdline_src_unknown(%args) -> [status, msg, payload, meta]
 
 This function has arg with unknown cmdline_src value.
 
@@ -625,7 +625,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -636,7 +636,7 @@ Return value:  (any)
 
 Usage:
 
- test_binary(%args) -> [status, msg, result, meta]
+ test_binary(%args) -> [status, msg, payload, meta]
 
 Accept binary in stdin/file.
 
@@ -658,7 +658,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -686,7 +686,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

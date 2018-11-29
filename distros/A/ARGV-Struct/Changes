@@ -12,3 +12,5 @@
  - Migrate to Moo and Type::Tiny
 0.05 2018-09-18 23:10:00
  - Changes to dist.ini resulted in Makefile.PL not being generated
+0.06 2018-11-28 23:00:00
+ - bin/argvstruct wasn't getting the correct shebang after installation (toddr)

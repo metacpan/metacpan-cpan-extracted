@@ -6,7 +6,7 @@ use DBI;
 use DBD::Pg;
 use Getopt::Long;
 use File::Spec;
-our $VERSION = '3.33';
+our $VERSION = '3.34';
 
 Getopt::Long::Configure (qw(bundling));
 
@@ -251,18 +251,29 @@ sub sequences_are {
 sub functions_are {
     my $schema = shift;
     my $sth = $dbh->prepare(q{
-        SELECT p.proname
+        SELECT p.proname, md5(p.prosrc) as md5, proargtypes::text
           FROM pg_catalog.pg_proc p
           JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
          WHERE n.nspname = ?
          ORDER BY p.proname
     });
-    my $funcs = $dbh->selectcol_arrayref($sth, undef, $schema);
-    return unless $funcs && @$funcs;
+    my $allfuncs = $dbh->selectall_arrayref($sth, undef, $schema);
+    return unless $allfuncs && @$allfuncs;
+    my @funcs=map{$_->[0]} @$allfuncs;
     print "SELECT functions_are('$schema', ARRAY[\n    '",
-        join("',\n    '", @$funcs),
+        join("',\n    '", @funcs),
         "'\n]);\n\n";
     $total_tests++;
+    for my $row (@$allfuncs) {
+        my ($proname, $md5, $proargs)=@$row;
+        print qq{SELECT is(md5(p.prosrc), '$md5', 'Function $proname body should match checksum')
+  FROM pg_catalog.pg_proc p
+  JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
+ WHERE n.nspname = '$schema'
+   AND proname = '$proname'
+   AND proargtypes::text = '$proargs';\n\n};
+        $total_tests++;
+    }
 #
 # debating whether to check full function existance and thus full ownership ornot
 #    for my $func (@{ $funcs }) {
@@ -644,6 +655,6 @@ David E. Wheeler <dwheeler@cpan.org>
 
 =head1 Copyright
 
-Copyright (c) 2009-2016 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2009-2018 David E. Wheeler. Some Rights Reserved.
 
 =cut

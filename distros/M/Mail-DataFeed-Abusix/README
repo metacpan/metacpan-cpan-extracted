@@ -1,0 +1,102 @@
+NAME
+
+    Mail::DataFeed::Abusix - Send SMTP transaction data to the Abusix
+    transaction feed
+
+VERSION
+
+    version 1.20181128
+
+SYNOPSIS
+
+      use Mail::DataFeed::Abusix;
+    
+      my $abusix_feed = Mail::DataFeed::Abusix->new(
+        feed_name => 'testing_feed',
+        feed_dest => 'test.endpoint.example.com:1234',
+        feed_key => 'this_is_a_secret',
+      );
+    
+      $abusix_feed->port(25);
+      $abusix_feed->ip_address('1.2.3.4');
+      $abusix_feed->reverse_dns('test.example.org');
+      $abusix_feed->helo('server.example.org');
+      $abusix_feed->used_esmtp(1);
+      $abusix_feed->used_tls(1);
+      $abusix_feed->used_auth(0);
+      $abusix_feed->mail_from_domain('from.example.org');
+    
+      $abusix_feed->send();
+
+DESCRIPTION
+
+    Send SMTP transaction data via udp to the Abusix real-time transaction
+    feed.
+
+CONSTRUCTOR
+
+ new(%args)
+
+      Create a new Abusix feed object
+    
+      Required args
+    
+      * feed_name - This identifies the feed to the collector.
+      * feed_key - This authenticates the feed data against the feed_name to the collector
+      * feed_dest -  The host or host:port where the data should be sent.
+                     If the port is not specified then it defaults to port 12211.
+                     Multiple destinations can be specified using comma, semicolon or whitespace to delimit the hosts.
+                     If multiple hosts are specified then the data is sent to them all.
+
+METHODS
+
+ port($port)
+
+      Set the port used to connect to the SMTP server
+
+ ip_address($ip_address)
+
+      Set the IP address (ipv4 or ipv6) connecting to the SMTP server
+
+ reverse_dns($hostname)
+
+      Set the reverse DNS of the connecting IP address.
+
+ helo($helo)
+
+      Set the HELO string used to connect to the SMTP server.
+
+ used_esmtp()
+
+      Set to true if ESMTP (EHLO) was used in the connection.
+      Set to false if SMTP (HELO) was used in the connection.
+
+ used_tls()
+
+      Set to true if TLS was used in the connection.
+      Set to false if TLS was NOT used in the connection.
+
+ used_auth()
+
+      Set to true if SMTP authentication was used in the connection.
+      Set to false if SMTP authentication was NOT used in the connection.
+
+ mail_from_domain()
+
+      Set the mail from domain.
+
+ send()
+
+      Send the report to abusix.
+
+AUTHOR
+
+    Marc Bradshaw <marc@marcbradshaw.net>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018 by Marc Bradshaw.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

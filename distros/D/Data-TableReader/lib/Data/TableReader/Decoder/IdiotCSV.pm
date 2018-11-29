@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::IdiotCSV;
-$Data::TableReader::Decoder::IdiotCSV::VERSION = '0.007';
+$Data::TableReader::Decoder::IdiotCSV::VERSION = '0.008';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -36,7 +36,7 @@ Data::TableReader::Decoder::IdiotCSV - Access rows of a badly formatted comma-de
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

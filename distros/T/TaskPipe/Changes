@@ -27,3 +27,6 @@ Revision history for Perl extension TaskPipe.
 
 0.08  Wed Nov 22 10:39:10 2018
 	- Remove auto-created configs which were causing test fails
+
+0.09  Tue Nov 27 15:59:15 2018
+	- Correct shebang lines in scripts

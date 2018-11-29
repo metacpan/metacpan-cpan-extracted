@@ -5,6 +5,7 @@
 
 enum {
   SPVM_PACKAGE_VAR_C_FLAG_PRIVATE = 1,
+  SPVM_PACKAGE_VAR_C_FLAG_PUBLIC = 2,
 };
 
 struct SPVM_package_var {
@@ -16,6 +17,8 @@ struct SPVM_package_var {
   SPVM_OP* op_name;
   int32_t id;
   int32_t flag;
+  int32_t has_setter;
+  int32_t has_getter;
 };
 
 SPVM_PACKAGE_VAR* SPVM_PACKAGE_VAR_new(SPVM_COMPILER* compiler);

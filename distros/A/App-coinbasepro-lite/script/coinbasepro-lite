@@ -1,0 +1,341 @@
+#!perl
+
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $prefix = '/App/coinbasepro/lite/';
+
+Perinci::CmdLine::Any->new(
+    url => $prefix,
+    subcommands => {
+        public  => { url => "${prefix}public", },
+        private => { url => "${prefix}private", },
+    },
+    log => 1,
+)->run;
+
+# ABSTRACT: Thin CLI for Coinbase Pro API
+# PODNAME: coinbasepro-lite
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+coinbasepro-lite - Thin CLI for Coinbase Pro API
+
+=head1 VERSION
+
+This document describes version 0.003 of coinbasepro-lite (from Perl distribution App-coinbasepro-lite), released on 2018-11-29.
+
+=head1 SYNOPSIS
+
+First, create an account at Coinbase Pro. Create an API then insert the API information
+in F<~/.config/coinbasepro-lite.conf>. Since the configuration file contains sensitive
+information, please make sure that the permission of the file is set so that
+unauthorized users cannot read it (e.g. chmod it to 0600).
+
+ # In ~/.config/coinbasepro-lite.conf
+ key = ...
+ secret = ...
+ passphrase = ...
+
+To perform a public request:
+
+ # list all products (currency pairs or markets)
+ % coinbasepro-lite public /products
+
+ # get order book for a product
+ % coinbasepro-lite public /products/BTC-USD/book?level=2
+
+To perform a private request:
+
+ % coinbasepro-lite private /coinbase-accounts
+ % coinbasepro-lite private /reports --arg type=fills --arg start_date=2018-02-01T00:00:00.000Z --arg end_date=2018-02-10T00:00:00.000Z
+
+=head1 DESCRIPTION
+
+This package offers a thin CLI for accessing Coinbase Pro API (public or
+private), mainly for debugging/testing.
+
+=head1 SUBCOMMANDS
+
+=head2 B<private>
+
+Perform a public API request.
+
+=head2 B<public>
+
+Perform a public API request.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand private
+
+=over
+
+=item B<--arg>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--args-json>=I<s>
+
+See C<--arg>.
+
+=item B<--endpoint>=I<s>*
+
+=item B<--key>=I<s>*
+
+=item B<--method>=I<s>
+
+Default value:
+
+ "GET"
+
+=item B<--passphrase>=I<s>*
+
+=item B<--secret>=I<s>*
+
+=back
+
+=head2 Options for subcommand public
+
+=over
+
+=item B<--arg>=I<s>%
+
+Each value is a name-value pair, use I<key=value> syntax. Can be specified multiple times.
+
+=item B<--args-json>=I<s>
+
+See C<--arg>.
+
+=item B<--endpoint>=I<s>*
+
+=item B<--method>=I<s>
+
+Default value:
+
+ "GET"
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C coinbasepro-lite coinbasepro-lite
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete coinbasepro-lite 'p/*/`coinbasepro-lite`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/coinbasepro-lite.conf>, F<~/coinbasepro-lite.conf>, or F</etc/coinbasepro-lite.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand private
+
+ args (see --arg)
+ endpoint (see --endpoint)
+ key (see --key)
+ method (see --method)
+ passphrase (see --passphrase)
+ secret (see --secret)
+
+=head2 Configuration for subcommand public
+
+ args (see --arg)
+ endpoint (see --endpoint)
+ method (see --method)
+
+=head1 ENVIRONMENT
+
+=head2 COINBASEPRO_LITE_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/coinbasepro-lite.conf>
+
+F<~/coinbasepro-lite.conf>
+
+F</etc/coinbasepro-lite.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-coinbasepro-lite>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-coinbasepro-lite>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-coinbasepro-lite>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<https://docs.pro.coinbase.com/>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

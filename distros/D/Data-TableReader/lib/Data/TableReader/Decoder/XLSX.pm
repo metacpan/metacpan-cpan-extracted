@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::XLSX;
-$Data::TableReader::Decoder::XLSX::VERSION = '0.007';
+$Data::TableReader::Decoder::XLSX::VERSION = '0.008';
 use Moo 2;
 use Carp;
 use Try::Tiny;
@@ -30,7 +30,7 @@ sub _build_workbook {
 		if ($class->isa('Spreadsheet::XLSX')) {
 			$wbook= $class->new($f);
 		} else {
-			$wbook= $class->new->parse($f);
+			$wbook= $class->new->parse($f, $self->xls_formatter);
 		}
 	}
 	defined $wbook or croak "Can't parse file '".$self->file_name."'";
@@ -51,7 +51,7 @@ Data::TableReader::Decoder::XLSX - Access sheets/rows of a modern Microsoft Exce
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '1.026'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '1.028'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,7 +63,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.026 of lcpan (from Perl distribution App-lcpan), released on 2018-09-08.
+This document describes version 1.028 of lcpan (from Perl distribution App-lcpan), released on 2018-11-29.
 
 =head1 SYNOPSIS
 
@@ -980,7 +980,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -1016,11 +1016,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--author-arg>=I<s>*
+
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
-
-=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1064,7 +1064,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -1441,7 +1441,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -1515,7 +1515,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--phase>=I<s>
 
@@ -2323,7 +2323,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2479,7 +2479,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.1"
+ "v5.26.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3151,6 +3151,18 @@ Select CPAN mirror to download from.
 
 =item B<--skip-file-indexing-pass-3>
 
+=item B<--skip-index-file-pattern>=I<s@>
+
+Skip a file pattern from being indexed.
+
+Can be specified multiple times.
+
+=item B<--skip-index-file-patterns-json>=I<s>
+
+Skip one or more file patterns from being indexed (JSON-encoded).
+
+See C<--skip-index-file-pattern>.
+
 =item B<--skip-index-file>=I<s@>
 
 Skip a file from being indexed.
@@ -3317,7 +3329,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author)
+ author (see --author-arg)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --no-include-core)
@@ -3787,6 +3799,7 @@ List of available configuration parameters:
  skip_file_indexing_pass_1 (see --skip-file-indexing-pass-1)
  skip_file_indexing_pass_2 (see --skip-file-indexing-pass-2)
  skip_file_indexing_pass_3 (see --skip-file-indexing-pass-3)
+ skip_index_file_patterns (see --skip-index-file-pattern)
  skip_index_files (see --skip-index-file)
  skip_sub_indexing (see --no-skip-sub-indexing)
  update_files (see --no-update-files)

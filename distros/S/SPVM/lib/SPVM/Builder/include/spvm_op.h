@@ -163,6 +163,10 @@ enum {
   SPVM_OP_C_ID_DEREF,
   SPVM_OP_C_ID_DOT3,
   SPVM_OP_C_ID_STRING_LENGTH,
+  SPVM_OP_C_ID_RW,
+  SPVM_OP_C_ID_RO,
+  SPVM_OP_C_ID_WO,
+  SPVM_OP_C_ID_BEGIN,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
@@ -207,6 +211,11 @@ enum {
   // ARRAY_ACCESS flag
   SPVM_OP_C_FLAG_ARRAY_ACCESS_WEAKEN = 1,
   SPVM_OP_C_FLAG_ARRAY_ACCESS_CONST = 2,
+};
+
+enum {
+  // NEW flag
+  SPVM_OP_C_FLAG_NEW_INLINE = 1,
 };
 
 /* Binary operation */
@@ -319,7 +328,7 @@ SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type, SPV
 SPVM_OP* SPVM_OP_build_ref_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_original);
 SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_name_package, SPVM_OP* op_name_field);
 SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPVM_OP* op_name_package, SPVM_OP* op_block, SPVM_OP* op_list_descriptors);
-SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_subname, SPVM_OP* op_return_type, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_block, SPVM_OP* op_list_captures, SPVM_OP* op_dot3);
+SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_subname, SPVM_OP* op_return_type, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_block, SPVM_OP* op_list_captures, SPVM_OP* op_dot3, int32_t is_begin);
 SPVM_OP* SPVM_OP_build_CONSTVALUE(SPVM_COMPILER* compiler, SPVM_OP* op_const);
 SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_field_base_name, SPVM_OP* op_descripters, SPVM_OP* type);
 SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* package_var, SPVM_OP* op_package_var_name, SPVM_OP* op_descriptors, SPVM_OP* op_type);
@@ -393,5 +402,6 @@ SPVM_OP* SPVM_OP_new_op_term_mutable_clone(SPVM_COMPILER* compiler, SPVM_OP* ori
 SPVM_OP* SPVM_OP_build_special_assign(SPVM_COMPILER* compiler, SPVM_OP* op_special_assign, SPVM_OP* op_term_dist, SPVM_OP* op_term_src);
 
 SPVM_OP* SPVM_OP_build_package_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_package_var_name);
+int32_t SPVM_OP_get_list_elements_count(SPVM_COMPILER* compiler, SPVM_OP* op_list);
 
 #endif

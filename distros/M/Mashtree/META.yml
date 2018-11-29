@@ -1,7 +1,7 @@
 ---
 abstract: 'Create a tree using Mash distances.'
 author:
-  - unknown
+  - 'Lee S. Katz <gzu2@cdc.gov>'
 build_requires:
   Test::More: '0.47'
 configure_requires:
@@ -34,5 +34,5 @@ requires:
   threads::shared: '0'
 resources:
   repository: git://github.com/lskatz/mashtree.git
-version: '0.34'
+version: v0.35.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

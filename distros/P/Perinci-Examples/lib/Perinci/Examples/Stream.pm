@@ -1,7 +1,7 @@
 package Perinci::Examples::Stream;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.80'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.810'; # VERSION
 
 use 5.010;
 use strict;
@@ -368,7 +368,7 @@ Perinci::Examples::Stream - Examples for streaming input/output
 
 =head1 VERSION
 
-This document describes version 0.80 of Perinci::Examples::Stream (from Perl distribution Perinci-Examples), released on 2017-07-11.
+This document describes version 0.810 of Perinci::Examples::Stream (from Perl distribution Perinci-Examples), released on 2018-11-29.
 
 =head1 DESCRIPTION
 
@@ -382,7 +382,7 @@ This package contains functions that demonstrate streaming input/output.
 
 Usage:
 
- count_ints(%args) -> [status, msg, result, meta]
+ count_ints(%args) -> [status, msg, payload, meta]
 
 This function accepts a stream of integers and return the number of integers input.
 
@@ -403,7 +403,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -414,7 +414,7 @@ Return value:  (any)
 
 Usage:
 
- count_lines(%args) -> [status, msg, result, meta]
+ count_lines(%args) -> [status, msg, payload, meta]
 
 Count number of lines in the input.
 
@@ -435,7 +435,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -446,7 +446,7 @@ Return value:  (any)
 
 Usage:
 
- count_words(%args) -> [status, msg, result, meta]
+ count_words(%args) -> [status, msg, payload, meta]
 
 This function receives a stream of words and return the number of words.
 
@@ -467,7 +467,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -478,7 +478,7 @@ Return value:  (any)
 
 Usage:
 
- produce_hashes(%args) -> [status, msg, result, meta]
+ produce_hashes(%args) -> [status, msg, payload, meta]
 
 This function produces a stream of hashes.
 
@@ -501,7 +501,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -512,7 +512,7 @@ Return value:  (array[hash])
 
 Usage:
 
- produce_ints(%args) -> [status, msg, result, meta]
+ produce_ints(%args) -> [status, msg, payload, meta]
 
 This function produces a stream of integers, starting from 1.
 
@@ -535,7 +535,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -546,7 +546,7 @@ Return value:  (array[int])
 
 Usage:
 
- produce_words(%args) -> [status, msg, result, meta]
+ produce_words(%args) -> [status, msg, payload, meta]
 
 This function produces a stream of random words.
 
@@ -569,7 +569,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -580,7 +580,7 @@ Return value:  (array[str])
 
 Usage:
 
- produce_words_err(%args) -> [status, msg, result, meta]
+ produce_words_err(%args) -> [status, msg, payload, meta]
 
 Like `produce_words()`, but 1 in every 10 words will be a non-word (which fails the result schema).
 
@@ -603,7 +603,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -614,7 +614,7 @@ Return value:  (array[str])
 
 Usage:
 
- square_nums(%args) -> [status, msg, result, meta]
+ square_nums(%args) -> [status, msg, payload, meta]
 
 This function squares its stream input.
 
@@ -633,7 +633,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -644,7 +644,7 @@ Return value:  (array[float])
 
 Usage:
 
- square_nums_from_file(%args) -> [status, msg, result, meta]
+ square_nums_from_file(%args) -> [status, msg, payload, meta]
 
 This function squares its stream input.
 
@@ -663,7 +663,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -674,7 +674,7 @@ Return value:  (array[float])
 
 Usage:
 
- square_nums_from_stdin(%args) -> [status, msg, result, meta]
+ square_nums_from_stdin(%args) -> [status, msg, payload, meta]
 
 This function squares its stream input.
 
@@ -693,7 +693,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -704,7 +704,7 @@ Return value:  (array[float])
 
 Usage:
 
- square_nums_from_stdin_or_file(%args) -> [status, msg, result, meta]
+ square_nums_from_stdin_or_file(%args) -> [status, msg, payload, meta]
 
 This function squares its stream input.
 
@@ -723,7 +723,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -734,7 +734,7 @@ Return value:  (array[float])
 
 Usage:
 
- wc(%args) -> [status, msg, result, meta]
+ wc(%args) -> [status, msg, payload, meta]
 
 Count the number of lines/words/characters of input, like the "wc" command.
 
@@ -753,7 +753,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -764,7 +764,7 @@ Return value:  (hash)
 
 Usage:
 
- wc_keys(%args) -> [status, msg, result, meta]
+ wc_keys(%args) -> [status, msg, payload, meta]
 
 Count the number of keys of each hash.
 
@@ -786,7 +786,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -814,7 +814,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

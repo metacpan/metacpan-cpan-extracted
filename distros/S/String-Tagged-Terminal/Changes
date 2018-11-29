@@ -1,5 +1,13 @@
 Revision history for String-Tagged-Terminal
 
+0.04    2018-11-29 14:17:27
+        [CHANGES]
+         * Experimental MSWin32 support, by Max Maischein
+
+        [BUGFIXES]
+         * Bugfix to bold attribute reset on escape-driven terminals when
+           other rendering attributes are still present
+
 0.03    2018-08-17 12:22:57
         [CHANGES]
          * Added ->print_to_terminal and ->say_to_terminal methods

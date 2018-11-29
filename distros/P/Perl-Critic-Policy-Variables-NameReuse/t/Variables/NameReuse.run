@@ -1,0 +1,69 @@
+## name NoReuseBasic
+## failures 0
+## cut
+
+$foo, @bar, $#bar, %baz;
+
+## name NoReuseSlice
+## failures 0
+## cut
+
+@foo, $foo[0];
+%bar, $bar{baz};
+
+## name NoReuseRef
+## failures 0
+## cut
+
+$foo, $$foo[0], $$foo{bar};
+
+## name NoReuseRefSlice
+## failures 0
+## cut
+
+@$foo[0,1], @$foo{'bar','baz'};
+
+## name ReuseBasic
+## failures 3
+## cut
+
+$foo, @foo, %foo;
+
+## name ReuseMultiple
+## failures 2
+## cut
+
+$foo, $#foo, $foo;
+
+## name ReuseSlice
+## failures 4
+## cut
+
+$foo, $foo[0];
+$bar, $bar{baz};
+
+## name ReuseRef
+## failures 3
+## cut
+
+$foo[0], $$foo[0];
+$foo{bar}, $$foo{bar};
+
+## name ReuseRefSlice
+## failures 3
+## cut
+
+@foo[0,1], @$foo[0,1];
+@foo{'bar','baz'}, @$foo{'bar','baz'};
+
+## name ReuseIndex
+## failures 2
+## cut
+
+%foo, $#foo;
+
+## name ReuseIndexRef
+## failures 2
+## cut
+
+@foo, $#$foo;

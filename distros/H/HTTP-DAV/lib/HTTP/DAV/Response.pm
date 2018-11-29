@@ -189,7 +189,7 @@ Instances of this class are usually created by a C<HTTP::DAV::Resource> object a
 
 HTTP::DAV::Response was created to handle two extra functions that normal HTTP Responses don't require:
 
- - WebDAV reponses have 6 extra error codes: 102, 207, 422, 423, 424 and 507. Older versions of the LWP's C<HTTP::Status> class did not have these extra codes. These were added.
+ - WebDAV responses have 6 extra error codes: 102, 207, 422, 423, 424 and 507. Older versions of the LWP's C<HTTP::Status> class did not have these extra codes. These were added.
 
  - WebDAV responses can actually contain more than one response (and often DO contain more than one) in the form of a "Multistatus". These multistatus responses come in the form of an XML document. HTTP::DAV::Response can accurately parse these XML responses and emulate the normal of the C<HTTP::Response>.
 
@@ -312,6 +312,8 @@ e.g. $messages eq "Forbidden\nLocked";
 e.g. @messages eq ["Forbidden", "Locked"];
 
 This routine is a variant on the standard C<HTTP::Response> C<message()>. 
+
+=back
 
 =cut
 

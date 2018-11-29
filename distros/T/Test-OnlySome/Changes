@@ -1,0 +1,33 @@
+Revision history for Test-OnlySome
+
+0.0_1   2018-11-23
+
+    - First version, released on an unsuspecting world.
+
+0.0_2   2018-11-24
+
+    - Require Keyword::Declare 0.001006+ based on cpantesters matrix results.
+    - Support implicit configuration using a package-level variable rather than
+      an expressly-passed hashref.
+
+0.0_3   2018-11-25
+
+    - Can be used via Import::Into and Test::Kit
+
+0.0_4   2018-11-26
+
+    - Support package args to specify which tests to skip
+
+0.0.5   2018-11-28
+
+    - Package args now use a "skip" keyword ahead of the test numbers
+      to skip.
+    - Test numbers must be >= 1.
+    - Added App::Prove plugin to collect test results
+    - Added loader module Test::OnlySome::RerunFailed to load the collected
+      test results and mark all cleanly-passed tests in a file to be skipped
+      by Test::OnlySome.
+
+0.0.6   2018-11-29
+
+    - Updated documentation

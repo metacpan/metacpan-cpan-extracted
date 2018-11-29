@@ -1,5 +1,5 @@
 package My::Fixtures;
-use Moose;
+use Moo;
 use DateTime;
 use namespace::autoclean;
 extends 'DBIx::Class::EasyFixture';
@@ -208,7 +208,5 @@ sub get_definition {
 }
 
 sub all_fixture_names { return keys %definition_for }
-
-__PACKAGE__->meta->make_immutable;
 
 1;

@@ -1,5 +1,8 @@
 Revision history for Calendar::Saka
 
+1.36  Wed Nov 28 15:15:00 2018
+      - Upgraded to use Date::Saka::Simple v0.21.
+
 1.35  Tue Nov 13 17:40:00 2018
       - Used namespace::autoclean instead.
 

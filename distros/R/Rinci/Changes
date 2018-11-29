@@ -1,3 +1,8 @@
+1.1.87  2018-11-29 (PERLANCAR)
+
+	- Specify function argument 'examples'.
+
+
 1.1.86  2017-12-09 (PERLANCAR)
 
 	- [Incompatible change] Revert 1.1.85's change: "Specify that example's

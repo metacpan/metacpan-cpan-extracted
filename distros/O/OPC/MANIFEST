@@ -4,7 +4,7 @@ lib/OPC/Node.pm
 lib/OPC/Part.pm
 lib/OPC/Root.pm
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/00-load.t
-META.yml
-META.json

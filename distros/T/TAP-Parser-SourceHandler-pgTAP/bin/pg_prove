@@ -4,7 +4,7 @@ use strict;
 use App::Prove;
 use Getopt::Long;
 
-our $VERSION = '3.33';
+our $VERSION = '3.34';
 $|++;
 
 # Fire up the app, process args, and run the tests.
@@ -144,7 +144,7 @@ pg_prove - A command-line tool for running and harnessing pgTAP tests
 =head1 Description
 
 C<pg_prove> is a command-line application to run one or more
-L<pgTAP|http://pgtap.org/> tests in a PostgreSQL database. The output of the
+L<pgTAP|https://pgtap.org/> tests in a PostgreSQL database. The output of the
 tests is harvested and processed by L<TAP::Harness|TAP::Harness> in order to
 summarize the results of the test.
 
@@ -332,7 +332,7 @@ compile time, usually 5432.
   pg_prove -P null=[NULL]
 
 Specifies printing options in the style of C<\pset> in the C<psql> program.
-See L<http://www.postgresql.org/docs/current/static/app-psql.html> for details
+See L<https://www.postgresql.org/docs/current/static/app-psql.html> for details
 on the supported options.
 
 =item C<-S>
@@ -343,7 +343,7 @@ on the supported options.
   pg_prove -S TEST_SEARCH_PATH=test,public
 
 Sets local variables for psql in the style of C<\set> in the C<psql> program.
-See L<http://www.postgresql.org/docs/current/static/app-psql.html> for details
+See L<https://www.postgresql.org/docs/current/static/app-psql.html> for details
 on the supported options.
 
 =item C<--runtests>
@@ -484,7 +484,7 @@ F<.proverc> and is sought only in the current directory.
 Due to how options are loaded you cannot use F<.proverc> for
 C<pg_prove>-specific options, only C<prove> options. However, <pg_prove> does
 support all of the usual libpq
-L<Environment Variables|http://www.postgresql.org/docs/current/static/libpq-envars.html>.
+L<Environment Variables|https://www.postgresql.org/docs/current/static/libpq-envars.html>.
 
 =item C<--norc>
 
@@ -798,6 +798,6 @@ David E. Wheeler <dwheeler@cpan.org>
 
 =head1 Copyright
 
-Copyright (c) 2008-2016 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2008-2018 David E. Wheeler. Some Rights Reserved.
 
 =cut

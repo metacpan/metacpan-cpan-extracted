@@ -90,6 +90,8 @@ METHODS
 
        $str->print_to_terminal( $fh )
 
+    Since version 0.03.
+
     Prints the string to the terminal by building a terminal escape string
     then printing it to the given IO handle (or STDOUT if not supplied).
 
@@ -102,8 +104,28 @@ METHODS
 
        $str->say_to_terminal( $fh )
 
+    Since version 0.03.
+
     Prints the string to the terminal as per "print_to_terminal", followed
     by a linefeed.
+
+COMPATIBILITY NOTES
+
+    On Windows, the following notes apply:
+
+      * On all versions of Windows, the attributes bold, fgindex and
+      bgindex are supported. The bold attribute is implemented by using
+      high-intensity colours, so will be indistinguishable from using
+      high-intensity colour indexes without bold. The full 256-color
+      palette is not supported by Windows, so it is down-converted to the
+      16 colours that are.
+
+      * Starting with Windows 10, also under and reverse are supported.
+
+      * The attributes italic, strike, altfont, blink are not supported on
+      any Windows version.
+
+      * On Windows, only a single output console is supported.
 
 TODO
 

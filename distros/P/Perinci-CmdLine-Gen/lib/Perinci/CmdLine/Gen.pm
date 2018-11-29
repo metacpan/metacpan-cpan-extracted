@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Gen;
 
-our $DATE = '2018-07-16'; # DATE
-our $VERSION = '0.486'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.487'; # VERSION
 
 use 5.010001;
 use strict;
@@ -440,9 +440,9 @@ use experimental 'smartmatch'; no warnings ('void'); require List::Util; use exp
         # determine minimum required version
         if ($cmdline_mod =~ /\APerinci::CmdLine::(Lite|Any)\z/) {
             if ($cmdline_mod eq 'Perinci::CmdLine::Lite') {
-                $cmdline_mod_ver = "1.811";
+                $cmdline_mod_ver = "1.816";
             } else {
-                $extra_modules->{"Perinci::CmdLine::Base"} = "1.811";
+                $extra_modules->{"Perinci::CmdLine::Base"} = "1.816";
                 $extra_modules->{"Perinci::CmdLine::Classic"} = "1.770";
             }
         }
@@ -580,7 +580,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.486 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2018-07-16.
+This document describes version 0.487 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2018-11-29.
 
 =head1 FUNCTIONS
 
@@ -589,7 +589,7 @@ This document describes version 0.486 of Perinci::CmdLine::Gen (from Perl distri
 
 Usage:
 
- gen_pericmd_script(%args) -> [status, msg, result, meta]
+ gen_pericmd_script(%args) -> [status, msg, payload, meta]
 
 Generate Perinci::CmdLine CLI script.
 
@@ -792,7 +792,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -803,7 +803,7 @@ Return value:  (any)
 
 Usage:
 
- gen_perinci_cmdline_script(%args) -> [status, msg, result, meta]
+ gen_perinci_cmdline_script(%args) -> [status, msg, payload, meta]
 
 Generate Perinci::CmdLine CLI script.
 
@@ -1006,7 +1006,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

@@ -34,11 +34,11 @@ Data::PathSimple - Navigate and manipulate data structures using paths
       },
     };
 
-    my $current_perl = get( $data, '/Languages/Perl/CurrentVersion' );
+    my $current_perl = get($data, '/Languages/Perl/CurrentVersion');
     my @perl_urls    = @{ get( $data, '/Languages/Perl/URLs' ) || [] };
     
-    set( $data, '/Languages/Perl/CurrentVersion', '5.16.2' );
-    set( $data, '/Languages/Python/URLs/1/', 'http://pypi.python.org' );
+    set($data, '/Languages/Perl/CurrentVersion', '5.16.2');
+    set($data, '/Languages/Python/URLs/1/', 'http://pypi.python.org');
 
 # DESCRIPTION
 
@@ -52,17 +52,13 @@ motivation is that the path will come from a user using a command line tool.
 
 The latest version can be found at:
 
-&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/alfie/Data-PathSimple](https://github.com/alfie/Data-PathSimple)
-
-Watch the repository and keep up with the latest changes:
-
-&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/alfie/Data-PathSimple/subscription](https://github.com/alfie/Data-PathSimple/subscription)
+&nbsp;&nbsp;&nbsp;&nbsp;[https://gitlab.com/alfiedotwtf/data-pathsimple](https://gitlab.com/alfie/data-pathsimple)
 
 # SUPPORT
 
 Please report any bugs or feature requests at:
 
-&nbsp;&nbsp;&nbsp;&nbsp;[https://github.com/alfie/Data-PathSimple/issues](https://github.com/alfie/Data-PathSimple/issues)
+&nbsp;&nbsp;&nbsp;&nbsp;[https://gitlab.com/alfie/data-pathsimple/issues](https://gitlab.com/alfie/data-pathsimple/issues)
 
 Feel free to fork the repository and submit pull requests :)
 
@@ -81,7 +77,7 @@ To install this module type the following:
 
 # AUTHOR
 
-[Alfie John](https://github.com/alfie) &lt;[alfiej@opera.com](mailto:alfiej@opera.com)&gt;
+[Alfie John](https://www.alfie.wtf)
 
 # WARRANTY
 
@@ -89,8 +85,16 @@ IT COMES WITHOUT WARRANTY OF ANY KIND.
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2012 by Alfie John
+Perpetual Copyright (C) to Alfie John
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see [http://www.gnu.org/licenses/](http://www.gnu.org/licenses/).

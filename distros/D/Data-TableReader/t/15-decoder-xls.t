@@ -6,6 +6,7 @@ use Try::Tiny;
 use File::Spec::Functions 'catfile';
 use Data::TableReader::Decoder::XLSX;
 use Data::TableReader::Decoder::XLS;
+use Data::TableReader;
 
 SKIP: {
 skip "Need an XLS parser", 1
@@ -15,6 +16,7 @@ subtest XLS => sub {
 		[ file_name => '', file_handle => open_data('AddressAuxData.xls'), _log => sub {} ],
 		'XLS decoder' );
 	run_test($xls);
+	run_test_w_sheet($xls);
 };
 }
 
@@ -26,6 +28,7 @@ subtest XLSX => sub {
 		[ file_name => '', file_handle => open_data('AddressAuxData.xlsx'), _log => sub {} ],
 		'XLSX decoder' );
 	run_test($xlsx);
+	run_test_w_sheet($xlsx);
 };
 }
 
@@ -33,7 +36,7 @@ done_testing;
 
 # Both worksheets have the same data, so just repeat the tests
 sub run_test {
-	my $decoder= shift;
+	my ($decoder, $skip_second)= @_;
 
 	ok( my $iter= $decoder->iterator, 'got iterator' );
 	ok( my $iter2= $decoder->iterator, 'second parallel iterator' );
@@ -45,6 +48,7 @@ sub run_test {
 	is_deeply( $iter->(), [ ('') x 5 ], 'row 3 blank' );
 	is_deeply( $iter->(), [ 'Another', '01 Main St', 'Elsewhere', 'OH', 45678 ], 'row 4' );
 	is_deeply( $iter->(), undef, 'no row 5' );
+	return if $skip_second;
 
 	ok( $iter->next_dataset, 'next dataset (worksheet)' );
 	is_deeply( $iter->(), [ 'Zip Codes', '', '', '', 'Cities', '', '', '', 'State Postal Codes', '', '' ], 'sheet 2, first row' );
@@ -55,10 +59,16 @@ sub run_test {
 	is_deeply( $iter->(), undef, 'no row 5' );
 }
 
+sub run_test_w_sheet {
+	my ($decoder) = @_;
+	run_test(Data::TableReader->new(input => $decoder->_sheets->[0], fields => [])->decoder, "skip_second");
+	return;
+}
+
 sub open_data {
 	my $name= shift;
 	my $t_dir= __FILE__;
-	$t_dir =~ s,[^\/]+$,,;
+	$t_dir =~ s,[^\/\\]+$,,;
 	$name= catfile($t_dir, 'data', $name);
 	open(my $fh, "<:raw", $name) or die "open($name): $!";
 	return $fh;

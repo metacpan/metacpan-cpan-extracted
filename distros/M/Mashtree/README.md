@@ -14,6 +14,14 @@ assemblies.
 **Note**: Compressed files are also accepted of any of the
 above file types.  You can compress with gz, bz2, or zip.
 
+### Slow and more accurate
+
+You can get a more accurate tree with the minimum abundance finder. Simply
+give `--mindepth 0`.  This step helps ignore very unique kmers that are 
+more likely read errors.
+
+    mashtree --mindepth 0 --numcpus 12 *.fastq.gz [*.fasta] > mashtree.dnd
+
 ### Advanced
 
     mashtree_wrapper.pl --reps 100 -- --numcpus 12 *.fastq.gz > mashtree.dnd
@@ -34,6 +42,9 @@ above file types.  You can compress with gz, bz2, or zip.
     --numcpus            1    This script uses Perl threads.
     --outmatrix          ''   If specified, will write a distance matrix
                               in tab-delimited format
+    --outtree                 If specified, the tree will be written to
+                              this file and not to stdout. Log messages
+                              will still go to stderr.
     --version                 Display the version and exit
 
     TREE OPTIONS
@@ -49,6 +60,7 @@ above file types.  You can compress with gz, bz2, or zip.
                               to discard lower-abundance kmers.
     --kmerlength         21
     --sketch-size        10000
+
 
 Also see `mashtree_wrapper.pl` for advanced usage. Run either script with
 `--help` for additional information.

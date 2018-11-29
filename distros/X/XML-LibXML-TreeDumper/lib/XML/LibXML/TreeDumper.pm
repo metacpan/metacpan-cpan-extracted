@@ -9,7 +9,7 @@ use Carp;
 use XML::LibXML;
 use Moo;
 
-our $VERSION = 0.02;
+our $VERSION = '0.03';
 
 has data => ( is => 'rw', trigger => \&_parse );
 has node => ( is => 'rw', lazy    => 1, builder => \&_parse);
@@ -78,7 +78,7 @@ XML::LibXML::TreeDumper - print a tree of libxml elements
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -106,6 +106,23 @@ or
   $dumper->data( $file );
   
   $dumper->dump;
+
+=head1 ATTRIBUTES
+
+=head2 data
+
+You can get/set the XML data. If you pass a reference, the value of the reference is handled as a
+string that contains XML. Otherwise it is handled as a file.
+
+=head2 node
+
+The root node of the parsed XML.
+
+=head1 METHODS
+
+=head2 dump
+
+return a string that represents the tree of the XML.
 
 =head1 AUTHOR
 

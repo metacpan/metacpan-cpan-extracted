@@ -1,3 +1,5 @@
+4.05 - allow silos to be opened read only
+
 4.04 - update the convert program to call a module rather than have the logic
        just in the program.
 

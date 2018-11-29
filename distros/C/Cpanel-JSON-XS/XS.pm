@@ -1,5 +1,5 @@
 package Cpanel::JSON::XS;
-our $VERSION = '4.07';
+our $VERSION = '4.08';
 our $XS_VERSION = $VERSION;
 # $VERSION = eval $VERSION;
 
@@ -699,6 +699,18 @@ If C<$enable> is true (or missing), then C<encode> will escape slashes,
 C<"\/">.
 
 This setting has no effect when decoding JSON texts.
+
+
+=item $json = $json->unblessed_bool ([$enable])
+
+=item $enabled = $json->get_unblessed_bool
+
+    $json = $json->unblessed_bool([$enable])
+
+If C<$enable> is true (or missing), then C<decode> will return
+Perl non-object boolean variables (1 and 0) for JSON booleans
+(C<true> and C<false>). If C<$enable> is false, then C<decode>
+will return C<Cpanel::JSON::XS::Boolean> objects for JSON booleans.
 
 
 =item $json = $json->allow_singlequote ([$enable])

@@ -1,7 +1,7 @@
 package Hailo::Tokenizer::Words;
 our $AUTHORITY = 'cpan:AVAR';
-$Hailo::Tokenizer::Words::VERSION = '0.74';
-use v5.28.0;
+$Hailo::Tokenizer::Words::VERSION = '0.75';
+use v5.10.0;
 use utf8;
 use Moose;
 use MooseX::StrictConstructor;

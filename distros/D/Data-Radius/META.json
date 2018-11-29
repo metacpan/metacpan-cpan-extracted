@@ -5,7 +5,7 @@
       "PortaOne <perl-radius at portaone.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_2"
    ],
@@ -23,9 +23,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Data::HexDump" : "0",
-            "ExtUtils::MakeMaker" : "6.64",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "configure" : {
@@ -41,8 +39,14 @@
             "Socket" : "2.021",
             "perl" : "v5.10.0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Data::HexDump" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.1"
+   "version" : "v1.2.2"
 }

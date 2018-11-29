@@ -1,0 +1,65 @@
+NAME
+
+    HTTP::AcceptCharset - Parse the HTTP header 'Accept-Charset'
+
+VERSION
+
+    version 0.03
+
+SYNOPSIS
+
+        use HTTP::AcceptCharset;
+        
+        my $header          = 'utf-8, iso-8859-1;q=0.5';
+        my $charset_header  = HTTP::AcceptCharset->new( $header );
+        
+        # returns utf-8
+        my $use_charset     = $charset_header->match( qw/iso-8859-1 utf-8/ );
+
+ATTRIBUTES
+
+ string
+
+    The header string as passed to new.
+
+ values
+
+    The given charset in the prioritized order.
+
+      Header                    | Values
+      --------------------------+----------------------------
+      utf-8, iso-8859-1;q=0.5   | utf-8, iso-8859-1
+      iso-8859-1;q=0.5, utf-8   | utf-8, iso-8859-1
+      utf-8                     | utf-8
+      utf-8, *                  | utf-8, *
+      utf-8;q=0.2, utf-16;q=0.5 | utf-16, utf-8
+
+METHODS
+
+ new
+
+        my $header          = 'utf-8, iso-8859-1;q=0.5';
+        my $charset_header  = HTTP::AcceptCharset->new( $header );
+
+ match
+
+        # header: 'utf-8, iso-8859-1;q=0.5';
+        my $charset = $charset_header->match('utf-8');               # utf-8
+        my $charset = $charset_header->match('iso-8859-1');          # iso-8859-1
+        my $charset = $charset_header->match('iso-8859-1', 'utf-8'); # utf-8
+        my $charset = $charset_header->match();                      # empty string
+        my $charset = $charset_header->match(undef);                 # empty string
+        my $charset = $charset_header->match('utf-16');              # empty string
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

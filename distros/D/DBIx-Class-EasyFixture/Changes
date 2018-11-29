@@ -1,5 +1,8 @@
 Revision history for DBIx-Class-EasyFixture
 
+        - fix incorrect method name in documentation example
+        - convert from Moose to Moo
+
 0.12    2015-08-28
         - Add support for bi-directional relationships (via github:lohengrin332)
 

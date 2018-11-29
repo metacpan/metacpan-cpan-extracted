@@ -8,6 +8,9 @@ use File::Basename;
 use XML::LibXML::TreeDumper;
 use Test::More;
 
+diag "Testing XML::LibXML::TreeDumper " . $XML::LibXML::TreeDumper::VERSION;
+ok $XML::LibXML::TreeDumper::VERSION;
+
 my $dumper = XML::LibXML::TreeDumper->new;
 isa_ok $dumper, 'XML::LibXML::TreeDumper';
 

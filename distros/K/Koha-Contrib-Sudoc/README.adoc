@@ -1,6 +1,6 @@
 = Chargeur Sudoc Koha par Tamil =
 Tamil s.a.r.l. <contact@tamil.fr>
-v2.22, juillet 2016
+v2.23, novembre 2018
 :linkcss:
 :icons: font
 :toc: right
@@ -339,7 +339,7 @@ chargées soient indexées avant de passer à l'étape de chargement des
 notices bibliographiques, sans quoi le lien biblio -> autorités ne pourra
 pas être réalisé.
 
-Si on est sûr de ne pas avoir des volumes trop importants d'autorités,
+Si on est sûr de ne pas avoir de volumes trop importants d'autorités,
 on peut laisser Koha indexer les autorités en tâche de fond. On attend
 un certain délai avant de lancer le chargement des notices
 bibliographiques.
@@ -627,7 +627,7 @@ biblio:
     - 610
 ----------
 
-=== Configuration de Koha et Zebra ===
+=== Configuration de Koha ===
 
 Une des tâches du Chargeur Sudoc consiste à mettre en correspondance les
 notices d'autorité et bibliographiques en provenance du Sudoc avec les
@@ -642,7 +642,7 @@ doit écraser (partiellement éventuellement) une notice existante. Le PPN
 des autorités sert également à *autoritiser* les zones des notices
 bibliographiques liées à des autorités.
 
-En fonction de son paramétrage de Koha, il peut être nécessaire de
+En fonction de son paramétrage local de Koha, il peut être nécessaire de
 déplacer le PPN dans une zone différente qui n'entre pas en conflit avec
 les zones déjà utilisées. Par exemple, il arrive que la zone 001 des
 notices bibliographiques Koha contienne le *biblionumber* (numéro
@@ -650,14 +650,17 @@ interne des notices Koha). Il est recommandé de déplacer la zone 001 des
 autorités et des notices bibliographiques dans la zone 009. Cette zone
 cible est définie via le paramètre *ppn_move* de la section biblio/auth
 de `sudoc.conf`. Ce déplacement est même indispensable pour les
-autorités parce que l'identifiant interne de Koha est placé en 001. Ce
-n'est pas le cas nécessairement pour les notices bibliographiques.
+autorités parce que l'identifiant interne de Koha (authid) est toujours placé
+en 001. Ce n'est pas le cas nécessairement pour les notices bibliographiques.
 
-Afin que le Chargeur Sudoc puisse interroger les PPN, il faut ajouter aux
-fichiers de configuration de Zebra un nouvel index *PPN*. Par exemple, si on
-déplace les PPN en 009, il faudra ajouter la ligne suivante aux fichiers
-`authority-koha-indexdefs.xml` ou `biblio-koha-indexdefs.xml` des autorités et
-des notices bibliographiques :
+Afin que le Chargeur Sudoc puisse interroger les PPN, il faut configurer son
+moteur de recherche, ElasticSearch ou Zebra, pour indexer le champ qui contient
+le PPN, bibliographique et d'autorité.
+
+*Zebra* -- Il faut ajouter aux fichiers de configuration de Zebra un nouvel
+index *PPN*. Par exemple, si on déplace les PPN en 009, il faudra ajouter la
+ligne suivante aux fichiers `authority-koha-indexdefs.xml` ou
+`biblio-koha-indexdefs.xml` des autorités et des notices bibliographiques :
 
 [source,xml]
 -----

@@ -785,12 +785,21 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       default:
         // Variable
         if (ch == '$') {
+          // Derefernece
           if (*(compiler->bufptr + 1) == '$') {
             compiler->bufptr++;
             SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_DEREF);
             yylvalp->opval = op;
             return DEREF;
           }
+          // Exception variable
+          else if (*(compiler->bufptr + 1) == '@') {
+            compiler->bufptr += 2;
+            SPVM_OP* op_exception_var = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_EXCEPTION_VAR, compiler->cur_file, compiler->cur_line);
+            yylvalp->opval = op_exception_var;
+            return EXCEPTION_VAR;
+          }
+          // Lexical variable or Package variable
           else {
             compiler->bufptr++;
 
@@ -819,6 +828,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 compiler->bufptr++;
               }
             }
+          
 
             int32_t var_name_length_without_sigil = compiler->bufptr - cur_token_ptr;
             char* var_name = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 1 + var_name_length_without_sigil + 1);
@@ -1022,10 +1032,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
             
             if (invalid) {
-              SPVM_COMPILER_error(compiler, "Invalid int literal %s at %s line %d\n", compiler->cur_file, compiler->cur_line);
+              SPVM_COMPILER_error(compiler, "Invalid int literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             else if (out_of_range) {
-              SPVM_COMPILER_error(compiler, "int literal out of range %s at %s line %d\n", compiler->cur_file, compiler->cur_line);
+              SPVM_COMPILER_error(compiler, "int literal out of range at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
             op_constant = SPVM_OP_new_op_constant_int(compiler, num, compiler->cur_file, compiler->cur_line);
           }
@@ -1119,6 +1129,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 if (strcmp(keyword, "byte") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BYTE);
                   return BYTE;
+                }
+                break;
+              case 'B' :
+                if (strcmp(keyword, "BEGIN") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BEGIN);
+                  return BEGIN;
                 }
                 break;
               case 'c' :
@@ -1310,6 +1326,16 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_RETURN);
                   return RETURN;
                 }
+                else if (strcmp(keyword, "rw") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_RW, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  return DESCRIPTOR;
+                }
+                else if (strcmp(keyword, "ro") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_RO, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  return DESCRIPTOR;
+                }
                 break;
               case 's' :
                 if (strcmp(keyword, "self") == 0) {
@@ -1375,6 +1401,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "weaken") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_WEAKEN);
                   return WEAKEN;
+                }
+                else if (strcmp(keyword, "wo") == 0) {
+                  SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_WO, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_descriptor;
+                  return DESCRIPTOR;
                 }
                 break;
               case '_':

@@ -3,8 +3,8 @@ NAME
     interface
 
 VERSION
-    This document describes version 0.010 of App::cryp::exchange (from Perl
-    distribution App-cryp-exchange), released on 2018-06-24.
+    This document describes version 0.011 of App::cryp::exchange (from Perl
+    distribution App-cryp-exchange), released on 2018-11-29.
 
 SYNOPSIS
     Please see included script cryp-exchange.
@@ -13,7 +13,7 @@ FUNCTIONS
   accounts
     Usage:
 
-     accounts(%args) -> [status, msg, result, meta]
+     accounts(%args) -> [status, msg, payload, meta]
 
     List exchange accounts.
 
@@ -28,7 +28,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -37,7 +37,7 @@ FUNCTIONS
   balance
     Usage:
 
-     balance(%args) -> [status, msg, result, meta]
+     balance(%args) -> [status, msg, payload, meta]
 
     List account balance.
 
@@ -52,7 +52,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -61,7 +61,7 @@ FUNCTIONS
   cancel_order
     Usage:
 
-     cancel_order(%args) -> [status, msg, result, meta]
+     cancel_order(%args) -> [status, msg, payload, meta]
 
     Cancel an order.
 
@@ -82,7 +82,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -91,7 +91,7 @@ FUNCTIONS
   create_limit_order
     Usage:
 
-     create_limit_order(%args) -> [status, msg, result, meta]
+     create_limit_order(%args) -> [status, msg, payload, meta]
 
     Create a limit order.
 
@@ -122,7 +122,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -131,7 +131,7 @@ FUNCTIONS
   exchanges
     Usage:
 
-     exchanges(%args) -> [status, msg, result, meta]
+     exchanges(%args) -> [status, msg, payload, meta]
 
     List supported exchanges.
 
@@ -146,7 +146,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -155,7 +155,7 @@ FUNCTIONS
   get_order
     Usage:
 
-     get_order(%args) -> [status, msg, result, meta]
+     get_order(%args) -> [status, msg, payload, meta]
 
     Get information about an order.
 
@@ -176,7 +176,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -185,7 +185,7 @@ FUNCTIONS
   open_orders
     Usage:
 
-     open_orders(%args) -> [status, msg, result, meta]
+     open_orders(%args) -> [status, msg, payload, meta]
 
     List open orders.
 
@@ -202,7 +202,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -211,7 +211,7 @@ FUNCTIONS
   orderbook
     Usage:
 
-     orderbook(%args) -> [status, msg, result, meta]
+     orderbook(%args) -> [status, msg, payload, meta]
 
     Get order book on an exchange.
 
@@ -230,7 +230,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -239,7 +239,7 @@ FUNCTIONS
   pairs
     Usage:
 
-     pairs(%args) -> [status, msg, result, meta]
+     pairs(%args) -> [status, msg, payload, meta]
 
     List pairs supported by exchange.
 
@@ -258,7 +258,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -267,7 +267,7 @@ FUNCTIONS
   ticker
     Usage:
 
-     ticker(%args) -> [status, msg, result, meta]
+     ticker(%args) -> [status, msg, payload, meta]
 
     Get a pair's ticker (last 24h price & volume information).
 
@@ -284,7 +284,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

@@ -4,13 +4,17 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.636';
+our $VERSION = '1.637';
 
 use Exporter qw( import );
 
 our @EXPORT_OK = qw( table_char_width );
 
+
 # test with gnome-terminal - ambiguous characters set to narrow
+
+# Control characters, non-characters and surrogates are removed before using this table.
+# However - to have less ranges in table_char_width - surrogates and non-characters return 1.
 
 
 sub table_char_width { [

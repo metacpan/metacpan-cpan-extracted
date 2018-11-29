@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '1.026'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '1.028'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1141,7 +1141,12 @@ sub _update_files {
     }
     push @filter_args, "-verbose", 1 if log_is_info();
 
-    my @cmd = ("minicpan", "-l", $cpan, "-r", $remote_url);
+    my @cmd = (
+        "minicpan",
+        (log_is_warn() ? () : ("-q")),
+        "-l", $cpan,
+        "-r", $remote_url,
+    );
     my $env = {};
     $env->{PERL5OPT} = "-MLWP::UserAgent::Patch::FilterLcpan=".join(",", @filter_args)
         if @filter_args;
@@ -1645,6 +1650,11 @@ sub _update_index {
                 next FILE;
             }
 
+            if ($args{skip_index_file_patterns} && first {$file->{name} =~ $_} @{ $args{skip_index_file_patterns} }) {
+                log_info("Skipped file %s (reason: skip_index_file_patterns)", $file->{name});
+                next FILE;
+            }
+
             my $path = _fullpath($file->{name}, $cpan, $file->{cpanid});
 
             log_info("[pass %d/3][#%i/%d] Processing file %s ...",
@@ -2042,6 +2052,16 @@ _
                     },
                 },
             },
+            examples => ['Foo-Bar-1.23.tar.gz'],
+        },
+        skip_index_file_patterns => {
+            summary => 'Skip one or more file patterns from being indexed',
+            'x.name.is_plural' => 1,
+            'summary.alt.plurality.singular' => 'Skip a file pattern from being indexed',
+            schema => ['array*', of=>'re*'],
+            cmdline_aliases => {
+            },
+            examples => ['^Foo-Bar-\d'],
         },
         skip_file_indexing_pass_1 => {
             schema => ['bool', is=>1],
@@ -3993,7 +4013,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.026 of App::lcpan (from Perl distribution App-lcpan), released on 2018-09-08.
+This document describes version 1.028 of App::lcpan (from Perl distribution App-lcpan), released on 2018-11-29.
 
 =head1 SYNOPSIS
 
@@ -4006,7 +4026,7 @@ See L<lcpan> script.
 
 Usage:
 
- authors(%args) -> [status, msg, result, meta]
+ authors(%args) -> [status, msg, payload, meta]
 
 List authors.
 
@@ -4064,7 +4084,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4079,7 +4099,7 @@ return array of records.
 
 Usage:
 
- deps(%args) -> [status, msg, result, meta]
+ deps(%args) -> [status, msg, payload, meta]
 
 List dependencies.
 
@@ -4164,7 +4184,7 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.26.0")
 
 Set base Perl version for determining core modules.
 
@@ -4183,7 +4203,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4194,7 +4214,7 @@ Return value:  (any)
 
 Usage:
 
- dists(%args) -> [status, msg, result, meta]
+ dists(%args) -> [status, msg, payload, meta]
 
 List distributions.
 
@@ -4278,7 +4298,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4293,7 +4313,7 @@ true, will return array of records.
 
 Usage:
 
- modules(%args) -> [status, msg, result, meta]
+ modules(%args) -> [status, msg, payload, meta]
 
 List modules/packages.
 
@@ -4346,7 +4366,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.26.0")
 
 Set base Perl version for determining core modules.
 
@@ -4367,7 +4387,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4382,7 +4402,7 @@ will return array of records.
 
 Usage:
 
- namespaces(%args) -> [status, msg, result, meta]
+ namespaces(%args) -> [status, msg, payload, meta]
 
 List namespaces.
 
@@ -4434,7 +4454,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4445,7 +4465,7 @@ Return value:  (any)
 
 Usage:
 
- packages(%args) -> [status, msg, result, meta]
+ packages(%args) -> [status, msg, payload, meta]
 
 List modules/packages.
 
@@ -4498,7 +4518,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.1")
+=item * B<perl_version> => I<str> (default: "v5.26.0")
 
 Set base Perl version for determining core modules.
 
@@ -4519,7 +4539,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4534,7 +4554,7 @@ will return array of records.
 
 Usage:
 
- rdeps(%args) -> [status, msg, result, meta]
+ rdeps(%args) -> [status, msg, payload, meta]
 
 List reverse dependencies.
 
@@ -4590,7 +4610,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4601,7 +4621,7 @@ Return value:  (any)
 
 Usage:
 
- releases(%args) -> [status, msg, result, meta]
+ releases(%args) -> [status, msg, payload, meta]
 
 List releases/tarballs.
 
@@ -4672,7 +4692,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4683,7 +4703,7 @@ Return value:  (any)
 
 Usage:
 
- reset(%args) -> [status, msg, result, meta]
+ reset(%args) -> [status, msg, payload, meta]
 
 Reset (empty) the database index.
 
@@ -4715,7 +4735,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4726,7 +4746,7 @@ Return value:  (any)
 
 Usage:
 
- stats(%args) -> [status, msg, result, meta]
+ stats(%args) -> [status, msg, payload, meta]
 
 Statistics of your local CPAN mirror.
 
@@ -4758,7 +4778,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -4769,7 +4789,7 @@ Return value:  (any)
 
 Usage:
 
- update(%args) -> [status, msg, result, meta]
+ update(%args) -> [status, msg, payload, meta]
 
 Create/update local CPAN mirror.
 
@@ -4823,6 +4843,10 @@ Select CPAN mirror to download from.
 
 =item * B<skip_file_indexing_pass_3> => I<bool>
 
+=item * B<skip_index_file_patterns> => I<array[re]>
+
+Skip one or more file patterns from being indexed.
+
 =item * B<skip_index_files> => I<array[str]>
 
 Skip one or more files from being indexed.
@@ -4847,7 +4871,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

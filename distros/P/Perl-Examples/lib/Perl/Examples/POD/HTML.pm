@@ -15,7 +15,7 @@ Perl::Examples::POD::HTML - Embedding HTML in POD
 
 =head1 VERSION
 
-This document describes version 0.092 of Perl::Examples::POD::HTML (from Perl distribution Perl-Examples), released on 2018-09-11.
+This document describes version 0.094 of Perl::Examples::POD::HTML (from Perl distribution Perl-Examples), released on 2018-11-29.
 
 =head1 DESCRIPTION
 

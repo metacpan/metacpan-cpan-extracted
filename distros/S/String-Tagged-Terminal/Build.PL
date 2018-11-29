@@ -9,6 +9,11 @@ my $build = Module::Build->new(
       'Convert::Color' => 0,
       'Convert::Color::XTerm' => 0,
       'String::Tagged' => 0,
+      'constant' => 0,
+      ( $^O eq "MSWin32" ?
+         ( "Win32::Console" => 0 ) :
+         () ),
+      'perl' => '5.010',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing
@@ -17,7 +22,6 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

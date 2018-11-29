@@ -1,7 +1,7 @@
 package Hailo::Role::Storage;
 our $AUTHORITY = 'cpan:AVAR';
-$Hailo::Role::Storage::VERSION = '0.74';
-use v5.28.0;
+$Hailo::Role::Storage::VERSION = '0.75';
+use v5.10.0;
 use Moose::Role;
 use MooseX::Types::Moose ':all';
 use namespace::clean -except => 'meta';

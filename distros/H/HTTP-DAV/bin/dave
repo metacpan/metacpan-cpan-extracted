@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 =pod
 
@@ -35,7 +35,7 @@ use Text::ParseWords;
 use Time::Local;
 use URI::file;
 
-my $VERSION    = "2.00";
+my $VERSION    = "2.01";
 my $TMP_DIR    = "/tmp";
 my $LOCK_OWNER = "dave/v$VERSION (pid $$)";
 my $USER_AGENT = "dave/v$VERSION (perldav)";

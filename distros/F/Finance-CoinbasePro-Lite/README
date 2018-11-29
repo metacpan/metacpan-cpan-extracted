@@ -1,0 +1,117 @@
+NAME
+    Finance::CoinbasePro::Lite - Client API library for Coinbase Pro (lite
+    edition)
+
+VERSION
+    This document describes version 0.004 of Finance::CoinbasePro::Lite
+    (from Perl distribution Finance-CoinbasePro-Lite), released on
+    2018-11-29.
+
+SYNOPSIS
+     use Finance::CoinbasePro::Lite;
+
+     my $cbp = Finance::CoinbasePro::Lite->new(
+         key        => 'Your API key',
+         secret     => 'Your API secret',
+         passphrase => 'Your API passphrase',
+     );
+
+     my $res = $cbp->public_request(GET => "/products");
+     # [
+     #   200,
+     #   "OK",
+     #   [
+     #     {
+     #       base_currency => "BCH",
+     #       base_max_size => 200,
+     #       ...
+     #     },
+     #     ...
+     #   ]
+     # ]
+
+     my $res = $cbp->private_request(GET => "/coinbase-accounts");
+     # [
+     #   200,
+     #   "OK",
+     #   [
+     #     {
+     #       active => 1,
+     #       balance => "0.00",
+     #       currency => "USD",
+     #       name => "USD wallet",
+     #       ...
+     #     },
+     #     ...
+     #   ]
+     # ]
+
+     my $res = $cbp->private_request(POST => "/reports", {
+         type => "fills",
+         start_date => "2018-02-01T00:00:00.000Z",
+         end_date   => "2018-02-01T00:00:00.000Z",
+     });
+
+DESCRIPTION
+    Coinbase Pro, <https://pro.coinbase.com>, is a US cryptocurrency
+    exchange. This module provides a Perl wrapper for Coinbase Pro's API.
+    Please peruse the Coinbase Pro API reference to see which API endpoints
+    are available.
+
+METHODS
+  new
+    Usage: new(%args)
+
+    Constructor. Known arguments:
+
+    *   key
+
+    *   secret
+
+    *   passphrase
+
+  public_request
+    Usage: public_request($method, $request_path [, \%params ]) =>
+    [$status_code, $message, $content]
+
+    Will send HTTP request and decode the JSON body for you.
+
+  private_request
+    Usage: public_request($method, $request_path [, \%params ]) =>
+    [$status_code, $message, $content]
+
+    Will send and sign HTTP request and decode the JSON body for you.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-CoinbasePro-Lite>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-CoinbasePro-Lite>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-CoinbasePro-L
+    ite>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Coinbase Pro API Reference, <https://docs.pro.coinbase.com/>
+
+    Finance::GDAX::API
+
+    CLI's: Finance::CoinbasePro::API::CLI, coinbasepro-lite from
+    App::coinbase::lite
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

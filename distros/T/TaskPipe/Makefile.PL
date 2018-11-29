@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 use File::Basename;
 use Cwd 'abs_path';
 use File::Spec;
-our $VERSION = 0.07;
+our $VERSION = 0.09;
 
 print "\nMakefile.PL for TaskPipe version $VERSION\n(c) Virtual Blue LTD 2018\n\n";
 

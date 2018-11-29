@@ -6,8 +6,8 @@ use strict;
 use vars qw($VERSION $VERSION_DATE $DEBUG);
 
 # Globals
-$VERSION = '0.48';
-$VERSION_DATE = '2015/03/26';
+$VERSION = '0.49';
+$VERSION_DATE = '2018/11/28';
 
 # Set this up to 3
 $DEBUG = 0;
@@ -36,7 +36,7 @@ sub new {
 
 ###########################################################################
 sub clone {
-    my $self  = @_;
+    my ($self)= @_;
     my $class = ref($self);
     my %clone = %{$self};
     bless {%clone}, $class;
@@ -831,7 +831,7 @@ sub propfind {
 
     # Make the call
     my $resp = $resource->propfind( -depth => $depth );
-    if ( $resp->is_success() ) {
+    if ($resp->is_success() || $resp->code == 207) {
         $resource->build_ls($resource);
         $self->ok( "propfind " . $resource->get_uri() . " succeeded", $url );
         return $resource;
@@ -1773,7 +1773,7 @@ The return value is always 1 or 0 indicating success or failure.
 
 See L<get()> for a description of what the optional callback parameter does.
 
-You can also pass a C<-headers> argument. That allows to specify custom HTTP headers. It can be either a hashref with header names and values, or a L<HTTP::Headers> object.
+You can also pass a C<-headers> argument. That allows one to specify custom HTTP headers. It can be either a hashref with header names and values, or a L<HTTP::Headers> object.
 
 B<put examples:>
 
@@ -2045,7 +2045,7 @@ or the README file in this library.
 
 You'll want to also read:
 
-=over *
+=over
 
 =item C<HTTP::DAV::Response>
 
@@ -2057,7 +2057,7 @@ You'll want to also read:
 
 and maybe if you're more inquisitive:
 
-=over *
+=over
 
 =item C<LWP::UserAgent>
 

@@ -2,8 +2,8 @@ NAME
     CryptoCurrency::Catalog - Catalog of cryptocurrencies
 
 VERSION
-    This document describes version 20180606 of CryptoCurrency::Catalog
-    (from Perl distribution CryptoCurrency-Catalog), released on 2018-06-06.
+    This document describes version 20181129.0.0 of CryptoCurrency::Catalog
+    (from Perl distribution CryptoCurrency-Catalog), released on 2018-11-29.
 
 SYNOPSIS
      use CryptoCurrency::Catalog;

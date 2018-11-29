@@ -1,5 +1,10 @@
-Revision history for Perl extension Tie::Hash::DarmstadtPM.
-===========================================================
+Revision history for Perl extension Acme::DarmstadtPM::TieHash
+==============================================================
+
+0.5  2018-11-28 22:02:00
+
+      - Remove Tie::ListKeyedHash dependency
+      - improve tests
 
 0.4  2014-01-04T08:59:11
 

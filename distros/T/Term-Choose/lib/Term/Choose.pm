@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.636';
+our $VERSION = '1.637';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -590,6 +590,9 @@ sub __choose {
                 if ( defined $self->{no_spacebar} ) {
                     $self->__marked_idx2rc( $self->{no_spacebar}, 0 );
                 }
+                if ( defined $self->{meta_items} ) {
+                    $self->__marked_idx2rc( $self->{meta_items}, 0 );
+                }
                 $self->__wr_screen();
             }
             else {
@@ -798,6 +801,8 @@ sub __prepare_promptline {
     }
     $self->{prompt_copy} = line_fold( $prompt, $self->{avail_width}, ' ' x $init, ' ' x $subseq );
     $self->{prompt_copy} .= "\n\r";
+    # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
+    #                 don't translate newline to carriage return-newline
     $self->{nr_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
     if ( @color ) {
         $self->{prompt_copy} =~ s/\x{feff}/shift @color/ge;
@@ -1163,7 +1168,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.636
+Version 1.637
 
 =cut
 

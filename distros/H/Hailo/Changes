@@ -1,5 +1,16 @@
 Revision history for Hailo
 
+0.75 2018-11-28 12:08:58
+
+    - In 0.73 we very aggressively put "use v5.28.0" without any
+      need. My bad. It's now "v5.10.0" again. Also in a fit of "let's
+      just use the latest" all the dependencies were pinned to
+      whatever was the latest on the author's machine in that release,
+      now they're all back to "0".
+
+      Some stuff may break due to older CPAN modules, but let's just
+      find that out as we go.
+
 0.74 2018-11-28 00:26:12
 
     - Fix missing test dependency on Pod::Section.

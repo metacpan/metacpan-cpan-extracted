@@ -1,3 +1,12 @@
+0.011   2018-11-29 (PERLANCAR)
+
+	- Rename App::cryp::Exchange::{gdax,coinbasepro_lite}.
+
+	- When account is not defined in configuration, allow continuing but use
+          public_only=>1, so we can still access public API e.g. pairs,
+          orderbook.
+
+
 0.010   2018-06-24 (PERLANCAR)
 
 	- [Bugfix] indodax: get_order: return incorrect filled_base_size

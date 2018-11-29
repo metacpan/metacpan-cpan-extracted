@@ -1,7 +1,7 @@
 package App::cryp::arbit;
 
-our $DATE = '2018-08-11'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,18 +36,8 @@ our %args_db = (
     },
 );
 
-# shared between these subcommands: opportunities, arbit
-our %args_arbit_common = (
-    strategy => {
-        summary => 'Which strategy to use for arbitration',
-        schema => ['str*', match=>qr/\A\w+\z/],
-        default => 'merge_order_book',
-        description => <<'_',
-
-Strategy is implemented in a `App::cryp::arbit::Strategy::*` perl module.
-
-_
-    },
+# shared between these subcommands: opportunities, arbit, collect-orderbooks
+our %args_accounts_and_currencies = (
     accounts => {
         summary => 'Cryptoexchange accounts',
         schema => ['array*', of=>'cryptoexchange::account', min_len=>2],
@@ -91,6 +81,21 @@ against BTC, `base_currencies` is ['XMR', 'LTC'] and `quote_currencies` is
 
 _
     },
+);
+
+# shared between these subcommands: opportunities, arbit
+our %args_arbit_common = (
+    strategy => {
+        summary => 'Which strategy to use for arbitration',
+        schema => ['str*', match=>qr/\A\w+\z/],
+        default => 'merge_order_book',
+        description => <<'_',
+
+Strategy is implemented in a `App::cryp::arbit::Strategy::*` perl module.
+
+_
+    },
+    %args_accounts_and_currencies,
     min_net_profit_margin => {
         summary => 'Minimum net profit margin that will trigger an arbitrage '.
             'trading, in percentage',
@@ -187,7 +192,7 @@ _
 
 our $db_schema_spec = {
     component_name => 'cryp_arbit',
-    latest_v => 1,
+    latest_v => 2,
     provides => [qw/exchange account balance tx price order_pair/],
     install => [
         # XXX later move to cryp-folio?
@@ -237,7 +242,162 @@ our $db_schema_spec = {
              note VARCHAR(255)
          )',
 
-        # currently unused
+        'CREATE TABLE arbit_opportunity (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             time DOUBLE NOT NULL, INDEX(time),
+             base_currency VARCHAR(10) NOT NULL,
+             quote_currency VARCHAR(10) NOT NULL,
+             -- base_size DECIMAL(21,8),
+             buy_exchange_id INT NOT NULL,
+             buy_price DECIMAL(21,8) NOT NULL,
+             sell_exchange_id INT NOT NULL,
+             sell_price DECIMAL(21,8) NOT NULL,
+             gross_profit_margin DOUBLE NOT NULL,
+             trading_profit_margin DOUBLE NOT NULL,
+             net_profit_margin DOUBLE
+         )',
+
+        # to collect historical orderbook data
+        'CREATE TABLE orderbook (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             time DOUBLE NOT NULL, INDEX(time),
+             exchange_id INT NOT NULL,
+             base_currency VARCHAR(10) NOT NULL,
+             quote_currency VARCHAR(10) NOT NULL,
+             type TEXT NOT NULL -- "buy" or "sell"
+         )',
+
+        'CREATE TABLE orderbook_item (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             orderbook_id INT NOT NULL, INDEX(orderbook_id),
+             amount DECIMAL(21,8) NOT NULL,
+             price DECIMAL(21,8) NOT NULL
+         )',
+
+        'CREATE TABLE order_pair (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             ctime DOUBLE NOT NULL, INDEX(ctime), -- create time in our database
+
+             base_currency VARCHAR(10) NOT NULL, -- the currency we are arbitraging, e.g. LTC
+             base_size DECIMAL(21,8) NOT NULL, -- amount of "currency" that we are arbitraging (sell on "sell exchange" and buy on "buy exchange")
+
+             expected_profit_margin DOUBLE NOT NULL, -- expected profit percentage (after trading fees & forex spread)
+             expected_net_profit DOUBLE NOT NULL, -- expected net profit (after trading fees & forex spread) in quote currency (converted to USD if fiat) if fully executed
+
+             -- we buy "base_size" of "base_currency" on "buy exchange" at
+             -- "buy_gross_price_orig" (in "buy_quote_currency") a.k.a
+             -- "buy_gross_price" (in "buy_quote_currency" converted to USD if
+             -- fiat)
+
+             -- possible statuses/lifecyle: creating (submitting to exchange),
+             -- open (created and open), cancelling, cancelled, done
+
+             buy_exchange_id INT NOT NULL,
+             buy_account_id INT NOT NULL,
+             buy_quote_currency VARCHAR(10) NOT NULL,
+             buy_gross_price_orig DECIMAL(21,8) NOT NULL,
+             buy_gross_price DECIMAL(21,8) NOT NULL,
+             buy_status VARCHAR(16) NOT NULL,
+
+             buy_ctime DOUBLE, -- order create time in "buy_exchange"
+             buy_order_id VARCHAR(80),
+             buy_actual_price DECIMAL(21,8), -- actual price after we create on exchange
+             buy_actual_base_size DECIMAL(21,8), -- actual size after we create on exchange
+             buy_filled_base_size DECIMAL(21,8),
+
+             -- then sell the same "base_size" of "base_currency"" on "sell
+             -- exchange" (the "base_currency"/"sell_exchange_quote_currency"
+             -- market pair) at "sell_gross_price_orig" (in
+             -- "sell_exchange_quote_currency") a.k.a "sell_gross_price" (in
+             -- "sell_exchange_quote_currency" converted to USD if fiat)
+
+             sell_exchange_id INT NOT NULL,
+             sell_account_id INT NOT NULL,
+             sell_quote_currency VARCHAR(10) NOT NULL,
+             sell_gross_price_orig DECIMAL(21,8) NOT NULL,
+             sell_gross_price DECIMAL(21,8) NOT NULL,
+             sell_status VARCHAR(16) NOT NULL,
+
+             sell_ctime DOUBLE, -- create time in "sell exchange"
+             sell_order_id VARCHAR(80),
+             sell_actual_price DECIMAL(21,8), -- actual price after we create on exchange
+             sell_actual_base_size DECIMAL(21,8), -- actual size after we create on exchange
+             sell_filled_base_size DECIMAL(21,8)
+         )',
+
+        'CREATE TABLE arbit_order_log (
+            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            order_pair_id INT NOT NULL,
+            type VARCHAR(4) NOT NULL, -- "buy" or "sell"
+            summary TEXT NOT NULL
+        )',
+    ],
+    upgrade_to_v2 => [
+        # to collect historical orderbook data
+        'CREATE TABLE orderbook (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             time DOUBLE NOT NULL, INDEX(time),
+             exchange_id INT NOT NULL,
+             base_currency VARCHAR(10) NOT NULL,
+             quote_currency VARCHAR(10) NOT NULL,
+             type TEXT NOT NULL -- "sell" or "buy"
+         )',
+
+        'CREATE TABLE orderbook_item (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             orderbook_id INT NOT NULL, INDEX(orderbook_id),
+             amount DECIMAL(21,8) NOT NULL,
+             price DECIMAL(21,8) NOT NULL
+         )',
+    ],
+    install_v1 => [
+        # XXX later move to cryp-folio?
+        'CREATE TABLE exchange (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             safename VARCHAR(100) NOT NULL, UNIQUE(safename)
+         )',
+
+        # XXX later move to cryp-folio?
+        'CREATE TABLE account (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             exchange_id INT NOT NULL,
+             nickname VARCHAR(64) NOT NULL,
+             UNIQUE(exchange_id,nickname),
+             note VARCHAR(255)
+         )',
+
+        # XXX later move to cryp-folio?
+        'CREATE TABLE latest_balance (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             time DOUBLE NOT NULL,
+             account_id INT NOT NULL,
+             currency VARCHAR(10) NOT NULL,
+             UNIQUE(account_id, currency),
+             available DECIMAL(21,8) NOT NULL
+         )',
+
+        # XXX later move to cryp-folio?
+        'CREATE TABLE balance_history (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             time DOUBLE NOT NULL,
+             account_id INT NOT NULL,
+             currency VARCHAR(10) NOT NULL,
+             UNIQUE(time, account_id, currency),
+             available DECIMAL(21,8) NOT NULL
+         )',
+
+        # XXX later move to cryp-folio
+        'CREATE TABLE price (
+             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             time DOUBLE NOT NULL, INDEX(time),
+             base_currency VARCHAR(10) NOT NULL,
+             quote_currency VARCHAR(10) NOT NULL,
+             type VARCHAR(4) NOT NULL, -- "buy" or "sell"
+             price DECIMAL(21,8) NOT NULL, -- price to buy (or sell) base_currency in quote_currency, e.g. if base_currency = BTC, quote_currency = USD, price = 11150 means 1 BTC is $11150
+             exchange_id INT NOT NULL,
+             note VARCHAR(255)
+         )',
+
         'CREATE TABLE arbit_opportunity (
              id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
              time DOUBLE NOT NULL, INDEX(time),
@@ -440,9 +600,12 @@ sub _get_exchange_client {
             "Please specify [exchange/$exchange/$account] section in configuration";
     }
 
-    my $client = $mod->new(
-        %{ $r->{_cryp}{exchanges}{$exchange}{$account} }
-    );
+    my %client_args = %{ $r->{_cryp}{exchanges}{$exchange}{$account} // {} };
+    unless ($client_args{api_key}) {
+        $client_args{public_only} = 1;
+    }
+
+    my $client = $mod->new(%client_args);
 
     $r->{_stash}{exchange_clients}{$exchange}{$account} = $client;
 }
@@ -549,11 +712,8 @@ sub _init {
                 m!(.+)/(.+)! or return [400, "Invalid account '$_', please use EXCHANGE/ACCOUNT syntax"];
                 my ($xchg, $acc) = ($1, $2);
                 unless (exists $account_exchanges{$xchg}) {
-                    my $rec = $xcat->by_safename($xchg);
-                    return [400, "Unknown exchange '$xchg'"] unless $rec;
-                    return [400, "Exchange '$xchg' is not assigned short code yet. ".
-                                "please contact the maintainer of CryptoExchange::Catalog ".
-                                "to add one for it"] unless $rec->{code};
+                    return [400, "Unknown exchange '$xchg'"]
+                        unless $xcat->by_safename($xchg);
                 }
                 $account_exchanges{$xchg}{$acc} = 1;
             }
@@ -709,9 +869,9 @@ sub _init_arbit {
     {
         # XXX hardcoded for now
         $r->{_stash}{trading_fees} = {
-            ':default' => {':default'=>0.3},
-            'indodax'  => {':default'=>0.3},
-            'gdax'     => {BTC=>0.25, ':default'=>0.3},
+            ':default'     => {':default'=>0.3},
+            'indodax'      => {':default'=>0.3},
+            'coinbase-pro' => {BTC=>0.25, ':default'=>0.3},
         };
     }
 
@@ -1116,6 +1276,130 @@ sub arbit {
     [200];
 }
 
+$SPEC{collect_orderbooks} = {
+    v => 1.1,
+    summary => 'Collect orderbooks into the database',
+    description => <<'_',
+
+This utility collect orderbooks from exchanges and put it into the database. The
+data can be used later e.g. for backtesting.
+
+_
+    args => {
+        %args_db,
+        %args_accounts_and_currencies,
+        frequency => {
+            summary => 'How many seconds to wait between rounds (in seconds)',
+            schema => 'posint*',
+            default => 30,
+        },
+    },
+};
+sub collect_orderbooks {
+    my %args = @_;
+
+    my $r = $args{-cmdline_r};
+    my $res;
+    $res = _init($r); return $res unless $res->[0] == 200;
+    $res = _init_arbit($r); return $res unless $res->[0] == 200;
+
+    my $dbh = $r->{_stash}{dbh};
+
+    # this section is borrowed from App::cryp::arbit::Strategy::merge_order_book
+
+    my %exchanges_for; # key="base currency"/"quote cryptocurrency or ':fiat'", value => [exchange, ...]
+    my %fiat_for;      # key=exchange safename, val=[fiat currency, ...]
+    my %pairs_for;     # key=exchange safename, val=[pair, ...]
+  DETERMINE_SETS:
+    for my $exchange (sort keys %{ $r->{_stash}{exchange_clients} }) {
+        my $pair_recs = $r->{_stash}{exchange_pairs}{$exchange};
+        for my $pair_rec (@$pair_recs) {
+            my $pair = $pair_rec->{name};
+            my ($basecur, $quotecur) = $pair =~ m!(.+)/(.+)!;
+            next unless grep { $_ eq $basecur  } @{ $r->{_stash}{base_currencies}  };
+            next unless grep { $_ eq $quotecur } @{ $r->{_stash}{quote_currencies} };
+
+            my $key;
+            if (App::cryp::arbit::_is_fiat($quotecur)) {
+                $key = "$basecur/:fiat";
+                $fiat_for{$exchange} //= [];
+                push @{ $fiat_for{$exchange} }, $quotecur
+                    unless grep { $_ eq $quotecur } @{ $fiat_for{$exchange} };
+            } else {
+                $key = "$basecur/$quotecur";
+            }
+            $exchanges_for{$key} //= [];
+            push @{ $exchanges_for{$key} }, $exchange;
+
+            $pairs_for{$exchange} //= [];
+            push @{ $pairs_for{$exchange} }, $pair
+                unless grep { $_ eq $pair } @{ $pairs_for{$exchange} };
+        }
+    } # DETERMINE_SETS
+
+  ROUND:
+    while (1) {
+      SET:
+        for my $set (keys %exchanges_for) {
+            my ($base_currency, $quote_currency0) = $set =~ m!(.+)/(.+)!;
+
+          EXCHANGE:
+            for my $exchange (sort keys %{ $r->{_stash}{exchange_clients} }) {
+                my $eid = App::cryp::arbit::_get_exchange_id($r, $exchange);
+                my $clients = $r->{_stash}{exchange_clients}{$exchange};
+                my $client = $clients->{ (sort keys %$clients)[0] };
+
+                my @pairs;
+                if ($quote_currency0 eq ':fiat') {
+                    push @pairs, map { "$base_currency/$_" } @{ $fiat_for{$exchange} };
+                } else {
+                    push @pairs, $set;
+                }
+
+              PAIR:
+                for my $pair (@pairs) {
+                    my ($basecur, $quotecur) = split m!/!, $pair;
+                    next unless grep { $_ eq $pair } @{ $pairs_for{$exchange} };
+
+                    my $time = time();
+                    log_debug "Getting orderbook %s on %s ...", $pair, $exchange;
+                    my $res = $client->get_order_book(pair => $pair);
+                    unless ($res->[0] == 200) {
+                        log_error "Couldn't get orderbook %s on %s: %s, skipping this pair",
+                            $pair, $exchange, $res;
+                        next PAIR;
+                    }
+
+                    # save orderbook to database
+                  TYPE:
+                    for my $type ("buy", "sell") {
+                        # sanity checks
+                        unless ($res->[2]{$type} && @{ $res->[2]{$type} }) {
+                            log_warn "No $type orders for %s on %s, skipping",
+                                $pair, $exchange;
+                            next;
+                        }
+                        $dbh->do("INSERT INTO orderbook (time,exchange_id,base_currency,quote_currency,type) VALUES (?,?,?,?,?)", {}, $time, $eid, $basecur, $quotecur, $type);
+                        my $orderbook_id = $dbh->last_insert_id("","","","");
+                        my $sth = $dbh->prepare("INSERT INTO orderbook_item (orderbook_id, price, amount) VALUES (?,?,?)");
+                        for my $item (@{ $res->[2]{$type} }) {
+                            #log_trace "item: %s", $item;
+                            $sth->execute($orderbook_id, $item->[0], $item->[1]);
+                        }
+                    } # TYPE
+                } # PAIR
+            } # EXCHANGE
+        } # SET
+
+      SLEEP:
+        log_trace "Sleeping for %d second(s) before next round ...",
+            $args{frequency};
+        sleep $args{frequency};
+    } # ROUND
+
+    [200];
+}
+
 sub _check_orders {
     my $r = shift;
 
@@ -1240,7 +1524,7 @@ sub _check_orders {
             my $res = $client->get_order(pair=>$op->{buy_pair}, type=>'buy', order_id=>$op->{buy_order_id});
             if ($res->[0] == 404) {
                 # assume 404 as order which was never filled and got cancelled.
-                # some exchanges, e.g. gdax return 404 for such orders
+                # some exchanges, e.g. coinbase-pro returns 404 for such orders
                 $code_update_buy_status->($op->{id}, 'cancelled', 'not found via get_order(), assume cancelled without being filled');
                 last;
             } elsif ($res->[0] != 200) {
@@ -1270,7 +1554,7 @@ sub _check_orders {
             my $res = $client->get_order(pair=>$op->{sell_pair}, type=>'sell', order_id=>$op->{sell_order_id});
             if ($res->[0] == 404) {
                 # assume 404 as order which was never filled and got cancelled.
-                # some exchanges, e.g. gdax return 404 for such orders
+                # some exchanges, e.g. coinbase-pro returns 404 for such orders
                 $code_update_sell_status->($op->{id}, 'cancelled', 'not found via get_order(), assume cancelled without being filled');
                 last;
             } elsif ($res->[0] != 200) {
@@ -1611,7 +1895,7 @@ App::cryp::arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.006 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-08-11.
+This document describes version 0.008 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-11-29.
 
 =head1 SYNOPSIS
 
@@ -1720,7 +2004,7 @@ passing C<$r> around. The keys that are used by routines in this module:
 
 Usage:
 
- arbit(%args) -> [status, msg, result, meta]
+ arbit(%args) -> [status, msg, payload, meta]
 
 Perform arbitrage.
 
@@ -1875,7 +2159,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1886,7 +2170,7 @@ Return value:  (any)
 
 Usage:
 
- check_orders(%args) -> [status, msg, result, meta]
+ check_orders(%args) -> [status, msg, payload, meta]
 
 Check the orders that have been created.
 
@@ -1922,7 +2206,78 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 collect_orderbooks
+
+Usage:
+
+ collect_orderbooks(%args) -> [status, msg, payload, meta]
+
+Collect orderbooks into the database.
+
+This utility collect orderbooks from exchanges and put it into the database. The
+data can be used later e.g. for backtesting.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<accounts> => I<array[cryptoexchange::account]>
+
+Cryptoexchange accounts.
+
+There should at least be two accounts, on at least two different
+cryptoexchanges. If not specified, all accounts listed on the configuration file
+will be included. Note that it's possible to include two or more accounts on the
+same cryptoexchange.
+
+=item * B<base_currencies> => I<array[cryptocurrency]>
+
+Target (crypto)currencies to arbitrate.
+
+If not specified, will list all supported pairs on all the exchanges and include
+the base cryptocurrencies that are listed on at least 2 different exchanges (for
+arbitrage possibility).
+
+=item * B<db_name>* => I<str>
+
+=item * B<db_password> => I<str>
+
+=item * B<db_username> => I<str>
+
+=item * B<frequency> => I<posint> (default: 30)
+
+How many seconds to wait between rounds (in seconds).
+
+=item * B<quote_currencies> => I<array[fiat_or_cryptocurrency]>
+
+The currencies to exchange (buy/sell) the target currencies.
+
+You can have fiat currencies as the quote currencies, to buy/sell the target
+(base) currencies during arbitrage. For example, to arbitrage LTC against USD
+and IDR, C<base_currencies> is ['BTC'] and C<quote_currencies> is ['USD', 'IDR'].
+
+You can also arbitrage cryptocurrencies against other cryptocurrency (usually
+BTC, "the USD of cryptocurrencies"). For example, to arbitrage XMR and LTC
+against BTC, C<base_currencies> is ['XMR', 'LTC'] and C<quote_currencies> is
+['BTC'].
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1933,7 +2288,7 @@ Return value:  (any)
 
 Usage:
 
- dump_cryp_config() -> [status, msg, result, meta]
+ dump_cryp_config() -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -1944,7 +2299,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1955,7 +2310,7 @@ Return value:  (any)
 
 Usage:
 
- get_profit_report(%args) -> [status, msg, result, meta]
+ get_profit_report(%args) -> [status, msg, payload, meta]
 
 Get profit report.
 
@@ -1992,7 +2347,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -2003,7 +2358,7 @@ Return value:  (any)
 
 Usage:
 
- list_order_pairs(%args) -> [status, msg, result, meta]
+ list_order_pairs(%args) -> [status, msg, payload, meta]
 
 List created order pairs.
 
@@ -2032,7 +2387,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -2043,7 +2398,7 @@ Return value:  (any)
 
 Usage:
 
- show_opportunities(%args) -> [status, msg, result, meta]
+ show_opportunities(%args) -> [status, msg, payload, meta]
 
 Show arbitrage opportunities.
 
@@ -2158,7 +2513,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

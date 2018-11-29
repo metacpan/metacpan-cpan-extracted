@@ -10,10 +10,10 @@ can_ok $person, qw/_list_request/;
 
 my $req = $person->_list_request("machida_pm");
 
-isa_ok $req, 'HTTP::Request';
-is $req->uri, "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons";
-is $req->method, 'GET';
-is $req->header('Content-Type'), 'application/json';
-is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';
+isa_ok $req, 'ARRAY';
+is $req->[1], "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons";
+is $req->[0], 'GET';
+is $req->[2]{headers}{'Content-Type'}, 'application/json';
+is $req->[2]{headers}{'Ocp-Apim-Subscription-Key'}, 'MYSECRET';
 
 done_testing;

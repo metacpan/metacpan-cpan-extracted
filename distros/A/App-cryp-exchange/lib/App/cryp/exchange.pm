@@ -1,7 +1,7 @@
 package App::cryp::exchange;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -119,10 +119,14 @@ sub _init {
         my $mod = "App::cryp::Exchange::$exchange"; $mod =~ s/-/_/g;
         (my $mod_pm = "$mod.pm") =~ s!::!/!g; require $mod_pm;
 
-        my $hash = $r->{_cryp}{exchanges}{$exchange}{$account}
-            or return [404, "Unknown $exchange account $account"];
-
-        my %args = map { $_ => $hash->{$_} } grep {/^api_/} keys %$hash;
+        my $hash = $r->{_cryp}{exchanges}{$exchange}{$account};
+        my %args;
+        if ($hash) {
+            %args = map { $_ => $hash->{$_} } grep {/^api_/} keys %$hash;
+        } else {
+            log_warn "Unknown $exchange account $account, using public API ...";
+            %args = (public_only => 1);
+        }
 
         $r->{_stash}{exchange_client} = $mod->new(%args);
     }
@@ -164,7 +168,6 @@ sub accounts {
     };
 
     [200, "OK", \@res, $resmeta];
-
 }
 
 $SPEC{balance} = {
@@ -443,7 +446,7 @@ App::cryp::exchange - Interact with cryptoexchanges using a common interface
 
 =head1 VERSION
 
-This document describes version 0.010 of App::cryp::exchange (from Perl distribution App-cryp-exchange), released on 2018-06-24.
+This document describes version 0.011 of App::cryp::exchange (from Perl distribution App-cryp-exchange), released on 2018-11-29.
 
 =head1 SYNOPSIS
 
@@ -456,7 +459,7 @@ Please see included script L<cryp-exchange>.
 
 Usage:
 
- accounts(%args) -> [status, msg, result, meta]
+ accounts(%args) -> [status, msg, payload, meta]
 
 List exchange accounts.
 
@@ -475,7 +478,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -486,7 +489,7 @@ Return value:  (any)
 
 Usage:
 
- balance(%args) -> [status, msg, result, meta]
+ balance(%args) -> [status, msg, payload, meta]
 
 List account balance.
 
@@ -505,7 +508,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -516,7 +519,7 @@ Return value:  (any)
 
 Usage:
 
- cancel_order(%args) -> [status, msg, result, meta]
+ cancel_order(%args) -> [status, msg, payload, meta]
 
 Cancel an order.
 
@@ -541,7 +544,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -552,7 +555,7 @@ Return value:  (any)
 
 Usage:
 
- create_limit_order(%args) -> [status, msg, result, meta]
+ create_limit_order(%args) -> [status, msg, payload, meta]
 
 Create a limit order.
 
@@ -585,7 +588,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -596,7 +599,7 @@ Return value:  (any)
 
 Usage:
 
- exchanges(%args) -> [status, msg, result, meta]
+ exchanges(%args) -> [status, msg, payload, meta]
 
 List supported exchanges.
 
@@ -615,7 +618,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -626,7 +629,7 @@ Return value:  (any)
 
 Usage:
 
- get_order(%args) -> [status, msg, result, meta]
+ get_order(%args) -> [status, msg, payload, meta]
 
 Get information about an order.
 
@@ -651,7 +654,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -662,7 +665,7 @@ Return value:  (any)
 
 Usage:
 
- open_orders(%args) -> [status, msg, result, meta]
+ open_orders(%args) -> [status, msg, payload, meta]
 
 List open orders.
 
@@ -683,7 +686,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -694,7 +697,7 @@ Return value:  (any)
 
 Usage:
 
- orderbook(%args) -> [status, msg, result, meta]
+ orderbook(%args) -> [status, msg, payload, meta]
 
 Get order book on an exchange.
 
@@ -717,7 +720,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -728,7 +731,7 @@ Return value:  (any)
 
 Usage:
 
- pairs(%args) -> [status, msg, result, meta]
+ pairs(%args) -> [status, msg, payload, meta]
 
 List pairs supported by exchange.
 
@@ -751,7 +754,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -762,7 +765,7 @@ Return value:  (any)
 
 Usage:
 
- ticker(%args) -> [status, msg, result, meta]
+ ticker(%args) -> [status, msg, payload, meta]
 
 Get a pair's ticker (last 24h price & volume information).
 
@@ -783,7 +786,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

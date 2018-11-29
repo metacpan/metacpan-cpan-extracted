@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Loader::Biblios;
 # ABSTRACT: Chargeur de notices biblio
-$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.24';
+$Koha::Contrib::Sudoc::Loader::Biblios::VERSION = '2.25';
 use Moose;
 
 extends 'Koha::Contrib::Sudoc::Loader';
@@ -112,10 +112,10 @@ sub handle_record {
                 ($d->{biblionumber}, $d->{framework}, $d->{record});
         }
     }
-
     $self->converter->init( $record );
     $self->converter->authoritize( $record );
     $self->converter->linking( $record );
+    $self->converter->itemize( $record, $koha_record );
 
     if ( $koha_record ) {
         # Modification d'une notice
@@ -131,7 +131,6 @@ sub handle_record {
     else {
         # Nouvelle notice
         $self->count_added( $self->count_added + 1 );
-        $self->converter->itemize($record);
         $self->converter->clean($record);
         $self->log->debug(
             "  Notice après traitement :\n" . $record->as('Text') );
@@ -169,7 +168,7 @@ Koha::Contrib::Sudoc::Loader::Biblios - Chargeur de notices biblio
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 AUTHOR
 

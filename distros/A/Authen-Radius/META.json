@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64",
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "configure" : {
@@ -41,8 +39,14 @@
             "Net::IP" : "1.26",
             "perl" : "v5.10.0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.27"
+   "version" : "0.28"
 }

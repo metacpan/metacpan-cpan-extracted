@@ -1,14 +1,45 @@
+NAME
 
+    Acme::DarmstadtPM::TieHash - a module that shows that Perl can do all
+    the Ruby things ;-)
 
-This archive contains the distribution Acme-DarmstadtPM-TieHash,
-version 0.4:
+VERSION
 
-  a module that shows that Perl can do all the Ruby things ;-)
+    version 0.5
 
-This software is Copyright (c) 2014 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+      #!/usr/bin/perl
+       
+      use strict;
+      use warnings;
+      use Test::More tests => 2;
+      
+      use constant ADT => 'Acme::DarmstadtPM::TieHash';
+       
+      use_ok(ADT);
+       
+      tie my %hash,ADT,sub{$_[0] + $_[-1]};
+      
+      is($hash{[1,5]},6,'Check [1,5]');
+       
+      untie %hash;
 
-  The Artistic License 2.0 (GPL Compatible)
+DESCRIPTION
 
+    Ronnie sent a mail to the mailinglist with some good Ruby stuff. I
+    said, that all these things can be done in Perl, too. So this module is
+    a proof how smart Perl is...
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2014 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

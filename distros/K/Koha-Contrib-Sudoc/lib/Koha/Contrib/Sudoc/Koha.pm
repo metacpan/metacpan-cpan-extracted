@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Koha;
 # ABSTRACT: Lien à Koha
-$Koha::Contrib::Sudoc::Koha::VERSION = '2.24';
+$Koha::Contrib::Sudoc::Koha::VERSION = '2.25';
 use Moose;
 use Modern::Perl;
 use Carp;
@@ -9,6 +9,7 @@ use DBI;
 use ZOOM;
 use MARC::Moose::Record;
 use C4::Biblio;
+use Search::Elasticsearch;
 use YAML;
 use Try::Tiny;
 
@@ -21,6 +22,11 @@ has conf => ( is => 'rw' );
 
 has _zconn => ( is => 'rw', isa => 'HashRef' );
 
+has es => ( is => 'rw' );
+
+has es_index => ( is=> 'rw' );
+
+has sth_biblio => (is => 'rw' );
 
 
 sub BUILD {
@@ -29,7 +35,7 @@ sub BUILD {
     # Use KOHA_CONF environment variable by default
     $self->conf_file( $ENV{KOHA_CONF} )  unless $self->conf_file;
 
-    $self->conf( XMLin( $self->conf_file, 
+    $self->conf( XMLin( $self->conf_file,
         keyattr => ['id'], forcearray => ['listen', 'server', 'serverinfo'],
         suppressempty => '     ') );
 
@@ -50,14 +56,36 @@ sub BUILD {
         ($tz) and $self->dbh->do( qq(SET time_zone = "$tz") );
     }
 
-    # Zebra connections 
+    if ( C4::Context->preference('SearchEngine') eq 'Elasticsearch' ) {
+        my $param = $c->{elasticsearch};
+        my $es = Search::Elasticsearch->new( nodes => $param->{server} );
+        $self->es( $es );
+        $self->es_index( {
+            biblios     => $param->{index_name} . '_biblios',
+            authorities => $param->{index_name} . '_authorities',
+        } );
+    }
+
+    # Zebra connections
     $self->_zconn( { biblio => undef, auth => undef } );
+
+    # Récupération d'une notice biblio brute
+    # Since version 17.05 marcxml biblio record is stored in biblio_metadata table.
+    my $version = C4::Context->preference('Version');
+    $self->sth_biblio( $self->dbh->prepare(
+        $version =~ /^([0-9]{2})/ && $1 >= 17
+        ? "SELECT metadata FROM biblio_metadata WHERE biblionumber=? "
+        : "SELECT marcxml FROM biblioitems WHERE biblionumber=? "
+    ) );
 }
 
 
 # Réinitialisation des deux connexions
 sub zconn_reset {
     my $self = shift;
+
+    return if $self->es; # Ne rien faire en mode ES
+
     my $zcs = $self->_zconn;
     for my $server ( keys %$zcs ) {
         my $zc = $zcs->{$server};
@@ -135,38 +163,55 @@ sub get_biblionumber_framework {
 }
 
 
-# Return a MARC::Moose::Record from its biblionumber,
-# and the record framework: (framework, record)
 sub get_biblio {
-    my ($self, $biblionumber) = @_; 
-    my $sth = $self->dbh->prepare(
-        "SELECT marcxml FROM biblioitems WHERE biblionumber=? ");
-    $sth->execute( $biblionumber );
-    my ($marcxml) = $sth->fetchrow;
-    return undef unless $marcxml;
-    my $record = MARC::Moose::Record::new_from($marcxml, 'Marcxml');
+    my ($self, $biblionumber) = @_;
+
+    return (undef, undef) unless $biblionumber;
+    $self->sth_biblio->execute($biblionumber);
+    my ($xml) = $self->sth_biblio->fetchrow;
+    return (undef, undef) unless $xml;
+
+    my $record = MARC::Moose::Record::new_from($xml, 'MarcXml');
     return (undef, undef)  unless $record;
 
     (GetFrameworkCode($biblionumber), $record);
 }
 
 
-# Lecture d'une notice biblio par son PPN
 sub get_biblio_by_ppn {
     my ($self, $ppn) = @_;
-    my ($rs, $record, $biblionumber, $framework);;
-    try {
-        $rs = $self->zbiblio()->search_pqf( "\@attr 1=PPN $ppn" );
-        if ( $rs->size() >= 1 ) {
-            $record = $rs->record(0);
-            $record = MARC::Moose::Record::new_from( $record->raw(), 'Iso2709' );
-            return (undef, undef, undef) unless $record;
-            ($biblionumber, $framework) = $self->get_biblionumber_framework($record);
-        } 
-    } catch {
-        warn "ZOOM error: $_";
-    };
-    return ($biblionumber, $framework, $record);
+
+    my ($record, $biblionumber, $framework);;
+
+    if ( my $es = $self->es ) { # Elasticsearch
+        my $res = $es->search(
+            index => $self->es_index->{biblios},
+            body => {
+                query => {  match => { ppn => $ppn }  }
+            }
+        );
+        if ( $res->{hits}->{total} != 0 ) {
+            my $raw = $res->{hits}->{hits}->[0]->{_source}->{record};
+            $record = _record_from_es($raw);
+        }
+    }
+    else {
+        try {
+            my $rs = $self->zbiblio()->search_pqf( "\@attr 1=PPN $ppn" );
+            if ( $rs->size() >= 1 ) {
+                $record = $rs->record(0);
+                $record = MARC::Moose::Record::new_from( $record->raw(), 'Iso2709' );
+            }
+        } catch {
+            warn "ZOOM error: $_";
+        };
+    }
+
+    if ( $record ) {
+        ($biblionumber, $framework) = $self->get_biblionumber_framework($record);
+        return ($biblionumber, $framework, $record);
+    }
+    return (undef, undef, undef) unless $record;
 }
 
 
@@ -182,7 +227,7 @@ sub get_biblios_by_authid {
             next unless $record;
             my ($biblionumber, $framework) = $self->get_biblionumber_framework($record);
             push @records, [$biblionumber, $framework, $record];
-        } 
+        }
     } catch {
         warn "ZOOM error: $_";
     };
@@ -190,18 +235,65 @@ sub get_biblios_by_authid {
 }
 
 
+sub _record_from_es {
+    my $raw = shift;
+
+    my $record = MARC::Moose::Record->new();
+    my @fields;
+    for my $field ( @$raw ) {
+        my $tag = shift @$field;
+        if ( $tag eq 'LDR' ) {
+            $record->_leader($field->[3]);
+        }
+        elsif ( $tag le '009' ) {
+            push @fields, MARC::Moose::Field::Control->new(
+                tag => $tag, value => $field->[3] );
+        }
+        else {
+            my $f = MARC::Moose::Field::Std->new(
+                tag => $tag, ind1 => shift @$field, ind2 => shift @$field );
+            my @subf;
+            while (@$field) {
+                push @subf, [ shift @$field => shift @$field ];
+            }
+            $f->subf( \@subf);
+            push @fields, $f;
+        }
+    }
+    $record->fields( \@fields );
+    return $record;
+}
+
+
 sub get_auth_by_ppn {
     my ($self, $ppn) = @_;
-    my ($rs, $authid, $record);
-    try {
-        $rs = $self->zauth()->search_pqf( "\@attr 1=PPN $ppn" );
-        if ( $rs->size() >= 1 ) {
-            $record = $rs->record(0);
-            $record = MARC::Moose::Record::new_from( $record->raw(), 'Iso2709' );
-            # FIXME: En dur, le authid Koha en 001, comme dans Koha lui-même
-            $authid = $record->field('001')->value if $record;
-        } 
-    };
+
+    my ($authid, $record);
+
+    if ( my $es = $self->es ) { # Elasticsearch
+        my $res = $es->search(
+            index => $self->es_index->{authorities},
+            body => {
+                query => {  match => { ppn => $ppn }  }
+            }
+        );
+        if ( $res->{hits}->{total} != 0 ) {
+            my $raw = $res->{hits}->{hits}->[0]->{_source}->{record};
+            $record = _record_from_es($raw);
+        }
+    }
+    else { # Zebra
+        try {
+            my $rs = $self->zauth()->search_pqf( "\@attr 1=PPN $ppn" );
+            if ( $rs->size() >= 1 ) {
+                $record = $rs->record(0);
+                $record = MARC::Moose::Record::new_from( $record->raw(), 'Iso2709' );
+                # FIXME: En dur, le authid Koha en 001, comme dans Koha lui-même
+            } 
+        };
+    }
+
+    $authid = $record->field('001')->value if $record;
     return ($authid, $record);
 }
 
@@ -222,11 +314,20 @@ Koha::Contrib::Sudoc::Koha - Lien Ã  Koha
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 DESCRIPTION
 
 =head1 METHODS
+
+=head2 get_biblio
+
+Return a MARC::Moose::Record from its biblionumber,
+and the record framework: (framework, record)
+
+=head2 get_bibio_by_ppn
+
+Lecture d'une notice biblio par son C<PPN>
 
 =head2 get_biblios_by_authid
 

@@ -1,7 +1,7 @@
 package Perinci::Examples::Tiny::Args;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.80'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.810'; # VERSION
 
 our %SPEC;
 
@@ -131,7 +131,7 @@ Perinci::Examples::Tiny::Args - Tests related to function arguments
 
 =head1 VERSION
 
-This document describes version 0.80 of Perinci::Examples::Tiny::Args (from Perl distribution Perinci-Examples), released on 2017-07-11.
+This document describes version 0.810 of Perinci::Examples::Tiny::Args (from Perl distribution Perinci-Examples), released on 2018-11-29.
 
 =head1 DESCRIPTION
 
@@ -146,7 +146,7 @@ Perinci::CmdLine frameworks.
 
 Usage:
 
- as_is(%args) -> [status, msg, result, meta]
+ as_is(%args) -> [status, msg, payload, meta]
 
 This function returns the argument as-is.
 
@@ -165,7 +165,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -176,7 +176,7 @@ Return value:  (any)
 
 Usage:
 
- has_date_and_duration_args(%args) -> [status, msg, result, meta]
+ has_date_and_duration_args(%args) -> [status, msg, payload, meta]
 
 This function contains a date and a duration argument.
 
@@ -197,7 +197,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -208,7 +208,7 @@ Return value:  (any)
 
 Usage:
 
- has_date_arg(%args) -> [status, msg, result, meta]
+ has_date_arg(%args) -> [status, msg, payload, meta]
 
 This function contains a date argument.
 
@@ -227,7 +227,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -238,7 +238,7 @@ Return value:  (any)
 
 Usage:
 
- has_dot_args(%args) -> [status, msg, result, meta]
+ has_dot_args(%args) -> [status, msg, payload, meta]
 
 This function contains arguments with dot in their names.
 
@@ -259,7 +259,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -270,7 +270,7 @@ Return value: Return the two numbers multiplied (any)
 
 Usage:
 
- has_duration_arg(%args) -> [status, msg, result, meta]
+ has_duration_arg(%args) -> [status, msg, payload, meta]
 
 This function contains a duration argument.
 
@@ -289,7 +289,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -317,7 +317,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

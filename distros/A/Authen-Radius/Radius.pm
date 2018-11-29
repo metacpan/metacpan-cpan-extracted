@@ -39,7 +39,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.27';
+$VERSION = '0.28';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0
@@ -377,9 +377,8 @@ sub clear_attributes {
 }
 
 sub _decode_enum {
-    my ( $name, $value, $format ) = @_;
+    my ( $name, $value) = @_;
 
-    $value = unpack( $format, $value );
     if ( defined $value && defined( $dict_val{$name}{$value} ) ) {
         $value = $dict_val{$name}{$value}{name};
     }
@@ -388,18 +387,48 @@ sub _decode_enum {
 }
 
 sub _decode_string {
-    my ( $self, $vendor, $id, $name, $value ) = @_;
+    my ( $self, $vendor, $id, $name, $value, $has_tag ) = @_;
 
     if ( $id == 2 && $vendor eq NO_VENDOR ) {
         return '<encrypted>';
     }
 
-    return $value;
+    if ($has_tag) {
+        my $tag = unpack('C', substr($value, 0, 1));
+        # rfc2868 section-3.3
+        # If the Tag field is greater than 0x1F, it SHOULD be
+        # interpreted as the first byte of the following String field.
+        if ($tag > 31) {
+            print STDERR "Attribute $name has tag value $tag bigger than 31 - ignoring it!\n" if $debug;
+            $tag = undef;
+        }
+        else {
+            # cut extracted tag
+            substr($value, 0, 1, '');
+        }
+        return ($value, $tag);
+    }
+
+    return ($value);
 }
 
 sub _decode_integer {
-    my ( $self, $vendor, $id, $name, $value ) = @_;
-    return _decode_enum( $name, $value, 'N' );
+    my ( $self, $vendor, $id, $name, $value, $has_tag ) = @_;
+
+    my $tag;
+    if ($has_tag) {
+        $tag = unpack('C', substr($value, 0, 1));
+        if ($tag > 31) {
+            print STDERR "Attribute $name has tag value $tag bigger than 31 - ignoring it!\n" if $debug;
+            $tag = undef;
+        }
+        else {
+            substr($value, 0, 1, "\x00");
+        }
+    }
+
+    $value = unpack('N', $value);
+    return (_decode_enum( $name, $value), $tag);
 }
 
 sub _decode_ipaddr {
@@ -501,11 +530,12 @@ my %decoder = (
 );
 
 sub _decode_value {
-    my ( $self, $vendor, $id, $type, $name, $value ) = @_;
+    my ( $self, $vendor, $id, $type, $name, $value, $has_tag ) = @_;
 
     if ( defined $type ) {
         if ( exists $decoder{$type} ) {
-            return $decoder{$type}->( $self, $vendor, $id, $name, $value );
+            my ($decoded, $tag) = $decoder{$type}->( $self, $vendor, $id, $name, $value, $has_tag );
+            return wantarray ? ($decoded, $tag) : $decoded;
         }
         else {
             if ($debug) {
@@ -545,12 +575,8 @@ sub get_attributes {
 
         $name  = $r->{name} // $id;
         $type  = $r->{type};
-        $tag = undef;
-        if ($r->{has_tag}) {
-            ( $tag, $rawvalue ) = unpack('Ca*', $rawvalue);
-        }
 
-        $value = $self->_decode_value( $vendor, $id, $type, $name, $rawvalue );
+        ($value, $tag) = $self->_decode_value( $vendor, $id, $type, $name, $rawvalue, $r->{has_tag} );
 
         push(
             @a, {
@@ -592,7 +618,7 @@ sub _encode_enum {
 }
 
 sub _encode_string {
-    my ( $self, $vendor, $id, $name, $value ) = @_;
+    my ( $self, $vendor, $id, $name, $value, $tag ) = @_;
 
     if ( $id == 2 && $vendor eq NO_VENDOR ) {
         $self->gen_authenticator();
@@ -605,12 +631,21 @@ sub _encode_string {
     #   return pack('C', 0) . substr($_[0], 0, 246);
     # }
 
+    if (defined $tag) {
+        $value = pack('C', $tag) . $value;
+    }
+
     return $value;
 }
 
 sub _encode_integer {
-    my ( $self, $vendor, $id, $name, $value ) = @_;
-    return _encode_enum( $name, $value, 'N' );
+    my ( $self, $vendor, $id, $name, $value, $tag ) = @_;
+    $value = _encode_enum( $name, $value, 'N' );
+    if (defined $tag) {
+        # tag added to 1st byte, not extending the value length
+        substr($value, 0, 1, pack('C', $tag) );
+    }
+    return $value;
 }
 
 sub _encode_ipaddr {
@@ -790,11 +825,11 @@ my %encoder = (
 );
 
 sub _encode_value {
-    my ( $self, $vendor, $id, $type, $name, $value ) = @_;
+    my ( $self, $vendor, $id, $type, $name, $value, $tag ) = @_;
 
     if ( defined $type ) {
         if ( exists $encoder{$type} ) {
-            return $encoder{$type}->( $self, $vendor, $id, $name, $value );
+            return $encoder{$type}->( $self, $vendor, $id, $name, $value, $tag );
         }
         else {
             if ($debug) {
@@ -827,6 +862,8 @@ sub add_attributes {
             $attr->{Tag} = $2;
             $attr_name = $1;
         }
+
+        die 'unknown attr name '.$attr_name if (! exists $dict_name{$attr_name});
 
         $id = $dict_name{$attr_name}{id} // int($attr_name);
         $vendor = vendorID($attr);
@@ -872,7 +909,7 @@ sub add_attributes {
             # WiMAX uses non-standard VSAs - include the continuation byte
         }
 
-        unless (defined($value = $self->_encode_value($vendor, $id, $type, $a->{Name}, $a->{Value}))) {
+        unless (defined($value = $self->_encode_value($vendor, $id, $type, $a->{Name}, $a->{Value}, $a->{Tag}))) {
             print STDERR "Unable to encode attribute $a->{Name} ($id, $type, $vendor) with value '$a->{Value}'\n" if $debug;
             next;
         }
@@ -885,22 +922,16 @@ sub add_attributes {
         }
 
         if ( $vendor eq NO_VENDOR ) {
-            if ($need_tag) {
-                $self->{'attributes'} .= pack('C C C', $id, length($value) + 3, $a->{Tag} // 0) . $value;
-            }
-            else {
-                $self->{'attributes'} .= pack('C C', $id, length($value) + 2) . $value;
-            }
+            # tag already included in $value, if any
+            $self->{'attributes'} .= pack('C C', $id, length($value) + 2) . $value;
         } else {
             # VSA
             # pack vendor-ID + vendor-type + vendor-length
             if ($vendor eq WIMAX_VENDOR) {
                 # add continuation byte
                 $value = pack('N C C C', $vendor, $id, length($value) + 3, 0) . $value;
-            } elsif ($need_tag) {
-                # tagged attribute
-                $value = pack('N C C C', $vendor, $id, length($value) + 3, $a->{Tag} // 0) . $value;
             } else {
+                # tag already included in $value, if any
                 $value = pack('N C C', $vendor, $id, length($value) + 2) . $value;
             }
 

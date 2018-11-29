@@ -15,7 +15,7 @@ Perl::Examples::POD::Text - Show the various examples of text
 
 =head1 VERSION
 
-This document describes version 0.092 of Perl::Examples::POD::Text (from Perl distribution Perl-Examples), released on 2018-09-11.
+This document describes version 0.094 of Perl::Examples::POD::Text (from Perl distribution Perl-Examples), released on 2018-11-29.
 
 =head1 DESCRIPTION
 

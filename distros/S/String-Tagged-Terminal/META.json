@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "String-Tagged-Terminal",
    "prereqs" : {
@@ -23,7 +23,9 @@
          "requires" : {
             "Convert::Color" : "0",
             "Convert::Color::XTerm" : "0",
-            "String::Tagged" : "0"
+            "String::Tagged" : "0",
+            "constant" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -35,7 +37,11 @@
    "provides" : {
       "String::Tagged::Terminal" : {
          "file" : "lib/String/Tagged/Terminal.pm",
-         "version" : "0.03"
+         "version" : "0.04"
+      },
+      "String::Tagged::Terminal::Win32Console" : {
+         "file" : "lib/String/Tagged/Terminal/Win32Console.pm",
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -44,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,0 +1,18 @@
+POST / HTTP/1.1
+Content-Length: 104
+User-Agent: HTTP-Tiny/0.025
+Content-Type: multipart/form-data; boundary=go7DX
+Connection: close
+Host: localhost:3000
+
+--go7DX
+Content-Disposition: form-data; name="file"; filename="test.txt"
+Content-Type: text/plain
+
+This is a test
+--go7DX
+Content-Disposition: form-data; name="testfield"
+
+test
+--go7DX--
+

@@ -2,7 +2,7 @@ package ARGV::Struct;
   use Moo;
   use Types::Standard qw/ArrayRef/;
 
-  our $VERSION = '0.05';
+  our $VERSION = '0.06';
 
   has argv => (
     is => 'ro', 

@@ -1,9 +1,10 @@
 package DBIx::Class::EasyFixture::Definition;
-$DBIx::Class::EasyFixture::Definition::VERSION = '0.12';
+$DBIx::Class::EasyFixture::Definition::VERSION = '0.13';
 # ABSTRACT: Validate fixture definitions
 
-use Moose;
-use Moose::Util::TypeConstraints;
+use Moo;
+use MooX::HandlesVia;
+use Types::Standard qw(Str HashRef ArrayRef);
 use Carp;
 use Storable 'dclone';
 use Scalar::Util 'blessed';
@@ -11,21 +12,21 @@ use namespace::autoclean;
 
 has 'name' => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
 );
 
 has 'definition' => (
     is       => 'ro',
-    isa      => 'HashRef',
+    isa      => HashRef,
     required => 1,
 );
 
 has 'fixtures' => (
-    traits   => ['Hash'],
     is       => 'ro',
-    isa      => 'HashRef',
+    isa      => HashRef,
     required => 1,
+    handles_via => 'Hash',
     handles  => {
         fixture_exists => 'exists',
     },
@@ -33,7 +34,7 @@ has 'fixtures' => (
 
 has 'group' => (
     is  => 'ro',
-    isa => 'ArrayRef[Str]',
+    isa => ArrayRef[Str],
 );
 
 around 'BUILDARGS' => sub {
@@ -153,7 +154,8 @@ sub _validate_class_and_data {
 
 sub _validate_next {
     my $self = shift;
-    my $next = $self->next or return;
+    my $next = $self->next;
+    return if not $next;
 
     $next = [$next] unless 'ARRAY' eq ref $next;
     my $name = $self->name;
@@ -177,7 +179,8 @@ sub _validate_required_objects {
 
     my $name = join '.' => $self->name, $self->resultset_class, 'requires';
 
-    my $requires = $self->requires or return;
+    my $requires = $self->requires;
+    return if not $requires;
     unless ( 'HASH' eq ref $requires ) {
         croak("$name does not appear to be a hashref");
     }
@@ -209,8 +212,6 @@ sub _validate_required_objects {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
-
 1;
 
 __END__
@@ -225,7 +226,7 @@ DBIx::Class::EasyFixture::Definition - Validate fixture definitions
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head2 DESCRIPTION
 

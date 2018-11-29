@@ -14,6 +14,26 @@ my $file = 't/' . basename $0;
 use FindBin;
 use lib "$FindBin::Bin/default/lib";
 
+# Sub
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Sub::Begin');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Literal
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Literal::IntOutOfRange');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
 # String
 {
   {

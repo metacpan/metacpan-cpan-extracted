@@ -2,7 +2,7 @@ package Test2::Compare::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.000115';
+our $VERSION = '0.000116';
 
 use Carp qw/confess croak/;
 use Scalar::Util qw/blessed/;
@@ -13,6 +13,7 @@ use Test2::Compare::Delta();
 sub MAX_CYCLES() { 75 }
 
 use Test2::Util::HashBase qw{builder _file _lines _info called};
+use Test2::Util::Ref qw/render_ref/;
 
 {
     no warnings 'once';
@@ -93,17 +94,19 @@ sub run {
     my $exists = $params{exists};
     my $got = $exists ? $params{got} : undef;
 
+    my $gotname = render_ref($got);
+
     # Prevent infinite cycles
     if (defined($got) && ref $got) {
         die "Cycle detected in comparison, aborting"
-            if $seen->{$got} && $seen->{$got} >= MAX_CYCLES;
-        $seen->{$got}++;
+            if $seen->{$gotname} && $seen->{$gotname} >= MAX_CYCLES;
+        $seen->{$gotname}++;
     }
 
     my $ok = $self->verify(%params);
     my @deltas = $ok ? $self->deltas(%params) : ();
 
-    $seen->{$got}-- if defined $got && ref $got;
+    $seen->{$gotname}-- if defined $got && ref $got;
 
     return if $ok && !@deltas;
 

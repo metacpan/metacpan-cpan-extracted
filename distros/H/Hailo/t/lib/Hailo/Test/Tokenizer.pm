@@ -1,5 +1,5 @@
 package Hailo::Test::Tokenizer;
-use v5.28.0;
+use v5.10.0;
 use Moose;
 use namespace::clean -except => 'meta';
 use Hailo::Tokenizer::Words;

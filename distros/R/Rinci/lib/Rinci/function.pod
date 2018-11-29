@@ -22,7 +22,7 @@ Rinci::function - Metadata for your functions/methods
 
 =head1 VERSION
 
-This document describes version 1.1.86 of Rinci::function (from Perl distribution Rinci), released on 2017-12-09.
+This document describes version 1.1.87 of Rinci::function (from Perl distribution Rinci), released on 2018-11-29.
 
 =head1 INTRODUCTION
 
@@ -217,11 +217,11 @@ codes that must fit in one unsigned byte (like L<Perinci::CmdLine>).
 
 =back
 
-=head2 Property: is_func => BOOL
+=head2 is_func
 
-Specify that the function can be called as a static function (i.e. procedural,
-not as a method). Default is true if unspecified, but becomes false if is_meth
-or is_class_meth is set to true.
+Bool. Specify that the function can be called as a static function (i.e.
+procedural, not as a method). Default is true if unspecified, but becomes false
+if is_meth or is_class_meth is set to true.
 
 Example:
 
@@ -229,83 +229,81 @@ Example:
  is_meth => 1
  is_func => 1 # if not specified, will default to false after is_meth set to 1
 
-=head2 Property: is_meth => BOOL
+=head2 is_meth
 
-Specify that the function can be called as an instance (object) method. Default
-is false.
+Bool. Specify that the function can be called as an instance (object) method.
+Default is false.
 
 Example:
 
  # specify that function is a method
  is_meth => 1
 
-=head2 Property: is_class_meth => BOOL
+=head2 is_class_meth
 
-Specify that the function can be called as a class method. Examples of class
-methods include the constructor, but there are others. Default is false.
+Bool. Specify that the function can be called as a class method. Examples of
+class methods include the constructor, but there are others. Default is false.
 
 Example:
 
  # specify that function is a class method
  is_class_meth => 1
 
-=head2 Property: args => HASH
+=head2 args (function property)
 
-Specify arguments. Property value is defhash of argument names and argument
-specification. Argument name must only contain letters, numbers, and underscores
-(and do not start with a number).
+Hash. Specify arguments. Property value is defhash of argument names and
+argument specification. Argument name must only contain letters, numbers, and
+underscores (and do not start with a number).
 
 Argument specification is a hash containing these keys:
 
-=over 4
-
-=item * B<schema> => SCHEMA
+=head3 schema (argument property)
 
 L<Data::Sah> schema for argument value.
 
-=item * B<default> => ANY
+=head3 default
 
-Give default value for argument. This takes precedence over schema, which can
-also specify default value. This is useful if you want to share a common schema
-over several arguments but want to have different default for each argument. For
-example, you have a C<ticket_status> schema. In C<create_ticket> function you
-want the default C<status> argument to be C<new>, while in C<reply_ticket> you
-want the default C<status> to be C<answered>.
+Any. Give default value for argument. This takes precedence over schema, which
+can also specify default value. This is useful if you want to share a common
+schema over several arguments but want to have different default for each
+argument. For example, you have a C<ticket_status> schema. In C<create_ticket>
+function you want the default C<status> argument to be C<new>, while in
+C<reply_ticket> you want the default C<status> to be C<answered>.
 
-=item * B<summary> => STR
+=head3 summary (argument property)
 
-From DefHash. A one-line plaintext summary, much like the C<summary> property in
-variable metadata.
+Str. From DefHash. A one-line plaintext summary, much like the C<summary>
+property in variable metadata.
 
-=item * B<req> => BOOL
+=head3 req
 
-Specify that argument is required (although its value can be undef/null).
+Bool. Specify that argument is required (although its value can be undef/null).
 Default is false.
 
-=item * B<description> => STR
+=head3 description (argument property)
 
-From DefHash. A longer description of marked up text, much like the
+Str. From DefHash. A longer description of marked up text, much like the
 C<description> property. It is suggested to format the text to 74 columns.
 
-=item * B<tags> => ARRAY OF (STR|HASH)
+=head3 tags (argument property)
 
-From DefHash. An array of tags, can be used by tools to categorize arguments.
-Not unlike the C<tags> property.
+Array of (str|hash). From DefHash. An array of tags, can be used by tools to
+categorize arguments. Not unlike the C<tags> property.
 
-=item * B<pos> => INT
+=head3 pos
 
-Argument position when specified in an ordered fashion, e.g. in an array. Starts
-from zero.
+Non-negative integer. Argument position when specified in an ordered fashion,
+e.g. in an array. Starts from zero.
 
-=item * B<greedy> => BOOL
+=head3 greedy
 
-Only relevant if B<pos> is specified, specify whether argument should gobble up
-all remaining values in an ordered argument list into an array.
+Bool. Only relevant if B<pos> is specified, specify whether argument should
+gobble up all remaining values in an ordered argument list into an array.
 
-=item * B<partial> => BOOL
+=head3 partial (argument property)
 
-Whether or not argument value can be sent partially. Only argument types that
-have a length notion can be set as partial (e.g. C<str> where the unit is
+Bool. Whether or not argument value can be sent partially. Only argument types
+that have a length notion can be set as partial (e.g. C<str> where the unit is
 character, C<buf> where the unit is byte, and C<array> where the unit is
 element).
 
@@ -341,31 +339,31 @@ sent), C<-arg_part_len> (length of part that is being sent). Example (in Perl):
              -arg_part_start => 20_000_000,
              -arg_part_len   =>  4_500_000);
 
-=item * B<stream> => bool
+=head3 stream (argument property)
 
-By setting this property to true, function can specify that it accepts streaming
-data for this argument. It is useful when argument value is large or of
-undetermined/infinite length. To send value as a stream, caller must send a
+Bool. By setting this property to true, function can specify that it accepts
+streaming data for this argument. It is useful when argument value is large or
+of undetermined/infinite length. To send value as a stream, caller must send a
 subroutine reference (callback) instead which the function will call repeatedly
 until it gets undef to signify exhaustion of data.
 
-=item * B<cmdline_aliases> => HASH
+=head3 cmdline_aliases
 
-Specify aliases for use in command-line options (or other possibly suitable
-situation where arguments are parsed from command-line-like options). Keys are
-alias names, values are itself hashes (alias specification). Valid alias
-specification keys: C<summary> (a string, optional), C<schema> (optional,
+Hash. Specify aliases for use in command-line options (or other possibly
+suitable situation where arguments are parsed from command-line-like options).
+Keys are alias names, values are itself hashes (alias specification). Valid
+alias specification keys: C<summary> (a string, optional), C<schema> (optional,
 defaults to argument's schema), C<is_flag> (bool, optional, if set to 1 then it
 is a shortcut for specifying C<schema> to C<< ["bool", {"is":1}] >>), C<code> (a
 code to set argument value, optional, will be given C<< (\%args, $val) >>); if
 not set, the default behavior is simply to set the argument value).
 
-=item * B<cmdline_on_getopt> => CODE
+=head3 cmdline_on_getopt
 
-A hook that will be called when argument is specified as a command-line option.
-In Perl, hook will be called with a hash argument containing this key: C<arg>
-(str, argument name), C<value> (str, option value), C<args> (hash, the argument
-hash defined so far).
+Code. A hook that will be called when argument is specified as a command-line
+option. In Perl, hook will be called with a hash argument containing this key:
+C<arg> (str, argument name), C<value> (str, option value), C<args> (hash, the
+argument hash defined so far).
 
 This can be useful if you want to process a command-line option directly on a
 per-option basis instead of getting the final resulting argument value. For
@@ -406,24 +404,25 @@ command-line. With the hooks, the function can load modules correctly (e.g.
 loading C<mod1> won't search in C<dir2> as that directory has not been added by
 -I).
 
-=item * B<completion> => CODE
+=head3 completion (argument property)
 
-A code to supply argument value completion. Will be explained in the examples.
+Code. A code to supply argument value completion. Will be explained in the
+examples.
 
-=item * B<index_completion> => CODE
+=head3 index_completion
 
-A code to supply argument element index completion. Applicable to the following
-argument types:
+Code. A code to supply argument element index completion. Applicable to the
+following argument types:
 
 B<hash>: for completing hash pair keys. (See also C<element_completion> for
 completing hash pair values).
 
 See examples for how to use this property.
 
-=item * B<element_completion> => CODE
+=head3 element_completion
 
-A code to supply argument element value completion. Applicable to the following
-argument types:
+Code. A code to supply argument element value completion. Applicable to the
+following argument types:
 
 B<array>: for completing array element values.
 
@@ -432,17 +431,18 @@ completing hash keys).
 
 See examples for how to use this property.
 
-=item * B<is_password> => STR
+=head3 is_password
 
-Experimental. Describe that argument holds password. Programs can react to this
-in several ways, for example they can turn off echoing to terminal when asking
-value from standard input. Or they can redact values to C<****> when logging.
+Experimental. Bool. Describe that argument holds password. Programs can react to
+this in several ways, for example they can turn off echoing to terminal when
+asking value from standard input. Or they can redact values to C<****> when
+logging.
 
-=item * B<cmdline_src> => STR
+=head3 cmdline_src
 
-Normally in a command-line program, command-line options and arguments will map
-to function arguments, e.g. C<--arg 2> will set the C<foo> argument to C<2> and
-positional arguments (argument which specifies the C<pos> property and
+Str. Normally in a command-line program, command-line options and arguments will
+map to function arguments, e.g. C<--arg 2> will set the C<foo> argument to C<2>
+and positional arguments (argument which specifies the C<pos> property and
 optionally also a C<greedy> property with true value) will get or slurp
 command-line arguments.
 
@@ -453,13 +453,13 @@ purpose:
 
 =over
 
-=item * C<file>
+=item * file
 
 Command-line option/argument value will be treated as filename and function
 argument will be set to content of the file (or in the case of streaming
 argument, to a callback which can be used to get the file's content).
 
-=item * C<stdin>
+=item * stdin
 
 This means that program should get function argument from the whole standard
 input until EOF.
@@ -467,30 +467,30 @@ input until EOF.
 Note that only one argument can have its source set to C<stdin> or
 C<stdin_or_file> or C<stdin_or_files> or C<stdin_or_args>.
 
-=item * C<stdin_or_file>
+=item * stdin_or_file
 
-This means that program should get value from content of file (the name of which
-is given from the first remaining command-line argument after all other
-arguments/options have been processed), or, if none is
-provided, from standard input.
+This means that program should get argument value from content of file (the name
+of which is given from the first remaining command-line argument after all other
+arguments/options have been processed), or, if none is provided, from standard
+input.
 
-=item * C<stdin_or_files>
+=item * stdin_or_files
 
-This means that program should get value from content of files (the names of
-which are taken from the remaining command-line arguments after all other
-arguments/options have been processed), or, or if no command-line argument
+This means that program should get argument value from content of files (the
+names of which are taken from the remaining command-line arguments after all
+other arguments/options have been processed), or, or if no command-line argument
 remains, from standard input. This behavior is similar to the C<< <> >> (diamond
 operator) in Perl.
 
-=item * C<stdin_or_args>
+=item * stdin_or_args
 
-This means that program should get value from remaining command-line
+This means that program should get argument value from remaining command-line
 argument(s), or if no command-line argument remains, from standard input.
 
-=item * C<stdin_line>
+=item * stdin_line
 
-This means that program should get value from a line of standard input; newline
-ending will be removed from the argument value.
+This means that program should get argument value from a line of standard input;
+newline ending will be removed from the argument value.
 
 Arguments with C<cmdline_src> of C<stdin_line> will be processed before
 C<stdin>/C<stdin_or_file>/C<stdin_or_files>/C<stdin_or_args>.
@@ -503,31 +503,32 @@ TODO: Define C<web_src> property?
 
 TODO: A way to define record separator?
 
-=item * B<cmdline_prompt> => str
+=head3 cmdline_prompt
 
-String to display when asking for argument value from stdin (if C<cmdline_src>
-property value is C<stdin_line>.
+Str. String to display when asking for argument value from stdin (if
+C<cmdline_src> property value is C<stdin_line>.
 
 TODO: cmdline_prompt_template?
 
-=item * B<meta> => hash (EXPERIMENTAL)
+=head3 meta
 
-This allows specifying argument submetadata, used e.g. when dealing with forms
-(a form field/widget can be a subform). Value is Rinci function metadata.
+Experimental. Hash. This allows specifying argument submetadata, used e.g. when
+dealing with forms (a form field/widget can be a subform). Value is Rinci
+function metadata.
 
-=item * B<element_meta> => hash (EXPERIMENTAL)
+=head3 element_meta
 
-This allows specifying argument element submetadata, used e.g. when dealing with
-forms (a form field/widget can contain an array of records/subforms). Value is
-Rinci function metadata.
+Experimental. Hash. This allows specifying argument element submetadata, used
+e.g. when dealing with forms (a form field/widget can contain an array of
+records/subforms). Value is Rinci function metadata.
 
-=item * B<deps> => hash
+=head3 deps (argument property)
 
-This property specifies argument's dependencies to other arguments (but possibly
-to other things too, in the future). This is similar to function's C<deps>
-property. It is a hash or dep types and values. The most important dep type is
-C<arg> (dependency to another argument). Some dep types are special: C<all>,
-C<any>, C<none>. Example:
+Hash. This property specifies argument's dependencies to other arguments (but
+possibly to other things too, in the future). This is similar to function's
+L</"deps (function property)"> property. It is a hash or dep types and values.
+The most important dep type is C<arg> (dependency to another argument). Some dep
+types are special: C<all>, C<any>, C<none>. Example:
 
  args => {
      delete => {
@@ -547,12 +548,15 @@ also specified. In a CLI context:
 
 Specifying C<--force> without C<--delete> doesn't make sense.
 
-=item * filters => [array of str|code]
+=head3 filters
 
-Experimental. Filters to apply before argument is converted from text and
-validated.
+Experimental. Array of string, or code. Filters to apply before argument is
+converted from text and validated.
 
-=back
+=head3 examples (argument property)
+
+Array. Each element is sample argument values. But if it is a hash, will be
+assumed as a DefHash.
 
 Example function metadata and its implementation in Perl:
 
@@ -829,12 +833,12 @@ When C<create_file> is executed over the command line:
  $ create-file file1 "hello filesystem" --extra-attr <tab>; # will complete with list of known attributes
  $ create-file file1 "hello filesystem" --extra-attr owner=<tab>; # will complete with list of Unix users
 
-=head2 Property: args_rels => hash
+=head2 args_rels
 
-This property is used to expression relationships between arguments. The value
-is actually L<Sah> schema hash clause set (see hash type in L<Sah::Type>). The
-arguments are represented as a hash, and you can use the various Sah clauses to
-express relationships between the arguments (hash keys) because the Sah hash
+Hash. This property is used to expression relationships between arguments. The
+value is actually L<Sah> schema hash clause set (see hash type in L<Sah::Type>).
+The arguments are represented as a hash, and you can use the various Sah clauses
+to express relationships between the arguments (hash keys) because the Sah hash
 type supports such clauses, e.g. C<choose_one>, C<choose_all>, C<req_one>,
 C<req_all>, C<dep_any>, C<dep_all>, C<req_dep_any>, C<req_dep_all>.
 
@@ -859,42 +863,42 @@ Another example:
 
  XXX
 
-=head2 Property: args_as => STR
+=head2 args_as
 
-Specify in what form the function expects the arguments. The value is actually
-implementation-specific since it describes the function implementation. For
-example in L<Perinci> for Perl, these values are recognized: C<array>, C<hash>,
-C<arrayref>, C<hashref>. This property is useful for wrapper to be able to
-convert one form to another.
+Str. Specify in what form the function expects the arguments. The value is
+actually implementation-specific since it describes the function implementation.
+For example in L<Perinci> for Perl, these values are recognized: C<array>,
+C<hash>, C<arrayref>, C<hashref>. This property is useful for wrapper to be able
+to convert one form to another.
 
 The default value is also left to the implementation.
 
 For interimplementation communication (e.g. via L<Riap::HTTP> or L<Riap::TCP>),
 named arguments are always used so this property is irrelevant.
 
-=head2 Property: result => HASH
+=head2 result
 
-Specify function return value. It is a defhash containing keys:
+DefHash. Specify function return value. It is a defhash containing keys:
 
 =over 4
 
-=item * B<summary>
+=item * summary (result property)
 
 From DefHash. Like the C<summary> property in variable metadata.
 
-=item * B<description>
+=item * description (result property)
 
 From DefHash. Like the C<description> property. Suggested to be formatted to 78
 columns.
 
-=item * B<schema> => SCHEMA
+=item * schema (result property)
 
 A Sah schema to validate the result (the third element in the envelope result).
 This schema should only be tested if status is 200. See also: C<statuses>.
 
-=item * B<statuses> => HASH
+=item * statuses
 
-Can be used to specify different result schema for different statuses. For
+Hash. Can be used to specify different result schema for different statuses. For
 example:
 
  statuses => {
@@ -903,17 +907,18 @@ example:
      },
  }
 
-=item * B<stream> => bool
+=item * stream (result property)
 
-Specify that function returns streaming output. Note that function can also
-signify streaming output by setting result metadata property C<stream> to true.
+Bool. Specify that function returns streaming output. Note that function can
+also signify streaming output by setting result metadata property C<stream> to
+true.
 
 Function must then return a subroutine reference (callback) as its actual result
 which the caller can call repeatedly until it gets undef to signify exhaustion.
 
-=item * B<partial> => bool
+=item * partial (result property)
 
-If set to true, specify that it is possible to request partial result. An
+Bool. If set to true, specify that it is possible to request partial result. An
 example is in a function that reads contents from (potentially large) files:
 
  # function metadata
@@ -979,18 +984,18 @@ Examples:
      }]
  }
 
-=head2 Property: result_naked => BOOL
+=head2 result_naked
 
-If set to true, specify that function does not envelope its results. The default
-is false, to encourage functions to create envelopes. However, wrapper should be
-able to create or strip envelope if needed. For example, if you have
+Bool. If set to true, specify that function does not envelope its results. The
+default is false, to encourage functions to create envelopes. However, wrapper
+should be able to create or strip envelope if needed. For example, if you have
 "traditional" functions which does not do envelopes, you can set this property
 to true, and the wrapper can generate the envelope for the functions.
 
-=head2 Property: examples => ARRAY
+=head2 examples (function property)
 
-This property allows you to put examples in a detailed and structured way, as an
-alternative to putting everything in C<description>.
+Array. This property allows you to put examples in a detailed and structured
+way, as an alternative to putting everything in C<description>.
 
 Each example is a defhash, it specifies what arguments are used, what the
 results are, and some description. It can be used when generating API/usage
@@ -1000,30 +1005,30 @@ against expected result). Known properties:
 
 =over 4
 
-=item * args => HASH
+=item * args (function example property)
 
-Arguments used to produce result. Can be converted to C<argv> by tool, e.g. when
-displaying command-line examples.
+Hash. Arguments used to produce result. Can be converted to C<argv> by tool,
+e.g. when displaying command-line examples.
 
-=item * argv => ARRAY
+=item * argv
 
-An alternative to C<args>, for example when function is run from the
+Array. An alternative to C<args>, for example when function is run from the
 command-line. Can be converted to C<args> most of the time when wanting to
 display examples in Perl instead of command-line.
 
-=item * src => STR
+=item * src
 
-An alternative to C<args> or C<argv>, to provide raw source code. See also:
+Str. An alternative to C<args> or C<argv>, to provide raw source code. See also:
 C<src_plang>. This can be used to show more general examples. For example, you
 can show how a function is used in an expression or code block, or how a
 command-line program is used in a shell script.
 
 Exactly one of C<args>, C<argv>, or C<src> must be specified.
 
-=item * src_plang => STR
+=item * src_plang
 
-The programming language the examples source code C<src> is written in. Valid
-values include: C<perl>, C<bash>.
+Str. The programming language the examples source code C<src> is written in.
+Valid values include: C<perl>, C<bash>.
 
 Command-line interface tools will typically only show examples written in
 C<bash> or other shells, while Perl module tools will typically only show
@@ -1031,35 +1036,35 @@ C<perl> examples.
 
 Required if C<src> is specified.
 
-=item * status => INT (default: 200)
+=item * status
 
-Status from envelope. If unspecified, assumed to be 200.
+Int. Status from envelope. If unspecified, assumed to be 200.
 
-=item * result => DATA
+=item * result
 
-Expected result.
+Any. Expected result.
 
-=item * summary => STR
+=item * summary (function example property)
 
 From DefHash. A one-line summary of the example You should describe, in one
 phrase or sentence, what the example tries to demonstrate. You can skip the
 summary if the example is pretty basic or things are already clear from the
 C<args> alone.
 
-=item * description => STR
+=item * description (function example property)
 
 From DefHash. Longer marked up text about the example (e.g. discussion or things
 to note), suggested to be formatted to 72 columns.
 
-=item * tags => ARRAY
+=item * tags (function example property)
 
 From DefHash.
 
-=item * test => BOOL (default: 1)
+=item * test
 
-Whether to actually test example or not. Examples are by default run as tests by
-a test module (e.g. Perl module L<Test::Rinci>. Setting this to 0 disables this
-example from being included in a test.
+Bool. Defaults to true. Whether to actually test example or not. Examples are by
+default run as tests by a test module (e.g. Perl module L<Test::Rinci>. Setting
+this to 0 disables this example from being included in a test.
 
 TODO: more detailed testing instruction (e.g. only test in release candidate,
 or under certain environment flag, etc).
@@ -1106,21 +1111,20 @@ Another example demonstrating C<src> for a function called C<list_countries>:
      },
  ],
 
-=head2 Property: features => HASH
+=head2 features
 
-The C<features> property is a deffhash. It allows functions to express their
-features. Each hash key contains feature name, which must only contain
-letters/numbers/underscores.
+DefHash. Allows functions to express their features. Each hash key contains
+feature name, which must only contain letters/numbers/underscores.
 
 Below is the list of defined features. New feature names may be defined by
 extension.
 
 =over 4
 
-=item * feature: reverse => BOOL (default: 0)
+=item * reverse
 
-If set to true, specifies that function supports reverse operation. To reverse,
-caller can add special argument C<-reverse>. For example:
+Bool. Default: false. If set to true, specifies that function supports reverse
+operation. To reverse, caller can add special argument C<-reverse>. For example:
 
  $SPEC{triple} = {
      v => 1.1,
@@ -1136,21 +1140,21 @@ caller can add special argument C<-reverse>. For example:
  triple(num=>12);              # => 36
  triple(num=>12, -reverse=>1); # =>  4
 
-=item * feature: tx => HASH
+=item * tx
 
-Default is none. Specify transactional support, as specified in
+Hash. Default is none. Specify transactional support, as specified in
 L<Rinci::Transaction>. Value is a hash containing these keys: C<v> (int,
 protocol version, default if not specified is 1).
 
 Please see Rinci::Transaction for more details on transaction.
 
-=item * feature: dry_run => bool|hash
+=item * dry_run
 
-If set to a true value, specifies that function supports dry-run (simulation)
-mode. Can also be set to a hash like this: C<<{default=>1}>> to mean that
-function supports dry-run and the default is dry-run mode. Example:
+Bool, or hash. If set to a true value, specifies that function supports dry-run
+(simulation) mode. Can also be set to a hash like this: C<<{default=>1}>> to
+mean that function supports dry-run and the default is dry-run mode. Example:
 
- use Log::Any '$log';
+ use Log::ger;
 
  $SPEC{rmre} = {
      summary  => 'Delete files in curdir matching a regex',
@@ -1165,7 +1169,7 @@ function supports dry-run and the default is dry-run mode. Example:
      opendir my($dir), ".";
      while (my $f = readdir($dir)) {
          next unless $f =~ $re;
-         $log->info("Deleting $f ...");
+         log_info "Deleting $f ...";
          next if $dry_run;
          unlink $f;
      }
@@ -1187,13 +1191,14 @@ function.
 
 =back
 
-=item * feature: pure => BOOL (default: 0)
+=item * pure
 
-If set to true, specifies that function is "pure" and has no "side effects"
-(these are terms from functional programming / computer science). Having a side
-effect means changing something, somewhere (e.g. setting the value of a global
-variable, modifies its arguments, writing some data to disk, changing system
-date/time, etc.) Specifying a function as pure means, among others:
+Bool. Default: false. If set to true, specifies that function is "pure" and has
+no "side effects" (these are terms from functional programming / computer
+science). Having a side effect means changing something, somewhere (e.g. setting
+the value of a global variable, modifies its arguments, writing some data to
+disk, changing system date/time, etc.) Specifying a function as pure means,
+among others:
 
 =over 4
 
@@ -1203,17 +1208,17 @@ date/time, etc.) Specifying a function as pure means, among others:
 
 =back
 
-=item * feature: immutable => BOOL
+=item * immutable
 
-Default is false. If set to true, specifies that function always returns the
-same result when given the same argument values. This enables optimization like
-memoization. An example of an immutable function is C<sub { $_[0]+$_[1] }> where
-its results only depend on the arguments. Example of a mutable function would be
-C<rand()> or C<read()> that reads contents from a file.
+Bool. Default is false. If set to true, specifies that function always returns
+the same result when given the same argument values. This enables optimization
+like memoization. An example of an immutable function is C<sub { $_[0]+$_[1] }>
+where its results only depend on the arguments. Example of a mutable function
+would be C<rand()> or C<read()> that reads contents from a file.
 
-=item * feature: idempotent => BOOL
+=item * idempotent
 
-Default is false. If set to true, specifies that function is idempotent.
+Bool. Default is false. If set to true, specifies that function is idempotent.
 Idempotency means that repeated invocation of a function (each with the same
 arguments) will have the same effect as a single invocation. In other words,
 extra invocation will not have any effect.
@@ -1235,22 +1240,22 @@ record the original file that was renamed (its MD5 checksum, size, or what not)
 or perhaps record the action in a history database or flag file, and refuse to
 rename again if the file to be renamed is not the original file.
 
-=item * feature: check_arg => bool
+=item * check_arg
 
-Default is false. If set to true, specifies that function supports the action of
-checking only a single argument. Usually useful when doing form processing,
-where we want to check only a single form field (function argument). To check a
-single argument, one passes C<-action> special argument with the value of
-C<check_arg> and also passes the argument she wants to check. Function should
-check that argument and immediately return 200 status upon success, or 400 upon
-validation failure.
+Bool. Default is false. If set to true, specifies that function supports the
+action of checking only a single argument. Usually useful when doing form
+processing, where we want to check only a single form field (function argument).
+To check a single argument, one passes C<-action> special argument with the
+value of C<check_arg> and also passes the argument she wants to check. Function
+should check that argument and immediately return 200 status upon success, or
+400 upon validation failure.
 
 =back
 
-=head2 Property: deps => HASH
+=head2 deps (function property)
 
-This property specifies function's dependencies to various things. It is a hash
-of dep types and values. Some dep types are special: C<all>, C<any>, and
+Hash. This property specifies function's dependencies to various things. It is a
+hash of dep types and values. Some dep types are special: C<all>, C<any>, and
 C<none>.
 
  deps => {
@@ -1282,43 +1287,44 @@ defined by an extension.
 
 =over 4
 
-=item * dep: env => STR
+=item * env
 
-Require that an environment variable exists and is true, where true is in the
-Perl sense (not an empty string or "0"; " " and "0.0" are both true). Example:
+Str. Require that an environment variable exists and is true, where true is in
+the Perl sense (not an empty string or "0"; " " and "0.0" are both true).
+Example:
 
  env => 'HTTPS'
 
-=item * dep: prog => STR
+=item * prog
 
-Require that a program exists. If STR doesn't contain path separator character
-'/' it will be searched in PATH. Windows filesystem should also use Unix-style
-path, e.g. "C:/Program Files/Foo/Bar.exe".
+Str. Require that a program exists. If STR doesn't contain path separator
+character '/' it will be searched in PATH. Windows filesystem should also use
+Unix-style path, e.g. "C:/Program Files/Foo/Bar.exe".
 
  prog => 'rsync'   # any rsync found on PATH
  prog => '/bin/su' # won't accept any other su
 
-=item * dep: pkg => STR
+=item * pkg
 
-Specify dependency on a L<Riap> package. STR must be a valid Riap package URI
-string. Checker can check that requesting C<info> on this URI succeeds and the
-type is indeed C<package>. Example:
+Str. Specify dependency on a L<Riap> package. STR must be a valid Riap package
+URI string. Checker can check that requesting C<info> on this URI succeeds and
+the type is indeed C<package>. Example:
 
  pkg => '/Foo/'
 
-=item * dep: func => STR
+=item * func
 
-Specify dependency on a L<Riap> function. STR must be a valid Riap function URI
-string. Checker can check that requesting C<info> on this URI succeeds and the
-type is indeed C<package>. Example:
+Str. Specify dependency on a L<Riap> function. STR must be a valid Riap function
+URI string. Checker can check that requesting C<info> on this URI succeeds and
+the type is indeed C<package>. Example:
 
  pkg => '/Foo/somefunc'
  pkg => 'http://gudangapi.com/ga/list_ubuntu_releases'
 
-=item * dep: code => CODE
+=item * code
 
-Require that anonymous function returns a true value after called, where the
-notion of true depends on the host language. Example in Perl:
+Code. Require that anonymous function returns a true value after called, where
+the notion of true depends on the host language. Example in Perl:
 
  code => sub {$>}  # i am not being run as root
 
@@ -1326,25 +1332,26 @@ Example in Ruby:
 
  "code" => Proc.new { Process.euid > 0 }  # i am not being run as root
 
-=item * dep: tmp_dir => BOOL
+=item * tmp_dir
 
-If set to 1, specify that function requires temporary directory. Caller should
-provide path to this using special argument C<-tmp_dir>.
+Bool. If set to 1, specify that function requires temporary directory. Caller
+should provide path to this using special argument C<-tmp_dir>.
 
-=item * dep: trash_dir => BOOL
+=item * trash_dir
 
-If set to 1, specify that function requires trash directory. Trash is not unlike
-a temporary directory. Caller should provide path to trash directory using
-special argument C<-trash_dir>.
+Bool. If set to 1, specify that function requires trash directory. Trash is not
+unlike a temporary directory. Caller should provide path to trash directory
+using special argument C<-trash_dir>.
 
 Trash directory can be provided, e.g. by transaction manager (see
 L<Rinci::Transaction>).
 
-=item * dep: all => [DEPHASH, ...]
+=item * all
 
-A "meta" type that allows several dependencies to be joined together in a
-logical-AND fashion. All dependency hashes must be satisfied. For example, to
-declare a dependency to several programs and an environment variable:
+Array of deps. A "meta" type that allows several dependencies to be joined
+together in a logical-AND fashion. All dependency hashes must be satisfied. For
+example, to declare a dependency to several programs and an environment
+variable:
 
  all => [
      {prog => 'rsync'},
@@ -1352,20 +1359,22 @@ declare a dependency to several programs and an environment variable:
      {env  => 'FORCE'},
  ],
 
-=item * dep: any => [DEPHASH, ...]
+=item * any
 
-Like C<all>, but specify a logical-OR relationship. Any one of the dependencies
-will suffice. For example, to specify requirement to alternative Perl modules:
+Array of deps. Like C<all>, but specify a logical-OR relationship. Any one of
+the dependencies will suffice. For example, to specify requirement to
+alternative Perl modules:
 
  or => [
      {perl_module => 'HTTP::Daemon'},
      {perl_module => 'HTTP::Daemon::SSL'},
  ],
 
-=item * dep: none => [DEPHASH, ...]
+=item * none
 
-Specify that none of the dependencies must be satisfied for this type to be
-satisfied. Example, to specify that the function not run under SUDO or by root:
+Array of deps. Specify that none of the dependencies must be satisfied for this
+type to be satisfied. Example, to specify that the function not run under SUDO
+or by root:
 
  none => [
      {env  => 'SUDO_USER'   },
@@ -1524,7 +1533,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -26,7 +26,7 @@ my $st = String::Tagged::Terminal->new
 
    $st->say_to_terminal( $fh );
 
-   is( $output, "a string with \e[1mbold\e[m formatting\n",
+   like( $output, qr/a string with \e\[1mbold\e\[m formatting\r?\n/,
       'output includes linefeed' );
 }
 

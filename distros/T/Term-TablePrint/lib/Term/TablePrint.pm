@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.101';
+our $VERSION = '0.103';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -148,7 +148,12 @@ sub print_table {
     $self->{plugin}->__hide_cursor();
     if ( $self->{choose_columns}  ) {
         $self->{orig_col_idxs} = $self->__choose_columns( $table_ref->[0] );
-        return if ! defined $self->{orig_col_idxs};
+        if ( ! defined $self->{orig_col_idxs} ) {
+            return;
+        }
+        if ( ! @{$self->{orig_col_idxs}} ) {
+            $self->{orig_col_idxs} = [ 0 .. $#{$table_ref->[0]} ];
+        }
     }
     else {
         $self->{orig_col_idxs} = [ 0 .. $#{$table_ref->[0]} ];
@@ -417,26 +422,40 @@ sub __calc_col_width {
         );                                                                      #
     }                                                                           #
     $self->{longest_col_name} = 0;
-    $self->{w_cols} = [ ( 1 ) x @{$self->{table_copy}[0]} ];
+    $self->{w_cols}  = [ ( 1 ) x @{$self->{table_copy}[0]} ];
+    $self->{w_int}   = [ ( 0 ) x @{$self->{table_copy}[0]} ];
+    $self->{w_fract} = [ ( 0 ) x @{$self->{table_copy}[0]} ];
     my $normal_row = 0;
     my @col_idx = ( 0 .. $#{$self->{table_copy}[0]} );
 
     for my $row ( @{$self->{table_copy}}[@{$self->{row_idxs}}] ) {
         for my $i ( @col_idx ) {
-            my $width = print_columns( $row->[$i] );
             if ( $normal_row ) {
+                my $width;
+                if ( ! length $row->[$i] ) {
+                    $width = 0;
+                }
+                elsif ( $row->[$i] =~/^([-+]?[0-9]*)(:?\.[0-9]+)?\z/ ) {
+                    $width = length( $row->[$i] );
+                    if ( defined $1 ) {
+                        $self->{w_int}[$i] = length( $1 ) if length( $1 ) > $self->{w_int}[$i];
+                    }
+                    if ( defined $2 ) {
+                        $self->{w_fract}[$i] = length( $2 ) if length( $2 ) > $self->{w_fract}[$i];
+                    }
+                }
+                else {
+                    $width = print_columns( $row->[$i] );
+                }
                 if ( $width > $self->{w_cols}[$i] ) {
                     $self->{w_cols}[$i] = $width;
-                }
-                if ( $row->[$i] && ! looks_like_number $row->[$i] ) {
-                    ++$self->{not_a_number}[$i];
                 }
             }
             else {
                 # col name
-                $self->{w_head}[$i] = $width;
-                if ( $width > $self->{longest_col_name} ) {
-                    $self->{longest_col_name} = $width;
+                $self->{w_head}[$i] = print_columns( $row->[$i] );
+                if ( $self->{w_head}[$i] > $self->{longest_col_name} ) {
+                    $self->{longest_col_name} = $self->{w_head}[$i];
                 }
                 if ( $i == $#$row ) {
                     $normal_row = 1;
@@ -551,22 +570,64 @@ sub __cols_to_string {
     else {
         $tab = ' ' x $self->{tab_w};
     }
+    for my $col ( 0 .. $#$w_cols ) {
+        if ( $w_cols->[$col] - $self->{w_int}[$col] < $self->{w_fract}[$col] ) {
+            $self->{w_fract}[$col] = $w_cols->[$col] - $self->{w_int}[$col];
+            $self->{w_fract}[$col] = 0 if $self->{w_fract}[$col] < 0;
+        }
+    }
     for my $row ( @{$self->{row_idxs}} ) {
         my $str = '';
         for my $col ( 0 .. $#$w_cols ) {
-            $str .= unicode_sprintf(
-                $self->{table_copy}[$row][$col],
-                $w_cols->[$col],
-                $self->{not_a_number}[$col] ? 0 : 1
-            );
+            if ( ! length $self->{table_copy}[$row][$col] ) {
+                $str = $str . ' ' x $w_cols->[$col];
+            }
+            elsif ( $self->{table_copy}[$row][$col] =~ /^([-+]?[0-9]*)(\.[0-9]+)?\z/ ) {
+                my $all = '';
+                if ( $self->{w_fract}[$col] ) {
+                    if ( defined $2 ) {
+                        if ( length $2 > $self->{w_fract}[$col] ) {
+                            $all = substr( $2, 0, $self->{w_fract}[$col] );
+                        }
+                        else {
+                            #$all = $2 . '0' x ( $self->{w_fract}[$col] - length $2 );
+                            $all = $2 . ' ' x ( $self->{w_fract}[$col] - length $2 );
+                        }
+                    }
+                    else {
+                        #$all = '.' . '0' x ( $self->{w_fract}[$col] - 1 );
+                        $all = ' ' x $self->{w_fract}[$col];
+                    }
+                }
+                if ( defined $1 ) {
+                    if ( $self->{w_int}[$col] > length $1 ) {
+                        $all = ' ' x ( $self->{w_int}[$col] - length $1 ) . $1 . $all;
+                    }
+                    else {
+                        $all = $1 . $all;
+                    }
+                }
+                if ( length $all > $w_cols->[$col] ) {
+                    $str = $str . substr( $all, 0, $w_cols->[$col] );
+                }
+                else {
+                    $str = $str . ' ' x ( $w_cols->[$col] - length $all ) . $all;
+                }
+            }
+            #elsif ( looks_like_number $self->{table_copy}[$row][$col] ) {
+            #    $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col], 1 );
+            #}
+            else {
+                $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col] );
+            }
             if ( $self->{color} && defined $self->{orig_table}[$row][$col] ) { ##
                 my @color = $self->{orig_table}[$row][$col] =~ /(\e\[[\d;]*m)/msg;
                 $str =~ s/\x{feff}/shift @color/ge;
-                $str .= $color[-1] if @color;
+                $str = $str . $color[-1] if @color;
             }
-            $str .= $tab if $col != $#$w_cols;
+            $str = $str . $tab if $col != $#$w_cols;
         }
-        $str .= RESET if $self->{color};
+        $str = $str . RESET if $self->{color};
         $self->{table_copy}[$row] = $str;   # overwrite table_copy to save memory
         if ( $self->{progress_status} ) {                                       #
             if ( $count >= $next_update ) {                                     #
@@ -682,7 +743,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.101
+Version 0.103
 
 =cut
 
@@ -730,8 +791,7 @@ Control characters, code points of the surrogate ranges and non-characters are r
 If the option I<squash_spaces> is enabled leading and trailing spaces are removed from the array elements and spaces
 are squashed to a single space.
 
-The elements in a column are right-justified if one or more elements of that column do not look like a number, else they
-are left-justified.
+If an element looks like a number it is left-justified, else it is right-justified.
 
 =head1 METHODS
 
@@ -845,6 +905,8 @@ Default: 0
 If I<choose_columns> is set to 1, the user can choose which columns to print. Columns can be added (with the
 C<SpaceBar> and the C<Return> key) until the user confirms with the I<-ok-> menu entry.
 
+Confirming without any selected columns selects all columns.
+
 Default: 0
 
 =head3 codepage_mapping
@@ -862,6 +924,8 @@ Default: 0
 =head3 color
 
 Setting this option to C<1> enables the support for color and text formatting escape sequences.
+
+At the end of each row it is added automatically a reset (C<\e[0m>).
 
 If the OS is MSWin32 and this option is enabled, C<Term::Choose> loads L<Win32::Console::ANSI>. C<Win32::Console::ANSI>
 emulates an ANSI console. See also the option L</codepage_mapping>.

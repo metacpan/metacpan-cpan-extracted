@@ -1,4 +1,21 @@
 Revision history for HTTP::DAV
+  v0.49 (released 2018/11/28):
+    *   bug fixes
+
+        Fixed perl shebang line in "dave" script, for ExtUtils::MakeMaker to
+        correctly replace it. Closes "RT#127819".
+
+        Fixed "propfind" response handling to also consider successful an
+        HTTP 207 status code. Closes "RT#127591".
+
+        Fixed "clone()" method to properly respect the class name. Closes
+        "RT#123528". Thanks to Ricardo Signes for the patch.
+
+    *   documentation fixes
+
+        Fixed various pod issues raised by Debian contributor
+        "fsfs@debian.org". Closes "RT#119878".
+
   v0.48 (released 2015/03/26):
     *   bug fixes
 

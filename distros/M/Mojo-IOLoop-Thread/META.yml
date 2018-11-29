@@ -26,7 +26,7 @@ no_index:
 provides:
   Mojo::IOLoop::Thread:
     file: lib/Mojo/IOLoop/Thread.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Mojolicious: '7.35'
   perl: '5.008001'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/tomk3003/mojo-ioloop-thread/issues
   homepage: https://github.com/tomk3003/mojo-ioloop-thread
   repository: git://github.com/tomk3003/mojo-ioloop-thread.git
-version: '0.08'
+version: '0.09'
 x_contributors:
   - 'tomk3003 <ThomasKratz@web.de>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

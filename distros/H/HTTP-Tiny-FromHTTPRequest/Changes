@@ -1,0 +1,11 @@
+Revision history for HTTP::Tiny::FromHTTPRequest
+================================================
+
+0.02   2018-11-29 10:03:00
+
+  * Fix required version of dependencies
+  * Fix example in SYNOPSIS
+
+0.01   2018-11-28 20:04:00
+
+  * initial release

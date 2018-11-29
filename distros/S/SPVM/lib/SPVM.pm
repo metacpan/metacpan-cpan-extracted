@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0394';
+our $VERSION = '0.0396';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -54,13 +54,16 @@ sub import {
 # Compile SPVM source code just after compile-time of Perl
 CHECK {
   if ($BUILDER) {
-    my $compile_success = $BUILDER->build_spvm();
+    my $compile_success = $BUILDER->build_spvm;
     unless ($compile_success) {
       exit(255);
     }
     
     # Set env
     $SPVM_ENV = $BUILDER->{env};
+    
+    # Call begin blocks
+    $BUILDER->call_begin_blocks;
   }
 }
 

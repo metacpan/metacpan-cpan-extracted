@@ -26,7 +26,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX-Static
   homepage: https://metacpan.org/release/Finance-SE-IDX-Static
   repository: git://github.com/perlancar/perl-Finance-SE-IDX-Static.git
-version: 20181012.0.0
+version: 20181129.0.0
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -333,7 +333,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

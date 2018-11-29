@@ -133,37 +133,6 @@ sub test_open {
     is( ENOENT, 2, "could not write to unwritable directory" );
     chmod 0755, $dir;
 
-    Data::RecordStore::open_store( $dir );
-    chmod 0444, "$dir/RECORD_INDEX_SILO/0";
-    eval {
-        $store = Data::RecordStore::open_store( $dir );
-        fail( "Was able to open store with unwriteable index" );
-    };
-    is( ENOENT, 2, "could not write to unwritable directory" );
-
-    chmod 0755, "$dir/RECORD_INDEX_SILO/0";
-
-    #
-    # Test old versions
-    #
-    my $ver = "$dir/VERSION";
-    unlink( $ver );
-    eval {
-        $store = Data::RecordStore::open_store( $dir );
-        fail( "was able to open store without version" );
-    };
-    like( $@, qr/run the record_store_convert/, "fail message for opening store without version" );
-
-    undef $out;
-    open $out, '>', $ver;
-    print $out "3.2\n";
-    close $out;
-    eval {
-        $store = Data::RecordStore::open_store( $dir );
-        fail( "was able to open store without version" );
-    };
-    like( $@, qr/run the record_store_convert/, "fail message for opening store with old version" );
-
 
 } #test_open
 

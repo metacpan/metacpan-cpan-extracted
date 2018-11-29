@@ -2,8 +2,8 @@ NAME
     CryptoExchange::Catalog - Catalog of cryptoexchanges
 
 VERSION
-    This document describes version 20180605.1.0 of CryptoExchange::Catalog
-    (from Perl distribution CryptoExchange-Catalog), released on 2018-06-05.
+    This document describes version 20181129.0.0 of CryptoExchange::Catalog
+    (from Perl distribution CryptoExchange-Catalog), released on 2018-11-29.
 
 SYNOPSIS
      use CryptoExchange::Catalog;

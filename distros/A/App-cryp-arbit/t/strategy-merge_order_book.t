@@ -24,7 +24,7 @@ subtest 'opt:min_net_profit_margin' => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -33,7 +33,7 @@ subtest 'opt:min_net_profit_margin' => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -46,7 +46,7 @@ subtest 'opt:min_net_profit_margin' => sub {
         {
             base_size => 0.2,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -99,7 +99,7 @@ subtest 'opt:forex_spreads' => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -108,7 +108,7 @@ subtest 'opt:forex_spreads' => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -121,7 +121,7 @@ subtest 'opt:forex_spreads' => sub {
         {
             base_size => 0.2,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -174,7 +174,7 @@ subtest 'opt:max_order_pairs' => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -183,7 +183,7 @@ subtest 'opt:max_order_pairs' => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -196,7 +196,7 @@ subtest 'opt:max_order_pairs' => sub {
         {
             base_size => 0.2,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -250,7 +250,7 @@ subtest 'buy & sell size match' => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.1,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -263,7 +263,7 @@ subtest 'buy & sell size match' => sub {
         {
             base_size => 0.1,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -316,7 +316,7 @@ subtest 'buy size > sell size' => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -325,7 +325,7 @@ subtest 'buy size > sell size' => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -338,7 +338,7 @@ subtest 'buy size > sell size' => sub {
         {
             base_size => 0.2,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -364,7 +364,7 @@ subtest 'buy size > sell size' => sub {
         {
             base_size => 0.8,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -426,7 +426,7 @@ subtest 'buy size < sell size' => sub {
     my $all_sell_orders = [
         {
             base_size        => 1,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -439,7 +439,7 @@ subtest 'buy size < sell size' => sub {
         {
             base_size => 0.2,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -465,7 +465,7 @@ subtest 'buy size < sell size' => sub {
         {
             base_size => 0.8,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -527,7 +527,7 @@ subtest 'selling account balance (1)' => sub {
     my $all_sell_orders = [
         {
             base_size        => 1,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -540,7 +540,7 @@ subtest 'selling account balance (1)' => sub {
         indodax => {
             ETH => [{account=>'i1', available=>0.15}],
         },
-        gdax => {
+        'coinbase-pro' => {
             USD => [{account=>'g1', available=>9999}],
         },
     };
@@ -550,7 +550,7 @@ subtest 'selling account balance (1)' => sub {
             base_size => 0.15,
             buy => {
                 account => "g1",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -614,7 +614,7 @@ subtest 'selling account balance (2)' => sub {
     my $all_sell_orders = [
         {
             base_size        => 1,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -627,7 +627,7 @@ subtest 'selling account balance (2)' => sub {
         indodax => {
             ETH => [{account=>'i1', available=>0.15}, {account=>'i2', available=>0.03}],
         },
-        gdax => {
+        'coinbase-pro' => {
             USD => [{account=>'g1', available=>9999}],
         },
     };
@@ -637,7 +637,7 @@ subtest 'selling account balance (2)' => sub {
             base_size => 0.15,
             buy => {
                 account => "g1",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -665,7 +665,7 @@ subtest 'selling account balance (2)' => sub {
             base_size => 0.03,
             buy => {
                 account => "g1",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -729,7 +729,7 @@ subtest 'selling account balance (3: re-sorting)' => sub {
     my $all_sell_orders = [
         {
             base_size        => 1,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -742,7 +742,7 @@ subtest 'selling account balance (3: re-sorting)' => sub {
         indodax => {
             ETH => [{account=>'i1', available=>0.21}, {account=>'i2', available=>0.03}],
         },
-        gdax => {
+        'coinbase-pro' => {
             USD => [{account=>'g1', available=>9999}],
         },
     };
@@ -752,7 +752,7 @@ subtest 'selling account balance (3: re-sorting)' => sub {
             base_size => 0.2,
             buy => {
                 account => "g1",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -779,7 +779,7 @@ subtest 'selling account balance (3: re-sorting)' => sub {
     ];
 
     my $correct_final_account_balances = {
-        gdax => { USD => [{ account => "g1", available => 9900.78 }] },
+        'coinbase-pro' => { USD => [{ account => "g1", available => 9900.78 }] },
         indodax => {
             ETH => [
                 { account => "i2", available => 0.03 },
@@ -830,7 +830,7 @@ subtest 'buying account balance (1)' => sub {
     my $all_sell_orders = [
         {
             base_size        => 1,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -843,7 +843,7 @@ subtest 'buying account balance (1)' => sub {
         indodax => {
             ETH => [{account=>'i1', available=>9999}],
         },
-        gdax => {
+        'coinbase-pro' => {
             USD => [{account=>'g1', available=>50}, {account=>'g2', available=>40}],
         },
     };
@@ -853,7 +853,7 @@ subtest 'buying account balance (1)' => sub {
             base_size => 0.101812258195887,
             buy => {
                 account => "g1",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -881,7 +881,7 @@ subtest 'buying account balance (1)' => sub {
             base_size => 0.0814498065567094,
             buy => {
                 account => "g2",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -908,7 +908,7 @@ subtest 'buying account balance (1)' => sub {
     ];
 
     my $correct_final_account_balances = {
-        gdax => { USD => [] },
+        'coinbase-pro' => { USD => [] },
         indodax => { ETH => [{ account => "i1", available => 9998.81673793525 }] },
     };
 
@@ -944,7 +944,7 @@ subtest 'opt:max_order_quote_size' => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -953,7 +953,7 @@ subtest 'opt:max_order_quote_size' => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -966,7 +966,7 @@ subtest 'opt:max_order_quote_size' => sub {
         {
             base_size => 0.17996400719856,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -992,7 +992,7 @@ subtest 'opt:max_order_quote_size' => sub {
         {
             base_size => 0.0200359928014397,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -1018,7 +1018,7 @@ subtest 'opt:max_order_quote_size' => sub {
         {
             base_size => 0.17996400719856,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1044,7 +1044,7 @@ subtest 'opt:max_order_quote_size' => sub {
         {
             base_size => 0.17996400719856,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1070,7 +1070,7 @@ subtest 'opt:max_order_quote_size' => sub {
         {
             base_size => 0.17996400719856,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1096,7 +1096,7 @@ subtest 'opt:max_order_quote_size' => sub {
         {
             base_size => 0.17996400719856,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1122,7 +1122,7 @@ subtest 'opt:max_order_quote_size' => sub {
         {
             base_size => 0.0801439712057587,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1176,7 +1176,7 @@ subtest 'opt:max_order_size_as_book_item_size_pct' => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2, # *80% = 0.16
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -1185,7 +1185,7 @@ subtest 'opt:max_order_size_as_book_item_size_pct' => sub {
         },
         {
             base_size        => 0.9, # *80% = 0.72
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -1198,7 +1198,7 @@ subtest 'opt:max_order_size_as_book_item_size_pct' => sub {
         {
             base_size => 0.16,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -1224,7 +1224,7 @@ subtest 'opt:max_order_size_as_book_item_size_pct' => sub {
         {
             base_size => 0.64,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1289,7 +1289,7 @@ subtest 'opt:min_account_balance' => sub {
     my $all_sell_orders = [
         {
             base_size        => 1,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -1302,7 +1302,7 @@ subtest 'opt:min_account_balance' => sub {
         indodax => {
             ETH => [{account=>'i1', available=>0.15}, {account=>'i2', available=>1}, ],
         },
-        gdax => {
+        'coinbase-pro' => {
             USD => [{account=>'g1', available=>9999}],
         },
     };
@@ -1317,7 +1317,7 @@ subtest 'opt:min_account_balance' => sub {
             base_size => 0.13,
             buy => {
                 account => "g1",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -1345,7 +1345,7 @@ subtest 'opt:min_account_balance' => sub {
             base_size => 0.02,
             buy => {
                 account => "g1",
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 491.1,
                 gross_price_orig => 491.1,
                 net_price => 491.9,
@@ -1372,7 +1372,7 @@ subtest 'opt:min_account_balance' => sub {
     ];
 
     my $correct_final_account_balances = {
-        gdax => { USD => [{account=>'g1', available=>9925.335}] },
+        'coinbase-pro' => { USD => [{account=>'g1', available=>9925.335}] },
         indodax => { ETH => [] },
     };
 
@@ -1409,7 +1409,7 @@ subtest "minimum buy base size" => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -1418,7 +1418,7 @@ subtest "minimum buy base size" => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -1431,7 +1431,7 @@ subtest "minimum buy base size" => sub {
         {
             base_size => 0.8,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1462,7 +1462,7 @@ subtest "minimum buy base size" => sub {
         all_sell_orders   => $all_sell_orders,
         min_net_profit_margin    => 0,
         exchange_pairs    => {
-            gdax => [{base_currency=>"ETH", min_base_size=>0.5}],
+            'coinbase-pro' => [{base_currency=>"ETH", min_base_size=>0.5}],
         },
         forex_spreads => {"USD/IDR"=>0},
     );
@@ -1489,7 +1489,7 @@ subtest "minimum buy quote size" => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -1498,7 +1498,7 @@ subtest "minimum buy quote size" => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -1511,7 +1511,7 @@ subtest "minimum buy quote size" => sub {
         {
             base_size => 0.8,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1542,7 +1542,7 @@ subtest "minimum buy quote size" => sub {
         all_sell_orders   => $all_sell_orders,
         min_net_profit_margin    => 0,
         exchange_pairs    => {
-            gdax => [{base_currency=>"ETH", min_quote_size=>200}],
+            'coinbase-pro' => [{base_currency=>"ETH", min_quote_size=>200}],
         },
         forex_spreads => {"USD/IDR"=>0},
     );
@@ -1569,7 +1569,7 @@ subtest "minimum sell base size" => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -1578,7 +1578,7 @@ subtest "minimum sell base size" => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -1591,7 +1591,7 @@ subtest "minimum sell base size" => sub {
         {
             base_size => 0.8,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,
@@ -1659,7 +1659,7 @@ subtest "minimum sell quote size" => sub {
     my $all_sell_orders = [
         {
             base_size        => 0.2,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 491.1,
             gross_price_orig => 491.1,
             net_price        => 491.9,
@@ -1668,7 +1668,7 @@ subtest "minimum sell quote size" => sub {
         },
         {
             base_size        => 0.9,
-            exchange         => "gdax",
+            exchange         => "coinbase-pro",
             gross_price      => 493.0,
             gross_price_orig => 493.0,
             net_price        => 494.0,
@@ -1681,7 +1681,7 @@ subtest "minimum sell quote size" => sub {
         {
             base_size => 0.9,
             buy => {
-                exchange => "gdax",
+                exchange => "coinbase-pro",
                 gross_price => 493,
                 gross_price_orig => 493,
                 net_price => 494,

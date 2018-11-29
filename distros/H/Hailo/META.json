@@ -34,31 +34,31 @@
       },
       "runtime" : {
          "recommends" : {
-            "DBD::Pg" : "v2.16.1",
-            "DBD::mysql" : "4.013"
+            "DBD::Pg" : "0",
+            "DBD::mysql" : "0"
          },
          "requires" : {
-            "Class::Load" : "0.25",
-            "DBD::SQLite" : "1.58",
-            "Data::Dump" : "1.23",
-            "Dir::Self" : "0.11",
-            "File::CountLines" : "v0.0.3",
+            "Class::Load" : "0",
+            "DBD::SQLite" : "0",
+            "Data::Dump" : "0",
+            "Dir::Self" : "0",
+            "File::CountLines" : "0",
             "File::Spec::Functions" : "0",
-            "Getopt::Long::Descriptive" : "0.103",
-            "IO::Interactive" : "1.022",
-            "IPC::System::Simple" : "1.25",
-            "List::MoreUtils" : "0.416",
-            "Moose" : "2.2011",
-            "MooseX::Getopt" : "0.74",
-            "MooseX::StrictConstructor" : "0.21",
-            "MooseX::Types" : "0.50",
-            "Regexp::Common" : "2017060201",
-            "Term::ReadLine" : "1.17",
-            "Term::Sk" : "0.18",
+            "Getopt::Long::Descriptive" : "0",
+            "IO::Interactive" : "0",
+            "IPC::System::Simple" : "0",
+            "List::MoreUtils" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "MooseX::Types" : "0",
+            "Regexp::Common" : "0",
+            "Term::ReadLine" : "0",
+            "Term::Sk" : "0",
             "Time::HiRes" : "0",
-            "autodie" : "2.29",
-            "namespace::clean" : "0.27",
-            "perl" : "5.028"
+            "autodie" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -66,15 +66,15 @@
             "Bot::Training" : "0.06",
             "Bot::Training::MegaHAL" : "0.03",
             "Bot::Training::StarCraft" : "0.03",
-            "Data::Section" : "0.200007",
-            "File::Slurp" : "9999.23",
-            "Pod::Section" : "0.02",
-            "Test::Exception" : "0.43",
-            "Test::Expect" : "0.34",
-            "Test::More" : "1.302133",
-            "Test::Output" : "1.031",
-            "Test::Script" : "1.25",
-            "Test::Script::Run" : "0.08"
+            "Data::Section" : "0",
+            "File::Slurp" : "0",
+            "Pod::Section" : "0",
+            "Test::Exception" : "0",
+            "Test::Expect" : "0",
+            "Test::More" : "0",
+            "Test::Output" : "0",
+            "Test::Script" : "0",
+            "Test::Script::Run" : "0"
          }
       }
    },
@@ -94,7 +94,7 @@
          "web" : "http://github.com/hailo/hailo"
       }
    },
-   "version" : "0.74",
+   "version" : "0.75",
    "x_authority" : "cpan:AVAR",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "JSON::XS version 4.0"

@@ -1,7 +1,7 @@
 package Perinci::Examples::ArgsAs;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.80'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.810'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,7 +100,7 @@ Perinci::Examples::ArgsAs - Demonstrate various values of `args_as` function met
 
 =head1 VERSION
 
-This document describes version 0.80 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2017-07-11.
+This document describes version 0.810 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2018-11-29.
 
 =head1 DESCRIPTION
 
@@ -124,7 +124,7 @@ The functions in this package can test:
 
 Usage:
 
- args_as_array($arg1, $arg2, $arg3) -> [status, msg, result, meta]
+ args_as_array($arg1, $arg2, $arg3) -> [status, msg, payload, meta]
 
 Regular perl subs use this.
 
@@ -134,11 +134,11 @@ Examples:
 
 =item * Without the optional arg3:
 
- args_as_array("abc", 10); # -> [200, "OK", ["abc", 10], {}]
+ args_as_array("abc", 10); # -> ["abc", 10]
 
 =item * With the optional arg3:
 
- args_as_array("def", 20, 0.5); # -> [200, "OK", ["def", 20, 0.5], {}]
+ args_as_array("def", 20, 0.5); # -> ["def", 20, 0.5]
 
 =back
 
@@ -161,7 +161,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -172,7 +172,7 @@ Return value:  (any)
 
 Usage:
 
- args_as_arrayref([$arg1, $arg2, $arg3]) -> [status, msg, result, meta]
+ args_as_arrayref([$arg1, $arg2, $arg3]) -> [status, msg, payload, meta]
 
 Alternative to `array` to avoid copying.
 
@@ -182,11 +182,11 @@ Examples:
 
 =item * Without the optional arg3:
 
- args_as_arrayref(["abc", 10]); # -> [200, "OK", [["abc", 10]], {}]
+ args_as_arrayref(["abc", 10]); # -> [["abc", 10]]
 
 =item * With the optional arg3:
 
- args_as_arrayref(["def", 20, 0.5]); # -> [200, "OK", [["def", 20, 0.5]], {}]
+ args_as_arrayref(["def", 20, 0.5]); # -> [["def", 20, 0.5]]
 
 =back
 
@@ -209,7 +209,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -220,7 +220,7 @@ Return value:  (any)
 
 Usage:
 
- args_as_hash(%args) -> [status, msg, result, meta]
+ args_as_hash(%args) -> [status, msg, payload, meta]
 
 This is the default.
 
@@ -230,15 +230,11 @@ Examples:
 
 =item * Without the optional arg3:
 
- args_as_hash(arg1 => "abc", arg2 => 10); # -> [200, "OK", ["arg2", 10, "arg1", "abc"], {}]
+ args_as_hash(arg1 => "abc", arg2 => 10); # -> ["arg1", "abc", "arg2", 10]
 
 =item * With the optional arg3:
 
- args_as_hash(arg1 => "def", arg2 => 20, arg3 => 0.5);
-
-Result:
-
- [200, "OK", ["arg3", 0.5, "arg2", 20, "arg1", "def"], {}]
+ args_as_hash(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg3", 0.5, "arg2", 20, "arg1", "def"]
 
 =back
 
@@ -261,7 +257,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -272,7 +268,7 @@ Return value:  (any)
 
 Usage:
 
- args_as_hashref(\%args) -> [status, msg, result, meta]
+ args_as_hashref(\%args) -> [status, msg, payload, meta]
 
 Alternative to `hash` to avoid copying.
 
@@ -282,7 +278,7 @@ Examples:
 
 =item * Without the optional arg3:
 
- args_as_hashref({ arg1 => "abc", arg2 => 10 }); # -> [200, "OK", [{ arg1 => "abc", arg2 => 10 }], {}]
+ args_as_hashref({ arg1 => "abc", arg2 => 10 }); # -> [{ arg1 => "abc", arg2 => 10 }]
 
 =item * With the optional arg3:
 
@@ -290,7 +286,7 @@ Examples:
 
 Result:
 
- [200, "OK", [{ arg1 => "def", arg2 => 20, arg3 => 0.5 }], {}]
+ [{ arg1 => "def", arg2 => 20, arg3 => 0.5 }]
 
 =back
 
@@ -313,7 +309,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -341,7 +337,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

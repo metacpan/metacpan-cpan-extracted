@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.026 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2018-09-08.
+    This document describes version 1.028 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2018-11-29.
 
 SYNOPSIS
     See lcpan script.
@@ -12,7 +12,7 @@ FUNCTIONS
   authors
     Usage:
 
-     authors(%args) -> [status, msg, result, meta]
+     authors(%args) -> [status, msg, payload, meta]
 
     List authors.
 
@@ -62,7 +62,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -74,7 +74,7 @@ FUNCTIONS
   deps
     Usage:
 
-     deps(%args) -> [status, msg, result, meta]
+     deps(%args) -> [status, msg, payload, meta]
 
     List dependencies.
 
@@ -159,7 +159,7 @@ FUNCTIONS
 
     *   modules* => *array[perl::modname]*
 
-    *   perl_version => *str* (default: "v5.26.1")
+    *   perl_version => *str* (default: "v5.26.0")
 
         Set base Perl version for determining core modules.
 
@@ -176,7 +176,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -185,7 +185,7 @@ FUNCTIONS
   dists
     Usage:
 
-     dists(%args) -> [status, msg, result, meta]
+     dists(%args) -> [status, msg, payload, meta]
 
     List distributions.
 
@@ -261,7 +261,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -273,7 +273,7 @@ FUNCTIONS
   modules
     Usage:
 
-     modules(%args) -> [status, msg, result, meta]
+     modules(%args) -> [status, msg, payload, meta]
 
     List modules/packages.
 
@@ -324,7 +324,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.1")
+    *   perl_version => *str* (default: "v5.26.0")
 
         Set base Perl version for determining core modules.
 
@@ -343,7 +343,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -355,7 +355,7 @@ FUNCTIONS
   namespaces
     Usage:
 
-     namespaces(%args) -> [status, msg, result, meta]
+     namespaces(%args) -> [status, msg, payload, meta]
 
     List namespaces.
 
@@ -403,7 +403,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -412,7 +412,7 @@ FUNCTIONS
   packages
     Usage:
 
-     packages(%args) -> [status, msg, result, meta]
+     packages(%args) -> [status, msg, payload, meta]
 
     List modules/packages.
 
@@ -463,7 +463,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.1")
+    *   perl_version => *str* (default: "v5.26.0")
 
         Set base Perl version for determining core modules.
 
@@ -482,7 +482,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -494,7 +494,7 @@ FUNCTIONS
   rdeps
     Usage:
 
-     rdeps(%args) -> [status, msg, result, meta]
+     rdeps(%args) -> [status, msg, payload, meta]
 
     List reverse dependencies.
 
@@ -546,7 +546,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -555,7 +555,7 @@ FUNCTIONS
   releases
     Usage:
 
-     releases(%args) -> [status, msg, result, meta]
+     releases(%args) -> [status, msg, payload, meta]
 
     List releases/tarballs.
 
@@ -623,7 +623,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -632,7 +632,7 @@ FUNCTIONS
   reset
     Usage:
 
-     reset(%args) -> [status, msg, result, meta]
+     reset(%args) -> [status, msg, payload, meta]
 
     Reset (empty) the database index.
 
@@ -660,7 +660,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -669,7 +669,7 @@ FUNCTIONS
   stats
     Usage:
 
-     stats(%args) -> [status, msg, result, meta]
+     stats(%args) -> [status, msg, payload, meta]
 
     Statistics of your local CPAN mirror.
 
@@ -697,7 +697,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -706,7 +706,7 @@ FUNCTIONS
   update
     Usage:
 
-     update(%args) -> [status, msg, result, meta]
+     update(%args) -> [status, msg, payload, meta]
 
     Create/update local CPAN mirror.
 
@@ -758,6 +758,10 @@ FUNCTIONS
 
     *   skip_file_indexing_pass_3 => *bool*
 
+    *   skip_index_file_patterns => *array[re]*
+
+        Skip one or more file patterns from being indexed.
+
     *   skip_index_files => *array[str]*
 
         Skip one or more files from being indexed.
@@ -780,7 +784,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

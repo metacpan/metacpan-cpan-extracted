@@ -10,12 +10,12 @@ can_ok $pg, qw/_list_request/;
 
 my $req = $pg->_list_request(start => 10, top => 5);
 
-isa_ok $req, 'HTTP::Request';
-like $req->uri, qr|^https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups|;
-like $req->uri, qr|start=10|;
-like $req->uri, qr|top=5|;
-is $req->method, 'GET';
-is $req->header('Content-Type'), 'application/json';
-is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';
+isa_ok $req, 'ARRAY';
+like $req->[1], qr|^https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups|;
+like $req->[1], qr|start=10|;
+like $req->[1], qr|top=5|;
+is $req->[0], 'GET';
+is $req->[2]{headers}{'Content-Type'}, 'application/json';
+is $req->[2]{headers}{'Ocp-Apim-Subscription-Key'}, 'MYSECRET';
 
 done_testing;

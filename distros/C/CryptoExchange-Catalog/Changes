@@ -1,3 +1,91 @@
+20181129.0.0  2018-11-29 (PERLANCAR)
+
+          - New exchanges:
+            + ABCC
+            + AirSwap
+            + Allbit
+            + BCoin.sg
+            + Bgogo
+            + Bilaxy
+            + BITBOX
+            + BiteBTC
+            + Bitibu
+            + Bitkub
+            + Bitrue
+            + Buda
+            + Bytex
+            + Cashierest
+            + Coinall
+            + Coinbase Pro
+            + Coinbit
+            + Coincheck
+            + CoinZest
+            + CPDAX
+            + CryptalDash
+            + Cryptology
+            + Cryptomate
+            + DEx.top
+            + DigiFinex
+            + DOBI trade
+            + Escodex
+            + FCoin
+            + GBX Digital Asset Exchange
+            + GDAC
+            + Graviex
+            + HADAX
+            + HBUS
+            + IDCM
+            + Instant Bitex
+            + Kryptono
+            + Liquid
+            + P2PB2B
+            + STEX
+            + Stronghold
+            + Tokenomy
+            + UEX
+            + WazirX
+            + YunEx
+            + ZBG
+
+          - Removed exchanges:
+            + BarterDEX
+            + BitFlip
+            + BitKonan
+            + Bitmaszyna
+            + BL3P
+            + cfinex
+            + CoinEx Market
+            + Cryptohub
+            + Cryptox
+            + Dgtmarket
+            + ExcambrioRex
+            + Fargobase
+            + fex
+            + Foxbit
+            + GDAX
+            + LEOxChange
+            + Mr. Exchange
+            + Octaex
+            + OKCoin.cn
+            + Omicrex
+            + Ore.Bz
+            + Orionx
+            + QBTC
+            + Qryptos
+            + Quoine
+            + Stocks.Exchange
+            + Buda
+            + TCC Exchange
+            + WEX
+            + xBTCe
+
+          - Changed exchanges:
+            + BtcTurk changed name from BTCTurk
+            + CHAOEX changed name from ChaoEX
+
+          - Total exchanges now 225 (from 210)
+
+
 20180605.1.0  2018-06-05 (PERLANCAR)
 
           - No functional changes.

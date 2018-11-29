@@ -6,6 +6,7 @@ use Carp;
 use Try::Tiny;
 use TaskPipe::Tool;
 use MooseX::ConfigCascade::Util;
+use Data::Dumper;
 
 has root_dir => (is => 'ro', isa => 'Str', required => 1);
 has cmdh => (is => 'rw', isa => 'TaskPipe::Tool', default => sub{
@@ -115,8 +116,7 @@ sub run_plan{
     if ( $p{key_mode} ){
         MooseX::ConfigCascade::Util->conf->{'TaskPipe::Task::Settings'}{'xbranch_key_mode'} = $p{key_mode};
     }
-    
-    MooseX::ConfigCascade::Util->conf->{'TaskPipe::TaskUtils::Settings'}{'xtask_script'} = 'scripts/taskpipe-xtask';
+    MooseX::ConfigCascade::Util->conf->{'TaskPipe::TaskUtils::Settings'}{'xtask_script'} = 'blib/script/taskpipe-xtask';
 
     $self->cmdh->handler->job_manager->init_job;
 

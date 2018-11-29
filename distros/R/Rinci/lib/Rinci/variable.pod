@@ -21,7 +21,7 @@ Rinci::variable - Metadata for your variables
 
 =head1 VERSION
 
-This document describes version 1.1.86 of Rinci::variable (from Perl distribution Rinci), released on 2017-12-09.
+This document describes version 1.1.87 of Rinci::variable (from Perl distribution Rinci), released on 2018-11-29.
 
 =head1 INTRODUCTION
 
@@ -75,7 +75,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

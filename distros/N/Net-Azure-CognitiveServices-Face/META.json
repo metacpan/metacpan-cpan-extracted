@@ -4,7 +4,7 @@
       "ytnobody <ytnobody@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.1",
+   "generated_by" : "Minilla/v3.1.3",
    "license" : [
       "perl_5"
    ],
@@ -43,11 +43,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Class::Accessor::Lite" : "0",
-            "HTTP::Request" : "0",
+            "HTTP::Tiny" : "0",
             "JSON" : "0",
-            "LWP::Protocol::https" : "0",
-            "LWP::UserAgent" : "0",
             "URI" : "0",
             "perl" : "5.008001"
          }
@@ -61,7 +58,7 @@
    "provides" : {
       "Net::Azure::CognitiveServices::Face" : {
          "file" : "lib/Net/Azure/CognitiveServices/Face.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "Net::Azure::CognitiveServices::Face::Base" : {
          "file" : "lib/Net/Azure/CognitiveServices/Face/Base.pm"
@@ -90,5 +87,10 @@
          "web" : "https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03",
+   "x_contributors" : [
+      "sazuma <azuma.satoshi@colon.ne.jp>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

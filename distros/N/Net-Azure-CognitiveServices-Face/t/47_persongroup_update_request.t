@@ -10,11 +10,11 @@ can_ok $pg, qw/_update_request/;
 
 my $req = $pg->_update_request('machida_pm', name => "ooimachiPM");
 
-isa_ok $req, 'HTTP::Request';
-is $req->uri, "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm";
-is $req->method, 'PATCH';
-is $req->header('Content-Type'), 'application/json';
-is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';
-is $req->content, '{"name":"ooimachiPM"}';
+isa_ok $req, 'ARRAY';
+is $req->[1], "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm";
+is $req->[0], 'PATCH';
+is $req->[2]{headers}{'Content-Type'}, 'application/json';
+is $req->[2]{headers}{'Ocp-Apim-Subscription-Key'}, 'MYSECRET';
+is $req->[2]{content}, '{"name":"ooimachiPM"}';
 
 done_testing;

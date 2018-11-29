@@ -3,8 +3,8 @@ NAME
     Exchange (static version)
 
 VERSION
-    This document describes version 20181012.0.0 of Finance::SE::IDX::Static
-    (from Perl distribution Finance-SE-IDX-Static), released on 2018-10-12.
+    This document describes version 20181129.0.0 of Finance::SE::IDX::Static
+    (from Perl distribution Finance-SE-IDX-Static), released on 2018-11-29.
 
 SYNOPSIS
     Use like you would use Finance::SE::IDX.

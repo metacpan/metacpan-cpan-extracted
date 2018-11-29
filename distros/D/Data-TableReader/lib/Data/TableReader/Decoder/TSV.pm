@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::TSV;
-$Data::TableReader::Decoder::TSV::VERSION = '0.007';
+$Data::TableReader::Decoder::TSV::VERSION = '0.008';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -36,7 +36,7 @@ Data::TableReader::Decoder::TSV - Access rows of a tab-delimited text file
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

@@ -7,10 +7,16 @@ package String::Tagged::Terminal;
 
 use strict;
 use warnings;
+use 5.010; # //
 
 use base qw( String::Tagged );
 
-our $VERSION = '0.03';
+use constant HAVE_MSWIN32 => $^O eq "MSWin32";
+HAVE_MSWIN32 and require String::Tagged::Terminal::Win32Console;
+
+our $VERSION = '0.04';
+
+require IO::Handle;
 
 =head1 NAME
 
@@ -142,7 +148,7 @@ sub build_terminal
 
       # Simple boolean attributes first
       foreach (
-         [ bold      =>  1, 21 ],
+         [ bold      =>  1, 22 ],
          [ under     =>  4, 24 ],
          [ italic    =>  3, 23 ],
          [ strike    =>  9, 29 ],
@@ -259,6 +265,8 @@ sub as_formatting
 
    $str->print_to_terminal( $fh )
 
+I<Since version 0.03.>
+
 Prints the string to the terminal by building a terminal escape string then
 printing it to the given IO handle (or C<STDOUT> if not supplied).
 
@@ -272,16 +280,25 @@ follows the suggestion of L<http://no-color.org/>.
 sub print_to_terminal
 {
    my $self = shift;
-   my ( $fh ) = @_;
+   my ( $fh, %options ) = @_;
 
    $fh //= \*STDOUT;
 
-   $fh->print( $self->build_terminal( no_color => $ENV{NO_COLOR} ) );
+   $options{win32}++ if HAVE_MSWIN32 and not exists $options{win32};
+
+   if( $options{win32} ) {
+      $self->String::Tagged::Terminal::Win32Console::print_to_console( $fh, %options );
+   }
+   else {
+      $fh->print( $self->build_terminal( no_color => $ENV{NO_COLOR} ) );
+   }
 }
 
 =head2 say_to_terminal
 
    $str->say_to_terminal( $fh )
+
+I<Since version 0.03.>
 
 Prints the string to the terminal as per L</print_to_terminal>, followed by a
 linefeed.
@@ -291,13 +308,42 @@ linefeed.
 sub say_to_terminal
 {
    my $self = shift;
-   my ( $fh ) = @_;
+   my ( $fh, %options ) = @_;
 
    $fh //= \*STDOUT;
 
-   $self->print_to_terminal( $fh );
+   $self->print_to_terminal( $fh, %options );
    $fh->say;
 }
+
+=head1 COMPATIBILITY NOTES
+
+On Windows, the following notes apply:
+
+=over 4
+
+=item *
+
+On all versions of Windows, the attributes C<bold>, C<fgindex> and C<bgindex>
+are supported. The C<bold> attribute is implemented by using high-intensity
+colours, so will be indistinguishable from using high-intensity colour indexes
+without bold. The full 256-color palette is not supported by Windows, so it is
+down-converted to the 16 colours that are.
+
+=item *
+
+Starting with Windows 10, also C<under> and C<reverse> are supported.
+
+=item *
+
+The attributes C<italic>, C<strike>, C<altfont>, C<blink> are not supported on
+any Windows version.
+
+=item *
+
+On Windows, only a single output console is supported.
+
+=back
 
 =head1 TODO
 

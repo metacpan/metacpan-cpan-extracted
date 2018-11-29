@@ -11,7 +11,8 @@ use Koha::Contrib::Sudoc::TransferDaemon;
 use Koha::Contrib::Sudoc::Loader::Biblios;
 use Koha::Contrib::Sudoc::Loader::Authorities;
 
-
+#FIXME: todelete
+use Bulac::SudocConverter;
 
 my ($doit);
 GetOptions(
@@ -78,7 +79,7 @@ sudoc - Commande de chargement des notices SUDOC
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 AUTHOR
 

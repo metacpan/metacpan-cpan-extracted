@@ -1,7 +1,7 @@
 package Hailo::Storage::Schema;
 our $AUTHORITY = 'cpan:AVAR';
-$Hailo::Storage::Schema::VERSION = '0.74';
-use v5.28.0;
+$Hailo::Storage::Schema::VERSION = '0.75';
+use v5.10.0;
 use strict;
 
 ## Soup to spawn the database itself / create statement handles

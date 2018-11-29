@@ -4,7 +4,7 @@ use strict;
 use 5.008003;
 no warnings 'utf8';
 
-our $VERSION = '2.029';
+our $VERSION = '2.030';
 
 use Encode::Locale qw();
 
@@ -39,7 +39,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.029
+Version 2.030
 
 =cut
 
@@ -78,10 +78,9 @@ The database plugins bundled with C<App::DBBrowser> provide support for the DBI 
 and C<DBD::Pg>. See L<App::DBBrowser::DB> how to write a database plugin.
 
 Before the output leading and trailing spaces are removed from the elements and spaces are squashed to a single
-white-space.
+white-space if the option I<squash_spaces> is enabled.
 
-The elements in a column are right-justified if one or more elements of that column do not look like a number, else they
-are left-justified.
+The elements are right-justified if they look like a number else they are left-justified.
 
 See L<Term::TablePrint|Term::TablePrint/DESCRIPTION> for more details.
 
@@ -453,7 +452,6 @@ Set the default I<lock> value:
 
 - C<Lk1>: Reset the SQL-statement only when a table is selected.
 
-
 =head3 Max Rows
 
 Sets C<LIMIT> automatically to I<Max Rows>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
@@ -549,6 +547,12 @@ Set the number of spaces between columns.
 
 Separate the columns from each other and the header from the body with lines.
 
+=head3 Color
+
+Enables the support for color and text formatting escape sequences.
+
+Before the output it is added a reset (C<\e[0m>) at the end of each row.
+
 =head3 Keep Header
 
 Show the table header on top of each page.
@@ -566,6 +570,10 @@ entry was created with this options menu.
 Setting the I<binary_filter> to C<1> means: print "BNRY" instead of arbitrary binary data. If data matches the repexp
 C</[\x00-\x08\x0B-\x0C\x0E-\x1F]/>, it is considered arbitrary binary data. Printing arbitrary binary data could break
 the output.
+
+=head3 Squash spaces
+
+If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are removed.
 
 =head3 Warnings
 

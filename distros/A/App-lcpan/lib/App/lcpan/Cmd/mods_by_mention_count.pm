@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mods_by_mention_count;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '1.026'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '1.028'; # VERSION
 
 use 5.010;
 use strict;
@@ -105,7 +105,7 @@ App::lcpan::Cmd::mods_by_mention_count - List modules ranked by number of mentio
 
 =head1 VERSION
 
-This document describes version 1.026 of App::lcpan::Cmd::mods_by_mention_count (from Perl distribution App-lcpan), released on 2018-09-08.
+This document describes version 1.028 of App::lcpan::Cmd::mods_by_mention_count (from Perl distribution App-lcpan), released on 2018-11-29.
 
 =head1 FUNCTIONS
 
@@ -114,7 +114,7 @@ This document describes version 1.026 of App::lcpan::Cmd::mods_by_mention_count 
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [status, msg, payload, meta]
 
 List modules ranked by number of mentions.
 
@@ -166,7 +166,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

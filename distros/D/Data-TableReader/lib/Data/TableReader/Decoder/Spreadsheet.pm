@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::Spreadsheet;
-$Data::TableReader::Decoder::Spreadsheet::VERSION = '0.007';
+$Data::TableReader::Decoder::Spreadsheet::VERSION = '0.008';
 use Moo 2;
 use Carp 'croak';
 use IO::Handle;
@@ -10,9 +10,8 @@ extends 'Data::TableReader::Decoder';
 
 
 has workbook => ( is => 'lazy' );
-
-
 has sheet => ( is => 'ro' );
+has xls_formatter => ( is => 'rw' );
 
 # Arrayref of all sheets we can search
 has _sheets => ( is => 'lazy' );
@@ -43,12 +42,20 @@ sub _build__sheets {
 	return \@sheets;
 }
 
+sub _oo_rowmax_fix {    # openoffice saves bogus rowmax, try and fix
+    my ($s, $rowmax)= @_;
+    my $final_row_max= ($s and ref $s->{Cells} eq "ARRAY" and $#{$s->{Cells}} < $rowmax)    #
+      ? $#{$s->{Cells}} : $rowmax;
+    return $final_row_max;
+}
+
 sub iterator {
 	my $self= shift;
 	my $sheets= $self->_sheets;
 	my $sheet= $sheets->[0];
 	my ($colmin, $colmax)= $sheet? $sheet->col_range() : (0,-1);
 	my ($rowmin, $rowmax)= $sheet? $sheet->row_range() : (0,-1);
+	$rowmax= _oo_rowmax_fix $sheet, $rowmax;
 	my $row= $rowmin-1;
 	Data::TableReader::Decoder::Spreadsheet::_Iter->new(
 		sub {
@@ -108,6 +115,7 @@ sub Data::TableReader::Decoder::Spreadsheet::_Iter::seek {
 	my $sheet= $f->{sheets}[$sheet_idx];
 	my ($colmin, $colmax)= $sheet? $sheet->col_range() : (0,-1);
 	my ($rowmin, $rowmax)= $sheet? $sheet->row_range() : (0,-1);
+	$rowmax= _oo_rowmax_fix $sheet, $rowmax;
 	$row= $rowmin-1 unless defined $row;
 	$f->{sheet_idx}= $sheet_idx;
 	${$f->{sheet_ref}}= $sheet;
@@ -138,7 +146,7 @@ Data::TableReader::Decoder::Spreadsheet - Base class for implementing spreadshee
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 
@@ -159,6 +167,16 @@ lazy-build this from the C<file_handle>.
 
 This is either a sheet name, a regex for matching a sheet name, or a parser's
 worksheet object.  It is also optional; if not set, all sheets will be iterated.
+
+=head2 xls_formatter
+
+An optional object that is passed to Excel parsers L<Spreadsheet::ParseXLSX> and
+L<Spreadsheet::ParseExcel>. It governs how raw data in cells is formatted into
+values depending on the type of the cell. The parsers create one of their own if
+none is provided, usually L<Spreadsheet::ParseExcel::FmtDefault>.
+
+Note that it does not work for Spreadsheet::XLSX, which hardcodes the formatter
+as Spreadsheet::XLSX::Fmt2007.
 
 =head1 AUTHOR
 

@@ -254,7 +254,7 @@ sub pack_attribute {
     }
     # else - for TVL type value is ARRAY-ref
 
-    my $encoded = encode($attr, $value, $self->dict);
+    my $encoded = encode($attr, $value, $self->dict, ($attr->{has_tag} ? $av->{Tag} : undef) );
 
     if (! defined $encoded) {
         warn "Unable to encode value for ".$av->{Name};
@@ -264,10 +264,7 @@ sub pack_attribute {
     my $len_encoded = length($encoded);
 
     if (! $vendor_id) {
-        if ($attr->{has_tag}) {
-            return pack('C C C', $attr->{id}, $len_encoded + 3, $av->{Tag}) . $encoded;
-        }
-
+        # tag already included into value, if any
         return pack('C C', $attr->{id}, $len_encoded + 2) . $encoded;
     }
 
@@ -278,12 +275,8 @@ sub pack_attribute {
         $vsa_header = pack('N C C C', $vendor_id, $attr->{id}, $len_encoded + 3, 0);
     }
     else {
-        if ($attr->{has_tag}) {
-            $vsa_header = pack('N C C C', $vendor_id, $attr->{id}, $len_encoded + 3, $av->{Tag});
-        }
-        else {
-            $vsa_header = pack('N C C', $vendor_id, $attr->{id}, $len_encoded + 2);
-        }
+        # tag already included into value, if any
+        $vsa_header = pack('N C C', $vendor_id, $attr->{id}, $len_encoded + 2);
     }
 
     return pack('C C', ATTR_VENDOR, length($vsa_header) + $len_encoded + 2) . $vsa_header . $encoded;
@@ -359,26 +352,14 @@ sub parse {
                 $attr = $dict->attribute_name($vendor, $attr_id);
             }
 
-            if ($attr && $attr->{has_tag}) {
-                $tag = unpack('C', substr($attributes, $pos + 2 + $vsa_header_len, 1));
-                $attr_val = substr($attributes, $pos + 3 + $vsa_header_len, $attr_len - 3 - $vsa_header_len);
-            }
-            else {
-                $attr_val = substr($attributes, $pos + 2 + $vsa_header_len, $attr_len - 2 - $vsa_header_len);
-            }
+            $attr_val = substr($attributes, $pos + 2 + $vsa_header_len, $attr_len - 2 - $vsa_header_len);
         }
         else {
             if ($dict) {
                 $attr = $dict->attribute_name(undef, $attr_id);
             }
 
-            if ($attr && $attr->{has_tag}) {
-                $tag = unpack('C', substr($attributes, $pos + 2, 1));
-                $attr_val = substr($attributes, $pos + 3, $attr_len - 3);
-            }
-            else {
-                $attr_val = substr($attributes, $pos + 2, $attr_len - 2);
-            }
+            $attr_val = substr($attributes, $pos + 2, $attr_len - 2);
         }
 
         if ($attr_id == ATTR_MSG_AUTH && ! $vendor) {
@@ -403,7 +384,7 @@ sub parse {
             next;
         }
 
-        my $decoded = decode($attr, $attr_val, $self->dict);
+        (my $decoded, $tag) = decode($attr, $attr_val, $self->dict);
         if (is_enum_type($attr->{type})) {
             # try to convert value to constants
             $decoded = $dict->constant($attr->{name}, $decoded) // $decoded;

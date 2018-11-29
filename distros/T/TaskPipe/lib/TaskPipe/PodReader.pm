@@ -28,7 +28,10 @@ sub read_pod{
     require_module( $module );
 
     my $filename = $module;
-    my $delim = File::Spec->catdir('');
+
+    #my $delim = File::Spec->catdir(''); # %INC seems to have unix style delims, even on windows
+    my $delim = '/';
+
     $filename=~ s{::}{$delim}g;    
     $filename.='.pm';
 

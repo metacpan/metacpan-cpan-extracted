@@ -1,0 +1,35 @@
+#!perl
+# allkinds.test: a test with a pass, fail, skip, and TODO.
+# Test 1 succeeds, 2 fails, 3 is skipped+fail, 4 is skipped+success,
+# 5 is todo+fail, 6 is todo+success.
+
+use rlib 'lib';
+use DTest;
+# Doesn't use Test::OnlySome
+
+ok(1, 'Test 1 succeeds');
+ok(0, 'Test 2 fails');
+
+SKIP: {
+    skip "Skipping test 3 (fail)", 1;
+    ok(0, 'Test 3 skipped');
+}
+
+SKIP: {
+    skip "Skipping test 4 (ok)", 1;
+    ok(1, 'Test 4 skipped');
+}
+
+TODO: {
+    todo_skip "Skipping test 5 (fail)", 1;
+    ok(0, 'Test 5 is todo');
+}
+
+TODO: {
+    todo_skip "Skipping test 6 (ok)", 1;
+    ok(0, 'Test 6 is todo');
+}
+
+done_testing();
+
+# vi: set ft=perl:

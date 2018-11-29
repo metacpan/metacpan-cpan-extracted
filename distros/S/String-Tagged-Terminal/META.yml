@@ -16,12 +16,17 @@ name: String-Tagged-Terminal
 provides:
   String::Tagged::Terminal:
     file: lib/String/Tagged/Terminal.pm
-    version: '0.03'
+    version: '0.04'
+  String::Tagged::Terminal::Win32Console:
+    file: lib/String/Tagged/Terminal/Win32Console.pm
+    version: '0.04'
 requires:
   Convert::Color: '0'
   Convert::Color::XTerm: '0'
   String::Tagged: '0'
+  constant: '0'
+  perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

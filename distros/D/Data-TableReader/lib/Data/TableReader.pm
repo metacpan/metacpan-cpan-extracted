@@ -1,5 +1,5 @@
 package Data::TableReader;
-$Data::TableReader::VERSION = '0.007';
+$Data::TableReader::VERSION = '0.008';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -31,6 +31,7 @@ has log                 => ( is => 'rw', trigger => sub { shift->_clear_log } );
 sub _build__file_handle {
 	my $self= shift;
 	my $i= $self->input;
+	return undef if ref($i) && (ref($i) eq "Spreadsheet::ParseExcel::Worksheet");
 	return $i if ref($i) && (ref($i) eq 'GLOB' or ref($i)->can('read'));
 	open(my $fh, '<', $i) or croak "open($i): $!";
 	binmode $fh;
@@ -41,36 +42,39 @@ sub _build__file_handle {
 sub _build_decoder {
 	my $self= shift;
 	my $decoder_arg= $self->_decoder_arg;
+	my $decoder_ref= ref $decoder_arg;
 	my ($class, @args);
 	if (!$decoder_arg) {
 		($class, @args)= $self->detect_input_format;
 		$self->_log->('trace', "Detected input format as %s", $class);
 	}
-	elsif (!ref $decoder_arg) {
+	elsif (!$decoder_ref) {
 		$class= $decoder_arg;
 	}
-	elsif (ref $decoder_arg eq 'HASH') {
-		my %tmp= %$decoder_arg;
-		$class= delete $tmp{CLASS}
-			or ($class)= $self->detect_input_format
-			or croak "require ->{CLASS} in decoder arguments";
-		@args= %tmp;
+	elsif ($decoder_ref eq "HASH" or $decoder_ref eq "ARRAY") {
+		($class, @args)= $decoder_ref eq "ARRAY"? @$decoder_arg : do {
+			my %tmp= %$decoder_arg;
+			(delete($tmp{CLASS}), %tmp);
+		};
+		if(!$class) {
+			my ($input_class, @input_args)= $self->detect_input_format;
+			croak "decoder class not in arguments and unable to identify decoder class from input"
+				if !$input_class;
+			($class, @args)= ($input_class, @input_args, @args);
+		}
 	}
-	elsif (ref $decoder_arg eq 'ARRAY') {
-		($class, @args)= @$decoder_arg;
-	}
-	elsif (ref($decoder_arg)->can('iterator')) {
+	elsif ($decoder_ref->can('iterator')) {
 		return $decoder_arg;
 	}
 	else {
-		croak "Can't create decoder from ".ref($decoder_arg);
+		croak "Can't create decoder from $decoder_ref";
 	}
 	$class= "Data::TableReader::Decoder::$class"
 		unless $class =~ /::/;
 	require_module($class) or croak "$class does not exist or is not installed";
 	$self->_log->('trace', 'Creating decoder %s on input %s', $class, $self->input);
 	return $class->new(
-		file_name   => ($self->input eq $self->_file_handle? '' : $self->input),
+		file_name   => ($self->input eq ($self->_file_handle||"") ? '' : $self->input),
 		file_handle => $self->_file_handle,
 		_log        => $self->_log,
 		@args
@@ -139,14 +143,11 @@ sub _log_fn {
 
 sub detect_input_format {
 	my ($self, $filename, $magic)= @_;
-	# Detect filename if not supplied
-	if (!defined $filename) {
-		my $input= $self->input;
-		$filename= '';
-		$filename= "$input" if defined $input and (!ref $input || ref($input) =~ /path|file/i);
-	}
-	my ($suffix)= ($filename =~ /\.([^.]+)$/);
-	$suffix= defined $suffix? uc($suffix) : '';
+
+	my $input= $self->input;
+	return ('XLSX', sheet => $input)
+		if ref($input) && (ref($input) eq "Spreadsheet::ParseExcel::Worksheet");
+
 	# Load first block of file, unless supplied
 	my $fpos;
 	if (!defined $magic) {
@@ -176,6 +177,15 @@ sub detect_input_format {
 
 	# Else trust the file extension, because TSV with commas can be very similar to CSV with
 	# tabs in the data.
+    my $suffix = do {
+        # Detect filename if not supplied
+        if (!defined $filename) {
+            $filename= '';
+            $filename= "$input" if defined $input and (!ref $input || ref($input) =~ /path|file/i);
+        }
+        my ($suffix)= ($filename =~ /\.([^.]+)$/);
+        defined $suffix? uc($suffix) : '';
+    };
 	return $suffix if length $suffix;
 
 	# Else probe some more...
@@ -672,7 +682,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -728,15 +738,21 @@ feedback about the validity of the data file.
 
 =head2 input
 
-This can be a file name or L<Path::Class> instance or file handle.  If a file
-handle, it must be seekable in order to auto-detect the file format, I<or> you
-may specify the decoder directly to avoid auto-detection.
+This can be a file name or L<Path::Class> instance or file handle or a
+L<Spreadsheet::ParseExcel::Worksheet> object.  If a file handle, it must be
+seekable in order to auto-detect the file format, I<or> you may specify the
+decoder directly to avoid auto-detection.
 
 =head2 decoder
 
 This is either an instance of L<Data::TableReader::Decoder>, or a class name,
 or a partial class name to be appended as C<"Data::TableReader::Decoder::$name">
 or an arrayref or hashref of arguments to build the decoder.
+
+In an arrayref the first argument can be undef, and in a hashref the CLASS
+argument can be missing or undef. In those cases it will be detected from the
+input attribute and any default arguments combined with (and if necessary
+trumped by) the extra arguments in the arrayref or hashref.
 
 Examples:
 
@@ -956,6 +972,12 @@ Portions of this software were funded by L<Ellis, Partners in Management Solutio
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Christian Walde
+
+Christian Walde <walde.christian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

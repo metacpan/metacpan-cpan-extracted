@@ -1,6 +1,20 @@
+0.008   2018-11-29 (PERLANCAR)
+
+	- When there is no api_key information for an account in
+	  configuration, instantiate exchange client with public_only=>1 so
+	  we can still do e.g. collect-orderbooks.
+
+
+0.007   2018-11-29 (PERLANCAR)
+
+	- Add subcommand: collect-orderbooks.
+
+	- Replace old references gdax -> coinbase-pro.
+
+
 0.006   2018-08-11 (PERLANCAR)
 
-	- Add option: --usd-rate (e.g. to assume specific rates when showing
+        - Add option: --usd-rate (e.g. to assume specific rates when showing
           profit report).
 
         - [ux] Only log fiat conversion rate once per new value.

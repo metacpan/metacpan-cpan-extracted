@@ -1925,5 +1925,7 @@ $resource->set_parent_resourcelist( $resourcelist )
 
 Sets the parent resource list (ask the question, which collection am I a member of?). See L<HTTP::DAV::ResourceList>.
 
+=back
+
 =cut
 

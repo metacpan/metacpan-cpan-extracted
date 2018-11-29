@@ -20,10 +20,10 @@
 %token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE 
 %token <opval> DESCRIPTOR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT EVAL
-%token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME MAYBE_SUB_NAME
+%token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME MAYBE_SUB_NAME EXCEPTION_VAR
 %token <opval> RETURN WEAKEN CROAK NEW
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
-%token <opval> AMPERSAND DOT3 LENGTH FATCAMMA
+%token <opval> AMPERSAND DOT3 LENGTH FATCAMMA RW RO WO BEGIN
 
 %type <opval> grammar
 %type <opval> opt_packages packages package package_block
@@ -33,7 +33,7 @@
 %type <opval> opt_descriptors descriptors sub_names opt_sub_names
 %type <opval> opt_statements statements statement normal_statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
-%type <opval> block eval_block
+%type <opval> block eval_block begin_block
 %type <opval> expression
 %type <opval> unop binop
 %type <opval> call_sub opt_vaarg
@@ -162,7 +162,17 @@ declaration
   | enumeration
   | our ';'
   | use
+  | begin_block
 
+begin_block
+  : BEGIN block
+    { 
+      SPVM_OP* op_sub = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_SUB, compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_sub_name = SPVM_OP_new_op_name(compiler, "BEGIN", compiler->cur_file, compiler->cur_line);
+      SPVM_OP* op_void_type = SPVM_OP_new_op_void_type(compiler, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_sub(compiler, op_sub, op_sub_name, op_void_type, NULL, NULL, $2, NULL, NULL, 1);
+    }
+    
 use
   : USE basic_type ';'
     {
@@ -250,17 +260,17 @@ has
 sub
   : opt_descriptors SUB sub_name ':' type_or_void '(' opt_args opt_vaarg')' block
      {
-       $$ = SPVM_OP_build_sub(compiler, $2, $3, $5, $7, $1, $10, NULL, $8);
+       $$ = SPVM_OP_build_sub(compiler, $2, $3, $5, $7, $1, $10, NULL, $8, 0);
      }
   | opt_descriptors SUB sub_name ':' type_or_void '(' opt_args opt_vaarg')' ';'
      {
-       $$ = SPVM_OP_build_sub(compiler, $2, $3, $5, $7, $1, NULL, NULL, $8);
+       $$ = SPVM_OP_build_sub(compiler, $2, $3, $5, $7, $1, NULL, NULL, $8, 0);
      }
 
 anon_sub
   : opt_descriptors SUB ':' type_or_void '(' opt_args opt_vaarg')' block
      {
-       $$ = SPVM_OP_build_sub(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7);
+       $$ = SPVM_OP_build_sub(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7, 0);
      }
   | '[' args ']' opt_descriptors SUB ':' type_or_void '(' opt_args opt_vaarg')' block
      {
@@ -273,7 +283,7 @@ anon_sub
          SPVM_OP_insert_child(compiler, op_list_args, op_list_args->last, $2);
        }
        
-       $$ = SPVM_OP_build_sub(compiler, $5, NULL, $7, $9, $4, $12, op_list_args, $10);
+       $$ = SPVM_OP_build_sub(compiler, $5, NULL, $7, $9, $4, $12, op_list_args, $10, 0);
      }
 
 opt_args
@@ -575,6 +585,7 @@ term
 
 normal_term
   : var
+  | EXCEPTION_VAR
   | package_var_access
   | CONSTANT
     {

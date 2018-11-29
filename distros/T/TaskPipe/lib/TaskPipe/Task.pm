@@ -1,6 +1,6 @@
 package TaskPipe::Task;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 use Moose;
 use Module::Runtime qw(require_module);

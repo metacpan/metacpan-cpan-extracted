@@ -1,7 +1,7 @@
 package Mojo::IOLoop::Thread;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 use threads;
 use Thread::Queue;
@@ -48,16 +48,22 @@ sub _start {
   $self->{pid} = $thr->tid();
   $self->emit('spawn');
 
-  while ( !$thr->is_joinable() ) {
-      if ( my $args = $self->{queue}->dequeue_nb() ) {
-          $self->emit(progress => @$args);
-      }
-      threads->yield();
-  }
+  my $rid = $self->ioloop->recurring(0.05 => sub {
+    while ( my $args = $self->{queue}->dequeue_nb() ) {
+      $self->emit(progress => @$args);
+    }
+    $self->emit('joinable') if $thr->is_joinable();
+    threads->yield();
+  });
 
-  my($err, $results) = $thr->join();
-
-  $self->$parent($err, @$results);
+  $self->on('joinable' => sub {
+    $self->ioloop->remove($rid);
+    while ( my $args = $self->{queue}->dequeue_nb() ) {
+      $self->emit(progress => @$args);
+    }
+    my($err, $results) = $thr->join();
+    $self->$parent($err, @$results);
+  });
 
   return $self;
 }

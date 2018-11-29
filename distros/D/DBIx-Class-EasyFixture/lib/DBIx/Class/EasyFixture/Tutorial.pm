@@ -1,5 +1,5 @@
 package DBIx::Class::EasyFixture::Tutorial;
-$DBIx::Class::EasyFixture::Tutorial::VERSION = '0.12';
+$DBIx::Class::EasyFixture::Tutorial::VERSION = '0.13';
 # ABSTRACT: what it says on the tin
 
 # this is not a .pod file because various repos replace the primary
@@ -19,7 +19,7 @@ DBIx::Class::EasyFixture::Tutorial - what it says on the tin
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 RATIONALE
 
@@ -38,7 +38,7 @@ particular format. Here's one way to do it, using a big hash (there are plenty
 of other ways to do this, but this is easy for a tutorial.
 
     package My::Fixtures;
-    use Moose;
+    use Moo;    # (Moose is also fine)
     extends 'DBIx::Class::EasyFixture';
 
     my %definition_for = (
@@ -119,7 +119,7 @@ The format of simple fixture is:
 Putting the above together, we get this:
 
     package My::Fixtures;
-    use Moose;
+    use Moo;
     use DateTime;
     extends 'DBIx::Class::EasyFixture';
     use namespace::autoclean;
@@ -220,7 +220,7 @@ current one.
 
 =head3 C<requires>
 
-If you have a C<requires> key, it takes a hash refence. They keys are fixtures
+If you have a C<requires> key, it takes a hash reference. They keys are fixtures
 to be loaded I<before> the current fixture. The values are hash references of
 attribute mappings. The C<our> key is our attribute name and the C<their> key
 is the required fixture's method name. The required fixture(s) is loaded and
@@ -248,7 +248,7 @@ name, you can just do this:
     }
 
 The reason the C<our> and C<their> are separate is because many people just
-use a primary key name of C<id>. This let's you do this:
+use a primary key name of C<id>. This lets you do this:
 
     requires => {
         person_with_customer => {
@@ -376,7 +376,7 @@ key:
         next => [qw/order_without_items second_order_without_items/],
     },
 
-=head2 Many-to-many relationhips.
+=head2 Many-to-many relationships.
 
 Orders aren't useful without items on them, so let's add two more tables:
 
@@ -518,7 +518,7 @@ defined thusly:
     },
 
 This would have the net effect of creating the C<person_rick_rubin> result,
-then creating the C<album_la_futura> result including the foreign key to it's
+then creating the C<album_la_futura> result including the foreign key to its
 producer, and finally backfilling the C<favorite_album_id> foreign key on the
 C<producer_rick_rubin> result.
 

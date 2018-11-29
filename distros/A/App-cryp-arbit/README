@@ -2,8 +2,8 @@ NAME
     App::cryp::arbit - Cryptocurrency arbitrage utility
 
 VERSION
-    This document describes version 0.006 of App::cryp::arbit (from Perl
-    distribution App-cryp-arbit), released on 2018-08-11.
+    This document describes version 0.008 of App::cryp::arbit (from Perl
+    distribution App-cryp-arbit), released on 2018-11-29.
 
 SYNOPSIS
     Please see included script cryp-arbit.
@@ -110,7 +110,7 @@ FUNCTIONS
   arbit
     Usage:
 
-     arbit(%args) -> [status, msg, result, meta]
+     arbit(%args) -> [status, msg, payload, meta]
 
     Perform arbitrage.
 
@@ -267,7 +267,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -276,7 +276,7 @@ FUNCTIONS
   check_orders
     Usage:
 
-     check_orders(%args) -> [status, msg, result, meta]
+     check_orders(%args) -> [status, msg, payload, meta]
 
     Check the orders that have been created.
 
@@ -310,7 +310,73 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  collect_orderbooks
+    Usage:
+
+     collect_orderbooks(%args) -> [status, msg, payload, meta]
+
+    Collect orderbooks into the database.
+
+    This utility collect orderbooks from exchanges and put it into the
+    database. The data can be used later e.g. for backtesting.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   accounts => *array[cryptoexchange::account]*
+
+        Cryptoexchange accounts.
+
+        There should at least be two accounts, on at least two different
+        cryptoexchanges. If not specified, all accounts listed on the
+        configuration file will be included. Note that it's possible to
+        include two or more accounts on the same cryptoexchange.
+
+    *   base_currencies => *array[cryptocurrency]*
+
+        Target (crypto)currencies to arbitrate.
+
+        If not specified, will list all supported pairs on all the exchanges
+        and include the base cryptocurrencies that are listed on at least 2
+        different exchanges (for arbitrage possibility).
+
+    *   db_name* => *str*
+
+    *   db_password => *str*
+
+    *   db_username => *str*
+
+    *   frequency => *posint* (default: 30)
+
+        How many seconds to wait between rounds (in seconds).
+
+    *   quote_currencies => *array[fiat_or_cryptocurrency]*
+
+        The currencies to exchange (buy/sell) the target currencies.
+
+        You can have fiat currencies as the quote currencies, to buy/sell
+        the target (base) currencies during arbitrage. For example, to
+        arbitrage LTC against USD and IDR, "base_currencies" is ['BTC'] and
+        "quote_currencies" is ['USD', 'IDR'].
+
+        You can also arbitrage cryptocurrencies against other cryptocurrency
+        (usually BTC, "the USD of cryptocurrencies"). For example, to
+        arbitrage XMR and LTC against BTC, "base_currencies" is ['XMR',
+        'LTC'] and "quote_currencies" is ['BTC'].
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -319,7 +385,7 @@ FUNCTIONS
   dump_cryp_config
     Usage:
 
-     dump_cryp_config() -> [status, msg, result, meta]
+     dump_cryp_config() -> [status, msg, payload, meta]
 
     This function is not exported.
 
@@ -330,7 +396,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -339,7 +405,7 @@ FUNCTIONS
   get_profit_report
     Usage:
 
-     get_profit_report(%args) -> [status, msg, result, meta]
+     get_profit_report(%args) -> [status, msg, payload, meta]
 
     Get profit report.
 
@@ -372,7 +438,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -381,7 +447,7 @@ FUNCTIONS
   list_order_pairs
     Usage:
 
-     list_order_pairs(%args) -> [status, msg, result, meta]
+     list_order_pairs(%args) -> [status, msg, payload, meta]
 
     List created order pairs.
 
@@ -406,7 +472,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -415,7 +481,7 @@ FUNCTIONS
   show_opportunities
     Usage:
 
-     show_opportunities(%args) -> [status, msg, result, meta]
+     show_opportunities(%args) -> [status, msg, payload, meta]
 
     Show arbitrage opportunities.
 
@@ -533,7 +599,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

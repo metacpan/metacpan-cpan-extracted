@@ -24,7 +24,7 @@ is( Authen::Radius->_decode_value(NoVendor, 96, 'ifid', 'Framed-Interface-Id', "
 
 is( Authen::Radius->_decode_value(VendorCisco, 1, 'avpair', 'session-protocol', "session-protocol=SIP"), 'SIP', 'avpair');
 
-is_deeply( Authen::Radius->_decode_value(NoVendor, 207, 'sublist', 'Digest-Attributes', "\x03\x0AREGISTER"), 'Method = "REGISTER"', 'sublist');
+is_deeply( scalar Authen::Radius->_decode_value(NoVendor, 207, 'sublist', 'Digest-Attributes', "\x03\x0AREGISTER"), 'Method = "REGISTER"', 'sublist');
 
 # not supported:
 

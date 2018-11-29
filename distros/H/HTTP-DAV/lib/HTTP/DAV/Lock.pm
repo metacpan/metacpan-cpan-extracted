@@ -34,7 +34,12 @@ sub _init {
 }
 
 ###########################################################################
-# ACCESSOR METHODS
+
+=head1 ACCESSOR METHODS
+
+=over
+
+=cut
 
 # GET
 sub get_owner { $_[0]->{_owner}; }

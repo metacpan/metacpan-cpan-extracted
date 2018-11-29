@@ -1,3 +1,7 @@
+0.04 2018-11-28
+ - use gmtime instead of localtime. Only machines in GMT could
+   sign properly
+
 0.03 2018-09-27
  - Correct prereqs for CPANTS (manwar)
 

@@ -8,6 +8,8 @@ use File::Temp qw/ :mktemp tempdir /;
 use Test::More;
 
 use Carp;
+use Errno qw(ENOENT);
+
 $SIG{ __DIE__ } = sub { Carp::confess( @_ ) };
 
 BEGIN {
@@ -135,7 +137,7 @@ sub test_open_silo {
         $silo = Data::RecordStore::Silo->open_silo( 'L', $dir, 4 );
         pass( "created silo with a match between template size and given size" );
     };
-    
+  {
     local( *STDERR );
     undef $out;
     open( STDERR, ">>", \$out );
@@ -143,25 +145,48 @@ sub test_open_silo {
     $silo = Data::RecordStore::Silo->open( 'L', $dir, 4 );
     like( $out, qr/deprecate/, "deprecation warning for Data::RecordStore::Silo::open" );
     eval {
-        $dir = tempdir( CLEANUP => 1 );
-        $silo = Data::RecordStore::Silo::open( 'L', $dir, 4 );
-        like( $out, qr/deprecate/, "deprecation warning for Data::RecordStore::Silo::open" );
+      $dir = tempdir( CLEANUP => 1 );
+      $silo = Data::RecordStore::Silo::open( 'L', $dir, 4 );
+      like( $out, qr/deprecate/, "deprecation warning for Data::RecordStore::Silo::open" );
     };
-    
+  }
     my $ndir = tempdir( CLEANUP => 1 );
     diag( " $ndir  ".(-d $ndir)." )" );
     eval {
-        $silo = Data::RecordStore::Silo::open_silo( 'L', $ndir, 4, { mode => 0755, chmod => 0755, owner=>'wolf', group => "wolf", zap => 'ignore' } );
+        $silo = Data::RecordStore::Silo::open_silo( 'L', $ndir, 4 );
         pass( "able to open silo with ::open_silo" );
     };
     
-    chmod 0544, "$ndir/0";
+
+    $silo->push( [ 100 ] );
+    is_deeply( $silo->get_record( 1 ), [ 100 ], "able to read" );
+    chmod 0444, "$ndir/0";
+
     eval {
-        $silo->push( [ 100 ] );
+        $silo->put_record( 1, [ 200 ] );
         fail( "able to ensure size with unwriteable data file" );
     };
     like( $@, qr/unable to open/, 'error for unwriteable data file' );
-    chmod 0744, "$ndir/0";
+    eval {
+        $silo->push( [ 200 ] );
+        fail( "able to ensure size with unwriteable data file" );
+    };
+    like( $@, qr/unable to open/, 'error for unwriteable data file' );
+
+
+    chmod 0444, "$ndir/0";
+
+    is_deeply( $silo->get_record( 1 ), [ 100 ], "able to read" );
+
+    chmod 0333, "$ndir/0";
+    eval {
+      my $rec = $silo->get_record( 1 );
+      fail( "able to get record from unreadable silo file" );
+    };
+    is( ENOENT, 2, "could not write to readable directory" );
+
+    
+
 } #test_open_silo
 
 sub test_put_record {
@@ -318,7 +343,7 @@ sub test_put_record {
     $silo->_copy_record( 3, 2 ); # idx used, not id like below
     is_deeply( $silo->get_record( 4 ), [ 4444, "d", 10003 ], "record after copy" );
     is_deeply( $silo->get_record( 3 ), [ 4444, "d", 10003 ], "copied record" );
-
+  {
     local $Data::RecordStore::Silo::MAX_SIZE = 80;
     $dir = tempdir( CLEANUP => 1 );
     $silo = Data::RecordStore::Silo->open_silo( 'Z*', $dir, 80 );
@@ -331,8 +356,8 @@ sub test_put_record {
     ok( -e "$dir/1", "touched 1 directory exists" );
 
     eval {
-        $silo->push( [ 'x' x 79 ] );
-        fail( "tried to create new data file but it existed" );
+      $silo->push( [ 'x' x 79 ] );
+      fail( "tried to create new data file but it existed" );
     };
     like( $@, qr/already exists/, "could not create new data file where one existed" );
     chmod 0644, "$dir/1";
@@ -345,7 +370,7 @@ sub test_put_record {
     open $out, ">", "$dir/2";
     print $out '';
     close $out;
-    
+  }
     eval {
         $silo->_ensure_entry_count( 10 );
         fail( "tried to ensure entry count when an existing data file was there" );

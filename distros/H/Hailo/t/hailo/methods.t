@@ -1,4 +1,4 @@
-use v5.28.0;
+use v5.10.0;
 use autodie;
 use Moose;
 use List::MoreUtils qw(uniq);

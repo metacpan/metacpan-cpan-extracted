@@ -2,7 +2,7 @@ package Test2::Suite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000115';
+our $VERSION = '0.000116';
 
 1;
 
@@ -59,7 +59,7 @@ also produces undesirable side effects.
 
 =item Test2::V#
 
-These does not live in the bundle namespace as they are the primary ways to use
+These do not live in the bundle namespace as they are the primary ways to use
 Test2::Suite.
 
 The current latest is L<Test2::V0>.

@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 package hailo;
 our $AUTHORITY = 'cpan:AVAR';
-$hailo::VERSION = '0.74';
-use v5.28.0;
+$hailo::VERSION = '0.75';
+use v5.10.0;
 use open qw< :encoding(utf8) :std >;
 use Dir::Self;
 use Moose;

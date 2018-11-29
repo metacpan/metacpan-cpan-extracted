@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '2.02';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.03';
 use 5.006;
 
 use strict;
@@ -217,6 +217,7 @@ sub EnvVars { return 'TZ' }
         'Venezuela Standard Time'         => 'America/Caracas',
         'Vladivostok'                     => 'Asia/Vladivostok',
         'Vladivostok Standard Time'       => 'Asia/Vladivostok',
+        'Volgograd Standard Time'         => 'Europe/Volgograd',
         'W. Australia'                    => 'Australia/Perth',
         'W. Australia Standard Time'      => 'Australia/Perth',
         'W. Central Africa Standard Time' => 'Africa/Luanda',
@@ -319,7 +320,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 

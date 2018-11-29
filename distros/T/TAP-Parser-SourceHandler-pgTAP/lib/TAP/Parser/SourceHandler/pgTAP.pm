@@ -9,7 +9,7 @@ use TAP::Parser::Iterator::Process ();
 @ISA = qw(TAP::Parser::SourceHandler);
 TAP::Parser::IteratorFactory->register_handler(__PACKAGE__);
 
-our $VERSION = '3.33';
+our $VERSION = '3.34';
 
 =head1 Name
 
@@ -91,7 +91,7 @@ won't need to use this module directly.
 
 =head2 Testing with pgTAP
 
-If you just want to write tests with L<pgTAP|http://pgtap.org/>, here's how:
+If you just want to write tests with L<pgTAP|https://pgtap.org/>, here's how:
 
 =over
 
@@ -124,7 +124,7 @@ started:
 
 Note how C<search_path> has been set so that the pgTAP functions can be found
 in the "tap" schema. Consult the extensive L<pgTAP
-documentation|http://pgtap.org/documentation.html> for a comprehensive list of
+documentation|https://pgtap.org/documentation.html> for a comprehensive list of
 test functions.
 
 =item *
@@ -283,7 +283,7 @@ time C<psql> was compiled, usually 5432.
 
 Specifies a hash of printing options in the style of C<\pset> in the C<psql>
 program. See the L<psql
-documentation|http://www.postgresql.org/docs/current/static/app-psql.html> for
+documentation|https://www.postgresql.org/docs/current/static/app-psql.html> for
 details on the supported options.
 
 =begin comment
@@ -374,7 +374,7 @@ sub make_iterator {
 
 =item * L<TAP::Parser::SourceHandler::RawTAP>
 
-=item * L<pgTAP|http://pgtap.org/>
+=item * L<pgTAP|https://pgtap.org/>
 
 =back
 
@@ -396,7 +396,7 @@ David E. Wheeler <dwheeler@cpan.org>
 
 =head1 Copyright and License
 
-Copyright (c) 2010-2016 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2010-2018 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

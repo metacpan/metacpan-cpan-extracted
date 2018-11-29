@@ -1,7 +1,7 @@
 package App::cryp::Exchange::indodax;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -559,7 +559,7 @@ App::cryp::Exchange::indodax - Interact with Indodax
 
 =head1 VERSION
 
-This document describes version 0.010 of App::cryp::Exchange::indodax (from Perl distribution App-cryp-exchange), released on 2018-06-24.
+This document describes version 0.011 of App::cryp::Exchange::indodax (from Perl distribution App-cryp-exchange), released on 2018-11-29.
 
 =for Pod::Coverage ^(.+)$
 

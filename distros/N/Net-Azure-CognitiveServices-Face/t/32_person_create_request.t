@@ -12,12 +12,12 @@ my $req = $person->_create_request("machida_pm",
     name     => 'ytnobody',
     userData => 'japan-perl',
 );
-isa_ok $req, 'HTTP::Request';
-is $req->uri, "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons";
-is $req->method, 'POST';
-is $req->header('Content-Type'), 'application/json';
-is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';
-like $req->content, qr|"userData":"japan-perl"|;
-like $req->content, qr|"name":"ytnobody"|;
+isa_ok $req, 'ARRAY';
+is $req->[1], "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons";
+is $req->[0], 'POST';
+is $req->[2]{headers}{'Content-Type'}, 'application/json';
+is $req->[2]{headers}{'Ocp-Apim-Subscription-Key'}, 'MYSECRET';
+like $req->[2]{content}, qr|"userData":"japan-perl"|;
+like $req->[2]{content}, qr|"name":"ytnobody"|;
 
 done_testing;

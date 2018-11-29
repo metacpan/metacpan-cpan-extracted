@@ -2,8 +2,8 @@
 
 # FRAGMENT id=shcompgen-hint command=cryp-exchange
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,7 +63,7 @@ cryp-exchange - Interact with cryptoexchanges using a common interface
 
 =head1 VERSION
 
-This document describes version 0.010 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-06-24.
+This document describes version 0.011 of cryp-exchange (from Perl distribution App-cryp-exchange), released on 2018-11-29.
 
 =head1 SYNOPSIS
 
@@ -81,7 +81,7 @@ family of scripts):
  api_key    = EKSGJUOR-ROR9K24P-Q45UBWVG-GZHANPQV-UY4Z1WBM
  api_secret = 71100dc13ffe4d082239c06b5c36fd8f0548cd97056ffa2ee491ae4dfd4f996fb468ef3c70b12073
 
- [exchange/gdax]
+ [exchange/coinbase-pro]
  api_key        = 2171d01f1de2518c94a11870a6df22d0
  api_secret     = 9B8T2nPFMRUiUIKA82txjaO09iNnJXBMVMdkDgJ0i2YambYKQY8DZAS54ERZE0sE2lzYrpTWfpU7/110xfesZluY
  api_passphrase = gdllszgwO774NN
@@ -93,31 +93,30 @@ To list supported exchanges:
  % cryp-exchange exchanges
  % cryp-exchange exchanges -l
 
-To list pairs offered in an exchange:
+To list pairs supported by an exchange:
 
- % cryp-exchange pairs indodax/wifey
- % cryp-exchange pairs gdax -l
+ % cryp-exchange pairs indodax
 
 To list accounts:
 
  % cryp-exchange accounts
  % cryp-exchange accounts -l
- % cryp-exchange accounts -I gdax -l ;# only accounts on gdax
- % cryp-exchange accounts -X gdax -l ;# all accounts except those on gdax
+ % cryp-exchange accounts -I coinbase-pro -l ;# only accounts on coinbase-pro
+ % cryp-exchange accounts -X coinbase-pro -l ;# all accounts except those on coinbase-pro
 
 To view ticker (last 24h price and volume information):
 
- % cryp-exchange ticker gdax BTC/USD
+ % cryp-exchange ticker coinbase-pro  BTC/USD
 
 To get order book:
 
- % cryp-exchange orderbook gdax
+ % cryp-exchange orderbook coinbase-pro
 
 =head2 Balance
 
 To get account balance:
 
- % cryp-exchange balance gdax
+ % cryp-exchange balance coinbase-pro
  % cryp-exchange balance indodax/wifey
 
 =head2 Order
@@ -125,26 +124,26 @@ To get account balance:
 To create a limit order:
 
  # buy 100USD worth of BTC at 7000USD/BTC
- % cryp-exchange create-limit-order gdax BTC/USD buy 7500 --quote-size 100
+ % cryp-exchange create-limit-order coinbase-pro BTC/USD buy 7500 --quote-size 100
 
  # buy 0.5BTC at 7000USD/BTC
- % cryp-exchange create-limit-order gdax BTC/USD buy 7500 --base-size 0.5
+ % cryp-exchange create-limit-order coinbase-pro BTC/USD buy 7500 --base-size 0.5
 
 To get information about an order:
 
- % cryp-exchange get-order gdax BTC/USD buy 6327a864-d2c8-4e3e-8de3-dd71921b7cd0
+ % cryp-exchange get-order coinbase-pro BTC/USD buy 6327a864-d2c8-4e3e-8de3-dd71921b7cd0
 
 To list open orders:
 
  # list all open orders
- % cryp-exchange open-orders gdax
+ % cryp-exchange open-orders coinbase-pro
 
  # list open orders for a specific pair only
- % cryp-exchange open-orders gdax BTC/USD
+ % cryp-exchange open-orders coinbase-pro BTC/USD
 
 To cancel an order:
 
- % cryp-exchange cancel-order gdax BTC/USD buy 6327a864-d2c8-4e3e-8de3-dd71921b7cd0
+ % cryp-exchange cancel-order coinbase-pro BTC/USD buy 6327a864-d2c8-4e3e-8de3-dd71921b7cd0
 
 =head1 DESCRIPTION
 
@@ -216,13 +215,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -271,7 +268,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 

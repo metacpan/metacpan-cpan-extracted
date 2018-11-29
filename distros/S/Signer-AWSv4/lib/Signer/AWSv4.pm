@@ -5,7 +5,7 @@ package Signer::AWSv4;
   use Digest::SHA qw//;
   use URI::Escape qw//;
 
-  our $VERSION = '0.03';
+  our $VERSION = '0.04';
 
   has access_key => (is => 'ro', isa => Str, required => 1);
   has secret_key => (is => 'ro', isa => Str, required => 1);
@@ -25,7 +25,7 @@ package Signer::AWSv4;
   has unsigned_payload => (is => 'ro', isa => Bool, default => 0);
 
   has time => (is => 'ro', isa => InstanceOf['Time::Piece'], default => sub {
-    localtime;
+    gmtime;
   });
 
   has date => (is => 'ro', isa => Str, init_arg => undef, lazy => 1, default => sub {

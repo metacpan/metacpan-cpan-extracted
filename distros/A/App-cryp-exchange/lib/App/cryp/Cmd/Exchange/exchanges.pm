@@ -1,7 +1,7 @@
 package App::cryp::Cmd::Exchange::exchanges;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010;
 use strict;
@@ -29,7 +29,7 @@ App::cryp::Cmd::Exchange::exchanges - List supported exchanges
 
 =head1 VERSION
 
-This document describes version 0.010 of App::cryp::Cmd::Exchange::exchanges (from Perl distribution App-cryp-exchange), released on 2018-06-24.
+This document describes version 0.011 of App::cryp::Cmd::Exchange::exchanges (from Perl distribution App-cryp-exchange), released on 2018-11-29.
 
 =head1 FUNCTIONS
 
@@ -38,7 +38,7 @@ This document describes version 0.010 of App::cryp::Cmd::Exchange::exchanges (fr
 
 Usage:
 
- handle_cmd(%args) -> [status, msg, result, meta]
+ handle_cmd(%args) -> [status, msg, payload, meta]
 
 List supported exchanges.
 
@@ -57,7 +57,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

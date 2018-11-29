@@ -15,8 +15,8 @@ BEGIN {
       DBD::SQLite
       DBI
       DBIx::Class
-      List::MoreUtils
-      Moose
+      Moo
+      MooX::HandlesVia
       namespace::autoclean
     );
 

@@ -1,4 +1,4 @@
-use v5.28.0;
+use v5.10.0;
 use strict;
 use warnings;
 use Test::Script::Run;

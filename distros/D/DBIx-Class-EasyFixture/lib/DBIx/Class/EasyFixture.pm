@@ -1,29 +1,31 @@
 package DBIx::Class::EasyFixture;
-$DBIx::Class::EasyFixture::VERSION = '0.12';
+$DBIx::Class::EasyFixture::VERSION = '0.13';
 # ABSTRACT: Easy fixtures with DBIx::Class
 
 use 5.008003;
-use Moose;
+use Moo;
+use MooX::HandlesVia;
+use Types::Standard qw(InstanceOf Bool HashRef);
 use Carp;
 use aliased 'DBIx::Class::EasyFixture::Definition';
 use namespace::autoclean;
 
 has 'schema' => (
     is       => 'ro',
-    isa      => 'DBIx::Class::Schema',
+    isa      => InstanceOf['DBIx::Class::Schema'],
     required => 1,
 );
 has '_in_transaction' => (
     is      => 'rw',
-    isa     => 'Bool',
+    isa     => Bool,
     default => 0,
     writer  => '_set_in_transaction',
 );
 has '_cache' => (
-    traits  => ['Hash'],
     is      => 'ro',
-    isa     => 'HashRef',
+    isa     => HashRef,
     default => sub { {} },
+    handles_via => 'Hash',
     handles => {
         _set_fixture => 'set',
         _get_result  => 'get',
@@ -33,7 +35,7 @@ has '_cache' => (
 );
 has 'no_transactions' => (
     is      => 'ro',
-    isa     => 'Bool',
+    isa     => Bool,
     default => 0,
 );
 
@@ -206,8 +208,6 @@ sub DEMOLISH {
     $self->unload;
 }
 
-__PACKAGE__->meta->make_immutable;
-
 1;
 
 __END__
@@ -222,15 +222,15 @@ DBIx::Class::EasyFixture - Easy fixtures with DBIx::Class
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
     package My::Fixtures;
-    use Moose;
+    use Moo;    # (Moose is also fine)
     extends 'DBIx::Class::EasyFixture';
 
-    sub get_fixture       { ... }
+    sub get_definition    { ... }
     sub all_fixture_names { ... }
 
 And in your test code:
@@ -330,7 +330,7 @@ name. However, C<fixture_loaded> still works as an alias to C<is_loaded>.
 If you attempt to load a fixture, a transaction is started and it will be
 rolled back when you call C<unload()> or when the fixture object falls out of
 scope. If, for some reason, you do not want transactions (for example, if you
-need to controll them manually), you can use a true value with the
+need to control them manually), you can use a true value with the
 C<no_transactions> argument.
 
     my $fixtures = My::Fixtures->new(

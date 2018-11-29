@@ -5,88 +5,81 @@ package Acme::DarmstadtPM::TieHash;
 use strict;
 use warnings;
 
-use Tie::ListKeyedHash;
+our $VERSION = '0.5';
+our $SEP     = '__Acme::DarmstadtPM::TieHash::KeySeparator__';
 
-our $VERSION = '0.4';
-
-sub TIEHASH{
+sub TIEHASH {
     my ($class,$code) = @_;
     
     
     my $self = {};
-    my %hash;
     bless $self,$class;
     
-    tie %hash,'Tie::ListKeyedHash';
-    $self->{HASH} = \%hash;
+    $self->{HASH} = {};
     $self->{CODE} = $code;
     
     return $self;
 }
 
-sub FETCH{
+sub FETCH {
     my ($self,$key) = @_;
+
+    return if !ref $key;
     
-    if (not ref $key) {
-        $key = [split(/$;/,$key)];
+    my $internal_key = join $SEP, @{ $key || [] };
+    if ( !exists $self->{HASH}->{$internal_key} ) {
+        $self->{HASH}->{$internal_key} = $self->{CODE}->(@$key);
     }
     
-    unless(exists $self->{HASH}->{$key}){
-        $self->{HASH}->{$key} = $self->{CODE}->(@$key);
-    }
-    
-    return $self->{HASH}->{$key};
+    $self->{HASH}->{$internal_key};
 }
 
-sub STORE{
+sub STORE {
     my ($self,$key,$value) = @_;
     
-    if (not ref $key) {
-        $key = [split(/$;/,$key)];
-    }
-    
-    $self->{HASH}->{$key} = $value;
+    my $internal_key = join $SEP, @{ $key || [] };
+    $self->{HASH}->{$internal_key} = $value;
 }
 
-sub DELETE{
+sub DELETE {
     my ($self,$key) = @_;
 
-    if (not ref $key) {
-        $key = [split(/$;/,$key)];
-    }
-    
-    delete $self->{HASH}->{$key};
+    my $internal_key = join $SEP, @{ $key || [] };
+    my $value = delete $self->{HASH}->{$internal_key};
+
+    return $value;
 }
 
-sub EXISTS{
+sub EXISTS {
     my ($self,$key) = @_;
 
-    if (not ref $key) {
-        $key = [split(/$;/,$key)];
-    }
-
-    return exists $self->{HASH}->{$key} ? 1 : 0;
+    my $internal_key = join $SEP, @{ $key || [] };
+    exists $self->{HASH}->{$internal_key};
 }
 
-sub CLEAR{
+sub CLEAR {
     my ($self) = @_;
-    $self->{HASH} = ();
+
+    $self->{HASH} = {};
 }
 
-sub FIRSTKEY{
+sub FIRSTKEY {
 	my ($self) = @_;
-	
-	my $a = keys %{$self->{HASH}}; 
-	my $key = scalar each %{$self->{HASH}};
-	return if (not defined $key);
-	return [$key];
+
+	my $a = keys %{ $self->{HASH} };
+	my $key = scalar each %{ $self->{HASH} };
+
+    return if !defined $key;
+    return [ split /$SEP/, $key ];
 }
 
 sub NEXTKEY {
 	my ($self,$last_key) = @_;
-	my $key = scalar each %{$self->{HASH}};
-	return if (not defined $key);
-	return [$key];
+
+	my $key = scalar each %{ $self->{HASH} };
+
+    return if !defined $key;
+    return [ split /$SEP/, $key ];
 }
 
 1;
@@ -95,13 +88,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Acme::DarmstadtPM::TieHash - a module that shows that Perl can do all the Ruby things ;-)
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 SYNOPSIS
 
@@ -125,6 +120,8 @@ version 0.4
 
 Ronnie sent a mail to the mailinglist with some good Ruby stuff. I said, that all these
 things can be done in Perl, too. So this module is a proof how smart Perl is...
+
+=for Pod::Coverage TIEHASH FETCH STORE EXISTS NEXTKEY FIRSTKEY CLEAR DELETE
 
 =head1 AUTHOR
 

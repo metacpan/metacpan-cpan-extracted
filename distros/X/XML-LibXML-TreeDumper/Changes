@@ -1,6 +1,11 @@
 Revision history for XML::LibXML::TreeDumper
 ============================================
 
+0.03 2018-11-28 20:28:00
+
+     * update dist.ini
+     * add some paragraphs in documentation
+
 0.02 2014-10-02
 
      * update prereq list

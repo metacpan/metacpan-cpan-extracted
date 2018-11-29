@@ -16,6 +16,7 @@ use File::Basename qw/basename fileparse/;
 use File::Temp qw/tempdir/;
 use List::Util qw/max/;
 use IO::Uncompress::Gunzip qw/gunzip/;
+#use Bio::Kmer;
 
 use threads;
 use Thread::Queue;
@@ -35,36 +36,79 @@ sub main{
   GetOptions($settings,qw(help kmerlength|kmer=i kmerCounter=s delta=i gt|greaterthan=i tempdir=s numcpus=i)) or die $!;
   $$settings{kmerlength} ||=21;
   $$settings{kmerCounter}||="";
-  $$settings{delta}      ||=10;
   $$settings{gt}         ||=1;
   $$settings{tempdir}    ||=tempdir(TEMPLATE=>"$0.XXXXXX",CLEANUP=>1,TMPDIR=>1);
   $$settings{numcpus}    ||=1;
+
+  if($$settings{delta}){
+    logmsg "WARNING: --delta has been deprecated";
+  }
 
   my($fastq)=@ARGV;
   die usage() if(!$fastq || $$settings{help});
   die "ERROR: I could not find fastq at $fastq" if(!-e $fastq);
 
+  # Find valleys with multithreading
+  my @thr;
+  for(my $kmerlength=7; $kmerlength<=32; $kmerlength+=3){
+    logmsg "Counting $kmerlength-kmers in $fastq";
+    push(@thr,
+      threads->new(sub{
+        my($fastq, $kmerlength)=@_;
+          #my $kmerCounter = Bio::Kmer->new($fastq,{numcpus=>$$settings{numcpus},kmerlength=>$kmerlength,sample=>0.01});
+          #my $histogram = $kmerCounter->histogram();
+          my $histogram   = mashHistogram($fastq,$kmerlength,$settings);
+          my $firstValley = findFirstValley($histogram, $settings);
+          return $firstValley;
+
+        },$fastq, $kmerlength
+      )
+    );
+  }
+
   my %firstValleyVote;
-  for(my $i=9; $i<=23; $i+=2){
-    $$settings{kmerlength}=$i;
-    my $histogram=mashHistogram($fastq,$settings);
-    my $tmp=findThePeaksAndValleys($histogram,$$settings{delta},$settings);
-    my $firstValley=$$tmp{valleys}[0][0] || next;
+  for(@thr){
+    my $firstValley = $_->join;
+    next if(!$firstValley);
     $firstValleyVote{$firstValley}++;
   }
 
+  # If no valleys were found, simply set the stage so that
+  # the minimum depth will be set to 0.
+  if(keys(%firstValleyVote) < 1){
+    logmsg "NOTE: no valleys were found and so I am inserting an imaginary vote for a valley at cov=1";
+    $firstValleyVote{0} = 1;
+  }
 
   logmsg "For various values of k, valleys were found:";
   my $firstValley=0;
+  # Average out the votes
+  my $totalFirstValley = 0;
+  my $totalVotes = 0;
+  my @vote;
   # Sort bins by their votes, highest to lowest
-  for my $bin(sort{$firstValleyVote{$b}<=>$firstValleyVote{$a}} keys(%firstValleyVote)){
+  for my $bin(sort{$firstValleyVote{$b}<=>$firstValleyVote{$a} || $a<=>$b} keys(%firstValleyVote)){
     my $value=$firstValleyVote{$bin};
     $firstValley||=$bin; # set the valley to the first bin we come to
-    logmsg "  $bin: $value votes";
-  }
+    for(1..$value){
+      push(@vote, $bin);
+    }
 
-  print join("\t",qw(kmer count))."\n";
-  print join("\t", $firstValley, 1)."\n";
+    $totalFirstValley += $bin * $value;
+    $totalVotes += $value;
+  }
+  @vote = sort {$a<=>$b} @vote;
+  logmsg @vote;
+  my $medianFirstValley = $vote[ int(scalar(@vote)/2) ];
+
+  # Get the average first valley across many kmers
+  my $avgFirstValley = $totalFirstValley/$totalVotes;
+  logmsg "    Average first valley is $avgFirstValley";
+  logmsg "    However, I will use the median valley: $medianFirstValley";
+  printf("%0.0f\n", $medianFirstValley);
+
+  #print join("\t",qw(kmer count))."\n";
+  #print join("\t", $firstValley, 1)."\n";
   return 0;
 
 }
@@ -72,9 +116,9 @@ sub main{
 # Poor man's way of subsampling
 # Thanks to Nick Greenfield for pointing this out.
 sub mashHistogram{
-  my($fastq,$settings)=@_;
-  my $sketch="$$settings{tempdir}/sketch.msh";
-  system("mash sketch -k $$settings{kmerlength} -b 1000000 -o $sketch $fastq > /dev/null 2>&1");
+  my($fastq,$k,$settings)=@_;
+  my $sketch="$$settings{tempdir}/sketch.$k.msh";
+  system("mash sketch -k $k -m 1 -o $sketch $fastq > /dev/null 2>&1");
   die if $?;
   
   my @histogram;
@@ -110,70 +154,59 @@ sub readHistogram{
   return \@hist;
 }
 
-sub findThePeaksAndValleys{
-  my($hist, $delta, $settings)=@_;
 
-  my($min,$max)=(MAXINT,MININT);
-  my($minPos,$maxPos)=(0,0);
-  my @maxTab=();
-  my @minTab=();
+# https://www.perlmonks.org/?node_id=629742
+sub localMinimaMaxima{
+  my($array, $settings)=@_;
 
-  my $lookForMax=1;
+  my @arr = @$array;
 
-  my $numZeros=0; # If we see too many counts of zero, then exit.
-  
-  for(my $kmerCount=$$settings{gt}+1;$kmerCount<@$hist;$kmerCount++){
-    my $countOfCounts=$$hist[$kmerCount];
-    if($countOfCounts == 0){ 
-      $numZeros++;
-    }
-    if($countOfCounts > $max){
-      $max=$countOfCounts;
-      $maxPos=$kmerCount;
-    }
-    if($countOfCounts < $min){
-      $min=$countOfCounts;
-      $minPos=$kmerCount;
-    }
+  my @minima;
+  my @maxima;
+  my $prev_cmp = 0;
 
-    if($lookForMax){
-      if($countOfCounts < $max - $delta){
-        push(@maxTab,[$maxPos,$max]);
-        $min=$countOfCounts;
-        $minPos=$kmerCount;
-        $lookForMax=0;
+  my $num = @arr - 2;
+  for my $i (0 .. $num){
+    my $cmp = $arr[$i] <=> $arr[$i+1];
+    if ($cmp != $prev_cmp) {
+      # have a minimum only after there has been a maximum
+      if($cmp < 0 && @maxima > 0){
+        push @minima, $i;
       }
-    }
-    else{
-      if($countOfCounts > $min + $delta){
-        push(@minTab,[$minPos,$min]);
-        $max=$countOfCounts;
-        $maxPos=$kmerCount;
-        $lookForMax=1;
+      elsif($cmp > 0){
+        push @maxima, $i;
       }
+      # when this and next elements are ==, defer checking for
+      # minima/maxima till next loop iteration
+      $prev_cmp = $cmp if $cmp;
     }
-
-    last if($numZeros > 3);
   }
 
-  return {peaks=>\@maxTab, valleys=>\@minTab};
+  # Uncomment the following if we want to look at the very
+  # last number in the array.
+  #if (@$array) {
+  #  push @minima, $num if $prev_cmp >= 0;
+  #  push @maxima, $num if $prev_cmp <= 0;
+  #}
+
+  ## debugging
+  #splice(@$array, 30);
+  #print join(".",@minima)."\n".join(",", @$array)."\n\n";
+
+  return(\@minima, \@maxima);
 }
 
-sub findTheValley{
-  my($peak1,$peak2,$hist,$settings)=@_;
+sub findFirstValley{
+  my($array, $settings)=@_;
+  my($minima, $maxima) = localMinimaMaxima($array, $settings);
 
-  my $valley=$$peak1[1];
-  my $kmerCount=$$peak1[0];
-  for(my $i=$$peak1[0]+1;$i<=$$peak2[0];$i++){
-    if($valley < $$hist[$i]){
-      $valley=$$hist[$i];
-      $kmerCount=$i;
-    } else {
-      last;
-    }
+  # Return the first minimum if it's not the first element
+  # or if there are no other minima.
+  if($$minima[0] > 0 || !$$minima[1]){
+    return $$minima[0];
+  } else {
+    return $$minima[1];
   }
-  
-  return [$kmerCount,$valley];
 }
 
 # http://www.perlmonks.org/?node_id=761662
@@ -191,32 +224,6 @@ sub which{
   return $tool_path;
 }
 
-# Opens a fastq file in a smart way
-sub openFastq{
-  my($fastq,$settings)=@_;
-
-  my $fh;
-
-  my @fastqExt=qw(.fastq.gz .fastq .fq.gz .fq);
-  my($name,$dir,$ext)=fileparse($fastq,@fastqExt);
-
-  # Open the file in different ways, depending on if it
-  # is gzipped or if the user has gzip installed.
-  if($ext =~/\.gz$/){
-    # use binary gzip if we can... why not take advantage
-    # of the compiled binary's speedup?
-    if(-e "/usr/bin/gzip"){
-      open($fh,"gzip -cd $fastq | ") or die "ERROR: could not open $fastq for reading!: $!";
-    }else{
-      $fh=new IO::Uncompress::Gunzip($fastq) or die "ERROR: could not read $fastq: $!";
-    }
-  } else {
-    open($fh,"<",$fastq) or die "ERROR: could not open $fastq for reading!: $!";
-  }
-  return $fh;
-}
-
-
 sub usage{
   "
   $0: 
@@ -229,8 +236,6 @@ sub usage{
   --gt     1   Look for the first peak at this kmer count
                and then the next valley.
   --kmer   21  kmer length
-  --delta  100 How different the counts have to be to
-               detect a valley or peak
   --numcpus  1 (not currently used)
 
   MISC

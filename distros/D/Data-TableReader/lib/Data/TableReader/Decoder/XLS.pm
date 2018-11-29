@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::XLS;
-$Data::TableReader::Decoder::XLS::VERSION = '0.007';
+$Data::TableReader::Decoder::XLS::VERSION = '0.008';
 use Moo 2;
 use Carp;
 extends 'Data::TableReader::Decoder::Spreadsheet';
@@ -24,7 +24,7 @@ sub _build_workbook {
 	if (ref $f and ref($f)->can('worksheets')) {
 		$wbook= $f;
 	} else {
-		$wbook= $self->default_xls_module->new->parse($f);
+		$wbook= $self->default_xls_module->new->parse($f, $self->xls_formatter);
 	}
 	defined $wbook or croak "Can't parse file '".$self->file_name."'";
 	return $wbook;
@@ -44,7 +44,7 @@ Data::TableReader::Decoder::XLS - Access sheets/rows of a Microsoft Excel '97 wo
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 DESCRIPTION
 

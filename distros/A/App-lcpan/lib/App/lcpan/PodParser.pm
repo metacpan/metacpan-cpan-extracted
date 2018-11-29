@@ -1,7 +1,7 @@
 package App::lcpan::PodParser;
 
-our $DATE = '2018-09-08'; # DATE
-our $VERSION = '1.026'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '1.028'; # VERSION
 
 use 5.010;
 use strict;
@@ -85,7 +85,7 @@ App::lcpan::PodParser - Pod parser for use in App::lcpan
 
 =head1 VERSION
 
-This document describes version 1.026 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2018-09-08.
+This document describes version 1.028 of App::lcpan::PodParser (from Perl distribution App-lcpan), released on 2018-11-29.
 
 =for Pod::Coverage .+
 

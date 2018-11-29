@@ -13,12 +13,12 @@ my $req = $face->_verify_request(
     faceId2 => "bar", 
 );
 
-isa_ok $req, 'HTTP::Request';
-is $req->uri, 'https://westus.api.cognitive.microsoft.com/face/v1.0/verify';
-is $req->method, 'POST';
-is $req->header('Content-Type'), 'application/json';
-is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';
-like $req->content, qr|"faceId1":"foo"|;
-like $req->content, qr|"faceId2":"bar"|;
+isa_ok $req, 'ARRAY';
+is $req->[1], 'https://westus.api.cognitive.microsoft.com/face/v1.0/verify';
+is $req->[0], 'POST';
+is $req->[2]{headers}{'Content-Type'}, 'application/json';
+is $req->[2]{headers}{'Ocp-Apim-Subscription-Key'}, 'MYSECRET';
+like $req->[2]{content}, qr|"faceId1":"foo"|;
+like $req->[2]{content}, qr|"faceId2":"bar"|;
 
 done_testing;

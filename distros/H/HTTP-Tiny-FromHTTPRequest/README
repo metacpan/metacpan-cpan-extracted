@@ -1,0 +1,54 @@
+NAME
+
+    HTTP::Tiny::FromHTTPRequest - Perform a request based on a plain HTTP
+    request or HTTP::Request object
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+        use v5.10;
+        use HTTP::Tiny::FromHTTPRequest;
+        use HTTP::Request;
+      
+        my $http = HTTP::Tiny::FromHTTPRequest->new;
+      
+        my $plain_request = q~
+        POST / HTTP/1.1
+        Content-Length: 104
+        User-Agent: HTTP-Tiny/0.025
+        Content-Type: multipart/form-data; boundary=go7DX
+        Connection: close
+        Host: localhost:3000
+        
+        --go7DX
+        Content-Disposition: form-data; name="file"; filename="test.txt"
+        
+        This is a test
+        --go7DX--
+        ~;
+        
+        my $response_from_object = $http->request( HTTP::Request->parse( $plain_request ) );
+        if ( $response_from_object->{success} ) {
+            say "Successful request from HTTP::Request object";
+        }
+        
+        my $response_from_plain  = $http->request( $plain_request );
+        if ( $response_from_plain->{success} ) {
+            say "Successful request from plain HTTP request";
+        }
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

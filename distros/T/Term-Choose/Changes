@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.637   2018-11-28
+    - Bugfix: don't allow to select 'meta_items' with Cntrl-SpaceBar.
+
 1.636   2018-11-25
     - Update char-width tables.
 

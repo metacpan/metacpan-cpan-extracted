@@ -1,0 +1,57 @@
+NAME
+
+    Perl::Critic::Policy::Variables::NameReuse - Don't reuse names for
+    different types of variables
+
+SYNOPSIS
+
+      perlcritic --single-policy=Variables::NameReuse script.pl
+      perlcritic --single-policy=Variables::NameReuse lib/
+    
+      # .perlcriticrc
+      severity = 1
+      only = 1
+      [Variables::NameReuse]
+
+DESCRIPTION
+
+    This policy checks for the existence of multiple variables with the
+    same name in a file. This can be confusing especially when accessing
+    elements of variables or using list or key-value slices. For example,
+    the code could access both $foo and $foo[0] but these actually refer to
+    the unrelated variables $foo and @foo.
+
+      my $foo = @foo;             # not ok
+      my @bar = @bar{'a','b'};    # not ok
+      my $count = @foo;           # ok
+      my @values = @bar{'a','b'}; # ok
+
+AFFILIATION
+
+    This policy has no affiliation.
+
+CONFIGURATION
+
+    This policy is not configurable except for the standard options.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Perl::Critic::Policy::Variables::ProhibitReusedNames - instead
+    prohibits redeclaring the same variable name across different scopes
+

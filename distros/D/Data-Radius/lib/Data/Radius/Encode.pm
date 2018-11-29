@@ -37,7 +37,9 @@ use Data::Radius::Util qw(is_enum_type);
 #  $coderef->($value, $attr, $dictionary)
 my %encode_map = (
     string      => \&encode_string,
+    string_tag  => \&encode_string_tag,
     integer     => \&encode_int,
+    integer_tag => \&encode_int_tag,
     byte        => \&encode_byte,
     short       => \&encode_short,
     signed      => \&encode_signed,
@@ -60,12 +62,13 @@ if (!defined inet_pton(AF_INET6, '::1')) {
 
 # value limits for numeric types
 my %limits_map = (
-    integer => [0,      2**32 - 1],
-    byte    => [0,      2**8  - 1],
-    short   => [0,      2**16 - 1],
-    signed  => [-2**31, 2**31 - 1],
+    integer     => [0,      2**32 - 1],
+    integer_tag => [0,      2**24 - 1],
+    byte        => [0,      2**8  - 1],
+    short       => [0,      2**16 - 1],
+    signed      => [-2**31, 2**31 - 1],
     # unix timestamp
-    date    => [0,      2**32 - 1],
+    date        => [0,      2**32 - 1],
 );
 
 sub encode_string {
@@ -78,10 +81,46 @@ sub encode_string {
     return $value;
 }
 
+sub encode_string_tag {
+    my ($value, $attr, $dict, $tag) = @_;
+    my $max_size = ($attr && $attr->{vendor}) ? MAX_VSA_STRING_SIZE : MAX_STRING_SIZE;
+
+    if (defined $tag) {
+        if ($tag > 31) {
+            warn sprintf('Too big tag value %d for %s', $tag, $attr->{name});
+        }
+        $max_size--;
+    }
+
+    if (length($value) > $max_size) {
+        warn "Too long value of ".$attr->{name};
+        return undef;
+    }
+
+    if (defined $tag) {
+        $value = pack('C', $tag) . $value;
+    }
+
+    return $value;
+}
+
 sub encode_int    { pack('N',  int($_[0])) }
 sub encode_byte   { pack('C',  int($_[0])) }
 sub encode_short  { pack('S>', int($_[0])) }
 sub encode_signed { pack('l>', int($_[0])) }
+
+sub encode_int_tag {
+    my ($value, $attr, $dict, $tag) = @_;
+    $value = pack('N', int($value));
+    if (defined $tag) {
+        if ($tag > 31) {
+            warn sprintf('Too big tag value %d for %s', $tag, $attr->{name});
+        }
+        # tag added to 1st byte, not extending the value length
+        substr($value, 0, 1, pack('C', $tag) );
+    }
+    return $value;
+}
 
 sub encode_ipaddr { inet_pton(AF_INET, $_[0]) }
 sub encode_ipv6addr { inet_pton(AF_INET6, $_[0]) }
@@ -175,14 +214,16 @@ sub encode_tlv {
 
 # main exported function
 sub encode {
-    my ($attr, $value, $dict) = @_;
+    my ($attr, $value, $dict, $tag) = @_;
 
     if (! defined $value) {
         warn "Value is not defined for " . $attr->{name};
         return undef;
     }
 
-    my $limits = $limits_map{ $attr->{type} };
+    my $encoder = $attr->{type} . ($attr->{has_tag} ? '_tag' : '');
+
+    my $limits = $limits_map{ $encoder };
     if ($limits) {
         # integer types
         if ($value !~ /^-?\d+$/) {
@@ -197,7 +238,7 @@ sub encode {
         }
     }
 
-    my $encoded = $encode_map{ $attr->{type} }->($value, $attr, $dict);
+    my $encoded = $encode_map{ $encoder }->($value, $attr, $dict, $tag);
     return $encoded;
 }
 

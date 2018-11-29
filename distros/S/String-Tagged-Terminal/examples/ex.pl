@@ -5,23 +5,49 @@ use warnings;
 
 use String::Tagged::Terminal;
 
-sub do_one
-{
-   my ( $name, $value ) = @_;
+my $st;
 
-   my $st = String::Tagged::Terminal->new( "An example of $name" );
-   $st->apply_tag( 14, -1, $name => $value );
+$st = String::Tagged::Terminal->new( "Basic colours: " );
+$st->append_tagged( sprintf( " [%d] ", $_ ), fgindex => $_, bgindex => $_==0 ? 7 : undef ) for 0 .. 7;
+$st->say_to_terminal;
+$st = String::Tagged::Terminal->new( "               " );
+$st->append_tagged( sprintf( " [%d] ", $_ ), bgindex => $_, fgindex => $_==7 ? 0 : undef ) for 0 .. 7;
+$st->say_to_terminal;
+print "\n";
 
-   $st->say_to_terminal;
+$st = String::Tagged::Terminal->new( "Bold colours: " );
+$st->append_tagged( sprintf( " [%d] ", $_ ), bold => 1, fgindex => $_, bgindex => $_==0 ? 7 : undef ) for 0 .. 7;
+$st->say_to_terminal;
+$st = String::Tagged::Terminal->new( "              " );
+$st->append_tagged( sprintf( " [%d] ", $_ ), bold => 1, bgindex => $_, fgindex => $_==7 ? 0 : undef ) for 0 .. 7;
+$st->say_to_terminal;
+print "\n";
+
+$st = String::Tagged::Terminal->new( "HI colours: " );
+$st->append_tagged( sprintf( " [%d] ", $_ ), fgindex => $_ ) for 8 .. 15;
+$st->say_to_terminal;
+$st = String::Tagged::Terminal->new( "            " );
+$st->append_tagged( sprintf( " [%d] ", $_ ), bgindex => $_ ) for 8 .. 15;
+$st->say_to_terminal;
+print "\n";
+
+$st = String::Tagged::Terminal->new( "Attrs: " );
+$st->append_tagged( $_, $_ => 1 )
+   ->append( " " ) for qw( bold italic under strike blink reverse altfont );
+$st->say_to_terminal;
+print "\n";
+
+print "256 colours:\n";
+$st = String::Tagged::Terminal->new;
+
+$st->append_tagged( "  ", bgindex => $_ ) for 0 .. 15;
+$st .= "\n\n";
+
+foreach my $b ( 0 .. 5 ) {
+   $st->append_tagged( "  ", bgindex => 16 + $b*36 + $_ ) for 0 .. 35;
+   $st .= "\n";
 }
+$st .= "\n";
 
-do_one @$_ for
-   [ bold    => 1 ],
-   [ italic  => 1 ],
-   [ under   => 1 ],
-   [ strike  => 1 ],
-   [ blink   => 1 ],
-   [ reverse => 1 ],
-   [ altfont => 1 ],
-   [ fgindex => 4 ],
-   [ bgindex => 2 ];
+$st->append_tagged( "  ", bgindex => 232 + $_ ) for 0 .. 23;
+$st->say_to_terminal;

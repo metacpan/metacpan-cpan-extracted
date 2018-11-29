@@ -4,9 +4,9 @@ Build.PL
 Changes
 lib/TAP/Parser/SourceHandler/pgTAP.pm
 MANIFEST			This list of files
-META.json
-META.yml
-README
+README.md
 t/bin/psql
 t/source.pg
 t/source_handler.t
+META.yml
+META.json

@@ -1,7 +1,7 @@
 package Sah::SchemaR::rinci::result_meta;
 
-our $DATE = '2018-01-14'; # DATE
-our $VERSION = '1.1.82.3'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '1.1.87.0'; # VERSION
 
 our $rschema = ["hash",[{_prop=>{caption=>{},cmdline=>{},default_lang=>{},defhash_v=>{},description=>{},func=>{},len=>{},logs=>{},name=>{},part_len=>{},part_start=>{},perm_err=>{},prev=>{},results=>{},stream=>{},summary=>{},tags=>{},v=>{},x=>{}},_ver=>1.1,summary=>"Rinci envelope result metadata"}],["hash"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::rinci::result_meta - Rinci envelope result metadata
 
 =head1 VERSION
 
-This document describes version 1.1.82.3 of Sah::SchemaR::rinci::result_meta (from Perl distribution Sah-Schemas-Rinci), released on 2018-01-14.
+This document describes version 1.1.87.0 of Sah::SchemaR::rinci::result_meta (from Perl distribution Sah-Schemas-Rinci), released on 2018-11-29.
 
 =head1 DESCRIPTION
 

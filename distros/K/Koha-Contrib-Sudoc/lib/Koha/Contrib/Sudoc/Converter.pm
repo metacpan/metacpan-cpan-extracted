@@ -1,6 +1,6 @@
 package Koha::Contrib::Sudoc::Converter;
 # ABSTRACT: Classe de base pour convertir les notices
-$Koha::Contrib::Sudoc::Converter::VERSION = '2.24';
+$Koha::Contrib::Sudoc::Converter::VERSION = '2.25';
 use Moose;
 use Modern::Perl;
 
@@ -62,21 +62,15 @@ sub authoritize {
     # Ne rien faire si c'est demandé pour l'ILN
     return unless $self->sudoc->c->{biblio}->{authoritize};
 
-    my $zconn = $self->sudoc->koha->zauth();
+    my $koha = $self->sudoc->koha;
     for my $field ( $record->field('5..|6..|7..') ) {
         my @subf;
         for my $sf ( @{$field->subf} ) {
             my ($letter, $value) = @$sf;
             push @subf, [ $letter => $value ];
-            if ( $letter eq '3' ) {
-                my $rs = $zconn->search_pqf( "\@attr 1=PPN $value" );
-                if ($rs->size() >= 1 ) {
-                    my $auth = MARC::Moose::Record::new_from(
-                        $rs->record(0)->raw(), 'Iso2709' );
-                    push @subf, [ '9' => $auth->field('001')->value ]
-                        if $auth;
-                }
-            }
+            next if $letter ne '3';
+            my ($authid, undef) = $koha->get_auth_by_ppn($value);
+            push @subf, [ 9 => $authid ] if $authid;
         }
         $field->subf(\@subf);
     }
@@ -89,21 +83,15 @@ sub linking {
     # Ne rien faire si c'est demandé pour l'ILN
     return unless $self->sudoc->c->{biblio}->{linking};
 
-    my $zconn = $self->sudoc->koha->zbiblio();
+    my $koha = $self->sudoc->koha;
     for my $field ( $record->field('4..|5..') ) {
         my @subf;
         for my $sf ( @{$field->subf} ) {
             my ($letter, $value) = @$sf;
             push @subf, [ $letter => $value ];
-            if ( $letter eq '0' ) {
-                my $rs = $zconn->search_pqf( "\@attr 1=PPN $value" );
-                if ($rs->size() >= 1 ) {
-                    my $biblio = MARC::Moose::Record::new_from(
-                        $rs->record(0)->raw(), 'Iso2709' );
-                    push @subf, [ '9' => $self->sudoc->koha->get_biblionumber($biblio) ],
-                        if $biblio;
-                }
-            }
+            next if $letter ne '0';
+            my ($biblionumber) = $koha->get_biblio_by_ppn($value);
+            push @subf, [ '9' => $biblionumber ] if $biblionumber;
         }
         $field->subf(\@subf);
     }
@@ -111,7 +99,10 @@ sub linking {
 
 
 sub itemize {
-    my ($self, $record) = @_;
+    my ($self, $record, $koha_record) = @_;
+
+    # Pas d'exemplarisation si on modifie une notice Koha
+    return if $koha_record;
 
     my $myrcr = $self->sudoc->c->{rcr};
     my $item = $self->{item};
@@ -205,7 +196,7 @@ Koha::Contrib::Sudoc::Converter - Classe de base pour convertir les notices
 
 =head1 VERSION
 
-version 2.24
+version 2.25
 
 =head1 DESCRIPTION
 
@@ -220,8 +211,8 @@ notice ou d'une notice qui existe déjà dans Koha:
  init            O      O
  authoritize     O      O
  linking         O      O
- itemize         N      O
- merge           O      N
+ itemize         O      O
+ merge           N      O
  clean           O      O
  framework       O      N
 
@@ -252,7 +243,8 @@ Les exemplaires courants.
 
 =head2 build
 
-Fabrique les structures de données nécessaires
+Fabrique les structures de données nécessaires pour la notice qu'on s'apprête à
+traiter.
 
 =head2 skip
 

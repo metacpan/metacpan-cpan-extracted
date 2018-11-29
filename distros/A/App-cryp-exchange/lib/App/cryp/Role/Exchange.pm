@@ -1,7 +1,7 @@
 package App::cryp::Role::Exchange;
 
-our $DATE = '2018-06-24'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2018-11-29'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -84,7 +84,7 @@ App::cryp::Role::Exchange - Role for interacting with an exchange
 
 =head1 VERSION
 
-This document describes version 0.010 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-06-24.
+This document describes version 0.011 of App::cryp::Role::Exchange (from Perl distribution App-cryp-exchange), released on 2018-11-29.
 
 =head1 DESCRIPTION
 
@@ -227,7 +227,8 @@ You have to specify one of base_size or quote_size, but not both.
 
 =back
 
-Some exchange drivers might provide additional options.
+Some specific exchanges might require more credentials or arguments (e.g.
+C<api_passphrase> on Coinbase Pro); please check with the specific drivers.
 
 When successful, payload in response must be a hashref which contains at least
 these keys: C<type> ("buy" or "sell"), C<pair>, C<order_id> (str, usually a

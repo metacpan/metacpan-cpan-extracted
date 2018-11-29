@@ -1,0 +1,30 @@
+MANIFEST
+LICENSE
+CHANGES
+bin/mashtree
+bin/mashtree_wrapper.pl
+bin/min_abundance_finder.pl
+lib/Mashtree.pm
+lib/Mashtree/Db.pm
+Makefile.PL
+README.md
+t/00_env.t
+t/01_filetypes.t
+t/02_lambda.t
+t/03_subsample.t
+t/10_sqlite.t
+t/filetypes/CFSAN000211.gbk.gz
+t/filetypes/CFSAN000189.gbk.gz
+t/filetypes/CFSAN000189.ref.fasta.gz
+t/filetypes/CFSAN001115.ref.fasta.bz2
+t/filetypes/CFSAN001140_1.fastq.gz
+t/filetypes/CFSAN000968.ref.fasta.gz
+t/filetypes/CFSAN001112.ref.fasta.gz
+t/filetypes/CFSAN000191.ref.fasta.gz
+t/filetypes/CFSAN000961.gbk.gz
+t/lambda/sample1.fastq.gz
+t/lambda/sample2.fastq.gz
+t/lambda/sample3.fastq.gz
+t/lambda/sample4.fastq.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

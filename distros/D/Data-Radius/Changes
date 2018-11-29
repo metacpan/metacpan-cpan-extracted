@@ -1,3 +1,8 @@
+1.2.2 2018-11-29
+
+ - Fix: tag for integer attribute does not change the data length
+ - Ensure tag for string attribute does not exceed 0x1F value
+
 1.2.1 2017-05-18
 
  - Fix Message-Authenticator value calculations for Disconnect and CoA requests
