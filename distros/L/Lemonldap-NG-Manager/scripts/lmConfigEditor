@@ -32,7 +32,8 @@ $refConf->{cfgLog} = '';
 
 # Sort keys
 $Data::Dumper::Sortkeys = 1;
-my $tmp                = Dumper($refConf);
+$Data::Dumper::Useperl  = 1;
+my $tmp = Dumper($refConf);
 
 my $refFile  = File::Temp->new( UNLINK => 1 );
 my $editFile = File::Temp->new( UNLINK => 1 );
@@ -68,12 +69,13 @@ if (`diff $refFile $editFile`) {
         {
             refConf => $refConf,
             newConf => $VAR1,
-            req => 1,
+            req     => 1,
         }
     );
-    unless($parser->testNewConf) {
+    unless ( $parser->testNewConf ) {
         print STDERR "Configuration seems to have some errors:\n ";
-        print STDERR Dumper({errors => $parser->errors,warnings => $parser->warnings});
+        print STDERR Dumper(
+            { errors => $parser->errors, warnings => $parser->warnings } );
         print STDERR "Are you sure you want to write it ? (yes/no) ";
         my $resp = <STDIN>;
         die "Aborted" unless $resp =~ /^yes$/i;

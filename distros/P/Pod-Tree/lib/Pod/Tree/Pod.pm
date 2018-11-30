@@ -3,10 +3,11 @@
 # terms as Perl itself.
 
 package Pod::Tree::Pod;
+use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 use IO::File;
 use Pod::Tree;

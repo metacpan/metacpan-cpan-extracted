@@ -9,7 +9,7 @@ use File::Spec;
 my @files = qw( MANIFEST MANIFEST.SKIP );
 plan tests => scalar @files * 4 
               +1 # MANIFEST existence check
-              +1 # MYMETA check
+              +1 # MYMETA.* non-existence check
               ;
 
 for my $file (@files) {

@@ -4,15 +4,12 @@ App::DBBrowser::OptDB;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use File::Spec::Functions qw( catfile );
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_subset settings_menu );
 use Term::Form         qw();
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;

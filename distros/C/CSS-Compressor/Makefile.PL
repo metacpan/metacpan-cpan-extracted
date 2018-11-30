@@ -10,5 +10,12 @@ WriteMakefile(
     },
     ABSTRACT_FROM  => 'Compressor.pm',
     AUTHOR         => 'Simon Bertrang <janus@cpan.org>',
+    META_MERGE     => {
+        resources      => {
+            license        => 'http://dev.perl.org/licenses/',
+            repository     => 'https://github.com/sbertrang/css-compressor.git',
+            bugtracker     => 'https://github.com/sbertrang/css-compressor/issues',
+        },
+    },
 );
 

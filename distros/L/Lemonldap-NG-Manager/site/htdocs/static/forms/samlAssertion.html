@@ -1,0 +1,47 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table">
+    <!-- Default -->
+    <tr>
+      <th><span trspan="default"></span></th>
+      <td>
+      <div class="input-group-solid" role="radiogroup">
+        <label class="radio-inline">
+          <input id="bopeOn" type="radio" value="1" name="bope" ng-model="currentNode.data[0]" role="radio" aria-labelledby="onl"/>
+          <span id="onl" for="bopeOn" trspan="on"></span>
+        </label>
+        <label class="radio-inline">
+          <input id="bopeOff" type="radio" value="0" name="bope" ng-model="currentNode.data[0]" ng-checked="currentNode.data[0]!==1&&currentNode.data[0]!=='1'" role="radio" aria-labelledby="offl"/>
+          <span id="offl" for="bopeOff" trspan="off"></span>
+        </label>
+      </div>
+      </td>
+    </tr>
+    <tr class="hidden">
+      <th><span trspan="index"></span></th>
+      <td><input id="sahinput" class="form-control" ng-model="currentNode.data[1]"/></td>
+    </tr>
+    <!-- Binding -->
+    <tr>
+      <th><span trspan="format"></span></th>
+      <td>
+      <select disabled="disabled" class="form-control" id="saaselect" ng-model="currentNode.data[2]">
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact">HTTP Artifact</option>
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">HTTP POST</option>
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect">HTTP Redirect</option>
+        <option value="urn:oasis:names:tc:SAML:2.0:bindings:SOAP">SOAP</option>
+      </select>
+      </td>
+    </tr>
+    <!-- URL -->
+    <tr>
+      <th><span trspan="url"></span></th>
+      <td><input aria-describedby="saalabel" id="saainput" class="form-control" ng-model="currentNode.data[3]"/></td>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[]
+</script>

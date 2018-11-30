@@ -3,7 +3,7 @@ package Perl::Critic::Freenode;
 use strict;
 use warnings;
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 1;
 
@@ -107,6 +107,10 @@ Module files should declare a package matching the filename
 =item L<Perl::Critic::Policy::Freenode::POSIXImports>
 
 Don't use L<POSIX> without specifying an import list
+
+=item L<Perl::Critic::Policy::Freenode::PreferredAlternatives>
+
+Various modules with preferred alternatives
 
 =item L<Perl::Critic::Policy::Freenode::Prototypes>
 

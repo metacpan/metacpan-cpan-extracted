@@ -3,7 +3,7 @@ package Lemonldap::NG::Manager::Conf::Parser;
 # This module is called either to parse a new configuration in JSON format (as
 # posted by the web interface) and test a new configuration object.
 #
-# The new object must be build with the following properties:
+# The new object must be built with the following properties:
 #  - refConf: the actual configuration
 #  - req    : the Lemonldap::NG::Common::PSGI::Request
 #  - tree   : the new configuration in JSON format
@@ -21,10 +21,13 @@ package Lemonldap::NG::Manager::Conf::Parser;
 use strict;
 use utf8;
 use Mouse;
-use Lemonldap::NG::Manager::Constants;
+use JSON 'to_json';
+use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '1.9.4';
+our $VERSION = '2.0.0';
+
+extends 'Lemonldap::NG::Common::Conf::Compact';
 
 # High debugging for developpers, set this to 1
 use constant HIGHDEBUG => 0;
@@ -66,7 +69,7 @@ has confChanged => (
 );
 
 # Properties required during build
-has refConf => ( is => 'ro', isa => 'HashRef', required => 1 );
+has refConf => ( is => 'ro', isa      => 'HashRef', required => 1 );
 has req     => ( is => 'ro', required => 1 );
 has newConf => ( is => 'rw', isa      => 'HashRef' );
 has tree    => ( is => 'rw', isa      => 'ArrayRef' );
@@ -77,6 +80,7 @@ sub hdebug {
         foreach my $d (@_) {
             if ( ref $d ) {
                 require Data::Dumper;
+                $Data::Dumper::Useperl = 1;
                 print STDERR Data::Dumper::Dumper($d);
             }
             else { print STDERR "$d\n" }
@@ -91,19 +95,17 @@ sub hdebug {
 sub check {
     my $self = shift;
     hdebug("# check()");
-    my $res;
     unless ( $self->newConf ) {
-        $res = $self->scanTree;
-        return 0 unless ($res);
+        return 0 unless ( $self->scanTree );
     }
-
     unless ( $self->testNewConf ) {
         hdebug("  testNewConf() failed");
         return 0;
     }
     hdebug("  tests succeed");
+    $self->compactConf( $self->newConf );
     unless ( $self->confChanged ) {
-        hdebug("  no changes detected");
+        hdebug("  no change detected");
         $self->message('__confNotChanged__');
         return 0;
     }
@@ -120,13 +122,14 @@ sub scanTree {
     $self->_scanNodes( $self->tree ) or return 0;
 
     # Set cfgNum to ref cfgNum (will be changed when saving), set other
-    # metadatas and set a value to the key if empty
+    # metadata and set a value to the key if empty
     $self->newConf->{cfgNum} = $self->req->params('cfgNum');
     $self->newConf->{cfgAuthor} =
       $self->req->userData->{ $Lemonldap::NG::Handler::Main::tsv->{whatToTrace}
           || '_whatToTrace' } // "anonymous";
-    $self->newConf->{cfgAuthorIP} = $self->req->remote_ip;
+    $self->newConf->{cfgAuthorIP} = $self->req->address;
     $self->newConf->{cfgDate}     = time;
+    $self->newConf->{cfgVersion}  = $VERSION;
     $self->newConf->{key} ||=
       join( '', map { chr( int( rand(94) ) + 33 ) } ( 1 .. 16 ) );
 
@@ -155,7 +158,7 @@ sub _scanNodes {
         hdebug("Looking to $name");
 
         # subnode
-        my $subNodes     = $leaf->{nodes}      // $leaf->{_nodes};
+        my $subNodes     = $leaf->{nodes} // $leaf->{_nodes};
         my $subNodesCond = $leaf->{nodes_cond} // $leaf->{_nodes_cond};
 
         ##################################
@@ -426,6 +429,74 @@ sub _scanNodes {
                 }
                 next;
             }
+
+            # CAS
+            elsif ( $base =~ /^cas(?:App|Srv)MetaDataNodes$/ ) {
+                my $optKey = $&;
+                hdebug('CAS');
+                if ( $target =~ /^cas(?:App|Srv)MetaDataOptions$/ ) {
+                    hdebug("  $target: looking for subnodes");
+                    $self->_scanNodes($subNodes);
+                    $self->set( $target, $key, $leaf->{title}, $leaf->{data} );
+                }
+                elsif ( $target =~ /^cas(?:App|Srv)MetaDataExportedVars$/ ) {
+                    hdebug("  $target");
+                    if ( $leaf->{cnodes} ) {
+                        hdebug('    unopened');
+                        $self->newConf->{$target}->{$key} =
+                          $self->refConf->{$target}->{$oldName} // {};
+                    }
+                    elsif ($h) {
+                        hdebug('    opened');
+                        $self->set( $target, $key, $leaf->{title},
+                            $leaf->{data} );
+                    }
+                    else {
+                        hdebug("  $target: looking for subnodes");
+                        $self->_scanNodes($subNodes);
+                    }
+                }
+                elsif ( $target =~ /^cas(?:Srv|App)MetaDataOptions/ ) {
+                    my $optKey = $&;
+                    hdebug "  $base sub key: $target";
+                    if ( $target eq 'casSrvMetaDataOptionsProxiedServices' ) {
+                        if ( $leaf->{cnodes} ) {
+                            hdebug('    unopened');
+                            $self->newConf->{$target}->{$key} =
+                              $self->refConf->{$target}->{$oldName} // {};
+                        }
+                        elsif ($h) {
+                            hdebug('    opened');
+                            $self->set( $target, $key, $leaf->{title},
+                                $leaf->{data} );
+                        }
+                        else {
+                            hdebug("  $target: looking for subnodes");
+                            $self->_scanNodes($subNodes);
+                        }
+                    }
+                    elsif ( $target =~
+                        /^(?:$casSrvMetaDataNodeKeys|$casAppMetaDataNodeKeys)/o
+                      )
+                    {
+                        $self->set(
+                            $optKey, [ $oldName, $key ],
+                            $target, $leaf->{data}
+                        );
+                    }
+                    else {
+                        push @{ $self->errors },
+                          { message => "Unknown CAS metadata option $target" };
+                        return 0;
+                    }
+                }
+                else {
+                    push @{ $self->errors },
+                      { message => "Unknown CAS option $target" };
+                    return 0;
+                }
+                next;
+            }
             else {
                 push @{ $self->errors },
                   { message => "Fatal: unknown special sub node $base" };
@@ -461,7 +532,7 @@ sub _scanNodes {
                         : {}
                     }
                   );
-                for ( my $i = 0 ; $i < @listCatNew; $i++ ) {
+                for ( my $i = 0 ; $i < @listCatNew ; $i++ ) {
                     if ( not( defined $listCatRef[$i] )
                         or $listCatRef[$i] ne $listCatNew[$i] )
                     {
@@ -661,6 +732,26 @@ sub _scanNodes {
             }
             else {
                 hdebug('  opened');
+
+                # combModules: just to replace "over" key
+                if ( $name eq 'combModules' ) {
+                    hdebug('     combModules');
+                    $self->newConf->{$name} = {};
+                    foreach my $node ( @{ $leaf->{nodes} } ) {
+                        my $tmp;
+                        $tmp->{$_} = $node->{data}->{$_} foreach (qw(type for));
+                        $tmp->{over} = {};
+                        foreach ( @{ $node->{data}->{over} } ) {
+                            $tmp->{over}->{ $_->[0] } = $_->[1];
+                        }
+                        $self->newConf->{$name}->{ $node->{title} } = $tmp;
+                    }
+
+                    # TODO: check changes
+                    $self->confChanged(1);
+                    next;
+                }
+
                 $subNodes //= [];
                 my $count = 0;
                 my @old   = (
@@ -672,6 +763,14 @@ sub _scanNodes {
                 foreach my $n (@$subNodes) {
                     hdebug("  looking at $n subnode");
                     if ( ref $n->{data} and ref $n->{data} eq 'ARRAY' ) {
+
+                        # authChoiceModules
+                        if ( $name eq 'authChoiceModules' ) {
+                            hdebug('     combModules');
+                            $n->{data}->[5] ||= {};
+                            $n->{data}->[5] = to_json( $n->{data}->[5] );
+                        }
+
                         $n->{data} = join ';', @{ $n->{data} };
                     }
                     $self->newConf->{$name}->{ $n->{title} } = $n->{data};
@@ -735,7 +834,8 @@ sub _scanNodes {
                     @oldKeys = keys %{ $self->refConf->{$name}->{$host} };
                 }
                 foreach my $prm ( @{ $getHost->{h} } ) {
-                    $self->newConf->{$name}->{$host}->{ $prm->{k} } = $prm->{v};
+                    $self->newConf->{$name}->{$host}->{ $prm->{k} } =
+                      $prm->{v};
                     if (
                         !$change
                         and (
@@ -917,7 +1017,7 @@ sub _unitTest {
         if (    $self->{skippedUnitTests}
             and $self->{skippedUnitTests} =~ /\b$key\b/ )
         {
-            $self->lmLog( "Ignore test for $key", 'debug' );
+            $self->logger->debug("Ignore test for $key");
             next;
         }
         hdebug("Testing $key");
@@ -960,15 +1060,15 @@ sub _unitTest {
                 or $attr->{type} =~ /Container$/ )
             {
                 my $keyMsg = $attr->{keyMsgFail} // $type->{keyMsgFail};
-                my $msg    = $attr->{msgFail}    // $type->{msgFail};
+                my $msg    = $attr->{msgFail} // $type->{msgFail};
                 $res = 0
                   unless (
                     $self->_execTest(
                         {
-                            keyTest => $attr->{keyTest} // $type->{keyTest},
+                            keyTest    => $attr->{keyTest} // $type->{keyTest},
                             keyMsgFail => $attr->{keyMsgFail}
                               // $type->{keyMsgFail},
-                            test    => $attr->{test}    // $type->{test},
+                            test    => $attr->{test} // $type->{test},
                             msgFail => $attr->{msgFail} // $type->{msgFail},
                         },
                         $conf->{$key},
@@ -1057,7 +1157,7 @@ sub _globalTest {
         if (    $self->{skippedGlobalTests}
             and $self->{skippedGlobalTests} =~ /\b$name\b/ )
         {
-            $self->lmLog( "Ignore test for $name", 'debug' );
+            $self->logger->debug("Ignore test for $name");
             next;
         }
         my $sub = $tests->{$name};
@@ -1129,7 +1229,7 @@ L<Lemonldap::NG::Manager>, L<http://lemonldap-ng.org/>
 
 =over
 
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -1138,6 +1238,10 @@ L<Lemonldap::NG::Manager>, L<http://lemonldap-ng.org/>
 Use OW2 system to report bug or ask for features:
 L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
+If you want to report a bug concerning configuration upload, please change
+HIGHDEBUG constant value to produce more logs. Then post them in the Gitlab
+ticket.
+
 =head1 DOWNLOAD
 
 Lemonldap::NG is available at
@@ -1145,13 +1249,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

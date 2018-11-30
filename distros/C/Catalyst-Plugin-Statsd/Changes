@@ -1,5 +1,26 @@
 Revision history for Catalyst-Plugin-Statsd.
 
+v0.4.2    2018-11-30 15:58:08+00:00 Europe/London
+  [Tests]
+  - Fixed tests to allow missing log output name.
+
+  - Added diagnostics.
+
+v0.4.1    2018-11-29 23:16:52+00:00 Europe/London
+  [Tests]
+  - Require Term::Size::Any so that Catalyst logging works on some
+    systems, #1.
+
+v0.4.0    2018-11-29 18:59:35+00:00 Europe/London
+  [Incompatabilities]
+  - Catalyst v5.90123 is now required.
+
+  - Perl v5.10.1 or newer is required.
+
+  [Enhancements]
+  - This modifies the log_stats method, and the stats report table can
+    be disabled.
+
 v0.3.0    2018-10-26 16:58:25+01:00 Europe/London
   [Enhancements]
   - Added the statsd_client method.

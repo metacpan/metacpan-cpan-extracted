@@ -25,6 +25,7 @@ Doc
 Double
 Duclos
 Eric
+Finn
 Golden
 Gunn
 Inc
@@ -47,6 +48,7 @@ Petr
 Písař
 Raw
 Regex
+Reis
 Riedel
 Robert
 Sedlacek
@@ -58,6 +60,7 @@ Time
 Timestamp
 Types
 VERSIONING
+Wallace
 Yury
 Zavarin
 and
@@ -80,4 +83,6 @@ rs
 sharding
 tbsliver
 tock
+toyou1995
+wallace
 yury

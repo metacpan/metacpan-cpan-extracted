@@ -1,0 +1,17 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table table-striped">
+    <tbody>
+      <tr ng-repeat="n in currentNode.nodes">
+        <th id="{{n+'label'}}" for="{{n+'i'}}">{{translateTitle(n)}}</th>
+        <td>
+          <input class="form-control" ng-model="n.data" ng-change="execFilters(_findScopeByKey('authParams'))" id="{{n+'i'}}" aria-describedby="{{n+'label'}}" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+<script type="text/menu">
+[]
+</script>

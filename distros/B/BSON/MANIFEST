@@ -78,9 +78,11 @@ t/00-report-prereqs.t
 t/backend.t
 t/common/create_oid.t
 t/common/cycle.t
+t/common/dualvar.t
 t/common/errors.t
 t/common/number_heuristics.t
 t/common/options.t
+t/common/tied.t
 t/common/top-array.t
 t/corpus/array.t
 t/corpus/binary.t
@@ -125,6 +127,7 @@ t/legacy/10-bson.t
 t/legacy/11-random.t
 t/legacy/12-exception.t
 t/lib/CorpusTest.pm
+t/lib/TestTie.pm
 t/lib/TestUtils.pm
 t/mapping/binary.t
 t/mapping/boolean.t
@@ -143,6 +146,7 @@ t/mapping/time.t
 t/mapping/timestamp.t
 t/pvtlib/CleanEnv.pm
 t/pvtlib/PPSubclass.pm
+t/raw.t
 t/regression/boolean_copy.t
 t/regression/scalar_ref_value.t
 t/regression/undef_round_trip.t

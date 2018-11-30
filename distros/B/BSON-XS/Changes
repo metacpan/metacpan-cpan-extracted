@@ -1,5 +1,21 @@
 Revision history for BSON-XS
 
+v0.6.0    2018-11-29 17:08:47-05:00 America/New_York
+
+    [Changed]
+
+    - PERL-1031 Limit BSON max-depth
+
+    - PERL-1040 Improve error message for unknown BSON type
+
+    [Prereqs]
+
+    - Requires BSON v1.10.0
+
+    [Testing]
+
+    - Synchronize tests with BSON.pm
+
 v0.4.6    2018-10-12 11:50:05-04:00 America/New_York
 
     [Bug fixes]

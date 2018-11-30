@@ -4,7 +4,6 @@ App::DBBrowser::Credentials;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use Term::Form qw();
 

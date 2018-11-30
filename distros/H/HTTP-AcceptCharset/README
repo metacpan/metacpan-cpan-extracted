@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -26,13 +26,13 @@ ATTRIBUTES
 
     The given charset in the prioritized order.
 
-      Header                    | Values
-      --------------------------+----------------------------
-      utf-8, iso-8859-1;q=0.5   | utf-8, iso-8859-1
-      iso-8859-1;q=0.5, utf-8   | utf-8, iso-8859-1
-      utf-8                     | utf-8
-      utf-8, *                  | utf-8, *
-      utf-8;q=0.2, utf-16;q=0.5 | utf-16, utf-8
+        Header                    | Values
+        --------------------------+----------------------------
+        utf-8, iso-8859-1;q=0.5   | utf-8, iso-8859-1
+        iso-8859-1;q=0.5, utf-8   | utf-8, iso-8859-1
+        utf-8                     | utf-8
+        utf-8, *                  | utf-8, *
+        utf-8;q=0.2, utf-16;q=0.5 | utf-16, utf-8
 
 METHODS
 

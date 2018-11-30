@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.3.7
+version v0.3.9
 
 # SYNOPSIS
 
@@ -132,7 +132,7 @@ The following metrics are logged:
     This counter is incremented when the `X-Sendfile` header is added.
 
     The header is configured using the `plack.xsendfile.type` environment
-    key, ortherwise the `HTTP_X_SENDFILE_TYPE` environment variable.
+    key, otherwise the `HTTP_X_SENDFILE_TYPE` environment variable.
 
     See [Plack::Middleware::XSendfile](https://metacpan.org/pod/Plack::Middleware::XSendfile) for more information.
 
@@ -163,19 +163,14 @@ sub finalize {
 }
 ```
 
+Alternatively, you can use [Catalyst::Plugin::Statsd](https://metacpan.org/pod/Catalyst::Plugin::Statsd).
+
 # KNOWN ISSUES
 
 ## Non-standard HTTP status codes
 
 If your application is returning a status code that is not handled by
 [HTTP::Status](https://metacpan.org/pod/HTTP::Status), then the metrics may not be logged for that reponse.
-
-## Support for older Perl versions
-
-This module requires Perl v5.10 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-["SOURCE"](#source).
 
 # SEE ALSO
 

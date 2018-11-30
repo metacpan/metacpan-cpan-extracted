@@ -17,7 +17,7 @@ use Plack::Util::Accessor qw/ client sample_rate /;
 use Time::HiRes;
 use Try::Tiny;
 
-our $VERSION = 'v0.3.7';
+our $VERSION = 'v0.3.9';
 
 sub call {
     my ( $self, $env ) = @_;
@@ -155,7 +155,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.3.7
+version v0.3.9
 
 =head1 SYNOPSIS
 
@@ -295,7 +295,7 @@ subclassed version of your statsd client to work around this.
 This counter is incremented when the C<X-Sendfile> header is added.
 
 The header is configured using the C<plack.xsendfile.type> environment
-key, ortherwise the C<HTTP_X_SENDFILE_TYPE> environment variable.
+key, otherwise the C<HTTP_X_SENDFILE_TYPE> environment variable.
 
 See L<Plack::Middleware::XSendfile> for more information.
 
@@ -326,19 +326,14 @@ You can access the configured statsd client from L<Catalyst>:
     $c->next::method(@_);
   }
 
+Alternatively, you can use L<Catalyst::Plugin::Statsd>.
+
 =head1 KNOWN ISSUES
 
 =head2 Non-standard HTTP status codes
 
 If your application is returning a status code that is not handled by
 L<HTTP::Status>, then the metrics may not be logged for that reponse.
-
-=head2 Support for older Perl versions
-
-This module requires Perl v5.10 or newer.
-
-Pull requests to support older versions of Perl are welcome. See
-L</SOURCE>.
 
 =head1 SEE ALSO
 

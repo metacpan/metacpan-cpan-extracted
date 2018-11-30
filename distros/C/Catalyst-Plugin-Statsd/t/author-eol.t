@@ -19,6 +19,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/100-basic.t',
+    't/101-disable-stats-report.t',
     't/author-clean-namespaces.t',
     't/author-critic.t',
     't/author-eof.t',

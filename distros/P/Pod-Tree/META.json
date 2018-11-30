@@ -4,7 +4,7 @@
       "Steven McDougall (swmcd@world.std.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "test" : {
          "requires" : {
-            "Path::Tiny" : "0.068",
+            "Path::Tiny" : "0.105",
             "Test::Compile" : "v1.2.1",
             "Test::More" : "1"
          }
@@ -51,14 +51,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/szabgab/Pod-Tree/issues"
+         "web" : "http://github.com/manwar/Pod-Tree/issues"
       },
       "homepage" : "http://metacpan.org/pod/Pod::Tree",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/szabgab/Pod-Tree.git",
-         "web" : "http://github.com/szabgab/Pod-Tree"
+         "url" : "http://github.com/manwar/Pod-Tree.git",
+         "web" : "http://github.com/manwar/Pod-Tree"
       }
    },
-   "version" : "1.25"
+   "version" : "1.27",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

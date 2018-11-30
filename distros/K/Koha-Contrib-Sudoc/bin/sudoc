@@ -11,9 +11,6 @@ use Koha::Contrib::Sudoc::TransferDaemon;
 use Koha::Contrib::Sudoc::Loader::Biblios;
 use Koha::Contrib::Sudoc::Loader::Authorities;
 
-#FIXME: todelete
-use Bulac::SudocConverter;
-
 my ($doit);
 GetOptions(
     'doit'     => \$doit,
@@ -79,7 +76,7 @@ sudoc - Commande de chargement des notices SUDOC
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 AUTHOR
 
@@ -87,7 +84,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Fréderic Demians.
+This software is Copyright (c) 2018 by Fréderic Demians.
 
 This is free software, licensed under:
 

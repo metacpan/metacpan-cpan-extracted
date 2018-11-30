@@ -8,7 +8,7 @@ use FFI::CheckLib ();
 use NewRelic::Agent::FFI::Procedural ();
 
 # ABSTRACT: Perl Agent for NewRelic APM
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub new
@@ -191,7 +191,7 @@ NewRelic::Agent::FFI - Perl Agent for NewRelic APM
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -438,6 +438,20 @@ Get the language name (usually C<perl>).
 
 Get the language version.
 
+=head1 CAVEATS
+
+=head2 Platform Limitations
+
+The SDK binaries provided by New Relic only work on Linux x86_64.  The binaries are labeled
+as a "beta" and were released in July 2016.  It doesn't seem likely that New Relic will be
+releasing new versions of the SDK.  The author of this module has had good success getting
+this module to work on Ubuntu Precise and Xenial, and heard from user feedback that it works
+with Bionic.  I have heard that it does NOT work with CentOS 7.  Your mileage may vary.
+
+=head2 Not Fork Safe!
+
+Bad things will happen if you call init before forking.  So don't do that.
+
 =head1 SEE ALSO
 
 =over 4
@@ -450,7 +464,11 @@ Procedural interface, recommended over this one.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Ville Skyttä (SCOP)
 
 =head1 COPYRIGHT AND LICENSE
 

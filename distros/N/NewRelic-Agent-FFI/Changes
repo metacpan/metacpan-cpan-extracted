@@ -1,5 +1,8 @@
 Revision history for NewRelic-Agent-FFI
 
+0.08      2018-11-30 11:18:08 -0500
+  - Document important limitations of the New Relic SDK
+
 0.07      2018-09-05 06:22:37 -0400
   - Fixed bug in newrelic_init
   - Dropped support for Perl 5.8.

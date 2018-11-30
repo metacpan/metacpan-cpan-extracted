@@ -1,12 +1,12 @@
 Changelog for Perl-Critic-Policy-RegularExpressions-RequireDefault
 
-0.02 Mon Nov 26 08:43:46 CET 2018 Maintenance release, update not required
+0.02 2018-11-26T07:43:46Z Maintenance release, update not required
 
 - Mention of requirement for Perl 5.14 as described in issue #3
   Ref: https://github.com/jonasbn/perl-critic-policy-regularexpressions-requiredefault/issues/3#issuecomment-441470047
 
 - Bumped Perl requirement from Perl 5.8 to 5.14 based on the above information
 
-0.01 Sun Nov 25 20:39:00 CET 2018 Feature release, update recommended
+0.01 2018-11-25T19:39:00Z Feature release, update recommended
 
 - Initial feature release, introducing policy for regular expressions and the /a and /aa modifiers

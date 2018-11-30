@@ -11,7 +11,7 @@ use Data::Dumper;
 use Regexp::Common('RE_ALL', 'Email::Address', 'URI', 'time');
 use Scalar::Util qw(looks_like_number blessed weaken reftype);
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 sub new {
     my ($class, %args) = @_;
@@ -131,7 +131,7 @@ sub _resolve_references {    ## no critic (Subroutines::ProhibitExcessComplexity
 sub compile {
     my ($self, %opts) = @_;
     ## no critic (Variables::ProhibitLocalVars)
-    local $self->{coersion} = $opts{coersion} // 0;
+    local $self->{coercion} = $opts{coercion} // $opts{coersion} // 0;
     local $self->{to_json}  = $opts{to_json}  // 0;
     $self->{required_modules} = {};
     my $input_sym   = $opts{input_symbole} // '$_[0]';
@@ -241,7 +241,7 @@ sub _validate_boolean {
     }
     if ($self->{to_json}) {
         $r .= "  $sympt = (($sympt)? \\1: \\0);\n";
-    } elsif ($self->{coersion}) {
+    } elsif ($self->{coercion}) {
         $r .= "  $sympt = (($sympt)? 1: 0);\n";
     }
     $r .= "}\n";
@@ -292,7 +292,7 @@ sub _validate_string {
         $r .= "  push \@\$errors, \"$path does not match format $schmpt->{format}\"";
         $r .= " if $sympt !~ /^$formats{$schmpt->{format}}\$/;\n";
     }
-    if ($self->{to_json} || $self->{coersion}) {
+    if ($self->{to_json} || $self->{coercion}) {
         $r .= "  $sympt = \"$sympt\";\n";
     }
     $r .= "}\n";
@@ -360,7 +360,7 @@ sub _validate_any_number {    ## no critic (Subroutines::ProhibitManyArgs Subrou
         $r .= "  push \@\$errors, '$path does not match format $schmpt->{format}'";
         $r .= " if $sympt !~ /^$formats{$schmpt->{format}}\$/;\n";
     }
-    if ($self->{to_json} || $self->{coersion}) {
+    if ($self->{to_json} || $self->{coercion}) {
         $r .= "  $sympt += 0;\n";
     }
     $r .= "} }\n";
@@ -670,7 +670,7 @@ with array of their required import symbols.
 
 =over
 
-=item coersion => true|false
+=item coercion => true|false
 
 =item to_json => true|false
 

@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.638   2018-11-30
+    - Option 'll': don't create a length-array but only assign when required.
+    - Bugfix option 'mouse'.
+
 1.637   2018-11-28
     - Bugfix: don't allow to select 'meta_items' with Cntrl-SpaceBar.
 

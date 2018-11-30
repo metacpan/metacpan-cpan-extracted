@@ -15,8 +15,6 @@ use List::MoreUtils qw( any none );
 use Term::Choose    qw( choose );
 use Term::Form      qw();
 
-use App::YTDL::Helper qw( check_mapping_stdout );
-
 
 sub _my_sort {
     my ( $sort_item, $sort_order, $h_ref, $a, $b ) = @_;
@@ -102,7 +100,6 @@ sub choose_videos {
             if ( $ex eq 'youtube' ) {
                 $tmp->{$ex}{$video_id}{extractor} = 'youtube';
             }
-            $title = check_mapping_stdout( $opt, $title ) if $Encode::Locale::ENCODING_CONSOLE_OUT !~ /^UTF-/i;
             my $line = sprintf "%*s |", $length_video_id, $video_id;
             $line .= sprintf " %7s", $tmp->{$ex}{$video_id}{duration}                          if $has_duration;
             $line .= sprintf "  %*s", $length_upload_date, $tmp->{$ex}{$video_id}{upload_date} if $length_upload_date;

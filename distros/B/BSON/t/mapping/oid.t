@@ -18,7 +18,7 @@ use BSON::Types ':all';
 
 my ( $bson, $expect, $hash );
 
-my $packed = BSON::OID::_generate_oid();
+my $packed = BSON::OID::_packed_oid();
 my $hexoid = unpack( "H*", $packed );
 my $all_bits = "\xff" x 8;
 

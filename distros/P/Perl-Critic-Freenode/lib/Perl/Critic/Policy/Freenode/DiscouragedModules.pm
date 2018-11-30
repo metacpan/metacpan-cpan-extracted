@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use Perl::Critic::Utils qw(:severities :classification :ppi);
-use Perl::Critic::Violation;
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 sub supported_parameters { () }
 sub default_severity { $SEVERITY_HIGH }
@@ -15,76 +14,27 @@ sub default_themes { 'freenode' }
 sub applies_to { 'PPI::Statement::Include' }
 
 my %modules = (
-	'AnyEvent' => {
-		expl => 'AnyEvent\'s author refuses to use public bugtracking and actively breaks interoperability. POE, IO::Async, and Mojo::IOLoop are widely used and interoperable async event loops.',
-	},
-	'Any::Moose' => {
-		expl => 'Any::Moose is deprecated. Use Moo instead.',
-	},
-	'Class::DBI' => {
-		expl => 'Class::DBI is an ancient database ORM abstraction layer which is buggy and abandoned. See DBIx::Class for a more modern DBI-based ORM, or Mad::Mapper for a Mojolicious-style ORM.',
-	},
-	'CGI' => {
-		expl => 'CGI.pm is an ancient module for communicating via the CGI protocol, with tons of bad practices and cruft. Use a modern framework such as those based on Plack (Web::Simple, Dancer2, Catalyst) or Mojolicious, they can still be served via CGI if you choose.',
-	},
-	'Coro' => {
-		expl => 'Coro no longer works on perl 5.22, you need to use the author\'s forked version of Perl. Avoid at all costs.',
-	},
-	'Error' => {
-		expl => 'Error.pm is overly magical and discouraged by its maintainers. Try Throwable for exception classes in Moo/Moose, or Exception::Class otherwise. Try::Tiny or Try are recommended for the try/catch syntax.',
-	},
-	'File::Slurp' => {
-		expl => 'File::Slurp gets file encodings all wrong, line endings on win32 are messed up, and it was written before layers were properly added. Use File::Slurper, Path::Tiny, Data::Munge, or Mojo::File.',
-	},
-	'Getopt::Std' => {
-		expl => 'Getopt::Std was the original very simplistic command-line option processing module. It is now obsoleted by the much more complete solution Getopt::Long, which also supports short options, and is wrapped by module such as Getopt::Long::Descriptive and Getopt::Long::Modern for simpler usage.',
-		severity => $SEVERITY_MEDIUM,
-	},
-	'HTML::Template' => {
-		expl => 'HTML::Template is an old and buggy module, try Template Toolkit, HTML::Zoom, or Text::Template instead, or HTML::Template::Pro if you must use the same syntax.',
-	},
-	'IO::Socket::INET6' => {
-		expl => 'IO::Socket::INET6 is an old attempt at an IPv6 compatible version of IO::Socket::INET, but has numerous issues and is discouraged by the maintainer in favor of IO::Socket::IP, which transparently creates IPv4 and IPv6 sockets.',
-	},
-	'JSON' => {
-		expl => 'JSON.pm is old and full of slow logic. Use JSON::MaybeXS instead, it is a drop-in replacement in most cases.',
-		severity => $SEVERITY_MEDIUM,
-	},
-	'JSON::Any' => {
-		expl => 'JSON::Any is deprecated. Use JSON::MaybeXS instead.',
-	},
-	'JSON::XS' => {
-		expl => 'JSON::XS\'s author refuses to use public bugtracking and actively breaks interoperability. Cpanel::JSON::XS is a fork with several bugfixes and a more collaborative maintainer. See also JSON::MaybeXS.',
-	},
-	'List::MoreUtils' => {
-		expl => 'List::MoreUtils is a far more complex distribution than it needs to be. Use List::SomeUtils instead, or see List::Util or List::UtilsBy for alternatives.',
-		severity => $SEVERITY_LOW,
-	},
-	'Mouse' => {
-		expl => 'Mouse was created to be a faster version of Moose, a niche that has since been better filled by Moo. Use Moo instead.',
-		severity => $SEVERITY_LOW,
-	},
-	'Net::IRC' => {
-		expl => 'Net::IRC is an ancient module implementing the IRC protocol. Use a modern event-loop-based module instead. Choices are POE::Component::IRC (and Bot::BasicBot based on that), Net::Async::IRC, and Mojo::IRC.',
-	},
-	'Readonly' => {
-		expl => 'Readonly.pm is buggy and slow. Use Const::Fast or ReadonlyX instead, or the core pragma constant.',
-		severity => $SEVERITY_MEDIUM,
-	},
-	'Switch' => {
-		expl => 'Switch.pm is a buggy and outdated source filter which can cause any number of strange errors, in addition to the problems with smart-matching shared by its replacement, the \'switch\' feature (given/when). Try Switch::Plain instead.',
-	},
-	'XML::Simple' => {
-		expl => 'XML::Simple tries to coerce complex XML documents into perl data structures. This leads to overcomplicated structures and unexpected behavior. Use a proper DOM parser instead like XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.',
-	},
+	'AnyEvent' => 'AnyEvent\'s author refuses to use public bugtracking and actively breaks interoperability. POE, IO::Async, and Mojo::IOLoop are widely used and interoperable async event loops.',
+	'Any::Moose' => 'Any::Moose is deprecated. Use Moo instead.',
+	'Class::DBI' => 'Class::DBI is an ancient database ORM abstraction layer which is buggy and abandoned. See DBIx::Class for a more modern DBI-based ORM, or Mad::Mapper for a Mojolicious-style ORM.',
+	'CGI' => 'CGI.pm is an ancient module for communicating via the CGI protocol, with tons of bad practices and cruft. Use a modern framework such as those based on Plack (Web::Simple, Dancer2, Catalyst) or Mojolicious, they can still be served via CGI if you choose.',
+	'Coro' => 'Coro no longer works on perl 5.22, you need to use the author\'s forked version of Perl. Avoid at all costs.',
+	'Error' => 'Error.pm is overly magical and discouraged by its maintainers. Try Throwable for exception classes in Moo/Moose, or Exception::Class otherwise. Try::Tiny or Try are recommended for the try/catch syntax.',
+	'File::Slurp' => 'File::Slurp gets file encodings all wrong, line endings on win32 are messed up, and it was written before layers were properly added. Use File::Slurper, Path::Tiny, Data::Munge, or Mojo::File.',
+	'HTML::Template' => 'HTML::Template is an old and buggy module, try Template Toolkit, HTML::Zoom, or Text::Template instead, or HTML::Template::Pro if you must use the same syntax.',
+	'IO::Socket::INET6' => 'IO::Socket::INET6 is an old attempt at an IPv6 compatible version of IO::Socket::INET, but has numerous issues and is discouraged by the maintainer in favor of IO::Socket::IP, which transparently creates IPv4 and IPv6 sockets.',
+	'JSON::Any' => 'JSON::Any is deprecated. Use JSON::MaybeXS instead.',
+	'JSON::XS' => 'JSON::XS\'s author refuses to use public bugtracking and actively breaks interoperability. Cpanel::JSON::XS is a fork with several bugfixes and a more collaborative maintainer. See also JSON::MaybeXS.',
+	'Net::IRC' => 'Net::IRC is an ancient module implementing the IRC protocol. Use a modern event-loop-based module instead. Choices are POE::Component::IRC (and Bot::BasicBot based on that), Net::Async::IRC, and Mojo::IRC.',
+	'Switch' => 'Switch.pm is a buggy and outdated source filter which can cause any number of strange errors, in addition to the problems with smart-matching shared by its replacement, the \'switch\' feature (given/when). Try Switch::Plain instead.',
+	'XML::Simple' => 'XML::Simple tries to coerce complex XML documents into perl data structures. This leads to overcomplicated structures and unexpected behavior. Use a proper DOM parser instead like XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.',
 );
 
 sub _violation {
 	my ($self, $module, $elem) = @_;
 	my $desc = "Used module $module";
-	my $expl = $modules{$module}{expl} // "Module $module is discouraged.";
-	my $severity = $modules{$module}{severity} // $self->default_severity;
-	return Perl::Critic::Violation->new($desc, $expl, $elem, $severity);
+	my $expl = $modules{$module} // "Module $module is discouraged.";
+	return $self->violation($desc, $expl, $elem);
 }
 
 sub violates {
@@ -103,8 +53,10 @@ discouraged from use
 =head1 DESCRIPTION
 
 Various modules are discouraged by the denizens of #perl on Freenode IRC, for
-various reasons which may include: buggy behavior, cruft, maintainer issues,
-or simply better modern replacements.
+various reasons which may include: buggy behavior, cruft, performance problems,
+maintainer issues, or simply better modern replacements. This is a high
+severity complement to
+L<Perl::Critic::Freenode::Policy::PreferredAlternatives>.
 
 =head1 MODULES
 
@@ -149,13 +101,6 @@ L<File::Slurp> gets file encodings all wrong, line endings on win32 are messed
 up, and it was written before layers were properly added. Use L<File::Slurper>,
 L<Path::Tiny/"slurp">, L<Data::Munge/"slurp">, or L<Mojo::File/"slurp">.
 
-=head2 Getopt::Std
-
-L<Getopt::Std> was the original very simplistic command-line option processing
-module. It is now obsoleted by the much more complete solution L<Getopt::Long>,
-which also supports short options, and is wrapped by modules such as
-L<Getopt::Long::Descriptive> and L<Getopt::Long::Modern> for simpler usage.
-
 =head2 HTML::Template
 
 L<HTML::Template> is an old and buggy module, try L<Template::Toolkit>,
@@ -169,11 +114,6 @@ L<IO::Socket::INET>, but has numerous issues and is discouraged by the
 maintainer in favor of L<IO::Socket::IP>, which transparently creates IPv4 and
 IPv6 sockets.
 
-=head2 JSON
-
-L<JSON>.pm is old and full of slow logic. Use L<JSON::MaybeXS> instead, it is a
-drop-in replacement in most cases.
-
 =head2 JSON::Any
 
 L<JSON::Any> is deprecated. Use L<JSON::MaybeXS> instead.
@@ -184,27 +124,11 @@ L<JSON::XS>'s author refuses to use public bugtracking and actively breaks
 interoperability. L<Cpanel::JSON::XS> is a fork with several bugfixes and a
 more collaborative maintainer. See also L<JSON::MaybeXS>.
 
-=head2 List::MoreUtils
-
-L<List::MoreUtils> is a far more complex distribution than it needs to be. Use
-L<List::SomeUtils> instead, or see L<List::Util> or L<List::UtilsBy> for
-alternatives.
-
-=head2 Mouse
-
-L<Mouse> was created to be a faster version of L<Moose>, a niche that has since
-been better filled by L<Moo>. Use L<Moo> instead.
-
 =head2 Net::IRC
 
 L<Net::IRC> is an ancient module implementing the IRC protocol. Use a modern
 event-loop-based module instead. Choices are L<POE::Component::IRC> (used for
 L<Bot::BasicBot>), L<Net::Async::IRC>, and L<Mojo::IRC>.
-
-=head2 Readonly
-
-L<Readonly>.pm is buggy and slow. Use L<Const::Fast> or L<ReadonlyX> instead,
-or the core pragma L<constant>.
 
 =head2 Switch
 

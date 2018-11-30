@@ -13,9 +13,12 @@ my $builder = Module::Build->new(
         'Path::Tiny' => 0,
         'Text::Diff' => 0,
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'App-diffdir-*' ],
     create_license     => 1,

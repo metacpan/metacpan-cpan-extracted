@@ -6,7 +6,7 @@ package BSON::Raw;
 # ABSTRACT: BSON type wrapper for pre-encoded BSON documents
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.10.1';
 
 use Moo;
 
@@ -27,6 +27,17 @@ has [qw/bson metadata/] => (
 
 use namespace::clean -except => 'meta';
 
+# Returns the first key of an encoded hash passed via BSON::Raw->new(bson=>$bson).
+# If the BSON document has no key, it will return C<undef>.
+sub _get_first_key {
+  my ($self) = @_;
+
+  return undef if length( $self->bson ) <= 5; ## no critic
+
+  my ( undef, undef, $key ) = unpack( "lCZ*", $self->bson );
+  return $key;
+}
+
 1;
 
 =pod
@@ -39,7 +50,7 @@ BSON::Raw - BSON type wrapper for pre-encoded BSON documents
 
 =head1 VERSION
 
-version v1.8.1
+version v1.10.1
 
 =head1 SYNOPSIS
 

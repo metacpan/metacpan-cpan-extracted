@@ -1,0 +1,53 @@
+<div class="form">
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fa fa-user"></i> </span>
+    </div>
+    <input name="user" type="text" class="form-control" value="<TMPL_VAR NAME="LOGIN">" trplaceholder="login" required aria-required="true"/>
+  </div>
+
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fa fa-lock"></i> </span>
+    </div>
+    <input name="password" type="password" class="form-control" trplaceholder="password" required aria-required="true"/>
+  </div>
+
+  <TMPL_IF NAME=CAPTCHA_SRC>
+  <div class="form-group">
+    <img src="<TMPL_VAR NAME=CAPTCHA_SRC>" class="img-thumbnail" />
+  </div>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fa fa-eye"></i> </span>
+    </div>
+    <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required aria-required="true"/>
+  </div>
+  </TMPL_IF>
+  <TMPL_IF NAME="TOKEN">
+    <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
+  </TMPL_IF>
+
+  <TMPL_INCLUDE NAME="checklogins.tpl">
+
+  <button type="submit" class="btn btn-success" >
+    <span class="fa fa-sign-in"></span>
+    <span trspan="connect">Connect</span>
+  </button>
+</div>
+
+<div class="actions">
+  <TMPL_IF NAME="DISPLAY_RESETPASSWORD">
+  <a class="btn btn-secondary" href="<TMPL_VAR NAME="MAIL_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
+    <span class="fa fa-info-circle"></span>
+    <span trspan="resetPwd">Reset my password</span>
+  </a>
+  </TMPL_IF>
+
+  <TMPL_IF NAME="DISPLAY_REGISTER">
+  <a class="btn btn-secondary" href="<TMPL_VAR NAME="REGISTER_URL">?skin=<TMPL_VAR NAME="SKIN"><TMPL_IF NAME="key">&<TMPL_VAR NAME="CHOICE_PARAM">=<TMPL_VAR NAME="key"></TMPL_IF><TMPL_IF NAME="AUTH_URL">&url=<TMPL_VAR NAME="AUTH_URL"></TMPL_IF>">
+    <span class="fa fa-plus-circle"></span>
+    <span trspan="createAccount">Create an account</span>
+  </a>
+  </TMPL_IF>
+</div>

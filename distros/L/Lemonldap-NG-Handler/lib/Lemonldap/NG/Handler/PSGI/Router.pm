@@ -2,15 +2,17 @@ package Lemonldap::NG::Handler::PSGI::Router;
 
 use 5.10.0;
 use Mouse;
+require Lemonldap::NG::Handler::PSGI::Main;
 
-extends 'Lemonldap::NG::Handler::PSGI::Base',
+extends 'Lemonldap::NG::Handler::Lib::PSGI',
   'Lemonldap::NG::Common::PSGI::Router';
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
 sub init {
-    my $tmp = $_[0]->Lemonldap::NG::Common::PSGI::Router::init( $_[1] )
-      and $_[0]->Lemonldap::NG::Handler::PSGI::Base::init( $_[1] );
+    $_[0]->api('Lemonldap::NG::Handler::PSGI::Main');
+    my $tmp = ( $_[0]->Lemonldap::NG::Common::PSGI::Router::init( $_[1] )
+          and $_[0]->Lemonldap::NG::Handler::Lib::PSGI::init( $_[1] ) );
     return $tmp;
 }
 
@@ -50,7 +52,7 @@ Lemonldap::NG.
   sub booksMethod {
     my ( $self, $req, @otherPathInfo ) = @_;
 
-    # Will be called only if authorisated
+    # Will be called only if authorized
     my $userId = $self->userId;
     my $book = $req->params('book');
     my $method = $req->method;
@@ -97,7 +99,7 @@ Level of protection. It can be one of:
 
 =head3 user
 
-Returns user session datas. If empty (no protection), returns:
+Returns user session data. If empty (no protection), returns:
 
   { _whatToTrace => 'anonymous' }
 
@@ -123,13 +125,7 @@ L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -145,13 +141,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

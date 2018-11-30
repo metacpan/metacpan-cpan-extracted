@@ -1,17 +1,13 @@
-package Lemonldap::NG::Handler::PSGI::AuthBasic;
+# LLNG wrapper class to enable AuthBasic handler with auto-protected PSGI
+#
+# See http://lemonldap-ng.org/documentation/latest/handlerarch
+package Lemonldap::NG::Handler::Server::AuthBasic;
 
 use strict;
-use Mouse;
-use Lemonldap::NG::Handler::Specific::AuthBasic;
 
-extends 'Lemonldap::NG::Handler::PSGI::Server';
+use base 'Lemonldap::NG::Handler::Lib::AuthBasic',
+  'Lemonldap::NG::Handler::PSGI::Main';
 
-sub init {
-    my $self = shift;
-    $self->subhandler('Lemonldap::NG::Handler::Specific::AuthBasic');
-    return $self->SUPER::init(@_);
-}
-
-our $VERSION = '1.9.6';
+our $VERSION = '2.0.0';
 
 1;

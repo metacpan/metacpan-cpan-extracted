@@ -26,8 +26,10 @@
                 <a id="save" class="link" ng-click="save()" tabIndex="-1">
                   <i class="glyphicon glyphicon-cloud-upload"></i>
                   {{translate('save')}}
-                  <input id="forcesave" type="checkbox" ng-model="forceSave" uib-tooltip="{{translate('forceSave')}}" tooltip-placement="right" ng-show="confirmNeeded||currentCfg.next">
                 </a>
+              </li>
+              <li >
+                <input id="forcesave" type="checkbox" ng-model="forceSave" uib-tooltip="{{translate('forceSave')}}" tooltip-placement="right" ng-show="confirmNeeded||currentCfg.next" role="checkbox" aria-label="Force save">
               </li>
               <li uib-dropdown>
                 <a id="navmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-cog"></i> {{translate('browse')}} <span class="caret"></span></a>
@@ -41,9 +43,9 @@
               <li ng-repeat="button in menu()" ng-include="'menubutton.html'"></li>
               <li uib-dropdown class="visible-xs">
                 <a id="langmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{translate('menu')}} <span class="caret"></span></a>
-                <ul uib-dropdown-menu aria-labelled-by="langmenu">
-                  <li ng-repeat="link in links"><a href="{{link.target}}"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
-                  <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
+                <ul uib-dropdown-menu aria-labelled-by="langmenu" role="grid">
+                  <li ng-repeat="link in links"><a href="{{link.target}}" role="row"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
+                  <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
                   <li ng-include="'languages.html'"></li>
                 </ul>
               </li>
@@ -102,36 +104,40 @@
 
   <!-- Prompt -->
   <script type="text/ng-template" id="prompt.html">
+  <div role="alertdialog" aria-labelledby="ptitle" aria-describedby="ptitle">
     <div class="modal-header">
-      <h3 class="modal-title" trspan="{{elem('message').title}}" />
+      <h3 id="ptitle" class="modal-title" trspan="{{elem('message').title}}" />
     </div>
     <div class="modal-body">
       <div class="input-group maxw">
-        <label class="input-group-addon" for="promptinput" trspan="{{elem('message').field}}"/>
-        <input id="promptinput" class="form-control" ng-model="result"/>
+        <label class="input-group-addon" id="promptlabel" for="promptinput" trspan="{{elem('message').field}}"/>
+        <input id="promptinput" class="form-control" ng-model="result" aria-describedby="promptlabel"/>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" id="promptok" ng-click="ok()" trspan="ok"></button>
-      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel"></button>
+      <button class="btn btn-primary" id="promptok" ng-click="ok()" trspan="ok" role="button"></button>
+      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel" role="button"></button>
     </div>
+  </div>
   </script>
 
   <!-- Message display -->
   <script type="text/ng-template" id="message.html">
+  <div role="alertdialog" aria-labelledby="mtitle" aria-describedby="mbody">
     <div class="modal-header">
-      <h3 class="modal-title" trspan="{{elem('message').title}}" />
+      <h3 id="mtitle" class="modal-title" trspan="{{elem('message').title}}" />
     </div>
-    <div class="modal-body">
+    <div id="mbody" class="modal-body">
       <div class="modal-p">{{translateP(elem('message').message)}}</div>
       <ul class="main-modal-ul" ng-model="elem('message').items">
         <li ng-repeat="item in elem('message').items" ng-include="'messageitem.html'"/>
       </ul>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" id="messageok" ng-click="ok()" trspan="ok"></button>
-      <button class="btn btn-warning" ng-click="cancel()" ng-if="elem('message').displayCancel" trspan="cancel"></button>
+      <button class="btn btn-primary" id="messageok" ng-click="ok()" trspan="ok" role="button"></button>
+      <button class="btn btn-warning" ng-click="cancel()" ng-if="elem('message').displayCancel" trspan="cancel" role="button"></button>
     </div>
+  </div>
   </script>
 
   <script type="text/ng-template" id="messageitem.html">
@@ -143,36 +149,40 @@
 
   <!-- Password question -->
   <script type="text/ng-template" id="password.html">
+  <div role="alertdialog" aria-labelledby="pwtitle" aria-describedby="pwtitle">
     <div class="modal-header">
-      <h3 class="modal-title" trspan="enterPassword" />
+      <h3 id="pwtitle" class="modal-title" trspan="enterPassword" />
     </div>
     <div class="modal-body">
       <div class="input-group maxw">
-        <label class="input-group-addon" for="mdPwd" trspan="password"/>
-        <input id="mdPwd" class="form-control" ng-model="result"/>
+        <label class="input-group-addon" id="mlabel" for="mdPwd" trspan="password"/>
+        <input id="mdPwd" class="form-control" ng-model="result" aria-describedby="mlabel"/>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" id="passwordok" ng-click="ok()" trspan="ok"></button>
-      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel"></button>
+      <button class="btn btn-primary" id="passwordok" ng-click="ok()" trspan="ok" role="button"></button>
+      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel" role="button"></button>
     </div>
+  </div>
   </script>
 
   <!-- Save confirm -->
   <script type="text/ng-template" id="save.html">
+  <div role="alertdialog" aria-labelledby="stitle" aria-describedby="sbody">
     <div class="modal-header">
-      <h3 class="modal-title" trspan="savingConfirmation" />
+      <h3 id="stitle" class="modal-title" trspan="savingConfirmation" />
     </div>
-    <div class="modal-body">
+    <div id="sbody" class="modal-body">
       <div class="input-group maxw">
-        <label class="input-group-addon" for="longtextinput" trspan="cfgLog"/>
-        <textarea id="longtextinput" rows="5" class="form-control" ng-model="result"/>
+        <label id="slabel" class="input-group-addon" for="longtextinput" trspan="cfgLog"/>
+        <textarea id="longtextinput" rows="5" class="form-control" ng-model="result" aria-describedby="slabel" />
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-primary" id="saveok" ng-click="ok()" trspan="ok"></button>
-      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel"></button>
+      <button class="btn btn-primary" id="saveok" ng-click="ok()" trspan="ok" role="button"></button>
+      <button class="btn btn-warning" ng-click="cancel()" trspan="cancel" role="button"></button>
     </div>
+  </div>
   </script>
 
   <TMPL_INCLUDE NAME="scripts.tpl">

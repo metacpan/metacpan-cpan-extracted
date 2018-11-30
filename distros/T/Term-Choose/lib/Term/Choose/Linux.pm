@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.637';
+our $VERSION = '1.638';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -238,10 +238,10 @@ sub __set_mode {
 
 sub __reset_mode {
     my ( $self ) = @_;
-    if ( delete $self->{hide_cursor} ) {
+    if ( $self->{hide_cursor} ) {
         $self->__show_cursor();
     }
-    if ( delete $self->{mouse} ) {
+    if ( $self->{mouse} ) {
         binmode STDIN, ':encoding(UTF-8)' or warn "binmode STDIN, :encoding(UTF-8): $!\n";
         print UNSET_EXT_MODE_MOUSE_1005     if $self->{mouse} == 3;
         print UNSET_SGR_EXT_MODE_MOUSE_1006 if $self->{mouse} == 4;

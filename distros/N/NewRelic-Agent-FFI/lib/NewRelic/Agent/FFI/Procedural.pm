@@ -24,7 +24,7 @@ use constant NEWRELIC_STATUS_CODE_STOPPING => 2;
 use constant NEWRELIC_STATUS_CODE_STARTED  => 3;
 
 # ABSTRACT: Procedural interface for NewRelic APM
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 my $ffi;
@@ -164,7 +164,7 @@ NewRelic::Agent::FFI::Procedural - Procedural interface for NewRelic APM
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,7 @@ version 0.07
  # enable embedded mode:
  newrelic_register_message_handler newrelic_message_handler;
  
- # initalize:
+ # initialize:
  newrelic_init
    'abc123'     # license key
    'REST API'   # app name
@@ -197,11 +197,11 @@ the author believes this module to be better than L<NewRelic::Agent::FFI> becaus
 =item Object oriented interface does represent or add anything
 
 The L<NewRelic::Agent> instance that you create doesn't represent anything in the NewRelic Agent SDK.  In fact if you don't understand
-how things work under the hood, you might be confused into believing that you can initialize agent instances in the same process.
+how things work under the hood, you might be confused into believing that you can initialize multiple agent instances in the same process.
 
 =item Object oriented interface is slower
 
-Because the C<$agent> instance needs to be shifted off the stack before calling the underlying C code there is a lot more overhead in the
+Because the unused C<$agent> instance needs to be shifted off the stack before calling the underlying C code there is a lot more overhead in the
 object oriented interface.
 
 =item Functions aren't renamed
@@ -475,6 +475,20 @@ Disable/enable instrumentation. By default, instrumentation is enabled.
 
 C<$set_enabled>  0 to disable, 1 to enable
 
+=head1 CAVEATS
+
+=head2 Platform Limitations
+
+The SDK binaries provided by New Relic only work on Linux x86_64.  The binaries are labeled
+as a "beta" and were released in July 2016.  It doesn't seem likely that New Relic will be
+releasing new versions of the SDK.  The author of this module has had good success getting
+this module to work on Ubuntu Precise and Xenial, and heard from user feedback that it works
+with Bionic.  I have heard that it does NOT work with CentOS 7.  Your mileage may vary.
+
+=head2 Not Fork Safe!
+
+Bad things will happen if you call newrelic_init before forking.  So don't do that.
+
 =head1 SEE ALSO
 
 =over 4
@@ -485,7 +499,11 @@ C<$set_enabled>  0 to disable, 1 to enable
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Ville Skyttä (SCOP)
 
 =head1 COPYRIGHT AND LICENSE
 

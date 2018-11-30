@@ -39,7 +39,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.28';
+$VERSION = '0.29';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0

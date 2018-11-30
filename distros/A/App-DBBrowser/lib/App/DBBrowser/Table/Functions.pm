@@ -4,7 +4,6 @@ App::DBBrowser::Table::Functions;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use List::MoreUtils qw( first_index );
 

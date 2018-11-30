@@ -6,14 +6,19 @@
   "license": "GPL2",
   "private": true,
   "dependencies": {
-    "angular": "1.5.x",
-    "angular-animate": "1.5.x",
+    "angular": "1.7.x",
+    "angular-animate": "x",
+    "angular-aria": "x",
     "angular-bootstrap": "x",
-    "angular-cookies": "1.5.x",
+    "angular-cookies": "x",
     "angular-ui-tree": "x",
-    "bootstrap": "x",
+    "bootstrap": "3.x",
     "es5-shim": "x",
     "file-saver.js": "x",
-    "jquery": "2.x"
+    "jquery": "x",
+    "jquery-ui": "x"
+  },
+  "resolutions": {
+    "angular": "1.7.x"
   }
 }

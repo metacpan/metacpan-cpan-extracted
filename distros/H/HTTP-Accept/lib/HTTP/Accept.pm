@@ -2,7 +2,7 @@ package HTTP::Accept;
 
 # ABSTRACT: Parse the HTTP header 'Accept'
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moo;
 
@@ -42,18 +42,18 @@ sub match {
 }
 
 around BUILDARGS => sub {
-  my ($orig, $class, @args) = @_;
+    my ($orig, $class, @args) = @_;
  
-  return { string => $args[0] }
-    if @args == 1 && !ref $args[0];
+    return { string => $args[0] }
+        if @args == 1 && !ref $args[0];
  
-  return $class->$orig(@args);
+    return $class->$orig(@args);
 };
 
 sub _parse_string {
     my ($self) = @_;
 
-    my @accepts = split /\s*,\s*/, $self->string;
+    my @accepts = split /\s*,\s*/, $self->string // '';
     my %weighted;
 
     for my $accept ( @accepts ) {
@@ -85,7 +85,7 @@ HTTP::Accept - Parse the HTTP header 'Accept'
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

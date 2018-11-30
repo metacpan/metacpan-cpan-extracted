@@ -4,13 +4,10 @@ App::DBBrowser::Table;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use Term::Choose            qw( choose );
 use Term::Choose::Constants qw( :screen );
 use Term::TablePrint        qw( print_table );
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;

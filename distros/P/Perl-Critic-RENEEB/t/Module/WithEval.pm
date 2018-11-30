@@ -4,6 +4,8 @@ package t::Module::WithEval;
 
 sub test {
     eval { say "hello" };
+
+    eval "say 'hello'";
 }
 
 1;

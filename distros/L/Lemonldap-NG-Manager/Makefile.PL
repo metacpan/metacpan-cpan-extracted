@@ -12,18 +12,32 @@ WriteMakefile(
         'Regexp::Common' => 0,
         'Test::Pod'      => 1.00,
     },
-    META_MERGE => { 'LWP::Protocol::https' => 0, },
-    PREREQ_PM  => {
+    META_MERGE => {
+        recommends => {
+            'LWP::Protocol::https' => 0,
+        },
+        resources => {
+            repository => {
+                url  => 'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng.git',
+                web  => 'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng',
+                type => 'git',
+            },
+            MailingList => 'mailto:lemonldap-ng-dev@ow2.org',
+            license     => 'http://opensource.org/licenses/GPL-2.0',
+            homepage    => 'http://lemonldap-ng.org/',
+            bugtracker  => {
+                web =>
+                  'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues',
+            },
+            x_twitter => 'https://twitter.com/lemonldapng',
+        },
+    },
+    PREREQ_PM => {
         'Convert::PEM'           => 0,
         'Crypt::OpenSSL::RSA'    => 0,
-        'HTML::Template'         => 0,
-        'JSON'                   => 0,
-        'Lemonldap::NG::Common'  => '1.9.18',
-        'Lemonldap::NG::Handler' => '1.9.18',
-        'LWP'                    => 0,
-        'URI'                    => 0,
-        'XML::LibXSLT'           => 0,
-        'XML::LibXML'            => 0,
+        'Lemonldap::NG::Common'  => '2.0.0',
+        'Lemonldap::NG::Handler' => '2.0.0',
+        'LWP::UserAgent'         => 0,
     },    # e.g., Module::Name => 1.1
     (
         $] >= 5.005
@@ -31,14 +45,13 @@ WriteMakefile(
           (
             ABSTRACT_FROM =>
               'lib/Lemonldap/NG/Manager.pm',    # retrieve abstract from module
-            AUTHOR => 'Xavier Guimard <x.guimard@free.fr>'
-              . ', Clément Oudot <clement@oodo.net>'
-              . ', Thomas Chemineau <thomas.chemineau@gmail.com>'
+            AUTHOR =>
+'Xavier Guimard <x.guimard@free.fr>, Clément Oudot <clement@oodo.net>'
           )
         : ()
     ),
     clean => {
-        FILES => 't/conf/lmConf-2.js',
+        FILES => 't/conf/lmConf-2.json',
     },
 );
 

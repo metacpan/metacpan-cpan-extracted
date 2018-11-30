@@ -1,3 +1,10 @@
+0.10 2018-11-30
+    * Corrected links to bug tracker etc, thanks to RENEEB
+    * Minor distribution cleanup
+    * Minor module cleanup, remove vars.pm
+    * Switch to File::ShareDir for storing the common data
+    * Update to a 2017 version of freedesktop.org.xml mime info
+
 0.09 2018-10-28
     * Re-release with correct META.* information
     * No upgrade necessary

@@ -1,5 +1,6 @@
 #!/usr/local/bin/perl
 
+use 5.006;
 use strict;
 use warnings;
 use File::Find;
@@ -98,7 +99,7 @@ sub Translate_POD {
 	my $depth = Depth($source);
 
 	my $pod = $source;
-	$pod =~ s(^$PodDir/)();
+	$pod =~ s(^\Q$PodDir\E/)();
 	$pod =~ s( \.\w+$ )()x;
 	$Index{$pod} = 1;
 
@@ -119,7 +120,7 @@ sub Depth {
 	my $tree   = Pod::Tree->new;
 	$tree->load_file($source);
 	my $children = $tree->get_root->get_children;
-	my @pod      = grep { is_pod $_ } @$children;
+	my @pod      = grep { $_->is_pod } @$children;
 	my $node1    = $pod[1];
 	$node1 or return '';
 

@@ -21,7 +21,7 @@ package BSON::XS;
 # ABSTRACT: XS implementation of MongoDB's BSON serialization
 
 use version;
-our $VERSION = 'v0.4.6';
+our $VERSION = 'v0.6.0';
 
 # cached for efficiency during decoding
 # XXX eventually move this into XS
@@ -51,7 +51,7 @@ BSON::XS - XS implementation of MongoDB's BSON serialization
 
 =head1 VERSION
 
-version v0.4.6
+version v0.6.0
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,6 @@ App::DBBrowser::CreateTable;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use File::Basename qw( basename );
 use List::Util     qw( none any );
@@ -13,8 +12,6 @@ use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_number );
 use Term::Form         qw();
 use Term::TablePrint   qw( print_table );
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;

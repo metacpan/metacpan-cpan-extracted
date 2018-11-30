@@ -67,8 +67,12 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.07",
-   "x_generated_by_perl" : "v5.29.2",
+   "version" : "0.08",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Ville Skytt\u00e4 (SCOP)"
+   ],
+   "x_generated_by_perl" : "v5.29.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_use_unsafe_inc" : 0
 }

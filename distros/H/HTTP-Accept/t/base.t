@@ -146,6 +146,25 @@ my %tests = (
             ],
         ],
     },
+    'undef' => {
+        header  => undef,
+        values  => [qw()],
+        ok      => [qw(text/html application/json)],
+        checks  => [
+            [
+                [qw(application/json text/html)],
+                'application/json',
+            ],
+            [
+                [qw(application/json application/AML)],
+                'application/json',
+            ],
+            [
+                [qw(image/png application/AML)],
+                'image/png',
+            ],
+        ],
+    },
 );
 
 for my $name ( sort keys %tests ) {

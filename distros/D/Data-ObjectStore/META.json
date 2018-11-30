@@ -4,13 +4,13 @@
       "Eric Wolf        coyocanid@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-ObjectStore",
    "prereqs" : {
@@ -28,14 +28,14 @@
       "runtime" : {
          "requires" : {
             "Data::RecordStore" : "3.2",
-            "perl" : "v5.20.0"
+            "perl" : "v5.16.0"
          }
       }
    },
    "provides" : {
       "Data::ObjectStore" : {
          "file" : "lib/Data/ObjectStore.pm",
-         "version" : "1.106"
+         "version" : "2.01"
       },
       "Data::ObjectStore::Array" : {
          "file" : "lib/Data/ObjectStore.pm"
@@ -53,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.106",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

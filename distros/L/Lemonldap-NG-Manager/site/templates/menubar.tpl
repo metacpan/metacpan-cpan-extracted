@@ -20,19 +20,19 @@
           </button>
           <!-- Last buttons, available languages -->
         </div>
-        <ul class="hidden-xs nav navbar-nav">
-          <li ng-repeat="l in links"><a href="{{l.target}}"><strong><i ng-if="l.icon" class="glyphicon glyphicon-{{l.icon}}"></i> {{translate(l.title)}}</strong></a></li>
+        <ul class="hidden-xs nav navbar-nav" role="grid">
+          <li ng-repeat="l in links" id="l in links"><a href="{{l.target}}" role="row" ng-mousedown="clickStyle={color: '#ffb84d'}"><strong><i ng-if="activeModule == l.title" ng-style="myStyle" class="glyphicon glyphicon-{{l.icon}}"></i><i ng-if="activeModule != l.title" class="glyphicon glyphicon-{{l.icon}}" ng-style="clickStyle"></i> <span ng-if="activeModule == l.title" ng-style="myStyle" ng-bind="translate(l.title)"></span><span ng-if="activeModule != l.title" ng-bind="translate(l.title)" ng-style="clickStyle"></span></strong></a></li>
         </ul>
         <ul class="hidden-xs nav navbar-nav navbar-right">
           <li uib-dropdown>
-            <a id="mainlangmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{translate('menu')}} <span class="caret"></span></a>
-            <ul uib-dropdown-menu aria-labelled-by="mainlangmenu">
-              <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
+            <a id="mainlangmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span ng-bind="translate('menu')"></span> <span class="caret"></span></a>
+            <ul uib-dropdown-menu aria-labelled-by="mainlangmenu" role="grid">
+              <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> <span ng-bind="translate(menulink.title)"></span></a></li>
               <li role="separator" class="divider"></li>
-              <li class="dropdown-header">{{translate('languages')}}</li>
+              <li class="dropdown-header"><span ng-bind="translate('languages')"></span></li>
               <li ng-include="'languages.html'"/>
               <li role="separator" class="divider"></li>
-              <li class="dropdown-header">{{translate('version')}}</li>
+              <li class="dropdown-header"><span ng-bind="translate('version')"></span></li>
               <li><a name="version"><TMPL_VAR NAME="VERSION"></a></li>
             </ul>
           </li>

@@ -67,16 +67,14 @@ typedef struct _stackette {
 
 #define EMPTY_STACK 0
 
+#define MAX_DEPTH 100
+
 /* convenience functions taken from Text::CSV_XS by H.M. Brand */
-#define _is_arrayref(f) ( f && \
-     (SvROK (f) || (SvRMAGICAL (f) && (mg_get (f), 1) && SvROK (f))) && \
-      SvOK (f) && SvTYPE (SvRV (f)) == SVt_PVAV )
-#define _is_hashref(f) ( f && \
-     (SvROK (f) || (SvRMAGICAL (f) && (mg_get (f), 1) && SvROK (f))) && \
-      SvOK (f) && SvTYPE (SvRV (f)) == SVt_PVHV )
-#define _is_coderef(f) ( f && \
-     (SvROK (f) || (SvRMAGICAL (f) && (mg_get (f), 1) && SvROK (f))) && \
-      SvOK (f) && SvTYPE (SvRV (f)) == SVt_PVCV )
+#define _is_reftype(f,x) \
+    (f && ((SvGMAGICAL (f) && mg_get (f)) || 1) && SvROK (f) && SvTYPE (SvRV (f)) == x)
+#define _is_arrayref(f) _is_reftype (f, SVt_PVAV)
+#define _is_hashref(f)  _is_reftype (f, SVt_PVHV)
+#define _is_coderef(f)  _is_reftype (f, SVt_PVCV)
 
 /* shorthand for getting an SV* from a hash and key */
 #define _hv_fetchs_sv(h,k) \
@@ -101,7 +99,7 @@ static bool call_key_value_iter (SV *func, SV **ret );
 
 /* BSON encoding
  *
- * Public function perl_mongo_sv_to_bson is the entry point.  It calls one
+ * Public function  perl_mongo_sv_to_bsonis the entry point.  It calls one
  * of the container encoding functions, hv_doc_to_bson, or
  * ixhash_doc_to_bson.  Those iterate their contents, encoding them with
  * sv_to_bson_elem.  sv_to_bson_elem delegates to various append_*
@@ -112,20 +110,20 @@ static bool call_key_value_iter (SV *func, SV **ret );
 
 static void perl_mongo_sv_to_bson (bson_t * bson, SV *sv, HV *opts);
 
-static void hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc);
-static void ixhash_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc);
-static void iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc);
+static void hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool subdoc);
+static void ixhash_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool subdoc);
+static void iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool subdoc);
 
-#define hv_doc_to_bson(b,d,o,s) hv_to_bson((b),(d),(o),(s),0)
-#define hv_elem_to_bson(b,d,o,s) hv_to_bson((b),(d),(o),(s),1)
-#define ixhash_doc_to_bson(b,d,o,s) ixhash_to_bson((b),(d),(o),(s),0)
-#define ixhash_elem_to_bson(b,d,o,s) ixhash_to_bson((b),(d),(o),(s),1)
-#define iter_doc_to_bson(b,d,o,s) iter_src_to_bson((b),(d),(o),(s),0)
-#define iter_elem_to_bson(b,d,o,s) iter_src_to_bson((b),(d),(o),(s),1)
+#define hv_doc_to_bson(b,d,o,s,u) hv_to_bson((b),(d),(o),(s),(u),0)
+#define hv_elem_to_bson(b,d,o,s,u) hv_to_bson((b),(d),(o),(s),(u),1)
+#define ixhash_doc_to_bson(b,d,o,s,u) ixhash_to_bson((b),(d),(o),(s),(u),0)
+#define ixhash_elem_to_bson(b,d,o,s,u) ixhash_to_bson((b),(d),(o),(s),(u),1)
+#define iter_doc_to_bson(b,d,o,s,u) iter_src_to_bson((b),(d),(o),(s),(u),0)
+#define iter_elem_to_bson(b,d,o,s,u) iter_src_to_bson((b),(d),(o),(s),(u),1)
 
-static void sv_to_bson_elem (bson_t * bson, const char *key, SV *sv, HV *opts, stackette *stack);
+static void sv_to_bson_elem (bson_t * bson, const char *key, SV *sv, HV *opts, stackette *stack, int depth);
 
-const char * maybe_append_first_key(bson_t *bson, HV *opts, stackette *stack);
+const char * maybe_append_first_key(bson_t *bson, HV *opts, stackette *stack, int depth);
 
 static void append_binary(bson_t * bson, const char * key, bson_subtype_t subtype, SV * sv);
 static void append_regex(bson_t * bson, const char *key, REGEXP *re, SV * sv);
@@ -154,10 +152,10 @@ static SV* bson_parent_type(SV *sv);
  *
  */
 
-static SV * bson_doc_to_hashref(bson_iter_t * iter, HV *opts, bool top);
-static SV * bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, bool top);
-static SV * bson_array_to_arrayref(bson_iter_t * iter, HV *opts);
-static SV * bson_elem_to_sv(const bson_iter_t * iter, const char *key, HV *opts);
+static SV * bson_doc_to_hashref(bson_iter_t * iter, HV *opts, int depth, bool top);
+static SV * bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, int depth, bool top);
+static SV * bson_array_to_arrayref(bson_iter_t * iter, HV *opts, int depth);
+static SV * bson_elem_to_sv(const bson_iter_t * iter, const char *key, HV *opts, int depth);
 static SV * bson_oid_to_sv(const bson_iter_t * iter);
 
 /********************************************************************
@@ -424,7 +422,7 @@ perl_mongo_sv_to_bson (bson_t * bson, SV *sv, HV *opts) {
   if ( ! sv_isobject(sv) ) {
     switch ( SvTYPE(SvRV(sv)) ) {
       case SVt_PVHV:
-        hv_doc_to_bson (bson, sv, opts, EMPTY_STACK);
+        hv_doc_to_bson (bson, sv, opts, EMPTY_STACK, 0);
         break;
       default:
         sv_dump(sv);
@@ -439,10 +437,10 @@ perl_mongo_sv_to_bson (bson_t * bson, SV *sv, HV *opts) {
     class = HvNAME(SvSTASH(obj));
 
     if ( strEQ(class, "Tie::IxHash") ) {
-      ixhash_doc_to_bson(bson, sv, opts, EMPTY_STACK);
+      ixhash_doc_to_bson(bson, sv, opts, EMPTY_STACK, 0);
     }
     else if ( strEQ(class, "BSON::Doc") ) {
-      iter_doc_to_bson(bson, sv, opts, EMPTY_STACK);
+      iter_doc_to_bson(bson, sv, opts, EMPTY_STACK, 0);
     }
     else if ( strEQ(class, "BSON::Raw") ) {
       STRLEN str_len;
@@ -489,7 +487,7 @@ perl_mongo_sv_to_bson (bson_t * bson, SV *sv, HV *opts) {
       bson_destroy(child);
     }
     else if (SvTYPE(obj) == SVt_PVHV) {
-      hv_doc_to_bson(bson, sv, opts, EMPTY_STACK);
+      hv_doc_to_bson(bson, sv, opts, EMPTY_STACK, 0);
     }
     else {
       croak ("Can't encode non-container of type '%s'", class);
@@ -498,18 +496,22 @@ perl_mongo_sv_to_bson (bson_t * bson, SV *sv, HV *opts) {
 }
 
 static void
-hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc) {
+hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool subdoc) {
   HE *he;
   HV *hv;
   const char *first_key = NULL;
 
+  depth++;
+  if ( depth > MAX_DEPTH ) {
+    croak("Exceeded max object depth of %d", MAX_DEPTH);
+  }
   hv = (HV*)SvRV(sv);
   if (!(stack = check_circular_ref(hv, stack))) {
-    croak("circular ref");
+    croak("circular reference detected");
   }
 
   if ( ! subdoc ) {
-    first_key = maybe_append_first_key(bson, opts, stack);
+    first_key = maybe_append_first_key(bson, opts, stack, depth);
   }
 
   (void)hv_iterinit (hv);
@@ -540,7 +542,7 @@ hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc) {
         croak( "Invalid UTF-8 detected while encoding BSON" );
     }
 
-    sv_to_bson_elem (bson, key, *hval, opts, stack);
+    sv_to_bson_elem (bson, key, *hval, opts, stack, depth);
     if (!utf8) {
       Safefree(key);
     }
@@ -550,14 +552,20 @@ hv_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc) {
   if ( ! subdoc ) {
     Safefree(stack);
   }
+  depth--;
 }
 
 static void
-ixhash_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc) {
+ixhash_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool subdoc) {
   int i;
   SV **keys_sv, **values_sv;
   AV *array, *keys, *values;
   const char *first_key = NULL;
+
+  depth++;
+  if ( depth > MAX_DEPTH ) {
+    croak("Exceeded max object depth of %d", MAX_DEPTH);
+  }
 
   /*
    * a Tie::IxHash is of the form:
@@ -579,7 +587,7 @@ ixhash_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc) {
   values = (AV*)SvRV(*values_sv);
 
   if ( ! subdoc ) {
-    first_key = maybe_append_first_key(bson, opts, stack);
+    first_key = maybe_append_first_key(bson, opts, stack, depth);
   }
 
   for (i=0; i<=av_len(keys); i++) {
@@ -599,24 +607,30 @@ ixhash_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc) {
         continue;
     }
 
-    sv_to_bson_elem(bson, str, *v, opts, stack);
+    sv_to_bson_elem(bson, str, *v, opts, stack, depth);
   }
 
   /* free the ixhash elem */
   if ( ! subdoc ) {
     Safefree(stack);
   }
+  depth--;
 }
 
 /* Construct a BSON document from an iterator code ref that returns key
  * value pairs */
 
 static void
-iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc) {
+iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, int depth, bool subdoc) {
   int i;
   SV *iter;
   SV * kv[2];
   const char *first_key = NULL;
+
+  depth++;
+  if ( depth > MAX_DEPTH ) {
+    croak("Exceeded max object depth of %d", MAX_DEPTH);
+  }
 
   /* check if we're in an infinite loop */
   if (!(stack = check_circular_ref(SvRV(sv), stack))) {
@@ -624,7 +638,7 @@ iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc)
   }
 
   if ( ! subdoc ) {
-    first_key = maybe_append_first_key(bson, opts, stack);
+    first_key = maybe_append_first_key(bson, opts, stack, depth);
   }
 
   iter = sv_2mortal(call_perl_reader(sv, "_iterator"));
@@ -645,19 +659,25 @@ iter_src_to_bson(bson_t * bson, SV *sv, HV *opts, stackette *stack, bool subdoc)
         continue;
     }
 
-    sv_to_bson_elem(bson, str, kv[1], opts, stack);
+    sv_to_bson_elem(bson, str, kv[1], opts, stack, depth);
   }
 
   /* free the stack elem for sv */
   if ( ! subdoc ) {
     Safefree(stack);
   }
+  depth--;
 }
 
 /* This is for an array reference contained *within* a document */
 static void
-av_to_bson (bson_t * bson, AV *av, HV *opts, stackette *stack) {
+av_to_bson (bson_t * bson, AV *av, HV *opts, stackette *stack, int depth) {
   I32 i;
+
+  depth++;
+  if ( depth > MAX_DEPTH ) {
+    croak("Exceeded max object depth of %d", MAX_DEPTH);
+  }
 
   if (!(stack = check_circular_ref(av, stack))) {
     croak("circular ref");
@@ -667,13 +687,14 @@ av_to_bson (bson_t * bson, AV *av, HV *opts, stackette *stack) {
     SV **sv;
     SV *key = sv_2mortal(newSViv (i));
     if (!(sv = av_fetch (av, i, 0)))
-      sv_to_bson_elem (bson, SvPV_nolen(key), newSV(0), opts, stack);
+      sv_to_bson_elem (bson, SvPV_nolen(key), newSV(0), opts, stack, depth);
     else
-      sv_to_bson_elem (bson, SvPV_nolen(key), *sv, opts, stack);
+      sv_to_bson_elem (bson, SvPV_nolen(key), *sv, opts, stack, depth);
   }
 
   /* free the av elem */
   Safefree(stack);
+  depth--;
 }
 
 /* verify and transform key, if necessary */
@@ -715,7 +736,7 @@ bson_key(const char * str, HV *opts) {
 }
 
 static void
-sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette *stack) {
+sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette *stack, int depth) {
   SV **svp;
   const char * key = bson_key(in_key,opts);
 
@@ -761,14 +782,14 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_t child;
 
         bson_append_document_begin(bson, key, -1, &child);
-        ixhash_elem_to_bson(&child, sv, opts, stack);
+        ixhash_elem_to_bson(&child, sv, opts, stack, depth);
         bson_append_document_end(bson, &child);
       }
       else if (strEQ(obj_type, "BSON::Doc")) {
         bson_t child;
 
         bson_append_document_begin(bson, key, -1, &child);
-        iter_elem_to_bson(&child, sv, opts, stack);
+        iter_elem_to_bson(&child, sv, opts, stack, depth);
         bson_append_document_end(bson, &child);
       }
       else if (strEQ(obj_type, "BSON::Raw")) {
@@ -868,7 +889,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_t child;
         dbref = sv_2mortal(call_perl_reader(sv, "_ordered"));
         bson_append_document_begin(bson, key, -1, &child);
-        ixhash_elem_to_bson(&child, dbref, opts, stack);
+        ixhash_elem_to_bson(&child, dbref, opts, stack, depth);
         bson_append_document_end(bson, &child);
       }
 
@@ -906,7 +927,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         if (SvOK(scope)) {
             bson_t * child = bson_new();
-            hv_elem_to_bson(child, scope, opts, EMPTY_STACK);
+            hv_elem_to_bson(child, scope, opts, EMPTY_STACK, 0);
             bson_append_code_with_scope(bson, key, -1, code_str, code_len, child);
             bson_destroy(child);
         } else {
@@ -1025,7 +1046,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 
         if ( SvROK(v) ) {
           /* delegate to wrapped value type */
-          return sv_to_bson_elem(bson,in_key,v,opts,stack);
+          return sv_to_bson_elem(bson,in_key,v,opts,stack,depth);
         }
 
         bson_append_int64(bson, key, -1, (int64_t)SvIV(sv));
@@ -1069,7 +1090,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         bson_t child;
         bson_append_document_begin(bson, key, -1, &child);
         /* don't add a _id to inner objs */
-        hv_elem_to_bson (&child, sv, opts, stack);
+        hv_elem_to_bson (&child, sv, opts, stack, depth);
         bson_append_document_end(bson, &child);
         break;
       }
@@ -1077,7 +1098,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
         /* array */
         bson_t child;
         bson_append_array_begin(bson, key, -1, &child);
-        av_to_bson (&child, (AV *)SvRV (sv), opts, stack);
+        av_to_bson (&child, (AV *)SvRV (sv), opts, stack, depth);
         bson_append_array_end(bson, &child);
         break;
       }
@@ -1132,7 +1153,7 @@ sv_to_bson_elem (bson_t * bson, const char * in_key, SV *sv, HV *opts, stackette
 }
 
 const char *
-maybe_append_first_key(bson_t *bson, HV *opts, stackette *stack) {
+maybe_append_first_key(bson_t *bson, HV *opts, stackette *stack, int depth) {
   SV *tempsv;
   SV **svp;
   const char *first_key = NULL;
@@ -1142,7 +1163,7 @@ maybe_append_first_key(bson_t *bson, HV *opts, stackette *stack) {
     first_key = SvPVutf8(tempsv, len);
     assert_valid_key(first_key, len);
     if ( (tempsv = _hv_fetchs_sv(opts, "first_value")) ) {
-      sv_to_bson_elem(bson, first_key, tempsv, opts, stack);
+      sv_to_bson_elem(bson, first_key, tempsv, opts, stack, depth);
     }
     else {
       bson_append_null(bson, first_key, -1);
@@ -1410,16 +1431,21 @@ bson_parent_type(SV* sv) {
  ********************************************************************/
 
 static SV *
-bson_doc_to_hashref(bson_iter_t * iter, HV *opts, bool top) {
+bson_doc_to_hashref(bson_iter_t * iter, HV *opts, int depth, bool top) {
   SV **svp;
   SV *wrap;
   SV *ordered;
   SV *ret;
   HV *hv = newHV();
 
+  depth++;
+  if ( depth > MAX_DEPTH ) {
+    croak("Exceeded max object depth of %d", MAX_DEPTH);
+  }
+
   /* delegate if 'ordered' option is true */
   if ( (ordered = _hv_fetchs_sv(opts, "ordered")) && SvTRUE(ordered) ) {
-    return bson_doc_to_tiedhash(iter, opts, top);
+    return bson_doc_to_tiedhash(iter, opts, depth, top);
   }
 
   int is_dbref = 1;
@@ -1442,7 +1468,7 @@ bson_doc_to_hashref(bson_iter_t * iter, HV *opts, bool top) {
     if ( key_num == 2 && is_dbref == 1 && strcmp( name, "$id" ) ) is_dbref = 0;
 
     /* get value and store into hash */
-    value = bson_elem_to_sv(iter, name, opts);
+    value = bson_elem_to_sv(iter, name, opts, depth);
     if (!hv_store (hv, name, 0-strlen(name), value, 0)) {
       croak ("failed storing value in hash");
     }
@@ -1459,11 +1485,12 @@ bson_doc_to_hashref(bson_iter_t * iter, HV *opts, bool top) {
     return dbref;
   }
 
+  depth--;
   return ret;
 }
 
 static SV *
-bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, bool top) {
+bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, int depth, bool top) {
   SV **svp;
   SV *wrap;
   SV *ret;
@@ -1474,6 +1501,11 @@ bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, bool top) {
 
   int is_dbref = 1;
   int key_num  = 0;
+
+  depth++;
+  if ( depth > MAX_DEPTH ) {
+    croak("Exceeded max object depth of %d", MAX_DEPTH);
+  }
 
   ixhash = new_object_from_pairs("Tie::IxHash",NULL);
 
@@ -1496,7 +1528,7 @@ bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, bool top) {
     /* get key and value and store into hash */
     key = sv_2mortal( newSVpvn(name, strlen(name)) );
     SvUTF8_on(key);
-    value = bson_elem_to_sv(iter, name, opts);
+    value = bson_elem_to_sv(iter, name, opts, depth);
     call_method_va(ixhash, "STORE", 2, key, value);
   }
 
@@ -1513,28 +1545,35 @@ bson_doc_to_tiedhash(bson_iter_t * iter, HV *opts, bool top) {
     return dbref;
   }
 
+  depth--;
   return ret;
 }
 
 static SV *
-bson_array_to_arrayref(bson_iter_t * iter, HV *opts) {
+bson_array_to_arrayref(bson_iter_t * iter, HV *opts, int depth) {
   AV *ret = newAV ();
+
+  depth++;
+  if ( depth > MAX_DEPTH ) {
+    croak("Exceeded max object depth of %d", MAX_DEPTH);
+  }
 
   while (bson_iter_next(iter)) {
     SV *sv;
     const char *name = bson_iter_key(iter);
 
     /* get value */
-    if ((sv = bson_elem_to_sv(iter, name, opts ))) {
+    if ((sv = bson_elem_to_sv(iter, name, opts, depth))) {
       av_push (ret, sv);
     }
   }
 
+  depth--;
   return newRV_noinc ((SV *)ret);
 }
 
 static SV *
-bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
+bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts, int depth) {
   SV **svp;
   SV *value = 0;
 
@@ -1595,7 +1634,7 @@ bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
     bson_iter_t child;
     bson_iter_recurse(iter, &child);
 
-    value = bson_doc_to_hashref(&child, opts, FALSE);
+    value = bson_doc_to_hashref(&child, opts, depth, FALSE);
 
     break;
   }
@@ -1603,7 +1642,7 @@ bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
     bson_iter_t child;
     bson_iter_recurse(iter, &child);
 
-    value = bson_array_to_arrayref(&child, opts);
+    value = bson_array_to_arrayref(&child, opts, depth);
 
     break;
   }
@@ -1771,7 +1810,7 @@ bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
         croak("error iterating BSON type %d\n", bson_iter_type(iter));
     }
 
-    scope_sv = sv_2mortal(bson_doc_to_hashref(&child, opts, TRUE));
+    scope_sv = sv_2mortal(bson_doc_to_hashref(&child, opts, depth, TRUE));
     value = new_object_from_pairs("BSON::Code", "code", code_sv, "scope", scope_sv, NULL);
 
     break;
@@ -1845,8 +1884,8 @@ bson_elem_to_sv (const bson_iter_t * iter, const char *key, HV *opts ) {
     break;
   }
   default: {
-    croak("type %d not supported\n", bson_iter_type(iter));
-    /* give up, it'll be trouble if we keep going */
+    /* Should already have been caught during bson_validate() but in case not: */
+    croak("unsupported BSON type \\x%02X for key '%s'.  Are you using the latest version of BSON::XS?", bson_iter_type(iter), key );
   }
   }
   return value;
@@ -1881,6 +1920,8 @@ _decode_bson(msg, options)
         size_t error_offset;
         STRLEN length;
         HV *opts;
+        uint32_t invalid_type;
+        const char *invalid_key;
 
     PPCODE:
         data = SvPV(msg, length);
@@ -1899,15 +1940,19 @@ _decode_bson(msg, options)
           croak("Error reading BSON document");
         }
 
-        if ( ! bson_validate(&bson, BSON_VALIDATE_NONE, &error_offset) ) {
+        if ( ! bson_validate(&bson, BSON_VALIDATE_NONE, &error_offset, &invalid_key, &invalid_type) ) {
           croak( "Invalid BSON input" );
+        }
+
+        if ( invalid_type != 0 ) {
+            croak("unsupported BSON type \\x%02X for key '%s'.  Are you using the latest version of BSON::XS?", invalid_type, invalid_key );
         }
 
         if ( ! bson_iter_init(&iter, &bson) ) {
           croak( "Error creating BSON iterator" );
         }
 
-        XPUSHs(sv_2mortal(bson_doc_to_hashref(&iter, opts, TRUE)));
+        XPUSHs(sv_2mortal(bson_doc_to_hashref(&iter, opts, 0, TRUE)));
 
 void
 _encode_bson(doc, options)

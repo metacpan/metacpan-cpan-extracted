@@ -1,0 +1,30 @@
+---
+# Topic Colors
+-
+    - q: 'The color red is blue'
+      difficulty: 4
+      chapter: 'colors'
+      answer: false
+    - q: 'The color red is red'
+      difficulty: 1
+      chapter: 'colors'
+      answer: true
+- q: 'Bananas are not always yellow'
+  difficulty: 6
+  chapter: 'colors'
+  answer: true
+# Topic Perl
+-
+    - q: 'Perls mascot is a camel'
+      difficulty: 3
+      chapter: 'perl'
+      answer: true
+    - q: 'Perls mascot is a dog'
+      difficulty: 3
+      chapter: 'perl'
+      answer: false
+- q: 'Perl can speak <i>HTML</i>'
+  difficulty: 5
+  chapter: 'perl'
+  answer: true
+# ... and so on ...

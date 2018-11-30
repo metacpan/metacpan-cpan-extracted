@@ -1,0 +1,192 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Lemonldap:NG::Portal::UserDB - Writing authentication modules for LemonLDAP::NG.
+
+=head1 SYNOPSIS
+
+  package Lemonldap::NG::Portal::UserDB::My;
+  
+  use strict;
+  use Mouse;
+  # Add constants used by this module
+  use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
+  
+  our $VERSION = '0.1';
+  
+  extends 'Lemonldap::NG::Common::Module';
+
+  sub init {
+      ...
+  }
+  
+  sub getUser {
+      my ( $self, $req, %args ) = @_;
+      ...
+  }
+  
+  sub setSessionInfo {
+      my ( $self, $req ) = @_;
+      ...
+  }
+  
+  sub setGroups {
+      my ( $self, $req ) = @_;
+      ...
+  }
+
+=head1 DESCRIPTION
+
+UserDB modules are used to search a user in user database. UserDB modules are
+independent objects that are instantiated by Lemonldap::NG portal. They must
+provide methods described below.
+
+=head1 METHODS
+
+=head2 Accessors and methods provided by Lemonldap::NG::Common::Module
+
+=over
+
+=item p: portal object
+
+=item conf: configuration hash (as reference)
+
+=item logger alias for p->logger accessor
+
+=item userLogger alias for p->userLogger accessor
+
+=item error: alias for p->error method
+
+=back
+
+=head3 "Routes" management
+
+Like any module that inherits from Lemonldap::NG::Portal::Plugin,
+Lemonldap::NG::Portal::Main::Auth provides URI path functions:
+
+=over
+
+=item addAuthRoute: wrapper to L<Lemonldap::NG::Handler::PSGI::Try>
+addAuthRoute() method
+
+=item addUnauthRoute: wrapper to L<Lemonldap::NG::Handler::PSGI::Try>
+addUnauthRoute() method
+
+=back
+
+Example:
+
+  sub init {
+      ...
+      $self->addAuthRoute( saml => { proxy => "proxySub" }, [ 'GET', 'POST' ] );
+      ...
+  }
+  sub proxySub {
+      my ( $self, $req ) = @_;
+      ...
+      # This sub must return a PSGI response. Example
+      return [ 302, [ Location => 'http://x.y/' ], [] ];
+  }
+
+This means that requests http://auth.../saml/proxy will be given to proxySub()
+method.
+
+=head2 Methods that must be provided by a UserDB module
+
+=head3 init()
+
+Method launched after object creation (after each configuration reload). It
+must return a true value if authentication module is ready, false else.
+
+=head3 Methods called at each request
+
+All these methods must return a Lemonldap::NG::Portal::Main::Constants value.
+They are called with one argument: a L<Lemonldap::NG::Portal::Main::Request>
+object.
+
+Note: if you want to change process() next steps, you just have to change
+$req->steps array.
+
+=head4 getUser($req,%args)
+
+First method called to search user in database. If $args{useMail} is set then
+$req->{user} contains a mail address.
+
+=head4 setSessionInfo($req)
+
+This method is called after authentication process. It must populate
+$req->sessionInfo.
+
+=head4 setGroups($req)
+
+This method populates $req->{sessionInfo}->{groups} if backend is able to
+provide groups I<(Like LDAP)>. Else, it juste return PE_OK.
+
+=head1 LOGGING
+
+Logging is provided by $self->logger and $self->userLogger. The following rules
+must be applied:
+
+=over
+
+=item logger->debug: technical debugging messages
+
+=item logger->info: simple technical information
+
+=item logger->notice: technical information that could interest administrators
+
+=item logger->warn: technical warning
+
+=item logger->error: error that must be reported to administrator
+
+=item userLogger->info: simple information about user's action
+
+=item userLogger->notice: information that may be registered (auth success,...)
+
+=item userLogger->warn: bad action of a user (auth failure). Auth/Combination
+transform it to "info" when another authentication scheme is available
+
+=item userLogger->error: bad action of a user that must be reported, (even if
+another backend is available with Combination)
+
+=back
+
+=head1 AUTHORS
+
+=over
+
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
+
+=back
+
+=head1 BUG REPORT
+
+Use OW2 system to report bug or ask for features:
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
+
+=head1 DOWNLOAD
+
+Lemonldap::NG is available at
+L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
+
+=head1 COPYRIGHT AND LICENSE
+
+See COPYING file for details.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut

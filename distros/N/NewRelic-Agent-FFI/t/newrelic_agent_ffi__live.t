@@ -6,7 +6,7 @@ use Time::HiRes qw( sleep );
 # NOTE: this test can be run in either DEAD or LIVE mode
 #  - DEAD - make all the calls but do not actually send the data to NR
 #           this is the default, and verifies that the NR agent class
-#           at least won't CRASH when you instrament your application
+#           at least won't CRASH when you instrument your application
 #           with it.
 #  - LIVE - if you set NEWRELIC_AGENT_FFI_TEST it will send metrics to NR
 #           using the key as specified in that environment variable.

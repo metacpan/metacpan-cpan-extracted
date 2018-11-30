@@ -3,6 +3,7 @@
 use Test::More;
 use strict;
 use IO::String;
+use JSON qw(from_json);
 
 eval { mkdir 't/notifications' };
 `rm -rf t/notifications/*`;
@@ -10,7 +11,7 @@ require 't/test-lib.pm';
 
 # Try to create a notification
 my $notif =
-'{"date":"2015-05-03","uid":"dwho","reference":"Test","xml":"<title>Test</title>"}';
+'{"date":"2099-05-03","uid":"dwho","reference":"Test","xml":"{\"title\":\"Test\"}"}';
 my $res =
   &client->jsonPostResponse( 'notifications/actives', '',
     IO::String->new($notif),
@@ -43,7 +44,7 @@ displayTests('done');
 
 # Delete notification
 $res =
-  &client->_del('notifications/done/dwho_Test_20150503_dwho_VGVzdA==.done');
+  &client->_del('notifications/done/dwho_Test_20990503_dwho_VGVzdA==.done');
 $res = &client->jsonResponse( 'notifications/done', 'groupBy=substr(uid,1)' );
 ok( $res->{result} == 1, 'Result = 1' );
 ok( $res->{count} == 0,  'Count = 0' );
@@ -90,9 +91,11 @@ sub displayTests {
 
     if ( $type eq 'actives' ) {
         $res = &client->jsonResponse( "notifications/$type/dwho_Test", '' );
-        ok( $res->{result} == 1,                     'Result = 1' );
-        ok( $res->{count} == 1,                      'Count = 1' );
-        ok( $res->{notifications}->[0] =~ /^<\?xml/, 'Response is XML' );
+        ok( $res->{result} == 1, 'Result = 1' );
+        ok( $res->{count} == 1,  'Count = 1' );
+        ok( eval { from_json( $res->{notifications}->[0] ) },
+            'Response is JSON' )
+          or print STDERR "Expect JSON, found:\n$res->{notifications}->[0]\n";
         count(3);
     }
 }

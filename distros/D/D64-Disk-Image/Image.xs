@@ -49,7 +49,7 @@ di_sync(di)
 
 # my ($numstatus, $status) = di_status($diskImage);
 
-SV*
+void
 di_status(di)
         DiskImage *di
     PREINIT:
@@ -57,15 +57,13 @@ di_status(di)
         int   numstatus, statuslen;
     PPCODE:
         New(1, status, DISKDRIVE_STATUS_LENGTH + 1, char);
-        if (status == NULL) {
-            Safefree(status);
-            XSRETURN_UNDEF;
+        if (status) {
+            memset(status, '\0', DISKDRIVE_STATUS_LENGTH + 1);
+            PUSHs(sv_2mortal(newSViv(numstatus = di_status(di, status))));
+            statuslen = strlen(status);
+            PUSHs(sv_2mortal(newSVpv(status, statuslen)));
+            PUSHs(sv_2mortal(newSVnv(numstatus)));
         }
-        memset(status, '\0', DISKDRIVE_STATUS_LENGTH + 1);
-        PUSHs(sv_2mortal(newSViv(numstatus = di_status(di, status))));
-        statuslen = strlen(status);
-        PUSHs(sv_2mortal(newSVpv(status, statuslen)));
-        PUSHs(sv_2mortal(newSVnv(numstatus)));
         Safefree(status);
 
 # my $numstatus = di_format($diskImage, $rawname, $rawid);
@@ -128,7 +126,7 @@ di_tracks(type)
 
 # my ($title, $id) = di_title($diskImage);
 
-SV*
+void
 di_title(di)
         DiskImage *di
     PREINIT:
@@ -194,7 +192,7 @@ di_free_ts(di, track, sector)
 
 # my $rawname = di_rawname_from_name($name);
 
-SV*
+void
 di_rawname_from_name(name)
         char *name
     PREINIT:
@@ -202,18 +200,16 @@ di_rawname_from_name(name)
         unsigned char *rawname;
     PPCODE:
         New(1, rawname, DIRECTORY_FILENAME_LENGTH + 1, unsigned char);
-        if (rawname == NULL) {
-            Safefree(rawname);
-            XSRETURN_UNDEF;
+        if (rawname) {
+            PUSHs(sv_2mortal(newSViv(rawnamelen = di_rawname_from_name(rawname, name))));
+            rawname[DIRECTORY_FILENAME_LENGTH] = '\0';
+            PUSHs(sv_2mortal(newSVpv((const char *)rawname, 0)));
         }
-        PUSHs(sv_2mortal(newSViv(rawnamelen = di_rawname_from_name(rawname, name))));
-        rawname[DIRECTORY_FILENAME_LENGTH] = '\0';
-        PUSHs(sv_2mortal(newSVpv((const char *)rawname, 0)));
         Safefree(rawname);
 
 # my $name = di_name_from_rawname($rawname);
 
-SV*
+void
 di_name_from_rawname(rawname)
         unsigned char *rawname
     PREINIT:
@@ -221,13 +217,11 @@ di_name_from_rawname(rawname)
         char *name;
     PPCODE:
         New(1, name, DIRECTORY_FILENAME_LENGTH + 1, char);
-        if (name == NULL) {
-            Safefree(name);
-            XSRETURN_UNDEF;
+        if (name) {
+            PUSHs(sv_2mortal(newSViv(namelen = di_name_from_rawname(name, rawname))));
+            name[DIRECTORY_FILENAME_LENGTH] = '\0';
+            PUSHs(sv_2mortal(newSVpv(name, 0)));
         }
-        PUSHs(sv_2mortal(newSViv(namelen = di_name_from_rawname(name, rawname))));
-        name[DIRECTORY_FILENAME_LENGTH] = '\0';
-        PUSHs(sv_2mortal(newSVpv(name, 0)));
         Safefree(name);
 
 # my $blocksfree = _di_blocksfree($diskImage);
@@ -278,7 +272,7 @@ di_close(imgfile)
 
 # my ($counter, $buffer) = di_read($imageFile, $maxlength);
 
-SV*
+void
 di_read(imgfile, len);
         ImageFile *imgfile
         int        len
@@ -287,14 +281,12 @@ di_read(imgfile, len);
         int            counter;
     PPCODE:
         New(1, buffer, len + 1, unsigned char);
-        if (buffer == NULL) {
-            Safefree(buffer);
-            XSRETURN_UNDEF;
+        if (buffer) {
+            memset(buffer, '\0', len + 1);
+            PUSHs(sv_2mortal(newSViv(counter = di_read(imgfile, buffer, len))));
+            PUSHs(sv_2mortal(newSVpv((const char *)buffer, counter)));
+            PUSHs(sv_2mortal(newSVnv(counter)));
         }
-        memset(buffer, '\0', len + 1);
-        PUSHs(sv_2mortal(newSViv(counter = di_read(imgfile, buffer, len))));
-        PUSHs(sv_2mortal(newSVpv((const char *)buffer, counter)));
-        PUSHs(sv_2mortal(newSVnv(counter)));
         Safefree(buffer);
 
 # my $counter = di_write($imageFile, $buffer, $length);

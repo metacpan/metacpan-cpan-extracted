@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use Path::Tiny;
 use Text::Diff;
 
-our $VERSION = 0.6;
+our $VERSION = 0.7;
 
 has files => (
     is      => 'rw',
@@ -194,7 +194,7 @@ App::diffdir - Compares two or more directories for files that differ
 
 =head1 VERSION
 
-This documentation refers to App::diffdir version 0.6
+This documentation refers to App::diffdir version 0.7
 
 =head1 SYNOPSIS
 

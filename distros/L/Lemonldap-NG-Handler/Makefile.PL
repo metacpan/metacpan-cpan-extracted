@@ -10,30 +10,39 @@ WriteMakefile(
     PMLIBDIRS      => ['lib'],
     BUILD_REQUIRES => {
         'Digest::HMAC_SHA1' => 0,
-        'HTTP::Message'     => 0,
         'IO::Pipe'          => 0,
-        'SOAP::Lite'        => 0,
         'Test::MockObject'  => 0,
         'Test::Pod'         => 0,
-        'File::Basename'    => 0,
         'Cwd'               => 0,
     },
     META_MERGE => {
         'recommends' => {
-            'Cache::Memcached'     => 0,
-            'Digest::HMAC_SHA1'    => 0,
-            'HTTP::Message'        => 0,
-            'LWP::Protocol::https' => 0,
-            'SOAP::Lite'           => 0,
+            'Cache::Memcached'  => 0,
+            'Digest::HMAC_SHA1' => 0,
+            'HTTP::Message'     => 0,
+            'SOAP::Lite'        => 0,
+        },
+        resources => {
+            repository => {
+                url  => 'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng.git',
+                web  => 'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng',
+                type => 'git',
+            },
+            MailingList => 'mailto:lemonldap-ng-dev@ow2.org',
+            license     => 'http://opensource.org/licenses/GPL-2.0',
+            homepage    => 'http://lemonldap-ng.org/',
+            bugtracker  => {
+                web =>
+                  'https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues',
+            },
+            x_twitter => 'https://twitter.com/lemonldapng',
         },
     },
     PREREQ_PM => {
-        'Apache::Session::Generate::MD5' => 0,
-        'CGI'                            => 3.08,
-        'Lemonldap::NG::Common'          => '1.9.18',
-        'LWP'                            => 0,
-        'Mouse'                          => 0,
-        'URI'                            => 0,
+        'Lemonldap::NG::Common' => '2.0.0',
+        'LWP::UserAgent'        => 0,
+        'Mouse'                 => 0,
+        'URI'                   => 0,
     },    # e.g., Module::Name => 1.1
     (
         $] >= 5.005
@@ -41,7 +50,8 @@ WriteMakefile(
           (
             ABSTRACT_FROM =>
               'lib/Lemonldap/NG/Handler.pm',    # retrieve abstract from module
-            AUTHOR => 'Xavier Guimard <x.guimard@free.fr>'
+            AUTHOR =>
+'Xavier Guimard <x.guimard@free.fr>, Clément Oudot <clement@oodo.net>'
           )
         : ()
     ),

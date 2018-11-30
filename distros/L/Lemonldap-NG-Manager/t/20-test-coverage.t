@@ -2,7 +2,7 @@
 
 use Test::More;
 use strict;
-use Lemonldap::NG::Manager::Constants;
+use Lemonldap::NG::Common::Conf::ReConstants;
 
 use_ok('Lemonldap::NG::Manager::Build::Attributes');
 my $count = 1;

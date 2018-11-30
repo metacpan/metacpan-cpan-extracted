@@ -13,8 +13,6 @@ use LWP::UserAgent   qw();
 use Mojo::DOM        qw();
 use Term::ANSIScreen qw( :screen );
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-
 use App::YTDL::ExtractData  qw( json_to_hash );
 use App::YTDL::Helper       qw( uni_capture HIDE_CURSOR SHOW_CURSOR );
 use App::YTDL::LWPUserAgent qw();

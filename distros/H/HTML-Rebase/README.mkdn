@@ -1,3 +1,7 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/html-rebase.svg?branch=master)](https://travis-ci.org/Corion/html-rebase)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/html-rebase?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/html-rebase)
+
 # NAME
 
 HTML::Rebase - rewrite HTML links to be relative to a given URL
@@ -22,11 +26,11 @@ HTML::Rebase - rewrite HTML links to be relative to a given URL
     __END__
     <html>
     <head>
-    <link rel="stylesheet" src="../css/site.css" />
+    <link rel="stylesheet" src="css/site.css" />
     </head>
     <body>
     <a href="http://perlmonks.org">Go to Perlmonks.org</a>
-    <a href="../index.html">Go to home page/a>
+    <a href="index.html">Go to home page/a>
     </body>
     </html>
 
@@ -58,12 +62,12 @@ to rewrite them.
 # REPOSITORY
 
 The public repository of this module is 
-[http://github.com/Corion/html-rebase](http://github.com/Corion/html-rebase).
+[https://github.com/Corion/html-rebase](https://github.com/Corion/html-rebase).
 
 # SUPPORT
 
 The public support forum of this module is
-[http://perlmonks.org/](http://perlmonks.org/).
+[https://perlmonks.org/](https://perlmonks.org/).
 
 # BUG TRACKER
 
@@ -77,7 +81,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2015 by Max Maischein `corion@cpan.org`.
+Copyright 2015-2018 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

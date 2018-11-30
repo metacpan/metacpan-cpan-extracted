@@ -1,5 +1,8 @@
 Revision history for Perl extension Radius.
 
+0.29 Fri Nov 30 11:54:42 2018
+    - Fix tests if FreeRADIUS dictionary not available
+
 0.28 Thu Nov 29 14:24:42 2018
     - Fixed tagged integer attribute encoding (reported by Alexander Bechikov)
 

@@ -17,7 +17,7 @@ our @EXPORT_OK = qw(
     );
 our @EXPORT = @EXPORT_OK;
 
-our $VERSION=q{3.2.17};
+our $VERSION=q{3.2.18};
 
 our @MANIFEST = (
 'clear.sh',
@@ -1860,6 +1860,11 @@ fi
 if [ "$MAJOR" == "8" ]
 then
     cp $SBDIR/grants_5_7_6.mysql $SBDIR/grants.mysql
+fi
+if [ "$MAJOR" == "10" -a "$MINOR" -ge 4 ]
+then
+    # password column since MariaDB 10.4.0 is empty and hashed password itself is stored in authentication_string column
+    sed "s/delete from user where password='';/delete from user where password='' and (authentication_string='' or plugin!='mysql_native_password');/" -i $SBDIR/grants.mysql
 fi
 # END UGLY WORKAROUND
 VERBOSE_SQL=''

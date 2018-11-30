@@ -3,7 +3,10 @@ package Lemonldap::NG::Manager::Cli;
 use strict;
 use Mouse;
 use Data::Dumper;
-use Lemonldap::NG::Manager::Constants;
+use Lemonldap::NG::Common::Conf::ReConstants;
+
+our $VERSION = '2.0.0';
+$Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
 
@@ -137,17 +140,44 @@ sub delKey {
     foreach my $el (@list) {
         my @path = split $sep, $el->[0];
         if ( $#path == 0 ) {
-            delete $new->{ $path[0] }->{ $el->[1] };
+            if (   exists $new->{ $path[0] }
+                && exists $new->{ $path[0] }->{ $el->[1] } )
+            {
+                delete $new->{ $path[0] }->{ $el->[1] }
+                  if exists $new->{ $path[0] }->{ $el->[1] };
+            }
         }
         elsif ( $#path == 1 ) {
-            delete $new->{ $path[0] }->{ $path[1] }->{ $el->[1] };
+            if (   exists $new->{ $path[0] }
+                && exists $new->{ $path[0] }->{ $path[1] }
+                && exists $new->{ $path[0] }->{ $path[1] }->{ $el->[1] } )
+            {
+                delete $new->{ $path[0] }->{ $path[1] }->{ $el->[1] };
+            }
         }
         elsif ( $#path == 2 ) {
-            delete $new->{ $path[0] }->{ $path[1] }->{ $path[2] }->{ $el->[1] };
+            if (   exists $new->{ $path[0] }
+                && exists $new->{ $path[0] }->{ $path[1] }
+                && exists $new->{ $path[0] }->{ $path[1] }->{ $path[2] }
+                && exists $new->{ $path[0] }->{ $path[1] }->{ $path[2] }
+                ->{ $el->[1] } )
+            {
+                delete $new->{ $path[0] }->{ $path[1] }->{ $path[2] }
+                  ->{ $el->[1] };
+            }
         }
         elsif ( $#path == 3 ) {
-            delete $new->{ $path[0] }->{ $path[1] }->{ $path[2] }->{ $path[3] }
-              ->{ $el->[1] };
+            if (   exists $new->{ $path[0] }
+                && exists $new->{ $path[0] }->{ $path[1] }
+                && exists $new->{ $path[0] }->{ $path[1] }->{ $path[2] }
+                && exists $new->{ $path[0] }->{ $path[1] }->{ $path[2] }
+                ->{ $path[3] }
+                && exists $new->{ $path[0] }->{ $path[1] }->{ $path[2] }
+                ->{ $path[3] }->{ $el->[1] } )
+            {
+                delete $new->{ $path[0] }->{ $path[1] }->{ $path[2] }
+                  ->{ $path[3] }->{ $el->[1] };
+            }
         }
         else {
             die $el->[0] . " has too many levels. Aborting";
@@ -239,8 +269,6 @@ sub _save {
 sub run {
     my $self = shift;
 
-    print STDERR "VERY EXPERIMENTAL FEATURE, prefer web interface\n";
-
     # Options simply call corresponding accessor
     my $args = {};
     while ( $_[0] =~ s/^--?// ) {
@@ -291,8 +319,8 @@ __END__
 
 =encoding utf8
 
-Lemonldap::NG::Manager::Cli - EXPERIMENTAL command line manager for
-Lemonldap::NG web SSO system.
+Lemonldap::NG::Manager::Cli - Command line manager for Lemonldap::NG web SSO
+system.
 
 =head1 SYNOPSIS
 
@@ -316,8 +344,8 @@ or use llng-manager-cli provides with this package.
 Lemonldap::NG::Manager provides a web interface to manage Lemonldap::NG Web-SSO
 system.
 
-Lemonldap::NG Manager::Cli provides an EXPERIMENTAL command line client to read
-or modify configuration.
+Lemonldap::NG Manager::Cli provides a command line client to read or modify
+configuration.
 
 =head1 METHODS
 
@@ -378,19 +406,11 @@ Other links: L<Lemonldap::NG::Manager>, L<http://lemonldap-ng.org/>
 
 =head1 AUTHORS
 
-Original idea from David Delassus in 2012.
-
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
+=item Original idea from David Delassus in 2012
 
-=item David Delassus, E<lt>linkdd@cpan.orgE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -406,13 +426,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

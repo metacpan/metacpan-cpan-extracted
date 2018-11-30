@@ -19,6 +19,7 @@
 # In this file, we use the latter "Baby Perl" approach, and increment
 # will be worked over by t/op/inc.t
 
+$| = 1;
 $Level = 1;
 my $test = 1;
 my $planned;
@@ -1744,6 +1745,20 @@ WATCHDOG_VIA_ALARM:
             kill($sig, $pid_to_kill);
         };
     }
+}
+
+# Orphaned Docker or Linux containers do not necessarily attach to PID 1. They might attach to 0 instead.
+sub is_linux_container {
+
+    if ($^O eq 'linux' && open my $fh, '<', '/proc/1/cgroup') {
+        while(<$fh>) {
+            if (m{^\d+:pids:(.*)} && $1 ne '/init.scope') {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 1;

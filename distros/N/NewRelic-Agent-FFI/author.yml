@@ -12,9 +12,15 @@ pod_spelling_system:
     - superset
     - datastore
     - obfuscator
+    - CentOS
+    - SCOP
+    - Skytt
+    - Ville
+    - Xenial
 
 pod_coverage:
   skip: 0
   # format is "Class#method" or "Class",regex allowed
   # for either Class or method.
   private: []
+

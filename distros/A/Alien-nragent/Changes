@@ -1,5 +1,9 @@
 Revision history for Alien-nragent
 
+0.05      2018-11-30 11:15:15 -0500
+  - Important documentation of limitations of the SDK.
+  - Include LICENSE file in share install Oops.
+
 0.04      2018-09-04 08:46:09 -0400
   - Simplify detection logic
 

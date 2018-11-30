@@ -7,6 +7,7 @@
 * Configuration metadatas: `/confs/<cfgNum|latest>`
 * Key value: `/confs/<cfgNum|latest>/<key>`
 * Full configuration (for saving): `/confs/<cfgNum|latest>?full`
+* Diff between 2 configurations: `/diff/<cfgNum1>/<cfgNum2>`
 
 Examples:
 

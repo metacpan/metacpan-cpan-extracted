@@ -1,5 +1,32 @@
 Revision history for BSON
 
+v1.10.1   2018-11-30 00:33:12-05:00 America/New_York
+
+    [Bugs fixed]
+
+    - PERL-1043 Max depth limits miscounted BSON::Raw, triggering
+      exceptions when there shouldn't be one.
+
+v1.10.0   2018-11-29 11:10:19-05:00 America/New_York
+
+    [Bugs fixed]
+
+    - PERL-1009 BSON 1.8.1 fails on bleadperl with -Duselongdouble
+
+    [Changed]
+
+    - PERL-606 Improve BSON error messages
+
+    - PERL-1010 BSON::Raw add get_first_key method
+
+    - PERL-740 Limit BSON encoding/decoding to max depth limits
+
+    - PERL-975 Implement ObjectID spec
+
+    [Testing]
+
+    - PERL-737 Test encoding of dual vars and PVMG types
+
 v1.8.1    2018-10-01 16:28:47-04:00 America/New_York
 
     [Bugs fixed]

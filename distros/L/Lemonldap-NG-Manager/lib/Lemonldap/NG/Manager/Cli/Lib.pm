@@ -3,6 +3,8 @@ package Lemonldap::NG::Manager::Cli::Lib;
 use Mouse;
 use Lemonldap::NG::Manager;
 
+our $VERSION = '2.0.0';
+
 extends 'Lemonldap::NG::Common::PSGI::Cli::Lib';
 
 has mgr => ( is => 'ro', isa => 'Lemonldap::NG::Manager' );

@@ -34,7 +34,7 @@
    "provides" : {
       "Data::RecordStore" : {
          "file" : "lib/Data/RecordStore.pm",
-         "version" : "4.05"
+         "version" : "4.06"
       },
       "Data::RecordStore::Converter" : {
          "file" : "lib/Data/RecordStore/Converter.pm"
@@ -55,6 +55,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "4.05",
+   "version" : "4.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

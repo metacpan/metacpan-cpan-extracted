@@ -3,26 +3,29 @@ abstract: 'rewrite HTML links to be relative to a given URL'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
-  Carp: 0
-  Exporter: 5
-  URI::URL: 0
-  URI::WithBase: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: HTML-Rebase
 no_index:
   directory:
     - t
     - inc
 requires:
-  Text::Unidecode: 0
-  perl: 5.006
+  Carp: '0'
+  Exporter: '5'
+  URI::URL: '0'
+  URI::WithBase: '0'
+  perl: '5.006'
 resources:
-  repository: http://github.com/Corion/html-rebase
-version: 0.03
+  repository: git://github.com/Corion/html-rebase.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

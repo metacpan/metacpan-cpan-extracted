@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.10.1';
 
 use Carp;
 use Config;
@@ -921,7 +921,7 @@ sub _iso8601_to_epochms {
         my $frac = $s - int($s);
         my $epoch = Time::Local::timegm(int($s), $m, $h, $D, $M, $Y) - $zone_offset;
         $epoch = HAS_INT64 ? 1000 * $epoch : Math::BigInt->new($epoch) * 1000;
-        $epoch += int($frac * 1000);
+        $epoch += HAS_INT64 ? $frac * 1000 : Math::BigFloat->new($frac) * 1000;
         return $epoch;
     }
     else {
@@ -941,7 +941,7 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.8.1
+version v1.10.1
 
 =head1 SYNOPSIS
 
@@ -1500,13 +1500,17 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Eric Daniels Olivier Duclos Pat Gunn Petr Písař Robert Sedlacek Thomas Bloor Yury Zavarin Oleg Kostyuk
+=for stopwords Eric Daniels Finn Olivier Duclos Pat Gunn Petr Písař Robert Sedlacek Thomas Bloor Wallace Reis Yury Zavarin Oleg Kostyuk
 
 =over 4
 
 =item *
 
 Eric Daniels <eric.daniels@mongodb.com>
+
+=item *
+
+Finn <toyou1995@gmail.com>
 
 =item *
 
@@ -1527,6 +1531,10 @@ Robert Sedlacek <rs@474.at>
 =item *
 
 Thomas Bloor <tbsliver@shadow.cat>
+
+=item *
+
+Wallace Reis <wallace@reis.me>
 
 =item *
 

@@ -4,7 +4,6 @@ App::DBBrowser::AttachDB;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use List::Util qw( any );
 

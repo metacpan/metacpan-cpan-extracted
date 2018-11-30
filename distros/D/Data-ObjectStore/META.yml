@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,7 +17,7 @@ name: Data-ObjectStore
 provides:
   Data::ObjectStore:
     file: lib/Data/ObjectStore.pm
-    version: '1.106'
+    version: '2.01'
   Data::ObjectStore::Array:
     file: lib/Data/ObjectStore.pm
   Data::ObjectStore::Container:
@@ -26,8 +26,8 @@ provides:
     file: lib/Data/ObjectStore.pm
 requires:
   Data::RecordStore: '3.2'
-  perl: v5.20.0
+  perl: v5.16.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.106'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '2.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

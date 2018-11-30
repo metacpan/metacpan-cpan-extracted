@@ -14,7 +14,7 @@ my $ini = File::Temp->new();
 my $dir = dirname( abs_path($0) );
 
 print $ini "[all]
-
+logger = Lemonldap::NG::Common::Logger::Std
 [configuration]
 type=File
 dirName=$dir
@@ -34,10 +34,10 @@ open STDERR, '>/dev/null';
 SKIP: {
     eval { require Digest::HMAC_SHA1 };
     skip
-"Digest::HMAC_SHA1 is not installed, so Lemonldap::NG::Handler::ZimbraPreAuth will not be useable",
+"Digest::HMAC_SHA1 is not installed, so Lemonldap::NG::Handler::Lib::ZimbraPreAuth will not be useable",
       1
       if ($@);
-    use_ok('Lemonldap::NG::Handler::Specific::ZimbraPreAuth');
+    use_ok('Lemonldap::NG::Handler::Lib::ZimbraPreAuth');
 }
 
 $LLNG_DEFAULTCONFFILE = undef;

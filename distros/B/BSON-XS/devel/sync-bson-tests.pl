@@ -25,12 +25,17 @@ sub try_system {
 
 sub rsync {
     my ($dir) = @_;
-    try_system( 'rsync', '-a', $bsonpm->child("corpus"),         $root );
-    try_system( 'rsync', '-a', $bsonpm->child(qw/t common/),     $root->child("t") );
-    try_system( 'rsync', '-a', $bsonpm->child(qw/t corpus/),     $root->child("t") );
-    try_system( 'rsync', '-a', $bsonpm->child(qw/t lib/),        $root->child("t") );
-    try_system( 'rsync', '-a', $bsonpm->child(qw/t mapping/),    $root->child("t") );
-    try_system( 'rsync', '-a', $bsonpm->child(qw/t regression/), $root->child("t") );
+    try_system( 'rsync', '-a', '--delete', $bsonpm->child("corpus"), $root );
+    try_system( 'rsync', '-a', '--delete', $bsonpm->child(qw/t common/),
+        $root->child("t") );
+    try_system( 'rsync', '-a', '--delete', $bsonpm->child(qw/t corpus/),
+        $root->child("t") );
+    try_system( 'rsync', '-a', '--delete', $bsonpm->child(qw/t lib/),
+        $root->child("t") );
+    try_system( 'rsync', '-a', '--delete', $bsonpm->child(qw/t mapping/),
+        $root->child("t") );
+    try_system( 'rsync', '-a', '--delete', $bsonpm->child(qw/t regression/),
+        $root->child("t") );
 }
 
 rsync();

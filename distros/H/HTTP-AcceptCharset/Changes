@@ -1,6 +1,10 @@
 Revision history for HTTP::AcceptCharset
 ========================================
 
+0.04  2018-11-30 09:45:00
+
+  * Fix uninitialized warning when header is undef
+
 0.01  2018-11-28 16:52:00
 
   * initial release

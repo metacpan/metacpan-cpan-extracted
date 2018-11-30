@@ -14,11 +14,18 @@
     <aside id="left" class="col-lg-4 col-md-4 col-sm-5 col-xs-12 scrollable " ng-class="{'hidden-xs':!showT}" role="complementary">
       <div class="navbar navbar-default">
         <div class="navbar-collapse">
-          <ul class="nav navbar-nav">
-            <li><a id="a-users" href="#"><i class="glyphicon glyphicon-user"></i> {{translate('users')}}</a></li>
-            <li><a id="a-ip" href="#/ipAddr"><i class="glyphicon glyphicon-sort-by-order"></i> {{translate('ipAddresses')}}</a></li>
-            <li><a id="a-multi" href="#/doubleIp"><i class="glyphicon glyphicon-exclamation-sign"></i> {{translate('multiIp')}}</a></li>
-            <li><a id="a-multi" href="#/persistent"><i class="glyphicon glyphicon-exclamation-sign"></i> {{translate('persistent')}}</a></li>
+          <ul class="nav navbar-nav" role="grid">
+            <li uib-dropdown>
+              <a id="navsso" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-user"></i> {{translate('ssoSessions')}} <span class="caret"></span></a>
+              <ul uib-dropdown-menu aria-labelled-by="navsso">
+                <li><a id="a-users" href="#" role="row"><i class="glyphicon glyphicon-user"></i> {{translate('users')}}</a></li>
+                <li><a id="a-ip" href="#!/ipAddr" role="row"><i class="glyphicon glyphicon-sort-by-order"></i> {{translate('ipAddresses')}}</a></li>
+                <li><a id="a-multi" href="#!/doubleIp" role="row"><i class="glyphicon glyphicon-exclamation-sign"></i> {{translate('multiIp')}}</a></li>
+                <li><a id="a-starttime" href="#!/_startTime" role="row"><i class="glyphicon glyphicon-hourglass"></i> {{translate('_startTime')}}</a></li>
+                <li><a id="a-updatetime" href="#!/_updateTime" role="row"><i class="glyphicon glyphicon-hourglass"></i> {{translate('_updateTime')}}</a></li>
+              </ul>
+            </li>
+            <li><a id="a-persistent" href="#!/persistent" role="row"><i class="glyphicon glyphicon-lock"></i> {{translate('persistentSessions')}}</a></li>
           </ul>
         </div>
       </div>
@@ -41,16 +48,16 @@
     <!-- Right(main) div -->
     <div id="right" class="col-lg-8 col-md-8 col-sm-7 col-xs-12 scrollable" ng-class="{'hidden-xs':showT&&!showM}">
       <!-- Menu buttons -->
-      <div class="lmmenu navbar navbar-default" ng-class="{'hidden-xs':!showM}">
+      <div ng-if="currentSession" class="lmmenu navbar navbar-default" ng-class="{'hidden-xs':!showM}">
         <div class="navbar-collapse" ng-class="{'collapse':!showM}" id="formmenu">
           <ul class="nav navbar-nav">
             <li ng-if="currentSession" ng-repeat="button in menu.session" ng-include="'menubutton.html'"></li>
             <li ng-if="currentSession===null" ng-repeat="button in menu.home" ng-include="'menubutton.html'"></li>
             <li uib-dropdown class="visible-xs">
               <a id="langmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Menu <span class="caret"></span></a>
-              <ul uib-dropdown-menu aria-labelled-by="langmenu">
-                <li ng-repeat="link in links"><a href="{{link.target}}"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
-                <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
+              <ul uib-dropdown-menu aria-labelled-by="langmenu" role="grid">
+                <li ng-repeat="link in links"><a href="{{link.target}}" role="row"><i ng-if="link.icon" class="glyphicon glyphicon-{{link.icon}}"></i> {{translate(link.title)}}</a></li>
+                <li ng-repeat="menulink in menulinks"><a href="{{menulink.target}}" role="row"><i ng-if="menulink.icon" class="glyphicon glyphicon-{{menulink.icon}}"></i> {{translate(menulink.title)}}</a></li>
                 <li ng-include="'languages.html'"></li>
               </ul>
             </li>
@@ -84,9 +91,18 @@
       </table>
     </div>
     <div ng-if="!node.nodes">
-      <th>{{translate(node.title)}}</th>
-      <td><tt>${{node.title}}</tt></td>
-      <td><span id="v-{{node.title}}">{{node.value}}</td>
+       <th ng-if="node.td!='1' && node.td!='2'">{{translate(node.title)}}</th>
+       <td class="data-{{node.epoch}}" ng-if="node.td>='1'">{{node.title}}</td>
+       <th ng-if="node.title=='type' || node.title=='rp'">{{translate(node.value)}}</th>
+       <td class="col-md-4 data-{{node.epoch}}" ng-if="node.title!='type' && node.title!='rp'">{{node.value}}</td>
+       <th ng-if="node.title=='type' || node.title=='rp'">{{translate(node.epoch)}}</th>
+       <td class="col-md-4 data-{{node.epoch}}" ng-if="node.epoch > 1500000000">{{localeDate(node.epoch)}}</td>
+       <td class="data-{{node.epoch}}">
+	      <span ng-if="node.td=='2'" class="link text-danger glyphicon glyphicon-minus-sign" ng-click="deleteOIDCConsent(node.title, node.epoch)"></span>
+		  <!--
+		  <span ng-if="$last && ( node.title=='TOTP' || node.title=='UBK' || node.title=='U2F' )" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newRule'})"></span>
+		  -->
+       </td>
     </div>
   </script>
 
@@ -96,7 +112,7 @@
         <a id="a-{{node.value}}" class="btn btn-node btn-sm" ng-click="stoggle(this)">
           <span class="glyphicon" ng-class="{'glyphicon-chevron-right': collapsed,'glyphicon-chevron-down': !collapsed}"></span>
         </a>
-        <span id="s-{{node.value}}" ng-click="stoggle(this)">{{node.value}} <span class="badge">{{node.count}}</span></span>
+        <span id="s-{{node.value}}" ng-click="stoggle(this)">{{node.title || node.value}} <span class="badge">{{node.count}}</span></span>
       </span>
       <span ng-if="node.session">
         <a class="btn btn-node btn-sm" ng-click="displaySession(this)">

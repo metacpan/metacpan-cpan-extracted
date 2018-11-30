@@ -1,4 +1,5 @@
 package Pod::Tree::HTML;
+use 5.006;
 use strict;
 use warnings;
 
@@ -19,7 +20,7 @@ use Pod::Tree::HTML::LinkMap;
 use constant BGCOLOR => '#ffffff';
 use constant TEXT    => '#000000';
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 sub new {
 	my ( $class, $source, $dest, %options ) = @_;
@@ -190,7 +191,7 @@ sub _make_title {
 	my $node1;
 	my $i = 0;
 	for my $child (@$children) {
-		is_pod $child or next;
+		$child->is_pod or next;
 		$i++ and $node1 = $child;
 		$node1 and last;
 	}
@@ -227,8 +228,8 @@ sub _emit_toc_1 {
 
 	while (@$nodes) {
 		my $node = $nodes->[0];
-		is_c_head2 $node and $html->_emit_toc_2($nodes), next;
-		is_c_head1 $node and $html->_emit_toc_item($node);
+		$node->is_c_head2 and $html->_emit_toc_2($nodes), next;
+		$node->is_c_head1 and $html->_emit_toc_item($node);
 		shift @$nodes;
 	}
 
@@ -243,8 +244,8 @@ sub _emit_toc_2 {
 
 	while (@$nodes) {
 		my $node = $nodes->[0];
-		is_c_head1 $node and last;
-		is_c_head2 $node and $html->_emit_toc_item($node);
+		$node->is_c_head1 and last;
+		$node->is_c_head2 and $html->_emit_toc_item($node);
 		shift @$nodes;
 	}
 
@@ -1073,7 +1074,7 @@ less flexible than the C<url> method
 
 =item *
 
-supported for backwards compatability with 
+supported for backwards compatibility with
 older versions of C<Pod::Tree::HTML>
 
 =back

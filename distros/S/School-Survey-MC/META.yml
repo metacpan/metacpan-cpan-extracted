@@ -1,0 +1,30 @@
+---
+abstract: 'pick multiple choice questions randomly'
+author:
+  - 'Boris Däppen <bdaeppen.perl@gmail.com>'
+build_requires:
+  Test::Script: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: School-Survey-MC
+requires:
+  Data::Dumper: '0'
+  HTML::Entities: '0'
+  YAML::Tiny: '0'
+  feature: '0'
+  perl: v5.6.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  homepage: https://gitlab.com/borisdaeppen/school-survey-mc
+  repository: git://gitlab.com/borisdaeppen/school-survey-mc.git
+version: '0.001'
+x_generated_by_perl: v5.22.4
+x_serialization_backend: 'YAML::Tiny version 1.70'

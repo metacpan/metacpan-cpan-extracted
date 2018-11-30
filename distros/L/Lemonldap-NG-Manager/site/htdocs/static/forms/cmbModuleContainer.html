@@ -1,0 +1,44 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th width="25%" trspan="name"></th>
+        <th width="25%" trspan="type"></th>
+        <th width="35%" trspan="use"></th>
+        <th />
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="s in currentNode.nodes">
+        <td>
+          <input class="form-control" ng-model="s.title" />
+        </td>
+        <td>
+          <select class="form-control" ng-model="s.data.type" ng-change="execFilters(_findScopeByKey('authParams'))">
+            <option ng-repeat="item in currentNode.select" ng-selected="item.k==s.data.type" value="{{item.k}}">{{item.v}}</option>
+          </select>
+        </td>
+        <td>
+          <select class="form-control" ng-model="s.data.for">
+            <option value="0" ng-selected="s.data.for==0" trspan="authAndUserdb">
+            <option value="1" ng-selected="s.data.for==1" trspan="authOnly">
+            <option value="2" ng-selected="s.data.for==2" trspan="userdbOnly">
+          </select>
+        </td>
+        <td>
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newCmbMod'})"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newCmbMod",
+  "icon": "plus-sign"
+}]
+</script>

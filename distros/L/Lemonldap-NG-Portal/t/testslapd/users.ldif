@@ -1,0 +1,36 @@
+dn: dc=example,dc=com
+objectClass: top
+objectClass: organization
+objectClass: dcObject
+dc: example
+o: Example
+
+dn: ou=users,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+dn: uid=dwho,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: dwho
+cn: Dr Who
+sn: Who
+mail: dwho@badwolf.org
+userPassword: dwho
+
+dn: uid=french,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: french
+cn:: RnLDqWTDqXJpYyBBY2NlbnRz
+sn: Accents
+mail: french@badwolf.org
+userPassword: french
+
+dn: uid=russian,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: russian
+cn:: 0KDRg9GB0YHQutC40Lk=
+sn:: 0KDRg9GB0YHQutC40Lk=
+mail: russian@badwolf.org
+userPassword: russian
+

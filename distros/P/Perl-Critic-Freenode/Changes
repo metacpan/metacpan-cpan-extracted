@@ -1,3 +1,14 @@
+0.028     2018-11-29 19:32:49 EST
+  - Split out lower severity violations from DiscouragedModules policy into a
+    new PreferredAlternatives policy. Perl::Critic does not support filtering
+    individual violations by severity, only policies, so this will allow
+    separately configuring and filtering these violations.
+  - Fixed DiscouragedModules and DeprecatedFeatures policy violations to report
+    severity as configured.
+  - Fixed DeprecatedFeatures to avoid false positives on method calls with the
+    same name as autoderef functions.
+  - Added /\C/, chdir(''), and bare here-docs to DeprecatedFeatures policy.
+
 0.027     2018-06-20 20:17:06 EDT
   - Add LoopOnHash policy
 

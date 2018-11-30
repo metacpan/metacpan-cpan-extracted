@@ -4,9 +4,6 @@ App::DBBrowser::DB::SQLite;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
-
-#our $VERSION = '';
 
 use Encode                qw( encode decode );
 use File::Find            qw( find );

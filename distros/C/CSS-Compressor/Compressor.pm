@@ -7,7 +7,7 @@ use Exporter qw( import );
 
 our @EXPORT_OK = qw( css_compress );
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our $MARKER;
 
@@ -73,6 +73,11 @@ sub css_compress {
                ( -1 + push @comments => $1 ).'___*/'
              !sogex;
 
+    # preserve urls to prevent breaking inline SVG for example
+    $css =~ s! ( url \( (?: [^()] | (?1) )* \) ) !
+        '___'.$MARKER.'_PRESERVED_TOKEN_'.(-1+push @tokens => $1).'___'
+        !gxe;
+
     # preserve strings so their content doesn't get accidentally minified
     $css =~ s! " ( [^"\\]*(?:\\.[^"\\]*)* ) " !
         $_ = $1,
@@ -101,6 +106,7 @@ sub css_compress {
     # ! in the first position of the comment means preserve
     # so push to the preserved tokens while stripping the !
     0 == index $_->[1] => '!'
+      and -1 == index $_->[1] => '! @noflip'
       and
         $css =~ s!___${MARKER}_PRESERVE_CANDIDATE_COMMENT_$_->[0]___!
                  '___'.$MARKER.'_PRESERVED_TOKEN_'.(-1+push @tokens => $_->[1]).'___'!e
@@ -151,6 +157,16 @@ sub css_compress {
               $_
              !xe;
 
+    # Similarly, don't strip spaces around addition within calc(10px + 10px) -
+    # swap out any calc()-related plus symbol to a token, and then swap back.
+    # Recursive regular expression is needed to match nested brackets, for
+    # example: `calc(10px + var(--foo))`.
+    $css =~ s!calc(\((?:[^()]|(?1))*\))!
+              $_ = $1,
+              s/\+/___${MARKER}_CALCADDITIONSYMBOL___/go,
+              "calc$_"
+             !gxe;
+
     # Remove spaces before the things that should not have spaces before them.
     $css =~ s/ +([!{};:>+()\],])/$1/g;
 
@@ -169,10 +185,15 @@ sub css_compress {
 
     # Put the space back in some cases, to support stuff like
     # @media screen and (-webkit-min-device-pixel-ratio:0){
+    # @supports((display: flex) or (display: -webkit-flex))
     $css =~ s! \b and \( !and (!gx;
+    $css =~ s! \b or \( !or (!gx;
 
     # Remove the spaces after the things that should not have spaces after them.
     $css =~ s/([!{},;:>+(\[]) +/$1/g;
+
+    # Swap back the plus sign from calc() addition.
+    $css =~ s!___${MARKER}_CALCADDITIONSYMBOL___!+!go;
 
     # Replace 0.6 to .6, but only when preceded by :
     $css =~ s!:0+\.([0-9]+)!:.$1!g;

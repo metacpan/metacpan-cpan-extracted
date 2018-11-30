@@ -17,6 +17,10 @@ BEGIN {
     use_ok( "Data::RecordStore" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
 }
 
+my $is_windows = $^O eq 'MSWin32';
+
+diag "running tests on $^O";
+
 # -----------------------------------------------------
 #               init
 # -----------------------------------------------------
@@ -123,16 +127,17 @@ sub test_open {
     #
     # Test directory that can't be written to
     #
-    $dir = tempdir( CLEANUP => 1 );
-    chmod 0666, $dir;
-    eval {
-        $store = Data::RecordStore::open_store( $dir );
-        fail( "Was able to open store in unwritable directory" );
-    };
+    unless( $is_windows ) {
+        $dir = tempdir( CLEANUP => 1 );
+        chmod 0666, $dir;
+        eval {
+            $store = Data::RecordStore::open_store( $dir );
+            fail( "Was able to open store in unwritable directory" );
+        };
 
-    is( ENOENT, 2, "could not write to unwritable directory" );
-    chmod 0755, $dir;
-
+        is( ENOENT, 2, "could not write to unwritable directory" );
+        chmod 0755, $dir;
+    }
 
 } #test_open
 
@@ -195,7 +200,7 @@ sub test_stow_and_fetch_and_delete {
     is( $store->_get_silo( 13 )->entry_count, 1, "one records in silo 13" );
     is( $store->_get_silo( 14 )->entry_count, 1, "one records in silo 14" );
 
-    {
+    unless( $is_windows ) {
         local( *STDERR );
         my $out;
         open( STDERR, ">>", \$out );
@@ -226,14 +231,16 @@ sub test_stow_and_fetch_and_delete {
     $store->delete_record( 54 );
     is( $store->active_entry_count, 2, "now 2 active record after trying to delete out of bounds record" );
 
-    chmod 0444, "$dir/silos/12_RECSTORE/0";
-    eval {
-        $store->empty;
-        fail( "Was able to unlink store with unwriteable file" );
-    };
-    like( $@, qr/Unable to empty silo/, "unable to open" );
+    unless( $is_windows ) {
+        chmod 0444, "$dir/silos/12_RECSTORE/0";
+        eval {
+            $store->empty;
+            fail( "Was able to unlink store with unwriteable file" );
+        };
+        like( $@, qr/Unable to empty silo/, "unable to open" );
 
-    chmod 0666, "$dir/silos/12_RECSTORE/0";
+        chmod 0666, "$dir/silos/12_RECSTORE/0";
+    }
 
     $dir = tempdir( CLEANUP => 1 );
     $store = Data::RecordStore->open_store( $dir );

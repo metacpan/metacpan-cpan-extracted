@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008000;
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,17 +14,17 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Catalyst-Plugin-Statsd",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008000",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Catalyst::Plugin::Statsd",
   "PREREQ_PM" => {
-    "Catalyst::Runtime" => 0,
+    "Catalyst" => "5.90123",
     "Moose::Role" => 0,
     "Plack::Middleware::Statsd" => 0,
     "Ref::Util" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
-    "Catalyst" => 0,
+    "Catalyst" => "5.90123",
     "Catalyst::Controller" => 0,
     "Catalyst::Test" => 0,
     "File::Spec" => 0,
@@ -32,12 +32,13 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Moose" => 0,
     "Net::Statsd::Tiny" => "0.3.0",
+    "Term::Size::Any" => 0,
     "Test::Log::Dispatch" => 0,
     "Test::More" => 0,
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.3.0",
+  "VERSION" => "v0.4.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,9 +46,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Catalyst" => 0,
+  "Catalyst" => "5.90123",
   "Catalyst::Controller" => 0,
-  "Catalyst::Runtime" => 0,
   "Catalyst::Test" => 0,
   "File::Spec" => 0,
   "Module::Metadata" => 0,
@@ -57,6 +57,7 @@ my %FallbackPrereqs = (
   "Net::Statsd::Tiny" => "0.3.0",
   "Plack::Middleware::Statsd" => 0,
   "Ref::Util" => 0,
+  "Term::Size::Any" => 0,
   "Test::Log::Dispatch" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,

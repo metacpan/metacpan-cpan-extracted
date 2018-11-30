@@ -1,6 +1,10 @@
 Revision history for HTTP::Accept
 =================================
 
+0.03  2018-11-30 09:41:00
+
+  * Fix uninitialized warning when header is undefined
+
 0.02  2018-11-29 08:06:00
 
   * Fix Changes file

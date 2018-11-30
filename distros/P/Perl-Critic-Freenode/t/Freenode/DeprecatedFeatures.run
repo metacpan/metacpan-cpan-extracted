@@ -27,6 +27,7 @@ defined $foo;
 defined $foo[0];
 defined $foo{bar};
 defined &foo;
+$obj->defined(@foo);
 foo ? bar ? 'foo' : 'bar' : 'baz';
 foo ? bar ? foo : bar : baz;
 $foo =~ m?foo?;
@@ -51,13 +52,28 @@ shift(@{$foo->{bar}[5]});
 shift $foo->{bar}[5]->@*;
 shift;
 shift();
+Foo->shift($foo);
 require Foo::Bar;
 use Foo::Bar;
 no Foo::Bar;
 require '::Foo::Bar.pm';
+qr/\cT\\C/;
+m/\cT\\C/;
+chdir;
+chdir();
+chdir 'foo';
+chdir(getcwd);
+<< 'foo';
+foo
+<<'';
+
+<<foo;
+foo
+foo << (bar);
+foo << +bar;
 
 ## name BadFeatures
-## failures 42
+## failures 51
 ## cut
 
 $[ = 1;
@@ -104,6 +120,19 @@ values $ref;
 require ::Foo::Bar;
 use ::Foo::Bar;
 no ::Foo::Bar;
+qr/\C/;
+m/\C/;
+chdir '';
+chdir(qq());
+chdir undef();
+<<;
+
+(<<);
+
+{<<}
+
+<< . bar;
+
 
 ## name POSIXDeprecations
 ## failures 12

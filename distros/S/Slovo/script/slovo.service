@@ -17,10 +17,10 @@ WantedBy=multi-user.target
 
 [Service]
 WorkingDirectory=/home/$USER/opt/slovo/bin
+Restart=always
+Type=forking
 User=$USER
 Group=$USER
-Type=forking
-Restart=always
 SyslogIdentifier=slovo
 PIDFile=/home/$USER/opt/slovo/bin/slovo.pid
 ExecStart=/home/$USER/opt/slovo/bin/hypnotoad slovo

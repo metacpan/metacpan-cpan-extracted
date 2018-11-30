@@ -1,0 +1,258 @@
+/* Tree */
+
+.tree-node {
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+.tree-node-default {
+  background: #fff;
+}
+.angular-ui-tree-handle {
+  cursor: pointer;
+  /* Uncomment this if you have many virtualhosts */
+  /*height:1.8em;
+  margin: 0;*/
+}
+
+/* Modal windows */
+.modal-p,
+.main-modal-ui,
+.modal-ui {
+  /* TODO */
+}
+
+#pleaseWait {
+  background-color: #fff;
+  width: 100%;
+  min-height: 9.9%;
+  height: auto;
+  z-index: 5000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 30% 20%;
+  text-align: center;
+  opacity: 0.8;
+  filter: alpha(opacity=80);
+  /* For IE8 and earlier */
+}
+
+/* Tables */
+
+.panel .table th {
+  width: 10%;
+  vertical-align: middle;
+}
+
+/* Category tree */
+ul.cat-tree {
+  list-style-type: square;
+}
+
+p.cat-tree-category {
+  font-weight: bold;
+}
+
+/* Main window */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background: radial-gradient(circle at 50% 0% ,  #fff 0%, #ddd 100%) no-repeat scroll 0% 0% #ddd;
+}
+header#navbar {
+  height: 9vh;
+  margin-bottom: 1vh;
+  padding-bottom: 0vh;
+}
+#content {
+  max-height: 86vh;
+  height: 86vh;
+  margin: 0px;
+  padding: 0px;
+  position: relative;
+}
+
+/* Navbar Brand */
+
+header#navbar .navbar-brand {
+  padding: 10px 15px;
+}
+
+header#navbar .navbar-brand img {
+  background: #FFFFFF;
+}
+
+/* Form elements */
+
+textarea {
+  width: 100%;
+}
+
+textarea#privateKey, textarea#publicKey, textarea#filetext {
+  font-size: 8pt;
+}
+
+dl,
+.panel {
+  margin-bottom: 8px;
+}
+.panel-body {
+  padding: 5px;
+}
+.input-group-solid {
+  border: 1px solid #CCC;
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+.input-group > .input-group-solid:last-child {
+  border-bottom-left-radius: 0px;
+  border-top-left-radius: 0px;
+}
+
+#cfgnum {
+  position: relative;
+}
+#cfgnum.label-warning:hover:after {
+  content: attr(comment);
+  padding: 4px 8px;
+  color: rgba(0,0,0,0.5);
+  position: absolute;
+  left: 100%;
+  bottom: 100%;
+  white-space: nowrap;
+  z-index: 2;
+  border-radius: 5px ;
+  background: #F0AD4E;
+}
+
+/* Menu */
+
+.link {
+  cursor: pointer;
+}
+
+/* Documentation */
+#bottom .panel {
+  height: 100%;
+  margin-top: 8px;
+}
+
+#bottom .panel-body {
+  height: 100%;
+}
+
+#right {
+  display: flex;
+  flex-direction: column;
+}
+
+#bottom {
+  flex: 1;
+}
+
+/* Resizable and scrollable elements */
+
+@media (min-width: 768px) {
+  .scrollable-sm {
+    max-height: 86vh !important;
+    overflow: auto;
+  }
+  #right,
+  #left {
+    max-height: 86vh !important;
+    height: 86vh;
+  }
+  #top {
+    /*height: 43vh;*/
+    overflow-x: hidden;
+  }
+  #bottom {
+    height: 43vh;
+    overflow: hidden;
+  }
+}
+#top,
+#bottom,
+#right,
+#left {
+  position: relative;
+}
+@media (max-width: 767px) {
+  #right {
+    position: absolute;
+    top:0;
+    z-index:1000;
+  }
+  .lmmenu {
+    position: static;
+    float: left;
+    width: 100%;
+    min-height: 200px;
+    margin-top: 0;
+    border: 1px solid #ccc;
+            box-shadow: none;
+  }
+  #content {
+    position: relative;
+  }
+}
+.scrollable {
+  overflow: auto;
+}
+.container {
+  padding-bottom: 15px;
+}
+.hresizer {
+  position: absolute;
+  width: 6px;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  background-color: #EEE;
+  cursor: e-resize;
+}
+.vresizer {
+  position: absolute;
+  height: 6px;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  background-color: #EEE;
+  cursor: n-resize;
+}
+.angular-ui-tree-empty {
+  min-height: auto;
+  border: none;
+}
+.old {
+  color: #A00;
+}
+.new {
+  color: #0A0;
+}
+
+/* Some specific styles */
+.maxw {
+  width: 100%;
+}
+.center {
+  text-align: center;
+}
+
+.backgrounddiv {
+  margin-top: 10px;
+}
+.llcontainer {
+  position: relative;
+  margin-bottom: 10px;
+}
+.navbar-nav li {
+ line-height: 50px;
+}

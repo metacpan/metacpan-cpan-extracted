@@ -5,7 +5,8 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 6;
+use Test::More tests => 5;
+require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
 #########################
@@ -21,12 +22,10 @@ ok(
     ),
     'new fake jail object'
 );
-$jail->build_jail();
+$jail->build_jail('Lemonldap::NG::Handler::Test');
 
-my $sub1 = "sub { return( basic('login','password') ) }";
-my $basic;
-ok( $basic = $jail->jail_reval($sub1), 'Compilation succeed' )
-  or print STDERR $jail->error . "\n";
+my $sub1  = "sub { return( basic('login','password') ) }";
+my $basic = $jail->jail_reval($sub1);
 like(
     &$basic,
     '/^Basic bG9naW46cGFzc3dvcmQ=$/',

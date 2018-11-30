@@ -27,12 +27,12 @@ do { my $x = {
                                         'Ref::Util::XS' => '0'
                                       },
                       'requires' => {
-                                      'Catalyst::Runtime' => '0',
+                                      'Catalyst' => '5.90123',
                                       'Moose::Role' => '0',
                                       'Plack::Middleware::Statsd' => '0',
                                       'Ref::Util' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.8.0'
+                                      'perl' => 'v5.10.1'
                                     }
                     },
        'test' => {
@@ -40,7 +40,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Catalyst' => '0',
+                                   'Catalyst' => '5.90123',
                                    'Catalyst::Controller' => '0',
                                    'Catalyst::Test' => '0',
                                    'File::Spec' => '0',
@@ -48,6 +48,7 @@ do { my $x = {
                                    'Moo' => '0',
                                    'Moose' => '0',
                                    'Net::Statsd::Tiny' => 'v0.3.0',
+                                   'Term::Size::Any' => '0',
                                    'Test::Log::Dispatch' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',

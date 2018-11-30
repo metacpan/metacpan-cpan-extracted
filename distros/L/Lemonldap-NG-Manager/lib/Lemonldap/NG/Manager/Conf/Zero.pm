@@ -1,5 +1,7 @@
 package Lemonldap::NG::Manager::Conf::Zero;
 
+our $VERSION = '2.0.0';
+
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir ) = @_;
     $domain               ||= 'example.com';
@@ -9,7 +11,7 @@ sub zeroConf {
     return {
         'timeout'             => 72000,
         'loginHistoryEnabled' => 1,
-        'userDB'              => 'Demo',
+        'userDB'              => 'Same',
         'applicationList'     => {
             '2administration' => {
                 'manager' => {
@@ -106,7 +108,8 @@ sub zeroConf {
         },
         'macros' => {
             '_whatToTrace' =>
-              '$_auth eq \'SAML\' ? "$_user\\@$_idpConfKey" : "$_user"'
+'$_auth eq \'SAML\' ? "$_user\\@$_idpConfKey" : $_auth eq \'OpenIDConnect\' ? "$_user\\@$_oidcConnectedRP" : "$_user"',
+            'UA' => '$ENV{HTTP_USER_AGENT}'
         },
         'notificationStorageOptions' => {
             'dirName' => $notificationDir
@@ -126,7 +129,7 @@ sub zeroConf {
             'LockDirectory' => "$persistentSessionDir/lock"
         },
         'reloadUrls' => {
-            "reload.$domain" => "http://reload.$domain/reload"
+            "localhost" => "http://reload.$domain/reload"
         },
         'sessionDataToRemember' => {},
         'notification'          => 1,
@@ -140,7 +143,7 @@ sub zeroConf {
             }
         },
         'registerDB'          => 'Demo',
-        'registerUrl'         => "http://auth.$domain/register.pl",
+        'registerUrl'         => "http://auth.$domain/register",
         'portal'              => "http://auth.$domain/",
         'notificationStorage' => 'File',
         'locationRules'       => {
@@ -153,7 +156,7 @@ sub zeroConf {
                 '^/logout' => 'logout_sso'
             },
             "manager.$domain" => {
-                'default'                                  => '$uid eq "dwho"',
+                'default' => '$uid eq "dwho" or $uid eq "rtyler"',
                 '(?#Configuration)^/(manager\.html|conf/)' => '$uid eq "dwho"',
                 '(?#Sessions)/sessions' => '$uid eq "dwho" or $uid eq "rtyler"',
                 '(?#Notifications)/notifications' =>
@@ -164,13 +167,12 @@ sub zeroConf {
         'securedCookie' => 0,
         'cookieName'    => 'lemonldap',
         'cfgAuthor'     => 'The LemonLDAP::NG team',
-        'exportedVars'  => {
-            'UA' => 'HTTP_USER_AGENT'
-        },
-        'portalSkin' => 'bootstrap',
+        'cfgVersion'    => $VERSION,
+        'exportedVars'  => {},
+        'portalSkin'    => 'bootstrap',
         'portalSkinBackground' =>
           '1280px-Cedar_Breaks_National_Monument_partially.jpg',
-        'mailUrl'                    => "http://auth.$domain/mail.pl",
+        'mailUrl'                    => "http://auth.$domain/resetpwd",
         'localSessionStorage'        => 'Cache::FileCache',
         'localSessionStorageOptions' => {
             'namespace'          => 'lemonldap-ng-sessions',

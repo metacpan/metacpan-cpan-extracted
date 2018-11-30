@@ -1,4 +1,5 @@
 package Pod::Tree::PerlPod;
+use 5.006;
 use strict;
 use warnings;
 use File::Find;
@@ -7,7 +8,7 @@ use IO::File;
 use Pod::Tree::HTML;
 use Pod::Tree::PerlUtil;
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 use base qw(Pod::Tree::PerlUtil);
 

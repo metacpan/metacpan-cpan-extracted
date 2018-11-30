@@ -1,11 +1,12 @@
 package Pod::Tree::PerlFunc;
+use 5.006;
 use strict;
 use warnings;
 use Pod::Tree;
 use Pod::Tree::HTML;
 use Pod::Tree::PerlUtil;
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 use base qw(Pod::Tree::PerlUtil);
 
@@ -110,7 +111,7 @@ sub add_links {
 sub _add_links {
 	my ( $perl_func, $node ) = @_;
 
-	is_sequence $node or return 1;
+	$node->is_sequence or return 1;
 	$node->get_letter eq 'C' or return 1;
 
 	my ($func) = Parse_Name($node);

@@ -3,9 +3,8 @@ package App::DBBrowser;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
-our $VERSION = '2.030';
+our $VERSION = '2.031';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -18,8 +17,6 @@ use File::Which    qw( which );
 
 use Term::Choose     qw( choose );
 use Term::TablePrint qw( print_table );
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI'; #
 
 #use App::DBBrowser::AttachDB;    # 'require'-d
 use App::DBBrowser::Auxil;
@@ -699,7 +696,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.030
+Version 2.031
 
 =head1 DESCRIPTION
 

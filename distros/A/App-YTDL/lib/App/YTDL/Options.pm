@@ -18,10 +18,8 @@ use Term::Choose       qw( choose );
 use Term::Choose::Util qw( print_hash choose_a_dir choose_a_file choose_a_number settings_menu insert_sep );
 use Term::Form         qw();
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-
 use App::YTDL::ChooseVideos qw( set_sort_videolist );
-use App::YTDL::Helper       qw( write_json read_json uni_capture HIDE_CURSOR SHOW_CURSOR check_mapping_stdout );
+use App::YTDL::Helper       qw( write_json read_json uni_capture HIDE_CURSOR SHOW_CURSOR );
 
 
 sub _show_info {
@@ -30,6 +28,7 @@ sub _show_info {
     if ( ! eval { $youtube_dl_version = uni_capture( @{$opt->{youtube_dl}}, '--version' ); 1 } ) {
         $youtube_dl_version = $@;
     }
+    chomp $youtube_dl_version;
     eval {
         $ffmpeg_version = uni_capture( $opt->{ffmpeg}, '-version' );
         if ( $ffmpeg_version && $ffmpeg_version =~ /^ffmpeg version (\S+)/m ) {
@@ -48,26 +47,27 @@ sub _show_info {
             $ffprobe_version = '';
         }
     };
-    my $version     = '  version  ';
-    my $bin         = '    bin    ';
-    my $video_dir   = ' video dir ';
-    my $config_dir  = 'config dir ';
-    my $youtube_dl  = 'youtube-dl ';
-    my $ffmpeg      = '  ffmpeg   ';
-    my $ffprobe     = '  ffprobe  ';
-    my $path = {
-        $version     => $main::VERSION,
-        $bin         => catfile( $RealBin, $RealScript ),
-        $video_dir   => $opt->{video_dir},
-        $config_dir  => $opt->{config_dir},
-        $youtube_dl  => $youtube_dl_version // 'error',
-        $ffmpeg      => $ffmpeg_version,
-        $ffprobe     => $ffprobe_version,
-    };
-    my $keys = [ $bin, $version, $video_dir, $config_dir, $youtube_dl ];
-    push @$keys, $ffmpeg  if $ffmpeg_version;
-    push @$keys, $ffprobe if $ffprobe_version;
-    print_hash( $path, { keys => $keys, preface => ' Close with ENTER' } );
+    my $info = '';
+    $info .= "Video dir: $opt->{video_dir}"   . "\n";
+    $info .= "Config dir: $opt->{video_dir}"  . "\n";
+    $info .= catfile( $RealBin, $RealScript ) . ": ";
+    $info .= $main::VERSION                   . "\n";
+    $info .= $opt->{youtube_dl}[0]            . ": ";
+    $info .= ( $youtube_dl_version // '?' )   . "\n";
+
+    if ( $opt->{ffmpeg} ) {
+        $info .= $opt->{ffmpeg} . ": ";
+        $info .= ( $ffmpeg_version // '?' );
+        $info .= "\n";
+    }
+    if ( $opt->{ffprobe} ) {
+        $info .= $opt->{ffprobe} . ": ";
+        $info .= ( $ffprobe_version // '?' );
+        $info .= "\n";
+    }
+    $info =~ s/\n/\n\n/g;
+    chomp $info;
+    choose( [ 'Close' ], { prompt => "\n$info" } );
 }
 
 
@@ -250,7 +250,7 @@ sub set_options {
                 }
                 if ( @capture ) {
                     choose(
-                        [ map { '  ' . check_mapping_stdout( $opt, decode( 'UTF_8', $_ ) ) } @capture ],
+                        [ map { '  ' . decode( 'UTF-8', $_ ) } @capture ],
                         { layout => 3 }
                     );
                 }

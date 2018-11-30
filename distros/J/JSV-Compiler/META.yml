@@ -4,6 +4,7 @@ author:
   - 'Anton Petrusevich'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  JSON: '2.91'
   Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,7 +23,7 @@ requires:
   Data::Dumper: '0'
   JSON: '0'
   JSON::Pointer: '0'
-  List::Util: '0'
+  List::Util: '1.33'
   Path::Tiny: '0'
   Regexp::Common: '0'
   Regexp::Common::Email::Address: '0'
@@ -34,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/jef-sure/jsv-compilator/issues
   repository: https://github.com/jef-sure/jsv-compilator.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,10 +1,14 @@
 # please alpha sort config items as you add them
 
 severity = 4
-theme = core
+theme = core + compatibility
 verbose = %f: [%p] %m at line %l, column %c.\n
 
 [Objects::ProhibitIndirectSyntax]
+forbid = command code is_c_back is_c_begin is_c_cut is_c_for is_c_end is_c_head1 is_c_head2 is_c_head3 is_c_head4 is_c_item is_c_over is_c_pod is_code is_command is_for is_item is_letter is_link is_list is_ordinary is_pod is_root is_sequence is_text is_verbatim ordinary root verbatim letter sequence text target get_arg get_brackets get_children get_command get_domain get_item_type get_letter get_list_type get_page get_raw get_raw_kids get_section get_siblings get_target get_text get_type get_deep_text
+
+
+[Compatibility::PerlMinimumVersionAndWhy]
 severity = 5
 
 [-InputOutput::RequireBriefOpen]
@@ -17,3 +21,6 @@ severity = 5
 [-ValuesAndExpressions::ProhibitCommaSeparatedStatements]
 [-ValuesAndExpressions::ProhibitConstantPragma]
 [-Variables::RequireLocalizedPunctuationVars]
+
+[-Compatibility::ProhibitThreeArgumentOpen]
+

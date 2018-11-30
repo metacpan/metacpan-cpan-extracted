@@ -1,0 +1,53 @@
+---
+# This file is used together with Dist::Iller and
+# Dist::Iller::Config::Author::CSSON to generate
+# dist.ini and weaver.ini.
+doctype: dist
+
+header:
+  name: DBIx-Class-Smooth
+  author:
+    - Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2018
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.020000
+      - experimental
+      - parent
+      - boolean
+      - Carp
+      - DBIx::Class
+      - DBIx::Class::Candy
+      - DBIx::Class::Helpers
+      - List::SomeUtils
+      - List::Util
+      - Module::Loader
+      - Moo
+      - Safe::Isa
+      - Scalar::Util
+      - String::CamelCase
+      - Sub::Exporter::Progressive
+      - Syntax::Keyword::Try
+
+  test:
+    requires:
+      - DateTime
+      - Module::Load
+
+plugins:
+  - +config: Author::CSSON
+
+  - +remove_plugin: Test::Version
+  - +remove_plugin: PromptIfStale
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile

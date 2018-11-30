@@ -1,0 +1,348 @@
+package Lemonldap::NG::Portal::Auth::OpenIDConnect;
+
+use strict;
+use Mouse;
+use MIME::Base64 qw/encode_base64 decode_base64/;
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_ERROR
+  PE_IDPCHOICE
+  PE_OK
+);
+
+our $VERSION = '2.0.0';
+
+extends 'Lemonldap::NG::Portal::Main::Auth',
+  'Lemonldap::NG::Portal::Lib::OpenIDConnect';
+
+# INTERFACE
+
+has opList   => ( is => 'rw', default => sub { [] } );
+has opNumber => ( is => 'rw', default => 0 );
+has path     => ( is => 'rw', default => 'oauth2' );
+
+use constant sessionKind => 'OIDC';
+
+# INITIALIZATION
+
+sub init {
+    my ($self) = @_;
+
+    return 0 unless ( $self->loadOPs and $self->refreshJWKSdata );
+    my @tab = ( sort keys %{ $self->oidcOPList } );
+    unless (@tab) {
+        $self->logger->error("No OP configured");
+        return 0;
+    }
+    $self->opNumber( scalar @tab );
+    my @list = ();
+
+    my $portalPath = $self->conf->{portal};
+    $portalPath =~ s#^https?://[^/]+/?#/#;
+
+    foreach (@tab) {
+        my $name = $self->conf->{oidcOPMetaDataOptions}->{$_}
+          ->{oidcOPMetaDataOptionsDisplayName};
+        my $icon = $self->conf->{oidcOPMetaDataOptions}->{$_}
+          ->{oidcOPMetaDataOptionsIcon};
+        my $img_src;
+
+        if ($icon) {
+            $img_src =
+              ( $icon =~ m#^https?://# )
+              ? $icon
+              : $portalPath . $self->p->staticPrefix . "/common/" . $icon;
+        }
+
+        push @list,
+          {
+            val   => $_,
+            name  => $name,
+            icon  => $img_src,
+            class => "openidconnect",
+          };
+    }
+    $self->addRouteFromConf(
+        'Unauth',
+        oidcServiceMetaDataFrontChannelURI => 'alreadyLoggedOut',
+        oidcServiceMetaDataBackChannelURI  => 'backLogout',
+    );
+    $self->addRouteFromConf(
+        'Auth',
+        oidcServiceMetaDataFrontChannelURI => 'frontLogout',
+        oidcServiceMetaDataBackChannelURI  => 'backLogout',
+    );
+    $self->opList( [@list] );
+    return 1;
+}
+
+# RUNNING METHODS
+
+sub extractFormInfo {
+    my ( $self, $req ) = @_;
+
+    # Check callback
+    if ( $req->param( $self->conf->{oidcRPCallbackGetParam} ) ) {
+
+        $self->logger->debug(
+            'OpenIDConnect callback URI detected: ' . $req->uri );
+
+        # AuthN Response
+        my $state = $req->param('state');
+
+        # Restore state
+        if ($state) {
+            if ( $self->extractState( $req, $state ) ) {
+                $self->logger->debug("State $state extracted");
+            }
+            else {
+                $self->userLogger->error("Unable to extract state $state");
+                return PE_ERROR;
+            }
+        }
+
+        # Get OpenID Provider
+        my $op = $req->data->{_oidcOPCurrent};
+
+        unless ($op) {
+            $self->userLogger->error("OpenID Provider not found");
+            return PE_ERROR;
+        }
+
+        $self->logger->debug("Using OpenID Provider $op");
+
+        # Check error
+        my $error = $req->param("error");
+        if ($error) {
+            my $error_description = $req->param("error_description");
+            my $error_uri         = $req->param("error_uri");
+
+            $self->logger->error("Error returned by $op Provider: $error");
+            $self->logger->error("Error description: $error_description")
+              if $error_description;
+            $self->logger->error("Error URI: $error_uri") if $error_uri;
+
+            return PE_ERROR;
+        }
+
+        # Get access_token and id_token
+        my $code = $req->param("code");
+        my $auth_method =
+          $self->conf->{oidcOPMetaDataOptions}->{$op}
+          ->{oidcOPMetaDataOptionsTokenEndpointAuthMethod}
+          || 'client_secret_post';
+
+        my $content =
+          $self->getAuthorizationCodeAccessToken( $req, $op, $code,
+            $auth_method );
+        return PE_ERROR unless $content;
+
+        my $json = $self->decodeJSON($content);
+
+        if ( $json->{error} ) {
+            $self->logger->error( "Error in token response:" . $json->{error} );
+            return PE_ERROR;
+        }
+
+        # Check validity of token response
+        unless ( $self->checkTokenResponseValidity($json) ) {
+            $self->logger->error("Token response is not valid");
+            return PE_ERROR;
+        }
+        else {
+            $self->logger->debug("Token response is valid");
+        }
+
+        my $access_token = $json->{access_token};
+        my $id_token     = $json->{id_token};
+
+        $self->logger->debug("Access token: $access_token");
+        $self->logger->debug("ID token: $id_token");
+
+        # Verify JWT signature
+        if ( $self->conf->{oidcOPMetaDataOptions}->{$op}
+            ->{oidcOPMetaDataOptionsCheckJWTSignature} )
+        {
+            unless ( $self->verifyJWTSignature( $id_token, $op ) ) {
+                $self->logger->error("JWT signature verification failed");
+                return PE_ERROR;
+            }
+            $self->logger->debug("JWT signature verified");
+        }
+        else {
+            $self->logger->debug("JWT signature check disabled");
+        }
+
+        my $id_token_payload = $self->extractJWT($id_token)->[1];
+
+        my $id_token_payload_hash =
+          $self->decodeJSON( decode_base64($id_token_payload) );
+
+        # Check validity of Access Token (optional)
+        my $at_hash = $id_token_payload_hash->{at_hash};
+        if ($at_hash) {
+            unless ( $self->verifyHash( $access_token, $at_hash, $id_token ) ) {
+                $self->userLogger->error(
+                    "Access token hash verification failed");
+                return PE_ERROR;
+            }
+            $self->logger->debug("Access token hash verified");
+        }
+        else {
+            $self->logger->debug(
+                "No at_hash in ID Token, access token will not be verified");
+        }
+
+        # Check validity of ID Token
+        unless ( $self->checkIDTokenValidity( $op, $id_token_payload_hash ) ) {
+            $self->userLogger->error('ID Token not valid');
+            return PE_ERROR;
+        }
+        else {
+            $self->logger->debug('ID Token is valid');
+        }
+
+        # Get user id defined in 'sub' field
+        my $user_id = $id_token_payload_hash->{sub};
+
+        # Remember tokens
+        $req->data->{access_token} = $access_token;
+        $req->data->{id_token}     = $id_token;
+
+        $self->logger->debug( "Found user_id: " . $user_id );
+        $req->user($user_id);
+
+        return PE_OK;
+    }
+
+    # No callback, choose Provider and send authn request
+    my $op;
+
+    unless ( $op = $req->param("idp") ) {
+        $self->logger->debug("Redirecting user to OP list");
+
+        # Auto select provider if there is only one
+        if ( $self->opNumber == 1 ) {
+            $op = $self->opList->[0]->{val};
+            $self->logger->debug("Selecting the only defined OP: $op");
+        }
+
+        else {
+
+            # IDP list
+            my $portalPath = $self->{portal};
+            $portalPath =~ s#^https?://[^/]+/?#/#;
+
+            $req->data->{list}            = $self->opList;
+            $req->data->{confirmRemember} = 0;
+
+            $req->data->{login} = 1;
+            return PE_IDPCHOICE;
+        }
+    }
+
+    # Provider is choosen
+    $self->logger->debug("OpenID Provider $op choosen");
+
+    $req->data->{_oidcOPCurrent} = $op;
+
+    # AuthN Request
+    $self->logger->debug("Build OpenIDConnect AuthN Request");
+
+    # Save state
+    my $state = $self->storeState( $req, qw/urldc checkLogins _oidcOPCurrent/ );
+
+    # Authorization Code Flow
+    $req->urldc(
+        $self->buildAuthorizationCodeAuthnRequest( $req, $op, $state ) );
+
+    $self->logger->debug( "Redirect user to " . $req->{urldc} );
+    $req->continue(1);
+    $req->steps( [] );
+
+    return PE_OK;
+}
+
+sub authenticate {
+    PE_OK;
+}
+
+sub setAuthSessionInfo {
+    my ( $self, $req ) = @_;
+    my $op = $req->data->{_oidcOPCurrent};
+
+    $req->{sessionInfo}->{authenticationLevel} = $self->conf->{oidcAuthnLevel};
+
+    $req->{sessionInfo}->{_oidc_OP} = $op;
+    $req->{sessionInfo}->{_oidc_access_token} =
+      $req->data->{access_token};
+
+    # Keep ID Token in session
+    my $store_IDToken = $self->conf->{oidcOPMetaDataOptions}->{$op}
+      ->{oidcOPMetaDataOptionsStoreIDToken};
+    if ($store_IDToken) {
+        $self->logger->debug("Store ID Token in session");
+        $req->{sessionInfo}->{_oidc_id_token} = $req->data->{id_token};
+    }
+    else {
+        $self->logger->debug("ID Token will not be stored in session");
+    }
+
+    PE_OK;
+}
+
+sub authLogout {
+    my ( $self, $req ) = @_;
+
+    my $op = $req->{sessionInfo}->{_oidc_OP};
+
+    # Find endession endpoint
+    my $endsession_endpoint =
+      $self->oidcOPList->{$op}->{conf}->{end_session_endpoint};
+
+    if ($endsession_endpoint) {
+        my $logout_url = $self->conf->{portal} . '?logout=1';
+        $req->urldc(
+            $self->buildLogoutRequest(
+                $endsession_endpoint, $req->{sessionInfo}->{_oidc_id_token},
+                $logout_url
+            )
+        );
+
+        $self->logger->debug(
+            "OpenID Connect logout to $op will be done on " . $req->urldc );
+    }
+    else {
+        $self->logger->debug("No end session endpoint found for $op");
+    }
+    PE_OK;
+}
+
+sub getDisplayType {
+    return "logo";
+}
+
+sub alreadyLoggedOut {
+    my ( $self, $req ) = @_;
+    $self->userLogger->info(
+        'Front-channel logout request for an already logged out user');
+    my $img = $self->conf->{staticPrefix} . '/common/icons/ok.png';
+
+    # No need to protect this frame
+    $req->frame(1);
+    my $frame = qq'<html><body><img src="$img"></body></html>';
+    return [
+        200,
+        [ 'Content-Type' => 'text/html', 'Content-Length' => length($frame) ],
+        [$frame]
+    ];
+}
+
+sub frontLogout {
+    my ( $self, $req ) = @_;
+}
+
+sub backLogout {
+    my ( $self, $req ) = @_;
+}
+
+1;

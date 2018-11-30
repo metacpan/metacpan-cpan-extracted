@@ -4,15 +4,12 @@ App::DBBrowser::Table::Substatements;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use List::MoreUtils   qw( any );
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_number );
 use Term::Form         qw();
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI'; #
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Subqueries;

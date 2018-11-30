@@ -12,7 +12,6 @@ dist.ini
 inc/mymm.pl
 lib/NewRelic/Agent/FFI.pm
 lib/NewRelic/Agent/FFI/Procedural.pm
-log4cplus.properties
 maint/log4cplus.properties
 t/00_diag.t
 t/01_use.t

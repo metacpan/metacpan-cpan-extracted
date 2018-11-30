@@ -8,7 +8,7 @@ use List::Util qw( first );
 use base qw( Alien::Base );
 
 # ABSTRACT: Download and install the NewRelic agent
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 
 {
@@ -31,6 +31,7 @@ sub dynamic_libs
   }
 }
 
+
 1;
 
 __END__
@@ -45,7 +46,7 @@ Alien::nragent - Download and install the NewRelic agent
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -65,6 +66,28 @@ If the NewRelic agent library is already in your library path, then they will be
 If the NewRelic agent library is installed in C</opt/newrelic>, then that will be used.
 
 Otherwise the NewRelic agent library will be downloaded, and installed.
+
+=head1 CAVEATS
+
+=head2 Platform Limitations
+
+The SDK binaries provided by New Relic only work on Linux x86_64.  The binaries are labeled
+as a "beta" and were released in July 2016.  It doesn't seem likely that New Relic will be
+releasing new versions of the SDK.  The author of this module has had good success getting
+this module to work on Ubuntu Precise and Xenial, and heard from user feedback that it works
+with Bionic.  I have heard that it does NOT work with CentOS 7.  Your mileage may vary.
+
+=head2 Not Fork Safe!
+
+Bad things will happen if you call newrelic_init before forking.  So don't do that.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<NewRelic::Agent::FFI::Procedural>
+
+=back
 
 =head1 AUTHOR
 

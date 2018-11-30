@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl extension for managing Lemonldap::NG Web-SSO system.'
 author:
-  - 'Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>, Thomas Chemineau <thomas.chemineau@gmail.com>'
+  - 'Xavier Guimard <x.guimard@free.fr>, ClÃ©ment Oudot <clement@oodo.net>'
 build_requires:
   IO::String: '0'
   Regexp::Common: '0'
@@ -19,17 +19,18 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  LWP::Protocol::https: '0'
 requires:
   Convert::PEM: '0'
   Crypt::OpenSSL::RSA: '0'
-  HTML::Template: '0'
-  JSON: '0'
-  LWP: '0'
-  Lemonldap::NG::Common: v1.9.18
-  Lemonldap::NG::Handler: v1.9.18
-  URI: '0'
-  XML::LibXML: '0'
-  XML::LibXSLT: '0'
-version: v1.9.18
-x_LWP::Protocol::https: 0
+  LWP::UserAgent: '0'
+  Lemonldap::NG::Common: v2.0.0
+  Lemonldap::NG::Handler: v2.0.0
+resources:
+  MailingList: mailto:lemonldap-ng-dev@ow2.org
+  X_twitter: https://twitter.com/lemonldapng
+  homepage: http://lemonldap-ng.org/
+  license: http://opensource.org/licenses/GPL-2.0
+version: v2.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

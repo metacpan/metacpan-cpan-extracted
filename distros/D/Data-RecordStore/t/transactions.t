@@ -26,6 +26,8 @@ use constant {
     TRA_DONE             => 6, # transaction complete. It may be removed.
 };
 
+my $is_windows = $^O eq 'MSWin32';
+
 
 # -----------------------------------------------------
 #               init

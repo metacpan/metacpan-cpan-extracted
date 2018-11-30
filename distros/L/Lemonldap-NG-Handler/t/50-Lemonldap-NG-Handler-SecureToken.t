@@ -14,7 +14,8 @@ my $ini = File::Temp->new();
 my $dir = dirname( abs_path($0) );
 
 print $ini "[all]
-
+logger = Lemonldap::NG::Common::Logger::Std
+logLeval = error
 [configuration]
 type=File
 dirName=$dir
@@ -35,10 +36,10 @@ open STDERR, '>/dev/null';
 SKIP: {
     eval { require Cache::Memcached };
     skip
-"Cache::Memcached is not installed, so Lemonldap::NG::Handler::Specific::SecureToken will not be useable",
+"Cache::Memcached is not installed, so Lemonldap::NG::Handler::SecureToken will not be useable",
       1
       if ($@);
-    use_ok('Lemonldap::NG::Handler::Specific::SecureToken');
+    use_ok('Lemonldap::NG::Handler::Lib::SecureToken');
 }
 
 $LLNG_DEFAULTCONFFILE = undef;

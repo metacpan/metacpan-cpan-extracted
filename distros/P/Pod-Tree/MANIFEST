@@ -1,7 +1,5 @@
 Changes
 MANIFEST
-META.yml
-META.json
 Makefile.PL
 README
 ToDo
@@ -196,8 +194,10 @@ t/18-template.t
 t/19-tree.t
 t/00-compile.t
 t/94-version.t
-t/95-tidyall.t
-t/96-perl-critic.t
+xt/95-tidyall.t
+xt/96-perl-critic.t
 .perlcriticrc
 .perltidyrc
 .tidyallrc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

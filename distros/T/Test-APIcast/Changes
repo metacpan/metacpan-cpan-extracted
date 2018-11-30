@@ -1,5 +1,13 @@
 Revision history for Perl extension Test-APIcast
 
+0.19 2018-11-30T08:38:17Z
+   - Revert the fix for missing directives.
+
+0.18 2018-11-30T08:21:48Z
+   - Support different than JSON config.
+   - Allow loading multiple environment files.
+   - Fix `TEST_NGINX_IGNORE_MISSING_DIRECTIVES`.
+
 0.17 2018-08-03T16:11:14Z
    - Reset ServerPort variable when using custom test block.
 

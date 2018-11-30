@@ -2,9 +2,8 @@ package Lemonldap::NG::Manager::Conf::Tests;
 
 use utf8;
 use Lemonldap::NG::Common::Regexp;
-use Lemonldap::NG::Handler::SharedConf;
 
-our $VERSION = '1.9.10';
+our $VERSION = '2.0.0';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -37,6 +36,20 @@ sub tests {
                     : "Portal seems not to be in the domain $conf->{domain}"
                 )
             );
+        },
+
+        # Check if portal URL is well formated
+        portalURL => sub {
+
+            # Checking for ending slash
+            $conf->{portal} .= '/'
+              unless ( $conf->{portal} =~ qr#/$# );
+
+            # Deleting trailing ending slash
+            my $regex = qr#/+$#;
+            $conf->{portal} =~ s/$regex/\//;
+
+            return 1;
         },
 
         # Check if virtual hosts are in the domain
@@ -186,11 +199,11 @@ sub tests {
         testApacheSession => sub {
             my ( $id, %h );
             my $gc =
-              $Lemonldap::NG::Handler::SharedConf::tsv->{sessionStorageModule};
+              $Lemonldap::NG::Handler::PSGI::Main::tsv->{sessionStorageModule};
             return 1
               if ( ( $gc and $gc eq $conf->{globalStorage} )
-                or $conf->{globalStorage} eq
-                'Lemonldap::NG::Common::Apache::Session::SOAP' );
+                or $conf->{globalStorage} =~
+                /^Lemonldap::NG::Common::Apache::Session::/ );
             eval "use $conf->{globalStorage}";
             return ( -1, "Unknown package $conf->{globalStorage}" ) if ($@);
             eval {
@@ -212,29 +225,80 @@ sub tests {
                     backend => $conf->{globalStorage}
                   };
             };
-            return ( -1, "Unable to insert datas ($@)" ) if ($@);
+            return ( -1, "Unable to insert data ($@)" ) if ($@);
             return ( -1, "Unable to recover data stored" )
               unless ( $h{a} == 1 );
             eval { tied(%h)->delete; };
             return ( -1, "Unable to delete session ($@)" ) if ($@);
             return ( -1,
 'All sessions may be lost and you must restart all your Apache servers'
-            ) if ( $conf->{globalStorage} ne $gc );
+            ) if ( $gc and $conf->{globalStorage} ne $gc );
             return 1;
         },
 
         # Warn if cookie name has changed
         cookieNameChanged => sub {
-            my $cn = $Lemonldap::NG::Handler::SharedConf::tsv->{cookieName};
+            my $cn = $Lemonldap::NG::Handler::PSGI::API::tsv->{cookieName};
             return (
                 1,
                 (
                     $cn
                       and $cn ne $conf->{cookieName}
-                    ? 'Cookie name has changed, you must restart all your Apache servers'
+                    ? 'Cookie name has changed, you must restart all your web servers'
                     : ()
                 )
             );
+        },
+
+        # Warn if cookie TTL is equal or lower than one hour
+        cookieTTL => sub {
+            return 1 unless ( defined $conf->{cookieExpiration} );
+            return ( 0, "Cookie TTL must be higher than one minute" )
+              unless ( $conf->{cookieExpiration} > 60 );
+            return ( 1, "Cookie TTL should be higher or equal than one hour" )
+              unless ( $conf->{cookieExpiration} >= 3600
+                || $conf->{cookieExpiration} == 0 );
+
+            # Return
+            return 1;
+        },
+
+        # Warn if session timeout is lower than 10 minutes
+        timeoutActivity => sub {
+            return 1 unless ( defined $conf->{timeout} );
+            return ( 1, "Session timeout should be higher than ten minutes" )
+              unless ( $conf->{timeout} > 600
+                || $conf->{timeout} == 0 );
+
+            # Return
+            return 1;
+        },
+
+        # Error if session Activity Timeout is equal or lower than one minute
+        timeoutActivity => sub {
+            return 1 unless ( defined $conf->{timeoutActivity} );
+            return ( 0,
+"Session activity timeout must be higher or equal than one minute"
+              )
+              unless ( $conf->{timeoutActivity} > 59
+                || $conf->{timeoutActivity} == 0 );
+
+            # Return
+            return 1;
+        },
+
+        # Error if session Activity Timeout is equal or lower than one minute
+        timeoutActivityInterval => sub {
+            return 1 unless ( defined $conf->{timeoutActivityInterval} );
+            return ( 0,
+"Activity timeout interval must be lower than session activity timeout"
+              )
+              if (  $conf->{timeoutActivity}
+                and $conf->{timeoutActivity} <=
+                $conf->{timeoutActivityInterval} );
+
+            # Return
+            return 1;
         },
 
         # Warn if manager seems to be unprotected
@@ -249,7 +313,7 @@ sub tests {
             );
         },
 
-        # Test SMTP connection and authentication
+        # Test SMTP connection and authentication (warning only)
         smtpConnectionAuthentication => sub {
 
             # Skip test if no SMTP configuration
@@ -279,7 +343,7 @@ sub tests {
             return 1;
         },
 
-        # SAML entity ID must be unique
+        # SAML entity ID must be uniq
         samlIDPEntityIdUniqueness => sub {
             return 1
               unless ( $conf->{samlIDPMetaDataXML}
@@ -333,6 +397,208 @@ sub tests {
                 $entityIds{$eid} = $spId;
             }
             return ( $res, join( ', ', @msg ) );
+        },
+
+        # Try to parse combination with declared modules
+        checkCombinations => sub {
+            return 1 unless ( $conf->{authentication} eq 'Combination' );
+            require Lemonldap::NG::Common::Combination::Parser;
+            return ( 0, 'No module declared for combination' )
+              unless ( $conf->{combModules} and %{ $conf->{combModules} } );
+            my $moduleList;
+            foreach my $md ( keys %{ $conf->{combModules} } ) {
+                my $entry = $conf->{combModules}->{$md};
+                $moduleList->{$md} = (
+                      $entry->{for} == 2 ? [ undef, {} ]
+                    : $entry->{for} == 1 ? [ {}, undef ]
+                    :                      [ {}, {} ]
+                );
+            }
+            eval {
+                Lemonldap::NG::Common::Combination::Parser->parse( $moduleList,
+                    $conf->{combination} );
+            };
+            return ( 0, $@ ) if ($@);
+
+            # Return
+            return 1;
+        },
+
+        # Warn if 2F dependencies seem missing
+        sfaDependencies => sub {
+
+            my $ok = 0;
+            foreach (qw(u totp utotp yubikey)) {
+                $ok ||= $conf->{ $_ . '2fActivation' };
+                last if ($ok);
+            }
+            return 1 unless ($ok);
+
+            # Use TOTP
+            if (   $conf->{totp2fActivation}
+                or $conf->{utotp2fActivation} )
+            {
+                eval "use Convert::Base32";
+                return ( 1,
+                    "Convert::Base32 module is required to enable TOTP" )
+                  if ($@);
+            }
+
+            # Use U2F
+            if (   $conf->{u2fActivation}
+                or $conf->{utotp2fActivation} )
+            {
+                eval "use Crypt::U2F::Server::Simple";
+                return ( 1,
+"Crypt::U2F::Server::Simple module is required to enable U2F"
+                ) if ($@);
+            }
+
+            # Use Yubikey
+            if ( $conf->{yubikey2fActivation} ) {
+                eval "use Auth::Yubikey_WebClient";
+                return ( 1,
+"Auth::Yubikey_WebClient module is required to enable Yubikey"
+                ) if ($@);
+            }
+
+            # Return
+            return 1;
+        },
+
+        # Warn if TOTP or U2F is enabled with UTOTP (U2F + TOTP)
+        utotp => sub {
+            return 1 unless ( $conf->{utotp2fActivation} );
+            my $w = "";
+            foreach ( 'totp', 'u' ) {
+                $w .= uc($_) . "2F is activated twice \n"
+                  if ( $conf->{ $_ . '2fActivation' } eq '1' );
+            }
+            return ( 1, ( $w ? $w : () ) );
+        },
+
+        # Warn if TOTP not 6 or 8 digits long
+        totp2fDigits => sub {
+            return 1 unless ( $conf->{totp2fActivation} );
+            return 1 unless ( defined $conf->{totp2fDigits} );
+            return (
+                1,
+                (
+                    (
+                             $conf->{totp2fDigits} == 6
+                          or $conf->{totp2fDigits} == 8
+                    )
+                    ? ''
+                    : 'TOTP should be 6 or 8 digits long'
+                )
+            );
+        },
+
+        # Test TOTP params
+        totp2fParams => sub {
+            return 1 unless ( $conf->{totp2fActivation} );
+            return ( 0, 'TOTP range must be defined' )
+              unless ( $conf->{totp2fRange} );
+            return ( 1, "TOTP interval should be higher than 10s" )
+              unless ( $conf->{totp2fInterval} > 10 );
+
+            # Return
+            return 1;
+        },
+
+        # Error if Yubikey client ID and secret key are missing
+        # Warn if Yubikey public ID size is not 12 digits long
+        yubikey2fParams => sub {
+            return 1 unless ( $conf->{yubikey2fActivation} );
+            return ( 0, "Yubikey client ID and secret key must be set" )
+              unless ( defined $conf->{yubikey2fSecretKey}
+                && defined $conf->{yubikey2fClientID} );
+            return (
+                1,
+                (
+                    ( $conf->{yubikey2fPublicIDSize} == 12 )
+                    ? ''
+                    : 'Yubikey public ID size should be 12 digits long'
+                )
+            );
+        },
+
+        # Error if REST 2F verify URL is missing
+        rest2fVerifyUrl => sub {
+            return 1 unless ( $conf->{rest2fActivation} );
+            return ( 0, "REST 2F Verify URL must be set" )
+              unless ( defined $conf->{rest2fVerifyUrl} );
+
+            # Return
+            return 1;
+        },
+
+        # Warn if 2FA is required without a registrable 2F module enabled
+        required2FA => sub {
+            return 1 unless ( $conf->{sfRequired} );
+
+            my $msg = '';
+            my $ok  = 0;
+            foreach (qw(u totp yubikey)) {
+                $ok ||= $conf->{ $_ . '2fActivation' }
+                  && $conf->{ $_ . '2fSelfRegistration' };
+                last if ($ok);
+            }
+
+            $ok ||= $conf->{'utotp2fActivation'}
+              && ( $conf->{'u2fSelfRegistration'}
+                || $conf->{'totp2fSelfRegistration'} );
+            $msg = "A self registrable module should be enabled to require 2FA"
+              unless ($ok);
+
+            return ( 1, $msg );
+        },
+
+        # Error if external 2F Send or Validate command is missing
+        ext2fCommands => sub {
+            return 1 unless ( $conf->{ext2fActivation} );
+            return ( 0, "External 2F Send or Validate command must be set" )
+              unless ( defined $conf->{ext2FSendCommand}
+                && defined $conf->{ext2FValidateCommand} );
+
+            # Return
+            return 1;
+        },
+
+        # Warn if XSRF token TTL is higher than 10s
+        formTimeout => sub {
+            return 1 unless ( defined $conf->{formTimeout} );
+            return ( 0, "XSRF form token TTL must be higher than 30s" )
+              unless ( $conf->{formTimeout} > 30 );
+            return ( 1, "XSRF form token TTL should not be higher than 2mn" )
+              if ( $conf->{formTimeout} > 120 );
+
+            # Return
+            return 1;
+        },
+
+        # Warn if number of password reset retries is null
+        passwordResetRetries => sub {
+            return 1 unless ( $conf->{portalDisplayResetPassword} );
+            return ( 1, "Number of reset password retries should not be null" )
+              unless ( $conf->{passwordResetAllowedRetries} );
+
+            # Return
+            return 1;
+        },
+
+        # Warn if bruteForceProtection enabled without History
+        bruteForceProtection => sub {
+            return 1 unless ( $conf->{bruteForceProtection} );
+            return ( 1,
+'"History" plugin is required to enable "BruteForceProtection" plugin'
+            ) unless ( $conf->{loginHistoryEnabled} );
+            return ( 1,
+'Number of failed logins must be higher than 2 to enable "BruteForceProtection" plugin'
+            ) unless ( $conf->{failedLoginNumber} > 2 );
+
+            # Return
+            return 1;
         },
     };
 }

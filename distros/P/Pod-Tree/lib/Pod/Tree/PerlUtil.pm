@@ -1,8 +1,9 @@
 package Pod::Tree::PerlUtil;
+use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 sub mkdir {
 	my ( $translator, $dir ) = @_;
@@ -42,7 +43,7 @@ sub get_name {
 	my $tree = Pod::Tree->new;
 	$tree->load_file($source);
 	my $children = $tree->get_root->get_children;
-	my @pod      = grep { is_pod $_ } @$children;
+	my @pod      = grep { $_->is_pod } @$children;
 	my $node1    = $pod[1];
 	$node1 or return ();
 

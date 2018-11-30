@@ -17,16 +17,40 @@ my @notManagedAttributes = (
 
     # Complex nodes
     'samlSPMetaDataOptions', 'samlIDPMetaDataOptions', 'oidcRPMetaDataOptions',
-    'oidcOPMetaDataOptions', 'vhostOptions',
+    'oidcOPMetaDataOptions', 'casSrvMetaDataOptions',  'casAppMetaDataOptions',
+    'vhostOptions',
+
+    # Second factor engine and lists of 2F modules
+    'sfEngine', 'available2FSelfRegistration', 'available2F',
+
+    # Brute force attack protection parameters
+    'bruteForceProtectionMaxAge', 'bruteForceProtectionTempo',
 
     # Metadatas (added by manager itself)
-    'cfgAuthor', 'cfgAuthorIP', 'cfgNum', 'cfgDate', 'cfgLog',
+    'cfgAuthor', 'cfgAuthorIP', 'cfgNum', 'cfgDate', 'cfgLog', 'cfgVersion',
 
     # HTML template parameter (for PSGI) (must be set in lemonldap-ng.ini)
     'staticPrefix',
 
     # PSGI/CGI protection (must be set in lemonldap-ng.ini)
     'protection',
+
+    # SecureToken handler
+    'secureTokenAllowOnError', 'secureTokenAttribute', 'secureTokenExpiration',
+    'secureTokenHeader', 'secureTokenMemcachedServers', 'secureTokenUrls',
+
+    # Zimbra handler
+    'zimbraAccountKey', 'zimbraBy', 'zimbraPreAuthKey', 'zimbraSsoUrl',
+    'zimbraUrl',
+
+    # Loggers
+    'log4perlConfFile', 'userSyslogFacility', 'logger', 'sentryDsn',
+    'syslogFacility',   'userLogger',         'logLevel',
+
+    # Other ini-only prms
+    'configStorage', 'status', 'localStorageOptions', 'localStorage',
+    'max2FDevices',              'max2FDevicesNameLength', 'checkTime',
+    'mySessionAuthorizedRWKeys', 'handlerInternalCache'
 );
 
 # Words used either as attribute name and node title
@@ -35,6 +59,8 @@ my $doubleUsage = qr/^(?:
   samlIDPMetaDataOptions|
   oidcRPMetaDataOptions|
   oidcOPMetaDataOptions|
+  casSrvMetaDataOptions|
+  casAppMetaDataOptions|
   vhostOptions
 )$/x;
 

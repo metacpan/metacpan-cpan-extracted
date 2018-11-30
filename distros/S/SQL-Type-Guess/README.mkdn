@@ -1,3 +1,7 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/sql-type-guess.svg?branch=master)](https://travis-ci.org/corion/sql-type-guess)
+[![appveyor build status](https://ci.appveyor.com/api/projects/status/github/corion/sql-type-guess?branch=master&svg=true)](https://ci.appveyor.com/project/corion/sql-type-guess)
+
 # NAME
 
 SQL::Type::Guess - guess an appropriate column type for a set of data
@@ -5,9 +9,9 @@ SQL::Type::Guess - guess an appropriate column type for a set of data
 # SYNOPSIS
 
     my @data=(
-      { fool => 1, when => '20140401', greeting => 'Hello', value => '1.05'  },
-      { fool => 0, when => '20140402', greeting => 'World', value => '99.05' },
-      { fool => 0, when => '20140402', greeting => 'World', value => '9.005' },
+      { seen => 1, when => '20140401', greeting => 'Hello', value => '1.05'  },
+      { seen => 0, when => '20140402', greeting => 'World', value => '99.05' },
+      { seen => 0, when => '20140402', greeting => 'World', value => '9.005' },
     );
 
     my $g= SQL::Type::Guess->new();
@@ -15,7 +19,7 @@ SQL::Type::Guess - guess an appropriate column type for a set of data
 
     print $g->as_sql( table => 'test' );
     # create table test (
-    #    "fool" decimal(1,0),
+    #    "seen" decimal(1,0),
     #    "greeting" varchar(5),
     #    "value" decimal(5,3),
     #    "when" date
@@ -30,11 +34,11 @@ SQL::Type::Guess - guess an appropriate column type for a set of data
 Creates a new `SQL::Type::Guess` instance. The following options are
 supported:
 
-- __column\_type__
+- **column\_type**
 
     Hashref of already known column types.
 
-- __column\_map__
+- **column\_map**
 
     Hashref mapping the combinations SQL type names
     to the resulting type name.
@@ -60,7 +64,7 @@ of the data to be stored that shouldn't be much of an issue.
 
 ## `$g->guess_data_type $OLD_TYPE, @VALUES`
 
-    my $type= $g->guess_data_type( $type, 1,2,3,undef,'Hello','World', );
+    $type= $g->guess_data_type( $type, 1,2,3,undef,'Hello','World', );
 
 Returns the data type that encompasses the already established data type in `$type`
 and the new values as passed in via `@values`.
@@ -86,11 +90,11 @@ Returns an SQL string that describes the data seen so far.
 
 Options:
 
-- __user__
+- **user**
 
     Supply a username for the table
 
-- __columns__
+- **columns**
 
     This allows you to specify the columns and their order. The default
     is alphabetical order of the columns.
@@ -107,7 +111,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2014 by Max Maischein `corion@cpan.org`.
+Copyright 2014-2018 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

@@ -10,9 +10,11 @@
 #
 # All other ideas have to be set in Manager/Build/Attributes.pm !
 
-# DON'T FORGET TO RUN jsongenerator.pl AFTER EACH CHANGE
+# DON'T FORGET TO RUN "make json" AFTER EACH CHANGE
 
 package Lemonldap::NG::Manager::Build::CTrees;
+
+our $VERSION = '2.0.0';
 
 sub cTrees {
     return {
@@ -23,9 +25,11 @@ sub cTrees {
             {
                 title => 'vhostOptions',
                 help  => 'configvhost.html#options',
+                form  => 'simpleInputContainer',
                 nodes => [
                     'vhostPort',        'vhostHttps',
-                    'vhostMaintenance', 'vhostAliases'
+                    'vhostMaintenance', 'vhostAliases',
+                    'vhostType',        'vhostAuthnLevel',
                 ],
             },
         ],
@@ -53,7 +57,8 @@ sub cTrees {
                 nodes => [
                     "samlIDPMetaDataOptionsAdaptSessionUtime",
                     "samlIDPMetaDataOptionsForceUTF8",
-                    "samlIDPMetaDataOptionsStoreSAMLToken"
+                    "samlIDPMetaDataOptionsStoreSAMLToken",
+                    "samlIDPMetaDataOptionsUserAttribute"
                 ]
             },
             {
@@ -118,7 +123,8 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => [
                             "samlSPMetaDataOptionsEncryptionMode",
-                            "samlSPMetaDataOptionsEnableIDPInitiatedURL"
+                            "samlSPMetaDataOptionsEnableIDPInitiatedURL",
+                            "samlSPMetaDataOptionsRule",
                         ]
                     }
                 ]
@@ -195,11 +201,47 @@ sub cTrees {
                     'oidcRPMetaDataOptionsIDTokenExpiration',
                     'oidcRPMetaDataOptionsAccessTokenExpiration',
                     'oidcRPMetaDataOptionsRedirectUris',
-                    'oidcRPMetaDataOptionsPostLogoutRedirectUris',
                     'oidcRPMetaDataOptionsBypassConsent',
+                    {
+                        title => 'logout',
+                        form  => 'simpleInputContainer',
+                        nodes => [
+                            'oidcRPMetaDataOptionsPostLogoutRedirectUris',
+                            'oidcRPMetaDataOptionsLogoutUrl',
+                            'oidcRPMetaDataOptionsLogoutType',
+                            'oidcRPMetaDataOptionsLogoutSessionRequired',
+                        ]
+                    },
+                    'oidcRPMetaDataOptionsRule',
                 ]
             },
             'oidcRPMetaDataOptionsExtraClaims',
+        ],
+        casSrvMetaDataNode => [
+            {
+                title => 'casSrvMetaDataOptions',
+                form  => 'simpleInputContainer',
+                nodes => [
+                    'casSrvMetaDataOptionsUrl',
+                    'casSrvMetaDataOptionsRenew',
+                    'casSrvMetaDataOptionsGateway',
+                    'casSrvMetaDataOptionsDisplayName',
+                    'casSrvMetaDataOptionsIcon',
+                ]
+            },
+            'casSrvMetaDataExportedVars',
+            'casSrvMetaDataOptionsProxiedServices',
+        ],
+        casAppMetaDataNode => [
+            {
+                title => 'casAppMetaDataOptions',
+                form  => 'simpleInputContainer',
+                nodes => [
+                    'casAppMetaDataOptionsService',
+                    'casAppMetaDataOptionsRule'
+                ]
+            },
+            'casAppMetaDataExportedVars',
         ],
     };
 }

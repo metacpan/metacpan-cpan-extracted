@@ -13,11 +13,14 @@ package Lemonldap::NG::Manager;
 use 5.10.0;
 use utf8;
 use Mouse;
-our $VERSION = '1.9.18';
+use JSON;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-extends 'Lemonldap::NG::Manager::Lib', 'Lemonldap::NG::Handler::PSGI::Router';
+our $VERSION = '2.0.0';
+
+extends 'Lemonldap::NG::Common::Conf::AccessLib',
+  'Lemonldap::NG::Handler::PSGI::Router';
 
 has csp => ( is => 'rw' );
 
@@ -30,11 +33,11 @@ sub init {
     my ( $self, $args ) = @_;
     $args ||= {};
 
-    my $conf = $self->confAcc;
-
-    if ( my $localconf = $conf->getLocalConf(MANAGERSECTION) ) {
-        $self->{$_} = $args->{$_} // $localconf->{$_}
-          foreach ( keys %$localconf );
+    if ( my $localconf = $self->confAcc->getLocalConf(MANAGERSECTION) ) {
+        foreach ( keys %$localconf ) {
+            $args->{$_} //= $localconf->{$_};
+            $self->{$_} = $args->{$_} unless (/^(?:l|userL)ogger$/);
+        }
     }
 
     # Manager needs to keep new Ajax behaviour
@@ -49,39 +52,50 @@ sub init {
         return 0;
     }
 
-    $self->{enabledModules} ||= "conf, sessions, notifications";
+    $self->{enabledModules} ||= "conf, sessions, notifications, 2ndFA";
     my @links;
     my @enabledModules =
       map { push @links, $_; "Lemonldap::NG::Manager::" . ucfirst($_) }
       split( /[,\s]+/, $self->{enabledModules} );
     extends 'Lemonldap::NG::Handler::PSGI::Router', @enabledModules;
     my @working;
+    my $conf = $self->confAcc->getConf;
+    unless ($conf) {
+        require Lemonldap::NG::Manager::Conf::Zero;
+        $conf = Lemonldap::NG::Manager::Conf::Zero::zeroConf();
+    }
     for ( my $i = 0 ; $i < @enabledModules ; $i++ ) {
         my $mod = $enabledModules[$i];
         no strict 'refs';
-        if ( &{"${mod}::addRoutes"}($self) ) {
-            $self->lmLog( "Module $mod enabled", 'debug' );
+        if ( &{"${mod}::addRoutes"}( $self, $conf ) ) {
+            $self->logger->debug("Module $mod enabled");
             push @working, $mod;
         }
         else {
             $links[$i] = undef;
-            $self->lmLog( "Module $mod can not be enabled: " . $self->error,
-                'error' );
+            $self->logger->error(
+                "Module $mod can not be enabled: " . $self->error );
         }
     }
     return 0 unless (@working);
-    $self->addRoute( links => 'links', ['GET'] );
+    $self->addRoute( links     => 'links',  ['GET'] );
+    $self->addRoute( 'psgi.js' => 'sendJs', ['GET'] );
 
-    my $portal = $Lemonldap::NG::Handler::Main::tsv->{portal}->();
+    my $portal = $conf->{portal};
     $portal =~ s#https?://([^/]*).*#$1#;
     $self->csp(
-"default-src 'self';frame-ancestors 'none';form-action 'self';img-src 'self' $portal;style-src 'self' $portal;"
+        "default-src 'self' $portal;frame-ancestors 'none';form-action 'self';"
     );
 
     $self->defaultRoute( $working[0]->defaultRoute );
 
-    my $linksIcons =
-      { 'conf' => 'cog', 'sessions' => 'duplicate', 'notifications' => 'bell' };
+# Find out more glyphicones at https://www.w3schools.com/icons/bootstrap_icons_glyphicons.asp
+    my $linksIcons = {
+        'conf'          => 'cog',
+        'sessions'      => 'duplicate',
+        'notifications' => 'bell',
+        '2ndFA'         => 'wrench'
+    };
 
     $self->links( [] );
     for ( my $i = 0 ; $i < @links ; $i++ ) {
@@ -95,21 +109,25 @@ sub init {
     }
 
     $self->menuLinks( [] );
-    push @{ $self->menuLinks },
-      {
-        target => &{ $Lemonldap::NG::Handler::SharedConf::tsv->{portal} },
-        title  => 'backtoportal',
-        icon   => 'home'
-      }
-      if ( defined $Lemonldap::NG::Handler::SharedConf::tsv->{portal} );
-    push @{ $self->menuLinks },
-      {
-        target => &{ $Lemonldap::NG::Handler::SharedConf::tsv->{portal} }
-          . '?logout=1',
-        title => 'logout',
-        icon  => 'log-out'
-      }
-      if ( defined $Lemonldap::NG::Handler::SharedConf::tsv->{portal} );
+    if (
+        my $portal =
+        $conf->{cfgNum}
+        ? Lemonldap::NG::Handler::PSGI::Main->tsv->{portal}->()
+        : $conf->{portal}
+      )
+    {
+        push @{ $self->menuLinks },
+          {
+            target => $portal,
+            title  => 'backtoportal',
+            icon   => 'home'
+          },
+          {
+            target => "$portal?logout=1",
+            title  => 'logout',
+            icon   => 'log-out'
+          };
+    }
     1;
 }
 
@@ -121,11 +139,10 @@ sub javascript {
     my ($self) = @_;
     return
       'var formPrefix=staticPrefix+"forms/";var confPrefix=scriptname+"confs/";'
-      . (
-        $self->links ? 'var links=' . JSON::to_json( $self->links ) . ';' : '' )
+      . ( $self->links ? 'var links=' . to_json( $self->links ) . ';' : '' )
       . (
         $self->menuLinks
-        ? 'var menulinks=' . JSON::to_json( $self->menuLinks ) . ';'
+        ? 'var menulinks=' . to_json( $self->menuLinks ) . ';'
         : ''
       );
 }
@@ -153,7 +170,9 @@ system.
 
 =head1 SYNOPSIS
 
-  #!/usr/bin/env plackup -I pl/lib
+Use any of Plack launcher. Example:
+
+  #!/usr/bin/env plackup
   
   use Lemonldap::NG::Manager;
   
@@ -167,51 +186,47 @@ system.
 
 The Perl part of Lemonldap::NG::Manager is the REST server. Web interface is
 written in Javascript, using AngularJS framework and can be found in `site`
-directory. The REST API is described in REST-API.md file given in source tree.
+directory. The REST API is described in REST-API.md file provided in source tree.
 
-Lemonldap::NG Manager uses L<Plack> to be compatible with CGI, FastCGI,... It
-inherits of L<Lemonldap::NG::Handler::PSGI::Router>
+Lemonldap::NG Manager uses L<Plack> to be CGI, FastCGI and so on compatible.
+It inherits of L<Lemonldap::NG::Handler::PSGI::Router>
 
 =head1 ORGANIZATION
 
-Lemonldap::NG Manager contains 4 parts:
+Lemonldap::NG Manager contains 6 parts:
 
 =over
 
-=item Configuration management:
+=item Configuration management
 
-see L<Lemonldap::NG::Manager::Conf>;
+=item Session explorer
 
-=item Session explorer:
+=item Notification explorer
 
-see L<Lemonldap::NG::Manager::Sessions>;
+=item Second Factors manager
 
-=item Notification explorer:
+=item Configuration builder (see L<Lemonldap::NG::Manager::Build>
 
-see L<Lemonldap::NG::Manager::Notifications>;
-
-=item Some files uses to generate static files:
-
-see below.
+=item Command line interface (see L<Lemonldap::NG::Manager::Cli>
 
 =back
 
-=head2 Generation of static files
+=head2 Static files generation
 
-The `scripts/jsongenerator.pl` file uses Lemonldap::NG::Manager::Build::Attributes,
+`scripts/jsongenerator.pl` file uses Lemonldap::NG::Manager::Build::Attributes,
 Lemonldap::NG::Manager::Build::Tree and Lemonldap::NG::Manager::Build::CTrees to generate
 
 =over
 
-=item `site/static/struct.json`:
+=item `site/htdocs/static/struct.json`:
 
-the main file that contains the tree view;
+main file containing the tree view;
 
-=item `site/static/js/conftree.js`:
+=item `site/htdocs/static/js/conftree.js`:
 
-generates sub tree for virtualhosts and SAML and OpenID-Connect partners;
+generates Virtualhosts, SAML and OpenID-Connect partners sub-trees;
 
-=item `Lemonldap::NG::Manager::Constants`:
+=item `Lemonldap::NG::Common::Conf::ReConstants`:
 
 constants used by all Perl manager components;
 
@@ -239,8 +254,8 @@ you can also fix them in $opts hash ref passed as argument to run() or new()).
   ;                Lemonldap::NG::Handler::PSGI::Router doc.
   protection     = manager
   
-  ;enabledModules: Modules to display. Default to `conf, sessions, notifications`
-  enabledModules = conf, sessions, notifications
+  ;enabledModules: Modules to display. Default to `conf, sessions, notifications, 2ndFA`
+  enabledModules = conf, sessions, notifications, 2ndFA
   
   ;logLevel:       choose one of error, warn, notice, info, debug
   ;                See Lemonldap::NG::Common::PSGI doc for more
@@ -253,28 +268,19 @@ you can also fix them in $opts hash ref passed as argument to run() or new()).
   ;languages:      Available interface languages
   languages      = en, fr
   
-  ;templateDir:    the path to the directory containing HTML templates
+  ;templateDir:    path to the directory containing HTML templates
   ;                See Lemonldap::NG::Common::PSGI doc for more
   templateDir    = /usr/share/lemonldap-ng/manager/
 
 =head1 SEE ALSO
 
-L<Lemonldap::NG::Handler::Router>, L<Lemonldap::NG::Portal>, L<Plack>, L<PSGI>,
-L<Lemonldap::NG::Manager::Conf>, L<Lemonldap::NG::Manager::Sessions>,
-L<Lemonldap::NG::Manager::Notifications>
 L<http://lemonldap-ng.org/>
 
 =head1 AUTHORS
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -283,6 +289,9 @@ L<http://lemonldap-ng.org/>
 Use OW2 system to report bug or ask for features:
 L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
+Note that if you want to post a ticket for a conf upload problem, please
+see L<Lemonldap::NG::Manager::Conf::Parser> before.
+
 =head1 DOWNLOAD
 
 Lemonldap::NG is available at
@@ -290,13 +299,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -1,9 +1,15 @@
-0.03 20150728
-    . Fix prerequisites
-    . No code changes, no need to upgrade
+0.04 2018-11-30
+    * Also respect <BASE>, not just <base>
+    * Cleaned up prerequisites
+    * Moved prerequisites to the proper section (runtime, not build-time)
+    * Documentation fixes
 
-0.02 20150726
-    + Match attributes case-insensitively
+0.03  2015-07-28
+    * Fix prerequisites
+    * No code changes, no need to upgrade
 
-0.01 20150726
-    Initial release after discussion on https://www.perlmonks.org/?node_id=1136273
+0.02  2015-07-26
+    * Match attributes case-insensitively
+
+0.01  2015-07-26
+    * Initial release after discussion on https://www.perlmonks.org/?node_id=1136273

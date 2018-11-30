@@ -1,0 +1,16 @@
+{
+"accountCreated":"Tài khoản của bạn đã được tạo, mật khẩu tạm thời vừa được gửi đến địa chỉ thư điện tử của bạn.",
+"autoMail":"Thư này đã được gửi tự động",
+"click2Register":"Nhấn ở đây để xác nhận việc đăng ký tài khoản của bạn",
+"click2Reset":"Nhấn ở đây để thiết lập lại mật khẩu của bạn",
+"hello":"Xin chào",
+"mailConfirmSubject":"[LemonLDAP::NG] Xác nhận thiết lập lại mật khẩu",
+"mailSubject":"[LemonLDAP::NG] Mật khẩu mới của bạn",
+"newPwdIs":"Mật khẩu mới của bạn là",
+"pwdChanged":"Mật khẩu của bạn đã được thay đổi.",
+"pwdIs":"Mật khẩu của bạn là",
+"registerConfirmSubject":"[LemonLDAP::NG] Xác nhận đăng ký tài khoản",
+"registerDoneSubject":"[LemonLDAP::NG] Tài khoản mới của bạn",
+"requestIssuedFromIP":"Yêu cầu được gửi đi từ địa chỉ IP",
+"yourLoginIs":"Đăng nhập của bạn là"
+}

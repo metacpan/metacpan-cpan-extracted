@@ -1,0 +1,13 @@
+bin/objectstore_explorer
+Build.PL
+CHANGELOG
+lib/Data/ObjectStore.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/object_store.t
+TODO.txt
+VERSIONS

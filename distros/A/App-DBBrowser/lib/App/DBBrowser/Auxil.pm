@@ -15,8 +15,6 @@ use Term::Choose::LineFold qw( line_fold );
 use Term::Choose::Util     qw( term_width );
 use Term::Form             qw();
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-
 
 sub new {
     my ( $class, $info, $options, $data ) = @_;

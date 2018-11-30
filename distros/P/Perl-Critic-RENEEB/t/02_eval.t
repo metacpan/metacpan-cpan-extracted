@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Perl::Critic;
+use Perl::Critic::Utils qw{ :severities };
 use Test::More;
 
 use Data::Dumper;
@@ -15,11 +16,23 @@ my %modules = (
     'Module::WithEval'    => 1,
 );
 
-plan tests => scalar keys %modules;
+use constant POLICY => 'Perl::Critic::Policy::Reneeb::ProhibitBlockEval';
+
+diag 'Testing *::ProhibitBlockEval version ' . POLICY->VERSION();
+
+is_deeply [ POLICY->default_themes ], [qw/reneeb/];
+
+is POLICY->default_severity, $SEVERITY_MEDIUM, 'Check default severity';
+
+is_deeply
+    [ POLICY->applies_to ], 
+    [ "PPI::Statement" ],
+    'Check node names this policy applies to';
+
 
 my $dir = dirname __FILE__;
 
-my $pc = Perl::Critic->new( -'single-policy' => 'Perl::Critic::Policy::Reneeb::ProhibitBlockEval' );
+my $pc = Perl::Critic->new( -'single-policy' => POLICY );
 
 for my $module ( sort keys %modules ) {
     my @parts = split /::/, $module;
@@ -35,3 +48,5 @@ for my $module ( sort keys %modules ) {
 
     is scalar @violations, $modules{$module}, "Check $module";
 }
+
+done_testing();

@@ -1,0 +1,20 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table table-striped">
+    <tbody>
+      <tr ng-repeat="mod in currentNode.nodes">
+        <th id="{{item.k+'label'}}" for="{{item.k+'i'}}">{{translate(mod.id)}}</th>
+        <td>
+          <select class="form-control" id="{{item.k+'i'}}" ng-model="mod.data" ng-change="mod.onChange()" aria-describedby="{{item.k+'label'}}">
+            <option ng-repeat="item in mod.select" ng-selected="item.k==mod.data" value="{{item.k}}" trspan="{{item.v}}"></option>
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[]
+</script>

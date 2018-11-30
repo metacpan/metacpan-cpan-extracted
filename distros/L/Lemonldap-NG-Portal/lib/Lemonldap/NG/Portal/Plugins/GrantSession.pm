@@ -1,0 +1,90 @@
+package Lemonldap::NG::Portal::Plugins::GrantSession;
+
+use strict;
+use Mouse;
+use Lemonldap::NG::Portal::Main::Constants qw(
+  PE_OK
+  PE_SESSIONNOTGRANTED
+);
+
+our $VERSION = '2.0.0';
+
+extends 'Lemonldap::NG::Portal::Main::Plugin';
+
+use constant afterData => 'run';
+
+has rules => ( is => 'rw', default => sub { {} } );
+
+sub init {
+    my ($self) = @_;
+    my $hd = $self->p->HANDLER;
+    foreach ( keys %{ $self->conf->{grantSessionRules} } ) {
+        $self->logger->debug("GrantRule key -> $_");
+        $self->logger->debug(
+            "GrantRule value -> " . $self->conf->{grantSessionRules}->{$_} );
+        my $rule =
+          $hd->buildSub(
+            $hd->substitute( $self->conf->{grantSessionRules}->{$_} ) );
+        unless ($rule) {
+            $self->error( "Bad grantSession rule " . $hd->tsv->{jail}->error );
+            return 0;
+        }
+        $self->rules->{$_} = $rule;
+    }
+    return 1;
+}
+
+sub run {
+    my ( $self, $req ) = @_;
+
+    sub sortByComment {
+        my $A = ( $a =~ /^.*?##(.*)$/ )[0];
+        my $B = ( $b =~ /^.*?##(.*)$/ )[0];
+        return !$A ? 1 : !$B ? -1 : $A cmp $B;
+    }
+
+    foreach ( sort sortByComment keys %{ $self->rules } ) {
+        $self->logger->debug( "Grant session condition -> "
+              . $self->conf->{grantSessionRules}->{$_} );
+        unless ( $self->rules->{$_}->( $req, $req->sessionInfo ) ) {
+            $req->userData( {} );
+
+            # Catch rule message
+            $_ =~ /^(.*?)##.*$/;
+            if ($1) {
+                $self->logger->debug("Message -> $1");
+
+                # Message can contain session data as user attributes or macros
+                my $hd  = $self->p->HANDLER;
+                my $msg = $hd->substitute($1);
+                unless ( $msg = $hd->buildSub($msg) ) {
+                    $self->error( "Bad message " . $hd->tsv->{jail}->error );
+                    return PE_OK;
+                }
+                $msg = $msg->( $req, $req->sessionInfo );
+                $req->info(
+                    $self->loadTemplate(
+                        'simpleInfo', params => { trspan => $msg }
+                    )
+                );
+                $self->userLogger->error( 'User '
+                      . $req->sessionInfo->{uid}
+                      . " was not granted to open session (rule -> $msg)" );
+                $req->urldc( $self->conf->{portal} );
+                return $req->authResult(PE_SESSIONNOTGRANTED);
+            }
+            else {
+                $self->userLogger->error( 'User '
+                      . $req->sessionInfo->{uid}
+                      . " was not granted to open session (rule -> "
+                      . $self->conf->{grantSessionRules}->{$_}
+                      . ")" );
+                $req->urldc( $self->conf->{portal} );
+                return $req->authResult(PE_SESSIONNOTGRANTED);
+            }
+        }
+    }
+    return PE_OK;
+}
+
+1;

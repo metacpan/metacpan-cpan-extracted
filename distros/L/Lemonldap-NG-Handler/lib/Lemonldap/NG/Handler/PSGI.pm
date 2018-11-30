@@ -1,15 +1,21 @@
+# LLNG platform class for auto-protected PSGI
+#
+# See http://lemonldap-ng.org/documentation/latest/handlerarch
 package Lemonldap::NG::Handler::PSGI;
 
 use 5.10.0;
 use Mouse;
+use Lemonldap::NG::Handler::PSGI::Main;
 
-extends 'Lemonldap::NG::Handler::PSGI::Base', 'Lemonldap::NG::Common::PSGI';
+extends 'Lemonldap::NG::Handler::Lib::PSGI', 'Lemonldap::NG::Common::PSGI';
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
 sub init {
-    my $tmp = $_[0]->Lemonldap::NG::Common::PSGI::init( $_[1] )
-      and $_[0]->Lemonldap::NG::Handler::PSGI::Base::init( $_[1] );
+    my ( $self, $args ) = @_;
+    $self->api('Lemonldap::NG::Handler::PSGI::Main') unless ( $self->api );
+    my $tmp = ( $self->Lemonldap::NG::Common::PSGI::init($args)
+          and $self->Lemonldap::NG::Handler::Lib::PSGI::init($args) );
     return $tmp;
 }
 
@@ -86,7 +92,7 @@ Level of protection. It can be one of:
 
 =head3 user
 
-Returns user session datas. If empty (no protection), returns:
+Returns user session data. If empty (no protection), returns:
 
   { _whatToTrace => 'anonymous' }
 
@@ -112,13 +118,7 @@ L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =over
 
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
+=item LemonLDAP::NG team L<http://lemonldap-ng.org/team>
 
 =back
 
@@ -134,13 +134,7 @@ L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
 
 =head1 COPYRIGHT AND LICENSE
 
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
+See COPYING file for details.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

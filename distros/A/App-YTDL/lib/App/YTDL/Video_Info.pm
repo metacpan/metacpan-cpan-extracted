@@ -14,10 +14,7 @@ use Term::Choose::LineFold qw( line_fold );
 use Term::Choose           qw( choose );
 use Term::Choose::Util     qw( term_size );
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-
 use App::YTDL::GetData qw( get_download_info );
-use App::YTDL::Helper  qw( check_mapping_stdout );
 
 
 sub gather_video_infos {
@@ -97,7 +94,6 @@ sub _prepare_print_info {
     for my $key ( @keys ) {
         next if ! $info->{$ex}{$video_id}{$key};
         $info->{$ex}{$video_id}{$key} =~ s/\R/ /g;
-        $info->{$ex}{$video_id}{$key} = check_mapping_stdout( $opt, $info->{$ex}{$video_id}{$key} );
     }
     return @keys;
 }

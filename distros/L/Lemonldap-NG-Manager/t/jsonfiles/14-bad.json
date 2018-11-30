@@ -5,10 +5,10 @@
     "id": "portalParams",
     "title": "portalParams",
     "nodes": [{
-      "default": "ftp://auth.example.com/",
+      "default": "http://auth.example.com/",
       "id": "portal",
       "title": "portal",
-      "data": "http://auth.example.com/"
+      "data": "ftp://auth.example.com/"
     }, {
       "id": "portalMenu",
       "title": "portalMenu",
@@ -98,7 +98,7 @@
             "id": "applicationList/0004-cat/0006-app",
             "data": {
               "display": "auto",
-              "uri": "http://manager.example.com/notifications.pl",
+              "uri": "http://manager.example.com/notifications",
               "description": "Explore WebSSO notifications",
               "logo": "database.png"
             }
@@ -107,7 +107,7 @@
               "display": "auto",
               "description": "Explore WebSSO sessions",
               "logo": "database.png",
-              "uri": "http://manager.example.com/sessions.pl"
+              "uri": "http://manager.example.com/sessions"
             },
             "title": "Sessions explorer",
             "type": "menuApp",
@@ -179,11 +179,11 @@
           "type": "bool",
           "data": 1
         }, {
-          "default": 1,
+          "default": 0,
           "id": "portalDisplayResetPassword",
           "title": "portalDisplayResetPassword",
           "type": "boolOrExpr",
-          "data": 1
+          "data": 0
         }, {
           "default": 1,
           "id": "portalDisplayRegister",
@@ -253,11 +253,11 @@
         "type": "bool",
         "data": 0
       }, {
-        "default": 0,
+        "default": 1,
         "id": "captcha_mail_enabled",
         "title": "captcha_mail_enabled",
         "type": "bool",
-        "data": 0
+        "data": 1
       }, {
         "default": 1,
         "id": "captcha_register_enabled",
@@ -270,22 +270,6 @@
         "title": "captcha_size",
         "type": "int",
         "data": 6
-      }, {
-        "default": "Apache::Session::File",
-        "id": "captchaStorage",
-        "title": "captchaStorage",
-        "data": "Apache::Session::File"
-      }, {
-        "default": [{
-          "data": "/var/lib/lemonldap-ng/captcha/",
-          "id": "captchaStorageOptions/Directory",
-          "title": "Directory",
-          "type": "keyText"
-        }],
-        "id": "captchaStorageOptions",
-        "title": "captchaStorageOptions",
-        "type": "keyTextContainer",
-        "nodes": []
       }]
     }]
   }, {
@@ -367,57 +351,27 @@
       "type": "select",
       "data": "Demo"
     }, {
-      "default": "Demo",
+      "default": "Same",
       "id": "userDB",
       "select": [{
+        "k": "Same",
+        "v": "Same as auth"
+      }, {
         "k": "AD",
         "v": "Active Directory"
       }, {
         "k": "DBI",
         "v": "Database (DBI)"
       }, {
-        "k": "Choice",
-        "v": "authChoice"
-      }, {
-        "k": "Demo",
-        "v": "Demonstration"
-      }, {
-        "k": "Facebook",
-        "v": "Facebook"
-      }, {
-        "k": "Google",
-        "v": "Google"
-      }, {
         "k": "LDAP",
         "v": "LDAP"
       }, {
-        "k": "Multi",
-        "v": "Multiple"
-      }, {
         "k": "Null",
         "v": "None"
-      }, {
-        "k": "OpenID",
-        "v": "OpenID"
-      }, {
-        "k": "Proxy",
-        "v": "Proxy"
-      }, {
-        "k": "Remote",
-        "v": "Remote"
-      }, {
-        "k": "SAML",
-        "v": "SAML v2"
-      }, {
-        "k": "Slave",
-        "v": "Slave"
-      }, {
-        "k": "WebID",
-        "v": "WebID"
       }],
       "title": "userDB",
       "type": "select",
-      "data": "Demo"
+      "data": "Same"
     }, {
       "default": "Demo",
       "id": "passwordDB",
@@ -919,12 +873,12 @@
       }, {
         "cnodes": "remoteGlobalStorageOptions",
         "default": [{
-          "data": "http://auth.example.com/Lemonldap/NG/Common/CGI/SOAPService",
+          "data": "http://auth.example.com/Lemonldap/NG/Common/PSGI/SOAPService",
           "id": "remoteGlobalStorageOptions/ns",
           "title": "ns",
           "type": "keyText"
         }, {
-          "data": "http://auth.example.com/index.pl/sessions",
+          "data": "http://auth.example.com/sessions",
           "id": "remoteGlobalStorageOptions/proxy",
           "title": "proxy",
           "type": "keyText"
@@ -1193,11 +1147,6 @@
     "type": "simpleInputContainer",
     "nodes": [{
       "default": "",
-      "id": "syslog",
-      "title": "syslog",
-      "data": ""
-    }, {
-      "default": "",
       "id": "trustedProxies",
       "title": "trustedProxies",
       "data": ""
@@ -1313,7 +1262,7 @@
           "title": "Directory",
           "type": "keyText"
         }, {
-          "data": "/var/lib/lemonldap-ng/sessions/lock/",
+          "data": "t/sessions",
           "id": "globalStorageOptions/LockDirectory",
           "title": "LockDirectory",
           "type": "keyText"
@@ -1342,37 +1291,6 @@
         "id": "localSessionStorage",
         "title": "localSessionStorage",
         "data": "Cache::FileCache"
-      }, {
-        "default": [{
-          "data": 3,
-          "id": "localSessionStorageOptions/cache_depth",
-          "title": "cache_depth",
-          "type": "keyText"
-        }, {
-          "data": "/tmp",
-          "id": "localSessionStorageOptions/cache_root",
-          "title": "cache_root",
-          "type": "keyText"
-        }, {
-          "data": 600,
-          "id": "localSessionStorageOptions/default_expires_in",
-          "title": "default_expires_in",
-          "type": "keyText"
-        }, {
-          "data": "007",
-          "id": "localSessionStorageOptions/directory_umask",
-          "title": "directory_umask",
-          "type": "keyText"
-        }, {
-          "data": "lemonldap-ng-sessions",
-          "id": "localSessionStorageOptions/namespace",
-          "title": "namespace",
-          "type": "keyText"
-        }],
-        "id": "localSessionStorageOptions",
-        "title": "localSessionStorageOptions",
-        "type": "keyTextContainer",
-        "nodes": []
       }]
     }, {
       "id": "multipleSessions",
@@ -1444,20 +1362,6 @@
     "nodes": [{
       "id": "customFunctions",
       "title": "customFunctions"
-    }, {
-      "id": "soap",
-      "title": "soap",
-      "type": "simpleInputContainer",
-      "nodes": [{
-        "default": 0,
-        "id": "Soap",
-        "title": "Soap",
-        "type": "bool",
-        "data": 0
-      }, {
-        "id": "exportedAttr",
-        "title": "exportedAttr"
-      }]
     }, {
       "id": "loginHistory",
       "title": "loginHistory",
@@ -1566,19 +1470,17 @@
         "title": "mailContent",
         "type": "simpleInputContainer",
         "nodes": [{
-          "default": "[LemonLDAP::NG] Your new password",
+          "default": "",
           "id": "mailSubject",
-          "title": "mailSubject",
-          "data": "[LemonLDAP::NG] Your new password"
+          "title": "mailSubject"
         }, {
           "id": "mailBody",
           "title": "mailBody",
           "type": "longtext"
         }, {
-          "default": "[LemonLDAP::NG] Password reset confirmation",
+          "default": "",
           "id": "mailConfirmSubject",
-          "title": "mailConfirmSubject",
-          "data": "[LemonLDAP::NG] Password reset confirmation"
+          "title": "mailConfirmSubject"
         }, {
           "id": "mailConfirmBody",
           "title": "mailConfirmBody",
@@ -1589,10 +1491,10 @@
         "title": "mailOther",
         "type": "simpleInputContainer",
         "nodes": [{
-          "default": "http://auth.example.com/mail.pl",
+          "default": "http://auth.example.com/resetpwd",
           "id": "mailUrl",
           "title": "mailUrl",
-          "data": "http://auth.example.com/mail.pl"
+          "data": "http://auth.example.com/resetpwd"
         }, {
           "default": "[A-Z]{3}[a-z]{5}.\\d{2}",
           "id": "randomPasswordRegexp",
@@ -1616,7 +1518,7 @@
       "title": "register",
       "type": "simpleInputContainer",
       "nodes": [{
-        "default": "Demo",
+        "default": "Null",
         "id": "registerDB",
         "select": [{
           "k": "AD",
@@ -1633,12 +1535,7 @@
         }],
         "title": "registerDB",
         "type": "select",
-        "data": "Demo"
-      }, {
-        "default": "http://auth.example.com/register.pl",
-        "id": "registerUrl",
-        "title": "registerUrl",
-        "data": "http://auth.example.com/register.pl"
+        "data": "Null"
       }, {
         "default": 0,
         "id": "registerTimeout",
@@ -1646,15 +1543,13 @@
         "type": "int",
         "data": 0
       }, {
-        "default": "[LemonLDAP::NG] Account register confirmation",
+        "default": "",
         "id": "registerConfirmSubject",
-        "title": "registerConfirmSubject",
-        "data": "[LemonLDAP::NG] Account register confirmation"
+        "title": "registerConfirmSubject"
       }, {
-        "default": "[LemonLDAP::NG] Your new account",
+        "default": "",
         "id": "registerDoneSubject",
-        "title": "registerDoneSubject",
-        "data": "[LemonLDAP::NG] Your new account"
+        "title": "registerDoneSubject"
       }]
     }, {
       "id": "security",
@@ -1665,12 +1560,6 @@
         "id": "userControl",
         "title": "userControl",
         "data": "^[\\w\\.\\-@]+$"
-      }, {
-        "default": 0,
-        "id": "portalForceAuthn",
-        "title": "portalForceAuthn",
-        "type": "bool",
-        "data": 0
       }, {
         "default": "p2@Pol9Lo_Ze&j*P",
         "id": "key",
@@ -1739,94 +1628,6 @@
         "data": 0
       }]
     }, {
-      "id": "specialHandlers",
-      "title": "specialHandlers",
-      "nodes": [{
-        "id": "zimbraHandler",
-        "title": "zimbraHandler",
-        "type": "simpleInputContainer",
-        "nodes": [{
-          "id": "zimbraPreAuthKey",
-          "title": "zimbraPreAuthKey"
-        }, {
-          "id": "zimbraAccountKey",
-          "title": "zimbraAccountKey"
-        }, {
-          "default": "",
-          "id": "zimbraBy",
-          "select": [{
-            "k": "",
-            "v": ""
-          }, {
-            "k": "name",
-            "v": "User name"
-          }, {
-            "k": "id",
-            "v": "User id"
-          }, {
-            "k": "foreignPrincipal",
-            "v": "Foreign principal"
-          }],
-          "title": "zimbraBy",
-          "type": "select",
-          "data": ""
-        }, {
-          "id": "zimbraUrl",
-          "title": "zimbraUrl"
-        }, {
-          "id": "zimbraSsoUrl",
-          "title": "zimbraSsoUrl"
-        }]
-      }, {
-        "id": "sympaHandler",
-        "title": "sympaHandler",
-        "type": "simpleInputContainer",
-        "nodes": [{
-          "id": "sympaSecret",
-          "title": "sympaSecret"
-        }, {
-          "id": "sympaMailKey",
-          "title": "sympaMailKey"
-        }]
-      }, {
-        "id": "secureTokenHandler",
-        "title": "secureTokenHandler",
-        "type": "simpleInputContainer",
-        "nodes": [{
-          "default": "127.0.0.1:11211",
-          "id": "secureTokenMemcachedServers",
-          "title": "secureTokenMemcachedServers",
-          "data": "127.0.0.1:11211"
-        }, {
-          "default": 60,
-          "id": "secureTokenExpiration",
-          "title": "secureTokenExpiration",
-          "type": "int",
-          "data": 60
-        }, {
-          "default": "uid",
-          "id": "secureTokenAttribute",
-          "title": "secureTokenAttribute",
-          "data": "uid"
-        }, {
-          "default": ".*",
-          "id": "secureTokenUrls",
-          "title": "secureTokenUrls",
-          "data": ".*"
-        }, {
-          "default": "Auth-Token",
-          "id": "secureTokenHeader",
-          "title": "secureTokenHeader",
-          "data": "Auth-Token"
-        }, {
-          "default": 1,
-          "id": "secureTokenAllowOnError",
-          "title": "secureTokenAllowOnError",
-          "type": "bool",
-          "data": 1
-        }]
-      }]
-    }, {
       "default": [],
       "id": "logoutServices",
       "title": "logoutServices",
@@ -1838,21 +1639,11 @@
   "id": "variables",
   "title": "variables",
   "nodes": [{
-    "default": [{
-      "data": "HTTP_USER_AGENT",
-      "id": "exportedVars/UA",
-      "title": "UA",
-      "type": "keyText"
-    }],
+    "default": [],
     "id": "exportedVars",
     "title": "exportedVars",
     "type": "keyTextContainer",
-    "nodes": [{
-      "data": "HTTP_USER_AGENT",
-      "type": "keyText",
-      "id": "exportedVars/UA",
-      "title": "UA"
-    }]
+    "nodes": []
   }, {
     "default": [],
     "id": "macros",
@@ -2313,12 +2104,6 @@
         "title": "samlIDPSSODescriptorSingleSignOnServiceHTTPArtifact",
         "type": "samlService",
         "data": ["urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact", "#PORTAL#/saml/singleSignOnArtifact", ""]
-      }, {
-        "default": "urn:oasis:names:tc:SAML:2.0:bindings:SOAP;#PORTAL#/saml/singleSignOnSOAP;",
-        "id": "samlIDPSSODescriptorSingleSignOnServiceSOAP",
-        "title": "samlIDPSSODescriptorSingleSignOnServiceSOAP",
-        "type": "samlService",
-        "data": ["urn:oasis:names:tc:SAML:2.0:bindings:SOAP", "#PORTAL#/saml/singleSignOnSOAP", ""]
       }]
     }, {
       "id": "samlIDPSSODescriptorSingleLogoutService",

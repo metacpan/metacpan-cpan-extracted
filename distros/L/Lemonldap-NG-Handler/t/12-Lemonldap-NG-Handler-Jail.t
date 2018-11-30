@@ -5,41 +5,45 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 6;
+use strict;
+use Test::More tests => 9;
+require 't/test.pm';
 BEGIN { use_ok('Lemonldap::NG::Handler::Main::Jail') }
 
 #########################
 
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
+my $res;
 
 ok(
     my $jail = Lemonldap::NG::Handler::Main::Jail->new(
-        'jail'            => undef,
-        'useSafeJail'     => 1,
-        'customFunctions' => undef
+        'jail'        => undef,
+        'useSafeJail' => 1,
     ),
     'new jail object'
 );
-$jail->build_jail();
+$jail->build_jail('Lemonldap::NG::Handler::Test');
 
-my $sub1  = "sub { return( basic('login','password') ) }";
-my $basic = $jail->jail_reval($sub1);
-ok( ( !defined($basic) or defined($basic) ),
-    'basic extended function can be undef with recent Safe Jail' );
+my $sub   = "sub { return( basic('login','password') ) }";
+my $basic = $jail->jail_reval($sub);
+ok( ( defined($basic) ), 'basic extended function is defined' );
 
-my $sub2          = "sub { return ( encode_base64('test') ) }";
-my $encode_base64 = $jail->jail_reval($sub2);
+$sub = "sub { return ( encode_base64('test','') ) }";
+my $code = $jail->jail_reval($sub);
 ok(
-    ( !defined($encode_base64) or defined($encode_base64) ),
-    'encode_base64 function can be undef with recent Safe Jail'
+    ( defined($code) and ref($code) eq 'CODE' ),
+    'encode_base64 function is defined'
 );
+ok( $res = &$code, "Function works" );
+ok( $res eq 'dGVzdA==', 'Get good result' );
 
-my $sub3      = "sub { return(checkDate('20000000000000','21000000000000')) }";
-my $checkDate = $jail->jail_reval($sub3);
-ok( ( !defined($checkDate) or defined($checkDate) ),
-    'checkDate extended function can be undef with recent Safe Jail' );
+$sub  = "sub { return(checkDate('20000000000000','21000000000000')) }";
+$code = $jail->jail_reval($sub);
+ok(
+    ( defined($code) and ref($code) eq 'CODE' ),
+    'checkDate extended function is defined'
+);
+ok( $res = &$code, "Function works" );
+ok( $res == 1, 'Get good result' );
 
-# basic and encode_base64 are not supported by safe jail, but checkDate is
-
-ok( &$checkDate == "1", 'checkDate extended function working with Safe Jail' );

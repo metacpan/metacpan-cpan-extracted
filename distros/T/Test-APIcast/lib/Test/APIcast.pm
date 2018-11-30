@@ -3,7 +3,7 @@ use v5.10.1;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = "0.17";
+our $VERSION = "0.19";
 
 BEGIN {
     $ENV{TEST_NGINX_BINARY} ||= 'openresty';

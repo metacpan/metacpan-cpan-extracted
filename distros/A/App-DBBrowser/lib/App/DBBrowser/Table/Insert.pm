@@ -4,7 +4,6 @@ App::DBBrowser::Table::Insert;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use Cwd                   qw( realpath );
 use Encode                qw( encode decode );
@@ -20,8 +19,6 @@ use Encode::Locale    qw();
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_file choose_a_subset );
 use Term::Form         qw();
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Opt;

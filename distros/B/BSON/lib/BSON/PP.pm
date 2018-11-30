@@ -1,12 +1,13 @@
 use 5.010001;
 use strict;
 use warnings;
+no warnings 'recursion';
 
 package BSON::PP;
 # ABSTRACT: Pure Perl BSON implementation
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.10.1';
 
 use B;
 use Carp;
@@ -62,6 +63,7 @@ use constant {
     BSON_OBJECTID => 'a12',
     BSON_BINARY_TYPE => 'C',
     BSON_CSTRING => 'Z*',
+    BSON_MAX_DEPTH => 100,
 };
 
 sub _printable {
@@ -184,12 +186,25 @@ sub _encode_bson {
     my $refaddr = refaddr($doc);
     die "circular reference detected" if $opt->{_circular}{$refaddr}++;
 
+    $opt->{_depth} = 0 unless defined $opt->{_depth};
+    $opt->{_depth}++;
+    if ($opt->{_depth} > BSON_MAX_DEPTH) {
+        croak "Exceeded max object depth of ". BSON_MAX_DEPTH;
+    }
+
     my $doc_type = ref($doc);
 
-    return $doc->bson
-      if $doc_type eq 'BSON::Raw' || $doc_type eq 'MongoDB::BSON::_EncodedDoc';
+    if ( $doc_type eq 'BSON::Raw' || $doc_type eq 'MongoDB::BSON::_EncodedDoc' ) {
+        delete $opt->{_circular}{$refaddr};
+        $opt->{_depth}--;
+        return $doc->bson;
+    }
 
-    return $$doc if $doc_type eq 'MongoDB::BSON::Raw';
+    if ( $doc_type eq 'MongoDB::BSON::Raw' ) {
+        delete $opt->{_circular}{$refaddr};
+        $opt->{_depth}--;
+        return $$doc;
+    }
 
     my $iter =
         $doc_type eq 'HASH'           ? undef
@@ -453,6 +468,8 @@ sub _encode_bson {
                 $bson .= pack( BSON_TYPE_NAME.BSON_DOUBLE, 0x01, $utf8_key, $value );
             }
             elsif ( $flags & B::SVf_IOK() ) {
+                # Force numeric; fixes dual-vars comparison bug on old Win32s
+                $value = 0+$value;
                 if ( $value > $max_int64 || $value < $min_int64 ) {
                     croak("BSON can only handle 8-byte integers. Key '$key' is '$value'");
                 }
@@ -498,6 +515,7 @@ sub _encode_bson {
     }
 
     delete $opt->{_circular}{$refaddr};
+    $opt->{_depth}--;
 
     return pack( BSON_INT32, length($bson) + 5 ) . $bson . "\0";
 }
@@ -526,8 +544,8 @@ my %FIELD_SIZES = (
     0xFF => 0,
 );
 
-my $ERR_UNSUPPORTED = "Unsupported BSON type 0x%x for key '%s'.  Are you using the latest driver version?";
-my $ERR_TRUNCATED = "Premature end of BSON field '%s' (type 0x%x)";
+my $ERR_UNSUPPORTED = "unsupported BSON type \\x%X for key '%s'.  Are you using the latest version of BSON.pm?";
+my $ERR_TRUNCATED = "premature end of BSON field '%s' (type 0x%x)";
 my $ERR_LENGTH = "BSON field '%s' (type 0x%x) has invalid length: wanted %d, got %d";
 my $ERR_MISSING_NULL = "BSON field '%s' (type 0x%x) missing null terminator";
 my $ERR_BAD_UTF8 = "BSON field '%s' (type 0x%x) contains invalid UTF-8";
@@ -544,6 +562,11 @@ sub _decode_bson {
     my ($bson, $opt) = @_;
     if ( !defined $bson ) {
         croak("Decode argument must not be undef");
+    }
+    $opt->{_depth} = 0 unless defined $opt->{_depth};
+    $opt->{_depth}++;
+    if ($opt->{_depth} > BSON_MAX_DEPTH) {
+        croak "Exceeded max object depth of ". BSON_MAX_DEPTH;
     }
     my $blen= length($bson);
     my $len = unpack( BSON_INT32, $bson );
@@ -802,7 +825,9 @@ sub _decode_bson {
 
         # ???
         else {
-            croak "Unsupported type $type";
+            # Should have already been caught in the minimum length check,
+            # but just in case not:
+            croak( sprintf( $ERR_UNSUPPORTED, $type, $key ) );
         }
 
         if ( $opt->{_decode_array} ) {
@@ -812,6 +837,7 @@ sub _decode_bson {
             $hash{$key} = $value;
         }
     }
+    $opt->{_depth}--;
     return $opt->{_decode_array} ? \@array : \%hash;
 }
 
@@ -827,7 +853,7 @@ BSON::PP - Pure Perl BSON implementation
 
 =head1 VERSION
 
-version v1.8.1
+version v1.10.1
 
 =head1 DESCRIPTION
 

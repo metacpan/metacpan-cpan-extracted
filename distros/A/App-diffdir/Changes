@@ -1,5 +1,13 @@
 Revision history for App-diffdir
 
+0.7   2018-11-29
+        Updating for release of version 0.7
+        Added perl 5.26 to .travis build (Ivan Wills)
+        Updating manifest with latest files (Ivan Wills)
+        Adding configure requires section (Ivan Wills)
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.6   2017-05-28
         Updating for release of version 0.6
         Outputting more info (Ivan Wills)

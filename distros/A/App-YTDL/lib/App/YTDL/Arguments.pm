@@ -11,8 +11,6 @@ our @EXPORT_OK = qw( from_arguments_to_choices );
 use Term::ANSIScreen qw( :cursor :screen );
 use Term::Choose     qw( choose );
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-
 use App::YTDL::ChooseVideos qw( choose_videos );
 use App::YTDL::ExtractData  qw( prepare_info );
 use App::YTDL::GetData      qw( get_vimeo_list_info get_download_info get_youtube_list_info );

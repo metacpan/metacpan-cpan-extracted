@@ -2,12 +2,6 @@
 [![Travis Build Status](https://travis-ci.org/Corion/MIME-Detect.svg?branch=master)](https://travis-ci.org/Corion/MIME-Detect)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/MIME-Detect?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/MIME-Detect)
 
-CONTRIBUTING
-
-See lib/WWW/Mechanize/Chrome/Contributing.pod
-
-[Google Keep Extraction](https://github.com/Corion/WWW-Mechanize-Chrome/raw/master/demo/keep-export-demo.mp4)
-
 # NAME
 
 MIME::Detect - MIME file type identification
@@ -146,7 +140,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein `corion@cpan.org`.
+Copyright 2015-2018 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

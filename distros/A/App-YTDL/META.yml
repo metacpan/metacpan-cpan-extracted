@@ -36,12 +36,10 @@ requires:
   Mojo::DOM: '0'
   Pod::Usage: '0'
   Term::ANSIScreen: '0'
-  Term::Choose: '1.600'
-  Term::Choose::LineFold: '1.600'
-  Term::Choose::Util: '0.064'
-  Term::Form: '0'
-  Text::Unidecode: '0'
-  Unicode::Normalize: '0'
+  Term::Choose: '1.637'
+  Term::Choose::LineFold: '1.637'
+  Term::Choose::Util: '0.068'
+  Term::Form: '0.502'
   constant: '0'
   if: '0'
   parent: '0'
@@ -51,5 +49,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-YTDL.git
-version: '0.303'
+version: '0.304'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

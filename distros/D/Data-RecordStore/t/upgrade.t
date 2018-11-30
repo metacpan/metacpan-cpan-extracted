@@ -17,6 +17,9 @@ BEGIN {
     use_ok( "Data::RecordStore::Converter" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
 }
 
+my $is_windows = $^O eq 'MSWin32';
+
+
 test_suite();
 
 done_testing;

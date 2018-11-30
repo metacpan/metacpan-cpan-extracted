@@ -1,0 +1,39 @@
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcPidFile: t/testslapd/slapd.pid
+
+dn: cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: schema
+
+include: file://__SCHEMA_DIR__/core.ldif
+include: file://__SCHEMA_DIR__/cosine.ldif
+include: file://__SCHEMA_DIR__/nis.ldif
+include: file://__SCHEMA_DIR__/inetorgperson.ldif
+
+dn: olcDatabase=frontend,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcFrontendConfig
+olcDatabase: frontend
+
+dn: olcDatabase=config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: config
+
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: /usr/lib/ldap
+olcModuleLoad: back_mdb
+
+dn: olcDatabase=mdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: mdb
+olcSuffix: dc=example,dc=com
+olcDbDirectory: t/testslapd/data
+olcRootDN: cn=admin,dc=example,dc=com
+olcRootPW: admin
+olcAccess: to * by * write
+

@@ -1,14 +1,13 @@
 package MIME::Detect;
-use Moo;
-use if $] < 5.020, 'Filter::signatures';
+use Moo 2;
+use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use Carp qw(croak);
 use XML::LibXML;
 use MIME::Detect::Type;
 
-use vars '$VERSION';
-$VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -318,8 +317,8 @@ sub mime_type_from_name( $self, $file ) {
 }
 
 package MIME::Detect::Buffer;
-use Moo;
-use if $] < 5.020, 'Filter::signatures';
+use Moo 2;
+use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 use Fcntl 'SEEK_SET';
@@ -432,7 +431,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

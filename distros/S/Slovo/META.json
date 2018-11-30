@@ -33,14 +33,18 @@
       },
       "runtime" : {
          "requires" : {
+            "Authen::SASL" : "2.16",
             "Class::Method::Modifiers" : "2.12",
-            "Cpanel::JSON::XS" : "4.06",
+            "Cpanel::JSON::XS" : "4.08",
+            "EV" : "4.22",
+            "Minion::Backend::SQLite" : "4.002",
             "Mojo::SQLite" : "3.001",
-            "Mojolicious" : "8.04",
+            "Mojolicious" : "8.07",
             "Mojolicious::Plugin::Authentication" : "1.32",
             "Mojolicious::Plugin::OpenAPI" : "2.00",
-            "Mojolicious::Plugin::PODViewer" : "0.02",
+            "Mojolicious::Plugin::PODViewer" : "0.002",
             "Mojolicious::Plugin::RoutesConfig" : "0.05",
+            "Net::SMTP" : "3.11",
             "Role::Tiny" : "2.000006",
             "perl" : "5.020000"
          }
@@ -64,6 +68,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2018.11.15",
+   "version" : "v2018.11.30",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

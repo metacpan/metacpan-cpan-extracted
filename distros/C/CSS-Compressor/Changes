@@ -1,0 +1,12 @@
+0.03  2018-11-29
+  - Prevent breaking inline SVG. (Timur Bilalov)
+  - Properly support @support rules. (Anton Eprev)
+  - Keep space around plus symbol in calc() expressions. (Aziz Yuldoshev)
+  - Do not preserve /*! @noflip */ comments. (Diogo Antunes)
+
+0.02  2012-06-27
+  - Fix dependencies.
+  - Use public email address.
+
+0.01  2012-06-21
+  - Initial release.

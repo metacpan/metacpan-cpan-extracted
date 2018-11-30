@@ -2,9 +2,10 @@
 # forms are unused
 
 use Test::More;
+use Data::Dumper;
 use strict;
 
-my $formDir = 'site/static/forms';
+my $formDir = 'site/htdocs/static/forms';
 
 my $count = 0;
 use_ok('Lemonldap::NG::Manager::Build::Tree');
@@ -23,13 +24,13 @@ delete $forms{restore};
 my ( @types, $attr, $tree, $ctrees );
 ok( $tree   = Lemonldap::NG::Manager::Build::Tree::tree(),     'Get tree' );
 ok( $ctrees = Lemonldap::NG::Manager::Build::CTrees::cTrees(), 'Get cTrees' );
-ok( $attr = Lemonldap::NG::Manager::Build::Attributes::attributes(),
+ok( $attr   = Lemonldap::NG::Manager::Build::Attributes::attributes(),
     'Get attributes' );
 $count += 4;
 
 my %types = %{ getTypes( $tree, values(%$ctrees), $attr ) };
 
-foreach (qw(home menuCat menuApp)) {
+foreach (qw(home menuCat menuApp authParamsTextContainer)) {
     ok( $forms{$_}, "Found $_ form" );
     $count++;
     delete $forms{$_};
@@ -37,10 +38,13 @@ foreach (qw(home menuCat menuApp)) {
 
 foreach my $type ( keys %types ) {
     delete $types{$type};
-    next
-      if ( $type =~
-/^(?:authParamsText|url|PerlModule|hostname|pcre|lmAttrOrMacro|subContainer|RSAP(?:ublic|rivate)Key(?:OrCertificate)?)$/
-      );
+    if ( $type =~
+/^(?:array|authParamsText|url|PerlModule|hostname|pcre|lmAttrOrMacro|subContainer|RSAP(?:ublic|rivate)Key(?:OrCertificate)?)$/
+      )
+    {
+        delete $forms{$type};
+        next;
+    }
     ok( $forms{$type}, "Found $type" );
     delete $forms{$type};
     $count++;
@@ -51,7 +55,7 @@ foreach my $type ( keys %types ) {
         $count++;
     }
 }
-ok( !%forms, "No unused forms" );
+ok( !%forms, "No unused forms" ) or print "Found:\n" . Dumper( \%forms );
 $count++;
 
 done_testing($count);

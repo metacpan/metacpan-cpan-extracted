@@ -467,16 +467,21 @@ bson_equal (const bson_t *bson,
  * bson_validate:
  * @bson: A bson_t.
  * @offset: A location for the error offset.
+ * @invalid_type: A handle for an invalid type
  *
  * Validates a BSON document by walking through the document and inspecting
  * the fields for valid content.
  *
  * Returns: true if @bson is valid; otherwise false and @offset is set.
+ * If the return value is false and type_code is non-zero, it represents an
+ * invalid type found during validation.
  */
 bool
 bson_validate (const bson_t         *bson,
                bson_validate_flags_t flags,
-               size_t               *offset);
+               size_t               *offset,
+               const char           **invalid_key,
+               uint32_t             *invalid_type);
 
 
 /**

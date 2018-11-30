@@ -1,0 +1,16 @@
+{
+"accountCreated":"Il tuo account è stato creato, una password temporanea è stata inviata al tuo indirizzo di posta elettronica.",
+"autoMail":"Questa mail é stata inviata automaticamente",
+"click2Register":"Clicca qui per confermare la registrazione del tuo account",
+"click2Reset":"Clicca qui per reimpostare la password",
+"hello":"Salve",
+"mailConfirmSubject":"Conferma reimpostazione password [LemonLDAP::NG] ",
+"mailSubject":"[LemonLDAP::NG] La tua nuova password",
+"newPwdIs":"La tua nuova password é",
+"pwdChanged":"La tua password é stata cambiata",
+"pwdIs":"La tua password é",
+"registerConfirmSubject":"[LemonLDAP :: NG] Conferma registro account",
+"registerDoneSubject":"[LemonLDAP::NG] Il tuo nuovo account",
+"requestIssuedFromIP":"La richiesta è stata emessa da IP",
+"yourLoginIs":"Il tuo login é"
+}

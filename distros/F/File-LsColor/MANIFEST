@@ -1,4 +1,7 @@
+bin/get_ls_colors
 bin/ls_color
+bin/ls_color_default
+bin/ls_color_internal
 lib/File/LsColor.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -7,4 +10,3 @@ t/01-pod.t
 t/02-pod-coverage.t
 t/021-synopsis.t
 t/03-ls_color.t
-META.yml                                 Module meta-data (added by MakeMaker)

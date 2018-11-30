@@ -1,0 +1,26 @@
+## name GoodModules
+## failures 0
+## cut
+
+use Cpanel::JSON::XS;
+use Const::Fast;
+use Getopt::Long;
+use Getopt::Long::Descriptive;
+use JSON::MaybeXS;
+use JSON::PP;
+use List::SomeUtils;
+use List::Util;
+use List::UtilsBy;
+use Moo;
+use Moose;
+use ReadonlyX;
+
+## name BadModules
+## failures 5
+## cut
+
+use Getopt::Std;
+use JSON;
+use List::MoreUtils;
+use Mouse;
+use Readonly;

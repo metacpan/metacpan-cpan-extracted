@@ -1,0 +1,18 @@
+{
+  "name": "lemonldap-ng-portal",
+  "description": "Lemonldap::NG portal",
+  "version": "1.9.0",
+  "homepage": "https://lemonldap-ng.org",
+  "license": "GPL2",
+  "private": true,
+  "dependencies": {
+    "bootstrap": "4.x",
+    "crypto-js": "x",
+    "fingerprintjs2": "x",
+    "font-awesome": "4.x",
+    "jquery": "2.x",
+    "jquery-ui": "x",
+    "jquery.cookie": "x",
+    "qrious": "x"
+  }
+}

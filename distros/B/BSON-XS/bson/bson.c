@@ -51,6 +51,8 @@ typedef struct
    bson_validate_flags_t flags;
    ssize_t               err_offset;
    bson_validate_phase_t phase;
+   const char *          invalid_key;
+   uint32_t              invalid_type;
 } bson_validate_state_t;
 
 
@@ -3024,7 +3026,7 @@ _bson_iter_validate_codewscope (const bson_iter_t *iter,
    bson_validate_state_t *state = data;
    size_t offset;
 
-   if (!bson_validate (v_scope, state->flags, &offset)) {
+   if (!bson_validate (v_scope, state->flags, &offset, NULL, NULL)) {
       state->err_offset = iter->off + offset;
       return false;
    }
@@ -3032,6 +3034,16 @@ _bson_iter_validate_codewscope (const bson_iter_t *iter,
    return true;
 }
 
+static void
+_bson_iter_record_unsupported_type (const bson_iter_t *iter,
+                                    const char        *key,
+                                    uint32_t          type_code,
+                                    void              *data)
+{
+   bson_validate_state_t *state = data;
+   state->invalid_key = key;
+   state->invalid_type = type_code;
+}
 
 static bool
 _bson_iter_validate_document (const bson_iter_t *iter,
@@ -3059,6 +3071,13 @@ static const bson_visitor_t bson_validate_funcs = {
    NULL, /* visit_code */
    NULL, /* visit_symbol */
    _bson_iter_validate_codewscope,
+   NULL, /* visit_int32 */
+   NULL, /* visit_timestamp */
+   NULL, /* visit_int64 */
+   NULL, /* visit_maxkey */
+   NULL, /* visit_minkey */
+   _bson_iter_record_unsupported_type,
+   NULL, /* visit_decimal128 */
 };
 
 
@@ -3101,7 +3120,9 @@ _bson_iter_validate_document (const bson_iter_t *iter,
 bool
 bson_validate (const bson_t         *bson,
                bson_validate_flags_t flags,
-               size_t               *offset)
+               size_t               *offset,
+               const char           **invalid_key,
+               uint32_t             *invalid_type)
 {
    bson_validate_state_t state = { flags, -1, BSON_VALIDATE_PHASE_START };
    bson_iter_t iter;
@@ -3117,6 +3138,12 @@ failure:
 
    if (offset) {
       *offset = state.err_offset;
+   }
+   if (invalid_key) {
+       *invalid_key = state.invalid_key;
+   }
+   if (invalid_type) {
+       *invalid_type = state.invalid_type;
    }
 
    return state.err_offset < 0;

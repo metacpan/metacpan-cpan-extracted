@@ -1,0 +1,54 @@
+#!perl
+use strict;
+use warnings;
+
+# PODNAME: mpc-dump
+# ABSTRACT: dump yaml to perl on stdout
+
+use utf8;
+binmode STDOUT, ":utf8";
+use feature 'say';
+use YAML::Tiny 'LoadFile';
+use Data::Dumper;
+ 
+my $file    =     shift @ARGV;
+
+my @doc = LoadFile( $file );
+my @q   = @{$doc[0]};
+
+say Dumper(\@q);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mpc-dump - dump yaml to perl on stdout
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+THIS IS AN EARLY RELEASE. YOU PROBABLY SHOULD NOT USE IT, UNLESS YOU KNOW WHY.
+
+Dump your yaml config to perl data structures on stdout.
+
+  mcp-dump myfile.yml
+
+=head1 AUTHOR
+
+Boris Däppen <bdaeppen.perl@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Boris Däppen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

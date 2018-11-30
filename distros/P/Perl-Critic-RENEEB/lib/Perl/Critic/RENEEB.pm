@@ -5,7 +5,7 @@ use strict;
 
 # ABSTRACT: A collection of handy Perl::Critic policies
 
-our $VERSION = '0.03';
+our $VERSION = '2.00';
 
 
 1; # End of Perl::Critic::RENEEB
@@ -22,7 +22,7 @@ Perl::Critic::RENEEB - A collection of handy Perl::Critic policies
 
 =head1 VERSION
 
-version 0.03
+version 2.00
 
 =head1 SYNOPSIS
 

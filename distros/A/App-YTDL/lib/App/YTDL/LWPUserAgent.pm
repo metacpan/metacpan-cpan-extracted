@@ -10,8 +10,6 @@ use parent qw( LWP::UserAgent );
 use App::YTDL::Helper qw( HIDE_CURSOR SHOW_CURSOR );
 
 
-
-
 my @ANI = qw(- \ | /);
 
 sub progress {

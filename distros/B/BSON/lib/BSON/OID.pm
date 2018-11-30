@@ -6,14 +6,14 @@ package BSON::OID;
 # ABSTRACT: BSON type wrapper for Object IDs
 
 use version;
-our $VERSION = 'v1.8.1';
+our $VERSION = 'v1.10.1';
 
 use Carp;
 use Config;
-use Digest::MD5 'md5';
 use Scalar::Util 'looks_like_number';
 use Sys::Hostname;
 use threads::shared; # NOP if threads.pm not loaded
+use Crypt::URandom ();
 
 use constant {
     HAS_INT64 => $Config{use64bitint},
@@ -39,20 +39,35 @@ use namespace::clean -except => 'meta';
 
 # OID generation
 {
+    my $_MAX_INC_VALUE = 0xFFFFFF;
+    my $_MAX_INC_VALUE_PLUS_ONE = 0x01000000;
+    my $_RANDOM_SIZE = 5;
     my $_inc : shared;
     {
         lock($_inc);
-        $_inc = int( rand(0xFFFFFF) );
+        $_inc = int( rand($_MAX_INC_VALUE) );
     }
 
-    my $_host = substr( md5(hostname), 0, 3 );
+    # for testing purposes
+    sub __reset_counter {
+        lock($_inc);
+        $_inc = $_MAX_INC_VALUE - 1;
+    }
+
+    my $_pid = $$;
+    my $_random = Crypt::URandom::urandom($_RANDOM_SIZE);
+
+    sub CLONE { $_random = Crypt::URandom::urandom($_RANDOM_SIZE) }
 
     #<<<
     sub _packed_oid {
         my $time = defined $_[0] ? $_[0] : time;
+        $_random = Crypt::Urandom::urandom($_RANDOM_SIZE) if $$ != $_pid;
         return pack(
-            'Na3na3', $time, $_host, $$ & 0xFFFF,
-            substr( pack( 'N', do { lock($_inc); $_inc++; $_inc %= 0xFFFFFF }), 1, 3)
+            'Na5a3',
+            $time,
+            $_random,
+            substr( pack( 'N', do { lock($_inc); $_inc++; $_inc %= $_MAX_INC_VALUE_PLUS_ONE } ), 1, 3)
         );
     }
     sub _packed_oid_special {
@@ -60,22 +75,12 @@ use namespace::clean -except => 'meta';
         return pack('Na8', $time, $fill);
     }
     #>>>
-
-    # see if we have XS OID generation
-    BEGIN {
-        if ( $INC{'BSON/XS.pm'} && BSON::XS->can('_generate_oid') ) {
-            *_generate_oid = \&BSON::XS::_generate_oid;
-        }
-        else {
-            *_generate_oid = \&_packed_oid;
-        }
-    }
 }
 
 sub BUILD {
     my ($self) = @_;
 
-    $self->{oid} = _generate_oid() unless defined $self->{oid};
+    $self->{oid} = _packed_oid() unless defined $self->{oid};
     croak "Invalid 'oid' field: OIDs must be 12 bytes"
       unless length( $self->oid ) == 12;
     return;
@@ -193,11 +198,6 @@ sub get_time {
     return unpack( "N", substr( $_[0]->{oid}, 0, 4 ) );
 }
 
-# for testing purposes
-sub _get_pid {
-    return unpack( "n", substr( $_[0]->{oid}, 7, 2 ) );
-}
-
 #pod =method TO_JSON
 #pod
 #pod Returns a string for this OID, with the OID given as 24 hex digits.
@@ -225,6 +225,15 @@ sub _cmp {
     return "$left" cmp "$right";
 }
 
+# Legacy MongoDB driver tests check for a PID matching $$, but the new OID
+# no longer has an embedded PID.  To avoid breaking legacy tests, we make
+# this return the masked PID.
+sub _get_pid { return $$ & 0xFFFF }
+
+# Legacy BSON::XS tests expect to find a _generate_oid, so we provide
+# one for back-compatibility.
+sub _generate_oid { _packed_oid() };
+
 use overload (
     '""'     => \&hex,
     "<=>"    => \&_cmp,
@@ -244,7 +253,7 @@ BSON::OID - BSON type wrapper for Object IDs
 
 =head1 VERSION
 
-version v1.8.1
+version v1.10.1
 
 =head1 SYNOPSIS
 

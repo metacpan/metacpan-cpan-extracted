@@ -1,4 +1,5 @@
 package Pod::Tree::PerlDist;
+use 5.006;
 use strict;
 use warnings;
 use HTML::Stream;
@@ -6,7 +7,7 @@ use Pod::Tree;
 use Pod::Tree::HTML;
 use Pod::Tree::PerlUtil;
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 use base qw(Pod::Tree::PerlUtil);
 

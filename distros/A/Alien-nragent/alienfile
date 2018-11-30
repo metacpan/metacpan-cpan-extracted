@@ -60,6 +60,7 @@ share {
     # we want!
     'mkdir -p %{.install.prefix}/include',
     'mkdir -p %{.install.prefix}/lib',
+    'cp LICENSE %{.install.prefix}',
     'cp -a include/* %{.install.prefix}/include',
     'cp -a lib/* %{.install.prefix}/lib',
   ];

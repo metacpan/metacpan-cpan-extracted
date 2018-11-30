@@ -3,19 +3,23 @@ package Lemonldap::NG::Manager::Notifications;
 use 5.10.0;
 use utf8;
 use Mouse;
+use JSON qw(from_json to_json);
+use POSIX qw(strftime);
 
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::PSGI::Constants;
-use Lemonldap::NG::Manager::Constants;
-use Lemonldap::NG::Common::Notification;
+use Lemonldap::NG::Common::Conf::ReConstants;
+require Lemonldap::NG::Common::Notifications;
 
 use feature 'state';
 
-extends 'Lemonldap::NG::Manager::Lib';
+extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
-our $VERSION = '1.9.1';
+our $VERSION = '2.0.0';
 
-has _notifAccess => ( is => 'rw' );
+has notifAccess => ( is => 'rw' );
+
+has notifFormat => ( is => 'rw' );
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -24,9 +28,18 @@ has _notifAccess => ( is => 'rw' );
 use constant defaultRoute => 'notifications.html';
 
 sub addRoutes {
-    my $self = shift;
+    my ( $self, $conf ) = @_;
 
-    unless ( $self->notifAccess ) {
+    if ( $conf->{oldNotifFormat} ) {
+        Lemonldap::NG::Common::Notifications->import('XML');
+        $self->notifFormat('XML');
+    }
+    else {
+        Lemonldap::NG::Common::Notifications->import('JSON');
+        $self->notifFormat('JSON');
+    }
+
+    unless ( $self->setNotifAccess($conf) ) {
         $self->addRoute( 'notifications.html', 'notEnabled', ['GET'] );
         $self->addRoute( notifications => 'notEnabled', ['GET'] );
         return ( $self->error ? 0 : 1 );
@@ -65,17 +78,8 @@ sub addRoutes {
 
 }
 
-sub notifAccess {
-    my $self = shift;
-    return $self->_notifAccess if ( $self->_notifAccess );
-
-    # 1. Get notificationStorage or build it using globalStorage
-    my $conf = $self->_confAcc->getConf();
-    unless ($conf) {
-        $self->error($Lemonldap::NG::Common::Conf::msg);
-        return 0;
-    }
-    my $args;
+sub setNotifAccess {
+    my ( $self, $conf ) = @_;
 
     # TODO: refresh system
     $self->{$_} //= $conf->{$_}
@@ -92,32 +96,34 @@ sub notifAccess {
               'notificationStorage is not defined in configuration' );
         return 0;
     }
-    $args->{type} = $self->{notificationStorage};
-    foreach ( keys %{ $self->{notificationStorageOptions} } ) {
-        $args->{$_} = $self->{notificationStorageOptions}->{$_};
-    }
-
-    # Get the type
-    $args->{type} =~ s/.*:://;
-    $args->{type} =~ s/(CBDI|RDBI)/DBI/;    # CDBI/RDBI are DBI
-
-    # If type not File or DBI, abort
-    unless ( $args->{type} =~ /^(File|DBI|LDAP)$/ ) {
-        $self->handlerAbort( notifications =>
-              "Only File, DBI or LDAP supported for Notifications" );
+    my $type =
+      "Lemonldap::NG::Common::Notifications::$self->{notificationStorage}";
+    $type =~ s/(?:C|R)DBI$/DBI/;
+    eval "require $type";
+    if ($@) {
+        $self->handlerAbort( notifications => "Unable to load $type: $@" );
         return 0;
     }
 
     # Force table name
-    $args->{p} = $self;
     unless (
-        $self->_notifAccess( Lemonldap::NG::Common::Notification->new($args) ) )
+        eval {
+            $self->notifAccess(
+                $type->new(
+                    {
+                        %{ $self->{notificationStorageOptions} },
+                        p    => $self,
+                        conf => $self
+                    }
+                )
+            );
+        }
+      )
     {
-        $self->handlerAbort(
-            notifications => $Lemonldap::NG::Common::Notification::msg );
+        $self->handlerAbort( notifications => $@ );
         return 0;
     }
-    return $self->_notifAccess();
+    return $self->notifAccess();
 }
 
 #######################
@@ -149,7 +155,7 @@ sub notifications {
     return $self->notification( $req, $notif, $type ) if ($notif);
 
     # Case 2: list
-    my $params = $req->params();
+    my $params = $req->parameters();
     my ( $notifs, $res );
 
     $notifs = $self->notifAccess->$sub();
@@ -225,10 +231,10 @@ sub notification {
 
     if ( $type eq 'actives' ) {
         my ( $uid, $ref ) = ( $id =~ /([^_]+?)_(.+)/ );
-        my $n = $self->notifAccess->_get( $uid, $ref );
+        my $n = $self->notifAccess->get( $uid, $ref );
         unless ($n) {
-            $self->lmLog( "Notification $ref not found for user $uid",
-                'notice' );
+            $self->userLogger->notice(
+                "Notification $ref not found for user $uid");
             return $self->sendJSONresponse(
                 $req,
                 {
@@ -257,37 +263,65 @@ sub newNotification {
         return $self->sendError( $req, undef, 200 );
     }
 
-    foreach my $r (qw(uid date reference xml)) {
+    foreach my $r (qw(uid reference xml)) {
         return $self->sendError( $req, "Missing $r", 200 )
           unless ( $json->{$r} );
     }
+
+    # Set default date value
+    my $dDate = strftime( "%Y-%m-%d", localtime() );
+    if ( $json->{date} ) {
+        $self->logger->debug(
+"Posted data : uid = $json->{uid} - Ref = $json->{reference} - Date = $json->{date}"
+        );
+    }
+    else {
+        $self->logger->debug(
+"Posted data : uid = $json->{uid} - Ref = $json->{reference} - Date = ???"
+        );
+        $json->{date} = $dDate;
+    }
+
+    # Check if posted date > today
+    unless ( $json->{date} ge $dDate ) {
+        $self->logger->debug("Posted Date < today !!! ");
+        $json->{date} = $dDate;
+    }
+    $self->logger->debug("Notification Date = $json->{date}");
 
     unless ( $json->{date} =~ /^\d{4}-\d{2}-\d{2}$/ ) {
         return $self->sendError( $req, "Malformed date", 200 );
     }
 
-    utf8::decode( $json->{xml} );
-
-    my $newNotif = qq#<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+    my $newNotif;
+    if ( $self->notifFormat eq 'XML' ) {
+        utf8::decode( $json->{xml} );
+        $newNotif = qq#<?xml version='1.0' encoding='UTF-8' standalone='no'?>
 <root><notification #
-      . join(
-        ' ',
-        map {
-            if ( my $t = $json->{$_} ) { $t =~ s/"/'/g; qq#$_="$t"# }
-            else                       { () }
-        } (qw(uid date reference condition))
-      ) . ">$json->{xml}</notification></root>";
+          . join(
+            ' ',
+            map {
+                if ( my $t = $json->{$_} ) { $t =~ s/"/'/g; qq#$_="$t"# }
+                else                       { () }
+            } (qw(uid date reference condition))
+          ) . ">$json->{xml}</notification></root>";
+    }
+    else {
+        eval {
+            my $tmp = from_json( $json->{xml}, { allow_nonref => 1 } );
+            $json->{$_} = $tmp->{$_} foreach ( keys %$tmp );
+            delete $json->{xml};
+        };
+        if ($@) {
+            $self->logger->error("Notification malformed $@");
+            return $self->sendError( $req, "Notification malformed: $@", 200 );
+        }
+        $newNotif = to_json($json);
+    }
 
     unless ( eval { $self->notifAccess->newNotification($newNotif) } ) {
-        $self->lmLog(
-"Notification not created: $@$Lemonldap::NG::Common::Notification::msg",
-            'error'
-        );
-        return $self->sendError(
-            $req,
-"Notification not created: $@$Lemonldap::NG::Common::Notification::msg",
-            200
-        );
+        $self->logger->error("Notification not created: $@");
+        return $self->sendError( $req, "Notification not created: $@", 200 );
     }
     else {
         return $self->sendJSONresponse( $req, { result => 1 } );
@@ -310,8 +344,8 @@ sub updateNotification {
     my $id = $req->params('notificationId') or die;
     my ( $uid, $ref ) = ( $id =~ /([^_]+?)_(.+)/ );
     my ( $n, $res );
-    unless ( $n = $self->notifAccess->_get( $uid, $ref ) ) {
-        $self->lmLog( "Notification $ref not found for user $uid", 'notice' );
+    unless ( $n = $self->notifAccess->get( $uid, $ref ) ) {
+        $self->logger->notice("Notification $ref not found for user $uid");
         return $self->sendError( $req,
             "Notification $ref not found for user $uid" );
     }
@@ -319,17 +353,17 @@ sub updateNotification {
     # Delete notifications
     my $status = 1;
     foreach ( keys %$n ) {
-        $status = 0 unless ( $self->notifAccess->_delete($_) );
+        $status = 0 unless ( $self->notifAccess->delete($_) );
     }
 
     unless ($status) {
-        $self->lmLog( "Notification $ref for user $uid not deleted", 'error' );
+        $self->logger->error("Notification $ref for user $uid not deleted");
         return $self->sendError( $req,
             "Notification $ref for user $uid not deleted" );
     }
 
     else {
-        $self->lmLog( "Notification $ref deleted for user $uid", 'info' );
+        $self->logger->info("Notification $ref deleted for user $uid");
         return $self->sendJSONresponse( $req, { result => 1 } );
     }
 }
@@ -341,103 +375,15 @@ sub deleteDoneNotification {
     # Purge notification
     my $id = $req->params('notificationId') or die;
     my ( $uid, $ref, $date ) = ( $id =~ /([^_]+?)_([^_]+?)_(.+)/ );
-    my $identifier = $self->notifAccess->_getIdentifier( $uid, $ref, $date );
-    unless ( $self->notifAccess->purge($identifier) ) {
-        $self->lmLog(
-"Notification $identifier not purged ($Lemonldap::NG::Common::Notification::msg)",
-            'warn'
-        );
-        return $self->sendError(
-            $req,
-"Notification $identifier not purged ($Lemonldap::NG::Common::Notification::msg)",
-            400
-        );
+    my $identifier = $self->notifAccess->getIdentifier( $uid, $ref, $date );
+    unless ( eval { $self->notifAccess->purge($identifier) } ) {
+        $self->logger->warn("Notification $identifier not purged ($@)");
+        return $self->sendError( $req,
+            "Notification $identifier not purged ($@)", 400 );
     }
 
-    $self->lmLog( "Notification $identifier purged", 'info' );
+    $self->logger->info("Notification $identifier purged");
     return $self->sendJSONresponse( $req, { result => 1 } );
 }
 
 1;
-__END__
-
-=head1 NAME
-
-=encoding utf8
-
-Lemonldap::NG::Manager::Notifications - Notifications explorer component of
-L<Lemonldap::NG::Manager>.
-
-=head1 SYNOPSIS
-
-See L<Lemonldap::NG::Manager>.
-
-=head1 DESCRIPTION
-
-Lemonldap::NG::Manager provides a web interface to manage Lemonldap::NG Web-SSO
-system.
-
-The Perl part of Lemonldap::NG::Manager is the REST server. Web interface is
-written in Javascript, using AngularJS framework and can be found in `site`
-directory. The REST API is described in REST-API.md file given in source tree.
-
-Lemonldap::NG Manager::Notifications provides the notifications explorer part.
-
-=head1 ORGANIZATION
-
-Lemonldap::NG Manager::Notifications is the only one module used to explore
-notifications.  The javascript part is in `site/static/js/notifications.js`
-file.
-
-=head1 SEE ALSO
-
-L<Lemonldap::NG::Manager>, L<http://lemonldap-ng.org/>
-
-=head1 AUTHORS
-
-=over
-
-=item Clement Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=item François-Xavier Deltombe, E<lt>fxdeltombe@gmail.com.E<gt>
-
-=item Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Thomas Chemineau, E<lt>thomas.chemineau@gmail.comE<gt>
-
-=back
-
-=head1 BUG REPORT
-
-Use OW2 system to report bug or ask for features:
-L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
-
-=head1 DOWNLOAD
-
-Lemonldap::NG is available at
-L<http://forge.objectweb.org/project/showfiles.php?group_id=274>
-
-=head1 COPYRIGHT AND LICENSE
-
-=over
-
-=item Copyright (C) 2015-2016 by Xavier Guimard, E<lt>x.guimard@free.frE<gt>
-
-=item Copyright (C) 2015-2016 by Clément Oudot, E<lt>clem.oudot@gmail.comE<gt>
-
-=back
-
-This library is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<http://www.gnu.org/licenses/>.
-
-=cut

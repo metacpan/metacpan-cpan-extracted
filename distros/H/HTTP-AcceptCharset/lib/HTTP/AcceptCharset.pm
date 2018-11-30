@@ -2,7 +2,7 @@ package HTTP::AcceptCharset;
 
 # ABSTRACT: Parse the HTTP header 'Accept-Charset'
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Moo;
 use List::Util qw(first);
@@ -36,18 +36,18 @@ sub match {
 }
 
 around BUILDARGS => sub {
-  my ($orig, $class, @args) = @_;
+    my ($orig, $class, @args) = @_;
  
-  return { string => $args[0] }
-    if @args == 1 && !ref $args[0];
+    return { string => $args[0] }
+        if @args == 1 && !ref $args[0];
  
-  return $class->$orig(@args);
+    return $class->$orig(@args);
 };
 
 sub _parse_string {
     my ($self) = @_;
 
-    my @charsets = split /\s*,\s*/, $self->string;
+    my @charsets = split /\s*,\s*/, $self->string // '';
     my %weighted;
 
     for my $charset ( @charsets ) {
@@ -76,7 +76,7 @@ HTTP::AcceptCharset - Parse the HTTP header 'Accept-Charset'
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -98,13 +98,13 @@ The header string as passed to C<new>.
 
 The given charset in the prioritized order.
 
-  Header                    | Values
-  --------------------------+----------------------------
-  utf-8, iso-8859-1;q=0.5   | utf-8, iso-8859-1
-  iso-8859-1;q=0.5, utf-8   | utf-8, iso-8859-1
-  utf-8                     | utf-8
-  utf-8, *                  | utf-8, *
-  utf-8;q=0.2, utf-16;q=0.5 | utf-16, utf-8
+    Header                    | Values
+    --------------------------+----------------------------
+    utf-8, iso-8859-1;q=0.5   | utf-8, iso-8859-1
+    iso-8859-1;q=0.5, utf-8   | utf-8, iso-8859-1
+    utf-8                     | utf-8
+    utf-8, *                  | utf-8, *
+    utf-8;q=0.2, utf-16;q=0.5 | utf-16, utf-8
 
 =head1 METHODS
 

@@ -16,7 +16,7 @@ subtest 'export' => sub {
 
 };
 
-subtest embeded => sub {
+subtest embedded => sub {
 
   skip_all 'test requires license key' unless $license_key;  
   ok(newrelic_message_handler, "address of newrelic_message_handler: @{[ newrelic_message_handler ]}");

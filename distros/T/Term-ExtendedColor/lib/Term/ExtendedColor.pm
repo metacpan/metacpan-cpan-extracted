@@ -5,14 +5,15 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.224';
+  $VERSION = '0.226';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
     uncolor
+    uncolour
     get_colors
+    get_colours
     autoreset
-
     fg
     bg
     clear
@@ -28,8 +29,10 @@ BEGIN {
   );
 }
 
-our $AUTORESET = 1;
+*uncolour    = *Term::ExtendedColor::uncolor;
+*get_colours = *Term::ExtendedColor::get_colors;
 
+our $AUTORESET = 1;
 
 my %color_names = (
 
@@ -766,7 +769,7 @@ finding one that doesn't. :)
 There's no way to give these extended colors meaningful names.
 
 Our first thought was to map them against some standard color names, like those
-in the HTML 4.0 specification or the SVG one. They didn’t match.
+in the HTML 4.0 specification or the SVG one. They didn't match.
 
 Therefore, they are named by their base color (red, green, magenta) plus index;
 The first index (always 1) is the brightest shade of that particular color,
@@ -991,7 +994,7 @@ L<Term::ExtendedColor::Xresources>, L<Term::ExtendedColor::TTY>, L<Term::ANSICol
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS
@@ -1000,7 +1003,7 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011 the B<Term::ExtendedColor> L</AUTHOR> and L</CONTRIBUTORS>
+Copyright 2010, 2011, 2018 the B<Term::ExtendedColor> L</AUTHOR> and L</CONTRIBUTORS>
 as listed above.
 
 =head1 LICENSE

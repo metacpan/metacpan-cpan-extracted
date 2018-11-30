@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More qw(no_plan);
+use Env qw($TEST_VERBOSE);
+use Data::Dumper;
 
 use_ok 'Perl::Critic::Policy::RegularExpressions::RequireDefault';
 
@@ -29,6 +31,33 @@ foreach my $data (
         is( $_->description, $assertion, "violation: $assertion" );
     }
     is( scalar @violations, $want_count, "statement: $str" );
+}
+
+{
+    my $str = q[
+        use re '/a';
+        my $digits = 1234;
+        if ($digits =~ m/\d/) {
+            print "We have digits\n";
+        }
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
+}
+
+{
+    my $str = q[
+        use re '/aa';
+        my $greeting = 'hello world';
+
+        my $greeting =~ s/hello/goodmorning/;
+    ];
+
+    my @violations = $critic->critique( \$str );
+
+    is( scalar @violations, 0 );
 }
 
 exit 0;

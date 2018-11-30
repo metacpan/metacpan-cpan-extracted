@@ -3,19 +3,14 @@
 ## cut
 
 use Cpanel::JSON::XS;
-use Const::Fast;
 use Dancer2;
 use DBIx::Class;
 use Exception::Class;
 use File::Slurp::Tiny;
-use Getopt::Long;
-use Getopt::Long::Descriptive;
 use IO::Async::Loop;
 use IO::Socket::IP;
 use JSON::MaybeXS;
 use JSON::PP;
-use List::Util;
-use List::UtilsBy;
 use Mad::Mapper;
 use Mojo::DOM;
 use Mojo::IOLoop;
@@ -38,7 +33,7 @@ use XML::TreeBuilder;
 use XML::Twig;
 
 ## name BadModules
-## failures 19
+## failures 14
 ## cut
 
 use Any::Moose;
@@ -48,15 +43,10 @@ use CGI;
 use Coro;
 use Error;
 use File::Slurp;
-use Getopt::Std;
 use HTML::Template;
 use IO::Socket::INET6;
-use JSON;
 use JSON::Any;
 use JSON::XS;
-use List::MoreUtils;
-use Mouse;
 use Net::IRC;
-use Readonly;
 use Switch;
 use XML::Simple;

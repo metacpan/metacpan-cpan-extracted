@@ -29,6 +29,7 @@ lib/Perl/Critic/Policy/Freenode/OpenArgs.pm
 lib/Perl/Critic/Policy/Freenode/OverloadOptions.pm
 lib/Perl/Critic/Policy/Freenode/POSIXImports.pm
 lib/Perl/Critic/Policy/Freenode/PackageMatchesFilename.pm
+lib/Perl/Critic/Policy/Freenode/PreferredAlternatives.pm
 lib/Perl/Critic/Policy/Freenode/Prototypes.pm
 lib/Perl/Critic/Policy/Freenode/StrictWarnings.pm
 lib/Perl/Critic/Policy/Freenode/Threads.pm
@@ -54,6 +55,7 @@ t/Freenode/OpenArgs.run
 t/Freenode/OverloadOptions.run
 t/Freenode/POSIXImports.run
 t/Freenode/PackageMatchesFilename.run
+t/Freenode/PreferredAlternatives.run
 t/Freenode/Prototypes.run
 t/Freenode/StrictWarnings.run
 t/Freenode/Threads.run

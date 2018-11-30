@@ -1,0 +1,16 @@
+{
+"accountCreated":"Your account has been created, your temporary password has been sent to your mail address.",
+"autoMail":"This mail was sent automatically",
+"click2Register":"Click here to confirm your account registration",
+"click2Reset":"Click here to reset your password",
+"hello":"Hello",
+"mailConfirmSubject": "[LemonLDAP::NG] Password reset confirmation",
+"mailSubject": "[LemonLDAP::NG] Your new password",
+"newPwdIs":"Your new password is",
+"pwdChanged":"Your password was changed.",
+"pwdIs":"Your password is",
+"registerConfirmSubject": "[LemonLDAP::NG] Account register confirmation",
+"registerDoneSubject": "[LemonLDAP::NG] Your new account",
+"requestIssuedFromIP":"The request was issued from IP",
+"yourLoginIs":"Your login is"
+}

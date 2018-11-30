@@ -8,6 +8,7 @@ my %prereqs_os_specific;
 
 if ( $^O eq 'MSWin32' ) {
     %prereqs_os_specific = (
+        'win32::Console'       => 0,
         'Win32::Console::ANSI' => 0,
         'Win32::ShellQuote'    => 0,
     );
@@ -60,12 +61,10 @@ WriteMakefile(
         'Mojo::DOM'                 => 0,
         'Pod::Usage'                => 0,
         'Term::ANSIScreen'          => 0,
-        'Term::Choose'              => '1.600',
-        'Term::Choose::LineFold'    => '1.600',
-        'Term::Choose::Util'        => '0.064',
-        'Term::Form'                => 0,
-        'Text::Unidecode'           => 0,
-        'Unicode::Normalize'        => 0,
+        'Term::Choose'              => '1.637',
+        'Term::Choose::LineFold'    => '1.637',
+        'Term::Choose::Util'        => '0.068',
+        'Term::Form'                => '0.502',
         %prereqs_os_specific,
     },
     dist  => {

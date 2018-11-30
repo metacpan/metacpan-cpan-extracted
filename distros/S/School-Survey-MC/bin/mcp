@@ -1,0 +1,150 @@
+#!perl
+use strict;
+use warnings;
+
+# PODNAME: mpc
+# ABSTRACT: pick multiple choice questions randomly
+
+use utf8;
+binmode STDOUT, ":utf8";
+use feature 'say';
+use YAML::Tiny 'LoadFile';
+use HTML::Entities;
+ 
+my $desired = int(shift @ARGV);
+my $file    =     shift @ARGV;
+
+my @doc = LoadFile( $file );
+my @q   = @{$doc[0]};
+
+my $question_count = scalar @q;
+
+# Choose questions randomly
+
+my $index;
+my @choosen = ();
+
+for (1..$desired) {
+    $index = int(rand(scalar @q));
+    my $question = $q[$index];
+
+    # if multiple subquestions, choose subquestion and override
+    if (ref($question) eq 'ARRAY') {
+    my $index = int(rand(scalar @{$question}));
+    $question = $question->[$index];
+    }
+
+    push @choosen, $question;
+    #say $question->{q};
+
+    # delete index from array
+    splice(@q, $index, 1);
+}
+
+# print choosen questions
+
+say '<!DOCTYPE html>';
+say '<html>';
+say '<head>';
+say '<meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">';
+say '<style>td { text-align: center; vertical-align: middle; }</style>';
+say '<title>mc survey</title>';
+say '</head>';
+say '<body>';
+say '<h1>Questions</h1>';
+say "$desired randomly picked questions out of $question_count.";
+say '<table border="1">';
+say "<tr><th>Answer</th><th>Claim</th></tr>";
+
+my $difficulty_sum = 0;
+my $difficulty_avg = 0;
+my $themen_count = {};
+
+for my $question (@choosen) {
+
+    $difficulty_sum += $question->{difficulty};
+    if (exists $themen_count->{$question->{chapter}} ) {
+        $themen_count->{$question->{chapter}}++;
+    }
+    else {
+        $themen_count->{$question->{chapter}} = 1;
+    }
+
+    say '<tr>';
+    say '<td>';
+    if (ref($question->{answer}) eq 'HASH') {
+        while (my ($answer, $bool) = each(%{$question->{answer}})) {
+            say "\x{2610} $answer" if $bool =~ /false/i;
+            say "\x{2611} $answer" if $bool =~ /true/i;
+        }
+    }
+    else {
+        say "\x{2610} true \x{2611} false" if $question->{answer} =~ /false/i;
+        say "\x{2611} true \x{2610} false" if $question->{answer} =~ /true/i;
+    }
+    say "\x{2610} don't know";
+    say '</td>';
+    say '<td>';
+    say encode_entities($question->{q});
+    say '</td>';
+    say '</tr>';
+
+}
+
+$difficulty_avg = $difficulty_sum / int scalar @choosen;
+
+say '</table>';
+
+say '<h1>Statistics</h1>';
+
+say '<p>';
+say "Average Difficulty $difficulty_avg (1=simplest; 6=most difficult)";
+say '</p>';
+say '<p>';
+say 'Occurence of Chapters<br />';
+
+for my $chap (keys %{$themen_count}) {
+    say "Chapter $chap";
+    say ':&nbsp;';
+    say $themen_count->{$chap};
+    say '<br />';
+}
+say '</p>';
+
+say '</body>';
+say '</html>';
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mpc - pick multiple choice questions randomly
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+THIS IS AN EARLY RELEASE. YOU PROBABLY SHOULD NOT USE IT, UNLESS YOU KNOW WHY.
+
+Pick 20 entries from yaml and print them to html:
+
+  mcp 20 myfile.yml > yourfile.html
+
+=head1 AUTHOR
+
+Boris Däppen <bdaeppen.perl@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Boris Däppen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

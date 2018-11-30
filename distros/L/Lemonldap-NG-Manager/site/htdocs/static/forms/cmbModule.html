@@ -1,0 +1,58 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{currentNode.title}}</h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th width="25%" trspan="name"></th>
+        <th width="25%" trspan="type"></th>
+        <th width="35%" trspan="use"></th>
+        <th />
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <input class="form-control" ng-model="currentNode.title" />
+        </td>
+        <td>
+          <select class="form-control" ng-model="currentNode.data.type" ng-change="execFilters(_findScopeByKey('authParams'))">
+            <option ng-repeat="item in _findContainer().select" ng-selected="item.k===currentNode.data.type" value="{{item.k}}">{{item.v}}</option>
+          </select>
+        </td>
+        <td>
+          <select class="form-control" ng-model="currentNode.data.for">
+            <option value="0" ng-selected="currentNode.data.for==0" trspan="authAndUserdb">
+            <option value="1" ng-selected="currentNode.data.for==1" trspan="authOnly">
+            <option value="2" ng-selected="currentNode.data.for==2" trspan="userdbOnly">
+          </select>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 trspan="overPrm"></h4>
+  <table class="table">
+    <tr ng-repeat="t in currentNode.data.over">
+      <td>
+        <input class="form-control" ng-model="t[0]" />
+      </td>
+      <td>
+        <input class="form-control" ng-model="t[1]" />
+      </td>
+      <td>
+        <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.data.over,$index)"/>
+        <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newCmbOver'})"/>
+      </td>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "newCmbOver",
+  "icon": "plus-sign"
+},{
+  "title": "deleteEntry",
+  "icon": "minus-sign"
+}]
+</script>

@@ -3,6 +3,7 @@
 # terms as Perl itself.
 
 package Pod::Tree;
+use 5.006;
 
 use strict;
 use warnings;
@@ -10,254 +11,254 @@ use IO::File;
 use Pod::Tree::Node;
 use Pod::Tree::Stream;
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 sub new {
-	my $class = shift;
-	my $tree  = {
-		loaded     => 0,
-		paragraphs => []
-	};
-	bless $tree, $class;
+    my $class = shift;
+    my $tree  = {
+    	loaded     => 0,
+    	paragraphs => []
+    };
+    bless $tree, $class;
 }
 
 sub load_file {
-	my ( $tree, $file, %options ) = @_;
+    my ( $tree, $file, %options ) = @_;
 
-	Pod::Tree::Node->set_filename($file);
+    Pod::Tree::Node->set_filename($file);
 
-	my $fh = IO::File->new;
-	$fh->open($file) or return '';
-	$tree->load_fh( $fh, %options );
+    my $fh = IO::File->new;
+    $fh->open($file) or return '';
+    $tree->load_fh( $fh, %options );
 
-	Pod::Tree::Node->set_filename("");
-	1;
+    Pod::Tree::Node->set_filename("");
+    1;
 }
 
 sub load_fh {
-	my ( $tree, $fh, %options ) = @_;
+    my ( $tree, $fh, %options ) = @_;
 
-	$tree->{in_pod} = 0;
-	$tree->_load_options(%options);
-	my $limit = $tree->{limit};
+    $tree->{in_pod} = 0;
+    $tree->_load_options(%options);
+    my $limit = $tree->{limit};
 
-	my $stream = Pod::Tree::Stream->new($fh);
-	my $paragraph;
-	my @paragraphs;
-	while ( $paragraph = $stream->get_paragraph ) {
-		push @paragraphs, $paragraph;
-		$limit and $limit == @paragraphs and last;
-	}
+    my $stream = Pod::Tree::Stream->new($fh);
+    my $paragraph;
+    my @paragraphs;
+    while ( $paragraph = $stream->get_paragraph ) {
+    	push @paragraphs, $paragraph;
+    	$limit and $limit == @paragraphs and last;
+    }
 
-	$tree->{paragraphs} = \@paragraphs;
-	$tree->_parse;
+    $tree->{paragraphs} = \@paragraphs;
+    $tree->_parse;
 }
 
 sub load_string {
-	my ( $tree, $string, %options ) = @_;
+    my ( $tree, $string, %options ) = @_;
 
-	my @chunks = split /( \n\s*\n | \r\s*\r | \r\n\s*\r\n )/x, $string;
+    my @chunks = split /( \n\s*\n | \r\s*\r | \r\n\s*\r\n )/x, $string;
 
-	my (@paragraphs);
-	while (@chunks) {
-		push @paragraphs, join '', splice @chunks, 0, 2;
-	}
+    my (@paragraphs);
+    while (@chunks) {
+    	push @paragraphs, join '', splice @chunks, 0, 2;
+    }
 
-	$tree->load_paragraphs( \@paragraphs, %options );
+    $tree->load_paragraphs( \@paragraphs, %options );
 }
 
 sub load_paragraphs {
-	my ( $tree, $paragraphs, %options ) = @_;
+    my ( $tree, $paragraphs, %options ) = @_;
 
-	$tree->{in_pod} = 1;
-	$tree->_load_options(%options);
+    $tree->{in_pod} = 1;
+    $tree->_load_options(%options);
 
-	my $limit      = $tree->{limit};
-	my @paragraphs = @$paragraphs;
-	$limit and splice @paragraphs, $limit;
+    my $limit      = $tree->{limit};
+    my @paragraphs = @$paragraphs;
+    $limit and splice @paragraphs, $limit;
 
-	$tree->{paragraphs} = \@paragraphs;
-	$tree->_parse;
+    $tree->{paragraphs} = \@paragraphs;
+    $tree->_parse;
 }
 
 sub loaded { shift->{'loaded'} }
 
 sub _load_options {
-	my ( $tree, %options ) = @_;
+    my ( $tree, %options ) = @_;
 
-	my ( $key, $value );
-	while ( ( $key, $value ) = each %options ) {
-		$tree->{$key} = $value;
-	}
+    my ( $key, $value );
+    while ( ( $key, $value ) = each %options ) {
+    	$tree->{$key} = $value;
+    }
 }
 
 sub _parse {
-	my $tree = shift;
+    my $tree = shift;
 
-	$tree->_make_nodes;
-	$tree->_make_for;
-	$tree->_make_sequences;
+    $tree->_make_nodes;
+    $tree->_make_for;
+    $tree->_make_sequences;
 
-	my $root = $tree->{root};
+    my $root = $tree->{root};
 
-	$root->parse_links;
-	$root->unescape;
-	$root->consolidate;
-	$root->make_lists;
+    $root->parse_links;
+    $root->unescape;
+    $root->consolidate;
+    $root->make_lists;
 
-	$tree->{'loaded'} = 1;
+    $tree->{'loaded'} = 1;
 }
 
 sub _add_paragraph {
-	my ( $tree, $paragraph ) = @_;
+    my ( $tree, $paragraph ) = @_;
 
-	for ($paragraph) {
-		/^=cut/ and do {
-			$tree->{in_pod} = 0;
-			last;
-		};
-		$tree->{in_pod} and do {
-			push @{ $tree->{paragraphs} }, $paragraph;
-			last;
-		};
-		/^=\w/ and do {
-			$tree->{in_pod} = 1;
-			push @{ $tree->{paragraphs} }, $paragraph;
-			last;
-		};
-	}
+    for ($paragraph) {
+    	/^=cut/ and do {
+    		$tree->{in_pod} = 0;
+    		last;
+    	};
+    	$tree->{in_pod} and do {
+    		push @{ $tree->{paragraphs} }, $paragraph;
+    		last;
+    	};
+    	/^=\w/ and do {
+    		$tree->{in_pod} = 1;
+    		push @{ $tree->{paragraphs} }, $paragraph;
+    		last;
+    	};
+    }
 }
 
 my %Command = map { $_ => 1 } qw(=pod =cut
-	=head1 =head2 =head3 =head4
-	=over =item =back
-	=for =begin =end);
+    =head1 =head2 =head3 =head4
+    =over =item =back
+    =for =begin =end);
 
 sub _make_nodes {
-	my $tree       = shift;
-	my $paragraphs = $tree->{paragraphs};
-	my $in_pod     = $tree->{in_pod};
-	my @children;
+    my $tree       = shift;
+    my $paragraphs = $tree->{paragraphs};
+    my $in_pod     = $tree->{in_pod};
+    my @children;
 
-	for my $paragraph (@$paragraphs) {
-		my ($word) = split( /\s/, $paragraph );
-		my $node;
+    for my $paragraph (@$paragraphs) {
+    	my ($word) = split( /\s/, $paragraph );
+    	my $node;
 
-		if ($in_pod) {
-			if ( $paragraph =~ /^\s/ ) {
-				$node = verbatim Pod::Tree::Node $paragraph;
-			}
-			elsif ( $Command{$word} ) {
-				$node   = command Pod::Tree::Node $paragraph;
-				$in_pod = $word ne '=cut';
-			}
-			else {
-				$node = ordinary Pod::Tree::Node $paragraph;
-			}
-		}
-		else {
-			if ( $Command{$word} ) {
-				$node   = command Pod::Tree::Node $paragraph;
-				$in_pod = $word ne '=cut';
-			}
-			else {
-				$node = code Pod::Tree::Node $paragraph;
-			}
-		}
+    	if ($in_pod) {
+    		if ( $paragraph =~ /^\s/ ) {
+    			$node = Pod::Tree::Node->verbatim($paragraph);
+    		}
+    		elsif ( $Command{$word} ) {
+    			$node   = Pod::Tree::Node->command($paragraph);
+    			$in_pod = $word ne '=cut';
+    		}
+    		else {
+    			$node = Pod::Tree::Node->ordinary($paragraph);
+    		}
+    	}
+    	else {
+    		if ( $Command{$word} ) {
+    			$node   = Pod::Tree::Node->command($paragraph);
+    			$in_pod = $word ne '=cut';
+    		}
+    		else {
+    			$node = Pod::Tree::Node->code($paragraph);
+    		}
+    	}
 
-		push @children, $node;
-	}
+    	push @children, $node;
+    }
 
-	$tree->{root} = root Pod::Tree::Node \@children;
+    $tree->{root} = Pod::Tree::Node->root( \@children );
 }
 
 sub _make_for {
-	my $tree = shift;
-	my $root = $tree->{root};
-	my $old  = $root->get_children;
+    my $tree = shift;
+    my $root = $tree->{root};
+    my $old  = $root->get_children;
 
-	my @new;
-	while (@$old) {
-		my $node = shift @$old;
-		is_c_for $node   and $node->force_for;
-		is_c_begin $node and $node->parse_begin($old);
-		push @new, $node;
-	}
+    my @new;
+    while (@$old) {
+    	my $node = shift @$old;
+    	$node->is_c_for   and $node->force_for;
+    	$node->is_c_begin and $node->parse_begin($old);
+    	push @new, $node;
+    }
 
-	$root->set_children( \@new );
+    $root->set_children( \@new );
 }
 
 sub _make_sequences {
-	my $tree  = shift;
-	my $root  = $tree->{root};
-	my $nodes = $root->get_children;
+    my $tree  = shift;
+    my $root  = $tree->{root};
+    my $nodes = $root->get_children;
 
-	for my $node (@$nodes) {
-		is_code $node     and next;
-		is_verbatim $node and next;
-		is_for $node      and next;
-		$node->make_sequences;
-	}
+    for my $node (@$nodes) {
+    	$node->is_code     and next;
+    	$node->is_verbatim and next;
+    	$node->is_for      and next;
+    	$node->make_sequences;
+    }
 }
 
 sub dump {
-	my $tree = shift;
-	$tree->{root}->dump;
+    my $tree = shift;
+    $tree->{root}->dump;
 }
 
 sub get_root { shift->{root} }
 
 sub set_root {
-	my ( $tree, $root ) = @_;
-	$tree->{root} = $root;
+    my ( $tree, $root ) = @_;
+    $tree->{root} = $root;
 }
 
 sub push {
-	my ( $tree, @nodes ) = @_;
-	my $root     = $tree->{root};
-	my $children = $root->get_children;
-	push @$children, @nodes;
+    my ( $tree, @nodes ) = @_;
+    my $root     = $tree->{root};
+    my $children = $root->get_children;
+    push @$children, @nodes;
 }
 
 sub pop {
-	my $tree     = shift;
-	my $root     = $tree->get_root;
-	my $children = $root->get_children;
-	pop @$children;
+    my $tree     = shift;
+    my $root     = $tree->get_root;
+    my $children = $root->get_children;
+    pop @$children;
 }
 
 sub walk {
-	my ( $tree, $sub ) = @_;
+    my ( $tree, $sub ) = @_;
 
-	my $root = $tree->get_root;
-	_walk( $root, $sub );
+    my $root = $tree->get_root;
+    _walk( $root, $sub );
 }
 
 sub _walk {
-	my ( $tree, $sub ) = @_;
+    my ( $tree, $sub ) = @_;
 
-	my $descend = &$sub($tree);    # :TRICKY: sub can modify node
-	$descend or return;
+    my $descend = &$sub($tree);    # :TRICKY: sub can modify node
+    $descend or return;
 
-	my $node = $tree;
+    my $node = $tree;
 
-	my $children = $node->get_children;
-	for my $child (@$children) {
-		_walk( $child, $sub );
-	}
+    my $children = $node->get_children;
+    for my $child (@$children) {
+    	_walk( $child, $sub );
+    }
 
-	my $siblings = $node->get_siblings;
-	for my $sibling (@$siblings) {
-		_walk( $sibling, $sub );
-	}
+    my $siblings = $node->get_siblings;
+    for my $sibling (@$siblings) {
+    	_walk( $sibling, $sub );
+    }
 }
 
 sub has_pod {
-	my $tree     = shift;
-	my $root     = $tree->get_root;
-	my $children = $root->get_children;
+    my $tree     = shift;
+    my $root     = $tree->get_root;
+    my $children = $root->get_children;
 
-	scalar grep { $_->get_type ne 'code' } @$children;
+    scalar grep { $_->get_type ne 'code' } @$children;
 }
 
 1
@@ -272,20 +273,20 @@ Pod::Tree - Create a static syntax tree for a POD
 =head1 SYNOPSIS
 
   use Pod::Tree;
-  
+
   $tree = Pod::Tree->new;
   $tree->load_file      ( $file, %options)
   $tree->load_fh        ( $fh  , %options);
   $tree->load_string    ( $pod , %options);
   $tree->load_paragraphs(\@pod , %options);
-  
-  $loaded = $tree->loaded;  
-  
+
+  $loaded = $tree->loaded;
+
   $node   = $tree->get_root;
             $tree->set_root  ($node);
   $node =   $tree->pop;
             $tree->push(@nodes);
-  
+
             $tree->walk(\&sub);
             $tree->has_pod and ...
   print     $tree->dump;
@@ -410,7 +411,7 @@ Sets the initial value of C<in_pod>.
 When C<in_pod> is false,
 the parser ignores all text until the next =command paragraph.
 
-The initial value of C<in_pod> 
+The initial value of C<in_pod>
 defaults to false for C<load_file()> and C<load_fh()> calls
 and true for  C<load_string()> and C<load_paragraphs()> calls.
 This is usually what you want, unless you want consistency.
@@ -440,13 +441,13 @@ Returns null iff it can't open I<$file>.
 
 =head2 No round-tripping
 
-Currently, C<Pod::Tree> does not provide a complete, exact 
+Currently, C<Pod::Tree> does not provide a complete, exact
 representation of its input. For example, it doesn't distingish
-between 
+between
 
     C<$foo-E<gt>bar>
 
-and 
+and
 
    C<< $foo->bar >>
 
@@ -456,27 +457,27 @@ exactly reconstructed from its C<Pod::Tree> representation.
 
 =head2 LZ<><> markups
 
-In the documentation of the 
+In the documentation of the
 
-    L<"sec">	section in this manual page
+    L<"sec">    section in this manual page
 
 markup, L<C<perlpod>> has always claimed
 
-		(the quotes are optional)
+    	(the quotes are optional)
 
 However, there is no way to decide from the syntax alone whether
 
     L<foo>
 
-is a link to the F<foo> man page or 
+is a link to the F<foo> man page or
 a link to the C<foo> section of this man page.
 
 C<Pod::Tree> parses C<< LZ<><foo> >> as a link to a section if
-C<foo> looks like a section name (e.g. contains whitespace), 
-and as a link to a man page otherswise. 
+C<foo> looks like a section name (e.g. contains whitespace),
+and as a link to a man page otherswise.
 
 In practice, this tends to break links to sections.
-If you want your section links to work reliably, 
+If you want your section links to work reliably,
 write them as C<< LZ<><"foo"> >> or C<< LZ<></foo> >>.
 
 
@@ -535,7 +536,7 @@ Jost Krieger <Jost.Krieger@ruhr-uni-bochum.de>
 
 =item *
 
-Marc A. Lehmann <pcg@goof.com> 
+Marc A. Lehmann <pcg@goof.com>
 
 =item *
 
@@ -575,7 +576,7 @@ Johan Vromans <JVromans@Squirrel.nl>
 =head1 AUTHOR
 
 Steven McDougall <swmcd@world.std.com>
-
+Currently maintained by Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT
 

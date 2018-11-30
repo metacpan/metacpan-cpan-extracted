@@ -9,7 +9,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '4.05';
+$VERSION = '4.06';
 
 our $DEBUG = 0;
 
@@ -1415,6 +1415,6 @@ Removes the file for this record store entirely from the file system.
        and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 4.05  (November, 2018))
+       Version 4.06  (November, 2018))
 
 =cut

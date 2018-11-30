@@ -2,7 +2,7 @@ NAME
     BSON - BSON serialization and deserialization
 
 VERSION
-    version v1.8.1
+    version v1.10.1
 
 SYNOPSIS
         use BSON;
@@ -462,6 +462,8 @@ AUTHORS
 CONTRIBUTORS
     *   Eric Daniels <eric.daniels@mongodb.com>
 
+    *   Finn <toyou1995@gmail.com>
+
     *   Olivier Duclos <odc@cpan.org>
 
     *   Pat Gunn <pgunn@mongodb.com>
@@ -471,6 +473,8 @@ CONTRIBUTORS
     *   Robert Sedlacek <rs@474.at>
 
     *   Thomas Bloor <tbsliver@shadow.cat>
+
+    *   Wallace Reis <wallace@reis.me>
 
     *   Yury Zavarin <yury.zavarin@gmail.com>
 

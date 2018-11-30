@@ -5,10 +5,9 @@ use warnings;
 
 use List::Util 'any', 'none';
 use Perl::Critic::Utils qw(:severities :classification :ppi);
-use Perl::Critic::Violation;
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 sub supported_parameters { () }
 sub default_severity { $SEVERITY_HIGH }
@@ -16,42 +15,21 @@ sub default_themes { 'freenode' }
 sub applies_to { 'PPI::Element' }
 
 my %features = (
-	':=' => {
-		expl => 'Use of := as an empty attribute list is deprecated in perl v5.12.0, use = alone.',
-	},
-	'$[' => {
-		expl => 'Use of $[ is deprecated in perl v5.12.0. See Array::Base and String::Base.',
-	},
-	'?PATTERN?' => {
-		expl => 'Use of ? as a match regex delimiter without an initial m is deprecated in perl v5.14.0. Use m?PATTERN? instead.',
-	},
-	'autoderef' => {
-		expl => 'Use of each/keys/pop/push/shift/splice/unshift/values on a reference is an experimental feature that is removed in perl v5.24.0. Dereference the array or hash to use these functions on it.',
-	},
-	'defined on array/hash' => {
-		expl => 'Use of defined() on an array or hash is deprecated in perl v5.6.2. The array or hash can be tested directly to check for non-emptiness: if (@foo) { ... }',
-	},
-	'do SUBROUTINE(LIST)' => {
-		expl => 'Use of do to call a subroutine is deprecated in perl 5.',
-	},
-	'NBSP in \\N{...}' => {
-		expl => 'Use of the "no-break space" character in character names is deprecated in perl v5.22.0.',
-	},
-	'POSIX character function' => {
-		expl => 'Several character matching functions in POSIX.pm are deprecated in perl v5.20.0: isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, and isxdigit. Regular expressions are a more portable and correct way to test character strings.',
-	},
-	'POSIX::tmpnam()' => {
-		expl => 'The tmpnam() function from POSIX is deprecated in perl v5.22.0. Use File::Temp instead.',
-	},
-	'qw(...) as parentheses' => {
-		expl => 'Use of qw(...) as parentheses is deprecated in perl v5.14.0. Wrap the list in literal parentheses when required, such as in a foreach loop.',
-	},
-	'require ::Foo::Bar' => {
-		expl => 'Bareword require starting with a double colon is an error in perl v5.26.0.',
-	},
-	'UNIVERSAL->import()' => {
-		expl => 'The method UNIVERSAL->import() (or passing import arguments to "use UNIVERSAL") is deprecated in perl v5.12.0.',
-	},
+	':=' => 'Use of := as an empty attribute list is deprecated in perl v5.12.0, use = alone.',
+	'$[' => 'Use of $[ is deprecated in perl v5.12.0. See Array::Base and String::Base.',
+	'/\\C/' => 'Use of the \\C character class in regular expressions is deprecated in perl v5.20.0. To examine a string\'s UTF-8-encoded byte representation, encode it to UTF-8.',
+	'?PATTERN?' => 'Use of ? as a match regex delimiter without an initial m is deprecated in perl v5.14.0. Use m?PATTERN? instead.',
+	'autoderef' => 'Use of each/keys/pop/push/shift/splice/unshift/values on a reference is an experimental feature that is removed in perl v5.24.0. Dereference the array or hash to use these functions on it.',
+	'Bare here-doc' => 'Use of bare << to create a here-doc with an empty string terminator is deprecated in perl 5. Use a quoted empty string like <<\'\'.',
+	'chdir(\'\')' => 'Use of chdir(\'\') or chdir(undef) to chdir home is deprecated in perl v5.8.0. Use chdir() instead.',
+	'defined on array/hash' => 'Use of defined() on an array or hash is deprecated in perl v5.6.2. The array or hash can be tested directly to check for non-emptiness: if (@foo) { ... }',
+	'do SUBROUTINE(LIST)' => 'Use of do to call a subroutine is deprecated in perl 5.',
+	'NBSP in \\N{...}' => 'Use of the "no-break space" character in character names is deprecated in perl v5.22.0.',
+	'POSIX character function' => 'Several character matching functions in POSIX.pm are deprecated in perl v5.20.0: isalnum, isalpha, iscntrl, isdigit, isgraph, islower, isprint, ispunct, isspace, isupper, and isxdigit. Regular expressions are a more portable and correct way to test character strings.',
+	'POSIX::tmpnam()' => 'The tmpnam() function from POSIX is deprecated in perl v5.22.0. Use File::Temp instead.',
+	'qw(...) as parentheses' => 'Use of qw(...) as parentheses is deprecated in perl v5.14.0. Wrap the list in literal parentheses when required, such as in a foreach loop.',
+	'require ::Foo::Bar' => 'Bareword require starting with a double colon is an error in perl v5.26.0.',
+	'UNIVERSAL->import()' => 'The method UNIVERSAL->import() (or passing import arguments to "use UNIVERSAL") is deprecated in perl v5.12.0.',
 );
 
 my %posix_deprecated = map { ($_ => 1, "POSIX::$_" => 1) }
@@ -63,14 +41,14 @@ my %autoderef_functions = map { ($_ => 1) }
 sub _violation {
 	my ($self, $feature, $elem) = @_;
 	my $desc = "$feature is deprecated";
-	my $expl = $features{$feature}{expl} // "$feature is deprecated or removed from recent versions of Perl.";
-	my $severity = $features{$feature}{severity} // $self->default_severity;
-	return Perl::Critic::Violation->new($desc, $expl, $elem, $severity);
+	my $expl = $features{$feature} // "$feature is deprecated or removed from recent versions of Perl.";
+	return $self->violation($desc, $expl, $elem);
 }
 
 sub violates {
 	my ($self, $elem) = @_;
 	my $next;
+	my $prev;
 	my $parent;
 	my @args;
 	my @violations;
@@ -109,6 +87,11 @@ sub violates {
 				if ($next and none { ($_->isa('PPI::Token::Operator') and $_ eq ':') or $_->isa('PPI::Token::Label') } $parent->schildren) {
 					push @violations, $self->_violation('?PATTERN?', $elem);
 				}
+			# Bare here-doc - differentiate this from the legitimate << operator
+			} elsif ($elem eq '<<' and (!($next = $elem->snext_sibling)
+				or ($next->isa('PPI::Token::Operator') and $next ne '~' and $next ne '!' and $next ne '+' and $next ne '-')
+				or ($next->isa('PPI::Token::Structure') and $next ne '(' and $next ne '{' and $next ne '['))) {
+				push @violations, $self->_violation('Bare here-doc', $elem);
 			}
 		} elsif ($elem->isa('PPI::Token::Word')) {
 			# UNIVERSAL->import()
@@ -133,52 +116,62 @@ sub violates {
 				    and ($next = $next->snext_sibling and $next->isa('PPI::Structure::List'))) {
 					push @violations, $self->_violation('do SUBROUTINE(LIST)', $elem);
 				}
-			# POSIX character function or POSIX::tmpnam()
-			} elsif (exists $posix_deprecated{$elem} or $elem eq 'tmpnam' or $elem eq 'POSIX::tmpnam') {
-				my $is_posix = $elem =~ m/^POSIX::/ ? 1 : 0;
-				(my $function_name = $elem) =~ s/^POSIX:://;
-				unless ($is_posix) {
-					my $includes = $elem->document->find('PPI::Statement::Include') || [];
-					foreach my $stmt (grep { ($_->module // '') eq 'POSIX' } @$includes) {
-						my @args = $stmt->arguments;
-						$is_posix = 1 if !@args or any { $_ =~ m/\b\Q$function_name\E\b/ } @args;
-					}
-				}
-				if ($is_posix) {
-					push @violations, $self->_violation('POSIX::tmpnam()', $elem) if $function_name eq 'tmpnam';
-					push @violations, $self->_violation('POSIX character function', $elem) if exists $posix_deprecated{$elem};
-				}
-			# defined array/hash
-			} elsif ($elem eq 'defined' and $next = $elem->snext_sibling) {
-				$next = $next->schild(0) if $next->isa('PPI::Structure::List');
-				if ($next and $next->isa('PPI::Token::Symbol')
-				    and ($next->raw_type eq '@' or $next->raw_type eq '%')
-				    and $next->raw_type eq $next->symbol_type) {
-					push @violations, $self->_violation('defined on array/hash', $elem);
-				}
-			# autoderef
-			} elsif (exists $autoderef_functions{$elem} and $next = $elem->snext_sibling) {
-				$next = $next->schild(0) if $next->isa('PPI::Structure::List');
-				$next = $next->schild(0) if $next and $next->isa('PPI::Statement::Expression');
-				if ($next and $next->isa('PPI::Token::Symbol') and $next->raw_type eq '$') {
-					# try to detect postderef, hacky for PPI that doesn't understand postderef yet
-					my $is_postderef;
-					until (!$next or ($next->isa('PPI::Token::Structure') and $next eq ';')
-						or ($next->isa('PPI::Token::Operator') and $next eq ',')) {
-						$next = $next->snext_sibling;
-						# this can just look for PPI::Token::Cast in PPI 1.237+
-						if ($next and ($next->isa('PPI::Token::Magic') or $next->isa('PPI::Token::Cast')) and ($next eq '@*' or $next eq '%*')) {
-							$is_postderef = 1;
-							last;
-						} elsif ($next and $next->isa('PPI::Token::Operator') and $next eq '*') {
-							my $prev = $next->sprevious_sibling;
-							if ($prev and $prev->isa('PPI::Token::Cast') and ($prev eq '@' or $prev eq '%')) {
-								$is_postderef = 1;
-								last;
-							}
+			# avoid false positives for method calls
+			} elsif (!($prev = $elem->sprevious_sibling) or !$prev->isa('PPI::Token::Operator') or $prev ne '->') {
+				# POSIX character function or POSIX::tmpnam()
+				if (exists $posix_deprecated{$elem} or $elem eq 'tmpnam' or $elem eq 'POSIX::tmpnam') {
+					my $is_posix = $elem =~ m/^POSIX::/ ? 1 : 0;
+					(my $function_name = $elem) =~ s/^POSIX:://;
+					unless ($is_posix) {
+						my $includes = $elem->document->find('PPI::Statement::Include') || [];
+						foreach my $stmt (grep { ($_->module // '') eq 'POSIX' } @$includes) {
+							my @args = $stmt->arguments;
+							$is_posix = 1 if !@args or any { $_ =~ m/\b\Q$function_name\E\b/ } @args;
 						}
 					}
-					push @violations, $self->_violation('autoderef', $elem) unless $is_postderef;
+					if ($is_posix) {
+						push @violations, $self->_violation('POSIX::tmpnam()', $elem) if $function_name eq 'tmpnam';
+						push @violations, $self->_violation('POSIX character function', $elem) if exists $posix_deprecated{$elem};
+					}
+				# defined array/hash
+				} elsif ($elem eq 'defined' and $next = $elem->snext_sibling) {
+					$next = $next->schild(0) if $next->isa('PPI::Structure::List');
+					if ($next and $next->isa('PPI::Token::Symbol')
+					    and ($next->raw_type eq '@' or $next->raw_type eq '%')
+					    and $next->raw_type eq $next->symbol_type) {
+						push @violations, $self->_violation('defined on array/hash', $elem);
+					}
+				# autoderef
+				} elsif (exists $autoderef_functions{$elem} and $next = $elem->snext_sibling) {
+					$next = $next->schild(0) if $next->isa('PPI::Structure::List');
+					$next = $next->schild(0) if $next and $next->isa('PPI::Statement::Expression');
+					if ($next and $next->isa('PPI::Token::Symbol') and $next->raw_type eq '$') {
+						# try to detect postderef, hacky for PPI that doesn't understand postderef yet
+						my $is_postderef;
+						until (!$next or ($next->isa('PPI::Token::Structure') and $next eq ';')
+							or ($next->isa('PPI::Token::Operator') and $next eq ',')) {
+							$next = $next->snext_sibling;
+							# this can just look for PPI::Token::Cast in PPI 1.237+
+							if ($next and ($next->isa('PPI::Token::Magic') or $next->isa('PPI::Token::Cast')) and ($next eq '@*' or $next eq '%*')) {
+								$is_postderef = 1;
+								last;
+							} elsif ($next and $next->isa('PPI::Token::Operator') and $next eq '*') {
+								my $prev = $next->sprevious_sibling;
+								if ($prev and $prev->isa('PPI::Token::Cast') and ($prev eq '@' or $prev eq '%')) {
+									$is_postderef = 1;
+									last;
+								}
+							}
+						}
+						push @violations, $self->_violation('autoderef', $elem) unless $is_postderef;
+					}
+				} elsif ($elem eq 'chdir' and $next = $elem->snext_sibling) {
+					$next = $next->schild(0) if $next->isa('PPI::Structure::List');
+					$next = $next->schild(0) if $next and $next->isa('PPI::Statement::Expression');
+					if ($next and (($next->isa('PPI::Token::Quote') and !length $next->string)
+						or ($next->isa('PPI::Token::Word') and $next eq 'undef'))) {
+						push @violations, $self->_violation('chdir(\'\')', $elem);
+					}
 				}
 			}
 		} elsif ($elem->isa('PPI::Token::Regexp')) {
@@ -188,6 +181,11 @@ sub violates {
 			}
 			if (!$elem->isa('PPI::Token::Regexp::Transliterate')) {
 				push @violations, $self->_violates_interpolated($elem);
+			}
+		} elsif ($elem->isa('PPI::Token::HereDoc')) {
+			# Bare here-doc
+			if ($elem eq '<<') {
+				push @violations, $self->_violation('Bare here-doc', $elem);
 			}
 		} elsif ($elem->isa('PPI::Token::QuoteLike')) {
 			if ($elem->isa('PPI::Token::QuoteLike::Regexp') or $elem->isa('PPI::Token::QuoteLike::Backtick') or $elem->isa('PPI::Token::QuoteLike::Command')) {
@@ -209,6 +207,8 @@ sub _violates_interpolated {
 	my $contents;
 	if ($elem->isa('PPI::Token::Regexp') or $elem->isa('PPI::Token::QuoteLike::Regexp')) {
 		$contents = $elem->get_match_string;
+		# /\C/
+		push @violations, $self->_violation('/\\C/', $elem) if $contents =~ m/(?<!\\)\\C/;
 	} elsif ($elem->isa('PPI::Token::Quote')) {
 		$contents = $elem->string;
 	} else {
@@ -255,6 +255,15 @@ C<use v5.16> or C<no feature "array_base">. While it is probably a bad idea in
 general, the modules L<Array::Base> and L<String::Base> can now be used to
 replace this functionality.
 
+=head2 /\C/
+
+The C<\C> regular expression character class would match a single byte of the
+internal representation of the string, which was dangerous because it violated
+the logical character abstraction of Perl strings, and substitutions using it
+could result in malformed UTF-8 sequences. It was deprecated in perl v5.20.0
+and removed in perl v5.24.0. Instead, explicitly encode the string to UTF-8
+using L<Encode> to examine its UTF-8-encoded byte representation.
+
 =head2 ?PATTERN?
 
 The C<?PATTERN?> regex match syntax is deprecated in perl v5.14.0 and removed
@@ -269,6 +278,19 @@ objects that overload both array and hash dereferencing, and so was removed in
 perl v5.24.0. Instead, explicitly dereference the reference when calling these
 functions. The functions affected are C<each>, C<keys>, C<pop>, C<push>,
 C<shift>, C<splice>, C<unshift>, and C<values>.
+
+=head2 Bare here-doc
+
+Using C< << > to initiate a here-doc would create it with an empty terminator,
+similar to C< <<'' >, so the here-doc would terminate on the next empty line.
+Omitting the quoted empty string has been deprecated since perl 5, and is a
+fatal error in perl v5.28.0.
+
+=head2 chdir('')
+
+Passing an empty string or C<undef> to C<chdir()> would change to the home
+directory, but this usage is deprecated in perl v5.8.0 and throws an error in
+perl v5.24.0. Instead, call C<chdir()> with no arguments for this behavior.
 
 =head2 defined on array/hash
 

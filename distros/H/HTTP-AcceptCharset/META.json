@@ -43,7 +43,7 @@
    "provides" : {
       "HTTP::AcceptCharset" : {
          "file" : "lib/HTTP/AcceptCharset.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "http://github.com/reneeb/HTTP-AcceptCharset"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

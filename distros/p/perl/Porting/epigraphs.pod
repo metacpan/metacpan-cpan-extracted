@@ -17,16 +17,119 @@ Consult your favorite dictionary for details.
 
 =head1 EPIGRAPHS
 
+=head2 v5.29.4 - The Mountain Goats, "Oceanographer's Choice"
+
+L<Announced on 2018-10-20 by Aaron Crane|https://www.nntp.perl.org/group/perl.perl5.porters/2018/10/msg252575.html>
+
+  Well
+  Guy in a skeleton costume
+  Comes up to the guy in the Superman suit
+  Runs through him with a broadsword
+  I flipped the television off
+  Bring all the bright lights up
+  Turn the radio up loud
+  I don't know why I'm so persuaded
+  That if I think things through
+  Long enough and hard enough
+  I'll somehow get to you
+  But then you came in and we locked eyes
+  You kicked the ashtray over as we came toward each other
+  Stubbed my cigarette out against the west wall
+  Quickly lit another
+  Look at that
+  Would you look at that?
+  We're throwing off sparks
+  What will I do when I don't have you
+  To hold onto in the dark?
+
+=head2 v5.29.3 - Mac Miller, "Senior Skip Day"
+
+L<Announced on 2018-09-20 by John 'genehack' Anderson|https://www.nntp.perl.org/group/perl.perl5.porters/2018/09/msg252255.html>
+
+  Enjoy the best things in your life
+  ’Cause you ain’t gonna get to live it twice
+  They say you waste time asleep
+  But I’m just tryin’ to dream
+
+=head2 v5.29.2 - Rick Riordan, "The Lightning Thief"
+
+L<Announced on 2018-08-20 by Chris 'BinGOs' Williams|https://www.nntp.perl.org/group/perl.perl5.porters/2018/08/msg251918.html>
+
+  Look, I didn't want to be a half-blood.
+
+  If you're reading this because you think you might be one,
+  my advice is: close this book right now. Believe whatever
+  lie your mom or dad told you about your birth, and try
+  to lead a normal life.
+
+  Being a half-blood is dangerous. It's scary. Most of the time,
+  it gets you killed in painful, nasty ways.
+
+  If you're a normal kid, reading this because you think it's
+  fiction, great. Read on. I envy you for being able to believe
+  that none of this ever happened.
+
+  But if you recognize yourself in these pages - if you feel
+  something stirring inside - stop reading immediately.
+  You might be one of us. And once you know that, it's only a
+  matter of time before they sense it too, and they'll come for you.
+
+=head2 v5.29.1 - Richard Curtis & Ben Elton, "Blackadder, Series 3, Episode 2: Ink and Incapability"
+
+L<Announced on 2018-07-20 by Steve Hay|https://www.nntp.perl.org/group/perl.perl5.porters/2018/07/msg251605.html>
+
+  Dr. Samuel Johnson: Here it is, sir: the very cornerstone of English
+  scholarship.  This book, sir, contains every word in our beloved
+  language.
+
+  Prince Regent George: Hmm.
+
+  Edmund Blackadder: Every single one, sir?
+
+  Johnson: (confidently) Every single word, sir!
+
+  Blackadder: (to Prince) Oh, well, in that case, sir, I hope you will
+  not object if I also offer the Doctor my most enthusiastic
+  contrafribularities.
+
+  Johnson: What?
+
+  Blackadder: 'Contrafribularities,' sir? It is a common word down our
+  way.
+
+  Johnson: Damn! (writes in the book)
+
+  Blackadder: Oh, I'm sorry, sir.  I'm anaspeptic, phrasmotic, even
+  compunctious to have caused you such pericombobulation.
+
+  Johnson: What? What? WHAT?
+
+=head2 v5.29.0 - Erle Stanley Gardner, The Case of the Grinning Gorilla
+
+L<Announced on 2018-06-26 by Sawyer X|http://nntp.perl.org/group/perl.perl5.porters/251297>
+
+  Courage is the only antidote for danger.
+
+=head2 v5.28.0 - Martin Luther King, Jr., 1967
+
+L<Announced on 2018-06-22 by Sawyer X|http://nntp.perl.org/group/perl.perl5.porters/251240>
+
+  When we look at modern man we have to face the fact that modern man
+  suffers from a kind of poverty of the spirit which stands in glaring
+  contrast with his scientific and technological abundance. We've learned
+  to fly the air as birds, we've learned to swim the seas as fish, yet we
+  haven't learned to walk the earth as brothers and sisters.
+
 =head2 v5.28.0-RC4 - Neil Gaiman, The Graveyard Book
 
-Announced on 2018-06-19 by Sawyer X
+L<Announced on 2018-06-19 by Sawyer X|http://nntp.perl.org/group/perl.perl5.porters/251212>
 
   You're alive, Bod. That means you have infinite potential. You can do
   anything, make anything, dream anything. If you can change the world,
   the world will change. Potential. Once you're dead, it's gone. Over.
   You've made what you've made, dreamed your dream, written your name.
   You may be buried here, you may even walk. But that potential is
-  finished.”
+  finished.
 
 =head2 v5.28.0-RC3 - Anthony Horowitz, Magpie Murders
 
@@ -476,7 +579,7 @@ L<Announced on 2016-10-10 by Aaron Crane|http://www.nntp.perl.org/group/perl.per
 
   I'm up on all the pop trivia, says the guy with the stud in his tongue.
       Are you?
-      Yes. Do you know who he lead singer of Echo and the Bunnymen is?
+      Yes. Do you know who the lead singer of Echo and the Bunnymen is?
       Let me guess, is he called Echo?
       Good guess but no, anyway when they played Glastonbury it was so
   muddy he had two roadies to hold up a binliner on each of his legs so

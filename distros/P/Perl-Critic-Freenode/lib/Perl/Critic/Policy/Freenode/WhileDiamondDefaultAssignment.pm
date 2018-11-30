@@ -6,7 +6,7 @@ use warnings;
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 use constant DESC => '<>/<<>>/readline/readdir/each result not explicitly assigned in while condition';
 use constant EXPL => 'When used alone in a while condition, the <>/<<>> operator, readline, readdir, and each functions assign their result to $_, but do not localize it. Assign the result to an explicit lexical variable instead (my $line = <...>, my $dir = readdir ...)';
@@ -80,9 +80,11 @@ C<readline()>, C<readdir()>, and C<each()> are extra magical in a while
 condition: if it is the only thing in the condition, it will assign its result
 to C<$_>, but it does not localize C<$_> to the while loop. (Note, this also
 applies to a C<for (;E<lt>E<gt>;)> construct.) This can unintentionally confuse
-outer loops that are already using C<$_> to iterate. To avoid this possibility,
-assign the result of the diamond operator or these functions to an explicit
-lexical variable.
+outer loops that are already using C<$_> to iterate. In addition, using C<$_>
+at all means that your loop can get confused by other code which does not
+politely localize its usage of the global variable. To avoid these
+possibilities, assign the result of the diamond operator or these functions to
+an explicit lexical variable.
 
   while (<$fh>) { ... }                   # not ok
   while (<<>>) { ... }                    # not ok

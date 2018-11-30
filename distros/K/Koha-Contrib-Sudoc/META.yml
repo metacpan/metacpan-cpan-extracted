@@ -15,7 +15,6 @@ meta-spec:
 name: Koha-Contrib-Sudoc
 requires:
   AnyEvent::Processor: '0'
-  Bulac::SudocConverter: '0'
   Business::ISBN: '0'
   Carp: '0'
   Class::Load: '0'
@@ -56,4 +55,4 @@ resources:
   bugtracker: https://github.com/fredericd/koha-sudoc/issues
   homepage: http://www.tamil.fr/sudoc/sudoc.html
   repository: https://github.com/fredericd/koha-sudoc
-version: '2.25'
+version: '2.26'

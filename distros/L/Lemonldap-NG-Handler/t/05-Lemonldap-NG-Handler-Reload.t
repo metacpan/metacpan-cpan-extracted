@@ -11,7 +11,6 @@ use Test::More tests => 6;
 
 BEGIN {
     use_ok('Lemonldap::NG::Handler::Main');
-    use_ok('Lemonldap::NG::Handler::Reload');
 }
 
 #########################
@@ -21,12 +20,17 @@ BEGIN {
 
 my $globalinit;
 
-open STDERR, '>/dev/null';
-
 my $tsv = {};
 
+sub Lemonldap::NG::Handler::Main::defaultLogger {
+    'Lemonldap::NG::Common::Logger::Std';
+}
+
+eval { Lemonldap::NG::Handler::Main->logLevelInit('error') };
+ok( !$@, 'logLevelInit' );
+
 ok(
-    Lemonldap::NG::Handler::Reload->jailInit(
+    Lemonldap::NG::Handler::Main->jailInit(
         {
             https        => 0,
             port         => 0,
@@ -47,7 +51,7 @@ ok(
 );
 
 ok(
-    Lemonldap::NG::Handler::Reload->defaultValuesInit(
+    Lemonldap::NG::Handler::Main->defaultValuesInit(
         {
             https        => 0,
             port         => 0,
@@ -68,7 +72,7 @@ ok(
 );
 
 ok(
-    Lemonldap::NG::Handler::Reload->locationRulesInit(
+    Lemonldap::NG::Handler::Main->locationRulesInit(
         {
             'locationRules' => {
                 'www1' => {
@@ -84,7 +88,7 @@ ok(
 );
 
 ok(
-    Lemonldap::NG::Handler::Reload->headersInit(
+    Lemonldap::NG::Handler::Main->headersInit(
         { exportedHeaders => { www1 => { Auth => '$uid', } } }, $tsv
     ),
     'forgeHeadersInit'

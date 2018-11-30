@@ -1,33 +1,22 @@
-# This file contains the description of all configuration parameters
+#  This file contains the description of all configuration parameters
 # It may be included only by batch files, never in portal or handler chain
 # for performances reasons
 
-# DON'T FORGET TO RUN jsongenerator.pl AFTER EACH CHANGE
+# DON'T FORGET TO RUN "make json" AFTER EACH CHANGE
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '1.9.11';
+our $VERSION = '2.0.0';
 use strict;
 use Regexp::Common qw/URI/;
 
 my $perlExpr = sub {
     my ( $val, $conf ) = @_;
-    my $s  = '';
-    my @cf = qw(
-      encode_base64 checkLogonHours date checkDate basic unicode2iso
-      iso2unicode groupMatch encrypt
-    );
-    push @cf,
-      defined $conf->{customFunctions}
-      ? map { my $f = $_; $f =~ s/\w+:://g; ( $f, $_ ) }
-      split( /\s+/, $conf->{customFunctions} )
-      : ();
-    foreach my $f (@cf) {
-        $s = "sub $f {1} $s";
-    }
-    no warnings( 'redefine', 'uninitialized' );
-    eval "$s $val";
-    return $@ ? ( 1, "__badExpression__: $@" ) : (1);
+    my $s = '';
+    Safe->new->reval("no warning; $s $val");
+    my $err = join( '',
+        grep { $_ =~ /Undefined subroutine/ ? () : $_ } split( /\n/, $@ ) );
+    return $err ? ( 1, "__badExpression__: $err" ) : (1);
 };
 
 my $url = $RE{URI}{HTTP}{ -scheme => "https?" };
@@ -76,7 +65,8 @@ sub types {
             test => sub {
                 my ( $val, $conf ) = @_;
                 return 1
-                  if ( defined $conf->{macros}->{$val} or $val eq '_timezone' );
+                  if ( defined $conf->{macros}->{$val}
+                    or $val eq '_timezone' );
                 foreach ( keys %$conf ) {
                     return 1
                       if ( $_ =~ /exportedvars$/i
@@ -115,12 +105,11 @@ sub types {
         },
         select => {
             test => sub {
-                my $test =
-                  grep (
-                    { $_ eq $_[0] } map ( { $_->{k} } @{ $_[2]->{select} } ) );
+                my $test = grep ( { $_ eq $_[0] }
+                    map ( { $_->{k} } @{ $_[2]->{select} } ) );
                 return $test
                   ? 1
-                  : ( 0, "Invalid value '$_[0]' for this select" );
+                  : ( 1, "Invalid value '$_[0]' for this select" );
             },
         },
 
@@ -218,6 +207,9 @@ sub types {
         samlService => {
             test => sub { 1 }
         },
+        array => {
+            test => sub { 1 }
+        },
     };
 }
 
@@ -225,6 +217,34 @@ sub attributes {
     return {
 
         # Other
+        checkTime => {
+            type => 'int',
+            documentation =>
+              'Timeout to check new configuration in local cache',
+            default => 600,
+            flags   => 'hp',
+        },
+        mySessionAuthorizedRWKeys => {
+            type          => 'array',
+            documentation => 'Alterable session keys by user itself',
+            default =>
+              [ '_appsListOrder', '_oidcConnectedRP', '_oidcConsents' ],
+        },
+        configStorage => {
+            type          => 'text',
+            documentation => 'Configuration storage',
+            flags         => 'hmp',
+        },
+        localStorage => {
+            type          => 'text',
+            documentation => 'Local cache',
+            flags         => 'hmp',
+        },
+        localStorageOptions => {
+            type          => 'keyTextContainer',
+            documentation => 'Local cache parameters',
+            flags         => 'hmp',
+        },
         cfgNum => {
             type          => 'int',
             default       => 0,
@@ -246,6 +266,15 @@ sub attributes {
             type          => 'longtext',
             documentation => 'Configuration update log',
         },
+        cfgVersion => {
+            type          => 'text',
+            documentation => 'Version of LLNG which build configuration',
+        },
+        status => {
+            type          => 'bool',
+            documentation => 'Status daemon activation',
+            flags         => 'h',
+        },
         confirmFormMethod => {
             type => "select",
             select =>
@@ -256,13 +285,16 @@ sub attributes {
         customFunctions => {
             type          => 'text',
             test          => qr/^(?:\w+(?:::\w+)*(?:\s+\w+(?:::\w+)*)*)?$/,
+            help          => 'customfunctions.html',
             msgFail       => "__badCustomFuncName__",
-            documentation => 'List of custom functions'
+            documentation => 'List of custom functions',
+            flags         => 'hmp',
         },
         https => {
             default       => 0,
             type          => 'bool',
             documentation => 'Use HTTPS for redirection from portal',
+            flags         => 'h',
         },
         infoFormMethod => {
             type => "select",
@@ -271,7 +303,11 @@ sub attributes {
             default       => 'get',
             documentation => 'HTTP method for info page form',
         },
-        port       => { type => 'int', },
+        port => {
+            type          => 'int',
+            documentation => 'Force port in redirection',
+            flags         => 'h',
+        },
         jsRedirect => {
             type          => 'boolOrExpr',
             default       => 0,
@@ -287,12 +323,15 @@ sub attributes {
             default       => 0,
             type          => 'bool',
             documentation => 'Maintenance mode for all virtual hosts',
+            flags         => 'h',
         },
         nginxCustomHandlers => {
             type    => 'keyTextContainer',
             keyTest => qr/^\w+$/,
             test    => qr/^[a-zA-Z][a-zA-Z0-9]*(?:::[a-zA-Z][a-zA-Z0-9]*)*$/,
+            help    => 'handlerarch.html',
             msgFail => '__badPerlPackageName__',
+            documentation => 'Custom Nginx handler (deprecated)',
         },
         noAjaxHook => {
             default       => 0,
@@ -303,6 +342,15 @@ sub attributes {
             type          => 'url',
             default       => 'http://auth.example.com/',
             documentation => 'Portal URL',
+            flags         => 'hmp',
+            test          => $url,
+            msgFail       => '__badUrl__',
+        },
+        portalStatus => {
+            type          => 'bool',
+            default       => 0,
+            help          => 'status.html',
+            documentation => 'Enable portal status',
         },
         portalUserAttr => {
             type    => 'text',
@@ -317,33 +365,113 @@ sub attributes {
             default       => 'get',
             documentation => 'HTTP method for redirect page form',
         },
+        reloadTimeout => {
+            type          => 'int',
+            default       => 5,
+            documentation => 'Configuration reload timeout',
+            flags         => 'm',
+        },
         reloadUrls => {
-            type    => 'keyTextContainer',
-            help    => 'configlocation.html#configuration_reload',
-            keyTest => qr/^$Regexp::Common::URI::RFC2396::host(?::\d+)?$/,
-            test    => $url,
-            msgFail => '__badUrl__'
+            type          => 'keyTextContainer',
+            help          => 'configlocation.html#configuration_reload',
+            keyTest       => qr/^$Regexp::Common::URI::RFC2396::host(?::\d+)?$/,
+            test          => $url,
+            msgFail       => '__badUrl__',
+            documentation => 'URL to call on reload',
+        },
+        portalMainLogo => {
+            type          => 'text',
+            default       => 'common/logos/logo_llng_400px.png',
+            documentation => 'Portal main logo path',
+        },
+        showLanguages => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Display langs icons',
         },
         staticPrefix => {
             type          => 'text',
             documentation => 'Prefix of static files for HTML templates',
         },
-        syslog => {
-            type => 'text',
-            test => qr/^(?:auth|authpriv|daemon|local\d|user)?$/,
-            msgFail =>
-              '__authorizedValues__: auth, authpriv, daemon, local0-7, user',
-            default       => '',
-            documentation => 'Syslog facility',
+        multiValuesSeparator => {
+            type          => 'authParamsText',
+            default       => '; ',
+            documentation => 'Separator for multiple values',
+            flags         => 'hmp',
+        },
+        stayConnected => {
+            type => 'bool',
+
+            #help          => 'stayconnected.html',
+            default       => 0,
+            documentation => 'Enable StayConnected plugin',
+        },
+        checkState => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Enable CheckState plugin',
+        },
+        checkStateSecret => {
+            type          => 'text',
+            documentation => 'Secret token for CheckState plugin',
+        },
+        skipRenewConfirmation => {
+            type    => 'bool',
+            default => 0,
+            documentation =>
+              'Avoid asking confirmation when an Issuer asks to renew auth',
+        },
+        handlerInternalCache => {
+            type          => 'int',
+            default       => 15,
+            documentation => 'Handler internal cache timeout',
+            flags         => 'hp',
         },
 
-        # Manager
+        # Loggers (ini only)
+        logLevel => {
+            type          => 'text',
+            documentation => 'Log level, must be set in .ini',
+            flags         => 'hmp',
+        },
+        logger => {
+            type          => 'text',
+            documentation => 'technical logger',
+            flags         => 'hmp',
+        },
+        userLogger => {
+            type          => 'text',
+            documentation => 'User actions logger',
+            flags         => 'hmp',
+        },
+        log4perlConfFile => {
+            type          => 'text',
+            documentation => 'Log4Perl logger configuration file',
+            flags         => 'hmp',
+        },
+        sentryDsn => {
+            type          => 'text',
+            documentation => 'Sentry logger DSN',
+            flags         => 'hmp',
+        },
+        syslogFacility => {
+            type          => 'text',
+            documentation => 'Syslog logger technical facility',
+            flags         => 'hmp',
+        },
+        userSyslogFacility => {
+            type          => 'text',
+            documentation => 'Syslog logger user-actions facility',
+            flags         => 'hmp',
+        },
+
+        # Manager or PSGI protected apps
         protection => {
             type          => 'text',
             test          => qr/^(?:none|authenticate|manager|)$/,
             msgFail       => '__authorizedValues__: none authenticate manager',
-            default       => 'none',
             documentation => 'Manager protection method',
+            flags         => 'hm',
         },
 
         # Menu
@@ -386,12 +514,7 @@ sub attributes {
             type          => 'portalskin',
             default       => 'bootstrap',
             documentation => 'Name of portal skin',
-            select        => [
-                { k => 'bootstrap', v => 'Bootstrap' },
-                { k => 'pastel',    v => 'Pastel' },
-                { k => 'impact',    v => 'Impact' },
-                { k => 'dark',      v => 'Dark' },
-            ],
+            select        => [ { k => 'bootstrap', v => 'Bootstrap' }, ],
         },
         portalSkinBackground => {
             type          => 'portalskinbackground',
@@ -416,33 +539,85 @@ sub attributes {
                     k => "1280px-Parry_Peak_from_Winter_Park.jpg",
                     v => 'Winter'
                 },
-                { k => "Aletschgletscher_mit_Pinus_cembra1.jpg", v => 'Pinus' },
+                {
+                    k => "Aletschgletscher_mit_Pinus_cembra1.jpg",
+                    v => 'Pinus'
+                },
             ],
         },
         portalSkinRules => {
-            type       => 'keyTextContainer',
-            help       => 'portalcustom.html',
-            keyTest    => $perlExpr,
-            keyMsgFail => '__badSkinRule__',
-            test       => qr/^\w+$/,
-            msgFail    => '__badValue__',
+            type          => 'keyTextContainer',
+            help          => 'portalcustom.html',
+            keyTest       => $perlExpr,
+            keyMsgFail    => '__badSkinRule__',
+            test          => qr/^\w+$/,
+            msgFail       => '__badValue__',
+            documentation => 'Rules to choose portal skin',
         },
 
         # Security
+        formTimeout => {
+            default       => 120,
+            type          => 'int',
+            documentation => 'Token timeout for forms',
+        },
+        requireToken => {
+            default       => 1,
+            type          => 'bool',
+            documentation => 'Enable token for forms',
+        },
+        tokenUseGlobalStorage => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable global token storage',
+        },
         cda => {
             default       => 0,
             type          => 'bool',
             documentation => 'Enable Cross Domain Authentication',
+            flags         => 'hp',
         },
         checkXSS => {
             default       => 1,
             type          => 'bool',
             documentation => 'Check XSS',
         },
+        portalForceAuthn => {
+            default => 0,
+            help    => 'forcereauthn.html',
+            type    => 'bool',
+            documentation =>
+              'Enable force to authenticate when displaying portal',
+        },
+        portalForceAuthnInterval => {
+            default => 5,
+            type    => 'int',
+            documentation =>
+'Maximum interval in seconds since last authentication to force reauthentication',
+        },
+        bruteForceProtection => {
+            default       => 0,
+            help          => 'bruteforceprotection.html',
+            type          => 'bool',
+            documentation => 'Enable brute force attack protection',
+        },
+        bruteForceProtectionTempo => {
+            default => 30,
+            type    => 'int',
+            documentation =>
+              'Brute force attack protection -> Tempo before try again',
+        },
+        bruteForceProtectionMaxAge => {
+            default => 300,
+            type    => 'int',
+            documentation =>
+              'Brute force attack protection -> Max age third failed login',
+        },
         grantSessionRules => {
-            type    => 'grantContainer',
-            keyTest => $perlExpr,
-            test    => sub { 1 },
+            type          => 'grantContainer',
+            keyTest       => $perlExpr,
+            test          => sub { 1 },
+            documentation => 'Rules to grant sessions',
         },
         hiddenAttributes => {
             type          => 'text',
@@ -452,6 +627,43 @@ sub attributes {
         key => {
             type          => 'password',
             documentation => 'Secret key',
+        },
+        cspDefault => {
+            type          => 'text',
+            default       => "'self'",
+            documentation => 'Default value for Content-Security-Policy',
+        },
+        cspFormAction => {
+            type    => 'text',
+            default => "'self'",
+            documentation =>
+              'Form action destination for Content-Security-Policy',
+        },
+        cspImg => {
+            type          => 'text',
+            default       => "'self' data:",
+            documentation => 'Image source for Content-Security-Policy',
+        },
+        cspScript => {
+            type          => 'text',
+            default       => "'self'",
+            documentation => 'Javascript source for Content-Security-Policy',
+        },
+        cspStyle => {
+            type          => 'text',
+            default       => "'self'",
+            documentation => 'Style source for Content-Security-Policy',
+        },
+        cspConnect => {
+            type    => 'text',
+            default => "'self'",
+            documentation =>
+              'Authorized Ajax destination for Content-Security-Policy',
+        },
+        cspFont => {
+            type          => 'text',
+            default       => "'self'",
+            documentation => 'Font source for Content-Security-Policy',
         },
         portalAntiFrame => {
             default       => 1,
@@ -463,24 +675,14 @@ sub attributes {
             type          => 'bool',
             documentation => 'Display login history checkbox in portal',
         },
-        portalForceAuthn => {
-            default       => 0,
-            type          => 'bool',
-            documentation => 'Force to authenticate when displaying portal',
-        },
-        portalForceAuthnInterval => {
-            type    => 'int',
-            default => 5,
-            documentation =>
-'Minimum number of seconds since last authentifcation to force reauthentication',
-        },
         randomPasswordRegexp => {
             type          => 'pcre',
             default       => '[A-Z]{3}[a-z]{5}.\d{2}',
             documentation => 'Regular expression to create a random password',
         },
-        trustedDomains => { type => 'text', },
-        storePassword  => {
+        trustedDomains =>
+          { type => 'text', documentation => 'Trusted domains', },
+        storePassword => {
             default       => 0,
             type          => 'bool',
             documentation => 'Store password in session',
@@ -517,6 +719,7 @@ sub attributes {
             type          => 'bool',
             default       => 1,
             documentation => 'Use 302 redirect code for error (500)',
+            flags         => 'h',
         },
         useRedirectOnForbidden => {
             default       => 0,
@@ -526,16 +729,23 @@ sub attributes {
         useSafeJail => {
             default       => 1,
             type          => 'bool',
+            help          => 'safejail.html',
             documentation => 'Activate Safe jail',
+            flags         => 'hp',
         },
         whatToTrace => {
             type          => 'lmAttrOrMacro',
             default       => 'uid',
             documentation => 'Session parameter used to fill REMOTE_USER',
+            flags         => 'hp',
+        },
+        lwpOpts => {
+            type          => 'keyTextContainer',
+            documentation => 'Options given to LWP::UserAgent',
         },
         lwpSslOpts => {
             type          => 'keyTextContainer',
-            documentation => 'Options given to LWP::UserAgent',
+            documentation => 'SSL options given to LWP::UserAgent',
         },
 
         # History
@@ -547,7 +757,6 @@ sub attributes {
         loginHistoryEnabled => {
             default       => 0,
             type          => 'bool',
-            default       => 1,
             documentation => 'Enable login history',
         },
         portalDisplayLoginHistory => {
@@ -583,31 +792,48 @@ sub attributes {
             documentation => 'Display register button in portal',
         },
         portalDisplayResetPassword => {
-            default       => 1,
+            default       => 0,
             type          => 'bool',
             documentation => 'Display reset password button in portal',
         },
+        passwordResetAllowedRetries => {
+            default       => 3,
+            type          => 'int',
+            documentation => 'Maximum number of retries to reset password',
+        },
+        portalDisplayOidcConsents => {
+            type          => 'boolOrExpr',
+            default       => '$_oidcConnectedRP',
+            documentation => 'Display OIDC consent tab in portal',
+        },
 
         # Cookies
-        cookieExpiration => { type => 'text', },
-        cookieName       => {
+        cookieExpiration => {
+            type          => 'int',
+            documentation => 'Cookie expiration',
+            flags         => 'hp',
+        },
+        cookieName => {
             type          => 'text',
             test          => qr/^[a-zA-Z][a-zA-Z0-9_-]*$/,
             msgFail       => '__badCookieName__',
             default       => 'lemonldap',
             documentation => 'Name of the main cookie',
+            flags         => 'hp',
         },
         domain => {
             type          => 'text',
-            test          => qr/^(?:$Regexp::Common::URI::RFC2396::hostname)?/,
+            test          => qr/^(?:$Regexp::Common::URI::RFC2396::hostname)?$/,
             msgFail       => '__badDomainName__',
             default       => 'example.com',
             documentation => 'DNS domain',
+            flags         => 'hp',
         },
         httpOnly => {
             default       => 1,
             type          => 'bool',
             documentation => 'Enable httpOnly flag in cookie',
+            flags         => 'hp',
         },
         securedCookie => {
             type   => 'select',
@@ -619,19 +845,33 @@ sub attributes {
             ],
             default       => 0,
             documentation => 'Cookie securisation method',
+            flags         => 'hp',
         },
 
         # Notification
+        oldNotifFormat => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Use old XML format for notifications',
+        },
         notificationWildcard => {
             type          => 'text',
             default       => 'allusers',
             documentation => 'Notification string to match all users',
         },
-        notificationXSLTfile => { type => 'text', },
-        notification         => {
+        notificationXSLTfile => {
+            type          => 'text',
+            documentation => 'Custom XSLT document for notifications',
+        },
+        notification => {
             default       => 0,
             type          => 'bool',
             documentation => 'Notification activation',
+        },
+        notificationServer => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Notification server activation',
         },
         notificationStorage => {
             type          => 'PerlModule',
@@ -651,7 +891,7 @@ sub attributes {
             documentation => 'Captcha on login page',
         },
         captcha_mail_enabled => {
-            default       => 0,
+            default       => 1,
             type          => 'bool',
             documentation => 'Captcha on password reset page',
         },
@@ -664,19 +904,6 @@ sub attributes {
             type          => 'int',
             default       => 6,
             documentation => 'Captcha size',
-        },
-
-        #captcha_data
-        #captcha_output
-        captchaStorage => {
-            type          => 'PerlModule',
-            default       => 'Apache::Session::File',
-            documentation => 'Captcha backend module',
-        },
-        captchaStorageOptions => {
-            type    => 'keyTextContainer',
-            default => { 'Directory' => '/var/lib/lemonldap-ng/captcha/', },
-            documentation => 'Captcha backend module options',
         },
 
         # Variables
@@ -714,6 +941,7 @@ sub attributes {
             type          => 'PerlModule',
             default       => 'Apache::Session::File',
             documentation => 'Session backend module',
+            flags         => 'hp',
         },
         globalStorageOptions => {
             type    => 'keyTextContainer',
@@ -724,11 +952,12 @@ sub attributes {
                   'Lemonldap::NG::Common::Apache::Session::Generate::SHA256',
             },
             documentation => 'Session backend module options',
+            flags         => 'hp',
         },
         localSessionStorage => {
-            type    => 'PerlModule',
-            default => 'Cache::FileCache',
-            , documentation => 'Sessions cache module',
+            type          => 'PerlModule',
+            default       => 'Cache::FileCache',
+            documentation => 'Local sessions cache module',
         },
         localSessionStorageOptions => {
             type    => 'keyTextContainer',
@@ -743,12 +972,19 @@ sub attributes {
         },
 
         # Persistent storage
-        persistentStorage        => { type => 'PerlModule', },
-        persistentStorageOptions => { type => 'keyTextContainer', },
-        sessionDataToRemember    => {
-            type       => 'keyTextContainer',
-            keyTest    => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
-            keyMsgFail => '__invalidSessionData__',
+        persistentStorage => {
+            type          => 'PerlModule',
+            documentation => 'Storage module for persistent sessions'
+        },
+        persistentStorageOptions => {
+            type          => 'keyTextContainer',
+            documentation => 'Options for persistent sessions storage module'
+        },
+        sessionDataToRemember => {
+            type          => 'keyTextContainer',
+            keyTest       => qr/^[_a-zA-Z][a-zA-Z0-9_]*$/,
+            keyMsgFail    => '__invalidSessionData__',
+            documentation => 'Data to remember in login history',
         },
 
         # SAML issuer
@@ -843,16 +1079,19 @@ sub attributes {
         },
 
         # Mails
-        mailBody    => { type => 'longtext', },
+        mailBody =>
+          { type => 'longtext', documentation => 'Custom mail body', },
         mailCharset => {
             type          => 'text',
             default       => 'utf-8',
             documentation => 'Mail charset',
         },
-        mailConfirmBody    => { type => 'longtext', },
+        mailConfirmBody => {
+            type          => 'longtext',
+            documentation => 'Custom confirm mail body',
+        },
         mailConfirmSubject => {
             type          => 'text',
-            default       => '[LemonLDAP::NG] Password reset confirmation',
             documentation => 'Mail subject for reset confirmation',
         },
         mailFrom => {
@@ -860,7 +1099,7 @@ sub attributes {
             default       => 'noreply@example.com',
             documentation => 'Sender email',
         },
-        mailReplyTo    => { type => 'text', },
+        mailReplyTo => { type => 'text', documentation => 'Reply-To address' },
         mailSessionKey => {
             type          => 'text',
             default       => 'mail',
@@ -868,7 +1107,6 @@ sub attributes {
         },
         mailSubject => {
             type          => 'text',
-            default       => '[LemonLDAP::NG] Your new password',
             documentation => 'Mail subject for new password email',
         },
         mailTimeout => {
@@ -878,7 +1116,7 @@ sub attributes {
         },
         mailUrl => {
             type          => 'url',
-            default       => 'http://auth.example.com/mail.pl',
+            default       => 'http://auth.example.com/resetpwd',
             documentation => 'URL of password reset page',
         },
         SMTPServer => {
@@ -887,29 +1125,52 @@ sub attributes {
             test    => qr/^(?:$Regexp::Common::URI::RFC2396::host(?::\d+)?)?$/,
             documentation => 'SMTP Server',
         },
-        SMTPAuthUser => { type => 'text', },
-        SMTPAuthPass => { type => 'password', },
+        SMTPPort => {
+            type          => 'int',
+            documentation => 'Fix SMTP port',
+        },
+        SMTPTLS => {
+            type    => 'select',
+            default => '',
+            select  => [
+                { k => '',         v => 'none' },
+                { k => 'starttls', v => 'SMTP + STARTTLS' },
+                { k => 'ssl',      v => 'SMTPS' },
+            ],
+            documentation => 'TLS protocol to use with SMTP',
+        },
+        SMTPTLSOpts => {
+            type          => 'keyTextContainer',
+            documentation => 'TLS/SSL options for SMTP',
+        },
+        SMTPAuthUser => {
+            type          => 'text',
+            documentation => 'Login to use to send mails',
+        },
+        SMTPAuthPass => {
+            type          => 'password',
+            documentation => 'Password to use to send mails',
+        },
 
         # Registration
         registerConfirmSubject => {
             type          => 'text',
-            default       => '[LemonLDAP::NG] Account register confirmation',
             documentation => 'Mail subject for register confirmation',
         },
         registerDB => {
             type   => 'select',
             select => [
-                { k => 'AD',   v => 'Active Directory' },
-                { k => 'Demo', v => 'Demonstration' },
-                { k => 'LDAP', v => 'LDAP' },
-                { k => 'Null', v => 'None' },
+                { k => 'AD',     v => 'Active Directory' },
+                { k => 'Demo',   v => 'Demonstration' },
+                { k => 'LDAP',   v => 'LDAP' },
+                { k => 'Null',   v => 'None' },
+                { k => 'Custom', v => 'customModule' },
             ],
-            default       => 'Demo',
+            default       => 'Null',
             documentation => 'Register module',
         },
         registerDoneSubject => {
             type          => 'text',
-            default       => '[LemonLDAP::NG] Your new account',
             documentation => 'Mail subject when register is done',
         },
         registerTimeout => {
@@ -919,8 +1180,220 @@ sub attributes {
         },
         registerUrl => {
             type          => 'text',
-            default       => 'http://auth.example.com/register.pl',
+            default       => 'http://auth.example.com/register',
             documentation => 'URL of register page',
+        },
+
+        # Upgrade session
+        upgradeSession => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Upgrade session activation',
+        },
+
+        # 2F
+        max2FDevices => {
+            default       => 10,
+            type          => 'int',
+            documentation => 'Maximum registered 2F devices',
+        },
+        max2FDevicesNameLength => {
+            default       => 20,
+            type          => 'int',
+            documentation => 'Maximum 2F devices name length',
+        },
+
+        # U2F
+        u2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'U2F activation',
+        },
+        u2fSelfRegistration => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'U2F self registration activation',
+        },
+        u2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+              'Authentication level for users authentified by password+U2F'
+        },
+        u2fUserCanRemoveKey => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Authorize users to remove existing U2F key',
+        },
+
+        # TOTP second factor
+        totp2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'TOTP activation',
+        },
+        totp2fSelfRegistration => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'TOTP self registration activation',
+        },
+        totp2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+              'Authentication level for users authentified by password+TOTP'
+        },
+        totp2fIssuer => {
+            type          => 'text',
+            documentation => 'TOTP Issuer',
+        },
+        totp2fInterval => {
+            type          => 'int',
+            default       => 30,
+            documentation => 'TOTP interval',
+        },
+        totp2fRange => {
+            type          => 'int',
+            default       => 1,
+            documentation => 'TOTP range (number of interval to test)',
+        },
+        totp2fDigits => {
+            type          => 'int',
+            default       => 6,
+            documentation => 'Number of digits for TOTP code',
+        },
+        totp2fDisplayExistingSecret => {
+            type    => 'bool',
+            default => 0,
+            documentation =>
+              'Display existing TOTP secret in registration form',
+        },
+        totp2fUserCanChangeKey => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Authorize users to change existing TOTP secret',
+        },
+        totp2fUserCanRemoveKey => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Authorize users to remove existing TOTP secret',
+        },
+
+        # UTOTP 2F
+        utotp2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'UTOTP activation (mixed U2F/TOTP module)',
+        },
+        utotp2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+'Authentication level for users authentified by password+(U2F or TOTP)'
+        },
+
+        # External second factor
+        ext2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'External second factor activation',
+        },
+        ext2FSendCommand => {
+            type          => 'text',
+            documentation => 'Send command of External second factor',
+        },
+        ext2FValidateCommand => {
+            type          => 'text',
+            documentation => 'Validation command of External second factor',
+        },
+        ext2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+'Authentication level for users authentified by External second factor'
+        },
+        ext2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for External 2F',
+        },
+
+        #  REST External second factor
+        rest2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'REST second factor activation',
+        },
+        rest2fInitUrl => {
+            type          => 'url',
+            documentation => 'REST 2F init URL',
+        },
+        rest2fInitArgs => {
+            type          => 'keyTextContainer',
+            keyTest       => qr/^\w+$/,
+            keyMsgFail    => '__badKeyName__',
+            test          => qr/^\w+$/,
+            msgFail       => '__badValue__',
+            documentation => 'Args for REST 2F init',
+        },
+        rest2fVerifyUrl => {
+            type          => 'url',
+            keyTest       => qr/^\w+$/,
+            keyMsgFail    => '__badKeyName__',
+            test          => qr/^\w+$/,
+            msgFail       => '__badValue__',
+            documentation => 'REST 2F init URL',
+        },
+        rest2fVerifyArgs => {
+            type          => 'keyTextContainer',
+            documentation => 'Args for REST 2F init',
+        },
+        rest2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+'Authentication level for users authentified by REST second factor'
+        },
+        rest2fLogo => {
+            type          => 'text',
+            documentation => 'Custom logo for REST 2F',
+        },
+
+        # Yubikey 2FA
+        yubikey2fActivation => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Yubikey second factor activation',
+        },
+        yubikey2fSelfRegistration => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            documentation => 'Yubikey self registration activation',
+        },
+        yubikey2fAuthnLevel => {
+            type => 'int',
+            documentation =>
+'Authentication level for users authentified by Yubikey second factor'
+        },
+        yubikey2fClientID => {
+            type          => 'text',
+            documentation => 'Yubico client ID',
+        },
+        yubikey2fSecretKey => {
+            type          => 'text',
+            documentation => 'Yubico secret key',
+        },
+        yubikey2fNonce => {
+            type          => 'text',
+            documentation => 'Yubico nonce',
+        },
+        yubikey2fUrl => {
+            type          => 'text',
+            documentation => 'Yubico server',
+        },
+        yubikey2fPublicIDSize => {
+            type          => 'int',
+            default       => 12,
+            documentation => 'Yubikey public ID size',
+        },
+        yubikey2fUserCanRemoveKey => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Authorize users to remove existing Yubikey',
         },
 
         # Single session
@@ -945,8 +1418,9 @@ sub attributes {
             documentation => 'Allow only one session per IP',
         },
         singleUserByIP => {
-            default => 0,
-            type    => 'bool',
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Allow only one user per IP',
         },
         singleSessionUserByIP => {
             default       => 0,
@@ -954,13 +1428,47 @@ sub attributes {
             documentation => 'Allow only one session per user on an IP',
         },
 
-        # SOAP server
-        Soap => {
+        # REST server
+        restSessionServer => {
             default       => 0,
             type          => 'bool',
-            documentation => 'Enable SOAP services',
+            documentation => 'Enable REST session server',
         },
-        exportedAttr => { type => 'text', },
+        restConfigServer => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable REST config server',
+        },
+
+        # SOAP server
+        soapSessionServer => {
+            default       => 0,
+            type          => 'bool',
+            help          => 'soapservices.html',
+            documentation => 'Enable SOAP session server',
+        },
+        soapConfigServer => {
+            default       => 0,
+            type          => 'bool',
+            help          => 'soapservices.html',
+            documentation => 'Enable SOAP config server',
+        },
+        exportedAttr => {
+            type => 'text',
+            documentation =>
+              'List of attributes to export by SOAP or REST servers',
+        },
+        wsdlServer => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'Enable /portal.wsdl server',
+        },
+
+        # AutoSignin
+        autoSigninRules => {
+            type          => 'keyTextContainer',
+            documentation => 'List of auto signin rules',
+        },
 
         ## Virtualhosts
 
@@ -990,33 +1498,24 @@ sub attributes {
                           : ( 0, '__badUrl__' );
                     }
                     $s =~ s/\b(accept|deny|unprotect|skip)\b/1/g;
-                    my @cf =
-                      qw(encode_base64 checkLogonHours date checkDate basic unicode2iso iso2unicode groupMatch encrypt);
-                    push @cf,
-                      defined $conf->{customFunctions}
-                      ? map { my $f = $_; $f =~ s/\w+:://g; ( $f, $_ ) }
-                      split( /\s+/, $conf->{customFunctions} )
-                      : ();
-                    foreach my $f (@cf) {
-                        $s = "sub $f {1} $s";
-                    }
-                    no warnings( 'redefine', 'uninitialized' );
-                    eval $s;
-                    return $@ ? ( 1, "__badExpression__: $@" ) : (1);
+                    Safe->new->reval("no warnings;$s");
+                    my $err = join( '',
+                        grep { $_ =~ /Undefined subroutine/ ? () : $_ }
+                          split( /\n/, $@ ) );
+                    return $err ? ( 1, "__badExpression__: $err" ) : (1);
                 },
                 msgFail => '__badExpression__',
             },
-            keyTest    => qr/^$Regexp::Common::URI::RFC2396::hostname$/,
-            keyMsgFail => '__badHostname__',
-            default    => {
-                default => 'deny',
-            },
+            keyTest => qr/^(?:\*\.)?$Regexp::Common::URI::RFC2396::hostname$/,
+            keyMsgFail    => '__badHostname__',
+            default       => { default => 'deny', },
             documentation => 'Virtualhost rules',
+            flags         => 'h',
         },
         exportedHeaders => {
-            type       => 'keyTextContainer',
-            help       => 'writingrulesand_headers.html#headers',
-            keyTest    => qr/^$Regexp::Common::URI::RFC2396::hostname$/,
+            type    => 'keyTextContainer',
+            help    => 'writingrulesand_headers.html#headers',
+            keyTest => qr/^(?:\*\.)?$Regexp::Common::URI::RFC2396::hostname$/,
             keyMsgFail => '__badHostname__',
             test       => {
                 keyTest    => qr/^(?=[^\-])[\w\-]+(?<=[^-])$/,
@@ -1024,36 +1523,27 @@ sub attributes {
                 test       => sub {
                     my ( $val, $conf ) = @_;
                     my $s = $val;
-                    my @cf =
-                      qw(encode_base64 checkLogonHours date checkDate basic unicode2iso iso2unicode groupMatch encrypt);
-                    push @cf,
-                      defined $conf->{customFunctions}
-                      ? map { my $f = $_; $f =~ s/\w+:://g; ( $f, $_ ) }
-                      split( /\s+/, $conf->{customFunctions} )
-                      : ();
-                    foreach my $f (@cf) {
-                        $s = "sub $f {1} $s";
-                    }
-                    no warnings( 'redefine', 'uninitialized' );
-                    eval $s;
-                    return $@ ? ( 1, "__badExpression__: $@" ) : (1);
-                  }
+                    Safe->new->reval("no warnings;$s");
+                    my $err = join( '',
+                        grep { $_ =~ /Undefined subroutine/ ? () : $_ }
+                          split( /\n/, $@ ) );
+                    return $err ? ( 1, "__badExpression__: $err" ) : (1);
+                }
             },
             documentation => 'Virtualhost headers',
+            flags         => 'h',
         },
         post => {
-            type          => 'postContainer',
-            help          => 'formreplay.html',
-            test          => sub { 1 },
-            keyTest       => qr/^$Regexp::Common::URI::RFC2396::hostname$/,
+            type    => 'postContainer',
+            help    => 'formreplay.html',
+            test    => sub { 1 },
+            keyTest => qr/^(?:\*\.)?$Regexp::Common::URI::RFC2396::hostname$/,
             keyMsgFail    => '__badHostname__',
-            documentation => 'Virtualhost urls/Datas to post',
+            documentation => 'Virtualhost urls/Data to post',
         },
 
-        vhostOptions => {
-            type => 'subContainer',
-        },
-        vhostPort => {
+        vhostOptions => { type => 'subContainer', },
+        vhostPort    => {
             type    => 'int',
             default => -1,
         },
@@ -1065,13 +1555,90 @@ sub attributes {
             type    => 'bool',
             default => 0,
         },
-        vhostAliases => {
-            type => 'text',
+        vhostAliases => { type => 'text', },
+        vhostType    => {
+            type   => 'select',
+            select => [
+                { k => 'Main',         v => 'Main' },
+                { k => 'Zimbra',       v => 'ZimbraPreAuth' },
+                { k => 'AuthBasic',    v => 'AuthBasic' },
+                { k => 'SecureToken',  v => 'SecureToken' },
+                { k => 'CDA',          v => 'CDA' },
+                { k => 'DevOps',       v => 'DevOps' },
+                { k => 'DevOpsST',     v => 'DevOpsST' },
+                { k => 'ServiceToken', v => 'ServiceToken' },
+            ],
+            default       => 'Main',
+            documentation => 'Handler type',
+        },
+        vhostAuthnLevel => { type => 'int', },
+
+        # SecureToken parameters
+        secureTokenAllowOnError => {
+            type          => 'text',
+            documentation => 'Secure Token allow requests in error',
+            flags         => 'h',
+        },
+        secureTokenAttribute => {
+            type          => 'text',
+            documentation => 'Secure Token attribute',
+            flags         => 'h',
+        },
+        secureTokenExpiration => {
+            type          => 'text',
+            documentation => 'Secure Token expiration',
+            flags         => 'h',
+        },
+        secureTokenHeader => {
+            type          => 'text',
+            documentation => 'Secure Token header',
+            flags         => 'h',
+        },
+        secureTokenMemcachedServers => {
+            type          => 'text',
+            documentation => 'Secure Token Memcached servers',
+            flags         => 'h',
+        },
+        secureTokenUrls => {
+            type          => 'text',
+            documentation => '',
+            flags         => 'h',
+        },
+
+        # Zimbra handler parameters
+        zimbraAccountKey => {
+            type          => 'text',
+            flags         => 'h',
+            documentation => 'Zimbra account session key',
+        },
+        zimbraBy => {
+            type          => 'text',
+            flags         => 'h',
+            documentation => 'Zimbra account type',
+        },
+        zimbraPreAuthKey => {
+            type          => 'text',
+            flags         => 'h',
+            documentation => 'Zimbra preauthentication key',
+        },
+        zimbraSsoUrl => {
+            type          => 'text',
+            flags         => 'h',
+            documentation => 'Zimbra local SSO URL pattern',
+        },
+        zimbraUrl => {
+            type          => 'text',
+            flags         => 'h',
+            documentation => 'Zimbra preauthentication URL',
         },
 
         # CAS IDP
-        casAttr                => { type => 'text', },
-        casAttributes          => { type => 'keyTextContainer', },
+        casAttr =>
+          { type => 'text', documentation => 'Pivot attribute for CAS', },
+        casAttributes => {
+            type          => 'keyTextContainer',
+            documentation => 'CAS exported attributes',
+        },
         casAccessControlPolicy => {
             type   => 'select',
             select => [
@@ -1082,9 +1649,13 @@ sub attributes {
             default       => 'none',
             documentation => 'CAS access control policy',
         },
-        casStorage        => { type => 'PerlModule', },
+        casStorage => {
+            type          => 'PerlModule',
+            documentation => 'Apache::Session module to store CAS user data',
+        },
         casStorageOptions => {
-            type => 'keyTextContainer',
+            type          => 'keyTextContainer',
+            documentation => 'Apache::Session module parameters',
         },
         issuerDBCASActivation => {
             default       => 0,
@@ -1100,6 +1671,34 @@ sub attributes {
             type          => 'boolOrExpr',
             default       => 1,
             documentation => 'CAS server rule',
+        },
+
+        # Partners
+        casAppMetaDataOptions => {
+            type          => 'subContainer',
+            documentation => 'Root of CAS app options',
+        },
+        casAppMetaDataExportedVars => {
+            type          => 'keyTextContainer',
+            default       => { cn => 'cn', mail => 'mail', uid => 'uid', },
+            documentation => 'CAS exported variables',
+        },
+        casAppMetaDataOptionsService => {
+            type          => 'url',
+            documentation => 'CAS App service',
+        },
+        casAppMetaDataOptionsRule => {
+            type          => 'text',
+            test          => $perlExpr,
+            documentation => 'CAS App rule',
+        },
+
+        # Fake attribute: used by manager REST API to agglomerate all nodes
+        # related to a CAS SP partner
+        casAppMetaDataNodes => {
+            type     => 'casAppMetaDataNodeContainer',
+            template => 'casAppMetaDataNode',
+            help     => 'idpcas.html',
         },
 
         # OpenID Issuer
@@ -1148,58 +1747,6 @@ sub attributes {
         openIdSreg_dob => { type => 'lmAttrOrMacro', },
         openIdSPList   => { type => 'blackWhiteList', default => '0;' },
 
-        # Zimbra
-        zimbraPreAuthKey => { type => 'text', },
-        zimbraAccountKey => { type => 'text', },
-        zimbraBy         => {
-            type   => 'select',
-            select => [
-                { k => '',                 v => '' },
-                { k => 'name',             v => 'User name' },
-                { k => 'id',               v => 'User id' },
-                { k => 'foreignPrincipal', v => 'Foreign principal' },
-            ],
-            default => '',
-        },
-        zimbraUrl    => { type => 'text', },
-        zimbraSsoUrl => { type => 'text', },
-
-        # Sympa
-        sympaSecret  => { type => 'text', },
-        sympaMailKey => { type => 'text', },
-
-        # Secure Token
-        secureTokenMemcachedServers => {
-            type          => 'text',
-            default       => '127.0.0.1:11211',
-            documentation => 'Secure Token Handler memcached servers',
-        },
-        secureTokenExpiration => {
-            type          => 'int',
-            default       => 60,
-            documentation => 'Secure Token Handler token expiration',
-        },
-        secureTokenAttribute => {
-            type          => 'text',
-            default       => 'uid',
-            documentation => 'Secure Token Handler attribute to store',
-        },
-        secureTokenUrls => {
-            type    => 'pcre',
-            default => '.*',
-            documentation =>
-              'Secure Token Handler regular expression to match protected URL',
-        },
-        secureTokenHeader => {
-            type          => 'text',
-            default       => 'Auth-Token',
-            documentation => 'Secure Token Handler header name',
-        },
-        secureTokenAllowOnError => {
-            default       => 1,
-            type          => 'bool',
-            documentation => 'Secure Token Handler allow request on error',
-        },
         #########
         ## SAML #
         #########
@@ -1275,6 +1822,14 @@ sub attributes {
             default       => '',
             documentation => 'SAML encryption public key',
         },
+        samlServiceSignatureMethod => {
+            type   => 'select',
+            select => [
+                { k => 'RSA_SHA1',   v => 'RSA SHA1' },
+                { k => 'RSA_SHA256', v => 'RSA SHA256' },
+            ],
+            default => 'RSA_SHA1',
+        },
         samlServiceUseCertificateInResponse => {
             type    => 'bool',
             default => 0,
@@ -1291,8 +1846,14 @@ sub attributes {
             type          => 'bool',
             documentation => 'SAML force metadata UTF8 conversion',
         },
-        samlStorage                 => { type => 'PerlModule', },
-        samlStorageOptions          => { type => 'keyTextContainer', },
+        samlStorage => {
+            type          => 'PerlModule',
+            documentation => 'Apache::Session module to store SAML user data',
+        },
+        samlStorageOptions => {
+            type          => 'keyTextContainer',
+            documentation => 'Apache::Session module parameters',
+        },
         samlAuthnContextMapPassword => {
             type          => 'int',
             default       => 2,
@@ -1334,6 +1895,26 @@ sub attributes {
             test    => $url,
             msgFail => '__badUrl__',
         },
+        samlDiscoveryProtocolActivation => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'SAML Discovery Protocol activation',
+        },
+        samlDiscoveryProtocolURL => {
+            type          => 'text',
+            test          => $url,
+            msgFail       => '__badUrl__',
+            documentation => 'SAML Discovery Protocol EndPoint URL',
+        },
+        samlDiscoveryProtocolPolicy => {
+            type          => 'text',
+            documentation => 'SAML Discovery Protocol Policy',
+        },
+        samlDiscoveryProtocolIsPassive => {
+            default       => 0,
+            type          => 'bool',
+            documentation => 'SAML Discovery Protocol Is Passive',
+        },
         samlRelayStateTimeout => {
             type          => 'int',
             default       => 600,
@@ -1367,12 +1948,6 @@ sub attributes {
               . '#PORTAL#/saml/singleSignOnArtifact;',
             documentation => 'SAML IDP SSO HTTP Artifact',
         },
-        samlIDPSSODescriptorSingleSignOnServiceSOAP => {
-            type    => 'samlService',
-            default => 'urn:oasis:names:tc:SAML:2.0:bindings:SOAP;'
-              . '#PORTAL#/saml/singleSignOnSOAP;',
-            documentation => 'SAML IDP SSO SOAP',
-        },
         samlIDPSSODescriptorSingleLogoutServiceHTTPRedirect => {
             type    => 'samlService',
             default => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect;'
@@ -1405,14 +1980,15 @@ sub attributes {
         samlIDPMetaDataNodes => {
             type     => 'samlIDPMetaDataNodeContainer',
             template => 'samlIDPMetaDataNode',
+            help     => 'authsaml.html',
         },
 
         # Fake attribute: used by manager REST API to agglomerate all nodes
         # related to a SAML SP partner
         samlSPMetaDataNodes => {
             type     => 'samlSPMetaDataNodeContainer',
-            help     => 'authsaml.html',
             template => 'samlSPMetaDataNode',
+            help     => 'idpsaml.html',
         },
 
         # TODO: split that
@@ -1428,6 +2004,31 @@ sub attributes {
         },
         samlIDPMetaDataXML => {
             type => 'file',
+            test => sub {
+                my $v = shift;
+                return 1 unless ( $v and %$v );
+                my @msg;
+                my $res = 1;
+                my %entityIds;
+                foreach my $idpId ( keys %$v ) {
+                    unless ( $v->{$idpId}->{samlIDPMetaDataXML} =~
+                        /entityID="(.+?)"/si )
+                    {
+                        push @msg, "$idpId SAML metadata has ne EntityID";
+                        $res = 0;
+                        next;
+                    }
+                    my $eid = $1;
+                    if ( defined $entityIds{$eid} ) {
+                        push @msg,
+"$idpId and $entityIds{$eid} have the same SAML EntityID";
+                        $res = 0;
+                        next;
+                    }
+                    $entityIds{$eid} = $idpId;
+                }
+                return ( $res, join( ', ', @msg ) );
+            },
         },
         samlIDPMetaDataOptions => {
             type       => 'keyTextContainer',
@@ -1510,9 +2111,7 @@ sub attributes {
                 { k => '',              v => '' },
                 { k => 'http-post',     v => 'POST' },
                 { k => 'http-redirect', v => 'Redirect' },
-                { k => 'http-soap',     v => 'SOAP' },
                 { k => 'artifact-get',  v => 'Artifact GET' },
-                { k => 'artifact-post', v => 'Artifact POST' },
             ],
             default => '',
         },
@@ -1523,8 +2122,6 @@ sub attributes {
                 { k => 'http-post',     v => 'POST' },
                 { k => 'http-redirect', v => 'Redirect' },
                 { k => 'http-soap',     v => 'SOAP' },
-                { k => 'artifact-get',  v => 'Artifact GET' },
-                { k => 'artifact-post', v => 'Artifact POST' },
             ],
             default => '',
         },
@@ -1557,6 +2154,7 @@ sub attributes {
             type    => 'bool',
             default => 0,
         },
+        samlIDPMetaDataOptionsUserAttribute => { type => 'text', },
 
         # SP keys
         samlSPMetaDataExportedAttributes => {
@@ -1568,9 +2166,7 @@ sub attributes {
             msgFail    => '__badValue__',
             default    => {},
         },
-        samlSPMetaDataXML => {
-            type => 'file',
-        },
+        samlSPMetaDataXML     => { type => 'file', },
         samlSPMetaDataOptions => {
             type       => 'keyTextContainer',
             keyTest    => qr/^[a-zA-Z](?:[a-zA-Z0-9_\-\.]*\w)?$/,
@@ -1641,10 +2237,8 @@ sub attributes {
             ],
             default => '',
         },
-        samlSPMetaDataOptionsNameIDSessionKey => {
-            type => 'text',
-        },
-        samlSPMetaDataOptionsOneTimeUse => {
+        samlSPMetaDataOptionsNameIDSessionKey => { type => 'text', },
+        samlSPMetaDataOptionsOneTimeUse       => {
             type    => 'bool',
             default => 0,
         },
@@ -1689,36 +2283,42 @@ sub attributes {
             type    => 'bool',
             default => 1,
         },
+        samlSPMetaDataOptionsRule => {
+            type          => 'text',
+            test          => $perlExpr,
+            documentation => 'Rule to grant access to this SP',
+        },
 
         # AUTH, USERDB and PASSWORD MODULES
         authentication => {
             type   => 'select',
             select => [
-                { k => 'Apache',    v => 'Apache' },
-                { k => 'AD',        v => 'Active Directory' },
-                { k => 'BrowserID', v => 'BrowserID (Mozilla Persona)' },
-                { k => 'Choice',    v => 'authChoice' },
-                { k => 'CAS',  v => 'Central Authentication Service (CAS)' },
-                { k => 'DBI',  v => 'Database (DBI)' },
-                { k => 'Demo', v => 'Demonstration' },
-                { k => 'Facebook',      v => 'Facebook' },
-                { k => 'Google',        v => 'Google' },
-                { k => 'Kerberos',      v => 'Kerberos' },
-                { k => 'LDAP',          v => 'LDAP' },
-                { k => 'LinkedIn',      v => 'LinkedIn' },
-                { k => 'Multi',         v => 'Multiple' },
-                { k => 'Null',          v => 'None' },
-                { k => 'OpenID',        v => 'OpenID' },
+                { k => 'Apache',      v => 'Apache' },
+                { k => 'AD',          v => 'Active Directory' },
+                { k => 'DBI',         v => 'Database (DBI)' },
+                { k => 'Facebook',    v => 'Facebook' },
+                { k => 'Google',      v => 'Google' },
+                { k => 'Kerberos',    v => 'Kerberos' },
+                { k => 'LDAP',        v => 'LDAP' },
+                { k => 'LinkedIn',    v => 'LinkedIn' },
+                { k => 'PAM',         v => 'PAM' },
+                { k => 'Radius',      v => 'Radius' },
+                { k => 'REST',        v => 'REST' },
+                { k => 'SSL',         v => 'SSL' },
+                { k => 'Twitter',     v => 'Twitter' },
+                { k => 'WebID',       v => 'WebID' },
+                { k => 'Demo',        v => 'Demonstration' },
+                { k => 'Choice',      v => 'authChoice' },
+                { k => 'Combination', v => 'combineMods' },
+                { k => 'CAS',    v => 'Central Authentication Service (CAS)' },
+                { k => 'OpenID', v => 'OpenID' },
                 { k => 'OpenIDConnect', v => 'OpenID Connect' },
-                { k => 'Proxy',         v => 'Proxy' },
-                { k => 'Radius',        v => 'Radius' },
-                { k => 'Remote',        v => 'Remote' },
                 { k => 'SAML',          v => 'SAML v2' },
+                { k => 'Proxy',         v => 'Proxy' },
+                { k => 'Remote',        v => 'Remote' },
                 { k => 'Slave',         v => 'Slave' },
-                { k => 'SSL',           v => 'SSL' },
-                { k => 'Twitter',       v => 'Twitter' },
-                { k => 'WebID',         v => 'WebID' },
-                { k => 'Yubikey',       v => 'Yubikey' },
+                { k => 'Null',          v => 'None' },
+                { k => 'Custom',        v => 'customModule' },
             ],
             default       => 'Demo',
             documentation => 'Authentication module',
@@ -1726,24 +2326,15 @@ sub attributes {
         userDB => {
             type   => 'select',
             select => [
-                { k => 'AD',            v => 'Active Directory' },
-                { k => 'DBI',           v => 'Database (DBI)' },
-                { k => 'Choice',        v => 'authChoice' },
-                { k => 'Demo',          v => 'Demonstration' },
-                { k => 'Facebook',      v => 'Facebook' },
-                { k => 'Google',        v => 'Google' },
-                { k => 'LDAP',          v => 'LDAP' },
-                { k => 'Multi',         v => 'Multiple' },
-                { k => 'Null',          v => 'None' },
-                { k => 'OpenID',        v => 'OpenID' },
-                { k => 'OpenIDConnect', v => 'OpenID Connect' },
-                { k => 'Proxy',         v => 'Proxy' },
-                { k => 'Remote',        v => 'Remote' },
-                { k => 'SAML',          v => 'SAML v2' },
-                { k => 'Slave',         v => 'Slave' },
-                { k => 'WebID',         v => 'WebID' },
+                { k => 'Same',   v => 'Same' },
+                { k => 'AD',     v => 'Active Directory' },
+                { k => 'DBI',    v => 'Database (DBI)' },
+                { k => 'LDAP',   v => 'LDAP' },
+                { k => 'REST',   v => 'REST' },
+                { k => 'Null',   v => 'None' },
+                { k => 'Custom', v => 'customModule' },
             ],
-            default       => 'Demo',
+            default       => 'Same',
             documentation => 'User module',
         },
         passwordDB => {
@@ -1754,10 +2345,36 @@ sub attributes {
                 { k => 'DBI',    v => 'Database (DBI)' },
                 { k => 'Demo',   v => 'Demonstration' },
                 { k => 'LDAP',   v => 'LDAP' },
+                { k => 'REST',   v => 'REST' },
                 { k => 'Null',   v => 'None' },
+                { k => 'Custom', v => 'customModule' },
             ],
             default       => 'Demo',
             documentation => 'Password module',
+        },
+
+        # Seconf Factor Engine
+        sfEngine => {
+            type          => 'text',
+            default       => '::2F::Engines::Default',
+            documentation => 'Second factor engine',
+        },
+        sfRequired => {
+            type          => 'boolOrExpr',
+            default       => 0,
+            help          => 'secondfactor.html',
+            documentation => 'Second factor required',
+        },
+        available2F => {
+            type          => 'text',
+            default       => 'UTOTP,TOTP,U2F,REST,Ext2F,Yubikey',
+            documentation => 'Available second factor modules',
+        },
+        available2FSelfRegistration => {
+            type    => 'text',
+            default => 'TOTP,U2F,Yubikey',
+            documentation =>
+              'Available self-registration modules for second factor',
         },
 
         # DEMO
@@ -1885,9 +2502,16 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 'find',
             documentation => '"deref" param of Net::LDAP::search()',
         },
-        mailLDAPFilter     => { type => 'text', },
-        LDAPFilter         => { type => 'text', },
-        AuthLDAPFilter     => { type => 'text', },
+        mailLDAPFilter => {
+            type          => 'text',
+            documentation => 'LDAP filter for mail search'
+        },
+        LDAPFilter =>
+          { type => 'text', documentation => 'Default LDAP filter' },
+        AuthLDAPFilter => {
+            type          => 'text',
+            documentation => 'LDAP filter for auth search'
+        },
         ldapGroupRecursive => {
             default       => 0,
             type          => 'bool',
@@ -1944,31 +2568,78 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 5,
             documentation => 'SSL authentication level',
         },
-        SSLVar => { type => 'text', },
+        SSLVar => {
+            type    => 'text',
+            default => 'SSL_CLIENT_S_DN_Email'
+        },
+        SSLVarIf => {
+            type    => 'keyTextContainer',
+            default => {}
+        },
+        sslByAjax => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Use Ajax request for SSL',
+        },
+        sslHost => {
+            type          => 'url',
+            documentation => 'URL for SSL Ajax request',
+        },
 
         # CAS
-        CAS_authnLevel => {
+        casAuthnLevel => {
             type          => 'int',
             default       => 1,
             documentation => 'CAS authentication level',
         },
-        CAS_url => {
+        casSrvMetaDataExportedVars => {
+            type          => 'keyTextContainer',
+            default       => { cn => 'cn', mail => 'mail', uid => 'uid', },
+            documentation => 'CAS exported variables',
+        },
+        casSrvMetaDataOptions => {
+            type          => 'subContainer',
+            documentation => 'Root of CAS server options',
+        },
+        casSrvMetaDataOptionsGateway => { type => 'bool', default => 0 },
+        casSrvMetaDataOptionsProxiedServices => {
+            type       => 'keyTextContainer',
+            keyTest    => qr/^\w/,
+            keyMsgFail => '__badCasProxyId__',
+        },
+        casSrvMetaDataOptionsRenew => { type => 'bool', default => 0 },
+        casSrvMetaDataOptionsUrl   => {
             type    => 'text',
             test    => $url,
             msgFail => '__badUrl__',
         },
-        CAS_CAFile  => { type => 'text', },
-        CAS_renew   => { type => 'bool', },
-        CAS_gateway => { type => 'bool', },
-        CAS_pgtFile => {
+        casSrvMetaDataOptionsDisplayName => {
             type          => 'text',
-            default       => '/tmp/pgt.txt',
-            documentation => 'CAS PGT file',
+            documentation => 'Name to display for CAS server',
         },
-        CAS_proxiedServices => {
-            type       => 'keyTextContainer',
-            keyTest    => qr/^\w+$/,
-            keyMsgFail => '__badCasProxyId__',
+        casSrvMetaDataOptionsIcon => {
+            type          => 'text',
+            documentation => 'Path of CAS Server Icon',
+        },
+
+        # Fake attribute: used by manager REST API to agglomerate all nodes
+        # related to a CAS IDP partner
+        casSrvMetaDataNodes => {
+            type     => 'casSrvMetaDataNodeContainer',
+            template => 'casSrvMetaDataNode',
+            help     => 'authcas.html',
+        },
+
+        # PAM
+        pamAuthnLevel => {
+            type          => 'int',
+            default       => 2,
+            documentation => 'PAM authentication level',
+        },
+        pamService => {
+            type          => 'text',
+            default       => 'login',
+            documentation => 'PAM service',
         },
 
         # Radius
@@ -1980,6 +2651,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         radiusSecret => { type => 'text', },
         radiusServer => { type => 'text', },
 
+        # REST
+        restAuthUrl   => { type => 'url' },
+        restUserDBUrl => { type => 'url' },
+
+        # TODO: add restMailDBUrl
+        restPwdConfirmUrl => { type => 'url' },
+        restPwdModifyUrl  => { type => 'url' },
+
         # Remote
         remotePortal        => { type => 'text', },
         remoteGlobalStorage => {
@@ -1990,17 +2669,27 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         remoteGlobalStorageOptions => {
             type    => 'keyTextContainer',
             default => {
-                proxy => 'http://auth.example.com/index.pl/sessions',
+                proxy => 'http://auth.example.com/sessions',
                 ns =>
-                  'http://auth.example.com/Lemonldap/NG/Common/CGI/SOAPService',
+'http://auth.example.com/Lemonldap/NG/Common/PSGI/SOAPService',
             },
-            documentation => 'Demo exported variables',
+            documentation => 'Apache::Session module parameters',
         },
 
         # Proxy
-        soapAuthService    => { type => 'text', },
-        remoteCookieName   => { type => 'text', },
-        soapSessionService => { type => 'text', },
+        proxyAuthService    => { type => 'text', },
+        proxySessionService => { type => 'text', },
+        remoteCookieName    => { type => 'text', },
+        proxyUseSoap        => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Use SOAP instead of REST',
+        },
+        proxyAuthnLevel => {
+            type          => 'int',
+            default       => 2,
+            documentation => 'Proxy authentication level',
+        },
 
         # OpenID
         openIdAuthnLevel => {
@@ -2020,22 +2709,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         'openIdIDPList' => { 'type' => 'blackWhiteList', default => '0;' },
 
-        # Google
-        googleAuthnLevel => {
-            type          => 'int',
-            default       => 1,
-            documentation => 'Google authentication level',
-        },
-        googleExportedVars => {
-            type          => 'keyTextContainer',
-            keyTest       => qr/^!?[a-zA-Z][a-zA-Z0-9_-]*$/,
-            keyMsgFail    => '__badVariableName__',
-            test          => qr/^[a-zA-Z][a-zA-Z0-9_:\-]*$/,
-            msgFail       => '__badValue__',
-            default       => {},
-            documentation => 'Google exported variables',
-        },
-
         # Facebook
         facebookAuthnLevel => {
             type          => 'int',
@@ -2053,6 +2726,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => {},
             documentation => 'Facebook exported variables',
         },
+        facebookUserField => { type => 'text', default => 'id' },
 
         # Twitter
         twitterAuthnLevel => {
@@ -2060,9 +2734,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 1,
             documentation => 'Twitter authentication level',
         },
-        twitterKey     => { type => 'text', },
-        twitterSecret  => { type => 'text', },
-        twitterAppName => { type => 'text', },
+        twitterKey       => { type => 'text', },
+        twitterSecret    => { type => 'text', },
+        twitterAppName   => { type => 'text', },
+        twitterUserField => { type => 'text', default => 'screen_name' },
 
         # LinkedIn
         linkedInAuthnLevel => {
@@ -2103,14 +2778,16 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 2,
             documentation => 'DBI authentication level',
         },
-        dbiAuthChain       => { type => 'text', },
-        dbiAuthUser        => { type => 'text', },
-        dbiAuthPassword    => { type => 'password', },
-        dbiUserChain       => { type => 'text', },
-        dbiUserUser        => { type => 'text', },
-        dbiUserPassword    => { type => 'password', },
-        dbiAuthTable       => { type => 'text', },
-        dbiUserTable       => { type => 'text', },
+        dbiAuthChain    => { type => 'text', },
+        dbiAuthUser     => { type => 'text', },
+        dbiAuthPassword => { type => 'password', },
+        dbiUserChain    => { type => 'text', },
+        dbiUserUser     => { type => 'text', },
+        dbiUserPassword => { type => 'password', },
+        dbiAuthTable    => { type => 'text', },
+        dbiUserTable    => { type => 'text', },
+
+        # TODO: add dbiMailCol
         dbiAuthLoginCol    => { type => 'text', },
         dbiAuthPasswordCol => { type => 'text', },
         dbiPasswordMailCol => { type => 'text', },
@@ -2145,7 +2822,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         # Null
         nullAuthnLevel => {
             type          => 'int',
-            default       => 2,
+            default       => 0,
             documentation => 'Null authentication level',
         },
 
@@ -2163,11 +2840,6 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             type          => 'int',
             default       => 3,
             documentation => 'Null authentication level',
-        },
-        krbUseModKrb => {
-            type          => 'bool',
-            default       => 0,
-            documentation => 'Rely on Web Server Kerberos module',
         },
         krbRemoveDomain => {
             type          => 'bool',
@@ -2212,32 +2884,40 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             test       => sub { 1 },
             select     => [
                 [
-                    { k => 'Apache',    v => 'Apache' },
-                    { k => 'AD',        v => 'Active Directory' },
-                    { k => 'BrowserID', v => 'BrowserID (Mozilla Persona)' },
-                    { k => 'CAS', v => 'Central Authentication Service (CAS)' },
-                    { k => 'DBI', v => 'Database (DBI)' },
+                    { k => 'Apache', v => 'Apache' },
+                    { k => 'AD',     v => 'Active Directory' },
+                    {
+                        k => 'CAS',
+                        v => 'Central Authentication Service (CAS)'
+                    },
+                    { k => 'DBI',           v => 'Database (DBI)' },
                     { k => 'Demo',          v => 'Demo' },
                     { k => 'Facebook',      v => 'Facebook' },
                     { k => 'Google',        v => 'Google' },
                     { k => 'Kerberos',      v => 'Kerberos' },
                     { k => 'LDAP',          v => 'LDAP' },
                     { k => 'LinkedIn',      v => 'LinkedIn' },
+                    { k => 'PAM',           v => 'PAM' },
                     { k => 'Null',          v => 'None' },
                     { k => 'OpenID',        v => 'OpenID' },
                     { k => 'OpenIDConnect', v => 'OpenID Connect' },
                     { k => 'Proxy',         v => 'Proxy' },
                     { k => 'Radius',        v => 'Radius' },
+                    { k => 'REST',          v => 'REST' },
                     { k => 'Remote',        v => 'Remote' },
                     { k => 'SAML',          v => 'SAML v2' },
                     { k => 'Slave',         v => 'Slave' },
                     { k => 'SSL',           v => 'SSL' },
                     { k => 'Twitter',       v => 'Twitter' },
                     { k => 'WebID',         v => 'WebID' },
-                    { k => 'Yubikey',       v => 'Yubikey' }
+                    { k => 'Custom',        v => 'customModule' },
                 ],
                 [
-                    { k => 'AD',            v => 'Active Directory' },
+                    { k => 'AD', v => 'Active Directory' },
+                    {
+                        k => 'CAS',
+                        v => 'Central Authentication Service (CAS)'
+                    },
                     { k => 'DBI',           v => 'Database (DBI)' },
                     { k => 'Demo',          v => 'Demo' },
                     { k => 'Facebook',      v => 'Facebook' },
@@ -2247,59 +2927,84 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'OpenID',        v => 'OpenID' },
                     { k => 'OpenIDConnect', v => 'OpenID Connect' },
                     { k => 'Proxy',         v => 'Proxy' },
+                    { k => 'REST',          v => 'REST' },
                     { k => 'Remote',        v => 'Remote' },
                     { k => 'SAML',          v => 'SAML v2' },
                     { k => 'Slave',         v => 'Slave' },
-                    { k => 'WebID',         v => 'WebID' }
+                    { k => 'WebID',         v => 'WebID' },
+                    { k => 'Custom',        v => 'customModule' },
                 ],
                 [
-                    { k => 'AD',   v => 'Active Directory' },
-                    { k => 'DBI',  v => 'Database (DBI)' },
-                    { k => 'Demo', v => 'Demo' },
-                    { k => 'LDAP', v => 'LDAP' },
-                    { k => 'Null', v => 'None' }
+                    { k => 'AD',     v => 'Active Directory' },
+                    { k => 'DBI',    v => 'Database (DBI)' },
+                    { k => 'Demo',   v => 'Demo' },
+                    { k => 'LDAP',   v => 'LDAP' },
+                    { k => 'REST',   v => 'REST' },
+                    { k => 'Null',   v => 'None' },
+                    { k => 'Custom', v => 'customModule' },
                 ]
+            ],
+            documentation => 'Hash list of Choice strings',
+        },
+
+        # Combination
+        combination => {
+            type          => 'text',
+            documentation => 'Combination rule'
+        },
+        combModules => {
+            type          => 'cmbModuleContainer',
+            keyTest       => qr/^\w+$/,
+            test          => sub { 1 },
+            documentation => 'Combination module description',
+            select        => [
+                { k => 'Apache',   v => 'Apache' },
+                { k => 'AD',       v => 'Active Directory' },
+                { k => 'DBI',      v => 'Database (DBI)' },
+                { k => 'Facebook', v => 'Facebook' },
+                { k => 'Google',   v => 'Google' },
+                { k => 'Kerberos', v => 'Kerberos' },
+                { k => 'LDAP',     v => 'LDAP' },
+                { k => 'PAM',      v => 'PAM' },
+                { k => 'Radius',   v => 'Radius' },
+                { k => 'REST',     v => 'REST' },
+                { k => 'SSL',      v => 'SSL' },
+                { k => 'Twitter',  v => 'Twitter' },
+                { k => 'WebID',    v => 'WebID' },
+                { k => 'Demo',     v => 'Demonstration' },
+                { k => 'CAS',    v => 'Central Authentication Service (CAS)' },
+                { k => 'OpenID', v => 'OpenID' },
+                { k => 'OpenIDConnect', v => 'OpenID Connect' },
+                { k => 'SAML',          v => 'SAML v2' },
+                { k => 'Proxy',         v => 'Proxy' },
+                { k => 'Remote',        v => 'Remote' },
+                { k => 'Slave',         v => 'Slave' },
+                { k => 'Null',          v => 'None' },
+                { k => 'Custom',        v => 'customModule' },
             ],
         },
 
-        # Multi
-        multiAuthStack => {
-            type => 'authParamsText',
+        # Custom auth modules
+        customAuth => {
+            type          => 'text',
+            documentation => 'Custom auth module',
         },
-        multiUserDBStack => {
-            type => 'authParamsText',
+        customUserDB => {
+            type          => 'text',
+            documentation => 'Custom user DB module',
         },
-        multiValuesSeparator => {
-            type          => 'authParamsText',
-            default       => '; ',
-            documentation => 'Separator for multiple values',
+        customPassword => {
+            type          => 'text',
+            documentation => 'Custom password module',
         },
-
-        # Yubikey
-        yubikeyAuthnLevel => {
-            type          => 'int',
-            default       => 3,
-            documentation => 'Yubikey authentication level',
+        customRegister => {
+            type          => 'text',
+            documentation => 'Custom register module',
         },
-        yubikeyClientID     => { type => 'text', },
-        yubikeySecretKey    => { type => 'text', },
-        yubikeyPublicIDSize => {
-            type          => 'int',
-            default       => 12,
-            documentation => 'Yubikey public ID size',
+        customAddParams => {
+            type          => 'keyTextContainer',
+            documentation => 'Custom additional parameters',
         },
-
-        # BrowserID
-        browserIdAuthnLevel => {
-            type          => 'int',
-            default       => 1,
-            documentation => 'Browser ID authentication level',
-        },
-        browserIdAutoLogin       => { type => 'bool', },
-        browserIdVerificationURL => { type => 'text', },
-        browserIdSiteName        => { type => 'text', },
-        browserIdSiteLogo        => { type => 'text', },
-        browserIdBackgroundColor => { type => 'text', },
 
         # OpenID Connect auth params
         oidcAuthnLevel => {
@@ -2356,8 +3061,18 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         oidcServiceMetaDataCheckSessionURI => {
             type          => 'text',
-            default       => 'checksession',
+            default       => 'checksession.html',
             documentation => 'OpenID Connect check session iframe',
+        },
+        oidcServiceMetaDataBackChannelURI => {
+            type          => 'text',
+            default       => 'blogout',
+            documentation => 'OpenID Connect Front-Channel logout endpoint',
+        },
+        oidcServiceMetaDataFrontChannelURI => {
+            type          => 'text',
+            default       => 'flogout',
+            documentation => 'OpenID Connect Front-Channel logout endpoint',
         },
         oidcServiceMetaDataAuthnContext => {
             type    => 'keyTextContainer',
@@ -2397,9 +3112,13 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             documentation => 'OpenID Connect allow hybrid flow',
         },
-        oidcStorage        => { type => 'PerlModule', },
+        oidcStorage => {
+            type          => 'PerlModule',
+            documentation => 'Apache::Session module to store OIDC user data',
+        },
         oidcStorageOptions => {
-            type => 'keyTextContainer',
+            type          => 'keyTextContainer',
+            documentation => 'Apache::Session module parameters',
         },
 
         # OpenID Connect metadata nodes
@@ -2465,6 +3184,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcOPMetaDataOptionsIcon         => { type => 'text', },
         oidcOPMetaDataOptionsStoreIDToken => { type => 'bool', default => 0 },
 
+        oidcRPMetaDataOptionsRule => {
+            type          => 'text',
+            test          => $perlExpr,
+            documentation => 'Rule to grant access to this SP',
+        },
+
         # OpenID Connect relying parties
         oidcRPMetaDataExportedVars => {
             type    => 'keyTextContainer',
@@ -2499,9 +3224,30 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcRPMetaDataOptionsRedirectUris => { type => 'text', },
         oidcRPMetaDataOptionsExtraClaims =>
           { type => 'keyTextContainer', default => {} },
-        oidcRPMetaDataOptionsBypassConsent => { type => 'bool', default => 0 },
+        oidcRPMetaDataOptionsBypassConsent => {
+            type    => 'bool',
+            help    => 'openidconnectclaims.html',
+            default => 0
+        },
         oidcRPMetaDataOptionsPostLogoutRedirectUris => { type => 'text', },
-
+        oidcRPMetaDataOptionsLogoutUrl              => {
+            type          => 'url',
+            documentation => 'Logout URL',
+        },
+        oidcRPMetaDataOptionsLogoutType => {
+            type   => 'select',
+            select => [
+                { k => 'front', v => 'Front Channel' },
+                { k => 'back',  v => 'Back Channel' },
+            ],
+            default       => 'front',
+            documentation => 'Logout type',
+        },
+        oidcRPMetaDataOptionsLogoutSessionRequired => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Session required for logout',
+        },
     };
 }
 

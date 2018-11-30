@@ -12,7 +12,8 @@ ok($auth, 'object created');
 my $freeradius_path = $ENV{TEST_FREERADIUS_PATH} || '/usr/share/freeradius';
 
 SKIP: {
-    skip 'no FreeRADIUS dictionary found', 21 if (! -d $freeradius_path);
+    # +1 test for no-warnings
+    skip 'no FreeRADIUS dictionary found', 20 if (! -d $freeradius_path);
 
     ok($auth->load_dictionary(File::Spec->catdir($freeradius_path, 'dictionary.rfc2865'), format => 'freeradius'), 'rfc2865 dictionary');
     ok($auth->load_dictionary(File::Spec->catdir($freeradius_path, 'dictionary.erx'), format => 'freeradius'), 'ERX (Juniper) vendor');

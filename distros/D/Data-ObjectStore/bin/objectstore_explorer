@@ -15,7 +15,7 @@ die "No object store found at $db_dir;" unless -d $db_dir;
 
 my $store = Data::ObjectStore->open_store( $db_dir );
 
-show( $store->load_root_container->_id );
+show( $store->load_root_container->[0] );
 
 print ">";
 

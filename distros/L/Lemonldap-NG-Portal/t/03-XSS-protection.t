@@ -1,157 +1,173 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl Lemonldap-NG-Portal.t'
-
-#########################
-
-# change 'tests => 1' to 'tests => last_test_to_print';
-
-package My::Portal;
+use Test::More;
 use strict;
-use Test::More tests => 22;
+use IO::String;
 
-BEGIN {
-    use_ok( 'Lemonldap::NG::Portal::Simple', ':all' );
-    sub Lemonldap::NG::Portal::Simple::lmLog { }
-}
+require 't/test-lib.pm';
 
-#use Lemonldap::NG::Portal::Simple;
+my $client = LLNG::Manager::Test->new(
+    {
+        ini => {
+            logLevel       => 'error',
+            useSafeJail    => 1,
+            trustedDomains => 'example3.com *.example2.com'
+        }
+    }
+);
 
-our @ISA = 'Lemonldap::NG::Portal::Simple';
-my ( $url, $result, $logout );
-$logout = 0;
-my @h = (
+my @tests = (
 
-    '' => PE_OK, 'Empty',
+    # 1 No redirection
+    '' => 0, 'Empty',
 
-    # 4 http://test.example.com/
-    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb20v' => PE_OK, 'Protected virtual host',
+    # 2 http://test1.example.com/
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tLw==' => 1, 'Protected virtual host',
 
-    # 5 http://test.example.com
-    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb20v' => PE_OK, 'Missing / in URL',
+    # 3 http://test1.example.com
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29t' => 1, 'Missing / in URL',
 
-    # 6 http://test.example.com:8000/test
-    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb206ODAwMC90ZXN0' => PE_OK, 'Non default port',
+    # 4 http://test1.example.com:8000/test
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tOjgwMDAvdGVzdA==' => 1,
+    'Non default port',
 
-    # 7 http://test.example.com:8000/
-    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb206ODAwMA==' => PE_BADURL,
+    # 5 http://test1.example.com:8000/
+    'aHR0cDovL3Rlc3QxLmV4YW1wbGUuY29tOjgwMDAv' => 1,
     'Non default port with missing /',
 
-    # 8 http://t.example2.com/test
-    'aHR0cDovL3QuZXhhbXBsZTIuY29tL3Rlc3Q=' => PE_OK,
+    # 6 http://t.example2.com/test
+    'aHR0cDovL3QuZXhhbXBsZTIuY29tL3Rlc3Q=' => 1,
     'Undeclared virtual host in trusted domain',
 
-    # 9 http://testexample2.com/
-    'aHR0cDovL3Rlc3RleGFtcGxlMi5jb20vCg==' => PE_BADURL,
+    # 7 http://testexample2.com/
+    'aHR0cDovL3Rlc3RleGFtcGxlMi5jb20vCg==' => 0,
     'Undeclared virtual host in untrusted domain'
       . ' (looks like a trusted domain, but is not)',
 
-    # 10 http://test.example3.com/
-    'aHR0cDovL3Rlc3QuZXhhbXBsZTMuY29tLwo=' => PE_BADURL,
+    # 8 http://test.example3.com/
+    'aHR0cDovL3Rlc3QuZXhhbXBsZTMuY29tLwo=' => 0,
     'Undeclared virtual host in untrusted domain (domain name'
       . ' "example3.com" is trusted, but domain "*.example3.com" not)',
 
-    # 11 http://example3.com/
-    'aHR0cDovL2V4YW1wbGUzLmNvbS8K' => PE_OK,
+    # 9 http://example3.com/
+    'aHR0cDovL2V4YW1wbGUzLmNvbS8K' => 1,
     'Undeclared virtual host with trusted domain name',
 
-    # 12 http://t.example.com/test
-    'aHR0cDovL3QuZXhhbXBsZS5jb20vdGVzdA==' => PE_BADURL,
+    # 10 http://t.example.com/test
+    'aHR0cDovL3QuZXhhbXBsZS5jb20vdGVzdA==' => 0,
     'Undeclared virtual host in (untrusted) protected domain',
 
-    # 13
-    'http://test.com/' => PE_BADURL, 'Non base64 encoded characters',
+    # 11
+    'http://test.com/' => 0, 'Non base64 encoded characters',
 
-    # 14 http://test.example.com:8000V
-    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb206ODAwMFY=' => PE_BADURL,
+    # 12 http://test.example.com:8000V
+    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb206ODAwMFY=' => 0,
     'Non number in port',
 
-    # 15 http://t.ex.com/test
-    'aHR0cDovL3QuZXguY29tL3Rlc3Q=' => PE_BADURL,
+    # 13 http://t.ex.com/test
+    'aHR0cDovL3QuZXguY29tL3Rlc3Q=' => 0,
     'Undeclared virtual host in untrusted domain',
 
-    # 16 http://test.example.com/%00
-    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb20vJTAw' => PE_BADURL, 'Base64 encoded \0',
+    # 14 http://test.example.com/%00
+    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb20vJTAw' => 0, 'Base64 encoded \0',
 
-    # 17 http://test.example.com/test\0
-    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb20vdGVzdAA=' => PE_BADURL,
+    # 15 http://test.example.com/test\0
+    'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb20vdGVzdAA=' => 0,
     'Base64 and url encoded \0',
 
-    # 18
-    'XX%00' => PE_BADURL, 'Non base64 encoded \0 ',
+    # 16
+    'XX%00' => 0, 'Non base64 encoded \0 ',
 
-    # 19 http://test.example.com/test?<script>alert()</script>
+    # 17 http://test.example.com/test?<script>alert()</script>
     'aHR0cDovL3Rlc3QuZXhhbXBsZS5jb20vdGVzdD88c2NyaXB0PmFsZXJ0KCk8L3NjcmlwdD4='
-      => PE_BADURL,
+      => 0,
     'base64 encoded HTML tags',
 
     # LOGOUT TESTS
     'LOGOUT',
 
-    # 20 url=http://www.toto.com/, bad referer
+    # 18 url=http://www.toto.com/, bad referer
     'aHR0cDovL3d3dy50b3RvLmNvbS8=',
-    'http://bad.com/' => PE_BADURL,
+    'http://bad.com/' => 0,
     'Logout required by bad site',
 
-    # 21 url=http://www.toto.com/, good referer
+    # 19 url=http://www.toto.com/, good referer
     'aHR0cDovL3d3dy50b3RvLmNvbS8=',
-    'http://test.example.com/' => PE_OK,
+    'http://test1.example.com/' => 1,
     'Logout required by good site',
 
-    # 22 url=http://www?<script>, good referer
+    # 20 url=http://www?<script>, good referer
     'aHR0cDovL3d3dz88c2NyaXB0Pg==',
-    'http://test.example.com/' => PE_BADURL,
+    'http://test1.example.com/' => 0,
     'script with logout',
 );
 
-my $count = 0;
-
-sub param {
-    shift;
-    my $p = shift;
-    $count++;
-    if ( $p and $p eq 'url' ) {
-        return $url;
-    }
-    else {
-        return $logout;
-    }
-}
-
-my $p;
-
-# CGI Environment
-$ENV{SCRIPT_NAME}     = '/test.pl';
-$ENV{SCRIPT_FILENAME} = '/tmp/test.pl';
-$ENV{REQUEST_METHOD}  = 'GET';
-$ENV{REQUEST_URI}     = "/test.pl";
-$ENV{QUERY_STRING}    = "";
-
+my $res;
 ok(
-    $p = My::Portal->new(
-        {
-            globalStorage  => 'Apache::Session::File',
-            domain         => 'example.com',
-            authentication => 'LDAP test=1',
-            userDB         => 'Null',
-            passwordDB     => 'Null',
-            registerDB     => 'Null',
-            domain         => 'example.com',
-            trustedDomains => '.example2.com example3.com',
-            checkXSS       => 1,
-        }
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=dwho'),
+        length => 23
     ),
-    'Portal object'
+    'Auth query'
 );
+count(1);
+expectOK($res);
+my $id = expectCookie($res);
 
-$p->{reVHosts} = '(?:test\.example\.com)';
-
-while ( defined( $url = shift(@h) ) ) {
+while ( defined( my $url = shift(@tests) ) ) {
     last if ( $url eq 'LOGOUT' );
-    $result = shift @h;
-    my $text = shift @h;
+    my $redir  = shift @tests;
+    my $detail = shift @tests;
+    ok(
+        $res = $client->_get(
+            '/',
+            query  => "url=$url",
+            cookie => "lemonldap=$id",
 
-    ok( $p->controlUrlOrigin() == $result, $text );
+            accept => 'text/html'
+        ),
+        $detail
+    );
+    ok( ( $res->[0] == ( $redir ? 302 : 200 ) ),
+        ( $redir ? 'Get redirection' : 'Redirection dropped' ) )
+      or explain( $res->[0], ( $redir ? 302 : 200 ) );
+    count(2);
 }
+
+while ( defined( my $url = shift(@tests) ) ) {
+    my $referer = shift @tests;
+    my $redir   = shift @tests;
+    my $detail  = shift @tests;
+    ok(
+        $res = $client->_get(
+            '/',
+            query  => "url=$url&logout=1",
+            cookie => "lemonldap=$id",
+
+            accept  => 'text/html',
+            referer => $referer,
+        ),
+        $detail
+    );
+    ok( ( $res->[0] == ( $redir ? 302 : 200 ) ),
+        ( $redir ? 'Get redirection' : 'Redirection dropped' ) )
+      or explain( $res->[0], ( $redir ? 302 : 200 ) );
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new('user=dwho&password=dwho'),
+            length => 23
+        ),
+        'Auth query'
+    );
+    expectOK($res);
+    $id = expectCookie($res);
+    count(3);
+}
+
+clean_sessions();
+
+done_testing( count() );
+__END__
 
 # LOGOUT CASES
 $logout = 1;

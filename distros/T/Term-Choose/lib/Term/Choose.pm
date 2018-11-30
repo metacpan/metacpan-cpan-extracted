@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.637';
+our $VERSION = '1.638';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -705,7 +705,6 @@ sub __length_longest {
     my $list = $self->{list};
     if ( $self->{ll} ) {
         $self->{length_longest} = $self->{ll};
-        $self->{length} = [ ( $self->{length_longest} ) x @$list ];
     }
     else {
         my $len = [];
@@ -828,7 +827,7 @@ sub __size_and_layout {
         my $firstrow_w = 0;
         for my $idx ( 0 .. $#{$self->{list}} ) {
             $all_in_first_row .= $self->{list}[$idx];
-            $firstrow_w += $self->{length}[$idx];
+            $firstrow_w += defined $self->{length}[$idx] ? $self->{length}[$idx] : $self->{length_longest};
             if ( $idx < $#{$self->{list}} ) {
                 $all_in_first_row .= ' ' x $self->{pad};
                 $firstrow_w += $self->{pad};
@@ -988,12 +987,12 @@ sub __wr_cell {
         if ( $col > 0 ) {
             for my $cl ( 0 .. $col - 1 ) {
                 my $i = $self->{rc2idx}[$row][$cl];
-                $lngth += $self->{length}[$i];
+                $lngth += defined $self->{length}[$i] ? $self->{length}[$i] : $self->{length_longest};
                 $lngth += $self->{pad};
             }
         }
         $self->__goto( $row - $self->{p_begin}, $lngth );
-        $self->{avail_col_width} = $self->{length}[$idx];
+        $self->{avail_col_width} = defined $self->{length}[$idx] ? $self->{length}[$idx] : $self->{length_longest};
     }
     else {
         $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width} );
@@ -1112,7 +1111,9 @@ sub __mouse_info_to_key {
         my $end_this_col;
         if ( $#{$self->{rc2idx}} == 0 ) {
             my $idx = $self->{rc2idx}[$row][$col];
-            $end_this_col = $end_last_col + $self->{length}[$idx] + $self->{pad};
+            $end_this_col = $end_last_col
+                          + ( defined $self->{length}[$idx] ? defined $self->{length}[$idx] : $self->{length_longest} )
+                          + $self->{pad};
         }
         else { #
             $end_this_col = $end_last_col + $self->{col_width};
@@ -1168,7 +1169,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.637
+Version 1.638
 
 =cut
 

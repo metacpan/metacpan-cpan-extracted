@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.031    2018-11-29
+        - MSWin32: set codepage temporarily to 65001.
+        - Removed "no warnings 'utf8'".
+
 2.030    2018-11-28
         - Update documentation.
 

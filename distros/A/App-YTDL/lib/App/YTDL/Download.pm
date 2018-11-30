@@ -11,8 +11,6 @@ our @EXPORT_OK = qw( download_youtube );
 use Term::ANSIScreen qw( :cursor :screen );
 use Term::Choose     qw( choose );
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-
 use App::YTDL::Helper  qw( HIDE_CURSOR SHOW_CURSOR uni_system );
 
 END { print SHOW_CURSOR }

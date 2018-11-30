@@ -1,9 +1,14 @@
+Changes
 Compressor.pm
 Makefile.PL
 MANIFEST
 README
+t/calc.t
+t/inline-svg.t
 t/load.t
+t/noflip.t
 t/simple.t
+t/supports.t
 t/yui.t
 t/yui/_munge.js
 t/yui/_munge.js.min
@@ -27,6 +32,8 @@ t/yui/bug2528034.css
 t/yui/bug2528034.css.min
 t/yui/charset-media.css
 t/yui/charset-media.css.min
+t/yui/color-simple.css
+t/yui/color-simple.css.min
 t/yui/color.css
 t/yui/color.css.min
 t/yui/comment.css
@@ -51,6 +58,8 @@ t/yui/media-test.css
 t/yui/media-test.css.min
 t/yui/opacity-filter.css
 t/yui/opacity-filter.css.min
+t/yui/preserve-case.css
+t/yui/preserve-case.css.min
 t/yui/preserve-new-line.css
 t/yui/preserve-new-line.css.min
 t/yui/preserve-strings.css

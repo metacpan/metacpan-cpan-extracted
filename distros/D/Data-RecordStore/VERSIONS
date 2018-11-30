@@ -1,3 +1,6 @@
+4.06 - updating tests for windows. Windows tests seem to be
+       failing because chmod is having no effect.
+
 4.05 - allow silos to be opened read only
 
 4.04 - update the convert program to call a module rather than have the logic

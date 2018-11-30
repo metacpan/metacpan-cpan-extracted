@@ -4,7 +4,7 @@
       "Giuseppe Maxia <gmax@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "apache_2_0"
    ],
@@ -19,6 +19,24 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "1",
+            "Socket" : "1.7"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -27,5 +45,5 @@
          "web" : "https://github.com/datacharmer/mysql-sandbox"
       }
    },
-   "version" : "v3.2.17"
+   "version" : "v3.2.18"
 }

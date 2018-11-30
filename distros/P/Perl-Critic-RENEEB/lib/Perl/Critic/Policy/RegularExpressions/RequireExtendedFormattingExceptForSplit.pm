@@ -11,7 +11,7 @@ use Perl::Critic::Utils qw{ :severities };
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.117';
+our $VERSION = '2.0';
 
 #-----------------------------------------------------------------------------
 
@@ -30,17 +30,10 @@ sub supported_parameters {
             default_string     => '0',
             integer_minimum    => 0,
         },
-        {
-            name               => 'strict',
-            description        =>
-                q<Should regexes that only contain whitespace and word characters be complained about?>,
-            behavior           => 'boolean',
-            default_string     => '0',
-        },
     );
 }
 
-sub default_severity     { return $SEVERITY_MEDIUM           }
+sub default_severity     { return $SEVERITY_MEDIUM }
 sub default_themes       { return qw<reneeb> }
 sub applies_to           {
     return qw<
@@ -56,9 +49,8 @@ sub violates {
     my ( $self, $elem, $doc ) = @_;
 
     my $match = $elem->get_match_string();
-    return if length $match <= $self->{_minimum_regex_length_to_complain_about};
-    return if not $self->{_strict} and $match =~ m< \A [\s\w]* \z >xms;
 
+    return if $self->{_minimum_regex_length_to_complain_about} >= length $match;
     return if _is_used_to_split( $elem );
 
     my $re = $doc->ppix_regexp_from_element( $elem )
@@ -110,7 +102,7 @@ Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSpli
 
 =head1 VERSION
 
-version 0.03
+version 2.00
 
 =head1 DESCRIPTION
 

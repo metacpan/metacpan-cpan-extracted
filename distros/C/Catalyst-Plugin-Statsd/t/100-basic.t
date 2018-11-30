@@ -6,6 +6,8 @@ use lib 't/lib';
 
 use Catalyst::Test 'StatsApp';
 
+my $log    = StatsApp->log;
+
 my $res = request('/');
 
 {
@@ -20,5 +22,24 @@ my $res = request('/');
       or diag( explain \@MockStatsd::Data );
 
 }
+
+cmp_deeply $log->msgs, [
+    superhashof(
+        {
+            level   => 'debug',
+            message => 'Statistics enabled',
+        }
+    ),
+    superhashof(
+        {
+            level   => 'info',
+            message => re(
+                '^Request took \d\.\d+s \(\d+\.\d+/s\)\n.+\n\| Action +\| Time'
+            ),
+
+        }
+    ),
+  ],
+  'logged output';
 
 done_testing;

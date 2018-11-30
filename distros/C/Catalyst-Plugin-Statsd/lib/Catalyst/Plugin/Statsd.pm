@@ -2,7 +2,7 @@ package Catalyst::Plugin::Statsd;
 
 # ABSTRACT: log Catalyst stats to statsd
 
-use v5.8;
+use v5.10.1;
 
 use Moose::Role;
 
@@ -13,9 +13,9 @@ use Ref::Util qw/ is_plain_arrayref /;
 
 use namespace::autoclean;
 
-requires 'finalize';
+requires qw/ log_stats /;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.4.2';
 
 
 sub statsd_client {
@@ -36,32 +36,31 @@ sub statsd_metric_name_filter {
     return $metric;
 }
 
-around finalize => sub {
+around log_stats => sub {
     my ( $next, $c ) = @_;
 
+    state $config = $c->config->{'Plugin::Statsd'} // {};
+
     if ( my $client = $c->statsd_client) {
-        if ( $c->use_stats ) {
 
-            my $stat = [ -1, "catalyst.response.time", $c->stats->elapsed ];
+        my $stat = [ -1, "catalyst.response.time", $c->stats->elapsed ];
+        my $metric = $c->statsd_metric_name_filter($stat) or next;
+
+        $client->timing_ms( "catalyst.response.time",
+                            ceil( $stat->[2] * 1000 ) );
+
+        foreach my $stat ( $c->stats->report ) {
+
             my $metric = $c->statsd_metric_name_filter($stat) or next;
+            my $timing = ceil( $stat->[2] * 1000 );
 
-            $client->timing_ms( "catalyst.response.time",
-                ceil( $stat->[2] * 1000 ) );
-
-            foreach my $stat ( $c->stats->report ) {
-
-                my $metric = $c->statsd_metric_name_filter($stat) or next;
-                my $timing = ceil( $stat->[2] * 1000 );
-
-                $client->timing_ms( $metric, $timing );
-
-            }
+            $client->timing_ms( $metric, $timing );
 
         }
 
     }
 
-    $c->$next;
+    $c->$next unless !!$config->{disable_stats_report};
 };
 
 
@@ -79,7 +78,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.3.0
+version v0.4.2
 
 =head1 SYNOPSIS
 
@@ -102,6 +101,26 @@ version v0.3.0
 =head1 DESCRIPTION
 
 This plugin will log L<Catalyst> timing statistics to statsd.
+
+=head2 CONFIGURATION
+
+  __PACKAGE__->config(
+
+    'Plugin::Statsd' => {
+        disable_stats_report => 0,
+    },
+
+  );
+
+=head2 C<disable_stats_report>
+
+Enabling stats will also log a table of statistics to the Catalyst
+log.  If you do not want this, then set C<disable_stats_report>
+to true.
+
+Note that if you are modifying the C<log_stats> method or using
+another plugin that does this, then this may interfere with that if
+you disable the stats report.
 
 =head1 METHODS
 
@@ -140,12 +159,6 @@ L<Plack::Middleware::Statsd> also logs response times.
 
 These are metrics generated from L<Catalyst::Stats>.
 
-=head1 KNOWN ISSUES
-
-Enabling stats will also log a table of statistics to the Catalyst
-log.  If you do not want this, then you will need to subclass
-L<Catalyst::Stats> or modify your logger accordingly.
-
 =head1 SEE ALSO
 
 =over
@@ -180,6 +193,12 @@ Robert Rothenberg <rrwo@cpan.org>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Slaven Rezić
+
+Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 

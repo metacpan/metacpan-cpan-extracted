@@ -1,12 +1,11 @@
 package MIME::Detect::Type;
 use strict;
-use Moo;
-use if $] < 5.020, 'Filter::signatures';
+use Moo 2;
+use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-use vars '$VERSION';
-$VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -146,6 +145,11 @@ has 'superclass' => (
     default => undef,
 );
 
+sub parse_num( $num ) {
+    $num =~ /^0x/ and return hex $num;
+    return 0+$num
+}
+
 sub BUILD($self, $args) {
     # Preparse the rules here:
     for my $rule (@{ $args->{rules} }) {
@@ -168,25 +172,25 @@ sub BUILD($self, $args) {
                        }xge;
 
         } elsif( ref $rule eq 'HASH' and $rule->{type} eq 'little32' ) {
-            $value = pack 'V', hex($rule->{value});
+            $value = pack 'V', parse_num($rule->{value});
 
         } elsif( ref $rule eq 'HASH' and $rule->{type} eq 'little16' ) {
-            $value = pack 'v', hex($rule->{value});
+            $value = pack 'v', parse_num($rule->{value});
 
         } elsif( ref $rule eq 'HASH' and $rule->{type} eq 'big32' ) {
-            $value = pack 'N', hex($rule->{value});
+            $value = pack 'N', parse_num($rule->{value});
 
         } elsif( ref $rule eq 'HASH' and $rule->{type} eq 'big16' ) {
-            $value = pack 'n', hex($rule->{value});
+            $value = pack 'n', parse_num($rule->{value});
 
         } elsif( ref $rule eq 'HASH' and $rule->{type} eq 'host16' ) {
-            $value = pack 'S', hex($rule->{value});
+            $value = pack 'S', parse_num($rule->{value});
 
         } elsif( ref $rule eq 'HASH' and $rule->{type} eq 'host32' ) {
-            $value = pack 'L', hex($rule->{value});
+            $value = pack 'L', parse_num($rule->{value});
 
         } elsif( ref $rule eq 'HASH' and $rule->{type} eq 'byte' ) {
-            $value = pack 'c', hex($rule->{value});
+            $value = pack 'c', parse_num($rule->{value});
 
         } else {
             die "Unknown rule type '$rule->{type}'";
@@ -263,7 +267,7 @@ sub matches($self, $buffer, $rules = $self->rules) {
 =head1 REPOSITORY
 
 The public repository of this module is 
-L<http://github.com/Corion/filter-signatures>.
+L<http://github.com/Corion/mime-detect>.
 
 =head1 SUPPORT
 
@@ -273,8 +277,8 @@ L<https://perlmonks.org/>.
 =head1 BUG TRACKER
 
 Please report bugs in this module via the RT CPAN bug queue at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filter-signatures>
-or via mail to L<filter-signatures-Bugs@rt.cpan.org>.
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=MIME-Detect>
+or via mail to L<mime-detect-Bugs@rt.cpan.org>.
 
 =head1 AUTHOR
 
@@ -282,7 +286,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

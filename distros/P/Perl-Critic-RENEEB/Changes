@@ -1,6 +1,12 @@
 Release history for Perl::Critic::RENEEB
 ========================================
 
+2.0   2018-11-29 16:46:00
+
+  [MISC]
+  * Removed 'strict' parameter -> it makes no sense
+  * Added lots of tests
+
 0.02  2015-02-23
 
   [MISC]

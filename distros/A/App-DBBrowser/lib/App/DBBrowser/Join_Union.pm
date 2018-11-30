@@ -4,7 +4,6 @@ App::DBBrowser::Join_Union;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use List::MoreUtils qw( any );
 
@@ -12,8 +11,6 @@ use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( line_fold );
 use Term::Choose::Util     qw( term_width );
 use Term::TablePrint       qw( print_table );
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::DBBrowser::DB;
 use App::DBBrowser::Auxil;

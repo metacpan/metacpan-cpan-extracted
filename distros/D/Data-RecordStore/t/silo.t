@@ -16,6 +16,8 @@ BEGIN {
     use_ok( "Data::RecordStore" ) || BAIL_OUT( "Unable to load Data::RecordStore" );
 }
 
+my $is_windows = $^O eq 'MSWin32';
+
 # -----------------------------------------------------
 #               init
 # -----------------------------------------------------
@@ -160,31 +162,33 @@ sub test_open_silo {
 
     $silo->push( [ 100 ] );
     is_deeply( $silo->get_record( 1 ), [ 100 ], "able to read" );
-    chmod 0444, "$ndir/0";
 
-    eval {
-        $silo->put_record( 1, [ 200 ] );
-        fail( "able to ensure size with unwriteable data file" );
-    };
-    like( $@, qr/unable to open/, 'error for unwriteable data file' );
-    eval {
-        $silo->push( [ 200 ] );
-        fail( "able to ensure size with unwriteable data file" );
-    };
-    like( $@, qr/unable to open/, 'error for unwriteable data file' );
+    unless( $is_windows ) {
+        chmod 0444, "$ndir/0";
+
+        eval {
+            $silo->put_record( 1, [ 200 ] );
+            fail( "able to ensure size with unwriteable data file" );
+        };
+        like( $@, qr/unable to open/, 'error for unwriteable data file' );
+        eval {
+            $silo->push( [ 200 ] );
+            fail( "able to ensure size with unwriteable data file" );
+        };
+        like( $@, qr/unable to open/, 'error for unwriteable data file' );
 
 
-    chmod 0444, "$ndir/0";
+        chmod 0444, "$ndir/0";
 
-    is_deeply( $silo->get_record( 1 ), [ 100 ], "able to read" );
+        is_deeply( $silo->get_record( 1 ), [ 100 ], "able to read" );
 
-    chmod 0333, "$ndir/0";
-    eval {
-      my $rec = $silo->get_record( 1 );
-      fail( "able to get record from unreadable silo file" );
-    };
-    is( ENOENT, 2, "could not write to readable directory" );
-
+        chmod 0333, "$ndir/0";
+        eval {
+            my $rec = $silo->get_record( 1 );
+            fail( "able to get record from unreadable silo file" );
+        };
+        is( ENOENT, 2, "could not write to readable directory" );
+    }
     
 
 } #test_open_silo
@@ -360,13 +364,14 @@ sub test_put_record {
       fail( "tried to create new data file but it existed" );
     };
     like( $@, qr/already exists/, "could not create new data file where one existed" );
+
     chmod 0644, "$dir/1";
     unlink "$dir/1";
     ok( ! -e "$dir/1", "touched 1 directory removed" );
     $silo->push( [ 'y' x 79 ] );
     ok( -e "$dir/1", "1 directory exists" );
     chmod 0644, "$dir/1";
-    
+
     open $out, ">", "$dir/2";
     print $out '';
     close $out;
@@ -377,31 +382,34 @@ sub test_put_record {
     };
     like( $@, qr/already exists/, "could not ensure entry count where a data file already existed" );    
     
-    unlink "$dir/1";
-    chmod 544, $dir;
-    eval {
-        $silo->push( [ 'x' x 79 ] );
-        fail( "tried to create new data file in unwriteable directory" );
-    };
-    like( $@, qr/can.t open/, "could not create new data in unwriteable directory" );
-    ok( ! -e "$dir/1", "touched 1 directory gone" );
+    unless( $is_windows ) {
+        unlink "$dir/1";
+        chmod 544, $dir;
+        eval {
+            $silo->push( [ 'x' x 79 ] );
+            fail( "tried to create new data file in unwriteable directory" );
+        };
+        like( $@, qr/can.t open/, "could not create new data in unwriteable directory" );
+        ok( ! -e "$dir/1", "touched 1 directory gone" );
           
-    eval {
-        $silo->_ensure_entry_count( 10 );
-        fail( "tried to ensure entry count when there is an unwriteable directory" );
-    };
+        eval {
+            $silo->_ensure_entry_count( 10 );
+            fail( "tried to ensure entry count when there is an unwriteable directory" );
+        };
     
-    like( $@, qr/can.t open/, "could not ensure entry count in unwriteable directory" );
-    ok( ! -e "$dir/1", "touched 1 directory gone" );
+        like( $@, qr/can.t open/, "could not ensure entry count in unwriteable directory" );
+        ok( ! -e "$dir/1", "touched 1 directory gone" );
 
-    chmod 755, $dir;
-    unlink "$dir/0";
-    ok( ! -e "$dir/0", " directory 0 gone" );
-    eval {
-        $silo->get_record(10);
-        fail( "able to get a record with the data files blown away" );
-    };
-    like( $@, qr/can.t open/, "could not get record when data files were blown away" );
+        chmod 755, $dir;
+
+        unlink "$dir/0";
+        ok( ! -e "$dir/0", " directory 0 gone" );
+        eval {
+            $silo->get_record(10);
+            fail( "able to get a record with the data files blown away" );
+        };
+        like( $@, qr/can.t open/, "could not get record when data files were blown away" );
+    }
     
     
 } #test_put_record

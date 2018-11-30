@@ -4,7 +4,6 @@ App::DBBrowser::Opt;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );
@@ -14,8 +13,6 @@ use FindBin               qw( $RealBin $RealScript );
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( insert_sep print_hash choose_a_number choose_a_subset settings_menu choose_a_dir );
 use Term::Form         qw();
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::OptDB;

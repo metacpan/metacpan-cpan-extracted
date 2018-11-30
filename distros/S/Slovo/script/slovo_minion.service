@@ -1,0 +1,23 @@
+# This file assumes that you installed Slovo in /home/$USER/opt/slovo
+# like this:
+# cpanm -L ~/opt/slovo Slovo
+# Modify this file by replacing $USER with your username and copy it to
+# /etc/systemd/system/slovo.service
+# For details see https://askubuntu.com/questions/676007
+# and then for more https://wiki.ubuntu.com/SystemdForUpstartUsers
+
+[Unit]
+Description=Роботници за Слово
+After=slovo.service
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/home/$USER/opt/slovo/bin/slovo minion worker -m production
+KillMode=process
+WorkingDirectory=/home/$USER/opt/slovo/bin
+User=$USER
+Group=$USER
+SyslogIdentifier=slovo_minion

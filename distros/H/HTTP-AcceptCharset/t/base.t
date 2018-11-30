@@ -126,6 +126,25 @@ my %tests = (
             ],
         ],
     },
+    'undef' => {
+        header  => undef,
+        values  => [qw//],
+        ok      => [qw/utf-8 iso-8859-1 UTF-8 Utf-8/],
+        checks  => [
+            [
+                [qw/iso-8859-1 utf-8/],
+                'iso-8859-1',
+            ],
+            [
+                [qw/iso-8859-1 utf-16/],
+                'iso-8859-1',
+            ],
+            [
+                [qw/iso-8859-2 utf-16/],
+                'iso-8859-2',
+            ],
+        ],
+    },
 );
 
 for my $name ( sort keys %tests ) {

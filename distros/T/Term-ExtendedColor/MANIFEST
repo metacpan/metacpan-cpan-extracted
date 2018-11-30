@@ -2,7 +2,6 @@ bin/color_matrix
 bin/colored_dmesg
 bin/show_all_colors
 bin/uncolor
-examples/attributes.pl
 examples/fall_through_attributes.pl
 lib/Term/ExtendedColor.pm
 Makefile.PL
@@ -23,4 +22,3 @@ t/50-complexity.t
 t/60-pod-coverage.t
 t/60-pod-syntax.t
 t/80-minperl.t
-META.yml                                 Module meta-data (added by MakeMaker)

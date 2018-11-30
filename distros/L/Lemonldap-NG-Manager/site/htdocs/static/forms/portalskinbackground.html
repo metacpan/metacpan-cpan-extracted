@@ -1,0 +1,19 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <div class="panel-body form-group">
+    <select id="selectform" class="form-control" ng-model="currentNode.data" ng-change="currentNode.onChange()">
+      <option ng-repeat="item in currentNode.select" ng-selected="item.k==currentNode.data" value="{{item.k}}" trspan="{{item.v}}"></option>
+    </select>
+    <div class="text-center" ng-if="currentNode.data" class="backgrounddiv">
+      <img ng-src="{{portal.data}}static/common/backgrounds/{{currentNode.data}}" class="img-rounded" width="250px" />
+    </div>
+  </div>
+</div>
+<script type="text/menu">
+[{
+  "title": "cancel",
+  "icon": "remove"
+}]
+</script>

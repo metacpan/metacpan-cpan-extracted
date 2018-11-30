@@ -4,9 +4,22 @@ use strict;
 
 use Safe;
 use Lemonldap::NG::Common::Safelib;    #link protected safe Safe object
-use constant SAFEWRAP => ( Safe->can("wrap_code_ref") ? 1 : 0 );
-use Mouse;
-use Lemonldap::NG::Handler::Main::Logger;
+
+# Workaround for another ModPerl/Mouse issue...
+BEGIN {
+    require Mouse;
+    no warnings;
+    my $v = $Mouse::VERSION
+      ? sprintf( "%d.%03d%03d", ( $Mouse::VERSION =~ /(\d+)/g ) )
+      : 0;
+    if ( $v < 2.005001 and $Lemonldap::NG::Handler::Apache2::Main::VERSION ) {
+        require Moose;
+        Moose->import();
+    }
+    else {
+        Mouse->import();
+    }
+}
 
 has customFunctions => ( is => 'rw', isa => 'Maybe[Str]' );
 
@@ -16,29 +29,41 @@ has jail => ( is => 'rw' );
 
 has error => ( is => 'rw' );
 
-our $VERSION = '1.9.16';
-
-use Lemonldap::NG::Handler::Main '$datas', '$tsv';
-use Lemonldap::NG::Handler::API ':functions';
+our $VERSION = '2.0.0';
 
 ## @imethod protected build_jail()
 # Build and return the security jail used to compile rules and headers.
 # @return Safe object
 sub build_jail {
-    my $self = shift;
+    my ( $self, $api, $require ) = @_;
 
     return $self->jail
-      if ( $self->jail
-        && $self->jail->useSafeJail == $self->useSafeJail
-        && $self->jail->customFunctions eq $self->customFunctions );
+      if (  $self->jail
+        and $self->jail->useSafeJail
+        and $self->useSafeJail
+        and $self->jail->useSafeJail == $self->useSafeJail );
 
     $self->useSafeJail(1) unless defined $self->useSafeJail;
+
+    if ($require) {
+        foreach my $f ( split /[, ]+/, $require ) {
+            if ( $f =~ /^[\w\:]+$/ ) {
+                eval "require $f";
+            }
+            else {
+                eval { require $f; };
+            }
+            if ($@) {
+                die "Unable to load '$f': $@";
+            }
+        }
+    }
 
     my @t =
       $self->customFunctions ? split( /\s+/, $self->customFunctions ) : ();
     foreach (@t) {
-        Lemonldap::NG::Handler::Main::Logger->lmLog( "Custom function : $_",
-            'debug' );
+        no warnings 'redefine';
+        $api->logger->debug("Custom function : $_");
         my $sub = $_;
         unless (/::/) {
             $sub = "$self\::$_";
@@ -48,16 +73,14 @@ sub build_jail {
         }
         next if ( $self->can($_) );
         eval "sub $_ {
-            my \$uri = Lemonldap::NG::Handler::API::${Lemonldap::NG::Handler::API::mode}::uri_with_args();
-            return $sub(\$uri,\@_)
+            return $sub(\@_)
         }";
-        Lemonldap::NG::Handler::Main::Logger->lmLog( $@, 'error' ) if ($@);
+        $api->logger->error($@) if ($@);
         $_ = "&$_";
     }
 
     if ( $self->useSafeJail ) {
         $self->jail( Safe->new );
-        $self->jail->share_from( 'main', ['%ENV'] );
     }
     else {
         $self->jail($self);
@@ -67,33 +90,31 @@ sub build_jail {
     $self->jail->share_from( 'Lemonldap::NG::Common::Safelib',
         $Lemonldap::NG::Common::Safelib::functions );
 
-    $self->jail->share_from( 'Lemonldap::NG::Handler::Main',
-        [ '$tsv', '$datas' ] );
-    $self->jail->share_from(
-        'Lemonldap::NG::Handler::API',
-        [
-            qw( &hostname &remote_ip &uri &uri_with_args
-              &unparsed_uri &args &method &header_in   )
-        ]
-    );
-    $self->jail->share_from( __PACKAGE__, [ @t, '&encrypt' ] );
+    $self->jail->share_from( __PACKAGE__, [ @t, '&encrypt', '&token' ] );
     $self->jail->share_from( 'MIME::Base64', ['&encode_base64'] );
 
+    #$self->jail->share_from( 'Lemonldap::NG::Handler::Main', ['$_v'] );
+
     # Initialize cryptographic functions to be able to use them in jail.
-    eval { encrypt('a') };
+    eval { token('a') };
 
     return $self->jail;
 }
 
 # Import crypto methods for jail
 sub encrypt {
-    return $tsv->{cipher}->encrypt(@_);
+    return &Lemonldap::NG::Handler::Main::tsv->{cipher}->encrypt(@_);
+}
+
+sub token {
+    return encrypt( join( ':', time, @_ ) );
 }
 
 ## @method reval
 # Fake reval method if useSafeJail is off
 sub reval {
     my ( $self, $e ) = @_;
+
     my $res = eval $e;
     if ($@) {
         $self->error($@);
@@ -139,26 +160,16 @@ sub share_from {
 }
 
 ## @imethod protected jail_reval()
-# Build and return restricted eval command with SAFEWRAP, if activated
+# Build and return restricted eval command
 # @return evaluation of $reval or $reval2
 sub jail_reval {
     my ( $self, $reval ) = @_;
 
     # if nothing is returned by reval, add the return statement to
     # the "no safe wrap" reval
-    my $nosw_reval = $reval;
-    if ( $reval !~ /^sub\{return\(.*\}$/ ) {
-        $nosw_reval =~ s/^sub\{(.*)\}$/sub{return($1)}/;
-    }
 
     my $res;
-    eval {
-        $res = (
-            SAFEWRAP
-            ? $self->jail->wrap_code_ref( $self->jail->reval($reval) )
-            : $self->jail->reval($nosw_reval)
-        );
-    };
+    eval { $res = ( $self->jail->reval($reval) ) };
     if ($@) {
         $self->error($@);
         return undef;

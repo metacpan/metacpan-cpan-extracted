@@ -3,8 +3,8 @@
    "author" : [
       "Max Maischein <corion@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -32,16 +32,31 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008",
-            "strict" : "0"
+            "File::Glob" : "0",
+            "Pod::Usage" : "0",
+            "Spreadsheet::Read" : "0",
+            "Text::CleanFragment" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "http://github.com/Corion/sql-type-guess"
+         "type" : "git",
+         "url" : "git://github.com/Corion/sql-type-guess.git",
+         "web" : "https://github.com/Corion/sql-type-guess"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27203",
+   "x_static_install" : 1
 }

@@ -1,4 +1,37 @@
-1.106 - added mode and group options for the createion
+ 2.01 - updated bug in test
+
+ 2   -
+   requires store update
+
+   The update now updates into a seperate directory.
+
+   use the new transactions of the recordstore which may nest.
+
+   added the following methods to the Data::ObjectStore :
+    * lock( @locknames ) - uses flock to lock those lock names
+    * unlock - unlocks all locks this store has locked
+
+   added the following methods to the Data::ObjectStore::Container :
+    * vol( key, value ) - gets/sets a keyed volatile value which is not saved
+    * lock( @locknames ) - uses flock to lock those lock names. convenience, just calls the store's method
+    * unlock - unlocks all locks this store has locked. convenience, just calls the store's method
+    
+   added a METADATA field to the objects which contains
+    * created time
+    * updated time
+    * connections - number of connections this has to the root
+    * backconnections - { id => count } of items connected to this
+   the class plus the metadata fields are joined by | and ended by a
+   space. Together, they make the head descriptor of the object.
+
+   big arrays and hashes
+    corresponds to a change in Data::RecordStore ( version )
+    which can now read and write partial records.
+    the sharding of these big arrays and hashes is now so that the
+    array or hash is on disk all at once, but the entries are
+    accessed and written to in one or more entries at a time.
+
+1.106 - added mode and group options for the creation
         of object stores
 1.105 - made Data::ObjectStore::get_id and Data::ObjectStore::Container::id public methods
 1.104 - make sure to use Data::RecordStore v 3.17

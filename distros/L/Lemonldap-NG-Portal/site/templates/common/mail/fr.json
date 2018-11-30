@@ -1,0 +1,16 @@
+{
+"accountCreated":"Votre compte a été créé, un mot de passe temporaire a été envoyé à votre adresse mail.",
+"autoMail":"Ceci est un message automatique",
+"click2Register":"Cliquez ici pour confirmer l'enregistrement de votre compte",
+"click2Reset":"Cliquez ici pour réinitialiser votre mot de passe",
+"hello":"Bonjour",
+"mailConfirmSubject": "[LemonLDAP::NG] Confirmation de réinitialisation de mot de passe",
+"mailSubject": "[LemonLDAP::NG] Votre nouveau mot-de-passe",
+"newPwdIs":"Votre nouveau mot de passe est",
+"pwdChanged":"Votre mot de passe a été changé.",
+"pwdIs":"Votre mot de passe est",
+"registerConfirmSubject": "[LemonLDAP::NG] Confirmation d'enregistrement de compte",
+"registerDoneSubject": "[LemonLDAP::NG] Votre nouveau compte",
+"requestIssuedFromIP":"La demande provient de l'IP",
+"yourLoginIs":"Votre identifiant est"
+}

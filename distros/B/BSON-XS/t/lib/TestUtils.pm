@@ -122,6 +122,18 @@ sub try_or_fail {
     return 1;
 }
 
+# Based on Deep::Hash::Utils nest
+sub create_nest {
+    my ($depth) = @_;
+    my $orig = my $hr = {};
+    my @numbers = ( 1 .. $depth );
+    while (my $key = shift @numbers) {
+        $hr->{$key} = @numbers ? {} : undef;
+        $hr = $hr->{$key};
+    }
+    return $orig;
+}
+
 
 1;
 #

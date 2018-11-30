@@ -4,7 +4,7 @@ Catalyst::Plugin::Statsd - log Catalyst stats to statsd
 
 # VERSION
 
-version v0.3.0
+version v0.4.2
 
 # SYNOPSIS
 
@@ -29,6 +29,28 @@ __PACKAGE__->config(
 # DESCRIPTION
 
 This plugin will log [Catalyst](https://metacpan.org/pod/Catalyst) timing statistics to statsd.
+
+## CONFIGURATION
+
+```perl
+__PACKAGE__->config(
+
+  'Plugin::Statsd' => {
+      disable_stats_report => 0,
+  },
+
+);
+```
+
+## `disable_stats_report`
+
+Enabling stats will also log a table of statistics to the Catalyst
+log.  If you do not want this, then set `disable_stats_report`
+to true.
+
+Note that if you are modifying the `log_stats` method or using
+another plugin that does this, then this may interfere with that if
+you disable the stats report.
 
 # METHODS
 
@@ -71,12 +93,6 @@ Catalyst.  However, it is probably unnecessary since
 
 These are metrics generated from [Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats).
 
-# KNOWN ISSUES
-
-Enabling stats will also log a table of statistics to the Catalyst
-log.  If you do not want this, then you will need to subclass
-[Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats) or modify your logger accordingly.
-
 # SEE ALSO
 
 - [Catalyst::Stats](https://metacpan.org/pod/Catalyst::Stats)
@@ -102,6 +118,10 @@ Robert Rothenberg <rrwo@cpan.org>
 
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
+
+# CONTRIBUTOR
+
+Slaven Rezić <slaven@rezic.de>
 
 # COPYRIGHT AND LICENSE
 

@@ -1,189 +1,198 @@
-NAME
-    Data::RecordStore - Simple and fast record based data store
+[1mNAME[0m
+     Data::RecordStore - Simple store for text and byte data
 
-SYNPOSIS
-    use Data::RecordStore;
+[1mSYNPOSIS[0m
+     use Data::RecordStore;
 
-    my $data = "TEXT DATA OR BYTES";
+     $store = Data::RecordStore->open_store( $directory );
+     $data = "TEXT OR BYTES";
 
-    my $store = Data::RecordStore->open( $directory );
+     # the first record id is 1
+     my $id = $store->stow( $data );
 
-    my $id = $store->stow( $data, $optionalID );
+     my $new_or_recycled_id = $store->next_id;
+     $store->stow( $new_data, $new_or_recycled_id );
 
-    my $val = $store->fetch( $id );
+     my $val = $store->fetch( $some_id );
 
-    $store->recycle( $id );
+     my $count = $store->entry_count;
 
-    my $new_id = $store->next_id;
+     # delete the old record, make its id available for future
+     # records
+     $store->recycle_id( $id_to_recycle ); 
 
-    $store->stow( "MORE DATA", $new_id );
+     $store->delete_record( $id_to_remove ); #deletes the old record
 
-DESCRIPTION
-    A simple and fast way to store arbitrary text or byte data. It is
-    written entirely in perl with no non-core dependencies. It is designed
-    to be both easy to set up and easy to use.
+     my $has_id = $store->has_id( $someother_id );
 
-LIMITATIONS
-    Data::RecordStore is not meant to store huge amounts of data. It will fail
-    if it tries to create a file size greater than the max allowed by the
-    filesystem. This limitation will be removed in subsequent versions. This
-    limitation is most important when working with sets of data that
-    approach the max file size of the system in question.
+     $store->empty; # clears out store completely
 
-    This is not written with thread safety in mind, so unexpected behavior
-    can occur when multiple Data::RecordStore objects open the same directory.
+[1mDESCRIPTION[0m
+    Data::RecordStore is a simple way to store serialized text or byte data.
+    It is written entirely in perl with no non-core dependencies. It is
+    designed to be both easy to set up and easy to use. Space is automatically
+    reclaimed when records are reycled or deleted.
 
-METHODS
-  open( directory )
-    Takes a single argument - a directory, and constructs the data store in
-    it. The directory must be writeable or creatible. If a RecordStore already
-    exists there, it opens it, otherwise it creates a new one.
+    Transactions (see below) can be created that stow and recycle records.
+    They come with the standard commit and rollback methods. If a process dies
+    in the middle of a commit or rollback, the operation can be reattempted.
+    Incomplete transactions are obtained by the store's 'list_transactions'
+    method.
 
-  entry_count
-    Returns how many entries are in this store. Recycling ids does _not_
-    decrement this entry_count.
+    Data::RecordStore operates directly and instantly on the file system. It
+    is not a daemon or server and is not thread safe. It can be used in a
+    thread safe manner if the controlling program uses locking mechanisms.
 
-  ensure_entry_count( min_count )
-    This makes sure there there are at least min_count entries in this
-    RecordStore. This creates empty records if needed.
+[1mMETHODS[0m
+  [1mopen_store( directory, options )[0m
+    Takes a directory, and constructs the data store in it. The directory must
+    be writeable or creatible. If a RecordStore already exists there, it opens
+    it, otherwise it creates a new one.
 
-  next_id
-    This sets up a new empty record and returns the id for it.
+   Options
+    group - when files are created, they use this user group if able.
 
-  stow( data, optionalID )
-    This saves the text or byte data to the RecordStore. If an id is passed
+  [1mcreate_transaction()[0m
+    Creates and returns a transaction object
+
+  [1mlist_transactions[0m
+    Returns a list of currently existing transaction objects not marked
+    TRA_DONE.
+
+  [1mstow( data, optionalID )[0m
+    This saves the text or byte data to the record store. If an id is passed
     in, this saves the data to the record for that id, overwriting what was
-    there. If an id is not passed in, it creates a new RecordStore.
+    there. If an id is not passed in, it creates a new record store.
 
     Returns the id of the record written to.
 
-  fetch( id )
+  [1mfetch( id )[0m
     Returns the record associated with the ID. If the ID has no record
     associated with it, undef is returned.
 
-  recycle( $id )
-    This marks that the record associated with the id may be reused. Calling
-    this does not decrement the number of entries reported by the RecordStore.
+  [1mentry_count[0m
+    How many entries there are for records. This is equal to the highest ID
+    that has been assigned minus the number of pending recycles. It is
+    different from the record count, as entries may be marked deleted.
 
-HELPER PACKAGES
-    Data::RecordStore relies on two helper packages that are useful in their own
-    right and are documented here.
+  [1mrecord_count[0m
+    Return how many records there actually are
 
-HELPER PACKAGE
-    Data::RecordStore::FixedStore
+  [1mdelete_record( id )[0m
+    Removes the entry with the given id from the store, freeing up its space.
+    It does not reuse the id.
 
-DESCRIPTION
-    A fixed record store that uses perl pack and unpack templates to store
-    identically sized sets of data and uses a single file to do so.
+  [1mhas_id( id )[0m
+      Returns true if an record with this id exists in the record store.
 
-SYNOPSIS
-    my $template = "LII"; # perl pack template. See perl pack/unpack.
+  [1mnext_id[0m
+    This sets up a new empty record and returns the id for it.
 
-    my $size; #required if the template does not have a definite size, like
-    A*
+  [1mempty()[0m
+    This empties out the entire record store completely. Use only if you mean
+    it.
 
-    my $store = Data::RecordStore::FixedStore->open( $template, $filename, $size
+  [1mempty_recycler()[0m
+      Clears out all data from the recycler.
+
+  [1mrecycle( id, keep_data_flag )[0m
+      Ads the id to the recycler, so it will be returned when next_id is called. 
+      This removes the data occupied by the id, freeing up space unles 
+      keep_data_flag is set to true.
+
+[1mLIMITATIONS[0m
+    Data::RecordStore is not thread safe. Thread coordination and locking can
+    be done on a level above Data::RecordStore.
+
+[1mHELPER PACKAGE[0m
+    Data::RecordStore::Transaction
+
+[1mHELPER DESCRIPTION[0m
+    A transaction that can collect actions on the record store and then writes
+    them as a block.
+
+[1mHELPER SYNOPSIS[0m
+    my $transaction = $store->create_transaction;
+
+    print join(",", $transaction->get_update_time,
+    $transaction->get_process_id, $transaction->get_state,
+    $transaction->get_id );
+
+    my $new_id = $transaction->stow( $data );
+
+    my $new_or_recycled_id = $store->next_id;
+
+    $transaction->stow( "MORE DATA", $new_or_recycled_id );
+
+    $transaction->delete_record( $someid ); $transaction->recycle_id( $dead_id
     );
 
-    my $new_id = $store->next_id;
+    if( $is_good ) { $transaction->commit; } else { $transaction->rollback; }
 
-    $store->put_record( $id, [ 321421424243, 12, 345 ] );
+    # # Get a list of transactions that are old and probably stale. # for my
+    $trans ($store->list_transactions) {
 
-    my $more_data = $store->get_record( $other_id );
+      next if $trans->get_udpate_time > $too_old;
 
-    my $removed_last = $store->pop;
-
-    my $last_id = $store->push( $data_at_the_end );
-
-    my $entries = $store->entry_count;
-
-    if( $entries < $min ) {
-
-        $store->ensure_empty_count( $min );
-
+      my $state = $trans->get_state;
+      if( $state == Data::RecordStore::Transaction::TRA_IN_COMMIT
+        || $state == Data::RecordStore::Transaction::TRA_CLEANUP_COMMIT )
+      {
+         $trans->commit;
+      }
+      elsif( $state == Data::RecordStore::Transaction::TRA_IN_ROLLBACK
+        || $state == Data::RecordStore::Transaction::TRA_CLEANUP_ROLLBACK )
+      {
+         $trans->rollback;
+      }
+      elsif( $state == Data::RecordStore::Transaction::TRA_ACTIVE )
+      {
+         # commit or rollback, depending on preference
+      }
     }
 
-    $store->emtpy;
+[1mMETHODS[0m
+  [1mget_update_time[0m
+    Returns the epoch time when the last time this was updated.
 
-    $store->unlink_store;
+  [1mget_process_id[0m
+    Returns the process id that last wrote to this transaction.
 
-METHODS
-  open( template, filename, size )
-    Opens or creates the file given as a fixed record length data store. If
-    a size is not given, it calculates the size from the template, if it
-    can. This will die if a zero byte record size is determined.
+  [1mget_state[0m
+    Returns the state of this process. Values are TRA_ACTIVE TRA_IN_COMMIT
+    TRA_IN_ROLLBACK TRA_COMMIT_CLEANUP TRA_ROLLBACK_CLEANUP TRA_DONE
 
-  empty
-    This empties out the database, setting it to zero records.
+  [1mget_id[0m
+    Returns the ID for this transaction, which is the same as its position in
+    the transaction index plus one.
 
-  ensure_entry_count( count )
-    Makes sure the data store has at least as many entries as the count
-    given. This creates empty records if needed to rearch the target record
-    count.
+  [1mstow( $data, $optional_id )[0m
+    Stores the data given. Returns the id that the data was stowed under. If
+    the id is not given, this generates one from the record store. The data
+    stored this way is really stored in the record store, but the index is not
+    updated until a commit happens. That means it is not reachable from the
+    store until the commit.
 
-  
-    Returns the number of entries in this store. This is the same as the
-    size of the file divided by the record size.
+  [1mdelete_record( $id )[0m
+    Marks that the record associated with the id is to be deleted when the
+    transaction commits.
 
-  get_record( idx )
-    Returns an arrayref representing the record with the given id. The array
-    in question is the unpacked template.
+  [1mrecycle_id( $id )[0m
+    Marks that the record associated with the id is to be deleted and its id
+    recycled when the transaction commits.
 
-  next_id
-    adds an empty record and returns its id, starting with 1
+  [1mcommit()[0m
+    Commit applies
 
-  pop
-    Remove the last record and return it.
-
-  push( data )
-    Add a record to the end of this store. Returns the id assigned to that
-    record. The data must be a scalar or list reference. If a list
-    reference, it should conform to the pack template assigned to this
-    store.
-
-  push( idx, data )
-    Saves the data to the record and the record to the filesystem. The data
-    must be a scalar or list reference. If a list reference, it should
-    conform to the pack template assigned to this store.
-
-  unlink_store
+  [1munlink_store[0m
     Removes the file for this record store entirely from the file system.
 
-HELPER PACKAGE
-    Data::RecordStore::FixedRecycleStore
+[1mAUTHOR
+       Eric Wolf        coyocanid@gmail.com[0m
+[1mCOPYRIGHT AND LICENSE[0m
+           Copyright (c) 2015-2018 Eric Wolf. All rights reserved.  
+           This program is free software; you can redistribute it 
+           and/or modify it under the same terms as Perl itself.
 
-SYNOPSIS
-    A subclass Data::RecordStore::FixedRecycleStore. This allows indexes to be
-    recycled and their record space reclaimed.
-
-    my $store = Data::RecordStore::FixedRecycleStore->open( $template,
-    $filename, $size );
-
-    my $id = $store->next_id;
-
-    $store->put_record( $id, ["SOMEDATA","FOR","PACK" ] );
-
-    my $id2 = $store->next_id; # == 2
-
-    $store->recycle( $id );
-
-    my $avail_ids = $store->get_recycled_ids; # [ 1 ]
-
-    my $id3 = $store->next_id;
-
-    $id3 == $id;
-
-METHODS
-  recycle( $idx )
-    Recycles the given id and reclaims its space.
-
-  get_recycled_ids
-    Returns a list reference of ids that are available to be reused.
-
-AUTHOR
-       Eric Wolf        coyocanid@gmail.com
-           Copyright (c) 2015 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
-           under the same terms as Perl itself.
-
-VERSION
-       Version 1.0  (October 10, 2015))
+[1mVERSION
+       Version 3.23  (Sep, 2018))[0m

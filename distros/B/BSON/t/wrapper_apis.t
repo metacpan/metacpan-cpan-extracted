@@ -49,7 +49,7 @@ my %apis = (
     },
     "BSON::OID" => {
         "BSON::OID" => [ qw/TO_JSON/ ],
-        "MongoDB::OID" => [ qw/value to_string get_time TO_JSON _get_pid/ ],
+        "MongoDB::OID" => [ qw/value to_string get_time TO_JSON/ ],
     },
     "BSON::Regex" => {
         "BSON::Regex" => [ qw/TO_JSON/ ],

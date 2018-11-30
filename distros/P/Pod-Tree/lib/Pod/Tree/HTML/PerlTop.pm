@@ -1,10 +1,11 @@
 package Pod::Tree::HTML::PerlTop;
+use 5.006;
 use strict;
 use warnings;
 
 use base qw(Pod::Tree::HTML);
 
-our $VERSION = '1.25';
+our $VERSION = '1.27';
 
 sub set_links {
 	my ( $html, $links ) = @_;

@@ -3,9 +3,8 @@ use strict;
 use URI::WithBase;
 use URI::URL;
 use Exporter 'import';
-use vars qw(@EXPORT_OK $VERSION);
-$VERSION = '0.03';
-@EXPORT_OK= qw(rebase_html rebase_css rebase_html_inplace rebase_css_inplace);
+our $VERSION = '0.04';
+our @EXPORT_OK= qw(rebase_html rebase_css rebase_html_inplace rebase_css_inplace);
 
 =head1 NAME
 
@@ -31,11 +30,11 @@ HTML::Rebase - rewrite HTML links to be relative to a given URL
   __END__
   <html>
   <head>
-  <link rel="stylesheet" src="../css/site.css" />
+  <link rel="stylesheet" src="css/site.css" />
   </head>
   <body>
   <a href="http://perlmonks.org">Go to Perlmonks.org</a>
-  <a href="../index.html">Go to home page/a>
+  <a href="index.html">Go to home page/a>
   </body>
   </html>
 
@@ -67,10 +66,10 @@ sub rebase_html_inplace {
     #    unless $url->is_absolute;
 
     # Check if we have a <base> tag which should replace the user-supplied URL
-    if( $_[0] =~ s!<\s*\bbase\b[^>]+\bhref=([^>]+)>!! ) {
+    if( $_[0] =~ s!<\s*\bbase\b[^>]+\bhref=([^>]+)>!!i ) {
         # Extract the HREF:
         my $href= $1;
-        if( $href =~ m!^(['"])(.*?)\1!i ) {
+        if( $href =~ m!^(['"])(.*?)\1! ) {
             # href="..." , with quotes
             $href = $2;
         } elsif( $href =~ m!^([^>"' ]+)! ) {
@@ -155,12 +154,12 @@ to rewrite them.
 =head1 REPOSITORY
 
 The public repository of this module is 
-L<http://github.com/Corion/html-rebase>.
+L<https://github.com/Corion/html-rebase>.
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
@@ -174,7 +173,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2018 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

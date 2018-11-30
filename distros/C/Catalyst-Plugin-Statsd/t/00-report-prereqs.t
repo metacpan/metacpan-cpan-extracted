@@ -60,7 +60,11 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  List::MoreUtils
+  Log::Dispatch
+  Log::Dispatch::Array
+  Term::Size::Perl
+  Term::Size::Win32
 );
 
 my @exclude = qw(

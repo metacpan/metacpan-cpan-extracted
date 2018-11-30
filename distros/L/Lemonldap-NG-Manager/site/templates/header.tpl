@@ -11,23 +11,27 @@
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-ui-tree/dist/angular-ui-tree.min.css" />
   <link rel="stylesheet" type="text/css" href="/javascript/bootstrap/css/bootstrap.min.css" />
   <link rel="stylesheet" type="text/css" href="/javascript/bootstrap/css/bootstrap-theme.min.css" />
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-bootstrap/ui-bootstrap-csp.min.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">css/manager.min.css" />
 //elsif:useexternallibs
-  <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-csp.css" />
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular/angular-csp.min.css" />
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-tree/2.13.0/angular-ui-tree.min.css" />
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"></script>
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"></script>
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-bootstrap/ui-bootstrap-csp.min.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">css/manager.min.css" />
 //elsif:cssminified
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular/angular-csp.min.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-ui-tree/dist/angular-ui-tree.min.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/bootstrap/dist/css/bootstrap-theme.min.css" />
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-bootstrap/ui-bootstrap-csp.min.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">css/manager.min.css" />
 //else -->
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular/angular-csp.css" />
-  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-ui-tree/dist/angular-ui-tree.min.css" />
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-ui-tree/dist/angular-ui-tree.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/bootstrap/dist/css/bootstrap.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/bootstrap/dist/css/bootstrap-theme.css" />
+  <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">bwr/angular-bootstrap/ui-bootstrap-csp.css" />
   <link rel="stylesheet" type="text/css" href="<TMPL_VAR NAME="STATIC_PREFIX">css/manager.css" />
 <!-- //endif -->

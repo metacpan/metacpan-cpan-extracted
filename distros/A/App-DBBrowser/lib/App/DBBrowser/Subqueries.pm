@@ -4,7 +4,6 @@ App::DBBrowser::Subqueries;
 use warnings;
 use strict;
 use 5.008003;
-no warnings 'utf8';
 
 use File::Spec::Functions qw( catfile );
 
@@ -14,8 +13,6 @@ use Term::Choose           qw( choose );
 use Term::Choose::LineFold qw( print_columns );
 use Term::Choose::Util     qw( choose_a_subset term_width );
 use Term::Form             qw();
-
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI'; #
 
 use App::DBBrowser::Auxil;
 

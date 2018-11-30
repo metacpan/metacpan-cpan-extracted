@@ -6,7 +6,7 @@ use JSON;
 use strict;
 
 require 't/test-lib.pm';
-my $struct = 'site/static/struct.json';
+my $struct = 'site/htdocs/static/struct.json';
 
 my @bad = qw(
   /confs/1567
@@ -43,7 +43,6 @@ foreach my $query (@bad) {
       or print STDERR "# Receive a $res->[0] code";
     my $href;
 
-    #print STDERR Dumper($res->[2]);use Data::Dumper;
     ok( $href = from_json( $res->[2]->[0] ), 'Response is JSON' );
     ok( $href->{error}, "Receive an explanation message ($href->{error})" );
     count(3);

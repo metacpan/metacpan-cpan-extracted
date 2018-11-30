@@ -4,17 +4,16 @@
 use Test::More;
 use strict;
 use JSON;
-use Data::Dumper;
 require 't/test-lib.pm';
 
 my $struct = 't/jsonfiles/12-modified.json';
-my $confFiles = [ 't/conf/lmConf-1.js', 't/conf/lmConf-2.js' ];
+my $confFiles = [ 't/conf/lmConf-1.json', 't/conf/lmConf-2.json' ];
 
 sub body {
     return IO::File->new( $struct, 'r' );
 }
 
-# Delete lmConf-2.js if exists
+# Delete lmConf-2.json if exists
 eval { unlink $confFiles->[1]; };
 mkdir 't/sessions';
 
@@ -65,6 +64,18 @@ if ($bug) {
 #print STDERR Dumper(\@changes,\@cmsg);
 
 count(6);
+
+# TODO: check result of this
+ok( $res = &client->jsonResponse('/diff/1/2'), 'Diff called' );
+my ( @c1, @c2 );
+ok( ( @c1 = sort keys %{ $res->[0] } ), 'diff() detects changes in conf 1' );
+ok( ( @c2 = sort keys %{ $res->[1] } ), 'diff() detects changes in conf 2' );
+ok( @c1 == 11, '11 keys changed in conf 1' )
+  or print STDERR "Expect: 11 keys, get: " . join( ', ', @c1 ) . "\n";
+ok( @c2 == 14, '14 keys changed or created in conf 2' )
+  or print STDERR "Expect: 14 keys, get: " . join( ',', @c2 ) . "\n";
+
+count(5);
 
 unlink $confFiles->[1];
 eval { rmdir 't/sessions'; };
@@ -126,16 +137,8 @@ sub changes {
             'new' => '1;bad.com'
         },
         {
-            'key' => 'exportedVars',
-            'new' => 'User-Agent'
-        },
-        {
             'new' => 'Uid',
             'key' => 'exportedVars'
-        },
-        {
-            'key' => 'exportedVars',
-            'old' => 'UA'
         },
         {
             'key' =>

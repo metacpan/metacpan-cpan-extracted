@@ -11,6 +11,8 @@ README
 cpanfile
 dist.ini
 lib/Perl/Critic/Policy/RegularExpressions/RequireDefault.pm
+lib/Perl/Critic/Policy/RegularExpressions/RequireDefault.pm.bak
+perl-critic-policy-regularexpressions-requiredefault.code-workspace
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

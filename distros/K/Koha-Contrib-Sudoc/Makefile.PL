@@ -30,7 +30,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Koha::Contrib::Sudoc",
   "PREREQ_PM" => {
     "AnyEvent::Processor" => 0,
-    "Bulac::SudocConverter" => 0,
     "Business::ISBN" => 0,
     "Carp" => 0,
     "Class::Load" => 0,
@@ -68,7 +67,7 @@ my %WriteMakefileArgs = (
     "ZOOM" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.25",
+  "VERSION" => "2.26",
   "test" => {
     "TESTS" => ""
   }
@@ -77,7 +76,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "AnyEvent::Processor" => 0,
-  "Bulac::SudocConverter" => 0,
   "Business::ISBN" => 0,
   "Carp" => 0,
   "Class::Load" => 0,

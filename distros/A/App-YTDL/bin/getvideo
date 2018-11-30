@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.303';
+our $VERSION = '0.304';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -19,9 +19,6 @@ use Term::ANSIScreen qw( :cursor :screen );
 use Term::Choose     qw( choose );
 use Term::Form       qw();
 
-use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
-print "\e(U" if $^O eq 'MSWin32';
-
 use App::YTDL::Arguments  qw( from_arguments_to_choices );
 use App::YTDL::Download   qw( download_youtube );
 use App::YTDL::Helper     qw( uni_capture );
@@ -29,9 +26,27 @@ use App::YTDL::History    qw( add_uploaders_to_history read_history_files upload
 use App::YTDL::Video_Info qw( gather_video_infos );
 use App::YTDL::Options    qw( read_config_file set_options );
 
-binmode STDIN,  ':encoding(console_in)';
-binmode STDOUT, ':encoding(console_out)';
-binmode STDERR, ':encoding(console_out)';
+binmode STDIN,  ':encoding(utf-8)';
+binmode STDOUT, ':encoding(utf-8)';
+binmode STDERR, ':encoding(utf-8)';
+
+my $old_out_codepage;
+
+BEGIN {
+    if ( $^O eq "MSWin32" ) {
+        require Win32::Console;
+        require Win32::Console::ANSI;
+        $old_out_codepage = Win32::Console::OutputCP();
+        Win32::Console::OutputCP( 65001 );
+        print "\e(U";
+    }
+}
+
+END {
+    if ( $^O eq "MSWin32" ) {
+        Win32::Console::OutputCP( $old_out_codepage ) if $old_out_codepage;
+    }
+}
 
 
 my ( $arg_file, $help );
@@ -70,7 +85,7 @@ my $opt = {
     use_extractor_dir           => 1,
     use_uploader_dir            => 1,
 
-    quality                     => 3,
+    quality                     => ' 720 or less',
     no_height_ok                => 1,
     prefer_free_formats         => 1,
 
@@ -185,7 +200,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.303
+Version 0.304
 
 =cut
 
@@ -258,6 +273,8 @@ Create/use uploader directories
 =head3 Resolution
 
 Set the video height.
+
+If set to I<manually>: C<+> => "merge", C<,> => "and", C</> => "or". See C<youtube-dl> documentation format section.
 
 =head3 No video height
 

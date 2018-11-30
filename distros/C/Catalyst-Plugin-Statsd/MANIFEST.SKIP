@@ -106,5 +106,8 @@
 Catalyst-Plugin-Statsd-.*/
 Catalyst-Plugin-Statsd-.*\.tar\.gz
 \.mailmap$
+perltidy\.(LOG|ERR)
+fatlib/
 cpanfile\.snapshot$
+local/
 ^CatalystX-Statsd

@@ -1,0 +1,17 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table table striped">
+    <tr>
+      <th><label id="labeli" for="textinput" trspan="value"></label></th>
+      <td><input id="textinput" class="form-control" ng-model="currentNode.data" ng-change="execFilters(_findScopeByKey('authParams'))" aria-describedby="labeli"/></td>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "cancel",
+  "icon": "remove"
+}]
+</script>

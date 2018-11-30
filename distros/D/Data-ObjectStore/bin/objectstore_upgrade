@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Data::ObjectStore;
+
+my( $source_dir, $dest_dir ) = shift @ARGV;
+unless( -d $source_dir && -d $dest_dir ) {
+    print STDERR "Usage: $0 <sourcedir> <destinationdir>\n";
+    exit;
+}
+Data::ObjectStore::upgrade_store( $source_dir, $dest_dir );

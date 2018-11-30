@@ -7,6 +7,9 @@ pod_spelling_system:
   # intentionally
   stopwords:
     - NewRelic
+    - CentOS
+    - SDK
+    - Xenial
 
 pod_coverage:
   skip: 0

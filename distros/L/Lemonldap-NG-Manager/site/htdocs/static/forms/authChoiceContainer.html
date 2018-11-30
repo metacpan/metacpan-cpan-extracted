@@ -1,0 +1,46 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{translateTitle(currentNode)}}</h3>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th id="namelabel" trspan="name"></th>
+        <th id="authlabel" trspan="authentication"></th>
+        <th id="userdblabel" trspan="userDB"></th>
+        <th id="pwdlabel" trspan="passwordDB"></th>
+        <th id="urllabel" trspan="url"></th>
+        <th id="condlabel" trspan="condition"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="c in currentNode.nodes">
+        <td width="12%">
+          <input class="form-control" ng-model="c.title" aria-decribedby="namelabel">
+        </td>
+        <td width="16%" ng-repeat="i in [0,1,2]">
+          <select class="form-control" ng-model="c.data[i]" ng-change="execFilters(_findScopeByKey('authParams'))" aria-decribedby="{{['authlabel','userdblabel','pwdlabel'][i]}}">
+            <option ng-repeat="item in currentNode.select[i]" ng-selected="item.k==c.data[i]" value="{{item.k}}">{{item.v}}</option>
+          </select>
+        </td>
+        <td width="20%">
+          <input class="form-control" ng-model="c.data[3]" aria-describedby="urllabel">
+        </td>
+        <td width="15%">
+          <input class="form-control" ng-model="c.data[4]" aria-describedby="condlabel">
+        </td>
+        <td width="5%">
+          <span class="link text-danger glyphicon glyphicon-minus-sign" ng-click="del(currentNode.nodes,$index)"/>
+          <span ng-if="$last" class="link text-success glyphicon glyphicon-plus-sign" ng-click="menuClick({title:'newChain',action: 'newAuthChoice'})"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "action": "newAuthChoice",
+  "title": "newChain",
+  "icon": "plus-sign"
+}]
+</script>
