@@ -142,6 +142,7 @@ WriteMakefile(
         prereqs => {
             develop => {
                 requires => {
+                    'App::RewriteVersion' => '0',   # for perl-bump-version
                     'File::Globstar' => '0',
                     'File::Grep' => '0',
                     'DateTime' => '0',

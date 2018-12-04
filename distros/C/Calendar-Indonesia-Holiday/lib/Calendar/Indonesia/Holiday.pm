@@ -1,7 +1,7 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2018-10-17'; # DATE
-our $VERSION = '0.322'; # VERSION
+our $DATE = '2018-12-04'; # DATE
+our $VERSION = '0.323'; # VERSION
 
 use 5.010001;
 use strict;
@@ -767,10 +767,10 @@ my %year_holidays;
     ];
 }
 
-# tentative
+# decreed nov 13, 2018
 #
 # ref:
-# - https://kalender.web.id/2019.html
+# - https://jpp.go.id/humaniora/sosial-budaya/327328-pemerintah-resmi-menetapkan-hari-libur-nasional-2019
 {
     my $eidulf2019;
     $year_holidays{2019} = [
@@ -792,7 +792,10 @@ my %year_holidays;
         _h_mawlid    ({_expand_dm("09-11")}, {hyear=>1441}),
         # - christmas
 
-        # XXX joint leave
+        _jointlv     ({_expand_dm("03-06")}, {holiday=>$eidulf2019}),
+        _jointlv     ({_expand_dm("04-06")}, {holiday=>$eidulf2019}),
+        _jointlv     ({_expand_dm("07-06")}, {holiday=>$eidulf2019}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
     ];
 }
 
@@ -1120,7 +1123,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.322 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2018-10-17.
+This document describes version 0.323 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2018-12-04.
 
 =head1 SYNOPSIS
 
@@ -1213,7 +1216,7 @@ days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
 Contains data from years 2002 to 2019 (joint leave days until
-2018).
+2019).
 
 This function is not exported by default, but exportable.
 
@@ -1271,7 +1274,7 @@ days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
 Contains data from years 2002 to 2019 (joint leave days until
-2018).
+2019).
 
 This function is not exported by default, but exportable.
 
@@ -1326,7 +1329,7 @@ List Indonesian holidays in calendar.
 List holidays and joint leave days ("cuti bersama").
 
 Contains data from years 2002 to 2019 (joint leave days until
-2018).
+2019).
 
 This function is not exported by default, but exportable.
 

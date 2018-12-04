@@ -1,12 +1,29 @@
 Revision history for Types-SQL
 
+v0.4.0    2018-12-04 10:36:59+00:00 Europe/London
+  [Enhancements]
+  - Added SmallInt, BigInt.
+
+  [Documentation]
+  - Updated Changes to refer to GitHub issues.
+
+  - Fixed typo in POD.
+
+  - Clarify relationship between some constrained types.
+
+  [Tests]
+  - Cleaned up test prereqs.
+
+  [Other]
+  - Minor code improvements.
+
 v0.3.1    2018-11-18 11:46:52+00:00 Europe/London
   [Enhancements]
   - InstanceOf['JSON::PP::Boolean', 'Types::Serialiser::Boolean'] can be
     translated.
 
   [Bug Fixes]
-  - Specify minimum version of Safe::Isa (Slaven Rezić).
+  - Specify minimum version of Safe::Isa, #4 (Slaven Rezić).
 
   [Toolchain]
   - Clean up prereqs list.

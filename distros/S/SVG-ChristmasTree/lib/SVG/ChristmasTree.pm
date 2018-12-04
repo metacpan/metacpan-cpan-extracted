@@ -13,7 +13,7 @@ Perl extension to draw Christmas trees with SVG
     print $tree->as_xml;
 
     # Or change things
-    my tree = SVG::ChristmasTree->new({
+    my $tree = SVG::ChristmasTree->new({
       layers => 5,
       leaf_colour => 'rgb(0,255,0)',
       pot_colour => 'rgb(0,0,255)',
@@ -34,7 +34,7 @@ use Math::Trig qw[deg2rad tan];
 
 with 'MooseX::Getopt';
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 # Constants that we haven't made into attributes yet
 use constant {
@@ -359,6 +359,8 @@ sub _coloured_shape {
     },
   );
 }
+
+__PACKAGE__->meta()->make_immutable();
 
 =head1 AUTHOR
 

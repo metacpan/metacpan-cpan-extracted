@@ -49,6 +49,7 @@ sub run_prove {
     my $test_fn = shift;
     my $results_fn = shift;
 
+    diag "vvvvvvvvvvv Running tests in $test_fn under App::Prove";
     my $app = App::Prove->new;
 
     $app->process_args(
@@ -65,14 +66,13 @@ sub run_prove {
         $app->run;
     };
 
-    diag "vvvvvvvvvvv Ran tests in $test_fn under App::Prove";
     diag "  Result was ", join ", ", @result;
     diag "  STDOUT:";
     diag $stdout;
     diag "  STDERR";
     diag $stderr;
     diag "^^^^^^^^^^^ End of output from running tests in $test_fn under App::Prove";
-}
+} #run_prove()
 
 sub check_results {
     my $test_fn = shift;

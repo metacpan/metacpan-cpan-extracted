@@ -1,5 +1,11 @@
 Revision history for JSCalendar-Duration
 
+0.002     2018-12-04 11:22:47-05:00 America/New_York
+
+        - Fix typos in copy/pasted code
+          (thanks Mohammad S Anwar)
+        - Fix plan in t/00_durations.t
+
 0.001     2018-11-21 13:28:02-05:00 America/New_York
 
         - First release to CPAN

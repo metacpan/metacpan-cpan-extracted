@@ -14,7 +14,7 @@ use Net::RDAP::SearchResult;
 use vars qw($VERSION);
 use strict;
 
-$VERSION = 0.11;
+$VERSION = 0.12;
 
 =pod
 
@@ -298,9 +298,8 @@ sub fetch {
 	$request->header('Authorization' => sprintf('Basic %s', encode_base64(join(':', ($args{'user'}, $args{'pass'}))))) if ($args{'user'} && $args{'pass'});
 
 	my $file = sprintf(
-		'%s/%s::cache::%s.json',
+		'%s/Net-RDAP-cache-%s.json',
 		($ENV{'TMPDIR'} || '/tmp'),
-		ref($self),
 		sha1_hex($url),
 	);
 

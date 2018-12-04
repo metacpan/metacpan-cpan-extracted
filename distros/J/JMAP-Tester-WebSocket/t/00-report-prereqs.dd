@@ -1,0 +1,50 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Data::Dumper' => '0',
+                                      'IO::Async::Loop' => '0',
+                                      'JMAP::Tester' => '0',
+                                      'JMAP::Tester::Response::Paragraph' => '0',
+                                      'JMAP::Tester::Response::Sentence' => '0',
+                                      'JMAP::Tester::Role::Result' => '0',
+                                      'JMAP::Tester::Role::SentenceCollection' => '0',
+                                      'JMAP::Tester::SentenceBroker' => '0',
+                                      'JSON' => '0',
+                                      'Moo' => '0',
+                                      'Moo::Role' => '0',
+                                      'Net::Async::WebSocket::Client' => '0.13',
+                                      'Params::Util' => '0',
+                                      'Protocol::WebSocket::Request' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Try::Tiny' => '0',
+                                      'namespace::clean' => '0',
+                                      'perl' => 'v5.10.0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

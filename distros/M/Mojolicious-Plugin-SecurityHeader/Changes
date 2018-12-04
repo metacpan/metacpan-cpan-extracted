@@ -1,6 +1,10 @@
 Revision history for Mojolicious-Plugin-SecurityHeader
 ======================================================
 
+0.06 2018-12-04 16:12:00
+
+    * add CORS support and improve tests
+
 0.05 2018-09-25 14:23:00
 
     * Fix issue where the order of the active headers was important

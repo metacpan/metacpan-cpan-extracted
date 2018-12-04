@@ -16,10 +16,10 @@ name: MARC-Transform
 provides:
   MARC::Transform:
     file: lib/MARC/Transform.pm
-    version: 0.003006
+    version: 0.003007
 requires:
   MARC::Record: 0
   Scalar::Util: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.003006
+version: 0.003007

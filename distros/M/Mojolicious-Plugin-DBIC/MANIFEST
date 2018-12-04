@@ -19,10 +19,14 @@ t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/controller.t
+t/inherit.t
+t/lib/Local/Controller/Extended.pm
 t/lib/Local/Schema.pm
 t/lib/Local/Schema/Result/Events.pm
 t/lib/Local/Schema/Result/Notes.pm
 t/plugin.t
 t/templates/notes/get.html.ep
+t/templates/notes/get_extended.html.ep
 t/templates/notes/list.html.ep
+t/templates/notes/list_extended.html.ep
 weaver.ini

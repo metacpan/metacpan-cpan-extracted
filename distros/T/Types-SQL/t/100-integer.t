@@ -4,7 +4,7 @@ use Test::Most;
 
 use if $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING}, 'Test::Warnings';
 
-use Types::SQL qw/ Integer /;
+use Types::SQL qw/ Integer SmallInt BigInt /;
 use Types::SQL::Util;
 
 subtest 'no size' => sub {
@@ -54,6 +54,16 @@ subtest 'bad size' => sub {
         my $type = Integer ['x'];
     }
     qr/Size must be a positive integer/, 'invalid size';
+
+};
+
+subtest 'aliases' => sub {
+
+    ok SmallInt->check(12345), 'SmallInt';
+    ok !SmallInt->check(123456), '!SmallInt';
+
+    ok BigInt->check('1234567890123456789'), 'BigInt';
+    ok !BigInt->check('12345678901234567890'), '!BigInt';
 
 };
 

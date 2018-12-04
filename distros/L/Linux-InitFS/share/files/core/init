@@ -1,25 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
 ###############################################################################
 # capture boot process for troubleshooting
 
 exec 2>/run/initfs.trc
 set -x
-
-
-###############################################################################
-# environment init
-
-if [[ -f /etc/inputrc ]]
-then
-	INPUTRC=/etc/inputrc
-	export INPUTRC
-fi
-
-if [[ -f /etc/profile ]]
-then
-	source /etc/profile
-fi
 
 
 ###############################################################################
@@ -30,45 +15,80 @@ INITBIN='/sbin/init'
 ROOTDEV='LABEL=root'
 MNTFLAG='ro'
 
+GETARGS='get_arg_core'
+
 
 ###############################################################################
-# import kernel command line
+# set environment visible to /init
 
-import_arg() {
+for f in /etc/env.d/*.sh
+do
+	if [ -r $f ]
+	then
+		. $f
+	fi
+done
+
+
+###############################################################################
+# global kernel command line functions
+
+import_handler() {
+	local func="$1"
+
+	GETARGS="${GETARGS} $func"
+
+}
+
+import_cmdline() {
+	local arg func
+
+	for arg in $(cat /proc/cmdline)
+	do
+		for func in $GETARGS
+		do
+			$func $arg
+		done
+	done
+
+	if [ -n "$ROOTFLG" ]
+	then
+		MNTOPTS="${MNTFLAG},${ROOTFLG}"
+	else
+		MNTOPTS=$MNTFLAG
+	fi
+
+}
+
+
+###############################################################################
+# core kernel argument handler
+
+get_arg_core() {
 	local arg="$1"
 
 	case $arg in
 
 		ro)
-			MNTFLAG="ro"
+			MNTFLAG=ro
 			;;
 		rw)
-			MNTFLAG="rw"
+			MNTFLAG=rw
 			;;
 
 		root=*)
 			ROOTDEV=${arg#root=}
 			;;
 
+		rootflags=*)
+			ROOTFLG=${arg#rootflags=}
+			;;
+
 		init=*)
 			INITBIN=${arg#init=}
 			;;
 
-		rescue)
-			RESCUE=nonempty
-			;;
-
 	esac
-}
-
-import_cmdline() {
-	local arg
-
-	for arg in $(cat /proc/cmdline)
-	do
-		import_arg "$arg"
-	done
-
 }
 
 
@@ -77,8 +97,16 @@ import_cmdline() {
 
 # try it
 mount_rootfs() {
+	local fstype
 
-	mount -o $MNTFLAG $ROOTDEV $ROOTMNT
+	fstype=$(blkid $NEXTDEV | sed 's/.*TYPE=//;s/^"//;s/"$//')
+
+	if [ -z "$fstype" ]
+	then
+		return 1
+	fi
+
+	mount -t $fstype -o $MNTOPTS $NEXTDEV $ROOTMNT
 
 	return $?
 }
@@ -87,9 +115,13 @@ mount_rootfs() {
 load_rootdev() {
 	local f
 
-	for f in /etc/load.d/*.sh
+	for f in /lib/initfs/load.d/*.sh
 	do
-		[[ -r $f ]] && source $f
+		if [ -r $f ]
+		then
+			. $f
+		fi
+		is_rootfs_mounted && break
 	done
 
 }
@@ -99,44 +131,66 @@ is_rootfs_mounted() {
 	grep -q $ROOTMNT /etc/mtab
 }
 
-# if we have no rootfs
-rootfs_not_mounted() {
-	exit # give up, kernel panic
+# highlevel: the whole sequence
+mount_rootfs_effort() {
+
+	if [ -z $NEXTDEV ]
+	then
+		NEXTDEV=$ROOTDEV
+	fi
+
+	mount_rootfs
+
+	if ! is_rootfs_mounted
+	then
+		local f
+		for f in /lib/initfs/load.d/*.sh
+		do
+			if [ -r $f ]
+			then
+				. $f
+			fi
+			is_rootfs_mounted && break
+		done
+	fi
+
+	if ! is_rootfs_mounted
+	then
+		mount_rootfs
+		return $?
+	fi
+
+	return 0
 }
 
 
 ###############################################################################
 # MAIN BLOCK
 
-for f in /etc/init.d/*.sh
+for f in /lib/initfs/init.d/*.sh
 do
-	[[ -r $f ]] && source $f
+	if [ -r $f ]
+	then
+		. $f
+	fi
 done
 unset f
 
 import_cmdline
 
-mount_rootfs 2> /dev/null
+mount_rootfs_effort
 
-if ! is_rootfs_mounted
-then
-	load_rootdev
-	mount_rootfs
-fi
-
-if ! is_rootfs_mounted
-then
-	rootfs_not_mounted
-fi
-
-if [[ -n $INIT_HAS_RESCUE && -n $RESCUE ]]
-then
-	rescue_shell
-fi
-
-for f in /etc/done.d/*.sh
+for f in /lib/initfs/done.d/*.sh
 do
-	[[ -r $f ]] && source $f
+	if [ -r $f ]
+	then
+		. $f
+	fi
 done
+unset f
 
 exec chroot $ROOTMNT $INITBIN
+
+echo BUG: got to end of rootfs:/init
+exit # panic - should never get here
+

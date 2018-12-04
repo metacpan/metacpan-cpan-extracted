@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.0.4] - 2018-12-04
+
+### Fixed
+
+- Added call to make_immutable()
+- Removed POSIX from pre-reqs
+- Fix to SYNOPSIS code (thanks manwar)
+
 ## [0.0.3] - 2018-12-03
 
 ### Fixed

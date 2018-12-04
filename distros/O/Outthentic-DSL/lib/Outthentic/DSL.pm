@@ -2,7 +2,7 @@ package Outthentic::DSL;
 
 use strict;
 
-our $VERSION = '0.2.8';
+our $VERSION = '0.2.10';
 
 use Carp;
 use Data::Dumper;
@@ -607,7 +607,7 @@ sub handle_code {
             my $st = system("$ext_runner 2>$source_file.err 1>$source_file.out");  
 
             if ($st != 0){
-              confess "$ext_runner failed, see $source_file.err for detailes";
+              confess "$ext_runner failed, see $source_file.err for details";
             }
 
             $self->debug("code OK. inline. $ext_runner") if $self->{debug_mod} >= 2;
@@ -645,8 +645,14 @@ sub handle_validator {
 
     my $self = shift;
     my $code = shift;
-    my $r = $self->handle_code($code);
-    $self->add_result({ status => $r->[0] , message => $r->[1] });
+
+    if (! defined ($self->{last_check_status}) or $self->{last_check_status}){
+      my $r = $self->handle_code($code);
+      $self->add_result({ status => $r->[0] , message => $r->[1] });
+    } else {
+      $self->debug("skip validator step because last check has been failed") if $self->{debug_mod} >= 1;
+    }
+
 
 }
 
@@ -655,9 +661,14 @@ sub handle_generator {
     my $self = shift;
     my $code = shift;
 
-    $self->validate(
-      $self->handle_code($code)
-    )
+    if (! defined ($self->{last_check_status}) or $self->{last_check_status}){
+      $self->validate(
+        $self->handle_code($code)
+      )
+    } else {
+      $self->debug("skip generator step because last check has been failed") if $self->{debug_mod} >= 1;
+    }
+
 
 }
 

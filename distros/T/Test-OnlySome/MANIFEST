@@ -18,6 +18,7 @@ t/04-multitest-blocks.t
 t/05-skip-these.t
 t/06-skip-next.t
 t/07-multi-package.t
+t/08-num-tests.t
 t/11-input-forms-implicit-config.t
 t/12-single-tests-implicit-config.t
 t/13-multitest-blocks-implicit-config.t
@@ -25,6 +26,7 @@ t/14-skip-these-implicit-config.t
 t/15-skip-next-implicit-config.t
 t/16-use-param-list-implicit-config.t
 t/17-invalid-param-lists.t
+t/18-num-tests.t
 t/21-import-into.t
 t/22-import-into-implicit.t
 t/23-test-kit.t

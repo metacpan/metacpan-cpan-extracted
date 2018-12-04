@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.322 of Calendar::Indonesia::Holiday
+    This document describes version 0.323 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2018-10-17.
+    2018-12-04.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -92,7 +92,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 2002 to 2019 (joint leave days until 2018).
+    Contains data from years 2002 to 2019 (joint leave days until 2019).
 
     This function is not exported by default, but exportable.
 
@@ -143,7 +143,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 2002 to 2019 (joint leave days until 2018).
+    Contains data from years 2002 to 2019 (joint leave days until 2019).
 
     This function is not exported by default, but exportable.
 
@@ -191,7 +191,7 @@ FUNCTIONS
 
     List holidays and joint leave days ("cuti bersama").
 
-    Contains data from years 2002 to 2019 (joint leave days until 2018).
+    Contains data from years 2002 to 2019 (joint leave days until 2019).
 
     This function is not exported by default, but exportable.
 

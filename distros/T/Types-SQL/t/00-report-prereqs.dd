@@ -18,7 +18,8 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::TrailingSpace' => '0.0203'
+                                      'Test::TrailingSpace' => '0.0203',
+                                      'Test::Warnings' => '0'
                                     }
                     },
        'runtime' => {
@@ -46,13 +47,10 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'JSON::PP' => '2.00',
                                    'Module::Metadata' => '0',
-                                   'Path::Tiny' => '0.004',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'Time::Piece' => '1.16',
-                                   'Time::Seconds' => '0',
                                    'Types::Common::Numeric' => '0',
                                    'Types::Common::String' => '0',
                                    'if' => '0'

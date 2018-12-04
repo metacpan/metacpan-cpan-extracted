@@ -7,7 +7,7 @@ use Carp;
 use MARC::Record;
 use YAML;
 use Scalar::Util qw< reftype >;
-our $VERSION = '0.003006';
+our $VERSION = '0.003007';
 our $DEBUG = 0;
 sub debug { $DEBUG and say STDERR @_ }
 
@@ -26,13 +26,21 @@ sub new {
     my @yaml;
     no warnings 'redefine';
     no warnings 'newline';
+    my $yamltoload;
     if ( -e $yaml ) {
         open my $yamls, "< $yaml" or die "can't open file: $!";
-        @yaml = YAML::LoadFile($yamls);
+        my $yamlline;
+        while ($yamlline = <$yamls>){ $yamltoload.=$yamlline; }
+        close $yamls;
+        #@yaml = YAML::LoadFile($yamls);
     }
     else {
-        @yaml = YAML::Load($yaml);
+        $yamltoload=$yaml;
+        #@yaml = YAML::Load($yaml);
     }
+    $yamltoload=~s/#_dollars_#/\\#_dollars_\\#/g;
+    $yamltoload=~s/#_dbquote_#/\\#_dbquote_\\#/g;
+    @yaml = YAML::Load($yamltoload);
     #warn "================". Data::Dumper::Dumper (\@yaml)."------------------";
     $record=$recordsource;
     $mth=$mthsource;
@@ -906,7 +914,7 @@ MARC::Transform - Perl module to transform a MARC record using a YAML configurat
 
 =head1 VERSION
 
-Version 0.003006
+Version 0.003007
 
 =head1 SYNOPSIS
 
@@ -2182,7 +2190,7 @@ Stephane Delaune, (delaune.stephane at gmail.com)
 
 =head1 COPYRIGHT
 
-Copyright 2011-2014 Stephane Delaune for Biblibre.com, all rights reserved.
+Copyright 2011-2018 Stephane Delaune for Biblibre.com, all rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -2197,7 +2205,7 @@ MARC::Transform - Module Perl pour transformer une notice MARC en utilisant un f
 
 =head1 - VERSION
 
-Version 0.003006
+Version 0.003007
 
 =head1 - SYNOPSIS
 
@@ -3472,7 +3480,7 @@ Stéphane Delaune, (delaune.stephane at gmail.com)
 
 =head1 - COPYRIGHT
 
-Copyright 2011-2014 Stephane Delaune for Biblibre.com, all rights reserved.
+Copyright 2011-2018 Stephane Delaune for Biblibre.com, all rights reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

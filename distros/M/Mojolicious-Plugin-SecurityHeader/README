@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -39,6 +39,18 @@ SECURITY HEADER
 
       * X-Xss-Protection
 
+      * Access-Control-Allow-Origin
+
+      * Access-Control-Expose-Headers
+
+      * Access-Control-Max-Age
+
+      * Access-Control-Allow-Credentials
+
+      * Access-Control-Allow-Methods
+
+      * Access-Control-Allow-Headers
+
 METHODS
 
     Mojolicious::Plugin::SecurityHeader inherits all methods from
@@ -50,9 +62,17 @@ METHODS
 
     Register plugin in Mojolicious application.
 
+CORS SUPPORT
+
+    Since version 0.06 this plugin also supports CORS
+    <https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS>. There's
+    already Mojolicious::Plugin::CORS, but unlike that module, with the
+    SecurityHeader plugin all CORS related headers are configurable.
+
 SEE ALSO
 
     Mojolicious, Mojolicious::Guides, http://mojolicious.org.
+    Mojolicious::Plugin::CORS
 
 AUTHOR
 

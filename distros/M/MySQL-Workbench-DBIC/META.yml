@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,10 @@ name: MySQL-Workbench-DBIC
 provides:
   MySQL::Workbench::DBIC:
     file: lib/MySQL/Workbench/DBIC.pm
-    version: '1.07'
+    version: '1.08'
   MySQL::Workbench::DBIC::FakeDBIC:
     file: lib/MySQL/Workbench/DBIC/FakeDBIC.pm
-    version: '1.07'
+    version: '1.08'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -37,10 +37,10 @@ resources:
   bugtracker: http://github.com/reneeb/MySQL-Workbench-DBIC/issues
   homepage: http://github.com/reneeb/MySQL-Workbench-DBIC
   repository: git://github.com/reneeb/MySQL-Workbench-DBIC.git
-version: '1.07'
+version: '1.08'
 x_contributors:
   - 'Mario Minati <mario.minati@minati.de>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

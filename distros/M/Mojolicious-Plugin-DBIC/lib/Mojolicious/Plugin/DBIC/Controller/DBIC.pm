@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::DBIC::Controller::DBIC;
-use Mojo::Base 'Mojolicious::Controller';
+our $VERSION = '0.002';
 # ABSTRACT: Build simple views to DBIC data
 
 #pod =head1 SYNOPSIS
@@ -20,6 +20,12 @@ use Mojo::Base 'Mojolicious::Controller';
 #pod
 #pod =head1 SEE ALSO
 #pod
+#pod L<Mojolicious::Plugin::DBIC>
+#pod
+#pod =cut
+
+use Mojo::Base 'Mojolicious::Controller';
+
 #pod =method list
 #pod
 #pod     get '/', {
@@ -29,7 +35,8 @@ use Mojo::Base 'Mojolicious::Controller';
 #pod         template => 'blog/list',
 #pod     };
 #pod
-#pod List data in a ResultSet.
+#pod List data in a ResultSet. Returns false if it has rendered a response,
+#pod true if dispatch can continue.
 #pod
 #pod This method uses the following stash values for configuration:
 #pod
@@ -57,7 +64,7 @@ sub list {
     my ( $c ) = @_;
     my $rs_class = $c->stash( 'resultset' );
     my $rs = $c->schema->resultset( $rs_class );
-    return $c->render(
+    return $c->stash(
         resultset => $rs,
     );
 }
@@ -71,7 +78,9 @@ sub list {
 #pod         template => 'blog/get',
 #pod     };
 #pod
-#pod Fetch a single result by its ID.
+#pod Fetch a single result by its ID. If no result is found, renders a not
+#pod found error. Returns false if it has rendered a response, true if
+#pod dispatch can continue.
 #pod
 #pod This method uses the following stash values for configuration:
 #pod
@@ -105,7 +114,11 @@ sub get {
     my $id = $c->stash( 'id' );
     my $rs = $c->schema->resultset( $rs_class );
     my $row = $rs->find( $id );
-    return $c->render(
+    if ( !$row ) {
+        $c->reply->not_found;
+        return;
+    }
+    return $c->stash(
         row => $row,
     );
 }
@@ -122,7 +135,7 @@ Mojolicious::Plugin::DBIC::Controller::DBIC - Build simple views to DBIC data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -151,7 +164,8 @@ Controllers are configured through the stash when setting up the routes.
         template => 'blog/list',
     };
 
-List data in a ResultSet.
+List data in a ResultSet. Returns false if it has rendered a response,
+true if dispatch can continue.
 
 This method uses the following stash values for configuration:
 
@@ -182,7 +196,9 @@ The L<DBIx::Class::ResultSet> object containing the desired objects.
         template => 'blog/get',
     };
 
-Fetch a single result by its ID.
+Fetch a single result by its ID. If no result is found, renders a not
+found error. Returns false if it has rendered a response, true if
+dispatch can continue.
 
 This method uses the following stash values for configuration:
 
@@ -209,6 +225,8 @@ The L<DBIx::Class::Row> object containing the desired object.
 =back
 
 =head1 SEE ALSO
+
+L<Mojolicious::Plugin::DBIC>
 
 =head1 AUTHOR
 

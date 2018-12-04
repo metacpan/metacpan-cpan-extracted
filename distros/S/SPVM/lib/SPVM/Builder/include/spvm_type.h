@@ -65,6 +65,8 @@ int32_t SPVM_TYPE_has_interface(
 
 int32_t SPVM_TYPE_get_runtime_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
+const char* SPVM_TYPE_new_type_name(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
+
 SPVM_TYPE* SPVM_TYPE_create_void_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_create_undef_type(SPVM_COMPILER* compiler);
 SPVM_TYPE* SPVM_TYPE_create_byte_type(SPVM_COMPILER* compiler);
@@ -132,8 +134,6 @@ int32_t SPVM_TYPE_is_interface_type(SPVM_COMPILER* compiler, int32_t basic_type_
 int32_t SPVM_TYPE_is_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 int32_t SPVM_TYPE_get_type_name_length(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
-void SPVM_TYPE_fprint_type_name(SPVM_COMPILER* compiler, FILE* fh, int32_t basic_type_id, int32_t dimension, int32_t flag);
-void SPVM_TYPE_sprint_type_name(SPVM_COMPILER* compiler, char* buffer, int32_t basic_type_id, int32_t dimension, int32_t flag);
 
 int32_t SPVM_TYPE_get_width(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t flag);
 

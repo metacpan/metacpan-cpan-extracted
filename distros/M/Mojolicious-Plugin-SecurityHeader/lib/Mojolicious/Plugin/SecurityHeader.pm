@@ -1,41 +1,53 @@
 package Mojolicious::Plugin::SecurityHeader;
+
 # ABSTRACT: Mojolicious Plugin
+
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub register {
     my ($self, $app, $headers) = @_;
 
+    return if !$headers;
     return if !ref $headers;
     return if 'ARRAY' ne ref $headers;
 
     my @headers_list = qw(
-        Strict-Transport-Security Public-Key-Pins Referrer-Policy 
+        Strict-Transport-Security Referrer-Policy 
         X-Content-Type-Options X-Frame-Options X-Xss-Protection
-        Content-Security-Policy
+        Content-Security-Policy Access-Control-Allow-Origin
+        Access-Control-Expose-Headers Access-Control-Max-Age
+        Access-Control-Allow-Credentials Access-Control-Allow-Methods
+        Access-Control-Allow-Headers
     );
 
     my %valid_headers;
     @valid_headers{@headers_list} = (1) x @headers_list;
 
     my %values = (
-        'Strict-Transport-Security' => \&check_sts,
-        'Referrer-Policy'           => [
-             "",
-             "no-referrer",
-             "no-referrer-when-downgrade",
-             "same-origin",
-             "origin",
-             "strict-origin",
-             "origin-when-cross-origin",
-             "strict-origin-when-cross-origin",
-             "unsafe-url"
-         ],
-         'X-Content-Type-Options'  => ['nosniff'],
-         'X-Xss-Protection'        => \&check_xp,
-         'X-Frame-Options'         => \&check_fo,
-         'Content-Security-Policy' => \&check_csp,
+        'X-Content-Type-Options'           => 'nosniff',
+        'X-Xss-Protection'                 => \&_check_xp,
+        'X-Frame-Options'                  => \&_check_fo,
+        'Content-Security-Policy'          => \&_check_csp,
+        'Access-Control-Allow-Methods'     => \&_check_methods,
+        'Access-Control-Allow-Origin'      => \&_is_url,
+        'Access-Control-Allow-Headers'     => \&_check_list,
+        'Access-Control-Expose-Headers'    => \&_check_list,
+        'Access-Control-Max-Age'           => \&_is_int,
+        'Access-Control-Allow-Credentials' => 'true',
+        'Strict-Transport-Security'        => \&_check_sts,
+        'Referrer-Policy'                  => [
+            "",
+            "no-referrer",
+            "no-referrer-when-downgrade",
+            "same-origin",
+            "origin",
+            "strict-origin",
+            "origin-when-cross-origin",
+            "strict-origin-when-cross-origin",
+            "unsafe-url"
+        ],
     );
 
     my %options = (
@@ -43,12 +55,14 @@ sub register {
     );
 
     my %headers_default = (
-        'Referrer-Policy'           => "",
-        'Strict-Transport-Security' => "max-age=31536000",
-        'X-Content-Type-Options'    => "nosniff",
-        'X-Xss-Protection'          => '1; mode=block',
-        'X-Frame-Options'           => 'DENY',
-        'Content-Security-Policy'   => "default-src 'self'",
+        'Referrer-Policy'                  => "",
+        'Strict-Transport-Security'        => "max-age=31536000",
+        'X-Content-Type-Options'           => "nosniff",
+        'X-Xss-Protection'                 => '1; mode=block',
+        'X-Frame-Options'                  => 'DENY',
+        'Content-Security-Policy'          => "default-src 'self'",
+        'Access-Control-Allow-Origin'      => '*',
+        'Access-Control-Allow-Credentials' => 'true',
     );
 
     my %security_headers;
@@ -57,31 +71,36 @@ sub register {
     my $header_value;
 
     HEADER:
-    for my $header ( @{ $headers || [] } ) {
-       if ( $valid_headers{$header} ) {
-           if ( $last_header ) {
-               $security_headers{$last_header} = $header_value // $headers_default{$last_header};
-           }
+    for my $header ( @{ $headers } ) {
+        next HEADER if !defined $header;
 
-           undef $header_value;
-           $last_header = $header;
-       }
-       elsif ( $last_header ) {
-           $header_value = $header;
+        if ( $valid_headers{$header} ) {
+            if ( $last_header ) {
+                $security_headers{$last_header} = $header_value // $headers_default{$last_header};
+            }
 
-           if ( $values{$last_header} ) {
-               my $ref = ref $values{$last_header};
+            undef $header_value;
+            $last_header = $header;
+        }
+        elsif ( $last_header ) {
+            $header_value = $header;
 
-               if ( $ref eq 'CODE' ) {
-                   $header_value = $values{$last_header}->($header_value // $headers_default{$last_header}, $options{$last_header});
-               }
-               elsif ( $ref eq 'ARRAY' ) {
-                   ($header_value) = grep{ $header_value eq $_ }@{ $values{$last_header} };
+            my $ref = ref $values{$last_header};
 
-                   undef $last_header if !$header_value;
-               }
-           }
-       }
+            if ( $ref eq 'CODE' ) {
+                $header_value = $values{$last_header}->($header_value, $options{$last_header});
+
+                undef $last_header if !defined $header_value;
+            }
+            elsif ( $ref eq 'ARRAY' ) {
+                ($header_value) = grep{ $header_value eq $_ }@{ $values{$last_header} };
+
+                undef $last_header if !$header_value;
+            }
+            else {
+                undef $last_header if $header_value ne $values{$last_header};
+            }
+        }
     }
 
     $security_headers{$last_header} = $header_value // $headers_default{$last_header} if $last_header;
@@ -89,28 +108,78 @@ sub register {
     $app->hook( before_dispatch => sub {
         my $c = shift;
 
+        HEADER_NAME:
         for my $header_name ( keys %security_headers ) {
+            next HEADER_NAME if !defined $security_headers{$header_name};
             $c->res->headers->header( $header_name => $security_headers{$header_name} );
         }
     });
 }
 
-sub check_csp {
+sub _is_int {
+    my ($value, $options) = @_;
+
+    return if !defined $value;
+    return if ref $value;
+    return if $value !~ m{\A[0-9]+\z};
+    return $value;
+}
+
+sub _check_methods {
+    my ($value, $options) = @_;
+
+    return           if !defined $value;
+    return uc $value if !ref $value;
+    return           if 'ARRAY' ne ref $value;
+
+    my @methods = qw(GET DELETE POST PATCH OPTIONS HEAD CONNECT TRACE PUT);
+    my %allowed = map{ $_ => 1 }@methods;
+
+    my $return = join ', ', map{ defined $_ && $allowed{uc $_} ? uc $_ : () }@{$value};
+
+    return $return || undef;
+}
+
+sub _check_list {
+    my ($value, $options) = @_;
+
+    return        if !defined $value;
+    return $value if !ref $value;
+    return        if 'ARRAY' ne ref $value;
+
+    my $return = join ', ', @{$value};
+
+    return $return || undef;
+}
+
+sub _is_url {
+    my ($value, $options) = @_;
+
+    return     if !defined $value;
+    return     if ref $value;
+    return '*' if $value eq '*';
+
+    return $value if $value =~ m{\Ahttps?://\S+\z}xms;
+    return;
+}
+
+sub _check_csp {
     my ($value, $options) = @_;
 
     my $option = '';
 
-    if ( ref $value ) {
-       for my $key ( reverse sort keys %{ $value || {} } ) {
-           my $tmp_value = $value->{$key};
-           $option .= sprintf "%s-src %s; ", $key, $tmp_value;
-       }
+    return $option if !ref $value;
+    return $option if 'HASH' ne ref $value;
+
+    for my $key ( reverse sort keys %{ $value } ) {
+        my $tmp_value = $value->{$key};
+        $option .= sprintf "%s-src %s; ", $key, $tmp_value;
     }
 
     return $option;
 }
 
-sub check_sts {
+sub _check_sts {
     my ($value, $options) = @_;
 
     my $option = '';
@@ -130,7 +199,7 @@ sub check_sts {
     return 'max-age=' . $value . $option;
 }
 
-sub check_fo {
+sub _check_fo {
     my ($value) = @_;
 
     my %allowed = ('DENY' => 1, 'SAMEORIGIN' => 1);
@@ -138,40 +207,38 @@ sub check_fo {
     return 'DENY' if !defined $value;
     return $value if $allowed{$value};
     return if !ref $value;
+    return if 'HASH' ne ref $value;
 
-    return if ref $value && !$value->{'ALLOW-FROM'};
+    return if !$value->{'ALLOW-FROM'};
     return 'ALLOW-FROM ' . $value->{'ALLOW-FROM'};
 }
 
-sub check_xp {
+sub _check_xp {
     my ($value, $options) = @_;
 
     if ( !ref $value ) {
-        return        if $value ne '1' && $value ne '0';
-        return $value if $value eq '0' || $value eq '1';
+        $value //= '';
+
+        return if $value ne '1' && $value ne '0';
+        return $value;
     }
 
-    if ( ref $value && $value->{value} eq '1' ) {
-       my $option = '';
+    return if 'HASH' ne ref $value;
+    return if !exists $value->{value} || $value->{value} ne '1';
 
-       if ( $value->{mode} && $value->{mode} eq 'block' ) {
-           $option = 'mode=block';
-       }
-       elsif ( $value->{report} ) {
-           $option = 'report=' . $value->{report};
-       }
+    my $option = '';
 
-       $value = '1; ' . $option if $option;
-       return  $value;
+    if ( $value->{mode} && $value->{mode} eq 'block' ) {
+        $option = 'mode=block';
+    }
+    elsif ( $value->{report} ) {
+        $option = 'report=' . $value->{report};
     }
 
-    return;
-}
+    $value  = '1; ';
+    $value .= $option if $option;
 
-sub is_string {
-    my ($value) = @_;
-
-    return defined $value;
+    return $value;
 }
 
 1;
@@ -188,7 +255,7 @@ Mojolicious::Plugin::SecurityHeader - Mojolicious Plugin
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -225,6 +292,18 @@ L<Mojolicious::Plugin::SecurityHeader> is a L<Mojolicious> plugin.
 
 =item * X-Xss-Protection
 
+=item * Access-Control-Allow-Origin
+
+=item * Access-Control-Expose-Headers
+
+=item * Access-Control-Max-Age
+
+=item * Access-Control-Allow-Credentials
+
+=item * Access-Control-Allow-Methods
+
+=item * Access-Control-Allow-Headers
+
 =back
 
 =head1 METHODS
@@ -238,9 +317,15 @@ L<Mojolicious::Plugin> and implements the following new ones.
 
 Register plugin in L<Mojolicious> application.
 
+=head1 CORS SUPPORT
+
+Since version 0.06 this plugin also supports L<CORS|https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS>.
+There's already L<Mojolicious::Plugin::CORS>, but unlike that module, with the C<SecurityHeader> plugin all
+CORS related headers are configurable.
+
 =head1 SEE ALSO
 
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>. L<Mojolicious::Plugin::CORS>
 
 =head1 AUTHOR
 

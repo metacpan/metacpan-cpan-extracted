@@ -15,7 +15,7 @@ get '/' => sub {
 
 my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)
-  ->header_isnt( 'X-Content-Type-Options', 'hallo' )
+  ->header_isnt( 'Content-Security-Policy', 'hallo' )
 ;
 
 done_testing();

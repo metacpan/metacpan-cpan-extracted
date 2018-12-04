@@ -39,4 +39,4 @@ requires:
   URI: '0'
   XML::LibXML: '0'
   vCard: '0'
-version: 0.11
+version: 0.12

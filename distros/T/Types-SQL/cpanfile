@@ -14,13 +14,10 @@ recommends "Type::Tiny::XS" => "0";
 
 on 'test' => sub {
   requires "File::Spec" => "0";
-  requires "JSON::PP" => "2.00";
   requires "Module::Metadata" => "0";
-  requires "Path::Tiny" => "0.004";
   requires "Test::More" => "0";
   requires "Test::Most" => "0";
   requires "Time::Piece" => "1.16";
-  requires "Time::Seconds" => "0";
   requires "Types::Common::Numeric" => "0";
   requires "Types::Common::String" => "0";
   requires "if" => "0";
@@ -48,4 +45,5 @@ on 'develop' => sub {
   requires "Test::Pod::LinkCheck" => "0";
   requires "Test::Portability::Files" => "0";
   requires "Test::TrailingSpace" => "0.0203";
+  requires "Test::Warnings" => "0";
 };

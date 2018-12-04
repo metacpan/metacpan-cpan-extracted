@@ -1,0 +1,9 @@
+
+for f in /etc/profile.d/*.sh
+do
+	if [ -r $f ]
+	then
+		. $f
+	fi
+done
+

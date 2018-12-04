@@ -13,7 +13,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 has output_path         => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                => ( is => 'ro', required => 1 );
@@ -82,13 +82,18 @@ sub create_schema{
 sub _custom_code {
     my ($self, $table) = @_;
 
+    my $name = $table->name;
+    if ( $self->uppercase ) {
+        $name = join '', map{ ucfirst } split /[_-]/, $table->name;
+    }
+
     my $path = File::Spec->catfile(
         $self->output_path || (),
         (split /::/, $self->namespace),
         $self->schema_name,
         $self->result_namespace,
         'Result',
-        $table->name . '.pm'
+        $name . '.pm'
     );
 
     return '' if !-f $path;
@@ -365,6 +370,8 @@ sub _class_template{
 
     my $template = qq~package $package;
 
+# ABSTRACT: Result class for $name
+
 use strict;
 use warnings;
 use base qw(DBIx::Class$inherit_from);
@@ -498,6 +505,8 @@ sub _main_template{
 
     my $template = qq~package $namespace;
 
+# ABSTRACT: Schema class
+
 use strict;
 use warnings;
 
@@ -527,7 +536,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

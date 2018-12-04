@@ -1,5 +1,9 @@
 Revision history for Robots-Validate:
 
+v0.1.4    2018-12-04 10:42:31+00:00 Europe/London
+  [Other]
+  - Use stricter types for robots attribute.
+
 v0.1.3    2018-11-07 00:01:09+00:00 Europe/London
   [Documentation]
   - Fix typo in abstract.

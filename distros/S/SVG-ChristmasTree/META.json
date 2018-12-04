@@ -26,7 +26,6 @@
             "Math::Trig" : "0",
             "Moose" : "0",
             "MooseX::Getopt" : "0",
-            "POSIX" : "0",
             "SVG" : "0",
             "Test::More" : "0",
             "namespace::autoclean" : "0"
@@ -42,7 +41,6 @@
             "Math::Trig" : "0",
             "Moose" : "0",
             "MooseX::Getopt" : "0",
-            "POSIX" : "0",
             "SVG" : "0",
             "namespace::autoclean" : "0",
             "perl" : "5.010000"
@@ -57,6 +55,6 @@
          "web" : "https://github.com/davorg/svg-christmastree"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

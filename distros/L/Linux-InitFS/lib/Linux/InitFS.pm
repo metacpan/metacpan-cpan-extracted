@@ -4,7 +4,7 @@ use strict;
 
 use 5.10.0;
 
-our $VERSION = 0.1;
+our $VERSION = 0.2;
 
 use base 'Exporter';
 our @EXPORT = qw( detect_kernel_config

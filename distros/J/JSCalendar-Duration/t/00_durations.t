@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More qw(no_plan);
+use Test::More;
 use JSCalendar::Duration qw(
   seconds_to_duration
   duration_to_seconds

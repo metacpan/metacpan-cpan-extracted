@@ -1,3 +1,14 @@
+0.2.10 2018-12-03
+
+Restore broken CPAN build
+
+0.2.9 2018-12-03
+
+* fix for https://rt.cpan.org/Public/Bug/Display.html?id=120849 ( add use lib '.' to Makefile.PL so that can instal under new Perls )
+* skip generator/validator step if last check has been failed
+* typo fixed detailes -> details
+* restore ./inc in Git scm to allow `cpanm` install via git url
+
 0.2.8 2016-12-27
 
 * fixed bug empty message in within expressions

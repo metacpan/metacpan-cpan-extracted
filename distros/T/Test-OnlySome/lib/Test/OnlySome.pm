@@ -15,7 +15,7 @@ use constant { true => !!1, false => !!0 };
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 # TODO move $TEST_NUMBER_OS into the options structure.
 
@@ -256,17 +256,37 @@ the time.  Example:
 
 Syntax:
 
-    os ['debug::variable::name'] $hashref_options <statement | block>
+    os ['debug::variable::name'] [$hashref_options] [test_count] <statement | block>
 
-C<$debug::variable::name> will be assigned at compilation time.
-C<$hashref_options> will be accessed at runtime.
+=over
+
+=item *
+
+C<$debug::variable::name> will be assigned at compilation time.  If specified,
+the given package variable will be filled in with the L<Keyword::Declare>
+parse of the os invocation.
+
+=item *
+
+C<$hashref_options> will be accessed at runtime.  If it is not given,
+L</$TEST_ONLYSOME> will be used instead.
+
+=item *
+
+C<test_count> must be a numeric literal, if present.  If it is given,
+it will be used instead of the number of tests specified in
+C<< $hashref_options->{n} >>.
+
+=back
 
 CAUTION: The given statement or block will be run in its own lexical scope,
 not in the caller's scope.
 
 =cut
 
-    keyword os(String? $debug_var, Var? $opts_name, Block|Statement $controlled) {
+    keyword os(String? $debug_var, Var? $opts_name, Num? $N,
+                Block|Statement $controlled)
+    {
 
         # At this point, caller() is in Keyword::Declare.
         #my $target = caller(2);     # Skip past Keyword::Declare's code.
@@ -275,7 +295,8 @@ not in the caller's scope.
         if(defined $debug_var) {
             no strict 'refs';
             $debug_var =~ s/^['"]|['"]$//g;   # $debug_var comes with quotes
-            ${$debug_var} = {opts_var_name => $opts_name, code => $controlled};
+            ${$debug_var} = {opts_var_name => $opts_name, code => $controlled,
+                n => $N};
             #print STDERR "# Stashed $controlled into `$debug_var`\n";
             #print STDERR Carp::ret_backtrace(); #join "\n", caller(0);
         }
@@ -289,7 +310,7 @@ not in the caller's scope.
         croak "Need options as a scalar variable - got $hrOptsName"
             unless defined $hrOptsName && substr($hrOptsName, 0, 1) eq '$';
 
-        return _gen($hrOptsName, $controlled);
+        return _gen($hrOptsName, $controlled, $N);
     } # os() }}}2
 
 } # import()
@@ -322,6 +343,7 @@ only-some test.
 sub _gen {
     my $optsVarName = shift or croak 'Need an options-var name';
     my $code = shift or croak 'Need code';
+    my $N = shift;
 
     # Syntactic parts, so I don't have to disambiguate interpolation in the
     # qq{} below from hash access in the generated code.  Instead of
@@ -330,9 +352,11 @@ sub _gen {
     my $L = '{';
     my $R = '}';
 
+    $N = "$optsVarName$W$L n $R // 1" unless $N;
+
     my $replacement = qq{
         {
-            my \$ntests = $optsVarName$W$L n $R // 1;   # TODO move this to a separate parm of os()
+            my \$ntests = $N;
             my \$first_test_num = \$TEST_NUMBER_OS;
             \$TEST_NUMBER_OS += \$ntests;
             SKIP: {
@@ -400,8 +424,8 @@ sub _nexttestnum {
 
 =head2 _escapekit
 
-Find the caller using a Test::Kit package that uses us, so we can import
-the keyword the right place.
+Find the caller that is using a Test::Kit package to use this module.  This
+helps us import the keyword into the right module.
 
 =cut
 
@@ -462,7 +486,7 @@ sub _printtrace {
 Exported into the caller's package.  A sequential numbering of tests that
 have been run under L</os>.
 
-=head2 C<$TEST_ONLYSOME> (Options hashref)
+=head2 C<$TEST_ONLYSOME>
 
 Exported into the caller's package.  A hashref of options, of the same format
 as an explicit-config hashref.  Keys are:

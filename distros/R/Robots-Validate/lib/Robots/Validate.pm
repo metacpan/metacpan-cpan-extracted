@@ -6,6 +6,7 @@ use v5.10;
 
 use Moo 1;
 
+use MooX::Const;
 use List::Util 1.33 qw/ first none /;
 use Net::DNS::Resolver;
 use Types::Standard -types;
@@ -15,7 +16,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.4';
 
 
 has resolver => (
@@ -30,7 +31,7 @@ sub _build_resolver {
 
 
 has robots => (
-    is  => 'lazy',
+    is  => 'const',
     isa => ArrayRef [
         Dict [
             name   => Str,
@@ -38,6 +39,7 @@ has robots => (
             domain => RegexpRef,
         ]
     ],
+    lazy    => 1,
     builder => 1,
 );
 
@@ -197,7 +199,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.4
 
 =head1 SYNOPSIS
 

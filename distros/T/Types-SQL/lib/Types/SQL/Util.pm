@@ -5,10 +5,10 @@ use warnings;
 
 use Exporter qw/ import /;
 
-use PerlX::Maybe;
+use PerlX::Maybe qw/ maybe /;
 use Safe::Isa 1.000008 qw/ $_isa $_call_if_can /;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.4.0';
 
 # RECOMMEND PREREQ: PerlX::Maybe::XS
 
@@ -226,7 +226,7 @@ Types::SQL::Util - extract DBIx::Class column_info from types
 
 =head1 VERSION
 
-version v0.3.1
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -302,15 +302,21 @@ This is treated as an C<unsigned integer> of size 1.
 
 =head3 C<Str>
 
+This is treated as a C<text> value without a size.
+
 =head3 C<NonEmptyStr>
 
 =head3 C<LowerCaseStr>
 
 =head3 C<UpperCaseStr>
 
-These are treated as a C<text> value without a size.
+These are treated the same as L</Str>.  In the future, if
+L<DBIx::Class> supports database-related constraints, this will be
+added to the metadata.
 
 =head3 C<SimpleStr>
+
+This is treated as a C<text> value with a size of 255.
 
 =head3 C<NonEmptySimpleStr>
 
@@ -318,7 +324,9 @@ These are treated as a C<text> value without a size.
 
 =head3 C<UpperCaseSimpleStr>
 
-These is trated as a C<text> value with a size of 255.
+These are treated the same as L</SimpleStr>. In the future, if
+L<DBIx::Class> supports database-related constraints, this will be
+added to the metadata.
 
 =head1 CUSTOM TYPES
 

@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.19';
+our $VERSION = '3.20';
 
 use vars qw(@ALL_TESTS);
 
@@ -928,7 +928,7 @@ sub _init_core {
         $browser_tests->{$browser} = 1;
     }
 
-    $self->{browser} = $browser;
+    $self->{browser}        = $browser;
     $self->{browser_string} = $browser_string || $BROWSER_NAMES{$browser}
         if defined($browser);
 
@@ -1376,7 +1376,7 @@ sub _init_os {
     my $ua            = lc $self->{user_agent};
 
     my $os_tests = $self->{os_tests} = {};
-    my $os = undef;
+    my $os       = undef;
     my $os_string = undef;
 
     # Windows
@@ -1514,7 +1514,7 @@ sub _init_os {
 
         # windows, set through some path above
         $os_tests->{windows} = 1;
-        $os_tests->{win32} = 1 if index( $ua, 'win32' ) != -1;
+        $os_tests->{win32}   = 1 if index( $ua, 'win32' ) != -1;
     }
     elsif ( index( $ua, 'macintosh' ) != -1 || index( $ua, 'mac_' ) != -1 ) {
 
@@ -2569,6 +2569,7 @@ sub public_version {
     my ($self) = @_;
     my ( $major, $minor ) = $self->_public;
 
+    $minor ||= q{};
     return "$major$minor";
 }
 
@@ -2596,6 +2597,7 @@ sub public_beta {
 sub browser_version {
     my ($self) = @_;
     my ( $major, $minor ) = $self->_public;
+    $minor ||= q{};
 
     return "$major$minor";
 }
@@ -2958,7 +2960,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.19
+version 3.20
 
 =head1 SYNOPSIS
 
@@ -3302,7 +3304,7 @@ mac68k macppc macosx ios
 
 =head3 pspgameos()
 
-It may not be possibile to detect Win98 in Netscape 4.x and earlier. On Opera
+It may not be possible to detect Win98 in Netscape 4.x and earlier. On Opera
 3.0, the userAgent string includes "Windows 95/NT4" on all Win32, so you can't
 distinguish between Win95 and WinNT.
 

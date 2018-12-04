@@ -28,7 +28,7 @@ See L<Test::OnlySome> for full documentation.
 use App::Prove;
 use Getopt::Long 2.5 qw(:config gnu_getopt pass_through);
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000008';
 
 # Accept --onlysome <filename>
 my %args;

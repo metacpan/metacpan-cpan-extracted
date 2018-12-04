@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::GetSentry;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.1.6';
+our $VERSION = '1.1.7';
 
 use Data::Dump 'dump';
 use Devel::StackTrace::Extract;
@@ -19,10 +19,7 @@ has 'raven' => sub {
     my $self = shift;
 
     foreach my $processor (@{ $self->processors }) {
-        eval {
-            require $processor;
-            $processor->import;
-        };
+        eval "require $processor; $processor->import;";
 
         warn $@ if $@;
     }

@@ -4,7 +4,7 @@ Types::SQL - a library of SQL types
 
 # VERSION
 
-version v0.3.1
+version v0.4.0
 
 # SYNOPSIS
 
@@ -64,6 +64,14 @@ my $type = Integer[ $precision ];
 ```
 
 Returns a `integer` data type, with an optional precision parameter.
+
+## `SmallInt`
+
+This is shorthand for `Integer[5]`.
+
+## `BigInt`
+
+This is shorthand for `Integer[19]`.
 
 ## `Serial`
 

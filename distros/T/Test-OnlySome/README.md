@@ -112,10 +112,16 @@ the time.  Example:
 
 Syntax:
 
-    os ['debug::variable::name'] $hashref_options <statement | block>
+    os ['debug::variable::name'] [$hashref_options] [test_count] <statement | block>
 
-`$debug::variable::name` will be assigned at compilation time.
-`$hashref_options` will be accessed at runtime.
+- `$debug::variable::name` will be assigned at compilation time.  If specified,
+the given package variable will be filled in with the [Keyword::Declare](https://metacpan.org/pod/Keyword::Declare)
+parse of the os invocation.
+- `$hashref_options` will be accessed at runtime.  If it is not given,
+["$TEST\_ONLYSOME"](#test_onlysome) will be used instead.
+- `test_count` must be a numeric literal, if present.  If it is given,
+it will be used instead of the number of tests specified in
+`$hashref_options->{n}`.
 
 CAUTION: The given statement or block will be run in its own lexical scope,
 not in the caller's scope.

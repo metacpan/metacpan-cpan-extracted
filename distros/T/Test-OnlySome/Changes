@@ -1,5 +1,9 @@
 Revision history for Test-OnlySome
 
+0.0.8   2018-12-04
+
+    - os() can now take the number of tests as a parameter (GH-8)
+
 0.0.7   2018-12-01
 
     - Added osprove(1) binary to run prove(1) with the Test::OnlyP plugin

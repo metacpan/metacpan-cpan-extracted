@@ -118,7 +118,7 @@ sub ip {
 	# prefer the service with the longest prefix length
 	my @urls = @{$matches->{(sort { Net::IP->new($b)->prefixlen <=> Net::IP->new($a)->prefixlen } keys(%{$matches}))[0]}};
 
-	return $package->assemble_url($package->get_best_url(@urls), 'ip', $ip->prefix);
+	return $package->assemble_url($package->get_best_url(@urls), 'ip', split(/\//, $ip->prefix));
 }
 
 #
@@ -278,6 +278,8 @@ sub load_registry {
 	my ($package, $url) = @_;
 
 	if (!defined($REGISTRY->{$url})) {
+		$package =~ s/:+/-/g;
+
 		my $file = sprintf('%s/%s-%s', File::Spec->tmpdir, $package, basename($url));
 
 		my ($mirror, $stat);

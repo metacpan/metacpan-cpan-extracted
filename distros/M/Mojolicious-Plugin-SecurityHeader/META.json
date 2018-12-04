@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Mojolicious-Plugin-SecurityHeader",
    "prereqs" : {
@@ -29,7 +29,7 @@
    "provides" : {
       "Mojolicious::Plugin::SecurityHeader" : {
          "file" : "lib/Mojolicious/Plugin/SecurityHeader.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -44,11 +44,11 @@
          "web" : "http://github.com/reneeb/Mojolicious-Plugin-SecurityHeader"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

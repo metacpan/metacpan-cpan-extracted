@@ -167,6 +167,8 @@ enum {
   SPVM_OP_C_ID_RO,
   SPVM_OP_C_ID_WO,
   SPVM_OP_C_ID_BEGIN,
+  SPVM_OP_C_ID_REQUIRE,
+  SPVM_OP_C_ID_IF_REQUIRE,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
@@ -255,6 +257,8 @@ struct SPVM_op {
   int8_t no_need_check;
 };
 
+SPVM_OP* SPVM_OP_build_if_require_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if_require, SPVM_OP* op_use, SPVM_OP* op_block);
+
 SPVM_OP* SPVM_OP_build_single_parenthes_term(SPVM_COMPILER* compiler, SPVM_OP* op_term);
 
 SPVM_OP* SPVM_OP_build_string_length(SPVM_COMPILER* compiler, SPVM_OP* op_string_length, SPVM_OP* op_term);
@@ -335,7 +339,7 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* package_var, SPVM_O
 SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages);
-SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package, SPVM_OP* sub_names);
+SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package, SPVM_OP* sub_names, int32_t is_require);
 SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, SPVM_OP* op_subname, SPVM_OP* op_terms);
 SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block);
@@ -354,7 +358,7 @@ SPVM_OP* SPVM_OP_new_op_constant_int(SPVM_COMPILER* compiler, int32_t value, con
 SPVM_OP* SPVM_OP_new_op_constant_long(SPVM_COMPILER* compiler, int64_t value, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_constant_float(SPVM_COMPILER* compiler, float value, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_constant_double(SPVM_COMPILER* compiler, double value, const char* file, int32_t line);
-SPVM_OP* SPVM_OP_new_op_constant_string(SPVM_COMPILER* compiler, char* string, int32_t length, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_constant_string(SPVM_COMPILER* compiler, const char* string, int32_t length, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_constant_byte_array_string(SPVM_COMPILER* compiler, char* string, int32_t length, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_var_from_op_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_list(SPVM_COMPILER* compiler, const char* file, int32_t line);

@@ -29,6 +29,7 @@ t/more-useragents.json
 t/perlcriticrc
 t/useragents.json
 tidyall.ini
+xt/author/pod-syntax.t
 xt/author/synopsis.t
 xt/author/tidyall.t
 xt/release/cpan-changes.t

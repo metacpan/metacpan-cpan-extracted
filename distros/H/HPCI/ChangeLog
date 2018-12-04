@@ -1,3 +1,6 @@
+0.74 - Moose doesn't die for odd number of args to new, just carps and
+       continues.  Have to catch it myself to augment the error message.
+
 0.73 - improved error message for misparsed files attribute lists (odd
        number of arguments for HPCI::File now lists those arguments so
 	   that you can track down which config file elements needs to be

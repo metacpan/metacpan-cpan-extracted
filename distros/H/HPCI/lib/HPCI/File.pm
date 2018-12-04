@@ -411,20 +411,20 @@ sub rename {
 }
 
 around BUILDARGS => sub {
-    my $orig  = shift;
-    my $class = shift;
-    my @args  = @_;
+    my $orig  =  shift;
+    my $class =  shift;
+    my @args  =  @_;
+    my $argcnt = scalar @args;
 
-    try {
+    if ($argcnt == 1 && ref $args[0] eq 'HASH' or $argcnt %2 == 0) {
         return $class->$orig(@args);
     }
-    catch {
-        my $msg = $_;
-        $msg .= "\nArgs are:\n";
+    else {
+        my $msg = "HPCI::File args must be a hasref or a key/value list\nArgs are:\n";
         my $cnt = 0;
-        my @pref = ( "  Key: ", "       Val: " );
+        my @pref = ( "  Key:   ", "    Val:   " );
 
-        for my $arg (@args) {
+        for my $arg (@args, '=== END OF ARG LIST ===') {
             $msg .= $pref[$cnt] . $arg . "\n";
             $cnt = 1 - $cnt;
         }

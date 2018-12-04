@@ -2361,6 +2361,10 @@ print "localhost cleanup() LINE=$line<==\n"
          unlink $logname;
       }
    }
+   if ($param_two eq 'ALRM') {
+      my $pkill=$Net::FullAuto::FA_Core::gbp->('pkill');
+      `$pkill/pkill fullauto.pl`;
+   }
    return 1 if $param_one eq '__return__';
    exit 1 if $param_one;
    exit 0;
@@ -18364,8 +18368,8 @@ sub ftm_login
                $hostlabel}{'IdentityFile'} &&
                $Net::FullAuto::FA_Core::Hosts{
                $hostlabel}{'IdentityFile'})) {
-            $determine_password->('',0,'localhost');
-            #$determine_password->('',0,$hostlabel,$password);
+            #$determine_password->('',0,'localhost');
+            $determine_password->('',0,$hostlabel,$password);
             unless ($password) {
                if ($su_id) {
                   $ftm_passwd=&Net::FullAuto::FA_Core::getpasswd($hostlabel,

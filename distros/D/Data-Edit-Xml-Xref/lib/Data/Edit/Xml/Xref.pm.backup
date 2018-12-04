@@ -4,11 +4,9 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
-# Handle url encoded file names such as blank to %20?
-# Handle relative files in hrefs, conrefs etc.
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20181101;
+our $VERSION = 20181204;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -20,87 +18,115 @@ use utf8;
 
 #D1 Cross reference                                                             # Check the cross references in a set of Dita files and report the results.
 
-sub xref(%)                                                                     # Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible atributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
+sub xref(%)                                                                     # Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
  {my (%attributes) = @_;                                                        # Attributes
-  my $xref = genHash(__PACKAGE__,                                               # Attributes used by cross referencer.
-    badImageRefs=>[],                                                           # [file, href]   Missing images.
-    badXml1=>[],                                                                # Files with a bad xml encoding header on the first line.
-    badXml2=>[],                                                                # Files with a bad xml doc type on the second line.
-    badXRefs=>[],                                                               # [file, href]   Invalid href attributes on xref tags.
-    badTopicRefs=>[],                                                           # [file, href]   Invalid href attributes topicref tags.
-    badConRefs=>[],                                                             # [file, href]   Invalid conref attributes.
-    conRefs=>{},                                                                # {file}{id}++   Conref definitions.
-    duplicateIds=>[],                                                           # [file, id]     Duplicate id definitions within a file.
-    ids=>{},                                                                    # {file}{id}++   Id definitions across all files.
-    images=>{},                                                                 # {file}{href}++ Images references.
-    imagesFound=>{},                                                            # Consolidated images found
-    imagesMissing=>{},                                                          # Consolidated images missing
+  my $xref = genHash(__PACKAGE__,                                               # Attributes used by the Xref cross referencer.
+    attributeCount=>{},                                                         # {file}{attribute} == count of the different xml attributes found in the xml files.
+    badBookMaps=>{},                                                            # Bad book maps
+    badConRefs=>{},                                                             # [file, href]   Invalid conref attributes.
+    badImageRefs=>{},                                                           # Consolidated images missing.
+    badTopicRefs=>{},                                                           # [file, href]   Invalid href attributes found on topicref tags.
+    badXml1=>{},                                                                # [Files] with a bad xml encoding header on the first line.
+    badXml2=>{},                                                                # [Files] with a bad xml doc type on the second line.
+    badXRefs=>{},                                                               # [file, href]   Invalid href attributes found on xref tags.
+    conRefs=>{},                                                                # {file}{href}   Count of conref definitions in each file.
+    docType=>{},                                                                # {file} == docType:  the docType for each xml file.
+    duplicateIds=>{},                                                           # [file, id]     Duplicate id definitions within each file.
+    duplicateTopicIds=>{},                                                      # Duplicate topic ids
+    duplicateTopicIds=>{},                                                      # [topicId, [files]] Files with duplicate topic ids - the id on the outermost tag.
+    fixBadRefs=>undef,                                                          # Try to fix bad references in L<these files|/fixedFiles> where possible.
+    fixedFiles=>{},                                                             # Files that have a missing conref or href which can be ameliorated by renaming the failing attribute to  "xtrf".
+    goodBookMaps=>{},                                                           # Good book maps
+    goodConRefs=>{},                                                            # Good con refs
+    goodImageRefs=>{},                                                          # Consolidated images found.
+    goodTopicRefs=>{},                                                          # Good topic refs
+    goodXRefs=>{},                                                              # Good xrefs
+    ids=>{},                                                                    # {file}{id}     Id definitions across all files.
+    images=>{},                                                                 # {file}{href}   Count of image references in each file.
     inputFiles=>[],                                                             # Input files from L<inputFolder|/inputFolder>.
     inputFolder=>undef,                                                         # A folder containing the dita and ditamap files to be cross referenced.
-    parseFailed=>[],                                                            # [file] files that failed to parse
-    topicRefs=>{},                                                              # {file}{href}++ Topic references.
-    xRefs=>{},                                                                  # {file}{href}++ Xrefs references.
-    results=>[],                                                                # Results table
+    maximumNumberOfProcesses=>4,                                                # Maximum number of processes to run in parallel at any one time.
+    missingImageFiles=>{},                                                      # [file, href] == Missing images in each file.
+    missingTopicIds=>{},                                                        # Missing topic ids
+    notReferenced=>{},                                                          # files in input area that are not referenced by a conref, image, topicref or xref tag and are not a bookmap.
+    parseFailed=>{},                                                            # [file] files that failed to parse
     reports=>q(reports),                                                        # Reports folder: the cross referencer will write reports to files in this folder.
-    statusLine=>undef,                                                          # Status line summarizing the cross reference.
+    results=>[],                                                                # Summary of results table
+    sourceFile=>undef,                                                          # The source file from which this structure was generated
+    statusLine=>undef,                                                          # Status line summarizing the cross reference. The counts listed in the status line are the counts of the files that have the described problems not a count of all the instances of all the problems in all the files.
     summary=>1,                                                                 # Print the summary line.
-    topicIds=>{},                                                               # {file} = topic id
-    duplicateTopicIds=>[],                                                      # [topicId, [files]] Files with duplicate topic ids
-    maximumNumberOfProcesses=>4,                                                # Maximum number of processes to run
+    tagCount=>{},                                                               # {file}{tags} == count of the different tag names found in the xml files.
+    topicIds=>{},                                                               # {file} = topic id - the id on the outermost tag.
+    topicRefs=>{},                                                              # {file}{href}++ References from bookmaps to topics via appendix, chapter, topicref.
+    validationErrors=>{},                                                       # True means that Lint detected errors in the xml contained in the file
+    xRefs=>{},                                                                  # {file}{href}++ Xrefs references.
+#    from=>{},                                                                   # Xrefs contributing to this xref by file
    );
   loadHash($xref, @_);                                                          # Load attributes complaining about any invalid ones
+
+  $xref->inputFolder or confess "Please supply a value for: inputFolder";
 
   $xref->inputFolder = absFromAbsPlusRel(currentDirectory, $xref->inputFolder)  # Make input folder absolute
     if $xref->inputFolder !~ m(\A/);
 
   my @phases = qw(loadInputFiles analyze reportBadXml1 reportBadXml2
-                  reportDuplicateIds reportBadXrefs reportBadTopicRefs
-                  reportBadConrefs reportImages reportParseFailed);
+                  reportDuplicateIds reportDuplicateTopicIds
+                  reportBadXrefs reportBadTopicRefs
+                  reportBadConrefs reportImages reportParseFailed
+                  reportAttributeCount reportTagCount reportDocTypeCount
+                  reportFileExtensionCount reportFileTypes
+                  reportValidationErrors reportBookMaps
+                  reportNotReferenced
+                 );
   for my $phase(@phases)                                                        # Perform analysis phases
    {$xref->$phase;
    }
 
+  if ($xref->fixBadRefs and my @files = sort keys %{$xref->fixedFiles})         # Fix files if requested
+   {for my $file(@files)
+     {fixOneFile($xref, $file);
+     }
+   }
+
   if (1)                                                                        # Summarize
-   {my $i = @{$xref->badImageRefs};
-    my $t = @{$xref->badTopicRefs};
-    my $x = @{$xref->badXRefs};
-    my $c = @{$xref->badConRefs};
-    my $d = @{$xref->duplicateIds};
-    my $b = @{$xref->badXml1};
-    my $B = @{$xref->badXml2};
-    my $I = keys %{$xref->imagesFound};
-    my $M = keys %{$xref->imagesMissing};
-    my $p = @{$xref->parseFailed};
-    my @o;
-    push @o, [$p, q(files failed to parse)] if $p >  1;
-    push @o, [$p, q(file failed to parse)]  if $p == 1;
-    push @o, [$x, q(bad xrefs)]             if $x >  1;
-    push @o, [$x, q(bad xref)]              if $x == 1;
-    push @o, [$c, q(bad conrefs)]           if $c >  1;
-    push @o, [$c, q(bad conref)]            if $c == 1;
-    push @o, [$t, q(bad topicrefs)]         if $t >  1;
-    push @o, [$t, q(bad topicref)]          if $t == 1;
-    push @o, [$i, q(missing image refs)]    if $i >  1;
-    push @o, [$i, q(missing image ref)]     if $i == 1;
-#   push @o, [$I, q(image files found)]     if $I >  1;
-#   push @o, [$I, q(image file found)]      if $I == 1;
-    push @o, [$M, q(missing image files)]   if $M >  1;
-    push @o, [$M, q(missing image file)]    if $M == 1;
-    push @o, [$d, q(duplicate ids)]         if $d >  1;
-    push @o, [$d, q(duplicate id)]          if $d == 1;
-    push @o, [$b, q(bad first lines)]       if $b >  1;
-    push @o, [$b, q(bad first line)]        if $b == 1;
-    push @o, [$B, q(bad second lines)]      if $B >  1;
-    push @o, [$B, q(bad second line)]       if $B == 1;
+   {my @o;
+    my $save = sub
+     {my ($field, $plural, $single) = @_;
+      my $n = keys %{$xref->{$field}};
+      push @o, [$n,            $plural]                   if $n >  1;
+      push @o, [$n, $single // ($plural =~ s(s\Z) ()gsr)] if $n == 1;
+     };
+
+    $save->("missingImageFiles", q(missing image files));
+    $save->("badTopicRefs",      q(bad topicrefs));
+    $save->("badXRefs",          q(bad xrefs));
+    $save->("badConRefs",        q(bad conrefs));
+    $save->("duplicateIds",      q(duplicate ids));
+    $save->("duplicateTopicIds", q(duplicate topic ids));
+    $save->("missingTopicIds",   q(missing topic ids));
+    $save->("badXml1",           q(bad first lines));
+    $save->("badXml2",           q(bad second lines));
+    $save->("badBookMaps",       q(bad book maps));
+    $save->("badImageRefs",      q(missing image references));
+    $save->("validationErrors",  q(validation errors));
+    $save->("parseFailed",       q(files failed to parse), q(file failed to parse));
+    $save->("notReferenced",     q(files not referenced), q(file not referenced));
+
     $xref->statusLine = @o ? join " ",
-      "Xref Errors:", join ", ", map {join " ", @$_} @o : q();
+      "Xref:", join ", ",
+               map {join " ", @$_}
+               sort
+                {return $$a[1] cmp $$b[1] if $$b[0] == $$a[0];
+                 $$b[0] <=> $$a[0]
+                }
+               @o : q();
     $xref->results    = \@o;
     if (@o and $xref->summary)
      {say STDERR $xref->statusLine;
      }
    }
 
-  $xref
+  $xref                                                                         # Return Xref results
  }
 
 sub loadInputFiles($)                                                           #P Load the names of the files to be processed
@@ -112,11 +138,12 @@ sub loadInputFiles($)                                                           
 sub analyzeOneFile($)                                                           #P Analyze one input file
  {my ($iFile) = @_;                                                             # File to analyze
   my $xref = bless {};                                                          # Cross referencer for this file
+     $xref->sourceFile = $iFile;                                                # File analyzed
 
   my $x = eval {Data::Edit::Xml::new($iFile)};                                  # Parse xml
 
   if ($@)
-   {push @{$xref->parseFailed}, [$iFile];
+   {$xref->parseFailed->{$iFile}++;
     return $xref;
    }
 
@@ -127,14 +154,15 @@ sub analyzeOneFile($)                                                           
      }
     if ($o->at_xref)                                                            # Xrefs but not to the web
      {if (my $h = $o->href)
-       {if ($h !~ m(\A(https?://|mailto:))i)
-         {$xref->xRefs->{$iFile}{$h}++;
+#      {if ($h !~ m(\A(https?://|mailto:))i)
+       {if ($o->attrX_format =~ m(\Adita)i)                                     # Check xref has format=dita
+         {$xref->xRefs->{$iFile}{$h}{$o->stringText}++;
          }
        }
      }
-    elsif ($o->at_topicref)                                                     # TopicRefs
+    elsif ($o->at(qr(\A(appendix|chapter|topicref)\Z)))                         # References from bookmaps
      {if (my $h = $o->href)
-       {$xref->topicRefs->{$iFile}{$h}++;
+       {$xref->topicRefs->{$iFile}{$h}{$o->attr_navtitle//$o->stringText}++;
        }
      }
     elsif ($o->at(qw(image)))                                                   # Images
@@ -148,16 +176,53 @@ sub analyzeOneFile($)                                                           
    });
 
   $xref->topicIds->{$iFile} = $x->id;                                           # Topic Id
+  $xref->docType ->{$iFile} = $x->tag;                                          # Document type
+  $xref->attributeCount->{$iFile} = $x->countAttrNames;                         # Attribute names
+  $xref->tagCount      ->{$iFile} = $x->countTagNames;                          # Tag names
 
-  if (1)                                                                        # Check xml headers
-   {my @h = split /\n/, readFile($iFile);
+  if (1)                                                                        # Check xml headers and lint errors
+   {my @h = split /\n/, my $s = readFile($iFile);
     if (!$h[0] or $h[0] !~ m(\A<\?xml version=\"1.0\" encoding=\"UTF-8\"\?>\Z))
-     {push @{$xref->badXml1}, $iFile;
+     {$xref->badXml1->{$iFile}++;
      }
     my $tag = $x->tag;
     if (!$h[1] or $h[1] !~ m(\A<!DOCTYPE $tag PUBLIC "-//))
-     {push @{$xref->badXml2}, $iFile;
+     {$xref->badXml2->{$iFile}++;
      }
+
+    $xref->validationErrors->{$iFile}++ if $s =~ m(<!--compressedErrors:)s;     # File has validation errors
+   }
+
+  $xref
+ }
+
+sub fixOneFile($$)                                                              #P Analyze one input file
+ {my ($xref, $file) = @_;                                                       # Xref results, file to fix
+
+  my $x = Data::Edit::Xml::new($file);                                          # Parse xml - should parse OK else otherwise how did we find out that this file needed to be fixed
+
+  $x->by(sub                                                                    # Each node
+   {my ($o) = @_;
+    if ($o->at_xref or $o->at_topicref or $o->at_image)                         # Hrefs that need to be fixed
+     {if (my $h = $o->href)
+       {if ($xref->fixedFiles->{$file}{$h})
+         {$o->renameAttr_href_xtrf;
+         }
+       }
+     }
+    if (my $conref = $o->attr_conref)                                           # Conref
+     {if ($xref->fixedFiles->{$file}{$conref})
+       {$o->renameAttr_href_xtrf;
+       }
+     }
+   });
+
+  if (1)                                                                        # Replace xml in source file
+   {my $S = my $s = readFile($file);
+    my $T = -p $x;
+    my $t = -t $x;
+    $s =~ s(<\s*$t.*<\s*\/\s*$t\s*>) ($T)is;
+    owf($file, $s) unless $s eq $S;
    }
 
   $xref
@@ -165,22 +230,31 @@ sub analyzeOneFile($)                                                           
 
 sub analyze($)                                                                  #P Analyze the input files
  {my ($xref) = @_;                                                              # Cross referencer
+  my @in = @{$xref->inputFiles};                                                # Input files
+  my @square = squareArray(@in);                                                # Divide the task
 
   my $process = temporaryFolder;
   my $ps = newProcessStarter($xref->maximumNumberOfProcesses, $process);        # Process starter
+     $ps->processingTitle   = q(Xref);
+     $ps->totalToBeStarted  = scalar @square;
+     $ps->processingLogFile = fpe($xref->reports, qw(log xref txt));
 
-  my @in = @{$xref->inputFiles};                                                # Input files
-  for my $iFile(@in)                                                            # Each input file
-   {$ps->start(sub{analyzeOneFile($iFile)});                                    # Analyze one input file
+  for my $row(@square)                                                          # Each row of input files file
+   {$ps->start(sub
+     {my @r;                                                                    # Results
+      for my $col(@$row)                                                        # Each column in the row
+       {push @r, analyzeOneFile($col);                                          # Analyze one input file
+       }
+      [@r]                                                                      # Return results as a reference
+     });
    }
 
-  for my $x($ps->finish)                                                        # Merge results from each file analyzed
-   {for my $field(qw(parseFailed badXml1 badXml2))                              # Merge arrays
-     {next unless my $xf = $x->{$field};
-      push @{$xref->{$field}}, @$xf;
-     }
+  for my $x(deSquareArray($ps->finish))                                         # Merge results from each file analyzed
+   {#$xref->from->{$x->sourceFile} = $x;                                         # Record contribution
 
-    for my $field(qw(ids xRefs topicRefs images conRefs topicIds))              # Merge hashes
+    for my $field(qw(parseFailed badXml1 badXml2
+                     ids xRefs topicRefs images conRefs topicIds
+                     validationErrors docType attributeCount tagCount))         # Merge hashes by file names which are unique
      {next unless my $xf = $x->{$field};
       for my $f(sort keys %$xf)
        {$xref->{$field}{$f} = $xf->{$f};
@@ -204,27 +278,82 @@ sub reportDuplicateIds($)                                                       
      }
    }
 
-  $xref->duplicateIds = \@dups;                                                 # All duplicates
+  $xref->duplicateIds = {map {$$_[2]=>$_} @dups};                               # All duplicates
 
   formatTable(\@dups, [qw(Id Count File)],
-    head=>qq(Data::Edit::Xml::Xref found NNNN duplicate id definitions on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(duplicateIdDefinitions txt))));
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN intra file duplicate id definitions on DDDD
+
+These ids are duplicated within a file, possibly becuase they were copied from
+another part of the same file.  This report does not show ids that are the same
+in different files as this is not a problem using Dita's three part addressing
+scheme which requires only that the topic id be unique across all files.
+
+Duplicate topic ids are reported in ../bad/topicIds.txt.
+
+END
+    file=>(my $f = fpe($xref->reports, qw(bad idDefinitionsDuplicated txt))));
+ }
+
+sub reportDuplicateTopicIds($)                                                  #P Report duplicate topic ids
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %dups;                                                                     # Duplicate topic ids definitions
+  my @dups;                                                                     # Duplicate topic ids definitions report
+  my @miss;                                                                     # Missing topic id definitions report
+  for my $file(sort keys %{$xref->topicIds})                                    # Each input file
+   {if (my $i = $xref->topicIds->{$file})                                       # Topic Id
+     {if (my $d = $dups{$i})                                                    # Duplicate topic id
+       {push @dups, [$i, $file, $d];                                            # Save details of duplicate definition
+       }
+      else
+       {$dups{$i} = $file;                                                      # Save topic id
+       }
+     }
+    else
+     {push @miss, [$file];                                                      # Missing topic id
+     }
+   }
+
+  $xref->duplicateTopicIds = {map {$$_[0]=>$_} @dups};                          # All duplicates
+  $xref->missingTopicIds   = {map {$$_[0]=>$_} @miss};                          # All missing
+
+  formatTable(\@dups, [qw(TopicId File1 File2)],
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN duplicate topic id definitions on DDDD
+
+File1, File2 are two files that both define TopicId
+
+END
+    file=>(fpe($xref->reports, qw(bad topicIdDefinitionsDuplicated txt))));
+
+  formatTable(\@miss, [qw(File)],
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN topics that have no topic id on DDDD
+
+END
+    file=>(fpe($xref->reports, qw(bad topicIdDefinitionsMissing txt))));
  }
 
 sub reportBadRefs($$)                                                           #P Report bad references found in xrefs or conrefs as they have the same structure
  {my ($xref, $type) = @_;                                                       # Cross referencer, type of reference to be processed
 
-  my @bad; my @good;                                                            # Bad xrefs
+  my @bad; my @good;                                                            # Bad xrefs.
   for   my $file(sort keys %{$xref->{${type}.q(Refs)}})                         # Each input file which will be absolute
    {for my $href(sort keys %{$xref->{${type}.q(Refs)}->{$file}})                # Each href in the file which will be relative
-     {if ($href =~ m(#))                                                        # Href with #
+     {my @text;
+      if (               ref($xref->{${type}.q(Refs)}->{$file}{$href}))         # Text associated with reference
+       {@text =  sort keys %{$xref->{${type}.q(Refs)}->{$file}{$href}};
+        s(\s+) ( )gs for @text;                                                 # Normalize white space
+       }
+      if ($href =~ m(#))                                                        # Href with #
        {my ($hFile, $hId) = split m(#), $href;                                  # File, topicId components
         my ($topic, $id)  = split m(/), $hId;                                   # Topic, id
                     $id //= '';
         my $fFile = $hFile ? absFromAbsPlusRel($file, $hFile) : $file;          # Target file absolute
         if ($hFile and !(-e $fFile or -e wwwDecode($fFile)))                    # Check target file
          {push @bad, [qq(No such file), $href,
-           $hFile, $id, $topic, q(), $fFile, $file];
+           $hFile, $id, $topic, q(), $file, $fFile, @text];
          }
 
         elsif (my $t = $xref->topicIds->{$fFile})                               # Check topic id
@@ -235,12 +364,12 @@ sub reportBadRefs($$)                                                           
                }
               else
                {push @bad, [qq(Duplicate id in topic), $href,
-                 $hFile, $topic, $t, $id, $file, $fFile];
+                 $hFile, $topic, $t, $id, $file, $fFile, @text];
                }
              }
             elsif ($id)
              {push @bad, [qq(No such id in topic), $href,
-                $hFile, $topic, $t, $id, $file, $t, $fFile];
+                $hFile, $topic, $t, $id, $file, $fFile, @text];
 
              }
             else
@@ -248,13 +377,13 @@ sub reportBadRefs($$)                                                           
              }
            }
           else
-           {push @bad, [qq(Topic id mismatch), $href,
-             $hFile, $topic, $id, $t, $file, $t, $fFile];
+           {push @bad, [qq(Topic id does not match target topic), $href,
+             $hFile, $topic, $id, $t, $file, $fFile, @text];
            }
          }
-        elsif ($topic)
+        elsif ($topic =~ m(\S)s)                                                # The href contains a topic id but there is not topic with that id
          {push @bad, [qq(No topic id on topic in target file), $href,
-           $hFile, $topic, $id, $t, $file, $t, $fFile];
+           $hFile, $topic, $id, $t, $file, $fFile, @text];
          }
         else
          {push @good,[$href, $fFile, $file];
@@ -263,45 +392,50 @@ sub reportBadRefs($$)                                                           
       else                                                                      # No # in href
        {my $fFile = absFromAbsPlusRel($file, $href);
         if (!-e $fFile and !-e wwwDecode($fFile))                               # Actual file name or www encoded file name
-         {push @bad, [qq(No such file), $href,
-           $fFile, q(), q(), q(), $file, $fFile];
+         {push @bad, my $p = [qq(No such file), $href,
+           $fFile, q(), q(), q(), $file, $fFile, @text];
          }
         else
-         {push @good,[$href, $fFile, $file];
+         {push @good, my $p = [$href, $fFile, $file];
          }
        }
      }
    }
 
   my $Type = ucfirst $type;
-  $xref->{my $t = q(bad).$Type.q(Refs)} = \@bad;                                # Bad references
+  $xref->{q(bad).$Type.q(Refs)}  = {map {$$_[6]=>$_} @bad};                     # Bad references
+  $xref->{q(good).$Type.q(Refs)} = {map {$$_[2]=>$_} @good};                    # Good references
 
   my $in = $xref->inputFolder//'';
-  formatTable(\@bad, [qw(Reason Href Href-File Href-Topic-Id Target-Topic-Id
-                         HRef-Id Source-File Target-File)],
-    head=><<END,
-NNNN Bad $type refs relative to folder $in on DDDD
-
+  formatTable(\@bad, <<END,
 Reason          The reason why the conref failed to resolve
 Href            The href in the source file
-Href-File       The target file referenced by the href in the source files
-Href-Topic-Id   The id of the topic referenced by the href in the source file
-Target-Topic-Id The actual id of the topic in the target file
-HRef-Id         The id of the statement in the body of the topic referenced by the href in the source file
-Source-File     The source file containing the reference
-Target-File     The target file
+Href_File       The target file referenced by the href in the source files
+Href_Topic_Id   The id of the topic referenced by the href in the source file
+Target_Topic_Id The actual id of the topic in the target file
+HRef_Id         The id of the statement in the body of the topic referenced by the href in the source file
+Source_File     The source file containing the reference
+Target_File     The target file
+Example_Text    Any text associated with the link such as the navtitle of a bad topicRef or the CDATA text of an xref.
 END
-    file=>(my $f = fpe($xref->reports, qq(bad${Type}Refs), q(txt))));
+    head     =>qq(Data::Edit::Xml::Xref found NNNN Bad ${type}Refs on DDDD),
+    summarize=>1,
+    wide     =>1,
+    file     =>(fpe($xref->reports, q(bad), qq(${Type}Refs), q(txt))));
 
-  formatTable(\@good, [qw(Href Source-File Target-File)],
-    head=><<END,
-NNNN Good $type refs relative to folder $in on DDDD
-
+  formatTable(\@good, <<END,
 Href            The href in the source file
-Source-File     The source file containing the reference
-Target-File     The target file
+Source_File     The source file containing the reference
+Target_File     The target file
 END
-    file=>(fpe($xref->reports, qq(good${Type}Refs), q(txt))));
+    head     =>qq(Data::Edit::Xml::Xref found NNNN Good $type refs on DDDD),
+    file     =>(fpe($xref->reports, q(good), qq(${Type}Refs), q(txt))));
+
+  for my $bad(@bad)                                                             # List of files to fix
+   {my $href = $$bad[1];
+    my $file = $$bad[6];
+    $xref->fixedFiles->{$file}{$href}++;
+   }
  }
 
 sub reportBadXrefs($)                                                           #P Report bad xrefs
@@ -313,33 +447,49 @@ sub reportBadTopicRefs($)                                                       
  {my ($xref) = @_;                                                              # Cross referencer
 
   my @bad; my @good;                                                            # Bad xrefs
-  for my $file(sort keys %{$xref->topicRefs})                                   # Each input file
+  for   my $file(sort keys %{$xref->topicRefs})                                 # Each input file
    {for my $href(sort keys %{$xref->topicRefs->{$file}})                        # Each topic ref in the file
-     {my $f = absFromAbsPlusRel(fullFileName($file), $href);                    # Target file absolute
+     {my @text;
+      if (               ref($xref->topicRefs->{$file}{$href}))                 # Text associated with reference
+       {@text =  sort keys %{$xref->topicRefs->{$file}{$href}};
+        s(\s+) ( )gs for @text;                                                 # Normalize white space
+       }
+      my $f = absFromAbsPlusRel(fullFileName($file), $href);                    # Target file absolute
       if ($f)
        {if (!-e $f and !-e wwwDecode($f))                                       # Check target file
-         {push @bad, [qq(No such file), $f, $href, $file];
+         {push @bad, my $p = [qq(No such file), $f, $href, $file, @text];
+          $xref->fixedFiles->{$file}{$href}++;
          }
         else
-         {push @good, [$f, $href, $file];
+         {push @good, my $p = [$f, $href, $file];
          }
        }
      }
    }
 
-  $xref->badTopicRefs = \@bad;                                                  # Bad references
-  my $in = $xref->inputFolder//'';
-  formatTable(\@bad, [qw(Reason FullFileName Href Source)],
-    head=><<END,
-NNNN Bad topicrefs on DDDD relative to folder $in
-END
-    file=>(fpe($xref->reports, qw(badTopicRefs txt))));
+  $xref->badTopicRefs  = {map {$$_[1]=>$_} @bad};                               # Bad topic references
+  $xref->goodTopicRefs = {map {$$_[0]=>$_} @good};                              # Good topic references
 
-  formatTable(\@good, [qw(FullFileName Href Source)],
-    head=><<END,
-NNNN Good topicrefs on DDDD relative to folder $in
+  my $in = $xref->inputFolder//'';
+  formatTable(\@bad, <<END,
+Reason         Reason the topic reference failed
+FullFileName   Name of the targeted file
+Href           Href text
+Source         Source file
+Example_Text   Any text bracketed by the topic ref
 END
-    file=>(fpe($xref->reports, qw(goodTopicRefs txt))));
+    head     =>qq(Data::Edit::Xml::Xref found NNNN Bad topicrefs on DDDD),
+    summarize=>1,
+    wide     =>1,
+    file     =>(fpe($xref->reports, qw(bad topicRefs txt))));
+
+  formatTable(\@good, <<END,
+FullFileName  The target file name
+Href          The href text in the source file
+Source        The source file
+END
+    head=>qq(Data::Edit::Xml::Xref found NNNN Good topicrefs on DDDD),
+    file=>(fpe($xref->reports, qw(good topicRefs txt))));
  }
 
 sub reportBadConrefs($)                                                         #P Report bad conrefs refs
@@ -355,48 +505,54 @@ sub reportImages($)                                                             
    {for my $href(sort keys %{$xref->images->{$file}})                           # Each image in the file
      {my $image = absFromAbsPlusRel($file, $href);                              # Image relative to current file
       if (-e $image or -e wwwDecode($image))                                    # Actual image name or www encoded image name
-       {$xref->imagesFound->{$image}++;                                         # Found image
+       {$xref->goodImageRefs->{$image}++;                                       # Found image
        }
       else
-       {push @bad, [$href, $file];                                              # Missing image
-        $xref->imagesMissing->{$image}++;                                       # Number of missing references
+       {push @bad, [$href, $image, $file];                                      # Missing image reference
+        $xref->badImageRefs->{$image}++;                                        # Number of missing references
+        $xref->fixedFiles->{$file}{$href}++;
        }
      }
    }
 
-  $xref->badImageRefs = \@bad;                                                  # Bad image references
+  $xref->missingImageFiles = {map {$$_[2]=>$_} @bad};                           # Missing image file names
 
-  formatTable(\@bad, [qw(Href File)],
-    head=>qq(NNNN Bad image references on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(badImageRefs txt))));
-
-  my $found = [map {[$xref->imagesFound->{$_}, $_]}
-              keys %{$xref->imagesFound}];
-  formatTable($found, [qw(Count ImageFileName)],
-    head=><<END,
-NNNN image files found on DDDD
-
-Count - Number of references to each image file found.
+  formatTable(\@bad, <<END,
+Href   Image reference in source file
+Image  Targetted image name
+File   Source file containing image reference
 END
-    file=>(fpe($xref->reports, qw(imagesFound txt))));
+    head=>qq(Data::Edit::Xml::Xref found NNNN Bad image references on DDDD),
+    summarize=>1,
+    file=>(my $f = fpe($xref->reports, qw(bad imageRefs txt))));
 
-  my $missing = [map {[$xref->imagesMissing->{$_}, $_]}
-                keys %{$xref->imagesMissing}];
-  formatTable($missing, [qw(Count ImageFileName)],
-    head=><<END,
-NNNN images missing on DDDD),
+  my $found = [map {[$xref->goodImageRefs->{$_}, $_]}
+              keys %{$xref->goodImageRefs}];
 
-Count - Number of references to each missing image.
+  formatTable($found, <<END,
+Count          Number of references to each image file found.
+ImageFileName  Full image file name
 END
-    file=>(fpe($xref->reports, qw(imagesMissing txt))));
+    head=>qq(Data::Edit::Xml::Xref found NNNN image files found on DDDD),
+    file=>(fpe($xref->reports, qw(good imagesFound txt))));
+
+  my $missing = [map {[$xref->badImageRefs->{$_}, $_]}
+                keys %{$xref->badImageRefs}];
+
+  formatTable($missing, <<END,
+Count          Number of references to each image file found.
+ImageFileName  Full image file name
+END
+    head=>qq(Data::Edit::Xml::Xref found NNNN images missing on DDDD),
+    file=>(fpe($xref->reports, qw(bad imagesMissing txt))));
  }
 
 sub reportParseFailed($)                                                        #P Report failed parses
  {my ($xref) = @_;                                                              # Cross referencer
 
   formatTable($xref->parseFailed, [qw(File)],
-    head=>qq(NNNN files failed to parse on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(parseFailed txt))));
+    head=>qq(Data::Edit::Xml::Xref found NNNN files failed to parse on DDDD),
+    file=>(my $f = fpe($xref->reports, qw(bad parseFailed txt))));
  }
 
 sub reportBadXml1($)                                                            #P Report bad xml on line 1
@@ -404,7 +560,7 @@ sub reportBadXml1($)                                                            
 
   formatTable($xref->badXml1, [qw(File)],
     head=>qq(Data::Edit::Xml::Xref found NNNN Files with the incorrect xml on line 1 on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(badXmlLine1 txt))));
+    file=>(my $f = fpe($xref->reports, qw(bad xmlLine1 txt))));
  }
 
 sub reportBadXml2($)                                                            #P Report bad xml on line 2
@@ -412,7 +568,174 @@ sub reportBadXml2($)                                                            
 
   formatTable($xref->badXml2, [qw(File)],
     head=>qq(Data::Edit::Xml::Xref found NNNN Files with the incorrect xml on line 2 on DDDD),
-    file=>(my $f = fpe($xref->reports, qw(badXmlLine2 txt))));
+    file=>(my $f = fpe($xref->reports, qw(bad xmlLine2 txt))));
+ }
+
+sub reportDocTypeCount($)                                                       #P Report doc type count
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %d;
+  for my $f(sort keys %{$xref->docType})
+   {my $d = $xref->docType->{$f};
+    $d{$d}++
+   }
+
+  formatTable(\%d, [qw(DocType)],
+    head=>qq(Data::Edit::Xml::Xref found NNNN different doc types on DDDD),
+    file=>(fpe($xref->reports, qw(count docTypes txt))));
+ }
+
+sub reportTagCount($)                                                           #P Report tag counts
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %d;
+  for   my $f(sort keys %{$xref->tagCount})
+   {for my $t(sort keys %{$xref->tagCount->{$f}})
+     {my $d = $xref->tagCount->{$f}{$t};
+      $d{$t} += $d;
+     }
+   }
+
+  formatTable(\%d, [qw(Tag Count)],
+    head=>qq(Data::Edit::Xml::Xref found NNNN different tags on DDDD),
+    file=>(fpe($xref->reports, qw(count tags txt))));
+ }
+
+sub reportAttributeCount($)                                                     #P Report attribute counts
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %d;
+  for   my $f(sort keys %{$xref->attributeCount})
+   {for my $t(sort keys %{$xref->attributeCount->{$f}})
+     {my $d = $xref->attributeCount->{$f}{$t};
+      $d{$t} += $d;
+     }
+   }
+
+  formatTable(\%d, [qw(Attribute Count)],
+    head=>qq(Data::Edit::Xml::Xref found NNNN different attributes on DDDD),
+    file=>(fpe($xref->reports, qw(count attributes txt))));
+ }
+
+sub reportValidationErrors($)                                                   #P Report the files known to have validation errors
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  formatTable([map {[$_]} sort keys %{$xref->validationErrors}], [qw(File)],
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN different topics with validation errors on DDDD
+END
+    file=>(fpe($xref->reports, qw(good bookMap txt))));
+ }
+
+sub checkBookMap($$)                                                            #P Check whether a bookmap is valid or not
+ {my ($xref, $bookMap) = @_;                                                    # Cross referencer, bookmap
+
+  for my $href($bookMap, sort keys %{$xref->topicRefs->{$bookMap}})             # Each topic ref in the bookmap
+   {my $t = absFromAbsPlusRel($bookMap, $href);
+    for my $field                                                               # Fields that report errors
+     (qw(parseFailed badXml1 badXml2 badTopicRefs badXRefs
+         imagesMissing badConRefs missingTopicIds
+         validationErrors))
+     {if ($xref->{$field}->{$t})
+       {return [$field, $bookMap, $href, $t];
+       }
+     }
+   }
+  undef                                                                         # No errors
+ }
+
+sub reportBookMaps($)                                                           #P Report on whether each bookmap is good or bad
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my @bad;
+  my @good;
+  for my $f(sort keys %{$xref->docType})
+   {if ($xref->docType->{$f} =~ m(map\Z)s)
+     {if (my $r = $xref->checkBookMap($f))
+       {push @bad, $r;
+       }
+      else
+       {push @good, [$f];
+       }
+     }
+   }
+
+  $xref-> badBookMaps = {map {$$_[1]=>$_} @bad};                                # Bad bookmaps
+  $xref->goodBookMaps = {map {$$_[0]=>$_} @good};                               # Good book maps
+
+  formatTable(\@bad, <<END,
+Reason      Reason bookmap failed
+Bookmap     Bookmap source file name
+Topic-Ref   Failing appendix, chapter or topic ref.
+Topic-File  Targeted topic file if known
+END
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN bookmaps with errors on DDDD
+END
+    summarize=>1,
+    file=>(fpe($xref->reports, qw(bad bookMap txt))));
+
+  formatTable(\@good, [qw(File)],
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN good bookmaps on DDDD
+END
+    file=>(fpe($xref->reports, qw(good bookMap txt))));
+ }
+
+sub reportFileExtensionCount($)                                                 #P Report file extension counts
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  formatTable(countFileExtensions($xref->inputFolder), [qw(Ext Count)],
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN different file extensions on DDDD
+END
+    file=>(fpe($xref->reports, qw(count fileExtensions txt))));
+ }
+
+sub reportFileTypes($)                                                          #P Report file type counts - takes too long in series
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  formatTable(countFileTypes
+   ($xref->inputFolder, $xref->maximumNumberOfProcesses),
+   [qw(Type Count)],
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN different file types on DDDD
+END
+    file=>(my $f = fpe($xref->reports, qw(count fileTypes txt))));
+ }
+
+sub reportNotReferenced($)                                                      #P Report files not referenced by any of conref, image, topicref, xref and are not bookmaps.
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my %files = map {$_=>1}
+    searchDirectoryTreesForMatchingFiles($xref->inputFolder);
+
+  for my $file(sort keys %{$xref->docType})
+   {my $tag = $xref->docType->{$file};
+    if ($tag =~ m(map\Z)is)
+     {delete $files{$file};
+     }
+   }
+
+  for my $file(sort keys %{$xref->conRefs},
+               sort keys %{$xref->goodImageRefs},
+               sort keys %{$xref->goodTopicRefs},
+               sort keys %{$xref->xRefs},
+              )
+   {delete $files{$file};
+   }
+
+  $xref->notReferenced = \%files;
+  formatTable([sort keys %files],
+   [qw(FileNo Unreferenced)],
+    head=><<END,
+Data::Edit::Xml::Xref found NNNN unreferenced files on DDDD.
+
+These are the files not mentioned in any conref, image, topicref, or xref and
+which are not bookmaps.
+
+END
+    file=>(my $f = fpe($xref->reports, qw(bad notReferenced txt))));
  }
 
 sub createSampleInputFiles($)                                                   #P Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
@@ -426,14 +749,14 @@ sub createSampleInputFiles($)                                                   
 <concept id="c$n">
   <title>Concept $n refers to $o</title>
   <conbody id="b$n">
-     <xref id="x$n" href="$o.dita#c$o/x$o">Good</xref>
-     <xref id="x$n" href="$o.dita#c$n/x$o">Duplicate id</xref>
-     <xref id="b1$n" href="bad$o.dita#c$o/x$o">Bad file</xref>
-     <xref id="b2$n" href="$o.dita#c$n/x$o">Bad topic id</xref>
-     <xref id="b3$n" href="$o.dita#c$o/x$n">Bad id in topic</xref>
-     <xref id="g1$n" href="$o.dita#c$o">Good 1</xref>
-     <xref id="g2$n" href="#c$o/x$o">Good 2</xref>
-     <xref id="g3$n" href="#c$o">Good 3</xref>
+     <xref id="x$n"  format="dita" href="$o.dita#c$o/x$o">Good</xref>
+     <xref id="x$n"  format="dita" href="$o.dita#c$n/x$o">Duplicate id</xref>
+     <xref id="b1$n" format="dita" href="bad$o.dita#c$o/x$o">Bad file</xref>
+     <xref id="b2$n" format="dita" href="$o.dita#c$n/x$o">Bad topic id</xref>
+     <xref id="b3$n" format="dita" href="$o.dita#c$o/x$n">Bad id in topic</xref>
+     <xref id="g1$n" format="dita" href="$o.dita#c$o">Good 1</xref>
+     <xref id="g2$n" format="dita" href="#c$o/x$o">Good 2</xref>
+     <xref id="g3$n" format="dita" href="#c$o">Good 3</xref>
      <p conref="#c$n">Good conref</p>
      <p conref="#b$n">Bad conref</p>
      <image href="a$n.png"/>
@@ -450,13 +773,23 @@ END
 </concept>
 END
   owf(fpe($in, qw(act2 dita)), <<END);
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE concept PUBLIC "-//OASIS//DTD DITA Concept//EN" "concept.dtd">
 <concept id="c2">
   <title id="title">All Timing Codes Begin Here</title>
   <conbody>
-    <xref href="act1.dita#c1/title"/>
+    <section>
+      <title/>
+      <xref  format="dita" href="act1.dita#c1/title"/>
+      <xref  format="dita" href="9999#c1/title"/>
+      <image href="9999.png"/>
+      <p conref="9999.dita"/>
+    </section>
   </conbody>
 </concept>
+<!--linted: 2018-Nov-23 -->
 END
+
   owf(fpe($in, qw(act3 dita)), <<END);
 <concept id="c3">
   <title>Error</title>
@@ -466,12 +799,13 @@ END
 </concept>
 END
   owf(fpe($in, qw(map bookmap ditamap)), <<END);
-<map>
+<map id="m1">
   <title>Test</title>
-  <topicref href="../act1.dita"/>
-  <topicref href="../act2.dita"/>
-  <topicref href="../map/aaa.txt"/>
-  <topicref href="bbb.txt"/>
+  <topicref format="dita" href="../act1.dita">Interesting topic</topicref>
+  <topicref format="dita" href="../act2.dita"/>
+  <topicref format="dita" href="../map/r.txt"/>
+  <topicref format="dita" href="9999.dita"/>
+  <topicref format="dita" href="bbb.txt"/>
 </map>
 END
   createEmptyFile(fpe($in, qw(a1 png)));
@@ -495,14 +829,27 @@ L<inputFolder|/inputFolder>:
   use Data::Edit::Xml::Xref;
 
   my $x = xref(inputFolder=>q(in));
-  ok $x->statusLine =~ m(\AXref Errors: 56 bad xrefs, 8 bad conrefs, 2 bad topicrefs, 8 missing images, 8 duplicate ids, 11 bad first lines, 11 bad second lines\Z);
-    Xref Errors: 1 file failed to parse, 48 bad xrefs, 8 bad conrefs,
-    2 bad topicrefs, 7 missing image refs, 1 image file found,
-    7 missing image files, 8 duplicate ids, 11 bad first lines,
-    11 bad second lines\Z);
+  ok nws($x->statusLine) eq nws(<<END);
+Xref:
+ 10 bad first lines,
+ 10 bad second lines,
+  9 bad conrefs,
+  9 bad xrefs,
+  8 duplicate ids,
+  8 missing image files,
+  8 missing image references,
+  3 bad topicrefs,
+  2 duplicate topic ids,
+  1 bad book map,
+  1 file failed to parse,
+  1 file not referenced
+END
 
+The counts listed in the L<statusLine|/statusLine> are the counts of the files
+that have the described problems not a count of all the instances of the
+problem in all the files which would be larger.
 
-More detailed reports are produced in the  L<reports|_/reports> folder:
+More detailed reports are produced in the  L<reports|/reports> folder:
 
   $x->reports
 
@@ -511,7 +858,7 @@ More detailed reports are produced in the  L<reports|_/reports> folder:
 Cross reference Dita XML.
 
 
-Version 20181101.
+Version 20181204.
 
 
 The following sections describe the methods in each functional area of this
@@ -525,7 +872,7 @@ Check the cross references in a set of Dita files and report the results.
 
 =head2 xref(%)
 
-Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible atributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
+Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
 
      Parameter    Description
   1  %attributes  Attributes
@@ -533,7 +880,7 @@ Check the cross references in a set of Dita files held in  L<inputFolder|/inputF
 B<Example:>
 
 
-    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>q(in), maximumNumberOfProcesses=>2);                
+    my $x = 𝘅𝗿𝗲𝗳(inputFolder=>q(in), fixBadRefs=>1, maximumNumberOfProcesses=>2); 
   
 
 
@@ -545,54 +892,82 @@ B<Example:>
 =head2 Data::Edit::Xml::Xref Definition
 
 
-Attributes used by cross referencer.
+Attributes used by the Xref cross referencer.
 
+
+B<attributeCount> - {file}{attribute} == count of the different xml attributes found in the xml files.
+
+B<badBookMaps> - Bad book maps
 
 B<badConRefs> - [file, href]   Invalid conref attributes.
 
-B<badImageRefs> - [file, href]   Missing images.
+B<badImageRefs> - Consolidated images missing.
 
-B<badTopicRefs> - [file, href]   Invalid href attributes topicref tags.
+B<badTopicRefs> - [file, href]   Invalid href attributes found on topicref tags.
 
-B<badXRefs> - [file, href]   Invalid href attributes on xref tags.
+B<badXRefs> - [file, href]   Invalid href attributes found on xref tags.
 
-B<badXml1> - Files with a bad xml encoding header on the first line.
+B<badXml1> - [Files] with a bad xml encoding header on the first line.
 
-B<badXml2> - Files with a bad xml doc type on the second line.
+B<badXml2> - [Files] with a bad xml doc type on the second line.
 
-B<conRefs> - {file}{id}++   Conref definitions.
+B<conRefs> - {file}{href}   Count of conref definitions in each file.
 
-B<duplicateIds> - [file, id]     Duplicate id definitions within a file.
+B<docType> - {file} == docType:  the docType for each xml file.
 
-B<duplicateTopicIds> - [topicId, [files]] Files with duplicate topic ids
+B<duplicateIds> - [file, id]     Duplicate id definitions within each file.
 
-B<ids> - {file}{id}++   Id definitions across all files.
+B<duplicateTopicIds> - [topicId, [files]] Files with duplicate topic ids - the id on the outermost tag.
 
-B<images> - {file}{href}++ Images references.
+B<fixBadRefs> - Try to fix bad references in L<these files|/fixedFiles> where possible.
 
-B<imagesFound> - Consolidated images found
+B<fixedFiles> - Files that have a missing conref or href which can be ameliorated by renaming the failing attribute to  "xtrf".
 
-B<imagesMissing> - Consolidated images missing
+B<goodBookMaps> - Good book maps
+
+B<goodConRefs> - Good con refs
+
+B<goodImageRefs> - Consolidated images found.
+
+B<goodTopicRefs> - Good topic refs
+
+B<goodXRefs> - Good xrefs
+
+B<ids> - {file}{id}     Id definitions across all files.
+
+B<images> - {file}{href}   Count of image references in each file.
 
 B<inputFiles> - Input files from L<inputFolder|/inputFolder>.
 
 B<inputFolder> - A folder containing the dita and ditamap files to be cross referenced.
 
-B<maximumNumberOfProcesses> - Maximum number of processes to run
+B<maximumNumberOfProcesses> - Maximum number of processes to run in parallel at any one time.
+
+B<missingImageFiles> - [file, href] == Missing images in each file.
+
+B<missingTopicIds> - Missing topic ids
+
+B<notReferenced> - files in input area that are not referenced by a conref, image, topicref or xref tag and are not a bookmap.
 
 B<parseFailed> - [file] files that failed to parse
 
 B<reports> - Reports folder: the cross referencer will write reports to files in this folder.
 
-B<results> - Results table
+B<results> - Summary of results table
 
-B<statusLine> - Status line summarizing the cross reference.
+B<sourceFile> - The source file from which this structure was generated
+
+B<statusLine> - Status line summarizing the cross reference. The counts listed in the status line are the counts of the files that have the described problems not a count of all the instances of all the problems in all the files.
 
 B<summary> - Print the summary line.
 
-B<topicIds> - {file} = topic id
+B<tagCount> - {file}{tags} == count of the different tag names found in the xml files.
 
-B<topicRefs> - {file}{href}++ Topic references.
+B<topicIds> - {file} = topic id - the id on the outermost tag.
+
+B<topicRefs> - {file}{href}++ References from bookmaps to topics via appendix, chapter, topicref.
+
+B<validationErrors> - True means that Lint detected errors in the xml contained in the file
 
 B<xRefs> - {file}{href}++ Xrefs references.
 
@@ -614,6 +989,14 @@ Analyze one input file
      Parameter  Description
   1  $iFile     File to analyze
 
+=head2 fixOneFile($$)
+
+Analyze one input file
+
+     Parameter  Description
+  1  $xref      Xref results
+  2  $file      File to fix
+
 =head2 analyze($)
 
 Analyze the input files
@@ -624,6 +1007,13 @@ Analyze the input files
 =head2 reportDuplicateIds($)
 
 Report duplicate ids
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportDuplicateTopicIds($)
+
+Report duplicate topic ids
 
      Parameter  Description
   1  $xref      Cross referencer
@@ -685,6 +1075,70 @@ Report bad xml on line 2
      Parameter  Description
   1  $xref      Cross referencer
 
+=head2 reportDocTypeCount($)
+
+Report doc type count
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportTagCount($)
+
+Report tag counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportAttributeCount($)
+
+Report attribute counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportValidationErrors($)
+
+Report the files known to have validation errors
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 checkBookMap($$)
+
+Check whether a bookmap is valid or not
+
+     Parameter  Description
+  1  $xref      Cross referencer
+  2  $bookMap   Bookmap
+
+=head2 reportBookMaps($)
+
+Report on whether each bookmap is good or bad
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportFileExtensionCount($)
+
+Report file extension counts
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportFileTypes($)
+
+Report file type counts - takes too long in series
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
+=head2 reportNotReferenced($)
+
+Report files not referenced by any of conref, image, topicref, xref and are not bookmaps.
+
+     Parameter  Description
+  1  $xref      Cross referencer
+
 =head2 createSampleInputFiles($)
 
 Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
@@ -700,29 +1154,51 @@ Create sample input files for testing. The attribute B<inputFolder> supplies the
 
 2 L<analyzeOneFile|/analyzeOneFile> - Analyze one input file
 
-3 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
+3 L<checkBookMap|/checkBookMap> - Check whether a bookmap is valid or not
 
-4 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
+4 L<createSampleInputFiles|/createSampleInputFiles> - Create sample input files for testing.
 
-5 L<reportBadConrefs|/reportBadConrefs> - Report bad conrefs refs
+5 L<fixOneFile|/fixOneFile> - Analyze one input file
 
-6 L<reportBadRefs|/reportBadRefs> - Report bad references found in xrefs or conrefs as they have the same structure
+6 L<loadInputFiles|/loadInputFiles> - Load the names of the files to be processed
 
-7 L<reportBadTopicRefs|/reportBadTopicRefs> - Report bad topic refs
+7 L<reportAttributeCount|/reportAttributeCount> - Report attribute counts
 
-8 L<reportBadXml1|/reportBadXml1> - Report bad xml on line 1
+8 L<reportBadConrefs|/reportBadConrefs> - Report bad conrefs refs
 
-9 L<reportBadXml2|/reportBadXml2> - Report bad xml on line 2
+9 L<reportBadRefs|/reportBadRefs> - Report bad references found in xrefs or conrefs as they have the same structure
 
-10 L<reportBadXrefs|/reportBadXrefs> - Report bad xrefs
+10 L<reportBadTopicRefs|/reportBadTopicRefs> - Report bad topic refs
 
-11 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
+11 L<reportBadXml1|/reportBadXml1> - Report bad xml on line 1
 
-12 L<reportImages|/reportImages> - Reports on images and references to images
+12 L<reportBadXml2|/reportBadXml2> - Report bad xml on line 2
 
-13 L<reportParseFailed|/reportParseFailed> - Report failed parses
+13 L<reportBadXrefs|/reportBadXrefs> - Report bad xrefs
 
-14 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
+14 L<reportBookMaps|/reportBookMaps> - Report on whether each bookmap is good or bad
+
+15 L<reportDocTypeCount|/reportDocTypeCount> - Report doc type count
+
+16 L<reportDuplicateIds|/reportDuplicateIds> - Report duplicate ids
+
+17 L<reportDuplicateTopicIds|/reportDuplicateTopicIds> - Report duplicate topic ids
+
+18 L<reportFileExtensionCount|/reportFileExtensionCount> - Report file extension counts
+
+19 L<reportFileTypes|/reportFileTypes> - Report file type counts - takes too long in series
+
+20 L<reportImages|/reportImages> - Reports on images and references to images
+
+21 L<reportNotReferenced|/reportNotReferenced> - Report files not referenced by any of conref, image, topicref, xref and are not bookmaps.
+
+22 L<reportParseFailed|/reportParseFailed> - Report failed parses
+
+23 L<reportTagCount|/reportTagCount> - Report tag counts
+
+24 L<reportValidationErrors|/reportValidationErrors> - Report the files known to have validation errors
+
+25 L<xref|/xref> - Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder.
 
 =head1 Installation
 
@@ -776,23 +1252,31 @@ my $mac     = $^O =~ m(darwin)is;
 Test::More->builder->output("/dev/null")                                        # Show only errors during testing
   if ((caller(1))[0]//'Data::Edit::Xml::Xref') eq "Data::Edit::Xml::Xref";
 
-if (1)
+if (!$windows)
  {my $N = 8;
+  clearFolder(q(reports), 32);
   createSampleInputFiles($N);
-  my $x = xref(inputFolder=>q(in), maximumNumberOfProcesses=>2);                #Txref
+  my $x = xref(inputFolder=>q(in), fixBadRefs=>1, maximumNumberOfProcesses=>2); #Txref
   ok nws($x->statusLine) eq nws(<<END);
-Xref Errors:
-  1 file failed to parse,
- 48 bad xrefs,
-  8 bad conrefs,
-  2 bad topicrefs,
-  7 missing image refs,
-  7 missing image files,
+Xref:
+ 10 bad first lines,
+ 10 bad second lines,
+  9 bad conrefs,
+  9 bad xrefs,
   8 duplicate ids,
-  11 bad first lines,
-  11 bad second lines
+  8 missing image files,
+  8 missing image references,
+  3 bad topicrefs,
+  2 duplicate topic ids,
+  1 bad book map,
+  1 file failed to parse,
+  1 file not referenced
 END
+ }
+else
+ {ok 1 for 1..1;
  }
 
 1
+
 

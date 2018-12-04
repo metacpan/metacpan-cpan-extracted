@@ -74,7 +74,9 @@ my $configure_clipbucket=sub {
    if (exists $main::aws->{permanent_ip}) {
       $permanent_ip=$main::aws->{permanent_ip}; 
    }
-   if (exists $main::aws->{'CLIPBUCKET.com'}) {
+   my $test_aws=
+         `wget -qO- http://169.254.169.254/latest/dynamic/instance-identity/`;
+   if (-1<index $test_aws,'signature') {
       my $n=$main::aws->{fullauto}->
             {SecurityGroups}->[0]->{GroupName}||'';
       my $c='aws ec2 describe-security-groups '.
@@ -1029,6 +1031,8 @@ END
          'chgrp -v mysql /var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chgrp -v mysql /var/lib/mysql/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /etc/my.cnf.d','__display__');
       # to make tokudb the default storage engine,
       # you have to start mysqld with: --default-storage-engine=tokudb
       my $toku_cnf=<<END;

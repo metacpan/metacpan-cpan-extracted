@@ -1,0 +1,51 @@
+
+###
+###
+### Linux::InitFS config file
+###
+### this will be searched for in /etc/default/Linux-Initfs, in
+### $HOME/.linux_initfs, and in <linux_src_dir>/.linux_initfs,
+### with newer values overriding previous ones.
+###
+### built-in defaults are in git/share/config/default
+###
+###
+
+
+##
+## not-found policy setting
+##
+
+# rescue, reboot, halt
+rootfs_missing = rescue
+
+
+##
+## static/dynamic policy setting
+##
+
+# default is ignore staticness
+# use_static will use static binaries where available,
+# only_static will quietly skip any dynamic binaries,
+# strict_static will fail if a static binary is unavailable
+#use_static
+#only_static
+#strict_static
+
+
+##
+## rescue mode options
+##
+
+# whether "rescue" on /proc/cmdline is respected
+rescue_flag
+
+# whether to include robust filesystem tools
+# versus whatever is compiled into busybox
+rescue_mkfs
+
+# whether real bash is preferred over busybox
+# note that xfs tool support pulls this in
+real_bash
+
+

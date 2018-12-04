@@ -1,5 +1,16 @@
 Changelog for Mojolicious-Plugin-DBIC
 
+0.002     2018-12-03 22:44:54-06:00 America/Chicago
+
+    [Added]
+
+    - Added test for inheriting from DBIC controller
+    - Added not found response to `get` action when row isn't found
+
+    [Fixed]
+
+    - Fixed missing dependencies. Thanks @eserte!
+
 0.001     2018-12-02 20:47:57-06:00 America/Chicago
 
     [Added]

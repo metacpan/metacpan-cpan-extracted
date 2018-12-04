@@ -7,6 +7,7 @@ package t43;
 use rlib 'lib';
 use DTest;
 use App::Prove;
+use Capture::Tiny qw(capture);
 use Best [ [qw(YAML::XS YAML)], qw(LoadFile) ];
 
 my $test_fn = localpath("allkinds.test");   # the test file to run
@@ -32,7 +33,7 @@ sub run_prove {
     my $test_fn = shift;
     my $results_fn = shift;
 
-    diag "=========== Running tests in $test_fn under App::Prove";
+    diag "vvvvvvvvvvv Running tests in $test_fn under App::Prove";
     my $app = App::Prove->new;
     $app->process_args(
         qw(-Q --norc --state=all),  # Isolate us from the environment
@@ -40,9 +41,20 @@ sub run_prove {
         $test_fn,
         '-PTest::OnlySomeP=filename,' . $results_fn
     );
-    $app->run;
-    diag "=========== Done running tests in $test_fn under App::Prove";
-}
+
+    # prove(1) gets confused by the mixed output from this script and from
+    # the inner App::Prove.  Therefore, capture it.
+    my ($stdout, $stderr, @result) = capture {
+        $app->run;
+    };
+
+    diag "  Result was ", join ", ", @result;
+    diag "  STDOUT:";
+    diag $stdout;
+    diag "  STDERR";
+    diag $stderr;
+    diag "^^^^^^^^^^^ End of output from running tests in $test_fn under App::Prove";
+} #run_prove()
 
 sub check_results {
     my $results_fn = shift;
@@ -51,5 +63,5 @@ sub check_results {
     my $results = LoadFile $results_fn;
     ok(ref $results eq 'HASH', "Result file is valid YAML");
     ok($results->{$test_fn}, "Result file has an entry for $test_fn");
-}
+} #check_results()
 

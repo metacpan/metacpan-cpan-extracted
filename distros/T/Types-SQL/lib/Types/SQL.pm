@@ -7,12 +7,12 @@ use warnings;
 
 use Type::Library
   -base,
-  -declare => qw/ Char Integer Numeric Serial Text Varchar /;
+  -declare => qw/ BigInt Char Integer Numeric Serial SmallInt Text Varchar /;
 
 use Ref::Util qw/ is_arrayref /;
 use Type::Utils 0.44 -all;
 use Types::Standard -types;
-use PerlX::Maybe;
+use PerlX::Maybe qw/ maybe /;
 
 use namespace::autoclean;
 
@@ -22,7 +22,7 @@ use namespace::autoclean;
 
 # ABSTRACT: a library of SQL types
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.4.0';
 
 
 sub VERSION { # for older Perls
@@ -103,6 +103,10 @@ our $Integer = _generate_type(
         );
     },
 );
+
+
+declare SmallInt, as Integer[5];
+declare BigInt, as Integer[19];
 
 
 our $Serial = _generate_type(
@@ -192,7 +196,7 @@ Types::SQL - a library of SQL types
 
 =head1 VERSION
 
-version v0.3.1
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -244,6 +248,14 @@ Returns a C<char> data type, with an optional size parameter.
   my $type = Integer[ $precision ];
 
 Returns a C<integer> data type, with an optional precision parameter.
+
+=head2 C<SmallInt>
+
+This is shorthand for C<Integer[5]>.
+
+=head2 C<BigInt>
+
+This is shorthand for C<Integer[19]>.
 
 =head2 C<Serial>
 

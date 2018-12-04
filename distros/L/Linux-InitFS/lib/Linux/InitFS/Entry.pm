@@ -4,30 +4,8 @@ use strict;
 
 my %ENTRIES = ();
 
-
-###############################################################################
-# cheat sheet for target symlinks
-
-{ # private lexicals begin
-
-my $symspec = undef;
-
-sub get_symlink($) {
-	my ( $linkfile ) = @_;
-
-	unless ( $symspec ) {
-		$symspec = Linux::InitFS::Spec->new( 'symlink' ) || [];
-		$symspec = { map { $_->[0] => $_->[1] } @$symspec };
-	}
-
-	if ( my $rv = $symspec->{$linkfile} ) {
-		return $rv;
-	}
-
-	return readlink $linkfile;
-}
-
-} # private lexicals end
+my $WANT_STATIC = undef;
+my $ONLY_STATIC = undef;
 
 
 ###############################################################################
@@ -42,13 +20,17 @@ sub new {
 
 	return undef unless $obj->{path};
 	return undef unless $obj->{type};
+
+	if ( my $rv = $ENTRIES{$obj->{path}} ) {
+		# FIXME sometimes this is bad...
+		return $rv;
+	}
+
 	return undef unless $obj->_init_dirs();
 
 	if ( $obj->{type} eq 'file' ) {
 		return undef unless $obj->_init_prog_deps();
 	}
-
-	# FIXME collision detection
 
 	$ENTRIES{$obj->{path}} = $obj;
 
@@ -85,7 +67,7 @@ sub new_file {
 
 	if ( -l $from ) {
 
-		my $link = get_symlink $from
+		my $link = readlink $from
 			or return;
 
 		$class->new_slink( $path, $link );
@@ -98,6 +80,10 @@ sub new_file {
 		}
 
 		return $class->new_host_file( $link, %args );
+	}
+
+	if ( -d $from ) {
+		return $class->new_dir( $path, %args );
 	}
 
 	$args{type} = 'file';
@@ -130,6 +116,15 @@ sub new_prog {
 
 	unless ( exists $args{mode} ) {
 		$args{mode} = 0755;
+	}
+
+	unless ( defined $WANT_STATIC ) {
+		$WANT_STATIC = Linux::InitFS::Kernel::feature_enabled( 'INITRAMFS_WITH_STATIC' );
+	}
+
+	if ( $WANT_STATIC ) {
+		my $static = $from . '.static';
+		$from = $static if -e $static;
 	}
 
 	return $class->new_file( $path, $from, %args );
@@ -212,28 +207,32 @@ sub _init_prog_deps_dynlib {
 	return $found;
 }
 
-sub _init_prog_deps_shell {
-	my ( $this, $file ) = @_;
-
-	my $rc = open my $fh, '<', $file;
-	return unless defined $rc;
-
-	my $txt = <$fh>;
-	my ( $interpreter ) = ( $txt =~ /^#!([^\s]+)/ );
-	return unless $interpreter;
-
-	$this->new_host_prog( $interpreter );
-
-	return 1;
-}
+#sub _init_prog_deps_shell {
+#	my ( $this, $file ) = @_;
+#
+#	my $rc = open my $fh, '<', $file;
+#	return unless defined $rc;
+#
+#	my $txt = <$fh>;
+#	my ( $interpreter ) = ( $txt =~ /^#!([^\s]+)/ );
+#	return unless $interpreter;
+#
+#	$this->new_host_prog( $interpreter );
+#
+#	return 1;
+#}
 
 sub _init_prog_deps {
 	my ( $this ) = @_;
 
 	my $run = $this->{from};
 
+	unless ( defined $ONLY_STATIC ) {
+		$ONLY_STATIC = Linux::InitFS::Kernel::feature_enabled( 'INITRAMFS_WITH_STATIC_ONLY' );
+	}
+
 	return 1 if $this->_init_prog_deps_dynlib( $run );
-	return 1 if $this->_init_prog_deps_shell( $run );
+#	return 1 if $this->_init_prog_deps_shell( $run );
 	return 1;
 }
 
@@ -337,6 +336,7 @@ sub execute {
 	$_->print_entry() for @devs;
 	$_->print_entry() for @rest;
 
+	return ( @dirs or @devs or @rest ) ? 1 : 0;
 }
 
 

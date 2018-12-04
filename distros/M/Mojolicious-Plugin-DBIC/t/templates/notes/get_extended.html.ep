@@ -1,0 +1,3 @@
+<h1><%= $row->title %></h1>
+<main><%= $row->description %></main>
+<footer><%= $extended %></footer>

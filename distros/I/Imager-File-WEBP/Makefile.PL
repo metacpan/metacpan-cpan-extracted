@@ -108,8 +108,9 @@ my %probe =
    name => "WEBP",
    inccheck => sub { -e File::Spec->catfile($_[0], "webp/mux.h") },
    libbase => [ "webpmux", "webp" ],
-   #testcode => _webp_test_code(),
-   #testcodeheaders => [ "webp/mux.h", "stdio.h", "string.h" ],
+   testcode => _webp_test_code(),
+   testcodeheaders => [ "webp/encode.h", "webp/decode.h", "webp/mux.h", "stdio.h", "string.h" ],
+   libopts => "-lwebpmux -lwebp",
    incpath => \@incpaths,
    libpath => \@libpaths,
    verbose => $verbose,
@@ -131,6 +132,21 @@ else {
 
 sub _webp_test_code {
   return <<'CODE';
+    unsigned int mux_ver = WebPGetMuxVersion();
+    unsigned int enc_ver = WebPGetEncoderVersion();
+    unsigned int dec_ver = WebPGetDecoderVersion();
+    printf("encoder %d.%d.%d (%x)\ndecoder %d.%d.%d (%x)\nmux %d.%d.%d (%x)\n",
+	    enc_ver >> 16, (enc_ver >> 8) & 0xFF, enc_ver & 0xFF, enc_ver,
+	    dec_ver >> 16, (dec_ver >> 8) & 0xFF, dec_ver & 0xFF, dec_ver,
+	    mux_ver >> 16, (mux_ver >> 8) & 0xFF, mux_ver & 0xFF, mux_ver);
+  if (enc_ver < 0x000500 || dec_ver < 0x000500) {
+    printf("Need at least version 0.5.0 of libwebp\n");
+    return 1;
+  }
+  if (mux_ver < 0x000300) {
+    printf("Need at least version 0.3.0 of libwebpmux (libwebp 0.5.0)\n");
+    return 1;
+  }
 return 0;
 CODE
 }

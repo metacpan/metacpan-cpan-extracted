@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,17 +14,22 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Plugin-DBIC",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Mojolicious::Plugin::DBIC",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "DBIx::Class" => 0,
+    "Mojolicious" => 8
+  },
   "TEST_REQUIRES" => {
+    "DBD::SQLite" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "SQL::Translator" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,10 +37,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "DBD::SQLite" => 0,
+  "DBIx::Class" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Mojolicious" => 8,
+  "SQL::Translator" => 0,
   "Test::More" => 0
 );
 

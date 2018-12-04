@@ -1,0 +1,16 @@
+Imager::File::WEBP provides file format support for Google's webp
+image file format to Imager.
+
+You will need at least version 0.5.0 of libwebp installed, including
+libwebpmux which is packaged with libwebp.
+
+To build Imager::File::WEBP you will also need the development headers
+installed.
+
+For Debian you can install all of that with:
+
+  apt-get install libwebp-dev
+
+which will also install the needed runtime libraries.
+
+I haven't tried this on Win32.

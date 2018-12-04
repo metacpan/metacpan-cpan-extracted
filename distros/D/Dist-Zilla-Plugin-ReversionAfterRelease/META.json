@@ -1,0 +1,55 @@
+{
+   "abstract" : "Bump and reversion after distribution release",
+   "author" : [
+      "Vernon Lyon <vlyon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-ReversionAfterRelease",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::ReversionOnRelease" : "0.06",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::XS version 3.03",
+   "x_static_install" : 1
+}
+

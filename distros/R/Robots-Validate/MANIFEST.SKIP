@@ -102,4 +102,7 @@
 Robots-Validate-.*/
 Robots-Validate-.*\.tar\.gz
 \.mailmap$
+perltidy\.(LOG|ERR)
+fatlib/
 cpanfile\.snapshot$
+local/

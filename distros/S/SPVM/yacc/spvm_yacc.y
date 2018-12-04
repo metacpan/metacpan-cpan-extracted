@@ -23,17 +23,17 @@
 %token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME MAYBE_SUB_NAME EXCEPTION_VAR
 %token <opval> RETURN WEAKEN CROAK NEW
 %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT
-%token <opval> AMPERSAND DOT3 LENGTH FATCAMMA RW RO WO BEGIN
+%token <opval> AMPERSAND DOT3 LENGTH FATCAMMA RW RO WO BEGIN REQUIRE
 
 %type <opval> grammar
 %type <opval> opt_packages packages package package_block
 %type <opval> opt_declarations declarations declaration
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-%type <opval> sub anon_sub opt_args args arg invocant has use our string_length
+%type <opval> sub anon_sub opt_args args arg invocant has use require our string_length
 %type <opval> opt_descriptors descriptors sub_names opt_sub_names
 %type <opval> opt_statements statements statement normal_statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
-%type <opval> block eval_block begin_block
+%type <opval> block eval_block begin_block if_require_statement
 %type <opval> expression
 %type <opval> unop binop
 %type <opval> call_sub opt_vaarg
@@ -176,11 +176,18 @@ begin_block
 use
   : USE basic_type ';'
     {
-      $$ = SPVM_OP_build_use(compiler, $1, $2, NULL);
+      $$ = SPVM_OP_build_use(compiler, $1, $2, NULL, 0);
     }
   | USE basic_type '(' opt_sub_names ')' ';'
     {
-      $$ = SPVM_OP_build_use(compiler, $1, $2, $4);
+      $$ = SPVM_OP_build_use(compiler, $1, $2, $4, 0);
+    }
+
+require
+  : REQUIRE basic_type
+    {
+      SPVM_OP* op_use = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, compiler->cur_file, compiler->cur_line);
+      $$ = SPVM_OP_build_use(compiler, op_use, $2, NULL, 1);
     }
 
 enumeration
@@ -446,6 +453,7 @@ statement
   | case_statement
   | default_statement
   | eval_block
+  | if_require_statement
 
 normal_statement
   : normal_term ';'
@@ -487,6 +495,14 @@ case_statement
 
 default_statement
   : DEFAULT ':'
+
+if_require_statement
+  : IF '(' require ')' block
+    {
+      SPVM_OP* op_if_require = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_IF_REQUIRE, compiler->cur_file, compiler->cur_line);
+      
+      $$ = SPVM_OP_build_if_require_statement(compiler, op_if_require, $3, $5);
+    }
 
 if_statement
   : IF '(' term ')' block else_statement

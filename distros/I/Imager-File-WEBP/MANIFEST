@@ -5,6 +5,7 @@ inc/Devel/CheckLib.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+README
 t/00use.t
 t/10version.t
 t/20write.t

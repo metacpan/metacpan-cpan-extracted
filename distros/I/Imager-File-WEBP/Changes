@@ -1,3 +1,12 @@
+Imager-File-WEBP 0.003 - 4 Dec 2018
+======================
+
+ - ensure we have at least version 0.5.0 of libwebp
+
+ - differentiate between file and image tags in the docs
+
+ - document libwebp requirements
+
 Imager-File-WEBP 0.002 - 3 Dec 2018
 ======================
 

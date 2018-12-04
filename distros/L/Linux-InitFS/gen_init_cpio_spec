@@ -34,4 +34,4 @@ enable_initfs_features
 	or die "Error while enabling initfs features.\n";
 
 # spit it out...
-exit ( generate_initfs_spec ? 0 : 1 );
+exit( generate_initfs_spec ? 0 : 1 );

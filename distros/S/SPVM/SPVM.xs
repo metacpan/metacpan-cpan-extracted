@@ -163,7 +163,7 @@ compile_spvm(...)
       SPVM_OP* op_name_package = SPVM_OP_new_op_name(compiler, name, file, line);
       SPVM_OP* op_type_package = SPVM_OP_build_basic_type(compiler, op_name_package);
       SPVM_OP* op_use_package = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, file, line);
-      SPVM_OP_build_use(compiler, op_use_package, op_type_package, NULL);
+      SPVM_OP_build_use(compiler, op_use_package, op_type_package, NULL, 0);
       SPVM_LIST_push(compiler->op_use_stack, op_use_package);
     }
   }
@@ -271,8 +271,11 @@ compile_spvm(...)
     // Build portable info
     SPVM_PORTABLE* portable = SPVM_PORTABLE_build_portable(compiler);
     
-    // Create run-time env
-    SPVM_ENV* env = SPVM_RUNTIME_build_runtime_env(portable);
+    // Build runtime
+    SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_build_runtime(portable);
+    
+    // Create env
+    SPVM_ENV* env = SPVM_RUNTIME_API_create_env(runtime);
     
     // Set ENV
     size_t iv_env = PTR2IV(env);
@@ -319,8 +322,10 @@ DESTROY(...)
   SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
   if (SvOK(sv_env)) {
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-    SPVM_RUNTIME_free(env);
-    free(env);
+    SPVM_RUNTIME* runtime = env->runtime;
+    
+    SPVM_RUNTIME_API_free_env(env);
+    SPVM_RUNTIME_API_free_runtime(runtime);
   }
 }
 

@@ -29,6 +29,7 @@ t/18_table_comments.t
 t/19_more_comments.t
 t/20_result_namespaces.t
 t/21_inherit_from_core.t
+t/22_custom_code_lc_uppercase.t
 t/Role.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
@@ -36,5 +37,7 @@ t/comment.mwb
 t/comment.mwb.bak
 t/m_to_n.mwb
 t/more_comments.mwb
+t/test-lc-uppercase.mwb
+t/test-lc-uppercase.mwb.bak
 t/test.mwb
 t/uppercase.mwb

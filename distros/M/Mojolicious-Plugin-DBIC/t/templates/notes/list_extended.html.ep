@@ -1,0 +1,6 @@
+<ul>
+% for my $row ( $resultset->all ) {
+    <li><%= $row->title %></li>
+% }
+</ul>
+<footer><%= $extended %></footer>
