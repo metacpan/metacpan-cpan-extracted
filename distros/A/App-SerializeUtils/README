@@ -2,8 +2,8 @@ NAME
     App::SerializeUtils - Utilities for serialization tasks
 
 VERSION
-    This document describes version 0.160 of App::SerializeUtils (from Perl
-    distribution App-SerializeUtils), released on 2018-01-29.
+    This document describes version 0.161 of App::SerializeUtils (from Perl
+    distribution App-SerializeUtils), released on 2018-11-19.
 
 SYNOPSIS
      $ script-that-produces-json | json2yaml
@@ -17,6 +17,8 @@ DESCRIPTION
     *   check-phpser
 
     *   check-yaml
+
+    *   dd2dd
 
     *   dd2ddc
 
@@ -33,6 +35,8 @@ DESCRIPTION
     *   json2dd
 
     *   json2ddc
+
+    *   json2json
 
     *   json2phpser
 
@@ -97,6 +101,8 @@ DESCRIPTION
     *   yaml2sereal
 
     *   yaml2storabls
+
+    *   yaml2yaml
 
 HOMEPAGE
     Please visit the project's homepage at

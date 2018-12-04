@@ -1,5 +1,11 @@
 Revision history for this software.
 
+2.13.6.8 2018/12/01 00:00:00
+  - makes die if __DATA__ has duplicate definitions
+  - allow comment line in __DATA__
+  - add comment in __DATA__
+  - created by INABA Hitoshi
+
 2.13.6.7 2018/08/19 00:00:00
   - support OVERRIDE_MAPPING
   - created by INABA Hitoshi

@@ -80,7 +80,7 @@ my $build = $class->new
   },
   'requires' => {
     'Carp' => '0',
-    'Config::Model' => '2.123',
+    'Config::Model' => '2.128',
     'Config::Model::Backend::Any' => '0',
     'File::Copy' => '0',
     'File::HomeDir' => '0',

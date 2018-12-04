@@ -11,6 +11,6 @@ my $authors = Acme::CPANAuthors->new('Danish');
 # would be silly.
 isa_ok($authors, 'Acme::CPANAuthors');
 
-is($authors->count, 5, 'How many Danish authors are there?');
+is($authors->count, 15, 'How many Danish authors are there?');
 
 done_testing;

@@ -1,3 +1,11 @@
+0.015   2018-12-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Delete test for strict.pm because Debian splits strict.pm's POD
+	  to strict.POD [RT#127839].
+
+
 0.014   2018-09-11 (PERLANCAR)
 
         - No functional changes.

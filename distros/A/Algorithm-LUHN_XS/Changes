@@ -1,0 +1,15 @@
+Revision history for Perl module Algorithm::LUHN_XS
+ 
+1.03 2018-12-03 KSCHWAB
+    - Add min requirement of 0.16 for XSLoader 
+
+1.02 2018-12-03 KSCHWAB
+    - Substantial performance improvement
+    - Add ExtUtils::MakeMaker 7.12 to CONFIGURE_REQUIRES
+
+1.01 2018-12-02 KSCHWAB
+    - Typo in Credits
+
+1.00 2018-12-02 KSCHWAB
+    - First release to CPAN
+

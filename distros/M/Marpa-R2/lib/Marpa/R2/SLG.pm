@@ -1,4 +1,4 @@
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -15,12 +15,12 @@
 
 package Marpa::R2::Scanless::G;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.000000';
+$VERSION        = '6.000000';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -504,7 +504,8 @@ sub Marpa::R2::Internal::Scanless::G::hash_to_runtime {
         my $g1_symbol_id = $g1_id_by_lexeme_name{$lexeme_name};
         if ( not defined $g1_symbol_id ) {
             Marpa::R2::exception(
-                'An L0 lexeme cannot appear on the RHS of an L0 rule'
+                qq{<$lexeme_name> is a lexeme but it is not a legal lexeme in G1:\n},
+                qq{   Lexemes must be G1 symbols that do not appear on a G1 LHS.\n}
             );
         }
         if ( not $g1_thin->symbol_is_accessible($g1_symbol_id) ) {

@@ -273,13 +273,15 @@ sub _verify_access_token_jwt {
 
     my $access_token_payload;
 
+    my $invalid_jwt;
     try {
         $access_token_payload =
             Mojo::JWT->new( secret => $self->jwt_secret )->decode( $access_token );
     }
     catch {
-        return ( 0, 'invalid_grant' );
+        $invalid_jwt = 1;
     };
+    return ( 0, 'invalid_grant' ) if $invalid_jwt;
 
     if (
         $access_token_payload

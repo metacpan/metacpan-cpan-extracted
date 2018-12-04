@@ -13,11 +13,11 @@ use warnings;
 use strict;
 
 package Text::VimColor;
-# git description: v0.26-5-g9246ba6
+# git description: v0.28-3-g19f6d99
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Syntax highlight text using Vim
-$Text::VimColor::VERSION = '0.28';
+$Text::VimColor::VERSION = '0.29';
 use constant HAVE_ENCODING => ($] >= 5.008001); # PerlIO::encoding & utf8::is_utf8
 
 use IO::File;
@@ -100,6 +100,7 @@ sub new {
     extra_vim_options      => [],
     html_inline_stylesheet => 1,
     xml_root_element       => 1,
+    xhtml5                 => 0,
     vim_let                => {},
     @_,
   };
@@ -285,6 +286,7 @@ sub _html_header
              : defined $input_filename     ? _xml_escape($input_filename)
              : '[untitled]';
 
+   my $xhtml5 = $self->{xhtml5};
    my $stylesheet;
    if ($self->{html_inline_stylesheet}) {
       $stylesheet = "<style>\n";
@@ -306,21 +308,33 @@ sub _html_header
    }
    else {
       $stylesheet =
-         "<link rel=\"stylesheet\" type=\"text/css\" href=\"" .
+         "<link rel=\"stylesheet\"" . ($xhtml5 ? '' : " type=\"text/css\"") . " href=\"" .
          _xml_escape($self->{html_stylesheet_url} ||
                      "file://${\ file($self->dist_file('light.css'))->as_foreign('Unix') }") .
          "\" />\n";
    }
 
-   "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"" .
-   " \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" .
-   "<html>\n" .
-   " <head>\n" .
-   "  <title>$title</title>\n" .
-   "  $stylesheet" .
-   " </head>\n" .
-   " <body>\n\n" .
-   "<pre>";
+   my $head = $xhtml5
+   ? <<"EOF"
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+EOF
+   : <<"EOF";
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN\"
+   http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+EOF
+
+   my $meta = $xhtml5 ? qq{<meta charset="utf-8"/>} : '';
+   return
+   $head
+   . " <head>\n"
+   . "  <title>$title</title>\n"
+   . $meta . "\n"
+   . "  $stylesheet"
+   . " </head>\n"
+   . " <body>\n\n" . "<pre>";
 }
 
 # Return a string safe to put in XML text or attribute values.  It doesn't
@@ -572,7 +586,7 @@ Text::VimColor - Syntax highlight text using Vim
 
 =head1 VERSION
 
-version 0.28
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -773,6 +787,13 @@ This can be used to supply the URL (relative or absolute) or the stylesheet
 to be referenced from the HTML C<< <link> >> element in the header.
 If this isn't given it will default to using a C<file://> URL to reference
 the supplied F<light.css> stylesheet, which is only really useful for testing.
+
+=item xhtml5
+
+If true (by default it is false), then output XHTML5 instead of XHTML 1.x when
+C<html_full_page> is specified.
+
+New in version 0.29 .
 
 =item xml_root_element
 
@@ -1125,7 +1146,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Text-VimColor>
+L<https://metacpan.org/release/Text-VimColor>
 
 =back
 
@@ -1164,7 +1185,7 @@ Randy Stauner <rwstauner@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Geoff Richards Hinrik Örn Sigurðsson mattn Vyacheslav Matyukhin
+=for stopwords Geoff Richards Hinrik Örn Sigurðsson mattn Randy Stauner Shlomi Fish Vyacheslav Matyukhin
 
 =over 4
 
@@ -1179,6 +1200,14 @@ Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
 =item *
 
 mattn <mattn.jp@gmail.com>
+
+=item *
+
+Randy Stauner <randy@r4s6.net>
+
+=item *
+
+Shlomi Fish <shlomif@shlomifish.org>
 
 =item *
 

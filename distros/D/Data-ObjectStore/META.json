@@ -27,7 +27,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::RecordStore" : "3.2",
+            "Data::RecordStore" : "4.05",
             "perl" : "v5.16.0"
          }
       }
@@ -35,7 +35,7 @@
    "provides" : {
       "Data::ObjectStore" : {
          "file" : "lib/Data/ObjectStore.pm",
-         "version" : "2.01"
+         "version" : "2.02"
       },
       "Data::ObjectStore::Array" : {
          "file" : "lib/Data/ObjectStore.pm"
@@ -53,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.01",
+   "version" : "2.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

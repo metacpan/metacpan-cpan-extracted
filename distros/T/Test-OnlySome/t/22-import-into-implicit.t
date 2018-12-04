@@ -99,7 +99,7 @@ os ok(1, 'Test 20');     # This one should run
 is($TEST_NUMBER_OS, 21, '$TEST_NUMBER_OS increments to 21');
 
 is_deeply($TEST_ONLYSOME, {skip => {6=>true, 8=>true, 10=>true, 14=>true, 18=>true,
-                                19=>true}, n=>1},
+                                19=>true}, n=>1, verbose=>0},
     '$TEST_ONLYSOME is what we set');
 
 # }}}1

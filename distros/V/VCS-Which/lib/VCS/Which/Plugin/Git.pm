@@ -19,7 +19,7 @@ use Contextual::Return;
 
 extends 'VCS::Which::Plugin';
 
-our $VERSION = version->new('0.6.4');
+our $VERSION = version->new('0.6.6');
 our $name    = 'Git';
 our $exe     = 'git';
 our $meta    = '.git';
@@ -316,7 +316,7 @@ VCS::Which::Plugin::Git - The Git plugin for VCS::Which
 
 =head1 VERSION
 
-This documentation refers to VCS::Which::Plugin::Git version 0.6.4.
+This documentation refers to VCS::Which::Plugin::Git version 0.6.6.
 
 =head1 SYNOPSIS
 

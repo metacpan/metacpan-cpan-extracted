@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke;
-$POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke::VERSION = '0.52';
+$POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke::VERSION = '0.54';
 #ABSTRACT: a backend for CPANPLUS::YACSmoke smokers.
 
 use strict;
@@ -10,9 +10,10 @@ sub _data {
   my $self = shift;
   $self->{_data} =
   {
-	check => [ '-MCPANPLUS::YACSmoke', '-e', 1 ],
-	index => [ '-MCPANPLUS::Backend', '-e', 'CPANPLUS::Backend->new()->reload_indices( update_source => 1 );' ],
-	smoke => [ '-MCPANPLUS::YACSmoke', '-e', 'my $module = shift; my $smoke = CPANPLUS::YACSmoke->new(); $smoke->test($module);' ],
+	check  => [ '-MCPANPLUS::YACSmoke', '-e', 1 ],
+	index  => [ '-MCPANPLUS::Backend', '-e', 'CPANPLUS::Backend->new()->reload_indices( update_source => 1 );' ],
+	smoke  => [ '-MCPANPLUS::YACSmoke', '-e', 'my $module = shift; my $smoke = CPANPLUS::YACSmoke->new(); $smoke->test($module);' ],
+  digest => qr/^\[MSG\] CPANPLUS is prefering/,
   };
   return;
 }
@@ -31,7 +32,7 @@ POE::Component::SmokeBox::Backend::CPANPLUS::YACSmoke - a backend for CPANPLUS::
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 DESCRIPTION
 
@@ -54,6 +55,12 @@ Returns [ '-MCPANPLUS::Backend', '-e', 'CPANPLUS::Backend->new()->reload_indices
 
 Returns [ '-MCPANPLUS::YACSmoke', '-e', 'my $module = shift; my $smoke = CPANPLUS::YACSmoke->new(); $smoke->test($module);' ]
 
+=item C<digest>
+
+Returns the following regexp:
+
+  qr/^\[MSG\] CPANPLUS is prefering/
+
 =back
 
 =head1 SEE ALSO
@@ -66,7 +73,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

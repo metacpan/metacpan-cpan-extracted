@@ -30,7 +30,9 @@
     * [15.17.1 Assisted moves using exit ornaments](#15.17.1)
     * [15.17.2 Custom assisted moves](#15.17.2)
 * [15.18 Pathfinding](#15.18)
-    * [15.18.1 Pathfinding problems](#15.18.1) 
+    * [15.18.1 Pathfinding problems](#15.18.1)
+    * [15.18.2 Avoiding path optimisation](#15.18.2)
+    * [15.18.3 Using path optimisation](#15.18.3)
 * [15.19 Room tags](#15.19)
 * [15.20 Room guilds](#15.20)
 * [15.21 Room flags](#15.21)
@@ -39,7 +41,8 @@
     * [15.21.3 Applying room tags](#15.21.3)
     * [15.21.4 Editing room flag colours](#15.21.4)
 * [15.22 The painter](#15.22)
-    * [15.22.1 Using the painter toolbar](#15.22.1)
+    * [15.22.1 Using the room painting toolbar](#15.22.1)
+    * [15.22.2 Using the quick painting toolbar](#15.22.2)
 * [15.23 Colouring the background map](#15.23)
     * [15.23.1 Colouring multiple gridblocks](#15.23.1)
 * [15.24 Wilderness rooms](#15.24)
@@ -53,6 +56,9 @@
     * [15.27.4 Transient exits](#15.27.4)
 * [15.28 Checked directions](#15.28)
 * [15.29 Getting lost](#15.29)
+    * [15.29.1 Auto-compare mode](#15.29.1)
+    * [15.29.2 Auto-rescue mode](#15.29.2)
+    * [15.29.3 Auto-slide mode](#15.29.3)
 * [15.30 Backing up maps](#15.29)
     * [15.30.1 Sharing maps](#15.29.1)
 * [15.31 Miscellaneous features](#15.30)
@@ -67,6 +73,7 @@
     * [15.31.9 Primary directions in other languages](#15.30.9)
     * [15.31.10 Secondary directions](#15.30.10)
     * [15.31.11 Secondary directions in Cyrosphere](#15.30.11)
+    * [15.31.12 Relative directions](#15.30.12)
 
 ---
 
@@ -489,6 +496,10 @@ An impassable exit (representing an exit that can't actually be used, at least n
 
 ![Impassable exit ornament](img/ch15/impassable_ornament.png)
 
+If you don't know how to get through an exit, you can mark it as a mystery exit, drawn as a dark red square.
+
+![Mystery exit ornament](img/ch15/mystery_ornament.png)
+
 An exit can be reset so that it no longer has an exit ornament.
 
 * Right-click on the exit and choose **Set ornaments > No ornament**
@@ -520,7 +531,7 @@ Unfortunately, because of technical limitations, assisted moves only apply a few
 
 Assisted moves can be turned off, if they're an annoyance.
 
-* From the automapper menu, de-select **Mode > Moves >  Allow assisted moves**
+* From the automapper menu, de-select **Mode > Movement flags >  Allow assisted moves**
 
 Assisted moves are not available when *redirect mode* is turned on (see [Section 7.5.6](ch07.html#7.5.6)).
 
@@ -538,11 +549,11 @@ When you try to move through an exit that has (for example) an openable door, th
 
 If this an annoyance, you can turn it off.
 
-* From the automapper menu, de-select **Mode > Moves > Open doors before move**
+* From the automapper menu, de-select **Mode > Movement flags > Open doors before move**
 
 You can also turn on *protected moves* mode, which blocks any world command which would move the character through an impassable or non-existent exit.
 
-* Select **Mode > Moves > Allow protected moves**
+* Select **Mode > Movement flags > Allow protected moves**
 
 ###<a name="15.17.2">15.17.2 Custom assisted moves</a>
 
@@ -569,7 +580,7 @@ All rooms along the path are selected so that you can clearly see the route. Whe
 
 ###<a name="15.18.1">15.18.1 Pathfinding problems</a>
 
-Sometimes, when you double-click on a destination room, you'll get a *No path found* error instead of what you were expecting. There are usually two reasons for this.
+Sometimes, when you double-click on a destination room, you'll get a *No path found* error. There are usually two reasons for this.
 
 Reason 1: *A path exists between rooms in one direction, but not the opposite direction*
 
@@ -585,9 +596,41 @@ Reason 2: *Axmud's pathfinding optimisation has failed*
 
 Some maps can contain many tens thousands of rooms. Finding a path between two rooms might take a long time - perhaps, a *very* long time - so Amxud tries to do some of the work in advance, working out the shortest paths across each region. 
 
-This approach works well in regions with just a few region exits, but would be useless in a large region with dozens or hundreds of region exits. (Working out all the possible paths would take much longer than actually moving between two rooms!)
+This approach works well when each pair of regions are connected to each other by a single exit. Sometimes it doesn't work so well when there are many exits connecting a single pair of regions.
 
-As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them. For example, consider a region B which is connected to regions A and C. 
+###<a name="15.18.2">15.18.2 Avoiding path optimisation</a>
+
+Axmud's pathfinding optimisation is not needed at all when the path between two rooms is in a single region, or if they are in neighbouring regions.
+
+You can change this behaviour, if you want. For example, you can tell Axmud to go via an intermediary region; in other words, you can tell Axmud not to use optimisation when finding a path between regions A and C, via region B:
+
+        A --- B --- C
+
+* From the automapper menu, click **Rooms > Pathfinding > Set adjacent regions mode...**
+* In the dialogue window, **Use adjacent regions** should already be selected
+* In the box below that, enter the number 2
+
+You can specify any number of adjacent regions. If you enter 10, Axmud won't use optimisiation when finding a path through these regions:
+
+        A --- B --- C --- D --- E --- F --- G --- H --- I --- J --- K
+
+You can also select **Use all regions**, which will disable optimisation altogether, or **Don't use the mode**, which will force Axmud to use optimisation when crossing regions.
+
+Experience shows that *the best settings for most users are the default settings*.
+
+###<a name="15.18.3">15.18.3 Using path optimisation</a>
+
+In a map with many thousands of rooms spread across dozens of regions, finding a path between two rooms might take a long time.
+
+Axmud's pathfinding optimisation works by calculating the paths through regions in advance. In other words, if three regions are linked like this:  
+
+        A --- B --- C
+
+...then Axmud calculates a path across region B in advance, from one region exit to the other. These pre-calculated paths are linked together in a network. Axmud uses this network of pre-calculated paths to find the shortest path between two rooms separated by a great distance.
+
+This approach works well in regions with just a few region exits, but would be useless in a large region with dozens or hundreds of region exits. (Working out all the possible paths would take *much* longer than actually moving between two rooms!)
+
+As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them. 
 
         A --- B --- C
 
@@ -598,15 +641,7 @@ You can add more super-region exits, if you want, and this will allow you to mov
 * Right-click on a region exit and select **Set exit type > Set super > Mark exit as super-region exit**
     * To reverse this step, select **Set exit type > Set super > Mark exit as normal region exit**
 
-There's are two situations in which you might want to convert all of Region B's region exits into super-region exits.
-
-* The only way to travel between two rooms in Region A is to go via Region B
-* You're drawing a town in Region A. Most buildings are just one room, but some buildings contain lots of rooms, so you've moved those rooms into Region B. There are now several groups of rooms in Region B which are connected to Region A, but not to each other.
-
-If either of those situations apply, do this:
-
-* Make Region B the current region
-* From the menu, select **Regions > Current region > Convert all region exits**
+It's possible to mark all of the region exits as super-region exits, but this is, in general, a very bad idea.
 
 ##<a name="15.19">15.19 Room tags</a>
 
@@ -691,9 +726,9 @@ All filters are now applied and all rooms are coloured white. You can now choose
 
 ###<a name="15.21.3">15.21.3 Applying room tags</a>
 
-There are two ways to turn room flags on and off.  The more convenient way is to use the painter, described in [Section 15.22](#15.22). The direct way is to set room flags, one room at a time.
+There are several ways to turn room flags *on* and *off*, some quicker than others.
 
-To mark a room as a pub - that is to say, to turn on the room's **pub** room flag:
+The long way is to use the automapper's menus. To mark a room as a pub - that is to say, to turn on the room's **pub** room flag:
 
 * Right-click the room and choose **Toggle room flags > Commercial > Room is a pub**
 * Repeat this step to turn the room flag off again
@@ -703,7 +738,7 @@ To turn on the room flag that means *this room is the centre of the world*:
 * Right-click the room and choose **Toggle room flags > Navigation > Room is centre of world**
 * Repeat this step to turn the room flag off again
 
-Of course, the rooms will only be coloured blue and orange if the **navigation** and **commercial** filters have been released, as described above.
+A much quicker way is to the painter, described in [Section 15.22](#15.22), or the quick painting toolbar, described in [Section 15.22](#15.22.2).
 
 ###<a name="15.21.4">15.21.4 Editing room flag colours</a>
 
@@ -721,7 +756,7 @@ If you don't like the colour the automapper is using for a particular flag, you 
 
 ##<a name="15.22">15.22 The painter</a>
 
-While exploring a region of the world - a forest, perhaps  - it would be quite tedious to set the room flags for every new room individually. The solution is to use the automapper window's *painter*.
+While exploring a region of the world - a forest, perhaps  - it would be quite tedious to set the room flags for every new room individually. One solution is to use the automapper window's *painter*.
 
 The painter can be configured by using the menus or by using the toolbar. We'll start by using the menus.
 
@@ -753,11 +788,11 @@ At the moment, the painter is only painting new rooms.  This is how to modify ex
 * Set your character's current room
 * Move your character from one room to another, painting rooms as you go
 
-###<a name="15.22.1">15.22.1 Using the painter toolbar</a>
+###<a name="15.22.1">15.22.1 Using the room painting toolbar</a>
 
-The painter toolbar can be used instead of the menus.  In many ways it's more convenient.
+The room painting toolbar can be used instead of the menus.  In many ways it's more convenient.
 
-![Painting toolbar](img/ch15/paint_toolbar.png)
+![Room painting toolbar](img/ch15/paint_toolbar.png)
 
 * Click the paintbrush button to enable the painter
 * Click the **Ne** button to paint only new rooms, or the **All** button to paint all rooms
@@ -771,6 +806,20 @@ Now you can add your favourite room flags.
 You can add as many favourite room flags as you like.  Each room flag aren't actually applied until you have clicked its button to select it.  Click the button a second time to unselect it.
 
 The remaining buttons in this toolbar are used for wilderness rooms, discussed in [Section 15.24](#15.24).
+
+###<a name="15.22.2">15.22.2 Using the quick painting toolbar</a>
+
+The painter described above is fine for painting rooms as you move around, but if you just want to toggle room flags in existing roms, you can use the quick painting toolbar.
+
+![Quick painting toolbar](img/ch15/quick_toolbar.png)
+
+This toolbar doesn't interact with the painter, but it does use the same set of favourite room flags. (Click the plus button to add some favourite room flags, if none currently exist).
+
+Using this toolbar is as simple as clicking on a coloured button, then clicking on a room.
+
+If you click on a selected room, the room flag is toggled in any other selected rooms at the same time. (If you're not careful, this can mean that a particular room flag is turned *on* in some rooms, and turned *off* in others!)
+
+The **Quick paint without resetting** button, when selected, allows you to click on rooms several times without having to click the coloured button each time.
 
 ##<a name="15.23">15.23 Colouring the background map</a>
 
@@ -925,7 +974,7 @@ If you de-select all of the items in the **Mode > Match rooms** menu, the automa
 
 When comparing verbose descriptions, only the first 100 characters are compared by default. You can increase or reduce that number, if you want.
 
-* From the automapper menu, choose **Mode > Verbose characters...**
+* From the automapper menu, choose **Mode > Match rooms > Set description length...**
 
 ###<a name="15.27.2">15.27.2 Hidden exits</a>
 
@@ -957,7 +1006,7 @@ Some rooms have exits which are *never* visible in the room's exit list. You can
 
 If you're mapping an area with a lot of hidden exits, you can turn on crafty exits mode.
 
-* From the automapper menu, click **Mode > Moves > Allow crafty moves**
+* From the automapper menu, click **Mode > Movement flags > Allow crafty moves**
 
 In crafty moves mode, if you character moves north from a room that doesn't contain a north exit, the automapper will create a hidden exit in that direction for you.  (This mode overrides protected moves mode, described in [Section 15.17.1](#15.17.1).)
 
@@ -1367,6 +1416,58 @@ In the new window, click on **Directions > Page 2** tab. You'll see a list of se
 * When you're finished, click the **Save** button at the bottom of the window
 
 Some zones of *Cryosphere* use *rimwards* (north), *hubwards* (south), *anticlockwise* (west) and *clockwise* (east). These can be added in the same way. Remember that the game abbreviates both *aft* and *anticlockwise* with *a*, so you'll need to decide which direction you want to abbreviate. (The pre-configured world profile abbreviates *anticlockwise*, not *aft*, as *a*.)
+
+###<a name="15.31.12">15.31.12 Relative directions</a>
+
+Relative directions are used by a handful of worlds in which a room's exits change depending on the direction in which the character is facing (which usually means the direction from which the character arrived).
+
+One such world is *Discworld MUD*. For a character that's facing north, the world uses the following relative directions:
+
+| Slot | Relative direction | Corresponds to |
+| ---- |:------------------ |:-------------- |
+| 0    | forward            | north          |
+| 1    | forward-right      | northeast      |
+| 2    | right              | east           |
+| 3    | backward-right     | southeast      |
+| 4    | backward           | south          |
+| 5    | backward-left      | southwest      |
+| 6    | left               | west           |
+| 7    | forward-left       | northwest      |
+
+However, if the character is facing northeast, the corresponding compass directions change:
+
+| Slot | Relative direction | Corresponds to |
+| ---- |:------------------ |:-------------- |
+| 0    | forward            | northeast      |
+| 1    | forward-right      | east           |
+| 2    | right              | southeast      |
+| 3    | backward-right     | south          |
+| 4    | backward           | southwest      |
+| 5    | backward-left      | west           |
+| 6    | left               | northwest      |
+| 7    | forward-left       | north          |
+
+If you're using the pre-configured world profile for *Discworld MUD*, then there's nothing to do - everything has been set up for you. If you're using a different profile, you'll have to define relative exits for yourself.
+
+First open the current dictionary's edit window:
+
+        ;editdictionary
+        ;edy
+
+In the new window, click on **Directions > Page 3** tab. You'll probably see an empty list.
+
+You don't have to add all eight relative directions, if the world doesn't them all; but you should at least add opposite pairs.
+
+* In the **Slot #** box, selected **Slot 0 (equivalent of north)**
+* Add a relative direction like **forward**
+    * If the world uses abbreviated directions like **fw**, you can add them, too
+* Click the **Add** button
+* Now, in the **Slot #** box, selected **Slot 4 (equivalent of south)**
+* Add a relative direction like **backward**
+    * If the world uses abbreviated directions like **bw**, you can add them, too
+* Click the **Add** button
+
+That's all you need to do. The Locator task and the automapper will take care of everything for you.
 
 ---
 

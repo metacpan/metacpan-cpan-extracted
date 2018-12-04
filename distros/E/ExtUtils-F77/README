@@ -11,7 +11,7 @@ Fortran subroutines on your system.
 2. Install
 
 Extract archive file.
-Change current directory to ExtUtils::F77-x.xx ("x.xx" is version
+Change current directory to extraction directory (usually ExtUtils-F77-x.xx/ where "x.xx" is version
 number).
 Type "perl Makefile.PL" to create Makefile.
 Type "make" to build module.

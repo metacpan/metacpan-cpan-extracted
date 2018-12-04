@@ -1,0 +1,29 @@
+---
+abstract: 'Dumper plugin for metabase-relayd'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.42'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Metabase-Relayd-Plugin-Dumper
+requires:
+  App::Metabase::Relayd: '0.12'
+  POE: '1.287'
+  Time::Piece: '0'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/app-metabase-relayd-plugin-dumper
+  repository: https://github.com/bingos/app-metabase-relayd-plugin-dumper.git
+version: '0.04'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

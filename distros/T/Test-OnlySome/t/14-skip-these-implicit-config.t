@@ -38,7 +38,7 @@ is($TEST_NUMBER_OS, 8, '$TEST_NUMBER_OS increments to 8');
 
 ok(1, 'Test 9');
 
-is_deeply($TEST_ONLYSOME, {skip => {2=>true, 4=>true, 6=>true}, n=>2},
+is_deeply($TEST_ONLYSOME, {skip => {2=>true, 4=>true, 6=>true}, verbose=>0, n=>2},
     '$TEST_ONLYSOME is what we set');
 
 dies_ok {
@@ -65,7 +65,7 @@ lives_ok {
     skip_these '1';
 } 'skip_these accepts "1"';
 
-is_deeply($TEST_ONLYSOME, {skip => {1=>true, 2=>true, 4=>true, 6=>true}, n=>2},
+is_deeply($TEST_ONLYSOME, {skip => {1=>true, 2=>true, 4=>true, 6=>true}, verbose=>0, n=>2},
     'Options structure is what we set, after modifications');
 
 done_testing();

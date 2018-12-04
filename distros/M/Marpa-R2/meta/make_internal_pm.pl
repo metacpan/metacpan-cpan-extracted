@@ -1,4 +1,4 @@
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -13,7 +13,7 @@
 # General Public License along with Marpa::R2.  If not, see
 # http://www.gnu.org/licenses/.
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use Carp;
@@ -71,7 +71,7 @@ say "\n1;";
 BEGIN {
 
 $HEADER = <<'END_OF_HEADER';
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -91,13 +91,13 @@ $HEADER = <<'END_OF_HEADER';
 
 package Marpa::R2::Internal;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use Carp;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.000000';
+$VERSION        = '6.000000';
 $STRING_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 END_OF_HEADER

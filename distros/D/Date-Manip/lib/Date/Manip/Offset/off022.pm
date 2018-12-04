@@ -6,9 +6,9 @@ Date::Manip::Offset::off022;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed May 30 14:51:33 EDT 2018
-#    Data version: tzdata2018e
-#    Code version: tzcode2018e
+#    Generated on: Fri Nov 30 14:30:25 EST 2018
+#    Data version: tzdata2018g
+#    Code version: tzcode2018g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.73';
+$VERSION='6.75';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -60,7 +60,9 @@ $Offset        = '+01:00:00';
       'europe/andorra',
       'europe/gibraltar',
       'europe/dublin',
+      'africa/casablanca',
       'africa/ceuta',
+      'africa/el_aaiun',
       'africa/sao_tome',
       'etc/gmt+1',
       'n',
@@ -68,7 +70,6 @@ $Offset        = '+01:00:00';
       'europe/vilnius',
       'europe/lisbon',
       'europe/uzhgorod',
-      'africa/casablanca',
       'europe/london',
       'europe/sofia',
       'europe/kaliningrad',
@@ -85,11 +86,11 @@ $Offset        = '+01:00:00';
       'wet',
       'europe/lisbon',
       'europe/london',
-      'africa/casablanca',
       'atlantic/madeira',
-      'africa/el_aaiun',
       'atlantic/canary',
       'atlantic/faroe',
+      'africa/casablanca',
+      'africa/el_aaiun',
       'africa/windhoek',
       'africa/algiers',
       'africa/ceuta',

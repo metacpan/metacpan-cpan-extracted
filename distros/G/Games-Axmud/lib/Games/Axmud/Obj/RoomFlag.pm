@@ -97,7 +97,7 @@
 
             # Flag set to TRUE for a custom room flag, added by the user (and which can be deleted
             #   by the user); FALSE for a built-in room flag which can't be deleted
-            customFlag                  => FALSE,
+            customFlag                  => $customFlag,
         };
 
         # Bless the object into existence

@@ -264,6 +264,10 @@ sub _send_msg {
 
     my ($buf_sr, $fds_ar) = $msg->can($self->{'_to_str_fn'})->($msg);
 
+    if ($fds_ar && @$fds_ar && !$self->supports_unix_fd()) {
+        die "Cannot send file descriptors without UNIX FD support!";
+    }
+
     $self->{'_io'}->enqueue_message( $buf_sr, $fds_ar );
 
     return $self->{'_io'}->flush_write_queue();

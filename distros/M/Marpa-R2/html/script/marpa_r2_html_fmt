@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -14,7 +14,7 @@
 # General Public License along with Marpa::R2.  If not, see
 # http://www.gnu.org/licenses/.
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
@@ -446,13 +446,21 @@ sub do_default {
     my $start_tag = Marpa::R2::HTML::start_tag();
     my $end_tag   = Marpa::R2::HTML::end_tag();
     my $is_empty_element  = Marpa::R2::HTML::is_empty_element();
+    if ($is_empty_element) {
+        if ( defined $start_tag ) {
+            push @new_line_data, [ 'empty element', 0, $start_tag ];
+        }
+        else {
+            push @new_line_data, [ 'empty element', 0, '<' . $tagname . '>' ];
+            push @new_line_data,
+                [ 'msg: empty element missing start tag', 0, 'preceeding', $tagname ]
+                if $main::ADDED_TAG_COMMENT_FLAG;
+        } ## end else [ if ( defined $start_tag ) ]
+        return \@new_line_data;
+    }
+
     {
-        ## no critic(Variables::ProhibitPackageVars)
-        my $tag_type =
-            $is_empty_element
-            ? 'empty element'
-            : 'start tag';
-        ##use critic
+        my $tag_type = 'start tag';
         if ( defined $start_tag ) {
             push @new_line_data, [ $tag_type, 0, $start_tag ];
         }

@@ -1,5 +1,5 @@
 package jacode4e;
-$VERSION = '2.13.6.7';
+$VERSION = '2.13.6.8';
 ######################################################################
 #
 # jacode4e - jacode.pl-like program for enterprise
@@ -12,6 +12,9 @@ $VERSION = '2.13.6.7';
 #
 # This software IS NOT "jacode.pl"!
 # If you want "jacode.pl", search it on CPAN again.
+#
+# And if you need round-trip conversion, you had better use
+# Jacode4e::RoundTrip module.
 #
 # SYNOPSIS
 # --------
@@ -76,7 +79,7 @@ $VERSION = '2.13.6.7';
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   require 'jacode4e.pl';
-#   jacode4e::VERSION('2.13.6.7');
+#   jacode4e::VERSION('2.13.6.8');
 #   while (<>) {
 #       $return =
 #       jacode4e::convert(\$_, 'cp932x', 'cp00930', {
@@ -122,7 +125,7 @@ usage:
 END
     }
     elsif ($ARGV[0] eq '--dumptable') {
-        chomp(@_ = <DATA>);
+        chomp(@_ = grep( ! /^#/, <DATA>));
         for my $encoding (@encodings) {
             open(TABLE,">$0.table.$encoding");
             for (@_) {
@@ -154,6 +157,7 @@ END
 }
 
 while (<DATA>) {
+    next if /^#/;
     chomp;
 
     my %hex = ();
@@ -167,10 +171,10 @@ while (<DATA>) {
     for my $encoding (@io_encodings) {
         if (($bin{$encoding} ne '') and ($bin{'utf8jp'} ne '')) {
             if (defined($tr{'utf8jp'}{$encoding}{$bin{$encoding}}) and ($tr{'utf8jp'}{$encoding}{$bin{$encoding}} ne '')) {
-                warn qq{@{[__FILE__]} duplicate definitions \$tr{'utf8jp'}{'$encoding'}{'$hex{$encoding}'} = "$hex{utf8}($bin{utf8})" and "} . uc unpack('H*',$tr{'utf8jp'}{$encoding}{$bin{$encoding}}) . qq{"($tr{'utf8jp'}{$encoding}{$bin{$encoding}})\n};
+                die qq{@{[__FILE__]} duplicate definitions \$tr{'utf8jp'}{'$encoding'}{'$hex{$encoding}'} = "$hex{utf8}($bin{utf8})" and "} . uc unpack('H*',$tr{'utf8jp'}{$encoding}{$bin{$encoding}}) . qq{"($tr{'utf8jp'}{$encoding}{$bin{$encoding}})\n};
             }
             if (defined($tr{$encoding}{'utf8jp'}{$bin{'utf8jp' }}) and ($tr{$encoding}{'utf8jp'}{$bin{'utf8jp' }} ne '')) {
-                warn qq{@{[__FILE__]} duplicate definitions \$tr{'$encoding'}{'utf8jp'}{'$hex{utf8}'} = "$hex{$encoding}" and "} . uc unpack('H*',$tr{$encoding}{'utf8jp'}{$bin{'utf8jp'}})    . qq{"\n};
+                die qq{@{[__FILE__]} duplicate definitions \$tr{'$encoding'}{'utf8jp'}{'$hex{utf8}'} = "$hex{$encoding}" and "} . uc unpack('H*',$tr{$encoding}{'utf8jp'}{$bin{'utf8jp'}})    . qq{"\n};
             }
             $tr{'utf8jp'}{$encoding}{$bin{$encoding}} = $bin{'utf8jp'};
             $tr{$encoding}{'utf8jp'}{$bin{'utf8jp'} } = $bin{$encoding};
@@ -902,7 +906,7 @@ jacode4e - jacode.pl-like program for enterprise
   use FindBin;
   use lib "$FindBin::Bin/lib";
   require 'jacode4e.pl';
-  jacode4e::VERSION('2.13.6.7');
+  jacode4e::VERSION('2.13.6.8');
   while (<>) {
       $return =
       jacode4e::convert(\$_, 'cp932x', 'cp00930', {
@@ -1026,7 +1030,7 @@ jacode4e - jacode.pl-like program for enterprise
   'utf8jp'           "\xF3\xB0\x85\xAB"  
   ---------------------------------------------------------------------------
 
-=head1 ABSTRACT
+=head1 RAISON D'ETRE
 
  This software has been developed for use promotion of JIS X 0213.
  
@@ -1082,7 +1086,7 @@ jacode4e - jacode.pl-like program for enterprise
 
 =item * UTF-8-SPUA-JP is UTF-8
 
-=item * Internal character encoding of jacode4e.pl, universally
+=item * Internal character encoding of jacode4e.pl and Jacode4e::RoundTrip, universally
 
 =item * Implements JIS X 0213 character set on to Unicode Supplementary Private Use Area-A
 
@@ -1102,40 +1106,50 @@ This software requires perl version 5.00503 or later to run.
 =head1 SOFTWARE LIFE CYCLE
 
                                          Jacode.pm  Jacode4e.pm
-                    jcode.pl  Encode.pm  jacode.pl  jacode4e.pl
-  --------------------------------------------------------------
-  1993 Perl4.036       |                     |                  
-    :     :            :                     :                  
-  1999 Perl5.00503     |                     |           |      
-  2000 Perl5.6         |                     |           |      
-  2002 Perl5.8         |         Born        |           |      
-  2007 Perl5.10        V          |          |           |      
-  2010 Perl5.12       EOL         |         Born         |      
-  2011 Perl5.14                   |          |           |      
-  2012 Perl5.16                   |          |           |      
-  2013 Perl5.18                   |          |           |      
-  2014 Perl5.20                   |          |           |      
-  2015 Perl5.22                   |          |           |      
-  2016 Perl5.24                   |          |           |      
-  2017 Perl5.26                   |          |           |      
-  2018 Perl5.28                   :          :          Born    
-  2019 Perl5.30                   :          :           :      
-  2020 Perl5.32                   :          :           :      
-    :     :                       V          V           V      
-  --------------------------------------------------------------
+                    jcode.pl  Encode.pm  jacode.pl  jacode4e.pl  Jacode4e::RoundTrip
+  -----------------------------------------------------------------------------------
+  1993 Perl4.036       |                     |                                       
+    :     :            :                     :                                       
+  1999 Perl5.00503     |                     |           |                |          
+  2000 Perl5.6         |                     |           |                |          
+  2002 Perl5.8         |         Born        |           |                |          
+  2007 Perl5.10        V          |          |           |                |          
+  2010 Perl5.12       EOL         |         Born         |                |          
+  2011 Perl5.14                   |          |           |                |          
+  2012 Perl5.16                   |          |           |                |          
+  2013 Perl5.18                   |          |           |                |          
+  2014 Perl5.20                   |          |           |                |          
+  2015 Perl5.22                   |          |           |                |          
+  2016 Perl5.24                   |          |           |                |          
+  2017 Perl5.26                   |          |           |                |          
+  2018 Perl5.28                   |          |          Born             Born        
+  2019 Perl5.30                   |          |           |                |          
+  2020 Perl5.32                   :          :           :                :          
+  2030 Perl5.52                   :          :           :                :          
+  2040 Perl5.72                   :          :           :                :          
+  2050 Perl5.92                   :          :           :                :          
+  2060 Perl5.112                  :          :           :                :          
+  2070 Perl5.132                  :          :           :                :          
+  2080 Perl5.152                  :          :           :                :          
+  2090 Perl5.172                  :          :           :                :          
+  2100 Perl5.192                  :          :           :                :          
+  2110 Perl5.212                  :          :           :                :          
+  2120 Perl5.232                  :          :           :                :          
+    :     :                       V          V           V                V          
+  -----------------------------------------------------------------------------------
 
 =head1 SOFTWARE COVERAGE
 
 When you lost your way, you can see this matrix and find your way.
 
-  Skill/Use  Amateur    Semipro    Pro        Enterprise
-  ---------------------------------------------------------
-  Expert     jacode.pl  Encode.pm  Encode.pm  jacode4e.pl
-  ---------------------------------------------------------
-  Middle     jacode.pl  jacode.pl  Encode.pm  jacode4e.pl
-  ---------------------------------------------------------
-  Beginner   jacode.pl  jacode.pl  jacode.pl  jacode4e.pl
-  ---------------------------------------------------------
+  Skill/Use  Amateur    Semipro    Pro        Enterprise   Enterprise(round-trip)
+  -------------------------------------------------------------------------------
+  Expert     jacode.pl  Encode.pm  Encode.pm  jacode4e.pl  Jacode4e::RoundTrip
+  -------------------------------------------------------------------------------
+  Middle     jacode.pl  jacode.pl  Encode.pm  jacode4e.pl  Jacode4e::RoundTrip
+  -------------------------------------------------------------------------------
+  Beginner   jacode.pl  jacode.pl  jacode.pl  jacode4e.pl  Jacode4e::RoundTrip
+  -------------------------------------------------------------------------------
 
 =head1 Why CP932X born?
 
@@ -1302,6 +1316,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 1;
 
+__DATA__
 #+++++++------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
 #||||||| ++++-------------------------------------------------------------------------- Microsoft CP932, IANA Windows-31J
 #||||||| |||| ++++--------------------------------------------------------------------- JISC Shift_JIS-2004
@@ -1317,7 +1332,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++-- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
 #2345678 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 12345678
 #VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVV
-__DATA__
 00       00   00   00   00   00   00   00   00   00   0000      00           F3B08080
 01       01   01   01   01   01   01   01   01   01   0001      01           F3B08081
 02       02   02   02   02   02   02   02   02   02   0002      02           F3B08082
@@ -1410,6 +1424,67 @@ __DATA__
 59       59   59   E8   E8   E8   E8   E8   59   E8   0059      59           F3B08199
 5A       5A   5A   E9   E9   E9   E9   E9   5A   E9   005A      5A           F3B0819A
 5B       5B   5B   70   4A   4A   4A   4A   5B   4A   005B      5B           F3B0819B
+#
+# ASCII and JIS X 0201 Roman (2001-04-30)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-yen.html
+#
+# When converting EUC-JP and Shift_JIS, handling of 0x5c and 0x7e can be a problem.
+# Since both encodings have long history and Japanese people have lot of experience
+# how to handle them, I now introduce it.
+#
+# Solution is very simple. Just regard YEN SIGN and REVERSE SOLIDUS as a different
+# glyphs of the same character. Then, distinction between ASCII and JIS X 0201
+# Roman can be neglected.
+#
+# Thus, when a Japanese person (almost Japanese people don't know about encoding;
+# a certain amount of people [Windows and Macintosh users] know the word "Shift_JIS"
+# as the only usable encoding) says "Shift_JIS", almost always it means "CP932".
+#
+# Please don't blame such Japanese people who don't aware of distinction between
+# Shift_JIS and CP932. The difference between Shift_JIS and CP932 was only that
+# CP932 has extension characters. It is the introduction of Unicode and conversion
+# to/from it that brought a confusing incompatibility of non-letter symbols between
+# Shift_JIS and CP932.
+#
+# The following is the reason why I wrote that when a Japanese person says
+# "Shift_JIS", almost always it means "CP932". For example, DOS/Windows programmers
+# write YEN SIGN + "n" to mean new line (in Shift_JIS, strictly speaking, CP932).
+# DOS/Windows use YEN SIGN (0x5c) for directory name separator. This is why
+# Microsoft cannot convert 0x5c in CP932 into characters other than U+005C.
+#
+# Not only Windows users but also UNIX users regarded 0x5c in Shift_JIS as an
+# ambiguous character of YEN SIGN and REVERSE SOLIDUS. For example, popular Japanese
+# encode converters such as nkf and qkc don't care about distinction between ASCII
+# (0x21-0x7e in EUC-JP) and JIS X 0201 Roman (0x21-0x7e in Shift_JIS). When I often
+# use TeraTerm, a telnet/ssh client for Windows, and read YEN SIGN, I read it as a
+# REVERSE SOLIDUS according to the context. (When a Japanese person is a writer,
+# it means YEN SIGN in most cases. When a non-Japanese person is a writer, it
+# always means REVERSE SOLIDUS).
+#
+# Thus, I don't complain if 0x5c in Shift_JIS is mapped into U+005C. Rather,
+# distinction of them (i.e., being strict to official standards) might confuse
+# many Japanese people.
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
+# Tomohiro KUBOTA <debian at tmail dot plala dot or dot jp>
+#
 5C       5C   5C   5B   5B   5B   5B   5B   5C   5B   005C      5C           F3B0819C
 5D       5D   5D   80   5A   5A   5A   5A   5D   5A   005D      5D           F3B0819D
 5E       5E   5E   B0   5F   5F   5F   5F   5E   5F   005E      5E           F3B0819E
@@ -1444,6 +1519,25 @@ __DATA__
 7B       7B   7B   C0   C0   C0   C0   C0   7B   C0   007B      7B           F3B081BB
 7C       7C   7C   4F   6A   6A   6A   6A   7C   6A   007C      7C           F3B081BC
 7D       7D   7D   D0   D0   D0   D0   D0   7D   D0   007D      7D           F3B081BD
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 7E       7E   7E   A0   A1   A1   A1   A1   7E   A1   007E      7E           F3B081BE
 7F       7F   7F   07   07   07   07   07   7F   07   007F      7F           F3B081BF
 80       80   80   20   20   20   20   20   80   20    ---        --         F3B08280
@@ -1590,6 +1684,25 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 814D     814D 814D 4279 A1AE A1AE A1AE A1AE 212E 4F4B FF40      EFBD80       F3B0848D
 814E     814E 814E 4460 A1AF A1AF A1AF A1AF 212F 4F61 00A8      C2A8         F3B0848E
 814F     814F 814F 4470 A1B0 A1B0 A1B0 A1B0 2130 4FF0 FF3E      EFBCBE       F3B0848F
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 8150     8150 8150 42A1 A1B1 A1B1 A1B1 A1B1 2131 4FF1 FFE3      EFBFA3       F3B08490
 8151     8151 8151 426D A1B2 A1B2 A1B2 A1B2 2132 4FF2 FF3F      EFBCBF       F3B08491
 8152     8152 8152 43DC A1B3 A1B3 A1B3 A1B3 2133 4FF3 30FD      E383BD       F3B08492
@@ -1602,11 +1715,104 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 8159     8159 8159 445E A1BA A1BA A1BA A1BA 213A 4F7A 3006      E38086       F3B08499
 815A     815A 815A 445F A1BB A1BB A1BB A1BB 213B 4F5E 3007      E38087       F3B0849A
 815B     815B 815B 4358 A1BC A1BC A1BC A1BC 213C 4F4C 30FC      E383BC       F3B0849B
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 815C     815C  --  DDB7 A1BD A1BD A1BD A1BD 213D 4F7E 2015      E28095       F3B0849C
 815D     815D 815D 445A A1BE A1BE A1BE A1BE 213E 4F6E 2010      E28090       F3B0849D
 815E     815E 815E 4261 A1BF A1BF A1BF A1BF 213F 4F6F FF0F      EFBC8F       F3B0849E
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 815F     815F  --  43E0 A1C0 A1C0 A1C0 A1C0 2140 4F7C FF3C      EFBCBC       F3B0849F
+#
+# Wave dash
+# https://en.wikipedia.org/wiki/Wave_dash
+#
+# Standard     Release  Code-Point        Glyph     Note
+# -----------------------------------------------------------------------------
+# Unicode 1.0  1991     U+301C WAVE DASH  \/\ (VA)  The glyph was different from the original JIS C 6226 or JIS X 0208.
+# Unicode 8.0  2015     U+301C WAVE DASH  /\/ (AV)  The glyph was fixed in Errata fixed in Unicode 8.0.0, The Unicode Consortium, 6 Oct 2014
+# JIS C 6226   1978     01-33             /\/ (AV)  The wave was not stressed this much.
+# JIS X 0208   1990     01-33             /\/ (AV)  
+# JIS X 0213   2000     1-01-33           /\/ (AV)  
+# -----------------------------------------------------------------------------
+#
+# Errata Fixed in Unicode 8.0.0
+# http://www.unicode.org/versions/Unicode8.0.0/erratafixed.html
+#
+# 2014-October-6
+# The character U+301C WAVE DASH was encoded to represent JIS C 6226-1978
+# 1-33. However, the representative glyph is inverted relative to the
+# original source. The glyph will be modified in future editions to match
+# the JIS source. The glyph shown below on the left is the incorrect glyph.
+# The corrected glyph is shown on the right. (See document L2/14-198 for
+# further context for this change.) 
+#
+# (Japanese) Wave dash
+# https://ja.wikipedia.org/wiki/%E6%B3%A2%E3%83%80%E3%83%83%E3%82%B7%E3%83%A5
+#
+# (Japanese) I'm just a programmer, cannot fix Unicode bug -- Dan Kogai-san 2006.05.10 11:00
+# http://blog.livedoor.jp/dankogai/archives/50488765.html
+#
+# (Japanese) About WAVE DASH problem -- yasuoka-san 2006.05.10 18:29
+# https://srad.jp/~yasuoka/journal/357074/
+#
+# (Japanese) Reason why Unicode's WAVE DASH example glyph was modified for the first time in 25 years
+# https://internet.watch.impress.co.jp/docs/special/691658.html
+#
 8160     8160 8160 43A1 A1C1 A1C1 A1C1 A1C1 2141 4FC1 301C      E3809C       F3B084A0
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 8161     8161 81D2 DFE5 A1C2 A1C2 A1C2 A1C2 2142 4FC2 2225      E288A5       F3B084A1
 8162     8162 8162 424F A1C3 A1C3 A1C3 A1C3 2143 4FC3 FF5C      EFBD9C       F3B084A2
 8163     8163 8163 447F A1C4 A1C4 A1C4 A1C4 2144 4FC4 2026      E280A6       F3B084A3
@@ -1634,6 +1840,25 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 8179     8179 8179 4466 A1DA A1DA A1DA A1DA 215A 4FE9 3010      E38090       F3B084B9
 817A     817A 817A 4476 A1DB A1DB A1DB A1DB 215B 4F4A 3011      E38091       F3B084BA
 817B     817B 817B 424E A1DC A1DC A1DC A1DC 215C 4F5B FF0B      EFBC8B       F3B084BB
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 817C     817C 81AF E9F3 A1DD A1DD A1DD A1DD 215D 4F5A FF0D      EFBC8D       F3B084BC
 817D     817D 817D 444B A1DE A1DE A1DE A1DE 215E 4F5F 00B1      C2B1         F3B084BD
 817E     817E 817E 447A A1DF A1DF A1DF A1DF 215F 4F6D 00D7      C397         F3B084BE
@@ -1652,8 +1877,46 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 818C     818C 818C 44EE A1EC A1EC A1EC A1EC 216C 4F71 2032      E280B2       F3B0858B
 818D     818D 818D 44EF A1ED A1ED A1ED A1ED 216D 4F72 2033      E280B3       F3B0858C
 818E     818E 818E 444E A1EE A1EE A1EE A1EE 216E 4F73 2103      E28483       F3B0858D
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 818F     818F 818F 425B A1EF A1EF A1EF A1EF 216F 4F74 FFE5      EFBFA5       F3B0858E
 8190     8190 8190 42E0 A1F0 A1F0 A1F0 A1F0 2170 4F75 FF04      EFBC84       F3B0858F
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 8191     8191  --  434A A1F1 A1F1 A1F1 A1F1 2171 4F76 FFE0      EFBFA0       F3B08590
 8192     8192  --  424A A1F2 A1F2 A1F2 A1F2 2172 4F77 FFE1      EFBFA1       F3B08591
 8193     8193 8193 426C A1F3 A1F3 A1F3 A1F3 2173 4F78 FF05      EFBC85       F3B08592
@@ -1682,6 +1945,7 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 81AA     81AA 81AA 44F2 A2AC A2AC A2AC A2AC 222C 7F6B 2191      E28691       F3B085A9
 81AB     81AB 81AB 44F3 A2AD A2AD A2AD A2AD 222D 7F60 2193      E28693       F3B085AA
 81AC     81AC 81AC 447D A2AE A2AE A2AE A2AE 222E 7F4B 3013      E38093       F3B085AB
+# Category 1(1 of 2) JIS C 6226-1978 Versus JIS X 0208-1983, CJKV Information Processing by Ken Lunde 1999
 81B8     81B8 81B8 4364 A2BA A2BA A2BA 7FD0 A5D4 45A9 2208      E28888       F3B085B7
 81B9     81B9 81B9 4365 A2BB A2BB A2BB 7FD1 A5D5 45AA 220B      E2888B       F3B085B8
 81BA     81BA 81BA 4366 A2BC A2BC A2BC 7FD2 A6F4 46EA 2286      E28A86       F3B085B9
@@ -1692,6 +1956,25 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 81BF     81BF 81BF 436B A2C1 A2C1 A2C1 7FD7 2D7B 60C0 2229      E288A9       F3B085BE
 81C8     81C8 81C8 436C A2CA A2CA A2CA 7FD8 A5D0 45A5 2227      E288A7       F3B08687
 81C9     81C9 81C9 436D A2CB A2CB A2CB 7FD9 A5D1 45A6 2228      E288A8       F3B08688
+#
+# Conversion tables differ between venders (2002-04-04)
+# http://www8.plala.or.jp/tkubota1/unicode-symbols-map2.html
+#
+# JIS      0208   SJIS   CP932  APPLE  0213   IBMGLY IBMIRV G-EUC  G-SJIS
+# -----------------------------------------------------------------------
+# 0x005C   ------ U+00A5 U+005C U+00A5 ------ U+00A5 U+005C U+005C U+00A5
+# 0x007E   ------ U+203E U+007E U+007E ------ U+203E U+007E U+007E U+203E
+# 0x2131   U+FFE3 U+FFE3 U+FFE3 U+FFE3 U+203E U+FFE3 U+FFE3 U+FFE3 U+FFE3
+# 0x213D   U+2015 U+2015 U+2015 U+2014 U+2014 U+2014 U+2014 U+2015 U+2015
+# 0x2140   U+005C U+005C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C U+FF3C
+# 0x2141   U+301C U+301C U+FF5E U+301C U+301C U+301C U+301C U+301C U+301C
+# 0x2142   U+2016 U+2016 U+2225 U+2016 U+2016 U+2016 U+2016 U+2016 U+2016
+# 0x215D   U+2212 U+2212 U+FF0D U+2212 U+2212 U+2212 U+2212 U+2212 U+2212
+# 0x216F   U+FFE5 U+FFE5 U+FFE5 U+FFE5 U+00A5 U+FFE5 U+FFE5 U+FFE5 U+FFE5
+# 0x2171   U+00A2 U+00A2 U+FFE0 U+00A2 U+00A2 U+FFE0 U+FFE0 U+00A2 U+00A2
+# 0x2172   U+00A3 U+00A3 U+FFE1 U+00A3 U+00A3 U+FFE1 U+FFE1 U+00A3 U+00A3
+# 0x224C   U+00AC U+00AC U+FFE2 U+00AC U+00AC U+FFE2 U+FFE2 U+00AC U+00AC
+#
 81CA     81CA  --  425F A2CC A2CC A2CC 76A7  --   --  FFE2      EFBFA2       F3B08689
 81CB     81CB 81CB 436E A2CD A2CD A2CD 7FDA A6F6 46EC 21D2      E28792       F3B0868A
 81CC     81CC 81CC 436F A2CE A2CE A2CE 7FDB A6F7 46ED 21D4      E28794       F3B0868B
@@ -1721,6 +2004,7 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 81F6     81F6 81F6 4378 A2F8 A2F8 A2F8 7FEE A5EF 45DB 2021      E280A1       F3B086B5
 81F7     81F7 81F7 4379 A2F9 A2F9 A2F9 7FEF A5F0 45DC 00B6      C2B6         F3B086B6
 81FC     81FC 81FC 437A A2FE A2FE A2FE 7FF0 A6FE 46FE 25EF      E297AF       F3B086BB
+# End of Category 1(1 of 2) JIS C 6226-1978 Versus JIS X 0208-1983, CJKV Information Processing by Ken Lunde 1999
 824F     824F 824F 42F0 A3B0 A3B0 A3B0 A3B0 2330 7BF0 FF10      EFBC90       F3B0878B
 8250     8250 8250 42F1 A3B1 A3B1 A3B1 A3B1 2331 7BF1 FF11      EFBC91       F3B0878C
 8251     8251 8251 42F2 A3B2 A3B2 A3B2 A3B2 2332 7BF2 FF12      EFBC92       F3B0878D
@@ -2066,6 +2350,7 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 848F     848F 848F 419E A7EF A7EF A7EF A7EF 276F 7D74 044D      D18D         F3B08E82
 8490     8490 8490 419F A7F0 A7F0 A7F0 A7F0 2770 7D75 044E      D18E         F3B08E83
 8491     8491 8491 41A0 A7F1 A7F1 A7F1 A7F1 2771 7D76 044F      D18F         F3B08E84
+# Category 1(2 of 2) JIS C 6226-1978 Versus JIS X 0208-1983, CJKV Information Processing by Ken Lunde 1999
 849F     849F 849F 437C AFBC A8A1 A8A1 7CD1 2C24 6BE0 2500      E29480       F3B08E92
 84A0     84A0 84A0 437D AFBF A8A2 A8A2 7CD2 2C26 6B50 2502      E29482       F3B08E93
 84A1     84A1 84A1 437E AFA1 A8A3 A8A3 7CC1 2C30 6BF0 250C      E2948C       F3B08E94
@@ -2098,6 +2383,8 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 84BC     84BC 84BC 43F0 A8BE A8BE A8BE 7FA4 2C49 6BC9 2525      E294A5       F3B08EAF
 84BD     84BD 84BD 43F1 A8BF A8BF A8BF 7FA1 2C5C 6B5B 2538      E294B8       F3B08EB0
 84BE     84BE 84BE 43F2 A8C0 A8C0 A8C0 7CCD 2C66 6B65 2542      E29582       F3B08EB1
+# End of Category 1(2 of 2) JIS C 6226-1978 Versus JIS X 0208-1983, CJKV Information Processing by Ken Lunde 1999
+# NEC Kanji Row 13, Appendix C, CJKV Information Processing by Ken Lunde 1999
 8740     8740 8740 E270 76B1 76B1 76B1 77C9 2D21 604F 2460      E291A0       F3B095A8
 8741     8741 8741 E271 76B2 76B2 76B2 77CA 2D22 607F 2461      E291A1       F3B095A9
 8742     8742 8742 E272 76B3 76B3 76B3 77CB 2D23 607B 2462      E291A2       F3B095AA
@@ -2172,6 +2459,7 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 8794     8794  --  DFD6 6FA2 6FA2 6FA2  --  2D74 6080 2211      E28891       F3B096BB
 8798     8798 8798 DFE0 6FB7 6FB7 6FB7  --  2D78 60A0 221F      E2889F       F3B096BF
 8799     8799 8799 E0AC 6FBA 6FBA 6FBA  --  2D79 60AB 22BF      E28ABF       F3B09780
+# End of NEC Kanji Row 13, Appendix C, CJKV Information Processing by Ken Lunde 1999
 889F     889F 889F 4867 B0A1 B0A1 B0A1 B0A1 3021 F04F 4E9C      E4BA9C       F3B09A82
 88A0     88A0 88A0 54D4 B0A2 B0A2 B0A2 B0A2 3022 F07F 5516      E59496       F3B09A83
 88A1     88A1 88A1 557A B0A3 B0A3 B0A3 B0A3 3023 F07B 5A03      E5A883       F3B09A84
@@ -3040,7 +3328,13 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 8D53     8D53 8D53 5045 B9B4 B9B4 B9B4 B9B4 3934 F9F4 62D8      E68B98       F3B0A7A3
 8D54     8D54 8D54 4CAC B9B5 B9B5 B9B5 B9B5 3935 F9F5 63A7      E68EA7       F3B0A7A4
 8D55     8D55 8D55 4BC5 B9B6 B9B6 B9B6 B9B6 3936 F9F6 653B      E694BB       F3B0A7A5
+# IBM Selected Kanji and Non-Kanji, Appendix Q, CJKV Information Processing by Ken Lunde 1999
+#
+# U+6602
+# https://glyphwiki.org/wiki/u6602
+#
 8D56     8D56 8D56 5B99 60AE B9B7 B9B7 50FC BDB6 8E86 6602      E69882       F3B0A7A6
+# End of IBM Selected Kanji and Non-Kanji, Appendix Q, CJKV Information Processing by Ken Lunde 1999
 8D57     8D57 8D57 48B0 B9B8 B9B8 B9B8 B9B8 3938 F9F8 6643      E69983       F3B0A7A7
 8D58     8D58 8D58 4A6D B9B9 B9B9 B9B9 B9B9 3939 F9F9 66F4      E69BB4       F3B0A7A8
 8D59     8D59 8D59 508B B9BA B9BA B9BA B9BA 393A F97A 676D      E69DAD       F3B0A7A9
@@ -4096,6 +4390,10 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 92C8     92C8 92C8 54FE C4CA C4CA C4CA C4CA 444A C4D1 939A      E98E9A       F3B0B883
 92C9     92C9 92C9 4C47 C4CB C4CB C4CB C4CB 444B C4D2 75DB      E7979B       F3B0B884
 92CA     92CA 92CA 45E3 C4CC C4CC C4CC C4CC 444C C4D3 901A      E9809A       F3B0B885
+#
+# U+585A
+# https://glyphwiki.org/wiki/u585a
+#
 92CB     92CB 92CB 4657 5CC4 C4CD C4CD 47C9 B6F5 86EB 585A      E5A19A       F3B0B886
 92CC     92CC 92CC 52D1 C4CE C4CE C4CE C4CE 444E C4D5 6802      E6A082       F3B0B887
 92CD     92CD 92CD 54CD C4CF C4CF C4CF C4CF 444F C4D6 63B4      E68EB4       F3B0B888
@@ -5821,6 +6119,11 @@ FF       FF   FF   FF   FF   FF   FF   FF   FF   FF    ---        --         F3B
 9C57     9C57 9C57 59C8 D7B8 D7B8 D7B8 D7B8 5738 E6F8 5F29      E5BCA9       F3B193AB
 9C58     9C58 9C58 59C9 D7B9 D7B9 D7B9 D7B9 5739 E6F9 5F2D      E5BCAD       F3B193AC
 9C59     9C59 9C59 59CC D7BA D7BA D7BA D7BA 573A E67A 5F38      E5BCB8       F3B193AD
+#
+# One 9C5A meaning requires 9C5A9C5A
+#
+# 9C5A9C5A 9C5A 9C5A 59CD D7BB D7BB D7BB D7BB 573B E65E 5F41      E5BD81       F3B483BE
+#
 9C5B     9C5B 9C5B 59CE D7BC D7BC D7BC D7BC 573C E64C 5F48      E5BD88       F3B193AF
 9C5C     9C5C 9C5C 59CF D7BD D7BD D7BD D7BD 573D E67E 5F4C      E5BD8C       F3B193B0
 9C5D     9C5D 9C5D 59D0 D7BE D7BE D7BE D7BE 573E E66E 5F4E      E5BD8E       F3B193B1
@@ -8520,12 +8823,17 @@ EA9B     EA9B EA9B 687C F3FB F3FB F3FB F3FB 737B 78C0 9F76      E9BDB6       F3B
 EA9C     EA9C EA9C 687D F3FC F3FC F3FC F3FC 737C 786A 9F95      E9BE95       F3B1BDB7
 EA9D     EA9D EA9D 687E F3FD F3FD F3FD F3FD 737D 78D0 9F9C      E9BE9C       F3B1BDB8
 EA9E     EA9E EA9E 687F F3FE F3FE F3FE F3FE 737E 78A1 9FA0      E9BEA0       F3B1BDB9
+# Category 2 JIS C 6226-1978 Versus JIS X 0208-1983, CJKV Information Processing by Ken Lunde 1999
 EA9F     EA9F EA9F 4E53 5CC3 F4A1 F4A1 B6C6 3646 F6C6 582F      E5A0AF       F3B1BDBA
 EAA0     EAA0 EAA0 4DB9 61FC F4A2 F4A2 CBEA 4B6A D269 69C7      E6A787       F3B1BDBB
 EAA1     EAA1 EAA1 52F3 6BA2 F4A3 F4A3 CDDA 4D5A D4E9 9059      E98199       F3B1BDBC
 EAA2     EAA2 EAA2 5EBB 65A7 F4A4 F4A4 E0F6 6076 799B 7464      E791A4       F3B1BDBD
+# End of Category 2 JIS C 6226-1978 Versus JIS X 0208-1983, CJKV Information Processing by Ken Lunde 1999
+# JIS X 0208-1983 Versus JIS X 0208-1990, CJKV Information Processing by Ken Lunde 1999
 EAA3     EAA3 EAA3 6884  --   --  F4A5 44A4 B4A8 8448 51DC      E5879C       F3B1BDBE
 EAA4     EAA4 EAA4 4F68 64B8 64B8 F4A6 58A8 C3BA 948A 7199      E78699       F3B1BDBF
+# End of JIS X 0208-1983 Versus JIS X 0208-1990, CJKV Information Processing by Ken Lunde 1999
+# IBM Selected Kanji and Non-kanji, Appendix C, CJKV Information Processing by Ken Lunde 1999
 FA40     FA40 86B3 41B1 74C1 74C1 74C1 77EB A2BD 428E 2170      E285B0       F3B2AB9C
 FA41     FA41 86B4 41B2 74C2 74C2 74C2 77EC A2BE 428F 2171      E285B1       F3B2AB9D
 FA42     FA42 86B5 41B3 74C3 74C3 74C3 77ED A2BF 4290 2172      E285B2       F3B2AB9E
@@ -8602,6 +8910,10 @@ FA98     FA98 F1EA 586C 5CB9 5CB9 5CB9 48CB B6E3 86B5 57AC      E59EAC       F3B
 FA99     FA99 886E 5870 5CBD 5CBD 5CBD 47F7 B6E5 86B7 57C8      E59F88       F3B2ACB4
 FA9A     FA9A 886D 5873 9FA6 9FA6 9FA6 47F6 B6E6 86B8 57C7      E59F87       F3B2ACB5
 FA9B     FA9B 886A 5877 5CBB 5CBB 5CBB 48CC B6E7 86B9 FA0F      EFA88F       F3B2ACB6
+#
+# U+FA10
+# https://glyphwiki.org/wiki/ufa10
+#
 FA9C     FA9C 8876 5882 C4CD 5CC7 5CC7 C4CD 444D C4D4 FA10      EFA890       F3B2ACB7
 FA9D     FA9D 887C 588A 5CD1 5CD1 5CD1 48BB B7A8 8748 589E      E5A29E       F3B2ACB8
 FA9E     FA9E  --  588C 5CD3 5CD3 5CD3 48CD B7AE 8755 58B2      E5A2B2       F3B2ACB9
@@ -8654,7 +8966,13 @@ FACC     FACC EAFA 5B54 5FF2 5FF2 5FF2 4FA7 BCDC 8DBC 64CE      E6938E       F3B
 FACD     FACD  --  5B7E 5FF8 5FF8 5FF8 50C9 BCF0 8DDC 654E      E6958E       F3B2ADA8
 FACE     FACE EB4B 5B97 60B3 60B3 60B3 51BD BDBD 8E8E 6600      E69880       F3B2ADA9
 FACF     FACF EB4D 5B98 60B1 60B1 60B1 51C4 BDB5 8E85 6615      E69895       F3B2ADAA
+# IBM Selected Kanji and Non-Kanji, Appendix Q, CJKV Information Processing by Ken Lunde 1999
+#
+# U+663B
+# https://glyphwiki.org/wiki/u663b
+#
 FAD0     FAD0  --  4F9F B9B7 60B6 60B6 B9B7 3937 F9F7 663B      E698BB       F3B2ADAB
+# End of IBM Selected Kanji and Non-Kanji, Appendix Q, CJKV Information Processing by Ken Lunde 1999
 FAD1     FAD1 EB4C 5B9D 60AF 60AF 60AF 51C0 BDB7 8E87 6609      E69889       F3B2ADAC
 FAD2     FAD2  --  5BA0 60BE 60BE 60BE 51A1 BDC2 8E93 662E      E698AE       F3B2ADAD
 FAD3     FAD3 EB4E 5BA1 60C4 60C4 60C4 51C7 BDC4 8E95 661E      E6989E       F3B2ADAE
@@ -8899,6 +9217,14 @@ FC48     FC48 FCB2 67E4 6DF2 6DF2 6DF2 6FA1 D5D4 AAA9 9D6B      E9B5AB       F3B
 FC49     FC49  --  67F4 6DF4 6DF4 6DF4 6FB2 D5DA AABA FA2D      EFA8AD       F3B2B19D
 FC4A     FC4A FCCD 67FE 6EAC 6EAC 6EAC 6FAE D5DC AABC 9E19      E9B899       F3B2B19E
 FC4B     FC4B EFF0 6856 6EA1 6EA1 6EA1 6FD6 D5EB AACD 9ED1      E9BB91       F3B2B19F
+# End of IBM Selected Kanji and Non-kanji, Appendix C, CJKV Information Processing by Ken Lunde 1999
+#
+# (Japanese) ghost characters
+# https://ja.wikipedia.org/wiki/%E5%B9%BD%E9%9C%8A%E6%96%87%E5%AD%97
+#
+# U+5F41
+# https://glyphwiki.org/wiki/u5f41
+#
 9C5A815C  --  815C 444A  --   --   --   --   --   --  2014      E28094       F3B2B4AC
 9C5A8161  --  8161 447C  --   --   --   --   --   --  2016      E28096       F3B2B4B1
 9C5A817C  --  817C 4260  --   --   --   --   --   --  2212      E28892       F3B2B58C
@@ -9476,7 +9802,9 @@ FC4B     FC4B EFF0 6856 6EA1 6EA1 6EA1 6FD6 D5EB AACD 9ED1      E9BB91       F3B
 9C5A8776  --  8776 DF43 74BC 74BC 74BC  --  A2D2 42A7 216B      E285AB       F3B386AE
 9C5A879D  --  879D E5EF  --   --   --   --   --   --  2756      E29D96       F3B38794
 9C5A879E  --  879E E47E  --   --   --   --   --   --  261E      E2989E       F3B38795
+# JIS X 0213:2000 Versus JIS X 0213:2004 (1 of 5)
 9C5A879F  --  879F B356 59FC 59FC 59FC  --   --   --  4FF1      E4BFB1       F3B38796
+# End of JIS X 0213:2000 Versus JIS X 0213:2004 (1 of 5)
 9C5A87A0  --  87A0 B342 59A4 59A4 59A4  --   --   --  2000B     F0A0808B     F3B38797
 9C5A87A1  --  87A1 B343 59A8 59A8 59A8  --   --   --  3402      E39082       F3B38798
 9C5A87A3  --  87A3 B84B  --   --   --   --   --   --  4E2F      E4B8AF       F3B3879A
@@ -9635,8 +9963,10 @@ FC4B     FC4B EFF0 6856 6EA1 6EA1 6EA1 6FD6 D5EB AACD 9ED1      E9BB91       F3B
 9C5A889B  --  889B B3D9  --   --   --   --   --   --  218BD     F0A1A2BD     F3B38A8E
 9C5A889C  --  889C BCD1  --   --   --  49E6 B8B0 8858 5B19      E5AC99       F3B38A8F
 9C5A889D  --  889D BCD5  --   --   --   --   --   --  5B25      E5ACA5       F3B38A90
+# JIS X 0213:2000 Versus JIS X 0213:2004 (2 of 5)
 9C5A889E  --  889E B375 6EB8 6EB8 6EB8  --   --   --  525D      E5899D       F3B38A91
 9C5A9873  --  9873 B38D 5BD5 5BD5 5BD5  --   --   --  20B9F     F0A0AE9F     F3B3B8A7
+# End of JIS X 0213:2000 Versus JIS X 0213:2004 (2 of 5)
 9C5A9874  --  9874 BCD9  --   --   --   --   --   --  5B41      E5AD81       F3B3B8A8
 9C5A9876  --  9876 BCE2  --   --   --   --  B8B9 8889 5B7D      E5ADBD       F3B3B8AA
 9C5A9877  --  9877 BCEC  --   --   --  4AA8 B8C0 8891 5B93      E5AE93       F3B3B8AB
@@ -9668,9 +9998,20 @@ FC4B     FC4B EFF0 6856 6EA1 6EA1 6EA1 6FD6 D5EB AACD 9ED1      E9BB91       F3B
 9C5A989A  --  989A B445  --   --   --   --   --   --  5DA4      E5B6A4       F3B3B98D
 9C5A989B  --  989B BDA6 5EA1 5EA1 5EA1 4BDC B9D2 89A7 5DA7      E5B6A7       F3B3B98E
 9C5A989D  --  989D BDAD 5EA6 5EA6 5EA6 4BB0  --   --  5DCB      E5B78B       F3B3B990
+# JIS X 0213:2000 Versus JIS X 0213:2004 (3 of 5)
 9C5A989E  --  989E B390  --   --   --   --   --   --  541E      E5909E       F3B3B991
+# End of JIS X 0213:2000 Versus JIS X 0213:2004 (3 of 5)
+#
+# (Japanese) ghost characters
+# https://ja.wikipedia.org/wiki/%E5%B9%BD%E9%9C%8A%E6%96%87%E5%AD%97
+#
+# U+5F41
+# https://glyphwiki.org/wiki/u5f41
+#
 9C5A9C5A 9C5A 9C5A 59CD D7BB D7BB D7BB D7BB 573B E65E 5F41      E5BD81       F3B483BE
+# JIS X 0213:2000 Versus JIS X 0213:2004 (4 of 5)
 9C5AEAA5  --  EAA5 B3AB 6EBF 6EBF 6EBF  --   --   --  5653      E59993       F3B4AE90
+# End of JIS X 0213:2000 Versus JIS X 0213:2004 (4 of 5)
 9C5AEAA6  --  EAA6 B44A 61CF 61CF 61CF  --   --   --  5DE2      E5B7A2       F3B4AE91
 9C5AEAA7  --  EAA7 BDBA  --   --   --  4CA2  --   --  5E14      E5B894       F3B4AE92
 9C5AEAA8  --  EAA8 BDBC  --   --   --  4BFA B9E8 89CA 5E18      E5B898       F3B4AE93
@@ -10544,11 +10885,13 @@ FC4B     FC4B EFF0 6856 6EA1 6EA1 6EA1 6FD6 D5EB AACD 9ED1      E9BB91       F3B
 9C5AEFF5  --  EFF5 D545 6EAB 6EAB 6EAB 70A8 D5F9 AAEF 9F94      E9BE94       F3B4BE8C
 9C5AEFF6  --  EFF6 D547  --   --   --  70AC  --   --  9F97      E9BE97       F3B4BE8D
 9C5AEFF7  --  EFF7 D54A 66EE 66EE 66EE  --  B6C0 8691 9FA2      E9BEA2       F3B4BE8E
+# JIS X 0213:2000 Versus JIS X 0213:2004 (5 of 5)
 9C5AEFF8  --  EFF8 B3D3  --   --   --   --   --   --  59F8      E5A7B8       F3B4BE8F
 9C5AEFF9  --  EFF9 B3E5 6ECD 6ECD 6ECD  --   --   --  5C5B      E5B19B       F3B4BE90
 9C5AEFFA  --  EFFA B451  --   --   --   --   --   --  5E77      E5B9B7       F3B4BE91
 9C5AEFFB  --  EFFB C5EF 80A3 80A3 80A3  --   --   --  7626      E798A6       F3B4BE92
 9C5AEFFC  --  EFFC C95B 80B4 80B4 80B4  --   --   --  7E6B      E7B9AB       F3B4BE93
+# End of JIS X 0213:2000 Versus JIS X 0213:2004 (5 of 5)
 9C5AF040  --  F040 B346  --   --   --   --   --   --  20089     F0A08289     F3B4BE94
 9C5AF041  --  F041 B841 59A1 59A1 59A1 41A1 B2A1 8241 4E02      E4B882       F3B4BE95
 9C5AF042  --  F042 B341  --   --   --   --   --   --  4E0F      E4B88F       F3B4BE96

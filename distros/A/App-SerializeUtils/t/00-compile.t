@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 47 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/SerializeUtils.pm'
@@ -16,6 +16,7 @@ my @scripts = (
     'script/check-json',
     'script/check-phpser',
     'script/check-yaml',
+    'script/dd2dd',
     'script/dd2ddc',
     'script/dd2json',
     'script/dd2phpser',
@@ -24,6 +25,7 @@ my @scripts = (
     'script/dd2yaml',
     'script/json2dd',
     'script/json2ddc',
+    'script/json2json',
     'script/json2phpser',
     'script/json2sereal',
     'script/json2storable',
@@ -55,7 +57,8 @@ my @scripts = (
     'script/yaml2json',
     'script/yaml2phpser',
     'script/yaml2sereal',
-    'script/yaml2storabls'
+    'script/yaml2storabls',
+    'script/yaml2yaml'
 );
 
 # no fake home requested

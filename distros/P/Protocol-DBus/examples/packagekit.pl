@@ -11,9 +11,6 @@ use Data::Dumper;
 use Protocol::DBus;
 use Protocol::DBus::Client;
 
-# https://rt.cpan.org/Public/Bug/Display.html?id=127115
-use Socket::MsgHdr;
-
 my $dbus = Protocol::DBus::Client::system();
 
 $dbus->do_authn();

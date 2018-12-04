@@ -27,6 +27,10 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
+            "PDL::Core" : "0",
+            "PDL::Lite" : "0",
+            "PDL::Primitive" : "0",
+            "PDL::Types" : "0",
             "Safe::Isa" : "0",
             "Scalar::Util" : "0",
             "Test2::API" : "0",
@@ -35,14 +39,15 @@
             "Test2::Tools::Compare" : "0",
             "Test2::Util::Ref" : "0",
             "Test2::Util::Table" : "0",
+            "constant" : "0",
             "parent" : "0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "PDL::Core" : "0",
             "Test2::V0" : "0"
          }
       }
@@ -50,7 +55,7 @@
    "provides" : {
       "Test2::Tools::PDL" : {
          "file" : "lib/Test2/Tools/PDL.pm",
-         "version" : "0.0001"
+         "version" : "0.0002"
       }
    },
    "release_status" : "stable",
@@ -59,7 +64,7 @@
          "url" : "https://github.com/stphnlyd/perl5-Test2-Tools-PDL.git"
       }
    },
-   "version" : "0.0001",
+   "version" : "0.0002",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

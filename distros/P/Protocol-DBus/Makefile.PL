@@ -32,9 +32,6 @@ WriteMakefile1(
         'Module::Load'  => 0,
         'Call::Context' => 0,
         'IO::Framed' => 0,
-
-        # Alas, an XS dependency. Possible to substitute Linux::Perl?
-        'Socket::MsgHdr' => 0,
     },
 
     TEST_REQUIRES => {

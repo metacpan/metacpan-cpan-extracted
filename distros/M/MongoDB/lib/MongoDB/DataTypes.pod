@@ -30,7 +30,7 @@ MongoDB::DataTypes - Using MongoDB data types with Perl
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 DESCRIPTION
 
@@ -185,8 +185,8 @@ only way to ensure that documents can roundtrip preserving key order.
 
 By default, the BSON decoder decodes doubles and integers into a
 Perl-native form.  To maximize fidelity during a roundtrip, the decoder
-supports the L<wrap_numbers> attribute to always decode to a BSON type
-wrapper class with numeric overloading.
+supports the L<wrap_numbers|BSON/wrap_numbers> attribute to always decode
+to a BSON type wrapper class with numeric overloading.
 
 =head3 32-bit Platforms
 

@@ -36,11 +36,16 @@ lib/Config/Model/user.d/ssh
 t/README.md
 t/custom_sshd.t
 t/custom_sshd_match.t
+t/model_tests.d/ssh-examples/bad-forward/system_ssh_config
+t/model_tests.d/ssh-examples/bad-forward/user_ssh_config
+t/model_tests.d/ssh-examples/bad-pref-auth/system_ssh_config
+t/model_tests.d/ssh-examples/bad-pref-auth/user_ssh_config
 t/model_tests.d/ssh-examples/basic/system_ssh_config
 t/model_tests.d/ssh-examples/basic/user_ssh_config
 t/model_tests.d/ssh-examples/legacy/system_ssh_config
 t/model_tests.d/ssh-examples/legacy/user_ssh_config
 t/model_tests.d/ssh-test-conf.pl
+t/model_tests.d/sshd-examples/bad-password-authentication/system_sshd_config
 t/model_tests.d/sshd-examples/debian-bug-671367/system_sshd_config
 t/model_tests.d/sshd-test-conf.pl
 t/model_tests.d/system-ssh-examples/basic/system_ssh_config

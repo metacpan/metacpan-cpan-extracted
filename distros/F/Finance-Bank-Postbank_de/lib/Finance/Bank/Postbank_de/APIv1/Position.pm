@@ -5,7 +5,7 @@ no warnings 'experimental::signatures';
 use feature 'signatures';
 extends 'HAL::Resource';
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 =head1 NAME
 

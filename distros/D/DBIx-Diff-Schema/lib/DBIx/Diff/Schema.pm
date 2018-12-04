@@ -1,7 +1,7 @@
 package DBIx::Diff::Schema;
 
-our $DATE = '2018-05-10'; # DATE
-our $VERSION = '0.091'; # VERSION
+our $DATE = '2018-12-03'; # DATE
+our $VERSION = '0.092'; # VERSION
 
 use 5.010001;
 use strict;
@@ -149,6 +149,10 @@ sub _diff_column_schema {
                 $res->{old_digits} = $c1->{DECIMAL_DIGITS};
                 $res->{new_digits} = $c2->{DECIMAL_DIGITS};
             }
+        }
+        if (($c1->{mysql_is_auto_increment} // 0) != ($c2->{mysql_is_auto_increment} // 0)) {
+            $res->{old_auto_increment} = $c1->{mysql_is_auto_increment} // 0;
+            $res->{new_auto_increment} = $c2->{mysql_is_auto_increment} // 0;
         }
     }
     $res;
@@ -367,7 +371,7 @@ DBIx::Diff::Schema - Compare schema of two DBI databases
 
 =head1 VERSION
 
-This document describes version 0.091 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2018-05-10.
+This document describes version 0.092 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2018-12-03.
 
 =head1 SYNOPSIS
 

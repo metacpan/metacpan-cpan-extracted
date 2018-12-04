@@ -7,21 +7,28 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Acme::CPANAuthors::Danish;
-{
-  $Acme::CPANAuthors::Danish::VERSION = '0.03';
-}
 # ABSTRACT: We are Danish CPAN authors
-
+$Acme::CPANAuthors::Danish::VERSION = '0.04';
 use strict;
 use warnings;
 use utf8;
 
 use Acme::CPANAuthors::Register (
     ABH      => 'Ask Bjørn Hansen',
+    GRUBER   => 'Anton Berezon',
+    WARMING  => 'Casper Warming',
+    BORUP    => 'Christian Borup',
+    KARASIK  => 'Dmitry Karasik',
+    UNIEJO   => 'Erik Johansen',
+    HTOUG    => 'Henrik Tougaard',
     JONASBN  => 'jonasbn',
     KAARE    => 'Kaare Rasmussen',
+    LBR      => 'Lars Balker',
     LTHEGLER => 'Lars Thegler',
+    LEGART   => 'Michael Legart',
     MADZ     => 'Michael Anton Dines Zedeler',
+    THOMAS   => 'Thomas Eibner',
+    TLBDK    => 'Troels Liebe Bentsen',
 );
 
 
@@ -31,13 +38,15 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Acme::CPANAuthors::Danish - We are Danish CPAN authors
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -55,8 +64,6 @@ version 0.03
 =head1 DESCRIPTION
 
 This class provides a hash of Pause ID/name of Danish CPAN authors.
-
-=encoding utf-8
 
 =head1 MAINTENANCE
 

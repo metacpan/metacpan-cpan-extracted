@@ -28,9 +28,9 @@ configure_requires:
   Test::More: '0.94'
   Time::Piece: '1.12'
   XSLoader: '0.08'
-  perl: '5.010'
+  perl: '5.010001'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -74,49 +74,49 @@ no_index:
 provides:
   Marpa::R2:
     file: lib/Marpa/R2.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::ASF:
     file: lib/Marpa/R2/ASF.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::Grammar:
     file: lib/Marpa/R2/Grammar.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::HTML:
     file: html/lib/Marpa/R2/HTML.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::HTML::Callback:
     file: html/lib/Marpa/R2/HTML/Callback.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::HTML::Config:
     file: html/lib/Marpa/R2/HTML/Config.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::HTML::Config::Compile:
     file: html/lib/Marpa/R2/HTML/Config/Compile.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::MetaAST:
     file: lib/Marpa/R2/MetaAST.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::MetaG:
     file: lib/Marpa/R2/MetaG.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::Recognizer:
     file: lib/Marpa/R2/Recognizer.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::Scanless::G:
     file: lib/Marpa/R2/SLG.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::Scanless::R:
     file: lib/Marpa/R2/SLR.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::Stuifzand:
     file: lib/Marpa/R2/Stuifzand.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::Thin::Trace:
     file: lib/Marpa/R2/Thin/Trace.pm
-    version: '4.000000'
+    version: '6.000000'
   Marpa::R2::Value:
     file: lib/Marpa/R2/Value.pm
-    version: '4.000000'
+    version: '6.000000'
 recommends:
   Config::AutoConf: '0.22'
   PPI: '1.206'
@@ -143,7 +143,7 @@ requires:
   Test::More: '0.94'
   Time::Piece: '1.12'
   XSLoader: '0.08'
-  perl: '5.010'
+  perl: '5.010001'
 resources:
   IRC:
     irc: irc://irc.freenode.net/#marpa
@@ -151,4 +151,5 @@ resources:
   homepage: http://savage.net.au/Marpa.html
   license: http://opensource.org/licenses/lgpl-3.0.html
   repository: git://github.com/jeffreykegler/Marpa--R2.git
-version: '4.000000'
+version: '6.000000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

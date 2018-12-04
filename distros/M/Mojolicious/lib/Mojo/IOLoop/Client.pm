@@ -65,7 +65,7 @@ sub connect {
 sub _cleanup {
   my $self = shift;
   $NDN->timedout($self->{dns}) if $NDN && $self->{dns};
-  return unless my $reactor = $self->reactor;
+  return $self unless my $reactor = $self->reactor;
   $self->{$_} && $reactor->remove(delete $self->{$_}) for qw(dns timer handle);
   return $self;
 }
@@ -73,7 +73,7 @@ sub _cleanup {
 sub _connect {
   my ($self, $args) = @_;
 
-  my $path = $args->{path};
+  my $path   = $args->{path};
   my $handle = $self->{handle} = $args->{handle};
 
   unless ($handle) {

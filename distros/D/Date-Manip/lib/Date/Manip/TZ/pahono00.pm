@@ -6,9 +6,9 @@ Date::Manip::TZ::pahono00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed May 30 14:49:36 EDT 2018
-#    Data version: tzdata2018e
-#    Code version: tzcode2018e
+#    Generated on: Fri Nov 30 14:28:46 EST 2018
+#    Data version: tzdata2018g
+#    Code version: tzcode2018g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.73';
+$VERSION='6.75';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -53,11 +53,14 @@ END { undef $VERSION; }
    1942 =>
      [
         [ [1942,2,9,12,30,0],[1942,2,9,3,0,0],'-09:30:00',[-9,-30,0],
-          'HDT',1,[1945,9,30,11,29,59],[1945,9,30,1,59,59],
-          '1942020912:30:00','1942020903:00:00','1945093011:29:59','1945093001:59:59' ],
+          'HWT',1,[1945,8,14,22,59,59],[1945,8,14,13,29,59],
+          '1942020912:30:00','1942020903:00:00','1945081422:59:59','1945081413:29:59' ],
      ],
    1945 =>
      [
+        [ [1945,8,14,23,0,0],[1945,8,14,13,30,0],'-09:30:00',[-9,-30,0],
+          'HPT',1,[1945,9,30,11,29,59],[1945,9,30,1,59,59],
+          '1945081423:00:00','1945081413:30:00','1945093011:29:59','1945093001:59:59' ],
         [ [1945,9,30,11,30,0],[1945,9,30,1,0,0],'-10:30:00',[-10,-30,0],
           'HST',0,[1947,6,8,12,29,59],[1947,6,8,1,59,59],
           '1945093011:30:00','1945093001:00:00','1947060812:29:59','1947060801:59:59' ],

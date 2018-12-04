@@ -1,15 +1,19 @@
 #!perl
 
-use Test::More;
+use Test2::V0;
 use Test::Lib;
 use My::Test;
 
-my $map = {
+use Data::Dump qw[ pp ];
+
+my %map = (
     R1  => 'T1',
     R2  => 'T2',
     R3  => 'wR1',
     T12 => 'T1,T2',
-};
+);
+
+sub name { My::Test::name( \%map, @_ ) }
 
 {
     package B1;
@@ -24,18 +28,24 @@ my $map = {
     );
 }
 
-check_class(
-    'B1',
-    {
-        b1_1 => 'b1_1.v',
-    },
-    {
-        T1_1 => {
-            b1_1 => 'b1_1.t1_1',
+subtest name( 'B1', 'T1' ) => sub {
+
+    is(
+        B1->new,
+        object {
+            call b1_1 => 'b1_1.v';
         },
-    },
-    $map, 'T1',
-);
+    );
+
+    is(
+        B1->_tags,
+        hash {
+            field T1_1 => hash {
+                field b1_1 => 'b1_1.t1_1';
+            };
+        },
+    );
+};
 
 {
     package B2;
@@ -51,18 +61,26 @@ check_class(
 
 }
 
-check_class(
-    'B2',
-    {
-        b2_1 => 'b2_1.v',
-    },
-    {
-        T2_1 => {
-            b2_1 => 'b2_1.t2_1',
+subtest name( 'B2', 'T2' ) => sub {
+
+    is(
+        B2->new,
+        object {
+            call b2_1 => 'b2_1.v';
         },
-    },
-    $map, 'T2'
-);
+    );
+
+    is(
+        B2->_tags,
+        hash {
+            field T2_1 => hash {
+                field b2_1 => 'b2_1.t2_1';
+            };
+        },
+    );
+
+};
+
 
 {
     package B3;
@@ -80,21 +98,26 @@ check_class(
 
 }
 
-check_class(
-    'B3',
-    {
-        b3_1 => 'b3_1.v',
-    },
-    {
-        T1_1 => {
-            b3_1 => 'b3_1.t1_1',
+subtest name( 'B3', 'T1,T2' ) => sub {
+
+    is(
+        B3->new,
+        object {
+            call b3_1 => 'b3_1.v';
+        } );
+
+    is(
+        B3->_tags,
+        hash {
+            field T1_1 => hash {
+                field b3_1 => 'b3_1.t1_1';
+            };
+            field T2_1 => hash {
+                field b3_1 => 'b3_1.t2_1';
+            };
         },
-        T2_1 => {
-            b3_1 => 'b3_1.t2_1',
-        },
-    },
-    $map, 'T1,T2'
-);
+    );
+};
 
 {
     package B4;
@@ -111,22 +134,29 @@ check_class(
 
 }
 
-check_class(
-    'B4',
-    {
-        b4_1  => 'b4_1.v',
-        t12_1 => 't12_1.v',
-    },
-    {
-        T1_1 => {
-            b4_1 => 'b4_1.t1_1',
+subtest name( 'B4', 'T12' ) => sub {
+
+    is(
+        B4->new,
+        object {
+            call b4_1  => 'b4_1.v';
+            call t12_1 => 't12_1.v';
         },
-        T2_1 => {
-            b4_1 => 'b4_1.t2_1',
+    );
+
+    is(
+        B4->_tags,
+        hash {
+            field T1_1 => hash {
+                field b4_1 => 'b4_1.t1_1';
+            };
+            field T2_1 => hash {
+                field b4_1 => 'b4_1.t2_1';
+            };
         },
-    },
-    $map, 'T12'
-);
+    );
+
+};
 
 
 {
@@ -143,20 +173,24 @@ check_class(
 
 }
 
-check_class(
-    'C1',
-    {
-        b1_1 => 'b1_1.v',
-        c1_1 => 'c1_1.v',
-    },
-    {
-        T1_1 => {
-            b1_1 => 'b1_1.t1_1',
-        },
-    },
-    $map, '<B1'
-);
+subtest name( 'C1', '<B1' ) => sub {
 
+    is(
+        C1->new,
+        object {
+            call b1_1 => 'b1_1.v';
+            call c1_1 => 'c1_1.v';
+        },
+    );
+    is(
+        C1->_tags,
+        hash {
+            field T1_1 => hash {
+                field b1_1 => 'b1_1.t1_1';
+            };
+        },
+    );
+};
 
 {
     package C2;
@@ -172,20 +206,24 @@ check_class(
 
 }
 
-check_class(
-    'C2',
-    {
-        b2_1 => 'b2_1.v',
-        c2_1 => 'c2_1.v',
-    },
-    {
-        T2_1 => {
-            b2_1 => 'b2_1.t2_1',
-        },
-    },
-    $map, '<B2'
-);
+subtest name( 'C2', '<B2' ) => sub {
 
+    is(
+        C2->new,
+        object {
+            call b2_1 => 'b2_1.v';
+            call c2_1 => 'c2_1.v';
+        },
+    );
+    is(
+        C2->_tags,
+        hash {
+            field T2_1 => hash {
+                field b2_1 => 'b2_1.t2_1';
+            };
+        },
+    );
+};
 
 {
     package C3;
@@ -202,23 +240,27 @@ check_class(
 
 }
 
-check_class(
-    'C3',
-    {
-        b3_1 => 'b3_1.v',
-        c3_1 => 'c3_1.v',
-    },
-    {
-        T1_1 => {
-            b3_1 => 'b3_1.t1_1',
-        },
-        T2_1 => {
-            b3_1 => 'b3_1.t2_1',
-        },
-    },
-    $map, '<B3'
-);
+subtest name( 'C3', '<B3' ) => sub {
 
+    is(
+        C3->new,
+        object {
+            call b3_1 => 'b3_1.v';
+            call c3_1 => 'c3_1.v';
+        },
+    );
+    is(
+        C3->_tags,
+        hash {
+            field T1_1 => hash {
+                field b3_1 => 'b3_1.t1_1';
+            };
+            field T2_1 => hash {
+                field b3_1 => 'b3_1.t2_1';
+            };
+        },
+    );
+};
 {
     package C31;
 
@@ -234,22 +276,28 @@ check_class(
 
 }
 
-check_class(
-    'C31',
-    {
-        b4_1  => 'b4_1.v',
-        c31_1 => 'c31_1.v',
-    },
-    {
-        T1_1 => {
-            b4_1 => 'b4_1.t1_1',
+subtest name( 'C31', '<B4' ) => sub {
+
+    is(
+        C31->new,
+        object {
+            call b4_1  => 'b4_1.v';
+            call c31_1 => 'c31_1.v';
         },
-        T2_1 => {
-            b4_1 => 'b4_1.t2_1',
+    );
+    is(
+        C31->_tags,
+        hash {
+            field T1_1 => hash {
+                field b4_1 => 'b4_1.t1_1';
+            };
+            field T2_1 => hash {
+                field b4_1 => 'b4_1.t2_1';
+            };
         },
-    },
-    $map, '<B4'
-);
+    );
+
+};
 
 {
     package C4;
@@ -267,26 +315,30 @@ check_class(
 
 }
 
-check_class(
-    'C4',
-    {
-        b1_1 => 'b1_1.v',
-        c4_1 => 'c4_1.v',
-        r1_1 => 'r1_1.v',
-    },
-    {
-        T1_1 => {
-            b1_1 => 'b1_1.t1_1',
-            r1_1 => 'r1_1.t1_1',
-            r1_2 => 'r1_2.t1_1',
+subtest name( 'C4', '<B1,wR1' ) => sub {
+
+    is(
+        C4->new,
+        object {
+            call b1_1 => 'b1_1.v';
+            call c4_1 => 'c4_1.v';
+            call r1_1 => 'r1_1.v';
         },
-        T1_2 => {
-            r1_1 => 'r1_1.t1_2',
+    );
+    is(
+        C4->_tags,
+        hash {
+            field T1_1 => hash {
+                field b1_1 => 'b1_1.t1_1';
+                field r1_1 => 'r1_1.t1_1';
+                field r1_2 => 'r1_2.t1_1';
+            };
+            field T1_2 => hash {
+                field r1_1 => 'r1_1.t1_2';
+            };
         },
-    },
-    $map,
-    '<B1,wR1',
-);
+    );
+};
 
 {
     package C5;
@@ -306,38 +358,43 @@ check_class(
 
 }
 
-check_class(
-    'C5',
-    {
-        b1_1 => 'b1_1.v',
-        c4_1 => 'c4_1.v',
-        c5_1 => 'c5_1.v',
-        r1_1 => 'r1_1.v',
-        r2_1 => 'r2_1.v',
-    },
-    {
-        T1_1 => {
-            b1_1 => 'b1_1.t1_1',
-            c5_1 => 'c5_1.t1_1',
-            r1_1 => 'r1_1.t1_1',
-            r1_2 => 'r1_2.t1_1',
-        },
-        T1_2 => {
-            r1_1 => 'r1_1.t1_2',
-        },
-        T2_1 => {
-            c5_1 => 'c5_1.t2_1',
-            r2_1 => 'r2_1.t2_1',
-            r2_2 => 'r2_2.t2_1',
-        },
-        T2_2 => {
-            r2_1 => 'r2_1.t2_2',
-        },
-    },
-    $map,
-    '<C4,R1,R2',
+subtest name( 'C5', '<C4,R1,R2' ) => sub {
 
-);
+    is(
+        C5->new,
+        object {
+            call b1_1 => 'b1_1.v';
+            call c4_1 => 'c4_1.v';
+            call c5_1 => 'c5_1.v';
+            call r1_1 => 'r1_1.v';
+            call r2_1 => 'r2_1.v';
+        },
+    );
+
+    is(
+        C5->_tags,
+        hash {
+            field T1_1 => hash {
+                field b1_1 => 'b1_1.t1_1';
+                field c5_1 => 'c5_1.t1_1';
+                field r1_1 => 'r1_1.t1_1';
+                field r1_2 => 'r1_2.t1_1';
+            };
+            field T1_2 => hash {
+                field r1_1 => 'r1_1.t1_2';
+            };
+            field T2_1 => hash {
+                field c5_1 => 'c5_1.t2_1';
+                field r2_1 => 'r2_1.t2_1';
+                field r2_2 => 'r2_2.t2_1';
+            };
+            field T2_2 => hash {
+                field r2_1 => 'r2_1.t2_2';
+            };
+        },
+    );
+
+};
 
 {
     package C6;
@@ -357,34 +414,38 @@ check_class(
 
 }
 
-check_class(
-    'C6',
-    {
-        b1_1 => 'b1_1.v',
-        c6_1 => 'c6_1.v',
-        r1_1 => 'r1_1.v',
-        r2_1 => 'r2_1.v',
-    },
-    {
-        T1_1 => {
-            b1_1 => 'b1_1.t1_1',
-            r1_1 => 'r1_1.t1_1',
-            r1_2 => 'r1_2.t1_1',
+subtest name( 'C6', '<B1,wR1,wR2' ) => sub {
+
+    is(
+        C6->new,
+        object {
+            call b1_1 => 'b1_1.v';
+            call c6_1 => 'c6_1.v';
+            call r1_1 => 'r1_1.v';
+            call r2_1 => 'r2_1.v';
         },
-        T1_2 => {
-            r1_1 => 'r1_1.t1_2',
+    );
+    is(
+        C6->_tags,
+        hash {
+            field T1_1 => hash {
+                field b1_1 => 'b1_1.t1_1';
+                field r1_1 => 'r1_1.t1_1';
+                field r1_2 => 'r1_2.t1_1';
+            };
+            field T1_2 => hash {
+                field r1_1 => 'r1_1.t1_2';
+            };
+            field T2_1 => hash {
+                field r2_1 => 'r2_1.t2_1';
+                field r2_2 => 'r2_2.t2_1';
+            };
+            field T2_2 => hash {
+                field r2_1 => 'r2_1.t2_2';
+            };
         },
-        T2_1 => {
-            r2_1 => 'r2_1.t2_1',
-            r2_2 => 'r2_2.t2_1',
-        },
-        T2_2 => {
-            r2_1 => 'r2_1.t2_2',
-        },
-    },
-    $map,
-    '<B1,wR1,wR2',
-);
+    );
+};
 
 {
     package C7;
@@ -404,34 +465,39 @@ check_class(
 
 }
 
-check_class(
-    'C7',
-    {
-        b2_1 => 'b2_1.v',
-        c7_1 => 'c7_1.v',
-        r1_1 => 'r1_1.v',
-        r2_1 => 'r2_1.v',
-    },
-    {
-        T1_1 => {
-            r1_1 => 'r1_1.t1_1',
-            r1_2 => 'r1_2.t1_1',
+subtest name( 'C7', '<B2,wR1,wR2' ) => sub {
+
+    is(
+        C7->new,
+        object {
+            call b2_1 => 'b2_1.v';
+            call c7_1 => 'c7_1.v';
+            call r1_1 => 'r1_1.v';
+            call r2_1 => 'r2_1.v';
         },
-        T1_2 => {
-            r1_1 => 'r1_1.t1_2',
+    );
+
+    is(
+        C7->_tags,
+        hash {
+            field T1_1 => hash {
+                field r1_1 => 'r1_1.t1_1';
+                field r1_2 => 'r1_2.t1_1';
+            };
+            field T1_2 => hash {
+                field r1_1 => 'r1_1.t1_2';
+            };
+            field T2_1 => hash {
+                field b2_1 => 'b2_1.t2_1';
+                field r2_1 => 'r2_1.t2_1';
+                field r2_2 => 'r2_2.t2_1';
+            };
+            field T2_2 => hash {
+                field r2_1 => 'r2_1.t2_2';
+            };
         },
-        T2_1 => {
-            b2_1 => 'b2_1.t2_1',
-            r2_1 => 'r2_1.t2_1',
-            r2_2 => 'r2_2.t2_1',
-        },
-        T2_2 => {
-            r2_1 => 'r2_1.t2_2',
-        },
-    },
-    $map,
-    '<B2,wR1,wR2',
-);
+    );
+};
 
 {
     package C8;
@@ -451,36 +517,40 @@ check_class(
 
 }
 
-check_class(
-    'C8',
-    {
-        b3_1 => 'b3_1.v',
-        c8_1 => 'c8_1.v',
-        r1_1 => 'r1_1.v',
-        r2_1 => 'r2_1.v',
-    },
-    {
-        T1_1 => {
-            b3_1 => 'b3_1.t1_1',
-            r1_1 => 'r1_1.t1_1',
-            r1_2 => 'r1_2.t1_1',
-        },
-        T1_2 => {
-            r1_1 => 'r1_1.t1_2',
-        },
-        T2_1 => {
-            b3_1 => 'b3_1.t2_1',
-            r2_1 => 'r2_1.t2_1',
-            r2_2 => 'r2_2.t2_1',
-        },
-        T2_2 => {
-            r2_1 => 'r2_1.t2_2',
-        },
-    },
-    $map,
-    '<B3,wR1,wR2',
-);
+subtest name( 'C8', '<B3,wR1,wR2' ) => sub {
 
+    is(
+        C8->new,
+        object {
+            call b3_1 => 'b3_1.v';
+            call c8_1 => 'c8_1.v';
+            call r1_1 => 'r1_1.v';
+            call r2_1 => 'r2_1.v';
+        },
+    );
+
+    is(
+        C8->_tags,
+        hash {
+            field T1_1 => hash {
+                field b3_1 => 'b3_1.t1_1';
+                field r1_1 => 'r1_1.t1_1';
+                field r1_2 => 'r1_2.t1_1';
+            };
+            field T1_2 => hash {
+                field r1_1 => 'r1_1.t1_2';
+            };
+            field T2_1 => hash {
+                field b3_1 => 'b3_1.t2_1';
+                field r2_1 => 'r2_1.t2_1';
+                field r2_2 => 'r2_2.t2_1';
+            };
+            field T2_2 => hash {
+                field r2_1 => 'r2_1.t2_2';
+            };
+        },
+    );
+};
 {
     package R3;
     use Moo::Role;
@@ -505,26 +575,30 @@ check_class(
     );
 }
 
-check_class(
-    'C9',
-    {
-        t1_1 => 't1_1.v',
-        r1_1 => 'r1_1.v',
-        r1_2 => 'r1_2.v',
-        c9_1 => 'c9_1.v',
-    },
-    {
-        T1_1 => {
-            r1_1 => 'r1_1.t1_1',
-            r1_2 => 'r1_2.t1_1',
+subtest name( 'C9', 'wR3' ) => sub {
+
+    is(
+        C9->new,
+        object {
+            call t1_1 => 't1_1.v';
+            call r1_1 => 'r1_1.v';
+            call r1_2 => 'r1_2.v';
+            call c9_1 => 'c9_1.v';
         },
-        T1_2 => {
-            r1_1 => 'r1_1.t1_2',
+    );
+    is(
+        C9->_tags,
+        hash {
+            field T1_1 => hash {
+                field r1_1 => 'r1_1.t1_1';
+                field r1_2 => 'r1_2.t1_1';
+            };
+            field T1_2 => hash {
+                field r1_1 => 'r1_1.t1_2';
+            };
         },
-    },
-    $map,
-    'wR3',
-);
+    );
+};
 
 {
     package C10;
@@ -543,45 +617,47 @@ check_class(
     );
 }
 
-TODO : {
+todo "Moo has issues with attributes inherited from multiple superclasses" =>
+  sub {
 
-    local $TODO = "Moo has issues with attributes inherited from multiple superclasses";
+    subtest name( 'C10', '<B1, <B2, R1, R2' ) => sub {
 
-check_class(
-    'C10',
-    {
-        b1_1 => 'b1_1.v',
-        b2_1 => 'b2_1.v',
-        t1_1 => 't1_1.v',
-        t2_1 => 't2_1.v',
-        r1_1 => 'r1_1.v',
-        r1_2 => 'r1_2.v',
-        c10_1 => 'c10_1.v',
-    },
-    {
-        T1_1 => {
-	    b1_1   => 'b1_1.t1_1',
-	    c10_1 => 'c10_1.t1_1',
-            r1_1 => 'r1_1.t1_1',
-            r1_2 => 'r1_2.t1_1',
-        },
-        T1_2 => {
-            r1_1 => 'r1_1.t1_2',
-        },
-        T2_1 => {
-	    b2_1  => 'b2_1.t2_1',
-	    c10_1 => 'c10_1.t2_1',
-            r2_1 => 'r2_1.t2_1',
-            r2_2 => 'r2_2.t2_1',
-        },
-        T2_2 => {
-            r2_1 => 'r2_1.t2_2',
-        },
-    },
-    $map,
-    '<B1, <B2, R1, R2',
-);
-
-}
+        is(
+            C10->new,
+            object {
+                call b1_1  => 'b1_1.v';
+                call b2_1  => 'b2_1.v';
+                call t1_1  => 't1_1.v';
+                call t2_1  => 't2_1.v';
+                call r1_1  => 'r1_1.v';
+                call r1_2  => 'r1_2.v';
+                call c10_1 => 'c10_1.v';
+            },
+        );
+        is(
+            C10->_tags,
+            hash {
+                field T1_1 => hash {
+                    field b1_1  => 'b1_1.t1_1';
+                    field c10_1 => 'c10_1.t1_1';
+                    field r1_1  => 'r1_1.t1_1';
+                    field r1_2  => 'r1_2.t1_1';
+                };
+                field T1_2 => hash {
+                    field r1_1 => 'r1_1.t1_2';
+                };
+                field T2_1 => hash {
+                    field b2_1  => 'b2_1.t2_1';
+                    field c10_1 => 'c10_1.t2_1';
+                    field r2_1  => 'r2_1.t2_1';
+                    field r2_2  => 'r2_2.t2_1';
+                };
+                field T2_2 => hash {
+                    field r2_1 => 'r2_1.t2_2';
+                };
+            },
+        );
+    };
+  };
 
 done_testing;

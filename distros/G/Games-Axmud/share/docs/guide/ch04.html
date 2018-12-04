@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 5.3.1">
+<meta name="generator" content="ReText 7.0.1">
+<title>ch04</title>
 </head>
 <body>
 <p><a href="ch03.html">Previous</a> <a href="index.html">Index</a> <a href="ch05.html">Next</a></p>
@@ -35,6 +36,7 @@
 </li>
 <li><a href="#4.10">4.10 The session preference window</a></li>
 <li><a href="#4.11">4.11 The quick preference window</a></li>
+<li><a href="#4.12">4.12 Storing data</a></li>
 </ul>
 <hr>
 <h2><a name="4.1">4.1 The main window</a></h2>
@@ -323,6 +325,31 @@
 <pre><code>    ;editquick
     ;edq
 </code></pre>
+<h2><a name="4.12">4.12 Storing data</a></h2>
+<p>Axmud stores data files in a location that depends on your system, and also on how you installed Axmud on that system.</p>
+<p>If you want to stored data in a different location - on a USB stick, or an external hard drive, for example - you can use this command:</p>
+<pre><code>    ;setdatadirectory
+    ;sdd
+</code></pre>
+<p>If you use Axmud on multiple devices - a desktop and a laptop, for example - you can set the location to a network drive that both devices can access.</p>
+<p>Note that you shouldn't use both devices simultaneously - if you try, Axmud on one device will arbitrarily overwrite filed saved by Axmud on the other device. </p>
+<p>(If you don't have your own network drive, or don't know how to set one up, you might like to use a commerical service like <a href="https://www.dropbox.com">Dropbox</a>).</p>
+<p>If you want to make a backup copy of the data directory - a wise decision, in many cases - you can do that manually, or you can use a client command.</p>
+<p>This command will create a backup copy of the entire data directory:</p>
+<pre><code>    ;backupdata
+    ;bud
+</code></pre>
+<p>When you're ready to restore files from the backup, you can do it manually, or use the client command:</p>
+<pre><code>    ;restoredata
+    ;rsd
+</code></pre>
+<p>If you want to make periodic backups, you could use the <strong>;autobackup</strong> command, but it's probably easier to use the client preference window, for example:</p>
+<ul>
+<li>In the main window menu, click <strong>Edit &gt; Axmud preferences... &gt; Client &gt; Page 5</strong></li>
+<li>In the <strong>Perform auto-backup</strong> box, select <strong>At regular intervals, when Axmud shuts down</strong></li>
+<li>Click the <strong>Set method</strong> button</li>
+<li>Click <strong>OK</strong> to close the window</li>
+</ul>
 <hr>
 <p><a href="ch03.html">Previous</a> <a href="index.html">Index</a> <a href="ch05.html">Next</a></p>
 </body>

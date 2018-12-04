@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::OpenSsh ;
-$Config::Model::OpenSsh::VERSION = '1.239';
+$Config::Model::OpenSsh::VERSION = '1.241';
 use Config::Model 2.111;
 
 1;
@@ -27,7 +27,7 @@ Config::Model::OpenSsh - OpenSSH config editor
 
 =head1 VERSION
 
-version 1.239
+version 1.241
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,6 @@ This command will add a C<Host Foo> section in C<~/.ssh/config>:
 This code snippet will remove the C<Host Foo> section added above:
 
  use Config::Model ;
- use Log::Log4perl qw(:easy) ;
  my $model = Config::Model -> new ( ) ;
  my $inst = $model->instance (root_class_name => 'Ssh');
  $inst -> config_root ->load("Host~Foo") ;

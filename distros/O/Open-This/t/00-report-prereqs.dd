@@ -10,14 +10,22 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Code::TidyAll' => '0.71',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
+                                      'Code::TidyAll::Plugin::Test::Vars' => '0.04',
+                                      'Parallel::ForkManager' => '1.19',
+                                      'Perl::Critic' => '1.132',
+                                      'Perl::Tidy' => '20180220',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::Code::TidyAll' => '0.50',
                                       'Test::More' => '0.96',
+                                      'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Synopsis' => '0'
+                                      'Test::Synopsis' => '0',
+                                      'Test::Vars' => '0.014'
                                     }
                     },
        'runtime' => {

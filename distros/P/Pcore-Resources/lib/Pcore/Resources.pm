@@ -1,4 +1,4 @@
-package Pcore::Resources v0.1.3;
+package Pcore::Resources v0.1.4;
 
 use Pcore -dist;
 

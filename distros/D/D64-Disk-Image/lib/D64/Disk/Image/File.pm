@@ -67,7 +67,7 @@ $EXPORT_TAGS{'all'} = [ @{$EXPORT_TAGS{'modes'}} ];
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp qw/carp croak verbose/;
 
@@ -177,7 +177,7 @@ Pawel Krol, E<lt>pawelkrol@cpan.orgE<gt>.
 
 =head1 VERSION
 
-Version 0.04 (2018-11-29)
+Version 0.05 (2018-12-01)
 
 =head1 COPYRIGHT AND LICENSE
 

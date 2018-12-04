@@ -2,8 +2,8 @@ NAME
     Color::ANSI::Util - Routines for dealing with ANSI colors
 
 VERSION
-    This document describes version 0.161 of Color::ANSI::Util (from Perl
-    distribution Color-ANSI-Util), released on 2018-09-26.
+    This document describes version 0.162 of Color::ANSI::Util (from Perl
+    distribution Color-ANSI-Util), released on 2018-12-02.
 
 SYNOPSIS
      use Color::ANSI::Util qw(
@@ -270,6 +270,12 @@ FUNCTIONS
     Normally you print this sequence after you print colored text.
 
 ENVIRONMENT
+  NO_COLOR
+    Can be used to explicitly disable color. See <https://no-color.org> for
+    more details.
+
+    Observed by: ansi{fg,bg}.
+
   COLOR => bool
     Can be used to explicitly disable color by setting it to 0.
 

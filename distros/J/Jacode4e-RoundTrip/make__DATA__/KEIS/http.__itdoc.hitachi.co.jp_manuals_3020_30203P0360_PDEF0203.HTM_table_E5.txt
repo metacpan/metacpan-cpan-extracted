@@ -1,0 +1,7 @@
+# http://itdoc.hitachi.co.jp/manuals/3020/30203P0360/PDEF0203.HTM
+# 表E-5　印字される字形の変更および印刷不可代替文字の印字が行われる文字の一覧
+# 文字1 	KEIS90 	SJIS 	文字2 	KEIS90 	SJIS
+尭 	B6C6 	8BC4 	堯 	F4A1 	EA9F
+槙 	CBEA 	968A 	槇 	F4A2 	EAA0
+遥 	CDDA 	9779 	遙 	F4A3 	EAA1
+瑶 	E0F6 	E0F4 	瑤 	F4A4 	EAA2

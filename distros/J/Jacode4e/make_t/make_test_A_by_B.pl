@@ -84,10 +84,10 @@ END___________________________________________________________________
             }
             my $output = '';
             if ($data{$OUTPUT_encoding} =~ /^[0123456789ABCDEF]+$/) {
-                $output = join('', map {"\\x$_"} ($data{$OUTPUT_encoding} =~ /([0123456789ABCDEF]{2})/g))
+                $output = join('', map {"\\x$_"} ($data{$OUTPUT_encoding} =~ /([0123456789ABCDEF]{2})/g));
             }
             else {
-                $output = join('', map {"\\x$_"} ($geta{$OUTPUT_encoding} =~ /([0123456789ABCDEF]{2})/g))
+                $output = join('', map {"\\x$_"} ($geta{$OUTPUT_encoding} =~ /([0123456789ABCDEF]{2})/g));
             }
             printf TEST ' ' x 8;
             printf TEST (qq{["%s",'%s','%s',{'INPUT_LAYOUT'=>'%s'},"%s"],\n},

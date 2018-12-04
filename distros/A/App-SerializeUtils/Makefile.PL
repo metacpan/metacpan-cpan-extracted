@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
     "script/check-json",
     "script/check-phpser",
     "script/check-yaml",
+    "script/dd2dd",
     "script/dd2ddc",
     "script/dd2json",
     "script/dd2phpser",
@@ -25,6 +26,7 @@ my %WriteMakefileArgs = (
     "script/dd2yaml",
     "script/json2dd",
     "script/json2ddc",
+    "script/json2json",
     "script/json2phpser",
     "script/json2sereal",
     "script/json2storable",
@@ -56,17 +58,21 @@ my %WriteMakefileArgs = (
     "script/yaml2json",
     "script/yaml2phpser",
     "script/yaml2sereal",
-    "script/yaml2storabls"
+    "script/yaml2storabls",
+    "script/yaml2yaml"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::SerializeUtils",
   "PREREQ_PM" => {
     "Cpanel::JSON::XS" => 0,
+    "Data::Dmp" => "0.21",
     "Data::Dump" => 0,
     "Data::Dump::Color" => 0,
+    "Data::Dumper" => 0,
     "Data::Undump" => 0,
     "Getopt::Long" => 0,
+    "Getopt::Long::Complete" => 0,
     "JSON::Color" => 0,
     "JSON::MaybeXS" => 0,
     "JSON::PP" => 0,
@@ -87,7 +93,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.160",
+  "VERSION" => "0.161",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -96,11 +102,14 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cpanel::JSON::XS" => 0,
+  "Data::Dmp" => "0.21",
   "Data::Dump" => 0,
   "Data::Dump::Color" => 0,
+  "Data::Dumper" => 0,
   "Data::Undump" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => 0,
+  "Getopt::Long::Complete" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::Color" => 0,

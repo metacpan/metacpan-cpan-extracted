@@ -40,7 +40,7 @@ use File::Path qw( make_path );
 use Scalar::Util qw(weaken);
 use vars qw($VERSION);
 
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 our $DEBUG = 0;
 our $UPGRADING;
@@ -2141,6 +2141,6 @@ Unlocks all names locked by this thread
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.01  (October, 2018))
+       Version 2.02  (October, 2018))
 
 =cut

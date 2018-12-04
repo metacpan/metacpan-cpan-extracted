@@ -4,8 +4,8 @@
 
 package Data::Dump::Color;
 
-our $DATE = '2018-01-17'; # DATE
-our $VERSION = '0.240'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.241'; # VERSION
 
 use 5.010001;
 use strict;
@@ -76,7 +76,17 @@ my $_colreset = color('reset');
 sub _col {
     my ($col, $str) = @_;
     my $colval = $COLORS{$col};
-    if ($COLOR // $ENV{COLOR} // (-t STDOUT)) {
+    my $enable_color = do {
+        if (defined $COLOR) {
+            $COLOR;
+        } elsif (exists $ENV{NO_COLOR}) {
+            0;
+        } else {
+            $ENV{COLOR} // (-t STDOUT) // 0;
+        }
+    };
+
+    if ($enable_color) {
         #say "D:col=$col, COLOR_DEPTH=$COLOR_DEPTH";
         if ($COLOR_DEPTH >= 256 && $colval =~ /^\d+$/) {
             return "\e[38;5;${colval}m" . $str . $_colreset;
@@ -775,7 +785,7 @@ Data::Dump::Color - Like Data::Dump, but with color
 
 =head1 VERSION
 
-This document describes version 0.240 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2018-01-17.
+This document describes version 0.241 of Data::Dump::Color (from Perl distribution Data-Dump-Color), released on 2018-12-02.
 
 =head1 SYNOPSIS
 
@@ -889,6 +899,11 @@ L<SHARYANTO::Role::ColorTheme>.
 =head1 ENVIRONMENT
 
 =over
+
+=item * NO_COLOR
+
+Can be used to disable color. Takes precedence over the C<COLOR> environment.
+See L<https://no-color.org> for more details.
 
 =item * COLOR
 

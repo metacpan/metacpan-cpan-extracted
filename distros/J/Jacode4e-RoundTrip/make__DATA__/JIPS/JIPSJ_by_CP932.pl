@@ -1,0 +1,370 @@
+######################################################################
+#
+# JIPSJ_by_CP932.pl
+#
+# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+######################################################################
+
+# NEC Corporation Standard character set dictionary <BASIC>
+# Document number ZBB10-3
+#
+# NEC Corporation Standard character set dictionary <EXTENSION>
+# Document number ZBB11-2
+
+use strict;
+
+my %JIPSJ_by_CP932 = ();
+
+my @JIPSJ_by_CP932_a = map { (split(/ /,$_))[3,4] } split(/\n/,<<'END');
+’Ë 92CB ’Ë 92CB B6F5
+úœ FA9C úœ FA9C 444D
+V 8D56 V 8D56 BDB6
+úÐ FAD0 úÐ FAD0 3937
+Ê 81CA Ê 81CA A5CF
+„Ÿ 849F „Ÿ 849F 2C24
+„  84A0 „  84A0 2C26
+„¡ 84A1 „¡ 84A1 2C30
+„¢ 84A2 „¢ 84A2 2C34
+„£ 84A3 „£ 84A3 2C3C
+„¤ 84A4 „¤ 84A4 2C38
+„¥ 84A5 „¥ 84A5 2C40
+„¦ 84A6 „¦ 84A6 2C50
+„§ 84A7 „§ 84A7 2C48
+„¨ 84A8 „¨ 84A8 2C58
+„© 84A9 „© 84A9 2C60
+„ª 84AA „ª 84AA 2C25
+„« 84AB „« 84AB 2C27
+„¬ 84AC „¬ 84AC 2C33
+„­ 84AD „­ 84AD 2C37
+„® 84AE „® 84AE 2C3F
+„¯ 84AF „¯ 84AF 2C3B
+„° 84B0 „° 84B0 2C47
+„± 84B1 „± 84B1 2C57
+„² 84B2 „² 84B2 2C4F
+„³ 84B3 „³ 84B3 2C5F
+„´ 84B4 „´ 84B4 2C6F
+„µ 84B5 „µ 84B5 2C44
+„¶ 84B6 „¶ 84B6 2C53
+„· 84B7 „· 84B7 2C4C
+„¸ 84B8 „¸ 84B8 2C5B
+„¹ 84B9 „¹ 84B9 2C63
+„º 84BA „º 84BA 2C41
+„» 84BB „» 84BB 2C54
+„¼ 84BC „¼ 84BC 2C49
+„½ 84BD „½ 84BD 2C5C
+„¾ 84BE „¾ 84BE 2C66
+‡„ 8784 ‡„ 8784 2D64
+úV FA56 úV FA56 A3F9
+úW FA57 úW FA57 A3FA
+ú^ FA5E ú^ FA5E D2B9
+ú_ FA5F ú_ FA5F D1ED
+úb FA62 úb FA62 C2FE
+úg FA67 úg FA67 BAC7
+új FA6A új FA6A B2D3
+ú| FA7C ú| FA7C B3D2
+úƒ FA83 úƒ FA83 D4A8
+úŠ FA8A úŠ FA8A B4EC
+ú‹ FA8B ú‹ FA8B B4EF
+ú FA90 ú FA90 B5BE
+ú’ FA92 ú’ FA92 B5CF
+ú– FA96 ú– FA96 B6D6
+ú› FA9B ú› FA9B B6E7
+ú FA9D ú FA9D B7A8
+ú  FAA0 ú  FAA0 B7CB
+ú£ FAA3 ú£ FAA3 B7D3
+úª FAAA úª FAAA B8D4
+ú® FAAE ú® FAAE B9A9
+ú¯ FAAF ú¯ FAAF B9B1
+ú° FAB0 ú° FAB0 C6B7
+ú± FAB1 ú± FAB1 B9BA
+úº FABA úº FABA BAEC
+ú» FABB ú» FABB BAFE
+ú¼ FABC ú¼ FABC BBA9
+ú½ FABD ú½ FABD BBB1
+úÁ FAC1 úÁ FAC1 BBC9
+úÃ FAC3 úÃ FAC3 BBD4
+úÉ FAC9 úÉ FAC9 BCCC
+úÊ FACA úÊ FACA BCD9
+úÍ FACD úÍ FACD BCF0
+úÕ FAD5 úÕ FAD5 BDD6
+úØ FAD8 úØ FAD8 BDE4
+úÞ FADE úÞ FADE BDD1
+úà FAE0 úà FAE0 BEBE
+úå FAE5 úå FAE5 BEE2
+úç FAE7 úç FAE7 BFBA
+úè FAE8 úè FAE8 BFBC
+úê FAEA úê FAEA BFD7
+úî FAEE úî FAEE BFE6
+úò FAF2 úò FAF2 C0A8
+ûB FB42 ûB FB42 C1D9
+ûC FB43 ûC FB43 C1CD
+ûD FB44 ûD FB44 C1DF
+ûH FB48 ûH FB48 C1F4
+ûP FB50 ûP FB50 C2F1
+ûX FB58 ûX FB58 C3CE
+ûY FB59 ûY FB59 C3D0
+û^ FB5E û^ FB5E C3F8
+ûf FB66 ûf FB66 C4CB
+ûk FB6B ûk FB6B C4ED
+ûn FB6E ûn FB6E C5AC
+ûp FB70 ûp FB70 C5D3
+ûr FB72 ûr FB72 C5DA
+ûu FB75 ûu FB75 C5E5
+û| FB7C û| FB7C C6DA
+û} FB7D û} FB7D C6DD
+û~ FB7E û~ FB7E C6EB
+û€ FB80 û€ FB80 C6F7
+û‚ FB82 û‚ FB82 C7A6
+û… FB85 û… FB85 C7F5
+û† FB86 û† FB86 C7F7
+û‰ FB89 û‰ FB89 C8E8
+û‹ FB8B û‹ FB8B C9AC
+û FB8D û FB8D C9B6
+ûŽ FB8E ûŽ FB8E C9BD
+û’ FB92 û’ FB92 C9F6
+û” FB94 û” FB94 CBD3
+û FB9D û FB9D CCFD
+ûž FB9E ûž FB9E CDA9
+ûŸ FB9F ûŸ FB9F CDC2
+û  FBA0 û  FBA0 CDD3
+û¡ FBA1 û¡ FBA1 CDE2
+û¢ FBA2 û¢ FBA2 CEA4
+û© FBA9 û© FBA9 CEEA
+û¬ FBAC û¬ FBAC CEFE
+û® FBAE û® FBAE CFBB
+û° FBB0 û° FBB0 CFC5
+û± FBB1 û± FBB1 CFC7
+û³ FBB3 û³ FBB3 CFFD
+û´ FBB4 û´ FBB4 D0C2
+ûµ FBB5 ûµ FBB5 D0CD
+û¶ FBB6 û¶ FBB6 D0EC
+û· FBB7 û· FBB7 D0F2
+û¸ FBB8 û¸ FBB8 D0F3
+ûÎ FBCE ûÎ FBCE D1E6
+ûÓ FBD3 ûÓ FBD3 D2A6
+ûÚ FBDA ûÚ FBDA D2B7
+ûè FBE8 ûè FBE8 D2FC
+ûé FBE9 ûé FBE9 D3B9
+ûê FBEA ûê FBEA D3C0
+ûî FBEE ûî FBEE D3D5
+ûð FBF0 ûð FBF0 D3D9
+ûò FBF2 ûò FBF2 D3DC
+ûö FBF6 ûö FBF6 D4B3
+û÷ FBF7 û÷ FBF7 D4B4
+ûù FBF9 ûù FBF9 D4B8
+ûú FBFA ûú FBFA D4C3
+ûû FBFB ûû FBFB D4D7
+ûü FBFC ûü FBFC D4DC
+üB FC42 üB FC42 D4EF
+üI FC49 üI FC49 D5DA
+üK FC4B üK FC4B D5EB
+END
+
+my @JIPSJ_by_CP932_b = map { (split(/ /,$_))[3,4] } split(/\n/,<<'END');
+’Ë 92CB ’Ë 92CB B6F5
+úœ FA9C úœ FA9C 444D
+V 8D56 V 8D56 BDB6
+úÐ FAD0 úÐ FAD0 3937
+Ê 81CA Ê 81CA A5CF
+„Ÿ 849F „Ÿ 849F 2C24
+„  84A0 „  84A0 2C26
+„¡ 84A1 „¡ 84A1 2C30
+„¢ 84A2 „¢ 84A2 2C34
+„£ 84A3 „£ 84A3 2C3C
+„¤ 84A4 „¤ 84A4 2C38
+„¥ 84A5 „¥ 84A5 2C40
+„¦ 84A6 „¦ 84A6 2C50
+„§ 84A7 „§ 84A7 2C48
+„¨ 84A8 „¨ 84A8 2C58
+„© 84A9 „© 84A9 2C60
+„ª 84AA „ª 84AA 2C25
+„« 84AB „« 84AB 2C27
+„¬ 84AC „¬ 84AC 2C33
+„­ 84AD „­ 84AD 2C37
+„® 84AE „® 84AE 2C3F
+„¯ 84AF „¯ 84AF 2C3B
+„° 84B0 „° 84B0 2C47
+„± 84B1 „± 84B1 2C57
+„² 84B2 „² 84B2 2C4F
+„³ 84B3 „³ 84B3 2C5F
+„´ 84B4 „´ 84B4 2C6F
+„µ 84B5 „µ 84B5 2C44
+„¶ 84B6 „¶ 84B6 2C53
+„· 84B7 „· 84B7 2C4C
+„¸ 84B8 „¸ 84B8 2C5B
+„¹ 84B9 „¹ 84B9 2C63
+„º 84BA „º 84BA 2C41
+„» 84BB „» 84BB 2C54
+„¼ 84BC „¼ 84BC 2C49
+„½ 84BD „½ 84BD 2C5C
+„¾ 84BE „¾ 84BE 2C66
+‡„ 8784 ‡„ 8784 2D64
+úV FA56 úV FA56 A3F9
+úW FA57 úW FA57 A3FA
+ú^ FA5E ú^ FA5E D2B9
+ú_ FA5F ú_ FA5F D1ED
+úb FA62 úb FA62 C2FE
+úg FA67 úg FA67 BAC7
+új FA6A új FA6A B2D3
+ú| FA7C ú| FA7C B3D2
+úƒ FA83 úƒ FA83 D4A8
+úŠ FA8A úŠ FA8A B4EC
+ú‹ FA8B ú‹ FA8B B4EF
+ú FA90 ú FA90 B5BE
+ú’ FA92 ú’ FA92 B5CF
+ú– FA96 ú– FA96 B6D6
+ú› FA9B ú› FA9B B6E7
+ú FA9D ú FA9D B7A8
+ú  FAA0 ú  FAA0 B7CB
+ú£ FAA3 ú£ FAA3 B7D3
+úª FAAA úª FAAA B8D4
+ú® FAAE ú® FAAE B9A9
+ú¯ FAAF ú¯ FAAF B9B1
+ú° FAB0 ú° FAB0 C6B7
+ú± FAB1 ú± FAB1 B9BA
+úº FABA úº FABA BAEC
+ú» FABB ú» FABB BAFE
+ú¼ FABC ú¼ FABC BBA9
+ú½ FABD ú½ FABD BBB1
+úÁ FAC1 úÁ FAC1 BBC9
+úÃ FAC3 úÃ FAC3 BBD4
+úÉ FAC9 úÉ FAC9 BCCC
+úÊ FACA úÊ FACA BCD9
+úÍ FACD úÍ FACD BCF0
+úÕ FAD5 úÕ FAD5 BDD6
+úØ FAD8 úØ FAD8 BDE4
+úÞ FADE úÞ FADE BDD1
+úà FAE0 úà FAE0 BEBE
+úå FAE5 úå FAE5 BEE2
+úç FAE7 úç FAE7 BFBA
+úè FAE8 úè FAE8 BFBC
+úê FAEA úê FAEA BFD7
+úî FAEE úî FAEE BFE6
+úò FAF2 úò FAF2 C0A8
+ûB FB42 ûB FB42 C1D9
+ûC FB43 ûC FB43 C1CD
+ûD FB44 ûD FB44 C1DF
+ûH FB48 ûH FB48 C1F4
+ûP FB50 ûP FB50 C2F1
+ûX FB58 ûX FB58 C3CE
+ûY FB59 ûY FB59 C3D0
+û^ FB5E û^ FB5E C3F8
+ûf FB66 ûf FB66 C4CB
+ûk FB6B ûk FB6B C4ED
+ûn FB6E ûn FB6E C5AC
+ûp FB70 ûp FB70 C5D3
+ûr FB72 ûr FB72 C5DA
+ûu FB75 ûu FB75 C5E5
+û| FB7C û| FB7C C6DA
+û} FB7D û} FB7D C6DD
+û~ FB7E û~ FB7E C6EB
+û€ FB80 û€ FB80 C6F7
+û‚ FB82 û‚ FB82 C7A6
+û… FB85 û… FB85 C7F5
+û† FB86 û† FB86 C7F7
+û‰ FB89 û‰ FB89 C8E8
+û‹ FB8B û‹ FB8B C9AC
+û FB8D û FB8D C9B6
+ûŽ FB8E ûŽ FB8E C9BD
+û’ FB92 û’ FB92 C9F6
+û” FB94 û” FB94 CBD3
+û FB9D û FB9D CCFD
+ûž FB9E ûž FB9E CDA9
+ûŸ FB9F ûŸ FB9F CDC2
+û  FBA0 û  FBA0 CDD3
+û¡ FBA1 û¡ FBA1 CDE2
+û¢ FBA2 û¢ FBA2 CEA4
+û© FBA9 û© FBA9 CEEA
+û¬ FBAC û¬ FBAC CEFE
+û® FBAE û® FBAE CFBB
+û° FBB0 û° FBB0 CFC5
+û± FBB1 û± FBB1 CFC7
+û³ FBB3 û³ FBB3 CFFD
+û´ FBB4 û´ FBB4 D0C2
+ûµ FBB5 ûµ FBB5 D0CD
+û¶ FBB6 û¶ FBB6 D0EC
+û· FBB7 û· FBB7 D0F2
+û¸ FBB8 û¸ FBB8 D0F3
+ûÎ FBCE ûÎ FBCE D1E6
+ûÓ FBD3 ûÓ FBD3 D2A6
+ûÚ FBDA ûÚ FBDA D2B7
+ûè FBE8 ûè FBE8 D2FC
+ûé FBE9 ûé FBE9 D3B9
+ûê FBEA ûê FBEA D3C0
+ûî FBEE ûî FBEE D3D5
+ûð FBF0 ûð FBF0 D3D9
+ûò FBF2 ûò FBF2 D3DC
+ûö FBF6 ûö FBF6 D4B3
+û÷ FBF7 û÷ FBF7 D4B4
+ûù FBF9 ûù FBF9 D4B8
+ûú FBFA ûú FBFA D4C3
+ûû FBFB ûû FBFB D4D7
+ûü FBFC ûü FBFC D4DC
+üB FC42 üB FC42 D4EF
+üI FC49 üI FC49 D5DA
+üK FC4B üK FC4B D5EB
+END
+
+for (@JIPSJ_by_CP932_a) {
+    if (not /^[0123456789ABCDEF]{4}$/) {
+        die;
+    }
+}
+
+my %JIPSJ_by_CP932_a = @JIPSJ_by_CP932_a;
+if (scalar(keys %JIPSJ_by_CP932_a) != scalar(@JIPSJ_by_CP932_a)/2) {
+    die;
+}
+
+my %reverse_JIPSJ_by_CP932_a = reverse @JIPSJ_by_CP932_a;
+if (scalar(keys %reverse_JIPSJ_by_CP932_a) != scalar(@JIPSJ_by_CP932_a)/2) {
+    die;
+}
+
+for (@JIPSJ_by_CP932_b) {
+    if (not /^[0123456789ABCDEF]{4}$/) {
+        die;
+    }
+}
+
+my %JIPSJ_by_CP932_b = @JIPSJ_by_CP932_b;
+if (scalar(keys %JIPSJ_by_CP932_b) != scalar(@JIPSJ_by_CP932_b)/2) {
+    die;
+}
+
+my %reverse_JIPSJ_by_CP932_b = reverse @JIPSJ_by_CP932_b;
+if (scalar(keys %reverse_JIPSJ_by_CP932_b) != scalar(@JIPSJ_by_CP932_b)/2) {
+    die;
+}
+
+if ("@JIPSJ_by_CP932_a" ne "@JIPSJ_by_CP932_b") {
+    while (@JIPSJ_by_CP932_a or @JIPSJ_by_CP932_b) {
+        my $a = shift @JIPSJ_by_CP932_a;
+        my $b = shift @JIPSJ_by_CP932_b;
+        if ($a ne $b) {
+            print STDERR "A=$a\n";
+            print STDERR "B=$b\n";
+            print STDERR "\n";
+        }
+    }
+    die;
+}
+
+%JIPSJ_by_CP932 = @JIPSJ_by_CP932_a;
+
+sub JIPSJ_by_CP932 {
+    my($cp932) = @_;
+    return $JIPSJ_by_CP932{$cp932};
+}
+
+sub keys_of_JIPSJ_by_CP932 {
+    return keys %JIPSJ_by_CP932;
+}
+
+sub values_of_JIPSJ_by_CP932 {
+    return values %JIPSJ_by_CP932;
+}
+
+1;
+
+__END__

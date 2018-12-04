@@ -1,0 +1,67 @@
+{
+   "abstract" : "AWS",
+   "author" : [
+      "Rob Lauer <rlauer6@comcast.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-Credentials",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Date::Format" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "JSON" : "0",
+            "Module::Loaded" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Data::Dumper" : "0",
+            "Date::Format" : "0",
+            "Exporter" : "0",
+            "File::HomeDir" : "0",
+            "File::chdir" : "0",
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "POSIX::strptime" : "0",
+            "Scalar::Util" : "0",
+            "Time::Local" : "0",
+            "constant" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.6",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

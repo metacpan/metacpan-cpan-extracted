@@ -1,6 +1,21 @@
 ==================================================
-Changes from 2012-04-11 00:00:00 +0000 to present.
+Changes from 2013-12-03 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.54 at 2018-12-02 17:45:22 +0000
+-----------------------------------------
+
+  Change: 160fc646f18ab212f3a122961ade2ac8d4c5c6cf
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-12-02 17:45:22 +0000
+
+    Refactored loop detection
+
+    Added digest() option to Backends to specify a regexp to reset loop
+    detection digests.
+
+    Only CPANPLUS::YACSmoke supports this currently. 
 
 -----------------------------------------
 version 0.52 at 2017-04-10 14:21:08 +0000
@@ -23,5 +38,5 @@ version 0.50 at 2017-02-17 11:30:52 +0000
     Work around perls without dot in @INC when running Makefile.PL 
 
 =================================================
-Plus 16 releases after 2012-04-11 00:00:00 +0000.
+Plus 16 releases after 2013-12-03 00:00:00 +0000.
 =================================================

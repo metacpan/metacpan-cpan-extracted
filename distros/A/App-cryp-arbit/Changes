@@ -1,3 +1,9 @@
+0.009   2018-12-03 (PERLANCAR)
+
+	- Bump DB schema version 2->3: Change data type of orderbook_item's
+	  id from int -> bigint.
+
+
 0.008   2018-11-29 (PERLANCAR)
 
 	- When there is no api_key information for an account in

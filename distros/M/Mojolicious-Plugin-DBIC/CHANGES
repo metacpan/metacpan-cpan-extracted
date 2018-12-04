@@ -1,0 +1,8 @@
+Changelog for Mojolicious-Plugin-DBIC
+
+0.001     2018-12-02 20:47:57-06:00 America/Chicago
+
+    [Added]
+
+    - Added plugin with schema configuration
+    - Added basic controller with "list" and "get" actions

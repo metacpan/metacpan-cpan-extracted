@@ -2,8 +2,8 @@ package Term::ANSIColor::Conditional;
 
 ## no critic (Modules::ProhibitAutomaticExportation)
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -40,6 +40,7 @@ BEGIN {
 
 sub _color_enabled {
     return $COLOR if defined $COLOR;
+    return 0 if exists $ENV{NO_COLOR};
     return $ENV{COLOR} if defined $ENV{COLOR};
     return (-t STDOUT);
 }
@@ -71,7 +72,7 @@ Term::ANSIColor::Conditional - Colorize text only if color is enabled
 
 =head1 VERSION
 
-This document describes version 0.003 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2018-11-29.
+This document describes version 0.006 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2018-12-02.
 
 =head1 SYNOPSIS
 
@@ -89,6 +90,8 @@ How to determine "color is enabled":
 
 =item * If package variable C<$Term::ANSIColor::Conditional::COLOR> is defined, use that.
 
+=item * Otherwise, check if C<NO_COLOR> environment variable exists. If yes, color is disabled.
+
 =item * Otherwise, check if C<COLOR> environment variable is defined and use that.
 
 =item * Otherwise, check if (-t STDOUT) is true (interactive terminal). If yes, color is enabled.
@@ -97,15 +100,24 @@ How to determine "color is enabled":
 
 =back
 
+Note that Term::ANSIColor already supports conditional color via the
+C<ANSI_COLORS_DISABLED> environment variable, but it does not supports the "more
+standard" C<NO_COLOR> and C<COLOR>, and it also does not check or interactive
+terminal.
+
 =for Pod::Coverage ^(.+)$
 
 =head1 VARIABLES
 
 =head2 $COLOR => bool
 
-=head1 ENVIRONMENT
+=head1 NO_COLOR
+
+For more information, see L<https://no-color.org>.
 
 =head2 COLOR
+
+=head1 ENVIRONMENT
 
 =head1 HOMEPAGE
 
@@ -127,9 +139,11 @@ feature.
 
 L<Term::ANSIColor>
 
-These modules also respect the C<COLOR> environment variable:
-L<Color::ANSI::Util>, L<Term::ANSITable>, L<Data::Dump::Color>, L<JSON::Color>,
-L<YAML::Tiny::Color>, L<App::diffwc>, L<App::rsynccolor>.
+L<Term::ANSIColor::Patch::Conditional>, patch version for this module.
+
+These modules also respect the C<NO_COLOR> and/or the C<COLOR> environment
+variable: L<Color::ANSI::Util>, L<Text::ANSITable>, L<Data::Dump::Color>,
+L<JSON::Color>, L<YAML::Tiny::Color>, L<App::diffwc>, L<App::rsynccolor>.
 
 =head1 AUTHOR
 

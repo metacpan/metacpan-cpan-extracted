@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::OOP; # git description: v0.38-57-gc1c0b50
+package Task::Kensho::OOP; # git description: v0.39-57-g1c71392
 # ABSTRACT: A Glimpse at an Enlightened Perl: Object Oriented Programming
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::OOP - A Glimpse at an Enlightened Perl: Object Oriented Programmin
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ Minimalist Object Orientation (with Moose compatibility)
 
 =head3 L<Moose>
 
-a postmodern object system for Perl5
+a postmodern object system for Perl5 (see also Task::Moose for a larger list of Moose extensions)
 
 =head3 L<MooseX::Aliases>
 
@@ -103,10 +103,6 @@ a Moose extension that makes your object constructors blow up on unknown attribu
 =head3 L<Package::Variant>
 
 Parameterizable packages
-
-=head3 L<Task::Moose>
-
-Task::Moose installs Moose and optionally a list of recommended modules that extend Moose.
 
 =head3 L<Type::Tiny>
 
@@ -153,7 +149,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -168,6 +164,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

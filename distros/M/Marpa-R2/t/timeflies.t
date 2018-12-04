@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -34,7 +34,7 @@
 # The permalink is:
 # http://en.wikipedia.org/w/index.php?title=Time_flies_like_an_arrow&oldid=311163283
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );

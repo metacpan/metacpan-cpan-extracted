@@ -11,8 +11,9 @@ WriteMakefile(
     VERSION_FROM       => 'lib/Data/Types.pm',
     ABSTRACT_FROM      => 'lib/Data/Types.pm',
     LICENSE            => 'perl',
+    MIN_PERL_VERSION   => '5.006',
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker'     => 0,
+        'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES   => {
         'Test::More' => '0.17',

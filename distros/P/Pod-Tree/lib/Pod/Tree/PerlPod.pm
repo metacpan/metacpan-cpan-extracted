@@ -8,7 +8,7 @@ use IO::File;
 use Pod::Tree::HTML;
 use Pod::Tree::PerlUtil;
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 use base qw(Pod::Tree::PerlUtil);
 

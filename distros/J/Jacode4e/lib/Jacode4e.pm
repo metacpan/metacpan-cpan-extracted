@@ -5,7 +5,7 @@ package Jacode4e;
 #
 # Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
-$VERSION = '2.13.6.7';
+$VERSION = '2.13.6.8';
 $VERSION = $VERSION;
 
 use strict;
@@ -104,7 +104,7 @@ Jacode4e - jacode.pl-like program for enterprise
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e;
-  Jacode4e::VERSION('2.13.6.7');
+  Jacode4e::VERSION('2.13.6.8');
   while (<>) {
       $return =
       Jacode4e::convert(\$_, 'cp932x', 'cp00930', {

@@ -1,35 +1,53 @@
 ---
 abstract: 'Add a tag with an arbitrary value to a an attribute'
 author:
-  - 'The Smithsonian Astrophysical Observatory'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '6.36'
-  Test::Deep: '0'
+  Data::Dump: '0'
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moo: '2.003004'
+  Test2::V0: '0'
   Test::Lib: '0'
   Test::More: '0'
+  perl: '5.006'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.36'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.14, CPAN::Meta::Converter version 2.143240'
-license: unknown
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: MooX-TaggedAttributes
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  MooX::TaggedAttributes:
+    file: lib/MooX/TaggedAttributes.pm
+    version: '0.04'
 requires:
-  Class::Method::Modifiers: '0'
-  Moo: '0'
+  Carp: '0'
+  Class::Method::Modifiers: '2.12'
+  MRO::Compat: '0'
+  Moo: '2.003004'
+  Moo::Role: '0'
   Scalar::Util: '0'
   Sub::Name: '0'
   namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes
-  license: http://www.gnu.org/licenses/gpl-3.0.html
-  repository: https://bitbucket.org/djerius/moox-taggedattributes
-version: '0.01'
+  repository: git://github.com/djerius/moox-taggedattributes.git
+version: '0.04'
+x_serialization_backend: 'YAML::Tiny version 1.70'

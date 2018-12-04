@@ -1,15 +1,23 @@
---- #YAML:1.0
-name:                DateTime-Format-JSON-MicrosoftDateFormat
-version:             0.03
-abstract:            Parse and format JSON MicrosoftDateFormat strings
-license:             ~
-author:              
-    - Michael R. Davis (mdavis@stopllc.com)
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    DateTime:                      0
-    Test::Simple:                  0.44
+---
+abstract: 'Parse and format JSON MicrosoftDateFormat strings'
+author:
+  - 'Michael R. Davis (mdavis@stopllc.com)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-JSON-MicrosoftDateFormat
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: 0
+  Test::Simple: 0.44
+version: 0.04

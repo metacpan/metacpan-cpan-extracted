@@ -1086,15 +1086,8 @@
 
             # Get the system keycode for this keypress
             $keycode = Gtk2::Gdk->keyval_name($event->keyval);
-
             # Translate it into a standard Axmud keycode
-            $standard = $axmud::CLIENT->currentKeycodeObj->reverseKeycode($keycode);
-            if (! $standard) {
-
-                # Not a standard Axmud keycode (which includes all letters and numbers), so just
-                #   use the system keycode
-                $standard = $keycode;
-            }
+            $standard = $axmud::CLIENT->reverseKeycode($keycode);
 
             # If it's a CTRL, SHIFT, ALT or ALT-GR keypress, set IVs
             if ($standard eq 'ctrl') {
@@ -1155,8 +1148,8 @@
 
             push (@list, $standard);
 
-            # (Below, use a keycode string, consisting of one or more standard keycodes
-            #   separated by a space)
+            # (Below, use a keycode string, consisting of one or more standard keycodes separated by
+            #   a space)
             $string = '' . join(' ', @list);
 
             # Get this window's entry strip object (if any)
@@ -1301,10 +1294,8 @@
             #   scrollbar containing the textview object
             } elsif (
                 (
-                    $standard eq 'kp_page_up' || $standard eq 'page_up'
-                    || $standard eq 'kp_page_down' || $standard eq 'page_down'
-                    || $standard eq 'kp_home' || $standard eq 'home'
-                    || $standard eq 'kp_end' || $standard eq 'end'
+                    $standard eq 'page_up' || $standard eq 'page_down' || $standard eq 'home'
+                    || $standard eq 'end'
                 )
                 && $tabObj
                 && $axmud::CLIENT->useScrollKeysFlag
@@ -1326,16 +1317,10 @@
                         && (
                             (
                                 $splitScreenMode ne 'split'
-                                && (
-                                    $standard eq 'kp_page_up' || $standard eq 'page_up'
-                                    || $standard eq 'kp_home' || $standard eq 'home'
-                                )
+                                && ($standard eq 'page_up' || $standard eq 'home')
                             ) || (
                                 $splitScreenMode eq 'split'
-                                && (
-                                    $standard eq 'kp_page_down' || $standard eq 'page_down'
-                                    || $standard eq 'kp_end' || $standard eq 'end'
-                                )
+                                && ($standard eq 'page_down' || $standard eq 'end')
                             )
                         )
                     ) {
@@ -1344,7 +1329,7 @@
 
                     } else {
 
-                        if ($standard eq 'kp_page_up' || $standard eq 'page_up') {
+                        if ($standard eq 'page_up') {
 
                             # Scroll up
                             if (! $axmud::CLIENT->smoothScrollKeysFlag) {
@@ -1358,7 +1343,7 @@
                                 $modValue = 0;
                             }
 
-                        } elsif ($standard eq 'kp_page_down' || $standard eq 'page_down') {
+                        } elsif ($standard eq 'page_down') {
 
                             # Scroll down
                             if (! $axmud::CLIENT->smoothScrollKeysFlag) {
@@ -1372,7 +1357,7 @@
                                 $modValue = $high;
                             }
 
-                        } elsif ($standard eq 'kp_home' || $standard eq 'home') {
+                        } elsif ($standard eq 'home') {
 
                             # Scroll to top
                             $modValue = 0;
@@ -1507,28 +1492,26 @@
             # Get the system keycode for this keypress
             $keycode = Gtk2::Gdk->keyval_name($event->keyval);
             # Translate it into a standard Axmud keycode
-            $standard = $axmud::CLIENT->currentKeycodeObj->reverseKeycode($keycode);
-            if ($standard) {
+            $standard = $axmud::CLIENT->reverseKeycode($keycode);
 
-                # If it's a CTRL, SHIFT, ALT or ALT-GR keypress, set IVs
-                if ($standard eq 'ctrl') {
-                    $self->ivPoke('ctrlKeyFlag', FALSE);
-                } elsif ($standard eq 'shift') {
-                    $self->ivPoke('shiftKeyFlag', FALSE);
-                } elsif ($standard eq 'alt') {
-                    $self->ivPoke('altKeyFlag', FALSE);
-                } elsif ($standard eq 'alt_gr') {
-                    $self->ivPoke('altGrKeyFlag', FALSE);
-                }
+            # If it's a CTRL, SHIFT, ALT or ALT-GR keypress, set IVs
+            if ($standard eq 'ctrl') {
+                $self->ivPoke('ctrlKeyFlag', FALSE);
+            } elsif ($standard eq 'shift') {
+                $self->ivPoke('shiftKeyFlag', FALSE);
+            } elsif ($standard eq 'alt') {
+                $self->ivPoke('altKeyFlag', FALSE);
+            } elsif ($standard eq 'alt_gr') {
+                $self->ivPoke('altGrKeyFlag', FALSE);
+            }
 
-                if (
-                    ! $self->ctrlKeyFlag
-                    && ! $self->shiftKeyFlag
-                    && ! $self->altKeyFlag
-                    && ! $self->altGrKeyFlag
-                ) {
-                    $self->ivPoke('modifierKeyFlag', FALSE);
-                }
+            if (
+                ! $self->ctrlKeyFlag
+                && ! $self->shiftKeyFlag
+                && ! $self->altKeyFlag
+                && ! $self->altGrKeyFlag
+            ) {
+                $self->ivPoke('modifierKeyFlag', FALSE);
             }
 
             # Return 'undef' to show that we haven't interfered with this keypress
@@ -2612,9 +2595,11 @@
             'load_all', 'load_file',
             'save_all', 'save', 'save_options',
             'import_files',
-            'export_all_files', 'export_file',
+#            'export_all_files', 'export_file',
+            'export_file',
             'import_data',
             'export_data',
+            'backup_restore_data',
             'disable_world_save', 'disable_save_load',
             # 'Edit' column
             'edit_quick_prefs', 'edit_client_prefs', 'edit_session_prefs',
@@ -2636,8 +2621,6 @@
             # 'Commands' column
             'repeat_cmd', 'repeat_second', 'repeat_interval',
             'cancel_repeat',
-            # 'Recordings' column
-            'start_stop_recording', 'pause_recording',
             # 'Axbasic' column
             'run_script', 'run_script_task',
         );
@@ -2704,6 +2687,32 @@
         );
 
         if ($openFlag && ! $stripObj->saveAllSessionsFlag) {
+            push (@sensitiseList, @list);
+        } else {
+            push (@desensitiseList, @list);
+        }
+
+        # Menu bar items that require a 'main' window with a visible session whose status is
+        #   'connected' or 'offline' and whose ->recordingPausedFlag is FALSE
+        @list = (
+            # 'Recordings' column
+            'start_stop_recording',
+        );
+
+        if ($openFlag && ! $self->visibleSession->recordingPausedFlag) {
+            push (@sensitiseList, @list);
+        } else {
+            push (@desensitiseList, @list);
+        }
+
+        # Menu bar items that require a 'main' window with a visible session whose status is
+        #   'connected' or 'offline' and whose ->recordingFlag is TRUE
+        @list = (
+            # 'Recordings' column
+            'pause_recording',
+        );
+
+        if ($openFlag && $self->visibleSession->recordingFlag) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);

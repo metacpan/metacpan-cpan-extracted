@@ -1,7 +1,7 @@
 package Sah::Schema::perl::pod_or_pm_filename;
 
-our $DATE = '2018-09-11'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2018-12-03'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 our $schema = [str => {
     summary => 'Filename (.pod or .pm file)',
@@ -74,7 +74,7 @@ Sah::Schema::perl::pod_or_pm_filename - Filename (.pod or .pm file)
 
 =head1 VERSION
 
-This document describes version 0.014 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-09-11.
+This document describes version 0.015 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-12-03.
 
 =head1 DESCRIPTION
 

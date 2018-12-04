@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::WebDev; # git description: v0.38-62-gf8bb31f
+package Task::Kensho::WebDev; # git description: v0.39-62-g2e22437
 # ABSTRACT: A Glimpse at an Enlightened Perl: Web Development
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::WebDev - A Glimpse at an Enlightened Perl: Web Development
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -70,6 +70,10 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head2 L<Task::Kensho::WebDev>: Web Development
 
+=head3 L<Attean>
+
+A Semantic Web Framework
+
 =head3 L<CGI::FormBuilder::Source::Perl>
 
 Build CGI::FormBuilder configs from Perl syntax files.
@@ -81,6 +85,10 @@ the new generation of Dancer, a lightweight yet powerful web application framewo
 =head3 L<HTML::FormHandler>
 
 HTML forms using Moose
+
+=head3 L<HTTP::BrowserDetect>
+
+Determine Web browser, version, and platform from an HTTP user agent string
 
 =head3 L<MIME::Types>
 
@@ -147,7 +155,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -162,6 +170,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

@@ -19,7 +19,7 @@ package MongoDB::_ServerSession;
 # MongoDB Server Session object
 
 use version;
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use MongoDB::Error;
 
@@ -88,6 +88,16 @@ has transaction_id => (
     is => 'rwp',
     init_arg => undef,
     default => sub { Math::BigInt->new('0') },
+);
+
+# pool_epoch
+#
+# tracks which pool the session came from; sessions won't be checked into
+# a newer pool
+
+has pool_epoch => (
+    is => 'ro',
+    default => -1,
 );
 
 # update_last_use

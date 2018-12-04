@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000012';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(parse_text to_editor_args);
@@ -60,7 +60,7 @@ sub parse_text {
 
 sub _module_to_filename {
     my $name = shift;
-    return undef unless is_module_name($name);
+    return undef unless ( defined $name && is_module_name($name) );
     try { require_module($name) };
 
     my $notional = module_notional_filename($name);
@@ -95,7 +95,8 @@ sub _maybe_extract_line_number {
 
     # git-grep (don't match on ::)
     # lib/Open/This.pm:17
-    if ( $$text =~ s{(\w):(\d+)\b}{$1} ) {
+    # Github links: foo/bar.go#L100
+    if ( $$text =~ s{(\w)[#:](\d+)\b}{$1} ) {
         return $2;
     }
 
@@ -163,7 +164,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000011
+version 0.000012
 
 =head1 DESCRIPTION
 
@@ -187,6 +188,10 @@ this case.)
 Copy/pasting a C<git-grep> result.
 
     ot lib/Foo/Bar.pm:99 # vim +99 Foo/Bar.pm
+
+Copy/pasting a partial GitHub URL.
+
+    ot lib/Foo/Bar.pm#100 # vim +100 Foo/Bar.pm
 
 =head1 FUNCTIONS
 

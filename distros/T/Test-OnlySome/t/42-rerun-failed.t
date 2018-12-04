@@ -18,6 +18,6 @@ os ok(1, 'Test 4 is not skipped');
 os ok(1, 'Test 5 is not skipped');
 os ok(1, 'Test 6 is not skipped');
 
-is_deeply $TEST_ONLYSOME, { n=>1, skip=>{1=>true} };
+is_deeply $TEST_ONLYSOME, { n=>1, skip=>{1=>true, 3=>true, 4=>true}, verbose=>0 };
 
 done_testing();

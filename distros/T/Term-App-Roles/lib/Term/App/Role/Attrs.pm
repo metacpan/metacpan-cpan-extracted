@@ -1,7 +1,7 @@
 package Term::App::Role::Attrs;
 
-our $DATE = '2014-12-10'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.02'; # VERSION
 
 use 5.010001;
 use Moo::Role;
@@ -69,7 +69,11 @@ has use_color => (
     lazy    => 1,
     default => sub {
         my $self = shift;
-        if (defined $ENV{COLOR}) {
+        if (exists $ENV{NO_COLOR}) {
+            $self->{_term_attrs_debug_info}{use_color_from} =
+                'NO_COLOR env';
+            return 0;
+        } elsif (defined $ENV{COLOR}) {
             $self->{_term_attrs_debug_info}{use_color_from} =
                 'COLOR env';
             return $ENV{COLOR};
@@ -228,7 +232,7 @@ has term_height => (
 );
 
 1;
-#ABSTRACT: Role for terminal-related attributes
+# ABSTRACT: Role for terminal-related attributes
 
 __END__
 
@@ -242,7 +246,7 @@ Term::App::Role::Attrs - Role for terminal-related attributes
 
 =head1 VERSION
 
-This document describes version 0.01 of Term::App::Role::Attrs (from Perl distribution Term-App-Roles), released on 2014-12-10.
+This document describes version 0.02 of Term::App::Role::Attrs (from Perl distribution Term-App-Roles), released on 2018-12-02.
 
 =head1 DESCRIPTION
 
@@ -303,6 +307,12 @@ Can be used to set C<use_utf8>.
 
 Can be used to set C<interactive>.
 
+=item * NO_COLOR
+
+Can be used to disable color. Takes precedence over C<COLOR>.
+
+For more information, see L<https://no-color.org>.
+
 =item * COLOR => BOOL (or INT or STR)
 
 Can be used to set C<use_color>. Can also be used to set C<color_depth> (if
@@ -349,7 +359,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

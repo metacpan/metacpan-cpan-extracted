@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Exceptions; # git description: v0.38-53-gf192e4a
+package Task::Kensho::Exceptions; # git description: v0.39-53-g488f904
 # ABSTRACT: A Glimpse at an Enlightened Perl: Exception Handling
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Exceptions - A Glimpse at an Enlightened Perl: Exception Handling
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -68,6 +68,10 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head2 L<Task::Kensho::Exceptions>: Exception Handling
 
+=head3 L<Syntax::Keyword::Try>
+
+try/catch/finally with full syntax support for control statements
+
 =head3 L<Try::Tiny>
 
 Lightweight exception handling that handles the vagaries of $@.
@@ -113,7 +117,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -128,6 +132,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

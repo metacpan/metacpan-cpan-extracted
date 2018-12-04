@@ -58,7 +58,7 @@ SEE ALSO [https://firebase.google.com/docs/cloud-messaging/http-server-ref](http
 
 # METHODS
 
-## new(%args)
+## new(\\%args)
 
     my $fcm = WWW::FCM::HTTP->new({
         api_key => $api_key,

@@ -1,6 +1,11 @@
 ExtUtils::F77 Changes list 
 --------------------------
 
+v1.22 released Dec 2nd 2018
+---------------------------
+
+* Fixed some minor typos in README and F77.pm
+
 v1.21 released Nov 25th 2018
 -----------------------------
 

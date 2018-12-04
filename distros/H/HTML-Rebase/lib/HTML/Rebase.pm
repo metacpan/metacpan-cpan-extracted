@@ -3,7 +3,7 @@ use strict;
 use URI::WithBase;
 use URI::URL;
 use Exporter 'import';
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT_OK= qw(rebase_html rebase_css rebase_html_inplace rebase_css_inplace);
 
 =head1 NAME
@@ -123,16 +123,8 @@ sub rebase_css_inplace {
 
 sub relative_url {
     my( $curr, $url ) = @_;
-    my $res = URI::WithBase->new( $url, $curr );
-    # Copy parts that URI::WithBase doesn't...
-    for my $part (qw( scheme host port )) {
-        if( ! defined $res->$part and defined $curr->$part ) {
-            $res->$part( $curr->$part );
-        };
-    };
+    my $res = URI::WithBase->new( $url, $curr )->abs;
     $res = $res->rel();
-    
-    #warn "$curr / $url => $res";
     
     $res
 };

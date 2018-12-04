@@ -15,6 +15,7 @@ sub _socket_class { "IO::Socket::SSL" }
 sub _default_port { 8883 }
 
 sub _socket_error { shift->_socket_class->errstr }
+sub _secure { 1 }
 
 sub new {
     my ($class, $server, $sockopts) = @_;

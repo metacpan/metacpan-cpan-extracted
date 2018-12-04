@@ -1,0 +1,63 @@
+{
+   "abstract" : "TIFF image file support for Imager",
+   "author" : [
+      "Tony Cook <tonyc@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Imager-File-WEBP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Imager" : "0.94",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Imager" : "0.94"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "0.94",
+            "XSLoader" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Imager-File-WEBP@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager-File-WEBP"
+      },
+      "homepage" : "http://imager.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tonycoz/imager-file-webp.git",
+         "web" : "http://github.com/tonycoz/imager-file-webp.git"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

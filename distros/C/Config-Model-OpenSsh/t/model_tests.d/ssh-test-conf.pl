@@ -19,6 +19,7 @@ Config::Model::BackendMgr::_set_test_home($home_for_test);
 
 $model_to_test = "Ssh";
 
+# Ssh backend excepts both system and user files
 my @setup = (
     setup => {
         'system_ssh_config' => {
@@ -58,9 +59,24 @@ my @setup = (
     {
         name => 'legacy',
         @setup,
-        load_check    => 'no',
-        load4perl_load_warnings => [ 'User', ( warn => qr/deprecated/) x 2, ],
-    }
+        load_check    => 'skip',
+        log4perl_load_warnings => [ [ 'User', ( warn => qr/deprecated/) x 2, ] ],
+    },
+    {
+        name => 'bad-forward',
+        @setup,
+        load_check    => 'skip',
+        load => 'Host:"foo.*,*.bar" LocalForward:0 port=20022',
+        log4perl_load_warnings => [ [ 'User', warn => qr/value '20022\+' does not match regexp/ ] ],
+    },
+    {
+       name => 'bad-pref-auth',
+       @setup,
+       load_check    => 'skip',
+       log4perl_load_warnings => [
+           [ 'User', ( warn => qr/Unknown check_list item/) , ]
+       ],
+    },
 );
 
 1;

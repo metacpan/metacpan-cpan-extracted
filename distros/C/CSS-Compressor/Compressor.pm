@@ -7,7 +7,7 @@ use Exporter qw( import );
 
 our @EXPORT_OK = qw( css_compress );
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 our $MARKER;
 
@@ -74,7 +74,7 @@ sub css_compress {
              !sogex;
 
     # preserve urls to prevent breaking inline SVG for example
-    $css =~ s! ( url \( (?: [^()] | (?1) )* \) ) !
+    $css =~ s! ( url \( ( (?: [^()]++ | \( (?2) \) )*+ ) \) ) !
         '___'.$MARKER.'_PRESERVED_TOKEN_'.(-1+push @tokens => $1).'___'
         !gxe;
 
@@ -316,7 +316,7 @@ Takes the stylesheet source, minifies it and returns the result string.
 
 =over 4
 
-=item L<http://developer.yahoo.com/yui/compressor/>
+=item L<https://github.com/YUICompressor-NET/YUICompressor.NET>
 
 YUIcompressor project homepage
 

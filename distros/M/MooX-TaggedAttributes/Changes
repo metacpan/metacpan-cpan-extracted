@@ -1,5 +1,42 @@
 Revision history for MooX-TaggedAttributes
 
+0.04      2018-12-01 21:47:16-05:00 America/New_York
+
+    * no changes. promoted to stable.
+
+0.03      2018-11-30 09:05:49-05:00 America/New_York (TRIAL RELEASE)
+
+  [ BUILD ]
+
+    * extend compatibiilty to 5.8.X
+    * remove vestiges of MakeMaker support in favor of Module::Build::Tiny
+
+
+0.02      2018-11-29 17:33:09-05:00 America/New_York (TRIAL RELEASE)
+
+  [ BUILD ]
+
+    * switch to Dist::Zilla and Test2
+
+
+0.01_01	2015-03-29T01:50:39-04:00
+
+  [DEPENDENCY FIX]
+    * requires Moo >= 1.001 for non-sub default values
+
+0.01    2015-03-26T17:19:41-0400
+
+  [ BUILD ]
+
+    * Clean up test suite; add more tests
+
+
+
+0.01_01	2015-01-12T14:53:52-05:00
+
+  [DEPENDENCY FIX]
+    * requires Moo >= 1.001 for non-sub default values
+
 0.01	2015-03-26T17:19:41-0400
 
   [ BUILD ]
@@ -40,4 +77,3 @@ Revision history for MooX-TaggedAttributes
 
 0.00	2015-01-09T17:23:29-0500
        Initial release.
-

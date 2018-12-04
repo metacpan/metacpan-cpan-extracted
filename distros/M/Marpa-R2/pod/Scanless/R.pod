@@ -1,4 +1,4 @@
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -172,7 +172,7 @@ described above for ranges.
 The range corresponding to the span
 [I<S, L>] is [I<S ... (S+L)-1>].
 The span corresponding to the range
-[I<S ... E>] is [I<S, (S-E)+1>].
+[I<S ... E>] is [I<S, (E-S)+1>].
 A span with
 a negative length
 is interpreted as if it was the range
@@ -2059,7 +2059,7 @@ for L</"substring()">.
 =for Marpa::R2::Display
 ignore: 1
 
-  Copyright 2015 Jeffrey Kegler
+  Copyright 2018 Jeffrey Kegler
   This file is part of Marpa::R2.  Marpa::R2 is free software: you can
   redistribute it and/or modify it under the terms of the GNU Lesser
   General Public License as published by the Free Software Foundation,

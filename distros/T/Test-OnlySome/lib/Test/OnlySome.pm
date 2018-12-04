@@ -15,6 +15,8 @@ use constant { true => !!1, false => !!0 };
 use parent 'Exporter';
 our @EXPORT = qw( skip_these skip_next );
 
+our $VERSION = '0.000007';
+
 # TODO move $TEST_NUMBER_OS into the options structure.
 
 # Docs {{{3
@@ -42,10 +44,44 @@ Manually: clone or untar into a working directory.  Then, in that directory,
 If some of the tests fail, please check the issues and file a new one if
 no one else has reported the problem yet.
 
-=head1 USAGE
+=head1 SYNOPSIS
 
-    use Test::More;
-    use Test::OnlySome;
+In your test file (e.g., C<t/01.t>):
+
+    use Test::More tests => 2;
+    use Test::OnlySome::RerunFailed;    # rerun only failed tests
+    os ok(1, 'passes');     # "os" marks tests that might be skipped
+    os ok(0, 'fails');
+
+At the command line:
+
+    $ osprove -lv
+    ...
+    ok 1 - passes
+    not ok 2 - fails
+    ...
+    Result: FAIL
+
+This creates C<.onlysome.yml>, which holds the test results from C<t/01.t>.
+Then, re-run:
+
+    $ osprove -lv
+    ...
+    ok 1 # skip Test::OnlySome: you asked me to skip this
+    not ok 2 - fails
+    ...
+
+Since test 1 passed the first time, it was skipped the second time.
+
+You don't have to use C<Test::OnlySome::RerunFailed>.  You can directly
+use C<Test::OnlySome>, and you can decide in some other way which tests
+you want to skip.
+
+The argument to L</os> can be a statement or block, and it doesn't have to
+be a L<Test::More> test.  You can wrap long-running tests in functions,
+and apply L</os> to those functions.
+
+=head1 MARKING TESTS
 
 You can pick which tests to skip using implicit or explicit configuration.
 Explicit configuration uses a hashref:
@@ -177,11 +213,18 @@ sub import {
 
     $hrTOS->{n} = 1 unless $hrTOS->{n};
     $hrTOS->{skip} = {} unless $hrTOS->{skip};
+    $hrTOS->{verbose} = 0 unless $hrTOS->{verbose};
 
     # Check the arguments.  Numeric arguments are tests to skip.
     my $curr_keyword = '';
     foreach(@_) {
-        if(/^skip/) { $curr_keyword='skip'; next; }
+        if(/^skip$/) { $curr_keyword='skip'; next; }
+        if(/^verbose$/) { $curr_keyword='verbose'; next; }
+
+        if ( $curr_keyword eq 'verbose' ) {
+            $hrTOS->{verbose} = !!$_;
+            next;
+        }
 
         if ( $curr_keyword eq 'skip' && _is_testnum ) {
             #print STDERR "TOS skipping $_\n";
@@ -191,6 +234,13 @@ sub import {
 
         croak "Test::OnlySome: I can't understand argument '$_'" .
             ($curr_keyword ? " to keyword '$curr_keyword'" : '');
+    } # foreach arg
+
+    if($hrTOS->{verbose}) {
+        my $msg = "# Test::OnlySome $VERSION loading\nConfig:\n" .
+            Dumper($hrTOS);
+        $msg =~ s/^/# /gm;
+        print STDERR $msg;
     }
 
 # `os` keyword - mark each test-calling statement this way {{{2
@@ -287,7 +337,7 @@ sub _gen {
             \$TEST_NUMBER_OS += \$ntests;
             SKIP: {
                 # print STDERR " ==> Trying test \$first_test_num\\n"; # DEBUG
-                skip 'Test::OnlySome: you asked me to skip these', \$ntests
+                skip 'Test::OnlySome: you asked me to skip this', \$ntests
                     if $optsVarName$W$L skip $R$W$L \$first_test_num $R;
                 $code
             }
@@ -404,7 +454,7 @@ sub _printtrace {
 # }}}2
 # }}}1
 
-# More docs, and $VERSION {{{3
+# More docs {{{3
 =head1 VARIABLES
 
 =head2 C<$TEST_NUMBER_OS>
@@ -475,15 +525,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 =cut
 
 # }}}3
-
-our $VERSION = '0.000006';
-
-=head1 VERSION
-
-Version 0.0.6
-
-=cut
-
 # License {{{3
 
 =head1 LICENSE AND COPYRIGHT

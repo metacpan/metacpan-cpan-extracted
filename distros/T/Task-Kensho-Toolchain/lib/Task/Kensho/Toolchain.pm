@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Toolchain; # git description: v0.38-60-gc7fbe15
+package Task::Kensho::Toolchain; # git description: v0.39-60-gde6744d
 # ABSTRACT: A Glimpse at an Enlightened Perl: Basic Toolchain
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Toolchain - A Glimpse at an Enlightened Perl: Basic Toolchain
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -77,6 +77,10 @@ Pack your dependencies onto your script file
 =head3 L<App::cpanminus>
 
 Get, unpack, build and install modules from CPAN
+
+=head3 L<App::cpm>
+
+a fast CPAN module installer
 
 =head3 L<App::perlbrew>
 
@@ -139,7 +143,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -154,6 +158,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

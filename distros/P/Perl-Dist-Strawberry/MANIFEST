@@ -87,7 +87,9 @@ share/32bit-5.26.0.1.pp
 share/32bit-5.26.0.2.pp
 share/32bit-5.26.1.1.pp
 share/32bit-5.26.2.1.pp
+share/32bit-5.26.3.1.pp
 share/32bit-5.28.0.1.pp
+share/32bit-5.28.1.1.pp
 share/64bit-5.16.3.1.pp
 share/64bit-5.18.2.1.pp
 share/64bit-5.18.2.2.pp
@@ -117,7 +119,9 @@ share/64bit-5.26.0.1.pp
 share/64bit-5.26.0.2.pp
 share/64bit-5.26.1.1.pp
 share/64bit-5.26.2.1.pp
+share/64bit-5.26.3.1.pp
 share/64bit-5.28.0.1.pp
+share/64bit-5.28.1.1.pp
 share/config-files/CPAN_Config.pm.tt
 share/extra-files/DISTRIBUTIONS.txt.tt
 share/extra-files/licenses/License.rtf

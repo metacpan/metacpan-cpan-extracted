@@ -21,15 +21,17 @@ no_index:
     - t
     - inc
 requires:
+  Code::TidyAll: '0'
   File::Find: '1'
   HTML::Stream: '1.49'
   IO::File: '1'
   IO::String: '1'
+  Perl::Tidy: '0'
   Pod::Escapes: '1.02'
   Text::Template: '1'
 resources:
   bugtracker: http://github.com/manwar/Pod-Tree/issues
   homepage: http://metacpan.org/pod/Pod::Tree
   repository: http://github.com/manwar/Pod-Tree.git
-version: '1.27'
+version: '1.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

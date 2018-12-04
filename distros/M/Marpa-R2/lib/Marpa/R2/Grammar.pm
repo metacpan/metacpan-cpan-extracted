@@ -1,4 +1,4 @@
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -15,7 +15,7 @@
 
 package Marpa::R2::Grammar;
 
-use 5.010;
+use 5.010001;
 
 use warnings;
 
@@ -26,7 +26,7 @@ no warnings qw(recursion qw);
 use strict;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '4.000000';
+$VERSION        = '6.000000';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -478,7 +478,7 @@ sub Marpa::R2::Grammar::precompute {
             my @counted_nullable_messages = map {
                       q{Nullable symbol "}
                     . $_
-                    . qq{" is on rhs of counted rule\n}
+                    . qq{" is on RHS of counted rule\n}
             } @counted_nullables;
             Marpa::R2::exception( @counted_nullable_messages,
                 'Counted nullables confuse Marpa -- please rewrite the grammar'
@@ -700,7 +700,7 @@ sub Marpa::R2::Internal::Grammar::slif_precompute {
             my @counted_nullable_messages = map {
                       q{Nullable symbol "}
                     . $_
-                    . qq{" is on rhs of counted rule\n}
+                    . qq{" is on RHS of counted rule\n}
             } @counted_nullables;
             Marpa::R2::exception( @counted_nullable_messages,
                 'Counted nullables confuse Marpa -- please rewrite the grammar'

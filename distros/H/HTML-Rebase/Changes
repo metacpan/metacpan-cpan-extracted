@@ -1,3 +1,10 @@
+0.05 2018-11-30
+    * Properly handle (non-standard) ports
+      This was uncovered through a patch by Mohammad ANWAR, who removed untested
+      imports, which prompted me to write a test for those, which uncovered
+      the bug. My thanks go to him!
+    * Test cleanup by Mohammad ANWAR
+
 0.04 2018-11-30
     * Also respect <BASE>, not just <base>
     * Cleaned up prerequisites

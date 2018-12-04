@@ -43,8 +43,8 @@ cmp_ok $t->pen_status, '==', 0, 'pen_up';
 $t->pen_down;
 cmp_ok $t->pen_status, '==', 1, 'pen_down';
 
-$t->turn(45);
-cmp_ok $t->heading, '==', 315, 'turn';
+$t->right(45);
+cmp_ok $t->heading, '==', 315, 'right';
 
 $t->right(1);
 cmp_ok $t->heading, '==', 316, 'right';

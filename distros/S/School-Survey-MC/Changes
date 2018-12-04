@@ -1,5 +1,10 @@
 Revision history for School-Survey-MC
  
+0.002     2018-12-03 08:41:12+01:00 Europe/Zurich
+ - replace feature say with sub, for perl < 5.10
+ - use Getopt::Args
+ - corrected podname in scripts
+
 0.001     2018-11-29 16:58:35+01:00 Europe/Zurich
 
  - initial release

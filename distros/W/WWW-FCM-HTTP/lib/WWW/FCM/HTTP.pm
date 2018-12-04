@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use LWP::UserAgent;
 use LWP::Protocol::https;
@@ -21,8 +21,9 @@ our $API_URL = 'https://fcm.googleapis.com/fcm/send';
 
 sub new {
     my $class = shift;
-    my %args = ref @_ eq 'HASH' ? %{ @_ } : @_;
-    croak 'Usage: WWW::FCM::HTTP->new(api_key => $api_key)' unless exists $args{api_key};
+    my %args  = $_[0] && ref $_[0] eq 'HASH' ? %{ $_[0] } : @_;
+    croak 'Usage: WWW::FCM::HTTP->new({ api_key => $api_key })'
+        unless (exists $args{api_key} && defined $args{api_key});
 
     $args{api_url} ||= $API_URL;
     $args{ua}      ||= LWP::UserAgent->new(
@@ -117,7 +118,7 @@ SEE ALSO L<< https://firebase.google.com/docs/cloud-messaging/http-server-ref >>
 
 =head1 METHODS
 
-=head2 new(%args)
+=head2 new(\%args)
 
     my $fcm = WWW::FCM::HTTP->new({
         api_key => $api_key,
@@ -165,4 +166,3 @@ it under the same terms as Perl itself.
 xaicron E<lt>xaicron@gmail.comE<gt>
 
 =cut
-

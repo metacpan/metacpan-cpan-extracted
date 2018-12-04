@@ -1,22 +1,14 @@
 Revision history for Test-OnlySome
 
-0.0_1   2018-11-23
+0.0.7   2018-12-01
 
-    - First version, released on an unsuspecting world.
+    - Added osprove(1) binary to run prove(1) with the Test::OnlyP plugin
+    - Made Test::OnlySome::RerunFailed idempotent
+    - Added "verbose" option to Test::OnlySome and Test::OnlySome::RerunFailed
 
-0.0_2   2018-11-24
+0.0.6   2018-11-29
 
-    - Require Keyword::Declare 0.001006+ based on cpantesters matrix results.
-    - Support implicit configuration using a package-level variable rather than
-      an expressly-passed hashref.
-
-0.0_3   2018-11-25
-
-    - Can be used via Import::Into and Test::Kit
-
-0.0_4   2018-11-26
-
-    - Support package args to specify which tests to skip
+    - Updated documentation
 
 0.0.5   2018-11-28
 
@@ -28,6 +20,21 @@ Revision history for Test-OnlySome
       test results and mark all cleanly-passed tests in a file to be skipped
       by Test::OnlySome.
 
-0.0.6   2018-11-29
+0.0_3   2018-11-25
 
-    - Updated documentation
+0.0_4   2018-11-26
+
+    - Support package args to specify which tests to skip
+
+    - Can be used via Import::Into and Test::Kit
+
+0.0_2   2018-11-24
+
+    - Require Keyword::Declare 0.001006+ based on cpantesters matrix results.
+    - Support implicit configuration using a package-level variable rather than
+      an expressly-passed hashref.
+
+0.0_1   2018-11-23
+
+    - First version, released on an unsuspecting world.
+

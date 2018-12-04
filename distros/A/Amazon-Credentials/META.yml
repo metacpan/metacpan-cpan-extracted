@@ -1,0 +1,48 @@
+---
+abstract: AWS
+author:
+  - 'Rob Lauer <rlauer6@comcast.net>'
+build_requires:
+  Data::Dumper: '0'
+  Date::Format: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  JSON: '0'
+  Module::Loaded: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-Credentials
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor: '0'
+  Data::Dumper: '0'
+  Date::Format: '0'
+  Exporter: '0'
+  File::HomeDir: '0'
+  File::chdir: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  POSIX::strptime: '0'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  constant: '0'
+  parent: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: v1.0.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

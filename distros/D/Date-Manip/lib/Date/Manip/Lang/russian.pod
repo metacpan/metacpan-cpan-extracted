@@ -762,7 +762,7 @@ creating a new translation, be aware that regular expressions with utf-8
 characters may be tricky.  For example, don't include the expression '[x]'
 where 'x' is a utf-8 character.
 
-A pair of colons is ALWAY allowed for all languages.  If a language allows
+A pair of colons is ALWAYS allowed for all languages.  If a language allows
 additional pairs, they are listed here:
 
    ч  м

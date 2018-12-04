@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.500'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.501'; # VERSION
 
 use 5.010;
 use strict;
@@ -54,7 +54,7 @@ ansitable-list-border-styles - List available border styles for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.500 of ansitable-list-border-styles (from Perl distribution Text-ANSITable), released on 2018-05-31.
+This document describes version 0.501 of ansitable-list-border-styles (from Perl distribution Text-ANSITable), released on 2018-12-02.
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,6 @@ Sample output:
  | Default::space_boxchar       Space as border                                                          Y          N   |
  | Default::spacei_ascii        Space, inner-only                                                        N          N   |
  | Default::spacei_boxchar      Space, inner-only                                                        Y          N   |
- | Demo::demo_custom_char       Demoes coderef in chars                                                  N          N   |
  | Default::bold                Bold                                                                     N          Y   |
  +----------------------------------------------------------------------------------------------------------------------+
  | Default::brick               Single, bold on bottom right to give illusion of depth                   N          Y   |
@@ -97,10 +96,6 @@ Sample output:
  | Default::singlev_utf8        Single, vertical only                                                    N          Y   |
  | Default::space_utf8          Space as border                                                          N          Y   |
  | Default::spacei_utf8         Space, inner-only                                                        N          Y   |
- | Extra::dash2                 Dash 2                                                                   N          Y   |
- | Extra::dash3                 Dash 3                                                                   N          Y   |
- | Extra::hboldh_dsingle        Horizontally-bold for header, single for data                            N          Y   |
- | Extra::hdoubleh_dsingle      Horizontally-double for header, single for data                          N          Y   |
  `----------------------------------------------------------------------------------------------------------------------'
 
 =head1 HOMEPAGE

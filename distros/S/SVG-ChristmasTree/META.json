@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl extension to draw Christmas trees with SVG",
+   "author" : [
+      "Dave Cross <dave@perlhacks.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SVG-ChristmasTree",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Math::Trig" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "POSIX" : "0",
+            "SVG" : "0",
+            "Test::More" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Trig" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "POSIX" : "0",
+            "SVG" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/davorg/svg-christmastree.git",
+         "web" : "https://github.com/davorg/svg-christmastree"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

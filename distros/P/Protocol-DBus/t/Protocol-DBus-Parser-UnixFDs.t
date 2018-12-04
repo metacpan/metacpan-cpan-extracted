@@ -7,11 +7,18 @@ use Test::More;
 use Test::FailWarnings;
 
 use Socket;
-use Socket::MsgHdr ();
+
+BEGIN { eval { require Socket::MsgHdr } }
 
 use_ok('Protocol::DBus::Parser::UnixFDs');
 
-if (Socket->can('SCM_RIGHTS')) {
+if ( !Socket::MsgHdr->can('new') ) {
+    note "Cannot test without Socket::MsgHdr!";
+}
+elsif (!Socket->can('SCM_RIGHTS')) {
+    note "$^O does not have Socket::SCM_RIGHTS!";
+}
+else {
     pipe my ($r, $w);
 
     socketpair my $yin, my $yang, Socket::AF_UNIX, Socket::SOCK_STREAM, 0;

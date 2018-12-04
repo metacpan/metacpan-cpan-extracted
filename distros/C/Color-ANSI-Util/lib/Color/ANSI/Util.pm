@@ -1,7 +1,7 @@
 package Color::ANSI::Util;
 
-our $DATE = '2018-09-26'; # DATE
-our $VERSION = '0.161'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.162'; # VERSION
 
 use 5.010001;
 use strict;
@@ -420,6 +420,10 @@ our $_color_depth; # cache, can be set during testing
 sub _color_depth {
     unless (defined $_color_depth) {
         {
+            if (exists $ENV{NO_COLOR}) {
+                $_color_depth = 0;
+                last;
+            }
             if (defined $ENV{COLOR} && !$ENV{COLOR}) {
                 $_color_depth = 0;
                 last;
@@ -546,7 +550,7 @@ Color::ANSI::Util - Routines for dealing with ANSI colors
 
 =head1 VERSION
 
-This document describes version 0.161 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2018-09-26.
+This document describes version 0.162 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2018-12-02.
 
 =head1 SYNOPSIS
 
@@ -893,6 +897,13 @@ Returns "\e[0m", which is the ANSI escape sequence to reset color. Normally you
 print this sequence after you print colored text.
 
 =head1 ENVIRONMENT
+
+=head2 NO_COLOR
+
+Can be used to explicitly disable color. See L<https://no-color.org> for more
+details.
+
+Observed by: ansi{fg,bg}.
 
 =head2 COLOR => bool
 

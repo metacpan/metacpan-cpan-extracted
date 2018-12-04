@@ -10,16 +10,21 @@ use Test::More;
 plan skip_all => "Disabled" if $ENV{NO_JIRA_CHECK};
 
 my @commits = split /\n/, <<'EOC';
-eb28fd35 (HEAD -> maint-v2.0, sandbox/maint-v2.0, origin/maint-v2.0, dagolden/maint-v2.0) PERL-959 Make Perl::Critic happy with the pvt construtor gen
-d79be6f2 PERL-967 Document that X509 doesn't need username
-0427b981 PERL-968 Re-enable release time spell check tests; fix more errors
-ca4fca0a PERL-968 Fix spelling errors
-61bd2f28 PERL-958 Don't require BSON::XS on Windows XP or earlier
-90a2882e PERL-897 Limit use of nameOnly for non-name filters
-3610cae7 PERL-897 Add nameOnly option to list_collections
-cff63d82 PERL-959 Undefer constructor in the private constructor
-a601807f PERL-953 Fix warning with default compression level
-2e722608 PERL-952 Show how to upgrade v2 over v1 without shadows
+eb94d14c PERL-1041 Check bulk error can call result before calling it
+ad0ecaeb PERL-1033 Fix docs link to BSON/wrap_numbers
+1a64d910 PERL-927 Skip count hint test before MongoDB 3.6
+41934c83 PERL-927 Coerce hint to IxHash or BSON::Doc if not string
+4003c366 PERL-988 Preserve index key order in results
+18d633cc PERL-970 Allow BSON::Doc as sort argument
+528cdc38 PERL-806 Check compatibility for SDAM tests
+e1b62814 PERL-1005 Defend txn example test vs possible abort
+a6c4f15b PERL-1006 Enable retry_writes during testing
+4d137574 PERL-1006 Force specific tests to disable retry_writes. Fix retryable error check
+73bd1786 PERL-1006 Fix issue with retry_writes and unordered bulk
+72f169f4 PERL-1012 Clear session pool on reconnect after fork/thread
+78b15406 PERL-1004 CI: Update stable branch Evergreen testing
+c4dc4b6c PERL-972 Amended transaction examples for session args to come last
+cc0a5ee5 PERL-972 Amended transaction examples to utilise session
 
 EOC
 

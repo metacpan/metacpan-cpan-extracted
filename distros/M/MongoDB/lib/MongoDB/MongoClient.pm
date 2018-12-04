@@ -19,7 +19,7 @@ package MongoDB::MongoClient;
 # ABSTRACT: A connection to a MongoDB server or multi-server deployment
 
 use version;
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use Moo;
 use MongoDB::ClientSession;
@@ -36,7 +36,7 @@ use MongoDB::_Dispatcher;
 use MongoDB::_SessionPool;
 use MongoDB::_Topology;
 use MongoDB::_URI;
-use BSON 1.006006;
+use BSON 1.010001;
 use Digest::MD5;
 use UUID::URandom;
 use Tie::IxHash;
@@ -1421,14 +1421,15 @@ sub disconnect {
 #pod     $client->reconnect;
 #pod
 #pod This method closes all connections to the server, as if L</disconnect> were
-#pod called, and then immediately reconnects.  Use this after forking or spawning
-#pod off a new thread.
+#pod called, and then immediately reconnects.  It also clears the session
+#pod cache.  Use this after forking or spawning off a new thread.
 #pod
 #pod =cut
 
 sub reconnect {
     my ($self) = @_;
     $self->_topology->close_all_links;
+    $self->_server_session_pool->reset_pool;
     $self->_topology->scan_all_servers(1);
     return 1;
 }
@@ -1844,7 +1845,7 @@ MongoDB::MongoClient - A connection to a MongoDB server or multi-server deployme
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 
@@ -2487,8 +2488,8 @@ Drops all connections to servers.
     $client->reconnect;
 
 This method closes all connections to the server, as if L</disconnect> were
-called, and then immediately reconnects.  Use this after forking or spawning
-off a new thread.
+called, and then immediately reconnects.  It also clears the session
+cache.  Use this after forking or spawning off a new thread.
 
 =head2 topology_status
 

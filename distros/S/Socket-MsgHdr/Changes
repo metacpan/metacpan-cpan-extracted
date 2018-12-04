@@ -4,6 +4,16 @@ LY - Lincoln Yeoh
 TLB - Troels Liebe Bentsen
 PE - Paul Evans
 
+0.05 Fri Nov 30 2018
+    - No changes.
+
+0.04_03 Fri Nov 30 2018
+    - Fix runtime loads. (FG)
+
+0.04_02 Mon Jan 11 23:09:10 2010
+    - (hints/solaris.pl, MSWin32.pl) Add -D_XOPEN_SOURCE=520 to treat
+      i86pc-solaris smoke test failures, also force "N/A" on MSWin32.
+
 0.04 Thu Jan 07 22:50:18 2010
     - (MsgHdr.xs) FreeBSD 6.3 / perl-5.8 fix:  explicitly NULL "empty"
       msghdr members.

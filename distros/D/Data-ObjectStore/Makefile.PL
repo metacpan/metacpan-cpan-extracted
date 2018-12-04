@@ -15,7 +15,7 @@ WriteMakefile
   'PREREQ_PM' => {
                    'Test::More' => 0,
                    'Module::Build' => '0.4',
-                   'Data::RecordStore' => '3.2'
+                   'Data::RecordStore' => '4.05'
                  }
 )
 ;

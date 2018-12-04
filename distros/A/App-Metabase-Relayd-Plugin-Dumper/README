@@ -1,0 +1,51 @@
+NAME
+
+    App::Metabase::Relayd::Plugin::Dumper - Dumper plugin for
+    metabase-relayd
+
+VERSION
+
+    version 0.04
+
+SYNOPSIS
+
+      # example metabase-relayd configuration file
+    
+      [Dumper]
+    
+      enable = 1
+
+DESCRIPTION
+
+    App::Metabase::Relayd::Plugin::Dumper is a plugin for
+    App::Metabase::Relayd and metabase-relayd that dumps the reports are
+    received by the daemon to file.
+
+    Configuration is handled by a section in the metabase-relayd
+    configuration file.
+
+CONFIGURATION
+
+    This plugin uses an [Dumper] section within the metabase-relayd
+    configuration file.
+
+    The only mandatory required parameter is enable. Set this to a true
+    value to enable the plugin.
+
+SEE ALSO
+
+    metabase-relayd
+
+    App::Metabase::Relayd::Plugin
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

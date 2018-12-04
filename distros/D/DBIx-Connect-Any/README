@@ -1,0 +1,53 @@
+NAME
+    DBIx::Connect::Any - Connect to DBI using DBIx::Connect::*
+
+VERSION
+    This document describes version 0.001 of DBIx::Connect::Any (from Perl
+    distribution DBIx-Connect-Any), released on 2018-12-03.
+
+SYNOPSIS
+    Instead of:
+
+     use DBI;
+     my $dbh = DBI->connect("dbi:mysql:database=mydb", ...);
+
+    you can now do:
+
+     use DBIx::Connect::Any;
+     my $dbh = DBIx::Connect::Any->connect("dbi:mysql:database=mydb", ...);
+
+    and connecting will be handled by DBIx::Connect::MySQL.
+
+DESCRIPTION
+    This is a wrapper for DBIx::Connect::MySQL and other future
+    DBIx::Connect::*.
+
+METHODS
+  connect($dsn, $user, $pass, ...)
+    Currently will pass to DBI::Connect::MySQL if $dsn starts with
+    "DBI:mysql:". Otherwise will pass to "DBI->connect".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-Connect-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DBIx-Connect-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Connect-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

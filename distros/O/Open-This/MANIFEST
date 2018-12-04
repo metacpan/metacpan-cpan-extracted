@@ -27,6 +27,7 @@ t/test-data/foo/bar/baz.html.ep
 tidyall.ini
 xt/author/pod-coverage.t
 xt/author/pod-spell.t
+xt/author/pod-syntax.t
 xt/author/synopsis.t
 xt/author/tidyall.t
 xt/release/cpan-changes.t

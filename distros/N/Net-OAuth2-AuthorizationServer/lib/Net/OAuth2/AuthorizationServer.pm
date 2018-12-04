@@ -11,7 +11,7 @@ Authorization Server
 
 =head1 VERSION
 
-0.18
+0.19
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ use Net::OAuth2::AuthorizationServer::ImplicitGrant;
 use Net::OAuth2::AuthorizationServer::PasswordGrant;
 use Net::OAuth2::AuthorizationServer::ClientCredentialsGrant;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 =head1 GRANT TYPES
 
@@ -120,6 +120,8 @@ Pierre VIGIER - C<pierre.vigier@gmail.com>
 Ian Sillitoe - L<https://github.com/sillitoe>
 
 Mirko Tietgen - L<mirko@abunchofthings.net>
+
+Dylan William Hardison - L<dylan@hardison.net>
 
 =head1 LICENSE
 

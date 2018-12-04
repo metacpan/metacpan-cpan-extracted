@@ -1,0 +1,32 @@
+---
+abstract: 'Perl implementation of the Neo4j Driver API'
+author:
+  - 'Arne Johannessen <ajnn@cpan.org>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.96'
+  Test::Warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Neo4j-Driver
+requires:
+  Cpanel::JSON::XS: '3.0201'
+  JSON::PP: '0'
+  LWP::UserAgent: '0'
+  REST::Client: '134'
+  Try::Tiny: '0'
+  URI: '1.25'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/johannessen/neo4j-driver-perl/issues
+  homepage: https://github.com/johannessen/neo4j-driver-perl
+  repository: https://github.com/johannessen/neo4j-driver-perl.git
+version: '0.09'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

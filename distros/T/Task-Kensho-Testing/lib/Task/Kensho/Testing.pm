@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Testing; # git description: v0.38-59-g22df7f0
+package Task::Kensho::Testing; # git description: v0.39-59-g9f8c883
 # ABSTRACT: A Glimpse at an Enlightened Perl: Testing
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Testing - A Glimpse at an Enlightened Perl: Testing
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -156,6 +156,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

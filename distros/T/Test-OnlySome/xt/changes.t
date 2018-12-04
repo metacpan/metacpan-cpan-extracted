@@ -24,7 +24,8 @@ my $re = join('|', map { quotemeta } @valid_dates);
 #diag "Regex is $re";
 
 # "Changes" header line format: ^<version> <date>$.  Assume Changes is in cwd.
-ok( scalar fgrep { /^\S+\s+$re$/ } 'Changes',
+my $matches = scalar fgrep { /^\S+\s+$re$/ } 'Changes';
+cmp_ok($matches, '>=', 1,
     "Changes file contains an entry for today's date");
 
 # vi: set ft=perl: #

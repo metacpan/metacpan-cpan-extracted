@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.500'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.501'; # VERSION
 
 use 5.010;
 use strict;
@@ -42,7 +42,7 @@ ansitable-list-style-sets - List available style sets for Text::ANSITable
 
 =head1 VERSION
 
-This document describes version 0.500 of ansitable-list-style-sets (from Perl distribution Text-ANSITable), released on 2018-05-31.
+This document describes version 0.501 of ansitable-list-style-sets (from Perl distribution Text-ANSITable), released on 2018-12-02.
 
 =head1 SYNOPSIS
 
@@ -56,14 +56,6 @@ Sample output:
  | Text::ANSITable::StyleSet::Alt   Set different foreground         even_bgcolor, even_fgcolor,    |
  | Row                              and/or background color for      odd_bgcolor, odd_fgcolor       |
  |                                  odd/even rows                                                   |
- | Text::ANSITable::StyleSet::Cal   Set foreground and/or            holiday_bgcolor,               |
- | endar::Indonesia::Holiday::Hol   background color for different   holiday_fgcolor,               |
- | idayType                         holiday types                    joint_leave_bgcolor,           |
- |                                                                   joint_leave_fgcolor            |
- | Text::ANSITable::StyleSet::SHA   Set foreground and/or            cpan_bgcolor, cpan_fgcolor,    |
- | RYANTO::PerlReleaseTypes         background color for different   noncpan_bgcolor,               |
- |                                  Perl releases                    noncpan_fgcolor,               |
- |                                                                   rename_bgcolor, rename_fgcolor |
  `--------------------------------------------------------------------------------------------------'
 
 =head1 HOMEPAGE

@@ -1,3 +1,10 @@
+0.501   2018-12-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention about the support for NO_COLOR.
+
+
 0.500   2018-05-31 (PERLANCAR)
 
 	- [Bugfix] Re-add 'require Win32::Console::ANSI', which was

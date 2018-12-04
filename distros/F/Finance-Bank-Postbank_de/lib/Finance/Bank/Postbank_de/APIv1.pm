@@ -4,6 +4,7 @@ use JSON 'decode_json';
 use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
+use Carp 'croak';
 use WWW::Mechanize;
 use Mozilla::CA;
 use HTTP::CookieJar::LWP;
@@ -17,7 +18,7 @@ use Finance::Bank::Postbank_de::APIv1::Account;
 use Finance::Bank::Postbank_de::APIv1::Depot;
 use Finance::Bank::Postbank_de::APIv1::Position;
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 =head1 NAME
 
@@ -97,6 +98,10 @@ sub fetch_config( $self ) {
         $self->diagnoseCertificateError( "$@ ");
     };
     my $config = decode_json( $ua->content );
+    if( ! exists $config->{ 'iob5-base' }) {
+        require Data::Dumper;
+        croak "Invalid config retrieved: " . Data::Dumper::Dumper($config);
+    };
     $self->config( $config );
     $config
 }
@@ -136,7 +141,7 @@ sub configure_ua( $self, $config = $self->fetch_config ) {
     my $ua = $self->ua;
 
     $ua->add_header(
-        'api-key' => $config->{apiKey},
+        'api-key' => $config->{'iob5-base'}->{apiKey},
         #'device-signature' => '494f423500225fd9',
         accept => ['application/hal+json', '*/*'],
         keep_alive => 1,
@@ -147,8 +152,8 @@ sub configure_ua( $self, $config = $self->fetch_config ) {
 
 sub login_url( $self ) {
     my $config = $self->config;
-    my $loginUrl = $config->{loginUrl};
-    $loginUrl =~ s!%(\w+)%!$config->{$1}!ge;
+    my $loginUrl = $config->{'iob5-base'}->{loginUrl};
+    $loginUrl =~ s!%(\w+)%!$config->{'iob5-base'}->{$1}!ge;
     $loginUrl
 }
 
@@ -159,7 +164,9 @@ sub login( $self, $username, $password ) {
     my $r =
     $ua->post(
         $loginUrl,
-        content => sprintf 'dummy=value&password=%s&username=%s', $password, $username
+        #content => sprintf 'dummy=value&password=%s&username=%s', $password, $username
+        #content => sprintf 'password=%s&username=%s', $password, $username
+        content => sprintf 'username=%s&password=%s', $username, $password
     );
 
     my $postbank = HAL::Resource->new(

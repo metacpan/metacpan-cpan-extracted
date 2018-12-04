@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::Base;
-$POE::Component::SmokeBox::Backend::Base::VERSION = '0.52';
+$POE::Component::SmokeBox::Backend::Base::VERSION = '0.54';
 #ABSTRACT: Base class for Backend smokers.
 
 use strict;
@@ -18,9 +18,10 @@ sub _data {
   my $self = shift;
   $self->{_data} =
   {
-  	check => [ 'DUMMY' ],
-  	index => [ 'DUMMY' ],
-	smoke => [ 'DUMMY' ],
+	  check  => [ 'DUMMY' ],
+	  index  => [ 'DUMMY' ],
+	  smoke  => [ 'DUMMY' ],
+    digest => [ 'DUMMY' ],
   };
   return;
 }
@@ -40,6 +41,11 @@ sub smoke {
   return $self->{_data}->{'smoke'} if $self->{_data}->{'smoke'};
 }
 
+sub digest {
+  my $self = shift;
+  return $self->{_data}->{'digest'} if $self->{_data}->{'digest'};
+}
+
 1;
 
 __END__
@@ -54,7 +60,7 @@ POE::Component::SmokeBox::Backend::Base - Base class for Backend smokers.
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -68,9 +74,10 @@ version 0.52
     my $self = shift;
     $self->{_data} =
     {
-  	check => [ '-MSome::Funky::Module', '-e', '1' ],
-  	index => [ '-MSome::Funky::Module', '-e', 'reload_indices();' ],
-	smoke => [ '-MSome::Funky::Module', '-e', 'my $module = shift; test($module);' ],
+	    check  => [ '-MSome::Funky::Module', '-e', '1' ],
+	    index  => [ '-MSome::Funky::Module', '-e', 'reload_indices();' ],
+	    smoke  => [ '-MSome::Funky::Module', '-e', 'my $module = shift; test($module);' ],
+      digest => qr/Some pattern to match/,
     };
     return;
   }
@@ -115,6 +122,11 @@ distribution to smoke will be passed as $ARGV[0].
 
   [ '-MSome::Funky::Module', '-e', 'my $module = shift; test($module);' ]
 
+=item C<digest>
+
+Returns a regular expression pattern that is used to match against smoker output. If the pattern is matched then the
+digests for detecting looping output are reset.
+
 =item C<_data>
 
 An internal method that gets called from C<new()> to initialise the internal data of the object. Overload this method to
@@ -138,7 +150,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

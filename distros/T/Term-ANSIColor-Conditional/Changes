@@ -1,3 +1,25 @@
+0.006   2018-12-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Note about Term::ANSIColor already supports conditional
+	  color output via ANSI_COLORS_DISABLED.
+
+	- [doc] Mention Term::ANSIColor::Patch::Conditional.
+
+
+0.005   2018-12-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix mentioned module.
+
+
+0.004   2018-12-02 (PERLANCAR)
+
+	- Observe NO_COLOR (see https://no-color.org).
+
+
 0.003   2018-11-29 (PERLANCAR)
 
 	- No functional changes.

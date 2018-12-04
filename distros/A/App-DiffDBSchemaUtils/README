@@ -1,0 +1,211 @@
+NAME
+    App::DiffDBSchemaUtils - Utilities related to diff-ing DB schemas
+
+VERSION
+    This document describes version 0.002 of App::DiffDBSchemaUtils (from
+    Perl distribution App-DiffDBSchemaUtils), released on 2018-12-03.
+
+DESCRIPTION
+    This distribution includes several utilities:
+
+    *   diff-db-schema
+
+    *   diff-mysql-schema
+
+    *   diff-pg-schema
+
+    *   diff-sqlite-schema
+
+FUNCTIONS
+  diff_db_schema
+    Usage:
+
+     diff_db_schema(%args) -> [status, msg, payload, meta]
+
+    Diff two database schemas.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dsn1* => *str*
+
+    *   dsn2* => *str*
+
+    *   password1 => *str*
+
+    *   password2 => *str*
+
+    *   username1 => *str*
+
+    *   username2 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  diff_mysql_schema
+    Usage:
+
+     diff_mysql_schema(%args) -> [status, msg, payload, meta]
+
+    Diff two MySQL database schemas.
+
+    Convenient thin wrapper for "diff_db_schema", when you have two MySQL
+    databases. Instead of having to specify two DSN's, you just specify two
+    database names.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db1* => *str*
+
+        Name of the first MySQL database.
+
+    *   db2* => *str*
+
+        Name of the second MySQL database.
+
+    *   password1 => *str*
+
+    *   password2 => *str*
+
+    *   username1 => *str*
+
+    *   username2 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  diff_pg_schema
+    Usage:
+
+     diff_pg_schema(%args) -> [status, msg, payload, meta]
+
+    Diff two PostgreSQL database schemas.
+
+    Convenient thin wrapper for "diff_db_schema", when you have two
+    PostgreSQL databases. Instead of having to specify two DSN's, you just
+    specify two database names.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db1* => *str*
+
+        Name of the first PostgreSQL database.
+
+    *   db2* => *str*
+
+        Name of the second PostgreSQL database.
+
+    *   password1 => *str*
+
+    *   password2 => *str*
+
+    *   username1 => *str*
+
+    *   username2 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  diff_sqlite_schema
+    Usage:
+
+     diff_sqlite_schema(%args) -> [status, msg, payload, meta]
+
+    Diff two SQLite database schemas.
+
+    Convenient thin wrapper for "diff_db_schema", when you have two SQLite
+    databases. Instead of having to specify two DSN's, you just specify two
+    database paths.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db1* => *str*
+
+        Name of the first PostgreSQL database.
+
+    *   db2* => *str*
+
+        Name of the second PostgreSQL database.
+
+    *   password1 => *str*
+
+    *   password2 => *str*
+
+    *   username1 => *str*
+
+    *   username2 => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DiffDBSchemaUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DiffDBSchemaUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffDBSchemaUtils
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBIx::Diff::Schema
+
+    For MySQL: MySQL::Diff and its CLI mysqldiff which can compare live
+    database schemas or database schemas specified as SQL. Outputs SQL
+    statements that express the difference.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

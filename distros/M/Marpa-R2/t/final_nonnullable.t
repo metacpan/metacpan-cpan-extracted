@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -17,7 +17,7 @@
 # which has more than 2 proper nullables
 # This is to test an untested branch of the CHAF logic.
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 

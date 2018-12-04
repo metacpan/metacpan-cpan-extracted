@@ -1,10 +1,10 @@
 package Term::App::Roles;
 
-our $DATE = '2014-12-10'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.02'; # VERSION
 
 1;
-#ABSTRACT: Collection of roles for terminal-based application
+# ABSTRACT: Collection of roles for terminal-based application
 
 __END__
 
@@ -18,7 +18,7 @@ Term::App::Roles - Collection of roles for terminal-based application
 
 =head1 VERSION
 
-This document describes version 0.01 of Term::App::Roles (from Perl distribution Term-App-Roles), released on 2014-12-10.
+This document describes version 0.02 of Term::App::Roles (from Perl distribution Term-App-Roles), released on 2018-12-02.
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -12,8 +12,10 @@ ldi / listdirection           Lists primary/secondary directions
          standard direction. Dictionaries also store a set of secondary
          directions such as 'out' and 'in', this set can contain as many or as
          few directions as you want.
-      This command lists all primary and secondary directions stored in the
-         current dictionary.
+      A few worlds use a set of relative directions which depend on the
+         direction of movement (see the help for ';addrelative').
+      This command lists all primary, secondary and relative directions stored
+         in the current dictionary.
 
       See also the help for ';listautosecondary'.
          

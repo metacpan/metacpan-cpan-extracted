@@ -11,7 +11,7 @@ use Parse::CPAN::Meta;
 use CPAN::Meta::Validator;
 
 use lib '.';
-use vars '%module';
+our %module;
 require 'Makefile.PL';
 # Loaded from Makefile.PL
 %module = get_module_info();

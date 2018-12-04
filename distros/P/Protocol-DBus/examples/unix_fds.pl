@@ -6,7 +6,7 @@ use autodie;
 
 use Socket;
 
-# bug in this module: it breaks when loaded dynamically
+# Required for unix FD support
 use Socket::MsgHdr;
 
 use Data::Dumper;

@@ -2,8 +2,8 @@ NAME
     DBIx::Diff::Schema - Compare schema of two DBI databases
 
 VERSION
-    This document describes version 0.091 of DBIx::Diff::Schema (from Perl
-    distribution DBIx-Diff-Schema), released on 2018-05-10.
+    This document describes version 0.092 of DBIx::Diff::Schema (from Perl
+    distribution DBIx-Diff-Schema), released on 2018-12-03.
 
 SYNOPSIS
      use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema

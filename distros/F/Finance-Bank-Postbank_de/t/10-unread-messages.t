@@ -5,7 +5,6 @@ use Finance::Bank::Postbank_de;
 
 use Test::More tests => 1;
 
-
 my $account = Finance::Bank::Postbank_de->new(
                 login => 'Petra.Pfiffig',
                 password => '12345678',

@@ -59,10 +59,11 @@ di_status(di)
         New(1, status, DISKDRIVE_STATUS_LENGTH + 1, char);
         if (status) {
             memset(status, '\0', DISKDRIVE_STATUS_LENGTH + 1);
-            PUSHs(sv_2mortal(newSViv(numstatus = di_status(di, status))));
+            numstatus = di_status(di, status);
             statuslen = strlen(status);
+            EXTEND(SP, 2);
+            PUSHs(sv_2mortal(newSViv(numstatus)));
             PUSHs(sv_2mortal(newSVpv(status, statuslen)));
-            PUSHs(sv_2mortal(newSVnv(numstatus)));
         }
         Safefree(status);
 
@@ -135,6 +136,7 @@ di_title(di)
     PPCODE:
         title = di_title(di);
         id = title + 18;
+        EXTEND(SP, 2);
         PUSHs(sv_2mortal(newSVpv((const char *)title, 16)));
         PUSHs(sv_2mortal(newSVpv((const char *)id, 5)));
 
@@ -196,14 +198,14 @@ void
 di_rawname_from_name(name)
         char *name
     PREINIT:
-        int            rawnamelen;
         unsigned char *rawname;
     PPCODE:
         New(1, rawname, DIRECTORY_FILENAME_LENGTH + 1, unsigned char);
         if (rawname) {
-            PUSHs(sv_2mortal(newSViv(rawnamelen = di_rawname_from_name(rawname, name))));
+            di_rawname_from_name(rawname, name);
             rawname[DIRECTORY_FILENAME_LENGTH] = '\0';
-            PUSHs(sv_2mortal(newSVpv((const char *)rawname, 0)));
+            EXTEND(SP, 1);
+            PUSHs(sv_2mortal(newSVpv((const char *)rawname, DIRECTORY_FILENAME_LENGTH)));
         }
         Safefree(rawname);
 
@@ -218,9 +220,10 @@ di_name_from_rawname(rawname)
     PPCODE:
         New(1, name, DIRECTORY_FILENAME_LENGTH + 1, char);
         if (name) {
-            PUSHs(sv_2mortal(newSViv(namelen = di_name_from_rawname(name, rawname))));
-            name[DIRECTORY_FILENAME_LENGTH] = '\0';
-            PUSHs(sv_2mortal(newSVpv(name, 0)));
+            namelen = di_name_from_rawname(name, rawname);
+            name[namelen] = '\0';
+            EXTEND(SP, 1);
+            PUSHs(sv_2mortal(newSVpv(name, namelen)));
         }
         Safefree(name);
 
@@ -283,9 +286,10 @@ di_read(imgfile, len);
         New(1, buffer, len + 1, unsigned char);
         if (buffer) {
             memset(buffer, '\0', len + 1);
-            PUSHs(sv_2mortal(newSViv(counter = di_read(imgfile, buffer, len))));
+            counter = di_read(imgfile, buffer, len);
+            EXTEND(SP, 2);
+            PUSHs(sv_2mortal(newSViv(counter)));
             PUSHs(sv_2mortal(newSVpv((const char *)buffer, counter)));
-            PUSHs(sv_2mortal(newSVnv(counter)));
         }
         Safefree(buffer);
 

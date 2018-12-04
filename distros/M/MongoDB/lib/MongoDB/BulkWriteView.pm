@@ -19,7 +19,7 @@ package MongoDB::BulkWriteView;
 # ABSTRACT: Bulk write operations against a query document
 
 use version;
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use Moo;
 
@@ -121,7 +121,6 @@ sub _update {
     }
 
     $self->_bulk->_retryable( 0 ) if $method eq 'update_many';
-    $self->_bulk->_retryable( 0 ) if $method eq 'delete_many';
 
     my $update = {
         q      => $self->_query,
@@ -140,6 +139,7 @@ sub _update {
 
 sub delete_many {
     my ($self) = @_;
+    $self->_bulk->_retryable( 0 );
     $self->_enqueue_write(
         [
             delete => {
@@ -182,7 +182,7 @@ MongoDB::BulkWriteView - Bulk write operations against a query document
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 

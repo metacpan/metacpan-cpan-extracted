@@ -22,4 +22,4 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#pdl
   repository: git://github.com/PDLPorters/extutils-f77.git
-version: '1.21'
+version: '1.22'

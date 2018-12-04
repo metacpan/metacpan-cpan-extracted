@@ -19,7 +19,7 @@ package MongoDB::IndexView;
 # ABSTRACT: Index management for a collection
 
 use version;
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use Moo;
 use MongoDB::Error;
@@ -67,7 +67,7 @@ has _bson_codec => (
 
 sub _build__bson_codec {
     my ($self) = @_;
-    return $self->collection->bson_codec;
+    return $self->collection->bson_codec->clone( ordered => 1 );
 }
 
 has _client => (
@@ -467,7 +467,7 @@ MongoDB::IndexView - Index management for a collection
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 

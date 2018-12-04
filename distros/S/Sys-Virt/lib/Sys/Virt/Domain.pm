@@ -466,6 +466,10 @@ The guest is shutoff due to controlled shutdown
 
 It is not known why the domain has shutoff
 
+=item Sys::Virt::Domain::STATE_SHUTOFF_DAEMON
+
+The daemon stopped the guest due to a failure
+
 =item Sys::Virt::Domain::STATE_PMSUSPENDED_UNKNOWN
 
 It is not known why the domain was suspended to RAM
@@ -1416,6 +1420,14 @@ documented later, and defaults to 0 if omitted.
 =item $dom->del_iothread($iothread, $flags=0)
 
 Delete an existing IOThread by the C<$iothread> value from the guest domain.
+The C<$flags> parameter accepts one or more the CONFIG OPTION constants
+documented later, and defaults to 0 if omitted.
+
+=item $dom->set_iothread($iothread, $params, $nparams, $flags=0)
+
+Set parameters for the IOThread by the C<$iothread> value on the guest domain.
+The C<$params> parameter is a hash reference whose keys are the
+C<IOTHREAD STATS> constants documented later.
 The C<$flags> parameter accepts one or more the CONFIG OPTION constants
 documented later, and defaults to 0 if omitted.
 
@@ -2985,6 +2997,34 @@ field in the *Stats APIs.
 
 =back
 
+=head2 IOTHREAD STATS
+
+The following constants defined IOThread statistics which
+can be monitored for a guest
+
+=over 4
+
+=item Sys::Virt::Domain::IOTHREAD_PARAM_POLL_MAX_NS
+
+The maximum polling time that can be used by polling algorithm in ns.
+The polling time starts at 0 (zero) and is the time spent by the guest
+to process IOThread data before returning the CPU to the host. The
+polling time will be dynamically modified over time based on the
+poll_grow and poll_shrink parameters provided.
+
+=item Sys::Virt::Domain::IOTHREAD_PARAM_POLL_GROW
+
+This provides a value for the dynamic polling adjustment algorithm to
+use to grow its polling interval up to the poll_max_ns value.
+
+=item Sys::Virt::Domain::IOTHREAD_PARAM_POLL_SHRINK
+
+This provides a value for the dynamic polling adjustment algorithm to
+use to shrink its polling interval when the polling interval exceeds
+the poll_max_ns value.
+
+=back
+
 =head2 VCPU FLAGS
 
 The following constants are useful when getting/setting the
@@ -4170,6 +4210,10 @@ Virtual CPU info
 =item Sys::Virt::Domain::STATS_PERF
 
 Performance event counter values
+
+=item Sys::Virt::Domain::STATS_IOTHREAD
+
+IOThread performance statistics values
 
 =back
 

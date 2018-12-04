@@ -19,7 +19,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0396';
+our $VERSION = '0.0397';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -197,7 +197,7 @@ L<SPVM::Document::Extension> - Extension is the way to C/C++ Binding to SPVM
 
 L<SPVM::Document::Language> - SPVM Language Specification
 
-=heaa1 EXAMPLES
+=head1 EXAMPLES
 
 =head2 How to use SPVM from Perl
 

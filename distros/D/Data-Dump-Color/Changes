@@ -1,3 +1,8 @@
+0.241   2018-12-02 (PERLANCAR)
+
+	- Observe NO_COLOR (see https://no-color.org).
+
+
 0.240   2018-01-17 (PERLANCAR)
 
         - Avoid "Negative repeat count does nothing" warning (thanks Scott

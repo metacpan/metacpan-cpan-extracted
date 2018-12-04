@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Dates; # git description: v0.38-50-gfc332c2
+package Task::Kensho::Dates; # git description: v0.39-50-g4281201
 # ABSTRACT: A Glimpse at an Enlightened Perl: Date Modules
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Dates - A Glimpse at an Enlightened Perl: Date Modules
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,10 @@ A date and time object
 
 A date time object with as little code as possible
 
+=head3 L<Time::Moment>
+
+A fast immutable object representing a date and time
+
 =head3 L<Time::ParseDate>
 
 Date parsing both relative and absolute
@@ -125,7 +129,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -140,6 +144,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

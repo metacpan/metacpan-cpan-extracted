@@ -39,7 +39,7 @@ variable F77LIBS, e.g.
 
 =cut
 
-$VERSION = "1.21"; 
+$VERSION = "1.22"; 
 
 warn "\nExtUtils::F77: Version $VERSION\n";
 
@@ -797,7 +797,7 @@ sub link_gnufortran_compiler {
 
 =head1 SEE ALSO
 
-The L<PGPLOT> module uses this to link with the Fortran based graphics library, and was the cause of this modules development.
+The L<PGPLOT> module uses this to link with the Fortran based graphics library, and was the cause of this module's development.
 
 =head1 AUTHOR
 

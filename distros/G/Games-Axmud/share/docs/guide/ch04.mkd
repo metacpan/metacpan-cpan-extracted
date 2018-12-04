@@ -27,6 +27,7 @@
     * [4.9.3 Changing system message colours](#4.9.3)
 * [4.10 The session preference window](#4.10)
 * [4.11 The quick preference window](#4.11)
+* [4.12 Storing data](#4.12)
 
 ---
 
@@ -420,6 +421,40 @@ A few of the most common configuration options have been grouped together in a s
 
         ;editquick
         ;edq
+
+##<a name="4.12">4.12 Storing data</a>
+
+Axmud stores data files in a location that depends on your system, and also on how you installed Axmud on that system.
+
+If you want to stored data in a different location - on a USB stick, or an external hard drive, for example - you can use this command:
+
+        ;setdatadirectory
+        ;sdd
+
+If you use Axmud on multiple devices - a desktop and a laptop, for example - you can set the location to a network drive that both devices can access.
+
+Note that you shouldn't use both devices simultaneously - if you try, Axmud on one device will arbitrarily overwrite filed saved by Axmud on the other device. 
+
+(If you don't have your own network drive, or don't know how to set one up, you might like to use a commerical service like [Dropbox](https://www.dropbox.com)).
+
+If you want to make a backup copy of the data directory - a wise decision, in many cases - you can do that manually, or you can use a client command.
+
+This command will create a backup copy of the entire data directory:
+
+        ;backupdata
+        ;bud
+
+When you're ready to restore files from the backup, you can do it manually, or use the client command:
+
+        ;restoredata
+        ;rsd
+
+If you want to make periodic backups, you could use the **;autobackup** command, but it's probably easier to use the client preference window, for example:
+
+* In the main window menu, click **Edit > Axmud preferences... > Client > Page 5**
+* In the **Perform auto-backup** box, select **At regular intervals, when Axmud shuts down**
+* Click the **Set method** button
+* Click **OK** to close the window
 
 ---
 

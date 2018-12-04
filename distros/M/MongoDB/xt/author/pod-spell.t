@@ -17,6 +17,7 @@ Ashley
 Ask
 Autoincrementing
 BSON
+Bachtiar
 Barr
 Bernard
 Binary
@@ -197,6 +198,7 @@ Uwe
 Vazquez
 Voelker
 Walde
+Wan
 Watt
 Whitney
 Williams
@@ -381,6 +383,7 @@ saslContinue
 saslStart
 secondaryPreferred
 sharded
+sindbach
 slaven
 ssl
 stevesanbeg

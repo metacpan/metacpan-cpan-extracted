@@ -5,7 +5,7 @@ use File::Temp;
 
 require './t/test_form.pm';
 
-use vars qw(@fields);
+our @fields;
 BEGIN {
   @fields = ('selectForm:kontoauswahl', 'selectForm:kontoauswahlButton');
 };

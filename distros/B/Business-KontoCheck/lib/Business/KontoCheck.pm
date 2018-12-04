@@ -41,11 +41,13 @@ our @EXPORT_OK = qw(kto_check kto_check_str kto_check_blz
    lut_suche_blz lut_suche_pz lut_suche_plz lut_suche_regel lut_suche_bic
    lut_suche_volltext lut_suche_namen lut_suche_namen_kurz
    lut_suche_ort lut_suche_multiple konto_check_at kto_check_at_str
-   generate_lut_at %kto_retval %kto_retval_kurz lut_keine_iban_berechnung);
+   generate_lut_at %kto_retval %kto_retval_kurz lut_keine_iban_berechnung
+   lut_scl_multi lut_scl_init lut_scl_sct lut_scl_sdd lut_scl_cor1 lut_scl_b2b lut_scl_scc
+   lut_scl_multi_blz lut_scl_sct_blz lut_scl_sdd_blz lut_scl_cor1_blz lut_scl_b2b_blz lut_scl_scc_blz );
 
 our @EXPORT = qw( lut_init kto_check kto_check_blz kto_check_at %kto_retval );
 
-our $VERSION = '6.05';
+our $VERSION = '6.06';
 
 require XSLoader;
 XSLoader::load('Business::KontoCheck', $VERSION);
@@ -605,10 +607,9 @@ sub lut_iban_regel1
 
 sub bic_name
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_name_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -627,10 +628,9 @@ sub bic_name1
 
 sub bic_name_kurz
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_name_kurz_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -649,10 +649,9 @@ sub bic_name_kurz1
 
 sub bic_plz
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_plz_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -671,10 +670,9 @@ sub bic_plz1
 
 sub bic_ort
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_ort_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -693,10 +691,9 @@ sub bic_ort1
 
 sub bic_pan
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_pan_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -715,10 +712,9 @@ sub bic_pan1
 
 sub bic_bic
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_bic_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -737,10 +733,9 @@ sub bic_bic1
 
 sub bic_pz
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_pz_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -759,10 +754,9 @@ sub bic_pz1
 
 sub bic_aenderung
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_aenderung_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -781,10 +775,9 @@ sub bic_aenderung1
 
 sub bic_loeschung
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_loeschung_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -803,10 +796,9 @@ sub bic_loeschung1
 
 sub bic_nachfolge_blz
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_nachfolge_blz_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -825,10 +817,9 @@ sub bic_nachfolge_blz1
 
 sub bic_iban_regel
 {
-   my $r;
+   my $r=1;
    my $v;
 
-   $r=1;
    $v=bic_iban_regel_i($r,@_);
    if(wantarray()){
       return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
@@ -1309,6 +1300,184 @@ sub iban_iban_regel1
    return iban_iban_regel_i($r,@_);
 }
 
+
+sub lut_scl_sct
+{
+   my $r=1;
+   my $v;
+
+   $v=lut_scl_sct_i($r,@_);
+   if(wantarray()){
+      return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_sct_blz
+{
+   my $r=1;
+   my $used_bic="";
+   my $v;
+
+   $v=lut_scl_sct_blz_i($r,$used_bic,@_);
+   if(wantarray()){
+      return ($v,$used_bic,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_sdd
+{
+   my $r=1;
+   my $v;
+
+   $v=lut_scl_sdd_i($r,@_);
+   if(wantarray()){
+      return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_sdd_blz
+{
+   my $r=1;
+   my $used_bic="";
+   my $v;
+
+   $v=lut_scl_sdd_blz_i($r,$used_bic,@_);
+   if(wantarray()){
+      return ($v,$used_bic,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_cor1
+{
+   my $r=1;
+   my $v;
+
+   $v=lut_scl_cor1_i($r,@_);
+   if(wantarray()){
+      return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_cor1_blz
+{
+   my $r=1;
+   my $used_bic="";
+   my $v;
+
+   $v=lut_scl_cor1_blz_i($r,$used_bic,@_);
+   if(wantarray()){
+      return ($v,$used_bic,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_b2b
+{
+   my $r=1;
+   my $v;
+
+   $v=lut_scl_b2b_i($r,@_);
+   if(wantarray()){
+      return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_b2b_blz
+{
+   my $r=1;
+   my $used_bic="";
+   my $v;
+
+   $v=lut_scl_b2b_blz_i($r,$used_bic,@_);
+   if(wantarray()){
+      return ($v,$used_bic,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_scc
+{
+   my $r=1;
+   my $v;
+
+   $v=lut_scl_scc_i($r,@_);
+   if(wantarray()){
+      return ($v,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+sub lut_scl_scc_blz
+{
+   my $r=1;
+   my $used_bic="";
+   my $v;
+
+   $v=lut_scl_scc_blz_i($r,$used_bic,@_);
+   if(wantarray()){
+      return ($v,$used_bic,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $v;
+   }
+}
+
+
+sub lut_scl_multi
+{
+   my $r=1;
+   my $scl_flags="";
+   my $used_bic="";
+   my $scl_name="";
+
+   $r=lut_scl_multi_i($scl_flags,$used_bic,$scl_name,@_);
+   if(wantarray()){
+      return ($scl_flags,$used_bic,$scl_name,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $scl_flags;
+   }
+}
+
+sub lut_scl_multi_blz
+{
+   my $r=1;
+   my $scl_flags="";
+   my $used_bic="";
+   my $scl_name="";
+
+   $r=lut_scl_multi_blz_i($scl_flags,$used_bic,$scl_name,@_);
+   if(wantarray()){
+      return ($scl_flags,$used_bic,$scl_name,$r,$Business::KontoCheck::kto_retval{$r},$Business::KontoCheck::kto_retval_kurz{$r});
+   }
+   else{
+      return $scl_flags;
+   }
+}
 
 %Business::KontoCheck::kto_retval = (
 -158 => 'die SCL-Blocks wurden noch nicht eingelesen',

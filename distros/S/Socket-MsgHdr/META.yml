@@ -1,21 +1,26 @@
---- #YAML:1.0
-name:               Socket-MsgHdr
-version:            0.04
-abstract:           sendmsg, recvmsg and ancillary data operations
+---
+abstract: 'sendmsg, recvmsg and ancillary data operations'
 author:
-    - A. U. Thor <mjp@domain_not_set.invalid>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Mike Pomraning <mjp@cpan.org>'
+  - 'Felipe Gasper <felipe@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:  {}
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Socket-MsgHdr
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/FGasper/p5-Socket-MsgHdr/issues
+  repository: git://github.com/FGasper/p5-Socket-MsgHdr.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

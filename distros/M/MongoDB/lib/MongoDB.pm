@@ -20,7 +20,7 @@ package MongoDB;
 # ABSTRACT: Official MongoDB Driver for Perl
 
 use version;
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 # regexp_pattern was unavailable before 5.10, had to be exported to load the
 # function implementation on 5.10, and was automatically available in 5.10.1
@@ -83,7 +83,7 @@ MongoDB - Official MongoDB Driver for Perl
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 
@@ -282,7 +282,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Brian Moss Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Harish Upadhyayula Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Matt S Trout Michael Langner Rotmanov Mike Dirolf Mohammad Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robert Sedlacek (Shadowcat Systems Ltd) Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Thomas Bloor Tobias Leich Uwe Voelker Whitney Jackson Xavier Guimard Xtreak Zhihong Zhang
+=for stopwords Andrew Page Andrey Khozov Ashley Willis Ask Bjørn Hansen Bernard Gorman Brendan W. McAdams Brian Moss Casey Rojas Christian Sturm Walde Colin Cyr Danny Raetzsch David Morrison Nadle Steinbrunner Storch diegok D. Ilmari Mannsåker Eric Daniels Gerard Goossen Glenn Fowler Graham Barr Hao Wu Harish Upadhyayula Jason Carey Toffaletti Johann Rolschewski John A. Kunze Joseph Harnish Josh Matthews Joshua Juran J. Stewart Kamil Slowikowski Ken Williams Matthew Shopsin Matt S Trout Michael Langner Rotmanov Mike Dirolf Mohammad Anwar Nickola Trupcheff Nigel Gregoire Niko Tyni Nuno Carvalho Orlando Vazquez Othello Maurer Pan Fan Pavel Denisov Rahul Dhodapkar Robert Sedlacek (Shadowcat Systems Ltd) Robin Lee Roman Yerin Ronald J Kimball Ryan Chipman Slaven Rezic Stephen Oberholtzer Steve Sanbeg Stuart Watt Thomas Bloor Tobias Leich Uwe Voelker Wan Bachtiar Whitney Jackson Xavier Guimard Xtreak Zhihong Zhang
 
 =over 4
 
@@ -533,6 +533,10 @@ Tobias Leich <email@froggs.de>
 =item *
 
 Uwe Voelker <uwe.voelker@xing.com>
+
+=item *
+
+Wan Bachtiar <sindbach@gmail.com>
 
 =item *
 

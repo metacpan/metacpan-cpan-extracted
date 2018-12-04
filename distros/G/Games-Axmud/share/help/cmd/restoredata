@@ -19,6 +19,8 @@ rsd / restoredata             Restores Axmud data directory from backup
          goes wrong with the backup/restore process, you won't lose everything).
          A new data directory called 'axmud-data' is then created, and the
          backup file is used to restore data there.
-                   
+
+      See also the help for ';setdatadirectory'.
+
    User commands:
       rsd / restore / restoredata

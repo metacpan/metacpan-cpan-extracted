@@ -22,9 +22,9 @@ my %WriteMakefileArgs = (
   "NAME" => "School::Survey::MC",
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
+    "Getopt::Args" => 0,
     "HTML::Entities" => 0,
     "YAML::Tiny" => 0,
-    "feature" => 0,
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::Script" => "1.10"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,10 +41,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
+  "Getopt::Args" => 0,
   "HTML::Entities" => 0,
   "Test::Script" => "1.10",
   "YAML::Tiny" => 0,
-  "feature" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

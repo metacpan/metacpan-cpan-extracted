@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extention to load module automatically in one liner.'
+abstract: 'Perl extension to load modules automatically in one-liners.'
 author:
   - 'Masayuki Matsuki <y.songmu@gmail.com>'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   L:
     file: lib/L.pm
-    version: v1.0.0
+    version: v1.0.1
 requires:
   Module::Load: '0'
   perl: '5.008001'
@@ -34,8 +34,10 @@ resources:
   bugtracker: https://github.com/Songmu/p5-L/issues
   homepage: https://github.com/Songmu/p5-L
   repository: git://github.com/Songmu/p5-L.git
-version: v1.0.0
+version: v1.0.1
 x_authority: cpan:SONGMU
 x_contributors:
+  - 'Nick Tonkin <1nickt@users.noreply.github.com>'
   - 'tokuhirom <tokuhirom@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

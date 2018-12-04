@@ -1,11 +1,8 @@
 #!perl
 
-use Test::More;
-use Test::Deep;
+use Test2::V0;
 
-TODO: {
-
-    local $TODO = "do not track changes to objects after instantiation";
+todo "do not track changes to objects after instantiation" => sub {
 
     {
         package T1;
@@ -42,22 +39,22 @@ TODO: {
 
     my $q = C1->new;
 
-    cmp_deeply(
+    is(
         $q,
-        methods(
-            t1_1  => 't1_1.v',
-            c1_1  => 'c1_1.v',
-            c1_2  => 'c1_2.v',
-            _tags => {
-                tag1 => {
-                    c1_1 => 'c1_1.t1',
-                },
-                tag2 => {
-                    c1_1 => 'c1_1.t2',
-                    c1_2 => 'c1_2.t2',
-                },
-            },
-        ),
+        object {
+            call t1_1  => 't1_1.v';
+            call c1_1  => 'c1_1.v';
+            call c1_2  => 'c1_2.v';
+            call _tags => hash {
+                field tag1 => hash {
+                    field c1_1 => 'c1_1.t1';
+                };
+                field tag2 => hash {
+                    field c1_1 => 'c1_1.t2';
+                    field c1_2 => 'c1_2.t2';
+                };
+            };
+        },
     );
 
     # now apply a role to the object and make sure things work.
@@ -79,27 +76,27 @@ TODO: {
 
     Moo::Role->apply_roles_to_object( $q, 'R1' );
 
-    cmp_deeply(
+    is(
         $q,
-        methods(
-            t1_1  => 't1_1.v',
-            c1_1  => 'c1_1.v',
-            c1_2  => 'c1_2.v',
-            r1_1  => 'r1_1.v',
-            _tags => {
-                tag1 => {
-                    c1_1 => 'c1_1.t1',
-                    r1_1 => 'r1_1.t1',
-                },
-                tag2 => {
-                    c1_1 => 'c1_1.t2',
-                    c1_2 => 'c1_2.t2',
-                    r1_1 => 'r1_1.t2',
-                },
-            },
-        ),
+        object {
+            call t1_1  => 't1_1.v';
+            call c1_1  => 'c1_1.v';
+            call c1_2  => 'c1_2.v';
+            call r1_1  => 'r1_1.v';
+            call _tags => hash {
+                field tag1 => hash {
+                    field c1_1 => 'c1_1.t1';
+                    field r1_1 => 'r1_1.t1';
+                };
+                field tag2 => hash {
+                    field c1_1 => 'c1_1.t2';
+                    field c1_2 => 'c1_2.t2';
+                    field r1_1 => 'r1_1.t2';
+                };
+            };
+        },
     );
 
-}
+};
 
 done_testing;

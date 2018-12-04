@@ -20,7 +20,7 @@ package MongoDB::Collection;
 # ABSTRACT: A MongoDB Collection
 
 use version;
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use MongoDB::ChangeStream;
 use MongoDB::Error;
@@ -1209,6 +1209,9 @@ sub aggregate {
         $options->{maxTimeMS} = $self->max_time_ms;
     }
 
+    # string is OK so we check ref, not just exists
+    __ixhash( $options, 'hint' ) if ref $options->{hint};
+
     # read preferences are ignored if the last stage is $out
     my ($last_op) = keys %{ $pipeline->[-1] };
 
@@ -1854,7 +1857,7 @@ sub __ixhash {
     if ( $type eq 'HASH' ) {
         $hash->{$key} = Tie::IxHash->new( %$ref );
     }
-    elsif ( $type eq 'ARRAY' ) {
+    elsif ( $type eq 'ARRAY' || $type eq 'BSON::Doc' ) {
         $hash->{$key} = Tie::IxHash->new( @$ref );
     }
     else {
@@ -1893,7 +1896,7 @@ MongoDB::Collection - A MongoDB Collection
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 

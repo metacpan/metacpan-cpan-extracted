@@ -1,29 +1,29 @@
-commit b8fd74b26434563e4b56599a36657a59ceea98c7
-Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
-Date:   Sat Feb 25 19:35:06 2017 -0800
+commit 6af9871d41b9f0c6fab63d2d8c7ce99b6e3be16e
+Author: Jeffrey Kegler <jeffreykegler@cpan.org>
+Date:   Mon Nov 19 14:08:52 2018 -0500
 
-    Add progress report bug fix from Marpa::R3: t+
+    Update version to 8.6.2
 
-commit a2e19108721f78b41f59c5e9c0511505e2a4242d
-Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
-Date:   Mon May 2 10:27:04 2016 -0700
+commit 3031dba8fb9975acc41487e6aba4d233ba5059d6
+Author: Jeffrey Kegler <jeffreykegler@cpan.org>
+Date:   Mon Nov 19 13:25:17 2018 -0500
 
-    "Too many YIMs" duplicate warnings elminated: t+
+    Update copyright date
 
-commit 77ed0f9930a11101ed0c85e83bdda8a5fd69d27e
-Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
-Date:   Mon May 2 09:57:33 2016 -0700
+commit f36b6f7eb0db1321a1d5b432dcc73bc1ef60c246
+Author: Jeffrey Kegler <jeffreykegler@cpan.org>
+Date:   Mon Nov 19 12:36:37 2018 -0500
 
-    update HOWTO
+    Update copyrights
 
-commit 8c331df900181b14870fa8eb3c44ac912b95c37a
-Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
-Date:   Mon May 2 09:57:19 2016 -0700
+commit 13e1b45dbca6aa5ac8a807dd54af2e1494a6aae4
+Author: Jeffrey Kegler <jeffreykegler@cpan.org>
+Date:   Wed Nov 7 23:06:20 2018 -0500
 
-    realclean target
+    Remove useless code
 
-commit 2e6727b0c36bc003e8aa8cbc6417b0d8f6085ca4
-Author: Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
-Date:   Mon May 2 08:15:28 2016 -0700
+commit 21a93c015d2c8ad903d38d1559300dec69c8eeaa
+Author: Jeffrey Kegler <jeffreykegler@cpan.org>
+Date:   Tue Sep 11 14:02:01 2018 -0400
 
-    Add a HOWTO file: t+
+    Doc fixes

@@ -21,7 +21,7 @@ ATTENTION
     This software IS NOT "jacode.pl"!
     If you want "jacode.pl", search it on CPAN again.
 
-ABSTRACT
+RAISON D'ETRE
 
     This software has been developed for use promotion of JIS X 0213.
 
@@ -44,7 +44,7 @@ ABSTRACT
       mnemonic      means
       -----------------------------------------------------------------------
       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-      cp932         Microsoft CP932
+      cp932         Microsoft CP932, IANA Windows-31J
       sjis2004      JISC Shift_JIS-2004
       cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
       keis78        HITACHI KEIS78
@@ -87,5 +87,5 @@ DEPENDENCIES
 
 SEE ALSO
 
-    perl, jcode.pl, jacode.pl
+    perl, jcode.pl, jacode.pl, Jacode4e::RoundTrip
 

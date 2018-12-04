@@ -6,11 +6,24 @@ use WWW::FCM::HTTP;
 
 subtest 'api_key required' => sub {
     eval { WWW::FCM::HTTP->new };
-    like $@, qr/Usage: WWW::FCM::HTTP->new\(api_key => \$api_key\)/;
+    like $@, qr/Usage: WWW::FCM::HTTP->new\(\{ api_key => \$api_key \}\)/;
+};
+
+subtest 'api_key must be defined' => sub {
+    eval { WWW::FCM::HTTP->new(api_key => undef) };
+    like $@, qr/Usage: WWW::FCM::HTTP->new\(\{ api_key => \$api_key \}\)/;
 };
 
 subtest 'success' => sub {
     my $fcm = WWW::FCM::HTTP->new(api_key => 'api_key');
+    isa_ok $fcm, 'WWW::FCM::HTTP';
+    isa_ok $fcm->{ua}, 'LWP::UserAgent';
+    is $fcm->{api_key}, 'api_key';
+    is $fcm->{api_url}, $WWW::FCM::HTTP::API_URL;
+};
+
+subtest 'success (hashref)' => sub {
+    my $fcm = WWW::FCM::HTTP->new({ api_key => 'api_key' });
     isa_ok $fcm, 'WWW::FCM::HTTP';
     isa_ok $fcm->{ua}, 'LWP::UserAgent';
     is $fcm->{api_key}, 'api_key';

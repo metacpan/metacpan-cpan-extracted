@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 5.3.1">
+<meta name="generator" content="ReText 7.0.1">
+<title>ch15</title>
 </head>
 <body>
 <p><a href="ch14.html">Previous</a> <a href="index.html">Index</a> <a href="ch16.html">Next</a></p>
@@ -44,7 +45,9 @@
 </ul>
 </li>
 <li><a href="#15.18">15.18 Pathfinding</a><ul>
-<li><a href="#15.18.1">15.18.1 Pathfinding problems</a> </li>
+<li><a href="#15.18.1">15.18.1 Pathfinding problems</a></li>
+<li><a href="#15.18.2">15.18.2 Avoiding path optimisation</a></li>
+<li><a href="#15.18.3">15.18.3 Using path optimisation</a></li>
 </ul>
 </li>
 <li><a href="#15.19">15.19 Room tags</a></li>
@@ -57,7 +60,8 @@
 </ul>
 </li>
 <li><a href="#15.22">15.22 The painter</a><ul>
-<li><a href="#15.22.1">15.22.1 Using the painter toolbar</a></li>
+<li><a href="#15.22.1">15.22.1 Using the room painting toolbar</a></li>
+<li><a href="#15.22.2">15.22.2 Using the quick painting toolbar</a></li>
 </ul>
 </li>
 <li><a href="#15.23">15.23 Colouring the background map</a><ul>
@@ -78,7 +82,12 @@
 </ul>
 </li>
 <li><a href="#15.28">15.28 Checked directions</a></li>
-<li><a href="#15.29">15.29 Getting lost</a></li>
+<li><a href="#15.29">15.29 Getting lost</a><ul>
+<li><a href="#15.29.1">15.29.1 Auto-compare mode</a></li>
+<li><a href="#15.29.2">15.29.2 Auto-rescue mode</a></li>
+<li><a href="#15.29.3">15.29.3 Auto-slide mode</a></li>
+</ul>
+</li>
 <li><a href="#15.29">15.30 Backing up maps</a><ul>
 <li><a href="#15.29.1">15.30.1 Sharing maps</a></li>
 </ul>
@@ -95,6 +104,7 @@
 <li><a href="#15.30.9">15.31.9 Primary directions in other languages</a></li>
 <li><a href="#15.30.10">15.31.10 Secondary directions</a></li>
 <li><a href="#15.30.11">15.31.11 Secondary directions in Cyrosphere</a></li>
+<li><a href="#15.30.12">15.31.12 Relative directions</a></li>
 </ul>
 </li>
 </ul>
@@ -429,6 +439,8 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>An exit which can be picked (for example by a thief, using a lockpick) is drawn as an empty rectangle. A breakable exit (representing a locked door that can be broken down by brute force) is drawn as a letter <strong>I</strong>, perpendicular to the exit.</p>
 <p>An impassable exit (representing an exit that can't actually be used, at least not by ordinary players) is drawn as purple square.</p>
 <p><img alt="Impassable exit ornament" src="img/ch15/impassable_ornament.png"></p>
+<p>If you don't know how to get through an exit, you can mark it as a mystery exit, drawn as a dark red square.</p>
+<p><img alt="Mystery exit ornament" src="img/ch15/mystery_ornament.png"></p>
 <p>An exit can be reset so that it no longer has an exit ornament.</p>
 <ul>
 <li>Right-click on the exit and choose <strong>Set ornaments &gt; No ornament</strong></li>
@@ -453,7 +465,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 </code></pre>
 <p>Assisted moves can be turned off, if they're an annoyance.</p>
 <ul>
-<li>From the automapper menu, de-select <strong>Mode &gt; Moves &gt;  Allow assisted moves</strong></li>
+<li>From the automapper menu, de-select <strong>Mode &gt; Movement flags &gt;  Allow assisted moves</strong></li>
 </ul>
 <p>Assisted moves are not available when <em>redirect mode</em> is turned on (see <a href="ch07.html#7.5.6">Section 7.5.6</a>).</p>
 <h3><a name="15.17.1">15.17.1 Assisted moves using exit ornaments</a></h3>
@@ -466,11 +478,11 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 </code></pre>
 <p>If this an annoyance, you can turn it off.</p>
 <ul>
-<li>From the automapper menu, de-select <strong>Mode &gt; Moves &gt; Open doors before move</strong></li>
+<li>From the automapper menu, de-select <strong>Mode &gt; Movement flags &gt; Open doors before move</strong></li>
 </ul>
 <p>You can also turn on <em>protected moves</em> mode, which blocks any world command which would move the character through an impassable or non-existent exit.</p>
 <ul>
-<li>Select <strong>Mode &gt; Moves &gt; Allow protected moves</strong></li>
+<li>Select <strong>Mode &gt; Movement flags &gt; Allow protected moves</strong></li>
 </ul>
 <h3><a name="15.17.2">15.17.2 Custom assisted moves</a></h3>
 <p>Sometimes the generic assisted move will not work - for example, it might not be possible to move through the exit by using the usual <strong>open east door</strong> command.</p>
@@ -490,7 +502,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p><img alt="Pathfinding example" src="img/ch15/pathfinding.png"></p>
 <p>All rooms along the path are selected so that you can clearly see the route. When you arrive, click on an empty area of the map to de-select them all.</p>
 <h3><a name="15.18.1">15.18.1 Pathfinding problems</a></h3>
-<p>Sometimes, when you double-click on a destination room, you'll get a <em>No path found</em> error instead of what you were expecting. There are usually two reasons for this.</p>
+<p>Sometimes, when you double-click on a destination room, you'll get a <em>No path found</em> error. There are usually two reasons for this.</p>
 <p>Reason 1: <em>A path exists between rooms in one direction, but not the opposite direction</em></p>
 <p>If the map has been drawn with simple exits (or no exits at all - see <a href="#15.8">Section 15.8</a>), there might appear to be a path from west to east:</p>
 <p><img alt="Pathfinding problem 1" src="img/ch15/path_problem1.png"></p>
@@ -498,8 +510,30 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p><img alt="Pathfinding problem 2" src="img/ch15/path_problem2.png"></p>
 <p>Reason 2: <em>Axmud's pathfinding optimisation has failed</em></p>
 <p>Some maps can contain many tens thousands of rooms. Finding a path between two rooms might take a long time - perhaps, a <em>very</em> long time - so Amxud tries to do some of the work in advance, working out the shortest paths across each region. </p>
-<p>This approach works well in regions with just a few region exits, but would be useless in a large region with dozens or hundreds of region exits. (Working out all the possible paths would take much longer than actually moving between two rooms!)</p>
-<p>As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them. For example, consider a region B which is connected to regions A and C. </p>
+<p>This approach works well when each pair of regions are connected to each other by a single exit. Sometimes it doesn't work so well when there are many exits connecting a single pair of regions.</p>
+<h3><a name="15.18.2">15.18.2 Avoiding path optimisation</a></h3>
+<p>Axmud's pathfinding optimisation is not needed at all when the path between two rooms is in a single region, or if they are in neighbouring regions.</p>
+<p>You can change this behaviour, if you want. For example, you can tell Axmud to go via an intermediary region; in other words, you can tell Axmud not to use optimisation when finding a path between regions A and C, via region B:</p>
+<pre><code>    A --- B --- C
+</code></pre>
+<ul>
+<li>From the automapper menu, click <strong>Rooms &gt; Pathfinding &gt; Set adjacent regions mode...</strong></li>
+<li>In the dialogue window, <strong>Use adjacent regions</strong> should already be selected</li>
+<li>In the box below that, enter the number 2</li>
+</ul>
+<p>You can specify any number of adjacent regions. If you enter 10, Axmud won't use optimisiation when finding a path through these regions:</p>
+<pre><code>    A --- B --- C --- D --- E --- F --- G --- H --- I --- J --- K
+</code></pre>
+<p>You can also select <strong>Use all regions</strong>, which will disable optimisation altogether, or <strong>Don't use the mode</strong>, which will force Axmud to use optimisation when crossing regions.</p>
+<p>Experience shows that <em>the best settings for most users are the default settings</em>.</p>
+<h3><a name="15.18.3">15.18.3 Using path optimisation</a></h3>
+<p>In a map with many thousands of rooms spread across dozens of regions, finding a path between two rooms might take a long time.</p>
+<p>Axmud's pathfinding optimisation works by calculating the paths through regions in advance. In other words, if three regions are linked like this:  </p>
+<pre><code>    A --- B --- C
+</code></pre>
+<p>...then Axmud calculates a path across region B in advance, from one region exit to the other. These pre-calculated paths are linked together in a network. Axmud uses this network of pre-calculated paths to find the shortest path between two rooms separated by a great distance.</p>
+<p>This approach works well in regions with just a few region exits, but would be useless in a large region with dozens or hundreds of region exits. (Working out all the possible paths would take <em>much</em> longer than actually moving between two rooms!)</p>
+<p>As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them. </p>
 <pre><code>    A --- B --- C
 </code></pre>
 <p>Region B might have many exits which lead to Region A, but only one of them is marked as a <em>super-region exit</em>. That's the one Axmud uses when it does pathfinding between a room in Region A and a room in Region C.</p>
@@ -510,16 +544,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 </ul>
 </li>
 </ul>
-<p>There's are two situations in which you might want to convert all of Region B's region exits into super-region exits.</p>
-<ul>
-<li>The only way to travel between two rooms in Region A is to go via Region B</li>
-<li>You're drawing a town in Region A. Most buildings are just one room, but some buildings contain lots of rooms, so you've moved those rooms into Region B. There are now several groups of rooms in Region B which are connected to Region A, but not to each other.</li>
-</ul>
-<p>If either of those situations apply, do this:</p>
-<ul>
-<li>Make Region B the current region</li>
-<li>From the menu, select <strong>Regions &gt; Current region &gt; Convert all region exits</strong></li>
-</ul>
+<p>It's possible to mark all of the region exits as super-region exits, but this is, in general, a very bad idea.</p>
 <h2><a name="15.19">15.19 Room tags</a></h2>
 <p>A good way to mark important rooms is with a room tag.  Rooms tags belong to a specific room.</p>
 <p><img alt="Room tag" src="img/ch15/room_tag.png"></p>
@@ -581,8 +606,8 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>To allow the centre of the world to be drawn orange, select <strong>View &gt; Room filters &gt; Release navigation filter</strong></li>
 </ul>
 <h3><a name="15.21.3">15.21.3 Applying room tags</a></h3>
-<p>There are two ways to turn room flags on and off.  The more convenient way is to use the painter, described in <a href="#15.22">Section 15.22</a>. The direct way is to set room flags, one room at a time.</p>
-<p>To mark a room as a pub - that is to say, to turn on the room's <strong>pub</strong> room flag:</p>
+<p>There are several ways to turn room flags <em>on</em> and <em>off</em>, some quicker than others.</p>
+<p>The long way is to use the automapper's menus. To mark a room as a pub - that is to say, to turn on the room's <strong>pub</strong> room flag:</p>
 <ul>
 <li>Right-click the room and choose <strong>Toggle room flags &gt; Commercial &gt; Room is a pub</strong></li>
 <li>Repeat this step to turn the room flag off again</li>
@@ -592,7 +617,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>Right-click the room and choose <strong>Toggle room flags &gt; Navigation &gt; Room is centre of world</strong></li>
 <li>Repeat this step to turn the room flag off again</li>
 </ul>
-<p>Of course, the rooms will only be coloured blue and orange if the <strong>navigation</strong> and <strong>commercial</strong> filters have been released, as described above.</p>
+<p>A much quicker way is to the painter, described in <a href="#15.22">Section 15.22</a>, or the quick painting toolbar, described in <a href="#15.22.2">Section 15.22</a>.</p>
 <h3><a name="15.21.4">15.21.4 Editing room flag colours</a></h3>
 <p>If you don't like the colour the automapper is using for a particular flag, you can easily change it.</p>
 <ul>
@@ -606,7 +631,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 </ul>
 <p><img alt="Set room flag colour" src="img/ch15/room_flag_4.png"></p>
 <h2><a name="15.22">15.22 The painter</a></h2>
-<p>While exploring a region of the world - a forest, perhaps  - it would be quite tedious to set the room flags for every new room individually. The solution is to use the automapper window's <em>painter</em>.</p>
+<p>While exploring a region of the world - a forest, perhaps  - it would be quite tedious to set the room flags for every new room individually. One solution is to use the automapper window's <em>painter</em>.</p>
 <p>The painter can be configured by using the menus or by using the toolbar. We'll start by using the menus.</p>
 <p>The first step is to turn the painter on:</p>
 <ul>
@@ -634,9 +659,9 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>Set your character's current room</li>
 <li>Move your character from one room to another, painting rooms as you go</li>
 </ul>
-<h3><a name="15.22.1">15.22.1 Using the painter toolbar</a></h3>
-<p>The painter toolbar can be used instead of the menus.  In many ways it's more convenient.</p>
-<p><img alt="Painting toolbar" src="img/ch15/paint_toolbar.png"></p>
+<h3><a name="15.22.1">15.22.1 Using the room painting toolbar</a></h3>
+<p>The room painting toolbar can be used instead of the menus.  In many ways it's more convenient.</p>
+<p><img alt="Room painting toolbar" src="img/ch15/paint_toolbar.png"></p>
 <ul>
 <li>Click the paintbrush button to enable the painter</li>
 <li>Click the <strong>Ne</strong> button to paint only new rooms, or the <strong>All</strong> button to paint all rooms</li>
@@ -649,6 +674,13 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 </ul>
 <p>You can add as many favourite room flags as you like.  Each room flag aren't actually applied until you have clicked its button to select it.  Click the button a second time to unselect it.</p>
 <p>The remaining buttons in this toolbar are used for wilderness rooms, discussed in <a href="#15.24">Section 15.24</a>.</p>
+<h3><a name="15.22.2">15.22.2 Using the quick painting toolbar</a></h3>
+<p>The painter described above is fine for painting rooms as you move around, but if you just want to toggle room flags in existing roms, you can use the quick painting toolbar.</p>
+<p><img alt="Quick painting toolbar" src="img/ch15/quick_toolbar.png"></p>
+<p>This toolbar doesn't interact with the painter, but it does use the same set of favourite room flags. (Click the plus button to add some favourite room flags, if none currently exist).</p>
+<p>Using this toolbar is as simple as clicking on a coloured button, then clicking on a room.</p>
+<p>If you click on a selected room, the room flag is toggled in any other selected rooms at the same time. (If you're not careful, this can mean that a particular room flag is turned <em>on</em> in some rooms, and turned <em>off</em> in others!)</p>
+<p>The <strong>Quick paint without resetting</strong> button, when selected, allows you to click on rooms several times without having to click the coloured button each time.</p>
 <h2><a name="15.23">15.23 Colouring the background map</a></h2>
 <p>You can colour the background map, if you want to.  It's very useful for features like rivers and mountain ranges which are a part of the game world, but which are not directly accessible to players.</p>
 <p><img alt="Coloured background" src="img/ch15/colour_bg.png"></p>
@@ -764,7 +796,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>If you de-select all of the items in the <strong>Mode &gt; Match rooms</strong> menu, the automapper will never get lost. (This is not recommended, especially when the automapper is in <em>update mode</em>.)</p>
 <p>When comparing verbose descriptions, only the first 100 characters are compared by default. You can increase or reduce that number, if you want.</p>
 <ul>
-<li>From the automapper menu, choose <strong>Mode &gt; Verbose characters...</strong></li>
+<li>From the automapper menu, choose <strong>Mode &gt; Match rooms &gt; Set description length...</strong></li>
 </ul>
 <h3><a name="15.27.2">15.27.2 Hidden exits</a></h3>
 <p>Some rooms have an exit which is visible some of the time, but not visible at other times.</p>
@@ -795,7 +827,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <h3><a name="15.27.3">15.27.3 Crafty exits</a></h3>
 <p>If you're mapping an area with a lot of hidden exits, you can turn on crafty exits mode.</p>
 <ul>
-<li>From the automapper menu, click <strong>Mode &gt; Moves &gt; Allow crafty moves</strong></li>
+<li>From the automapper menu, click <strong>Mode &gt; Movement flags &gt; Allow crafty moves</strong></li>
 </ul>
 <p>In crafty moves mode, if you character moves north from a room that doesn't contain a north exit, the automapper will create a hidden exit in that direction for you.  (This mode overrides protected moves mode, described in <a href="#15.17.1">Section 15.17.1</a>.)</p>
 <h3><a name="15.27.4">15.27.4 Transient exits</a></h3>
@@ -1139,6 +1171,134 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>When you're finished, click the <strong>Save</strong> button at the bottom of the window</li>
 </ul>
 <p>Some zones of <em>Cryosphere</em> use <em>rimwards</em> (north), <em>hubwards</em> (south), <em>anticlockwise</em> (west) and <em>clockwise</em> (east). These can be added in the same way. Remember that the game abbreviates both <em>aft</em> and <em>anticlockwise</em> with <em>a</em>, so you'll need to decide which direction you want to abbreviate. (The pre-configured world profile abbreviates <em>anticlockwise</em>, not <em>aft</em>, as <em>a</em>.)</p>
+<h3><a name="15.31.12">15.31.12 Relative directions</a></h3>
+<p>Relative directions are used by a handful of worlds in which a room's exits change depending on the direction in which the character is facing (which usually means the direction from which the character arrived).</p>
+<p>One such world is <em>Discworld MUD</em>. For a character that's facing north, the world uses the following relative directions:</p>
+<table>
+<thead>
+<tr>
+<th>Slot</th>
+<th align="left">Relative direction</th>
+<th align="left">Corresponds to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td align="left">forward</td>
+<td align="left">north</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="left">forward-right</td>
+<td align="left">northeast</td>
+</tr>
+<tr>
+<td>2</td>
+<td align="left">right</td>
+<td align="left">east</td>
+</tr>
+<tr>
+<td>3</td>
+<td align="left">backward-right</td>
+<td align="left">southeast</td>
+</tr>
+<tr>
+<td>4</td>
+<td align="left">backward</td>
+<td align="left">south</td>
+</tr>
+<tr>
+<td>5</td>
+<td align="left">backward-left</td>
+<td align="left">southwest</td>
+</tr>
+<tr>
+<td>6</td>
+<td align="left">left</td>
+<td align="left">west</td>
+</tr>
+<tr>
+<td>7</td>
+<td align="left">forward-left</td>
+<td align="left">northwest</td>
+</tr>
+</tbody>
+</table>
+<p>However, if the character is facing northeast, the corresponding compass directions change:</p>
+<table>
+<thead>
+<tr>
+<th>Slot</th>
+<th align="left">Relative direction</th>
+<th align="left">Corresponds to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td align="left">forward</td>
+<td align="left">northeast</td>
+</tr>
+<tr>
+<td>1</td>
+<td align="left">forward-right</td>
+<td align="left">east</td>
+</tr>
+<tr>
+<td>2</td>
+<td align="left">right</td>
+<td align="left">southeast</td>
+</tr>
+<tr>
+<td>3</td>
+<td align="left">backward-right</td>
+<td align="left">south</td>
+</tr>
+<tr>
+<td>4</td>
+<td align="left">backward</td>
+<td align="left">southwest</td>
+</tr>
+<tr>
+<td>5</td>
+<td align="left">backward-left</td>
+<td align="left">west</td>
+</tr>
+<tr>
+<td>6</td>
+<td align="left">left</td>
+<td align="left">northwest</td>
+</tr>
+<tr>
+<td>7</td>
+<td align="left">forward-left</td>
+<td align="left">north</td>
+</tr>
+</tbody>
+</table>
+<p>If you're using the pre-configured world profile for <em>Discworld MUD</em>, then there's nothing to do - everything has been set up for you. If you're using a different profile, you'll have to define relative exits for yourself.</p>
+<p>First open the current dictionary's edit window:</p>
+<pre><code>    ;editdictionary
+    ;edy
+</code></pre>
+<p>In the new window, click on <strong>Directions &gt; Page 3</strong> tab. You'll probably see an empty list.</p>
+<p>You don't have to add all eight relative directions, if the world doesn't them all; but you should at least add opposite pairs.</p>
+<ul>
+<li>In the <strong>Slot #</strong> box, selected <strong>Slot 0 (equivalent of north)</strong></li>
+<li>Add a relative direction like <strong>forward</strong><ul>
+<li>If the world uses abbreviated directions like <strong>fw</strong>, you can add them, too</li>
+</ul>
+</li>
+<li>Click the <strong>Add</strong> button</li>
+<li>Now, in the <strong>Slot #</strong> box, selected <strong>Slot 4 (equivalent of south)</strong></li>
+<li>Add a relative direction like <strong>backward</strong><ul>
+<li>If the world uses abbreviated directions like <strong>bw</strong>, you can add them, too</li>
+</ul>
+</li>
+<li>Click the <strong>Add</strong> button</li>
+</ul>
+<p>That's all you need to do. The Locator task and the automapper will take care of everything for you.</p>
 <hr>
 <p><a href="ch14.html">Previous</a> <a href="index.html">Index</a> <a href="ch16.html">Next</a></p>
 </body>

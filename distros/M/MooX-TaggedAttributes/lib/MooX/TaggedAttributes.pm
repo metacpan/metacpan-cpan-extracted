@@ -1,32 +1,14 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2015 Smithsonian Astrophysical Observatory
-#
-# This file is part of MooX::TaggedAttributes
-#
-# MooX::TaggedAttributes is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package MooX::TaggedAttributes;
+
+# ABSTRACT: Add a tag with an arbitrary value to a an attribute
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 use Carp;
+use MRO::Compat;
 
 use Moo::Role;
 
@@ -157,11 +139,10 @@ my $can = sub { ( shift )->next::can };
 # but note that djerius' published solution was incomplete.
 around _tag_list => sub {
 
-    # 1. call &$orig to handle tag role compositions into the current
-    #    class
 
-    # 2. call up the inheritance stack to handle parent class tag role
-    #    compositions.
+    # 1. call &$orig to handle tag role compositions into the current class
+
+    # 2. call up the inheritance stack to handle parent class tag role compositions.
 
     my $orig    = shift;
     my $package = caller;
@@ -178,8 +159,8 @@ use namespace::clean -except => qw( import );
 # _tags can't be lazy; we must resolve the tags and attributes at
 # object creation time in case a role is modified after this object
 # is created, as we scan both clsses and roles to gather the tags.
-# classes are immutable after the first instantiation
-# of an object, but roles aren't.
+# classes should be immutable after the first instantiation
+# of an object (but see RT#101631), but roles aren't.
 
 # We also need to identify when a role has been added to an *object*
 # which adds tagged attributes.  TODO: make this work.
@@ -195,7 +176,10 @@ sub _build_cache {
 
     my $class = shift;
 
-    # returned cached tags if available.
+    # returned cached tags if available.  Note that as of Moo v.1.006001
+    # instantiated classes may still have attributes composed into them
+    # (i.e., they're not fully immutable, see RT#101631), but that
+    # is acknowledged as a bug, not a feature, so we don't support that.
     return $TAGCACHE{$class} if $TAGCACHE{$class};
 
     my %cache;
@@ -213,8 +197,8 @@ has _tag_cache => (
     is       => 'ro',
     init_arg => undef,
     default  => sub {
-	my $class = blessed( $_[0] );
-	return $TAGCACHE{$class} ||= $class->_build_cache;
+        my $class = blessed( $_[0] );
+        return $TAGCACHE{$class} ||= $class->_build_cache;
     }
 );
 
@@ -222,12 +206,29 @@ sub _tags { blessed( $_[0] ) ? $_[0]->_tag_cache : $_[0]->_build_cache }
 
 1;
 
+#
+# This file is part of MooX-TaggedAttributes
+#
+# This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 __END__
+
+=pod
+
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory instantiation use'ing
 
 =head1 NAME
 
 MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
+=head1 VERSION
+
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -367,29 +368,32 @@ looks like
 If a role with tagged attributes is applied to an object, the
 tags for those attributes are not visible.
 
+=head1 BUGS
 
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes>
+or by email to
+L<bug-MooX-TaggedAttributes@rt.cpan.org|mailto:bug-MooX-TaggedAttributes@rt.cpan.org>.
 
-Please report any bugs or feature requests to
-C<bug-moox-taggedattributes@rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes>.
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 SOURCE
 
-Copyright (c) 2015 The Smithsonian Astrophysical Observatory
-
-MooX::TaggedAttributes is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+The development version is on github at L<https://github.com/djerius/moox-taggedattributes>
+and may be cloned from L<git://github.com/djerius/moox-taggedattributes.git>
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

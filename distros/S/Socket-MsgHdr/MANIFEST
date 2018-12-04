@@ -1,11 +1,21 @@
+.gitignore
+.travis.yml
+CONTRIBUTING
 Changes
-Makefile.PL
+LICENSE
 MANIFEST
+Makefile.PL
 MsgHdr.xs
-ppport.h
 README
+hints/MSWin32.pl
+hints/solaris.pl
+lib/Socket/MsgHdr.pm
+ppport.h
 t/10basic.t
 t/20send.t
 t/30recv.t
-lib/Socket/MsgHdr.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+t/40runtime.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

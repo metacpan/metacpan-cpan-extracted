@@ -6,7 +6,7 @@ use Carp qw(croak);
 use POSIX qw(strftime);
 use Moo 2;
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 has [
     'number',
@@ -313,8 +313,8 @@ Finance::Bank::Postbank_de::Account - Postbank bank account class
   require Crypt::SSLeay; # It's a prerequisite
   use Finance::Bank::Postbank_de::Account;
   my $statement = Finance::Bank::Postbank_de::Account->parse_statement(
-                number => '9999999999',
-                password => '11111',
+                login => 'Petra.Pfiffig',
+                password => '123456789',
               );
   # Retrieve account data :
   print "Balance : ",$statement->balance->[1]," EUR\n";

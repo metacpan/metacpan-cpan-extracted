@@ -1,0 +1,4 @@
+Host foo
+
+# bad value test check propagation in elements of type check_list
+PreferredAuthentications hostbased,publickeys

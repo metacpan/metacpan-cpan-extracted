@@ -1,3 +1,8 @@
+0.092   2018-12-03 (PERLANCAR)
+
+	- Detect change of column AUTO_INCREMENT (mysql) status.
+
+
 0.091   2018-05-10 (PERLANCAR)
 
 	- Handle mysql driver's table_info() which returns database name as

@@ -1,3 +1,10 @@
+0.05  2018-12-03
+  - Synchronise README
+0.04  2018-12-03
+  - Fixed link to YUIcompressor project homepage (Mohammad S Anwar)
+  - Improve URL preservation with better recursive regular expression
+  - Require 5.10 or higher for recursive regular expressions
+  - Added LICENSE meta name (Mohammad S Anwar)
 0.03  2018-11-29
   - Prevent breaking inline SVG. (Timur Bilalov)
   - Properly support @support rules. (Anton Eprev)

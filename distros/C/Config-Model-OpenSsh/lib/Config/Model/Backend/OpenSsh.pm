@@ -8,10 +8,10 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::OpenSsh ;
-$Config::Model::Backend::OpenSsh::VERSION = '1.239';
+$Config::Model::Backend::OpenSsh::VERSION = '1.241';
 use 5.10.1;
 
-use Config::Model 2.123;
+use Config::Model 2.128;
 
 use Mouse ;
 extends "Config::Model::Backend::Any" ;
@@ -119,19 +119,19 @@ sub assign {
     $elt->annotation($comment) if $comment and $type ne 'hash';
 
     if ($type eq 'leaf') {
-        $elt->store( join(' ',@$arg) ) ;
+        $elt->store( value => join(' ',@$arg), check => $check ) ;
     }
     elsif ($type eq 'list') {
-        $elt->push ( @$arg ) ;
+        $elt->push_x ( values => $arg, check => $check ) ;
     }
     elsif ($type eq 'hash') {
         my $hv = $elt->fetch_with_id($arg->[0]);
-        $hv->store( $arg->[1] );
+        $hv->store( value => $arg->[1], check => $check );
         $hv->annotation($comment) if $comment;
     }
     elsif ($type eq 'check_list') {
-        my @check = split /,/,$arg->[0] ;
-        $elt->set_checked_list (@check) ;
+        my @check = split /\s*,\s*/,$arg->[0] ;
+        $elt->set_checked_list (\@check, check => 'skip') ;
     }
     else {
         die "OpenSsh::assign did not expect $type for $key\n";
@@ -237,7 +237,7 @@ Config::Model::Backend::OpenSsh - Common backend methods for Ssh and Sshd backen
 
 =head1 VERSION
 
-version 1.239
+version 1.241
 
 =head1 SYNOPSIS
 

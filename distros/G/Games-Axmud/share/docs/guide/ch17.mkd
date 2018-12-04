@@ -315,6 +315,9 @@ The strings specified below return the following kinds of value in a peek/poke o
          Show some Locator debug messages (GA::Client->debugLocatorFlag)
     F debug.locator.all
          Show all Locator debug messages (GA::Client->debugMaxLocatorFlag)
+    F debug.locator.exit
+         Show illegal exit direction debug messages
+            (GA::Client->debugMaxLocatorFlag)
     F debug.locator.move
          Show Locator's movement command list (GA::Client->debugMoveListFlag)
     F debug.obj.parse
@@ -495,18 +498,6 @@ The strings specified below return the following kinds of value in a peek/poke o
          Auto-complete navigation type (GA::Client->autoCompleteType)
     F instruct.complete.parent
          Auto-complete registry location (GA::Client->autoCompleteParent)
-
-
-    O keycode.obj.current
-         Current keycode object (GA::Client->currentKeycodeObj)
-    O keycode.obj.NAME
-         Keycode object called 'NAME' (from GA::Client->keycodeObjHash)
-    S keycode.current.KEYCODE
-         Current value for the standard KEYCODE value (from
-            GA::Obj::Keycode->keycodeHash)
-    S keycode.default.KEYCODE
-         Default value for the standard KEYCODE value (from
-            GA::CLIENT->constKeycodeHash)
 
 
     F log.allow
@@ -977,8 +968,10 @@ The strings specified below return the following kinds of value in a peek/poke o
          Current recording position (GA::Session->recordingPosn)
 
 
-    S regex.url
+    S regex.url.long
          Regex matching valid web links (GA::Client->constUrlRegex)
+    S regex.url.short
+         Regex matching short web links (GA::Client->constShortUrlRegex)
     S regex.email
          Regex matching valid email addresses (GA::Client->constEmailRegex)
 

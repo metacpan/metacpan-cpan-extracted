@@ -1,0 +1,23 @@
+---
+abstract: 'Send data to Abusix'
+author:
+  - 'Marc Bradshaw <marc@marcbradshaw.net>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Milter-Authentication-Handler-AbusixDataFeed
+requires:
+  English: '0'
+  Mail::DataFeed::Abusix: '0'
+  Mail::Milter::Authentication: '2.20181130'
+  Sys::Syslog: '0'
+version: '2.20181204'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,0 +1,6 @@
+
+# see also https://www.blog-libre.org/2015/11/21/loption-match-de-sshd_config/
+
+Match Address 192.168.0.0/24,192.168.1.4
+PasswordAuthentication blork
+PermitRootLogin no

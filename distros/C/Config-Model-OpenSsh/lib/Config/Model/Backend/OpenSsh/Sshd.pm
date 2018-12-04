@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::OpenSsh::Sshd ;
-$Config::Model::Backend::OpenSsh::Sshd::VERSION = '1.239';
+$Config::Model::Backend::OpenSsh::Sshd::VERSION = '1.241';
 use Mouse ;
 extends "Config::Model::Backend::OpenSsh" ;
 
@@ -20,54 +20,8 @@ use File::Path ;
 
 my $logger = Log::Log4perl::get_logger("Backend::OpenSsh");
 
-sub _host {
-    my ($self,$root,$patterns,$comment)  = @_;
-    $logger->debug("host: pattern @$patterns # $comment");
-    my $hash_obj = $root->fetch_element('Host');
-
-    $logger->info("ssh: load host patterns '".join("','", @$patterns)."'");
-
-    $self->current_node = $hash_obj->fetch_with_id("@$patterns");
-}
-
-sub _forward {
-    my ($self,$root,$key,$args,$comment)  = @_;
-    $logger->debug("forward: $key @$args # $comment");
-    $self->current_node($root) unless defined $self->current_node ;
-
-    my $elt_name = $key =~ /local/i ? 'Localforward' : 'RemoteForward' ;
-    my $size = $self->current_node->fetch_element($key)->fetch_size;
-
-    $logger->info("ssh: load $key '".join("','", @$args)."'");
-
-    my $v6 = ($args->[1] =~ m![/\[\]]!) ? 1 : 0;
-
-    # cleanup possible square brackets used for IPv6
-    foreach (@$args) {
-        s/[\[\]]+//g;
-    }
-
-    # reverse enable to assign string to port even if no bind_adress
-    # is specified
-    my $re = $v6 ? qr!/! : qr!:! ;
-    my ($port,$bind_adr ) = reverse split $re,$args->[0] ;
-    my ($host,$host_port) = split $re,$args->[1] ;
-
-    my $load_str = '';
-    $load_str .= "GatewayPorts=1 " if $bind_adr ;
-
-    $load_str .= "$key:$size ";
-
-    $load_str .= 'ipv6=1 ' if $v6 ;
-
-    $load_str .= "bind_address=$bind_adr " if defined $bind_adr ;
-    $load_str .= "port=$port host=$host hostport=$host_port";
-
-    $self->current_node -> load($load_str) ;
-}
-
 sub match {
-    my ($self,$root, $key, $pairs,$comment) = @_ ;
+    my ($self, $root, $key, $pairs, $comment, $check) = @_ ;
     $logger->debug("match: @$pairs # $comment");
     my $list_obj = $root->fetch_element('Match');
 
@@ -79,7 +33,10 @@ sub match {
     while (@$pairs) {
         my $criteria = shift @$pairs;
         my $pattern  = shift @$pairs;
-        $block_obj->load(qq!Condition $criteria="$pattern"!);
+        $block_obj->load(
+            steps => qq!Condition $criteria="$pattern"!,
+            check => $check,
+        );
     }
 
     $self->current_node( $block_obj->fetch_element('Settings') );
@@ -171,7 +128,7 @@ Config::Model::Backend::OpenSsh::Sshd - Backend for sshd configuration files
 
 =head1 VERSION
 
-version 1.239
+version 1.241
 
 =head1 SYNOPSIS
 
@@ -179,29 +136,9 @@ None
 
 =head1 DESCRIPTION
 
-This calls provides a backend to read and write sshd client configuration files.
+This class provides a backend to read and write sshd client configuration files.
 
-=head1 STOP
-
-The documentation provides on the reader and writer of OpenSsh configuration files.
-These details are not needed for the basic usages explained in L<Config::Model::OpenSsh>.
-
-=head1 Methods
-
-These read/write functions are part of C<OpenSsh::Sshd> read/write backend.
-They are
-declared in sshd configuration model and are called back when needed to read the
-configuration file and write it back.
-
-=head2 read (object => <sshd_root>, config_dir => ...)
-
-Read F<sshd_config> in C<config_dir> and load the data in the
-C<sshd_root> configuration tree.
-
-=head2 write (object => <sshd_root>, config_dir => ...)
-
-Write F<sshd_config> in C<config_dir> from the data stored in
-C<sshd_root> configuration tree.
+This class is a plugin for L<Config::Model::BackendMgr>.
 
 =head1 SEE ALSO
 

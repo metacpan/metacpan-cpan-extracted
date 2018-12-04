@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,9 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test2-Tools-PDL",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Test2::Tools::PDL",
   "PREREQ_PM" => {
     "Exporter" => 0,
+    "PDL::Core" => 0,
+    "PDL::Lite" => 0,
+    "PDL::Primitive" => 0,
+    "PDL::Types" => 0,
     "Safe::Isa" => 0,
     "Scalar::Util" => 0,
     "Test2::API" => 0,
@@ -25,15 +30,15 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Compare" => 0,
     "Test2::Util::Ref" => 0,
     "Test2::Util::Table" => 0,
+    "constant" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "PDL::Core" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.0001",
+  "VERSION" => "0.0002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +48,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => 0,
   "PDL::Core" => 0,
+  "PDL::Lite" => 0,
+  "PDL::Primitive" => 0,
+  "PDL::Types" => 0,
   "Safe::Isa" => 0,
   "Scalar::Util" => 0,
   "Test2::API" => 0,
@@ -52,6 +60,7 @@ my %FallbackPrereqs = (
   "Test2::Util::Ref" => 0,
   "Test2::Util::Table" => 0,
   "Test2::V0" => 0,
+  "constant" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

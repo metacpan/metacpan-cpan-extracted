@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use feature 'say';
+
+use SVG::ChristmasTree;
+
+my $tree = SVG::ChristmasTree->new_with_options;
+
+say $tree->as_xml;
+
+=head1 NAME
+
+tree
+
+=head1 DESCRIPTION
+
+Draw an SVG Christmas tree.
+
+=head1 SYNOPSIS
+
+Draw the default Christmas tree.
+
+    $ ./tree > my_tree.svg
+
+Draw a different Christmas tree.
+
+    $ ./tree --layers=5 --pot_colour='rgb(0,0,255)' > another_tree.svg
+
+=head1 OPTIONS

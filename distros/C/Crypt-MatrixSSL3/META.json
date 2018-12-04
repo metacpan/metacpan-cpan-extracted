@@ -4,13 +4,13 @@
       "C. N. Drake <christopher@pobox.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Crypt-MatrixSSL3",
    "no_index" : {
@@ -36,7 +36,7 @@
       "develop" : {
          "requires" : {
             "Devel::PPPort" : "3.23",
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Distribution" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
@@ -68,27 +68,27 @@
    "provides" : {
       "Crypt::MatrixSSL3" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.2"
       },
       "Crypt::MatrixSSL3::Client" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.2"
       },
       "Crypt::MatrixSSL3::HelloExt" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.2"
       },
       "Crypt::MatrixSSL3::Keys" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.2"
       },
       "Crypt::MatrixSSL3::Server" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.2"
       },
       "Crypt::MatrixSSL3::SessID" : {
          "file" : "lib/Crypt/MatrixSSL3.pm",
-         "version" : "v3.9.1"
+         "version" : "v3.9.2"
       }
    },
    "release_status" : "stable",
@@ -103,11 +103,11 @@
          "web" : "https://github.com/powerman/perl-Crypt-MatrixSSL3"
       }
    },
-   "version" : "v3.9.1",
+   "version" : "v3.9.2",
    "x_contributors" : [
       "Alex Efros <powerman@cpan.org>",
       "vonydev <vony@teamevolve.ro>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::XML; # git description: v0.38-63-gadfe871
+package Task::Kensho::XML; # git description: v0.39-63-gb60260d
 # ABSTRACT: A Glimpse at an Enlightened Perl: XML Development
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::XML - A Glimpse at an Enlightened Perl: XML Development
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -69,10 +69,6 @@ facilitates the ease and simplicity the distribution aims to achieve.
 =for stopwords libxml libxml2 libxslt RDF
 
 =head2 L<Task::Kensho::XML>: XML Development
-
-=head3 L<RDF::Trine>
-
-An RDF Framework for Perl
 
 =head3 L<XML::Generator::PerlData>
 
@@ -131,7 +127,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -146,6 +142,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

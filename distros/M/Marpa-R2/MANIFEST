@@ -1,4 +1,4 @@
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -130,8 +130,10 @@ html/t/examples.t
 html/t/fmt.t
 html/t/fmt_t_data/expected1.html
 html/t/fmt_t_data/expected2.html
+html/t/fmt_t_data/expected3.html
 html/t/fmt_t_data/input1.html
 html/t/fmt_t_data/input2.html
+html/t/fmt_t_data/input3.html
 html/t/fmt_t_data/score_expected1.html
 html/t/fmt_t_data/score_expected2.html
 html/t/missing.t
@@ -198,6 +200,7 @@ pod/Semantics.pod
 pod/Semantics/Null.pod
 pod/Semantics/Order.pod
 pod/Semantics/Phases.pod
+pod/Semantics/Rank.pod
 pod/Support.pod
 pod/Tracing.pod
 pod/Tutorial2.pod
@@ -206,6 +209,8 @@ pperl/Marpa/R2/Perl.pm
 pperl/Marpa/R2/Perl/.gitignore
 t/.gitignore
 t/00-load.t
+t/50d-giarank.t
+t/50d-ranksyn.t
 t/ah2.t
 t/ah_numeric.t
 t/asf_syn.t
@@ -282,6 +287,7 @@ t/sl_evsyn2.t
 t/sl_exhaust.t
 t/sl_external1.t
 t/sl_fullsyn.t
+t/sl_gabend.t
 t/sl_gia.t
 t/sl_gia_err.t
 t/sl_gie.t

@@ -1,7 +1,7 @@
 package Text::ANSITable;
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.500'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.501'; # VERSION
 
 use 5.010001;
 use Carp;
@@ -1672,7 +1672,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.500 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2018-05-31.
+This document describes version 0.501 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2018-12-02.
 
 =head1 SYNOPSIS
 
@@ -2187,10 +2187,10 @@ width is explicitly set to a positive value.
 
 =head2 use_color => BOOL
 
-Whether to output color. Default is taken from C<COLOR> environment variable, or
-detected via C<(-t STDOUT)>. If C<use_color> is set to 0, an attempt to use a
-colored color theme (i.e. anything that is not the C<no_color> theme) will
-result in an exception.
+Whether to output color. Default is taken from C<NO_COLOR> environment variable,
+C<COLOR> environment variable, or detected via C<(-t STDOUT)>. If C<use_color>
+is set to 0, an attempt to use a colored color theme (i.e. anything that is not
+the C<no_color> theme) will result in an exception.
 
 (In the future, setting C<use_color> to 0 might opt the module to use
 normal/plain string routines instead of the slower ta_* functions from

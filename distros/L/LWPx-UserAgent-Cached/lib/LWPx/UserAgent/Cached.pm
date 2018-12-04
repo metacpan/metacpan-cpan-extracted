@@ -5,7 +5,7 @@ package LWPx::UserAgent::Cached;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 ## no critic (Bangs::ProhibitCommentedOutCode)
 
@@ -281,7 +281,7 @@ LWPx::UserAgent::Cached - Subclass of LWP::UserAgent that caches HTTP GET reques
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -417,7 +417,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/LWPx-UserAgent-Cached>
+L<https://metacpan.org/release/LWPx-UserAgent-Cached>
 
 =item *
 
@@ -445,14 +445,6 @@ L<http://cpanratings.perl.org/d/LWPx-UserAgent-Cached>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/LWPx-UserAgent-Cached>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -463,7 +455,7 @@ L<http://cpants.cpanauthors.org/dist/LWPx-UserAgent-Cached>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/L/LWPx-UserAgent-Cached>
 
@@ -509,7 +501,7 @@ Mark Gardner <mjgardner@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by ZipRecruiter.
+This software is copyright (c) 2018 by ZipRecruiter.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

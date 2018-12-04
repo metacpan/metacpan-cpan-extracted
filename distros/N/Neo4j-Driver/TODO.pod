@@ -1,0 +1,180 @@
+
+=encoding utf8
+
+=head1 TODO
+
+=head2 Driver
+
+=over
+
+=item * Write tests.
+
+=item * HTTPS support.
+
+=item * The current C<close> method is a no-op. It should either be removed
+completely or behave like the session C<close> method; see below.
+
+=item * Consider if the 6 second timeout is too long. It should in fact be as
+short as reasonably possible.
+
+=back
+
+=head2 Session
+
+=over
+
+=item * Support for persistent connections would be nice.
+
+=item * Two different sessions should use two different TCP connections (at the
+moment, every session uses the same L<REST::Client> instance).
+
+=item * Sessions should offer a C<close> method that automatically rolls back
+and terminates all currently open transactions. The current C<close> method is
+a no-op, which needs to be fixed.
+
+=item * Sessions of some of the official drivers can have at most one
+transaction running at a time. This restriction is not necessary for this Perl
+driver because L<REST::Client> works fine without it. Perhaps we should
+implement it anyway for consistency; however, the Python driver docs explicitly
+say that a "Session is a logical container for one or more transactional units
+of work".
+
+=back
+
+=head2 Transaction
+
+=over
+
+=item * The option to send multiple statements at once should no longer be
+exposed to the client. It should only be used internally for running statements
+lazily. The method structure should be refactored such that this becomes
+obvious.
+
+=item * Using the C<meta> data (which is automatically returned since version
+3.0 (or possibly 3.1/3.2/3.3) and cannot be explicitly requested in
+C<resultDataContents>), it should be possible to parse out the IDs and stuff
+from any reply and bless the entities in the JSON hashes accordingly. However,
+we'd need to investigate how the official drivers handle multiple requests for
+the same entities: We'd rather avoid the hassle of keeping a central object
+store like L<REST::Neo4p> does. C<rest> can always be requested in
+C<resultDataContents>, but just returns some info for the deprecated API. It
+should work on old server versions where C<meta> is not available. However, the
+internal structure is different (actually C<rest> looks easier to parse than
+C<meta> at first glance).
+
+=item * Profile the performance penalty of blessing the entities in the JSON
+hashes (see using the C<meta> data). If the penalty turns out to be low,
+blessing should probably be done by default.
+
+=item * An alternative to using C<< $client->{_res}->status_line >>
+(to get the HTTP error message) might be to call
+C<< $client->getUseragent->add_handler(response_header => sub { $status_line = shift->status_line }) >>.
+However, this is probably slower and would likely need to be run for each and
+every POST including those with C<2xx> status codes, which might not be
+acceptable.
+
+=item * Disabling C<die_on_error> probably makes errors harder to find, but has
+no clear advantages. In particular, errors are often missing the proper header
+fields for the commit URL etc., so it's likely the failed request doesn't
+produce useful return values and the next request will fail anyway with a
+misleading error message due to the URLs being corrupted. This feature is not
+present in the official drivers anyway; it was inspired by Neo4p and should
+probably be removed completely.
+
+=item * Consider supporting re-using C<Record> objects for query parameters in
+C<run>. The Java and C# drivers do this.
+
+=item * Profile whether C<Tie::IxHash> or sorting C<JSON:PP> is quicker and
+adjust the code accordingly.
+
+=item * Investigate which JSON module is the best. While C<Cpanel::JSON::XS>
+may have some advantages in terms of correctness (I think?), maybe
+C<JSON::MaybeXS> is more compatible.
+
+=item * Run statements lazily: Just like with the official drivers, statements
+passed to C<run> should be gathered until their results are actually accessed.
+Then, and only then, all statements gathered so far should be sent to the
+server using a single request. Challenges of this approach include that
+notifications are not associated with a single statement, so there must be an
+option to disable this behaviour; indeed, disabled should probably be the
+default when stats are requested. Additionally, there are some bugs with
+multiple statements (see tests C<non-arrayref individual statement> and
+C<include empty statement>). If stats end up being requested by default due to
+profiling, this item would mean investing time in developing an optimisation
+feature that is almost never used. Since the server is often run on localhost
+anyway where latency is very close to zero, this item should not have high
+priority.
+
+=back
+
+=head2 StatementResult
+
+=over
+
+=item * Consider whether to implement iterator semantics for StatementResult.
+
+=back
+
+=head2 Record
+
+=over
+
+=item * B<Bugfix:> C<get> should croak if the call is ambiguous (i. e., there's
+more than one field but the field to get is not specified by argument). Note,
+though, that the Python driver intentionally does deliver the first field only
+in this exact scenario (though its method is called C<value> instead of
+C<get>).
+
+=item * Consider whether to implement methods to query the list of fields for
+this record (C<keys>, C<has>, C<size>) and/or a mapping function for all fields
+(C<map>/C<forEach>). Given that this data should easily be available through
+the StatementResult object, these seem slightly superfluous though.
+
+=item * Implement C<graph>; see
+<https://github.com/neo4j/neo4j/blob/3.5/community/server/src/main/java/org/neo4j/server/rest/transactional/GraphExtractionWriter.java>,
+L<https://github.com/neo4j/neo4j-python-driver/wiki/1.6-changelog#160a1>.
+
+=back
+
+=head2 ResultColumns
+
+=over
+
+=item * B<Bugfix:> The C<get> method behaves unpredictably for queries
+that have fields with conflicting indexes and keys such as C<RETURN 1, 0>.
+It would technically be possible to distinguish between a key and an index
+by inspecting the scalar's FLAGS (namely, C<POK>/C<IOK>; see
+L<https://metacpan.org/pod/Devel::Peek#EXAMPLES> and C<JSON::PP>'s
+C<_looks_like_number>). Then C<get(0)> would mean I<index> C<0> and C<get('0')>
+would mean I<key> C<0>. Not sure if this is the best approach though.
+(FWIW, it's exactly what the JS driver does.)
+
+=item * The C<list> implementation is quite ugly and probably has bugs with
+regards to index/key collisions.
+
+=back
+
+=head2 ResultSummary
+
+=over
+
+=item * Profile the server-side performance penalty of requesting stats for
+various kinds of queries. If the penalty turns out to be low, stats should
+probably be requested by default.
+
+=item * The ResultSummary is currently only available via C<summary> after
+explicitly requesting stats before C<run>, while the C<ResultSummary> object is
+created regardless. Profile the performance impact of this (questionable)
+design and investigate possible improvements. One option might be to always
+provide the summary, but to provide the counters only if requested before
+running the statement.
+
+=back
+
+=head2 SummaryCounters
+
+=over
+
+=item * C<use Class::Accessor::Fast 0.34;>
+
+=back

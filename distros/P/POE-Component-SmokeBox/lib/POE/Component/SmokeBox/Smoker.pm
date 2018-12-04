@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Smoker;
-$POE::Component::SmokeBox::Smoker::VERSION = '0.52';
+$POE::Component::SmokeBox::Smoker::VERSION = '0.54';
 #ABSTRACT: encapsulates a smoker object.
 
 use strict;
@@ -54,7 +54,7 @@ POE::Component::SmokeBox::Smoker - encapsulates a smoker object.
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -173,7 +173,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -3,15 +3,15 @@ abstract: 'A Glimpse at an Enlightened Perl: Web Crawling'
 author:
   - 'Chris Prather <chris@prather.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Module::Metadata: '0'
   Test::More: '0'
   perl: '5.006'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 keywords:
   - EPO
   - enlightened
@@ -31,7 +31,7 @@ no_index:
 provides:
   Task::Kensho::WebCrawling:
     file: lib/Task/Kensho/WebCrawling.pm
-    version: '0.39'
+    version: '0.40'
 requires:
   HTTP::Thin: '0'
   HTTP::Tiny: '0'
@@ -48,23 +48,11 @@ resources:
   bugtracker: https://github.com/EnlightenedPerlOrganisation/task-kensho/issues
   homepage: https://github.com/EnlightenedPerlOrganisation/task-kensho
   repository: https://github.com/EnlightenedPerlOrganisation/task-kensho.git
-version: '0.39'
+version: '0.40'
 x_Dist_Zilla:
   perl:
-    version: '5.025000'
+    version: '5.029005'
   plugins:
-    -
-      class: Dist::Zilla::Plugin::RewriteVersion
-      config:
-        Dist::Zilla::Plugin::RewriteVersion:
-          add_tarball_name: 0
-          finders:
-            - ':ExecFiles'
-            - ':InstallModules'
-          global: 1
-          skip_version_provider: 0
-      name: =inc::SubTaskPluginBundle/RewriteVersion
-      version: '0.015'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -85,7 +73,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: =inc::SubTaskPluginBundle/Git::GatherDir
-      version: '2.038'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::MungeFile::WithConfigFile
       config:
@@ -98,28 +86,28 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::MungeFile::WithConfigFile:
           configfile: ../modules.yml
       name: =inc::SubTaskPluginBundle/MungeFile::WithConfigFile
-      version: '0.004'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: =inc::SubTaskPluginBundle/MetaYAML
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: =inc::SubTaskPluginBundle/MetaJSON
-      version: '6.003'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: =inc::SubTaskPluginBundle/License
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: =inc::SubTaskPluginBundle/Manifest
-      version: '6.003'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: =inc::SubTaskPluginBundle/License
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: 1
+          bail_out_on_fail: '1'
           fail_on_warning: author
           fake_home: 0
           filename: xt/author/00-compile.t
@@ -130,8 +118,9 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: =inc::SubTaskPluginBundle/Test::Compile
-      version: '2.054'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -149,47 +138,52 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
           trailing_whitespace: 1
       name: =inc::SubTaskPluginBundle/Test::EOL
-      version: '0.18'
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: =inc::SubTaskPluginBundle/MetaTests
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
       name: =inc::SubTaskPluginBundle/Test::CPAN::Changes
-      version: '0.009'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: =inc::SubTaskPluginBundle/Test::ChangesHasContent
-      version: '0.008'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::Test::MinimumVersion
       name: =inc::SubTaskPluginBundle/Test::MinimumVersion
-      version: '2.000006'
+      version: '2.000008'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: =inc::SubTaskPluginBundle/PodSyntaxTests
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: =inc::SubTaskPluginBundle/PodCoverageTests
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
         Dist::Zilla::Plugin::Test::PodSpelling:
-          directories: []
+          directories:
+            - bin
+            - lib
           spell_cmd: ''
           stopwords:
             - irc
           wordlist: Pod::Wordlist
       name: =inc::SubTaskPluginBundle/Test::PodSpelling
-      version: '2.007000'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -205,11 +199,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: =inc::SubTaskPluginBundle/Test::ReportPrereqs
-      version: '0.024'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Test::Portability
+      config:
+        Dist::Zilla::Plugin::Test::Portability:
+          options: ''
       name: =inc::SubTaskPluginBundle/Test::Portability
-      version: '2.000006'
+      version: '2.001000'
     -
       class: Dist::Zilla::Plugin::Test::CleanNamespaces
       config:
@@ -221,7 +218,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Git::Describe
       name: =inc::SubTaskPluginBundle/Git::Describe
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -235,79 +232,79 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@Author::ETHER/EnsurePod5'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@Author::ETHER/H1Nester'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::ETHER/SingleEncoding'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@Author::ETHER/List'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@Author::ETHER/Verbatim'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/header'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::ETHER/Name'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::ETHER/Version'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/prelude'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: TYPES
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::ETHER/Leftovers'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/postlude'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@Author::ETHER/generate SUPPORT'
-              version: '1.01'
+              version: '1.06'
             -
               class: Pod::Weaver::Section::AllowOverride
               name: '@Author::ETHER/allow override SUPPORT'
@@ -315,7 +312,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::ETHER/Authors'
-              version: '4.013'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Section::AllowOverride
+              name: '@Author::ETHER/allow override AUTHOR'
+              version: '0.05'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@Author::ETHER/Contributors'
@@ -323,31 +324,21 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::ETHER/Legal'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::ETHER/footer'
-              version: '4.013'
+              version: '4.015'
       name: =inc::SubTaskPluginBundle/PodWeaver
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: =inc::SubTaskPluginBundle/NextRelease
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: =inc::SubTaskPluginBundle/GithubMeta
-      version: '0.54'
-    -
-      class: Dist::Zilla::Plugin::AuthorityFromModule
-      config:
-        Dist::Zilla::Plugin::AuthorityFromModule:
-          module: Task::Kensho::WebCrawling
-        Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000032'
-          version: '0.003'
-      name: =inc::SubTaskPluginBundle/AuthorityFromModule
-      version: '0.006'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Authority
       name: =inc::SubTaskPluginBundle/Authority
@@ -355,7 +346,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: =inc::SubTaskPluginBundle/MetaNoIndex
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -366,25 +357,26 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: ':InstallModules'
-              version: '6.003'
+              version: '6.012'
+          include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002000'
-          inherit_missing: 0
-          inherit_version: 0
-          meta_noindex: 1
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '0'
+          inherit_version: '0'
+          meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000032'
-          version: '0.003'
+          Module::Metadata: '1.000034'
+          version: '0.006'
       name: =inc::SubTaskPluginBundle/MetaProvides::Package
-      version: '2.004000'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: =inc::SubTaskPluginBundle/MetaConfig
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: =inc::SubTaskPluginBundle/MetaResources
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Keywords
       config:
@@ -397,9 +389,16 @@ x_Dist_Zilla:
       name: =inc::SubTaskPluginBundle/Keywords
       version: '0.007'
     -
+      class: Dist::Zilla::Plugin::UseUnsafeInc
+      config:
+        Dist::Zilla::Plugin::UseUnsafeInc:
+          dot_in_INC: 0
+      name: =inc::SubTaskPluginBundle/UseUnsafeInc
+      version: '0.001'
+    -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: =inc::SubTaskPluginBundle/AutoPrereqs
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: =inc::SubTaskPluginBundle/MinimumPerl
@@ -411,59 +410,34 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: '=inc::SubTaskPluginBundle/task components'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
+          git_version: 2.19.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
           paths:
             - .
-            - /Volumes/amaretto/Users/ether/git/Task-Kensho/modules.yml
+            - ../modules.yml
       name: =inc::SubTaskPluginBundle/Git::Contributors
-      version: '0.023'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: =inc::SubTaskPluginBundle/RunExtraTests
-      version: '0.028'
+      version: '0.029'
     -
-      class: Dist::Zilla::Plugin::MakeMaker::Fallback
+      class: Dist::Zilla::Plugin::MakeMaker
       config:
-        Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.38'
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
-      name: =inc::SubTaskPluginBundle/MakeMaker::Fallback
-      version: '0.022'
-    -
-      class: Dist::Zilla::Plugin::ModuleBuildTiny::Fallback
-      config:
-        Dist::Zilla::Plugin::ModuleBuildTiny::Fallback:
-          mb_version: '0.28'
-          plugins:
-            -
-              class: Dist::Zilla::Plugin::ModuleBuild
-              config:
-                Dist::Zilla::Role::TestRunner:
-                  default_jobs: 1
-              name: 'ModuleBuild, via ModuleBuildTiny::Fallback'
-              version: '6.003'
-            -
-              class: Dist::Zilla::Plugin::ModuleBuildTiny
-              config:
-                Dist::Zilla::Role::TestRunner:
-                  default_jobs: 1
-              name: 'ModuleBuildTiny, via ModuleBuildTiny::Fallback'
-              version: '0.014'
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
-      name: =inc::SubTaskPluginBundle/ModuleBuildTiny::Fallback
-      version: '0.023'
+      name: =inc::SubTaskPluginBundle/MakeMaker
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -471,7 +445,7 @@ x_Dist_Zilla:
           dry_run: 0
           mode: auto
       name: =inc::SubTaskPluginBundle/StaticInstall
-      version: '0.009'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::CheckSelfDependency
       config:
@@ -479,8 +453,8 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000032'
-          version: '0.003'
+          Module::Metadata: '1.000034'
+          version: '0.006'
       name: =inc::SubTaskPluginBundle/CheckSelfDependency
       version: '0.011'
     -
@@ -497,35 +471,38 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: ..
       name: '=inc::SubTaskPluginBundle/initial check'
-      version: '2.038'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
       name: =inc::SubTaskPluginBundle/Git::CheckFor::MergeConflicts
-      version: '0.013'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
       name: =inc::SubTaskPluginBundle/Git::CheckFor::CorrectBranch
-      version: '0.013'
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::Git::Remote::Check
       name: =inc::SubTaskPluginBundle/Git::Remote::Check
-      version: 0.2.0
+      version: 0.1.2
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: =inc::SubTaskPluginBundle/CheckPrereqsIndexed
-      version: '0.018'
+      version: '0.020'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: =inc::SubTaskPluginBundle/TestRelease
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -536,21 +513,22 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: ..
       name: '=inc::SubTaskPluginBundle/after tests'
-      version: '2.038'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::CheckIssues
       name: =inc::SubTaskPluginBundle/CheckIssues
-      version: '0.009'
+      version: '0.010'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: =inc::SubTaskPluginBundle/UploadToCPAN
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::ArchiveRelease
       name: =inc::SubTaskPluginBundle/ArchiveRelease
-      version: '4.26'
+      version: '6.000'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -564,11 +542,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '=inc::SubTaskPluginBundle/release snapshot'
-      version: '2.038'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Clean
       name: =inc::SubTaskPluginBundle/Clean
@@ -580,58 +559,63 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: inc::SubTaskPluginBundle/::Role::BundleDeps
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.003'
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.003'
+      version: '6.012'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: 0
-    version: '6.003'
+      is_trial: '0'
+    version: '6.012'
 x_authority: cpan:PERIGRIN
-x_authority_from_module: Task::Kensho::WebCrawling
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Leo Lapworth <leo@cuckoo.org>'
   - 'Chris Nehren <apeiron@cpan.org>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Dan Book <grinnz@gmail.com>'
+  - 'Rachel Kelly <rkellyalso@gmail.com>'
+  - 'Shawn Sorichetti <shawn@coloredblocks.com>'
   - 'Rick Leir <rleir@leirtech.com>'
-x_permissions_from_module: Task::Kensho::WebCrawling
+x_generated_by_perl: v5.29.5
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1
+x_use_unsafe_inc: 0

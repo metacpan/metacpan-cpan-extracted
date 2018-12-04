@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.028'; # VERSION
+our $VERSION = '0.029'; # VERSION
 
 =head1 NAME
 
@@ -880,6 +880,7 @@ sub merge : method {
     Future->needs_all(
         map $_->completed, @sources
     )->on_ready($combined->completed)
+     ->on_ready(sub { @sources = () })
      ->retain;
     $combined
 }
@@ -1810,7 +1811,8 @@ sub chained {
         return $src;
     } else {
         my $src = $self->new(@_);
-        $log->tracef("Constructing chained source for %s with no parent", $src->label, $self->label);
+        $log->tracef("Constructing chained source for %s with no parent", $src->label);
+        return $src;
     }
 }
 

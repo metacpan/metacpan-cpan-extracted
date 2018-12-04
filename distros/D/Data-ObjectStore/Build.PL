@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
     test_files         => [ 't/object_store.t', ],
     requires => {
         'perl'              => 'v5.16',
-        'Data::RecordStore' => 3.20,
+        'Data::RecordStore' => 4.05,
     },
     );
 

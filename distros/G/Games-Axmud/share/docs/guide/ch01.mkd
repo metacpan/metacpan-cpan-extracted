@@ -8,9 +8,10 @@ Axmud is a modern client for MUDs (Multi-User Dungeons), MUCKs, MOOs, MUSEs, MUS
 
 Axmud’s features include:
 
-* Telnet, SSH and SLL connections
+* Telnet, SSH and SSL connections
 * ANSI, xterm, OSC and RGB colours
 * Full support for all major MUD protocols, including MXP and GMCP (with partial Pueblo support)
+* VT100 emulation
 * Class-based triggers, aliases, macros, timers and hooks
 * A powerful graphical automapper
 * 100 pre-configured worlds

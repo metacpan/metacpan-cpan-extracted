@@ -31,6 +31,18 @@ my $target = $map->{$^O} || $map->{default} ;
             $target , qr!/etc/ssh/userkeys/%u /var/lib/misc/userkeys2/%u! ,
         }
     },
+    {
+        # test that check value is indeed passed when loading Match block
+        # that contain a bad value. The bad value is skipped.
+        name => 'bad-password-authentication',
+        setup => {
+            'system_sshd_config' => $map,
+        },
+        load_check => 'skip',
+        check => {
+            'Match:0 Settings PermitRootLogin' => 'no',
+        }
+    }
 );
 
 1;

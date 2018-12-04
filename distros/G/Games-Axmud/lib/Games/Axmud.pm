@@ -130,7 +130,8 @@
     use warnings;
     use diagnostics;
 
-    our $VERSION = '1.1.273';
+    # (This variable exists for the benefit of Kwalitee, and is never referenced by the code)
+    our $VERSION = '1.1.343';
 
     use Glib qw(TRUE FALSE);
 
@@ -143,13 +144,11 @@
     use Games::Axmud::EditWin;
     use Games::Axmud::FixedWin;
     use Games::Axmud::Generic;
-    use Games::Axmud::Gtk;
     use Games::Axmud::Interface;
     use Games::Axmud::InterfaceModel;
     use Games::Axmud::Mcp;
     use Games::Axmud::ModelObj;
     use Games::Axmud::Mxp;
-    use Games::Axmud::Net;
     use Games::Axmud::Node;
     use Games::Axmud::OtherWin;
     use Games::Axmud::PrefWin;
@@ -165,7 +164,7 @@
     use Games::Axmud::Obj::Area;
     use Games::Axmud::Obj::Atcp;
     use Games::Axmud::Obj::BasicWorld;
-    use Games::Axmud::Obj::BinomialHeap;
+    use Games::Axmud::Obj::Heap;
     use Games::Axmud::Obj::Blinker;
     use Games::Axmud::Obj::ChatContact;
     use Games::Axmud::Obj::ColourScheme;
@@ -180,7 +179,6 @@
     use Games::Axmud::Obj::GaugeLevel;
     use Games::Axmud::Obj::Gmcp;
     use Games::Axmud::Obj::GridColour;
-    use Games::Axmud::Obj::Keycode;
     use Games::Axmud::Obj::Link;
     use Games::Axmud::Obj::Loop;
     use Games::Axmud::Obj::Map;
@@ -197,10 +195,12 @@
     use Games::Axmud::Obj::Repeat;
     use Games::Axmud::Obj::RoomFlag;
     use Games::Axmud::Obj::Route;
+    use Games::Axmud::Obj::Simple;
     use Games::Axmud::Obj::SkillHistory;
     use Games::Axmud::Obj::Sound;
     use Games::Axmud::Obj::Tab;
     use Games::Axmud::Obj::Tablezone;
+    use Games::Axmud::Obj::Telnet;
     use Games::Axmud::Obj::TextView;
     use Games::Axmud::Obj::Toolbar;
     use Games::Axmud::Obj::Tts;
@@ -234,7 +234,7 @@
         #   stored in the object's IVs
         # Given the instance variable to be modified, checks whether modifying this variable is
         #   allowed. (It's up to the Axmud code to refrain from modifying IVs in other Perl objects,
-        #   when those objects have their ->_privFlag set to TRUE.)
+        #   when those objects have their ->_privFlag set to TRUE)
         #
         # Expected arguments
         #   $iv   - The instance variable to be modified
@@ -3591,9 +3591,9 @@
         { $_[0]->{_objClass} }
 
     # The parent GA::Obj::File. Value matches one of the standard file object types (currently
-    #   'config', 'otherprof', 'worldmodel', 'tasks', 'scripts', 'contacts', 'keycodes', 'dicts',
-    #   'toolbar', 'usercmds', 'zonemaps', 'winmaps', 'tts' or, for 'worldprof' file objects, the
-    #   name of the world profile). Very important; used to set parent file object's ->modifyFlag
+    #   'config', 'otherprof', 'worldmodel', 'tasks', 'scripts', 'contacts', 'dicts', 'toolbar',
+    #   'usercmds', 'zonemaps', 'winmaps', 'tts' or, for 'worldprof' file objects, the name of the
+    #   world profile). Very important; used to set parent file object's ->modifyFlag
     sub _parentFile
         { $_[0]->{_parentFile} }
 
@@ -3656,12 +3656,12 @@ MS Windows yet.
 Axmud is a modern Multi-User Dungeon (MUD) client written in Perl 5 / GTK 2.
 Its features include:
 
-Telnet, SSH and SLL connections - ANSI/xterm/OSC/RGB colour - Full support for
+Telnet, SSH and SSL connections - ANSI/xterm/OSC/RGB colour - Full support for
 all major MUD protocols, including MXP and GMCP (with partial Pueblo support) -
-Class-based triggers, aliases, macros, timers and hooks - Graphical automapper
-- 100 pre-configured worlds - Multiple approaches to scripting - Fully
-customisable from top to bottom, using the command line or the extensive GUI
-interface - Native support for visually-impaired users
+VT100 emulation - Class-based triggers, aliases, macros, timers and hooks
+- Graphical automapper - 100 pre-configured worlds - Multiple approaches to
+scripting - Fully customisable from top to bottom, using the command line or the
+extensive GUI interface - Native support for visually-impaired users
 
 =head1 AUTHOR
 

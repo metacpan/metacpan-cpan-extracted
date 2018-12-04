@@ -1,7 +1,7 @@
 package App::rsynccolor;
 
-our $DATE = '2018-02-01'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Add some color to rsync output
@@ -18,7 +18,7 @@ App::rsynccolor - Add some color to rsync output
 
 =head1 VERSION
 
-This document describes version 0.003 of App::rsynccolor (from Perl distribution App-rsynccolor), released on 2018-02-01.
+This document describes version 0.004 of App::rsynccolor (from Perl distribution App-rsynccolor), released on 2018-12-02.
 
 =head1 SYNOPSIS
 

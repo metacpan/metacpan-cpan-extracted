@@ -19,6 +19,8 @@ bud / backupdata              Creates a backup copy of the Axmud data directory
       If you've specified a directory in which backup files should be saved
          (using the ';autobackup' command), the backup file is saved there.
          Otherwise you'll be prompted to choose a directory.
+
+      See also the help for ';setdatadirectory'.
           
    User commands:
       bud / backup / backupdata

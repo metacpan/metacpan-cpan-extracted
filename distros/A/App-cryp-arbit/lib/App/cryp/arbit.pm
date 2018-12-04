@@ -1,7 +1,7 @@
 package App::cryp::arbit;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2018-12-03'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -192,7 +192,7 @@ _
 
 our $db_schema_spec = {
     component_name => 'cryp_arbit',
-    latest_v => 2,
+    latest_v => 3,
     provides => [qw/exchange account balance tx price order_pair/],
     install => [
         # XXX later move to cryp-folio?
@@ -268,11 +268,11 @@ our $db_schema_spec = {
          )',
 
         'CREATE TABLE orderbook_item (
-             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+             id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
              orderbook_id INT NOT NULL, INDEX(orderbook_id),
              amount DECIMAL(21,8) NOT NULL,
              price DECIMAL(21,8) NOT NULL
-         )',
+         ) ENGINE=MyISAM',
 
         'CREATE TABLE order_pair (
              id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -331,6 +331,9 @@ our $db_schema_spec = {
             type VARCHAR(4) NOT NULL, -- "buy" or "sell"
             summary TEXT NOT NULL
         )',
+    ],
+    upgrade_to_v3 => [
+        'ALTER TABLE orderbook_item ENGINE=MyISAM, CHANGE COLUMN id id BIGINT NOT NULL AUTO_INCREMENT',
     ],
     upgrade_to_v2 => [
         # to collect historical orderbook data
@@ -1895,7 +1898,7 @@ App::cryp::arbit - Cryptocurrency arbitrage utility
 
 =head1 VERSION
 
-This document describes version 0.008 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-11-29.
+This document describes version 0.009 of App::cryp::arbit (from Perl distribution App-cryp-arbit), released on 2018-12-03.
 
 =head1 SYNOPSIS
 

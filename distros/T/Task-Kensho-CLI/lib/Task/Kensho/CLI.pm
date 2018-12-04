@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::CLI; # git description: v0.38-47-g1a952c1
+package Task::Kensho::CLI; # git description: v0.39-47-g2896740
 # ABSTRACT: A Glimpse at an Enlightened Perl: Useful Command-line Tools
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::CLI - A Glimpse at an Enlightened Perl: Useful Command-line Tools
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head1 RECOMMENDED MODULES
 
-=for stopwords pastebin
+=for stopwords pastebin yay
 
 =head2 L<Task::Kensho::CLI>: Useful Command-line Tools
 
@@ -78,13 +78,13 @@ A grep-like text finder
 
 Easy access to any pastebin
 
-=head3 L<Devel::REPL>
-
-a modern perl interactive shell
-
 =head3 L<Module::CoreList>
 
 What modules shipped with versions of perl
+
+=head3 L<Reply>
+
+reply - read, eval, print, loop, yay!
 
 =head1 INSTALLING
 
@@ -123,7 +123,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -138,6 +138,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

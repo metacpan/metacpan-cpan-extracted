@@ -4,7 +4,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 # VERSION
 
-version 0.000011
+version 0.000012
 
 # DESCRIPTION
 
@@ -28,6 +28,10 @@ this case.)
 Copy/pasting a `git-grep` result.
 
     ot lib/Foo/Bar.pm:99 # vim +99 Foo/Bar.pm
+
+Copy/pasting a partial GitHub URL.
+
+    ot lib/Foo/Bar.pm#100 # vim +100 Foo/Bar.pm
 
 # FUNCTIONS
 

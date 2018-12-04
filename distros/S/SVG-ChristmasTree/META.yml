@@ -1,0 +1,38 @@
+---
+abstract: 'Perl extension to draw Christmas trees with SVG'
+author:
+  - 'Dave Cross <dave@perlhacks.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Math::Trig: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  POSIX: '0'
+  SVG: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SVG-ChristmasTree
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::Trig: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  POSIX: '0'
+  SVG: '0'
+  namespace::autoclean: '0'
+  perl: '5.010000'
+resources:
+  repository: git://github.com/davorg/svg-christmastree.git
+version: v0.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

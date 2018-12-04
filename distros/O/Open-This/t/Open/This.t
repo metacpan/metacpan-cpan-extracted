@@ -21,6 +21,13 @@ use Test::Differences;
 }
 
 {
+    my $text        = 'lib/Open/This.pm#17';
+    my $line_number = Open::This::_maybe_extract_line_number( \$text );
+    is( $line_number, 17, 'GitHub line_number' );
+    is( $text, 'lib/Open/This.pm', 'GitHub line number stripped' );
+}
+
+{
     my $text        = 'lib/Open/This.pm-17-';
     my $line_number = Open::This::_maybe_extract_line_number( \$text );
     is( $line_number, 17, 'git-grep context line_number' );

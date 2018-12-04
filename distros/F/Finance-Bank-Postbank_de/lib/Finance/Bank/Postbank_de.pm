@@ -16,7 +16,7 @@ use Mozilla::CA;
 
 #use IO::Socket::SSL qw(SSL_VERIFY_PEER SSL_VERIFY_NONE);
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 has 'login' => (
     is => 'ro',
@@ -222,7 +222,7 @@ sub _build_account_numbers {
   my %numbers;
   # this currently includes the credit card numbers ...
   for my $acc ( $bp->get_accounts() ) {
-      $numbers{ $acc->iban } = $acc unless $acc->productType eq 'depot';
+      $numbers{ $acc->iban } = $acc if ($acc->productType ne 'DEPOT' and $acc->productType ne 'BAUFINANZIERUNG');
   };
 
   return $self->_account_numbers( \%numbers );
@@ -304,8 +304,8 @@ Finance::Bank::Postbank_de - Check your Postbank.de bank account from Perl
   require Crypt::SSLeay; # It's a prerequisite
   use Finance::Bank::Postbank_de;
   my $account = Finance::Bank::Postbank_de->new(
-                login => '9999999999',
-                password => '11111',
+                login => 'Petra.Pfiffig',
+                password => '123456789',
                 status => sub { shift;
                                 print join(" ", @_),"\n"
                                   if ($_[0] eq "HTTP Code")

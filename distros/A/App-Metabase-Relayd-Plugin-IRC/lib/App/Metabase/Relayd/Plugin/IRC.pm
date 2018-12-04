@@ -1,5 +1,5 @@
 package App::Metabase::Relayd::Plugin::IRC;
-$App::Metabase::Relayd::Plugin::IRC::VERSION = '0.08';
+$App::Metabase::Relayd::Plugin::IRC::VERSION = '0.10';
 # ABSTRACT: IRC plugin for metabase-relayd
 
 use strict;
@@ -93,7 +93,7 @@ App::Metabase::Relayd::Plugin::IRC - IRC plugin for metabase-relayd
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

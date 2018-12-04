@@ -1,0 +1,81 @@
+NAME
+
+    Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
+
+SYNOPSIS
+
+    use FindBin;
+    use lib "$FindBin::Bin/lib";
+    use Jacode4e::RoundTrip;
+    $return =
+    Jacode4e::RoundTrip::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
+
+RAISON D'ETRE
+
+    This software has been developed for use promotion of JIS X 0213.
+
+    Jacode4e::RoundTrip module can round-trip convert JIS X 0213 characters
+    in Japanese main-frames or enterprise servers each other, using its
+    user-defined area.
+
+    The encodings that can be round-trip converted are cp932x, cp00930,
+    keis78, keis83, keis90, jef, jef9p, jipsj, jipse, utf8, and utf8jp.
+
+    This table shows shortage to support JIS X 0213 in each encoding
+    ---------------------------------------------------------------------
+                          Jacode4e   short-  user-def.  unused    free
+    mnemonic              supported     age       area    area    area
+    ---------------------------------------------------------------------
+    cp932x                   11,285       0         --      --      --
+    cp00930                  11,257      28      1,880      --   1,880
+    keis78, keis83, keis90    8,268   3,017      2,914     188   3,102
+    jef, jef9p                8,814   2,471      3,102      --   3,102
+    jipsj, jipse              8,637   2,648      3,948      --   3,948
+    utf8                     11,220      65      6,400      --      65
+    utf8jp                   11,285       0         --      --      --
+    ---------------------------------------------------------------------
+
+    cp00930 use 28 code points from its user-defined area. Similarly, keis78,
+    keis83, and keis90 use 3,017, jef and jef9p use 2,471, jipsj and jipse
+    use 2,648, utf8 use 65. In case of KEIS, user-defined area is not enough
+    to support JIS X 0213. So I decided to use unused area.
+
+    Yes, you cannot use your gaiji on Jacode4e::RoundTrip module, you see.
+
+    Jacode4e::RoundTrip module doesn't work as Jacode4e. And Jacode4e module
+    doesn't work as Jacode4e::RoundTrip, too.
+
+    This software is useful for processing your JIS X 0213 data by other
+    system, and importing it again into your system.
+
+WHAT IS "CP932X"?
+
+    * "cp932x" as mnemonic
+    * CP932X is CP932
+    * Pronounce [si: pi: nain thri: tu: kai] in English
+    * Pronounce [shi: pi: kju: san' ni kai] in Japanese
+    * [si: pi: nain thri: tu: iks] is reserved for Microsoft Corporation ;-P
+    * CP932 upper compatible
+    * Supports JIS X 0213 character set
+    * Used ghost character "\x9C\x5A" as single shift code
+    * Used "\x9C\x5A\x9C\x5A" for single "\x9C\x5A"
+    * You can use private use characters you made
+    * You can use your operating system, network, and database.
+    * In most cases, application programs can be used as it is.
+
+INSTALLATION
+
+   To test this software, type the following:
+
+   make test
+
+   To install this software, copy 'Jacode4e/RoundTrip.pm' to any directory of @INC.
+
+DEPENDENCIES
+
+    This software requires perl 5.00503 or later.
+
+SEE ALSO
+
+    perl, jcode.pl, jacode.pl, Jacode4e
+

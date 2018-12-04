@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-Model-OpenSsh",
    "prereqs" : {
@@ -31,7 +31,7 @@
          },
          "requires" : {
             "Carp" : "0",
-            "Config::Model" : "2.123",
+            "Config::Model" : "2.128",
             "Config::Model::Backend::Any" : "0",
             "File::Copy" : "0",
             "File::HomeDir" : "0",
@@ -68,8 +68,8 @@
          "web" : "http://github.com/dod38fr/config-model-openssh.git"
       }
    },
-   "version" : "1.239",
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "1.241",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

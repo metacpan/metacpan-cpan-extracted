@@ -3,7 +3,7 @@ package Protocol::DBus;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =encoding utf8
 
@@ -95,10 +95,10 @@ See the distribution’s F<examples/> directory.
 
 =over
 
-=item * Currently EXTERNAL is the only supported authentication mechanism.
+=item * UNIX FD support requires that L<Socket::MsgHdr> be loaded at
+authentication time.
 
-=item * UNIX FD support is “transparent”: send and receive Perl filehandles
-as part of message bodies. :)
+=item * Currently EXTERNAL is the only supported authentication mechanism.
 
 =back
 
@@ -107,6 +107,8 @@ as part of message bodies. :)
 =over
 
 =item * Add conveniences like match rule logic.
+
+=item * Improve parsing of bus paths in environment variables.
 
 =item * Add DBUS_COOKIE_SHA1 authentication.
 

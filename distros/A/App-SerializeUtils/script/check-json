@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-01-29'; # DATE
-our $VERSION = '0.160'; # VERSION
+our $DATE = '2018-11-19'; # DATE
+our $VERSION = '0.161'; # VERSION
 
 use 5.010;
 use strict;
@@ -51,7 +51,7 @@ check-json - Check JSON syntax
 
 =head1 VERSION
 
-This document describes version 0.160 of check-json (from Perl distribution App-SerializeUtils), released on 2018-01-29.
+This document describes version 0.161 of check-json (from Perl distribution App-SerializeUtils), released on 2018-11-19.
 
 =head1 DESCRIPTION
 

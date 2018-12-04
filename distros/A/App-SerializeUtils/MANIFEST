@@ -11,6 +11,7 @@ lib/App/SerializeUtils.pm
 script/check-json
 script/check-phpser
 script/check-yaml
+script/dd2dd
 script/dd2ddc
 script/dd2json
 script/dd2phpser
@@ -19,6 +20,7 @@ script/dd2storable
 script/dd2yaml
 script/json2dd
 script/json2ddc
+script/json2json
 script/json2phpser
 script/json2sereal
 script/json2storable
@@ -51,6 +53,7 @@ script/yaml2json
 script/yaml2phpser
 script/yaml2sereal
 script/yaml2storabls
+script/yaml2yaml
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

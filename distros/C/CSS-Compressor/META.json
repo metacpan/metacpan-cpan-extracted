@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,7 +31,9 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "perl" : "5.010000"
+         }
       }
    },
    "release_status" : "stable",
@@ -46,5 +48,5 @@
          "url" : "https://github.com/sbertrang/css-compressor.git"
       }
    },
-   "version" : "0.03"
+   "version" : "0.05"
 }

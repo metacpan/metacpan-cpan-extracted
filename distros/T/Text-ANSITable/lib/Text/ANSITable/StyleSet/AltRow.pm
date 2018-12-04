@@ -1,7 +1,7 @@
 package Text::ANSITable::StyleSet::AltRow;
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.500'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.501'; # VERSION
 
 use 5.010;
 use Moo;
@@ -56,7 +56,7 @@ Text::ANSITable::StyleSet::AltRow - Set different foreground and/or background c
 
 =head1 VERSION
 
-This document describes version 0.500 of Text::ANSITable::StyleSet::AltRow (from Perl distribution Text-ANSITable), released on 2018-05-31.
+This document describes version 0.501 of Text::ANSITable::StyleSet::AltRow (from Perl distribution Text-ANSITable), released on 2018-12-02.
 
 =for Pod::Coverage ^(summary|apply)$
 

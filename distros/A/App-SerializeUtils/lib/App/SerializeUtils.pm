@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.160'; # VERSION
+our $VERSION = '0.161'; # VERSION
 
 1;
 # ABSTRACT: Utilities for serialization tasks
@@ -21,7 +21,7 @@ App::SerializeUtils - Utilities for serialization tasks
 
 =head1 VERSION
 
-This document describes version 0.160 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2018-01-29.
+This document describes version 0.161 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2018-11-19.
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,8 @@ serialization:
 
 =item * L<check-yaml>
 
+=item * L<dd2dd>
+
 =item * L<dd2ddc>
 
 =item * L<dd2json>
@@ -55,6 +57,8 @@ serialization:
 =item * L<json2dd>
 
 =item * L<json2ddc>
+
+=item * L<json2json>
 
 =item * L<json2phpser>
 
@@ -119,6 +123,8 @@ serialization:
 =item * L<yaml2sereal>
 
 =item * L<yaml2storabls>
+
+=item * L<yaml2yaml>
 
 =back
 

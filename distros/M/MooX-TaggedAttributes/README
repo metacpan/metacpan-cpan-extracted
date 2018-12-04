@@ -1,46 +1,123 @@
-MooX-TaggedAttributes
+MooX::TaggedAttributes
 
-Attach a tag-value pair to an attribute in a Moo class or role, and
-provides a interface to query which attributes have which tags, and
-what the values are.
+This module attaches a tag-value pair to an attribute in a Moo class or
+role, and provides a interface to query which attributes have which
+tags, and what the values are.
+
+  Tagging Attributes
+
+To define a set of tags, create a special *tag role*:
+
+    package T1;
+    use Moo::Role;
+    use MooX::TaggedAttributes -tags => [ 't1' ];
+
+    has a1 => ( is => 'ro', t1 => 'foo' );
+
+If there's only one tag, it can be passed directly without being wrapped
+in an array:
+
+    package T2;
+    use Moo::Role;
+    use MooX::TaggedAttributes -tags => 't2';
+
+    has a2 => ( is => 'ro', t2 => 'bar' );
+
+A tag role is a standard Moo::Role with added machinery to track
+attribute tags. As shown, attributes may be tagged in the tag role as
+well as in modules which consume it.
+
+Tag roles may be consumed just as ordinary roles, but in order for role
+consumers to have the ability to assign tags to attributes, they need to
+be consumed with the Perl use statement, not with the with statement.
+
+Consuming with the with statement *will* propagate attributes with
+existing tags, but won't provide the ability to tag new attributes.
+
+This is correct:
+
+    package R2;
+    use Moo::Role;
+    use T1;
+
+    has r2 => ( is => 'ro', t1 => 'foo' );
+
+    package R3;
+    use Moo::Role;
+    use R3;
+
+    has r3 => ( is => 'ro', t1 => 'foo' );
+
+The same goes for classes:
+
+    package C2;
+    use Moo;
+    use T1;
+
+    has c2 => ( is => 'ro', t1 => 'foo' );
+
+Combining tag roles is as simple as use'ing them in the new role:
+
+    package T12;
+    use T1;
+    use T2;
+
+    package C2;
+    use Moo;
+    use T12;
+
+    has c2 => ( is => 'ro', t1 => 'foo', t2 => 'bar' );
+
+  Accessing tags
+
+Classes and objects are provided a _tags method which returns a hash of
+hashes keyed off of the tags and attribute names. For example, for the
+following code:
+
+    package T;
+    use Moo::Role;
+    use MooX::TaggedAttributes -tags => [ qw( t1 t2 ) ];
+
+    package C;
+    use Moo;
+    use T;
+
+    has a => ( is => 'ro', t1 => 2 );
+    has b => ( is => 'ro', t2 => 'foo' );
+
+The tag structure returned by either of the following
+
+    C->_tags
+    C->new->_tags
+
+looks like
+
+    { t1 => { a => 2 },
+      t2 => { b => 'foo' },
+    }
 
 INSTALLATION
 
-To install this module, run the following commands:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-SUPPORT AND DOCUMENTATION
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
 
-After installing, you can find documentation for this module with the
-perldoc command.
+COPYRIGHT AND LICENSE
 
-    perldoc MooX::TaggedAttributes
+This software is Copyright (c) 2018 by Smithsonian Astrophysical
+Observatory.
 
+This is free software, licensed under:
 
-COPYRIGHT AND LICENCE
-
---8<--8<--8<--8<--
-
-This file is part of MooX-TaggedAttributes
-
-Copyright (c) 2015 The Smithsonian Astrophysical Observatory
-
-MooX-TaggedAttributes is free software: you can redistribute it and/or
-modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->8-->8-->8-->8--
+  The GNU General Public License, Version 3, June 2007

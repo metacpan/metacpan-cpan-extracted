@@ -39,7 +39,7 @@ sub new { shift->SUPER::new(handle => shift) }
 
 sub _cleanup {
   my $self = shift;
-  return unless my $reactor = $self->reactor;
+  return undef unless my $reactor = $self->reactor;
   $reactor->remove($self->{handle}) if $self->{handle};
   return $self;
 }
@@ -53,7 +53,7 @@ sub _expand {
     SSL_startHandshake => 0
   };
   $tls->{SSL_alpn_protocols} = $args->{tls_protocols} if $args->{tls_protocols};
-  $tls->{SSL_ca_file} = $args->{tls_ca}
+  $tls->{SSL_ca_file}        = $args->{tls_ca}
     if $args->{tls_ca} && -T $args->{tls_ca};
   $tls->{SSL_cert_file}   = $args->{tls_cert}    if $args->{tls_cert};
   $tls->{SSL_cipher_list} = $args->{tls_ciphers} if $args->{tls_ciphers};
@@ -78,13 +78,14 @@ sub _expand {
 sub _tls {
   my ($self, $handle, $server) = @_;
 
-  return $self->_cleanup->emit(upgrade => delete $self->{handle})
-    if $server ? $handle->accept_SSL : $handle->connect_SSL;
-
   # Switch between reading and writing
-  my $err = $IO::Socket::SSL::SSL_ERROR;
-  if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
-  elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
+  if (!($server ? $handle->accept_SSL : $handle->connect_SSL)) {
+    my $err = $IO::Socket::SSL::SSL_ERROR;
+    if    ($err == READ)  { $self->reactor->watch($handle, 1, 0) }
+    elsif ($err == WRITE) { $self->reactor->watch($handle, 1, 1) }
+  }
+
+  else { $self->_cleanup->emit(upgrade => delete $self->{handle}) }
 }
 
 1;

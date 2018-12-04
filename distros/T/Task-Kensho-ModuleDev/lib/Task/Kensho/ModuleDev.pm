@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::ModuleDev; # git description: v0.38-56-g51d2c81
+package Task::Kensho::ModuleDev; # git description: v0.39-56-ge61f07a
 # ABSTRACT: A Glimpse at an Enlightened Perl: Module Development
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::ModuleDev - A Glimpse at an Enlightened Perl: Module Development
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -66,13 +66,17 @@ facilitates the ease and simplicity the distribution aims to achieve.
 
 =head1 RECOMMENDED MODULES
 
-=for stopwords profiler templated
+=for stopwords profiler templated tidyall validator
 
 =head2 L<Task::Kensho::ModuleDev>: Module Development
 
 =head3 L<CPAN::Uploader>
 
 Upload things to the CPAN
+
+=head3 L<Code::TidyAll>
+
+Engine for tidyall, your all-in-one code tidier and validator
 
 =head3 L<Data::Printer>
 
@@ -109,10 +113,6 @@ Critique Perl source code for best-practices.
 =head3 L<Perl::Tidy>
 
 Parses and beautifies perl source
-
-=head3 L<Perl::Version>
-
-Parse and manipulate Perl version strings
 
 =head3 L<Pod::Readme>
 
@@ -159,7 +159,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -174,6 +174,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

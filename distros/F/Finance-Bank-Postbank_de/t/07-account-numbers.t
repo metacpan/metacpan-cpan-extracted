@@ -3,7 +3,7 @@ use strict;
 use File::Spec;
 use FindBin;
 
-use vars qw(@related_accounts);
+our @related_accounts;
 BEGIN {
   @related_accounts = qw( 
       DE18201100221234567895

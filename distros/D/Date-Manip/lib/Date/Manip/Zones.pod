@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed May 30 14:52:52 EDT 2018
-#    Data version: tzdata2018e
-#    Code version: tzcode2018e
+#    Generated on: Fri Nov 30 14:33:51 EST 2018
+#    Data version: tzdata2018g
+#    Code version: tzcode2018g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -923,6 +923,7 @@ default alias can be overridden as described above.
                                           America/Nome
      NZST-12NZDT                          Pacific/Auckland
      PKT-5PKST                            Asia/Karachi
+     PST-8PDT                             Asia/Manila
      PST8PDT                              America/Los_Angeles
                                           America/Vancouver
                                           America/Tijuana
@@ -946,8 +947,6 @@ default alias can be overridden as described above.
      WET-1WEST                            Europe/Luxembourg
      WET0WEST                             WET
                                           Europe/Lisbon
-                                          Africa/Casablanca
-                                          Africa/El_Aaiun
                                           Atlantic/Madeira
                                           Atlantic/Canary
                                           Atlantic/Faroe
@@ -1611,16 +1610,16 @@ L<Date::Manip::TZ> module.
                         Atlantic/Faroe
                         Europe/Lisbon
                         Africa/Abidjan
-                        Africa/Casablanca
                         Africa/Accra
                         Atlantic/Canary
                         Atlantic/Madeira
                         Atlantic/Reykjavik
                         Africa/Monrovia
                         Africa/Bissau
-                        Africa/El_Aaiun
                         America/Danmarkshavn
                         Africa/Sao_Tome
+                        Africa/Casablanca
+                        Africa/El_Aaiun
                         Etc/GMT
                         UT
                         UTC
@@ -1705,7 +1704,9 @@ L<Date::Manip::TZ> module.
                         Europe/Andorra
                         Europe/Gibraltar
                         Europe/Dublin
+                        Africa/Casablanca
                         Africa/Ceuta
+                        Africa/El_Aaiun
                         Africa/Sao_Tome
                         Etc/GMT+1
                         N
@@ -1713,7 +1714,6 @@ L<Date::Manip::TZ> module.
                         Europe/Vilnius
                         Europe/Lisbon
                         Europe/Uzhgorod
-                        Africa/Casablanca
                         Europe/London
                         Europe/Sofia
                         Europe/Kaliningrad
@@ -1823,7 +1823,6 @@ L<Date::Manip::TZ> module.
      0      +03:00:00   Asia/Baghdad
                         Europe/Kirov
                         Europe/Moscow
-                        Europe/Volgograd
                         Africa/Nairobi
                         Europe/Minsk
                         Europe/Simferopol
@@ -1831,6 +1830,7 @@ L<Date::Manip::TZ> module.
                         Asia/Qatar
                         Europe/Istanbul
                         Africa/Juba
+                        Europe/Volgograd
                         Etc/GMT+3
                         P
                         Antarctica/Syowa
@@ -1881,13 +1881,13 @@ L<Date::Manip::TZ> module.
                         Europe/Samara
                         Europe/Saratov
                         Europe/Ulyanovsk
+                        Europe/Volgograd
                         Asia/Baku
                         Asia/Tbilisi
                         Asia/Yerevan
                         Etc/GMT+4
                         Q
                         Europe/Kirov
-                        Europe/Volgograd
                         Europe/Moscow
                         Europe/Simferopol
                         Asia/Aqtau
@@ -2033,7 +2033,7 @@ L<Date::Manip::TZ> module.
                         Asia/Brunei
                         Asia/Kuching
      0      +07:33:52   Asia/Chita
-     0      +07:34:20   Asia/Macau
+     0      +07:34:10   Asia/Macau
      0      +07:36:42   Asia/Hong_Kong
      0      +07:38:00   Asia/Choibalsan
      0      +07:39:40   Asia/Brunei
@@ -2097,6 +2097,7 @@ L<Date::Manip::TZ> module.
                         Asia/Sakhalin
                         Asia/Taipei
                         Asia/Hong_Kong
+                        Asia/Macau
                         Asia/Jakarta
                         Asia/Kuala_Lumpur
                         Asia/Kuching
@@ -2446,11 +2447,11 @@ L<Date::Manip::TZ> module.
      1      +01:00:00   WET
                         Europe/Lisbon
                         Europe/London
-                        Africa/Casablanca
                         Atlantic/Madeira
-                        Africa/El_Aaiun
                         Atlantic/Canary
                         Atlantic/Faroe
+                        Africa/Casablanca
+                        Africa/El_Aaiun
                         Africa/Windhoek
                         Africa/Algiers
                         Africa/Ceuta
@@ -2633,8 +2634,8 @@ L<Date::Manip::TZ> module.
                         Asia/Chita
                         Asia/Khandyga
                         Asia/Yakutsk
-                        Asia/Macau
                         Asia/Hong_Kong
+                        Asia/Macau
                         Asia/Taipei
                         Asia/Manila
      1      +09:30:00   Asia/Seoul
@@ -2646,6 +2647,7 @@ L<Date::Manip::TZ> module.
                         Asia/Vladivostok
                         Asia/Seoul
                         Asia/Tokyo
+                        Asia/Macau
      1      +10:30:00   Australia/Adelaide
                         Australia/Broken_Hill
                         Australia/Darwin
@@ -2936,7 +2938,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Vilnius
                       Europe/Lisbon
                       Europe/Uzhgorod
-                      Africa/Casablanca
                       Europe/Kaliningrad
                       Europe/Sofia
                       Europe/Tallinn
@@ -3224,8 +3225,10 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Helsinki
                       Atlantic/Azores
                       Asia/Kolkata
+     HPT              Pacific/Honolulu
      HST              Pacific/Honolulu
                       America/Adak
+     HWT              Pacific/Honolulu
      I                I
      IDDT             Asia/Jerusalem
      IDT              Asia/Jerusalem
@@ -3246,6 +3249,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Asia/Seoul
                       Asia/Taipei
                       Asia/Hong_Kong
+                      Asia/Manila
      K                K
      KDT              Asia/Seoul
      KMT              Europe/Kiev
@@ -3386,6 +3390,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Juneau
                       America/Metlakatla
                       America/Sitka
+                      Asia/Manila
                       America/Dawson_Creek
                       America/Boise
      PKST             Asia/Karachi
@@ -3412,6 +3417,7 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Vancouver
      PST              America/Los_Angeles
                       America/Vancouver
+                      Asia/Manila
                       America/Tijuana
                       America/Whitehorse
                       America/Dawson
@@ -3473,8 +3479,6 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Europe/Madrid
      WEST             WET
                       Europe/Lisbon
-                      Africa/Casablanca
-                      Africa/El_Aaiun
                       Atlantic/Madeira
                       Atlantic/Canary
                       Atlantic/Faroe
@@ -3488,10 +3492,8 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      WET              WET
                       Atlantic/Faroe
                       Europe/Lisbon
-                      Africa/Casablanca
                       Atlantic/Canary
                       Atlantic/Madeira
-                      Africa/El_Aaiun
                       Atlantic/Azores
                       Africa/Ceuta
                       Africa/Algiers

@@ -3,7 +3,7 @@ Locale::Codes::Language_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Fri Aug 31 12:16:03 EDT 2018
+#    Generated on: Mon Dec  3 12:38:30 EST 2018
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.58';
+$VERSION='3.59';
 
 $Locale::Codes::Retired{'language'}{'alpha-2'}{'code'} = {
    q(in) => q(Indonesian),
@@ -228,6 +228,13 @@ $Locale::Codes::Retired{'language'}{'alpha-2'}{'name'} = {
 
 $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(!o!ung) => [ q(oun), q(!O!ung) ],
+   q(!xoo) => [ q(nmn), q(!Xoo) ],
+   q(//ani) => [ q(hnh), q(//Ani) ],
+   q(//gana) => [ q(gnq), q(//Gana) ],
+   q(//xegwi) => [ q(xeg), q(//Xegwi) ],
+   q(/gwi) => [ q(gwj), q(/Gwi) ],
+   q(/xam) => [ q(xam), q(/Xam) ],
+   q(=/hua) => [ q(huc), q(=/Hua) ],
    q(=/kx'au//'ein) => [ q(aue), q(=/Kx'au//'ein) ],
    q(a'tong) => [ q(aot), q(A'tong) ],
    q(adap) => [ q(adp), q(Adap) ],
@@ -315,6 +322,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(greek, ancient (to 1453)) => [ q(grc), q(Greek, Ancient (to 1453)) ],
    q(gusan) => [ q(gsn), q(Gusan) ],
    q(guwinmal) => [ q(xgm), q(Guwinmal) ],
+   q(hai//om) => [ q(hgm), q(Hai//om) ],
    q(hainyaxo bozo) => [ q(bzx), q(Hainyaxo Bozo) ],
    q(haka chin) => [ q(cnh), q(Haka Chin) ],
    q(hawai'i pidgin sign language) => [ q(hps), q(Hawai'i Pidgin Sign Language) ],
@@ -333,6 +341,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(izi-ezaa-ikwo-mgbo) => [ q(izi), q(Izi-Ezaa-Ikwo-Mgbo) ],
    q(jarawa (nigeria)) => [ q(jar), q(Jarawa (Nigeria)) ],
    q(jeng) => [ q(jeg), q(Jeng) ],
+   q(ju/'hoan) => [ q(ktz), q(Ju/'hoan) ],
    q(kabixi) => [ q(xbx), q(Kabixi) ],
    q(kachchi) => [ q(kfr), q(Kachchi) ],
    q(kadara) => [ q(kad), q(Kadara) ],
@@ -402,6 +411,7 @@ $Locale::Codes::Retired{'language'}{'alpha-3'}{'name'} = {
    q(mro chin) => [ q(cmr), q(Mro Chin) ],
    q(mudbura) => [ q(mwd), q(Mudbura) ],
    q(muduapa) => [ q(wiv), q(Muduapa) ],
+   q(n/u) => [ q(ngh), q(N/u) ],
    q(nakama) => [ q(nib), q(Nakama) ],
    q(nama (namibia)) => [ q(naq), q(Nama (Namibia)) ],
    q(nanggu) => [ q(ngr), q(Nanggu) ],

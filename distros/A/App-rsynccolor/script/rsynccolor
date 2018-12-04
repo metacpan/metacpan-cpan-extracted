@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-02-01'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,7 +24,13 @@ sub run {
         join(" ", map { ShellQuote::Any::Tiny::shell_quote($_) } @ARGV);
     open my $rsync, "$cmd |" or die "rsynccolor: Can't run rsync: $!\n";
 
-    my $use_color = $ENV{COLOR} // (-t STDOUT);
+    my $use_color = do {
+        if (exists $ENV{NO_COLOR}) {
+            0;
+        } else {
+            $ENV{COLOR} // (-t STDOUT);
+        }
+    };
 
     $|++;
 
@@ -67,7 +73,7 @@ rsynccolor - Add some color to rsync output
 
 =head1 VERSION
 
-This document describes version 0.003 of rsynccolor (from Perl distribution App-rsynccolor), released on 2018-02-01.
+This document describes version 0.004 of rsynccolor (from Perl distribution App-rsynccolor), released on 2018-12-02.
 
 =head1 SYNOPSIS
 
@@ -89,6 +95,11 @@ to rsync output, currently:
 will be highlighted in red to be more visually striking.
 
 =head1 ENVIRONMENT
+
+=head2 NO_COLOR
+
+Force setting color off. Takes precedence over C<COLOR>. See
+L<https://no-color.org>.
 
 =head2 COLOR => bool
 

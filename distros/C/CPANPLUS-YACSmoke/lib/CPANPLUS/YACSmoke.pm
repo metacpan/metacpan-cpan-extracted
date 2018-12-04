@@ -1,5 +1,5 @@
 package CPANPLUS::YACSmoke;
-$CPANPLUS::YACSmoke::VERSION = '1.02';
+$CPANPLUS::YACSmoke::VERSION = '1.04';
 # Dist::Zilla: +PodWeaver
 #ABSTRACT: Yet Another CPANPLUS Smoke Tester
 
@@ -96,6 +96,7 @@ sub new {
 
   my $exclude_dists;
   my $exclude_auths;
+  my $local_lib;
   my $config_file = catfile( $conf->get_conf('base'), CONFIG_FILE );
   if ( -r $config_file ) {
      my $cfg = CPANPLUS::YACSmoke::IniFiles->new(-file => $config_file);
@@ -113,6 +114,7 @@ sub new {
           $exclude_auths->add( @list );
        }
      }
+     $local_lib = $cfg->val( 'CONFIG', 'local::lib' );
   }
 
   my $self = bless { @_ }, $package;
@@ -121,6 +123,7 @@ sub new {
   $self->{exclude_dists} = $exclude_dists;
   $self->{exclude_auths} = $exclude_auths;
   $self->{allow_retries} = 'aborted|ungraded';
+  $self->{local_lib}     = $local_lib;
   return $self;
 }
 
@@ -155,19 +158,36 @@ sub test {
 
   $self->_disconnect_db();
 
+  my $target = 'create';
+
+  if ( $self->{local_lib} ) {
+     $self->_setup_local_lib();
+     $self->{conf}->_perl5lib( $ENV{PERL5LIB} );
+     $target = 'install';
+     msg("Setup local::lib environment in '$ENV{PERL_LOCAL_LIB_ROOT}'");
+  }
+
   foreach my $mod ( @mods ) {
      eval {
 		CPANPLUS::Error->flush();
 		my $stat = $self->{cpanplus}->install(
 				modules  => [ $mod ],
-				target   => 'create',
+				target   => $target,
 				allow_build_interactively => 0,
 				# other settings now set via set_config() method
 		);
      };
   }
 
-  $self->{cpanplus}->save_state();
+  if ( $self->{local_lib} ) {
+    my $build_dir = $self->_get_build_dir();
+    msg("Flushing '$build_dir'");
+    rmtree($build_dir) if -e $build_dir;
+    msg("Flushed '$build_dir'");
+  }
+
+  $self->{cpanplus}->save_state() if !$self->{local_lib};
+
   return 1;
 }
 
@@ -434,6 +454,18 @@ sub _get_build_dir {
   );
 }
 
+sub _setup_local_lib {
+  my $self = shift;
+  return if !$self->{local_lib};
+  require Cwd;
+  require File::Temp;
+  require CPANPLUS::YACSmoke::locallib;
+  my $tmpdir = File::Temp::tempdir( DIR => '.', CLEANUP => 1 );
+  my $abs = Cwd::abs_path($tmpdir);
+  CPANPLUS::YACSmoke::locallib->ensure_dir_structure_for( $abs, { quiet => 1 } );
+  CPANPLUS::YACSmoke::locallib->setup_env_hash_for( $abs );
+}
+
 }
 
 'Yakkity Yac';
@@ -450,7 +482,7 @@ CPANPLUS::YACSmoke - Yet Another CPANPLUS Smoke Tester
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -500,6 +532,17 @@ a particular CPAN author ID.
 
 The above would ignore all distributions of any CPAN author ID that
 begins with C<ASS>, such as C<ASSAM> and C<ASSONIA>.
+
+Experimental support for L<local::lib> type environment has been added.
+In the C<ini> file specify the C<local::lib> setting to enable this feature.
+
+  [CONFIG]
+  local::lib = 1
+
+Setting this will make CPANPLUS::YACSmoke setup a L<local::lib> under the
+current working directory before testing starts. All modules tested (and prereqs
+resolved during testing) will be installed into the L<local::lib>. When testing
+finishes, the L<local::lib> will be removed.
 
 See L<Config::IniFiles> for more information on the INI file format.
 
@@ -672,7 +715,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams, Jos Boumans, Robert Rothenberg and Barbie.
+This software is copyright (c) 2018 by Chris Williams, Jos Boumans, Robert Rothenberg and Barbie.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

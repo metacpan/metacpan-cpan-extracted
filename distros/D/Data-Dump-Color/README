@@ -2,8 +2,8 @@ NAME
     Data::Dump::Color - Like Data::Dump, but with color
 
 VERSION
-    This document describes version 0.240 of Data::Dump::Color (from Perl
-    distribution Data-Dump-Color), released on 2018-01-17.
+    This document describes version 0.241 of Data::Dump::Color (from Perl
+    distribution Data-Dump-Color), released on 2018-12-02.
 
 SYNOPSIS
     Use it like you would Data::Dump, e.g.:
@@ -98,6 +98,11 @@ FAQ
     SHARYANTO::Role::ColorTheme.
 
 ENVIRONMENT
+    *   NO_COLOR
+
+        Can be used to disable color. Takes precedence over the "COLOR"
+        environment. See <https://no-color.org> for more details.
+
     *   COLOR
 
         If set, then will force color output on or off. By default, will

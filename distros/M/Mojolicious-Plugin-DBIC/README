@@ -1,0 +1,73 @@
+Mojolicious::Plugin::DBIC
+
+This plugin makes working with DBIx::Class easier in Mojolicious.
+
+  Configuration
+
+Configure your schema in multiple ways:
+
+    # Just DSN
+    plugin DBIC => {
+        schema => {
+            'MySchema' => 'DSN',
+        },
+    };
+
+    # Arguments to connect()
+    plugin DBIC => {
+        schema => {
+            'MySchema' => [ 'DSN', 'user', 'password', { RaiseError => 1 } ],
+        },
+    };
+
+    # Connected schema object
+    my $schema = MySchema->connect( ... );
+    plugin DBIC => {
+        schema => $schema,
+    };
+
+This plugin can also be configured from the application configuration
+file:
+
+    # myapp.conf
+    {
+        dbic => {
+            schema => {
+                'MySchema' => 'dbi:SQLite:data.db',
+            },
+        },
+    }
+
+    # myapp.pl
+    use Mojolicious::Lite;
+    plugin 'Config';
+    plugin 'DBIC';
+
+  Controller
+
+This plugin contains a controller to reduce the code needed for simple
+database operations. See Mojolicious::Plugin::DBIC::Controller::DBIC.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

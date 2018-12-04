@@ -1,5 +1,13 @@
 Changes for Data::Turtle:
 
+0.0200 2018-12-01
+    - Drop the unnecessary turn() method.
+
+0.0107 2018-12-01
+    - Improve eg/lindenmayer-gd a bit more.
+    - Drop redundant NAME section.
+    - Update the SEE ALSO section.
+
 0.0106 2018-03-18
     - Improve documentation.
     - Follow perlcritic and fix my conditional returns.

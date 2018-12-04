@@ -3,8 +3,8 @@ NAME
     ANSI colors
 
 VERSION
-    This document describes version 0.500 of Text::ANSITable (from Perl
-    distribution Text-ANSITable), released on 2018-05-31.
+    This document describes version 0.501 of Text::ANSITable (from Perl
+    distribution Text-ANSITable), released on 2018-12-02.
 
 SYNOPSIS
      use 5.010;
@@ -465,10 +465,11 @@ ATTRIBUTES
     columns and when width is explicitly set to a positive value.
 
   use_color => BOOL
-    Whether to output color. Default is taken from "COLOR" environment
-    variable, or detected via "(-t STDOUT)". If "use_color" is set to 0, an
-    attempt to use a colored color theme (i.e. anything that is not the
-    "no_color" theme) will result in an exception.
+    Whether to output color. Default is taken from "NO_COLOR" environment
+    variable, "COLOR" environment variable, or detected via "(-t STDOUT)".
+    If "use_color" is set to 0, an attempt to use a colored color theme
+    (i.e. anything that is not the "no_color" theme) will result in an
+    exception.
 
     (In the future, setting "use_color" to 0 might opt the module to use
     normal/plain string routines instead of the slower ta_* functions from

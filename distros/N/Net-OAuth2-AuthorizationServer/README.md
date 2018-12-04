@@ -11,7 +11,7 @@ Authorization Server
 
 # VERSION
 
-0.18
+0.19
 
 # SYNOPSIS
 
@@ -77,6 +77,8 @@ Pierre VIGIER - `pierre.vigier@gmail.com`
 Ian Sillitoe - [https://github.com/sillitoe](https://github.com/sillitoe)
 
 Mirko Tietgen - [mirko@abunchofthings.net](https://metacpan.org/pod/mirko@abunchofthings.net)
+
+Dylan William Hardison - [dylan@hardison.net](https://metacpan.org/pod/dylan@hardison.net)
 
 # LICENSE
 

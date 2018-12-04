@@ -35,7 +35,6 @@
             "Call::Context" : "0",
             "IO::Framed" : "0",
             "Module::Load" : "0",
-            "Socket::MsgHdr" : "0",
             "X::Tiny" : "0",
             "parent" : "0",
             "perl" : "5.01"
@@ -62,5 +61,5 @@
          "web" : "https://github.com/FGasper/p5-Protocol-DBus"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06"
 }

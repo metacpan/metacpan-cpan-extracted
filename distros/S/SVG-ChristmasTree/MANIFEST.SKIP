@@ -1,0 +1,9 @@
+.*\.svg
+blib/*
+SVG-ChristmasTree-*
+.git/
+.gitignore
+.*\.bak
+Makefile$
+MYMETA\.*
+.travis.yml

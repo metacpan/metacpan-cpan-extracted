@@ -1,5 +1,5 @@
 #!perl
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -18,7 +18,7 @@
 # are detected.  These tests are for problems which are supposed
 # to abend.
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
@@ -128,7 +128,7 @@ my $counted_nullable_grammar = {
 test_grammar(
     'counted nullable',
     $counted_nullable_grammar,
-    qq{Nullable symbol "Seq" is on rhs of counted rule\n}
+    qq{Nullable symbol "Seq" is on RHS of counted rule\n}
         . qq{Counted nullables confuse Marpa -- please rewrite the grammar\n}
 );
 

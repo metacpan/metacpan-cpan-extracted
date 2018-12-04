@@ -244,6 +244,7 @@ $Data{'country'}{'un'}{'orig'}{'name'} = {
    "Lao People&#39;s Democratic Republic"    => "Lao People's Democratic Republic",
    "R&#233;union"                            => "Reunion",
    "Saint Barth&#233;lemy"                   => "Saint Barthelemy",
+   "C&#244;te d’Ivoire"                  => "Cote d'Ivoire",
 };
 
 $Data{'country'}{'un'}{'new'} = {

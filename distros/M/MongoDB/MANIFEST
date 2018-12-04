@@ -233,6 +233,8 @@ t/data/SDAM/rs/non_rs_member.json
 t/data/SDAM/rs/non_rs_member.yml
 t/data/SDAM/rs/normalize_case.json
 t/data/SDAM/rs/normalize_case.yml
+t/data/SDAM/rs/normalize_case_me.json
+t/data/SDAM/rs/normalize_case_me.yml
 t/data/SDAM/rs/null_election_id.json
 t/data/SDAM/rs/null_election_id.yml
 t/data/SDAM/rs/primary_becomes_standalone.json
@@ -718,6 +720,7 @@ t/threads/basic.t
 t/threads/bson.t
 t/threads/cursor.t
 t/threads/oid.t
+t/threads/sessions.t
 t/transactions-spec.t
 t/unit/configuration.t
 t/unit/link.t

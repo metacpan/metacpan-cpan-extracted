@@ -6,9 +6,6 @@ use autodie;
 
 use Socket;
 
-# bug in this module: it breaks when loaded dynamically
-use Socket::MsgHdr;
-
 use Data::Dumper;
 
 use FindBin;

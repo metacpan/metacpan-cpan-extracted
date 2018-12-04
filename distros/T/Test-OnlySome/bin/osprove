@@ -1,0 +1,54 @@
+#!perl
+
+# Doc {{{1
+
+=head1 NAME
+
+osprove - Run prove with -PTest::OnlySomeP
+
+=head1 SYNOPSIS
+
+    osprove ...     # Run prove with args ... and with -PTest::OnlySomeP
+    osprove --onlysome foo ...  # OnlySomeP output to file "foo"
+
+NOTE: run C<prove --help> to see help on the C<...> in those examples.
+
+See L<Test::OnlySome> for full documentation.
+
+=cut
+
+# The note about "prove --help" is because the help option in App::Prove uses
+# pod2usage, which reads the POD from the invoking script ($0; see
+# https://metacpan.org/pod/Pod::Usage#DESCRIPTION and
+# https://metacpan.org/source/MAREKR/Pod-Usage-1.69/lib/Pod/Usage.pm#L95 .
+# Therefore, "osprove --help" actually reads the POD above!
+
+# }}}1
+
+use App::Prove;
+use Getopt::Long 2.5 qw(:config gnu_getopt pass_through);
+
+our $VERSION = '0.000007';
+
+# Accept --onlysome <filename>
+my %args;
+GetOptions(\%args, "onlysome=s") or
+    die "I'm sorry, Dave.  I'm afraid I don't understand that right now.";
+
+# Sanity check, since Getopt::Long passes through switches not supplied
+# with a required argument.
+die "--onlysome requires a filename" if grep /^--onlysome$/, @ARGV;
+
+# Make the plugin's parameter string
+my $param = '';
+$param = '=filename,' . $args{onlysome} if $args{onlysome};
+
+# Run prove
+my $app = App::Prove->new;
+$app->process_args(
+    '-PTest::OnlySomeP' . $param,   # Load our plugin
+    @ARGV                           # Everything else goes to App::Prove
+);
+exit( $app->run ? 0 : 1 );
+
+# vi: set ft=perl fdm=marker fdl=0:

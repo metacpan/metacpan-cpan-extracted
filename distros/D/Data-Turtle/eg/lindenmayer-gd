@@ -6,48 +6,96 @@ use warnings;
 
 use Data::Turtle;
 use GD;
+use Getopt::Long;
 
-my $repeat   = shift || 6;
-my $start    = shift || 'X';
-my $distance = shift || 3;
-my $theta    = shift || 25;
-my $center   = shift || 0;
-my $width    = shift || 500;
-my $height   = shift || 500;
+my %opts = (
+    rule     => 3,
+    repeat   => 6,
+    distance => 3,
+    theta    => 25,
+    center   => 0,
+    width    => 500,
+    height   => 500,
+);
+GetOptions( \%opts,
+    'rule=i',
+    'repeat=i',
+    'distance=i',
+    'theta=i',
+    'center',
+    'width=i',
+    'height=i',
+) or die "Can't get options";
 
 my %rule = (
-    # Branches: start=X, distance=20, theta=20
-#    X => 'YF[-X][+X]',
-#    Y => 'F',
-
-    # Koch curve: start=F, distance=10, theta=90
-#    F => 'F+F-F-F+F',
-
-    # Fractal plant: start=X, distance=3, theta=25
-    X => 'F[-X][X]F[-X]+FX',
-    F => 'FF',
-
-    # Dragon curve: start=FX, distance=10, theta=90
-#    X => 'X+YF+',
-#    Y => '-FX-Y',
-
-    # Sierpiński arrowhead curve: start=F, distance=1, theta=60
-#    F => 'G-F-G',
-#    G => 'F+G+F',
-
-    # Sierpiński triangle: start=F-G-G, distance=4, theta=120
-#    F => 'F-G+F+G-F',
-#    G => 'GG',
+    1 => { # Branches: distance=20, theta=20
+        axiom => 'X',
+        X => 'YF[-X][+X]',
+        Y => 'F',
+    },
+    2 => { # Koch curve: distance=10, theta=90
+        axiom => 'F',
+        F => 'F+F-F-F+F',
+    },
+    3 => { # Fractal plant: distance=3, theta=25
+        axiom => 'X',
+        X => 'F[-X][X]F[-X]+FX',
+        F => 'FF',
+    },
+    4 => { # Dragon curve: distance=10, theta=90
+        axiom => 'FX',
+        X => 'X+YF+',
+        Y => '-FX-Y',
+    },
+    5 => { # Sierpiński arrowhead curve: distance=1, theta=60
+        axiom => 'F',
+        F => 'G-F-G',
+        G => 'F+G+F',
+    },
+    6 => { # Sierpiński triangle: distance=4, theta=120
+        axiom => 'F-G-G',
+        F => 'F-G+F+G-F',
+        G => 'GG',
+    },
+    7 => { # Koch snowflake: distance=3, theta=60
+        axiom => 'F++F++F',
+        F => 'F-F++F-F',
+        X => 'FF',
+    },
+    8 => { # Sierpiński carpet: distance=4, theta=90
+        axiom => 'F',
+        F => 'F+F-F-F-G+F+F+F-F',
+        G => 'GGG',
+    },
+    9 => { # Koch island: distance=5, theta=90
+        axiom => 'F-F-F-F',
+        F => 'F-F+F+FF-F-F+F',
+    },
+    10 => { # Koch islands and lakes: distance=5, theta=90
+        axiom => 'F+F+F+F',
+        F => 'F+f-FF+F+FF+Ff+FF-f+FF-F-FF-Ff-FFF',
+        f => 'ffffff',
+    },
+    11 => { # Grid: distance=5, theta=90
+        axiom => 'F-F-F-F',
+        F => 'FF-F-F-F-FF',
+    },
+    12 => { # Terndrils: distance=5, theta=90
+        axiom => 'F-F-F-F',
+        F => 'FF-F--F-F',
+    },
 );
+
+my $string = $rule{ $opts{rule} }{axiom};
 
 my $turtle = Data::Turtle->new(
-    width  => $width,
-    height => $height,
-    x      => $width / 2,
-    y      => $center ? $height / 2 : $height,
+    width  => $opts{width},
+    height => $opts{height},
+    x      => $opts{width} / 2,
+    y      => $opts{center} ? $opts{height} / 2 : $opts{height},
 );
 
-my $img = GD::Image->new( $width, $height );
+my $img = GD::Image->new( $opts{width}, $opts{height} );
 
 my %color = (
     white => $img->colorAllocate( 255, 255, 255 ),
@@ -60,34 +108,31 @@ $img->interlaced('true');
 my @statestack;
 
 my %translate = (
-    'F' => sub {
-        my @line = $turtle->forward($distance);
-        if ( $turtle->pen_status == 1 && @line ) {
-            $img->setThickness( $line[5] );
-            $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
-        }
-    },
-    'G' => sub {
-        my @line = $turtle->forward($distance);
-        if ( $turtle->pen_status == 1 && @line ) {
-            $img->setThickness( $line[5] );
-            $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
-        }
-    },
-    '-' => sub { $turtle->turn( - $theta ) },
-    '+' => sub { $turtle->turn($theta) },
+    'f' => sub { $turtle->forward( $opts{distance} ) },
+    'F' => \&forward,
+    'G' => \&forward,
+    '-' => sub { $turtle->turn( - $opts{theta} ) },
+    '+' => sub { $turtle->turn( $opts{theta} ) },
     'M' => sub { $turtle->mirror },
     '[' => sub { push @statestack, [ $turtle->get_state ] },
     ']' => sub { $turtle->set_state( @{ pop @statestack } ) },
 );
 
-for ( 1 .. $repeat ) {
-    $start =~ s/(.)/defined($rule{$1}) ? $rule{$1} : $1/eg;
+for ( 1 .. $opts{repeat} ) {
+    $string =~ s/(.)/defined($rule{ $opts{rule} }{$1}) ? $rule{ $opts{rule} }{$1} : $1/eg;
 }
-warn "$start\n";
+warn "$string\n";
 
-for my $command ( split //, $start ) {
+for my $command ( split //, $string ) {
     $translate{$command}->() if exists $translate{$command};
 }
 
 print $img->png;
+
+sub forward {
+    my @line = $turtle->forward( $opts{distance} );
+    if ( $turtle->pen_status == 1 && @line ) {
+        $img->setThickness( $line[5] );
+        $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
+    }
+}

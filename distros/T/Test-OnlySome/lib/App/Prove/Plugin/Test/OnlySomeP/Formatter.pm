@@ -7,9 +7,10 @@ use warnings;
 use parent 'TAP::Formatter::Console';   # TODO make the parent a parameter
 
 use Best [ [qw(YAML::XS YAML)], qw(DumpFile) ];
-use File::Spec;
 
-use constant FILENAME => '.onlysome.yml';   # TODO make this a parameter
+#use Data::Dumper;
+
+our $VERSION = '0.000007';
 
 # Docs {{{2
 
@@ -31,10 +32,16 @@ Called after the tests run.  Outputs the test results to a YAML file.
 
 # }}}2
 
+#sub _initialize {  # DEBUG
+#    my $self = shift;
+#    print STDERR "Formatter got args: ", Dumper([@_]), "\n";
+#    return $self->SUPER::_initialize(@_);
+#} #_initialize()
+
 sub summary {
     my $self = shift;
     my ($aggregate, $interrupted) = @_;
-    my ($destfn, %results);
+    my %results;
 
     $self->SUPER::summary(@_);
 
@@ -42,47 +49,24 @@ sub summary {
     # already iterated over the results.
 
     while( my ($fn, $parser) = each %{$aggregate->{parser_for}} ) {
-
-        # Pick the output filename based on the first test file we encounter.
-        # Put it in the directory above that file.
-        unless($destfn) {
-            my ($volume,$directories,$file) = File::Spec->splitpath(
-                File::Spec->rel2abs($fn) );
-            $directories = File::Spec->catdir($directories);
-                # Trim trailing slash , if any
-
-            my @dirs = File::Spec->splitdir($directories);
-            pop @dirs;
-
-            $destfn = File::Spec->catpath($volume,
-                File::Spec->catdir(@dirs), FILENAME);
-            #print STDERR "Writing output to $destfn\n";
-        }
-
         # Save the results for this test file
         $results{$fn} = {};
-        $results{$fn}->{$_} = _ary($parser->{$_})
+        $results{$fn}->{$_} = _ary($parser->$_)
             for qw(passed failed skipped actual_passed actual_failed todo todo_passed);
-
     } #foreach result file
 
     # Save the output
-    if($destfn) {
-        DumpFile $destfn, \%results;
-    } else {
-        warn "# No tests to report on";
-    }
-
+    DumpFile $App::Prove::Plugin::Test::OnlySomeP::Filename, \%results;
+        # The plugin guarantees this exists.
 } #summary()
 
-# Wrap the arg in an arrayref if it isn't already
+# Wrap the arg(s) in an arrayref unless the first arg already is one.
 sub _ary {
-    my $arg = shift;
-    return $arg if ref $arg eq 'ARRAY';
-    return [$arg];
+    return $_[0] if ref $_[0] eq 'ARRAY';
+    return [@_];
 }
 
-# More docs, and $VERSION {{{2
+# More docs {{{2
 =head1 AUTHOR
 
 Christopher White, C<< <cxwembedded at gmail.com> >>
@@ -127,15 +111,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome>
 =cut
 
 # }}}2
-
-our $VERSION = '0.000006';
-
-=head1 VERSION
-
-Version 0.0.6
-
-=cut
-
 # License {{{2
 
 =head1 ACKNOWLEDGEMENTS
@@ -174,5 +149,4 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 # }}}2
 1;
-
 # vi: set fdm=marker fdl=1 fo-=ro: #

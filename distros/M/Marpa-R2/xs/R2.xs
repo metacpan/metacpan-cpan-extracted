@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Jeffrey Kegler
+ * Copyright 2018 Jeffrey Kegler
  * This file is part of Marpa::R2.  Marpa::R2 is free software: you can
  * redistribute it and/or modify it under the terms of the GNU Lesser
  * General Public License as published by the Free Software Foundation,
@@ -807,6 +807,7 @@ u_r0_new (Scanless_R * slr)
   dTHX;
   Marpa_Recce r0 = slr->r0;
   const IV trace_lexers = slr->trace_lexers;
+  const IV trace_terminals = slr->trace_terminals;
   G_Wrapper *lexer_wrapper = slr->slg->l0_wrapper;
   const int too_many_earley_items = slr->too_many_earley_items;
 
@@ -846,7 +847,7 @@ u_r0_new (Scanless_R * slr)
 	       (long) assertion, (long) terminal,
 	       xs_g_error (lexer_wrapper));
 	  }
-	if (trace_lexers >= 1)
+	if (trace_lexers >= 1 || trace_terminals > 2)
 	  {
 	    union marpa_slr_event_s *event =
 	      marpa__slr_event_push (slr->gift);
@@ -1194,9 +1195,7 @@ u_pos_set (Scanless_R * slr, const char* name, int start_pos_arg, int length_arg
 
   /* Application level intervention resets |perl_pos| */
   slr->last_perl_pos = -1;
-  new_perl_pos = new_perl_pos;
   slr->perl_pos = new_perl_pos;
-  new_end_pos = new_end_pos;
   slr->end_pos = new_end_pos;
   return old_perl_pos;
 }
@@ -2784,7 +2783,7 @@ slr_es_span_to_literal_sv (Scanless_R * slr,
 
 #define EXPECTED_LIBMARPA_MAJOR 8
 #define EXPECTED_LIBMARPA_MINOR 6
-#define EXPECTED_LIBMARPA_MICRO 0
+#define EXPECTED_LIBMARPA_MICRO 2
 
 MODULE = Marpa::R2        PACKAGE = Marpa::R2::Thin
 

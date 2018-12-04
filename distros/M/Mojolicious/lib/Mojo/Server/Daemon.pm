@@ -15,7 +15,7 @@ has acceptors => sub { [] };
 has [qw(backlog max_clients silent)];
 has inactivity_timeout => sub { $ENV{MOJO_INACTIVITY_TIMEOUT} // 15 };
 has ioloop             => sub { Mojo::IOLoop->singleton };
-has listen => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
+has listen       => sub { [split ',', $ENV{MOJO_LISTEN} || 'http://*:3000'] };
 has max_requests => 100;
 
 sub DESTROY {
@@ -32,7 +32,7 @@ sub run {
 
   # Make sure the event loop can be stopped in regular intervals
   my $loop = $self->ioloop;
-  my $int = $loop->recurring(1 => sub { });
+  my $int  = $loop->recurring(1 => sub { });
   local $SIG{INT} = local $SIG{TERM} = sub { $loop->stop };
   $self->start->ioloop->start;
   $loop->remove($int);
@@ -130,7 +130,7 @@ sub _finish {
 
   # Always remove connection for WebSockets
   my $c = $self->{connections}{$id};
-  return unless my $tx = $c->{tx};
+  return undef unless my $tx = $c->{tx};
   return $self->_remove($id) if $tx->is_websocket;
 
   # Finish transaction
@@ -155,7 +155,7 @@ sub _finish {
   return $self->_remove($id) if $tx->error || !$tx->keep_alive;
 
   # Build new transaction for leftovers
-  return unless length(my $leftovers = $tx->req->content->leftovers);
+  return undef unless length(my $leftovers = $tx->req->content->leftovers);
   $tx = $c->{tx} = $self->_build_tx($id, $c);
   $tx->server_read($leftovers);
 }
@@ -168,7 +168,7 @@ sub _listen {
   croak qq{Invalid listen location "$listen"}
     unless $proto eq 'http' || $proto eq 'https' || $proto eq 'http+unix';
 
-  my $query = $url->query;
+  my $query   = $url->query;
   my $options = {backlog => $self->backlog};
   $options->{$_} = $query->param($_) for qw(fd single_accept reuse);
   if ($proto eq 'http+unix') { $options->{path} = $url->host }
@@ -197,7 +197,7 @@ sub _listen {
       $stream->on(close => sub { $self && $self->_close($id) });
       $stream->on(error =>
           sub { $self && $self->app->log->error(pop) && $self->_close($id) });
-      $stream->on(read => sub { $self->_read($id => pop) });
+      $stream->on(read    => sub { $self->_read($id => pop) });
       $stream->on(timeout => sub { $self->_debug($id, 'Inactivity timeout') });
     }
   );
@@ -213,7 +213,7 @@ sub _read {
   my ($self, $id, $chunk) = @_;
 
   # Make sure we have a transaction
-  my $c = $self->{connections}{$id};
+  my $c  = $self->{connections}{$id};
   my $tx = $c->{tx} ||= $self->_build_tx($id, $c);
   warn term_escape "-- Server <<< Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;
   $tx->server_read($chunk);
@@ -232,7 +232,7 @@ sub _write {
 
   # Protect from resume event recursion
   my $c = $self->{connections}{$id};
-  return if !(my $tx = $c->{tx}) || $c->{writing};
+  return undef if !(my $tx = $c->{tx}) || $c->{writing};
   local $c->{writing} = 1;
   my $chunk = $tx->server_write;
   warn term_escape "-- Server >>> Client (@{[_url($tx)]})\n$chunk\n" if DEBUG;

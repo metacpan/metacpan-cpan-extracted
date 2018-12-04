@@ -1,10 +1,12 @@
 package Data::Turtle;
 our $AUTHORITY = 'cpan:GENE';
 
+# ABSTRACT: Turtle Movement and State Operations
+
 use Moo;
 use POSIX qw( ceil );
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0200';
 
 use constant K => 3.14159265358979323846 / 180;
 
@@ -90,16 +92,10 @@ sub pen_down {
 }
 
 
-sub turn {
+sub right {
     my $self = shift;
     my $degrees = shift // 0;
     $self->heading( ( $self->heading + $degrees ) % 360 );
-}
-
-
-sub right {
-    my $self = shift;
-    $self->turn(@_);
 }
 
 
@@ -197,18 +193,18 @@ __END__
 
 =head1 NAME
 
-Data::Turtle
+Data::Turtle - Turtle Movement and State Operations
 
 =head1 VERSION
 
-version 0.0106
+version 0.0200
 
 =head1 SYNOPSIS
 
   use Data::Turtle;
   my $turtle = Data::Turtle->new;
   $turtle->pen_up;
-  $turtle->turn(45);
+  $turtle->right(45);
   $turtle->forward(10);
   $turtle->goto(100, 100);
   $turtle->mirror;
@@ -232,10 +228,6 @@ values for drawing by your favorite graphics package.
 
 Please see the F<eg/> distribution directory for example code, with L<GD> and
 L<Imager>.
-
-=head1 NAME
-
-Data::Turtle - Turtle Movement and State Operations
 
 =head1 METHODS
 
@@ -308,12 +300,6 @@ Raise the pen head to stop drawing.
 
 Lower the pen head to begin drawing.
 
-=head2 turn
-
-  $turtle->right($degrees);
-
-Set the heading to the given degrees.
-
 =head2 right
 
   $turtle->right($degrees);
@@ -371,6 +357,10 @@ Reflect the heading by multiplying by -1.
 Move the pen to the given coordinate.
 
 =head1 SEE ALSO
+
+L<Moo>
+
+L<POSIX>
 
 L<https://metacpan.org/source/YVESP/llg-1.07/Turtle.pm>
 

@@ -2,54 +2,98 @@ package namespace::local;
 
 use 5.008;
 use strict;
-use warnings;
-our $VERSION = '0.03';
+use warnings FATAL => 'all';
+our $VERSION = '0.0401';
 
 =head1 NAME
 
-namespace::local - Confine imports to the current scope
+namespace::local - Confine imports or functions to a given scope
 
 =head1 SYNOPSIS
 
-This module allows to use imports inside a block or sub without polluting
-the whole package:
+This module allows to confine imports or private functions
+to a given scope. The following modes of operation exist:
+
+=head2 -around (the default)
+
+This confines all subsequent imports and functions
+between the use of L<namespace::local> and the end of scope.
 
     package My::Package;
+
+    sub normal_sub {
+        # frobnicate() is unknown
+    }
 
     sub using_import {
         use namespace::local;
-        use Foo::Bar qw(quux);
-        # quux() is available here
+        use Some::Crazy::DSL qw(frobnicate);
+        frobnicate Foo => 42;
     }
 
     sub no_import {
-        # quux() is unknown
+        # frobnicate() is unknown
     }
 
-Another use case is confining private functions:
+=head2 -below
+
+Hides subsequent imports and functions on end of scope.
+
+This may be used to mask private functions:
 
     package My::Package;
+    use Moo::Role;
 
+    # This is available everywhere
     sub public {
-        return _private();
+        return private();
     };
 
     use namespace::local -below;
-    sub _private {
+
+    # This is only available in the current file
+    sub private {
         return 42;
     };
 
-    # now elsewhere
-    use My::Package;
-    My::Package->public; # 42
-    My::Package->_private; # dies! no such function/method
-
-Note that this doesn't work for private methods since methods
+Note that this doesn't work for private I<methods> since methods
 are resolved at runtime.
 
-Unlike L<namespace::clean> by which it is clearly inspired,
-it is useless at the top or your module as it will erase all
-functions defined below its use line.
+=head2 -above
+
+Hide all functions and exports above the use line.
+
+This emulates L<namespace::clean>, by which this module is clearly inspired.
+
+    package My::Module;
+    use POSIX;
+    use Time::HiRes;
+    use Carp;
+    use namespace::local -above;
+
+    # now define public functions here
+
+=head1 EXEMPTIONS
+
+The following symbols are not touched by this module, to avoid breaking things:
+
+=over
+
+=item * anything that does not consist of word characters;
+
+=item * $_, @_, $1, $2, ...;
+
+=item * Arrays: C<@CARP_NOT>, C<@EXPORT>, C<@EXPORT_OK>, C<@ISA>;
+
+=item * Scalars: C<$AUTOLOAD>, C<$a>, C<$b>;
+
+=item * Files: C<DATA>, C<STDERR>, C<STDIN>, C<STDOUT>;
+
+=item * Functions: C<AUTOLOAD>, C<DESTROY>, C<import>;
+
+=back
+
+This list is likely incomplete, and may grow in the future.
 
 =head1 METHOD/FUNCTIONS
 
@@ -78,10 +122,6 @@ Currently the module works by saving and then restoring globs,
 so variables and filehandles are also reset.
 This may be changed in the future.
 
-Additionally, it skips C<_>, C<a>, C<b>, and all numbers,
-to avoid breaking things.
-More exceptions MAY be added in the future (e.g. C<ARGV>).
-
 =cut
 
 use Carp;
@@ -95,25 +135,20 @@ use B::Hooks::EndOfScope 'on_scope_end';
 # 3) upon leaving scope, restore the table again thus erasing
 #    all imports that followed the use of this module
 
+my %known_args;
+$known_args{$_}++ for qw(-above -below -around);
+
 sub import {
     my ($class, $action) = @_;
 
+    $action ||= '-around';
     croak "Unknown argument $action"
-        if defined $action and $action ne '-below';
-    $action ||= '';
+        unless $known_args{$action};
 
-    my $caller = caller;
+#    my $control = $class->new( target => scalar caller );
+    my $control = namespace::local::_izer->new( target => scalar caller );
 
-    # FIXME the ($caller, @names, %content) triplet makes me cry,
-    #    should be an object.
-    my @names = _get_syms( $caller );
-
-    # Shallow copy of symbol table does not work for all cases,
-    #     or it would've been just '%content = %{ $caller."::" }
-    my %content;
-    foreach my $name( @names ) {
-        $content{$name} = _save_glob( $caller, $name );
-    };
+    $control->save_all;
 
     # FIXME UGLY HACK
     # Immediate backup-and-restore of symbol table
@@ -121,28 +156,80 @@ sub import {
     #     above 'use namespace::local' line
     #     thus preventing subsequent imports from leaking upwards
     # I do not know why it works, it shouldn't.
-    unless ($action eq '-below') {
-        _erase_syms( $caller );
-        foreach my $name (@names) {
-            _restore_glob( $caller, $name, $content{$name} )
-        };
+    if ($action eq '-around') {
+        $control->restore_all;
     };
 
-    # TODO Somehow adding an `unless $action eq '-above'
-    # doesn't turn this into namespace::clean ...
-    on_scope_end {
-        _erase_syms( $caller );
-        foreach my $name (@names) {
-            _restore_glob( $caller, $name, $content{$name} )
-        };
+    if ($action eq '-above' ) {
+        on_scope_end {
+            $control->erase_known;
+        }
+    } else {
+        on_scope_end {
+            $control->restore_all;
+        }
     };
 };
 
-# Skip some global symbols to avoid breaking unrelated things
-# This list is to grow :'(
-my %let_go;
-foreach my $name(qw(_ a b)) {
-    $let_go{$name}++;
+# Hide internal OO engine
+# Maybe it will be released later...
+package
+    namespace::local::_izer;
+
+use Carp; # too
+
+# TODO use Package::Stash?
+sub new {
+    my ($class, %opt) = @_;
+
+    # TODO validate options better
+    # Assume caller?
+    croak "target package not specified"
+        unless defined $opt{target};
+
+    return bless {
+        target  => $opt{target},
+        names   => [],
+        content => {},
+    }, $class;
+
+    # TODO read names here?
+};
+
+sub save_all {
+    my $self = shift;
+
+    my @names = $self->read_names;
+
+    # Shallow copy of symbol table does not work for all cases,
+    #     or it would've been just '%content = %{ $target."::" }
+    $self->save_globs( @names );
+
+    $self->{names} = \@names;
+    return $self;
+};
+
+sub restore_all {
+    my $self = shift;
+
+    # Erase _all_ globs, then restore those known to us
+    $self->erase_unknown;
+    $self->restore_globs( @{ $self->{names} } );
+
+    return $self;
+};
+
+sub erase_known {
+    my $self = shift;
+
+    $self->erase_globs( @{ $self->{names} } );
+};
+
+sub erase_unknown {
+    my $self = shift;
+
+    my @todo = grep { !exists $self->{content}{$_} } $self->read_names;
+    $self->erase_globs( @todo );
 };
 
 # in: package name
@@ -152,58 +239,97 @@ foreach my $name(qw(_ a b)) {
 # We really need to filter because copying ALL table
 #     was preventing on_scope_end from execution
 #     (accedental reference count increase?..)
-sub _get_syms {
-    my $package = shift;
 
-    no strict 'refs'; ## no critic
+sub read_names {
+    my $self = shift;
+
+    my $package = $self->{target};
+
     my @list = sort grep {
-        /^\w+$/ and !/^[0-9]+$/ and !$let_go{$_}
-    } keys %{ $package."::" };
-    return @list;
-};
-
-# In: package
-# Out: (none)
-# Side effect: destroys symbol table
-sub _erase_syms {
-    my $package = shift;
-
-    foreach my $name( _get_syms( $package ) ) {
+        /^\w+$/ and !/^[0-9]+$/ and $_ ne '_'
+    } do {
         no strict 'refs'; ## no critic
-        delete ${ $package."::" }{$name};
+        keys %{ $package."::" };
     };
+
+    return @list;
 };
 
 # Don't touch NAME, PACKAGE, and GLOB itself
 my @TYPES = qw(SCALAR ARRAY HASH CODE IO FORMAT);
 
+# Skip some well-known variables and functions
+# Format: touch_not{ $name }{ $type }
+# NOTE if you change the list, also change the EXEMPTIONS section in the POD.
+my %touch_not;
+$touch_not{$_}{ARRAY}++  for qw( CARP_NOT EXPORT EXPORT_OK ISA );
+$touch_not{$_}{CODE}++   for qw( AUTOLOAD DESTROY import );
+$touch_not{$_}{IO}++     for qw( DATA STDERR STDIN STDOUT );
+$touch_not{$_}{SCALAR}++ for qw( AUTOLOAD a b );
+
+# In: package
+# Out: (none)
+# Side effect: destroys symbol table
+sub erase_globs {
+    my ($self, @names) = @_;
+    my $package = $self->{target};
+
+    foreach my $name( @names ) {
+        next if $touch_not{$name};
+        no strict 'refs'; ## no critic
+        delete ${ $package."::" }{$name};
+    };
+};
+
+
 # In: package, symbol
 # Out: a hash with glob content
-sub _save_glob {
-    my ($package, $name) = @_;
-    my $copy;
+sub save_globs {
+    my ($self, @names) = @_;
 
-    foreach my $type (@TYPES) {
-        no strict 'refs'; ## no critic
-        my $value = *{$package."::".$name}{$type};
-        $copy->{$type} = $value if defined $value;
+    my $package = $self->{target};
+
+    foreach my $name ( @names ) {
+        foreach my $type (@TYPES) {
+            my $value = do {
+                no strict 'refs'; ## no critic
+                *{$package."::".$name}{$type};
+            };
+            $self->{content}{$name}{$type} = $value if defined $value;
+        };
     };
-
-    return $copy;
 };
 
 # In: package, symbol, hash
 # Out: (none)
 # Side effect: recreates *package::symbol
-sub _restore_glob {
-    my ($package, $name, $copy) = @_;
-    # TODO better input validation needed
-    die "ouch" unless ref $copy eq 'HASH';
+sub restore_globs {
+    my ($self, @names) = @_;
 
-    foreach my $type ( @TYPES ) {
-        defined $copy->{$type} or next;
-        no strict 'refs'; ## no critic
-        *{ $package."::".$name } = $copy->{$type}
+    my $package = $self->{target};
+
+    foreach my $name( @names ) {
+        my $copy = $self->{content}{$name};
+        if ( my $skip = $touch_not{$name} ) {
+            foreach my $type (keys %$skip) {
+                my $value = do {
+                    no strict 'refs'; ## no critic
+                    *{$package."::".$name}{$type};
+                };
+                $copy->{$type} = $value if defined $value;
+            };
+        };
+
+        {
+            no strict 'refs'; ## no critic
+            delete ${ $package."::" }{$name};
+        };
+
+        foreach my $type ( @TYPES ) {
+            defined $copy->{$type} or next;
+            no strict 'refs'; ## no critic
+            *{ $package."::".$name } = $copy->{$type}
+        };
     };
 };
 
@@ -214,9 +340,8 @@ Konstantin S. Uvarin, C<< <khedin at gmail.com> >>
 =head1 BUGS
 
 This is experimental module. There certainly are bugs.
-Suggestions on improvements and/or new features are wanted.
 
-Feedback welcome at:
+Bug reports, feature requests, suggestions and general feedback welcome at:
 
 =over
 
@@ -260,10 +385,11 @@ L<http://search.cpan.org/dist/namespace-local/>
 
 =back
 
-
 =head1 SEE ALSO
 
-L<namespace::clean>
+L<namespace::clean>, L<namespace::sweep>, L<namespace::autoclean>...
+
+L<B::Hooks::EndOfScope> is used as a backend.
 
 =head1 LICENSE AND COPYRIGHT
 

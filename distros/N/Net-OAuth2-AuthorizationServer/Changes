@@ -1,9 +1,12 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
+0.19     2018-12-01
+        - Avoid returning from the try/catch block as this never works
+          (GH #20, GH #21, thanks to Dylan William Hardison)
+
 0.18     2018-05-17
         - Fix a couple of typos and path issues revealed by Debian package
           built linter (GH #18, GH #17, with thanks to Mirko Tietge)
-
 
 0.17     2018-04-16
         - Handle inconsistencies between various grant types and the return

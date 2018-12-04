@@ -27,7 +27,7 @@ TODO: {
 
 TODO: {
     todo_skip "Skipping test 6 (ok)", 1;
-    ok(0, 'Test 6 is todo');
+    ok(1, 'Test 6 is todo');
 }
 
 done_testing();

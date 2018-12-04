@@ -30,5 +30,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-SQLite
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DBD-SQLite/DBD-SQLite
-version: '1.58'
+version: '1.60'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

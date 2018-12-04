@@ -3,7 +3,7 @@ package Net::MQTT::Simple;
 # use strict;    # might not be available (e.g. on openwrt)
 # use warnings;  # same.
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 # Please note that these are not documented and are subject to change:
 our $KEEPALIVE_INTERVAL = 60;
@@ -24,6 +24,7 @@ BEGIN {
 
 sub _default_port { 1883 }
 sub _socket_error { "$@" }
+sub _secure { 0 }
 
 sub _client_identifier { "Net::MQTT::Simple[$$]" }
 
@@ -63,6 +64,7 @@ sub import {
 sub new {
     my ($class, $server, $sockopts) = @_;
     @_ == 2 or @_ == 3 or _croak "Wrong number of arguments for $class->new";
+
     my $port = $class->_default_port;
 
     # Add port for bare IPv6 address
@@ -73,9 +75,63 @@ sub new {
 
     return bless {
         server       => $server,
+        username     => $username,
+        password     => $password,
         last_connect => 0,
         sockopts     => $sockopts // {},
     }, $class;
+}
+
+sub last_will {
+    my ($self, $topic, $message, $retain) = @_;
+
+    my %old;
+    %old = %{ $self->{will} } if $self->{will};
+
+    _croak "Wrong number of arguments for last_will" if @_ > 4;
+
+    if (@_ >= 2) {
+        if (not defined $topic and not defined $message) {
+            delete $self->{will};
+            delete $self->{encoded_will};
+
+            return;
+        } else {
+            $self->{will} = {
+                topic   => $topic    // $old{topic}   // '',
+                message => $message  // $old{message} // '',
+                retain  => !!$retain // $old{retain}  // 0,
+            };
+            _croak("Topic is empty") if not length $self->{will}->{topic};
+
+            my $e = $self->{encoded_will} = { %{ $self->{will} } };
+            utf8::encode($e->{topic});
+            utf8::downgrade($e->{message}, 1) or do {
+                my ($file, $line, $method) = (caller 1)[1, 2, 3];
+                warn "Wide character in $method at $file line $line.\n";
+                utf8::encode($e->{message});
+            };
+        }
+    }
+
+    return @{ $self->{will} }{qw/topic message retain/};
+}
+
+sub login {
+    my ($self, $username, $password) = @_;
+
+
+    if (@_ > 1) {
+        _croak "Password login is disabled for insecure connections"
+            if defined $password
+            and not $self->_secure || $ENV{MQTT_SIMPLE_ALLOW_INSECURE_LOGIN};
+
+        utf8::encode($username);
+        $self->{username} = $username;
+        $self->{password} = $password;
+    }
+
+    return $username;
 }
 
 sub _connect {
@@ -127,10 +183,12 @@ sub _send {
     my ($self, $data) = @_;
 
     $self->_connect unless exists $self->{skip_connect};
+    delete $self->{skip_connect};
+
     my $socket = $self->{socket} or return;
 
     syswrite $socket, $data
-        or delete $self->{socket};  # reconnect on next message
+        or $self->_drop_connection;  # reconnect on next message
 
     $self->{last_send} = time;
 }
@@ -138,13 +196,27 @@ sub _send {
 sub _send_connect {
     my ($self) = @_;
 
+    my $will = $self->{encoded_will};
+    my $flags = 0x02;
+    $flags |= 0x04 if $will;
+    $flags |= 0x20 if $will and $will->{retain};
+
+    $flags |= 0x80 if defined $self->{username};
+    $flags |= 0x40 if defined $self->{username} and defined $self->{password};
+
     $self->_send("\x10" . _prepend_variable_length(pack(
-        "x C/a* C C n n/a*",
+        "x C/a* C C n n/a*"
+            . ($flags & 0x04 ? "n/a* n/a*" : "")
+            . ($flags & 0x80 ? "n/a*" : "")
+            . ($flags & 0x40 ? "n/a*" : ""),
         $PROTOCOL_NAME,
         0x03,
-        0x02,
+        $flags,
         $KEEPALIVE_INTERVAL,
-        $self->_client_identifier
+        $self->_client_identifier,
+        ($flags & 0x04 ? ($will->{topic}, $will->{message}) : ()),
+        ($flags & 0x80 ? $self->{username} : ()),
+        ($flags & 0x40 ? $self->{password} : ()),
     )));
 }
 
@@ -203,7 +275,7 @@ sub _parse {
         # On receiving an enormous packet, just disconnect to avoid exhausting
         # RAM on tiny systems.
         # TODO: just slurp and drop the data
-        delete $self->{socket};
+        $self->_drop_connection;
         return;
     }
 
@@ -351,10 +423,26 @@ sub tick {
         $self->{ping} = time;
     }
     if ($self->{ping} and time() >= $self->{ping} + $PING_TIMEOUT) {
-        delete $self->{socket};
+        $self->_drop_connection;
     }
 
     return !! $self->{socket};
+}
+
+sub disconnect {
+    my ($self) = @_;
+
+    $self->_send(pack "C x", 0xe0)
+        if $self->{socket} and $self->{socket}->connected;
+
+    $self->_drop_connection;
+}
+
+sub _drop_connection {
+    my ($self) = @_;
+
+    delete $self->{socket};
+    $self->{last_connect} = 0;
 }
 
 1;
@@ -399,7 +487,7 @@ Net::MQTT::Simple - Minimal MQTT version 3 interface
             my ($topic, $message) = @_;
             print "[$topic] $message\n";
         },
-    }
+    );
 
 =head1 DESCRIPTION
 
@@ -440,6 +528,49 @@ out of scope.
 Optionally, a reference to a hash of socket options can be passed. Options
 specified in this hash are passed on to the socket constructor.
 
+=head3 last_will([$topic, $message[, $retain]])
+
+Set a "Last Will and Testament", to be used on subsequent connections. Note
+that the last will cannot be updated for a connection that is already
+established.
+
+A last will is a message that is published by the broker on behalf of the
+client, if the connection is dropped without an explicit call to C<disconnect>.
+
+Without arguments, returns the current values without changing the
+active configuration.
+
+When the given topic and message are both undef, the last will is deconfigured.
+In other cases, only arguments which are C<defined> are updated with the given
+value. For the first setting, the topic is mandatory, the message defaults to
+an empty string, and the retain flag defaults to false.
+
+Returns a list of the three values in the same order as the arguments.
+
+=head3 login($username[, $password])
+
+Sets authentication credentials, to be used on subsequent connections. Note
+that the credentials cannot be updated for a connection that is already
+established.
+
+The username is text, the password is binary.
+
+See L<Net::MQTT::Simple::SSL> for information about secure connections. To
+enable insecure password authenticated connections, set the environment
+variable MQTT_SIMPLE_ALLOW_INSECURE_LOGIN to a true value.
+
+Returns the username.
+
+=head1 DISCONNECTING GRACEFULLY
+
+=head2 disconnect
+
+Performs a graceful disconnect, which ensures that the server does NOT send
+the registered "Last Will" message.
+
+Subsequent calls that require a connection, will cause a new connection to be
+set up.
+
 =head1 PUBLISHING MESSAGES
 
 The two methods for publishing messages are the same, except for the state of
@@ -465,7 +596,7 @@ Subscribes to the given topic(s) and registers the callbacks. Note that only
 the first matching handler will be called for every message, even if filter
 patterns overlap.
 
-=head2 unsubscribe(topic[, topic, ...]) {
+=head2 unsubscribe(topic[, topic, ...])
 
 Unsubscribes from the given topic(s) and unregisters the corresponding
 callbacks. The given topics must exactly match topics that were previously
@@ -531,11 +662,6 @@ indicate that it has already been sent before.
 =item Authentication
 
 No username and password are sent to the server.
-
-=item Last will
-
-The server won't publish a "last will" message on behalf of us when our
-connection's gone.
 
 =item Large data
 

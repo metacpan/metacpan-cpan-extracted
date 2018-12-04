@@ -19,7 +19,7 @@ package MongoDB::ChangeStream;
 # ABSTRACT: A stream providing update information for collections.
 
 use version;
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use Moo;
 use Try::Tiny;
@@ -259,7 +259,7 @@ MongoDB::ChangeStream - A stream providing update information for collections.
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 

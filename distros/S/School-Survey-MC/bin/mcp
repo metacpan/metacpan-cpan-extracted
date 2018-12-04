@@ -2,19 +2,32 @@
 use strict;
 use warnings;
 
-# PODNAME: mpc
+# PODNAME: mcp
 # ABSTRACT: pick multiple choice questions randomly
 
 use utf8;
 binmode STDOUT, ":utf8";
-use feature 'say';
 use YAML::Tiny 'LoadFile';
 use HTML::Entities;
- 
-my $desired = int(shift @ARGV);
-my $file    =     shift @ARGV;
+use Getopt::Args;
 
-my @doc = LoadFile( $file );
+sub say { print "$_\n" } # say for perl below 5.10
+
+arg quantity => (
+    isa => 'Int',
+    required => 1,
+    comment  => 'Number of questions to pic',
+);
+
+arg file => (
+    isa => 'Str',
+    required => 1,
+    comment  => 'Path to YAML file, containg multiple choice questions',
+);
+
+my $o = optargs;
+
+my @doc = LoadFile( $o->{file} );
 my @q   = @{$doc[0]};
 
 my $question_count = scalar @q;
@@ -24,7 +37,7 @@ my $question_count = scalar @q;
 my $index;
 my @choosen = ();
 
-for (1..$desired) {
+for (1..$o->{quantity}) {
     $index = int(rand(scalar @q));
     my $question = $q[$index];
 
@@ -52,7 +65,7 @@ say '<title>mc survey</title>';
 say '</head>';
 say '<body>';
 say '<h1>Questions</h1>';
-say "$desired randomly picked questions out of $question_count.";
+say $o->{quantity} . " randomly picked questions out of $question_count.";
 say '<table border="1">';
 say "<tr><th>Answer</th><th>Claim</th></tr>";
 
@@ -122,11 +135,11 @@ __END__
 
 =head1 NAME
 
-mpc - pick multiple choice questions randomly
+mcp - pick multiple choice questions randomly
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

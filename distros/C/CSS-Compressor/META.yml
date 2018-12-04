@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -17,9 +17,10 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
+requires:
+  perl: 5.010000
 resources:
   bugtracker: https://github.com/sbertrang/css-compressor/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/sbertrang/css-compressor.git
-version: 0.03
+version: 0.05

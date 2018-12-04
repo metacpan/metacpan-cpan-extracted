@@ -41,7 +41,7 @@ is($TEST_NUMBER_OS, 10, '$TEST_NUMBER_OS increments to 10');
 skip_next;
 os ok(0, 'Test 10 - should be skipped');
 
-is_deeply($TEST_ONLYSOME, {skip => {2=>true, 6=>true, 10=>true}, n=>1},
+is_deeply($TEST_ONLYSOME, {skip => {2=>true, 6=>true, 10=>true}, verbose=>0, n=>1},
     '$TEST_ONLYSOME is what we set');
 
 done_testing();

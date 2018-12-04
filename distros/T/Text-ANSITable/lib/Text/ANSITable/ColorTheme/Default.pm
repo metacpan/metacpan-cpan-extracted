@@ -1,7 +1,7 @@
 package Text::ANSITable::ColorTheme::Default;
 
-our $DATE = '2018-05-31'; # DATE
-our $VERSION = '0.500'; # VERSION
+our $DATE = '2018-12-02'; # DATE
+our $VERSION = '0.501'; # VERSION
 
 use 5.010;
 use strict;
@@ -123,7 +123,7 @@ Text::ANSITable::ColorTheme::Default - Default color themes
 
 =head1 VERSION
 
-This document describes version 0.500 of Text::ANSITable::ColorTheme::Default (from Perl distribution Text-ANSITable), released on 2018-05-31.
+This document describes version 0.501 of Text::ANSITable::ColorTheme::Default (from Perl distribution Text-ANSITable), released on 2018-12-02.
 
 =head1 COLOR THEMES
 

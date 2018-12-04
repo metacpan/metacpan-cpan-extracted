@@ -1,5 +1,5 @@
 package POE::Component::SmokeBox::Backend::Test::Idle;
-$POE::Component::SmokeBox::Backend::Test::Idle::VERSION = '0.52';
+$POE::Component::SmokeBox::Backend::Test::Idle::VERSION = '0.54';
 #ABSTRACT: a backend to test idle kills.
 
 use strict;
@@ -31,7 +31,7 @@ POE::Component::SmokeBox::Backend::Test::Idle - a backend to test idle kills.
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

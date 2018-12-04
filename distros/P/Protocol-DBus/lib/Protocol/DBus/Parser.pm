@@ -3,12 +3,8 @@ package Protocol::DBus::Parser;
 use strict;
 use warnings;
 
-use Socket::MsgHdr ();
-
 use Protocol::DBus::Marshal ();
 use Protocol::DBus::Message ();
-
-use constant _CHUNK_SIZE => 65536;
 
 use constant SINGLE_UNIX_FD_CMSGHDR => (0, 0, pack 'I!');
 
@@ -67,30 +63,45 @@ sub get_message {
 
     if (defined $self->{'_unix_fds'}) {
 
-        my $msg_buflen = $self->{'_msgsz'} - length $self->{'_buf'};
-        my $msg = Socket::MsgHdr->new(
-            buflen => $msg_buflen,
-        );
+        my $needed_bytes = $self->{'_msgsz'} - length $self->{'_buf'};
 
-        # The unix FDs might arrive in a single control
-        # message, as individual control messages, or as
-        # some combination thereof. There is no way to know.
-        # So plan for the worst, and assume each unix FD is
-        # in its own control.
-        $msg->cmsghdr( (SINGLE_UNIX_FD_CMSGHDR()) x $self->{'_pending_unix_fds'} );
+        my $got;
 
-        my $got = Socket::MsgHdr::recvmsg( $self->{'_s'}, $msg );
-        if (defined $got) {
+        if ($self->{'_unix_fds'}) {
+            my $msg = Socket::MsgHdr->new(
+                buflen => $needed_bytes,
+            );
 
-            if ($self->{'_pending_unix_fds'}) {
-                require Protocol::DBus::Parser::UnixFDs;
-                push @{ $self->{'_filehandles'} }, Protocol::DBus::Parser::UnixFDs::extract_from_msghdr($msg);
-                $self->{'_pending_unix_fds'} = $self->{'_unix_fds'} - @{ $self->{'_filehandles'} };
+            # The unix FDs might arrive in a single control
+            # message, as individual control messages, or as
+            # some combination thereof. There is no way to know.
+            # So plan for the worst, and assume each unix FD is
+            # in its own control.
+            $msg->cmsghdr( (SINGLE_UNIX_FD_CMSGHDR()) x $self->{'_pending_unix_fds'} );
+
+            $got = Socket::MsgHdr::recvmsg( $self->{'_s'}, $msg );
+            if (defined $got) {
+
+                if ($self->{'_pending_unix_fds'}) {
+                    require Protocol::DBus::Parser::UnixFDs;
+                    push @{ $self->{'_filehandles'} }, Protocol::DBus::Parser::UnixFDs::extract_from_msghdr($msg);
+                    $self->{'_pending_unix_fds'} = $self->{'_unix_fds'} - @{ $self->{'_filehandles'} };
+                }
+
+                $self->{'_buf'} .= $msg->buf();
             }
+        }
+        else {
+            $got = sysread(
+                $self->{'_s'},
+                $self->{'_buf'},
+                $needed_bytes,
+                length $self->{'_buf'},
+            );
+        }
 
-            $self->{'_buf'} .= $msg->buf();
-
-            if ($got >= $msg_buflen) {
+        if (defined $got) {
+            if ($got >= $needed_bytes) {
                 local $Protocol::DBus::Marshal::PRESERVE_VARIANT_SIGNATURES = 1 if $self->{'_preserve_variant_signatures'};
 
                 # This clears out the buffer .. it should??
@@ -101,6 +112,9 @@ sub get_message {
                 delete @{$self}{'_bodysz', '_unix_fds'};
 
                 return $msg;
+            }
+            elsif (!$got) {
+                die "Peer stopped writing!";
             }
         }
         elsif (!$!{'EAGAIN'} && !$!{'EWOULDBLOCK'}) {

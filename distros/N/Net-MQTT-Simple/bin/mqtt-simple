@@ -28,13 +28,15 @@ GetOptions(
     "cert=s"            => \my $cert,
     "key=s"             => \my $key,
     "e|except=s"        => \my @exceptions,
+    "u|user|username=s" => \my $username,
+    "pass|password=s"   => \my $password,
 ) or die $usage;
 
 $host or die $usage;
 $datetime = "%Y-%m-%d %H:%M:%S" if defined $datetime and $datetime eq "";
 
 die "--ca, --cert, --key and --insecure require --ssl\n"
-    if ($ca or $cert or $key or $insecure) and not $ssl;
+    if ($ca or $cert or $key) and not $ssl;
 
 die "--key requires --cert\n" if $key and not $cert;
 die "--cert requires --key\n" if $cert and not $key;
@@ -46,6 +48,7 @@ $ENV{MQTT_SIMPLE_SSL_CA}   = $ca   if $ca;
 $ENV{MQTT_SIMPLE_SSL_CERT} = $cert if $cert;
 $ENV{MQTT_SIMPLE_SSL_KEY}  = $key  if $key;
 $ENV{MQTT_SIMPLE_SSL_INSECURE} = 1 if $insecure;
+$ENV{MQTT_SIMPLE_ALLOW_INSECURE_LOGIN} = 1 if $insecure;
 
 if ($one) {
     die "--count and --one cannot be combined" if $count;
@@ -53,9 +56,10 @@ if ($one) {
     $message_only = 1;
 }
 
-my $m = $class->new($host);
-
 defined $publish or @topics or die $usage;
+
+my $m = $class->new($host);
+$m->login($username, $password) if defined $username;
 
 if (defined $publish) {
     my $method = $retain ? "retain" : "publish";
@@ -216,9 +220,11 @@ Use SSL instead of unencrypted connection.
 
 =item --insecure
 
-Disable SSL certificate validation. Useful for testing, bad idea in production.
+Disable SSL certificate validation and enable clear text passwords. Useful for
+testing, bad idea in production.
 
-Overrides the environment variable C<MQTT_SIMPLE_SSL_INSECURE>.
+Overrides the environment variable C<MQTT_SIMPLE_SSL_INSECURE> and
+C<MQTT_SIMPLE_ALLOW_INSECURE_LOGIN>.
 
 =item --ca I<path>
 

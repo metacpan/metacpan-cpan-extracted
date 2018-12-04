@@ -143,11 +143,15 @@ You can prevent a trigger from firing too often by setting a cooldown period. Fo
 
 ###<a name="7.1.3">7.1.3 Trigger styles</a>
 
+Now click on **Page 2** of the **Attributes** tab.
+
+![Trigger styles tab](img/ch07/trigger_styles.png)
+
 Triggers are able to change the way matching lines are displayed. This is really useful if you want to change the colour of something like **The orc drops its treasure**, so that it stands out against the surrounding text.
 
 Trigger styles are turned *off* by default. When you turn them on, you need to decide whether the new style should apply to the whole line, or just the portion of the line that matches the trigger's pattern.
 
-If the trigger's pattern contains groups (see [Section 6.1.5](ch06.html#6.1.5), you can also apply a style just to that portion of text. For example, if you use the pattern **You have (.*) gold coins**, which matches the line:
+If the trigger's pattern contains groups (see [Section 6.1.5](ch06.html#6.1.5)), you can also apply a style just to that portion of text. For example, if you use the pattern **You have (.*) gold coins**, which matches the line:
 
         You have 100 gold coins
 
@@ -474,12 +478,12 @@ The response can be any kind of instruction. It's usually a world command like *
 ###<a name="7.3.1">7.3.1 Axmud keycodes</a>
 A key part of Axmud's design is *platform independence*. If you install Axmud on one computer with Linux and on another computer with MS Windows, the data you save on one can be transferred to the without problems.
 
-For this reason, Axmud uses keycodes - a short string corresponding to every key on the keyboard. The keycode for each key is the same, regardless of which operating system you're using.
+For this reason, Axmud uses a set of standard keycodes - short strings corresponding to every key on the keyboard. The keycode for each key is the same, regardless of which operating system you're using.
 
 Axmud's keycodes - always in lower-case - are:
 
         shift alt alt_gr ctrl num_lock
-        escape pause break insert delete return backspace space
+        escape pause break insert delete return backspace space tab
         home page_up page_down end
         up down left right
         f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12
@@ -493,8 +497,9 @@ Axmud's keycodes - always in lower-case - are:
 There are also a set of keycodes for the keypad (the keys, normally on the right side of the keyboard, which are laid out like a calculator):
 
         kp_0 kp_1 kp_2 kp_3 kp_4 kp_5 kp_6 kp_7 kp_8 kp_9
-        kp_up kp_down kp_left kp_right kp_page_up kp_page_down
-        kp_home kp_end kp_insert kp_delete kp_full_stop
+        kp_add kp_subtract kp_multiply kp_divide kp_enter kp_full_stop
+
+The keycodes 'full_stop' and 'kp_full_stop' represent the full stop/period keys. Axmud supports a number of alternatives to the standard keycodes, including 'period'. (Type **;listkeycodealternative** for a list of alternative keycodes.)
 
 Keycodes can be combined when two or more keys are pressed together. For example, SHIFT + F1 corresponds to the keycode string "shift f1" (a string containing two words separated by a single space character).
 
@@ -502,7 +507,7 @@ Keycodes can be combined when two or more keys are pressed together. For example
 
 * From the main window menu, click **Edit > World macros**
 * In the **Macro stimulus** box, enter the keycode **f1**
-    * Axmud keycodes are always in lower-case characters
+    * Axmud standard keycodes are always in lower-case characters
 * In the **Macro response** box, enter the command **get coins from corpses**
 * In the **Name** box, enter the name **mymacro**
 * Click the **Add** button to create the macro
@@ -642,7 +647,8 @@ This is a complete list of Axmud's hook events.
 * **get_focus**, **lose_focus** - happen when this session's main window becomes the active (focused) window, or when some other window becomes the active window
 * **close_disconnect** - happens just before Axmud stops running
 * **map_room** - happens when the automapper's current room is set
-* **map_no_room** - happens when the automapper's current room is reset (for example, when the automapper gets lost)
+* **map_no_room** - happens when the automapper's current room is reset (for example, when the automapper gets lost; does fire when the Locator task is reset)
+* **map_lost** - happens when the automapper's current room is reset (doesn't fire when the Locator task is reset)
 * **map_rescue_on** - happens when auto-rescue mode activates, and the automapper switches to a temporary region rather than marking the character as lost
 * **map_rescue_merge** - happens during auto-rescue mode when rooms are merged back into the previous region
 * **map_rescue_off** - happens when auto-rescue mode disactivates

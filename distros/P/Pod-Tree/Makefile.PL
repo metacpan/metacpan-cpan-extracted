@@ -6,6 +6,24 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
+my $prereq_pm = {
+    'File::Find'     => 1,
+    'HTML::Stream'   => 1.49,
+    'IO::File'       => 1,
+    'IO::String'     => 1,
+    'Pod::Escapes'   => 1.02,
+    'Text::Template' => 1,
+};
+for my $interesting_module (qw(
+    Perl::Tidy
+    Code::TidyAll
+                              )) {
+    eval "require $interesting_module";
+    if (!$@) {
+        $prereq_pm->{$interesting_module} ||= 0;
+    }
+}
+
 my %config = (
     NAME         => 'Pod::Tree',
     VERSION_FROM => 'lib/Pod/Tree.pm',    # finds $VERSION
@@ -24,37 +42,30 @@ my %config = (
 
     clean => {
         FILES =>
-            "t/pod2html.d/*.html* t/pods2html.d/A t/pods2html.d/html_act* t/pods2html.d/podR/HTML t/*/*.act lib/Pod/Tree/*~"
+            "Pod-Tree-* t/pod2html.d/*.html* t/pods2html.d/A t/pods2html.d/html_act* t/pods2html.d/podR/HTML t/*/*.act lib/Pod/Tree/*~"
     },
     dist => {
         COMPRESS => 'gzip --best',
         SUFFIX   => '.gz'
     },
     EXE_FILES => [qw(mod2html podtree2html pods2html perl2html)],
-    PREREQ_PM => {
-        'File::Find'     => 1,
-        'HTML::Stream'   => 1.49,
-        'IO::File'       => 1,
-        'IO::String'     => 1,
-        'Pod::Escapes'   => 1.02,
-        'Text::Template' => 1,
-    },
+    PREREQ_PM => $prereq_pm,
     (
         eval { ExtUtils::MakeMaker->VERSION(6.46) }
         ? (
             META_MERGE => {
-            	'meta-spec' => { version => 2 },
-            	resources   => {
-            		repository => {
-            			type => 'git',
-            			url  => 'http://github.com/manwar/Pod-Tree.git',
-            			web  => 'http://github.com/manwar/Pod-Tree',
-            		},
-            		bugtracker => {
-            			web => 'http://github.com/manwar/Pod-Tree/issues',
-            		},
-            		homepage => 'http://metacpan.org/pod/Pod::Tree',
-            	},
+                'meta-spec' => { version => 2 },
+                resources   => {
+                    repository => {
+                    	type => 'git',
+                    	url  => 'http://github.com/manwar/Pod-Tree.git',
+                    	web  => 'http://github.com/manwar/Pod-Tree',
+                    },
+                    bugtracker => {
+                    	web => 'http://github.com/manwar/Pod-Tree/issues',
+                    },
+                    homepage => 'http://metacpan.org/pod/Pod::Tree',
+                },
             }
              )
         : ()

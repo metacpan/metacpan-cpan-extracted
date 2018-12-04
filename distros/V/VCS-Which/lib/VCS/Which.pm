@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use Path::Tiny;
 
-our $VERSION = version->new('0.6.4');
+our $VERSION = version->new('0.6.6');
 
 our %systems;
 
@@ -57,6 +57,9 @@ sub get_systems {
     my ($self) = @_;
 
     for my $dir (@INC) {
+        if ( $dir !~ /^\/|^\w:\// ) {
+            $dir = "./$dir";
+        }
         my @files = glob "$dir/VCS/Which/Plugin/*.pm";
 
         for my $file (@files) {
@@ -67,7 +70,11 @@ sub get_systems {
 
             next if $systems{$module};
 
-            require $file;
+            eval {
+                require $file;
+            } or do {
+                confess $@, "Error with $file / $module";
+            };
             $systems{$module} = 1;
         }
     }
@@ -341,7 +348,7 @@ VCS::Which - Generically interface with version control systems
 
 =head1 VERSION
 
-This documentation refers to VCS::Which version 0.6.4.
+This documentation refers to VCS::Which version 0.6.6.
 
 =head1 SYNOPSIS
 

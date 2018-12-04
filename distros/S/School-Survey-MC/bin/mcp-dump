@@ -2,14 +2,15 @@
 use strict;
 use warnings;
 
-# PODNAME: mpc-dump
+# PODNAME: mcp-dump
 # ABSTRACT: dump yaml to perl on stdout
 
 use utf8;
 binmode STDOUT, ":utf8";
-use feature 'say';
 use YAML::Tiny 'LoadFile';
 use Data::Dumper;
+
+sub say { print "$_\n" } # say for perl below 5.10
  
 my $file    =     shift @ARGV;
 
@@ -26,11 +27,11 @@ __END__
 
 =head1 NAME
 
-mpc-dump - dump yaml to perl on stdout
+mcp-dump - dump yaml to perl on stdout
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

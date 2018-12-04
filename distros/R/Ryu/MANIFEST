@@ -29,6 +29,7 @@ t/00-check-deps.t
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/chained.t
 t/chomp.t
 t/combine_latest.t
 t/count.t

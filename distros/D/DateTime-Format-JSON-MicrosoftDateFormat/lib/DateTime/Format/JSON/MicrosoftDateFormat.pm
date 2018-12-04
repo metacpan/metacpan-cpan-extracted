@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use DateTime;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -20,11 +20,27 @@ DateTime::Format::JSON::MicrosoftDateFormat - Parse and format JSON MicrosoftDat
 
   say $formatter->format_datetime($dt);                              #/Date(1392067678000)/
 
+=head2 The Perl One Liner
+
+  perl -MDateTime::Format::JSON::MicrosoftDateFormat -e 'print DateTime::Format::JSON::MicrosoftDateFormat->new->parse_datetime(shift), "\n";' '/Date(1392606509000-0500)/'
+
 =head1 DESCRIPTION
 
 This module understands the JSON MicrosoftDateFormat date/time format. e.g. /Date(1392067678000)/
 
 =head1 USAGE
+
+Note: The usage of MicrosoftDateFormat is deprecated for new JSON services.  Please use ISO 8601 for all new development.
+
+From RFC 7493 (The I-JSON Message Format):
+
+  Protocols often contain data items that are designed to contain timestamps or time durations. It
+  is RECOMMENDED that all such data items be expressed as string values in ISO 8601 format,
+  as specified in RFC 3339, with the additional restrictions that uppercase rather than lowercase
+  letters be used, that the timezone be included not defaulted, and that optional trailing seconds
+  be included even when their value is "00". It is also RECOMMENDED that all data items
+  containing time durations conform to the "duration" production in Appendix A of RFC 3339, with
+  the same additional restrictions.
 
 =head2 import
 
@@ -51,7 +67,7 @@ sub import {
   die("$PACKAGE import: Expecting parameters to be hash") if @_ % 2;
   my %opt=@_;
   if ($opt{"to_json"}) {
-    *DateTime::TO_JSON=sub {shift->_stringify};
+    *DateTime::TO_JSON=sub {my $self=shift; return "$self"};
   }
 }
 
@@ -104,9 +120,9 @@ Returns a JSON formatted date string for the passed DateTime object
 
   my $dt=DateTime->now;
   my $formatter=DateTime::Format::JSON::MicrosoftDateFormat->new;
-  $formatter->format_datetime($dt);
+  print $formatter->format_datetime($dt), "\n";
 
-However, format_datetime is typically use like this...
+However, format_datetime is typically used like this...
 
   use DateTime;
   use DateTime::Format::JSON::MicrosoftDateFormat;

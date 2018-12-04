@@ -1,5 +1,5 @@
 ---
-abstract: 'Confine imports to the current scope'
+abstract: 'Confine imports or functions to a given scope'
 author:
   - 'Konstantin S. Uvarin <khedin@gmail.com>'
 build_requires:
@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/namespace-local-perl/issues
   repository: https://github.com/dallaylaen/namespace-local-perl.git
-version: '0.03'
+version: '0.0401'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

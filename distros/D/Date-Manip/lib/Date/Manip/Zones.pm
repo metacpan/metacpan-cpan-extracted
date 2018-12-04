@@ -5,9 +5,9 @@ package Date::Manip::Zones;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Wed May 30 14:52:52 EDT 2018
-#    Data version: tzdata2018e
-#    Code version: tzcode2018e
+#    Generated on: Fri Nov 30 14:33:51 EST 2018
+#    Data version: tzdata2018g
+#    Code version: tzcode2018g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.73';
+$VERSION='6.75';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,8 +37,8 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2018e';
-$TzcodeVersion = 'tzcode2018e';
+$TzdataVersion = 'tzdata2018g';
+$TzcodeVersion = 'tzcode2018g';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
 $LastYear      = '2068';
@@ -1493,6 +1493,7 @@ $LastYear      = '2068';
   'nst11npt'                           => 'america/adak',
   'nzst-12nzdt'                        => 'pacific/auckland',
   'pkt-5pkst'                          => 'asia/karachi',
+  'pst-8pdt'                           => 'asia/manila',
   'pst8pdt'                            => 'america/los_angeles',
   'pst8ppt'                            => 'america/los_angeles',
   'sast-2sast'                         => 'africa/johannesburg',
@@ -1876,7 +1877,6 @@ $LastYear      = '2068';
                      'europe/vilnius',
                      'europe/lisbon',
                      'europe/uzhgorod',
-                     'africa/casablanca',
                      'europe/kaliningrad',
                      'europe/sofia',
                      'europe/tallinn',
@@ -2164,8 +2164,10 @@ $LastYear      = '2068';
                      'europe/helsinki',
                      'atlantic/azores',
                      'asia/kolkata' ],
+  'hpt'         => [ 'pacific/honolulu' ],
   'hst'         => [ 'pacific/honolulu',
                      'america/adak' ],
+  'hwt'         => [ 'pacific/honolulu' ],
   'i'           => [ 'i' ],
   'iddt'        => [ 'asia/jerusalem' ],
   'idt'         => [ 'asia/jerusalem',
@@ -2185,7 +2187,8 @@ $LastYear      = '2068';
                      'asia/pyongyang',
                      'asia/seoul',
                      'asia/taipei',
-                     'asia/hong_kong' ],
+                     'asia/hong_kong',
+                     'asia/manila' ],
   'k'           => [ 'k' ],
   'kdt'         => [ 'asia/seoul' ],
   'kmt'         => [ 'europe/kiev',
@@ -2326,6 +2329,7 @@ $LastYear      = '2068';
                      'america/juneau',
                      'america/metlakatla',
                      'america/sitka',
+                     'asia/manila',
                      'america/dawson_creek',
                      'america/boise' ],
   'pkst'        => [ 'asia/karachi' ],
@@ -2352,6 +2356,7 @@ $LastYear      = '2068';
                      'america/vancouver' ],
   'pst'         => [ 'america/los_angeles',
                      'america/vancouver',
+                     'asia/manila',
                      'america/tijuana',
                      'america/whitehorse',
                      'america/dawson',
@@ -2413,8 +2418,6 @@ $LastYear      = '2068';
                      'europe/madrid' ],
   'west'        => [ 'wet',
                      'europe/lisbon',
-                     'africa/casablanca',
-                     'africa/el_aaiun',
                      'atlantic/madeira',
                      'atlantic/canary',
                      'atlantic/faroe',
@@ -2428,10 +2431,8 @@ $LastYear      = '2068';
   'wet'         => [ 'wet',
                      'atlantic/faroe',
                      'europe/lisbon',
-                     'africa/casablanca',
                      'atlantic/canary',
                      'atlantic/madeira',
-                     'africa/el_aaiun',
                      'atlantic/azores',
                      'africa/ceuta',
                      'africa/algiers',
@@ -2627,7 +2628,7 @@ $LastYear      = '2068';
   '+07:21:20'  => 'off150',
   '+07:30:00'  => 'off151',
   '+07:33:52'  => 'off152',
-  '+07:34:20'  => 'off153',
+  '+07:34:10'  => 'off153',
   '+07:36:42'  => 'off154',
   '+07:38:00'  => 'off155',
   '+07:39:40'  => 'off156',

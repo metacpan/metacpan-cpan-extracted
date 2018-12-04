@@ -21,7 +21,7 @@ sub get_request_data {
 
 sub create_response {
     my ($code, $data, $headers) = @_;
-    my $content = eval { encode_json $data } || $data;
+    my $content = ref $data ? encode_json($data) : $data;
     return [$code => [
         'Content-Length' => length($content),
         'Content-Type'   => 'application/json; charset=UTF-8',

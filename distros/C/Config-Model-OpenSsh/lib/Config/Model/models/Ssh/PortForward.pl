@@ -15,7 +15,7 @@
     'class_description' => 'Configuration class that represents the parameters required
 to specify port forwarding in a ssh configuration.',
     'copyright' => [
-      '2009-2011 Dominique Dumont'
+      '2009-2018 Dominique Dumont'
     ],
     'element' => [
       'ipv6',
@@ -39,6 +39,7 @@ The bind_address of \'localhost\' indicates that the listening port be bound for
       {
         'description' => 'Listening port. Connection made to this port will be forwarded to the other side of the tunnel.',
         'mandatory' => '1',
+        'match' => '^\\w+$',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -53,6 +54,7 @@ The bind_address of \'localhost\' indicates that the listening port be bound for
       {
         'description' => 'Port number to connect the tunnel to.',
         'mandatory' => '1',
+        'match' => '^\\w+$',
         'summary' => 'destination port',
         'type' => 'leaf',
         'value_type' => 'uniline'

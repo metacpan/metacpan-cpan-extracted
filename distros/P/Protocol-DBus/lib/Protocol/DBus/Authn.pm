@@ -35,20 +35,24 @@ sub new {
     return $self;
 }
 
-sub negotiate_unix_fd {
-    my ($self) = @_;
-
-    $self->{'_negotiate_unix_fd'} = 1;
-
-    return $self;
+sub negotiated_unix_fd {
+    return $_[0]->{'_negotiated_unix_fd'} ? 1 : 0;
 }
 
 sub _create_xaction {
     my ($self) = @_;
 
+    my $auth_label = 'AUTH';
+
+    # Unless the mechanism sends its own initial NUL, might as well use the
+    # same system call to send the initial NUL as we use to send the AUTH.
+    if (!$self->{'_mechanism'}->must_send_initial()) {
+        substr( $auth_label, 0, 0 ) = "\0";
+    }
+
     # 0 = send; 1 = receive
     my @xaction = (
-        [ 0 => 'AUTH', $self->{'_mechanism'}->label(), $self->{'_mechanism'}->INITIAL_RESPONSE() ],
+        [ 0 => $auth_label, $self->{'_mechanism'}->label(), $self->{'_mechanism'}->INITIAL_RESPONSE() ],
         $self->{'_mechanism'}->AFTER_AUTH(),
 
         [ 1 => \&_consume_ok ],
@@ -92,9 +96,8 @@ sub go {
 
     my $s = $self->{'_socket'};
 
-    $self->{'_sent_initial'} ||= do {
-        $self->{'_mechanism'}->send_initial($s);
-    };
+    # Don’t send_initial() if !must_send_initial().
+    $self->{'_sent_initial'} ||= !$self->{'_mechanism'}->must_send_initial() || $self->{'_mechanism'}->send_initial($s);
 
     if ($self->{'_sent_initial'}) {
       LINES:

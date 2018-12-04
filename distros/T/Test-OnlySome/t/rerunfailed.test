@@ -1,0 +1,15 @@
+#!perl
+
+use 5.012;
+use strict;
+use warnings;
+use Test::More tests => 4;
+use Test::OnlySome::RerunFailed filename => 't/rerunfailed.out';
+    # , verbose => 1;
+
+os ok(1);
+os ok(0);
+os ok(0);
+os ok(1);
+
+# vi: set ft=perl:

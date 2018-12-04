@@ -101,10 +101,6 @@ L<Using cme|https://github.com/dod38fr/config-model/wiki/Using-cme> wiki page
 
 L<config-model wiki|https://github.com/dod38fr/config-model/wiki>
 
-=item *
-
-L<config-model user mailing list|https://lists.sourceforge.net/lists/listinfo/config-model-users>
-
 =back
 
 =head1 Installation from git

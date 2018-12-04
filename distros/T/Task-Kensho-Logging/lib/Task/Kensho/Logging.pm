@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Logging; # git description: v0.38-55-g77b82dc
+package Task::Kensho::Logging; # git description: v0.39-55-g6bec8da
 # ABSTRACT: A Glimpse at an Enlightened Perl: Logging
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Logging - A Glimpse at an Enlightened Perl: Logging
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Olaf Alders Shawn Sorichetti Dan Book Rachel Kelly Chris Nehren Rick Leir
 
 =over 4
 
@@ -128,6 +128,22 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Leo Lapworth <leo@cuckoo.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
 
 =item *
 

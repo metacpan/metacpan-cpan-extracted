@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Task::Kensho::Email; # git description: v0.38-51-g83efcad
+package Task::Kensho::Email; # git description: v0.39-51-g2b7077f
 # ABSTRACT: A Glimpse at an Enlightened Perl: Email
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 __END__
 
@@ -17,7 +17,7 @@ Task::Kensho::Email - A Glimpse at an Enlightened Perl: Email
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,10 @@ A library for sending email
 
 A B<simple> email object. No, really!
 
+=head3 L<Email::Stuffer>
+
+A more casual approach to creating and sending Email:: emails
+
 =head3 L<Email::Valid>
 
 Check validity of Internet email addresses
@@ -121,7 +125,7 @@ Chris Prather <chris@prather.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Rick Leir
+=for stopwords Karen Etheridge Leo Lapworth Chris Nehren Olaf Alders Dan Book Rachel Kelly Shawn Sorichetti Rick Leir
 
 =over 4
 
@@ -136,6 +140,22 @@ Leo Lapworth <leo@cuckoo.org>
 =item *
 
 Chris Nehren <apeiron@cpan.org>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Dan Book <grinnz@gmail.com>
+
+=item *
+
+Rachel Kelly <rkellyalso@gmail.com>
+
+=item *
+
+Shawn Sorichetti <shawn@coloredblocks.com>
 
 =item *
 

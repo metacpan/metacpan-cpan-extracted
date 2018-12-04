@@ -21,10 +21,44 @@ Manually: clone or untar into a working directory.  Then, in that directory,
 If some of the tests fail, please check the issues and file a new one if
 no one else has reported the problem yet.
 
-# USAGE
+# SYNOPSIS
 
-    use Test::More;
-    use Test::OnlySome;
+In your test file (e.g., `t/01.t`):
+
+    use Test::More tests => 2;
+    use Test::OnlySome::RerunFailed;    # rerun only failed tests
+    os ok(1, 'passes');     # "os" marks tests that might be skipped
+    os ok(0, 'fails');
+
+At the command line:
+
+    $ osprove -lv
+    ...
+    ok 1 - passes
+    not ok 2 - fails
+    ...
+    Result: FAIL
+
+This creates `.onlysome.yml`, which holds the test results from `t/01.t`.
+Then, re-run:
+
+    $ osprove -lv
+    ...
+    ok 1 # skip Test::OnlySome: you asked me to skip this
+    not ok 2 - fails
+    ...
+
+Since test 1 passed the first time, it was skipped the second time.
+
+You don't have to use `Test::OnlySome::RerunFailed`.  You can directly
+use `Test::OnlySome`, and you can decide in some other way which tests
+you want to skip.
+
+The argument to ["os"](#os) can be a statement or block, and it doesn't have to
+be a [Test::More](https://metacpan.org/pod/Test::More) test.  You can wrap long-running tests in functions,
+and apply ["os"](#os) to those functions.
+
+# MARKING TESTS
 
 You can pick which tests to skip using implicit or explicit configuration.
 Explicit configuration uses a hashref:
@@ -90,61 +124,6 @@ not in the caller's scope.
 
 Removes the ["os"](#os) keyword definition.
 
-# INTERNALS
-
-## \_gen
-
-This routine generates source code that, at runtime, will execute a given
-only-some test.
-
-## \_is\_testnum
-
-Return True if the provided parameter, or `$_`, is a valid test number.
-
-## \_opts
-
-Returns the appropriate options hashref, and an indication of whether
-the caller should `shift` (true for explicit config).  Call as `_opts($_[0])`.
-
-## \_nexttestnum
-
-Gets the caller's current `$TEST_NUMBER_OS` value.
-
-## \_escapekit
-
-Find the caller using a Test::Kit package that uses us, so we can import
-the keyword the right place.
-
-## \_printtrace
-
-Print a full stack trace
-
-# VARIABLES
-
-## `$TEST_NUMBER_OS`
-
-Exported into the caller's package.  A sequential numbering of tests that
-have been run under ["os"](#os).
-
-## `$TEST_ONLYSOME` (Options hashref)
-
-Exported into the caller's package.  A hashref of options, of the same format
-as an explicit-config hashref.  Keys are:
-
-- `n`
-
-    The number of tests in each ["os"](#os) call.
-
-- `skip`
-
-    A hashref of tests to skip.  Test numbers are keys; any truthy
-    value will indicate that the ["os"](#os) call beginning with that test number
-    should be skipped.
-
-# AUTHOR
-
-Christopher White, `<cxwembedded at gmail.com>`
-
 # BUGS
 
 Please report any bugs or feature requests on GitHub, at
@@ -177,10 +156,6 @@ You can also look for information at:
 - RT: CPAN's request tracker
 
     [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-OnlySome)
-
-# VERSION
-
-Version 0.0.6
 
 # LICENSE AND COPYRIGHT
 

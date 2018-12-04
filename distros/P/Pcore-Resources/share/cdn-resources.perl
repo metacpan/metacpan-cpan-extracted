@@ -18,7 +18,7 @@
     ammap3_path    => sub ( $cdn, $ver = 'v3.21.14' ) { $cdn->("/static/ammap-$ver/") },
 
     # https://www.amcharts.com/lib/4/
-    amcharts4_path => sub ( $cdn, $ver = 'v4.0.1' ) { $cdn->("/static/amcharts-$ver/") },      #
+    amcharts4_path => sub ( $cdn, $ver = 'v4.0.3' ) { $cdn->("/static/amcharts-$ver/") },      #
 
     # https://www.amcharts.com/lib/4/geodata/
     amcharts4_geodata_path => sub ( $cdn, $ver = 'v4.0.20' ) { $cdn->("/static/amcharts-geodata-$ver/") },

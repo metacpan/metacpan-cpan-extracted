@@ -251,16 +251,17 @@ sub _verify_auth_code_jwt {
     return ( 0, 'invalid_grant' )
         if ( $client_secret ne $client->{ client_secret } );
 
-    my $auth_code_payload;
+    my ( $auth_code_payload,$invalid_jwt );
 
     try {
         $auth_code_payload = Mojo::JWT->new( secret => $self->jwt_secret )->decode( $auth_code );
     }
     catch {
-        return ( 0, 'invalid_grant' );
+        $invalid_jwt = 1;
     };
 
     if (  !$auth_code_payload
+        or $invalid_jwt
         or $auth_code_payload->{ type } ne 'auth'
         or $auth_code_payload->{ client } ne $client_id
         or ( $uri && $auth_code_payload->{ aud } ne $uri ) )

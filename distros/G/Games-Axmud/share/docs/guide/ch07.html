@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 5.3.1">
+<meta name="generator" content="ReText 7.0.1">
+<title>ch07</title>
 </head>
 <body>
 <p><a href="ch06.html">Previous</a> <a href="index.html">Index</a> <a href="ch08.html">Next</a></p>
@@ -119,9 +120,11 @@
 <p><strong>Cooldown (in seconds)</strong></p>
 <p>You can prevent a trigger from firing too often by setting a cooldown period. For example, if you set the cooldown to 10, after firing the trigger won't be able to fire again for another 10 seconds. The default value is 0, meaning no cooldown period is used.</p>
 <h3><a name="7.1.3">7.1.3 Trigger styles</a></h3>
+<p>Now click on <strong>Page 2</strong> of the <strong>Attributes</strong> tab.</p>
+<p><img alt="Trigger styles tab" src="img/ch07/trigger_styles.png"></p>
 <p>Triggers are able to change the way matching lines are displayed. This is really useful if you want to change the colour of something like <strong>The orc drops its treasure</strong>, so that it stands out against the surrounding text.</p>
 <p>Trigger styles are turned <em>off</em> by default. When you turn them on, you need to decide whether the new style should apply to the whole line, or just the portion of the line that matches the trigger's pattern.</p>
-<p>If the trigger's pattern contains groups (see <a href="ch06.html#6.1.5">Section 6.1.5</a>, you can also apply a style just to that portion of text. For example, if you use the pattern <strong>You have (.*) gold coins</strong>, which matches the line:</p>
+<p>If the trigger's pattern contains groups (see <a href="ch06.html#6.1.5">Section 6.1.5</a>), you can also apply a style just to that portion of text. For example, if you use the pattern <strong>You have (.*) gold coins</strong>, which matches the line:</p>
 <pre><code>    You have 100 gold coins
 </code></pre>
 <p>...you can draw attention to the <strong>100</strong> by clicking on <strong>Mode n</strong>, then selecting the number 1 (meaning, the substring matching the first group in the pattern) in the box just below.</p>
@@ -398,10 +401,10 @@
 <p>The response can be any kind of instruction. It's usually a world command like <strong>get coins from corpse</strong>, but it could be a client command like <strong>;openautomapper</strong> or any other kind of instruction (see <a href="ch04.html#4.4">Section 4.4</a>).</p>
 <h3><a name="7.3.1">7.3.1 Axmud keycodes</a></h3>
 <p>A key part of Axmud's design is <em>platform independence</em>. If you install Axmud on one computer with Linux and on another computer with MS Windows, the data you save on one can be transferred to the without problems.</p>
-<p>For this reason, Axmud uses keycodes - a short string corresponding to every key on the keyboard. The keycode for each key is the same, regardless of which operating system you're using.</p>
+<p>For this reason, Axmud uses a set of standard keycodes - short strings corresponding to every key on the keyboard. The keycode for each key is the same, regardless of which operating system you're using.</p>
 <p>Axmud's keycodes - always in lower-case - are:</p>
 <pre><code>    shift alt alt_gr ctrl num_lock
-    escape pause break insert delete return backspace space
+    escape pause break insert delete return backspace space tab
     home page_up page_down end
     up down left right
     f1 f2 f3 f4 f5 f6 f7 f8 f9 f10 f11 f12
@@ -414,15 +417,15 @@
 </code></pre>
 <p>There are also a set of keycodes for the keypad (the keys, normally on the right side of the keyboard, which are laid out like a calculator):</p>
 <pre><code>    kp_0 kp_1 kp_2 kp_3 kp_4 kp_5 kp_6 kp_7 kp_8 kp_9
-    kp_up kp_down kp_left kp_right kp_page_up kp_page_down
-    kp_home kp_end kp_insert kp_delete kp_full_stop
+    kp_add kp_subtract kp_multiply kp_divide kp_enter kp_full_stop
 </code></pre>
+<p>The keycodes 'full_stop' and 'kp_full_stop' represent the full stop/period keys. Axmud supports a number of alternatives to the standard keycodes, including 'period'. (Type <strong>;listkeycodealternative</strong> for a list of alternative keycodes.)</p>
 <p>Keycodes can be combined when two or more keys are pressed together. For example, SHIFT + F1 corresponds to the keycode string "shift f1" (a string containing two words separated by a single space character).</p>
 <h3><a name="7.3.2">7.3.2 Adding macros</a></h3>
 <ul>
 <li>From the main window menu, click <strong>Edit &gt; World macros</strong></li>
 <li>In the <strong>Macro stimulus</strong> box, enter the keycode <strong>f1</strong><ul>
-<li>Axmud keycodes are always in lower-case characters</li>
+<li>Axmud standard keycodes are always in lower-case characters</li>
 </ul>
 </li>
 <li>In the <strong>Macro response</strong> box, enter the command <strong>get coins from corpses</strong></li>
@@ -518,7 +521,8 @@
 <li><strong>get_focus</strong>, <strong>lose_focus</strong> - happen when this session's main window becomes the active (focused) window, or when some other window becomes the active window</li>
 <li><strong>close_disconnect</strong> - happens just before Axmud stops running</li>
 <li><strong>map_room</strong> - happens when the automapper's current room is set</li>
-<li><strong>map_no_room</strong> - happens when the automapper's current room is reset (for example, when the automapper gets lost)</li>
+<li><strong>map_no_room</strong> - happens when the automapper's current room is reset (for example, when the automapper gets lost; does fire when the Locator task is reset)</li>
+<li><strong>map_lost</strong> - happens when the automapper's current room is reset (doesn't fire when the Locator task is reset)</li>
 <li><strong>map_rescue_on</strong> - happens when auto-rescue mode activates, and the automapper switches to a temporary region rather than marking the character as lost</li>
 <li><strong>map_rescue_merge</strong> - happens during auto-rescue mode when rooms are merged back into the previous region</li>
 <li><strong>map_rescue_off</strong> - happens when auto-rescue mode disactivates</li>

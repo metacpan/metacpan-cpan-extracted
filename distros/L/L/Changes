@@ -1,5 +1,8 @@
 Revision history for Perl extension L
 
+v1.0.1 2018-12-03T00:56:24Z
+    - Fix a couple of typos in documentation (1nickt)
+
 v1.0.0 2017-06-27T07:50:19Z
     - fix test case for perl 5.27.1 or later
     - use Minilla for releasing

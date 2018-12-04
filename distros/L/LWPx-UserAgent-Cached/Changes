@@ -1,5 +1,9 @@
 Revision history for perl distribution LWPx-UserAgent-Role-Cached
 
+0.009     2018-12-03 16:24:31-06:00 America/Chicago
+    - remove link to CPAN forum from docs as it's apparently been discontinued,
+      and other doc changes as created by updates to
+      Pod::Weaver::Section::Support
 0.008     2016-10-27 00:29:55-05:00 America/Chicago
     - more correctly handle HTTP Client-Transfer-Encoding: chunked
       headers

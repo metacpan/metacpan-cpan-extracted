@@ -23,7 +23,7 @@ package MongoDB::Error;
 
 use version;
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.0.2';
 
 use Moo;
 use Carp;
@@ -187,7 +187,7 @@ sub _is_retryable {
 
     return 1 if _check_is_retryable_message( $self->message );
 
-    if ( $self->$_isa( 'MongoDB::WriteConcernError' ) ) {
+    if ( $self->$_isa( 'MongoDB::WriteConcernError' ) && $self->result->$_can( 'output' ) ) {
       return 1 if _check_is_retryable_code( $self->result->output->{writeConcernError}{code} );
       return 1 if _check_is_retryable_message( $self->result->output->{writeConcernError}{message} );
     }
@@ -416,7 +416,7 @@ MongoDB::Error - MongoDB Driver Error classes
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 SYNOPSIS
 

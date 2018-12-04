@@ -1,3 +1,19 @@
+0.161   2018-11-19 (PERLANCAR)
+
+	- Add scripts dd2dd, json2json, yaml2yml for convenience.
+
+	- serializeutils-convert: Expand documentation, add options
+	  --color, --compact, --safe, --dumper.
+
+        - By default output colored JSON, YAML, and Perl.
+
+        - Allow compact Perl output using Data::Dmp instead of the default
+          Data::Dump or Data::Dump::Color.
+
+        - Allow Perl output using Data::Dumper (--dumper Data::Dumper) instead
+          of the default Data::Dump or Data::Dump::Color.
+
+
 0.160   2018-01-29 (PERLANCAR)
 
 	- pp-json, pp-yaml: Observe COLOR environment variable to set

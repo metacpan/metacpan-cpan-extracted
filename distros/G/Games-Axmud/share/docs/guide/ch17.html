@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReText 5.3.1">
+<meta name="generator" content="ReText 7.0.1">
+<title>ch17</title>
 </head>
 <body>
 <p><a href="ch16.html">Previous</a> <a href="index.html">Index</a> <a href="ch18.html">Next</a></p>
@@ -299,6 +300,9 @@ F debug.locator.some
      Show some Locator debug messages (GA::Client-&gt;debugLocatorFlag)
 F debug.locator.all
      Show all Locator debug messages (GA::Client-&gt;debugMaxLocatorFlag)
+F debug.locator.exit
+     Show illegal exit direction debug messages
+        (GA::Client-&gt;debugMaxLocatorFlag)
 F debug.locator.move
      Show Locator's movement command list (GA::Client-&gt;debugMoveListFlag)
 F debug.obj.parse
@@ -479,18 +483,6 @@ F instruct.complete.type
      Auto-complete navigation type (GA::Client-&gt;autoCompleteType)
 F instruct.complete.parent
      Auto-complete registry location (GA::Client-&gt;autoCompleteParent)
-
-
-O keycode.obj.current
-     Current keycode object (GA::Client-&gt;currentKeycodeObj)
-O keycode.obj.NAME
-     Keycode object called 'NAME' (from GA::Client-&gt;keycodeObjHash)
-S keycode.current.KEYCODE
-     Current value for the standard KEYCODE value (from
-        GA::Obj::Keycode-&gt;keycodeHash)
-S keycode.default.KEYCODE
-     Default value for the standard KEYCODE value (from
-        GA::CLIENT-&gt;constKeycodeHash)
 
 
 F log.allow
@@ -961,8 +953,10 @@ F recording.position
      Current recording position (GA::Session-&gt;recordingPosn)
 
 
-S regex.url
+S regex.url.long
      Regex matching valid web links (GA::Client-&gt;constUrlRegex)
+S regex.url.short
+     Regex matching short web links (GA::Client-&gt;constShortUrlRegex)
 S regex.email
      Regex matching valid email addresses (GA::Client-&gt;constEmailRegex)
 

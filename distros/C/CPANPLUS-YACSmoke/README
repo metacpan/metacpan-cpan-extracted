@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.02
+    version 1.04
 
 SYNOPSIS
 
@@ -58,6 +58,17 @@ CONFIGURATION FILE
 
     The above would ignore all distributions of any CPAN author ID that
     begins with ASS, such as ASSAM and ASSONIA.
+
+    Experimental support for local::lib type environment has been added. In
+    the ini file specify the local::lib setting to enable this feature.
+
+      [CONFIG]
+      local::lib = 1
+
+    Setting this will make CPANPLUS::YACSmoke setup a local::lib under the
+    current working directory before testing starts. All modules tested
+    (and prereqs resolved during testing) will be installed into the
+    local::lib. When testing finishes, the local::lib will be removed.
 
     See Config::IniFiles for more information on the INI file format.
 
@@ -223,7 +234,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017 by Chris Williams, Jos Boumans,
+    This software is copyright (c) 2018 by Chris Williams, Jos Boumans,
     Robert Rothenberg and Barbie.
 
     This is free software; you can redistribute it and/or modify it under

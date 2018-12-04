@@ -10,18 +10,31 @@ use File::ShareDir;
 sub call {
     my ($self, $operation, $params) = @_;
     my $call = compiled_client($self, $operation);
-    return process_return($self, $call->($params));
+    return process_return($self, $operation, $call->($params));
 }
 
 sub process_return {
-    my ($self, $return, $trace) = @_;
+    my ($self, $operation, $return, $trace) = @_;
 
     if ($self->{debug}) {
         $trace->printErrors;
         $trace->printRequest;
         $trace->printResponse;
     }
-    return $return->{parameters}{return};
+    if (exists $return->{parameters}{return}) {
+        return $return->{parameters}{return};
+    }
+    elsif (exists $return->{parameters}{$operation}) {
+        if (exists $return->{parameters}{$operation}{resultado_solicitacao}) {
+            return $return->{parameters}{$operation}{resultado_solicitacao};
+        }
+        else {
+            return $return->{parameters}{$operation};
+        }
+    }
+    else {
+        return $return;
+    }
 }
 
 sub compiled_client {
@@ -65,13 +78,17 @@ sub build_transport {
     ###
     ### which is why we need to customize our transport here :(
     my @timeout = $self->{timeout} ? (timeout => $self->{timeout}) : ();
+    my $ua = LWP::UserAgent->new(
+        @timeout,
+        ssl_opts => { verify_hostname => 0 },
+#        $self->{usuario}, $self->{senha}
+    );
+    $ua->credentials( @{$self->{ua_auth}} ) if exists $self->{ua_auth};
+
     $self->{transport} = XML::Compile::Transport::SOAPHTTP->new(
         address    => $self->{wsdl}->endPoint,
         @timeout,
-        user_agent => LWP::UserAgent->new(
-            @timeout,
-            ssl_opts => { verify_hostname => 0 },
-        ),
+        user_agent => $ua
     )->compileClient();
 
     if ($self->{precompile}) {

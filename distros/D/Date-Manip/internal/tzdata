@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION='6.73';
+$VERSION='6.75';
 
 our ($dmb);
 $dmb = new Date::Manip::Base;
@@ -1051,7 +1051,7 @@ END {
 }
 
 our (\$VERSION);
-\$VERSION='6.73';
+\$VERSION='$VERSION';
 END { undef \$VERSION; }
 
 \%Dates         = (
@@ -1273,7 +1273,7 @@ use warnings;
 require 5.010000;
 
 our (\$VERSION);
-\$VERSION='6.73';
+\$VERSION='$VERSION';
 END { undef \$VERSION; }
 
 our (\$Offset,\%Offset);
@@ -1353,7 +1353,7 @@ use warnings;
 require 5.010000;
 
 our (\$VERSION);
-\$VERSION='6.61';
+\$VERSION='$VERSION';
 END { undef \$VERSION; }
 
 our (\$TzdataVersion,\$TzcodeVersion,
@@ -1876,7 +1876,9 @@ sub _print_mod_row {
 
       $wid       = length($val)  if (! $wid);
 
-      print $out ' 'x$indent,$val,' 'x($wid-length($val));
+      my $rep    = $wid-length($val);
+      $rep       = 0  if ($rep < 0);
+      print $out ' 'x$indent,$val,' 'x$rep;
    }
    print $out "\n";
 }

@@ -103,7 +103,7 @@ is($TEST_NUMBER_OS, 21, '$TEST_NUMBER_OS increments to 21');
 is_deeply($hrOpts, {skip => {6=>true, 8=>true, 10=>true, 14=>true, 18=>true,
                                 19=>true}, n=>1},
     'Options structure is what we set');
-is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}}, '$TEST_ONLYSOME has only the default content');
+is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}, verbose=>0}, '$TEST_ONLYSOME has only the default content');
 
 # }}}1
 
@@ -117,7 +117,7 @@ is($TEST_NUMBER_OS, 23, '$TEST_NUMBER_OS increments to 23');
 os $hrOpts ok(1, 'Test 23');     # This one should run
 
 is($hrOpts->{skip}->{22}, true, 'skip->22 is set');
-is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}}, '$TEST_ONLYSOME has only the default content');
+is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}, verbose=>0}, '$TEST_ONLYSOME has only the default content');
 
 # }}}1
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Finance::Bank::Postbank_de.
 
+0.55 2018-12-03
+  * Adapt to site (well, API-data) changes
+    BAUFINANZIERUNG accounts will not be returned for the time being
+
 0.54 2018-09-02
   + Add missing prerequisite for JSON, Future
     This addresses RT #127022 , reported by Slaven Rezic

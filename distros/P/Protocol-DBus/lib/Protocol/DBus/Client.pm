@@ -127,6 +127,20 @@ sub authn_pending_send {
 
 #----------------------------------------------------------------------
 
+=head2 $yn = I<OBJ>->supports_unix_fd()
+
+Boolean that indicates whether this client supports UNIX FD passing.
+
+=cut
+
+sub supports_unix_fd {
+    my ($self) = @_;
+
+    return $self->{'_authn'}->negotiated_unix_fd();
+}
+
+#----------------------------------------------------------------------
+
 =head2 $msg = I<OBJ>->get_message()
 
 Same as in the base class, but for clients the initial “Hello” message and

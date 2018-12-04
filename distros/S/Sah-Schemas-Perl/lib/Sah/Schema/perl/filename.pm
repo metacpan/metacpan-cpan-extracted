@@ -1,7 +1,7 @@
 package Sah::Schema::perl::filename;
 
-our $DATE = '2018-09-11'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2018-12-03'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 our $schema = [str => {
     summary => 'Filename (Perl script/module/POD)',
@@ -70,7 +70,7 @@ Sah::Schema::perl::filename - Filename (Perl script/module/POD)
 
 =head1 VERSION
 
-This document describes version 0.014 of Sah::Schema::perl::filename (from Perl distribution Sah-Schemas-Perl), released on 2018-09-11.
+This document describes version 0.015 of Sah::Schema::perl::filename (from Perl distribution Sah-Schemas-Perl), released on 2018-12-03.
 
 =head1 DESCRIPTION
 

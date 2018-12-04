@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-use vars qw(@accessors);
+our @accessors;
 
 BEGIN { @accessors = qw( name number balance transactions_future iban account_type )};
 

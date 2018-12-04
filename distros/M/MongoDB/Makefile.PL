@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Authen::SASL::SASLprep" => 0,
     "Authen::SCRAM::Client" => "0.011",
-    "BSON" => "1.006006",
+    "BSON" => "1.010001",
     "BSON::Bytes" => 0,
     "BSON::Code" => 0,
     "BSON::DBRef" => 0,
@@ -84,7 +84,7 @@ my %WriteMakefileArgs = (
     "threads::shared" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v2.0.1",
+  "VERSION" => "v2.0.2",
   "test" => {
     "TESTS" => "t/*.t t/deprecated/*.t t/examples/*.t t/threads/*.t t/unit/*.t"
   }
@@ -93,7 +93,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Authen::SASL::SASLprep" => 0,
   "Authen::SCRAM::Client" => "0.011",
-  "BSON" => "1.006006",
+  "BSON" => "1.010001",
   "BSON::Bytes" => 0,
   "BSON::Code" => 0,
   "BSON::DBRef" => 0,
@@ -162,7 +162,7 @@ runtime_requires('Type::Tiny::XS');
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
 if (!want_pp() && can_xs() && ($^O ne "MSWin32" || do {my (undef,$major,undef,undef,$id)=Win32::GetOSVersion(); $id>2 || ($id==2 && $major>=6)})) {
-runtime_requires('BSON::XS', '0.004002');
+runtime_requires('BSON::XS', '0.006000');
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {

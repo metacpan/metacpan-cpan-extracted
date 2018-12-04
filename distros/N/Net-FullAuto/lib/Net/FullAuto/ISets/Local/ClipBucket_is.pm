@@ -108,6 +108,13 @@ my $configure_clipbucket=sub {
       ($hash,$output,$error)=run_aws_cmd($c);
       Net::FullAuto::FA_Core::handle_error($error) if $error
          && $error!~/already exists/;
+      my $g=get_aws_security_id('ClipBucketSecurityGroup');
+      my $fullauto_inst=
+            Net::FullAuto::Cloud::fa_amazon::get_fullauto_instance();
+      my $i=$fullauto_inst->{InstanceId};
+      $c="aws ec2 modify-instance-attribute --instance-id $i ".
+         "--groups $g";
+      ($hash,$output,$error)=run_aws_cmd($c);
    }
    my $local=$localhost;
    my $handle=$local;
@@ -902,37 +909,6 @@ END
          './configure','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','__display__');
-      # to make tokudb the default storage engine,
-      # you have to start mysqld with: --default-storage-engine=tokudb
-      my $toku_cnf=<<END;
-[mariadb]
-# See https://mariadb.com/kb/en/tokudb-differences/ for differences
-# between TokuDB in MariaDB and TokuDB from http://www.tokutek.com/
-
-plugin-load-add=ha_tokudb.so
-
-[mysqld_safe]
-malloc-lib=/usr/local/lib/libjemalloc.so.2
-END
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "echo -e \"$toku_cnf\" > ~/tokudb.cnf");
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ~/tokudb.cnf /etc/my.cnf.d/tokudb.cnf',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'rm -rvf ~/tokudb.cnf','__display__');
-      # https://github.com/arslancb/clipbucket/issues/429
-      my $strict_mode_cnf=<<END;
-[mysqld]
-sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
-END
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "echo -e \"$strict_mode_cnf\" > ~/strict_mode.cnf");
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ~/strict_mode.cnf /etc/my.cnf.d/strict_mode.cnf',
-         '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'rm -rvf ~/strict_mode.cnf','__display__');
       ($stdout,$stderr)=$handle->cwd('..');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ls -1 /opt','__display__');
@@ -1053,6 +1029,37 @@ END
          'chgrp -v mysql /var/lib/mysql','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chgrp -v mysql /var/lib/mysql/mysql','__display__');
+      # to make tokudb the default storage engine,
+      # you have to start mysqld with: --default-storage-engine=tokudb
+      my $toku_cnf=<<END;
+[mariadb]
+# See https://mariadb.com/kb/en/tokudb-differences/ for differences
+# between TokuDB in MariaDB and TokuDB from http://www.tokutek.com/
+
+plugin-load-add=ha_tokudb.so
+
+[mysqld_safe]
+malloc-lib=/usr/local/lib/libjemalloc.so.2
+END
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "echo -e \"$toku_cnf\" > ~/tokudb.cnf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ~/tokudb.cnf /etc/my.cnf.d/tokudb.cnf',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf ~/tokudb.cnf','__display__');
+      # https://github.com/arslancb/clipbucket/issues/429
+      my $strict_mode_cnf=<<END;
+[mysqld]
+sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+END
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "echo -e \"$strict_mode_cnf\" > ~/strict_mode.cnf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ~/strict_mode.cnf /etc/my.cnf.d/strict_mode.cnf',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf ~/strict_mode.cnf','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql start','__display__');
       #($stdout,$stderr)=$handle->cmd($sudo.

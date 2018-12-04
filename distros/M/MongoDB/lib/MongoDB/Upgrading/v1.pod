@@ -27,7 +27,7 @@ MongoDB::Upgrading::v1 - Deprecations and behavior changes from v0 to v1
 
 =head1 VERSION
 
-version v2.0.1
+version v2.0.2
 
 =head1 DESCRIPTION
 

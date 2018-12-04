@@ -5,9 +5,6 @@ use warnings;
 
 use parent qw( IO::Framed::Write );
 
-use Socket;
-use Socket::MsgHdr;
-
 my %fh_fds;
 
 sub DESTROY {
@@ -41,6 +38,8 @@ sub WRITE {
 
     # Only use sendmsg if we actually need to.
     if (my $fds_ar = $fh_fds{ $_[0] }[0]) {
+        die 'Socket::MsgHdr is not loaded!' if !Socket::MsgHdr->can('new');
+
         my $msg = Socket::MsgHdr->new( buf => $_[1] );
 
         $msg->cmsghdr(

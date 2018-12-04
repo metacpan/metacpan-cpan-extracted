@@ -19,8 +19,9 @@ my @files = (
     't/000-report-versions.t',      't/004-cached.t',
     't/005-custom-cache.t',         't/006-cached-chi.t',
     't/TestCache.pm',               't/author-critic.t',
-    't/author-eol.t',               't/author-mojibake.t',
-    't/author-no-tabs.t',           't/author-pod-coverage.t',
+    't/author-eol.t',               't/author-minimum-version.t',
+    't/author-mojibake.t',          't/author-no-tabs.t',
+    't/author-pod-coverage.t',      't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',        't/author-portability.t',
     't/author-synopsis.t',          't/author-test-version.t',
     't/cache_control.t',            't/cache_key.t',
@@ -32,8 +33,7 @@ my @files = (
     't/pages/8.html',               't/pages/9.html',
     't/release-cpan-changes.t',     't/release-dist-manifest.t',
     't/release-distmeta.t',         't/release-kwalitee.t',
-    't/release-meta-json.t',        't/release-minimum-version.t',
-    't/release-pod-linkcheck.t',    't/release-unused-vars.t'
+    't/release-meta-json.t',        't/release-unused-vars.t'
 );
 
 notabs_ok($_) foreach @files;

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-use vars qw( @numbers @dates );
+our ( @numbers,  @dates );
 
 BEGIN {
   @numbers = (

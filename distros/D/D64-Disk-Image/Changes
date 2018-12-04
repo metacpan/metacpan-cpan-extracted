@@ -1,5 +1,10 @@
 Revision history for Perl extension D64::Disk::Image.
 
+0.05  2018-12-01
+    - fix randomly occurring "panic: XSUB failed to extend arg stack" error by
+      properly using "EXTEND" macro to make room on the argument stack for the
+      return values before they are pushed onto the stack with the "PUSHs" macro
+
 0.04  2018-11-29
     - properly return an empty list from the following method calls: "read",
       "status", "rawname_from_name", and "name_from_rawname" (remove an invalid

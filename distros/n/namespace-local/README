@@ -1,8 +1,6 @@
-namespace-local
-
 # NAME
 
-namespace::local - confine imports to current scope only
+namespace::local - Confine imports and/or functions to a given scope
 
 # INSTALLATION
 

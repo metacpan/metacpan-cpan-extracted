@@ -63,7 +63,7 @@ L<cme>
 
 =over
 
-=item 2009-2011 Dominique Dumont
+=item 2009-2018 Dominique Dumont
 
 
 =back

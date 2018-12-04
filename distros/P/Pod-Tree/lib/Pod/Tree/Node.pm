@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Pod::Escapes ();
 
-our $VERSION = '1.27';
+our $VERSION = '1.29';
 
 sub root    # ctor
 {

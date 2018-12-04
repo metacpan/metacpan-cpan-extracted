@@ -3,10 +3,14 @@ abstract: 'Skip individual tests in a *.t file'
 author:
   - 'Christopher White <cxwembedded@gmail.com>'
 build_requires:
+  App::Prove: '0'
+  Capture::Tiny: '0'
   Carp: '0'
   Exporter: '0'
+  Exporter::Renaming: '0'
   Import::Into: '0'
   Pod::Markdown: '0'
+  Test2::Tools::Compare: '0'
   Test::Fatal: '0'
   Test::Kit: '2.14'
   Test::More: '0'
@@ -17,7 +21,7 @@ configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,12 +31,29 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  App::Prove::Plugin::Test::OnlySomeP:
+    file: lib/App/Prove/Plugin/Test/OnlySomeP.pm
+    version: '0.000007'
+  App::Prove::Plugin::Test::OnlySomeP::Formatter:
+    file: lib/App/Prove/Plugin/Test/OnlySomeP/Formatter.pm
+    version: '0.000007'
+  Test::OnlySome:
+    file: lib/Test/OnlySome.pm
+    version: '0.000007'
+  Test::OnlySome::PathCapsule:
+    file: lib/Test/OnlySome/PathCapsule.pm
+    version: '0.000007'
+  Test::OnlySome::RerunFailed:
+    file: lib/Test/OnlySome/RerunFailed.pm
+    version: '0.000007'
 recommends:
   YAML::XS: '0'
 requires:
   Best: '0.11'
   Data::Dumper: '0'
   File::Spec: '0'
+  Getopt::Long: '2.5'
   Keyword::Declare: '0.001006'
   Scalar::Util: '1.39'
   YAML: '0'
@@ -40,5 +61,5 @@ requires:
   vars: '0'
 resources:
   repository: https://github.com/cxw42/Test-OnlySome.git
-version: '0.000006'
+version: '0.000007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

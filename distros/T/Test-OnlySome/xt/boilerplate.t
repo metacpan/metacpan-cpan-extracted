@@ -1,10 +1,9 @@
-#!perl -T
+#!perl
 use 5.006;
 use strict;
 use warnings;
 use Test::More;
-
-plan tests => 3;
+use File::Globstar qw(globstar);
 
 sub not_in_file_ok {
     my ($filename, %regex) = @_;
@@ -38,19 +37,15 @@ sub module_boilerplate_ok {
     );
 }
 
-TODO: {
-  local $TODO = "Need to replace the boilerplate text";
-
-  not_in_file_ok('README.md' =>
+not_in_file_ok('README.md',
     "The README is used..."       => qr/The README is used/,
     "'version information here'"  => qr/to provide version information/,
-  );
+);
 
-  not_in_file_ok(Changes =>
+not_in_file_ok('Changes',
     "placeholder date/time"       => qr(Date/time)
-  );
+);
 
-  module_boilerplate_ok('lib/Test/OnlySome.pm');
+module_boilerplate_ok($_) for globstar 'lib/**/*.pm';
 
-
-}
+done_testing();

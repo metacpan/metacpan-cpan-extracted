@@ -14,7 +14,7 @@
 #     REVISION:  ---
 #===============================================================================
 
-use Test::More tests => 19;                      # last test to print
+use Test::More tests => 15;                      # last test to print
 
 BEGIN { use_ok('Business::KontoCheck') };
 
@@ -82,6 +82,5 @@ if($rv eq $soll){$ok_cnt++;} else {$nok_cnt++};
 ok($rv eq $soll,"Kodierung 5: $rv (ok: $ok_cnt, nok: $nok_cnt)");
 
 __DATA__
-12070024:Deutsche Bank Privat und Gesch‰ftskunden:Deutsche Bank Privat und Gesch√§ftskunden:Deutsche Bank Privat und Gesch&auml;ftskunden:Deutsche Bank Privat und GeschÑftskunden
 17092404:VR Bank F¸rstenwalde Seelow Wriezen:VR Bank F√ºrstenwalde Seelow Wriezen:VR Bank F&uuml;rstenwalde Seelow Wriezen:VR Bank FÅrstenwalde Seelow Wriezen
 50069976:Volksbank Wiﬂmar:Volksbank Wi√ümar:Volksbank Wi&szlig;mar:Volksbank Wi·mar

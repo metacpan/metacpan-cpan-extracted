@@ -12,11 +12,14 @@ all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Alders
 Alders'
+Anwar
+Mohammad
 Olaf
 Open
 This
 lib
 libs
+mohammad
 olaf
 ot
 script

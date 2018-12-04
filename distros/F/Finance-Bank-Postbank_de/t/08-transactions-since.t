@@ -3,7 +3,7 @@ use strict;
 use FindBin;
 use Data::Dumper;
 
-use vars qw($statement);
+our $statement;
 use Test::More;
 
 my %days = (
