@@ -8,8 +8,10 @@ Makefile.PL
 README
 dist.ini
 lib/App/MysqlUtils.pm
+script/mysql-copy-rows-adjust-pk
 script/mysql-drop-all-tables
 script/mysql-drop-tables
+script/mysql-find-identical-rows
 script/mysql-query
 script/mysql-run-pl-files
 script/mysql-run-sql-files

@@ -2,7 +2,7 @@ package Term::Table::LineBreak;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -22,6 +22,7 @@ sub columns { uni_length($_[0]->{+STRING}) }
 sub break {
     my $self = shift;
     my ($len) = @_;
+
     $self->{+_LEN} = $len;
 
     $self->{+IDX} = 0;

@@ -12,10 +12,14 @@ my $id1 = 'session:06b6d2138df949524092eefc066ee5ab3598bf96';
 my $id2 = q(string\\string"string'string);
 my $id2_quoted_no_backslash = q('string\\string"string''string');
 
-my $dbh = DbiTestConnect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 1, AutoCommit => 0 });
+my $dbh = DbiTestConnect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 0, AutoCommit => 0 });
 
 if ($dbh->{mariadb_serverversion} < 50001) {
     plan skip_all => "Servers < 5.0.1 do not support sql_mode NO_BACKSLASH_ESCAPES";
+}
+
+if ($dbh->{mariadb_clientversion} < 50001) {
+    $id2_quoted_no_backslash = q(X'737472696E675C737472696E6722737472696E6727737472696E67');
 }
 
 plan tests => 24;

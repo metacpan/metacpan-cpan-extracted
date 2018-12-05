@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw (Class::Accessor::Fast);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 __PACKAGE__->mk_accessors(qw( ul ol min_heading_level permalink in_block_of trac_url ));
 

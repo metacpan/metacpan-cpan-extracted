@@ -56,6 +56,15 @@ tables:
         name: company
         not_null: '0'
         precision: '-1'
+      -
+        autoincrement: '0'
+        comment: ''
+        datatype: TEXT
+        default_value: ''
+        length: '11'
+        name: sig
+        not_null: '1'
+        precision: '-1'
     foreign_keys: {}
     indexes:
       -

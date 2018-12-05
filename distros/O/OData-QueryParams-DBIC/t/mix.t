@@ -11,6 +11,7 @@ my %tests = (
     'select=col1&filter=Price le 100&skip=10' => [ { Price => { '<=' => 100 } }, { columns => ['col1'], page => 11 } ],
     'select=col1&filter=Price le 100&skip='   => [ { Price => { '<=' => 100 } }, { columns => ['col1'] } ],
     'select=&filter=Price le 100&skip=10'     => [ { Price => { '<=' => 100 } }, { page => 11 } ],
+    '$select=&filter=Price le 100&$skip=10'   => [ { Price => { '<=' => 100 } }, { page => 11 } ],
 
 );
 

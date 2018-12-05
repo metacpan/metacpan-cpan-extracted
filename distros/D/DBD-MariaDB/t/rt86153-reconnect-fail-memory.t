@@ -7,6 +7,8 @@ use vars qw($test_dsn $test_user $test_password);
 use lib 't', '.';
 require 'lib.pl';
 
+use constant SHOW_PROGRESS => ($ENV{SHOW_PROGRESS} ? 1 : 0);
+
 my $COUNT_CONNECT = 4000;   # Number of connect/disconnect iterations
 
 my $have_storable;
@@ -26,9 +28,23 @@ if (!$have_pt_size) {
     plan skip_all => "module Proc::ProcessTable does not support size attribute on current platform\n";
 }
 
-my $dbh = DbiTestConnect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 1, AutoCommit => 1 });
+plan skip_all => 'this test is not supported on OpenBSD platform' if $^O eq 'openbsd';
+
+my $dbh = DbiTestConnect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 0 });
+
+if (not eval { $dbh->do('SHOW GRANTS') }) {
+    plan skip_all => $dbh->errstr();
+}
+
+if (eval { DBI->connect($test_dsn, '4yZ73s9qeECdWi', '64heUGwAsVoNqo', { RaiseError => 1, PrintError => 0 }) }) {
+    plan skip_all => 'Server accepts connections with invalid user/password';
+}
 
 plan tests => 3;
+
+if (not SHOW_PROGRESS and $ENV{TEST_VERBOSE}) {
+    note "You can set \$ENV{SHOW_PROGRESS} to monitor the progress of slow tests";
+}
 
 sub size {
   my($p, $pt);
@@ -52,9 +68,9 @@ $prev_size= undef;
 
 # run reconnect with a bad password
 for (my $i = 0;  $i < $COUNT_CONNECT;  $i++) {
-    eval { $dbh2 = DBI->connect($test_dsn, $test_user, "$test_password ",
+    eval { $dbh2 = DBI->connect($test_dsn, '4yZ73s9qeECdWi', '64heUGwAsVoNqo',
                                { RaiseError => 1, 
-                                 PrintError => 1,
+                                 PrintError => 0,
                                  AutoCommit => 0 });};
 
     if ($i % 100  ==  99) {
@@ -73,6 +89,9 @@ for (my $i = 0;  $i < $COUNT_CONNECT;  $i++) {
             $size      = size();
         }
         $prev_size = $size;
+    }
+    if (SHOW_PROGRESS) {
+        note sprintf "Progress: %5d/%5d", $i+1, $COUNT_CONNECT;
     }
 }
 

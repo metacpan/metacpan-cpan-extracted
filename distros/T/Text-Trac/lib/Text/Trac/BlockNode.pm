@@ -7,7 +7,7 @@ use base qw( Class::Accessor::Fast Class::Data::Inheritable );
 use UNIVERSAL::require;
 use Text::Trac::InlineNode;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 __PACKAGE__->mk_classdata( block_nodes => [qw( heading hr p ul ol blockquote pre table dl )] );
 

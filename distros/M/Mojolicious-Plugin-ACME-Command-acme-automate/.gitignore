@@ -1,0 +1,13 @@
+*.key
+*.crt
+*.cert
+*.pem
+
+!t/test.key
+
+Build.PL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Mojo-ACME-*.tar.gz

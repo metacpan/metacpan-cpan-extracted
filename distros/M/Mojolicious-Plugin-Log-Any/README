@@ -38,7 +38,7 @@ SYNOPSIS
         
         # Log::Log4perl
         use Log::Log4perl;
-        Log::Log4perl->init($self->home->child('log.conf'));
+        Log::Log4perl->init($self->home->child('log.conf')->to_string);
         $self->plugin('Log::Any' => {logger => 'Log::Log4perl'});
       }
       
@@ -59,9 +59,12 @@ DESCRIPTION
 
     The default behavior of the Mojo::Log object to filter messages by
     level, keep history, prepend a timestamp, and write log messages to a
-    file or STDERR will be suppressed. It is expected that the logging
-    framework output handler will be configured to handle these details as
-    necessary.
+    file or STDERR will be suppressed, by setting the application log level
+    to debug (the lowest level) and removing the default "message" in
+    Mojo::Log handler. It is expected that the logging framework output
+    handler will be configured to handle these details as necessary. If you
+    want to customize how the logging framework is attached, use
+    Mojo::Log::Role::AttachLogger directly.
 
 METHODS
 

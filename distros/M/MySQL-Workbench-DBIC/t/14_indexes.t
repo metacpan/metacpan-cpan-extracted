@@ -38,7 +38,7 @@ ok( -e $subpath . '/DBIC_Schema/Result/UserRole.pm', 'UserRole' );
 ok( -e $subpath . '/DBIC_Schema/Result/Role.pm', 'Role' );
 
 my $content = do{ local (@ARGV, $/) = $subpath . '/DBIC_Schema/Result/UserRole.pm'; <> };
-like_string $content, qr/sqlt_deploy_hook/;
+like_string $content, qr/sub sqlt_deploy_hook/;
 
 like_string $content,
     qr/add_index\( \s* 
@@ -46,6 +46,17 @@ like_string $content,
         name \s*   => \s* "fk_Gefa_User_has_Role_Role1_idx", \s*
         fields \s* => \s* \['RoleID'\]
     /xms;
+
+like_string $content, qr/
+    ^=head1 \s+ DEPLOYMENT \s+
+    ^=head2 \s+ sqlt_deploy_hook \s+
+    ^These \s indexes \s are \s added \s to \s the \s table \s during \s deployment \s+
+    ^=over \s+ 4 \s+
+    ^=item \s \* \s fk_Gefa_User_has_Role_Role1_idx \s+
+    ^=item \s \* \s fk_Gefa_User_has_Role_Gefa_User_idx \s+
+    ^=back \s+
+    ^=cut
+/xms;
 
 done_testing();
 

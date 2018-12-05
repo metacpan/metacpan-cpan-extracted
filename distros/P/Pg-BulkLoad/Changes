@@ -1,0 +1,8 @@
+Revision history for Pg::BulkLoad
+
+2.02    05 December 2018
+Fixed CPAN metadata issues
+2.01    25 November 2018
+Initial Release
+2.00    14 November 2018
+First Trial release

@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
     "YAML::Tiny" => "1.64"
   },
   "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "List::MoreUtils" => "0.33",
   "Moo" => "1.003001",
   "Scalar::Util" => "1.32",
+  "Test::Exception" => 0,
   "Test::LongString" => "0.16",
   "XML::LibXML" => "2.0019",
   "YAML::Tiny" => "1.64"

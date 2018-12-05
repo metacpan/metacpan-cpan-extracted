@@ -18,10 +18,10 @@ name: OData-QueryParams-DBIC
 provides:
   OData::QueryParams::DBIC:
     file: lib/OData/QueryParams/DBIC.pm
-    version: '0.04'
+    version: '0.06'
   OData::QueryParams::DBIC::FilterUtils:
     file: lib/OData/QueryParams/DBIC/FilterUtils.pm
-    version: '0.04'
+    version: '0.06'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: http://github.com/reneeb/OData-QueryParams-DBIC/issues
   homepage: http://github.com/reneeb/OData-QueryParams-DBIC
   repository: git://github.com/reneeb/OData-QueryParams-DBIC.git
-version: '0.04'
+version: '0.06'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <info@perl-services.de>'

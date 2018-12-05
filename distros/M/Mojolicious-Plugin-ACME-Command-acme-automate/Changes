@@ -1,0 +1,7 @@
+Revision history for Perl module Mojolicious-Plugin-ACME-Command-acme-automate
+
+0.02 2018-12-04
+  - Fix compile-time error
+
+0.01 2018-12-04
+  - Initial release

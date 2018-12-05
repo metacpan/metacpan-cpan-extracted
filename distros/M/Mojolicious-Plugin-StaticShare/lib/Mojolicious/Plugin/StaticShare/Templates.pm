@@ -110,6 +110,8 @@ pre {
 <script src="/static-share/js/modal.js"></script>
 <script src="/static-share/js/dropdown.js"></script>
 <script src="/static-share/js/main.js"></script>
+<script src="/static-share/js/hammer.min.js"></script>
+<script src="/static-share/js/toasts.js"></script>
 
 % if (param('edit')) {
 <script src="/static-share/js/ace.js" type="text/javascript" charset="utf-8"></script>
@@ -163,11 +165,11 @@ pre {
         <div class="input-field">
           <input type="text" name="dir-name" class="" style="width:100%;" placeholder="<%= i18n 'new dir name'%>" >
         </div>
-        <a class="lime-text text-lighten-5 dir hide" style="display:block;"></a>
+        <a class="hover-shadow3d lime-text text-lighten-5 dir hide" style="display:block;"></a>
         <div class="red-text error"></div>
       </td>
       <td class="action" style="width:1%;">
-        <a href="javascript:" _href="<%= $url_path->to_route %>" class="save-dir">
+        <a href="javascript:" _href="<%= $url_path->to_route %>" class="hover-shadow3d save-dir">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 lime-fill fill-lighten-5" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg>
         </a>
       </td>
@@ -187,11 +189,11 @@ pre {
         <div class="input-field hide">
            <input type="text" name="dir-name" class="" style="width:100%;" placeholder="<%= i18n 'new dir name'%>" value="<%== $dir %>">
         </div>
-        <a href="<%= $url %>" class="lime-text text-darken-4 dir" style="display:block;"><%== $dir %></a>
+        <a href="<%= $url %>" class="hover-shadow3d lime-text text-darken-4 dir" style="display:block;"><%== $dir %></a>
         <div class="red-text error"></div>
       </td>
       <td class="action" style="width:1%;">
-        <a href="javascript:" _href="<%= $url %>" class="save-dir hide">
+        <a href="javascript:" _href="<%= $url %>" class="hover-shadow3d save-dir hide">
           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 lime-fill fill-darken-4" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg>
         </a>
       </td>
@@ -250,14 +252,14 @@ pre {
       <input type="checkbox" name="file-check" class="" style="margin:0 0.5rem;">
     </td>
     <td class="name" style="">
-      <a class="file-view hide"></a>
+      <a class="file-view hide hover-shadow3d"></a>
       <input type="text" name="file-name" value="" class="" style="width:100%;">
       <div class="red-text error"></div>
     </td>
     <td class="action" style="width:1%;">
-      <a href="" class="file-download hide" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 light-blue-fill fill-darken-1" style="height:1.2rem;" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#download" /></svg></a>
-      <a href="javascript:" _href="" class="file-rename hide" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg></a>
-      <a href="javascript:" class="file-upload"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 white-fill" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg></a>
+      <a href="" class="file-download hide hover-shadow3d" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 light-blue-fill fill-darken-1" style="height:1.2rem;" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#download" /></svg></a>
+      <a href="javascript:" _href="" class="file-rename hide hover-shadow3d" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg></a>
+      <a href="javascript:" class="file-upload hover-shadow3d"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 white-fill" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg></a>
     </td>
     <td class="size right-align fs8" style="width:1%;"></td>
     <!--td class="type"></td-->
@@ -275,18 +277,18 @@ pre {
     </td>
 
     <td class="name" style="">
-      <a href="<%= $href %>" class="file-view"><%== $file->{name} %></a>
+      <a href="<%= $href %>" class="file-view hover-shadow3d"><%== $file->{name} %></a>
       <input type="text" name="file-name" value="<%== $file->{name} %>" class="hide" style="width:100%;">
       <div class="red-text error hide"></div>
     </td>
     <td class="action" style="width:1%;">
-      <a href="<%= $href %>?attachment=1" class="file-download" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 light-blue-fill fill-darken-1" style000="height:1.2rem;" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#download" /></svg></a>
+      <a href="<%= $href %>?attachment=1" class="file-download hover-shadow3d" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 light-blue-fill fill-darken-1" style000="height:1.2rem;" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#download" /></svg></a>
       
 % if ($c->is_admin) {
-      <a href="<%= $href %>?edit=1" class="file-edit hide" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 light-blue-fill fill-darken-1" style000="height:1.2rem;" viewBox="0 0 252 252"><use xlink:href="/static-share/fonts/icons.svg#edit-file" /></svg></a>
+      <a href="<%= $href %>?edit=1" class="file-edit hide hover-shadow3d" style="padding:0.1rem;"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon12 light-blue-fill fill-darken-1" style000="height:1.2rem;" viewBox="0 0 252 252"><use xlink:href="/static-share/fonts/icons.svg#edit-file" /></svg></a>
 % }
 
-      <a href="javascript:" _href="<%= $href %>" class="file-rename hide" style="padding:0.1rem;"><svg class="icon icon12" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg></a>
+      <a href="javascript:" _href="<%= $href %>" class="file-rename hide hover-shadow3d" style="padding:0.1rem;"><svg class="icon icon12" viewBox="0 0 26 26"><use xlink:href="/static-share/fonts/icons.svg#upload" /></svg></a>
 
     </td>
     <td class="size right-align fs8" style="width:1%;"><%= $file->{size} %></td>
@@ -335,16 +337,16 @@ pre {
   % }
 
 % unless (@{$url_path->parts}) {
-  <a href="<%= $url_path %>" class="chip grey-text grey lighten-4"><%= i18n 'root' %></a>
+  <a href="<%= $url_path %>" class="chip grey-text grey lighten-4 hover-shadow3d"><%= i18n 'root' %></a>
 % }
 % my $con;
 % for my $part (@{$url_path->parts}) {
 %   $con .="/$part";
-  <a href="<%= $con %>" class="chip card maroon-text maroon lighten-5"><%= $part %></a>
+  <a href="<%= $con %>" class="chip card maroon-text maroon lighten-5 hover-shadow3d"><%= $part %></a>
 % }
 
 % if ($c->plugin->root_url->to_route ne $url_path->to_route) {
-  <a href="<%= $url_path->clone->trailing_slash(0)->to_dir %>" class="btn-flat000 chip right nowrap" style="">
+  <a href="<%= $url_path->clone->trailing_slash(0)->to_dir %>" class="btn-flat000 chip right nowrap hover-shadow3d" style="">
     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon15 maroon-fill" viewBox="0 0 50 50"><use xlink:href="/static-share/fonts/icons.svg#up-left-round" /></svg>
     <span class="maroon-text"><%= i18n 'Up'%></span>
   </a>

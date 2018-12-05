@@ -13,7 +13,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 has output_path         => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                => ( is => 'ro', required => 1 );
@@ -23,6 +23,7 @@ has namespace           => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::
 has result_namespace    => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
 has resultset_namespace => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
 has schema_name         => ( is => 'rwp', isa => sub { $_[0] =~ m{ \A [A-Za-z0-9_]+ \z }xms } );
+has parser              => ( is => 'rwp' );
 has version_add         => ( is => 'ro', required => 1, default => sub { 0.01 } );
 has column_details      => ( is => 'ro', required => 1, default => sub { 0 } );
 has use_fake_dbic       => ( is => 'ro', required => 1, default => sub { 0 } );
@@ -36,18 +37,25 @@ has many_to_many_prefix => ( is => 'ro', required => 1, default => sub { '' } );
 has version => ( is => 'rwp' );
 has classes => ( is => 'rwp', isa => sub { ref $_[0] && ref $_[0] eq 'ARRAY' }, default => sub { [] } );
 
-before new => sub {
-    my ($self, %args) = @_;
+around new => sub {
+    my ($next, $class, %args) = @_;
 
     if ( $args{use_fake_dbic} || !eval{ require DBIx::Class } ) {
         require MySQL::Workbench::DBIC::FakeDBIC;
     }
+
+    my $self = $class->$next( %args );
+
+    my $parser = MySQL::Workbench::Parser->new( file => $self->file );
+    $self->_set_parser( $parser );
+
+    return $self;
 };
 
 sub create_schema{
     my $self = shift;
 
-    my $parser = MySQL::Workbench::Parser->new( file => $self->file );
+    my $parser = $self->parser;
     my @tables = @{ $parser->tables };
 
     my @classes;
@@ -87,8 +95,11 @@ sub _custom_code {
         $name = join '', map{ ucfirst } split /[_-]/, $table->name;
     }
 
+    my @base_path;
+    push @base_path, $self->output_path if $self->output_path;
+
     my $path = File::Spec->catfile(
-        $self->output_path || (),
+        @base_path,
         (split /::/, $self->namespace),
         $self->schema_name,
         $self->result_namespace,
@@ -107,8 +118,6 @@ sub _custom_code {
         (.*?)
         ^[#] \s+ --- \s*
     }xms;
-
-    $code //= '';
 
     return $code;
 }
@@ -129,7 +138,7 @@ sub _write_files{
             $self->_mkpath( $dir );
         }
 
-        if( open my $fh, '>', ( $dir || '.' ) . '/' . $file . '.pm' ){
+        if( open my $fh, '>', $dir . '/' . $file . '.pm' ){
             print $fh $files{$package};
             close $fh;
         }
@@ -142,10 +151,7 @@ sub _write_files{
 sub _untaint_path{
     my ($self,$path) = @_;
     ($path) = ( $path =~ /(.*)/ );
-    # win32 uses ';' for a path separator, assume others use ':'
-    my $sep = ($^O =~ /win32/i) ? ';' : ':';
-    # -T disallows relative directories in the PATH
-    $path = join $sep, grep !/^\.+$/, split /$sep/, $path;
+    $path = File::Spec->catdir( File::Spec->splitdir( $path ) );
     return $path;
 }
 
@@ -273,10 +279,12 @@ sub _class_template{
         $data = JSON->new->utf8(1)->decode( $comment );
     };
 
-    $data //= {};
+    if ( !ref $data || 'HASH' ne ref $data ) {
+        $data = {};
+    }
 
     my @core_components = $self->inherit_from_core ? () : qw(PK::Auto Core);
-    my $components      = join( ' ', @core_components, @{ $data->{components} || [] } ) // '';
+    my $components      = join( ' ', @core_components, @{ $data->{components} || [] } );
     my $load_components = $components ? "__PACKAGE__->load_components( qw/$components/ );" : '';
 
     my %foreign_keys;
@@ -407,7 +415,8 @@ sub _indexes_template {
     return '' if !@indexes;
     return '' if $self->skip_indexes;
 
-    my $hooks = '';
+    my $hooks     = '';
+    my $indexlist = '';
 
     INDEX:
     for my $index ( @indexes ) {
@@ -424,11 +433,27 @@ sub _indexes_template {
     );
 
 ', $type, $index->name, join ', ', map{ "'$_'" }@{ $index->columns };
+
+        $indexlist.= sprintf "=item * %s\n\n", $index->name;
     }
 
     return '' if !$hooks;
 
     my $sub_string = qq~
+=head1 DEPLOYMENT
+
+=head2 sqlt_deploy_hook
+
+These indexes are added to the table during deployment
+
+=over 4
+
+$indexlist
+
+=back
+
+=cut
+
 sub sqlt_deploy_hook {
     my (\$self, \$table) = \@_;
 
@@ -536,7 +561,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -709,6 +734,10 @@ be in JSON format.
 By default, the classes inherit from C<DBIx::Class> and they load the components
 C<PK::Auto> and C<Core>. If you set I<inherit_from_core>, the classes inherit
 from C<DBIx::Class::Core>. and no extra components are loaded.
+
+=head2 parser
+
+The C<MySQL::Workbench::Parser> object.
 
 =head1 AUTHOR
 

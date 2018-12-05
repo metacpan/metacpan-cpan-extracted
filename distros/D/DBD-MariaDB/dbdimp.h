@@ -42,6 +42,16 @@
 #define MY_CS_PRIMARY 32
 #endif
 
+/* Macro is available in mysql_com.h, but not defined in older MySQL versions */
+#ifndef SERVER_STATUS_NO_BACKSLASH_ESCAPES
+#define SERVER_STATUS_NO_BACKSLASH_ESCAPES 512
+#endif
+
+/* Macro is not defined in older MySQL versions */
+#ifndef CR_NO_STMT_METADATA
+#define CR_NO_STMT_METADATA 2052
+#endif
+
 /* Macro is not defined in some MariaDB versions */
 #ifndef CR_NO_RESULT_SET
 #define CR_NO_RESULT_SET 2053
@@ -313,22 +323,12 @@ PERL_STATIC_INLINE UV SvUV_nomg(pTHX_ SV *sv)
 #endif
 
 /*
- * MySQL 5.7 below 5.7.18 and MySQL 8.0.0 are affected by Bug #78778.
- * mysql_insert_id() is reset to 0 after performing SELECT operation.
- * https://bugs.mysql.com/bug.php?id=78778
+ * MySQL and MariaDB Embedded are affected by https://jira.mariadb.org/browse/MDEV-16578
+ * MariaDB 10.2.2+ prior to 10.2.19 and 10.3.9 and MariaDB Connector/C prior to 3.0.5 are affected by https://jira.mariadb.org/browse/CONC-336
+ * MySQL 8.0.4+ is affected too by https://bugs.mysql.com/bug.php?id=93276
  */
-#if !defined(MARIADB_BASE_VERSION) && ((MYSQL_VERSION_ID >= 50700 && MYSQL_VERSION_ID <= 50717) || MYSQL_VERSION_ID == 80000)
-#define HAVE_BROKEN_INSERT_ID_AFTER_SELECT
-#endif
-
-/*
- * MySQL 5.7, MySQL 8.0, MySQL Connector/C 6.1.5 and higher are affected by Bug #89139.
- * mysql_insert_id() is reset to 0 after calling mysql_ping() C function.
- * Once Bug #89139 is fixed we can adjust the upper bound of this check.
- * https://bugs.mysql.com/bug.php?id=89139
- */
-#if !defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 50700 && (MYSQL_VERSION_ID < 60100 || MYSQL_VERSION_ID >= 60105)
-#define HAVE_BROKEN_INSERT_ID_AFTER_PING
+#if defined(HAVE_EMBEDDED) || (!defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 80004) || (defined(MARIADB_PACKAGE_VERSION) && (!defined(MARIADB_PACKAGE_VERSION_ID) || MARIADB_PACKAGE_VERSION_ID < 30005)) || (defined(MARIADB_VERSION_ID) && ((MARIADB_VERSION_ID >= 100202 && MARIADB_VERSION_ID < 100219) || (MARIADB_VERSION_ID >= 100300 && MARIADB_VERSION_ID < 100309)))
+#define HAVE_BROKEN_INIT
 #endif
 
 /*
@@ -421,7 +421,9 @@ struct imp_drh_st {
     dbih_drc_t com;         /* MUST be first element in structure   */
     unsigned long int instances;
     bool non_embedded_started;
+#if !defined(HAVE_EMBEDDED) && defined(HAVE_BROKEN_INIT)
     bool non_embedded_finished;
+#endif
     bool embedded_started;
     SV *embedded_args;
     SV *embedded_groups;
@@ -455,6 +457,7 @@ struct imp_dbh_st {
     bool use_server_side_prepare;
     bool disable_fallback_for_server_prepare;
     void* async_query_in_flight;
+    my_ulonglong insertid;
     struct {
 	    unsigned int auto_reconnects_ok;
 	    unsigned int auto_reconnects_failed;
@@ -567,6 +570,7 @@ struct imp_sth_st {
 #define dbd_discon_all		mariadb_dr_discon_all
 #define dbd_take_imp_data	mariadb_db_take_imp_data
 #define dbd_db_login6_sv	mariadb_db_login6_sv
+#define dbd_db_do6		mariadb_db_do6
 #define dbd_db_commit		mariadb_db_commit
 #define dbd_db_rollback		mariadb_db_rollback
 #define dbd_db_disconnect	mariadb_db_disconnect
@@ -583,6 +587,7 @@ struct imp_sth_st {
 #define dbd_st_blob_read	mariadb_st_blob_read
 #define dbd_st_STORE_attrib	mariadb_st_STORE_attrib
 #define dbd_st_FETCH_attrib	mariadb_st_FETCH_attrib
+#define dbd_st_last_insert_id	mariadb_st_last_insert_id
 #define dbd_bind_ph		mariadb_st_bind_ph
 
 #include <dbd_xsh.h>
@@ -600,31 +605,17 @@ PERL_STATIC_INLINE int dbd_st_execute(SV *sth, imp_sth_t *imp_sth) {
 }
 #endif
 
+#ifndef HAVE_DBI_1_642
+IV mariadb_db_do6(SV *dbh, imp_dbh_t *imp_dbh, SV *statement, SV *attribs, I32 items, I32 ax);
+SV *mariadb_st_last_insert_id(SV *sth, imp_sth_t *imp_sth, SV *catalog, SV *schema, SV *table, SV *field, SV *attr);
+#endif
+
 #define MARIADB_DR_ATTRIB_GET_SVPS(attribs, key) DBD_ATTRIB_GET_SVP((attribs), "" key "", sizeof((key))-1)
 
 SV* mariadb_dr_my_ulonglong2sv(pTHX_ my_ulonglong val);
 #define my_ulonglong2sv(val) mariadb_dr_my_ulonglong2sv(aTHX_ val)
 
 void    mariadb_dr_do_error (SV* h, unsigned int rc, const char *what, const char *sqlstate);
-
-my_ulonglong mariadb_st_internal_execute(SV *,
-                                       char *,
-                                       STRLEN,
-                                       int,
-                                       imp_sth_ph_t *,
-                                       MYSQL_RES **,
-                                       MYSQL **,
-                                       bool);
-
-my_ulonglong mariadb_st_internal_execute41(SV *,
-                                         char *,
-                                         STRLEN,
-                                         int,
-                                         MYSQL_RES **,
-                                         MYSQL_STMT **,
-                                         MYSQL_BIND *,
-                                         MYSQL **,
-                                         bool *);
 
 bool mariadb_st_more_results(SV*, imp_sth_t*);
 

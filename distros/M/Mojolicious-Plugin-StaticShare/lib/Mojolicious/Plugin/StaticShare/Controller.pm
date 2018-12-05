@@ -52,22 +52,28 @@ sub post {
   my ($c) = @_;
   $c->_stash();
   
-  #~ if ($c->is_admin && $c->param('admin')) {
-    # Temporary Redirect
-    #~ $c->res->code(307);
-    #~ return $c->redirect_to($c->req->url->to_abs->path);
-  #~ }
-  
   my $file_path = $c->stash('file_path');
+  my $url_path = $c->stash('url_path');
   
-  if ($c->is_admin && (my $dir = $c->param('dir'))) {
-    return $c->new_dir($file_path, $dir);
-  } elsif ($c->is_admin && (my $rename = $c->param('rename'))) {
-    return $c->rename($file_path, $rename);
-  } elsif ($c->is_admin && (my $delete = $c->param('delete[]') && $c->every_param('delete[]'))) {
-    return $c->delete($file_path, $delete);
-  } elsif ($c->is_admin && defined(my $edit = $c->param('edit'))) {
-    return $c->_edit($file_path, $edit);
+  $c->app->log->debug($file_path, $url_path->to_route, $c->dumper($c->req->params->to_hash))
+    if $c->plugin->debug;
+  
+  if (my $dir = $c->param('dir')) {
+    return $c->new_dir($file_path, $dir)
+      if $c->is_admin;
+    return $c->render(json=>{error=>$c->i18n('you cant create dir')});
+  } elsif (my $rename = $c->param('rename')) {
+    return $c->rename($file_path, $rename)
+      if $c->is_admin;
+    return $c->render(json=>{error=>$c->i18n('you cant rename')});
+  } elsif (my $delete = $c->param('delete[]') && $c->every_param('delete[]')) {
+    return $c->delete($file_path, $delete)
+      if $c->is_admin;
+    return $c->render(json=>{error=>$c->i18n('you cant delete')});
+  } elsif (defined (my $edit = $c->param('edit'))) {
+    return $c->_edit($file_path, $edit)
+      if $c->is_admin;
+    return $c->render(json=>{error=>$c->i18n('you cant edit')});
   }
   
   return $c->render(json=>{error=>$c->i18n('target directory not found')})
@@ -76,9 +82,13 @@ sub post {
   return $c->render(json=>{error=>$c->i18n('you cant upload')})
     unless $c->is_admin || $c->public_uploads;
   
+  my $name = url_unescape($c->param('name') || '');#$file->filename
+  utf8::upgrade($name);
+  #~ return $c->render(json=>{error=>$c->i18n('Provide the name of upload file')})
+    #~ unless $name =~ /\S/i;
   
   return $c->render(json=>{error=>$c->i18n('Cant open target directory')})
-    unless -w $file_path;
+    unless !$name || -w $file_path;
   #~ $c->req->max_message_size(0);
   # Check file size
   return $c->render(json=>{error=>$c->i18n('upload is too big')}, status=>417)
@@ -86,22 +96,25 @@ sub post {
 
   my $file = $c->req->upload('file')
     or return $c->render(json=>{error=>$c->i18n('Where is your upload file?')});
-  my $name = url_unescape($c->param('name') || $file->filename);
-  utf8::upgrade($name);
-  return $c->render(json=>{error=>$c->i18n('Provide the name of upload file')})
-    unless $name =~ /\S/i;
-  
-  my $to = $file_path->child($name);
+
+  my $to = $name ? $file_path->child($name) : $file_path;
   
   return $c->render(json=>{error=>$c->i18n('path is not a directory')})
-    unless -d $file_path;
+    unless !$name || -d $file_path;
+  return $c->render(json=>{error=>$c->i18n('path is a directory')})
+    if !$name && -d $to;
+  
   return $c->render(json=>{error=>$c->i18n('file already exists')})
     if -e $to;
   
   eval { $file->asset->move_to($to) }
     or return $c->render(json=>{error=>$@  =~ /(.+) at /});
   
-  $c->render(json=>{ok=> $c->stash('url_path')->merge($name)->to_route});
+  
+  $url_path->merge($name)
+    if $name;
+  
+  $c->render(json=>{ok=> $url_path->trailing_slash(0)->to_route});
 }
 
 sub _stash {

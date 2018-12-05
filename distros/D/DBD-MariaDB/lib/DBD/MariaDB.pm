@@ -10,7 +10,7 @@ use DBI;
 use DynaLoader();
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '1.00';
+our $VERSION = '1.10';
 
 bootstrap DBD::MariaDB $VERSION;
 
@@ -44,6 +44,13 @@ sub driver{
 	DBD::MariaDB::db->install_method('mariadb_async_ready');
 	DBD::MariaDB::st->install_method('mariadb_async_result');
 	DBD::MariaDB::st->install_method('mariadb_async_ready');
+
+        # for older DBI versions register our last_insert_id statement method
+        if (not eval { DBI->VERSION(1.642) }) {
+            # disable warning: method name prefix 'last_' is not associated with a registered driver
+            local $SIG{__WARN__} = sub {};
+            DBD::MariaDB::st->install_method('last_insert_id');
+        }
 
 	$methods_are_installed++;
     }
@@ -106,6 +113,7 @@ sub connect {
     my($port);
     my($cWarn);
     my $connect_ref= { 'Name' => $dsn };
+    $attrhash = {} unless defined $attrhash;
 
     # create a 'blank' dbh
     my $attr_dsn = DBD::MariaDB->parse_dsn($dsn);
@@ -118,7 +126,7 @@ sub connect {
 	'password' => $password
     };
 
-    if (defined $attrhash) {
+    if (exists $attrhash->{dbi_imp_data}) {
       $connect_ref->{'dbi_imp_data'} = $attrhash->{dbi_imp_data};
     }
 

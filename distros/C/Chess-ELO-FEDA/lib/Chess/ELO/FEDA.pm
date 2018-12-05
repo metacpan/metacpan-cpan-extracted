@@ -1,5 +1,5 @@
 package Chess::ELO::FEDA;
-$Chess::ELO::FEDA::VERSION = '0.03';
+$Chess::ELO::FEDA::VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -19,18 +19,23 @@ sub new {
    my $class = shift;
    my %args = @_;
    my $self = {-verbose=>0, -url=>'', -target=>'', -ext=>'', -path=>''};
-   $self->{-path} = $args{-path} if exists $args{-path};
+   $self->{-path} = $args{-folder} if exists $args{-folder};
    $self->{-target} = $args{-target} if exists $args{-target};
    $self->{-url} = $args{-url} if exists $args{-url};
    $self->{-verbose} = $args{-verbose} if exists $args{-verbose};
    $self->{-callback} = $args{-callback} if exists $args{-callback};
 
-   if( $self->{-target} =~ m!(\w+)$! ) {
+   if( $self->{-target} && ($self->{-target} =~ m!(\w+)$!) ) {
       $self->{-ext} = lc( $1 );
    }
    
    if( ($self->{-ext} ne 'sqlite') && ($self->{-ext} ne 'csv') ) {
-      die "Unsupported target: [" . $self->{-ext} . "]";
+      if( $self->{-target} ) {
+         die "Unsupported target: [" . $self->{-ext} . "]";
+      }
+      else {
+         $self->{-ext} = 'NULL';
+      }
    }
 
    unless(-d $self->{-path} ) {
@@ -55,8 +60,8 @@ sub cleanup {
 
 sub download {
    my $self = shift;
-   
-   my $target_filename = catfile($self->{-path}, $self->{-target});
+   my $filename = $self->{-target} || 'chess_elo_feda';
+   my $target_filename = catfile($self->{-path}, $filename);
    my $zip_filename = $target_filename . '.zip';
    my $xls_filename = $target_filename . '.xls';
 
@@ -86,7 +91,10 @@ sub parse {
    
    my $rc = 0;
 
-   if( $self->{-ext} eq 'sqlite' ) {
+   if( $self->{-ext} eq 'NULL' ) {
+      $rc = $self->_parse_null;
+   }
+   elsif( $self->{-ext} eq 'sqlite' ) {
       $rc = $self->_parse_sqlite;
    }
    elsif( $self->{-ext} eq 'csv' ) {
@@ -142,6 +150,17 @@ sub _extract_file_from_zip {
 
 #-------------------------------------------------------------------------------
 
+sub _parse_null {
+   my $self = shift;
+   
+   $self->{-verbose} and print "+ NULL target", "\n";
+   my $rc = $self->_parse_abstract_dbd(undef);
+   
+   return $rc;
+}
+
+#-------------------------------------------------------------------------------
+
 sub _parse_sqlite {
    my $self = shift;
    
@@ -193,7 +212,7 @@ sub _parse_abstract_dbd {
    my $self = shift;
    my $dbh = shift;
    
-   $dbh->do(qq/CREATE TABLE elo_feda(
+   $dbh and $dbh->do(qq/CREATE TABLE elo_feda(
 feda_id integer primary key, 
 surname varchar(32) not null,
 name    varchar(32), 
@@ -226,8 +245,6 @@ flag    varchar(8)
             $feda_player{ $player_keys->[$col_index] } = $value;
          }
          
-         ##next if $feda_player{fed} ne 'CNT';
-         
          $feda_player{name} = decode('latin1', $feda_player{name});
          
          my $name = $feda_player{name};
@@ -247,7 +264,7 @@ flag    varchar(8)
                $feda_player{name}    = '***';
          }
          eval {
-               $stmt->execute(
+               $stmt and $stmt->execute(
                         $feda_player{feda_id},
                         $feda_player{surname},
                         $feda_player{name},
@@ -270,15 +287,20 @@ flag    varchar(8)
    my $i = $START_XLS_ROW;
    my $j = $i + $BLOCK_TXN - 1;
    
-   my $stmt = $dbh->prepare("insert into elo_feda (feda_id, surname, name, fed, rating, games, birth, title, flag) values (?,?,?,?,?,?,?,?,?)");
+   my $stmt = $dbh ? 
+      $dbh->prepare("insert into elo_feda (feda_id, surname, name, fed, rating, games, birth, title, flag) values (?,?,?,?,?,?,?,?,?)"):
+      undef;
+
    do {
       new_xls_player($worksheet, $stmt, \@player_keys, $self->{-callback}, $i, $j, $self->{-verbose});
-      $dbh->commit unless $dbh->{AutoCommit};
+      if( $dbh && (! $dbh->{AutoCommit}) ) {
+         $dbh->commit unless $dbh->{AutoCommit};
+      }
       $i += $BLOCK_TXN;
       $j = ($i + $BLOCK_TXN -1) > $row_max ? $row_max : $i + $BLOCK_TXN - 1;
    } while( $i <= $row_max );
 
-   $stmt->finish;
+   $stmt and $stmt->finish;
 
    return 1;
 }
@@ -299,7 +321,7 @@ Chess::ELO::FEDA - Download FEDA ELO (L<http://www.feda.org>) into differents ba
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -351,7 +373,7 @@ Working folder of the overall process. It is not created if it doesn't exists.
 
 Target file where the parser stores the ELO information. According the file
 extension, it selects the proper backend: .sqlite for SQLite dabase or .csv
-for a CSV file format.
+for a CSV file format. An empty value means that no backend is built.
 
 =item -url
 
@@ -388,7 +410,7 @@ Miguel Prz <niceperl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Miguel Prz.
+This software is copyright (c) 2018 by Miguel Prz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

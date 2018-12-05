@@ -23,44 +23,18 @@ For interacting with data in LabKey Server
 This module is designed to simplify querying and manipulating data in LabKey Server.  It should more or less replicate the javascript APIs of the same names. 
 
 After the module is installed, if you need to login with a specific user you 
-will need to create a .netrc file in the home directory of the user
-running the perl script.  Documentation on .netrc can be found here:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=netrc
+will need to create a L<.netrc|https://www.labkey.org/Documentation/wiki-page.view?name=netrc>
+file in the home directory of the user running the perl script.
 
 In API versions 0.08 and later, you can specify the param '-loginAsGuest'
 which will query the server without any credentials.  The server must permit 
 guest to that folder for this to work though.
 
-=head1 SEE ALSO
-
-The LabKey client APIs are described in greater detail here:
-https://www.labkey.org/wiki/home/Documentation/page.view?name=viewAPIs
-
-Support questions should be directed to the LabKey forum:
-https://www.labkey.org/announcements/home/Server/Forum/list.view?
-
-=head1 AUTHOR 
-
-LabKey Software C<info@labkey.com>
-
-=head1 CONTRIBUTING
-
-Send comments, suggestions and bug reports to:
-
-L<https://www.labkey.org/project/home/Developer/Forum/begin.view>
-
-
-=head1 COPYRIGHT
- 
-Copyright (c) 2010 Ben Bimber
-Copyright (c) 2011-2013 LabKey Software
-
-Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
-
 =cut
 
 package LabKey::Query;
 
+use warnings;
 use strict;
 use JSON;
 use Data::Dumper;
@@ -84,17 +58,20 @@ my $context = new IO::Socket::SSL::SSL_Context(
 IO::Socket::SSL::set_default_context($context);
 
 use LWP::UserAgent;
-use HTTP::Request;
+use HTTP::Cookies;
+use HTTP::Request::Common;
 use URI;
 
 
 use vars qw($VERSION);
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 
 
-=head1 selectRows()
+=head1 FUNCTIONS
+
+=head2 selectRows()
 
 selectRows() can be used to query data from LabKey server
 
@@ -131,91 +108,45 @@ The following are optional:
 	-useragent => an instance of LWP::UserAgent (if not provided, a new instance will be created)
 	-timeout => timeout in seconds (used when creating a new LWP::UserAgent)
 	
-NOTE: 
+=head3 NOTE
 
-- In version 1.0 and later of the perl API, the default result format is 9.1.  This is different from the LabKey JS, which defaults to the earlier format for legacy purposes.
-- The environment variable 'LABKEY_URL' can be used instead of supplying a '-baseUrl' param 
-- The environment variable 'LABKEY_NETRC' can be used to specify an alternate location of a netrc file, if not in the user's home directory.
+In version 1.0 and later of the perl API, the default result format is 9.1.  This is different from the LabKey JS, which defaults to the earlier format for legacy purposes.
 
 =cut
 
 sub selectRows {
+	my %args = @_;
 
-	my %args = @_;	
-	
-	#allow baseUrl as environment variable
-	$args{'-baseUrl'} = $args{'-baseUrl'} || $ENV{LABKEY_URL};
-	
-	#sanity checking
-	my @required = ( '-containerPath', '-queryName', '-schemaName', '-baseUrl' );
-	foreach (@required) {
-		if ( !$args{$_} ) { croak("ERROR: Missing required param: $_") }
+	my @required = ('-queryName', '-schemaName');
+	_checkRequiredParams(\%args, \@required);
+
+	my $ctx = _getServerContext(%args);
+
+	my $data = {
+        'schemaName'      => $args{'-schemaName'},
+        'query.queryName' => $args{'-queryName'},
+		'apiVersion'      => $args{'-requiredVersion'} || 9.1
+    };
+
+	foreach (@{$args{-filterArray}}) {
+        $$data{'query.' . @{$_}[0] . '~' . @{$_}[1]} = @{$_}[2];
 	}
 
-	my $url = URI->new(
-		_normalizeSlash($args{'-baseUrl'}) 
-	  . "query/"
-	  . _normalizeSlash($args{'-containerPath'})
-	  . "getQuery.api?"
-  	);	
-	
-	#if no machine supplied, extract domain from baseUrl	
-	if (!$args{'-machine'}){		
-		$args{'-machine'} = $url->host;
-	}
-
-	my $lk_config;
-	my $netrc_file = $args{-netrcFile} || $ENV{LABKEY_NETRC};
-	if(!$args{'-loginAsGuest'}){
-		$lk_config = _readrc( $args{-machine}, $netrc_file );
+	foreach (@{$args{-parameters}}) {
+        $$data{'query.param.' . @{$_}[0]} = @{$_}[1];
 	}
 	
-	my %params = (
-  		schemaName => $args{'-schemaName'},
-  		"query.queryName" => $args{'-queryName'},
-  		apiVersion => $args{'-requiredVersion'} || 9.1,
-  	);
-
-	foreach ( @{ $args{-filterArray} } ) {
-		$params{"query." . @{$_}[0] . "~" . @{$_}[1]} = @{$_}[2] ;
-	}
-
-	foreach ( @{ $args{-parameters} } ) {
-		$params{"query.param." . @{$_}[0]} = @{$_}[1];
-	}
-	
-	foreach ('viewName', 'offset', 'sort', 'maxRows', 'columns', 'containerFilterName'){
-		if ( $args{'-'.$_} ) {
-			$params{"query.".$_} = $args{'-'.$_};
+	foreach ('viewName', 'offset', 'sort', 'maxRows', 'columns', 'containerFilterName') {
+		if ($args{'-' . $_}) {
+            $$data{'query.' . $_} = $args{'-' . $_};
 		}		
 	}	
 	
-	$url->query_form(%params);
-		
-	print $url."\n" if $args{-debug};
-
-	#Fetch the actual data from the query
-	my $request = HTTP::Request->new( "GET" => $url );
-	if($lk_config){
-		$request->authorization_basic( $$lk_config{'login'}, $$lk_config{'password'} );
-	}
-	my $ua = $args{'-useragent'} || _createUserAgent( %args );
-	my $response = $ua->request($request);
-
-	# Simple error checking
-	if ( $response->is_error ) {
-		croak( $response->status_line );
-	}
-
-	my $json_obj = JSON->new->utf8->decode( $response->content )
-	  || croak("ERROR: Unable to decode JSON.\n$url\n");
-
-	return $json_obj;
-
+    return _postData($ctx, _buildURL($ctx, 'query', 'getQuery.api'), $data);
 }
 
 
-=head1 insertRows()
+=head2 insertRows()
 
 insertRows() can be used to insert records into a LabKey table
 
@@ -242,43 +173,15 @@ The following are optional:
 	-useragent => an instance of LWP::UserAgent (if not provided, a new instance will be created)
 	-timeout => timeout in seconds (used when creating a new LWP::UserAgent)
 
-NOTE:
-- The environment variable 'LABKEY_URL' can be used instead of supplying a '-baseUrl' param
-- The environment variable 'LABKEY_NETRC' can be used to specify an alternate location of a netrc file, if not in the user's home directory
-
 =cut
 
 sub insertRows {
 	my %args = @_;
 
-	#allow baseUrl as an environment variable
-	$args{'-baseUrl'} = $args{'-baseUrl'} || $ENV{LABKEY_URL};
+	my @required = ('-queryName', '-schemaName', '-rows');
+	_checkRequiredParams(\%args, \@required);
 
-	#sanity checking
-	my @required = ( '-containerPath', '-queryName', '-schemaName', '-baseUrl', '-rows' );
-	foreach (@required) {
-		if ( !$args{$_} ) { croak("ERROR: Missing required param: $_") }
-	}	
-
-	#if no machine supplied, extract domain from baseUrl 
-	if (!$args{'-machine'}){
-		my $url = URI->new($args{'-baseUrl'});
-		$args{'-machine'} = $url->host;
-	}
-	
-	my $lk_config;
-	my $netrc_file = $args{-netrcFile} || $ENV{LABKEY_NETRC};
-	if(!$args{'-loginAsGuest'}){
-		$lk_config = _readrc( $args{-machine}, $netrc_file );
-	}
-
-	my $url =
-	    _normalizeSlash($args{'-baseUrl'}) 
-	  . "query/"
-	  . _normalizeSlash($args{'-containerPath'})
-	  . "insertRows.api";
-
-	print $url."\n" if $args{-debug};
+	my $ctx = _getServerContext(%args);
 
 	my $data = {
 		"schemaName" => $args{'-schemaName'},
@@ -286,14 +189,11 @@ sub insertRows {
 		"rows"       => $args{'-rows'}
 	};
 
-	my $ua = $args{'-useragent'} || _createUserAgent( %args );
-	my $response = _postData($ua, $url, $data, $lk_config);
-	return $response;
-
+	return _postData($ctx, _buildURL($ctx, 'query', 'insertRows.api'), $data);
 }
 
 
-=head1 updateRows()
+=head2 updateRows()
 
 updateRows() can be used to update records in a LabKey table
 
@@ -320,42 +220,15 @@ The following are optional:
 	-useragent => an instance of LWP::UserAgent (if not provided, a new instance will be created)
 	-timeout => timeout in seconds (used when creating a new LWP::UserAgent)
 
-NOTE:
-- The environment variable 'LABKEY_URL' can be used instead of supplying a '-baseUrl' param
-- The environment variable 'LABKEY_NETRC' can be used to specify an alternate location of a netrc file, if not in the user's home directory
-	 
 =cut
 
 sub updateRows {
 	my %args = @_;
 
-	#allow baseUrl as environment variable
-	$args{'-baseUrl'} = $args{'-baseUrl'} || $ENV{LABKEY_URL};
+	my @required = ('-queryName', '-schemaName', '-rows');
+	_checkRequiredParams(\%args, \@required);
 
-	#sanity checking
-	my @required = ( '-containerPath', '-queryName', '-schemaName', '-baseUrl', '-rows' );
-	foreach (@required) {
-		if ( !$args{$_} ) { croak("ERROR: Missing required param: $_") }
-	}
-
-	#if no machine supplied, extract domain from baseUrl 
-	if (!$args{'-machine'}){
-		my $url = URI->new($args{'-baseUrl'});
-		$args{'-machine'} = $url->host;
-	}
-	my $lk_config;
-	my $netrc_file = $args{-netrcFile} || $ENV{LABKEY_NETRC};
-	if(!$args{'-loginAsGuest'}){
-		$lk_config = _readrc( $args{-machine}, $netrc_file );
-	}
-
-	my $url =
-	    _normalizeSlash($args{'-baseUrl'}) 
-	  . "query/"
-	  . _normalizeSlash($args{'-containerPath'})
-	  . "updateRows.api";
-
-	print $url."\n" if $args{-debug};
+	my $ctx = _getServerContext(%args);
 
 	my $data = {
 		"schemaName" => $args{'-schemaName'},
@@ -363,14 +236,11 @@ sub updateRows {
 		"rows"       => $args{'-rows'}
 	};
 
-	my $ua = $args{'-useragent'} || _createUserAgent( %args );
-	my $response = _postData($ua, $url, $data, $lk_config);
-	return $response;
-
+	return _postData($ctx, _buildURL($ctx, 'query', 'updateRows.api'), $data);
 }
 
 
-=head1 deleteRows()
+=head2 deleteRows()
 
 deleteRows() can be used to delete records in a LabKey table
 
@@ -394,42 +264,15 @@ The following are optional:
 	-useragent => an instance of LWP::UserAgent (if not provided, a new instance will be created)
 	-timeout => timeout in seconds (used when creating a new LWP::UserAgent)
 
-NOTE:
-- The environment variable 'LABKEY_URL' can be used instead of supplying a '-baseUrl' param
-- The environment variable 'LABKEY_NETRC' can be used to specify an alternate location of a netrc file, if not in the user's home directory
-	 
 =cut
 
 sub deleteRows {
 	my %args = @_;
 
-	#allow baseUrl as environment variable
-	$args{'-baseUrl'} = $args{'-baseUrl'} || $ENV{LABKEY_URL};
+	my @required = ('-queryName', '-schemaName', '-rows');
+	_checkRequiredParams(\%args, \@required);
 
-	#sanity checking
-	my @required = ( '-containerPath', '-queryName', '-schemaName', '-baseUrl', '-rows' );
-	foreach (@required) {
-		if ( !$args{$_} ) { croak("ERROR: Missing required param: $_") }
-	}
-
-	#if no machine supplied, extract domain from baseUrl 
-	if (!$args{'-machine'}){
-		my $url = URI->new($args{'-baseUrl'});
-		$args{'-machine'} = $url->host;
-	}
-	my $lk_config;
-	my $netrc_file = $args{-netrcFile} || $ENV{LABKEY_NETRC};
-	if(!$args{'-loginAsGuest'}){
-		$lk_config = _readrc( $args{-machine}, $netrc_file );
-	}
-
-	my $url =
-	    _normalizeSlash($args{'-baseUrl'}) 
-	  . "query/"
-	  . _normalizeSlash($args{'-containerPath'})
-	  . "deleteRows.api";
-
-	print $url."\n" if $args{-debug};
+	my $ctx = _getServerContext(%args);
 
 	my $data = {
 		"schemaName" => $args{'-schemaName'},
@@ -437,14 +280,11 @@ sub deleteRows {
 		"rows"       => $args{'-rows'}
 	};
 
-	my $ua = $args{'-useragent'} || _createUserAgent( %args );
-	my $response = _postData($ua, $url, $data, $lk_config);
-	return $response;
-
+	return _postData($ctx, _buildURL($ctx, 'query', 'deleteRows.api'), $data);
 }
 
 
-=head1 executeSql()
+=head2 executeSql()
 
 executeSql() can be used to execute arbitrary SQL
 
@@ -469,67 +309,33 @@ The following are optional:
 	-useragent => an instance of LWP::UserAgent (if not provided, a new instance will be created)
 	-timeout => timeout in seconds (used when creating a new LWP::UserAgent)
 
-NOTE:
-- The environment variable 'LABKEY_URL' can be used instead of supplying a '-baseUrl' param
-- The environment variable 'LABKEY_NETRC' can be used to specify an alternate location of a netrc file, if not in the user's home directory
-	 
 =cut
 
 sub executeSql {
 	my %args = @_;
 
-	#allow baseUrl as environment variable
-	$args{'-baseUrl'} = $args{'-baseUrl'} || $ENV{LABKEY_URL};
+	my @required = ('-schemaName', '-sql');
+	_checkRequiredParams(\%args, \@required);
 
-	#sanity checking
-	my @required = ( '-containerPath', '-baseUrl', '-sql' );
-	foreach (@required) {
-		if ( !$args{$_} ) { croak("ERROR: Missing required param: $_") }
-	}
+	my $ctx = _getServerContext(%args);
 
-	#if no machine supplied, extract domain from baseUrl 
-	if (!$args{'-machine'}){
-		my $url = URI->new($args{'-baseUrl'});
-		$args{'-machine'} = $url->host;
-	}
-	my $lk_config;
-	my $netrc_file = $args{-netrcFile} || $ENV{LABKEY_NETRC};
-	if(!$args{'-loginAsGuest'}){
-		$lk_config = _readrc( $args{-machine}, $netrc_file );
-	}
-
-	my $url =
-	    _normalizeSlash($args{'-baseUrl'}) 
-	  . "query/"
-	  . _normalizeSlash($args{'-containerPath'})
-	  . "executeSql.api?";
-
-	print $url."\n" if $args{-debug};
-	
 	my $data = {
 		"schemaName" => $args{'-schemaName'},
-		"sql" => $args{'-sql'},			
+		"sql"        => $args{'-sql'}
 	};
 	
-	foreach ('offset', 'sort', 'maxRows', 'containerFilterName'){
-		if ( $args{'-'.$_} ) {
-			$$data{$_} = $args{'-'.$_};
+	foreach ('offset', 'sort', 'maxRows', 'containerFilterName') {
+		if ($args{'-' . $_}) {
+			$$data{$_} = $args{'-' . $_};
 		}		
 	}
 		
-	print Dumper($data) if $args{-debug};
-	
-	my $ua = $args{'-useragent'} || _createUserAgent( %args );
-	my $response = _postData($ua, $url, $data, $lk_config);
-	return $response;
-
+	return _postData($ctx, _buildURL($ctx, 'query', 'executeSql.api'), $data);
 }
 
 
-
-
 # NOTE: this code adapted from Net::Netrc module.  It was changed so alternate locations could be supplied for a .netrc file
-sub _readrc() {
+sub _readrc {
 
 	my $host = shift || 'default';
 	my $file = shift;
@@ -543,7 +349,6 @@ sub _readrc() {
 	}
 
 	my %netrc = ();
-	my ( $login, $pass, $acct ) = ( undef, undef, undef );
 	my $fh;
 	local $_;
 
@@ -553,6 +358,7 @@ sub _readrc() {
 	unless ( $^O eq 'os2'
 		|| $^O eq 'MSWin32'
 		|| $^O eq 'MacOS'
+		|| $^O eq 'darwin'
 		|| $^O =~ /^cygwin/ )
 	{
 		my @stat = stat($file);
@@ -647,8 +453,8 @@ sub _readrc() {
 }
 
 
-sub _normalizeSlash(){
-	my $containerPath = shift;
+sub _normalizeSlash {
+	my ($containerPath) = @_;
 		
 	$containerPath =~ s/^\///;
 	$containerPath =~ s/\/$//;	
@@ -657,36 +463,39 @@ sub _normalizeSlash(){
 }
 
 
-sub _postData(){
-	my ($ua, $url, $data, $lk_config) = @_;
-	
+sub _postData {
+	my ($ctx, $url, $data) = @_;
+
+	print "POST " . $url . "\n" if $$ctx{debug};
+	print Dumper($data) if $$ctx{debug};
+
 	my $json_obj = JSON->new->utf8->encode($data);
 
-	my $req = new HTTP::Request;
-	$req->method('POST');
-	$req->url($url);
+	my $req = POST $url;
 	$req->content_type('application/json');
 	$req->content($json_obj);
-	$req->authorization_basic( $$lk_config{'login'}, $$lk_config{'password'} );
-	my $response = $ua->request($req);
+	$req->authorization_basic($$ctx{auth}{'login'}, $$ctx{auth}{'password'});
+
+	my $response = $$ctx{userAgent}->request($req);
 
 	# Simple error checking
 	if ( $response->is_error ) {
-		croak($response->status_line);
+		croak($response->status_line . '\n' . $response->decoded_content);
 	}
 
-	#print Dumper($response);
-	$json_obj = JSON->new->utf8->decode( $response->content )
+	my $response_json = JSON->new->utf8->decode( $response->content )
 	  || croak("ERROR: Unable to decode JSON.\n$url\n");
 	  
-  	return $json_obj;	
+  	return $response_json;
 }
 
-sub _createUserAgent() {
+sub _createUserAgent {
 	my %args = @_;
 
-	my $ua = new LWP::UserAgent;
+	my $ua = LWP::UserAgent->new;
 	$ua->agent("Perl API Client/1.0");
+	$ua->cookie_jar(HTTP::Cookies->new());
+
 	if ($args{'-timeout'}) {
 		print "setting timeout to " . $args{'-timeout'} . "\n";
 		$ua->timeout($args{'-timeout'});
@@ -694,6 +503,143 @@ sub _createUserAgent() {
 	return $ua;
 }
 
+sub _buildURL {
+	my ($ctx, $controller, $action) = @_;
+
+	return URI->new(
+		_normalizeSlash($$ctx{baseUrl})
+		. _normalizeSlash($controller)
+		. _normalizeSlash($$ctx{containerPath})
+		. $action
+		. '?'
+	);
+}
+
+sub _checkRequiredParams {
+	my %args = %{$_[0]};
+	my @required = @{$_[1]};
+
+	foreach (@required) {
+		if (!$args{$_}) {
+			croak("ERROR: Missing required param: $_")
+		}
+	}
+}
+
+sub _fetchCSRF {
+	my ($ctx) = @_;
+
+	my $url = _buildURL($ctx, 'login', 'whoAmI.api');
+
+	print "CRSF " . $url . "\n" if $$ctx{debug};
+
+    my $req = GET $url;
+	$req->content_type('application/json');
+
+	if (!$$ctx{isGuest}) {
+		$req->authorization_basic($$ctx{auth}{'login'}, $$ctx{auth}{'password'});
+	}
+
+	my $response = $$ctx{userAgent}->request($req);
+
+	if ($response->is_error) {
+		croak($response->status_line . '\n' . $response->decoded_content);
+	}
+
+	my $json_obj = JSON->new->utf8->decode($response->content)
+		|| croak("ERROR: Unable to decode JSON.\n$url\n");
+
+	return $$json_obj{'CSRF'};
+}
+
+sub _getServerContext {
+	my %args = @_;
+
+	#allow baseUrl as environment variable
+	$args{'-baseUrl'} = $args{'-baseUrl'} || $ENV{LABKEY_URL};
+
+	my @required = ('-containerPath', '-baseUrl');
+	_checkRequiredParams(\%args, \@required);
+
+	#if no machine supplied, extract domain from baseUrl
+	if (!$args{'-machine'}) {
+		$args{'-machine'} = URI->new($args{'-baseUrl'})->host;
+	}
+
+	my $is_guest;
+	my $lk_config;
+	my $netrc_file = $args{-netrcFile} || $ENV{LABKEY_NETRC};
+
+	if ($args{'-loginAsGuest'}) {
+		$is_guest = 1;
+	}
+	else {
+		$lk_config = _readrc($args{-machine}, $netrc_file);
+		$is_guest = 0;
+	}
+
+	my $ctx = {
+		auth          => $lk_config,
+		baseUrl       => $args{'-baseUrl'},
+		containerPath => $args{'-containerPath'},
+		isGuest       => $is_guest,
+		userAgent     => $args{'-useragent'} || _createUserAgent(%args),
+	};
+
+	if ($args{-debug}) {
+		$$ctx{debug} = 1;
+	}
+
+	my $csrfHeader = "X-LABKEY-CSRF";
+
+	if (!$$ctx{userAgent}->default_header($csrfHeader)) {
+		$$ctx{userAgent}->default_header($csrfHeader => _fetchCSRF($ctx));
+	}
+
+	return $ctx;
+}
+
+=pod
+
+=head1 ENVIORNMENT VARIABLES
+
+=over 4
+
+=item *
+The 'LABKEY_URL' environment variable can be used instead of supplying a '-baseUrl' param.
+
+=item *
+The 'LABKEY_NETRC' environment variable can be used to specify an alternate location of a netrc file, if not in the user's home directory.
+
+=back
+
+=head1 AUTHOR
+
+LabKey C<info@labkey.com>
+
+=head1 CONTRIBUTING
+
+Send comments, suggestions and bug reports to:
+
+L<https://www.labkey.org/home/developer/forum/project-start.view>
+
+
+=head1 COPYRIGHT
+ 
+Copyright (c) 2010 Ben Bimber
+Copyright (c) 2011-2018 LabKey Corporation
+
+Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
+
+=head1 SEE ALSO
+
+The LabKey client APIs are described in greater detail here:
+https://www.labkey.org/Documentation/wiki-page.view?name=viewAPIs
+
+Support questions should be directed to the LabKey forum:
+https://www.labkey.org/home/Server/Forum/announcements-list.view
+
+=cut
 
 1;
 

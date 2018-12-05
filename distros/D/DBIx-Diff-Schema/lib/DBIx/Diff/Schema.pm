@@ -1,7 +1,7 @@
 package DBIx::Diff::Schema;
 
-our $DATE = '2018-12-03'; # DATE
-our $VERSION = '0.092'; # VERSION
+our $DATE = '2018-12-05'; # DATE
+our $VERSION = '0.093'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,6 +13,9 @@ use List::Util qw(first);
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
+                       list_columns
+                       list_tables
+                       check_table_exists
                        diff_db_schema
                        diff_table_schema
                        db_schema_eq
@@ -25,6 +28,24 @@ $SPEC{':package'} = {
     v => 1.1,
     summary => 'Compare schema of two DBI databases',
 };
+
+my %arg0_dbh = (
+    dbh => {
+        schema => ['obj*'],
+        summary => 'DBI database handle',
+        req => 1,
+        pos => 0,
+    },
+);
+
+my %arg1_table = (
+    table => {
+        schema => ['str*'],
+        summary => 'Table name',
+        req => 1,
+        pos => 1,
+    },
+);
 
 my %diff_db_args = (
     dbh1 => {
@@ -56,7 +77,17 @@ my %diff_table_args = (
     },
 );
 
-sub _check_table_exists {
+$SPEC{check_table_exists} = {
+    v => 1.1,
+    summary => 'Check whether a table exists',
+    args => {
+        %arg0_dbh,
+        %arg1_table,
+    },
+    args_as => "array",
+    result_naked => 1,
+};
+sub check_table_exists {
     my ($dbh, $name) = @_;
     my $sth;
     if ($name =~ /(.+)\.(.+)/) {
@@ -68,7 +99,16 @@ sub _check_table_exists {
     $sth->fetchrow_hashref ? 1:0;
 }
 
-sub _list_tables {
+$SPEC{list_tables} = {
+    v => 1.1,
+    summary => 'List table names in a database',
+    args => {
+        %arg0_dbh,
+    },
+    args_as => "array",
+    result_naked => 1,
+};
+sub list_tables {
     my ($dbh) = @_;
 
     my $driver = $dbh->{Driver}{Name};
@@ -106,7 +146,17 @@ sub _list_tables {
     sort @res;
 }
 
-sub _list_columns {
+$SPEC{list_columns} = {
+    v => 1.1,
+    summary => 'List columns of a table',
+    args => {
+        %arg0_dbh,
+        %arg1_table,
+    },
+    args_as => "array",
+    result_naked => 1,
+};
+sub list_columns {
     my ($dbh, $table) = @_;
 
     my @res;
@@ -161,8 +211,8 @@ sub _diff_column_schema {
 sub _diff_table_schema {
     my ($dbh1, $dbh2, $table1, $table2) = @_;
 
-    my @columns1 = _list_columns($dbh1, $table1);
-    my @columns2 = _list_columns($dbh2, $table2);
+    my @columns1 = list_columns($dbh1, $table1);
+    my @columns2 = list_columns($dbh2, $table2);
 
     log_trace("columns1: %s ...", \@columns1);
     log_trace("columns2: %s ...", \@columns2);
@@ -231,9 +281,9 @@ sub diff_table_schema {
     #$log->tracef("Comparing table %s vs %s ...", $table1, $table2);
 
     die "Table $table1 in first database does not exist"
-        unless _check_table_exists($dbh1, $table1);
+        unless check_table_exists($dbh1, $table1);
     die "Table $table2 in second database does not exist"
-        unless _check_table_exists($dbh2, $table2);
+        unless check_table_exists($dbh2, $table2);
     _diff_table_schema($dbh1, $dbh2, $table1, $table2);
 }
 
@@ -303,8 +353,8 @@ sub diff_db_schema {
     my $dbh1 = shift; no warnings ('void');require Scalar::Util;my $arg_err; ((defined($dbh1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh1)) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { die "diff_db_schema(): " . "Invalid argument value for dbh1: $arg_err" } # VALIDATE_ARG
     my $dbh2 = shift; no warnings ('void');((defined($dbh2)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh2)) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { die "diff_db_schema(): " . "Invalid argument value for dbh2: $arg_err" } # VALIDATE_ARG
 
-    my @tables1 = _list_tables($dbh1);
-    my @tables2 = _list_tables($dbh2);
+    my @tables1 = list_tables($dbh1);
+    my @tables2 = list_tables($dbh2);
 
     log_trace("tables1: %s ...", \@tables1);
     log_trace("tables2: %s ...", \@tables2);
@@ -371,7 +421,7 @@ DBIx::Diff::Schema - Compare schema of two DBI databases
 
 =head1 VERSION
 
-This document describes version 0.092 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2018-12-03.
+This document describes version 0.093 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2018-12-05.
 
 =head1 SYNOPSIS
 
@@ -393,6 +443,33 @@ To compare schemas of a single table from two databases:
 Currently only tested on Postgres and SQLite.
 
 =head1 FUNCTIONS
+
+
+=head2 check_table_exists
+
+Usage:
+
+ check_table_exists($dbh, $table) -> any
+
+Check whether a table exists.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$dbh>* => I<obj>
+
+DBI database handle.
+
+=item * B<$table>* => I<str>
+
+Table name.
+
+=back
+
+Return value:  (any)
 
 
 =head2 db_schema_eq
@@ -524,6 +601,56 @@ Table name.
 =item * B<$table2> => I<str>
 
 Second table name (assumed to be the same as first table name if unspecified).
+
+=back
+
+Return value:  (any)
+
+
+=head2 list_columns
+
+Usage:
+
+ list_columns($dbh, $table) -> any
+
+List columns of a table.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$dbh>* => I<obj>
+
+DBI database handle.
+
+=item * B<$table>* => I<str>
+
+Table name.
+
+=back
+
+Return value:  (any)
+
+
+=head2 list_tables
+
+Usage:
+
+ list_tables($dbh) -> any
+
+List table names in a database.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$dbh>* => I<obj>
+
+DBI database handle.
 
 =back
 

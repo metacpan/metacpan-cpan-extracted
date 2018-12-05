@@ -19,6 +19,10 @@ my @tests = (
         param  => [qw/get POST/],
         result => 'GET, POST',
     },
+    {
+        param  => '*',
+        result => ( join ', ', qw(GET DELETE POST PATCH OPTIONS HEAD CONNECT TRACE PUT) ),
+    },
 );
 
 for my $test ( @tests ) {

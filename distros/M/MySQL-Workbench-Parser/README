@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.01
+    version 1.03
 
 SYNOPSIS
 
@@ -50,6 +50,16 @@ METHODS
 ATTRIBUTES
 
       * file
+
+WARNINGS
+
+    The ER model designed with Workbench is checked for:
+
+      * duplicate indices
+
+      * duplicate table names
+
+      * duplicate column names in a table
 
 AUTHOR
 

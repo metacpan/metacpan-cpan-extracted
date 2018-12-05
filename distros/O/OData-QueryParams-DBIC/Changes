@@ -1,6 +1,15 @@
 Change history for OData::QueryParams::DBIC
 ===========================================
 
+0.06 2018-12-05 15:29:00
+
+    fix dist
+
+0.05 2018-12-05 15:28:00
+
+    fix handling of subject
+    add more tests
+
 0.04 2018-11-24 20:09:00
 
     do not return a list of columns when no select is given

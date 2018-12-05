@@ -65,10 +65,14 @@ sub list_tree {
   local $File::Find::dont_use_nlink = 1 if $options->{dont_use_nlink};
 
   my %all;
-  my $wanted = {wanted => sub { $all{$File::Find::name}++ }, no_chdir => 1};
-  $wanted->{postprocess} = sub { delete $all{$File::Find::dir} }
-    unless $options->{dir};
-  find $wanted, $$self if -d $$self;
+  my $wanted = sub {
+    if ($options->{max_depth}) {
+      (my $rel = $File::Find::name) =~ s!^\Q$$self\E/?!!;
+      $File::Find::prune = 1 if splitdir($rel) >= $options->{max_depth};
+    }
+    $all{$File::Find::name}++ if $options->{dir} || !-d $File::Find::name;
+  };
+  find {wanted => $wanted, no_chdir => 1}, $$self if -d $$self;
   delete $all{$$self};
 
   return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
@@ -148,6 +152,13 @@ sub to_array { [splitdir ${shift()}] }
 sub to_rel { $_[0]->new(abs2rel(${$_[0]}, $_[1])) }
 
 sub to_string {"${$_[0]}"}
+
+sub touch {
+  my $self = shift;
+  $self->open('>') unless -e $$self;
+  utime undef, undef, $$self or croak qq{Can't touch file "$$self": $!};
+  return $self;
+}
 
 sub with_roles { shift->Mojo::Base::with_roles(@_) }
 
@@ -350,6 +361,12 @@ Force L<File::Find> to always stat directories.
 
 Include hidden files and directories.
 
+=item max_depth
+
+  max_depth => 3
+
+Maximum number of levels to descend when searching for files.
+
 =back
 
 =head2 make_path
@@ -483,6 +500,16 @@ L<Mojo::File> object.
   my $str = $path->to_string;
 
 Stringify the path.
+
+=head2 touch
+
+  $path = $path->touch;
+
+Create file if it does not exist or change the modification and access time to
+the current time.
+
+  # Safely read file
+  say path('.bashrc')->touch->slurp;
 
 =head2 with_roles
 

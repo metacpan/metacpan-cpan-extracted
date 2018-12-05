@@ -26,15 +26,16 @@ no_index:
 provides:
   Dist::Zilla::App::Command::distversion:
     file: lib/Dist/Zilla/App/Command/distversion.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Capture::Tiny: '0'
   Dist::Zilla: '0'
+  Sort::Naturally: '0'
 resources:
   bugtracker: https://github.com/Altreus/Dist-Zilla-App-Command-distversion/issues
   homepage: https://github.com/Altreus/Dist-Zilla-App-Command-distversion
   repository: https://github.com/Altreus/Dist-Zilla-App-Command-distversion.git
-version: '0.02'
+version: '0.03'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -180,7 +181,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.02
+          tag: v0.03
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -393,5 +394,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.010'
 x_contributors:
+  - 'Alastair Douglas <alastair.douglas@gmail.com>'
   - 'Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

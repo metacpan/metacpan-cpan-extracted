@@ -50,6 +50,7 @@
       },
       "test" : {
          "recommends" : {
+            "CPAN::Meta::YAML" : "0",
             "Proc::ProcessTable" : "0",
             "TAP::Harness" : "3.31"
          },
@@ -95,7 +96,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "1.00",
+   "version" : "1.10",
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Alexey Molchanov <alexey.molchanov@portaone.com>",

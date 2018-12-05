@@ -1,5 +1,8 @@
 Revision history for Text::Trac
 
+0.20  2018.12.05 MANWAR
+      - Added minimum perl version.
+
 0.19  2018.10.20 MANWAR
       Fixed SEE ALSO broken links
       Tidied up Changes file

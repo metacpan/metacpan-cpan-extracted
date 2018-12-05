@@ -18,7 +18,7 @@ Log::Log4perl->init({
   'log4perl.appender.info_log.layout' => 'Log::Log4perl::Layout::SimpleLayout',
 });
 
-my $log = Mojo::Log->with_roles('+AttachLogger')->new
+my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new
   ->unsubscribe('message')->attach_logger('Log::Log4perl', 'Test::Log::Debug');
 
 my $debug_log = Log::Log4perl::Appender::TestBuffer->by_name('debug_log');

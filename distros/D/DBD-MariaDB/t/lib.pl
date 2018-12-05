@@ -3,7 +3,9 @@ use warnings;
 
 use Test::More;
 use FindBin qw($Bin);
-use vars qw($test_dsn $test_user $test_password);
+use vars qw($test_dsn $test_user $test_password $test_db);
+
+use DBD::MariaDB;
 
 $| = 1; # flush stdout asap to keep in sync with stderr
 
@@ -17,18 +19,26 @@ $::test_dsn      = $::test_dsn      || $ENV{'DBI_DSN'}   || 'DBI:MariaDB:databas
 $::test_user     = $::test_user     || $ENV{'DBI_USER'}  || '';
 $::test_password = $::test_password || $ENV{'DBI_PASS'}  || '';
 
+BAIL_OUT "DBI test_dsn is not valid" unless $::test_dsn =~ /^[Dd][Bb][Ii]:MariaDB:/;
+
+if (not $::test_db) {
+    my $driver_dsn = $::test_dsn;
+    $driver_dsn =~ s/^[^:]*:[^:]*://;
+    $::test_db = DBD::MariaDB->parse_dsn($driver_dsn)->{database};
+    $::test_db = 'test' unless $::test_db;
+}
+
 sub DbiTestConnect {
     my $err;
     my $dbh = eval { DBI->connect(@_) };
     if ( $dbh ) {
-        if ( $dbh->{mariadb_serverversion} < 40103 ) {
-            $err = "MariaDB or MySQL server version is older then 4.1.3";
-        } else {
-            my $current_charset = $dbh->selectrow_array('SELECT @@character_set_database');
-            my $expected_charset = $dbh->selectrow_array("SHOW CHARSET LIKE 'utf8mb4'") ? 'utf8mb4' : 'utf8';
-            if ($current_charset ne $expected_charset) {
-                $err = "Database charset is not $expected_charset, but $current_charset";
-            }
+        my ($current_charset, $current_collation) = $dbh->selectrow_array('SELECT @@character_set_database, @@collation_database');
+        my $expected_charset = $dbh->selectrow_array("SHOW CHARSET LIKE 'utf8mb4'") ? 'utf8mb4' : 'utf8';
+        my $expected_collation = "${expected_charset}_unicode_ci";
+        if ($current_charset ne $expected_charset) {
+            $err = "Database charset is not $expected_charset, but $current_charset";
+        } elsif ($current_collation ne $expected_collation) {
+            $err = "Database collation is not $expected_collation, but $current_collation";
         }
     } else {
         if ( $@ ) {

@@ -1,14 +1,25 @@
 package MySQL::Workbench::DBIC::FakeDBIC;
 
+# ABSTRACT: provide some DBIx::Class method stubs when DBIx::Class is not installed 
+
+use strict;
+use warnings;
+
+
 package
   DBIx::Class::Schema;
 
-# ABSTRACT: provide some DBIx::Class method stubs when DBIx::Class is not installed 
+use strict;
+use warnings;
 
 sub DBIx::Class::Schema::load_namespaces {}
 
+
 package
    DBIx::Class;
+
+use strict;
+use warnings;
 
 sub DBIx::Class::load_components {}
 sub DBIx::Class::table {}
@@ -16,6 +27,7 @@ sub DBIx::Class::add_columns {}
 sub DBIx::Class::set_primary_key {}
 sub DBIx::Class::belongs_to {}
 sub DBIx::Class::has_many {}
+
 
 1;
 
@@ -31,12 +43,40 @@ MySQL::Workbench::DBIC::FakeDBIC - provide some DBIx::Class method stubs when DB
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 DESCRIPTION
 
 C<MySQL::Workbench::DBIC> tries to load the schema class to determine what version number
 should be used. This fails when L<DBIx::Class> is not installed. So we fake it.
+
+=head1 METHODS OVERLOADED
+
+=head2 DBIx::Class::Schema
+
+=over 4
+
+=item * load_namespaces
+
+=back
+
+=head2 DBIx::Class
+
+=over 4
+
+=item * load_components
+
+=item * DBIx::Class::table
+
+=item * add_columns
+
+=item * set_primary_key
+
+=item * belongs_to
+
+=item * has_many
+
+=back
 
 =head1 AUTHOR
 

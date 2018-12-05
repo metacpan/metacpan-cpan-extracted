@@ -1,5 +1,9 @@
 Change history for Dist::Zilla::App::Command::distversion
 
+0.03      2018-12-05 14:25:08 GMT
+
+    - Added --rc, which currently is not configurable but patches welcome.
+
 0.02      2017-10-02 11:47:18 BST
 
     - Fixed versioning argh dzil why

@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More ;
 use DBI;
+use DBD::MariaDB;
 $|= 1;
 
 use vars qw($test_user $test_password $test_db $test_dsn);
@@ -10,8 +11,10 @@ use lib 't', '.';
 require 'lib.pl';
 
 # remove database from DSN
-my $test_dsn_without_db = $test_dsn;
-$test_dsn_without_db =~ s/^(DBI:[^:]+):(?:[^:;]+)([:;]?)/$1:$2/;
+my ($dbi_dsn, $driver_dsn) = ($test_dsn =~ /^([^:]*:[^:]*:)(.*)$/);
+my $attr_dsn = DBD::MariaDB->parse_dsn($driver_dsn);
+delete $attr_dsn->{database};
+my $test_dsn_without_db = $dbi_dsn . join ';', map { $_ . '=' . $attr_dsn->{$_} } sort keys %{$attr_dsn};
 
 sub fatal_error {
     my ($message) = @_;
@@ -29,11 +32,11 @@ sub fatal_error {
 }
 
 sub connect_to_server {
-    return eval { DBI->connect($test_dsn_without_db, $test_user, $test_password, { RaiseError => 1, PrintError => 0, AutoCommit => 1 }) };
+    return eval { DBI->connect($test_dsn_without_db, $test_user, $test_password, { RaiseError => 1, PrintError => 0 }) };
 }
 
 sub connect_to_database {
-    return eval { DBI->connect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 0, AutoCommit => 1 }) };
+    return eval { DBI->connect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 0 }) };
 }
 
 my $dbh = connect_to_database();
@@ -42,7 +45,7 @@ if (not $dbh) {
     fatal_error "Cannot connect to '$test_dsn_without_db' server" unless $dbh;
     diag "Connected to server '$test_dsn_without_db'";
 
-    my $failed = not eval { $dbh->do("CREATE DATABASE IF NOT EXISTS $test_db") };
+    my $failed = not eval { $dbh->do("CREATE DATABASE IF NOT EXISTS " . $dbh->quote_identifier($test_db)) };
     fatal_error "Cannot create database '$test_db' on '$test_dsn_without_db' for user '$test_user'" if $failed;
     diag "Created database '$test_db'";
 
@@ -61,10 +64,22 @@ diag "Database '$test_db' has charset '$charset'";
 if ($charset ne 'utf8mb4') {
     my $newcharset = $dbh->selectrow_array("SHOW CHARSET LIKE 'utf8mb4'") ? 'utf8mb4' : 'utf8';
     if ($newcharset ne $charset) {
-        my $failed = not eval { $dbh->do("ALTER DATABASE $test_db CHARSET '$newcharset'") };
+        my $failed = not eval { $dbh->do("ALTER DATABASE " . $dbh->quote_identifier($test_db) . " CHARACTER SET '$newcharset'") };
         fatal_error "No permission to change charset for '$test_db' database on '$test_dsn' for user '$test_user'" if $failed;
         diag "Changed charset for '$test_db' database to '$newcharset'";
+        $charset = $newcharset;
     }
+}
+
+my $collation = $dbh->selectrow_array('SELECT @@collation_database');
+diag "Database '$test_db' has collation '$collation'";
+
+if ($collation ne "${charset}_unicode_ci") {
+    my $newcollation = "${charset}_unicode_ci";
+    my $failed = not eval { $dbh->do("ALTER DATABASE " . $dbh->quote_identifier($test_db) . " COLLATE '$newcollation'") };
+    fatal_error "No permission to change collation for '$test_db' database on '$test_dsn' for user '$test_user'" if $failed;
+    diag "Changed collation for '$test_db' database to '$newcollation'";
+    $collation = $newcollation;
 }
 
 $dbh->disconnect();

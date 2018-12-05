@@ -2,13 +2,124 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.012 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2018-11-06.
+    This document describes version 0.013 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2018-12-05.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
 
 FUNCTIONS
+  mysql_copy_rows_adjust_pk
+    Usage:
+
+     mysql_copy_rows_adjust_pk(%args) -> [status, msg, payload, meta]
+
+    Copy rows from one table to another, adjust PK column if necessary.
+
+    This utility can be used when you have rows in one table that you want
+    to insert to another table, but the PK might clash. When that happens,
+    the value of the other columns are inspected. When all the values of the
+    other columns match, the row is assumed to be a duplicate and skipped.
+    If some values of the other column differ, then the row is assumed to be
+    different and a new value of the PK column is chosen (there are several
+    choices on how to select the new PK).
+
+    An example:
+
+     % mysql-copy-rows-adjust-pk db1 --from t1 --to t2 --pk-column id --adjust "add 1000"
+
+    Suppose these are the rows in table "t1":
+
+     id    date                 description        user
+     --    ----                 -----------        ----
+      1    2018-12-03 12:01:01  Created user u1    admin1
+      2    2018-12-03 12:44:33  Removed user u1    admin1
+
+    And here are the rows in table "t2":
+
+     id    date                 description        user
+     --    ----                 -----------        ----
+      1    2018-12-03 12:01:01  Created user u1    admin1
+      2    2018-12-03 13:00:45  Rebooted machine1  admin1
+      3    2018-12-03 13:05:00  Created user u2    admin2
+
+    You can see that row id=1 in both tables are identical. This will be
+    skipped. On the other hand, row id=2 in "t1" is different with row id=2
+    in "t2". This row will be adjusted: "id" will be changed to 2+1000=1002.
+    So the final rows in table "t2" will be (sorted by date):
+
+     id    date                 description        user
+     --    ----                 -----------        ----
+      1    2018-12-03 12:01:01  Created user u1    admin1
+      1002 2018-12-03 12:44:33  Removed user u1    admin1
+      2    2018-12-03 13:00:45  Rebooted machine1  admin1
+      3    2018-12-03 13:05:00  Created user u2    admin2
+
+    So basically this utility is similar to MySQL's INSERT ... ON DUPLICATE
+    KEY UPDATE, but will avoid inserting identical rows.
+
+    If the adjusted PK column clashes with another row in the target table,
+    the row is skipped.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   adjust* => *str*
+
+        How to adjust the value of the PK column.
+
+        Currently the choices are:
+
+        *   "add N" add N to the original value.
+
+        *   "subtract N" subtract N from the original value.
+
+    *   database* => *str*
+
+    *   from* => *str*
+
+        Name of source table.
+
+    *   host => *str* (default: "localhost")
+
+    *   password => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    *   pk_column* => *str*
+
+        Name of PK column.
+
+    *   port => *int* (default: 3306)
+
+    *   to* => *str*
+
+        Name of target table.
+
+    *   username => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   mysql_drop_all_tables
     Usage:
 
@@ -110,6 +221,58 @@ FUNCTIONS
     *   -dry_run => *bool*
 
         Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_find_identical_rows
+    Usage:
+
+     mysql_find_identical_rows(%args) -> [status, msg, payload, meta]
+
+    List rows on one table that are identical on another table.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   database* => *str*
+
+    *   exclude_columns => *array[str]*
+
+        What column(s) to exclude from comparison.
+
+    *   host => *str* (default: "localhost")
+
+    *   password => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    *   port => *int* (default: 3306)
+
+    *   return_column* => *str*
+
+        What column to return.
+
+    *   t1* => *str*
+
+        Name of the first table.
+
+    *   t2* => *str*
+
+        Name of the second table.
+
+    *   username => *str*
+
+        Will try to get default from "~/.my.cnf".
 
     Returns an enveloped result (an array).
 

@@ -4,6 +4,7 @@ package # split, so as not to confuse stuff
     File::Find::Rule::Permissions::Tests;
 
 use strict;
+use lib '.';
 use File::Find::Rule::Permissions;
 use Data::Dumper;
 
@@ -71,7 +72,8 @@ undef($owner) if( # must have three different users
 );
 
 if($owner && $group && $useringroup && $random) { eval q{
-    use Test::More tests => 26;
+    use Test::More;
+    END { done_testing }
 }} else { eval {
     use Test::More;
     plan skip_all => "Couldn't figure out a user who is in a group, and two users not in that group";
@@ -90,3 +92,23 @@ do 't/_filetests.pl'; # run root tests, define subs
 user($owner);
 group($useringroup);
 other($random);
+
+edge_cases();
+
+# this can't work with mocks
+is_deeply(
+    [sort { $a cmp $b } File::Find::Rule::Permissions->file()->permissions(
+        isReadable => 1
+    )->in('t')],
+    [sort { $a cmp $b } map { "t/$_" } qw(
+        _createtestfiles.pl
+        _filetests.pl
+        _mock.pl
+        coverage.sh
+        mocked.t
+        notmocked.t
+        pod-coverage.t
+        pod.t
+    )],
+    "appears to work without specifying a user"
+);

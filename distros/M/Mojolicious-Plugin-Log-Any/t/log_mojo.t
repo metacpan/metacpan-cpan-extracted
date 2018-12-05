@@ -10,7 +10,7 @@ my @log;
 my $inner_log = Mojo::Log->new;
 $inner_log->unsubscribe('message')->on(message => sub { push @log, "[$_[1]] " . join "\n", @_[2..$#_] });
 
-my $log = Mojo::Log->with_roles('+AttachLogger')->new
+my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new
   ->unsubscribe('message')->attach_logger($inner_log);
 
 foreach my $level (@levels) {

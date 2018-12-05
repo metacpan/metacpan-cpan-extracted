@@ -15,7 +15,7 @@ name: Mojolicious-Plugin-SecurityHeader
 provides:
   Mojolicious::Plugin::SecurityHeader:
     file: lib/Mojolicious/Plugin/SecurityHeader.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Mojolicious: '7.00'
   perl: '5.010'
@@ -23,7 +23,7 @@ resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-SecurityHeader/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-SecurityHeader
   repository: http://github.com/reneeb/Mojolicious-Plugin-SecurityHeader.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <info@perl-services.de>'

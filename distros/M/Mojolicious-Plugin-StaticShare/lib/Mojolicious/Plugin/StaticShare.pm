@@ -3,11 +3,12 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::File qw(path);
 use Mojolicious::Types;
 use Mojo::Path;
-#~ use Mojo::Util qw(decode);
+use Mojo::Util;# qw(decode);
 
 my $PKG = __PACKAGE__;
 
-has [qw(app config)];
+has [qw(app)] => undef, weak => 1;
+has [qw(config)];# => undef, weak => 1;
 has root_url => sub { Mojo::Path->new(shift->config->{root_url})->leading_slash(1)->trailing_slash(1) };
 has root_dir => sub { Mojo::Path->new(shift->config->{root_dir} // '.')->trailing_slash(1) };
 has admin_pass => sub { shift->config->{admin_pass} };
@@ -26,6 +27,13 @@ has re_markdown => sub { qr{[.]m(?:d(?:own)?|kdn?|arkdown)$}i };
 has re_pod => sub { qr{[.]p(?:od|m|l)$} };
 has re_html => sub { qr{[.]html?$} };
 has mime => sub { Mojolicious::Types->new };
+has max_upload_size => sub { shift->config->{max_upload_size} };
+has routes_names => sub {
+  my $self = shift;
+  return [$self." ROOT GET (#1)", $self." ROOT POST (#2)", $self." PATH GET (#3)", $self." PATH POST (#4)"];
+};
+has debug => sub { shift->config->{debug} // $ENV{StaticShare_DEBUG} };
+
 
 sub register {# none magic
   my ($self, $app, $args) = @_;
@@ -43,12 +51,16 @@ sub register {# none magic
   push @{$app->renderer->paths}, ref $self->templates_dir ? @{$self->templates_dir} : $self->templates_dir
     if $self->templates_dir;
   
+  # ROUTING 4 routes
   my $route = $self->root_url->clone->merge('*pth');#"$args->{root_url}/*pth";
   my $r = $app->routes;
-  $r->get($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', pth=>'', plugin=>$self);#->name("$PKG ROOT GET");
-  $r->post($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', pth=>'', plugin=>$self);#->name("$PKG ROOT POST");
-  $r->get($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', plugin=>$self );#->name("$PKG GET");
-  $r->post($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', plugin=>$self );#->name("$PKG POST");
+  my $names = $self->routes_names;
+  $r->get($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', pth=>'', plugin=>$self, )->name($names->[0]);#$PKG
+  $r->post($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', pth=>'', plugin=>$self, )->name($names->[1]);#->name("$PKG ROOT POST");
+  $r->get($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', plugin=>$self, )->name($names->[2]);#;
+  $r->post($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', plugin=>$self, )->name($names->[3]);#;
+  
+  
   
   path($self->config->{root_dir})->make_path
     unless !$self->config->{root_dir} || -e $self->config->{root_dir};
@@ -59,6 +71,12 @@ sub register {# none magic
   #POD
   $self->app->plugin(PODRenderer => {no_perldoc => 1})
     unless $self->app->renderer->helpers->{'pod_to_html'} && ($self->render_pod // '') eq 0 ;
+  
+  # PATCH EMIT CHUNK
+  $self->_patch_emit_chunk()
+    if defined $self->max_upload_size;
+  
+  #~ warn $self, Mojo::Util::dumper($self->config);
   
   return ($app, $self);
 }
@@ -93,6 +111,11 @@ my %loc = (
     'I AM SURE'=>"ДА",
     'Save'=> 'Сохранить',
     'Success saved' => "Успешно сохранено",
+    'you cant delete'=>"Удаление запрещено, обратитесь к админу",
+    'you cant upload'=>"Запрещено, обратитесь к админу",
+    'you cant create dir'=>"Создание папки запрещено, обратитесь к админу",
+    'you cant rename'=>"Переименование запрещено, обратитесь к админу",
+    'you cant edit' => "Редактирование запрещено, обратитесь к админу",
   },
 );
 sub i18n {# helper
@@ -122,7 +145,50 @@ sub is_admin {# as helper
   return $sess->{StaticShare} && $sess->{StaticShare}{admin};
 }
 
-
+sub _patch_emit_chunk {
+  my $self = shift;
+  
+  Mojo::Util::monkey_patch 'Mojo::Transaction::HTTP', 'server_read' => sub {
+    my ($self, $chunk) = @_;
+    
+    $self->emit('chunk before req parse'=>$chunk);### только одна строка патча этот эмит
+   
+    # Parse request
+    my $req = $self->req;
+    $req->parse($chunk) unless $req->error;
+    
+    $self->emit('chunk'=>$chunk);### только одна строка патча этот эмит
+   
+    # Generate response
+    $self->emit('request') if $req->is_finished && !$self->{handled}++;
+    
+  };
+  
+  #~ my $r1 = $self->app->routes->lookup($self->routes_names->[1]);
+  #~ warn  'POST ROUTE #2', $r1;
+  #~ my $r2 = $self->app->routes->lookup($self->routes_names->[3]);
+  #~ warn  'POST ROUTE #4', $r2;
+  
+  $self->app->hook(after_build_tx => sub {
+    my ($tx, $app) = @_;
+      $tx->once('chunk'=>sub {
+      my ($tx, $chunk) = @_;
+      return unless $tx->req->method =~ /PUT|POST/;
+      my $url = $tx->req->url->to_abs;
+      my $match = Mojolicious::Routes::Match->new(root => $self->app->routes);
+      $match->find(undef, {method => $tx->req->method, path => $tx->req->url->path->to_route,});# websocket => $ws
+      my $route = $match->endpoint
+        || return;
+      
+      #~ warn "TX CHUNK ROUTE: ", $route->name;# eq $self->routes_names->[1] || $route->name eq $self->routes_names->[3]);#Mojo::Util::dumper($url);, length($chunk)
+      $tx->req->max_message_size($self->max_upload_size)
+        if $route->name eq $self->routes_names->[1] || $route->name eq $self->routes_names->[3]
+      # TODO admin session
+      
+    });
+  });
+  
+}
 
 ##############################################
 package __internal__::Markdown;
@@ -142,7 +208,7 @@ sub new {
 
 sub parse { my $self = shift; no strict 'refs'; ($self->{pkg}.'::markdown')->(@_); }
 
-our $VERSION = '0.063';
+our $VERSION = '0.070';
 =pod
 
 =encoding utf8
@@ -159,7 +225,7 @@ Mojolicious::Plugin::StaticShare - browse, upload, copy, move, delete, edit, ren
 
 =head1 VERSION
 
-0.063
+0.070
 
 =head1 SYNOPSIS
 
@@ -226,7 +292,7 @@ Template path, format, handler, etc  which render directory index. Defaults to b
 
 =head3 Usefull stash variables
 
-C<pth>, C<url_path>, C<file_path>, C<language>, C<dirs>, C<files>, C<index>
+Plugin make any stash variables for rendering: C<pth>, C<url_path>, C<file_path>, C<language>, C<dirs>, C<files>, C<index>
 
 =head4 pth
 
@@ -299,6 +365,12 @@ Arrayref to match files to include to directory index page. Defaults to C<< [qw(
 Boolean to disable/enable uploads for public users. Defaults to undef (disable).
 
   public_uploads=>1, # enable
+
+=head2 max_upload_size
+
+  max_upload_size=>0, # unlimited
+
+Numeric value limiting uploads size for route. See L<Mojolicious#max_request_size>, L<Mojolicious#build_tx>.
 
 =head1 Extended markdown & pod
 

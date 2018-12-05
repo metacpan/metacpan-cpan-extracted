@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed);
 
 our @EXPORT = qw(params_to_dbic);
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub params_to_dbic ( $query_string, %opts ) {
     my $query;
@@ -37,16 +37,20 @@ sub params_to_dbic ( $query_string, %opts ) {
         $query = Mojo::Parameters->new( $query_string );
     }
 
-    my $params = $query->to_hash || {};
+    my $params = $query->to_hash;
 
     my $filter_key = $opts{strict} ? '$filter' : 'filter';
     my %filter = _parse_filter( delete $params->{$filter_key} );
 
     my %dbic_opts;
-    for my $param_key ( keys %{ $params || {} } ) {
-        $param_key =~ s{\A\$}{} if !$opts{strict};
 
-        my $sub = __PACKAGE__->can( '_parse_' . $param_key );
+    PARAM_KEY:
+    for my $param_key ( keys %{ $params } ) {
+        my $method = $param_key =~ s{\A\$}{}r;
+
+        next PARAM_KEY if $opts{strict} && $param_key !~ m{\A\$}xms;
+
+        my $sub = __PACKAGE__->can( '_parse_' . $method );
         if ( $sub ) {
             my %key_opts = $sub->( $params->{$param_key} );
             %dbic_opts = (%dbic_opts, %key_opts);
@@ -83,7 +87,7 @@ sub _parse_orderby ( $orderby_data ) {
 
     for my $order_by ( @order_bys ) {
         my $direction;
-        $order_by =~ s{\s+((?:de|a)sc)\z}{$1 && ( $direction = $1 ); ''}e;
+        $order_by =~ s{\s+(.*?)\z}{$1 && (lc $1 eq 'desc' || lc $1 eq 'asc') && ( $direction = lc $1 ); ''}e;
 
         $direction //= 'asc';
 
@@ -94,7 +98,6 @@ sub _parse_orderby ( $orderby_data ) {
 }
 
 sub _parse_select ( $select_data ) {
-    return if !defined $select_data;
     return if !length $select_data;
     return columns => [ split /\s*,\s*/, $select_data ];
 }
@@ -177,7 +180,7 @@ OData::QueryParams::DBIC - parse OData style query params and provide info for D
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

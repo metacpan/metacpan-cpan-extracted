@@ -48,11 +48,11 @@
 
 /* Definitionen und Includes  */
 #ifndef VERSION
-#define VERSION "6.06 (final)"
+#define VERSION "6.07 (final)"
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 06
+#define VERSION_MINOR 07
 #endif
-#define VERSION_DATE "2018-11-29"
+#define VERSION_DATE "2018-12-04"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -20778,13 +20778,13 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
       case 5:
         return "03.12.2018";
       case 6:
-        return "29. November 2018";            /* Klartext-Datum der Bibliotheksversion */
+        return "4. Dezember 2018";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:
         return "6";             /* Hauptversionszahl */
       case 9:
-        return "06";             /* Unterversionszahl */
+        return "07";             /* Unterversionszahl */
    }
 }
 

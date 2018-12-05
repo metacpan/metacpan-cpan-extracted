@@ -1,3 +1,22 @@
+(function(window){
+  if(window.Package){
+    Materialize = {};
+  } else {
+    window.Materialize = {};
+  }
+})(window);
+
+// Velocity has conflicts when loaded with jQuery, this will check for it
+// First, check if in noConflict mode
+var Vel;
+if (jQuery) {
+  Vel = jQuery.Velocity;
+} else if ($) {
+  Vel = $.Velocity;
+} else {
+  Vel = Velocity;
+}
+
 $( document ).ready(function() {
   console.log('Доброго всем ALL GLORY TO GLORIA');
   /**********************************************/
@@ -31,7 +50,11 @@ $( document ).ready(function() {
       progress.css('width',  ex + '%');
     },
     done: function (e, data) {//Upload finished
-      if(data.result.error) return data.context.siblings('.error').html(data.result.error).closest('tr').find('td.action a.file-upload').show();
+      if(data.result.error) {
+        Materialize.toast(data.result.error, 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
+        data.context.siblings('.error').html(data.result.error).closest('tr').find('td.action a.file-upload').show();
+        return;
+      }
       var name = data.context.val();
       var tr = data.context.closest('tr');
       $('td.chb input', tr).off('change.cancel');
@@ -44,6 +67,7 @@ $( document ).ready(function() {
       $('td.action a.file-rename', tr).attr('_href', data.result.ok);
       $('td.action a.file-upload', tr).remove();
       progress.css('width',  '0%');
+      Materialize.toast("upload success", 3000, 'fw500 green-text text-darken-3 green lighten-5 border');
     },
     fail: function (e, data) {
       data.context.siblings('.error').html("upload fail");
@@ -117,11 +141,19 @@ $( document ).ready(function() {
     var err = $('.error', tr).html('');
     $.post( a.attr('_href'), { "rename": input.val(), })
       .done(function(data) {
-        if (data.error) return err.html(data.error);
-        if (data.ok) f_ToggleFileCheckbox(chb, input.val(), data.ok);
+        if (data.error) {
+          console.log("rename error:", data);
+          Materialize.toast(data.error, 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
+          return err.html(data.error);
+        }
+        if (data.ok) {
+          Materialize.toast("renamed success", 3000, 'fw500 green-text text-darken-3 green lighten-5 border');
+          f_ToggleFileCheckbox(chb, input.val(), data.ok);
+        }
         
       })
       .fail(function() {
+        Materialize.toast("rename fail", 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
         err.html('something fail');
       })
     ;
@@ -137,13 +169,19 @@ $( document ).ready(function() {
       $.post( decodeURI(location.pathname).replace(/\/$/, '')+'/'+items[0], { "delete": items, })
         .done(function(data) {
           if(data.ok) {
+            Materialize.toast("success deleted", 3000, 'fw500 green-text text-darken-3 green lighten-5 border');
             data.ok.map(function(val, idx){
               if (val == 1 ) rows[idx].remove();
               else $('.error', rows[idx]).html(val);
             });
           }
+          else {
+            console.log("delete error:", data);
+            Materialize.toast(data.error, 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
+          }
         })
         .fail(function() {
+          Materialize.toast("delete fail", 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
           rows.map(function(row){
             $('.error', row).html('something fail');
           });
@@ -212,7 +250,12 @@ $( document ).ready(function() {
     var err = $('.error', tr).html('');
     $.post( a.attr('_href'), [[action, input.val() ]].reduce(function(prev,curr){prev[curr[0]]=curr[1];return prev;},{}))// as map to plain object
       .done(function(data) {
-        if(data.error) return err.html(data.error);
+        if(data.error) {
+          console.log(action+" error: ", data);
+          Materialize.toast(data.error, 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
+          return err.html(data.error);
+        }
+        Materialize.toast(action+" successed", 3000, 'fw500 green-text text-darken-3 green lighten-5 border');
         var dir =  input.val();
         var ad = $('a.dir', tr);
         ad.text(dir);
@@ -224,6 +267,7 @@ $( document ).ready(function() {
         $('.dirs-col .btn-panel a').removeClass('hide');
       })
       .fail(function() {
+        Materialize.toast(action+" fail", 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
         err.html('something fail');
       });
   });
@@ -275,11 +319,13 @@ $( document ).ready(function() {
         {"edit":editor.getValue()}
       ).done(function( data ) {//
         //~ console.log("done save", data);
+        Materialize.toast("save success", 3000, 'fw500 green-text text-darken-3 green lighten-5 border');
         $this.hide();
         success.removeClass('hide');
         fail.addClass('hide');
       }).fail(function(data){
         //~ console.log("fail save", data);
+        Materialize.toast("save fail", 3000, 'fw500 red-text text-darken-3 red lighten-5 border');
         fail.removeClass('hide');
         success.addClass('hide');
       });

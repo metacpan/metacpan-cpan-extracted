@@ -1,5 +1,5 @@
 package Algorithm::LUHN_XS;
-$Algorithm::LUHN_XS::VERSION = '1.03';
+$Algorithm::LUHN_XS::VERSION = '1.04';
 require XSLoader;
 XSLoader::load('Algorithm::LUHN_XS', $VERSION);
 use 5.006;
@@ -9,7 +9,7 @@ use Exporter;
 
 our @ISA       = qw/Exporter/;
 our @EXPORT    = qw//;
-our @EXPORT_OK = qw/check_digit is_valid valid_chars/;
+our @EXPORT_OK = qw/check_digit check_digit_fast is_valid valid_chars/;
 our $ERROR;
 
 # The hash of valid characters.
@@ -21,7 +21,7 @@ _al_init_vc(\%map);
 
 =head1 NAME
 
-Algorithm::LUHN_XS - XS Version of the original Algorithm::LUHN
+Algorithm::LUHN_XS - Very Fast XS Version of the original Algorithm::LUHN
 
 =head1 SYNOPSIS
 
@@ -46,9 +46,27 @@ Algorithm::LUHN_XS - XS Version of the original Algorithm::LUHN
 
 This module is an XS version of the original Perl Module Algorithm::LUHN, which
 was written by Tim Ayers.  It should work exactly the same, only substantially
-faster.
+ faster. The supplied check_digit() routine is 100% compatible with the pure
+Perl Algorithm::LUHN module, while the faster check_digit_fast and really fast
+check_digit_rff are not. 
 
-The rest of the documentation is a copy of the original docs.
+How much faster? Here's a benchmark, running on a 3.4GHz i7-2600:
+
+C<Benchmark: timing 100 iterations>
+
+C<Algorithm::LUHN: 69 secs (69.37 usr 0.00 sys)  1.44/s>
+
+C<check_digit:      2 secs ( 1.98 usr 0.00 sys) 50.51/s>
+
+C<check_digit_fast: 2 secs ( 1.68 usr 0.00 sys) 59.52/s>
+
+C<check_digit_rff:  1 secs ( 1.29 usr 0.00 sys) 77.52/s>
+
+So, it's 35x to 53x faster than the original pure Perl module, depending on
+how much compatibility with the original module you need.
+
+The rest of the documentation is mostly a copy of the original docs, with some
+additions for functions that are new.
 
 This module calculates the Modulus 10 Double Add Double checksum, also known as
 the LUHN Formula. This algorithm is used to verify credit card numbers and
@@ -89,39 +107,68 @@ a valid card number. Ie:
 
 =cut
 
-sub is_valid {
-  my $N = shift;
-  my $c = check_digit(substr($N, 0,length($N)-1));
-  if (defined $c) {
-    if (substr($N,length($N)-1, 1) eq $c) {
-      return 1;
-    } else {
-      $ERROR = "Check digit incorrect. Expected $c";
-      return '';
-    }
-  } else {
-    # $ERROR will have been set by check_digit
-    return '';
-  }
-}
+=item is_valid_fast CHECKSUMMED_NUM
+=cut
+=item is_valid_rff CHECKSUMMED_NUM
+
+Like with check_digit, we have 3 versions of is_valid, each one progressively
+faster than the check_digit that comes in the original pure Perl 
+Algorithm::LUHN module.  Here's a benchmark of 1M total calls to is_valid():
+
+C<Benchmark: timing 100 iterations>
+
+C<Algorithm::LUHN: 100 secs (100.29 usr 0.01 sys)  1.00/s>
+
+C<is_valid:          3 secs (  2.46 usr 0.11 sys) 38.91/s>
+
+C<is_valid_fast:     2 secs (  2.38 usr 0.05 sys) 41.15/s> 
+
+C<is_valid_rff:      2 secs (  1.97 usr 0.08 sys) 48.78/s>
+
+Algorithm::LUHN_XS varies from 38x to 48x times faster than the original
+pure perl Algorithm::LUHN module. The is_valid() routine is 100% compatible
+with the original, returning either '1' for success or the empty string ''
+for failure.   The is_valid_fast routine returns 1 for success and 0 for 
+failure.  Finally, the is_valid_rff function also returns 1 for success 
+and 0 for failure, but only works with numeric input.  If you supply any 
+alpha characters, the return values won't be valid.
+
+=cut
+
+# is_valid is an XS function
 
 =item check_digit NUM
 
 This function returns the checksum of the given number. If it cannot calculate
-the check_digit it will return undef and set $Algorithm::LUHN_XS::ERROR to contain
-the reason why.
+the check_digit it will return undef and set $Algorithm::LUHN_XS::ERROR to 
+contain the reason why.  This is much faster than the check_digit routine
+in the pure perl Algorithm::LUHN module, but only about half as fast as
+the check_digit_fast() function in this module, due to the need to return both
+integers and undef, which isn't fast with XS.
 
 =cut
 
-sub check_digit {
-  my $rv=_al_check_digit(shift);
-  if ($rv == -1) {
-      $ERROR = _al_get_lasterr();
-      return;
-  } 
-  return $rv;
-  
-}
+=item check_digit_fast NUM
+
+This function returns the checksum of the given number. If it cannot calculate
+the check_digit it will return -1 and set $Algorithm::LUHN_XS::ERROR to 
+contain the reason why. It's about 20% faster than check_digit because the XS
+code in this case only has to return integers.
+
+=cut
+
+=item check_digit_rff NUM
+
+This function returns the checksum of the given number. 
+
+It's about 50% faster than check_digit because it ignored the valid_chars, and
+only produces a valid output for numeric input.  If you pass it input with alpha
+characters, the checksum produced won't be right. Works great for Credit Cards,
+but not for things like <CUSIP identifiers|https://en.wikipedia.org/wiki/CUSIP>.
+
+=cut
+
+# check_digit, check_digit_fast, and check_digit_rff are XS defined functions
 
 =item valid_chars LIST
 

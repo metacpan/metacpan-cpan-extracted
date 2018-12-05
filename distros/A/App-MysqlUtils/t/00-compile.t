@@ -6,15 +6,17 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/MysqlUtils.pm'
 );
 
 my @scripts = (
+    'script/mysql-copy-rows-adjust-pk',
     'script/mysql-drop-all-tables',
     'script/mysql-drop-tables',
+    'script/mysql-find-identical-rows',
     'script/mysql-query',
     'script/mysql-run-pl-files',
     'script/mysql-run-sql-files',

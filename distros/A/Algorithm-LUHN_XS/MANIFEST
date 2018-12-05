@@ -2,14 +2,13 @@
 Changes
 LICENSE
 MANIFEST
-META.json
-META.yml
 Makefile.PL
 README
 README.md
-dist.ini
 lib/Algorithm/LUHN_XS.pm
-lib/Algorithm/LUHN_XS.xs
+LUHN_XS.xs
 t/01-cc.t
 t/02-vc.t
 t/03-csp.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

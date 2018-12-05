@@ -3,7 +3,7 @@ package Text::Trac::Macro::Timestamp;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub process {
 	my $class = shift;

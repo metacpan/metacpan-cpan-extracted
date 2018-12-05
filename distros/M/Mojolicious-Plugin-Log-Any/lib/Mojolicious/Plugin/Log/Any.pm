@@ -2,14 +2,14 @@ package Mojolicious::Plugin::Log::Any;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 sub register {
   my ($self, $app, $conf) = @_;
   
   my $logger = $conf->{logger} // 'Log::Any';
   
-  $app->log->with_roles('Mojo::Log::Role::AttachLogger')
+  $app->log->with_roles('Mojo::Log::Role::AttachLogger')->level('debug')
     ->unsubscribe('message')->attach_logger($logger, ref($app));
 }
 
@@ -54,7 +54,7 @@ Mojolicious::Plugin::Log::Any - Use other loggers in a Mojolicious application
     
     # Log::Log4perl
     use Log::Log4perl;
-    Log::Log4perl->init($self->home->child('log.conf'));
+    Log::Log4perl->init($self->home->child('log.conf')->to_string);
     $self->plugin('Log::Any' => {logger => 'Log::Log4perl'});
   }
   
@@ -74,8 +74,11 @@ application class name, which is C<Mojolicious::Lite> for lite applications.
 
 The default behavior of the L<Mojo::Log> object to filter messages by level,
 keep history, prepend a timestamp, and write log messages to a file or STDERR
-will be suppressed. It is expected that the logging framework output handler
-will be configured to handle these details as necessary.
+will be suppressed, by setting the application log level to C<debug> (the
+lowest level) and removing the default L<Mojo::Log/"message"> handler. It is
+expected that the logging framework output handler will be configured to handle
+these details as necessary. If you want to customize how the logging framework
+is attached, use L<Mojo::Log::Role::AttachLogger> directly.
 
 =head1 METHODS
 

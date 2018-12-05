@@ -1,4 +1,8 @@
-Revision history for App-ShellCompleter-mpv
+0.060   2018-12-05 (PERLANCAR)
+
+	- [refactor] Extract list of options to module so it's usable by
+	  other code.
+
 
 0.05    2016-10-21 (PERLANCAR)
 

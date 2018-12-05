@@ -11,7 +11,7 @@ package # split to avoid confusing stupid software
     File::Find::Rule::Permissions;
 
 no warnings qw(redefine);
-sub stat {
+sub _stat {
     my $filename = shift;
     my @stat = CORE::stat($filename);
     my $mode = oct($filename);
@@ -24,7 +24,7 @@ sub stat {
     );
 }
 
-sub getusergroupdetails {
+sub _getusergroupdetails {
     my %params = @_;
     my $users = $params{users};         # { user1 => 1, user2 => 2 }
     my $groups = $params{groups};       # { group1 => 1, group2 => 2 }

@@ -20,6 +20,8 @@ requires:
   Complete::Util: '0.57'
   Config::IOD::Reader: '0.340'
   DBI: '0'
+  DBIx::Diff::Schema: '0.093'
+  Data::Cmp: '0.002'
   Data::Sah::Coerce::perl::str::str_strip_trailing_slash: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
@@ -28,9 +30,10 @@ requires:
   Data::Sah::Compiler::perl::TH::str: '0'
   File::Path: '0'
   IPC::System::Options: '0.330'
+  List::MoreUtils: '0'
   Log::ger: '0.023'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.811'
+  Perinci::CmdLine::Base: '1.816'
   Perinci::CmdLine::Classic: '1.770'
   Perinci::Object: '0.310'
   Perinci::Sub::DepChecker: '0'
@@ -46,7 +49,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-MysqlUtils
   homepage: https://metacpan.org/release/App-MysqlUtils
   repository: git://github.com/perlancar/perl-App-MysqlUtils.git
-version: '0.012'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -57,11 +60,19 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript mysql_copy_rows_adjust_pk'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript mysql_drop_all_tables'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript mysql_drop_tables'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript mysql_find_identical_rows'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -381,7 +392,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -427,10 +438,6 @@ x_Dist_Zilla:
       name: Prereqs
       version: '6.009'
     -
-      class: Dist::Zilla::Plugin::Acme::CPANLists::Whitelist
-      name: Acme::CPANLists::Whitelist
-      version: '0.04'
-    -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
@@ -438,6 +445,10 @@ x_Dist_Zilla:
           type: x_spec
       name: DevelopX_spec
       version: '6.009'
+    -
+      class: Dist::Zilla::Plugin::Acme::CPANModules::Whitelist
+      name: Acme::CPANModules::Whitelist
+      version: '0.001'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

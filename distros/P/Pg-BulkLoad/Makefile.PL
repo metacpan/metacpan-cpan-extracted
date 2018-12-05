@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::MockObject" => 0
   },
-  "VERSION" => "2.01",
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,9 +55,5 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-if ( $^O eq 'MSWin32' ) {
-	$WriteMakefileArgs{PREREQ_PM}{'Win32API::File'} = $FallbackPrereqs{'Win32API::File'} = '99999';
-}
 
 WriteMakefile(%WriteMakefileArgs);

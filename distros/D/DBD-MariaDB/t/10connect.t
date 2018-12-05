@@ -6,11 +6,11 @@ use DBI;
 use DBI::Const::GetInfoType;
 $|= 1;
 
-use vars qw($test_dsn $test_user $test_password $test_db);
+use vars qw($test_dsn $test_user $test_password);
 use lib 't', '.';
 require 'lib.pl';
 
-my $dbh = eval { DBI->connect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 1, AutoCommit => 0 }) };
+my $dbh = eval { DBI->connect($test_dsn, $test_user, $test_password, { RaiseError => 1, PrintError => 0, AutoCommit => 0 }) };
 if (not defined $dbh) {
     my $err = $@;
     $err = "unknown error" unless $err;
@@ -80,7 +80,7 @@ my $result = $dbh->selectall_arrayref('select ' . $storage_engine);
 my $default_storage_engine = $result->[0]->[0] || 'unknown';
 diag "Default storage engine is: $default_storage_engine";
 
-my $res = $dbh->selectrow_hashref('SELECT @@character_set_client, @@character_set_results, @@character_set_connection, @@character_set_server, @@character_set_database, @@collation_connection, @@collation_database');
+my $res = $dbh->selectrow_hashref('SELECT @@character_set_client, @@character_set_results, @@character_set_connection, @@character_set_server, @@character_set_database, @@collation_connection, @@collation_server, @@collation_database');
 foreach (sort keys %{$res}) {
     like($res->{$_}, qr/^utf8/, "Value of $_ is UTF-8");
     diag("$_ is: ". $res->{$_});
@@ -92,7 +92,11 @@ foreach (sort keys %{$info_hashref}) {
     diag("$_ is: ". $info_hashref->{$_});
 }
 
-ok($dbh->disconnect(), 'Disconnected');
+SKIP: {
+
+skip $dbh->errstr(), 2 unless eval { $dbh->do('SHOW GRANTS') };
+skip 'Server accepts connections with invalid user/password', 2
+  if eval { DBI->connect($test_dsn, '4yZ73s9qeECdWi', '64heUGwAsVoNqo', { RaiseError => 1, PrintError => 0 }) };
 
 # dbi docs state:
 # The username and password can also be specified using the attributes
@@ -100,14 +104,18 @@ ok($dbh->disconnect(), 'Disconnected');
 # and $password parameters.
 # see https://rt.cpan.org/Ticket/Display.html?id=89835
 
-my $failed = not eval {$dbh= DBI->connect($test_dsn, $test_user, $test_password,
-   { RaiseError => 1, PrintError => 1, AutoCommit => 0,
+my $failed = not eval { DBI->connect($test_dsn, $test_user, $test_password,
+   { RaiseError => 1, PrintError => 0, AutoCommit => 0,
      Username => '4yZ73s9qeECdWi', Password => '64heUGwAsVoNqo' });};
 ok($failed, 'Username and Password attributes override');
 
-my $success = eval {$dbh= DBI->connect($test_dsn, '4yZ73s9qeECdWi', '64heUGwAsVoNqo',
-   { RaiseError => 1, PrintError => 1, AutoCommit => 0,
+my $success = eval { DBI->connect($test_dsn, '4yZ73s9qeECdWi', '64heUGwAsVoNqo',
+   { RaiseError => 1, PrintError => 0, AutoCommit => 0,
      Username => $test_user, Password => $test_password });};
-ok($success, 'Username and Password attributes override');
+ok($success, 'Username and Password attributes override') or diag(DBI->errstr());
+
+}
+
+ok($dbh->disconnect(), 'Disconnected');
 
 done_testing;

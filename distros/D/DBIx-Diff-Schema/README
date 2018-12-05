@@ -2,8 +2,8 @@ NAME
     DBIx::Diff::Schema - Compare schema of two DBI databases
 
 VERSION
-    This document describes version 0.092 of DBIx::Diff::Schema (from Perl
-    distribution DBIx-Diff-Schema), released on 2018-12-03.
+    This document describes version 0.093 of DBIx::Diff::Schema (from Perl
+    distribution DBIx-Diff-Schema), released on 2018-12-05.
 
 SYNOPSIS
      use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema
@@ -23,6 +23,27 @@ DESCRIPTION
     Currently only tested on Postgres and SQLite.
 
 FUNCTIONS
+  check_table_exists
+    Usage:
+
+     check_table_exists($dbh, $table) -> any
+
+    Check whether a table exists.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
   db_schema_eq
     Usage:
 
@@ -139,6 +160,44 @@ FUNCTIONS
 
         Second table name (assumed to be the same as first table name if
         unspecified).
+
+    Return value: (any)
+
+  list_columns
+    Usage:
+
+     list_columns($dbh, $table) -> any
+
+    List columns of a table.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
+
+    *   $table* => *str*
+
+        Table name.
+
+    Return value: (any)
+
+  list_tables
+    Usage:
+
+     list_tables($dbh) -> any
+
+    List table names in a database.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh* => *obj*
+
+        DBI database handle.
 
     Return value: (any)
 

@@ -113,6 +113,7 @@ my %tests = (
             subject  =>  "Price",
             value    =>  20
         },
+    "()"                              => undef,
     "Address/City ne 'London'"                                 =>
         {
             operator =>  "ne",
@@ -178,6 +179,12 @@ my %tests = (
                 value    =>  5
             },
             value => 10,
+        },
+    "user_id ge 10" =>
+        {
+            operator =>  "ge",
+            subject  =>  "user_id",
+            value    =>  10
         },
 );
 

@@ -1,0 +1,63 @@
+{
+   "abstract" : "server side http transport for DBI-Gofer using PSGI",
+   "author" : [
+      "Tim Bunce, L<http://www.linkedin.com/in/timbunce>",
+      "James Wright L<https://metacpan.org/author/JWRIGHT>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.024",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-DBI-Gofer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.024"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.605",
+            "DBI::Gofer::Execute" : "0",
+            "DBI::Gofer::Transport::Base" : "0",
+            "HTTP::Date" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Plack::Component" : "0",
+            "Plack::MIME" : "0",
+            "Plack::Request" : "0",
+            "Plack::Response" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Safe::Isa" : "0",
+            "Socket" : "0",
+            "Try::Tiny" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBI::Gofer::Transport::psgi" : {
+         "file" : "lib/DBI/Gofer/Transport/psgi.pm",
+         "version" : "0.001"
+      },
+      "Plack::App::DBI::Gofer" : {
+         "file" : "lib/Plack/App/DBI/Gofer.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

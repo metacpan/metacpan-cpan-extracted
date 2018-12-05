@@ -1,5 +1,5 @@
 package GitLab::API::v4::Paginator;
-$GitLab::API::v4::Paginator::VERSION = '0.13';
+$GitLab::API::v4::Paginator::VERSION = '0.14';
 =encoding utf8
 
 =head1 NAME

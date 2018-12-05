@@ -18,34 +18,35 @@ my $TESTDB = "test";
 
 our $opt = { "help" => \&Usage, };
 
+my ($test_host, $test_port, $test_socket);
 {
 local ($::test_host, $::test_port, $::test_user, $::test_socket, $::test_password, $::test_db, $::test_mysql_config, $::test_cflags, $::test_libs);
 eval { require "./t/MariaDB.mtest" } and do {
-$opt->{'testhost'} = $::test_host;
-$opt->{'testport'} = $::test_port;
 $opt->{'testuser'} = $::test_user;
-$opt->{'testsocket'} = $::test_socket;
 $opt->{'testpassword'} = $::test_password;
 $opt->{'testdb'} = $::test_db;
 $opt->{'mysql_config'} = $::test_mysql_config;
 $opt->{'cflags'} = $::test_cflags;
 $opt->{'libs'} = $::test_libs;
+$test_host = $::test_host;
+$test_port = $::test_port;
+$test_socket = $::test_socket;
 }
 }
 
 Getopt::Long::GetOptions(
     $opt,
     "help",
-    "testdb=s",
-    "testhost=s",
-    "testport=s",
-    "testuser=s",
-    "testpassword=s",
-    "testsocket=s",
-    "cflags=s",
-    "libs=s",
-    "mysql_config=s",
-    "mariadb_config=s",
+    "testdb:s",
+    "testhost:s",
+    "testport:s",
+    "testuser:s",
+    "testpassword:s",
+    "testsocket:s",
+    "cflags:s",
+    "libs:s",
+    "mysql_config:s",
+    "mariadb_config:s",
     ) || die Usage();
 
 $opt->{mysql_config} = delete $opt->{mariadb_config} if exists $opt->{mariadb_config};
@@ -102,10 +103,58 @@ for my $key (qw(testdb testhost testuser testpassword testsocket testport cflags
   Configure($opt, $source, $key);
 }
 
+if (!$opt->{testport} && (!$opt->{testhost} || $opt->{testhost} eq 'localhost') && !defined $opt->{testsocket} && $test_socket) {
+  $opt->{testsocket} = $test_socket;
+  $source->{testsocket} = "User's choice";
+}
+
+if (!$opt->{testsocket}) {
+  if (!defined $opt->{testhost} && $test_host && (!$opt->{testport} || $test_host ne 'localhost')) {
+    $opt->{testhost} = $test_host;
+    $source->{testhost} = "User's choice";
+  }
+  if (!defined $opt->{testport} && $test_port && (!$opt->{testhost} || $opt->{testhost} ne 'localhost')) {
+    $opt->{testport} = $test_port;
+    $source->{testport} = "User's choice";
+  }
+} else {
+  if (!defined $opt->{testhost} && $test_host && $test_host eq 'localhost') {
+    $opt->{testhost} = 'localhost';
+    $source->{testhost} = "User's choice";
+  }
+}
+
 #if we have a testport but no host, assume 127.0.0.1
 if ( $opt->{testport} && !$opt->{testhost} ) {
   $opt->{testhost} = '127.0.0.1';
   $source->{testhost} = 'guessed';
+}
+
+foreach (qw(testhost testport testsocket)) {
+  next if defined $opt->{$_};
+  $opt->{$_} = '';
+  $source->{$_} = 'default';
+}
+
+# testsocket makes sense only when testhost is localhost
+if ($opt->{testsocket} && $opt->{testhost} && $opt->{testhost} ne 'localhost') {
+  die << "MSG";
+Option --testport or --testhost different from localhost cannot be specified together with option --testsocket.
+MSG
+}
+
+# testport cannot be specified when host is localhost
+if ($opt->{testport} && $opt->{testhost} && $opt->{testhost} eq 'localhost') {
+  die << "MSG";
+Option --testport cannot be specified when --testhost is localhost.
+MSG
+}
+
+# testhost cannot be embedded
+if ($opt->{testhost} && $opt->{testhost} eq 'embedded') {
+  die << "MSG";
+Option --testhost cannot be embedded.
+MSG
 }
 
 # Separate libs and libdirs from ldflags
@@ -185,11 +234,11 @@ check_lib(
   ccflags => $opt->{cflags},
   ldflags => (join ' ', @libdirs, @libs, @ldflags),
   header => 'mysql.h',
-  function => "\n#ifndef MYSQL_VERSION_ID\n#include <mysql_version.h>\n#endif\nreturn (MYSQL_VERSION_ID >= 40103) ? 0 : 1;\n",
+  function => "\n#ifndef MYSQL_VERSION_ID\n#include <mysql_version.h>\n#endif\nreturn (MYSQL_VERSION_ID >= 40108) ? 0 : 1;\n",
 ) or die <<"MSG";
 
 ERROR: Wrong version or unable to check version of MariaDB/MySQL include files.
-To build DBD::MariaDB it is needed MariaDB or MySQL client >= 4.1.3.
+To build DBD::MariaDB it is needed MariaDB or MySQL client >= 4.1.8.
 
 MSG
 
@@ -235,6 +284,7 @@ my $fileName = File::Spec->catfile("t", "MariaDB.mtest");
               "\$::test_dsn .= \":\$::test_host\" if \$::test_host;\n" .
 	      "\$::test_dsn .= \":\$::test_port\" if \$::test_port;\n".
 	      "\$::test_dsn .= \";mariadb_socket=\$::test_socket\" if \$::test_socket;\n" .
+	      "\$::test_dsn .= \";mariadb_connect_timeout=120;mariadb_read_timeout=120;mariadb_write_timeout=120\";\n" .
 	      "\$::test_mysql_config = \$opt->{'mysql_config'} if \$source->{'mysql_config'} eq 'User\\'s choice';\n" .
 	      "\$::test_cflags = \$opt->{'cflags'} if \$source->{'cflags'} eq 'User\\'s choice';\n" .
 	      "\$::test_libs = \$opt->{'libs'} if \$source->{'libs'} eq 'User\\'s choice';\n" .
@@ -244,6 +294,7 @@ my $fileName = File::Spec->catfile("t", "MariaDB.mtest");
 
 my $cflags = "-I\$(DBI_INSTARCH_DIR) $opt->{'cflags'}";
 $cflags .= " -DHAVE_DBI_1_634" if eval { DBI->VERSION(1.634) };
+$cflags .= " -DHAVE_DBI_1_642" if eval { DBI->VERSION(1.642) };
 $cflags .= " -DHAVE_EMBEDDED" if $have_embedded;
 $cflags .= " -DHAVE_GET_CHARSET_NUMBER" if $have_get_charset_number;
 $cflags .= " -DHAVE_GET_OPTION" if $have_get_option;
@@ -358,6 +409,7 @@ if (eval { ExtUtils::MakeMaker->VERSION(5.43) }) {
           recommends => {
             'Proc::ProcessTable' => 0,
             'TAP::Harness' => '3.31',
+            'CPAN::Meta::YAML' => 0,
           },
           suggests => {
             'Storable' => 0,
@@ -494,7 +546,7 @@ sub ParseMySQLConfig {
 
 sub Configure {
     my($opt, $source, $param) = @_;
-    if (defined($opt->{$param}) and length($opt->{$param})) {
+    if (defined($opt->{$param})) {
         $source->{$param} = "User's choice";
         return;
     }
@@ -533,11 +585,10 @@ sub Configure {
             if (defined $main_lib) {
                 my $function = "\n#ifndef MYSQL_VERSION_ID\n#include <mysql_version.h>\n#endif\n";
                 if ($_ eq 'libmysqld-libs') {
-                    # libmariadbd.so from MariaDB 10.3.1+ is totally broken and always crash
-                    # when calling mysql_real_connect() function, see reported bug:
+                    # libmariadbd.so from MariaDB 10.3.1 - 10.3.7 is broken, unusable
+                    # and always crash in mysql_real_connect() function, so avoid its usage
                     # https://jira.mariadb.org/browse/MDEV-16478
-                    # so we need to avoid using this broken library
-                    $function .= "\n#if defined(MARIADB_BASE_VERSION) || defined(MARIADB_PACKAGE_VERSION)\nif (mysql_get_client_version() >= 100301) return 1;\n#endif\n";
+                    $function .= "\n#if defined(MARIADB_BASE_VERSION) || defined(MARIADB_PACKAGE_VERSION)\nif (mysql_get_client_version() >= 100301 && mysql_get_client_version() < 100308) return 1;\n#endif\n";
                 }
                 $function .= 'return (mysql_get_client_version() == MYSQL_VERSION_ID) ? 0 : 1;';
                 # libmysqld is built using g++ rather than gcc and sometimes
@@ -614,8 +665,7 @@ perl Makefile.PL --testuser=username
       $source->{$param} = "default";
       $opt->{$param} = $TESTDB;
     }
-    elsif ($param eq "testhost" || $param eq "testport"  ||
-        $param eq "testpassword" || $param eq "testsocket" ) {
+    elsif ($param eq "testpassword") {
       $source->{$param} = "default";
       $opt->{$param} = "";
     }
@@ -660,6 +710,9 @@ section "Linker flags" or type
 
   perl Makefile.PL --help
 MSG
+    }
+    elsif ($param eq "testhost" || $param eq "testport" || $param eq "testsocket") {
+      # known parameter, but do nothing
     }
     else {
       die "Unknown configuration parameter: $param";

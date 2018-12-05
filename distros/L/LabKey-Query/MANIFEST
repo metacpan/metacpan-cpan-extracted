@@ -1,11 +1,16 @@
 Build.PL
 Changes
+CPAN.txt
+eg/labkey_api.pl
 lib/LabKey/Query.pm
 LICENSE
-MANIFEST
-MANIFEST.SKIP
-META.yml
-README
-t/001_load.t
-Todo
+MANIFEST			This list of files
 META.json
+META.yml
+README.pod
+t/00_load.t
+t/01_selectRows.t
+t/02_executeSql.t
+t/03_insertRows.t
+t/04_updateRows.t
+t/05_deleteRows.t

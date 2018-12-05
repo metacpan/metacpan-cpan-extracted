@@ -3,7 +3,7 @@
    "author" : [
       "John Karr <brainbuz@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -40,7 +40,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.01",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brainbuz/pgbulkload/issues"
+      },
+      "homepage" : "https://github.com/brainbuz/pgbulkload",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/brainbuz/pgbulkload.git",
+         "web" : "https://github.com/brainbuz/pgbulkload"
+      }
+   },
+   "version" : "2.02",
    "x_generated_by_perl" : "v5.28.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

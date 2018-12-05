@@ -1,0 +1,110 @@
+NAME
+
+    Plack::App::DBI::Gofer - server side http transport for DBI-Gofer using
+    PSGI
+
+SYNOPSIS
+
+            use Plack::App::DBI::Gofer;
+            my $app = Plack::App::DBI::Gofer->new( config => {
+                    %DBI_Gofer_Execute_config_params
+            })->to_app;
+            
+            # or map a path to a forced dsn
+            use Plack::Builder;
+            builder {
+                    mount '/mydb' => Plack::App::DBI::Gofer->new( config => {
+                            forced_connect_dsn => 'dbi:SQLite:dbname=mydb.db',
+                    })->to_app;
+            };
+
+    For a corresponding client-side transport see
+    DBD::Gofer::Transport::http.
+
+DESCRIPTION
+
+    This module implements a DBD::Gofer server-side http transport through
+    PSGI.
+
+    This enables DBI to connect to databases through your PSGI-enabled HTTP
+    server.
+
+CONFIGURATION
+
+ Gofer Configuration
+
+    Rather than provide a DBI proxy that will connect to any database as
+    any user, you may well want to restrict access to just one or a few
+    databases.
+
+    Or perhaps you want the database passwords to be stored only in your
+    app.psgi so you don't have to maintain them in all your clients.
+
+    A typical usage might be to define configurations for each specific
+    database being used and then define a coresponding location for each of
+    those. That would also allow standard http location access controls to
+    be used
+
+    That approach can also provide a level of indirection by avoiding the
+    need for the clients to know and use the actual DSN. The clients can
+    just connect to the specific gofer url with an empty DSN. This means
+    you can change the DSN being used without having to update the clients.
+
+    This enables the use of forking PSGI web servers and handlers,
+    including Starman, Monoceros and Gazelle as caching, stateless database
+    proxies.
+
+    At this time, this application doesn't support asynchronous, event
+    driven servers such as Twiggy.
+
+    config
+
+      Set to a hash of DBI::Gofer::Execute options, optional.
+
+DIFFERENCES FROM DBI::Gofer::Transport::mod_perl
+
+      * No equivalent for the Apache::Status support
+
+      * No client side transport (relies instead on
+      DBD::Gofer::Transport::http)
+
+TO DO
+
+      * Add a lighter client side http transport that doesn't require
+      installing mod_perl
+
+      Possibly using HTTP::Tiny or HTTP::Lite
+
+      * More tests
+
+      * Support http authorization (Basic and Digest)
+
+      * Support PSGI streaming and async.
+
+    Please report any bugs or feature requests to
+    bug-plack-app-dbi-gofer@rt.cpan.org, or through the web interface at
+    http://rt.cpan.org.
+
+AUTHOR
+
+    Tim Bunce, http://www.linkedin.com/in/timbunce
+
+    James Wright https://metacpan.org/author/JWRIGHT
+
+LICENCE AND COPYRIGHT
+
+    Copyright (c) 2007, Tim Bunce, Ireland. All rights reserved.
+
+    Copyright (c) 2018, James Wright, United States.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+SEE ALSO
+
+      * DBD::Gofer
+
+      * DBD::Gofer::Transport::http
+
+      * Plack
+

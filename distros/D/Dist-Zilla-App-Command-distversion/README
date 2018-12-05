@@ -10,4 +10,24 @@ SYNOPSIS
 
         $ dzil distversion
         0.01
+    
+        $ dzil distversion --rc
+        0.01-rc1
+
+OPTIONS
+
+ rc
+
+    Produce a release candidate version. This is defined as your dist
+    version with the suffix -rcN, where N is either 1, or 1 more than the
+    previous RC version.
+
+    Since dzil doesn't care about the output of this module, nor tracks RC
+    versions for you, the module currently looks for git tags matching your
+    dist version. Later, this will be configurable. Any tag matching
+    /^v$distversion-rc(\d+)/ is considered a release candidate tag, and if
+    none is found, we use 1.
+
+    Any tag matching /^v$distversion/ is considered a problem and we emit a
+    warning.
 

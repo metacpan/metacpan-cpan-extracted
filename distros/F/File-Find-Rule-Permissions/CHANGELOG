@@ -1,3 +1,6 @@
+2.04    2018-12-04      Make the tests pass on modern perls where . isn't
+                          in @INC
+
 2.03    2016-09-27      Clean up some nasty old code, no functional changes
 
 2.02    2016-09-21      Fix bug in tests that broke when tested in parallel

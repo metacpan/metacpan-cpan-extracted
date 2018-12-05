@@ -2,9 +2,9 @@
 
 use strict;
 use Test;
-use Algorithm::LUHN_XS qw/check_digit is_valid  valid_chars/;
+use Algorithm::LUHN_XS qw/check_digit check_digit_fast is_valid  valid_chars/;
 
-BEGIN { plan tests => 27 }
+BEGIN { plan tests => 30 }
 
 # Check some numeric and alphanumeric values
 
@@ -25,7 +25,13 @@ while (@values) {
 # Check a value including non-alphanum char (should fail).
 my ($v, $c);
 $v = '016783A@';
-ok(!($c=check_digit($v)));
+ok(!defined($c=check_digit($v)));
+$c ||= ''; # make sure $c is defined or we get an "uninit val" warning
+ok($Algorithm::LUHN_XS::ERROR, qr/\S/,
+   "  Expected an error, but got a check_digit instead: $v => $c\n");
+ok($Algorithm::LUHN_XS::ERROR, qr/^Invalid/,
+   "  Did not get the expected error. Got $Algorithm::LUHN_XS::ERROR\n");
+ok(($c=check_digit_fast($v))==-1);
 $c ||= ''; # make sure $c is defined or we get an "uninit val" warning
 ok($Algorithm::LUHN_XS::ERROR, qr/\S/,
    "  Expected an error, but got a check_digit instead: $v => $c\n");

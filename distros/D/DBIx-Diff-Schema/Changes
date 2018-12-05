@@ -1,3 +1,9 @@
+0.093   2018-12-05 (PERLANCAR)
+
+	- Make these functions public: list_columns, list_tables,
+	  check_table_exists.
+
+
 0.092   2018-12-03 (PERLANCAR)
 
 	- Detect change of column AUTO_INCREMENT (mysql) status.

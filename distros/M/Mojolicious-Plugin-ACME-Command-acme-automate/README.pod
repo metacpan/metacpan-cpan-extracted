@@ -1,0 +1,102 @@
+=encoding utf8
+
+=head1 NAME
+
+Mojolicious::Plugin::ACME::Command::acme::automate - Automate ACME registration and signed certificate generation
+
+=head1 SYNOPSIS
+
+  Usage: APPLICATION acme cert generate [OPTIONS]
+    myapp acme automate
+    myapp acme automate -t -a myaccount.key -T template -l http://*:8928 -o proxy_pass=http://127.0.0.1:3000 domain1.com {domain2.com, ...}
+
+  Options:
+
+        --full, --no-full                Automatically chain the resulting
+                                         certificate with the intermediate
+                                         defaults to true, use --no-full to
+                                         disable
+    -h, --help                           Show this summary of available options
+    -i, --intermediate                   The url of the intermediate cert to
+                                         be chained if "full" is passed
+    -l, --listen <location>              One or more locations you want to
+                                         listen on, defaults to the value of
+                                         MOJO_LISTEN or "http://*:3000"
+    -n, --name                           The name of the file(s) to be
+                                         generated, defaults to the app's
+                                         moniker
+    -o, --option <key=value>             Options to pass as variables to the
+                                         template
+    -p, --proxy                          Activate reverse proxy support,
+                                         defaults to the value of
+                                         MOJO_REVERSE_PROXY
+    -T, --template <filename>            Template for building a config file
+                                         for your reverse proxy server
+                                         (e.g. nginx)
+
+=head1 DESCRIPTION
+
+L<Mojolicious::Plugin::ACME::Command::acme::automate> automates ACME
+registration and signed certificate generation for one or more domains.
+
+=head1 ATTRIBUTES
+
+L<Mojolicious::Plugin::ACME::Command::acme::automate> inherits all
+attributes from L<Mojolicious::Plugin::ACME::Command> and implements the
+following new ones.
+
+=head2 description
+
+  my $description = $v->description;
+  $v              = $v->description('Foo');
+
+Short description of this command, used for the command list.
+
+=head2 usage
+
+  my $usage = $v->usage;
+  $v        = $v->usage('Foo');
+
+Usage information for this command, used for the help screen.
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::ACME::Command::acme::automate> inherits all methods from
+L<Mojolicious::Command> and implements the following new ones.
+
+=head2 run
+
+  $v->run(@ARGV);
+
+Run this command.
+
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojo::ACME>.
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/s1037989/Mojolicious-Plugin-ACME-Command-acme-automate>
+
+=head1 AUTHOR
+
+Stefan Adams, E<lt>sadams@cpan.org<gt>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Joel Berger (jberger)
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2018 by Stefan Adams and L</CONTRIBUTORS>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

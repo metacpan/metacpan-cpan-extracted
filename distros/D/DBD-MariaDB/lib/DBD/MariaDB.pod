@@ -32,7 +32,7 @@ DBD::MariaDB - MariaDB and MySQL driver for the Perl5 Database Interface (DBI)
   # Connect to the database.
   my $dbh = DBI->connect('DBI:MariaDB:database=test;host=localhost',
                          'joe', q(joe's password),
-                         {'RaiseError' => 1});
+                         { RaiseError => 1, PrintError => 0 });
 
   # Drop table 'foo'. This may fail, if 'foo' doesn't exist
   # Thus we put an eval around it.
@@ -83,7 +83,8 @@ types of objects are available: database handles and statement handles. Perl
 returns a database handle to the connect method like so:
 
   my $dbh = DBI->connect("DBI:MariaDB:database=$db;host=$host",
-                         $user, $password, {RaiseError => 1});
+                         $user, $password,
+                         { RaiseError => 1, PrintError => 0 });
 
 Once you have connected to a database, you can execute SQL statements with:
 
@@ -184,19 +185,19 @@ between client and server will be compressed.
 
 If your DSN contains the option C<mariadb_connect_timeout=##>, the connect
 request to the server will timeout if it has not been successful after the given
-number of seconds.
+number of seconds. Zero value means infinite timeout.
 
 =item mariadb_write_timeout
 
 If your DSN contains the option C<mariadb_write_timeout=##>, the write operation
 to the server will timeout if it has not been successful after the given number
-of seconds.
+of seconds. Zero value means infinite timeout.
 
 =item mariadb_read_timeout
 
 If your DSN contains the option C<mariadb_read_timeout=##>, the read operation
 to the server will timeout if it has not been successful after the given number
-of seconds.
+of seconds. Zero value means infinite timeout.
 
 =item mariadb_init_command
 
@@ -366,7 +367,7 @@ I<mariadb_server_prepare> in the connect:
       'DBI:MariaDB:database=test;host=localhost;mariadb_server_prepare=1',
       'user',
       'password',
-      { RaiseError => 1, AutoCommit => 1 },
+      { RaiseError => 1, PrintError => 0 },
   );
 
 or:
@@ -375,7 +376,7 @@ or:
       'DBI:MariaDB:database=test;host=localhost',
       'user',
       'password',
-      { RaiseError => 1, AutoCommit => 1, mariadb_server_prepare => 1 },
+      { RaiseError => 1, PrintError => 0, mariadb_server_prepare => 1 },
   );
 
 There are many benefits to using server side prepare statements, mostly if you
@@ -426,7 +427,7 @@ server. If not specified C<[server]> and C<[embedded]> groups will be used.
 Example:
 
   my $dsn = 'DBI:MariaDB:host=embedded;database=test;'
-          . 'mariadb_embedded_groups=embedded_server,common";
+          . 'mariadb_embedded_groups=embedded_server,common';
 
 =item mariadb_conn_attrs
 
@@ -558,7 +559,8 @@ L<C<< $dbh->errstr() >>|DBI/errstr> for error number and string,
 C<< $dbh->get_info($GetInfoType{SQL_SERVER_NAME}) >> for server host name,
 C<< $dbh->get_info($GetInfoType{SQL_DBMS_NAME}) >> and
 C<< $dbh->get_info($GetInfoType{SQL_DBMS_VER}) >> for server database name and
-version, L<C<< $dbh->last_insert_id() >>|DBI/last_insert_id> for insert id.
+version, L<C<< $dbh->last_insert_id() >>|DBI/last_insert_id> or
+C<< $sth->last_insert_id() >> for insert id.
 
 =over 2
 
@@ -874,7 +876,10 @@ can also be accessed via C<< $dbh->{mariadb_insertid} >> but this can easily
 produce incorrect results in case one database handle is shared.
 
 Portable DBI applications should not use I<mariadb_insertid>. Instead they
-should use DBI method L<C<< $dbh->last_insert_id() >>|DBI/last_insert_id>.
+should use DBI method L<C<< $dbh->last_insert_id() >>|DBI/last_insert_id>
+or statement DBI method C<< $sth->last_insert_id() >>. Statement method was
+introduced in DBI version 1.642, but DBD::MariaDB implements it also for older
+DBI versions.
 
 =item mariadb_is_blob
 
@@ -1041,9 +1046,9 @@ DBD::MariaDB must provide information about the correct type.
 
 Moreover, DBI API for L<do|DBI/do>, L<execute|DBI/execute> and all
 L<select*|DBI/selectrow_array> methods binds all parameters as C<SQL_VARCHAR>
-type. Currently it is an API limitation which does not allow to specify the bind
-type. Varchar is a string and so DBD::MariaDB treats all of them as I<Unicode>
-strings.
+type. Currently it is an API limitation which does not allow one to specify the
+bind type. Varchar is a string and so DBD::MariaDB treats all of them as
+I<Unicode> strings.
 
 The only way how to specify a type in DBI is via the
 L<bind_param|DBI/bind_param> method. Its third argument takes C<SQL_*> constant

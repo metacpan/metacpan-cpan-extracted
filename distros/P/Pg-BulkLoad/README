@@ -1,5 +1,5 @@
 This archive contains the distribution Pg-BulkLoad,
-version 2.01:
+version 2.02:
 
   Bulk Load for Postgres with ability to skip bad records.
 

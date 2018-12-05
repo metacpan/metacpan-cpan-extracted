@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST			This list of files
 README.pod
 lib/Mojolicious/Plugin/StaticShare.pm
+lib/Mojolicious/Plugin/PODRenderer.pm
 lib/Mojolicious/Plugin/StaticShare/Controller.pm
 lib/Mojolicious/Plugin/StaticShare/Templates.pm
 lib/Mojolicious/Plugin/StaticShare/static/static-share/css/main.css
@@ -70,6 +71,8 @@ lib/Mojolicious/Plugin/StaticShare/static/static-share/js/velocity.min.js
 lib/Mojolicious/Plugin/StaticShare/static/static-share/js/modal.js
 lib/Mojolicious/Plugin/StaticShare/static/static-share/js/dropdown.js
 lib/Mojolicious/Plugin/StaticShare/static/static-share/js/ace.js
+lib/Mojolicious/Plugin/StaticShare/static/static-share/js/toasts.js
+lib/Mojolicious/Plugin/StaticShare/static/static-share/js/hammer.min.js
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

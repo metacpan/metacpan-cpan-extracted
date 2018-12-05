@@ -117,7 +117,14 @@ my $configure_clipbucket=sub {
       $c="aws ec2 modify-instance-attribute --instance-id $i ".
          "--groups $g";
       ($hash,$output,$error)=run_aws_cmd($c);
+      $c='aws ec2 describe-security-groups '.
+         "--group-names $n";
+      ($hash,$output,$error)=run_aws_cmd($c);
+      my $sg=$hash->{SecurityGroups}->[0]->{GroupName};
+      print "\n   NEW SECURITY GROUP -> $sg\n\n";
    }
+#&Net::FullAuto::FA_Core::cleanup;
+
    my $local=$localhost;
    my $handle=$local;
    my ($stdout,$stderr)=('','');
@@ -1046,24 +1053,24 @@ plugin-load-add=ha_tokudb.so
 malloc-lib=/usr/local/lib/libjemalloc.so.2
 END
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "echo -e \"$toku_cnf\" > ~/tokudb.cnf");
+         "echo -e \"$toku_cnf\" > /opt/source/tokudb.cnf");
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ~/tokudb.cnf /etc/my.cnf.d/tokudb.cnf',
+         'cp -v /opt/source/tokudb.cnf /etc/my.cnf.d/tokudb.cnf',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'rm -rvf ~/tokudb.cnf','__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'rm -rvf /opt/source/tokudb.cnf','__display__');
       # https://github.com/arslancb/clipbucket/issues/429
-      my $strict_mode_cnf=<<END;
+      my $sql_mode_cnf=<<END;
 [mysqld]
-sql_mode=IGNORE_SPACE,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+sql_mode=IGNORE_SPACE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
 END
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "echo -e \"$strict_mode_cnf\" > ~/strict_mode.cnf");
+         "echo -e \"$sql_mode_cnf\" > /opt/source/sql_mode.cnf");
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'cp -v ~/strict_mode.cnf /etc/my.cnf.d/strict_mode.cnf',
+         'cp -v /opt/source/sql_mode.cnf /etc/my.cnf.d/sql_mode.cnf',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'rm -rvf ~/strict_mode.cnf','__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'rm -rvf /opt/source/sql_mode.cnf','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql start','__display__');
       #($stdout,$stderr)=$handle->cmd($sudo.
@@ -2077,7 +2084,7 @@ END
       " categories.sql");
    my @sql=('structure','configs','ads_placements',
             'countries','email_templates','pages','user_levels',
-            'categories','add_admin');
+            'categories','add_admin','import_categories');
    foreach my $file (@sql) {
       print "\nRUNNING $file.sql SQL FILE\n";
       ($stdout,$stderr)=$handle->cmd($sudo.

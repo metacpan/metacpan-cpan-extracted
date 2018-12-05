@@ -2,7 +2,7 @@ package Term::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use Term::Table::Cell();
 
@@ -11,11 +11,10 @@ use Scalar::Util qw/blessed/;
 use List::Util qw/max sum/;
 use Carp qw/croak carp/;
 
-use Term::Table::HashBase qw/rows _columns collapse max_width mark_tail sanitize show_header auto_columns no_collapse header/;
+use Term::Table::HashBase qw/rows _columns collapse max_width mark_tail sanitize show_header auto_columns no_collapse header allow_overflow pad/;
 
 sub BORDER_SIZE()   { 4 }    # '| ' and ' |' borders
 sub DIV_SIZE()      { 3 }    # ' | ' column delimiter
-sub PAD_SIZE()      { 4 }    # Extra arbitrary padding
 sub CELL_PAD_SIZE() { 2 }    # space on either side of the |
 
 sub init {
@@ -36,6 +35,8 @@ sub init {
             $self->{+NO_COLLAPSE}->{$idx} ||= $self->{+NO_COLLAPSE}->{$header->[$idx]};
         }
     }
+
+    $self->{+PAD} = 4 unless defined $self->{+PAD};
 
     $self->{+COLLAPSE}  = 1 unless defined $self->{+COLLAPSE};
     $self->{+SANITIZE}  = 1 unless defined $self->{+SANITIZE};
@@ -98,11 +99,16 @@ sub regen_columns {
         if $self->{+COLLAPSE};
 
     my $current = sum(map {$_->{width}} @$cols);
-    my $border = sum(BORDER_SIZE, PAD_SIZE, DIV_SIZE * @$cols);
+    my $border = sum(BORDER_SIZE, $self->{+PAD}, DIV_SIZE * (@$cols - 1));
     my $total = $current + $border;
 
     if ($total > $self->{+MAX_WIDTH}) {
         my $fair = ($self->{+MAX_WIDTH} - $border) / @$cols;
+        if ($fair < 1) {
+            return $self->{+_COLUMNS} = $cols if $self->{+ALLOW_OVERFLOW};
+            croak "Table is too large ($total including $self->{+PAD} padding) to fit into max-width ($self->{+MAX_WIDTH})";
+        }
+
         my $under = 0;
         my @fix;
         for my $c (@$cols) {
@@ -116,6 +122,10 @@ sub regen_columns {
 
         # Recalculate fairness
         $fair = int(($self->{+MAX_WIDTH} - $border - $under) / @fix);
+        if ($fair < 1) {
+            return $self->{+_COLUMNS} = $cols if $self->{+ALLOW_OVERFLOW};
+            croak "Table is too large ($total including $self->{+PAD} padding) to fit into max-width ($self->{+MAX_WIDTH})";
+        }
 
         # Adjust over-long columns
         $_->{width} = $fair for @fix;
@@ -133,7 +143,7 @@ sub render {
             $cell->reset;
         }
     }
-    my $width = sum(BORDER_SIZE, PAD_SIZE, DIV_SIZE * @$cols, map { $_->{width} } @$cols);
+    my $width = sum(BORDER_SIZE, $self->{+PAD}, DIV_SIZE * @$cols, map { $_->{width} } @$cols);
 
     #<<< NO-TIDY
     my $border   = '+' . join('+', map { '-' x ($_->{width}  + CELL_PAD_SIZE) }      @$cols) . '+';
@@ -259,12 +269,15 @@ wrong. This module is able to generic format rows of data into tables.
     use Term::Table;
 
     my $table = Term::Table->new(
-        max_width    => 80, # defaults to terminal size 
-        collapse     => 1, # do not show empty columns
-        header => [ 'name', 'age', 'hair color' ],
-        rows         => [
-            [ 'Fred Flinstone',  2000000, 'black' ],
-            [ 'Wilma Flinstone', 1999995, 'red' ],
+        max_width      => 80,    # defaults to terminal size
+        pad            => 4,     # Extra padding between table and max-width (defaults to 4)
+        allow_overflow => 0,     # default is 0, when off an exception will be thrown if the table is too big
+        collapse       => 1,     # do not show empty columns
+
+        header => ['name', 'age', 'hair color'],
+        rows   => [
+            ['Fred Flinstone',  2000000, 'black'],
+            ['Wilma Flinstone', 1999995, 'red'],
             ...
         ],
     );
@@ -309,6 +322,19 @@ in any row. Having a header for the column will not effect collapse.
 Set the maximum width of the table, the table may not be this big, but it will
 be no bigger. If none is specified it will attempt to find the width of your
 terminal and use that, otherwise it falls back to the terminal width or C<80>.
+
+=item pad => $num
+
+Defaults to 4, extra padding for row width calculations. Default is for legacy
+support. Set this to 0 to turn padding off.
+
+=item allow_overflow => $bool
+
+Defaults to 0. If this is off then an exception will be thrown if the table
+cannot be made to fit inside the max-width. If this is set to 1 then the table
+will be rendered anyway, larger than max-width, if it is not possible to stay
+within the max-width. In other words this turns max-width from a hard-limit to
+a soft recommendation.
 
 =item sanitize => $bool
 

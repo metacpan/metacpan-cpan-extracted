@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.08
+    version 1.09
 
 SYNOPSIS
 
@@ -187,6 +187,10 @@ ATTRIBUTES
     By default, the classes inherit from DBIx::Class and they load the
     components PK::Auto and Core. If you set inherit_from_core, the classes
     inherit from DBIx::Class::Core. and no extra components are loaded.
+
+ parser
+
+    The MySQL::Workbench::Parser object.
 
 AUTHOR
 

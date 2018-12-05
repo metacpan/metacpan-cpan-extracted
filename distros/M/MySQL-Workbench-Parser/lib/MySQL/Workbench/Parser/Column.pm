@@ -8,7 +8,8 @@ use warnings;
 use Moo;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.04;
+
+our $VERSION = '1.03';
 
 has node => (
     is       => 'ro',
@@ -25,7 +26,6 @@ has table => (
         blessed $_[0] && $_[0]->isa( 'MySQL::Workbench::Parser::Table' );
     },
 );
-
 
 
 sub BUILD {
@@ -100,7 +100,9 @@ MySQL::Workbench::Parser::Column - A column of the ER model
 
 =head1 VERSION
 
-version 1.01
+version 1.03
+
+=head1 METHODS
 
 =for Pod::Coverage BUILD
 
@@ -149,6 +151,10 @@ returns
 =item * table
 
 =back
+
+=head1 MISC
+
+=head2 BUILD
 
 =head1 AUTHOR
 

@@ -1,0 +1,42 @@
+---
+abstract: 'server side http transport for DBI-Gofer using PSGI'
+author:
+  - 'Tim Bunce, L<http://www.linkedin.com/in/timbunce>'
+  - 'James Wright L<https://metacpan.org/author/JWRIGHT>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.024, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-DBI-Gofer
+provides:
+  DBI::Gofer::Transport::psgi:
+    file: lib/DBI/Gofer/Transport/psgi.pm
+    version: '0.001'
+  Plack::App::DBI::Gofer:
+    file: lib/Plack/App/DBI/Gofer.pm
+    version: '0.001'
+requires:
+  DBI: '1.605'
+  DBI::Gofer::Execute: '0'
+  DBI::Gofer::Transport::Base: '0'
+  HTTP::Date: '0'
+  List::Util: '0'
+  MIME::Base64: '0'
+  Plack::Component: '0'
+  Plack::MIME: '0'
+  Plack::Request: '0'
+  Plack::Response: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  Safe::Isa: '0'
+  Socket: '0'
+  Try::Tiny: '0'
+  parent: '0'
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

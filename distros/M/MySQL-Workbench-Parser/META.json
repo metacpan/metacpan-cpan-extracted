@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "MySQL-Workbench-Parser",
    "prereqs" : {
@@ -41,6 +41,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::LongString" : "0.16"
          }
       }
@@ -48,19 +49,19 @@
    "provides" : {
       "MySQL::Workbench::Parser" : {
          "file" : "lib/MySQL/Workbench/Parser.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       },
       "MySQL::Workbench::Parser::Column" : {
          "file" : "lib/MySQL/Workbench/Parser/Column.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       },
       "MySQL::Workbench::Parser::Index" : {
          "file" : "lib/MySQL/Workbench/Parser/Index.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       },
       "MySQL::Workbench::Parser::Table" : {
          "file" : "lib/MySQL/Workbench/Parser/Table.pm",
-         "version" : "1.01"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -75,13 +76,13 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-Parser"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>",
       "Renee <reb@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

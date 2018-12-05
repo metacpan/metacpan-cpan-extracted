@@ -1,8 +1,38 @@
-SYNOPSIS
+NAME
+    App::ShellCompleter::mpv - Shell completion for mpv
 
+VERSION
+    This document describes version 0.060 of App::ShellCompleter::mpv (from
+    Perl distribution App-ShellCompleter-mpv), released on 2018-12-05.
+
+SYNOPSIS
     See _mpv included in this distribution.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ShellCompleter-mpv>.
 
-    mpv, http://mpv.io/
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ShellCompleter-mpv>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-mp
+    v>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    mpv, <http://mpv.io/>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

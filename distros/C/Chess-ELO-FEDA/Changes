@@ -1,3 +1,6 @@
+0.04    2018-12-04 21:00:00 Europe/Madrid
+        - undefined target means no backend
+
 0.03    2017-11-06 22:30:00 Europe/Madrid
         - Add Changes file
         - Improve documentation

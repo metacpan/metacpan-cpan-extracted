@@ -1,3 +1,8 @@
+0.013   2018-12-05 (PERLANCAR)
+
+	- Add utilities: mysql-find-identical-rows, mysql-copy-rows-adjust-pk.
+
+
 0.012   2018-11-06 (PERLANCAR)
 
 	- [ux] mysql-sql-dump-extract-tables: add short option alias -I for

@@ -1,0 +1,376 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_copy_rows_adjust_pk
+# and generated automatically using Perinci::CmdLine::Gen version 0.487
+
+our $DATE = '2018-12-05'; # DATE
+our $DIST = 'App-MysqlUtils'; # DIST
+our $VERSION = '0.013'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/MysqlUtils/mysql_copy_rows_adjust_pk",
+    program_name => "mysql-copy-rows-adjust-pk",
+    log => 1,
+    log_level => "info",
+    pass_cmdline_object => 1,
+    config_filename => "mysqlutils.conf",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Copy rows from one table to another, adjust PK column if necessary
+# PODNAME: mysql-copy-rows-adjust-pk
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mysql-copy-rows-adjust-pk - Copy rows from one table to another, adjust PK column if necessary
+
+=head1 VERSION
+
+This document describes version 0.013 of mysql-copy-rows-adjust-pk (from Perl distribution App-MysqlUtils), released on 2018-12-05.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % mysql-copy-rows-adjust-pk [options] <database>
+
+=head1 DESCRIPTION
+
+This utility can be used when you have rows in one table that you want to insert
+to another table, but the PK might clash. When that happens, the value of the
+other columns are inspected. When all the values of the other columns match, the
+row is assumed to be a duplicate and skipped. If some values of the other column
+differ, then the row is assumed to be different and a new value of the PK column
+is chosen (there are several choices on how to select the new PK).
+
+An example:
+
+ % mysql-copy-rows-adjust-pk db1 --from t1 --to t2 --pk-column id --adjust "add 1000"
+
+Suppose these are the rows in table C<t1>:
+
+ id    date                 description        user
+ --    ----                 -----------        ----
+  1    2018-12-03 12:01:01  Created user u1    admin1
+  2    2018-12-03 12:44:33  Removed user u1    admin1
+
+And here are the rows in table C<t2>:
+
+ id    date                 description        user
+ --    ----                 -----------        ----
+  1    2018-12-03 12:01:01  Created user u1    admin1
+  2    2018-12-03 13:00:45  Rebooted machine1  admin1
+  3    2018-12-03 13:05:00  Created user u2    admin2
+
+You can see that row id=1 in both tables are identical. This will be skipped. On
+the other hand, row id=2 in C<t1> is different with row id=2 in C<t2>. This row
+will be adjusted: C<id> will be changed to 2+1000=1002. So the final rows in
+table C<t2> will be (sorted by date):
+
+ id    date                 description        user
+ --    ----                 -----------        ----
+  1    2018-12-03 12:01:01  Created user u1    admin1
+  1002 2018-12-03 12:44:33  Removed user u1    admin1
+  2    2018-12-03 13:00:45  Rebooted machine1  admin1
+  3    2018-12-03 13:05:00  Created user u2    admin2
+
+So basically this utility is similar to MySQL's INSERT ... ON DUPLICATE KEY
+UPDATE, but will avoid inserting identical rows.
+
+If the adjusted PK column clashes with another row in the target table, the row
+is skipped.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--adjust>=I<s>*
+
+How to adjust the value of the PK column.
+
+Currently the choices are:
+
+* "add N" add N to the original value.
+* "subtract N" subtract N from the original value.
+
+
+=item B<--database>=I<s>*
+
+=item B<--from>=I<s>*
+
+Name of source table.
+
+=item B<--pk-column>=I<s>*
+
+Name of PK column.
+
+=item B<--to>=I<s>*
+
+Name of target table.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>, B<-c>
+
+Set path to configuration file.
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Connection options
+
+=over
+
+=item B<--host>=I<s>
+
+Default value:
+
+ "localhost"
+
+=item B<--password>=I<s>
+
+Will try to get default from `~/.my.cnf`.
+
+
+=item B<--port>=I<s>
+
+Default value:
+
+ 3306
+
+=item B<--username>=I<s>
+
+Will try to get default from `~/.my.cnf`.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--dry-run>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C mysql-copy-rows-adjust-pk mysql-copy-rows-adjust-pk
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete mysql-copy-rows-adjust-pk 'p/*/`mysql-copy-rows-adjust-pk`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/mysqlutils.conf>, F<~/mysqlutils.conf>, or F</etc/mysqlutils.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ adjust (see --adjust)
+ database (see --database)
+ format (see --format)
+ from (see --from)
+ host (see --host)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ password (see --password)
+ pk_column (see --pk-column)
+ port (see --port)
+ to (see --to)
+ username (see --username)
+
+=head1 ENVIRONMENT
+
+=head2 MYSQL_COPY_ROWS_ADJUST_PK_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/mysqlutils.conf>
+
+F<~/mysqlutils.conf>
+
+F</etc/mysqlutils.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-MysqlUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-MysqlUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-MysqlUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/niceperl/Chess-ELO-FEDA/issues
   homepage: https://github.com/niceperl/Chess-ELO-FEDA
   repository: https://github.com/niceperl/Chess-ELO-FEDA.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

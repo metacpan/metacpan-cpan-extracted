@@ -15,7 +15,7 @@ use YAML::Tiny;
 
 use MySQL::Workbench::Parser::Table;
 
-our $VERSION = 1.01;
+our $VERSION = 1.03;
 
 has file   => (
     is       => 'ro',
@@ -69,7 +69,7 @@ sub _parse {
     my $self = shift;
 
     my $zip = Archive::Zip->new;
-    unless ( $zip->read( $self->file ) == AZ_OK ) {
+    if ( $zip->read( $self->file ) != AZ_OK ) {
         croak "can't read file " . $self->file;
     }
 
@@ -112,7 +112,69 @@ sub _parse {
         );
     }
 
+    $self->_lint( \@tables );
+
     $self->_set_tables( \@tables );
+}
+
+sub _lint {
+    my ($self, $tables) = @_;
+
+    return if !ref $tables;
+    return if 'ARRAY' ne ref $tables;
+
+    my %tablenames;
+    my %indexes;
+    my %duplicate_columns;
+
+    for my $table ( @{ $tables } ) {
+        my $name = $table->name;
+
+        $tablenames{$name}++;
+
+        INDEX:
+        for my $index ( @{ $table->indexes } ) {
+            my $index_name = $index->name;
+
+            next INDEX if $index_name eq 'PRIMARY';
+
+            $indexes{$index_name}++;
+        }
+
+        my %columns;
+
+        COLUMN:
+        for my $column ( @{ $table->columns } ) {
+            my $column_name = $column->name;
+            $duplicate_columns{$name}++ if $columns{$column_name};
+            $columns{$column_name}++;
+        }
+    }
+
+    # warn if table names occur more than once
+    my @duplicate_tables = grep{ $tablenames{$_} > 1 }sort keys %tablenames;
+    if ( @duplicate_tables ) {
+        carp 'duplicate table names (' .
+            ( join ', ', @duplicate_tables ).
+            ')';
+    }
+
+    # warn if index name occurs more than once
+    my @duplicate_indexes = grep{ $indexes{$_} > 1  }sort keys %indexes;
+    if ( @duplicate_indexes ) {
+        carp 'duplicate indexes (' .
+            ( join ', ', @duplicate_indexes ) .
+            ')';
+    }
+
+    # warn if there are duplicate column names
+    if ( %duplicate_columns ) {
+        carp 'duplicate column names in a table (' .
+            ( join ', ', sort keys %duplicate_columns ).
+            ')';
+    }
+
+    return 1;
 }
 
 1;
@@ -129,7 +191,7 @@ MySQL::Workbench::Parser - parse .mwb files created with MySQL Workbench
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -176,6 +238,20 @@ returns the MySQL name of the datatype
 =over 4
 
 =item * file
+
+=back
+
+=head1 WARNINGS
+
+The ER model designed with Workbench is checked for:
+
+=over 4
+
+=item * duplicate indices
+
+=item * duplicate table names
+
+=item * duplicate column names in a table
 
 =back
 

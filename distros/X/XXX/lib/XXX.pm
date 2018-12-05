@@ -1,11 +1,15 @@
 use strict; use warnings;
 package XXX;
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 use base 'Exporter';
 
 our @EXPORT = qw( WWW XXX YYY ZZZ );
 
 our $DumpModule = 'YAML';
+
+if ($ENV{PERL_XXX_DUMPER}) {
+    _set_dump_module($ENV{PERL_XXX_DUMPER});
+}
 
 sub import {
     my ($package, @args) = @_;
@@ -14,20 +18,16 @@ sub import {
         if ($arg eq '-with') {
             die "-with requires another argument"
               unless $i++ < @args;
-            $DumpModule = $args[$i];
-            die "Don't know how to use XXX -with '$DumpModule'"
-                unless $DumpModule =~ /^(
-                                           (?:YAML|JSON)(?:::.*)?|
-                                           Data::Dumper|
-                                           Data::Dump(?:::Color)?
-                                       )$/x;
+            _set_dump_module($args[ $i ]);
         }
         # TODO Deprecation. These options are now undocumented. Next releases:
-        # warn, then die, then remove.
+        # die, then remove.
         elsif ($arg =~ /^-dumper$/i) {
+            warn "Option '-dumper' is deprecated";
             $DumpModule = 'Data::Dumper';
         }
         elsif ($arg =~ /^-yaml$/i) {
+            warn "Option '-yaml' is deprecated";
             $DumpModule = 'YAML';
         }
         else {
@@ -37,6 +37,17 @@ sub import {
     }
     @_ = ($package);
     goto &Exporter::import;
+}
+
+sub _set_dump_module {
+    my ($module) = @_;
+    $DumpModule = $module;
+    die "Don't know how to use XXX -with '$DumpModule'"
+        unless $DumpModule =~ /^(
+                                   (?:YAML|JSON)(?:::.*)?|
+                                   Data::Dumper|
+                                   Data::Dump(?:::Color)?
+                               )$/x;
 }
 
 sub _xxx_dump {

@@ -9,7 +9,7 @@ use Test::More;
 my @levels = qw(debug info warn error fatal);
 
 my $debug_log = Log::Dispatchouli->new_tester({debug => 1});
-my $log = Mojo::Log->with_roles('+AttachLogger')->new
+my $log = Mojo::Log->with_roles('Mojo::Log::Role::AttachLogger')->new
   ->unsubscribe('message')->attach_logger($debug_log);
 
 foreach my $level (@levels) {

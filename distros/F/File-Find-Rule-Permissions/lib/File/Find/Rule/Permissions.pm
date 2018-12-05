@@ -2,7 +2,6 @@ package File::Find::Rule::Permissions;
 use strict;
 
 use Devel::AssertOS::Unix;
-
 use File::Find::Rule;
 use base qw(File::Find::Rule);
 use vars qw(
@@ -11,7 +10,7 @@ use vars qw(
     %GroupnamesByGID %UIDinGID
 );
 @EXPORT  = @File::Find::Rule::EXPORT;
-$VERSION = '2.03';
+$VERSION = '2.04';
 
 use Fcntl qw(:mode);
 
@@ -75,6 +74,10 @@ uid), but not for an arbitrary user.  That this module can also check
 for the effective uid is more of a lucky accident that just falls out
 of the code when checking for any arbitrary user :-)
 
+Parameters can be supplied as a list as in the SYNOPSIS above, or a hashref:
+
+  ...->permissions({ isReadable => 0, user => 'nobody' })
+
 =head1 BUGS
 
 I assume a Unix-a-like system, both when looking at file permissions,
@@ -91,14 +94,14 @@ also have the same limitation.
 # figure out who has what UID and which UIDs are in which group
 (%UIDsByUsername, %UsernamesByUID, %GIDsByGroupname,
     %GroupnamesByGID, %UIDinGID) = ();
-getusergroupdetails();
+_getusergroupdetails();
 
 # we override these in the test suite to avoid having to be root.
 # or we will do when that bit is written, anyway.
 
-sub stat { return CORE::stat(shift); }
-sub geteuid { return $>; }
-sub getusergroupdetails {
+sub _stat { return CORE::stat(shift); }
+sub _geteuid { return $>; }
+sub _getusergroupdetails {
     while(my($name, undef, $uid, $gid) = getpwent()) {
         $UIDsByUsername{$name} = $uid;
         $UsernamesByUID{$uid} = $name;
@@ -115,7 +118,12 @@ sub getusergroupdetails {
     }
 }
 
-sub File::Find::Rule::permissions {
+{
+    no strict 'refs';
+    *{'File::Find::Rule::permissions'} = sub { goto &permissions };
+}
+
+sub permissions {
     my $self = shift()->_force_object;
     my %criteria = ref($_[0]) eq "HASH" ? %{$_[0]} : @_;
 
@@ -133,13 +141,13 @@ sub File::Find::Rule::permissions {
         # if a user has been specified, first get their UID (from their
 	# username if necessary).  If a user *hasn't* been specified,
 	# then we pretend one has anyway
-        $criteria{user} = geteuid() unless(exists($criteria{user}));
+        $criteria{user} = _geteuid() unless(exists($criteria{user}));
         if($criteria{user} =~ /^\d+$/) { $userid = $criteria{user}; }
          else { $userid = $UIDsByUsername{$criteria{user}}; }
-            
+
         # now divine the user's permissions.  first get the file's mode
 	# bits and ownership
-        my($mode, $file_uid, $file_gid) = (&stat($file))[2,4,5];
+        my($mode, $file_uid, $file_gid) = (_stat($file))[2,4,5];
         
         # now check user/group perms.  Set isReadable etc if the mode has
 	# the owner bit set and the user is the owner, or has the group bit
@@ -202,7 +210,7 @@ information for me to be able to replicate it consistently.  Especially
 useful are test scripts which fail with the current implementation but
 should pass.
 
-Please report bugs either by email or using L<http://rt.cpan.org/>.
+Bug reports should be made on Github or by email.
 
 =head1 SOURCE CODE REPOSITORY
 

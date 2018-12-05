@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+cpanfile
+lib/DBI/Gofer/Transport/psgi.pm
+lib/Plack/App/DBI/Gofer.pm

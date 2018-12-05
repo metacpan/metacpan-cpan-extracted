@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
     
 use Test::More;
+use Cwd;
 
 use strict;
 use warnings;
@@ -16,6 +17,7 @@ my @allfiles = sort { $a cmp $b } File::Find::Rule::Permissions->file()->permiss
     user => 'root'
 )->in("$testfiledir");
 ok(@allfiles == 512, "root can read all files");
+
 @allfiles = sort { $a cmp $b } File::Find::Rule::Permissions->file()->permissions(
     isWriteable => 1,
     user => 'root'
@@ -231,3 +233,20 @@ sub other {
         "'other'  bits say if file is readable, not writeable by randoms"
     );
 }
+
+sub edge_cases  {
+    # internally FFR uses File::Find, which chdir()s all over the place. When
+    # this dies it has no opportunity to chdir back whence it came. Sulk.
+    my $cwd = getcwd();
+    eval { File::Find::Rule::Permissions->file()->permissions()->in("$testfiledir") };
+    ok($@ eq "File::Find::Rule::Permissions::permissions: no criteria\n",
+        "must provide at least one of is{Readable,Writeable,Executable}");
+    chdir($cwd);
+
+    my @allfiles = sort { $a cmp $b } File::Find::Rule::Permissions->file()->permissions({
+        isReadable => 1,
+        user => 'root'
+    })->in("$testfiledir");
+    ok(@allfiles == 512, "params can be given as a hashref");
+}
+

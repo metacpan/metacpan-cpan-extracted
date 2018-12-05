@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Chess-ELO-FEDA,
-version 0.03:
+version 0.04:
 
   Download FEDA ELO (L<http://www.feda.org>) into differents backends (SQLite)
 
-This software is copyright (c) 2017 by Miguel Prz.
+This software is copyright (c) 2018 by Miguel Prz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

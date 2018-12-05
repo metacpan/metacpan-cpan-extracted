@@ -1,0 +1,82 @@
+#!perl
+
+our $DATE = '2018-12-05'; # DATE
+our $VERSION = '0.060'; # VERSION
+
+# NO_PERINCI_CMDLINE_SCRIPT
+# FRAGMENT id=shcompgen-hint completer=1 for=mpv
+
+use 5.010001;
+use strict;
+use warnings;
+#use Log::Any '$log';
+
+use App::ShellCompleter::mpv;
+use Getopt::Long::Complete; ;# just so it can be detected as Getopt::Long script by Getopt::Long::Util
+use ShellCompleter::Util qw(run_shell_completer_for_getopt_long_app);
+
+{
+    no warnings 'once';
+    run_shell_completer_for_getopt_long_app(
+        %App::ShellCompleter::mpv::scargs,
+    );
+}
+
+# ABSTRACT: Shell completer for mpv
+# PODNAME: _mpv
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+_mpv - Shell completer for mpv
+
+=head1 VERSION
+
+This document describes version 0.060 of _mpv (from Perl distribution App-ShellCompleter-mpv), released on 2018-12-05.
+
+=head1 SYNOPSIS
+
+To install, install the CPAN distribution this command comes in with, and then
+in your bash (and/or bash startup file):
+
+ complete -C _mpv mpv
+
+or, you can use L<shcompgen> to do that for you automatically.
+
+Now B<mpv> has bash completion:
+
+ % mpv --shu<tab>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ShellCompleter-mpv>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ShellCompleter-mpv>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-mpv>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

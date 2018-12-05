@@ -13,6 +13,7 @@ no warnings 'experimental::signatures';
 use parent 'Exporter';
 
 our @EXPORT_OK = qw(parser);
+our $VERSION   = '0.06';
 
 use constant Operators => {
     EQUALS             => 'eq',
@@ -26,19 +27,6 @@ use constant Operators => {
     IS_NULL            => 'is null',
     NOT_EQUAL          => 'ne',
 };
-
-sub is_unary ($op) {
-    my $value;
-    if ($op eq Operators->{IS_NULL} ) {
-        $value++;
-    }
-
-    return $value;
-};
-
-sub is_logical ($op) {
-    return ( $op eq Operators->{AND} || $op eq Operators->{OR} );
-}
 
 sub predicate ($config) {
 
@@ -58,10 +46,10 @@ sub parser {
     state $REGEX = {
         parenthesis => qr/^([(](.*)[)])$/x,
         andor       => qr/^(.*?) \s+ (or|and) \s+ (.*)$/x,
-        math        => qr/\(? ([A-Za-z0-9\/\.]*) \s+ (mod|div|add|sub|mul) \s+ ([0-9]+(?:\.[0-9]+)? ) \)? \s+ (.*) /x,
+        math        => qr/\(? ([A-Za-z0-9\/\._]*) \s+ (mod|div|add|sub|mul) \s+ ([0-9]+(?:\.[0-9]+)? ) \)? \s+ (.*) /x,
         op          => qr/
             ((?:(?:\b[A-Za-z]+\(.*?\))
-                | [A-Za-z0-9\/\.]
+                | [A-Za-z0-9\/\._]
                 | '.*?')*)
             \s+
             (eq|gt|lt|ge|le|ne)
@@ -88,13 +76,11 @@ sub parser {
 
             if ( @match ) {
                 if ( $key eq 'parenthesis' ) {
-                    if( @match > 1 ) {
-                        if( index( $match[1], ')' ) < index( $match[1], '(' ) ) {
-                            next KEY;
-                        }
-
-                        $obj = parse_fragment($match[1]);
+                    if( index( $match[1], ')' ) < index( $match[1], '(' ) ) {
+                        next KEY;
                     }
+
+                    $obj = parse_fragment($match[1]);
                 }
                 elsif ( $key eq 'math' ) {
                     $obj = parse_fragment( $match[2] . ' ' . $match[3] );
@@ -132,7 +118,8 @@ sub parser {
                     #    }
                     #}
                 }
-                elsif ( $key eq 'startsWith' || $key eq 'endsWith' || $key eq 'contains' || $key eq 'substringof' ) {
+                # ( $key eq 'startsWith' || $key eq 'endsWith' || $key eq 'contains' || $key eq 'substringof' ) {
+                else {
                     $obj = predicate({
                         subject  => $match[0],
                         operator => $key,
@@ -151,18 +138,12 @@ sub parser {
         sub ($filter_string) {
 
             return if !defined $filter_string;
-            return if $filter_string eq '';
 
             $filter_string =~ s{\A\s+}{};
             $filter_string =~ s{\s+\z}{};
 
-            my $obj = {};
-
-            if( length $filter_string > 0 ) {
-                $obj = parse_fragment($filter_string);
-            }
-
-            return $obj;
+            return if $filter_string eq '';
+            return parse_fragment($filter_string);
         };
 }
 
@@ -180,7 +161,7 @@ OData::QueryParams::DBIC::FilterUtils - parse filter param
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -190,10 +171,6 @@ version 0.04
     my $vars   = parser->( $filter );
 
 =head1 METHODS
-
-=head2 is_unary
-
-=head2 is_logical
 
 =head2 predicate
 
