@@ -1,0 +1,2 @@
+<: macro some_macro -> ($s) { :>... <: __('The macro says: ') ~ $s :> ... <: } :>
+

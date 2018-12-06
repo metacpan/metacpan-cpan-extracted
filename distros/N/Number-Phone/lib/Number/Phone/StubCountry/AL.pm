@@ -22,52 +22,59 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214153;
+our $VERSION = 1.20181205223701;
 
 my $formatters = [
                 {
-                  'pattern' => '(4)(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '4[0-6]'
-                },
-                {
-                  'leading_digits' => '6',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(6\\d)(\\d{3})(\\d{4})'
-                },
-                {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '
-            [2358][2-5]|
-            4[7-9]
-          ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
-                },
-                {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2',
                   'leading_digits' => '
-            [235][16-9]|
-            [79]|
-            8[016-9]
+            80(?:
+              0|
+              8[1-9]
+            )|
+            900[1-9]
           ',
-                  'pattern' => '(\\d{3})(\\d{3,5})'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3,4})'
+                },
+                {
+                  'leading_digits' => '4[2-6]',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '
+            [2358][2-5]|
+            4
+          '
+                },
+                {
+                  'leading_digits' => '[23578]',
+                  'format' => '$1 $2',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{5})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '6',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(808[1-9]\\d{2})|(900[1-9]\\d{2})',
+                'voip' => '',
+                'pager' => '',
                 'mobile' => '
           6(?:
             [689][2-9]|
             7[2-6]
           )\\d{6}
         ',
-                'personal_number' => '700[2-9]\\d{4}',
-                'voip' => '',
                 'fixed_line' => '
           (?:
             [2358](?:
@@ -75,13 +82,14 @@ my $validators = {
               [2-5][2-9]\\d
             )|
             4(?:
-              [2-57-9][2-9]\\d|
-              6\\d{2}
-            )
+              [2-57-9][2-9]|
+              6\\d
+            )\\d
           )\\d{4}
         ',
+                'personal_number' => '700[2-9]\\d{4}',
+                'specialrate' => '(808[1-9]\\d\\d)|(900[1-9]\\d\\d)',
                 'toll_free' => '800\\d{4}',
-                'pager' => '',
                 'geographic' => '
           (?:
             [2358](?:
@@ -89,9 +97,9 @@ my $validators = {
               [2-5][2-9]\\d
             )|
             4(?:
-              [2-57-9][2-9]\\d|
-              6\\d{2}
-            )
+              [2-57-9][2-9]|
+              6\\d
+            )\\d
           )\\d{4}
         '
               };
@@ -184,7 +192,11 @@ my %areanames = (
   355396 => "Shushicë\/Armen\,\ Vlorë",
   355397 => "Vllahinë\/Kote\,\ Vlorë",
   355398 => "Sevaster\/Brataj\/Hore\-Vranisht\,\ Vlorë",
-  3554 => "Tirana",
+  35542 => "Tirana",
+  35543 => "Tirana",
+  35544 => "Tirana",
+  35545 => "Tirana",
+  35546 => "Tirana",
   35547 => "Kamëz\/Vorë\/Paskuqan\/Zall\-Herr\/Burxullë\/Prezë\,\ Tiranë",
   35548 => "Kashar\/Vaqar\/Ndroq\/Pezë\/Farkë\/Dajt\,\ Tiranë",
   35549 => "Petrelë\/Baldushk\/Bërzhitë\/Krrabë\/Shengjergj\/Zall\-Bastar\,\ Tiranë",

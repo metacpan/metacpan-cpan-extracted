@@ -22,22 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{3,4})',
+                  'national_rule' => '0$1',
+                  'format' => '$1-$2',
                   'leading_digits' => '
             (?:
               3[1-3]|
               [46][1-4]|
               5[1-5]
             )1
-          ',
-                  'format' => '$1-$2',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3,4})'
+          '
                 },
                 {
+                  'national_rule' => '$1',
+                  'format' => '$1-$2',
                   'leading_digits' => '
             1(?:
               5(?:
@@ -63,34 +65,32 @@ my $formatters = [
               )
             )
           ',
-                  'format' => '$1-$2',
-                  'national_rule' => '$1',
                   'pattern' => '(\\d{4})(\\d{4})'
                 },
                 {
-                  'format' => '$1',
+                  'pattern' => '(\\d{5})',
                   'national_rule' => '0$1',
                   'leading_digits' => '1[016-9]114',
-                  'pattern' => '(\\d{5})'
+                  'format' => '$1'
                 },
                 {
                   'leading_digits' => '2[1-9]',
-                  'national_rule' => '0$1',
                   'format' => '$1-$2-$3',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d)(\\d{3,4})(\\d{4})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
-                  'format' => '$1-$2-$3',
                   'leading_digits' => '
             60[2-9]|
             80
-          '
+          ',
+                  'format' => '$1-$2-$3',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'format' => '$1-$2-$3',
                   'national_rule' => '0$1',
+                  'format' => '$1-$2-$3',
                   'leading_digits' => '
             1[0-25-9]|
             (?:
@@ -102,51 +102,49 @@ my $formatters = [
                   'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '[57]0',
                   'national_rule' => '0$1',
+                  'leading_digits' => '[57]0',
                   'format' => '$1-$2-$3',
                   'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 },
                 {
-                  'intl_format' => 'NA',
+                  'pattern' => '(\\d{2})(\\d{5})(\\d{4})',
+                  'leading_digits' => '50',
+                  'format' => '$1-$2-$3',
+                  'national_rule' => '0$1'
+                },
+                {
                   'leading_digits' => '00308',
-                  'national_rule' => '$1',
+                  'intl_format' => 'NA',
                   'format' => '$1 $2 $3',
+                  'national_rule' => '$1',
                   'pattern' => '(\\d{5})(\\d{3})(\\d{3})'
                 },
                 {
                   'national_rule' => '$1',
-                  'format' => '$1 $2 $3',
-                  'intl_format' => 'NA',
                   'leading_digits' => '
             00(?:
               36|
               79
             )8
           ',
+                  'format' => '$1 $2 $3',
+                  'intl_format' => 'NA',
                   'pattern' => '(\\d{5})(\\d{3,4})(\\d{4})'
                 },
                 {
-                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{5})(\\d{2})(\\d{3})(\\d{4})',
                   'national_rule' => '$1',
-                  'intl_format' => 'NA',
                   'leading_digits' => '00798',
-                  'pattern' => '(\\d{5})(\\d{2})(\\d{3})(\\d{4})'
+                  'format' => '$1 $2 $3 $4',
+                  'intl_format' => 'NA'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
-          2[1-9]\\d{6,7}|
-          (?:
-            3[1-3]|
-            [46][1-4]|
-            5[1-5]
-          )(?:
-            1\\d{2,3}|
-            [1-9]\\d{6,7}
-          )
-        ',
+                'pager' => '15\\d{7,8}',
+                'mobile' => '1[0-26-9]\\d{7,8}',
+                'voip' => '70\\d{8}',
                 'toll_free' => '
           (?:
             00(?:
@@ -159,9 +157,6 @@ my $validators = {
             80\\d
           )\\d{6}
         ',
-                'personal_number' => '50\\d{8}',
-                'voip' => '70\\d{8}',
-                'pager' => '15\\d{7,8}',
                 'geographic' => '
           2[1-9]\\d{6,7}|
           (?:
@@ -173,6 +168,18 @@ my $validators = {
             [1-9]\\d{6,7}
           )
         ',
+                'fixed_line' => '
+          2[1-9]\\d{6,7}|
+          (?:
+            3[1-3]|
+            [46][1-4]|
+            5[1-5]
+          )(?:
+            1\\d{2,3}|
+            [1-9]\\d{6,7}
+          )
+        ',
+                'personal_number' => '50\\d{8,9}',
                 'specialrate' => '(60[2-9]\\d{6})|(
           1(?:
             5(?:
@@ -198,8 +205,7 @@ my $validators = {
               99
             )
           )\\d{4}
-        )',
-                'mobile' => '1[0-26-9]\\d{7,8}'
+        )'
               };
 my %areanames = (
   822 => "Seoul",

@@ -1,5 +1,10 @@
 Revision history for perl distribution LWPx-UserAgent-Role-Cached
 
+0.010     2018-12-05 12:23:13-06:00 America/Chicago
+    - add ignore_headers option to allow for aggressive caching that ignores
+      response headers to the contrary
+    - no longer strip content headers when caching; this was causing problems
+      with some apps that assumed that Content-type would continue to exist
 0.009     2018-12-03 16:24:31-06:00 America/Chicago
     - remove link to CPAN forum from docs as it's apparently been discontinued,
       and other doc changes as created by updates to

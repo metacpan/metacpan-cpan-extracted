@@ -1,0 +1,159 @@
+NAME
+    Bencher::Scenario::ScalarCmp - Benchmark Scalar::Cmp against similar
+    solutions
+
+VERSION
+    This document describes version 0.001 of Bencher::Scenario::ScalarCmp
+    (from Perl distribution Bencher-Scenario-ScalarCmp), released on
+    2018-12-06.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m ScalarCmp
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m ScalarCmp
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Scalar::Cmp 0.001
+
+    Data::Cmp 0.006
+
+    Data::Cmp::Numeric 0.006
+
+    Data::Cmp::StrOrNumeric 0.006
+
+BENCHMARK PARTICIPANTS
+    *   Scalar::Cmp::cmp_scalar (perl_code)
+
+        Function call template:
+
+         Scalar::Cmp::cmp_scalar(<data1>, <data2>)
+
+    *   Scalar::Cmp::cmpnum_scalar (perl_code)
+
+        Function call template:
+
+         Scalar::Cmp::cmpnum_scalar(<data1>, <data2>)
+
+    *   Scalar::Cmp::cmpstrornum_scalar (perl_code)
+
+        Function call template:
+
+         Scalar::Cmp::cmpstrornum_scalar(<data1>, <data2>)
+
+    *   Data::Cmp::cmp_data (perl_code)
+
+        Function call template:
+
+         Data::Cmp::cmp_data(<data1>, <data2>)
+
+    *   Data::Cmp::Numeric::cmp_data (perl_code)
+
+        Function call template:
+
+         Data::Cmp::Numeric::cmp_data(<data1>, <data2>)
+
+    *   Data::Cmp::StrOrNumeric::cmp_data (perl_code)
+
+        Function call template:
+
+         Data::Cmp::StrOrNumeric::cmp_data(<data1>, <data2>)
+
+    *   cmp (perl_code)
+
+        Code template:
+
+         <data1> cmp <data2>
+
+    *   <=> (perl_code)
+
+        Code template:
+
+         <data1> <=> <data2>
+
+BENCHMARK DATASETS
+    *   nums
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.26.0*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
+    version 4.8.0-53-generic*.
+
+    Benchmark with default options ("bencher -m ScalarCmp"):
+
+     #table1#
+     +-----------------------------------+------------+-----------+------------+---------+---------+
+     | participant                       |  rate (/s) | time (ns) | vs_slowest |  errors | samples |
+     +-----------------------------------+------------+-----------+------------+---------+---------+
+     | Data::Cmp::StrOrNumeric::cmp_data |     831170 |    1203.1 |      1     | 1.2e-11 |      20 |
+     | Data::Cmp::cmp_data               |    1100000 |     900   |      1.3   | 1.7e-09 |      20 |
+     | Scalar::Cmp::cmpstrornum_scalar   |    1127000 |     887.2 |      1.356 | 4.2e-11 |      20 |
+     | Data::Cmp::Numeric::cmp_data      |    1200000 |     870   |      1.4   | 1.3e-09 |      20 |
+     | Scalar::Cmp::cmp_scalar           |    1500000 |     680   |      1.8   | 4.1e-09 |      21 |
+     | Scalar::Cmp::cmpnum_scalar        |    1600000 |     630   |      1.9   | 1.8e-09 |      21 |
+     | <=>                               |  300000000 |       3   |    400     | 5.7e-10 |      22 |
+     | cmp                               | -400000000 |      -2   |   -500     |   2e-10 |      20 |
+     +-----------------------------------+------------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m ScalarCmp
+    --module-startup"):
+
+     #table2#
+     +-------------------------+-----------+------------------------+------------+---------+---------+
+     | participant             | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+     +-------------------------+-----------+------------------------+------------+---------+---------+
+     | Data::Cmp::Numeric      |       9.5 |                    5.5 |        1   | 7.2e-05 |      20 |
+     | Data::Cmp::StrOrNumeric |       8.7 |                    4.7 |        1.1 | 1.3e-05 |      20 |
+     | Scalar::Cmp             |       8.7 |                    4.7 |        1.1 | 3.2e-05 |      20 |
+     | Data::Cmp               |       8.6 |                    4.6 |        1.1 |   3e-05 |      21 |
+     | perl -e1 (baseline)     |       4   |                    0   |        2.4 | 1.1e-05 |      20 |
+     +-------------------------+-----------+------------------------+------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+BENCHMARK NOTES
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-ScalarCmp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-ScalarCmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Scal
+    arCmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Bencher::Scenario::DataCmp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

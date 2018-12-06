@@ -22,10 +22,17 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{4})(\\d{4})',
+                  'leading_digits' => '00777[01]',
+                  'format' => '$1-$2',
+                  'intl_format' => 'NA'
+                },
+                {
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             (?:
               12|
@@ -34,95 +41,10 @@ my $formatters = [
             )0
           ',
                   'format' => '$1-$2-$3',
-                  'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
-                  'leading_digits' => '800',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '0$1'
-                },
-                {
-                  'intl_format' => 'NA',
-                  'leading_digits' => '0077',
-                  'national_rule' => '$1',
-                  'format' => '$1-$2',
-                  'pattern' => '(\\d{4})(\\d{4})'
-                },
-                {
-                  'leading_digits' => '0077',
-                  'intl_format' => 'NA',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '$1',
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{3,4})'
-                },
-                {
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{4})',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '$1',
-                  'leading_digits' => '0088',
-                  'intl_format' => 'NA'
-                },
-                {
-                  'leading_digits' => '
-            00(?:
-              37|
-              66
-            )
-          ',
-                  'intl_format' => 'NA',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '$1',
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{3,4})'
-                },
-                {
-                  'pattern' => '(\\d{4})(\\d{4})(\\d{4,5})',
-                  'leading_digits' => '
-            00(?:
-              37|
-              66
-            )
-          ',
-                  'intl_format' => 'NA',
-                  'national_rule' => '$1',
-                  'format' => '$1-$2-$3'
-                },
-                {
-                  'pattern' => '(\\d{4})(\\d{5})(\\d{5,6})',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '$1',
-                  'intl_format' => 'NA',
-                  'leading_digits' => '
-            00(?:
-              37|
-              66
-            )
-          '
-                },
-                {
-                  'pattern' => '(\\d{4})(\\d{6})(\\d{6,7})',
-                  'intl_format' => 'NA',
-                  'leading_digits' => '
-            00(?:
-              37|
-              66
-            )
-          ',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '$1'
-                },
-                {
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
-                  'national_rule' => '0$1',
-                  'format' => '$1-$2-$3',
-                  'leading_digits' => '
-            [2579]0|
-            80[1-9]
-          '
-                },
-                {
-                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{4})(\\d)(\\d{4})',
                   'format' => '$1-$2-$3',
                   'leading_digits' => '
             1(?:
@@ -171,21 +93,19 @@ my $formatters = [
               )
             )
           ',
-                  'pattern' => '(\\d{4})(\\d)(\\d{4})'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{4})',
+                  'format' => '$1-$2-$3',
                   'leading_digits' => '
             1(?:
-              2[3-6]|
-              3[3-9]|
-              4[2-6]|
+              [2-46]|
               5(?:
                 [236-8]|
                 [45][2-69]
               )|
-              [68][2-7]|
               7[2-689]|
+              8[2-7]|
               9[1-578]
             )|
             2(?:
@@ -236,8 +156,7 @@ my $formatters = [
               3[1-36-9]|
               4[4578]|
               5[013-8]|
-              6[1-9]|
-              7[2-8]|
+              [67]|
               8[14-7]|
               9(?:
                 [4-7]|
@@ -247,7 +166,7 @@ my $formatters = [
             7(?:
               2[15]|
               3[5-9]|
-              4[02-9]|
+              4|
               6[135-8]|
               7[0-4689]|
               9(?:
@@ -317,11 +236,12 @@ my $formatters = [
               )
             )
           ',
-                  'format' => '$1-$2-$3',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{4})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
             1|
             2(?:
@@ -357,19 +277,15 @@ my $formatters = [
             )|
             9(?:
               [235-8]|
-              93(?:
-                31|
-                4
-              )
+              93[34]
             )
           ',
-                  'national_rule' => '0$1',
                   'format' => '$1-$2-$3'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{4})',
-                  'format' => '$1-$2-$3',
                   'national_rule' => '0$1',
+                  'format' => '$1-$2-$3',
                   'leading_digits' => '
             2(?:
               [34]7|
@@ -382,70 +298,78 @@ my $formatters = [
           '
                 },
                 {
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
-                  'national_rule' => '0$1',
-                  'format' => '$1-$2-$3',
                   'leading_digits' => '
-            3|
+            [36]|
             4(?:
               2[09]|
               7[01]
-            )|
-            6[1-9]
-          '
+            )
+          ',
+                  'format' => '$1-$2-$3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '[2479][1-9]',
                   'format' => '$1-$2-$3',
+                  'leading_digits' => '
+            2[2-9]|
+            4|
+            7[235-9]|
+            9[49]
+          ',
                   'national_rule' => '0$1'
+                },
+                {
+                  'leading_digits' => '007',
+                  'format' => '$1-$2-$3',
+                  'intl_format' => 'NA',
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{3,4})'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '800',
+                  'format' => '$1-$2-$3'
+                },
+                {
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{4})',
+                  'leading_digits' => '008',
+                  'intl_format' => 'NA',
+                  'format' => '$1-$2-$3'
+                },
+                {
+                  'leading_digits' => '
+            [2579]|
+            80
+          ',
+                  'format' => '$1-$2-$3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
+                },
+                {
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{3,4})',
+                  'format' => '$1-$2-$3',
+                  'intl_format' => 'NA'
+                },
+                {
+                  'pattern' => '(\\d{4})(\\d{4})(\\d{4,5})',
+                  'intl_format' => 'NA',
+                  'format' => '$1-$2-$3'
+                },
+                {
+                  'intl_format' => 'NA',
+                  'format' => '$1-$2-$3',
+                  'pattern' => '(\\d{4})(\\d{5})(\\d{5,6})'
+                },
+                {
+                  'format' => '$1-$2-$3',
+                  'intl_format' => 'NA',
+                  'pattern' => '(\\d{4})(\\d{6})(\\d{6,7})'
                 }
               ];
 
 my $validators = {
-                'pager' => '20\\d{8}',
-                'geographic' => '
-          (?:
-            1(?:
-              1[235-8]|
-              2[3-6]|
-              3[3-9]|
-              4[2-6]|
-              [58][2-8]|
-              6[2-7]|
-              7[2-9]|
-              9[1-9]
-            )|
-            2[2-9]\\d|
-            [36][1-9]\\d|
-            4(?:
-              6[02-8]|
-              [2-578]\\d|
-              9[2-59]
-            )|
-            5(?:
-              6[1-9]|
-              7[2-8]|
-              [2-589]\\d
-            )|
-            7(?:
-              3[4-9]|
-              4[02-9]|
-              [25-9]\\d
-            )|
-            8(?:
-              3[2-9]|
-              4[5-9]|
-              5[1-9]|
-              8[03-9]|
-              [2679]\\d
-            )|
-            9(?:
-              [679][1-9]|
-              [2-58]\\d
-            )
-          )\\d{6}
-        ',
                 'fixed_line' => '
           (?:
             1(?:
@@ -458,54 +382,109 @@ my $validators = {
               7[2-9]|
               9[1-9]
             )|
-            2[2-9]\\d|
-            [36][1-9]\\d|
+            (?:
+              2[2-9]|
+              [36][1-9]
+            )\\d|
             4(?:
-              6[02-8]|
               [2-578]\\d|
+              6[02-8]|
               9[2-59]
             )|
             5(?:
+              [2-589]\\d|
               6[1-9]|
-              7[2-8]|
-              [2-589]\\d
+              7[2-8]
             )|
             7(?:
+              [25-9]\\d|
               3[4-9]|
-              4[02-9]|
-              [25-9]\\d
+              4[02-9]
             )|
             8(?:
+              [2679]\\d|
               3[2-9]|
               4[5-9]|
               5[1-9]|
-              8[03-9]|
-              [2679]\\d
+              8[03-9]
             )|
             9(?:
-              [679][1-9]|
-              [2-58]\\d
+              [2-58]\\d|
+              [679][1-9]
+            )
+          )\\d{6}
+        ',
+                'specialrate' => '(990\\d{6})|(570\\d{6})',
+                'personal_number' => '60\\d{7}',
+                'geographic' => '
+          (?:
+            1(?:
+              1[235-8]|
+              2[3-6]|
+              3[3-9]|
+              4[2-6]|
+              [58][2-8]|
+              6[2-7]|
+              7[2-9]|
+              9[1-9]
+            )|
+            (?:
+              2[2-9]|
+              [36][1-9]
+            )\\d|
+            4(?:
+              [2-578]\\d|
+              6[02-8]|
+              9[2-59]
+            )|
+            5(?:
+              [2-589]\\d|
+              6[1-9]|
+              7[2-8]
+            )|
+            7(?:
+              [25-9]\\d|
+              3[4-9]|
+              4[02-9]
+            )|
+            8(?:
+              [2679]\\d|
+              3[2-9]|
+              4[5-9]|
+              5[1-9]|
+              8[03-9]
+            )|
+            9(?:
+              [2-58]\\d|
+              [679][1-9]
             )
           )\\d{6}
         ',
                 'toll_free' => '
-          120\\d{6}|
-          800\\d{7}|
-          00(?:
-            37\\d{6,13}|
-            66\\d{6,13}|
-            777(?:
-              [01]\\d{2}|
-              5\\d{3}|
-              8\\d{4}
+          (?:
+            00(?:
+              (?:
+                37|
+                66
+              )\\d{4,11}|
+              777(?:
+                [01]|
+                (?:
+                  5|
+                  8\\d
+                )\\d
+              )|
+              882[1245]\\d\\d
             )|
-            882[1245]\\d{4}
-          )
+            (?:
+              120|
+              800\\d
+            )\\d{4}
+          )\\d\\d
         ',
-                'personal_number' => '60\\d{7}',
                 'voip' => '50[1-9]\\d{7}',
                 'mobile' => '[7-9]0[1-9]\\d{7}',
-                'specialrate' => '(990\\d{6})|(570\\d{6})'
+                'pager' => '20\\d{8}'
               };
 my %areanames = (
   8111 => "Sapporo\,\ Hokkaido",
@@ -566,8 +545,6 @@ my %areanames = (
   811453 => "Hayakita\,\ Hokkaido",
   811454 => "Mukawa\,\ Hokkaido",
   811455 => "Mukawa\,\ Hokkaido",
-  811456 => "",
-  811457 => "",
   811462 => "Urakawa\,\ Hokkaido",
   811463 => "Urakawa\,\ Hokkaido",
   811464 => "Shizunai\,\ Hokkaido",
@@ -586,8 +563,6 @@ my %areanames = (
   811535 => "Akkeshi\,\ Hokkaido",
   811536 => "Akkeshi\,\ Hokkaido",
   811537 => "Nakashibetsu\,\ Hokkaido",
-  811538 => "",
-  811539 => "",
   811541 => "Teshikaga\,\ Hokkaido",
   811542 => "Kushiro\,\ Hokkaido",
   811543 => "Kushiro\,\ Hokkaido",
@@ -597,20 +572,16 @@ my %areanames = (
   811547 => "Shiranuka\,\ Hokkaido",
   811548 => "Teshikaga\,\ Hokkaido",
   811549 => "Kushiro\,\ Hokkaido",
-  811551 => "",
   811552 => "Obihiro\,\ Hokkaido",
   811553 => "Obihiro\,\ Hokkaido",
   811554 => "Obihiro\,\ Hokkaido",
   811555 => "Obihiro\,\ Hokkaido",
   811556 => "Obihiro\,\ Hokkaido",
-  811557 => "",
   811558 => "Hiroo\,\ Hokkaido",
   811559 => "Obihiro\,\ Hokkaido",
   811562 => "Honbetsu\,\ Hokkaido",
   811563 => "Honbetsu\,\ Hokkaido",
   811564 => "Kamishihoro\,\ Hokkaido",
-  811566 => "",
-  811567 => "",
   81157 => "Kitami\,\ Hokkaido",
   811582 => "Monbetsu\,\ Hokkaido",
   811583 => "Monbetsu\,\ Hokkaido",
@@ -624,17 +595,10 @@ my %areanames = (
   811632 => "Teshio\,\ Hokkaido",
   811634 => "Hamatonbetsu\,\ Hokkaido",
   811635 => "Hamatonbetsu\,\ Hokkaido",
-  811636 => "",
-  811637 => "",
-  811638 => "",
-  811639 => "",
-  811642 => "",
-  811643 => "",
   811644 => "Rumoi\,\ Hokkaido",
   811645 => "Rumoi\,\ Hokkaido",
   811646 => "Haboro\,\ Hokkaido",
   811647 => "Haboro\,\ Hokkaido",
-  811648 => "",
   811652 => "Shibetsu\,\ Hokkaido",
   811653 => "Shibetsu\,\ Hokkaido",
   811654 => "Nayoro\,\ Hokkaido",
@@ -649,8 +613,6 @@ my %areanames = (
   811734 => "Goshogawara\,\ Aomori",
   811735 => "Goshogawara\,\ Aomori",
   811736 => "Goshogawara\,\ Aomori",
-  811737 => "",
-  811738 => "",
   81174 => "Kanita\,\ Aomori",
   811752 => "Mutsu\,\ Aomori",
   811753 => "Mutsu\,\ Aomori",
@@ -723,7 +685,6 @@ my %areanames = (
   811986 => "Tono\,\ Iwate",
   811987 => "Tono\,\ Iwate",
   81199 => "Morioka\,\ Iwate",
-  81220 => "",
   81222 => "Sendai\,\ Miyagi",
   812230 => "Sendai\,\ Miyagi",
   812232 => "Iwanuma\,\ Miyagi",
@@ -744,8 +705,6 @@ my %areanames = (
   81225 => "Ishinomaki\,\ Miyagi",
   81226 => "Kesennuma\,\ Miyagi",
   81227 => "Sendai\,\ Miyagi",
-  81228 => "",
-  81229 => "",
   81233 => "Shinjo\,\ Yamagata",
   81234 => "Sakata\,\ Yamagata",
   81235 => "Tsuruoka\,\ Yamagata",
@@ -765,24 +724,14 @@ my %areanames = (
   812387 => "Nagai\,\ Yamagata",
   812388 => "Nagai\,\ Yamagata",
   812389 => "Yonezawa\,\ Yamagata",
-  81240 => "",
   812412 => "Kitakata\,\ Fukushima",
   812413 => "Kitakata\,\ Fukushima",
   812414 => "Yanaizu\,\ Fukushima",
   812415 => "Yanaizu\,\ Fukushima",
   812416 => "Tajima\,\ Fukushima",
-  812417 => "",
-  812418 => "",
-  8124190 => "Tajima\,\ Fukushima",
-  8124191 => "Tajima\,\ Fukushima",
-  8124192 => "Tajima\,\ Fukushima",
-  8124193 => "Tajima\,\ Fukushima",
-  8124194 => "Tajima\,\ Fukushima",
-  8124195 => "Tajima\,\ Fukushima",
+  812419 => "Tajima\,\ Fukushima",
   8124196 => "Yanaizu\,\ Fukushima",
   8124197 => "Yanaizu\,\ Fukushima",
-  8124198 => "Tajima\,\ Fukushima",
-  8124199 => "Tajima\,\ Fukushima",
   81242 => "Aizuwakamatsu\,\ Fukushima",
   81243 => "Nihonmatsu\,\ Fukushima",
   81244 => "Hobara\,\ Fukushima",
@@ -831,8 +780,6 @@ my %areanames = (
   812554 => "Joetsu\,\ Niigata",
   812555 => "Itoigawa\,\ Niigata",
   812556 => "Itoigawa\,\ Niigata",
-  812557 => "",
-  812558 => "",
   812559 => "Yasuzuka\,\ Niigata",
   812560 => "Itoigawa\,\ Niigata",
   812562 => "Sanjo\,\ Niigata",
@@ -840,10 +787,6 @@ my %areanames = (
   812564 => "Sanjo\,\ Niigata",
   812565 => "Sanjo\,\ Niigata",
   812566 => "Sanjo\,\ Niigata",
-  812567 => "",
-  812568 => "",
-  812569 => "",
-  812570 => "",
   812571 => "Muika\,\ Niigata",
   812572 => "Kashiwazaki\,\ Niigata",
   812573 => "Kashiwazaki\,\ Niigata",
@@ -852,7 +795,6 @@ my %areanames = (
   812576 => "Tokamachi\,\ Niigata",
   812577 => "Muika\,\ Niigata",
   812578 => "Muika\,\ Niigata",
-  812579 => "",
   812580 => "Tokamachi\,\ Niigata",
   812582 => "Nagaoka\,\ Niigata",
   812583 => "Nagaoka\,\ Niigata",
@@ -876,7 +818,6 @@ my %areanames = (
   8126174 => "Omachi\,\ Nagano",
   8126175 => "Omachi\,\ Nagano",
   8126176 => "Omachi\,\ Nagano",
-  8126177 => "",
   8126178 => "Omachi\,\ Nagano",
   8126179 => "Omachi\,\ Nagano",
   812618 => "Omachi\,\ Nagano",
@@ -884,10 +825,6 @@ my %areanames = (
   81262 => "Nagano\,\ Nagano",
   81263 => "Matsumoto\,\ Nagano",
   812640 => "Nagano\,\ Nagano",
-  812642 => "",
-  812643 => "",
-  812644 => "",
-  812645 => "",
   812646 => "Nagano\,\ Nagano",
   812647 => "Nagano\,\ Nagano",
   812648 => "Nagano\,\ Nagano",
@@ -975,16 +912,8 @@ my %areanames = (
   812876 => "Kuroiso\,\ Tochigi",
   812877 => "Kuroiso\,\ Tochigi",
   812878 => "Nasukarasuyama\,\ Tochigi",
-  8128790 => "Nasukarasuyama\,\ Tochigi",
-  8128791 => "Nasukarasuyama\,\ Tochigi",
-  8128792 => "Nasukarasuyama\,\ Tochigi",
-  8128793 => "Nasukarasuyama\,\ Tochigi",
-  8128794 => "Nasukarasuyama\,\ Tochigi",
-  8128795 => "Nasukarasuyama\,\ Tochigi",
-  8128796 => "Nasukarasuyama\,\ Tochigi",
-  8128797 => "Nasukarasuyama\,\ Tochigi",
+  812879 => "Nasukarasuyama\,\ Tochigi",
   8128798 => "Otawara\,\ Tochigi",
-  8128799 => "Nasukarasuyama\,\ Tochigi",
   81288 => "Imabari\,\ Ehime",
   812890 => "Utsunomiya\,\ Tochigi",
   812892 => "Utsunomiya\,\ Tochigi",
@@ -1019,14 +948,6 @@ my %areanames = (
   812965 => "Shimodate\,\ Ibaraki",
   812967 => "Kasama\,\ Ibaraki",
   812968 => "Kasama\,\ Ibaraki",
-  812972 => "",
-  812973 => "",
-  812974 => "",
-  812975 => "",
-  812976 => "",
-  812977 => "",
-  812978 => "",
-  812979 => "",
   81298 => "Tsuchiura\,\ Ibaraki",
   812992 => "Ishioka\,\ Ibaraki",
   812993 => "Ishioka\,\ Ibaraki",
@@ -1039,25 +960,8 @@ my %areanames = (
   813 => "Tokyo",
   81420 => "Tokorozawa\,\ Saitama",
   814220 => "Kokubunji\,\ Tokyo",
-  814222 => "",
-  814223 => "",
-  814224 => "",
-  814225 => "",
-  814226 => "",
-  814227 => "",
-  814228 => "",
-  814229 => "",
   81423 => "Kokubunji\,\ Tokyo",
   814240 => "Kokubunji\,\ Tokyo",
-  814241 => "",
-  814242 => "",
-  814243 => "",
-  814244 => "",
-  814245 => "",
-  814246 => "",
-  814247 => "",
-  814248 => "",
-  814249 => "",
   81425 => "Tachikawa\,\ Tokyo",
   81426 => "Hachioji\,\ Tokyo",
   81427 => "Sagamihara\,\ Kanagawa",
@@ -1071,16 +975,10 @@ my %areanames = (
   814287 => "Ome\,\ Tokyo",
   814288 => "Ome\,\ Tokyo",
   814289 => "Ome\,\ Tokyo",
-  814290 => "Tokorozawa\,\ Saitama",
+  81429 => "Tokorozawa\,\ Saitama",
   814291 => "Hanno\,\ Saitama",
-  814292 => "Tokorozawa\,\ Saitama",
-  814293 => "Tokorozawa\,\ Saitama",
-  814294 => "Tokorozawa\,\ Saitama",
-  814295 => "Tokorozawa\,\ Saitama",
-  814296 => "Tokorozawa\,\ Saitama",
   814297 => "Hanno\,\ Saitama",
   814298 => "Hanno\,\ Saitama",
-  814299 => "Tokorozawa\,\ Saitama",
   81432 => "Chiba\,\ Chiba",
   81433 => "Chiba\,\ Chiba",
   81434 => "Chiba\,\ Chiba",
@@ -1103,9 +1001,6 @@ my %areanames = (
   814703 => "Tateyama\,\ Chiba",
   814704 => "Tateyama\,\ Chiba",
   814705 => "Tateyama\,\ Chiba",
-  814706 => "",
-  814707 => "",
-  814708 => "",
   814709 => "Kamogawa\,\ Chiba",
   81471 => "Kashiwa\,\ Chiba",
   81473 => "Ichikawa\,\ Chiba",
@@ -1128,16 +1023,10 @@ my %areanames = (
   814792 => "Choshi\,\ Chiba",
   814793 => "Choshi\,\ Chiba",
   814794 => "Choshi\,\ Chiba",
+  814795 => "Choshi\,\ Chiba",
   8147950 => "Yokaichiba\,\ Chiba",
-  8147951 => "Choshi\,\ Chiba",
-  8147952 => "Choshi\,\ Chiba",
-  8147953 => "Choshi\,\ Chiba",
-  8147954 => "Choshi\,\ Chiba",
   8147955 => "Yokaichiba\,\ Chiba",
-  8147956 => "Choshi\,\ Chiba",
   8147957 => "Yokaichiba\,\ Chiba",
-  8147958 => "Choshi\,\ Chiba",
-  8147959 => "Choshi\,\ Chiba",
   814796 => "Yokaichiba\,\ Chiba",
   814797 => "Yokaichiba\,\ Chiba",
   814798 => "Yokaichiba\,\ Chiba",
@@ -1153,9 +1042,6 @@ my %areanames = (
   81493 => "Higashimatsuyama\,\ Saitama",
   81494 => "Chichibu\,\ Saitama",
   81495 => "Honjo\,\ Saitama",
-  814992 => "",
-  814994 => "",
-  814996 => "",
   814998 => "Ogasawara\,\ Tokyo",
   8152 => "Nagoya\,\ Aichi",
   81531 => "Tahara\,\ Aichi",
@@ -1174,10 +1060,6 @@ my %areanames = (
   815393 => "Hamamatsu\,\ Shizuoka",
   815394 => "Hamamatsu\,\ Shizuoka",
   815395 => "Hamamatsu\,\ Shizuoka",
-  8153960 => "",
-  8153961 => "",
-  8153962 => "",
-  8153963 => "",
   8153964 => "Hamamatsu\,\ Shizuoka",
   8153965 => "Hamamatsu\,\ Shizuoka",
   8153966 => "Hamamatsu\,\ Shizuoka",
@@ -1188,14 +1070,11 @@ my %areanames = (
   8153971 => "Hamamatsu\,\ Shizuoka",
   8153972 => "Hamamatsu\,\ Shizuoka",
   8153973 => "Hamamatsu\,\ Shizuoka",
-  8153974 => "",
   8153975 => "Hamamatsu\,\ Shizuoka",
   8153976 => "Hamamatsu\,\ Shizuoka",
-  8153977 => "",
   8153978 => "Hamamatsu\,\ Shizuoka",
   8153979 => "Hamamatsu\,\ Shizuoka",
   815398 => "Hamamatsu\,\ Shizuoka",
-  815399 => "",
   81542 => "Shizuoka\,\ Shizuoka",
   81543 => "Shizuoka\,\ Shizuoka",
   81544 => "Fujinomiya\,\ Shizuoka",
@@ -1210,10 +1089,6 @@ my %areanames = (
   81553 => "Yamanashi\,\ Yamanashi",
   81554 => "Otsuki\,\ Yamanashi",
   81555 => "Fujiyoshida\,\ Yamanashi",
-  815562 => "",
-  815563 => "",
-  815564 => "",
-  815565 => "",
   815566 => "Minobu\,\ Yamanashi",
   81557 => "Ito\,\ Shizuoka",
   815582 => "Shimoda\,\ Shizuoka",
@@ -1221,12 +1096,8 @@ my %areanames = (
   815584 => "Shimoda\,\ Shizuoka",
   815585 => "Shimoda\,\ Shizuoka",
   815586 => "Shimoda\,\ Shizuoka",
-  815587 => "",
-  815588 => "",
-  815589 => "",
   81559 => "Numazu\,\ Shizuoka",
   81561 => "Seto\,\ Aichi",
-  81562 => "",
   81563 => "Nishio\,\ Aichi",
   81564 => "Okazaki\,\ Aichi",
   81565 => "Toyota\,\ Aichi",
@@ -1247,15 +1118,10 @@ my %areanames = (
   815744 => "Minokamo\,\ Gifu",
   815745 => "Minokamo\,\ Gifu",
   815746 => "Minokamo\,\ Gifu",
-  815747 => "",
-  815748 => "",
   815752 => "Sekigahara\,\ Gifu",
   815753 => "Sekigahara\,\ Gifu",
   815754 => "Sekigahara\,\ Gifu",
   815755 => "Sekigahara\,\ Gifu",
-  815756 => "",
-  815757 => "",
-  815758 => "",
   815762 => "Gero\,\ Gifu",
   815763 => "Gero\,\ Gifu",
   815764 => "Gero\,\ Gifu",
@@ -1266,7 +1132,6 @@ my %areanames = (
   815769 => "Shokawa\,\ Gifu",
   81577 => "Takayama\,\ Gifu",
   81578 => "Kamioka\,\ Akita",
-  81581 => "",
   81582 => "Gifu\,\ Gifu",
   81583 => "Gifu\,\ Gifu",
   81584 => "Ogaki\,\ Gifu",
@@ -1277,12 +1142,6 @@ my %areanames = (
   81592 => "Tsu\,\ Mie",
   81593 => "Yokkaichi\,\ Mie",
   81594 => "Kuwana\,\ Mie",
-  815952 => "",
-  815953 => "",
-  815954 => "",
-  815955 => "",
-  815956 => "",
-  815957 => "",
   815958 => "Kameyama\,\ Mie",
   815959 => "Kameyama\,\ Mie",
   81596 => "Ise\,\ Mie",
@@ -1297,8 +1156,6 @@ my %areanames = (
   815984 => "Matsusaka\,\ Mie",
   815985 => "Matsusaka\,\ Mie",
   815986 => "Matsusaka\,\ Mie",
-  815987 => "",
-  815988 => "",
   815992 => "Toba\,\ Mie",
   815993 => "Toba\,\ Mie",
   815994 => "Ago\,\ Mie",
@@ -1306,21 +1163,14 @@ my %areanames = (
   815996 => "Ago\,\ Mie",
   815997 => "Ago\,\ Mie",
   815998 => "Ago\,\ Mie",
-  815999 => "\ Tsu\,\ Mie",
+  815999 => "Tsu\,\ Mie",
   816 => "Osaka\,\ Osaka",
   81721 => "Tondabayashi\,\ Osaka",
   81722 => "Sakai\,\ Osaka",
+  81723 => "Sakai\,\ Osaka",
   817230 => "Neyagawa\,\ Osaka",
-  817231 => "Sakai\,\ Osaka",
-  817232 => "Sakai\,\ Osaka",
-  817233 => "Sakai\,\ Osaka",
-  817234 => "Sakai\,\ Osaka",
-  817235 => "Sakai\,\ Osaka",
-  817236 => "Sakai\,\ Osaka",
-  817237 => "Sakai\,\ Osaka",
   817238 => "Neyagawa\,\ Osaka",
   817239 => "Neyagawa\,\ Osaka",
-  81724 => "",
   81725 => "Izumi\,\ Osaka",
   81726 => "Ibaraki\,\ Osaka",
   81727 => "Ikeda\,\ Osaka",
@@ -1333,10 +1183,6 @@ my %areanames = (
   817355 => "Shingu\,\ Fukuoka",
   817356 => "Kushimoto\,\ Wakayama",
   817357 => "Kushimoto\,\ Wakayama",
-  817362 => "",
-  817363 => "",
-  817364 => "",
-  817365 => "",
   817366 => "Iwade\,\ Wakayama",
   817367 => "Iwade\,\ Wakayama",
   817368 => "Iwade\,\ Wakayama",
@@ -1353,16 +1199,11 @@ my %areanames = (
   817455 => "Yamatotakada\,\ Nara",
   817456 => "Yamatotakada\,\ Nara",
   817457 => "Yamatotakada\,\ Nara",
-  817458 => "",
-  817459 => "",
   817463 => "Yoshino\,\ Nara",
   817464 => "Yoshino\,\ Nara",
   817465 => "Yoshino\,\ Nara",
   817466 => "Totsukawa\,\ Nara",
   817468 => "Kamikitayama\,\ Nara",
-  817472 => "",
-  817473 => "",
-  817474 => "",
   817475 => "Shimonoseki\,\ Yamaguchi",
   817476 => "Shimonoseki\,\ Yamaguchi",
   817482 => "Yokaichi\,\ Shiga",
@@ -1423,9 +1264,6 @@ my %areanames = (
   817723 => "Miyazu\,\ Kyoto",
   817724 => "Miyazu\,\ Kyoto",
   817725 => "Miyazu\,\ Kyoto",
-  817726 => "",
-  817727 => "",
-  817728 => "",
   817732 => "Fukuchiyama\,\ Kyoto",
   817733 => "Fukuchiyama\,\ Kyoto",
   817734 => "Fukuchiyama\,\ Kyoto",
@@ -1443,14 +1281,9 @@ my %areanames = (
   817903 => "Fukusaki\,\ Hyogo",
   817904 => "Fukusaki\,\ Hyogo",
   817905 => "Fukusaki\,\ Hyogo",
-  817906 => "",
-  817907 => "",
-  817908 => "",
   817912 => "Aioi\,\ Hyogo",
   817914 => "Aioi\,\ Hyogo",
   817915 => "Aioi\,\ Hyogo",
-  817916 => "",
-  817917 => "",
   81792 => "Himeji\,\ Hyogo",
   81793 => "Himeji\,\ Hyogo",
   817940 => "Kakogawa\,\ Hyogo",
@@ -1468,16 +1301,11 @@ my %areanames = (
   817954 => "Nishiwaki\,\ Hyogo",
   817955 => "Sanda\,\ Hyogo",
   817956 => "Sanda\,\ Hyogo",
-  817957 => "",
-  817958 => "",
   817959 => "Sanda\,\ Hyogo",
-  817960 => "",
   817962 => "Toyooka\,\ Hyogo",
   817963 => "Toyooka\,\ Hyogo",
   817964 => "Toyooka\,\ Hyogo",
   817965 => "Toyooka\,\ Hyogo",
-  817966 => "",
-  817967 => "",
   817968 => "Hamasaka\,\ Hyogo",
   817969 => "Hamasaka\,\ Hyogo",
   81797 => "Nishinomiya\,\ Hyogo",
@@ -1494,8 +1322,6 @@ my %areanames = (
   818204 => "Yanai\,\ Yamaguchi",
   818205 => "Yanai\,\ Yamaguchi",
   818206 => "Yanai\,\ Yamaguchi",
-  818207 => "",
-  818208 => "",
   81822 => "Hiroshima\,\ Hiroshima",
   81823 => "Kure\,\ Hiroshima",
   818240 => "Higashi\-ku\,\ Hiroshima",
@@ -1510,35 +1336,16 @@ my %areanames = (
   81825 => "Hiroshima\,\ Hiroshima",
   818262 => "Kake\,\ Hiroshima",
   818263 => "Kake\,\ Hiroshima",
-  818264 => "",
-  818265 => "",
-  818266 => "",
-  818267 => "",
-  818268 => "",
   81827 => "Iwakuni\,\ Yamaguchi",
   81828 => "Hiroshima\,\ Hiroshima",
   818290 => "Hiroshima\,\ Hiroshima",
+  818292 => "Hiroshima\,\ Hiroshima",
   8182920 => "Hatsukaichi\,\ Hiroshima",
-  8182921 => "Hiroshima\,\ Hiroshima",
-  8182922 => "Hiroshima\,\ Hiroshima",
-  8182923 => "Hiroshima\,\ Hiroshima",
-  8182924 => "Hiroshima\,\ Hiroshima",
-  8182925 => "Hiroshima\,\ Hiroshima",
-  8182926 => "Hiroshima\,\ Hiroshima",
-  8182927 => "Hiroshima\,\ Hiroshima",
-  8182928 => "Hiroshima\,\ Hiroshima",
-  8182929 => "Hiroshima\,\ Hiroshima",
   818293 => "Hatsukaichi\,\ Hiroshima",
-  8182940 => "Hatsukaichi\,\ Hiroshima",
+  818294 => "Hatsukaichi\,\ Hiroshima",
   8182941 => "Hiroshima\,\ Hiroshima",
   8182942 => "Hiroshima\,\ Hiroshima",
   8182943 => "Hiroshima\,\ Hiroshima",
-  8182944 => "Hatsukaichi\,\ Hiroshima",
-  8182945 => "Hatsukaichi\,\ Hiroshima",
-  8182946 => "Hatsukaichi\,\ Hiroshima",
-  8182947 => "Hatsukaichi\,\ Hiroshima",
-  8182948 => "Hatsukaichi\,\ Hiroshima",
-  8182949 => "Hatsukaichi\,\ Hiroshima",
   818295 => "Hatsukaichi\,\ Hiroshima",
   818296 => "Hiroshima\,\ Hiroshima",
   818297 => "Hatsukaichi\,\ Hiroshima",
@@ -1561,16 +1368,10 @@ my %areanames = (
   818373 => "Nagato\,\ Yamaguchi",
   818374 => "Nagato\,\ Yamaguchi",
   818375 => "Mine\,\ Yamaguchi",
-  8183760 => "Mine\,\ Yamaguchi",
-  8183761 => "Mine\,\ Yamaguchi",
-  8183762 => "Mine\,\ Yamaguchi",
-  8183763 => "Mine\,\ Yamaguchi",
-  8183764 => "Mine\,\ Yamaguchi",
-  8183765 => "Mine\,\ Yamaguchi",
+  818376 => "Mine\,\ Yamaguchi",
   8183766 => "Shimonoseki\,\ Yamaguchi",
   8183767 => "Shimonoseki\,\ Yamaguchi",
   8183768 => "Shimonoseki\,\ Yamaguchi",
-  8183769 => "Mine\,\ Yamaguchi",
   818377 => "Shimonoseki\,\ Yamaguchi",
   818378 => "Shimonoseki\,\ Yamaguchi",
   818382 => "Hagi\,\ Yamaguchi",
@@ -1579,24 +1380,16 @@ my %areanames = (
   818385 => "Hagi\,\ Yamaguchi",
   818387 => "Tamagawa\,\ Yamaguchi",
   818388 => "Tamagawa\,\ Yamaguchi",
-  818390 => "Yamaguchi\,\ Yamaguchi",
+  81839 => "Yamaguchi\,\ Yamaguchi",
   818391 => "Ogori\,\ Yamaguchi",
-  818392 => "Yamaguchi\,\ Yamaguchi",
-  818393 => "Yamaguchi\,\ Yamaguchi",
-  818394 => "Yamaguchi\,\ Yamaguchi",
-  818395 => "Yamaguchi\,\ Yamaguchi",
-  818396 => "Yamaguchi\,\ Yamaguchi",
   818397 => "Ogori\,\ Yamaguchi",
   818398 => "Ogori\,\ Yamaguchi",
-  818399 => "Yamaguchi\,\ Yamaguchi",
   81845 => "Innoshima\,\ Hiroshima",
   818462 => "Takehara\,\ Hiroshima",
   818463 => "Takehara\,\ Hiroshima",
   818464 => "Takehara\,\ Hiroshima",
   818466 => "Mima\,\ Tokushima",
   818467 => "Mima\,\ Tokushima",
-  818472 => "",
-  818473 => "",
   818474 => "Fuchu\,\ Hiroshima",
   818475 => "Fuchu\,\ Hiroshima",
   818476 => "Fuchu\,\ Hiroshima",
@@ -1604,25 +1397,9 @@ my %areanames = (
   818478 => "Tojo\,\ Hiroshima",
   818479 => "Tojo\,\ Hiroshima",
   81848 => "Onomichi\,\ Hiroshima",
+  81849 => "Fukuyama\,\ Hiroshima",
   818490 => "Onomichi\,\ Hiroshima",
-  818491 => "Fukuyama\,\ Hiroshima",
-  818492 => "Fukuyama\,\ Hiroshima",
-  8184930 => "Onomichi\,\ Hiroshima",
-  8184931 => "Fukuyama\,\ Hiroshima",
-  8184932 => "Fukuyama\,\ Hiroshima",
-  8184933 => "Onomichi\,\ Hiroshima",
-  8184934 => "Onomichi\,\ Hiroshima",
-  8184935 => "Onomichi\,\ Hiroshima",
-  8184936 => "Onomichi\,\ Hiroshima",
-  8184937 => "Onomichi\,\ Hiroshima",
-  8184938 => "Onomichi\,\ Hiroshima",
-  8184939 => "Onomichi\,\ Hiroshima",
-  818494 => "Fukuyama\,\ Hiroshima",
-  818495 => "Fukuyama\,\ Hiroshima",
-  818496 => "Fukuyama\,\ Hiroshima",
-  818497 => "Fukuyama\,\ Hiroshima",
-  818498 => "Fukuyama\,\ Hiroshima",
-  818499 => "Fukuyama\,\ Hiroshima",
+  818493 => "Onomichi\,\ Hiroshima",
   818512 => "Nishigo\,\ Fukushima",
   818514 => "Ama\,\ Shimane",
   81852 => "Matsue\,\ Shimane",
@@ -1633,8 +1410,6 @@ my %areanames = (
   818545 => "Kisuki\,\ Shimane",
   818546 => "Kakeya\,\ Shimane",
   818547 => "Kakeya\,\ Shimane",
-  818548 => "",
-  818549 => "",
   818552 => "Hamada\,\ Shimane",
   818553 => "Hamada\,\ Shimane",
   818554 => "Hamada\,\ Shimane",
@@ -1662,23 +1437,14 @@ my %areanames = (
   818594 => "Yonago\,\ Tottori",
   818595 => "Yonago\,\ Tottori",
   818596 => "Yonago\,\ Tottori",
-  818597 => "",
-  818598 => "",
   81862 => "Okayama\,\ Okayama",
   81863 => "Tamano\,\ Okayama",
   81864 => "Kurashiki\,\ Okayama",
   818652 => "Kurashiki\,\ Okayama",
   818654 => "Kamogata\,\ Okayama",
-  8186550 => "Kamogata\,\ Okayama",
-  8186551 => "Kamogata\,\ Okayama",
+  818655 => "Kamogata\,\ Okayama",
   8186552 => "Kurashiki\,\ Okayama",
   8186553 => "Kurashiki\,\ Okayama",
-  8186554 => "Kamogata\,\ Okayama",
-  8186555 => "Kamogata\,\ Okayama",
-  8186556 => "Kamogata\,\ Okayama",
-  8186557 => "Kamogata\,\ Okayama",
-  8186558 => "Kamogata\,\ Okayama",
-  8186559 => "Kamogata\,\ Okayama",
   818656 => "Kasaoka\,\ Okayama",
   818657 => "Kasaoka\,\ Okayama",
   818660 => "Seto\,\ Okayama",
@@ -1689,18 +1455,10 @@ my %areanames = (
   818666 => "Ibara\,\ Okayama",
   818667 => "Ibara\,\ Okayama",
   818668 => "Ibara\,\ Okayama",
-  8186690 => "Soja\,\ Okayama",
+  818669 => "Soja\,\ Okayama",
   8186691 => "Kurashiki\,\ Okayama",
-  8186692 => "Soja\,\ Okayama",
-  8186693 => "Soja\,\ Okayama",
-  8186694 => "Soja\,\ Okayama",
-  8186695 => "Soja\,\ Okayama",
-  8186696 => "Soja\,\ Okayama",
   8186697 => "Kurashiki\,\ Okayama",
   8186698 => "Kurashiki\,\ Okayama",
-  8186699 => "Soja\,\ Okayama",
-  818672 => "",
-  818673 => "",
   818674 => "Kuse\,\ Okayama",
   818675 => "Kuse\,\ Okayama",
   818676 => "Kuse\,\ Okayama",
@@ -1735,25 +1493,12 @@ my %areanames = (
   81875 => "Kan\'onji\,\ Kagawa",
   81877 => "Marugame\,\ Kagawa",
   81878 => "Takamatsu\,\ Kagawa",
-  818792 => "",
-  818793 => "",
-  818794 => "",
-  818795 => "",
   818796 => "Tonosho\,\ Kagawa",
   818797 => "Tonosho\,\ Kagawa",
   818798 => "Tonosho\,\ Kagawa",
-  818802 => "",
-  818803 => "",
-  818804 => "",
-  818805 => "",
   818806 => "Sukumo\,\ Kochi",
   818807 => "Sukumo\,\ Kochi",
   818808 => "Tosashimizu\,\ Kochi",
-  8188090 => "",
-  8188091 => "",
-  8188092 => "",
-  8188093 => "",
-  8188094 => "",
   8188095 => "Tosashimizu\,\ Kochi",
   8188096 => "Tosashimizu\,\ Kochi",
   8188097 => "Tosashimizu\,\ Kochi",
@@ -1764,24 +1509,14 @@ my %areanames = (
   818834 => "Kamojima\,\ Tokushima",
   818835 => "Mima\,\ Tokushima",
   818836 => "Mima\,\ Tokushima",
-  818837 => "",
-  818838 => "",
   818842 => "Anan\,\ Tokushima",
   818843 => "Anan\,\ Tokushima",
   818844 => "Anan\,\ Tokushima",
-  818845 => "",
-  818846 => "",
-  818847 => "",
-  818848 => "",
   81885 => "Komatsushima\,\ Tokushima",
   81886 => "Tokushima\,\ Tokushima",
   818872 => "Muroto\,\ Kochi",
   818873 => "Aki\,\ Kochi",
   818874 => "Aki\,\ Kochi",
-  818875 => "",
-  818876 => "",
-  818877 => "",
-  818878 => "",
   818879 => "Muroto\,\ Kochi",
   81888 => "Kochi\,\ Kochi",
   818892 => "Sakawa\,\ Kochi",
@@ -1816,20 +1551,10 @@ my %areanames = (
   818978 => "Hakata\,\ Ehime",
   81898 => "Imabari\,\ Ehime",
   81899 => "Matsuyama\,\ Ehime",
-  819204 => "",
-  819205 => "",
-  819208 => "",
   81922 => "Fukuoka\,\ Fukuoka",
-  819230 => "Fukuoka\,\ Fukuoka",
-  819231 => "Fukuoka\,\ Fukuoka",
+  81923 => "Fukuoka\,\ Fukuoka",
   819232 => "Maebaru\,\ Fukuoka",
   819233 => "Maebaru\,\ Fukuoka",
-  819234 => "Fukuoka\,\ Fukuoka",
-  819235 => "Fukuoka\,\ Fukuoka",
-  819236 => "Fukuoka\,\ Fukuoka",
-  819237 => "Fukuoka\,\ Fukuoka",
-  819238 => "Fukuoka\,\ Fukuoka",
-  819239 => "Fukuoka\,\ Fukuoka",
   81924 => "Fukuoka\,\ Fukuoka",
   81925 => "Fukuoka\,\ Fukuoka",
   81926 => "Fukuoka\,\ Fukuoka",
@@ -1883,15 +1608,12 @@ my %areanames = (
   81958 => "Nagasaki\,\ Nagasaki",
   819592 => "Oseto\,\ Nagasaki",
   819593 => "Oseto\,\ Nagasaki",
-  819594 => "",
-  819595 => "",
   819596 => "Fukue\,\ Nagasaki",
   819597 => "Fukue\,\ Nagasaki",
   819598 => "Fukue\,\ Nagasaki",
   819599 => "Oseto\,\ Nagasaki",
   81962 => "Kumamoto\,\ Kumamoto",
   81963 => "Kumamoto\,\ Kumamoto",
-  81964 => "",
   81965 => "Yatsushiro\,\ Kumamoto",
   819662 => "Hitoyoshi\,\ Kumamoto",
   819663 => "Hitoyoshi\,\ Kumamoto",
@@ -1900,13 +1622,7 @@ my %areanames = (
   819666 => "Minamata\,\ Kumamoto",
   819667 => "Minamata\,\ Kumamoto",
   819668 => "Minamata\,\ Kumamoto",
-  819672 => "",
-  819673 => "",
-  819674 => "",
-  819675 => "",
   819676 => "Takamori\,\ Kumamoto",
-  819677 => "",
-  819678 => "",
   819679 => "Takamori\,\ Kumamoto",
   819682 => "Yamaga\,\ Kumamoto",
   819683 => "Yamaga\,\ Kumamoto",
@@ -1949,8 +1665,6 @@ my %areanames = (
   819803 => "Nago\,\ Okinawa",
   819804 => "Nago\,\ Okinawa",
   819805 => "Nago\,\ Okinawa",
-  819806 => "",
-  819807 => "",
   819808 => "Yaeyama\ District\,\ Okinawa",
   819809 => "Yaeyama\ District\,\ Okinawa",
   819822 => "Nobeoka\,\ Miyazaki",
@@ -1977,43 +1691,25 @@ my %areanames = (
   81987 => "Nichinan\,\ Miyazaki",
   81988 => "Naha\,\ Okinawa",
   81989 => "Naha\,\ Okinawa",
-  819912 => "",
-  819913 => "",
   81992 => "Kagoshima\,\ Kagoshima",
   819932 => "Ibusuki\,\ Kagoshima",
-  8199330 => "Ibusuki\,\ Kagoshima",
+  819933 => "Ibusuki\,\ Kagoshima",
   8199331 => "Kagoshima\,\ Kagoshima",
-  8199332 => "Ibusuki\,\ Kagoshima",
-  8199333 => "Ibusuki\,\ Kagoshima",
-  8199334 => "Ibusuki\,\ Kagoshima",
-  8199335 => "Ibusuki\,\ Kagoshima",
-  8199336 => "Ibusuki\,\ Kagoshima",
-  8199337 => "Ibusuki\,\ Kagoshima",
-  8199338 => "Ibusuki\,\ Kagoshima",
-  8199339 => "Ibusuki\,\ Kagoshima",
-  8199340 => "Ibusuki\,\ Kagoshima",
-  8199341 => "Ibusuki\,\ Kagoshima",
-  8199342 => "Ibusuki\,\ Kagoshima",
+  819934 => "Ibusuki\,\ Kagoshima",
   8199343 => "Kagoshima\,\ Kagoshima",
-  8199344 => "Ibusuki\,\ Kagoshima",
   8199345 => "Kagoshima\,\ Kagoshima",
-  8199346 => "Ibusuki\,\ Kagoshima",
   8199347 => "Kagoshima\,\ Kagoshima",
-  8199348 => "Ibusuki\,\ Kagoshima",
-  8199349 => "Ibusuki\,\ Kagoshima",
   819935 => "Kaseda\,\ Kagoshima",
   819936 => "Kaseda\,\ Kagoshima",
   819937 => "Kaseda\,\ Kagoshima",
   819938 => "Kaseda\,\ Kagoshima",
   819940 => "Shibushi\,\ Kagoshima",
-  819942 => "",
   819943 => "Kanoya\,\ Kagoshima",
   819944 => "Kanoya\,\ Kagoshima",
   819945 => "Kanoya\,\ Kagoshima",
   819946 => "Kanoya\,\ Kagoshima",
   819947 => "Shibushi\,\ Kagoshima",
   819948 => "Shibushi\,\ Kagoshima",
-  819949 => "",
   819952 => "Okuchi\,\ Kagoshima",
   819953 => "Okuchi\,\ Kagoshima",
   819954 => "Kajiki\,\ Kagoshima",
@@ -2027,9 +1723,6 @@ my %areanames = (
   819966 => "Izumi\,\ Kagoshima",
   819967 => "Izumi\,\ Kagoshima",
   819968 => "Izumi\,\ Kagoshima",
-  819969 => "",
-  819972 => "",
-  819973 => "",
   819974 => "Yakushima\,\ Kagoshima",
   819975 => "Naze\,\ Kagoshima",
   819976 => "Naze\,\ Kagoshima",

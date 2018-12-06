@@ -22,53 +22,44 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '[19]',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'personal_number' => '',
-                'toll_free' => '',
-                'fixed_line' => '
-          1(?:
-            5\\d|
-            8[3567]
-          )\\d{6}
-        ',
-                'geographic' => '
-          1(?:
-            5\\d|
-            8[3567]
-          )\\d{6}
-        ',
                 'pager' => '',
-                'specialrate' => '',
                 'mobile' => '
           (?:
             1[0-2]|
             9[0-3569]
           )\\d{7}
-        '
+        ',
+                'voip' => '',
+                'toll_free' => '',
+                'geographic' => '
+          1(?:
+            5\\d|
+            8[35-7]
+          )\\d{6}
+        ',
+                'fixed_line' => '
+          1(?:
+            5\\d|
+            8[35-7]
+          )\\d{6}
+        ',
+                'specialrate' => '',
+                'personal_number' => ''
               };
 my %areanames = (
-  24911 => "Omdurman",
-  24921 => "Atbara",
   249183 => "Khartoum",
-  24931 => "Port\ Sudan",
-  24941 => "Kassala",
-  249441 => "Jedaraf",
-  24951 => "Wadmedai",
-  24961 => "Sennar",
-  249616 => "Shetnzi",
-  24971 => "Kosti",
-  24981 => "Al\-Ubayyid",
 );
     sub new {
       my $class = shift;

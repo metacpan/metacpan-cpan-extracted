@@ -1,7 +1,7 @@
 use v5.10.0;
 package JMAP::Tester::Response::Sentence::Set;
 # ABSTRACT: the kind of sentence you get in reply to a setFoos call
-$JMAP::Tester::Response::Sentence::Set::VERSION = '0.021';
+$JMAP::Tester::Response::Sentence::Set::VERSION = '0.022';
 use Moo;
 extends 'JMAP::Tester::Response::Sentence';
 
@@ -85,7 +85,7 @@ sub old_state { $_[0]->arguments->{oldState} }
 
 sub as_set { $_[0] }
 
-sub created { $_[0]->arguments->{created} }
+sub created { $_[0]->arguments->{created} // {} }
 
 sub created_id {
   my ($self, $creation_id) = @_;
@@ -182,7 +182,7 @@ JMAP::Tester::Response::Sentence::Set - the kind of sentence you get in reply to
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 

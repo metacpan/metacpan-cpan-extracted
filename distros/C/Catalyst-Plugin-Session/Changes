@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::Plugin::Session
 
+0.41 2018-12-05
+      - Don't let an evil session ID supplier have an easy XSS vector (Michael McClimon++)
+
 0.40 2015-01-26
       - Add a flag so that a storage can finalize during finalize_header rather
       than finalize_body.  This is to enable storages that need to write to the

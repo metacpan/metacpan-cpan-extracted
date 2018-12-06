@@ -2,7 +2,7 @@ use v5.10.0;
 use warnings;
 package JMAP::Tester::Role::Result;
 # ABSTRACT: the kind of thing that you get back for a request
-$JMAP::Tester::Role::Result::VERSION = '0.021';
+$JMAP::Tester::Role::Result::VERSION = '0.022';
 use Moo::Role;
 
 use JMAP::Tester::Abort ();
@@ -13,15 +13,12 @@ use namespace::clean;
 #pod
 #pod This is the role consumed by the class of any object returned by JMAP::Tester's
 #pod C<request> method.  Its only guarantee, for now, is an C<is_success> method,
-#pod and an C<http_response> method.
+#pod and a C<response_payload> method.
 #pod
 #pod =cut
 
 requires 'is_success';
-
-has http_response => (
-  is => 'ro',
-);
+requires 'response_payload';
 
 #pod =method assert_successful
 #pod
@@ -89,13 +86,13 @@ JMAP::Tester::Role::Result - the kind of thing that you get back for a request
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 
 This is the role consumed by the class of any object returned by JMAP::Tester's
 C<request> method.  Its only guarantee, for now, is an C<is_success> method,
-and an C<http_response> method.
+and a C<response_payload> method.
 
 =head1 METHODS
 

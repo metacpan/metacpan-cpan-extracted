@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.128';
+$Config::Model::Value::VERSION = '2.129';
 use 5.10.1;
 
 use Mouse;
@@ -1020,7 +1020,7 @@ sub run_code_set_on_value {
 }
 
 sub run_regexp_set_on_value {
-    my ( $self, $value_r, $apply_fix, $array, $msg, $test_sub, $w_info ) = @_;
+    my ( $self, $value_r, $apply_fix, $array, $may_be, $test_sub, $w_info ) = @_;
 
     # no need to check default or computed values
     return unless defined $$value_r;
@@ -1028,7 +1028,7 @@ sub run_regexp_set_on_value {
     foreach my $rxp ( sort keys %$w_info ) {
         # $_[0] is set to $$value_r when $sub is called
         my $sub = sub { $test_sub->( $_[0], $rxp ) };
-        my $msg = $w_info->{$rxp}{msg} || "value '$$value_r' should $msg" . "match regexp $rxp";
+        my $msg = $w_info->{$rxp}{msg} || "value should ${may_be}match regexp '$rxp'";
         my $fix = $w_info->{$rxp}{fix};
         $self->run_code_on_value( $value_r, $apply_fix, $array, 'regexp', $sub, $msg, $fix );
     }
@@ -1159,9 +1159,17 @@ sub check_fetched_value {
         $logger->debug("is not needed");
     }
 
+    $self->store_warning($value, $silent);
+
+    return wantarray ? $self->all_errors : $self->is_ok;
+}
+
+sub store_warning {
+    my ($self, $value, $silent) = @_ ;
+
     # old_warn is used to avoid warning the user several times for the
-    # same reason. We take care to clean up this hash each time this routine
-    # is run
+    # same reason (i.e. when storing and fetching value). We take care
+    # to clean up this hash each time store is run
     my $old_warn = $self->{old_warning_hash} || {};
     my %warn_h;
 
@@ -1169,18 +1177,18 @@ sub check_fetched_value {
         foreach my $w ( $self->all_warnings ) {
             $warn_h{$w} = 1;
             next if $old_warn->{$w};
-            my $str = defined $value ? "'$value'" : '<undef>';
+            my $str = $value // '<undef>';
+            chomp $str;
+            my $w_str = $str =~ /\n/ ? "\n+++++\n$str\n+++++" : "'$str'";
             if ($::_use_log4perl_to_warn) {
-                $user_logger->warn("Warning in '" . $self->location_short . "' value $str: $w");
+                $user_logger->warn("Warning in '" . $self->location_short . "': $w\nOffending value: $w_str");
             }
             else {
-                warn "Warning in '" . $self->location_short . "' value $str: $w\n";
+                warn "Warning in '" . $self->location_short . "': $w\nOffending value: $w_str\n";
             }
         }
     }
     $self->{old_warning_hash} = \%warn_h;
-
-    return wantarray ? $self->all_errors : $self->is_ok;
 }
 
 sub store {
@@ -1434,22 +1442,10 @@ sub check_stored_value {
 
     $self->needs_check(0) unless $self->has_error or $self->has_warning;
 
-    # avoid warning the user several times for the same value (at
-    # store time and then at fetch time).
-    my %warn_h;
-    if ( $self->has_warning and not $nowarning and not $silent ) {
-        foreach my $w ( $self->all_warnings ) {
-            $warn_h{$w} = 1;
-            my $str = defined $value ? "'$value'" : '<undef>';
-            if ($::_use_log4perl_to_warn) {
-                $user_logger->warn("Warning in '" . $self->location_short . "' value $str: $w");
-            }
-            else {
-                warn "Warning in '" . $self->location_short . "' value $str: $w\n";
-            }
-        }
-    }
-    $self->{old_warning_hash} = \%warn_h;
+    # must always warn when storing a value, hence clearing the list
+    # of already issued warnings
+    $self->{old_warning_hash} = {};
+    $self->store_warning($value, $silent);
 
     return wantarray ? ($ok,$fixed_value) : $ok;
 }
@@ -1475,7 +1471,9 @@ sub load_data {
     my %args  = @_ > 1 ? @_ : ( data => shift );
     my $data  = delete $args{data} // delete $args{value};
 
-    if ( ref $data ) {
+    my $rd = ref $data;
+
+    if ( $rd and grep { $rd eq $_ } qw/ARRAY HASH SCALAR/) {
         Config::Model::Exception::LoadData->throw(
             object     => $self,
             message    => "load_data called with non scalar arg",
@@ -1900,7 +1898,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.128
+version 2.129
 
 =head1 SYNOPSIS
 

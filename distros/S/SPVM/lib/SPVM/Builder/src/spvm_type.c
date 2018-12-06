@@ -207,7 +207,7 @@ int32_t SPVM_TYPE_has_interface(
   SPVM_PACKAGE* interface = interface_basic_type->package;
   
   // Package which have only anon sub
-  if (package->flag & SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB) {
+  if (package->flag & SPVM_PACKAGE_C_FLAG_ANON_SUB_PACKAGE) {
     assert(package->subs->length == 1);
     assert(interface->subs->length == 1);
     SPVM_SUB* sub_interface = SPVM_LIST_fetch(interface->subs, 0);
@@ -934,7 +934,7 @@ int32_t SPVM_TYPE_is_value_type(SPVM_COMPILER* compiler, int32_t basic_type_id, 
     SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
     // Package
     if (package) {
-      if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+      if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE) {
         is_value_t = 1;
       }
       else {
@@ -965,7 +965,7 @@ int32_t SPVM_TYPE_is_value_ref_type(SPVM_COMPILER* compiler, int32_t basic_type_
     SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
     // Package
     if (package) {
-      if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+      if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE) {
         is_value_ref_type = 1;
       }
       else {
@@ -996,7 +996,7 @@ int32_t SPVM_TYPE_is_value_array_type(SPVM_COMPILER* compiler, int32_t basic_typ
     SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, basic_type_name, strlen(basic_type_name));
     // Package
     if (package) {
-      if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+      if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE) {
         is_value_array_type = 1;
       }
       else {
@@ -1027,7 +1027,7 @@ int32_t SPVM_TYPE_basic_type_is_value_type(SPVM_COMPILER* compiler, int32_t basi
   
   // Package
   if (package) {
-    if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+    if (package->category == SPVM_PACKAGE_C_CATEGORY_VALUE) {
       is_basic_type_value_t = 1;
     }
     else {

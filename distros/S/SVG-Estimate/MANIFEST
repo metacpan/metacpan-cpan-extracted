@@ -90,6 +90,7 @@ t/var/illustrator-box-in.svg
 t/var/inkscape-box-in.svg
 t/var/inkscape-box-px.svg
 t/var/inkscapetest.svg
+t/var/move_arc.svg
 t/var/onesquare.svg
 t/var/onesquare_with_units.svg
 t/var/onesquare_with_units_transform.svg

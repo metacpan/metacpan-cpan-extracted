@@ -22,59 +22,45 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'leading_digits' => '52[0-79]',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '(8-$1)',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{6})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
             37|
             4(?:
-              1|
-              5[45]|
-              6[2-4]
+              [15]|
+              6[1-8]
             )
           ',
-                  'national_rule' => '(8-$1)',
-                  'format' => '$1 $2',
-                  'pattern' => '([34]\\d)(\\d{6})'
+                  'national_rule' => '(8-$1)'
                 },
                 {
-                  'pattern' => '([3-6]\\d{2})(\\d{5})',
+                  'leading_digits' => '[3-6]',
                   'format' => '$1 $2',
                   'national_rule' => '(8-$1)',
-                  'leading_digits' => '
-            3[148]|
-            4(?:
-              [24]|
-              6[09]
-            )|
-            528|
-            6
-          '
+                  'pattern' => '(\\d{3})(\\d{5})'
                 },
                 {
-                  'pattern' => '([7-9]\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '[7-9]',
+                  'national_rule' => '8 $1',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '8 $1'
-                },
-                {
-                  'pattern' => '(5)(2\\d{2})(\\d{4})',
-                  'leading_digits' => '52[0-79]',
-                  'national_rule' => '(8-$1)',
-                  'format' => '$1 $2 $3'
+                  'leading_digits' => '[7-9]',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})'
                 }
               ];
 
 my $validators = {
                 'mobile' => '6\\d{7}',
-                'specialrate' => '(808\\d{5})|(
-          9(?:
-            0[0239]|
-            10
-          )\\d{5}
-        )|(70[67]\\d{5})',
                 'pager' => '',
+                'voip' => '',
                 'geographic' => '
           (?:
             3[1478]|
@@ -82,16 +68,21 @@ my $validators = {
             52
           )\\d{6}
         ',
+                'toll_free' => '800\\d{5}',
+                'specialrate' => '(808\\d{5})|(
+          9(?:
+            0[0239]|
+            10
+          )\\d{5}
+        )|(70[67]\\d{5})',
+                'personal_number' => '700\\d{5}',
                 'fixed_line' => '
           (?:
             3[1478]|
             4[124-6]|
             52
           )\\d{6}
-        ',
-                'toll_free' => '800\\d{5}',
-                'personal_number' => '700\\d{5}',
-                'voip' => ''
+        '
               };
 my %areanames = (
   370310 => "Varėna",
@@ -139,7 +130,7 @@ my %areanames = (
   37046 => "Klaipėda",
   370460 => "Palanga",
   370469 => "Neringa",
-  3705 => "Vilnius",
+  37052 => "Vilnius",
   370528 => "Elektrėnai\/Trakai",
 );
     sub new {

@@ -22,11 +22,12 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [];
 
 my $validators = {
+                'pager' => '',
                 'mobile' => '
           (?:
             4[015-8]|
@@ -34,34 +35,34 @@ my $validators = {
             9\\d
           )\\d{6}
         ',
+                'voip' => '85[0-5]\\d{5}',
+                'toll_free' => '80[01]\\d{5}',
+                'geographic' => '79\\d{6}',
+                'fixed_line' => '79\\d{6}',
                 'specialrate' => '(
           810(?:
             0[0-6]|
             [2-8]\\d
           )\\d{3}
         )|(82[09]\\d{5})|(
-          0\\d{4}|
-          81(?:
-            0(?:
-              0[7-9]|
-              1\\d
-            )|
-            5\\d{2}
+          (?:
+            0\\d|
+            81(?:
+              0(?:
+                0[7-9]|
+                1\\d
+              )|
+              5\\d\\d
+            )
           )\\d{3}
         )',
-                'pager' => '',
-                'geographic' => '79\\d{6}',
-                'personal_number' => '880\\d{5}',
-                'voip' => '85[0-5]\\d{5}',
-                'fixed_line' => '79\\d{6}',
-                'toll_free' => '80[01]\\d{5}'
+                'personal_number' => '880\\d{5}'
               };
 my %areanames = (
   472 => "Oslo",
   4731 => "Buskerud",
   4732 => "Buskerud",
   4733 => "Vestfold",
-  4734 => "Vestfold",
   4735 => "Telemark",
   4737 => "Aust\-Agder",
   4738 => "Vest\-Agder",
@@ -71,7 +72,6 @@ my %areanames = (
   4755 => "Hordaland",
   4756 => "Hordaland",
   4757 => "Sogn\ og\ Fjordane",
-  4760 => "Oppland",
   4761 => "Oppland",
   4762 => "Hedmark",
   4763 => "Akershus",

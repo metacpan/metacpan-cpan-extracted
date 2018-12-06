@@ -1,7 +1,7 @@
 use v5.10.0;
 package JMAP::Tester::Response::Sentence;
 # ABSTRACT: a single triple within a JMAP response
-$JMAP::Tester::Response::Sentence::VERSION = '0.021';
+$JMAP::Tester::Response::Sentence::VERSION = '0.022';
 use Moo;
 
 use namespace::clean;
@@ -127,7 +127,7 @@ JMAP::Tester::Response::Sentence - a single triple within a JMAP response
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 

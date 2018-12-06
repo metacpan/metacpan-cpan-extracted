@@ -24,7 +24,7 @@ ok( !$@, "successful login" ) or diag( '$@:' . $@ );
 # RFC 2087: QUOTA
 SKIP: {
     my ( $res, $root );
-    skip "QUOTA not supported", 1 unless $imap->has_capability("QUOTA");
+    skip "QUOTA not supported", 5 unless $imap->has_capability("QUOTA");
 
     foreach my $root ( "", "INBOX", "/blah" ) {
         $res = $imap->getquotaroot($root);

@@ -57,6 +57,13 @@ Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 
 See L</ENCODING>.
 
+=head1 CONSTRUCTOR
+
+If desired, both C<URI::Fast> and L<URI::Fast::IRI> may be instantiated using
+the default constructor, C<new>.
+
+  my $uri = URI::Fast->new('http://www.example.com');
+
 =head1 ATTRIBUTES
 
 All attributes serve as full accessors, allowing the URI segment to be both

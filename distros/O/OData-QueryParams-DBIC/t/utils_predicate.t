@@ -8,8 +8,8 @@ use warnings;
 use Test::More;
 use OData::QueryParams::DBIC::FilterUtils qw(parser);
 
-is_deeply OData::QueryParams::DBIC::FilterUtils::predicate(undef), { operator => 'eq', subject => undef, value => undef };
-is_deeply OData::QueryParams::DBIC::FilterUtils::predicate(0), { operator => 'eq', subject => undef, value => undef };
+is_deeply OData::QueryParams::DBIC::FilterUtils::predicate(undef), { operator => 'eq', subject => undef, value => undef, val_type => undef, sub_type => undef };
+is_deeply OData::QueryParams::DBIC::FilterUtils::predicate(0), { operator => 'eq', subject => undef, value => undef, val_type => undef, sub_type => undef };
 
 my $parser = parser;
 is $parser->(undef), undef;

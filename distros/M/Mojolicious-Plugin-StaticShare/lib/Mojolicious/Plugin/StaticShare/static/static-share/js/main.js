@@ -195,7 +195,7 @@ $( document ).ready(function() {
   $('.files-col .btn-panel a.del-files').on('click', function(ev){
     var rows = [],
       files = [],
-      ul = $('<ul class="collection card">');
+      ul = $('<ul class="collection card blue lighten-4">');
     $('table.files input[type="checkbox"]:checked').each(function(){
       var chb = $(this);
       var tr = chb.closest('tr');
@@ -203,7 +203,7 @@ $( document ).ready(function() {
       if (a.text() == '' || a.attr('href') == '') return;
       rows.push(tr);
       files.push(a.text());
-      ul.append($('<li class="collection-item">').text(a.attr('href')));
+      ul.append($('<li class="collection-item blue-text text-darken-4">').text(a.attr('href')));
     });
     confirm_delete(rows, files, ul, 'del-files');
   });
@@ -284,7 +284,7 @@ $( document ).ready(function() {
   $('.dirs-col .btn-panel a.del-dirs').on('click', function(ev){
     var rows = [],
       dirs = [],
-      ul = $('<ul class="collection card">');
+      ul = $('<ul class="collection card lime lighten-4">');
     $('table.dirs input[type="checkbox"]:checked').each(function(){
       var chb = $(this);
       var tr = chb.closest('tr');
@@ -292,7 +292,7 @@ $( document ).ready(function() {
       if (a.text() == '' || a.attr('href') == '') return;
       rows.push(tr);
       dirs.push(a.text());
-      ul.append($('<li class="collection-item">').text(a.attr('href')));
+      ul.append($('<li class="collection-item lime-text text-darken-4">').text(a.attr('href')));
     });
     confirm_delete(rows, dirs, ul, 'del-dirs');
   });

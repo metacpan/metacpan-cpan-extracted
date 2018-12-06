@@ -1,13 +1,13 @@
 ---
 abstract: 'IMAP4 client library'
 author:
-  - 'Phil Pearl (Lobbes) <phil@zimbra.com>'
+  - 'Phil Pearl (Lobbes) <plobbes+mail-imapclient@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,4 +33,5 @@ requires:
   perl: '5.008'
 resources:
   homepage: http://sourceforge.net/projects/mail-imapclient/
-version: '3.39'
+version: '3.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

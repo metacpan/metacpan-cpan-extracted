@@ -36,11 +36,11 @@ Backup::EZ - Simple backups based on rsync
 
 =head1 VERSION
 
-Version 0.31
+Version 0.34
 
 =cut
 
-our $VERSION = '0.31';
+our $VERSION = '0.35';
 
 =head1 SYNOPSIS
 
@@ -340,11 +340,11 @@ sub _rsync2 {
     }
 
     if ($link_dest) {
-        push @$extra_opts, "--link-dest $link_dest";
+        push @$extra_opts, sprintf '--link-dest "%s"', $link_dest;
     }
 
     if ( $self->{exclude_file} ) {
-        push @$extra_opts, "--exclude-from " . $self->{exclude_file};
+        push @$extra_opts, sprintf '--exclude-from "%s"', $self->{exclude_file};
     }
 
     $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
@@ -353,7 +353,7 @@ sub _rsync2 {
     # uncoverable branch false
     if ( $self->_is_unit_test ) {
         $cmd = sprintf(
-            "rsync %s %s %s/ %s%s",
+            'rsync -s %s %s "%s/" "%s%s"',
             join(' ', @$extra_opts),
             $archive_opts,               # archive options
             $dir,                        # src dir
@@ -363,7 +363,7 @@ sub _rsync2 {
     }
     else {
         $cmd = sprintf(
-            "rsync %s %s -e ssh %s/ %s:%s%s",
+            'rsync -s %s %s -e ssh "%s/" %s:"%s%s"',
             join( ' ', @{$extra_opts} ),    # extra rsync options
             $archive_opts,                  # archive options
             $dir,                           # src dir

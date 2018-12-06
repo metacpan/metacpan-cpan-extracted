@@ -4,13 +4,13 @@
       "Dominique Dumont (ddumont@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Log-Dispatch-Tk",
    "no_index" : {
@@ -32,13 +32,21 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Dispatch" : "2.00",
-            "Log::Dispatch::Output" : "1.011",
+            "Log::Dispatch" : "2.68",
             "Tk" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.9",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log::Dispatch::ToTk"
+      },
+      "homepage" : "https://metacpan.org/pod/Log::Dispatch::ToTk",
+      "repository" : {
+         "url" : "https://github.com/dod38fr/log-dispatch-tk"
+      }
+   },
+   "version" : "2.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

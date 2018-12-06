@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'national_rule' => '(8 $1)',
                   'format' => '$1 $2-$3-$4',
-                  'leading_digits' => '12',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'leading_digits' => '12'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{6})',
@@ -38,45 +38,16 @@ my $formatters = [
                   'national_rule' => '8 $1'
                 },
                 {
-                  'leading_digits' => '
-            13|
-            [2-5]
-          ',
+                  'pattern' => '(\\d{3})(\\d)(\\d{2})(\\d{2})',
                   'national_rule' => '(8 $1)',
-                  'format' => '$1 $2-$3-$4',
-                  'pattern' => '(\\d{3})(\\d)(\\d{2})(\\d{2})'
+                  'leading_digits' => '[1-5]',
+                  'format' => '$1 $2-$3-$4'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
-          (?:
-            1(?:
-              2\\d|
-              3[1-9]
-            )|
-            2(?:
-              22|
-              4[0-35-8]
-            )|
-            3(?:
-              22|
-              4[03-9]
-            )|
-            4(?:
-              22|
-              3[128]|
-              4\\d|
-              6[15]
-            )|
-            5(?:
-              22|
-              5[7-9]|
-              6[014-689]
-            )
-          )\\d{5}
-        ',
+                'personal_number' => '',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             1(?:
@@ -104,11 +75,37 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'geographic' => '
+          (?:
+            1(?:
+              2\\d|
+              3[1-9]
+            )|
+            2(?:
+              22|
+              4[0-35-8]
+            )|
+            3(?:
+              22|
+              4[03-9]
+            )|
+            4(?:
+              22|
+              3[128]|
+              4\\d|
+              6[15]
+            )|
+            5(?:
+              22|
+              5[7-9]|
+              6[014-689]
+            )
+          )\\d{5}
+        ',
                 'toll_free' => '',
-                'personal_number' => '',
                 'voip' => '',
                 'mobile' => '6[1-9]\\d{6}',
-                'specialrate' => ''
+                'pager' => ''
               };
 
     sub new {

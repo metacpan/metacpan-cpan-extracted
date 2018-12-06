@@ -83,7 +83,7 @@
    "provides" : {
       "LWPx::UserAgent::Cached" : {
          "file" : "lib/LWPx/UserAgent/Cached.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/mjgardner/LWPx-UserAgent-Cached"
       }
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_generated_by_perl" : "v5.16.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }

@@ -40,6 +40,7 @@ my $origin = SVG::Estimate::Rect->new(
 isa_ok $origin, 'SVG::Estimate::Rect';
 is $origin->x, 0, 'default x';
 is $origin->y, 0, '... y';
+is $origin->min_x, 0, 'Rect with no x,y default to 0,0';
 
 my $line = SVG::Estimate::Rect->new(
     start_point => [1,1],

@@ -48,5 +48,10 @@ $furniture->estimate;
 cmp_ok $furniture->round($furniture->length), '==', 44755.084, 'furniture - length';
 cmp_ok $furniture->shape_count, '==', 563, 'furniture - shape count';
 
+my $move_arc = SVG::Estimate->new( file_path => $t.'/var/move_arc.svg' );
+$move_arc->estimate;
+cmp_ok $move_arc->round($move_arc->length), '==', 237.834, 'move_arc - length';
+cmp_ok $move_arc->shape_count, '==', 1, 'move_arc - shape count';
+
 done_testing();
 

@@ -11,6 +11,7 @@ my %optional = (
     "Compress::Zlib"   => { for => "COMPRESS DEFLATE support" },
     "Digest::HMAC_MD5" => { for => "Authmechanism 'CRAM-MD5'" },
     "Digest::MD5"      => { for => "Authmechanism 'DIGEST-MD5'" },
+    "IO::Socket::IP"   => { for => "IPv6 support" },
     "IO::Socket::SSL"  => { for => "SSL enabled connections (Ssl => 1)" },
     "Test::Pod"        => { for => "Pod tests", ver => "1.00" },
 );
@@ -57,7 +58,7 @@ do {
 
 WriteMakefile(
     NAME         => 'Mail::IMAPClient',
-    AUTHOR       => 'Phil Pearl (Lobbes) <phil@zimbra.com>',
+    AUTHOR       => 'Phil Pearl (Lobbes) <plobbes+mail-imapclient@gmail.com>',
     ABSTRACT     => 'IMAP4 client library',
     VERSION_FROM => 'lib/Mail/IMAPClient.pm',
     LICENSE      => 'perl',

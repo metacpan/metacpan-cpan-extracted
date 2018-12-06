@@ -22,34 +22,35 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214153;
+our $VERSION = 1.20181205223701;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '[29]',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
-                'mobile' => '9[1-49]\\d{7}',
-                'voip' => '',
-                'personal_number' => '',
-                'toll_free' => '',
-                'fixed_line' => '
-          2\\d(?:
-            [26-9]\\d|
-            \\d[26-9]
-          )\\d{5}
-        ',
                 'geographic' => '
           2\\d(?:
-            [26-9]\\d|
-            \\d[26-9]
+            [0134][25-9]|
+            [25-9]\\d
           )\\d{5}
         ',
-                'pager' => ''
+                'toll_free' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'fixed_line' => '
+          2\\d(?:
+            [0134][25-9]|
+            [25-9]\\d
+          )\\d{5}
+        ',
+                'mobile' => '9[1-49]\\d{7}',
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   24422 => "Luanda",
@@ -57,8 +58,12 @@ my %areanames = (
   244232 => "Zaire",
   2442321 => "Soyo",
   244233 => "Uige",
-  244234 => "Bengo",
+  2442342 => "Bengo",
+  2442345 => "Bengo",
+  2442346 => "Bengo",
+  2442347 => "Bengo",
   2442348 => "Caxito",
+  2442349 => "Bengo",
   244235 => "Cuanza\ Norte",
   2442358 => "N\'Dalatando",
   244236 => "Cuanza\ Sul",
@@ -73,14 +78,25 @@ my %areanames = (
   244252 => "Lunda\ Norte",
   2442524 => "Lucapa",
   2442526 => "Dundo",
-  244253 => "Lunda\ Sul",
+  2442532 => "Lunda\ Sul",
   2442535 => "Saurimo",
-  244254 => "Moxico",
+  2442536 => "Lunda\ Sul",
+  2442537 => "Lunda\ Sul",
+  2442538 => "Lunda\ Sul",
+  2442539 => "Lunda\ Sul",
+  2442542 => "Moxico",
+  2442545 => "Moxico",
   2442546 => "Luena",
-  244261 => "Huila",
+  2442547 => "Moxico",
+  2442548 => "Moxico",
+  2442549 => "Moxico",
   2442612 => "Lubango",
+  2442615 => "Huila",
+  2442616 => "Huila",
+  2442617 => "Huila",
+  2442618 => "Huila",
+  2442619 => "Huila",
   244264 => "Namibe",
-  2442643 => "Tombua",
   244265 => "Cunene",
   2442652 => "Kuroka",
   2442655 => "Ondjiva",

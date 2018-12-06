@@ -3,16 +3,20 @@ use strict;
 
 package JMAP::Tester::Result::Auth;
 # ABSTRACT: what you get when you authenticate
-$JMAP::Tester::Result::Auth::VERSION = '0.021';
+$JMAP::Tester::Result::Auth::VERSION = '0.022';
 use Moo;
-with 'JMAP::Tester::Role::Result';
+with 'JMAP::Tester::Role::HTTPResult';
 
 use namespace::clean;
 
 #pod =head1 OVERVIEW
 #pod
 #pod This is what you get when you authenticate!  It's got an C<is_success> method.
-#pod It returns true.
+#pod It returns true. It also has:
+#pod
+#pod =method client_session
+#pod
+#pod The client session struct
 #pod
 #pod =cut
 
@@ -36,12 +40,18 @@ JMAP::Tester::Result::Auth - what you get when you authenticate
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 
 This is what you get when you authenticate!  It's got an C<is_success> method.
-It returns true.
+It returns true. It also has:
+
+=head1 METHODS
+
+=head2 client_session
+
+The client session struct
 
 =head1 AUTHOR
 

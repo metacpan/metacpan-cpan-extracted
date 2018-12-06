@@ -44,7 +44,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_native_headers(SPVM_ENV* env, SPVM_STRING_BUFF
   
   for (int32_t sub_id = 1; sub_id < runtime->subs_length; sub_id++) {
     SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
-    if (sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC) {
+    if (sub->flag & SPVM_SUB_C_FLAG_NATIVE) {
       SPVM_RUNTIME_PACKAGE* sub_package = &runtime->packages[sub->package_id];
       const char* sub_name = &runtime->string_pool[sub->name_id];
       const char* sub_package_name = &runtime->string_pool[sub_package->name_id];
@@ -63,7 +63,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_precompile_headers(SPVM_ENV* env, SPVM_STRING_
   
   for (int32_t sub_id = 1; sub_id < runtime->subs_length; sub_id++) {
     SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
-    if (sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC) {
+    if (sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE) {
       SPVM_RUNTIME_PACKAGE* sub_package = &runtime->packages[sub->package_id];
       const char* sub_name = &runtime->string_pool[sub->name_id];
       const char* sub_package_name = &runtime->string_pool[sub_package->name_id];
@@ -83,7 +83,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_set_sub_native_addresses(SPVM_ENV* env, SPVM_P
   
   for (int32_t sub_id = 1; sub_id < runtime->subs_length; sub_id++) {
     SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
-    if (sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC) {
+    if (sub->flag & SPVM_SUB_C_FLAG_NATIVE) {
       SPVM_RUNTIME_PACKAGE* sub_package = &runtime->packages[sub->package_id];
       const char* sub_name = &runtime->string_pool[sub->name_id];
       const char* sub_package_name = &runtime->string_pool[sub_package->name_id];
@@ -105,7 +105,7 @@ void SPVM_CSOURCE_BUILDER_EXE_add_set_sub_precompile_addresses(SPVM_ENV* env, SP
   
   for (int32_t sub_id = 0; sub_id < runtime->subs_length; sub_id++) {
     SPVM_RUNTIME_SUB* sub = &runtime->subs[sub_id];
-    if (sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC) {
+    if (sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE) {
       SPVM_RUNTIME_PACKAGE* sub_package = &runtime->packages[sub->package_id];
       const char* sub_name = &runtime->string_pool[sub->name_id];
       const char* sub_package_name = &runtime->string_pool[sub_package->name_id];
@@ -192,8 +192,8 @@ void SPVM_CSOURCE_BUILDER_EXE_build_exe_csource(SPVM_ENV* env, SPVM_STRING_BUFFE
     SPVM_STRING_BUFFER_add(string_buffer, ".index = ");
     SPVM_STRING_BUFFER_add_int(string_buffer, runtime_field->index);
     SPVM_STRING_BUFFER_add(string_buffer, ", ");
-    SPVM_STRING_BUFFER_add(string_buffer, ".byte_offset = ");
-    SPVM_STRING_BUFFER_add_int(string_buffer, runtime_field->byte_offset);
+    SPVM_STRING_BUFFER_add(string_buffer, ".offset = ");
+    SPVM_STRING_BUFFER_add_int(string_buffer, runtime_field->offset);
     SPVM_STRING_BUFFER_add(string_buffer, ", ");
     SPVM_STRING_BUFFER_add(string_buffer, ".flag = ");
     SPVM_STRING_BUFFER_add_int(string_buffer, runtime_field->flag);
@@ -326,7 +326,7 @@ void SPVM_CSOURCE_BUILDER_EXE_build_exe_csource(SPVM_ENV* env, SPVM_STRING_BUFFE
     SPVM_STRING_BUFFER_add(string_buffer, ".fields_byte_size = ");
     SPVM_STRING_BUFFER_add_int(string_buffer, runtime_package->package_vars_length);
     SPVM_STRING_BUFFER_add(string_buffer, ", ");
-    SPVM_STRING_BUFFER_add(string_buffer, ".object_fields_byte_offset = ");
+    SPVM_STRING_BUFFER_add(string_buffer, ".object_fields_offset = ");
     SPVM_STRING_BUFFER_add_int(string_buffer, runtime_package->package_vars_length);
     SPVM_STRING_BUFFER_add(string_buffer, ", ");
     SPVM_STRING_BUFFER_add(string_buffer, ".object_fields_length = ");

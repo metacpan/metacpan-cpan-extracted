@@ -1,5 +1,10 @@
 Revision history for JMAP-Tester
 
+0.022     2018-12-06 06:24:38+11:00 Australia/Melbourne
+        - bytes_ref now returns a *reference* to a byte string
+        - allow created_creation_ids to work even if created is empty
+        - response_payload method, a generic way to get at a Result's response
+
 0.021     2018-08-27 15:16:43-04:00 America/New_York
         - autoflush output handle used for logging
 

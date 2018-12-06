@@ -22,26 +22,32 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'pattern' => '(2\\d)(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '2[12]',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
+                  'leading_digits' => '[236-9]',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '
-            2[3-9]|
-            [346-9]
-          ',
-                  'pattern' => '([2-46-9]\\d{2})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
+                'pager' => '',
+                'mobile' => '
+          9(?:
+            [1-36]\\d\\d|
+            480
+          )\\d{5}
+        ',
+                'voip' => '30\\d{7}',
+                'toll_free' => '80[02]\\d{6}',
+                'geographic' => '
           2(?:
             [12]\\d|
             [35][1-689]|
@@ -52,11 +58,7 @@ my $validators = {
             9[1256]
           )\\d{6}
         ',
-                'toll_free' => '80[02]\\d{6}',
-                'personal_number' => '884[0-4689]\\d{5}',
-                'voip' => '30\\d{7}',
-                'pager' => '',
-                'geographic' => '
+                'fixed_line' => '
           2(?:
             [12]\\d|
             [35][1-689]|
@@ -73,29 +75,24 @@ my $validators = {
             9[1579]
           )\\d{5}
         )|(
-          6(?:
-            0[178]|
-            4[68]
-          )\\d{6}|
-          76(?:
-            0[1-57]|
-            1[2-47]|
-            2[237]
-          )\\d{5}
-        )|(
-          7(?:
-            0(?:
-              7\\d|
-              8[17]
+          (?:
+            6(?:
+              0[178]|
+              4[68]
+            )\\d|
+            76(?:
+              0[1-57]|
+              1[2-47]|
+              2[237]
             )
           )\\d{5}
-        )',
-                'mobile' => '
-          9(?:
-            [1236]\\d{2}|
-            480
+        )|(
+          70(?:
+            7\\d|
+            8[17]
           )\\d{5}
-        '
+        )',
+                'personal_number' => '884[0-4689]\\d{5}'
               };
 my %areanames = (
   35121 => "Lisbon",

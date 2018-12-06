@@ -22,40 +22,65 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             22|
             3
-          ',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+          '
                 },
                 {
-                  'leading_digits' => '
-            2[13-9]|
-            [5-7]
-          ',
                   'national_rule' => '0$1',
+                  'leading_digits' => '[25-7]',
                   'format' => '$1 $2 $3',
-                  'pattern' => '([25-7]\\d{2})(\\d{2})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})'
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{5})',
+                  'national_rule' => '0$1',
                   'leading_digits' => '[89]',
-                  'format' => '$1 $2',
-                  'national_rule' => '0$1',
-                  'pattern' => '([89]\\d{2})(\\d{5})'
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
+                'toll_free' => '800\\d{5}',
+                'geographic' => '
+          (?:
+            (?:
+              2[1-9]|
+              3[1-79]
+            )\\d|
+            5(?:
+              33|
+              5[257]
+            )
+          )\\d{5}
+        ',
+                'fixed_line' => '
+          (?:
+            (?:
+              2[1-9]|
+              3[1-79]
+            )\\d|
+            5(?:
+              33|
+              5[257]
+            )
+          )\\d{5}
+        ',
+                'specialrate' => '(808\\d{5})|(90[056]\\d{5})|(803\\d{5})',
+                'personal_number' => '',
+                'pager' => '',
                 'mobile' => '
           (?:
             562|
-            6\\d{2}|
+            6\\d\\d|
             7(?:
               [189]\\d|
               6[07]|
@@ -63,31 +88,7 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'specialrate' => '(808\\d{5})|(90[056]\\d{5})|(803\\d{5})',
-                'geographic' => '
-          (?:
-            2[1-9]\\d|
-            3[1-79]\\d|
-            5(?:
-              33|
-              5[257]
-            )
-          )\\d{5}
-        ',
-                'pager' => '',
-                'voip' => '3[08]\\d{6}',
-                'personal_number' => '',
-                'toll_free' => '800\\d{5}',
-                'fixed_line' => '
-          (?:
-            2[1-9]\\d|
-            3[1-79]\\d|
-            5(?:
-              33|
-              5[257]
-            )
-          )\\d{5}
-        '
+                'voip' => '3[08]\\d{6}'
               };
 my %areanames = (
   373210 => "Grigoriopol",
@@ -130,7 +131,7 @@ my %areanames = (
   373297 => "Basarabeasca",
   373298 => "Comrat",
   373299 => "Cahul",
-  373533 => "Tiraspol",
+  37353 => "Tiraspol",
   373552 => "Bender",
   373555 => "Ribnita",
   373557 => "Slobozia",

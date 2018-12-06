@@ -22,30 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214153;
+our $VERSION = 1.20181205223701;
 
 my $formatters = [];
 
 my $validators = {
-                'personal_number' => '',
-                'voip' => '',
                 'fixed_line' => '6[2-467]\\d{3}',
-                'toll_free' => '',
-                'pager' => '',
-                'geographic' => '6[2-467]\\d{3}',
                 'specialrate' => '([01589]\\d{5})',
-                'mobile' => '4\\d{4}'
+                'personal_number' => '',
+                'geographic' => '6[2-467]\\d{3}',
+                'toll_free' => '',
+                'voip' => '',
+                'mobile' => '4\\d{4}',
+                'pager' => ''
               };
 my %areanames = (
-  2471 => "Georgetown",
-  2472 => "U\.S\.\ Base",
-  2473 => "Travellers\ Hill",
-  2474 => "Two\ Boats",
-  2475 => "Georgetown",
-  2476 => "Georgetown",
-  2477 => "Georgetown",
-  2478 => "Georgetown",
-  2479 => "Georgetown",
+  24762 => "US\ Base",
+  24763 => "Travellers\ Hill\ \&\ Airhead",
+  24764 => "Two\ Boats",
+  24766 => "Georgetown",
+  24767 => "Georgetown",
 );
     sub new {
       my $class = shift;

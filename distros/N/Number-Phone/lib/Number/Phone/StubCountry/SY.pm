@@ -22,66 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '[1-5]'
+                  'leading_digits' => '[1-5]',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '(9\\d{2})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '9'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
-          (?:
-            1(?:
-              1\\d?|
-              4\\d|
-              [2356]
-            )|
-            2(?:
-              1\\d?|
-              [235]
-            )|
-            3(?:
-              [13]\\d|
-              4
-            )|
-            4[13]|
-            5[1-3]
-          )\\d{6}
-        ',
-                'personal_number' => '',
-                'voip' => '',
-                'fixed_line' => '
-          (?:
-            1(?:
-              1\\d?|
-              4\\d|
-              [2356]
-            )|
-            2(?:
-              1\\d?|
-              [235]
-            )|
-            3(?:
-              [13]\\d|
-              4
-            )|
-            4[13]|
-            5[1-3]
-          )\\d{6}
-        ',
-                'toll_free' => '',
                 'mobile' => '
           9(?:
             22|
@@ -89,7 +47,43 @@ my $validators = {
             6[024-9]
           )\\d{6}
         ',
-                'specialrate' => ''
+                'pager' => '',
+                'voip' => '',
+                'geographic' => '
+          (?:
+            1[14]\\d|
+            2(?:
+              1\\d?|
+              [235]
+            )|
+            3(?:
+              [13]\\d|
+              4
+            )|
+            4[13]|
+            5[1-3]
+          )\\d{6}|
+          1[1-356]\\d{6}
+        ',
+                'toll_free' => '',
+                'personal_number' => '',
+                'specialrate' => '',
+                'fixed_line' => '
+          (?:
+            1[14]\\d|
+            2(?:
+              1\\d?|
+              [235]
+            )|
+            3(?:
+              [13]\\d|
+              4
+            )|
+            4[13]|
+            5[1-3]
+          )\\d{6}|
+          1[1-356]\\d{6}
+        '
               };
 
     sub new {

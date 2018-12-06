@@ -16,8 +16,11 @@ GetOptions(\my %opts, qw/
   save-cpanfile
   exclude-core
   perl-version=s
+  allow-test-pms
   features=s
   base-dir=s
+  ignore_re=s
+  ignore=s@
   recommends
   suggests
   develop
@@ -121,6 +124,16 @@ If Test::Class family is used under t/, this option is implicitly set.
 
 Set the base directory from where C<scan-perl-prereqs-nqlite>
 starts traversing files and directories.
+
+=item ignore
+
+Set a list of paths C<scan-perl-prereqs-nqlite> should ignore. This is
+useful when your distribution has a set of OS-specific modules, for example.
+
+=item ignore_re
+
+You can also specify a regexp instead of a list of paths. If this is
+set, C<ignore> options are ignored.
 
 =item blib
 

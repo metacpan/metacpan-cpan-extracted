@@ -22,23 +22,50 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '($1) $2-$3',
                   'intl_format' => '$1-$2-$3',
+                  'format' => '($1) $2-$3',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'specialrate' => '(900[2-9]\\d{6})',
+                'personal_number' => '
+          5(?:
+            00|
+            2[12]|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
                 'fixed_line' => '
+          869(?:
+            2(?:
+              29|
+              36
+            )|
+            302|
+            4(?:
+              6[015-9]|
+              70
+            )
+          )\\d{4}
+        ',
+                'geographic' => '
           869(?:
             2(?:
               29|
@@ -62,33 +89,7 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'personal_number' => '
-          5(?:
-            00|
-            2[12]|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
                 'voip' => '',
-                'pager' => '',
-                'geographic' => '
-          869(?:
-            2(?:
-              29|
-              36
-            )|
-            302|
-            4(?:
-              6[015-9]|
-              70
-            )
-          )\\d{4}
-        ',
-                'specialrate' => '(900[2-9]\\d{6})',
                 'mobile' => '
           869(?:
             5(?:
@@ -98,7 +99,8 @@ my $validators = {
             66\\d|
             76[02-7]
           )\\d{4}
-        '
+        ',
+                'pager' => ''
               };
 use Number::Phone::NANP::Data;
 sub areaname {

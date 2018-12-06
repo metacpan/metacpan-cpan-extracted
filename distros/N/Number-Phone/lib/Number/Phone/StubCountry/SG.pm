@@ -22,48 +22,53 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{4})(\\d{4})',
                   'leading_digits' => '
             [369]|
-            8[1-9]
+            8[1-8]
           ',
-                  'format' => '$1 $2',
-                  'pattern' => '([3689]\\d{3})(\\d{4})'
+                  'format' => '$1 $2'
                 },
                 {
-                  'pattern' => '(1[89]00)(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '1[89]00'
-                },
-                {
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '7000',
-                  'pattern' => '(7000)(\\d{4})(\\d{3})'
-                },
-                {
-                  'pattern' => '(800)(\\d{3})(\\d{4})',
-                  'leading_digits' => '800',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
+                  'leading_digits' => '8',
                   'format' => '$1 $2 $3'
+                },
+                {
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{4})',
+                  'leading_digits' => '1[89]',
+                  'format' => '$1 $2 $3'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '70',
+                  'pattern' => '(\\d{4})(\\d{4})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
                 'geographic' => '6[1-9]\\d{6}',
+                'toll_free' => '
+          (?:
+            18|
+            8
+          )00\\d{7}
+        ',
                 'fixed_line' => '6[1-9]\\d{6}',
-                'toll_free' => '1?800\\d{7}',
                 'personal_number' => '',
-                'voip' => '3[12]\\d{6}',
+                'specialrate' => '(1900\\d{7})|(7000\\d{7})',
                 'mobile' => '
           (?:
             8[1-8]|
             9[0-8]
           )\\d{6}
         ',
-                'specialrate' => '(1900\\d{7})|(7000\\d{7})'
+                'pager' => '',
+                'voip' => '3[12]\\d{6}'
               };
 
     sub new {

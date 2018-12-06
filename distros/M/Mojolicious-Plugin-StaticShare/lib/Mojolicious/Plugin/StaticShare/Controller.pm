@@ -105,7 +105,7 @@ sub post {
     if !$name && -d $to;
   
   return $c->render(json=>{error=>$c->i18n('file already exists')})
-    if -e $to;
+    if !$c->param('replace') && -e $to;
   
   eval { $file->asset->move_to($to) }
     or return $c->render(json=>{error=>$@  =~ /(.+) at /});
@@ -115,6 +115,19 @@ sub post {
     if $name;
   
   $c->render(json=>{ok=> $url_path->trailing_slash(0)->to_route});
+}
+
+# TODO DELETE request
+sub delete {
+  my ($c) = @_;
+  $c->_stash();
+  
+  my $file_path = $c->stash('file_path');
+  my $url_path = $c->stash('url_path');
+  
+  $c->app->log->debug($file_path, $url_path->to_route, $c->dumper($c->req->params->to_hash))
+    if $c->plugin->debug;
+  
 }
 
 sub _stash {

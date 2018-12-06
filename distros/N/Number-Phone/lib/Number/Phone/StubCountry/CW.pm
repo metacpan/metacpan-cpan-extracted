@@ -22,53 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214155;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '[13-7]',
-                  'format' => '$1 $2'
+                  'leading_digits' => '[3467]',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(9)(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '9'
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
+                  'leading_digits' => '9[4-8]',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
                 'voip' => '',
-                'fixed_line' => '
-          9(?:
-            [48]\\d{2}|
-            50\\d|
-            7(?:
-              2[0-24]|
-              [34]\\d|
-              6[35-7]|
-              77|
-              8[7-9]
-            )
-          )\\d{4}
-        ',
-                'toll_free' => '',
                 'pager' => '955\\d{5}',
-                'geographic' => '
-          9(?:
-            [48]\\d{2}|
-            50\\d|
-            7(?:
-              2[0-24]|
-              [34]\\d|
-              6[35-7]|
-              77|
-              8[7-9]
-            )
-          )\\d{4}
-        ',
-                'specialrate' => '(60[0-2]\\d{4})',
                 'mobile' => '
           9(?:
             5(?:
@@ -80,15 +51,46 @@ my $validators = {
               3[01]
             )
           )\\d{4}
+        ',
+                'fixed_line' => '
+          9(?:
+            (?:
+              [48]\\d|
+              50
+            )\\d|
+            7(?:
+              2[0-24]|
+              [34]\\d|
+              6[35-7]|
+              77|
+              8[7-9]
+            )
+          )\\d{4}
+        ',
+                'specialrate' => '(60[0-2]\\d{4})',
+                'personal_number' => '',
+                'toll_free' => '',
+                'geographic' => '
+          9(?:
+            (?:
+              [48]\\d|
+              50
+            )\\d|
+            7(?:
+              2[0-24]|
+              [34]\\d|
+              6[35-7]|
+              77|
+              8[7-9]
+            )
+          )\\d{4}
         '
               };
 my %areanames = (
   599318 => "St\.\ Eustatius",
   599416 => "Saba",
-  599715 => "Bonaire",
-  599717 => "Bonaire",
-  599718 => "Bonaire",
-  599750 => "Bonaire",
+  59971 => "Bonaire",
+  59975 => "Bonaire",
 );
     sub new {
       my $class = shift;

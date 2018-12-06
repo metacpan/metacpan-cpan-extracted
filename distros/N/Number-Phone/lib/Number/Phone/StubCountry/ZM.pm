@@ -22,43 +22,42 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223705;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{4})',
-                  'national_rule' => '$1',
-                  'format' => '$1 $2'
-                },
-                {
-                  'national_rule' => '$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '[1-8]',
-                  'pattern' => '([1-8])(\\d{2})(\\d{4})'
-                },
-                {
-                  'leading_digits' => '[29]',
                   'format' => '$1 $2',
-                  'national_rule' => '0$1',
-                  'pattern' => '([29]\\d)(\\d{7})'
+                  'intl_format' => 'NA',
+                  'pattern' => '(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(800)(\\d{3})(\\d{3})',
-                  'leading_digits' => '800',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'leading_digits' => '[28]',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
+                },
+                {
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'leading_digits' => '[79]',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{2})(\\d{7})'
                 }
               ];
 
 my $validators = {
+                'mobile' => '
+          (?:
+            76|
+            9[5-8]
+          )\\d{7}
+        ',
                 'pager' => '',
+                'voip' => '',
                 'geographic' => '21[1-8]\\d{6}',
-                'fixed_line' => '21[1-8]\\d{6}',
                 'toll_free' => '800\\d{6}',
                 'personal_number' => '',
-                'voip' => '',
-                'mobile' => '9[4-9]\\d{7}',
-                'specialrate' => ''
+                'specialrate' => '',
+                'fixed_line' => '21[1-8]\\d{6}'
               };
 my %areanames = (
   260211 => "Lusaka\ Province",

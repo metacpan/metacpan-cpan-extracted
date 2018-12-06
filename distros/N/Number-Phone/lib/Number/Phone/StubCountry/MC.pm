@@ -22,57 +22,64 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'leading_digits' => '8',
+                  'format' => '$1 $2 $3',
+                  'intl_format' => 'NA',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})'
+                },
+                {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'leading_digits' => '[39]',
-                  'national_rule' => '$1',
                   'format' => '$1 $2 $3 $4'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'leading_digits' => '4',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '4',
                   'national_rule' => '0$1'
                 },
                 {
-                  'leading_digits' => '6',
-                  'format' => '$1 $2 $3 $4 $5',
+                  'pattern' => '(\\d)(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
                   'national_rule' => '0$1',
-                  'pattern' => '(6)(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
-                },
-                {
-                  'leading_digits' => '8',
-                  'national_rule' => '$1',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})'
+                  'leading_digits' => '6',
+                  'format' => '$1 $2 $3 $4 $5'
                 }
               ];
 
 my $validators = {
+                'geographic' => '
+          (?:
+            870|
+            9[2-47-9]\\d
+          )\\d{5}
+        ',
                 'toll_free' => '90\\d{6}',
                 'fixed_line' => '
-          870\\d{5}|
-          9[2-47-9]\\d{6}
+          (?:
+            870|
+            9[2-47-9]\\d
+          )\\d{5}
         ',
-                'voip' => '',
                 'personal_number' => '',
-                'geographic' => '
-          870\\d{5}|
-          9[2-47-9]\\d{6}
-        ',
-                'pager' => '',
                 'specialrate' => '',
                 'mobile' => '
-          3\\d{7}|
-          4(?:
-            4\\d|
-            5[1-9]
-          )\\d{5}|
-          6\\d{8}
-        '
+          (?:
+            (?:
+              3|
+              6\\d
+            )\\d\\d|
+            4(?:
+              4\\d|
+              5[1-9]
+            )
+          )\\d{5}
+        ',
+                'pager' => '',
+                'voip' => ''
               };
 
     sub new {

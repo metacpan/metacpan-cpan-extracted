@@ -22,30 +22,39 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214154;
+our $VERSION = 1.20181205223702;
 
 my $formatters = [
                 {
                   'leading_digits' => '
-            1|
-            77
-          ',
-                  'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
-                },
-                {
-                  'leading_digits' => '
-            [2-68]|
+            [23568]|
+            4[5-7]|
             7[246]
           ',
                   'format' => '$1 $2 $3',
-                  'pattern' => '([2-8])(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '
+            1[67]|
+            7
+          '
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'personal_number' => '',
+                'geographic' => '
+          (?:
+            2[3-6]|
+            [34][5-7]|
+            5[236]|
+            6[2-46]|
+            7[246]|
+            8[2-4]
+          )\\d{5}
+        ',
                 'toll_free' => '',
                 'fixed_line' => '
           (?:
@@ -57,24 +66,16 @@ my $validators = {
             8[2-4]
           )\\d{5}
         ',
-                'geographic' => '
-          (?:
-            2[3-6]|
-            [34][5-7]|
-            5[236]|
-            6[2-46]|
-            7[246]|
-            8[2-4]
-          )\\d{5}
-        ',
-                'pager' => '',
+                'personal_number' => '',
                 'specialrate' => '',
                 'mobile' => '
           (?:
             1[67]|
             77
           )\\d{6}
-        '
+        ',
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   9752 => "Thimphu",

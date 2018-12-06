@@ -22,161 +22,194 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{2})(\\d{3})',
                   'format' => '$1 $2',
                   'leading_digits' => '
-            [2-5]|
-            7[1-9]|
-            [89](?:
+            2(?:
+              0[2-689]|
+              [2-9]
+            )|
+            3(?:
+              [0-46-9]|
+              5[013-9]
+            )|
+            [457]|
+            8(?:
               0[2-9]|
-              [1-9]
-            )
-          ',
-                  'pattern' => '(\\d{2})(\\d{3})'
-                },
-                {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '
-            [2-5]|
-            7[1-9]|
-            [89](?:
-              0[2-9]|
-              [1-9]
+              [13-9]
+            )|
+            9(?:
+              0[89]|
+              [2-579]
             )
           '
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '20',
-                  'format' => '$1 $2 $3'
-                },
-                {
-                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             2(?:
-              [0367]|
+              0[2-689]|
+              [2-9]
+            )|
+            3(?:
+              [0-46-9]|
+              5[013-9]
+            )|
+            [457]|
+            8(?:
+              0[2-9]|
+              [13-9]
+            )|
+            9(?:
+              0[89]|
+              [2-579]
+            )
+          ',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '20[2-689]',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
+                },
+                {
+                  'leading_digits' => '
+            2(?:
+              0[1-689]|
+              [367]|
               4[3-8]
             )
           ',
+                  'format' => '$1 $2 $3 $4',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})'
                 },
                 {
+                  'leading_digits' => '
+            80[01]|
+            90[015]
+          ',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})'
+                },
+                {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '20',
+                  'leading_digits' => '20[2-689]',
                   'format' => '$1 $2 $3 $4'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '6',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})',
                   'format' => '$1 $2 $3 $4 $5',
                   'leading_digits' => '
             2(?:
-              [0367]|
+              0[2-689]|
+              [367]|
               4[3-8]
             )
           '
                 },
                 {
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{1,5})',
                   'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
-            2(?:
-              [12589]|
-              4[12]
+            2[2-9]|
+            3(?:
+              [0-46-9]|
+              5[013-9]
             )|
-            [3-5]|
-            7[1-9]|
+            [457]|
             8(?:
               0[2-9]|
-              [1-9]
+              [13-9]
             )|
             9(?:
-              0[2-46-9]|
-              [1-9]
+              0[89]|
+              [2-579]
             )
-          ',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{1,4})'
-                },
-                {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})',
-                  'leading_digits' => '
-            70|
-            80[01]|
-            90[015]
-          ',
-                  'format' => '$1 $2 $3'
-                },
-                {
-                  'leading_digits' => '6',
-                  'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+          '
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
-          (?:
-            2[2-9]\\d{2,9}|
-            (?:
-              3(?:
-                [0-46-9]\\d|
-                5[013-9]
-              )|
-              [457]\\d{2}|
-              8(?:
-                0[2-9]|
-                [13-9]\\d
-              )|
-              9(?:
-                0[89]|
-                [2-579]\\d
-              )
-            )\\d{1,8}
-          )
-        ',
-                'fixed_line' => '
-          (?:
-            2[2-9]\\d{2,9}|
-            (?:
-              3(?:
-                [0-46-9]\\d|
-                5[013-9]
-              )|
-              [457]\\d{2}|
-              8(?:
-                0[2-9]|
-                [13-9]\\d
-              )|
-              9(?:
-                0[89]|
-                [2-579]\\d
-              )
-            )\\d{1,8}
-          )
-        ',
-                'toll_free' => '800\\d{5}',
-                'personal_number' => '',
                 'voip' => '
           20(?:
             1\\d{5}|
             [2-689]\\d{1,7}
           )
         ',
-                'mobile' => '6[25-79][18]\\d{6}',
-                'specialrate' => '(801\\d{5})|(90[015]\\d{5})'
+                'pager' => '',
+                'mobile' => '
+          6(?:
+            [269][18]|
+            5[158]|
+            7[189]|
+            81
+          )\\d{6}
+        ',
+                'specialrate' => '(801\\d{5})|(90[015]\\d{5})',
+                'personal_number' => '',
+                'fixed_line' => '
+          (?:
+            (?:
+              2[2-9]|
+              [457]\\d
+            )\\d|
+            3(?:
+              [0-46-9]\\d|
+              5[013-9]
+            )|
+            8(?:
+              0[2-9]|
+              [13-9]\\d
+            )|
+            9(?:
+              0[89]|
+              [2-579]\\d
+            )
+          )\\d{1,8}
+        ',
+                'toll_free' => '800\\d{5}',
+                'geographic' => '
+          (?:
+            (?:
+              2[2-9]|
+              [457]\\d
+            )\\d|
+            3(?:
+              [0-46-9]\\d|
+              5[013-9]
+            )|
+            8(?:
+              0[2-9]|
+              [13-9]\\d
+            )|
+            9(?:
+              0[89]|
+              [2-579]\\d
+            )
+          )\\d{1,8}
+        '
               };
 my %areanames = (
-  35221 => "Weicherdange",
   35222 => "Luxembourg\ City",
   35223 => "Mondorf\-les\-Bains\/Bascharage\/Noerdange\/Remich",
-  35224 => "Luxembourg",
+  352240 => "Luxembourg",
+  352241 => "Luxembourg",
+  3522420 => "Luxembourg",
   3522421 => "Weicherdange",
   3522422 => "Luxembourg\ City",
   3522423 => "Mondorf\-les\-Bains\/Bascharage\/Noerdange\/Remich",
+  3522424 => "Luxembourg",
   3522425 => "Luxembourg",
+  3522426 => "Luxembourg",
   3522427 => "Belair\,\ Luxembourg",
   3522428 => "Luxembourg\ City",
   3522429 => "Luxembourg\/Kockelscheuer",
@@ -188,11 +221,15 @@ my %areanames = (
   3522435 => "Sandweiler\/Moutfort\/Roodt\-sur\-Syre",
   3522436 => "Hesperange\/Kockelscheuer\/Roeser",
   3522437 => "Leudelange\/Ehlange\/Mondercange",
+  3522438 => "Luxembourg",
   3522439 => "Windhof\/Steinfort",
   3522440 => "Howald",
+  3522441 => "Luxembourg",
   3522442 => "Plateau\ de\ Kirchberg",
   3522443 => "Findel\/Kirchberg",
+  3522444 => "Luxembourg",
   3522445 => "Diedrich",
+  3522446 => "Luxembourg",
   3522447 => "Lintgen",
   3522448 => "Contern\/Foetz",
   3522449 => "Howald",
@@ -206,22 +243,29 @@ my %areanames = (
   3522457 => "Esch\-sur\-Alzette\/Schifflange",
   3522458 => "Soleuvre\/Differdange",
   3522459 => "Soleuvre",
+  352246 => "Luxembourg",
   3522467 => "Dudelange",
+  3522470 => "Luxembourg",
   3522471 => "Betzdorf",
   3522472 => "Echternach",
   3522473 => "Rosport",
   3522474 => "Wasserbillig",
   3522475 => "Grevenmacher\-sur\-Moselle",
   3522476 => "Wormeldange",
+  3522477 => "Luxembourg",
   3522478 => "Junglinster",
   3522479 => "Berdorf\/Consdorf",
   3522480 => "Diekirch",
   3522481 => "Ettelbruck\/Reckange\-sur\-Mess",
+  3522482 => "Luxembourg",
   3522483 => "Vianden",
   3522484 => "Han\/Lesse",
   3522485 => "Bissen\/Roost",
+  3522486 => "Luxembourg",
   3522487 => "Larochette",
   3522488 => "Mertzig\/Wahl",
+  3522489 => "Luxembourg",
+  352249 => "Luxembourg",
   3522492 => "Clervaux\/Fischbach\/Hosingen",
   3522495 => "Wiltz",
   3522497 => "Huldange",
@@ -344,11 +388,13 @@ my %areanames = (
   35236 => "Hesperange\/Kockelscheuer\/Roeser",
   35237 => "Leudelange\/Ehlange\/Mondercange",
   35239 => "Windhof\/Steinfort",
-  3524 => "Luxembourg\ City",
   35240 => "Howald",
+  35241 => "Luxembourg\ City",
   35242 => "Plateau\ de\ Kirchberg",
   35243 => "Findel\/Kirchberg",
+  35244 => "Luxembourg\ City",
   35245 => "Diedrich",
+  35246 => "Luxembourg\ City",
   35247 => "Lintgen",
   35248 => "Contern\/Foetz",
   35249 => "Howald",
@@ -389,7 +435,7 @@ my %areanames = (
       $number =~ s/(^\+352|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
-      $number =~ s/^(?:(15(?:0[06]|1[12]|35|4[04]|55|6[26]|77|88|99)\d))//;
+      $number =~ s/^(?:(15(?:0[06]|1[12]|[35]5|4[04]|6[26]|77|88|99)\d))//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }

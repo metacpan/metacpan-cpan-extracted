@@ -5,7 +5,7 @@ package LWPx::UserAgent::Cached;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 ## no critic (Bangs::ProhibitCommentedOutCode)
 
@@ -145,6 +145,21 @@ has ref_in_cache_key => ( is => 'rw', isa => Bool, default => 0 );
 
 has positive_cache => ( is => 'rw', isa => Bool, default => 1 );
 
+#pod =attr ignore_headers
+#pod
+#pod Settable at construction or anytime thereafter, indicates whether we should
+#pod ignore C<Cache-Control: no-cache>, C<Cache-Control: no-store>, and
+#pod C<Pragma: no-cache> HTTP headers when deciding whether to cache a response.
+#pod Defaults to false.
+#pod
+#pod B<Important note:> This option is potentially dangerous, as it ignores the
+#pod explicit instructions from the server and thus can lead to returning stale
+#pod content.
+#pod
+#pod =cut
+
+has ignore_headers => ( is => 'rw', isa => Bool, default => 0 );
+
 #pod =head1 HANDLERS
 #pod
 #pod This module works by adding C<request_send>, C<response_done> and
@@ -239,13 +254,14 @@ sub _set_cache {
     }
 
     $response->decode;
-    $response->remove_content_headers;
     $self->cache->set( $response->request->as_string => $response );
     return;
 }
 
 sub _no_cache_header_directives {
     my ( $self, $message ) = @_;
+    return if $self->ignore_headers;
+
     for my $header_name (qw(pragma cache_control)) {
         if ( my @directives = $message->header($header_name) ) {
             return 1 if any {/\A no- (?: cache | store ) /xms} @directives;
@@ -281,7 +297,7 @@ LWPx::UserAgent::Cached - Subclass of LWP::UserAgent that caches HTTP GET reques
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -353,6 +369,17 @@ store the HTTP referrer in the cache key. Defaults to false.
 Settable at construction or anytime thereafter, indicates whether we should
 only cache positive responses (HTTP response codes from C<200> to C<300>
 inclusive) or cache everything. Defaults to true.
+
+=head2 ignore_headers
+
+Settable at construction or anytime thereafter, indicates whether we should
+ignore C<Cache-Control: no-cache>, C<Cache-Control: no-store>, and
+C<Pragma: no-cache> HTTP headers when deciding whether to cache a response.
+Defaults to false.
+
+B<Important note:> This option is potentially dangerous, as it ignores the
+explicit instructions from the server and thus can lead to returning stale
+content.
 
 =head1 REQUIRES
 

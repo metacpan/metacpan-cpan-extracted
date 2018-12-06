@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -18,8 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  Log::Dispatch: '2.00'
-  Log::Dispatch::Output: '1.011'
+  Log::Dispatch: '2.68'
   Tk: '0'
-version: '1.9'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log::Dispatch::ToTk
+  homepage: https://metacpan.org/pod/Log::Dispatch::ToTk
+  repository: https://github.com/dod38fr/log-dispatch-tk
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

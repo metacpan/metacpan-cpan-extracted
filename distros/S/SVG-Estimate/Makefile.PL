@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "XML::Hash::LX" => 0,
     "XML::LibXML" => 0
   },
-  "VERSION" => "1.0108",
+  "VERSION" => "1.0109",
   "test" => {
     "TESTS" => "t/*.t t/Path/*.t"
   }

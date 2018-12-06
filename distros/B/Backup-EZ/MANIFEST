@@ -1,14 +1,12 @@
-.project
-.travis.yml
 bin/ezbackup
-build.sh
 Changes
-cpan-upload.sh
 ignore.txt
 lib/Backup/EZ.pm
 lib/Backup/EZ/Dir.pm
-Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
 README
 share/ezbackup.conf
 share/ezbackup_exclude.rsync

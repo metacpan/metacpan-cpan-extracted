@@ -22,40 +22,41 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214153;
+our $VERSION = 1.20181205223702;
 
 my $formatters = [];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '18[1-8]\\d{3,9}',
-                'fixed_line' => '18[1-8]\\d{3,9}',
-                'toll_free' => '800\\d{4,7}',
+                'geographic' => '18[1-8]\\d{3,6}',
+                'toll_free' => '800\\d{4,6}',
                 'personal_number' => '',
-                'voip' => '',
-                'mobile' => '
-          4\\d{5,10}|
-          50\\d{4,8}
-        ',
                 'specialrate' => '([67]00\\d{5,6})|(
-          [13]0\\d{4,8}|
-          2(?:
-            0(?:
-              [016-8]\\d{3,7}|
-              [2-59]\\d{2,7}
-            )|
-            9\\d{4,8}
-          )|
+          (?:
+            10|
+            [23][09]
+          )\\d{4,8}|
           60(?:
             [12]\\d{5,6}|
             6\\d{7}
           )|
           7(?:
-            1\\d{7}|
-            3\\d{8}|
-            5[03-9]\\d{2,7}
-          )
-        )'
+            (?:
+              1|
+              3\\d
+            )\\d{7}|
+            5[03-9]\\d{3,7}
+          )|
+          20[2-59]\\d\\d
+        )',
+                'fixed_line' => '18[1-8]\\d{3,6}',
+                'mobile' => '
+          (?:
+            4[0-8]|
+            50
+          )\\d{4,8}
+        ',
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   35813 => "North\ Karelia",
@@ -104,14 +105,7 @@ my %areanames = (
   35886 => "Oulu",
   35887 => "Oulu",
   35888 => "Oulu",
-  35891 => "Helsinki",
-  35892 => "Helsinki",
-  35893 => "Helsinki",
-  35894 => "Helsinki",
-  35895 => "Helsinki",
-  35896 => "Helsinki",
-  35897 => "Helsinki",
-  35898 => "Helsinki",
+  3589 => "Helsinki",
 );
     sub new {
       my $class = shift;

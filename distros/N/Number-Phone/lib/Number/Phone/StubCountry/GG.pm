@@ -22,139 +22,150 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
-                  'pattern' => '(7\\d{3})(\\d{6})',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '845464',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})'
+                },
+                {
+                  'format' => '$1 $2',
+                  'leading_digits' => '8001111',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{4})'
+                },
+                {
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'leading_digits' => '800',
+                  'pattern' => '(\\d{3})(\\d{6})'
+                },
+                {
+                  'national_rule' => '0$1',
+                  'leading_digits' => '
+            1(?:
+              [24][02-9]|
+              3(?:
+                [02-79]|
+                8(?:
+                  [0-4689]|
+                  7[0-24-9]
+                )
+              )|
+              5(?:
+                [04-9]|
+                2(?:
+                  [025-9]|
+                  4[013-9]
+                )|
+                3(?:
+                  [014-68]|
+                  9[0-37-9]
+                )
+              )|
+              6(?:
+                [02-8]|
+                9(?:
+                  [0-2458]|
+                  7[0-25689]
+                )
+              )|
+              7(?:
+                [02-57-9]|
+                6(?:
+                  [013-79]|
+                  8[0-25689]
+                )
+              )|
+              8|
+              9(?:
+                [0235-9]|
+                4(?:
+                  [2-57-9]|
+                  6[0-689]
+                )
+              )
+            )
+          ',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{4})(\\d{5,6})'
+                },
+                {
+                  'pattern' => '(\\d{5})(\\d{4,5})',
                   'national_rule' => '0$1',
                   'format' => '$1 $2',
                   'leading_digits' => '
-            7(?:
-              [1-57-9]|
-              624
+            1(?:
+              38|
+              5[23]|
+              69|
+              7|
+              94
             )
           '
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
+                  'national_rule' => '0$1',
                   'leading_digits' => '
-            2|
-            5[56]|
-            7[06]
+            [25]|
+            7(?:
+              0|
+              6(?:
+                [04-9]|
+                2[356]
+              )
+            )
           ',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '
-            1(?:
-              [02-9]1|
-              1
-            )|
-            3|
-            9[018]
-          ',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
+                  'leading_digits' => '[1389]',
+                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '
-            1(?:
-              3873|
-              5(?:
-                242|
-                39[4-6]
-              )|
-              (?:
-                697|
-                768
-              )[347]|
-              9467
-            )
-          ',
-                  'format' => '$1 $2',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{5})(\\d{4,5})'
-                },
-                {
-                  'leading_digits' => '1',
-                  'format' => '$1 $2',
-                  'national_rule' => '0$1',
-                  'pattern' => '(1\\d{3})(\\d{5,6})'
-                },
-                {
-                  'pattern' => '(800)(\\d{4})',
-                  'leading_digits' => '8001111',
+                  'pattern' => '(\\d{4})(\\d{6})',
+                  'leading_digits' => '7',
                   'format' => '$1 $2',
                   'national_rule' => '0$1'
-                },
-                {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '845464',
-                  'pattern' => '(845)(46)(4\\d)'
-                },
-                {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '
-            8(?:
-              4[2-5]|
-              7[0-3]
-            )
-          ',
-                  'pattern' => '(8\\d{2})(\\d{3})(\\d{4})'
-                },
-                {
-                  'leading_digits' => '80',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'pattern' => '(80\\d)(\\d{3})(\\d{4})'
-                },
-                {
-                  'format' => '$1 $2',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '800',
-                  'pattern' => '(800)(\\d{6})'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          7(?:
-            781\\d|
-            839\\d|
-            911[17]
-          )\\d{5}
+                'toll_free' => '
+          80[08]\\d{7}|
+          800\\d{6}|
+          8001111
         ',
+                'geographic' => '1481[25-9]\\d{5}',
+                'personal_number' => '70\\d{8}',
                 'specialrate' => '(
-          8(?:
-            4(?:
-              5464\\d|
-              [2-5]\\d{7}
-            )|
-            70\\d{7}
-          )
-        )|(
           (?:
-            87[123]|
+            8(?:
+              4[2-5]|
+              7[0-3]
+            )|
             9(?:
               [01]\\d|
               8[0-3]
             )
-          )\\d{7}
+          )\\d{7}|
+          845464\\d
         )|(
           (?:
             3[0347]|
             55
           )\\d{8}
         )',
-                'geographic' => '1481[25-9]\\d{5}',
+                'fixed_line' => '1481[25-9]\\d{5}',
                 'pager' => '
           76(?:
-            0[012]|
+            0[0-2]|
             2[356]|
             4[0134]|
             5[49]|
@@ -164,18 +175,16 @@ my $validators = {
             9[39]
           )\\d{6}
         ',
-                'voip' => '56\\d{8}',
-                'personal_number' => '70\\d{8}',
-                'toll_free' => '
-          80(?:
-            0(?:
-              1111|
-              \\d{6,7}
-            )|
-            8\\d{7}
-          )
+                'mobile' => '
+          7(?:
+            (?:
+              781|
+              839
+            )\\d|
+            911[17]
+          )\\d{5}
         ',
-                'fixed_line' => '1481[25-9]\\d{5}'
+                'voip' => '56\\d{8}'
               };
 my %areanames = (
   44113 => "Leeds",
@@ -344,26 +353,13 @@ my %areanames = (
   441383 => "Dunfermline",
   441384 => "Dudley",
   441386 => "Evesham",
-  4413870 => "Dumfries",
-  4413871 => "Dumfries",
-  4413872 => "Dumfries",
+  441387 => "Dumfries",
   4413873 => "Langholm",
-  4413874 => "Dumfries",
-  4413875 => "Dumfries",
-  4413876 => "Dumfries",
-  4413877 => "Dumfries",
-  4413878 => "Dumfries",
-  4413879 => "Dumfries",
+  441388 => "Bishop\ Auckland",
   4413880 => "Bishop\ Auckland\/Stanhope\ \(Eastgate\)",
   4413881 => "Bishop\ Auckland\/Stanhope\ \(Eastgate\)",
   4413882 => "Stanhope\ \(Eastgate\)",
-  4413883 => "Bishop\ Auckland",
-  4413884 => "Bishop\ Auckland",
   4413885 => "Stanhope\ \(Eastgate\)",
-  4413886 => "Bishop\ Auckland",
-  4413887 => "Bishop\ Auckland",
-  4413888 => "Bishop\ Auckland",
-  4413889 => "Bishop\ Auckland",
   441389 => "Dumbarton",
   441392 => "Exeter",
   441394 => "Felixstowe",
@@ -467,25 +463,13 @@ my %areanames = (
   441476 => "Grantham",
   441477 => "Holmes\ Chapel",
   441478 => "Isle\ of\ Skye\ \-\ Portree",
-  4414790 => "Grantown\-on\-Spey",
-  4414791 => "Grantown\-on\-Spey",
-  4414792 => "Grantown\-on\-Spey",
-  4414793 => "Grantown\-on\-Spey",
-  4414794 => "Grantown\-on\-Spey",
-  4414795 => "Grantown\-on\-Spey",
-  4414796 => "Grantown\-on\-Spey",
-  4414797 => "Grantown\-on\-Spey",
-  44147980 => "Grantown\-on\-Spey",
+  441479 => "Grantown\-on\-Spey",
   44147981 => "Aviemore",
   44147982 => "Nethy\ Bridge",
   44147983 => "Boat\ of\ Garten",
   44147984 => "Carrbridge",
   44147985 => "Dulnain\ Bridge",
   44147986 => "Cairngorm",
-  44147987 => "Grantown\-on\-Spey",
-  44147988 => "Grantown\-on\-Spey",
-  44147989 => "Grantown\-on\-Spey",
-  4414799 => "Grantown\-on\-Spey",
   441480 => "Huntingdon",
   441481 => "Guernsey",
   441482 => "Kingston\-upon\-Hull",
@@ -524,16 +508,8 @@ my %areanames = (
   44151 => "Liverpool",
   441520 => "Lochcarron",
   441522 => "Lincoln",
-  4415240 => "Lancaster",
-  4415241 => "Lancaster",
+  441524 => "Lancaster",
   4415242 => "Hornby",
-  4415243 => "Lancaster",
-  4415244 => "Lancaster",
-  4415245 => "Lancaster",
-  4415246 => "Lancaster",
-  4415247 => "Lancaster",
-  4415248 => "Lancaster",
-  4415249 => "Lancaster",
   441525 => "Leighton\ Buzzard",
   441526 => "Martin",
   441527 => "Redditch",
@@ -545,16 +521,10 @@ my %areanames = (
   441535 => "Keighley",
   441536 => "Kettering",
   441538 => "Ipstones",
-  4415390 => "Kendal",
-  4415391 => "Kendal",
-  4415392 => "Kendal",
-  4415393 => "Kendal",
+  441539 => "Kendal",
   4415394 => "Hawkshead",
   4415395 => "Grange\-over\-Sands",
   4415396 => "Sedbergh",
-  4415397 => "Kendal",
-  4415398 => "Kendal",
-  4415399 => "Kendal",
   441540 => "Kingussie",
   441542 => "Keith",
   441543 => "Cannock",
@@ -686,16 +656,9 @@ my %areanames = (
   441692 => "North\ Walsham",
   441694 => "Church\ Stretton",
   441695 => "Skelmersdale",
-  4416970 => "Brampton",
-  4416971 => "Brampton",
-  4416972 => "Brampton",
+  441697 => "Brampton",
   4416973 => "Wigton",
   4416974 => "Raughton\ Head",
-  4416975 => "Brampton",
-  4416976 => "Brampton",
-  4416977 => "Brampton",
-  4416978 => "Brampton",
-  4416979 => "Brampton",
   441698 => "Motherwell",
   441700 => "Rothesay",
   441702 => "Southend\-on\-Sea",
@@ -744,16 +707,10 @@ my %areanames = (
   441765 => "Ripon",
   441766 => "Porthmadog",
   441767 => "Sandy",
-  4417680 => "Penrith",
-  4417681 => "Penrith",
-  4417682 => "Penrith",
+  441768 => "Penrith",
   4417683 => "Appleby",
   4417684 => "Pooley\ Bridge",
-  4417685 => "Penrith",
-  4417686 => "Penrith",
   4417687 => "Keswick",
-  4417688 => "Penrith",
-  4417689 => "Penrith",
   441769 => "South\ Molton",
   441770 => "Isle\ of\ Arran",
   441771 => "Maud",
@@ -912,16 +869,8 @@ my %areanames = (
   441943 => "Guiseley",
   441944 => "West\ Heslerton",
   441945 => "Wisbech",
-  4419460 => "Whitehaven",
-  4419461 => "Whitehaven",
-  4419462 => "Whitehaven",
-  4419463 => "Whitehaven",
-  4419464 => "Whitehaven",
-  4419465 => "Whitehaven",
-  4419466 => "Whitehaven",
+  441946 => "Whitehaven",
   4419467 => "Gosforth",
-  4419468 => "Whitehaven",
-  4419469 => "Whitehaven",
   441947 => "Whitby",
   441948 => "Whitchurch",
   441949 => "Whatton",
@@ -979,11 +928,7 @@ my %areanames = (
   441994 => "St\ Clears",
   441995 => "Garstang",
   441997 => "Strathpeffer",
-  44200 => "London",
-  44201 => "London",
-  44203 => "London",
-  44207 => "London",
-  44208 => "London",
+  4420 => "London",
   442310 => "Portsmouth",
   442311 => "Southampton",
   44238 => "Southampton",
@@ -1037,7 +982,15 @@ my %areanames = (
       $number =~ s/(^\+44|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
-      $number =~ s/^(?:0)//;
+      my $prefix = qr/^(?:0|([25-9]\d{5})$)/;
+      my @matches = $number =~ /$prefix/;
+      if (defined $matches[-1]) {
+        no warnings 'uninitialized';
+        $number =~ s/$prefix/1481$1/;
+      }
+      else {
+        $number =~ s/$prefix//;
+      }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }

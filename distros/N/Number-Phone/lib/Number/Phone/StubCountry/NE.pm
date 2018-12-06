@@ -22,33 +22,40 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3 $4',
                   'leading_digits' => '
             09|
-            [289]
+            2[01]|
+            8[04589]|
+            9
           ',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'pattern' => '(08)(\\d{3})(\\d{3})',
-                  'leading_digits' => '08',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
+                'mobile' => '
+          (?:
+            8[04589]|
+            9\\d
+          )\\d{6}
+        ',
+                'pager' => '',
                 'voip' => '',
-                'fixed_line' => '
+                'geographic' => '
           2(?:
             0(?:
               20|
               3[1-7]|
-              4[134]|
+              4[13-5]|
               5[14]|
               6[14578]|
               7[1-578]
@@ -63,13 +70,14 @@ my $validators = {
           )\\d{4}
         ',
                 'toll_free' => '08\\d{6}',
-                'pager' => '',
-                'geographic' => '
+                'personal_number' => '',
+                'specialrate' => '(09\\d{6})',
+                'fixed_line' => '
           2(?:
             0(?:
               20|
               3[1-7]|
-              4[134]|
+              4[13-5]|
               5[14]|
               6[14578]|
               7[1-578]
@@ -82,24 +90,11 @@ my $validators = {
               88
             )
           )\\d{4}
-        ',
-                'specialrate' => '(09\\d{6})',
-                'mobile' => '
-          (?:
-            8[04589]|
-            9\\d
-          )\\d{6}
         '
               };
 my %areanames = (
-  2272020 => "Niamey",
-  2272031 => "Niamey",
-  2272032 => "Niamey",
-  2272033 => "Niamey",
-  2272034 => "Niamey",
-  2272035 => "Niamey",
-  2272036 => "Niamey",
-  2272037 => "Niamey",
+  227202 => "Niamey",
+  227203 => "Niamey",
   2272041 => "Maradi",
   2272044 => "Agadez",
   2272045 => "Arlit",

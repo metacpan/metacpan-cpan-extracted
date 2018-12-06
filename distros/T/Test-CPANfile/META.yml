@@ -23,7 +23,10 @@ no_index:
 requires:
   Exporter: '5.57'
   Module::CPANfile: '0'
-  Perl::PrereqScanner::NotQuiteLite: '0.96'
-resources: {}
-version: '0.02'
+  Module::CoreList: '2.99'
+  Perl::PrereqScanner::NotQuiteLite: '0.9902'
+resources:
+  bugtracker: https://github.com/charsbar/Test-CPANfile/issues
+  repository: https://github.com/charsbar/Test-CPANfile
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

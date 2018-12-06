@@ -7,7 +7,7 @@ use Module::CPANfile;
 use Perl::PrereqScanner::NotQuiteLite::App;
 use Test::More;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 our @EXPORT = qw/cpanfile_has_all_used_modules/;
 
 my %Phases = (
@@ -126,6 +126,26 @@ Test::CPANfile - see if cpanfile lists every used modules
         index  => $index,
     );
     done_testing;
+    
+    # You can ignore specific files
+    use Test::CPANfile;
+    use Test::More;
+    
+    # ignore prereqs in lib/Foo/Bar/Win32.pm, lib/Foo/Bar/Mac.pm etc
+    cpanfile_has_all_used_modules(
+        ignore => [qw!lib/Foo/Bar/!],
+    );
+    done_testing;
+    
+    # Or you can scan extra files
+    use Test::CPANfile;
+    use Test::More;
+    
+    cpanfile_has_all_used_modules(
+        lib => [glob 'extlib/*/lib'],
+    );
+    done_testing;
+    
 
 =head1 DESCRIPTION
 
@@ -137,7 +157,36 @@ It's ok if you list a module that is C<eval>ed in the code, or a module that doe
 
 =head2 cpanfile_has_all_used_modules()
 
-You can pass an optional hash, which is passed to L<Perl::PrereqScanner::NotQuiteLite::App>'s constructor to change its behavior.
+You can pass an optional hash, which is passed to L<Perl::PrereqScanner::NotQuiteLite::App>'s constructor to change its behavior. Notable options are:
+
+=over
+
+=item exclude_core, perl_version
+
+Test::CPANfile usually ignores prerequisites that are bundled in the Perl core (of 5.008001 by default; you can change this with C<perl_version> option). If you do not want this, explicitly set C<exclude_core> option to false.
+
+=item allow_test_pms
+
+Test::CPANfile usually ignores C<.pm> files under C<t/> directory if modules in those .pm files are not used in C<.t> files. With this option, Test::CPANfile looks for those C<.pm> files under C<t/>, regardless they are used in C<.t> files or not. This is useful if you are using a test module that automatically loads modules under C<t/>.
+If L<Test::Class> family is used under C<t/>, this option is implicitly set.
+
+=item ignore
+
+Set a list of paths Test::CPANfile should ignore. This is useful when your distribution has a set of OS-specific modules, for example.
+
+=item ignore_re
+
+You can also specify a regexp instead of a list of paths. If this is set, C<ignore> options are ignored.
+
+=item libs
+
+If your distribution has an uncommon directory layout for some reasons, you can add extra directories to scan. This also might help when you have private modules that are not uploaded on the CPAN. Put them under C<extlib/> for example, and add the directory to C<libs>, then Test::CPANfile also looks under the directory, and excludes modules found there as a part of the distribution, at the cost of extra dependencies for those private modules. 
+
+=item recommends, suggests, develop
+
+Set these to test more extensively.
+
+=back
 
 =head3 CPAN::Common::Index support
 

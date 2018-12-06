@@ -22,51 +22,51 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'leading_digits' => '[235]',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[235]'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{6})',
-                  'format' => '$1 $2',
-                  'leading_digits' => '[89]'
+                  'leading_digits' => '[89]',
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
+                'voip' => '',
+                'pager' => '',
                 'mobile' => '
           (?:
             222|
-            55[15]
+            55[015]
           )\\d{6}
         ',
                 'specialrate' => '(90\\d[1-9]\\d{5})',
-                'pager' => '',
-                'geographic' => '
-          3(?:
-            3(?:
-              3\\d[7-9]|
-              [0-24-9]\\d[46]
-            )|
-            5\\d{2}[7-9]
-          )\\d{4}
-        ',
                 'personal_number' => '',
-                'voip' => '',
                 'fixed_line' => '
           3(?:
             3(?:
-              3\\d[7-9]|
-              [0-24-9]\\d[46]
+              [0-24-9]\\d[46]|
+              3\\d[7-9]
             )|
-            5\\d{2}[7-9]
+            5\\d\\d[7-9]
           )\\d{4}
         ',
-                'toll_free' => '80\\d[1-9]\\d{5}'
+                'toll_free' => '80\\d[1-9]\\d{5}',
+                'geographic' => '
+          3(?:
+            3(?:
+              [0-24-9]\\d[46]|
+              3\\d[7-9]
+            )|
+            5\\d\\d[7-9]
+          )\\d{4}
+        '
               };
 my %areanames = (
   24033004 => "Bioko",
@@ -129,53 +129,33 @@ my %areanames = (
   24033286 => "Continental\ Region",
   24033294 => "Bioko",
   24033296 => "Continental\ Region",
-  24033304 => "Bioko",
-  24033306 => "Continental\ Region",
   24033307 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033308 => "Litoral\/Annobón",
   24033309 => "Bioko",
-  24033314 => "Bioko",
-  24033316 => "Continental\ Region",
   24033317 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033318 => "Litoral\/Annobón",
   24033319 => "Bioko",
-  24033324 => "Bioko",
-  24033326 => "Continental\ Region",
   24033327 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033328 => "Litoral\/Annobón",
   24033329 => "Bioko",
-  24033334 => "Bioko",
-  24033336 => "Continental\ Region",
   24033337 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033338 => "Litoral\/Annobón",
   24033339 => "Bioko",
-  24033344 => "Bioko",
-  24033346 => "Continental\ Region",
   24033347 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033348 => "Litoral\/Annobón",
   24033349 => "Bioko",
-  24033354 => "Bioko",
-  24033356 => "Continental\ Region",
   24033357 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033358 => "Litoral\/Annobón",
   24033359 => "Bioko",
-  24033364 => "Bioko",
-  24033366 => "Continental\ Region",
   24033367 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033368 => "Litoral\/Annobón",
   24033369 => "Bioko",
-  24033374 => "Bioko",
-  24033376 => "Continental\ Region",
   24033377 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033378 => "Litoral\/Annobón",
   24033379 => "Bioko",
-  24033384 => "Bioko",
-  24033386 => "Continental\ Region",
   24033387 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033388 => "Litoral\/Annobón",
   24033389 => "Bioko",
-  24033394 => "Bioko",
-  24033396 => "Continental\ Region",
   24033397 => "Centro\-Sur\/Kié\-Ntem\/Wele\-Nzás",
   24033398 => "Litoral\/Annobón",
   24033399 => "Bioko",

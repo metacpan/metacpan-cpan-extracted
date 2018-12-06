@@ -26,6 +26,10 @@ subtest num => sub {
     is(cmp_data([10], [9]), -1);
 };
 
+subtest str_vs_num => sub {
+    is(cmp_data("a", 0), 1);
+};
+
 subtest ref => sub {
     is(cmp_data([], 0), 2);
     is(cmp_data(0, []), 2);
@@ -50,6 +54,7 @@ subtest hash => sub {
     is(cmp_data({a=>1}, {a=>1}), 0);
     is(cmp_data({a=>1}, {a=>1, b=>2}), -1);
     is(cmp_data({a=>1, c=>3, d=>4}, {a=>1, b=>2}), 1);
+    is(cmp_data({a=>1, c=>3}, {a=>1, b=>2}), 2);
     is(cmp_data({a=>1}, {a=>0, b=>2}), 1);
     is(cmp_data({a=>1}, {b=>1}), 2);
 };

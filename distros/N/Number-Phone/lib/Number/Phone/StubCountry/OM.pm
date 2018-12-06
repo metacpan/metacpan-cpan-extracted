@@ -22,44 +22,51 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{3})(\\d{4,6})',
                   'format' => '$1 $2',
+                  'leading_digits' => '[58]'
+                },
+                {
                   'leading_digits' => '2',
-                  'pattern' => '(2\\d)(\\d{6})'
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{2})(\\d{6})'
                 },
                 {
                   'format' => '$1 $2',
                   'leading_digits' => '[79]',
-                  'pattern' => '([79]\\d{3})(\\d{4})'
-                },
-                {
-                  'format' => '$1 $2',
-                  'leading_digits' => '[58]00',
-                  'pattern' => '([58]00)(\\d{4,6})'
+                  'pattern' => '(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
                 'voip' => '',
+                'pager' => '',
+                'mobile' => '
+          (?:
+            7(?:
+              [19]\\d|
+              22
+            )|
+            9(?:
+              0[1-9]|
+              [1-9]\\d
+            )
+          )\\d{5}
+        ',
+                'specialrate' => '(900\\d{5})',
+                'personal_number' => '',
                 'fixed_line' => '2[2-6]\\d{6}',
                 'toll_free' => '
-          8007\\d{4,5}|
-          500\\d{4}
+          (?:
+            500|
+            8007\\d?
+          )\\d{4}
         ',
-                'pager' => '',
-                'geographic' => '2[2-6]\\d{6}',
-                'specialrate' => '(900\\d{5})',
-                'mobile' => '
-          7[19]\\d{6}|
-          9(?:
-            0[1-9]|
-            [1-9]\\d
-          )\\d{5}
-        '
+                'geographic' => '2[2-6]\\d{6}'
               };
 my %areanames = (
   96823 => "Dhofar\ \&\ Al\ Wusta",

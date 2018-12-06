@@ -4,13 +4,15 @@ use Mojo::File qw(path);
 use Mojolicious::Types;
 use Mojo::Path;
 use Mojo::Util;# qw(decode);
+use Scalar::Util 'weaken';
 
 my $PKG = __PACKAGE__;
 
-has [qw(app)] => undef, weak => 1;
-has [qw(config)];# => undef, weak => 1;
+has qw(app) => undef, weak => 1;
+has qw(config);# => undef, weak => 1;
 has root_url => sub { Mojo::Path->new(shift->config->{root_url})->leading_slash(1)->trailing_slash(1) };
 has root_dir => sub { Mojo::Path->new(shift->config->{root_dir} // '.')->trailing_slash(1) };
+has host => sub { shift->config->{host} };
 has admin_pass => sub { shift->config->{admin_pass} };
 has access => sub { shift->config->{access} };
 has public_uploads => sub { !! shift->config->{public_uploads} };
@@ -28,9 +30,11 @@ has re_pod => sub { qr{[.]p(?:od|m|l)$} };
 has re_html => sub { qr{[.]html?$} };
 has mime => sub { Mojolicious::Types->new };
 has max_upload_size => sub { shift->config->{max_upload_size} };
-has routes_names => sub {
+#separate routes store for matching without conflicts
+has routes   => sub { Mojolicious::Routes->new }; # для max_upload_size
+has routes_names => sub {# тоже для max_upload_size
   my $self = shift;
-  return [$self." ROOT GET (#1)", $self." ROOT POST (#2)", $self." PATH GET (#3)", $self." PATH POST (#4)"];
+  return [$self." ROOT GET (#1)", $self." PATH GET (#2)", $self." ROOT POST (#3)", $self." PATH POST (#4)"];
 };
 has debug => sub { shift->config->{debug} // $ENV{StaticShare_DEBUG} };
 
@@ -53,14 +57,21 @@ sub register {# none magic
   
   # ROUTING 4 routes
   my $route = $self->root_url->clone->merge('*pth');#"$args->{root_url}/*pth";
-  my $r = $app->routes;
   my $names = $self->routes_names;
-  $r->get($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', pth=>'', plugin=>$self, )->name($names->[0]);#$PKG
-  $r->post($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', pth=>'', plugin=>$self, )->name($names->[1]);#->name("$PKG ROOT POST");
-  $r->get($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', plugin=>$self, )->name($names->[2]);#;
-  $r->post($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', plugin=>$self, )->name($names->[3]);#;
+  $self->_make_route(routes => $app->routes, action => 'get', path => $self->root_url->to_route, name => $names->[0], pth => '', host => $self->host, )
+    ->_make_route(routes => $app->routes, action => 'get', path => $route->to_route, name => $names->[1], host => $self->host,)
+    ->_make_route(routes => $app->routes, action => 'post', path => $self->root_url->to_route, name => $names->[2], pth => '', host => $self->host,)
+    ->_make_route(routes => $app->routes, action => 'post', path => $route->to_route, name => $names->[3], host => $self->host,);
+  #~ $r->get($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', pth=>'', plugin=>$self, )->name($names->[0]);#$PKG
+  #~ $r->get($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'get', plugin=>$self, )->name($names->[1]);#;
+  #~ $r->post($self->root_url->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', pth=>'', plugin=>$self, )->name($names->[2]);#->name("$PKG ROOT POST");
+  #~ $r->post($route->to_route)->to(namespace=>$PKG, controller=>"Controller", action=>'post', plugin=>$self, )->name($names->[3]);#;
   
   
+  # only POST uploads
+  $self->_make_route(routes => $self->routes, action => 'post', path => $self->root_url->to_route, name => $names->[2], pth => '')# без host!
+    ->_make_route(routes => $self->routes, action => 'post', path => $route->to_route, name => $names->[3])
+    if defined $self->max_upload_size;
   
   path($self->config->{root_dir})->make_path
     unless !$self->config->{root_dir} || -e $self->config->{root_dir};
@@ -73,12 +84,23 @@ sub register {# none magic
     unless $self->app->renderer->helpers->{'pod_to_html'} && ($self->render_pod // '') eq 0 ;
   
   # PATCH EMIT CHUNK
-  $self->_patch_emit_chunk()
+  $self->_hook_chunk()
     if defined $self->max_upload_size;
   
-  #~ warn $self, Mojo::Util::dumper($self->config);
-  
   return ($app, $self);
+}
+
+sub _make_route {
+  my ($self) = shift;
+  my $arg = ref $_[0] ? shift : {@_};
+  weaken $self;
+  my $action = $arg->{action};
+  my $r = $arg->{routes}->$action($arg->{path});
+  $r->to(namespace=>$PKG, controller=>"Controller", action=>$arg->{action}, defined $arg->{pth} ? (pth=>$arg->{pth}) : (), plugin=>$self, );
+  $r->name($arg->{name});
+  $r->over(host => $arg->{host})
+    if $arg->{host};
+  return $self;
 }
 
 my %loc = (
@@ -145,8 +167,44 @@ sub is_admin {# as helper
   return $sess->{StaticShare} && $sess->{StaticShare}{admin};
 }
 
-sub _patch_emit_chunk {
+my $patched;
+sub _hook_chunk {
   my $self = shift;
+  
+  _patch_emit_chunk() unless $patched++;
+  
+  weaken $self;
+  $self->app->hook(after_build_tx => sub {
+    my ($tx, $app) = @_;
+      $tx->once('chunk'=>sub {
+      my ($tx, $chunk) = @_;
+      return unless $tx->req->method =~ /PUT|POST/;
+      my $url = $tx->req->url->to_abs;
+      my $match = Mojolicious::Routes::Match->new(root => $self->routes);
+      #~ weaken $tx;
+      #~ weaken $app;
+      #~ Mojolicious::Controller->new(app=>$app, tx=>$tx)
+      my $host = $self->host;
+      $match->find(undef, {method => $tx->req->method, path => $url->path->to_route});# websocket => $ws
+      $app->log->debug("TX ONCE CHUNK check route: [".$url->path->to_route."]",
+        "match route: ". (($match->endpoint && $match->endpoint->name) || 'none'),
+        $host ? ("match host: ". $tx->req->headers->host =~ /$host/) : ()  #, Mojo::Util::dumper($url)
+      ) if $self->debug;
+      my $route = $match->endpoint
+        || return;
+      
+      # eq $self->routes_names->[1] || $route->name eq $self->routes_names->[3]);#Mojo::Util::dumper($url);, length($chunk)
+      $tx->req->max_message_size($self->max_upload_size)
+        if (($route->name eq $self->routes_names->[2]) || ($route->name eq $self->routes_names->[3]))
+          && $host && $tx->req->headers->host =~ /$host/;
+      # TODO admin session
+      
+    });
+  });
+  
+}
+
+sub _patch_emit_chunk {
   
   Mojo::Util::monkey_patch 'Mojo::Transaction::HTTP', 'server_read' => sub {
     my ($self, $chunk) = @_;
@@ -164,31 +222,9 @@ sub _patch_emit_chunk {
     
   };
   
-  #~ my $r1 = $self->app->routes->lookup($self->routes_names->[1]);
-  #~ warn  'POST ROUTE #2', $r1;
-  #~ my $r2 = $self->app->routes->lookup($self->routes_names->[3]);
-  #~ warn  'POST ROUTE #4', $r2;
-  
-  $self->app->hook(after_build_tx => sub {
-    my ($tx, $app) = @_;
-      $tx->once('chunk'=>sub {
-      my ($tx, $chunk) = @_;
-      return unless $tx->req->method =~ /PUT|POST/;
-      my $url = $tx->req->url->to_abs;
-      my $match = Mojolicious::Routes::Match->new(root => $self->app->routes);
-      $match->find(undef, {method => $tx->req->method, path => $tx->req->url->path->to_route,});# websocket => $ws
-      my $route = $match->endpoint
-        || return;
-      
-      #~ warn "TX CHUNK ROUTE: ", $route->name;# eq $self->routes_names->[1] || $route->name eq $self->routes_names->[3]);#Mojo::Util::dumper($url);, length($chunk)
-      $tx->req->max_message_size($self->max_upload_size)
-        if $route->name eq $self->routes_names->[1] || $route->name eq $self->routes_names->[3]
-      # TODO admin session
-      
-    });
-  });
-  
 }
+
+our $VERSION = '0.074';
 
 ##############################################
 package __internal__::Markdown;
@@ -208,7 +244,7 @@ sub new {
 
 sub parse { my $self = shift; no strict 'refs'; ($self->{pkg}.'::markdown')->(@_); }
 
-our $VERSION = '0.070';
+
 =pod
 
 =encoding utf8
@@ -225,7 +261,7 @@ Mojolicious::Plugin::StaticShare - browse, upload, copy, move, delete, edit, ren
 
 =head1 VERSION
 
-0.070
+0.074
 
 =head1 SYNOPSIS
 
@@ -368,9 +404,13 @@ Boolean to disable/enable uploads for public users. Defaults to undef (disable).
 
 =head2 max_upload_size
 
-  max_upload_size=>0, # unlimited
+  max_upload_size=>0, # unlimited POST
 
-Numeric value limiting uploads size for route. See L<Mojolicious#max_request_size>, L<Mojolicious#build_tx>.
+Numeric value limiting uploads size for route.
+WARN-EXPIRIMENTAL patching of L<Mojo::Transaction::HTTP#server_read>
+for emit chunk event.
+
+See also L<Mojolicious#max_request_size>, L<Mojolicious#build_tx>.
 
 =head1 Extended markdown & pod
 
@@ -444,7 +484,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2017 Mikhail Che.
+Copyright 2017+ Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

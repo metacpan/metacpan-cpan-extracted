@@ -1,0 +1,157 @@
+NAME
+    Bencher::Scenario::DataCmp - Benchmark Data::Cmp against similar
+    solutions
+
+VERSION
+    This document describes version 0.001 of Bencher::Scenario::DataCmp
+    (from Perl distribution Bencher-Scenario-DataCmp), released on
+    2018-12-06.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m DataCmp
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m DataCmp
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Data::Cmp 0.006
+
+    Data::Cmp::Numeric 0.006
+
+    Data::Cmp::StrOrNumeric 0.006
+
+    JSON::PP 2.27400_02
+
+    Data::Compare 1.25
+
+BENCHMARK PARTICIPANTS
+    *   Data::Cmp::cmp_data (perl_code)
+
+        Function call template:
+
+         Data::Cmp::cmp_data(<data1>, <data2>)
+
+    *   Data::Cmp::Numeric::cmp_data (perl_code)
+
+        Function call template:
+
+         Data::Cmp::Numeric::cmp_data(<data1>, <data2>)
+
+    *   Data::Cmp::StrOrNumeric::cmp_data (perl_code)
+
+        Function call template:
+
+         Data::Cmp::StrOrNumeric::cmp_data(<data1>, <data2>)
+
+    *   JSON::PP (perl_code)
+
+        Code template:
+
+         JSON::PP::encode_json(<data1>) eq JSON::PP::encode_json(<data2>)
+
+    *   Data::Compare::Compare (perl_code)
+
+        Function call template:
+
+         Data::Compare::Compare(<data1>, <data2>)
+
+BENCHMARK DATASETS
+    *   empty arrays
+
+    *   small arrays
+
+    *   1k array of ints
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.26.0*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
+    version 4.8.0-53-generic*.
+
+    Benchmark with default options ("bencher -m DataCmp"):
+
+     #table1#
+     +-----------------------------------+------------------+-----------+-----------+------------+---------+---------+
+     | participant                       | dataset          | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+     +-----------------------------------+------------------+-----------+-----------+------------+---------+---------+
+     | Data::Compare::Compare            | 1k array of ints |       238 |  4.21     |       1    | 4.1e-06 |      20 |
+     | JSON::PP                          | 1k array of ints |       330 |  3        |       1.4  | 6.3e-06 |      20 |
+     | Data::Cmp::StrOrNumeric::cmp_data | 1k array of ints |       830 |  1.2      |       3.5  | 3.4e-06 |      20 |
+     | Data::Cmp::Numeric::cmp_data      | 1k array of ints |      1120 |  0.891    |       4.72 | 6.9e-07 |      20 |
+     | Data::Cmp::cmp_data               | 1k array of ints |      1140 |  0.88     |       4.78 | 6.4e-07 |      20 |
+     | Data::Compare::Compare            | small arrays     |     30000 |  0.033    |     130    | 5.3e-08 |      20 |
+     | JSON::PP                          | small arrays     |     36000 |  0.028    |     150    |   4e-08 |      20 |
+     | Data::Cmp::StrOrNumeric::cmp_data | small arrays     |     93700 |  0.0107   |     394    | 3.3e-09 |      20 |
+     | Data::Cmp::cmp_data               | small arrays     |    100000 |  0.0098   |     430    | 5.5e-08 |      21 |
+     | Data::Cmp::Numeric::cmp_data      | small arrays     |    100000 |  0.0097   |     440    |   1e-08 |      20 |
+     | JSON::PP                          | empty arrays     |    128000 |  0.00782  |     538    | 3.3e-09 |      20 |
+     | Data::Compare::Compare            | empty arrays     |    154000 |  0.00649  |     648    | 3.2e-09 |      22 |
+     | Data::Cmp::Numeric::cmp_data      | empty arrays     |    300000 |  0.0033   |    1300    | 6.7e-09 |      20 |
+     | Data::Cmp::StrOrNumeric::cmp_data | empty arrays     |    310000 |  0.0032   |    1300    |   5e-09 |      20 |
+     | Data::Cmp::cmp_data               | empty arrays     |    315000 |  0.003175 |    1325    | 3.4e-11 |      20 |
+     +-----------------------------------+------------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m DataCmp
+    --module-startup"):
+
+     #table2#
+     +-------------------------+-----------+------------------------+------------+---------+---------+
+     | participant             | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+     +-------------------------+-----------+------------------------+------------+---------+---------+
+     | Data::Compare           |        32 |                     24 |        1   | 7.7e-05 |      20 |
+     | JSON::PP                |        27 |                     19 |        1.2 | 5.4e-05 |      21 |
+     | Data::Cmp               |        13 |                      5 |        2.5 | 3.4e-05 |      20 |
+     | Data::Cmp::StrOrNumeric |        13 |                      5 |        2.5 | 1.9e-05 |      20 |
+     | Data::Cmp::Numeric      |        13 |                      5 |        2.5 | 1.9e-05 |      21 |
+     | perl -e1 (baseline)     |         8 |                      0 |        4   | 1.3e-05 |      20 |
+     +-------------------------+-----------+------------------------+------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+BENCHMARK NOTES
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-DataCmp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-DataCmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Data
+    Cmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Bencher::Scenario::ScalarCmp
+
+    Bencher::Scenario::Serializers
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

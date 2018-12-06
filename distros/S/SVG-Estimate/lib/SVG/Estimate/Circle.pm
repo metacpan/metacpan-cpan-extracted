@@ -1,5 +1,5 @@
 package SVG::Estimate::Circle;
-$SVG::Estimate::Circle::VERSION = '1.0108';
+$SVG::Estimate::Circle::VERSION = '1.0109';
 use Moo;
 use Math::Trig qw/pi/;
 
@@ -13,7 +13,7 @@ SVG::Estimate::Circle - Handles estimating circles.
 
 =head1 VERSION
 
-version 1.0108
+version 1.0109
 
 =head1 SYNOPSIS
 
@@ -78,6 +78,8 @@ sub BUILDARGS {
     my ($class, @args) = @_;
     ##Upgrade to hashref
     my $args = @args % 2 ? $args[0] : { @args };
+    $args->{cx} //= 0;
+    $args->{cy} //= 0;
     my $center   = [ $args->{cx}, $args->{cy} ];
     if ($args->{transformer}->has_transforms) {
         ##Approximate the circle with a polygon

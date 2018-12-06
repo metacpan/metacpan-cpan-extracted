@@ -22,18 +22,21 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214155;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
-                  'pattern' => '([1-59]\\d)(\\d{3})(\\d{4})',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'leading_digits' => '[1-59]',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
+                'mobile' => '9\\d{8}',
+                'pager' => '',
+                'voip' => '',
                 'geographic' => '
           (?:
             11(?:
@@ -100,10 +103,12 @@ my $validators = {
             3(?:
               3(?:
                 11[0-46-8]|
-                22[0-6]|
+                (?:
+                  22|
+                  55
+                )[0-6]|
                 33[0134689]|
                 44[04]|
-                55[0-6]|
                 66[01467]
               )|
               4(?:
@@ -123,8 +128,10 @@ my $validators = {
                 88[1-4]
               )|
               7(?:
-                11[1-9]|
-                22[1-9]|
+                (?:
+                  11|
+                  22
+                )[1-9]|
                 33[13-7]|
                 44[13-6]|
                 55[1-689]
@@ -151,8 +158,9 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'pager' => '',
                 'toll_free' => '',
+                'personal_number' => '',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             11(?:
@@ -219,10 +227,12 @@ my $validators = {
             3(?:
               3(?:
                 11[0-46-8]|
-                22[0-6]|
+                (?:
+                  22|
+                  55
+                )[0-6]|
                 33[0134689]|
                 44[04]|
-                55[0-6]|
                 66[01467]
               )|
               4(?:
@@ -242,8 +252,10 @@ my $validators = {
                 88[1-4]
               )|
               7(?:
-                11[1-9]|
-                22[1-9]|
+                (?:
+                  11|
+                  22
+                )[1-9]|
                 33[13-7]|
                 44[13-6]|
                 55[1-689]
@@ -269,11 +281,7 @@ my $validators = {
               )
             )
           )\\d{4}
-        ',
-                'voip' => '',
-                'personal_number' => '',
-                'mobile' => '9\\d{8}',
-                'specialrate' => ''
+        '
               };
 my %areanames = (
   25111111 => "Arada\ I\,\ Addis\ Ababa",
@@ -296,7 +304,7 @@ my %areanames = (
   251111860 => "Sululta\,\ Addis\ Ababa",
   25111187 => "Goha\ Tsion\,\ Addis\ Ababa",
   25111188 => "Chancho\,\ Addis\ Ababa",
-  25111213 => "Addis\ Ketema\ I\,\ Addis\ Ababa",
+  2511121 => "Addis\ Ketema\ I\,\ Addis\ Ababa",
   25111236 => "Hagere\ Hiwot\,\ Addis\ Ababa",
   25111237 => "Holeta\ Gent\,\ Addis\ Ababa",
   25111238 => "Jeldu\,\ Addis\ Ababa",
@@ -345,13 +353,13 @@ my %areanames = (
   25111515 => "Filwoha\ II\,\ Addis\ Ababa",
   25111517 => "Sheraton\/DID\,\ Addis\ Ababa",
   25111518 => "Addis\ Ababa\ Region",
-  25111544 => "ECA\,\ Addis\ Ababa",
+  2511154 => "ECA\,\ Addis\ Ababa",
   25111550 => "Filwoha\ IV\,\ Addis\ Ababa",
   25111551 => "Filwoha\ III\,\ Addis\ Ababa",
   25111552 => "Filwha\ VI\,\ Addis\ Ababa",
   25111553 => "Filwha\ V\,\ Addis\ Ababa",
   25111554 => "Filwha\ VII\,\ Addis\ Ababa",
-  25111618 => "Bole\ I\,\ Addis\ Ababa",
+  2511161 => "Bole\ I\,\ Addis\ Ababa",
   25111626 => "Bole\ Michael\,\ Addis\ Ababa",
   25111629 => "Gerji\,\ Addis\ Ababa",
   25111645 => "Yeka\ I\,\ Addis\ Ababa",
@@ -411,6 +419,37 @@ my %areanames = (
   25122665 => "Robe\,\ South\-East\ Region",
   25122666 => "Dodolla\,\ South\-East\ Region",
   25122668 => "Dolomena\,\ South\-East\ Region",
+  25125111 => "Dire\ Dawa\ I\,\ East\ Region",
+  25125112 => "Dire\ Dawa\ II\,\ East\ Region",
+  25125114 => "Shinile\,\ East\ Region",
+  25125115 => "Artshek\,\ East\ Region",
+  25125116 => "Melka\ Jeldu\,\ East\ Region",
+  25125332 => "Bedeno\,\ East\ Region",
+  25125333 => "Deder\,\ East\ Region",
+  25125334 => "Grawa\,\ East\ Region",
+  25125335 => "Chelenko\,\ East\ Region",
+  25125336 => "Kersa\,\ East\ Region",
+  25125337 => "Kobo\,\ East\ Region",
+  25125338 => "Kombolocha\,\ East\ Region",
+  25125441 => "Hirna\,\ East\ Region",
+  25125444 => "Miesso\,\ East\ Region",
+  25125446 => "Erer\,\ East\ Region",
+  25125447 => "Hurso\,\ East\ Region",
+  25125551 => "Asebe\ Teferi\,\ East\ Region",
+  25125554 => "Assebot\,\ East\ Region",
+  25125661 => "Alemaya\,\ East\ Region",
+  25125662 => "Aweday\,\ East\ Region",
+  25125666 => "Harar\ I\,\ East\ Region",
+  25125667 => "Harar\ II\,\ East\ Region",
+  25125669 => "Kebribeyah\,\ East\ Region",
+  25125771 => "Degahabur\,\ East\ Region",
+  25125772 => "Gursum\,\ East\ Region",
+  25125774 => "Kabri\ Dehar\,\ East\ Region",
+  25125775 => "Jigiga\,\ East\ Region",
+  25125776 => "Godie\,\ East\ Region",
+  25125777 => "Teferi\ Ber\,\ East\ Region",
+  25125779 => "Chinagson\,\ East\ Region",
+  251258 => "Kelafo\,\ East\ Region",
   25133110 => "Kabe\,\ North\-East\ Region",
   25133111 => "Dessie\ I\,\ North\-East\ Region",
   25133112 => "Dessie\ II\,\ North\-East\ Region",
@@ -472,47 +511,6 @@ my %areanames = (
   25134773 => "Edaga\-Hamus\,\ North\ Region",
   25134774 => "Alemata\,\ North\ Region",
   25134775 => "Axum\,\ North\ Region",
-  25125111 => "Dire\ Dawa\ I\,\ East\ Region",
-  25125112 => "Dire\ Dawa\ II\,\ East\ Region",
-  25125114 => "Shinile\,\ East\ Region",
-  25125115 => "Artshek\,\ East\ Region",
-  25125116 => "Melka\ Jeldu\,\ East\ Region",
-  25125332 => "Bedeno\,\ East\ Region",
-  25125333 => "Deder\,\ East\ Region",
-  25125334 => "Grawa\,\ East\ Region",
-  25125335 => "Chelenko\,\ East\ Region",
-  25125336 => "Kersa\,\ East\ Region",
-  25125337 => "Kobo\,\ East\ Region",
-  25125338 => "Kombolocha\,\ East\ Region",
-  25125441 => "Hirna\,\ East\ Region",
-  25125444 => "Miesso\,\ East\ Region",
-  25125446 => "Erer\,\ East\ Region",
-  25125447 => "Hurso\,\ East\ Region",
-  25125551 => "Asebe\ Teferi\,\ East\ Region",
-  25125554 => "Assebot\,\ East\ Region",
-  25125661 => "Alemaya\,\ East\ Region",
-  25125662 => "Aweday\,\ East\ Region",
-  25125665 => "Babile\,\ East\ Region",
-  25125666 => "Harar\ I\,\ East\ Region",
-  25125667 => "Harar\ II\,\ East\ Region",
-  25125669 => "Kebribeyah\,\ East\ Region",
-  25125771 => "Degahabur\,\ East\ Region",
-  25125772 => "Gursum\,\ East\ Region",
-  25125774 => "Kabri\ Dehar\,\ East\ Region",
-  25125775 => "Jigiga\,\ East\ Region",
-  25125776 => "Godie\,\ East\ Region",
-  25125777 => "Teferi\ Ber\,\ East\ Region",
-  25125779 => "Chinagson\,\ East\ Region",
-  25125880 => "Kelafo\,\ East\ Region",
-  25146110 => "Shashamane\ I\,\ South\ Region",
-  25146111 => "Shashamane\ II\,\ South\ Region",
-  25146112 => "Kofele\,\ South\ Region",
-  25146114 => "Wondo\ Kela\,\ South\ Region",
-  25146115 => "Butajira\,\ South\ Region",
-  25146116 => "Arsi\ Negele\,\ South\ Region",
-  25146117 => "Adame\ Tulu\,\ South\ Region",
-  25146118 => "Kuyera\,\ South\ Region",
-  25146119 => "Shasemene\,\ South\ Region",
   25146220 => "Awassa\ I\,\ South\ Region",
   25146221 => "Awassa\ II\,\ South\ Region",
   25146222 => "Wonda\ Basha\,\ South\ Region",
@@ -537,10 +535,7 @@ my %areanames = (
   25146556 => "Alaba\ Kulito\,\ South\ Region",
   25146558 => "Enseno\,\ South\ Region",
   25146559 => "Boditi\,\ South\ Region",
-  25146660 => "Kebado\,\ South\ Region",
-  25146771 => "Werabe\,\ South\ Region",
-  25146774 => "Gidole\,\ South\ Region",
-  25146777 => "Sawla\,\ South\ Region",
+  251466 => "Kebado\,\ South\ Region",
   25146881 => "Arba\ Minch\,\ South\ Region",
   25146882 => "Kibet\,\ South\ Region",
   25146883 => "Buii\,\ South\ Region",
@@ -580,7 +575,7 @@ my %areanames = (
   25147556 => "Tepi\,\ South\-West\ Region",
   25147558 => "Macha\,\ South\-West\ Region",
   25147559 => "Abebo\,\ South\-West\ Region",
-  25157227 => "Ghedo\,\ West\ Region",
+  251572 => "Ghedo\,\ West\ Region",
   25157550 => "Ejaji\,\ West\ Region",
   25157555 => "Dembidolo\,\ West\ Region",
   25157661 => "Nekemte\,\ West\ Region",
@@ -622,7 +617,7 @@ my %areanames = (
   25158446 => "Worota\,\ North\-West\ Region",
   25158447 => "Mekane\-Eyesus\,\ North\-West\ Region",
   25158448 => "Teda\,\ North\-West\ Region",
-  25158550 => "Pawe\,\ North\-West\ Region",
+  251585 => "Pawe\,\ North\-West\ Region",
   25158661 => "Motta\,\ North\-West\ Region",
   25158662 => "Keraniyo\,\ North\-West\ Region",
   25158663 => "Debre\-work\,\ North\-West\ Region",

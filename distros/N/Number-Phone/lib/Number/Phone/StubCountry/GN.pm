@@ -22,25 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '3',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '3'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
                   'leading_digits' => '[67]',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
+                  'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
-                'mobile' => '6[02356]\\d{7}',
-                'specialrate' => '',
-                'pager' => '',
                 'geographic' => '
           30(?:
             24|
@@ -52,6 +49,7 @@ my $validators = {
             9[1478]
           )\\d{4}
         ',
+                'toll_free' => '',
                 'fixed_line' => '
           30(?:
             24|
@@ -63,12 +61,14 @@ my $validators = {
             9[1478]
           )\\d{4}
         ',
-                'toll_free' => '',
                 'personal_number' => '',
+                'specialrate' => '',
+                'mobile' => '6[02356]\\d{7}',
+                'pager' => '',
                 'voip' => '722\\d{6}'
               };
 my %areanames = (
-  2243024 => "Fria",
+  224302 => "Fria",
   2243031 => "Boké",
   2243032 => "Kamsar",
   2243041 => "Conakry",
@@ -83,8 +83,8 @@ my %areanames = (
   22430613 => "Télimélé",
   2243068 => "Mamou",
   2243069 => "Dalaba",
-  2243071 => "Kankan",
-  2243081 => "Faranah",
+  224307 => "Kankan",
+  224308 => "Faranah",
   2243091 => "N\'Zérékoré",
   2243094 => "Macenta",
   2243097 => "Guéckédou",

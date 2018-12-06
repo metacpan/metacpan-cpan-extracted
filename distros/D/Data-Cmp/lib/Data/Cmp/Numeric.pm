@@ -1,7 +1,7 @@
 package Data::Cmp::Numeric;
 
-our $DATE = '2018-08-13'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-12-06'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -30,7 +30,7 @@ sub _cmp_data {
         return $def2 ? -1 : 0;
     }
 
-    # both are defined
+    # so both are defined ...
 
     my $reftype1 = reftype($d1);
     my $reftype2 = reftype($d2);
@@ -42,11 +42,11 @@ sub _cmp_data {
         }
     } elsif ( $reftype1 xor $reftype2) { return 2 }
 
-    # both are refs
+    # so both are refs ...
 
     return 2 if $reftype1 ne $reftype2;
 
-    # both are refs of the same type
+    # so both are refs of the same type ...
 
     my $pkg1 = blessed($d1);
     my $pkg2 = blessed($d2);
@@ -56,7 +56,7 @@ sub _cmp_data {
         return 2 if defined $pkg2;
     }
 
-    # both are non-objects or objects of the same class
+    # so both are non-objects or objects of the same class ...
 
     my $refaddr1 = refaddr($d1);
     my $refaddr2 = refaddr($d2);
@@ -110,7 +110,7 @@ Data::Cmp::Numeric - Compare two data structures, return -1/0/1 like <=>
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Cmp::Numeric (from Perl distribution Data-Cmp), released on 2018-08-13.
+This document describes version 0.006 of Data::Cmp::Numeric (from Perl distribution Data-Cmp), released on 2018-12-06.
 
 =head1 SYNOPSIS
 

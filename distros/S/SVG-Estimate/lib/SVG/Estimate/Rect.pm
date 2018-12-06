@@ -1,5 +1,5 @@
 package SVG::Estimate::Rect;
-$SVG::Estimate::Rect::VERSION = '1.0108';
+$SVG::Estimate::Rect::VERSION = '1.0109';
 use Moo;
 
 extends 'SVG::Estimate::Shape';
@@ -11,7 +11,7 @@ SVG::Estimate::Rect - Handles estimating rectangles.
 
 =head1 VERSION
 
-version 1.0108
+version 1.0109
 
 =head1 SYNOPIS
 
@@ -82,6 +82,8 @@ sub BUILDARGS {
     my ($class, @args) = @_;
     ##Upgrade to hashref
     my $args = @args % 2 ? $args[0] : { @args };
+    $args->{x} //= 0;
+    $args->{y} //= 0;
     my $origin   = [ $args->{x}, $args->{y} ];
     my $opposite = [ $args->{x} + $args->{width}, $args->{y} + $args->{height} ];
     if ($args->{transformer}->has_transforms) {

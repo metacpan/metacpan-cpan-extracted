@@ -22,47 +22,51 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214153;
+our $VERSION = 1.20181205223701;
 
 my $formatters = [
                 {
-                  'pattern' => '([2-4679])(\\d{3})(\\d{4})',
-                  'leading_digits' => '[2-4679][2-8]',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '
+            600[25]|
+            800
+          ',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{2,9})'
                 },
                 {
-                  'pattern' => '(5\\d)(\\d{3})(\\d{4})',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '
+            [236]|
+            [479][2-8]
+          '
+                },
+                {
                   'leading_digits' => '5',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '([479]00)(\\d)(\\d{5})',
+                  'leading_digits' => '[479]',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '$1',
-                  'leading_digits' => '[479]00'
-                },
-                {
-                  'pattern' => '([68]00)(\\d{2,9})',
-                  'format' => '$1 $2',
-                  'national_rule' => '$1',
-                  'leading_digits' => '[68]00'
+                  'pattern' => '(\\d{3})(\\d)(\\d{5})'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
                 'voip' => '',
+                'mobile' => '5[024-68]\\d{7}',
+                'pager' => '',
                 'fixed_line' => '[2-4679][2-8]\\d{6}',
+                'specialrate' => '(700[05]\\d{5})|(900[02]\\d{5})|(600[25]\\d{5})',
+                'personal_number' => '',
+                'geographic' => '[2-4679][2-8]\\d{6}',
                 'toll_free' => '
           400\\d{6}|
           800\\d{2,9}
-        ',
-                'pager' => '',
-                'geographic' => '[2-4679][2-8]\\d{6}',
-                'specialrate' => '(700[05]\\d{5})|(900[02]\\d{5})|(600[25]\\d{5})',
-                'mobile' => '5[024-68]\\d{7}'
+        '
               };
 
     sub new {

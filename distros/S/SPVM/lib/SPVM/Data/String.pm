@@ -4,28 +4,28 @@ use base 'SPVM::Data';
 
 use SPVM::ExchangeAPI;
 
-sub to_elements {
+sub to_elems {
   my $self = shift;
   
   my $env = $self->{env};
   
-  SPVM::ExchangeAPI::to_elements($env, $self);
+  SPVM::ExchangeAPI::to_elems($env, $self);
 }
 
-sub to_binary {
+sub to_bin {
   my $self = shift;
 
   my $env = $self->{env};
   
-  SPVM::ExchangeAPI::to_binary($env, $self);
+  SPVM::ExchangeAPI::to_bin($env, $self);
 }
 
-sub to_string {
+sub to_str {
   my $self = shift;
   
   my $env = $self->{env};
   
-  SPVM::ExchangeAPI::to_string($env, $self);
+  SPVM::ExchangeAPI::to_str($env, $self);
 }
 
 1;
@@ -36,23 +36,23 @@ SPVM::Data::String - SPVM String
 
 =head1 METHODS
 
-=head2 to_elements
+=head2 to_elems
 
-  my $byte_array = $spvm_string->to_elements;
+  my $byte_array = $spvm_string->to_elems;
 
 Convert SPVM string to Perl array reference.
 
 Each element is corresponding byte of SPVM string.
 
-=head2 to_binary
+=head2 to_bin
 
-  my $binary = $spvm_string->to_binary;
+  my $binary = $spvm_string->to_bin;
 
 Convert SPVM string to Perl byte string(encoded string).
 
-=head2 to_string
+=head2 to_str
 
-  my $string = $spvm_string->to_string;
+  my $string = $spvm_string->to_str;
 
 Convert SPVM string to Perl text string(decoded string).
 

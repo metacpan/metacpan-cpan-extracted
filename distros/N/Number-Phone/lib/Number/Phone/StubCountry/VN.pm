@@ -22,137 +22,126 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223705;
 
 my $formatters = [
                 {
-                  'pattern' => '([17]99)(\\d{4})',
+                  'pattern' => '(\\d{2})(\\d{5})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2',
-                  'leading_digits' => '[17]99'
-                },
-                {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '2[48]',
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
-                },
-                {
                   'leading_digits' => '80',
-                  'format' => '$1 $2',
-                  'national_rule' => '0$1',
-                  'pattern' => '(80)(\\d{5})'
+                  'format' => '$1 $2'
                 },
                 {
-                  'pattern' => '(69\\d)(\\d{4,5})',
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'leading_digits' => '[17]99',
                   'format' => '$1 $2',
+                  'intl_format' => 'NA',
+                  'national_rule' => '0$1'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{4,5})',
                   'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'intl_format' => 'NA',
                   'leading_digits' => '69'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '2[0-35-79]',
-                  'pattern' => '(\\d{3})(\\d{4})(\\d{3})'
-                },
-                {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '
-            8(?:
-              8|
-              9[89]
-            )|
-            9
-          ',
-                  'pattern' => '([89]\\d)(\\d{3})(\\d{2})(\\d{2})'
-                },
-                {
-                  'pattern' => '(1[2689]\\d)(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '
-            1(?:
-              [26]|
-              8[68]|
-              99
-            )
-          '
-                },
-                {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '86[689]',
-                  'pattern' => '(86[689])(\\d{3})(\\d{3})'
-                },
-                {
-                  'pattern' => '(1[89]00)(\\d{4,6})',
-                  'leading_digits' => '1[89]00',
+                  'pattern' => '(\\d{4})(\\d{4,6})',
                   'format' => '$1 $2',
-                  'national_rule' => '$1'
+                  'leading_digits' => '1'
+                },
+                {
+                  'national_rule' => '0$1',
+                  'leading_digits' => '[69]',
+                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '[3578]',
+                  'national_rule' => '0$1'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '2[48]',
+                  'format' => '$1 $2 $3'
+                },
+                {
+                  'national_rule' => '0$1',
+                  'leading_digits' => '2',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{4})(\\d{3})'
                 }
               ];
 
 my $validators = {
+                'toll_free' => '1800\\d{4,6}',
+                'geographic' => '
+          2(?:
+            0[3-9]|
+            1[0-689]|
+            2[0-25-9]|
+            3[2-9]|
+            4[2-8]|
+            5[124-9]|
+            6[0-39]|
+            7[0-7]|
+            8[2-7]|
+            9[0-4679]
+          )\\d{7}
+        ',
+                'fixed_line' => '
+          2(?:
+            0[3-9]|
+            1[0-689]|
+            2[0-25-9]|
+            3[2-9]|
+            4[2-8]|
+            5[124-9]|
+            6[0-39]|
+            7[0-7]|
+            8[2-7]|
+            9[0-4679]
+          )\\d{7}
+        ',
                 'specialrate' => '(1900\\d{4,6})|(
-          [17]99\\d{4}|
-          69\\d{5,6}|
-          80\\d{5}
+          (?:
+            [17]99|
+            69\\d\\d?|
+            80\\d
+          )\\d{4}
         )',
+                'personal_number' => '',
+                'pager' => '',
                 'mobile' => '
           (?:
-            9\\d|
-            1(?:
-              2\\d|
-              6[2-9]|
-              8[68]|
-              99
+            (?:
+              3\\d|
+              7[06-9]
+            )\\d|
+            5(?:
+              2[238]|
+              [689]\\d
+            )|
+            8(?:
+              [1-58]\\d|
+              6[5689]|
+              9[689]
+            )|
+            9(?:
+              [0-8]\\d|
+              9[013-9]
             )
-          )\\d{7}|
-          8(?:
-            6[689]|
-            8\\d|
-            9[89]
           )\\d{6}
         ',
-                'toll_free' => '1800\\d{4,6}',
-                'fixed_line' => '
+                'voip' => '
           (?:
-            2(?:
-              0[3-9]|
-              1[0-689]|
-              2[0-25-9]|
-              3[2-9]|
-              4[2-8]|
-              5[124-9]|
-              6[0-39]|
-              7[0-7]|
-              8[2-7]|
-              9[0-4679]
-            )\\d|
-            866
-          )\\d{6}
-        ',
-                'voip' => '',
-                'personal_number' => '',
-                'geographic' => '
-          (?:
-            2(?:
-              0[3-9]|
-              1[0-689]|
-              2[0-25-9]|
-              3[2-9]|
-              4[2-8]|
-              5[124-9]|
-              6[0-39]|
-              7[0-7]|
-              8[2-7]|
-              9[0-4679]
-            )\\d|
-            866
-          )\\d{6}
-        ',
-                'pager' => ''
+            67|
+            99
+          )2\\d{6}
+        '
               };
 my %areanames = (
   84203 => "Quang\ Ninh\ province",
@@ -187,13 +176,7 @@ my %areanames = (
   84237 => "Thanh\ Hoa\ province",
   84238 => "Nghe\ An\ province",
   84239 => "Ha\ Tinh\ province",
-  84242 => "Hanoi\ City",
-  84243 => "Hanoi\ City",
-  84244 => "Hanoi\ City",
-  84245 => "Hanoi\ City",
-  84246 => "Hanoi\ City",
-  84247 => "Hanoi\ City",
-  84248 => "Hanoi\ City",
+  8424 => "Hanoi\ City",
   84251 => "Dong\ Nai\ province",
   84252 => "Binh\ Thuan\ province",
   84254 => "Ba\ Ria\ Vung\ Tau\ province",
@@ -215,12 +198,7 @@ my %areanames = (
   84275 => "Ben\ Tre\ province",
   84276 => "Tay\ Ninh\ province",
   84277 => "Dong\ Thap\ province",
-  84282 => "Ho\ Chi\ Minh\ City",
-  84283 => "Ho\ Chi\ Minh\ City",
-  84284 => "Ho\ Chi\ Minh\ City",
-  84285 => "Ho\ Chi\ Minh\ City",
-  84286 => "Ho\ Chi\ Minh\ City",
-  84287 => "Ho\ Chi\ Minh\ City",
+  8428 => "Ho\ Chi\ Minh\ City",
   84290 => "Ca\ Mau\ province",
   84291 => "Bac\ Lieu\ province",
   84292 => "Can\ Tho\ City",

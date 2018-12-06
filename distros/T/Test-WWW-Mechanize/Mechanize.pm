@@ -9,11 +9,11 @@ Test::WWW::Mechanize - Testing-specific WWW::Mechanize subclass
 
 =head1 VERSION
 
-Version 1.50
+Version 1.52
 
 =cut
 
-our $VERSION = '1.50';
+our $VERSION = '1.52';
 
 =head1 SYNOPSIS
 
@@ -143,6 +143,20 @@ sub new {
 
     return $self;
 }
+
+
+# Override WWW::Mechanize->_reset_page() to handle Test::WWW::Mechanize-specific data.
+sub _reset_page {
+    my $self = shift;
+
+    # Parent object stuff
+    $self->SUPER::_reset_page( @_ );
+
+    $self->{ids} = undef;
+
+    return;
+}
+
 
 =head1 METHODS: HTTP VERBS
 
@@ -442,8 +456,17 @@ sub follow_link_ok {
 
 =head2 $mech->click_ok( $button[, $desc] )
 
-Clicks the button named by C<$button>.  An optional C<$desc> can
-be given for the test.
+=head2 $mech->click_ok( \@button-and-coordinates [, $desc ] )
+
+Clicks the button named by C<$button>.  An optional C<$desc> can be
+given for the test.
+
+    $mech->click_ok( 'continue', 'Clicking the "Continue" button' );
+
+Alternatively the first argument can be an arrayref with three elements:
+The name of the button and the X and Y coordinates of the button.
+
+    $mech->click_ok( [ 'continue', 12, 47 ], 'Clicking the "Continue" button' );
 
 =cut
 
@@ -452,11 +475,17 @@ sub click_ok {
     my $button = shift;
     my $desc   = shift;
 
-    my $response = $self->click( $button );
+    my $response;
+    if ( ref($button) eq 'ARRAY' ) {
+        $response = $self->click( $button->[0], $button->[1], $button->[2] );
+    }
+    else {
+        $response = $self->click( $button );
+    }
+
     if ( !$response ) {
         return $TB->ok( 0, $desc );
     }
-
 
     my $ok = $response->is_success;
 
@@ -708,7 +737,7 @@ sub _tidy_content_ok {
         $tidy = HTML::Tidy5->new();
     }
 
-    $tidy->parse( '', $self->content );
+    $tidy->parse( '', $self->content_for_tidy );
 
     my @messages = $tidy->messages;
     my $nmessages = @messages;
@@ -725,6 +754,24 @@ sub _tidy_content_ok {
     }
 
     return $ok;
+}
+
+
+=head2 $mech->content_for_tidy()
+
+This method is called by C<html_tidy_ok()> to get the content that should
+be validated by HTML::Tidy5. By default, this is just C<content()>,
+but subclasses can override it to modify the content before validation.
+
+This method should not change any state in the Mech object.  Specifically,
+it should not actually modify any of the actual content.
+
+=cut
+
+sub content_for_tidy {
+    my $self = shift;
+
+    return $self->content;
 }
 
 
@@ -1581,6 +1628,203 @@ sub scraped_id_like {
 }
 
 
+=head2 id_exists( $id )
+
+Returns TRUE/FALSE if the given ID exists in the given HTML, or if none
+is provided, then the current page.
+
+The Mech object caches the IDs so that it doesn't bother reparsing every
+time it's asked about an ID.
+
+=cut
+
+sub id_exists {
+    my $self = shift;
+    my $id   = shift;
+
+    assert_is( $self->ct, 'text/html', 'Can only call id_exists on HTML pages' );
+
+    if ( !$self->{ids} ) {
+        my $ids = $self->{ids} = {};
+        my $p = HTML::Parser->new(
+            handlers => {
+                start => [
+                    sub {
+                        my $attr = shift;
+
+                        if ( my $id = $attr->{id} ) {
+                            $ids->{$id} = 1;
+                        }
+                    },
+                    'attr'
+                ],
+            },
+        );
+        $p->parse( $self->content );
+        $p->eof;
+    }
+
+    return $self->{ids}->{$id};
+}
+
+
+=head2 $agent->id_exists_ok( $id [, $msg] )
+
+Verifies there is an HTML element with ID C<$id> in the page.
+
+=cut
+
+sub id_exists_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $self = shift;
+    my $id   = shift;
+    my $msg  = shift || ('ID "' . ($id || '') . '" should exist');
+
+    my $exists = $self->id_exists( $id );
+
+    return $TB->ok( $exists, $msg );
+}
+
+
+=head2 $agent->ids_exist_ok( \@ids [, $msg] )
+
+Verifies an HTML element exists with each ID in C<\@ids>.
+
+=cut
+
+sub ids_exist_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $self = shift;
+    my $ids  = shift;
+    my $msg  = shift;
+
+    assert_arrayref( $ids );
+
+    my $subtest_name = 'ids_exist_ok( [' . join( ', ', @{$ids} ) . ']';
+    $subtest_name .= ", $msg" if defined $msg;
+    $subtest_name .= ' )';
+
+    return $TB->subtest(
+        $subtest_name,
+        sub {
+            $TB->plan( tests => scalar @{$ids} );
+
+            foreach my $id ( @$ids ) {
+                $self->id_exists_ok( $id );
+            }
+        }
+    );
+}
+
+=head2 $agent->lacks_id_ok( $id [, $msg] )
+
+Verifies there is NOT an HTML element with ID C<$id> in the page.
+
+=cut
+
+sub lacks_id_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $self = shift;
+    my $id   = shift;
+    my $msg  = shift || ('ID "' . ($id || '') . '" should not exist');
+
+    assert_nonblank( $id );
+
+    my $exists = $self->id_exists( $id );
+
+    return $TB->ok( !$exists, $msg );
+}
+
+
+=head2 $agent->lacks_ids_ok( \@ids [, $msg] )
+
+Verifies there are no HTML elements with any of the ids given in C<\@ids>.
+
+=cut
+
+sub lacks_ids_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $self = shift;
+    my $ids = shift;
+    my $msg = shift;
+
+    assert_arrayref( $ids );
+
+    my $subtest_name = 'lacks_id_ok( [' . join( ', ', @{$ids} ) . ']';
+    $subtest_name .= ", $msg" if defined $msg;
+    $subtest_name .= ' )';
+
+    return $TB->subtest(
+        $subtest_name,
+        sub {
+            $TB->plan( tests => scalar @{$ids} );
+
+            foreach my $id ( @$ids ) {
+                $self->lacks_id_ok( $id, "ID '" . ($id // '') . "' should not exist" );
+            }
+        }
+    );
+}
+
+
+=head2 $mech->button_exists( $button )
+
+Returns a boolean saying whether the submit C<$button> exists. Does not
+do a test. For that you want C<button_exists_ok> or C<lacks_button_ok>.
+
+=cut
+
+sub button_exists {
+    my $self   = shift;
+    my $button = shift;
+
+    my $input = $self->grep_inputs( {
+        type => qr/^submit$/,
+        name => qr/^$button$/
+    } );
+
+    return !!$input;
+}
+
+
+=head2 $mech->button_exists_ok( $button [, $msg] )
+
+Asserts that the button exists on the page.
+
+=cut
+
+sub button_exists_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $self   = shift;
+    my $button = shift;
+    my $msg    = shift;
+
+    return $TB->ok( $self->button_exists( $button ), $msg );
+}
+
+
+=head2 $mech->lacks_button_ok( $button [, $msg] )
+
+Asserts that the button exists on the page.
+
+=cut
+
+sub lacks_button_ok {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+    my $self   = shift;
+    my $button = shift;
+    my $msg    = shift;
+
+    return $TB->ok( !$self->button_exists( $button ), $msg );
+}
+
+
 =head1 METHODS: MISCELLANEOUS
 
 =head2 $mech->autolint( [$status] )
@@ -1980,10 +2224,11 @@ L<http://search.cpan.org/dist/Test-WWW-Mechanize>
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to
+@marderh,
 Eric A. Zarko,
-moznion,
+@moznion,
 Robert Stone,
-tynovsky,
+@tynovsky,
 Jerry Gay,
 Jonathan "Duke" Leto,
 Philip G. Potter,

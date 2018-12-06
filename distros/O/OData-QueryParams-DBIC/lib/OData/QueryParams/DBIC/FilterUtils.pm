@@ -13,7 +13,7 @@ no warnings 'experimental::signatures';
 use parent 'Exporter';
 
 our @EXPORT_OK = qw(parser);
-our $VERSION   = '0.06';
+our $VERSION   = '0.08';
 
 use constant Operators => {
     EQUALS             => 'eq',
@@ -34,9 +34,15 @@ sub predicate ($config) {
 
     my $this = {
         subject  => $config->{subject},
+        sub_type => $config->{sub_type},
         value    => $config->{value},
+        val_type => $config->{val_type},
         operator => ($config->{operator}) ? $config->{operator} : Operators->{EQUALS},
     };
+
+    if ( $this->{value} && $this->{value} =~ m{\A[0-9]+(?:\.[0-9]+)?\z} ) {
+        $this->{val_type} = 'numeric';
+    }
 
     return $this;
 }
@@ -54,7 +60,7 @@ sub parser {
             \s+
             (eq|gt|lt|ge|le|ne)
             \s+
-            (true|false|datetimeoffset'(.*)'|'(.*)'|(?:[0-9]+(?:\.[0-9]+)?)*)
+            (true|false|datetimeoffset'(.*)'|('.*')|(?:[0-9]+(?:\.[0-9]+)?)*)
         /x,
         startsWith  => qr/^startswith[(](.*), \s* '(.*)'[)]/x,
         endsWith    => qr/^endswith[(](.*), \s* '(.*)'[)]/x,
@@ -86,9 +92,13 @@ sub parser {
                     $obj = parse_fragment( $match[2] . ' ' . $match[3] );
                     $obj->{subject} = predicate({
                         subject  => $match[0],
+                        sub_type => 'field',
                         operator => $match[1],
                         value    => $match[2],
+                        val_type => 'string',
                     });
+
+                    $obj->{sub_type} = undef;
                 }
                 elsif ( $key eq 'andor' ) {
                     $obj = predicate({
@@ -100,12 +110,25 @@ sub parser {
                 elsif ( $key eq 'op' ) {
                     $obj = predicate({
                         subject  => $match[0],
+                        sub_type => 'field',
                         operator => $match[1],
                         value    => $match[2],
                     });
 
                     if ( $match[0] =~ m{\(.*?\)} ) {
-                        $obj->{subject} = parse_fragment( $match[0] );
+                        $obj->{subject}  = parse_fragment( $match[0] );
+                        $obj->{sub_type} = undef;
+                    }
+
+                    if ( $match[2] =~ m{\A'.*?'\z} ) {
+                        #$obj->{value}    = $1;
+                        $obj->{val_type} = 'string';
+                    }
+                    elsif ( $match[2] eq 'true' | $match[2] eq 'false' ) {
+                        $obj->{val_type} = 'bool';
+                    }
+                    elsif ( $match[2] =~ m{\A[0-9]+(?:\.[0-9]+)?\z} ) {
+                        $obj->{val_type} = 'numeric';
                     }
 
                     #if(typeof obj.value === 'string') {
@@ -122,8 +145,10 @@ sub parser {
                 else {
                     $obj = predicate({
                         subject  => $match[0],
+                        sub_type => ( $key eq 'substringof' ? 'string' : 'field' ),
                         operator => $key,
                         value    => $match[1],
+                        val_type => ( $key eq 'substringof' ? 'field' : 'string' ),
                     });
                 }
 
@@ -161,7 +186,7 @@ OData::QueryParams::DBIC::FilterUtils - parse filter param
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 

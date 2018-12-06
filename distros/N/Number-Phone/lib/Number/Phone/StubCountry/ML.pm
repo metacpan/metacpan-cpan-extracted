@@ -22,27 +22,53 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[24-9]',
-                  'format' => '$1 $2 $3 $4'
+                  'leading_digits' => '
+            67(?:
+              0[09]|
+              [59]9|
+              77|
+              8[89]
+            )|
+            74(?:
+              0[02]|
+              44|
+              55
+            )
+          ',
+                  'intl_format' => 'NA',
+                  'format' => '$1',
+                  'pattern' => '(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{4})',
-                  'format' => '$1',
                   'leading_digits' => '
-            67|
-            74
+            [24-79]|
+            8[0239]
           ',
-                  'intl_format' => 'NA'
+                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 }
               ];
 
 my $validators = {
+                'mobile' => '
+          (?:
+            2(?:
+              079|
+              17\\d
+            )|
+            (?:
+              50|
+              [679]\\d|
+              8[239]
+            )\\d\\d
+          )\\d{4}
+        ',
                 'pager' => '',
+                'voip' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -61,8 +87,7 @@ my $validators = {
             )\\d
           )\\d{4}
         ',
-                'personal_number' => '',
-                'voip' => '',
+                'toll_free' => '80\\d{6}',
                 'fixed_line' => '
           (?:
             2(?:
@@ -81,18 +106,7 @@ my $validators = {
             )\\d
           )\\d{4}
         ',
-                'toll_free' => '80\\d{6}',
-                'mobile' => '
-          (?:
-            2(?:
-              079|
-              17\\d
-            )|
-            50\\d{2}|
-            [679]\\d{3}|
-            8[239]\\d{2}
-          )\\d{4}
-        ',
+                'personal_number' => '',
                 'specialrate' => ''
               };
 my %areanames = (
@@ -106,8 +120,7 @@ my %areanames = (
   2232076 => "Bamako",
   2232077 => "Bamako",
   2232078 => "Bamako",
-  2232126 => "Koulikoro",
-  2232127 => "Koulikoro",
+  223212 => "Koulikoro",
   223214 => "Mopti",
   223215 => "Kayes",
   223216 => "Sikasso",

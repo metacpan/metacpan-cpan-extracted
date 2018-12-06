@@ -22,40 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'leading_digits' => '
-            [2-57-9]|
-            6[036-9]
-          ',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[2-9]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
                 'geographic' => '
-          (?:
-            20[2-8]|
-            3(?:
-              [0-2][2-7]|
-              3[24-7]
-            )|
-            4(?:
-              0[2-467]|
-              1[2467]
-            )|
-            5(?:
-              [01][2467]|
-              2[2-467]
-            )
-          )\\d{5}
-        ',
-                'fixed_line' => '
           (?:
             20[2-8]|
             3(?:
@@ -78,27 +57,43 @@ my $validators = {
             9\\d
           )\\d{5}
         ',
-                'personal_number' => '',
-                'voip' => '78[1-49]\\d{5}',
-                'mobile' => '
-          6(?:
-            00\\d|
-            3[024]\\d|
-            6[0-25]\\d|
-            [7-9]\\d{2}
-          )\\d{4}
-        ',
-                'specialrate' => '(
+                'fixed_line' => '
           (?:
-            9(?:
-              4[1568]|
-              5[178]
+            20[2-8]|
+            3(?:
+              [0-2][2-7]|
+              3[24-7]
+            )|
+            4(?:
+              0[2-467]|
+              1[2467]
+            )|
+            5(?:
+              [01][2467]|
+              2[2-467]
             )
           )\\d{5}
-        )|(77[1-9]\\d{5})'
+        ',
+                'personal_number' => '',
+                'specialrate' => '(
+          9(?:
+            4[1568]|
+            5[178]
+          )\\d{5}
+        )|(77[1-9]\\d{5})',
+                'mobile' => '
+          6(?:
+            00|
+            3[024]|
+            6[0-25]|
+            [7-9]\\d
+          )\\d{5}
+        ',
+                'pager' => '',
+                'voip' => '78[1-49]\\d{5}'
               };
 my %areanames = (
-  38220 => "Danilovgad\/Kolasin\/Podgorica",
+  3822 => "Danilovgad\/Kolasin\/Podgorica",
   38230 => "Bar\/Ulcinj",
   38231 => "Herceg\ Novi",
   38232 => "Kotor\/Tivat",

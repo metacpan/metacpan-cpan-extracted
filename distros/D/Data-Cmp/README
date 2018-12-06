@@ -2,8 +2,8 @@ NAME
     Data::Cmp - Compare two data structures, return -1/0/1 like cmp
 
 VERSION
-    This document describes version 0.005 of Data::Cmp (from Perl
-    distribution Data-Cmp), released on 2018-08-13.
+    This document describes version 0.006 of Data::Cmp (from Perl
+    distribution Data-Cmp), released on 2018-12-06.
 
 SYNOPSIS
      use Data::Cmp qw(cmp_data);
@@ -128,6 +128,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+  Data comparison
     Other variants of Data::Cmp: Data::Cmp::Numeric,
     Data::Cmp::StrOrNumeric, Data::Cmp::Custom (allows custom actions and
     comparison routines), Data::Cmp::Diff (generates diff structure instead
@@ -149,6 +150,11 @@ SEE ALSO
     Test modules that do data structure comparison: Test::DataCmp (test
     module based on Data::Cmp::Custom), Test::More ("is_deeply()"),
     Test::Deep, Test2::Tools::Compare.
+
+  Others
+    Scalar::Cmp which employs roughly the same rules as Data::Cmp but does
+    not recurse into arrays/hashes and is meant to compare two scalar
+    values.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -54,6 +54,7 @@ File content editor (with ace.js)
 __DATA__
 
 @@ layouts/Mojolicious-Plugin-StaticShare/main.html.ep
+% $c->tx->res->headers->cache_control('private, max-age=0, no-cache, no-store');
 <!DOCTYPE html>
 <html>
 <head>

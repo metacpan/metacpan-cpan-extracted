@@ -9,12 +9,13 @@ use Catalyst::Exception ();
 use Digest              ();
 use overload            ();
 use Object::Signature   ();
+use HTML::Entities      ();
 use Carp;
 use List::Util qw/ max /;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 $VERSION = eval $VERSION;
 
 my @session_data_accessors; # used in delete_session
@@ -480,6 +481,7 @@ sub _load_sessionid {
             $c->_sessionid($sid);
             return $sid;
         } else {
+            $sid = HTML::Entities::encode_entities($sid);
             my $err = "Tried to set invalid session ID '$sid'";
             $c->log->error($err);
             Catalyst::Exception->throw($err);
@@ -669,7 +671,7 @@ sub set_session_id { shift->maybe::next::method(@_) }
 sub delete_session_id { shift->maybe::next::method(@_) }
 sub extend_session_id { shift->maybe::next::method(@_) }
 
-__PACKAGE__;
+__PACKAGE__->meta->make_immutable;
 
 __END__
 

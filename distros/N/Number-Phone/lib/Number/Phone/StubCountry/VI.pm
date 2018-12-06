@@ -22,28 +22,41 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223705;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '($1) $2-$3',
                   'intl_format' => '$1-$2-$3',
+                  'format' => '($1) $2-$3',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'personal_number' => '
+          5(?:
+            00|
+            2[12]|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
                 'specialrate' => '(900[2-9]\\d{6})',
                 'geographic' => '(
           340(?:
             2(?:
               01|
-              2[0678]|
+              2[06-8]|
               44|
               77
             )|
@@ -77,7 +90,7 @@ my $validators = {
           340(?:
             2(?:
               01|
-              2[0678]|
+              2[06-8]|
               44|
               77
             )|
@@ -108,19 +121,6 @@ my $validators = {
             998
           )\\d{4}
         )',
-                'pager' => '',
-                'voip' => '',
-                'personal_number' => '
-          5(?:
-            00|
-            2[12]|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
                 'toll_free' => '
           8(?:
             00|
@@ -131,7 +131,9 @@ my $validators = {
             77|
             88
           )[2-9]\\d{6}
-        '
+        ',
+                'voip' => '',
+                'pager' => ''
               };
 use Number::Phone::NANP::Data;
 sub areaname {

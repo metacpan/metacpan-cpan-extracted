@@ -1,9 +1,9 @@
 This archive contains the distribution SVG-Estimate,
-version 1.0108:
+version 1.0109:
 
   Estimates the length of all the vectors in an SVG file.
 
-This software is copyright (c) 2016 by Plain Black Coproration.
+This software is copyright (c) 2018 by Plain Black Coproration.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

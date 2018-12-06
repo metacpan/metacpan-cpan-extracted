@@ -3,16 +3,23 @@ use strict;
 
 package JMAP::Tester::Result::Download;
 # ABSTRACT: what you get when you download a blob
-$JMAP::Tester::Result::Download::VERSION = '0.021';
+$JMAP::Tester::Result::Download::VERSION = '0.022';
 use Moo;
-with 'JMAP::Tester::Role::Result';
+with 'JMAP::Tester::Role::HTTPResult';
 
 use namespace::clean;
 
 #pod =head1 OVERVIEW
 #pod
 #pod This is what you get when you download!  It's got an C<is_success> method.  It
-#pod returns true.
+#pod returns true. It also has:
+#pod
+#pod =method bytes_ref
+#pod
+#pod The raw bytes of the blob.
+#pod
+#pod It also has a C<bytes_ref> method which will return a reference to the
+#pod raw bytes of the download.
 #pod
 #pod =cut
 
@@ -23,7 +30,7 @@ has bytes_ref => (
   lazy => 1,
   default => sub {
     my $str = $_[0]->http_response->decoded_content(charset => 'none');
-    return $str;
+    return \$str;
   },
 );
 
@@ -41,12 +48,21 @@ JMAP::Tester::Result::Download - what you get when you download a blob
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 
 This is what you get when you download!  It's got an C<is_success> method.  It
-returns true.
+returns true. It also has:
+
+=head1 METHODS
+
+=head2 bytes_ref
+
+The raw bytes of the blob.
+
+It also has a C<bytes_ref> method which will return a reference to the
+raw bytes of the download.
 
 =head1 AUTHOR
 

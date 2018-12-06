@@ -1,5 +1,5 @@
 package SVG::Estimate::Path;
-$SVG::Estimate::Path::VERSION = '1.0108';
+$SVG::Estimate::Path::VERSION = '1.0109';
 use Moo;
 use Image::SVG::Path qw/extract_path_info/;
 use SVG::Estimate::Path::Moveto;
@@ -20,7 +20,7 @@ SVG::Estimate::Path - Handles estimating arbitrary vectors.
 
 =head1 VERSION
 
-version 1.0108
+version 1.0109
 
 =head1 SYNOPSIS
 

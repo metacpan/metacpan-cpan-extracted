@@ -1,5 +1,5 @@
 package SVG::Estimate::Line;
-$SVG::Estimate::Line::VERSION = '1.0108';
+$SVG::Estimate::Line::VERSION = '1.0109';
 use Moo;
 
 extends 'SVG::Estimate::Shape';
@@ -11,7 +11,7 @@ SVG::Estimate::Line - Handles estimating straight lines.
 
 =head1 VERSION
 
-version 1.0108
+version 1.0109
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,9 @@ sub BUILDARGS {
     my ($class, @args) = @_;
     ##Upgrade to hashref
     my $args = @args % 2 ? $args[0] : { @args };
+    foreach my $arg (qw(x1 x2 y1 y2)) {
+        $args->{$arg} //= 0;
+    }
     return $args unless exists $args->{transformer};
     my $point1 = $args->{transformer}->transform([$args->{x1}, $args->{y1}]);
     my $point2 = $args->{transformer}->transform([$args->{x2}, $args->{y2}]);

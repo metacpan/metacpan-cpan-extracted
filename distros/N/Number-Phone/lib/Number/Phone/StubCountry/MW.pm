@@ -22,32 +22,32 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d)(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
-                  'leading_digits' => '1'
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '1[2-9]'
                 },
                 {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
                   'leading_digits' => '2',
-                  'pattern' => '(2\\d{2})(\\d{3})(\\d{3})'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[17-9]',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4'
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '[17-9]',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
-                  'leading_digits' => '31'
+                  'leading_digits' => '3',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
@@ -55,28 +55,30 @@ my $validators = {
                 'fixed_line' => '
           (?:
             1[2-9]|
-            21\\d{2}
-          )\\d{5}
-        ',
-                'toll_free' => '',
-                'personal_number' => '',
-                'voip' => '31\\d{7}',
-                'pager' => '',
-                'geographic' => '
-          (?:
-            1[2-9]|
-            21\\d{2}
+            21\\d\\d
           )\\d{5}
         ',
                 'specialrate' => '',
+                'personal_number' => '',
+                'geographic' => '
+          (?:
+            1[2-9]|
+            21\\d\\d
+          )\\d{5}
+        ',
+                'toll_free' => '',
+                'voip' => '31\\d{7}',
                 'mobile' => '
           (?:
             111|
-            77\\d|
-            88\\d|
-            99\\d
+            (?:
+              77|
+              88|
+              99
+            )\\d
           )\\d{6}
-        '
+        ',
+                'pager' => ''
               };
 
     sub new {

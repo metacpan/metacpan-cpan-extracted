@@ -22,34 +22,10 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '
-            [38]9|
-            4(?:
-              [45][0-5]|
-              87
-            )|
-            5(?:
-              0|
-              6(?:
-                3[14-7]|
-                7
-              )|
-              7[37]
-            )|
-            6[36-8]|
-            7|
-            9[1-9]
-          ',
-                  'pattern' => '([3-9]\\d)(\\d{3})(\\d{4})'
-                },
-                {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
             3(?:
@@ -69,71 +45,50 @@ my $formatters = [
               [49]2|
               5[24]
             )|
-            8[0-8]|
-            90
+            [89]0
           ',
-                  'pattern' => '([3-689]\\d{2})(\\d{3})(\\d{3})'
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
+                  'pattern' => '(\\d{4})(\\d{5})',
                   'format' => '$1 $2',
-                  'national_rule' => '0$1',
                   'leading_digits' => '
-            3(?:
-              [1-46-8](?:
-                [013-9]|
-                22
-              )|
-              5[013-9]
-            )|
+            3[1-8]|
             4(?:
-              [137][013-9]|
+              [1367]|
               [45][6-9]|
-              6(?:
-                [013-9]|
-                22
-              )|
               8[4-6]
             )|
             5(?:
-              [1245][013-9]|
-              3|
+              [1-5]|
               6(?:
                 [015689]|
                 3[02389]
               )|
               7[4-6]
             )|
-            6(?:
-              [12][13-8]|
-              [49][013-9]|
-              5[0135-9]
+            6[12459]
+          ',
+                  'national_rule' => '0$1'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '
+            [35-9]|
+            4(?:
+              [45]|
+              87
             )
           ',
-                  'pattern' => '([3-6]\\d{3})(\\d{5})'
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            3[1-8]|
-            4[13-8]|
-            5[1-7]|
-            6[12459]
-          )\\d{7}
-        ',
-                'pager' => '',
-                'toll_free' => '800\\d{6}',
-                'fixed_line' => '
-          (?:
-            3[1-8]|
-            4[13-8]|
-            5[1-7]|
-            6[12459]
-          )\\d{7}
-        ',
                 'voip' => '89[1-579]\\d{6}',
-                'personal_number' => '',
+                'pager' => '',
                 'mobile' => '
           (?:
             39|
@@ -143,7 +98,25 @@ my $validators = {
             9[1-9]
           )\\d{7}
         ',
-                'specialrate' => '(900[2-49]\\d{5})'
+                'specialrate' => '(900[2-49]\\d{5})',
+                'personal_number' => '',
+                'fixed_line' => '
+          (?:
+            3[1-8]|
+            4[13-8]|
+            5[1-7]|
+            6[12459]
+          )\\d{7}
+        ',
+                'toll_free' => '800\\d{6}',
+                'geographic' => '
+          (?:
+            3[1-8]|
+            4[13-8]|
+            5[1-7]|
+            6[12459]
+          )\\d{7}
+        '
               };
 my %areanames = (
   38031 => "Zakarpattia",
@@ -161,34 +134,52 @@ my %areanames = (
   3803144 => "Irshava\,\ Zakarpattia",
   3803145 => "Perechyn\,\ Zakarpattia",
   3803146 => "Mizhhirya\,\ Zakarpattia",
-  38032 => "Lviv",
+  380320 => "Lviv",
+  380321 => "Lviv",
   380322 => "Bryukhovichi\/Lviv\,\ Lviv",
   3803230 => "Pustomyty\,\ Lviv",
   3803231 => "Gorodok\,\ Lviv",
+  3803232 => "Lviv",
+  3803233 => "Lviv",
   3803234 => "Mostyska\,\ Lviv",
+  3803235 => "Lviv",
   3803236 => "Sambir\,\ Lviv",
+  3803237 => "Lviv",
   3803238 => "Old\ Sambir\,\ Lviv",
   3803239 => "Zhidachiv\,\ Lviv",
+  3803240 => "Lviv",
   3803241 => "Nikolaev\,\ Lviv",
+  3803242 => "Lviv",
+  3803243 => "Lviv",
   3803244 => "Drogobych\,\ Lviv",
   3803245 => "Stryi\,\ Lviv",
+  3803246 => "Lviv",
   3803247 => "Truskavets\,\ Lviv",
   3803248 => "Boryslav\/Skhidnytsya\,\ Lviv",
   3803249 => "Chervonograd\,\ Lviv",
+  3803250 => "Lviv",
   3803251 => "Skole\/Slavske\,\ Lviv",
   3803252 => "Zhovkva\,\ Lviv",
+  3803253 => "Lviv",
   3803254 => "Kamyanka\-Buzka\,\ Lviv",
   3803255 => "Radehiv\,\ Lviv",
   3803256 => "Novoyavorivsk\,\ Lviv",
   3803257 => "Sokal\,\ Lviv",
+  3803258 => "Lviv",
   3803259 => "Yavoriv\,\ Lviv",
   3803260 => "Morshin\,\ Lviv",
   3803261 => "Novy\ Rozdol\,\ Lviv",
+  3803262 => "Lviv",
   3803263 => "Peremyshlyany\,\ Lviv",
   3803264 => "Busk\,\ Lviv",
   3803265 => "Zolochiv\,\ Lviv",
   3803266 => "Brody\,\ Lviv",
+  3803267 => "Lviv",
+  3803268 => "Lviv",
   3803269 => "Turka\,\ Lviv",
+  380327 => "Lviv",
+  380328 => "Lviv",
+  380329 => "Lviv",
   38033 => "Volyn",
   380332 => "Lutsk\,\ Volyn",
   3803342 => "Volodymyr\-Volynsky\,\ Volyn",
@@ -502,13 +493,16 @@ my %areanames = (
   3805357 => "Orzhitsa\,\ Poltava",
   3805358 => "Pyriatyn\,\ Poltava",
   3805359 => "Hrebinka\,\ Poltava",
-  380536 => "Kremenchug\,\ Poltava",
+  3805360 => "Kremenchug\,\ Poltava",
   3805361 => "Lubny\,\ Poltava",
   3805362 => "Khorol\,\ Poltava",
   3805363 => "Reshetilivka\,\ Poltava",
   3805364 => "Mashivka\,\ Poltava",
   3805365 => "Globin\,\ Poltava",
   3805366 => "Kremenchug\,\ Poltava",
+  3805367 => "Kremenchug\,\ Poltava",
+  3805368 => "Kremenchug\,\ Poltava",
+  3805369 => "Kremenchug\,\ Poltava",
   38054 => "Sumy",
   3805442 => "Putivl\,\ Sumy",
   3805443 => "Belopoly\,\ Sumy",
@@ -547,8 +541,9 @@ my %areanames = (
   3805547 => "Belozerka\,\ Kherson",
   3805548 => "Novotroitsk\,\ Kherson",
   3805549 => "New\ Kakhovka\,\ Kherson",
-  38056 => "Dnipropetrovsk\/Dnipro",
-  380563 => "Pavlograd\,\ Dnipro",
+  380560 => "Dnipropetrovsk\/Dnipro",
+  380561 => "Dnipropetrovsk\/Dnipro",
+  380562 => "Dnipropetrovsk\/Dnipro",
   3805630 => "Mezhova\,\ Dnipro",
   3805631 => "Petropavlovka\,\ Dnipro",
   3805632 => "Pavlograd\,\ Dnipro",
@@ -556,23 +551,32 @@ my %areanames = (
   3805634 => "Petrykivka\,\ Dnipro",
   3805635 => "Yurievka\,\ Dnipro",
   3805636 => "Ternivka\,\ Dnipro",
+  3805637 => "Pavlograd\,\ Dnipro",
   3805638 => "Pokrovskoe\,\ Dnipro",
   3805639 => "Vasylkivka\,\ Dnipro",
   380564 => "Krivoy\ Rog\,\ Dnipro",
   3805650 => "Sofiyivka\,\ Dnipro",
+  3805651 => "Dnipropetrovsk\/Dnipro",
   3805652 => "Yellow\ Waters\,\ Dnipro",
   3805653 => "Volnogirsk\,\ Dnipro",
-  3805654 => "Кринички\,\ Dnipro",
+  3805654 => "Krynychky\,\ Dnipro",
+  3805655 => "Dnipropetrovsk\/Dnipro",
   3805656 => "Apostolove\,\ Dnipro",
   3805657 => "Broad\,\ Dnipro",
   3805658 => "Verhnedneprovsk\,\ Dnipro",
-  380566 => "Nikopol\,\ Dnipro",
+  3805659 => "Dnipropetrovsk\/Dnipro",
+  3805660 => "Nikopol\,\ Dnipro",
+  3805661 => "Nikopol\,\ Dnipro",
   3805662 => "Nikopol\,\ Dnipro",
   3805663 => "Sinelnikovo\,\ Dnipro",
+  3805664 => "Nikopol\,\ Dnipro",
   3805665 => "Manganese\,\ Dnipro",
+  3805666 => "Nikopol\,\ Dnipro",
   3805667 => "Ordzhonikidze\,\ Dnipro",
   3805668 => "Tomakivka\,\ Dnipro",
   3805669 => "Salt\,\ Dnipro",
+  380567 => "Dnipropetrovsk\/Dnipro",
+  380568 => "Dnipropetrovsk\/Dnipro",
   380569 => "Dneprodzerzhinsk\/Novomoskovsk\,\ Dnipro",
   3805690 => "Tsarichanka\,\ Dnipro",
   3805691 => "Magdalenivka\,\ Dnipro",
@@ -628,75 +632,108 @@ my %areanames = (
   3806175 => "Vasilivka\/Dneprorudne\,\ Zaporizhzhia",
   3806178 => "Tokmak\,\ Zaporizhzhia",
   380619 => "Melitopol\,\ Zaporizhzhia",
-  3806192 => "Melitopol\,\ Zaporizhzhia",
-  38062 => "Donetsk",
+  380620 => "Donetsk",
+  380621 => "Donetsk",
+  380622 => "Donetsk",
   380623 => "Krasnoarmeysk\/Makeyevka\,\ Donetsk",
   3806232 => "Makeevka\,\ Donetsk",
   3806236 => "Yasinovata\,\ Donetsk",
   3806237 => "Selidus\,\ Donetsk",
   3806239 => "Krasnoarmeysk\,\ Donetsk",
-  380624 => "Gorlovka\,\ Donetsk",
+  3806240 => "Gorlovka\,\ Donetsk",
+  3806241 => "Gorlovka\,\ Donetsk",
   3806242 => "Gorlovka\,\ Donetsk",
   3806243 => "Great\ Novosilka\,\ Donetsk",
   3806244 => "Volnovaha\,\ Donetsk",
+  3806245 => "Gorlovka\,\ Donetsk",
   3806246 => "Volodarske\,\ Donetsk",
   3806247 => "Dzerzhinsk\,\ Donetsk",
+  3806248 => "Gorlovka\,\ Donetsk",
   3806249 => "Debaltsevo\,\ Donetsk",
   3806250 => "Kirovske\,\ Donetsk",
+  3806251 => "Donetsk",
   3806252 => "Yenakievo\,\ Donetsk",
   3806253 => "Starobesheve\,\ Donetsk",
   3806254 => "Torez\,\ Donetsk",
   3806255 => "Shakhtarsk\,\ Donetsk",
   3806256 => "Snizhne\,\ Donetsk",
   3806257 => "Ilovajsk\/Khartsyzsk\,\ Donetsk",
+  3806258 => "Donetsk",
   3806259 => "Amvrosievka\,\ Donetsk",
-  380626 => "Kramatorsk\/Slavyansk\,\ Donetsk",
+  3806260 => "Kramatorsk\/Slavyansk\,\ Donetsk",
   3806261 => "Krasny\ Liman\,\ Donetsk",
   3806262 => "Svyatogorsk\/Slavyansk\,\ Donetsk",
+  3806263 => "Kramatorsk\/Slavyansk\,\ Donetsk",
   3806264 => "Kramatorsk\,\ Donetsk",
+  3806265 => "Kramatorsk\/Slavyansk\,\ Donetsk",
+  3806266 => "Kramatorsk\/Slavyansk\,\ Donetsk",
   3806267 => "Druzhkovka\,\ Donetsk",
+  3806268 => "Kramatorsk\/Slavyansk\,\ Donetsk",
   3806269 => "Aleksandrovka\,\ Donetsk",
-  380627 => "Artemivsk\,\ Donetsk",
+  3806270 => "Artemivsk\,\ Donetsk",
+  3806271 => "Artemivsk\,\ Donetsk",
   3806272 => "Kostiantynivka\,\ Donetsk",
   3806273 => "Vugledar\,\ Donetsk",
   3806274 => "Artemivsk\/Siversk\,\ Donetsk",
   3806275 => "Dokuchaevsk\,\ Donetsk",
+  3806276 => "Artemivsk\,\ Donetsk",
   3806277 => "Dobropolia\,\ Donetsk",
   3806278 => "Marinka\,\ Donetsk",
   3806279 => "Telmanov\,\ Donetsk",
+  380628 => "Donetsk",
   380629 => "Mariupol\,\ Donetsk",
   3806296 => "Novoazovsk\,\ Donetsk",
   3806297 => "Mangosh\/Yalta\,\ Donetsk",
-  38064 => "Luhansk",
+  380640 => "Luhansk",
+  380641 => "Luhansk",
   380642 => "Luhansk\/Oleksandrivsk\,\ Luhansk",
+  3806430 => "Luhansk",
   3806431 => "Anthracite\,\ Luhansk",
   3806432 => "Krasnyi\ Luch\,\ Luhansk",
   3806433 => "Rovenky\,\ Luhansk",
   3806434 => "Sverdlovsk\,\ Luhansk",
   3806435 => "Krasnodon\,\ Luhansk",
   3806436 => "Lutugin\,\ Luhansk",
+  3806437 => "Luhansk",
+  3806438 => "Luhansk",
+  3806439 => "Luhansk",
+  3806440 => "Luhansk",
   3806441 => "Perevalsk\,\ Luhansk",
   3806442 => "Alchevsk\,\ Luhansk",
   3806443 => "Bryanka\,\ Luhansk",
   3806444 => "Stakhanov\,\ Luhansk",
   3806445 => "Novoyadar\,\ Luhansk",
   3806446 => "Kirovsk\,\ Luhansk",
+  3806447 => "Luhansk",
+  3806448 => "Luhansk",
+  3806449 => "Luhansk",
+  3806450 => "Luhansk",
   3806451 => "Lisichansk\,\ Luhansk",
   3806452 => "Severodonetsk\,\ Luhansk",
   3806453 => "Rubizhne\,\ Luhansk",
   3806454 => "Kremenna\,\ Luhansk",
   3806455 => "Pervomaisk\,\ Luhansk",
   3806456 => "Trinity\ Church\,\ Luhansk",
+  3806457 => "Luhansk",
+  3806458 => "Luhansk",
+  3806459 => "Luhansk",
+  3806460 => "Luhansk",
   3806461 => "Starobilsk\,\ Luhansk",
   3806462 => "Belokurakine\,\ Luhansk",
   3806463 => "Novopskov\,\ Luhansk",
   3806464 => "Markovka\,\ Luhansk",
   3806465 => "Milow\,\ Luhansk",
   3806466 => "Belovodsk\,\ Luhansk",
+  3806467 => "Luhansk",
+  3806468 => "Luhansk",
+  3806469 => "Luhansk",
+  380647 => "Luhansk",
   3806471 => "Swatov\,\ Luhansk",
   3806472 => "Stanitsa\ Luhansk\,\ Luhansk",
   3806473 => "Slavyanoserbsk\,\ Luhansk",
   3806474 => "Popasna\,\ Luhansk",
+  380648 => "Luhansk",
+  380649 => "Luhansk",
   38065 => "Crimea",
   38069 => "Sevastopol\ city",
 );

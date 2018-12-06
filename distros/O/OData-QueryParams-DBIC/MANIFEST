@@ -15,12 +15,15 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/fails.t
 t/filter.t
+t/filter_me.t
 t/filter_strict.t
 t/filter_utils.t
 t/mix.t
 t/mix_strict.t
 t/orderby.t
+t/orderby_me.t
 t/select.t
+t/select_me.t
 t/skip.t
 t/top.t
 t/unknown_op.t

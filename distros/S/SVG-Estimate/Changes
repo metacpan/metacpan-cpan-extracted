@@ -1,4 +1,8 @@
-1.0107 2018-10-09
+1.0109 2018-12-05
+ * Handle cases when shapes are missing x,y information that defaults to 0.
+ * Make sure that the end point of an arc path is always set.
+
+1.0108 2018-10-09
  * Handle the edge case of an empty path
 
 1.0107 2017-01-23

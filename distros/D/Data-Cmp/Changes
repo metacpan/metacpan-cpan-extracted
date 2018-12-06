@@ -1,3 +1,14 @@
+0.006    2018-12-06 (PERLANCAR)
+
+         - No functional changes.
+
+         - Minor code edits.
+
+         - [test] Add tests for Data::Cmp::Numeric & Data::Cmp::StrOrNumeric.
+
+         - [doc] Mention Scalar::Cmp.
+
+
 0.005    2018-08-13 (PERLANCAR)
 
          - No functional changes.

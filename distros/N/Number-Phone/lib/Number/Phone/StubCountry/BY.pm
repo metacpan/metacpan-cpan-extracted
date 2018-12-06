@@ -22,25 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214154;
+our $VERSION = 1.20181205223702;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2-$3-$4',
-                  'national_rule' => '8 0$1',
-                  'leading_digits' => '
-            17(?:
-              [02358]|
-              1[0-2]|
-              9[0189]
-            )|
-            2[4-9]|
-            [34]
-          ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{3})(\\d{3})',
+                  'national_rule' => '8 $1',
+                  'format' => '$1 $2',
+                  'leading_digits' => '800'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2,4})',
+                  'national_rule' => '8 $1',
+                  'leading_digits' => '800',
+                  'format' => '$1 $2 $3'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2-$3-$4',
                   'leading_digits' => '
             1(?:
               5[24]|
@@ -60,122 +59,60 @@ my $formatters = [
               3[26]
             )
           ',
-                  'national_rule' => '8 0$1',
-                  'format' => '$1 $2-$3-$4'
-                },
-                {
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})',
-                  'leading_digits' => '
-            1(?:
-              5[169]|
-              6(?:
-                3[1-3]|
-                4|
-                5[125]
-              )|
-              7(?:
-                1[3-9]|
-                7[0-24-6]|
-                9[2-7]
-              )
-            )|
-            2(?:
-              1[35]|
-              2[34]|
-              3[3-5]
-            )
-          ',
-                  'format' => '$1 $2-$3',
                   'national_rule' => '8 0$1'
                 },
                 {
-                  'pattern' => '([89]\\d{2})(\\d{3})(\\d{4})',
+                  'national_rule' => '8 0$1',
                   'leading_digits' => '
-            8[01]|
-            9
+            1(?:
+              [56]|
+              7(?:
+                1[3-9]|
+                7|
+                9[2-7]
+              )
+            )|
+            2[1-3]
           ',
-                  'national_rule' => '8 $1',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2-$3',
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{3})'
                 },
                 {
-                  'pattern' => '(82\\d)(\\d{4})(\\d{4})',
-                  'national_rule' => '8 $1',
+                  'national_rule' => '8 0$1',
+                  'leading_digits' => '[1-4]',
+                  'format' => '$1 $2-$3-$4',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
+                },
+                {
+                  'leading_digits' => '[89]',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '82'
-                },
-                {
-                  'leading_digits' => '800',
-                  'format' => '$1 $2',
                   'national_rule' => '8 $1',
-                  'pattern' => '(800)(\\d{3})'
-                },
-                {
-                  'national_rule' => '8 $1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '800',
-                  'pattern' => '(800)(\\d{2})(\\d{2,4})'
+                  'pattern' => '(\\d{3})(\\d{3,4})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'voip' => '249\\d{6}',
+                'pager' => '',
                 'mobile' => '
           (?:
             2(?:
-              5[5679]|
+              5[5-79]|
               9[1-9]
             )|
-            33\\d|
-            44\\d
+            (?:
+              33|
+              44
+            )\\d
           )\\d{6}
         ',
+                'personal_number' => '',
                 'specialrate' => '(
           (?:
             810|
             902
           )\\d{7}
         )',
-                'geographic' => '
-          (?:
-            1(?:
-              5(?:
-                1[1-5]|
-                [24]\\d|
-                6[2-4]|
-                9[1-7]
-              )|
-              6(?:
-                [235]\\d|
-                4[1-7]
-              )|
-              7\\d{2}
-            )|
-            2(?:
-              1(?:
-                [246]\\d|
-                3[0-35-9]|
-                5[1-9]
-              )|
-              2(?:
-                [235]\\d|
-                4[0-8]
-              )|
-              3(?:
-                [26]\\d|
-                3[02-79]|
-                4[024-7]|
-                5[03-7]
-              )
-            )
-          )\\d{5}
-        ',
-                'pager' => '',
-                'toll_free' => '
-          8(?:
-            0[13]|
-            20\\d
-          )\\d{7}|
-          800\\d{3,7}
-        ',
                 'fixed_line' => '
           (?:
             1(?:
@@ -189,7 +126,7 @@ my $validators = {
                 [235]\\d|
                 4[1-7]
               )|
-              7\\d{2}
+              7\\d\\d
             )|
             2(?:
               1(?:
@@ -210,8 +147,47 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'voip' => '249\\d{6}',
-                'personal_number' => ''
+                'toll_free' => '
+          8(?:
+            0[013]|
+            20\\d
+          )\\d{7}|
+          800\\d{3,6}
+        ',
+                'geographic' => '
+          (?:
+            1(?:
+              5(?:
+                1[1-5]|
+                [24]\\d|
+                6[2-4]|
+                9[1-7]
+              )|
+              6(?:
+                [235]\\d|
+                4[1-7]
+              )|
+              7\\d\\d
+            )|
+            2(?:
+              1(?:
+                [246]\\d|
+                3[0-35-9]|
+                5[1-9]
+              )|
+              2(?:
+                [235]\\d|
+                4[0-8]
+              )|
+              3(?:
+                [26]\\d|
+                3[02-79]|
+                4[024-7]|
+                5[03-7]
+              )
+            )
+          )\\d{5}
+        '
               };
 my %areanames = (
   3751511 => "Vyalikaya\ Byerastavitsa\,\ Grodno\ Region",
@@ -340,7 +316,7 @@ my %areanames = (
       $number =~ s/(^\+375|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
-      $number =~ s/^(?:8?0?)//;
+      $number =~ s/^(?:0|80?)//;
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }

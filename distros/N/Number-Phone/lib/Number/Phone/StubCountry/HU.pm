@@ -22,60 +22,58 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
                   'national_rule' => '($1)',
                   'leading_digits' => '1',
-                  'pattern' => '(1)(\\d{3})(\\d{4})'
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '($1)',
-                  'leading_digits' => '[2-9]'
+                  'leading_digits' => '[2-9]',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '[48]0\\d{6}',
-                'fixed_line' => '
-          (?:
-            1\\d|
-            2[2-9]|
-            3[2-7]|
-            4[24-9]|
-            5[2-79]|
-            6[23689]|
-            7[2-9]|
-            8[2-57-9]|
-            9[2-69]
-          )\\d{6}
-        ',
                 'voip' => '21\\d{7}',
-                'personal_number' => '',
-                'geographic' => '
-          (?:
-            1\\d|
-            2[2-9]|
-            3[2-7]|
-            4[24-9]|
-            5[2-79]|
-            6[23689]|
-            7[2-9]|
-            8[2-57-9]|
-            9[2-69]
-          )\\d{6}
-        ',
                 'pager' => '',
-                'specialrate' => '(9[01]\\d{6})|(38\\d{7})',
                 'mobile' => '
           (?:
             [257]0|
             3[01]
           )\\d{7}
+        ',
+                'specialrate' => '(9[01]\\d{6})|(38\\d{7})',
+                'personal_number' => '',
+                'fixed_line' => '
+          (?:
+            1\\d|
+            [27][2-9]|
+            3[2-7]|
+            4[24-9]|
+            5[2-79]|
+            6[23689]|
+            8[2-57-9]|
+            9[2-69]
+          )\\d{6}
+        ',
+                'toll_free' => '[48]0\\d{6}',
+                'geographic' => '
+          (?:
+            1\\d|
+            [27][2-9]|
+            3[2-7]|
+            4[24-9]|
+            5[2-79]|
+            6[23689]|
+            8[2-57-9]|
+            9[2-69]
+          )\\d{6}
         '
               };
 my %areanames = (

@@ -22,36 +22,28 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2|
             8[2-7]
           ',
-                  'pattern' => '([28]\\d)(\\d{3})(\\d{3,4})'
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'pattern' => '(80\\d)(\\d{3})(\\d{3})',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '80'
+                  'leading_digits' => '8'
                 }
               ];
 
 my $validators = {
+                'voip' => '',
                 'mobile' => '8[2-7]\\d{7}',
-                'specialrate' => '',
                 'pager' => '',
-                'geographic' => '
-          2(?:
-            [1346]\\d|
-            5[0-2]|
-            [78][12]|
-            93
-          )\\d{5}
-        ',
                 'fixed_line' => '
           2(?:
             [1346]\\d|
@@ -60,9 +52,17 @@ my $validators = {
             93
           )\\d{5}
         ',
-                'toll_free' => '800\\d{6}',
+                'specialrate' => '',
                 'personal_number' => '',
-                'voip' => ''
+                'geographic' => '
+          2(?:
+            [1346]\\d|
+            5[0-2]|
+            [78][12]|
+            93
+          )\\d{5}
+        ',
+                'toll_free' => '800\\d{6}'
               };
 my %areanames = (
   25821 => "Maputo",
@@ -75,7 +75,7 @@ my %areanames = (
   258272 => "Pemba",
   258281 => "Chokwe",
   258282 => "Xai\-Xai",
-  258293 => "Inhambane",
+  25829 => "Inhambane",
 );
     sub new {
       my $class = shift;

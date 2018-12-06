@@ -1,0 +1,7 @@
+: cascade with cascade::helpers
+
+: block title -> { # with default
+	[title: <: __('My Template!') :>]
+: }
+
+: block body -> { } # without default

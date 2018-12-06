@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/fastmail/JMAP-Tester/issues
   homepage: https://github.com/fastmail/JMAP-Tester
   repository: https://github.com/fastmail/JMAP-Tester.git
-version: '0.021'
+version: '0.022'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -338,7 +338,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.021'
+          tag: '0.022'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed);
 
 our @EXPORT = qw(params_to_dbic);
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 sub params_to_dbic ( $query_string, %opts ) {
     my $query;
@@ -40,7 +40,7 @@ sub params_to_dbic ( $query_string, %opts ) {
     my $params = $query->to_hash;
 
     my $filter_key = $opts{strict} ? '$filter' : 'filter';
-    my %filter = _parse_filter( delete $params->{$filter_key} );
+    my %filter = _parse_filter( delete $params->{$filter_key}, %opts );
 
     my %dbic_opts;
 
@@ -52,7 +52,7 @@ sub params_to_dbic ( $query_string, %opts ) {
 
         my $sub = __PACKAGE__->can( '_parse_' . $method );
         if ( $sub ) {
-            my %key_opts = $sub->( $params->{$param_key} );
+            my %key_opts = $sub->( $params->{$param_key}, %opts );
             %dbic_opts = (%dbic_opts, %key_opts);
         }
     }
@@ -60,27 +60,27 @@ sub params_to_dbic ( $query_string, %opts ) {
     return \%filter, \%dbic_opts;
 }
 
-sub _parse_top ( $top_data ) {
+sub _parse_top ( $top_data, %opt ) {
     return if $top_data !~ m{\A[0-9]+\z};
     return ( rows => $top_data );
 }
 
-sub _parse_skip ( $skip_data ) {
+sub _parse_skip ( $skip_data, %opt ) {
     return if $skip_data !~ m{\A[0-9]+\z};
     return ( page => $skip_data + 1 );
 }
 
-sub _parse_filter ( $filter_data ) {
+sub _parse_filter ( $filter_data, %opt ) {
     return if !defined $filter_data;
     return if $filter_data eq '';
 
     my $obj    = parser->( $filter_data );
-    my %filter = _flatten_filter( $obj );
+    my %filter = _flatten_filter( $obj, %opt );
 
     return %filter;
 }
 
-sub _parse_orderby ( $orderby_data ) {
+sub _parse_orderby ( $orderby_data, %opt ) {
     my @order_bys = split /\s*,\s*/, $orderby_data;
 
     my @dbic_order_by;
@@ -88,6 +88,12 @@ sub _parse_orderby ( $orderby_data ) {
     for my $order_by ( @order_bys ) {
         my $direction;
         $order_by =~ s{\s+(.*?)\z}{$1 && (lc $1 eq 'desc' || lc $1 eq 'asc') && ( $direction = lc $1 ); ''}e;
+
+        if ( $opt{me} && $order_by !~ m{/} ) {
+            $order_by = 'me.' . $order_by;
+        }
+
+        $order_by =~ s{/}{.};
 
         $direction //= 'asc';
 
@@ -97,12 +103,19 @@ sub _parse_orderby ( $orderby_data ) {
     return order_by => \@dbic_order_by;
 }
 
-sub _parse_select ( $select_data ) {
+sub _parse_select ( $select_data, %opt ) {
     return if !length $select_data;
-    return columns => [ split /\s*,\s*/, $select_data ];
+
+    my @columns = split /\s*,\s*/, $select_data;
+    if ( $opt{me} ) {
+        @columns = map{ m{/} ? $_ : 'me.' . $_ }@columns;
+    }
+
+    my @full_names = map{ s{/}{.}r }@columns;
+    return columns => \@full_names;
 }
 
-sub _flatten_filter ($obj) {
+sub _flatten_filter ($obj, %opt) {
     my %map = (
         'lt'  => '<',
         'le'  => '<=',
@@ -132,7 +145,7 @@ sub _flatten_filter ($obj) {
             croak 'Unsupported expression';
         }
         elsif ( ref $rule ) {
-            my ($filter_key, $filter_value) = $rule->($obj);
+            my ($filter_key, $filter_value) = $rule->($obj, %opt);
             $filter{$filter_key}            = $filter_value;
         }
         else {
@@ -142,6 +155,13 @@ sub _flatten_filter ($obj) {
 
             if ( $value =~ m{\A'(.*)'\z} ) {
                 $value = $1;
+            }
+
+            my $is_field         = $obj->{sub_type} && $obj->{sub_type} eq 'field';
+            my $is_foreign_field = $subject =~ m{\A\w+\/};
+
+            if ( $opt{me} && $is_field && !$is_foreign_field ) {
+                $subject = 'me.' . $subject;
             }
 
             $subject =~ s{\A\w+\K/}{.};
@@ -155,14 +175,14 @@ sub _flatten_filter ($obj) {
     return %filter;
 }
 
-sub _build_bool ($obj ) {
+sub _build_bool ($obj, %opt) {
     my $op      = $obj->{operator};
     my $subject = $obj->{subject};
     my $value   = $obj->{value};
 
     return "-$op" => [
-        { _flatten_filter( $subject ) },
-        { _flatten_filter( $value ) },
+        { _flatten_filter( $subject, %opt ) },
+        { _flatten_filter( $value, %opt ) },
     ];
 }
 
@@ -180,7 +200,7 @@ OData::QueryParams::DBIC - parse OData style query params and provide info for D
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 

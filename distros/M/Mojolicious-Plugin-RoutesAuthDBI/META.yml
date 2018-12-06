@@ -1,5 +1,5 @@
 ---
-abstract: 'from DBI tables does generate routes, make authentication and make restrict access (authorization) to app routes.'
+abstract: 'from DBI tables does generate app routes, make authentication and make restrict access (authorization).'
 author:
   - 'Mikhail Che <mche@cpan.org>'
 build_requires:
@@ -27,6 +27,6 @@ requires:
   perl: '5.014'
 resources:
   repository: git://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI.git
-version: '0.851'
+version: '0.861'
 x_homepage: https://github.com/mche
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

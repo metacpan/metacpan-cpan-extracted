@@ -1,7 +1,7 @@
 package Data::Cmp;
 
-our $DATE = '2018-08-13'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2018-12-06'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,7 +28,7 @@ sub _cmp_data {
         return $def2 ? -1 : 0;
     }
 
-    # both are defined
+    # so both are defined ...
 
     my $reftype1 = reftype($d1);
     my $reftype2 = reftype($d2);
@@ -36,11 +36,11 @@ sub _cmp_data {
         return $d1 cmp $d2;
     } elsif ( $reftype1 xor $reftype2) { return 2 }
 
-    # both are refs
+    # so both are refs ...
 
     return 2 if $reftype1 ne $reftype2;
 
-    # both are refs of the same type
+    # so both are refs of the same type ...
 
     my $pkg1 = blessed($d1);
     my $pkg2 = blessed($d2);
@@ -50,7 +50,7 @@ sub _cmp_data {
         return 2 if defined $pkg2;
     }
 
-    # both are non-objects or objects of the same class
+    # so both are non-objects or objects of the same class ...
 
     my $refaddr1 = refaddr($d1);
     my $refaddr2 = refaddr($d2);
@@ -104,7 +104,7 @@ Data::Cmp - Compare two data structures, return -1/0/1 like cmp
 
 =head1 VERSION
 
-This document describes version 0.005 of Data::Cmp (from Perl distribution Data-Cmp), released on 2018-08-13.
+This document describes version 0.006 of Data::Cmp (from Perl distribution Data-Cmp), released on 2018-12-06.
 
 =head1 SYNOPSIS
 
@@ -231,6 +231,8 @@ feature.
 
 =head1 SEE ALSO
 
+=head2 Data comparison
+
 Other variants of Data::Cmp: L<Data::Cmp::Numeric>, L<Data::Cmp::StrOrNumeric>,
 L<Data::Cmp::Custom> (allows custom actions and comparison routines),
 L<Data::Cmp::Diff> (generates diff structure instead of just returning
@@ -250,6 +252,11 @@ L<Data::Dmp>, just to name a few.
 Test modules that do data structure comparison: L<Test::DataCmp> (test module
 based on Data::Cmp::Custom), L<Test::More> (C<is_deeply()>), L<Test::Deep>,
 L<Test2::Tools::Compare>.
+
+=head2 Others
+
+L<Scalar::Cmp> which employs roughly the same rules as Data::Cmp but does not
+recurse into arrays/hashes and is meant to compare two scalar values.
 
 =head1 AUTHOR
 

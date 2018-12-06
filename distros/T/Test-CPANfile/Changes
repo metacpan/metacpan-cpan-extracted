@@ -1,5 +1,11 @@
 Revision history for Test-CPANfile
 
+0.04 2018/12/06
+  - add an example and doc about libs option
+
+0.03 2018/12/06
+  - add more examples and options
+
 0.02 2018/09/30
   - add CPAN::Common::Index support
 

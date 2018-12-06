@@ -22,86 +22,86 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214154;
+our $VERSION = 1.20181205223702;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d)(\\d{2})(\\d{2})',
                   'leading_digits' => '2',
-                  'pattern' => '(2)(\\d)(\\d{2})(\\d{2})'
+                  'format' => '$1 $2 $3 $4',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(2)(\\d{3})(\\d{3,4})',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '2'
-                },
-                {
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'national_rule' => '0$1',
                   'format' => '$1 $2',
                   'leading_digits' => '
-            43[124-7]|
-            70[1-9]
-          '
-                },
-                {
-                  'leading_digits' => '
-            43[124-7]|
+            43[1-6]|
             70[1-9]
           ',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})'
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
                   'national_rule' => '0$1',
+                  'leading_digits' => '2',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[78]00',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})'
+                  'pattern' => '(\\d)(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,3})',
                   'national_rule' => '0$1',
-                  'leading_digits' => '99[69]'
-                },
-                {
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             [356]|
             4[124-7]|
             7[1-9]|
             8[1-6]|
             9[1-7]
-          ',
+          '
+                },
+                {
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '
+            43[1-7]|
+            70[1-9]
+          ',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,3})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '
+            7|
+            80
+          ',
+                  'national_rule' => '0$1'
                 },
                 {
                   'leading_digits' => '
-            48|
-            8[7-9]|
+            [48]|
             9[08]
           ',
                   'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3,4})'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'national_rule' => '0$1',
+                  'leading_digits' => '9',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
                 'geographic' => '
-          2\\d{5,7}|
           (?:
-            [36]\\d|
-            5[1-9]|
-            8[1-6]|
-            9[1-7]
-          )\\d{5,6}|
-          (?:
+            (?:
+              [236]\\d|
+              5[1-9]|
+              8[1-6]|
+              9[1-7]
+            )\\d|
             4(?:
               [124-7]\\d|
               3[1-6]
@@ -110,44 +110,48 @@ my $validators = {
               0[1-9]|
               [1-9]\\d
             )
-          )\\d{4,5}
-        ',
-                'personal_number' => '700\\d{5}',
-                'voip' => '',
-                'fixed_line' => '
-          2\\d{5,7}|
-          (?:
-            [36]\\d|
-            5[1-9]|
-            8[1-6]|
-            9[1-7]
-          )\\d{5,6}|
-          (?:
-            4(?:
-              [124-7]\\d|
-              3[1-6]
-            )|
-            7(?:
-              0[1-9]|
-              [1-9]\\d
-            )
-          )\\d{4,5}
+          )\\d{4,5}|
+          2\\d{5}
         ',
                 'toll_free' => '800\\d{5}',
+                'fixed_line' => '
+          (?:
+            (?:
+              [236]\\d|
+              5[1-9]|
+              8[1-6]|
+              9[1-7]
+            )\\d|
+            4(?:
+              [124-7]\\d|
+              3[1-6]
+            )|
+            7(?:
+              0[1-9]|
+              [1-9]\\d
+            )
+          )\\d{4,5}|
+          2\\d{5}
+        ',
+                'specialrate' => '(90\\d{6})',
+                'personal_number' => '700\\d{5}',
                 'mobile' => '
           (?:
-            8[7-9]\\d|
-            9(?:
-              8\\d|
-              9[69]
-            )
-          )\\d{6}|
-          4(?:
-            3[0789]|
-            8\\d
+            4(?:
+              3[07-9]|
+              8\\d
+            )|
+            (?:
+              8[7-9]\\d|
+              9(?:
+                8\\d|
+                9[69]
+              )
+            )\\d
           )\\d{5}
         ',
-                'specialrate' => '(90\\d{6})'
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   3592 => "Sofia",
@@ -175,8 +179,12 @@ my %areanames = (
   3593038 => "Chokmanovo",
   3593039 => "Polkovnik\ Serafimovo",
   3593040 => "Trigrad",
-  3593041 => "Devin",
   35930410 => "Breze\,\ Smol\.",
+  35930411 => "Devin",
+  35930412 => "Devin",
+  35930413 => "Devin",
+  35930414 => "Devin",
+  35930415 => "Devin",
   35930416 => "Gyovren",
   35930417 => "Grohotno",
   35930418 => "Buynovo\,\ Smol\.",
@@ -607,7 +615,9 @@ my %areanames = (
   3594107 => "Sredets\,\ St\.\ Zagora",
   3594108 => "Vasil\ Levski\,\ St\.\ Zagora",
   3594109 => "Trakia",
-  3594111 => "Starozagorski\ bani",
+  35941110 => "Starozagorski\ bani",
+  35941111 => "Starozagorski\ bani",
+  35941112 => "Starozagorski\ bani",
   35941113 => "Pryaporets\,\ St\.\ Zagora",
   35941114 => "Lozen\,\ St\.\ Zagora",
   35941115 => "Borilovo",
@@ -1291,16 +1301,18 @@ my %areanames = (
   3596147 => "Ivancha\,\ V\.\ Tarnovo",
   3596148 => "Pavel",
   3596149 => "Kutsina",
-  359615 => "Zlataritsa",
+  3596150 => "Zlataritsa",
   35961502 => "Gorsko\ Novo\ Selo",
   35961503 => "Chakali",
   3596151 => "Elena\,\ V\.\ Tarnovo",
   3596152 => "Bebrovo",
+  3596153 => "Zlataritsa",
   3596154 => "Buynovtsi",
   3596155 => "Konstantin",
   3596156 => "Rodina",
   3596157 => "Slivovitsa",
   3596158 => "Sredni\ kolibi",
+  3596159 => "Zlataritsa",
   35961602 => "Tsarski\ izvor",
   35961603 => "Lozen\,\ V\.\ Tarnovo",
   35961604 => "Mirovo\,\ V\.\ Tarnovo",
@@ -1345,9 +1357,9 @@ my %areanames = (
   3596328 => "Oresh",
   3596329 => "Tsarevets\,\ V\.\ Tarnovo",
   3596352 => "Dolni\ Lukovit",
-  3596356 => "Komarevo\,\ Pleven",
   35963560 => "Radishevo",
   35963561 => "Grivitsa",
+  35963562 => "Komarevo\,\ Pleven",
   35963563 => "Borislav",
   35963564 => "Bivolare",
   35963565 => "Mechka\,\ Pleven",
@@ -1355,9 +1367,9 @@ my %areanames = (
   35963567 => "Gradina\,\ Pleven",
   35963568 => "Bukovlak",
   35963569 => "Kamenets\,\ Pleven",
-  3596357 => "Yasen\,\ Pleven",
   35963570 => "Staroseltsi",
   35963571 => "Brestovets",
+  35963572 => "Yasen\,\ Pleven",
   35963573 => "Disevitsa",
   35963574 => "Todorovo\,\ Pleven",
   35963575 => "Bohot",
@@ -1440,9 +1452,13 @@ my %areanames = (
   3596577 => "Breste",
   3596578 => "Reselets",
   3596579 => "Ruptsi\,\ Pleven",
-  359658 => "Belene",
   3596580 => "Tatari",
   3596581 => "Byala\ voda\,\ Pleven",
+  3596582 => "Belene",
+  3596583 => "Belene",
+  3596584 => "Belene",
+  3596585 => "Belene",
+  3596586 => "Belene",
   3596587 => "Petokladentsi",
   3596588 => "Dekov",
   3596589 => "Kulina\ voda",
@@ -1984,7 +2000,10 @@ my %areanames = (
   35984778 => "Bogdantsi\,\ Razgrad",
   35984779 => "Zdravets\,\ Razgrad",
   359848 => "Kubrat",
-  35986 => "Silistra",
+  359860 => "Silistra",
+  359861 => "Silistra",
+  3598620 => "Silistra",
+  3598621 => "Silistra",
   3598622 => "Alekovo\,\ Silistra",
   3598623 => "Golesh\,\ Silistra",
   3598624 => "Kalipetrovo",
@@ -1993,6 +2012,8 @@ my %areanames = (
   3598627 => "Babuk",
   3598628 => "Tsar\ Asen\,\ Silistra",
   3598629 => "Smilets\,\ Silistra",
+  3598630 => "Silistra",
+  3598631 => "Silistra",
   3598632 => "Zafirovo",
   3598633 => "Staro\ selo\,\ Silistra",
   3598634 => "Nova\ Cherna",
@@ -2001,9 +2022,9 @@ my %areanames = (
   3598637 => "Malak\ Preslavets",
   3598638 => "Bogdantsi\,\ Silistra",
   3598639 => "Kolarovo\,\ Silistra",
-  359864 => "Dulovo",
   3598640 => "Pravda\,\ Silistra",
   3598641 => "Okorsh",
+  3598642 => "Dulovo",
   3598643 => "Zlatoklas",
   3598644 => "Chernolik",
   3598645 => "Mezhden",
@@ -2011,14 +2032,19 @@ my %areanames = (
   3598647 => "Paisievo",
   3598648 => "Sekulovo",
   3598649 => "Yarebitsa",
-  359866 => "Tutrakan",
+  359865 => "Silistra",
+  3598660 => "Tutrakan",
+  3598661 => "Tutrakan",
   3598662 => "Dobrotitsa\,\ Silistra",
   3598663 => "Sitovo\,\ Silistra",
   3598664 => "Polyana\,\ Silistra",
   3598665 => "Iskra\,\ Silistra",
+  3598666 => "Tutrakan",
   3598667 => "Belitsa\,\ Silistra",
   3598668 => "Popina",
   3598669 => "Garvan\,\ Silistra",
+  3598670 => "Silistra",
+  3598671 => "Silistra",
   3598672 => "Bradvari",
   3598673 => "Alfatar",
   3598674 => "Profesor\ Ishirkovo",
@@ -2027,6 +2053,9 @@ my %areanames = (
   3598677 => "Srebarna",
   3598678 => "Sratsimir\,\ Silistra",
   3598679 => "Kaynardzha",
+  359868 => "Silistra",
+  3598690 => "Silistra",
+  3598691 => "Silistra",
   3598692 => "Stefan\ Karadzha\,\ Silistra",
   3598693 => "Zvenimir",
   3598694 => "Zebil",

@@ -1,4 +1,8 @@
-0.43 2018-11-??
+0.44 2018-12-05
+-bugfix: removed hard-coded references to class name which were preventing expected
+ behavior when subclassing URI::Fast
+
+0.43 2018-11-27
 -new feature: append() method serially constructs a URI from fragments of path,
  query, and fragment (credit: merlyn)
 

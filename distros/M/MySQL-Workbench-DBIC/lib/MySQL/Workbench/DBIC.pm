@@ -13,7 +13,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 has output_path         => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                => ( is => 'ro', required => 1 );
@@ -132,8 +132,6 @@ sub _write_files{
         my $file = pop @path;
         my $dir  = File::Spec->catdir( @path );
 
-        $dir = $self->_untaint_path( $dir );
-
         unless( -e $dir ){
             $self->_mkpath( $dir );
         }
@@ -148,13 +146,6 @@ sub _write_files{
     }
 }
 
-sub _untaint_path{
-    my ($self,$path) = @_;
-    ($path) = ( $path =~ /(.*)/ );
-    $path = File::Spec->catdir( File::Spec->splitdir( $path ) );
-    return $path;
-}
-
 sub _mkpath{
     my ($self, $path) = @_;
 
@@ -162,7 +153,6 @@ sub _mkpath{
 
     for my $i ( 0..$#parts ){
         my $dir = File::Spec->catdir( @parts[ 0..$i ] );
-        $dir = $self->_untaint_path( $dir );
         unless ( -e $dir ) {
             mkdir $dir or die "$dir: $!";
         }
@@ -494,7 +484,7 @@ sub _main_template{
 
     my $version;
     eval {
-        my $lib_path = $self->_untaint_path( $self->output_path );
+        my $lib_path = $self->output_path;
         my @paths    = @INC;
         unshift @INC, $lib_path;
 
@@ -561,7 +551,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.09
+version 1.10
 
 =head1 SYNOPSIS
 

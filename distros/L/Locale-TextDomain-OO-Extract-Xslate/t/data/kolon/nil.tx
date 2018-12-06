@@ -1,0 +1,4 @@
+# This should just extract without warnings 
+<: if ($max != nil) { :>
+     max="<: $max :>"
+<: } :>

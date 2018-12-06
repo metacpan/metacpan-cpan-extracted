@@ -22,71 +22,44 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '[235]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2',
+                  'intl_format' => 'NA',
+                  'leading_digits' => '
+            [237]|
+            80
+          '
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{5})',
                   'leading_digits' => '8',
+                  'format' => '$1 $2',
+                  'national_rule' => '0$1'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '[235]',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
-          3(?:
-            0(?:
-              [237]\\d|
-              80
-            )|
-            [167](?:
-              2[0-6]|
-              7\\d|
-              80
-            )|
-            2(?:
-              2[0-5]|
-              7\\d|
-              80
-            )|
-            3(?:
-              2[0-3]|
-              7\\d|
-              80
-            )|
-            4(?:
-              2[013-9]|
-              3[01]|
-              7\\d|
-              80
-            )|
+                'mobile' => '
+          (?:
+            2[0346-8]\\d|
             5(?:
-              2[0-7]|
-              7\\d|
-              80
-            )|
-            8(?:
-              2[0-2]|
-              7\\d|
-              80
-            )|
-            9(?:
-              [28]0|
-              7\\d
+              [0457]\\d|
+              6[01]
             )
-          )\\d{5}
+          )\\d{6}
         ',
-                'toll_free' => '800\\d{5}',
-                'personal_number' => '',
-                'voip' => '',
                 'pager' => '',
+                'voip' => '',
                 'geographic' => '
           3(?:
             0(?:
@@ -130,15 +103,51 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'toll_free' => '800\\d{5}',
                 'specialrate' => '',
-                'mobile' => '
-          (?:
-            2[034678]\\d|
+                'personal_number' => '',
+                'fixed_line' => '
+          3(?:
+            0(?:
+              [237]\\d|
+              80
+            )|
+            [167](?:
+              2[0-6]|
+              7\\d|
+              80
+            )|
+            2(?:
+              2[0-5]|
+              7\\d|
+              80
+            )|
+            3(?:
+              2[0-3]|
+              7\\d|
+              80
+            )|
+            4(?:
+              2[013-9]|
+              3[01]|
+              7\\d|
+              80
+            )|
             5(?:
-              [0457]\\d|
-              6[01]
+              2[0-7]|
+              7\\d|
+              80
+            )|
+            8(?:
+              2[0-2]|
+              7\\d|
+              80
+            )|
+            9(?:
+              [28]0|
+              7\\d
             )
-          )\\d{6}
+          )\\d{5}
         '
               };
 my %areanames = (
@@ -199,7 +208,6 @@ my %areanames = (
   2333624 => "Kete\-Krachi",
   2333625 => "Denu\/Aflao",
   2333626 => "Keta\/Akatsi",
-  2333627 => "Hohoe",
   233367 => "Volta\ Region",
   233368 => "Volta\ Region",
   2333720 => "Tamale",
@@ -216,7 +224,7 @@ my %areanames = (
   2333822 => "Bawku",
   233387 => "Upper\ East\ Region",
   233388 => "Upper\ East\ Region",
-  2333920 => "Wa",
+  233392 => "Wa",
   233397 => "Upper\ West\ Region",
   233398 => "Upper\ West\ Region",
 );

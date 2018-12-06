@@ -149,6 +149,19 @@ static SV* get_##member(pTHX_ SV *uri) { \
  * Utilities
  -----------------------------------------------------------------------------*/
 
+// Returns the class name of a blessed object. Gets magic before evaluating.
+// Returns an empty string if the object is not defined or is not a reference.
+static
+const char* class_name(pTHX_ SV *sv) {
+  SvGETMAGIC(sv);
+
+  if (!SvOK(sv) || !SvROK(sv)) {
+    return "";
+  }
+
+  return HvNAME(SvSTASH(SvRV(sv)));
+}
+
 // Returns true if the SV is defined. Gets magic before evaluating the
 // definedness of the SV.
 static
@@ -1777,6 +1790,8 @@ void absolute(pTHX_ SV *sv_target, SV *sv_uri, SV *sv_base) {
   uri_t *base   = URI(sv_base);
   uri_t *target = URI(sv_target);
 
+  const char *class = class_name(aTHX_ sv_target);
+
   // Relative URIs may begin with // to indicate an authority section without a
   // scheme, which is illegal in standard URI syntax (authority may only come
   // after a scheme, which is required, separated by //). This workaround helps
@@ -1789,7 +1804,7 @@ void absolute(pTHX_ SV *sv_target, SV *sv_uri, SV *sv_base) {
     SV *fixed = newSVpvn("x:", 2);
     sv_catsv(fixed, sv_2mortal(to_string(aTHX_ sv_uri)));
 
-    SV *sv_tmp = sv_2mortal(new(aTHX_ "URI::Fast", sv_2mortal(fixed), 0));
+    SV *sv_tmp = sv_2mortal(new(aTHX_ class, sv_2mortal(fixed), 0));
     rel = URI(sv_tmp);
 
     str_clear(aTHX_ rel->scheme);
@@ -2304,12 +2319,14 @@ SV* absolute(uri, base)
   SV *uri
   SV *base
   PREINIT:
+    const char *class;
     SV *sv_target;
   CODE:
-    sv_target = new(aTHX_ "URI::Fast", sv_2mortal(newSVpvn("", 0)), 0);
+    class = class_name(aTHX_ uri);
+    sv_target = new(aTHX_ class, sv_2mortal(newSVpvn("", 0)), 0);
 
-    if (!sv_isobject(base) || !sv_derived_from(base, "URI::Fast")) {
-      absolute(aTHX_ sv_target, uri, sv_2mortal(new(aTHX_ "URI::Fast", base, 0)));
+    if (!sv_isobject(base) || !sv_derived_from(base, class)) {
+      absolute(aTHX_ sv_target, uri, sv_2mortal(new(aTHX_ class, base, 0)));
     } else {
       absolute(aTHX_ sv_target, uri, base);
     }

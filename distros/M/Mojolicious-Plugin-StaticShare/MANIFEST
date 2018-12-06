@@ -81,5 +81,7 @@ t/basic.t
 t/тест/тест2.txt
 t/тест/тест.txt
 t/тест/INDEX.md
+t/static-share.my.pl
+t/static-share.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
@@ -31,43 +31,14 @@ my $formatters = [
                   'format' => '$1-$2'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{4})',
                   'leading_digits' => '6',
-                  'format' => '$1-$2'
+                  'format' => '$1-$2',
+                  'pattern' => '(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(
-          (?:
-            8(?:
-              22|
-              55|
-              60|
-              7[78]|
-              86
-            )|
-            9(?:
-              00|
-              81
-            )
-          )\\d{4}
-        )',
-                'mobile' => '
-          (?:
-            1[16]1|
-            21[89]|
-            8(?:
-              1[01]|
-              7[23]
-            )
-          )\\d{4}|
-          6(?:
-            [02-9]\\d|
-            1[0-5]
-          )\\d{5}
-        ',
-                'fixed_line' => '
+                'geographic' => '
           (?:
             1(?:
               0\\d|
@@ -142,10 +113,7 @@ my $validators = {
           )\\d{4}
         ',
                 'toll_free' => '800\\d{4}',
-                'personal_number' => '',
-                'voip' => '',
-                'pager' => '',
-                'geographic' => '
+                'fixed_line' => '
           (?:
             1(?:
               0\\d|
@@ -218,7 +186,39 @@ my $validators = {
               9\\d
             )
           )\\d{4}
-        '
+        ',
+                'specialrate' => '(
+          (?:
+            8(?:
+              22|
+              55|
+              60|
+              7[78]|
+              86
+            )|
+            9(?:
+              00|
+              81
+            )
+          )\\d{4}
+        )',
+                'personal_number' => '',
+                'mobile' => '
+          (?:
+            1[16]1|
+            21[89]|
+            6(?:
+              [02-9]\\d|
+              1[0-5]
+            )\\d|
+            8(?:
+              1[01]|
+              7[23]
+            )
+          )\\d{4}
+        ',
+                'pager' => '',
+                'voip' => ''
               };
 
     sub new {

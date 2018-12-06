@@ -22,36 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[23]',
-                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '([23]\\d)(\\d{2})(\\d{3})(\\d{2})',
                   'national_rule' => '0$1',
-                  'pattern' => '([23]\\d)(\\d{2})(\\d{3})(\\d{2})'
+                  'leading_digits' => '[23]',
+                  'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'voip' => '22\\d{7}',
-                'fixed_line' => '
-          20(?:
-            2\\d{2}|
-            4[47]\\d|
-            5[3467]\\d|
-            6[279]\\d|
-            7(?:
-              2[29]|
-              [35]\\d
-            )|
-            8[268]\\d|
-            9[245]\\d
-          )\\d{4}
-        ',
-                'toll_free' => '',
-                'pager' => '',
                 'geographic' => '
           20(?:
             2\\d{2}|
@@ -66,8 +48,26 @@ my $validators = {
             9[245]\\d
           )\\d{4}
         ',
+                'toll_free' => '',
+                'personal_number' => '',
                 'specialrate' => '',
-                'mobile' => '3[2-49]\\d{7}'
+                'fixed_line' => '
+          20(?:
+            2\\d{2}|
+            4[47]\\d|
+            5[3467]\\d|
+            6[279]\\d|
+            7(?:
+              2[29]|
+              [35]\\d
+            )|
+            8[268]\\d|
+            9[245]\\d
+          )\\d{4}
+        ',
+                'mobile' => '3[2-49]\\d{7}',
+                'pager' => '',
+                'voip' => '22\\d{7}'
               };
 my %areanames = (
   2612022 => "Antananarivo",

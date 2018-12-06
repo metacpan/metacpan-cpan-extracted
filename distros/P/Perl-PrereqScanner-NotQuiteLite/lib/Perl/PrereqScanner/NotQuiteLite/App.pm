@@ -47,6 +47,16 @@ sub new {
     $opts{features} = \%map;
   }
 
+  if ($opts{ignore} and ref $opts{ignore} eq 'ARRAY') {
+    require Regexp::Trie;
+    my $re = Regexp::Trie->new;
+    for (@{$opts{ignore}}) {
+        s|\\|/|g if $^O eq 'MSWin32';
+        $re->add($_);
+    }
+    $opts{ignore_re} ||= $re->_regexp;
+  }
+
   bless \%opts, $class;
 }
 
@@ -287,6 +297,11 @@ sub _scan_dir {
 
 sub _scan_file {
   my ($self, $file) = @_;
+
+  if ($self->{ignore_re}) {
+    $file =~ s|\\|/|g if $^O eq 'MSWin32';
+    return if $file =~ /\b$self->{ignore_re}\b/;
+  }
 
   my $context = Perl::PrereqScanner::NotQuiteLite->new(
     parsers => $self->{parsers},

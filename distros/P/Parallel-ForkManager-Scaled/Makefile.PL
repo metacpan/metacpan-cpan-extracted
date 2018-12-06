@@ -9,7 +9,7 @@ auto_set_repository;
 
 requires 'List::Util';
 requires 'Moo';
-requires 'Parallel::ForkManager';
+requires 'Parallel::ForkManager' => '2.00';
 requires 'Unix::Statgrab';
 requires 'namespace::clean';
 requires 'Storable';

@@ -1,0 +1,105 @@
+NAME
+    Scalar::Cmp - Compare two scalars
+
+VERSION
+    This document describes version 0.002 of Scalar::Cmp (from Perl
+    distribution Scalar-Cmp), released on 2018-12-06.
+
+SYNOPSIS
+     use Scalar::Cmp qw(cmp_scalar cmpnum_scalar cmpstrornum_scalar);
+
+     # undef
+     say cmp_scalar(undef, undef); # => 0
+     say cmp_scalar(undef, 1);     # => -1
+
+     # references
+     say cmp_scalar(1, []);        # => 2
+     say cmp_scalar([], 1);        # => 2
+     say cmp_scalar([], []);       # => 2
+     my $r = []; say cmp_scalar($r, $r);  # => 0
+
+     # cmp_scalar always uses cmp (mnemonic: "cmp" operator)
+     say cmpstr_scalar("1.0", 1);  # => 1
+
+     # cmpnum_scalar always uses <=>
+     say cmpnum_scalar("1.0", 1);  # => 0
+     say cmpnum_scalar("a", "0");  # => 0, but emit warnings
+
+     # cmpstrornum_scalar uses <=> if both scalars look like number, or cmp otherwise
+     say cmp_scalar(1, 1);         # => 0
+     say cmp_scalar(1, 2);         # => -1
+     say cmp_scalar(2, 1);         # => -1
+     say cmp_scalar("1.0", 1);     # => 0
+     say cmp_scalar("a", "0");     # => 1
+
+DESCRIPTION
+    This module provides "cmp_scalar" (and "cmpnum_scalar" and
+    "cmpstrornum_scalar" which are convenient routines to compare two scalar
+    values (ii.e. check if they are the same, or find out who is "greater
+    than" the other). The routines can handle "undef" and references, so you
+    don't have to manually check for these.
+
+    The routines return -1, 0, 1 like Perl's "cmp" and "<=>" operators, but
+    also possibly 2 when the two scalars are different but there is no
+    sensible notion of which one is larger than the other (e.g. 1 vs "[1]").
+    The following is the rule:
+
+    1. Defined value is greater than undef.
+         cmp_scalar(undef, 0); # => -1
+
+    2. undef is the same as itself.
+         cmp_scalar(undef, undef); # => 0
+
+        Note: This might not be what you want if you expect "undef" to act
+        like "NULL" in relational databases, where "NULL" is not equal to
+        itself.
+
+    2. References cannot be compared with non-references.
+         cmp_scalar(1, []); # => 2
+         cmp_scalar([], 1); # => 2
+
+    3. A reference is only the same as itself, otherwise it cannot be
+    compared.
+         cmp_scalar([], []); # => 2
+
+         my $ary = [];
+         cmp_scalar($ary, $ary); # => 0, same "address"
+
+    4. Non-references are compared with "cmp" or "<=>"
+        "cmp_scalar" always uses "cmp". "cmpnum_scalar" always uses "<=>".
+        "cmpstrornum_scalar" uses "<=>" if both scalars look like number, or
+        "cmp" otherwise.
+
+FUNCTIONS
+  cmp_scalar
+  cmpnum_scalar
+  cmpstrornum_scalar
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Scalar-Cmp>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Scalar-Cmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Scalar-Cmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    The Perl's "cmp" and "<=>" operators.
+
+    Data::Cmp which uses similar comparison rules but recurse into array and
+    hash elements.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

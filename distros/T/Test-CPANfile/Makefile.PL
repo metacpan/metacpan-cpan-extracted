@@ -10,7 +10,8 @@ WriteMakefile(
     LICENSE       => 'perl',
     META_MERGE => {
         resources => {
-            repository => '',
+            repository => 'https://github.com/charsbar/Test-CPANfile',
+            bugtracker => 'https://github.com/charsbar/Test-CPANfile/issues',
         },
     },
 );

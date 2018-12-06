@@ -22,52 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '
-            [3467]|
-            9(?:
-              0[1-9]|
-              [1-9]
-            )
+            [367]|
+            4(?:
+              00|
+              [56]
+            )|
+            9[14-9]
           ',
                   'format' => '$1-$2'
                 },
                 {
+                  'leading_digits' => '[89]',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[89]00',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(900\\d{7})|(4[05]0\\d{4})',
-                'mobile' => '
-          (?:
-            46[46]|
-            7[2-9]\\d|
-            9[14-9]\\d
-          )\\d{4}
-        ',
-                'voip' => '',
-                'personal_number' => '',
                 'toll_free' => '800\\d{7}',
-                'fixed_line' => '
-          (?:
-            3(?:
-              0[0-3]|
-              3[0-59]
-            )|
-            6(?:
-              [57][02468]|
-              6[024568]|
-              8[024689]
-            )
-          )\\d{4}
-        ',
                 'geographic' => '
           (?:
             3(?:
@@ -76,12 +54,37 @@ my $validators = {
             )|
             6(?:
               [57][02468]|
-              6[024568]|
+              6[024-68]|
               8[024689]
             )
           )\\d{4}
         ',
-                'pager' => ''
+                'fixed_line' => '
+          (?:
+            3(?:
+              0[0-3]|
+              3[0-59]
+            )|
+            6(?:
+              [57][02468]|
+              6[024-68]|
+              8[024689]
+            )
+          )\\d{4}
+        ',
+                'personal_number' => '',
+                'specialrate' => '(900\\d{7})|(4[05]0\\d{4})',
+                'pager' => '',
+                'mobile' => '
+          (?:
+            46[46]|
+            (?:
+              7[2-9]|
+              9[14-9]
+            )\\d
+          )\\d{4}
+        ',
+                'voip' => ''
               };
 my %areanames = (
   960300 => "Malé\/Hulhulé\/Aarah",

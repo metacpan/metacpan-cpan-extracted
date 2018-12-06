@@ -3,9 +3,9 @@ use strict;
 
 package JMAP::Tester::Result::Failure;
 # ABSTRACT: what you get when your JMAP request utterly fails
-$JMAP::Tester::Result::Failure::VERSION = '0.021';
+$JMAP::Tester::Result::Failure::VERSION = '0.022';
 use Moo;
-with 'JMAP::Tester::Role::Result';
+with 'JMAP::Tester::Role::HTTPResult';
 
 use namespace::clean;
 
@@ -15,7 +15,11 @@ use namespace::clean;
 #pod This class should be replaced, in most cases, by more useful classes in the
 #pod future.
 #pod
-#pod It's got an C<is_success> method.  It returns false.
+#pod It's got an C<is_success> method.  It returns false. It also has:
+#pod
+#pod =method ident
+#pod
+#pod An error identifier. May or may not be defined.
 #pod
 #pod =cut
 
@@ -37,7 +41,7 @@ JMAP::Tester::Result::Failure - what you get when your JMAP request utterly fail
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 
@@ -45,7 +49,13 @@ This is the sort of worthless object you get back when your JMAP request fails.
 This class should be replaced, in most cases, by more useful classes in the
 future.
 
-It's got an C<is_success> method.  It returns false.
+It's got an C<is_success> method.  It returns false. It also has:
+
+=head1 METHODS
+
+=head2 ident
+
+An error identifier. May or may not be defined.
 
 =head1 AUTHOR
 

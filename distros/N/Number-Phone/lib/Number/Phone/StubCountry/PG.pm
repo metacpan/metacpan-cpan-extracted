@@ -22,82 +22,85 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'format' => '$1 $2',
                   'leading_digits' => '
-            [13-689]|
-            27
-          '
+            18|
+            [2-69]|
+            85
+          ',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{4})',
+                  'leading_digits' => '[78]',
                   'format' => '$1 $2',
-                  'leading_digits' => '
-            20|
-            7
-          '
+                  'pattern' => '(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          7(?:
-            [0-689]\\d|
-            75
-          )\\d{5}
-        ',
-                'specialrate' => '',
-                'pager' => '',
+                'toll_free' => '180\\d{4}',
                 'geographic' => '
           (?:
-            3[0-2]\\d|
-            4[257]\\d|
-            5[34]\\d|
+            (?:
+              3[0-2]|
+              4[257]|
+              5[34]|
+              9[78]
+            )\\d|
             64[1-9]|
             77(?:
               [0-24]\\d|
               30
             )|
-            85[02-46-9]|
-            9[78]\\d
+            85[02-46-9]
           )\\d{4}
         ',
+                'specialrate' => '',
                 'personal_number' => '',
+                'fixed_line' => '
+          (?:
+            (?:
+              3[0-2]|
+              4[257]|
+              5[34]|
+              9[78]
+            )\\d|
+            64[1-9]|
+            77(?:
+              [0-24]\\d|
+              30
+            )|
+            85[02-46-9]
+          )\\d{4}
+        ',
+                'pager' => '',
+                'mobile' => '
+          (?:
+            7(?:
+              [0-689]\\d|
+              75
+            )|
+            81\\d
+          )\\d{5}
+        ',
                 'voip' => '
           2(?:
             0[0-47]|
             7[568]
           )\\d{4}
-        ',
-                'fixed_line' => '
-          (?:
-            3[0-2]\\d|
-            4[257]\\d|
-            5[34]\\d|
-            64[1-9]|
-            77(?:
-              [0-24]\\d|
-              30
-            )|
-            85[02-46-9]|
-            9[78]\\d
-          )\\d{4}
-        ',
-                'toll_free' => '180\\d{4}'
+        '
               };
 my %areanames = (
   6753 => "NCD",
   67542 => "Madang",
   67545 => "Sepik",
   67547 => "Morobe",
-  67553 => "Highlands",
-  67554 => "Highlands",
-  67562 => "Oro",
-  67564 => "MP\/Gulf\/Tabubil\/Kiunga",
+  6755 => "Highlands",
+  6756 => "MP\/Gulf\/Tabubil\/Kiunga",
   6759 => "Islands",
 );
     sub new {

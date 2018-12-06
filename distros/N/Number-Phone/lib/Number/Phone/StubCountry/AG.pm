@@ -22,64 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214153;
+our $VERSION = 1.20181205223701;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '($1) $2-$3',
                   'intl_format' => '$1-$2-$3',
+                  'format' => '($1) $2-$3',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          268(?:
-            4(?:
-              6[0-38]|
-              84
-            )|
-            56[0-2]
-          )\\d{4}
-        ',
-                'pager' => '26840[69]\\d{4}',
-                'toll_free' => '
-          8(?:
-            00|
-            33|
-            44|
-            55|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
-                'fixed_line' => '
-          268(?:
-            4(?:
-              6[0-38]|
-              84
-            )|
-            56[0-2]
-          )\\d{4}
-        ',
                 'voip' => '26848[01]\\d{4}',
-                'personal_number' => '
-          5(?:
-            00|
-            2[12]|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
+                'pager' => '26840[69]\\d{4}',
                 'mobile' => '
           268(?:
             464|
@@ -92,7 +54,47 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'specialrate' => '(900[2-9]\\d{6})'
+                'fixed_line' => '
+          268(?:
+            4(?:
+              6[0-38]|
+              84
+            )|
+            56[0-2]
+          )\\d{4}
+        ',
+                'specialrate' => '(900[2-9]\\d{6})',
+                'personal_number' => '
+          5(?:
+            00|
+            2[12]|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
+                'toll_free' => '
+          8(?:
+            00|
+            33|
+            44|
+            55|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
+                'geographic' => '
+          268(?:
+            4(?:
+              6[0-38]|
+              84
+            )|
+            56[0-2]
+          )\\d{4}
+        '
               };
 use Number::Phone::NANP::Data;
 sub areaname {

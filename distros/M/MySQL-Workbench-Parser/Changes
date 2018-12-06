@@ -1,6 +1,10 @@
 Change history for MySQL::Workbench::Parser
 ===========================================
 
+1.04 2018-12-06 10:07:00
+
+  * update list of test dependencies
+
 1.02 2018-12-04 20:21:00
 
   * add lint functionality

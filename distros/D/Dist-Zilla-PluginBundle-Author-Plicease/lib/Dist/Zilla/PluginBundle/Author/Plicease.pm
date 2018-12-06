@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.28 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.29 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.28 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.28
+    Author::Plicease.*   2.29
     OurPkgVersion        0.12
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -157,7 +157,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.28 {
     )]);
     $self->_my_add_plugin(['MetaJSON']);
 
-    if($^O ne 'MSWin32')
+    if($^O ne 'MSWin32' && !$ENV{PLICEASE_DZIL_NO_GIT})
     {
       foreach my $plugin (qw( Git::Check Git::Commit Git::Tag Git::Push ))
       {
@@ -274,15 +274,18 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.28 {
     {
       my $travis = YAML::LoadFile(".travis.yml");
       
-      if(exists $travis->{perl} && grep /^5\.19$/, @{ $travis->{perl} })
-      {
-        die "travis is trying to test Perl 5.19";
-      }
-      
-      unless(exists $travis->{perl} && grep /^5\.26$/, @{ $travis->{perl} })
+      if(exists $travis->{perl} && grep /^5\.(8|10|12)$/, @{ $travis->{perl} })
       {
         print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
-        print STDERR "travis is not testing Perl 5.26";
+        print STDERR "travis is testing prior to 5.14";
+        print STDERR Term::ANSIColor::color('reset') if -t STDERR;
+        print STDERR "\n";
+      }
+
+      unless(exists $travis->{perl} && grep /^5\.28$/, @{ $travis->{perl} })
+      {
+        print STDERR Term::ANSIColor::color('bold red') if -t STDERR;
+        print STDERR "travis is not testing Perl 5.28";
         print STDERR Term::ANSIColor::color('reset') if -t STDERR;
         print STDERR "\n";
       }
@@ -363,7 +366,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.28
+version 2.29
 
 =head1 SYNOPSIS
 

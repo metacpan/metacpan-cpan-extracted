@@ -13,7 +13,7 @@ Config::Model::Cookbook::CreateModelFromDoc - Create a configuration model from 
 
 =head1 VERSION
 
-version 2.128
+version 2.129
 
 =head1 Introduction
 

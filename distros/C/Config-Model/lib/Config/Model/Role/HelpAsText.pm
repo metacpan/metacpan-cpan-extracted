@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Role::HelpAsText;
-$Config::Model::Role::HelpAsText::VERSION = '2.128';
+$Config::Model::Role::HelpAsText::VERSION = '2.129';
 # ABSTRACT: Translate element help from pod to text
 
 use Mouse::Role;
@@ -57,7 +57,7 @@ Config::Model::Role::HelpAsText - Translate element help from pod to text
 
 =head1 VERSION
 
-version 2.128
+version 2.129
 
 =head1 SYNOPSIS
 

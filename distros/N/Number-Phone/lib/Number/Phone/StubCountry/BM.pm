@@ -22,22 +22,32 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214154;
+our $VERSION = 1.20181205223702;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '($1) $2-$3',
                   'intl_format' => '$1-$2-$3',
+                  'format' => '($1) $2-$3',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'voip' => '',
+                'mobile' => '
+          441(?:
+            [37]\\d|
+            5[0-39]
+          )\\d{5}
+        ',
+                'pager' => '',
                 'personal_number' => '
           5(?:
             00|
@@ -49,16 +59,33 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'voip' => '',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'fixed_line' => '
           441(?:
             2(?:
               02|
               23|
-              61|
-              [3479]\\d
+              [3479]\\d|
+              61
             )|
-            [46]\\d{2}|
+            [46]\\d\\d|
+            5(?:
+              4\\d|
+              60|
+              89
+            )|
+            824
+          )\\d{4}
+        ',
+                'geographic' => '
+          441(?:
+            2(?:
+              02|
+              23|
+              [3479]\\d|
+              61
+            )|
+            [46]\\d\\d|
             5(?:
               4\\d|
               60|
@@ -77,31 +104,6 @@ my $validators = {
             77|
             88
           )[2-9]\\d{6}
-        ',
-                'pager' => '',
-                'geographic' => '
-          441(?:
-            2(?:
-              02|
-              23|
-              61|
-              [3479]\\d
-            )|
-            [46]\\d{2}|
-            5(?:
-              4\\d|
-              60|
-              89
-            )|
-            824
-          )\\d{4}
-        ',
-                'specialrate' => '(900[2-9]\\d{6})',
-                'mobile' => '
-          441(?:
-            [37]\\d|
-            5[0-39]
-          )\\d{5}
         '
               };
 use Number::Phone::NANP::Data;

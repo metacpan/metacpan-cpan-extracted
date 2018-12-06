@@ -22,44 +22,48 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
-                },
-                {
                   'pattern' => '(\\d)(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
+                  'leading_digits' => '2',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '2'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '8',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '1',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
-          2\\d{7}|
-          85\\d{6}
+                'geographic' => '
+          (?:
+            2\\d|
+            85
+          )\\d{6}
         ',
                 'toll_free' => '',
-                'personal_number' => '',
-                'voip' => '',
-                'pager' => '',
-                'geographic' => '
-          2\\d{7}|
-          85\\d{6}
-        ',
                 'specialrate' => '',
-                'mobile' => '19[123]\\d{7}'
+                'personal_number' => '',
+                'fixed_line' => '
+          (?:
+            2\\d|
+            85
+          )\\d{6}
+        ',
+                'mobile' => '19[1-3]\\d{7}',
+                'pager' => '',
+                'voip' => ''
               };
 
     sub new {

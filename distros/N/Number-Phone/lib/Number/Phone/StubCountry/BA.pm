@@ -22,40 +22,50 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214153;
+our $VERSION = 1.20181205223702;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2-$3',
-                  'leading_digits' => '[3-5]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{3})',
+                  'intl_format' => 'NA',
+                  'format' => '$1-$2',
+                  'leading_digits' => '[2-9]'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2-$3',
+                  'leading_digits' => '[3-5]',
+                  'national_rule' => '0$1'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             6[1-356]|
             [7-9]
           ',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '6[047]',
-                  'format' => '$1 $2 $3 $4',
-                  'national_rule' => '0$1'
+                  'national_rule' => '0$1',
+                  'leading_digits' => '6',
+                  'format' => '$1 $2 $3 $4'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
+                'specialrate' => '(8[12]\\d{6})|(9[0246]\\d{6})|(
+          70(?:
+            3[0146]|
+            [56]0
+          )\\d{4}
+        )',
                 'personal_number' => '',
-                'toll_free' => '8[08]\\d{6}',
                 'fixed_line' => '
           (?:
             3(?:
-              [05679][2-9]|
+              [05-79][2-9]|
               1[4579]|
               [23][24-9]|
               4[2-4689]|
@@ -76,7 +86,7 @@ my $validators = {
                 'geographic' => '
           (?:
             3(?:
-              [05679][2-9]|
+              [05-79][2-9]|
               1[4579]|
               [23][24-9]|
               4[2-4689]|
@@ -94,13 +104,8 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'pager' => '',
-                'specialrate' => '(8[12]\\d{6})|(9[0246]\\d{6})|(
-          70(?:
-            3[0146]|
-            [56]0
-          )\\d{4}
-        )',
+                'toll_free' => '8[08]\\d{6}',
+                'voip' => '',
                 'mobile' => '
           6(?:
             0(?:
@@ -111,7 +116,8 @@ my $validators = {
             44[0-6]|
             71[137]
           )\\d{5}
-        '
+        ',
+                'pager' => ''
               };
 my %areanames = (
   38730 => "Central\ Bosnia\ Canton",
@@ -124,7 +130,7 @@ my %areanames = (
   38737 => "Una\-Sana\ Canton",
   38738 => "Bosnian\-Podrinje\ Canton\ Goražde",
   38739 => "West\ Herzegovina\ Canton",
-  38749 => "Brčko\ District",
+  3874 => "Brčko\ District",
   38750 => "Mrkonjić\ Grad",
   38751 => "Banja\ Luka",
   38752 => "Prijedor",

@@ -3,7 +3,7 @@ use warnings;
 
 package JMAP::Tester;
 # ABSTRACT: a JMAP client made for testing JMAP servers
-$JMAP::Tester::VERSION = '0.021';
+$JMAP::Tester::VERSION = '0.022';
 use Moo;
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
@@ -790,7 +790,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 OVERVIEW
 

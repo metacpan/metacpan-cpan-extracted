@@ -22,17 +22,19 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223703;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{4})(\\d{4})',
                   'format' => '$1-$2',
-                  'pattern' => '(\\d{4})(\\d{4})'
+                  'leading_digits' => '[237-9]'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '',
+                'specialrate' => '',
+                'personal_number' => '',
                 'fixed_line' => '
           2(?:
             2(?:
@@ -41,9 +43,10 @@ my $validators = {
               [23]\\d|
               4[04-6]|
               5[57]|
-              7[013689]|
-              8[0146-9]|
-              9[012]
+              64|
+              7[0135689]|
+              8[01346-9]|
+              9[0-2]
             )|
             4(?:
               07|
@@ -53,11 +56,13 @@ my $validators = {
               5[1-35]
             )|
             5(?:
+              08|
               16|
               4[03-5]|
               5\\d|
               6[4-6]|
-              74
+              74|
+              80
             )|
             6(?:
               [056]\\d|
@@ -74,13 +79,12 @@ my $validators = {
             )|
             8(?:
               79|
-              8[0-35789]|
+              8[0-357-9]|
               9[1-57-9]
             )
           )\\d{4}
         ',
-                'voip' => '',
-                'personal_number' => '',
+                'toll_free' => '',
                 'geographic' => '
           2(?:
             2(?:
@@ -89,9 +93,10 @@ my $validators = {
               [23]\\d|
               4[04-6]|
               5[57]|
-              7[013689]|
-              8[0146-9]|
-              9[012]
+              64|
+              7[0135689]|
+              8[01346-9]|
+              9[0-2]
             )|
             4(?:
               07|
@@ -101,11 +106,13 @@ my $validators = {
               5[1-35]
             )|
             5(?:
+              08|
               16|
               4[03-5]|
               5\\d|
               6[4-6]|
-              74
+              74|
+              80
             )|
             6(?:
               [056]\\d|
@@ -122,13 +129,13 @@ my $validators = {
             )|
             8(?:
               79|
-              8[0-35789]|
+              8[0-357-9]|
               9[1-57-9]
             )
           )\\d{4}
         ',
+                'voip' => '',
                 'pager' => '',
-                'specialrate' => '',
                 'mobile' => '[37-9]\\d{7}'
               };
 my %areanames = (
@@ -150,7 +157,7 @@ my %areanames = (
   5042245 => "La\ Vega\,\ Tegucigalpa",
   5042246 => "La\ Vega\,\ Tegucigalpa",
   5042255 => "El\ Hato",
-  5042407 => "Roatán\,\ Bay\ Islands",
+  504240 => "Roatán\,\ Bay\ Islands",
   5042423 => "La\ Ceiba",
   5042424 => "Sabá",
   5042425 => "Utila\,\ Bay\ Islands",
@@ -171,7 +178,7 @@ my %areanames = (
   5042451 => "Sonaguera",
   5042452 => "Coyoles\ Central",
   5042453 => "Guanaja",
-  5042516 => "San\ Pedro\ Sula\,\ Cortés",
+  504251 => "San\ Pedro\ Sula\,\ Cortés",
   5042540 => "San\ Pedro\ Sula\,\ Cortés",
   5042545 => "San\ Pedro\ Sula\,\ Cortés",
   5042550 => "San\ Pedro\ Sula\,\ Cortés",
@@ -185,8 +192,8 @@ my %areanames = (
   5042564 => "San\ Pedro\ Sula\,\ Cortés",
   5042565 => "Chamelecón",
   5042566 => "Jardines\ Del\ Valle",
-  5042574 => "Búfalo",
-  5042617 => "Choloma\,\ Cortés",
+  504257 => "Búfalo",
+  504261 => "Choloma\,\ Cortés",
   5042643 => "Santa\ Bárbara",
   5042647 => "Progreso",
   5042648 => "Progreso\/Santa\ Cruz",

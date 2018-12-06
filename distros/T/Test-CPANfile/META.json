@@ -40,7 +40,8 @@
          "requires" : {
             "Exporter" : "5.57",
             "Module::CPANfile" : "0",
-            "Perl::PrereqScanner::NotQuiteLite" : "0.96"
+            "Module::CoreList" : "2.99",
+            "Perl::PrereqScanner::NotQuiteLite" : "0.9902"
          }
       },
       "test" : {
@@ -52,7 +53,14 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/charsbar/Test-CPANfile/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/charsbar/Test-CPANfile"
+      }
+   },
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -3479,9 +3479,9 @@ then you are responsible for establishing the connection, i.e. make
 sure that C<$ssl> in the example is a valid and connected socket.
 
 This method is primarily used to provide a drop-in replacement for
-L<IO::Socket::INET>, used by L</connect> by default.  In fact, this
+IO::Socket::(INET|IP), used by L</connect> by default.  In fact, this
 method is called by L</connect> itself after having established a
-suitable L<IO::Socket::INET> socket connection towards the target
+suitable IO::Socket::(INET|IP) socket connection towards the target
 server; for this reason, this method also carries the normal
 operations associated with L</connect>, namely:
 
@@ -3533,8 +3533,8 @@ Version note: attribute added in Mail::IMAPClient 3.22
 
 =head2 Socketargs
 
-The arguments used in the call to IO::Socket::{UNIX|INET|SSL}->new can
-be controlled by setting this attribute to an ARRAY reference
+The arguments used in the call to IO::Socket::{UNIX|INET|IP|SSL}->new
+can be controlled by setting this attribute to an ARRAY reference
 containing the desired arguments.
 
 For example, to always pass MultiHomed => 1 to IO::Socket::...->new
@@ -3552,7 +3552,7 @@ Version note: attribute added in Mail::IMAPClient 3.34
 
 If an IMAP connection requires SSL you can set the Ssl attribute to
 '1' and Mail::IMAPClient will automatically use L<IO::Socket::SSL>
-instead of L<IO::Socket::INET> to connect to the server.  This
+instead of IO::Socket::(INET|IP) to connect to the server.  This
 attribute is used in the L</connect> method.  The arguments used in
 the call to IO::Socket::SSL->new can be controlled by setting this
 attribute to an ARRAY reference containing the desired arguments.
@@ -3896,7 +3896,7 @@ L</connect> method, but if you are implementing an advanced
 authentication technique you may choose to set up your own socket
 connection and then set this parameter manually, bypassing the
 B<connect> method completely.  This is also useful if you want to use
-L<IO::Socket::INET> alternatives like L<IO::Socket::SSL> and need full
+IO::Socket::(INET|IP) alternatives like IO::Socket::SSL and need full
 control.
 
 L</RawSocket> simply gets/sets the socket without attempting any

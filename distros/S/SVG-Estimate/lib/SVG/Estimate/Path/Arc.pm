@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::Arc;
-$SVG::Estimate::Path::Arc::VERSION = '1.0108';
+$SVG::Estimate::Path::Arc::VERSION = '1.0109';
 use Moo;
 use Math::Trig qw/pi acos deg2rad rad2deg/;
 use Clone qw/clone/;
@@ -15,7 +15,7 @@ SVG::Estimate::Path::Arc - Handles estimating arcs.
 
 =head1 VERSION
 
-version 1.0108
+version 1.0109
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,6 @@ sub BUILDARGS {
         return $args;
     }
     $class->endpoint_to_center($args);
-    $args->{end_point} = clone $args->{point};
     my $start = $class->this_point($args, 0);
     my $end   = $class->this_point($args, 1);
     $args->{min_x}  = $start->[0] < $end->[0] ? $start->[0] : $end->[0];
@@ -174,6 +173,7 @@ sub BUILDARGS {
     $args->{max_y}  = $start->[1] > $end->[1] ? $start->[1] : $end->[1];
     $args->{shape_length}  = $class->segment_length($args, 0, 1, $start, $end, 1e-4, 5, 0);
     $args->{travel_length} = 0;
+    $args->{end_point}     = clone $end;
     return $args;
 }
 

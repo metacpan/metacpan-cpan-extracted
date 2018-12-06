@@ -11,7 +11,7 @@ use SPVM 'TestCase::Extension2';
 use SPVM 'TestCase::Pointer';
 
 # Start objects count
-my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $start_memory_blocks_count = SPVM::memory_blocks_count();
 
 # Native Exception
 {
@@ -32,27 +32,32 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Field
 {
-  ok(TestCase::Extension->get_byte_field());
-  ok(TestCase::Extension->get_short_field());
-  ok(TestCase::Extension->get_int_field());
-  ok(TestCase::Extension->get_long_field());
-  ok(TestCase::Extension->get_float_field());
-  ok(TestCase::Extension->get_double_field());
-  ok(TestCase::Extension->get_object_field());
+  ok(TestCase::Extension->bfield());
+  ok(TestCase::Extension->sfield());
+  ok(TestCase::Extension->ifield());
+  ok(TestCase::Extension->lfield());
+  ok(TestCase::Extension->ffield());
+  ok(TestCase::Extension->dfield());
+  ok(TestCase::Extension->ofield());
 
-  ok(TestCase::Extension->set_byte_field());
-  ok(TestCase::Extension->set_short_field());
-  ok(TestCase::Extension->set_int_field());
-  ok(TestCase::Extension->set_long_field());
-  ok(TestCase::Extension->set_float_field());
-  ok(TestCase::Extension->set_double_field());
-  ok(TestCase::Extension->set_object_field());
+  ok(TestCase::Extension->set_bfield());
+  ok(TestCase::Extension->set_sfield());
+  ok(TestCase::Extension->set_ifield());
+  ok(TestCase::Extension->set_lfield());
+  ok(TestCase::Extension->set_ffield());
+  ok(TestCase::Extension->set_dfield());
+  ok(TestCase::Extension->set_ofield());
 
 }
 
 # Ref
 {
-  ok(TestCase::Extension->ref());
+  ok(TestCase::Extension->ref_byte());
+  ok(TestCase::Extension->ref_short());
+  ok(TestCase::Extension->ref_int());
+  ok(TestCase::Extension->ref_long());
+  ok(TestCase::Extension->ref_float());
+  ok(TestCase::Extension->ref_double());
 }
 
 # Native Exception
@@ -71,5 +76,5 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 SPVM::set_exception_undef();
 
 # All object is freed
-my $end_memory_blocks_count = SPVM::get_memory_blocks_count();
+my $end_memory_blocks_count = SPVM::memory_blocks_count();
 is($end_memory_blocks_count, $start_memory_blocks_count);

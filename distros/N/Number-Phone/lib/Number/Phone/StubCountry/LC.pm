@@ -22,23 +22,25 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '($1) $2-$3',
                   'intl_format' => '$1-$2-$3',
+                  'format' => '($1) $2-$3',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(900[2-9]\\d{6})',
+                'pager' => '',
                 'mobile' => '
           758(?:
             28[4-7]|
@@ -59,18 +61,7 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'fixed_line' => '
-          758(?:
-            4(?:
-              30|
-              5[0-9]|
-              6[2-9]|
-              8[0-2]
-            )|
-            57[0-2]|
-            638
-          )\\d{4}
-        ',
+                'voip' => '',
                 'toll_free' => '
           8(?:
             00|
@@ -82,6 +73,19 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
+                'geographic' => '
+          758(?:
+            4(?:
+              30|
+              5\\d|
+              6[2-9]|
+              8[0-2]
+            )|
+            57[0-2]|
+            638
+          )\\d{4}
+        ',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'personal_number' => '
           5(?:
             00|
@@ -93,13 +97,11 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'voip' => '',
-                'pager' => '',
-                'geographic' => '
+                'fixed_line' => '
           758(?:
             4(?:
               30|
-              5[0-9]|
+              5\\d|
               6[2-9]|
               8[0-2]
             )|

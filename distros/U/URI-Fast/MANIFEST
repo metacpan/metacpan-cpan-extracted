@@ -13,6 +13,7 @@ t/abs.t
 t/basics.t
 t/compare.t
 t/encoding.t
+t/inheritance.t
 t/ipv.t
 t/iri.t
 t/memory.t

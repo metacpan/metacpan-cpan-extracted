@@ -22,30 +22,32 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'intl_format' => 'NA',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'format' => '($1) $2-$3',
                   'intl_format' => '$1-$2-$3',
+                  'format' => '($1) $2-$3',
+                  'leading_digits' => '[2-9]',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'geographic' => '
+                'fixed_line' => '
           7215(?:
             4[2-8]|
             8[239]|
             9[056]
           )\\d{4}
         ',
+                'specialrate' => '(900[2-9]\\d{6})',
                 'personal_number' => '
           5(?:
             00|
@@ -56,14 +58,6 @@ my $validators = {
             77|
             88
           )[2-9]\\d{6}
-        ',
-                'voip' => '',
-                'fixed_line' => '
-          7215(?:
-            4[2-8]|
-            8[239]|
-            9[056]
-          )\\d{4}
         ',
                 'toll_free' => '
           8(?:
@@ -76,6 +70,15 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
+                'geographic' => '
+          7215(?:
+            4[2-8]|
+            8[239]|
+            9[056]
+          )\\d{4}
+        ',
+                'voip' => '',
+                'pager' => '',
                 'mobile' => '
           7215(?:
             1[02]|
@@ -83,8 +86,7 @@ my $validators = {
             5[034679]|
             8[014-8]
           )\\d{4}
-        ',
-                'specialrate' => '(900[2-9]\\d{6})'
+        '
               };
 use Number::Phone::NANP::Data;
 sub areaname {

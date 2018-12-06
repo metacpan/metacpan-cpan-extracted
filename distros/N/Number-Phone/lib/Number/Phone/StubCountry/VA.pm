@@ -22,65 +22,66 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223705;
 
 my $formatters = [];
 
 my $validators = {
+                'voip' => '55\\d{8}',
                 'mobile' => '
-          3(?:
-            [12457-9]\\d{8}|
-            6\\d{7,8}|
-            3\\d{7,9}
-          )
+          33\\d{9}|
+          3[1-9]\\d{8}|
+          3[2-9]\\d{7}
         ',
-                'specialrate' => '(
-          84(?:
-            [08]\\d{6}|
-            [17]\\d{3}
-          )
-        )|(
-          0878\\d{5}|
-          1(?:
-            44|
-            6[346]
-          )\\d{6}|
-          89(?:
-            2\\d{3}|
-            4(?:
-              [0-4]\\d{2}|
-              [5-9]\\d{4}
-            )|
-            5(?:
-              [0-4]\\d{2}|
-              [5-9]\\d{6}
-            )|
-            9\\d{6}
-          )
-        )',
                 'pager' => '',
-                'geographic' => '06698\\d{5}',
-                'fixed_line' => '06698\\d{5}',
-                'toll_free' => '
-          80(?:
-            0\\d{6}|
-            3\\d{3}
-          )
-        ',
                 'personal_number' => '
           1(?:
             78\\d|
             99
           )\\d{6}
         ',
-                'voip' => '55\\d{8}'
+                'specialrate' => '(
+          84(?:
+            [08]\\d{3}|
+            [17]
+          )\\d{3}
+        )|(
+          (?:
+            (?:
+              0878|
+              1(?:
+                44|
+                6[346]
+              )\\d
+            )\\d\\d|
+            89(?:
+              2|
+              (?:
+                4[5-9]|
+                (?:
+                  5[5-9]|
+                  9
+                )\\d\\d
+              )\\d
+            )
+          )\\d{3}|
+          89[45][0-4]\\d\\d
+        )',
+                'fixed_line' => '06698\\d{1,6}',
+                'geographic' => '06698\\d{1,6}',
+                'toll_free' => '
+          80(?:
+            0\\d{3}|
+            3
+          )\\d{3}
+        '
               };
 my %areanames = (
   39010 => "Genoa",
   39011 => "Turin",
   390122 => "Turin",
   390125 => "Turin",
-  390131 => "Alessandria",
+  39013 => "Alessandria",
   390141 => "Asti",
   39015 => "Biella",
   390161 => "Vercelli",
@@ -96,8 +97,7 @@ my %areanames = (
   390321 => "Novara",
   390322 => "Novara",
   390324 => "Verbano\-Cusio\-Ossola",
-  390331 => "Varese",
-  390332 => "Varese",
+  39033 => "Varese",
   390341 => "Lecco",
   390342 => "Sondrio",
   390343 => "Sondrio",
@@ -128,7 +128,7 @@ my %areanames = (
   39045 => "Verona",
   390461 => "Trento",
   390471 => "Bolzano\/Bozen",
-  390481 => "Gorizia",
+  39048 => "Gorizia",
   39049 => "Padova",
   39050 => "Pisa",
   39051 => "Bologna",
@@ -150,6 +150,7 @@ my %areanames = (
   390586 => "Livorno",
   39059 => "Modena",
   3906 => "Rome",
+  3906698 => "Vatican\ City",
   39070 => "Cagliari",
   39071 => "Ancona",
   390731 => "Ancona",

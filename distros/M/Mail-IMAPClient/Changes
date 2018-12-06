@@ -5,6 +5,16 @@ Changes from 2.99_01 to 3.16    made by Mark Overmeer
 Changes from 0.09    to 2.99_01 made by David Kernen
 	- Potential compatibility issues from 3.17+ highlighted with '*'
 
+version 3.40: Thu Dec  6 01:44:16 UTC 2018
+	- rt.cpan.org#122373 support IPv6 by using IO::Socket::IP over IO::Socket::INET
+	  [Gilles Lamiral and Mark Overmeer]
+	- rt.cpan.org#127103 flags() undef value as an ARRAY reference on a bogus message
+	  [Gilles Lamiral]
+	- rt.cpan.org#124523 update examples/populate_mailbox.pl timegm usage
+	  [Bernhard M. W.]
+	- t/capability.t: added first set of tests
+	- t/quota.t: minor fix when tests skipped
+
 version 3.39: Fri Feb  3 00:43:00 UTC 2017
 	- rt.cpan.org#115726: uninitialized value via fetch_hash
 	  [Malte Stretz]

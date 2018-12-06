@@ -22,41 +22,33 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'leading_digits' => '
-            [1-6]|
-            7[0-4]|
-            8[05]
-          ',
+                  'pattern' => '(\\d{2})(\\d{3})',
                   'format' => '$1-$2',
-                  'pattern' => '(\\d{2})(\\d{3})'
+                  'leading_digits' => '
+            [2-6]|
+            7[014]|
+            8[05]
+          '
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2',
                   'leading_digits' => '
-            7[5-9]|
-            8[46-9]
-          ',
-                  'format' => '$1 $2'
+            7[578]|
+            8
+          '
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{3})',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{4})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          (?:
-            7[578]|
-            8[46-9]
-          )\\d{5}
-        ',
-                'specialrate' => '',
-                'pager' => '',
                 'geographic' => '
           (?:
             2\\d|
@@ -67,6 +59,7 @@ my $validators = {
             8[05]
           )\\d{3}
         ',
+                'toll_free' => '0800\\d{3}',
                 'fixed_line' => '
           (?:
             2\\d|
@@ -77,8 +70,15 @@ my $validators = {
             8[05]
           )\\d{3}
         ',
-                'toll_free' => '0800\\d{3}',
+                'specialrate' => '',
                 'personal_number' => '',
+                'mobile' => '
+          (?:
+            7[578]|
+            8[46-9]
+          )\\d{5}
+        ',
+                'pager' => '',
                 'voip' => ''
               };
 

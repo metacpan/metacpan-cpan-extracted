@@ -7,7 +7,7 @@ use Storable qw( freeze thaw );
 
 use 5.010;
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 extends 'Parallel::ForkManager';
 
@@ -28,21 +28,14 @@ has _last_stats  => ( is => 'rw',  clearer => 1, predicate => 1, default => sub{
 
 has __unstorable => ( is => 'ro', init_arg => undef, default => sub{[qw( _stats_pct _host_info _last_stats )]} );
 
-#
-# Once Parallel::ForkManager has converted to Moo (in development)
-# this will no longer be necessary. Probably. :)
-#
-sub FOREIGNBUILDARGS {
-    my ($class, @args) = @_;
-    my @ret;
+around BUILDARGS => sub {
+    my ($orig, $class, @args) = @_;
 
-    my $args = @args > 1 ? {@args} : $args[0];
+    @args = %{$args[0]} if @args && ref($args[0]) eq 'HASH';
 
-    push @ret, 1; # will get changed later in BUILD()
-    push @ret, $args->{tempdir} if defined $args->{tempdir};
-
-    @ret;
-}
+    # max_proc is required by Parallel::Forkmanager, we'll change it later.
+    $class->$orig(max_proc => 1, @args);
+};
 
 sub BUILD {
     my $self = shift;
@@ -311,7 +304,7 @@ Parallel::ForkManager::Scaled - Run processes in parallel based on CPU usage
 
 =head1 VERSION
 
-Version 0.17
+Version 0.20
 
 =head1 SYNOPSIS
 

@@ -22,51 +22,50 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[2489]2',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '[2489]',
                   'national_rule' => '0$1',
-                  'pattern' => '([2489])(2\\d{2})(\\d{4})'
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '5[69]',
-                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'leading_digits' => '5',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(5[69]\\d)(\\d{3})(\\d{3})'
+                  'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(1[78]00)(\\d{3})(\\d{3})',
-                  'national_rule' => '$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '1[78]00'
+                  'leading_digits' => '1',
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'personal_number' => '',
-                'toll_free' => '1800\\d{6}',
                 'fixed_line' => '
           (?:
-            22[234789]|
+            22[2-47-9]|
             42[45]|
             82[01458]|
             92[369]
           )\\d{5}
         ',
+                'personal_number' => '',
+                'specialrate' => '(1700\\d{6})',
+                'toll_free' => '1800\\d{6}',
                 'geographic' => '
           (?:
-            22[234789]|
+            22[2-47-9]|
             42[45]|
             82[01458]|
             92[369]
           )\\d{5}
         ',
+                'voip' => '',
                 'pager' => '',
-                'specialrate' => '(1700\\d{6})',
                 'mobile' => '5[69]\\d{7}'
               };
 

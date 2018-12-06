@@ -22,142 +22,151 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'format' => '$1-$2 $3',
-                  'national_rule' => '0$1',
                   'leading_digits' => '
-            240|
+            24|
             [346]|
             7[2-57-9]|
-            9[1-9]
+            9[2-9]
           ',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '21',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
-                },
-                {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,5})',
                   'leading_digits' => '
-            2(?:
-              1[1-9]|
-              [69]|
-              7[0-35-9]
-            )|
-            70|
-            86
+            80|
+            9
           ',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3'
-                },
-                {
-                  'pattern' => '(2\\d)(\\d{3,4})(\\d{4})',
-                  'leading_digits' => '2[028]',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1'
                 },
                 {
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '90',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})'
-                },
-                {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2(?:
               10|
               74
             )|
-            5|
-            [89]0
+            [59]|
+            80
           ',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})',
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '2[028]'
+                },
+                {
+                  'leading_digits' => '[278]',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,5})'
                 }
               ];
 
 my $validators = {
+                'pager' => '[28]6\\d{6,7}',
                 'mobile' => '
           2(?:
-            [028]\\d{7,8}|
-            1\\d{6,8}|
-            [79]\\d{7}
-          )
+            [0-28]\\d?|
+            [79]
+          )\\d{7}|
+          21\\d{6}
         ',
-                'specialrate' => '(90\\d{6,7})',
-                'pager' => '[28]6\\d{6,7}',
-                'geographic' => '
-          (?:
-            3[2-79]|
-            [49][2-9]|
-            6[235-9]|
-            7[2-57-9]
-          )\\d{6}|
-          24099\\d{3}
-        ',
-                'personal_number' => '70\\d{7}',
                 'voip' => '',
-                'fixed_line' => '
-          (?:
-            3[2-79]|
-            [49][2-9]|
-            6[235-9]|
-            7[2-57-9]
-          )\\d{6}|
-          24099\\d{3}
-        ',
                 'toll_free' => '
           508\\d{6,7}|
           80\\d{6,8}
-        '
+        ',
+                'geographic' => '
+          (?:
+            24099|
+            (?:
+              3[2-79]|
+              [49][2-9]|
+              6[235-9]|
+              7[2-57-9]
+            )\\d{3}
+          )\\d{3}
+        ',
+                'fixed_line' => '
+          (?:
+            24099|
+            (?:
+              3[2-79]|
+              [49][2-9]|
+              6[235-9]|
+              7[2-57-9]
+            )\\d{3}
+          )\\d{3}
+        ',
+                'specialrate' => '(90\\d{6,7})',
+                'personal_number' => '70\\d{7}'
               };
 my %areanames = (
-  642409 => "Scott\ Base",
-  643 => "South\ Island",
+  6424 => "Scott\ Base",
   64320 => "Gore\/Edendale",
   64321 => "Invercargill\/Stewart\ Island\/Rakiura",
   64322 => "Otautau",
   64323 => "Riverton\/Winton",
   64324 => "Tokanui\/Lumsden\/Te\ Anau",
+  64325 => "South\ Island",
+  64326 => "South\ Island",
+  64327 => "South\ Island",
+  64328 => "South\ Island",
+  64329 => "South\ Island",
   64330 => "Ashburton\/Akaroa\/Chatham\ Islands",
   64331 => "Rangiora\/Amberley\/Culverden\/Darfield\/Cheviot\/Kaikoura",
   64332 => "Christchurch",
   64333 => "Christchurch",
   64334 => "Christchurch\/Rolleston",
   64335 => "Christchurch",
+  64336 => "South\ Island",
   64337 => "Christchurch",
   64338 => "Christchurch",
+  64339 => "South\ Island",
+  64340 => "South\ Island",
   643409 => "Queenstown",
   64341 => "Balclutha\/Milton",
+  64342 => "South\ Island",
   64343 => "Oamaru\/Mount\ Cook\/Twizel\/Kurow",
   64344 => "Queenstown\/Cromwell\/Alexandra\/Wanaka\/Ranfurly\/Roxburgh",
   64345 => "Dunedin\/Queenstown",
   64346 => "Dunedin\/Palmerston",
   64347 => "Dunedin",
   64348 => "Dunedin\/Lawrence\/Mosgiel",
+  64349 => "South\ Island",
+  6435 => "South\ Island",
   64352 => "Murchison\/Takaka\/Motueka",
   64354 => "Nelson",
   64357 => "Blenheim",
+  6436 => "South\ Island",
   64361 => "Timaru",
   64368 => "Timaru\/Waimate\/Fairlie",
   64369 => "Geraldine",
+  6437 => "South\ Island",
   64373 => "Greymouth",
   64375 => "Hokitika\/Franz\ Josef\ Glacier\/Fox\ Glacier\/Haast",
   64376 => "Greymouth",
   64378 => "Westport",
   64390 => "Ashburton",
+  64391 => "South\ Island",
+  64392 => "South\ Island",
+  64393 => "South\ Island",
   64394 => "Christchurch\/Invercargill",
   64395 => "Dunedin\/Timaru",
   64396 => "Christchurch",
   64397 => "Christchurch",
   64398 => "Christchurch\/Blenheim\/Nelson",
+  64399 => "South\ Island",
   64423 => "Wellington\/Porirua\/Tawa",
   64429 => "Paraparaumu",
   6443 => "Wellington",

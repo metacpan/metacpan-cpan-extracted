@@ -1,0 +1,21 @@
+# A filter, a function, and a method.
+# Doing a separate file so I don't have to update the
+# expected line numbers in the existing tests
+#
+# None of these should warn or die or accumulate anything
+# in the extractor's lexicon.
+
+# variable
+<: $a_variable | __ :>
+<: __($a_variable) :>
+<: $c.__($a_variable) :>
+
+# methodcall
+<: $an_object.foo() | __ :>
+<: __($an_object.foo()) :>
+<: $c.__($an_object.foo()) :>
+
+# field
+<: $an_object.foo | __ :>
+<: __($an_object.foo) :>
+<: $c.__($an_object.foo) :>

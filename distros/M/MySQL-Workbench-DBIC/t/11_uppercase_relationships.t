@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -40,8 +40,6 @@ my $class = join '/',
 
 ok -f $class;
 
-$class = _untaint_path( $class );
-
 my $content = do{ local ( @ARGV, $/ ) = $class; <> };
 like_string $content, qr/__PACKAGE__->belongs_to\(groups => 'MyApp::DB::DBIC_Schema::Result::Groups',/, 'Uppercase Relationships (Groups)';
 like_string $content, qr/__PACKAGE__->belongs_to\(users => 'MyApp::DB::DBIC_Schema::Result::Users',/, 'Uppercase Relationships (Users)';
@@ -51,18 +49,15 @@ done_testing();
 
 eval{
     #rmtree( $output_path );
-    $output_path = _untaint_path( $output_path );
     #rmdir $output_path;
 };
 
 sub rmtree{
     my ($path) = @_;
-    $path = _untaint_path( $path );
     opendir my $dir, $path or die $!;
     while( my $entry = readdir $dir ){
         next if $entry =~ /^\.?\.$/;
         my $file = File::Spec->catfile( $path, $entry );
-        $file = _untaint_path( $file );
         if( -d $file ){
             rmtree( $file );
             rmdir $file;
@@ -74,12 +69,3 @@ sub rmtree{
     closedir $dir;
 }
 
-sub _untaint_path{
-    my ($path) = @_;
-    ($path) = ( $path =~ /(.*)/ );
-    # win32 uses ';' for a path separator, assume others use ':'
-    my $sep = ($^O =~ /win32/i) ? ';' : ':';
-    # -T disallows relative directories in the PATH
-    $path = join $sep, grep !/^\./, split /$sep/, $path;
-    return $path;
-}

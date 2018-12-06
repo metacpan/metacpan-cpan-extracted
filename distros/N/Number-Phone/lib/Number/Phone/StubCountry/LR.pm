@@ -22,41 +22,48 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'leading_digits' => '2',
-                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
-                  'pattern' => '(2\\d)(\\d{3})(\\d{3})'
+                  'leading_digits' => '[45]',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '([4-5])(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '2',
                   'national_rule' => '0$1',
-                  'leading_digits' => '[45]'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[23578]'
+                  'leading_digits' => '[23578]',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
                 'voip' => '',
-                'fixed_line' => '
+                'mobile' => '
           (?:
-            2\\d{3}|
-            33333
-          )\\d{4}
+            (?:
+              (?:
+                20|
+                77|
+                88
+              )\\d|
+              330|
+              555
+            )\\d|
+            4[67]
+          )\\d{5}|
+          5\\d{6}
         ',
-                'toll_free' => '',
                 'pager' => '',
-                'geographic' => '
+                'fixed_line' => '
           (?:
             2\\d{3}|
             33333
@@ -65,21 +72,17 @@ my $validators = {
                 'specialrate' => '(
           332(?:
             02|
-            [2-5]\\d
+            [34]\\d
           )\\d{4}
         )',
-                'mobile' => '
+                'personal_number' => '',
+                'geographic' => '
           (?:
-            20\\d{2}|
-            330\\d|
-            4[67]|
-            5(?:
-              55
-            )?\\d|
-            77\\d{2}|
-            88\\d{2}
-          )\\d{5}
-        '
+            2\\d{3}|
+            33333
+          )\\d{4}
+        ',
+                'toll_free' => ''
               };
 
     sub new {

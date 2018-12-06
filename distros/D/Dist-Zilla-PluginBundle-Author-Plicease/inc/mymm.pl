@@ -9,7 +9,7 @@ sub myWriteMakefile
   my %args = @_;
 
   $args{PREREQ_PM}->{'Dist::Zilla::PluginBundle::Git'} = 0
-    if $] >= 5.010001 && $^O ne 'MSWin32';
+    if $^O ne 'MSWin32' && !$ENV{PLICEASE_DZIL_NO_GIT};
   $args{PREREQ_PM}->{'Dist::Zilla::Plugin::PkgVersion::Block'} = 0
     if $] >= 5.014;
   

@@ -22,33 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})',
-                  'intl_format' => 'NA',
-                  'leading_digits' => '[1-79]',
-                  'national_rule' => '$1',
-                  'format' => '$1-$2-$3'
+                  'format' => '$1-$2-$3',
+                  'intl_format' => 'NA'
                 },
                 {
-                  'pattern' => '([3489]\\d{2})(\\d{3})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[3489]',
-                  'format' => '$1 $2-$3-$4',
-                  'national_rule' => '8 ($1)'
-                },
-                {
-                  'pattern' => '(7\\d{2})(\\d{3})(\\d{4})',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'national_rule' => '8 ($1)',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '7'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})(\\d{2})',
+                  'national_rule' => '8 ($1)',
+                  'format' => '$1 $2-$3-$4',
+                  'leading_digits' => '[3489]'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(80[39]\\d{7})',
-                'mobile' => '9\\d{9}',
                 'fixed_line' => '
           (?:
             3(?:
@@ -78,10 +74,8 @@ my $validators = {
             )
           )\\d{7}
         ',
-                'toll_free' => '80[04]\\d{7}',
                 'personal_number' => '808\\d{7}',
-                'voip' => '',
-                'pager' => '',
+                'specialrate' => '(80[39]\\d{7})',
                 'geographic' => '
           (?:
             3(?:
@@ -110,12 +104,16 @@ my $validators = {
               7[1-37-9]
             )
           )\\d{7}
-        '
+        ',
+                'toll_free' => '80[04]\\d{7}',
+                'voip' => '',
+                'mobile' => '9\\d{9}',
+                'pager' => ''
               };
 my %areanames = (
   7301 => "Republic\ of\ Buryatia",
   7302 => "Chita",
-  733622 => "Baikonur",
+  733 => "Baikonur",
   7341 => "Udmurtian\ Republic",
   7342 => "Perm",
   7343 => "Ekaterinburg",
@@ -135,7 +133,7 @@ my %areanames = (
   7390 => "Republic\ of\ Khakassia",
   7391 => "Krasnoyarsk\ Territory",
   7394 => "Republic\ of\ Tuva",
-  7401 => "Kaliningrad",
+  740 => "Kaliningrad",
   7411 => "Republic\ of\ Sakha",
   7413 => "Magadan",
   7415 => "Kamchatka\ Region",
@@ -179,7 +177,7 @@ my %areanames = (
   771041 => "Aktau\,\ Zhezkazgan",
   771042 => "Zharyk",
   771043 => "Zhairem",
-  771063 => "Satpaev",
+  77106 => "Satpaev",
   77112 => "Uralsk",
   771130 => "Peremetnoye",
   771131 => "Darinskoye",
@@ -200,11 +198,12 @@ my %areanames = (
   771146 => "Akzhaiksky\ District",
   771147 => "Akzhaiksky\ District",
   771149 => "Zelenovsky\ District",
-  7712 => "Atyrau\ Region",
   77122 => "Atyrau",
+  771230 => "Atyrau\ Region",
   7712302 => "Tengizshevroil",
   7712303 => "Tengizs",
   771231 => "Akkystau",
+  771232 => "Atyrau\ Region",
   771233 => "Ganyushkino",
   771234 => "Indernborski",
   771235 => "Dossor",
@@ -212,7 +211,7 @@ my %areanames = (
   771237 => "Kulsary",
   771238 => "Miyaly",
   771239 => "Makat",
-  7713 => "Aktobe\ Region",
+  77125 => "Atyrau\ Region",
   77132 => "Aktobe\/Kargalinskoye",
   771330 => "Khromtau\ District",
   771331 => "Martuk",
@@ -232,7 +231,7 @@ my %areanames = (
   771347 => "Aitekebisky\ District",
   771348 => "Shalkarsky\ District",
   771349 => "Shalkarsky\ District",
-  7714 => "Kostanai\ Region",
+  77135 => "Aktobe\ Region",
   77142 => "Kostanai",
   771430 => "Arkalyk",
   771431 => "Rudny",
@@ -260,7 +259,9 @@ my %areanames = (
   771455 => "Zatobolsk",
   771456 => "Kachar",
   771457 => "Dzhangildinsky\ District",
+  771458 => "Kostanai\ Region",
   77145834 => "Krasnogorsk",
+  771459 => "Kostanai\ Region",
   77152 => "Petropavlovsk",
   771531 => "Bulayevo",
   771532 => "Smirnovo",
@@ -300,8 +301,7 @@ my %areanames = (
   771648 => "Derzhavinsk",
   771649 => "Zhaksynsky\ District",
   771651 => "Kabanbai\ Batyr",
-  77172 => "Astana",
-  7718 => "Pavlodar\ Region",
+  7717 => "Astana",
   77182 => "Pavlodar",
   771831 => "Zhelezinka",
   771832 => "Irtyshsk",
@@ -318,7 +318,6 @@ my %areanames = (
   771844 => "Irtyshsky\ District",
   771845 => "Pavlodar\ Area",
   77187 => "Ekibastuz",
-  7721 => "Karaganda\ Region",
   77212 => "Karaganda",
   77213 => "Aktau\/Temirtau",
   772131 => "Abai",
@@ -333,12 +332,13 @@ my %areanames = (
   772153 => "Topar",
   772154 => "Botakara",
   772156 => "Shakhtinsk",
+  772159 => "Karaganda\ Region",
   77222 => "Semey",
   772230 => "Urdzhar",
   772236 => "Beskaragai",
   772237 => "Ayagoz",
   772239 => "Makanchi",
-  772246 => "Barshatas",
+  77224 => "Barshatas",
   772251 => "Kurchatov",
   772252 => "Karaul",
   772256 => "Kainar",
@@ -365,7 +365,6 @@ my %areanames = (
   772348 => "Kokpekty",
   772351 => "Borodulikha",
   772353 => "Novaya\ Shulba",
-  7724 => "Kyzylorda\ Region",
   77242 => "Kyzylorda",
   772431 => "Zhalagash",
   772432 => "Shiyeli",
@@ -375,6 +374,7 @@ my %areanames = (
   772437 => "Zhosaly",
   772438 => "Aiteke\ bi",
   772439 => "Aralsky\ District",
+  77245 => "Kyzylorda\ Region",
   77252 => "Shymkent",
   772530 => "Temirlanovka",
   772531 => "Aksukent",
@@ -408,15 +408,15 @@ my %areanames = (
   772642 => "Moiynkum",
   772643 => "Shu",
   772644 => "Karatau",
-  7727 => "Almaty\ Region",
   77272 => "Almaty",
   772725 => "Otegen\ Batyra",
   77272956 => "Talgar",
   77272983 => "Kaskelen",
   77273 => "Almaty",
-  772740 => "Karassaisky\ District",
+  77274 => "Karassaisky\ District",
   772752 => "Otegen\ Batyra",
   772757 => "Akshi",
+  772759 => "Almaty\ Region",
   772770 => "Uzynagash",
   772771 => "Kaskelen",
   772772 => "Kapchagai",

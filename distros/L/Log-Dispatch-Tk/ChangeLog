@@ -1,3 +1,11 @@
+2018-12-05 Dominique Dumont  <ddumont@cpan.org> v2.01
+
+	* Adapted to new Log::Dispatch (RT #127912)
+	  Thanks Slaven for the report
+	* Requires Log::Dispatch >= 2.68
+	* Bump version to 2.01 to avoid problem with version
+	  comparison between 1.9 and 1.10
+
 2017-05-14  Dominique Dumont  <ddumont@cpan.org> v1.9
 
 	* Fix smoke tests (Thanks to Slaven Rezic)

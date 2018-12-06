@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.43';
+our $XS_VERSION = our $VERSION = '0.44';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -25,8 +25,6 @@ our @EXPORT_OK = qw(
 require URI::Fast::IRI;
 
 use overload 'eq' => sub{ $_[0]->compare($_[1]) };
-
-#sub uri_split{ _split_uri(defined $_[0] ? "$_[0]" : $_[0]) }
 
 sub auth {
   my ($self, $val) = @_;
@@ -199,7 +197,7 @@ sub compare {
 #-------------------------------------------------------------------------------
 sub relative {
   my ($self, $base) = @_;
-  my $rel = uri("$self");
+  my $rel = (ref $self)->new("$self");
 
   my $rpath = $self->path;
   ($_, $_, my $bpath) = uri_split("$base");
@@ -308,6 +306,13 @@ Behaves (hopefully) identically to L<URI::Split>, but roughly twice as fast.
 =head2 encode/decode/uri_encode/uri_decode
 
 See L</ENCODING>.
+
+=head1 CONSTRUCTOR
+
+If desired, both C<URI::Fast> and L<URI::Fast::IRI> may be instantiated using
+the default constructor, C<new>.
+
+  my $uri = URI::Fast->new('http://www.example.com');
 
 =head1 ATTRIBUTES
 

@@ -2,28 +2,28 @@ package SPVM::ExchangeAPI;
 
 use Encode 'encode', 'decode';
 
-sub to_string {
-  my $binary = SPVM::ExchangeAPI::to_binary(@_);
+sub to_str {
+  my $bin = SPVM::ExchangeAPI::to_bin(@_);
   
-  my $string = decode('UTF-8', $binary);
+  my $string = decode('UTF-8', $bin);
   
   return $string;
 }
 
-sub new_byte_array_from_string {
+sub new_barray_from_str {
   my ($env, $string) = @_;
   
-  my $binary = encode('UTF-8', $string);
+  my $bin = encode('UTF-8', $string);
   
-  return SPVM::ExchangeAPI::new_byte_array_from_binary($env, $binary);
+  return SPVM::ExchangeAPI::new_barray_from_bin($env, $bin);
 }
 
-sub new_string {
+sub new_str {
   my ($env, $string) = @_;
   
-  my $binary = encode('UTF-8', $string);
+  my $bin = encode('UTF-8', $string);
 
-  return SPVM::ExchangeAPI::new_string_from_binary($env, $binary);
+  return SPVM::ExchangeAPI::new_str_from_bin($env, $bin);
 }
 
 # other functions is implemented in SPVM.xs

@@ -1,6 +1,7 @@
 package Log::Dispatch::TkText;
 
 use strict;
+use warnings;
 use vars qw($VERSION);
 
 use Tk;
@@ -8,7 +9,7 @@ use Tk::ROText ;
 use Log::Dispatch::ToTk;
 use base qw(Tk::Derived Tk::ROText);
 
-$VERSION = '1.9';
+$VERSION = '2.01';
 
 Tk::Widget->Construct('LogText');
 

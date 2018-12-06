@@ -22,26 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{3})(\\d{3})',
+                  'format' => '$1-$2',
                   'leading_digits' => '
             [2-4]|
             5[2-58]
-          ',
-                  'format' => '$1-$2',
-                  'pattern' => '(\\d{3})(\\d{3})'
+          '
                 },
                 {
-                  'leading_digits' => '56',
-                  'format' => '$1-$2-$3',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '5',
+                  'format' => '$1-$2-$3'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '[6-8]',
-                  'format' => '$1-$2'
+                  'format' => '$1-$2',
+                  'leading_digits' => '[6-8]'
                 }
               ];
 
@@ -50,31 +50,35 @@ my $validators = {
           (?:
             2[1-3]|
             3[0-7]|
-            4\\d|
-            5[2-58]|
-            68\\d
+            (?:
+              4|
+              68
+            )\\d|
+            5[2-58]
           )\\d{4}
         ',
-                'pager' => '',
                 'toll_free' => '',
+                'personal_number' => '',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             2[1-3]|
             3[0-7]|
-            4\\d|
-            5[2-58]|
-            68\\d
+            (?:
+              4|
+              68
+            )\\d|
+            5[2-58]
           )\\d{4}
         ',
-                'voip' => '56\\d{4}',
-                'personal_number' => '',
                 'mobile' => '
           (?:
             7[124-7]|
             8[125-9]
           )\\d{5}
         ',
-                'specialrate' => ''
+                'pager' => '',
+                'voip' => '56\\d{4}'
               };
 
     sub new {

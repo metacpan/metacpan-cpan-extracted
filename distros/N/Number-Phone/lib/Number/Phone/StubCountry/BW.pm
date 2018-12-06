@@ -22,61 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214154;
+our $VERSION = 1.20181205223702;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '[2-6]',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(7\\d)(\\d{3})(\\d{3})',
-                  'leading_digits' => '7',
-                  'format' => '$1 $2 $3'
-                },
-                {
-                  'pattern' => '(90)(\\d{5})',
                   'leading_digits' => '90',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{2})(\\d{5})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '7',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            2(?:
-              4[0-48]|
-              6[0-24]|
-              9[0578]
-            )|
-            3(?:
-              1[0-35-9]|
-              55|
-              [69]\\d|
-              7[01]
-            )|
-            4(?:
-              6[03]|
-              7[1267]|
-              9[0-5]
-            )|
-            5(?:
-              3[0389]|
-              4[0489]|
-              7[1-47]|
-              88|
-              9[0-49]
-            )|
-            6(?:
-              2[1-35]|
-              5[149]|
-              8[067]
-            )
-          )\\d{4}
-        ',
-                'pager' => '',
-                'toll_free' => '',
+                'personal_number' => '',
+                'specialrate' => '(90\\d{5})',
                 'fixed_line' => '
           (?:
             2(?:
@@ -109,31 +77,63 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'voip' => '79[12][01]\\d{4}',
-                'personal_number' => '',
+                'toll_free' => '',
+                'geographic' => '
+          (?:
+            2(?:
+              4[0-48]|
+              6[0-24]|
+              9[0578]
+            )|
+            3(?:
+              1[0-35-9]|
+              55|
+              [69]\\d|
+              7[01]
+            )|
+            4(?:
+              6[03]|
+              7[1267]|
+              9[0-5]
+            )|
+            5(?:
+              3[0389]|
+              4[0489]|
+              7[1-47]|
+              88|
+              9[0-49]
+            )|
+            6(?:
+              2[1-35]|
+              5[149]|
+              8[067]
+            )
+          )\\d{4}
+        ',
+                'voip' => '
+          79(?:
+            1(?:
+              [01]\\d|
+              20
+            )|
+            2[0-2]\\d
+          )\\d{3}
+        ',
+                'pager' => '',
                 'mobile' => '
           7(?:
-            [1-6]\\d|
-            7[014-8]
-          )\\d{5}
-        ',
-                'specialrate' => '(90\\d{5})'
+            [1-6]\\d{3}|
+            7(?:
+              [014-8]\\d\\d|
+              200
+            )
+          )\\d{3}
+        '
               };
 my %areanames = (
-  267240 => "Francistown",
-  267241 => "Francistown",
-  267242 => "Francistown",
-  267243 => "Francistown",
-  267244 => "Francistown",
-  267248 => "Francistown",
-  267260 => "Selebi\-Phikwe",
-  267261 => "Selebi\-Phikwe",
-  267262 => "Selebi\-Phikwe",
-  267264 => "Selebi\-Phikwe",
-  267290 => "Letlhakane\/Orapa",
-  267295 => "Letlhakane\/Orapa",
-  267297 => "Letlhakane\/Orapa",
-  267298 => "Letlhakane\/Orapa",
+  26724 => "Francistown",
+  26726 => "Selebi\-Phikwe",
+  26729 => "Letlhakane\/Orapa",
   267310 => "Gaborone\ \(outer\)",
   267312 => "Gaborone",
   267313 => "Gaborone",
@@ -142,10 +142,9 @@ my %areanames = (
   267317 => "Gaborone",
   267318 => "Gaborone",
   267319 => "Gaborone",
-  267355 => "Gaborone",
+  26735 => "Gaborone",
   26736 => "Gaborone",
-  267370 => "Gaborone",
-  267371 => "Gaborone",
+  26737 => "Gaborone",
   267390 => "Gaborone",
   267391 => "Gaborone",
   267392 => "Gaborone",
@@ -153,48 +152,22 @@ my %areanames = (
   267394 => "Gaborone",
   267395 => "Gaborone",
   267397 => "Gaborone",
-  267460 => "Serowe",
-  267463 => "Serowe",
-  267471 => "Mahalapye",
-  267472 => "Mahalapye",
-  267476 => "Mahalapye",
-  267477 => "Mahalapye",
-  267490 => "Palapye",
-  267491 => "Palapye",
-  267492 => "Palapye",
-  267493 => "Palapye",
-  267494 => "Palapye",
-  267495 => "Palapye",
+  26746 => "Serowe",
+  26747 => "Mahalapye",
+  26749 => "Palapye",
   267530 => "Lobatse",
   267533 => "Lobatse",
   267538 => "Ramotswa",
   267539 => "Ramotswa",
-  267540 => "Barolong\/Ngwaketse",
-  267544 => "Barolong\/Ngwaketse",
-  267548 => "Barolong\/Ngwaketse",
-  267549 => "Barolong\/Ngwaketse",
-  267571 => "Mochudi",
-  267572 => "Mochudi",
-  267573 => "Mochudi",
-  267574 => "Mochudi",
-  267577 => "Mochudi",
-  267588 => "Jwaneng",
-  267590 => "Molepolole",
-  267591 => "Molepolole",
-  267592 => "Molepolole",
-  267593 => "Molepolole",
-  267594 => "Molepolole",
-  267599 => "Molepolole",
-  267621 => "Kasane",
-  267622 => "Kasane",
-  267623 => "Kasane",
-  267625 => "Kasane",
+  26754 => "Barolong\/Ngwaketse",
+  26757 => "Mochudi",
+  26758 => "Jwaneng",
+  26759 => "Molepolole",
+  26762 => "Kasane",
   267651 => "Kgalagadi",
   267654 => "Kgalagadi",
   267659 => "Gantsi",
-  267680 => "Maun",
-  267686 => "Maun",
-  267687 => "Maun",
+  26768 => "Maun",
 );
     sub new {
       my $class = shift;

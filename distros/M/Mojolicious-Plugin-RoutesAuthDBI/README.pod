@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin::Authentication';
 use Mojolicious::Plugin::RoutesAuthDBI::Util qw(load_class);
 use Mojo::Util qw(hmac_sha1_sum);
 use Hash::Merge qw( merge );
+use Scalar::Util 'weaken';
 
 use constant  PKG => __PACKAGE__;
 
@@ -77,13 +78,14 @@ has merge_conf => sub {#hashref
 
 has access => sub {# object
   my $self = shift;
+  weaken $self;
   my $conf = $self->merge_conf->{'access'};
   @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
     if $conf->{tables};
   my $class = load_class($conf);
   $class->import( @{ $conf->{import} });
   $class->new(app=>$self->app, plugin=>$self,);
-};
+}, weak => 1;
 
 has admin => sub {# object
   my $self = shift;
@@ -91,7 +93,7 @@ has admin => sub {# object
   @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
     if $conf->{tables};
   load_class($conf)->init(%$conf, app=>$self->app, plugin=>$self,);
-};
+}, weak => 1;
 
 has oauth => sub {
   my $self = shift;
@@ -99,7 +101,7 @@ has oauth => sub {
   @{$self->merge_conf->{template}{tables}}{keys %{$conf->{tables}}} = values %{$conf->{tables}}
     if $conf->{tables};
   load_class($conf)->init(%$conf, app=>$self->app, plugin=>$self, model=>$self->model($conf->{controller}),);
-};
+}, weak => 1;
 
 has guest => sub {# object
   my $self = shift;
@@ -112,7 +114,7 @@ has guest => sub {# object
   
   my $class = load_class($conf);
   $class->new( %$conf, app=>$self->app, plugin=>$self, model=>$self->model($conf->{module}), );
-};
+}, weak => 1;
 
 has log => sub {# object
   my $self = shift;
@@ -127,7 +129,7 @@ has log => sub {# object
   my $class = load_class($conf);
   $class->new( %$conf, app=>$self->app, plugin=>$self, model=>$self->model($conf->{module}), )
     unless $conf->{disabled};
-};
+}, weak => 1;
 
 #~ has model => sub {
   #~ my $m = { map {$_ => load_class("Mojolicious::Plugin::RoutesAuthDBI::Model::$_")->new} qw(Profiles Namespaces Routes Refs Controllers Actions Roles Logins) };
@@ -155,6 +157,7 @@ sub register {
   $self->SUPER::register($self->app, $self->merge_conf->{auth});
   $self->app->plugin('HeaderCondition');# routes host_re
   
+  weaken $self;
   $self->app->routes->add_condition(access => sub {$self->cond_access(@_)});
   $access->apply_ns();
   $access->apply_route($_) for @{ $access->routes };
@@ -175,6 +178,7 @@ sub register {
   $self->log
     if $self->conf->{log};
   
+  weaken $access;
   $self->app->helper('access', sub {$access});
   
   return $self, $access;
@@ -354,13 +358,15 @@ sub model {
   my $class =  load_class(namespace => $ns, module=> $name)
     or die "Model module [$name] not found at namespace [$ns] or has errors";
   
+  weaken $self;
+  weaken $self->{app};
   $class->new(app=>$self->app, plugin=>$self); # синглетоны в общем
   
   #~ my $m = { map {$_ => load_class("Mojolicious::Plugin::RoutesAuthDBI::Model::$_")->new} qw(Profiles Namespaces Routes Refs Controllers Actions Roles Logins) };
   
 };
 
-our $VERSION = '0.851';
+our $VERSION = '0.861';
 
 =pod
 
@@ -376,11 +382,11 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.851
+0.861
 
 =head1 NAME
 
-Mojolicious::Plugin::RoutesAuthDBI - from DBI tables does generate routes, make authentication and make restrict access (authorization) to app routes.
+Mojolicious::Plugin::RoutesAuthDBI - from DBI tables does generate app routes, make authentication and make restrict access (authorization).
 
 =head1 DB DESIGN DIAGRAM
 

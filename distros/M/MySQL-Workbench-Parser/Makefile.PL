@@ -27,10 +27,11 @@ my %WriteMakefileArgs = (
     "YAML::Tiny" => "1.64"
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "Test::Exception" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Archive::Zip" => "1.30",
+  "Capture::Tiny" => 0,
   "Carp" => 0,
   "File::Basename" => "2.82",
   "File::Spec" => "3.40",

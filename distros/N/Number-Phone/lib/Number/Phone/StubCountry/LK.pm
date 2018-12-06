@@ -22,58 +22,62 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '[1-689]',
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '7',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'leading_digits' => '7'
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'personal_number' => '',
-                'toll_free' => '',
-                'fixed_line' => '
-          1(?:
-            1[2-57]\\d{6}|
-            973\\d{5}
-          )|
-          (?:
-            2[13-7]|
-            3[1-8]|
-            4[157]|
-            5[12457]|
-            6[35-7]|
-            [89]1
-          )[2-57]\\d{6}
-        ',
                 'geographic' => '
-          1(?:
-            1[2-57]\\d{6}|
-            973\\d{5}
-          )|
           (?:
-            2[13-7]|
-            3[1-8]|
-            4[157]|
-            5[12457]|
-            6[35-7]|
-            [89]1
-          )[2-57]\\d{6}
+            1(?:
+              1[2-57]\\d|
+              973
+            )|
+            (?:
+              2[13-7]|
+              3[1-8]|
+              4[157]|
+              5[12457]|
+              6[35-7]|
+              [89]1
+            )[2-57]\\d
+          )\\d{5}
         ',
-                'pager' => '',
+                'toll_free' => '',
+                'personal_number' => '',
                 'specialrate' => '',
-                'mobile' => '7[0125-8]\\d{7}'
+                'fixed_line' => '
+          (?:
+            1(?:
+              1[2-57]\\d|
+              973
+            )|
+            (?:
+              2[13-7]|
+              3[1-8]|
+              4[157]|
+              5[12457]|
+              6[35-7]|
+              [89]1
+            )[2-57]\\d
+          )\\d{5}
+        ',
+                'mobile' => '7[0-25-8]\\d{7}',
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   9411 => "Colombo",
@@ -103,8 +107,8 @@ my %areanames = (
   9465 => "Batticaloa",
   9466 => "Matale",
   9467 => "Kalmunai\,\ Ampara",
-  9481 => "Kandy",
-  9491 => "Galle",
+  948 => "Kandy",
+  949 => "Galle",
 );
     sub new {
       my $class = shift;

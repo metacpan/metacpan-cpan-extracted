@@ -22,27 +22,28 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'leading_digits' => '[2-9]',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '',
+                'voip' => '',
                 'mobile' => '
           (?:
-            6[234689]0|
+            6[2-4689]0|
             77\\d|
             88[0-4]
           )\\d{4}
         ',
-                'voip' => '',
+                'pager' => '',
                 'personal_number' => '',
-                'toll_free' => '',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             2(?:
@@ -103,24 +104,24 @@ my $validators = {
             900
           )\\d{4}
         ',
-                'pager' => ''
+                'toll_free' => ''
               };
 my %areanames = (
-  680255 => "Sonsorol\ State\ and\ Hatohobei\ State",
-  680277 => "Angaur\ State",
-  680345 => "Peleliu\ State",
-  680488 => "Koror\ State",
-  680535 => "Ngatpang\ State",
-  680544 => "Aimeliik\ State",
-  680587 => "Airai\ State",
+  68025 => "Sonsorol\ State\ and\ Hatohobei\ State",
+  68027 => "Angaur\ State",
+  6803 => "Peleliu\ State",
+  6804 => "Koror\ State",
+  68053 => "Ngatpang\ State",
+  68054 => "Aimeliik\ State",
+  68058 => "Airai\ State",
   680622 => "Ngchesar\ State",
-  680654 => "Melekeok\ State",
-  680679 => "Ngiwal\ State",
-  680733 => "Ngaremlengui\ State",
-  680747 => "Ngardmau\ State",
-  680824 => "Ngaraard\ State",
-  680855 => "Ngarchelong\ State",
-  680876 => "Kayangel\ State",
+  68065 => "Melekeok\ State",
+  68067 => "Ngiwal\ State",
+  68073 => "Ngaremlengui\ State",
+  68074 => "Ngardmau\ State",
+  68082 => "Ngaraard\ State",
+  68085 => "Ngarchelong\ State",
+  68087 => "Kayangel\ State",
 );
     sub new {
       my $class = shift;

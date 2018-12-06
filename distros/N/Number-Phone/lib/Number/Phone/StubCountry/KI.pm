@@ -22,12 +22,21 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214156;
+our $VERSION = 1.20181205223704;
 
 my $formatters = [];
 
 my $validators = {
-                'specialrate' => '',
+                'voip' => '
+          30(?:
+            0[01]\\d\\d|
+            12(?:
+              11|
+              20
+            )
+          )\\d\\d
+        ',
+                'pager' => '',
                 'mobile' => '
           (?:
             6(?:
@@ -48,9 +57,6 @@ my $validators = {
             [24]\\d|
             3[1-9]|
             50|
-            8[0-5]
-          )\\d{3}|
-          (?:
             65(?:
               02[12]|
               12[56]|
@@ -58,7 +64,7 @@ my $validators = {
               [3-5]00
             )|
             7(?:
-              27\\d{2}|
+              27\\d\\d|
               3100|
               5(?:
                 02[12]|
@@ -70,29 +76,18 @@ my $validators = {
                 )|
                 500
               )
-            )
+            )|
+            8[0-5]
           )\\d{3}
         ',
-                'toll_free' => '',
                 'personal_number' => '',
-                'voip' => '
-          30(?:
-            0[01]\\d{2}|
-            12(?:
-              11|
-              20
-            )
-          )\\d{2}
-        ',
-                'pager' => '',
+                'specialrate' => '',
+                'toll_free' => '',
                 'geographic' => '
           (?:
             [24]\\d|
             3[1-9]|
             50|
-            8[0-5]
-          )\\d{3}|
-          (?:
             65(?:
               02[12]|
               12[56]|
@@ -100,7 +95,7 @@ my $validators = {
               [3-5]00
             )|
             7(?:
-              27\\d{2}|
+              27\\d\\d|
               3100|
               5(?:
                 02[12]|
@@ -112,7 +107,8 @@ my $validators = {
                 )|
                 500
               )
-            )
+            )|
+            8[0-5]
           )\\d{3}
         '
               };
@@ -178,6 +174,9 @@ my %areanames = (
       my $number = shift;
       $number =~ s/(^\+686|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
-        return $self->is_valid() ? $self : undef;
+      return $self if ($self->is_valid());
+      $number =~ s/^(?:0)//;
+      $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
+      return $self->is_valid() ? $self : undef;
     }
 1;

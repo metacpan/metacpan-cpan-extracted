@@ -14,7 +14,7 @@ BEGIN {
     eval { $params = MyTest->new; };
     $@
       ? plan skip_all => $@
-      : plan tests    => 104;
+      : plan tests    => 107;
 }
 
 BEGIN { use_ok('Mail::IMAPClient') or exit; }
@@ -44,6 +44,11 @@ $imap
   . "Are server/user/password correct?\n";
 
 isa_ok( $imap, 'Mail::IMAPClient' );
+
+{
+    my $type = ref $imap->Socket;
+    ok( $type =~ /^IO::Socket::.*/, "Socket ref is $type" );
+}
 
 $imap->Debug_fh->autoflush() if $imap->Debug_fh;
 
@@ -449,6 +454,14 @@ else {
       if $imap->message_count;
     $imap->close;
     $imap->delete($target);
+}
+
+{
+    $imap->select('inbox');
+    my $bogusf = $imap->flags(42);
+    is( $bogusf, undef, '(scalar) flags returns undef for bogus message' );
+    my @bogusf = $imap->flags(42);
+    is( $bogusf[0], undef, '(list) flags returns array with undef element 0 for bogus message' );
 }
 
 $imap->_disconnect;

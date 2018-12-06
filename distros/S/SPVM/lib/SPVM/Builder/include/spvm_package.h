@@ -6,15 +6,14 @@
 enum {
   SPVM_PACKAGE_C_CATEGORY_CLASS,
   SPVM_PACKAGE_C_CATEGORY_INTERFACE,
-  SPVM_PACKAGE_C_CATEGORY_VALUE_T,
+  SPVM_PACKAGE_C_CATEGORY_VALUE,
 };
 
 enum {
-  SPVM_PACKAGE_C_FLAG_IS_PRIVATE = 1,
-  SPVM_PACKAGE_C_FLAG_IS_ANON = 2,
-  SPVM_PACKAGE_C_FLAG_IS_POINTER = 4,
-  SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB = 8,
-  SPVM_PACKAGE_C_FLAG_IS_PUBLIC = 16,
+  SPVM_PACKAGE_C_FLAG_POINTER = 1,
+  SPVM_PACKAGE_C_FLAG_ANON_SUB_PACKAGE = 2,
+  SPVM_PACKAGE_C_FLAG_PRIVATE = 4,
+  SPVM_PACKAGE_C_FLAG_PUBLIC = 8,
 };
 
 extern const char* const SPVM_PACKAGE_C_CATEGORY_NAMES[];
@@ -55,7 +54,7 @@ struct SPVM_package {
   SPVM_LIST* op_uses;
   int32_t id;
   int32_t fields_byte_size;
-  int32_t object_fields_byte_offset;
+  int32_t object_fields_offset;
   int32_t object_fields_length;
   int32_t flag;
   int32_t category;

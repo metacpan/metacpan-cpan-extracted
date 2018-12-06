@@ -23,6 +23,7 @@ requires 'Object::Signature';
 requires 'MRO::Compat';
 requires 'MooseX::Emulate::Class::Accessor::Fast' => '0.00801';
 requires 'Moose' => '0.76';
+requires 'HTML::Entities';
 
 # an indirect dep. needs a certain version.
 requires 'Tie::RefHash' => '1.34';

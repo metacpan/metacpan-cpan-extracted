@@ -1450,9 +1450,14 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   
   package->load_path = compiler->cur_file;
   
-  if (!op_type) {
+  int32_t is_anon;
+  if (op_type) {
+    is_anon = 0;
+  }
+  // Anon
+  else  {
     // Package is anon
-    package->flag |= SPVM_PACKAGE_C_FLAG_IS_ANON;
+    is_anon = 1;
     
     // Anon package name
     char* name_package = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, strlen("anon2147483647") + 1);
@@ -1466,7 +1471,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   
   const char* package_name = op_type->uv.type->basic_type->name;
   
-  if (!(package->flag & SPVM_PACKAGE_C_FLAG_IS_ANON) && islower(package_name[0])) {
+  if (!is_anon && islower(package_name[0])) {
     SPVM_COMPILER_error(compiler, "Package name must start with upper case \"%s\" at %s line %d\n", package_name, op_package->file, op_package->line);
   }
   
@@ -1500,21 +1505,21 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           package->category = SPVM_PACKAGE_C_CATEGORY_INTERFACE;
           category_descriptors_count++;
           break;
-        case SPVM_DESCRIPTOR_C_ID_POINTER:
+        case SPVM_DESCRIPTOR_C_ID_POINTER_T:
           package->category = SPVM_PACKAGE_C_CATEGORY_CLASS;
-          package->flag |= SPVM_PACKAGE_C_FLAG_IS_POINTER;
+          package->flag |= SPVM_PACKAGE_C_FLAG_POINTER;
           category_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_VALUE_T:
-          package->category = SPVM_PACKAGE_C_CATEGORY_VALUE_T;
+          package->category = SPVM_PACKAGE_C_CATEGORY_VALUE;
           category_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
-          package->flag |= SPVM_PACKAGE_C_FLAG_IS_PRIVATE;
+          package->flag |= SPVM_PACKAGE_C_FLAG_PRIVATE;
           access_control_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PUBLIC:
-          package->flag |= SPVM_PACKAGE_C_FLAG_IS_PUBLIC;
+          package->flag |= SPVM_PACKAGE_C_FLAG_PUBLIC;
           access_control_descriptors_count++;
           break;
         default:
@@ -1792,7 +1797,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     }
     
     // Sort fields(except value package)
-    if (package->category != SPVM_PACKAGE_C_CATEGORY_VALUE_T) {
+    if (package->category != SPVM_PACKAGE_C_CATEGORY_VALUE) {
       for (int32_t i = 0; i < (package->fields->length - 1); i++) {
         for (int32_t j = (package->fields->length - 1); j > i; j--) {
           SPVM_FIELD* field1 = SPVM_LIST_fetch(package->fields, j-1);
@@ -1811,7 +1816,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     
     // Field declarations
     for (int32_t i = 0; i < package->fields->length; i++) {
-      if (package->flag & SPVM_PACKAGE_C_FLAG_IS_POINTER) {
+      if (package->flag & SPVM_PACKAGE_C_FLAG_POINTER) {
         SPVM_COMPILER_error(compiler, "Pointer package can't have field at %s line %d\n", op_decl->file, op_decl->line);
         continue;
       }
@@ -1909,10 +1914,10 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       for (i = 0; i < package->subs->length; i++) {
         SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, i);
         
-        if (sub->flag & SPVM_SUB_C_FLAG_IS_ANON_SUB) {
-          package->flag |= SPVM_PACKAGE_C_FLAG_IS_HAS_ONLY_ANON_SUB;
+        if (sub->flag & SPVM_SUB_C_FLAG_ANON) {
+          package->flag |= SPVM_PACKAGE_C_FLAG_ANON_SUB_PACKAGE;
           assert(package->subs->length == 1);
-          assert(package->flag & SPVM_PACKAGE_C_FLAG_IS_ANON);
+          assert(is_anon);
         }
 
         sub->rel_id = i;
@@ -1974,7 +1979,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
             // Bind standard functions
             sub->package = package;
             
-            if (sub->flag & SPVM_SUB_C_FLAG_IS_DESTRUCTOR) {
+            if (sub->flag & SPVM_SUB_C_FLAG_DESTRUCTOR) {
               package->sub_destructor = sub;
             }
             
@@ -1990,7 +1995,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     }
     
     // Clear current sub names
-    if (package->flag & SPVM_PACKAGE_C_FLAG_IS_ANON) {
+    if (is_anon) {
       compiler->current_sub_names = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
     }
     
@@ -2172,7 +2177,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   
   // Anon sub
   if (!op_name_sub) {
-    sub->flag |= SPVM_SUB_C_FLAG_IS_ANON_SUB;
+    sub->flag |= SPVM_SUB_C_FLAG_ANON;
     
     // Anon sub name
     char* name_sub = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 1);
@@ -2209,23 +2214,23 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
       SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
       
       if (descriptor->id == SPVM_DESCRIPTOR_C_ID_NATIVE) {
-        sub->flag |= SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC;
+        sub->flag |= SPVM_SUB_C_FLAG_NATIVE;
       }
       else if (descriptor->id == SPVM_DESCRIPTOR_C_ID_PRECOMPILE) {
-        sub->flag |= SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC;
+        sub->flag |= SPVM_SUB_C_FLAG_PRECOMPILE;
       }
       else {
         SPVM_COMPILER_error(compiler, "invalid subroutine descriptor %s", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_descriptors->file, op_descriptors->line);
       }
     }
 
-    if ((sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC) && (sub->flag & SPVM_SUB_C_FLAG_HAVE_PRECOMPILE_DESC)) {
+    if ((sub->flag & SPVM_SUB_C_FLAG_NATIVE) && (sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE)) {
       SPVM_COMPILER_error(compiler, "native and compile descriptor can't be used together", op_descriptors->file, op_descriptors->line);
     }
   }
 
   // Native subroutine can't have block
-  if ((sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC) && op_block) {
+  if ((sub->flag & SPVM_SUB_C_FLAG_NATIVE) && op_block) {
     SPVM_COMPILER_error(compiler, "Native subroutine can't have block", op_block->file, op_block->line);
   }
   
@@ -2260,7 +2265,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   }
   
   // Native my vars is same as arguments
-  if (sub->flag & SPVM_SUB_C_FLAG_HAVE_NATIVE_DESC) {
+  if (sub->flag & SPVM_SUB_C_FLAG_NATIVE) {
     SPVM_OP* op_arg = op_args->first;
     while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
       SPVM_LIST_push(sub->mys, op_arg->uv.var->my);
@@ -2271,7 +2276,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   sub->return_type = op_return_type->uv.type;
   
   if (strcmp(sub->op_name->uv.name, "DESTROY") == 0) {
-    sub->flag |= SPVM_SUB_C_FLAG_IS_DESTRUCTOR;
+    sub->flag |= SPVM_SUB_C_FLAG_DESTRUCTOR;
     
     // DESTROY return type must be void
     if (!(sub->return_type->dimension == 0 && sub->return_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_VOID)) {
@@ -2392,7 +2397,7 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   op_sub->uv.sub->op_inline = op_constant;
   
   // Subroutine is constant
-  op_sub->uv.sub->flag |= SPVM_SUB_C_FLAG_IS_ENUM;
+  op_sub->uv.sub->flag |= SPVM_SUB_C_FLAG_ENUM;
   op_sub->uv.sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD;
   
   // Add current sub names

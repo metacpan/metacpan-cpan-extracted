@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.14'
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,6 +26,7 @@ requires:
   Digest: 0
   File::Spec: 0
   File::Temp: 0
+  HTML::Entities: 0
   List::Util: 0
   MRO::Compat: 0
   Moose: '0.76'
@@ -38,4 +39,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://git.shadowcat.co.uk/catagits/Catalyst-Plugin-Session.git
-version: '0.40'
+version: '0.41'

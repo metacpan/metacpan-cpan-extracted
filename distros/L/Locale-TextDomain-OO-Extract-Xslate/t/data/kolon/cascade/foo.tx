@@ -1,0 +1,7 @@
+: cascade cascade::base
+: # uses default title
+: around body -> {
+	: __('My template body!')
+	xXx <: some_macro('hi') :> xXx
+: }
+

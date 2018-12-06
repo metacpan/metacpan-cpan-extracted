@@ -1,12 +1,12 @@
 package Log::Dispatch::ToTk;
 
+use warnings;
 use strict;
-use vars qw($VERSION);
 
 use base qw(Log::Dispatch::Output);
 use fields qw/widget/ ;
 
-$VERSION = '1.9';
+our $VERSION = '2.01';
 
 sub new
   {
@@ -28,7 +28,7 @@ sub new
     return $self ;
   }
 
-sub log
+sub log_message
   {
     my $self = shift;
     my %params = @_;
@@ -36,7 +36,7 @@ sub log
     map {my $k = $_ ; s/^-//; $params{$_} = delete $params{$k}}
       grep /^-/,keys %params ;
 
-    return unless $self->_should_log($params{level});
+    return unless $self->_should_log($self->_level_as_number($params{level}));
     
     chomp $params{message};
     my $nb = $self->_level_as_number($params{level}) ;

@@ -22,51 +22,36 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20180619214157;
+our $VERSION = 1.20181205223705;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             [1-6]|
             7[24-68]
           ',
-                  'pattern' => '([1-7])(\\d{3})(\\d{3,4})'
+                  'pattern' => '(\\d)(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'pattern' => '(7\\d{2})(\\d{3})(\\d{3})',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '7[0137]'
+                  'leading_digits' => '7',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '',
-                'fixed_line' => '
-          (?:
-            1(?:
-              7\\d|
-              [2-68]
-            )|
-            2[2-68]|
-            3[2358]|
-            4[2-58]|
-            5[2-6]|
-            6[3-58]|
-            7[24-68]
-          )\\d{5}
-        ',
                 'voip' => '',
+                'pager' => '',
+                'mobile' => '7[0137]\\d{7}',
+                'specialrate' => '',
                 'personal_number' => '',
-                'geographic' => '
+                'fixed_line' => '
+          17\\d{6}|
           (?:
-            1(?:
-              7\\d|
-              [2-68]
-            )|
-            2[2-68]|
+            [12][2-68]|
             3[2358]|
             4[2-58]|
             5[2-6]|
@@ -74,9 +59,18 @@ my $validators = {
             7[24-68]
           )\\d{5}
         ',
-                'pager' => '',
-                'specialrate' => '',
-                'mobile' => '7[0137]\\d{7}'
+                'toll_free' => '',
+                'geographic' => '
+          17\\d{6}|
+          (?:
+            [12][2-68]|
+            3[2358]|
+            4[2-58]|
+            5[2-6]|
+            6[3-58]|
+            7[24-68]
+          )\\d{5}
+        '
               };
 
     sub new {
