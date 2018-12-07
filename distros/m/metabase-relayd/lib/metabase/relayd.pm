@@ -1,5 +1,5 @@
 package metabase::relayd;
-$metabase::relayd::VERSION = '0.40';
+$metabase::relayd::VERSION = '0.42';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ metabase::relayd
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

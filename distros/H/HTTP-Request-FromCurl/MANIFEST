@@ -15,6 +15,7 @@ script/pcurl.pl
 t/00-load.t
 t/curl-identity.t
 t/curl-multi.t
+t/implicit-headers.t
 t/localserver-cookiejar.txt
 t/squash-url.t
 xt/99-changes.t

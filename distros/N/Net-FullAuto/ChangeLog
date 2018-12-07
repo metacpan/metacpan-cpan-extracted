@@ -20,6 +20,30 @@
 #######################################################################
 
 
+2018-12-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000449 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+
+2018-12-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000448 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+
+2018-12-06  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000447 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+	* Updated FA_Core.pm to add password
+	  bypass with determine_password().
+
+
 2018-12-05  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000446 released

@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Const::Fast" => 0,
     "List::Util" => "1.33",
+    "Storable" => "3.06",
     "Type::Coercion" => 0,
     "Type::Library" => 0,
     "Type::Tiny" => "1.002001",
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
     "Test::TypeTiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.3.5",
+  "VERSION" => "v0.3.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "List::Util" => "1.33",
   "Module::Metadata" => 0,
   "Moo" => "1.006000",
+  "Storable" => "3.06",
   "Test::More" => 0,
   "Test::Most" => 0,
   "Test::TypeTiny" => 0,

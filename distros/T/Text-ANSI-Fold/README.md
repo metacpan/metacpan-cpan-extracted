@@ -110,6 +110,13 @@ Actually, text can be set by **new** or **configure** method through
             Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
+When using **chops** method, **width** parameter can take array
+reference, and chops text into given width list.
+
+    my $fold = new Text::ANSI::Fold;
+    my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
+    # return ("1", "22", "333") and keep "4444"
+
 # OPTIONS
 
 Option parameter can be specified as name-value list for **ansi\_fold**
@@ -123,9 +130,10 @@ function as well as **new** and **configure** method.
 
     $f->configure(boundary => 'word');
 
-- **width** => _n_
+- **width** => _n_, _\[ n, m, ... \]_
 
-    Specify folding width.
+    Specify folding width.  Array reference can be specified but works
+    only with **chops** method.
 
 - **boundary** => "word"
 
@@ -181,7 +189,7 @@ function as well as **new** and **configure** method.
 
 # LICENSE
 
-Copyright (C) Kazumasa Utashiro.
+Copyright (C) 2018- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -2,8 +2,8 @@ NAME
     Perinci::Examples - Various examples of Rinci metadata
 
 VERSION
-    This document describes version 0.810 of Perinci::Examples (from Perl
-    distribution Perinci-Examples), released on 2018-11-29.
+    This document describes version 0.811 of Perinci::Examples (from Perl
+    distribution Perinci-Examples), released on 2018-12-07.
 
 DESCRIPTION
     This distribution contains an odd mix of various functions, variables,
@@ -131,6 +131,34 @@ FUNCTIONS
     *   n => *int* (default: 10)
 
         Number of log messages to produce.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  comment_fruit
+    Usage:
+
+     comment_fruit(%args) -> [status, msg, payload, meta]
+
+    Comment on a fruit.
+
+    This function demonstrate argument's "examples" property. It can be used
+    to show choices (e.g. in argument completion) but does not require that
+    value be one of the examples only.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fruit* => *str*
 
     Returns an enveloped result (an array).
 

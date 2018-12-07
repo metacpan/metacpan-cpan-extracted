@@ -1,6 +1,6 @@
 package PMLTQ::Command::query;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::query::VERSION = '1.4.0';
+$PMLTQ::Command::query::VERSION = '1.5.0';
 # ABSTRACT: WIP: Executes query on treebank
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -68,6 +68,7 @@ sub run {
 
   'limit|L=i',
   'timeout|t=i',
+  'history|H',
 
   'quiet|q',
   'help|h=s@',
@@ -337,7 +338,8 @@ sub http_search {
           query => $q,
           limit => $opts{limit},
           # row_limit => $opts{limit}, #TODO: currently not working
-          timeout => $opts{timeout}
+          timeout => $opts{timeout},
+          nohistory => !!$opts{history}
         })
        )
      ),$sub ,1024*8 );
@@ -622,7 +624,7 @@ PMLTQ::Command::query - WIP: Executes query on treebank
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 
@@ -728,6 +730,10 @@ Password for a HTTP or SQL PML-TQ service.
 
 Only applicable to SQL-based engine.
 Specify maximum number of results (i.e. rows printed by pmltq).
+
+=item B<--history|-H>
+
+Sets whether should be query logged to users query history on server.
 
 =item B<--timeout|-t> seconds
 

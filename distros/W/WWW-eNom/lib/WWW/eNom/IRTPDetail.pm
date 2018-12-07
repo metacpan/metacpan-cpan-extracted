@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 use WWW::eNom::Types qw( Bool );
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Representation of IRTP Detail
 
 has 'is_transfer_locked' => (

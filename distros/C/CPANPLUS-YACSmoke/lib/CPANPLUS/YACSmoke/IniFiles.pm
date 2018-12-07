@@ -1,5 +1,5 @@
 package CPANPLUS::YACSmoke::IniFiles;
-$CPANPLUS::YACSmoke::IniFiles::VERSION = '1.04';
+$CPANPLUS::YACSmoke::IniFiles::VERSION = '1.06';
 require 5.004;
 use strict;
 use Carp;
@@ -2182,7 +2182,7 @@ sub _make_filehandle {
 # 2000.May.09 Created to excapsulate TIEHASH interface    JW
 ############################################################
 package Config::IniFiles::_section;
-$Config::IniFiles::_section::VERSION = '1.04';
+$Config::IniFiles::_section::VERSION = '1.06';
 use strict;
 use Carp;
 

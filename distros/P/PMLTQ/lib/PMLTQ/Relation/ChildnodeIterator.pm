@@ -1,6 +1,6 @@
 package PMLTQ::Relation::ChildnodeIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::ChildnodeIterator::VERSION = '1.4.0';
+$PMLTQ::Relation::ChildnodeIterator::VERSION = '1.5.0';
 # ABSTRACT: Iterates over child nodes
 
 use 5.006;
@@ -56,7 +56,7 @@ PMLTQ::Relation::ChildnodeIterator - Iterates over child nodes
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 AUTHORS
 

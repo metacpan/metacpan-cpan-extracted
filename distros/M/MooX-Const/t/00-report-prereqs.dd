@@ -23,6 +23,10 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'Type::Tiny::XS' => '0',
+                                        'Types::Const' => 'v0.3.6'
+                                      },
                       'requires' => {
                                       'Moo' => '1.006000',
                                       'Safe::Isa' => '0',

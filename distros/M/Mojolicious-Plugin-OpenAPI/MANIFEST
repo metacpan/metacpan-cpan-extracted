@@ -3,6 +3,7 @@
 .travis.yml
 Changes
 cpanfile
+lib/JSON/Validator/OpenAPI/Mojolicious.pm
 lib/Mojolicious/Plugin/OpenAPI.pm
 lib/Mojolicious/Plugin/OpenAPI/Cors.pm
 lib/Mojolicious/Plugin/OpenAPI/Guides/Swagger2.pod
@@ -42,6 +43,9 @@ t/simple-cors.t
 t/spec.t
 t/swagger2.t
 t/tutorial.t
+t/v2-file.t
+t/v2-readonly.t
+t/v3.t
 t/validate.t
 t/x-mojo-placeholder.t
 t/yaml.t

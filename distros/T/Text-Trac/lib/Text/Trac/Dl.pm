@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Text::Trac::BlockNode);
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 sub init {
 	my $self = shift;

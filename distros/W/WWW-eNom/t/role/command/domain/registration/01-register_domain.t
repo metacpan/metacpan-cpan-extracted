@@ -9,8 +9,9 @@ use String::Random qw( random_string );
 
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
-use Test::WWW::eNom qw( create_api );
+use Test::WWW::eNom qw( create_api mock_response );
 use Test::WWW::eNom::Contact qw( create_contact );
+use Test::WWW::eNom::Domain qw( mock_domain_registration );
 
 use WWW::eNom::DomainRequest::Registration;
 
@@ -35,16 +36,20 @@ subtest 'Register Available Domain - No Privacy, Locking, Auto Renew' => sub {
         });
     } 'Lives through creating request object';
 
+    my $mocked_api = mock_domain_registration( request => $request );
+
     my $domain;
     lives_ok {
         $domain = $eNom->register_domain( request => $request );
     } 'Lives through registering domain';
 
+    $mocked_api->unmock_all();
+
     if( isa_ok( $domain, 'WWW::eNom::Domain' ) ) {
         like( $domain->id, qr/^\d+$/, 'id looks numeric' );
         cmp_ok( $domain->name,                 'eq', $request->name,       'Correct name' );
         cmp_ok( $domain->status,               'eq', 'Registered',         'Correct status' );
-        cmp_ok( $domain->verification_status,  'eq', 'Pending Suspension', 'Correct verification_status' );
+        ok( ( grep { $domain->verification_status eq $_ } ( 'Pending Suspension', 'Verified' ) ), 'Correct verification_status' );
         cmp_ok( $domain->is_auto_renew,        '==', 0,                    'Correct is_auto_renew' );
         cmp_ok( $domain->is_locked,            '==', 0,                    'Correct is_locked' );
         cmp_ok( $domain->is_private,           '==', 0,                    'Correct is_private' );
@@ -80,16 +85,20 @@ subtest 'Register Available Domain - With Privacy, Locking, Auto Renew' => sub {
         });
     } 'Lives through creating request object';
 
+    my $mocked_api = mock_domain_registration( request => $request );
+
     my $domain;
     lives_ok {
         $domain = $eNom->register_domain( request => $request );
     } 'Lives through registering domain';
 
+    $mocked_api->unmock_all();
+
     if( isa_ok( $domain, 'WWW::eNom::Domain' ) ) {
         like( $domain->id, qr/^\d+$/, 'id looks numeric' );
         cmp_ok( $domain->name,                 'eq', $request->name,       'Correct name' );
         cmp_ok( $domain->status,               'eq', 'Registered',         'Correct status' );
-        cmp_ok( $domain->verification_status,  'eq', 'Pending Suspension', 'Correct verification_status' );
+        ok( ( grep { $domain->verification_status eq $_ } ( 'Pending Suspension', 'Verified' ) ), 'Correct verification_status' );
         cmp_ok( $domain->is_auto_renew,        '==', 1,                    'Correct is_auto_renew' );
         cmp_ok( $domain->is_locked,            '==', 1,                    'Correct is_locked' );
         cmp_ok( $domain->is_private,           '==', 1,                    'Correct is_private' );
@@ -125,9 +134,19 @@ subtest 'Attempt to Register Unavailable' => sub {
         });
     } 'Lives through creating request object';
 
+    my $mocked_api = mock_response(
+        method   => 'Purchase',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Domain name not available' ]
+        }
+    );
+
     throws_ok {
         $eNom->register_domain( request => $request );
     } qr/Domain not available for registration/, 'Throws on registering unavailable domain';
+
+    $mocked_api->unmock_all();
 };
 
 done_testing;

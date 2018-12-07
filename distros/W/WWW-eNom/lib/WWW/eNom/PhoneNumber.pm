@@ -13,7 +13,7 @@ use WWW::eNom::Types qw( Str NumberPhone );
 use Number::Phone;
 use Carp;
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Extendes Number::Phone to add 'number' functionatly (without country code)
 
 has '_number_phone_obj' => (

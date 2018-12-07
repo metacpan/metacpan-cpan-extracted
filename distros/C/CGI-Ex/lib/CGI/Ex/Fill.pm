@@ -12,35 +12,24 @@ CGI::Ex::Fill - Fast but compliant regex based form filler
 ###----------------------------------------------------------------###
 
 use strict;
-use vars qw($VERSION
-            @EXPORT @EXPORT_OK
-            $REMOVE_SCRIPT
-            $REMOVE_COMMENT
-            $MARKER_SCRIPT
-            $MARKER_COMMENT
-            $OBJECT_METHOD
-            $_TEMP_TARGET
-            );
-use base qw(Exporter);
+use warnings;
+use Exporter qw(import);
 
-BEGIN {
-    $VERSION   = '2.47';
-    @EXPORT    = qw(form_fill);
-    @EXPORT_OK = qw(fill form_fill html_escape get_tagval_by_key swap_tagval_by_key);
-};
+our $VERSION = '2.48';
+our @EXPORT    = qw(form_fill);
+our @EXPORT_OK = qw(fill form_fill html_escape get_tagval_by_key swap_tagval_by_key);
 
 ### These directives are used to determine whether or not to
 ### remove html comments and script sections while filling in
 ### a form.  Default is on.  This may give some trouble if you
 ### have a javascript section with form elements that you would
 ### like filled in.
-BEGIN {
-    $REMOVE_SCRIPT  = 1;
-    $REMOVE_COMMENT = 1;
-    $MARKER_SCRIPT  = "\0SCRIPT\0";
-    $MARKER_COMMENT = "\0COMMENT\0";
-    $OBJECT_METHOD  = "param";
-};
+our $REMOVE_SCRIPT  = 1;
+our $REMOVE_COMMENT = 1;
+our $MARKER_SCRIPT  = "\0SCRIPT\0";
+our $MARKER_COMMENT = "\0COMMENT\0";
+our $OBJECT_METHOD  = "param";
+our $_TEMP_TARGET;
 
 ###----------------------------------------------------------------###
 

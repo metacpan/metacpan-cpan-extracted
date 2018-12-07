@@ -10,22 +10,8 @@ use strict;
 use warnings;
 use Template::Alloy 1.016;
 use base qw(Template::Alloy);
-use vars qw($VERSION
-            $QR_PRIVATE
-            $WHILE_MAX
-            $MAX_EVAL_RECURSE
-            $MAX_MACRO_RECURSE
-            $STAT_TTL
-            $EXTRA_COMPILE_EXT
-            $PERL_COMPILE_EXT
-            $SCALAR_OPS
-            $FILTER_OPS
-            $LIST_OPS
-            $HASH_OPS
-            $VOBJS
-            );
 
-$VERSION = '2.47';
+our $VERSION = '2.48';
 
 ### install true symbol table aliases that can be localized
 *QR_PRIVATE        = *Template::Alloy::QR_PRIVATE;

@@ -13,3 +13,4 @@ CGI-ACL-*
 .git
 .*.swp
 *.bak
+.*.yml

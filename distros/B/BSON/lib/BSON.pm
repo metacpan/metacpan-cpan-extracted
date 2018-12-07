@@ -9,7 +9,7 @@ use base 'Exporter';
 our @EXPORT_OK = qw/encode decode/;
 
 use version;
-our $VERSION = 'v1.10.1';
+our $VERSION = 'v1.10.2';
 
 use Carp;
 use Config;
@@ -941,7 +941,7 @@ BSON - BSON serialization and deserialization
 
 =head1 VERSION
 
-version v1.10.1
+version v1.10.2
 
 =head1 SYNOPSIS
 
@@ -1500,7 +1500,7 @@ Stefan G. <minimalist@lavabit.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Eric Daniels Finn Olivier Duclos Pat Gunn Petr Písař Robert Sedlacek Thomas Bloor Wallace Reis Yury Zavarin Oleg Kostyuk
+=for stopwords Eric Daniels Finn Olivier Duclos Pat Gunn Petr Písař Robert Sedlacek Thomas Bloor Tobias Leich Wallace Reis Yury Zavarin Oleg Kostyuk
 
 =over 4
 
@@ -1531,6 +1531,10 @@ Robert Sedlacek <rs@474.at>
 =item *
 
 Thomas Bloor <tbsliver@shadow.cat>
+
+=item *
+
+Tobias Leich <email@froggs.de>
 
 =item *
 

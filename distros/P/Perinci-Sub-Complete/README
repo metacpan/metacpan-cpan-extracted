@@ -3,8 +3,8 @@ NAME
     metadata
 
 VERSION
-    This document describes version 0.931 of Perinci::Sub::Complete (from
-    Perl distribution Perinci-Sub-Complete), released on 2018-06-01.
+    This document describes version 0.932 of Perinci::Sub::Complete (from
+    Perl distribution Perinci-Sub-Complete), released on 2018-12-07.
 
 SYNOPSIS
     See Perinci::CmdLine or Perinci::CmdLine::Lite or App::riap which use
@@ -411,7 +411,7 @@ FUNCTIONS
   complete_from_schema
     Usage:
 
-     complete_from_schema(%args) -> [status, msg, result, meta]
+     complete_from_schema(%args) -> [status, msg, payload, meta]
 
     Complete a value from schema.
 
@@ -435,7 +435,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 

@@ -1,0 +1,16 @@
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+
+Changes
+README.txt
+README.rpod
+
+Unicruft.pm
+Unicruft.xs
+
+t/common.plt
+t/01_ini.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

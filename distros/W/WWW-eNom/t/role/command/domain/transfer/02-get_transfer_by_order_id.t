@@ -9,12 +9,22 @@ use String::Random qw( random_string );
 
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
-use Test::WWW::eNom qw( create_api );
+use Test::WWW::eNom qw( create_api mock_response );
 use Test::WWW::eNom::Contact qw( create_contact );
-use Test::WWW::eNom::Domain qw( create_transfer );
+use Test::WWW::eNom::Domain::Transfer qw( create_transfer mock_domain_transfer );
+
+use WWW::eNom::DomainRequest::Transfer;
 
 subtest 'Invalid Order ID' => sub {
     my $api = create_api();
+
+    my $mocked_api = mock_response(
+        method   => 'TP_GetOrderDetail',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Transfer Order Detail record does not exist.' ],
+        }
+    );
 
     throws_ok {
         $api->get_transfer_by_order_id( 999_999_999 );
@@ -40,6 +50,8 @@ subtest 'Valid Transfer' => sub {
 
     my $transfer = create_transfer( $transfer_details );
 
+    my $mocked_api = mock_domain_transfer( request => WWW::eNom::DomainRequest::Transfer->new( $transfer_details ) );
+
     my $retrieved_transfer;
     lives_ok {
         $retrieved_transfer = $api->get_transfer_by_order_id( $transfer->order_id );
@@ -53,6 +65,8 @@ subtest 'Valid Transfer' => sub {
         cmp_ok( $retrieved_transfer->use_existing_contacts, '==',
             $transfer_details->{use_existing_contacts}, 'Correct use_existing_contacts' );
     }
+
+    $mocked_api->unmock_all;
 };
 
 done_testing;

@@ -1,7 +1,7 @@
 package Perinci::Examples::FilePartial;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.810'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.811'; # VERSION
 
 use 5.010;
 use strict;
@@ -129,7 +129,7 @@ Perinci::Examples::FilePartial - Examples for reading/writing files (demos parti
 
 =head1 VERSION
 
-This document describes version 0.810 of Perinci::Examples::FilePartial (from Perl distribution Perinci-Examples), released on 2018-11-29.
+This document describes version 0.811 of Perinci::Examples::FilePartial (from Perl distribution Perinci-Examples), released on 2018-12-07.
 
 =head1 DESCRIPTION
 

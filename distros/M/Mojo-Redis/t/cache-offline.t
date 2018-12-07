@@ -23,7 +23,7 @@ like $res, qr{oops!}, 'failed to cache';
 
 {
   no warnings 'redefine';
-  local *Mojo::Redis::Connection::Offline::_time = sub { time + 601 };
+  local *Mojo::Redis::Cache::_time = sub { time + 601 };
   $cache->refresh(0)->memoize_p(main => 'cache_me', [{foo => 42}])->then(sub { $res = shift })->wait;
   is $n, 3, 'compute called after expired';
 }

@@ -20,6 +20,7 @@ WriteMakefile(
 	  : ()),
 	PL_FILES	=> {},
 	TEST_REQUIRES => {
+		'Test::Exception' => 0.42,
 		'Test::Most' => 0,
 		'Test::NoWarnings' => 0,
 		'Test::Script' => 1.12,
@@ -56,14 +57,18 @@ WriteMakefile(
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
-			type => 'git',
-			url => 'git://github.com/nigelhorne/CGI-Info.git',
-			web => 'https://github.com/nigelhorne/CGI-Info',
+				type => 'git',
+				url => 'git://github.com/nigelhorne/CGI-Info.git',
+				web => 'https://github.com/nigelhorne/CGI-Info',
+				repository => 'https://github.com/nigelhorne/CGI-Info',
 			},
 			bugtracker => {
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
-				mailto => 'bug-CGI-Info@rt.cpan.org'
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
+				# mailto => 'bug-CGI-Info@rt.cpan.org'
+				web => 'https://github.com/nigelhorne/CGI-Info/issues',
+				url => 'https://github.com/nigelhorne/CGI-Info/issues',
 			}
+		
 		},
 	},
 	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this

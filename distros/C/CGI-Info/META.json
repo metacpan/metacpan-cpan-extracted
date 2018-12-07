@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -53,6 +53,7 @@
          "requires" : {
             "IPC::System::Simple" : "0",
             "Test::CleanNamespaces" : "0",
+            "Test::Exception" : "0.42",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0",
             "Test::Script" : "1.12",
@@ -65,15 +66,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-CGI-Info@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info"
+         "web" : "https://github.com/nigelhorne/CGI-Info/issues",
+         "x_url" : "https://github.com/nigelhorne/CGI-Info/issues"
       },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/CGI-Info.git",
-         "web" : "https://github.com/nigelhorne/CGI-Info"
+         "web" : "https://github.com/nigelhorne/CGI-Info",
+         "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.67",
+   "version" : "0.68",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

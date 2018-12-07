@@ -101,6 +101,7 @@ my @tests = (
     { cmd => [ '--verbose', '-s', '--cookie', 'cookie=nomnom; session=jam', '$url', ] },
     { cmd => [ '--verbose', '-s', '--cookie', 't/localserver-cookiejar.txt', '$url', ],},
     { cmd => [ '--verbose', '-s', '--cookie-jar', $tempcookies, '$url', ],},
+    { cmd => [ '--verbose', '-s', '-L', '$url', ],},
 );
 
 sub curl( @args ) {

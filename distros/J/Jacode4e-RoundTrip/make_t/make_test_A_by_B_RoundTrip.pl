@@ -5,7 +5,7 @@
 # Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-use strict;
+use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
@@ -13,13 +13,13 @@ my @data = ();
 open(JACODE4E_ROUNDTRIP,"$FindBin::Bin/../lib/Jacode4e/RoundTrip.pm") || die;
 while (<JACODE4E_ROUNDTRIP>) {
     if (/^__DATA__$/) {
-        chomp(@data = <JACODE4E_ROUNDTRIP>);
+        chomp(@data = grep( ! /^#/, <JACODE4E_ROUNDTRIP>));
         last;
     }
 }
 close(JACODE4E_ROUNDTRIP);
 
-my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse unicode utf8 utf8jp );
+my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8jp );
 my @io_encoding = (grep( ! /^unicode$/, @encoding), 'jef9p');
 
 my $fileno = 3001;
@@ -56,7 +56,7 @@ BEGIN {
     @test = (
 END___________________________________________________________________
 
-        for (grep( ! /^#/, @data)) {
+        for (@data) {
             my %data = ();
             @data{@encoding} = split(/ +/,$_);
             $data{'jef9p'} = $data{'jef'};

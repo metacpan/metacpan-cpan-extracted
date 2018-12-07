@@ -6,9 +6,10 @@ package CGI::Ex::Validate;
 #  Distributed under the Perl Artistic License without warranty
 
 use strict;
+use warnings;
 use Carp qw(croak);
 
-our $VERSION  = '2.47';
+our $VERSION = '2.48';
 our $QR_EXTRA = qr/^(\w+_error|as_(array|string|hash)_\w+|no_\w+)/;
 our @UNSUPPORTED_BROWSERS = (qr/MSIE\s+5.0\d/i);
 our $JS_URI_PATH;

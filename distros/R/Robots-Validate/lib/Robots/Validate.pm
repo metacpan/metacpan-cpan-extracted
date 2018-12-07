@@ -7,6 +7,7 @@ use v5.10;
 use Moo 1;
 
 use MooX::Const;
+use Types::Const v0.3.6;
 use List::Util 1.33 qw/ first none /;
 use Net::DNS::Resolver;
 use Types::Standard -types;
@@ -16,7 +17,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.5';
 
 
 has resolver => (
@@ -199,7 +200,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.1.4
+version v0.1.5
 
 =head1 SYNOPSIS
 

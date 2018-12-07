@@ -9,7 +9,7 @@ use String::Random qw( random_string );
 
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
-use Test::WWW::eNom qw(create_api);
+use Test::WWW::eNom qw( create_api mock_response );
 
 use List::Util qw( first );
 
@@ -20,6 +20,16 @@ subtest 'Test Unavailable Domain' => sub {
     my $tld = 'com';
 
     subtest 'No Suggestions' => sub {
+        my $mocked_api = mock_response(
+            method   => 'Check',
+            response => {
+                ErrCount => 0,
+                Domain   => [ "$sld.$tld" ],
+                RRPText  => [ 'Domain not available' ],
+                RRPCode  => [ 211 ],
+            }
+        );
+
         my $domain_availabilities;
         lives_ok {
             $domain_availabilities = $eNom->check_domain_availability(
@@ -28,6 +38,8 @@ subtest 'Test Unavailable Domain' => sub {
                 suggestions => 0,
             );
         } 'Lives through checking domain availability';
+
+        $mocked_api->unmock_all;
 
         if( cmp_ok( scalar @{ $domain_availabilities }, '==', 1, 'Correct number of domain availability records' ) ) {
             my $domain_availability = $domain_availabilities->[0];
@@ -39,6 +51,35 @@ subtest 'Test Unavailable Domain' => sub {
     };
 
     subtest 'With Suggestions' => sub {
+        my $mocked_api = mock_response(
+            method   => 'Check',
+            response => {
+                ErrCount => 0,
+                Domain   => [qw( google.com google.net google.org google.us )],
+                RRPText  => [ map { 'Domain not available' } 1 .. 4 ],
+                RRPCode  => [ map { 211 } 1 .. 4  ],
+            }
+        );
+
+        mock_response(
+            mocked_api => $mocked_api,
+            method     => 'NameSpinner',
+            response   => {
+                namespin => {
+                    domains => {
+                        domain => {
+                            'AllGoogles' => {
+                                'com' => 'n',
+                                'net' => 'n',
+                                'org' => 'n',
+                                'us'  => 'n',
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
         my $domain_availabilities;
         lives_ok {
             $domain_availabilities = $eNom->check_domain_availability(
@@ -47,6 +88,8 @@ subtest 'Test Unavailable Domain' => sub {
                 suggestions => 1,
             );
         } 'Lives through checking domain availability';
+
+        $mocked_api->unmock_all;
 
         if( cmp_ok( scalar @{ $domain_availabilities }, '>', 1, 'Correct number of domain availability records' ) ) {
             my $domain_availability = first {
@@ -68,6 +111,16 @@ subtest 'Test Available Domain' => sub {
     my $tld = 'com';
 
     subtest 'No Suggestions' => sub {
+        my $mocked_api = mock_response(
+            method   => 'Check',
+            response => {
+                ErrCount => 0,
+                Domain   => [ "$sld.$tld" ],
+                RRPText  => [ 'Domain available' ],
+                RRPCode  => [ 210 ],
+            }
+        );
+
         my $domain_availabilities;
         lives_ok {
             $domain_availabilities = $eNom->check_domain_availability(
@@ -76,6 +129,8 @@ subtest 'Test Available Domain' => sub {
                 suggestions => 0,
             );
         } 'Lives through checking domain availability';
+
+        $mocked_api->unmock_all;
 
         if( cmp_ok( scalar @{ $domain_availabilities }, '==', 1, 'Correct number of domain availability records' ) ) {
             my $domain_availability = $domain_availabilities->[0];
@@ -87,6 +142,32 @@ subtest 'Test Available Domain' => sub {
     };
 
     subtest 'With Suggestions' => sub {
+        my $mocked_api = mock_response(
+            method   => 'Check',
+            response => {
+                ErrCount => 0,
+                Domain   => [ "$sld.$tld" ],
+                RRPText  => [ 'Domain available' ],
+                RRPCode  => [ 210 ],
+            }
+        );
+
+        mock_response(
+            mocked_api => $mocked_api,
+            method     => 'NameSpinner',
+            response   => {
+                namespin => {
+                    domains => {
+                        domain => {
+                            'All' . $sld => {
+                                $tld => 'y',
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
         my $domain_availabilities;
         lives_ok {
             $domain_availabilities = $eNom->check_domain_availability(
@@ -114,6 +195,22 @@ subtest 'Test Multiple Domains' => sub {
     my $unavailable_sld = 'google';
     my $available_sld   = 'test-' . random_string('ccnnccnnccnnccnnccnn');
     my $tlds = [qw( com net )];
+
+    my $mocked_api = mock_response(
+        method   => 'Check',
+        response => {
+            ErrCount => 0,
+            Domain   => [
+                ( map { $unavailable_sld . '.' . $_ } @{ $tlds } ),
+                ( map { $available_sld   . '.' . $_ } @{ $tlds } ),
+            ],
+            RRPText  => [
+                'Domain not available', 'Domain not available',
+                'Domain available', 'Domain available'
+            ],
+            RRPCode  => [ 211, 211, 210, 210 ],
+        }
+    );
 
     my $domain_availabilities;
     lives_ok {
@@ -158,6 +255,8 @@ subtest 'Test Multiple Domains' => sub {
             };
         }
     };
+
+    $mocked_api->unmock_all;
 };
 
 done_testing;

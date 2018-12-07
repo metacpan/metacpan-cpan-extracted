@@ -5,21 +5,21 @@
 # Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-use strict;
+use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 my @data = ();
-open(JACODE4E,"$FindBin::Bin/../lib/jacode4e.pl") || die;
+open(JACODE4E,"$FindBin::Bin/../lib/Jacode4e.pm") || die;
 while (<JACODE4E>) {
     if (/^__DATA__$/) {
-        chomp(@data = <JACODE4E>);
+        chomp(@data = grep( ! /^#/, <JACODE4E>));
         last;
     }
 }
 close(JACODE4E);
 
-my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse unicode utf8 utf8jp );
+my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8jp );
 my @io_encoding = (grep( ! /^unicode$/, @encoding), 'jef9p');
 
 my $fileno = 2001;
@@ -56,7 +56,7 @@ BEGIN {
     @test = (
 END___________________________________________________________________
 
-        for (grep( ! /^#/, @data)) {
+        for (@data) {
             my %data = ();
             @data{@encoding} = split(/ +/,$_);
             $data{'jef9p'} = $data{'jef'};

@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -46,8 +46,9 @@ our @EXPORT_OK = qw( load_backend curry currym );
 #pod C<Yancy::Backend> namespace. The C<$arg> is handled by the backend
 #pod module. Read your backend module's documentation for details.
 #pod
-#pod See L<Yancy/Database Backend> for information about backend URLs and
-#pod L<Yancy::Backend> for more information about backend objects.
+#pod See L<Yancy::Help::Config/Database Backend> for information about
+#pod backend URLs and L<Yancy::Backend> for more information about backend
+#pod objects.
 #pod
 #pod =cut
 
@@ -127,7 +128,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.015
+version 1.016
 
 =head1 SYNOPSIS
 
@@ -163,8 +164,9 @@ The C<$backend_name> should be the name of a module in the
 C<Yancy::Backend> namespace. The C<$arg> is handled by the backend
 module. Read your backend module's documentation for details.
 
-See L<Yancy/Database Backend> for information about backend URLs and
-L<Yancy::Backend> for more information about backend objects.
+See L<Yancy::Help::Config/Database Backend> for information about
+backend URLs and L<Yancy::Backend> for more information about backend
+objects.
 
 =head2 curry
 

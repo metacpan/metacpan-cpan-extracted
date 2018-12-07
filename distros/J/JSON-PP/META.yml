@@ -21,6 +21,7 @@ requires:
   Scalar::Util: '1.08'
   Test::More: '0'
 resources:
-  repository: http://github.com/makamaka/JSON-PP
-version: '2.97001'
+  bugtracker: https://github.com/makamaka/JSON-PP/issues
+  repository: https://github.com/makamaka/JSON-PP
+version: '4.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

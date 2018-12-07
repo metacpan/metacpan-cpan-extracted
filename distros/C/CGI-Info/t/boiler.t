@@ -53,4 +53,3 @@ TODO: {
 
 	module_boilerplate_ok('lib/CGI/Info.pm');
 }
-

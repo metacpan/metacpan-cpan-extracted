@@ -1,7 +1,7 @@
 package Perinci::Examples::ArgsAs;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.810'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.811'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,7 +100,7 @@ Perinci::Examples::ArgsAs - Demonstrate various values of `args_as` function met
 
 =head1 VERSION
 
-This document describes version 0.810 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2018-11-29.
+This document describes version 0.811 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2018-12-07.
 
 =head1 DESCRIPTION
 

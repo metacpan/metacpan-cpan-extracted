@@ -1,7 +1,7 @@
 package DBIx::CSV;
 
-our $DATE = '2018-07-03'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ DBIx::CSV - Generate CSV from SQL query result
 
 =head1 VERSION
 
-This document describes version 0.003 of DBIx::CSV (from Perl distribution DBIx-CSV), released on 2018-07-03.
+This document describes version 0.004 of DBIx::CSV (from Perl distribution DBIx-CSV), released on 2018-12-07.
 
 =head1 SYNOPSIS
 

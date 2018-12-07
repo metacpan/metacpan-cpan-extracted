@@ -1,0 +1,22 @@
+v0.2.0 2018-12-07T03:31:12Z
+ - amcharts3 removed
+ - cdn resources renamed
+ - namespace renamed
+
+v0.1.4 2018-11-30T20:40:19Z
+ - amcharts v4.0.3
+
+v0.1.3 2018-11-26T20:30:41Z
+ - amcharts v4.0.1
+
+v0.1.2 2018-11-24T10:02:48Z
+ - amcharts v4.0.0
+
+v0.1.1 2018-11-18T15:54:02Z
+ - fa v5.4.2
+ - cdn resources renamed
+ - method call fixed
+ - fa v5.5.0
+
+v0.1.0 2018-10-17T03:19:26Z
+ - init

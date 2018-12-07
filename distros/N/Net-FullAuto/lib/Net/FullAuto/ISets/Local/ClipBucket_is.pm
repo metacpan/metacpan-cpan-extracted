@@ -214,30 +214,75 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.'chmod -Rv 777 /opt/source',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget --random-wait --progress=dot -O libmcrypt-2.5.8.tar.gz '.
-      'https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/'.
-      'libmcrypt-2.5.8.tar.gz/download','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "tar zxvf libmcrypt-2.5.8.tar.gz",'__display__');
-   ($stdout,$stderr)=$handle->cwd('libmcrypt-2.5.8');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './configure','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'make install','__display__');
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
 my $b=1;
 if ($b==1) {
    #if ($b==1) {
    if (-1==index `php -v`,'PHP') {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone https://github.com/php/php-src.git','__display__');
+         'cmake --version','__display__');
+      $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
+      if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://gitlab.kitware.com/cmake/cmake',
+            '__display__');
+         ($stdout,$stderr)=$handle->cwd('cmake');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            './configure','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make install','__display__');
+         ($stdout,$stderr)=$handle->cwd('/opt/source');
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/nih-at/libzip.git',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('libzip');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git tag -l','__display__');
+      $stdout=~s/^.*\n(.*)$/$1/s;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout $stdout",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp build','__display__');
+      ($stdout,$stderr)=$handle->cwd('build');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '/usr/local/bin/cmake ..','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v libzip.pc /usr/lib64/pkgconfig','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ../xcode/zipconf.h /usr/local/include','__display__');
+      ($stdout,$stderr)=$handle->cmd(
+         "echo -e /usr/local/lib64 | ${sudo}tee -a /etc/ld.so.conf",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ldconfig -v','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/jedisct1/libsodium',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('libsodium');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git checkout -b remotes/origin/stable',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/php/php-src.git',
+         '__display__');
       ($stdout,$stderr)=$handle->cwd('php-src');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'wget -qO- http://php.net/downloads.php','__display__');
+         'wget -qO- http://php.net/downloads.php');
       $stdout=~s/^.*?Current Stable.*?PHP\s+(.*?)\s+.*$/$1/s;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "git checkout PHP-$stdout",'__display__');
+         "git checkout php-$stdout",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -249,14 +294,13 @@ if ($b==1) {
          '--with-curl '.
          '--enable-filter '.
          '--enable-fpm '.
+         '--with-sodium '.
          '--with-gd '.
-         '--enable-gd-native-ttf '.
          '--with-freetype-dir '.
          '--with-jpeg-dir '.
          '--with-png-dir '.
          '--enable-intl '.
          '--enable-mbstring '.
-         '--with-mcrypt '.
          '--enable-mysqlnd '.
          '--with-mysql-sock=/var/lib/mysql/mysql.sock '.
          '--with-mysqli=mysqlnd '.
@@ -270,8 +314,8 @@ if ($b==1) {
          '--with-sqlite3 '.
          '--enable-xmlreader '.
          '--enable-xmlwriter '.
-         '--enable-zip '.
-         '--with-zlib','__display__');
+         '--with-libzip=/opt/source/libzip '.
+         '--enable-zip','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make -j2','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -285,8 +329,25 @@ if ($b==1) {
          'cp -v ./php.ini-production /usr/local/php7/lib/php.ini',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /usr/local/php7/etc/php-fpm.d','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./sapi/fpm/www.conf /usr/local/php7/etc/php-fpm.d/www.conf',
          '__display__');
+      my $wcnf=<<END;
+catch_workers_output = yes
+
+php_flag[display_errors] = on
+php_admin_value[error_log] = /var/log/fpm-php.www.log
+php_admin_flag[log_errors] = on
+END
+      ($stdout,$stderr)=$handle->cmd(
+         "echo -e \"$wcnf\" | ${sudo}tee -a ".
+         '/usr/local/php7/etc/php-fpm.d/www.conf',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'touch /var/log/fpm-php.www.log');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 777 /var/log/fpm-php.www.log','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php7/etc/php-fpm.conf',
          '__display__');
@@ -801,13 +862,13 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'unzip loaders.linux-x86_64.zip','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v ixed.7.1.lin $img_ext",'__display__');
+      "cp -v ixed.7.2.lin $img_ext",'__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    # https://forum.likg.org.ua/server-side-actions/
    # install-phpshield-sourceguardian-php-encoders-t306.html
    my $zd=<<END;
 ; Enable phpshield extension module
-extension=${img_ext}ixed.7.1.lin
+extension=${img_ext}ixed.7.2.lin
 END
    ($stdout,$stderr)=$handle->cmd(
       "echo -e \"$zd\" > phpshield.ini");

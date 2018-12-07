@@ -11,6 +11,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 use Test::WWW::eNom qw( create_api );
 use Test::WWW::eNom::Contact qw( create_contact );
+use Test::WWW::eNom::Domain qw( mock_domain_registration );
 
 use WWW::eNom::DomainRequest::Registration;
 
@@ -77,10 +78,14 @@ subtest 'Register Available US Domain - With Nexus Data' => sub {
         });
     } 'Lives through construction of request';
 
+    my $mocked_api = mock_domain_registration( request => $request );
+
     my $domain;
     lives_ok {
         $domain = $eNom->register_domain( request => $request );
     } 'Lives through registering domain';
+
+    $mocked_api->unmock_all();
 
     if( isa_ok( $domain, 'WWW::eNom::Domain' ) ) {
         like( $domain->id, qr/^\d+$/, 'id looks numeric' );

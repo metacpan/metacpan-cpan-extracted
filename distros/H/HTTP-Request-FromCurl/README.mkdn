@@ -53,6 +53,26 @@ will be returned.
         read_files => 1,
     );
 
+### Options
+
+- **argv**
+
+    An arrayref of commands as could be given in ` @ARGV `.
+
+- **command**
+
+    A scalar in a command line, excluding the `curl` command
+
+- **command\_curl**
+
+    A scalar in a command line, including the `curl` command
+
+- **read\_files**
+
+    Do read in the content of files specified with (for example)
+    `--data=@/etc/passwd`. The default is to not read the contents of files
+    specified this way.
+
 ## `->squash_uri( $uri )`
 
     my $uri = HTTP::Request::FromCurl->squash_uri(
@@ -78,6 +98,7 @@ The following `curl` options are recognized but ignored:
 
 - ` --dump-header `
 - ` --include `
+- ` --location `
 - ` --progress-bar `
 - ` --silent `
 - ` --verbose `

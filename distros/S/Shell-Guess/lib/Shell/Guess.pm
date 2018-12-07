@@ -7,7 +7,7 @@ use File::Spec;
 # TODO: see where we can use P9Y::ProcessTable
 
 # ABSTRACT: Make an educated guess about the shell in use
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 
 sub _win32_getppid
@@ -93,6 +93,11 @@ sub login_shell
   return __PACKAGE__->command_shell if $^O eq 'dos';
 
   my $username = shift || $ENV{USER} || $ENV{USERNAME} || $ENV{LOGNAME};
+
+  unless(defined $username)
+  {
+    $username = eval { getpwuid $< };
+  }
 
   if($^O eq 'darwin')
   {
@@ -187,6 +192,8 @@ sub _unixy_shells
   { return __PACKAGE__->z_shell      }
   elsif($shell =~ /fish$/)
   { return __PACKAGE__->fish_shell   }
+  elsif($shell =~ /pwsh$/)
+  { return __PACKAGE__->power_shell  }
   elsif($shell =~ /sh$/)
   { return __PACKAGE__->bourne_shell }
   else
@@ -207,7 +214,7 @@ Shell::Guess - Make an educated guess about the shell in use
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -512,7 +519,7 @@ All other instance methods will return false
 
   my $shell = Shell::Guess->power_shell;
 
-Returns an instance of Shell::Guess for Windows PowerShell.
+Returns an instance of Shell::Guess for Microsoft PowerShell (either for Windows C<powershell.exe> or Unix C<pwsh>).
 
 The following instance methods will return:
 
@@ -664,7 +671,7 @@ Returns true if the shell is traditionally an OpenVMS shell (e.g. dcl)
 
  my $bool = $shell->is_win32;
 
-Returns true if the shell is traditionally a Windows shell (command.com, cmd.exe)
+Returns true if the shell is traditionally a Windows shell (command.com, cmd.exe, powershell.exe, pwsh)
 
 =head2 is_z
 

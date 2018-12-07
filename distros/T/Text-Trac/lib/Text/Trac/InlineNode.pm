@@ -8,7 +8,7 @@ use UNIVERSAL::require;
 use Text::Trac::LinkResolver;
 use HTML::Entities qw();
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 tie my %token_table, 'Tie::IxHash';
 
@@ -278,11 +278,14 @@ sub _lhref_formatter {
 
 sub _make_link {
 	my ( $self, $ns, $target, $match, $label ) = @_;
-	if ( $target =~ m!^//! or $target eq 'mailto' ) {
+	if ( defined $target && ( $target =~ m!^//! or $target eq 'mailto' ) ) {
 		return $self->_make_ext_link( $ns . ':' . $target, $label );
 	}
 	else {
-		my $handler = $self->{external_handler}->{$ns};
+		my $handler;
+		if ( defined $ns ) {
+			$handler = $self->{external_handler}->{$ns};
+		}
 		return $handler ? $handler->format_link( $match, $target, $label ) : $match;
 	}
 }

@@ -11,7 +11,7 @@ Information about the CGI environment
 
 # VERSION
 
-Version 0.67
+Version 0.68
 
 # SYNOPSIS
 

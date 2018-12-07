@@ -6,7 +6,7 @@ use Storable; # RT117983
 use Class::Autouse qw{Carp Locale::Language Locale::Object::Country Locale::Object::DB I18N::AcceptLanguage I18N::LangTags::Detect};
 
 use vars qw($VERSION);
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 =head1 NAME
 
@@ -14,7 +14,7 @@ CGI::Lingua - Create a multilingual web page
 
 =head1 VERSION
 
-Version 0.58
+Version 0.59
 
 =cut
 
@@ -77,8 +77,10 @@ lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
 
-Takes an optional boolean parameter syslog, to log messages to
+Takes an optional parameter syslog, to log messages to
 L<Sys::Syslog>.
+It can be a boolean to enable/disable logging to syslog, or a reference
+to a hash to be given to Sys::Syslog::setlogsock.
 
 Takes optional parameter logger, an object which is used for warnings
 and traces.
@@ -95,9 +97,11 @@ or logger (or both) are set.
 If neither is given, L<Carp> will be used.
 
 Takes an optional parameter dont_use_ip.  By default, if none of the
-requested languages are supported, CGI::Lingua->language() looks in the IP
+requested languages is supported, CGI::Lingua->language() looks in the IP
 address for the language to use.  This may be not what you want, so use this
 option to disable the feature.
+
+The optional parameter debug is passed on to L<I18N::AcceptLanguage>.
 
 =cut
 
@@ -117,17 +121,21 @@ sub new {
 
 	my $cache = $params{cache};
 	my $logger = $params{logger};
+	my $info = $params{info};
+
 	if($cache && $ENV{'REMOTE_ADDR'}) {
 		my $key = "$ENV{REMOTE_ADDR}/";
-		if(my $l = $class->_what_language()) {
+		my $l;
+		if($info && ($l = $info->lang())) {
+			$key .= "$l/";
+		} elsif($l = $class->_what_language()) {
 			$key .= "$l/";
 		}
 		$key .= join('/', @{$params{supported}});
 		if($logger) {
 			$logger->debug("Looking in cache for $key");
 		}
-		my $rc = $cache->get($key);
-		if($rc) {
+		if(my $rc = $cache->get($key)) {
 			if($logger) {
 				$logger->debug('Found - thawing');
 			}
@@ -136,7 +144,13 @@ sub new {
 			$rc->{_syslog} = $params{syslog};
 			$rc->{_cache} = $cache;
 			$rc->{_supported} = $params{supported};
+			$rc->{_info} = $info;
 
+			if(($rc->{_what_language} || $rc->{_rlanguage}) && $info && $info->lang()) {
+				delete $rc->{_what_language};
+				delete $rc->{_rlanguage};
+				delete $rc->{_country};
+			}
 			return $rc;
 		}
 	}
@@ -144,7 +158,7 @@ sub new {
 	return bless {
 		_supported => $params{supported}, # List of languages (two letters) that the application
 		_cache => $cache,	# CHI
-		_info => $params{info},
+		_info => $info,
 		# _rlanguage => undef,	# Requested language
 		# _slanguage => undef,	# Language that the website should display
 		# _sublanguage => undef,	# E.g. United States for en-US if you want American English
@@ -158,6 +172,7 @@ sub new {
 		_have_ipcountry => -1,	# -1 = don't know
 		_have_geoip => -1,	# -1 = don't know
 		_have_geoipfree => -1,	# -1 = don't know
+		_debug => $params{debug} || 0,
 	}, $class;
 }
 
@@ -182,9 +197,7 @@ sub DESTROY {
 	$key .= join('/', @{$self->{_supported}});
 	return if($cache->get($key));
 
-	my $logger = $self->{_logger};
-
-	if($logger) {
+	if(my $logger = $self->{_logger}) {
 		$logger->trace("Storing self in cache as $key");
 	}
 
@@ -216,12 +229,19 @@ sub _warn {
 
 	return unless($warning);
 
-	if($self->{_syslog}) {
+	if(my $syslog = $self->{_syslog}) {
 		require Sys::Syslog;
 		require CGI::Info;
 
 		Sys::Syslog->import();
-		openlog(CGI::Info->new()->script_name(), 'cons,pid', 'user');
+		if(ref($syslog eq 'HASH')) {
+			Sys::Syslog::setlogsock($syslog);
+		}
+		if(my $info = $self->{_info}) {
+			openlog($info->script_name(), 'cons,pid', 'user');
+		} else {
+			openlog(CGI::Info->new(syslog => $syslog)->script_name(), 'cons,pid', 'user');
+		}
 		syslog('warning', $warning);
 		closelog();
 	}
@@ -322,6 +342,9 @@ sub language_code_alpha2 {
 	unless($self->{_slanguage}) {
 		$self->_find_language();
 	}
+	if($self->{_logger}) {
+		$self->{_logger}->trace('language_code_alpha2 returns ', $self->{_slanguage_code_alpha2});
+	}
 	return $self->{_slanguage_code_alpha2};
 }
 
@@ -373,6 +396,9 @@ sub requested_language {
 
 # The language cache is stored as country_2_letter -> $language_human_readable_name=$language_2_letter
 # The IP cache is stored as ip -> country_human_readable_name
+
+# Returns the human readable language, such as 'English'
+
 sub _find_language {
 	my $self = shift;
 
@@ -395,7 +421,7 @@ sub _find_language {
 				warn $_[0];
 			}
 		};
-		my $i18n = I18N::AcceptLanguage->new();
+		my $i18n = I18N::AcceptLanguage->new(debug => $self->{_debug});
 		my $l = $i18n->accepts($http_accept_language, $self->{_supported});
 		local $SIG{__WARN__} = 'DEFAULT';
 		if((!$l) && ($http_accept_language =~ /(.+)-.+/)) {
@@ -427,14 +453,14 @@ sub _find_language {
 					$self->{_slanguage_code_alpha2} = $l;
 					$self->{_rlanguage} = $self->{_slanguage};
 
-					my $l;
+					my $sl;
 					if($http_accept_language =~ /..-(..)$/) {
-						$l = $self->_code2country($1);
+						$sl = $self->_code2country($1);
 					} elsif($http_accept_language =~ /..-([a-z]{2,3})$/i) {
-						$l = Locale::Object::Country->new(code_alpha3 => $1);
+						$sl = Locale::Object::Country->new(code_alpha3 => $1);
 					}
-					if($l) {
-						$self->{_rlanguage} .= ' (' . $l->name . ')';
+					if($sl) {
+						$self->{_rlanguage} .= ' (' . $sl->name() . ')';
 						# The requested sublanguage
 						# isn't supported so don't
 						# define that
@@ -455,7 +481,7 @@ sub _find_language {
 					}
 					if($accepts =~ /\-/) {
 						delete $self->{_slanguage};
-					} else  {
+					} else {
 						my $from_cache;
 						if($self->{_cache}) {
 							$from_cache = $self->{_cache}->get($accepts);
@@ -464,7 +490,7 @@ sub _find_language {
 							if($self->{_logger}) {
 								$self->{_logger}->debug("$accepts is in cache as $from_cache");
 							}
-							$self->{_rlanguage} = (split(/=/, $from_cache))[0];
+							$self->{_slanguage} = (split(/=/, $from_cache))[0];
 						} else {
 							$self->{_slanguage} = $self->_code2language($accepts);
 						}
@@ -484,7 +510,7 @@ sub _find_language {
 							if($self->{_sublanguage}) {
 								$self->{_rlanguage} = "$self->{_slanguage} ($self->{_sublanguage})";
 								if($self->{_logger}) {
-									$self->{_logger}->debug("rlanguage: $self->{_rlanguage}");
+									$self->{_logger}->debug("_rlanguage: $self->{_rlanguage}");
 								}
 							}
 							$self->{_sublanguage_code_alpha2} = $variety;
@@ -541,7 +567,7 @@ sub _find_language {
 							if(defined($results[0])) {
 								eval {
 									$language_name = $self->_code2countryname($variety);
-								}
+								};
 							}
 						}
 						if($@ || !defined($language_name)) {
@@ -575,8 +601,7 @@ sub _find_language {
 				$self->{_rlanguage} = I18N::LangTags::Detect::detect();
 			}
 			if($self->{_rlanguage}) {
-				my $l = $self->_code2language($self->{_rlanguage});
-				if($l) {
+				if($l = $self->_code2language($self->{_rlanguage})) {
 					$self->{_rlanguage} = $l;
 				# } else {
 					# We have the language, but not the right
@@ -647,7 +672,9 @@ sub _find_language {
 		}
 		my $ip = $ENV{'REMOTE_ADDR'};
 		if($language_name) {
-			$self->{_rlanguage} = $language_name;
+			if((!defined($self->{_rlanguage})) || ($self->{_rlanguage} eq 'Unknown')) {
+				$self->{_rlanguage} = $language_name;
+			}
 			unless((exists($self->{_slanguage})) && ($self->{_slanguage} ne 'Unknown')) {
 				# Check if the language is one that we support
 				# Don't bother with secondary language
@@ -704,7 +731,7 @@ sub _find_language {
 			if(!defined($self->{_slanguage_code_alpha2})) {
 				if($self->{_logger}) {
 					$self->{_logger}->debug("Can't determine slanguage_code_alpha2");
-				};
+				}
 			} elsif(!defined($from_cache) && $self->{_cache} &&
 			   defined($self->{_slanguage_code_alpha2})) {
 				if($self->{_logger}) {
@@ -746,12 +773,21 @@ sub _what_language {
 	my $self = shift;
 
 	if(ref($self)) {
+		if($self->{_logger}) {
+			$self->{_logger}->trace('Entered _what_language');
+		}
 		if($self->{_what_language}) {
+			if($self->{_logger}) {
+				$self->{_logger}->trace('_what_language: returning cached value: ', $self->{_what_language});
+			}
 			return $self->{_what_language};	# Useful in case something changes the $info hash
 		}
 		if(my $info = $self->{_info}) {
 			if(my $rc = $info->lang()) {
 				# E.g. cgi-bin/script.cgi?lang=de
+				if($self->{_logger}) {
+					$self->{_logger}->trace("_what_language set language to $rc from the lang argument");
+				}
 				return $self->{_what_language} = $rc;
 			}
 		}
@@ -831,9 +867,15 @@ sub country {
 			return;
 		}
 	}
-	if(is_private_ipv4($ip)) {
+	if(is_private_ip($ip)) {
 		if($self->{_logger}) {
 			$self->{_logger}->trace("Can't determine country from LAN connection $ip");
+		}
+		return;
+	}
+	if(is_loopback_ip($ip)) {
+		if($self->{_logger}) {
+			$self->{_logger}->trace("Can't determine country from loopback connection $ip");
 		}
 		return;
 	}
@@ -921,8 +963,9 @@ sub country {
 			LWP::Simple->import();
 			JSON::Parse->import();
 
-			my $data = JSON::Parse::parse_json(LWP::Simple::get("http://www.geoplugin.net/json.gp?ip=$ip"));
-			$self->{_country} = $data->{'geoplugin_countryCode'};
+			if(my $data = LWP::Simple::get("http://www.geoplugin.net/json.gp?ip=$ip")) {
+				$self->{_country} = JSON::Parse::parse_json($data)->{'geoplugin_countryCode'};
+			}
 		}
 	}
 	unless($self->{_country}) {
@@ -960,7 +1003,7 @@ sub country {
 			require Net::Whois::IANA;
 			Net::Whois::IANA->import();
 
-			my $iana = new Net::Whois::IANA;
+			my $iana = Net::Whois::IANA->new();
 			eval {
 				$iana->whois_query(-ip => $ip);
 			};
@@ -980,6 +1023,7 @@ sub country {
 				$self->{_country} = $1;
 			}
 		}
+		# TODO - try freegeoip.net if whois has failed
 	}
 
 	if($self->{_country}) {
@@ -1205,7 +1249,7 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-L<Locale::Country::Object>
+L<Locale::Country>
 L<HTTP::BrowserDetect>
 
 =head1 SUPPORT
@@ -1223,10 +1267,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Lingua>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Lingua>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Lingua>
@@ -1240,13 +1280,11 @@ L<http://search.cpan.org/dist/CGI-Lingua/>
 
 =head1 ACKNOWLEDGEMENTS
 
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Nigel Horne.
+Copyright 2010-2018 Nigel Horne.
 
-This program is released under the following licence: GPL
-
+This program is released under the following licence: GPL2
 
 =cut
 

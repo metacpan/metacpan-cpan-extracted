@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
-use Mojo::Base -base;
+use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -95,6 +95,12 @@ sub connect {
 	delete $self->{auth};
 	$self->{actions} = {};
 
+	$self->on(disconnect => sub {
+		my ($self, $code) = @_;
+		$self->{_exit} = $code;
+		Mojo::IOLoop->stop;
+	});
+
 	my $rpc = JSON::RPC2::TwoWay->new(debug => $self->{debug}) or croak 'no rpc?';
 	$rpc->register('rpcswitch.greetings', sub { $self->rpc_greetings(@_) }, notification => 1);
 	$rpc->register('rpcswitch.ping', sub { $self->rpc_ping(@_) });
@@ -146,8 +152,7 @@ sub connect {
 			return unless $conn;
 			$conn->close;
 			$self->log->info('connection to rpcswitch closed');
-			$self->{_exit} = WORK_CONNECTION_CLOSED; # todo: doc
-			Mojo::IOLoop->stop;
+			$self->emit(disconnect => WORK_CONNECTION_CLOSED); # todo: doc
 		});
 	});
 

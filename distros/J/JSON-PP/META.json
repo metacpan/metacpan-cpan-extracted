@@ -39,10 +39,13 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/makamaka/JSON-PP/issues"
+      },
       "repository" : {
-         "url" : "http://github.com/makamaka/JSON-PP"
+         "url" : "https://github.com/makamaka/JSON-PP"
       }
    },
-   "version" : "2.97001",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "4.00",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

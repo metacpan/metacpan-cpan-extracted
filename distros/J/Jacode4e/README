@@ -9,12 +9,6 @@ SYNOPSIS
     use Jacode4e;
     $return =
     Jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
-    
-    use FindBin;
-    use lib "$FindBin::Bin/lib";
-    require 'jacode4e.pl';
-    $return =
-    jacode4e::convert(\$line, $OUTPUT_encoding, $INPUT_encoding [, { %option }]);
 
 ATTENTION
 
@@ -32,7 +26,7 @@ RAISON D'ETRE
 
     "JIS X 0213 bridge" needs last one meter.
 
-    To solve the problem, jacode4e.pl proposes CP932X [shi:pi:kju:san'nikai].
+    To solve the problem, Jacode4e proposes CP932X [shi:pi:kju:san'nikai].
 
     CP932X implements JIS X 0213 over CP932.
 
@@ -54,9 +48,13 @@ RAISON D'ETRE
       jef9p         FUJITSU JEF ( 9 point size for printing with option OUTPUT_SHIFTING)
       jipsj         NEC JIPS(J)
       jipse         NEC JIPS(E)
+      letsj         UNISYS LetsJ
       utf8          UTF-8
       utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
     -----------------------------------------------------------------------
+
+    If you need round-trip conversion, you had better use Jacode4e::RoundTrip
+    module.
 
 WHAT IS "CP932X"?
 

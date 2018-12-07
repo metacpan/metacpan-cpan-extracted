@@ -2,6 +2,52 @@
 
 namespace::local - Confine imports and/or functions to a given scope
 
+# USAGE
+
+## Confining imports and prototypes
+
+    # normal code here
+    {
+        use namespace::local;
+        use Some::Crazy::DSL;
+    };
+    # symbol table restored
+
+## Hiding private functions
+
+    package My::Class;
+    use Moo::Role;
+    sub visible {
+        # is available as $self->visible
+    };
+
+    use namespace::local -below;
+    sub private {
+        # only visible within this module
+    };
+
+## Hiding imports
+
+Emulate `namespace::clean` by which this module was expired:
+
+    use Lots::Of::Imports qw(do_this do_that frobnicate);
+    use namespace::local -above;
+
+    # do_this, do_that, and frobnicate are only visible until end of scope
+
+# CONTENT OF THIS PACKAGE
+
+* `lib` - the module itself
+
+* `t` - tests
+
+* `xt` - author tests
+
+* `it` - integration tests involving Moo, Moose, overload & so on
+(not required for installation)
+
+* `example` - usage examples
+
 # INSTALLATION
 
 To install this module, run the following commands:

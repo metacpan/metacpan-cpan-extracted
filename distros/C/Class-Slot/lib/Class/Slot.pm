@@ -12,7 +12,7 @@ use Scalar::Util qw(refaddr);
 use Filter::Simple;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our $DEBUG_ALL = $ENV{CLASS_SLOT_DEBUG}; # Enable debugging for all classes
 our %DEBUG;                              # Enable debugging for individual classes
@@ -204,7 +204,18 @@ sub new \{
   my \$class = shift;
 };
 
-  if (@{ $class . '::ISA' }) {
+  my $has_parents = @{ $class . '::ISA' };
+
+  my $can_ctor = 0;
+  foreach (@{ $class . '::ISA' }) {
+    if ($_->can('new')) {
+      $can_ctor = 1;
+      last;
+    }
+  }
+
+
+  if ($has_parents && $can_ctor) {
     $code .= "  my \$self = \$class->SUPER::new(\@_);\n";
   } else {
     $code .= "  my \$self = bless { \@_ }, \$class;\n";

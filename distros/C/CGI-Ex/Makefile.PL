@@ -39,7 +39,6 @@ WriteMakefile1(
               },
               TEST_REQUIRES => {
                 'Test::More' => '0',
-                'Test::Warn' => '0',
               },
 
               dist          => {

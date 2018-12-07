@@ -6,7 +6,6 @@ lib/CGI/Info.pm
 LICENCE
 Makefile.PL
 MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
 README
 README.md
 t/00-load.t
@@ -31,9 +30,12 @@ t/is_tablet.t
 t/json.t
 t/kwalitee.t
 t/lib/MyLogger.pm
+t/links.t
 t/manifest.t
 t/metrics.t
 t/namespaces.t
+t/no404s.t
+t/noopentickets.t
 t/noplan.t
 t/param.t
 t/params.t
@@ -55,4 +57,5 @@ t/unused.t
 t/used.t
 t/vars.t
 t/xml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

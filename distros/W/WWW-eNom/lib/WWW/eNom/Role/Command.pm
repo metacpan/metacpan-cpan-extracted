@@ -22,7 +22,7 @@ with 'WWW::eNom::Role::Command::Raw',
      'WWW::eNom::Role::Command::Domain::PrivateNameServer',
      'WWW::eNom::Role::Command::Service';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Submission of eNom Commands
 
 # Used to force xml_simple response type and restore the existing type afterwards

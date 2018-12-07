@@ -3,7 +3,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -228,10 +228,26 @@ sub retrieve {
 
 sub chops {
     my $obj = shift;
+    my %opt = @_;
+    my $width = $opt{width} // $obj->{width};
+
     my @chops;
-    while ((my $chop = $obj->retrieve) ne '') {
-	push @chops, $chop;
+
+    if (ref $width eq 'ARRAY') {
+	for my $w (@{$width}) {
+	    if ((my $chop = $obj->retrieve(width => $w)) ne '') {
+		push @chops, $chop;
+	    } else {
+		last;
+	    }
+	}
     }
+    else {
+	while ((my $chop = $obj->retrieve(width => $width)) ne '') {
+	    push @chops, $chop;
+	}
+    }
+
     @chops;
 }
 
@@ -353,6 +369,13 @@ B<text> option.  Next program just works.
             Text::ANSI::Fold->new(width => 40, text => $_)->chops;
     }
 
+When using B<chops> method, B<width> parameter can take array
+reference, and chops text into given width list.
+
+    my $fold = new Text::ANSI::Fold;
+    my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
+    # return ("1", "22", "333") and keep "4444"
+
 =head1 OPTIONS
 
 Option parameter can be specified as name-value list for B<ansi_fold>
@@ -368,9 +391,10 @@ function as well as B<new> and B<configure> method.
 
 =over 7
 
-=item B<width> => I<n>
+=item B<width> => I<n>, I<[ n, m, ... ]>
 
-Specify folding width.
+Specify folding width.  Array reference can be specified but works
+only with B<chops> method.
 
 =item B<boundary> => "word"
 
@@ -432,7 +456,7 @@ are not supported by these modules.
 
 =head1 LICENSE
 
-Copyright (C) Kazumasa Utashiro.
+Copyright (C) 2018- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

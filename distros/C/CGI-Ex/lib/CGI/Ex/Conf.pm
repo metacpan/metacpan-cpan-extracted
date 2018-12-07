@@ -12,69 +12,67 @@ CGI::Ex::Conf - Conf Reader/Writer for many different data format types
 ###----------------------------------------------------------------###
 
 use strict;
-use base qw(Exporter);
+use warnings;
+use Exporter qw(import);
 use Carp qw(croak);
-use vars qw($VERSION
-            @DEFAULT_PATHS
-            $DEFAULT_EXT
-            %EXT_READERS
-            %EXT_WRITERS
-            $DIRECTIVE
-            $IMMUTABLE_QR
-            $IMMUTABLE_KEY
-            %CACHE
-            $HTML_KEY
-            @EXPORT_OK
-            $NO_WARN_ON_FAIL
-            );
-@EXPORT_OK = qw(conf_read conf_write in_cache);
 
-$VERSION = '2.47';
+our @EXPORT_OK = qw(conf_read conf_write in_cache);
 
-$DEFAULT_EXT = 'conf';
+our $VERSION = '2.48';
 
-%EXT_READERS = (''         => \&read_handler_yaml,
-                'conf'     => \&read_handler_yaml,
-                'json'     => \&read_handler_json,
-                'val_json' => \&read_handler_json,
-                'ini'      => \&read_handler_ini,
-                'pl'       => \&read_handler_pl,
-                'sto'      => \&read_handler_storable,
-                'storable' => \&read_handler_storable,
-                'val'      => \&read_handler_yaml,
-                'xml'      => \&read_handler_xml,
-                'yaml'     => \&read_handler_yaml,
-                'yml'      => \&read_handler_yaml,
-                'html'     => \&read_handler_html,
-                'htm'      => \&read_handler_html,
-                );
+our $DEFAULT_EXT = 'conf';
+our @DEFAULT_PATHS;
 
-%EXT_WRITERS = (''         => \&write_handler_yaml,
-                'conf'     => \&write_handler_yaml,
-                'ini'      => \&write_handler_ini,
-                'json'     => \&write_handler_json,
-                'val_json' => \&write_handler_json,
-                'pl'       => \&write_handler_pl,
-                'sto'      => \&write_handler_storable,
-                'storable' => \&write_handler_storable,
-                'val'      => \&write_handler_yaml,
-                'xml'      => \&write_handler_xml,
-                'yaml'     => \&write_handler_yaml,
-                'yml'      => \&write_handler_yaml,
-                'html'     => \&write_handler_html,
-                'htm'      => \&write_handler_html,
-                );
+our %EXT_READERS = (
+    ''         => \&read_handler_yaml,
+    'conf'     => \&read_handler_yaml,
+    'json'     => \&read_handler_json,
+    'val_json' => \&read_handler_json,
+    'ini'      => \&read_handler_ini,
+    'pl'       => \&read_handler_pl,
+    'sto'      => \&read_handler_storable,
+    'storable' => \&read_handler_storable,
+    'val'      => \&read_handler_yaml,
+    'xml'      => \&read_handler_xml,
+    'yaml'     => \&read_handler_yaml,
+    'yml'      => \&read_handler_yaml,
+    'html'     => \&read_handler_html,
+    'htm'      => \&read_handler_html,
+    );
+
+our %EXT_WRITERS = (
+    ''         => \&write_handler_yaml,
+    'conf'     => \&write_handler_yaml,
+    'ini'      => \&write_handler_ini,
+    'json'     => \&write_handler_json,
+    'val_json' => \&write_handler_json,
+    'pl'       => \&write_handler_pl,
+    'sto'      => \&write_handler_storable,
+    'storable' => \&write_handler_storable,
+    'val'      => \&write_handler_yaml,
+    'xml'      => \&write_handler_xml,
+    'yaml'     => \&write_handler_yaml,
+    'yml'      => \&write_handler_yaml,
+    'html'     => \&write_handler_html,
+    'htm'      => \&write_handler_html,
+    );
 
 ### $DIRECTIVE controls how files are looked for when namespaces are not absolute.
 ### If directories 1, 2 and 3 are passed and each has a config file
 ### LAST would return 3, FIRST would return 1, and MERGE will
 ### try to put them all together.  Merge behavior of hashes
 ### is determined by $IMMUTABLE_\w+ variables.
-$DIRECTIVE = 'LAST'; # LAST, MERGE, FIRST
+our $DIRECTIVE = 'LAST'; # LAST, MERGE, FIRST
 
-$IMMUTABLE_QR = qr/_immu(?:table)?$/i;
+our $IMMUTABLE_QR = qr/_immu(?:table)?$/i;
 
-$IMMUTABLE_KEY = 'immutable';
+our $IMMUTABLE_KEY = 'immutable';
+
+our $NO_WARN_ON_FAIL;
+
+our $HTML_KEY;
+
+our %CACHE;
 
 ###----------------------------------------------------------------###
 

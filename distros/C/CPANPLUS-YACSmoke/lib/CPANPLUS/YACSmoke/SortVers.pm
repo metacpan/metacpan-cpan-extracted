@@ -7,7 +7,7 @@
 # the same terms as Perl itself.
 
 package CPANPLUS::YACSmoke::SortVers;
-$CPANPLUS::YACSmoke::SortVers::VERSION = '1.04';
+$CPANPLUS::YACSmoke::SortVers::VERSION = '1.06';
 require Exporter;
 @ISA=qw(Exporter);
 

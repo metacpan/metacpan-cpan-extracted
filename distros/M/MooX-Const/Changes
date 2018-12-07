@@ -1,5 +1,11 @@
 Revision history for MooX-Const:
 
+v0.2.2    2018-12-06 18:00:47+00:00 Europe/London
+  [Other]
+  - Added recommended minimum version of Types::Const.
+
+  - Recommend Type::Tiny::XS.
+
 v0.2.1    2018-11-16 18:28:00+00:00 Europe/London
   [Documentation]
   - Added a ROADMAP section for planned changes.

@@ -1,7 +1,7 @@
 package Perinci::Examples::Version;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.810'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.811'; # VERSION
 
 our %SPEC;
 
@@ -26,7 +26,7 @@ Perinci::Examples::Version - Package that contains entity_v in its Rinci package
 
 =head1 VERSION
 
-This document describes version 0.810 of Perinci::Examples::Version (from Perl distribution Perinci-Examples), released on 2018-11-29.
+This document describes version 0.811 of Perinci::Examples::Version (from Perl distribution Perinci-Examples), released on 2018-12-07.
 
 =head1 DESCRIPTION
 

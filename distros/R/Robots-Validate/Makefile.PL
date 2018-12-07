@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Moo" => 1,
     "MooX::Const" => 0,
     "Net::DNS::Resolver" => 0,
-    "Types::Const" => "0.3.2",
+    "Types::Const" => "0.3.6",
     "Types::Standard" => 0,
     "namespace::autoclean" => 0
   },
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.1.4",
+  "VERSION" => "v0.1.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Net::DNS::Resolver::Mock" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
-  "Types::Const" => "0.3.2",
+  "Types::Const" => "0.3.6",
   "Types::Standard" => 0,
   "namespace::autoclean" => 0
 );

@@ -26,6 +26,7 @@ my %map_keis83  = map_undefined_char('keis83',  [qw( keis78 keis83 keis90 )],   
 my %map_keis90  = map_undefined_char('keis90',  [qw( keis78 keis83 keis90 )],   0x7D01,   0xFFFF, qr/^ (?:              [\x7D\x7F\x81-\x9E\xA0][\xA1-\xFE]            ) $/x); # 8080-2-100-10, Table 4-1 and CJKV Information Processing, Table D-23: KEIS Encoding Specifications
 my %map_jef     = map_undefined_char('jef',     [qw( jef    jef9p         )],   0x8001,   0xFFFF, qr/^ (?:                          [\x80-\xA0][\xA1-\xFE]            ) $/x); # CJKV Information Processing, Table D-14: JEF Encoding Specifications
 my %map_jipsj   = map_undefined_char('jipsj',   [qw( jipsj                )],   0x7401,   0xFFFF, qr/^ (?: [\x74-\x7E][\x21-\x7E] | [\xE0-\xFE][\xA1-\xFE]            ) $/x); # ZBB10-3, ZBB11-2
+my %map_letsj   = map_undefined_char('letsj',   [qw( letsj                )],   0x3101,   0xFFFF, qr/^ (?:                 [\x31-\x40\x6D-\x78][\xA1-\xFE]            ) $/x); # http://www.unisys.co.jp/tec_info/tr56/5605.htm
 my %map_utf8    = map_undefined_char('utf8',    [qw( utf8                 )], 0xEE8080, 0xFFFFFF, qr/^ (?: [\xEE][\x80-\xBF][\x80-\xBF] | [\xEF][\x80-\xA3][\x80-\xBF]) $/x); # Private Use Area of UTF-8
 
 my %utf8jp = map { $_ => 1 } (
@@ -35,6 +36,7 @@ my %utf8jp = map { $_ => 1 } (
     keys(%map_keis90),
     keys(%map_jef),
     keys(%map_jipsj),
+    keys(%map_letsj),
     keys(%map_utf8)
 );
 
@@ -46,6 +48,53 @@ for my $oct1 (0xE0 .. 0xF8) {
     }
 }
 
+print <<'COMMENT';
+############################################################################################
+# Jacode4e::RoundTrip supplement table
+############################################################################################
+#-------------------------------------------------------------------------------------------
+# CP00930 User-defined Area: ([\x69-\x71][\x41-\xFE]|[\x72][\x41-\xEA])
+#
+# C-H 3-3220-024 IBM Corp. 2002, Table 2. Structure of Japanese DBCS-Host 6.2 Structure of Japanese DBCS-Host
+# CJKV Information Processing by Ken Lunde 1999, Table D-20: IBM Japanese DBCS-Host Encoding Specifications
+# The last user-defined character in this region is 0x72EA.
+#
+#-------------------------------------------------------------------------------------------
+# KEIS User-defined Area and Unused Area: ([\x7D\x7F\x81-\x9E\xA0][\xA1-\xFE])
+#
+# 8080-2-100-10 by 1986, 1989, Hitachi, Ltd., Table 4-1 KEIS83 Encoding Specifications
+# CJKV Information Processing by Ken Lunde 1999, Table D-23: KEIS Encoding Specifications
+# Table D-23 said that user-defined area is (?:[\x81-\xA0][\xA1-\xFE]), but
+# ([\x9F][\xA1-\xFE]) is already used by Japan Geographic Data Center.
+#
+# 8080-2-100-10 tells us unused area, ([\x7D\x7F][\xA1-\xFE]). I decided to use that
+# area without permission by Hitachi, Ltd. Yes, this is a hack we love.
+#
+#-------------------------------------------------------------------------------------------
+# JEF User-defined Area: ([\x80-\xA0][\xA1-\xFE])
+#
+# CJKV Information Processing by Ken Lunde 1999, Table D-14: JEF Encoding Specifications
+#
+#-------------------------------------------------------------------------------------------
+# JIPS User-defined Area: ([\x74-\x7E][\x21-\x7E]|[\xE0-\xFE][\xA1-\xFE])
+#
+# ZBB10-3, ZBB11-2 by NEC Corporation 1982, 1993, Figure-1 JIPS code plane
+#
+#-------------------------------------------------------------------------------------------
+# LetsJ User-defined Area: ([\x31-\x40\x6D-\x78][\xA1-\xFE])
+#
+# Heterogeneous database cooperation among heterogeneous OS environments
+# http://www.unisys.co.jp/tec_info/tr56/5605.htm
+#
+#-------------------------------------------------------------------------------------------
+# UTF-8 User-defined Area: ([\xE0][\xA0-\xBF][\x80-\xBF]|[\xE1-\xEF][\x80-\xBF][\x80-\xBF])
+#
+# Private-Use Characters
+# http://www.unicode.org/faq/private_use.html
+#
+#-------------------------------------------------------------------------------------------
+COMMENT
+
 for my $utf8jp (sort keys %utf8jp) {
     my $cp00930 = defined($map_cp00930{$utf8jp}) ? uc unpack('H*', $map_cp00930{$utf8jp}) : ' -- ';
     my $keis78  = defined($map_keis78 {$utf8jp}) ? uc unpack('H*', $map_keis78 {$utf8jp}) : ' -- ';
@@ -53,33 +102,41 @@ for my $utf8jp (sort keys %utf8jp) {
     my $keis90  = defined($map_keis90 {$utf8jp}) ? uc unpack('H*', $map_keis90 {$utf8jp}) : ' -- ';
     my $jef     = defined($map_jef    {$utf8jp}) ? uc unpack('H*', $map_jef    {$utf8jp}) : ' -- ';
     my $jipsj   = defined($map_jipsj  {$utf8jp}) ? uc unpack('H*', $map_jipsj  {$utf8jp}) : ' -- ';
+    my $letsj   = defined($map_letsj  {$utf8jp}) ? uc unpack('H*', $map_letsj  {$utf8jp}) : ' -- ';
     my $utf8    = defined($map_utf8   {$utf8jp}) ? uc unpack('H*', $map_utf8   {$utf8jp}) : '  --  ';
     my $jipse   = ($jipsj =~ /--/) ? ' -- '      : EBCDIC_NEC_by_JIS8(substr($jipsj,0,2)) . EBCDIC_NEC_by_JIS8(substr($jipsj,2,2));
     my $unicode = ($utf8  =~ /--/) ? '   ---   ' : $Unicode_by_UTF8{$utf8};
 
     printf
-#+++++++------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-#||||||| ++++-------------------------------------------------------------------------- Microsoft CP932, IANA Windows-31J
-#||||||| |||| ++++--------------------------------------------------------------------- JISC Shift_JIS-2004
-#||||||| |||| |||| ++++---------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
-#||||||| |||| |||| |||| ++++----------------------------------------------------------- HITACHI KEIS78
-#||||||| |||| |||| |||| |||| ++++------------------------------------------------------ HITACHI KEIS83
-#||||||| |||| |||| |||| |||| |||| ++++------------------------------------------------- HITACHI KEIS90
-#||||||| |||| |||| |||| |||| |||| |||| ++++-------------------------------------------- FUJITSU JEF
-#||||||| |||| |||| |||| |||| |||| |||| |||| ++++--------------------------------------- NEC JIPS(J)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| ++++---------------------------------- NEC JIPS(E)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| +++++++++------------------------ Unicode
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| ++++++++++++----------- UTF-8
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++-- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
-#2345678 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 12345678
-#VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVV
+#+++++++------------------------------------------------------------------------------------ CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+#||||||| ++++------------------------------------------------------------------------------- Microsoft CP932, IANA Windows-31J
+#||||||| |||| ++++-------------------------------------------------------------------------- JISC Shift_JIS-2004
+#||||||| |||| |||| ++++--------------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+#||||||| |||| |||| |||| ++++---------------------------------------------------------------- HITACHI KEIS78
+#||||||| |||| |||| |||| |||| ++++----------------------------------------------------------- HITACHI KEIS83
+#||||||| |||| |||| |||| |||| |||| ++++------------------------------------------------------ HITACHI KEIS90
+#||||||| |||| |||| |||| |||| |||| |||| ++++------------------------------------------------- FUJITSU JEF
+#||||||| |||| |||| |||| |||| |||| |||| |||| ++++-------------------------------------------- NEC JIPS(J)
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| ++++--------------------------------------- NEC JIPS(E)
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++---------------------------------- UNISYS LetsJ
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| +++++++++------------------------ Unicode
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| ++++++++++++----------- UTF-8
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++-- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
+#2345678 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 12345678
+#VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVV
     join(' ', qw( 
-%-8s     %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-9s      %-12s        %-8s
+%-8s     %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-9s      %-12s        %-8s
     ))."\n",
 
-    # 1        2      3      4        5       6       7       8    9      10     11       12    13
-    '--------',' -- ',' -- ',$cp00930,$keis78,$keis83,$keis90,$jef,$jipsj,$jipse,$unicode,$utf8,uc unpack('H*',$utf8jp);
+    # 1        2      3      4        5       6       7       8    9      10     11     12       13    14
+    '--------',' -- ',' -- ',$cp00930,$keis78,$keis83,$keis90,$jef,$jipsj,$jipse,$letsj,$unicode,$utf8,uc unpack('H*',$utf8jp);
 }
+
+print STDOUT <<COMMENT;
+############################################################################################
+# End of table
+############################################################################################
+COMMENT
 
 sub map_undefined_char {
     my($encoding, $brother_encoding, $from, $to, $re_user_defined_or_undefined_area) = @_;

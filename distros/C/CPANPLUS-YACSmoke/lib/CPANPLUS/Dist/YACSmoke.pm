@@ -1,5 +1,5 @@
 package CPANPLUS::Dist::YACSmoke;
-$CPANPLUS::Dist::YACSmoke::VERSION = '1.04';
+$CPANPLUS::Dist::YACSmoke::VERSION = '1.06';
 # Dist::Zilla: +PodWeaver
 #ABSTRACT: CPANPLUS distribution class that integrates CPAN Testing services into CPANPLUS
 
@@ -375,7 +375,7 @@ CPANPLUS::Dist::YACSmoke - CPANPLUS distribution class that integrates CPAN Test
 
 =head1 VERSION
 
-version 1.04
+version 1.06
 
 =head1 SYNOPSIS
 

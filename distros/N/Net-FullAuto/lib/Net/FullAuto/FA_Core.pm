@@ -18368,7 +18368,6 @@ sub ftm_login
                $hostlabel}{'IdentityFile'} &&
                $Net::FullAuto::FA_Core::Hosts{
                $hostlabel}{'IdentityFile'})) {
-            #$determine_password->('',0,'localhost');
             $determine_password->('',0,$hostlabel,$password);
             unless ($password) {
                if ($su_id) {
@@ -19870,10 +19869,9 @@ END
                   "wait_for_passwd_prompt() PASSWORD PROMPT=$lin<==\n"
                   if $Net::FullAuto::FA_Core::log &&
                   -1<index $Net::FullAuto::FA_Core::LOG,'*';
-#print "DO WE GET HERE TWO\n";sleep 5;
-               $determine_password->($login_Mast_error,$loop_count,$hostlabel)
+               $determine_password->($login_Mast_error,$loop_count,
+                                     $hostlabel,$password)
                   if $filehandle->{_hostlabel}->[0]=~/__Master_${$}__/;
-#print "DONE WITH DETERMINE\n";<STDIN>;
                $gotpass=1;last PW;
             } elsif ((-1<index $lin,'530 ')
                   || (-1<index $lin,'421 ')
@@ -26858,7 +26856,7 @@ print $Net::FullAuto::FA_Core::LOG "WE ARE BACK FROM LOOKUP<==\n"
          $Hosts{$hostlabel}->{'label'} eq 'Firefox MozRepl') ||
          $Hosts{$hostlabel}->{'label'} eq 'Localhost Shell')) {
    } elsif ($hostlabel!~/__Master_${$}__/ && !$identityfile) {
-      $determine_password->('',0,$hostlabel,$password);#GGGGGG
+      $determine_password->('',0,$hostlabel,$password);
       $login_passwd=&Net::FullAuto::FA_Core::getpasswd(
          $hostlabel,$login_id,'','');
    }

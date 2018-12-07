@@ -41,10 +41,13 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/makamaka/JSON/issues"
+      },
       "repository" : {
          "url" : "https://github.com/makamaka/JSON"
       }
    },
-   "version" : "2.97001",
-   "x_serialization_backend" : "JSON version 2.97001"
+   "version" : "4.00",
+   "x_serialization_backend" : "JSON version 4.00"
 }

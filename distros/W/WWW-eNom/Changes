@@ -1,5 +1,9 @@
 Revision history for WWW-eNom
 
+v2.7.0   2018-1207
+    - Support for GDPR changes, specifically party_id of contacts
+    - Added Mocking support to all tests
+
 v2.6.0   2016-12-07
     - Workaround issue with old private nameservers having multiple ip addresses
       (even though this is no longer allowed).  Just use the first ip address.

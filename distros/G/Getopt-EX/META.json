@@ -57,7 +57,7 @@
    "provides" : {
       "Getopt::EX" : {
          "file" : "lib/Getopt/EX.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.11.0"
       },
       "Getopt::EX::Colormap" : {
          "file" : "lib/Getopt/EX/Colormap.pm"
@@ -80,8 +80,11 @@
       "Getopt::EX::Module" : {
          "file" : "lib/Getopt/EX/Module.pm"
       },
-      "xg" : {
-         "file" : "lib/Getopt/EX/Colormap.pm"
+      "Getopt::EX::ToggleValue" : {
+         "file" : "lib/Getopt/EX/Util.pm"
+      },
+      "Getopt::EX::Util" : {
+         "file" : "lib/Getopt/EX/Util.pm"
       }
    },
    "release_status" : "stable",
@@ -95,7 +98,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX"
       }
    },
-   "version" : "v1.10.1",
+   "version" : "v1.11.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <utashiro@cpan.org>"

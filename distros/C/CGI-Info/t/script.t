@@ -195,11 +195,11 @@ PATHS: {
 	if($^O eq 'MSWin32') {
 		TODO: {
 			local $TODO = 'Script_dir test needs to be done on Windows';
-			ok($i->script_dir() =~ /\\CGI-Info$/);
+			ok($i->script_dir() =~ /\\CGI-Info$/i);
 			ok($i->script_path() =~ /\\.+bar\.pl$/);
 		}
 	} else {
-		ok($i->script_dir() =~ /\/CGI-Info/);
+		ok($i->script_dir() =~ /\/CGI-Info/i);
 		ok($i->script_path() =~ /\/.+bar\.pl$/);
 	}
 

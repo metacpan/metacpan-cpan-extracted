@@ -2,7 +2,7 @@ NAME
     BSON - BSON serialization and deserialization
 
 VERSION
-    version v1.10.1
+    version v1.10.2
 
 SYNOPSIS
         use BSON;
@@ -473,6 +473,8 @@ CONTRIBUTORS
     *   Robert Sedlacek <rs@474.at>
 
     *   Thomas Bloor <tbsliver@shadow.cat>
+
+    *   Tobias Leich <email@froggs.de>
 
     *   Wallace Reis <wallace@reis.me>
 

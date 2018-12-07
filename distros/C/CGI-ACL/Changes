@@ -1,5 +1,8 @@
 Revision history for CGI-ACL
 
+0.03	Fri Dec  7 11:19:53 EST 2018
+	Added allow_country and deny_country('*')
+
 0.02	Tue Feb 21 11:11:32 EST 2017
 	Fixed t/country.t
 

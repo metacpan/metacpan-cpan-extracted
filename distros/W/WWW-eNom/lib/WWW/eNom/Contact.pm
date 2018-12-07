@@ -8,7 +8,7 @@ use MooseX::StrictConstructor;
 use MooseX::Params::Validate;
 use namespace::autoclean;
 
-use WWW::eNom::Types qw( ContactType EmailAddress HashRef PhoneNumber Str );
+use WWW::eNom::Types qw( RawContactType EmailAddress HashRef PhoneNumber Str );
 
 use WWW::eNom::PhoneNumber;
 
@@ -16,7 +16,7 @@ use Data::Util qw( is_string );
 use Try::Tiny;
 use Carp;
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Representation of eNom Contact
 
 has 'first_name' => (
@@ -116,7 +116,7 @@ sub BUILD {
 
 sub construct_creation_request {
     my $self = shift;
-    my ( $contact_type ) = pos_validated_list( \@_, { isa => ContactType, optional => 1 } );
+    my ( $contact_type ) = pos_validated_list( \@_, { isa => RawContactType, optional => 1 } );
 
     my $creation_request = {
         FirstName    => $self->first_name,
@@ -145,7 +145,22 @@ sub construct_creation_request {
 
 sub construct_from_response {
     my $self         = shift;
-    my ( $response ) = pos_validated_list( \@_, { isa => HashRef } );
+    my ( $raw_response ) = pos_validated_list( \@_, { isa => HashRef } );
+
+    # Some routes return 'FirstName' some 'RegistrantFirstName'
+    # This logic is meant to normalize that structure
+    my $response;
+    for my $prefix (qw( Admin Administrative Registrant Tech Technical AuxBilling )) {
+        if( exists $raw_response->{ $prefix . 'FirstName' } ) {
+            for my $key ( keys %{ $raw_response } ) {
+                $response->{ substr( $key, length $prefix ) } = $raw_response->{ $key };
+            }
+
+            last;
+        }
+    }
+
+    $response //= $raw_response;
 
     return try {
         return $self->new({

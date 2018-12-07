@@ -17,7 +17,7 @@ use Carp;
 
 requires 'submit', 'get_domain_privacy_wholesale_price';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Domain Transfer API Calls
 
 sub transfer_domain {

@@ -6,7 +6,7 @@ package BSON::Double;
 # ABSTRACT: BSON type wrapper for Double
 
 use version;
-our $VERSION = 'v1.10.1';
+our $VERSION = 'v1.10.2';
 
 use Carp;
 
@@ -132,7 +132,7 @@ BSON::Double - BSON type wrapper for Double
 
 =head1 VERSION
 
-version v1.10.1
+version v1.10.2
 
 =head1 SYNOPSIS
 

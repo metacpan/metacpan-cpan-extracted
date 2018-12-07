@@ -21,11 +21,12 @@ build_requires:
   Test::Warn: '0'
   XML::Simple: '0'
   lib: '0'
-  perl: '5.01301'
+  perl: '5.013006'
 configure_requires:
   Module::Build: '0.28'
+  perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -61,10 +62,11 @@ requires:
   XML::LibXML::Simple: '0'
   namespace::autoclean: '0'
   overload: '0'
-  perl: '5.01301'
+  perl: '5.013006'
 resources:
   bugtracker: https://github.com/drzigman/www-enom/issues
   homepage: https://metacpan.org/release/WWW-eNom
   repository: git://github.com/drzigman/www-enom.git
-version: v2.6.0
-x_serialization_backend: 'YAML::Tiny version 1.62'
+version: v2.7.0
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.70'

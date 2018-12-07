@@ -11,18 +11,12 @@ CGI::Ex::JSONDump - Comprehensive data to JSON dump.
 #  Distributed under the Perl Artistic License without warranty      #
 ###----------------------------------------------------------------###
 
-use vars qw($VERSION
-            @EXPORT @EXPORT_OK);
 use strict;
-use base qw(Exporter);
+use Exporter qw(import);
 
-BEGIN {
-    $VERSION = '2.47';
-
-    @EXPORT = qw(JSONDump);
-    @EXPORT_OK = @EXPORT;
-
-};
+our $VERSION = '2.48';
+our @EXPORT = qw(JSONDump);
+our @EXPORT_OK = @EXPORT;
 
 sub JSONDump {
     my ($data, $args) = @_;

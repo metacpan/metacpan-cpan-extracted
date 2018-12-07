@@ -1,0 +1,561 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title></title><link rel="stylesheet" type="text/css" href="blue.css"><meta name="generator" content="DocBook XSL Stylesheets V1.79.1"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div lang="en" class="article"><div class="titlepage"><div><div><h2 class="title"><a name="idm1"></a><em class="medialabel"> <span class="inlinemediaobject"><img src="images/pmltq.png" alt="PML Tree Query"></span> </em></h2></div><div><h3 class="subtitle"><i>Tutorial for the PML-TQ web client</i></h3></div><div><div class="authorgroup"><div class="author"><h3 class="author"><span class="firstname">Petr</span> <span class="surname">Pajas</span></h3></div><div class="author"><h3 class="author"><span class="firstname">Jiří</span> <span class="surname">Mírovský</span></h3></div></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl class="toc"><dt><span class="section"><a href="#idm18">Introduction</a></span></dt><dd><dl><dt><span class="section"><a href="#idm24">PML-TQ main features</a></span></dt><dt><span class="section"><a href="#idm35">Basic concepts</a></span></dt></dl></dd><dt><span class="section"><a href="#tutorial">Tutorial</a></span></dt><dd><dl><dt><span class="section"><a href="#web-interface-getting-started">Getting started</a></span></dt><dt><span class="section"><a href="#idm142">A simple query</a></span></dt><dt><span class="section"><a href="#idm218">Executing the query</a></span></dt><dt><span class="section"><a href="#idm270">A query with two nodes</a></span></dt><dt><span class="section"><a href="#idm306">Disjunctions, regular expressions and set enumerations</a></span></dt><dt><span class="section"><a href="#idm327">Types of relations (links)</a></span></dt><dt><span class="section"><a href="#tut_member_selector">Querying labeled references using the <code class="literal">member</code>
+      selector</a></span></dt><dt><span class="section"><a href="#idm422">Subqueries (testing existence, non-existence and number of
+      occurrences)</a></span></dt><dt><span class="section"><a href="#idm487">Looking for small result trees?</a></span></dt><dt><span class="section"><a href="#section-functions">Functions</a></span></dt><dt><span class="section"><a href="#section-output-filters">Output filters</a></span></dt></dl></dd></dl></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="idm18"></a>Introduction</h2></div></div></div><p>PML Tree Query (PML-TQ) is a query language and search engine
+    targeted for querying multi-layer annotated treebanks stored in the PML
+    data format. It can be used to query all kinds of treebanks: dependency,
+    constituency, multi-layered, parallel treebanks, as well as other kinds of
+    richly structured types of annotation.</p><p>The query language is declarative and offers both textual and
+    graphical representation of queries (note: in the current version of the WEB-based interface, only the textual representation of queries is available). There are two
+    implementations of the query engine, one based on a relational database
+    (Oracle or PostgreSQL &gt;= 8.4), the other based on Perl and the TrEd
+    toolkit. Three user interfaces are available: a WEB-based interface for
+    the database-based query engine displaying query results as SVG, a
+    full-featured graphical user interface for both engines available as a
+    plug-in to the tree editor TrEd, and a text-only command-line
+    interface.</p><p>This tutorial focuses on the WEB-based interface. For a tutorial
+      dedicated to the TrEd client, as well as for further information on the query
+      language, please refer to <a class="ulink" href="https://ufal.mff.cuni.cz/pmltq/doc/pmltq_doc.html" target="_top">the PML-TQ manual</a>.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm24"></a>PML-TQ main features</h3></div></div></div><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p>queries can span over all layers of annotation (including
+        annotation dictionaries)</p></li><li class="listitem"><p>allows arbitrary logical constraints</p></li><li class="listitem"><p>supports output filters (generate custom text output, compute
+        statistics, ...)</p></li><li class="listitem"><p>the WEB-based client works without installation, in a web browser</p></li></ol></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm35"></a>Basic concepts</h3></div></div></div><p>A <em class="firstterm">PML-TQ query</em> consists of a
+    <em class="firstterm">selective part</em> that selects nodes from the treebank
+    and an optional sequence of <em class="firstterm">output filters</em> that are
+    used to extract data from the matching nodes, post-process the results,
+    compute statistics, generate tabular output, etc.</p><p>The <em class="firstterm">selective part</em> of a PML-TQ query
+    postulates requirements on one or more nodes from the treebank and their
+    mutual relationships (e.g. on the topological configuration in the tree
+    structure). It is formed by one or more <em class="firstterm">node
+    selectors</em>, which form the outermost scope of the query. Inner
+    scopes of the query are given by nested subqueries as described
+    later.</p><p>A <em class="firstterm">node selector</em> represents a node in the
+    treebank of a certain type (in the PML data model, the nodes in the
+    treebank annotation can be typed; the query can also refer to several
+    annotation layers with different types of nodes) and postulates
+    constraints on its properties including relationships to nodes represented
+    by other selectors.</p><p>Selectors may <em class="firstterm">nest</em> other selectors; a nested
+    selector belongs to the same scope as the containing selector The nested
+    selector may explicitly specify the relation of its matching node to the
+    node matched by the containing selector; the default relation is
+    <code class="literal">child</code>. The nesting of selectors can thus naturally
+    follow the topology of the matching tree.</p><p>Selectors can also be named and referred to from other node
+    selectors; however, in many cases, the need for explicitly naming them can
+    be eliminated by nesting.</p><p>A <em class="firstterm">match</em> of a query is a mapping which assigns
+    to each outermost-scoped selector a node from a treebank (called a
+    <em class="firstterm">matching node</em>) of the type specified by the
+    selector, in such a way that all the matching nodes are mutually distinct
+    and simultaneously satisfy the constraints postulated by their
+    corresponding selectors (including constraints on their mutual
+    relationships). The <em class="firstterm">match</em> can be represented as a
+    tuple of the matching nodes ordered accordingly to some canonical ordering
+    of the selectors from the outermost scope of the query. There can be zero,
+    one, or more distinct matches of the query in the treebank (two matches
+    are distinct if, as ordered tuples, they differ in at least one
+    node).</p><p>Non-identity rule: Two distinct selectors <span class="emphasis"><em>in the same
+    scope</em></span> of the query always represent two distinct nodes in each
+    match of the query or sub-query (unless explicitly specified othewise in the query).</p><p>Selectors can postulate the following types of
+    <em class="firstterm">constraints</em>: </p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>predicates</p></li><li class="listitem"><p>references to other selectors</p></li><li class="listitem"><p>subqueries</p></li><li class="listitem"><p>boolean combinations of the above</p></li></ul></div><p> In the following descriptions, we refer to the selector
+    postulating a constraint as as the <em class="firstterm">current
+    selector</em>.</p><p><em class="firstterm">Predicate constraints</em> assert equality,
+    inequality, or regular expression match between values computed from
+    terms. An atomic term is a constant (integer, float, or character string),
+    or an attribute of a node matched by the current selector or some other
+    selector in the current or outer scope of the query. A term is either an
+    atomic term or a term obtained from other terms using arithmetical
+    (<code class="literal">+, *, -, div, mod</code>) or string (concatenation
+    <code class="literal">&amp;</code> ) operators, or functions.</p><p>A <em class="firstterm">reference</em> is a constraint on the
+    relationship of a node matched by some named selector to the node matched
+    by the current selector. The referred selector must either belong to the
+    same scope as the current selector or to its outer scope.</p><p>A <em class="firstterm">subquery</em> is formed by a selector (called
+    the <em class="firstterm">leading selector of the subquery</em>) nested in the
+    current selector and augmented by restrictions on the number of
+    occurrences, computed as the number of distinct nodes matched by the
+    leading selector of the subquery relatively to a fixed match of the
+    selectors in the current and outer scope (including the current selector).
+    For example, to postulate a constraint that each node matched by the
+    current selector must have at least two child nodes, we create a subquery
+    in form of a nested selector in the child relation to the current selector
+    and restrict the number of occurrences to two and more.</p><p>The leading selector can nest other selectors. Each subquery starts
+    a new scope whose outer scope is the scope of the containing selector
+    together with the containing selector's outer scope (if any). Unlike
+    selectors from the outermost scope, selectors declared within a subquery
+    do not represent any particular node in the resulting match. They can
+    refer to selectors from the same scope, and also to selectors from the
+    outer scope, but not vice versa (selectors from the outer scope cannot
+    refer to the selectors in the subquery).</p><p>A subquery constraint is verified as follows: for each match of the
+    selectors in the current and outer scope, all matches of the subquery are
+    located (these may coincide with nodes matched by the selectors in the
+    outer scope). The number of distinct nodes matched by the leading selector
+    of the subquery are counted and this number is compared with the
+    restrictions on number of occurrences. The constraint is satisfied if and
+    only if these restrictions are met.</p><p>A constraint can also be a boolean combination of other constraints;
+    a nested node selector occurring in a boolean combination with other
+    nested node selectors or constraints is considered to be a subquery with
+    at least one occurrence.</p><p>A PML-TQ query can be visualized as a graph consisting of one or
+    more trees whose nodes are the selectors connected by edges according to
+    the nesting of selectors and subqueries. In this sense we may sometimes
+    refer to selectors as <em class="firstterm">query nodes</em> and to the query
+    as <em class="firstterm">query graph</em> or <em class="firstterm">query tree</em>
+    (a technical root can be added above all the trees so that a forest
+    becomes a single tree). The edges can be labeled or colored to represent
+    different relationships between nodes. References to named selectors can
+    be represented by an additional layer of links (edges) in the graph that
+    may go across the basic tree structure of the query tree.</p></div></div><div class="section"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="tutorial"></a>Tutorial</h2></div></div></div><p>The purpose of this tutorial is to show how to create and run
+    queries from the PML-TQ WEB-based client, searching treebanks hosted at <a class="ulink" href="http://lindat.cz" target="_top">the Lindat/Clarin web pages</a>.</p><p>As our examples, we use queries over the Prague Dependency Treebank 3.0;
+    conceptually similar queries can be applied to most other treebanks,
+    although the node types and attributes will be probably different.</p><p>The tutorial gradually passes from very simple to complex queries
+    and demonstrates various common syntactic constructions of the PML-TQ
+    language.</p><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="web-interface-getting-started"></a>Getting started</h3></div></div></div><p>The PML-TQ provides a client interface in the form
+      of a web application that can be accessed by any web browser capable of
+      combining JavaScript, CSS, and SVG (<a class="ulink" href="http://www.w3.org/Graphics/SVG/" target="_top">Scalable Vector Graphics</a>),
+      such as Firefox, Google Chrome, Opera browser, and Safari.</p><p>Unlike the TrEd interface, this interface does not require any
+      installation, but lacks some features such as graphical query builder
+      and graphical representation of the query (the queries must be entered
+      in the text form), and of course does not support querying local files.
+      </p><p>To access the PML-TQ servers hosted at Lindat/Clarin servers,
+      go to <a class="ulink" href="http://lindat.cz" target="_top">lindat.cz</a> and in the
+      top menu, click on 
+      <span class="inlinemediaobject"><img src="images/callouts/TreeQuery.png" height="25" alt="TreeQuery"></span>. A starting PML-TQ
+      web page will be displayed (see
+      <a class="xref" href="#fig-screenshot-web-lindat-main" title="Figure 1. The PML-TQ web-service at Lindat/Clarin web pages">Figure 1, “The PML-TQ web-service at Lindat/Clarin web pages”</a>).</p><div class="figure"><a name="fig-screenshot-web-lindat-main"></a><p class="title"><b>Figure 1. The PML-TQ web-service at Lindat/Clarin web pages</b></p><div class="figure-contents"><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" style="cellpadding: 0; cellspacing: 0;" width="75%"><tr><td align="center"><img src="images/screenshot_web_lindat_main.png" align="middle" width="100%" alt="The PML-TQ web-service at Lindat/Clarin web pages"></td></tr></table></div></div></div><br class="figure-break"><p>Below, you can see two lists – a list of recently used treebanks and a list
+      of featured treebanks. Clicking on any of the listed treebanks will
+      connect you directly to the server for the given treebank.</p><p>A list of all available treebanks can be accessed by clicking on 
+      <span class="inlinemediaobject"><img src="images/callouts/BrowseTreebanks.png" height="25" alt="Browse Treebanks"></span>, as demonstrated in <a class="xref" href="#fig-screenshot-web-lindat-browse-treebanks" title="Figure 2. The list of available treebanks at Lindat/Clarin web pages">Figure 2, “The list of available treebanks at Lindat/Clarin web pages”</a>.</p><div class="figure"><a name="fig-screenshot-web-lindat-browse-treebanks"></a><p class="title"><b>Figure 2. The list of available treebanks at Lindat/Clarin web pages</b></p><div class="figure-contents"><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" style="cellpadding: 0; cellspacing: 0;" width="75%"><tr><td align="center"><img src="images/screenshot_web_lindat_browse_treebanks.png" align="middle" width="100%" alt="The list of available treebanks at Lindat/Clarin web pages"></td></tr></table></div></div></div><br class="figure-break"><p>Here, you can filter the treebanks according to their public availability (i.e. accessibility of the server without login),
+      language and other tags. By clicking on a single treebank from the (filtered) list below, you will get connected to the search
+      server for the respective treebank. For example, if you select the Prague Dependency Treebank 3.0 (PDT 3.0), you will get to
+      the following web page (<a class="xref" href="#fig-screenshot-web-lindat-pdt30-help" title="Figure 3. The help page for the PDT 3.0 treebank">Figure 3, “The help page for the PDT 3.0 treebank”</a>):</p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-help"></a><p class="title"><b>Figure 3. The help page for the PDT 3.0 treebank</b></p><div class="figure-contents"><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" style="cellpadding: 0; cellspacing: 0;" width="75%"><tr><td align="center"><img src="images/screenshot_web_lindat_pdt30_help.png" align="middle" width="100%" alt="The help page for the PDT 3.0 treebank"></td></tr></table></div></div></div><br class="figure-break"><p>It is a very short introduction to the query language that should help you start searching in the treebank if you do not
+      wish to read through this lengthy tutorial. To proceed to the page where you can actually enter
+      a search query, click on <span class="guibutton">
+      <span class="inlinemediaobject"><img src="images/callouts/button-query.png" height="19" alt="Query"></span></span>. </p><p>The following web page will be displayed (<a class="xref" href="#fig-screenshot-web-lindat-pdt30-start" title="Figure 4. The start page for searching in the PDT 3.0 treebank">Figure 4, “The start page for searching in the PDT 3.0 treebank”</a>):</p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-start"></a><p class="title"><b>Figure 4. The start page for searching in the PDT 3.0 treebank</b></p><div class="figure-contents"><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" style="cellpadding: 0; cellspacing: 0;" width="75%"><tr><td align="center"><img src="images/screenshot_web_lindat_pdt30_start.png" align="middle" width="100%" alt="The start page for searching in the PDT 3.0 treebank"></td></tr></table></div></div></div><br class="figure-break"></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm142"></a>A simple query</h3></div></div></div><p>Now we may create our first simple query. We shall search for all
+      nodes of the type <code class="literal">t-node</code> (tectogrammatical nodes in
+      PDT 3.0) whose attribute <code class="literal">functor</code> equals to
+      <code class="literal">PRED</code> (Predicate). In the web client, the query can be created in two
+      ways:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>Method 1: Click on 
+             <span class="inlinemediaobject"><img src="images/callouts/toolbar-NodeTypes.png" height="25" alt="Node Types"></span> in the toolbar; a list of available nodes for PDT 3.0 is displayed:
+    </p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-nodetypes"></a><p class="title"><b>Figure 5. A part of the list of available node types for PDT 3.0</b></p><div class="figure-contents"><div class="mediaobject" align="center"><img src="images/screenshot_web_lindat_pdt30_node_types_menu_cut.png" align="middle" alt="A part of the list of available node types for PDT 3.0"></div></div></div><p><br class="figure-break">
+      
+    Choose <code class="literal">t-node</code>. The string <code class="literal">t-node</code> will be copied to the text area below the toolbar.
+    </p><p>
+      Properties of a node follow its type, enclosed in square brackets: type <code class="literal">[</code> and choose
+      a t-node attribute <code class="literal">functor</code> 
+      from menu <span class="inlinemediaobject"><img src="images/callouts/toolbar-Attributes.png" height="25" alt="Attributes"></span> in the toolbar. Next, select operator <code class="literal">=</code> from the <code class="literal">Comparison</code> group
+              in the <span class="inlinemediaobject"><img src="images/callouts/toolbar-Operators.png" height="25" alt="Operators"></span> menu in the toolbar, and type <code class="literal">"PRED"</code>. Finish by closing the definition of the t-node by <code class="literal">]</code>.
+    <a class="xref" href="#fig-screenshot-web-lindat-pdt30-query-PRED" title="Figure 6. A simple query searching for Predicates in PDT 3.0">Figure 6, “A simple query searching for Predicates in PDT 3.0”</a> shows how the query should look like (the spaces are optional).
+    </p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-query-PRED"></a><p class="title"><b>Figure 6. A simple query searching for Predicates in PDT 3.0</b></p><div class="figure-contents"><div class="mediaobject" align="center"><img src="images/screenshot_web_lindat_pdt30_query_PRED_cut.png" align="middle" alt="A simple query searching for Predicates in PDT 3.0"></div></div></div><p><br class="figure-break">
+  </p></li><li class="listitem"><p>Method 2: In the query text area, start typing <code class="literal">t-</code>. The popup menu with possible node types will be offered:
+    </p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-node-type-hints-t-layer-cut"></a><p class="title"><b>Figure 7. List of available node types for PDT 3.0 containing the string <code class="literal">t-</code></b></p><div class="figure-contents"><div class="mediaobject" align="center"><img src="images/screenshot_web_lindat_pdt30_node_type_hints_t-layer_cut.png" align="middle" alt="List of available node types for PDT 3.0 containing the string t-"></div></div></div><p><br class="figure-break">
+
+    Choose <code class="literal">t-node</code> and continue typing the query, i.e. <code class="literal">[ fu</code>. After you start typing the name of the attribute,
+    another popup window with possible attributes is offered:
+    </p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-attribute-hints-functor-cut"></a><p class="title"><b>Figure 8. List of available attribute names in PDT 3.0 containing the string <code class="literal">fu</code></b></p><div class="figure-contents"><div class="mediaobject" align="center"><img src="images/screenshot_web_lindat_pdt30_attribute_hints_functor_cut.png" align="middle" alt="List of available attribute names in PDT 3.0 containing the string fu"></div></div></div><p><br class="figure-break">
+    
+    Choose <code class="literal">functor</code> and finish typing the rest of the query, i.e. <code class="literal">="functor"]</code>.
+    </p><p>
+    The resulting query should be the same as in <a class="xref" href="#fig-screenshot-web-lindat-pdt30-query-PRED" title="Figure 6. A simple query searching for Predicates in PDT 3.0">Figure 6, “A simple query searching for Predicates in PDT 3.0”</a> (again, the spaces are optional), i.e.:
+     </p><pre class="programlisting">t-node [ functor="PRED" ]</pre><p>
+     <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-KVJI" target="_top">try the query</a></span></p><p>
+  </p></li></ul></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>Throughout the tutorial, you can use the button <span class="keysym">try the query</span> placed
+          below examples to go directly to the web client and try the example. Such permanent links
+          to queries in the web client can be created by clicking on <span class="inlinemediaobject"><img src="images/callouts/PermanentLink.png" height="25" alt="Permanent Link"></span> on the right side below the query text area.</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm218"></a>Executing the query</h3></div></div></div><p>
+          To execute the query, press  <span class="inlinemediaobject"><img src="images/callouts/ExecuteQuery.png" height="25" alt="Execute Query"></span> below the query text area. The query gets processed by the server and the result
+              is displayed. <a class="xref" href="#fig-screenshot-web-lindat-pdt30-query-PRED" title="Figure 6. A simple query searching for Predicates in PDT 3.0">Figure 6, “A simple query searching for Predicates in PDT 3.0”</a> shows the first matching tree.
+    </p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-query-PRED-result"></a><p class="title"><b>Figure 9. A result tree for the query searching for Predicates in PDT 3.0</b></p><div class="figure-contents"><div class="mediaobject" align="center"><table border="0" summary="manufactured viewport for HTML img" style="cellpadding: 0; cellspacing: 0;" width="75%"><tr><td align="center"><img src="images/screenshot_web_lindat_pdt30_query_PRED_result.png" align="middle" width="100%" alt="A result tree for the query searching for Predicates in PDT 3.0"></td></tr></table></div></div></div><p><br class="figure-break">
+        
+    The corresponding sentence is displayed just above the tree. Try clicking on the individual words of the sentence and see the animation marking the corresponding nodes in the tree.
+    </p><p>Buttons <span class="inlinemediaobject"><img src="images/callouts/ResultPrevious.png" height="25" alt="Previous"></span> and <span class="inlinemediaobject"><img src="images/callouts/ResultNext.png" height="25" alt="Next"></span> can be used to navigate among the results, and buttons <span class="inlinemediaobject"><img src="images/callouts/TreePrevious.png" height="25" alt="&lt;&lt;"></span> and <span class="inlinemediaobject"><img src="images/callouts/TreeNext.png" height="25" alt="&gt;&gt;"></span> to see context sentences/trees. To go directly to the N-th result,
+              change the number of the current result (<span class="inlinemediaobject"><img src="images/callouts/ResultNumber.png" height="25" alt="1 of 100"></span>) to a desired number (make sure that the focus is in
+              the result number field) and – in the list of matching nodes – click on <span class="inlinemediaobject"><img src="images/callouts/MatchingNode1.png" height="25" alt="1 t-node"></span>. The corresponding matching node in the given result is displayed (and highlighted in the same colour, in this case green).
+            </p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title">Note</h3><p>By default, the search engine returns up to 100 matches (in no
+        particular order), which should be more than sufficient for viewing a
+        few matching examples. This limit can be changed on the right side above the query text area ( <span class="inlinemediaobject"><img src="images/callouts/ResultLimit.png" height="25" alt="Result Limit"></span>), but raising this limit may slow down
+        the search. We shall later see how to compute the number of all
+        matches, using output filters.</p></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm270"></a>A query with two nodes</h3></div></div></div><p>We shall now make the query more complex by adding another node to
+      it. We shall ask for a t-node with functor "PRED" (Predicate) that has a child with
+      functor "PAT" (Patient).</p><p>
+      To add a node to an existing one in the query, you need to specify
+      a type of relation of the new node to the existing one. The list of
+      available relations can be accessed through <span class="inlinemediaobject"><img src="images/callouts/toolbar-Relations.png" height="25" alt="Relations"></span> in the toolbar (see <a class="xref" href="#fig-screenshot-web-lindat-pdt30-relations-menu-cut" title="Figure 10. A part of the list of available standard relations between nodes in PML-TQ">Figure 10, “A part of the list of available standard relations between nodes in PML-TQ”</a>).
+
+    </p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-relations-menu-cut"></a><p class="title"><b>Figure 10. A part of the list of available standard relations between nodes in PML-TQ</b></p><div class="figure-contents"><div class="mediaobject" align="center"><img src="images/screenshot_web_lindat_pdt30_relations_menu_cut.png" align="middle" alt="A part of the list of available standard relations between nodes in PML-TQ"></div></div></div><p><br class="figure-break">
+              
+      The default value is <code class="literal">child</code>, so the following two queries
+      are equivalent:
+      </p><pre class="programlisting">t-node [ functor="PRED", t-node [ functor="PAT" ] ]</pre><p>
+      <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-OMAE" target="_top">try the query</a></span></p><p>
+      or
+      </p><pre class="programlisting">t-node [ functor="PRED", child t-node [ functor="PAT" ] ]</pre><p>
+      <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-DJFE" target="_top">try the query</a></span></p><p>
+      These forms of the query use nesting of node selectors. The query can also be expressed without nesting, using names,
+      either as
+      </p><pre class="programlisting">t-node $a := [ functor="PRED", child $b ];
+t-node $b := [ functor="PAT" ];</pre><p>
+      <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-5JL9" target="_top">try the query</a></span></p><p>
+      or 
+      </p><pre class="programlisting">t-node $a := [ functor="PRED" ];
+t-node $b := [ functor="PAT", parent $a ];</pre><p>
+      <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-HNYG" target="_top">try the query</a></span></p><p>
+      naming the two nodes
+      <code class="literal">$a</code> and <code class="literal">$b</code> and either indicating
+      that <code class="literal">$a</code> has a child $b or that <code class="literal">$b</code>
+      has a parent $a.</p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm306"></a>Disjunctions, regular expressions and set enumerations</h3></div></div></div><p>We now extend our query to cover t-nodes not only with
+        functor <code class="literal">PAT</code> (Patient) but also <code class="literal">ADDR</code> (Addressee).
+        This can be done in three different ways:</p><p>Using a disjunction:
+        </p><pre class="programlisting">t-node [ functor="PRED", t-node [ functor="PAT" or functor="ADDR" ] ]</pre><p>
+        <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-0ZPS" target="_top">try the query</a></span>
+      </p><p>Using a regular expression:
+        </p><pre class="programlisting">t-node [ functor="PRED", t-node [ functor ~ "^(PAT|ADDR)$" ] ]</pre><p>
+        <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-AAZA" target="_top">try the query</a></span></p><p>Symbol <code class="literal">~</code> (tilde) denotes a binary relation between
+      two values that is true if and only if the value on the left interpreted
+      as string matches the value on the right interpreted as regular
+      expression.</p><p>Using a set enumeration:
+        </p><pre class="programlisting">t-node [ functor="PRED", t-node [ functor in { "PAT", "ADDR" } ] ]</pre><p>
+        <span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-BXXQ" target="_top">try the query</a></span></p><p>The relation <code class="literal">in</code> asserts that the value computed
+      from the expression on the left equals to a value of some of the
+      expressions listed in the set enumeration on the right.
+      </p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm327"></a>Types of relations (links)</h3></div></div></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="idm329"></a>Structural relations</h4></div></div></div><p>The nodes in the query can be linked by several types of
+        relations. The built-in relations are the structural relations (child,
+        parent, ancestor, descendant, sibling, same-tree-as,
+        same-document-as), ordering relations (depth-first-precedes,
+        depth-first-follows, order-precedes, order-follows). The name of a
+        built-in relation can optionally be followed by a pair of colons
+        <code class="literal">::</code> in order to distinguish it from PML reference
+        relations described below.</p></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="idm333"></a>PML Reference Links</h4></div></div></div><p>The PML data model allows connecting nodes (and other data
+        structures) by so called PML references. In PML-TQ one can use any PML
+        reference as a relation by using the attribute path of an attribute
+        containing the reference, optionally followed by
+        <code class="literal">-&gt;</code> (in order to prevent a collision with a
+        similarly named built-in or implementation specific relations). For
+        example, in PDT 3.0, nodes on the t-layer are connected to nodes
+        on the a-layer using PML references in the attributes
+        <code class="literal">a/lex.rf</code> and <code class="literal">a/aux.rf</code>. The
+        following query uses the <code class="literal">a/lex.rf</code> PML reference as
+        a relation:</p><pre class="programlisting">
+# t-layer dependency reversed on a-layer
+a-node $A := [
+ child a-node $B := [  ]
+];
+
+t-node [
+  child t-node [
+    a/lex.rf $A
+  ],
+  a/lex.rf $B
+];
+</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-UPLP" target="_top">try the query</a></span><p>PML references are also used in PDT 3.0 to represent
+        grammatical coreference links (attribute
+        <code class="literal">coref_gram.rf</code>). For example, the following query
+        searches for a grammatical coreference where referring node precedes
+        the referred node. The query defines selectors for two
+        tectogrammatical nodes <code class="literal">$referring</code> and
+        <code class="literal">$referred</code> connected by a grammatical-coreference
+        link <code class="literal">coref_gram.rf</code>, such that the lexical
+        counterpart of <code class="literal">$referred</code> follows that of
+        <code class="literal">$referring</code> in the ordering of the a-layer (which
+        coincides with the ordering of the original sentence).</p><pre class="programlisting">
+t-node $referring := [
+ a/lex.rf a-node $referring_lex := [],
+ coref_gram.rf t-node $referred := [
+   a/lex.rf a-node $referred_lex := [ order-follows $referring_lex ],
+ ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-7R5H" target="_top">try the query</a></span><p>In the previous example, the two t-nodes were directly connected by
+        a grammatical-coreference link. If we want to look for nodes connected
+        by a chain of grammatical-coreference links, we can do it by using a
+        transitive closure of the relation <code class="literal">coref_gram.rf</code>,
+        which can be expressed in PML-TQ as
+        <code class="literal">coref_gram.rf{1,}</code>. The lower bound
+        <code class="literal">1</code> means we are looking for chains of length at
+        least 1 and the absence of the upper bound means that we put no limits
+        on the length of the chain.</p><pre class="programlisting">
+t-node $referring := [
+ a/lex.rf a-node $referring_lex := [],
+ coref_gram.rf{1,} t-node $referred := [
+   a/lex.rf a-node $referred_lex := [ order-follows $referring_lex ],
+ ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-LDCJ" target="_top">try the query</a></span><p>Note that in the case of a cyclic chain of PML references, the
+        chains maximum length is the number of distinct nodes in the chain
+        plus one (i.e. the chain is allowed to start and end on the same node,
+        but it is not allowed to continue another round along the cycle). For
+        example, the following query searches for a cycle in the annotation of
+        grammatical coreference in the PDT 3.0 tectogrammatical annotation
+        (and does not find anything, as there are no such cycles in PDT 3.0):</p><pre class="programlisting">
+t-node $t := [
+ coref_gram.rf{1,} $t
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-FNOO" target="_top">try the query</a></span></div><div class="section"><div class="titlepage"><div><div><h4 class="title"><a name="idm364"></a>Implementation- or corpus-specific relations</h4></div></div></div><p>Finally, any particular implementation or installation of the
+        PML-TQ query engine can extend the language by defining and
+        implementing additional specific relations. The relations behave
+        syntactically as the built-in relations and must use different names
+        than the built-in relations (their name can be followed by a pair of
+        colons <code class="literal">::</code> in order to distinguish them from a PML
+        reference relation).</p><p>The current implementation defines two relations specific for
+        the PDT 3.0 annotation: <code class="literal">echild</code> and
+        <code class="literal">eparent</code>. These relations can be used both on the
+        tectogrammatical and analytical layer and represent the effective
+        dependency, rather than technical dependency represented by the
+        built-in relations <code class="literal">child</code> and
+        <code class="literal">parent</code>. Thus, they abstract from certain
+        constructions such as coordination and apposition as well as the
+        dominance of prepositions (<code class="literal">afun="AuxP"</code>) and
+        connectives (<code class="literal">afun="AuxC"</code>) on the analytical
+        layer.</p><p>Here are a few examples of queries using these relations:</p><pre class="programlisting">
+# a semantic verb with ACT (Actor) and EFF (Effect)
+t-node [
+  gram/sempos="v",
+  echild t-node [ functor="ACT" ],
+  echild t-node [ functor="EFF" ],
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-6XZG" target="_top">try the query</a></span><pre class="programlisting">
+# a t-node with two effective parents (common modifier of coordinated nodes)
+t-node [
+  eparent t-node [ ],
+  eparent t-node [ ],
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-VIFG" target="_top">try the query</a></span><pre class="programlisting">
+# a verb with no actant
+t-node $a := [ gram/sempos="v",
+  ! echild t-node [ functor in { "ACT","PAT","ADDR","ORIG","EFF" } ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-KD0U" target="_top">try the query</a></span><pre class="programlisting">
+# reversed effective dependency on a-layer and t-layer
+# excluding numeric constructions
+a-node $A := [
+  m/tag !~ "^C",
+  echild a-node $B := [
+    m/tag !~ "^C"
+  ]
+];
+t-node [
+  a/lex.rf $B,
+  echild t-node [ a/lex.rf $A ]
+];</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-E7EV" target="_top">try the query</a></span><p>Just like PML reference relations, specific relations can be
+        used in the transitive form by setting minimum and maximum bounds, for
+        example:</p><pre class="programlisting"># effective descendant
+t-node [ echild{1,} t-node [ ] ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-TVPA" target="_top">try the query</a></span><pre class="programlisting"># effective grand-grand child
+t-node [ echild{2,2} t-node [ ] ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-KFAG" target="_top">try the query</a></span></div></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="tut_member_selector"></a>Querying labeled references using the <code class="literal">member</code>
+      selector</h3></div></div></div><p>The <code class="literal">member</code> selector is useful for querying some types of
+      complex-valued node attributes, e.g. lists of complex structures. In PDT 3.0,
+      there are three such attributes, representing discourse relations (attribute <code class="literal">discourse</code>),
+      textual coreference (<code class="literal">coref_text</code>) and bridging anaphora (<code class="literal">bridging</code>).</p><p>For example, attribute <code class="literal">bridging</code> is a list of structures, each consisting of two members:
+        a PML reference to the anaphor node (<code class="literal">bridging/target_node.rf</code>)
+        and the type of the relation (<code class="literal">bridging/type</code>).
+        So, each structure in the list represents one labeled semantic
+      relation. To be able to combine constraints on the target node
+      (anaphor) with the type of the relation that points to it, we must
+      use a feature of PML-TQ called <code class="literal">member</code>
+      selectors.</p><p>The following query searches for bridging relations of type <code class="literal">PART_WHOLE</code>.</p><pre class="programlisting">t-node [
+  member bridging [
+    type = "PART_WHOLE",
+    target_node.rf t-node [ ]
+  ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-N60N" target="_top">try the query</a></span><p>The intermediate <code class="literal">member</code> selector matches one
+      element of the <code class="literal">bridging</code> list at a time and tests its
+      type. If the type matches, the nested node selector for the
+      <code class="literal">target_node.rf</code> PML-reference relation takes action.</p><p>Similarly, we can search for discourse relations of a given discourse type.
+      The following example searches for discourse relations of discourse
+      type <code class="literal">opp</code> (opposition). The query also specifies that
+      the target node is in the same tree as the start node, thus searching only for
+      intra-sentential discourse relations.</p><pre class="programlisting">t-node $s:= [
+  member discourse [
+    discourse_type = "opp",
+    target_node.rf t-node [ same-tree-as $s ]
+  ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-JLE9" target="_top">try the query</a></span></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm422"></a>Subqueries (testing existence, non-existence and number of
+      occurrences)</h3></div></div></div><p>Sometimes it is useful to test existence, non-existence or number
+      of occurrences of a node related to our query. For example, to find all
+      predicates without a subject on the analytical layer of PDT 3.0, we could use the following
+      query</p><pre class="programlisting">a-node [ afun="Pred", 0x echild a-node [ afun="Sb" ] ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-DNC3" target="_top">try the query</a></span><p>The query finds an a-node with <code class="literal">afun="Pred"</code> that
+      has no effective children with <code class="literal">afun="Sb"</code>. This is
+      expressed using a selector preceded by a restriction on number of
+      occurrences (0x - zero times), which is called a subquery.</p><p>Of course, we could constrain the number of occurrences to a
+      non-zero value, too. For example, to find all predicates that govern one
+      subject or one object, but not both, we could use the following
+      query:</p><pre class="programlisting">a-node [ afun="Pred", 1x echild a-node [ afun in {"Sb","Obj"} ] ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-ECL6" target="_top">try the query</a></span><p>The nodes matched by subqueries are not part of the result match
+      (in our example, the match would consist of the predicate nodes only,
+      the subjects or objects would not be included).</p><p>The number of occurrences of a subquery can be constrained not
+      only to a single number but to any finite union of
+      bounded or partially unbounded intervals of positive integers; e.g.
+      <code class="literal">0|2..4|6+x</code> restricts the number of occurrences to
+      zero, two to four, or six or more, eliminating one and five. While the
+      plus sign stands for <span class="emphasis"><em>or more</em></span>, the minus sign means
+      <span class="emphasis"><em>or less</em></span>, as in <code class="literal">4-x</code> (occurring
+      four or less times).</p><p>Subqueries are also created using boolean operators, such as
+      negation:</p><pre class="programlisting">a-node [ afun="Pred", ! echild a-node [ afun="Sb" ] ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-XRBI" target="_top">try the query</a></span><p>In this example, the selector <code class="literal">! echild a-node [ afun="Sb"
+      ]</code> is automatically turned into a (still negated) subquery with
+      one and more occurrences; the query becomes: </p><pre class="programlisting">a-node [ afun="Pred", ! 1+x echild a-node [ afun="Sb" ] ]</pre><p><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-WPPZ" target="_top">try the query</a></span>
+      </p><p>A common use of subqueries is also constraining nodes on a
+      descending path from one node to another. Let us for example formulate a
+      query searching for a descending chain of tectogrammatical nodes with
+      the functor <code class="literal">RSTR</code> (restrictive or descriptive
+      abdominal modification). We want the chain to satisfy the following
+      conditions:</p><div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><p><a name="subq-i1"></a>The chain is connected to a node <code class="literal">$N</code> which
+          is a semantic noun (<code class="literal">gram/sempos ~ "^n"</code>) and has
+          other functor than <code class="literal">RSTR</code></p></li><li class="listitem"><p><a name="subq-i3"></a>The chain is at least 3 nodes long.</p></li><li class="listitem"><p><a name="subq-i4"></a>The descending chain ends with a node <code class="literal">$R</code>
+          with the functor <code class="literal">RSTR</code></p></li><li class="listitem"><p><a name="subq-i5"></a>The chain cannot descend beyond <code class="literal">$R</code>, i.e.
+          <code class="literal">$R</code> has no child node with the functor
+          <code class="literal">RSTR</code>.</p></li><li class="listitem"><p><a name="subq-i2"></a>All nodes that belong to the chain have the functor
+          <code class="literal">RSTR</code></p></li></ol></div><p>The corresponding query looks like this:</p><pre class="programlisting">
+t-node $N:= [
+  # condition <a class="xref" href="#subq-i1">1</a>.
+  gram/sempos ~ "^n",
+  functor != "RSTR",
+
+  # conditions <a class="xref" href="#subq-i3">2</a>. and <a class="xref" href="#subq-i4">3</a>.
+  descendant{3,} t-node $R := [
+    functor = "RSTR",
+    # condition <a class="xref" href="#subq-i5">4</a>.
+    0x  t-node [ functor = "RSTR" ]
+  ],
+
+  # condition <a class="xref" href="#subq-i2">5</a>.
+  0x descendant t-node [
+    !functor = "RSTR",
+    descendant $R
+  ],
+];</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-XOEY" target="_top">try the query</a></span><p>Note how the condition <a class="xref" href="#subq-i2">5</a>. is expressed:
+      we say that there is no descendant of $N dominating $R whose
+      <code class="literal">functor</code> would not equal <code class="literal">RSTR</code>.
+      Thus, we have rewritten the original condition of the form <span class="math">∀<i>x</i> <i>C</i>(<i>x</i>,<i>N</i>,<i>R</i>)</span>
+      as <span class="math">¬ ∃<i>x</i> ¬<i>C</i>(<i>x</i>,<i>N</i>,<i>R</i>)</span>.
+      
+       </p></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="idm487"></a>Looking for small result trees?</h3></div></div></div><p>Sometimes you want to find a good small example tree demonstrating
+      some linguistic phenomenon. You want it to fit to a presentation slide
+      or an article page. You can do so by putting a limit on the tree
+      size.</p><p>Using a subquery this can be done as follows:</p><pre class="programlisting">t-node [
+  10-x same-tree-as t-node [],
+  functor="DPHR", # the rest of your query
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-V43E" target="_top">try the query</a></span><p>This selects t-nodes with <code class="literal">functor="DPHR"</code> in
+      trees with at most 10 other t-nodes. Using functions (<a class="xref" href="#section-functions" title="Functions">see below</a>), this can be
+      written as</p><pre class="programlisting">t-root [
+  descendants() &lt;= 10,
+  descendant t-node [ functor="DPHR" ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-VWRZ" target="_top">try the query</a></span><p>but note that in this case the <code class="literal">t-root</code> appears
+      as a node in the result set. To avoid it, we can write</p><pre class="programlisting">t-node [
+  functor="DPHR",
+  1x ancestor t-root [ descendants() &lt;= 10 ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-3QXX" target="_top">try the query</a></span><p>For treebanks that do not have a special node type for the root
+      node, we can write e.g.:</p><pre class="programlisting">node [
+  functor="DPHR",
+  1x ancestor node [
+    depth() = 0, # the root
+    descendants() &lt;= 10
+  ]
+]</pre></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="section-functions"></a>Functions</h3></div></div></div><p>PML-TQ provides a set of built-in functions that can be used in
+      expressions constraining nodes and also in output filters. The functions
+      can be split into the following categories:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>functions returning information about the tree
+          structure</p></li><li class="listitem"><p>functions related to information about the document</p></li><li class="listitem"><p>string functions</p></li><li class="listitem"><p>numerical functions</p></li><li class="listitem"><p>group functions (applicable only in output filters (<a class="xref" href="#section-output-filters" title="Output filters">see below</a>)</p></li></ul></div><p>In the web client, lists of available functions can be accessed via
+             <span class="inlinemediaobject"><img src="images/callouts/toolbar-Functions.png" height="25" alt="Node Types"></span> in the toolbar, see <a class="xref" href="#fig-screenshot-web-lindat-pdt30-functions" title="Figure 11. A part of the list of available functions in PML-TQ">Figure 11, “A part of the list of available functions in PML-TQ”</a>.
+    </p><div class="figure"><a name="fig-screenshot-web-lindat-pdt30-functions"></a><p class="title"><b>Figure 11. A part of the list of available functions in PML-TQ</b></p><div class="figure-contents"><div class="mediaobject" align="center"><img src="images/screenshot_web_lindat_pdt30_functions_menu_cut.png" align="middle" alt="A part of the list of available functions in PML-TQ"></div></div></div><p><br class="figure-break">
+
+      For description of all individual functions, refer to
+        <a class="ulink" href="https://ufal.mff.cuni.cz/pmltq/doc/pmltq_doc.html#functions" target="_top">the PML-TQ manual</a>.
+        Here, we only give a few examples demonstrating
+      the use of some of the functions from the first category on a few common
+      query constructions, usually also expressible by means of subqueries.
+      Whether it is more efficient to use functions than subqueries may depend
+      on implementation.</p><pre class="programlisting"># a leaf node (using functions)
+t-node [ sons()=0 ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-YTAY" target="_top">try the query</a></span><pre class="programlisting"># a leaf node (using a subquery)
+t-node [ 0x child t-node [ ] ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-FCCC" target="_top">try the query</a></span><pre class="programlisting"># right-most child
+t-node [ rbrothers()=0 ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-8QOL" target="_top">try the query</a></span><pre class="programlisting"># left-most child
+t-node [ lbrothers()=0 ]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-PCRC" target="_top">try the query</a></span><pre class="programlisting"># first leaf node in a subtree of $t (using functions)
+t-node $t := [
+  descendant t-node [
+    sons()=0,
+    depth_first_order()-depth()=depth_first_order($t)-depth($t)
+  ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-TYVS" target="_top">try the query</a></span><pre class="programlisting"># first leaf node in a subtree of $t (using a subquery)
+t-node $t := [
+  descendant t-node $d := [ sons()=0 ],
+  0x descendant [ sons()=0, depth-first-precedes $d ],
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-JQXY" target="_top">try the query</a></span><pre class="programlisting"># last leaf node in a subtree of $t
+t-node $t := [
+  descendant t-node [
+    sons()=0,
+    depth_first_order()-depth()=depth_first_order($t)+descendants($t)-1-depth($t)
+  ]
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-P9BX" target="_top">try the query</a></span><pre class="programlisting"># last leaf node in a subtree of $t (using a subquery)
+t-node $t := [
+  descendant t-node $d := [ sons()=0 ],
+  0x descendant [ depth-first-follows $d ],
+]</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-MEJV" target="_top">try the query</a></span></div><div class="section"><div class="titlepage"><div><div><h3 class="title"><a name="section-output-filters"></a>Output filters</h3></div></div></div><p>Output filters are used for extracting data from the nodes matched
+      by the query and generating tabular output. Filters must follow the
+      selective part of the query and start with <code class="literal">&gt;&gt;</code>.
+      Filters can be chained: the first filter extracts data from the matching
+      nodes and all subsequent filters operate on the output from the
+      immediately preceding filter. Details can be found in the PML-TQ manual,
+      sections <a class="ulink" href="https://ufal.mff.cuni.cz/pmltq/doc/pmltq_doc.html#outputFilter" target="_top">PML-TQ Syntax Reference</a>
+      and <a class="ulink" href="https://ufal.mff.cuni.cz/pmltq/doc/pmltq_doc.html#agg_functions" target="_top">Group Functions</a>.
+      </p><p>One of the simplest filters uses the group function
+      <code class="literal">count()</code> to compute the total number of matches of the
+      query in the treebank:</p><pre class="programlisting"># counting occurrences
+t-node [ functor="PRED" ]
+&gt;&gt; count()</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-WP0O" target="_top">try the query</a></span><p>The group functions <code class="literal">min()</code>,
+      <code class="literal">max()</code>, and <code class="literal">avg()</code>, can be used to
+      compute maximum, minimum, and average values of data extracted from the
+      matching nodes. For example: to compute a maximum number of child nodes
+      of a t-node with the functor <code class="literal">PRED</code>, we can use the
+      following:</p><pre class="programlisting">
+t-node $n := [ functor="PRED" ]
+&gt;&gt; max(sons($n))</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-GXVZ" target="_top">try the query</a></span><p>The following query computes maximum, minimum and average size of
+      a tectogrammatical tree:</p><pre class="programlisting">
+t-root $n := [ ]
+&gt;&gt; descendants($n)
+&gt;&gt; max(), min(), avg()</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-NESG" target="_top">try the query</a></span><p>The above query uses two filters: the first extracts the number of
+      descendants from each node matched by the selector
+      <code class="literal">$n</code>, the second computes maximum, minimum and average
+      value from the values returned by the first filter.</p><p>The following query shows a common grouping construction using the
+      'for' clause. It extracts the attribute <code class="literal">functor</code> from
+      the matched nodes and for each distinct value counts the number it
+      occurred:</p><pre class="programlisting">
+t-node $n := [ ]
+&gt;&gt; for $n.functor
+   give $1, count()</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-DKF0" target="_top">try the query</a></span><p>Note that <code class="literal">$1</code> in the <code class="literal">give</code>
+      clause refers to the first (and only) key used in the
+      <code class="literal">for</code> clause, i.e. to
+      <code class="literal">$n.functor</code>.</p><p>By appending a <code class="literal">sort by</code> clause to a filter, we
+      may reorder the rows it produces by some of its columns. In the
+      following query, the output of the filter is sorted using the second
+      output column (the <code class="literal">count()</code>) in descendant order as
+      the primary key and the first output column (the <code class="literal">$1</code>
+      in the <code class="literal">give</code> clause) in the default (ascending)
+      order:</p><pre class="programlisting">t-node $n := [ ]
+&gt;&gt; for $n.functor
+   give $1, count()
+   sort by $2 desc, $1</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-7UV1" target="_top">try the query</a></span><p>The <code class="literal">for</code> clause can be used to create groups not
+      only by attribute values, but also by some of the matching nodes. For
+      example, in order to find out how many grammatical-coreference links can
+      start in one tectogrammatical node, we may use the following
+      query:</p><pre class="programlisting">
+t-node $referring := [
+  coref_gram.rf t-node $referred := [  ]
+];
+&gt;&gt;  for $referring give count()
+&gt;&gt; max()</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-EW5L" target="_top">try the query</a></span><p>The selective part of the query matches every pair of
+      tectogrammatical nodes that are linked by a grammatical-coreference
+      link. The first filter groups the resulting pairs of nodes by the first
+      of the nodes (<code class="literal">$referring</code>) and outputs the number of
+      pairs in each group; this is the number of grammatical-coreference links
+      starting in the node <code class="literal">$referring</code>. The second filter
+      simply computes the maximum of the values returned by the first
+      filter.</p><p>The <code class="literal">for</code> clause partitions all input rows into
+      groups before any further processing and the subsequent
+      <code class="literal">give</code> clause then produces one output row for each
+      group, letting all group functions, such as <code class="literal">count()</code>,
+      <code class="literal">min()</code>, <code class="literal">max()</code>, etc. operate on the
+      particular group.</p><p>PML-TQ further supports a syntax that allows different partitions
+      to be defined for different group function and also let the
+      <code class="literal">give</code> clause operate on all input rows. This is done
+      by following the function arguments by an <code class="literal">over</code>
+      clause. Here we show an example where we use one of the ranking group
+      functions (<code class="literal">row_number()</code>) to select just a few top
+      ranking rows from each group. Please refer to the PML-TQ manual, section
+      <a class="ulink" href="https://ufal.mff.cuni.cz/pmltq/doc/pmltq_doc.html#grouping_explained" target="_top">Group functions explained</a>
+      for more examples.</p><p>In the following query we extract the syntactic label
+      (<code class="literal">afun</code>) and the part of speech (the first position of
+      the morphological tag) from every node on the analytical
+      (morphosyntactical) layer of PDT 3.0. Then we apply further filters to
+      output in order to obtain the three most frequent parts of speech for
+      each <code class="literal">afun</code>. If several parts of speech occur the same
+      number of times for a given afun, we sample those three that come first
+      alphabetically.</p><pre class="programlisting">
+a-node $a:= [ ]
+&gt;&gt; $a.afun, substr($a.m/tag,0,1)  # get afun and part of speech (POS)
+&gt;&gt; for $1,$2 give $1, $2, count() # count occurrences of POS for each afun
+&gt;&gt; $1, $2, row_number(over $1 sort by $3 desc, $2) # get the rank of each POS over the afun
+   sort by $1, $3
+&gt;&gt; filter $3 &lt;= 3
+&gt;&gt; $1, $2, $3
+</pre><span class="keysym"><a class="ulink" href="http://hdl.handle.net/11346/PMLTQ-YY1E" target="_top">try the query</a></span></div></div></div></body></html>

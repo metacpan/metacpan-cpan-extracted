@@ -9,26 +9,46 @@ use String::Random qw( random_string );
 
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
-use Test::WWW::eNom qw( create_api );
-use Test::WWW::eNom::Contact qw( create_contact );
+use Test::WWW::eNom qw( create_api mock_response );
+use Test::WWW::eNom::Contact qw( create_contact mock_get_contacts );
 use Test::WWW::eNom::Domain qw( create_domain $UNREGISTERED_DOMAIN $NOT_MY_DOMAIN );
 
 use WWW::eNom::DomainRequest::Registration;
 
 subtest 'Get Contacts For Unregistered Domain' => sub {
-    my $api         = create_api();
+    my $api = create_api();
+
+    my $mocked_api = mock_response(
+        method   => 'GetContacts',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Domain name not found' ],
+        }
+    );
 
     throws_ok {
         $api->get_contacts_by_domain_name( $UNREGISTERED_DOMAIN->name );
     } qr/Domain not found in your account/, 'Throws on unregistered domain';
+
+    $mocked_api->unmock_all();
 };
 
 subtest 'Get Contacts For Domain Registered To Someone Else' => sub {
-    my $api         = create_api();
+    my $api = create_api();
+
+    my $mocked_api = mock_response(
+        method   => 'GetContacts',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Domain name not found' ],
+        }
+    );
 
     throws_ok {
         $api->get_contacts_by_domain_name( $NOT_MY_DOMAIN->name );
     } qr/Domain not found in your account/, 'Throws on domain registered to someone else';
+
+    $mocked_api->unmock_all();
 };
 
 subtest 'Get Contacts For Domain With All Contact Defined' => sub {
@@ -53,10 +73,19 @@ subtest 'Get Contacts For Domain With All Contact Defined' => sub {
         billing_contact    => $contacts->{billing_contact},
     });
 
+    my $mocked_api = mock_get_contacts(
+        registrant_contact => $domain->registrant_contact,
+        admin_contact      => $domain->admin_contact,
+        technical_contact  => $domain->technical_contact,
+        billing_contact    => $domain->billing_contact,
+    );
+
     my $retrieved_contacts;
     lives_ok {
         $retrieved_contacts = $api->get_contacts_by_domain_name( $domain->name );
     } 'Lives through retrieving contacts';
+
+    $mocked_api->unmock_all();
 
     for my $contact_type (keys %{ $retrieved_contacts } ) {
         subtest "$contact_type" => sub {
@@ -91,6 +120,11 @@ subtest 'Get Contacts For Domain Missing Contact' => sub {
         }
     }
 
+    my $mocked_api = mock_response(
+        method   => 'Purchase',
+        response => { }
+    );
+
     my $domain_response;
     lives_ok {
         $domain_response = $api->submit({
@@ -99,13 +133,25 @@ subtest 'Get Contacts For Domain Missing Contact' => sub {
         });
     } 'Lives through domain registration';
 
-    note('Sleeping to allow eNom time to create the account');
-    sleep 5;
+    if( !$ENV{USE_MOCK} ) {
+        note('Sleeping to allow eNom time to create the account');
+        sleep 5;
+    }
+
+    mock_get_contacts(
+        mocked_api         => $mocked_api,
+        registrant_contact => $contact,
+        admin_contact      => $contact,
+        technical_contact  => $contact,
+        billing_contact    => $contact,
+    );
 
     my $retrieved_contacts;
     lives_ok {
         $retrieved_contacts = $api->get_contacts_by_domain_name( $domain_request->name );
     } 'Lives through retrieving contacts';
+
+    $mocked_api->unmock_all();
 
     delete $retrieved_contacts->{is_pending_irtp};
     for my $contact_type (keys %{ $retrieved_contacts } ) {
@@ -140,6 +186,11 @@ subtest 'Get Contacts For Domain With No Manually Specific Contacts (Reseller On
         }
     }
 
+    my $mocked_api = mock_response(
+        method   => 'Purchase',
+        response => { }
+    );
+
     my $domain_response;
     lives_ok {
         $domain_response = $api->submit({
@@ -148,8 +199,18 @@ subtest 'Get Contacts For Domain With No Manually Specific Contacts (Reseller On
         });
     } 'Lives through domain registration';
 
-    note('Sleeping to allow eNom time to create the account');
-    sleep 5;
+    if( !$ENV{USE_MOCK} ) {
+        note('Sleeping to allow eNom time to create the account');
+        sleep 5;
+    }
+
+    mock_get_contacts(
+        mocked_api         => $mocked_api,
+        registrant_contact => $contact,
+        admin_contact      => $contact,
+        technical_contact  => $contact,
+        billing_contact    => $contact,
+    );
 
     my $retrieved_contacts;
     lives_ok {

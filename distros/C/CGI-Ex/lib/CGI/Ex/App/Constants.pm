@@ -6,13 +6,15 @@ CGI::Ex::App::Constants - Easier access to magic App values
 
 =cut
 
-use vars qw(%constants @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
 use strict;
 use warnings;
 use Exporter qw(import); # allow for goto from CGI::Ex::App
-use base qw(Exporter);
 
-$VERSION = '2.47';
+our $VERSION = '2.48';
+our %constants;
+our @EXPORT;
+our @EXPORT_OK;
+our %EXPORT_TAGS;
 
 BEGIN {
 my $all = {
@@ -86,7 +88,7 @@ my $all = {
     App__validate_when_data__use_ready_validate   => 0,
 };
 
-no strict 'refs';
+require constant;
 while (my ($method, $val) = each %$all) {
     my ($prefix, $tag, $name) = split /__/, $method;
     if (! $name) {
@@ -103,7 +105,7 @@ while (my ($method, $val) = each %$all) {
 
     $val =~ s/\s+-.*//;
     $val *= 1 if $val =~ /^\d+$/;
-    *{__PACKAGE__."::$method"} = sub () { $val };
+    import constant $method => $val;
 }
 
 }; # end of BEGIN

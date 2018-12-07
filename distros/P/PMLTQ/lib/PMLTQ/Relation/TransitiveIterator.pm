@@ -1,6 +1,6 @@
 package PMLTQ::Relation::TransitiveIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::TransitiveIterator::VERSION = '1.4.0';
+$PMLTQ::Relation::TransitiveIterator::VERSION = '1.5.0';
 # ABSTRACT: Iterates over nodes that are transitive
 
 use 5.006;
@@ -139,7 +139,7 @@ PMLTQ::Relation::TransitiveIterator - Iterates over nodes that are transitive
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 AUTHORS
 

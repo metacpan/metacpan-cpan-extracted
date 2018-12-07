@@ -1,3 +1,7 @@
+2.48
+    2018-12-06
+        * Fix app constants on modern perls.
+
 2.47
     2018-08-16
         * Replace mechanism for setting cookies via meta tags with JavaScript equivalent (thanks to Garth Hill, Dillan Hildebrand, Alfredo Cabrera, Matt Swensen)

@@ -35,14 +35,14 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Monkey::Patch::Action" => "0.060",
-    "Perinci::Examples" => "0.79",
+    "Perinci::Examples" => "0.811",
     "Perinci::Sub::Normalize" => "0.19",
     "Sah::SchemaR::negint" => 0,
     "Sah::SchemaR::posint" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.931",
+  "VERSION" => "0.932",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %FallbackPrereqs = (
   "Log::ger" => "0.023",
   "Module::Installed::Tiny" => 0,
   "Monkey::Patch::Action" => "0.060",
-  "Perinci::Examples" => "0.79",
+  "Perinci::Examples" => "0.811",
   "Perinci::Sub::GetArgs::Argv" => "0.83",
   "Perinci::Sub::Normalize" => "0.19",
   "Perinci::Sub::Util" => "0.46",

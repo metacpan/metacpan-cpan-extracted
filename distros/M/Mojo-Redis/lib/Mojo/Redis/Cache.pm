@@ -3,8 +3,8 @@ use Mojo::Base -base;
 
 use Mojo::JSON;
 use Protocol::Redis;
-use Scalar::Util 'blessed';
-use Storable ();
+use Storable    ();
+use Time::HiRes ();
 
 use constant OFFLINE => $ENV{MOJO_REDIS_CACHE_OFFLINE};
 
@@ -25,11 +25,13 @@ sub compute_p {
   my $self    = shift;
   my $key     = join ':', $self->namespace, shift;
   my $expire  = shift || $self->default_expire;
-  my $conn    = $self->connection;
 
-  # Data is stored as a serialized array-ref in Redis, so no need to check for defined
-  return ($self->{refresh} ? Mojo::Promise->new->resolve : $conn->write_p(GET => $key))->then(sub {
-    return $_[0] ? $self->deserialize->($_[0])->[0] : $self->_compute_p($conn, $key, $expire, $compute);
+  my $p = $self->refresh ? Mojo::Promise->new->resolve : $self->connection->write_p(GET => $key);
+  return $p->then(sub {
+    my $data = $_[0] ? $self->deserialize->(shift) : undef;
+    return $self->_maybe_compute_p($key, $expire, $compute, $data) if $expire < 0;
+    return $self->_compute_p($key, $expire, $compute) unless $data;
+    return $data->[0];
   });
 }
 
@@ -37,26 +39,48 @@ sub memoize_p {
   my ($self, $obj, $method) = (shift, shift, shift);
   my $args = ref $_[0] eq 'ARRAY' ? shift : [];
   my $expire = shift || $self->default_expire;
-  my $key = join ':', $self->namespace, '@M' => (ref($obj) || $obj), $method, Mojo::JSON::encode_json($args);
-  my $conn = $self->connection;
+  my $key = join ':', '@M' => (ref($obj) || $obj), $method, Mojo::JSON::encode_json($args);
 
-  return ($self->{refresh} ? Mojo::Promise->new->resolve : $conn->write_p(GET => $key))->then(sub {
-    return $_[0]
-      ? $self->deserialize->($_[0])->[0]
-      : $self->_compute_p($conn, $key, $expire, sub { $obj->$method(@$args) });
-  });
+  return $self->compute_p($key, $expire, sub { $obj->$method(@$args) });
 }
 
 sub _compute_p {
-  my ($self, $conn, $key, $expire, $compute) = @_;
+  my ($self, $key, $expire, $compute) = @_;
 
   my $set = sub {
-    my $res = shift;
-    $conn->write_p(SET => $key => $self->serialize->([$res]), PX => 1000 * $expire)->then(sub {$res});
+    my $data = shift;
+    my @set
+      = $expire < 0
+      ? $self->serialize->([$data, _time() + -$expire])
+      : ($self->serialize->([$data]), PX => 1000 * $expire);
+    $self->connection->write_p(SET => $key => @set)->then(sub {$data});
   };
 
-  my $res = $compute->();
-  return blessed $res ? $res->then(sub { $set->(@_) }) : $set->($res);
+  my $data = $compute->();
+  return UNIVERSAL::can($data, 'then') ? $data->then(sub { $set->(@_) }) : $set->($data);
+}
+
+sub _maybe_compute_p {
+  my ($self, $key, $expire, $compute, $data) = @_;
+
+  # Nothing in cache
+  return $self->_compute_p($key => $expire, $compute)->then(sub { ($_[0], {computed => 1}) }) unless $data;
+
+  # No need to refresh cache
+  return ($data->[0], {expired => 0}) if $data->[1] and _time() < $data->[1];
+
+  # Try to refresh, but use old data on error
+  my $p = Mojo::Promise->new;
+  eval {
+    $self->_compute_p($key => $expire, $compute)->then(
+      sub { $p->resolve(shift,      {computed => 1,     expired => 1}) },
+      sub { $p->resolve($data->[0], {error    => $_[0], expired => 1}) },
+    );
+  } or do {
+    $p->resolve($data->[0], {error => $@, expired => 1});
+  };
+
+  return $p;
 }
 
 sub _offline_connection {
@@ -69,24 +93,24 @@ sub write_p {
   my ($conn, $op, $key) = (shift, shift, shift);
 
   if ($op eq 'SET') {
-    $STORE->{$conn->url}{$key} = [$_[0], defined $_[2] ? $_[2] + _time() * 1000 : undef];
+    $STORE->{$conn->url}{$key} = [$_[0], defined $_[2] ? $_[2] + Mojo::Redis::Cache::_time() * 1000 : undef];
     return Mojo::Promise->new->resolve('OK');
   }
   else {
     my $val     = $STORE->{$conn->url}{$key} || [];
-    my $expired = $val->[1] && $val->[1] < _time() * 1000;
+    my $expired = $val->[1] && $val->[1] < Mojo::Redis::Cache::_time() * 1000;
     delete $STORE->{$conn->url}{$key} if $expired;
     return Mojo::Promise->new->resolve($expired ? undef : $val->[0]);
   }
 }
-
-sub _time { time }
 
 'Mojo::Redis::Connection::Offline';
 HERE
   my $redis = shift->redis;
   return $c->new(protocol => $redis->protocol_class->new(api => 1), url => $redis->url);
 }
+
+sub _time { Time::HiRes::time() }
 
 1;
 
@@ -216,9 +240,41 @@ still present in Redis, but instead the cached value will be passed on to
 L<Mojo::Promise/then>.
 
 C<$key> will be prefixed by L</namespace> resulting in "namespace:some-key".
+
 C<$expire> is the number of seconds before the cache should expire, and will
 default to L</default_expire> unless passed in. The last argument is a
 callback used to calculate cached value.
+
+C<$expire> can also be a negative number. This will result in serving old cache
+in the case where the C<$compute_function> fails. An example usecase would be
+if you are fetching Twitter updates for your website, but instead of throwing
+an exception if Twitter is down, you will serve old data instead. Note that the
+fulfilled promise will get two variables passed in:
+
+  $promise->then(sub { my ($data, $info) = @_ });
+
+C<$info> is a hash and can have these keys:
+
+=over 2
+
+=item * computed
+
+Will be true if the C<$compute_function> was called successfully and C<$data>
+is fresh.
+
+=item * expired
+
+Will be true if C<$data> is expired. If this key is present and false, it will
+indicate that the C<$data> is within the expiration period. The C<expired> key
+can be found together with both L</computed> and L</error>.
+
+=item * error
+
+Will hold a string if the C<$compute_function> failed.
+
+=back
+
+Negative C<$expire> is currently EXPERIMENTAL, but unlikely to go away.
 
 =head2 memoize_p
 
@@ -236,8 +292,7 @@ the same as:
     sub { return $obj->$method_name(@args) }
   );
 
-C<$expire> is the number of seconds before the cache should expire, and will
-default to L</default_expire> unless passed in.
+See L</compute_p> regarding C<$expire>.
 
 =head1 SEE ALSO
 

@@ -1,5 +1,6 @@
 requires "Const::Fast" => "0";
 requires "List::Util" => "1.33";
+requires "Storable" => "3.06";
 requires "Type::Coercion" => "0";
 requires "Type::Library" => "0";
 requires "Type::Tiny" => "1.002001";

@@ -12,7 +12,7 @@ use Mozilla::PublicSuffix;
 
 requires 'name';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Parse a domain into sld and public_suffix/tld
 
 has 'sld' => (

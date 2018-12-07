@@ -2,6 +2,10 @@
 
 Getopt::EX - Getopt Extender
 
+# VERSION
+
+Version v1.11.0
+
 # DESCRIPTION
 
 [Getopt::EX](https://metacpan.org/pod/Getopt::EX) extends the basic function of [Getopt](https://metacpan.org/pod/Getopt) family to

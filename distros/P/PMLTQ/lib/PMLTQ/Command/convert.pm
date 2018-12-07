@@ -1,6 +1,6 @@
 package PMLTQ::Command::convert;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::convert::VERSION = '1.4.0';
+$PMLTQ::Command::convert::VERSION = '1.5.0';
 # ABSTRACT: Converts PML files to SQL
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -89,7 +89,7 @@ PMLTQ::Command::convert - Converts PML files to SQL
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 

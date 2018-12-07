@@ -13,6 +13,7 @@ use Type::Library
 
 use Const::Fast ();
 use List::Util 1.33 ();
+use Storable 3.06 (); # Regexp support
 use Type::Coercion;
 use Type::Tiny 1.002001;
 use Type::Utils -all;
@@ -24,7 +25,7 @@ use Types::TypeTiny ();
 
 use namespace::autoclean 0.28;
 
-our $VERSION = 'v0.3.5';
+our $VERSION = 'v0.3.6';
 
 
 sub VERSION { # for older Perls
@@ -125,7 +126,7 @@ Types::Const - Types that coerce references to read-only
 
 =head1 VERSION
 
-version v0.3.5
+version v0.3.6
 
 =head1 SYNOPSIS
 

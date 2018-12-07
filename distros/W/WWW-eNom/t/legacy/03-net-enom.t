@@ -31,6 +31,22 @@ subtest 'Use Net::eNom instead of WWW::eNom' => sub {
 
     isa_ok( $api, 'Net::eNom' );
 
+    my $mocked_api = Test::MockModule->new('Net::eNom');
+    if( $ENV{USE_MOCK} ) {
+        $mocked_api->mock( 'Check', sub {
+            my $self = shift;
+
+            note( 'Mocked Net::eNom->Check' );
+
+            return {
+                ErrCount   => 0,
+                DomainName => 'enom.com',
+                RRPCode    => 211,
+                RRPText    => 'Domain not available',
+            };
+        });
+    }
+
     my $response;
     lives_ok {
         $response = $api->Check( Domain => 'enom.com' );

@@ -17,7 +17,7 @@ Readonly my $SUGGESTABLE_TLDS => [ qw( com net tv cc ) ];
 
 requires 'submit';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Domain Availability API Calls
 
 sub check_domain_availability {

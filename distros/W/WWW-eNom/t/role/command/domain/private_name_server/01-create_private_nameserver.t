@@ -9,13 +9,21 @@ use Test::Deep;
 
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
-use Test::WWW::eNom qw( create_api );
-use Test::WWW::eNom::Domain qw( create_domain $UNREGISTERED_DOMAIN $NOT_MY_DOMAIN );
+use Test::WWW::eNom qw( create_api mock_response );
+use Test::WWW::eNom::Domain qw( create_domain mock_update_nameserver mock_domain_retrieval $UNREGISTERED_DOMAIN $NOT_MY_DOMAIN );
 
 use WWW::eNom::PrivateNameServer;
 
 subtest 'Create Private Nameserver On Unregistered Domain' => sub {
     my $api = create_api();
+
+    my $mocked_api = mock_response(
+        method   => 'GetDomainInfo',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Domain name not found' ],
+        }
+    );
 
     throws_ok {
         $api->create_private_nameserver({
@@ -26,10 +34,20 @@ subtest 'Create Private Nameserver On Unregistered Domain' => sub {
             },
         });
     } qr/Domain not found in your account/, 'Throws on unregistered domain';
+
+    $mocked_api->unmock_all;
 };
 
 subtest 'Create Private Nameserver On Domain Registered To Someone Else' => sub {
     my $api = create_api();
+
+    my $mocked_api = mock_response(
+        method   => 'GetDomainInfo',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Domain name not found' ],
+        }
+    );
 
     throws_ok {
         $api->create_private_nameserver({
@@ -40,6 +58,8 @@ subtest 'Create Private Nameserver On Domain Registered To Someone Else' => sub 
             },
         });
     } qr/Domain not found in your account/, 'Throws on not my domain';
+
+    $mocked_api->unmock_all;
 };
 
 subtest 'Create Private Nameserver' => sub {
@@ -52,6 +72,11 @@ subtest 'Create Private Nameserver' => sub {
         ip     => '4.2.2.1',
     );
 
+    my $mocked_api = mock_update_nameserver(
+        domain      => $domain,
+        nameservers => [ @initial_nameservers, $private_nameserver ],
+    );
+
     lives_ok {
         $api->create_private_nameserver({
             domain_name        => $domain->name,
@@ -60,6 +85,8 @@ subtest 'Create Private Nameserver' => sub {
     } 'Lives through registering private nameserver';
 
     my $retrieved_domain = $api->get_domain_by_name( $domain->name );
+
+    $mocked_api->unmock_all;
 
     cmp_bag( $retrieved_domain->ns, [ @initial_nameservers, 'ns1.' . $domain->name ], 'Correct ns' );
 
@@ -82,12 +109,24 @@ subtest 'Create Private Nameserver - Other Private Nameservers In Use' => sub {
         ip     => '4.2.2.2',
     );
 
+    my $mocked_api = mock_update_nameserver(
+        domain      => $domain,
+        nameservers => [ @initial_nameservers, $private_nameserver_ns1 ],
+    );
+
     lives_ok {
         $api->create_private_nameserver({
             domain_name        => $domain->name,
             private_nameserver => $private_nameserver_ns1,
         });
     } 'Lives through registering private nameserver';
+
+    $mocked_api->unmock_all;
+
+    $mocked_api = mock_update_nameserver(
+        domain      => $domain,
+        nameservers => [ @initial_nameservers, $private_nameserver_ns1, $private_nameserver_ns2 ],
+    );
 
     lives_ok {
         $api->create_private_nameserver({
@@ -97,6 +136,8 @@ subtest 'Create Private Nameserver - Other Private Nameservers In Use' => sub {
     } 'Lives through registering private nameserver';
 
     my $retrieved_domain = $api->get_domain_by_name( $domain->name );
+
+    $mocked_api->unmock_all;
 
     cmp_bag( $retrieved_domain->ns,
         [ @initial_nameservers, map { $_->name } ( $private_nameserver_ns1, $private_nameserver_ns2 ) ], 'Correct ns' );
@@ -114,6 +155,11 @@ subtest 'Create Private Nameserver - Duplicate' => sub {
         ip     => '4.2.2.1',
     );
 
+    my $mocked_api = mock_update_nameserver(
+        domain      => $domain,
+        nameservers => [ @{ $domain->ns }, $private_nameserver ],
+    );
+
     lives_ok {
         $api->create_private_nameserver({
             domain_name        => $domain->name,
@@ -121,12 +167,42 @@ subtest 'Create Private Nameserver - Duplicate' => sub {
         });
     } 'Lives through registering private nameserver';
 
+    $mocked_api->unmock_all;
+
+    $mocked_api = mock_domain_retrieval(
+        name        => $domain->name,
+        nameservers => [ @{ $domain->ns }, $private_nameserver->name ],
+    );
+
+    mock_response(
+        mocked_api => $mocked_api,
+        method     => 'RegisterNameServer',
+        response   => {
+            ErrCount => 1,
+            errors   => [ 'This nameserver is already registered.' ],
+        }
+    );
+
+    mock_response(
+        mocked_api => $mocked_api,
+        method     => 'CheckNSStatus',
+        response   => {
+            ErrCount      => 0,
+            CheckNsStatus => {
+                name      => $private_nameserver->name,
+                ipaddress => $private_nameserver->ip,
+            },
+        }
+    );
+
     throws_ok {
         $api->create_private_nameserver({
             domain_name        => $domain->name,
             private_nameserver => $private_nameserver,
         });
     } qr/Private nameserver already registered/, 'Throws on duplicate';
+
+    $mocked_api->unmock_all;
 };
 
 done_testing;

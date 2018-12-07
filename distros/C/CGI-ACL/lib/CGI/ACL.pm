@@ -1,7 +1,7 @@
 package CGI::ACL;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2017, Nigel Horne
+# Copyright (C) 2018, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -9,6 +9,8 @@ package CGI::ACL;
 # All other users (including Commercial, Charity, Educational, Government)
 #	must apply in writing for a licence for use from Nigel Horne at the
 #	above e-mail.
+
+# TODO:  Add deny_all_countries() and allow_country() methods, so that we can easily block all but a few countries.
 
 use 5.006_001;
 use warnings;
@@ -23,22 +25,22 @@ CGI::ACL - Decide whether to allow a client to run this script
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
 Does what it says on the tin.
 
-    use CGI::Info;
+    use CGI::Lingua;
     use CGI::ACL;
 
     my $acl = CGI::ACL->new();
     # ...
-    my $denied = $acl->all_denied(info => CGI::Info->new());
+    my $denied = $acl->all_denied(info => CGI::Lingua->new());
 
 =head1 SUBROUTINES/METHODS
 
@@ -53,8 +55,6 @@ sub new {
 	my $class = ref($proto) || $proto;
 
 	return unless(defined($class));
-
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	return bless { }, $class;
 }
@@ -73,19 +73,21 @@ Give an IP (or CIDR) that we allow to connect to us
 sub allow_ip {
 	my $self = shift;
 	my %params;
-	
+
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::carp('Usage: allow_ip($ip_address)');
 	} elsif(@_ % 2 == 0) {
 		%params = @_;
 	} else {
 		$params{'ip'} = shift;
 	}
 
-	if(!defined($params{'ip'})) {
-		Carp::carp 'Usage: allow_ip($ip_address)';
-	} else {
+	if(defined($params{'ip'})) {
 		$self->{_allowed_ips}->{$params{'ip'}} = 1;
+	} else {
+		Carp::carp('Usage: allow_ip($ip_address)');
 	}
 	return $self;
 }
@@ -97,27 +99,29 @@ Give a country, or a reference to a list of countries, that we will not allow to
     use CGI::ACL;
 
     # Don't allow the UK to connect to us
-    my $acl = CGI::ACL->new()->deny_country('UK');
+    my $acl = CGI::ACL->new()->deny_country('GB');
+
+    # Don't allow any countries to connect to us (a sort of 'default deny')
+    my $acl = CGI::ACL->new()->deny_country('*');
 
 =cut
 
 sub deny_country {
 	my $self = shift;
 	my %params;
-	
+
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::carp('Usage: deny_country($ip_address)');
 	} elsif(@_ % 2 == 0) {
 		%params = @_;
 	} else {
 		$params{'country'} = shift;
 	}
 
-	if(!defined($params{'country'})) {
-		Carp::carp 'Usage: deny_country($country)';
-	} else {
+	if(defined(my $c = $params{'country'})) {
 		# This shenanegans allows country to be a scalar or list
-		my $c = $params{'country'};
 		if(ref($c) eq 'ARRAY') {
 			foreach my $country(@{$c}) {
 				$self->{_deny_countries}->{lc($country)} = 1;
@@ -125,22 +129,64 @@ sub deny_country {
 		} else {
 			$self->{_deny_countries}->{lc($c)} = 1;
 		}
+	} else {
+		Carp::carp('Usage: deny_country($ip_address)');
+	}
+	return $self;
+}
+
+=head2 allow_country
+
+Give a country, or a reference to a list of countries, that we will allow to access us
+
+    use CGI::ACL;
+
+    # Allow only the UK and US to connect to us
+    my @allow_list = ('GB', 'US');
+    my $acl = CGI::ACL->new()->deny_country->('*')->allow_country(country => \@allow_list);
+
+=cut
+
+sub allow_country {
+	my $self = shift;
+	my %params;
+
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::carp('Usage: allow_country($country)');
+	} elsif(@_ % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'country'} = shift;
+	}
+
+	if(defined(my $c = $params{'country'})) {
+		# This shenanegans allows country to be a scalar or list
+		if(ref($c) eq 'ARRAY') {
+			foreach my $country(@{$c}) {
+				$self->{_allow_countries}->{lc($country)} = 1;
+			}
+		} else {
+			$self->{_allow_countries}->{lc($c)} = 1;
+		}
+	} else {
+		Carp::carp('Usage: allow_country($country)');
 	}
 	return $self;
 }
 
 =head2 all_denied
 
-If any of the restrictions return false, return false, which should allow access
+If any of the restrictions return false then return false, which should allow access
 
-    use CGI::Info;
     use CGI::Lingua;
     use CGI::ACL;
 
     # Allow Google to connect to us
     my $acl = CGI::ACL->new()->allow_ip(ip => '8.35.80.39');
 
-    if($acl->all_denied(info => CGI::Info->new())) {
+    if($acl->all_denied()) {
     	print 'You are not allowed to view this site';
 	return;
     }
@@ -177,23 +223,28 @@ sub all_denied {
 		}
 	}
 
-	my %params;
-	
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif(@_ % 2 == 0) {
-		%params = @_;
-	} else {
-		$params{'info'} = shift;
-	}
+	if($self->{_deny_countries} || $self->{_allow_countries}) {
+		my %params;
 
-	if((!defined($params{'info'})) && !defined($params{'lingua'})) {
-		Carp::carp 'Usage: all_denied($info/$lingua)';
-		return 1;
-	}
+		if(ref($_[0]) eq 'HASH') {
+			%params = %{$_[0]};
+		} elsif(@_ % 2 == 0) {
+			%params = @_;
+		} else {
+			$params{'lingua'} = shift;
+		}
 
-	if(my $lingua = $params{'lingua'}) {
-		return $self->{_deny_countries}->{$lingua->country()};
+		if(!defined($params{'lingua'})) {
+			Carp::carp 'Usage: all_denied($$lingua)';
+			return 1;
+		}
+
+		if(my $lingua = $params{'lingua'}) {
+			if($self->{_deny_countries}->{'*'}) {
+				return !$self->{_allow_countries}->{$lingua->country()};
+			}
+			return $self->{_deny_countries}->{$lingua->country()};
+		}
 	}
 
 	return 1;
@@ -213,7 +264,7 @@ automatically be notified of progress on your bug as I make changes.
 
 =head1 SEE ALSO
 
-L<CGI::Info>
+L<CGI::Lingua>
 
 =head1 SUPPORT
 
@@ -229,10 +280,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-ACL>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-ACL>
@@ -245,9 +292,9 @@ L<http://search.cpan.org/dist/CGI-ACL/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017,2018 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

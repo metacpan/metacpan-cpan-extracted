@@ -8,7 +8,7 @@ use Data::Validate::Domain qw( is_domain );
 use Data::Validate::Email qw( is_email );
 use URI;
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: WWW::eNom Moose Type Library
 
 use MooseX::Types -declare => [qw(
@@ -28,6 +28,7 @@ use MooseX::Types -declare => [qw(
     IPv6s
 
     ContactType
+    RawContactType
     DateTime
     DomainName
     DomainNames
@@ -66,9 +67,10 @@ subtype Int,      as MooseInt;
 subtype Str,      as MooseStr;
 subtype Strs,     as ArrayRef[Str];
 
-enum ContactType,   [qw( Registrant Tech Admin AuxBilling )];
-enum NexusCategory, [qw( C11 C12 C21 C31 C32 )];
-enum NexusPurpose,  [qw( P1 P2 P3 P4 P5 )];
+enum ContactType,    [qw( Billing Registrant Tech Admin AuxBilling )];
+enum RawContactType, [qw( Billing Registrant Tech Admin Technical Administrative AuxBilling )];
+enum NexusCategory,  [qw( C11 C12 C21 C31 C32 )];
+enum NexusPurpose,   [qw( P1 P2 P3 P4 P5 )];
 
 subtype DomainName, as Str,
     where { is_domain( $_ ) },

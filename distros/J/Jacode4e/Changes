@@ -1,5 +1,11 @@
 Revision history for this software.
 
+2.13.6.9 2018/12/07 00:00:00
+  - remove jacode4e.pl
+  - support UNISYS LetsJ encoding
+  - add some tests
+  - created by INABA Hitoshi
+
 2.13.6.8 2018/12/01 00:00:00
   - makes die if __DATA__ has duplicate definitions
   - allow comment line in __DATA__

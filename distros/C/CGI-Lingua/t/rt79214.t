@@ -37,6 +37,6 @@ RT79214: {
 		TODO: {
 			local $TODO = 'https://rt.cpan.org/Public/Bug/Display.html?id=79214';
 			ok(!defined($l->code_alpha2()));
-		};
+		}
 	}
 }

@@ -23,6 +23,7 @@ BEGIN {
         ["\x9C\x5A\x9C\x5A",'jef9p',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xD7\xBB"        ],
         ["\x9C\x5A\x9C\x5A",'jipsj',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\x57\x3B"        ],
         ["\x9C\x5A\x9C\x5A",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE6\x5E"        ],
+        ["\x9C\x5A\x9C\x5A",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xD7\xBB"        ],
         ["\x9C\x5A\x9C\x5A",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE5\xBD\x81"    ],
         ["\x9C\x5A\x9C\x5A",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xF3\xB4\x83\xBE"],
     );

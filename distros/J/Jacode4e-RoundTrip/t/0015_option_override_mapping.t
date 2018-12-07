@@ -23,6 +23,7 @@ BEGIN {
         ["\x81\x5D",'jef9p',   'cp932x',{'INPUT_LAYOUT'=>'D',                    'OVERRIDE_MAPPING'=>{"\x81\x5D"=>"\xA1\xDD"        }},"\xA1\xDD"        ],
         ["\x81\x5D",'jipsj',   'cp932x',{'INPUT_LAYOUT'=>'D',                    'OVERRIDE_MAPPING'=>{"\x81\x5D"=>"\x21\x5D"        }},"\x21\x5D"        ],
         ["\x81\x5D",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D',                    'OVERRIDE_MAPPING'=>{"\x81\x5D"=>"\x4F\x5A"        }},"\x4F\x5A"        ],
+        ["\x81\x5D",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D',                    'OVERRIDE_MAPPING'=>{"\x81\x5D"=>"\xA1\xDD"        }},"\xA1\xDD"        ],
         ["\x81\x5D",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D',                    'OVERRIDE_MAPPING'=>{"\x81\x5D"=>"\xEF\xBC\x8D"    }},"\xEF\xBC\x8D"    ],
         ["\x81\x5D",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D',                    'OVERRIDE_MAPPING'=>{"\x81\x5D"=>"\xF3\xB0\x84\xBC"}},"\xF3\xB0\x84\xBC"],
 
@@ -37,6 +38,7 @@ BEGIN {
         ["\x81\x40",'jef9p',   'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x40\x40",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\xA1\xDD"        }},"\xA1\xDD"        ],
         ["\x81\x40",'jipsj',   'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\x21\x5D"        }},"\x21\x5D"        ],
         ["\x81\x40",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x40\x40",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\x4F\x5A"        }},"\x4F\x5A"        ],
+        ["\x81\x40",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\xA1\xA1",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\xA1\xDD"        }},"\xA1\xDD"        ],
         ["\x81\x40",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\xEF\xBC\x8D"    }},"\xEF\xBC\x8D"    ],
         ["\x81\x40",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20",'OVERRIDE_MAPPING'=>{"\x81\x40"=>"\xF3\xB0\x84\xBC"}},"\xF3\xB0\x84\xBC"],
     );

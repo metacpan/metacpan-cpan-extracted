@@ -1,7 +1,7 @@
 package DBIx::TSV;
 
-our $DATE = '2018-07-02'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ DBIx::TSV - Generate TSV from SQL query result
 
 =head1 VERSION
 
-This document describes version 0.002 of DBIx::TSV (from Perl distribution DBIx-TSV), released on 2018-07-02.
+This document describes version 0.003 of DBIx::TSV (from Perl distribution DBIx-TSV), released on 2018-12-07.
 
 =head1 SYNOPSIS
 

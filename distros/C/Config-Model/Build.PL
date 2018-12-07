@@ -80,7 +80,9 @@ my $build = $class->new(
     'Test::More' => '0',
     'Test::Warn' => '0.11',
     'YAML' => '0',
-    'YAML::Tiny' => '0'
+    'YAML::Tiny' => '0',
+    'boolean' => '0',
+    'lib' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'
@@ -123,8 +125,15 @@ my $build = $class->new(
     'Storable' => '0',
     'Text::Levenshtein::Damerau' => '0',
     'Text::Wrap' => '0',
+    'base' => '0',
+    'open' => '0',
+    'overload' => '0',
     'parent' => '0',
-    'perl' => '5.010'
+    'perl' => 'v5.12.0',
+    'strict' => '0',
+    'utf8' => '0',
+    'vars' => '0',
+    'warnings' => '0'
   },
 
     # cleanup required by t/auto_read.t

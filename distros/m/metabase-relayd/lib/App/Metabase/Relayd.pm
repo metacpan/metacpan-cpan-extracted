@@ -1,5 +1,5 @@
 package App::Metabase::Relayd;
-$App::Metabase::Relayd::VERSION = '0.40';
+$App::Metabase::Relayd::VERSION = '0.42';
 #ABSTRACT: the guts of the metabase-relayd command
 
 use strict;
@@ -165,7 +165,7 @@ App::Metabase::Relayd - the guts of the metabase-relayd command
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -186,7 +186,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

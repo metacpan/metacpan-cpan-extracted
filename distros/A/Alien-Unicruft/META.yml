@@ -1,0 +1,29 @@
+---
+abstract: 'install the libunicruft C library on your system'
+author:
+  - 'Bryan Jurish <moocow@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Text::ParseWords: '0'
+configure_requires:
+  Alien::Base::ModuleBuild: '0.027'
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Unicruft
+provides:
+  Alien::Unicruft:
+    file: lib/Alien/Unicruft.pm
+    version: '0.001'
+requires:
+  Alien::Base: '0.005'
+  File::ShareDir: '1.00'
+  perl: v5.8.9
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -11,7 +11,7 @@ use WWW::eNom::Types qw( Bool Contact DomainName DomainNames Int NexusCategory N
 
 use Carp;
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Domain Registration Request
 
 has 'name' => (

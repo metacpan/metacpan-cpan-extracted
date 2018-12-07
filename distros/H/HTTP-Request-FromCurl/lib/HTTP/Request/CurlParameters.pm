@@ -13,7 +13,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -194,9 +194,10 @@ sub _pairlist( $self, $l, $prefix = "    " ) {
         pairmap { my $v = ref $b ? $$b : qq{'$b'}; qq{$prefix'$a' => $v} } @$l
 }
 
-sub _build_headers( $self, $prefix = "    " ) {
+sub _build_headers( $self, $prefix = "    ", %options ) {
     # This is so we create the standard header order in our output
     my $h = HTTP::Headers->new( %{ $self->headers });
+    $h->remove_header( @{$options{implicit_headers}} );
     $self->_pairlist([ $h->flatten ], $prefix);
 }
 
@@ -210,10 +211,23 @@ L<HTTP::Request> object and to perform the request using L<WWW::Mechanize>.
 This is mostly intended as a convenience function for creating Perl demo
 snippets from C<curl> examples.
 
+=head3 Options
+
+=over 4
+
+=item B<implicit_headers>
+
+Arrayref of headers that will not be output.
+
+Convenient values are ['Content-Length']
+
+=back
+
 =cut
 
 sub as_snippet( $self, %options ) {
     $options{ prefix } ||= '';
+    $options{ implicit_headers } ||= [];
 
     my @preamble;
     push @preamble, @{ $options{ preamble } } if $options{ preamble };
@@ -251,7 +265,7 @@ sub as_snippet( $self, %options ) {
     my \$r = HTTP::Request->new(
         '@{[$self->method]}' => '@{[$self->uri]}',
         [
-@{[$self->_build_headers('            ')]},
+@{[$self->_build_headers('            ', %options)]},
         ],
         @{[$self->_build_body()]}
     );

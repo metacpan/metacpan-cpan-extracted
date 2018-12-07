@@ -1,5 +1,5 @@
 package App::Metabase::Relayd::Plugin;
-$App::Metabase::Relayd::Plugin::VERSION = '0.40';
+$App::Metabase::Relayd::Plugin::VERSION = '0.42';
 #ABSTRACT: metabase-relayd plugins
 
 use strict;
@@ -19,7 +19,7 @@ App::Metabase::Relayd::Plugin - metabase-relayd plugins
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 DESCRIPTION
 
@@ -82,7 +82,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2018 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

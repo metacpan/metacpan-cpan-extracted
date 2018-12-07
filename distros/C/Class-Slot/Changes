@@ -1,3 +1,6 @@
+0.06    2018-12-07
+-bugfix: do not call SUPER::new if no parent class can('new')
+
 0.05    2018-07-23
 -bugfix: package names correctly escaped when used as hash key
 

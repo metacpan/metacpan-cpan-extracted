@@ -13,6 +13,8 @@ pod_spelling_system:
     - cmd
     - tc
     - PowerShell
+    - powershell
+    - pwsh
     - prereqs
     - FreeBSD
     - ps

@@ -1,7 +1,7 @@
 package Perinci::Examples::Tiny::Args;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.810'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.811'; # VERSION
 
 our %SPEC;
 
@@ -131,7 +131,7 @@ Perinci::Examples::Tiny::Args - Tests related to function arguments
 
 =head1 VERSION
 
-This document describes version 0.810 of Perinci::Examples::Tiny::Args (from Perl distribution Perinci-Examples), released on 2018-11-29.
+This document describes version 0.811 of Perinci::Examples::Tiny::Args (from Perl distribution Perinci-Examples), released on 2018-12-07.
 
 =head1 DESCRIPTION
 

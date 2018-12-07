@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.129';
+$Config::Model::BackendMgr::VERSION = '2.130';
 use Mouse;
 use strict;
 use warnings;
@@ -500,7 +500,7 @@ sub is_auto_write_for_type {
 __PACKAGE__->meta->make_immutable;
 
 package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.129';
+$Config::Model::DeprecatedHandle::VERSION = '2.130';
 our $AUTOLOAD;
 
 sub new {
@@ -543,7 +543,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.129
+version 2.130
 
 =head1 SYNOPSIS
 

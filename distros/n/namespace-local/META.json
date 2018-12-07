@@ -50,6 +50,6 @@
          "web" : "https://github.com/dallaylaen/namespace-local-perl"
       }
    },
-   "version" : "0.0401",
+   "version" : "0.0402",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

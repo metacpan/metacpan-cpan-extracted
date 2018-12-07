@@ -1,6 +1,6 @@
 package PMLTQ::Commands;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Commands::VERSION = '1.4.0';
+$PMLTQ::Commands::VERSION = '1.5.0';
 # ABSTRACT: PMLTQ command line interface
 
 use PMLTQ::Base -strict;
@@ -173,7 +173,7 @@ PMLTQ::Commands - PMLTQ command line interface
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 

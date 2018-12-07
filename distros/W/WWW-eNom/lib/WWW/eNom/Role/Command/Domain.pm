@@ -18,7 +18,7 @@ use Carp;
 
 requires 'submit', 'get_contacts_by_domain_name', 'delete_private_nameserver';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Domain Related Operations
 
 sub get_domain_by_name {
@@ -81,7 +81,7 @@ sub get_is_domain_locked_by_name {
         });
 
         if( $response->{ErrCount} > 0 ) {
-            if( $response->{RRPText} =~ m/Command blocked/ ) {
+            if( $response->{RRPText} =~ m/Command blocked/ || $response->{RRPText} =~ m/Authorization error/ ) {
                 croak 'Domain owned by someone else';
             }
 

@@ -2,8 +2,8 @@ NAME
     DBIx::TSV - Generate TSV from SQL query result
 
 VERSION
-    This document describes version 0.002 of DBIx::TSV (from Perl
-    distribution DBIx-TSV), released on 2018-07-02.
+    This document describes version 0.003 of DBIx::TSV (from Perl
+    distribution DBIx-TSV), released on 2018-12-07.
 
 SYNOPSIS
      use DBI;

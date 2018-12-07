@@ -11,7 +11,7 @@ Yancy::Help::Config - How to configure Yancy
 
 =head1 VERSION
 
-version 1.015
+version 1.016
 
 =head1 SYNOPSIS
 
@@ -360,6 +360,15 @@ fields from the row with C<{field}>, like so:
             { title => "Person", template => '{name} <{email}>' },
         ],
     },
+
+=item x-filter
+
+This key is an array of filter names to run when setting or creating an
+item. Filters can allow for hashing passwords, for example.  Filters are
+added by plugins or during configuration of
+L<Mojolicious::Plugin::Yancy>. See
+L<Mojolicious::Plugin::Yancy/yancy.filter.add> for how to create
+a filter in your app.
 
 =item x-view-url
 

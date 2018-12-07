@@ -9,18 +9,18 @@ Decide whether to allow a client to run this script
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
 Does what it says on the tin.
 
-    use CGI::Info;
+    use CGI::Lingua;
     use CGI::ACL;
 
     my $acl = CGI::ACL->new();
     # ...
-    my $denied = $acl->all_denied(info => CGI::Info->new());
+    my $denied = $acl->all_denied(info => CGI::Lingua->new());
 
 # SUBROUTINES/METHODS
 
@@ -44,20 +44,32 @@ Give a country, or a reference to a list of countries, that we will not allow to
     use CGI::ACL;
 
     # Don't allow the UK to connect to us
-    my $acl = CGI::ACL->new()->deny_country('UK');
+    my $acl = CGI::ACL->new()->deny_country('GB');
+
+    # Don't allow any countries to connect to us (a sort of 'default deny')
+    my $acl = CGI::ACL->new()->deny_country('*');
+
+## allow\_country
+
+Give a country, or a reference to a list of countries, that we will allow to access us
+
+    use CGI::ACL;
+
+    # Allow only the UK and US to connect to us
+    my @allow_list = ('GB', 'US');
+    my $acl = CGI::ACL->new()->deny_country->('*')->allow_country(country => \@allow_list);
 
 ## all\_denied
 
-If any of the restrictions return false, return false, which should allow access
+If any of the restrictions return false then return false, which should allow access
 
-    use CGI::Info;
     use CGI::Lingua;
     use CGI::ACL;
 
     # Allow Google to connect to us
     my $acl = CGI::ACL->new()->allow_ip(ip => '8.35.80.39');
 
-    if($acl->all_denied(info => CGI::Info->new())) {
+    if($acl->all_denied()) {
         print 'You are not allowed to view this site';
         return;
     }
@@ -83,7 +95,7 @@ automatically be notified of progress on your bug as I make changes.
 
 # SEE ALSO
 
-[CGI::Info](https://metacpan.org/pod/CGI::Info)
+[CGI::Lingua](https://metacpan.org/pod/CGI::Lingua)
 
 # SUPPORT
 
@@ -97,10 +109,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-ACL)
 
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/CGI-ACL](http://annocpan.org/dist/CGI-ACL)
-
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/CGI-ACL](http://cpanratings.perl.org/d/CGI-ACL)
@@ -111,6 +119,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017,2018 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

@@ -38,6 +38,6 @@ RT69509: {
 
 			ok($l->language() eq 'Unknown');
 			ok(!defined($l->code_alpha2()));
-		};
+		}
 	}
 }

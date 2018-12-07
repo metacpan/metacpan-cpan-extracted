@@ -29,6 +29,7 @@ do { my $x = {
                       'requires' => {
                                       'Const::Fast' => '0',
                                       'List::Util' => '1.33',
+                                      'Storable' => '3.06',
                                       'Type::Coercion' => '0',
                                       'Type::Library' => '0',
                                       'Type::Tiny' => '1.002001',

@@ -1,6 +1,6 @@
 package PMLTQ::Command::version;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::version::VERSION = '1.4.0';
+$PMLTQ::Command::version::VERSION = '1.5.0';
 # ABSTRACT: Print PMLTQ version
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -28,7 +28,7 @@ PMLTQ::Command::version - Print PMLTQ version
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 

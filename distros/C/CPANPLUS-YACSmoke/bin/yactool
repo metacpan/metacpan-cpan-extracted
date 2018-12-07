@@ -57,7 +57,7 @@ yactool - A simple command-line tool for CPANPLUS::YACSmoke
 
 =head1 VERSION
 
-version 1.04
+version 1.06
 
 =head1 SYNOPSIS
 

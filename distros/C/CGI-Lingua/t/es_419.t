@@ -44,5 +44,5 @@ ES_419: {
 			skip 'Tests require Internet access', 1 unless(-e 't/online.enabled');
 			ok(defined($l->sublanguage()));
 		}
-	};
+	}
 }

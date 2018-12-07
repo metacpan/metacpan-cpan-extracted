@@ -1,6 +1,6 @@
 package PMLTQ::Relation::AncestorIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::AncestorIterator::VERSION = '1.4.0';
+$PMLTQ::Relation::AncestorIterator::VERSION = '1.5.0';
 # ABSTRACT: Iterates over ancestor nodes
 
 use 5.006;
@@ -53,7 +53,7 @@ PMLTQ::Relation::AncestorIterator - Iterates over ancestor nodes
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 AUTHORS
 

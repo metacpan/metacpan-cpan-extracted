@@ -113,6 +113,7 @@ doc/mk_rail.sh
 doc/mk_rails.xsh
 doc/new_equality_test.png
 doc/pmltq_doc.xml
+doc/pmltq_tutorial_web_client.html
 doc/pmltq_tutorial_web_client.xml
 doc/print.xsl
 doc/rail_attributePath.png
@@ -147,14 +148,21 @@ doc/tutorial_queries_2.png
 doc/tutorial_queries_2b.pdf
 doc/tutorial_queries_2b.png
 doc/tutorial_queries_2c.png
+doc/www/Discourse_101_Book_Chapter_8.pdf
+doc/www/Onambele_Converting.pdf
 doc/www/blue.css
 doc/www/index.html
 doc/www/main.css
+doc/www/pml-tq_mwe_2015.pdf
+doc/www/pmltq-0.7.10.tar.gz
 doc/www/pmltq.png
 doc/www/pmltq_opera.png
 doc/www/pmltq_opera_small.png
+doc/www/pmltq_seminar_2009.pdf
 doc/www/pmltq_tred.png
 doc/www/pmltq_tred_small.png
+doc/www/web_client.png
+doc/www/web_client_small.png
 lib/PMLTQ.pm
 lib/PMLTQ/Base.pm
 lib/PMLTQ/BtredEvaluator.pm
@@ -250,6 +258,7 @@ xt/author/lib/TredMacro.pm
 xt/author/lib/bootstrap.pl
 xt/author/lib/test_commands.pl
 xt/author/pml2base.t
+xt/author/queries/pdt_test/_a-node-under-t-root.tq
 xt/author/queries/pdt_test/_filter-complex-multiple.tq
 xt/author/queries/pdt_test/_filter-complex-quote-set.tq
 xt/author/queries/pdt_test/_user-defined-a-node-echild.tq
@@ -282,6 +291,7 @@ xt/author/queries/treex_test/simple-a-node.tq
 xt/author/queries/treex_test/simple-t-node.tq
 xt/author/queries/treex_test/user-defined-a-node-eparent.tq
 xt/author/queries/treex_test/user-defined-t-node-eparent.tq
+xt/author/results/pdt_test/a-node-under-t-root.res
 xt/author/results/pdt_test/bug-two-succesive-filters.res
 xt/author/results/pdt_test/complex-a-non-projective.res
 xt/author/results/pdt_test/condition-complex.res

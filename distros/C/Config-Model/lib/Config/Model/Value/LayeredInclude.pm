@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value::LayeredInclude;
-$Config::Model::Value::LayeredInclude::VERSION = '2.129';
+$Config::Model::Value::LayeredInclude::VERSION = '2.130';
 use 5.010;
 use strict;
 use warnings;
@@ -107,7 +107,7 @@ Config::Model::Value::LayeredInclude - Include a sub layer configuration
 
 =head1 VERSION
 
-version 2.129
+version 2.130
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -67,6 +67,30 @@ will be returned.
         read_files => 1,
     );
 
+=head3 Options
+
+=over 4
+
+=item B<argv>
+
+An arrayref of commands as could be given in C< @ARGV >.
+
+=item B<command>
+
+A scalar in a command line, excluding the C<curl> command
+
+=item B<command_curl>
+
+A scalar in a command line, including the C<curl> command
+
+=item B<read_files>
+
+Do read in the content of files specified with (for example)
+C<< --data=@/etc/passwd >>. The default is to not read the contents of files
+specified this way.
+
+=back
+
 =head2 C<< ->squash_uri( $uri ) >>
 
     my $uri = HTTP::Request::FromCurl->squash_uri(
@@ -103,6 +127,8 @@ The following C<curl> options are recognized but ignored:
 
 =item C< --include >
 
+=item C< --location >
+
 =item C< --progress-bar >
 
 =item C< --silent >
@@ -127,9 +153,10 @@ our @option_spec = (
     'referrer|e=s',
     'form|F=s@',
     'get|G',
+    'head|I',
     'header|H=s@',
     'include|i',         # ignored
-    'head|I',
+    'location|L',        # ignored, we always follow redirects
     'max-time|m=s',
     'keepalive!',
     'request|X=s',

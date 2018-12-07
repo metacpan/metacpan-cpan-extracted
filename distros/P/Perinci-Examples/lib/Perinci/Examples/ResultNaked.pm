@@ -1,7 +1,7 @@
 package Perinci::Examples::ResultNaked;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.810'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.811'; # VERSION
 
 use 5.010001;
 use strict;
@@ -76,7 +76,7 @@ Perinci::Examples::ResultNaked - Demonstrate `result_naked` property
 
 =head1 VERSION
 
-This document describes version 0.810 of Perinci::Examples::ResultNaked (from Perl distribution Perinci-Examples), released on 2018-11-29.
+This document describes version 0.811 of Perinci::Examples::ResultNaked (from Perl distribution Perinci-Examples), released on 2018-12-07.
 
 =head1 DESCRIPTION
 
@@ -108,7 +108,7 @@ Examples:
 
 =item * Without the optional arg3:
 
- result_naked(arg1 => "abc", arg2 => 10); # -> [200, "OK", ["arg1", "abc", "arg2", 10]]
+ result_naked(arg1 => "abc", arg2 => 10); # -> [200, "OK", ["arg2", 10, "arg1", "abc"]]
 
 =item * With the optional arg3:
 
@@ -116,7 +116,7 @@ Examples:
 
 Result:
 
- [200, "OK", ["arg2", 20, "arg3", 0.5, "arg1", "def"]]
+ [200, "OK", ["arg1", "def", "arg3", 0.5, "arg2", 20]]
 
 =back
 
@@ -155,7 +155,7 @@ Examples:
 
 =item * With the optional arg3:
 
- result_not_naked(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg2", 20, "arg3", 0.5, "arg1", "def"]
+ result_not_naked(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg3", 0.5, "arg1", "def", "arg2", 20]
 
 =back
 

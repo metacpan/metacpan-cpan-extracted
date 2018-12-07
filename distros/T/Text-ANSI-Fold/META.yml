@@ -1,7 +1,7 @@
 ---
 abstract: 'Text folding with ANSI sequence and Asian wide characters.'
 author:
-  - =over
+  - '- Kazumasa Utashiro.'
 build_requires:
   Test::More: '0.98'
 configure_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Text::ANSI::Fold:
     file: lib/Text/ANSI/Fold.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Text::VisualWidth::PP: '0.05'
   perl: '5.014'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Fold/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Fold
   repository: git://github.com/kaz-utashiro/Text-ANSI-Fold.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'

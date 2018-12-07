@@ -1,5 +1,5 @@
 package CPANPLUS::Config::YACSmoke;
-$CPANPLUS::Config::YACSmoke::VERSION = '1.04';
+$CPANPLUS::Config::YACSmoke::VERSION = '1.06';
 # Dist::Zilla: +PodWeaver
 #ABSTRACT: Set the environment for YACSmoking
 
@@ -27,7 +27,7 @@ CPANPLUS::Config::YACSmoke - Set the environment for YACSmoking
 
 =head1 VERSION
 
-version 1.04
+version 1.06
 
 =head1 SYNOPSIS
 

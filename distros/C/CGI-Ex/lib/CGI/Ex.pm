@@ -15,17 +15,17 @@ CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 
 use 5.006;
 use strict;
-our ($VERSION,
-     $PREFERRED_CGI_MODULE,
+our $VERSION = '2.48';
+
+our ($PREFERRED_CGI_MODULE,
      $PREFERRED_CGI_REQUIRED,
      $AUTOLOAD,
      $DEBUG_LOCATION_BOUNCE,
      @EXPORT, @EXPORT_OK
      );
-use base qw(Exporter);
+use Exporter qw(import);
 
 BEGIN {
-    $VERSION               = '2.47';
     $PREFERRED_CGI_MODULE  ||= 'CGI';
     @EXPORT = ();
     @EXPORT_OK = qw(get_form

@@ -9,5 +9,6 @@ minil.toml
 t/00_compile.t
 t/01_fold.t
 t/02_oo.t
+t/03_chops.t
 META.yml
 MANIFEST

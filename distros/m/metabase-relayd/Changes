@@ -1,6 +1,16 @@
 ==================================================
-Changes from 2012-04-11 00:00:00 +0000 to present.
+Changes from 2013-12-07 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.42 at 2018-12-06 19:56:41 +0000
+-----------------------------------------
+
+  Change: 3cb48a9270b4c8b539ce70f9452872b515a1a7d9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2018-12-06 19:56:41 +0000
+
+    Add Module::Pluggable to prereqs 
 
 -----------------------------------------
 version 0.40 at 2017-04-10 19:03:34 +0000
@@ -52,16 +62,6 @@ version 0.32 at 2014-03-12 21:19:22 +0000
 
     Added new option nocurl for disabling upstream curl use 
 
------------------------------------------
-version 0.30 at 2013-04-13 16:00:22 +0000
------------------------------------------
-
-  Change: d13dd3476dac540e1ed09ac670702a956d332f2e
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-04-13 17:00:22 +0000
-
-    Added metabase::relayd and added prereq 'unless' 
-
 =================================================
-Plus 14 releases after 2012-04-11 00:00:00 +0000.
+Plus 15 releases after 2013-12-07 00:00:00 +0000.
 =================================================

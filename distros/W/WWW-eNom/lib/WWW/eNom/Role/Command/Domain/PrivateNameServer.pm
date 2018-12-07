@@ -17,7 +17,7 @@ use Carp;
 
 requires 'submit', 'update_nameservers_for_domain_name', 'get_domain_by_name';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Domain Private Nameserver Operations
 
 sub create_private_nameserver {

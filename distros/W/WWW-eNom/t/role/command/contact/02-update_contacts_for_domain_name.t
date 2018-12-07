@@ -9,15 +9,24 @@ use String::Random qw( random_string );
 
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
-use Test::WWW::eNom qw( create_api );
+use Test::WWW::eNom qw( create_api mock_response );
 use Test::WWW::eNom::Contact qw( create_contact );
 use Test::WWW::eNom::Domain qw(
     create_domain retrieve_domain_with_cron_delay
+    mock_domain_retrieval
     $UNREGISTERED_DOMAIN $NOT_MY_DOMAIN
 );
 
 subtest 'Update Contacts for Unregistered Domain' => sub {
     my $api = create_api();
+
+    my $mocked_api = mock_response(
+        method   => 'Contacts',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Domain name ID not found' ]
+        }
+    );
 
     throws_ok {
         $api->update_contacts_for_domain_name(
@@ -28,10 +37,20 @@ subtest 'Update Contacts for Unregistered Domain' => sub {
             billing_contact    => create_contact(),
         );
     } qr/Domain not found in your account/, 'Throws on unregistered domain';
+
+    $mocked_api->unmock_all();
 };
 
 subtest 'Update Contacts for Domain Registered To Someone Else' => sub {
     my $api = create_api();
+
+    my $mocked_api = mock_response(
+        method   => 'Contacts',
+        response => {
+            ErrCount => 1,
+            errors   => [ 'Domain name ID not found' ]
+        }
+    );
 
     throws_ok {
         $api->update_contacts_for_domain_name(
@@ -42,11 +61,30 @@ subtest 'Update Contacts for Domain Registered To Someone Else' => sub {
             billing_contact    => create_contact(),
         );
     } qr/Domain not found in your account/, 'Throws on unregistered domain';
+
+    $mocked_api->unmock_all();
 };
 
 subtest 'Update Contacts - No Changes' => sub {
     my $api    = create_api();
     my $domain = create_domain();
+
+    my $mocked_api = mock_response(
+        method   => 'Contacts',
+        response => {
+            ErrCount => 0,
+            errors   => [ ]
+        }
+    );
+
+    mock_domain_retrieval(
+        mocked_api         => $mocked_api,
+        name               => $domain->name,
+        registrant_contact => $domain->registrant_contact,
+        admin_contact      => $domain->admin_contact,
+        technical_contact  => $domain->technical_contact,
+        billing_contact    => $domain->billing_contact,
+    );
 
     lives_ok {
         $api->update_contacts_for_domain_name(
@@ -58,7 +96,9 @@ subtest 'Update Contacts - No Changes' => sub {
         );
     } 'Lives through updating contact';
 
-    my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+    my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+
+    $mocked_api->unmock_all();
 
     subtest 'Inspect Unchanged Contacts' => sub {
         for my $unchanged_contact_type (qw( registrant_contact admin_contact technical_contact billing_contact )) {
@@ -81,6 +121,24 @@ subtest 'Update Contacts - Change Registrant Contact - With Transfer Lock' => su
             phone_number      => '18005550000',
         });
 
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 1,
+            registrant_contact      => $updated_contact,
+            admin_contact           => $domain->admin_contact,
+            technical_contact       => $domain->technical_contact,
+            billing_contact         => $domain->billing_contact,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name        => $domain->name,
@@ -89,7 +147,9 @@ subtest 'Update Contacts - Change Registrant Contact - With Transfer Lock' => su
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+
+        $mocked_api->unmock_all();
 
         subtest 'Inspect IRTP Detail' => sub {
             if( isa_ok( $retrieved_domain->irtp_detail, 'WWW::eNom::IRTPDetail' ) ) {
@@ -122,6 +182,24 @@ subtest 'Update Contacts - Change Registrant Contact - With Transfer Lock' => su
             phone_number      => '18005550000',
         });
 
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 0,
+            registrant_contact      => $updated_contact,
+            admin_contact           => $domain->admin_contact,
+            technical_contact       => $domain->technical_contact,
+            billing_contact         => $domain->billing_contact,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name        => $domain->name,
@@ -130,7 +208,9 @@ subtest 'Update Contacts - Change Registrant Contact - With Transfer Lock' => su
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+
+        $mocked_api->unmock_all();
 
         ok( !$retrieved_domain->has_irtp_detail, 'Correctly lacks irtp_detail' );
 
@@ -160,6 +240,30 @@ subtest 'Update Contacts - Change Non Registrant Contact' => sub {
             phone_number      => '18005550000',
         });
 
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        my %contacts = (
+            registrant_contact => $domain->registrant_contact,
+            admin_contact      => $domain->admin_contact,
+            technical_contact  => $domain->technical_contact,
+            billing_contact    => $domain->billing_contact,
+        );
+
+        $contacts{ $contact_type } = $updated_contact;
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 0,
+            %contacts,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name   => $domain->name,
@@ -167,7 +271,8 @@ subtest 'Update Contacts - Change Non Registrant Contact' => sub {
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+        $mocked_api->unmock_all();
 
         ok( !$retrieved_domain->has_irtp_detail, 'Correctly lacks rtp_detail' );
 
@@ -183,7 +288,6 @@ subtest 'Update Contacts - Change Non Registrant Contact' => sub {
                     "Correct unchanged $unchanged_contact_type ");
             }
         };
-
     };
 };
 
@@ -209,6 +313,21 @@ subtest 'Update Contacts - Change All Contacts' => sub {
         }),
     };
 
+    my $mocked_api = mock_response(
+        method   => 'Contacts',
+        response => {
+            ErrCount => 0,
+            errors   => [ ]
+        }
+    );
+
+    mock_domain_retrieval(
+        mocked_api              => $mocked_api,
+        name                    => $domain->name,
+        is_pending_verification => 1,
+        %{ $updated_contacts },
+    );
+
     lives_ok {
         $api->update_contacts_for_domain_name(
             domain_name        => $domain->name,
@@ -217,7 +336,9 @@ subtest 'Update Contacts - Change All Contacts' => sub {
         );
     } 'Lives through updating contacts';
 
-    my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+    my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+
+    $mocked_api->unmock_all();
 
     subtest 'Inspect IRTP Detail' => sub {
         if( isa_ok( $retrieved_domain->irtp_detail, 'WWW::eNom::IRTPDetail' ) ) {
@@ -246,6 +367,24 @@ subtest 'Changing Contacts After Changing The Registrant' => sub {
             phone_number      => '18005551111',
         });
 
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 1,
+            registrant_contact      => $updated_contact,
+            admin_contact           => $domain->admin_contact,
+            technical_contact       => $domain->technical_contact,
+            billing_contact         => $domain->billing_contact,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name        => $domain->name,
@@ -254,7 +393,9 @@ subtest 'Changing Contacts After Changing The Registrant' => sub {
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+        $mocked_api->unmock_all();
+
         is_deeply( $retrieved_domain->registrant_contact, $updated_contact, 'Correct registrant contact' );
     };
 
@@ -267,6 +408,24 @@ subtest 'Changing Contacts After Changing The Registrant' => sub {
             phone_number      => '18005552222',
         });
 
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 1,
+            registrant_contact      => $updated_contact,
+            admin_contact           => $domain->admin_contact,
+            technical_contact       => $domain->technical_contact,
+            billing_contact         => $domain->billing_contact,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name        => $domain->name,
@@ -275,7 +434,9 @@ subtest 'Changing Contacts After Changing The Registrant' => sub {
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+        $mocked_api->unmock_all();
+
         is_deeply( $retrieved_domain->registrant_contact, $updated_contact, 'Correct registrant contact' );
     };
 
@@ -288,6 +449,24 @@ subtest 'Changing Contacts After Changing The Registrant' => sub {
             phone_number      => '18005553333',
         });
 
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 1,
+            registrant_contact      => $domain->registrant_contact,
+            admin_contact           => $domain->admin_contact,
+            technical_contact       => $updated_contact,
+            billing_contact         => $domain->billing_contact,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name        => $domain->name,
@@ -296,7 +475,9 @@ subtest 'Changing Contacts After Changing The Registrant' => sub {
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+        $mocked_api->unmock_all();
+
         is_deeply( $retrieved_domain->technical_contact, $updated_contact, 'Correct technical contact' );
     };
 };
@@ -322,6 +503,24 @@ subtest 'Changing Something Other Then Registrant Then Changing the Registrant' 
     });
 
     subtest 'Change Non Registrant Contact' => sub {
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 0,
+            registrant_contact      => $domain->registrant_contact,
+            admin_contact           => $domain->admin_contact,
+            technical_contact       => $updated_technical_contact,
+            billing_contact         => $domain->billing_contact,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name       => $domain->name,
@@ -329,12 +528,32 @@ subtest 'Changing Something Other Then Registrant Then Changing the Registrant' 
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+        $mocked_api->unmock_all();
+
         ok( !$retrieved_domain->has_irtp_detail, 'Correctly lacks irtp_detail' );
         is_deeply( $retrieved_domain->technical_contact, $updated_technical_contact, 'Correct registrant contact' );
     };
 
     subtest 'Change Registrant Contact' => sub {
+        my $mocked_api = mock_response(
+            method   => 'Contacts',
+            response => {
+                ErrCount => 0,
+                errors   => [ ]
+            }
+        );
+
+        mock_domain_retrieval(
+            mocked_api              => $mocked_api,
+            name                    => $domain->name,
+            is_pending_verification => 1,
+            registrant_contact      => $updated_registrant_contact,
+            admin_contact           => $domain->admin_contact,
+            technical_contact       => $updated_technical_contact,
+            billing_contact         => $domain->billing_contact,
+        );
+
         lives_ok {
             $api->update_contacts_for_domain_name(
                 domain_name        => $domain->name,
@@ -343,7 +562,8 @@ subtest 'Changing Something Other Then Registrant Then Changing the Registrant' 
             );
         } 'Lives through updating contact';
 
-        my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+        my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+        $mocked_api->unmock_all();
 
         subtest 'Inspect IRTP Detail' => sub {
             if( isa_ok( $retrieved_domain->irtp_detail, 'WWW::eNom::IRTPDetail' ) ) {
@@ -383,6 +603,24 @@ subtest 'Update Two Contacts at Once' => sub {
         }),
     };
 
+    my $mocked_api = mock_response(
+        method   => 'Contacts',
+        response => {
+            ErrCount => 0,
+            errors   => [ ]
+        }
+    );
+
+    mock_domain_retrieval(
+        mocked_api              => $mocked_api,
+        name                    => $domain->name,
+        is_pending_verification => 1,
+        registrant_contact      => $updated_contacts->{registrant_contact},
+        admin_contact           => $updated_contacts->{admin_contact},
+        technical_contact       => $domain->technical_contact,
+        billing_contact         => $domain->billing_contact,
+    );
+
     lives_ok {
         $api->update_contacts_for_domain_name(
             domain_name        => $domain->name,
@@ -391,7 +629,8 @@ subtest 'Update Two Contacts at Once' => sub {
         );
     } 'Lives through updating contacts';
 
-    my $retrieved_domain = retrieve_domain_with_cron_delay( $domain->name );
+    my $retrieved_domain = retrieve_domain_with_cron_delay( $api, $domain->name );
+    $mocked_api->unmock_all();
 
     subtest 'Inspect IRTP Detail' => sub {
         if( isa_ok( $retrieved_domain->irtp_detail, 'WWW::eNom::IRTPDetail' ) ) {

@@ -26,7 +26,7 @@ use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 our @EXPORT_OK = qw(joi validate_json);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
@@ -198,6 +198,7 @@ sub validate {
   local $self->{grouped} = 0;
   local $self->{schema}  = Mojo::JSON::Pointer->new($schema);
   local $self->{seen}    = {};
+  local $self->{temp_schema} = [];    # make sure random-errors.t does not fail
   $self->{report} = [];
   my @errors = $self->_validate($data, '', $schema);
   $self->_report if DEBUG and REPORT;
@@ -478,11 +479,11 @@ sub _stack {
 
 sub _validate {
   my ($self, $data, $path, $schema) = @_;
-  my ($seen_addr, $type, @errors);
+  my ($seen_addr, $type);
 
   $schema = $self->_ref_to_schema($schema) if $schema->{'$ref'};
-  $seen_addr = refaddr $schema;
-  $seen_addr .= ':' . (ref $data ? refaddr $data : "s:$data") if defined $data;
+  $seen_addr = join ':', refaddr($schema),
+    (!defined $data ? 'c:undef' : ref $data ? refaddr $data : "s:$data");
 
   # Avoid recursion
   if ($self->{seen}{$seen_addr}) {
@@ -490,7 +491,7 @@ sub _validate {
     return @{$self->{seen}{$seen_addr}};
   }
 
-  $self->{seen}{$seen_addr} = \@errors;
+  $self->{seen}{$seen_addr} = \my @errors;
 
   # Make sure we validate plain data and not a perl object
   $data = $data->TO_JSON if blessed $data and UNIVERSAL::can($data, 'TO_JSON');
@@ -498,7 +499,8 @@ sub _validate {
 
   # Test base schema before allOf, anyOf or oneOf
   if (ref $type eq 'ARRAY') {
-    push @errors, $self->_validate_any_of($data, $path, [map { +{%$schema, type => $_} } @$type]);
+    push @{$self->{temp_schema}}, [map { +{%$schema, type => $_} } @$type];
+    push @errors, $self->_validate_any_of($data, $path, $self->{temp_schema}[-1]);
   }
   elsif ($type) {
     my $method = sprintf '_validate_type_%s', $type;
@@ -539,7 +541,7 @@ sub _validate_all_of {
   my (@errors, @expected);
 
   $self->_report_schema($path, 'allOf', $rules) if REPORT;
-  $self->{grouped}++;
+  local $self->{grouped} = $self->{grouped} + 1;
 
   my $i = 0;
   for my $rule (@$rules) {
@@ -551,8 +553,6 @@ sub _validate_all_of {
   continue {
     $i++;
   }
-
-  $self->{grouped}--;
 
   $self->_report_errors($path, 'allOf', \@errors) if REPORT;
   my $expected = join ' or ', _uniq(@expected);
@@ -568,15 +568,12 @@ sub _validate_any_of {
   my (@e, @errors, @expected);
 
   $self->_report_schema($path, 'anyOf', $rules) if REPORT;
-  $self->{grouped}++;
+  local $self->{grouped} = $self->{grouped} + 1;
 
   my $i = 0;
   for my $rule (@$rules) {
     @e = $self->_validate($data, $path, $rule);
-    if (!@e) {
-      $self->_report_errors($path, 'anyOf', \@errors) if REPORT;
-      return;
-    }
+    return unless @e;
     my $schema_type = _guess_schema_type($rule);
     push @errors, [$i, @e] and next if !$schema_type or $schema_type eq $type;
     push @expected, $schema_type;
@@ -584,8 +581,6 @@ sub _validate_any_of {
   continue {
     $i++;
   }
-
-  $self->{grouped}--;
 
   $self->_report_errors($path, 'anyOf', \@errors) if REPORT;
   my $expected = join ' or ', _uniq(@expected);
@@ -599,7 +594,7 @@ sub _validate_one_of {
   my (@errors, @expected);
 
   $self->_report_schema($path, 'oneOf', $rules) if REPORT;
-  $self->{grouped}++;
+  local $self->{grouped} = $self->{grouped} + 1;
 
   my $i = 0;
   for my $rule (@$rules) {
@@ -611,8 +606,6 @@ sub _validate_one_of {
   continue {
     $i++;
   }
-
-  $self->{grouped}--;
 
   if (REPORT) {
     my @e
@@ -1068,14 +1061,14 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-2.18
+2.19
 
 =head1 SYNOPSIS
 
   use JSON::Validator;
   my $validator = JSON::Validator->new;
 
-  # Define a schema - http://json-schema.org/examples.html
+  # Define a schema - http://json-schema.org/learn/miscellaneous-examples.html
   # You can also load schema from disk or web
   $validator->schema(
     {
@@ -1490,7 +1483,7 @@ L</schema>. Example:
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015, Jan Henning Thorsen
+Copyright (C) 2014-2018, Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

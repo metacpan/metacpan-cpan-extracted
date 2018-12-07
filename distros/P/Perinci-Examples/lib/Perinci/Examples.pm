@@ -2,8 +2,8 @@
 
 package Perinci::Examples;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.810'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.811'; # VERSION
 
 use 5.010001;
 use strict;
@@ -302,7 +302,6 @@ _
     },
     features => {pure => 1},
 };
-
 sub noop {
     my %args = @_; # NO_VALIDATE_ARGS
     [200, "OK", $args{arg}];
@@ -349,7 +348,6 @@ _
     },
     features => {pure => 1},
 };
-
 sub noop2 {
     no warnings 'uninitialized';
     my %args = @_; # NO_VALIDATE_ARGS
@@ -1086,6 +1084,40 @@ sub multi_status {
     $res->as_struct;
 }
 
+$SPEC{comment_fruit} = {
+    v => 1.1,
+    summary => 'Comment on a fruit',
+    description => <<'_',
+
+This function demonstrate argument's `examples` property. It can be used to show
+choices (e.g. in argument completion) but does not require that value be one of
+the examples only.
+
+_
+    args => {
+        fruit => {
+            schema => 'str*',
+            examples => [
+                'apple',
+                'apricot',
+                'banana',
+                'cherry',
+                {value=>'durian', summary=>'Summary for durian'},
+            ],
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub comment_fruit {
+    my %args = @_;
+    my $fruit = $args{fruit} // '';
+    [200, "OK",
+     $fruit =~ /\A(banana|pineapple)\z/i ?
+         "$fruit is probably yellow" :
+         "I don't know about $fruit"];
+}
+
 1;
 # ABSTRACT: Various examples of Rinci metadata
 
@@ -1101,7 +1133,7 @@ Perinci::Examples - Various examples of Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.810 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2018-11-29.
+This document describes version 0.811 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2018-12-07.
 
 =head1 DESCRIPTION
 
@@ -1247,6 +1279,40 @@ Minimum level.
 =item * B<n> => I<int> (default: 10)
 
 Number of log messages to produce.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 comment_fruit
+
+Usage:
+
+ comment_fruit(%args) -> [status, msg, payload, meta]
+
+Comment on a fruit.
+
+This function demonstrate argument's C<examples> property. It can be used to show
+choices (e.g. in argument completion) but does not require that value be one of
+the examples only.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<fruit>* => I<str>
 
 =back
 

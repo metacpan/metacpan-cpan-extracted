@@ -1,6 +1,6 @@
 package PMLTQ::Command::init;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::init::VERSION = '1.4.0';
+$PMLTQ::Command::init::VERSION = '1.5.0';
 # ABSTRACT: Initialize empty database
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -21,7 +21,9 @@ my %known_relations = (
   'apreds/LM/target.rf'                  => 'node',
   'local_event/author'                   => 'user',
   'n-node/a.rf'                          => 'a-node',
+  'nonterminal/coref.rf'                 => 'nonterminal',
   'nonterminal/coindex.rf'               => 'nonterminal',
+  'nonterminal/gapping.rf'               => 'nonterminal',
   'problem/author'                       => 'user',
   'secedge/idref'                        => 'nonterminal',
   'st-node/tnode.rfs'                    => 't-node',
@@ -246,7 +248,7 @@ PMLTQ::Command::init - Initialize empty database
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 

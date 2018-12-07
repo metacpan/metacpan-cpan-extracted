@@ -26,7 +26,7 @@ Readonly my $CONTACT_TYPE_ENOM_MAPPING => { reverse %{ $ENOM_CONTACT_TYPE_MAPPIN
 
 requires 'submit';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Contact Related Operations
 
 sub get_contacts_by_domain_name {
@@ -66,7 +66,7 @@ sub get_contacts_by_domain_name {
 
             # If no other contact has been provided then MY information (the reseller)
             # is used.  Treat this as no info.
-            if( $common_contact_response->{PartyID} eq $billing_party_id ) {
+            if( defined $common_contact_response->{PartyID} && $common_contact_response->{PartyID} eq $billing_party_id ) {
                 next;
             }
 

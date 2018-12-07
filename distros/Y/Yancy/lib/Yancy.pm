@@ -1,6 +1,6 @@
 package Yancy;
-our $VERSION = '1.015';
-# ABSTRACT: A simple CMS for administrating data
+our $VERSION = '1.016';
+# ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
 #pod
@@ -194,11 +194,11 @@ sub startup {
 
 =head1 NAME
 
-Yancy - A simple CMS for administrating data
+Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.015
+version 1.016
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ use Carp;
 
 requires 'submit', 'purchase_domain_privacy_for_domain';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Domain Registration API Calls
 
 sub register_domain {

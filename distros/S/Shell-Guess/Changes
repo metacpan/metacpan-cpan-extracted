@@ -1,5 +1,8 @@
 Revision history for Shell-Guess
 
+0.09      2018-12-06 21:07:21 -0500
+  - Detect PowerShell on Unix (pwsh)
+
 0.08      2017-12-19 11:30:36 -0500
   - Use /proc/[pid]/comm as a method for guessing the shell in addition
     to the methods already used (simbabque++)

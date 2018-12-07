@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIx::CSV",
   "PREREQ_PM" => {
     "DBIx::TextTableAny" => 0,
+    "Text::Table::CSV" => "0.020",
     "strict" => 0,
     "warnings" => 0
   },
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,6 +40,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,
+  "Text::Table::CSV" => "0.020",
   "strict" => 0,
   "warnings" => 0
 );

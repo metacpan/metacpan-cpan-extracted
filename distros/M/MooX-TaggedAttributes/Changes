@@ -1,5 +1,12 @@
 Revision history for MooX-TaggedAttributes
 
+0.05      2018-12-06 18:55:08-05:00 America/New_York
+
+  [ BUG FIX ]
+
+    * non-inner packages using tag roles didn't work.
+
+
 0.04      2018-12-01 21:47:16-05:00 America/New_York
 
     * no changes. promoted to stable.

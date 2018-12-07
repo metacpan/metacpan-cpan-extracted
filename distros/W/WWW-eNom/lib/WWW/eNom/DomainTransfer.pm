@@ -10,7 +10,7 @@ use namespace::autoclean;
 
 use WWW::eNom::Types qw( Bool Contact DomainName HashRef PositiveInt Str );
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Representation of In Progress Domain Transfer
 
 has 'order_id' => (
@@ -88,6 +88,8 @@ sub construct_from_response {
         transfer_detail => { isa => HashRef },
     );
 
+    # Note how we check both Admin and Administrative, we do this because eNom
+    # responds with Both depending on which route was called.
     return $self->new(
         order_id              => $args{transfer_detail}{transferorderdetailid},
         name                  => sprintf('%s.%s', $args{transfer_detail}{sld}, $args{transfer_detail}{tld} ),
@@ -96,16 +98,22 @@ sub construct_from_response {
         is_locked             => ( $args{transfer_detail}{lock}        eq 'True' ),
         is_auto_renew         => ( $args{transfer_detail}{renew}       eq 'True' ),
         use_existing_contacts => ( $args{transfer_detail}{usecontacts} == 1      ),
-        $args{transfer_detail}{contacts}{Registrant} ne 'None'
+        exists $args{transfer_detail}{contacts}{Registrant} && $args{transfer_detail}{contacts}{Registrant} ne 'None'
             ? ( registrant_contact => WWW::eNom::Contact->construct_from_response( $args{transfer_detail}{contacts}{Registrant} ) )
             : ( ),
-        $args{transfer_detail}{contacts}{Admin} ne 'None'
+        exists $args{transfer_detail}{contacts}{Admin} && $args{transfer_detail}{contacts}{Admin} ne 'None'
             ? ( admin_contact => WWW::eNom::Contact->construct_from_response( $args{transfer_detail}{contacts}{Admin} ) )
             : ( ),
-        $args{transfer_detail}{contacts}{Tech} ne 'None'
+        exists $args{transfer_detail}{contacts}{Administrative} && $args{transfer_detail}{contacts}{Administrative} ne 'None'
+            ? ( admin_contact => WWW::eNom::Contact->construct_from_response( $args{transfer_detail}{contacts}{Administrative} ) )
+            : ( ),
+        exists $args{transfer_detail}{contacts}{Tech} && $args{transfer_detail}{contacts}{Tech} ne 'None'
             ? ( technical_contact => WWW::eNom::Contact->construct_from_response( $args{transfer_detail}{contacts}{Tech} ) )
             : ( ),
-        $args{transfer_detail}{contacts}{AuxBilling} ne 'None'
+        exists $args{transfer_detail}{contacts}{Technical} && $args{transfer_detail}{contacts}{Technical} ne 'None'
+            ? ( technical_contact => WWW::eNom::Contact->construct_from_response( $args{transfer_detail}{contacts}{Technical} ) )
+            : ( ),
+        exists $args{transfer_detail}{contacts}{AuxBilling} && $args{transfer_detail}{contacts}{AuxBilling} ne 'None'
             ? ( billing_contact => WWW::eNom::Contact->construct_from_response( $args{transfer_detail}{contacts}{AuxBilling} ) )
             : ( ),
     );

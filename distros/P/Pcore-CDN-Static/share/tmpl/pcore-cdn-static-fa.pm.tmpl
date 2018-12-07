@@ -1,0 +1,35 @@
+package Pcore::CDN::Static::FA;
+
+use Pcore -const, -export;
+
+const our $EXPORT => {
+: for $export.keys().sort() -> $tag {
+<: $tag :> => [qw[<: $export[$tag] :>]],
+: }
+};
+
+: for $glyphs.keys().sort() -> $key {
+const our <: $key | raw :> => '<: $glyphs[$key] | raw :>';
+: }
+
+1;
+__END__
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Pcore::CDN::Static::FA
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head1 METHODS
+
+=head1 SEE ALSO
+
+=cut

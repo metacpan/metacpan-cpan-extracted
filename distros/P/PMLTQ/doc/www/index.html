@@ -13,7 +13,7 @@
     <div style="margin: 2% 3%;">
       <div class="top-links">
           <a href="#getting-started">Getting Started</a> |
-          <a href="#documentation">Documentation</a> |
+          <a href="#user-documentation">User Documentation</a> |
           <a href="#clients">Clients</a> |
           <a href="#server">Server</a> |
           <a href="#biblio">Bibliography</a> |
@@ -21,41 +21,46 @@
           <a href="#license">License</a>
       </div>
       <div id="content">
-        <p>PML-TQ is a powerful open-source search tool for all kinds
+        <p><font color="red"><b>These pages are obsolete! Please go to <a href="https://ufal.mff.cuni.cz/pmltq">https://ufal.mff.cuni.cz/pmltq</a> instead.</b></font></p>
+        <p>The PML-TQ is a powerful open-source search tool for all kinds
         of linguistaically  annotated treebanks with several client interfaces
-        and two search backends (one based on a SQL database and one
-        based on Perl and the <a href="http://ufal.mff.cuni.cz/~pajas/tred">TrEd toolkit</a>).
+        and two search backends (one based on an SQL database and one
+        based on Perl and the <a href="http://ufal.mff.cuni.cz/~pajas/tred" target="_blank">TrEd toolkit</a>).
         The tool works natively with treebanks encoded in the
-        <a href="http://ufal.mff.cuni.cz/jazz/PML/">PML data format</a>
+        <a href="http://ufal.mff.cuni.cz/jazz/PML/" target="_blank">PML data format</a>
         (conversion scripts are available for many established treebank formats).
         </p>
         <hr width="300px" align="left"/>
         <div id="getting-started" class="web-section">
-            <a href="pmltq_tred.png"><img hspace="5pt" vspace="5pt" src="pmltq_tred_small.png" class="right" alt="PML-TQ in TrEd (screenshot)" /></a>
-            <a href="pmltq_opera.png"><img hspace="5pt" vspace="5pt" src="pmltq_opera_small.png" class="right" alt="PML-TQ in Opera (screenshot)" /></a>
-          <h3>Getting Started</h3>
+            <a href="web_client.png"><img hspace="5pt" vspace="5pt" src="web_client_small.png" class="right" width="328" alt="PML-TQ at Lindat/Claring web service (screenshot)" /></a>
+            <a href="pmltq_tred.png"><img hspace="5pt" vspace="5pt" src="pmltq_tred_small.png" class="right" width="328" alt="PML-TQ in TrEd (screenshot)" /></a>
+            <!--a href="pmltq_opera.png"><img hspace="5pt" vspace="5pt" src="pmltq_opera_small.png" class="right" alt="PML-TQ in Opera (screenshot)" /></a-->
+          <h2>Getting Started</h2>
           <div>
             <dl>
+              <dt>Search various treebanks using our server:</dt>
+              <dd><p><a href="https://ufal.mff.cuni.cz" target="_blank">ÚFAL</a> is hosting a PML-TQ search service for <a
+              href="http://ufal.mff.cuni.cz/pdt2.0/" target="_blank">PDT 2.0</a>, <a
+              href="http://ufal.mff.cuni.cz/pdt2.5/" target="_blank">PDT 2.5</a>, <a
+              href="http://ufal.mff.cuni.cz/pdt3.0/" target="_blank">PDT 3.0</a>
+              and many other treebanks, including <a
+              href="https://catalog.ldc.upenn.edu/ldc99t42" target="_blank">Penn Treebank
+              3</a>, Penn Chinese Treebank, Penn Arabic Treebank, <a
+              href="http://www.ims.uni-stuttgart.de/projekte/TIGER/TIGERCorpus/" target="_blank">Tiger
+              Corpus 1.0</a>, Universal Dependencies treebanks, and <a href="https://ufal.mff.cuni.cz/hamledt" target="_blank">HamleDT</a> treebanks.
+              <!--To register, send an email to <a
+              href="mailto:kopp&#64;ufal.mff.cuni.cz">Matyáš
+              Kopp</a>, the current developer of the PML-TQ--><!--; for some treebanks, you will need to
+              obtain a license from the treebank distributor-->  The
+              server is accessible from several clients, including
+              modern web browsers and the tree editor TrEd (see <a
+              href="#clients">clients</a>).  </p></dd>
               <dt>Search your local files:</dt>
               <dd><p>Use the client-side PML-TQ search engine,
               which is part of the <b>pmltq</b>
-              extension to the tree editor <a href="http://ufal.mff.cuni.cz/~pajas/tred">TrEd</a>
-              (see <a href="#client">section about client interfaces</a> below).
+              extension to the tree editor <a href="http://ufal.mff.cuni.cz/~pajas/tred" target="_blank">TrEd</a>
+              (see <a href="#clients">section about client interfaces</a> below).
               </p></dd>
-              <dt>Register to search various treebanks using our server:</dt>
-              <dd><p>We are hosting a PML-TQ search service for <a
-              href="http://ufal.mff.cuni.cz/pdt/pdt2.0/">PDT 2.0</a>
-              and various other treebanks, including <a
-              href="http://www.cis.upenn.edu/~treebank/">Penn Treebank
-              3</a>, Penn Chinese Treebank, Penn Arabic Treebank, <a
-              href="http://www.ims.uni-stuttgart.de/projekte/TIGER/TIGERCorpus/">Tiger
-              Corpus 1.0</a>. To register, send an email to <a
-              href="mailto:stepanek&#64;ufal.mff.cuni.cz">Jan
-              Štěpánek</a>; for some treebanks, you will need to
-              obtain a license from the treebank distributor.  The
-              server is accessible from several clients, including
-              modern web browsers or TrEd (see <a
-              href="#client">clients</a>).  </p></dd>
               <dt>Search any treebank on your own PML-TQ server:</dt>
               <dd><p>Download and install the <a href="#server">PML-TQ server</a> (Linux, UNIX, Mac OS X)
               on your computer/server.
@@ -64,28 +69,49 @@
           </div>
         </div>
         <hr width="300px" align="left"/>
-        <div id="documentation" class="web-section">
-          <h3>Documentation</h3>
+        <div id="user-documentation" class="web-section">
+          <h2>User Documentation</h2>
           <ul>
-            <li><a href="doc/pmltq_doc.html">PML-TQ Manual and Query Language Reference</a> (incomplete)</li>
+            <li><a href="doc/pmltq_tutorial_web_client.html">Tutorial to the PML-TQ query language and the web interface</a></li>
+            <li><a href="doc/pmltq_doc.html">PML-TQ manual and query language reference</a> (detailed but incomplete; it contains also a tutorial to the PML-TQ query language for the TrEd client)</li>
+            <!--li><a href="#additional">Additional Resources</a> (list of various other tutorials and introductions to the PML-TQ</li-->
           </ul>
+          <h3>Additional Resources</h3>
+          <h4>More or less general presentations/tutorials about the PML-TQ</h4>
+          <ul>
+          <li><a href="http://ufal.mff.cuni.cz/~stepanek/clara-2010/#(11)" target="_blank">Introduction to the  PML-TQ on slides by Jan Štěpánek</a> (2010, English)
+          <li><a href="pmltq_seminar_2009.pdf" target="_blank">Slides about the PML-TQ from Monday's ÚFAL seminar</a> (Petr Pajas and Jan Štěpánek, 2009, Czech)
+          <li><a href="http://ufal.mff.cuni.cz/pmltq/share/doc/PML_Technology_TrEd_PML-TQ_2010_Stepanek.html" target="_blank">Tutorial about the PML, TrEd and PML-TQ</a> (Jan Štěpánek, CLARA Course on Treebank Annotation, 2010, English)
+          </ul>
+          <h4>Introductions/tutorials focused on the PML-TQ used for various language phenomena</h4>
+          <ul>
+          <li><a href="Discourse_101_Book_Chapter_8.pdf" target="_blank">Introduction to the PML-TQ focused on discourse relations</a> (Jiří Mírovský, chapter 8 from the book Discourse and Coherence, 2015, English)
+          <li><a href="pml-tq_mwe_2015.pdf" target="_blank">Searching for named entities in the PML-TQ</a> (Jiří Mírovský and Pavel Straňák, PARSEME training school, 2015, English)
+          <li><a href="http://ufal.mff.cuni.cz/daniel-zeman/nastroje-ufal" target="_blank">Dan Zeman's introduction to the PML-TQ (among other things), focused mostly on morhplogy and surface syntax</a> (regularly updated, Czech)
+          </ul>
+
         </div>
+
         <hr width="300px" align="left"/>
         <div id="clients" class="web-section">
-          <h3>Clients</h3>
+          <h2>Clients</h2>
           <dl>
             <dt id="web-client">Web Browser</dt>
             <dd>
               <p>Any web browser with good support for SVG rendering, CSS, and JavaScript
-              can be used as a client to a PML-TQ server (we recomend <a href="http://www.opera.com">Opera</a>).
+              can be used as a client to a PML-TQ server (Firefox, Google Chrome, Opera browser, Safari, IE >=11).</p>
+              <p>A PML-TQ server hosted at ÚFAL can be accessed via <a href="https://lindat.mff.cuni.cz/services/pmltq/#!/home" target="_blank">LINDAT/Clarin web service</a> (many of the treebanks
+              are accessible freely, other treebanks require a login name and password - contact <a
+              href="mailto:kopp&#64;ufal.mff.cuni.cz">Matyáš
+              Kopp</a> to get information on how to obtain access to other treebanks).
               </p>
             </dd>
             <dt id="tred-client">TrEd</dt>
             <dd><p>
-              A fully graphical client for PML-TQ
+              A fully graphical client for the PML-TQ
               with client-side searching capability
               is part of the tree
-              editor <a href="http://ufal.mff.cuni.cz/pajas/~tred">TrEd</a>
+              editor <a href="http://ufal.mff.cuni.cz/pajas/~tred" target="_blank">TrEd</a>
               (a GPL-licensed software available separatelly)
               as
               an extension called <b>pmltq</b>.
@@ -94,28 +120,31 @@
             <p>
               To install this extension,
               start TrEd, select
-              <span class="guimenu">Setup > Manage Extensions > Get New Extensions</span>
+              <span class="guimenu">Setup -> Manage Extensions -> Get New Extensions</span>
               and select 'pmltq'. When done, press <tt class="keysym">Shift</tt>+<tt class="keysym">F3</tt>
               to start the search.
               Select <span class="guibutton">Treebank (server)</span> for searching using a PML-TQ
               server, or 'Files (local)' for
-              searching local files using client-side search engine built into the client.
+              searching local files using client-side search engine built into the client (contact <a
+              href="mailto:kopp&#64;ufal.mff.cuni.cz">Matyáš
+              Kopp</a> to get access to the PML-TQ server hosted at ÚFAL).
             </p>
             </dd>
             <dt id="cl-client">Command-line</dt>
             <dd>
-              <p>A simple text-based client called <tt>pmltq</tt> is included in the server package.</p>
+              <p>Under development!</p>
+              <!--p>A simple text-based client called <tt>pmltq</tt> is included in the server package.</p-->
             </dd>
           </dl>
         </div>
         <hr width="300px" align="left"/>
         <div id="server" class="web-section">
-          <h3>Server</h3>
+          <h2>Server</h2>
           <p>
-            This distribution contains a fast and efficient implementation
-            of PML-TQ powered by an SQL database with a
+            The distribution (see the download section below) contains a fast and efficient implementation
+            of the PML-TQ powered by an SQL database with a
             client-server architecture
-            (HTTP client -> custom HTTP server -> CGI -> SQL database backend).
+            (client -> REST API -> PML-TQ server -> SQL database backend).
           </p>
           <p>The server is intended for searching large static data sets (complete treebanks).
           For individual files or small treebanks, up to say 10K trees (your mileage may vary),
@@ -123,20 +152,28 @@
           <a href="#tred-client">TrEd</a> is usually sufficient.
           </p>
           <p>
-            Running a PML-TQ server requires either Oracle or PostgresSQL
-            database, Perl >= 5.8.8 and several Perl modules installable from CPAN.
-            The treebank must be encoded in or converted to the <a href="http://ufal.mff.cuni.cz/jazz/PML/index_en.html">PML format</a>.
+            The most important dependencies for running a PML-TQ server are:
+          <ul>
+            <li>the PML-TQ server distribution, see Download below,</li>
+            <li>an HTTP server,</li>
+            <li>PostgreSQL (>=8.4),</li>
+            <li>Perl (>=5.14),</li>
+            <li>the tree editor TrEd.</li>
+          </ul>
+            <!-- and several Perl modules installable from CPAN.-->
+            The treebank must be encoded in or converted to the <a href="http://ufal.mff.cuni.cz/jazz/PML/index_en.html" target="_blank">PML format</a>.
           </p>
           <p>
-            The server has been tested on Linux
-            with <a href="http://www.oracle.com/technology/software/products/database/index.html">Oracle XE 10g</a> and <a href="http://www.postgresql.org/">PostgresSQL (8.4beta)</a>.
+            The server has been tested on Linux.
           </p>
-          <h4>Download</h4>
-          <p>Current version is 0.7.10 (beta). This realease is ready for testing, but some important parts of the documentation
-          are still missing.</p>
-          <p><a href="pmltq-0.7.10.tar.gz">pmltq.tar.gz</a> - PML-TQ distribution package</p>
+          <h3>Download the server</h3>
+           <h4>Current version</h4>
+            <p>The current version of the PML-TQ server can be downloaded from the GIT repository: <a href="https://github.com//ufal/perl-pmltq-server" target="_blank">https://github.com//ufal/perl-pmltq-server</a>.</p>
+           <h4>Old versions</h4>
+          <p>Previous versions of the PML-TQ server (up to the version 0.7.10 (beta), released in 2013) were published each as a single .tar.gz archive.
+          <br>You can still download the most recent of them (still, outdated) here: <a href="pmltq-0.7.10.tar.gz">pmltq-0.7.10.tar.gz</a> (PML-TQ distribution package).</p>
 
-          <h4>Directory structure</h4>
+          <!--h4>Directory structure</h4>
           <pre class="literallayout">
 Subdirectories:
   config    - sample configuration files (must edit first!)
@@ -151,9 +188,13 @@ Scripts:
   install_deps.sh - install modules required by the search server
   pmltq_http  - small HTTP server providing PML-TQ services
   pml2base.pl - PML to SQL database conversion script
-  pmltq     - command-line client for both dabase and Perl-driven query engine</pre>
-          <h4>Installation of PML-TQ Server</h4>
-          <p>To run PML-TQ Servers, you will first need to install
+  pmltq     - command-line client for both dabase and Perl-driven query engine</pre-->
+          <h3>Installation of the PML-TQ Server</h3>
+          <p>To install the server, please contact its current developer, <a
+              href="mailto:kopp&#64;ufal.mff.cuni.cz">Matyáš
+              Kopp</a>.
+          </p>
+          <!--p>To run PML-TQ Servers, you will first need to install
           an SQL database server. Fully supported are Oracle 10g or 11g and PostgreSQL ver. min. 8.4.1.</p>
           <p>Then follow carefully the instructions in the
           <tt>README</tt> file provided in the distribution
@@ -161,42 +202,65 @@ Scripts:
           asked to edit during the installation process.
           Since individual steps of the server installation are still poorly documented,
           do not hesitate to ask the authors for guidance via e-mail.
-          </p>
+          </p-->
         </div>
       </div>
       <hr width="300px" align="left"/>
       <div id="biblio" class="web-section">
-        <h3>Bibliography</h3>
+        <h2>Bibliography</h2>
+        <h3>General bibliography about the PML-TQ and the PML</h3>
         <p class="P1">
         Štěpánek Jan, Pajas Petr: <a
-        href="http://www.lrec-conf.org/proceedings/lrec2010/pdf/381_Paper.pdf">Querying
+        href="http://www.lrec-conf.org/proceedings/lrec2010/pdf/381_Paper.pdf" target="_blank">Querying
         Diverse Treebanks in a Uniform Way</a>, in <i>Proceedings of
         the Seventh conference on International Language Resources and
-        Evaluation (LREC'10)</i>, Copyright &copy; European Language
+        Evaluation (LREC'10)</i>, European Language
         Resources Association (ELRA), Valletta, Malta, pp. 1828-1835, 2010
         </p>
         <p class="P1">
-          Pajas Petr, Štěpánek Jan: <a href="http://www.aclweb.org/anthology/P/P09/P09-4009.pdf">System for Querying Syntactically Annotated Corpora</a>,
-          in <i>Proceedings of the ACL-IJCNLP 2009 Software Demonstrations</i>, Copyright © Association for Computational Linguistics, Suntec, Singapore, pp. 33-36, 2009
+          Pajas Petr, Štěpánek Jan: <a href="http://www.aclweb.org/anthology/P/P09/P09-4009.pdf" target="_blank">System for Querying Syntactically Annotated Corpora</a>,
+          in <i>Proceedings of the ACL-IJCNLP 2009 Software Demonstrations</i>, Association for Computational Linguistics, Suntec, Singapore, pp. 33-36, 2009
         </p>
         <p class="P1">
-          Pajas Petr, Štěpánek Jan: <a href="http://www.aclweb.org/anthology/C/C08/C08-1085.pdf">Recent Advances in a Feature-Rich Framework for Treebank Annotation</a>,
+          Pajas Petr, Štěpánek Jan: <a href="http://www.aclweb.org/anthology/C/C08/C08-1085.pdf" target="_blank">Recent Advances in a Feature-Rich Framework for Treebank Annotation</a>,
           in <i>The 22nd International Conference on Computational Linguistics - Proceedings of the Conference,</i> Manchester, pp. 673-680, 2008
+        </p>
+        <h3>Case studies bibliography</h3>
+        <p class="P1">
+          Onambélé Christophe, Kopp Matyáš, Passarotti Marco, Mírovský Jiří: <a href="Onambele_Converting.pdf" target="_blank">Converting Latin Treebank Data into an SQL Database for Query Purposes</a>. In: Proceedings of the 2Nd International Conference on Digital Access to Textual Cultural Heritage, ACM, New York, NY, USA, ISBN 978-1-4503-5265-9, pp. 117-122, 2017
+        </p>
+        <p class="P1">
+          Mírovský Jiří, Poláková Lucie, Štěpánek Jan: <a href="http://www.lrec-conf.org/proceedings/lrec2016/summaries/889.html" target="_blank">Searching in the Penn Discourse Treebank Using the PML-Tree Query</a>,
+          in <i>Proceedings of the Tenth International Conference on Language Resources and Evaluation (LREC 2016), European Language Resources Association (ELRA), Paris, France, pp. 1762-1769, 2016
+        </p>
+        <p class="P1">
+          Zikánová Šárka, Hajičová Eva, Hladká Barbora, Jínová Pavlína, Mírovský Jiří, Nedoluzhko Anna, Poláková Lucie, Rysová Kateřina, Rysová Magdaléna, Václ Jan: <a href="Discourse_101_Book_Chapter_8.pdf" target="_blank">Discourse and Coherence. From the Sentence Structure to Relations in Text, Chapter 8.</a> ÚFAL, Praha, Czechia, ISBN 978-80-904571-8-8, 274 pp., Dec 2015 (focused on searching for discourse relations in the Prague Dependency Treebank)
         </p>
       </div>
       <hr width="300px" align="left"/>
       <div id="ackno" class="web-section">
-        <h3>Authors</h3>
-        <p>Copyright © 2008-2009 by <a href="http://ufal.mff.cuni.cz/~pajas">Petr Pajas</a> and Jan Štěpánek</p>
-        <h4>Acknowledgement</h4>
-        <p>The development of PML-TQ is a part of the project <a href="http://ufal.mff.cuni.cz/jazz/">"Integration of language resources for information extraction from natural texts"</a>, Information Society of Grant Agency of Academy of Sciences of the Czech Republic: 1ET101120503</p>
+        <h2>Authors</h2>
+        <p>© 2008-2010 Petr Pajas and Jan Štěpánek
+        <br>© 2011-2013 Jan Štěpánek
+        <br>© 2013-2015 Michal Sedlák
+        <br>© 2015-2018 Matyáš Kopp (kopp at ufal.mff.cuni.cz)
+        </p>
+        <h3>Acknowledgement</h3>
+        <p>The development of the PML-TQ was/has been supported by the following projects:
+           <ul>
+           <li><a href="http://ufal.mff.cuni.cz/jazz/" target="_blank">"Integration of language resources for information extraction from natural texts"</a>, Information Society of Grant Agency of Academy of Sciences of the Czech Republic: 1ET101120503 (2005-2009)</li>
+           <li><a href="https://ufal.mff.cuni.cz/grants/lindatclarin" target="_blank">"The LINDAT/Clarin: Establishing and operating the Czech node of pan-European infrastructure for research"</a>, a project funded by the Ministry of Education, Youth and Sports of the Czech Republic: LM2010013 (2010-2015)</li>
+           <li><a href="https://lindat.mff.cuni.cz/en" target="_blank">"The LINDAT/Clarin: Centre for Language Research Infrastructure"</a>, a project funded by the Ministry of Education, Youth and Sports of the Czech Republic: LM2015071 (2016-2019)</li>
+           </ul>
+        </p>
       </div>
       <hr width="300px" align="left"/>
       <div id="license" class="web-section">
-        <h3>License</h3>
-        <p>This software is published under
-        <a href="http://www.gnu.org/copyleft/gpl.html">GPL (General Public License)</a>.</p>
+        <h2>License</h2>
+        <p>This software is published under the
+        <a href="http://www.gnu.org/copyleft/gpl.html" target="_blank">GPL (General Public License)</a>.</p>
       </div>
+
     </div>
   </body>
 </html>

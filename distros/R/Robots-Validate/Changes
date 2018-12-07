@@ -1,5 +1,9 @@
 Revision history for Robots-Validate:
 
+v0.1.5    2018-12-06 17:56:02+00:00 Europe/London
+  [Bug Fixes]
+  - Bumped minimum version of Types::Const to support Regexp refs.
+
 v0.1.4    2018-12-04 10:42:31+00:00 Europe/London
   [Other]
   - Use stricter types for robots attribute.

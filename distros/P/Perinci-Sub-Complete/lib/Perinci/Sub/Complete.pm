@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2018-06-01'; # DATE
-our $VERSION = '0.931'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.932'; # VERSION
 
 use 5.010001;
 use strict;
@@ -490,15 +490,34 @@ sub complete_arg_val {
             return; # from eval
         }
 
-        my $sch = $arg_spec->{schema};
-        unless ($sch) {
-            log_trace("[comp][periscomp] arg spec does not specify schema, declining");
-            return; # from eval
-        };
+        my $fres_from_arg_examples;
+      COMPLETE_FROM_ARG_EXAMPLES:
+        {
+            my $eg = $arg_spec->{examples};
+            unless ($eg) {
+                log_trace("[comp][periscomp] arg spec does not specify examples");
+                last COMPLETE_FROM_ARG_EXAMPLES;
+            }
+            $fres_from_arg_examples = complete_array_elem(
+                word=>$word, array=>[map {ref $_ eq 'HASH' ? $_->{value} : $_} @$eg]);
+        } # COMPLETE_FROM_ARG_EXAMPLES
 
-        # XXX normalize schema if not normalized
+        my $fres_from_schema;
+      COMPLETE_FROM_SCHEMA:
+        {
+            my $sch = $arg_spec->{schema};
+            unless ($sch) {
+                log_trace("[comp][periscomp] arg spec does not specify schema");
+                last COMPLETE_FROM_SCHEMA;
+            }
+            # XXX normalize schema if not normalized
+            $fres_from_schema = complete_from_schema(arg=>$arg, extras=>$extras, schema=>$sch, word=>$word);
+        } # COMPLETE_FROM_SCHEMA
 
-        $fres = complete_from_schema(arg=>$arg, extras=>$extras, schema=>$sch, word=>$word);
+        $fres = combine_answers(grep {defined} (
+            $fres_from_arg_examples,
+            $fres_from_schema,
+        ));
     };
     log_debug("[comp][periscomp] completion died: $@") if $@;
     unless ($fres) {
@@ -1263,7 +1282,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.931 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2018-06-01.
+This document describes version 0.932 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2018-12-07.
 
 =head1 SYNOPSIS
 
@@ -1698,7 +1717,7 @@ the result of this function for bash.
 
 Usage:
 
- complete_from_schema(%args) -> [status, msg, result, meta]
+ complete_from_schema(%args) -> [status, msg, payload, meta]
 
 Complete a value from schema.
 
@@ -1726,7 +1745,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 

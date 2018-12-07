@@ -112,99 +112,99 @@
    "provides" : {
       "BSON" : {
          "file" : "lib/BSON.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Binary" : {
          "file" : "lib/BSON/Binary.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Bool" : {
          "file" : "lib/BSON/Bool.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Bytes" : {
          "file" : "lib/BSON/Bytes.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Code" : {
          "file" : "lib/BSON/Code.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::DBPointer" : {
          "file" : "lib/BSON/DBPointer.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::DBRef" : {
          "file" : "lib/BSON/DBRef.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Decimal128" : {
          "file" : "lib/BSON/Decimal128.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Doc" : {
          "file" : "lib/BSON/Doc.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Double" : {
          "file" : "lib/BSON/Double.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Int32" : {
          "file" : "lib/BSON/Int32.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Int64" : {
          "file" : "lib/BSON/Int64.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::MaxKey" : {
          "file" : "lib/BSON/MaxKey.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::MinKey" : {
          "file" : "lib/BSON/MinKey.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::OID" : {
          "file" : "lib/BSON/OID.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::ObjectId" : {
          "file" : "lib/BSON/ObjectId.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::PP" : {
          "file" : "lib/BSON/PP.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Raw" : {
          "file" : "lib/BSON/Raw.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Regex" : {
          "file" : "lib/BSON/Regex.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::String" : {
          "file" : "lib/BSON/String.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Symbol" : {
          "file" : "lib/BSON/Symbol.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Time" : {
          "file" : "lib/BSON/Time.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Timestamp" : {
          "file" : "lib/BSON/Timestamp.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       },
       "BSON::Types" : {
          "file" : "lib/BSON/Types.pm",
-         "version" : "v1.10.1"
+         "version" : "v1.10.2"
       }
    },
    "release_status" : "stable",
@@ -219,7 +219,7 @@
          "web" : "https://github.com/mongodb/mongo-perl-bson"
       }
    },
-   "version" : "v1.10.1",
+   "version" : "v1.10.2",
    "x_authority" : "cpan:MONGODB",
    "x_contributors" : [
       "Eric Daniels <eric.daniels@mongodb.com>",
@@ -229,6 +229,7 @@
       "Petr P\u00edsa\u0159 <ppisar@redhat.com>",
       "Robert Sedlacek <rs@474.at>",
       "Thomas Bloor <tbsliver@shadow.cat>",
+      "Tobias Leich <email@froggs.de>",
       "Wallace Reis <wallace@reis.me>",
       "Yury Zavarin <yury.zavarin@gmail.com>",
       "Oleg Kostyuk <cub@cpan.org>"

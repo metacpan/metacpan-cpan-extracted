@@ -3,7 +3,7 @@ package namespace::local;
 use 5.008;
 use strict;
 use warnings FATAL => 'all';
-our $VERSION = '0.0401';
+our $VERSION = '0.0402';
 
 =head1 NAME
 

@@ -41,7 +41,7 @@
          "web" : "https://github.com/a6502/JobCenter-Client-Mojo"
       }
    },
-   "version" : "0.34",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.05"
+   "version" : "0.35",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

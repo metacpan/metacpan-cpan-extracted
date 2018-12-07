@@ -1,5 +1,3 @@
-.appveyor.yml
-.travis.yml
 Changes
 ignore.txt
 lib/CGI/ACL.pm
@@ -19,12 +17,21 @@ t/dist.t
 t/gv.t
 t/ip.t
 t/kwalitee.t
+t/links.t
 t/manifest.t
 t/metrics.t
+t/no404s.t
 t/noop.t
+t/noopentickets.t
+t/noplan.t
 t/pod-cm.t
 t/pod.t
+t/port.t
+t/prereq.t
 t/snippets.t
 t/spelling.t
+t/strict.t
+t/unused.t
+t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -11,7 +11,7 @@ use MooseX::Params::Validate;
 
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
-use Test::WWW::eNom qw(create_api);
+use Test::WWW::eNom qw( create_api mock_response );
 
 use WWW::eNom::Types qw( Bool DomainAvailabilities Int Str Strs );
 use WWW::eNom::DomainAvailability;
@@ -67,6 +67,26 @@ sub test_suggest_names {
         num_results => { isa => Int },
     );
 
+    my $mocked_api = mock_response(
+        method     => 'NameSpinner',
+        response   => {
+            namespin => {
+                domains => {
+                    domain => {
+                        map {
+                            (   $args{related}
+                              ? random_string('ccccccccccccccc')
+                              : random_string('cccccc') . join( '-', split( ' ', $args{phrase} ) ) )
+                            => {
+                                map { $_ => 'y' } @{ $args{tlds} }
+                            }
+                        } 1 .. $args{num_results}
+                    }
+                }
+            }
+        }
+    );
+
     my $domain_availabilities;
     warnings_are {
         $domain_availabilities = $eNom->suggest_domain_names({
@@ -76,6 +96,8 @@ sub test_suggest_names {
             num_results => $args{num_results},
         });
     } [ ], 'Lives through retrieving domain suggestions';
+
+    $mocked_api->unmock_all;
 
     inspect_domain_availabilities(
         domain_availabilities => $domain_availabilities,

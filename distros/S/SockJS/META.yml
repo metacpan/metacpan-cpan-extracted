@@ -28,7 +28,7 @@ no_index:
 provides:
   SockJS:
     file: lib/SockJS.pm
-    version: '0.09'
+    version: '0.10'
   SockJS::Connection:
     file: lib/SockJS/Connection.pm
   SockJS::Exception:
@@ -76,7 +76,7 @@ resources:
   bugtracker: https://github.com/vti/sockjs-perl/issues
   homepage: https://github.com/vti/sockjs-perl
   repository: git://github.com/vti/sockjs-perl.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - 'BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>'
   - 'vti <viacheslav.t@gmail.com>'

@@ -12,18 +12,17 @@ CGI::Ex::Die - A CGI::Carp::FatalsToBrowser type utility.
 ###----------------------------------------------------------------###
 
 use strict;
-use vars qw($VERSION
-            $no_recurse
-            $EXTENDED_ERRORS $SHOW_TRACE $IGNORE_EVAL
-            $ERROR_TEMPLATE
-            $LOG_HANDLER $FINAL_HANDLER
-            );
-
+use vars qw($EXTENDED_ERRORS $SHOW_TRACE $IGNORE_EVAL);
 use CGI::Ex;
 use CGI::Ex::Dump qw(debug ctrace dex_html);
 
+our $VERSION = '2.48';
+our $no_recurse;
+our $ERROR_TEMPLATE;
+our $LOG_HANDLER;
+our $FINAL_HANDLER;
+
 BEGIN {
-  $VERSION = '2.47';
   $SHOW_TRACE = 0      if ! defined $SHOW_TRACE;
   $IGNORE_EVAL = 0     if ! defined $IGNORE_EVAL;
   $EXTENDED_ERRORS = 1 if ! defined $EXTENDED_ERRORS;

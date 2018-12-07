@@ -1,7 +1,6 @@
 package CGI::Info;
 
 # TODO: remove the expect argument
-# TODO: add Test::Distribution
 
 use warnings;
 use strict;
@@ -21,11 +20,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.67
+Version 0.68
 
 =cut
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 =head1 SYNOPSIS
 
@@ -692,7 +691,7 @@ sub params {
 
 		$key =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 		$key =~ tr/+/ /;
-		if($value) {
+		if(defined($value)) {
 			$value =~ s/%([a-fA-F\d][a-fA-F\d])/pack("C", hex($1))/eg;
 			$value =~ tr/+/ /;
 		} else {
@@ -1286,7 +1285,7 @@ sub is_robot {
 		return 0;
 	}
 
-	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot/i) {
+	if($agent =~ /.+bot|msnptc|is_archiver|backstreet|spider|scoutjet|gingersoftware|heritrix|dodnetdotcom|yandex|nutch|ezooms|plukkie|nova\.6scan\.com|Twitterbot|adscanner/i) {
 		$self->{_is_robot} = 1;
 		return 1;
 	}
@@ -1700,10 +1699,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Info>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Info>
@@ -1718,7 +1713,7 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 Copyright 2010-2018 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

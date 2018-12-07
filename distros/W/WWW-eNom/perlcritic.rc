@@ -1,6 +1,7 @@
 severity = 3
 verbose  = 9
-exclude  = ValuesAndExpressions::ProhibitVersionStrings RegularExpressions::RequireExtendedFormatting ValuesAndExpressions::ProhibitVersionStrings Subroutines::RequireArgUnpacking
+exclude  = ValuesAndExpressions::ProhibitVersionStrings RegularExpressions::RequireExtendedFormatting ValuesAndExpressions::ProhibitVersionStrings Subroutines::RequireArgUnpacking Moose::RequireMakeImmutable Moose::RequireCleanNamespace ValuesAndExpressions::RequireNumericVersion Freenode::DiscouragedModules Freenode::OverloadOptions
+
 include  = Variables::ProhibitPackageVars
 
 [Subroutines::ProhibitUnusedPrivateSubroutines]

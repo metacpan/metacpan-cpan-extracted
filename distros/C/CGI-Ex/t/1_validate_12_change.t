@@ -7,8 +7,8 @@
 =cut
 
 use strict;
+use warnings;
 use Test::More tests => 12;
-use Test::Warn;
 
 use_ok('CGI::Ex::Validate');
 my $e;
@@ -86,7 +86,12 @@ is($form->{'key3'}, '23', "Non-global is fine");
         },
     };
 
-    local $^W = 1;  # enable warnings
-    warning_is { $e = validate($form, $v) } undef, 'No warnings';
+    my @warn;
+    local $SIG{'__WARN__'} = sub { push @warn, [@_] };
+
+    warn "Before\n";
+    $e = validate($form, $v);
+    warn "After\n";
+    is_deeply(\@warn, [["Before\n"], ["After\n"]], 'No warnings');
     ok(! $e, 'No error');
 }

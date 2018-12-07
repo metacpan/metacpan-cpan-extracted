@@ -13,7 +13,7 @@ use WWW::eNom::Types qw( DomainName IP );
 use Try::Tiny;
 use Carp;
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Representation of Private Nameserver
 
 has 'name' => (

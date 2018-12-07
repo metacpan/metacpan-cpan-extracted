@@ -1,6 +1,6 @@
 package PMLTQ::Base;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Base::VERSION = '1.4.0';
+$PMLTQ::Base::VERSION = '1.5.0';
 # ABSTRACT: Base class for PMLTQ inspired by L<Mojo::Base> and L<Mojo::Base::XS>
 
 use strict;
@@ -75,7 +75,7 @@ PMLTQ::Base - Base class for PMLTQ inspired by L<Mojo::Base> and L<Mojo::Base::X
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 

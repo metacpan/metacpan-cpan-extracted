@@ -12,9 +12,12 @@ use Safe::Isa qw( $_isa );
 use Types::Const qw( Const );
 use Types::Standard qw( Value Object Ref );
 
+# RECOMMEND PREREQ: Types::Const v0.3.6
+# RECOMMEND PREREQ: Type::Tiny::XS
+
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 sub VERSION { # for older Perls
@@ -117,7 +120,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 

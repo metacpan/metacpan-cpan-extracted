@@ -32,6 +32,7 @@ Inc
 Int32
 Int64
 Kostyuk
+Leich
 MaxKey
 MinKey
 MongoDB
@@ -58,6 +59,7 @@ Symbol
 Thomas
 Time
 Timestamp
+Tobias
 Types
 VERSIONING
 Wallace
@@ -70,6 +72,7 @@ codecs
 cub
 david
 dbrefs
+email
 eric
 ixhash
 lib

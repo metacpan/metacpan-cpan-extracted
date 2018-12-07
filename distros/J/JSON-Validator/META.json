@@ -51,6 +51,6 @@
          "web" : "https://github.com/jhthorsen/json-validator"
       }
    },
-   "version" : "2.18",
+   "version" : "2.19",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

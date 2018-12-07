@@ -1,6 +1,6 @@
 package PMLTQ::SQLEvaluator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::SQLEvaluator::VERSION = '1.4.0';
+$PMLTQ::SQLEvaluator::VERSION = '1.5.0';
 # ABSTRACT: SQL evaluator of PML-TQ queries which can use PostreSQL as a backend
 
 use 5.006;
@@ -2777,7 +2777,7 @@ PMLTQ::SQLEvaluator - SQL evaluator of PML-TQ queries which can use PostreSQL as
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 AUTHORS
 

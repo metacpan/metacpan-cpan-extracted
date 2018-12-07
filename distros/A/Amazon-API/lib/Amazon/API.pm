@@ -56,7 +56,8 @@ L</IMPLEMENTATION NOTES> for using C<Amazon::API> directly to call AWS services.
 
 =head1 ERRORS
 
-Errors encountered are returned as an C<Amazon::API::Error> exception object.  See L<Amazon::API::Error>/
+Errors encountered are returned as an C<Amazon::API::Error> exception
+object.  See L<Amazon::API::Error>/
 
 =cut
 
@@ -89,7 +90,7 @@ use vars qw/@EXPORT $VERSION/;
 
 @EXPORT=qw/$VERSION/;
 
-$VERSION = '1.1.3-5'; $VERSION=~s/\-.*$//;
+our $VERSION = '1.1.4'; $VERSION=~s/\-.*$//;
 
 =pod
 
@@ -101,7 +102,7 @@ $VERSION = '1.1.3-5'; $VERSION=~s/\-.*$//;
 
 =over 5
 
-=item credentials
+=item credentials (required)
 
 C<Amazon::Credentials> object or at least an object that
 C<->can(get_aws_access_key_id)> and
@@ -112,7 +113,7 @@ C<->can(get_aws_secret_access_key)> and C<->can(get_token)>
 Your own user agent object or by default C<LWP::UserAgent>.  Using
 C<Furl>, if you have it avaiable may result in faster response.
 
-=item api
+=item api (reqired)
 
 The name of the AWS service.  Example: AWSEvents
 
@@ -164,7 +165,8 @@ sub new {
 			  );
   }
 
-  $self->set_protocol('https') unless $self->get_protocol();
+  $self->set_protocol('https')
+    unless $self->get_protocol();
   
   unless ( $self->get_url ) {
     if ( $self->get_service_url_base() ) {

@@ -16,6 +16,7 @@ use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 
 use Getopt::EX::LabeledParam;
+use Getopt::EX::Util;
 
 our $COLOR_RGB24 = 0;
 
@@ -89,7 +90,7 @@ sub rgb24 {
     my $rgb = shift;
     if ($COLOR_RGB24) {
 	return (2,
-		map { hex $_ }
+		map { hex }
 		$rgb =~ /^\#?([\da-f]{2})([\da-f]{2})([\da-f]{2})/i);
     } else {
 	return (5, ansi256_number $rgb);
@@ -107,20 +108,15 @@ sub rgb12 {
     }
 }
 
-package xg {
-    sub new    { bless do { my $offset = 0; \$offset }, shift }
-    sub toggle { ${+shift} ^= 10 }
-    sub offset { ${+shift} }
-}
-
 sub ansi_numbers {
     local $_ = shift // '';
     my @numbers;
-    my $xg = new xg;
+    my $toggle = new Getopt::EX::ToggleValue value => 10;
 
     while (m{\G
 	     (?:
-	       (?<slash> /)				# /
+	       (?<toggle> /)				# /
+	     | (?<reset> \^)				# ^
 	     | (?<h24>  \#?[0-9a-f]{6} )		# 24bit hex
 	     | (?<h12>  \# [0-9a-f]{3} )		# 12bit hex
 	     | (?<rgb>  \(\d+,\d+,\d+\) )		# 24bit decimal
@@ -138,26 +134,29 @@ sub ansi_numbers {
 	     | (?<err>  .+ )				# error
 	     )
 	    }xig) {
-	if ($+{slash}) {
-	    $xg->toggle;
+	if ($+{toggle}) {
+	    $toggle->toggle;
+	}
+	elsif ($+{reset}) {
+	    $toggle->reset;
 	}
 	elsif ($+{h24}) {
-	    push @numbers, 38 + $xg->offset, rgb24($+{h24});
+	    push @numbers, 38 + $toggle->value, rgb24($+{h24});
 	}
 	elsif ($+{h12}) {
-	    push @numbers, 38 + $xg->offset, rgb12($+{h12});
+	    push @numbers, 38 + $toggle->value, rgb12($+{h12});
 	}
 	elsif (my $rgb = $+{rgb}) {
 	    my @rgb = $rgb =~ /(\d+)/g;
 	    die "Unexpected value: $rgb\n" if grep { $_ > 255 } @rgb;
 	    my $hex = sprintf "%02X%02X%02X", @rgb;
-	    push @numbers, 38 + $xg->offset, rgb24($hex);
+	    push @numbers, 38 + $toggle->value, rgb24($hex);
 	}
 	elsif ($+{c256}) {
-	    push @numbers, 38 + $xg->offset, 5, ansi256_number $+{c256};
+	    push @numbers, 38 + $toggle->value, 5, ansi256_number $+{c256};
 	}
 	elsif ($+{c16}) {
-	    push @numbers, $numbers{$+{c16}} + $xg->offset;
+	    push @numbers, $numbers{$+{c16}} + $toggle->value;
 	}
 	elsif ($+{efct}) {
 	    my $efct = uc $+{efct};
@@ -174,7 +173,7 @@ sub ansi_numbers {
 	}
 	elsif ($+{name}) {
 	    if (my $rgb = $color_table{$+{name}}) {
-		push @numbers, 38 + $xg->offset, rgb24($rgb);
+		push @numbers, 38 + $toggle->value, rgb24($rgb);
 	    } else {
 		die "Unknown color name: $+{name}\n";
 	    }
@@ -300,9 +299,11 @@ sub apply_color {
 sub new {
     my $class = shift;
     my $obj = SUPER::new $class;
+    my %opt = @_;
 
     $obj->{CACHE} = {};
-    configure $obj @_ if @_;
+    $opt{CONCAT} //= "^"; # Reset character for LabeledParam object
+    configure $obj %opt;
 
     $obj;
 }
@@ -412,6 +413,13 @@ specified by I<LABEL=> style precedence.  Multiple labels can be set
 for same value by connecting them together.  Label name can be
 specified with C<*> and C<?> wild characters.
 
+If the color spec start with plus (C<+>) mark with labeled list
+format, it is appended to the current value with reset mark (C<^>).
+Next example uses wildcard to set all labels end with `CHANGE' to `R'
+and set `R^S' to `OCHANGE' label.
+
+    --cm '*CHANGE=R,OCHANGE=+S'
+
 Indexed list example is like this:
 
     --cm 555/100,555/010,555/001 \
@@ -495,11 +503,17 @@ with other special effects :
 
     ;    No effect
     X    No effect
+    /    Toggle foreground/background
+    ^    Reset to foreground
 
 At first the color is considered as foreground, and slash (C</>)
 switches foreground and background.  If multiple colors are given in
 the same spec, all indicators are produced in the order of their
 presence.  Consequently, the last one takes effect.
+
+If the spec start with plus (C<+>) or minus (C<->) character,
+following characters are appneded/deleted from previous value. Reset
+mark (C<^>) is inserted before appended string.
 
 Effect characters are case insensitive, and can be found anywhere and
 in any order in color spec string.  Because C<X> and C<;> takes no

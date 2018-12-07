@@ -1,0 +1,51 @@
+{
+   "abstract" : "install the libunicruft C library on your system",
+   "author" : [
+      "Bryan Jurish <moocow@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Unicruft",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.027",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.005",
+            "File::ShareDir" : "1.00",
+            "perl" : "v5.8.9"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Text::ParseWords" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Unicruft" : {
+         "file" : "lib/Alien/Unicruft.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

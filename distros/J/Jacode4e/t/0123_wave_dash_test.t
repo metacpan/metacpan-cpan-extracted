@@ -20,6 +20,7 @@ BEGIN {
         ["\x81\x60",'jef9p',  'cp932',{'INPUT_LAYOUT'=>'D'},"\xA1\xC1"],
         ["\x81\x60",'jipsj',  'cp932',{'INPUT_LAYOUT'=>'D'},"\x21\x41"],
         ["\x81\x60",'jipse',  'cp932',{'INPUT_LAYOUT'=>'D'},"\x4F\xC1"],
+        ["\x81\x60",'letsj',  'cp932',{'INPUT_LAYOUT'=>'D'},"\xA1\xC1"],
         ["\x81\x60",'utf8',   'cp932',{'INPUT_LAYOUT'=>'D'},"\xE3\x80\x9C"],
     );
     $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }

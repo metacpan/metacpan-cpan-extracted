@@ -19,11 +19,11 @@ RAISON D'ETRE
     user-defined area.
 
     The encodings that can be round-trip converted are cp932x, cp00930,
-    keis78, keis83, keis90, jef, jef9p, jipsj, jipse, utf8, and utf8jp.
+    keis78, keis83, keis90, jef, jef9p, jipsj, jipse, letsj, utf8, and utf8jp.
 
     This table shows shortage to support JIS X 0213 in each encoding
     ---------------------------------------------------------------------
-                          Jacode4e   short-  user-def.  unused    free
+                           Jacode4e  short-  user-def.  unused    free
     mnemonic              supported     age       area    area    area
     ---------------------------------------------------------------------
     cp932x                   11,285       0         --      --      --
@@ -31,14 +31,16 @@ RAISON D'ETRE
     keis78, keis83, keis90    8,268   3,017      2,914     188   3,102
     jef, jef9p                8,814   2,471      3,102      --   3,102
     jipsj, jipse              8,637   2,648      3,948      --   3,948
+    letsj                     9,876   1,409      2,632      --   2,632
     utf8                     11,220      65      6,400      --      65
     utf8jp                   11,285       0         --      --      --
     ---------------------------------------------------------------------
 
     cp00930 use 28 code points from its user-defined area. Similarly, keis78,
     keis83, and keis90 use 3,017, jef and jef9p use 2,471, jipsj and jipse
-    use 2,648, utf8 use 65. In case of KEIS, user-defined area is not enough
-    to support JIS X 0213. So I decided to use unused area.
+    use 2,648, letsj use 1,409, utf8 use 65. In case of KEIS, user-defined
+    area is not enough to support JIS X 0213. So I decided to use unused
+    area.
 
     Yes, you cannot use your gaiji on Jacode4e::RoundTrip module, you see.
 

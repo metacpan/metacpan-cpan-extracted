@@ -11,16 +11,13 @@ CGI::Ex::Dump - A debug utility
 #  Distributed under the Perl Artistic License without warranty      #
 ###----------------------------------------------------------------###
 
-use vars qw(@ISA @EXPORT @EXPORT_OK $VERSION
-            $CALL_LEVEL
-            $ON $SUB $QR1 $QR2 $full_filename $DEPARSE);
+use vars qw($CALL_LEVEL $ON $SUB $QR1 $QR2 $full_filename $DEPARSE);
 use strict;
-use Exporter;
+use Exporter qw(import);
 
-$VERSION   = '2.47';
-@ISA       = qw(Exporter);
-@EXPORT    = qw(dex dex_warn dex_text dex_html ctrace dex_trace);
-@EXPORT_OK = qw(dex dex_warn dex_text dex_html ctrace dex_trace debug caller_trace);
+our $VERSION = '2.48';
+our @EXPORT    = qw(dex dex_warn dex_text dex_html ctrace dex_trace);
+our @EXPORT_OK = qw(dex dex_warn dex_text dex_html ctrace dex_trace debug caller_trace);
 
 ### is on or off
 sub on  { $ON = 1 };

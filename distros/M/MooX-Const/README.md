@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.2.1
+version v0.2.2
 
 # SYNOPSIS
 

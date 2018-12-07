@@ -1,6 +1,6 @@
 package PMLTQ::Command::load;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::load::VERSION = '1.4.0';
+$PMLTQ::Command::load::VERSION = '1.5.0';
 # ABSTRACT: Load treebank to database
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -60,7 +60,7 @@ PMLTQ::Command::load - Load treebank to database
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 

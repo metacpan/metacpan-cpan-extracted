@@ -8,6 +8,6 @@ BEGIN {
 ";
 }
 
-require_ok('CGI::Info') || print 'Bail out!';
+require_ok('CGI::Lingua') || print 'Bail out!';
 
 diag( "Testing CGI::Lingua $CGI::Lingua::VERSION, Perl $], $^X" );

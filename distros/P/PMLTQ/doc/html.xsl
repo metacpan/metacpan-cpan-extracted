@@ -5,7 +5,7 @@
                 version='1.0'>
   <!-- Import docbook stylesheet. Or import slides/fo/plain.xsl, or ... -->
   <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/html/docbook.xsl"/>
-
+  <xsl:output method="html" encoding="UTF-8" />
   <xsl:template match="text()[ancestor::phrase[@role='math']]">
     <xsl:for-each select="str:tokenize(string(.), '')">
       <xsl:choose>

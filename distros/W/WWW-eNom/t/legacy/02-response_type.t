@@ -5,10 +5,11 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use Test::MockModule;
 
 use FindBin;
 use lib "$FindBin::Bin/../lib/";
-use Test::WWW::eNom qw( check_for_credentials $ENOM_USERNAME $ENOM_PASSWORD );
+use Test::WWW::eNom qw( check_for_credentials mock_response $ENOM_USERNAME $ENOM_PASSWORD );
 
 use Data::Util qw( is_hash_ref is_string );
 use XML::Simple qw( XMLin );
@@ -40,6 +41,18 @@ subtest 'XML Response' => sub {
         });
     } 'Lives through creation of WWW::eNom Object';
 
+    my $mocked_api = mock_response(
+        method   => 'Check',
+        response => <<RESPONSE,
+<?xml version="1.0" encoding="utf-8"?>
+<interface-response>
+<DomainName>enom.com</DomainName>
+<RRPCode>211</RRPCode>
+<RRPText>Domain not available</RRPText>
+</interface-response>
+RESPONSE
+    );
+
     my $response;
     lives_ok {
         $response = $api->Check( Domain => $DOMAIN );
@@ -66,6 +79,15 @@ subtest 'XML Simple Response' => sub {
         });
     } 'Lives through creation of WWW::eNom Object';
 
+    my $mocked_api = mock_response(
+        method   => 'Check',
+        response => {
+            DomainName => $DOMAIN,
+            RRPCode    => 211,
+            RRPText    => 'Domain not available',
+        }
+    );
+
     my $response;
     lives_ok {
         $response = $api->Check( Domain => $DOMAIN );
@@ -86,6 +108,13 @@ subtest 'HTML Response' => sub {
         });
     } 'Lives through creation of WWW::eNom Object';
 
+    my $mocked_api = mock_response(
+        method   => 'Check',
+        response => <<RESPONSE,
+<HTML><BODY><STRONG>DomainName: </STRONG>enom.com<BR /><STRONG>RRPCode: </STRONG>211<BR /><STRONG>RRPText: </STRONG>Domain not available</BODY></HTML>
+RESPONSE
+    );
+
     my $response;
     lives_ok {
         $response = $api->Check( Domain => $DOMAIN );
@@ -105,6 +134,18 @@ subtest 'TEXT Response' => sub {
             test          => 1,
         });
     } 'Lives through creation of WWW::eNom Object';
+
+    my $mocked_api = mock_response(
+        method   => 'Check',
+        response => <<RESPONSE,
+;URL Interface
+;Machine is SJL1VWRESELL_T1
+;Encoding Type is utf-8
+DomainName=enom.com
+RRPCode=211
+RRPText=Domain not available
+RESPONSE
+    );
 
     my $response;
     lives_ok {

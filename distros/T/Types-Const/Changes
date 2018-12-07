@@ -1,5 +1,9 @@
 Revision history for Types-Const:
 
+v0.3.6    2018-12-06 17:51:23+00:00 Europe/London
+  [Bug Fixes]
+  - Set minimum version of Storable for Regexp support.
+
 v0.3.5    2018-11-20 19:05:10+00:00 Europe/London
   [Documentation]
   - Added a note about possible issues with RegexpRefs, RT#127635.

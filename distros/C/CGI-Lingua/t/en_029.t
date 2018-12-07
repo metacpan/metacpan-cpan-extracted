@@ -39,5 +39,5 @@ EN_029: {
 		local $TODO = "sublanguage doesn't handle 3 characters";
 
 		ok(defined($l->sublanguage()));
-	};
+	}
 }

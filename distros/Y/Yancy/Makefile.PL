@@ -13,7 +13,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A simple CMS for administrating data",
+  "ABSTRACT" => "A simple framework and editor for content-driven Mojolicious websites",
   "AUTHOR" => "Doug Bell <preaction\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "1.015",
+  "VERSION" => "1.016",
   "test" => {
     "TESTS" => "t/*.t t/backend/*.t t/controller/*.t t/examples/*.t t/plugin/auth/*.t t/plugin/form/*.t"
   }

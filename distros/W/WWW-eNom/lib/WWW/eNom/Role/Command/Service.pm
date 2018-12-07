@@ -17,7 +17,7 @@ use Carp;
 
 requires 'submit', '_set_domain_auto_renew', 'get_domain_by_name';
 
-our $VERSION = 'v2.6.0'; # VERSION
+our $VERSION = 'v2.7.0'; # VERSION
 # ABSTRACT: Addon Services That Can Be Purchased
 
 sub get_domain_privacy_wholesale_price {

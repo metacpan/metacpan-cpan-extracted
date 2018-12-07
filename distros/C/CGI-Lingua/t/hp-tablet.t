@@ -38,5 +38,5 @@ RT77332: {
 			skip 'Test requires Internet access', 1 unless(-e 't/online.enabled');
 			ok(uc($l->locale()->code_alpha2()) eq 'NZ');
 		}
-	};
+	}
 }

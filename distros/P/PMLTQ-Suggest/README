@@ -1,3 +1,8 @@
+NAME
+
+    PMLTQ::Suggest - Tool for generating simple PMLTQ query based on given
+    nodes
+
 DESCRIPTION
 
     This is an implementation of a Suggest server and a plugin for PML-TQ

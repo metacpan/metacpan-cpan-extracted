@@ -1,3 +1,7 @@
+0.08 2018-12-06
+    * Add C<implicit_headers> option to leave out headers when generating code
+    * Handle -L , --location
+
 0.07 2018-11-27
     * Fix broken code generation
     * The requests worked but the generated code did not

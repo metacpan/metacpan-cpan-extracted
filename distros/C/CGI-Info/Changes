@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.68	Fri Dec  7 08:14:21 EST 2018
+	Allow a parameter to have the value 0
+
 0.67	Tue Mar 27 12:31:12 EDT 2018
 	Remove the 'provides' tag
 

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "x$1" == "xsize" ]; then
+  echo "77 140"
+else
+  echo "bad"
+  exit 2
+fi

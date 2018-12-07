@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use Test::MockModule;
+use MooseX::Params::Validate;
 
 use WWW::eNom;
 
@@ -15,7 +17,7 @@ Readonly my $SKIP_MESSAGE   => 'PERL_WWW_ENOM_USERNAME and PERL_WWW_ENOM_PASSWOR
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
-    create_api check_for_credentials
+    create_api check_for_credentials mock_response
     $ENOM_USERNAME $ENOM_PASSWORD
 );
 
@@ -41,6 +43,30 @@ sub check_for_credentials {
     }
 
     return;
+}
+
+sub mock_response {
+    my ( %args ) = validated_hash(
+        \@_,
+        force_mock => { isa => 'Bool', default => 0 },
+        method     => { isa => 'Str' },
+        response   => { isa => 'Str | HashRef' },
+        mocked_api => { isa => 'Test::MockModule', optional => 1 }
+    );
+
+    my $mocked_api = defined $args{mocked_api} ? $args{mocked_api} : Test::MockModule->new('WWW::eNom');
+
+    if( $ENV{USE_MOCK} || $args{force_mock} ) {
+        $mocked_api->mock( $args{method}, sub {
+            my $self = shift;
+
+            note( 'Mocked WWW::eNom->' . $args{method} );
+
+            return $args{response};
+        });
+    }
+
+    return $mocked_api;
 }
 
 1;

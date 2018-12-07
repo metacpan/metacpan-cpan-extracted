@@ -13,6 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/../../../../lib";
 use Test::WWW::eNom qw( create_api );
 use Test::WWW::eNom::Domain qw( $UNREGISTERED_DOMAIN $NOT_MY_DOMAIN );
+use Test::WWW::eNom::Domain::Transfer qw( mock_domain_transfer mock_tp_get_order_detail );
 use Test::WWW::eNom::Contact qw( create_contact );
 
 use WWW::eNom::Contact;
@@ -33,6 +34,8 @@ subtest 'Transfer Unregistered Domain' => sub {
         );
     } 'Lives through creating request object';
 
+    my $mocked_api = mock_domain_transfer( request => $request );
+
     my $domain_transfer;
     lives_ok {
         $domain_transfer = $api->transfer_domain( request => $request );
@@ -43,11 +46,22 @@ subtest 'Transfer Unregistered Domain' => sub {
         domain_transfer => $domain_transfer,
     );
 
-    my $mocked_submit = mock_submit(
-        request   => $request,
-        order_id  => $domain_transfer->order_id,
-        status_id => 20,
-        status    => 'Canceled - Domain is currently not registered and cannot be transferred',
+    $mocked_api->unmock_all;
+
+    $mocked_api = mock_tp_get_order_detail(
+        force_mock    => 1,
+        order_id      => $domain_transfer->order_id,
+        sld           => $request->sld,
+        tld           => $request->tld,
+        status_id     => 20,
+        status        => 'Canceled - Domain is currently not registered and cannot be transferred',
+        is_locked     => $request->is_locked,
+        is_auto_renew => $request->is_auto_renew,
+        use_existing_contacts => $request->use_existing_contacts,
+        registrant_contact    => $request->registrant_contact,
+        admin_contact         => $request->admin_contact,
+        technical_contact     => $request->technical_contact,
+        billing_contact       => $request->billing_contact,
     );
 
     subtest 'Inspect Pending Transfer Detail' => sub {
@@ -57,6 +71,8 @@ subtest 'Transfer Unregistered Domain' => sub {
         cmp_ok( $updated_domain_transfer->status, 'eq',
             'Canceled - Domain is currently not registered and cannot be transferred', 'Correct status' );
     };
+
+    $mocked_api->unmock_all;
 };
 
 subtest 'Transfer Domain - Bad EPP Key' => sub {
@@ -74,6 +90,8 @@ subtest 'Transfer Domain - Bad EPP Key' => sub {
         );
     } 'Lives through creating request object';
 
+    my $mocked_api = mock_domain_transfer( request => $request );
+
     my $domain_transfer;
     lives_ok {
         $domain_transfer = $api->transfer_domain( request => $request );
@@ -84,11 +102,22 @@ subtest 'Transfer Domain - Bad EPP Key' => sub {
         domain_transfer => $domain_transfer,
     );
 
-    my $mocked_submit = mock_submit(
-        request   => $request,
-        order_id  => $domain_transfer->order_id,
-        status_id => 32,
-        status    => 'Canceled - Invalid EPP/authorization key - Please contact current registrar to obtain correct key',
+    $mocked_api->unmock_all;
+
+    $mocked_api = mock_tp_get_order_detail(
+        force_mock    => 1,
+        order_id      => $domain_transfer->order_id,
+        sld           => $request->sld,
+        tld           => $request->tld,
+        status_id     => 32,
+        status        => 'Canceled - Invalid EPP/authorization key - Please contact current registrar to obtain correct key',
+        is_locked     => $request->is_locked,
+        is_auto_renew => $request->is_auto_renew,
+        use_existing_contacts => $request->use_existing_contacts,
+        registrant_contact    => $request->registrant_contact,
+        admin_contact         => $request->admin_contact,
+        technical_contact     => $request->technical_contact,
+        billing_contact       => $request->billing_contact,
     );
 
     subtest 'Inspect Pending Transfer Detail' => sub {
@@ -99,6 +128,8 @@ subtest 'Transfer Domain - Bad EPP Key' => sub {
             'Canceled - Invalid EPP/authorization key - Please contact current registrar to obtain correct key',
             'Correct status' );
     };
+
+    $mocked_api->unmock_all;
 };
 
 subtest 'Transfer Domain - New Contacts - No Privacy, Locking, Auto Renew' => sub {
@@ -120,6 +151,8 @@ subtest 'Transfer Domain - New Contacts - No Privacy, Locking, Auto Renew' => su
         );
     } 'Lives through creating request object';
 
+    my $mocked_api = mock_domain_transfer( request => $request );
+
     my $domain_transfer;
     lives_ok {
         $domain_transfer = $api->transfer_domain( request => $request );
@@ -130,11 +163,20 @@ subtest 'Transfer Domain - New Contacts - No Privacy, Locking, Auto Renew' => su
         domain_transfer => $domain_transfer,
     );
 
-    my $mocked_submit = mock_submit(
-        request   => $request,
-        order_id  => $domain_transfer->order_id,
+    $mocked_api->unmock_all;
+
+    $mocked_api = mock_tp_get_order_detail(
+        force_mock    => 1,
+        order_id      => $domain_transfer->order_id,
+        sld           => $request->sld,
+        tld           => $request->tld,
         status_id => 9,
         status    => 'Awaiting auto verification of transfer request',
+        use_existing_contacts => $request->use_existing_contacts,
+        registrant_contact    => $request->registrant_contact,
+        admin_contact         => $request->admin_contact,
+        technical_contact     => $request->technical_contact,
+        billing_contact       => $request->billing_contact,
     );
 
     subtest 'Inspect Pending Transfer Detail' => sub {
@@ -153,6 +195,8 @@ subtest 'Transfer Domain - New Contacts - No Privacy, Locking, Auto Renew' => su
             is_deeply( $updated_domain_transfer->$attribute, $request->$attribute, "Correct $contact_type contact" );
         }
     };
+
+    $mocked_api->unmock_all;
 };
 
 subtest 'Transfer Domain - Use Existing Contacts - With Privacy, Locking, Auto Renew' => sub {
@@ -170,6 +214,8 @@ subtest 'Transfer Domain - Use Existing Contacts - With Privacy, Locking, Auto R
         );
     } 'Lives through creating request object';
 
+    my $mocked_api = mock_domain_transfer( request => $request );
+
     my $domain_transfer;
     lives_ok {
         $domain_transfer = $api->transfer_domain( request => $request );
@@ -180,11 +226,16 @@ subtest 'Transfer Domain - Use Existing Contacts - With Privacy, Locking, Auto R
         domain_transfer => $domain_transfer,
     );
 
-    my $mocked_submit = mock_submit(
-        request   => $request,
-        order_id  => $domain_transfer->order_id,
-        status_id => 9,
-        status    => 'Awaiting auto verification of transfer request',
+    $mocked_api->unmock_all;
+
+    $mocked_api = mock_tp_get_order_detail(
+        force_mock  => 1,
+        order_id    => $domain_transfer->order_id,
+        sld         => $request->sld,
+        tld         => $request->tld,
+        status_id   => 9,
+        status      => 'Awaiting auto verification of transfer request',
+        use_existing_contacts => $request->use_existing_contacts,
     );
 
     subtest 'Inspect Pending Transfer Detail' => sub {
@@ -200,6 +251,8 @@ subtest 'Transfer Domain - Use Existing Contacts - With Privacy, Locking, Auto R
             ok( !$domain_transfer->$predicate, "Correctly lacks $contact_type contact" );
         }
     };
+
+    $mocked_api->unmock_all;
 };
 
 # I considered adding test coverage for these additional cases but because
@@ -226,65 +279,14 @@ sub inspect_preliminary_transfer_detail {
             cmp_ok( $args{domain_transfer}->is_auto_renew,         '==', $args{request}->is_auto_renew, 'Correct is_auto_renew' );
             cmp_ok( $args{domain_transfer}->use_existing_contacts, '==',
                 $args{request}->use_existing_contacts, 'Correct use_existing_contacts' );
-            cmp_ok( $args{domain_transfer}->status_id,             '==', 9, 'Correct status_id' );
-            cmp_ok( $args{domain_transfer}->status, 'eq', 'Awaiting auto verification of transfer request', 'Correct status' );
+            cmp_ok( $args{domain_transfer}->status_id,             '==', 13, 'Correct status_id' );
+            cmp_ok( $args{domain_transfer}->status, 'eq', 'Domain awaiting transfer initiation', 'Correct status' );
 
-            for my $contact_type (qw( registrant admin technical billing )) {
-                my $predicate = sprintf('has_%s_contact', $contact_type );
-                ok( !$args{domain_transfer}->$predicate, "Correctly lacks $contact_type contact" );
+            for my $contact_type (qw( registrant_contact admin_contact technical_contact billing_contact )) {
+                is_deeply( $args{domain_transfer}->$contact_type, $args{request}->$contact_type, "Correct $contact_type" );
             }
         }
     };
 
     return;
-}
-
-sub mock_submit {
-    my ( %args ) = validated_hash(
-        \@_,
-        request   => { isa => 'WWW::eNom::DomainRequest::Transfer' },
-        order_id  => { isa => 'Int' },
-        status_id => { isa => 'Int' },
-        status    => { isa => 'Str' },
-    );
-
-    my $mock = Test::MockModule->new('WWW::eNom');
-    $mock->mock('submit', sub {
-        note('Mocked WWW::eNom->submit');
-
-        my $contacts;
-        if( $args{request}->use_existing_contacts ) {
-            $contacts = {
-                'Registrant' => 'None',
-                'Tech'       => 'None',
-                'Admin'      => 'None',
-                'AuxBilling' => 'None',
-            };
-        }
-        else {
-            $contacts = {
-                'Registrant' => $args{request}->registrant_contact->construct_creation_request(),
-                'Tech'       => $args{request}->technical_contact->construct_creation_request(),
-                'Admin'      => $args{request}->admin_contact->construct_creation_request(),
-                'AuxBilling' => $args{request}->billing_contact->construct_creation_request(),
-            };
-        }
-
-        return {
-            ErrCount            => 0,
-            transferorderdetail => {
-                'transferorderdetailid' => $args{order_id},
-                'sld'         => $args{request}->sld,
-                'tld'         => $args{request}->tld,
-                'statusid'    => $args{status_id},
-                'statusdesc'  => $args{status},
-                'lock'        => ( $args{request}->is_locked             ? 'True' : 'False' ),
-                'renew'       => ( $args{request}->is_auto_renew         ? 'True' : 'False' ),
-                'usecontacts' => ( $args{request}->use_existing_contacts ? '1' : '0' ),
-                'contacts'    => $contacts,
-            },
-        }
-    });
-
-    return $mock;
 }

@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/namespace-local-perl/issues
   repository: https://github.com/dallaylaen/namespace-local-perl.git
-version: '0.0401'
+version: '0.0402'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

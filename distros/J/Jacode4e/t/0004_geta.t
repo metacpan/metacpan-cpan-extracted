@@ -23,6 +23,7 @@ BEGIN {
         ["\xFC\xFC",'jef9p',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xA2\xAE"        ],
         ["\xFC\xFC",'jipsj',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\x22\x2E"        ],
         ["\xFC\xFC",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\x7F\x4B"        ],
+        ["\xFC\xFC",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xA2\xAE"        ],
         ["\xFC\xFC",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE3\x80\x93"    ],
         ["\xFC\xFC",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xF3\xB0\x85\xAB"],
     );

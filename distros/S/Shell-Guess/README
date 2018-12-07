@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.08
+    version 0.09
 
 SYNOPSIS
 
@@ -277,7 +277,8 @@ CLASS METHODS
 
       my $shell = Shell::Guess->power_shell;
 
-    Returns an instance of Shell::Guess for Windows PowerShell.
+    Returns an instance of Shell::Guess for Microsoft PowerShell (either
+    for Windows powershell.exe or Unix pwsh).
 
     The following instance methods will return:
 
@@ -421,7 +422,7 @@ INSTANCE METHODS
      my $bool = $shell->is_win32;
 
     Returns true if the shell is traditionally a Windows shell
-    (command.com, cmd.exe)
+    (command.com, cmd.exe, powershell.exe, pwsh)
 
  is_z
 

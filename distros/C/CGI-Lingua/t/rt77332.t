@@ -38,5 +38,5 @@ RT77332: {
 			ok(defined($l->code_alpha2()));
 			ok($l->country() eq 'by');
 		}
-	};
+	}
 }

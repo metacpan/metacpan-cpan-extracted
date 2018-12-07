@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.015';
+our $VERSION = '1.016';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -257,11 +257,11 @@ our $VERSION = '1.015';
 #pod
 #pod =over
 #pod
-#pod =item * $field_name - The name of the field being filtered
+#pod =item * $name - The name of the collection/field being filtered
 #pod
-#pod =item * $field_value - The value to filter
+#pod =item * $value - The value to filter, either the entire item, or a single field
 #pod
-#pod =item * $field_conf - The full configuration for the field
+#pod =item * $conf - The configuration for the collection/field
 #pod
 #pod =back
 #pod
@@ -292,6 +292,32 @@ our $VERSION = '1.015';
 #pod                             type => 'SHA-1',
 #pod                         },
 #pod                     },
+#pod                 },
+#pod             },
+#pod         },
+#pod     }
+#pod
+#pod Collections can also have filters. A collection filter will get the
+#pod entire hash reference as its value. For example, here's a filter that
+#pod updates the C<last_updated> field with the current time:
+#pod
+#pod     $c->yancy->filter->add( 'timestamp' => sub {
+#pod         my ( $coll_name, $item, $coll_conf ) = @_;
+#pod         $item->{last_updated} = time;
+#pod         return $item;
+#pod     } );
+#pod
+#pod And you configure this on the collection using C<< x-filter >>:
+#pod
+#pod     # mysite.conf
+#pod     {
+#pod         collections => {
+#pod             people => {
+#pod                 'x-filter' => [ 'timestamp' ],
+#pod                 properties => {
+#pod                     name => { type => 'string' },
+#pod                     address => { type => 'string' },
+#pod                     last_updated => { type => 'datetime' },
 #pod                 },
 #pod             },
 #pod         },
@@ -859,9 +885,17 @@ sub _helper_filter_apply {
     my ( $self, $c, $coll_name, $item ) = @_;
     my $coll = $c->yancy->schema( $coll_name );
     my $filters = $self->_filters;
+    if ( my $coll_filters = $coll->{'x-filter'} ) {
+        for my $filter ( @{ $coll_filters } ) {
+            my $sub = $filters->{ $filter };
+            die "Unknown filter: $filter (collection: $coll_name)"
+                unless $sub;
+            $item = $sub->( $coll_name, $item, $coll );
+        }
+    }
     for my $key ( keys %{ $coll->{properties} } ) {
-        next unless $coll->{properties}{ $key }{ 'x-filter' };
-        for my $filter ( @{ $coll->{properties}{ $key }{ 'x-filter' } } ) {
+        next unless my $prop_filters = $coll->{properties}{ $key }{ 'x-filter' };
+        for my $filter ( @{ $prop_filters } ) {
             my $sub = $filters->{ $filter };
             die "Unknown filter: $filter (collection: $coll_name, field: $key)"
                 unless $sub;
@@ -890,7 +924,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.015
+version 1.016
 
 =head1 SYNOPSIS
 
@@ -1147,11 +1181,11 @@ three arguments:
 
 =over
 
-=item * $field_name - The name of the field being filtered
+=item * $name - The name of the collection/field being filtered
 
-=item * $field_value - The value to filter
+=item * $value - The value to filter, either the entire item, or a single field
 
-=item * $field_conf - The full configuration for the field
+=item * $conf - The configuration for the collection/field
 
 =back
 
@@ -1182,6 +1216,32 @@ And you configure this on a field using C<< x-filter >> and C<< x-digest >>:
                             type => 'SHA-1',
                         },
                     },
+                },
+            },
+        },
+    }
+
+Collections can also have filters. A collection filter will get the
+entire hash reference as its value. For example, here's a filter that
+updates the C<last_updated> field with the current time:
+
+    $c->yancy->filter->add( 'timestamp' => sub {
+        my ( $coll_name, $item, $coll_conf ) = @_;
+        $item->{last_updated} = time;
+        return $item;
+    } );
+
+And you configure this on the collection using C<< x-filter >>:
+
+    # mysite.conf
+    {
+        collections => {
+            people => {
+                'x-filter' => [ 'timestamp' ],
+                properties => {
+                    name => { type => 'string' },
+                    address => { type => 'string' },
+                    last_updated => { type => 'datetime' },
                 },
             },
         },

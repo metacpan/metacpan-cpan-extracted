@@ -6,7 +6,7 @@ package BSON::OID;
 # ABSTRACT: BSON type wrapper for Object IDs
 
 use version;
-our $VERSION = 'v1.10.1';
+our $VERSION = 'v1.10.2';
 
 use Carp;
 use Config;
@@ -62,7 +62,7 @@ use namespace::clean -except => 'meta';
     #<<<
     sub _packed_oid {
         my $time = defined $_[0] ? $_[0] : time;
-        $_random = Crypt::Urandom::urandom($_RANDOM_SIZE) if $$ != $_pid;
+        $_random = Crypt::URandom::urandom($_RANDOM_SIZE) if $$ != $_pid;
         return pack(
             'Na5a3',
             $time,
@@ -253,7 +253,7 @@ BSON::OID - BSON type wrapper for Object IDs
 
 =head1 VERSION
 
-version v1.10.1
+version v1.10.2
 
 =head1 SYNOPSIS
 

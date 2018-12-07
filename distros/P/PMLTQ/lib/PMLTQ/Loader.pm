@@ -1,6 +1,6 @@
 package PMLTQ::Loader;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Loader::VERSION = '1.4.0';
+$PMLTQ::Loader::VERSION = '1.5.0';
 # ABSTRACT: Module loader for L<PMLTQ::Relation|PMLTQ::Relation>s inspired by L<Mojo::Loader>
 
 
@@ -67,7 +67,7 @@ PMLTQ::Loader - Module loader for L<PMLTQ::Relation|PMLTQ::Relation>s inspired b
 
 =head1 VERSION
 
-version 1.4.0
+version 1.5.0
 
 =head1 SYNOPSIS
 

@@ -34,7 +34,7 @@ no_index:
 provides:
   MooX::TaggedAttributes:
     file: lib/MooX/TaggedAttributes.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '2.12'
@@ -49,5 +49,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes
   repository: git://github.com/djerius/moox-taggedattributes.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.70'

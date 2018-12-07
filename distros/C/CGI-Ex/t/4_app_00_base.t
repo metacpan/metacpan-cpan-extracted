@@ -13,11 +13,12 @@ we do try to put it through most paces.
 
 =cut
 
-use Test::More tests => 234;
+use Test::More tests => 241;
 use strict;
 use warnings;
 use CGI::Ex::Dump qw(debug caller_trace);
 
+BEGIN { $INC{'CGIXFail.pm'} = 'local' };
 {
     package CGIXFail;
     use vars qw($AUTOLOAD);
@@ -29,6 +30,7 @@ use CGI::Ex::Dump qw(debug caller_trace);
         die "Not calling CGI::Ex method $meth while testing App";
     }
 }
+BEGIN { $INC{'Foo.pm'} = 'local' }; # begin so use base below functions
 {
     package Foo;
 
@@ -167,7 +169,7 @@ ok($Foo::test_stdout eq "Main Content", "Got the right output for Foo2");
 
 {
     package Foo2_1;
-    our @ISA = qw(Foo);
+    use base qw(Foo);
     sub pre_navigate { 1 }
 }
 Foo2_1->navigate;
@@ -178,24 +180,27 @@ ok($Foo::test_stdout eq "Main Content", "Got the right output for Foo2_1");
 
 {
     package Foo2_2;
-    our @ISA = qw(Foo);
+    use base qw(Foo);
     sub pre_loop { 1 }
+    use Foo qw(App__finalize__finished_and_move_to_next_step);
 }
 Foo2_2->navigate;
 ok($Foo::test_stdout eq "", "Got the right output for Foo2_2");
 
 {
     package Foo2_3;
-    our @ISA = qw(Foo);
+    use base qw(Foo);
     sub post_loop { 1 }
+    use Foo qw(:App__finalize);
 }
 Foo2_3->navigate;
 ok($Foo::test_stdout eq "", "Got the right output for Foo2_3");
 
 {
     package Foo2_4;
-    our @ISA = qw(Foo);
+    use base qw(Foo);
     sub post_navigate { $Foo::test_stdout .= " post"; 1 }
+    use Foo qw(:App);
 }
 Foo2_4->navigate;
 ok($Foo::test_stdout eq "Main Content post", "Got the right output for Foo2_4");
@@ -204,6 +209,27 @@ Foo2_4->new({_no_post_navigate => 1})->navigate;
 ok($Foo::test_stdout eq "Main Content", "Got the right output for Foo2_4");
 
 my $f;
+
+###----------------------------------------------------------------###
+
+my $v = eval { Foo2_1::App__finalize__finished_and_move_to_next_step() };
+is($v, undef, 'constants - no constant imported');
+
+$v = eval { Foo2_2::App__finalize__finished_and_move_to_next_step() };
+is($v, 1, 'constants - App__finalize__finished_and_move_to_next_step');
+$v = eval { Foo2_2::App__finalize__finished_but_show_page() };
+is($v, undef, 'constants - only hook value was imported');
+
+
+$v = eval { Foo2_3::App__finalize__finished_and_move_to_next_step() };
+is($v, 1, 'constants - :App__finalize');
+$v = eval { Foo2_2::App__run_step__move_to_next_step() };
+is($v, undef, 'constants - only hook values were imported');
+
+$v = eval { Foo2_4::App__finalize__finished_and_move_to_next_step() };
+is($v, 1, 'constants - :App');
+$v = eval { Foo2_4::App__run_step__move_to_next_step() };
+is($v, 0, 'constants - all values were imported');
 
 ###----------------------------------------------------------------###
 

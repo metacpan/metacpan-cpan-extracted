@@ -1,6 +1,6 @@
 package PMLTQ::Suggest::Utils;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Suggest::Utils::VERSION = '0.0.2';
+$PMLTQ::Suggest::Utils::VERSION = '0.0.3';
 use strict;
 use warnings;
 

@@ -5,12 +5,10 @@ package MooX::TaggedAttributes;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 use MRO::Compat;
-
-use Moo::Role;
 
 use Scalar::Util qw[ blessed ];
 use Class::Method::Modifiers qw[ install_modifier ];
@@ -50,16 +48,22 @@ sub import {
     _install_role_import( $target );
 }
 
+# Moo::Role won't compose anything before it was used into a consuming
+# package. Don't want import to be consumed.
+use Moo::Role;
+
 sub _install_role_import {
 
     my $target = shift;
 
     ## no critic (ProhibitNoStrict)
     no strict 'refs';
-    no warnings 'redefine';
     *{"${target}::import"} = sub {
 
         my $class  = shift;
+
+        return unless Moo::Role->is_role( $class );
+
         my $target = caller;
 
         Moo::Role->apply_roles_to_package( $target, $class );
@@ -228,7 +232,7 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

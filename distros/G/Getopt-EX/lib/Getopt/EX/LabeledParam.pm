@@ -17,7 +17,8 @@ sub new {
     my $class = shift;
 
     my $obj = bless {
-	newlabel => 0,
+	NEWLABEL => 0,
+	CONCAT => "",
 	HASH => {},
 	LIST => [],
     }, $class;
@@ -90,15 +91,24 @@ sub load_params {
 	if ($spec =~ s/\b(sub\s*{.*)//) { # sub { ... }
 	    push @spec, parse_func($1);
 	}
-	push @spec, $spec if $spec ne "";
-	my $c = @spec > 1 ? [ @spec ] : $spec[0];
+	push @spec, $spec if $spec ne '';
+	my $c = @spec > 1 ? [ @spec ] : @spec == 1 ? $spec[0] : "";
 	if (@$_ == 0) {
 	    $obj->push_list($c);
 	}
 	else {
-	    map { $obj->{HASH}->{$_} = $c }
 	    map {
-		if (!/\W/ and $obj->{newlabel}) {
+		if ($c =~ /^\++(.*)/) {
+		    $obj->{HASH}->{$_} .= $obj->{CONCAT} . "$1";
+		} elsif ($c =~ /^\-+(.*)$/i) {
+		    my $chars = $1 =~ s/(?=\W)/\\/gr;
+		    $obj->{HASH}->{$_} =~ s/[$chars]+//g;
+		} else {
+		    $obj->{HASH}->{$_} = $c;
+		}
+	    }
+	    map {
+		if (!/\W/ and $obj->{NEWLABEL}) {
 		    $_;
 		} else {
 		    match_glob($_, keys %{$obj->{HASH}})
@@ -149,7 +159,7 @@ Getopt::EX::LabeledParam - Labeled parameter handling
 
   require Getopt::EX::LabeledParam;
   my $cmap = new Getopt::EX::LabeledParam
-      newlabel => 0,
+      NEWLABEL => 0,
       HASH => \%colormap,
       LIST => \@colors,
       ;
@@ -187,6 +197,12 @@ and
 
 produces same result.
 
+If B<VALUE> part start with plus (C<+>) character, it is appended to
+current value.  At this time, C<CONCAT> string is inserted before
+additional string.  Default C<CONCAT> strings is empty, so use
+configure method to set.  If B<VALUE> part start with minus (C<->)
+character, following characters are deleted from the current value.
+
 If B<LABEL>= part is omitted, values are treated anonymous list and
 stored in list object.  For example,
 
@@ -222,11 +238,15 @@ method.  You can provide default setting of hash and list, and it is
 usually easier to access those values directly, rather than through
 class methods.
 
-=item B<newlable> =E<gt> 0/1
+=item B<NEWLABEL> =E<gt> 0/1
 
 By default, B<load_params> does not create new entry in colormap
-table, and absent label is ignored.  Setting <newlabel> parameter true
+table, and absent label is ignored.  Setting <NEWLABEL> parameter true
 makes it possible create a new hash entry.
+
+=item B<CONCAT> =E<gt> I<string>
+
+Set concatination string inserted before appending string.
 
 =back
 

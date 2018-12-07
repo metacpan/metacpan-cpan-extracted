@@ -45,8 +45,7 @@ lib/Text/Trac/Table.pm
 lib/Text/Trac/Text.pm
 lib/Text/Trac/Ul.pm
 Makefile.PL
-MANIFEST			This list of files
-META.yml
+MANIFEST            This list of files
 README.md
 script/trac2html
 t/00-load.t
@@ -62,9 +61,6 @@ t/10-script.t
 t/11-script-noclass.t
 t/12-script-noclass-noid.t
 t/13-script-noclass-noid-nospan.t
-t/95-tidyall.t
-t/96-perl-critic.t
-t/boilerplate.t
 t/corpus/padre_development.trac
 t/corpus/padre_download_activeperl.trac
 t/corpus/padre_download_cpan.trac
@@ -125,7 +121,10 @@ t/expected/padre_translationstyle_noclass_noid_nospan.html
 t/expected/padre_wikistart_noclass_noid_nospan.html
 t/expected/padre_wxformbuilder_noclass_noid_nospan.html
 t/expected/padre_wxwidgets_noclass_noid_nospan.html
-t/pod-coverage.t
-t/pod.t
 t/TestTextTrac.pm
-t/version.t
+xt/version.t
+xt/pod-coverage.t
+xt/pod.t
+xt/95-tidyall.t
+xt/96-perl-critic.t
+xt/boilerplate.t

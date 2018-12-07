@@ -1,7 +1,11 @@
 package PMLTQ::Suggest;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Suggest::VERSION = '0.0.2';
+$PMLTQ::Suggest::VERSION = '0.0.3';
 # ABSTRACT: Tool for generating simple PMLTQ query based on given nodes
+
+=head1 NAME
+
+PMLTQ::Suggest - Tool for generating simple PMLTQ query based on given nodes
 
 =head1 DESCRIPTION
 

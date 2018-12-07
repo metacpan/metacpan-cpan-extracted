@@ -1,7 +1,7 @@
 package Sah::Schemas::Perl;
 
-our $DATE = '2018-12-03'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2018-12-07'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Perl
@@ -18,7 +18,7 @@ Sah::Schemas::Perl - Sah schemas related to Perl
 
 =head1 VERSION
 
-This document describes version 0.015 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2018-12-03.
+This document describes version 0.016 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2018-12-07.
 
 =head1 HOMEPAGE
 
