@@ -1,15 +1,18 @@
 ﻿Revision history for Perl module RT::Client::REST
 
-0.54 Mon Nov 12 2018 "Dean Hanstead" <dean@bytefoundry.com.au>
+0.55 Sat Dec 08 2018 "Dean Hamstead" <dean@fragfest.com.au>
+  - Fix for GH#18
+
+0.54 Mon Nov 12 2018 "Dean Hanstead" <dean@fragfest.com.au>
   - Fixes for whitespace handling in attachments RT127607
   - Fix edgecase for handling 401's RT127288
 
-0.53 Mon Nov 05 2018 "Dean Hamstead" <dean@bytefoundry.com.au>
+0.53 Mon Nov 05 2018 "Dean Hamstead" <dean@fragfest.com.au>
   - Fix some tests on Windows
   - Various coding changes internally
   - Expose CC Addresses and Admin CC Addresses on Queues
 
-0.52 Fri Apr 06 2018 "Dean Hamstead" <dean@bytefoundry.com.au>
+0.52 Fri Apr 06 2018 "Dean Hamstead" <dean@fragfest.com.au>
   - Fix up lots of Pod Critic complaints
   - Fix up lots of Perl Critic complaints
   - Use Dist-Zilla for releases

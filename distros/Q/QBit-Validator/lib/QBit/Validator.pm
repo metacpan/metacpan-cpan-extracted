@@ -1,25 +1,31 @@
 package QBit::Validator;
-$QBit::Validator::VERSION = '0.011';
+$QBit::Validator::VERSION = '0.012';
 use qbit;
 
 use base qw(QBit::Class);
 
 use Exception::Validator;
 
-__PACKAGE__->mk_ro_accessors(qw(data app));
+__PACKAGE__->mk_ro_accessors(qw(app parent path));
 
 __PACKAGE__->mk_accessors(qw(template));
 
-my %available_fields = map {$_ => TRUE} qw(data template app throw pre_run);
+my %AVAILABLE_FIELDS = map {$_ => TRUE} qw(data template app throw pre_run path path_manager parent sys_errors_handler);
+
+our $PATH_MANAGER = 'QBit::Validator::PathManager';
+our $SYS_ERRORS_HANDLER = sub { };
 
 sub init {
     my ($self) = @_;
 
-    foreach (qw(data template)) {
+    foreach (qw(template)) {
         throw Exception::Validator gettext('Expected "%s"', $_) unless exists($self->{$_});
     }
 
-    my @bad_fields = grep {!$available_fields{$_}} keys(%{$self});
+    throw Exception::Validator gettext('Option "parent" must be QBit::Validator')
+      if defined($self->parent) && (!blessed($self->parent) || !$self->parent->isa('QBit::Validator'));
+
+    my @bad_fields = grep {!$AVAILABLE_FIELDS{$_}} keys(%{$self});
     throw Exception::Validator gettext('Unknown options: %s', join(', ', @bad_fields))
       if @bad_fields;
 
@@ -30,128 +36,136 @@ sub init {
         $self->{'pre_run'}($self);
     }
 
-    $self->{'__CHECK_FIELDS__'} = {};
+    local $SYS_ERRORS_HANDLER = $self->{'sys_errors_handler'} if exists($self->{'sys_errors_handler'});
 
-    my $data     = $self->data;
-    my $template = $self->template;
+    $self->_init_template();
 
-    $self->_validation($data, $template);
+    $self->validate($self->data) if exists($self->{'data'});
 
     $self->throw_exception() if $self->has_errors && $self->{'throw'};
 }
 
-sub _validation {
-    my ($self, $data, $template, $no_check_options, @path_field) = @_;
+sub use_errors_handler {
+    my ($self, $error) = @_;
 
-    throw Exception::Validator gettext('Key "template" must be HASH')
+    $SYS_ERRORS_HANDLER->($error);
+}
+
+sub _init_template {
+    my ($self) = @_;
+
+    $self->{'__CHECKS__'} = [];
+
+    my $template = $self->template;
+
+    throw Exception::Validator gettext('Key "%s" must be HASH', 'template')
       if !defined($template) || ref($template) ne 'HASH';
 
-    $template->{'type'} //= ['scalar'];
+    my ($type_obj, $final_template) = $self->_get_type_and_template($template);
 
-    $template->{'type'} = [$template->{'type'}] unless ref($template->{'type'}) eq 'ARRAY';
+    push(@{$self->{'__CHECKS__'}}, $type_obj->get_checks_by_template($self, $final_template, []));
+}
 
-    my $already_check;
-    foreach my $type_name (@{$template->{'type'}}) {
-        my $type = $self->_get_type_by_name($type_name);
+sub data {
+    my ($self, @params) = @_;
 
-        if ($type->can('get_template')) {
-            my $new_template = $type->merge_templates($template, $type->get_template());
+    if (@params) {
+        $self->{'data'} = $params[0];
+    }
 
-            $self->_validation($data, $new_template, TRUE, @path_field);
+    my $parent = $self->parent // $self;
+
+    return $parent->{'data'};
+}
+
+sub _get_type_and_template {
+    my ($self, $template) = @_;
+
+    my $exists_check = exists($template->{'check'});
+    my $check        = delete($template->{'check'});
+
+    throw Exception::Validator gettext('Option "%s" must be defined', 'check')
+      if $exists_check && !defined($check);
+
+    my $type = delete($template->{'type'}) // 'scalar';
+
+    my $type_obj = $self->_get_type_by_name($type);
+
+    if ($type_obj->can('get_template')) {
+        my $base_template = $type_obj->get_template();
+
+        if (exists($base_template->{'check'}) && ref($base_template->{'check'}) ne 'ARRAY') {
+            $base_template->{'check'} = [$base_template->{'check'}];
         }
 
-        last unless $type->check_options($self, $data, $template, \$already_check, @path_field);
-    }
+        $template = {%$base_template, %$template};
 
-    unless ($no_check_options) {
-        my $all_options = $self->_get_all_options_by_types($template->{'type'});
+        push(@{$template->{'check'}}, ref($check) eq 'ARRAY' ? @$check : $check) if defined($check);
 
-        my $diff = arrays_difference([keys(%$template)], $all_options);
+        return $self->_get_type_and_template($template);
+    } else {
+        $template->{'type'} = $type;
 
-        throw Exception::Validator gettext('Unknown options: %s', join(', ', @$diff)) if @$diff;
+        push(@{$template->{'check'}}, ref($check) eq 'ARRAY' ? @$check : $check) if defined($check);
+
+        return ($type_obj, $template);
     }
 }
+
+sub validate {
+    my ($self, $data) = @_;
+
+    $self->data($data);
+
+    return $self->_validate($data);
+}
+
+sub _validate {
+    my ($self, $data) = @_;
+
+    delete($self->{'__ERRORS__'});
+
+    my @checks = @{$self->{'__CHECKS__'}};
+
+    my $res = TRUE;
+    try {
+        foreach my $check (@checks) {
+            last unless $check->($self, $data);
+        }
+    }
+    catch {
+        my ($exception) = @_;
+
+        my $error;
+        if ($exception->{'check_error'} || !$self->{'__CUSTOM_ERRORS__'}) {
+            $error = $exception->message;
+        } else {
+            $error = $self->{'__CUSTOM_ERRORS__'};
+        }
+
+        $self->{'__ERRORS__'} = $error;
+
+        $res = FALSE;
+    };
+
+    return $res;
+}
+
+sub get_errors {$_[0]->{'__ERRORS__'}}
 
 sub _get_type_by_name {
     my ($self, $type_name) = @_;
 
-    unless (exists($self->{'__TYPES__'}{$type_name})) {
+    my $package_stash = package_stash(ref($self));
+
+    unless (exists($package_stash->{'__TYPES__'}{$type_name})) {
         my $type_class = 'QBit::Validator::Type::' . $type_name;
-        my $type_fn    = "$type_class.pm";
-        $type_fn =~ s/::/\//g;
+        require_class($type_class);
 
-        try {
-            require $type_fn;
-        }
-        catch {
-            throw Exception::Validator gettext('Unknown type "%s"', $type_name);
-        };
-
-        $self->{'__TYPES__'}{$type_name} = $type_class->new();
+        $package_stash->{'__TYPES__'}{$type_name} = $type_class->new();
     }
 
-    return $self->{'__TYPES__'}{$type_name};
-}
-
-sub super_check {
-    my ($self, $type_name, @params) = @_;
-
-    my %types = map {$_ => TRUE} $self->_get_all_types($params[2]->{'type'});
-
-    throw Exception::Validator gettext('You can not use sub "check" of type "%s" for this template', $type_name)
-      unless $types{$type_name};
-
-    my $type = $self->_get_type_by_name($type_name);
-
-    throw Exception::Validator gettext('Do not exists sub "check" for type "%s"', $type_name)
-      unless $type->can('get_template');
-
-    my $type_template = $type->get_template();
-
-    throw Exception::Validator gettext('Do not exists sub "check" for type "%s"', $type_name)
-      unless exists($type_template->{'check'});
-
-    throw Exception::Validator gettext('Option "check" must be code')
-      if !defined($type_template->{'check'}) || ref($type_template->{'check'}) ne 'CODE';
-
-    $type_template->{'check'}(@params);
-}
-
-sub _get_all_types {
-    my ($self, $types) = @_;
-
-    $types //= ['scalar'];
-    $types = [$types] unless ref($types) eq 'ARRAY';
-
-    my %uniq_types = map {$_ => TRUE} @$types;
-
-    foreach my $type_name (@$types) {
-        my $type = $self->_get_type_by_name($type_name);
-
-        if ($type->can('get_template')) {
-            my $type_template = $type->get_template();
-
-            $uniq_types{$_} = TRUE foreach $self->_get_all_types($type_template->{'type'});
-        }
-    }
-
-    return sort(keys(%uniq_types));
-}
-
-sub _get_all_options_by_types {
-    my ($self, $types) = @_;
-
-    my @types_name = $self->_get_all_types($types);
-
-    my %uniq_options = ();
-
-    foreach my $type_name (@types_name) {
-        my $type = $self->_get_type_by_name($type_name);
-
-        $uniq_options{$_} = TRUE foreach $type->get_all_options_name();
-    }
-
-    return [keys(%uniq_options)];
+    return $package_stash->{'__TYPES__'}{$type_name};
 }
 
 sub throw_exception {
@@ -160,93 +174,86 @@ sub throw_exception {
     throw Exception::Validator $self->get_all_errors;
 }
 
-sub _add_error {
-    my ($self, $template, $error, $field, %opts) = @_;
-
-    my $key = $self->_get_key($field);
-
-    if ($opts{'check_error'}) {
-        $self->{'__CHECK_FIELDS__'}{$key}{'error'} = {
-            msgs => [$error],
-            path => $field // []
-        };
-    } elsif ($self->has_error($field)) {
-        push(@{$self->{'__CHECK_FIELDS__'}{$key}{'error'}{'msgs'}}, $error)
-          unless exists($template->{'msg'});
-    } else {
-        $self->{'__CHECK_FIELDS__'}{$key}{'error'} = {
-            msgs => [exists($template->{'msg'}) ? $template->{'msg'} : $error],
-            path => $field // []
-        };
-    }
-
-    delete($self->{'__CHECK_FIELDS__'}{$key}{'ok'}) if exists($self->{'__CHECK_FIELDS__'}{$key}{'ok'});
-}
-
 sub get_all_errors {
     my ($self) = @_;
 
     my $error = '';
 
-    $error .= join("\n", map {@{$_->{'msgs'}}} $self->get_fields_with_error());
+    $error .= join("\n", map {$_->{'message'}} $self->get_fields_with_error());
 
     return $error;
 }
 
 sub get_error {
-    my ($self, $field) = @_;
+    my $error = $_[0]->path_manager->get_data_by_path($_[1] // $_[0]->path_manager->root, $_[0]->get_errors);
 
-    my $key = $self->_get_key($field);
-
-    my $error = '';
-    foreach ($self->get_fields_with_error()) {
-        $error = join("\n", @{$_->{'msgs'}}) if $key eq $self->_get_key($_->{'path'});
-    }
-
-    return $error;
+    return ref($error) eq '' ? $error : undef;
 }
 
 sub get_fields_with_error {
     my ($self) = @_;
 
-    return map {$self->{'__CHECK_FIELDS__'}{$_}{'error'}}
-      grep     {$self->{'__CHECK_FIELDS__'}{$_}{'error'}} sort keys(%{$self->{'__CHECK_FIELDS__'}});
+    my $errors = $self->get_errors;
+
+    if (defined($errors)) {
+        my $path_manager = $self->path_manager;
+
+        return _get_nodes($path_manager, $path_manager->root, $errors);
+    } else {
+        return ();
+    }
 }
 
-sub _add_ok {
-    my ($self, $field) = @_;
+sub _get_nodes {
+    my ($path_manager, $root_path, $data) = @_;
 
-    return if $self->checked($field) && $self->has_error($field);
+    if (ref($data) eq 'HASH') {
+        return map {
+            _get_nodes($path_manager,
+                $path_manager->concatenate($root_path, $path_manager->delimiter, $path_manager->hash_path($_)),
+                $data->{$_})
+          }
+          sort keys(%$data);
+    } elsif (ref($data) eq 'ARRAY') {
+        my $i      = 0;
+        my @result = ();
+        while ($i < @$data) {
+            if (defined($data->[$i])) {
+                push(
+                    @result,
+                    _get_nodes(
+                        $path_manager,
+                        $path_manager->concatenate($root_path, $path_manager->delimiter, $path_manager->array_path($i)),
+                        $data->[$i]
+                    )
+                );
+            }
 
-    $self->{'__CHECK_FIELDS__'}{$self->_get_key($field)}{'ok'} = TRUE;
+            $i++;
+        }
+
+        return @result;
+    } else {
+        return {path => $root_path, message => $data};
+    }
 }
 
-sub checked {
-    my ($self, $field) = @_;
-
-    return exists($self->{'__CHECK_FIELDS__'}{$self->_get_key($field)});
-}
-
-sub has_error {
-    my ($self, $field) = @_;
-
-    return exists($self->{'__CHECK_FIELDS__'}{$self->_get_key($field)}{'error'});
-}
+sub has_error {defined($_[0]->get_error($_[1]))}
 
 sub has_errors {
-    my ($self) = @_;
-
-    return !!$self->get_fields_with_error();
+    return defined($_[0]->get_errors);
 }
 
-sub _get_key {
-    my ($self, $path_field) = @_;
+sub path_manager {
+    my ($self) = @_;
 
-    $path_field //= [];
+    unless ($self->{'path_manager'}) {
+        require_class($PATH_MANAGER);
 
-    $path_field = [$path_field] unless ref($path_field) eq 'ARRAY';
+        $self->{'path_manager'} = $PATH_MANAGER->new();
+    }
 
-    return join(' => ', @$path_field);
+    return $self->{'path_manager'};
 }
 
 TRUE;
@@ -271,10 +278,6 @@ https://github.com/QBitFramework/QBit-Validator
 
 cpanm QBit::Validator
 
-=item *
-
-apt-get install libqbit-validator-perl (http://perlhub.ru/)
-
 =back
 
 =head1 Package methods
@@ -297,7 +300,7 @@ B<template> - template for check
 
 =item
 
-B<pre_run> - function is executed before checking
+B<pre_run> - function is executed before checking (deprecated)
 
 =item
 
@@ -306,6 +309,34 @@ B<app> - model using in check
 =item
 
 B<throw> - throw (boolean type, throw exception if an error has occurred)
+
+=item
+
+B<sys_errors_handler> - handler for system errors in sub "check" (default empty function: sub {})
+
+  # global set handler
+  $QBit::Validator::SYS_ERRORS_HANDLER = sub {log($_[0])}; # first argument is error
+
+  #or local set handler
+  my $qv = QBit::Validator->new(template => {}, sys_errors_handler => sub {log($_[0])});
+
+=item
+
+B<path_manager> - path manager (default QBit::Validator::PathManager)
+
+  # global set path_manager
+  $QBit::Validator::PATH_MANAGER = 'MyPathManager::For::Data::DPath';
+
+  #or local set path_manager
+  my $qv = QBit::Validator->new(template => {}, path_manager => MyPathManager::For::Data::DPath->new()});
+
+=item
+
+B<path> - data path for validator (see: QBit::Validator::PathManager)
+
+=item
+
+B<parent> - ref to a parent validator
 
 =back
 
@@ -329,13 +360,41 @@ B<Example:>
 
 =head2 template
 
-get or set template
+get or set template (Use only into pre_run)
 
 B<Example:>
 
   my $template = $qv->template;
 
   $qv->template($template);
+
+=head2 data
+
+set or get data
+
+B<Example:>
+
+  $self->db->table->edit($qv->data) unless $qv->has_errors;
+
+=head2 validate
+
+set data and validate it
+
+B<Example:>
+
+  my $qv = QBit::Validator->new(
+    template => {
+        type => 'scalar',
+        min  => 50,
+        max  => 60,
+    }
+  );
+
+  foreach (45 .. 65) {
+      $qv->validate($_);
+
+      print $qv->get_error() if $qv->has_errors;
+  }
 
 =head2 has_errors
 
@@ -347,25 +406,26 @@ B<Example:>
       ...
   }
 
-=head2 data
+=head2 has_error
 
-return data
+return boolean result (TRUE if an error has occurred in field or FALSE)
 
 B<Example:>
 
-  $self->db->table->edit($qv->data) unless $qv->has_errors;
+  $qv->get_error('field') if $qv->has_error('field');
+  $qv->get_error('/field') if $qv->has_error('/field');
 
-=head2 get_wrong_fields
+=head2 get_error
 
-return list name of fields with error
+return error by path (string or array)
 
 B<Example:>
 
   if ($qv->has_errors) {
-      my @fields = $qv->get_wrong_fields;
+      my $error = $qv->get_error('hello');
+      #or '/hello'
 
-      ldump(\@fields); # ['hello']
-      # [''] - error in root
+      print $error; # 'Error'
   }
 
 =head2 get_fields_with_error
@@ -381,24 +441,12 @@ B<Example:>
 
       # [
       #     {
-      #         msgs => ['Error'],
-      #         path => ['hello']
+      #         messsage => 'Error',
+      #         path     => '/hello/'
       #     }
       # ]
       #
-      # path => [''] - error in root
-  }
-
-=head2 get_error
-
-return error by path
-
-B<Example:>
-
-  if ($qv->has_errors) {
-      my $error = $qv->get_error('hello'); # or ['hello']
-
-      print $error; # 'Error'
+      # path => '/' - error in root
   }
 
 =head2 get_all_errors
@@ -526,6 +574,18 @@ one_of
 =item
 
 any_of
+
+=back
+
+For more information see tests
+
+=head2 variable
+
+=over
+
+=item
+
+conditions
 
 =back
 

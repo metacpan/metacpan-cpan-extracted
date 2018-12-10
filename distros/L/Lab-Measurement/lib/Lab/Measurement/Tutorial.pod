@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.670
+version 3.671
 
 =head1 How to read the documentation
 
@@ -723,6 +723,22 @@ have unique names. Instead we use C<hard_copy_suffix>:
      y         => 'voltage',
      hard_copy_suffix => '_VI',
  );
+
+=head3 Refresh interval
+
+We can set a mininum type between redraws of the live plot. This becomes handy
+for large plot, where the redrawing the plot is slow. 
+
+ # Wait at least 10 minutes before redraw:
+ $datafile->add_plot(
+     ...
+     refresh_interval => 600,
+ );
+
+To ensure that the whole data is plotted at the end of the measurement, we force a
+redraw of all plots:
+
+ $sweep->refresh_plots(force => 1);
 
 =head2 Block data
 

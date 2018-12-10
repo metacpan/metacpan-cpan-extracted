@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.12",
+            "ExtUtils::MakeMaker" : "0",
             "XSLoader" : "0.16"
          }
       },
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.04",
+   "version" : "1.06",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

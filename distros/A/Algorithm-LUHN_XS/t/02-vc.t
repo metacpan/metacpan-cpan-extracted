@@ -4,7 +4,7 @@ use strict;
 use Test;
 use Algorithm::LUHN_XS qw/valid_chars/;
 
-BEGIN { plan tests => 6 }
+BEGIN { plan tests => 7 }
 
 # Check the valid_chars contents
 {
@@ -61,6 +61,15 @@ BEGIN { plan tests => 6 }
       unless $ok;
   }
   ok($ok, 1, $msg);
+  # load every map value and make sure _dump_map runs
+  my %mymap;
+  for (0..255) {
+      $mymap{$_}=$_;
+      $mymap{'0'}="\n";
+      $mymap{"A"}="-1000";
+  }
+  valid_chars(%mymap);
+  ok(Algorithm::LUHN_XS::_dump_map());
 }
 
 __END__

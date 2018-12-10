@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::CleanNamespaces; # git description: v0.22-6-g67eaa09
+package Test::CleanNamespaces; # git description: v0.23-5-gf8e88b1
 # ABSTRACT: Check for uncleaned imports
 # KEYWORDS: testing namespaces clean dirty imports exports subroutines methods
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Module::Runtime ();
 use Sub::Identify ();
@@ -125,8 +125,14 @@ sub _remaining_imports {
     my @overloads = grep { $imports{$_} eq 'overload::nil' || $imports{$_} eq 'overload::_nil' } keys %imports;
     delete @imports{@overloads} if @overloads;
 
-    if ("$]" < 5.010)
+    if ("$]" < 5.020)
     {
+        # < haarg> 5.10+ allows sticking a readonly scalar ref directly in the symbol table, rather than a glob.  when auto-promoted to a sub, it will have the correct name.
+        # < haarg> but that only works if the symbol table entry is empty
+        # < haarg> if it exists, it has to use the *$const = sub () { $val } method, so the name is __ANON__
+        # < haarg> newer versions don't use that method
+        # < haarg> rather, newer versions of constant.pm don't use that method
+        # < haarg> and then the name ends up being YourPackage::__ANON__
         my @constants = grep { $imports{$_} eq 'constant::__ANON__' } keys %imports;
         delete @imports{@constants} if @constants;
     }
@@ -188,7 +194,7 @@ Test::CleanNamespaces - Check for uncleaned imports
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 

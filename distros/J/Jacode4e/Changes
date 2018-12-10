@@ -1,5 +1,10 @@
 Revision history for this software.
 
+2.13.6.10 2018/12/10 00:00:00
+  - add some documents
+  - add make__DATA__/JIS/*
+  - created by INABA Hitoshi
+
 2.13.6.9 2018/12/07 00:00:00
   - remove jacode4e.pl
   - support UNISYS LetsJ encoding

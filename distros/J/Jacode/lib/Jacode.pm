@@ -5,7 +5,7 @@ package Jacode;
 #
 # Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
-$VERSION = '2.13.4.19';
+$VERSION = '2.13.4.20';
 $VERSION = $VERSION;
 
 use strict;
@@ -119,22 +119,16 @@ Convert SJIS to MIME-Header-ISO_2022_JP and print each line by perl 5.8.1 or lat
       print $s;
   }
 
+=head1 AUTHOR
+
+INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+
+This project was originated by INABA Hitoshi.
+
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software;
-
-Copyright (c) 2018 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
-
-The latest version is available here:
-
-L<http://search.cpan.org/dist/jacode4e/>
-
-Use and redistribution for ANY PURPOSE are granted as long as all
-copyright notices are retained.  Redistribution with modification
-is allowed provided that you make your modified version obviously
-distinguishable from the original one.  THIS SOFTWARE IS PROVIDED
-BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES ARE
-DISCLAIMED.
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.031';
+our $VERSION = '2.032';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.031
+Version 2.032
 
 =cut
 
@@ -585,6 +585,14 @@ the output.
 =head3 Squash spaces
 
 If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and leading and trailing spaces are removed.
+
+=head3 Decimal separator
+
+Set the decimal separator. Numbers with a decimal separator are formatted as number if this option is set to the right
+value.
+
+Allowed values: a character with a print width of C<1>. If an invalid values is passed, I<decimal_separator> falls back
+to the default value (dot).
 
 =head3 Warnings
 

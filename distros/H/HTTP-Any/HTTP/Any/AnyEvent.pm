@@ -128,6 +128,8 @@ sub do_http {
 				}
 			}
 
+			$$h{Protocol} = "HTTP/" . $$h{HTTPVersion};
+
 			my $content_encoding = $$h{'content-encoding'};
 			if ($body and $$opt{gzip} and $content_encoding and $content_encoding eq 'gzip') {
 				require Compress::Raw::Zlib;

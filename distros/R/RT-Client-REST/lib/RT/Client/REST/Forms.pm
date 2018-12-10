@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Forms;
-$RT::Client::REST::Forms::VERSION = '0.54';
+$RT::Client::REST::Forms::VERSION = '0.55';
 use Exporter;
 
 use vars qw(@EXPORT @ISA);
@@ -65,7 +65,7 @@ sub form_parse {
                 }
                 $c .= "\n";
             }
-            elsif ($state <= 1 && $line =~ m/^($field:\s)(.*)?$/) {
+            elsif ($state <= 1 && $line =~ m/^($field:\s?)(.*)?$/) {
                 # Read a field: value specification.
                 my $f     = $1;
                 my $value = $2;
@@ -227,7 +227,7 @@ RT::Client::REST::Forms - This package provides functions from RT::Interface::RE
 
 =head1 VERSION
 
-version 0.54
+version 0.55
 
 =head2 METHODS
 
@@ -253,7 +253,7 @@ Add a value to a (possibly multi-valued) hash key.
 
 =item vsplit
 
-"Normalise" a hash key that's known to be multi-valued.
+"Normalize" a hash key that's known to be multi-valued.
 
 =back
 

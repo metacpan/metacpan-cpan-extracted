@@ -1,7 +1,7 @@
 package Sah::Schema::perl::pm_filename;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2018-12-09'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 our $schema = [str => {
     summary => 'Filename (.pm file)',
@@ -68,7 +68,7 @@ Sah::Schema::perl::pm_filename - Filename (.pm file)
 
 =head1 VERSION
 
-This document describes version 0.016 of Sah::Schema::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-12-07.
+This document describes version 0.017 of Sah::Schema::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2018-12-09.
 
 =head1 DESCRIPTION
 

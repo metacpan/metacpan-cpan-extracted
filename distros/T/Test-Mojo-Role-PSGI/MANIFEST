@@ -1,9 +1,11 @@
 Build.PL
 Changes
+LICENSE
 MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
+README
 cpanfile
 lib/Test/Mojo/Role/PSGI.pm
 t/basic.t

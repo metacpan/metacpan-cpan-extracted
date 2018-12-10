@@ -8,6 +8,7 @@ use namespace::clean;
 
 Moose::Exporter->setup_import_methods(also => 'Moose::Role');
 
+our $CAN;
 use constant CAN => [ qw(import) ];
 use constant CANT => [ qw(with) ];
 

@@ -3,6 +3,9 @@ package R2;
 use Test::Lib;
 
 use Moo::Role;
+
+use namespace::clean;
+
 use T2;
 
 has r2_1 => (

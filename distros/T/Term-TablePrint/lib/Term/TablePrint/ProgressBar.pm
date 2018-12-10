@@ -5,101 +5,90 @@ use strict;
 use warnings;
 use 5.008003;
 
-use Term::Choose::LineFold qw( print_columns cut_to_printwidth );
-use Term::Choose::Util     qw( term_width );
-
-use constant DEFAULTS => {
-    fh         => \*STDERR,
-    name       => undef,
-    count      => undef,
-    so_far     => 0,
-    remove     => 0,
-    #silent     => 0,
-};
+use Term::Choose::Util qw( term_width );
 
 
 sub new {
-    my $class = shift;
-    my $self = shift || {};
+    my ( $class, $self ) = @_;
     bless $self, $class;
+    my $count_cells = $self->{row_count} * $self->{col_count};
+    if ( $self->{threshold} && $self->{threshold} < $count_cells ) {
+        print "\rComputing: ";
+        $self->{times} = 3;
+        if ( $count_cells / $self->{threshold} > 50 ) {
+            $self->{type} = 'multi';
+            $self->{total} = $self->{row_count};
+        }
+        else {
+            $self->{type} = 'single';
+            $self->{total} = $self->{row_count} * $self->{times};
+        }
+    }
     return $self;
 }
 
 
-sub init {
-    my ( $self, $config ) = @_;
-    for ( keys %{DEFAULTS()} ) {
-        $self->{$_} = $config->{$_}  if defined $config->{$_};
-        $self->{$_} = DEFAULTS->{$_} if ! defined $self->{$_};
+sub set_progress_bar {
+    my ( $self ) = @_;
+    if (! $self->{type} ) {
+        return;
     }
-    my $target = $self->{count};
-    die "No 'count'!" if ! defined $target;
     my $term_w = term_width();
-    $self->{bar_width} = $term_w - 7; # for the  "100% ["  and the  "]"
-    if ( defined $self->{name} ) {
-        my $name = $self->{name};
-        my $name_w = print_columns( $self->{name} );
-        my $max_name_w = int( $term_w / 3 );
-        if ( $name_w > $max_name_w ) {
-            $name = cut_to_printwidth( $name, $max_name_w );
-            $name_w = $max_name_w;
-        }
-        $self->{bar_width} -= $name_w;
-        #$self->{bar_width} -= 2; # for the ': '
-    }
-    $self->{short_print_fmt} = 0;
-    if ( $self->{bar_width} < 8 ) {
-        $self->{bar_width} = $term_w - 7;
-        $self->{short_print_fmt} = 1;
-        if ( $self->{bar_width} < 5 ) {
-            $self->{bar_width} = $term_w;
-            $self->{short_print_fmt} = 2;
-        }
-    }
-    $self->{major_units} = $self->{bar_width} / $target;
-    my $prev_fh = select( $self->{fh} );
-    local $| = 1;
-    select( $prev_fh );
-    $self->{target} = $target; #
-    $self->update( $self->{so_far} ); # Initialize the progress bar
-
-}
-
-
-sub update {
-    my ( $self, $so_far ) = @_;
-    my $target = my $next = $self->{target};
-    my @chars = ( ' ' ) x $self->{bar_width};
-    my $biggies = $self->{major_units} * $so_far;
-    for ( 0 .. $biggies - 1 ) {
-        $chars[$_] = '=';
-    }
-    $next *= ( $self->{major_units} * $so_far + 1 ) / $self->{bar_width};
-    local $\ = undef;
-    my $to_print = "\r";
-    if ( $self->{short_print_fmt} == 2 ) {
-        $to_print .= join '', @chars;
+    if ( $self->{type} eq 'multi' ) {
+        $self->{fmt} = "\rComputing: (" . $self->{times}-- . ") %3d%% [%s]";
     }
     else {
-        if ( defined $self->{name} && ! $self->{short_print_fmt} ) {
-            #$to_print .= $self->{name} . ': ';
-            $to_print .= $self->{name};
-        }
-        my $ratio = $so_far / $target;
-        # Rounds down %
-        $to_print .= sprintf "%3d%% [%s]", $ratio * 100, join '', @chars;
+        $self->{fmt} = "\rComputing: %3d%% [%s]";
     }
-    my $fh = $self->{fh};
-    print $fh $to_print;
-    if ( $so_far >= $target && $self->{remove} && ! $self->{pb_ended} ) {
-        print $fh "\r", ' ' x $self->{term_width}, "\r";
-        $self->{pb_ended} = 1;
+    if ( $term_w < 25 ) {
+        $self->{short_print} = 1;
     }
-    if ( $next > $target ) {
-        $next = $target;
+    else {
+        $self->{short_print} = 0;
     }
-    return $next;
+    $self->{bar_w} = $term_w - length( sprintf $self->{fmt}, 100, '' ); # - 1;
+    $self->{step} = int( $self->{total} / $self->{bar_w} || 1 );
+    my $count;
+    if ( $self->{type} eq 'multi' ) {
+        $count = 0;
+        $self->{next_update} = $self->{step};
+    }
+    else {
+        $count = $self->{so_far} || 0;
+        $self->{next_update} ||= $self->{step};
+    }
+    return $count;
 }
+
+
+sub update_progress_bar {
+    my ( $self, $count ) = @_;
+    my $multi = int( $count / ( $self->{total} / $self->{bar_w} ) ) || 1;
+    if ( $self->{short_print} ) {
+        print "\r" . ( '=' x $multi ) . ( ' ' x $self->{bar_w} - $multi );
+    }
+    else {
+        printf $self->{fmt}, ( $count / $self->{total} * 100 ), ( '=' x $multi ) . ( ' ' x ( $self->{bar_w} - $multi ) );
+    }
+    $self->{next_update} = $self->{next_update} + $self->{step};
+}
+
+
+sub last_update_progress_bar {
+    my ( $self, $count ) = @_;
+    if ( $self->{times} < 1 ||  $self->{type} eq 'multi' ) {
+        $self->update_progress_bar( $self->{total} );
+    }
+    else {
+        $self->{so_far} = $count;
+    }
+}
+
+
+
+
+
+
 
 
 

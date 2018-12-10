@@ -1,6 +1,10 @@
 Revision history for Etherpad
 
-1.2.13.0  2016-04-25 09:45:51 UTC
+1.2.13.1  2018-12-10 11:26:36 UTC
+    - Add missing restoreRevision method
+    - Upgrade dependency to Mojolicious >= 8
+
+1.2.13.0  2016-04-25 09:44:00 UTC
     - Update to Etherpad API v1.2.13
 
 1.2.12.1  2015-07-19 13:10:04 UTC

@@ -10,6 +10,7 @@ our @EXPORT_OK = qw(stuff);
 
 sub stuff { }
 
+our $CAN;
 use constant CAN => [ qw(stuff import) ];
 use constant CANT => [ qw(dualvar) ];
 

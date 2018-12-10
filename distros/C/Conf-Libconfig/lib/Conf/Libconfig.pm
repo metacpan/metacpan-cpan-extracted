@@ -4,7 +4,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.100';
 
 require XSLoader;
 XSLoader::load('Conf::Libconfig', $VERSION);
@@ -155,7 +155,7 @@ modify new bool value to handle and return true if add successfully.
 
 =head2 $self->add_array ($path, $key, \@array)
 
-add array value to handle and return true if add successfully.
+add array value to handle and return true if add successfully, but the elements must all be scalar values of the same type.
 
 =head2 $self->add_list ($path, $key, \@list)
 

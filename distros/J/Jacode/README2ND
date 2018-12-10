@@ -35,26 +35,24 @@ INSTALLATION
 
    To install this software, copy 'Jacode.pm' to any directory of @INC.
 
-AUTHOR
-
-    Copyright (c) 2018 INABA Hitoshi
-
-LICENSE AND COPYRIGHT
-
-    This software is free software;
-
-    Use and redistribution for ANY PURPOSE are granted as long as all
-    copyright notices are retained.  Redistribution with modification
-    is allowed provided that you make your modified version obviously
-    distinguishable from the original one.  THIS SOFTWARE IS PROVIDED
-    BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES ARE
-    DISCLAIMED.
-
-    This software is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
 SEE ALSO
 
-    perl, jcode.pl, jacode.pl, jacode4e.pl, Sjis.pm, pkf, Modern::Open
+    jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
+    ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+    http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
+    ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
+    http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
+    https://twitter.com/uta46/status/11578906320
+
+    jacode - Perl program for Japanese character code conversion
+    https://metacpan.org/search?q=jacode.pl
+
+    Jacode4e - jacode.pl-like program for enterprise
+    https://metacpan.org/pod/Jacode4e
+
+    Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
+    https://metacpan.org/pod/Jacode4e::RoundTrip
+
+    Modern::Open - Autovivification, Autodie, and 3-args open support
+    https://metacpan.org/pod/Modern::Open
 

@@ -1,3 +1,9 @@
+0.017   2018-12-09 (PERLANCAR)
+
+	- Argh, previous commit still didn't delete all tests for
+	  strict.pm.
+
+
 0.016   2018-12-07 (PERLANCAR)
 
 	- No functional changes.

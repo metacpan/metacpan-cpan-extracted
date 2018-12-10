@@ -1,4 +1,12 @@
 Revision history for Perl module Algorithm::LUHN_XS
+1.06 2018-12-08 KSCHWAB
+    - Fix memory leak
+    - Improve test coverage
+
+1.05 2018-12-07 KSCHWAB
+    - Bounds checking
+    - More tests
+    - Doc fixes
 
 1.04 2018-12-03 KSCHWAB
     - Remove XSMULTI and move XS file to base directory

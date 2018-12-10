@@ -254,6 +254,7 @@ lib/Lab/Moose/Sweep/DataFile.pm
 lib/Lab/Moose/Sweep/Step.pm
 lib/Lab/Moose/Sweep/Step/Frequency.pm
 lib/Lab/Moose/Sweep/Step/Magnet.pm
+lib/Lab/Moose/Sweep/Step/Power.pm
 lib/Lab/Moose/Sweep/Step/Repeat.pm
 lib/Lab/Moose/Sweep/Step/Temperature.pm
 lib/Lab/Moose/Sweep/Step/Voltage.pm

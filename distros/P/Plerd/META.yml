@@ -25,7 +25,7 @@ no_index:
 provides:
   Plerd:
     file: lib/Plerd.pm
-    version: '1.7'
+    version: '1.72'
   Plerd::Init:
     file: lib/Plerd/Init.pm
   Plerd::Post:
@@ -57,7 +57,11 @@ requires:
   URI: '0'
   Web::Mention: '0.6'
   YAML: '0'
-version: '1.7'
+resources:
+  bugtracker: https://github.com/jmacdotorg/plerd/issues
+  homepage: https://github.com/jmacdotorg/plerd
+  repository: git://github.com/jmacdotorg/plerd.git
+version: '1.72'
 x_authority: cpan:JMAC
 x_contributors:
   - 'Christian Sánchez <sanchezchristian@gmail.com>'

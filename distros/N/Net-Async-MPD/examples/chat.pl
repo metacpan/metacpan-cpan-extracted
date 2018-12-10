@@ -3,17 +3,19 @@
 use strict;
 use warnings;
 
-use PerlX::Maybe;
 use Net::Async::MPD;
 use IO::Async::Timer::Periodic;
 
 # use Log::Any::Adapter;
 # Log::Any::Adapter->set( 'Stderr', log_level => 'trace' );
 
+my %shared = ( auto_connect => 1 );
+$shared{host} = $ARGV[0] if $ARGV[0];
+
 my %accounts = (
-  alice   => Net::Async::MPD->new( maybe host => $ARGV[0], auto_connect => 1 ),
-  bob     => Net::Async::MPD->new( maybe host => $ARGV[0], auto_connect => 1 ),
-  charlie => Net::Async::MPD->new( maybe host => $ARGV[0], auto_connect => 1 ),
+  alice   => Net::Async::MPD->new( %shared ),
+  bob     => Net::Async::MPD->new( %shared ),
+  charlie => Net::Async::MPD->new( %shared ),
 );
 
 # Accounts have a channel of their own that they send messages to

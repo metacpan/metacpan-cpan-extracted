@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     "bin/estimatesvg"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "SVG::Estimate",
   "PREREQ_PM" => {
     "Clone" => 0,
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "XML::Hash::LX" => 0,
     "XML::LibXML" => 0
   },
-  "VERSION" => "1.0109",
+  "VERSION" => "1.0110",
   "test" => {
     "TESTS" => "t/*.t t/Path/*.t"
   }

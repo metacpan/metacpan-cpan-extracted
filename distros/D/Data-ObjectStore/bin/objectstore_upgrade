@@ -5,7 +5,7 @@ use warnings;
 
 use Data::ObjectStore;
 
-my( $source_dir, $dest_dir ) = shift @ARGV;
+my( $source_dir, $dest_dir ) = @ARGV;
 unless( -d $source_dir && -d $dest_dir ) {
     print STDERR "Usage: $0 <sourcedir> <destinationdir>\n";
     exit;

@@ -1,3 +1,29 @@
+libqbit-validator-perl (0.012) raring; urgency=low
+
+  * rm ppa
+
+  * correct documentation
+
+  * rm unused code
+
+  * type variable and documentations
+
+  * PathManager for type variable
+
+  * dpath
+
+  * added type variable
+
+  * redefine new for exception
+
+  * test and error handler
+
+  * added test for errors
+
+  * validator new
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun,  9 Dec 2018 21:41:13 +0300
+
 libqbit-validator-perl (0.011) raring; urgency=low
 
   * deleted empty string

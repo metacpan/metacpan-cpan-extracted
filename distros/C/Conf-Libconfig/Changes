@@ -1,5 +1,7 @@
 Revision history for Conf-Libconfig
 
+0.10    Sun 09 Dec 2018 10:37:38 AM CST
+        * Support libconfig 1.7.x 
 0.021	Wed 27 Oct 2010 10:39:25 AM CST
         * Auto setup ExtUtils::PkgConfig.
 0.019   Thu 10 Jun 2010 02:57:05 PM CST

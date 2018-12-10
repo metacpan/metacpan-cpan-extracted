@@ -13,7 +13,7 @@
 
 package Map::Metro::Plugin::Map::Berlin {
 
-    our $VERSION = '0.05';
+    our $VERSION = '2018.1209';
 
     use Moose;
     use File::ShareDir 'dist_dir';

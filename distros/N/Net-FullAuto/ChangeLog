@@ -20,6 +20,46 @@
 #######################################################################
 
 
+2018-12-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000454 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+	* Added google-drive-ocamlfuse install.
+
+
+2018-12-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000453 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+	* Using ClipBucket recommended versions
+	  of ffmpeg (2.X) and PHP (7.0.X).
+
+
+2018-12-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000452 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+
+2018-12-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000451 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+
+2018-12-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000450 released
+
+        * Updated Local ISet ClipBucket_is.pm.
+
+
 2018-12-07  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000449 released

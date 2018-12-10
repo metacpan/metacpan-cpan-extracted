@@ -1,6 +1,9 @@
 package B3;
 
 use Moo;
+
+use namespace::clean;
+
 use T2;
 use T1;
 

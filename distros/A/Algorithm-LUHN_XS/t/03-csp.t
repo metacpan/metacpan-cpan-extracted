@@ -2,9 +2,11 @@
 
 use strict;
 use Test;
-use Algorithm::LUHN_XS qw/check_digit check_digit_fast is_valid  valid_chars/;
+use Algorithm::LUHN_XS qw/check_digit check_digit_fast is_valid  
+                       is_valid_fast is_valid_rff check_digit_rff
+                       valid_chars/;
 
-BEGIN { plan tests => 30 }
+BEGIN { plan tests => 56 }
 
 # Check some numeric and alphanumeric values
 
@@ -20,7 +22,18 @@ while (@values) {
   ok(!is_valid("$v".(9-$c)));
   ok($Algorithm::LUHN_XS::ERROR, qr/^Check digit/,
      "  Did not get the expected error. Got $Algorithm::LUHN_XS::ERROR\n");
+  my $d = check_digit_fast($v);
+  ok($d, $expected, "check_digit($v): expected $expected; got $d\n");
+  ok(is_valid_fast("$v$c"));
+  ok(!is_valid_fast("$v".(9-$c)));
+  ok($Algorithm::LUHN_XS::ERROR, qr/^Check digit/,
+     "  Did not get the expected error. Got $Algorithm::LUHN_XS::ERROR\n");
 }
+# check_digit_rff and is_valid_rff should fail with non-numeric input
+my $cd;
+ok(($cd=check_digit_rff("392690QT"))==-1);
+ok((!is_valid_rff("392690QT3")));
+
 
 # Check a value including non-alphanum char (should fail).
 my ($v, $c);

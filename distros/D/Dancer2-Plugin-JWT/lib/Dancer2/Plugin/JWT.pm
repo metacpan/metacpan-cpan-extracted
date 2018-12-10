@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Dancer2::Plugin::JWT;
 # ABSTRACT: JSON Web Token made simple for Dancer2
-$Dancer2::Plugin::JWT::VERSION = '0.016';
+$Dancer2::Plugin::JWT::VERSION = '0.017';
 use Dancer2::Plugin;
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use URI;
@@ -162,6 +162,7 @@ on_plugin_import {
 	    name => 'after',
 	    code => sub {
 		    my $response = shift;
+            $response = $response->isa('Dancer2::Core::Response') ? $response : $response->response;
 		    $response->push_header('Access-Control-Expose-Headers' => 'Authorization');
 	    }
 	 )

@@ -3,6 +3,8 @@ package C5;
 use Moo;
 extends 'C4';
 
+use namespace::clean;
+
 use R1;
 use R2;
 

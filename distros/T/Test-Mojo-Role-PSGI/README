@@ -1,0 +1,89 @@
+NAME
+
+    Test::Mojo::Role::PSGI - Test PSGI apps using Test::Mojo
+
+SYNOPSIS
+
+      use strict;
+      use warnings;
+    
+      use Test::More;
+      use Test::Mojo;
+    
+      my $t = Test::Mojo->with_roles('+PSGI')->new('path/to/app.psgi');
+    
+      $t->get_ok('/some/path')
+        ->status_is(200)
+        ->content_type_like(qr/html/)
+        ->text_is('.some-class:nth-child(5)' => 'content of 5th some-class');
+    
+      ...
+    
+      done_testing;
+
+DESCRIPTION
+
+    Test::Mojo makes testing Mojolicious applications easy and fun.
+    Wouldn't it be nice if there was some way to use it for non-Mojolicious
+    apps? Test::Mojo::Role::PSGI does just that.
+
+OVERRIDES
+
+ new
+
+    Overrides the "new" in Test::Mojo method to use a PSGI app,
+    instantiating a script or class if necessary. This should feel very
+    similar to the original behavior except that now PSGI apps are the
+    target, rather than Mojolicious apps.
+
+    Acceptable arguments are strings that can be used by "load_psgi" in
+    Plack::Util or else instantated PSGI applications, including bare code
+    references.
+
+NOTA BENE
+
+    This module previously recommended Test::Mojo::WithRoles and depended
+    on it. Since that recommendation, proper role handling was added to
+    Mojolicious (see "Extending Test::Mojo" in
+    Mojolicious::Guides::Testing). This obviates the need for "WithRoles",
+    just use the native one. The translation is as follows:
+
+      use Test::More;
+      use Test::Mojo;
+    
+      my $t = Test::Mojo::WithRoles->new('path/to/app.psgi');
+
+    becomes
+
+      use Test::More;
+      use Test::Mojo;
+    
+      my $t = Test::Mojo->with_roles('+PSGI')->new('path/to/app.psgi');
+
+SEE ALSO
+
+    Test::Mojo
+
+    Mojolicious
+
+    Mojolicious::Plugin::MountPSGI
+
+    Role::Tiny
+
+    Test::Mojo::WithRoles
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Test-Mojo-Role-PSGI
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2015 by Joel Berger
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

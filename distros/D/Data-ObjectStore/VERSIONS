@@ -1,3 +1,8 @@
+ 2.03 - fix typo in bin/objectstore_upgrade
+        timing test update
+        added clearvol method
+        fix bug in vol and add test for vol
+
  2.02 - updated datastore version requirements
 
  2.01 - updated bug in test

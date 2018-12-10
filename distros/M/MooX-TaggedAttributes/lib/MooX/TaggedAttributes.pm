@@ -5,7 +5,7 @@ package MooX::TaggedAttributes;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use Carp;
 use MRO::Compat;
@@ -48,53 +48,55 @@ sub import {
     _install_role_import( $target );
 }
 
-# Moo::Role won't compose anything before it was used into a consuming
-# package. Don't want import to be consumed.
-use Moo::Role;
+# this needs to be accessible by tag role import() methods, but don't want it
+# to pollute the namespace
+our $_role_import = sub {
+    my $class = shift;
+    return unless Moo::Role->is_role( $class );
+
+    my $target = caller;
+    Moo::Role->apply_roles_to_package( $target, $class );
+    _install_tags( $target, $TAGSTORE{$class} );
+};
+
 
 sub _install_role_import {
-
     my $target = shift;
 
-    ## no critic (ProhibitNoStrict)
-    no strict 'refs';
-    *{"${target}::import"} = sub {
+    ## no critic (ProhibitStringyEval)
 
-        my $class  = shift;
-
-        return unless Moo::Role->is_role( $class );
-
-        my $target = caller;
-
-        Moo::Role->apply_roles_to_package( $target, $class );
-
-        _install_tags( $target, $TAGSTORE{$class} );
-    };
-
+    croak( "error installing import routine into $target\n" )
+      unless eval
+      "package $target; sub import { goto \$MooX::TaggedAttributes::_role_import }; 1;";
 }
 
 
 sub _install_tags {
-
     my ( $target, $tags ) = @_;
 
     if ( $TAGSTORE{$target} ) {
-
         push @{ $TAGSTORE{$target} }, @$tags;
-
     }
 
     else {
-
         $TAGSTORE{$target} = [@$tags];
         _install_tag_handler( $target );
     }
-
 }
 
 sub _install_tag_handler {
-
     my $target = shift;
+
+    # we need to
+    #  1) use the target package's around() function, and
+    #  2) call it in that package's context.
+
+    # create a closure which knows about the target's around
+    # so that if namespace::clean is called on the target class
+    # we don't lose access to it.
+
+    ## no critic (ProhibitStringyEval)
+    my $around = eval( "package $target; sub { goto &around }" );
 
     install_modifier(
         $target,
@@ -103,16 +105,7 @@ sub _install_tag_handler {
 
             $attrs = ref $attrs ? $attrs : [$attrs];
 
-            my $target = caller;
-
             my @tags = @{ $TAGSTORE{$target} };
-
-            # we need to
-            #  1) use the target package's around() function, and
-            #  2) call it in that package's context.
-
-            ## no critic (ProhibitStringyEval)
-            my $around = eval( "package $target; sub { goto &around }" );
 
             $around->(
                 "_tag_list" => sub {
@@ -128,8 +121,11 @@ sub _install_tag_handler {
                 } );
 
         } );
-
 }
+
+# Moo::Role won't compose anything before it was used into a consuming
+# package. Don't want import to be consumed.
+use Moo::Role;
 
 use Sub::Name 'subname';
 
@@ -143,10 +139,9 @@ my $can = sub { ( shift )->next::can };
 # but note that djerius' published solution was incomplete.
 around _tag_list => sub {
 
-
     # 1. call &$orig to handle tag role compositions into the current class
 
-    # 2. call up the inheritance stack to handle parent class tag role compositions.
+# 2. call up the inheritance stack to handle parent class tag role compositions.
 
     my $orig    = shift;
     my $package = caller;
@@ -203,8 +198,7 @@ has _tag_cache => (
     default  => sub {
         my $class = blessed( $_[0] );
         return $TAGCACHE{$class} ||= $class->_build_cache;
-    }
-);
+    } );
 
 sub _tags { blessed( $_[0] ) ? $_[0]->_tag_cache : $_[0]->_build_cache }
 
@@ -232,40 +226,53 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
-    # Create a Role used to apply the attributes
-    package Tags;
-    use Moo::Role;
-    use MooX::TaggedAttributes -tags => [ qw( t1 t2 ) ];
+ # define a Tag Role
+ package T1;
+ use Moo::Role;
+ 
+ use MooX::TaggedAttributes -tags => [qw( t1 t2 )];
+ 1;
 
-    # Apply the role directly to a class
-    package C1;
-    use Tags;
+ # Apply a tag role directly to a class
+ package C1;
+ use Moo;
+ use T1;
+ 
+ has c1 => ( is => 'ro', t1 => 1 );
+ 1;
 
-    has c1 => ( is => 'ro', t1 => 1 );
+ # use a tag role in another Role
+ package R1;
+ 
+ use Moo::Role;
+ use T1;
+ 
+ has r1 => ( is => 'ro', t2 => 2 );
+ 1;
 
-    my $obj = C1->new;
+ # Use a tag role which consumes a tag role in a class
+ package C2;
+ use Moo;
+ use R1;
+ 
+ has c2 => ( is => 'ro', t2 => sub { } );
+ 1;
 
-    # get the value of the tag t1, applied to attribute a1
-    $obj->_tags->{t1}{a1};
-
-    # Apply the tags to a role
-    package R1;
-    use Tag1;
-
-    has r1 => ( is => 'ro', t2 => 2 );
-
-    # Use that role in a class
-    package C2;
-    use R1;
-
-    has c2 => ( is => 'ro', t2 => sub { }  );
-
-    # get the value of the tag t2, applied to attribute c2
-    C2->new->_tags->{t2}{c2};
+ # Use our tags
+ use C1;
+ use C2;
+ 
+ use 5.010;
+ 
+ # get the value of the tag t1, applied to attribute a1
+ say C1->new->_tags->{t1}{a1};
+ 
+ # get the value of the tag t2, applied to attribute c2
+ say C2->new->_tags->{t2}{c2};
 
 =head1 DESCRIPTION
 
@@ -277,20 +284,24 @@ which tags, and what the values are.
 
 To define a set of tags, create a special I<tag role>:
 
-    package T1;
-    use Moo::Role;
-    use MooX::TaggedAttributes -tags => [ 't1' ];
-
-    has a1 => ( is => 'ro', t1 => 'foo' );
+ package T1;
+ use Moo::Role;
+ use MooX::TaggedAttributes -tags => [ 't1' ];
+ 
+ has a1 => ( is => 'ro', t1 => 'foo' );
+ 
+ 1;
 
 If there's only one tag, it can be passed directly without being
 wrapped in an array:
 
-    package T2;
-    use Moo::Role;
-    use MooX::TaggedAttributes -tags => 't2';
-
-    has a2 => ( is => 'ro', t2 => 'bar' );
+ package T2;
+ use Moo::Role;
+ use MooX::TaggedAttributes -tags => 't2';
+ 
+ has a2 => ( is => 'ro', t2 => 'bar' );
+ 
+ 1;
 
 A tag role is a standard B<Moo::Role> with added machinery to track
 attribute tags.  As shown, attributes may be tagged in the tag role
@@ -305,37 +316,45 @@ existing tags, but won't provide the ability to tag new attributes.
 
 This is correct:
 
-    package R2;
-    use Moo::Role;
-    use T1;
+ package R2;
+ use Moo::Role;
+ use T1;
+ 
+ has r2 => ( is => 'ro', t1 => 'foo' );
+ 1;
 
-    has r2 => ( is => 'ro', t1 => 'foo' );
-
-    package R3;
-    use Moo::Role;
-    use R3;
-
-    has r3 => ( is => 'ro', t1 => 'foo' );
+ package R3;
+ use Moo::Role;
+ use R3;
+ 
+ has r3 => ( is => 'ro', t1 => 'foo' );
+ 1;
 
 The same goes for classes:
 
-    package C2;
-    use Moo;
-    use T1;
-
-    has c2 => ( is => 'ro', t1 => 'foo' );
+ package C1;
+ use Moo;
+ use T1;
+ 
+ has c1 => ( is => 'ro', t1 => 'foo' );
+ 1;
 
 Combining tag roles is as simple as B<use>'ing them in the new role:
 
-    package T12;
-    use T1;
-    use T2;
+ package T12;
+ 
+ use Moo::Role;
+ use T1;
+ use T2;
+ 
+ 1;
 
-    package C2;
-    use Moo;
-    use T12;
-
-    has c2 => ( is => 'ro', t1 => 'foo', t2 => 'bar' );
+ package C2;
+ use Moo;
+ use T12;
+ 
+ has c2 => ( is => 'ro', t1 => 'foo', t2 => 'bar' );
+ 1;
 
 =head2 Accessing tags
 
@@ -343,27 +362,30 @@ Classes and objects are provided a B<_tags> method which returns a
 hash of hashes keyed off of the tags and attribute names.  For
 example, for the following code:
 
-    package T;
-    use Moo::Role;
-    use MooX::TaggedAttributes -tags => [ qw( t1 t2 ) ];
+ package T;
+ use Moo::Role;
+ use MooX::TaggedAttributes -tags => [qw( t1 t2 )];
+ 1;
 
-    package C;
-    use Moo;
-    use T;
+ package C;
+ use Moo;
+ use T;
+ 
+ has a => ( is => 'ro', t1 => 2 );
+ has b => ( is => 'ro', t2 => 'foo' );
+ 1;
 
-    has a => ( is => 'ro', t1 => 2 );
-    has b => ( is => 'ro', t2 => 'foo' );
+The tag structure returned by  C<< C->_tags >>
 
-The tag structure returned by either of the following
+ { t1 => { a => 2 }, t2 => { b => "foo" } }
 
-    C->_tags
-    C->new->_tags
 
-looks like
+and C<< C->new->_tags >>
 
-    { t1 => { a => 2 },
-      t2 => { b => 'foo' },
-    }
+ { t1 => { a => 2 }, t2 => { b => "foo" } }
+
+
+are identical.
 
 =head1 BUGS AND LIMITATIONS
 

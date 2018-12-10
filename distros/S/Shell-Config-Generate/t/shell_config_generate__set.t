@@ -19,24 +19,27 @@ $config->set( FOO_ESCAPE3 => '"' );
 $config->set( FOO_NEWLINE => "\n" );
 $config->set( FOO_TAB     => "\t" );
 
-foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe fish ))
+foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe pwsh fish ))
 {
   subtest $shell => sub {
     my $shell_path = find_shell($shell);
-    skip_all "no $shell found" unless defined $shell_path;
+    skip_all "$shell not found" unless defined $shell_path;
 
     my $env = get_env($config, $shell, $shell_path);
 
-    is $env->{FOO_SIMPLE_SET}, 'bar',                             "[$shell]".'FOO_SIMPLE_SET = bar';
-    is $env->{FOO_ESCAPE1},    '!@#$%^&*()_+-={}|[]\\;:<>?,./~`', "[$shell]".'FOO_ESCAPE1    = !@#$%^&*()_+-={}|[]\\;:<>?,./~`';
-    is $env->{FOO_ESCAPE2},    "'",                               "[$shell]".'FOO_ESCAPE2    = \'';
-    is $env->{FOO_ESCAPE3},    '"',                               "[$shell]".'FOO_ESCAPE3    = "';
-    is $env->{FOO_TAB},        "\t",                              "[$shell]".'FOO_TAB        = \t';
-    
-    SKIP: {
-    skip "not sure how to escape new line for fish shell", 1 if $shell eq 'fish';
-    is $env->{FOO_NEWLINE},    "\n",                              "[$shell]".'FOO_NEWLINE    = \n';
-    }
+    is
+      $env,
+      hash {
+        field FOO_SIMPLE_SET => 'bar';
+        field FOO_ESCAPE1    => '!@#$%^&*()_+-={}|[]\\;:<>?,./~`';
+        field FOO_ESCAPE2    => "'";
+        field FOO_ESCAPE3    => '"';
+        field FOO_TAB        => "\t";
+        field FOO_NEWLINE    => "\n" if $shell ne 'fish';
+        etc;
+      },
+      $shell,
+    ;
     
   }
 }

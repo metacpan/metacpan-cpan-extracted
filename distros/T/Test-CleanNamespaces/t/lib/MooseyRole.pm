@@ -8,6 +8,7 @@ use namespace::clean;
 
 sub role_stuff {}
 
+our $CAN;
 use constant CAN => [ qw(role_stuff) ];
 use constant CANT => [ qw(devnull devnull with meta) ];
 

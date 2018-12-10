@@ -49,7 +49,7 @@ no_index:
 provides:
   Test::CleanNamespaces:
     file: lib/Test/CleanNamespaces.pm
-    version: '0.23'
+    version: '0.24'
 recommends:
   Package::Stash::XS: '0'
 requires:
@@ -69,10 +69,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-CleanNamespaces
   homepage: https://github.com/karenetheridge/Test-CleanNamespaces
   repository: https://github.com/karenetheridge/Test-CleanNamespaces.git
-version: '0.23'
+version: '0.24'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.029005'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -157,7 +157,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::ETHER/InstallGuide'
-      version: '1.200009'
+      version: '1.200012'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -396,6 +396,10 @@ x_Dist_Zilla:
               name: '@Author::ETHER/Authors'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::AllowOverride
+              name: '@Author::ETHER/allow override AUTHOR'
+              version: '0.05'
+            -
               class: Pod::Weaver::Section::Contributors
               name: '@Author::ETHER/Contributors'
               version: '0.009'
@@ -443,7 +447,7 @@ x_Dist_Zilla:
           inherit_version: '0'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: '@Author::ETHER/MetaProvides::Package'
       version: '2.004003'
@@ -496,13 +500,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.0
+          git_version: 2.19.1
           include_authors: 0
           include_releaser: 1
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -510,7 +514,7 @@ x_Dist_Zilla:
           dry_run: 1
           mode: auto
       name: '@Author::ETHER/StaticInstall'
-      version: '0.011'
+      version: '0.012'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -525,7 +529,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: '@Author::ETHER/CheckSelfDependency'
       version: '0.011'
@@ -563,7 +567,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20180622'
+          Module::CoreList: '5.20181120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -588,7 +592,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.045'
@@ -596,7 +600,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -604,7 +608,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -630,7 +634,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.045'
@@ -713,7 +717,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -726,11 +730,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.23
+          tag: v0.24
           tag_format: v%v
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -767,7 +771,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -789,7 +793,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.0
+          git_version: 2.19.1
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.045'
@@ -799,7 +803,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@Author::ETHER/GitHub::Update'
-      version: '0.45'
+      version: '0.47'
     -
       class: Dist::Zilla::Plugin::Run::AfterRelease
       config:
@@ -838,7 +842,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: DynamicPrereqs
       version: '0.034'
@@ -873,7 +877,7 @@ x_Dist_Zilla:
             - Moose::Conflicts
           no_forced_deps: 0
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000034'
           version: '0.006'
       name: Test::CheckBreaks
       version: '0.019'
@@ -950,6 +954,6 @@ x_authority: cpan:FLORA
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Graham Knop <haarg@haarg.org>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.29.5
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

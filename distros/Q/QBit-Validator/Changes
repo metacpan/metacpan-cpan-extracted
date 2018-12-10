@@ -1,141 +1,93 @@
 ==================================================
-Changes from 2016-11-19 00:00:00 +0000 to present.
+Changes from 2017-12-09 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.011 at 2017-11-19 10:41:04 +0000
+version 0.012 at 2018-12-09 18:41:12 +0000
 ------------------------------------------
 
-  Change: 82f7be22b5b4a380649d32072cff59157f910ff4
+  Change: 57d9a0f91814b0ff0a58826c11729ff7c2942c1f
   Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2017-11-19 13:40:08 +0000
+  Date : 2018-12-09 21:40:25 +0000
 
-    Merge pull request #14 from Madskill/deps_for_hash
+    Merge pull request #16 from Madskill/rm_ppa
 
-    new deps and refactoring exceptions 
+    rm ppa 
 
-  Change: c9c5bf91997782c15c6c8049cbb54ae9e5fb3d8a
+  Change: 7570c62df39cc64bbbbf7f42caded6442c22d4e0
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-11-19 13:39:08 +0000
+  Date : 2018-12-09 21:39:45 +0000
 
-    deleted empty string 
+    rm ppa 
 
-  Change: 68b3efd0f32ea7a014365b5b665b4f399b9d76b0
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-11-19 13:33:39 +0000
-
-    new deps and refactoring exceptions 
-
-------------------------------------------
-version 0.010 at 2017-04-23 11:46:10 +0000
-------------------------------------------
-
-  Change: 2e45698671d6bd8f00a855be815d239a628eb9fc
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-04-23 14:46:10 +0000
-
-    Version 0.010 
-
-  Change: 6b3e345e20830081f2bd6ce922bb33c2d76c36e6
+  Change: feb3d0d0e018891d488a84fc05c239479aa84dbf
   Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2017-04-23 14:44:44 +0000
+  Date : 2018-12-09 21:37:51 +0000
 
-    Merge pull request #13 from Madskill/fix_bug
+    Merge pull request #15 from Madskill/deps_for_hash
 
-    next => return and use ref 
+    Deps for hash 
 
-  Change: f77bbf5be72ffa0fec2da8a44617a63a31a867f9
+  Change: 70b16124dbd68f70b65481902d15a5c3b05fc612
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2017-04-23 14:42:28 +0000
+  Date : 2018-12-09 21:36:05 +0000
 
-    next => return and use ref 
+    correct documentation 
 
-------------------------------------------
-version 0.009 at 2016-12-11 00:01:18 +0000
-------------------------------------------
-
-  Change: fe25c25283723f01485b33da23d329a3abc881c2
+  Change: 4253e36333166d047ff6fa002148a507e7598659
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-11 03:01:18 +0000
+  Date : 2018-12-09 21:21:28 +0000
 
-    Version 0.009 
+    rm unused code 
 
-  Change: 0ca56e6184ea8114f0024c4af7a47f963696a381
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-11 03:00:11 +0000
-
-    Merge pull request #12 from Madskill/any_of_for_hash
-
-    added documentation 
-
-  Change: 0f2f881f936087b003c4ffc754eb8395e5c5391b
+  Change: 764a74b0346e6522f16129825c978cf5cb95cb2d
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-11 02:59:19 +0000
+  Date : 2018-12-09 21:14:04 +0000
 
-    added documentation 
+    type variable and documentations 
 
-  Change: 5d9367adca21717ba48f4b2b03492a7cb520dc8e
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-12-11 02:57:27 +0000
-
-    Merge pull request #11 from Madskill/any_of_for_hash
-
-    added new option 'any_of' for hash 
-
-  Change: f4443da4a328687624e55f5c98ac78f01a4479a1
+  Change: d82e751c2cefc0536d7d56b8e89a3637c29eb1f6
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-12-11 02:56:13 +0000
+  Date : 2018-12-03 09:32:59 +0000
 
-    added new option 'any_of' for hash 
+    PathManager for type variable 
 
-------------------------------------------
-version 0.008 at 2016-11-19 15:12:34 +0000
-------------------------------------------
-
-  Change: 9898ee802b79be5fbcd181126aad9c83ae86c172
+  Change: b140e5476d801d9893c3870a1daeec8a19160766
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-19 18:12:34 +0000
+  Date : 2018-12-01 23:53:34 +0000
 
-    Version 0.008 
+    dpath 
 
-  Change: 7e463956d40ca050e942acbb2fe1fea8c3666747
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-11-19 19:11:19 +0000
-
-    Merge pull request #10 from Madskill/fix_skip
-
-    Fix skip 
-
-  Change: e640d60a155c1d0d572e00efbc10c339eb4a092a
+  Change: be5cad1b5f0612648ab22402f93c94c544797b4a
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-19 18:09:09 +0000
+  Date : 2018-11-06 08:51:43 +0000
 
-    move check error 
+    added type variable 
 
-  Change: 5014822a11fbf65a5be088faf796a26a4a7e3c24
+  Change: 8ed60ceb6990ac91bfd42049ef88a1fdfb1560a0
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-19 18:03:40 +0000
+  Date : 2018-10-13 19:54:56 +0000
 
-    last if error 
+    redefine new for exception 
 
-  Change: 6d4a091920f9a7581fa220c3aae46f1ded6178c8
+  Change: 713378130d6c64eab3a1be6a8f39af477eb3fd48
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-19 17:46:26 +0000
+  Date : 2018-10-13 18:29:52 +0000
 
-    Merge remote-tracking branch 'upstream/master' into upload_to_cpan 
+    test and error handler 
 
-  Change: 4ea38339a7f9dbcf438571c57ed3fba5c3eab1f4
+  Change: 13683254161409f9519ce2bc889b69650be7b3df
+  Author: Igor Sverdlov <blizzard@yandex-team.ru>
+  Date : 2018-10-12 22:13:50 +0000
+
+    added test for errors 
+
+  Change: 65160b9eb297d9cb24432924951a69c962dde7bb
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-19 17:44:08 +0000
+  Date : 2018-10-12 10:57:08 +0000
 
-    last 
+    validator new 
 
-  Change: 189d82a6951bb2e56592d7f34d52e175f7afdfe8
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-11-19 17:28:06 +0000
-
-    move logic into type 
-
-================================================
-Plus 7 releases after 2016-11-19 00:00:00 +0000.
-================================================
+=================================================
+Plus 11 releases after 2017-12-09 00:00:00 +0000.
+=================================================

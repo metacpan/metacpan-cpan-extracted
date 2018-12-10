@@ -165,7 +165,11 @@ sub test_vol {
       my $store = Data::ObjectStore::open_store( $dir );
       my $root = $store->load_root_container;
       $root->vol( "TEST", "VALUE" );
+      $root->vol( "TEST2", "VALUE2" );
       is( $store->load_root_container->vol( "TEST" ), "VALUE", "VOL lived in store" );
+      is( $store->load_root_container->vol( "TEST2" ), "VALUE2", "VOL lived in store" );
+      $root->clearvol( "TEST2" );
+      ok( ! $store->load_root_container->vol( "TEST2" ), "VOL cleared from store" );
       $store->load_root_container->store->save;
   }
     my $store = Data::ObjectStore::open_store( $dir );
@@ -191,8 +195,7 @@ sub test_suite {
 
     is( $store->get_db_version, $Data::RecordStore::VERSION, "store version" );
     ok( (time - $store->get_created_time) < 3, "just created" );
-    is( $store->get_last_update_time, $store->get_created_time, "Just created" );
-  
+    ok( ($store->get_last_update_time-$store->get_created_time) < 3, "Just created" );
 
     ok( ! $store->_has_dirty, "no dirty yet" );
 

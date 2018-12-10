@@ -228,8 +228,7 @@ set_arrayvalue(config_setting_t *settings, const char *key, AV *value, int flag)
 		case CONFIG_TYPE_ARRAY:
 		case CONFIG_TYPE_LIST:
 			/*Perl_warn(aTHX_ "new list");*/
-			settings_item = config_setting_add(settings, NULL, (flag ? CONFIG_TYPE_LIST : CONFIG_TYPE_ARRAY));
-			set_array(settings_item, value, &returnStatus);
+			set_array(settings, value, &returnStatus);
 			break;
 		case CONFIG_TYPE_GROUP:
 			/*Perl_warn(aTHX_ "new group");*/

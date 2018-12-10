@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Paginator
 
+2.08  2018-12-10 MANWAR
+      - Updated pod with details for working example code.
+
 2.07  2017-10-17 MANWAR
       - Added missing test prereq as recommended by CPANTS.
 

@@ -1,0 +1,95 @@
+MooX::PDL::Role::Proxy
+
+MooX::PDL::Role::Proxy is a Moo::Role which turns its consumer into a
+proxy object for some of its attributes, which are assumed to be PDL
+objects (or other proxy objects). A subset of PDL methods applied to the
+proxy object are applied to the selected attributes. (See PDL::QuckStart
+for more information on PDL and its objects (piddles)).
+
+As an example, consider an object representing a set of detected events
+(think physics, not computing), which contains metadata describing the
+events as well as piddles representing event position, energy, and
+arrival time. The structure might look like this:
+
+  {
+      metadata => \%metadata,
+      time   => $time,         # piddle
+      x      => $x,            # piddle
+      y      => $y,            # piddle
+      energy => $energy        # piddle
+  }
+
+To filter the events on energy would traditionally be performed
+explicitly on each element in the structure, e.g.
+
+  my $mask = which( $obj->{energy} > 20 );
+
+  my $copy = {};
+  $copy->{time}   = $obj->{time}->where( $mask );
+  $copy->{x}      = $obj->{x}->where( $mask );
+  $copy->{y}      = $obj->{y}->where( $mask );
+  $copy->{energy} = $obj->{energy}->where( $mask );
+
+Or, more succinctly,
+
+  $new->{$_} = $obj->{$_}->where( $mask ) for qw( time x y energy );
+
+With MooX::PDL::Role::Proxy this turns into
+
+  my $copy = $obj->where( $mask );
+
+Or, if the results should be stored in the same object,
+
+  $obj->inplace->where( $mask );
+
+  Usage and Class requirements
+
+Each attribute to be operated on by the common "PDL"-like operators
+should be given a "piddle" option, e.g.
+
+  has p1 => (
+      is      => 'rw',
+      default => sub { sequence( 10 ) },
+      piddle  => 1,
+  );
+
+(Treat the option value as an identifier for the group of piddles which
+should be operated on, rather than as a boolean).
+
+To support non-inplace operations, the class must provide a
+"clone_with_piddles" method with the following signature:
+
+   sub clone_with_piddles ( $self, %piddles )
+
+It should clone $self and assign the values in %piddles to the
+attributes named by its keys. To assist with the latter operation, see
+the provided "_set_attrs" method.
+
+To support inplace operations, attributes tagged with the "piddle"
+option must have write accessors. They may be public or private.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

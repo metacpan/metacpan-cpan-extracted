@@ -175,6 +175,11 @@ use_ok('Pg::BulkLoad');
 use feature qw/signatures postderef/;
 no warnings qw/experimental uninitialized/;
 
+dies_ok(
+    sub { Pg::BulkLoad->new( wrongarg => 'dieshere') },
+    'dies if arguments missing'
+);
+
 my %args = (
     pg        => $dbh,
     errorfile => '/tmp/pgbulk.error',

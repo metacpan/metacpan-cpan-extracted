@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '7.12'
+  ExtUtils::MakeMaker: '0'
   XSLoader: '0.16'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
@@ -24,5 +24,5 @@ requires:
   perl: '5.008001'
   strict: '0'
   warnings: '0'
-version: '1.04'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

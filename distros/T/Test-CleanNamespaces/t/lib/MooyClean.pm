@@ -8,6 +8,7 @@ use namespace::clean;
 
 sub stuff {}
 
+our $CAN;
 use constant CAN => [ qw(stuff meta) ];
 use constant CANT => [ qw(catdir catfile devnull with) ];
 

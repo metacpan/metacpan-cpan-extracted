@@ -15,6 +15,7 @@ role {
 
 sub parameterized_role_stuff {}
 
+our $CAN;
 use constant CAN => [ qw(role_stuff) ];  # TODO: meta
 use constant CANT => [ qw(devnull parameter role with) ];
 

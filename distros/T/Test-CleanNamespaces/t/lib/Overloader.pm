@@ -22,6 +22,7 @@ use overload
     fallback => 1,
 ;
 
+our $CAN;
 use constant CAN => [ qw(new) ];
 use constant CANT => [ qw(stuff looks_like_number) ];
 

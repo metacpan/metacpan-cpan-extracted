@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.671 2018-12-08
+  * Live plots: Add support for minimal time interval between redraws
+  * Add Moose Power sweep support
+  * Documentation improvements
+
 3.670 2018-11-22
   * Add Moose driver for Lakeshore340
   * Add driver for Keysight B2901A SMU

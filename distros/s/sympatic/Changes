@@ -1,0 +1,16 @@
+Revision history for Sympatic
+
+0.1    2018-12-08    Marc Chantreux
+
+* add documentation
+* add test suite
+
+also, as we expect
+
+* beginners to not worry about gory details
+  (default should be helpful)
+* extra behavior to be disable
+
+0.0    2018-02-07    Marc Chantreux
+
+Initial release, just code

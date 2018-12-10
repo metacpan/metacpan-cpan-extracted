@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,9 +25,11 @@ resources:
   bugtracker: https://github.com/plicease/Shell-Config-Generate/issues
   homepage: https://metacpan.org/pod/Shell::Config::Generate
   repository: git://github.com/plicease/Shell-Config-Generate.git
-version: '0.31'
+version: '0.33'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Brad Macpherson (BRAD, brad-mac)'
   - mohawk
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.29.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

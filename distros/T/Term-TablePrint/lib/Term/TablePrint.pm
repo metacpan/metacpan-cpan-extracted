@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -57,23 +57,24 @@ sub DESTROY {
 sub __validate_options {
     my ( $self, $opt ) = @_;
     my $valid = {
-        max_rows         => '[ 0-9 ]+',
-        min_col_width    => '[ 0-9 ]+',
-        progress_bar     => '[ 0-9 ]+',
-        tab_width        => '[ 0-9 ]+',
-        choose_columns   => '[ 0 1 ]',
-        binary_filter    => '[ 0 1 ]',
-        codepage_mapping => '[ 0 1 ]',
-        color            => '[ 0 1 ]',
-        grid             => '[ 0 1 ]',
-        keep_header      => '[ 0 1 ]',
-        squash_spaces    => '[ 0 1 ]',
-        table_expand     => '[ 0 1 2 ]',
-        mouse            => '[ 0 1 2 3 4 ]',
-        binary_string    => '',
-        prompt           => '',
-        undef            => '',
-        #thsd_sep        => '',
+        max_rows          => '[ 0-9 ]+',
+        min_col_width     => '[ 0-9 ]+',
+        progress_bar      => '[ 0-9 ]+',
+        tab_width         => '[ 0-9 ]+',
+        choose_columns    => '[ 0 1 ]',
+        binary_filter     => '[ 0 1 ]',
+        codepage_mapping  => '[ 0 1 ]',
+        color             => '[ 0 1 ]',
+        grid              => '[ 0 1 ]',
+        keep_header       => '[ 0 1 ]',
+        squash_spaces     => '[ 0 1 ]',
+        table_expand      => '[ 0 1 2 ]',
+        mouse             => '[ 0 1 2 3 4 ]',
+        binary_string     => '',
+        decimal_separator => '',
+        prompt            => '',
+        undef             => '',
+        #thsd_sep         => '',
     };
     for my $key ( keys %$opt ) {
         if ( ! exists $valid->{$key} ) {
@@ -94,22 +95,23 @@ sub __validate_options {
 
 sub __set_defaults {
     my ( $self ) = @_;
-    $self->{binary_filter}    = 0      if ! defined $self->{binary_filter};
-    $self->{binary_string}    = 'BNRY' if ! defined $self->{binary_string};
-    $self->{choose_columns}   = 0      if ! defined $self->{choose_columns};
-    $self->{codepage_mapping} = 0      if ! defined $self->{codepage_mapping};
-    $self->{color}            = 0      if ! defined $self->{color};
-    $self->{grid}             = 0      if ! defined $self->{grid};
-    $self->{keep_header}      = 1      if ! defined $self->{keep_header};
-    $self->{squash_spaces}    = 0      if ! defined $self->{squash_spaces};
-    $self->{max_rows}         = 200000 if ! defined $self->{max_rows};
-    $self->{min_col_width}    = 30     if ! defined $self->{min_col_width};
-    $self->{mouse}            = 0      if ! defined $self->{mouse};
-    $self->{progress_bar}     = 40000  if ! defined $self->{progress_bar};
-    $self->{prompt}           = ''     if ! defined $self->{prompt};
-    $self->{tab_width}        = 2      if ! defined $self->{tab_width};
-    $self->{table_expand}     = 1      if ! defined $self->{table_expand};
-    $self->{undef}            = ''     if ! defined $self->{undef};
+    $self->{binary_filter}     = 0      if ! defined $self->{binary_filter};
+    $self->{binary_string}     = 'BNRY' if ! defined $self->{binary_string};
+    $self->{choose_columns}    = 0      if ! defined $self->{choose_columns};
+    $self->{codepage_mapping}  = 0      if ! defined $self->{codepage_mapping};
+    $self->{color}             = 0      if ! defined $self->{color};
+    $self->{decimal_separator} = '.'    if ! defined $self->{decimal_separator};
+    $self->{grid}              = 0      if ! defined $self->{grid};
+    $self->{keep_header}       = 1      if ! defined $self->{keep_header};
+    $self->{squash_spaces}     = 0      if ! defined $self->{squash_spaces};
+    $self->{max_rows}          = 200000 if ! defined $self->{max_rows};
+    $self->{min_col_width}     = 30     if ! defined $self->{min_col_width};
+    $self->{mouse}             = 0      if ! defined $self->{mouse};
+    $self->{progress_bar}      = 40000  if ! defined $self->{progress_bar};
+    $self->{prompt}            = ''     if ! defined $self->{prompt};
+    $self->{tab_width}         = 2      if ! defined $self->{tab_width};
+    $self->{table_expand}      = 1      if ! defined $self->{table_expand};
+    $self->{undef}             = ''     if ! defined $self->{undef};
     $self->{thsd_sep} = ',';
     $self->{tab_w}    = $self->{tab_width};
     $self->{tab_w}++    if $self->{grid} && ! ( $self->{tab_width} % 2 );
@@ -133,33 +135,43 @@ sub print_table {
         return;
     }
     $self->__set_defaults();
+    if ( print_columns( $self->{decimal_separator} ) != 1 ) {
+        $self->{decimal_separator} = '.';
+    }
+    if ( $self->{decimal_separator} ne '.' ) {
+        $self->{thsd_sep} = '_';
+    }
     my $table_rows = @$table_ref - 1;
     if ( $self->{max_rows} && $table_rows >= $self->{max_rows} ) {
         $self->{info_row} = sprintf( 'Reached the row LIMIT %s', insert_sep( $self->{max_rows}, $self->{thsd_sep} ) );
         if ( $table_rows > $self->{max_rows} ) { # because for App::DBBrowser adding "(Total %d)" would be wrong
             $self->{info_row} .= sprintf( '  (total %s)', insert_sep( $table_rows, $self->{thsd_sep} ) );
         }
-        $self->{idx_last_row} = $self->{max_rows}; # -1 for index and +1 for header row
+        $self->{row_idxs} = [ 0 .. $self->{max_rows} ]; # -1 for index and +1 for header row
     }
     else {
-        $self->{idx_last_row} = $#$table_ref;
+        $self->{row_idxs} = [ 0 .. $#$table_ref ];
     }
     local $| = 1;
     $self->{plugin}->__hide_cursor();
     if ( $self->{choose_columns}  ) {
-        $self->{orig_col_idxs} = $self->__choose_columns( $table_ref->[0] );
-        if ( ! defined $self->{orig_col_idxs} ) {
+        $self->{chosen_cols} = $self->__choose_columns( $table_ref->[0] );
+        if ( ! defined $self->{chosen_cols} ) {
             return;
         }
-        if ( ! @{$self->{orig_col_idxs}} ) {
-            $self->{orig_col_idxs} = [ 0 .. $#{$table_ref->[0]} ];
+        if ( ! @{$self->{chosen_cols}} ) {
+            $self->{chosen_cols} = [ 0 .. $#{$table_ref->[0]} ];
         }
     }
     else {
-        $self->{orig_col_idxs} = [ 0 .. $#{$table_ref->[0]} ];
+        $self->{chosen_cols} = [ 0 .. $#{$table_ref->[0]} ];
     }
-    $self->{row_idxs} = [ 0 .. $self->{idx_last_row} ];
     $self->{orig_table} = $table_ref;
+    $self->{progress} = Term::TablePrint::ProgressBar->new( {
+                            row_count => scalar @{$self->{row_idxs}},
+                            col_count => scalar @{$self->{chosen_cols}},
+                            threshold => $self->{progress_bar},
+                        } );
     $self->__recursive_code();
     if ( exists $self->{backup_opt} ) {
         my $backup_opt = $self->{backup_opt};
@@ -179,74 +191,8 @@ sub print_table {
 }
 
 
-sub __print_single_row {
-    my ( $self, $row, $len_key ) = @_;
-    my $orig_tbl = $self->{orig_table};
-    my $term_w = term_width();
-    $len_key = int( $term_w / 100 * 33 ) if $len_key > int( $term_w / 100 * 33 );
-    my $separator = ' : ';
-    my $len_sep = print_columns( $separator );
-    my $col_max = $term_w - ( $len_key + $len_sep + 1 );
-    my $row_data = [ ' Close with ENTER' ];
-
-    for my $col ( @{$self->{orig_col_idxs}} ) {
-        push @{$row_data}, ' ';
-        my $key = $orig_tbl->[0][$col];
-        if ( ! defined $key ) {
-            $key = $self->{undef};
-        }
-        if ( $self->{color} ) {
-            $key =~ s/\e\[[\d;]*m//msg;
-        }
-        $key =~ s/\t/ /g;
-        $key =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
-        $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-        $key = cut_to_printwidth( $key, $len_key );
-        my $sep = $separator;
-        my $value = $orig_tbl->[$row][$col];
-        if ( ! defined $value || $value eq '' ) {
-            push @{$row_data}, sprintf "%*.*s%*s%s", $len_key, $len_key, $key, $len_sep, $sep, '';
-        }
-        else {
-            if ( $self->{color} ) {
-                $value =~ s/\e\[[\d;]*m//msg;
-            }
-            if ( ref $value ) {
-                $value = _handle_reference( $value );
-            }
-            for my $line ( split /\n+/, line_fold( $value, $col_max, '', '' ) ) {
-                push @{$row_data}, sprintf "%*.*s%*s%s", $len_key, $len_key, $key, $len_sep, $sep, $line;
-                $key = '' if $key;
-                $sep = '' if $sep;
-            }
-        }
-    }
-    choose(
-        $row_data,
-        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
-    );
-}
-
-
 sub __recursive_code {
     my ( $self ) = @_;
-    my $count_cells = ( $self->{idx_last_row} + 1 ) * @{$self->{orig_col_idxs}};
-    if ( $self->{progress_bar} && $self->{progress_bar} < $count_cells ) {
-        $self->{plugin}->__clear_screen();
-        print 'Computing:';
-        my ( $type, $total, $name );
-        if ( ( $count_cells / $self->{progress_bar} ) > 50 ) {
-            $type = 'multi';
-            $total = $self->{idx_last_row} + 1;
-        }
-        else {
-            $type = 'single';
-            $total = ( $self->{idx_last_row} + 1 ) * 3;
-            $name = 'Computing: ';
-        }
-        $self->{progress} = Term::TablePrint::ProgressBar->new( { count => $total, name => $name } );
-        $self->{progress_status} = [ $type, $total, 0, 0 ];
-    }
     $self->{table_copy} = [];
     $self->__copy_table();
     $self->__calc_col_width();
@@ -360,18 +306,11 @@ sub __recursive_code {
 
 sub __copy_table {
     my ( $self ) = @_;
-    my ( $type, $total, $next_update, $count );                                 #
-    if ( $self->{progress_status} ) {                                           #
-        ( $type, $total, $next_update, $count ) = @{$self->{progress_status}};  #
-        $self->{progress}->init(                                                #
-            $type eq 'multi' ? { name => 'Computing: (3) ' }                    #
-                             : { so_far => $count }                             #
-        );                                                                      #
-    }                                                                           #
+    my $count = $self->{progress}->set_progress_bar();            #
     for my $row ( @{$self->{orig_table}}[@{$self->{row_idxs}}] ) {
         my $tmp = [];
-        for ( @{$row}[@{$self->{orig_col_idxs}}] ) {
-            my $str = $_;
+        for ( @{$row}[@{$self->{chosen_cols}}] ) {
+            my $str = $_; # this is where the copying happens
             $str = $self->{undef}            if ! defined $str;
             $str = _handle_reference( $str ) if ref $str;
             if ( $self->{squash_spaces} ) {
@@ -392,39 +331,27 @@ sub __copy_table {
             push @$tmp, $str;
         }
         push @{$self->{table_copy}}, $tmp;
-        if ( $self->{progress_status} ) {                                       #
-            if ( $count >= $next_update ) {                                     #
-                $next_update = $self->{progress}->update( $count );             #
-            }                                                                   #
-            ++$count;                                                           #
-        }                                                                       #
+        if ( $self->{progress}{type} ) {                          #
+            if ( $count >= $self->{progress}{next_update} ) {     #
+                $self->{progress}->update_progress_bar( $count ); #
+            }                                                     #
+            ++$count;                                             #
+        }                                                         #
     }
-    if ( $self->{progress_status} ) {                                           #
-        if ( $type eq 'single' ) {                                              #
-            $self->{progress_status}[2] = $next_update;                         #
-            $self->{progress_status}[3] = $count;                               #
-        }                                                                       #
-        elsif ( $total >= $next_update ) {                                      #
-            $self->{progress}->update( $total );                                #
-        }                                                                       #
-    }
+    if ( $self->{progress}{type} ) {                              #
+        $self->{progress}->last_update_progress_bar( $count );    #
+    }                                                             #
 }
 
 
 sub __calc_col_width {
     my ( $self ) = @_;
-    my ( $type, $total, $next_update, $count );                                 #
-    if ( $self->{progress_status} ) {                                           #
-        ( $type, $total, $next_update, $count ) = @{$self->{progress_status}};  #
-        $self->{progress}->init(                                                #
-            $type eq 'multi' ? { name => 'Computing: (2) ' }                    #
-                             : { so_far => $count }                             #
-        );                                                                      #
-    }                                                                           #
+    my $count = $self->{progress}->set_progress_bar();            #
     $self->{longest_col_name} = 0;
     $self->{w_cols}  = [ ( 1 ) x @{$self->{table_copy}[0]} ];
     $self->{w_int}   = [ ( 0 ) x @{$self->{table_copy}[0]} ];
     $self->{w_fract} = [ ( 0 ) x @{$self->{table_copy}[0]} ];
+    my $ds = quotemeta( $self->{decimal_separator} );
     my $normal_row = 0;
     my @col_idx = ( 0 .. $#{$self->{table_copy}[0]} );
 
@@ -435,13 +362,13 @@ sub __calc_col_width {
                 if ( ! length $row->[$i] ) {
                     $width = 0;
                 }
-                elsif ( $row->[$i] =~/^([-+]?[0-9]*)(:?\.[0-9]+)?\z/ ) {
+                elsif ( $row->[$i] =~/^([-+]?[0-9]*)($ds[0-9]+)?\z/ ) {
                     $width = length( $row->[$i] );
-                    if ( defined $1 ) {
-                        $self->{w_int}[$i] = length( $1 ) if length( $1 ) > $self->{w_int}[$i];
+                    if ( defined $1 && length( $1 ) > $self->{w_int}[$i] ) {
+                        $self->{w_int}[$i] = length $1;
                     }
-                    if ( defined $2 ) {
-                        $self->{w_fract}[$i] = length( $2 ) if length( $2 ) > $self->{w_fract}[$i];
+                    if ( defined $2 && length( $2 ) > $self->{w_fract}[$i] ) {
+                        $self->{w_fract}[$i] = length $2;
                     }
                 }
                 else {
@@ -462,22 +389,16 @@ sub __calc_col_width {
                 }
             }
         }
-        if ( $self->{progress_status} ) {                                       #
-            if ( $count >= $next_update ) {                                     #
-                $next_update = $self->{progress}->update( $count );             #
-            }                                                                   #
-            ++$count;                                                           #
-        }                                                                       #
+        if ( $self->{progress}{type} ) {                          #
+            if ( $count >= $self->{progress}{next_update} ) {     #
+                $self->{progress}->update_progress_bar( $count ); #
+            }                                                     #
+            ++$count;                                             #
+        }                                                         #
     }
-    if ( $self->{progress_status} ) {                                           #
-        if ( $type eq 'single' ) {                                              #
-            $self->{progress_status}[2] = $next_update;                         #
-            $self->{progress_status}[3] = $count;                               #
-        }                                                                       #
-        elsif ( $total >= $next_update ) {                                      #
-            $self->{progress}->update( $total );                                #
-        }                                                                       #
-    }                                                                           #
+    if ( $self->{progress}{type} ) {                              #
+        $self->{progress}->last_update_progress_bar( $count );    #
+    }                                                             #
 }
 
 
@@ -555,14 +476,7 @@ sub __calc_avail_col_width {
 
 sub __cols_to_string {
     my ( $self, $w_cols ) = @_;
-    my ( $type, $total, $next_update, $count );                                 #
-    if ( $self->{progress_status} ) {                                           #
-        ( $type, $total, $next_update, $count ) = @{$self->{progress_status}};  #
-        $self->{progress}->init(                                                #
-            $type eq 'multi' ? { name => 'Computing: (1) ' }                    #
-                             : { so_far => $count }                             #
-        );                                                                      #
-    }                                                                           #
+    my $count = $self->{progress}->set_progress_bar();            #
     my $tab;
     if ( $self->{grid} ) {
         $tab = ( ' ' x int( $self->{tab_w} / 2 ) ) . '|' . ( ' ' x int( $self->{tab_w} / 2 ) );
@@ -576,13 +490,14 @@ sub __cols_to_string {
             $self->{w_fract}[$col] = 0 if $self->{w_fract}[$col] < 0;
         }
     }
+    my $ds = quotemeta( $self->{decimal_separator} );
     for my $row ( @{$self->{row_idxs}} ) {
         my $str = '';
         for my $col ( 0 .. $#$w_cols ) {
             if ( ! length $self->{table_copy}[$row][$col] ) {
                 $str = $str . ' ' x $w_cols->[$col];
             }
-            elsif ( $self->{table_copy}[$row][$col] =~ /^([-+]?[0-9]*)(\.[0-9]+)?\z/ ) {
+            elsif ( $self->{table_copy}[$row][$col] =~ /^([-+]?[0-9]*)($ds[0-9]+)?\z/ ) {
                 my $all = '';
                 if ( $self->{w_fract}[$col] ) {
                     if ( defined $2 ) {
@@ -590,12 +505,10 @@ sub __cols_to_string {
                             $all = substr( $2, 0, $self->{w_fract}[$col] );
                         }
                         else {
-                            #$all = $2 . '0' x ( $self->{w_fract}[$col] - length $2 );
                             $all = $2 . ' ' x ( $self->{w_fract}[$col] - length $2 );
                         }
                     }
                     else {
-                        #$all = '.' . '0' x ( $self->{w_fract}[$col] - 1 );
                         $all = ' ' x $self->{w_fract}[$col];
                     }
                 }
@@ -614,9 +527,6 @@ sub __cols_to_string {
                     $str = $str . ' ' x ( $w_cols->[$col] - length $all ) . $all;
                 }
             }
-            #elsif ( looks_like_number $self->{table_copy}[$row][$col] ) {
-            #    $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col], 1 );
-            #}
             else {
                 $str = $str . unicode_sprintf( $self->{table_copy}[$row][$col], $w_cols->[$col] );
             }
@@ -629,16 +539,16 @@ sub __cols_to_string {
         }
         $str = $str . RESET if $self->{color};
         $self->{table_copy}[$row] = $str;   # overwrite table_copy to save memory
-        if ( $self->{progress_status} ) {                                       #
-            if ( $count >= $next_update ) {                                     #
-                $next_update = $self->{progress}->update( $count );             #
-            }                                                                   #
-            ++$count;                                                           #
-        }                                                                       #
+        if ( $self->{progress}{type} ) {                          #
+            if ( $count >= $self->{progress}{next_update} ) {     #
+                $self->{progress}->update_progress_bar( $count ); #
+            }                                                     #
+            ++$count;                                             #
+        }                                                         #
     }
-    if ( $self->{progress_status} && $total >= $next_update ) {                 #
-        $self->{progress}->update( $total );                                    #
-    }                                                                           #
+    if ( $self->{progress}{type} ) {                              #
+        $self->{progress}->last_update_progress_bar( $count );    #
+    }                                                             #
     return $self->{table_copy}; # now $list
 }
 
@@ -678,6 +588,48 @@ sub __choose_columns {
     }
 }
 
+sub __print_single_row {
+    my ( $self, $row, $len_key ) = @_;
+    my $orig_tbl = $self->{orig_table};
+    my $term_w = term_width();
+    $len_key = int( $term_w / 100 * 33 ) if $len_key > int( $term_w / 100 * 33 );
+    my $separator = ' : ';
+    my $len_sep = length( $separator );
+    my $col_max = $term_w - ( $len_key + $len_sep + 1 );
+    my $row_data = [ ' Close with ENTER' ];
+
+    for my $col ( @{$self->{chosen_cols}} ) {
+        push @{$row_data}, ' ';
+        my $key = $orig_tbl->[0][$col];
+        if ( ! defined $key ) {
+            $key = $self->{undef};
+        }
+        if ( $self->{color} ) {
+            $key =~ s/\e\[[\d;]*m//msg;
+        }
+        $key =~ s/\t/ /g;
+        $key =~ s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
+        $key =~ s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+        $key = cut_to_printwidth( $key, $len_key );
+        my $copy_sep = $separator;
+        my $value = $orig_tbl->[$row][$col];
+        if ( $self->{color} ) {
+            $value =~ s/\e\[[\d;]*m//msg;
+        }
+        if ( ref $value ) {
+            $value = _handle_reference( $value );
+        }
+        for my $line ( split /\n+/, line_fold( $value, $col_max, '', '' ) ) {
+            push @{$row_data}, sprintf "%*.*s%*s%s", $len_key, $len_key, $key, $len_sep, $copy_sep, $line;
+            $key      = '' if $key;
+            $copy_sep = '' if $copy_sep;
+        }
+    }
+    choose(
+        $row_data,
+        { prompt => '', layout => 3, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
+    );
+}
 
 sub __header_sep {
     my ( $self, $w_cols ) = @_;
@@ -690,7 +642,6 @@ sub __header_sep {
     return $header_sep;
 }
 
-
 sub _handle_reference {
     require Data::Dumper;
     local $Data::Dumper::Useqq = 1;
@@ -699,7 +650,6 @@ sub _handle_reference {
     local $Data::Dumper::Maxdepth = 2;
     return 'ref: ' . Data::Dumper::Dumper( $_[0] );
 }
-
 
 sub __print_term_not_wide_enough_message {
     my ( $self ) = @_;
@@ -714,7 +664,6 @@ sub __print_term_not_wide_enough_message {
         { prompt => $prompt_2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0 }
     );
 }
-
 
 sub _minus_x_percent {
     my ( $value, $percent ) = @_;
@@ -743,7 +692,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.103
+Version 0.104
 
 =cut
 
@@ -908,6 +857,16 @@ C<SpaceBar> and the C<Return> key) until the user confirms with the I<-ok-> menu
 Confirming without any selected columns selects all columns.
 
 Default: 0
+
+=head3 decimal_separator
+
+Set the decimal separator. Numbers with a decimal separator are formatted as number if this option is set to the right
+value.
+
+Allowed values: a character with a print width of C<1>. If an invalid values is passed, I<decimal_separator> falls back
+to the default value.
+
+Default: . (dot)
 
 =head3 codepage_mapping
 

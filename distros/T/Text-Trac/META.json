@@ -1,0 +1,57 @@
+{
+   "abstract" : "Perl extension for formatting text with Trac Wiki Style.",
+   "author" : [
+      "Gosuke Miyashita, <gosukenator at gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Trac",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "1.001014"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "Class::Data::Inheritable" : "0",
+            "HTML::Entities" : "0",
+            "List::MoreUtils" : "0",
+            "Path::Tiny" : "0",
+            "Tie::IxHash" : "0",
+            "UNIVERSAL::require" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Text-Trac.git",
+         "web" : "https://github.com/manwar/Text-Trac"
+      }
+   },
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

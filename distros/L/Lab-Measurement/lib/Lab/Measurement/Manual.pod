@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.670
+version 3.671
 
 =head1 OVERVIEW
 
@@ -91,6 +91,8 @@ instruments and the high-level Lab::XPRESS interface
 =item * L<Lab::Moose::Sweep::Step::Voltage>
 
 =item * L<Lab::Moose::Sweep::Step::Frequency>
+
+=item * L<Lab::Moose::Sweep::Step::Power>
 
 =item * L<Lab::Moose::Sweep::Step::Magnet>
 

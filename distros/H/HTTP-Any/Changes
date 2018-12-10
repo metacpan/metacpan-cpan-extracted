@@ -1,5 +1,8 @@
 Revision history for Perl extension HTTP::Any.
 
+0.09  2018-11-10
+	- Protocol
+
 0.08  2017-05-16
 	- max_redirect
 

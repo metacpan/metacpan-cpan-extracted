@@ -947,7 +947,7 @@ END
 
 
    Amazon Key Name 
-                      ]I[{1,'',40}
+                      ]I[{1,'fullauto',40}
 
 END
    my $upload_keyfile=sub {

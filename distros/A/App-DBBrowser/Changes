@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.032    2018-12-09
+        - New option 'decimal_separator'.
+
 2.031    2018-11-29
         - MSWin32: set codepage temporarily to 65001.
         - Removed "no warnings 'utf8'".

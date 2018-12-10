@@ -214,6 +214,18 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.'chmod -Rv 777 /opt/source',
       '__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget --random-wait --progress=dot -O libmcrypt-2.5.8.tar.gz '.
+      'https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/'.
+      'libmcrypt-2.5.8.tar.gz/download','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar zxvf libmcrypt-2.5.8.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cwd('libmcrypt-2.5.8');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
 my $b=1;
 if ($b==1) {
    #if ($b==1) {
@@ -270,6 +282,8 @@ if ($b==1) {
          'git checkout -b remotes/origin/stable',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         './autogen.sh','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          './configure','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','__display__');
@@ -278,11 +292,9 @@ if ($b==1) {
          'git clone https://github.com/php/php-src.git',
          '__display__');
       ($stdout,$stderr)=$handle->cwd('php-src');
+      # https://clipbucket.com/cb-install-requirements/
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'wget -qO- http://php.net/downloads.php');
-      $stdout=~s/^.*?Current Stable.*?PHP\s+(.*?)\s+.*$/$1/s;
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "git checkout php-$stdout",'__display__');
+         'git checkout php-7.0.27','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -294,13 +306,15 @@ if ($b==1) {
          '--with-curl '.
          '--enable-filter '.
          '--enable-fpm '.
-         '--with-sodium '.
          '--with-gd '.
+         '--enable-gd-native-ttf '.
          '--with-freetype-dir '.
          '--with-jpeg-dir '.
          '--with-png-dir '.
          '--enable-intl '.
          '--enable-mbstring '.
+         '--with-mcrypt '.
+         #'--with-sodium '.
          '--enable-mysqlnd '.
          '--with-mysql-sock=/var/lib/mysql/mysql.sock '.
          '--with-mysqli=mysqlnd '.
@@ -314,8 +328,9 @@ if ($b==1) {
          '--with-sqlite3 '.
          '--enable-xmlreader '.
          '--enable-xmlwriter '.
-         '--with-libzip=/opt/source/libzip '.
-         '--enable-zip','__display__');
+         '--enable-zip '.
+         #'--with-libzip=/opt/source/libzip '.
+         '--with-zlib','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make -j2','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -333,11 +348,14 @@ if ($b==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./sapi/fpm/www.conf /usr/local/php7/etc/php-fpm.d/www.conf',
          '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php7/etc/php-fpm.conf',
+         '__display__');
       my $wcnf=<<END;
 catch_workers_output = yes
 
 php_flag[display_errors] = on
-php_admin_value[error_log] = /var/log/fpm-php.www.log
+php_admin_value[error_log] = /usr/local/php7/var/log/fpm-php.www.log
 php_admin_flag[log_errors] = on
 END
       ($stdout,$stderr)=$handle->cmd(
@@ -706,6 +724,8 @@ END
       ($stdout,$stderr)=$handle->cwd('/opt/source/ffmpeg/');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'git clone git://source.ffmpeg.org/ffmpeg','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git checkout remotes/origin/release/2.8','__display__');
       ($stdout,$stderr)=$handle->cwd('ffmpeg');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './configure --enable-gpl --enable-libfdk_aac --enable-libmp3lame '.
@@ -862,13 +882,13 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'unzip loaders.linux-x86_64.zip','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v ixed.7.2.lin $img_ext",'__display__');
+      "cp -v ixed.7.0.lin $img_ext",'__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    # https://forum.likg.org.ua/server-side-actions/
    # install-phpshield-sourceguardian-php-encoders-t306.html
    my $zd=<<END;
 ; Enable phpshield extension module
-extension=${img_ext}ixed.7.2.lin
+extension=${img_ext}ixed.7.0.lin
 END
    ($stdout,$stderr)=$handle->cmd(
       "echo -e \"$zd\" > phpshield.ini");
@@ -1009,8 +1029,6 @@ END
          'groupadd mysql');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'useradd -r -g mysql mysql');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'ls -1','__display__');
       my @rpm_files=split "\n", $stdout;
       foreach my $rpm (@rpm_files) {
          next if $rpm!~/64-common/;
@@ -1134,8 +1152,8 @@ END
       #   'rm -rvf /opt/source/sql_mode.cnf','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'service mysql start','__display__');
-      #($stdout,$stderr)=$handle->cmd($sudo.
-      #   'chmod -v 711 /var/lib/mysql/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 711 /var/lib/mysql/mysql','__display__');
       print "MYSQL START STDOUT=$stdout and STDERR=$stderr<==\n";sleep 5;
       print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
       sleep 5;
@@ -1174,36 +1192,6 @@ END
       'certbot-auto');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://github.com/arslancb/clipbucket.git','__display__');
-my $z=0;
-if ($z==1) {
-   my $cb_tar='clipbucket-2.8.v3354-stable.zip';
-   my $cb_md5='7dc581a36120592035b18cf8b7111916';
-   foreach my $count (1..3) {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-         "https://sourceforge.net/projects/clipbucket/files/ClipBucket%20v2/".
-         $cb_tar,'__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "md5sum -c - <<<\"$cb_md5 $cb_tar\"",
-         '__display__');
-      unless ($stderr) {
-         print(qq{ + CHECKSUM Test for $cb_tar *PASSED* \n});
-         last
-      } elsif ($count>=3) {
-         print "FATAL ERROR! : CHECKSUM Test for $cb_tar *FAILED* ",
-               "after $count attempts\n";
-         &Net::FullAuto::FA_Core::cleanup;
-      }
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "rm -rvf $cb_tar",'__display__');
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "unzip $cb_tar",'__display__');
-   $cb_tar=~s/\.zip$//;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "chmod -Rv 755 $cb_tar",'__display__');
-   ($stdout,$stderr)=$handle->cwd("$cb_tar/upload");
-}
    ($stdout,$stderr)=$handle->cwd("clipbucket");
    ($stdout,$stderr)=$handle->cmd(
       'git tag | sort -n | tail -1','__display__');
@@ -2000,6 +1988,11 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'sed -i \'s/memory_limit = 128M/memory_limit = 256M/\' '.
       '/usr/local/php7/lib/php.ini');
+   # https://www.toptal.com/php/getting-the-most-out-of-your-log-files-a-practical-guide
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'sed -i \'s|;error_log = syslog|error_log = '.
+      '/usr/local/php7/var/log/php_error.log|\' '.
+      '/usr/local/php7/lib/php.ini');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v /usr/local/php7/lib/php.ini /usr/local/php7/etc',
       '__display__');
@@ -2012,26 +2005,58 @@ END
       'yum -y install gmp-devel.x86_64',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://github.com/OCamlPro/opam.git','__display__');
-   ($stdout,$stderr)=$handle->cwd('opam');
-   ($stdout,$stderr)=$handle->cmd($sudo.'make lib-ext','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'./configure','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'make','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
-   ($stdout,$stderr)=$handle->cwd('..');
-   ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y install m4 fuse fuse-devel libcurl-devel libsqlite3x-devel zlib-devel',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y install bubblewrap',
       '__display__');
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      'opam init','__display__');
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      'opam update','__display__');
-#   ($stdout,$stderr)=$handle->cmd($sudo.
-#      'opam install google-drive-ocamlfuse',
-#      '__display__');
+   ($stdout,$stderr)=$handle->cwd('~');
+   ($stdout,$stderr)=$handle->cmd(
+      'git clone https://github.com/OCamlPro/opam.git','__display__');
+   ($stdout,$stderr)=$handle->cwd('opam');
+   ($stdout,$stderr)=$handle->cmd('make lib-ext','__display__');
+   ($stdout,$stderr)=$handle->cmd('./configure','__display__');
+   ($stdout,$stderr)=$handle->cmd('make lib-ext','__display__');
+   ($stdout,$stderr)=$handle->cmd('make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('..');
+   $handle->{_cmd_handle}->print('opam init');
+   my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   my $m=1;
+   while ($m==1) {
+      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $output=~/$prompt/;
+      print $output;
+      if (-1<index $output,'choose a different') {
+         $handle->{_cmd_handle}->print('y');
+         $output='';
+         next;
+      } elsif (-1<index $output,'Set that up') {
+         $handle->{_cmd_handle}->print('y');
+         $output='';
+         next;
+      }
+   }
+   ($stdout,$stderr)=$handle->cmd(
+      'opam update','__display__');
+   print "\n\n   EXPECT *** LONG **** DELAY - up to 10 minutes ...\n\n";
+   ($stdout,$stderr)=$handle->cmd(
+      'opam switch create ocaml-base-compiler',600,'__display__');
+   $handle->{_cmd_handle}->print('opam install google-drive-ocamlfuse');
+   my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=~s/\$$//;
+   my $n=1;
+   while ($n==1) {
+      my $output.=Net::FullAuto::FA_Core::fetch($handle);
+      last if $output=~/$prompt/;
+      print $output;
+      if (-1<index $output,'want to continue') {
+         $handle->{_cmd_handle}->print('Y');
+         $output='';
+         next;
+      }
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp /google-drive','__display__');
    my $substitute_email_module='%NL%'.
@@ -2222,6 +2247,8 @@ END
         (CLIPBUCKET is **NOT** a sponsor of the FullAuto© Project.)
 END
    print $starting_clipbucket;sleep 10;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -Rv www-data:www-data /var/www','__display__');
    $region=~s/^.*['](.*)[']$/$1/;
    ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- '.
       'http://docs.aws.amazon.com/ses/latest/DeveloperGuide/smtp-connect.html'
@@ -3538,4 +3565,81 @@ END
 };
 
 1
- 
+
+__DATA__
+
+Mount Google Drive on headless CentOS 7 server
+26 June, 2016
+
+I have been using google-drive-ocamlfuse for quite some time to backup my Virtualmin Virtual Servers, but finding any help setting this up for CentOS 7 in one place as far as i can see doesn't exist.
+
+So I have taken information from 2 seperate blogs (i have linked to these below) and examples from what i had to do to get it up and running.
+
+First thing is first... We need to install it from source.
+
+You need OPAM to be installed this is pretty easy to do, just type the following commands:
+
+$ sudo yum install ocaml ocaml-camlp4-devel ocaml-ocamldoc
+$ git clone https://github.com/OCamlPro/opam.git 
+$ cd opam 
+$ ./configure 
+$ make 
+$ sudo make install
+$ sudo yum install m4 fuse fuse-devel libcurl-devel libsqlite3x-devel zlib-devel
+$ opam init 
+$ opam update 
+$ opam install google-drive-ocamlfuse
+After successful build, the google-drive-ocamlfuse binary will be found in ~/.opam/system/bin. Add this to the end of your PATH environment as below:
+
+$ nano ~/.bashrc
+PATH=$PATH:$HOME/.opam/system/bin
+export PATH
+$ source ~/.bashrc
+Once installed you need to authorise it with your account, you do this as follows:
+
+Head over to https://console.developers.google.com/project and create a new project for access to Google Drive.
+
+First click on Create Project and then enter a Project Name anything will do here.
+
+Once it's created you should be able to manage it, if not just click on the name you created.
+
+Then click on the three lines in the top right and select API Manager, on this page select Drive API and then Enable
+
+You will then get an error saying you need to create credentials, this is fine just click the Go to Credentials button.
+
+On the next page, it's hard to spot at first but click where it says client ID (it's the 3rd line down), then click Configure consent screen.
+
+On this page just fill the form in how ever you want, it doesn't affect what we are doing here (Minimum you need to fill in is Product name shown to users).
+
+Next select Web application, and again give it any name then click Create.
+
+You will now see your client ID and client secret, keep these handy for the next step.
+
+Head back over to your SSH window and type the following, using the clientID and client secret you generated previously:
+
+$ google-drive-ocamlfuse -headless -id YOUR_CLIENT_ID -secret YOUR_SECRET
+An url will appear in the window, just copy and paste the link into your web browser follow the prompts and then copy and paste the code shown back into the console.
+
+Once entered it should give the following response:
+
+Access token retrieved correctly.
+
+After that your Google Drive access should be ok!
+
+The next quick step is to mount the folder, choose where you want it and create the folder as follows:
+
+mkdir YOUR FOLDER PATH
+then mount it:
+
+google-drive-ocamlfuse YOUR FOLDER PATH
+if you need to unmount it for any reason just use the following:
+
+fusermount -u YOUR FOLDER PATH
+If you want to use a folder which is not empty just add the -o nonempty mount option as follows:
+
+$ google-drive-ocamlfuse YOUR FOLDER PATH -o nonempty
+I used the sites below to help with this.
+
+http://xmodulo.com/mount-google-drive-linux.html
+
+https://www.devops.zone/ubuntu-howtos/mount-google-drive-on-your-server-using-ocamlfuse/ 

@@ -146,7 +146,22 @@ Vue.component('item-form', {
             this.$data._value = JSON.parse( JSON.stringify( this.$data._value ) );
         },
 
+        _isEqual: function ( left, right ) {
+            var fields = new Set( Object.keys( left ).concat( Object.keys( right ) ) );
+            var isEqual = true;
+            fields.forEach(function ( key ) {
+                if ( !isEqual ) return;
+                isEqual = ( left[ key ] == right[ key ] );
+            });
+            return isEqual;
+        },
+
         cancel: function () {
+            if ( !this._isEqual( this.$data._value, this.value ) ) {
+                if ( !confirm( 'Changes will be lost' ) ) {
+                    return;
+                }
+            }
             this.$data._value = JSON.parse( JSON.stringify( this.value ) );
             this.$emit( 'close' );
         },
@@ -681,6 +696,16 @@ var app = new Vue({
             return tmpl.replace( /\{([^}]+)\}/g, function ( match, field ) {
                 return data[field];
             } );
+        },
+
+        renderValue: function ( field, value ) {
+            var coll = this.schema;
+            var fieldType = coll.properties[ field ].type;
+            var type = Array.isArray( fieldType ) ? fieldType[0] : fieldType;
+            if ( type == 'boolean' ) {
+                return value ? 'Yes' : 'No';
+            }
+            return value;
         },
 
         rowViewUrl: function ( data ) {

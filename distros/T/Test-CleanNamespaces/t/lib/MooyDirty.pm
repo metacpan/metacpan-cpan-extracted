@@ -7,6 +7,7 @@ use File::Spec::Functions 'catdir';
 
 sub stuff {}
 
+our $CAN;
 use constant CAN => [ qw(stuff catdir meta has with) ];
 use constant CANT => [ ];
 use constant DIRTY => [ qw(catdir has with) ];

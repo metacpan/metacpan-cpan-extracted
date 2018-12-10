@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.670';
+$Lab::Moose::Sweep::VERSION = '3.671';
 #ABSTRACT: Base class for high level sweeps
 
 # Step/List and Continuous sweep are implemented as subclasses
@@ -506,7 +506,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.670
+version 3.671
 
 =head1 DESCRIPTION
 
@@ -517,7 +517,7 @@ The Sweep interface is documented in L<Lab::Measurement::Tutorial>.
 This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
-            2018       Andreas K. HÃ¼ttel, Simon Reinhardt
+            2018       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

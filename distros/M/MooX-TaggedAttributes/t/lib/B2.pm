@@ -1,6 +1,9 @@
 package B2;
 
 use Moo;
+
+use namespace::clean;
+
 use T2;
 
 has b2_1 => (

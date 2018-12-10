@@ -656,7 +656,7 @@ LICENSING
             }
         }
         close FH_CHANGES;
-        my $dirname  = dirname($file[0]);
+        my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
         $dirname =~ tr#/#-#;
         my $basename = basename($file[0], '.pm','.pl','.bat');
         my $tardir = "$dirname-$basename-$version";
@@ -687,6 +687,9 @@ LICENSING
                         chmod(0664, "$tardir/$file");
                     }
                     elsif ($file =~ m/\. (?: pl | bat | exe | com ) \z/oxmsi) {
+                        chmod(0775, "$tardir/$file");
+                    }
+                    elsif ($file =~ m{^bin/}oxmsi) {
                         chmod(0775, "$tardir/$file");
                     }
                     else {

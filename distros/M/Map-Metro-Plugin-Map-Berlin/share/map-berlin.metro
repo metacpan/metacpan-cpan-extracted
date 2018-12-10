@@ -183,9 +183,9 @@ Babelsberg
 Potsdam Hauptbahnhof
 
 # S75
-Gehrenseestr.
-Hohenschönhausen
 Wartenberg
+Hohenschönhausen
+Gehrenseestr.
 
 # S8
 Plänterwald
@@ -490,15 +490,14 @@ Schloßstr.
 1001|Friedenau|Schöneberg
 9|Friedrich-Wilhelm-Platz|Walther-Schreiber-Platz
 5|Friedrichsfelde|Tierpark
-1005,1007|Friedrichsfelde Ost|Lichtenberg
-1075|Friedrichsfelde Ost|Springpfuhl
+1005,1007,1075|Friedrichsfelde Ost|Lichtenberg
 1003|Friedrichshagen|Hirschgarten
 1003|Friedrichstr.|Hackescher Markt
 1003,1005,1007,1009|Friedrichstr.|Hauptbahnhof
 1001,1025,1026,1002|Friedrichstr.|Oranienburger Str.
 6|Friedrichstr.|Oranienburger Tor
 1001|Frohnau|Hohen Neuendorf
-1075|Gehrenseestr.|Hohenschönhausen
+1075|Gehrenseestr.|Springpfuhl
 1001,1025,1026,1002|Gesundbrunnen|Bornholmer Str.
 8|Gesundbrunnen|Pankstr.
 2|Gleisdreieck|Bülowstr.
@@ -543,7 +542,7 @@ Schloßstr.
 1001|Hermsdorf|Frohnau
 1003|Hirschgarten|Köpenick
 1001,1008|Hohen Neuendorf|Birkenwerder
-1075|Hohenschönhausen|Wartenberg
+1075|Hohenschönhausen|Gehrenseestr.
 1041|Hohenzollerndamm|Halensee
 1046|Hohenzollerndamm|Heidelberger Platz
 3|Hohenzollernplatz|Fehrbelliner Platz
@@ -590,8 +589,7 @@ Schloßstr.
 9|Leopoldplatz|Amrumer Str.
 6|Leopoldplatz|Seestr.
 5|Lichtenberg|Friedrichsfelde
-1075|Lichtenberg|Friedrichsfelde Ost
-1005,1007|Lichtenberg|Nöldnerplatz
+1005,1007,1075|Lichtenberg|Nöldnerplatz
 1002|Lichtenrade|Schichauweg
 1025,1026|Lichterfelde Ost|Lankwitz
 1025,1026|Lichterfelde Süd|Osdorfer Str.
@@ -631,8 +629,7 @@ Schloßstr.
 4|Nollendorfplatz|Viktoria-Luise-Platz
 1,3,2|Nollendorfplatz|Wittenbergplatz
 1001,1025,1026,1002|Nordbahnhof|Humboldthain
-1075|Nöldnerplatz|Lichtenberg
-1005,1007|Nöldnerplatz|Ostkreuz
+1005,1007,1075|Nöldnerplatz|Ostkreuz
 1047|Oberspree|Schöneweide
 2|Olympia-Stadion|Ruhleben
 1009,1003|Olympiastadion|Pichelsberg
@@ -645,9 +642,8 @@ Schloßstr.
 9|Osloer Str.|Nauener Platz
 1003,1005,1007,1009|Ostbahnhof|Jannowitzbrücke
 1008,1085|Ostkreuz|Frankfurter Allee
-1075|Ostkreuz|Nöldnerplatz
 1041|Ostkreuz|Treptower Park
-1003,1005,1007|Ostkreuz|Warschauer Str.
+1003,1005,1007,1075|Ostkreuz|Warschauer Str.
 6|Otisstr.|Holzhauser Str.
 1008,1002|Pankow|Pankow-Heinersdorf
 2|Pankow|Vinetastr.
@@ -718,8 +714,7 @@ Schloßstr.
 3|Spichernstr.|Hohenzollernplatz
 1047|Spindlersfeld|Oberspree
 2|Spittelmarkt|Hausvogteiplatz
-1007|Springpfuhl|Friedrichsfelde Ost
-1075|Springpfuhl|Gehrenseestr.
+1007,1075|Springpfuhl|Friedrichsfelde Ost
 6|Stadtmitte|Französische Str.
 2|Stadtmitte|Mohrenstr.
 1041|Storkower Str.|Frankfurter Allee
@@ -756,8 +751,9 @@ Schloßstr.
 9|Walther-Schreiber-Platz|Schloßstr.
 1007|Wannsee|Griebnitzsee
 1001|Wannsee|Nikolassee
-1003,1005,1007,1009|Warschauer Str.|Ostbahnhof
+1003,1005,1007,1075,1009|Warschauer Str.|Ostbahnhof
 1,3|Warschauer Str.|Schlesisches Tor
+1075|Wartenberg|Hohenschönhausen
 5|Weberwiese|Frankfurter Tor
 1041|Wedding|Gesundbrunnen
 6|Wedding|Leopoldplatz

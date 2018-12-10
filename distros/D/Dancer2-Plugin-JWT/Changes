@@ -1,3 +1,7 @@
+0.017  2018-12-08
+   - Fix issue with Headers object redirection (Issue #8)
+   - Declare minimum required Perl version (Mohammad S Anwar)
+
 0.016  2018-10-29
    - Use expiration information (thanks to EM Hernández-Novich)
 

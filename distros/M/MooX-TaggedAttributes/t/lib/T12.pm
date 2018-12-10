@@ -2,6 +2,8 @@ package T12;
 
 use Moo::Role;
 
+use namespace::clean;
+
 use T1;
 use T2;
 

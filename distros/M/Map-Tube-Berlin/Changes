@@ -1,5 +1,10 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+2018.1209
+	- data changes:
+	  - S75 now to Ostbahnhof
+	- switch to new version scheme (YYYY.MMDD)
+
 0.17  2018-08-11
 	- data changes:
 	  - U3 now to Warschauer Str.

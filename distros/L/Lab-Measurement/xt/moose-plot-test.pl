@@ -30,11 +30,11 @@ warn "output folder: $filename";
 
 my $sweep = sweep(
     type => 'Step::Voltage', instrument => $source, from => -1,
-    to   => 1,               step       => 0.01
+    to   => 1,               step       => 0.0001
 );
 
 my $datafile_2d = sweep_datafile( columns => [qw/x y y2/] );
-my $curve_options = { with => 'lines', linewidth => 2 };
+my $curve_options = { with => 'points', linewidth => 2 };
 $datafile_2d->add_plot(
     curves => [
         { x => 'x', y => 'y',  curve_options => $curve_options },
@@ -48,7 +48,9 @@ $datafile_2d->add_plot(
         grid   => 0,                                  # disable grid
 
     },
-    refresh => 'manual',
+    refresh_interval => 1,
+
+    # refresh => 'manual',
 
 );
 
@@ -65,4 +67,4 @@ $sweep->start(
 
 );
 
-$sweep->refresh_plots();
+$sweep->refresh_plots( force => 1 );

@@ -1,5 +1,8 @@
 Revision history for Perl module Test-Mojo-Role-PSGI
 
+0.06 2018-12-10
+  - Remove recommendation of Test::Mojo::WithRoles
+  - Bump Mojolicious dependecy to 7.42 for role handling
 0.05 2015-11-17
   - Added more realistic Catalyst tests (nicomen)
   - Bump verion of MountPSGI to 0.07 (request body handling)

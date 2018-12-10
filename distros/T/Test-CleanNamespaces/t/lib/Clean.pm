@@ -10,6 +10,7 @@ sub method { }
 
 sub callstuff { stuff(); 'called stuff' }
 
+our $CAN;
 use constant CAN => [ qw(method callstuff) ];
 use constant CANT => [ qw(stuff catdir) ];
 

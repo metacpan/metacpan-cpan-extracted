@@ -1,0 +1,36 @@
+---
+abstract: 'A more producive perl thanks to CPAN'
+author:
+  - 'the sympa community <sympa-developpers@lists.renater.fr>'
+build_requires:
+  Class::Load: '0'
+  Test::CheckManifest: '0.9'
+  Test::Kwalitee: '1.27'
+  Test::Pod: '1.22'
+  Test::Pod::Coverage: '1.08'
+  Test::Simple: '1.302120'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: sympatic
+requires:
+  Carp: '0'
+  Function::Parameters: '2.001003'
+  Import::Into: '1.002005'
+  Moo: '2.002005'
+  MooX::LvalueAttribute: '0.16'
+  Path::Tiny: '0.0104'
+  Types::Standard: '1.002001'
+  perl: v5.16.0
+  utf8::all: '0.024'
+resources:
+  homepage: https://github.com/sympa-community/p5-sympatic
+  repository: https://github.com/sympa-community/p5-sympatic.git
+version: '0.1'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

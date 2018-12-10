@@ -65,6 +65,7 @@ sub defaults {
             binary_string        => 'BNRY',
             codepage_mapping     => 0, # not an option, always 0
             color                => 0,
+            decimal_separator    => '.',
             grid                 => 0,
             keep_header          => 0,
             min_col_width        => 30,
@@ -295,16 +296,17 @@ sub __menus {
             { name => 'parentheses',        text => "- Parentheses",  section => 'G' },
         ],
         config_output => [
-            { name => 'min_col_width',      text => "- Colwidth",      section => 'table' },
-            { name => 'progress_bar',       text => "- ProgressBar",   section => 'table' },
-            { name => 'tab_width',          text => "- Tabwidth",      section => 'table' },
-            { name => 'grid',               text => "- Grid",          section => 'table' },
-            { name => 'color',              text => "- Color",         section => 'table' },
-            { name => 'keep_header',        text => "- Keep Header",   section => 'table' },
-            { name => 'undef',              text => "- Undef",         section => 'table' },
-            { name => 'binary_filter',      text => "- Binary filter", section => 'table' },
-            { name => 'squash_spaces',      text => "- Squash spaces", section => 'table' },
-            { name => 'file_find_warnings', text => "- Warnings",      section => 'G' },
+            { name => 'min_col_width',      text => "- Colwidth",          section => 'table' },
+            { name => 'progress_bar',       text => "- ProgressBar",       section => 'table' },
+            { name => 'tab_width',          text => "- Tabwidth",          section => 'table' },
+            { name => 'grid',               text => "- Grid",              section => 'table' },
+            { name => 'color',              text => "- Color",             section => 'table' },
+            { name => 'keep_header',        text => "- Keep Header",       section => 'table' },
+            { name => 'undef',              text => "- Undef",             section => 'table' },
+            { name => 'binary_filter',      text => "- Binary filter",     section => 'table' },
+            { name => 'squash_spaces',      text => "- Squash spaces",     section => 'table' },
+            { name => 'decimal_separator',  text => "- Decimal sep",       section => 'table' },
+            { name => 'file_find_warnings', text => "- Warnings",          section => 'G' },
         ],
     };
     return $menus->{$group};
@@ -462,6 +464,13 @@ sub set_options {
                     { name => 'undef', prompt => "undef" },
                 ];
                 my $prompt = 'Print replacement for undefined table values.';
+                $sf->__group_readline( $section, $items, $prompt );
+            }
+            elsif ( $opt eq 'decimal_separator' ) {
+                my $items = [
+                    { name => 'decimal_separator', prompt => "Decimal separator" },
+                ];
+                my $prompt = 'Set the decimal separator.';
                 $sf->__group_readline( $section, $items, $prompt );
             }
             elsif ( $opt eq 'progress_bar' ) {

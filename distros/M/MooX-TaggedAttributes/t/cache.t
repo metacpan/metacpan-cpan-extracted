@@ -6,6 +6,8 @@ use Moo::Role ();
 
 {
     package C;
+
+    use Moo;
     use R1;
 }
 

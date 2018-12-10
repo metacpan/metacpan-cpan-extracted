@@ -5,7 +5,7 @@ package Pod::Weaver::PluginBundle::SLOYD;
 use strict;
 use warnings;
 
-# VERSION
+our $VERSION = '0.0003'; # VERSION
 
 
 use namespace::autoclean;
@@ -21,6 +21,7 @@ sub mvp_bundle_config {
         [ '@Default/Version',        _exp('Version'),         {} ],
 
         [ '@Default/prelude', _exp('Region'),  { region_name => 'prelude' } ],
+        [ 'STATUS',           _exp('Generic'), {} ],
         [ 'SYNOPSIS',         _exp('Generic'), {} ],
         [ 'DESCRIPTION',      _exp('Generic'), {} ],
         [ 'OVERVIEW',         _exp('Generic'), {} ],
@@ -68,7 +69,7 @@ Pod::Weaver::PluginBundle::SLOYD - SLOYD's default Pod::Weaver configuration
 
 =head1 VERSION
 
-version 0.0002
+version 0.0003
 
 =head1 OVERVIEW
 
@@ -80,6 +81,7 @@ It is nearly equivalent to the following:
     [Name]
     [Version]
     [Region  / prelude]
+    [Generic / STATUS]
     [Generic / SYNOPSIS]
     [Generic / DESCRIPTION]
     [Generic / OVERVIEW]

@@ -1,0 +1,41 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Database::Async::Transaction
+at lib/Database/Async/Transaction.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Database::Async::Transaction - represents a single database transaction in L<Database::Async>
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 new
+
+Instantiates the transaction. This is not intended to be called directly;
+that's normally handled by L<Database::Async> itself.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Database::Async::DB>
+
+L<db|Database::Async::DB/db>, L<do|Database::Async::DB/do>, L<insert|Database::Async::DB/insert>, L<prepare|Database::Async::DB/prepare>, L<query|Database::Async::DB/query>, L<quote_field_name|Database::Async::DB/quote_field_name>, L<quote_table_name|Database::Async::DB/quote_table_name>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth C<< <TEAM@cpan.org> >>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+

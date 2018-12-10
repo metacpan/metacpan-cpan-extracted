@@ -1,7 +1,7 @@
 package Perinci::Examples::Bin::Any::Completion;
 
-our $DATE = '2016-10-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-12-09'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Example CLI scripts related to completion
@@ -18,7 +18,7 @@ Perinci::Examples::Bin::Any::Completion - Example CLI scripts related to complet
 
 =head1 VERSION
 
-This document describes version 0.002 of Perinci::Examples::Bin::Any::Completion (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2016-10-25.
+This document describes version 0.003 of Perinci::Examples::Bin::Any::Completion (from Perl distribution Perinci-Examples-Bin-Any-Completion), released on 2018-12-09.
 
 =head1 HOMEPAGE
 
@@ -42,7 +42,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

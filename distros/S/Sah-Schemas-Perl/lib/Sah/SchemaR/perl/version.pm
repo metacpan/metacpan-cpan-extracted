@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::version;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2018-12-09'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 our $rschema = ["obj",[{isa=>"version",summary=>"Perl version object","x.perl.coerce_rules"=>["str_perl_version"]}],["obj"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::version - Perl version object
 
 =head1 VERSION
 
-This document describes version 0.016 of Sah::SchemaR::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2018-12-07.
+This document describes version 0.017 of Sah::SchemaR::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2018-12-09.
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,20 @@
+=head1
+
+    hello("John"); # Python    correct
+    hello("John"); # Javascript correct
+    hello("John"); # Javascript correct
+
+    hello "John";
+
+
+    () # parentheses are about priority
+
+    'this', 34
+
+
+
+[x, y] = [23,45,453]
+[x, ...rest] = [23,45,453]
+console.log(x)
+
+    my ( $x, $y, @rest ) = @

@@ -1,5 +1,5 @@
 package SVG::Estimate::Polygon;
-$SVG::Estimate::Polygon::VERSION = '1.0109';
+$SVG::Estimate::Polygon::VERSION = '1.0110';
 use Moo;
 use Math::Trig qw/pi/;
 use Clone qw/clone/;
@@ -12,7 +12,7 @@ SVG::Estimate::Polygon - Handles estimating shapes of more than 3 points with st
 
 =head1 VERSION
 
-version 1.0109
+version 1.0110
 
 =head1 SYNOPSIS
 

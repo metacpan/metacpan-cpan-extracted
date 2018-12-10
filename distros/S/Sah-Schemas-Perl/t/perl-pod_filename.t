@@ -17,7 +17,6 @@ subtest "coercion" => sub {
     is_deeply($c->([]), [], "uncoerced");
     is($c->("*"), "*", "uncoerced 2");
 
-    is($c->("strict"), "strict", "does not become module path");
     is($c->("Test::More"), "Test::More", "does not become module path 2");
     is($c->("Test/More"), "Test/More", "does not become module path 3");
     is($c->("Test/More.pm"), "Test/More.pm", "does not become module path 4");

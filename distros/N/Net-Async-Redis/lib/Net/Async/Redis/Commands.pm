@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.012'; # VERSION
+our $VERSION = '1.013'; # VERSION
 
 =head1 NAME
 
@@ -2257,6 +2257,12 @@ sub client_kill : method {
 
 Get the list of client connections.
 
+=over 4
+
+=item * [TYPE normal|master|replica|pubsub]
+
+=back
+
 L<https://redis.io/commands/client-list>
 
 =cut
@@ -3929,7 +3935,7 @@ Create, destroy, and manage consumer groups.
 
 =item * [CREATE key groupname id-or-$]
 
-=item * [SETID key id-or-$]
+=item * [SETID key groupname id-or-$]
 
 =item * [DESTROY key groupname]
 
@@ -3957,6 +3963,8 @@ Return new entries from a stream using a consumer group, or access the history o
 =item * [COUNT count]
 
 =item * [BLOCK milliseconds]
+
+=item * [NOACK]
 
 =item * STREAMS
 

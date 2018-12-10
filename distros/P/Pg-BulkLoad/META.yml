@@ -1,33 +1,39 @@
 ---
 abstract: 'Bulk Load for Postgres with ability to skip bad records.'
 author:
-  - 'John Karr <brainbuz@cpan.org>'
+  - 'John Karr <brainbuz@brainbuz.org>'
 build_requires:
   Data::Printer: '0'
   Mojo::Pg: '4.10'
   Test::Exception: '0'
   Test::MockObject: '0'
+  Test::More: '0'
   perl: '5.024'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.024'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
-license: perl
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Pg-BulkLoad
 requires:
+  Carp: '0'
   DBD::Pg: v3.5.3
   DBI: '0'
+  Data::Dumper: '0'
+  Data::Printer: '0'
   Path::Tiny: '0.100'
   Try::Tiny: '0.30'
+  feature: '0'
   perl: '5.024'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/brainbuz/pgbulkload/issues
   homepage: https://github.com/brainbuz/pgbulkload
   repository: https://github.com/brainbuz/pgbulkload.git
-version: '2.02'
+version: '2.031'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Text::Trac::LinkResolver );
 
-our $VERSION = '0.22';
+our $VERSION = '0.24';
 
 sub init {
 	my $self = shift;

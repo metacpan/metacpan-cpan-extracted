@@ -1,5 +1,11 @@
 Revision history for Net-Async-Redis
 
+1.013     2018-12-10 02:03:19+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support for `NOACK` and type parameter for `client_kill`, as provided in
+    latest Redis 5.x release
+
 1.012     2018-10-19 11:03:35+08:00 Asia/Kuala_Lumpur
     No new features.
 

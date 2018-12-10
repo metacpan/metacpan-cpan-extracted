@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.016';
+our $VERSION = '1.017';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -161,12 +161,19 @@ our $VERSION = '1.016';
 #pod method's arguments|Yancy::Backend/list>. This helper only returns the list
 #pod of items, not the total count of items or any other value.
 #pod
+#pod This helper will also filter out any password fields in the returned
+#pod data. To get all the data, use the L</backend> helper to access the
+#pod backend methods directly.
+#pod
 #pod =head2 yancy.get
 #pod
 #pod     my $item = $c->yancy->get( $collection, $id );
 #pod
 #pod Get an item from the backend. C<$collection> is the collection name.
 #pod C<$id> is the ID of the item to get. See L<Yancy::Backend/get>.
+#pod
+#pod This helper will filter out password values in the returned data. To get
+#pod all the data, use the L</backend> helper to access the backend directly.
 #pod
 #pod =head2 yancy.set
 #pod
@@ -789,13 +796,29 @@ sub _helper_schema {
 }
 
 sub _helper_list {
-    my ( $c, @args ) = @_;
-    return @{ $c->yancy->backend->list( @args )->{items} };
+    my ( $c, $coll_name, @args ) = @_;
+    my @items = @{ $c->yancy->backend->list( $coll_name, @args )->{items} };
+    my $coll = $c->yancy->schema( $coll_name );
+    for my $prop_name ( keys %{ $coll->{properties} } ) {
+        my $prop = $coll->{properties}{ $prop_name };
+        if ( $prop->{format} && $prop->{format} eq 'password' ) {
+            delete $_->{ $prop_name } for @items;
+        }
+    }
+    return @items;
 }
 
 sub _helper_get {
-    my ( $c, @args ) = @_;
-    return $c->yancy->backend->get( @args );
+    my ( $c, $coll_name, $id, @args ) = @_;
+    my $item = $c->yancy->backend->get( $coll_name, $id, @args );
+    my $coll = $c->yancy->schema( $coll_name );
+    for my $prop_name ( keys %{ $coll->{properties} } ) {
+        my $prop = $coll->{properties}{ $prop_name };
+        if ( $prop->{format} && $prop->{format} eq 'password' ) {
+            delete $item->{ $prop_name };
+        }
+    }
+    return $item;
 }
 
 sub _helper_delete {
@@ -875,6 +898,22 @@ sub _helper_validate {
                 additionalProperties => 0, # Disallow any other properties
             }
         );
+        $schema = $args[0];
+    }
+
+    # Pre-filter booleans
+    for my $prop_name ( keys %{ $schema->{properties} } ) {
+        my $prop = $schema->{properties}{ $prop_name };
+        my $is_boolean = ref $prop->{type} eq 'ARRAY'
+            ? ( grep { $_ eq 'boolean' } @{ $prop->{type} } )
+            : ( $prop->{type} eq 'boolean' )
+            ;
+        if ( $is_boolean && defined $item->{ $prop_name } ) {
+            my $value = $item->{ $prop_name };
+            if ( $value ne 'true' && $value ne 'false' ) {
+                $item->{ $prop_name } = $value ? "true" : "false";
+            }
+        }
     }
 
     my @errors = $v->validate_input( $item, @args );
@@ -924,7 +963,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.016
+version 1.017
 
 =head1 SYNOPSIS
 
@@ -1085,12 +1124,19 @@ See L<the backend documentation for more information about the list
 method's arguments|Yancy::Backend/list>. This helper only returns the list
 of items, not the total count of items or any other value.
 
+This helper will also filter out any password fields in the returned
+data. To get all the data, use the L</backend> helper to access the
+backend methods directly.
+
 =head2 yancy.get
 
     my $item = $c->yancy->get( $collection, $id );
 
 Get an item from the backend. C<$collection> is the collection name.
 C<$id> is the ID of the item to get. See L<Yancy::Backend/get>.
+
+This helper will filter out password values in the returned data. To get
+all the data, use the L</backend> helper to access the backend directly.
 
 =head2 yancy.set
 

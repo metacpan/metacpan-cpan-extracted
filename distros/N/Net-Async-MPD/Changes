@@ -1,5 +1,11 @@
 Revision history for Net-Async-MPD
 
+0.005     2018-12-08 18:37:01+00:00 Europe/London
+
+    * Fixes:
+      * Fixed an issue with the parser for grouped results ignoring
+        the last line of input
+
 0.004     2018-01-29 23:03:08+00:00 Europe/London
 
     * Fixes:

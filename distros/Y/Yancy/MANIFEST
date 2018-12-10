@@ -88,6 +88,7 @@ t/lib/Local/BackendTestSchema.pm
 t/lib/Local/BackendTestSchema/Result/mojo_migrations.pm
 t/lib/Local/BackendTestSchema/Result/people.pm
 t/lib/Local/BackendTestSchema/Result/user.pm
+t/lib/Local/Controller/Extend/Yancy.pm
 t/lib/Local/Schema.pm
 t/lib/Local/Schema/Result/blog.pm
 t/lib/Local/Schema/Result/mojo_migrations.pm
@@ -107,6 +108,8 @@ t/share/templates/blog_delete.html.ep
 t/share/templates/blog_edit.html.ep
 t/share/templates/blog_list.html.ep
 t/share/templates/blog_view.html.ep
+t/share/templates/extend/blog_list.html.ep
+t/share/templates/extend/blog_view.html.ep
 t/share/templates/people.html.ep
 t/share/templates/people/index.html.ep
 t/share/templates/user_edit.html.ep

@@ -8,7 +8,7 @@ Model for check options in QBit application.
 ### Install:
 
 ```
-apt-get install libqbit-validator-perl
+cpanm QBit::Validator
 ```
 
 ### Require:
@@ -61,17 +61,6 @@ if ($qv->has_errors) {
 $self->db->table->edit($qv->data) unless $qv->has_errors;
 ```
 
-  - get_wrong_fields - return list name of fields with error
-
-```
-if ($qv->has_errors) {
-    my @fields = $qv->get_wrong_fields;
-
-    ldump(\@fields); # ['hello']
-    # [''] - error in root
-}
-```
-
   - get_fields_with_error - return list fields with error
 
 ```
@@ -82,12 +71,12 @@ if ($qv->has_errors) {
 
     # [
     #     {
-    #         msgs => ['Error'],
-    #         path => ['hello']
+    #         message => 'Error',
+    #         path    => '/hello/'
     #     }
     # ]
     #
-    # path => [''] - error in root
+    # path => '/' - error in root
 }
 ```
 
@@ -95,7 +84,7 @@ if ($qv->has_errors) {
 
 ```
 if ($qv->has_errors) {
-    my $error = $qv->get_error('hello'); # or ['hello']
+    my $error = $qv->get_error('hello'); # or '/hello'
 
     print $error; # 'Error'
 }
@@ -121,9 +110,31 @@ $qv->throw_exception if $qv->has_errors;
 
   - data (checking data)
   - template (template for check)
-  - pre_run (function is executed before checking)
+  - pre_run (function is executed before checking, deprecated)
   - app (model using in check)
   - throw (boolean type, throw exception if an error has occurred)
+  - sys_errors_handler (handler for system errors in sub "check", default empty function: ```sub {}```)
+
+  ```
+  # global set handler
+  $QBit::Validator::SYS_ERRORS_HANDLER = sub {log($_[0])}; # first argument is error
+
+  #or local set handler
+  my $qv = QBit::Validator->new(template => {}, sys_errors_handler => sub {log($_[0])});
+  ```
+
+  - path_manager (path manager, default QBit::Validator::PathManager)
+
+  ```
+  # global set path_manager
+  $QBit::Validator::PATH_MANAGER = 'MyPathManager::For::Data::DPath';
+
+  #or local set path_manager
+  my $qv = QBit::Validator->new(template => {}, path_manager => MyPathManager::For::Data::DPath->new()});
+  ```
+
+  - path (data path for validator, see: QBit::Validator::PathManager)
+  - parent (ref to a parent validator)
 
 ### Default types
 
@@ -160,5 +171,11 @@ $qv->throw_exception if $qv->has_errors;
     - extra
     - one_of
     - any_of
+
+    For more information see tests
+
+  - #### variable
+
+    - conditions
 
     For more information see tests

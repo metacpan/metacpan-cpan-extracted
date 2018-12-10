@@ -89,7 +89,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $bucket, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.0.6 );
+        my $ver = version->parse( $args->{ver} // v4.0.7 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 

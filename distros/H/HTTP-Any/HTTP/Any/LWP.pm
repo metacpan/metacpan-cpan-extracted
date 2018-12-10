@@ -149,9 +149,10 @@ sub _headers {
 	my ($res) = @_;
 	my %h = %{$res->headers};
 	my %r = map { my $v = $h{$_}; $_ => ref $v eq "ARRAY" ? join(",", @$v) : $v } keys %h;
-	$r{Status} = $res->code;
-	$r{Reason} = $res->message;
-	$r{URL}    = $res->base->as_string;
+	$r{Protocol} = $res->protocol;
+	$r{Status}   = $res->code;
+	$r{Reason}   = $res->message;
+	$r{URL}      = $res->base->as_string;
 	if (my $prev = $res->previous) {
 		return \%r, _headers($prev);
 	} else {

@@ -3,6 +3,8 @@ use Moo;
 
 extends 'B1', 'B2';
 
+use namespace::clean;
+
 use R1;
 use R2;
 

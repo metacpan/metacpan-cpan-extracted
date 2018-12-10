@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Paginator;
 
-$Dancer2::Plugin::Paginator::VERSION   = '2.07';
+$Dancer2::Plugin::Paginator::VERSION   = '2.08';
 $Dancer2::Plugin::Paginator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Paginator - Dancer2 plugin for Paginator::Lite.
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =cut
 
@@ -45,7 +45,9 @@ register_plugin;
         template 'list', { paginator => $paginator };
     };
 
-    dance;
+    true;
+
+For complete working code, please take a look <a href="https://github.com/manwar/Dancer2-Cookbook">Dancer2 Cookbook</a>.
 
 =head1 CONFIGURATION
 

@@ -4,7 +4,7 @@ use warnings;
 use WWW::Correios::SIGEP::LogisticaReversa;
 use WWW::Correios::SIGEP::Common;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
     my ($class, $params) = @_;
@@ -130,8 +130,13 @@ sub fecha_plp_varios_servicos {
     die "fecha_plp_varios_servicos: parametros exigidos"
         unless ref $params eq 'HASH';
 
-    my $xml = _gera_xml_plp($self, $params);
-    use DDP; p $xml, string_max => 0, as => 'XML a ser enviada aos Correios';
+    my $xml;
+    if (exists $params->{xml}) {
+        $xml = $params->{xml};
+    }
+    else {
+        $xml = $self->gera_xml_plp($params);
+    }
 
     return WWW::Correios::SIGEP::Common::call(
         $self,
@@ -140,7 +145,7 @@ sub fecha_plp_varios_servicos {
             usuario        => $self->{usuario} || $params->{usuario},
             senha          => $self->{senha}   || $params->{senha},
             cartaoPostagem => $self->{cartao} || $params->{cartao},
-            xml            => $xml, #_gera_xml_plp($self, $params),
+            xml            => $xml,
             idPlpCliente   => $params->{id},
             listaEtiquetas => [
                 map {
@@ -167,7 +172,7 @@ sub status_plp {
     );
 }
 
-sub _gera_xml_plp {
+sub gera_xml_plp {
     my ($self, $params) = @_;
 
     #  I'm sorry, ubu.
@@ -747,6 +752,52 @@ Método da API SIGEP: I<fechaPlpVariosServicos>
 Use esse método para gerar a PLP associada à entrega de um ou mais objetos
 postais. O valor retornado é o id da PLP gerada, que pode ser consultada
 via C<status_plp()>.
+
+Esse método gera automaticamente o XML a ser enviado para o SIGEP.
+Se preferir gerar em duas etapas, por exemplo para validar o XML gerado
+junto aos Correios, é só usar o método C<gera_xml_plp()>. De fato, a
+chamada acima é exatamente igual a:
+
+    my $xml = $sigep->gera_xml_plp({
+        diretoria             => 10,
+        codigo_administrativo => 111,
+        remetente => {
+            nome => 'Minha Empresa LTDA',
+            logradouro  => 'Minha Rua',
+            numero      => 100,
+            complemento => 302,
+            bairro      => 'Meu bairro',
+            cep         => '111111222',
+            cidade      => 'Minha Cidade',
+            estado      => 'XX',
+        },
+        objetos => [
+            {
+                etiqueta => 'SS123456789BR',
+                codigo_postagem => '41068',
+                tipo => '001',
+                peso => 50, # em gramas
+                valor_declarado => '50,00',
+                servicos_adicionais => [1,35],
+                destinatario => {
+                    nome => 'Comprador Feliz da Silva',
+                    logradouro => 'Rua da Entrega',
+                    numero     => 1,
+                    complemento => 'casa',
+                    bairro      => 'Bairro Feliz',
+                    cidade      => 'Cidade Feliz',
+                    uf          => 'ZZ',
+                    cep         => '2222233',
+                },
+            },
+        ],
+    });
+
+    my $id_plp = $sigep->fecha_plp_varios_servicos({
+        id      => 111111,
+        xml     => $xml,
+        objetos => [{ etiqueta => 'SS123456789BR' }],
+    });
 
 =head1 status_plp( $id_plp )
 

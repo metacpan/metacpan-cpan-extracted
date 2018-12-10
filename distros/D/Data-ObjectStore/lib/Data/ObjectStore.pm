@@ -40,7 +40,7 @@ use File::Path qw( make_path );
 use Scalar::Util qw(weaken);
 use vars qw($VERSION);
 
-$VERSION = '2.02';
+$VERSION = '2.03';
 
 our $DEBUG = 0;
 our $UPGRADING;
@@ -114,7 +114,6 @@ sub unlock {
     splice @$fhs;
 }
 
-
 sub upgrade_store {
     my( $source_path, $dest_path ) = @_;
 
@@ -169,7 +168,6 @@ sub upgrade_store {
 
       my $meta = $clone_thing->[METADATA];
       $meta->{root_connected} = 1;
-#      $meta->{backconnections} = {};
       $meta->{created} = time;
       $meta->{updated} = time;
 
@@ -293,43 +291,6 @@ sub create_container {
     $obj;
 } #create_container
 
-sub _save {
-    my( $self, $obj, $nocheck ) = @_;
-    my $thingy = $self->_knot( $obj );
-    my $id = $thingy->[ID];
-    _log( " save obj 'r$id'" );
-    delete $self->[DIRTY]{$id};   # need the upgrading cas?
-
-    #
-    # Delete from the recordstore if this is not root connected and not being saved by the upgrade
-    # before if it knows if it is root connected or not. The only time it may call check_connections
-    # is when save is called directly with an item that would be deleted.
-    #
-    if( $thingy->[METADATA]{root_connected} == 0 && $id > 2 && ( $nocheck || ! $self->_check_connections($thingy) ) ) {
-        _log( " SAVE ..delete 'r$id' " );
-        $self->[RECORD_STORE]->delete_record( $id );
-    }
-
-    # 
-    # Save to the record store.
-    #
-    else {
-        my $text_rep = $thingy->_freezedry;
-        my( @meta ) = ref( $thingy );
-        for my $fld (@METAFIELDS) {
-            my $val = $thingy->[METADATA]{$fld};
-            if( $fld eq 'backconnections' ) {
-                push @meta, $val ? join( ',', %$val ) : '';
-            } else {
-                push @meta, $val;
-            }
-        }
-        my $meta_string = join('|', @meta );
-        _log( " SAVE ..stow 'r$id' '$meta_string $text_rep'" );
-        $self->[RECORD_STORE]->stow( "$meta_string $text_rep", $id );
-    }
-} #_save
-
 sub save {
     my( $self, $ref ) = @_;
     if( ref( $ref ) ) {
@@ -373,6 +334,43 @@ sub save {
     $self->[DIRTY] = {};
     _log( "--- SAVE END ---" );
 } #save
+
+sub _save {
+    my( $self, $obj, $nocheck ) = @_;
+    my $thingy = $self->_knot( $obj );
+    my $id = $thingy->[ID];
+    _log( " save obj 'r$id'" );
+    delete $self->[DIRTY]{$id};   # need the upgrading cas?
+
+    #
+    # Delete from the recordstore if this is not root connected and not being saved by the upgrade
+    # before if it knows if it is root connected or not. The only time it may call check_connections
+    # is when save is called directly with an item that would be deleted.
+    #
+    if( $thingy->[METADATA]{root_connected} == 0 && $id > 2 && ( $nocheck || ! $self->_check_connections($thingy) ) ) {
+        _log( " SAVE ..delete 'r$id' " );
+        $self->[RECORD_STORE]->delete_record( $id );
+    }
+
+    # 
+    # Save to the record store.
+    #
+    else {
+        my $text_rep = $thingy->_freezedry;
+        my( @meta ) = ref( $thingy );
+        for my $fld (@METAFIELDS) {
+            my $val = $thingy->[METADATA]{$fld};
+            if( $fld eq 'backconnections' ) {
+                push @meta, $val ? join( ',', %$val ) : '';
+            } else {
+                push @meta, $val;
+            }
+        }
+        my $meta_string = join('|', @meta );
+        _log( " SAVE ..stow 'r$id' '$meta_string $text_rep'" );
+        $self->[RECORD_STORE]->stow( "$meta_string $text_rep", $id );
+    }
+} #_save
 
 sub _has_dirty {
     my $self = shift;
@@ -1660,12 +1658,17 @@ sub get {
     
 } #get
 
+sub clearvol {
+    my( $self, $key ) = @_;
+    delete $self->[VOLATILE]{$key};
+}
+
 sub vol {
     my( $self, $key, $val ) = @_;
     if( defined( $val ) ) {
-        $self->[VOLATILE]{key} = $val;
+        $self->[VOLATILE]{$key} = $val;
     }
-    $self->[VOLATILE]{key};
+    $self->[VOLATILE]{$key};
 }
 
 sub lock {
@@ -2106,6 +2109,10 @@ a hash or array reference.
 
 This sets or gets a temporary (volatile) value attached to the object.
 
+=head2 clearvol( key )
+
+This unsets a temporary (volatile) value attached to the object.
+
 =head2 store
 
 Returns the Data::ObjectStore that created this object.
@@ -2141,6 +2148,6 @@ Unlocks all names locked by this thread
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.02  (October, 2018))
+       Version 2.03  (October, 2018))
 
 =cut

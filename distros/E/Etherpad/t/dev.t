@@ -52,7 +52,7 @@ is $ec->get_users_count($p), 0, 'padUsersCount 2';
 my $t = $ec->list_saved_revisions($p);
 is_deeply $t, [], 'listSavedRevisions';
 
-like $ec->get_html($p), qr(.*<!DOCTYPE HTML><html><body>Welcome to Etherpad!<br>This is a test pad.*</body></html>), 'getHTML';
+like $ec->get_html($p), qr(.*<!DOCTYPE HTML><html><body>Welcome to Etherpad!.*</body></html>), 'getHTML';
 
 ok $ec->delete_pad($p), 'deletePad';
 
@@ -80,6 +80,12 @@ ok $ec->append_text($p, "\nFezes are cool"), 'appendText';
 is $ec->get_text($p), "I'm an alien, alright? Let's drop the subject.\nAnd use accents: é\nFezes are cool\n", 'getText after appendText';
 
 is $ec->get_users_count($p), 0, 'padUsersCount';
+
+is $ec->get_revisions_count($p), 2, 'getRevisions 3';
+
+ok $ec->restore_revision($p, 1);
+
+is $ec->get_text($p), "I'm an alien, alright? Let's drop the subject.\nAnd use accents: é\n\n", 'getText after restoreRevision';
 
 $t = $ec->get_read_only_id($p);
 like $t, qr(.+), 'getReadOnlyId';

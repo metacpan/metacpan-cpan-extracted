@@ -6,6 +6,8 @@ extends 'B3';
 with 'R1';
 with 'R2';
 
+use namespace::clean;
+
 has c8_1 => (
     is      => 'ro',
     default => 'c8_1.v',

@@ -11,6 +11,7 @@ use Sub::Exporter -setup => {
 
 sub stuff { }
 
+our $CAN;
 use constant CAN => [ qw(stuff import) ];
 use constant CANT => [ qw(dualvar) ];
 

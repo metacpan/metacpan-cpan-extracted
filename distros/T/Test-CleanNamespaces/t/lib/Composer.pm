@@ -10,6 +10,7 @@ use namespace::clean;
 
 sub child_stuff {}
 
+our $CAN;
 use constant CAN => [ qw(method role_stuff child_stuff) ];
 use constant CANT => [ qw(catdir devnull catfile with) ];
 

@@ -7,12 +7,11 @@ use List::Util qw( shuffle );
 use Array::Utils qw( array_minus );
 use Net::Async::MPD;
 use IO::Async::Loop;
-use PerlX::Maybe;
 use Future::Utils qw( repeat );
 
 my $loop = IO::Async::Loop->new;
 my $mpd = Net::Async::MPD->new(
-  maybe host => $ARGV[0],
+  $ARGV[0] ? ( host => $ARGV[0] ) : (),
   auto_connect => 1,
 );
 

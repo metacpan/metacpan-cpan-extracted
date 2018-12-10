@@ -30,7 +30,7 @@ foreach my $sep (undef, ':', ';', '|')
 
     $config->prepend_path( FOO_PATH2 => qw( foo bar baz ) );
 
-    foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe fish ))
+    foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe pwsh fish ))
     {
       subtest $shell => sub {
         my $shell_path = find_shell($shell);

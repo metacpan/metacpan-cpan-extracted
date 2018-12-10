@@ -28,7 +28,7 @@ do {
 eval { $config->set_alias("myecho1", "$perl_exe $script_name f00f") };
 is $@, '', 'set_alias';
 
-foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe fish ))
+foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe pwsh fish ))
 {
   subtest $shell => sub {
     skip_all 'jsh does not have aliases' if $shell eq 'jsh';
@@ -48,6 +48,7 @@ foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bs
 
 subtest 'powershell.exe' => sub {
   my $shell = 'powershell.exe';
+  $shell = 'pwsh' unless $^O =~ /^(MSWin32|cygwin|msys)$/;
   my $shell_path = find_shell($shell);
   my $guess = TestLib::get_guess($shell);
   

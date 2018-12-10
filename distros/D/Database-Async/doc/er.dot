@@ -1,0 +1,37 @@
+digraph {
+ node [shape=record];
+ Root [
+  label = "{Database::Async|<pools>+ pools\l}"
+ ];
+ Pool [
+  label = "{::Connection::Pool|+ connections\l}"
+ ];
+ Root:pools -> Pool;
+ Connection [
+  label = "{::Connection|<transactions>+ transactions|<statements>+ statements\l}"
+ ];
+ Pool:connections -> Connection;
+ Transaction [
+  label = "{::Transaction|<savepoints>+ savepoints|<statements>+ statements\l}"
+ ];
+ Connection:transactions -> Transaction;
+ Transaction_Savepoint [
+  label = "{::Transaction::Savepoint|<statements>+ statements\l}"
+ ];
+ Transaction:savepoints -> Transaction_Savepoint;
+ Statement [
+  label = "{::Statement|<fields>+ fields\l}"
+ ];
+ Connection:statements -> Statement;
+ Transaction:statements -> Statement;
+ Transaction_Savepoint:statements -> Statement;
+ Field [
+  label = "{::Field}"
+ ];
+ Statement:fields -> Field;
+ Row [
+  label = "{::Row|<fields>+ fields\l}"
+ ];
+ Row:fields -> Field;
+}
+

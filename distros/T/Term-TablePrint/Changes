@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.104   2018-12-09
+        - Bugfix in regexp.
+        - New option: 'decimal_separator'.
+        - Update progress bar.
+
 0.103   2018-11-28
         - 'choose_columns': by default all columns are chosen.
 

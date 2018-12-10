@@ -8,8 +8,7 @@ WriteMakefile
   'NAME' => 'Data::ObjectStore',
   'EXE_FILES' => [
                    'bin/objectstore_explorer',
-                   'bin/objectstore_upgrade',
-                   'bin/objectstore_upgrade~'
+                   'bin/objectstore_upgrade'
                  ],
   'VERSION_FROM' => 'lib/Data/ObjectStore.pm',
   'PREREQ_PM' => {

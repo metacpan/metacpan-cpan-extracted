@@ -1,5 +1,8 @@
 Revision history for Pg::BulkLoad
-
+2.031   08 December 2018 
+fixed typo in pod.
+2.03    07 December 2018
+Revised Pod fixed coverage
 2.02    05 December 2018
 Fixed CPAN metadata issues
 2.01    25 November 2018

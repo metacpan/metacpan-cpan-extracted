@@ -94,6 +94,7 @@ my %shell = (
   '44bsd-csh'      => 'c_shell',
   jsh              => 'bourne_shell',
   'powershell.exe' => 'power_shell',
+  'pwsh'           => 'power_shell',
   'fish'           => 'fish_shell',
 );
 
@@ -119,7 +120,7 @@ sub get_env
   unlink $fn if -e $fn;
   do {
     open(my $fh, '>', $fn) || die "unable to write to $fn $!";
-    if($shell->is_unix)
+    if($shell->is_unix || ($shell->is_power && $^O !~ /^(cygwin|MSWin32|msys)$/))
     {
       print $fh "#!$shell_path";
       print $fh " -f" if $shell->is_c;
@@ -163,7 +164,7 @@ sub get_env
       $output = `$shell_path $fn`;
     }
   }
-  elsif($shell->is_power)
+  elsif($shell->is_power && $^O =~ /^(cygwin|MSWin32|msys)$/)
   {
     my $fn2 = $fn;
     $fn2 = Cygwin::posix_to_win_path($fn) if $^O =~ /^(cygwin|msys)$/;

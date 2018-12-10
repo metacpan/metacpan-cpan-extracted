@@ -27,7 +27,7 @@ sub dummysource {
 my $gate = dummysource();
 my $bias = dummysource();
 
-my $size   = 50;
+my $size   = 300;
 my $center = $size / 2;
 
 my $gate_sweep = sweep(
@@ -41,9 +41,13 @@ my $bias_sweep = sweep(
 
 my $datafile_3d = sweep_datafile( columns => [qw/gate bias current/] );
 $datafile_3d->add_plot(
-    type => 'pm3d', x => 'gate', y => 'bias',
-    z    => 'current',
-    refresh => 'manual',    # want to refresh only at end of sweep
+    type             => 'pm3d',
+    x                => 'gate',
+    y                => 'bias',
+    z                => 'current',
+    refresh_interval => 1,
+
+    # refresh => 'manual',    # want to refresh only at end of sweep
 );
 
 my $meas = sub {
@@ -60,6 +64,7 @@ $gate_sweep->start(
     measurement => $meas,
     folder      => $filename,
 );
-$gate_sweep->refresh_plots();
+
+$gate_sweep->refresh_plots( force => 1 );
 
 warn "output folder: ", $gate_sweep->foldername();

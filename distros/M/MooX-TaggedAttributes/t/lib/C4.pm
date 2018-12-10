@@ -5,6 +5,8 @@ extends 'B1';
 
 with 'R1';
 
+use namespace::clean;
+
 has c4_1 => (
     is      => 'ro',
     T1_1    => 'should not stick',

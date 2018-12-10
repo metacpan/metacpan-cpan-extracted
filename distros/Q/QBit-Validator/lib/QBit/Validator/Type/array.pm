@@ -1,159 +1,156 @@
 package QBit::Validator::Type::array;
-$QBit::Validator::Type::array::VERSION = '0.011';
+$QBit::Validator::Type::array::VERSION = '0.012';
 use qbit;
 
 use base qw(QBit::Validator::Type);
 
 use Exception::Validator;
+use Exception::Validator::FailedField;
 
 #order is important
-my $OPTIONS = [
-    {name => 'optional', required => TRUE},
-    {name => 'size_min'},
-    {name => 'size'},
-    {name => 'size_max'},
-    {name => 'all'},
-    {name => 'contents'},
-];
-
-sub _get_options {
-    my ($self) = @_;
-
-    return clone($OPTIONS);
+sub get_options_name {
+    qw(type size_min size size_max all contents);
 }
 
-sub _get_options_name {
-    return map {$_->{'name'}} @$OPTIONS;
+sub pre_process_template {
+    my ($self, $template) = @_;
+
+    throw Exception::Validator gettext('Options "all" and "contents" can not be used together')
+      if exists($template->{'all'}) && exists($template->{'contents'});
 }
 
-sub optional {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+sub type {
+    return sub {
+        throw gettext('Data must be ARRAY') unless ref($_[1]) eq 'ARRAY';
 
-    if ($template->{$option}) {
-        if (defined($data)) {
-            unless (ref($data) eq 'ARRAY') {
-                $qv->_add_error($template, gettext('Data must be ARRAY'), \@path_field);
-
-                return FALSE;
-            }
-        } else {
-            $qv->_add_ok(\@path_field);
-
-            return FALSE;
-        }
-    } else {
-        if (!defined($data)) {
-            $qv->_add_error($template, gettext('Data must be defined'), \@path_field);
-
-            return FALSE;
-        } else {
-            unless (ref($data) eq 'ARRAY') {
-                $qv->_add_error($template, gettext('Data must be ARRAY'), \@path_field);
-
-                return FALSE;
-            }
-        }
-    }
-
-    return TRUE;
+        return TRUE;
+      }
 }
 
 sub size_min {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $size_min) = @_;
 
-    throw Exception::Validator gettext('Option "%s" must be positive number', $option)
-      if !defined($template->{$option}) || $template->{$option} !~ /\A[0-9]+\z/;
+    throw Exception::Validator gettext('Option "%s" must be positive number', 'size_min')
+      if !defined($size_min) || $size_min !~ /\A[0-9]+\z/;
 
-    if (@$data < $template->{$option}) {
-        $qv->_add_error($template, gettext('Data size "%s" less then "%s"', scalar(@$data), $template->{$option}),
-            \@path_field);
+    return sub {
+        throw FF gettext('Data size "%s" less then "%s"', scalar(@{$_[1]}), $size_min) if @{$_[1]} < $size_min;
 
-        return FALSE;
-    }
-
-    return TRUE;
+        return TRUE;
+    };
 }
 
 sub size {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $size) = @_;
 
-    throw Exception::Validator gettext('Key "%s" must be positive number', $option)
-      if !defined($template->{$option}) || $template->{$option} !~ /\A[0-9]+\z/;
+    throw Exception::Validator gettext('Option "%s" must be positive number', 'size')
+      if !defined($size) || $size !~ /\A[0-9]+\z/;
 
-    unless (@$data == $template->{$option}) {
-        $qv->_add_error($template, gettext('Data size "%s" not equal "%s"', scalar(@$data), $template->{$option}),
-            \@path_field);
+    return sub {
+        throw FF gettext('Data size "%s" not equal "%s"', scalar(@{$_[1]}), $size) unless @{$_[1]} == $size;
 
-        return FALSE;
-    }
-
-    return TRUE;
+        return TRUE;
+    };
 }
 
 sub size_max {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $size_max) = @_;
 
-    throw Exception::Validator gettext('Key "%s" must be positive number', $option)
-      if !defined($template->{$option}) || $template->{$option} !~ /\A[0-9]+\z/;
+    throw Exception::Validator gettext('Option "%s" must be positive number', 'size_max')
+      if !defined($size_max) || $size_max !~ /\A[0-9]+\z/;
 
-    if (@$data > $template->{$option}) {
-        $qv->_add_error($template, gettext('Data size "%s" more than "%s"', scalar(@$data), $template->{$option}),
-            \@path_field);
+    return sub {
+        throw FF gettext('Data size "%s" more than "%s"', scalar(@{$_[1]}), $size_max) if @{$_[1]} > $size_max;
 
-        return FALSE;
-    }
-
-    return TRUE;
+        return TRUE;
+    };
 }
 
 sub all {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $template) = @_;
 
-    throw Exception::Validator gettext('Options "all" and "contents" can not be used together')
-      if exists($template->{$option}) && exists($template->{'contents'});
+    my $parent       = $qv->parent // $qv;
+    my $path_manager = $parent->path_manager();
 
-    throw Exception::Validator gettext('Option "%s" must be HASH')
-      if !defined($template->{$option}) || ref($template->{$option}) ne 'HASH';
+    my $validator = QBit::Validator->new(
+        template => $template,
+        parent   => $parent,
+        path     => $path_manager->get_absolute_path($path_manager->get_path_part('array', '%d'), $qv->path),
+    );
 
-    my $num = 0;
-    foreach (@$data) {
-        my @path = (@path_field, $num);
+    return sub {
+        my $errors = [];
 
-        $qv->_validation($_, $template->{'all'}, undef, @path);
+        my $num = 0;
+        $path_manager->set_dynamic_part(\$num);
+        foreach (@{$_[1]}) {
+            unless ($validator->_validate($_)) {
+                $errors->[$num] = $validator->get_errors;
+            }
 
-        return FALSE if $qv->has_error(\@path);
+            $num++;
+        }
+        $path_manager->reset_dynamic_part();
 
-        $num++;
-    }
+        throw FF $errors if @$errors;
 
-    return TRUE;
+        return TRUE;
+    };
 }
 
 sub contents {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $templates) = @_;
 
-    throw Exception::Validator gettext('Option "%s" must be ARRAY', $option)
-      if !defined($template->{$option}) || ref($template->{$option}) ne 'ARRAY';
+    throw Exception::Validator gettext('Option "%s" must be ARRAY', 'contents')
+      if !defined($templates) || ref($templates) ne 'ARRAY';
 
-    if (@$data != @{$template->{$option}}) {
-        $qv->_add_error($template,
-            gettext('Data size "%s" no equal "%s"', scalar(@$data), scalar(@{$template->{$option}})), \@path_field);
+    my $parent       = $qv->parent // $qv;
+    my $path_manager = $parent->path_manager;
 
-        return FALSE;
+    my $path = $qv->path;
+
+    my @validators = ();
+    my $i          = 0;
+    foreach my $template (@$templates) {
+        my $validator = QBit::Validator->new(
+            template => $template,
+            parent   => $parent,
+            path     => $path_manager->get_absolute_path($path_manager->get_path_part('array', $i), $path),
+        );
+
+        push(@validators, $validator);
+
+        $i++;
     }
 
-    my $num = 0;
-    foreach (@$data) {
-        my @path = (@path_field, $num);
+    return sub {
+        throw FF gettext('Data size "%s" no equal "%s"', scalar(@{$_[1]}), scalar(@validators))
+          unless @{$_[1]} == @validators;
 
-        $qv->_validation($_, $template->{$option}[$num], undef, @path);
+        my $errors = [];
+        my $num    = 0;
+        foreach (@{$_[1]}) {
+            unless ($validators[$num]->_validate($_)) {
+                $errors->[$num] = $validators[$num]->get_errors;
+            }
 
-        return FALSE if $qv->has_error(\@path);
+            $num++;
+        }
 
-        $num++;
+        throw FF $errors if @$errors;
+
+        return TRUE;
+    };
+}
+
+sub init {
+    my ($self) = @_;
+
+    $self->SUPER::init();
+
+    foreach ($self->get_options_name) {
+        $self->{$_} = \&$_;
     }
-
-    return TRUE;
 }
 
 TRUE;

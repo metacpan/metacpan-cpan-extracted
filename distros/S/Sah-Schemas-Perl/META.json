@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Perl"
       }
    },
-   "version" : "0.016",
+   "version" : "0.017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

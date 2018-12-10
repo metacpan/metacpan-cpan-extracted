@@ -8,7 +8,7 @@ use Carp qw( croak );
 use Exporter ();
 
 # ABSTRACT: Portably generate config for any shell
-our $VERSION = '0.31'; # VERSION
+our $VERSION = '0.33'; # VERSION
 
 
 sub new
@@ -435,7 +435,7 @@ Shell::Config::Generate - Portably generate config for any shell
 
 =head1 VERSION
 
-version 0.31
+version 0.33
 
 =head1 SYNOPSIS
 

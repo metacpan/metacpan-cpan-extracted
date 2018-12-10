@@ -1,5 +1,10 @@
 Revision history for this software.
 
+2.13.4.20 2018/12/10 00:00:00
+  - add known license
+  - add some documents
+  - created by INABA Hitoshi
+
 2.13.4.19 2018/03/05 00:00:00
   - change system(...) to `...` in t/001_test.t
   - add lib/Jacode.pm

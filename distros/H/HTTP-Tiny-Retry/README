@@ -1,0 +1,57 @@
+NAME
+    HTTP::Tiny::Retry - Retry failed HTTP::Tiny requests
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Retry (from Perl
+    distribution HTTP-Tiny-Retry), released on 2018-12-09.
+
+SYNOPSIS
+     use HTTP::Tiny::Retry;
+
+     my $res  = HTTP::Tiny::Retry->new(
+         # retries     => 4, # optional, default 3
+         # retry_delay => 5, # optional, default is 2
+         # ...
+     )->get("http://www.example.com/");
+
+DESCRIPTION
+    This class is a subclass of HTTP::Tiny that retry fail responses (a.k.a.
+    responses with 5xx statuses; 4xx are considered the client's fault so we
+    don't retry those).
+
+ENVIRONMENT
+  HTTP_TINY_RETRIES
+    Int. Used to set default for the "retries" attribute.
+
+  HTTP_TINY_RETRY_DELAY
+    Int. Used to set default for the "retry_delay" attribute.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Retry>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Retry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Retry>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny
+
+    HTTP::Tiny::Patch::Retry, patch version of this module.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

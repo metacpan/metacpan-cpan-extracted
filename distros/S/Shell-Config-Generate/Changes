@@ -1,5 +1,11 @@
 Revision history for Shell-Config-Generate
 
+0.33      2018-12-09 06:33:53 -0500
+  - Production release identical to 0.32_01
+
+0.32_01   2018-12-06 16:49:11 -0500
+  - Test against PowerShell on Unix (pwsh) when found
+
 0.31      2017-10-25 11:10:03 -0400
   - Production release identical to 0.30_01
 

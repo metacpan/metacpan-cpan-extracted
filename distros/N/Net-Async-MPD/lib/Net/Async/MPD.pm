@@ -3,7 +3,7 @@ package Net::Async::MPD;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use IO::Async::Loop;
 use IO::Async::Stream;
@@ -176,46 +176,52 @@ my $parsers = { none => sub { @_ } };
   my $grouped_list = sub {
     my @lines = @{shift()};
 
-    # What we are grouping
+    # Our main category comes at the top of the list of lines
     my ($main) = split /:\s+/, $lines[0], 2;
 
-    # How we are grouping, from top to bottom
-    my (@categories, %categories);
+    # Make a list of any other categories we might have
+    my @categories;
     foreach (@lines) {
       my ($key) = split /:\s+/, $_, 2;
-
-      if ($key ne $main) {
-        push @categories, $key unless defined $categories{$key};
-        $categories{$key} = 1;
+      if ($key eq $main) {
+        last if @categories;
       }
+      else {
+        push @categories, $key;
+      };
     }
 
     my $return = {};
-    my $item;
-    foreach my $line (@lines) {
-      my ($key, $value) = split /:\s+/, $line, 2;
 
-      if (defined $item->{$key}) {
-        # Find the appropriate list of items or create a new one
-        # and populate it
-        my $pointer = $return;
-        foreach my $key (@categories) {
-          my $val = $item->{$key} // q{};
-          $pointer->{$key}{$val} = {} unless defined $pointer->{$key}{$val};
-          $pointer = $pointer->{$key}{$val};
+    while (@lines) {
+      # Generate a has with all the data returned for a single item
+      # This will be over several lines if we are grouping
+      my $item = do {
+        my $set;
+        my %missing_keys = map { $_ => 1 } $main, @categories;
+
+        while ( my $line = shift @lines ) {
+          my ($key, $value) = split /:\s+/, $line, 2;
+
+          $set->{$key} = $value;
+          delete $missing_keys{$key};
+
+          last unless %missing_keys;
         }
-        $pointer->{$main} = [] unless defined $pointer->{$main};
-        my $list = $pointer->{$main};
 
-        push @{$list}, delete $item->{$main};
+        $set;
+      };
 
-        # Start a new item
-        $item = { $key => $value };
-        next;
+      # Find or create the array of results we need to push the data into
+      my $pointer = $return;
+      for my $category (@categories) {
+        my $value = $item->{$category} // '';
+        $pointer = $pointer->{$category}{$value} //= {};
       }
 
-      $item->{$key} = $value;
+      push @{ $pointer->{$main} //= [] }, delete $item->{$main};
     }
+
     return $return;
   };
 

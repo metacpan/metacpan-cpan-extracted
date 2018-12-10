@@ -3,7 +3,7 @@ use warnings;
 
 use 5.006;
 
-use ExtUtils::MakeMaker 7.12;
+use ExtUtils::MakeMaker;
 
 my $preop =
     'pod2markdown lib/Algorithm/LUHN_XS.pm > README.md;' .
@@ -12,7 +12,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Very Fast XS Version of the original Algorithm::LUHN",
   "AUTHOR" => "Kerry Schwab <kschwab\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => '7.12',
+    "ExtUtils::MakeMaker" => 0,
     "XSLoader" => '0.16'
   },
   "DISTNAME" => "Algorithm-LUHN_XS",

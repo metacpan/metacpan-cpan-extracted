@@ -5,7 +5,6 @@ use warnings;
 
 use Net::Async::MPD;
 use Term::ReadLine;
-use PerlX::Maybe;
 use Data::Printer output => 'stdout';
 use IO::Async::Loop;
 use IO::Async::Timer::Periodic;
@@ -22,7 +21,7 @@ my $term = Term::ReadLine->new('MPD REPL');
 my $finished = $loop->new_future;
 
 my $mpd = Net::Async::MPD->new(
-  maybe host => $ARGV[0],
+  $ARGV[0] ? ( host => $ARGV[0] ) : (),
   auto_connect => 1,
 );
 

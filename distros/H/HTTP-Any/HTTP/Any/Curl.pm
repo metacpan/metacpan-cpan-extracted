@@ -169,11 +169,15 @@ sub headers {
 sub _parse_headers {
 	my ($url, $h) = @_;
 
+	if ($h =~ m/^\r?\n$/) {
+		$h = "HTTP/0.9 200 Assumed OK\r\n";
+	}
+
 	$h =~ s/(?<!\r\n)\r\nHTTP/\r\n\r\nHTTP/g; # fix bad server headers
 	$h =~ s/(,\r*\n)\s+/, /g; # fix for old standard, multyline header
 
 	my ($status_line, @h) = split /\r?\n/, $h;
-	my ($status, $reason) = $status_line =~ m/HTTP\/\d\.\d\s+(\d+)(?:\s+(.+))?/;
+	my ($protocol, $status, $reason) = $status_line =~ m/(HTTP\/\d\.\d)\s+(\d+)(?:\s+(.+))?/;
 	# ToDo Когда $reason не указан, формировать на основе $status?
 
 	my %h = ();
@@ -184,9 +188,10 @@ sub _parse_headers {
 	}
 
 	return {
-		Status => $status,
-		Reason => $reason,
-		URL    => $url,
+		Protocol => $protocol,
+		Status   => $status,
+		Reason   => $reason,
+		URL      => $url,
 		map { $_ => join ",", @{$h{$_}} } keys %h
 	};
 }

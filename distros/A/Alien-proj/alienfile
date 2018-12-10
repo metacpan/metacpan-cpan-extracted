@@ -1,0 +1,135 @@
+use 5.010;
+use alienfile;
+use Sort::Versions;
+
+my $on_windows = $^O =~ /mswin/i;
+my $on_automated_rig
+  =  $ENV{PERL_CPAN_REPORTER_DIR}
+  || $ENV{PERL_CPAN_REPORTER_CONFIG}
+  || $ENV{AUTOMATED_TESTING}
+  || $ENV{TRAVIS}
+  || $ENV{APPVEYOR};
+
+
+use Cwd;
+my $base_dir = getcwd();
+
+#  make libtool noisy for debug purposes
+#$ENV{LTFLAGS} = "--debug --verbose" if $on_windows;
+
+
+
+my $min_target_version = '4.9.0';
+
+plugin 'PkgConfig' => (
+    pkg_name => 'proj',
+    minimum_version => $min_target_version,
+);
+
+
+share {
+
+  my $with_local = '';
+  my $with_cpp11 = '';
+
+  start_url 'http://download.osgeo.org/proj/';
+  #start_url "file://$base_dir";  #  debug
+  plugin Download => (
+    filter  => qr/^proj-([0-9\.]+)\.tar\.gz$/,
+    version => qr/^proj-([0-9\.]+)\.tar\.gz$/,
+  );
+
+  my $proj_version = get_proj_version() // 'not yet defined';
+  say "Downloaded proj version is $proj_version";
+  
+  plugin Extract => (format => 'tar.gz');
+
+
+  plugin 'Build::Autoconf' => ();
+
+  my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
+  $build_static = '';
+  $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
+  $build_static = '' if $ENV{FORCE_DYNAMIC};
+  
+  
+  if ($^O =~ /bsd/) {
+    plugin 'Build::Make' => 'gmake';
+    if (-d '/usr/local') {
+        $with_local = ' --with-local=/usr/local ';
+    }
+  }
+  elsif ($^O =~ /dragonfly/) {
+    #  might need to be combined with bsd check above
+    #  but not sure if /usr/local is needed yet
+    plugin 'Build::Make' => 'gmake';
+  }
+
+  my $make_cmd = '%{make}';
+  my $make_inst_cmd = '%{make} install';
+  my @make_clean;
+  #  try not to exceed the cpan-testers log limits
+  if ($on_automated_rig) {
+    say "Running under CI or automated testing";
+    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
+    if (!$on_windows) {
+        $make_cmd =~ s/%%/%/;
+        $make_cmd =~ s/type/cat/;
+        $make_cmd =~ s/"/'/g;
+        $make_inst_cmd =~ s/%%/%/;
+        $make_inst_cmd =~ s/type/cat/;
+        $make_inst_cmd =~ s/"/'/g;
+    }
+    #if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
+    #    push @make_clean, '%{make} clean';
+    #}
+    #  clean up the build dir on cpan testers etc
+    plugin 'Cleanse::BuildDir';
+  }
+  
+  build [
+    "%{configure} $with_local $with_cpp11 $build_static",
+    \&pause,
+    $make_cmd,
+    $make_inst_cmd,
+    #@make_clean
+  ];
+
+};
+
+
+sub pause {
+    return;  #  re-enable in case of debug
+    return if $on_automated_rig;
+    return if !$on_windows;
+
+    say "CONTINUE?";
+    my $response = <>;
+    while (not $response =~ /yes/) {
+        $response = <>;
+    }
+}
+
+
+sub get_proj_version {
+    my $h = get_alien_state_hash();
+    return $h->{runtime}{version};
+}
+
+sub get_alien_state_hash {
+    use JSON::PP;
+    my $root = "$base_dir/_alien";
+    my $f = "$root/state.json";
+    my $h = {};
+    if (-e $f) {
+        open my $fh, '<', $f or die $!;
+        my $d = do {
+            local $/ = undef;
+            <$fh>;
+        };
+        $h = JSON::PP::decode_json($d);
+    }
+    return $h;
+}
+

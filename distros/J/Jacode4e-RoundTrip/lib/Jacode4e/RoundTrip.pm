@@ -1,5 +1,5 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.3';
+$VERSION = '2.13.81.4';
 ######################################################################
 #
 # Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
@@ -60,6 +60,8 @@ $VERSION = '2.13.81.3';
 #       INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
 #                         'S' means one char as SBCS, 'D' means one char as DBCS
 #                         default is 'S'
+#                         each letter may optionally be followed by a number
+#                         indicating the repeat count, see samples
 #       OUTPUT_SHIFTING   true means use output shift code, false means not use
 #                         default is false
 #       SPACE             output space code in DBCS/MBCS
@@ -71,17 +73,29 @@ $VERSION = '2.13.81.3';
 #                         (CAUTION! override also SPACE option)
 #       -----------------------------------------------------------------------
 #
-# SAMPLE
-# ------
+# SAMPLES
+# -------
 #
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   use Jacode4e::RoundTrip;
-#   Jacode4e::RoundTrip::VERSION('2.13.81.3');
+#   Jacode4e::RoundTrip::VERSION('2.13.81.4');
 #   while (<>) {
 #       $return =
 #       Jacode4e::RoundTrip::convert(\$_, 'cp932x', 'cp00930', {
 #           'INPUT_LAYOUT'     => 'SSSDDDSSDDSDSD',
+#           'OUTPUT_SHIFTING'  => 0,
+#           'SPACE'            => "\x81\xA2",
+#           'GETA'             => "\x81\xA1",
+#           'OVERRIDE_MAPPING' => { "\x44\x5A" => "\x81\x7C", },
+#       });
+#       print $_;
+#   }
+#
+#   while (<>) {
+#       $return =
+#       Jacode4e::RoundTrip::convert(\$_, 'cp932x', 'cp00930', {
+#           'INPUT_LAYOUT'     => 'S3D3S2D2SDSD',
 #           'OUTPUT_SHIFTING'  => 0,
 #           'SPACE'            => "\x81\xA2",
 #           'GETA'             => "\x81\xA1",
@@ -909,6 +923,8 @@ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
       -----------------------------------------------------------------------
       INPUT_LAYOUT      input record layout by 'S' and 'D' sequence
                         'S' means one char as SBCS, 'D' means one char as DBCS
+                        each letter may optionally be followed by a number
+                        indicating the repeat count, see samples
       OUTPUT_SHIFTING   true means use output shift code, false means not use
                         default is false
       SPACE             output space code in DBCS/MBCS
@@ -918,16 +934,28 @@ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
                         (CAUTION! override also SPACE option)
       -----------------------------------------------------------------------
 
-=head1 SAMPLE
+=head1 SAMPLES
 
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e::RoundTrip;
-  Jacode4e::RoundTrip::VERSION('2.13.81.3');
+  Jacode4e::RoundTrip::VERSION('2.13.81.4');
   while (<>) {
       $return =
       Jacode4e::RoundTrip::convert(\$_, 'cp932x', 'cp00930', {
           'INPUT_LAYOUT'     => 'SSSDDDSSDDSDSD',
+          'OUTPUT_SHIFTING'  => 0,
+          'SPACE'            => "\x81\xA2",
+          'GETA'             => "\x81\xA1",
+          'OVERRIDE_MAPPING' => { "\x44\x5A" => "\x81\x7C", },
+      });
+      print $_;
+  }
+ 
+  while (<>) {
+      $return =
+      Jacode4e::RoundTrip::convert(\$_, 'cp932x', 'cp00930', {
+          'INPUT_LAYOUT'     => 'S3D3S2D2SDSD',
           'OUTPUT_SHIFTING'  => 0,
           'SPACE'            => "\x81\xA2",
           'GETA'             => "\x81\xA1",
@@ -1073,7 +1101,7 @@ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
  jef, jef9p                8,814   2,471      3,102      --   3,102
  jipsj, jipse              8,637   2,648      3,948      --   3,948
  letsj                     9,876   1,409      2,632      --   2,632
- utf8                     11,220      65      6,400      --      65
+ utf8                     11,220      65      6,400      --   6,400
  utf8jp                   11,285       0         --      --      --
  ---------------------------------------------------------------------
  
@@ -1323,14 +1351,59 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  Heterogeneous database cooperation among heterogeneous OS environments
  http://www.unisys.co.jp/tec_info/tr56/5605.htm
 
+ UNISYS_SJIS KANJI CONVERT(DOS ver)
+ https://www.vector.co.jp/soft/dos/util/se238607.html
+
+ ANSI X3.4-1968 (US-ASCII) with 0x60/0x27 as left/right single quotation mark to Unicode
+ http://www.unicode.org/Public/MAPPINGS/VENDORS/MISC/US-ASCII-QUOTES.TXT
+
+ JIS X 0201 (1976) to Unicode 1.1 Table
+ http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/JIS0201.TXT
+
+ JIS X 0208 (1990) to Unicode
+ http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/JIS0208.TXT
+
+ JIS X 0212 (1990) to Unicode
+ http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/JIS/JIS0212.TXT
+
  UTF-8, a transformation format of ISO 10646
  https://www.rfc-editor.org/rfc/rfc3629.txt
 
  Kanji shift code
  https://ja.wikipedia.org/wiki/%E6%BC%A2%E5%AD%97%E3%82%B7%E3%83%95%E3%83%88%E3%82%B3%E3%83%BC%E3%83%89
 
+ CJKV Information Processing
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/78-vs-83-1.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/78-vs-83-2.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/78-vs-83-3.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/78-vs-83-4.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/83-vs-90-1.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/83-vs-90-2.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/TJ2.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/TJ3.sjs
+ https://resources.oreilly.com/examples/9781565922242/tree/master/AppQ/TJ4.sjs
+
  Very old fj.kanji discussion
  http://www.ie.u-ryukyu.ac.jp/~kono/fj/fj.kanji/index.html
+
+ jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
+ ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+ http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
+ ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
+ http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
+ https://twitter.com/uta46/status/11578906320
+
+ jacode - Perl program for Japanese character code conversion
+ https://metacpan.org/search?q=jacode.pl
+
+ Jacode4e - jacode.pl-like program for enterprise
+ https://metacpan.org/pod/Jacode4e
+
+ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
+ https://metacpan.org/pod/Jacode4e::RoundTrip
+
+ Modern::Open - Autovivification, Autodie, and 3-args open support
+ https://metacpan.org/pod/Modern::Open
 
  BackPAN
  http://backpan.perl.org/authors/id/I/IN/INA/

@@ -8,7 +8,7 @@
 use strict;
 use FindBin;
 use lib $FindBin::Bin;
-require 'lib/jacode4e.pl';
+require '../lib/Jacode4e.pm';
 require 'EBCDIC/EBCDIC_NEC_by_JIS8.pl';
 require 'UTF8/UTF8_by_Unicode.pl';
 
@@ -147,7 +147,7 @@ sub map_undefined_char {
         my $defined = 1;
         for my $OUTPUT_encoding (@{$brother_encoding}) {
             my $c = $char_utf8jp;
-            jacode4e::convert(\$c, $OUTPUT_encoding, 'utf8jp', { 'INPUT_LAYOUT'=>'D', 'GETA'=>"\x00\x00" });
+            Jacode4e::convert(\$c, $OUTPUT_encoding, 'utf8jp', { 'INPUT_LAYOUT'=>'D', 'GETA'=>"\x00\x00" });
             if ($c eq "\x00\x00") {
                 $defined = 0;
                 if ($OUTPUT_encoding eq $encoding) {
@@ -167,7 +167,7 @@ sub map_undefined_char {
             my $mapped = 0;
             for my $INPUT_encoding (@{$brother_encoding}) {
                 my $c = $char;
-                jacode4e::convert(\$c, 'utf8jp', $INPUT_encoding, { 'INPUT_LAYOUT'=>'D', 'GETA'=>"\x00\x00" });
+                Jacode4e::convert(\$c, 'utf8jp', $INPUT_encoding, { 'INPUT_LAYOUT'=>'D', 'GETA'=>"\x00\x00" });
                 if ($c ne "\x00\x00") {
                     $mapped = 1;
                     last;

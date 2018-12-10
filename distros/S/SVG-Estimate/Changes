@@ -1,3 +1,6 @@
+1.0109 2018-12-09
+ * Set minimum version of perl to be 5.010
+
 1.0109 2018-12-05
  * Handle cases when shapes are missing x,y information that defaults to 0.
  * Make sure that the end point of an arc path is always set.

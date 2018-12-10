@@ -4,40 +4,39 @@
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.009",
+   "generated_by" : "App::ModuleBuildTiny version 0.024",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-Mojo-Role-PSGI",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.007"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.009"
+            "App::ModuleBuildTiny" : "0.024"
          }
       },
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "0",
-            "Mojolicious" : "6.0",
+            "Mojolicious" : "7.42",
             "Mojolicious::Plugin::MountPSGI" : "0.07",
-            "Role::Tiny" : "0",
-            "Test::Mojo::WithRoles" : "0"
+            "Role::Tiny" : "0"
          }
       }
    },
    "provides" : {
       "Test::Mojo::Role::PSGI" : {
          "file" : "lib/Test/Mojo/Role/PSGI.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -52,5 +51,6 @@
          "url" : "http://github.com/jberger/Test-Mojo-Role-PSGI"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

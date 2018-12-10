@@ -1,260 +1,222 @@
 package QBit::Validator::Type::hash;
-$QBit::Validator::Type::hash::VERSION = '0.011';
+$QBit::Validator::Type::hash::VERSION = '0.012';
 use qbit;
 
 use base qw(QBit::Validator::Type);
 
 use Exception::Validator;
+use Exception::Validator::FailedField;
 
 #order is important
-my $OPTIONS = [
-    {name => 'optional', required => TRUE},
-    {name => 'deps'},
-    {name => 'fields'},
-    {name => 'one_of'},
-    {name => 'any_of'},
-    {name => 'extra',    required => TRUE},
-];
-
-sub _get_options {
-    return clone($OPTIONS);
+sub get_options_name {
+    qw(type deps fields one_of any_of extra);
 }
 
-sub _get_options_name {
-    return map {$_->{'name'}} @$OPTIONS;
+sub pre_process_template {
+    my ($self, $template) = @_;
+
+    $template->{'extra'} //= FALSE;
 }
 
-sub optional {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+sub type {
+    my ($qv, $types) = @_;
 
-    if ($template->{$option}) {
-        if (defined($data)) {
-            unless (ref($data) eq 'HASH') {
-                $qv->_add_error($template, gettext('Data must be HASH'), \@path_field);
+    return sub {
+        throw FF gettext('Data must be HASH') if ref($_[1]) ne 'HASH';
 
-                return FALSE;
-            }
-        } else {
-            $qv->_add_ok(\@path_field);
-
-            return FALSE;
-        }
-    } else {
-        if (!defined($data)) {
-            $qv->_add_error($template, gettext('Data must be defined'), \@path_field);
-
-            return FALSE;
-        } else {
-            unless (ref($data) eq 'HASH') {
-                $qv->_add_error($template, gettext('Data must be HASH'), \@path_field);
-
-                return FALSE;
-            }
-        }
-    }
-
-    return TRUE;
+        return TRUE;
+      }
 }
 
 sub deps {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $depends, $template) = @_;
 
-    throw Exception::Validator gettext('Option "%s" must be HASH', $option) unless ref($template->{$option}) eq 'HASH';
+    throw Exception::Validator gettext('Option "%s" must be HASH', 'deps') unless ref($depends) eq 'HASH';
 
-    my $no_error = TRUE;
+    throw Exception::Validator gettext('You must specify option "%s"', 'fields') unless exists($template->{'fields'});
 
-    foreach my $field (keys(%{$template->{$option}})) {
-        my @path = (@path_field, $field);
+    my $inverse_depends = $qv->{'__INVERSE_DEPENDS__'} = {};
+    foreach my $field (keys(%$depends)) {
+        my $deps = $depends->{$field};
 
-        if (exists($data->{$field})) {
-            my $deps = $template->{$option}{$field};
+        throw Exception::Validator gettext('You must specify the fields on which the field "%s"', $field)
+          unless defined($deps);
 
-            my ($dep_fields, $cases, $set_template);
-            if (ref($deps) eq 'HASH') {
-                throw Exception::Validator gettext('You must specify option "fields"')
-                  unless exists($deps->{'fields'});
+        if (ref($deps) ne 'ARRAY') {
+            $depends->{$field} = $deps = [$deps];
+        }
 
-                $dep_fields = $deps->{'fields'};
+        my @unknown_fields = grep {!exists($template->{'fields'}{$_})} @$deps;
 
-                my @exists_options = grep {exists($deps->{$_})} qw(cases set_template);
-                throw Exception::Validator gettext('You must specify option "cases" or "set_template"')
-                  if @exists_options != 1;
+        throw Exception::Validator gettext('Keys: %s do not used in option "fields"', join(', ', @unknown_fields))
+          if @unknown_fields;
 
-                $cases        = $deps->{'cases'};
-                $set_template = $deps->{'set_template'};
-            } else {
-                $dep_fields = $deps;
-            }
-
-            throw Exception::Validator gettext('You must specify the fields on which the field "%s"', $field)
-              unless defined($dep_fields);
-
-            $dep_fields = [$dep_fields] unless ref($dep_fields) eq 'ARRAY';
-
-            my @dep_fields_with_errors = ();
-            my $has_errors             = FALSE;
-            foreach my $dep_field (@$dep_fields) {
-                unless (exists($data->{$dep_field})) {
-                    push(@dep_fields_with_errors, $dep_field);
-
-                    next;
-                }
-
-                my @dep_path = (@path_field, $dep_field);
-
-                $qv->_validation($data->{$dep_field}, $template->{'fields'}{$dep_field}, undef, @dep_path)
-                  unless $qv->checked(\@dep_path);
-
-                $has_errors = TRUE if $qv->has_error(\@dep_path);
-            }
-
-            if (@dep_fields_with_errors) {
-                $qv->_add_error($template,
-                    gettext('Key "%s" depends from: %s', $field, join(',', map {"\"$_\""} @dep_fields_with_errors)),
-                    \@path);
-
-                return FALSE;
-            }
-
-            if ($has_errors) {
-                $no_error = FALSE;
-                next;
-            }
-
-            if (defined($cases)) {
-                throw Exception::Validator gettext('Option "%s" must be ARRAY', 'cases') if ref($cases) ne 'ARRAY';
-
-                foreach my $case (@$cases) {
-                    my $case_template =
-                      {%{$case->[0]}, map {$_ => {skip => TRUE}} grep {!exists($case->[0]{$_})} @$dep_fields};
-
-                    my $case_qv = $qv->new(
-                        data => {map {$_ => $data->{$_}} @$dep_fields},
-                        template => {type => 'hash', fields => $case_template}
-                    );
-
-                    unless ($case_qv->has_errors) {
-                        $template->{'fields'}{$field} = $case->[1];
-
-                        last;
-                    }
-                }
-            }
-
-            if (defined($set_template)) {
-                throw Exception::Validator gettext('Option "%s" must be code', 'set_template')
-                  if ref($set_template) ne 'CODE';
-
-                try {
-                    my $new_template = $set_template->($qv, $data);
-
-                    if (defined($new_template) && ref($new_template) eq 'HASH') {
-                        $template->{'fields'}{$field} = $new_template;
-                    }
-                }
-                catch {
-                    throw Exception::Validator gettext('Internal error');
-                };
-            }
+        foreach (@$deps) {
+            push(@{$inverse_depends->{$_}}, $field);
         }
     }
 
-    return $no_error;
+    my $order = $qv->{'__FIELDS_ORDER__'} = {};
+    foreach my $field (keys(%{$template->{'fields'}})) {
+        $order->{$field} = _get_field_order($field, $order, $depends);
+    }
+
+    return ();
 }
 
+sub _get_field_order {
+    #my ($field, $order, $deps) = @_;
+
+    return $_[1]->{$_[0]} if defined($_[1]->{$_[0]});
+
+    if ($_[2]->{$_[0]}) {
+        return array_n_max(map {$_[1]->{$_} = _get_field_order($_, $_[1], $_[2])} @{$_[2]->{$_[0]}}) + 1;
+    } else {
+        return 0;
+    }
+}
+
+#TODO: implement method _exists
+# defined = required
+
 sub fields {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $fields, $template) = @_;
 
-    my $no_error = TRUE;
+    my $parent = $qv->parent // $qv;
+    my $path_manager = $parent->path_manager();
 
-    foreach my $field (keys(%{$template->{$option}})) {
-        my @path = (@path_field, $field);
+    my $path = $qv->path();
 
-        if (!$template->{$option}{$field}{'optional'} && !exists($data->{$field})) {
-            $qv->_add_error($template, gettext('Key "%s" required', $field), \@path);
-        }
-
-        $qv->_validation($data->{$field}, $template->{$option}{$field}, undef, @path)
-          unless $qv->checked(\@path);
-
-        $no_error = FALSE if $qv->has_error(\@path);
+    my %validators = ();
+    foreach my $field (keys(%$fields)) {
+        $validators{$field} = QBit::Validator->new(
+            template => $fields->{$field},
+            parent   => $parent,
+            path     => $path_manager->get_absolute_path($path_manager->get_path_part('hash', $field), $path),
+        );
     }
 
-    return $no_error;
+    my $inverse_depends = $qv->{'__INVERSE_DEPENDS__'} // {};
+
+    my $order = $qv->{'__FIELDS_ORDER__'} // {};
+    my @sorted_fields = sort {($order->{$a} // 0) <=> ($order->{$b} // 0)} keys(%$fields);
+
+    return sub {
+        my %errors = ();
+        foreach my $field (@sorted_fields) {
+            next if $errors{$field};
+
+            unless ($validators{$field}->_validate($_[1]->{$field})) {
+                $errors{$field} = $validators{$field}->get_errors;
+
+                _set_recursive_depends_errors($field, \%errors, $inverse_depends);
+            }
+        }
+
+        throw FF \%errors if %errors;
+
+        return TRUE;
+      }
+}
+
+sub _set_recursive_depends_errors {
+    #my ($field, $errors, $inverse_depends) = @_;
+
+    foreach (@{$_[2]->{$_[0]} // []}) {
+        $_[1]->{$_} = gettext('Field "%s" depends on "%s"', $_, $_[0]);
+
+        _set_recursive_depends_errors($_, $_[1], $_[2]);
+    }
 }
 
 sub extra {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $val, $template) = @_;
 
-    my @extra_fields = grep {!$template->{'fields'}{$_}} keys(%$data);
+    unless ($val) {
+        return sub {
+            my @extra_fields = grep {!$template->{'fields'}{$_}} keys(%{$_[1]});
 
-    if (@extra_fields && !$template->{$option}) {
-        $qv->_add_error($template, gettext('Extra fields: %s', join(', ', @extra_fields)), \@path_field);
+            if (@extra_fields) {
+                throw FF gettext('Extra fields: %s', join(', ', @extra_fields));
+            }
 
-        return FALSE;
+            return TRUE;
+          }
     }
 
-    return TRUE;
+    return ();
 }
 
 sub one_of {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $list, $template) = @_;
 
-    throw Exception::Validator gettext('Option "%s" must be ARRAY', $option)
-      if ref($template->{$option}) ne 'ARRAY';
+    throw Exception::Validator gettext('Option "%s" must be ARRAY', 'one_of')
+      if ref($list) ne 'ARRAY';
 
     my $min_size = 2;
 
     throw Exception::Validator gettext('Option "%s" have size "%s", but expected size equal or more than "%s"',
-        $option, scalar(@{$template->{$option}}), $min_size)
-      if @{$template->{$option}} < $min_size;
+        'one_of', scalar(@$list), $min_size)
+      if @$list < $min_size;
 
-    my @received_fields = ();
-    foreach my $field (@{$template->{$option}}) {
-        throw Exception::Validator gettext('Key "%s" do not use in option "fields"', $field)
-          unless exists($template->{'fields'}{$field});
-
-        push(@received_fields, $field) if exists($data->{$field});
+    my @unknow_fields = grep {!exists($template->{'fields'}{$_})} @$list;
+    if (@unknow_fields) {
+        throw Exception::Validator gettext('Keys: %s do not used in option "fields"', join(', ', @unknow_fields));
     }
 
-    unless (@received_fields == 1) {
-        $qv->_add_error($template, gettext('Expected one key from: %s', join(', ', @{$template->{$option}})),
-            \@path_field);
+    return sub {
+        my @received_fields = ();
+        foreach my $field (@$list) {
+            push(@received_fields, $field) if exists($_[1]->{$field});
+        }
 
-        return FALSE;
-    }
+        if (@received_fields != 1) {
+            throw FF gettext('Expected one key from: %s', join(', ', $list));
+        }
 
-    return TRUE;
+        return TRUE;
+    };
 }
 
 sub any_of {
-    my ($self, $qv, $data, $template, $option, @path_field) = @_;
+    my ($qv, $list, $template) = @_;
 
-    throw Exception::Validator gettext('Option "%s" must be ARRAY', $option)
-      if ref($template->{$option}) ne 'ARRAY';
+    throw Exception::Validator gettext('Option "%s" must be ARRAY', 'any_of')
+      if ref($list) ne 'ARRAY';
 
     my $min_size = 2;
 
     throw Exception::Validator gettext('Option "%s" have size "%s", but expected size equal or more than "%s"',
-        $option, scalar(@{$template->{$option}}), $min_size)
-      if @{$template->{$option}} < $min_size;
+        'any_of', scalar(@$list), $min_size)
+      if @$list < $min_size;
 
-    my @received_fields = ();
-    foreach my $field (@{$template->{$option}}) {
-        throw Exception::Validator gettext('Key "%s" do not use in option "fields"', $field)
-          unless exists($template->{'fields'}{$field});
-
-        push(@received_fields, $field) if exists($data->{$field});
+    my @unknow_fields = grep {!exists($template->{'fields'}{$_})} @$list;
+    if (@unknow_fields) {
+        throw Exception::Validator gettext('Keys: %s do not used in option "fields"', join(', ', @unknow_fields));
     }
 
-    unless (@received_fields) {
-        $qv->_add_error($template, gettext('Expected any keys from: %s', join(', ', @{$template->{$option}})),
-            \@path_field);
+    return sub {
+        my @received_fields = ();
+        foreach my $field (@$list) {
+            push(@received_fields, $field) if exists($_[1]->{$field});
+        }
 
-        return FALSE;
+        unless (@received_fields) {
+            throw FF gettext('Expected any keys from: %s', join(', ', $list));
+        }
+
+        return TRUE;
+    };
+}
+
+sub init {
+    my ($self) = @_;
+
+    $self->SUPER::init();
+
+    foreach ($self->get_options_name) {
+        $self->{$_} = \&$_;
     }
-
-    return TRUE;
 }
 
 TRUE;

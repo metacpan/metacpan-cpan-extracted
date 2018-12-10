@@ -1,7 +1,13 @@
 Revision history for Text::Trac
 
+0.24  2018.12.09 MANWAR
+      Removed +x from unit test scripts.
+
+0.23  2018.12.08 MANWAR
+      Now using ExtUtils::MakeMaker for packaging.
+
 0.22  2018.12.07 MANWAR
-      - Moved author unit tests to subfolder xt/.
+      Moved author unit tests to subfolder xt/.
 
 0.21  2018.12.06 MANWAR
       Fixed warning 'Use of uninitialized value $target ..' as reported by CPANTESTERS.

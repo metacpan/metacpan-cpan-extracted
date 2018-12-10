@@ -4,7 +4,7 @@ use Role::Tiny;
 
 use Mojolicious;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 around new => sub {
@@ -30,9 +30,9 @@ Test::Mojo::Role::PSGI - Test PSGI apps using Test::Mojo
   use warnings;
 
   use Test::More;
-  use Test::Mojo::WithRoles 'PSGI';
+  use Test::Mojo;
 
-  my $t = Test::Mojo::WithRoles->new('path/to/app.psgi');
+  my $t = Test::Mojo->with_roles('+PSGI')->new('path/to/app.psgi');
 
   $t->get_ok('/some/path')
     ->status_is(200)
@@ -49,8 +49,6 @@ L<Test::Mojo> makes testing L<Mojolicious> applications easy and fun.
 Wouldn't it be nice if there was some way to use it for non-Mojolicious apps?
 L<Test::Mojo::Role::PSGI> does just that.
 
-The author suggests using L<Test::Mojo::WithRoles> to make instances of the tester with (possibly multiple) roles applied in a sane way.
-
 =head1 OVERRIDES
 
 =head2 new
@@ -59,6 +57,26 @@ Overrides the L<Test::Mojo/new> method to use a PSGI app, instantiating a script
 This should feel very similar to the original behavior except that now PSGI apps are the target, rather than Mojolicious apps.
 
 Acceptable arguments are strings that can be used by L<Plack::Util/load_psgi> or else instantated PSGI applications, including bare code references.
+
+=head1 NOTA BENE
+
+This module previously recommended L<Test::Mojo::WithRoles> and depended on it.
+Since that recommendation, proper role handling was added to Mojolicious (see L<Mojolicious::Guides::Testing/"Extending Test::Mojo">).
+This obviates the need for "WithRoles", just use the native one.
+The translation is as follows:
+
+  use Test::More;
+  use Test::Mojo;
+
+  my $t = Test::Mojo::WithRoles->new('path/to/app.psgi');
+
+becomes
+
+  use Test::More;
+  use Test::Mojo;
+
+  my $t = Test::Mojo->with_roles('+PSGI')->new('path/to/app.psgi');
+
 
 =head1 SEE ALSO
 

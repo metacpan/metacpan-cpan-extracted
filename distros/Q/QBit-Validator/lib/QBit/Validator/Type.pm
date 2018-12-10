@@ -1,53 +1,97 @@
 package QBit::Validator::Type;
-$QBit::Validator::Type::VERSION = '0.011';
+$QBit::Validator::Type::VERSION = '0.012';
 use qbit;
 
 use base qw(QBit::Class);
 
 use Exception::Validator;
+use Exception::Validator::FailedField;
 
-__PACKAGE__->abstract_methods(qw(_get_options _get_options_name));
+sub get_all_options_name {
+    my ($self) = @_;
 
-sub check_options {
-    my ($self, $qv, $data, $template, $already_check, @path_field) = @_;
+    return qw(message msg skip optional), $self->get_options_name(), qw(check);
+}
 
-    return FALSE if $qv->has_error(\@path_field);
+sub get_options_name {()}
 
-    if ($template->{'skip'}) {
-        $qv->_add_ok(\@path_field);
+sub get_checks_by_template {
+    my ($self, $qv, $template, $path) = @_;
+
+    $self->pre_process_template($template);
+
+    my @checks         = ();
+    my %exists_options = ();
+
+    foreach my $option ($self->get_all_options_name()) {
+        if (exists($template->{$option})) {
+            $exists_options{$option} = TRUE;
+
+            if ($option eq 'message' || $option eq 'msg') {
+                $qv->{'__CUSTOM_ERRORS__'} = $template->{$option};
+
+                next;
+            }
+
+            push(@checks, $self->{$option}->($qv, $template->{$option}, $template));
+        }
+    }
+
+    my @unknown_options = grep {!$exists_options{$_}} keys(%$template);
+    throw gettext('Unknown options: %s for type: %s', join(', ', @unknown_options), $template->{'type'})
+      if @unknown_options;
+
+    if (!$exists_options{'optional'} && (!exists($template->{'eq'}) || defined($template->{'eq'}))) {
+        unshift(@checks, $self->{'required'}->($qv));
+    }
+
+    return @checks;
+}
+
+sub pre_process_template {}
+
+sub skip {
+    my ($qv, $val, $template) = @_;
+
+    return $val ? sub {0} : ();
+}
+
+sub optional {
+    my ($qv) = @_;
+
+    return sub {
+        return FALSE unless defined($_[1]);
+      }
+}
+
+sub required {
+    my ($qv) = @_;
+
+    return sub {
+        throw gettext('Data must be defined') unless defined $_[1];
 
         return TRUE;
-    }
+      }
+}
 
-    my @options =
-      map {$_->{'name'}} grep {exists($template->{$_->{'name'}}) || $_->{'required'}} @{$self->_get_options()};
+sub check {
+    my ($qv, $checks) = @_;
 
-    foreach my $option (@options) {
-        if ($self->can($option)) {
-            last unless $self->$option($qv, $data, $template, $option, @path_field);
-        } else {
-            throw Exception::Validator gettext('Option "%s" don\'t have check sub', $option);
-        }
-    }
+    throw Exception::Validator gettext('Option "%s" must be array of code', 'check')
+      if !defined($checks)
+      || ref($checks) ne 'ARRAY'
+      || !@$checks
+      || grep {ref($_) ne 'CODE'} @$checks;
 
-    return FALSE if $qv->has_error(\@path_field);
-
-    if (exists($template->{'check'}) && !$$already_check) {
-        $$already_check = TRUE;
-
-        throw Exception::Validator gettext('Option "%s" must be code', 'check')
-          if !defined($template->{'check'}) || ref($template->{'check'}) ne 'CODE';
-
-        if (!defined($data) && $template->{'optional'}) {
-            $qv->_add_ok(\@path_field);
-
-            return TRUE;
-        }
+    return sub {
+        my ($qv, $data) = @_;
 
         my $error;
         my $error_msg;
         try {
-            $template->{'check'}($qv, $data, $template, @path_field);
+            foreach my $check (@$checks) {
+                $check->($qv, $data);
+            }
         }
         catch Exception::Validator with {
             $error     = TRUE;
@@ -55,38 +99,28 @@ sub check_options {
         }
         catch {
             $error     = TRUE;
+
+            $qv->use_errors_handler(shift);
+
             $error_msg = gettext('Internal error');
         };
 
         if ($error) {
-            $qv->_add_error($template, $error_msg, \@path_field, check_error => TRUE);
-
-            return FALSE;
+            throw FF $error_msg, check_error => TRUE;
         }
-    }
 
-    $qv->_add_ok(\@path_field);
-
-    return TRUE;
+        return TRUE;
+      }
 }
 
-sub get_all_options_name {
+sub init {
     my ($self) = @_;
 
-    return qw(skip type check msg), $self->_get_options_name();
-}
+    $self->SUPER::init();
 
-sub merge_templates {
-    my ($self, $template, $template2) = @_;
-
-    return {
-        type => $template2->{'type'},
-        (
-            map {$_ => $template2->{$_}}
-              grep {!exists($template->{$_}) && $_ ne 'msg'} keys(%$template2)
-        ),
-        map {$_ => $template->{$_}} grep {$_ ne 'type' && $_ ne 'check'} keys(%$template)
-    };
+    foreach (qw(skip optional required check)) {
+        $self->{$_} = \&$_;
+    }
 }
 
 TRUE;

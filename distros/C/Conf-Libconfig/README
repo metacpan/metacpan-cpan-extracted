@@ -21,6 +21,8 @@ Instructions:
     wget http://www.hyperrealm.com/libconfig/libconfig-1.3.2.tar.gz
 	# Support libconfig-1.4.x
 	# wget http://www.hyperrealm.com/libconfig/libconfig-1.4.7.tar.gz
+    # Support libconfig-1.7.x 
+    # wget https://hyperrealm.github.io/libconfig/dist/libconfig-1.7.2.tar.gz 
     tar -zxf libconfig-1.3.2.tar.gz
     cd libconfig-1.3.2
     export MYPREFIX=/usr

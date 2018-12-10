@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::str::str_convert_perl_pm_or_pod_to_path;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2018-12-09'; # DATE
+our $VERSION = '0.017'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ Data::Sah::Coerce::perl::str::str_convert_perl_pm_or_pod_to_path - Convert modul
 
 =head1 VERSION
 
-This document describes version 0.016 of Data::Sah::Coerce::perl::str::str_convert_perl_pm_or_pod_to_path (from Perl distribution Sah-Schemas-Perl), released on 2018-12-07.
+This document describes version 0.017 of Data::Sah::Coerce::perl::str::str_convert_perl_pm_or_pod_to_path (from Perl distribution Sah-Schemas-Perl), released on 2018-12-09.
 
 =head1 DESCRIPTION
 

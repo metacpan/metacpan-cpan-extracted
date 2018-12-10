@@ -3,6 +3,8 @@ package C31;
 use Moo;
 extends 'B4';
 
+use namespace::clean;
+
 has c31_1 => (
     is      => 'ro',
     T1_1    => 'should not stick',

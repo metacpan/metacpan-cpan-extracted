@@ -18,6 +18,7 @@ my $floatkey = "floatkey";
 my $longkey = "longkey";
 my $binarykey = "binarykey";
 my @arr = (1, 2, 3);
+my @arr_str = ("1", "2", "3");
 my @list = ("abc", 456, 0x888);
 my %hash = ("online", "玄幻小说", "story", "杀魂逆天");
 
@@ -30,7 +31,7 @@ ok($foo->add_scalar("me.mar", $key, "hello, world"), "add string scalar - status
 ok($foo->modify_scalar("me.mar.float", "float string"), "modify scalar - status ok");
 # array test
 $key = "node2";
-ok($foo->add_array("me.arr", $key,  \@arr), "add array into array - status ok");
+ok($foo->add_array("me.arr", $key,  \@arr_str), "add array into array - status ok");
 ok($foo->add_array("me.mar", $key,  \@arr), "add array into hash - status ok");
 # list test, like add_array
 $key = "node3";

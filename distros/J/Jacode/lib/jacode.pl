@@ -44,7 +44,7 @@ $support_jcode_package_too = 1;
 #
 #   ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
 #
-$VERSION = '2.13.4.19';
+$VERSION = '2.13.4.20';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -11666,40 +11666,51 @@ this a more useful tool, please let everyone share it.
 
 =head1 SOFTWARE LIFE CYCLE
 
-                    jcode.pl  Encode.pm  jacode.pl  jacode4e.pl
-  --------------------------------------------------------------
-  1993 Perl4.036       |                     |                  
-    :     :            :                     :                  
-  1999 Perl5.00503     |                     |           |      
-  2000 Perl5.6         |                     |           |      
-  2002 Perl5.8         |         Born        |           |      
-  2007 Perl5.10        V          |          |           |      
-  2010 Perl5.12       EOL         |         Born         |      
-  2011 Perl5.14                   |          |           |      
-  2012 Perl5.16                   |          |           |      
-  2013 Perl5.18                   |          |           |      
-  2014 Perl5.20                   |          |           |      
-  2015 Perl5.22                   |          |           |      
-  2016 Perl5.24                   |          |           |      
-  2017 Perl5.26                   |          |           |      
-  2018 Perl5.28                   :          :          Born    
-  2019 Perl5.30                   :          :           :      
-  2020 Perl5.32                   :          :           :      
-    :     :                       V          V           V      
-  --------------------------------------------------------------
+                                         Jacode.pm
+                    jcode.pl  Encode.pm  jacode.pl  Jacode4e  Jacode4e::RoundTrip
+  --------------------------------------------------------------------------------
+  1993 Perl4.036       |                     |                                    
+    :     :            :                     :                                    
+  1999 Perl5.00503     |                     |         |               |          
+  2000 Perl5.6         |                     |         |               |          
+  2002 Perl5.8         |         Born        |         |               |          
+  2007 Perl5.10        V          |          |         |               |          
+  2010 Perl5.12       EOL         |         Born       |               |          
+  2011 Perl5.14                   |          |         |               |          
+  2012 Perl5.16                   |          |         |               |          
+  2013 Perl5.18                   |          |         |               |          
+  2014 Perl5.20                   |          |         |               |          
+  2015 Perl5.22                   |          |         |               |          
+  2016 Perl5.24                   |          |         |               |          
+  2017 Perl5.26                   |          |         |               |          
+  2018 Perl5.28                   |          |        Born            Born        
+  2019 Perl5.30                   |          |         |               |          
+  2020 Perl5.32                   :          :         :               :          
+  2030 Perl5.52                   :          :         :               :          
+  2040 Perl5.72                   :          :         :               :          
+  2050 Perl5.92                   :          :         :               :          
+  2060 Perl5.112                  :          :         :               :          
+  2070 Perl5.132                  :          :         :               :          
+  2080 Perl5.152                  :          :         :               :          
+  2090 Perl5.172                  :          :         :               :          
+  2100 Perl5.192                  :          :         :               :          
+  2110 Perl5.212                  :          :         :               :          
+  2120 Perl5.232                  :          :         :               :          
+    :     :                       V          V         V               V          
+  --------------------------------------------------------------------------------
 
 =head1 SOFTWARE COVERAGE
 
 When you lost your way, you can see this matrix and find your way.
 
-  Skill/Use  Amateur    Semipro    Pro        Enterprise
-  ---------------------------------------------------------
-  Expert     jacode.pl  Encode.pm  Encode.pm  jacode4e.pl
-  ---------------------------------------------------------
-  Middle     jacode.pl  jacode.pl  Encode.pm  jacode4e.pl
-  ---------------------------------------------------------
-  Beginner   jacode.pl  jacode.pl  jacode.pl  jacode4e.pl
-  ---------------------------------------------------------
+  Skill/Use  Amateur    Semipro    Pro        Enterprise  Enterprise(round-trip)
+  -------------------------------------------------------------------------------
+  Expert     jacode.pl  Encode.pm  Encode.pm  Jacode4e    Jacode4e::RoundTrip
+  -------------------------------------------------------------------------------
+  Middle     jacode.pl  jacode.pl  Encode.pm  Jacode4e    Jacode4e::RoundTrip
+  -------------------------------------------------------------------------------
+  Beginner   jacode.pl  jacode.pl  jacode.pl  Jacode4e    Jacode4e::RoundTrip
+  -------------------------------------------------------------------------------
 
 =head1 AUTHOR
 
@@ -11707,7 +11718,12 @@ This project was originated by Kazumasa Utashiro E<lt>utashiro@iij.ad.jpE<gt>.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is free software;
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018 INABA Hitoshi E<lt>ina@cpan.org>E<gt> in a CPAN
 
@@ -11913,13 +11929,6 @@ I am thankful to all persons.
  Larry Wall, Perl
  http://www.perl.org/
 
- Kazumasa Utashiro, jcode.pl
- ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
- http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
- ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
- http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
- https://twitter.com/uta46/status/11578906320
-
  mikeneko creator club, Private manual of jcode.pl
  http://mikeneko.creator.club.ne.jp/~lab/kcode/jcode.html
 
@@ -11958,5 +11967,24 @@ I am thankful to all persons.
 
  TechLION vol.26
  https://type.jp/et/feature/1569
+
+ jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
+ ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+ http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
+ ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
+ http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
+ https://twitter.com/uta46/status/11578906320
+
+ jacode - Perl program for Japanese character code conversion
+ https://metacpan.org/search?q=jacode.pl
+
+ Jacode4e - jacode.pl-like program for enterprise
+ https://metacpan.org/pod/Jacode4e
+
+ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
+ https://metacpan.org/pod/Jacode4e::RoundTrip
+
+ Modern::Open - Autovivification, Autodie, and 3-args open support
+ https://metacpan.org/pod/Modern::Open
 
 =cut

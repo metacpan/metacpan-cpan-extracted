@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.670';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.671';
 #ABSTRACT: Text based data file ('Gnuplot style')
 
 use 5.010;
@@ -14,6 +14,7 @@ use Scalar::Util 'looks_like_number';
 use Module::Load 'load';
 use Lab::Moose::DataFile::Read;
 use List::Util 'any';
+use Time::HiRes 'time';
 use namespace::autoclean;
 
 extends 'Lab::Moose::DataFile';
@@ -204,16 +205,17 @@ sub log_comment {
 sub _add_plot_handle {
     my ( $self, %args ) = validated_hash(
         \@_,
-        plot    => { isa => 'Lab::Moose::Plot' },
-        type    => { isa => enum( [qw/2d pm3d/] ) },
-        curves  => { isa => 'ArrayRef[HashRef]' },
-        legend  => { isa => 'Maybe[Str]' },
-        refresh => { isa => 'Str' },
+        plot             => { isa => 'Lab::Moose::Plot' },
+        type             => { isa => enum( [qw/2d pm3d/] ) },
+        curves           => { isa => 'ArrayRef[HashRef]' },
+        legend           => { isa => 'Maybe[Str]', optional => 1 },
+        refresh          => { isa => 'Str' },
+        refresh_interval => { isa => 'Lab::Moose::PosNum' },
     );
 
     my $plots = $self->plots();
 
-    push @{$plots}, {%args};
+    push @{$plots}, { %args, last_refresh_time => time() };
 }
 
 sub _add_2d_plot {
@@ -228,6 +230,7 @@ sub _add_2d_plot {
         curve_options    => { isa => 'HashRef',           default  => {} },
         legend           => { isa => 'Str',               optional => 1 },
         refresh => { isa => 'Str', default => 'point' },
+        refresh_interval => { isa => 'Lab::Moose::PosNum', default => 0 },
     );
 
     my $error_msg     = "Provide either 'x/y' or 'curves' arguments";
@@ -260,7 +263,8 @@ sub _add_2d_plot {
         }
     }
 
-    my $refresh = delete $args{refresh};
+    my $refresh          = delete $args{refresh};
+    my $refresh_interval = delete $args{refresh_interval};
 
     my %default_plot_options = (
         xlabel => $curves->[0]->{x},
@@ -286,11 +290,12 @@ sub _add_2d_plot {
     my $plot = Lab::Moose::Plot->new(%args);
 
     $self->_add_plot_handle(
-        plot    => $plot,
-        type    => '2d',
-        curves  => $curves,
-        legend  => $legend_column,
-        refresh => $refresh,
+        plot             => $plot,
+        type             => '2d',
+        curves           => $curves,
+        legend           => $legend_column,
+        refresh          => $refresh,
+        refresh_interval => $refresh_interval,
     );
 }
 
@@ -306,6 +311,7 @@ sub _add_pm3d_plot {
         plot_options     => { isa => 'HashRef',           default  => {} },
         curve_options    => { isa => 'HashRef',           default  => {} },
         refresh => { isa => 'Str', default => 'block' },
+        refresh_interval => { isa => 'Lab::Moose::PosNum', default => 0 },
     );
 
     my $error_msg = "Provide either 'x/y/z' or 'curves' arguments";
@@ -326,7 +332,8 @@ sub _add_pm3d_plot {
         }
     }
 
-    my $refresh = delete $args{refresh};
+    my $refresh          = delete $args{refresh};
+    my $refresh_interval = delete $args{refresh_interval};
 
     my %default_plot_options = (
         pm3d    => 'implicit map corners2color c1',
@@ -353,14 +360,14 @@ sub _add_pm3d_plot {
         }
     }
 
-    my $plot  = Lab::Moose::Plot->new(%args);
-    my $plots = $self->plots();
-    push @{$plots}, {
-        plot    => $plot,
-        type    => 'pm3d',
-        curves  => $curves,
-        refresh => $refresh,
-    };
+    my $plot = Lab::Moose::Plot->new(%args);
+    $self->_add_plot_handle(
+        plot             => $plot,
+        type             => 'pm3d',
+        curves           => $curves,
+        refresh          => $refresh,
+        refresh_interval => $refresh_interval,
+    );
 }
 
 sub add_plot {
@@ -455,12 +462,21 @@ sub add_plot {
 
 sub _refresh_plot {
     my $self = shift;
-    my ($index) = validated_list(
+    my ( $index, $force ) = validated_list(
         \@_,
         index => { isa => 'Int' },
+        force => { isa => 'Bool' },
     );
     my $plots = $self->plots();
     my $plot  = $plots->[$index];
+
+    # Is it time to replot?
+    if ( not $force
+        and time() - $plot->{last_refresh_time} < $plot->{refresh_interval} )
+    {
+        return;
+    }
+    $plot->{last_refresh_time} = time();
 
     if ( not defined $plot ) {
         croak "no plot with name at index $index";
@@ -563,9 +579,10 @@ sub _refresh_plot {
 
 sub refresh_plots {
     my $self = shift;
-    my ($refresh) = validated_list(
+    my ( $refresh, $force ) = validated_list(
         \@_,
-        refresh => { isa => 'Str', optional => 1 },
+        refresh => { isa => 'Str',  optional => 1 },
+        force   => { isa => 'Bool', default  => 0 },
     );
 
     my @plots = @{ $self->plots() };
@@ -586,7 +603,7 @@ sub refresh_plots {
     }
 
     for my $index (@indices) {
-        $self->_refresh_plot( index => $index );
+        $self->_refresh_plot( index => $index, force => $force );
     }
 }
 
@@ -606,7 +623,7 @@ Lab::Moose::DataFile::Gnuplot - Text based data file ('Gnuplot style')
 
 =head1 VERSION
 
-version 3.670
+version 3.671
 
 =head1 SYNOPSIS
 
@@ -796,6 +813,10 @@ Default for 2D plots. Replot for each new row.
 Default for 3D plots. Replot when finishing a block.
 
 =back
+
+=item * refresh_interval
+
+Minimum time between replots. Default: replot as often as C<refresh> attribute allows.
 
 =item * hard_copy        
 

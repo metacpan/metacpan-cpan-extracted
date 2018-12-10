@@ -1,8 +1,10 @@
 package R1;
 
 use Test::Lib;
-
 use Moo::Role;
+
+use namespace::clean;
+
 use T1;
 
 has r1_1 => (

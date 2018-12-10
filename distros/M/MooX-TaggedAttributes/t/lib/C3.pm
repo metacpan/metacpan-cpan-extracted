@@ -3,6 +3,8 @@ package C3;
 use Moo;
 extends 'B3';
 
+use namespace::clean;
+
 has c3_1 => (
     is      => 'ro',
     T1_1    => 'should not stick',

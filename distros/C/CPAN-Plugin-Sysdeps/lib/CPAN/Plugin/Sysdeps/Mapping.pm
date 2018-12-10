@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.53';
+our $VERSION = '0.54';
 
 # shortcuts
 #  os and distros
@@ -447,6 +447,11 @@ sub mapping {
        [package => 'capstone']],
       [like_debian,
        [package => 'libcapstone-dev']], # but test failures with Capstone 0.6 @ jessie
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^6\.},
+	package => []], # N/A for centos6
+       [package => 'capstone-devel']],
      ],
 
      [cpanmod => 'CDB::TinyCDB',
@@ -468,9 +473,17 @@ sub mapping {
 
      [cpanmod => 'Ceph::Rados',
       #[os_freebsd,
-      # [package => 'ceph-devel']], # XXX Doesnt build for FreeBSD 10.x
+      # [package => 'ceph']], # XXX installation takes ~375MB --- could it be made smaller?
       [like_debian,
        [package => 'librados-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^7\.},
+	package => 'librados2-devel'],
+       [linuxdistro => 'fedora',
+	linuxdistroversion => '28',
+	package => 'librados-devel'], # XXX but compilation errors
+      ],
      ],
 
      [cpanmod => 'Chipcard::PCSC',
@@ -847,10 +860,10 @@ sub mapping {
 
      [cpanmod => 'Devel::IPerl',
       [like_debian,
-       [linuxdistrocodename => [qw(stretch)],
-	[package => [qw(libzmq3-dev ipython jupyter-console jupyter-notebook libmagic-dev)]],
-       [package => [qw(libzmq3-dev ipython ipython-notebook libmagic-dev)]], # as specified in https://metacpan.org/source/ZMUGHAL/Devel-IPerl-0.006/README.md
-       ]]
+       [before_debian_stretch,
+	[package => [qw(libzmq3-dev ipython ipython-notebook libmagic-dev)]]], # as specified in https://metacpan.org/source/ZMUGHAL/Devel-IPerl-0.006/README.md
+       [package => [qw(libzmq3-dev ipython jupyter-console jupyter-notebook libmagic-dev)]],
+      ],
      ],
 
      [cpanmod => 'Devel::Jemallctl',
@@ -1093,7 +1106,14 @@ sub mapping {
 	[package => 'libgccjit-5-dev']],
        [linuxdistrocodename => [qw(stretch)],
 	[package => 'libgccjit-6-dev']],
+       [linuxdistrocodename => [qw(bionic)],
+	[package => 'libgccjit-7-dev']], # use matching with current gcc, don't use libgccjit-8-dev | libgccjit-6-dev | libgccjit-5-dev
+       [linuxdistrocodename => [qw(buster)],
+	[package => 'libgccjit-8-dev']], # use matching with current gcc, don't use libgccjit-7-dev | libgccjit-6-dev
       ],
+      [like_fedora,
+       [linuxdistro => 'fedora', # not available for CentOS6 or 7
+	[package => 'libgccjit-devel']]],
      ],
 
      [cpanmod => 'GD',
@@ -1251,7 +1271,7 @@ sub mapping {
        [package => 'libgnome2-dev']], # does not work, module does not look into /usr/include/libgnome-2.0/
      ],
 
-     [cpanmod => ['GnuPG', 'GnuPG::Interface', 'Module::Signature'],
+     [cpanmod => ['GnuPG', 'Module::Signature'],
       [os_freebsd,
        [package => 'gnupg1'] #  XXX what about gnupg (version 2)?
       ],
@@ -1263,6 +1283,20 @@ sub mapping {
        [package => 'gnupg']],
       [like_fedora,
        [package => 'gnupg2']],
+     ],
+
+     [cpanmod => 'GnuPG::Interface',
+      [os_freebsd,
+       [package => 'gnupg1'] #  XXX what about gnupg (version 2)?
+      ],
+      [os_dragonfly,
+       [package => 'gnupg']],
+      [os_openbsd,
+       [package => 'gnupg']],
+      [like_debian,
+       [package => 'gnupg']],
+      [like_fedora,
+       [package => 'gnupg']], # does not work with gnupg2
      ],
 
      [cpanmod => 'Goo::Canvas',
@@ -1372,11 +1406,13 @@ sub mapping {
       [like_debian,
        [package => 'libgtkimageview-dev']]],
 
-     [cpanmod => 'Gtk2::Notify', # but compilation errors, see https://rt.cpan.org/Ticket/Display.html?id=67467
+     [cpanmod => ['Gtk2::Notify', 'Gtk3::Notify'], # but compilation errors, see https://rt.cpan.org/Ticket/Display.html?id=67467
       [os_freebsd,
        [package => 'libnotify']],
       [like_debian,
        [package => 'libnotify-dev']],
+      [like_fedora,
+       [package => 'libnotify-devel']],
      ],
 
      [cpanmod => 'Gtk2::Spell',
@@ -1641,6 +1677,15 @@ sub mapping {
        [package => [qw(freetype giflib libpng jpeg libtiff)]]],
      ],
 
+     [cpanmod => 'Imager::File::WEBP',
+      [os_freebsd,
+       [package => 'webp']], # but tests fail with "undefined symbol: WebPFree" on older freebsd (9)
+      [like_debian,
+       [package => 'libwebp-dev']], # but tests fail with "undefined symbol: WebPFree" on jessie+xenial
+      [like_fedora,
+       [package => 'libwebp-devel']], # but test or compilation failures with centos6+7; fedora28 works
+     ],
+
      [cpanmod => 'Imager::Font::T1',
       [os_freebsd,
        [package => 't1lib']],
@@ -1665,9 +1710,11 @@ sub mapping {
 	[package => 'openjdk-7-jdk']],
        [linuxdistrocodename => [qw(stretch xenial)],
 	[package => 'openjdk-8-jdk']],
+       [linuxdistrocodename => [qw(buster bionic)],
+	[package => 'openjdk-11-jdk']],
       ],
       [like_fedora,
-       [package => 'java-1.8.0-openjdk-devel | java-1.7.0-openjdk-devel | java-1.6.0-openjdk-devel']],
+       [package => 'java-11-openjdk-devel | java-9-openjdk-devel | java-1.8.0-openjdk-devel | java-1.7.0-openjdk-devel | java-1.6.0-openjdk-devel']],
      ],
 
      [cpanmod => 'Inline::Lua',
@@ -1898,6 +1945,10 @@ sub mapping {
 	[package => 'libsystemd-journal-dev']],
        # sid, stretch and xenial
        [package => 'libsystemd-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^7\.},
+	package => 'systemd-devel']],
      ],
 
      [cpanmod => 'LMDB_File',
@@ -1994,7 +2045,10 @@ sub mapping {
      [cpanmod => 'Math::MPFI',
       # XXX what about freebsd?
       [like_debian,
-       [package => 'libmpfi-dev']]],
+       [package => 'libmpfi-dev']],
+      [like_fedora,
+       [package => 'mpfi-devel']],
+     ],
 
      [cpanmod => 'Math::RngStream',
       [os_freebsd,
@@ -2365,6 +2419,10 @@ sub mapping {
        [package => 'glfw']],
       [like_debian,
        [package => 'libglfw3-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^7\.},
+	package => 'glfw-devel']],
       [os_darwin,
        [package => 'glfw']],
      ],

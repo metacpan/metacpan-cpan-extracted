@@ -22,7 +22,7 @@ $config->comment( "comment with a trailing backslash: \\" );
 eval { $config->set( FOO_SIMPLE_SET => 'bar' ) };
 diag $@ if $@;
 
-foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh command.com cmd.exe ksh 44bsd-csh jsh powershell.exe fish ))
+foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh command.com cmd.exe ksh 44bsd-csh jsh powershell.exe pwsh fish ))
 {
   subtest $shell => sub {
     my $shell_path = find_shell($shell);

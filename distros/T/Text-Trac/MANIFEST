@@ -4,18 +4,6 @@
 .tidyallrc
 .travis.yml
 Changes
-inc/Module/AutoInstall.pm
-inc/Module/Install.pm
-inc/Module/Install/AutoInstall.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Scripts.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Text/Trac.pm
 lib/Text/Trac/BlockNode.pm
 lib/Text/Trac/Blockquote.pm
@@ -45,7 +33,8 @@ lib/Text/Trac/Table.pm
 lib/Text/Trac/Text.pm
 lib/Text/Trac/Ul.pm
 Makefile.PL
-MANIFEST            This list of files
+MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
 script/trac2html
 t/00-load.t
@@ -122,9 +111,11 @@ t/expected/padre_wikistart_noclass_noid_nospan.html
 t/expected/padre_wxformbuilder_noclass_noid_nospan.html
 t/expected/padre_wxwidgets_noclass_noid_nospan.html
 t/TestTextTrac.pm
-xt/version.t
-xt/pod-coverage.t
-xt/pod.t
 xt/95-tidyall.t
 xt/96-perl-critic.t
 xt/boilerplate.t
+xt/pod-coverage.t
+xt/pod.t
+xt/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

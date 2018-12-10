@@ -11,6 +11,7 @@ build_requires:
   IPC::Open3: '0'
   Moo: '2.003004'
   Test2::V0: '0'
+  Test::CleanNamespaces: '0'
   Test::Lib: '0'
   Test::More: '0'
   perl: '5.006'
@@ -34,7 +35,7 @@ no_index:
 provides:
   MooX::TaggedAttributes:
     file: lib/MooX/TaggedAttributes.pm
-    version: '0.05'
+    version: '0.07'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '2.12'
@@ -49,5 +50,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes
   repository: git://github.com/djerius/moox-taggedattributes.git
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'YAML::Tiny version 1.70'
