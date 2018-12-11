@@ -3,12 +3,15 @@ abstract: 'Simple backups based on rsync'
 author:
   - 'John Gravatt <john@gravatt.org>'
 build_requires:
-  File::ShareDir::Install: '0'
+  File::Path: '0'
+  File::Touch: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir: '0'
+  File::ShareDir::Install: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,13 +30,11 @@ requires:
   Devel::Confess: '0'
   Env: '0'
   File::RandomGenerator: '0'
-  File::ShareDir: '0'
-  File::ShareDir::Install: '0'
   File::Slurp: '0'
   Modern::Perl: '0'
   Sys::Hostname: '0'
   Time::localtime: '0'
   Unix::Syslog: '0'
   perl: '5.006'
-version: '0.35'
+version: '0.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

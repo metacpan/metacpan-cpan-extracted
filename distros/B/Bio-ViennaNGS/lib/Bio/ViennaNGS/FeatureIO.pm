@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2017-06-10 19:07:22 michl>
+# Last changed Time-stamp: <2018-11-25 14:37:31 mtw>
 package Bio::ViennaNGS::FeatureIO;
 
 use Bio::ViennaNGS;
@@ -58,6 +58,8 @@ has '_entries' => ( # of elements in $self->data
 		   lazy => 1,
 		  );
 
+with 'Bio::ViennaNGS::FeatureBase';
+
 sub BUILD { # call a parser method, depending on $self->instanceOf
   my $self = shift;
   my $this_function = (caller(0))[3];
@@ -115,6 +117,7 @@ sub count_entries {
   $self->_entries($cnt);
 }
 
+# TODO ensure FeatureBase is handled correctly
 sub parse_bedgraph_file{
   my ($self,$filename) = @_;
   my $this_function = (caller(0))[3];
@@ -141,7 +144,8 @@ sub parse_bed6_file{
   $file = read_file( $file, array_ref => 1, chomp =>1 );
 
   if ($typ == 2){ # initialize an empty FeatureChain object
-    $fc = Bio::ViennaNGS::FeatureChain->new(type => "feature");
+    $fc = Bio::ViennaNGS::FeatureChain->new(type => "feature",
+					    base => $self->base);
    }
 
   #  print "********** in parse_bed6: typ= $typ ************\n";
@@ -152,14 +156,15 @@ sub parse_bed6_file{
 					 end=>$feat[2],
 					 name=>$feat[3],
 					 score=>$feat[4],
-					 strand=>$feat[5]);
+					 strand=>$feat[5],
+					 base=>$self->base);
     if($typ == 0){ # ArrayRef of individual Feature objects
       push @{$self->data}, $feat;
     }
     elsif ($typ == 1) { # ArrayRef of FeatureChain objects, one per Feature object
       $fc = Bio::ViennaNGS::FeatureChain->new(type => "feature",
-					      chain => [$feat]);
-      #      $fc->count_entries();
+					      chain => [$feat],
+					      base => $self->base);
       push @{$self->data}, $fc;
     }
     elsif($typ == 2){
@@ -167,7 +172,7 @@ sub parse_bed6_file{
       $fc->count_entries();
     }
     else{
-      croak "ERROR [$this_function] don't know how to handle typ $typ";
+      croak "ERROR [$this_function] don't know how to handle type $typ";
     }
   } #end foreach
   if ($typ == 2) { push @{$self->data}, $fc; }
@@ -221,6 +226,7 @@ feature annotation classes
 					       file => "file.bed6",
 					       filetype => 'Bed6',
 					       instanceOf => 'Feature',
+                                               base => 0,
 					      );
 
   # initialize a FeatureIO object from a Bed12 file
@@ -228,12 +234,14 @@ feature annotation classes
 					       file => "file.bed12",
 					       filetype => 'Bed12',
 					       instanceOf => 'Bed',
+                                               base => 0,
 					      );
 
   # initialize a FeatureIO object from a bedGraph file
   my $obj = Bio::ViennaNGS::FeatureIO->new(file       => "file.bg",
                                            filetype   => "BedGraph",
                                            instanceOf => "BedGraph",
+                                           base => 0,
                                           );
 
 
@@ -270,6 +278,10 @@ adjusted to L<Bio::ViennaNGS::FeatureChain> in the future.
 In case of pasring bedGraph data, C<$self-E<gt>instanceOf> is ignored
 and C<$self-E<gt>data> holds an ArrayRef to individual
 L<Bio::ViennaNGS::BedGraph> objects.
+
+L<Bio::ViennaNGS::FeatureIO> implements the
+L<Bio::ViennaNGS::FeatureBase> role, i.e. it is aware of 0-based
+(default) or 1-based features (aka BED intervals).
 
 =head1 METHODS
 
@@ -310,7 +322,7 @@ Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2016 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
+Copyright (C) 2014-2018 Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

@@ -20,6 +20,21 @@
 #######################################################################
 
 
+2018-12-10  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000455 released
+
+	* Updated Makefile.PL - updated Cygwin
+	  dependency from libisl10 to libisl15.
+
+	* Repaired Makefile.PL for latest Cygwin
+	  release.
+
+	* Removed -Werror from Win32::OLE make file.
+
+	* Added $(CHMOD) to installbin in Makefile.PL.
+
+
 2018-12-09  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000454 released

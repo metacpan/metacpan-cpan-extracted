@@ -5,7 +5,7 @@ package App::SpeedTest;
 use strict;
 use warnings;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 1;
 __END__
@@ -188,13 +188,16 @@ This option will show all servers in the selection with the distance in
 kilometers to the server.
 
  $ speedtest --list --country=IS
- 4998: GreenQloud                     Hafnarfjordur   2066.12 km
- 4141: Vodafone                       Reykjavík       2068.59 km
- 4820: 365                            Reykjavík       2068.59 km
- 4818: Siminn                         Reykjavik       2068.59 km
- 1092: Hringidan ehf                  Reykjavik       2068.59 km
- 3684: Nova                           Reykjavik       2068.59 km
- 3644: Snerpa                         Isafjordur      2222.57 km
+   1: 10661 - Tengir hf              Akureyri    1980.02 km
+   2: 21605 - Premis ehf             Reykjavík   2039.16 km
+   3:  3684 - Nova                   Reykjavik   2039.16 km
+   4:  6471 - Gagnaveita Reykjavikur Reykjavik   2039.16 km
+   5: 10650 - Nova VIP               Reykjavik   2039.16 km
+   6: 16148 - Hringidan              Reykjavik   2039.16 km
+   7:  4818 - Siminn                 Reykjavik   2039.16 km
+   8: 17455 - Hringdu                Reykjavík   2039.16 km
+   9:  4141 - Vodafone               Reykjavík   2039.16 km
+  10:  3644 - Snerpa                 Isafjordur  2192.27 km
 
 =item -p | --ping
 X<-p>
@@ -204,16 +207,16 @@ Show a list of servers in the selection with their latency in ms.
 Be very patient if running this with L</--all>.
 
  $ speedtest --ping --cc=BE
- 5151: Combell                        Brussels         148.45 km     120 ms
- 4812: Universite Catholique de Louva Louvain-La-Neuv  159.41 km     122 ms
- 2419: VOO                            Liege            154.15 km     131 ms
- 4904: Verixi SPRL                    Louvain-La-Neuv  159.41 km     137 ms
- 4320: EDPnet                         Sint-Niklaas     128.45 km     258 ms
- 4319: Mobistar NV                    Evere            145.15 km     308 ms
- 3457: iGlobe bvba                    Diegem           141.28 km     340 ms
- 5867: Teleweb                        Lokeren          141.00 km     541 ms
- 2955: Nucleus BVBA                   Antwerp          111.57 km 4000000 ms
- 2848: Cu.be Solutions                Diegem           141.28 km 4000000 ms
+   1: 10986 - Proximus             Schaarbeek         169.72 km      58 ms
+   2:  4812 - Universite Catholiqâ€¦ Louvain-La-Neuve   186.05 km      66 ms
+   3: 12627 - Proximus             Brussels           172.22 km      67 ms
+   4: 12306 - VOO                  Liège              185.52 km      79 ms
+   5: 21086 - ASP                  Brussels           172.22 km      91 ms
+   6:  4319 - Orange Belgium       Brussels           172.22 km     127 ms
+   7:  4320 - EDPnet               Sint-Niklaas       147.26 km     489 ms
+   8:  2955 - Nucleus BVBA         Antwerp            132.91 km 4000000 ms
+   9:  2848 - Cu.be Solutions      Diegem             165.51 km 4000000 ms
+  10:  5151 - Combell              Brussels           172.22 km 4000000 ms
 
 If a server does not respond, a very high latency is used as default.
 
@@ -233,19 +236,36 @@ to do all required tests.
  $ speedtest -T3 -c NL -Q2
  Testing for 80.x.y.z : XS4ALL Internet BV (NL)
 
- Using 4358:  52.33 km      64 ms KPN
- Test download ..                                      Download:   30.497 Mbit/s
- Test upload   ..                                      Upload:     32.366 Mbit/s
+ Using 13218:  26.52 km      25 ms XS4ALL Internet BV
+ Test download ..                                      Download     31.807 Mbit/s
+ Test upload   ..                                      Upload       86.587 Mbit/s
 
- Using 4045:  52.33 km      66 ms SoftLayer Technologies, Inc.
- Test download ..                                      Download:   31.971 Mbit/s
- Test upload   ..                                      Upload:     33.503 Mbit/s
+ Using 15850:  26.09 km      25 ms QTS Data Centers
+ Test download ..                                      Download     80.763 Mbit/s
+ Test upload   ..                                      Upload       77.122 Mbit/s
 
- Using 3386:  52.33 km      67 ms NFOrce Entertainment B.V.
- Test download ..                                      Download:   28.022 Mbit/s
- Test upload   ..                                      Upload:     33.221 Mbit/s
+ Using 11365:  26.09 km      27 ms Vancis
+ Test download ..                                      Download    106.022 Mbit/s
+ Test upload   ..                                      Upload       82.891 Mbit/s
 
-=item -s# | --server=#
+ Rank 01: Server:  11365   26.09 km      27 ms,  DL:  106.022 UL:   82.891
+ Rank 02: Server:  15850   26.09 km      25 ms,  DL:   80.763 UL:   77.122
+ Rank 03: Server:  13218   26.52 km      25 ms,  DL:   31.807 UL:   86.587
+
+ $ speedtest -1v0 -T5
+ DL:  200.014 Mbit/s, UL:  159.347 Mbit/s, SRV: 13218
+ DL:  203.599 Mbit/s, UL:  166.247 Mbit/s, SRV: 15850
+ DL:  207.249 Mbit/s, UL:  134.957 Mbit/s, SRV: 11365
+ DL:  195.490 Mbit/s, UL:  172.109 Mbit/s, SRV: 5972
+ DL:  179.413 Mbit/s, UL:  160.309 Mbit/s, SRV: 2042
+
+ Rank 01: Server:  15850   26.09 km      30 ms,  DL:  203.599 UL:  166.247
+ Rank 02: Server:   5972   26.09 km      32 ms,  DL:  195.490 UL:  172.109
+ Rank 03: Server:  13218   26.52 km      23 ms,  DL:  200.014 UL:  159.347
+ Rank 04: Server:  11365   26.09 km      31 ms,  DL:  207.249 UL:  134.957
+ Rank 05: Server:   2042   51.41 km      33 ms,  DL:  179.413 UL:  160.309
+
+=item -s# | --server=# | --server=filename
 X<-s>
 X<--server>
 
@@ -260,6 +280,33 @@ always test against the same server.
  Test download ........................................Download:   92.633 Mbit/s
  Test upload   ........................................Upload:     92.552 Mbit/s
  DL:   92.633 Mbit/s, UL:   92.552 Mbit/s
+
+If you pass a filename, it is expected to reflect a server-like structure as
+received from the speedtest server-list, possibly completed with upload- and
+download URL's:
+
+  {   cc      => "NL",
+      country => "Netherlands",
+      host    => "unlisted.host.amsterdam:8080",
+      id      => 9999,
+      lat     => "52.37316",
+      lon     => "4.89122",
+      name    => "Amsterdam",
+      ping    => 20.0,
+      sponsor => "Dam tot Damloop",
+      url     => "http://unlisted.host.amsterdam/speedtest/speedtest/upload.php",
+      url2    => "http://unlisted.host.amsterdam/speedtest/speedtest/upload.php",
+
+      dl_list => [
+          "http://unlisted.host.amsterdam/files/128.bin",
+          "http://unlisted.host.amsterdam/files/256.bin",
+          # 40 URL's pointing to files in increasing size
+          "http://unlisted.host.amsterdam/files/2G.bin",
+          ],
+      ul_list => [
+          # 40 URL's
+          ],
+      }
 
 =item -t# | --timeout=#
 X<-t>
@@ -354,8 +401,11 @@ Debian wheezy will run with just two additional packages:
 
 =head1 SEE ALSO
 
+As an alternative to L<speedtest.net|http://www.speedtest.net/>, you
+could consider L<http://compari.tech/speed|http://compari.tech/speed>.
+
 The L<speedtest-cli|https://github.com/sivel/speedtest-cli> project
-that inspired me to improve a broken CLI written in python into out
+that inspired me to improve a broken CLI written in python into our
 beloved language Perl.
 
 =head1 CONTRIBUTING
@@ -386,7 +436,7 @@ personal use, but was asked to make it publicly available as application.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 H.Merijn Brand
+Copyright (C) 2014-2018 H.Merijn Brand
 
 =head1 LICENSE
 

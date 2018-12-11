@@ -6,21 +6,22 @@ use Backup::EZ;
 use Data::Dumper;
 use Test::More;
 
-system("t/nuke.pl");
-system("t/pave.pl");
+require "t/common.pl";
+
+nuke();
+pave();
 
 my $ez;
 eval {
 	$ez = Backup::EZ->new(
-						   conf         => 't/ezbackup_user.conf',
-						   exclude_file => 'share/ezbackup_exclude.rsync',
-						   dryrun       => 0,
+		conf         => 't/ezbackup_user.conf',
+		exclude_file => 'share/ezbackup_exclude.rsync',
+		dryrun       => 0,
 	);
 };
 ok($ez);
 
-ok(	$ez->backup);
+ok( $ez->backup );
 
-
-system("t/nuke.pl");
+nuke();
 done_testing();

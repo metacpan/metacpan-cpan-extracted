@@ -1,7 +1,7 @@
 requires "Exporter" => "0";
-requires "List::SomeUtils" => "0.50";
+requires "List::SomeUtils" => "0.56";
 requires "List::Util" => "1.45";
-requires "List::UtilsBy" => "0.10";
+requires "List::UtilsBy" => "0.11";
 requires "base" => "0";
 requires "strict" => "0";
 requires "warnings" => "0";
@@ -23,6 +23,7 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Code::TidyAll" => "0.56";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";
   requires "Cwd" => "0";
   requires "File::Spec" => "0";
@@ -48,6 +49,5 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
 };

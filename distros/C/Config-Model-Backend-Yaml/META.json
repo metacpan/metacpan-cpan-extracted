@@ -1,0 +1,74 @@
+{
+   "abstract" : "Read and write config as a YAML data structure",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Config-Model-Backend-Yaml",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Model" : "2.130",
+            "Config::Model::Backend::Any" : "0",
+            "Config::Model::Exception" : "0",
+            "File::Path" : "0",
+            "Log::Log4perl" : "0",
+            "YAML::XS" : "0.69",
+            "base" : "0",
+            "boolean" : "0",
+            "parent" : "0",
+            "perl" : "v5.12.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config::Model::BackendMgr" : "0",
+            "Config::Model::Tester" : "3.006",
+            "Config::Model::Tester::Setup" : "0",
+            "ExtUtils::testlib" : "0",
+            "Path::Tiny" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "ddumont at cpan.org",
+         "web" : "https://github.com/dod38fr/config-model-backend-yaml/issues"
+      },
+      "homepage" : "https://github.com/dod38fr/config-model/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dod38fr/config-model-backend-yaml.git",
+         "web" : "http://github.com/dod38fr/config-model-backend-yaml"
+      }
+   },
+   "version" : "2.131",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

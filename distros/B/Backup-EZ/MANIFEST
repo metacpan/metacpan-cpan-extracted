@@ -1,8 +1,10 @@
+.includepath
 bin/ezbackup
 Changes
 ignore.txt
 lib/Backup/EZ.pm
 lib/Backup/EZ/Dir.pm
+Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 MYMETA.json
@@ -23,6 +25,7 @@ t/17-missing-dir.t
 t/18-exclude.t
 t/19-chunked.t
 t/boilerplate.t
+t/common.pl
 t/ezbackup.conf
 t/ezbackup2.conf
 t/ezbackup_chunked.conf
@@ -32,8 +35,6 @@ t/ezbackup_missing_dir.conf
 t/ezbackup_reldir.conf
 t/ezbackup_user.conf
 t/manifest.t
-t/nuke.pl
-t/pave.pl
 t/pod-coverage.t.ignore
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

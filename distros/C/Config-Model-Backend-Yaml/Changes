@@ -1,0 +1,7 @@
+NEXT
+
+  This module was spinned off Config::Model 2.130. Here are the changes
+  since version 2.130:
+    * Read and write boolean values to and from YAML (Depends on YAML::XS)
+    * YAML::XS is configured to ignore Perl/* tags. I.e. Perl object cannot
+      be created with this backend.

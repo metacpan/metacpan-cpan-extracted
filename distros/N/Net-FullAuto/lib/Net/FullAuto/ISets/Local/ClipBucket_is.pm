@@ -2059,6 +2059,8 @@ END
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -vp /google-drive','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'chown -v ec2-user:ec2-user /google-drive','__display__');
    my $substitute_email_module='%NL%'.
 '#####################################################%NL%'.
 '# Inserted by FullAuto to handle Amazon SES passwords%NL%'.

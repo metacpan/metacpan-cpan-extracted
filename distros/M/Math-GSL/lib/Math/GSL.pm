@@ -26,7 +26,7 @@ our %EXPORT_TAGS = ( all => \@EXPORT_OK, );
 
 our ($GSL_PREC_DOUBLE, $GSL_PREC_SINGLE, $GSL_PREC_APPROX ) = 0 .. 2;
 our $GSL_MODE_DEFAULT = $GSL_PREC_DOUBLE;
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ Math::GSL - Perl interface to the GNU Scientific Library (GSL)
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,7 @@ L<Math::GSL::Const>           - Various Constants
 
 L<Math::GSL::DHT>             - Discrete Hankel Transforms
 
-L<Math::GSL::Deriv>            - Numerical Derivative
+L<Math::GSL::Deriv>           - Numerical Derivative
 
 L<Math::GSL::Eigen>           - Eigenvalues and Eigenvectors
 
@@ -141,11 +141,15 @@ L<Math::GSL::Randist>         - Random Number Distributions
 
 L<Math::GSL::Roots>           - Root Finding Algorithms
 
+L<Math::GSL::Rstat>           - Running Statistics
+
 L<Math::GSL::SF>              - Special Functions
 
 L<Math::GSL::Siman>           - Simulated Annealing
 
 L<Math::GSL::Sort>            - Sorting
+
+L<Math::GSL::SparseMatrix>    - Sparse Matrices
 
 L<Math::GSL::Spline>          - Splines
 
@@ -159,7 +163,7 @@ L<Math::GSL::Vector>          - N-dimensional Vectors
 
 L<Math::GSL::Wavelet>         - Basic Wavelets
 
-L<Math::GSL::Wavelet2D>        - 2D Wavelets
+L<Math::GSL::Wavelet2D>       - 2D Wavelets
 
 =cut
 

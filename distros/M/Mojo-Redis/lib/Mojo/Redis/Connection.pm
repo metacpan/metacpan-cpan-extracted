@@ -21,6 +21,7 @@ sub DESTROY {
 
 sub disconnect {
   my $self = shift;
+  $self->_reject_queue;
   $self->{stream}->close if $self->{stream};
   return $self;
 }
@@ -151,7 +152,7 @@ sub _on_close_cb {
     return unless $self;
     my ($stream, $err) = @_;
     delete $self->{$_} for qw(id stream);
-    $self->emit(error => $err) if @_ == 2;
+    $self->_reject_queue($err);
     $self->emit('close') if @_ == 1;
     warn qq([@{[$self->_id]}] @{[$err ? "ERROR $err" : "CLOSED"]}\n) if DEBUG;
   };
@@ -210,6 +211,13 @@ sub _parse_message_cb {
     return $p ? $p->reject($err) : $self->emit(error => $err) unless $res;
     return $p ? $p->resolve($res->[0]) : $self->emit(response => $res->[0]);
   };
+}
+
+sub _reject_queue {
+  my ($self, $err) = @_;
+  state $default = 'Premature connection close';
+  for my $p (@{delete $self->{waiting} || []}) { $p      and $p->reject($err      || $default) }
+  for my $i (@{delete $self->{write}   || []}) { $i->[1] and $i->[1]->reject($err || $default) }
 }
 
 sub _write {

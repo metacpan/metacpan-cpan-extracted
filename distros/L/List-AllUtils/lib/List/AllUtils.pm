@@ -3,11 +3,11 @@ package List::AllUtils;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use List::Util 1.45      ();
-use List::SomeUtils 0.50 ();
-use List::UtilsBy 0.10   ();
+use List::SomeUtils 0.56 ();
+use List::UtilsBy 0.11   ();
 
 BEGIN {
     my %imported;
@@ -50,7 +50,7 @@ List::AllUtils - Combines List::Util, List::SomeUtils and List::UtilsBy in one b
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -83,6 +83,13 @@ order.
 
 The docs below come from L<List::Util> 1.31, L<List::SomeUtils> 0.50, and
 L<List::UtilsBy> 0.10.
+
+=head1 WHAT IS EXPORTED?
+
+All this module does is load L<List::Util>, L<List::SomeUtils>, and
+L<List::UtilsBy>, and then re-export everything that they provide. That means
+that regardless of the documentation below, you will get any subroutine that
+your installed version provides.
 
 =head1 LIST-REDUCTION FUNCTIONS
 
@@ -316,15 +323,19 @@ empty list:
 
 =over
 
-=item * Reduction to an identity (boolean)
+=item *
 
-=item * Result is undefined (three-valued)
+Reduction to an identity (boolean)
+
+=item *
+
+Result is undefined (three-valued)
 
 =back
 
 In the first case, the result of the junction applied to the empty list is
 determined by a mathematical reduction to an identity depending on whether
-the underlying comparison is "or" or "and". Conceptually:
+the underlying comparison is "or" or "and".  Conceptually:
 
                     "any are true"      "all are true"
                     --------------      --------------
@@ -332,10 +343,10 @@ the underlying comparison is "or" or "and". Conceptually:
     1 element:      A || 0              A && 1
     0 elements:     0                   1
 
-In the second case, three-value logic is desired, in which a junction applied
-to an empty list returns C<undef> rather than true or false.
+In the second case, three-value logic is desired, in which a junction
+applied to an empty list returns C<undef> rather than true or false
 
-Junctions with a C<_u> suffix implement three-valued logic. Those
+Junctions with a C<_u> suffix implement three-valued logic.  Those
 without are boolean.
 
 =head3 all BLOCK LIST
@@ -428,7 +439,7 @@ Evaluation of BLOCK will immediately stop at the second true value.
 =head3 apply BLOCK LIST
 
 Applies BLOCK to each item in LIST and returns a list of the values after BLOCK
-has been applied. In scalar context, the last element is returned. This
+has been applied. In scalar context, the last element is returned.  This
 function is similar to C<map> but will not modify the elements of the input
 list:
 
@@ -469,7 +480,7 @@ Inserts VALUE after the first item in LIST which is equal to STRING.
 
 Evaluates BLOCK for each pair of elements in ARRAY1 and ARRAY2 and returns a
 new list consisting of BLOCK's return values. The two elements are set to C<$a>
-and C<$b>. Note that those two are aliases to the original value so changing
+and C<$b>.  Note that those two are aliases to the original value so changing
 them will modify the input arrays.
 
   @a = (1 .. 5);
@@ -514,9 +525,9 @@ scalar context, returns the number of unique elements in LIST.
   my $x = uniq 1, 1, 2, 2, 3, 5, 3, 4; # returns 5
   # returns "Mike", "Michael", "Richard", "Rick"
   my @n = distinct "Mike", "Michael", "Richard", "Rick", "Michael", "Rick"
-  # returns '', 'S1', A5' and complains about "Use of uninitialized value"
+  # returns '', undef, 'S1', A5'
   my @s = distinct '', undef, 'S1', 'A5'
-  # returns undef, 'S1', A5' and complains about "Use of uninitialized value"
+  # returns '', undef, 'S1', A5'
   my @w = uniq undef, '', 'S1', 'A5'
 
 C<distinct> is an alias for C<uniq>.
@@ -527,7 +538,7 @@ B<RT#49800> can be used to give feedback about this behavior.
 
 Returns a new list by stripping values in LIST occurring more than once by
 comparing the values as hash keys, except that undef is considered separate
-from ''. The order of elements in the returned list is the same as in LIST.
+from ''.  The order of elements in the returned list is the same as in LIST.
 In scalar context, returns the number of elements occurring only once in LIST.
 
   my @x = singleton 1,1,2,2,3,4,5 # returns 3 4 5
@@ -587,9 +598,9 @@ Negative values are only ok when they refer to a partition previously created:
 =head3 each_array ARRAY1 ARRAY2 ...
 
 Creates an array iterator to return the elements of the list of arrays ARRAY1,
-ARRAY2 throughout ARRAYn in turn. That is, the first time it is called, it
-returns the first element of each array. The next time, it returns the second
-elements. And so on, until all elements are exhausted.
+ARRAY2 throughout ARRAYn in turn.  That is, the first time it is called, it
+returns the first element of each array.  The next time, it returns the second
+elements.  And so on, until all elements are exhausted.
 
 This is useful for looping over more than one array at once:
 
@@ -609,7 +620,7 @@ plain arrays.
 =head3 natatime EXPR, LIST
 
 Creates an array iterator, for looping over an array in chunks of
-C<$n> items at a time. (n at a time, get it?). An example is
+C<$n> items at a time.  (n at a time, get it?).  An example is
 probably a better explanation than I could give in words.
 
 Example:
@@ -830,11 +841,24 @@ that there are more lines of Perl code involved. Therefore, LIST needs to be
 fairly big in order for C<minmax> to win over a naive implementation. This
 limitation does not apply to the XS version.
 
-=head2 *By functions
+=head3 mode LIST
 
-=head3 rev_sort_by
+Calculates the most common items in the list and returns them as a list. This
+is effectively done by string comparisons, so references will be
+stringified. If they implement string overloading, this will be used.
 
-=head3 rev_nsort_by
+If more than one item appears the same number of times in the list, all such
+items will be returned. For example, the mode of a unique list is the list
+itself.
+
+This function B<always> returns a list. That means that in scalar context you
+get a count indicating the number of modes in the list.
+
+=head1 List::UtilsBy Functions
+
+=head2 rev_sort_by
+
+=head2 rev_nsort_by
 
    @vals = rev_sort_by { KEYFUNC } @vals
 
@@ -842,15 +866,15 @@ limitation does not apply to the XS version.
 
 I<Since version 0.06.>
 
-Similar to C<sort_by> and C<nsort_by> but returns the list in the reverse
+Similar to L</sort_by> and L</nsort_by> but returns the list in the reverse
 order. Equivalent to
 
- @vals = reverse sort_by { KEYFUNC } @vals
+   @vals = reverse sort_by { KEYFUNC } @vals
 
 except that these functions are slightly more efficient because they avoid
 the final C<reverse> operation.
 
-=head3 max_by
+=head2 max_by
 
    $optimal = max_by { KEYFUNC } @vals
 
@@ -859,10 +883,10 @@ the final C<reverse> operation.
 Returns the (first) value from C<@vals> that gives the numerically largest
 result from the key function.
 
- my $tallest = max_by { $_->height } @people
+   my $tallest = max_by { $_->height } @people
 
- use File::stat qw( stat );
- my $newest = max_by { stat($_)->mtime } @files;
+   use File::stat qw( stat );
+   my $newest = max_by { stat($_)->mtime } @files;
 
 In scalar context, the first maximal value is returned. In list context, a
 list of all the maximal values is returned. This may be used to obtain
@@ -870,19 +894,29 @@ positions other than the first, if order is significant.
 
 If called on an empty list, an empty list is returned.
 
-For symmetry with the C<nsort_by> function, this is also provided under the
+For symmetry with the L</nsort_by> function, this is also provided under the
 name C<nmax_by> since it behaves numerically.
 
-=head3 min_by
+=head2 min_by
 
    $optimal = min_by { KEYFUNC } @vals
 
    @optimal = min_by { KEYFUNC } @vals
 
-Similar to C<max_by> but returns values which give the numerically smallest
+Similar to L</max_by> but returns values which give the numerically smallest
 result from the key function. Also provided as C<nmin_by>
 
-=head3 uniq_by
+=head2 minmax_by
+
+   ( $minimal, $maximal ) = minmax_by { KEYFUNC } @vals
+
+Similar to calling both L</min_by> and L</max_by> with the same key function
+on the same list. This version is more efficient than calling the two other
+functions individually, as it has less work to perform overall. In the case of
+ties, only the first optimal element found in each case is returned. Also
+provided as C<nminmax_by>.
+
+=head2 uniq_by
 
    @vals = uniq_by { KEYFUNC } @vals
 
@@ -890,19 +924,19 @@ Returns a list of the subset of values for which the key function block
 returns unique values. The first value yielding a particular key is chosen,
 subsequent values are rejected.
 
- my @some_fruit = uniq_by { $_->colour } @fruit;
+   my @some_fruit = uniq_by { $_->colour } @fruit;
 
 To select instead the last value per key, reverse the input list. If the order
 of the results is significant, don't forget to reverse the result as well:
 
- my @some_fruit = reverse uniq_by { $_->colour } reverse @fruit;
+   my @some_fruit = reverse uniq_by { $_->colour } reverse @fruit;
 
 Because the values returned by the key function are used as hash keys, they
 ought to either be strings, or at least well-behaved as strings (such as
 numbers, or object references which overload stringification in a suitable
 manner).
 
-=head3 partition_by
+=head2 partition_by
 
    %parts = partition_by { KEYFUNC } @vals
 
@@ -911,30 +945,28 @@ distributed according to the result of the key function block. Each value will
 be an ARRAY ref containing all the values which returned the string from the
 key function, in their original order.
 
- my %balls_by_colour = partition_by { $_->colour } @balls;
+   my %balls_by_colour = partition_by { $_->colour } @balls;
 
 Because the values returned by the key function are used as hash keys, they
 ought to either be strings, or at least well-behaved as strings (such as
 numbers, or object references which overload stringification in a suitable
 manner).
 
-=head3 count_by
+=head2 count_by
 
    %counts = count_by { KEYFUNC } @vals
-
-I<Since version 0.07.>
 
 Returns a key/value list of integers, giving the number of times the key
 function block returned the key, for each value in the list.
 
- my %count_of_balls = count_by { $_->colour } @balls;
+   my %count_of_balls = count_by { $_->colour } @balls;
 
 Because the values returned by the key function are used as hash keys, they
 ought to either be strings, or at least well-behaved as strings (such as
 numbers, or object references which overload stringification in a suitable
 manner).
 
-=head3 zip_by
+=head2 zip_by
 
    @vals = zip_by { ITEMFUNC } \@arr0, \@arr1, \@arr2,...
 
@@ -943,34 +975,32 @@ invoked with values from across each each of the given ARRAY references. Each
 value in the returned list will be the result of the function having been
 invoked with arguments at that position, from across each of the arrays given.
 
- my @transposition = zip_by { [ @_ ] } @matrix;
+   my @transposition = zip_by { [ @_ ] } @matrix;
 
- my @names = zip_by { "$_[1], $_[0]" } \@firstnames, \@surnames;
+   my @names = zip_by { "$_[1], $_[0]" } \@firstnames, \@surnames;
 
- print zip_by { "$_[0] => $_[1]\n" } [ keys %hash ], [ values %hash ];
+   print zip_by { "$_[0] => $_[1]\n" } [ keys %hash ], [ values %hash ];
 
 If some of the arrays are shorter than others, the function will behave as if
 they had C<undef> in the trailing positions. The following two lines are
 equivalent:
 
- zip_by { f(@_) } [ 1, 2, 3 ], [ "a", "b" ]
- f( 1, "a" ), f( 2, "b" ), f( 3, undef )
+   zip_by { f(@_) } [ 1, 2, 3 ], [ "a", "b" ]
+   f( 1, "a" ), f( 2, "b" ), f( 3, undef )
 
 The item function is called by C<map>, so if it returns a list, the entire
 list is included in the result. This can be useful for example, for generating
 a hash from two separate lists of keys and values
 
- my %nums = zip_by { @_ } [qw( one two three )], [ 1, 2, 3 ];
- # %nums = ( one => 1, two => 2, three => 3 )
+   my %nums = zip_by { @_ } [qw( one two three )], [ 1, 2, 3 ];
+   # %nums = ( one => 1, two => 2, three => 3 )
 
 (A function having this behaviour is sometimes called C<zipWith>, e.g. in
 Haskell, but that name would not fit the naming scheme used by this module).
 
-=head3 unzip_by
+=head2 unzip_by
 
    $arr0, $arr1, $arr2, ... = unzip_by { ITEMFUNC } @vals
-
-I<Since version 0.09.>
 
 Returns a list of ARRAY references containing the values returned by the
 function block, when invoked for each of the values given in the input list.
@@ -980,78 +1010,70 @@ ARRAY reference will contain all the values returned in the first position by
 the function block, the second will contain all the values from the second
 position, and so on.
 
- my ( $firstnames, $lastnames ) = unzip_by { m/^(.*?) (.*)$/ } @names;
+   my ( $firstnames, $lastnames ) = unzip_by { m/^(.*?) (.*)$/ } @names;
 
 If the function returns lists of differing lengths, the result will be padded
 with C<undef> in the missing elements.
 
-This function is an inverse of C<zip_by>, if given a corresponding inverse
+This function is an inverse of L</zip_by>, if given a corresponding inverse
 function.
 
-=head3 extract_by
+=head2 extract_by
 
    @vals = extract_by { SELECTFUNC } @arr
-
-I<Since version 0.05.>
 
 Removes elements from the referenced array on which the selection function
 returns true, and returns a list containing those elements. This function is
 similar to C<grep>, except that it modifies the referenced array to remove the
 selected values from it, leaving only the unselected ones.
 
- my @red_balls = extract_by { $_->color eq "red" } @balls;
+   my @red_balls = extract_by { $_->color eq "red" } @balls;
 
- # Now there are no red balls in the @balls array
+   # Now there are no red balls in the @balls array
 
 This function modifies a real array, unlike most of the other functions in this
 module. Because of this, it requires a real array, not just a list.
 
-This function is implemented by invoking C<splice()> on the array, not by
+This function is implemented by invoking C<splice> on the array, not by
 constructing a new list and assigning it. One result of this is that weak
 references will not be disturbed.
 
- extract_by { !defined $_ } @refs;
+   extract_by { !defined $_ } @refs;
 
 will leave weak references weakened in the C<@refs> array, whereas
 
- @refs = grep { defined $_ } @refs;
+   @refs = grep { defined $_ } @refs;
 
 will strengthen them all again.
 
-=head3 extract_first_by
+=head2 extract_first_by
 
    $val = extract_first_by { SELECTFUNC } @arr
 
-I<Since version 0.10.>
-
-A hybrid between C<extract_by> and C<List::Util::first>. Removes the first
+A hybrid between L</extract_by> and C<List::Util::first>. Removes the first
 element from the referenced array on which the selection function returns
 true, returning it.
 
-As with C<extract_by>, this function requires a real array and not just a
-list, and is also implemented using C<splice()> so that weak references are
+As with L</extract_by>, this function requires a real array and not just a
+list, and is also implemented using C<splice> so that weak references are
 not disturbed.
 
 If this function fails to find a matching element, it will return an empty
 list in list context. This allows a caller to distinguish the case between
 no matching element, and the first matching element being C<undef>.
 
-=head3 weighted_shuffle_by
+=head2 weighted_shuffle_by
 
    @vals = weighted_shuffle_by { WEIGHTFUNC } @vals
-
-I<Since version 0.07.>
 
 Returns the list of values shuffled into a random order. The randomisation is
 not uniform, but weighted by the value returned by the C<WEIGHTFUNC>. The
 probability of each item being returned first will be distributed with the
 distribution of the weights, and so on recursively for the remaining items.
 
-=head3 bundle_by
+=head2 bundle_by
 
    @vals = bundle_by { BLOCKFUNC } $number, @vals
-
-I<Since version 0.07.>
 
 Similar to a regular C<map> functional, returns a list of the values returned
 by C<BLOCKFUNC>. Values from the input list are given to the block function in
@@ -1130,7 +1152,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

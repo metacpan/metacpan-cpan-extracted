@@ -5,7 +5,7 @@ author:
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: Author, CPAN::Meta::Converter version 2.150005
+generated_by: Author, CPAN::Meta::Converter version 2.150010
 license: perl
 meta-spec: 
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,15 +14,17 @@ name: App-SpeedTest
 provides: 
   App::SpeedTest: 
     file: speedtest
-    version: '0.19'
+    version: '0.20'
 recommends: 
-  Data::Peek: '0.44'
-  Getopt::Long: '2.48'
-  HTML::TreeBuilder: '5.03'
-  LWP::UserAgent: '6.13'
-  Socket: '2.021'
-  Time::HiRes: '1.9728'
-  XML::Simple: '2.20'
+  Data::Peek: '0.48'
+  Getopt::Long: '2.5'
+  HTML::TreeBuilder: '5.07'
+  LWP::UserAgent: '6.36'
+  Socket: '2.027'
+  Test::More: '1.302141'
+  Text::CSV_XS: '1.37'
+  Time::HiRes: '1.9759'
+  XML::Simple: '2.25'
 requires: 
   Data::Dumper: 0
   Data::Peek: 0
@@ -40,4 +42,4 @@ resources:
   homepage: https://metacpan.org/pod/App::SpeedTest
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/speedtest
-version: '0.19'
+version: '0.20'

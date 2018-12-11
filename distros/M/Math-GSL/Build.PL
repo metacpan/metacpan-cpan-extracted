@@ -24,6 +24,7 @@ use Data::Dumper;
 use Module::Build;
 use lib 'inc';
 use GSLBuilder;
+use Ver2Func;
 use File::Spec::Functions qw/:ALL/;
 
 our $MIN_GSL_VERSION = "1.15";
@@ -33,7 +34,7 @@ my $gsl_conf;
 $gsl_conf = check_gsl_version();
 $gsl_conf = check_gsl_version_pkgconfig() if not $gsl_conf;
 
-my ($major,$minor) = split /\./, $gsl_conf->{gsl_version};
+my ($major,$minor,$tiny) = split /\./, $gsl_conf->{gsl_version};
 my $ccflags = $gsl_conf->{gsl_cflags};
 my $ldflags = $gsl_conf->{gsl_libs};
 
@@ -70,44 +71,34 @@ if ($Config{archname} =~ /x86_64|amd64/ ) {
     $ldflags .= ' -fPIC  -fno-omit-frame-pointer ';
     $ccflags .= ' -fPIC  -fno-omit-frame-pointer ';
 }
-$ccflags = $Config{cccdlflags} . ' ' . $ldflags;
+# this causes warnings with clang + OSX
+$ccflags = $Config{cccdlflags} . ' ' . $ccflags unless GSLBuilder::is_darwin();
 
-my @Subsystems = grep { ! /^Test$/ } GSLBuilder::subsystems();
-push @Subsystems, "Multilarge" if $major >= 2;
-push @Subsystems, "Multifit" if $major >= 2;
+my $ver2func = Ver2Func->new( $gsl_conf->{gsl_version} );
 
 my $cleanup = qq{
                  xs/*_wrap*.c core *.core swig/system.i swig/renames.i
                  swig/*.o Makefile Math-GSL-* tmp* pod2ht*.tmp _build pm
                  lib/Math/GSL/[A-z]+/* blib *.so *.orig
-                } . join " ", map { catfile( (qw/lib Math GSL/, "$_.pm") ) } @Subsystems;
+                } . join " ", map { catfile( (qw/lib Math GSL/, "$_.pm") ) } $ver2func->subsystems;
 
 
 $ldflags = '-shared ' . $ldflags unless GSLBuilder::is_darwin();
 
-my $ver2func = do(catfile(qw/inc ver2func/));
+my $swig_version;
 
 unless (GSLBuilder::is_release()) {
-    my $swig_ver = swig_version();
-    if ((split(/\./, $swig_ver))[0] < 2) {
+    $swig_version = swig_version();
+    if ((split(/\./, $swig_version))[0] < 2) {
         print "
 ***
-*** You need to have SWIG 2.X or greater installed. (You have $swig_ver).
+*** You need to have SWIG 2.0 or greater installed. (You have $swig_version).
 *** Get SWIG at http://www.swig.org/\n";
         exit 0;
     }
 }
 
 $ccflags = "$ccflags " . ($ENV{CC_FLAGS}||''),
-
-my $c_deps      = GSLBuilder::c_modules();
-my $swig_source = [
-                   map {
-                       my $deps = [ catfile("pod", "$_.pod") ];
-                       push @$deps, catfile("c","$_.c"), catfile("c","$_.h") if $c_deps->{$_};
-                       [ catfile("swig", "$_.i"), $deps ]
-                   } @Subsystems ,
-                  ];
 
 my $builder = GSLBuilder->new(
     module_name         => 'Math::GSL',
@@ -117,8 +108,9 @@ my $builder = GSLBuilder->new(
     dist_version_from   => catfile(qw/lib Math GSL.pm/),
     include_dirs        => [],
     extra_linker_flags  => $ldflags,
-    extra_compiler_flags=> $ccflags,
-    swig_flags          => $swig_flags,
+    extra_compiler_flags=> $ccflags . " " . $swig_flags,
+    # suppress swig warnings about GSL source code
+    swig_flags          => $swig_flags . " -w451,454",
     license             => 'gpl',
     meta_merge     => {
         resources => {
@@ -127,23 +119,25 @@ my $builder = GSLBuilder->new(
     },
     build_requires => {
         'Test::Most'      => '0.31',
+        'Test::More'      => 0,
         'Test::Exception' => '0.21',
         'Test::Class'     => '0.12',
         'Test::Taint'     => '1.06',
     },
     requires => {
+        'Math::Complex'   => 0,
         'Scalar::Util'    => 0,
         'version'         => '0.77',
-        'perl'            => '5.8.0',
+        'perl'            => '5.8.1',
         'parent'          => 0,
     },
     sign                  => 0,
     configure_requires => {
         'PkgConfig'       => '0.07720',
         'Module::Build'   => '0.38',
+        'Alien::GSL'      => '1.01',
     },
-    swig_source           => $swig_source,
-    ver2func => $ver2func,
+    swig_version          => $swig_version,
     current_version       => $gsl_conf->{gsl_version},
     gsl_prefix            => $gsl_conf->{gsl_prefix},
 );
@@ -160,9 +154,8 @@ print "Have a great day!\n";
 
 sub swig_version {
     my $swig = GSLBuilder::swig_binary_name();
-
-    my $cmd = "$swig -version";
-    my $out = `$cmd`;
+    my $cmd  = "$swig -version";
+    my $out  = `$cmd`;
 
     if ($?) {
         die "Can't run [$cmd] : $out";
@@ -182,7 +175,9 @@ sub modify_env {
                    /usr/local/pkgconfig /usr/libdata/pkgconfig
                    /usr/local/libdata/pkgconfig /opt/pkgconfig);
 
-    $ENV{PKG_CONFIG_PATH} = join(":", @guess) . $ENV{PKG_CONFIG_PATH};
+    unshift @guess, $ENV{PKG_CONFIG_PATH} if $ENV{PKG_CONFIG_PATH};
+
+    $ENV{PKG_CONFIG_PATH} = join(":", @guess);
 }
 
 sub try_compile {
@@ -202,9 +197,9 @@ sub try_compile {
     my $cccmd = $args{cccmd};
     my $errornull;
     my $ccflags =  $Config{'ccflags'};
-        $ccflags .= " $args{ccflags}" if $args{ccflags};
+    $ccflags .= " $args{ccflags}" if $args{ccflags};
 
-        if ($args{silent} ) {
+    if ($args{silent} ) {
         $errornull = "2>/dev/null" unless defined $errornull;
     } else {
         $errornull = '';

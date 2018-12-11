@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECCGOST;
 
 #
-# $Id: ECCGOST.pm 1701 2018-07-28 07:36:34Z willem $
+# $Id: ECCGOST.pm 1723 2018-12-03 09:17:48Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1701 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1723 $)[1];
 
 
 =head1 NAME
@@ -41,9 +41,9 @@ use strict;
 use integer;
 use warnings;
 
-use constant ECCGOST_OK => Net::DNS::SEC::libcrypto->can('ECCGOST_verify');
+use constant ECCGOST_configured => Net::DNS::SEC::libcrypto->can('ECCGOST_verify');
 
-BEGIN { die unless ECCGOST_OK }					# not needed on voyage
+BEGIN { die 'No "use Net::DNS::SEC" or no ECCGOST' unless ECCGOST_configured }
 
 BEGIN { require Digest::GOST::CryptoPro }
 

@@ -24,6 +24,10 @@ no_index:
 requires:
   Dist::Zilla::Plugin::ReversionOnRelease: '0.06'
   perl: '5.008005'
-version: '0.1'
+resources:
+  bugtracker: https://github.com/vlyon/Dist-Zilla-Plugin-ReversionAfterRelease/issues
+  homepage: https://github.com/vlyon/Dist-Zilla-Plugin-ReversionAfterRelease
+  repository: https://github.com/vlyon/Dist-Zilla-Plugin-ReversionAfterRelease.git
+version: '0.2'
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 1

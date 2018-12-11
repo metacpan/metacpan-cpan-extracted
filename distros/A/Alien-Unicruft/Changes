@@ -2,5 +2,8 @@
 ##
 ## Change log for perl distribution Alien::Unicruft
 
+v0.002 Tue, 11 Dec 2018 09:19:22 +0100 moocow
+	+ version bump for libunicruft v0.23
+
 v0.001 Fri, 07 Dec 2018 10:55:14 +0100 moocow
 	+ initial version

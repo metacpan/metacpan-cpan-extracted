@@ -4,7 +4,7 @@
       "xaicron <xaicron@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.3",
    "license" : [
       "perl_5"
    ],
@@ -47,17 +47,23 @@
             "AnyEvent::Socket" : "0",
             "Cache::Memory::Simple" : "0",
             "Crypt::JWT" : "0",
+            "Crypt::PK::ECC" : "0.059",
             "JSON" : "0",
             "Moo" : "0",
             "Protocol::HTTP2::Client" : "0",
             "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
       "Net::APNs::HTTP2" : {
          "file" : "lib/Net/APNs/HTTP2.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -71,7 +77,11 @@
          "web" : "https://github.com/xaicron/p5-Net-APNs-HTTP2"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:XAICRON",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_contributors" : [
+      "colin <colink@perldreamer.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

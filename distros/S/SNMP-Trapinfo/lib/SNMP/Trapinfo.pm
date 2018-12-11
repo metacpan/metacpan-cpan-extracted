@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Safe;		# Safe module, creates a compartment for eval's and tests for disabled commands
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 sub AUTOLOAD {
         my $self = shift;
@@ -64,11 +64,14 @@ sub expand {
 	my $string = shift;
 	return "" if ! defined $string;
 	my $key;
-	while ( ($key) = ($string =~ /\${([\w\-\.\*:]+)}/) ) {
+	while ( ($key) = ($string =~ /\$\{([\w\-\.\*:]+)}/) ) {
 		my $newval;
 		my ($action, $line) = $key =~ /^([PV])(\d+)?$/;
 		if ($action && $line) {
-			$newval = $self->$action($line) || "(null)";
+			$newval = $self->$action($line);
+			if (!defined $newval) {
+				$newval = "(null)";
+			}
 		} elsif ($key eq "DUMP") {
 			my %h = %{$self->data};
 			delete $h{"SNMP-COMMUNITY-MIB::snmpTrapCommunity"};
@@ -79,9 +82,15 @@ sub expand {
 			$newval = $self->hostip;
 		} else {
 			if ($key =~ /\*/) {
-				$newval = $self->match_key($key) || "(null)";
+				$newval = $self->match_key($key);
+				if (!defined $newval) {
+					$newval =  "(null)";
+				}
 			} else {
-				$newval = $self->data->{$key} || "(null)";
+				$newval = $self->data->{$key};
+				if (!defined $newval) {
+					$newval = "(null)";
+				}
 			}
 		}
 
@@ -89,7 +98,7 @@ sub expand {
 		# Otherwise possible infinite loop
 		# though not sure why (see tests for examples)
 		#$string =~ s/\${$key}/$newval/;
-		$string =~ s/\${([\w\-\.\*:]+)}/$newval/;	
+		$string =~ s/\$\{([\w\-\.\*:]+)\}/$newval/;
 
 	}
 	return $string;
@@ -211,14 +220,12 @@ sub fully_translated {
 sub P {
 	my ($self, $line) = @_;
 	$_ = $self->{P}->[--$line];
-	$_ = "" unless defined $_;
 	return $_;
 }
 
 sub V {
 	my ($self, $line) = @_;
 	$_ = $self->{V}->[--$line];
-	$_ = "" unless defined $_;
 	return $_;
 }
 

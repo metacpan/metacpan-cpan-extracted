@@ -1,10 +1,11 @@
-# $Id: 10-keyset.t 1705 2018-08-23 10:24:02Z willem $	-*-perl-*-
+# $Id: 10-keyset.t 1716 2018-09-24 09:51:04Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
 my %prerequisite = (
+	'Digest::SHA'	=> 5.23,
 	'Net::DNS::SEC' => 1.01,
 	'MIME::Base64'	=> 2.13,
 	);

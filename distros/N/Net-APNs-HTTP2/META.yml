@@ -2,11 +2,12 @@
 abstract: 'APNs Provider API for Perl'
 author:
   - 'xaicron <xaicron@gmail.com>'
-build_requires: {}
+build_requires:
+  Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,13 +26,14 @@ no_index:
 provides:
   Net::APNs::HTTP2:
     file: lib/Net/APNs/HTTP2.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   AnyEvent: '0'
   AnyEvent::Handle: '0'
   AnyEvent::Socket: '0'
   Cache::Memory::Simple: '0'
   Crypt::JWT: '0'
+  Crypt::PK::ECC: '0.059'
   JSON: '0'
   Moo: '0'
   Protocol::HTTP2::Client: '0'
@@ -40,6 +42,9 @@ resources:
   bugtracker: https://github.com/xaicron/p5-Net-APNs-HTTP2/issues
   homepage: https://github.com/xaicron/p5-Net-APNs-HTTP2
   repository: git://github.com/xaicron/p5-Net-APNs-HTTP2.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:XAICRON
+x_contributors:
+  - 'colin <colink@perldreamer.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

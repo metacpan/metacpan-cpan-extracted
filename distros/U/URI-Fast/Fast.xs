@@ -1001,7 +1001,7 @@ SV* get_auth(pTHX_ SV *uri_obj) {
 }
 
 static
-SV* split_path(pTHX_ SV* sv_uri) {
+SV* split_path(pTHX_ SV* sv_uri, int include_leading) {
   uri_t *uri = URI(sv_uri);
   size_t len, segment_len, brk, idx = 0;
   AV* arr = newAV();
@@ -1012,6 +1012,11 @@ SV* split_path(pTHX_ SV* sv_uri) {
 
   if (len > 0) {
     if (str[0] == '/') {
+      if (include_leading) {
+        tmp = newSVpvn("", 0);
+        av_push(arr, tmp);
+      }
+
       ++idx; // skip past leading /
     }
 
@@ -2169,8 +2174,10 @@ SV* get_auth(uri_obj)
 
 SV* split_path(uri)
   SV* uri
+  ALIAS:
+    split_path_compat = 1
   CODE:
-    RETVAL = split_path(aTHX_ uri);
+    RETVAL = split_path(aTHX_ uri, ix == 1 ? 1 : 0);
   OUTPUT:
     RETVAL
 

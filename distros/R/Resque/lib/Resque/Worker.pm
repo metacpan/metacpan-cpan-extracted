@@ -1,6 +1,6 @@
 package Resque::Worker;
 # ABSTRACT: Does the hard work of babysitting Resque::Job's
-$Resque::Worker::VERSION = '0.36';
+$Resque::Worker::VERSION = '0.37';
 use Moose;
 with 'Resque::Encoder';
 
@@ -415,7 +415,7 @@ Resque::Worker - Does the hard work of babysitting Resque::Job's
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 ATTRIBUTES
 

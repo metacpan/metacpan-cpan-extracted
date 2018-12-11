@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1705 2018-08-23 10:24:02Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1723 2018-12-03 09:17:48Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -76,8 +76,22 @@ WriteMakefile(
 
 package MY;				## customise generated Makefile
 
-sub special_targets {
-	return join "\n\n", '.NOTPARALLEL:', shift->SUPER::special_targets();
+sub test {
+	return shift->SUPER::test() if $^O =~ /cygwin|MSWin/i;
+
+	join '', shift->SUPER::test(), <<'END';
+# suppress parallel test execution
+FULLPERLRUN = HARNESS_OPTIONS=c $(FULLPERL)
+END
+}
+
+
+sub dist {
+	return join '', shift->SUPER::dist(), <<'END';
+
+# $(PERM_RWX) raises security issues downstream
+PREOP =	$(NOECHO) $(CHMOD) $(PERM_RW) demo$(DFSEP)*
+END
 }
 
 
@@ -91,12 +105,12 @@ sub install {
 		s|([/])[/]+|$1|g;				# remove gratuitous //s
 	}
 
-	eval 'require Net::DNS::SEC';
+	eval 'require Net::DNS::SEC; $Net::DNS::SEC::VERSION =~ s/(\.\d)$/${1}0/';
 	my @version = grep $_, ( 'version', $Net::DNS::SEC::VERSION );
 
-	my $nameregex = '\W+Net\WDNS\WSEC.pm$';
+	my $nameregex = '\W+Net\W+DNS\W+SEC.pm$';
 	my @installed = grep $_ && m/$nameregex/io, values %INC;
-	my %hidden;
+	my %occluded;
 
 	foreach (@installed) {
 		my $path = $1 if m/^(.+)$nameregex/i;
@@ -106,11 +120,11 @@ sub install {
 			last if $_ eq $path;
 		}
 		foreach ( grep !$seen{$_}, @INC ) {
-			$hidden{$_}++;				# hidden libraries
+			$occluded{$_}++;			# suppress install
 		}
 	}
 
-	return $self->SUPER::install(@_) unless $hidden{$install_site};
+	return $self->SUPER::install(@_) unless $occluded{$install_site};
 
 	my $message;
 	warn $message = <<"AMEN";

@@ -1,3 +1,12 @@
+0.20	2018-12-10
+
+    * Versions
+    * It's 2017
+    * Show a ranked summary of the tries with --try
+    * It's 2018
+    * Deal with proxy settings in env
+    * Add index to list/ping lists
+
 0.19	2016-01-02
 
     * Try multiple addresses for the server list RT#110400

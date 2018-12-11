@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.032';
+our $VERSION = '2.033';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.032
+Version 2.033
 
 =cut
 
@@ -560,9 +560,8 @@ Separate the columns from each other and the header from the body with lines.
 
 =head3 Color
 
-Enables the support for color and text formatting escape sequences.
-
-Before the output it is added a reset (C<\e[0m>) at the end of each row.
+Enables the support for color and text formatting escape sequences (SGR) if set to C<Enable>. Before the output it is
+added a reset (C<\e[0m>) at the end of each row.
 
 =head3 Keep Header
 

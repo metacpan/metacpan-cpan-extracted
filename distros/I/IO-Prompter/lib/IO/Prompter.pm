@@ -1,5 +1,6 @@
 use 5.010;
 package IO::Prompter;
+use utf8;
 
 use warnings;
 no if $] >= 5.018000, warnings => 'experimental';
@@ -9,7 +10,7 @@ use Contextual::Return qw< PUREBOOL BOOL SCALAR METHOD VOID LIST RETOBJ >;
 use Scalar::Util qw< openhandle looks_like_number >;
 use Symbol       qw< qualify_to_ref >;
 
-our $VERSION = '0.004014';
+our $VERSION = '0.004015';
 
 my $fake_input;     # Flag that we're faking input from the source
 
@@ -1012,7 +1013,7 @@ sub _generate_buffered_reader_from {
                 else {
                     $input = $local_fake_input;
                     sleep 1;
-                    for (split q{}, $local_fake_input) {
+                    for ($local_fake_input =~ m/\X/g) {
                         _simulate_typing();
                         $outputter_ref->(-echostyle => $opt_ref->{-echo}($_));
                     }
@@ -1351,11 +1352,13 @@ sub _generate_unbuffered_reader_from {
                         # Redraw...
                         my $input_pre  = substr($input.' ',0,length($input)-$insert_offset+1);
                         my $input_post = substr($input.' ',length($input)-$insert_offset);
-                        my $display_pre  = join q{}, map { $opt_ref->{-echo}($_) } split //, $input_pre;
-                        my $display_post = join q{}, map { $opt_ref->{-echo}($_) } split //, $input_post;
+                        my $display_pre 
+                            = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
+                        my $display_post
+                            = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
                         $outputter_ref->( -echostyle =>
                               "\b" x length($display_pre)
-                            . join(q{}, map { $opt_ref->{-echo}($_) } split //, $input)
+                            . join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g)
                             . q{ } x length($opt_ref->{-echo}(q{ }))
                             . "\b" x length($display_post)
                         );
@@ -1402,7 +1405,7 @@ sub _generate_unbuffered_reader_from {
                 elsif (!$prev_was_verbatim && $next =~ /\A\R\z/) {
                     # Complete faked line, if faked input incomplete...
                     if ($faking && length($local_fake_input)) {
-                        for (split q{}, $local_fake_input) {
+                        for ($local_fake_input =~ m/\X/g) {
                             _simulate_typing();
                             $outputter_ref->(-echostyle => $opt_ref->{-echo}($_));
                         }
@@ -1495,11 +1498,13 @@ sub _generate_unbuffered_reader_from {
                     if ($insert_offset || $prev_insert_offset) {
                         my $input_pre  = substr($input,0,length($input)-$prev_insert_offset);
                         my $input_post = substr($input,length($input)-$insert_offset);
-                        my $display_pre  = join q{}, map { $opt_ref->{-echo}($_) } split //, $input_pre;
-                        my $display_post = join q{}, map { $opt_ref->{-echo}($_) } split //, $input_post;
+                        my $display_pre 
+                            = join q{}, map { $opt_ref->{-echo}($_) } $input_pre =~ m/\X/g;
+                        my $display_post
+                            = join q{}, map { $opt_ref->{-echo}($_) } $input_post =~ m/\X/g;
                         $outputter_ref->( -echostyle =>
                               "\b" x length($display_pre)
-                            . join(q{}, map { $opt_ref->{-echo}($_) } split //, $input)
+                            . join(q{}, map { $opt_ref->{-echo}($_) } $input =~ m/\X/g)
                             . "\b" x length($display_post)
                         );
                     }
@@ -1716,7 +1721,7 @@ IO::Prompter - Prompt for input, read it, clean it, return it.
 
 =head1 VERSION
 
-This document describes IO::Prompter version 0.004014
+This document describes IO::Prompter version 0.004015
 
 
 =head1 SYNOPSIS
@@ -1737,6 +1742,29 @@ This document describes IO::Prompter version 0.004014
                 wisdom => [ 'cosmic', 'folk' ],
           }, '>';
 
+
+=head1 CAVEATS
+
+=over
+
+=item 1.
+
+Several features of this module are known to have problems under
+Windows. If using that platform, you may have more success
+(and less distress) by trying IO::Prompt::Tiny, IO::Prompt::Simple,
+or IO::Prompt::Hooked first.
+
+=item 2.
+
+By default the C<prompt()> subroutine does not return a string; it
+returns an object with overloaded string and boolean conversions.
+This object B<I<always>> evaluates true in boolean contexts, unless the
+read operation actually failed. This means that the object evaluates
+true I<even when the input value is zero or
+an empty string.> See L<"Returning raw data"> to turn off this 
+(occasionally counter-intuitive) behaviour.
+
+=back
 
 =head1 DESCRIPTION
 
@@ -1770,17 +1798,17 @@ return a value (i.e. even on failure), prefix the call with C<scalar>:
     # Only produces as many elements
     # as there were successful inputs...
     my @data = (
-        prompt('Name:'),
-        prompt(' Age:'),
-        prompt(' Sex:'),
+        prompt(' Name:'),
+        prompt('  Age:'),
+        prompt('Score:'),
     );
 
     # Always produces exactly three elements
     # (some of which may be failure objects)...
     my @data = (
-        scalar prompt('Name:'),
-        scalar prompt(' Age:'),
-        scalar prompt(' Sex:'),
+        scalar prompt(' Name:'),
+        scalar prompt('  Age:'),
+        scalar prompt('Score:'),
     );
 
 In void contexts, C<prompt()> still requests input, but also issues a

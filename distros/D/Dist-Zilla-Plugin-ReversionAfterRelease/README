@@ -6,10 +6,9 @@ NAME
 SYNOPSIS
 
       [VersionFromModule]
-      [CopyFilesFromBuild]
-      copy = Changes
-      
       [UploadToCPAN]
+      [CopyFilesFromRelease]
+      filename = Changes
       
       ; commit source files as of "dzil release" with any
       ; allowable modifications (e.g Changes)

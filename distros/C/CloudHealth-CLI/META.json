@@ -1,0 +1,44 @@
+{
+   "abstract" : "A CLI for the CloudHealth API",
+   "author" : [
+      "Jose Luis Martinez <jlmartinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CloudHealth-CLI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ARGV::Struct" : "0",
+            "CloudHealth::API" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pplu/cloudhealth-cli/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pplu/cloudhealth-cli.git",
+         "web" : "https://github.com/pplu/cloudhealth-cli"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

@@ -5,32 +5,34 @@ use warnings FATAL => 'all';
 use Backup::EZ;
 use Data::Dumper;
 use Test::More;
+use File::Path qw(remove_tree);
 
+require "t/common.pl";
 
 ###### NUKE AND PAVE ######
 
-system("t/nuke.pl");
-system("t/pave.pl");
+nuke();
+pave();
 
 ###### RUN TESTS ######
 
 # verify dryrun actually works
 my $ez = Backup::EZ->new(
-						  conf         => 't/ezbackup_missing_dir.conf',
-						  exclude_file => 'share/ezbackup_exclude.rsync',
-						  dryrun       => 1
+	conf         => 't/ezbackup_missing_dir.conf',
+	exclude_file => 'share/ezbackup_exclude.rsync',
+	dryrun       => 1
 );
 die if !$ez;
-system( "rm -rf " . $ez->{conf}->{dest_dir} );
+remove_tree($ez->get_dest_dir);
 
 ok( $ez->backup );
 ok( !$ez->get_list_of_backups() );
 
 # now run for real
 $ez = Backup::EZ->new(
-					conf         => 't/ezbackup_missing_dir.conf',
-					exclude_file => 'share/ezbackup_exclude.rsync',
-					dryrun       => 0
+	conf         => 't/ezbackup_missing_dir.conf',
+	exclude_file => 'share/ezbackup_exclude.rsync',
+	dryrun       => 0
 );
 die if !$ez;
 
@@ -45,6 +47,5 @@ ok( @list == 2 ) or print Dumper \@list;
 my $host = $ez->get_backup_host;
 ok($host);
 
-
-system("t/nuke.pl");
+nuke();
 done_testing();

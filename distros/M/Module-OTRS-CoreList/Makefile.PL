@@ -7,7 +7,7 @@ use 5.008;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "what modules shipped with versions of OTRS (>= 2.3.x)",
+  "ABSTRACT" => "what modules shipped with versions of OTRS (>= 2.3.x) ",
   "AUTHOR" => "Renee Baecker <reneeb\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Pod::Coverage::TrustPod" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }

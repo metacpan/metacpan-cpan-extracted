@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2018-01-10 00:28:46 mtw>
+# Last changed Time-stamp: <2018-11-25 21:40:36 mtw>
 
 package Bio::ViennaNGS::FeatureInterval;
 
@@ -14,7 +14,7 @@ has 'chromosome' => (
 		     isa => 'Str',
 		     required => 1,
 		     predicate => 'has_chromosome',
-	     );
+		    );
 
 has 'start' => (
 		is      => 'rw',
@@ -31,20 +31,31 @@ has 'end' => (
 	     );
 
 has '_length' => ( # length of interval
-		   is => 'rw',
-		   isa => 'Int',
-		   predicate => 'length',
-		   init_arg => undef, # make this unsettable via constructor
+		  is => 'rw',
+		  isa => 'Int',
+		  predicate => 'length',
+		  init_arg => undef, # make this unsettable via constructor
 		 );
+
+with 'Bio::ViennaNGS::FeatureBase';
 
 sub BUILD { # call a parser method, depending on $self->instanceOf
   my $self = shift;
   my $this_function = (caller(0))[3];
+  my $len = undef;
 
-  confess "ERROR [$this_function] \$self->end must be >= than \$self->start"
-    unless ($self->end >= $self->start);
-  my $len = $self->end-$self->start;
-  $self->_length($len);
+  if ($self->base == 0){
+    confess "ERROR [$this_function] \$self->end must be > than \$self->start for 0-based start coordinates [==> start ".eval($self->start)." end ".eval($self->end)." <==]"
+      unless ($self->end > $self->start);
+    $len = eval($self->end)-eval($self->start)-1;
+    $self->_length($len);
+  }
+  else {
+    confess "ERROR [$this_function] \$self->end must be >= than \$self->start for 0-based start coordinates [==> start ".eval($self->start)." end ".eval($self->end)." <==]"
+      unless ($self->end >= $self->start);
+    $len = $self->end-$self->start;
+    $self->_length($len);
+  }
 }
 
 sub dump {

@@ -28,15 +28,15 @@
          "requires" : {
             "Class::Method::Modifiers" : "0",
             "Mojolicious" : "7.42",
-            "Mojolicious::Plugin::MountPSGI" : "0.07",
-            "Role::Tiny" : "0"
+            "Mojolicious::Plugin::MountPSGI" : "0.14",
+            "Role::Tiny" : "2.000001"
          }
       }
    },
    "provides" : {
       "Test::Mojo::Role::PSGI" : {
          "file" : "lib/Test/Mojo/Role/PSGI.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "url" : "http://github.com/jberger/Test-Mojo-Role-PSGI"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

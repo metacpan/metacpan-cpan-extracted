@@ -1,3 +1,10 @@
+0.15    2018-12-10
+
+- Require List::UtilsBy 0.11 and include the docs from that version.
+
+- Require List::SomeUtils 0.56 and include the docs from that version.
+
+
 0.14    2017-02-07
 
 - Re-release after git pull of some changes.

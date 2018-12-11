@@ -437,8 +437,8 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'color' ) {
-                my $prompt = '"Enable ANSI color escapes"';
-                my $list = [ 'NO', 'YES' ];
+                my $prompt = '"ANSI color escapes"';
+                my $list = [ 'No', 'Yes' ]; # , 'Remove'
                 my $sub_menu = [ [ $opt, "  ANSI color escapes", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

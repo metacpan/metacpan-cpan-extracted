@@ -10,14 +10,16 @@ use Data::Printer alias => 'pdump';
 use File::Path;
 use File::RandomGenerator;
 
+require "t/common.pl";
+
 use constant SRC_DIR     => '/tmp/backup_ez_testdata';
 use constant FOO_SUBDIR  => 'dir1/foo';
 use constant SRC_FOO_DIR => sprintf( '%s/%s', SRC_DIR(), FOO_SUBDIR() );
 
 ###### NUKE AND PAVE ######
 
-system("t/nuke.pl");
-system("t/pave.pl");
+nuke();
+pave();
 
 ###### RUN TESTS ######
 
@@ -27,7 +29,7 @@ my $ez = Backup::EZ->new(
     dryrun       => 0
 );
 die if !$ez;
-system( "rm -rf " . $ez->get_dest_dir );
+remove_tree($ez->get_dest_dir);
 
 validate_conf($ez);
 finish_paving($ez);
@@ -60,9 +62,8 @@ $src_count  = get_dir_entry_count(SRC_DIR);
 $dest_count = get_dir_entry_count( get_dest_backup_dir($ez, $list[1]) );
 ok( $src_count == $dest_count, "checking file counts" );
 
-system("t/nuke.pl");
-
 done_testing();
+nuke();
 
 #######################
 

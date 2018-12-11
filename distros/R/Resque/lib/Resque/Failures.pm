@@ -1,6 +1,6 @@
 package Resque::Failures;
 # ABSTRACT: Class for managing Resque failures
-$Resque::Failures::VERSION = '0.36';
+$Resque::Failures::VERSION = '0.37';
 use Moose;
 with 'Resque::Encoder';
 use Class::Load qw(load_class);
@@ -123,7 +123,7 @@ Resque::Failures - Class for managing Resque failures
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 ATTRIBUTES
 
@@ -142,7 +142,7 @@ By default: Resque::Failure::Redis
 
 create() a failure on the failure_class() and save() it.
 
-$failures->throw( %job_description_hash );
+  $failures->throw( %job_description_hash );
 
 See L<Resque> code for a usage example.
 
@@ -150,26 +150,27 @@ See L<Resque> code for a usage example.
 
 Create a new failure on the failure_class() backend.
 
-$failures->create( ... );
+  $failures->create( ... );
 
 =head2 count
 
 How many failures are in the resque system.
 
-my $count = $failures->count();
+  my $count = $failures->count();
 
 =head2 all
 
 Return a range of failures (or an arrayref in scalar context)
 in the same way Resque::peek() does for jobs.
 
-my @failures = $failures->all('my_queue', $opt_start, $opt_count);
+  my @all  = $failures->all; # get all failed jobs
+  my @some = $failures->all(10, 10); # get failure 10 to 20
 
 =head2 clear
 
 Remove all failures.
 
-$failures->clear();
+  $failures->clear();
 
 =head2 requeue
 
@@ -177,7 +178,7 @@ Requeue by index number.
 
 Failure will be updated to note retried date.
 
-$failures->requeue( $index );
+  $failures->requeue( $index );
 
 =head2 remove
 
@@ -188,12 +189,12 @@ sucesive ones will move left, so index will decrese
 one. If you want to remove several ones start removing
 from the rightmost one.
 
-$failures->remove( $index );
+  $failures->remove( $index );
 
 =head2 mass_remove
 
 Remove and optionally requeue all or matching failed jobs. Errors that happen
-after this method is fired will remind untouched.
+after this method is fired will remain untouched.
 
 Filters, if present, are useful to select failed jobs and should be regexes or
 strings that will be matched against any of the following failed job field:

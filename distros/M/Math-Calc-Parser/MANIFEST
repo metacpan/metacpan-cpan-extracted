@@ -15,6 +15,8 @@ lib/ath.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/ath.t
+t/bignum.t
+t/bigrat.t
 t/errors.t
 t/eval.t
 t/functions.t

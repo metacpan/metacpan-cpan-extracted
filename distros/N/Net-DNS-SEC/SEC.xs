@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1705 2018-08-23 10:24:02Z willem $"
+#define XS_Id "$Id: SEC.xs 1716 2018-09-24 09:51:04Z willem $"
 
 
 =head1 NAME
@@ -230,7 +230,8 @@ MODULE = Net::DNS::SEC	PACKAGE = Net::DNS::SEC::libcrypto
 
 PROTOTYPES: DISABLE
 
-void croak_memory_wrap()
+void
+croak_memory_wrap()
 
 SV*
 VERSION(void)

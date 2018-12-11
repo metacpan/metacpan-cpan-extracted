@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 100;
+use Test::More tests => 102;
 BEGIN { use_ok('SNMP::Trapinfo') };
 
 #########################
@@ -64,8 +64,8 @@ cmp_ok( $trap->P(3), 'eq', "sysUpTime", "Got p3 correctly");
 cmp_ok( $trap->P(9), 'eq', "snmpTrapAddress", "Got p9 correctly");
 cmp_ok( $trap->V(5), '==', 2, "Got v5 correctly");
 cmp_ok( $trap->V(8), 'eq', '"PPP LCP Open"', "Got v8 correctly");
-    is( $trap->V(13), '', "No V13 - got blank");
-    is( $trap->P(25), '', "No P25 - got blank");
+    is( $trap->V(13), undef, "No V13 - got blank");
+    is( $trap->P(25), undef, "No P25 - got blank");
     is( $trap->V(12), '0', "Got a zero for V correctly");
     is( $trap->P(12), '0', "Got a zero for P correctly");
 cmp_ok( $trap->expand('Port ${IF-MIB::ifIndex} (${P7}=${V7}) is Up with message ${V8}'), 'eq', 
@@ -248,8 +248,23 @@ cmp_ok( $trap->eval('"${CERENT-454-MIB::cerent454AlarmPortNumber.*.remoteAlarmIn
     is( $trap->last_eval_string, '"(null)" =~ /stuff/', "Expanded correctly");
     is( $trap->expand('${SNMP-COMMUNITY-MIB::snmpTrapCommunity}'), '"*****"', "Password hidden on input");
 
+
+$data = <<EOF;
+localhost
+UDP: [127.0.0.1]:48932->[127.0.0.1]:162
+DISMAN-EXPRESSION-MIB::sysUpTimeInstance 3:23:35:13.48
+SNMPv2-MIB::snmpTrapOID.0 IF-MIB::linkUp
+IBM-6611-APPN-MIB::ibmProd.258.1.1 0
+EOF
+
+$trap = SNMP::Trapinfo->new(\$data, { hide_passwords => 1 } );
+cmp_ok( $trap->eval('${IBM-6611-APPN-MIB::ibmProd.258.1.1} <= 4294967295'),
+	"eq", 1, "Got value of 0");
+is( $trap->expand('${IBM-6611-APPN-MIB::ibmProd.258.1.1} <= 4294967295'), "0 <= 4294967295", "Expands correctly");
+
+
 # Infinite loop tests
-  diag "Doing infinite tests";
+  note "Doing infinite tests";
     is( $trap->eval('"${CERENT-454-MIB::cerent454AlarmPortNumber*}" eq "infinite"'), 0, "No infinite loop! - phew");
     
 

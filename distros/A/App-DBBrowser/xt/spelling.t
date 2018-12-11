@@ -42,3 +42,4 @@ substatement
 MERCHANTIBILITY
 incr
 SQ
+SGR

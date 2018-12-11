@@ -9,7 +9,7 @@ use Moo;
 use Scalar::Util qw(blessed);
 
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 has node => (
     is       => 'ro',
@@ -56,6 +56,21 @@ sub as_hash {
     return \%info;
 }
 
+
+sub as_string {
+    my ($self) = @_;
+
+    my $info = sprintf "%s %s%s%s%s%s",
+        $self->name,
+        $self->datatype,
+        ( $self->length > 0 ? "(" . $self->length . ")" : '' ),
+        ( $self->not_null ? ' NOT NULL' : '' ),
+        ( $self->autoincrement ? ' AUTOINCREMENT' : '' ),
+        $self->default_value;
+
+    return $info;
+}
+
 sub _parse {
     my $self = shift;
 
@@ -100,7 +115,7 @@ MySQL::Workbench::Parser::Column - A column of the ER model
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 METHODS
 
@@ -123,6 +138,24 @@ returns
         autoincrement => '1',
         default_value => '',
     )
+
+=head2 as_string
+
+Returns a stringified version of the column information
+
+    (
+        name          => 'id',
+        datatype      => 'INT',
+        length        => '',
+        precision     => '0',
+        not_null      => '1',
+        autoincrement => '1',
+        default_value => '',
+    )
+
+returns
+
+    id INT NOT NULL AUTOINCREMENT
 
 =head1 ATTRIBUTES
 

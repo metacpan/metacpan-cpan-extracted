@@ -1,0 +1,55 @@
+{
+   "abstract" : "A REST API Client for the CloudHealth API",
+   "author" : [
+      "Jose Luis Martinez <jlmartinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CloudHealth-API",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON::MaybeXS" : "0",
+            "Moo" : "0",
+            "MooX::StrictConstructor" : "0",
+            "Throwable::Error" : "0",
+            "Type::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pplu/cloudhealth-api-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pplu/cloudhealth-api-perl.git",
+         "web" : "https://github.com/pplu/cloudhealth-api-perl"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

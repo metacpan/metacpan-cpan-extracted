@@ -1,17 +1,15 @@
 package POE::Component::Hailo;
-BEGIN {
-  $POE::Component::Hailo::AUTHORITY = 'cpan:HINRIK';
-}
-BEGIN {
-  $POE::Component::Hailo::VERSION = '0.10';
-}
-
+our $AUTHORITY = 'cpan:HINRIK';
+$POE::Component::Hailo::VERSION = '0.11';
 use 5.010;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Carp 'croak';
 use Hailo;
-use POE qw(Wheel::Run Filter::Reference);
+use JSON;
+use LWP::UserAgent;
+use POE qw(Wheel::Run Filter::JSON);
+use Try::Tiny;
 
 sub spawn {
     my ($package, %args) = @_;
@@ -67,7 +65,7 @@ sub _start {
         ProgramArgs => [ %{ $self->{Hailo_args} } ],
         StdoutEvent => '_child_stdout',
         StderrEvent => '_child_stderr',
-        StdioFilter => POE::Filter::Reference->new,
+        StdioFilter => POE::Filter::JSON->new,
         ( $^O eq 'MSWin32' ? ( CloseOnCall => 0 ) : ( CloseOnCall => 1 ) ),
     );
 
@@ -127,7 +125,9 @@ sub _child_stderr {
 
 sub _child_stdout {
     my ($kernel, $self, $input) = @_[KERNEL, OBJECT, ARG0];
-    $kernel->post(@$input{qw(sender event result context)});
+
+    warn $input->{error} if $input->{error};
+    $kernel->post(@$input{qw(sender event result context error)});
     $kernel->refcount_decrement($input->{sender}, __PACKAGE__);
     return;
 }
@@ -158,27 +158,70 @@ sub _main {
         binmode STDOUT;
     }
 
-    my $hailo;
-    eval { $hailo = Hailo->new(%args) };
-    if ($@) {
-        chomp $@;
-        warn "$@\n";
-        return;
-    }
-
     my $raw;
     my $size = 4096;
-    my $filter = POE::Filter::Reference->new;
+    my $filter = POE::Filter::JSON->new;
 
     while (sysread STDIN, $raw, $size) {
         my $requests = $filter->get([$raw]);
         for my $req (@$requests) {
-            my $method = $req->{method};
-            $req->{result} = [$hailo->$method(@{ $req->{args} })];
+            if ($args{server_host}) {
+                _call_hailo_server(@args{qw(server_host server_port)}, $req);
+            }
+            else {
+                _call_hailo_native(\%args, $req);
+            }
             my $response = $filter->put([$req]);
             print @$response;
         }
     }
+
+    return;
+}
+
+sub _call_hailo_native {
+    my ($hailo_args, $request) = @_;
+
+    try {
+        my $hailo = Hailo->new(%$hailo_args);
+        my $method = $request->{method};
+        $request->{result} = [$hailo->$method(@{ $request->{args} })];
+    }
+    catch {
+        $request->{error} = $_;
+    };
+
+    return;
+}
+
+sub _call_hailo_server {
+    my ($host, $port, $request) = @_;
+
+    my %method_map = (
+        learn       => 'learn',
+        learn_reply => 'learn_and_reply',
+        reply       => 'reply',
+    );
+    my $rest_method = $method_map{$request->{method}};
+    return if !$rest_method;
+
+    try {
+        my $ua = LWP::UserAgent->new(
+            default_headers => HTTP::Headers->new(
+                Content_Type => 'application/json'
+            ),
+        );
+        my $raw_response = $ua->post(
+            "http://$host:$port/$rest_method",
+            Content => encode_json({input => $request->{args}[0]}),
+        );
+
+        my $response = decode_json($raw_response->content);
+        $request->{result} = [$response->{reply}];
+    }
+    catch {
+        $request->{error} = $_;
+    };
 
     return;
 }

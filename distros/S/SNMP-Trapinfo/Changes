@@ -1,5 +1,11 @@
 Revision history for Perl extension SNMP::Trapinfo
 
+1.05 2018-12-10
+    Set license to perl_5 (Mohammad S Anwar)
+
+1.04 2018-12-10
+    Fixed 'Unescaped left brace in regex is illegal here' warning message in perl 5.22+
+
 1.03 2014-09-22
     Added option to hide passwords on read of the packet
     Added rv2gv in Safe compartment, which is needed from perl 5.18 onwards

@@ -1,16 +1,15 @@
 #!/pro/bin/perl
 
 # speedtest - test network speed using speedtest.net
-# (m)'16 [2016-01-02] Copyright H.M.Brand 2014-2016
+# (m)'18 [2018-12-10] Copyright H.M.Brand 2014-2018
 
 require 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
-sub usage
-{
+sub usage {
     my $err = shift and select STDERR;
     (my $p = $0) =~ s{.*/}{};
     print <<"EOH";
@@ -27,6 +26,7 @@ usage: $p [ --no-geo | --country=NL ] [ --list | --ping ] [ options ]
        --url          show server url in list
 
     -s --server=nnn   use testserver with id nnn
+       --server=file  use testserver from file
     -t --timeout=nnn  set server timeout to nnn seconds
        --url=sss      use specific server url (do not scan) ext php
        --mini=sss     use specific server url (do not scan) ext from sss
@@ -88,7 +88,7 @@ GetOptions (
     "B|bytes"		=> sub { $unit = [ 8, "byte" ] },
 
     "T|try:5"		=>    \$opt_T,
-    "s|server=i"	=> \my $server,
+    "s|server=s"	=> \my $server,
     "t|timeout=i"	=> \my $timeout,
     "d|download!"	=>    \$opt_d,
     "u|upload!"		=>    \$opt_u,
@@ -102,7 +102,7 @@ GetOptions (
 $opt_C || $opt_P and $opt_v = 0;
 
 use LWP::UserAgent;
-use XML::Simple;
+use XML::Simple; # Can safely be replaced with XML::LibXML::Simple
 use HTML::TreeBuilder;
 use Time::HiRes qw( gettimeofday tv_interval );
 use List::Util qw( min max sum first );
@@ -116,8 +116,7 @@ use Math::Trig;
 	use Data::Peek;
 	$dp = 1;
 	};
-    sub ddumper
-    {
+    sub ddumper {
 	$dp ? DDumper (@_)
 	    : print STDERR Dumper (@_);
 	} # ddumper
@@ -131,6 +130,7 @@ my $ua = LWP::UserAgent->new (
     timeout      => $timeout,
     cookie_jar   => {},
     );
+$ua->env_proxy;
 
 binmode STDOUT, ":encoding(utf-8)";
 
@@ -207,6 +207,18 @@ if ($url || $mini) {
 if ($server) {
     $opt_c = "";
     $opt_a = 1;
+    unless ($server =~ m{^[0-9]+$}) {
+	open my $fh, "<", $server or die;#usage (1);
+	my $data = do { local $/; <$fh>; };
+	print $data;
+	$data =~ m/^\s*\{\s*(['"]?)cc\1\s*=>\s*(["'])[A-Z]{1,3}\2\s*,/ &&
+	$data =~ m/\s(["']?)id\1\s*=>\s*[0-9]+\s*,/ or die;#usage (1);
+	$data = eval $data;
+	$data->{dist} = distance ($client->{lat}, $client->{lon},
+	    $data->{lat}, $data->{lon});
+	($data->{url0} = $data->{url}) =~ s{/speedtest/upload.*}{};
+	$url = $data;
+	}
     }
 else {
     if ($opt_c) {
@@ -247,24 +259,26 @@ else {
 if ($list) {
     my %list = servers ();
     my @fld = qw( id sponsor name dist );
-    my $fmt = "%5d: %-30.30s %-15.15s %7.2f km\n";
+    my $fmt = "%3d: %5d - %-30.30s %-15.15s %7.2f km\n";
     if (defined $url) {
 	push @fld, "url0";
 	$fmt .= "       %s\n";
 	}
-    printf $fmt, @{$list{$_}}{@fld}
+    my $idx = 1;
+    printf $fmt, $idx++, @{$list{$_}}{@fld}
 	for sort { $list{$a}{dist} <=> $list{$b}{dist} } keys %list;
     exit 0;
     }
 
 if ($ping) {
     my @fld = qw( id sponsor name dist ping );
-    my $fmt = "%5d: %-30.30s %-15.15s %7.2f km %7.0f ms\n";
+    my $fmt = "%3d: %5d - %-30.30s %-15.15s %7.2f km %7.0f ms\n";
     if (defined $url) {
 	push @fld, "url0";
 	$fmt .= "       %s\n";
 	}
-    printf $fmt, @{$_}{@fld} for servers_by_ping ();
+    my $idx = 1;
+    printf $fmt, $idx++, @{$_}{@fld} for servers_by_ping ();
     exit 0;
     }
 
@@ -276,6 +290,7 @@ $opt_P and print qq{<?xml version="1.0" encoding="UTF-8" ?>\n<prtg>\n},
 my @srvrs = $url ? ($url) : servers_by_ping ();
 my @hosts = grep { $_->{ping} < 1000 } @srvrs;
 @hosts > $opt_T and splice @hosts, $opt_T;
+my @try;
 foreach my $host (@hosts) {
     $host->{sponsor} =~ s/\s+$//;
     if ($opt_P) {
@@ -296,7 +311,7 @@ foreach my $host (@hosts) {
 	    $s = join " " => "", map { inet_ntoa ($_) } @ad[4 .. $#ad];
 	    }
 	@hosts > 1 and print STDERR "\n";
-	printf STDERR "Using %4d: %6.2f km %7.0f ms%s %s\n",
+	printf STDERR "Using %5d: %6.2f km %7.0f ms%s %s\n",
 	    $host->{id}, $host->{dist}, $host->{ping}, $s, $host->{sponsor};
 	}
     $opt_v > 3 and ddumper $host;
@@ -306,8 +321,9 @@ foreach my $host (@hosts) {
     if ($opt_d) {
 	$opt_v and print STDERR "Test download ";
 	# http://ookla.extraip.net/speedtest/random350x350.jpg
-	my @url = map { ("$base/random${_}x${_}.jpg") x 4 }
-	    350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000;
+	my @url = @{$host->{dl_list} // [
+	    map { ("$base/random${_}x${_}.jpg") x 4 }
+	    350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000 ]};
 	my @rslt;
 	$opt_q and splice @url, $opt_q;
 	foreach my $url (@url) {
@@ -333,12 +349,13 @@ foreach my $host (@hosts) {
 	$opt_v and print STDERR "Test upload   ";
 	my @data = (0 .. 9, "a" .. "Z", "a" .. "z"); # Random pure ASCII data
 	my $data = join "" => map { $data[int rand $#data] } 0 .. 4192;
-	$data = "content1=".($data x 1024); # Total length just over 4 Mb
+	$data = "content1=".($data x 8192); # Total length just over 4 Mb
 	my @rslt;
 	my $url  = $host->{url}; # .php, .asp, .aspx, .jsp
 	# see $upld->{mintestsize} and $upld->{maxchunksize} ?
 	my @size = map { $_ * 1000 }
-	    ((256) x 10, (512) x 10, (1024) x 10, (4192) x 10);
+	  # ((256) x 10, (512) x 10, (1024) x 10, (4096) x 10);
+	    ((256) x 10, (512) x 10, (1024) x 5, (2048) x 5, (4096) x 5, (8192) x 5);
 	$opt_q and splice @size, $opt_q;
 	foreach my $sz (@size) {
 	    my $req = HTTP::Request->new (POST => $url);
@@ -358,12 +375,22 @@ foreach my $host (@hosts) {
 
 	$ul = result ("Upload", $host, scalar @size, @rslt);
 	}
-    $opt_1 and print "DL: $dl M$unit->[1]/s, UL: $ul M$unit->[1]/s\n";
+    push @try => [ $host, $dl, $ul, $dl + $ul ];
+    $opt_1 and print "DL: $dl M$unit->[1]/s, UL: $ul M$unit->[1]/s, SRV: $host->{id}\n";
     }
 $opt_P and print "  </prtg>\n";
 
-sub result
-{
+if ($opt_T and @try > 1) {
+    print "\n";
+    my $rank = 1;
+    foreach my $t (sort { $b->[-1] <=> $a->[-1] } @try) {
+	my ($host, $dl, $ul) = @$t;
+	printf "Rank %02d: Server: %6d  %6.2f km %7.0f ms,  DL: %s UL: %s\n",
+	    $rank++, $host->{id}, $host->{dist}, $host->{ping}, $dl, $ul;
+	}
+    }
+
+sub result {
     my ($dir, $host, $n, @rslt) = @_;
 
     my $size = (sum map { $_->[0] } @rslt) //         0;
@@ -401,8 +428,7 @@ sub result
 
 ### ############################################################################
 
-sub get_config
-{
+sub get_config {
     my $url = "http://www.speedtest.net/speedtest-config.php";
     my $rsp = $ua->request (HTTP::Request->new (GET => $url));
     $rsp->is_success or die "Cannot get config: ", $rsp->status_line, "\n";
@@ -416,8 +442,7 @@ sub get_config
     return $xml->{settings};
     } # get_config
 
-sub get_servers
-{
+sub get_servers {
     my $servlist;
     foreach my $url (qw(
 	      http://www.speedtest.net/speedtest-servers-static.php
@@ -452,8 +477,7 @@ sub get_servers
     return map { $_->{id} => $_ } @{$xml->{settings}{servers}{server}};
     } # get_servers
 
-sub distance
-{
+sub distance {
     my ($lat_c, $lon_c, $lat_s, $lon_s) = @_;
     my $rad = 6371; # km
 
@@ -468,8 +492,7 @@ sub distance
     return 6371 * 2 * atan2 (sqrt ($x), sqrt (1 - $x)); # km
     } # distance
 
-sub servers
-{
+sub servers {
     my %list = get_servers ();
     if (my $iid = $config->{"server-config"}{ignoreids}) {
 	$opt_v > 3 and warn "Removing servers $iid from server list\n";
@@ -486,8 +509,7 @@ sub servers
     return %list;
     } # servers
 
-sub servers_by_ping
-{
+sub servers_by_ping {
     my %list = servers;
     my @list = values %list;
     $opt_v > 1 and say STDERR "Finding fastest host out of @{[scalar @list]} hosts for $opt_c ...";
@@ -498,6 +520,7 @@ sub servers_by_ping
 	cookie_jar   => {},
 	timeout      => $timeout,
 	);
+    $pa->env_proxy;
     if (@list > 40) {
 	@list = sort { $a->{dist} <=> $b->{dist} } @list;
 	splice @list, 40;
@@ -708,13 +731,16 @@ This option will show all servers in the selection with the distance in
 kilometers to the server.
 
  $ speedtest --list --country=IS
- 4998: GreenQloud                     Hafnarfjordur   2066.12 km
- 4141: Vodafone                       Reykjavík       2068.59 km
- 4820: 365                            Reykjavík       2068.59 km
- 4818: Siminn                         Reykjavik       2068.59 km
- 1092: Hringidan ehf                  Reykjavik       2068.59 km
- 3684: Nova                           Reykjavik       2068.59 km
- 3644: Snerpa                         Isafjordur      2222.57 km
+   1: 10661 - Tengir hf              Akureyri    1980.02 km
+   2: 21605 - Premis ehf             Reykjavík   2039.16 km
+   3:  3684 - Nova                   Reykjavik   2039.16 km
+   4:  6471 - Gagnaveita Reykjavikur Reykjavik   2039.16 km
+   5: 10650 - Nova VIP               Reykjavik   2039.16 km
+   6: 16148 - Hringidan              Reykjavik   2039.16 km
+   7:  4818 - Siminn                 Reykjavik   2039.16 km
+   8: 17455 - Hringdu                Reykjavík   2039.16 km
+   9:  4141 - Vodafone               Reykjavík   2039.16 km
+  10:  3644 - Snerpa                 Isafjordur  2192.27 km
 
 =item -p | --ping
 X<-p>
@@ -724,16 +750,16 @@ Show a list of servers in the selection with their latency in ms.
 Be very patient if running this with L</--all>.
 
  $ speedtest --ping --cc=BE
- 5151: Combell                        Brussels         148.45 km     120 ms
- 4812: Universite Catholique de Louva Louvain-La-Neuv  159.41 km     122 ms
- 2419: VOO                            Liege            154.15 km     131 ms
- 4904: Verixi SPRL                    Louvain-La-Neuv  159.41 km     137 ms
- 4320: EDPnet                         Sint-Niklaas     128.45 km     258 ms
- 4319: Mobistar NV                    Evere            145.15 km     308 ms
- 3457: iGlobe bvba                    Diegem           141.28 km     340 ms
- 5867: Teleweb                        Lokeren          141.00 km     541 ms
- 2955: Nucleus BVBA                   Antwerp          111.57 km 4000000 ms
- 2848: Cu.be Solutions                Diegem           141.28 km 4000000 ms
+   1: 10986 - Proximus             Schaarbeek         169.72 km      58 ms
+   2:  4812 - Universite Catholiqâ€¦ Louvain-La-Neuve   186.05 km      66 ms
+   3: 12627 - Proximus             Brussels           172.22 km      67 ms
+   4: 12306 - VOO                  Liège              185.52 km      79 ms
+   5: 21086 - ASP                  Brussels           172.22 km      91 ms
+   6:  4319 - Orange Belgium       Brussels           172.22 km     127 ms
+   7:  4320 - EDPnet               Sint-Niklaas       147.26 km     489 ms
+   8:  2955 - Nucleus BVBA         Antwerp            132.91 km 4000000 ms
+   9:  2848 - Cu.be Solutions      Diegem             165.51 km 4000000 ms
+  10:  5151 - Combell              Brussels           172.22 km 4000000 ms
 
 If a server does not respond, a very high latency is used as default.
 
@@ -753,19 +779,36 @@ to do all required tests.
  $ speedtest -T3 -c NL -Q2
  Testing for 80.x.y.z : XS4ALL Internet BV (NL)
 
- Using 4358:  52.33 km      64 ms KPN
- Test download ..                                      Download:   30.497 Mbit/s
- Test upload   ..                                      Upload:     32.366 Mbit/s
+ Using 13218:  26.52 km      25 ms XS4ALL Internet BV
+ Test download ..                                      Download     31.807 Mbit/s
+ Test upload   ..                                      Upload       86.587 Mbit/s
 
- Using 4045:  52.33 km      66 ms SoftLayer Technologies, Inc.
- Test download ..                                      Download:   31.971 Mbit/s
- Test upload   ..                                      Upload:     33.503 Mbit/s
+ Using 15850:  26.09 km      25 ms QTS Data Centers
+ Test download ..                                      Download     80.763 Mbit/s
+ Test upload   ..                                      Upload       77.122 Mbit/s
 
- Using 3386:  52.33 km      67 ms NFOrce Entertainment B.V.
- Test download ..                                      Download:   28.022 Mbit/s
- Test upload   ..                                      Upload:     33.221 Mbit/s
+ Using 11365:  26.09 km      27 ms Vancis
+ Test download ..                                      Download    106.022 Mbit/s
+ Test upload   ..                                      Upload       82.891 Mbit/s
 
-=item -s# | --server=#
+ Rank 01: Server:  11365   26.09 km      27 ms,  DL:  106.022 UL:   82.891
+ Rank 02: Server:  15850   26.09 km      25 ms,  DL:   80.763 UL:   77.122
+ Rank 03: Server:  13218   26.52 km      25 ms,  DL:   31.807 UL:   86.587
+
+ $ speedtest -1v0 -T5
+ DL:  200.014 Mbit/s, UL:  159.347 Mbit/s, SRV: 13218
+ DL:  203.599 Mbit/s, UL:  166.247 Mbit/s, SRV: 15850
+ DL:  207.249 Mbit/s, UL:  134.957 Mbit/s, SRV: 11365
+ DL:  195.490 Mbit/s, UL:  172.109 Mbit/s, SRV: 5972
+ DL:  179.413 Mbit/s, UL:  160.309 Mbit/s, SRV: 2042
+
+ Rank 01: Server:  15850   26.09 km      30 ms,  DL:  203.599 UL:  166.247
+ Rank 02: Server:   5972   26.09 km      32 ms,  DL:  195.490 UL:  172.109
+ Rank 03: Server:  13218   26.52 km      23 ms,  DL:  200.014 UL:  159.347
+ Rank 04: Server:  11365   26.09 km      31 ms,  DL:  207.249 UL:  134.957
+ Rank 05: Server:   2042   51.41 km      33 ms,  DL:  179.413 UL:  160.309
+
+=item -s# | --server=# | --server=filename
 X<-s>
 X<--server>
 
@@ -780,6 +823,33 @@ always test against the same server.
  Test download ........................................Download:   92.633 Mbit/s
  Test upload   ........................................Upload:     92.552 Mbit/s
  DL:   92.633 Mbit/s, UL:   92.552 Mbit/s
+
+If you pass a filename, it is expected to reflect a server-like structure as
+received from the speedtest server-list, possibly completed with upload- and
+download URL's:
+
+  {   cc      => "NL",
+      country => "Netherlands",
+      host    => "unlisted.host.amsterdam:8080",
+      id      => 9999,
+      lat     => "52.37316",
+      lon     => "4.89122",
+      name    => "Amsterdam",
+      ping    => 20.0,
+      sponsor => "Dam tot Damloop",
+      url     => "http://unlisted.host.amsterdam/speedtest/speedtest/upload.php",
+      url2    => "http://unlisted.host.amsterdam/speedtest/speedtest/upload.php",
+
+      dl_list => [
+          "http://unlisted.host.amsterdam/files/128.bin",
+          "http://unlisted.host.amsterdam/files/256.bin",
+          # 40 URL's pointing to files in increasing size
+          "http://unlisted.host.amsterdam/files/2G.bin",
+          ],
+      ul_list => [
+          # 40 URL's
+          ],
+      }
 
 =item -t# | --timeout=#
 X<-t>
@@ -874,8 +944,11 @@ Debian wheezy will run with just two additional packages:
 
 =head1 SEE ALSO
 
+As an alternative to L<speedtest.net|http://www.speedtest.net/>, you
+could consider L<http://compari.tech/speed|http://compari.tech/speed>.
+
 The L<speedtest-cli|https://github.com/sivel/speedtest-cli> project
-that inspired me to improve a broken CLI written in python into out
+that inspired me to improve a broken CLI written in python into our
 beloved language Perl.
 
 =head1 CONTRIBUTING
@@ -906,7 +979,7 @@ personal use, but was asked to make it publicly available as application.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016 H.Merijn Brand
+Copyright (C) 2014-2018 H.Merijn Brand
 
 =head1 LICENSE
 

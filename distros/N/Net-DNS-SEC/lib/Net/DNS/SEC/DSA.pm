@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
 #
-# $Id: DSA.pm 1701 2018-07-28 07:36:34Z willem $
+# $Id: DSA.pm 1723 2018-12-03 09:17:48Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1701 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1723 $)[1];
 
 
 =head1 NAME
@@ -46,9 +46,9 @@ use integer;
 use warnings;
 use MIME::Base64;
 
-use constant DSA_OK => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_DSA');
+use constant DSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_DSA');
 
-BEGIN { die unless DSA_OK }					# not needed on voyage
+BEGIN { die 'No "use Net::DNS::SEC" or no DSA' unless DSA_configured }
 
 
 my %parameters = (

@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.44';
+our $XS_VERSION = our $VERSION = '0.45';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -376,10 +376,24 @@ L</auth>.
 In scalar context, returns the entire path string. In list context, returns a
 list of path segments, split by C</>.
 
+  my $uri = uri '/foo/bar';
+  my $path = $uri->path;  # "/foo/bar"
+  my @path = $uri->path;  # ("foo", "bar")
+
 The path may also be updated using either a string or an array ref of segments:
 
   $uri->path('/foo/bar');
   $uri->path(['foo', 'bar']);
+
+This differs from the behavior of L<URI/path_segments>, which considers the
+leading slash separating the path from the authority section to be an
+individual segment. If this behavior is desired, the lower level
+C<split_path_compat> is available. C<split_path_compat> (and its partner,
+C<split_path>), always return an array reference.
+
+  my $uri = uri '/foo/bar';
+  $uri->split_path;         # ['foo', 'bar'];
+  $uri->split_path_compat;  # ['', 'foo', 'bar'];
 
 =head2 query
 

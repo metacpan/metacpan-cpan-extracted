@@ -1,3 +1,8 @@
+0.45 2018-12-10
+-feature: documented and exposed lower level method split_path, added
+ split_path_compat which replicates the behavior of URI->path_segments as a
+ getter
+
 0.44 2018-12-05
 -bugfix: removed hard-coded references to class name which were preventing expected
  behavior when subclassing URI::Fast

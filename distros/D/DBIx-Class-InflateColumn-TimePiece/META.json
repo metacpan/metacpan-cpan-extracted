@@ -1,0 +1,65 @@
+{
+   "abstract" : "Auto-create Time::Piece objects from integer columns",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-InflateColumn-TimePiece",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::InflateColumn::TimePiece" : {
+         "file" : "lib/DBIx/Class/InflateColumn/TimePiece.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece/issues"
+      },
+      "homepage" : "http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece.git",
+         "web" : "http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

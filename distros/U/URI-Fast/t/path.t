@@ -34,4 +34,9 @@ subtest 'set array' => sub{
   };
 };
 
+subtest 'compat' => sub{
+  ok my $uri = uri('http://test.com/foo/bar'), 'ctor';
+  is $uri->split_path_compat, ['', 'foo', 'bar'], 'includes empty leading segment';
+};
+
 done_testing;

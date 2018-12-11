@@ -99,21 +99,24 @@ isnt $redis->db->connection, $conn, 'new fork gets a new connecion';
 undef $conn;
 $redis->{pid} = $$;
 
-note 'New connection, because URL changed';
+note 'Connection closes when ref is lost';
 $db = $redis->db;
-$db->get_p($0)->wait;    # Make sure we are connected
-$redis->url->host($ENV{TEST_ONLINE} =~ /localhost/ ? '127.0.0.1' : 'localhost');
-$db = undef;
-is @{$redis->{queue}}, 0, 'database was not enqued';
-
-# Connection closes when ref is lost
-$db = $redis->db;
-$db->get_p($0)->wait;
-ok $db->connection->is_connected, 'connected';
+$db->get_p($0)->catch(sub { $err = shift })->wait;    # Make sure we are connected
+ok $db->connection->is_connected, 'connected' or diag $err;
 my $closed;
 $db->connection->on(close => sub { $closed++ });
 $redis->max_connections(0);
 undef $db;
 ok $closed, 'connection was closed on destruction';
+
+note 'New connection, because URL changed';
+use Socket;
+my $host = $redis->url->host;
+$db = $redis->db;
+$db->get_p($0)->catch(sub { $err = shift })->wait;    # Make sure we are connected
+$redis->url->host($host =~ /[a-z]/ ? inet_ntoa(inet_aton $host) : gethostbyaddr(inet_aton($host), AF_INET));
+diag 'Changed host to ' . $redis->url->host;
+$db = undef;
+is @{$redis->{queue}}, 0, 'database was not enqued' or diag $err;
 
 done_testing;

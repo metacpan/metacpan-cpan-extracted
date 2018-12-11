@@ -1,6 +1,11 @@
 Change history for MySQL::Workbench::Parser
 ===========================================
 
+1.05 2018-12-10 15:37:00
+
+  * add 'as_string' method to column class
+  * add 'dom' attribute to parser
+
 1.04 2018-12-06 10:07:00
 
   * update list of test dependencies

@@ -154,5 +154,26 @@ tables:
 my $parser = MySQL::Workbench::Parser->new( file => $mwb );
 is_string $parser->dump, $check;
 
+ok $parser->dom;
+
+my %columns;
+
+TABLE:
+for my $table ( @{ $parser->tables } ) {
+    my $name = $table->name;
+
+    for my $col ( @{ $table->columns } ) {
+        my $col_name = $col->name;
+        my $string   = $col->as_string;
+
+        $columns{$name}->{$col_name} = $string;
+    }
+}
+
+my $speisen_cols = $columns{speisen};
+
+is $speisen_cols->{speisen_id}, 'speisen_id INT NOT NULL';
+is $speisen_cols->{speisencol}, 'speisencol DECIMAL';
+is $speisen_cols->{name}, 'name VARCHAR(45) NOT NULL';
 
 done_testing();

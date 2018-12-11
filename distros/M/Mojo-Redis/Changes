@@ -1,5 +1,11 @@
 Revision history for perl distribution Mojo-Redis
 
+3.13 2018-12-11T14:44:45+0900
+ - Fix rejecting promises when connection is lost #24
+ - Fix connection.t when using a remote server #25
+ - Fix cursor.t to use TEST_ONLINE #26 #27
+   Contributor: Alexander Karelas
+
 3.12 2018-12-07T12:04:19+0900
  - Add support for negative cache expire for serving stale data
  - Add destructor to Connection object to clean up connections

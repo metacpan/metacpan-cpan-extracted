@@ -6,7 +6,7 @@ use constant ELEMENTS_COUNT => $ENV{REDIS_TEST_ELEMENTS_COUNT} || 1000;
 
 plan skip_all => 'TEST_ONLINE=redis://localhost' unless $ENV{TEST_ONLINE};
 
-my $redis = Mojo::Redis->new;
+my $redis = Mojo::Redis->new($ENV{TEST_ONLINE});
 my $db    = $redis->db;
 my ($cursor, $expected, $guard, $res);
 

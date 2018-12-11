@@ -4,7 +4,7 @@ List::AllUtils - Combines List::Util, List::SomeUtils and List::UtilsBy in one b
 
 # VERSION
 
-version 0.14
+version 0.15
 
 # SYNOPSIS
 
@@ -37,6 +37,13 @@ order.
 
 The docs below come from [List::Util](https://metacpan.org/pod/List::Util) 1.31, [List::SomeUtils](https://metacpan.org/pod/List::SomeUtils) 0.50, and
 [List::UtilsBy](https://metacpan.org/pod/List::UtilsBy) 0.10.
+
+# WHAT IS EXPORTED?
+
+All this module does is load [List::Util](https://metacpan.org/pod/List::Util), [List::SomeUtils](https://metacpan.org/pod/List::SomeUtils), and
+[List::UtilsBy](https://metacpan.org/pod/List::UtilsBy), and then re-export everything that they provide. That means
+that regardless of the documentation below, you will get any subroutine that
+your installed version provides.
 
 # LIST-REDUCTION FUNCTIONS
 
@@ -273,7 +280,7 @@ empty list:
 
 In the first case, the result of the junction applied to the empty list is
 determined by a mathematical reduction to an identity depending on whether
-the underlying comparison is "or" or "and". Conceptually:
+the underlying comparison is "or" or "and".  Conceptually:
 
                     "any are true"      "all are true"
                     --------------      --------------
@@ -281,10 +288,10 @@ the underlying comparison is "or" or "and". Conceptually:
     1 element:      A || 0              A && 1
     0 elements:     0                   1
 
-In the second case, three-value logic is desired, in which a junction applied
-to an empty list returns `undef` rather than true or false.
+In the second case, three-value logic is desired, in which a junction
+applied to an empty list returns `undef` rather than true or false
 
-Junctions with a `_u` suffix implement three-valued logic. Those
+Junctions with a `_u` suffix implement three-valued logic.  Those
 without are boolean.
 
 ### all BLOCK LIST
@@ -377,7 +384,7 @@ Evaluation of BLOCK will immediately stop at the second true value.
 ### apply BLOCK LIST
 
 Applies BLOCK to each item in LIST and returns a list of the values after BLOCK
-has been applied. In scalar context, the last element is returned. This
+has been applied. In scalar context, the last element is returned.  This
 function is similar to `map` but will not modify the elements of the input
 list:
 
@@ -418,7 +425,7 @@ Inserts VALUE after the first item in LIST which is equal to STRING.
 
 Evaluates BLOCK for each pair of elements in ARRAY1 and ARRAY2 and returns a
 new list consisting of BLOCK's return values. The two elements are set to `$a`
-and `$b`. Note that those two are aliases to the original value so changing
+and `$b`.  Note that those two are aliases to the original value so changing
 them will modify the input arrays.
 
     @a = (1 .. 5);
@@ -463,9 +470,9 @@ scalar context, returns the number of unique elements in LIST.
     my $x = uniq 1, 1, 2, 2, 3, 5, 3, 4; # returns 5
     # returns "Mike", "Michael", "Richard", "Rick"
     my @n = distinct "Mike", "Michael", "Richard", "Rick", "Michael", "Rick"
-    # returns '', 'S1', A5' and complains about "Use of uninitialized value"
+    # returns '', undef, 'S1', A5'
     my @s = distinct '', undef, 'S1', 'A5'
-    # returns undef, 'S1', A5' and complains about "Use of uninitialized value"
+    # returns '', undef, 'S1', A5'
     my @w = uniq undef, '', 'S1', 'A5'
 
 `distinct` is an alias for `uniq`.
@@ -476,7 +483,7 @@ scalar context, returns the number of unique elements in LIST.
 
 Returns a new list by stripping values in LIST occurring more than once by
 comparing the values as hash keys, except that undef is considered separate
-from ''. The order of elements in the returned list is the same as in LIST.
+from ''.  The order of elements in the returned list is the same as in LIST.
 In scalar context, returns the number of elements occurring only once in LIST.
 
     my @x = singleton 1,1,2,2,3,4,5 # returns 3 4 5
@@ -536,9 +543,9 @@ Negative values are only ok when they refer to a partition previously created:
 ### each\_array ARRAY1 ARRAY2 ...
 
 Creates an array iterator to return the elements of the list of arrays ARRAY1,
-ARRAY2 throughout ARRAYn in turn. That is, the first time it is called, it
-returns the first element of each array. The next time, it returns the second
-elements. And so on, until all elements are exhausted.
+ARRAY2 throughout ARRAYn in turn.  That is, the first time it is called, it
+returns the first element of each array.  The next time, it returns the second
+elements.  And so on, until all elements are exhausted.
 
 This is useful for looping over more than one array at once:
 
@@ -558,7 +565,7 @@ plain arrays.
 ### natatime EXPR, LIST
 
 Creates an array iterator, for looping over an array in chunks of
-`$n` items at a time. (n at a time, get it?). An example is
+`$n` items at a time.  (n at a time, get it?).  An example is
 probably a better explanation than I could give in words.
 
 Example:
@@ -779,11 +786,24 @@ that there are more lines of Perl code involved. Therefore, LIST needs to be
 fairly big in order for `minmax` to win over a naive implementation. This
 limitation does not apply to the XS version.
 
-## \*By functions
+### mode LIST
 
-### rev\_sort\_by
+Calculates the most common items in the list and returns them as a list. This
+is effectively done by string comparisons, so references will be
+stringified. If they implement string overloading, this will be used.
 
-### rev\_nsort\_by
+If more than one item appears the same number of times in the list, all such
+items will be returned. For example, the mode of a unique list is the list
+itself.
+
+This function **always** returns a list. That means that in scalar context you
+get a count indicating the number of modes in the list.
+
+# List::UtilsBy Functions
+
+## rev\_sort\_by
+
+## rev\_nsort\_by
 
     @vals = rev_sort_by { KEYFUNC } @vals
 
@@ -791,7 +811,7 @@ limitation does not apply to the XS version.
 
 _Since version 0.06._
 
-Similar to `sort_by` and `nsort_by` but returns the list in the reverse
+Similar to ["sort\_by"](#sort_by) and ["nsort\_by"](#nsort_by) but returns the list in the reverse
 order. Equivalent to
 
     @vals = reverse sort_by { KEYFUNC } @vals
@@ -799,7 +819,7 @@ order. Equivalent to
 except that these functions are slightly more efficient because they avoid
 the final `reverse` operation.
 
-### max\_by
+## max\_by
 
     $optimal = max_by { KEYFUNC } @vals
 
@@ -819,19 +839,29 @@ positions other than the first, if order is significant.
 
 If called on an empty list, an empty list is returned.
 
-For symmetry with the `nsort_by` function, this is also provided under the
+For symmetry with the ["nsort\_by"](#nsort_by) function, this is also provided under the
 name `nmax_by` since it behaves numerically.
 
-### min\_by
+## min\_by
 
     $optimal = min_by { KEYFUNC } @vals
 
     @optimal = min_by { KEYFUNC } @vals
 
-Similar to `max_by` but returns values which give the numerically smallest
+Similar to ["max\_by"](#max_by) but returns values which give the numerically smallest
 result from the key function. Also provided as `nmin_by`
 
-### uniq\_by
+## minmax\_by
+
+    ( $minimal, $maximal ) = minmax_by { KEYFUNC } @vals
+
+Similar to calling both ["min\_by"](#min_by) and ["max\_by"](#max_by) with the same key function
+on the same list. This version is more efficient than calling the two other
+functions individually, as it has less work to perform overall. In the case of
+ties, only the first optimal element found in each case is returned. Also
+provided as `nminmax_by`.
+
+## uniq\_by
 
     @vals = uniq_by { KEYFUNC } @vals
 
@@ -851,7 +881,7 @@ ought to either be strings, or at least well-behaved as strings (such as
 numbers, or object references which overload stringification in a suitable
 manner).
 
-### partition\_by
+## partition\_by
 
     %parts = partition_by { KEYFUNC } @vals
 
@@ -867,11 +897,9 @@ ought to either be strings, or at least well-behaved as strings (such as
 numbers, or object references which overload stringification in a suitable
 manner).
 
-### count\_by
+## count\_by
 
     %counts = count_by { KEYFUNC } @vals
-
-_Since version 0.07._
 
 Returns a key/value list of integers, giving the number of times the key
 function block returned the key, for each value in the list.
@@ -883,7 +911,7 @@ ought to either be strings, or at least well-behaved as strings (such as
 numbers, or object references which overload stringification in a suitable
 manner).
 
-### zip\_by
+## zip\_by
 
     @vals = zip_by { ITEMFUNC } \@arr0, \@arr1, \@arr2,...
 
@@ -915,11 +943,9 @@ a hash from two separate lists of keys and values
 (A function having this behaviour is sometimes called `zipWith`, e.g. in
 Haskell, but that name would not fit the naming scheme used by this module).
 
-### unzip\_by
+## unzip\_by
 
     $arr0, $arr1, $arr2, ... = unzip_by { ITEMFUNC } @vals
-
-_Since version 0.09._
 
 Returns a list of ARRAY references containing the values returned by the
 function block, when invoked for each of the values given in the input list.
@@ -934,14 +960,12 @@ position, and so on.
 If the function returns lists of differing lengths, the result will be padded
 with `undef` in the missing elements.
 
-This function is an inverse of `zip_by`, if given a corresponding inverse
+This function is an inverse of ["zip\_by"](#zip_by), if given a corresponding inverse
 function.
 
-### extract\_by
+## extract\_by
 
     @vals = extract_by { SELECTFUNC } @arr
-
-_Since version 0.05._
 
 Removes elements from the referenced array on which the selection function
 returns true, and returns a list containing those elements. This function is
@@ -955,7 +979,7 @@ selected values from it, leaving only the unselected ones.
 This function modifies a real array, unlike most of the other functions in this
 module. Because of this, it requires a real array, not just a list.
 
-This function is implemented by invoking `splice()` on the array, not by
+This function is implemented by invoking `splice` on the array, not by
 constructing a new list and assigning it. One result of this is that weak
 references will not be disturbed.
 
@@ -967,40 +991,34 @@ will leave weak references weakened in the `@refs` array, whereas
 
 will strengthen them all again.
 
-### extract\_first\_by
+## extract\_first\_by
 
     $val = extract_first_by { SELECTFUNC } @arr
 
-_Since version 0.10._
-
-A hybrid between `extract_by` and `List::Util::first`. Removes the first
+A hybrid between ["extract\_by"](#extract_by) and `List::Util::first`. Removes the first
 element from the referenced array on which the selection function returns
 true, returning it.
 
-As with `extract_by`, this function requires a real array and not just a
-list, and is also implemented using `splice()` so that weak references are
+As with ["extract\_by"](#extract_by), this function requires a real array and not just a
+list, and is also implemented using `splice` so that weak references are
 not disturbed.
 
 If this function fails to find a matching element, it will return an empty
 list in list context. This allows a caller to distinguish the case between
 no matching element, and the first matching element being `undef`.
 
-### weighted\_shuffle\_by
+## weighted\_shuffle\_by
 
     @vals = weighted_shuffle_by { WEIGHTFUNC } @vals
-
-_Since version 0.07._
 
 Returns the list of values shuffled into a random order. The randomisation is
 not uniform, but weighted by the value returned by the `WEIGHTFUNC`. The
 probability of each item being returned first will be distributed with the
 distribution of the weights, and so on recursively for the remaining items.
 
-### bundle\_by
+## bundle\_by
 
     @vals = bundle_by { BLOCKFUNC } $number, @vals
-
-_Since version 0.07._
 
 Similar to a regular `map` functional, returns a list of the values returned
 by `BLOCKFUNC`. Values from the input list are given to the block function in
@@ -1065,7 +1083,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Dave Rolsky.
+This software is Copyright (c) 2018 by Dave Rolsky.
 
 This is free software, licensed under:
 

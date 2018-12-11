@@ -30,7 +30,7 @@ Net::APNs::HTTP2 - APNs Provider API for Perl
             ...
         });
 
-        # You can chainged
+        # You can chain prepare statements
         $apns->prepare(...)->prepare(...)->prepare(...);
 
         # send all prepared requests in parallel
@@ -57,10 +57,7 @@ Supported arguments are:
 - auth\_key : File Path
 
     Universal Push Notification Client SSL Certificate.
-    But, can not use this auth key as it is.
-    Please convert key as follows:
-
-        openssl pkcs8 -in AuthKey_XXXXXXXXXX.p8 -inform PEM -out auth_key.p8 -outform PEM -nocrypt
+    This certificate filename like AuthKey\_XXXXXXXXXX.p8.
 
 - key\_id : Str
 
@@ -100,7 +97,7 @@ Create a request.
         ...
     });
 
-You can chainged call
+You can chain calls to prepare:
 
     $apns->prepare(...)->prepare(...)->prepare(...)->send();
 
@@ -111,6 +108,18 @@ Send notification.
 ## $apns->close()
 
 Close connections.
+
+## $apns->on\_error($fatal, $message)
+
+Callback that is invoked when there's a hard error trying to open the connection to Apple.
+
+- `$fatal`
+
+    A boolean which will be true if this is a fatal error.
+
+- `$message`
+
+    The error returned from the server.
 
 # LICENSE
 

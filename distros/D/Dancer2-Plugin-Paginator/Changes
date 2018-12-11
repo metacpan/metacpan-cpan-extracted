@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Paginator
 
+2.09  2018-12-11 MANWAR
+      - Fixed broken link.
+
 2.08  2018-12-10 MANWAR
       - Updated pod with details for working example code.
 

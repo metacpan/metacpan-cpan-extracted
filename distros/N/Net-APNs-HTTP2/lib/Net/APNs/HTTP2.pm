@@ -3,9 +3,10 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Moo;
+use Crypt::PK::ECC 0.059;
 use Crypt::JWT;
 use JSON;
 use Cache::Memory::Simple;
@@ -123,6 +124,7 @@ sub prepare {
     my $apns_topic       = $extra_header->{apns_topic}      || $self->bundle_id;
     my $apns_id          = $extra_header->{apns_id};
     my $apns_collapse_id = $extra_header->{apns_collapse_id};
+    $cb ||= sub {};
 
     my $clinet = $self->_client;
     $clinet->request(
@@ -212,7 +214,7 @@ Net::APNs::HTTP2 - APNs Provider API for Perl
             ...
         });
 
-        # You can chainged
+        # You can chain prepare statements
         $apns->prepare(...)->prepare(...)->prepare(...);
 
         # send all prepared requests in parallel
@@ -241,10 +243,7 @@ Supported arguments are:
 =item auth_key : File Path
 
 Universal Push Notification Client SSL Certificate.
-But, can not use this auth key as it is.
-Please convert key as follows:
-
-  openssl pkcs8 -in AuthKey_XXXXXXXXXX.p8 -inform PEM -out auth_key.p8 -outform PEM -nocrypt
+This certificate filename like AuthKey_XXXXXXXXXX.p8.
 
 =item key_id : Str
 
@@ -286,7 +285,7 @@ Create a request.
       ...
   });
 
-You can chainged call
+You can chain calls to prepare:
 
   $apns->prepare(...)->prepare(...)->prepare(...)->send();
 
@@ -297,6 +296,22 @@ Send notification.
 =head2 $apns->close()
 
 Close connections.
+
+=head2 $apns->on_error($fatal, $message)
+
+Callback that is invoked when there's a hard error trying to open the connection to Apple.
+
+=over 4
+
+=item C<< $fatal >>
+
+A boolean which will be true if this is a fatal error.
+
+=item C<< $message >>
+
+The error returned from the server.
+
+=back
 
 =head1 LICENSE
 

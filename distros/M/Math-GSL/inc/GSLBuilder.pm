@@ -9,39 +9,15 @@ use File::Path qw/mkpath/;
 use File::Spec::Functions qw/:ALL/;
 use base 'Module::Build';
 
+use Ver2Func;
+
 sub is_release {
     return -e '.git' ? 0 : 1;
-}
-sub subsystems {
-    sort qw/
-        Diff         Machine      Statistics    BLAS
-        Eigen        Matrix       Poly          MatrixComplex
-        BSpline      Errno        PowInt        VectorComplex
-        CBLAS        FFT          Min           IEEEUtils
-        CDF          Fit          QRNG
-        Chebyshev    Monte        RNG           Vector
-        Heapsort     Randist      Roots
-        Combination  Histogram    Multimin      Wavelet
-        Complex      Histogram2D  Multiroots    Wavelet2D
-        Const        Siman        Sum           Sys
-        NTuple       Integration  Sort          Test
-        DHT          Interp       ODEIV         SF
-        Deriv        Linalg       Permutation   Spline
-        Version
-    /;
-}
-
-sub c_modules {
-    my @c = qw/Matrix Randist/;
-    return +{ map {($_ => 1)} @c };
 }
 
 sub process_swig_files {
     my $self = shift;
     my $p = $self->{properties};
-
-    my $files_ref = $p->{swig_source};
-    return unless ($files_ref);
 
     unless (is_release()) {
         $self->process_versioned_swig_files;
@@ -53,18 +29,24 @@ sub process_swig_files {
     my $gsl_ldflags     = $self->{properties}->{extra_linker_flags};
     my $gsl_ccflags     = $self->{properties}->{extra_compiler_flags};
     my $swig_flags      = $self->{properties}->{swig_flags};
+    my $swig_version    = $self->{properties}->{swig_version};
 
     if ($binding_ver ne $current_version) {
         print "VERSION MISMATCH: Let's hope for the best.\n";
     }
     print "Processing $binding_ver XS files, GSL $current_version (via gsl-config) at $gsl_prefix\n";
-    print "Compiler   = " . qx{ $Config{cc} --version } . "\n";
-    print "ccflags    = @$gsl_ccflags\n";
-    print "ldflags    = @$gsl_ldflags\n";
-    print "swig_flags = $swig_flags\n" unless is_release();
-    foreach my $file (@$files_ref) {
-        $self->process_xs_file($file->[0], $binding_ver);
-    }
+    print "Compiler        = " . qx{ $Config{cc} --version } . "\n";
+    print "ccflags         = @$gsl_ccflags\n";
+    print "ldflags         = @$gsl_ldflags\n";
+    print "swig_flags      = $swig_flags\n" unless is_release();
+    print "swig_version    = $swig_version\n" unless is_release();
+    my $PERL5LIB           = $ENV{PERL5LIB} || "";
+    my $LD_LIBRARY_PATH    = $ENV{LD_LIBRARY_PATH} || "";
+    print "PERL5LIB        = $PERL5LIB\n";
+    print "LD_LIBRARY_PATH = $LD_LIBRARY_PATH\n";
+
+    $self->process_xs_file( $_, $binding_ver )
+      foreach Ver2Func->new( $current_version )->swig_files;
 }
 
 sub get_binding_version {
@@ -102,45 +84,22 @@ sub process_versioned_swig_files {
     my $self = shift;
 
     my $p = $self->{properties};
-    my $files_ref = $p->{swig_source};
 
     my $cur_ver = $p->{current_version};
-    my $ver2func = $p->{ver2func};
 
-    foreach my $ver (sort {cmp_versions($a, $b)} keys %{$ver2func}) {
-        next if (cmp_versions($cur_ver, $ver) == -1);
-        my @renames;
-        foreach my $high_ver (keys %{$ver2func}) {
-            next if (cmp_versions($high_ver, $ver) < 1);
-            push @renames, @{$ver2func->{$high_ver}};
-        }
+    foreach my $ver ( Ver2Func->versions( $cur_ver ) ) {
+
         print "Building wrappers for GSL $ver\n";
-        my $renames_fname = catfile(qw/swig renames.i/);
-        open(my $fh, '>', $renames_fname)
-            or die "Could not create $renames_fname: $!";
-        foreach my $rename (@renames) {
-            print $fh q{%rename("%(regex:/} . $rename . q{/$ignore/)s") "";} . "\n";
-        }
-        close($fh) or die "Could not close $renames_fname: $!";
 
-        foreach my $file (@$files_ref) {
-            my ($major,$minor,$tiny) = split /\./, $ver;
-            # don't create lots of XS for subsystems that didn't exist
-            # in old GSL versions
-            if ($file->[0] =~ m/Multilarge/) {
-                if ($major >=2 && $minor >= 1) {
-                    $self->process_swig($file->[0], $file->[1], $ver);
-                }
-            } else {
-                $self->process_swig($file->[0], $file->[1], $ver);
-            }
-            if ($file->[0] =~ m/Multifit/) {
-                if ($major >=2) {
-                    $self->process_swig($file->[0], $file->[1], $ver);
-                }
-            } else {
-                $self->process_swig($file->[0], $file->[1], $ver);
-            }
+        my $ver2func = Ver2Func->new( $ver );
+
+	my $renames_i = catfile( qw/swig renames.i/ );
+        $ver2func->write_renames_i( $renames_i );
+	copy( $renames_i, catfile( 'swig', "renames.${ver}.i" ) );
+
+        foreach my $entry ( $ver2func->sources ) {
+            my ( $swig_file, $deps ) = @$entry;
+            $self->process_swig( $swig_file, $deps, $ver );
         }
     }
 }
@@ -201,16 +160,21 @@ sub process_swig {
 sub swig_binary_name {
     # recent versions of Ubuntu call it swig2.0 . Le sigh.
     my $cmd = "swig -version";
-    my $out = `$cmd`;
+    my $out  = eval { no warnings; `$cmd` };
     if ($?) {
         $cmd = "swig2.0 -version";
-        $out = `$cmd`;
-
+        $out  = eval { no warnings; `$cmd` };
         if ($?) {
-            die "Can't find the swig binary!";
-        } else {
-            return "swig2.0";
+            $cmd = "swig3.0 -version";
+            $out = eval { no warnings; `$cmd` };
+
+            if ($?) {
+                die "Can't find the swig binary!";
+            } else {
+                return "swig3.0";
+            }
         }
+        return "swig2.0";
     }
     return "swig";
 }
@@ -219,8 +183,6 @@ sub swig_binary_name {
 sub compile_swig {
     my ($self, $file, $c_file, $ver) = @_;
     my ($cf, $p) = ($self->{config}, $self->{properties}); # For convenience
-
-    print "Creating $c_file\n";
 
     # File name, minus the suffix
     (my $file_base = $file) =~ s/\.[^.]+$//;
@@ -241,10 +203,9 @@ sub compile_swig {
     my $to      = catfile(qw/lib Math GSL/, $pm_file);
     chmod 0644, $from, $to;
 
-    $self->do_system(@swig, '-o', $c_file ,
-                     '-outdir', $gsldir,
-		             '-perl5', @swig_flags, $file)
-	    or die "error : $! while building ( @swig_flags ) $c_file in $gsldir from '$file'";
+    my @args = ( @swig, '-o', $c_file , '-outdir', $gsldir, '-perl5', @swig_flags, $file);
+    print join(" ", @args ) . "\n";
+    $self->do_system( @args ) or die "error : $! while building ( @swig_flags ) $c_file in $gsldir from '$file'";
     move($from, "$from.$ver");
 
     {
@@ -256,7 +217,8 @@ sub compile_swig {
       my $contents = <$in>;
       close $in;
 
-      $contents =~ s{("GSL_VERSION", TRUE \| 0x2 \| GV_ADDMULTI\);[\s\n]*sv_setsv\(sv, SWIG_FromCharPtr\(")\d\.\d+(\.\d)?}
+      # TODO: this doesn't support x.y.z
+      $contents =~ s{("GSL_VERSION", TRUE \| 0x2 \| GV_ADDMULTI\);[\s\n]*sv_setsv\(sv, SWIG_FromCharPtr\(")\d\.\d+}
                     {$1$ver};
 
       open my $out, ">", $c_file or die "Can't overwrite file $c_file: $!";
@@ -265,7 +227,7 @@ sub compile_swig {
     }
 
     if ($p->{current_version} eq $ver) {
-        print "Copying from: $from.$ver, to: $to; it makes the CPAN indexer happy.\n";
+        # print "Copying from: $from.$ver, to: $to; it makes the CPAN indexer happy.\n";
         copy("$from.$ver", $to);
     }
 
@@ -301,12 +263,13 @@ sub link_c {
     }
 
     my @lddlflags = $self->split_like_shell($cf->{lddlflags});
-    my @shrp = $self->split_like_shell($cf->{shrpenv});
-    my @ld = $self->split_like_shell($cf->{ld} || $Config{cc});
+    my @shrp      = $self->split_like_shell($cf->{shrpenv});
+    my @ld        = $self->split_like_shell($cf->{ld} || $Config{cc});
 
     # Strip binaries if we are compiling on windows
     push @ld, "-s" if (is_windows() && $Config{cc} =~ /\bgcc\b/i);
 
+    print join(" ", @shrp, @ld, @lddlflags, '-o', $lib_file, $obj_file, @$objects, @linker_flags) . "\n";
     $self->do_system(@shrp, @ld, @lddlflags, '-o', $lib_file,
 		     $obj_file, @$objects, @linker_flags)
       or die "error building $lib_file file from '$obj_file'";
@@ -329,7 +292,6 @@ sub compile_c {
   $self->add_to_cleanup($obj_file);
   return $obj_file if $self->up_to_date($file, $obj_file);
 
-
   $cf->{installarchlib} = $Config{archlib};
 
   my @include_dirs = @{$p->{include_dirs}}
@@ -337,12 +299,10 @@ sub compile_c {
 			: map {"-I$_"} ( catdir($cf->{installarchlib}, 'CORE') ) ;
 
   my @extra_compiler_flags = $self->split_like_shell($p->{extra_compiler_flags});
+  my @cccdlflags           = $self->split_like_shell($cf->{cccdlflags});
+  my @ccflags              = $self->split_like_shell($cf->{ccflags});
 
-  my @cccdlflags = $self->split_like_shell($cf->{cccdlflags});
-
-  my @ccflags  = $self->split_like_shell($cf->{ccflags});
   push @ccflags, $self->split_like_shell($Config{cppflags});
-
   my @optimize = $self->split_like_shell($cf->{optimize});
 
   # Whoah! There seems to be a bug in gcc 4.1.0 and optimization
@@ -356,7 +316,7 @@ sub compile_c {
 
   my @cc = $self->split_like_shell($cf->{cc});
   @cc = $self->split_like_shell($Config{cc}) unless @cc;
-
+  print join(" ", @cc, @flags, '-o', $obj_file, $file) . "\n";
   $self->do_system(@cc, @flags, '-o', $obj_file, $file)
     or die "error building $Config{_o} file from '$file'";
 

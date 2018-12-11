@@ -1,5 +1,9 @@
 Revision history for Perl extension Net-APNs-HTTP2
 
+0.02 2018-12-11T07:05:52Z
+    - #1 Can use original pkcs8 auth key. (perlDreamer++)
+    - #2 Document on_error and fix typo. (perlDreamer++)
+
 0.01 2017-09-14T11:33:39Z
 
     - original version

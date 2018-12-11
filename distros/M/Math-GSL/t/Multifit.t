@@ -1,6 +1,6 @@
 package Math::GSL::Multifit::Test;
 use base q{Test::Class};
-use Test::More;
+use Test::Most;
 use Math::GSL           qw/:all/;
 use Math::GSL::BLAS     qw/:all/;
 use Math::GSL::Test     qw/:all/;
@@ -10,15 +10,17 @@ use Math::GSL::Vector   qw/:all/;
 use Math::GSL::Machine  qw/:all/;
 use Data::Dumper;
 use strict;
+use warnings;
 BEGIN { gsl_set_error_handler_off() }
 
 BEGIN {
     my $version= gsl_version();
     my ($major, $minor) = split /\./, $version;
-    if ($major >= 2) {
+    if ($major >= 2 and $minor >= 1) {
         eval "use Math::GSL::Multifit qw/:all/";
+        die $@ if @$;
     } else {
-        plan skip_all => "Multifit swig bindings don't like GSL < 2.0";
+        plan skip_all => "Multifit swig bindings don't like GSL < 2.1";
         exit(0);
     }
 }

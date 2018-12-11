@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.033    2018-12-10
+        - "Term::Choose" minimum version: '1.638'.
+        - "Term::TablePrint" mininum version: '0.104'.
+
 2.032    2018-12-09
         - New option 'decimal_separator'.
 

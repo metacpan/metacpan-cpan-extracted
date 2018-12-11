@@ -1,35 +1,44 @@
 {
    "abstract" : "A non-blocking wrapper around L<Hailo|Hailo>",
    "author" : [
-      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+      "Hinrik \u00d6rn Sigur\u00f0sson <hinrik.sig@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670",
+   "generated_by" : "Dist::Zilla version 5.048, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "POE-Component-Hailo",
    "no_index" : {
       "directory" : [
          "t",
-         "xt",
-         "utils"
+         "utils",
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.31"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
-            "Hailo" : 0,
-            "POE" : 0
+            "Hailo" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "POE" : "0",
+            "POE::Filter::JSON" : "0",
+            "Try::Tiny" : "0"
          }
       }
    },
@@ -39,7 +48,7 @@
          "mailto" : "bug-POE-Component-Hailo@rt.cpan.org",
          "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Hailo"
       },
-      "homepage" : "http://search.cpan.org/dist/POE-Component-Hailo/",
+      "homepage" : "http://metacpan.org/release/POE-Component-Hailo",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -49,7 +58,7 @@
          "web" : "http://github.com/hinrik/poe-component-hailo"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_authority" : "cpan:HINRIK"
 }
 

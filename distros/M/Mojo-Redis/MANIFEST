@@ -19,6 +19,7 @@ t/benchmark.t
 t/cache-offline.t
 t/cache.t
 t/connection-auth.t
+t/connection-lost.t
 t/connection-sentinel.t
 t/connection-unix.t
 t/connection.t

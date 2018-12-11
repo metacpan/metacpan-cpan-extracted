@@ -1,4 +1,4 @@
-# PODNAME: CoreList.pod
+# PODNAME: Module::OTRS::CoreList
 
 __END__
 
@@ -8,11 +8,11 @@ __END__
 
 =head1 NAME
 
-CoreList.pod
+Module::OTRS::CoreList
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -43,7 +43,7 @@ Module::OTRS::CoreList - what modules shipped with versions of OTRS (>= 2.3.x)
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 AUTHOR
 

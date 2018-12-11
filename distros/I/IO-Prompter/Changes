@@ -180,3 +180,12 @@ Revision history for IO-Prompter
 
     * Numerous improvements to completion behaviour
       (Many thanks, Victor, and apologies for the long delay!)
+
+
+0.004015  Sat Dec  8 06:53:05 2018
+
+    * Added warning about limitations under Windows
+      (Thanks, Jan!)
+
+    * Added warning about prompt() returning object not string
+      (Merci, Mirod!)

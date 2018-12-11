@@ -1,3 +1,8 @@
+0.37      2018-12-10 21:22:15+01:00 Europe/Madrid
+
+    - Fixed docs for Resque::Failures::all() (reported by Nick Tonkin)
+    - Reformated POD for code examples all around Resque::Failures
+
 0.36      2018-06-18 14:10:40+02:00 Europe/Madrid
 
     - New Worker::autoconfig attribute to allow dinamic updates of working workers

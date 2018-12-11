@@ -8,6 +8,7 @@ use Test::More;
 
 is calc 'e', exp(1), 'Euler\'s number';
 is calc 'pi', pi, 'Pi';
+is calc 'π', pi, encode('UTF-8', 'π');
 is +(calc 'i')->Im, 1, 'Imaginary unit';
 is +(calc 'i')->Re, 0, 'Imaginary unit';
 
@@ -22,15 +23,16 @@ is calc 'floor -2.5', -3, 'Floor';
 is calc 'round 2.5', 3, 'Round';
 is calc 'round -2.5', -3, 'Round';
 
-is calc 'acos -1', pi, 'Arccosine';
+is calc 'acos 0', pi/2, 'Arccosine';
 is calc 'asin -1', -(pi/2), 'Arcsine';
 is calc 'atan 1', pi/4, 'Arctangent';
+is calc 'atan2(1,1)', pi/4, 'Arctangent (2 args)';
 is calc 'sin pi/2', 1, 'Sine';
 is calc 'cos π', -1, 'Cosine';
 is calc 'tan -π/4', -1, 'Tangent';
 
-is calc 'log 5', log(5) / log(10), 'Common logarithm';
-is calc 'ln 5', log(5), 'Natural logarithm';
+is calc 'log 5', log10(5), 'Common logarithm';
+is calc 'ln 5', ln(5), 'Natural logarithm';
 is calc 'logn(5,2)', log(5) / log(2), 'Custom logarithm';
 
 is calc 'sqrt 64', 8, 'Square root';

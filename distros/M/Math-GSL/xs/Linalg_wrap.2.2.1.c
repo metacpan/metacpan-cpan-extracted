@@ -9909,15 +9909,17 @@ XS(_wrap_gsl_linalg_givens) {
     int ecode1 = 0 ;
     double val2 ;
     int ecode2 = 0 ;
-    void *argp3 = 0 ;
-    int res3 = 0 ;
-    void *argp4 = 0 ;
-    int res4 = 0 ;
+    double temp3 ;
+    int res3 = SWIG_TMPOBJ ;
+    double temp4 ;
+    int res4 = SWIG_TMPOBJ ;
     int argvi = 0;
     dXSARGS;
     
-    if ((items < 4) || (items > 4)) {
-      SWIG_croak("Usage: gsl_linalg_givens(a,b,c,s);");
+    arg3 = &temp3;
+    arg4 = &temp4;
+    if ((items < 2) || (items > 2)) {
+      SWIG_croak("Usage: gsl_linalg_givens(a,b);");
     }
     ecode1 = SWIG_AsVal_double SWIG_PERL_CALL_ARGS_2(ST(0), &val1);
     if (!SWIG_IsOK(ecode1)) {
@@ -9929,18 +9931,20 @@ XS(_wrap_gsl_linalg_givens) {
       SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "gsl_linalg_givens" "', argument " "2"" of type '" "double""'");
     } 
     arg2 = (double)(val2);
-    res3 = SWIG_ConvertPtr(ST(2), &argp3,SWIGTYPE_p_double, 0 |  0 );
-    if (!SWIG_IsOK(res3)) {
-      SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "gsl_linalg_givens" "', argument " "3"" of type '" "double *""'"); 
-    }
-    arg3 = (double *)(argp3);
-    res4 = SWIG_ConvertPtr(ST(3), &argp4,SWIGTYPE_p_double, 0 |  0 );
-    if (!SWIG_IsOK(res4)) {
-      SWIG_exception_fail(SWIG_ArgError(res4), "in method '" "gsl_linalg_givens" "', argument " "4"" of type '" "double *""'"); 
-    }
-    arg4 = (double *)(argp4);
     gsl_linalg_givens(arg1,arg2,arg3,arg4);
     ST(argvi) = sv_newmortal();
+    if (SWIG_IsTmpObj(res3)) {
+      if (argvi >= items) EXTEND(sp,1);  ST(argvi) = SWIG_From_double  SWIG_PERL_CALL_ARGS_1((*arg3)); argvi++  ;
+    } else {
+      int new_flags = SWIG_IsNewObj(res3) ? (SWIG_POINTER_OWN | 0) : 0;
+      if (argvi >= items) EXTEND(sp,1);  ST(argvi) = SWIG_NewPointerObj((void*)(arg3), SWIGTYPE_p_double, new_flags); argvi++  ;
+    }
+    if (SWIG_IsTmpObj(res4)) {
+      if (argvi >= items) EXTEND(sp,1);  ST(argvi) = SWIG_From_double  SWIG_PERL_CALL_ARGS_1((*arg4)); argvi++  ;
+    } else {
+      int new_flags = SWIG_IsNewObj(res4) ? (SWIG_POINTER_OWN | 0) : 0;
+      if (argvi >= items) EXTEND(sp,1);  ST(argvi) = SWIG_NewPointerObj((void*)(arg4), SWIGTYPE_p_double, new_flags); argvi++  ;
+    }
     
     
     

@@ -32,15 +32,15 @@ sub TEST_RT66882 : Tests {
     # perls that have DUSELONGDOUBLE, so give it some leeway
     # Where is the loss of precision coming from? Is it a bug in Perl, GSL or Math::GSL ?
     # A beer if you figure it out.
-    #local $TODO = "loss of precision on Perls with DUSELONGDOUBLE";
+    # why doesn't $TODO work here?
+    local $TODO = "loss of precision on Perls with DUSELONGDOUBLE";
 
     # additional diagnostics
     local %ENV; $ENV{DEBUG} = 1;
     my $results = {
-        'gsl_sf_fermi_dirac_m1_e(10.0, $r)' => 10.9999546021312975656,
+        'gsl_sf_fermi_dirac_m1_e(10.0, $r)' => 0.9999546021312975656,
     };
-    # verify_results($results, 'Math::GSL::SF', 1e-16);
-    ok(1);
+    verify_results($results, 'Math::GSL::SF', 1e-16);
 }
 
 sub TEST_ELLINT : Tests {
@@ -49,7 +49,6 @@ sub TEST_ELLINT : Tests {
     my ($major, $minor) = split /\./, $version;
     my $results;
 
-    local $TODO = "these functions are not currently available";
     return;
 
     # these funcitons no longer have an n param in GSL >=2
@@ -1336,14 +1335,10 @@ sub TEST_ZBESSEL_ARRAYS : Tests {
 
     lives_ok(sub { my $il = gsl_sf_bessel_il_scaled_array(1,1) }, 'gsl_sf_bessel_il_scaled_array(1,1) lives ');
 
-    return;
-    # kl_scaled_array does not seem to be found by SWIG, although it is for gsl2.0
+    local $TODO = "gsl_sf_bessel_kl_scaled_array is missing";
     lives_ok(sub {
             my $kl = gsl_sf_bessel_kl_scaled_array(1,1)
         }, 'gsl_sf_bessel_kl_scaled_array(1,1) lives ');
-
-    my $kl = gsl_sf_bessel_kl_scaled_array(1,1);
-    die Dumper [ $kl ];
 }
 
 Test::Class->runtests;

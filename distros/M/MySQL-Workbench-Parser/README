@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.04
+    version 1.05
 
 SYNOPSIS
 
@@ -25,12 +25,6 @@ METHODS
             file => '/path/to/file.mwb',
         );
 
- tables
-
-    returns an array of MySQL::Workbench::Parser::Table objects
-
-        my @tables = $parser->tables;
-
  dump
 
     dump the database structure as YAML
@@ -49,7 +43,20 @@ METHODS
 
 ATTRIBUTES
 
+      * tables
+
+      An array of MySQL::Workbench::Parser::Table objects
+
+          my @tables = $parser->tables;
+
       * file
+
+      * datatypes
+
+      * dom
+
+      The DOM <https://metacpan.org/pod/XML::LibXML> created by
+      XML::LibXML.
 
 WARNINGS
 

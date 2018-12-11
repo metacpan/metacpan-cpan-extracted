@@ -7,6 +7,7 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Code::TidyAll' => '0.56',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                       'Cwd' => '0',
                                       'File::Spec' => '0',
@@ -32,16 +33,15 @@ do { my $x = {
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'blib' => '1.01',
                                       'perl' => '5.006'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Exporter' => '0',
-                                      'List::SomeUtils' => '0.50',
+                                      'List::SomeUtils' => '0.56',
                                       'List::Util' => '1.45',
-                                      'List::UtilsBy' => '0.10',
+                                      'List::UtilsBy' => '0.11',
                                       'base' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'

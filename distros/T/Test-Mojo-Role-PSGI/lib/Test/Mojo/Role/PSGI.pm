@@ -4,7 +4,7 @@ use Role::Tiny;
 
 use Mojolicious;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 $VERSION = eval $VERSION;
 
 around new => sub {

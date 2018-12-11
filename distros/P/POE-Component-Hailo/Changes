@@ -1,3 +1,9 @@
+0.11  Mon Dec 10 21:22:02 CET 2018
+    - Added support for calling a remote Hailo server
+    - Switched to POE::Filter::JSON for easier debugging
+    - Propagate and print errors from the subprocess
+    - Make warnings non-fatal fatal again
+
 0.10  Tue Aug 17 22:52:59 GMT 2010
     - Use Dist::Zilla
     - Make all warnings fatal

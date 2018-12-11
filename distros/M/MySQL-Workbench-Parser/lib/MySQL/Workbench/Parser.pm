@@ -15,7 +15,7 @@ use YAML::Tiny;
 
 use MySQL::Workbench::Parser::Table;
 
-our $VERSION = 1.04;
+our $VERSION = 1.05;
 
 has file   => (
     is       => 'ro',
@@ -41,6 +41,13 @@ has datatypes => (
     },
     lazy    => 1,
     default => sub { +{} },
+);
+
+has dom => (
+    is  => 'rwp',
+    isa => sub {
+        blessed $_[0] && $_[0]->isa('XML::LibXML');
+    },
 );
 
 sub dump {
@@ -75,6 +82,8 @@ sub _parse {
 
     my $xml = $zip->contents( 'document.mwb.xml' );
     my $dom = XML::LibXML->load_xml( string => $xml );
+
+    $self->_set_dom( $dom );
 
     my %datatypes;
     my @simple_type_nodes = $dom->documentElement->findnodes( './/value[@key="simpleDatatypes"]/link' );
@@ -191,7 +200,7 @@ MySQL::Workbench::Parser - parse .mwb files created with MySQL Workbench
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -210,12 +219,6 @@ Create a new parser object
     my $parser = MySQL::Workbench::Parser->new(
         file => '/path/to/file.mwb',
     );
-
-=head2 tables
-
-returns an array of L<MySQL::Workbench::Parser::Table> objects
-
-    my @tables = $parser->tables;
 
 =head2 dump
 
@@ -237,7 +240,19 @@ returns the MySQL name of the datatype
 
 =over 4
 
+=item * tables
+
+An array of L<MySQL::Workbench::Parser::Table> objects
+
+    my @tables = $parser->tables;
+
 =item * file
+
+=item * datatypes
+
+=item * dom
+
+The L<DOM|https://metacpan.org/pod/XML::LibXML> created by L<XML::LibXML>.
 
 =back
 

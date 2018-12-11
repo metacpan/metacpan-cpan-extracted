@@ -1,0 +1,84 @@
+%perlcode %{
+@EXPORT_OK = qw/
+               gsl_spmatrix_alloc
+               gsl_spmatrix_get
+               gsl_spmatrix_set
+               gsl_spmatrix_free
+               gsl_spmatrix_transpose
+               gsl_spmatrix_transpose2
+               gsl_spmatrix_transpose_memcpy
+               gsl_spmatrix_set_zero
+               gsl_spmatrix_add
+               gsl_spmatrix_nnz
+               gsl_spmatrix_scale
+               gsl_spmatrix_d2sp
+               gsl_spmatrix_sp2d
+               gsl_spmatrix_minmax
+               gsl_spmatrix_ccs
+               gsl_spmatrix_crs
+               gsl_spmatrix_memcpy
+               gsl_spmatrix_ptr
+               gsl_spmatrix_fwrite
+               gsl_spmatrix_fread
+               gsl_spmatrix_fprintf
+               gsl_spmatrix_fscanf
+             /;
+%EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Math::GSL::SparseMatrix - Sparse Matrices
+
+=head1 SYNOPSIS
+
+    use Math::GSL::SparseMatrix qw/:all/;
+    use Math::GSL::Matrix qw/gsl_matrix_alloc/;
+    my $sparse = gsl_spmatrix_alloc(100,100);
+    my $status = gsl_spmatrix_set($sparse,50,50,42.42);
+    my $value  = gsl_spmatrix_get($sparse,50,50);
+
+    # multiply every element by 5
+    $status = gsl_spmatrix_scale($sparse, 5);
+
+    # get the number of non-zero elements
+    my $nnz = gsl_spmatrix_nnz($sparse);
+
+    # fine min and max values, other than zero elements
+    ($status, $min, $max) = gsl_spmatrix_minmax($sparse);
+
+    # set all elements to zero
+    $status = gsl_spmatrix_set_zero($sparse);
+
+    my $dense  = gsl_matrix_alloc(100,100);
+    # convert a sparse matrix to a dense matrix
+    $status = gsl_spmatrix_sp2d($dense, $sparse);
+
+    # convert a dense matrix to a sparse matrix
+    $status = gsl_spmatrix_d2sp($sparse, $dense);
+
+=head1 DESCRIPTION
+
+NOTE: This module requires GSL 2.0 or higher.
+
+For more informations on the functions, we refer you to the GSL offcial
+documentation: L<http://www.gnu.org/software/gsl/manual/html_node/>
+
+=head1 AUTHORS
+
+Jonathan "Duke" Leto <jonathan@leto.net> and Thierry Moisan <thierry.moisan@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008-2016 Jonathan "Duke" Leto and Thierry Moisan
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+
+%}

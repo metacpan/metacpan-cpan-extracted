@@ -1,12 +1,12 @@
 {
    "abstract" : "Read and process an SNMP trap from Net-SNMP's snmptrapd",
    "author" : [
-      "Ton Voon <ton.voon@opsera.com>"
+      "Ton Voon <ton.voon@opsview.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -38,5 +38,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.03"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tonvoon/perl-snmp-trapinfo.git",
+         "web" : "https://github.com/tonvoon/perl-snmp-trapinfo"
+      }
+   },
+   "version" : "1.05"
 }

@@ -1,8 +1,8 @@
 package Dist::Zilla::Plugin::ReversionAfterRelease;
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 use Moose;
 extends 'Dist::Zilla::Plugin::ReversionOnRelease';
-with qw(Dist::Zilla::Role::AfterRelease Dist::Zilla::Role::FileWatcher);
+with 'Dist::Zilla::Role::AfterRelease';
 
 # Don't munge files before release
 sub munge_files { }
@@ -35,10 +35,9 @@ Dist::Zilla::Plugin::ReversionAfterRelease - Bump and reversion after distributi
 =head1 SYNOPSIS
 
   [VersionFromModule]
-  [CopyFilesFromBuild]
-  copy = Changes
-  
   [UploadToCPAN]
+  [CopyFilesFromRelease]
+  filename = Changes
   
   ; commit source files as of "dzil release" with any
   ; allowable modifications (e.g Changes)

@@ -6,4 +6,4 @@ build.sh
 cpan-upload.sh
 Makefile.old
 MANIFEST.bak
-Makefile
+Makefile$

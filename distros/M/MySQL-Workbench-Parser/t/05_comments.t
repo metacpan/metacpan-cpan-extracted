@@ -63,4 +63,22 @@ tables:
 my $parser = MySQL::Workbench::Parser->new( file => $mwb );
 is_string $parser->dump, $check;
 
+my %columns;
+
+TABLE:
+for my $table ( @{ $parser->tables } ) {
+    my $name = $table->name;
+
+    for my $col ( @{ $table->columns } ) {
+        my $col_name = $col->name;
+        my $string   = $col->as_string;
+
+        $columns{$name}->{$col_name} = $string;
+    }
+}
+
+my $test_cols = $columns{Test};
+
+is $test_cols->{test_id}, 'test_id INT NOT NULL AUTOINCREMENT';
+
 done_testing();

@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000454';
+our $VERSION='1.0000455';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -869,8 +869,8 @@ if ($^O eq 'cygwin') {
                            'perl-libwww-perl','perl-LWP-Protocol-https',
                            'wget','git','figlet','autobuild','autoconf',
                            'automake','libtool','libxml2','libxml2-devel',
-                           'pkg-config','libisl10',
-                           #'pkg-config','libisl10','libcloog-isl4',
+                           'pkg-config','libisl15',
+                           #'pkg-config','libisl15','libcloog-isl4',
                            'sqlite3','rpm','cpio','curl') {
          unless (-1<index $cygcheck, "$package ") {
             $need_packages{$package}='';
@@ -1685,6 +1685,14 @@ sub fa_install_mod {
          } else {
             fa_system("${env}cd \"$dir\";$s$^X $butil.PL");
          }
+         open(FH,"<$dir/Makefile");
+         my @makefile=<FH>;
+         close FH;
+         my $newmakefile=join '', @makefile;
+         $newmakefile=~s/-Werror=format-security //sg;
+         open(FH,">$dir/Makefile");
+         print FH $newmakefile;
+         close FH;
          if ($butil eq 'Makefile') {
             print "*** Running ${sudo}make install\n";
             fa_system("cd \"$dir\";${sudo}make install");
@@ -2864,7 +2872,7 @@ if ($^O eq 'MSWin32' || $^O eq 'MSWin64') {
                       .'db,libdb-devel,ncurses,cron,inetutils,pkg-config,'
                       .'git,libcrypt-devel,perl-LWP-Protocol-https,nano,'
                       .'autobuild,autoconf,automake,libtool,libxml2-devel,'
-                      .'libisl10,libcloog-isl4,sqlite3,rpm,cpio,curl'
+                      .'libisl15,libcloog-isl4,sqlite3,rpm,cpio,curl'
                       .$selection.' -X -A -q '."-R $cygwin_root_dir "
                       .'-s '.$mirror_url;
             } else {
@@ -6794,6 +6802,8 @@ sub MY::installbin {
    my $inherited = shift->SUPER::installbin(@_);
 
    $inherited =~ s/RM_F\) \\/RM_F\) bin\/fullauto\$(EXE_EXT) fullauto.c fullauto\$(EXE_EXT)\\/;
+
+   $inherited =~ s/RM_F\) \$\(INST_SCRIPT\)\/fullauto.exe/RM_F\) \$\(INST_SCRIPT\)\/fullauto.exe\n\t\$\(CHMOD\) 755 bin\/fullauto\$\(EXE_EXT\)/s;
 
    $inherited; #
 

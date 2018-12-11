@@ -4279,6 +4279,7 @@ XS(_wrap_gsl_fft_complex_radix2_forward) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4313,8 +4314,21 @@ XS(_wrap_gsl_fft_complex_radix2_forward) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_complex_radix2_forward" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_forward(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -4342,6 +4356,7 @@ XS(_wrap_gsl_fft_complex_radix2_backward) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4376,8 +4391,21 @@ XS(_wrap_gsl_fft_complex_radix2_backward) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_complex_radix2_backward" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_backward(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -4405,6 +4433,7 @@ XS(_wrap_gsl_fft_complex_radix2_inverse) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4439,8 +4468,21 @@ XS(_wrap_gsl_fft_complex_radix2_inverse) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_complex_radix2_inverse" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_inverse(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -4471,6 +4513,7 @@ XS(_wrap_gsl_fft_complex_radix2_transform) {
     int val4 ;
     int ecode4 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4510,8 +4553,21 @@ XS(_wrap_gsl_fft_complex_radix2_transform) {
       SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "gsl_fft_complex_radix2_transform" "', argument " "4"" of type '" "gsl_fft_direction""'");
     } 
     arg4 = (gsl_fft_direction)(val4);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_transform(arg1,arg2,arg3,arg4);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -4541,6 +4597,7 @@ XS(_wrap_gsl_fft_complex_radix2_dif_forward) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4575,8 +4632,21 @@ XS(_wrap_gsl_fft_complex_radix2_dif_forward) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_complex_radix2_dif_forward" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_dif_forward(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -4604,6 +4674,7 @@ XS(_wrap_gsl_fft_complex_radix2_dif_backward) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4638,8 +4709,21 @@ XS(_wrap_gsl_fft_complex_radix2_dif_backward) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_complex_radix2_dif_backward" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_dif_backward(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -4667,6 +4751,7 @@ XS(_wrap_gsl_fft_complex_radix2_dif_inverse) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4701,8 +4786,21 @@ XS(_wrap_gsl_fft_complex_radix2_dif_inverse) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_complex_radix2_dif_inverse" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_dif_inverse(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -4733,6 +4831,7 @@ XS(_wrap_gsl_fft_complex_radix2_dif_transform) {
     int val4 ;
     int ecode4 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -4772,8 +4871,21 @@ XS(_wrap_gsl_fft_complex_radix2_dif_transform) {
       SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "gsl_fft_complex_radix2_dif_transform" "', argument " "4"" of type '" "gsl_fft_direction""'");
     } 
     arg4 = (gsl_fft_direction)(val4);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_radix2_dif_transform(arg1,arg2,arg3,arg4);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -5516,6 +5628,7 @@ XS(_wrap_gsl_fft_complex_forward) {
     void *argp5 = 0 ;
     int res5 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -5560,8 +5673,21 @@ XS(_wrap_gsl_fft_complex_forward) {
       SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "gsl_fft_complex_forward" "', argument " "5"" of type '" "gsl_fft_complex_workspace *""'"); 
     }
     arg5 = (gsl_fft_complex_workspace *)(argp5);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_forward(arg1,arg2,arg3,(gsl_fft_complex_wavetable const *)arg4,arg5);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -5599,6 +5725,7 @@ XS(_wrap_gsl_fft_complex_backward) {
     void *argp5 = 0 ;
     int res5 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -5643,8 +5770,21 @@ XS(_wrap_gsl_fft_complex_backward) {
       SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "gsl_fft_complex_backward" "', argument " "5"" of type '" "gsl_fft_complex_workspace *""'"); 
     }
     arg5 = (gsl_fft_complex_workspace *)(argp5);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_backward(arg1,arg2,arg3,(gsl_fft_complex_wavetable const *)arg4,arg5);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -5682,6 +5822,7 @@ XS(_wrap_gsl_fft_complex_inverse) {
     void *argp5 = 0 ;
     int res5 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -5726,8 +5867,21 @@ XS(_wrap_gsl_fft_complex_inverse) {
       SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "gsl_fft_complex_inverse" "', argument " "5"" of type '" "gsl_fft_complex_workspace *""'"); 
     }
     arg5 = (gsl_fft_complex_workspace *)(argp5);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_inverse(arg1,arg2,arg3,(gsl_fft_complex_wavetable const *)arg4,arg5);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -5768,6 +5922,7 @@ XS(_wrap_gsl_fft_complex_transform) {
     int val6 ;
     int ecode6 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -5817,8 +5972,21 @@ XS(_wrap_gsl_fft_complex_transform) {
       SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "gsl_fft_complex_transform" "', argument " "6"" of type '" "gsl_fft_direction""'");
     } 
     arg6 = (gsl_fft_direction)(val6);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_complex_transform(arg1,arg2,arg3,(gsl_fft_complex_wavetable const *)arg4,arg5,arg6);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -5852,6 +6020,7 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_backward) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -5886,8 +6055,21 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_backward) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_halfcomplex_radix2_backward" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_radix2_backward(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -5915,6 +6097,7 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_inverse) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -5949,8 +6132,21 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_inverse) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_halfcomplex_radix2_inverse" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_radix2_inverse(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -5978,6 +6174,7 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_transform) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -6012,8 +6209,21 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_transform) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_halfcomplex_radix2_transform" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_radix2_transform(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -6486,6 +6696,7 @@ XS(_wrap_gsl_fft_halfcomplex_backward) {
     void *argp5 = 0 ;
     int res5 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -6530,8 +6741,21 @@ XS(_wrap_gsl_fft_halfcomplex_backward) {
       SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "gsl_fft_halfcomplex_backward" "', argument " "5"" of type '" "gsl_fft_real_workspace *""'"); 
     }
     arg5 = (gsl_fft_real_workspace *)(argp5);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_backward(arg1,arg2,arg3,(gsl_fft_halfcomplex_wavetable const *)arg4,arg5);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -6569,6 +6793,7 @@ XS(_wrap_gsl_fft_halfcomplex_inverse) {
     void *argp5 = 0 ;
     int res5 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -6613,8 +6838,21 @@ XS(_wrap_gsl_fft_halfcomplex_inverse) {
       SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "gsl_fft_halfcomplex_inverse" "', argument " "5"" of type '" "gsl_fft_real_workspace *""'"); 
     }
     arg5 = (gsl_fft_real_workspace *)(argp5);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_inverse(arg1,arg2,arg3,(gsl_fft_halfcomplex_wavetable const *)arg4,arg5);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -6652,6 +6890,7 @@ XS(_wrap_gsl_fft_halfcomplex_transform) {
     void *argp5 = 0 ;
     int res5 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -6696,8 +6935,21 @@ XS(_wrap_gsl_fft_halfcomplex_transform) {
       SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "gsl_fft_halfcomplex_transform" "', argument " "5"" of type '" "gsl_fft_real_workspace *""'"); 
     }
     arg5 = (gsl_fft_real_workspace *)(argp5);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_transform(arg1,arg2,arg3,(gsl_fft_halfcomplex_wavetable const *)arg4,arg5);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -6725,13 +6977,12 @@ XS(_wrap_gsl_fft_halfcomplex_unpack) {
     double *arg2 ;
     size_t arg3 ;
     size_t arg4 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
     size_t val3 ;
     int ecode3 = 0 ;
     size_t val4 ;
     int ecode4 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -6756,11 +7007,24 @@ XS(_wrap_gsl_fft_halfcomplex_unpack) {
         arg1[i] = (double) SvNV(*tv);
       }
     }
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_double, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_fft_halfcomplex_unpack" "', argument " "2"" of type '" "double []""'"); 
-    } 
-    arg2 = (double *)(argp2);
+    {
+      AV *tempav;
+      I32 len;
+      int i;
+      SV **tv;
+      if (!SvROK(ST(1)))
+      croak("Math::GSL : $complex_coefficient is not a reference!");
+      if (SvTYPE(SvRV(ST(1))) != SVt_PVAV)
+      croak("Math::GSL : $complex_coefficient is not an array ref!");
+      
+      tempav = (AV*)SvRV(ST(1));
+      len = av_len(tempav);
+      arg2 = (double *) malloc((len+2)*sizeof(double));
+      for (i = 0; i <= len; i++) {
+        tv = av_fetch(tempav, i, 0);
+        arg2[i] = (double) SvNV(*tv);
+      }
+    }
     ecode3 = SWIG_AsVal_size_t SWIG_PERL_CALL_ARGS_2(ST(2), &val3);
     if (!SWIG_IsOK(ecode3)) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_halfcomplex_unpack" "', argument " "3"" of type '" "size_t""'");
@@ -6771,12 +7035,28 @@ XS(_wrap_gsl_fft_halfcomplex_unpack) {
       SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "gsl_fft_halfcomplex_unpack" "', argument " "4"" of type '" "size_t""'");
     } 
     arg4 = (size_t)(val4);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_unpack((double const (*))arg1,arg2,arg3,arg4);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     {
+      printf("FFT ARGOUT halfcomplex unpack\n");
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg4 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
+    {
       if (arg1) free(arg1);
     }
-    
+    {
+      if (arg2) free(arg2);
+    }
     
     
     XSRETURN(argvi);
@@ -6784,7 +7064,9 @@ XS(_wrap_gsl_fft_halfcomplex_unpack) {
     {
       if (arg1) free(arg1);
     }
-    
+    {
+      if (arg2) free(arg2);
+    }
     
     
     SWIG_croak_null();
@@ -6798,13 +7080,12 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_unpack) {
     double *arg2 ;
     size_t arg3 ;
     size_t arg4 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
     size_t val3 ;
     int ecode3 = 0 ;
     size_t val4 ;
     int ecode4 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -6829,11 +7110,24 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_unpack) {
         arg1[i] = (double) SvNV(*tv);
       }
     }
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_double, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_fft_halfcomplex_radix2_unpack" "', argument " "2"" of type '" "double []""'"); 
-    } 
-    arg2 = (double *)(argp2);
+    {
+      AV *tempav;
+      I32 len;
+      int i;
+      SV **tv;
+      if (!SvROK(ST(1)))
+      croak("Math::GSL : $complex_coefficient is not a reference!");
+      if (SvTYPE(SvRV(ST(1))) != SVt_PVAV)
+      croak("Math::GSL : $complex_coefficient is not an array ref!");
+      
+      tempav = (AV*)SvRV(ST(1));
+      len = av_len(tempav);
+      arg2 = (double *) malloc((len+2)*sizeof(double));
+      for (i = 0; i <= len; i++) {
+        tv = av_fetch(tempav, i, 0);
+        arg2[i] = (double) SvNV(*tv);
+      }
+    }
     ecode3 = SWIG_AsVal_size_t SWIG_PERL_CALL_ARGS_2(ST(2), &val3);
     if (!SWIG_IsOK(ecode3)) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_halfcomplex_radix2_unpack" "', argument " "3"" of type '" "size_t""'");
@@ -6844,12 +7138,28 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_unpack) {
       SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "gsl_fft_halfcomplex_radix2_unpack" "', argument " "4"" of type '" "size_t""'");
     } 
     arg4 = (size_t)(val4);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_halfcomplex_radix2_unpack((double const (*))arg1,arg2,arg3,arg4);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     {
+      printf("FFT ARGOUT halfcomplex unpack\n");
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg4 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
+    {
       if (arg1) free(arg1);
     }
-    
+    {
+      if (arg2) free(arg2);
+    }
     
     
     XSRETURN(argvi);
@@ -6857,7 +7167,9 @@ XS(_wrap_gsl_fft_halfcomplex_radix2_unpack) {
     {
       if (arg1) free(arg1);
     }
-    
+    {
+      if (arg2) free(arg2);
+    }
     
     
     SWIG_croak_null();
@@ -6875,6 +7187,7 @@ XS(_wrap_gsl_fft_real_radix2_transform) {
     size_t val3 ;
     int ecode3 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -6909,8 +7222,21 @@ XS(_wrap_gsl_fft_real_radix2_transform) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_real_radix2_transform" "', argument " "3"" of type '" "size_t""'");
     } 
     arg3 = (size_t)(val3);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_real_radix2_transform(arg1,arg2,arg3);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -7613,6 +7939,7 @@ XS(_wrap_gsl_fft_real_transform) {
     void *argp5 = 0 ;
     int res5 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -7657,8 +7984,21 @@ XS(_wrap_gsl_fft_real_transform) {
       SWIG_exception_fail(SWIG_ArgError(res5), "in method '" "gsl_fft_real_transform" "', argument " "5"" of type '" "gsl_fft_real_workspace *""'"); 
     }
     arg5 = (gsl_fft_real_workspace *)(argp5);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_real_transform(arg1,arg2,arg3,(gsl_fft_real_wavetable const *)arg4,arg5);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
+    {
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg3 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
     {
       if (arg1) free(arg1);
     }
@@ -7686,13 +8026,12 @@ XS(_wrap_gsl_fft_real_unpack) {
     double *arg2 ;
     size_t arg3 ;
     size_t arg4 ;
-    void *argp2 = 0 ;
-    int res2 = 0 ;
     size_t val3 ;
     int ecode3 = 0 ;
     size_t val4 ;
     int ecode4 = 0 ;
     int argvi = 0;
+    SV * _saved[1] ;
     int result;
     dXSARGS;
     
@@ -7717,11 +8056,24 @@ XS(_wrap_gsl_fft_real_unpack) {
         arg1[i] = (double) SvNV(*tv);
       }
     }
-    res2 = SWIG_ConvertPtr(ST(1), &argp2,SWIGTYPE_p_double, 0 |  0 );
-    if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "gsl_fft_real_unpack" "', argument " "2"" of type '" "double []""'"); 
-    } 
-    arg2 = (double *)(argp2);
+    {
+      AV *tempav;
+      I32 len;
+      int i;
+      SV **tv;
+      if (!SvROK(ST(1)))
+      croak("Math::GSL : $complex_coefficient is not a reference!");
+      if (SvTYPE(SvRV(ST(1))) != SVt_PVAV)
+      croak("Math::GSL : $complex_coefficient is not an array ref!");
+      
+      tempav = (AV*)SvRV(ST(1));
+      len = av_len(tempav);
+      arg2 = (double *) malloc((len+2)*sizeof(double));
+      for (i = 0; i <= len; i++) {
+        tv = av_fetch(tempav, i, 0);
+        arg2[i] = (double) SvNV(*tv);
+      }
+    }
     ecode3 = SWIG_AsVal_size_t SWIG_PERL_CALL_ARGS_2(ST(2), &val3);
     if (!SWIG_IsOK(ecode3)) {
       SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "gsl_fft_real_unpack" "', argument " "3"" of type '" "size_t""'");
@@ -7732,12 +8084,28 @@ XS(_wrap_gsl_fft_real_unpack) {
       SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "gsl_fft_real_unpack" "', argument " "4"" of type '" "size_t""'");
     } 
     arg4 = (size_t)(val4);
+    _saved[0] = ST(0);
     result = (int)gsl_fft_real_unpack((double const (*))arg1,arg2,arg3,arg4);
     ST(argvi) = SWIG_From_int  SWIG_PERL_CALL_ARGS_1((int)(result)); argvi++ ;
     {
+      printf("FFT ARGOUT unpack\n");
+      int i=0;
+      AV* tempav = newAV();
+      
+      while( i < arg4 ) {
+        av_push(tempav, newSVnv((double) arg1[i]));
+        i++;
+      }
+      
+      ST(argvi) = sv_2mortal( newRV_noinc( (SV*) tempav) );
+      argvi++;
+    }
+    {
       if (arg1) free(arg1);
     }
-    
+    {
+      if (arg2) free(arg2);
+    }
     
     
     XSRETURN(argvi);
@@ -7745,7 +8113,9 @@ XS(_wrap_gsl_fft_real_unpack) {
     {
       if (arg1) free(arg1);
     }
-    
+    {
+      if (arg2) free(arg2);
+    }
     
     
     SWIG_croak_null();

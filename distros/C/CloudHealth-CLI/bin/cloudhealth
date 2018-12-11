@@ -1,0 +1,95 @@
+#!perl
+
+use v5.10;
+use JSON::MaybeXS;
+use ARGV::Struct;
+use CloudHealth::API;
+use Moo;
+use Types::Standard qw/ArrayRef Bool Str Maybe/;
+
+has json => (is => 'ro', default => sub { JSON::MaybeXS->new->pretty });
+has argv_struct => (is => 'ro', lazy => 1, default => sub {
+  my $self = shift;
+  my @params = @{ $self->argv };
+  shift @params;
+  my $arg_parser = ARGV::Struct->new(argv => [ '{', @params, '}' ]);
+  return $arg_parser->parse;
+});
+has argv => (is => 'ro', isa => ArrayRef, required => 1);
+has ch => (is => 'ro', lazy => 1, default => sub { CloudHealth::API->new });
+
+has credentials_detected => (is => 'ro', isa => Bool, lazy => 1, default => sub {
+  my $self = shift;
+  $self->ch->credentials->is_set;
+});
+
+has run_method => (is => 'ro', isa => Maybe[Str], lazy => 1, default => sub { shift->argv->[0] });
+
+has method_specified => (is => 'ro', isa => Bool, lazy => 1, default => sub {
+  my $self = shift;
+  defined $self->run_method;
+});
+has method_exists => (is => 'ro', isa => Bool, lazy => 1, default => sub {
+  my $self = shift;
+  return 0 if (not $self->method_specified);
+  return 1 if ($self->ch->can($self->run_method));
+});
+
+has wants_help => (is => 'ro', isa => Bool, lazy => 1, default => sub {
+  my $self = shift;
+  return grep { lc($_) eq '--help' or lc($_) eq 'help' } @{ $self->argv };
+});
+
+sub usage {
+  my $self = shift;
+
+  say " * Didn't detect credentials. Set env CLOUDHEALTH_APIKEY" if (not $self->credentials_detected);
+  say " * Didn't specify the method to call" if (not $self->method_specified);
+  say sprintf(" * Don't know method %s", $self->run_method) if ($self->method_specified and not $self->method_exists);
+  if (not $self->method_specified or not $self->method_exists or $self->wants_help) {
+    say 'The following methods are available:';
+    foreach my $kind (sort keys %{ $self->ch->method_classification }) {
+      say $kind;
+      foreach my $method (sort @{ $self->ch->method_classification->{ $kind } }) {
+        say "  $method"
+      }
+    }
+    say '';
+  }
+  if ($self->method_specified and $self->method_exists) {
+    say sprintf '%s accepts the following parameters:', $self->run_method;
+    my $callinfo_class = $self->ch->call_former->callinfo_class($self->run_method);
+
+    say "  $_" foreach (map { $_->{ name } } @{ $callinfo_class->_url_params });
+    say "  $_" foreach (map { $_->{ name } } @{ $callinfo_class->_query_params });
+    if ($callinfo_class->can('_body_params')) {
+      say "  $_" foreach (map { $_->{ name } } @{ $callinfo_class->_body_params });
+    }
+  }
+  say "Usage: $0 method param1 param1value param2 param2value";
+  return 1;
+}
+
+sub run {
+  my ($self) = shift;
+
+  return $self->usage if (not $self->credentials_detected);
+  return $self->usage if (not $self->method_specified);
+  return $self->usage if (not $self->method_exists);
+  return $self->usage if ($self->wants_help);
+
+  my $method = $self->run_method;
+  my $result = eval {
+    $self->ch->$method(%{ $self->argv_struct });
+  };
+  if ($@) {
+    say $@;
+    return 1;
+  }
+  if (ref($result)) {
+    say $self->json->encode($result);
+  }
+  return 0;
+}
+
+exit __PACKAGE__->new(argv => [ @ARGV ])->run;

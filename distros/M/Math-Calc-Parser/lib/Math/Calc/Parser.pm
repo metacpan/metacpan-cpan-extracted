@@ -2,20 +2,27 @@ package Math::Calc::Parser;
 use strict;
 use warnings;
 use utf8;
-use Carp 'croak';
+use Carp ();
 use Exporter ();
-use List::Util 'reduce';
-use Math::Complex;
-use POSIX qw/ceil floor/;
-use Scalar::Util qw/blessed looks_like_number/;
+use List::Util ();
+use Math::Complex ();
+use POSIX ();
+use Scalar::Util ();
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 our @ISA = 'Exporter';
 our @EXPORT_OK = 'calc';
 our $ERROR;
 
 # See disclaimer in Math::Round
 use constant ROUND_HALF => 0.50000000000008;
+
+BEGIN {
+	local $@;
+	if (eval { require Math::Random::Secure; 1 }) {
+		Math::Random::Secure->import('rand');
+	}
+}
 
 {
 	my %operators = (
@@ -60,11 +67,21 @@ use constant ROUND_HALF => 0.50000000000008;
 }
 
 {
-	sub _real { blessed $_[0] ? $_[0]->Re : $_[0] }
-	sub _each { blessed $_[0] ? cplx($_[1]->($_[0]->Re), $_[1]->($_[0]->Im)) : $_[1]->($_[0]) }
+	sub _real { Scalar::Util::blessed $_[0] && $_[0]->isa('Math::Complex') ? $_[0]->Re : $_[0] }
+	sub _each { Scalar::Util::blessed $_[0] && $_[0]->isa('Math::Complex') ? Math::Complex::cplx($_[1]->($_[0]->Re), $_[1]->($_[0]->Im)) : $_[1]->($_[0]) }
 	
 	# Adapted from Math::Round
-	sub _round { $_[0] >= 0 ? floor($_[0] + ROUND_HALF) : ceil($_[0] - ROUND_HALF) }
+	sub _round { $_[0] >= 0 ? POSIX::floor($_[0] + ROUND_HALF) : POSIX::ceil($_[0] - ROUND_HALF) }
+	
+	sub _fact_check {
+		my $r = _real($_[0]);
+		die 'Factorial of negative number' if $r < 0;
+		die 'Factorial of infinity' if $r == 'inf';
+		die 'Factorial of NaN' if $r != $r;
+		return $r;
+	}
+	
+	sub _atan_factor { Math::BigFloat->new(1)->bsub($_[0]->copy->bpow(2))->bsqrt }
 	
 	my %functions = (
 		'<<'  => { args => 2, code => sub { _real($_[0]) << _real($_[1]) } },
@@ -75,33 +92,33 @@ use constant ROUND_HALF => 0.50000000000008;
 		'/'   => { args => 2, code => sub { $_[0] / $_[1] } },
 		'%'   => { args => 2, code => sub { _real($_[0]) % _real($_[1]) } },
 		'^'   => { args => 2, code => sub { $_[0] ** $_[1] } },
-		'!'   => { args => 1, code => sub { my $r = _real($_[0]);
-		                                    die 'Factorial of negative number' if $r < 0;
-		                                    die 'Factorial of infinity' if $r == 'inf';
-		                                    die 'Factorial of NaN' if $r != $r;
-		                                    reduce { $a * $b } 1, 1..$r } },
+		'!'   => { args => 1, code => sub { my $r = _fact_check($_[0]); List::Util::reduce { $a * $b } 1, 1..$r },
+			bignum_code => sub { my $r = _fact_check($_[0]); $r->copy->bfac } },
 		'u-'  => { args => 1, code => sub { -$_[0] } },
 		'u+'  => { args => 1, code => sub { +$_[0] } },
-		sqrt  => { args => 1, code => sub { sqrt $_[0] } },
-		pi    => { args => 0, code => sub { pi } },
-		'π'   => { args => 0, code => sub { pi } },
-		i     => { args => 0, code => sub { i } },
-		e     => { args => 0, code => sub { exp 1 } },
-		ln    => { args => 1, code => sub { log $_[0] } },
-		log   => { args => 1, code => sub { log($_[0])/log(10) } },
-		logn  => { args => 2, code => sub { log($_[0])/log($_[1]) } },
-		sin   => { args => 1, code => sub { sin $_[0] } },
-		cos   => { args => 1, code => sub { cos $_[0] } },
-		tan   => { args => 1, code => sub { tan $_[0] } },
-		asin  => { args => 1, code => sub { asin $_[0] } },
-		acos  => { args => 1, code => sub { acos $_[0] } },
-		atan  => { args => 1, code => sub { atan $_[0] } },
+		sqrt  => { args => 1, code => sub { Math::Complex::sqrt $_[0] }, bignum_code => sub { $_[0]->copy->bsqrt } },
+		pi    => { args => 0, code => sub { Math::Complex::pi }, bignum_code => sub { Math::BigFloat->bpi } },
+		'π'   => { args => 0, code => sub { Math::Complex::pi }, bignum_code => sub { Math::BigFloat->bpi } },
+		i     => { args => 0, code => sub { Math::Complex::i }, bignum_code => sub { Math::BigFloat->bnan } },
+		e     => { args => 0, code => sub { exp 1 }, bignum_code => sub { Math::BigFloat->new(1)->bexp } },
+		ln    => { args => 1, code => sub { Math::Complex::ln $_[0] }, bignum_code => sub { $_[0]->copy->blog } },
+		log   => { args => 1, code => sub { Math::Complex::log10 $_[0] }, bignum_code => sub { $_[0]->copy->blog(10) } },
+		logn  => { args => 2, code => sub { Math::Complex::log($_[0]) / Math::Complex::log($_[1]) }, bignum_code => sub { $_[0]->copy->blog($_[1]) } },
+		sin   => { args => 1, code => sub { Math::Complex::sin $_[0] }, bignum_code => sub { $_[0]->copy->bsin } },
+		cos   => { args => 1, code => sub { Math::Complex::cos $_[0] }, bignum_code => sub { $_[0]->copy->bcos } },
+		tan   => { args => 1, code => sub { Math::Complex::tan $_[0] }, bignum_code => sub { scalar $_[0]->copy->bsin->bdiv($_[0]->copy->bcos) } },
+		asin  => { args => 1, code => sub { Math::Complex::asin $_[0] }, bignum_code => sub { $_[0]->copy->batan2(_atan_factor($_[0])->badd(1))->bmul(2) } },
+		acos  => { args => 1, code => sub { Math::Complex::acos $_[0] }, bignum_code => sub { _atan_factor($_[0])->batan2($_[0]->copy->badd(1))->bmul(2) } },
+		atan  => { args => 1, code => sub { Math::Complex::atan $_[0] }, bignum_code => sub { $_[0]->copy->batan } },
+		atan2 => { args => 2, code => sub { Math::Complex::atan2 $_[0], $_[1] }, bignum_code => sub { $_[0]->copy->batan2($_[1]) } },
 		abs   => { args => 1, code => sub { abs $_[0] } },
-		rand  => { args => 0, code => sub { rand } },
+		rand  => { args => 0, code => sub { rand }, bignum_code => sub { Math::BigFloat->new(rand) } },
 		int   => { args => 1, code => sub { _each($_[0], sub { int $_[0] }) } },
-		floor => { args => 1, code => sub { _each($_[0], sub { floor $_[0] }) } },
-		ceil  => { args => 1, code => sub { _each($_[0], sub { ceil $_[0] }) } },
-		round => { args => 1, code => sub { _each($_[0], sub { _round $_[0] }) } },
+		floor => { args => 1, code => sub { _each($_[0], sub { POSIX::floor $_[0] }) }, bignum_code => sub { $_[0]->copy->bfloor } },
+		ceil  => { args => 1, code => sub { _each($_[0], sub { POSIX::ceil $_[0] }) }, bignum_code => sub { $_[0]->copy->bceil } },
+		round => { args => 1, code => sub { _each($_[0], sub { _round $_[0] }) }, bignum_code => sub { $_[0]->copy->bfround(0, 'common') },
+			# Math::BigRat ->as_float broken with upgrading active
+			bigrat_code => sub { local $Math::BigFloat::upgrade = undef; $_[0]->as_float->bfround(0, 'common') } },
 	);
 	
 	sub _default_functions { +{%functions} }
@@ -109,31 +126,75 @@ use constant ROUND_HALF => 0.50000000000008;
 
 {
 	my $singleton;
-	sub _instance { blessed $_[0] ? $_[0] : ($singleton ||= $_[0]->new) }
+	sub _instance { Scalar::Util::blessed $_[0] ? $_[0] : ($singleton ||= $_[0]->new) }
 }
 
 sub calc ($) { _instance(__PACKAGE__)->evaluate($_[0]) }
 
-sub new { bless {}, shift }
+sub new {
+	my $class = shift;
+	my %params = @_ == 1 ? %{$_[0]} : @_;
+	my $self = bless {}, $class;
+	$self->bignum($params{bignum}) if exists $params{bignum};
+	$self->bigrat($params{bigrat}) if exists $params{bigrat};
+	return $self;
+}
 
 sub error { _instance(shift)->{error} }
+
+sub bignum {
+	my $self = shift;
+	return $self->{bignum} unless @_;
+	$self->{bignum} = !!shift;
+	if ($self->{bignum}) {
+		require Math::BigInt;
+		Math::BigInt->VERSION('1.87');
+		require Math::BigFloat;
+		Math::BigFloat->VERSION('1.58');
+		Math::BigInt->upgrade('Math::BigFloat');
+		Math::BigFloat->downgrade('Math::BigInt');
+		Math::BigFloat->upgrade(undef);
+	}
+	return $self;
+}
+
+sub bigrat {
+	my $self = shift;
+	return $self->{bigrat} unless @_;
+	$self->{bigrat} = !!shift;
+	if ($self->{bigrat}) {
+		require Math::BigInt;
+		Math::BigInt->VERSION('1.87');
+		require Math::BigRat;
+		Math::BigRat->VERSION('0.20');
+		require Math::BigFloat;
+		Math::BigFloat->VERSION('1.58');
+		Math::BigInt->upgrade('Math::BigFloat');
+		Math::BigFloat->upgrade('Math::BigRat');
+		Math::BigFloat->downgrade(undef);
+	}
+	return $self;
+}
 
 sub _functions { shift->{_functions} ||= _default_functions() }
 
 sub add_functions {
 	my ($self, %functions) = @_;
 	foreach my $name (keys %functions) {
-		croak qq{Function "$name" has invalid name} unless $name =~ m/\A[a-z]\w*\z/i;
+		Carp::croak qq{Function "$name" has invalid name} unless $name =~ m/\A[a-z]\w*\z/i;
 		my $definition = $functions{$name};
 		$definition = { args => 0, code => $definition } if ref $definition eq 'CODE';
-		croak qq{No argument count for function "$name"}
+		Carp::croak qq{No argument count for function "$name"}
 			unless defined (my $args = $definition->{args});
-		croak qq{Invalid argument count for function "$name"}
+		Carp::croak qq{Invalid argument count for function "$name"}
 			unless $args =~ m/\A\d+\z/ and $args >= 0;
-		croak qq{No coderef for function "$name"}
+		Carp::croak qq{No coderef for function "$name"}
 			unless defined (my $code = $definition->{code});
-		croak qq{Invalid coderef for function "$name"} unless ref $code eq 'CODE';
-		$self->_functions->{$name} = { args => $args, code => $code };
+		Carp::croak qq{Invalid coderef for function "$name"} unless ref $code eq 'CODE';
+		my %function = (args => $args, code => $code);
+		$function{bignum_code} = $definition->{bignum_code} if defined $definition->{bignum_code};
+		$function{bigrat_code} = $definition->{bigrat_code} if defined $definition->{bigrat_code};
+		$self->_functions->{$name} = \%function;
 	}
 	return $self;
 }
@@ -160,6 +221,8 @@ my $token_re = qr{(
 sub parse {
 	my ($self, $expr) = @_;
 	$self = _instance($self);
+	my $bignum = $self->bignum;
+	my $bigrat = $self->bigrat;
 	my (@expr_queue, @oper_stack, $binop_possible);
 	while ($expr =~ /$token_re/g) {
 		my ($token, $octal) = ($1, $2);
@@ -191,7 +254,8 @@ sub parse {
 			_shunt_comma(\@expr_queue, \@oper_stack)
 				or die "Misplaced comma or mismatched parentheses\n";
 			$binop_possible = 0;
-		} elsif (looks_like_number $token) {
+		} elsif (Scalar::Util::looks_like_number $token) {
+			$token = Math::BigFloat->new($token) if $bignum or $bigrat;
 			_shunt_number(\@expr_queue, \@oper_stack, $token);
 			$binop_possible = 1;
 		} elsif ($token =~ m/\A\w+\z/) {
@@ -288,6 +352,8 @@ sub evaluate {
 	
 	die "No expression to evaluate\n" unless @$expr;
 	
+	my $bignum = $self->bignum;
+	my $bigrat = $self->bigrat;
 	my @eval_stack;
 	foreach my $token (@$expr) {
 		die "Undefined token in evaluate\n" unless defined $token;
@@ -296,10 +362,13 @@ sub evaluate {
 			my $num_args = $function->{args};
 			die "Malformed expression\n" if @eval_stack < $num_args;
 			my @args = $num_args > 0 ? splice @eval_stack, -$num_args : ();
+			my $code = $function->{code};
+			$code = $function->{bignum_code} if ($bignum or $bigrat) and defined $function->{bignum_code};
+			$code = $function->{bigrat_code} if $bigrat and defined $function->{bigrat_code};
 			my ($result, $errored, $error);
 			{
 				local $@;
-				unless (eval { $result = $function->{code}(@args); 1 }) {
+				unless (eval { $result = $code->(@args); 1 }) {
 					$errored = 1;
 					$error = $@;
 				}
@@ -313,9 +382,9 @@ sub evaluate {
 			die qq{Undefined result from function "$token"\n} unless defined $result;
 			{
 				no warnings 'numeric';
-				push @eval_stack, 0+$result;
+				push @eval_stack, $result+0;
 			}
-		} elsif (looks_like_number $token) {
+		} elsif (Scalar::Util::looks_like_number $token) {
 			push @eval_stack, $token;
 		} else {
 			die qq{Invalid function "$token"\n};
@@ -387,6 +456,16 @@ Math::Calc::Parser - Parse and evaluate mathematical expressions
   
   $parser->remove_functions('π', 'e');
   $parser->evaluate('3π'); # Invalid function exception
+  
+  # Arbitrary precision calculations - use only in a controlled environment
+  $parser->bignum(1);
+  my $result = $parser->evaluate('30!'); # 265252859812191058636308480000000
+  my $result = $parser->evaluate('atan pi'); # 1.262627255678911683444322083605698343509
+  
+  # Rational number calculations - use only in a controlled environment
+  $parser->bigrat(1);
+  my $result = $parser->evaluate('3 / 9'); # 1/3
+  my $result = $parser->evaluate('3 >> 2'); # 3/4
 
 =head1 DESCRIPTION
 
@@ -411,6 +490,29 @@ customized using L</"add_functions"> and L</"remove_functions">.
 Compact exportable function wrapping L</"evaluate"> for string expressions.
 Throws an exception on error. See L<ath> for easy compact one-liners.
 
+=head1 ATTRIBUTES
+
+These attributes can only be set on instantiated objects.
+
+=head2 bignum
+
+  my $bool = $parser->bignum;
+  $parser  = $parser->bignum($bool);
+
+Enable support for arbitrary precision numbers using L<Math::BigInt> and
+L<Math::BigFloat>. This will avoid losing precision when working with floats or
+large integers, but see L</"BIGNUM CAVEATS">.
+
+=head2 bigrat
+
+  my $bool = $parser->bigrat;
+  $parser  = $parser->bigrat($bool);
+
+Enable support for precise rational numbers using L<Math::BigRat>. This will
+avoid losing precision when working with integer divison and similar
+operations, and will result in output like C<3/7> where possible, but see
+L</"BIGNUM CAVEATS">.
+
 =head1 METHODS
 
 Aside from C<add_functions> and C<remove_functions>, all methods can be called
@@ -420,6 +522,7 @@ available.
 =head2 new
 
   my $parser = Math::Calc::Parser->new;
+  my $parser = Math::Calc::Parser->new(bignum => 1);
 
 Creates a new L<Math::Calc::Parser> object.
 
@@ -475,7 +578,8 @@ Returns the error message after a failed L</"try_evaluate">.
 
   $parser->add_functions(
     my_function => { args => 5, code => sub { return grep { $_ > 0 } @_; } },
-    other_function => sub { 20 }
+    other_function => sub { 20 },
+    bignum_function => { args => 1, code => sub { 2 ** $_[0] }, bignum_code => sub { Math::BigInt->new(2)->bpow($_[0]) } },
   );
 
 Adds functions to be recognized by the parser object. Keys are function names
@@ -487,6 +591,12 @@ than or equal to C<0>. C<code> or the passed coderef will be called with the
 numeric operands passed as parameters, and must either return a numeric result
 or throw an exception. Non-numeric results will be cast to numbers in the usual
 perl fashion, and undefined results will throw an evaluation error.
+
+Alternate implementations to be used when L</"bignum"> or L</"bigrat"> is
+enabled can be passed as C<bignum_code> and C<bigrat_code> respectively.
+C<bignum_code> will also be used for L</"bigrat"> calculations if
+C<bigrat_code> is not separately defined; it is not common that these will need
+separate implementations.
 
 =head2 remove_functions
 
@@ -525,6 +635,10 @@ Absolute value.
 =item atan
 
 Inverse sine, cosine, and tangent.
+
+=item atan2
+
+Two-argument inverse tangent of first argument divided by second argument.
 
 =item ceil
 
@@ -572,11 +686,13 @@ Log with arbitrary base given as second argument.
 
 =item rand
 
-Random value between 0 and 1 (exclusive of 1).
+Random value between 0 and 1 (exclusive of 1). Uses L<Math::Random::Secure> if
+installed.
 
 =item round
 
-Round to nearest integer, with halfway cases rounded away from zero.
+Round to nearest integer, with halfway cases rounded away from zero. Due to
+bugs in L<Math::BigRat>, precision may be lost with L</"bigrat"> enabled.
 
 =item sin
 
@@ -604,6 +720,32 @@ numeric operations but may be more difficult to use in comparisons.
 Operators that are not defined to operate on complex numbers will return the
 result of the operation on the real components of their operands. This includes
 the operators C<E<lt>E<lt>>, C<E<gt>E<gt>>, C<%>, and C<!>.
+
+=head1 BIGNUM CAVEATS
+
+The L<Math::BigInt>, L<Math::BigFloat>, and L<Math::BigRat> packages are useful
+for working with numbers without losing precision, and can be used by this
+module by setting the L</"bignum"> or L</"bigrat"> attributes, but care should
+be taken. They will perform significantly slower than native Perl numbers, and
+can result in an operation that does not terminate or one that uses up all your
+memory.
+
+Additionally, similar to when using the L<bignum> or L<bigrat> pragmas, the
+auto-upgrading and downgrading behavior of these modules can only be set
+globally, so enabling these options will affect all other uses of these modules
+in your program. For the same reason, it is not recommended to enable both
+L</"bignum"> and L</"bigrat"> in the same program.
+
+The evaluated result may be a L<Math::BigInt>, L<Math::BigFloat>,
+L<Math::BigRat>, or other similar type of object. These objects can be printed
+and behave normally as numbers.
+
+L<Math::BigFloat> defaults to rounding values at 40 digits in division. This
+can be controlled by setting the global L<Math::BigFloat/"ACCURACY AND PRECISION">,
+but may have a large impact on performance and memory usage.
+
+Complex math is incompatible with L</"bignum"> and L</"bigrat"> and will likely
+result in NaN.
 
 =head1 BUGS
 

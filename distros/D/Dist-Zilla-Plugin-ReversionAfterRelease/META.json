@@ -48,7 +48,18 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.1",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vlyon/Dist-Zilla-Plugin-ReversionAfterRelease/issues"
+      },
+      "homepage" : "https://github.com/vlyon/Dist-Zilla-Plugin-ReversionAfterRelease",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vlyon/Dist-Zilla-Plugin-ReversionAfterRelease.git",
+         "web" : "https://github.com/vlyon/Dist-Zilla-Plugin-ReversionAfterRelease"
+      }
+   },
+   "version" : "0.2",
    "x_serialization_backend" : "JSON::XS version 3.03",
    "x_static_install" : 1
 }
