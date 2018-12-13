@@ -64,10 +64,7 @@ is( $qids[1], $ftask->uuid(), 'It is the correct noop task' );
 
 ok( !$queue->find_command('xyzzy'), 'Did not find non-existant command.' );
 
-SKIP:
 {
-    skip 'Long running tests not enabled.', 4 unless $ENV{CPANEL_SLOW_TESTS};
-
     ok( !$queue->process_next_task(),        'Start background task.' );
     ok( !$queue->is_task_queued( $qids[0] ), 'Not in queue.' );
     my $task = $queue->find_task( $qids[0] );

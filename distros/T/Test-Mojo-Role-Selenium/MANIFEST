@@ -1,5 +1,4 @@
 .perltidyrc
-.ship.conf
 .travis.yml
 Changes
 cpanfile

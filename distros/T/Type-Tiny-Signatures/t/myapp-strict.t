@@ -18,7 +18,7 @@ ok ! eval { greeting('martian') };
 ok $@;
 
 is meeting(epoch => time), 'our meeting is at ' . time;
-ok ! eval { meeting(epocj => time) };
+is meeting(epocj => time), 'our meeting is at ' . time;
 ok $@;
 
 ok 1 and done_testing;

@@ -30,6 +30,7 @@ os $hrOpts ok(1, 'Test 5');     # This one should run
 is($TEST_NUMBER_OS, 6, '$TEST_NUMBER_OS increments to 6');
 
 $hrOpts->{n} = 2;
+skip_these $hrOpts, 7;
 skip_next $hrOpts;
 os $hrOpts {
     ok(0, 'Test 6');
@@ -40,7 +41,7 @@ is($TEST_NUMBER_OS, 8, '$TEST_NUMBER_OS increments to 8');
 
 ok(1, 'Test 9');
 
-is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true}, n=>2},
+is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true, 7=>true}, n=>2},
     'Options structure is what we set');
 is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}, verbose=>0}, '$TEST_ONLYSOME has only the default content');
 

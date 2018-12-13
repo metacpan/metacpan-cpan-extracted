@@ -10,7 +10,7 @@ use parent 'DBIx::Class';
 
 use Time::Piece;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub register_column {
     my ($self, $column, $info, @rest) = @_;
@@ -49,7 +49,7 @@ DBIx::Class::InflateColumn::TimePiece - Auto-create Time::Piece objects from int
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

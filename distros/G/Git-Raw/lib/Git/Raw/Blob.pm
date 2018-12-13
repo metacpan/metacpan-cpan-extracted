@@ -1,5 +1,5 @@
 package Git::Raw::Blob;
-$Git::Raw::Blob::VERSION = '0.81';
+$Git::Raw::Blob::VERSION = '0.82';
 use strict;
 use warnings;
 use overload
@@ -14,7 +14,7 @@ Git::Raw::Blob - Git blob class
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 DESCRIPTION
 

@@ -359,14 +359,12 @@ sub model {
     or die "Model module [$name] not found at namespace [$ns] or has errors";
   
   weaken $self;
-  weaken $self->{app};
+  #~ weaken $self->{app};
   $class->new(app=>$self->app, plugin=>$self); # синглетоны в общем
-  
-  #~ my $m = { map {$_ => load_class("Mojolicious::Plugin::RoutesAuthDBI::Model::$_")->new} qw(Profiles Namespaces Routes Refs Controllers Actions Roles Logins) };
   
 };
 
-our $VERSION = '0.861';
+our $VERSION = '0.862';
 
 =pod
 
@@ -382,7 +380,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.861
+0.862
 
 =head1 NAME
 

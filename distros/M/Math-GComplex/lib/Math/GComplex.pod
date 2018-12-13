@@ -6,11 +6,11 @@ Math::GComplex - Generic complex number library.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
-    use 5.014;
+    use 5.010;
     use Math::GComplex;
     use Math::AnyNum qw(:overload);
 
@@ -44,17 +44,17 @@ The following functions are exportable:
         atan2 deg2rad rad2deg
 
     :special
-        log logn exp sqrt cbrt root
+        log logn exp pow pown sqrt cbrt root
 
     :misc
         cplx abs acmp sgn conj norm
         inv real imag reals floor ceil
 
-Each function can be exported individually, as:
+Multiple functions can be exported as:
 
-    use Math::GComplex qw(acosh);
+    use Math::GComplex qw(acos acosh);
 
-There is also the possibility of exporting an entire group of functions, as:
+There is also the possibility of exporting an entire group of functions, by specifying their group name, as:
 
     use Math::GComplex qw(:trig);
 
@@ -83,28 +83,18 @@ Nothing is exported by default.
 
 =head1 INITIALIZATION
 
-=head2 new / make
+=head2 new / cplx / make
 
+    my $z = cplx($real, $imag);
     my $z = Math::GComplex->new($real, $imag);
     my $z = Math::GComplex->make($real, $imag);
 
 Create a new complex number, given its Cartesian coordinate form.
 
-=head2 cplx
-
-    my $z = cplx($real, $imag);
-
-Create a new complex number, given its Cartesian coordinate form.
-
-=head2 emake
-
-    my $z = Math::GComplex->emake($r, $theta);
-
-Create a new complex number, given its polar form.
-
-=head2 cplxe
+=head2 cplxe / emake
 
     my $z = cplxe($r, $theta);
+    my $z = Math::GComplex->emake($r, $theta);
 
 Create a new complex number, given its polar form.
 
@@ -251,6 +241,12 @@ Natural exponentiation of C<$x>, defined as:
 Raises C<$x> to power C<$y> and returns the result, defined as:
 
     a^b = exp(log(a) * b)
+
+=head2 pown
+
+    $x->pown($n)
+
+Raises C<$x> to power C<$n> and returns the result, where C<$n> is a native integer.
 
 =head2 root
 
@@ -433,6 +429,53 @@ The integer-truncation function, defined as:
 
     int(a + b*i) = int(a) + int(b)*i
 
+=head2 and
+
+    $x & $y
+    $x->and($y)
+
+Bitwise AND-logical operation, defined as:
+
+    (a + b*i) & (x + y*i) = (a & x) + (b & y)*i
+
+=head2 or
+
+    $x | $y
+    $x->or($y)
+
+Bitwise OR-logical operation, defined as:
+
+    (a + b*i) | (x + y*i) = (a | x) + (b | y)*i
+
+=head2 xor
+
+    $x ^ $y
+    $x->xor($y)
+
+Bitwise XOR-logical operation, defined as:
+
+    (a + b*i) ^ (x + y*i) = (a ^ x) + (b ^ y)*i
+
+=head2 lsft
+
+    $x << $n
+    $x->lsft($n)
+
+Bitwise left-shift operation, defined as:
+
+    (a + b*i) << n         = (a << n) + (b << n)*i
+    (a + b*i) << (x + y*i) = int((a + b*i) * 2**(x + y*i))
+
+=head2 rsft
+
+    $x >> $n
+    $x->rsft($n)
+
+Bitwise right-shift operation, defined as:
+
+    (a + b*i) >> n         = (a >> n) + (b >> n)*i
+    (a + b*i) >> (x + y*i) = int((a + b*i) / 2**(x + y*i))
+
 =head2 real
 
     $x->real
@@ -554,7 +597,7 @@ However the user may still encounter incorrect results due to rounding errors an
 
 =head1 AUTHOR
 
-Daniel Șuteu, C<< <trizen at protonmail.com> >>
+Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 BUGS
 

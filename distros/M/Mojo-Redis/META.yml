@@ -18,11 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '7.30'
+  Mojolicious: '7.80'
   Protocol::Redis: '1.0006'
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-redis/issues
   homepage: https://github.com/jhthorsen/mojo-redis
   repository: https://github.com/jhthorsen/mojo-redis.git
-version: '3.13'
+version: '3.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

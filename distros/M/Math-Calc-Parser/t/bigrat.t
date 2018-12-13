@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use utf8;
 use Encode 'encode';
-use Test::Needs { 'Math::BigInt' => '1.87', 'Math::BigFloat' => '1.58', 'Math::BigRat' => '0.20' };
+use Test::Needs { 'Math::BigInt' => '1.999722', 'Math::BigFloat' => '1.999722', 'Math::BigRat' => '0.260804' };
 use Math::Calc::Parser;
 use Test::More;
 

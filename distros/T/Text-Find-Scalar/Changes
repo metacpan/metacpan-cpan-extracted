@@ -1,4 +1,10 @@
 Revision history for Perl extension Text::Find::Scalar.
+=======================================================
+
+0.08  2018-12-12 15:52:00
+
+    - add tests
+    - improve code layout
 
 0.06  2016-05-15
     - fix warning 'Unescaped left brace in regex is deprecated'

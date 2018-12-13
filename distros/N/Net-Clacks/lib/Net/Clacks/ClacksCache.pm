@@ -1,13 +1,13 @@
 package Net::Clacks::ClacksCache;
 #---AUTOPRAGMASTART---
-use 5.020;
+use 5.010_001;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 4.8;
+our $VERSION = 4.9;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---

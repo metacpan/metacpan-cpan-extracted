@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 =head1 NAME
 
@@ -68,6 +68,7 @@ use curry::weak;
 use Log::Any qw($log);
 use Syntax::Keyword::Try;
 
+use Ryu '0.030';
 use Ryu::Source;
 
 use Ryu::Async::Process;
@@ -160,6 +161,14 @@ sub from_stream {
     my ($self, $stream) = @_;
 
     my $src = $self->source(label => 'from');
+
+    # Our ->flow_control monitoring gives us a boolean
+    # value every time the state changes:
+    # 1 - we are active
+    # 0 - we are paused
+    $src->flow_control
+        ->each($stream->curry::weak::want_readready);
+
     $stream->configure(
         on_read => sub {
             my ($stream, $buffref, $eof) = @_;
@@ -184,9 +193,12 @@ sub to_stream {
     my ($self, $stream) = @_;
 
     my $sink = $self->sink(label => 'from');
-    $sink->source->each(sub {
-        $stream->write($_)
-    });
+    $sink->flow_control
+        ->each($stream->curry::weak::want_writeready);
+    $sink->source
+        ->each(sub {
+            $stream->write($_)
+        });
 #    unless($stream->parent) {
 #        $self->add_child($stream);
 #        $sink->source->on_ready(sub {
@@ -222,6 +234,9 @@ Returns a new L<Ryu::Sink> that wraps STDOUT.
 
 sub stdout {
     my ($self) = @_;
+    return $self->to_stream(
+        IO::Async::Stream->new_for_stdout
+    )
 }
 
 =head2 timer
@@ -525,5 +540,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
 

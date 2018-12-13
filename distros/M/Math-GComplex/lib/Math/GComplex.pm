@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use overload
   '""' => \&stringify,
@@ -18,6 +18,12 @@ use overload
   '!=' => \&ne,
 
   '~' => \&conj,
+  '&' => \&and,
+  '|' => \&or,
+  '^' => \&xor,
+
+  '>>' => \&rsft,
+  '<<' => \&lsft,
 
   '>'  => sub { $_[2] ? (goto &lt) : (goto &gt) },
   '>=' => sub { $_[2] ? (goto &le) : (goto &ge) },
@@ -98,6 +104,8 @@ use overload
                    cbrt => \&cbrt,
                    logn => \&logn,
                    root => \&root,
+                   pow  => \&pow,
+                   pown => \&pown,
                   );
 
     my %misc = (
@@ -105,7 +113,7 @@ use overload
         acmp => \&acmp,
         cplx => \&cplx,
 
-        abs => sub (_) { goto &abs },         # built-in function
+        abs => sub (_) { goto &abs },    # built-in function
 
         inv  => \&inv,
         sgn  => \&sgn,
@@ -408,6 +416,83 @@ sub norm ($) {
 }
 
 #
+## (a+b*i) AND (x+y*i) = (a AND x) + (b AND y)*i
+#
+
+sub and {
+    my ($x, $y) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    $y = __PACKAGE__->new($y) if ref($y) ne __PACKAGE__;
+
+    __PACKAGE__->new($x->{a} & $y->{a}, $x->{b} & $y->{b});
+}
+
+#
+## (a+b*i) OR (x+y*i) = (a OR x) + (b OR y)*i
+#
+
+sub or {
+    my ($x, $y) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    $y = __PACKAGE__->new($y) if ref($y) ne __PACKAGE__;
+
+    __PACKAGE__->new($x->{a} | $y->{a}, $x->{b} | $y->{b});
+}
+
+#
+## (a+b*i) XOR (x+y*i) = (a XOR x) + (b XOR y)*i
+#
+
+sub xor {
+    my ($x, $y) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    $y = __PACKAGE__->new($y) if ref($y) ne __PACKAGE__;
+
+    __PACKAGE__->new($x->{a} ^ $y->{a}, $x->{b} ^ $y->{b});
+}
+
+#
+## (a+b*i) << n       = (a << n) + (b << n)*i
+## (a+b*i) << (x+y*i) = int((a+b*i) * 2^(x+y*i))
+#
+
+sub lsft {
+    my ($x, $y) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    $y = __PACKAGE__->new($y) if ref($y) ne __PACKAGE__;
+
+    if ($y->{b} == 0) {
+        return __PACKAGE__->new($x->{a} << $y->{a}, $x->{b} << $y->{a});
+    }
+
+    state $two = __PACKAGE__->new(2, 0);
+    $x->mul($two->pow($y))->int;
+}
+
+#
+## (a+b*i) >> n       = (a >> n) + (b >> n)*i
+## (a+b*i) >> (x+y*i) = int((a+b*i) / 2^(x+y*i))
+#
+
+sub rsft {
+    my ($x, $y) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    $y = __PACKAGE__->new($y) if ref($y) ne __PACKAGE__;
+
+    if ($y->{b} == 0) {
+        return __PACKAGE__->new($x->{a} >> $y->{a}, $x->{b} >> $y->{a});
+    }
+
+    state $two = __PACKAGE__->new(2, 0);
+    $x->div($two->pow($y))->int;
+}
+
+#
 ## log(a + b*i) = log(a^2 + b^2)/2 + atan2(b, a)*i    -- where a,b are real
 #
 
@@ -472,10 +557,45 @@ sub pow {
             return __PACKAGE__->new($x->{a} + 1, $x->{b});
         }
 
-        return __PACKAGE__->new($x->{a}, $x->{b});
+        return $x;
     }
 
     $x->log->mul($y)->exp;
+}
+
+sub pown ($$) {
+    my ($x, $y) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+
+    $y = CORE::int($y);
+    my $neg = $y < 0;
+    $y = CORE::int(CORE::abs($y));
+
+    if ($x->{a} == 0 and $x->{b} == 0) {
+
+        if ($neg) {
+            return $x->inv;
+        }
+
+        if ($y == 0) {
+            return __PACKAGE__->new($x->{a} + 1, $x->{b});
+        }
+
+        return $x;
+    }
+
+    my ($rx, $ry) = (1, 0);
+    my ($ax, $bx) = (@{$x}{qw(a b)});
+
+    while (1) {
+        ($rx, $ry) = ($rx * $ax - $ry * $bx, $rx * $bx + $ry * $ax) if ($y & 1);
+        ($y >>= 1) or last;
+        ($ax, $bx) = ($ax * $ax - $bx * $bx, $ax * $bx + $bx * $ax);
+    }
+
+    my $res = __PACKAGE__->new($rx, $ry);
+    $neg ? $res->inv : $res;
 }
 
 #
@@ -601,7 +721,7 @@ sub sin {
     $t1->{a} /= 2;
     $t1->{b} /= 2;
 
-    @{$t1}{'a', 'b'} = (-$t1->{b}, $t1->{a});
+    @{$t1}{qw(a b)} = (-$t1->{b}, $t1->{a});
 
     $t1;
 }
@@ -642,7 +762,7 @@ sub asin ($) {
     $r->{b} += $x->{a};
 
     $r = $r->log;
-    @{$r}{'a', 'b'} = ($r->{b}, -$r->{a});
+    @{$r}{qw(a b)} = ($r->{b}, -$r->{a});
     $r;
 }
 
@@ -721,7 +841,7 @@ sub acos ($) {
     my $t1 = __PACKAGE__->new((1 - $x->{a}) / 2, $x->{b} / -2)->sqrt;
     my $t2 = __PACKAGE__->new((1 + $x->{a}) / 2, $x->{b} / +2)->sqrt;
 
-    @{$t1}{'a', 'b'} = (-$t1->{b}, $t1->{a});
+    @{$t1}{qw(a b)} = (-$t1->{b}, $t1->{a});
 
     $t1->{a} += $t2->{a};
     $t1->{b} += $t2->{b};
@@ -731,7 +851,7 @@ sub acos ($) {
     $r->{a} *= -2;
     $r->{b} *= -2;
 
-    @{$r}{'a', 'b'} = (-$r->{b}, $r->{a});
+    @{$r}{qw(a b)} = (-$r->{b}, $r->{a});
 
     $r;
 }
@@ -788,7 +908,7 @@ sub tan ($) {
 
     $r->{a} -= 1;
 
-    @{$r}{'a', 'b'} = ($r->{b}, $r->{a});
+    @{$r}{qw(a b)} = ($r->{b}, $r->{a});
 
     $r;
 }
@@ -828,7 +948,7 @@ sub atan ($) {
     $t1->{a} /= 2;
     $t1->{b} /= 2;
 
-    @{$t1}{'a', 'b'} = (-$t1->{b}, $t1->{a});
+    @{$t1}{qw(a b)} = (-$t1->{b}, $t1->{a});
 
     $t1;
 }
@@ -847,7 +967,7 @@ sub atan2 {
 
     $t = $t->div($x->mul($x)->add($y->mul($y))->sqrt)->log;
 
-    @{$t}{'a', 'b'} = ($t->{b}, -$t->{a});
+    @{$t}{qw(a b)} = ($t->{b}, -$t->{a});
 
     $t;
 }
@@ -905,7 +1025,7 @@ sub cot ($) {
 
     $r->{a} += 1;
 
-    @{$r}{'a', 'b'} = ($r->{b}, $r->{a});
+    @{$r}{qw(a b)} = ($r->{b}, $r->{a});
 
     $r;
 }
@@ -1062,7 +1182,7 @@ sub csc ($) {
         $t1->{b} /= $den;
     }
 
-    @{$t1}{'a', 'b'} = ($t1->{b}, $t1->{a});
+    @{$t1}{qw(a b)} = ($t1->{b}, $t1->{a});
 
     $t1;
 }
@@ -1120,7 +1240,7 @@ sub deg2rad ($) {
 
     $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
 
-    my $t = __PACKAGE__->new($x->{a} / 180, $x->{b} / 180);
+    my $t  = __PACKAGE__->new($x->{a} / 180, $x->{b} / 180);
     my $pi = CORE::atan2(0, -($x->{a} * $x->{a} + $x->{b} * $x->{b}));
 
     if (!ref($pi)) {

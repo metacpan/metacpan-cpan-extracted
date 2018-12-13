@@ -63,7 +63,6 @@ like($logged, qr| FATAL] die with message at t/50-die\.t line \d+\. Exit 255, ET
 $Log::Log4Cli::LEVEL = 4;
 
 eval { die_fatal "evaled die_fatal test" };
-is($Log::Log4Cli::STATUS, 127);     # deprecated TODO: remove it
 isa_ok($@, 'Log::Log4Cli::Exception');
 like($@, qr|^evaled die_fatal test at t/50-die\.t line \d+\.$|, "Stringify test");
 is($@->{EXIT_CODE}, 127, "Exit code test");
@@ -71,7 +70,6 @@ like($@->{ERR_MESSAGE}, qr|^evaled die_fatal test at t/50-die\.t line \d+\.$|, "
 like($@->{LOG_MESSAGE}, qr/ FATAL] evaled die_fatal test\. Exit 127, ET \d+s$/, "Log message test");
 
 eval { die_info "evaled die_info test" };
-is($Log::Log4Cli::STATUS, 0);       # deprecated TODO: remove it
 isa_ok($@, 'Log::Log4Cli::Exception');
 like($@, qr|^evaled die_info test at t/50-die\.t line \d+\.$|, "Stringify test");
 is($@->{EXIT_CODE}, 0, "Exit code test");
@@ -81,7 +79,6 @@ like($@->{LOG_MESSAGE}, qr/ INFO] evaled die_info test\. Exit 0, ET \d+s$/, "Log
 $Log::Log4Cli::LEVEL = 0;
 
 eval { die_fatal undef, 42 };
-is($Log::Log4Cli::STATUS, 42);      # deprecated TODO: remove it
 isa_ok($@, 'Log::Log4Cli::Exception');
 like($@, qr|^Died at t/50-die\.t line \d+\.$|, "Stringify test");
 is($@->{EXIT_CODE}, 42, "Exit code test");
@@ -89,7 +86,6 @@ like($@->{ERR_MESSAGE}, qr|^Died at t/50-die\.t line \d+\.$|, "Err message test"
 like($@->{LOG_MESSAGE}, qr/ FATAL] Exit 42, ET \d+s$/, "Log message test");
 
 eval { die_info undef, 43 };
-is($Log::Log4Cli::STATUS, 43);      # deprecated TODO: remove it
 isa_ok($@, 'Log::Log4Cli::Exception');
 like($@, qr|^Died at t/50-die\.t line \d+\.$|, "Stringify test");
 is($@->{EXIT_CODE}, 43, "Exit code test");

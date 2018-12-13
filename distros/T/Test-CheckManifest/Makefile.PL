@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,19 +14,22 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Test-CheckManifest",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Test::CheckManifest",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Cwd" => 0,
+    "Cwd" => "3.75",
     "File::Basename" => 0,
     "File::Find" => 0,
     "File::Spec" => 0,
-    "Test::Builder" => 0
+    "Scalar::Util" => 0,
+    "Test::Builder" => 0,
+    "Test::More" => 0
   },
   "TEST_REQUIRES" => {
     "CPAN::Meta::YAML" => 0
   },
-  "VERSION" => "1.33",
+  "VERSION" => "1.38",
   "test" => {
     "TESTS" => "t/*.t t/extra/*.t t/xt/*.t"
   }
@@ -36,11 +39,13 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "CPAN::Meta::YAML" => 0,
   "Carp" => 0,
-  "Cwd" => 0,
+  "Cwd" => "3.75",
   "File::Basename" => 0,
   "File::Find" => 0,
   "File::Spec" => 0,
-  "Test::Builder" => 0
+  "Scalar::Util" => 0,
+  "Test::Builder" => 0,
+  "Test::More" => 0
 );
 
 

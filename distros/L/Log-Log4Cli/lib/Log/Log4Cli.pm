@@ -15,7 +15,7 @@ BEGIN {
     };
 }
 
-our $VERSION = '0.21'; # Don't forget to change in pod below
+our $VERSION = '0.22'; # Don't forget to change in pod below
 
 our @EXPORT = qw(
     die_fatal
@@ -46,7 +46,6 @@ our $COLORS = {
 our $LEVEL = 0;
 our $POSITIONS = undef;
 our $COLOR;              # color on/off switcher; defined below
-our $STATUS = undef;     # exit code; deprecated TODO: remove it
 
 my $FD;                  # descriptor to write messages; defined below
 
@@ -56,8 +55,6 @@ sub _die($$$$) {
 
     if ($^S) {
         # inside eval block
-        $STATUS = $_[0]; # deprecated TODO: remove it
-
         my ($file, $line) = (caller(1))[1,2];
         CORE::die bless {
             ERR_MESSAGE => ($_[3] ? "$_[3]" : "Died") . " at $file line $line.",
@@ -134,7 +131,7 @@ Log::Log4Cli -- Lightweight logger for command line tools
 
 =head1 VERSION
 
-Version 0.21
+Version 0.22
 
 =head1 SYNOPSIS
 
@@ -160,8 +157,9 @@ Version 0.21
 
 =head1 DESCRIPTION
 
-Lightweight, but sufficient and user friendly logging for command line tools with
-minimal impact on performance, no configuration and no non-core dependencies.
+Lightweight, but sufficient and user friendly logging for command line tools
+with minimal impact on performance, optional configuration and no non-core
+dependencies.
 
 =head1 EXPORT
 
@@ -174,9 +172,9 @@ All subroutines described below are exported by default.
     die_fatal "Something terrible happened", 8;
 
 Log message and exit with provided code. In eval blocks C<Carp::croak> used
-instead of exit and exit code stored in C<$Log::Log4Cli::STATUS>. All
-arguments are optional. If second arg (exit code) omitted die_fatal, die_alert
-and die_info will exit with 127, 0 and 0 respectively.
+instead of exit(). All arguments are optional. If second arg (exit code)
+omitted die_fatal, die_alert and die_info will exit with C<127>, C<0> and C<0>
+respectively.
 
 =head2 log_fatal, log_error, log_alert, log_warn, log_info, log_debug, log_trace
 

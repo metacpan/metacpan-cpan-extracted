@@ -1,0 +1,70 @@
+{
+   "abstract" : "A fluentd publisher for Message::Passing",
+   "author" : [
+      "Wallace Reis <wallace@reis.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Message-Passing-Fluentd",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.20",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Fluent::Logger" : "0",
+            "Moo" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wreis/Message-Passing-Fluentd/issues"
+      },
+      "homepage" : "https://github.com/wreis/Message-Passing-Fluentd",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wreis/Message-Passing-Fluentd.git",
+         "web" : "https://github.com/wreis/Message-Passing-Fluentd"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.20.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_static_install" : 1
+}
+

@@ -60,7 +60,9 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  Math::BigInt
+  Math::BigFloat
+  Math::BigRat
 );
 
 my @exclude = qw(

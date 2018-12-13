@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 =head1 NAME
 
@@ -391,38 +391,6 @@ sub throw {
     $src->fail('...');
 }
 
-=head2 pause
-
-Does nothing useful.
-
-=cut
-
-sub pause {
-    my $self = shift;
-    $self->{is_paused} = 1;
-    $self
-}
-
-=head2 resume
-
-Is about as much use as L</pause>.
-
-=cut
-
-sub resume {
-    my $self = shift;
-    $self->{is_paused} = 0;
-    $self
-}
-
-=head2 is_paused
-
-Might return 1 or 0, but is generally meaningless.
-
-=cut
-
-sub is_paused { $_[0]->{is_paused} }
-
 =head2 debounce
 
 Not yet implemented.
@@ -713,6 +681,38 @@ sub sprintf_methods {
         my ($item) = @_;
         $src->emit(sprintf $fmt, map $item->$_ // '', @methods)
     }, $src);
+}
+
+sub buffer {
+    my ($self, $count) = @_;
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $src->{pause_propagation} = 0;
+    $count ||= 10;
+    my @pending;
+    $self->completed->on_ready(sub {
+        shift->on_ready($src->completed) unless $src->completed->is_ready
+    });
+    $src->flow_control
+        ->each($src->$curry::weak(sub {
+            my ($src) = @_;
+            return unless $_;
+            $src->emit(shift @pending) while @pending and not $src->is_paused;
+        }))->retain;
+    $self->each_while_source($self->$curry::weak(sub {
+        my ($self, $item) = @_;
+        push @pending, $item;
+        $self->pause($src) if @pending >= $count;
+        $src->emit(shift @pending) while @pending and not $src->is_paused;
+        $self->resume($src) if @pending < $count;
+    }), $src);
+}
+
+sub retain {
+    my ($self) = @_;
+    $self->{_self} = $self;
+    $self->completed
+        ->on_ready(sub { delete $self->{_self} });
+    $self
 }
 
 =head2 as_list
@@ -1610,9 +1610,10 @@ sub emit {
     use namespace::clean qw(try catch finally);
     my $self = shift;
     my $completion = $self->completed;
+    my @handlers = @{$self->{on_item} || []} or return $self;
     for (@_) {
-        for my $code (@{$self->{on_item}}) {
-            die 'already completed' if $completion->is_ready;
+        die 'already completed' if $completion->is_ready;
+        for my $code (@handlers) {
             try {
                 $code->($_);
             } catch {
@@ -1719,10 +1720,6 @@ sub notify_child_completion {
     $self
 }
 
-sub label { shift->{label} }
-
-sub parent { shift->{parent} }
-
 =head2 await
 
 Block until this source finishes.
@@ -1742,7 +1739,7 @@ Mark this source as completed.
 
 =cut
 
-sub finish { $_[0]->completed->done; $_[0] }
+sub finish { $_[0]->completed->done unless $_[0]->completed->is_ready; $_[0] }
 
 sub refresh { }
 
@@ -1831,7 +1828,7 @@ sub each_while_source {
     $self->each($code);
     $src->completed->on_ready(sub {
         my $count = extract_by { refaddr($_) == refaddr($code) } @{$self->{on_item}};
-        $log->tracef("->e_w_s completed on %s for refaddr 0x%x", $self->describe, refaddr($self));
+        $log->tracef("->each_while_source completed on %s for refaddr 0x%x, removed %d on_item handlers", $self->describe, refaddr($self), $count);
     });
     $src
 }

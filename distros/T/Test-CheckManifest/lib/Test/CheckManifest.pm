@@ -11,14 +11,21 @@ use File::Spec;
 use File::Basename;
 use Test::Builder;
 use File::Find;
+use Scalar::Util qw(blessed);
 
-our $VERSION = '1.33';
+our $VERSION = '1.38';
 our $VERBOSE = 1;
+our $HOME;
 
 my $test      = Test::Builder->new();
 my $test_bool = 1;
 my $plan      = 0;
 my $counter   = 0;
+
+my @excluded_files = qw(
+    pm_to_blib Makefile META.yml Build pod2htmd.tmp META.json
+    pod2htmi.tmp Build.bat .cvsignore MYMETA.json MYMETA.yml
+);
 
 sub import {
     my $self   = shift;
@@ -36,36 +43,64 @@ sub import {
     $plan = 1 if(exists $plan{tests});
 }
 
-sub ok_manifest{
-    my ($hashref,$msg) = @_;
-    
-    $test->plan(tests => 1) unless $plan;
-    
-    my $is_hashref = 1;
-    $is_hashref = 0 unless ref($hashref);
-    
-    unless ( $is_hashref ) {
-        $msg = $hashref;
+sub _validate_args {
+    my ($hashref, $msg) = @_;
+
+    my $ref = ref $hashref;
+    if ( !$ref || 'HASH' ne $ref ) {
+        $msg     = $hashref if !$ref;
         $hashref = {};
     }
 
-    my $tmp_path = dirname( File::Spec->rel2abs( $0 ) );
+    my $ref_filter     = ref $hashref->{filter};
+    $hashref->{filter} = [] if !$ref_filter || 'ARRAY' ne $ref_filter;
+    $hashref->{filter} = [ grep{ blessed $_ && $_->isa('Regexp') } @{ $hashref->{filter} } ];
 
-    if ( $hashref->{file} ) {
-        $tmp_path = dirname $hashref->{file};
+    my $ref_exclude     = ref $hashref->{exclude};
+    $hashref->{exclude} = [] if !$ref_exclude || 'ARRAY' ne $ref_exclude;
+    push @{$hashref->{exclude}}, qw!/blib /_blib! if $test_bool;
+
+    for my $excluded_path ( @{ $hashref->{exclude} } ) {
+        croak 'path in excluded array must be "absolute"' if $excluded_path !~  m!^/!;
     }
-    elsif ( $hashref->{dir} ) {
-        $tmp_path = $hashref->{dir};
+
+    my $bool = lc( $hashref->{bool} || '' );
+    $hashref->{bool} = $bool && $bool eq 'and' ? 'and' : 'or';
+    
+    return $hashref, $msg;
+}
+
+sub _check_excludes {
+    my ($hashref, $home) = @_;
+
+    my @excluded;
+
+    for my $excluded_path ( @{ $hashref->{exclude} } ) {
+        my $path = Cwd::realpath( $home . $excluded_path );
+        next if !$path || !-e $path;
+
+        push @excluded, $path;
     }
     
-    my $bool = 1;
-    my $home = Cwd::realpath( $tmp_path );
-    my $manifest;
+    return \@excluded;
+}
 
+sub _find_home {
+    my ($params) = @_;
+
+    my $tmp_path = dirname( File::Spec->rel2abs( $0 ) );
+
+    if ( $params->{file} ) {
+        $tmp_path = dirname $params->{file};
+    }
+    elsif ( $params->{dir} ) {
+        $tmp_path = $params->{dir};
+    }
+
+    my $home    = Cwd::realpath( $tmp_path );
     my $counter = 0;
     while ( 1 ) {
-        my $manifest_path = File::Spec->catfile( $home . '/MANIFEST' );
-        last if -f $manifest_path;
+        last if -f File::Spec->catfile( $home, 'MANIFEST' );
 
         my $tmp_home = Cwd::realpath( File::Spec->catdir( $home, '..' ) );
 
@@ -73,113 +108,90 @@ sub ok_manifest{
         $home = $tmp_home;
     }
 
-    eval { $manifest = Cwd::realpath( $home . '/MANIFEST' ); 1; };
-    if ( !$manifest ) {
+    return $HOME if $HOME;
+    return $home;
+}
+
+sub ok_manifest {
+    my ($hashref,$msg) = _validate_args( @_ );
+    
+    $test->plan(tests => 1) if !$plan;
+    
+    my $bool     = 1;
+    my $home     = _find_home( $hashref );
+    my $manifest = File::Spec->catfile( $home, 'MANIFEST' );
+
+    if ( !-f $manifest ) {
         $test->BAILOUT( 'Cannot find a MANIFEST. Please check!' );
     }
+    elsif( !-r $manifest ) {
+        $test->is_num( 0, $test_bool, "can't open $manifest" );
+        return;
+    }
     
-    my $skip;
-    my $skip_path = File::Spec->catfile( $home, 'MANIFEST.SKIP' );
-    eval { $skip = Cwd::realpath( $skip_path ) if -f $skip_path; 1; };
+    my $skip_path  = File::Spec->catfile( $home, 'MANIFEST.SKIP' );
+    my @skip_files = _read_file( $skip_path );
 
     my @dup_files     = ();
     my @missing_files = ();
     my @files_plus    = ();
-    my $arref         = ['/blib' , '/_build'];
-    my $filter        = $is_hashref && 
-                        $hashref->{filter} ? $hashref->{filter}  : [];
-    my $comb          = $is_hashref && 
-                        $hashref->{bool} && 
-                        $hashref->{bool} =~ m/^and$/i ?
-                               'and' :
-                               'or'; 
-                   
-    push @$arref, @{$hashref->{exclude}} 
-        if $is_hashref and exists $hashref->{exclude} and 
-            ref($hashref->{exclude}) eq 'ARRAY';
-    
-    for(@$arref){
-        croak 'path in excluded array must be "absolute"' unless m!^/!;
-        my $path = $home . $_;
-        next unless -e $path;
-        $_ = Cwd::realpath($path);
+    my $excluded      = _check_excludes( $hashref, $home );
+
+    my @files = _read_file( $manifest );
+
+    for my $tfile ( @files ) {
+        $tfile = ( split /\s{2,}/, $tfile, 2 )[0];
+
+        next if !-e $home . '/' . $tfile;
+
+        $tfile = File::Spec->rel2abs($home . '/' . $tfile);
     }
-    
-    @$arref = grep { defined }@$arref;
-    
-    unless( open my $fh, '<', $manifest ){
+
+    my (@dir_files,%files_hash,%excluded);
+    @files_hash{@files} = ();
+
+    find({
+        no_chdir => 1,
+        follow   => 0,
+        wanted   => sub {
+            my $file         = $File::Find::name;
+            my $is_excluded  = _is_excluded(
+                $file,
+                $excluded,
+                $hashref->{filter},
+                $hashref->{bool},
+                \@skip_files,
+                $home,
+            );
+            
+            push @dir_files, File::Spec->rel2abs($file) if -f $file and !$is_excluded;
+            
+            $excluded{$file} = 1 if -f $file and $is_excluded
+        }
+    },$home);
+
+    #use Data::Dumper;
+    #print STDERR ">>",++$counter,":",Dumper(\@files,\@dir_files);
+    SFILE:
+    for my $file ( @dir_files ) {
+        for my $check ( @files ) {
+            if ( $file eq $check ) {
+                delete $files_hash{$check};
+                next SFILE;
+            }
+        }
+
+        push @missing_files, $file;
         $bool = 0;
-        $msg  = "can't open $manifest";
     }
-    else{
-        { # extra block to use "last"
-        
-        my $files_in_skip = _read_skip( $skip, \$msg, \$bool );
-        last unless $files_in_skip;
 
-        my @files = _read_file( $fh );
-        close $fh;
-    
-        chomp @files;
-    
-        {
-            local $/ = "\r";
-            chomp @files;
-        }
-    
-        for my $tfile(@files){
-            $tfile = (split(/\s{2,}/,$tfile,2))[0];
-            next unless -e $home . '/' . $tfile;
-            $tfile = File::Spec->rel2abs($home . '/' . $tfile);
-        }
-    
-        my (@dir_files,%files_hash,%excluded);
-        @files_hash{@files} = ();
-    
-        find({
-            no_chdir => 1,
-            follow   => 0,
-            wanted   => sub {
-                my $file         = $File::Find::name;
-                my $is_excluded  = _is_excluded(
-                    $file,
-                    $arref,
-                    $filter,
-                    $comb,
-                    $files_in_skip,
-                    $home,
-                );
-                
-                push(@dir_files,File::Spec->rel2abs($file)) if -f $file and !$is_excluded;
-                
-                $excluded{$file} = 1 if -f $file and $is_excluded
-            }
-        },$home);
+    delete @files_hash{ keys %excluded };
+    @files_plus = sort keys %files_hash;
+    $bool = 0 if scalar @files_plus > 0;
 
-        #use Data::Dumper;
-        #print STDERR ">>",++$counter,":",Dumper(\@files,\@dir_files);
-        SFILE:
-        for my $file(@dir_files){
-            for my $check(@files){
-                if($file eq $check){
-                    delete $files_hash{$check};
-                    next SFILE;
-                }
-            }
-            push(@missing_files,$file);
-            $bool = 0;
-        }
-    
-        delete $files_hash{$_} for keys %excluded;
-        @files_plus = sort keys %files_hash;
-        $bool = 0 if scalar @files_plus > 0;
-
-        my %seen_files = ();
-        @dup_files = map { 1==$seen_files{$_}++ ? $_ : () } @files;
-        $bool = 0 if scalar @dup_files > 0;
-        
-        } # close extra block
-    }
+    my %seen_files = ();
+    @dup_files = map { $seen_files{$_}++ ? $_ : () } @files;
+    $bool = 0 if scalar @dup_files > 0;
     
     my $diag = 'The following files are not named in the MANIFEST file: '.
                join(', ',@missing_files);
@@ -188,44 +200,56 @@ sub ok_manifest{
     my $dup  = 'The following files appeared more than once in the MANIFEST file: '.
                join(', ',@dup_files);
     
-    $test->is_num($bool,$test_bool,$msg);
+    my $success = $test->is_num($bool,$test_bool,$msg);
+
+    $test->diag( "MANIFEST: $manifest" ) if !$success;
     $test->diag($diag) if scalar @missing_files >= 1 and $test_bool == 1 and $VERBOSE;
     $test->diag($plus) if scalar @files_plus    >= 1 and $test_bool == 1 and $VERBOSE;
     $test->diag($dup)  if scalar @dup_files     >= 1 and $test_bool == 1 and $VERBOSE;
+
+    return $success;
 }
 
 sub _read_file {
-    my ($fh) = @_;
+    my ($path) = @_;
+
+    return if !-r $path;
     
     my @files;
-    my $selftest = 0;
 
+    open my $fh, '<', $path;
     while( my $fh_line = <$fh> ){
         chomp $fh_line;
         
-        $selftest++ if $fh_line =~ m{# MANIFEST for Test-CheckManifest};
-
         next if $fh_line =~ m{ \A \s* \# }x;
-        next if $selftest && $fh_line =~ m{# selftest};
         
         my ($file);
         
-        if ( ($file) = $fh_line =~ /^'(\\[\\']|.+)+'\s*(.*)/) {
+        if ( ($file) = $fh_line =~ /^'(\\[\\']|.+)+'\s*/) {
             $file =~ s/\\([\\'])/$1/g;
         }
         else {
-            ($file) = $fh_line =~ /^(\S+)\s*(.*)/;
+            ($file) = $fh_line =~ /^(\S+)\s*/;
         }
 
         next unless $file;
 
         push @files, $file;
     }
+
+    close $fh;
     
+    chomp @files;
+
+    {
+        local $/ = "\r";
+        chomp @files;
+    }
+
     return @files;
 }
 
-sub _not_ok_manifest{
+sub _not_ok_manifest {
     $test_bool = 0;
     ok_manifest(@_);
     $test_bool = 1;
@@ -233,10 +257,6 @@ sub _not_ok_manifest{
 
 sub _is_excluded{
     my ($file,$dirref,$filter,$bool,$files_in_skip,$home) = @_;
-    my @excluded_files = qw(
-        pm_to_blib Makefile META.yml Build pod2htmd.tmp 
-        pod2htmi.tmp Build.bat .cvsignore MYMETA.json MYMETA.yml
-    );
 
     if ( $files_in_skip and 'ARRAY' eq ref $files_in_skip ) {
         (my $local_file = $file) =~ s{\Q$home\E/?}{};
@@ -247,14 +267,18 @@ sub _is_excluded{
     }
         
     my @matches = grep{ $file =~ /$_$/ }@excluded_files;
+
+    return 1 if @matches;
+
+    my $is_in_dir = _is_in_dir( $file, $dirref );
     
-    if($bool eq 'or'){
-        push @matches, $file if grep{ref($_) and ref($_) eq 'Regexp' and $file =~ /$_/}@$filter;
-        push @matches, $file if grep{$file =~ /^\Q$_\E/}@$dirref;
+    $bool ||= 'or';
+    if ( $bool eq 'or' ) {
+        push @matches, $file if grep{ $file =~ /$_/ }@$filter;
+        push @matches, $file if $is_in_dir;
     }
     else{
-        if(grep{$file =~ /$_/ and ref($_) and ref($_) eq 'Regexp'}@$filter and
-           grep{$file =~ /^\Q$_\E/ and not ref($_)}@$dirref){
+        if( grep{ $file =~ /$_/ }@$filter and $is_in_dir ) {
             push @matches, $file;
         }
     }
@@ -262,22 +286,34 @@ sub _is_excluded{
     return scalar @matches;
 }
 
-sub _read_skip {
-    my ($skip, $msg, $bool) = @_;
+sub _is_in_dir {
+    my ($file, $excludes) = @_;
 
-    return [] unless $skip and -e $skip;
-    
-    my @files;
-    if( -e $skip and not open my $skip_fh, '<', $skip ) {
-        $$bool = 0;
-        $$msg  = "can't open $skip";
-        return;
-    }
-    else {
-        @files = _read_file( $skip_fh );
+    my (undef, $path) = File::Spec->splitpath( $file );
+    my @file_parts    = File::Spec->splitdir( $path );
+    my $is_in_dir;
+
+    EXCLUDE:
+    for my $exclude ( @{ $excludes || [] } ) {
+        my (undef, $exclude_dir, $efile) = File::Spec->splitpath( $exclude );
+        my @exclude_parts        = File::Spec->splitdir( $exclude_dir . $efile );
+
+        pop @exclude_parts if $exclude_parts[-1] eq '';
+
+        next EXCLUDE if @exclude_parts > @file_parts;
+
+        my @subparts = @file_parts[ 0 .. $#exclude_parts ];
+
+        my $exclude_join = join '/', @exclude_parts;
+        my $sub_join     = join '/', @subparts;
+
+        next EXCLUDE if $exclude_join ne $sub_join;
+
+        $is_in_dir = 1;
+        last EXCLUDE;
     }
 
-    return \@files;
+    return $is_in_dir;
 }
 
 1;
@@ -294,7 +330,7 @@ Test::CheckManifest - Check if your Manifest matches your distro
 
 =head1 VERSION
 
-version 1.33
+version 1.38
 
 =head1 SYNOPSIS
 

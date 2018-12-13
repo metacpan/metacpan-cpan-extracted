@@ -1,5 +1,5 @@
 package Git::Raw::Rebase::Operation;
-$Git::Raw::Rebase::Operation::VERSION = '0.81';
+$Git::Raw::Rebase::Operation::VERSION = '0.82';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Git::Raw::Rebase::Operation - Git rebase operation class
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 DESCRIPTION
 

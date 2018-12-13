@@ -1,5 +1,9 @@
 Revision history for perl distribution Test-Mojo-Role-Selenium
 
+0.15 2018-12-12T12:07:16+0900
+ - Changed default driver from Selenium::PhantomJS to Selenium::Chrome
+ - No longer EXPERIMENTAL
+
 0.14 2018-03-08T21:04:31+0100
  - Forgot to remove Carp::Always #4
 

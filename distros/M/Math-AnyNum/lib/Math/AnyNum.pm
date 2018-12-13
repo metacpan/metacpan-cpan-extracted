@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -378,11 +378,14 @@ use overload
             my $name = shift(@_);
 
             if ($name eq ':overload') {
-                overload::constant
-                  integer => sub { bless \Math::GMPz::Rmpz_init_set_ui($_[0]) },
-                  float   => sub { bless \_str2obj($_[0]) },
-                  binary  => sub {
-                    my $const = ($_[0] =~ tr/_//dr);
+                overload::constant integer => sub {
+                    ($_[0] < ULONG_MAX)
+                      ? (bless \Math::GMPz::Rmpz_init_set_ui($_[0]))
+                      : (bless \Math::GMPz::Rmpz_init_set_str("$_[0]", 10));
+                  },
+                  float  => sub { bless \_str2obj($_[0]) },
+                  binary => sub {
+                    my $const  = ($_[0] =~ tr/_//dr);
                     my $prefix = substr($const, 0, 2);
                     bless \(
                               $prefix eq '0x' ? Math::GMPz::Rmpz_init_set_str(substr($const, 2) || 0, 16)
@@ -594,7 +597,7 @@ sub _str2obj {
     # Floating-point
     if ($s =~ tr/e.//) {
         my $r = Math::MPFR::Rmpfr_init2($PREC);
-        if (Math::MPFR::Rmpfr_set_str($r, $s, 10, $ROUND)) {
+        if (Math::MPFR::Rmpfr_set_str($r, "$s", 10, $ROUND)) {
             Math::MPFR::Rmpfr_set_nan($r);
         }
         return $r;
@@ -612,7 +615,7 @@ sub _str2obj {
     }
 
     # Integer
-    eval { Math::GMPz::Rmpz_init_set_str($s, 10) } // goto &_nan;
+    eval { Math::GMPz::Rmpz_init_set_str("$s", 10) } // goto &_nan;
 }
 
 # Parse a given decimal expansion string as a base-10 fraction
@@ -1045,7 +1048,7 @@ sub new {
 
         if (index($num, '/') != -1) {
             my $r = Math::GMPq::Rmpq_init();
-            eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
+            eval { Math::GMPq::Rmpq_set_str($r, "$num", $int_base); 1 } // goto &nan;
 
             if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*(?:/\s*[-+]?[1-9]+[0-9]*\s*)?\z}) {
                 goto &nan;
@@ -1056,13 +1059,13 @@ sub new {
         }
         elsif (index($num, '.') != -1) {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            if (Math::MPFR::Rmpfr_set_str($r, $num, $int_base, $ROUND)) {
+            if (Math::MPFR::Rmpfr_set_str($r, "$num", $int_base, $ROUND)) {
                 Math::MPFR::Rmpfr_set_nan($r);
             }
             return bless \$r, $class;
         }
         else {
-            return bless \(eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // goto &nan), $class;
+            return bless \(eval { Math::GMPz::Rmpz_init_set_str("$num", $int_base) } // goto &nan), $class;
         }
     }
 
@@ -1081,7 +1084,7 @@ sub new_ui {
 
 sub new_z {
     my ($class, $str, $base) = @_;
-    bless \Math::GMPz::Rmpz_init_set_str($str, $base // 10), $class;
+    bless \Math::GMPz::Rmpz_init_set_str("$str", $base // 10), $class;
 }
 
 sub new_q {
@@ -1102,7 +1105,7 @@ sub new_q {
 sub new_f {
     my ($class, $str, $base) = @_;
     my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_set_str($r, $str, $base // 10, $ROUND);
+    Math::MPFR::Rmpfr_set_str($r, "$str", $base // 10, $ROUND);
     bless \$r, $class;
 }
 
@@ -1115,13 +1118,13 @@ sub new_c {
         my $re = Math::MPFR::Rmpfr_init2($PREC);
         my $im = Math::MPFR::Rmpfr_init2($PREC);
 
-        Math::MPFR::Rmpfr_set_str($re, $real, $base // 10, $ROUND);
-        Math::MPFR::Rmpfr_set_str($im, $imag, $base // 10, $ROUND);
+        Math::MPFR::Rmpfr_set_str($re, "$real", $base // 10, $ROUND);
+        Math::MPFR::Rmpfr_set_str($im, "$imag", $base // 10, $ROUND);
 
         Math::MPC::Rmpc_set_fr_fr($c, $re, $im, $ROUND);
     }
     else {
-        Math::MPC::Rmpc_set_str($c, $real, $base // 10, $ROUND);
+        Math::MPC::Rmpc_set_str($c, "$real", $base // 10, $ROUND);
     }
 
     bless \$c, $class;
@@ -1900,7 +1903,7 @@ sub __cmp__ {
         Math::MPC::RMPC_IM($f, $y);
         Math::MPFR::Rmpfr_nan_p($f) && return undef;
 
-        my $si = Math::MPC::Rmpc_cmp($x, $y);
+        my $si     = Math::MPC::Rmpc_cmp($x, $y);
         my $re_cmp = Math::MPC::RMPC_INEX_RE($si);
 
         return (
@@ -10494,7 +10497,7 @@ sub bsearch ($$;$) {
     my ($left, $right, $block) = @_;
 
     if (@_ == 3) {
-        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left)  // return undef);
         $right = Math::GMPz::Rmpz_init_set(_star2mpz($right) // return undef);
     }
     else {
@@ -10530,7 +10533,7 @@ sub bsearch_ge ($$;$) {
     my ($left, $right, $block) = @_;
 
     if (@_ == 3) {
-        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left)  // return undef);
         $right = Math::GMPz::Rmpz_init_set(_star2mpz($right) // return undef);
     }
     else {
@@ -10572,7 +10575,7 @@ sub bsearch_le ($$;$) {
     my ($left, $right, $block) = @_;
 
     if (@_ == 3) {
-        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left) // return undef);
+        $left  = Math::GMPz::Rmpz_init_set(_star2mpz($left)  // return undef);
         $right = Math::GMPz::Rmpz_init_set(_star2mpz($right) // return undef);
     }
     else {

@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception::MissingMethodName;
 
-$Method::ParamValidator::Exception::MissingMethodName::VERSION   = '0.12';
+$Method::ParamValidator::Exception::MissingMethodName::VERSION   = '0.14';
 $Method::ParamValidator::Exception::MissingMethodName::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception::MissingMethodName - Handles 'missing method n
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 

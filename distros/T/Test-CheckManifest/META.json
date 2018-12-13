@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -19,20 +19,36 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Cwd" : "0",
+            "Cwd" : "3.75",
             "File::Basename" : "0",
             "File::Find" : "0",
             "File::Spec" : "0",
-            "Test::Builder" : "0"
+            "Scalar::Util" : "0",
+            "Test::Builder" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
             "CPAN::Meta::YAML" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Test::CheckManifest" : {
+         "file" : "lib/Test/CheckManifest.pm",
+         "version" : "1.38"
       }
    },
    "release_status" : "stable",
@@ -47,7 +63,16 @@
          "web" : "http://github.com/reneeb/Test-CheckManifest"
       }
    },
-   "version" : "1.33",
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "version" : "1.38",
+   "x_contributors" : [
+      "doug <doug@hcsw.org>",
+      "LorenzoTa <LorenzoTa@users.noreply.github.com>",
+      "Michael Gray <michael@michaelgray.info>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Renee <reb@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

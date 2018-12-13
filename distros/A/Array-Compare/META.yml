@@ -16,7 +16,7 @@ name: Array-Compare
 provides:
   Array::Compare:
     file: lib/Array/Compare.pm
-    version: v3.0.1
+    version: v3.0.2
 requires:
   Carp: '0'
   Moo: '0'
@@ -25,5 +25,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/array-compare.git
-version: v3.0.1
+version: v3.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

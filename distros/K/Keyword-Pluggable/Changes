@@ -1,5 +1,8 @@
 Revision history for Keyword-Pluggable
 
+1.04    2018-12-12
+        - allow modifying the source after the keyword
+
 1.03    2018-11-23
 	- build fixes
 

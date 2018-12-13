@@ -77,11 +77,8 @@ sub localpath { # Return the path to a file in the same directory as the caller 
         # Dummy filename assumed to be in cwd, if we're running from -e
         # or are otherwise without a caller.
 
-    my $path = Test::OnlySome::PathCapsule->new($filename);
+    return Test::OnlySome::PathCapsule->new($filename)->file($newfn)->abs;
         # Assume the code up to this point hasn't changed cwd
-
-    $path->file($newfn);
-    return $path->abs;
 } #}}}1
 
 sub import { # {{{1

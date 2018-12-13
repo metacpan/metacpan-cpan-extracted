@@ -1,0 +1,107 @@
+NAME
+
+    Mojolicious::Plugin::ReCAPTCHAv2Async - Adds async recaptcha_verify_p
+    helper to Mojolicious ReCAPTCHAv2 plugin.
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+      use Mojolicious::Lite;
+    
+      plugin(
+        ReCAPTCHAv2Async => {
+          sitekey => 'site-key-embedded-in-public-html',
+          secret  => 'key-used-in-internal-verification-requests',
+          ... # and all the rest from ReCAPTCHAv2
+        }
+      );
+    
+      # later
+      
+      # assembling website:
+      $c->stash( captcha => app->recaptcha_get_html );
+      # now use stashed value in your HTML template, i.e.: <form..>...<% $captcha %>...</form>
+    
+      # on incoming request:
+      sub form_handler {
+        my $c = shift;
+    
+        $c->render_later;
+    
+        $c->recaptcha_verify_p->then(
+          sub {
+            ...
+            $c->render('success');
+          }
+        )->catch(
+          sub {
+            my @errors = @_;
+            if (@errors) {
+              $c->reply->exception(join "\n", @errors);
+            }
+            else {
+              $c->render(text => "no bots allowed", status 403);
+            }
+          }
+        );
+      }
+    
+      # or in an under:
+      under sub {
+        my $c = shift;
+    
+        $c->render_later;
+        
+        $c->recaptcha_verify_p->then(
+          sub { $c->continue }
+        )->catch(
+          sub { $c->reply->exception(...)  }
+        );
+    
+        return undef;
+      };
+
+DESCRIPTION
+
+    This subclass of Mojolicious::Plugin::ReCAPTCHAv2 adds a helper that
+    returns a Mojo::Promise, allowing you to use it in a non-blocking/async
+    manner.
+
+HELPERS
+
+    Mojolicious::Plugin::ReCAPTCHAv2Async inherits all helpers from
+    Mojolicious::Plugin::ReCAPTCHAv2 and adds the following ones:
+
+ recaptcha_verify_p
+
+    This helper returns a Mojo::Promise that will resolve if the reCAPTCHA
+    service believes that the challenge was solved by a human, and it will
+    reject if there was a failure. The failure can be caused either by an
+    error or because the service believes the challenge was attempted by a
+    bot.
+
+    In case of errors, those will be passed through the rejection. See the
+    recaptcha_get_errors helper for more information about the possible
+    errors.
+
+SEE ALSO
+
+    Mojolicious
+
+    Mojolicious::Plugin::ReCAPTCHAv2
+
+AUTHOR
+
+    Andreas Guldstrand <andreas.guldstrand@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2018 by Andreas Guldstrand.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

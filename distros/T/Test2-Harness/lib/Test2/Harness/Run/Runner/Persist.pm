@@ -6,12 +6,12 @@ use POSIX ":sys_wait_h";
 use Fcntl qw/LOCK_EX LOCK_UN SEEK_SET/;
 use Time::HiRes qw/sleep time/;
 use Test2::Util qw/pkg_to_file/;
-use Test2::Harness::Util qw/read_file write_file open_file/;
+use Test2::Harness::Util qw/read_file write_file open_file parse_exit/;
 use File::Spec;
 
 use Test2::Harness::Util::DepTracer();
 
-our $VERSION = '0.001070';
+our $VERSION = '0.001071';
 
 use parent 'Test2::Harness::Run::Runner';
 use Test2::Harness::Util::HashBase qw{
@@ -145,7 +145,8 @@ sub check_monitored {
         next unless $check;
         $reaped++;
         die "$$ ($self->{+STAGE}) waitpid error for stage '$cs': $check (expected $pid)" if $check != $pid;
-        print "$$ ($self->{+STAGE}) Stage '$cs' has exited ($exit)\n";
+        my $e = parse_exit($exit);
+        print "$$ ($self->{+STAGE}) Stage '$cs' has exited (sig: $e->{sig}, err: $e->{err})\n";
         delete $monitor->{$cs};
     }
 

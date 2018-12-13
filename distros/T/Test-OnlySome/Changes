@@ -1,25 +1,32 @@
 Revision history for Test-OnlySome
 
+0.1.0   2018-12-12
+
+    - Breaking change: in a multi-test block, only skip if all the tests
+      in that block are skipped (GH-9).
+    - Added tests of osprove(1).
+    - Support running tests on Windows (GH-11).
+
 0.0.8   2018-12-04
 
-    - os() can now take the number of tests as a parameter (GH-8)
+    - os() can now take the number of tests as a parameter (GH-8).
 
 0.0.7   2018-12-01
 
-    - Added osprove(1) binary to run prove(1) with the Test::OnlyP plugin
-    - Made Test::OnlySome::RerunFailed idempotent
-    - Added "verbose" option to Test::OnlySome and Test::OnlySome::RerunFailed
+    - Added osprove(1) binary to run prove(1) with the Test::OnlyP plugin.
+    - Made Test::OnlySome::RerunFailed idempotent.
+    - Added "verbose" option to Test::OnlySome and Test::OnlySome::RerunFailed.
 
 0.0.6   2018-11-29
 
-    - Updated documentation
+    - Updated documentation.
 
 0.0.5   2018-11-28
 
     - Package args now use a "skip" keyword ahead of the test numbers
       to skip.
     - Test numbers must be >= 1.
-    - Added App::Prove plugin to collect test results
+    - Added App::Prove plugin to collect test results.
     - Added loader module Test::OnlySome::RerunFailed to load the collected
       test results and mark all cleanly-passed tests in a file to be skipped
       by Test::OnlySome.
@@ -28,9 +35,8 @@ Revision history for Test-OnlySome
 
 0.0_4   2018-11-26
 
-    - Support package args to specify which tests to skip
-
-    - Can be used via Import::Into and Test::Kit
+    - Support package args to specify which tests to skip.
+    - Can be used via Import::Into and Test::Kit.
 
 0.0_2   2018-11-24
 

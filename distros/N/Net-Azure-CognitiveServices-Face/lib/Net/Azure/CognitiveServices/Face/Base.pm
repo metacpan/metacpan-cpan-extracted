@@ -52,12 +52,13 @@ sub request {
     }
     my $body;
     if ($res->{content}) {
-        if ($res->{headers}{'Content-Type'} !~ /application\/json/) {
+        my $content_type = $res->{headers}{'Content-Type'} || $res->{headers}{'content-type'};
+        if ($content_type !~ /application\/json/) {
             croak($res->{content}); 
         }
         $body = $self->json->decode($res->{content});
     }
-    if (!$res->is_success) {
+    if (!$res->{success}) {
         croak($body->{error}{message});
     }
     $body;

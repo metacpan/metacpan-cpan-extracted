@@ -5,6 +5,9 @@ author:
 build_requires:
   DBD::SQLite: '0'
   DBI: '0'
+  File::Basename: '0'
+  SQL::Translator: '0'
+  Scalar::Util: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -17,14 +20,17 @@ name: DBIx-Class-InflateColumn-TimePiece
 provides:
   DBIx::Class::InflateColumn::TimePiece:
     file: lib/DBIx/Class/InflateColumn/TimePiece.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   DBIx::Class: '0'
+  Time::Piece: '0'
+  parent: '0'
+  perl: '5.010'
 resources:
   bugtracker: http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece/issues
   homepage: http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece
   repository: git://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

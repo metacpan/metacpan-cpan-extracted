@@ -28,10 +28,10 @@ no_index:
 provides:
   Math::Calc::Parser:
     file: lib/Math/Calc/Parser.pm
-    version: '1.003'
+    version: '1.004'
   ath:
     file: lib/ath.pm
-    version: '1.003'
+    version: '1.004'
 recommends:
   Math::Random::Secure: '0'
 requires:
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Math-Calc-Parser/issues
   homepage: https://github.com/Grinnz/Math-Calc-Parser
   repository: https://github.com/Grinnz/Math-Calc-Parser.git
-version: '1.003'
+version: '1.004'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -194,7 +194,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.003'
+          tag: '1.004'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

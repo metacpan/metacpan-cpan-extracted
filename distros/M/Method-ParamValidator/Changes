@@ -1,5 +1,11 @@
 Revision history for Method::ParamValidator
 
+0.14   Thu Dec 13 08:40:00 2018
+       - Tidied up SYNOPSIS code.
+
+0.13   Wed Dec 12 11:00:00 2018
+       - Making use of Test::Exception in unit test.
+
 0.12   Sun Oct 21 09:30:00 2018
        - Used namespace::autoclean.
 

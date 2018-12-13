@@ -4,11 +4,11 @@ package Ithumb::XS;
 
 =head1 NAME
 
-Ithumb::XS - Small and simple thumbnail module, based on Imlib2 library.
+Ithumb::XS - Fast, small and simple image thumbnailazer, based on Imlib2 library.
 
 =head1 DESCRIPTION
 
-Ithumb::XS is a very small (one function) and simple Perl-XS module
+Ithumb::XS is a very small (one function) and fast and simple Perl-XS module
 for creation a thumbnails, using Imlib2 library.
 
 =head1 MAINTAINERS
@@ -27,7 +27,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( create_thumbnail );
 
-our $VERSION = 'v0.1.4.1';
+our $VERSION = 'v0.1.5';
 
 require XSLoader;
 XSLoader::load('Ithumb::XS', $VERSION);
@@ -38,7 +38,7 @@ __END__
 
 =head1 SYNOPSIS
 
-  use Ithumb::XS;
+  use Ithumb::XS ();
 
   Ithumb::XS::create_thumbnail('src.png', 100, 100, 'output.png');
 
@@ -50,13 +50,13 @@ Creates a small copy (with cropping) of the image.
 
 =over 12
 
-=item C<$source_image> - full path to source image
+=item C<$src_image> - path to source image
 
 =item C<$width> - destination width
 
 =item C<$height> - destination height
 
-=item C<$dst_image> - full path to destionation result image
+=item C<$dst_image> - path to destionation result image
   
 =back
 

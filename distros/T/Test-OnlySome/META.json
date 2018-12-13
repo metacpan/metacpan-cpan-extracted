@@ -56,6 +56,7 @@
             "File::Spec" : "0",
             "Getopt::Long" : "2.5",
             "Keyword::Declare" : "0.001006",
+            "List::Util::MaybeXS" : "1.500002",
             "Scalar::Util" : "1.39",
             "YAML" : "0",
             "perl" : "5.012",
@@ -77,23 +78,23 @@
    "provides" : {
       "App::Prove::Plugin::Test::OnlySomeP" : {
          "file" : "lib/App/Prove/Plugin/Test/OnlySomeP.pm",
-         "version" : "0.000008"
+         "version" : "0.001000"
       },
       "App::Prove::Plugin::Test::OnlySomeP::Formatter" : {
          "file" : "lib/App/Prove/Plugin/Test/OnlySomeP/Formatter.pm",
-         "version" : "0.000008"
+         "version" : "0.001000"
       },
       "Test::OnlySome" : {
          "file" : "lib/Test/OnlySome.pm",
-         "version" : "0.000008"
+         "version" : "0.001000"
       },
       "Test::OnlySome::PathCapsule" : {
          "file" : "lib/Test/OnlySome/PathCapsule.pm",
-         "version" : "0.000008"
+         "version" : "0.001000"
       },
       "Test::OnlySome::RerunFailed" : {
          "file" : "lib/Test/OnlySome/RerunFailed.pm",
-         "version" : "0.000008"
+         "version" : "0.001000"
       }
    },
    "release_status" : "stable",
@@ -104,6 +105,6 @@
          "web" : "https://github.com/cxw42/Test-OnlySome"
       }
    },
-   "version" : "0.000008",
+   "version" : "0.001000",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Small and simple thumbnail module, based on Imlib2 library.",
+   "abstract" : "Fast, small and simple image thumbnailazer, based on Imlib2 library.",
    "author" : [
       "Peter P. Neuromantic <p.brovchenko@protonmail.com>"
    ],
@@ -38,6 +38,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.1.4.1",
+   "version" : "v0.1.5",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

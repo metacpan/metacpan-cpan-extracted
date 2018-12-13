@@ -1,0 +1,195 @@
+
+[![Travis Build Status](https://travis-ci.org/Corion/HTTP-Request-Generator.svg?branch=master)](https://travis-ci.org/Corion/HTTP-Request-Generator)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/Corion/HTTP-Request-Generator?branch=master&svg=true)](https://ci.appveyor.com/project/Corion/HTTP-Request-Generator)
+
+# NAME
+
+HTTP::Request::Generator - generate HTTP requests
+
+# SYNOPSIS
+
+    use HTTP::Request::Generator 'generate_requests';
+
+    @requests = generate_requests(
+        method  => 'GET',
+        pattern => 'https://example.com/{bar,foo,gallery}/[00..99].html',
+    );
+
+    # generates 300 requests from
+    #     https://example.com/bar/00.html to
+    #     https://example.com/gallery/99.html
+
+    @requests = generate_requests(
+        method => 'POST',
+        url    => '/profiles/:name',
+        url_params => {
+            name => ['Corion','Co-Rion'],
+        },
+        query_params => {
+            stars => [2,3],
+        },
+        body_params => {
+            comment => ['Some comment', 'Another comment, A++'],
+        },
+        headers => [
+            {
+                "Content-Type" => 'text/plain; encoding=UTF-8',
+                Cookie => 'my_session_id',
+            },
+            {
+                "Content-Type" => 'text/plain; encoding=Latin-1',
+                Cookie => 'my_session_id',
+            },
+        ],
+    );
+    # Generates 16 requests out of the combinations
+
+    for my $req (@requests) {
+        $ua->request( $req );
+    };
+
+## `generate_requests( %options )`
+
+    my $g = generate_requests(
+        url => '/profiles/:name',
+        url_params => ['Mark','John'],
+        wrap => sub {
+            my( $req ) = @_;
+            # Fix up some values
+            $req->{headers}->{'Content-Length'} = 666;
+        },
+    );
+    while( my $r = $g->()) {
+        send_request( $r );
+    };
+
+This function creates data structures that are suitable for sending off
+a mass of similar but different HTTP requests. All array references are expanded
+into the cartesian product of their contents. The above example would create
+two requests:
+
+      url => '/profiles/Mark,
+      url => '/profiles/John',
+
+`generate_requests` returns an iterator in scalar context. In list context, it
+returns the complete list of requests.
+
+There are helper functions
+that will turn that data into a data structure suitable for your HTTP framework
+of choice.
+
+    {
+      method => 'GET',
+      url => '/profiles/Mark',
+      protocol => 'http',
+      port => 80,
+      headers => {},
+      body_params => {},
+      query_params => {},
+    }
+
+As a shorthand for creating lists, you can use the `pattern` option, which
+will expand a string into a set of requests. `{}` will expand into alternatives
+while `[xx..yy]` will expand into the range `xx` to `yy`. Note that these
+lists will be expanded in memory.
+
+### Options
+
+- **pattern**
+
+    Generate URLs from this pattern instead of `query_params`, `url_params`
+    and `url`.
+
+- **url**
+
+    URL template to use.
+
+- **url\_params**
+
+    Parameters to replace in the `url` template.
+
+- **body\_params**
+
+    Parameters to replace in the POST body.
+
+- **query\_params**
+
+    Parameters to replace in the GET request.
+
+- **host**
+
+    Hostname(s) to use.
+
+- **port**
+
+    Port(s) to use.
+
+- **headers**
+
+    Headers to use. Currently, no templates are generated for the headers. You have
+    to specify complete sets of headers for each alternative.
+
+- **limit**
+
+    Limit the number of requests generated.
+
+## `as_http_request`
+
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_http_request,
+    )
+
+Converts the request data to a [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object.
+
+## `as_dancer`
+
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_dancer,
+    )
+
+Converts the request data to a [Dancer::Request](https://metacpan.org/pod/Dancer::Request) object.
+
+## `as_plack`
+
+    generate_requests(
+        method => 'POST',
+        url    => '/feedback/:item',
+        wrap => \&HTTP::Request::Generator::as_plack,
+    )
+
+Converts the request data to a [Plack::Request](https://metacpan.org/pod/Plack::Request) object.
+
+# SEE ALSO
+
+[The Curl Manpage](https://curl.haxx.se/docs/manpage.html) for the pattern syntax
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/HTTP-Request-Generator](https://github.com/Corion/HTTP-Request-Generator).
+
+# SUPPORT
+
+The public support forum of this module is [https://perlmonks.org/](https://perlmonks.org/).
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-Generator](https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Request-Generator)
+or via mail to [HTTP-Request-Generator-Bugs@rt.cpan.org](mailto:HTTP-Request-Generator-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2017-2018 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

@@ -1,5 +1,26 @@
 Revision history for Ryu
 
+0.031     2018-12-13 23:03:16+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->buffer method for collecting items while a source/sink
+    are paused
+    - ->retain method for keeping sources around
+
+0.030     2018-12-13 20:58:38+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - flow control expanded and moved to the Ryu::Node
+    parent class
+
+    Bugs fixed:
+
+    - resolved some edge cases where handlers can be
+    added/removed during callback loops
+    - the ->source inside a Ryu::Sink for handling events
+    is now preserved when attaching an external source
+    via ->from
+
 0.029     2018-12-02 14:20:37+08:00 Asia/Kuala_Lumpur
     No new features.
 

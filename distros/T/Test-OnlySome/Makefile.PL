@@ -49,7 +49,7 @@ my $secure_perl_path = get_perl_filename();
 
         return <<EOT;
 authortest:
-\tRELEASE_TESTING=1 prove -lv xt
+\tRELEASE_TESTING=1 prove -lvj4 xt
 
 testhere:   # Run the tests from lib rather than blib
 \tprove -lj4
@@ -124,6 +124,7 @@ WriteMakefile(
         'File::Spec' => '0',
         'Getopt::Long' => '2.5',
         'Keyword::Declare'  => '0.001006',
+        'List::Util::MaybeXS' => '1.500002',
         'Scalar::Util' => '1.39',
         'vars' => '0',
     },

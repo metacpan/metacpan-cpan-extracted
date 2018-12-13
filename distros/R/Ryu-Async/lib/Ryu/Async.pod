@@ -1,0 +1,179 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Ryu::Async
+at lib/Ryu/Async.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Ryu::Async - use L<Ryu> with L<IO::Async>
+
+=head1 SYNOPSIS
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ 
+ use IO::Async::Loop;
+ use Ryu::Async;
+ 
+ use Log::Any::Adapter qw(Stdout), log_level => 'trace';
+ 
+ my $loop = IO::Async::Loop->new;
+ $loop->add(
+ 	my $ryu = Ryu::Async->new
+ );
+ 
+ {
+ 	my $timer = $ryu->timer(
+ 		interval => 0.10,
+ 	)->take(10)
+ 	 ->each(sub { print "tick\n" });
+ 	warn $timer->describe;
+ 	$timer->get;
+ }
+
+=head1 DESCRIPTION
+
+This is an L<IO::Async::Notifier> subclass for interacting with L<Ryu>.
+
+=head1 METHODS
+
+=head2 from
+
+Creates a new L<Ryu::Source> from a thing.
+
+The exact details of this are likely to change in future, but a few things that are expected to work:
+
+ $ryu->from($io_async_stream_instance)
+     ->by_line
+     ->each(sub { print "Line: $_\n" });
+ $ryu->from([1..1000])
+     ->sum
+     ->each(sub { print "Total was $_\n" });
+
+=head2 from_stream
+
+Create a new L<Ryu::Source> from an L<IO::Async::Stream> instance.
+
+Note that a stream which is not already attached to an L<IO::Async::Notifier>
+will be added as a child of this instance.
+
+=head2 stdin
+
+Create a new L<Ryu::Source> that wraps STDIN.
+
+As with other L<IO::Async::Stream> wrappers, this will emit data as soon as it's available,
+as raw bytes.
+
+Use L<Ryu::Source/by_line> and L<Ryu::Source/decode> to split into lines and/or decode from UTF-8.
+
+=head2 stdout
+
+Returns a new L<Ryu::Sink> that wraps STDOUT.
+
+=head2 timer
+
+Provides a L<Ryu::Source> which emits an empty string at selected intervals.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * interval - how often to trigger the timer, in seconds (fractional values allowed)
+
+=item * reschedule - type of rescheduling to use, can be C<soft>, C<hard> or C<drift> as documented
+in L<IO::Async::Timer::Periodic>
+
+=back
+
+Example:
+
+ $ryu->timer(interval => 1, reschedule => 'hard')
+     ->combine_latest(...)
+
+=head2 run
+
+Creates an L<IO::Async::Process>.
+
+=head2 source
+
+Returns a new L<Ryu::Source> instance.
+
+=head2 udp_client
+
+Creates a new UDP client.
+
+This provides a sink for L<Ryu::Async::Client/outgoing> packets, and a source for L<Ryu::Async::Client/incoming> responses.
+
+=over 4
+
+=item * C<uri> - an optional URI of the form C<udp://host:port>
+
+=item * C<host> - which host to listen on, defaults to C<0.0.0.0>
+
+=item * C<port> - the port to listen on
+
+=back
+
+Returns a L<Ryu::Async::Client> instance.
+
+=head2 udp_server
+
+=head2 sink
+
+Returns a new L<Ryu::Sink>.
+
+The label will default to the calling package/class and method,
+with some truncation rules:
+
+=over 4
+
+=item * A C<Net::Async::> prefix will be replaced by C<Na>.
+
+=item * A C<Web::Async::> prefix will be replaced by C<Wa>.
+
+=item * A C<IO::Async::> prefix will be replaced by C<Ia>.
+
+=item * A C<Tickit::Async::> prefix will be replaced by C<Ta>.
+
+=item * A C<Tickit::Widget::> prefix will be replaced by C<TW>.
+
+=back
+
+This list of truncations is subject to change, so please don't
+rely on any of these in string matches or similar - better to set
+your own label if you need consistency.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Ryu>
+
+=item * L<IO::Async>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+

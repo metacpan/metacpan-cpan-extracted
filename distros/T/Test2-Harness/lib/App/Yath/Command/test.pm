@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001070';
+our $VERSION = '0.001071';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -13,6 +13,7 @@ use Test2::Harness::Run;
 use Test2::Harness::Util::JSON qw/encode_json/;
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
 
+use Test2::Harness::Util qw/parse_exit/;
 use App::Yath::Util qw/is_generated_test_pl find_yath/;
 
 use Time::HiRes qw/time/;
@@ -245,6 +246,15 @@ sub options {
         },
 
         {
+            spec => 'notify-text=s',
+            field => 'notify_text',
+            used_by => {jobs => 1},
+            section => 'Job Options',
+            usage => ['--notify-text "custom notification info"'],
+            long_desc => "Add a custom text snippet to email/slack notifications",
+        },
+
+        {
             spec => 'qvf!',
             field => 'formatter',
             used_by => {display => 1},
@@ -351,6 +361,7 @@ sub run_command {
                 slack_fail   => $settings->{slack_fail},
                 slack_notify => $settings->{slack_notify},
                 slack_log    => $settings->{slack_log},
+                notify_text  => $settings->{notify_text},
             ),
         );
 
@@ -424,8 +435,11 @@ sub run_command {
 
         $self->paint("\n");
 
-        $self->paint("Test runner exited badly: $exit\n") if $exit;
-        $self->paint("Test runner exited badly: ?\n") unless defined $exit;
+        if ($exit) {
+            my $e = parse_exit($exit);
+            $self->paint("Test runner exited badly, signal: $e->{sig}, error: $e->{err}\n");
+        }
+        $self->paint("Test runner exited badly\n") unless defined $exit;
         $self->paint("An exception was caught\n") if !$ok && !$sig;
         $self->paint("Received SIG$sig\n") if $sig;
         $self->paint("$lost test file(s) were never run!\n") if $lost;
@@ -487,6 +501,11 @@ sub send_slack {
     require HTTP::Tiny;
     my $ht = HTTP::Tiny->new();
 
+    my $text = "Test run $settings->{run_id} has completed on " . hostname();
+    if (my $append = $settings->{notify_text}) {
+        $text .= "\n$append";
+    }
+
     for my $dest (@{$settings->{slack}}) {
         my $r = $ht->post(
             $settings->{slack_url},
@@ -495,7 +514,7 @@ sub send_slack {
                 content => encode_json(
                     {
                         channel     => $dest,
-                        text        => "Test run $settings->{run_id} has completed on " . hostname(),
+                        text        => $text,
                         attachments => [
                             {
                                 fallback => 'Test Summary',
@@ -518,6 +537,11 @@ sub send_slack_fail {
     require HTTP::Tiny;
     my $ht = HTTP::Tiny->new();
 
+    my $text = "Test run $settings->{run_id} failed on " . hostname();
+    if (my $append = $settings->{notify_text}) {
+        $text .= "\n$append";
+    }
+
     for my $dest (@{$settings->{slack_fail}}) {
         my $r = $ht->post(
             $settings->{slack_url},
@@ -526,7 +550,7 @@ sub send_slack_fail {
                 content => encode_json(
                     {
                         channel     => $dest,
-                        text        => "Test run $settings->{run_id} failed on " . hostname(),
+                        text        => $text,
                         attachments => [
                             {
                                 fallback => 'Test Failure Summary',
@@ -551,6 +575,11 @@ sub send_slack_notify {
     my $ht   = HTTP::Tiny->new();
     my $host = hostname();
 
+    my $text = "Test(s) failed on $host.";
+    if (my $append = $settings->{notify_text}) {
+        $text .= "\n$append";
+    }
+
     for my $dest (sort keys %$slacks) {
         my $fails = join "\n" => @{$slacks->{$dest}};
 
@@ -561,7 +590,7 @@ sub send_slack_notify {
                 content => encode_json(
                     {
                         channel     => $dest,
-                        text        => "Test(s) failed on $host",
+                        text        => $text,
                         attachments => [
                             {
                                 fallback => 'Test Failure Notifications',
@@ -610,6 +639,8 @@ sub _send_email {
     my $settings = $self->{+SETTINGS};
     my $host     = hostname();
     my $subject  = "Test run $settings->{run_id} on $host";
+
+    $body = "$settings->{notify_text}\n\n$body" if $settings->{notify_text};
 
     $body .= "\nThe log file can be found on $host at " . File::Spec->rel2abs($settings->{log_file}) . "\n"
         if $settings->{log};
@@ -914,6 +945,10 @@ Test2::Harness normally forks to start a test. Forking can break some select tes
 =item --no-batch-owner-notices
 
 Usually owner failures are sent as a single batch at the end of testing. Toggle this to send failures as they happen.
+
+=item --notify-text "custom notification info"
+
+Add a custom text snippet to email/slack notifications
 
 =item --slack-log
 

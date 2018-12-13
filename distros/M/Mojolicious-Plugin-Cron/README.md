@@ -9,7 +9,7 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
 
     # Mojolicious::Lite
 
-    plugin Cron( '*/5 9-17 * * *' => sub {
+    plugin Cron => ( '*/5 9-17 * * *' => sub {
         # do someting non-blocking but useful
     });
 

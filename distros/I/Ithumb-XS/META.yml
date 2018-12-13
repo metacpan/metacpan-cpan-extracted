@@ -1,5 +1,5 @@
 ---
-abstract: 'Small and simple thumbnail module, based on Imlib2 library.'
+abstract: 'Fast, small and simple image thumbnailazer, based on Imlib2 library.'
 author:
   - 'Peter P. Neuromantic <p.brovchenko@protonmail.com>'
 build_requires:
@@ -20,5 +20,5 @@ no_index:
 requires:
   XSLoader: '0'
   perl: '5.020001'
-version: v0.1.4.1
+version: v0.1.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,44 @@
+#!perl
+# mixedskip.test: Inner test file for mixed-skip tests.  Includes both
+# implicit-config (default) and explicit-config (if @ARGV) versions of the
+# same tests.
+
+# TODO test more scenarios
+
+use rlib 'lib';
+use DTest;
+use Test::OnlySome;
+
+if(@ARGV) {
+    diag 'Explicit config';
+    my $hr = {};
+    skip_these $hr, 1, 4;
+
+    os $hr 2 {
+        ok(0, 'Test 1 - marked as skip');
+        ok(1, 'Test 2 - not marked as skip');
+    };
+
+    os $hr 2 {
+        ok(1, 'Test 3 - not marked as skip');
+        ok(0, 'Test 4 - marked as skip');
+    };
+
+} else {
+    diag 'Implicit config';
+    skip_these 1, 4;
+    os 2 {
+        ok(0, 'Test 1 - marked as skip');
+        ok(1, 'Test 2 - not marked as skip');
+    };
+
+    os 2 {
+        ok(1, 'Test 3 - not marked as skip');
+        ok(0, 'Test 4 - marked as skip');
+    };
+
+}
+
+done_testing();
+
+# vi: set ft=perl:

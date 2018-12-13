@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +26,17 @@ no_index:
 provides:
   App::ansifold:
     file: lib/App/ansifold.pm
-    version: '0.01'
+    version: '0.02'
 requires:
-  Text::ANSI::Fold: '0.02'
+  Text::ANSI::Fold: '0.05'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/kaz-utashiro/ansifold/issues
   homepage: https://github.com/kaz-utashiro/ansifold
   repository: git://github.com/kaz-utashiro/ansifold.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

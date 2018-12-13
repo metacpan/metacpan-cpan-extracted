@@ -1,0 +1,24 @@
+Tue Dec 11 12:53:58 2018  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.10-1]:
+	* configure.ac: bump release
+	* cpan/Makefile.am: rename tarball for minor release only
+	* src/main/perl/t/02-credentials.t: GMT, not UTC
+	* README.md: mention 'make cpan'
+	* cpan/extra-files: new
+
+Mon Dec 10 13:44:31 2018  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.0.10]:
+	* ChangeLog: new
+	* bootstrap: new
+	* configure.ac
+	- bump minor release
+	- add cpan/Makefile
+	* cpan/Makefile.am: new
+	* Makfile.am: add path above
+	* cpan/buildspec.yml
+	- don't build from git repo, build local
+	- use relative path for above
+	* src/main/perl/lib/Amazon/Credentials.pm.in
+	(_iso8601_to_time): always run strptime() in GMT

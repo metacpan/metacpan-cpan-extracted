@@ -2,7 +2,7 @@ package App::Yath::Command::projects;
 use strict;
 use warnings;
 
-our $VERSION = '0.001070';
+our $VERSION = '0.001071';
 
 use parent 'App::Yath::Command::test';
 use Test2::Harness::Util::HashBase;
@@ -335,6 +335,10 @@ Test2::Harness normally forks to start a test. Forking can break some select tes
 =item --no-batch-owner-notices
 
 Usually owner failures are sent as a single batch at the end of testing. Toggle this to send failures as they happen.
+
+=item --notify-text "custom notification info"
+
+Add a custom text snippet to email/slack notifications
 
 =item --slack-log
 

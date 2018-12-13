@@ -56,10 +56,10 @@ ATTRIBUTES
  allow_decimal_underscore
 
      my $bool = $app->allow_decimal_underscore;
-     $app = $app->allow_decimal_underscore(1);
+     $app = $app->allow_decimal_underscore(0);
 
     If true, decimal versions with underscores will be allowed. Defaults to
-    false. See "Using underscore in decimal $VERSION" in
+    true. See "Using underscore in decimal $VERSION" in
     Dist::Zilla::Plugin::BumpVersionAfterRelease for more information.
 
  dry_run
@@ -139,9 +139,12 @@ METHODS
     version assignment in the form our $VERSION = '...';. Returns true if
     the version was rewritten, or false if no version assignment was found.
     If is_trial is true, # TRIAL will be appended to the version assignment
-    line when rewriting. An exception will be thrown if an invalid version
-    is passed, or an I/O error occurs. A warning will be printed if
-    $version is lower than the version previously declared in the file.
+    line when rewriting. The -TRIAL indication is not part of the version
+    and should be added to the name of the archive you upload to PAUSE,
+    which is outside of the scope of this tool. An exception will be thrown
+    if an invalid version is passed, or an I/O error occurs. A warning will
+    be printed if $version is lower than the version previously declared in
+    the file.
 
  rewrite_versions
 

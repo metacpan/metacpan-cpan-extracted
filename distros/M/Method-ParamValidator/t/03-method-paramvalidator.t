@@ -4,6 +4,7 @@ use 5.006;
 use strict; use warnings;
 
 use Test::More;
+use Test::Exception;
 use Method::ParamValidator;
 
 my $validator = Method::ParamValidator->new;
@@ -13,13 +14,8 @@ sub lookup { exists $LOCATION->{uc($_[0])} };
 $validator->add_field({ name => 'location', format => 's', check => \&lookup });
 $validator->add_method({ name => 'check_location', fields => { location => 1 }});
 
-eval { $validator->validate('check_location', { }); };
-like($@, qr/Missing required parameter/);
-
-eval { $validator->validate('check_location', { location => undef }); };
-like($@, qr/Undefined required parameter/);
-
-eval { $validator->validate('check_location', { location => 'X' }); };
-like($@, qr/Parameter failed check constraint/);
+throws_ok { $validator->validate('check_location', { })                   } qr/Missing required parameter/;
+throws_ok { $validator->validate('check_location', { location => undef }) } qr/Undefined required parameter/;
+throws_ok { $validator->validate('check_location', { location => 'X' })   } qr/Parameter failed check constraint/;
 
 done_testing();

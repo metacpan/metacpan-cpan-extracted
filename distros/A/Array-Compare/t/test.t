@@ -57,30 +57,31 @@ $comp->Skip({});
 # @A and @B differ in column 6
 # Array context
 my @diffs = $comp->compare(\@A, \@B);
-ok(scalar @diffs == 1 && $diffs[0] == 6);
+is(@diffs, 1);
+is($diffs[0], 6);
 
 # Scalar context
 my $diffs =  $comp->compare(\@A, \@B);
-ok($diffs);
+is($diffs, 1);
 
 # @A and @B differ in column 6 (which we ignore)
 $comp->Skip(\%skip1);
 # Array context
 @diffs = $comp->compare(\@A, \@B);
-ok(not @diffs);
+is(@diffs, 0);
 
 # Scalar context
 $diffs = $comp->compare(\@A, \@B);
-ok(not $diffs);
+is($diffs, 0);
 
 # @A and @C are the same
 # Array context
 @diffs = $comp->compare(\@A, \@C);
-ok(not @diffs);
+is(@diffs, 0);
 
 # Scalar context
 $diffs = $comp->compare(\@A, \@C);
-ok(not $diffs);
+is($diffs, 0);
 
 # Test arrays of differing length
 my @D = (0 .. 5);
@@ -91,13 +92,13 @@ ok( not $comp->compare(\@D, \@E));
 
 $comp->DefFull(1);
 @diffs = $comp->compare(\@D, \@E);
-ok(@diffs == 5);
+is(@diffs, 5);
 
 @diffs = $comp->compare(\@E, \@D);
-ok(@diffs == 5);
+is(@diffs, 5);
 
 $diffs = $comp->compare(\@D, \@E);
-ok($diffs == 5);
+is($diffs, 5);
 
 # Test Perms
 my @F = (1 .. 5);

@@ -25,8 +25,17 @@ WHAT IS Array::Compare?
 HOW DO I INSTALL IT?
 
   Array::Compare uses the standard Perl module architecture and can
-  therefore by installed using the standard Perl method which, in brief,
-  goes something like this:
+  therefore by installed using the standard Perl method, that is,
+
+    cpanm Array::Compare
+
+  or
+
+    cpan Array::Compare
+
+  (possibly with sudo in front).
+  
+  You can always download it from CPAN or Github, and then...
 
     gzip -cd Array-Compare-X.XX.tar.gz | tar xvf -
     cd Array-Compare-X.XX

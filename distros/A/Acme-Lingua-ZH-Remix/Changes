@@ -1,3 +1,6 @@
+0.97
+        - re-packaging with mbtiny. no feature changes.
+
 0.96:
 - Try to be faster by adding fuzzy exit conditions.
 

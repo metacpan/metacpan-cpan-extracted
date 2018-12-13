@@ -9,14 +9,14 @@ use version ();
 use Version::Next 'next_version';
 
 use Class::Tiny::Chained {
-	allow_decimal_underscore => 0,
+	allow_decimal_underscore => 1,
 	dry_run => 0,
 	follow_symlinks => 0,
 	global => 0,
 	verbose => 0,
 };
 
-our $VERSION = '0.006';
+our $VERSION = '1.000';
 
 sub bump_version {
 	my ($self, $version, $bump) = @_;
@@ -272,9 +272,9 @@ command-line usage.
 =head2 allow_decimal_underscore
 
  my $bool = $app->allow_decimal_underscore;
- $app = $app->allow_decimal_underscore(1);
+ $app = $app->allow_decimal_underscore(0);
 
-If true, decimal versions with underscores will be allowed. Defaults to false.
+If true, decimal versions with underscores will be allowed. Defaults to true.
 See L<Dist::Zilla::Plugin::BumpVersionAfterRelease/"Using underscore in decimal $VERSION">
 for more information.
 
@@ -354,9 +354,11 @@ Rewrites the version of the file at C<$file> to C<$version> if it has a version
 assignment in the form C<our $VERSION = '...';>. Returns true if the version
 was rewritten, or false if no version assignment was found. If C<is_trial> is
 true, C<# TRIAL> will be appended to the version assignment line when
-rewriting. An exception will be thrown if an invalid version is passed, or an
-I/O error occurs. A warning will be printed if C<$version> is lower than the
-version previously declared in the file.
+rewriting. The C<-TRIAL> indication is not part of the version and should be
+added to the name of the archive you upload to PAUSE, which is outside of the
+scope of this tool. An exception will be thrown if an invalid version is
+passed, or an I/O error occurs. A warning will be printed if C<$version> is
+lower than the version previously declared in the file.
 
 =head2 rewrite_versions
 

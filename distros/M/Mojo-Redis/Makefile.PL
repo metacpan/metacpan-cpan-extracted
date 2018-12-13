@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Mojolicious' => '7.30',
+  'Mojolicious' => '7.80',
   'Protocol::Redis' => '1.0006'
 }
 ,

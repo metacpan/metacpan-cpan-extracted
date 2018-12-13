@@ -1,22 +1,25 @@
 Revision history for Perl extension Ithumb::XS.
 
-v0.1.4.1  Thu Nov 22 11:00:00 2018
+v0.1.5  Sat Dec 8 10:03:19 MSK 2018
+	- Fixed and improve readme's and pod-docs
+
+v0.1.4.1  Thu Nov 22 11:00:00 MSK 2018
 	- Fixed render validation error
 	- Fixed module description
 
-v0.1.4  Thu Nov 22 10:00:00 2018
+v0.1.4  Thu Nov 22 10:00:00 MSK 2018
 	- Some XS improves (better input validation)
 
-v0.1.3  Tue Jul 3 11:30:00 2018
+v0.1.3  Tue Jul 3 11:30:00 MSK 2018
 	- Improve XS code
 
-v0.1.2  Wed Mar 14 08:00:00 2018
+v0.1.2  Wed Mar 14 08:00:00 MSK 2018
 	- Fixed CPAN Kwalitee Issues
 
-v0.1.1  Sun Mar 11 18:34:53 2018
+v0.1.1  Sun Mar 11 18:34:53 MSK 2018
 	- Fixed test, pod-docs and typo.
 
-v0.1.0  Sun Mar 11 12:00:00 2018
+v0.1.0  Sun Mar 11 12:00:00 MSK 2018
 	- The first release.
 	  Add basic functionality, create distribution and make cpan-package.
 

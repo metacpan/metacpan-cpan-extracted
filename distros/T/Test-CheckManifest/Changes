@@ -1,6 +1,26 @@
 Revision history for Perl extension Test::CheckManifest.
 ========================================================
 
+1.38  2018-12-13 16:26:00
+
+      [BUGFIX]
+      * require at least Cwd 3.75
+
+1.35  2018-12-12 09:05:00
+
+      [BUGFIX]
+      * Tests failed
+
+1.34  2018-12-11
+
+      [BUGFIX]
+      * Tests failed on Windows (github #9)
+      * 'exclude' is meant to be a list of directories, but it was handled as regular expressions
+
+      [IMPROVEMENTS]
+      * rewrite larger parts of the module
+      * add lots of tests
+
 1.33  2018-01-26
 
       [INTERNAL]

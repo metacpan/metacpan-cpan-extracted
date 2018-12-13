@@ -14,7 +14,7 @@ use constant DEBUG => $ENV{MOJO_SELENIUM_DEBUG} || 0;
 $ENV{TEST_SELENIUM} //= '0';
 $ENV{MOJO_SELENIUM_BASE_URL} ||= $ENV{TEST_SELENIUM} =~ /^http/ ? $ENV{TEST_SELENIUM} : '';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my $SCRIPT_NAME = File::Basename::basename($0);
 my $SCREENSHOT  = 1;
@@ -24,7 +24,7 @@ has driver => sub {
   my $args = $self->driver_args;
   my ($driver, $env) = split /\&/, +($ENV{MOJO_SELENIUM_DRIVER} || ''), 2;
   $env = Mojo::Parameters->new($env || '')->to_hash;
-  $driver ||= $args->{driver_class} || 'Selenium::PhantomJS';
+  $driver ||= $args->{driver_class} || 'Selenium::Chrome';
   eval "require $driver;1" or croak "require $driver: $@";
   warn "[Selenium] Using $driver\n" if DEBUG;
   $driver = $driver->new(%$args, %$env, ua => $self->ua);
@@ -451,7 +451,8 @@ Test::Mojo::Role::Selenium - Test::Mojo in a real browser
   use Mojo::Base -strict;
   use Test::More;
 
-  $ENV{MOJO_SELENIUM_DRIVER} ||= 'Selenium::Chrome';
+  $ENV{MOJO_SELENIUM_BASE_URL} ||= 'http://mojolicious.org';
+  $ENV{MOJO_SELENIUM_DRIVER}   ||= 'Selenium::Chrome';
 
   my $t = Test::Mojo->with_roles("+Selenium")->new->setup_or_skip_all;
 
@@ -506,10 +507,8 @@ is done by L<Selenium::Remote::Driver>.
 
 Some of the L<Selenium::Remote::Driver> methods are available directly in this
 role, while the rest are available through the object held by the L</driver>
-attribute. Please let me know if you think more tests or methods should be
+attribute. Please create an issue if you think more tests or methods should be
 provided directly by L<Test::Mojo::Role::Selenium>.
-
-This role is EXPERIMENTAL and subject to change.
 
 =head1 OPTIONAL DEPENDENCIES
 
@@ -529,25 +528,13 @@ are a quick intro to install some of the dependencies to make this module work.
   # Run tests
   $ MOJO_SELENIUM_DRIVER=Selenium::Chrome prove -l
 
-=item * L<Selenium::PhantomJS>
-
-  # macOS
-  $ brew install phantomjs
-
-  # Ubuntu
-  $ sudo apt-get install phantomjs
-
-  # Run tests
-  $ MOJO_SELENIUM_DRIVER=Selenium::PhantomJS prove -l
-
 =back
 
 =head1 CAVEAT
 
-L<Test::Mojo/tx> is only populated by this role, if the initial request is done
-by passing a relative path to L</navigate_ok>. This means that methods such as
-L<Test::Mojo/header_is> will not work as expected (probably fail completely) if
-L</navigate_ok> is issued with an absolute path like L<http://mojolicious.org>.
+L<Test::Mojo/tx> is only populated, if the request went through an L</Internal app>.
+This means that methods such as L<Test::Mojo/header_is> will not work or
+probably fail completely when testing an L</External app>.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -558,6 +545,8 @@ instead of starting a local server. Note that this will disable L<Test::Mojo>
 methods such as L</status_is>, since L<Test::Mojo/tx> will not be set. See
 also L</CAVEAT>.
 
+This variable will get the value of L</TEST_SELENIUM> if it looks like a URL.
+
 =head2 MOJO_SELENIUM_TEST_HOST
 
 In some cases you may want to override the host of your test server, when
@@ -567,14 +556,19 @@ L<Test::Mojo> methods.
 
 =head2 MOJO_SELENIUM_DRIVER
 
-This variable can be set to a classname, such as L<Selenium::Chrome> or
-L<Selenium::PhantomJS>, which will force the selenium driver. It can also be
-used to pass on arguments to the driver's constructor. Example:
+This variable can be set to a classname, such as L<Selenium::Chrome> which will
+force the selenium driver. It can also be used to pass on arguments to the
+driver's constructor. Example:
 
   MOJO_SELENIUM_DRIVER='Selenium::Remote::Driver&browser_name=firefox&port=4444'
 
 The arguments will be read using L<Mojo::Parameters/parse>, which means they
 follow standard URL format rules.
+
+=head2 TEST_SELENIUM
+
+This variable must be set to a true value for L</setup_or_skip_all> to not skip
+this test. Will also set L</MOJO_SELENIUM_BASE_URL> if it looks like an URL.
 
 =head1 ATTRIBUTES
 
@@ -587,11 +581,11 @@ An instance of L<Selenium::Remote::Driver>.
 =head2 driver_args
 
   $hash = $self->driver_args;
-  $self = $self->driver_args({driver_class => "Selenium::PhantomJS"});
+  $self = $self->driver_args({driver_class => "Selenium::Chrome"});
 
 Used to set args passed on to the L</driver> on construction time. In addition,
 a special key "driver_class" can be set to use another driver class, than the
-default L<Selenium::PhantomJS>.
+default.
 
 Note that the environment variavble C<MOJO_SELENIUM_DRIVER> can also be used to
 override the driver class.
@@ -831,8 +825,6 @@ See L<Selenium::Remote::WebElement/submit>.
 
 Used to toggle the "checked" attribute either with a click event or fallback to
 javascript.
-
-TODO: The implementation might change in the future.
 
 =head2 wait_for
 

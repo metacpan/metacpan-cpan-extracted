@@ -1,3 +1,8 @@
+1.000     2018-12-13 14:06:09 EST
+  - Default allow_decimal_underscore to enabled. Underscores in decimal
+    versions are not ideal, but they are still the most convenient method of
+    indicating a developer release when not using Dist::Zilla.
+
 0.006     2018-04-21 19:40:09 EDT
   - Use and recognize tr/_//d to remove underscores from versions
 

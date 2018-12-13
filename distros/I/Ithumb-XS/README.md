@@ -1,16 +1,24 @@
 # Ithumb::XS
 
-Ithumb::XS is a very small (one function) and simple Perl-XS module
+Ithumb::XS is a very small (single function) and simple Perl-XS module
 for creation a thumbnails, using Imlib2 library.
 
 ## Installation
 
-To install this module type the following:
+To manual install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+```
+$ perl Makefile.PL
+$ make
+$ make test
+$ make install
+```
+
+To automatical install this module type the following:
+
+```
+$ cpan install Ithumb::XS
+```
 
 ## Dependences
 

@@ -4,9 +4,7 @@
 #
 # This tests the code for handling long-running processes. Since it is, by
 #  necessity, slower to execute than we probably want to run as a normal
-#  test. This code is disabled, unless it is run with the environment
-#  variable CPANEL_SLOW_TESTS set.
-
+#  test.
 
 use strict;
 use FindBin;
@@ -16,28 +14,26 @@ use File::Path ();
 use Test::More tests => 34;
 use cPanel::TaskQueue;
 
-my $tmpdir = './tmp';
+my $tmpdir   = './tmp';
 my $statedir = "$tmpdir/statedir";
 
 {
+
     package SleepTask;
     use base 'cPanel::TaskQueue::ChildProcessor';
 
     sub _do_child_task {
-        my ($self, $cmd, $logger, @args) = @_;
+        my ( $self, $cmd, $logger, @args ) = @_;
 
         my $secs = $args[0] || 10;
-        system( "sleep $secs" );
+        system("sleep $secs");
     }
 }
 
-SKIP:
 {
-    skip 'Long running tests not enabled.', 34 unless $ENV{CPANEL_SLOW_TESTS};
-
     # In case the last test did not succeed.
     cleanup();
-    File::Path::mkpath( $statedir );
+    File::Path::mkpath($statedir);
 
     cPanel::TaskQueue->register_task_processor( 'sleep', SleepTask->new() );
 
@@ -45,8 +41,8 @@ SKIP:
     isa_ok( $queue, 'cPanel::TaskQueue', 'Correct object built.' );
 
     foreach my $cnt ( 1 .. 8 ) {
-        my $time = 10+$cnt;
-        ok( $queue->queue_task( "sleep $time" ), "$cnt task queued" );
+        my $time = 10 + $cnt;
+        ok( $queue->queue_task("sleep $time"), "$cnt task queued" );
     }
 
     is( $queue->how_many_queued(), 8, 'correct number queued' );
@@ -57,18 +53,17 @@ SKIP:
 
     # Don't use normally, only for monitoring.
     my $queues = $queue->snapshot_task_lists();
-    is( scalar( @{$queues->{waiting}} ), 3, 'Waiting list is correct size.' );
-    is( scalar( @{$queues->{processing}} ), 5, 'Processing list is empty.' );
+    is( scalar( @{ $queues->{waiting} } ),    3, 'Waiting list is correct size.' );
+    is( scalar( @{ $queues->{processing} } ), 5, 'Processing list is empty.' );
     foreach my $cnt ( 1 .. 5 ) {
-        my $time = 10+$cnt;
-        if ( defined $queues->{processing}->[$cnt-1] ) {
-            is( $queues->{processing}->[$cnt-1]->full_command(), "sleep $time", "$cnt command is correct" );
+        my $time = 10 + $cnt;
+        if ( defined $queues->{processing}->[ $cnt - 1 ] ) {
+            is( $queues->{processing}->[ $cnt - 1 ]->full_command(), "sleep $time", "$cnt command is correct" );
         }
         else {
-            fail( "$cnt processing task not found" )
+            fail("$cnt processing task not found");
         }
     }
-
 
     ok( !$queue->has_work_to_do(), 'can\'t work too many in process.' );
 
@@ -87,8 +82,7 @@ SKIP:
     cleanup();
 }
 
-
 # Clean up after myself
 sub cleanup {
-    File::Path::rmtree( $tmpdir );
+    File::Path::rmtree($tmpdir);
 }

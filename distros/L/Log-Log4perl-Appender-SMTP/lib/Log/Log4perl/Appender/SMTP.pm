@@ -8,7 +8,7 @@ use Carp;
 use Net::Domain 'hostfqdn';
 use Net::SMTP;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
 	my($class, @options) = @_;
@@ -34,7 +34,7 @@ sub log {
 	$smtp->mail($self->{from}) or return
 		carp "log4perl: sender rejected: $self->{from}";
 
-	$smtp->to($self->{to}) or return
+	$smtp->to(split /,/, $self->{to}) or return
 		carp "log4perl: recipient(s) rejected: $self->{to}";
 
 	$smtp->data;

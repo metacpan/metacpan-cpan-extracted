@@ -5,7 +5,7 @@ use DTest;
 use Test::OnlySome;
 
 my $hrOpts = {
-    skip => { 2=>true, 6=>true }
+    skip => { 2=>true, 3=>true, 6=>true, 7=>true, 8=>true }
 };
 
 is($TEST_NUMBER_OS, 1, 'Tests start at 1');

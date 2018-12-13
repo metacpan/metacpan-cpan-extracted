@@ -1,0 +1,60 @@
+{
+   "abstract" : "Find scalar names in a text.",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-Find-Scalar",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006002"
+         }
+      }
+   },
+   "provides" : {
+      "Text::Find::Scalar" : {
+         "file" : "lib/Text/Find/Scalar.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Text-Find-Scalar/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Text-Find-Scalar",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/reneeb/Text-Find-Scalar.git",
+         "web" : "http://github.com/reneeb/Text-Find-Scalar"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

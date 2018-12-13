@@ -9,7 +9,7 @@ use Math::Complex ();
 use POSIX ();
 use Scalar::Util ();
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 our @ISA = 'Exporter';
 our @EXPORT_OK = 'calc';
 our $ERROR;
@@ -148,9 +148,9 @@ sub bignum {
 	$self->{bignum} = !!shift;
 	if ($self->{bignum}) {
 		require Math::BigInt;
-		Math::BigInt->VERSION('1.87');
+		Math::BigInt->VERSION('1.999722');
 		require Math::BigFloat;
-		Math::BigFloat->VERSION('1.58');
+		Math::BigFloat->VERSION('1.999722');
 		Math::BigInt->upgrade('Math::BigFloat');
 		Math::BigFloat->downgrade('Math::BigInt');
 		Math::BigFloat->upgrade(undef);
@@ -164,11 +164,11 @@ sub bigrat {
 	$self->{bigrat} = !!shift;
 	if ($self->{bigrat}) {
 		require Math::BigInt;
-		Math::BigInt->VERSION('1.87');
+		Math::BigInt->VERSION('1.999722');
 		require Math::BigRat;
-		Math::BigRat->VERSION('0.20');
+		Math::BigRat->VERSION('0.260804');
 		require Math::BigFloat;
-		Math::BigFloat->VERSION('1.58');
+		Math::BigFloat->VERSION('1.999722');
 		Math::BigInt->upgrade('Math::BigFloat');
 		Math::BigFloat->upgrade('Math::BigRat');
 		Math::BigFloat->downgrade(undef);

@@ -3,7 +3,7 @@ use rlib 'lib';
 use DTest;
 use Test::OnlySome;
 
-$TEST_ONLYSOME->{skip} = { 2=>true, 6=>true };
+$TEST_ONLYSOME->{skip} = { 2=>true, 3=>true, 6=>true, 7=>true, 8=>true };
 
 is($TEST_NUMBER_OS, 1, 'Tests start at 1');
 

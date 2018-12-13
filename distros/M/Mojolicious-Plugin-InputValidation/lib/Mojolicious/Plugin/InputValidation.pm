@@ -2,6 +2,7 @@ package IV_ANY;
 sub new { my $class = shift; bless {@_}, $class }
 sub optional { shift->{optional} }
 sub nillable { shift->{nillable} }
+sub empty    { shift->{empty} }
 sub error { my $self = shift; $self->{error} = shift if @_; $self->{error} }
 sub pattern {
     my $self         = shift;
@@ -10,9 +11,10 @@ sub pattern {
 }
 sub accepts {
     my ($self, $value, $path) = @_;
-    return 1 if ($self->nillable and not defined $value);
-    return 1 if defined $value && !$self->pattern;
-    return 1 if $self->pattern && $value =~ $self->pattern;
+    return 1 if ($self->nillable and not defined $value)
+             or ($self->empty and defined $value and !ref $value and $value eq '')
+             or (defined $value && !$self->pattern)
+             or ($self->pattern && $value =~ $self->pattern);
 
     $self->error("Value '$value' does not match at path " . ($path || '/'));
     return 0;
@@ -24,6 +26,7 @@ sub new { my $class = shift; bless {@_}, $class }
 sub accepts {
     my ($self, $value, $path) = @_;
     return 1 if ($self->nillable and not defined $value)
+             or ($self->empty and defined $value and !ref $value and $value eq '')
              or ($value =~ /^\w+$/);
 
     $self->error("Value '$value' does not match word characters only at path " . ($path || '/'));
@@ -36,6 +39,7 @@ sub new { my $class = shift; bless {@_}, $class }
 sub accepts {
     my ($self, $value, $path) = @_;
     return 1 if ($self->nillable and not defined $value)
+             or ($self->empty and defined $value and !ref $value and $value eq '')
              or ($value =~ /^-?\d+\.\d+$/);
 
     $self->error("Value '$value' is not a float at path " . ($path || '/'));
@@ -48,6 +52,7 @@ sub new { my $class = shift; bless {@_}, $class }
 sub accepts {
     my ($self, $value, $path) = @_;
     return 1 if ($self->nillable and not defined $value)
+             or ($self->empty and defined $value and !ref $value and $value eq '')
              or ($value =~ /^-?\d+$/);
 
     $self->error("Value '$value' is not an integer at path " . ($path || '/'));
@@ -192,6 +197,7 @@ sub pattern {
 sub accepts {
     my ($self, $value, $path) = @_;
     return 1 if ($self->nillable and not defined $value)
+             or ($self->empty and defined $value and !ref $value and $value eq '')
              or ($value =~ $self->pattern);
 
     $self->error("Value '$value' does not match datetime format at path " . ($path || '/'));
@@ -202,7 +208,7 @@ package Mojolicious::Plugin::InputValidation;
 use Mojo::Base 'Mojolicious::Plugin';
 no strict 'subs';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Mojo::Util 'monkey_patch';
 
@@ -280,7 +286,7 @@ Mojolicious::Plugin::InputValidation - Validate incoming requests
       # Validate incoming requests against our data model.
       if (my $error = $c->validate_json_request({
           title    => iv_any,
-          abstract => iv_any(optional => 1),
+          abstract => iv_any(optional => 1, empty => 1),
           author   => {
               firstname => iv_word,
               lastname  => iv_word,
@@ -334,11 +340,12 @@ This is the base type for all other types. By default it matches defined values
 only. It supports beeing optional, means that it is okay if this element is
 missing entirely in the payload.
 When this type is marked as nillable, it also accepts a null/undef value.
+To accept an empty string, mark it as empty.
 This type supports a regex pattern to match against. All options can be combined.
 
   {
       foo  => iv_any,
-      bar  => iv_any(optional => 1),
+      bar  => iv_any(optional => 1, empty => 1),
       baz  => iv_any(nillable => 1),
       quux => iv_any(pattern => qr/^new|mint|used$/),
   }
@@ -368,10 +375,11 @@ leading dash.
 
 This type is meant to match identifiers. It matches word character strings (\w+).
 Using the iv_any type one can achieve the same with: iv_any(pattern => qr/^\w+$/)
+To accept an empty string, mark it as empty.
 
   {
       foo => iv_word,
-      bar => iv_word(optional => 1),
+      bar => iv_word(optional => 1, empty => 1),
       baz => iv_word(nillable => 1),
   }
 

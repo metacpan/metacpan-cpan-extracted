@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,15 +14,21 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-Class-InflateColumn-TimePiece",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "DBIx::Class::InflateColumn::TimePiece",
   "PREREQ_PM" => {
-    "DBIx::Class" => 0
+    "DBIx::Class" => 0,
+    "Time::Piece" => 0,
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "DBD::SQLite" => 0,
-    "DBI" => 0
+    "DBI" => 0,
+    "File::Basename" => 0,
+    "SQL::Translator" => 0,
+    "Scalar::Util" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +38,12 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "DBD::SQLite" => 0,
   "DBI" => 0,
-  "DBIx::Class" => 0
+  "DBIx::Class" => 0,
+  "File::Basename" => 0,
+  "SQL::Translator" => 0,
+  "Scalar::Util" => 0,
+  "Time::Piece" => 0,
+  "parent" => 0
 );
 
 

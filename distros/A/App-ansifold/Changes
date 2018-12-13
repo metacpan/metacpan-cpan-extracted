@@ -1,4 +1,8 @@
-Revision history for Perl extension App-ansifold
+Revision history for `ansifold' command.
+
+0.02 2018-12-12T23:21:16Z
+
+    - Add --truncate option.
 
 0.01 2018-07-21T18:01:12Z
 

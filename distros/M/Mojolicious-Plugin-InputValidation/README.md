@@ -15,7 +15,7 @@
       # Validate incoming requests against our data model.
       if (my $error = $c->validate_json_request({
           title    => iv_any,
-          abstract => iv_any(optional => 1),
+          abstract => iv_any(optional => 1, empty => 1),
           author   => {
               firstname => iv_word,
               lastname  => iv_word,

@@ -10,6 +10,8 @@ use Scalar::Util qw/blessed/;
 use lib dirname(__FILE__) . '/lib';
 use TimePieceDB;
 
+local $ENV{TZ} = 'UTC';
+
 if ( !eval { require DBD::SQLite } ) {
     plan skip_all => 'DBD::SQLite is not installed!';
 }
@@ -21,8 +23,8 @@ my @tests = (
     [ 0,             '1970-01-01' ],
     [ 25 * 60 * 60 , '1970-01-02' ],
     [ 1544536942,    '2018-12-11' ],
-    [ 1544536942,    '2018-12-11 15:02:22', sub { sprintf "%s %s", $_[0]->ymd, $_[0]->hms } ],
-    [ -1,            '1970-01-01' ],
+    [ 1544536942,    '2018-12-11 14:02:22', sub { sprintf "%s %s", $_[0]->ymd, $_[0]->hms } ],
+    [ -1,            '1969-12-31' ],
     [ 1544536942,    '11-12-2018', sub { $_[0]->dmy } ],
 );
 

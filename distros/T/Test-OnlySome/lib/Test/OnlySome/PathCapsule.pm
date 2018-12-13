@@ -1,5 +1,7 @@
 #!perl
 
+# TODO see if I can replace this with Path::Class, Path::Extended,
+# or Badger::Filesystem::Path.
 package Test::OnlySome::PathCapsule;
 use 5.012;
 use strict;
@@ -10,7 +12,7 @@ use Cwd qw(cwd);
 
 use constant { true => !!1, false => !!0 };
 
-our $VERSION = '0.000008';
+our $VERSION = '0.001000';
 
 # Docs {{{2
 
@@ -39,6 +41,8 @@ Test::OnlySome::PathCapsule doesn't care whether the path actually exists on dis
 
 # }}}2
 
+# new() # {{{1
+
 =head2 new
 
 Create a new instance.
@@ -51,18 +55,19 @@ directory; otherwise, it points at a file.
 
 =cut
 
-sub new { # {{{1
+sub new {
     my $class = shift;
     my $filename = shift;
     my $is_dir = shift // false;
     my $cwd = cwd;
+
     unless(defined $filename) {
         $filename = $cwd;
         $is_dir = true;
     }
 
-    $filename = File::Spec->rel2abs($filename)
-        if !File::Spec->file_name_is_absolute($filename);
+    $filename = File::Spec->rel2abs($filename, $cwd)
+        unless File::Spec->file_name_is_absolute($filename);
 
     my ($vol, $dir, $file) = File::Spec->splitpath($filename, $is_dir);
     $dir = File::Spec->catdir($dir);
@@ -79,7 +84,29 @@ sub new { # {{{1
 
         _is_dir => $is_dir,     # The path's context
         _relative_to => $cwd,   # never changes
+    }, $class;
+} # }}}1
+# clone() # {{{1
+
+=head2 clone
+
+Return a clone of this instance.  Useful if you want to start from one
+path and move to others.  Usage is C<$instance->clone()>.
+
+=cut
+
+sub clone {
+    my $self = shift or croak "Need an instance";
+    my $new_instance = {
+        _vol => $self->{_vol},
+        _dirs => [@{ $self->{_dirs} }],     # One-level-deep copy
+        _file => $self->{_file},
+
+        _is_dir => $self->{_is_dir},
+        _relative_to => $self->{_relative_to},
     };
+
+    return bless($new_instance, ref $self);
 } # }}}1
 
 =head2 up

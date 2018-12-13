@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
 #---AUTOPRAGMASTART---
-use 5.020;
+use 5.010_001;
 use strict;
 use warnings;
 use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp;
-our $VERSION = 4.8;
+our $VERSION = 4.9;
 use Fatal qw( close );
 use Array::Contains;
 #---AUTOPRAGMAEND---
@@ -62,14 +62,14 @@ foreach my $file (@files) {
         }
         if($line =~ /^package\ / || $line =~ /^\#\!/) {
             print $ofh "#---AUTOPRAGMASTART---\n";
-            print $ofh "use 5.020;\n";
+            print $ofh "use 5.010_001;\n";
             print $ofh "use strict;\n";
             print $ofh "use warnings;\n";
             print $ofh "use diagnostics;\n";
             print $ofh "use mro 'c3';\n";
             print $ofh "use English qw(-no_match_vars);\n";
             print $ofh "use Carp;\n";
-            print $ofh "our \$VERSION = 4.8;\n";
+            print $ofh "our \$VERSION = 4.9;\n";
             print $ofh "use Fatal qw( close );\n";
             print $ofh "use Array::Contains;\n";
             print $ofh "#---AUTOPRAGMAEND---\n";

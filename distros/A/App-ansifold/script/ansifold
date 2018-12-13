@@ -22,12 +22,13 @@ ansifold [ options ]
     --padchar=_              Padding character
     --ambiguous=narrow|wide  Unicode ambiguous character handling
     --paragraph, -p          Print extra newline
+    --truncate               Truncate folded text
 
 =head1 DESCRIPTION
 
 B<ansifold> is almost B<fold> compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
-sequences properly.
+sequences and Unicode multibyte characters properly.
 
 =head1 LICENSE
 
@@ -60,6 +61,7 @@ my @optargs = (
     "padchar=s"   => \$opt{padchar},
     "ambiguous=s" => \$opt{ambiguous},
     "paragraph|p" => \$opt{paragraph},
+    "truncate!"   => \$opt{truncate},
     "s" => sub {
 	$opt{boundary} = 'word';
     },
@@ -73,15 +75,19 @@ use Getopt::Long;
 Getopt::Long::Configure("bundling");
 GetOptions(@optargs) || pod2usage();
 
-my @option = do {
+if ($opt{truncate}) {
+    $opt{width} = [ $opt{width} ];
+}
+
+my $fold = new Text::ANSI::Fold do {
     map  { $_ => $opt{$_} }
     grep { defined $opt{$_} }
     qw(width boundary padding padchar ambiguous);
 };
 
-my $fold = new Text::ANSI::Fold @option;
-
 while (<>) {
+    my $chomped = chomp;
     print join "\n", $fold->text($_)->chops;
+    print "\n" if $chomped;
     print "\n" if $opt{paragraph};
 }

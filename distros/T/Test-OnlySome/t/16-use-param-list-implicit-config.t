@@ -1,7 +1,7 @@
 #!perl
 use rlib 'lib';
 use DTest;
-use Test::OnlySome qw(skip 2 6);
+use Test::OnlySome qw(skip 2 3 6 7 8);
 
 is($TEST_NUMBER_OS, 1, 'Tests start at 1');
 
@@ -41,7 +41,8 @@ is($TEST_NUMBER_OS, 10, '$TEST_NUMBER_OS increments to 10');
 skip_next;
 os ok(0, 'Test 10 - should be skipped');
 
-is_deeply($TEST_ONLYSOME, {skip => {2=>true, 6=>true, 10=>true}, verbose=>0, n=>1},
+is_deeply($TEST_ONLYSOME, {skip => {2=>true, 3=>true, 6=>true, 7=>true,
+            8=>true, 10=>true}, verbose=>0, n=>1},
     '$TEST_ONLYSOME is what we set');
 
 done_testing();

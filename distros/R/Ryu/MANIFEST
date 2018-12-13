@@ -24,11 +24,16 @@ lib/Ryu/Manual/Reactive.pod
 lib/Ryu/Node.pm
 lib/Ryu/Observable.pm
 lib/Ryu/Sink.pm
+lib/Ryu/Sink.pod
 lib/Ryu/Source.pm
+lib/Ryu/Source.pod
+lib/Ryu/Stream.pm
+lib/Ryu/Stream.pod
 t/00-check-deps.t
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/buffer.t
 t/chained.t
 t/chomp.t
 t/combine_latest.t
@@ -41,6 +46,7 @@ t/exception.t
 t/extract_all.t
 t/filter.t
 t/flat_map.t
+t/flow_control.t
 t/map.t
 t/max.t
 t/mean.t

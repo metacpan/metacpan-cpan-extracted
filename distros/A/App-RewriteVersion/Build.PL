@@ -84,7 +84,7 @@ EOW
         "Dan Book <dbook\@cpan.org>"
       ],
       "dist_name" => "App-RewriteVersion",
-      "dist_version" => "0.006",
+      "dist_version" => "1.000",
       "license" => "artistic_2",
       "module_name" => "App::RewriteVersion",
       "recommends" => {

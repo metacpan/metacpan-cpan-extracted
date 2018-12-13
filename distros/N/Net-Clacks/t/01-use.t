@@ -20,11 +20,10 @@ BEGIN {
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 4;
+use Test::More tests => 3;
 BEGIN { 
     use_ok('Net::Clacks::Server');
     use_ok('Net::Clacks::Client');
-    use_ok('Net::Clacks::Client::Async');
     use_ok('Net::Clacks::ClacksCache');
 };
 

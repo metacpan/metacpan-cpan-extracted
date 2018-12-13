@@ -1,21 +1,21 @@
 #!/usr/bin/perl
 
-use Test::More ( $^O =~ /mswin/i
-        ? ('skip_all' => 'checked_system tests do not work under Windows')
-        : eval "use Test::Exception; 1;"
-        ? (tests => 10)
-        : ('skip_all' => 'Test::Exception needed for this test.')
-    );
+use Test::More (
+      $^O =~ /mswin/i                ? ( 'skip_all' => 'checked_system tests do not work under Windows' )
+    : eval "use Test::Exception; 1;" ? ( tests      => 10 )
+    :                                  ( 'skip_all' => 'Test::Exception needed for this test.' )
+);
 
 use strict;
 use warnings;
 
 {
+
     package MockLogger;
     my $message;
-    sub new   { return bless {}; }
+    sub new { return bless {}; }
     sub throw { shift; die @_; }
-    sub warn  { shift; $message = join( '', 'WARN:', @_ ); }
+    sub warn { shift; $message = join( '', 'WARN:', @_ ); }
 
     sub get_message { return $message; }
     sub clear { $message = ''; return; }
@@ -26,16 +26,16 @@ use cPanel::TaskQueue::Processor;
 my $proc = cPanel::TaskQueue::Processor->new();
 
 throws_ok { $proc->checked_system() } qr/must be a hashref/, 'No arg case recognized';
-throws_ok { $proc->checked_system({}) } qr/required 'logger'/, 'Recognized missing logger';
+throws_ok { $proc->checked_system( {} ) } qr/required 'logger'/, 'Recognized missing logger';
 
 my $logger = MockLogger->new();
 throws_ok { $proc->checked_system( { logger => $logger, name => 'test' } ); }
-    qr/required 'cmd'/,
-    'Recognized missing cmd';
+qr/required 'cmd'/,
+  'Recognized missing cmd';
 
 throws_ok { $proc->checked_system( { logger => $logger, cmd => 'test' } ); }
-    qr/required 'name'/,
-    'Recognized missing name';
+qr/required 'name'/,
+  'Recognized missing name';
 
 $logger->clear();
 {
@@ -44,7 +44,7 @@ $logger->clear();
     open STDERR, '>', '/dev/null' or die "Unable to redirect STDERR: $!";
     is( $proc->checked_system( { logger => $logger, name => 'foobarxyzzy', cmd => 'foobarxyzzy' } ), -1, 'Program cannot run' );
     is( $logger->get_message, 'WARN:Failed to run foobarxyzzy', 'Warning detected.' );
-    open STDERR, '>', $olderr;
+    open STDERR, '>&=', $olderr;
 }
 
 $logger->clear();

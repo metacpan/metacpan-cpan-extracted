@@ -98,6 +98,11 @@ $redis->{pid} = -1;
 isnt $redis->db->connection, $conn, 'new fork gets a new connecion';
 undef $conn;
 $redis->{pid} = $$;
+$conn = $redis->_blocking_connection;
+$redis->{pid} = -1;
+isnt $redis->_blocking_connection, $conn, 'new fork gets a new blocking connection';
+undef $conn;
+$redis->{pid} = $$;
 
 note 'Connection closes when ref is lost';
 $db = $redis->db;

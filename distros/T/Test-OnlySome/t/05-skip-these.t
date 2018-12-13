@@ -5,7 +5,7 @@ use Test::OnlySome;
 use Test::Fatal qw(dies_ok lives_ok);
 
 my $hrOpts = {};
-skip_these $hrOpts, 2, 4, 6;
+skip_these $hrOpts, 2, 4, 6, 7;
 
 is($TEST_NUMBER_OS, 1, 'Tests start at 1');
 
@@ -39,7 +39,7 @@ is($TEST_NUMBER_OS, 8, '$TEST_NUMBER_OS increments to 8');
 
 ok(1, 'Test 9');
 
-is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true}, n=>2},
+is_deeply($hrOpts, {skip => {2=>true, 4=>true, 6=>true, 7=>true}, n=>2},
     'Options structure is what we set');
 is_deeply($TEST_ONLYSOME, {n=>1, skip=>{}, verbose=>0}, '$TEST_ONLYSOME has only the default content');
 
@@ -67,7 +67,7 @@ lives_ok {
     skip_these $hrOpts, '1';
 } 'skip_these accepts "1"';
 
-is_deeply($hrOpts, {skip => {1=>true, 2=>true, 4=>true, 6=>true}, n=>2},
+is_deeply($hrOpts, {skip => {1=>true, 2=>true, 4=>true, 6=>true, 7=>true}, n=>2},
     'Options structure is what we set, after modifications');
 
 done_testing();

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-Azure-EventHubs
 
+0.08 2018-12-13T09:52:54Z
+    - Stabilize testing script t/13_req.t
+
 0.07 2018-07-03T03:29:58Z
     - Fix misdirected dependency (for netbsd)
 

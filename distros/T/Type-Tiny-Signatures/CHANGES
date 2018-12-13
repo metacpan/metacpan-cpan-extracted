@@ -1,26 +1,36 @@
 Changelog for Type-Tiny-Signatures
 
-0.06 2015-09-27T11:56:22
- - Updated build.
- - Updated build requirements.
+0.07 2018-12-13T13:43:53
+ - Updated dist.ini (Al Newkirk)
+ - Added development settings files (Al Newkirk)
+ - Updated test to honor new F::P config (Al Newkirk)
+ - Made .gitignore more rigid and explicit (Al Newkirk)
+ - Updated to work with new Function::Parameters API (Al Newkirk)
+ - Added additional target Perl versions to build against (Al Newkirk)
+
+0.06 2015-09-27T11:56:29
+ - v0.06 (Al Newkirk)
+ - Updated build. (Al Newkirk)
+ - Updated build requirements. (Al Newkirk)
 
 0.05 2015-07-04T04:28:30
- - v0.05
- - Refactored import.
+ - v0.05 (Al Newkirk)
+ - Refactored import. (Al Newkirk)
 
 0.04 2015-07-04T01:06:53
- - v0.04
- - Refactored import.
+ - v0.04 (Al Newkirk)
+ - Refactored import. (Al Newkirk)
 
 0.03 2015-06-21T09:54:47
- - v0.03
+ - v0.03 (Al Newkirk)
  - Added support for Function::Parameters strict mode and customization.
- - Updated POD.
+   (Al Newkirk)
+ - Updated POD. (Al Newkirk)
 
 0.02 2015-06-15T00:00:50
- - v0.02
- - Minor updates to code and POD.
+ - v0.02 (Al Newkirk)
+ - Minor updates to code and POD. (Al Newkirk)
 
 0.01 2015-06-14T13:38:27
- - v0.01
- - Initial commit.
+ - v0.01 (Al Newkirk)
+ - Initial commit. (Al Newkirk)

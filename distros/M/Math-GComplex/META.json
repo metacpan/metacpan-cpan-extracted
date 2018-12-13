@@ -1,7 +1,7 @@
 {
    "abstract" : "Generic complex number library.",
    "author" : [
-      "Daniel Șuteu <trizen@protonmail.com>"
+      "Daniel Șuteu <trizen@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
@@ -36,7 +36,7 @@
    "provides" : {
       "Math::GComplex" : {
          "file" : "lib/Math/GComplex.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "url" : "https://github.com/trizen/Math-GComplex"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

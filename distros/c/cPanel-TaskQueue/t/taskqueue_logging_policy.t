@@ -26,38 +26,36 @@ my $tmpdir = './tmp';
 
 # clean up if last run failed.
 cleanup();
-File::Path::mkpath( $tmpdir ) or die "Unable to create tmpdir: $!";
+File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 # test bad new calls.
-eval {
-    my $cf = cPanel::TaskQueue->new( {} );
-};
+eval { my $cf = cPanel::TaskQueue->new( {} ); };
 like( $@, qr/state directory/, 'Cannot create StateFile without parameters' );
-like( ($logger->get_msgs())[0], qr/throw.*?state directory/, 'Logged correctly.' );
+like( ( $logger->get_msgs() )[0], qr/throw.*?state directory/, 'Logged correctly.' );
 $logger->reset_msgs();
 
 my $queue = cPanel::TaskQueue->new( { name => 'tasks', state_dir => $tmpdir } );
 
-cPanel::TaskQueue->register_task_processor( 'mock', sub {} );
+cPanel::TaskQueue->register_task_processor( 'mock', sub { } );
 
-ok( $queue->queue_task( 'mock this is a test' ), 'Task added.' );
+ok( $queue->queue_task('mock this is a test'), 'Task added.' );
 
-cPanel::TaskQueue->unregister_task_processor( 'mock' );
+cPanel::TaskQueue->unregister_task_processor('mock');
 
 ok( $queue->process_next_task(), 'Task completed' );
-like( ($logger->get_msgs())[0], qr/warn.*?No processor found/, 'Warned correctly.' );
+like( ( $logger->get_msgs() )[0], qr/warn.*?No processor found/, 'Warned correctly.' );
 $logger->reset_msgs();
 
 # Make a task with no retries remaining.
-my $task = cPanel::TaskQueue::Task->new( {cmd=>'noop', id=>1, retries=> 1});
+my $task = cPanel::TaskQueue::Task->new( { cmd => 'noop', id => 1, retries => 1 } );
 $task->decrement_retries;
-ok( !$queue->queue_task( $task ), 'Finished trying to queue a task with no retries.' );
-like( ($logger->get_msgs())[0], qr/info.*?0 retries/, 'Infoed correctly.' );
+ok( !$queue->queue_task($task), 'Finished trying to queue a task with no retries.' );
+like( ( $logger->get_msgs() )[0], qr/info.*?0 retries/, 'Infoed correctly.' );
 $logger->reset_msgs();
 
 cleanup();
 
 # Discard temporary files that we don't need any more.
 sub cleanup {
-    File::Path::rmtree( $tmpdir ) if -d $tmpdir;
+    File::Path::rmtree($tmpdir) if -d $tmpdir;
 }

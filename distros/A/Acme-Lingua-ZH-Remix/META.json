@@ -1,0 +1,62 @@
+{
+   "abstract" : "The Chinese sentence generator.",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.023",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-Lingua-ZH-Remix",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.023"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Merge" : "0",
+            "List::MoreUtils" : "0",
+            "Moose" : "0",
+            "Types::Standard" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Lingua::ZH::Remix" : {
+         "file" : "lib/Acme/Lingua/ZH/Remix.pm",
+         "version" : "0.97"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Acme-Lingua-ZH-Remix/issues"
+      },
+      "homepage" : "https://github.com/gugod/Acme-Lingua-ZH-Remix",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/Acme-Lingua-ZH-Remix.git",
+         "web" : "https://github.com/gugod/Acme-Lingua-ZH-Remix"
+      }
+   },
+   "version" : "0.97",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

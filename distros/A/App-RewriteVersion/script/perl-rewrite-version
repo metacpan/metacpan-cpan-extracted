@@ -5,18 +5,18 @@ use warnings;
 use App::RewriteVersion;
 use Getopt::Long::Modern 'auto_help';
 
-our $VERSION = '0.006';
+our $VERSION = '1.000';
 
 GetOptions(
-	'D|dist-dir=s'       => \my $dist_dir,
-	'd|dry-run'          => \my $dry_run,
-	'f|from=s'           => \my $version_from,
-	'g|global'           => \my $global,
-	'L|follow-symlinks'  => \my $follow,
-	't|trial'            => \my $is_trial,
-	'u|allow-underscore' => \my $underscore,
-	'V|set-version=s'    => \my $set_version,
-	'v|verbose'          => \my $verbose,
+	'D|dist-dir=s'        => \my $dist_dir,
+	'd|dry-run'           => \my $dry_run,
+	'f|from=s'            => \my $version_from,
+	'g|global'            => \my $global,
+	'L|follow-symlinks'   => \my $follow,
+	't|trial'             => \my $is_trial,
+	'u|allow-underscore!' => \my $underscore,
+	'V|set-version=s'     => \my $set_version,
+	'v|verbose'           => \my $verbose,
 );
 
 my $subdirs = @ARGV ? [@ARGV] : undef;
@@ -40,7 +40,7 @@ perl-rewrite-version - A tool to rewrite your Perl module versions
  perl-rewrite-version [options] [subdir ...]
  
    perl-rewrite-version --from lib/Foo/Bar.pm
-   perl-rewrite-version --trial --allow-underscore -V 3.30_3 lib script
+   perl-rewrite-version --trial --no-allow-underscore -V 3.30_3 lib script
    perl-rewrite-version -LdvgD /opt/projects/Foo-Bar/
    V=v1.0.0 perl-rewrite-version
  
@@ -51,7 +51,7 @@ perl-rewrite-version - A tool to rewrite your Perl module versions
    -g, --global                 rewrite versions globally instead of just the first per file (default: disabled)
    -L, --follow-symlinks        follow symlinks when finding perl files to rewrite (default: disabled)
    -t, --trial                  mark version as a trial version (default: disabled)
-   -u, --allow-underscore       allow decimal versions with underscores (default: disabled)
+   -u, --allow-underscore       allow decimal versions with underscores (default: enabled)
    -V, --set-version <version>  set version manually instead of from file
    -v, --verbose                print progress messages to STDOUT (default: disabled)
 
@@ -106,11 +106,15 @@ rewrite.
 
 =head2 -t, --trial
 
-Mark version assignment as a trial release.
+Mark version assignment as a trial release. This will only add a C<# TRIAL>
+comment to the version assignment, as the C<-TRIAL> indication is not part of
+the version and should be added to the name of the archive you upload to PAUSE,
+which is outside of the scope of this tool.
 
 =head2 -u, --allow-underscore
 
-Allow decimal versions with underscores. See
+Allow decimal versions with underscores. Enabled by default, use
+C<--no-allow-underscore> to disable. See
 L<Dist::Zilla::Plugin::BumpVersionAfterRelease/"Using underscore in decimal $VERSION">
 for more information.
 

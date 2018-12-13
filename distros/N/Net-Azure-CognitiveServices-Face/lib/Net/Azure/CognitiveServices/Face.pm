@@ -7,7 +7,7 @@ use Net::Azure::CognitiveServices::Face::FaceList;
 use Net::Azure::CognitiveServices::Face::Person;
 use Net::Azure::CognitiveServices::Face::PersonGroup;
 
-our $VERSION  = "0.03";
+our $VERSION  = "0.04";
 our $AUTOLOAD;
 our $INSTANCES = {};
 our $ACCESS_KEY;

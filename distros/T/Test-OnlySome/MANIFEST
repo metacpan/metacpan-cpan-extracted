@@ -19,6 +19,7 @@ t/05-skip-these.t
 t/06-skip-next.t
 t/07-multi-package.t
 t/08-num-tests.t
+t/09-mixed-skip-blocks.t
 t/11-input-forms-implicit-config.t
 t/12-single-tests-implicit-config.t
 t/13-multitest-blocks-implicit-config.t
@@ -37,6 +38,7 @@ t/41-load-rerun-failed.t
 t/42-rerun-failed.t
 t/43-plugin-output.t
 t/44-rerun-failed-multi-run.t
+t/45-osprove-multi-run.t
 t/allkinds.test
 t/allkinds.yml
 t/lib/DImportInto.pm
@@ -44,6 +46,7 @@ t/lib/DTest.pm			Helpers for testing
 t/lib/DTestKit.pm
 t/lib/Nested/DImportInto.pm
 t/lib/Nested/DTestKit.pm
+t/mixedskip.test
 t/rerunfailed.test
 xt/boilerplate.t
 xt/changes.t

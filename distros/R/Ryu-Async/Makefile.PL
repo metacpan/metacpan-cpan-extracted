@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "IO::Async" => "0.71",
     "IO::Socket::IP" => "0.37",
     "Log::Any" => "1.050",
-    "Ryu" => "0.026",
+    "Ryu" => "0.030",
     "Syntax::Keyword::Try" => 0,
     "URI::tcp" => 0,
     "URI::udp" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Variable::Disposition" => "0.004",
     "indirect" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +58,7 @@ my %FallbackPrereqs = (
   "IO::Socket::IP" => "0.37",
   "IPC::Open3" => 0,
   "Log::Any" => "1.050",
-  "Ryu" => "0.026",
+  "Ryu" => "0.030",
   "Syntax::Keyword::Try" => 0,
   "Test::CheckDeps" => "0.010",
   "Test::Deep" => "1.126",

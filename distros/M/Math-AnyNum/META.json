@@ -39,7 +39,7 @@
    "provides" : {
       "Math::AnyNum" : {
          "file" : "lib/Math/AnyNum.pm",
-         "version" : "0.29"
+         "version" : "0.30"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/trizen/Math-AnyNum"
       }
    },
-   "version" : "0.29",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

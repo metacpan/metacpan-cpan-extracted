@@ -2,7 +2,7 @@ package App::Yath::Command::failed;
 use strict;
 use warnings;
 
-our $VERSION = '0.001070';
+our $VERSION = '0.001071';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -98,7 +98,7 @@ sub run_command {
     my $lost = $stat ? $stat->{lost} : 0;
 
     # Possible failure causes
-    my $fail = $lost || $exit || !defined($exit) || !$ok || !$stat;
+    my $fail = $lost || !$ok || !$stat;
 
     if (@$bad) {
         print(File::Spec->abs2rel($_->file), "\n") for sort {
@@ -352,6 +352,10 @@ Test2::Harness normally forks to start a test. Forking can break some select tes
 =item --no-batch-owner-notices
 
 Usually owner failures are sent as a single batch at the end of testing. Toggle this to send failures as they happen.
+
+=item --notify-text "custom notification info"
+
+Add a custom text snippet to email/slack notifications
 
 =item --slack-log
 

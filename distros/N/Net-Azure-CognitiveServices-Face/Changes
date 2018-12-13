@@ -1,5 +1,9 @@
 Revision history for Perl extension Net-Azure-CognitiveServices-Face
 
+0.04 2018-12-13T07:22:22Z
+
+    - modify some errors in Base.pm
+
 0.03 2018-11-29T05:33:40Z
 
     - remove dependencies to Class::Accessor::Lite and LWP::UserAgent

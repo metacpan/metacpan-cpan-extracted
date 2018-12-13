@@ -178,7 +178,7 @@ but C<Skip> is ignored for, hopefully, obvious reasons.
 
 package Array::Compare;
 
-require 5.006_000;
+require 5.010_000;
 use strict;
 use warnings;
 our ($VERSION, $AUTOLOAD);
@@ -187,7 +187,7 @@ use Moo;
 use Types::Standard qw(Str Bool HashRef);
 use Carp;
 
-$VERSION = '3.0.1';
+$VERSION = '3.0.2';
 
 has Sep        => ( is => 'rw', isa => Str,     default => '^G' );
 has WhiteSpace => ( is => 'rw', isa => Bool,    default => 1 );
@@ -246,9 +246,14 @@ comparison).
 #
 sub _check_args {
   my $self = shift;
-  croak('Must compare two arrays.') unless @_ == 2;
-  croak('Argument 1 is not an array') unless ref($_[0]) eq 'ARRAY';
-  croak('Argument 2 is not an array') unless ref($_[1]) eq 'ARRAY';
+
+  my @errs;
+
+  push @errs, 'Must compare two arrays.' unless @_ == 2;
+  push @errs, 'Argument 1 is not an array' unless ref($_[0]) eq 'ARRAY';
+  push @errs, 'Argument 2 is not an array' unless ref($_[1]) eq 'ARRAY';
+
+  croak join "\n", @errs if @errs;
 
   return;
 }
@@ -266,6 +271,19 @@ sub compare_len {
   $self->_check_args(@_);
 
   return @{$_[0]} == @{$_[1]};
+}
+
+=head2 different_len \@ARR1, \@ARR2
+
+Passed two arrays and returns true if they are of different lengths.
+
+This is just the inverse of C<compare_len> (which is badly named).
+
+=cut
+
+sub different_len {
+  my $self = shift;
+  return ! $self->compare_len(@_);
 }
 
 =head2 compare \@ARR1, \@ARR2
@@ -384,18 +402,8 @@ sub full_compare {
   # the number of the columns that appear in the longer list and aren't
   # in the shorter list. If we've been called in scalar context we
   # return the difference in the lengths of the two lists.
-  unless ($self->compare_len(@_)) {
-    if (wantarray) {
-      my ($max, $min);
-      if ($#{$row1} > $#{$row2}) {
-        ($max, $min) = ($#{$row1}, $#{$row2} + 1);
-      } else {
-        ($max, $min) = ($#{$row2}, $#{$row1} + 1);
-      }
-      return ($min .. $max);
-    } else {
-      return abs(@{$row1} - @{$row2});
-    }
+  if ($self->different_len(@_)) {
+    return $self->_different_len_returns(@_);
   }
 
   my ($arr1, $arr2) = @_;
@@ -407,11 +415,8 @@ sub full_compare {
 
     my ($val1, $val2) = ($arr1->[$_], $arr2->[$_]);
 
-    next unless defined $val1 or defined $val2;
-
-    if ((defined $val1 and not defined $val2)
-      or (defined $val2 and not defined $val1)) {
-      push @diffs, $_;
+    if (not defined $val1 or not defined $val2) {
+      push @diffs, $_ if $self->_defined_diff($val1, $val2);
       next;
     }
 
@@ -429,6 +434,30 @@ sub full_compare {
   }
 
   return wantarray ? @diffs : scalar @diffs;
+}
+
+sub _different_len_returns {
+  my $self = shift;
+  my ($row1, $row2) = @_;
+
+  if (wantarray) {
+    if ($#{$row1} > $#{$row2}) {
+      return ( $#{$row2} + 1 .. $#{$row1} );
+    } else {
+      return ( $#{$row1} + 1 .. $#{$row2} );
+    }
+  } else {
+    return abs(@{$row1} - @{$row2});
+  }
+}
+
+sub _defined_diff {
+  my $self = shift;
+  my ($val1, $val2) = @_;
+
+  return   if not defined $val1 and not defined $val2;
+  return 1 if     defined $val1 and not defined $val2;
+  return 1 if not defined $val1 and     defined $val2;
 }
 
 =head2 perm \@ARR1, \@ARR2

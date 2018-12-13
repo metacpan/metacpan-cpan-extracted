@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
-use Test::More;
 use strict;
 use utf8;
+use Test::More 0.98;
 use Acme::Lingua::ZH::Remix;
 
 my $r = Acme::Lingua::ZH::Remix->new;

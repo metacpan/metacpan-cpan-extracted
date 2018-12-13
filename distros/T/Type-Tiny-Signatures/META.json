@@ -4,7 +4,7 @@
       "Al Newkirk <anewkirk@ana.io>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -21,15 +21,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Function::Parameters" : "1.0605",
-            "Type::Tiny" : "1.000005",
+            "Function::Parameters" : "2.001003",
+            "Type::Tiny" : "1.004002",
             "perl" : "v5.14.0"
          }
       },
       "test" : {
          "requires" : {
-            "Function::Parameters" : "1.0605",
-            "Type::Tiny" : "1.000005",
+            "Function::Parameters" : "2.001003",
+            "Type::Tiny" : "1.004002",
             "perl" : "v5.14.0"
          }
       }
@@ -46,7 +46,12 @@
          "web" : "https://github.com/alnewkirk/Type-Tiny-Signatures"
       }
    },
-   "version" : "0.06",
-   "x_authority" : "cpan:AWNCORP"
+   "version" : "0.07",
+   "x_authority" : "cpan:AWNCORP",
+   "x_contributors" : [
+      "Al Newkirk <al@iamalnewkirk.com>"
+   ],
+   "x_generated_by_perl" : "v5.14.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

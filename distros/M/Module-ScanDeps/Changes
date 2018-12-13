@@ -1,3 +1,17 @@
+1.26  2018-12-12
+
+- Glue DLLs of XS modules should have type "shared" rather than "data"
+    
+  Detection broke on Windows where nowadays $Config{dlext} = "xs.dll"
+  (i.e. it's not a simple suffix)
+
+- Mention some other modules: Module::ExtractUse and Perl::PrereqScanner::* family
+
+- Add %Preload rules for:
+  - JSON::MaybeXS
+  - HTTP::Entity::Parser
+  - FFI::Platypus
+
 1.25  2018-08-18
 
 - Merge pull request #2 from shawnlaffan/master, thanx Shawn!

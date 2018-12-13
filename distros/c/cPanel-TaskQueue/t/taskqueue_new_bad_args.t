@@ -14,17 +14,13 @@ use cPanel::TaskQueue;
 my $tmpdir = './tmp';
 
 # Make sure we are clean to start with.
-File::Path::rmtree( $tmpdir );
-File::Path::mkpath( $tmpdir ) or die "Unable to create tmpdir: $!";
+File::Path::rmtree($tmpdir);
+File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
-eval {
-    cPanel::TaskQueue->new();
-};
+eval { cPanel::TaskQueue->new(); };
 ok( defined $@, "Cannot create TaskQueue with no directory." );
 
-eval {
-    cPanel::TaskQueue->new( { state_dir => $tmpdir } );
-};
+eval { cPanel::TaskQueue->new( { state_dir => $tmpdir } ); };
 ok( defined $@, "Cannot create TaskQueue with no name." );
 
-File::Path::rmtree( $tmpdir );
+File::Path::rmtree($tmpdir);

@@ -27,6 +27,6 @@ requires:
   perl: '5.014'
 resources:
   repository: git://github.com/mche/Mojolicious-Plugin-RoutesAuthDBI.git
-version: '0.861'
+version: '0.862'
 x_homepage: https://github.com/mche
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.29
+Version 0.30
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     fibonacci(n,k)            n-th Fibonacci number of k-th order
     fibmod(n,m)               n-th Fibonacci number modulo m
     polygonal(n,k)            n-th k-gonal number
-    harmonic(n)               n-th harmonic numbers: 1+1/2+...+1/n
+    harmonic(n)               n-th harmonic number: 1+1/2+...+1/n
     secant_number(n)          n-th secant/zig number
     tangent_number(n)         n-th tangent/zag number
     euler(n)                  n-th Euler number: E_n
@@ -118,7 +118,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     is_smooth(n,k)            return 1 if all prime factors of n are <= k
     is_smooth_over_prod(n,k)  return 1 if n is smooth over the primes p|k
     is_prime(n,[r])           Miller-Rabin primality test
-    primorial(n)              product of primes below n
+    primorial(n)              product of primes <= n
     next_prime(n)             next prime > n
     valuation(n,k)            number of times n is divisible by k
     remdiv(n,k)               n / k^valuation(n,k)
@@ -1471,13 +1471,13 @@ See also:
 
 =head2 superfactorial
 
-    superfactorial(n)                               #=> Int | NaN
+    superfactorial(n)                             #=> Int | NaN
 
 Product of first C<n> factorials: C<Prod_{k=1..n} k!>.
 
 =head2 hyperfactorial
 
-    hyperfactorial(n)                               #=> Int | NaN
+    hyperfactorial(n)                             #=> Int | NaN
 
 Hyperfactorial of C<n>, defined as: C<Prod_{k=1..n} k^k>.
 
@@ -1737,8 +1737,8 @@ This function finds a value C<k> such that f(k) = 0. Returns C<undef> otherwise.
 
 =head2 bsearch_le
 
-    bsearch_le(n, \&f)                               #=> Int | undef
-    bsearch_le(a, b, \&f)                            #=> Int | undef
+    bsearch_le(n, \&f)                            #=> Int | undef
+    bsearch_le(a, b, \&f)                         #=> Int | undef
 
 Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
 
@@ -1751,8 +1751,8 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<u
 
 =head2 bsearch_ge
 
-    bsearch_ge(n, \&f)                               #=> Int | undef
-    bsearch_ge(a, b, \&f)                            #=> Int | undef
+    bsearch_ge(n, \&f)                            #=> Int | undef
+    bsearch_ge(a, b, \&f)                         #=> Int | undef
 
 Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
 

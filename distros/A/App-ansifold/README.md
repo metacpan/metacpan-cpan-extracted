@@ -12,12 +12,13 @@ ansifold \[ options \]
     --padchar=_              Padding character
     --ambiguous=narrow|wide  Unicode ambiguous character handling
     --paragraph, -p          Print extra newline
+    --truncate               Truncate folded text
 
 # DESCRIPTION
 
 **ansifold** is almost **fold** compatible command utilizing
 [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module, which enables to handle ANSI terminal
-sequences properly.
+sequences and Unicode multibyte characters properly.
 
 # LICENSE
 

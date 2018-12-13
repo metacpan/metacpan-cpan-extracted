@@ -1,8 +1,7 @@
 #!/usr/bin/perl
 
 # This test is checking some timeout code with respect to locking, so it runs
-# for a long time (by necessity). This code is normally disabled, unless it is
-# run with the environment variable CPANEL_SLOW_TESTS set.
+# for a long time (by necessity).
 
 use strict;
 use warnings;
@@ -12,7 +11,7 @@ use lib "$FindBin::Bin/mocks";
 
 use POSIX qw(strftime);
 use File::Path ();
-use Test::More tests=>4;
+use Test::More tests => 4;
 
 use cPanel::FakeLogger;
 use cPanel::StateFile::FileLocker ();
@@ -24,20 +23,20 @@ use cPanel::StateFile::FileLocker ();
 my $tmpdir = './tmp';
 
 # Make sure we are clean to start with.
-File::Path::rmtree( $tmpdir );
-File::Path::mkpath( $tmpdir ) or die "Unable to create temporary directory: $!";
+File::Path::rmtree($tmpdir);
+File::Path::mkpath($tmpdir) or die "Unable to create temporary directory: $!";
 my $filename = "$tmpdir/fake.file";
 my $lockfile = "$filename.lock";
 
 my $logger = cPanel::FakeLogger->new;
-my $locker = cPanel::StateFile::FileLocker->new({logger => $logger, max_age=>120, max_wait=>120});
+my $locker = cPanel::StateFile::FileLocker->new( { logger => $logger, max_age => 120, max_wait => 120 } );
 
 # Someone else's lockfile
 {
     open( my $fh, '>', $lockfile ) or die "Cannot create lockfile.";
-    print $fh "1\n$0\n", time+200, "\n";
-    close( $fh );
-    eval { $locker->file_unlock( $lockfile ) };
+    print $fh "1\n$0\n", time + 200, "\n";
+    close($fh);
+    eval { $locker->file_unlock($lockfile) };
     like( $@, qr/locked by another/, 'Did not unlock belonging to someone else' );
     ok( -e $lockfile, 'Empty: lockfile not removed' );
     unlink $lockfile;
@@ -45,10 +44,10 @@ my $locker = cPanel::StateFile::FileLocker->new({logger => $logger, max_age=>120
 
 # Attempt to double lock a file
 {
-    my $lock = $locker->file_lock( $filename );
-    eval { $locker->file_lock( $filename ); };
+    my $lock = $locker->file_lock($filename);
+    eval { $locker->file_lock($filename); };
     like( $@, qr/relock/, 'Not allowed to double-lock' );
-    $locker->file_unlock( $lock );
+    $locker->file_unlock($lock);
 }
 
 {
@@ -56,7 +55,7 @@ my $locker = cPanel::StateFile::FileLocker->new({logger => $logger, max_age=>120
     print $fh "This is not actually a lock file\n";
     close $fh;
 
-    eval { $locker->file_lock( $filename ); };
+    eval { $locker->file_lock($filename); };
     like( $@, qr/Invalid lock file/, 'Correctly handle invalid lock file.' );
 }
-File::Path::rmtree( $tmpdir );
+File::Path::rmtree($tmpdir);

@@ -40,7 +40,7 @@ create_thumbnail(src_path, w, h, dst_path)
 	CODE:
 	{
 
-     char *validate_error = validate_input(&w, &h, src_path, dst_path);
+	 char *validate_error = validate_input(&w, &h, src_path, dst_path);
 
 	 if (validate_error[0] != '\0')
 		 Perl_croak(aTHX_ "%s", validate_error);

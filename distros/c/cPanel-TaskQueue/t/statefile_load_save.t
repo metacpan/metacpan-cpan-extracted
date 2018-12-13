@@ -11,9 +11,9 @@ use Test::More tests => 24;
 use cPanel::StateFile;
 use MockCacheable;
 
-my $tmpdir = './tmp';
-my $dir = "$tmpdir/state_test";
-my $file = "$dir/state_dir/state_file";
+my $tmpdir   = './tmp';
+my $dir      = "$tmpdir/state_test";
+my $file     = "$dir/state_dir/state_file";
 my $lockname = "$file.lock";
 
 # TODO: Need to testing for timeout logic, but it would slow down the tests.
@@ -21,7 +21,7 @@ my $lockname = "$file.lock";
 
 # clean up if last run failed.
 cleanup();
-File::Path::mkpath( $tmpdir ) or die "Unable to create tmpdir: $!";
+File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
 # test valid creation
 my $mock_obj = MockCacheable->new;
@@ -39,10 +39,10 @@ ok( !-e $lockname, "File not locked at this time." );
 {
     my $msg;
     local $SIG{__WARN__} = sub { $msg = join( ' ', @_ ); };
-    $state->warn( "This is a warning\n" );
+    $state->warn("This is a warning\n");
     is( $msg, "This is a warning\n", 'warn method works.' );
 
-    $state->info( "This is an info message\n" );
+    $state->info("This is an info message\n");
     is( $msg, "This is an info message\n", 'info method works.' );
 }
 
@@ -63,7 +63,7 @@ ok( !-e $lockname, "File is unlocked." );
     # Recreating file, so delete it first.
     unlink $file;
     open( my $fh, '>', $file ) or die "Unable to create empty state file: $!";
-    close( $fh );
+    close($fh);
 
     my $state = cPanel::StateFile->new( { state_file => $file, data_obj => $mock_obj } );
     isa_ok( $state, 'cPanel::StateFile' );
@@ -86,11 +86,11 @@ ok( !-e $lockname, "File is unlocked." );
 {
     open( my $fh, '>', $file ) or die "Unable to write state file: $!\n";
     print $fh 'This is the updated state file.';
-    close( $fh );
+    close($fh);
 }
 
 ok( $state->synch(), 'Synch occured.' );
-ok( !-e $lockname, "File is not locked." );
+ok( !-e $lockname,   "File is not locked." );
 
 is( $mock_obj->{load_called}, 1, "file changed, load." );
 is( $mock_obj->{data}, 'This is the updated state file.', 'Correct data is loaded.' );
@@ -104,7 +104,7 @@ cleanup();
 
 # Discard temporary files that we don't need any more.
 sub cleanup {
-    unlink $file if -e $file;
-    unlink $lockname if -e $lockname;
-    File::Path::rmtree( $tmpdir ) if -d $tmpdir;
+    unlink $file                if -e $file;
+    unlink $lockname            if -e $lockname;
+    File::Path::rmtree($tmpdir) if -d $tmpdir;
 }

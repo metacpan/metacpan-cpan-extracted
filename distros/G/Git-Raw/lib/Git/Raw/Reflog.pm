@@ -1,5 +1,5 @@
 package Git::Raw::Reflog;
-$Git::Raw::Reflog::VERSION = '0.81';
+$Git::Raw::Reflog::VERSION = '0.82';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Git::Raw::Reflog - Git reflog class
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 

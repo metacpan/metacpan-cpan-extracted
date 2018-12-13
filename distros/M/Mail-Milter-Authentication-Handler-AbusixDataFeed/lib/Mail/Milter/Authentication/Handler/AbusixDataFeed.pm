@@ -4,7 +4,7 @@ use warnings;
 use Mail::Milter::Authentication 2.201811;
 use base 'Mail::Milter::Authentication::Handler';
 # ABSTRACT: Send data to Abusix
-our $VERSION = '2.20181204'; ## VERSION
+our $VERSION = '2.20181213'; ## VERSION
 
 use English qw{ -no_match_vars };
 use Sys::Syslog qw{:standard :macros};
@@ -80,7 +80,6 @@ sub eoh_callback {
     if ( defined $self->{ 'first_received' } ) {
         my $used_smtp  = $self->{ 'first_received' } =~ / with SMTP/;
         my $used_esmtp = $self->{ 'first_received' } =~ / with ESMTP/;
-        warn " VALUES SMTP $used_smtp ESMTP $used_esmtp";
         if ( $used_smtp xor $used_esmtp ) {
             # Filters line noise!
             $self->{ 'abusix_feed' }->used_esmtp( 1 ) if $used_esmtp;

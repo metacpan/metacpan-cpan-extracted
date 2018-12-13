@@ -250,10 +250,7 @@ if ($Config{usethreads} && !$is_sunpro) {
 my @deps = glob 'deps/libgit2/deps/{http-parser,zlib}/*.c';
 my @srcs = glob 'deps/libgit2/src/{*.c,transports/*.c,xdiff/*.c,streams/*.c}';
 
-if ($is_msvc) {
-	push @srcs, 'deps/libgit2/src/hash/hash_win32.c';
-}
-elsif (!$library_opts{'ssl'}{'use'} && !$is_osx) {
+if (!$library_opts{'ssl'}{'use'} && !$is_osx) {
 	push @srcs, 'deps/libgit2/src/hash/hash_generic.c';
 }
 
@@ -269,9 +266,15 @@ if ($is_windows) {
 	$def .= ' -DWIN32 -DGIT_WIN32 -DGIT_WINHTTP -DGIT_HTTPS';
 	$lib .= ' -lwinhttp -lrpcrt4 -lcrypt32';
 
+	if ($library_opts{'ssl'}{'use'}) {
+		$lib .= ' -lbcrypt';
+	}
+
+	$def .= ' -DSTRSAFE_NO_DEPRECATE';
+
 	if ($is_msvc) {
 		# visual studio compiler
-		$def .= ' -D_CRT_SECURE_NO_WARNINGS -DGIT_SHA1_WIN32';
+		$def .= ' -D_CRT_SECURE_NO_WARNINGS';
 	} else {
 		# mingw/cygwin
 		$def .= ' -D_WIN32_WINNT=0x0501 -D__USE_MINGW_ANSI_STDIO=1';
@@ -368,10 +371,9 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0",
-    "Time::Local" => 0,
-    "blib" => "1.01"
+    "Time::Local" => 0
   },
-  "VERSION" => "0.81",
+  "VERSION" => "0.82",
   "test" => {
     "TESTS" => "t/*.t"
   }

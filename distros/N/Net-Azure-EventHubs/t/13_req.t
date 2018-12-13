@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
+use Test::Time time => 1476061810; # => 2016-10-10 10:10:10
 use Net::Azure::EventHubs;
 
 my $hub = Net::Azure::EventHubs->new(

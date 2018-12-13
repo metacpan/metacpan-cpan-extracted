@@ -57,7 +57,10 @@ is($TEST_NUMBER_OS, 9, '$TEST_NUMBER_OS increments to 9');
 # 03 {{{1
 
 $TEST_ONLYSOME->{skip}->{10} = true;
+$TEST_ONLYSOME->{skip}->{11} = true;
 $TEST_ONLYSOME->{skip}->{14} = true;
+$TEST_ONLYSOME->{skip}->{15} = true;
+$TEST_ONLYSOME->{skip}->{16} = true;
 
 os ok(1, 'Test 9');     # This one should run
 
@@ -99,8 +102,9 @@ os ok(1, 'Test 20');     # This one should run
 
 is($TEST_NUMBER_OS, 21, '$TEST_NUMBER_OS increments to 21');
 
-is_deeply($TEST_ONLYSOME, {skip => {6=>true, 8=>true, 10=>true, 14=>true, 18=>true,
-                                19=>true}, n=>1, verbose=>0},
+is_deeply($TEST_ONLYSOME, {skip => {6=>true, 8=>true, 10=>true, 11=>true,
+            14=>true, 15=>true, 16=>true, 18=>true,
+            19=>true}, n=>1, verbose=>0},
     '$TEST_ONLYSOME is what we set');
 
 # }}}1

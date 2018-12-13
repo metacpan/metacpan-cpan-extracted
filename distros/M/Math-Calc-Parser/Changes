@@ -1,3 +1,7 @@
+1.004     2018-12-11 17:07:49 EST
+  - Increase Math::BigInt, Math::BigFloat, and Math::BigRat versions required
+    to enable bignum and bigrat functionality to avoid incompatibilities.
+
 1.003     2018-12-10 20:55:56 EST
   - Use Math::Random::Secure for rand function if installed
   - Add bignum and bigrat support

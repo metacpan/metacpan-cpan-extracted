@@ -28,20 +28,26 @@
       },
       "runtime" : {
          "requires" : {
-            "DBIx::Class" : "0"
+            "DBIx::Class" : "0",
+            "Time::Piece" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
             "DBD::SQLite" : "0",
-            "DBI" : "0"
+            "DBI" : "0",
+            "File::Basename" : "0",
+            "SQL::Translator" : "0",
+            "Scalar::Util" : "0"
          }
       }
    },
    "provides" : {
       "DBIx::Class::InflateColumn::TimePiece" : {
          "file" : "lib/DBIx/Class/InflateColumn/TimePiece.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -56,7 +62,7 @@
          "web" : "http://github.com/reneeb/DBIx-Class-InflateColumn-TimePiece"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

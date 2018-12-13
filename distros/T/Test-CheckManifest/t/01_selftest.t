@@ -1,4 +1,4 @@
-#!/usr/bin/perl -T
+#!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -6,7 +6,7 @@ use File::Spec;
 use File::Basename;
 use Test::More;
 
-eval "use Test::CheckManifest tests => 9";
+eval "use Test::CheckManifest tests => 10";
 plan skip_all => "Test::CheckManifest required" if $@;
 
 #$Test::CheckManifest::VERBOSE = 0;
@@ -14,19 +14,12 @@ plan skip_all => "Test::CheckManifest required" if $@;
 # create a directory and a file 
 my $home = dirname(File::Spec->rel2abs($0));
 
+my $dir   = File::Spec->catdir($home,'.git');
+my $dir2  = File::Spec->catdir($home,'test');
+my $file1 = File::Spec->catfile($dir,'test.txt');
+my $file2 = File::Spec->catfile($home,'test.svn');
+my $file3 = File::Spec->catfile($dir2,'hallo.txt');
 
-
-# untaint
-if ($home =~ /^([-\@\w.\/\\: ~]+)$/) {
-    $home = $1;
-} 
-else {
-    die "Bad data in $home"; 
-}
-
-my $dir  = $home . '/.git/';
-my $dir2 = $home . '/test/';
-my ($file1,$file2,$file3) = ($dir.'test.txt', $home . '/test.svn', $dir2.'hallo.txt');
 
 mkdir $dir;
 
@@ -46,14 +39,25 @@ Test::CheckManifest::_not_ok_manifest({filter => [qr/\.git/], exclude => ['/.git
 Test::CheckManifest::_not_ok_manifest({filter  => [qr/\.git/],
                                        bool    => 'and',
                                        exclude => ['/t/test']}, 'filter AND exclude');
-ok_manifest({filter  => [qr/\.(git|build)/],
-             exclude => ['/t/test']}, 'filter OR exclude');
+
+Test::CheckManifest::_not_ok_manifest({
+    filter  => [qr/\.git|blib/],
+    exclude => ['/t/test'],
+    verbose => 1,
+}, 'filter OR exclude - test.svn is missing in MANIFEST');
+
+unlink $file2;
+
+ok_manifest({
+    filter  => [qr/\.(git|build)/],
+    exclude => ['/t/test'],
+}, 'filter OR exclude');
 
 unlink $file3;
 
 ok_manifest({filter => [qr/\.git/, qr/\.svn/, qr/\.build/ ]},'Filter \.git or \.svn');
 
-unlink $file2, $file1;
+unlink $file1;
 rmdir  $dir;
 rmdir  $dir2;
 

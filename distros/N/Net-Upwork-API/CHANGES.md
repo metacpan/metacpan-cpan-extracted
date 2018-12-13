@@ -1,3 +1,9 @@
+## 2.0.2
+* Set library User-Agent
+
+## 2.0.1
+* Fix CPANTS errors
+
 ## 2.0.0
 * OAuth2 release
 

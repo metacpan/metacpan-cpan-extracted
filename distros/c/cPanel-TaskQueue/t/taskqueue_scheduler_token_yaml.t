@@ -8,21 +8,19 @@ use warnings;
 use File::Path ();
 use cPanel::TaskQueue::Scheduler( '-serializer' => 'cPanel::TQSerializer::YAML' );
 
-my $tmpdir = './tmp';
+my $tmpdir   = './tmp';
 my $statedir = "$tmpdir/taskqueue";
 
 # In case the last test did not succeed.
 cleanup();
-File::Path::mkpath( $tmpdir ) or die "Unable to create tmpdir: $!";
+File::Path::mkpath($tmpdir) or die "Unable to create tmpdir: $!";
 
-my $sched = cPanel::TaskQueue::Scheduler->new(
-    { name => 'tasks', state_dir => $statedir }
-);
+my $sched = cPanel::TaskQueue::Scheduler->new( { name => 'tasks', state_dir => $statedir } );
 
 my $token = $sched->get_token();
 ok( defined $token, 'Can get a token.' );
 
-my $sched2 = cPanel::TaskQueue::Scheduler->new( {token=>$token} );
+my $sched2 = cPanel::TaskQueue::Scheduler->new( { token => $token } );
 isa_ok( $sched2, 'cPanel::TaskQueue::Scheduler', 'Recreated from token.' );
 is( $sched2->get_name(), $sched2->get_name(), 'Names are the same.' );
 
@@ -30,44 +28,30 @@ is( $sched2->get_name(), $sched2->get_name(), 'Names are the same.' );
 # necessary to verify the error checking.
 # The following tests will change when the token format changes.
 
-eval {
-    cPanel::TaskQueue::Scheduler->new( {token=> ''} );
-};
+eval { cPanel::TaskQueue::Scheduler->new( { token => '' } ); };
 like( $@, qr/Invalid token./, 'empty token is not valid.' );
 
-eval {
-    cPanel::TaskQueue::Scheduler->new( {token=> 'connie'} );
-};
+eval { cPanel::TaskQueue::Scheduler->new( { token => 'connie' } ); };
 like( $@, qr/Invalid token./, 'empty token is not valid.' );
 
-eval {
-    cPanel::TaskQueue::Scheduler->new( {token=> 'tqsched1'} );
-};
+eval { cPanel::TaskQueue::Scheduler->new( { token => 'tqsched1' } ); };
 like( $@, qr/Invalid token./, 'No second part' );
 
-eval {
-    cPanel::TaskQueue::Scheduler->new( {token=> 'tqsched1:|:'} );
-};
+eval { cPanel::TaskQueue::Scheduler->new( { token => 'tqsched1:|:' } ); };
 like( $@, qr/Invalid token./, 'No third part' );
 
-eval {
-    cPanel::TaskQueue::Scheduler->new( {token=> 'xyzzy:|:fred:|:tasks_sched.yaml'} );
-};
+eval { cPanel::TaskQueue::Scheduler->new( { token => 'xyzzy:|:fred:|:tasks_sched.yaml' } ); };
 like( $@, qr/Invalid token./, 'Version does not match' );
 
-eval {
-    cPanel::TaskQueue::Scheduler->new( {token=> 'tqsched1:|:fred:|:tasks_sched.yaml'} );
-};
+eval { cPanel::TaskQueue::Scheduler->new( { token => 'tqsched1:|:fred:|:tasks_sched.yaml' } ); };
 like( $@, qr/Invalid token./, 'Name does not match' );
 
-eval {
-    cPanel::TaskQueue::Scheduler->new( {token=> 'tqsched1:|:tasks|:fred_sched.yaml'} );
-};
+eval { cPanel::TaskQueue::Scheduler->new( { token => 'tqsched1:|:tasks|:fred_sched.yaml' } ); };
 like( $@, qr/Invalid token./, 'File does not match' );
 
 cleanup();
 
 # Clean up after myself
 sub cleanup {
-    File::Path::rmtree( $tmpdir ) if -e $tmpdir;
+    File::Path::rmtree($tmpdir) if -e $tmpdir;
 }

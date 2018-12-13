@@ -1,6 +1,6 @@
 package Method::ParamValidator;
 
-$Method::ParamValidator::VERSION   = '0.12';
+$Method::ParamValidator::VERSION   = '0.14';
 $Method::ParamValidator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator - Configurable method parameter validator.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
@@ -57,32 +57,23 @@ as of now but will be extended as per the requirements.
     $validator->add_method({ name   => 'add_user',
                              fields => { firstname => 1, lastname => 1, age => 1, sex => 0 }});
 
-    eval { $validator->validate('get_xyz'); };
-    like($@, qr/Invalid method name received/);
-
-    eval { $validator->validate('add_user'); };
-    like($@, qr/Missing parameters/);
-
-    eval { $validator->validate('add_user', []); };
-    like($@, qr/Invalid parameters data structure/);
-
-    eval { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 'A' }); };
-    like($@, qr/Parameter failed check constraint/);
-
-    eval { $validator->validate('add_user', { firstname => 'F', lastname => 'L' }); };
-    like($@, qr/Missing required parameter/);
-
-    eval { $validator->validate('add_user', { firstname => 'F', lastname => undef, age => 10 }); };
-    like($@, qr/Undefined required parameter/);
-
-    eval { $validator->validate('add_user', { firstname => 'F' }); };
-    like($@, qr/Missing required parameter/);
+    throws_ok { $validator->validate('get_xyz')  }     qr/Invalid method name received/;
+    throws_ok { $validator->validate('add_user') }     qr/Missing parameters/;
+    throws_ok { $validator->validate('add_user', []) } qr/Invalid parameters data structure/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 'A' }) } qr/Parameter failed check constraint/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 10, sex => 's' }) } qr/Parameter failed check constraint/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L' }) } qr/Missing required parameter/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => undef, age => 10 }) } qr/Undefined required parameter/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F' }) } qr/Missing required parameter/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 40, location => 'X' })  } qr/Parameter failed check constraint/;
+    lives_ok  { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 40, location => 'UK' }) };
+    lives_ok  { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 40, location => 'uk' }) };
 
     done_testing();
 
 =head2 Setting up method validator using configuration file.
 
-Sample configuration file in JSON format.
+Sample configuration file in C<JSON> format.
 
     { "fields"  : [ { "name" : "firstname", "format" : "s" },
                     { "name" : "lastname",  "format" : "s" },
@@ -99,34 +90,26 @@ Sample configuration file in JSON format.
                   ]
     }
 
-Then you just need one line to get everything setup using the above configuration file (config.json).
+Then you just need one line to get everything setup using the above configuration file C<config.json>.
 
     use strict; use warnings;
     use Test::More;
+    use Test::Exception;
     use Method::ParamValidator;
 
     my $validator = Method::ParamValidator->new({ config => "config.json" });
 
-    eval { $validator->validate('get_xyz'); };
-    like($@, qr/Invalid method name received/);
-
-    eval { $validator->validate('add_user'); };
-    like($@, qr/Missing parameters/);
-
-    eval { $validator->validate('add_user', []); };
-    like($@, qr/Invalid parameters data structure/);
-
-    eval { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 'A' }); };
-    like($@, qr/Parameter failed check constraint/);
-
-    eval { $validator->validate('add_user', { firstname => 'F', lastname => 'L' }); };
-    like($@, qr/Missing required parameter/);
-
-    eval { $validator->validate('add_user', { firstname => 'F', lastname => undef, age => 10 }); };
-    like($@, qr/Undefined required parameter/);
-
-    eval { $validator->validate('add_user', { firstname => 'F' }); };
-    like($@, qr/Missing required parameter/);
+    throws_ok { $validator->validate('get_xyz')  }     qr/Invalid method name received/;
+    throws_ok { $validator->validate('add_user') }     qr/Missing parameters/;
+    throws_ok { $validator->validate('add_user', []) } qr/Invalid parameters data structure/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 'A' }) } qr/Parameter failed check constraint/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 10, sex => 's' }) } qr/Parameter failed check constraint/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L' }) } qr/Missing required parameter/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => undef, age => 10 }) } qr/Undefined required parameter/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F' }) } qr/Missing required parameter/;
+    throws_ok { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 40, location => 'X' })  } qr/Parameter failed check constraint/;
+    lives_ok  { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 40, location => 'UK' }) };
+    lives_ok  { $validator->validate('add_user', { firstname => 'F', lastname => 'L', age => 40, location => 'uk' }) };
 
     done_testing();
 
@@ -136,6 +119,7 @@ It allows you to provide your own method for validating a field as shown below:
 
     use strict; use warnings;
     use Test::More;
+    use Test::Exception;
     use Method::ParamValidator;
 
     my $validator = Method::ParamValidator->new;
@@ -146,8 +130,7 @@ It allows you to provide your own method for validating a field as shown below:
     $validator->add_field({ name => 'location', format => 's', check => \&lookup });
     $validator->add_method({ name => 'check_location', fields => { location => 1 }});
 
-    eval { $validator->validate('check_location', { location => 'X' }); };
-    like($@, qr/Parameter failed check constraint/);
+    throws_ok { $validator->validate('check_location', { location => 'X' }) } qr/Parameter failed check constraint/;
 
     done_testing();
 
@@ -165,20 +148,20 @@ Using the above configuration file test the code as below:
 
     use strict; use warnings;
     use Test::More;
+    use Test::Exception;
     use Method::ParamValidator;
 
     my $validator = Method::ParamValidator->new({ config => "config.json" });
 
-    eval { $validator->validate('check_location', { location => 'X' }); };
-    like($@, qr/Parameter failed check constraint/);
+    throws_ok { $validator->validate('check_location', { location => 'X' }) } qr/Parameter failed check constraint/;
 
     done_testing();
 
 =head2 Plug-n-Play with Moo package
 
-Lets start with a basic Moo package PlayMath.
+Lets start with a basic Moo package C<Calculator>.
 
-    package PlayMath;
+    package Calculator;
 
     use Moo;
     use namespace::autoclean;
@@ -199,7 +182,7 @@ Lets start with a basic Moo package PlayMath.
 
     1;
 
-Now we need to create configuration file for the package PlayMath as below:
+Now we need to create configuration file for the package C<Calculator> as below:
 
     { "fields"  : [ { "name" : "op", "format" : "s", "source": [ "add", "sub", "mul" ] },
                     { "name" : "a",  "format" : "d" },
@@ -214,7 +197,7 @@ Now we need to create configuration file for the package PlayMath as below:
                   ]
     }
 
-Finally plug the validator to the package PlayMath as below:
+Finally plug the validator to the package C<Calculator> as below:
 
     use Method::ParamValidator;
 
@@ -231,34 +214,24 @@ Finally plug the validator to the package PlayMath as below:
         $self->validator->validate($2, $param);
     };
 
-Here is unit test for the package PlayMath.
+Here is unit test for the package C<Calculator>.
 
     use strict; use warnings;
     use Test::More;
-    use PlayMath;
+    use Test::Exception;
+    use Calculator;
 
-    my $math = PlayMath->new;
+    my $calc = Calculator->new;
 
-    is($math->do({ op => 'add', a => 4, b => 2 }), 6);
+    is($calc->do({ op => 'add', a => 4, b => 2 }), 6);
+    is($calc->do({ op => 'sub', a => 4, b => 2 }), 2);
+    is($calc->do({ op => 'mul', a => 4, b => 2 }), 8);
 
-    is($math->do({ op => 'sub', a => 4, b => 2 }), 2);
-
-    is($math->do({ op => 'mul', a => 4, b => 2 }), 8);
-
-    eval { $math->do({ op => 'add' }) };
-    like($@, qr/Missing required parameter. \(a\)/);
-
-    eval { $math->do({ op => 'add', a => 1 }) };
-    like($@, qr/Missing required parameter. \(b\)/);
-
-    eval { $math->do({ op => 'x', a => 1, b => 2 }) };
-    like($@, qr/Parameter failed check constraint. \(op\)/);
-
-    eval { $math->do({ op => 'add', a => 'x', b => 2 }) };
-    like($@, qr/Parameter failed check constraint. \(a\)/);
-
-    eval { $math->do({ op => 'add', a => 1, b => 'x' }) };
-    like($@, qr/Parameter failed check constraint. \(b\)/);
+    throws_ok { $calc->do({ op => 'add' }) } qr/Missing required parameter. \(a\)/;
+    throws_ok { $calc->do({ op => 'add', a => 1 }) } qr/Missing required parameter. \(b\)/;
+    throws_ok { $calc->do({ op => 'x', a => 1, b => 2 }) } qr/Parameter failed check constraint. \(op\)/;
+    throws_ok { $calc->do({ op => 'add', a => 'x', b => 2 }) } qr/Parameter failed check constraint. \(a\)/;
+    throws_ok { $calc->do({ op => 'add', a => 1, b => 'x' }) } qr/Parameter failed check constraint. \(b\)/;
 
     done_testing();
 
@@ -420,7 +393,7 @@ Add field to the validator. Parameters are defined as below:
     |         |                                                                 |
     | check   | Optional code ref to validate field value.                      |
     |         |                                                                 |
-    | source  | Optional hashref to validate field value againsts.              |
+    | source  | Optional hashref to validate field value against.               |
     |         |                                                                 |
     | message | Optional field message.                                         |
     |         |                                                                 |

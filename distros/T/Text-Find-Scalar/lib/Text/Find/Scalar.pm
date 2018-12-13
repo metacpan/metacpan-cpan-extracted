@@ -1,85 +1,111 @@
 package Text::Find::Scalar;
 
+# ABSTRACT: Find scalar names in a text.
+
 use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
-sub new{
-  my ($class) = @_;
-  
-  my $self = {};
-  bless $self,$class;
-  
-  $self->_Counter(0);
-  
-  return $self;
+sub new {
+    my ($class) = @_;
+
+    my $self = {};
+    bless $self,$class;
+
+    $self->_counter(0);
+
+    return $self;
 }# new
 
-sub find{
-  my ($self,$text) = @_;
-  my @array = ();
-  $self->_Counter(0);
-  if(defined $text){
+sub find {
+    my ($self,$text) = @_;
+    my @array = ();
+
+    $self->_counter(0);
+
+    return if !defined $text;
+    return if ref $text;
+
     $text =~ s,<<'(.*?)'.*?\n\1,,sg;
     $text =~ s,'.*?',,sg;
     $text =~ s,q~.*?~,,sg;
+
     @array = $text =~ m/(?:(\$\w+(?:->)?(?:\[\$?\w+\]|\{\$?\w+\}))|(\$\{\w+\})|(\$\w+))/sg;
     @array = grep{defined}@array;
-  }
-  $self->_Elements(@array);
-  return wantarray ? @{$self->_Elements()} : $self->_Elements();
+
+    $self->_elements(@array);
+
+    return wantarray ? @{$self->_elements()} : $self->_elements();
 }# find
 
-sub unique{
-  my ($self) = @_;
-  my %seen;
-  my @unique = grep{!$seen{$_++}}@{$self->_Elements()};
-  return \@unique;
+sub unique {
+    my ($self) = @_;
+
+    my %seen;
+    my @unique = grep{!$seen{$_}++}@{$self->_elements()};
+
+    return \@unique;
 }# unique
 
-sub count{
-  my ($self,$name) = @_;
-  my %counter;
-  $counter{$_}++ for(@{$self->_Elements()});
-  return $counter{$name};
-}# count
+sub count {
+    my ($self, $name) = @_;
+
+    return if !defined $name;
+    return if $name !~ m{\A\$};
+
+    my %counter;
+    $counter{$_}++ for @{ $self->_elements };
+
+    return $counter{$name};
+}
 
 sub hasNext{
-  my ($self) = @_;
-  my $count = $self->_Counter();
-  if($count > scalar(@{$self->_Elements()}) - 1){
-    return 0;
-  }  
-  return 1;
-}# hasNext
+    my ($self) = @_;
+
+    my $count = $self->_counter();
+
+    return 0 if $count > $#{ $self->_elements };
+    return 1;
+}
 
 sub nextElement{
-  my ($self)  = @_;
-  my $count   = $self->_Counter();
-  my $all     = $self->_Elements();
-  my $element = undef;
-  if($count < scalar(@$all)){
-    $element = ${$all}[$count];
-  }
-  $self->_Counter(++$count);
-  return $element;
+    my ($self)  = @_;
+
+    my $count   = $self->_counter();
+    my $all     = $self->_elements();
+
+    my $element = undef;
+
+    if( $count < scalar @$all ) {
+        $element = $all->[$count];
+    }
+
+    $self->_counter(++$count);
+
+    return $element;
 }# nextElement
 
-sub _Counter{
-  my ($self,$count) = @_;
-  $self->{Counter} = $count if(defined $count);
-  return $self->{Counter};
+sub _counter{
+    my ($self,$count) = @_;
+
+    $self->{Counter} = $count if defined $count;
+
+    return $self->{Counter};
 }# _Counter
 
-sub _Elements{
-  my ($self,@elements) = @_;
-  $self->{Elements} = [@elements] if(scalar(@elements) > 0);
-  return $self->{Elements};
+sub _elements{
+    my ($self,@elements) = @_;
+
+    $self->{Elements} = [@elements] if scalar @elements > 0;
+
+    return $self->{Elements};
 }# _Elements
 
 1;
+
+__END__
 
 =pod
 
@@ -87,11 +113,11 @@ sub _Elements{
 
 =head1 NAME
 
-Text::Find::Scalar
+Text::Find::Scalar - Find scalar names in a text.
 
 =head1 VERSION
 
-version 0.06
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -109,9 +135,9 @@ version 0.06
 
 =head1 DESCRIPTION
 
-This Class helps to find all Scalar variables in a text. It is recommended to
+This class helps to find all scalar variables in a text. It is recommended to
 use L<PPI> to parse Perl programs. This module should help to find SCALAR names
-e.g. in Error messages.
+e.g. in error messages.
 
 Scalars that should be found:
 
@@ -142,10 +168,6 @@ Scalars that are not covered
 =item
 
 =back
-
-=head1 NAME
-
-Text::Find::Scalar - Find scalar names in a text.
 
 =head1 EXAMPLE
 
@@ -181,7 +203,7 @@ prints
 
   my $finder = Text::Find::Scalar->new();
 
-creates a new Text::Find::Scalar object.
+creates a new C<Text::Find::Scalar> object.
 
 =head2 find
 
@@ -218,26 +240,6 @@ returns an arrayref with a list of all scalars, but each match appears just once
 
 returns the number of appearances of one scalar.
 
-=head2 "private" methods
-
-=head3 _Elements
-
-returns an arrayref of all scalars found in the text
-
-=head3 _Counter
-
-=head1 AUTHOR
-
-Renee Baecker, E<lt>module@renee-baecker.deE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2006 by Renee Baecker
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
-
 =head1 AUTHOR
 
 Renee Baecker <reneeb@cpan.org>
@@ -250,7 +252,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-__END__
-# Below is stub documentation for your module. You'd better edit it!
-

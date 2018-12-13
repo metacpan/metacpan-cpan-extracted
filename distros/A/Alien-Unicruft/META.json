@@ -37,7 +37,7 @@
    "provides" : {
       "Alien::Unicruft" : {
          "file" : "lib/Alien/Unicruft.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

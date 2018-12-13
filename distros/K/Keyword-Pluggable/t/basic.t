@@ -18,7 +18,7 @@ use Test::More tests => 4;
 
         Keyword::Pluggable::define 
 		keyword    => 'poke', 
-		code       => sub { "ok 2, 'synthetic test 2';" },
+		code       => sub { substr ${$_[0]}, 0, 0, "ok 2, 'synthetic test 2';" },
 		expression => 1,
 	;
     }

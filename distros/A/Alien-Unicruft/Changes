@@ -2,6 +2,11 @@
 ##
 ## Change log for perl distribution Alien::Unicruft
 
+v0.003 Wed, 12 Dec 2018 09:05:43 +0100 moocow
+	+ added --disable-doc configure option to alien_build_commands (requires libunicruft >= v0.24)
+	  - don't bother building docs for alien builds
+	  - should hopefully fix RT #127996 (build fails for BSD make, apparently due to 'vpath' in doc/libunicruft/Makefile)
+
 v0.002 Tue, 11 Dec 2018 09:19:22 +0100 moocow
 	+ version bump for libunicruft v0.23
 

@@ -30,21 +30,10 @@ sub main {
     }
 
     done_testing();
-
-    #    # Return the same exit code that Test::Builder would have.
-    #    # But we don't need to do this if we don't manually call exit().
-    #    my @summary = Test::More->builder->summary;
-    #    diag Dumper(\@summary);
-    #    my @failures = grep { !$_ } @summary;
-    #    my $exitcode = $#failures+1;
-    #    $exitcode = 254 if $exitcode > 254;
-    #    return $exitcode;
 } #main()
 
 #########################################################################
 
-# Run prove().  TODO: Swallow stdout and stderr while this is running, so
-# that the intentional failures in t/allkinds.test don't confuse the output.
 sub run_prove {
     my $test_fn = shift;
     my $results_fn = shift;

@@ -4,8 +4,7 @@
 #
 # This tests the code for tasks scheduled for some time in the future. Since these
 #  tasks are, by necessity, slower to execute than we probably don't want to run
-#  as a normal test. This code is disabled, unless it is run with the environment
-#  variable CPANEL_SLOW_TESTS set.
+#  as a normal test.
 
 use strict;
 use warnings;
@@ -22,7 +21,7 @@ my $tmpdir   = File::Temp->newdir();
 my $statedir = "$tmpdir";
 
 throws_ok { cPanel::TaskQueue::Scheduler->new( { state_dir => $statedir } ); } qr/scheduler name/,
-    'Must supply a name.';
+  'Must supply a name.';
 
 my $sched = cPanel::TaskQueue::Scheduler->new( { name => 'tasks', state_dir => $statedir } );
 isa_ok( $sched, 'cPanel::TaskQueue::Scheduler', 'Correct object built.' );
@@ -138,6 +137,7 @@ ok( $sched->seconds_until_next_task() <= 0, 'Scheduled right now (or in the last
 
 {
     my $label = 'flush_all_tasks';
+
     # Start with clean state
     $tmpdir   = File::Temp->newdir();
     $statedir = "$tmpdir";
@@ -146,22 +146,24 @@ ok( $sched->seconds_until_next_task() <= 0, 'Scheduled right now (or in the last
     my $time = time + 10;
     my @qid;
     foreach my $cnt ( 1 .. 4 ) {
-        push @qid, $sched->schedule_task( "noop $cnt", { at_time => $time+$cnt } );
+        push @qid, $sched->schedule_task( "noop $cnt", { at_time => $time + $cnt } );
     }
     is( $sched->how_many_scheduled(), 4, "$label: correct number tasks scheduled." );
-    my $queue = MockQueue->new();
-    my @flushed = $sched->flush_all_tasks( $queue );
-    is( @flushed, 4, "$label: All tasks flushed." );
+    my $queue   = MockQueue->new();
+    my @flushed = $sched->flush_all_tasks($queue);
+    is( @flushed,                     4, "$label: All tasks flushed." );
     is( $sched->how_many_scheduled(), 0, "$label: No scheduled tasks remain" );
     my @tasks = $queue->get_tasks();
     is( scalar(@tasks), 4, "$label: correct number of tasks queued" );
+
     # The following is only true because MockQueue does not recreate the tasks.
-    is_deeply( [map {$_->uuid} @tasks], \@flushed, "$label: Correct tasks queued" )
-        or note explain( \@tasks );
+    is_deeply( [ map { $_->uuid } @tasks ], \@flushed, "$label: Correct tasks queued" )
+      or note explain( \@tasks );
 }
 
 {
     my $label = 'delete_all_tasks';
+
     # Start with clean state
     $tmpdir   = File::Temp->newdir();
     $statedir = "$tmpdir";
@@ -170,10 +172,10 @@ ok( $sched->seconds_until_next_task() <= 0, 'Scheduled right now (or in the last
     my $time = time + 10;
     my @qid;
     foreach my $cnt ( 1 .. 4 ) {
-        push @qid, $sched->schedule_task( "noop $cnt", { at_time => $time+$cnt } );
+        push @qid, $sched->schedule_task( "noop $cnt", { at_time => $time + $cnt } );
     }
     is( $sched->how_many_scheduled(), 4, "$label: correct number tasks scheduled." );
-    is( $sched->delete_all_tasks(), 4, "$label: all tasks deleted" );
+    is( $sched->delete_all_tasks(),   4, "$label: all tasks deleted" );
     is( $sched->how_many_scheduled(), 0, "$label: No scheduled tasks remain" );
 }
 

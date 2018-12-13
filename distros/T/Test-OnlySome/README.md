@@ -50,13 +50,17 @@ Then, re-run:
 
 Since test 1 passed the first time, it was skipped the second time.
 
-You don't have to use `Test::OnlySome::RerunFailed`.  You can directly
+You don't have to use [Test::OnlySome::RerunFailed](https://metacpan.org/pod/Test::OnlySome::RerunFailed).  You can directly
 use `Test::OnlySome`, and you can decide in some other way which tests
 you want to skip.
 
 The argument to ["os"](#os) can be a statement or block, and it doesn't have to
 be a [Test::More](https://metacpan.org/pod/Test::More) test.  You can wrap long-running tests in functions,
 and apply ["os"](#os) to those functions.
+
+Please note that ["os"](#os) can take a `test_count` argument.  As discussed
+in more detail below, please use a `test_count` of 1 for all tests run
+under [Test::OnlySome::RerunFailed](https://metacpan.org/pod/Test::OnlySome::RerunFailed).
 
 # MARKING TESTS
 
@@ -123,8 +127,19 @@ parse of the os invocation.
 it will be used instead of the number of tests specified in
 `$hashref_options->{n}`.
 
-CAUTION: The given statement or block will be run in its own lexical scope,
+### Cautions
+
+- The given statement or block will be run in its own lexical scope,
 not in the caller's scope.
+- If you use `test_count>1`, the whole block will be skipped based on
+whether the **first test** in that block should be skipped.  So, for example,
+
+        os 2 { ok(1); ok(0); }
+
+    will skip the `ok(0)` if the `ok(1)` is skipped.
+
+I recommend that, when using [Test::OnlySome::RerunFailed](https://metacpan.org/pod/Test::OnlySome::RerunFailed), you **not** use
+`test_count>1`.
 
 ## unimport
 

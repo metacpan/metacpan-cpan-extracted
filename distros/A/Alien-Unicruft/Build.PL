@@ -30,7 +30,7 @@ my $builder = Alien::Base::ModuleBuild->new
 			pattern  => qr/^unicruft-([\d\.\-]+)\.tar\.gz$/,
 		       },
    alien_build_commands => [
-			    '%c --prefix=%s --enable-shared --enable-static FLEX=no BISON=no FLEX=no BISON=no DOXYGEN=no OPTGEN_PERL=no POD2TEXT=no POD2MAN=no POD2HTML=no POD2LATEX=no',
+			    '%c --prefix=%s --enable-shared --enable-static --disable-doc FLEX=no BISON=no FLEX=no BISON=no DOXYGEN=no OPTGEN_PERL=no POD2TEXT=no POD2MAN=no POD2HTML=no POD2LATEX=no',
 			    'make',
 			   ],
    alien_isolate_dynamic => 1,

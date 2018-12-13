@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 =head1 NAME
 
@@ -35,6 +35,7 @@ sub new {
 		@_
 	)
 }
+
 =head2 from
 
 Given a source, will attach it as the input for this sink.
@@ -47,7 +48,11 @@ sub from {
     die 'expected a subclass of Ryu::Source, received ' . $src . ' instead' unless $src->isa('Ryu::Source');
 
 	$self = $self->new unless ref $self;
-    $self->{source} = $src;
+    $src->each_while_source(sub {
+        $self->emit($_)
+    }, $self->source);
+    $src->completed->on_ready($self->source->completed);
+# $self->{source} = $src;
 	return $self
 }
 

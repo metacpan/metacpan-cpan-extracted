@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 44;
+plan tests => 74;
 
 use Math::GComplex qw(:overload acos cosh);
 
@@ -66,4 +66,49 @@ use Math::GComplex qw(:overload acos cosh);
 
     like($z2->real, qr/^-2\.6255065752\d*\z/);
     like($z2->imag, qr/^0\.13446357403\d*\z/);
+}
+
+{
+    my @A281964 = qw(1 2 4 16 104 624 3648 29184);
+    my @A282132 = qw(0 1 3 6 30 300 2100 11760);
+
+    my $sum  = 0;
+    my $fact = 1;
+
+    foreach my $k (1 .. scalar(@A281964)) {
+        $fact *= $k;
+
+        $sum += i->pown($k - 1) / $k;
+        my $t = $sum * $fact;
+
+        is($t->real, shift(@A281964));
+        is($t->imag, shift(@A282132));
+    }
+}
+
+{
+    is((0)->pown(0),  1);
+    is((0)->pown(3),  0);
+    is((1)->pown(5),  1);
+    is((1)->pown(-5), 1);
+    is((2)->pown(-5), 0.03125);
+
+    my $n = 2 + 3 * i;
+    is($n->pown('10'), -341525 - 145668 * i);
+    is($n->pown(10),   -341525 - 145668 * i);
+
+    is((3 + 4 * i)->pown(7), 76443 + 16124 * i);
+    is((3 + 4 * i)->pown(8), 164833 + 354144 * i);
+}
+
+{
+    my $z = 13 + 34 * i;
+    my $t = 24 + 97 * i;
+
+    is($z >> 1, 6 + 17 * i);
+    is($z << 3, 104 + 272 * i);
+
+    is($z | $t, 29 + 99 * i);
+    is($z & $t, 8 + 32 * i);
+    is($z ^ $t, 21 + 67 * i);
 }

@@ -8,7 +8,7 @@ use Algorithm::Cron;
 
 use Carp 'croak';
 
-our $VERSION = "0.026";
+our $VERSION = "0.027";
 use constant CRON_DIR => 'mojo_cron_';
 my $crondir;
 
@@ -104,7 +104,7 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
 
   # Mojolicious::Lite
 
-  plugin Cron( '*/5 9-17 * * *' => sub {
+  plugin Cron => ( '*/5 9-17 * * *' => sub {
       # do someting non-blocking but useful
   });
 

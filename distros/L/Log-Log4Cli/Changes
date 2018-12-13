@@ -1,5 +1,8 @@
 Revision history for Log-Log4Cli
 
+0.22    2018-12-12
+        - get rid of global status for evaled die_*
+
 0.21    2018-02-25
         - die with objects are used for die_* in eval blocks
 

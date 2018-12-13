@@ -1,0 +1,13 @@
+{
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Acme-Lingua-ZH-Remix/issues"
+      },
+      "homepage" : "https://github.com/gugod/Acme-Lingua-ZH-Remix",
+      "repository" : {
+         "url" : "git://github.com/gugod/Acme-Lingua-ZH-Remix.git",
+         "web" : "https://github.com/gugod/Acme-Lingua-ZH-Remix"
+      }
+   },
+    "x_static_install" : 1
+}

@@ -18,6 +18,7 @@ use warnings;
 
 use Net::OAuth2::Profile::WebServer;
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
+use LWP::UserAgent;
 
 use constant BASE_HOST      => "https://www.upwork.com";
 use constant DEFAULT_EPOINT => "api";
@@ -30,6 +31,8 @@ use constant URI_ATOKEN  => "/api/v3/oauth2/token";
 
 use constant ENTRY_POINT_API => "api";
 use constant ENTRY_POINT_GDS => "gds";
+
+use constant UPWORK_LIBRARY_USER_AGENT => "Github Upwork API Perl Client";
 
 =pod
 
@@ -74,6 +77,9 @@ sub new {
 sub get_oauth_client {
     my $self = shift;
 
+    my $ua = LWP::UserAgent->new();
+    $ua->agent(UPWORK_LIBRARY_USER_AGENT);
+
     $self->{oauth_client} = Net::OAuth2::Profile::WebServer->new(
 	client_id	   => $self->{config}{client_id},
         client_secret	   => $self->{config}{client_secret},
@@ -85,7 +91,8 @@ sub get_oauth_client {
         authorize_path     => URI_AUTH,
 	access_token_path  => URI_ATOKEN,
 	refresh_token_path => URI_ATOKEN,
-	redirect_uri       => $self->{config}{redirect_uri}
+	redirect_uri       => $self->{config}{redirect_uri},
+	user_agent         => $ua
     );
 }
 

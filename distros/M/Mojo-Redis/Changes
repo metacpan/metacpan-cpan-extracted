@@ -1,5 +1,13 @@
 Revision history for perl distribution Mojo-Redis
 
+3.15 2018-12-13T08:24:10+0900
+ - Fix connection-lost.t in other languages #30
+ - Bumped Mojolicious version for Mojo::Promise support #32
+
+3.14 2018-12-12T23:10:30+0900
+ - Fix fork-safity for the blocking connection #28
+ - Fix connection-lost.t in other languages #29
+
 3.13 2018-12-11T14:44:45+0900
  - Fix rejecting promises when connection is lost #24
  - Fix connection.t when using a remote server #25

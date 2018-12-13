@@ -11,3 +11,4 @@ use Cwd;
     ok_manifest({ filter => [ qr/\.(git|build)/, qr/Test-CheckManifest-/ ], dir => $dir });
 
 }
+

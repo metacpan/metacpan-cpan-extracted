@@ -7,7 +7,7 @@ use Carp qw(croak);
 use Test::OnlySome::PathCapsule;
 #use Data::Dumper;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.001000';
 use constant DEFAULT_FILENAME => '.onlysome.yml';
 
 our $Filename;  # The output filename to use, where the formatter can read it.

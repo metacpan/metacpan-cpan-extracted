@@ -2,7 +2,7 @@ package Test2::Harness::Run::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001070';
+our $VERSION = '0.001071';
 
 use Carp qw/croak confess/;
 use POSIX ":sys_wait_h";
@@ -173,7 +173,7 @@ sub wait {
 
     my $pid = $self->{+PID} or croak "No PID, cannot wait";
     my $check = waitpid($pid, $flags || 0);
-    my $exit = ($? >> 8) || $? & 127;
+    my $exit = $?;
 
     return if $check == 0;
     die "Spawn process was already reaped" if $check == -1;

@@ -98,7 +98,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "0.001070",
+   "version" : "0.001071",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.00"
 }
 

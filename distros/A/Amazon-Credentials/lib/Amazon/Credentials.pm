@@ -27,7 +27,7 @@ use constant  AWS_CONTAINER_CREDENTIALS_URL          => 'http://169.254.170.2';
 
 use vars qw/$VERSION @EXPORT/;
 
-$VERSION = '1.0.6-0'; $VERSION=~s/\-.*$//;
+$VERSION = '1.0.10-1'; $VERSION=~s/\-.*$//;
 
 @EXPORT = qw/$VERSION/;
 
@@ -199,7 +199,7 @@ in the constructor.
 sub new {
   my $class = shift;
   my $self = $class->SUPER::new(ref($_[0]) ? $_[0] : { @_ });
-
+  
   unless ( $self->get_logger ) {
     $self->set_logger(bless {}, 'Amazon::Credentials::Logger');
   }
@@ -208,15 +208,15 @@ sub new {
     $self->set_user_agent(new LWP::UserAgent);
   }
 
-  $self->set_profile($ENV{AWS_PROFILE}) unless
-    $self->get_profile;
-
-  unless ( $self->get_aws_secret_access_key && $self->get_aws_access_key_id ) {
-    $self->set_credentials();
-  }
+  $self->set_profile($ENV{AWS_PROFILE})
+    unless $self->get_profile;
 
   $self->set_region($ENV{AWS_REGION} || $self->get_default_region)
     unless $self->get_region;
+
+  unless ( $self->get_aws_secret_access_key && $self->get_aws_access_key_id ) {
+    $self->set_credentials;
+  }
 
   $self;
 }
@@ -335,8 +335,6 @@ sub find_credentials {
       use File::chdir;
       use File::HomeDir;
 
-      #my $profile_naoptions_profile = $options{profile};
-      
       foreach my $config ( ".aws/config", ".aws/credentials" ) {
 	# reset this since we have hav
 	my $profile_name = $options{profile};
@@ -352,11 +350,13 @@ sub find_credentials {
 	# look for credentials...by interating through credentials file
 	while (<$fh>) {
 	  chomp;
+          my $current_line = $_;
 	  # once we find a profile section that matches, undef it
 	  # ./aws/credentials uses [profile-name]
 	  # ./aws/config uses [profile profile-name]
 	  
 	  if (/^\s*region\s*=\s*(.*?)\s*$/ ) {
+            my $region = $1;
 	    # go ahead and use this region setting IF:
 	    # 1. this is the default profile (we may reset region later though)
 	    # 2. the profile we want to use is this profile
@@ -364,7 +364,7 @@ sub find_credentials {
 	    if ( $last_profile =~/default/ ||
 		 ($profile_to_find && $last_profile =~/$profile_to_find/) ||
 		 ! $last_profile ) {
-	      $self->set_region($1);
+	      $self->set_region($region);
 	    }
 	  }
 	  
@@ -374,7 +374,7 @@ sub find_credentials {
 	    }
 	    elsif (/^\s*\[\s*$profile_name\s*\]/) {
 	      undef $profile_name;
-	      $last_profile = $_; 
+	      $last_profile = $current_line;
 	    }
 	  } 
 	  elsif (defined $profile_name && /^\s*\[\s*profile\s+/) {
@@ -437,9 +437,12 @@ sub is_token_expired {
 
   if ( defined $expiration_date ) {
     # AWS recommends getting credentials 5 minutes prior to expiration
-    my $g = timegm(strptime($expiration_date, "%Y-%m-%dT%H:%M:%S%Z"));
+    my $g = _iso8601_to_time($expiration_date);
+
+    # shave 5 minutes or window interval off of the expiration time
     $g -= $window_interval * 60;
 
+    # (expiration_time - window_interval) - current_time = # of seconds left before expiration
     my $seconds_left = $g - time;
 
     if ( $self->get_debug ) {
@@ -456,6 +459,20 @@ sub is_token_expired {
   }
 
   return $expired;
+}
+
+sub _iso8601_to_time {
+  my $iso8601 = shift;
+  
+  $iso8601 =~s/^(.*)Z$/$1\+00:00/;
+
+  my $gmtime = eval {
+    local %ENV;
+    $ENV{TZ} = 'GMT';
+    timegm(strptime($iso8601, "%Y-%m-%dT%H:%M:%S%z"));
+  };
+
+  return $gmtime;
 }
 
 =pod

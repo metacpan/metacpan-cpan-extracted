@@ -27,8 +27,6 @@ done_testing();
 
 exit(0);
 
-# Run prove().  TODO: Swallow stdout and stderr while this is running, so
-# that the intentional failures in t/allkinds.test don't confuse the output.
 sub run_prove {
     my $test_fn = shift;
     my $results_fn = shift;

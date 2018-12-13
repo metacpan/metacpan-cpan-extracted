@@ -1,5 +1,9 @@
 Revision history for Git-Raw
 
+0.82      2018-12-12 17:14:23+02:00 Africa/Johannesburg
+
+ - Update libgit2 to da8138b0121
+
 0.81      2018-06-27 19:20:17+02:00 Africa/Johannesburg
 
  - Cleanup generated inc files (GH#196)

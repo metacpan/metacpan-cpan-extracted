@@ -1,6 +1,6 @@
 package Acme::Lingua::ZH::Remix;
 use v5.10;
-our $VERSION = "0.96";
+our $VERSION = "0.97";
 
 =pod
 
@@ -48,12 +48,13 @@ The corpus should use full-width punctuation characters.
 =cut
 
 use utf8;
-use Any::Moose;
+use Moose;
+use Types::Standard qw(HashRef Int);
 use List::MoreUtils qw(uniq);
 use Hash::Merge qw(merge);
 
-has phrases      => (is => "rw", isa => "HashRef", lazy_build => 1);
-has phrase_count => (is => "rw", isa => "Int",     lazy_build => 1);
+has phrases      => (is => "rw", isa => HashRef, lazy_build => 1);
+has phrase_count => (is => "rw", isa => Int, lazy_build => 1);
 
 sub _build_phrases {
     my $self   = shift;
@@ -258,9 +259,13 @@ sub random_sentence {
 
 1;
 
+=head1 AUTHOR
+
+Kang-min Liu <gugod@gugod.org>
+
 =head1 COPYRIGHT
 
-Copyright 2010,2011,2012 by Kang-min Liu, <gugod@gugod.org>
+Copyright 2010- by Kang-min Liu, <gugod@gugod.org>
 
 This program is free software; you can redistribute it a nd/or modify
 it under the same terms as Perl itself.

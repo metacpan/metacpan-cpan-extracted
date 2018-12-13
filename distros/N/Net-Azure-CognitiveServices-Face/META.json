@@ -58,7 +58,7 @@
    "provides" : {
       "Net::Azure::CognitiveServices::Face" : {
          "file" : "lib/Net/Azure/CognitiveServices/Face.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Net::Azure::CognitiveServices::Face::Base" : {
          "file" : "lib/Net/Azure/CognitiveServices/Face/Base.pm"
@@ -87,7 +87,7 @@
          "web" : "https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "sazuma <azuma.satoshi@colon.ne.jp>"
    ],
