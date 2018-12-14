@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::HasParent;
-$HTML::FormFu::Role::HasParent::VERSION = '2.06';
+# ABSTRACT: HasParent role
+$HTML::FormFu::Role::HasParent::VERSION = '2.07';
 use Moose::Role;
 
 sub BUILD {
@@ -26,11 +27,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::HasParent
+HTML::FormFu::Role::HasParent - HasParent role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

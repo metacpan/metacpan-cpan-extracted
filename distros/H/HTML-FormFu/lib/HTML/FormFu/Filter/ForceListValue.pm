@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::ForceListValue;
-$HTML::FormFu::Filter::ForceListValue::VERSION = '2.06';
+$HTML::FormFu::Filter::ForceListValue::VERSION = '2.07';
 # ABSTRACT: convert a single value into a 1-item-list
 
 use Moose;
@@ -32,7 +32,7 @@ HTML::FormFu::Filter::ForceListValue - convert a single value into a 1-item-list
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -14,109 +14,109 @@ use Scalar::Util;
 
 extends 'Data::Object::Array';
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 method captures () {
 
-    my $string = $self->initial;
+  my $string = $self->initial;
 
-    my $last_match_start = $self->last_match_start;
-    my $last_match_end   = $self->last_match_end;
+  my $last_match_start = $self->last_match_start;
+  my $last_match_end   = $self->last_match_end;
 
-    my @captures;
+  my @captures;
 
-    for (my $i = 1; $i < @$last_match_end; $i++) {
-        my $start = $last_match_start->[$i] || 0;
-        my $end   = $last_match_end->[$i]   || 0;
+  for (my $i = 1; $i < @$last_match_end; $i++) {
+    my $start = $last_match_start->[$i] || 0;
+    my $end   = $last_match_end->[$i]   || 0;
 
-        push @captures, substr "$string", $start, $end - $start;
-    }
+    push @captures, substr "$string", $start, $end - $start;
+  }
 
-    return Data::Object::deduce_deep([@captures]);
+  return Data::Object::deduce_deep([@captures]);
 
 }
 
 method count () {
 
-    return Data::Object::deduce_deep($self->[2]);
+  return Data::Object::deduce_deep($self->[2]);
 
 }
 
 method initial () {
 
-    return Data::Object::deduce_deep($self->[6]);
+  return Data::Object::deduce_deep($self->[6]);
 
 }
 
 method last_match_end () {
 
-    return Data::Object::deduce_deep($self->[4]);
+  return Data::Object::deduce_deep($self->[4]);
 
 }
 
 method last_match_start () {
 
-    return Data::Object::deduce_deep($self->[3]);
+  return Data::Object::deduce_deep($self->[3]);
 
 }
 
 method named_captures () {
 
-    return Data::Object::deduce_deep($self->[5]);
+  return Data::Object::deduce_deep($self->[5]);
 
 }
 
 method matched () {
 
-    my $string = $self->initial;
+  my $string = $self->initial;
 
-    my $last_match_start = $self->last_match_start;
-    my $last_match_end   = $self->last_match_end;
+  my $last_match_start = $self->last_match_start;
+  my $last_match_end   = $self->last_match_end;
 
-    my $start = $last_match_start->[0] || 0;
-    my $end   = $last_match_end->[0]   || 0;
+  my $start = $last_match_start->[0] || 0;
+  my $end   = $last_match_end->[0]   || 0;
 
-    return Data::Object::deduce_deep(substr "$string", $start, $end - $start);
+  return Data::Object::deduce_deep(substr "$string", $start, $end - $start);
 
 }
 
 method prematched () {
 
-    my $string = $self->initial;
+  my $string = $self->initial;
 
-    my $last_match_start = $self->last_match_start;
-    my $last_match_end   = $self->last_match_end;
+  my $last_match_start = $self->last_match_start;
+  my $last_match_end   = $self->last_match_end;
 
-    my $start = $last_match_start->[0] || 0;
-    my $end   = $last_match_end->[0]   || 0;
+  my $start = $last_match_start->[0] || 0;
+  my $end   = $last_match_end->[0]   || 0;
 
-    return Data::Object::deduce_deep(substr "$string", 0, $start);
+  return Data::Object::deduce_deep(substr "$string", 0, $start);
 
 }
 
 method postmatched () {
 
-    my $string = $self->initial;
+  my $string = $self->initial;
 
-    my $last_match_start = $self->last_match_start;
-    my $last_match_end   = $self->last_match_end;
+  my $last_match_start = $self->last_match_start;
+  my $last_match_end   = $self->last_match_end;
 
-    my $start = $last_match_start->[0] || 0;
-    my $end   = $last_match_end->[0]   || 0;
+  my $start = $last_match_start->[0] || 0;
+  my $end   = $last_match_end->[0]   || 0;
 
-    return Data::Object::deduce_deep(substr "$string", $end);
+  return Data::Object::deduce_deep(substr "$string", $end);
 
 }
 
 method regexp () {
 
-    return Data::Object::deduce_deep($self->[0]);
+  return Data::Object::deduce_deep($self->[0]);
 
 }
 
 method string () {
 
-    return Data::Object::deduce_deep($self->[1]);
+  return Data::Object::deduce_deep($self->[1]);
 
 }
 
@@ -134,21 +134,21 @@ Data::Object::Regexp::Result - Regexp Result Object for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Regexp::Result;
+  use Data::Object::Regexp::Result;
 
-    my $result = Data::Object::Regexp::Result->new([
-        $regexp,
-        $altered_string,
-        $count,
-        $last_match_end,
-        $last_match_start,
-        $named_captures,
-        $initial_string
-    ]);
+  my $result = Data::Object::Regexp::Result->new([
+    $regexp,
+    $altered_string,
+    $count,
+    $last_match_end,
+    $last_match_start,
+    $named_captures,
+    $initial_string
+  ]);
 
 =head1 DESCRIPTION
 
@@ -160,20 +160,20 @@ data whose shape conforms to the tuple defined in the synopsis.
 
 =head2 captures
 
-    # given the expression qr/(.* test)/
-    # given the string "example test matching"
+  # given the expression qr/(.* test)/
+  # given the string "example test matching"
 
-    $result->captures; # ['example test']
+  $result->captures; # ['example test']
 
 The captures method returns the capture groups from the result object which
 contains information about the results of the regular expression operation.
 
 =head2 count
 
-    # given the expression qr/.* test/
-    # given the string "example test matching"
+  # given the expression qr/.* test/
+  # given the string "example test matching"
 
-    $result->count; # 1
+  $result->count; # 1
 
 The count method returns the number of match occurrences from the result object
 which contains information about the results of the regular expression
@@ -181,23 +181,23 @@ operation.
 
 =head2 initial
 
-    # given the expression qr/.* test/
-    # given the string "example test matching"
+  # given the expression qr/.* test/
+  # given the string "example test matching"
 
-    $result->replace($string, 'love', 'g');
+  $result->replace($string, 'love', 'g');
 
-    $result->string;  # 'love matching'
-    $result->initial; # 'example test matching'
+  $result->string;  # 'love matching'
+  $result->initial; # 'example test matching'
 
 The initial method returns the unaltered string from the result object which
 contains information about the results of the regular expression operation.
 
 =head2 last_match_end
 
-    # given the expression qr/(.* test)/
-    # given the string "example test matching"
+  # given the expression qr/(.* test)/
+  # given the string "example test matching"
 
-    $result->last_match_end;
+  $result->last_match_end;
 
 The last_match_end method returns an array of offset positions into the string
 where the capture(s) stopped matching from the result object which contains
@@ -205,10 +205,10 @@ information about the results of the regular expression operation.
 
 =head2 last_match_start
 
-    # given the expression qr/(.* test)/
-    # given the string "example test matching"
+  # given the expression qr/(.* test)/
+  # given the string "example test matching"
 
-    $result->last_match_start;
+  $result->last_match_start;
 
 The last_match_start method returns an array of offset positions into the
 string where the capture(s) matched from the result object which contains
@@ -216,10 +216,10 @@ information about the results of the regular expression operation.
 
 =head2 matched
 
-    # given the expression qr/.* test/
-    # given the string "example test matching"
+  # given the expression qr/.* test/
+  # given the string "example test matching"
 
-    $result->matched; # "example test"
+  $result->matched; # "example test"
 
 The matched method returns the portion of the string that matched from the
 result object which contains information about the results of the regular
@@ -227,10 +227,10 @@ expression operation.
 
 =head2 named_captures
 
-    # given the expression qr/(?<stuff>.* test)/
-    # given the string "example test matching"
+  # given the expression qr/(?<stuff>.* test)/
+  # given the string "example test matching"
 
-    $result->named_captures; # { stuff => "example test" }
+  $result->named_captures; # { stuff => "example test" }
 
 The named_captures method returns a hash containing the requested named regular
 expressions and captured string pairs from the result object which contains
@@ -238,10 +238,10 @@ information about the results of the regular expression operation.
 
 =head2 postmatched
 
-    # given the expression qr/(.* test)/
-    # given the string "example test matching"
+  # given the expression qr/(.* test)/
+  # given the string "example test matching"
 
-    $result->postmatched; # " matching"
+  $result->postmatched; # " matching"
 
 The postmatched method returns the portion of the string after the regular
 expression matched from the result object which contains information about the
@@ -249,10 +249,10 @@ results of the regular expression operation.
 
 =head2 prematched
 
-    # given the expression qr/(test .*)/
-    # given the string "example test matching"
+  # given the expression qr/(test .*)/
+  # given the string "example test matching"
 
-    $result->prematched; # "example "
+  $result->prematched; # "example "
 
 The prematched method returns the portion of the string before the regular
 expression matched from the result object which contains information about the
@@ -260,10 +260,10 @@ results of the regular expression operation.
 
 =head2 regexp
 
-    # given the expression qr/.* test/
-    # given the string "example test matching"
+  # given the expression qr/.* test/
+  # given the string "example test matching"
 
-    $result->regexp; # qr/.* test/
+  $result->regexp; # qr/.* test/
 
 The regexp method returns the regular expression used to perform the match from
 the result object which contains information about the results of the regular
@@ -271,10 +271,10 @@ expression operation.
 
 =head2 string
 
-    # given the expression qr/(.* test)/
-    # given the string "example test matching"
+  # given the expression qr/(.* test)/
+  # given the string "example test matching"
 
-    $result->string; # "example test matching"
+  $result->string; # "example test matching"
 
 The string method returns the string matched against the regular expression
 from the result object which contains information about the results of the
@@ -372,7 +372,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

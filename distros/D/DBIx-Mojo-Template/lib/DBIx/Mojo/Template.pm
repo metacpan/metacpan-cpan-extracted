@@ -41,7 +41,7 @@ sub data {
     my ($name, $param) = (url_unescape($url->path), $url->query->to_hash);
     utf8::decode($name);
     $dict->{$name} = DBIx::Mojo::Statement->new(dict=>$dict, name=>$name, raw=>$t, param=>$param, mt=>_mt(%{$arg{mt} || {}}), vars=>$arg{vars} || {});
-    weaken $dict->{$name}->{dict};
+    #~ weaken $dict->{$name}->{dict};
   }
   die "None DATA dict in package [$pkg]"
     unless %$dict;
@@ -100,7 +100,7 @@ sub _data_dict_files {
   return $dict;
 }
 
-our $VERSION = '0.060';
+our $VERSION = '0.061';
 
 #=============================================
 package DBIx::Mojo::Statement;
@@ -109,7 +109,9 @@ use Mojo::Base -base;
 use Hash::Merge qw(merge);
 use Scalar::Util 'weaken';
 
-has [qw(dict name raw param mt vars sth)];
+has [qw(dict sth)], undef, weak=>1;
+has [qw(name raw param mt vars )];
+
 # sth - attr for save cached dbi statement
 
 use overload '""' => sub { shift->raw };
@@ -145,7 +147,7 @@ DBIx::Mojo::Template - Render SQL statements by Mojo::Template
 
 =head1 VERSION
 
-0.060
+0.061
 
 =head1 SYNOPSIS
 

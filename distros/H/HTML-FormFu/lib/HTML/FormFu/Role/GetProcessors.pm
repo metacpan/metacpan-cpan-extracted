@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::GetProcessors;
-$HTML::FormFu::Role::GetProcessors::VERSION = '2.06';
+# ABSTRACT: processor getter roles
+$HTML::FormFu::Role::GetProcessors::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Util qw(
@@ -80,11 +81,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::GetProcessors
+HTML::FormFu::Role::GetProcessors - processor getter roles
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

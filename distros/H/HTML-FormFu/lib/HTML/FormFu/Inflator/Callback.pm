@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Inflator::Callback;
-$HTML::FormFu::Inflator::Callback::VERSION = '2.06';
+$HTML::FormFu::Inflator::Callback::VERSION = '2.07';
 # ABSTRACT: Callback inflator
 
 use Moose;
@@ -37,7 +37,7 @@ HTML::FormFu::Inflator::Callback - Callback inflator
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Model::HashRef;
-$HTML::FormFu::Model::HashRef::VERSION = '2.06';
+$HTML::FormFu::Model::HashRef::VERSION = '2.07';
 # ABSTRACT: handle hashrefs
 
 use Moose;
@@ -322,7 +322,7 @@ HTML::FormFu::Model::HashRef - handle hashrefs
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

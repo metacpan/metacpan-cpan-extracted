@@ -13,24 +13,24 @@ use Data::Object::Signatures;
 use Scalar::Util;
 
 map with($_), our @ROLES = qw(
-    Data::Object::Role::Dumper
+  Data::Object::Role::Dumper
 );
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 method print () {
 
-    my @result = Data::Object::Role::Dumper::dump($self);
+  my @result = Data::Object::Role::Dumper::dump($self);
 
-    return CORE::print(@result);
+  return CORE::print(@result);
 
 }
 
 method say () {
 
-    my @result = Data::Object::Role::Dumper::dump($self);
+  my @result = Data::Object::Role::Dumper::dump($self);
 
-    return CORE::print(@result, "\n");
+  return CORE::print(@result, "\n");
 
 }
 
@@ -48,13 +48,13 @@ Data::Object::Role::Output - Output Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::Output';
+  with 'Data::Object::Role::Output';
 
 =head1 DESCRIPTION
 
@@ -65,18 +65,18 @@ objects which meet the criteria for being output.
 
 =head2 print
 
-    # given $output
+  # given $output
 
-    $output->print;
+  $output->print;
 
 The print method outputs the value represented by the object to STDOUT and
 returns true. This method returns a number value.
 
 =head2 say
 
-    # given $output
+  # given $output
 
-    $output->say;
+  $output->say;
 
 The say method outputs the value represented by the object appended with a
 newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
@@ -186,7 +186,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Attribute;
-$HTML::FormFu::Attribute::VERSION = '2.06';
+$HTML::FormFu::Attribute::VERSION = '2.07';
 # ABSTRACT: accessor class
 
 use warnings;
@@ -569,7 +569,7 @@ HTML::FormFu::Attribute - accessor class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

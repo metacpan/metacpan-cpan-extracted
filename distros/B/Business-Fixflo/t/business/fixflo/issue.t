@@ -37,6 +37,7 @@ can_ok(
 		CallbackId
         AttendenceDate
         CloseReason
+        CostCode
         Quotes
         QuoteEndTime
 		FaultTitle

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Validator;
-$HTML::FormFu::Validator::VERSION = '2.06';
+$HTML::FormFu::Validator::VERSION = '2.07';
 # ABSTRACT: Validator Base Class
 
 use Moose;
@@ -81,7 +81,7 @@ HTML::FormFu::Validator - Validator Base Class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

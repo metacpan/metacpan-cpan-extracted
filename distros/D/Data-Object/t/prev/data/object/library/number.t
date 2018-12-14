@@ -6,11 +6,11 @@ use Test::TypeTiny;
 
 use Data::Object qw(deduce);
 use Data::Object::Library qw(
-    NumObj
-    NumObject
-    NumberObj
-    NumberObject
-    Object
+  NumObj
+  NumObject
+  NumberObj
+  NumberObject
+  Object
 );
 
 ok_subtype Object, NumObj;

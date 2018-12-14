@@ -1,350 +1,272 @@
 Changelog for Data-Object
 
-0.59 2015-11-29T11:58:23
- - Updated build.
- - Added global types array to library.
- - Added the Proxyable role to support proxy methods and autoloading.
- - Modified POD in SYNOPSIS for existing roles.
- - Added support for alternate Data::Object namespacing.
-
-0.58 2015-10-11T05:48:56
- - v0.58
- - Updated build.
- - Updated SEE ALSO POD.
- - Updated POD for Hash values method.
- - Modify the Hash fold method to support empty hashes.
-
-0.57 2015-10-10T12:07:44
- - v0.57
- - Updated build.
- - Updated codification examples for Array, Hash, and Code packages.
-
-0.56 2015-10-10T11:39:35
- - v0.56
- - Updated build.
- - Updated POD.
- - Updated codification implementation.
- - Added reify function.
- - Refactored codification to to use Sub::Quote.
- - Updated main module synopsis.
-
-0.55 2015-09-27T20:40:42
- - v0.55
- - Updated build.
- - Updated POD for Syntax packages and removed dead code.
-
-0.54 2015-09-27T12:01:24
- - v0.54
- - Updated build.
- - Updated the .travis.yml file to include Perl versions 5.14+.
- - Fixed code object dump method test failure.
-
-0.53 2015-09-26T14:22:18
- - v0.53
- - Updated build.
- - Fixed Type::Tiny::XS type constraint test failure.
-
-0.52 2015-09-26T11:32:55
- - v0.52
- - Updated build.
- - Updated POD for all syntax packages.
-
-0.51 2015-09-26T10:46:49
- - v0.51
- - Updated build.
- - Updated and cleaned-up POD across all files.
-
-0.50 2015-09-26T09:31:12
- - v0.50
- - Updated build.
- - Complete refactoring, massive changes and cleanup.
- - Miscellaneous changes.
- - Imported Data::Object::Signatures into the codebase.
- - Imported Data::Object::Library into the codebase.
- - Updated dist.ini, .gitignore, and POD for Data::Object, etc.
- - Added method and function signatures to type classes.
- - Miscellaneous changes and cleanup.
- - Added support for producing immutable type objects.
- - Make all data type objects throwable.
- - Refactor import statements and foreign function calls.
- - Added Perl 5.14 and Type::Tiny(::Signatues) dependencies.
- - Updated POD for Data::Object.
- - Updated the distribution description.
- - Updated the POD for the new method on each class.
- - Removed the Constructor role.
-
-0.42 2015-09-17T17:15:23
- - v0.42
- - Updated build.
- - Updated gitignore.
- - Miscellaneous changes.
- - Updated the POD for the syntax packages.
-
-0.41 2015-08-21T01:24:42
- - v0.41
- - Updated build.
- - Updated POD for syntax packages.
-
-0.40 2015-08-13T15:35:31
- - v0.40
- - Updated build.
- - Changed behaviour for req and opt functions.
- - Updated POD for Data::Object.
- - Updated POD for const.
-
-0.39 2015-08-13T11:13:32
- - v0.39
- - Updated build.
- - Added req and opt functions to the syntax packages.
- - Removed the alias function.
- - Added tests and POD for the const function.
- - Refactored the constructor for all type classes.
-
-0.38 2015-08-10T16:40:13
- - v0.38
- - Updated build.
- - Updated miscellaneous role descriptions.
- - Updated POD for Role.
- - Updated the POD for the Singleton class.
- - Updated the ABSTRACT for all relevant classes.
- - Update the Data::Object description.
- - Added const function to the core export tag.
-
-0.37 2015-08-09T20:40:09
- - v0.37
- - Updated build.
- - Added the const function, Updated the load and alias functions.
- - Updated POD for teh Exception class.
- - Updated the main SYNOPSIS.
- - Modified constructor for all objects.
-
-0.36 2015-08-08T21:28:07
- - v0.36
- - Updated build.
- - Added SEE ALSO sections to the class and role packages.
-
-0.35 2015-08-08T21:22:17
- - v0.35
- - Updated build.
- - Fixed and documented the defaulter behavior.
-
-0.34 2015-08-08T19:43:13
- - v0.34
- - Updated build.
- - Update the Data::Object description.
- - Updated the alias function POD.
-
-0.33 2015-08-08T17:18:07
- - v0.33
- - Updated build.
- - Fixed attribute altering and defaulter behavior.
- - Updated the SEE ALSO documentation.
- - Updated POD for syntax packages.
- - Added alias function.
-
-0.32 2015-08-07T12:11:12
- - v0.32
- - Updated build.
+0.60 2018-12-14T03:44:06
+ - Reformatted module files (Al Newkirk)
+ - Reformatted test files (Al Newkirk)
+ - Updated to work with new Type::Tiny::Signatures release (Al Newkirk)
+ - Updated build. (Al Newkirk)
+ - Added global types array to library. (Al Newkirk)
+ - Added the Proxyable role to support proxy methods and autoloading. (Al
+   Newkirk)
+ - Modified POD in SYNOPSIS for existing roles. (Al Newkirk)
+ - Added support for alternate Data::Object namespacing. (Al Newkirk)
+ - v0.58 (Al Newkirk)
+ - Updated SEE ALSO POD. (Al Newkirk)
+ - Updated POD for Hash values method. (Al Newkirk)
+ - Modify the Hash fold method to support empty hashes. (Al Newkirk)
+ - v0.57 (Al Newkirk)
+ - Updated codification examples for Array, Hash, and Code packages. (Al
+   Newkirk)
+ - v0.56 (Al Newkirk)
+ - Updated POD. (Al Newkirk)
+ - Updated codification implementation. (Al Newkirk)
+ - Added reify function. (Al Newkirk)
+ - Refactored codification to to use Sub::Quote. (Al Newkirk)
+ - Updated main module synopsis. (Al Newkirk)
+ - v0.55 (Al Newkirk)
+ - Updated POD for Syntax packages and removed dead code. (Al Newkirk)
+ - v0.54 (Al Newkirk)
+ - Updated the .travis.yml file to include Perl versions 5.14+. (Al
+   Newkirk)
+ - Fixed code object dump method test failure. (Al Newkirk)
+ - v0.53 (Al Newkirk)
+ - Fixed Type::Tiny::XS type constraint test failure. (Al Newkirk)
+ - v0.52 (Al Newkirk)
+ - Updated POD for all syntax packages. (Al Newkirk)
+ - v0.51 (Al Newkirk)
+ - Updated and cleaned-up POD across all files. (Al Newkirk)
+ - v0.50 (Al Newkirk)
+ - v0.42 (Al Newkirk)
+ - Updated gitignore. (Al Newkirk)
+ - Complete refactoring, massive changes and cleanup. (Al Newkirk)
+ - Miscellaneous changes. (Al Newkirk)
+ - Imported Data::Object::Signatures into the codebase. (Al Newkirk)
+ - Imported Data::Object::Library into the codebase. (Al Newkirk)
+ - Updated dist.ini, .gitignore, and POD for Data::Object, etc. (Al
+   Newkirk)
+ - Added method and function signatures to type classes. (Al Newkirk)
+ - Miscellaneous changes and cleanup. (Al Newkirk)
+ - Added support for producing immutable type objects. (Al Newkirk)
+ - Make all data type objects throwable. (Al Newkirk)
+ - Refactor import statements and foreign function calls. (Al Newkirk)
+ - Added Perl 5.14 and Type::Tiny(::Signatues) dependencies. (Al Newkirk)
+ - Updated POD for Data::Object. (Al Newkirk)
+ - Updated the distribution description. (Al Newkirk)
+ - Updated the POD for the new method on each class. (Al Newkirk)
+ - Removed the Constructor role. (Al Newkirk)
+ - Updated the POD for the syntax packages. (Al Newkirk)
+ - v0.41 (Al Newkirk)
+ - Updated POD for syntax packages. (Al Newkirk)
+ - v0.40 (Al Newkirk)
+ - Changed behaviour for req and opt functions. (Al Newkirk)
+ - Updated POD for const. (Al Newkirk)
+ - v0.39 (Al Newkirk)
+ - Added req and opt functions to the syntax packages. (Al Newkirk)
+ - Removed the alias function. (Al Newkirk)
+ - Added tests and POD for the const function. (Al Newkirk)
+ - Refactored the constructor for all type classes. (Al Newkirk)
+ - v0.38 (Al Newkirk)
+ - Updated miscellaneous role descriptions. (Al Newkirk)
+ - Updated POD for Role. (Al Newkirk)
+ - Updated the POD for the Singleton class. (Al Newkirk)
+ - Updated the ABSTRACT for all relevant classes. (Al Newkirk)
+ - Update the Data::Object description. (Al Newkirk)
+ - Added const function to the core export tag. (Al Newkirk)
+ - v0.37 (Al Newkirk)
+ - Added the const function, Updated the load and alias functions. (Al
+   Newkirk)
+ - Updated POD for teh Exception class. (Al Newkirk)
+ - Updated the main SYNOPSIS. (Al Newkirk)
+ - Modified constructor for all objects. (Al Newkirk)
+ - v0.36 (Al Newkirk)
+ - Added SEE ALSO sections to the class and role packages. (Al Newkirk)
+ - v0.35 (Al Newkirk)
+ - Fixed and documented the defaulter behavior. (Al Newkirk)
+ - v0.34 (Al Newkirk)
+ - Updated the alias function POD. (Al Newkirk)
+ - v0.33 (Al Newkirk)
+ - Fixed attribute altering and defaulter behavior. (Al Newkirk)
+ - Updated the SEE ALSO documentation. (Al Newkirk)
+ - Added alias function. (Al Newkirk)
+ - v0.32 (Al Newkirk)
  - Added "alt", "def", and "defaulter" functions to the syntax packages.
-
-0.31 2015-08-05T04:26:12
- - v0.31
- - Updated build.
- - Fixed and simplified all class/object constructors.
-
-0.30 2015-08-04T04:04:12
- - v0.30
- - Updated build.
- - Fixed documentation for Class, Role, and Exception packages.
-
-0.29 2015-08-04T03:44:24
- - v0.29
- - Added documentation for Class, Role, and Exception packages.
- - Updated build.
- - Added tests for the Syntax DSL packages.
- - Updated Syntax package descriptions.
-
-0.28 2015-08-03T20:53:33
- - v0.28
- - Updated build.
- - Generating documentation for the Syntax DSL packages.
-
-0.27 2015-08-03T20:43:08
- - v0.27
- - Updated build.
- - Added documentation for the Syntax DSL packages.
-
-0.26 2015-08-02T15:32:19
- - v0.26
- - Updated build.
- - Fixed DSLs for Class and Role definitions.
-
-0.25 2015-08-02T15:23:32
- - v0.25
- - Updated build.
- - Added DSLs for Class and Role definitions.
-
-0.24 2015-07-31T22:59:15
- - v0.24
- - Updated build.
- - Fixed exception class and tests.
-
-0.23 2015-07-30T19:01:20
- - v0.23
- - Updated CHANGES.
- - Modified singleton configuration.
- - Updated build.
- - Allow lists to the Hash and Array constructor.
- - Refactor the Hash fold method.
-
-0.22 2015-07-23T15:54:15
- - v0.22
- - Updated build.
+   (Al Newkirk)
+ - v0.31 (Al Newkirk)
+ - Fixed and simplified all class/object constructors. (Al Newkirk)
+ - v0.30 (Al Newkirk)
+ - Fixed documentation for Class, Role, and Exception packages. (Al
+   Newkirk)
+ - v0.29 (Al Newkirk)
+ - Added documentation for Class, Role, and Exception packages. (Al
+   Newkirk)
+ - Added tests for the Syntax DSL packages. (Al Newkirk)
+ - Updated Syntax package descriptions. (Al Newkirk)
+ - v0.28 (Al Newkirk)
+ - Generating documentation for the Syntax DSL packages. (Al Newkirk)
+ - v0.27 (Al Newkirk)
+ - Added documentation for the Syntax DSL packages. (Al Newkirk)
+ - v0.26 (Al Newkirk)
+ - Fixed DSLs for Class and Role definitions. (Al Newkirk)
+ - v0.25 (Al Newkirk)
+ - Added DSLs for Class and Role definitions. (Al Newkirk)
+ - v0.24 (Al Newkirk)
+ - Fixed exception class and tests. (Al Newkirk)
+ - v0.23 (Al Newkirk)
+ - Updated CHANGES. (Al Newkirk)
+ - Modified singleton configuration. (Al Newkirk)
+ - Allow lists to the Hash and Array constructor. (Al Newkirk)
+ - Refactor the Hash fold method. (Al Newkirk)
+ - v0.22 (Al Newkirk)
  - Added fold/unfold functionality, Replaced Carp::confess with throw,
-   Updated POD.
-
-0.21 2015-07-15T07:20:29
- - v0.21
- - Updated build.
- - Added throw function, "core" and "all" exports, and tests.
- - Modified exception and singleton classes.
- - Added additional merge method tests.
- - Updated project files.
- - Added generic exception class.
- - v0.20
- - Added singleton pattern class.
+   Updated POD. (Al Newkirk)
+ - v0.21 (Al Newkirk)
+ - Added throw function, "core" and "all" exports, and tests. (Al Newkirk)
+ - Modified exception and singleton classes. (Al Newkirk)
+ - Added additional merge method tests. (Al Newkirk)
+ - Updated project files. (Al Newkirk)
+ - Added generic exception class. (Al Newkirk)
+ - v0.20 (Al Newkirk)
+ - Added singleton pattern class. (Al Newkirk)
 
 0.20 2015-06-30T01:56:42
- - v0.20
- - Added singleton pattern class.
+ - v0.20 (Al Newkirk)
+ - Added singleton pattern class. (Al Newkirk)
 
 0.19 2015-06-14T05:20:10
- - v0.19
- - Added export tags and constructor.
+ - v0.19 (Al Newkirk)
+ - Added export tags and constructor. (Al Newkirk)
 
 0.18 2015-05-27T19:30:01
- - v0.18
- - Added Data::Object::Role::Type role.
- - Fixed POD rendering errors.
- - Added missing type_regexp alias.
+ - v0.18 (Al Newkirk)
+ - Added Data::Object::Role::Type role. (Al Newkirk)
+ - Fixed POD rendering errors. (Al Newkirk)
+ - Added missing type_regexp alias. (Al Newkirk)
 
 0.17 2015-03-31T21:13:16
- - v0.17
- - Updated build.
- - Added partially implemented base Class and Role modules.
- - Updated .travis.yml config.
+ - v0.17 (Al Newkirk)
+ - Updated build. (Al Newkirk)
+ - Added partially implemented base Class and Role modules. (Al Newkirk)
+ - Updated .travis.yml config. (Al Newkirk)
 
 0.16 2015-03-26T05:55:27
- - v0.16
- - Excluding development files.
+ - v0.16 (Al Newkirk)
+ - Excluding development files. (Al Newkirk)
 
 0.15 2015-03-26T05:42:23
- - v0.15
- - Updated build.
- - Fixed POD errors.
+ - v0.15 (Al Newkirk)
+ - Updated build. (Al Newkirk)
+ - Fixed POD errors. (Al Newkirk)
 
 0.14 2015-03-26T04:40:52
- - v0.14
- - Updated build.
- - Updated documentation.
- - Miscellaneous style update.
- - Added documentation for Float, Integer, and Number classes.
- - Added documentation about overloading.
- - Modified the overload definitions.
- - Fixed signature bug in the data_undef function definition.
- - Removed accidental MatchResult class.
- - Added Regexp class and role links to documentation.
- - Updated the .gitignore file.
- - Re-implemented support for Regexp objects.
- - Added Regexp link to SEE ALSO section.
- - Miscellaneous cleanup of typos and layouts.
- - Upgraded to Moo v2.
- - Update documentation for class Scalar.
+ - v0.14 (Al Newkirk)
+ - Updated build. (Al Newkirk)
+ - Updated documentation. (Al Newkirk)
+ - Miscellaneous style update. (Al Newkirk)
+ - Added documentation for Float, Integer, and Number classes. (Al Newkirk)
+ - Added documentation about overloading. (Al Newkirk)
+ - Modified the overload definitions. (Al Newkirk)
+ - Fixed signature bug in the data_undef function definition. (Al Newkirk)
+ - Removed accidental MatchResult class. (Al Newkirk)
+ - Added Regexp class and role links to documentation. (Al Newkirk)
+ - Updated the .gitignore file. (Al Newkirk)
+ - Re-implemented support for Regexp objects. (Al Newkirk)
+ - Added Regexp link to SEE ALSO section. (Al Newkirk)
+ - Miscellaneous cleanup of typos and layouts. (Al Newkirk)
+ - Upgraded to Moo v2. (Al Newkirk)
+ - Update documentation for class Scalar. (Al Newkirk)
  - Removed scalar routines for "or", "and", "not", and "xor" operations.
- - Document roles usages.
- - Rework roles and composition.
- - Miscellaneous cleanup.
- - Removed Clone dependency.
- - Removed Coercive role.
- - Removed Type::Tiny dependency, add ROLES package variables.
- - v0.13
- - Updated dist.ini.
+   (Al Newkirk)
+ - Document roles usages. (Al Newkirk)
+ - Rework roles and composition. (Al Newkirk)
+ - Miscellaneous cleanup. (Al Newkirk)
+ - Removed Clone dependency. (Al Newkirk)
+ - Removed Coercive role. (Al Newkirk)
+ - Removed Type::Tiny dependency, add ROLES package variables. (Al Newkirk)
+ - v0.13 (Al Newkirk)
+ - Updated dist.ini. (Al Newkirk)
  - Modified testing strategy and added strict and warnings declarations.
- - Miscellaneous cleanup before release.
- - Added support for Regexp objects.
- - Updated documentation to correct incorrect grammar.
+   (Al Newkirk)
+ - Miscellaneous cleanup before release. (Al Newkirk)
+ - Added support for Regexp objects. (Anthony Brummett)
+ - Updated documentation to correct incorrect grammar. (Anthony Brummett)
  - Explain that coderefs are also acceptable where codified strings are.
- - Fixed typo about codification arguments.
+   (Anthony Brummett)
+ - Fixed typo about codification arguments. (Anthony Brummett)
 
 0.13 2015-02-02T05:07:38
- - v0.13
- - Updated dist.ini.
+ - v0.13 (Al Newkirk)
+ - Updated dist.ini. (Al Newkirk)
  - Modified testing strategy and added strict and warnings declarations.
- - Miscellaneous cleanup before release.
- - Miscellaneous cleanup after PR merge.
- - Reverted to the old .travis.yml config.
- - Added contributor and updated the build process.
- - Added Anthony Brummett to .mailmap as a contributor.
+   (Al Newkirk)
+ - Miscellaneous cleanup before release. (Al Newkirk)
+ - Miscellaneous cleanup after PR merge. (Al Newkirk)
+ - Reverted to the old .travis.yml config. (Al Newkirk)
+ - Added contributor and updated the build process. (Al Newkirk)
+ - Added Anthony Brummett to .mailmap as a contributor. (Anthony Brummett)
  - Proper incantation for capturing the exception and re-throwing it.
- - Localize $@ before eval.
- - Fixed illegal use of constructor in the Array role.
- - Updated documentation to correct incorrect grammar.
+   (Anthony Brummett)
+ - Localize $@ before eval. (Anthony Brummett)
+ - Fixed illegal use of constructor in the Array role. (Al Newkirk)
+ - Updated documentation to correct incorrect grammar. (Anthony Brummett)
  - Explain that coderefs are also acceptable where codified strings are.
- - Fixed typo about codification arguments.
+   (Anthony Brummett)
+ - Fixed typo about codification arguments. (Anthony Brummett)
 
 0.12 2015-01-04T03:33:44
- - v0.12
+ - v0.12 (Al Newkirk)
  - The hashify method of Array supports codification. Miscellaneous roles
-   cleanup.
+   cleanup. (Al Newkirk)
 
 0.11 2015-01-02T05:02:50
- - v0.11
- - Updated documentation.
- - Reworked codification.
- - Removed method requirements in lib/Data/Object/Role/Array.pm.
+ - v0.11 (Al Newkirk)
+ - Updated documentation. (Al Newkirk)
+ - Reworked codification. (Al Newkirk)
+ - Removed method requirements in lib/Data/Object/Role/Array.pm. (Al
+   Newkirk)
 
 0.10 2015-01-01T06:25:26
- - v0.10
+ - v0.10 (Al Newkirk)
  - Removed assertions and validations and added instantiation function
-   aliases.
+   aliases. (Al Newkirk)
 
 0.09 2014-12-23T03:34:14
- - v0.09
- - Added tests for the dump method on all data objects.
- - Added the Output role to all Data Objects.
+ - v0.09 (Al Newkirk)
+ - Added tests for the dump method on all data objects. (Al Newkirk)
+ - Added the Output role to all Data Objects. (Al Newkirk)
 
 0.08 2014-12-17T15:36:53
- - v0.08
- - Implemented Values/Detract roles.
+ - v0.08 (Al Newkirk)
+ - Implemented Values/Detract roles. (Al Newkirk)
 
 0.07 2014-12-15T12:21:49
- - v0.07
- - Added META file to dist.
+ - v0.07 (Al Newkirk)
+ - Added META file to dist. (Al Newkirk)
 
 0.06 2014-12-14T02:15:37
- - v0.06
- - Updated documentation.
- - Rewrote history a bit.
- - Added detract and detract_deep functions.
- - Relocated the object type roles.
- - Fixed fractional numeric tests.
- - Updated the required Perl version.
- - Fixed documentation.
+ - v0.06 (Al Newkirk)
+ - Updated documentation. (Al Newkirk)
+ - Rewrote history a bit. (Al Newkirk)
+ - Added detract and detract_deep functions. (Al Newkirk)
+ - Relocated the object type roles. (Al Newkirk)
+ - Fixed fractional numeric tests. (Al Newkirk)
+ - Updated the required Perl version. (Al Newkirk)
+ - Fixed documentation. (Al Newkirk)
 
 0.05 2014-12-11T20:15:49
- - v0.05
- - Added some initial documentation.
- - Added deduce_deep function.
- - Added deduce_type function.
+ - v0.05 (Al Newkirk)
+ - Added some initial documentation. (Al Newkirk)
+ - Added deduce_deep function. (Al Newkirk)
+ - Added deduce_type function. (Al Newkirk)
 
 0.04 2014-12-07T21:13:04
- - v0.04
+ - v0.04 (Al Newkirk)
  - Added overloading and deducing, and other undocumented functionality.
+   (Al Newkirk)
 
 0.03 2014-12-04T04:26:57
- - v0.03
- - Added object construction functions.
+ - v0.03 (Al Newkirk)
+ - Added object construction functions. (Al Newkirk)
 
 0.02 2014-12-03T11:01:41
- - v0.02
- - Initial commit.
+ - v0.02 (Al Newkirk)
+ - Initial commit. (Al Newkirk)

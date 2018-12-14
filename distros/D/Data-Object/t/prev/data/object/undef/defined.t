@@ -8,22 +8,22 @@ can_ok 'Data::Object::Undef', 'defined';
 use Scalar::Util 'refaddr';
 
 subtest 'test the defined method' => sub {
-    my $undef = Data::Object::Undef->new(undef);
-    my $defined = $undef->defined;
+  my $undef   = Data::Object::Undef->new(undef);
+  my $defined = $undef->defined;
 
-    isnt refaddr($undef), refaddr($defined);
-    is $defined, 0;
+  isnt refaddr($undef), refaddr($defined);
+  is $defined, 0;
 
-    isa_ok $undef, 'Data::Object::Undef';
-    isa_ok $defined, 'Data::Object::Number';
+  isa_ok $undef,   'Data::Object::Undef';
+  isa_ok $defined, 'Data::Object::Number';
 
-    $defined = $undef->defined(9876543210);
+  $defined = $undef->defined(9876543210);
 
-    isnt refaddr($undef), refaddr($defined);
-    is $defined, 0;
+  isnt refaddr($undef), refaddr($defined);
+  is $defined, 0;
 
-    isa_ok $undef, 'Data::Object::Undef';
-    isa_ok $defined, 'Data::Object::Number';
+  isa_ok $undef,   'Data::Object::Undef';
+  isa_ok $defined, 'Data::Object::Number';
 };
 
 ok 1 and done_testing;

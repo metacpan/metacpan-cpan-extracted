@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Textarea;
-$HTML::FormFu::Element::Textarea::VERSION = '2.06';
+$HTML::FormFu::Element::Textarea::VERSION = '2.07';
 # ABSTRACT: Textarea form field
 
 use Moose;
@@ -66,7 +66,7 @@ HTML::FormFu::Element::Textarea - Textarea form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -13,13 +13,13 @@ use Data::Object::Signatures;
 use Scalar::Util;
 
 map with($_), our @ROLES = qw(
-    Data::Object::Role::Defined
-    Data::Object::Role::Detract
-    Data::Object::Role::Throwable
-    Data::Object::Role::Type
+  Data::Object::Role::Defined
+  Data::Object::Role::Detract
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
 );
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 1;
 
@@ -35,13 +35,13 @@ Data::Object::Role::Item - Item Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::Item';
+  with 'Data::Object::Role::Item';
 
 =head1 DESCRIPTION
 
@@ -52,45 +52,45 @@ which meet the criteria for being considered items.
 
 =head2 data
 
-    # given $item
+  # given $item
 
-    $item->data; # original value
+  $item->data; # original value
 
 The data method returns the original and underlying value contained by the
 object. This method is an alias to the detract method.
 
 =head2 detract
 
-    # given $item
+  # given $item
 
-    $item->detract; # original value
+  $item->detract; # original value
 
 The detract method returns the original and underlying value contained by the
 object.
 
 =head2 methods
 
-    # given $item
+  # given $item
 
-    $item->methods;
+  $item->methods;
 
 The methods method returns the list of methods attached to object. This method
 returns an array value.
 
 =head2 roles
 
-    # given $item
+  # given $item
 
-    $item->roles;
+  $item->roles;
 
 The roles method returns the list of roles attached to object. This method
 returns an array value.
 
 =head2 throw
 
-    # given $item
+  # given $item
 
-    $item->throw;
+  $item->throw;
 
 The throw method terminates the program using the core die keyword, passing the
 object to the L<Data::Object::Exception> class as the named parameter C<object>.
@@ -98,9 +98,9 @@ If captured this method returns an exception value.
 
 =head2 type
 
-    # given $item
+  # given $item
 
-    $item->type; # ITEM
+  $item->type; # ITEM
 
 The type method returns a string representing the internal data type object name.
 This method returns a string value.
@@ -221,7 +221,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

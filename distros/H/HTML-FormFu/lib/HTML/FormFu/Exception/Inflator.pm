@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Exception::Inflator;
-$HTML::FormFu::Exception::Inflator::VERSION = '2.06';
+# ABSTRACT: Inflator exception
+$HTML::FormFu::Exception::Inflator::VERSION = '2.07';
 use Moose;
 extends 'HTML::FormFu::Exception::Input';
 
@@ -37,11 +38,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Exception::Inflator
+HTML::FormFu::Exception::Inflator - Inflator exception
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

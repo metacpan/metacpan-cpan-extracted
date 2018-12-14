@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Length;
-$HTML::FormFu::Constraint::Length::VERSION = '2.06';
+$HTML::FormFu::Constraint::Length::VERSION = '2.07';
 # ABSTRACT: Min/Max Length String Constraint
 
 use Moose;
@@ -60,7 +60,7 @@ HTML::FormFu::Constraint::Length - Min/Max Length String Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

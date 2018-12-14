@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Integer;
-$HTML::FormFu::Constraint::Integer::VERSION = '2.06';
+$HTML::FormFu::Constraint::Integer::VERSION = '2.07';
 # ABSTRACT: Unsigned Integer Constraint
 
 use Moose;
@@ -25,7 +25,7 @@ HTML::FormFu::Constraint::Integer - Unsigned Integer Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

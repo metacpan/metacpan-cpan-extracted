@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::OutputProcessor::StripWhitespace;
-$HTML::FormFu::OutputProcessor::StripWhitespace::VERSION = '2.06';
+$HTML::FormFu::OutputProcessor::StripWhitespace::VERSION = '2.07';
 # ABSTRACT: Strip shitespace from HTML output
 
 use Moose;
@@ -126,7 +126,7 @@ __PACKAGE__->meta->make_immutable;
 use strict;
 
 package HTML::FormFu::OutputProcessor::StripWhitespace::_iter;
-$HTML::FormFu::OutputProcessor::StripWhitespace::_iter::VERSION = '2.06';
+$HTML::FormFu::OutputProcessor::StripWhitespace::_iter::VERSION = '2.07';
 use Moose;
 use MooseX::Attribute::Chained;
 
@@ -180,7 +180,7 @@ HTML::FormFu::OutputProcessor::StripWhitespace - Strip shitespace from HTML outp
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

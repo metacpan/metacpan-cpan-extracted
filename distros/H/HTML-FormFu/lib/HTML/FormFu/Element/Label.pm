@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Label;
-$HTML::FormFu::Element::Label::VERSION = '2.06';
+$HTML::FormFu::Element::Label::VERSION = '2.07';
 # ABSTRACT: field for displaying only
 
 use Moose;
@@ -103,7 +103,7 @@ HTML::FormFu::Element::Label - field for displaying only
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

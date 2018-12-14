@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Localize;
-$HTML::FormFu::Localize::VERSION = '2.06';
+# ABSTRACT: Localization
+$HTML::FormFu::Localize::VERSION = '2.07';
 use warnings;
 
 use HTML::FormFu::Util qw( require_class );
@@ -190,11 +191,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Localize
+HTML::FormFu::Localize - Localization
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

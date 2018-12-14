@@ -1,9 +1,7 @@
-set -e
-cpanm --installdeps .
-v=$( perl -Ilib -MSympatic -E'say $Sympatic::VERSION' )
-perl Makefile.PL
-make dist
-tar xf *gz
-cd Sympatic-$v
-cpanm .
-RELEASE_TESTING=true prove -r
+# with no parameter, the script start the regular test suite
+# with $1 not equal to '' or '0', start the whole test suite for CPAN releaes purpose
+
+
+dzil authordeps|cpanm
+rm -f LICENSE MANIFEST README Makefile.PL META.json META.yml
+RELEASE_TESTING=${1:-} dzil test

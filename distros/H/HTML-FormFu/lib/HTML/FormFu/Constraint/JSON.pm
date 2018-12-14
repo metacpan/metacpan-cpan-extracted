@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Constraint::JSON;
-$HTML::FormFu::Constraint::JSON::VERSION = '2.06';
+# ABSTRACT: Valid JSON string
+$HTML::FormFu::Constraint::JSON::VERSION = '2.07';
 use JSON::MaybeXS qw( decode_json );
 use Moose;
 
@@ -29,19 +30,15 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Constraint::JSON
+HTML::FormFu::Constraint::JSON - Valid JSON string
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 
 Checks for valid JSON string
-
-=head1 NAME
-
-HTML::FormFu::Constraint::JSON - Valid JSON string
 
 =head1 SEE ALSO
 

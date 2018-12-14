@@ -13,56 +13,56 @@ use Data::Object::Signatures;
 use Scalar::Util;
 
 map with($_), our @ROLES = qw(
-    Data::Object::Role::Item
-    Data::Object::Role::Alphabetic
-    Data::Object::Role::Value
+  Data::Object::Role::Item
+  Data::Object::Role::Alphabetic
+  Data::Object::Role::Value
 );
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 method defined () {
 
-    return 1;
+  return 1;
 
 }
 
 method search ($string, $flags) {
 
-    my $captures;
-    my @matches;
+  my $captures;
+  my @matches;
 
-    my $result = "$self";
-    my $op     = '$string =~ m/$result/';
-    my $capt   = '$captures = (' . $op . ($flags // '') . ')';
-    my $mtch   = '@matches  = ([@-], [@+], {%-})';
-    my $expr   = join ';', $capt, $mtch;
+  my $result = "$self";
+  my $op     = '$string =~ m/$result/';
+  my $capt   = '$captures = (' . $op . ($flags // '') . ')';
+  my $mtch   = '@matches  = ([@-], [@+], {%-})';
+  my $expr   = join ';', $capt, $mtch;
 
-    my $error = do { local $@; eval $expr; $@ };
+  my $error = do { local $@; eval $expr; $@ };
 
-    Data::Object::throw($error) if $error;
+  Data::Object::throw($error) if $error;
 
-    return [$result, $string, $captures, @matches, $string];
+  return [$result, $string, $captures, @matches, $string];
 
 }
 
 method replace ($string, $replacement, $flags) {
 
-    my $captures;
-    my @matches;
+  my $captures;
+  my @matches;
 
-    my $result = "$self";
-    my $op     = '$string =~ s/$result/$replacement/';
-    my $capt   = '$captures = (' . $op . ($flags // '') . ')';
-    my $mtch   = '@matches  = ([@-], [@+], {%-})';
-    my $expr   = join ';', $capt, $mtch;
+  my $result = "$self";
+  my $op     = '$string =~ s/$result/$replacement/';
+  my $capt   = '$captures = (' . $op . ($flags // '') . ')';
+  my $mtch   = '@matches  = ([@-], [@+], {%-})';
+  my $expr   = join ';', $capt, $mtch;
 
-    my $initial = $string;
+  my $initial = $string;
 
-    my $error = do { local $@; eval $expr; $@ };
+  my $error = do { local $@; eval $expr; $@ };
 
-    Data::Object::throw($error) if $error;
+  Data::Object::throw($error) if $error;
 
-    return [$result, $string, $captures, @matches, $initial];
+  return [$result, $string, $captures, @matches, $initial];
 
 }
 
@@ -80,13 +80,13 @@ Data::Object::Role::Regexp - Regexp Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::Regexp';
+  with 'Data::Object::Role::Regexp';
 
 =head1 DESCRIPTION
 
@@ -97,18 +97,18 @@ expressions.
 
 =head2 data
 
-    # given $regexp
+  # given $regexp
 
-    $regexp->data; # original value
+  $regexp->data; # original value
 
 The data method returns the original and underlying value contained by the
 object. This method is an alias to the detract method.
 
 =head2 defined
 
-    # given $regexp
+  # given $regexp
 
-    $regexp->defined; # 1
+  $regexp->defined; # 1
 
 The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
@@ -116,36 +116,36 @@ number object.
 
 =head2 detract
 
-    # given $regexp
+  # given $regexp
 
-    $regexp->detract; # original value
+  $regexp->detract; # original value
 
 The detract method returns the original and underlying value contained by the
 object.
 
 =head2 dump
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->dump; # qr/(?^u:test)/
+  $regexp->dump; # qr/(?^u:test)/
 
 The dump method returns returns a string representation of the object.
 This method returns a string value.
 
 =head2 eq
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->eq(qr(test)); # 1
+  $regexp->eq(qr(test)); # 1
 
 The eq method returns true if the argument provided is equal to the value
 represented by the object. This method returns a number value.
 
 =head2 ge
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->ge(qr(test)); # 1
+  $regexp->ge(qr(test)); # 1
 
 The ge method returns true if the argument provided is greater-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
@@ -153,18 +153,18 @@ object.
 
 =head2 gt
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->gt(qr(test)); # 0
+  $regexp->gt(qr(test)); # 0
 
 The gt method returns true if the argument provided is greater-than the value
 represented by the object. This method returns a number value.
 
 =head2 le
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->le(qr(test)); # 1
+  $regexp->le(qr(test)); # 1
 
 The le method returns true if the argument provided is less-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
@@ -172,55 +172,55 @@ object.
 
 =head2 lt
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->lt(qr(test)); # 0
+  $regexp->lt(qr(test)); # 0
 
 The lt method returns true if the argument provided is less-than the value
 represented by the object. This method returns a number value.
 
 =head2 methods
 
-    # given $regexp
+  # given $regexp
 
-    $regexp->methods;
+  $regexp->methods;
 
 The methods method returns the list of methods attached to object. This method
 returns an array value.
 
 =head2 ne
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->ne(qr(test)); # 1
+  $regexp->ne(qr(test)); # 1
 
 The ne method returns true if the argument provided is not equal to the value
 represented by the object. This method returns a number value.
 
 =head2 new
 
-    # given qr(something to match against)
+  # given qr(something to match against)
 
-    my $re = Data::Object::Regexp->new(qr(something to match against));
+  my $re = Data::Object::Regexp->new(qr(something to match against));
 
 The new method expects a regular-expression object and returns a new class
 instance.
 
 =head2 print
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->print; # 'qr/(?^u:test)/'
+  $regexp->print; # 'qr/(?^u:test)/'
 
 The print method outputs the value represented by the object to STDOUT and
 returns true. This method returns a number value.
 
 =head2 replace
 
-    # given qr(test)
+  # given qr(test)
 
-    $re->replace('this is a test', 'drill');
-    $re->replace('test 1 test 2 test 3', 'drill', 'gi');
+  $re->replace('this is a test', 'drill');
+  $re->replace('test 1 test 2 test 3', 'drill', 'gi');
 
 The replace method performs a regular expression substitution on the given
 string. The first argument is the string to match against.  The second argument
@@ -231,18 +231,18 @@ used to introspect the result of the operation.
 
 =head2 roles
 
-    # given $regexp
+  # given $regexp
 
-    $regexp->roles;
+  $regexp->roles;
 
 The roles method returns the list of roles attached to object. This method
 returns an array value.
 
 =head2 say
 
-    # given qr(test)
+  # given qr(test)
 
-    $regexp->say; # 'qr/(?^u:test)/\n'
+  $regexp->say; # 'qr/(?^u:test)/\n'
 
 The say method outputs the value represented by the object appended with a
 newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
@@ -250,10 +250,10 @@ object.
 
 =head2 search
 
-    # given qr((test))
+  # given qr((test))
 
-    $re->search('this is a test');
-    $re->search('this does not match', 'gi');
+  $re->search('this is a test');
+  $re->search('this does not match', 'gi');
 
 The search method performs a regular expression match against the given string
 This method will always return a regexp::Result object which
@@ -261,9 +261,9 @@ can be used to introspect the result of the operation.
 
 =head2 throw
 
-    # given $regexp
+  # given $regexp
 
-    $regexp->throw;
+  $regexp->throw;
 
 The throw method terminates the program using the core die keyword, passing the
 object to the L<Data::Object::Exception> class as the named parameter C<object>.
@@ -271,9 +271,9 @@ If captured this method returns an exception value.
 
 =head2 type
 
-    # given $regexp
+  # given $regexp
 
-    $regexp->type; # REGEXP
+  $regexp->type; # REGEXP
 
 The type method returns a string representing the internal data type object name.
 This method returns a string value.
@@ -418,7 +418,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

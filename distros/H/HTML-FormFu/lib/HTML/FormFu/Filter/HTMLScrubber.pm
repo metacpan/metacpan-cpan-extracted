@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::HTMLScrubber;
-$HTML::FormFu::Filter::HTMLScrubber::VERSION = '2.06';
+$HTML::FormFu::Filter::HTMLScrubber::VERSION = '2.07';
 # ABSTRACT: filter removing HTML markup
 
 use Moose;
@@ -61,7 +61,7 @@ HTML::FormFu::Filter::HTMLScrubber - filter removing HTML markup
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

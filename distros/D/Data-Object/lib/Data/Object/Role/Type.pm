@@ -12,86 +12,86 @@ use Data::Object::Library;
 use Data::Object::Signatures;
 use Scalar::Util;
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 my %METHODS;
 my %ROLES;
 
 method methods () {
 
-    no strict 'refs';
+  no strict 'refs';
 
-    my $package = ref($self) || $self;
+  my $package = ref($self) || $self;
 
-    if (exists $METHODS{$package}) {
+  if (exists $METHODS{$package}) {
 
-        return [ sort @{$METHODS{$package}} ];
+    return [sort @{$METHODS{$package}}];
 
-    }
+  }
 
-    require Function::Parameters::Info;
+  require Function::Parameters::Info;
 
-    for my $method (keys %{ "${package}::" }) {
+  for my $method (keys %{"${package}::"}) {
 
-        my $config = Function::Parameters::info("${package}::${method}");
+    my $config = Function::Parameters::info("${package}::${method}");
 
-        push @{$METHODS{$package}}, $method if $config;
+    push @{$METHODS{$package}}, $method if $config;
 
-    }
+  }
 
-    return [ sort @{$METHODS{$package}} ];
+  return [sort @{$METHODS{$package}}];
 
 }
 
 method roles () {
 
-    no strict 'refs';
+  no strict 'refs';
 
-    my $package = ref($self) || $self;
+  my $package = ref($self) || $self;
 
-    if (exists $ROLES{$package}) {
+  if (exists $ROLES{$package}) {
 
-        return [ sort @{$ROLES{$package}} ];
+    return [sort @{$ROLES{$package}}];
 
-    }
+  }
 
-    my @list = ();
+  my @list = ();
 
-    for my $role (@{ "${package}::ROLES" }) {
+  for my $role (@{"${package}::ROLES"}) {
 
-        push @list, $role;
+    push @list, $role;
 
-    }
+  }
 
-    if ($package !~ /::Role/) {
+  if ($package !~ /::Role/) {
 
-        (my $role = $package) =~ s/Data::Object/Data::Object::Role/;
+    (my $role = $package) =~ s/Data::Object/Data::Object::Role/;
 
-        my $roles = roles($role);
+    my $roles = roles($role);
 
-        push @list, @$roles if @$roles;
+    push @list, @$roles if @$roles;
 
-    }
+  }
 
-    for my $role (@list) {
+  for my $role (@list) {
 
-        my $roles = roles($role);
+    my $roles = roles($role);
 
-        push @list, @$roles if @$roles;
+    push @list, @$roles if @$roles;
 
-    }
+  }
 
-    my %seen;
+  my %seen;
 
-    @list = grep { not $seen{$_}++ } @list;
+  @list = grep { not $seen{$_}++ } @list;
 
-    return $ROLES{$package} = [sort @list];
+  return $ROLES{$package} = [sort @list];
 
 }
 
 method type () {
 
-    return Data::Object::deduce_type($self);
+  return Data::Object::deduce_type($self);
 
 }
 
@@ -109,13 +109,13 @@ Data::Object::Role::Type - Type Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::Type';
+  with 'Data::Object::Role::Type';
 
 =head1 DESCRIPTION
 
@@ -126,27 +126,27 @@ objects which meet the criteria for being considered type objects.
 
 =head2 methods
 
-    # given $type
+  # given $type
 
-    $type->methods;
+  $type->methods;
 
 The methods method returns the list of methods attached to object. This method
 returns an array value.
 
 =head2 roles
 
-    # given $type
+  # given $type
 
-    $type->roles;
+  $type->roles;
 
 The roles method returns the list of roles attached to object. This method
 returns an array value.
 
 =head2 type
 
-    # given $type
+  # given $type
 
-    $type->type; # TYPE
+  $type->type; # TYPE
 
 The type method returns a string representing the internal data type object name.
 This method returns a string value.
@@ -243,7 +243,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

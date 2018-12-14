@@ -33,6 +33,7 @@ use Business::Fixflo::Property;
     CloseReason
     ContactNumber
     ContactNumberAlt
+    CostCode
     Created
     DirectEmailAddress
     DirectMobileNumber
@@ -79,6 +80,7 @@ has [ qw/
     CallbackId
     ContactNumber
     ContactNumberAlt
+    CostCode
     Created
     CloseReason
     DirectEmailAddress

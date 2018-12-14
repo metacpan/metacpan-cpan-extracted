@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter;
-$HTML::FormFu::Filter::VERSION = '2.06';
+$HTML::FormFu::Filter::VERSION = '2.07';
 # ABSTRACT: Filter Base Class
 
 use Moose;
@@ -63,7 +63,7 @@ HTML::FormFu::Filter - Filter Base Class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

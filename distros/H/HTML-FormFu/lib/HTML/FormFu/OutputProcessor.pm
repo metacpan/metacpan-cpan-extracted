@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::OutputProcessor;
-$HTML::FormFu::OutputProcessor::VERSION = '2.06';
+$HTML::FormFu::OutputProcessor::VERSION = '2.07';
 # ABSTRACT: Post-process HTML output
 
 use Moose;
@@ -37,7 +37,7 @@ HTML::FormFu::OutputProcessor - Post-process HTML output
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Blank;
-$HTML::FormFu::Element::Blank::VERSION = '2.06';
+$HTML::FormFu::Element::Blank::VERSION = '2.07';
 # ABSTRACT: blank element
 
 use Moose;
@@ -51,7 +51,7 @@ HTML::FormFu::Element::Blank - blank element
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SEE ALSO
 

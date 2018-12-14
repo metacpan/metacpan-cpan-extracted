@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::File;
-$HTML::FormFu::Constraint::File::VERSION = '2.06';
+$HTML::FormFu::Constraint::File::VERSION = '2.07';
 # ABSTRACT: File Upload Constraint
 
 use Moose;
@@ -33,7 +33,7 @@ HTML::FormFu::Constraint::File - File Upload Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

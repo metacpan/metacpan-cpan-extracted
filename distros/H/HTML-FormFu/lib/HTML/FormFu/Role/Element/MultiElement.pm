@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::Element::MultiElement;
-$HTML::FormFu::Role::Element::MultiElement::VERSION = '2.06';
+# ABSTRACT: multi-element role
+$HTML::FormFu::Role::Element::MultiElement::VERSION = '2.07';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -71,11 +72,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::Element::MultiElement
+HTML::FormFu::Role::Element::MultiElement - multi-element role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

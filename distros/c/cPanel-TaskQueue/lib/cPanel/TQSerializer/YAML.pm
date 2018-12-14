@@ -1,5 +1,5 @@
 package cPanel::TQSerializer::YAML;
-$cPanel::TQSerializer::YAML::VERSION = '0.901';
+$cPanel::TQSerializer::YAML::VERSION = '0.902';
 use YAML::Syck ();
 
 # with no bless flags

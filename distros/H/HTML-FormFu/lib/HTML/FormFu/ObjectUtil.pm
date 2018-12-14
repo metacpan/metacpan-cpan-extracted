@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::ObjectUtil;
-$HTML::FormFu::ObjectUtil::VERSION = '2.06';
+# ABSTRACT: utilities for dealing with FormFu objects
+$HTML::FormFu::ObjectUtil::VERSION = '2.07';
 use warnings;
 
 use Exporter qw( import );
@@ -277,11 +278,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::ObjectUtil
+HTML::FormFu::ObjectUtil - utilities for dealing with FormFu objects
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

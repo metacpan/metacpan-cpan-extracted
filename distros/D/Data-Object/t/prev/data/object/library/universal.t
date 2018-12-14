@@ -6,9 +6,9 @@ use Test::TypeTiny;
 
 use Data::Object qw(data_universal);
 use Data::Object::Library qw(
-    UniversalObj
-    UniversalObject
-    Object
+  UniversalObj
+  UniversalObject
+  Object
 );
 
 ok_subtype Object, UniversalObj;

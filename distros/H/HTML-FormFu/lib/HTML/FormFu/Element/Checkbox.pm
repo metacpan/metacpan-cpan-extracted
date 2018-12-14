@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Checkbox;
-$HTML::FormFu::Element::Checkbox::VERSION = '2.06';
+$HTML::FormFu::Element::Checkbox::VERSION = '2.07';
 # ABSTRACT: Checkbox form field
 
 use Moose;
@@ -91,7 +91,7 @@ HTML::FormFu::Element::Checkbox - Checkbox form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

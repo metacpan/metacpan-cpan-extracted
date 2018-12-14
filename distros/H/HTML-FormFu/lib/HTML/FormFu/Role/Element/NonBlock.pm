@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Role::Element::NonBlock;
-$HTML::FormFu::Role::Element::NonBlock::VERSION = '2.06';
+$HTML::FormFu::Role::Element::NonBlock::VERSION = '2.07';
 # ABSTRACT: base class for single-tag elements
 
 use Moose::Role;
@@ -63,7 +63,7 @@ HTML::FormFu::Role::Element::NonBlock - base class for single-tag elements
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

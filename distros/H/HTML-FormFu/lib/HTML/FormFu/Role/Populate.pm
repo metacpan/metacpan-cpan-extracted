@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::Populate;
-$HTML::FormFu::Role::Populate::VERSION = '2.06';
+# ABSTRACT: Populate role
+$HTML::FormFu::Role::Populate::VERSION = '2.07';
 use Moose::Role;
 
 use Scalar::Util qw( reftype );
@@ -98,11 +99,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::Populate
+HTML::FormFu::Role::Populate - Populate role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

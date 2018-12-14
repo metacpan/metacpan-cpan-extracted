@@ -67,20 +67,20 @@ can_ok 'Data::Object::Hash', 'unfold';
 can_ok 'Data::Object::Hash', 'values';
 
 subtest 'test instantiation' => sub {
-    eval { Data::Object::Hash->new };
-    like $@, qr/Type Instantiation Error/;
+  eval { Data::Object::Hash->new };
+  like $@, qr/Type Instantiation Error/;
 
-    eval { Data::Object::Hash->new(1) };
-    like $@, qr/Type Instantiation Error/;
+  eval { Data::Object::Hash->new(1) };
+  like $@, qr/Type Instantiation Error/;
 
-    my $h1 = Data::Object::Hash->new(1,2);
-    is_deeply $h1, {1,2};
+  my $h1 = Data::Object::Hash->new(1, 2);
+  is_deeply $h1, {1, 2};
 
-    my $h2 = Data::Object::Hash->new({1,2});
-    is_deeply $h2, {1,2};
+  my $h2 = Data::Object::Hash->new({1, 2});
+  is_deeply $h2, {1, 2};
 
-    my $h3 = Data::Object::Hash->new($h2);
-    is_deeply $h3, {1,2};
+  my $h3 = Data::Object::Hash->new($h2);
+  is_deeply $h3, {1, 2};
 };
 
 ok 1 and done_testing;

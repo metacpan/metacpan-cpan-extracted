@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Printable;
-$HTML::FormFu::Constraint::Printable::VERSION = '2.06';
+$HTML::FormFu::Constraint::Printable::VERSION = '2.07';
 # ABSTRACT: Printable Characters Constraint
 
 use Moose;
@@ -27,7 +27,7 @@ HTML::FormFu::Constraint::Printable - Printable Characters Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

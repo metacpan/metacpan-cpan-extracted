@@ -33,7 +33,7 @@ html_formfu_deploy.pl - deploy local copy of HTML::FormFu template files
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

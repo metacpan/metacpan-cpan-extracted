@@ -13,32 +13,32 @@ use Data::Object::Signatures;
 
 use Carp ();
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
-method AUTOLOAD {
+method AUTOLOAD () {
 
-    my (@namespace) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
+  my (@namespace) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
 
-    my ($package, $method) = @namespace;
+  my ($package, $method) = @namespace;
 
-    unshift @_, $self;
+  unshift @_, $self;
 
-    my $build = $package->can('BUILDPROXY');
-    my $error = qq(Can't locate object method "$method" via package "$package");
+  my $build = $package->can('BUILDPROXY');
+  my $error = qq(Can't locate object method "$method" via package "$package");
 
-    Carp::confess($error) unless $build && ref($build) eq 'CODE';
+  Carp::confess($error) unless $build && ref($build) eq 'CODE';
 
-    my $proxy = $build->($package, $method, @_);
+  my $proxy = $build->($package, $method, @_);
 
-    Carp::confess($error) unless $proxy && ref($proxy) eq 'CODE';
+  Carp::confess($error) unless $proxy && ref($proxy) eq 'CODE';
 
-    goto &$proxy;
+  goto &$proxy;
 
 }
 
-method DESTROY {
+method DESTROY () {
 
-    ; # noop
+  ;    # noop
 
 }
 
@@ -56,21 +56,21 @@ Data::Object::Role::Proxyable - Proxyable Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::Proxyable';
+  with 'Data::Object::Role::Proxyable';
 
-    sub BUILDPROXY {
+  sub BUILDPROXY {
 
-        my ($class, $method, @args) = @_;
+    my ($class, $method, @args) = @_;
 
-        return sub { ... }; # process method call ...
+    return sub { ... }; # process method call ...
 
-    }
+  }
 
 =head1 DESCRIPTION
 
@@ -171,7 +171,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

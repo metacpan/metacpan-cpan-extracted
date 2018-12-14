@@ -3,6 +3,7 @@ use Mojo::Base -base;
 
 use Mojo::JSON;
 use Protocol::Redis;
+use Scalar::Util 'blessed';
 use Storable    ();
 use Time::HiRes ();
 
@@ -57,7 +58,7 @@ sub _compute_p {
   };
 
   my $data = $compute->();
-  return UNIVERSAL::can($data, 'then') ? $data->then(sub { $set->(@_) }) : $set->($data);
+  return (blessed $data and $data->can('then')) ? $data->then(sub { $set->(@_) }) : $set->($data);
 }
 
 sub _maybe_compute_p {

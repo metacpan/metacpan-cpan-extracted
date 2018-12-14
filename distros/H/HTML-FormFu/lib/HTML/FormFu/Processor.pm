@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Processor;
-$HTML::FormFu::Processor::VERSION = '2.06';
+$HTML::FormFu::Processor::VERSION = '2.07';
 # ABSTRACT: base class for constraints
 
 use Moose;
@@ -78,7 +78,7 @@ HTML::FormFu::Processor - base class for constraints
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

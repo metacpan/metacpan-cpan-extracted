@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::QueryType::Catalyst;
-$HTML::FormFu::QueryType::Catalyst::VERSION = '2.06';
+$HTML::FormFu::QueryType::Catalyst::VERSION = '2.07';
 # ABSTRACT: uploaded file
 
 use Moose;
@@ -84,7 +84,7 @@ HTML::FormFu::QueryType::Catalyst - uploaded file
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

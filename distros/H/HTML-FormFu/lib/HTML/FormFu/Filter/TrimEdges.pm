@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::TrimEdges;
-$HTML::FormFu::Filter::TrimEdges::VERSION = '2.06';
+$HTML::FormFu::Filter::TrimEdges::VERSION = '2.07';
 # ABSTRACT: filter trimming whitespace
 
 use Moose;
@@ -34,7 +34,7 @@ HTML::FormFu::Filter::TrimEdges - filter trimming whitespace
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for Business-Fixflo
 
+0.35     2018-12-14
+        - Add CostCode to Business::Fixflo::Issue
+
 0.34     2018-02-09
         - Add AppointmentDate, AttendenceDate, CloseReason, Quotes,
           QuoteEndTime to Business::Fixflo::Issue

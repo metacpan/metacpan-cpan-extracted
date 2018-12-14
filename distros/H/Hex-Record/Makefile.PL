@@ -18,8 +18,8 @@ WriteMakefile(
         'Test::More'     => 0,
     },
     PREREQ_PM => {
-        'Test::Warn'      => 0,
-        'Clone'           => 0,
+        'Test::Warn' => 0,
+        'Clone'      => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Hex-Record-*' },

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Deflator::FormatNumber;
-$HTML::FormFu::Deflator::FormatNumber::VERSION = '2.06';
+$HTML::FormFu::Deflator::FormatNumber::VERSION = '2.07';
 # ABSTRACT: Format a number for a locale
 
 use Moose;
@@ -68,7 +68,7 @@ HTML::FormFu::Deflator::FormatNumber - Format a number for a locale
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -467,6 +467,11 @@ t/elements/datetime_seconds.t
 t/elements/datetime_seconds.yml
 t/elements/element_setup.t
 t/elements/email.t
+t/elements/error_attributes_failing_test.select-with-attrs.yml
+t/elements/error_attributes_failing_test.select.yml
+t/elements/error_attributes_failing_test.t
+t/elements/error_attributes_failing_test.text-with-attrs.yml
+t/elements/error_attributes_failing_test.text.yml
 t/elements/escaping.t
 t/elements/field_default_empty_value.t
 t/elements/field_default_empty_value.yml

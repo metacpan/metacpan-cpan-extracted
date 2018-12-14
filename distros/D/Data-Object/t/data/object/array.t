@@ -86,20 +86,20 @@ can_ok 'Data::Object::Array', 'unshift';
 can_ok 'Data::Object::Array', 'values';
 
 subtest 'test instantiation' => sub {
-    eval { Data::Object::Array->new };
-    like $@, qr/Type Instantiation Error/;
+  eval { Data::Object::Array->new };
+  like $@, qr/Type Instantiation Error/;
 
-    eval { Data::Object::Array->new(1) };
-    like $@, qr/Type Instantiation Error/;
+  eval { Data::Object::Array->new(1) };
+  like $@, qr/Type Instantiation Error/;
 
-    my $a1 = Data::Object::Array->new(1,2);
-    is_deeply $a1, [1,2];
+  my $a1 = Data::Object::Array->new(1, 2);
+  is_deeply $a1, [1, 2];
 
-    my $a2 = Data::Object::Array->new([1,2]);
-    is_deeply $a2, [1,2];
+  my $a2 = Data::Object::Array->new([1, 2]);
+  is_deeply $a2, [1, 2];
 
-    my $a3 = Data::Object::Array->new($a2);
-    is_deeply $a3, [1,2];
+  my $a3 = Data::Object::Array->new($a2);
+  is_deeply $a3, [1, 2];
 };
 
 ok 1 and done_testing;

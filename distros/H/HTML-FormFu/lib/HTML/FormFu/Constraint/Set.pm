@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Set;
-$HTML::FormFu::Constraint::Set::VERSION = '2.06';
+$HTML::FormFu::Constraint::Set::VERSION = '2.07';
 # ABSTRACT: Set of Values Constraint
 
 use Moose;
@@ -52,7 +52,7 @@ HTML::FormFu::Constraint::Set - Set of Values Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

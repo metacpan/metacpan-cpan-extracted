@@ -10,424 +10,434 @@ use Data::Object;
 use Scalar::Util;
 
 use Type::Library -base;
-use Type::Utils   -all;
+use Type::Utils -all;
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 extends 'Types::Standard';
 extends 'Types::Common::Numeric';
 extends 'Types::Common::String';
 
 our @TYPES = qw(
-    Any
-    AnyObj
-    AnyObject
-    ArrayObj
-    ArrayObject
-    ArrayRef
-    Bool
-    ClassName
-    CodeObj
-    CodeObject
-    CodeRef
-    ConsumerOf
-    Defined
-    Dict
-    Enum
-    FileHandle
-    FloatObj
-    FloatObject
-    GlobRef
-    HasMethods
-    HashObj
-    HashObject
-    HashRef
-    InstanceOf
-    Int
-    IntObj
-    IntObject
-    IntegerObj
-    IntegerObject
-    Item
-    LaxNum
-    LowerCaseSimpleStr
-    LowerCaseStr
-    Map
-    Maybe
-    NegativeInt
-    NegativeNum
-    NegativeOrZeroInt
-    NegativeOrZeroNum
-    NonEmptySimpleStr
-    NonEmptyStr
-    Num
-    NumObj
-    NumObject
-    NumberObj
-    NumberObject
-    NumericCode
-    Object
-    OptList
-    Optional
-    Overload
-    Password
-    PositiveInt
-    PositiveNum
-    PositiveOrZeroInt
-    PositiveOrZeroNum
-    Ref
-    RegexpObj
-    RegexpObject
-    RegexpRef
-    RoleName
-    ScalarObj
-    ScalarObject
-    ScalarRef
-    SimpleStr
-    SingleDigit
-    Str
-    StrMatch
-    StrObj
-    StrObject
-    StrictNum
-    StringObj
-    StringObject
-    StrongPassword
-    Tied
-    Tuple
-    Undef
-    UndefObj
-    UndefObject
-    UniversalObj
-    UniversalObject
-    UpperCaseSimpleStr
-    UpperCaseStr
-    Value
+  Any
+  AnyObj
+  AnyObject
+  ArrayObj
+  ArrayObject
+  ArrayRef
+  Bool
+  ClassName
+  CodeObj
+  CodeObject
+  CodeRef
+  ConsumerOf
+  Defined
+  Dict
+  Enum
+  FileHandle
+  FloatObj
+  FloatObject
+  GlobRef
+  HasMethods
+  HashObj
+  HashObject
+  HashRef
+  InstanceOf
+  Int
+  IntObj
+  IntObject
+  IntegerObj
+  IntegerObject
+  Item
+  LaxNum
+  LowerCaseSimpleStr
+  LowerCaseStr
+  Map
+  Maybe
+  NegativeInt
+  NegativeNum
+  NegativeOrZeroInt
+  NegativeOrZeroNum
+  NonEmptySimpleStr
+  NonEmptyStr
+  Num
+  NumObj
+  NumObject
+  NumberObj
+  NumberObject
+  NumericCode
+  Object
+  OptList
+  Optional
+  Overload
+  Password
+  PositiveInt
+  PositiveNum
+  PositiveOrZeroInt
+  PositiveOrZeroNum
+  Ref
+  RegexpObj
+  RegexpObject
+  RegexpRef
+  RoleName
+  ScalarObj
+  ScalarObject
+  ScalarRef
+  SimpleStr
+  SingleDigit
+  Str
+  StrMatch
+  StrObj
+  StrObject
+  StrictNum
+  StringObj
+  StringObject
+  StrongPassword
+  Tied
+  Tuple
+  Undef
+  UndefObj
+  UndefObject
+  UniversalObj
+  UniversalObject
+  UpperCaseSimpleStr
+  UpperCaseStr
+  Value
 );
 
 my $registry = __PACKAGE__->meta;
 
 sub DECLARE {
 
-    my ($name, %opts) = @_;
+  my ($name, %opts) = @_;
 
-    return map +(DECLARE($_, %opts)), @$name if ref $name;
+  return map +(DECLARE($_, %opts)), @$name if ref $name;
 
-    ($opts{name} = $name) =~ s/:://g;
+  ($opts{name} = $name) =~ s/:://g;
 
-    my @cans = ref($opts{can})  eq 'ARRAY' ? @{$opts{can}}  : $opts{can}  // ();
-    my @isas = ref($opts{isa})  eq 'ARRAY' ? @{$opts{isa}}  : $opts{isa}  // ();
-    my @does = ref($opts{does}) eq 'ARRAY' ? @{$opts{does}} : $opts{does} // ();
+  my @cans = ref($opts{can}) eq 'ARRAY'  ? @{$opts{can}}  : $opts{can}  // ();
+  my @isas = ref($opts{isa}) eq 'ARRAY'  ? @{$opts{isa}}  : $opts{isa}  // ();
+  my @does = ref($opts{does}) eq 'ARRAY' ? @{$opts{does}} : $opts{does} // ();
 
-    my $code = $opts{constraint};
-    my $text = $opts{inlined};
+  my $code = $opts{constraint};
+  my $text = $opts{inlined};
 
-    $opts{constraint} = sub {
-        my @args = @_;
-        return if @isas and grep(not($args[0]->isa($_)),  @isas);
-        return if @cans and grep(not($args[0]->can($_)),  @cans);
-        return if @does and grep(not($args[0]->does($_)), @does);
-        return if $code and not $code->(@args);
-        return 1;
-    };
+  $opts{constraint} = sub {
+    my @args = @_;
+    return if @isas and grep(not($args[0]->isa($_)),  @isas);
+    return if @cans and grep(not($args[0]->can($_)),  @cans);
+    return if @does and grep(not($args[0]->does($_)), @does);
+    return if $code and not $code->(@args);
+    return 1;
+  };
 
-    $opts{inlined} = sub {
-        my $blessed = "Scalar::Util::blessed($_[1])";
-        return join(' && ', map "($_)",
-            join(' && ', map "($blessed and $_[1]->isa('$_'))",  @isas),
-            join(' && ', map "($blessed and $_[1]->does('$_'))", @does),
-            join(' && ', map "($blessed and $_[1]->can('$_'))",  @cans),
-        $text ? $text : (),
-        );
-    };
+  $opts{inlined} = sub {
+    my $blessed = "Scalar::Util::blessed($_[1])";
+    return join(' && ',
+      map "($_)",
+      join(' && ', map "($blessed and $_[1]->isa('$_'))",  @isas),
+      join(' && ', map "($blessed and $_[1]->does('$_'))", @does),
+      join(' && ', map "($blessed and $_[1]->can('$_'))",  @cans),
+      $text ? $text : (),
+    );
+  };
 
-    $opts{bless}   = "Type::Tiny";
-    $opts{parent}  = "Object" unless $opts{parent};
-    $opts{coerion} = 1;
+  $opts{bless}   = "Type::Tiny";
+  $opts{parent}  = "Object" unless $opts{parent};
+  $opts{coerion} = 1;
 
-    { no warnings "numeric"; $opts{_caller_level}++ }
+  { no warnings "numeric"; $opts{_caller_level}++ }
 
-    my $coerce = delete $opts{coerce};
-    my $type   = declare(%opts);
+  my $coerce = delete $opts{coerce};
+  my $type   = declare(%opts);
 
-    my $functions = {
-        'Data::Object::Array'     => 'data_array',
-        'Data::Object::Code'      => 'data_code',
-        'Data::Object::Float'     => 'data_float',
-        'Data::Object::Hash'      => 'data_hash',
-        'Data::Object::Integer'   => 'data_integer',
-        'Data::Object::Number'    => 'data_number',
-        'Data::Object::Regexp'    => 'data_regexp',
-        'Data::Object::Scalar'    => 'data_scalar',
-        'Data::Object::String'    => 'data_string',
-        'Data::Object::Undef'     => 'data_undef',
-        'Data::Object::Universal' => 'data_universal',
-    };
+  my $functions = {
+    'Data::Object::Array'     => 'data_array',
+    'Data::Object::Code'      => 'data_code',
+    'Data::Object::Float'     => 'data_float',
+    'Data::Object::Hash'      => 'data_hash',
+    'Data::Object::Integer'   => 'data_integer',
+    'Data::Object::Number'    => 'data_number',
+    'Data::Object::Regexp'    => 'data_regexp',
+    'Data::Object::Scalar'    => 'data_scalar',
+    'Data::Object::String'    => 'data_string',
+    'Data::Object::Undef'     => 'data_undef',
+    'Data::Object::Universal' => 'data_universal',
+  };
 
-    my ($key) = grep { $functions->{$_} } @isas;
+  my ($key) = grep { $functions->{$_} } @isas;
 
-    for my $coercive ('ARRAY' eq ref $coerce ? @$coerce : $coerce) {
-        my $object   = $registry->get_type($coercive);
-        my $function = $$functions{$key};
+  for my $coercive ('ARRAY' eq ref $coerce ? @$coerce : $coerce) {
+    my $object   = $registry->get_type($coercive);
+    my $function = $$functions{$key};
 
-        my $forward = Data::Object->can($function);
-        coerce $opts{name}, from $coercive, via { $forward->($_) };
+    my $forward = Data::Object->can($function);
+    coerce $opts{name}, from $coercive, via { $forward->($_) };
 
-       $object->coercion->i_really_want_to_unfreeze;
+    $object->coercion->i_really_want_to_unfreeze;
 
-        my $reverse = Data::Object->can('deduce_deep');
-        coerce $coercive, from $opts{name}, via { $reverse->($_) };
+    my $reverse = Data::Object->can('deduce_deep');
+    coerce $coercive, from $opts{name}, via { $reverse->($_) };
 
-        $object->coercion->freeze;
-    }
+    $object->coercion->freeze;
+  }
 
-    return $type;
+  return $type;
 
 }
 
-my %array_constraint = (constraint_generator => sub {
+my %array_constraint = (
+  constraint_generator => sub {
 
-    my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) :
-        return $registry->get_type('ArrayObject');
+    my $param
+      = @_
+      ? Types::TypeTiny::to_TypeTiny(shift)
+      : return $registry->get_type('ArrayObject');
 
     Types::TypeTiny::TypeTiny->check($param)
-        or Types::Standard::_croak(
-            "Parameter to ArrayObject[`a] expected ".
-            "to be a type constraint; got $param"
-        );
+      or Types::Standard::_croak("Parameter to ArrayObject[`a] expected "
+        . "to be a type constraint; got $param");
 
     return sub {
-        my $arrayobj = shift;
-        $param->check($_) || return for @$arrayobj;
-        return !!1;
+      my $arrayobj = shift;
+      $param->check($_) || return for @$arrayobj;
+      return !!1;
     }
 
-});
+  }
+);
 
-my %array_coercion = (coercion_generator => sub {
+my %array_coercion = (
+  coercion_generator => sub {
 
     my ($parent, $child, $param) = @_;
 
     return $parent->coercion unless $param->has_coercion;
 
     my $coercable_item = $param->coercion->_source_type_union;
-    my $c = "Type::Coercion"->new(type_constraint => $child);
+    my $c              = "Type::Coercion"->new(type_constraint => $child);
 
     $c->add_type_coercions(
-        $registry->get_type('ArrayRef') => sub {
-            my $value = @_ ? $_[0] : $_;
-            my $new   = [];
+      $registry->get_type('ArrayRef') => sub {
+        my $value = @_ ? $_[0] : $_;
+        my $new   = [];
 
-            for (my $i=0; $i < @$value; $i++) {
-                my $item = $value->[$i];
-                return $value unless $coercable_item->check($item);
-                $new->[$i] = $param->coerce($item);
-            }
+        for (my $i = 0; $i < @$value; $i++) {
+          my $item = $value->[$i];
+          return $value unless $coercable_item->check($item);
+          $new->[$i] = $param->coerce($item);
+        }
 
-            return $parent->coerce($new);
-        },
+        return $parent->coerce($new);
+      },
     );
 
     return $c;
 
-});
+  }
+);
 
-my %array_explanation = (deep_explanation => sub {
+my %array_explanation = (
+  deep_explanation => sub {
 
     my ($type, $value, $varname) = @_;
     my $param = $type->parameters->[0];
 
     for my $i (0 .. $#$value) {
-        my $item = $value->[$i];
-        next if $param->check($item);
-        my $message  = '"%s" constrains each value in the array object with "%s"';
-        my $position = sprintf('%s->[%d]', $varname, $i);
-        my $criteria = $param->validate_explain($item, $position);
-        return [sprintf($message, $type, $param), @{$criteria}]
+      my $item = $value->[$i];
+      next if $param->check($item);
+      my $message  = '"%s" constrains each value in the array object with "%s"';
+      my $position = sprintf('%s->[%d]', $varname, $i);
+      my $criteria = $param->validate_explain($item, $position);
+      return [sprintf($message, $type, $param), @{$criteria}];
     }
 
     return;
 
-});
+  }
+);
 
 DECLARE ["ArrayObj", "ArrayObject"] => (
-    %array_constraint,
-    %array_coercion,
-    %array_explanation,
+  %array_constraint, %array_coercion, %array_explanation,
 
-    isa    => ["Data::Object::Array"],
-    does   => ["Data::Object::Role::Array"],
-    can    => ["data", "dump"],
-    coerce => ["ArrayRef"],
+  isa    => ["Data::Object::Array"],
+  does   => ["Data::Object::Role::Array"],
+  can    => ["data", "dump"],
+  coerce => ["ArrayRef"],
 );
 
 DECLARE ["CodeObj", "CodeObject"] => (
-    isa    => ["Data::Object::Code"],
-    does   => ["Data::Object::Role::Code"],
-    can    => ["data", "dump"],
-    coerce => ["CodeRef"],
+  isa    => ["Data::Object::Code"],
+  does   => ["Data::Object::Role::Code"],
+  can    => ["data", "dump"],
+  coerce => ["CodeRef"],
 );
 
 DECLARE ["FloatObj", "FloatObject"] => (
-    isa    => ["Data::Object::Float"],
-    does   => ["Data::Object::Role::Float"],
-    can    => ["data", "dump"],
-    coerce => ["Str", "Num", "LaxNum"],
+  isa    => ["Data::Object::Float"],
+  does   => ["Data::Object::Role::Float"],
+  can    => ["data", "dump"],
+  coerce => ["Str", "Num", "LaxNum"],
 );
 
-my %hash_constraint = (constraint_generator => sub {
+my %hash_constraint = (
+  constraint_generator => sub {
 
-    my $param = @_ ? Types::TypeTiny::to_TypeTiny(shift) :
-        return $registry->get_type('HashObject');
+    my $param
+      = @_
+      ? Types::TypeTiny::to_TypeTiny(shift)
+      : return $registry->get_type('HashObject');
 
     Types::TypeTiny::TypeTiny->check($param)
-        or Types::Standard::_croak(
-            "Parameter to HashObject[`a] expected ".
-            "to be a type constraint; got $param"
-        );
+      or Types::Standard::_croak("Parameter to HashObject[`a] expected "
+        . "to be a type constraint; got $param");
 
     return sub {
-        my $hashobj = shift;
-        $param->check($_) || return for values %$hashobj;
-        return !!1;
+      my $hashobj = shift;
+      $param->check($_) || return for values %$hashobj;
+      return !!1;
     }
 
-});
+  }
+);
 
-my %hash_coercion = (coercion_generator => sub {
+my %hash_coercion = (
+  coercion_generator => sub {
 
     my ($parent, $child, $param) = @_;
 
     return $parent->coercion unless $param->has_coercion;
 
     my $coercable_item = $param->coercion->_source_type_union;
-    my $c = "Type::Coercion"->new(type_constraint => $child);
+    my $c              = "Type::Coercion"->new(type_constraint => $child);
 
     $c->add_type_coercions(
-        $registry->get_type('HashRef') => sub {
-            my $value = @_ ? $_[0] : $_;
-            my $new   = {};
+      $registry->get_type('HashRef') => sub {
+        my $value = @_ ? $_[0] : $_;
+        my $new   = {};
 
-            for my $key (sort keys %$value) {
-                my $item = $value->{$key};
-                return $value unless $coercable_item->check($item);
-                $new->{$key} = $param->coerce($item);
-            }
+        for my $key (sort keys %$value) {
+          my $item = $value->{$key};
+          return $value unless $coercable_item->check($item);
+          $new->{$key} = $param->coerce($item);
+        }
 
-            return $parent->coerce($new);
-        },
+        return $parent->coerce($new);
+      },
     );
 
     return $c;
 
-});
+  }
+);
 
-my %hash_explanation = (deep_explanation => sub {
+my %hash_explanation = (
+  deep_explanation => sub {
 
     my ($type, $value, $varname) = @_;
     my $param = $type->parameters->[0];
 
     for my $key (sort keys %$value) {
-        my $item = $value->{$key};
-        next if $param->check($item);
-        my $message  = '"%s" constrains each value in the hash object with "%s"';
-        my $position = sprintf('%s->{%s}', $varname, B::perlstring($key));
-        my $criteria = $param->validate_explain($item, $position);
-        return [sprintf($message, $type, $param), @{$criteria}]
+      my $item = $value->{$key};
+      next if $param->check($item);
+      my $message  = '"%s" constrains each value in the hash object with "%s"';
+      my $position = sprintf('%s->{%s}', $varname, B::perlstring($key));
+      my $criteria = $param->validate_explain($item, $position);
+      return [sprintf($message, $type, $param), @{$criteria}];
     }
 
     return;
 
-});
+  }
+);
 
-my %hash_overrides = (my_methods => {
+my %hash_overrides = (
+  my_methods => {
 
     hashref_allows_key => sub {
 
-        my ($self, $key) = @_;
+      my ($self, $key) = @_;
 
-        $registry->get_type('Str')->check($key);
+      $registry->get_type('Str')->check($key);
 
     },
 
     hashref_allows_value => sub {
 
-        my ($self, $key, $value) = @_;
+      my ($self, $key, $value) = @_;
 
-        return !!0 unless $self->my_hashref_allows_key($key);
-        return !!1 if $self == $registry->get_type('HashRef');
+      return !!0 unless $self->my_hashref_allows_key($key);
+      return !!1 if $self == $registry->get_type('HashRef');
 
-        my $href = $self->find_parent(sub { $_->has_parent
-            && $registry->get_type('HashRef') == $_->parent
-        });
+      my $href = $self->find_parent(sub {
+        $_->has_parent && $registry->get_type('HashRef') == $_->parent;
+      });
 
-        my $param = $href->type_parameter;
+      my $param = $href->type_parameter;
 
-        $registry->get_type('Str')->check($key) and $param->check($value);
+      $registry->get_type('Str')->check($key) and $param->check($value);
 
     },
 
-});
+  }
+);
 
 DECLARE ["HashObj", "HashObject"] => (
-    %hash_constraint,
-    %hash_coercion,
-    %hash_explanation,
-    %hash_overrides,
+  %hash_constraint, %hash_coercion, %hash_explanation, %hash_overrides,
 
-    isa    => ["Data::Object::Hash"],
-    does   => ["Data::Object::Role::Hash"],
-    can    => ["data", "dump"],
-    coerce => ["HashRef"],
+  isa    => ["Data::Object::Hash"],
+  does   => ["Data::Object::Role::Hash"],
+  can    => ["data", "dump"],
+  coerce => ["HashRef"],
 );
 
 DECLARE ["IntObj", "IntObject", "IntegerObj", "IntegerObject"] => (
-    isa    => ["Data::Object::Integer"],
-    does   => ["Data::Object::Role::Integer"],
-    can    => ["data", "dump"],
-    coerce => ["Str", "Num", "LaxNum", "StrictNum", "Int"],
+  isa    => ["Data::Object::Integer"],
+  does   => ["Data::Object::Role::Integer"],
+  can    => ["data", "dump"],
+  coerce => ["Str", "Num", "LaxNum", "StrictNum", "Int"],
 );
 
 DECLARE ["NumObj", "NumObject", "NumberObj", "NumberObject"] => (
-    isa    => ["Data::Object::Number"],
-    does   => ["Data::Object::Role::Number"],
-    can    => ["data", "dump"],
-    coerce => ["Str", "Num", "LaxNum", "StrictNum"],
+  isa    => ["Data::Object::Number"],
+  does   => ["Data::Object::Role::Number"],
+  can    => ["data", "dump"],
+  coerce => ["Str", "Num", "LaxNum", "StrictNum"],
 );
 
 DECLARE ["RegexpObj", "RegexpObject"] => (
-    isa    => ["Data::Object::Regexp"],
-    does   => ["Data::Object::Role::Regexp"],
-    can    => ["data", "dump"],
-    coerce => ["RegexpRef"],
+  isa    => ["Data::Object::Regexp"],
+  does   => ["Data::Object::Role::Regexp"],
+  can    => ["data", "dump"],
+  coerce => ["RegexpRef"],
 );
 
 DECLARE ["ScalarObj", "ScalarObject"] => (
-    isa    => ["Data::Object::Scalar"],
-    does   => ["Data::Object::Role::Scalar"],
-    can    => ["data", "dump"],
-    coerce => ["ScalarRef"],
+  isa    => ["Data::Object::Scalar"],
+  does   => ["Data::Object::Role::Scalar"],
+  can    => ["data", "dump"],
+  coerce => ["ScalarRef"],
 );
 
 DECLARE ["StrObj", "StrObject", "StringObj", "StringObject"] => (
-    isa    => ["Data::Object::String"],
-    does   => ["Data::Object::Role::String"],
-    can    => ["data", "dump"],
-    coerce => ["Str"],
+  isa    => ["Data::Object::String"],
+  does   => ["Data::Object::Role::String"],
+  can    => ["data", "dump"],
+  coerce => ["Str"],
 );
 
 DECLARE ["UndefObj", "UndefObject"] => (
-    isa    => ["Data::Object::Undef"],
-    does   => ["Data::Object::Role::Undef"],
-    can    => ["data", "dump"],
-    coerce => ["Undef"],
+  isa    => ["Data::Object::Undef"],
+  does   => ["Data::Object::Role::Undef"],
+  can    => ["data", "dump"],
+  coerce => ["Undef"],
 );
 
 DECLARE ["AnyObj", "AnyObject", "UniversalObj", "UniversalObject"] => (
-    isa    => ["Data::Object::Universal"],
-    does   => ["Data::Object::Role::Universal"],
-    can    => ["data", "dump"],
-    coerce => ["Any"],
+  isa    => ["Data::Object::Universal"],
+  does   => ["Data::Object::Role::Universal"],
+  can    => ["data", "dump"],
+  coerce => ["Any"],
 );
 
 1;
@@ -444,11 +454,11 @@ Data::Object::Library - Type Library for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Library;
+  use Data::Object::Library;
 
 =head1 DESCRIPTION
 
@@ -460,10 +470,10 @@ libraries and adds type constraints and coercions for L<Data::Object> objects.
 
 =head2 Any
 
-    has data => (
-        is  => 'rw',
-        isa => Any,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Any,
+  );
 
 The Any type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Any> function can be
@@ -473,10 +483,10 @@ validated.
 
 =head2 AnyObj
 
-    has data => (
-        is  => 'rw',
-        isa => AnyObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => AnyObj,
+  );
 
 The AnyObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Universal> object. The
@@ -486,10 +496,10 @@ the argument can not be validated.
 
 =head2 AnyObject
 
-    has data => (
-        is  => 'rw',
-        isa => AnyObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => AnyObject,
+  );
 
 The AnyObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Universal> object. The
@@ -499,10 +509,10 @@ if the argument can not be validated.
 
 =head2 ArrayObj
 
-    has data => (
-        is  => 'rw',
-        isa => ArrayObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => ArrayObj,
+  );
 
 The ArrayObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Array> object. The
@@ -512,10 +522,10 @@ if the argument can not be validated.
 
 =head2 ArrayObject
 
-    has data => (
-        is  => 'rw',
-        isa => ArrayObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => ArrayObject,
+  );
 
 The ArrayObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Array> object. The
@@ -525,10 +535,10 @@ false if the argument can not be validated.
 
 =head2 ArrayRef
 
-    has data => (
-        is  => 'rw',
-        isa => ArrayRef,
-    );
+  has data => (
+    is  => 'rw',
+    isa => ArrayRef,
+  );
 
 The ArrayRef type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ArrayRef
@@ -538,10 +548,10 @@ argument can not be validated.
 
 =head2 Bool
 
-    has data => (
-        is  => 'rw',
-        isa => Bool,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Bool,
+  );
 
 The Bool type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Bool> function can be
@@ -551,10 +561,10 @@ validated.
 
 =head2 ClassName
 
-    has data => (
-        is  => 'rw',
-        isa => ClassName['MyClass'],
-    );
+  has data => (
+    is  => 'rw',
+    isa => ClassName['MyClass'],
+  );
 
 The ClassName type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ClassName
@@ -564,10 +574,10 @@ argument can not be validated.
 
 =head2 CodeObj
 
-    has data => (
-        is  => 'rw',
-        isa => CodeObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => CodeObj,
+  );
 
 The CodeObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Code> object. The C<assert_CodeObj
@@ -577,10 +587,10 @@ argument can not be validated.
 
 =head2 CodeObject
 
-    has data => (
-        is  => 'rw',
-        isa => CodeObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => CodeObject,
+  );
 
 The CodeObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Code> object. The
@@ -590,10 +600,10 @@ false if the argument can not be validated.
 
 =head2 CodeRef
 
-    has data => (
-        is  => 'rw',
-        isa => CodeRef,
-    );
+  has data => (
+    is  => 'rw',
+    isa => CodeRef,
+  );
 
 The CodeRef type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_CodeRef> function
@@ -603,10 +613,10 @@ be validated.
 
 =head2 ConsumerOf
 
-    has data => (
-        is  => 'rw',
-        isa => ConsumerOf['MyRole'],
-    );
+  has data => (
+    is  => 'rw',
+    isa => ConsumerOf['MyRole'],
+  );
 
 The ConsumerOf type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ConsumerOf
@@ -616,10 +626,10 @@ the argument can not be validated.
 
 =head2 Defined
 
-    has data => (
-        is  => 'rw',
-        isa => Defined,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Defined,
+  );
 
 The Defined type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Defined> function
@@ -629,10 +639,10 @@ be validated.
 
 =head2 Dict
 
-    has data => (
-        is  => 'rw',
-        isa => Dict,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Dict,
+  );
 
 The Dict type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Dict> function can be
@@ -642,10 +652,10 @@ validated.
 
 =head2 Enum
 
-    has data => (
-        is  => 'rw',
-        isa => Enum,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Enum,
+  );
 
 The Enum type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Enum> function can be
@@ -655,10 +665,10 @@ validated.
 
 =head2 FileHandle
 
-    has data => (
-        is  => 'rw',
-        isa => FileHandle,
-    );
+  has data => (
+    is  => 'rw',
+    isa => FileHandle,
+  );
 
 The FileHandle type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_FileHandle
@@ -668,10 +678,10 @@ the argument can not be validated.
 
 =head2 FloatObj
 
-    has data => (
-        is  => 'rw',
-        isa => FloatObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => FloatObj,
+  );
 
 The FloatObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Float> object. The
@@ -681,10 +691,10 @@ if the argument can not be validated.
 
 =head2 FloatObject
 
-    has data => (
-        is  => 'rw',
-        isa => FloatObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => FloatObject,
+  );
 
 The FloatObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Float> object. The
@@ -694,10 +704,10 @@ false if the argument can not be validated.
 
 =head2 GlobRef
 
-    has data => (
-        is  => 'rw',
-        isa => GlobRef,
-    );
+  has data => (
+    is  => 'rw',
+    isa => GlobRef,
+  );
 
 The GlobRef type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_GlobRef> function
@@ -707,10 +717,10 @@ be validated.
 
 =head2 HasMethods
 
-    has data => (
-        is  => 'rw',
-        isa => HasMethods[...],
-    );
+  has data => (
+    is  => 'rw',
+    isa => HasMethods[...],
+  );
 
 The HasMethods type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_HasMethods
@@ -720,10 +730,10 @@ the argument can not be validated.
 
 =head2 HashObj
 
-    has data => (
-        is  => 'rw',
-        isa => HashObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => HashObj,
+  );
 
 The HashObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Hash> object. The C<assert_HashObj
@@ -733,10 +743,10 @@ argument can not be validated.
 
 =head2 HashObject
 
-    has data => (
-        is  => 'rw',
-        isa => HashObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => HashObject,
+  );
 
 The HashObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Hash> object. The
@@ -746,10 +756,10 @@ false if the argument can not be validated.
 
 =head2 HashRef
 
-    has data => (
-        is  => 'rw',
-        isa => HashRef,
-    );
+  has data => (
+    is  => 'rw',
+    isa => HashRef,
+  );
 
 The HashRef type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_HashRef> function
@@ -759,10 +769,10 @@ be validated.
 
 =head2 InstanceOf
 
-    has data => (
-        is  => 'rw',
-        isa => InstanceOf['MyClass'],
-    );
+  has data => (
+    is  => 'rw',
+    isa => InstanceOf['MyClass'],
+  );
 
 The InstanceOf type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_InstanceOf
@@ -772,10 +782,10 @@ the argument can not be validated.
 
 =head2 Int
 
-    has data => (
-        is  => 'rw',
-        isa => Int,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Int,
+  );
 
 The Int type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Int> function can be
@@ -785,10 +795,10 @@ validated.
 
 =head2 IntObj
 
-    has data => (
-        is  => 'rw',
-        isa => IntObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => IntObj,
+  );
 
 The IntObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Integer> object. The
@@ -798,10 +808,10 @@ the argument can not be validated.
 
 =head2 IntObject
 
-    has data => (
-        is  => 'rw',
-        isa => IntObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => IntObject,
+  );
 
 The IntObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Integer> object. The
@@ -811,10 +821,10 @@ if the argument can not be validated.
 
 =head2 IntegerObj
 
-    has data => (
-        is  => 'rw',
-        isa => IntegerObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => IntegerObj,
+  );
 
 The IntegerObj type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Integer> object. The
@@ -824,10 +834,10 @@ false if the argument can not be validated.
 
 =head2 IntegerObject
 
-    has data => (
-        is  => 'rw',
-        isa => IntegerObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => IntegerObject,
+  );
 
 The IntegerObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Integer> object. The
@@ -837,10 +847,10 @@ or false if the argument can not be validated.
 
 =head2 Item
 
-    has data => (
-        is  => 'rw',
-        isa => Item,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Item,
+  );
 
 The Item type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Item> function can be
@@ -850,10 +860,10 @@ validated.
 
 =head2 LaxNum
 
-    has data => (
-        is  => 'rw',
-        isa => LaxNum,
-    );
+  has data => (
+    is  => 'rw',
+    isa => LaxNum,
+  );
 
 The LaxNum type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_LaxNum> function
@@ -863,10 +873,10 @@ be validated.
 
 =head2 LowerCaseSimpleStr
 
-    has data => (
-        is  => 'rw',
-        isa => LowerCaseSimpleStr,
-    );
+  has data => (
+    is  => 'rw',
+    isa => LowerCaseSimpleStr,
+  );
 
 The LowerCaseSimpleStr type constraint is provided by the
 L<Types::Common::String> library. Please see that documentation for more The
@@ -877,10 +887,10 @@ information.
 
 =head2 LowerCaseStr
 
-    has data => (
-        is  => 'rw',
-        isa => LowerCaseStr,
-    );
+  has data => (
+    is  => 'rw',
+    isa => LowerCaseStr,
+  );
 
 The LowerCaseStr type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The C<assert_type
@@ -890,10 +900,10 @@ argument can not be validated.
 
 =head2 Map
 
-    has data => (
-        is  => 'rw',
-        isa => Map[Int, HashRef],
-    );
+  has data => (
+    is  => 'rw',
+    isa => Map[Int, HashRef],
+  );
 
 The Map type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Map> function can be
@@ -903,10 +913,10 @@ validated.
 
 =head2 Maybe
 
-    has data => (
-        is  => 'rw',
-        isa => Maybe,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Maybe,
+  );
 
 The Maybe type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Maybe> function can be
@@ -916,10 +926,10 @@ validated.
 
 =head2 NegativeInt
 
-    has data => (
-        is  => 'rw',
-        isa => NegativeInt,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NegativeInt,
+  );
 
 The NegativeInt type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
@@ -929,10 +939,10 @@ false if the argument can not be validated.
 
 =head2 NegativeNum
 
-    has data => (
-        is  => 'rw',
-        isa => NegativeNum,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NegativeNum,
+  );
 
 The NegativeNum type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
@@ -942,10 +952,10 @@ false if the argument can not be validated.
 
 =head2 NegativeOrZeroInt
 
-    has data => (
-        is  => 'rw',
-        isa => NegativeOrZeroInt,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NegativeOrZeroInt,
+  );
 
 The NegativeOrZeroInt type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
@@ -956,10 +966,10 @@ information.
 
 =head2 NegativeOrZeroNum
 
-    has data => (
-        is  => 'rw',
-        isa => NegativeOrZeroNum,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NegativeOrZeroNum,
+  );
 
 The NegativeOrZeroNum type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
@@ -970,10 +980,10 @@ information.
 
 =head2 NonEmptySimpleStr
 
-    has data => (
-        is  => 'rw',
-        isa => NonEmptySimpleStr,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NonEmptySimpleStr,
+  );
 
 The NonEmptySimpleStr type constraint is provided by the
 L<Types::Common::String> library. Please see that documentation for more The
@@ -984,10 +994,10 @@ information.
 
 =head2 NonEmptyStr
 
-    has data => (
-        is  => 'rw',
-        isa => NonEmptyStr,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NonEmptyStr,
+  );
 
 The NonEmptyStr type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_type> function
@@ -997,10 +1007,10 @@ validated.
 
 =head2 Num
 
-    has data => (
-        is  => 'rw',
-        isa => Num,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Num,
+  );
 
 The Num type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Num> function can be
@@ -1010,10 +1020,10 @@ validated.
 
 =head2 NumObj
 
-    has data => (
-        is  => 'rw',
-        isa => NumObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NumObj,
+  );
 
 The NumObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Number> object. The
@@ -1023,10 +1033,10 @@ the argument can not be validated.
 
 =head2 NumObject
 
-    has data => (
-        is  => 'rw',
-        isa => NumObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NumObject,
+  );
 
 The NumObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Number> object. The
@@ -1036,10 +1046,10 @@ if the argument can not be validated.
 
 =head2 NumberObj
 
-    has data => (
-        is  => 'rw',
-        isa => NumberObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NumberObj,
+  );
 
 The NumberObj type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Number> object. The
@@ -1049,10 +1059,10 @@ if the argument can not be validated.
 
 =head2 NumberObject
 
-    has data => (
-        is  => 'rw',
-        isa => NumberObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NumberObject,
+  );
 
 The NumberObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Number> object. The
@@ -1062,10 +1072,10 @@ or false if the argument can not be validated.
 
 =head2 NumericCode
 
-    has data => (
-        is  => 'rw',
-        isa => NumericCode,
-    );
+  has data => (
+    is  => 'rw',
+    isa => NumericCode,
+  );
 
 The NumericCode type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The
@@ -1075,10 +1085,10 @@ false if the argument can not be validated.
 
 =head2 Object
 
-    has data => (
-        is  => 'rw',
-        isa => Object,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Object,
+  );
 
 The Object type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Object> function
@@ -1088,10 +1098,10 @@ be validated.
 
 =head2 OptList
 
-    has data => (
-        is  => 'rw',
-        isa => OptList,
-    );
+  has data => (
+    is  => 'rw',
+    isa => OptList,
+  );
 
 The OptList type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_OptList> function
@@ -1101,10 +1111,10 @@ be validated.
 
 =head2 Optional
 
-    has data => (
-        is  => 'rw',
-        isa => Dict[id => Optional[Int]],
-    );
+  has data => (
+    is  => 'rw',
+    isa => Dict[id => Optional[Int]],
+  );
 
 The Optional type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Optional
@@ -1114,10 +1124,10 @@ argument can not be validated.
 
 =head2 Overload
 
-    has data => (
-        is  => 'rw',
-        isa => Overload,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Overload,
+  );
 
 The Overload type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Overload
@@ -1127,10 +1137,10 @@ argument can not be validated.
 
 =head2 Password
 
-    has data => (
-        is  => 'rw',
-        isa => Password,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Password,
+  );
 
 The Password type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_Password
@@ -1140,10 +1150,10 @@ argument can not be validated.
 
 =head2 PositiveInt
 
-    has data => (
-        is  => 'rw',
-        isa => PositiveInt,
-    );
+  has data => (
+    is  => 'rw',
+    isa => PositiveInt,
+  );
 
 The PositiveInt type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
@@ -1153,10 +1163,10 @@ false if the argument can not be validated.
 
 =head2 PositiveNum
 
-    has data => (
-        is  => 'rw',
-        isa => PositiveNum,
-    );
+  has data => (
+    is  => 'rw',
+    isa => PositiveNum,
+  );
 
 The PositiveNum type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
@@ -1166,10 +1176,10 @@ false if the argument can not be validated.
 
 =head2 PositiveOrZeroInt
 
-    has data => (
-        is  => 'rw',
-        isa => PositiveOrZeroInt,
-    );
+  has data => (
+    is  => 'rw',
+    isa => PositiveOrZeroInt,
+  );
 
 The PositiveOrZeroInt type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
@@ -1180,10 +1190,10 @@ information.
 
 =head2 PositiveOrZeroNum
 
-    has data => (
-        is  => 'rw',
-        isa => PositiveOrZeroNum,
-    );
+  has data => (
+    is  => 'rw',
+    isa => PositiveOrZeroNum,
+  );
 
 The PositiveOrZeroNum type constraint is provided by the
 L<Types::Common::Numeric> library. Please see that documentation for more The
@@ -1194,10 +1204,10 @@ information.
 
 =head2 Ref
 
-    has data => (
-        is  => 'rw',
-        isa => Ref['SCALAR'],
-    );
+  has data => (
+    is  => 'rw',
+    isa => Ref['SCALAR'],
+  );
 
 The Ref type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_type> function can be
@@ -1207,10 +1217,10 @@ validated.
 
 =head2 RegexpObj
 
-    has data => (
-        is  => 'rw',
-        isa => RegexpObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => RegexpObj,
+  );
 
 The RegexpObj type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Regexp> object. The
@@ -1220,10 +1230,10 @@ if the argument can not be validated.
 
 =head2 RegexpObject
 
-    has data => (
-        is  => 'rw',
-        isa => RegexpObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => RegexpObject,
+  );
 
 The RegexpObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Regexp> object. The
@@ -1233,10 +1243,10 @@ or false if the argument can not be validated.
 
 =head2 RegexpRef
 
-    has data => (
-        is  => 'rw',
-        isa => RegexpRef,
-    );
+  has data => (
+    is  => 'rw',
+    isa => RegexpRef,
+  );
 
 The RegexpRef type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_RegexpRef
@@ -1246,10 +1256,10 @@ argument can not be validated.
 
 =head2 RoleName
 
-    has data => (
-        is  => 'rw',
-        isa => RoleName,
-    );
+  has data => (
+    is  => 'rw',
+    isa => RoleName,
+  );
 
 The RoleName type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_RoleName
@@ -1259,10 +1269,10 @@ argument can not be validated.
 
 =head2 ScalarObj
 
-    has data => (
-        is  => 'rw',
-        isa => ScalarObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => ScalarObj,
+  );
 
 The ScalarObj type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Scalar> object. The
@@ -1272,10 +1282,10 @@ if the argument can not be validated.
 
 =head2 ScalarObject
 
-    has data => (
-        is  => 'rw',
-        isa => ScalarObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => ScalarObject,
+  );
 
 The ScalarObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Scalar> object. The
@@ -1285,10 +1295,10 @@ or false if the argument can not be validated.
 
 =head2 ScalarRef
 
-    has data => (
-        is  => 'rw',
-        isa => ScalarRef,
-    );
+  has data => (
+    is  => 'rw',
+    isa => ScalarRef,
+  );
 
 The ScalarRef type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_ScalarRef
@@ -1298,10 +1308,10 @@ argument can not be validated.
 
 =head2 SimpleStr
 
-    has data => (
-        is  => 'rw',
-        isa => SimpleStr,
-    );
+  has data => (
+    is  => 'rw',
+    isa => SimpleStr,
+  );
 
 The SimpleStr type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The
@@ -1311,10 +1321,10 @@ if the argument can not be validated.
 
 =head2 SingleDigit
 
-    has data => (
-        is  => 'rw',
-        isa => SingleDigit,
-    );
+  has data => (
+    is  => 'rw',
+    isa => SingleDigit,
+  );
 
 The SingleDigit type constraint is provided by the L<Types::Common::Numeric>
 library. Please see that documentation for more information. The
@@ -1324,10 +1334,10 @@ false if the argument can not be validated.
 
 =head2 Str
 
-    has data => (
-        is  => 'rw',
-        isa => Str,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Str,
+  );
 
 The Str type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Str> function can be
@@ -1337,10 +1347,10 @@ validated.
 
 =head2 StrMatch
 
-    has data => (
-        is  => 'rw',
-        isa => StrMatch,
-    );
+  has data => (
+    is  => 'rw',
+    isa => StrMatch,
+  );
 
 The StrMatch type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_StrMatch
@@ -1350,10 +1360,10 @@ argument can not be validated.
 
 =head2 StrObj
 
-    has data => (
-        is  => 'rw',
-        isa => StrObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => StrObj,
+  );
 
 The StrObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::String> object. The
@@ -1363,10 +1373,10 @@ the argument can not be validated.
 
 =head2 StrObject
 
-    has data => (
-        is  => 'rw',
-        isa => StrObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => StrObject,
+  );
 
 The StrObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::String> object. The
@@ -1376,10 +1386,10 @@ if the argument can not be validated.
 
 =head2 StrictNum
 
-    has data => (
-        is  => 'rw',
-        isa => StrictNum,
-    );
+  has data => (
+    is  => 'rw',
+    isa => StrictNum,
+  );
 
 The StrictNum type constraint is provided by the L<Types::Standard> library.
 Please see that documentation for more information. The C<assert_StrictNum
@@ -1389,10 +1399,10 @@ argument can not be validated.
 
 =head2 StringObj
 
-    has data => (
-        is  => 'rw',
-        isa => StringObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => StringObj,
+  );
 
 The StringObj type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::String> object. The
@@ -1402,10 +1412,10 @@ if the argument can not be validated.
 
 =head2 StringObject
 
-    has data => (
-        is  => 'rw',
-        isa => StringObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => StringObject,
+  );
 
 The StringObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::String> object. The
@@ -1415,10 +1425,10 @@ or false if the argument can not be validated.
 
 =head2 StrongPassword
 
-    has data => (
-        is  => 'rw',
-        isa => StrongPassword,
-    );
+  has data => (
+    is  => 'rw',
+    isa => StrongPassword,
+  );
 
 The StrongPassword type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The
@@ -1428,10 +1438,10 @@ return true or false if the argument can not be validated.
 
 =head2 Tied
 
-    has data => (
-        is  => 'rw',
-        isa => Tied['MyClass'],
-    );
+  has data => (
+    is  => 'rw',
+    isa => Tied['MyClass'],
+  );
 
 The Tied type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Tied> function can be
@@ -1441,10 +1451,10 @@ validated.
 
 =head2 Tuple
 
-    has data => (
-        is  => 'rw',
-        isa => Tuple[Int, Str, Str],
-    );
+  has data => (
+    is  => 'rw',
+    isa => Tuple[Int, Str, Str],
+  );
 
 The Tuple type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Tuple> function can be
@@ -1454,10 +1464,10 @@ validated.
 
 =head2 Undef
 
-    has data => (
-        is  => 'rw',
-        isa => Undef,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Undef,
+  );
 
 The Undef type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Undef> function can be
@@ -1467,10 +1477,10 @@ validated.
 
 =head2 UndefObj
 
-    has data => (
-        is  => 'rw',
-        isa => UndefObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => UndefObj,
+  );
 
 The UndefObj type constraint is provided by this library and accepts any object
 that is, or is derived from, a L<Data::Object::Undef> object. The
@@ -1480,10 +1490,10 @@ if the argument can not be validated.
 
 =head2 UndefObject
 
-    has data => (
-        is  => 'rw',
-        isa => UndefObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => UndefObject,
+  );
 
 The UndefObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Undef> object. The
@@ -1493,10 +1503,10 @@ false if the argument can not be validated.
 
 =head2 UniversalObj
 
-    has data => (
-        is  => 'rw',
-        isa => UniversalObj,
-    );
+  has data => (
+    is  => 'rw',
+    isa => UniversalObj,
+  );
 
 The UniversalObj type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Universal> object. The
@@ -1506,10 +1516,10 @@ or false if the argument can not be validated.
 
 =head2 UniversalObject
 
-    has data => (
-        is  => 'rw',
-        isa => UniversalObject,
-    );
+  has data => (
+    is  => 'rw',
+    isa => UniversalObject,
+  );
 
 The UniversalObject type constraint is provided by this library and accepts any
 object that is, or is derived from, a L<Data::Object::Universal> object. The
@@ -1519,10 +1529,10 @@ return true or false if the argument can not be validated.
 
 =head2 UpperCaseSimpleStr
 
-    has data => (
-        is  => 'rw',
-        isa => UpperCaseSimpleStr,
-    );
+  has data => (
+    is  => 'rw',
+    isa => UpperCaseSimpleStr,
+  );
 
 The UpperCaseSimpleStr type constraint is provided by the
 L<Types::Common::String> library. Please see that documentation for more The
@@ -1533,10 +1543,10 @@ information.
 
 =head2 UpperCaseStr
 
-    has data => (
-        is  => 'rw',
-        isa => UpperCaseStr,
-    );
+  has data => (
+    is  => 'rw',
+    isa => UpperCaseStr,
+  );
 
 The UpperCaseStr type constraint is provided by the L<Types::Common::String>
 library. Please see that documentation for more information. The C<assert_type
@@ -1546,10 +1556,10 @@ argument can not be validated.
 
 =head2 Value
 
-    has data => (
-        is  => 'rw',
-        isa => Value,
-    );
+  has data => (
+    is  => 'rw',
+    isa => Value,
+  );
 
 The Value type constraint is provided by the L<Types::Standard> library. Please
 see that documentation for more information. The C<assert_Value> function can be
@@ -1649,7 +1659,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

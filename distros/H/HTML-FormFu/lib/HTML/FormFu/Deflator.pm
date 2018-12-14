@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Deflator;
-$HTML::FormFu::Deflator::VERSION = '2.06';
+$HTML::FormFu::Deflator::VERSION = '2.07';
 # ABSTRACT: Deflator Base Class
 
 use Moose;
@@ -53,7 +53,7 @@ HTML::FormFu::Deflator - Deflator Base Class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

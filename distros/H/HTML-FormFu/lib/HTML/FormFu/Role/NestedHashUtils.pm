@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::NestedHashUtils;
-$HTML::FormFu::Role::NestedHashUtils::VERSION = '2.06';
+# ABSTRACT: role for nested hashes
+$HTML::FormFu::Role::NestedHashUtils::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Util qw( split_name );
@@ -163,11 +164,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::NestedHashUtils
+HTML::FormFu::Role::NestedHashUtils - role for nested hashes
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

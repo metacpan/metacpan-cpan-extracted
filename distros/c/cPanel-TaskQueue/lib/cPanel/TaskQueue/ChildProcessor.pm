@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::ChildProcessor;
-$cPanel::TaskQueue::ChildProcessor::VERSION = '0.901';
+$cPanel::TaskQueue::ChildProcessor::VERSION = '0.902';
 use strict;
 
 #use warnings;
@@ -35,7 +35,7 @@ use cPanel::TaskQueue::Scheduler ();
     }
 
     sub process_task {
-        my ( $self, $task, $logger ) = @_;
+        my ( $self, $task, $logger, $guard ) = @_;
         my $pid = fork();
 
         $logger->throw( q{Unable to start a child process to handle the '} . $task->command() . "' task\n" )
@@ -43,6 +43,16 @@ use cPanel::TaskQueue::Scheduler ();
 
         # Parent returns
         return $pid if $pid;
+
+        if ( !$guard ) {
+            die __PACKAGE__ . ': expected 3 arguments to process_task($task, $logger, $guard): $guard was missing';
+        }
+
+        # Now in child
+        # Ensure the child process never unlocks
+        # the lock file as this should always be done
+        # in the parent.
+        $guard->_in_child();
 
         my $timeout = $self->get_child_timeout() || $task->child_timeout();
         my $oldalarm;

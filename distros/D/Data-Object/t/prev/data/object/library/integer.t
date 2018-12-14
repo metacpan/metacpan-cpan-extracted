@@ -6,11 +6,11 @@ use Test::TypeTiny;
 
 use Data::Object qw(deduce);
 use Data::Object::Library qw(
-    IntObj
-    IntObject
-    IntegerObj
-    IntegerObject
-    Object
+  IntObj
+  IntObject
+  IntegerObj
+  IntegerObject
+  Object
 );
 
 ok_subtype Object, IntObj;
@@ -19,7 +19,7 @@ ok_subtype Object, IntegerObj;
 ok_subtype Object, IntegerObject;
 
 my $data1 = -10;
-my $data2 = deduce -10;
+my $data2 = deduce - 10;
 
 should_fail($data1, IntObj);
 should_pass($data2, IntObj);

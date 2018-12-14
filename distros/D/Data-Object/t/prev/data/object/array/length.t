@@ -8,16 +8,16 @@ can_ok 'Data::Object::Array', 'length';
 use Scalar::Util 'refaddr';
 
 subtest 'test the length method' => sub {
-    my $array = Data::Object::Array->new([1..5]);
+  my $array = Data::Object::Array->new([1 .. 5]);
 
-    my @argument = ();
-    my $length = $array->length(@argument);
+  my @argument = ();
+  my $length   = $array->length(@argument);
 
-    isnt refaddr($array), refaddr($length);
-    is $length, 5;
+  isnt refaddr($array), refaddr($length);
+  is $length, 5;
 
-    isa_ok $array, 'Data::Object::Array';
-    isa_ok $length, 'Data::Object::Number';
+  isa_ok $array,  'Data::Object::Array';
+  isa_ok $length, 'Data::Object::Number';
 };
 
 ok 1 and done_testing;

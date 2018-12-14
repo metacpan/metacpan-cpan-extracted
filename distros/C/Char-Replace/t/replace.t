@@ -66,4 +66,16 @@ is $got, $expect, "need to grow the string" or diag ":$got:\n", ":$expect:\n";
     is Char::Replace::replace( $str, \@MAP ), $str, q[check string with \0];
 }
 
+{
+    note "preserve utf8 state of a string";
+    @MAP = @{ Char::Replace::identity_map() };
+    $MAP[ ord('h') ] = 'H';
+    $MAP[ ord('l') ] = 'LL';
+
+    is Char::Replace::replace( q[hello], \@MAP ), q[HeLLLLo], q[hello];
+
+    is Char::Replace::replace( q[héllò], \@MAP ), q[HéLLLLò], q[héllò];
+
+}
+
 done_testing;

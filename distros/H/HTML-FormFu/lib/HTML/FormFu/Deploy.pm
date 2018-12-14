@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Deploy;
-$HTML::FormFu::Deploy::VERSION = '2.06';
+# ABSTRACT: deploy project
+$HTML::FormFu::Deploy::VERSION = '2.07';
 use warnings;
 
 use HTML::FormFu::Constants qw( $EMPTY_STR );
@@ -118,11 +119,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Deploy
+HTML::FormFu::Deploy - deploy project
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

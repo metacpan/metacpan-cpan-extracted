@@ -3,10 +3,8 @@ use Test::Kwalitee qw< kwalitee_ok >;
 use strict;
 use warnings;
 
-BEGIN {
-	$ENV{RELEASE_TESTING}
-		or plan skip_all => 'these tests are for release candidate testing'
-}
+$ENV{RELEASE_TESTING} or
+    plan skip_all => q{no $RELEASE_TESTING (Author tests not required for installation)};
 
-kwalitee_ok;
+kwalitee_ok -use_strict;
 done_testing;

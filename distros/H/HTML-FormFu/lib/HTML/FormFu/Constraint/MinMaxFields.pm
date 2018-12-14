@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::MinMaxFields;
-$HTML::FormFu::Constraint::MinMaxFields::VERSION = '2.06';
+$HTML::FormFu::Constraint::MinMaxFields::VERSION = '2.07';
 # ABSTRACT: Min/Max Multi-field Constraint
 
 use Moose;
@@ -115,7 +115,7 @@ HTML::FormFu::Constraint::MinMaxFields - Min/Max Multi-field Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

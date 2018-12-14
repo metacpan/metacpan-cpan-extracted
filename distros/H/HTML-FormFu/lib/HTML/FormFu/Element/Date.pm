@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Date;
-$HTML::FormFu::Element::Date::VERSION = '2.06';
+$HTML::FormFu::Element::Date::VERSION = '2.07';
 # ABSTRACT: 3 select menu multi-field
 
 use Moose;
@@ -504,7 +504,7 @@ HTML::FormFu::Element::Date - 3 select menu multi-field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Block;
-$HTML::FormFu::Element::Block::VERSION = '2.06';
+$HTML::FormFu::Element::Block::VERSION = '2.07';
 # ABSTRACT: Block element
 
 use Moose;
@@ -274,7 +274,7 @@ HTML::FormFu::Element::Block - Block element
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -6,9 +6,9 @@ use Test::TypeTiny;
 
 use Data::Object qw(deduce);
 use Data::Object::Library qw(
-    ScalarObj
-    ScalarObject
-    Object
+  ScalarObj
+  ScalarObject
+  Object
 );
 
 ok_subtype Object, ScalarObj;

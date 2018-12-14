@@ -30,11 +30,12 @@ my %WriteMakefileArgs = (
     "Class::Load" => 0,
     "Test::CheckManifest" => "0.9",
     "Test::Kwalitee" => "1.27",
+    "Test::Kwalitee::Extra" => "0.4.0",
     "Test::Pod" => "1.22",
     "Test::Pod::Coverage" => "1.08",
     "Test::Simple" => "1.302120"
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "Path::Tiny" => "0.0104",
   "Test::CheckManifest" => "0.9",
   "Test::Kwalitee" => "1.27",
+  "Test::Kwalitee::Extra" => "0.4.0",
   "Test::Pod" => "1.22",
   "Test::Pod::Coverage" => "1.08",
   "Test::Simple" => "1.302120",

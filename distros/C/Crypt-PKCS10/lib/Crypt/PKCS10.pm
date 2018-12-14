@@ -22,7 +22,7 @@ use Encode ();
 use MIME::Base64;
 use Scalar::Util ();
 
-our $VERSION = 1.8002_01;
+our $VERSION = '2.001';
 
 my $apiVersion = undef;  # 0 for compatibility.  1 for prefered
 my $error;
@@ -427,7 +427,7 @@ sub error {
     return $error;
 }
 
-my $pemre = qr/(?ms:^\r?-----BEGIN\s(?:NEW\s)?CERTIFICATE\sREQUEST-----\r?\n\s*(.*?)\s*^\r?-----END\s(?:NEW\s)?CERTIFICATE\sREQUEST-----\r?$)/;
+my $pemre = qr/(?ms:^\r?-----BEGIN\s(?:NEW\s)?CERTIFICATE\sREQUEST-----\s*\r?\n\s*(.*?)\s*^\r?-----END\s(?:NEW\s)?CERTIFICATE\sREQUEST-----\r?$)/;
 
 sub _new {
     my( $class, $die, $der ) = splice( @_, 0, 3 );
@@ -1560,24 +1560,22 @@ sub checkSignature {
         # Verify signature using the correct module and hash type.
 
         if( $keyp->{keytype} eq 'RSA' ) {
-            eval { require Crypt::OpenSSL::RSA; };
-            die( "Unable to load Crypt::OpenSSL::RSA\n") if( $@ );
 
-            $key = Crypt::OpenSSL::RSA->new_public_key( $key );
-            $hash = "use_${hash}_hash";
-            eval { $key->$hash; };
-            die( "Unsupported hash type $hash\n" ) if( $@ );
-            $key->use_pkcs1_padding;
-            return $key->verify( $self->certificationRequest, $sig );
+            eval { require Crypt::PK::RSA; };
+            die( "Unable to load Crypt::PK::RSA\n" ) if( $@ );
+
+            $key = Crypt::PK::RSA->new( \$key );
+            return $key->verify_message( $sig, $self->certificationRequest, uc($hash),  "v1.5" );
+
         }
 
         if( $keyp->{keytype} eq 'DSA' ) {
-            eval { require Crypt::OpenSSL::DSA; };
-            die( "Unable to load Crypt::OpenSSL::DSA\n" ) if( $@ );
-            eval "require $hashmod" or die( "Unable to load $hashmod\n" ); ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
-            my $dsa = Crypt::OpenSSL::DSA->read_pub_key_str( $key );
-            return $dsa->verify( eval "$hashfcn( \$self->certificationRequest )", $sig ); ## no critic (BuiltinFunctions::ProhibitStringyEval)
+            eval { require Crypt::PK::DSA; };
+            die( "Unable to load Crypt::PK::DSA\n" ) if( $@ );
+
+            $key = Crypt::PK::DSA->new( \$key );
+            return $key->verify_message( $sig, $self->certificationRequest, uc($hash) );
         }
 
         if( $keyp->{keytype} eq 'ECC' ) {
@@ -1736,43 +1734,9 @@ sub __stringify {
 
 __END__
 
+=encoding utf-8
+
 =pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Crypt::PKCS10 - parse PKCS #10 certificate requests
-
-=head1 VERSION
-
-version 1.800201
-
-=head1 SYNOPSIS
-
-    use Crypt::PKCS10;
-
-    Crypt::PKCS10->setAPIversion( 1 );
-    my $decoded = Crypt::PKCS10->new( $csr ) or die Crypt::PKCS10->error;
-
-    print $decoded;
-
-    @names = $decoded->extensionValue('subjectAltName' );
-    @names = $decoded->subject unless( @names );
-
-    %extensions = map { $_ => $decoded->extensionValue( $_ ) } $decoded->extensions
-
-=head1 DESCRIPTION
-
-C<Crypt::PKCS10> parses PKCS #10 certificate requests (CSRs) and provides accessor methods to extract the data in usable form.
-
-Common object identifiers will be translated to their corresponding names.
-Additionally, accessor methods allow extraction of single data fields.
-The format of returned data varies by accessor.
-
-The access methods return the value corresponding to their name.  If called in scalar context, they return the first value (or an empty string).  If called in array context, they return all values.
-
-B<true> values should be specified as 1 and B<false> values as 0.  Future API changes may provide different functions when other values are used.
 
 =begin :readme
 
@@ -1815,8 +1779,8 @@ F<Changes> describes additional improvements.  Details follow.
 
 C<Crypt::PKCS10> supports DSA, RSA and ECC public keys in CSRs.
 
-It depends on C<Crypt::OpenSSL::DSA>, C<Crypt::OpenSSL::RSA> and C<Crypt::PK::ECC>
-for some operations.  All are recommended.  Some methods will return errors if
+It depends on C<Crypt::PK::*> (provided by CryptX) for some operations.
+All are recommended. Some methods will return errors if
 Crypt::PKCS10 is presented with a CSR containing an unsupported public key type.
 
 To install this module type the following:
@@ -1830,19 +1794,43 @@ To install this module type the following:
 
 C<Convert::ASN1>
 
-C<Crypt::OpenSSL::DSA>
+C<Crypt::PK::DSA>
 
-C<Crypt::OpenSSL::RSA>
+C<Crypt::PK::RSA>
 
 C<Crypt::PK::ECC>
 
 C<Digest::SHA>
 
-For ECC: C<Crypt::PK::ECC>
-
 Very old CSRs may require C<DIGEST::MD{5,4,2}>
 
 =end :readme
+
+=head1 SYNOPSIS
+
+    use Crypt::PKCS10;
+
+    Crypt::PKCS10->setAPIversion( 1 );
+    my $decoded = Crypt::PKCS10->new( $csr ) or die Crypt::PKCS10->error;
+
+    print $decoded;
+
+    @names = $decoded->extensionValue('subjectAltName' );
+    @names = $decoded->subject unless( @names );
+
+    %extensions = map { $_ => $decoded->extensionValue( $_ ) } $decoded->extensions
+
+=head1 DESCRIPTION
+
+C<Crypt::PKCS10> parses PKCS #10 certificate requests (CSRs) and provides accessor methods to extract the data in usable form.
+
+Common object identifiers will be translated to their corresponding names.
+Additionally, accessor methods allow extraction of single data fields.
+The format of returned data varies by accessor.
+
+The access methods return the value corresponding to their name.  If called in scalar context, they return the first value (or an empty string).  If called in array context, they return all values.
+
+B<true> values should be specified as 1 and B<false> values as 0.  Future API changes may provide different functions when other values are used.
 
 =head1 METHODS
 
@@ -1884,6 +1872,8 @@ In a future release, the warning will be changed to a fatal exception.
 To ease migration, both old and new names are accepted by the API.
 
 Every program should call C<setAPIversion(1)>.
+
+=cut
 
 =head2 class method getAPIversion
 
@@ -1988,6 +1978,8 @@ If B<true>, the CSR's signature is checked.  If verification fails, C<new> will 
 If B<false>, the CSR's signature is not checked.
 
 The default is B<true> for API version 1 and B<false> for API version 0.
+
+See C<checkSignature> for requirements and limitations.
 
 =back
 
@@ -2206,6 +2198,7 @@ In array context, the value(s) are returned as a list of items, which may be ref
  print( " $_: ", scalar $decoded->attributes($_), "\n" )
                                    foreach ($decoded->attributes);
 
+
 =for readme stop
 
 See the I<Table of known OID names> below for a list of names.
@@ -2230,6 +2223,7 @@ The names vary depending on the API version; however, the returned names are acc
 The values of extensions vary, however the following code fragment will dump most extensions and their value(s).
 
  print( "$_: ", $decoded->extensionValue($_,1), "\n" ) foreach ($decoded->extensions);
+
 
 The sample code fragment is not guaranteed to handle all cases.
 Production code needs to select the extensions that it understands and should respect
@@ -2319,6 +2313,7 @@ To register a shortname for an existing OID without one, specify C<$longname> as
 E.g. To register /E for emailAddress, use:
   C<< Crypt::PKCS10->registerOID( '1.2.840.113549.1.9.1', undef, 'e' ) >>
 
+
 Generates an exception if any argument is not valid, or is in use.
 
 Returns B<true> otherwise.
@@ -2334,6 +2329,10 @@ the reason.
 
 Returns B<undef> if it was not possible to complete the verification process (e.g. a required
 Perl module could not be loaded or an unsupported key/signature type is present.)
+
+I<Note>: Requires Crypt::PK::* for the used algorithm to be installed. For RSA
+v1.5 padding is assumed, PSS is not supported (validation fails).
+
 
 =head2 certificateTemplate
 
@@ -2351,8 +2350,12 @@ structures, and as names by methods such as B<extensionValue>.
 Unknown OIDs are returned in numeric form, or can be registered with
 B<registerOID>.
 
-=for MAINTAINER  To generate the following table, use:
+=begin MAINTAINER
+
+ To generate the following table, use:
     perl -Mwarnings -Mstrict -MCrypt::PKCS10 -e'Crypt::PKCS10->_listOIDs'
+
+=end MAINTAINER
 
  OID                        Name (API v1)              Old Name (API v0)
  -------------------------- -------------------------- ---------------------------
@@ -2540,38 +2543,13 @@ C<Crypt::PKCS10> is based on the generic ASN.1 module by Graham Barr and on the
  x509decode example by Norbert Klasen. It is also based upon the
 works of Duncan Segrest's C<Crypt-X509-CRL> module.
 
-=for readme start
-
-
 =head1 AUTHORS
 
-=over 4
-
-=item *
-
 Gideon Knocke <gknocke@cpan.org>
-
-=item *
-
 Timothe Litt <tlhackque@cpan.org>
 
-=back
+=head1 LICENSE
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014, 2016 by Gideon Knocke, Timothe Litt.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUG REPORTS
-
-Please report any bugs or feature requests on the bugtracker website
-https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-PKCS10 or by email
-to bug-crypt-pkcs10@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+GPL v1 -- See LICENSE file for details
 
 =cut

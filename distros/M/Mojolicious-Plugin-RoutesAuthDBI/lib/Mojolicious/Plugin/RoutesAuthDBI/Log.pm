@@ -5,7 +5,8 @@ use Mojo::Util qw(decode url_unescape);
 
 #~ use constant  PKG => __PACKAGE__;
 
-has [qw(app plugin model)];
+has [qw(app plugin)], undef, weak=>1;
+has qw(model);
 
 has hook => sub {
   my $self = shift;
@@ -27,6 +28,10 @@ sub new {
 sub log {
   my ($self, $c) = @_;
   my $conf = $self->plugin->merge_conf;
+  
+  return
+    if $conf->{log}{skip_static} && $c->stash->{'mojo.static'};
+  
   my $auth_helper = $conf->{auth}{current_user_fn};
   my $u = $c->$auth_helper || ($self->plugin->guest && $self->plugin->guest->current($c))
     or return;
@@ -81,6 +86,10 @@ String, default to 'Guest' (this module).
 =head2 disabled
 
 Boolean, disable logging.
+
+=head2 skip_static
+
+Boolean. True then log non-static routes only. Default false.
 
 =head2 tables
 

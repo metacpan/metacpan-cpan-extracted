@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Number;
-$HTML::FormFu::Constraint::Number::VERSION = '2.06';
+$HTML::FormFu::Constraint::Number::VERSION = '2.07';
 # ABSTRACT: Numerical Constraint
 
 use Moose;
@@ -35,7 +35,7 @@ HTML::FormFu::Constraint::Number - Numerical Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

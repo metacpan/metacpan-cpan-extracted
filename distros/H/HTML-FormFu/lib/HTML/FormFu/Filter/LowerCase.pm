@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::LowerCase;
-$HTML::FormFu::Filter::LowerCase::VERSION = '2.06';
+$HTML::FormFu::Filter::LowerCase::VERSION = '2.07';
 # ABSTRACT: filter transforming to lower case
 
 use Moose;
@@ -31,7 +31,7 @@ HTML::FormFu::Filter::LowerCase - filter transforming to lower case
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

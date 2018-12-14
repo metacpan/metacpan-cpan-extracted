@@ -1,0 +1,289 @@
+#!/usr/bin/perl
+# vim: ft=perl:fdm=marker:fmr=#<,#>:fen:et:sw=2:
+package App::makedist;
+
+use strict;
+use warnings FATAL => 'all';
+use vars     qw($VERSION);
+use autodie  qw(:all);
+
+#< init
+
+$VERSION = '0.016';
+
+sub usage {
+  pod2usage(
+    msg => "makedist v$VERSION\n",
+    verbose => 1,
+    exitval => 0,
+  );
+}
+
+
+use Cwd;
+use Pod::Usage;
+use File::Basename      qw(basename);
+use File::LsColor       qw(ls_color);
+use Term::ExtendedColor qw(fg bg bold);
+use Getopt::Long;
+use Module::Extract::VERSION;
+use File::Find::Rule;
+
+my $opt_verbose  = 0;
+my $opt_noconfig = 0;
+
+GetOptions(
+  'noconfig'  => \$opt_noconfig,
+  'v|verbose' => \$opt_verbose,
+  'h|help'    => \&usage,
+);
+#>
+
+my $MANIFEST = './MANIFEST';
+
+my @files_in_dist;
+
+# load config file
+our $command_on_success;
+our $finished_product;
+config_init() unless $opt_noconfig;
+
+
+# First we need to make sure that all files that's listed in the MANIFEST
+# actually exists.
+verify_manifest();
+
+# File-LsColor-0.308.tar.gz
+# App-makedist-0.002.tar.gz
+my $tarball = build_filename();
+
+
+system('tar', 'czf', $tarball, @files_in_dist);
+if($? == 0) {
+  printf("- Distribution created: %s\n", ls_color($tarball)) if $opt_verbose;
+
+  # all good, execute code from config if defined
+  # let the config have the value of $tarball as a variable
+  $finished_product = $tarball;
+  if(defined($command_on_success)) {
+    $command_on_success->();
+  }
+}
+
+
+sub build_filename { #<
+  my $file;
+  my $rule = File::Find::Rule->new;
+  $rule->file;
+  $rule->name(qr/[.]pm$/);
+
+  # try to get $VERSION from a perl module if it exists
+  $file = ($rule->in(getcwd()))[0];
+
+  # and resort to anything in bin/ directory if it fails
+  if(!$file) {
+    $file = (glob('./bin/*'))[0];
+  }
+
+  # no lib/**/*.pm and no bin/*, rip :(
+  die "Can not find any suitable files!\n" if not defined $file;
+
+  printf("- Getting \$VERSION from %s...\n",ls_color(basename($file))) if $opt_verbose;
+  my $dist = get_package_name($file);
+
+  printf("- Getting distribution name from %s...\n", ls_color(basename($file))) if $opt_verbose;
+  my $version = scalar Module::Extract::VERSION->parse_version_safely($file);
+
+  printf("  Looks like %s %s\n", bold(fg(214, $dist)), bold($version)) if $opt_verbose;
+
+  my $dist_name = sprintf("%s-%s.tar.gz", $dist, $version);
+  return $dist_name;
+}
+#>
+
+sub get_package_name { #<
+  my $file = shift;
+  my $package;
+
+  open(my $fh, '<', $file) or die "Can't open '$file': $!\n";
+  while(<$fh>) {
+    chomp;
+
+    # package File::LsColor;
+    # XXX Fix regex, this isn't good
+    if($_ =~ m/^package\s+(.+);/) {
+      $package = $1;
+      $package =~ s/::/-/g;
+      last;
+    }
+  }
+
+  # if we can't figure out a package name, the dist probably isn't a perl
+  # module, so we use the basename of the current working directory and apply the
+  # App- prefix
+
+  # File-LsColor-0.132.tar.gz
+  # App-makedist-0.012.tar.gz
+  return (defined $package ? $package : 'App-' . basename(getcwd()));
+}
+#>
+
+sub verify_manifest { #<
+  open(my $fh, '<', $MANIFEST) or die "Can't open '$MANIFEST': aborting\n";
+  print "- Checking file integrity...\n" if $opt_verbose;
+  while(<$fh>) {
+    chomp;
+
+    # sometimes the MANIFEST contains things like
+    # MANIFEST\t\t\t this list of files
+
+    s/MANIFEST.+$/MANIFEST/;
+
+    if(-e $_) {
+      print '   ' . ok($_) if $opt_verbose;
+      push(@files_in_dist, $_);
+    }
+    else {
+      printf("%s %s from MANIFEST. Aborting.\n", bold($_), bg('red1', 'MISSING'));
+      exit;
+    }
+  }
+  if($opt_verbose) {
+    print "  All files in MANIFEST present!\n";
+    printf("  %d files to be added to distribution.\n", scalar @files_in_dist);
+  }
+}
+#>
+
+
+
+sub config_init { #< config
+  my $config;
+  if(-f "$ENV{XDG_CONFIG_HOME}/makedist/makedist.conf") {
+    $config = "$ENV{XDG_CONFIG_HOME}/makedist/makedist.conf";
+  }
+  elsif(-f "$ENV{HOME}/.makedist.conf") {
+    $config = "$ENV{HOME}/.makedist.conf";
+  }
+  else {
+    print "makedist: no configuratino file found.\n";
+  }
+  require($config);
+  warn "$@" if $@;
+}
+#>
+
+
+sub ok {
+  my $str = shift;
+  return sprintf("%4s %s\n", fg('greenyellow', 'OK'), ls_color($str));
+}
+
+
+
+
+__END__
+
+
+=pod
+
+=head1 NAME
+
+makedist - make cpan distribution
+
+=head1 USAGE
+
+    makedist [OPTIONS]
+
+=head1 DESCRIPTION
+
+makedist automates the process of creating a distribution to be
+uploaded to CPAN.
+
+The MANIFEST file is inspected for files to be included.
+
+We make an attempt to extract the package name from any perl module
+file found, and the package name must follow this convention:
+
+    package File::LsColor;
+
+If extraction fails, we use the basename of the current working
+directory as a distribution name:
+
+    ~/dev/makedist  => App-makedist
+
+Version number is extracted from a perl module file if it exists, else
+an App:: distribution is assumed and version is extracted from the bin/
+directory.
+
+
+=head1 CONFIGURATION
+
+makedist looks for a configuration file in the following locations, in
+order of precedence:
+
+  $XDG_CONFIG_HOME/makedist/makedist.conf
+  $HOME/.makedist.conf
+
+Various options can be set in the makedist.conf configuration file.
+
+By default, two variables can be accessed and modified in the
+configuration file:
+
+    # the basename of the gzipped tarball, i.e File-LsColor-0.192.tar.gz
+    $finished_product
+
+    # code to execute on success. A few examples are provided in the
+    # configuration file.
+    $command_on_success
+
+The author uses the $command_on_success coderef like this:
+
+    our $command_on_success = sub {
+      copy();   # copy the dist to a local dir
+      scp();    # scp the dist to a remote server
+      upload(); # upload the dist to cpan
+    }
+
+An example configuration file is provided with this distribution.
+
+
+=head1 OPTIONS
+
+        --noconfig skip config file
+
+    -v, --verbose explain what is being done
+    -h, --help    show this help and exit
+
+=head1 REPORTING BUGS
+
+Report bugs and/or feature requests on L<https://github.com/trapd00r/makedist>,
+the repository issue tracker or directly to L<m@japh.se>
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  m@japh.se
+  http://japh.se
+  http://github.com/trapd00r
+
+=head1 CONTRIBUTORS
+
+None required yet.
+
+=head1 COPYRIGHT
+
+Copyright 2018 B<THIS APPLICATION>s L</AUTHOR> and L</CONTRIBUTORS> as listed
+above.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<~/|http://japh.se>
+
+=cut

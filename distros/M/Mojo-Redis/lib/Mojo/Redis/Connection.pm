@@ -23,16 +23,17 @@ sub disconnect {
   my $self = shift;
   $self->_reject_queue;
   $self->{stream}->close if $self->{stream};
+  $self->{gone_away} = 1;
   return $self;
 }
 
-sub is_connected { shift->{stream} ? 1 : 0 }
+sub is_connected { $_[0]->{stream} && !$_[0]->{gone_away} ? 1 : 0 }
 
 sub write_p {
   my $self = shift;
   my $p = Mojo::Promise->new(ioloop => $self->ioloop);
   $self->write_q(@_, $p);
-  $self->{stream} ? $self->_write : $self->_connect;
+  $self->is_connected ? $self->_write : $self->_connect;
   return $p;
 }
 
@@ -54,6 +55,9 @@ sub _encode {
 sub _connect {
   my $self = shift;
   return $self if $self->{id};    # Connecting
+
+  # Cannot reuse a connection because of transaction state and other state
+  return $self->_reject_queue('Redis server has gone away') if $self->{gone_away};
 
   my $url = $self->{master_url} || $self->url;
   return $self->_discover_master if !$self->{master_url} and $url->query->param('sentinel');
@@ -83,7 +87,7 @@ sub _connect {
     }
   );
 
-  warn "[@{[$self->_id]}] CONNECTING $url (blocking=@{[$self->_loop_is_singleton ? 0 : 1]})\n" if DEBUG;
+  warn "[@{[$self->_id]}] CONNECTING $url (blocking=@{[$self->_is_blocking]})\n" if DEBUG;
   return $self;
 }
 
@@ -136,13 +140,13 @@ sub _discover_master {
     }
   );
 
-  warn "[@{[$self->_id]}] SENTINEL DISCOVERY $url (blocking=@{[$self->_loop_is_singleton ? 0 : 1]})\n" if DEBUG;
+  warn "[@{[$self->_id]}] SENTINEL DISCOVERY $url (blocking=@{[$self->_is_blocking]})\n" if DEBUG;
   return $self;
 }
 
 sub _id { $_[0]->{id} || '0' }
 
-sub _loop_is_singleton { shift->ioloop eq Mojo::IOLoop->singleton }
+sub _is_blocking { shift->ioloop eq Mojo::IOLoop->singleton ? 0 : 1 }
 
 sub _on_close_cb {
   my $self = shift;
@@ -152,6 +156,7 @@ sub _on_close_cb {
     return unless $self;
     my ($stream, $err) = @_;
     delete $self->{$_} for qw(id stream);
+    $self->{gone_away} = 1;
     $self->_reject_queue($err);
     $self->emit('close') if @_ == 1;
     warn qq([@{[$self->_id]}] @{[$err ? "ERROR $err" : "CLOSED"]}\n) if DEBUG;
@@ -218,6 +223,7 @@ sub _reject_queue {
   state $default = 'Premature connection close';
   for my $p (@{delete $self->{waiting} || []}) { $p      and $p->reject($err      || $default) }
   for my $i (@{delete $self->{write}   || []}) { $i->[1] and $i->[1]->reject($err || $default) }
+  return $self;
 }
 
 sub _write {

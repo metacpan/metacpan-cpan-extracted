@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::QueryType::CGI;
-$HTML::FormFu::QueryType::CGI::VERSION = '2.06';
+$HTML::FormFu::QueryType::CGI::VERSION = '2.07';
 # ABSTRACT: uploaded file
 
 use Moose;
@@ -75,7 +75,7 @@ HTML::FormFu::QueryType::CGI - uploaded file
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 METHODS
 

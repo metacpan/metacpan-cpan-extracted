@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Constants;
-$HTML::FormFu::Constants::VERSION = '2.06';
+# ABSTRACT: FormFU constants EMPTY_STR and SPACE
+$HTML::FormFu::Constants::VERSION = '2.07';
 use warnings;
 
 use Readonly;
@@ -25,11 +26,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Constants
+HTML::FormFu::Constants - FormFU constants EMPTY_STR and SPACE
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

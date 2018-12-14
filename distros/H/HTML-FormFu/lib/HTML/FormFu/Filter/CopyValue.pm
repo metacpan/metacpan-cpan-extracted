@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::CopyValue;
-$HTML::FormFu::Filter::CopyValue::VERSION = '2.06';
+$HTML::FormFu::Filter::CopyValue::VERSION = '2.07';
 # ABSTRACT: copy the value from another field
 
 use Moose;
@@ -46,7 +46,7 @@ HTML::FormFu::Filter::CopyValue - copy the value from another field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -16,7 +16,7 @@ use FindBin qw/$Bin/;
 use File::Find qw/find/;
 use Term::ANSIColor;
 
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 my $GOOD     = colored('GOOD', 'green');
 my $BAD      = colored('BAD ', 'red');
@@ -252,7 +252,7 @@ chkfacl - Uses the whole hierarchy of a file to check that it can be read by the
 
 =head1 VERSION
 
-This documentation refers to chkfacl version 0.4.
+This documentation refers to chkfacl version 0.5.
 
 =head1 SYNOPSIS
 

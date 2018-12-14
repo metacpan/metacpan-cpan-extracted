@@ -23,4 +23,9 @@ is $link->html,
   qq(<a class="le-link" href="http://%3Cscript%3Eevil(%22code%22)%3C/script%3E" title="">http://&lt;script&gt;evil(&quot;code&quot;)&lt;/script&gt;</a>\n),
   'evil html';
 
+$link = undef;
+$embedder->get('mailto:jhthorsen@cpan.org', sub { $link = $_[1]; Mojo::IOLoop->stop });
+Mojo::IOLoop->start;
+is $link->error->{message}, 'Could not find LinkEmbedder::Link::Mailto', 'get()';
+
 done_testing;

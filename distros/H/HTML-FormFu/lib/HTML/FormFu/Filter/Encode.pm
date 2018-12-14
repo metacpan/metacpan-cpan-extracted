@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::Encode;
-$HTML::FormFu::Filter::Encode::VERSION = '2.06';
+$HTML::FormFu::Filter::Encode::VERSION = '2.07';
 # ABSTRACT: Encode/Decode Submitted Values
 
 use Moose;
@@ -98,7 +98,7 @@ HTML::FormFu::Filter::Encode - Encode/Decode Submitted Values
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

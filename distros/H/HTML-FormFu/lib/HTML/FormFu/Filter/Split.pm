@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::Split;
-$HTML::FormFu::Filter::Split::VERSION = '2.06';
+$HTML::FormFu::Filter::Split::VERSION = '2.07';
 # ABSTRACT: filter splitting a singe value into an arrayref
 
 use Moose;
@@ -44,7 +44,7 @@ HTML::FormFu::Filter::Split - filter splitting a singe value into an arrayref
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

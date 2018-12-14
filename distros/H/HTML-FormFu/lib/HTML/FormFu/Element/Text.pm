@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Text;
-$HTML::FormFu::Element::Text::VERSION = '2.06';
+$HTML::FormFu::Element::Text::VERSION = '2.07';
 # ABSTRACT: Text form field
 
 use Moose;
@@ -34,7 +34,7 @@ HTML::FormFu::Element::Text - Text form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

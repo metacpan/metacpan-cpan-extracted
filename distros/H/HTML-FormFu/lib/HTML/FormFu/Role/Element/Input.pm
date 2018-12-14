@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Role::Element::Input;
-$HTML::FormFu::Role::Element::Input::VERSION = '2.06';
+$HTML::FormFu::Role::Element::Input::VERSION = '2.07';
 # ABSTRACT: Role for input fields
 
 use Moose::Role;
@@ -201,10 +201,8 @@ around render_data_non_recursive => sub {
     my ( $orig, $self, $args ) = @_;
 
     my $render = $self->$orig(
-        {   field_type                 => $self->field_type,
-            placeholder                => $self->placeholder,
-            error_attributes           => xml_escape( $self->error_attributes ),
-            error_container_attributes => xml_escape( $self->error_attributes ),
+        {   field_type  => $self->field_type,
+            placeholder => $self->placeholder,
             $args ? %$args : (),
         } );
 
@@ -282,7 +280,7 @@ HTML::FormFu::Role::Element::Input - Role for input fields
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

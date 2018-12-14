@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::OutputProcessor::Indent;
-$HTML::FormFu::OutputProcessor::Indent::VERSION = '2.06';
+$HTML::FormFu::OutputProcessor::Indent::VERSION = '2.07';
 # ABSTRACT: Nicely Indent HTML Output
 
 use Moose;
@@ -113,7 +113,7 @@ HTML::FormFu::OutputProcessor::Indent - Nicely Indent HTML Output
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

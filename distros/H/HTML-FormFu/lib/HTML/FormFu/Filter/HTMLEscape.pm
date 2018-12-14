@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::HTMLEscape;
-$HTML::FormFu::Filter::HTMLEscape::VERSION = '2.06';
+$HTML::FormFu::Filter::HTMLEscape::VERSION = '2.07';
 # ABSTRACT: filter escaping HTML
 
 use Moose;
@@ -36,7 +36,7 @@ HTML::FormFu::Filter::HTMLEscape - filter escaping HTML
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

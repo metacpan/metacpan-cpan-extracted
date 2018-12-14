@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Util;
-$HTML::FormFu::Util::VERSION = '2.06';
+# ABSTRACT: various utilities
+$HTML::FormFu::Util::VERSION = '2.07';
 use warnings;
 
 use HTML::FormFu::Constants qw( $SPACE );
@@ -577,11 +578,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Util
+HTML::FormFu::Util - various utilities
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

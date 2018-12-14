@@ -1,5 +1,5 @@
 package ZMQ::Raw::Z85;
-$ZMQ::Raw::Z85::VERSION = '0.27';
+$ZMQ::Raw::Z85::VERSION = '0.28';
 use strict;
 use warnings;
 use ZMQ::Raw;
@@ -10,7 +10,7 @@ ZMQ::Raw::Z85 - ZeroMQ Z85 methods
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::FormAndElementMethods;
-$HTML::FormFu::Role::FormAndElementMethods::VERSION = '2.06';
+# ABSTRACT: role for form and element methods
+$HTML::FormFu::Role::FormAndElementMethods::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Attribute qw(
@@ -336,11 +337,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::FormAndElementMethods
+HTML::FormFu::Role::FormAndElementMethods - role for form and element methods
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

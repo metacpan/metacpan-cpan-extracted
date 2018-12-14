@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Upload;
-$HTML::FormFu::Upload::VERSION = '2.06';
+$HTML::FormFu::Upload::VERSION = '2.07';
 # ABSTRACT: uploaded file
 
 use Moose;
@@ -63,7 +63,7 @@ HTML::FormFu::Upload - uploaded file
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

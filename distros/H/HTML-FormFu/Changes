@@ -1,3 +1,9 @@
+2.07      2018-12-14 15:55:00+00:00 UTC
+
+    - Fix handling or error_attributes & error_container_attributes
+
+    - Allow pre_process() plugins to replace query() object
+
 2.06      2018-04-09 20:23:54+00:00 UTC
 
     - New JSON Constraint

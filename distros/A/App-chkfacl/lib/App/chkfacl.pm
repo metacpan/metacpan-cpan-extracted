@@ -12,7 +12,7 @@ use Carp;
 use English qw/ -no_match_vars /;
 use base qw/Exporter/;
 
-our $VERSION = 0.4;
+our $VERSION = 0.5;
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -26,7 +26,7 @@ App::chkfacl - Uses the whole hierarchy of a file to check that it can be read b
 
 =head1 VERSION
 
-This documentation refers to chkfacl version 0.4.
+This documentation refers to chkfacl version 0.5.
 
 =head1 SYNOPSIS
 

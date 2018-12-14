@@ -1,6 +1,12 @@
 Revision history for Term::TablePrint
 
 
+0.106   2018-12-14
+        - Bugfix in "single-row-print".
+
+0.105   2018-12-14
+        - Bugfix in "single-row-print": don't skipp columns with empty cells.
+
 0.104   2018-12-09
         - Bugfix in regexp.
         - New option: 'decimal_separator'.

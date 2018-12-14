@@ -7,7 +7,9 @@ use Scalar::Util 'weaken';
 
 my %DICT_CACHE = ();# для каждого пакета/модуля
 
-has [qw(dbh dict template_vars mt)];
+has [qw(dbh dict)], undef, weak=>1;
+has [qw(template_vars mt)];
+
 has dbi_cache_st => 1; # 1 - use DBI caching and 0 overvise this module caching
 
 has debug => $ENV{DEBUG_DBIx_Mojo_Model} || 0;
@@ -25,7 +27,7 @@ sub new {
   
   $self->dbh($singleton->dbh)
     unless $self->dbh;
-  weaken $self->{dbh};
+  #~ weaken $self->{dbh};
     
   $self->template_vars(merge($self->template_vars || {}, $singleton->template_vars))
     #~ and weaken $self->{template_vars}
@@ -42,7 +44,7 @@ sub new {
   
   $self->dict( $DICT_CACHE{$class} ||= DBIx::Mojo::Template->new($class, mt => $self->mt, vars => $self->template_vars, $data_files ? (data => $data_files) : (), ) )
     unless $self->dict;
-  weaken $self->{dict};
+  #~ weaken $self->{dict};
   
   $self->debug
     && say STDERR "[DEBUG $PKG new] parsed dict keys [@{[keys %{$self->dict}]}] for class [$class]";

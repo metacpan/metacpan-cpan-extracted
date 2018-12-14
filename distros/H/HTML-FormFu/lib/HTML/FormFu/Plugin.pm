@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Plugin;
-$HTML::FormFu::Plugin::VERSION = '2.06';
+$HTML::FormFu::Plugin::VERSION = '2.07';
 # ABSTRACT: base class for plugins
 
 use Moose;
@@ -47,7 +47,7 @@ HTML::FormFu::Plugin - base class for plugins
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head2 DESCRIPTION
 

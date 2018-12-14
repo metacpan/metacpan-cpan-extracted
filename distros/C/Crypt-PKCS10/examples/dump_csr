@@ -30,8 +30,6 @@ use Crypt::PKCS10;
 use File::Slurp;
 use Getopt::Std;
 
-our $VERSION = '1.0';
-
 our( $opt_l );
 
 getopts( 'l' );

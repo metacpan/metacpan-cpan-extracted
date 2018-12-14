@@ -1,5 +1,8 @@
 Revision history for Perl extension HTTP::Any.
 
+0.10  2018-11-14
+	- HTTP/2 for curl
+
 0.09  2018-11-10
 	- Protocol
 

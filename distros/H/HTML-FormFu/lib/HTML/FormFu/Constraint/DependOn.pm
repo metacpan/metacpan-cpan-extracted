@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::DependOn;
-$HTML::FormFu::Constraint::DependOn::VERSION = '2.06';
+$HTML::FormFu::Constraint::DependOn::VERSION = '2.07';
 # ABSTRACT: Multi-field Dependency Constraint
 
 use Moose;
@@ -95,7 +95,7 @@ HTML::FormFu::Constraint::DependOn - Multi-field Dependency Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

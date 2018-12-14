@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Deflator::Strftime;
-$HTML::FormFu::Deflator::Strftime::VERSION = '2.06';
+$HTML::FormFu::Deflator::Strftime::VERSION = '2.07';
 # ABSTRACT: Strftime deflator
 
 use Moose;
@@ -46,7 +46,7 @@ HTML::FormFu::Deflator::Strftime - Strftime deflator
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

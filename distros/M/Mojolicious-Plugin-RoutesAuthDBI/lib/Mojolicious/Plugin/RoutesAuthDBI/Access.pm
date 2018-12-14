@@ -4,8 +4,10 @@ use Exporter 'import';
 our @EXPORT_OK = qw(load_user validate_user);
 use Mojolicious::Plugin::RoutesAuthDBI::Util qw(load_class);
 use Mojo::Util qw(md5_sum);
+#~ use Mojo::Exception;
 
-has [qw(app plugin)];
+has [qw(app plugin)], undef, weak=>1;
+has qw(model);
 
 #~ has model_profiles => sub { shift->plugin->model('Profiles') };
 #~ has model => sub {
@@ -21,14 +23,17 @@ sub load_user {# import for Mojolicious::Plugin::Authentication
   
   my $p = load_class("Mojolicious::Plugin::RoutesAuthDBI::Model::Profiles")->get_profile($uid, undef);
   #~ my $p = $c->model_profiles->get_profile($uid, undef);
-  if ($p->{id}) {
-    $c->app->log->debug("Loading profile by id=$uid success");
-    $p->{pass} = '**********************';
-    return $p;
-  }
-  $c->app->log->debug("Loading profile by id=$uid failed");
   
-  return undef;
+  $c->app->log->debug("Loading profile by id=$uid failed")
+    and return undef
+    unless $p && $p->{id};
+    
+  #~ eval { Mojo::Exception->throw('load_user') };
+  #~ $c->app->log->debug($c->dumper($_)) for @{$@->frames};
+  
+  $c->app->log->debug("Loading profile by id=$uid success");
+  $p->{pass} = '**********************';
+  return $p;
 }
 
 sub validate_user {# import for Mojolicious::Plugin::Authentication

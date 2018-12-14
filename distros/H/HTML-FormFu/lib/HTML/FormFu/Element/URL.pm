@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::URL;
-$HTML::FormFu::Element::URL::VERSION = '2.06';
+$HTML::FormFu::Element::URL::VERSION = '2.07';
 # ABSTRACT: HTML5 URL form field
 
 use Moose;
@@ -93,7 +93,7 @@ HTML::FormFu::Element::URL - HTML5 URL form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

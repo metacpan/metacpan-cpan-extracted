@@ -98,7 +98,7 @@ $redis->{pid} = -1;
 isnt $redis->db->connection, $conn, 'new fork gets a new connecion';
 undef $conn;
 $redis->{pid} = $$;
-$conn = $redis->_blocking_connection;
+$conn         = $redis->_blocking_connection;
 $redis->{pid} = -1;
 isnt $redis->_blocking_connection, $conn, 'new fork gets a new blocking connection';
 undef $conn;
@@ -120,8 +120,14 @@ my $host = $redis->url->host;
 $db = $redis->db;
 $db->get_p($0)->catch(sub { $err = shift })->wait;    # Make sure we are connected
 $redis->url->host($host =~ /[a-z]/ ? inet_ntoa(inet_aton $host) : gethostbyaddr(inet_aton($host), AF_INET));
-diag 'Changed host to ' . $redis->url->host;
+note 'Changed host to ' . $redis->url->host;
 $db = undef;
 is @{$redis->{queue}}, 0, 'database was not enqued' or diag $err;
+
+note 'Blocking connection';
+$db = $redis->db;
+isnt $db->connection(1)->ioloop, Mojo::IOLoop->singleton, 'blocking connection';
+isnt $db->connection(1)->ioloop, $db->connection(0)->ioloop,
+  'blocking connection does not share non-blocking connection ioloop';
 
 done_testing;

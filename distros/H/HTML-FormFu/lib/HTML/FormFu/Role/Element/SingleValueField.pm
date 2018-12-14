@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::Element::SingleValueField;
-$HTML::FormFu::Role::Element::SingleValueField::VERSION = '2.06';
+# ABSTRACT: role for single value fields
+$HTML::FormFu::Role::Element::SingleValueField::VERSION = '2.07';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -300,11 +301,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::Element::SingleValueField
+HTML::FormFu::Role::Element::SingleValueField - role for single value fields
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

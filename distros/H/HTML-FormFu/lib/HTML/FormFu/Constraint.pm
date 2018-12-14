@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint;
-$HTML::FormFu::Constraint::VERSION = '2.06';
+$HTML::FormFu::Constraint::VERSION = '2.07';
 # ABSTRACT: Constrain User Input
 
 use Moose;
@@ -358,7 +358,7 @@ HTML::FormFu::Constraint - Constrain User Input
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

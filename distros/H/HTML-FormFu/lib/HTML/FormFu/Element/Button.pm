@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Button;
-$HTML::FormFu::Element::Button::VERSION = '2.06';
+$HTML::FormFu::Element::Button::VERSION = '2.07';
 # ABSTRACT: Button form field
 
 use Moose;
@@ -35,7 +35,7 @@ HTML::FormFu::Element::Button - Button form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

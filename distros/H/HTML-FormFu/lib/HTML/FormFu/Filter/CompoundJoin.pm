@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::CompoundJoin;
-$HTML::FormFu::Filter::CompoundJoin::VERSION = '2.06';
+$HTML::FormFu::Filter::CompoundJoin::VERSION = '2.07';
 # ABSTRACT: CompoundJoin filter
 
 use Moose;
@@ -49,7 +49,7 @@ HTML::FormFu::Filter::CompoundJoin - CompoundJoin filter
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

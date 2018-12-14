@@ -13,7 +13,7 @@ HTML::FormFu::Manual::Cookbook - Cooking with HTML::FormFu
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

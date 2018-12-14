@@ -14,73 +14,70 @@ use Scalar::Util;
 
 use Data::Dumper ();
 
-use overload (
-    '""'     => 'data',
-    '~~'     => 'data',
-    fallback => 1,
-);
+use overload ('""' => 'data', '~~' => 'data', fallback => 1,);
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
-has file       => ( is => 'ro' );
-has line       => ( is => 'ro' );
-has message    => ( is => 'ro' );
-has object     => ( is => 'ro' );
-has package    => ( is => 'ro' );
-has subroutine => ( is => 'ro' );
+has file       => (is => 'ro');
+has line       => (is => 'ro');
+has message    => (is => 'ro');
+has object     => (is => 'ro');
+has package    => (is => 'ro');
+has subroutine => (is => 'ro');
 
-around BUILDARGS => fun ($orig, $self, @args) {
+around BUILDARGS => fun($orig, $self, @args) {
 
-    unshift @args, (ref $args[0] ? 'object' : 'message') if @args == 1;
+  unshift @args, (ref $args[0] ? 'object' : 'message') if @args == 1;
 
-    return $self->$orig(@args);
+  return $self->$orig(@args);
 
 };
 
 method catch ($object) {
 
-    my $class = ref $self;
+  my $class = ref $self;
 
-    return UNIVERSAL::isa($object, $class);
+  return UNIVERSAL::isa($object, $class);
 
 }
 
 method data () {
 
-    my $class   = ref $self;
-    my $file    = $self->file;
-    my $line    = $self->line;
-    my $default = $self->message;
-    my $object  = $self->object;
+  my $class   = ref $self;
+  my $file    = $self->file;
+  my $line    = $self->line;
+  my $default = $self->message;
+  my $object  = $self->object;
 
-    my $objref  = overload::StrVal($object) if $object;
-    my $message = $default || "An exception ($class) was thrown";
-    my @with    = join " ", "with", $objref if $objref and not $default;
+  my $objref = overload::StrVal($object) if $object;
+  my $message = $default || "An exception ($class) was thrown";
+  my @with = join " ", "with", $objref if $objref and not $default;
 
-    return join(" ", $message, @with, "in $file at line $line") . "\n";
+  return join(" ", $message, @with, "in $file at line $line") . "\n";
 
 }
 
 method dump () {
 
-    local $Data::Dumper::Terse = 1;
+  local $Data::Dumper::Terse = 1;
 
-    return Data::Dumper::Dumper($self);
+  return Data::Dumper::Dumper($self);
 
 }
 
 method throw (Any @args) {
 
-    my $class  = ref $self || $self || __PACKAGE__;
+  my $class = ref $self || $self || __PACKAGE__;
 
-    unshift @args, (ref $args[0] ? 'object' : 'message') if @args == 1;
+  unshift @args, (ref $args[0] ? 'object' : 'message') if @args == 1;
 
-    die $class->new(ref $self ? (%$self) : (), @args,
-        file       => (caller(0))[1],
-        line       => (caller(0))[2],
-        package    => (caller(0))[0],
-        subroutine => (caller(0))[3],
-    );
+  die $class->new(
+    ref $self ? (%$self) : (), @args,
+    file       => (caller(0))[1],
+    line       => (caller(0))[2],
+    package    => (caller(0))[0],
+    subroutine => (caller(0))[3],
+  );
 
 }
 
@@ -98,15 +95,15 @@ Data::Object::Exception - Exception Object for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Exception;
+  use Data::Object::Exception;
 
-    my $exception = Data::Object::Exception->new;
+  my $exception = Data::Object::Exception->new;
 
-    $exception->throw('Something went wrong');
+  $exception->throw('Something went wrong');
 
 =head1 DESCRIPTION
 
@@ -117,29 +114,29 @@ catching, and introspecting generic exception objects.
 
 =head2 catch
 
-    $exception->catch;
+  $exception->catch;
 
 The catch method returns true if the argument is the same type of object as the
 invocant.
 
 =head2 data
 
-    # given $exception
+  # given $exception
 
-    $exception->data; # original value
+  $exception->data; # original value
 
 The data method returns the original and underlying value contained by the
 object. This method is an alias to the detract method.
 
 =head2 dump
 
-    $exception->dump;
+  $exception->dump;
 
 The dump method returns a stringified version of the exception object.
 
 =head2 throw
 
-    $exception->throw;
+  $exception->throw;
 
 The throw method terminates the program using the core die keyword, passing the
 exception object as the only argument.
@@ -236,7 +233,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

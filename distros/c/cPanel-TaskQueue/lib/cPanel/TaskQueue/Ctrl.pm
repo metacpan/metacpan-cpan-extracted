@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Ctrl;
-$cPanel::TaskQueue::Ctrl::VERSION = '0.901';
+$cPanel::TaskQueue::Ctrl::VERSION = '0.902';
 use warnings;
 use strict;
 

@@ -1,0 +1,60 @@
+{
+   "abstract" : "automake a distribution for upload to cpan",
+   "author" : [
+      "Magnus Woldrich <m@japh.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-makedist",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "File::Basename" : "0",
+            "File::Find::Rule" : "0",
+            "File::LsColor" : "0",
+            "Module::Extract::VERSION" : "0",
+            "Term::ExtendedColor" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::makedist" : {
+         "file" : "bin/makedist"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trapd00r/makedist/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/trapd00r/makedist"
+      }
+   },
+   "version" : "0.016",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

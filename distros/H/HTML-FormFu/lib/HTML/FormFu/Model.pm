@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Model;
-$HTML::FormFu::Model::VERSION = '2.06';
+$HTML::FormFu::Model::VERSION = '2.07';
 # ABSTRACT: base class for models
 
 use Moose;
@@ -54,7 +54,7 @@ HTML::FormFu::Model - base class for models
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SEE ALSO
 

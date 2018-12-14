@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::ContainsElements;
-$HTML::FormFu::Role::ContainsElements::VERSION = '2.06';
+# ABSTRACT: Role for contained elements and fields
+$HTML::FormFu::Role::ContainsElements::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Util qw(
@@ -161,11 +162,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::ContainsElements
+HTML::FormFu::Role::ContainsElements - Role for contained elements and fields
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

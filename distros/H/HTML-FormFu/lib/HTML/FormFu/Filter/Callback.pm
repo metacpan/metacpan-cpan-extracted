@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::Callback;
-$HTML::FormFu::Filter::Callback::VERSION = '2.06';
+$HTML::FormFu::Filter::Callback::VERSION = '2.07';
 # ABSTRACT: filter with custom subroutine
 
 use Moose;
@@ -37,7 +37,7 @@ HTML::FormFu::Filter::Callback - filter with custom subroutine
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

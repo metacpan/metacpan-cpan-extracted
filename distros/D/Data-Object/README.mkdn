@@ -4,7 +4,7 @@ Data::Object - Object Orientation for Perl 5
 
 # VERSION
 
-version 0.59
+version 0.60
 
 # SYNOPSIS
 
@@ -215,11 +215,11 @@ type of data provided.
     $deep = deduce_deep {1,2,3,{4,5,6,[-1]}};
 
     # Data::Object::Hash {
-    #     1 => Data::Object::Number ( 2 ),
-    #     3 => Data::Object::Hash {
-    #          4 => Data::Object::Number ( 5 ),
-    #          6 => Data::Object::Array [ Data::Object::Integer ( -1 ) ],
-    #     },
+    #   1 => Data::Object::Number ( 2 ),
+    #   3 => Data::Object::Hash {
+    #      4 => Data::Object::Number ( 5 ),
+    #      6 => Data::Object::Array [ Data::Object::Integer ( -1 ) ],
+    #   },
     # }
 
 The deduce\_deep function returns a data type object. If the data provided is
@@ -252,11 +252,11 @@ reference of the data type object provided.
     my $revert = detract_deep $object; # produces ...
 
     # {
-    #     '1' => 2,
-    #     '3' => {
-    #         '4' => 5,
-    #         '6' => [ -1, 99, bless({}, 'main'), sub { ... } ]
-    #       }
+    #   '1' => 2,
+    #   '3' => {
+    #     '4' => 5,
+    #     '6' => [ -1, 99, bless({}, 'main'), sub { ... } ]
+    #     }
     # }
 
 The detract\_deep function returns a value of native type. If the data provided
@@ -340,11 +340,16 @@ function takes all arguments accepted by the [Data::Object::Exception](https://m
 
 # AUTHOR
 
-Al Newkirk &lt;anewkirk@ana.io>
+Al Newkirk <anewkirk@ana.io>
+
+# CONTRIBUTORS
+
+- Al Newkirk <al@iamalnewkirk.com>
+- Anthony Brummett <abrummet@genome.wustl.edu>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

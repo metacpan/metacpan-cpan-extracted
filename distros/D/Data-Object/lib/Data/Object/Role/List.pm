@@ -13,8 +13,8 @@ use Data::Object::Signatures;
 use Scalar::Util;
 
 map with($_), our @ROLES = qw(
-    Data::Object::Role::Comparison
-    Data::Object::Role::Output
+  Data::Object::Role::Comparison
+  Data::Object::Role::Output
 );
 
 requires 'grep';
@@ -28,7 +28,7 @@ requires 'sort';
 requires 'tail';
 requires 'values';
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 1;
 
@@ -44,13 +44,13 @@ Data::Object::Role::List - List Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::List';
+  with 'Data::Object::Role::List';
 
 =head1 DESCRIPTION
 
@@ -207,13 +207,15 @@ L<Data::Object::Signatures>
 
 =back
 
+=cut
+
 =head1 AUTHOR
 
 Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

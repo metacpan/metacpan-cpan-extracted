@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu;
-$HTML::FormFu::VERSION = '2.06';
+$HTML::FormFu::VERSION = '2.07';
 # ABSTRACT: HTML Form Creation, Rendering and Validation Framework
 
 use Moose;
@@ -282,6 +282,8 @@ sub process {
     }
 
     my $submitted;
+    # refetch query in-case anything in pre_process/process changed it
+    $query = $self->query;
 
     if ( defined $query ) {
         eval { my @params = $query->param };
@@ -1227,7 +1229,7 @@ HTML::FormFu - HTML Form Creation, Rendering and Validation Framework
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

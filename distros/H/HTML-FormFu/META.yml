@@ -33,508 +33,508 @@ no_index:
 provides:
   HTML::FormFu:
     file: lib/HTML/FormFu.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Attribute:
     file: lib/HTML/FormFu/Attribute.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constants:
     file: lib/HTML/FormFu/Constants.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint:
     file: lib/HTML/FormFu/Constraint.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::ASCII:
     file: lib/HTML/FormFu/Constraint/ASCII.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::AllOrNone:
     file: lib/HTML/FormFu/Constraint/AllOrNone.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::AutoSet:
     file: lib/HTML/FormFu/Constraint/AutoSet.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Bool:
     file: lib/HTML/FormFu/Constraint/Bool.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Callback:
     file: lib/HTML/FormFu/Constraint/Callback.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::CallbackOnce:
     file: lib/HTML/FormFu/Constraint/CallbackOnce.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::DateTime:
     file: lib/HTML/FormFu/Constraint/DateTime.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::DependOn:
     file: lib/HTML/FormFu/Constraint/DependOn.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Email:
     file: lib/HTML/FormFu/Constraint/Email.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Equal:
     file: lib/HTML/FormFu/Constraint/Equal.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::File:
     file: lib/HTML/FormFu/Constraint/File.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::File::MIME:
     file: lib/HTML/FormFu/Constraint/File/MIME.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::File::MaxSize:
     file: lib/HTML/FormFu/Constraint/File/MaxSize.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::File::MinSize:
     file: lib/HTML/FormFu/Constraint/File/MinSize.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::File::Size:
     file: lib/HTML/FormFu/Constraint/File/Size.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Integer:
     file: lib/HTML/FormFu/Constraint/Integer.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::JSON:
     file: lib/HTML/FormFu/Constraint/JSON.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Length:
     file: lib/HTML/FormFu/Constraint/Length.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::MaxLength:
     file: lib/HTML/FormFu/Constraint/MaxLength.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::MaxRange:
     file: lib/HTML/FormFu/Constraint/MaxRange.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::MinLength:
     file: lib/HTML/FormFu/Constraint/MinLength.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::MinMaxFields:
     file: lib/HTML/FormFu/Constraint/MinMaxFields.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::MinRange:
     file: lib/HTML/FormFu/Constraint/MinRange.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Number:
     file: lib/HTML/FormFu/Constraint/Number.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Printable:
     file: lib/HTML/FormFu/Constraint/Printable.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Range:
     file: lib/HTML/FormFu/Constraint/Range.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Regex:
     file: lib/HTML/FormFu/Constraint/Regex.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Repeatable::Any:
     file: lib/HTML/FormFu/Constraint/Repeatable/Any.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Required:
     file: lib/HTML/FormFu/Constraint/Required.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Set:
     file: lib/HTML/FormFu/Constraint/Set.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::SingleValue:
     file: lib/HTML/FormFu/Constraint/SingleValue.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Constraint::Word:
     file: lib/HTML/FormFu/Constraint/Word.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deflator:
     file: lib/HTML/FormFu/Deflator.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deflator::Callback:
     file: lib/HTML/FormFu/Deflator/Callback.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deflator::CompoundDateTime:
     file: lib/HTML/FormFu/Deflator/CompoundDateTime.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deflator::CompoundSplit:
     file: lib/HTML/FormFu/Deflator/CompoundSplit.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deflator::FormatNumber:
     file: lib/HTML/FormFu/Deflator/FormatNumber.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deflator::PathClassFile:
     file: lib/HTML/FormFu/Deflator/PathClassFile.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deflator::Strftime:
     file: lib/HTML/FormFu/Deflator/Strftime.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Deploy:
     file: lib/HTML/FormFu/Deploy.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element:
     file: lib/HTML/FormFu/Element.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Blank:
     file: lib/HTML/FormFu/Element/Blank.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Block:
     file: lib/HTML/FormFu/Element/Block.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Button:
     file: lib/HTML/FormFu/Element/Button.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Checkbox:
     file: lib/HTML/FormFu/Element/Checkbox.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Checkboxgroup:
     file: lib/HTML/FormFu/Element/Checkboxgroup.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::ComboBox:
     file: lib/HTML/FormFu/Element/ComboBox.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::ContentButton:
     file: lib/HTML/FormFu/Element/ContentButton.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Date:
     file: lib/HTML/FormFu/Element/Date.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::DateTime:
     file: lib/HTML/FormFu/Element/DateTime.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Email:
     file: lib/HTML/FormFu/Element/Email.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Fieldset:
     file: lib/HTML/FormFu/Element/Fieldset.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::File:
     file: lib/HTML/FormFu/Element/File.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Hidden:
     file: lib/HTML/FormFu/Element/Hidden.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Hr:
     file: lib/HTML/FormFu/Element/Hr.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Image:
     file: lib/HTML/FormFu/Element/Image.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Label:
     file: lib/HTML/FormFu/Element/Label.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Multi:
     file: lib/HTML/FormFu/Element/Multi.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Number:
     file: lib/HTML/FormFu/Element/Number.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Password:
     file: lib/HTML/FormFu/Element/Password.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Radio:
     file: lib/HTML/FormFu/Element/Radio.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Radiogroup:
     file: lib/HTML/FormFu/Element/Radiogroup.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Repeatable:
     file: lib/HTML/FormFu/Element/Repeatable.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Reset:
     file: lib/HTML/FormFu/Element/Reset.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Select:
     file: lib/HTML/FormFu/Element/Select.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::SimpleTable:
     file: lib/HTML/FormFu/Element/SimpleTable.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Src:
     file: lib/HTML/FormFu/Element/Src.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Submit:
     file: lib/HTML/FormFu/Element/Submit.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Text:
     file: lib/HTML/FormFu/Element/Text.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::Textarea:
     file: lib/HTML/FormFu/Element/Textarea.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Element::URL:
     file: lib/HTML/FormFu/Element/URL.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Exception:
     file: lib/HTML/FormFu/Exception.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Exception::Constraint:
     file: lib/HTML/FormFu/Exception/Constraint.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Exception::Inflator:
     file: lib/HTML/FormFu/Exception/Inflator.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Exception::Input:
     file: lib/HTML/FormFu/Exception/Input.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Exception::Transformer:
     file: lib/HTML/FormFu/Exception/Transformer.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Exception::Validator:
     file: lib/HTML/FormFu/Exception/Validator.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::FakeQuery:
     file: lib/HTML/FormFu/FakeQuery.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter:
     file: lib/HTML/FormFu/Filter.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::Callback:
     file: lib/HTML/FormFu/Filter/Callback.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::CompoundJoin:
     file: lib/HTML/FormFu/Filter/CompoundJoin.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::CompoundSprintf:
     file: lib/HTML/FormFu/Filter/CompoundSprintf.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::CopyValue:
     file: lib/HTML/FormFu/Filter/CopyValue.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::Encode:
     file: lib/HTML/FormFu/Filter/Encode.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::ForceListValue:
     file: lib/HTML/FormFu/Filter/ForceListValue.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::FormatNumber:
     file: lib/HTML/FormFu/Filter/FormatNumber.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::HTMLEscape:
     file: lib/HTML/FormFu/Filter/HTMLEscape.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::HTMLScrubber:
     file: lib/HTML/FormFu/Filter/HTMLScrubber.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::LowerCase:
     file: lib/HTML/FormFu/Filter/LowerCase.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::NonNumeric:
     file: lib/HTML/FormFu/Filter/NonNumeric.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::Regex:
     file: lib/HTML/FormFu/Filter/Regex.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::Split:
     file: lib/HTML/FormFu/Filter/Split.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::TrimEdges:
     file: lib/HTML/FormFu/Filter/TrimEdges.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::UpperCase:
     file: lib/HTML/FormFu/Filter/UpperCase.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Filter::Whitespace:
     file: lib/HTML/FormFu/Filter/Whitespace.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N:
     file: lib/HTML/FormFu/I18N.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::bg:
     file: lib/HTML/FormFu/I18N/bg.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::cs:
     file: lib/HTML/FormFu/I18N/cs.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::da:
     file: lib/HTML/FormFu/I18N/da.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::de:
     file: lib/HTML/FormFu/I18N/de.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::en:
     file: lib/HTML/FormFu/I18N/en.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::es:
     file: lib/HTML/FormFu/I18N/es.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::fr:
     file: lib/HTML/FormFu/I18N/fr.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::hu:
     file: lib/HTML/FormFu/I18N/hu.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::it:
     file: lib/HTML/FormFu/I18N/it.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::ja:
     file: lib/HTML/FormFu/I18N/ja.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::no:
     file: lib/HTML/FormFu/I18N/no.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::pt_br:
     file: lib/HTML/FormFu/I18N/pt_br.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::pt_pt:
     file: lib/HTML/FormFu/I18N/pt_pt.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::ro:
     file: lib/HTML/FormFu/I18N/ro.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::ru:
     file: lib/HTML/FormFu/I18N/ru.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::tr:
     file: lib/HTML/FormFu/I18N/tr.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::ua:
     file: lib/HTML/FormFu/I18N/ua.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::I18N::zh_cn:
     file: lib/HTML/FormFu/I18N/zh_cn.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Inflator:
     file: lib/HTML/FormFu/Inflator.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Inflator::Callback:
     file: lib/HTML/FormFu/Inflator/Callback.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Inflator::CompoundDateTime:
     file: lib/HTML/FormFu/Inflator/CompoundDateTime.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Inflator::DateTime:
     file: lib/HTML/FormFu/Inflator/DateTime.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Literal:
     file: lib/HTML/FormFu/Literal.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Localize:
     file: lib/HTML/FormFu/Localize.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Model:
     file: lib/HTML/FormFu/Model.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Model::HashRef:
     file: lib/HTML/FormFu/Model/HashRef.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::ObjectUtil:
     file: lib/HTML/FormFu/ObjectUtil.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::OutputProcessor:
     file: lib/HTML/FormFu/OutputProcessor.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::OutputProcessor::Indent:
     file: lib/HTML/FormFu/OutputProcessor/Indent.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::OutputProcessor::StripWhitespace:
     file: lib/HTML/FormFu/OutputProcessor/StripWhitespace.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Plugin:
     file: lib/HTML/FormFu/Plugin.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Plugin::StashValid:
     file: lib/HTML/FormFu/Plugin/StashValid.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Preload:
     file: lib/HTML/FormFu/Preload.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Processor:
     file: lib/HTML/FormFu/Processor.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::QueryType::CGI:
     file: lib/HTML/FormFu/QueryType/CGI.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::QueryType::CGI::Simple:
     file: lib/HTML/FormFu/QueryType/CGI/Simple.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::QueryType::Catalyst:
     file: lib/HTML/FormFu/QueryType/Catalyst.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Constraint::Others:
     file: lib/HTML/FormFu/Role/Constraint/Others.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::ContainsElements:
     file: lib/HTML/FormFu/Role/ContainsElements.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::ContainsElementsSharedWithField:
     file: lib/HTML/FormFu/Role/ContainsElementsSharedWithField.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::CreateChildren:
     file: lib/HTML/FormFu/Role/CreateChildren.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::CustomRoles:
     file: lib/HTML/FormFu/Role/CustomRoles.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::Coercible:
     file: lib/HTML/FormFu/Role/Element/Coercible.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::Field:
     file: lib/HTML/FormFu/Role/Element/Field.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::FieldMethods:
     file: lib/HTML/FormFu/Role/Element/FieldMethods.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::Group:
     file: lib/HTML/FormFu/Role/Element/Group.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::Input:
     file: lib/HTML/FormFu/Role/Element/Input.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::Layout:
     file: lib/HTML/FormFu/Role/Element/Layout.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::MultiElement:
     file: lib/HTML/FormFu/Role/Element/MultiElement.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::NonBlock:
     file: lib/HTML/FormFu/Role/Element/NonBlock.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::ProcessOptionsFromModel:
     file: lib/HTML/FormFu/Role/Element/ProcessOptionsFromModel.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Element::SingleValueField:
     file: lib/HTML/FormFu/Role/Element/SingleValueField.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Filter::Compound:
     file: lib/HTML/FormFu/Role/Filter/Compound.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::FormAndBlockMethods:
     file: lib/HTML/FormFu/Role/FormAndBlockMethods.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::FormAndElementMethods:
     file: lib/HTML/FormFu/Role/FormAndElementMethods.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::FormBlockAndFieldMethods:
     file: lib/HTML/FormFu/Role/FormBlockAndFieldMethods.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::GetProcessors:
     file: lib/HTML/FormFu/Role/GetProcessors.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::HasParent:
     file: lib/HTML/FormFu/Role/HasParent.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::NestedHashUtils:
     file: lib/HTML/FormFu/Role/NestedHashUtils.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Populate:
     file: lib/HTML/FormFu/Role/Populate.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Role::Render:
     file: lib/HTML/FormFu/Role/Render.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Transformer:
     file: lib/HTML/FormFu/Transformer.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Transformer::Callback:
     file: lib/HTML/FormFu/Transformer/Callback.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Upload:
     file: lib/HTML/FormFu/Upload.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::UploadParam:
     file: lib/HTML/FormFu/UploadParam.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Util:
     file: lib/HTML/FormFu/Util.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Validator:
     file: lib/HTML/FormFu/Validator.pm
-    version: '2.06'
+    version: '2.07'
   HTML::FormFu::Validator::Callback:
     file: lib/HTML/FormFu/Validator/Callback.pm
-    version: '2.06'
+    version: '2.07'
 requires:
   Carp: '0'
   Class::MOP::Method: '0'
@@ -584,7 +584,7 @@ requires:
 resources:
   homepage: https://github.com/FormFu/HTML-FormFu
   repository: https://github.com/FormFu/HTML-FormFu.git
-version: '2.06'
+version: '2.07'
 x_Dist_Zilla:
   perl:
     version: '5.014004'
@@ -930,7 +930,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.06
+          tag: v2.07
           tag_format: v%v%t
           tag_message: 'v%v%t - %d'
         Dist::Zilla::Role::Git::Repo:

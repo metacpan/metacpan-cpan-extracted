@@ -1,6 +1,6 @@
 package Method::ParamValidator::Exception::InvalidParameterDataStructure;
 
-$Method::ParamValidator::Exception::InvalidParameterDataStructure::VERSION   = '0.14';
+$Method::ParamValidator::Exception::InvalidParameterDataStructure::VERSION   = '0.15';
 $Method::ParamValidator::Exception::InvalidParameterDatastructure::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Exception::InvalidParameterDataStructure - Handles 'inva
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 

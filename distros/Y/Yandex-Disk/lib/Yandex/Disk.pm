@@ -12,18 +12,21 @@ use File::Basename;
 use URI::Escape;
 use Encode;
 use IO::Socket::SSL;
+use Term::Sk;
 
-our $VERSION    = '0.04';
+our $VERSION    = '0.05';
 
 my $WAIT_RETRY  = 20;
-my $BUFF_SIZE = 8192;
+#my $BUFF_SIZE   = 8192;
+my $BUFF_SIZE   = 81;
 
 sub new {
-    my $class       = shift;
-    my %opt         = @_;
-    my $self        = {};
-    $self->{token}  = $opt{-token} || croak "Specify -token param";
-    my $ua          = LWP::UserAgent->new;
+    my $class                   = shift;
+    my %opt                     = @_;
+    my $self                    = {};
+    $self->{token}              = $opt{-token} || croak "Specify -token param";
+
+    my $ua                      = LWP::UserAgent->new;
     $ua->agent("Yandex::Disk perl module");
     $ua->default_header('Accept' => 'application/json');
     $ua->default_header('Content-Type'  => 'application/json');
@@ -48,11 +51,13 @@ sub getDiskInfo {
 }
 
 sub uploadFile {
-    my $self        = shift;
-    my %opt         = @_;
-    my $overwrite   = $opt{-overwrite};
-    my $file        = $opt{-file} || croak "Specify -file param";
-    my $remote_path = $opt{-remote_path} || croak "Specify -remote_path param";
+    my $self                = shift;
+    my %opt                 = @_;
+    my $overwrite           = $opt{-overwrite};
+    my $file                = $opt{-file} || croak "Specify -file param";
+    my $remote_path         = $opt{-remote_path} || croak "Specify -remote_path param";
+    my $show_progress_bar   = $opt{-show_progress_bar};
+
     $overwrite = 1 if not defined $overwrite;
 
     if (not -f $file) {
@@ -79,7 +84,14 @@ sub uploadFile {
         croak "Cant uploadFile: " . $res->status_line;
     }
     
-    my $upl_code = __upload_file($url_to_upload, $file);
+    # Progress bar if need
+    my $term;
+    if ($show_progress_bar) {
+        $term = __prepareProgressBar(-s $file);
+    }
+
+    my $upl_code = __upload_file($url_to_upload, $file, $term);
+
     if ($upl_code ne '201') {
         croak "Cant upload file. Code: $code";
     }
@@ -145,19 +157,31 @@ sub deleteResource {
 }
 
 sub downloadFile {
-    my $self = shift;
-    my %opt = @_;
-    my $path = $opt{-path} || croak "Specify -path param";
-    my $file = $opt{-file} || croak "Specify -file param";
+    my $self                = shift;
+    my %opt                 = @_;
+    my $path                = $opt{-path} || croak "Specify -path param";
+    my $file                = $opt{-file} || croak "Specify -file param";
+    my $show_progress_bar   = $opt{-show_progress_bar};
 
     my $res = $self->__request('https://cloud-api.yandex.net/v1/disk/resources/download?path=' . uri_escape($path), "GET");
     my $code = $res->code;
     if ($code ne '200') {
         croak "Error on request file $path: " . $res->status_line;
     }
+
     my $download_url = __fromJson($res->decoded_content)->{href};
 
-    $self->__download($download_url, $file);
+    my $term;
+    if ($show_progress_bar) {
+        if ($download_url =~ /[&?]fsize=(\d+)/) {
+            $term = __prepareProgressBar($1);
+        }
+        else {
+            carp "Can't get size of downloaded file. Progress bar will disabled.";
+        }
+    }
+
+    $self->__download($download_url, $file, $term);
     return 1;
 }
 
@@ -252,13 +276,20 @@ sub public {
 }
 
 sub __download {
-    my ($self, $url, $fname) = @_;
+    my ($self, $url, $fname, $term) = @_;
     my $ua = $self->{ua};
 
     open my $FL, ">$fname" or croak "Cant open $fname to write $!";
     binmode $FL;
-    my $res = $ua->get($url, ':read_size_hint' => $BUFF_SIZE, ':content_cb' => sub {print $FL $_[0];});
+    my $res = $ua->get($url, ':read_size_hint' => $BUFF_SIZE, ':content_cb' => 
+        sub {
+            print $FL $_[0];
+            $term->up($BUFF_SIZE) if $term;
+        }
+    );
     close $FL;
+    $term->close if $term;
+
     if ($res->code eq '200') {
         return 1;
     }
@@ -284,7 +315,7 @@ sub __waitResponse {
 
 sub __upload_file {
     #Buffered chunked upload file
-    my ($url, $file) = @_;
+    my ($url, $file, $term) = @_;
 
     my $u1 = URI->new($url);
 
@@ -318,6 +349,8 @@ sub __upload_file {
 
         $sock->print($filebuf) or croak "Cant print to socket";
         $sock->print("\r\n") or croak "Cant print to socket";
+
+        $term->up($BUFF_SIZE) if $term;
     }
     close $FH;
 
@@ -326,6 +359,8 @@ sub __upload_file {
                        
     my @answer = $sock->getlines();
     $sock->close();
+
+    $term->close if $term;
 
     my ($code) = $answer[0] =~ /(\d{3})/;
 
@@ -347,6 +382,20 @@ sub __fromJson {
     my $string = ref($_[0]) ? $_[1] : $_[0];
     my $res = JSON::XS::decode_json($string);
     return $res;
+}
+
+sub __prepareProgressBar {
+    my ($file_size) = @_;
+    my $format = '%2d Elapsed: %8t %21b %4p %2d (%8c of %11m bytes)';
+    my $target = $file_size;
+    my $term = Term::Sk->new($format, {
+            freq    => 'd',
+            base    => 0,
+            target  => $target,
+            pdisp   => '!',
+        }
+    );
+    return $term;
 }
 
 
@@ -452,6 +501,7 @@ Upload file (-file) to Yandex Disk in folder (-remote_path). Return 1 if success
         -overwrite          => Owervrite file if exists (default: 1)
         -remote_path        => Path to upload file on disk
         -file               => Path to local file
+        -show_progress_bar  => Show progress bar upload file
 
 =head2 createFolder(%opt)
     
@@ -480,6 +530,7 @@ Download file from Yandex Disk to local file. Method overwrites local file if ex
     Options:
         -path               => Path to file on Yandex Disk
         -file               => Path to local destination
+        -show_progress_bar  => Show progress bar download file
 
 =head2 emptyTrash(%opt)
 

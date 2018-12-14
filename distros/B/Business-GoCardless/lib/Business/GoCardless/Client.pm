@@ -369,6 +369,7 @@ sub _api_request {
             my $json;
             $json = JSON->new->utf8->canonical->encode( $params ) if $params;
             $req->content( $json ) if $json;
+            $req->header( 'Content-Length' => 0 ) if ! $json; # always have a content length
             say STDERR "GOCARDLESS -> $json" if $ENV{GOCARDLESS_DEBUG} && $json;
         } else {
             $req->content_type( 'application/x-www-form-urlencoded' );

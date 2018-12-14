@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Email;
-$HTML::FormFu::Constraint::Email::VERSION = '2.06';
+$HTML::FormFu::Constraint::Email::VERSION = '2.07';
 # ABSTRACT: Email Address Constraint
 
 use Moose;
@@ -68,7 +68,7 @@ HTML::FormFu::Constraint::Email - Email Address Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Transformer::Callback;
-$HTML::FormFu::Transformer::Callback::VERSION = '2.06';
+$HTML::FormFu::Transformer::Callback::VERSION = '2.07';
 # ABSTRACT: Callback transformer
 
 use Moose;
@@ -39,7 +39,7 @@ HTML::FormFu::Transformer::Callback - Callback transformer
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

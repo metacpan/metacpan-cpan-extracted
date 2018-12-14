@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::AllOrNone;
-$HTML::FormFu::Constraint::AllOrNone::VERSION = '2.06';
+$HTML::FormFu::Constraint::AllOrNone::VERSION = '2.07';
 # ABSTRACT: Multi-field All or None Constraint
 
 use Moose;
@@ -80,7 +80,7 @@ HTML::FormFu::Constraint::AllOrNone - Multi-field All or None Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

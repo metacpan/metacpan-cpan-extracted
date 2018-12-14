@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Src;
-$HTML::FormFu::Element::Src::VERSION = '2.06';
+$HTML::FormFu::Element::Src::VERSION = '2.07';
 # ABSTRACT: custom HTML element
 
 use Moose;
@@ -31,7 +31,7 @@ HTML::FormFu::Element::Src - custom HTML element
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for perl distribution LinkEmbedder
 
+1.02 2018-12-14T12:32:49+0900
+ - Add get() again
+
 1.01 2018-09-26T13:44:46+0900
  - Forgot to remove Carp::Always
  - Add support for https://perlbot.pl #1

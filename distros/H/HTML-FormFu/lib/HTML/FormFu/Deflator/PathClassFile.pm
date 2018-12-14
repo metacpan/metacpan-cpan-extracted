@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Deflator::PathClassFile;
-$HTML::FormFu::Deflator::PathClassFile::VERSION = '2.06';
+$HTML::FormFu::Deflator::PathClassFile::VERSION = '2.07';
 # ABSTRACT: Deflator for Path::Class::File objects
 
 use Moose;
@@ -52,7 +52,7 @@ HTML::FormFu::Deflator::PathClassFile - Deflator for Path::Class::File objects
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Multi;
-$HTML::FormFu::Element::Multi::VERSION = '2.06';
+$HTML::FormFu::Element::Multi::VERSION = '2.07';
 # ABSTRACT: Combine multiple fields in a single element
 
 use Moose;
@@ -202,7 +202,7 @@ HTML::FormFu::Element::Multi - Combine multiple fields in a single element
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -6,9 +6,9 @@ use Test::TypeTiny;
 
 use Data::Object qw(deduce);
 use Data::Object::Library qw(
-    FloatObj
-    FloatObject
-    Object
+  FloatObj
+  FloatObject
+  Object
 );
 
 ok_subtype Object, FloatObj;

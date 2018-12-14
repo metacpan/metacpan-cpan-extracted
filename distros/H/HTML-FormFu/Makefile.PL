@@ -84,7 +84,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.92",
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "2.06",
+  "VERSION" => "2.07",
   "test" => {
     "TESTS" => "t/*.t t/bugs/*.t t/constraints/*.t t/deflators/*.t t/elements/*.t t/examples/*.t t/filters/*.t t/force_errors/*.t t/form/*.t t/i18n/*.t t/inflators/*.t t/internals/*.t t/load_config/*.t t/model/*.t t/nested/*.t t/nested/constraints/*.t t/nested/elements/*.t t/nested/filters/*.t t/nested/form/*.t t/nested/inflators/*.t t/nested/internals/*.t t/nested/transformers/*.t t/nested/validators/*.t t/output_processors/*.t t/plugins/*.t t/repeatable/*.t t/repeatable/constraints/*.t t/repeatable/repeatable/constraints/*.t t/roles/*.t t/transformers/*.t t/utils/*.t t/validators/*.t"
   }

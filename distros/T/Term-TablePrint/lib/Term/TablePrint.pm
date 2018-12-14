@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.104';
+our $VERSION = '0.106';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -65,9 +65,9 @@ sub __validate_options {
         binary_filter     => '[ 0 1 ]',
         codepage_mapping  => '[ 0 1 ]',
         color             => '[ 0 1 ]',
-        grid              => '[ 0 1 ]',
         keep_header       => '[ 0 1 ]',
         squash_spaces     => '[ 0 1 ]',
+        grid              => '[ 0 1 2 ]',
         table_expand      => '[ 0 1 2 ]',
         mouse             => '[ 0 1 2 3 4 ]',
         binary_string     => '',
@@ -209,6 +209,7 @@ sub __recursive_code {
     }
     if ( $self->{keep_header} ) {
         my $col_names = shift @$list;
+        push @header, $self->__header_sep( $w_cols ) if $self->{grid} == 2;
         push @header, $col_names;
         push @header, $self->__header_sep( $w_cols ) if $self->{grid};
     }
@@ -613,6 +614,9 @@ sub __print_single_row {
         $key = cut_to_printwidth( $key, $len_key );
         my $copy_sep = $separator;
         my $value = $orig_tbl->[$row][$col];
+        if ( ! defined $value || ! length $value ) {
+            $value = ' '; # to show also keys/columns with no values
+        }
         if ( $self->{color} ) {
             $value =~ s/\e\[[\d;]*m//msg;
         }
@@ -692,7 +696,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.104
+Version 0.106
 
 =cut
 
@@ -733,7 +737,7 @@ The following modifications are made (at a copy of the original data) to the tab
 
 Tab characters (C<\t>) are replaces with a space.
 
-Vertical spaces C<\v>) are squashed to two spaces
+Vertical spaces (C<\v>) are squashed to two spaces
 
 Control characters, code points of the surrogate ranges and non-characters are removed.
 
@@ -884,7 +888,7 @@ Default: 0
 
 Setting this option to C<1> enables the support for color and text formatting escape sequences.
 
-At the end of each row it is added automatically a reset (C<\e[0m>).
+At the end of each row it is added automatically a reset (C<\e[0m>) if I<color> is enabled.
 
 If the OS is MSWin32 and this option is enabled, C<Term::Choose> loads L<Win32::Console::ANSI>. C<Win32::Console::ANSI>
 emulates an ANSI console. See also the option L</codepage_mapping>.

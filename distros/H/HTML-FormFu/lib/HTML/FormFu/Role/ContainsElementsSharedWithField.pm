@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::ContainsElementsSharedWithField;
-$HTML::FormFu::Role::ContainsElementsSharedWithField::VERSION = '2.06';
+# ABSTRACT: Role for constraints on elements and fields
+$HTML::FormFu::Role::ContainsElementsSharedWithField::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Util qw(
@@ -75,11 +76,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::ContainsElementsSharedWithField
+HTML::FormFu::Role::ContainsElementsSharedWithField - Role for constraints on elements and fields
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::FormBlockAndFieldMethods;
-$HTML::FormFu::Role::FormBlockAndFieldMethods::VERSION = '2.06';
+# ABSTRACT: role for form, block and field methods
+$HTML::FormFu::Role::FormBlockAndFieldMethods::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Attribute qw( mk_inherited_accessors );
@@ -46,19 +47,15 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::FormBlockAndFieldMethods
+HTML::FormFu::Role::FormBlockAndFieldMethods - role for form, block and field methods
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 
 Inherited Field methods.
-
-=head1 NAME
-
-HTML::FormFu::Role::FormBlockAndFieldMethods
 
 =head1 AUTHOR
 

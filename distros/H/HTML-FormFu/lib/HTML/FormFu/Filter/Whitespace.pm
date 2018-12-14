@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::Whitespace;
-$HTML::FormFu::Filter::Whitespace::VERSION = '2.06';
+$HTML::FormFu::Filter::Whitespace::VERSION = '2.07';
 # ABSTRACT: filter stripping all whitespace
 
 use Moose;
@@ -25,7 +25,7 @@ HTML::FormFu::Filter::Whitespace - filter stripping all whitespace
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

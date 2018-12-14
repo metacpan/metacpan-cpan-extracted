@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Literal;
-$HTML::FormFu::Literal::VERSION = '2.06';
+# ABSTRACT: a FormFu literal
+$HTML::FormFu::Literal::VERSION = '2.07';
 use warnings;
 
 use HTML::FormFu::Constants qw( $EMPTY_STR );
@@ -38,11 +39,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Literal
+HTML::FormFu::Literal - a FormFu literal
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

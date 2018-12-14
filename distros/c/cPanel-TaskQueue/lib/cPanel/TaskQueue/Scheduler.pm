@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Scheduler;
-$cPanel::TaskQueue::Scheduler::VERSION = '0.901';
+$cPanel::TaskQueue::Scheduler::VERSION = '0.902';
 # This module handles queuing of tasks for execution. The queue is persistent
 # handles consolidating of duplicate tasks.
 

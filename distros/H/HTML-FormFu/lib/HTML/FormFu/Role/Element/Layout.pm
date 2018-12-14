@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::Element::Layout;
-$HTML::FormFu::Role::Element::Layout::VERSION = '2.06';
+# ABSTRACT: layout role
+$HTML::FormFu::Role::Element::Layout::VERSION = '2.07';
 use Moose::Role;
 use MooseX::Attribute::Chained;
 
@@ -340,11 +341,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::Element::Layout
+HTML::FormFu::Role::Element::Layout - layout role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

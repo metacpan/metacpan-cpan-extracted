@@ -1,6 +1,25 @@
 Revision history for cPanel-TaskQueue
 
-0.901     2018-12-13 16:21:41-06:00 America/Chicago
+0.902
+     - Revert: Use atomic filesystem operations for cPanel::StateFile.
+       "we have code that fails when the file is changed out from under it"
+     - Avoid giving up a lock when we are forking
+     - Reduce reconstitute overhead by 40%
+     - Try non-blocking flock before expensive alarm setup
+     - Auto generate META.json as suggested by CPANTS.
+0.901
+     - Don't confuse callers by returning a failure if plugin already included
+     - Travis testing
+     - Track Makefile.PL for Travis
+     - Adjust tests to pass as a result of 3d8ad9b6de
+     - All tests run always now. CPANEL_SLOW_TESTS requirement was hiding bugs
+     - Merge POD with PM for better long term management.
+     - Perl Tidy
+     - README.mkdn for github
+     - Use atomic filesystem operations for cPanel::StateFile.
+0.900
+     - ???
+0.???
      - Correct deferral logic to clear tags when a task completes
      - Correct flawed load logic relating to resuming after pause.
 0.700    2014-10-15 16:37:12 America/Chicago

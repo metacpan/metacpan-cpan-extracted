@@ -6,9 +6,9 @@ use Test::TypeTiny;
 
 use Data::Object qw(deduce);
 use Data::Object::Library qw(
-    UndefObj
-    UndefObject
-    Object
+  UndefObj
+  UndefObject
+  Object
 );
 
 ok_subtype Object, UndefObj;

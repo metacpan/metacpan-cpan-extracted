@@ -1,0 +1,5 @@
+name = "Crypt-PKCS10"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+#authors_from="authors.pod"
+

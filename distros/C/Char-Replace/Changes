@@ -1,8 +1,13 @@
 Revision history for Char-Replace
 
+0.003     2018-12-14 15:30:08-06:00 America/Chicago
+
+- add a trim XS helper (and some benchmark) with UTF-8 support
+- basic UTF-8 support for replace
+
 0.002     2018-12-11 14:55:47-06:00 America/Chicago
 
-fixup for non alphanumeric characters
+- fixup for non alphanumeric characters
 
 0.001     2018-12-11 12:03:27-06:00 America/Chicago
 

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::NonNumeric;
-$HTML::FormFu::Filter::NonNumeric::VERSION = '2.06';
+$HTML::FormFu::Filter::NonNumeric::VERSION = '2.07';
 # ABSTRACT: filter removing all non-numeric characters
 
 use Moose;
@@ -25,7 +25,7 @@ HTML::FormFu::Filter::NonNumeric - filter removing all non-numeric characters
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

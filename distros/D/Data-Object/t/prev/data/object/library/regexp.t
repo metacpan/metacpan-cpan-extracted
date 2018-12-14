@@ -6,9 +6,9 @@ use Test::TypeTiny;
 
 use Data::Object qw(deduce);
 use Data::Object::Library qw(
-    RegexpObj
-    RegexpObject
-    Object
+  RegexpObj
+  RegexpObject
+  Object
 );
 
 ok_subtype Object, RegexpObj;

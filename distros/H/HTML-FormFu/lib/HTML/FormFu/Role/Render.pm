@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::Render;
-$HTML::FormFu::Role::Render::VERSION = '2.06';
+# ABSTRACT: Render role
+$HTML::FormFu::Role::Render::VERSION = '2.07';
 use HTML::FormFu::Util qw( process_attrs );
 use Carp qw( croak );
 use Scalar::Util qw( reftype );
@@ -141,11 +142,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::Render
+HTML::FormFu::Role::Render - Render role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

@@ -14,33 +14,34 @@ use Scalar::Util;
 
 with 'Data::Object::Role::String';
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 method new ($class: @args) {
 
-    my $arg  = $args[0];
-    my $role = 'Data::Object::Role::Type';
+  my $arg  = $args[0];
+  my $role = 'Data::Object::Role::Type';
 
-    $arg = $arg->data if Scalar::Util::blessed($arg)
-        and $arg->can('does')
-        and $arg->does($role);
+  $arg = $arg->data
+    if Scalar::Util::blessed($arg)
+    and $arg->can('does')
+    and $arg->does($role);
 
-    Data::Object::throw('Type Instantiation Error: Not a String')
-        unless defined($arg) && not ref($arg);
+  Data::Object::throw('Type Instantiation Error: Not a String')
+    unless defined($arg) && not ref($arg);
 
-    return bless \$arg, $class;
+  return bless \$arg, $class;
 
 }
 
-our @METHODS = @{ __PACKAGE__->methods };
+our @METHODS = @{__PACKAGE__->methods};
 
-my  $exclude = qr/^data|detract|new$/;
+my $exclude = qr/^data|detract|new$/;
 
-around [ grep { !/$exclude/ } @METHODS ] => fun ($orig, $self, @args) {
+around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
 
-    my $results = $self->$orig(@args);
+  my $results = $self->$orig(@args);
 
-    return Data::Object::deduce_deep($results);
+  return Data::Object::deduce_deep($results);
 
 };
 
@@ -58,13 +59,13 @@ Data::Object::String - String Object for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::String;
+  use Data::Object::String;
 
-    my $string = Data::Object::String->new('abcedfghi');
+  my $string = Data::Object::String->new('abcedfghi');
 
 =head1 DESCRIPTION
 
@@ -85,9 +86,9 @@ role and implements proxy methods as documented herewith.
 
 =head2 append
 
-    # given 'firstname'
+  # given 'firstname'
 
-    $string->append('lastname'); # firstname lastname
+  $string->append('lastname'); # firstname lastname
 
 The append method modifies and returns the string with the argument list
 appended to it separated using spaces. This method returns a
@@ -95,9 +96,9 @@ L<Data::Object::String> object.
 
 =head2 camelcase
 
-    # given 'hello world'
+  # given 'hello world'
 
-    $string->camelcase; # HelloWorld
+  $string->camelcase; # HelloWorld
 
 The camelcase method modifies the string such that it will no longer have any
 non-alphanumeric characters and each word (group of alphanumeric characters
@@ -107,9 +108,9 @@ object.
 
 =head2 chomp
 
-    # given "name, age, dob, email\n"
+  # given "name, age, dob, email\n"
 
-    $string->chomp; # name, age, dob, email
+  $string->chomp; # name, age, dob, email
 
 The chomp method is a safer version of the chop method, it's used to remove the
 newline (or the current value of $/) from the end of the string. Note, this
@@ -118,9 +119,9 @@ L<Data::Object::String> object.
 
 =head2 chop
 
-    # given "this is just a test."
+  # given "this is just a test."
 
-    $string->chop; # this is just a test
+  $string->chop; # this is just a test
 
 The chop method removes the last character of a string and returns the character
 chopped. It is much more efficient than "s/.$//s" because it neither scans nor
@@ -129,22 +130,22 @@ method returns a L<Data::Object::String> object.
 
 =head2 concat
 
-    # given 'ABC'
+  # given 'ABC'
 
-    $string->concat('DEF', 'GHI'); # ABCDEFGHI
+  $string->concat('DEF', 'GHI'); # ABCDEFGHI
 
 The concat method modifies and returns the string with the argument list
 appended to it. This method returns a L<Data::Object::String> object.
 
 =head2 contains
 
-    # given 'Nullam ultrices placerat nibh vel malesuada.'
+  # given 'Nullam ultrices placerat nibh vel malesuada.'
 
-    $string->contains('trices'); # 1; true
-    $string->contains('itrices'); # 0; false
+  $string->contains('trices'); # 1; true
+  $string->contains('itrices'); # 0; false
 
-    $string->contains(qr/trices/); # 1; true
-    $string->contains(qr/itrices/); # 0; false
+  $string->contains(qr/trices/); # 1; true
+  $string->contains(qr/itrices/); # 0; false
 
 The contains method searches the string for the string specified in the
 argument and returns true if found, otherwise returns false. If the argument is
@@ -155,18 +156,18 @@ object.
 
 =head2 data
 
-    # given $string
+  # given $string
 
-    $string->data; # original value
+  $string->data; # original value
 
 The data method returns the original and underlying value contained by the
 object. This method is an alias to the detract method.
 
 =head2 defined
 
-    # given $string
+  # given $string
 
-    $string->defined; # 1
+  $string->defined; # 1
 
 The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
@@ -174,36 +175,36 @@ L<Data::Object::Number> object.
 
 =head2 detract
 
-    # given $string
+  # given $string
 
-    $string->detract; # original value
+  $string->detract; # original value
 
 The detract method returns the original and underlying value contained by the
 object.
 
 =head2 dump
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->dump; # 'exciting'
+  $string->dump; # 'exciting'
 
 The dump method returns returns a string representation of the object.
 This method returns a L<Data::Object::String> object.
 
 =head2 eq
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->eq('Exciting'); # 0
+  $string->eq('Exciting'); # 0
 
 The eq method returns true if the argument provided is equal to the value
 represented by the object. This method returns a L<Data::Object::Number> object.
 
 =head2 ge
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->ge('Exciting'); # 1
+  $string->ge('Exciting'); # 1
 
 The ge method returns true if the argument provided is greater-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
@@ -211,18 +212,18 @@ object.
 
 =head2 gt
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->gt('Exciting'); # 1
+  $string->gt('Exciting'); # 1
 
 The gt method returns true if the argument provided is greater-than the value
 represented by the object. This method returns a L<Data::Object::Number> object.
 
 =head2 hex
 
-    # given '0xaf'
+  # given '0xaf'
 
-    string->hex; # 175
+  string->hex; # 175
 
 The hex method returns the value resulting from interpreting the string as a
 hex string. This method returns a data type object to be determined after
@@ -230,14 +231,14 @@ execution.
 
 =head2 index
 
-    # given 'unexplainable'
+  # given 'unexplainable'
 
-    $string->index('explain'); # 2
-    $string->index('explain', 0); # 2
-    $string->index('explain', 1); # 2
-    $string->index('explain', 2); # 2
-    $string->index('explain', 3); # -1
-    $string->index('explained'); # -1
+  $string->index('explain'); # 2
+  $string->index('explain', 0); # 2
+  $string->index('explain', 1); # 2
+  $string->index('explain', 2); # 2
+  $string->index('explain', 3); # -1
+  $string->index('explained'); # -1
 
 The index method searches for the argument within the string and returns the
 position of the first occurrence of the argument. This method optionally takes a
@@ -248,27 +249,27 @@ after execution.
 
 =head2 lc
 
-    # given 'EXCITING'
+  # given 'EXCITING'
 
-    $string->lc; # exciting
+  $string->lc; # exciting
 
 The lc method returns a lowercased version of the string. This method returns a
 L<Data::Object::String> object. This method is an alias to the lowercase method.
 
 =head2 lcfirst
 
-    # given 'EXCITING'
+  # given 'EXCITING'
 
-    $string->lcfirst; # eXCITING
+  $string->lcfirst; # eXCITING
 
 The lcfirst method returns a the string with the first character lowercased.
 This method returns a L<Data::Object::String> object.
 
 =head2 le
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->le('Exciting'); # 0
+  $string->le('Exciting'); # 0
 
 The le method returns true if the argument provided is less-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
@@ -276,18 +277,18 @@ object.
 
 =head2 length
 
-    # given 'longggggg'
+  # given 'longggggg'
 
-    $string->length; # 9
+  $string->length; # 9
 
 The length method returns the number of characters within the string. This
 method returns a L<Data::Object::Number> object.
 
 =head2 lines
 
-    # given "who am i?\nwhere am i?\nhow did I get here"
+  # given "who am i?\nwhere am i?\nhow did I get here"
 
-    $string->lines; # ['who am i?','where am i?','how did i get here']
+  $string->lines; # ['who am i?','where am i?','how did i get here']
 
 The lines method breaks the string into pieces, split on 1 or more newline
 characters, and returns an array reference consisting of the pieces. This method
@@ -295,65 +296,65 @@ returns a L<Data::Object::Array> object.
 
 =head2 lowercase
 
-    # given 'EXCITING'
+  # given 'EXCITING'
 
-    $string->lowercase; # exciting
+  $string->lowercase; # exciting
 
 The lowercase method is an alias to the lc method. This method returns a
 L<Data::Object::String> object.
 
 =head2 lt
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->lt('Exciting'); # 0
+  $string->lt('Exciting'); # 0
 
 The lt method returns true if the argument provided is less-than the value
 represented by the object. This method returns a L<Data::Object::Number> object.
 
 =head2 methods
 
-    # given $string
+  # given $string
 
-    $string->methods;
+  $string->methods;
 
 The methods method returns the list of methods attached to object. This method
 returns a L<Data::Object::Array> object.
 
 =head2 ne
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->ne('Exciting'); # 1
+  $string->ne('Exciting'); # 1
 
 The ne method returns true if the argument provided is not equal to the value
 represented by the object. This method returns a L<Data::Object::Number> object.
 
 =head2 new
 
-    # given abcedfghi
+  # given abcedfghi
 
-    my $string = Data::Object::String->new('abcedfghi');
+  my $string = Data::Object::String->new('abcedfghi');
 
 The new method expects a string and returns a new class instance.
 
 =head2 print
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->print; # 'exciting'
+  $string->print; # 'exciting'
 
 The print method outputs the value represented by the object to STDOUT and
 returns true. This method returns a L<Data::Object::Number> object.
 
 =head2 replace
 
-    # given 'Hello World'
+  # given 'Hello World'
 
-    $string->replace('World', 'Universe'); # Hello Universe
-    $string->replace('world', 'Universe', 'i'); # Hello Universe
-    $string->replace(qr/world/i, 'Universe'); # Hello Universe
-    $string->replace(qr/.*/, 'Nada'); # Nada
+  $string->replace('World', 'Universe'); # Hello Universe
+  $string->replace('world', 'Universe', 'i'); # Hello Universe
+  $string->replace(qr/world/i, 'Universe'); # Hello Universe
+  $string->replace(qr/.*/, 'Nada'); # Nada
 
 The replace method performs a smart search and replace operation and returns the
 modified string (if any modification occurred). This method optionally takes a
@@ -363,27 +364,27 @@ L<Data::Object::String> object.
 
 =head2 reverse
 
-    # given 'dlrow ,olleH'
+  # given 'dlrow ,olleH'
 
-    $string->reverse; # Hello, world
+  $string->reverse; # Hello, world
 
 The reverse method returns a string where the characters in the string are in
 the opposite order. This method returns a L<Data::Object::String> object.
 
 =head2 rindex
 
-    # given 'explain the unexplainable'
+  # given 'explain the unexplainable'
 
-    $string->rindex('explain'); # 14
-    $string->rindex('explain', 0); # 0
-    $string->rindex('explain', 21); # 14
-    $string->rindex('explain', 22); # 14
-    $string->rindex('explain', 23); # 14
-    $string->rindex('explain', 20); # 14
-    $string->rindex('explain', 14); # 0
-    $string->rindex('explain', 13); # 0
-    $string->rindex('explain', 0); # 0
-    $string->rindex('explained'); # -1
+  $string->rindex('explain'); # 14
+  $string->rindex('explain', 0); # 0
+  $string->rindex('explain', 21); # 14
+  $string->rindex('explain', 22); # 14
+  $string->rindex('explain', 23); # 14
+  $string->rindex('explain', 20); # 14
+  $string->rindex('explain', 14); # 0
+  $string->rindex('explain', 13); # 0
+  $string->rindex('explain', 0); # 0
+  $string->rindex('explained'); # -1
 
 The rindex method searches for the argument within the string and returns the
 position of the last occurrence of the argument. This method optionally takes a
@@ -394,18 +395,18 @@ be determined after execution.
 
 =head2 roles
 
-    # given $string
+  # given $string
 
-    $string->roles;
+  $string->roles;
 
 The roles method returns the list of roles attached to object. This method
 returns a L<Data::Object::Array> object.
 
 =head2 say
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->say; # 'exciting\n'
+  $string->say; # 'exciting\n'
 
 The say method outputs the value represented by the object appended with a
 newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
@@ -413,9 +414,9 @@ object.
 
 =head2 snakecase
 
-    # given 'hello world'
+  # given 'hello world'
 
-    $string->snakecase; # helloWorld
+  $string->snakecase; # helloWorld
 
 The snakecase method modifies the string such that it will no longer have any
 non-alphanumeric characters and each word (group of alphanumeric characters
@@ -426,12 +427,12 @@ modifies the string. This method returns a L<Data::Object::String> object.
 
 =head2 split
 
-    # given 'name, age, dob, email'
+  # given 'name, age, dob, email'
 
-    $string->split(', '); # ['name', 'age', 'dob', 'email']
-    $string->split(', ', 2); # ['name', 'age, dob, email']
-    $string->split(qr/\,\s*/); # ['name', 'age', 'dob', 'email']
-    $string->split(qr/\,\s*/, 2); # ['name', 'age, dob, email']
+  $string->split(', '); # ['name', 'age', 'dob', 'email']
+  $string->split(', ', 2); # ['name', 'age, dob, email']
+  $string->split(qr/\,\s*/); # ['name', 'age', 'dob', 'email']
+  $string->split(qr/\,\s*/, 2); # ['name', 'age, dob, email']
 
 The split method splits the string into a list of strings, separating each
 chunk by the argument (string or regexp object), and returns that list as an
@@ -442,9 +443,9 @@ L<Data::Object::Array> object.
 
 =head2 strip
 
-    # given 'one,  two,  three'
+  # given 'one,  two,  three'
 
-    $string->strip; # one, two, three
+  $string->strip; # one, two, three
 
 The strip method returns the string replacing occurences of 2 or more
 whitespaces with a single whitespace. This method returns a
@@ -452,9 +453,9 @@ L<Data::Object::String> object.
 
 =head2 throw
 
-    # given $string
+  # given $string
 
-    $string->throw;
+  $string->throw;
 
 The throw method terminates the program using the core die keyword, passing the
 object to the L<Data::Object::Exception> class as the named parameter C<object>.
@@ -462,9 +463,9 @@ If captured this method returns a L<Data::Object::Exception> object.
 
 =head2 titlecase
 
-    # given 'mr. john doe'
+  # given 'mr. john doe'
 
-    $string->titlecase; # Mr. John Doe
+  $string->titlecase; # Mr. John Doe
 
 The titlecase method returns the string capitalizing the first character of
 each word (group of alphanumeric characters separated by 1 or more whitespaces).
@@ -473,54 +474,54 @@ L<Data::Object::String> object.
 
 =head2 trim
 
-    # given ' system is   ready   '
+  # given ' system is   ready   '
 
-    $string->trim; # system is   ready
+  $string->trim; # system is   ready
 
 The trim method removes 1 or more consecutive leading and/or trailing spaces
 from the string. This method returns a L<Data::Object::String> object.
 
 =head2 type
 
-    # given $string
+  # given $string
 
-    $string->type; # STRING
+  $string->type; # STRING
 
 The type method returns a string representing the internal data type object name.
 This method returns a L<Data::Object::String> object.
 
 =head2 uc
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->uc; # EXCITING
+  $string->uc; # EXCITING
 
 The uc method returns an uppercased version of the string. This method returns a
 L<Data::Object::String> object. This method is an alias to the uppercase method.
 
 =head2 ucfirst
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->ucfirst; # Exciting
+  $string->ucfirst; # Exciting
 
 The ucfirst method returns a the string with the first character uppercased.
 This method returns a L<Data::Object::String> object.
 
 =head2 uppercase
 
-    # given 'exciting'
+  # given 'exciting'
 
-    $string->uppercase; # EXCITING
+  $string->uppercase; # EXCITING
 
 The uppercase method is an alias to the uc method. This method returns a
 L<Data::Object::String> object.
 
 =head2 words
 
-    # given "is this a bug we're experiencing"
+  # given "is this a bug we're experiencing"
 
-    $string->words; # ["is","this","a","bug","we're","experiencing"]
+  $string->words; # ["is","this","a","bug","we're","experiencing"]
 
 The words method splits the string into a list of strings, separating each
 group of characters by 1 or more consecutive spaces, and returns that list as an
@@ -666,7 +667,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

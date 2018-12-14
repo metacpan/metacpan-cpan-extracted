@@ -1,5 +1,5 @@
 package cPanel::TaskQueue;
-$cPanel::TaskQueue::VERSION = '0.901';
+$cPanel::TaskQueue::VERSION = '0.902';
 # This module handles queuing of tasks for execution. The queue is persistent
 # handles consolidating of duplicate tasks.
 
@@ -589,28 +589,49 @@ END { undef %valid_processors }    # case CPANEL-10871 to avoid a SEGV during gl
         push @{ $self->{processing_list} }, $task;
         $self->_add_task_to_deferral_object( $task, $processor );
 
-        # Finished making changes, save to disk.
-        $guard->update_file();
-
-        # I don't want to stay locked while processing.
         my $pid;
         my $ex;
-        $guard->call_unlocked(
-            sub {
-                my $orig_alarm;
-                eval {
-                    local $SIG{'ALRM'} = sub { die "time out reached\n"; };
-                    $orig_alarm = alarm( $self->_timeout($processor) );
-                    $pid = $processor->process_task( $task->clone(), $self->{disk_state}->get_logger() );
-                    alarm $orig_alarm;
-                    1;
-                } or do {
-                    $ex = $@;    # save exception for later
-                    alarm $orig_alarm;
-                };
-            }
-        );
 
+        if ( $processor->isa('cPanel::TaskQueue::ChildProcessor') ) {
+
+            #
+            # Will fork() so there is no concern about the parent
+            # keeping the lock since it should return right away and
+            # will not be blocking other processes from getting a lock
+            # as soon as we return from this sub.
+            #
+            # This avoids going though a whole cycle of update_file, unlock,
+            # relock, and re-read from disk
+            #
+            # No need to set an alarm as we are going to fork() and
+            # ChildProcessor already handles timeouts
+            #
+            eval { $pid = $processor->process_task( $task->clone(), $self->{disk_state}->get_logger(), $guard ) } or do {
+                $ex = $@;
+            };
+        }
+        else {
+            # We are going to have to unlock and relock
+            # Finished making changes, save to disk.
+            $guard->update_file();
+
+            # I don't want to stay locked while processing.
+            $guard->call_unlocked(
+                sub {
+                    my $orig_alarm;
+                    eval {
+                        local $SIG{'ALRM'} = sub { die "time out reached\n"; };
+                        $orig_alarm = alarm( $self->_timeout($processor) );
+                        $pid = $processor->process_task( $task->clone(), $self->{disk_state}->get_logger() );
+                        alarm $orig_alarm;
+                        1;
+                    } or do {
+                        $ex = $@;    # save exception for later
+                        alarm $orig_alarm;
+                    };
+                }
+            );
+        }
         # Deal with a child process or remove from processing.
         if ($pid) {
             $task->set_pid($pid);

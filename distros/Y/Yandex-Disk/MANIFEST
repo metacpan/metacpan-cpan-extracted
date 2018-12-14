@@ -5,6 +5,7 @@ README
 t/00_yandexdisk_api.t
 t/01_yandexdisk_public.t
 t/small_file
+t/big_test_upload_file
 lib/Yandex/Disk.pm
 lib/Yandex/Disk/Public.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

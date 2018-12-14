@@ -11,7 +11,7 @@ use Scalar::Util;
 
 use parent 'Moo::Role';
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 1;
 
@@ -27,20 +27,20 @@ Data::Object::Role - Role Declaration for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    package Persona;
+  package Persona;
 
-    use Data::Object::Role;
+  use Data::Object::Role;
 
-    extends 'Entity';
-    with    'Identity';
+  extends 'Entity';
+  with  'Identity';
 
-    has id => ( is => 'ro' );
+  has id => ( is => 'ro' );
 
-    1;
+  1;
 
 =head1 DESCRIPTION
 
@@ -141,7 +141,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

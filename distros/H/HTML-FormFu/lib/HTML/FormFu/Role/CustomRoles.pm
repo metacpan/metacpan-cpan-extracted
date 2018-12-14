@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::CustomRoles;
-$HTML::FormFu::Role::CustomRoles::VERSION = '2.06';
+# ABSTRACT: add custom roles
+$HTML::FormFu::Role::CustomRoles::VERSION = '2.07';
 use Moose::Role;
 use Moose::Util qw( ensure_all_roles );
 
@@ -60,11 +61,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::CustomRoles
+HTML::FormFu::Role::CustomRoles - add custom roles
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

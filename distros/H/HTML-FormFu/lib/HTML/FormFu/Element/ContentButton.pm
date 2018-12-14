@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::ContentButton;
-$HTML::FormFu::Element::ContentButton::VERSION = '2.06';
+$HTML::FormFu::Element::ContentButton::VERSION = '2.07';
 # ABSTRACT: Button form field containing markup
 
 use Moose;
@@ -79,7 +79,7 @@ HTML::FormFu::Element::ContentButton - Button form field containing markup
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

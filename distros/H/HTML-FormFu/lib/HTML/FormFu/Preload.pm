@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Preload;
-$HTML::FormFu::Preload::VERSION = '2.06';
+# ABSTRACT: preload plugins
+$HTML::FormFu::Preload::VERSION = '2.07';
 use warnings;
 
 use HTML::FormFu;
@@ -34,11 +35,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Preload
+HTML::FormFu::Preload - preload plugins
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

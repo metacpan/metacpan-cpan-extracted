@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::ComboBox;
-$HTML::FormFu::Element::ComboBox::VERSION = '2.06';
+$HTML::FormFu::Element::ComboBox::VERSION = '2.07';
 # ABSTRACT: Select / Text hybrid
 
 use Moose;
@@ -303,7 +303,7 @@ HTML::FormFu::Element::ComboBox - Select / Text hybrid
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

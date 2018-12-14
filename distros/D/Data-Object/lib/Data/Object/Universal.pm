@@ -14,34 +14,35 @@ use Scalar::Util;
 
 with 'Data::Object::Role::Universal';
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 method new ($class: @args) {
 
-    my $arg  = $args[0];
-    my $role = 'Data::Object::Role::Type';
+  my $arg  = $args[0];
+  my $role = 'Data::Object::Role::Type';
 
-    $arg = $arg->data if Scalar::Util::blessed($arg)
-        and $arg->can('does')
-        and $arg->does($role);
+  $arg = $arg->data
+    if Scalar::Util::blessed($arg)
+    and $arg->can('does')
+    and $arg->does($role);
 
-    if (Scalar::Util::blessed($arg) && $arg->isa('Regexp') && $^V <= v5.12.0) {
-        $arg = do {\(my $q = qr/$arg/)};
-    }
+  if (Scalar::Util::blessed($arg) && $arg->isa('Regexp') && $^V <= v5.12.0) {
+    $arg = do { \(my $q = qr/$arg/) };
+  }
 
-    return bless ref($arg) ? $arg : \$arg, $class;
+  return bless ref($arg) ? $arg : \$arg, $class;
 
 }
 
-our @METHODS = @{ __PACKAGE__->methods };
+our @METHODS = @{__PACKAGE__->methods};
 
-my  $exclude = qr/^data|detract|new$/;
+my $exclude = qr/^data|detract|new$/;
 
-around [ grep { !/$exclude/ } @METHODS ] => fun ($orig, $self, @args) {
+around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
 
-    my $results = $self->$orig(@args);
+  my $results = $self->$orig(@args);
 
-    return Data::Object::deduce_deep($results);
+  return Data::Object::deduce_deep($results);
 
 };
 
@@ -59,13 +60,13 @@ Data::Object::Universal - Universal Object for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Universal;
+  use Data::Object::Universal;
 
-    my $object = Data::Object::Universal->new($scalar);
+  my $object = Data::Object::Universal->new($scalar);
 
 =head1 DESCRIPTION
 
@@ -80,18 +81,18 @@ role and implements proxy methods as documented herewith.
 
 =head2 data
 
-    # given $object
+  # given $object
 
-    $object->data; # original value
+  $object->data; # original value
 
 The data method returns the original and underlying value contained by the
 object. This method is an alias to the detract method.
 
 =head2 defined
 
-    # given $object
+  # given $object
 
-    $object->defined; # 1
+  $object->defined; # 1
 
 The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
@@ -99,116 +100,116 @@ L<Data::Object::Number> object.
 
 =head2 detract
 
-    # given $object
+  # given $object
 
-    $object->detract; # original value
+  $object->detract; # original value
 
 The detract method returns the original and underlying value contained by the
 object.
 
 =head2 dump
 
-    # given 0
+  # given 0
 
-    $object->dump; # 0
+  $object->dump; # 0
 
 The dump method returns returns a string representation of the object.
 This method returns a L<Data::Object::String> object.
 
 =head2 eq
 
-    # given $object
+  # given $object
 
-    $object->eq; # exception thrown
+  $object->eq; # exception thrown
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
 =head2 ge
 
-    # given $object
+  # given $object
 
-    $object->ge; # exception thrown
+  $object->ge; # exception thrown
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
 =head2 gt
 
-    # given $object
+  # given $object
 
-    $object->gt; # exception thrown
+  $object->gt; # exception thrown
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
 =head2 le
 
-    # given $object
+  # given $object
 
-    $object->le; # exception thrown
+  $object->le; # exception thrown
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
 =head2 lt
 
-    # given $object
+  # given $object
 
-    $object->lt; # exception thrown
+  $object->lt; # exception thrown
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
 =head2 methods
 
-    # given $object
+  # given $object
 
-    $object->methods;
+  $object->methods;
 
 The methods method returns the list of methods attached to object. This method
 returns a L<Data::Object::Array> object.
 
 =head2 ne
 
-    # given $object
+  # given $object
 
-    $object->ne; # exception thrown
+  $object->ne; # exception thrown
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
 =head2 new
 
-    # given $scalar
+  # given $scalar
 
-    my $object = Data::Object::Universal->new($scalar);
+  my $object = Data::Object::Universal->new($scalar);
 
 The new method expects a scalar reference and returns a new class instance.
 
 =head2 print
 
-    # given 0
+  # given 0
 
-    $object->print; # 0
+  $object->print; # 0
 
 The print method outputs the value represented by the object to STDOUT and
 returns true. This method returns a L<Data::Object::Number> object.
 
 =head2 roles
 
-    # given $object
+  # given $object
 
-    $object->roles;
+  $object->roles;
 
 The roles method returns the list of roles attached to object. This method
 returns a L<Data::Object::Array> object.
 
 =head2 say
 
-    # given 0
+  # given 0
 
-    $object->say; # '0\n'
+  $object->say; # '0\n'
 
 The say method outputs the value represented by the object appended with a
 newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
@@ -216,9 +217,9 @@ object.
 
 =head2 throw
 
-    # given $object
+  # given $object
 
-    $object->throw;
+  $object->throw;
 
 The throw method terminates the program using the core die keyword, passing the
 object to the L<Data::Object::Exception> class as the named parameter C<object>.
@@ -226,9 +227,9 @@ If captured this method returns a L<Data::Object::Exception> object.
 
 =head2 type
 
-    # given $object
+  # given $object
 
-    $object->type; # UNIVERSAL
+  $object->type; # UNIVERSAL
 
 The type method returns a string representing the internal data type object name.
 This method returns a L<Data::Object::String> object.
@@ -369,7 +370,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Checkboxgroup;
-$HTML::FormFu::Element::Checkboxgroup::VERSION = '2.06';
+$HTML::FormFu::Element::Checkboxgroup::VERSION = '2.07';
 # ABSTRACT: Group of checkbox form fields
 
 use Moose;
@@ -244,7 +244,7 @@ HTML::FormFu::Element::Checkboxgroup - Group of checkbox form fields
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

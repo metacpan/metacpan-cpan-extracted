@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Transformer;
-$HTML::FormFu::Transformer::VERSION = '2.06';
+$HTML::FormFu::Transformer::VERSION = '2.07';
 # ABSTRACT: Transformer Base Class
 
 use Moose;
@@ -70,7 +70,7 @@ HTML::FormFu::Transformer - Transformer Base Class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

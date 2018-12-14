@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Reset;
-$HTML::FormFu::Element::Reset::VERSION = '2.06';
+$HTML::FormFu::Element::Reset::VERSION = '2.07';
 # ABSTRACT: Reset button form field
 
 use Moose;
@@ -32,7 +32,7 @@ HTML::FormFu::Element::Reset - Reset button form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

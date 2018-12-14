@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::CompoundSprintf;
-$HTML::FormFu::Filter::CompoundSprintf::VERSION = '2.06';
+$HTML::FormFu::Filter::CompoundSprintf::VERSION = '2.07';
 # ABSTRACT: CompoundSprintf filter
 
 use Moose;
@@ -47,7 +47,7 @@ HTML::FormFu::Filter::CompoundSprintf - CompoundSprintf filter
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

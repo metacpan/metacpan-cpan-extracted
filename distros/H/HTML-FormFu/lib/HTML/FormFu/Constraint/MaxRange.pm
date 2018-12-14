@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::MaxRange;
-$HTML::FormFu::Constraint::MaxRange::VERSION = '2.06';
+$HTML::FormFu::Constraint::MaxRange::VERSION = '2.07';
 # ABSTRACT: Maximum Value Constraint
 
 use Moose;
@@ -29,7 +29,7 @@ HTML::FormFu::Constraint::MaxRange - Maximum Value Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

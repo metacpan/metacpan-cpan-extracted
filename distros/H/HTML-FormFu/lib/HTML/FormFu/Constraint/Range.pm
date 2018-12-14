@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Range;
-$HTML::FormFu::Constraint::Range::VERSION = '2.06';
+$HTML::FormFu::Constraint::Range::VERSION = '2.07';
 # ABSTRACT: Numerical Range Constraint
 
 use Moose;
@@ -64,7 +64,7 @@ HTML::FormFu::Constraint::Range - Numerical Range Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

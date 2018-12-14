@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Exception;
-$HTML::FormFu::Exception::VERSION = '2.06';
+# ABSTRACT: Exception base class
+$HTML::FormFu::Exception::VERSION = '2.07';
 use Moose;
 
 with 'HTML::FormFu::Role::Populate';
@@ -42,11 +43,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Exception
+HTML::FormFu::Exception - Exception base class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

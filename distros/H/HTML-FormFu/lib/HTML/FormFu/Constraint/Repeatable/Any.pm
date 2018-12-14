@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Repeatable::Any;
-$HTML::FormFu::Constraint::Repeatable::Any::VERSION = '2.06';
+$HTML::FormFu::Constraint::Repeatable::Any::VERSION = '2.07';
 # ABSTRACT: Ensure at least 1 of a repeated field is filled-in
 
 use Moose;
@@ -130,7 +130,7 @@ HTML::FormFu::Constraint::Repeatable::Any - Ensure at least 1 of a repeated fiel
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -12,26 +12,26 @@ use Data::Object::Library;
 use Data::Object::Signatures;
 use Scalar::Util;
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 use overload (
-    '0+'     => 'data',
-    '""'     => 'data',
-    '~~'     => 'data',
-    'bool'   => 'data',
-    'qr'     => 'data',
-    fallback => 1,
+  '0+'     => 'data',
+  '""'     => 'data',
+  '~~'     => 'data',
+  'bool'   => 'data',
+  'qr'     => 'data',
+  fallback => 1,
 );
 
 method data () {
 
-    return $self->detract;
+  return $self->detract;
 
 }
 
 method detract () {
 
-    return Data::Object::detract_deep($self);
+  return Data::Object::detract_deep($self);
 
 }
 
@@ -49,13 +49,13 @@ Data::Object::Role::Detract - Detract Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::Detract';
+  with 'Data::Object::Role::Detract';
 
 =head1 DESCRIPTION
 
@@ -66,18 +66,18 @@ data objects which meet the criteria for being detractable.
 
 =head2 data
 
-    # given $detract
+  # given $detract
 
-    $detract->data; # original value
+  $detract->data; # original value
 
 The data method returns the original and underlying value contained by the
 object. This method is an alias to the detract method.
 
 =head2 detract
 
-    # given $detract
+  # given $detract
 
-    $detract->detract; # original value
+  $detract->detract; # original value
 
 The detract method returns the original and underlying value contained by the
 object.
@@ -174,7 +174,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

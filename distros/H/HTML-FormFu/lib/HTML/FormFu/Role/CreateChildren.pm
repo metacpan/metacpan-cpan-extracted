@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::CreateChildren;
-$HTML::FormFu::Role::CreateChildren::VERSION = '2.06';
+# ABSTRACT: CreateChildren role
+$HTML::FormFu::Role::CreateChildren::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Util qw( _merge_hashes require_class );
@@ -443,11 +444,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::CreateChildren
+HTML::FormFu::Role::CreateChildren - CreateChildren role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

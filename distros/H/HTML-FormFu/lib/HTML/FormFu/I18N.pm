@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::I18N;
-$HTML::FormFu::I18N::VERSION = '2.06';
+# ABSTRACT: localization base class
+$HTML::FormFu::I18N::VERSION = '2.07';
 use Moose;
 
 extends 'Locale::Maketext';
@@ -26,11 +27,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::I18N
+HTML::FormFu::I18N - localization base class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

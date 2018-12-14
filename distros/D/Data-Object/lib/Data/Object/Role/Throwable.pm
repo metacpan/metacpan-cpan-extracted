@@ -12,16 +12,16 @@ use Data::Object::Library;
 use Data::Object::Signatures;
 use Scalar::Util;
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 method throw (@args) {
 
-    my $message = (@args % 2 == 1) ? shift : undef;
-    my $class   = Data::Object::load('Data::Object::Exception');
+  my $message = (@args % 2 == 1) ? shift : undef;
+  my $class   = Data::Object::load('Data::Object::Exception');
 
-    @_ = ($class => (object => $self, message => $message));
+  @_ = ($class => (object => $self, message => $message));
 
-    goto $class->can('throw');
+  goto $class->can('throw');
 
 }
 
@@ -39,13 +39,13 @@ Data::Object::Role::Throwable - Throwable Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Class;
+  use Data::Object::Class;
 
-    with 'Data::Object::Role::Throwable';
+  with 'Data::Object::Role::Throwable';
 
 =head1 DESCRIPTION
 
@@ -56,9 +56,9 @@ data objects which meet the criteria for being throwable.
 
 =head2 throw
 
-    # given $throwable
+  # given $throwable
 
-    $throwable->throw;
+  $throwable->throw;
 
 The throw method terminates the program using the core die keyword, passing the
 object to the L<Data::Object::Exception> class as the named parameter C<object>.
@@ -156,7 +156,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

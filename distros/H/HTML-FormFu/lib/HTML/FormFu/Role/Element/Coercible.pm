@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::Element::Coercible;
-$HTML::FormFu::Role::Element::Coercible::VERSION = '2.06';
+# ABSTRACT: coercible element role
+$HTML::FormFu::Role::Element::Coercible::VERSION = '2.07';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -108,11 +109,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::Element::Coercible
+HTML::FormFu::Role::Element::Coercible - coercible element role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

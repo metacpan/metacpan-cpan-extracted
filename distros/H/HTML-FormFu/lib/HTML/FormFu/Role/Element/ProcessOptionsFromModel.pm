@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::Element::ProcessOptionsFromModel;
-$HTML::FormFu::Role::Element::ProcessOptionsFromModel::VERSION = '2.06';
+# ABSTRACT: process_options_from_model role
+$HTML::FormFu::Role::Element::ProcessOptionsFromModel::VERSION = '2.07';
 use Moose::Role;
 
 sub _process_options_from_model {
@@ -38,11 +39,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::Element::ProcessOptionsFromModel
+HTML::FormFu::Role::Element::ProcessOptionsFromModel - process_options_from_model role
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

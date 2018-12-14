@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::ASCII;
-$HTML::FormFu::Constraint::ASCII::VERSION = '2.06';
+$HTML::FormFu::Constraint::ASCII::VERSION = '2.07';
 # ABSTRACT: ASCII Characters Constraint
 
 use Moose;
@@ -27,7 +27,7 @@ HTML::FormFu::Constraint::ASCII - ASCII Characters Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

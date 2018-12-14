@@ -1,55 +1,98 @@
-Revision history for perl module Crypt::PKCS10
+2.001 2018-12-14T10:22:00Z
 
-1.0 2014-08-20
+  - Bump version to work around string sorting (i.e. "1.11" < "1.9")
 
- - Initial Version
+1.11 2018-12-13T09:50:03Z
 
-1.1 2015-10-09
+  - Change log entry for the next version
 
- - Allow same OID elements in RDNs
- - Support for all DirectoryStrings
- - New accessor method: organizationName 
+1.10 2018-03-04T15:02:26Z
 
-1.2 2015-11-13
+ - fix cpan prereqs
 
- - Add generic method extensionValue
- - Ommit unknown or damaged extensions
+1.9 2018-03-03T14:16:54Z
 
-1.3 2015-11-17
+ - Accept trailing whitespace after header line
+ - Convert build process to Minilla
+ - Add license to code file; fix Kwalitee
 
- - Experimental Perl features removed
- - Refactored building process
+1.8002_01
 
-1.4_01 2016-01-14
+ - Filter OpenSSL's 'WARNING: can't open config file' messages.
+ - Add dieOnError option to new()
+ - Report undefined $csr gracefully
+ - API v0 tests should not try to verify a signature.
+ - new() in void context will generate an exception.
 
-- Find PEM anywhere
-- Support repeated attributes
-- Various crashes, internal optimizations
-- More OIDs
-- Access methods: subject, subjectAltName, extensions
-- Generate access methods for unknown OIDs in DNs at runtime
-- Add extractCSR method to get CSR in binary or PEM
-- subjectPublicKey option to extract in PEM format
-- Convert IP addresses to strings
-- Convert basicConstraints to string
-- Add registerOID to allow extraction of simple custom OIDs
-- More tests
-- Improve documentation
-- Add setAPIversion, regularize OID names in V1
-- For API V1, attributes method returns names or values of attributes (except extensions)
-- Improve build: Use Dist::Zilla, autogenerate README,LICENE,META,Makefile.PL
-- Generate & ship Commitlog from git
+1.8002
 
-1.4_02
+ - Cosmetic: wrap long form OpenSSL config in test
+ - Make RSA, DSA and ECC support optional.  Warn during install none are present or any don't work.
+ - Signature verification requires the corresponding module, as does decoding ECC public keys.
+ - subjectPublicKeyParams and checkSignature set error() for unsupported key type or hash.
+ - Clean up carp/croak, especially where crept into evals.
+ - Provide instance method for error.
+ - Fix stringify's interactions with API v0.
+ - Add binaryMode and PEMonly options to provide finer grained control of formats
 
-- For API V1, omit space in key usage list
-- Look for policy identifier names in all tables
-- Decode certificatePolicyIdentifier, add related OIDs
-- Avoid building un-necessary ASN.1 parsers
-- Fully decode ApplicationCertPolicies for API V1
-- Check enhanced key usage before registering OID
-- Add name2oid to API
-- Internal cleanup  & error reporting improvements
+1.8001
+
+ - Makefile.pl: Diagnose old OpenSSL versions that fail signature verification and discard automated tests in that case.
+ - Print full OpenSSL configuration during automated testing.
+ - Require CryptX with version fix.
+ - Silence test warning if openssl command is missing.
+ - No changes to functional code.
+
+1.8
+
+ - When returning PEM, ensure max line width of 64 to satisfy RFC 7468, not 76 of MIME.
+ - Fix test failures on some editions of 5.8.8 due to Perl bug 39185.  (Tripped in test, not module.)
+
+1.7_01
+
+ - Address CPANTS failures due to bugs in old versions of Crypt::PK::ECC
+ - Add explicit version dependency for CryptX, the parent distribution.
+ - For insurance, add explicit version requirements for the other modules we depend on.
+ - Add getAPIversion
+ - Make stringify use an overloadable method so it can be extended if subclassed.
+ - Correctly parse DER for expected length when removing padding.
+
+1.7
+
+ - ECC test doesn't require Data::Dumper
+ - Support more EC OIDs
+ - Add DSA OIDs
+ - Add subjectPublicKeyParams(), which provides some description of the key
+ - Add certificationRequest and signature(1) to enable verification of CSR signatures
+ - Add signatureParams()
+ - Add signature(2) to extract ECDSA signature components.
+ - Fix and extend registerOID, add tests.
+ - Add examples/ directory with sample code
+ - Verify signature of CSRs in new() by default.  Add checkSignature().
+ - Optionally allow invalid base64 character in PEM data.
+ - Allow new() from filename and options from hashref.
+
+1.6
+
+ - Support some EC OIDs
+
+1.5
+
+ - Uncoordinated release of 1.4_04
+
+1.4_05
+
+ - Sign distribution kits
+ - Remove execute permissions from text files
+ - Generate Markdown format README for github
+ - Use Pod::Weaver to manage authorship, copyright from dist.ini
+ - Add prerequisites display test
+ - Validate with perlcritic, pod syntax
+
+1.4_04
+
+ - Build Kwalitee issues: Minimum Perl version, Repo location, and Provides in META
+ - Fix test issues due to hash randomization on newer Perl versions.
 
 1.4_03
 
@@ -75,72 +118,55 @@ Revision history for perl module Crypt::PKCS10
 - Return basicConstraints as a hash
 - Accept numeric OIDs as arguments to extensionValue, extensionPresent and attributes.
 
-1.4_04
- - Build Kwalitee issues: Minimum Perl version, Repo location, and Provides in META
- - Fix test issues due to hash randomization on newer Perl versions.
+1.4_02
 
-1.4_05
- - Sign distribution kits
- - Remove execute permissions from text files
- - Generate Markdown format README for github
- - Use Pod::Weaver to manage authorship, copyright from dist.ini
- - Add prerequisites display test
- - Validate with perlcritic, pod syntax
+- For API V1, omit space in key usage list
+- Look for policy identifier names in all tables
+- Decode certificatePolicyIdentifier, add related OIDs
+- Avoid building un-necessary ASN.1 parsers
+- Fully decode ApplicationCertPolicies for API V1
+- Check enhanced key usage before registering OID
+- Add name2oid to API
+- Internal cleanup  & error reporting improvements
 
-1.5
- - Uncoordinated release of 1.4_04
+1.4_01 2016-01-14
 
-1.6
- - Support some EC OIDs
+- Find PEM anywhere
+- Support repeated attributes
+- Various crashes, internal optimizations
+- More OIDs
+- Access methods: subject, subjectAltName, extensions
+- Generate access methods for unknown OIDs in DNs at runtime
+- Add extractCSR method to get CSR in binary or PEM
+- subjectPublicKey option to extract in PEM format
+- Convert IP addresses to strings
+- Convert basicConstraints to string
+- Add registerOID to allow extraction of simple custom OIDs
+- More tests
+- Improve documentation
+- Add setAPIversion, regularize OID names in V1
+- For API V1, attributes method returns names or values of attributes (except extensions)
+- Improve build: Use Dist::Zilla, autogenerate README,LICENE,META,Makefile.PL
+- Generate & ship Commitlog from git
 
-1.7
- - ECC test doesn't require Data::Dumper
- - Support more EC OIDs
- - Add DSA OIDs
- - Add subjectPublicKeyParams(), which provides some description of the key
- - Add certificationRequest and signature(1) to enable verification of CSR signatures
- - Add signatureParams()
- - Add signature(2) to extract ECDSA signature components.
- - Fix and extend registerOID, add tests.
- - Add examples/ directory with sample code
- - Verify signature of CSRs in new() by default.  Add checkSignature().
- - Optionally allow invalid base64 character in PEM data.
- - Allow new() from filename and options from hashref.
+1.3 2015-11-17
 
-1.7_01
- - Address CPANTS failures due to bugs in old versions of Crypt::PK::ECC
- - Add explicit version dependency for CryptX, the parent distribution.
- - For insurance, add explicit version requirements for the other modules we depend on.
- - Add getAPIversion
- - Make stringify use an overloadable method so it can be extended if subclassed.
- - Correctly parse DER for expected length when removing padding.
+ - Experimental Perl features removed
+ - Refactored building process
 
-1.8
- - When returning PEM, ensure max line width of 64 to satisfy RFC 7468, not 76 of MIME.
- - Fix test failures on some editions of 5.8.8 due to Perl bug 39185.  (Tripped in test, not module.)
+1.2 2015-11-13
 
-1.8001
- - Makefile.pl: Diagnose old OpenSSL versions that fail signature verification and discard automated tests in that case.
- - Print full OpenSSL configuration during automated testing.
- - Require CryptX with version fix.
- - Silence test warning if openssl command is missing.
- - No changes to functional code.
+ - Add generic method extensionValue
+ - Ommit unknown or damaged extensions
 
-1.8002
- - Cosmetic: wrap long form OpenSSL config in test
- - Make RSA, DSA and ECC support optional.  Warn during install none are present or any don't work.
- - Signature verification requires the corresponding module, as does decoding ECC public keys.
- - subjectPublicKeyParams and checkSignature set error() for unsupported key type or hash.
- - Clean up carp/croak, especially where crept into evals.
- - Provide instance method for error.
- - Fix stringify's interactions with API v0.
- - Add binaryMode and PEMonly options to provide finer grained control of formats
+1.1 2015-10-09
 
-1.8002_01
- - Filter OpenSSL's 'WARNING: can't open config file' messages.
- - Add dieOnError option to new()
- - Report undefined $csr gracefully
- - API v0 tests should not try to verify a signature.
- - new() in void context will generate an exception.
+ - Allow same OID elements in RDNs
+ - Support for all DirectoryStrings
+ - New accessor method: organizationName 
 
+1.0 2014-08-20
 
+ - Initial Version
+
+__END__

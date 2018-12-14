@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Validator::Callback;
-$HTML::FormFu::Validator::Callback::VERSION = '2.06';
+$HTML::FormFu::Validator::Callback::VERSION = '2.07';
 # ABSTRACT: Callback validator
 
 use Moose;
@@ -39,7 +39,7 @@ HTML::FormFu::Validator::Callback - Callback validator
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

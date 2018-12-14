@@ -18,7 +18,7 @@ is_deeply $cursor->command, [scan => 0], 'default cursor command';
 $cursor = $redis->cursor(scan => 0, match => '*', count => 100);
 is_deeply $cursor->command, [scan => 0, match => '*', count => 100], 'scan, match and count';
 
-diag 'reset cursor';
+note 'Reset cursor';
 $cursor->command->[1] = 32;
 $cursor->{finished} = 1;
 $cursor->again;
@@ -28,7 +28,7 @@ ok !$cursor->finished, 'finished is reset';
 $db->set("redis:scan_test:key$_", $_) for 1 .. ELEMENTS_COUNT;
 $expected = [sort map {"redis:scan_test:key$_"} 1 .. ELEMENTS_COUNT];
 
-diag 'SCAN';
+note 'SCAN';
 $cursor = $redis->cursor(scan => 0, match => 'redis:scan_test:key*');
 $guard  = 10000;
 $res    = [];
@@ -48,7 +48,7 @@ is_deeply [sort @$res], $expected, 'all_p()';
 $cursor = $redis->cursor(keys => 'redis:scan_test:key*');
 is_deeply [sort @{$cursor->all}], $expected, 'keys';
 
-diag 'HSCAN';
+note 'HSCAN';
 $db->hset('redis:scan_test:hash', "key.$_" => "val.$_") for 1 .. ELEMENTS_COUNT;
 $cursor = $redis->cursor(hgetall => 'redis:scan_test:hash');
 $cursor->next_p->then(sub { $res = $_[0] })->wait;
@@ -61,7 +61,7 @@ is_deeply($cursor->all, $db->hgetall('redis:scan_test:hash'), 'hgetall');
 $cursor = $redis->cursor(hkeys => 'redis:scan_test:hash');
 is_deeply([sort @{$cursor->all}], [sort @{$db->hkeys('redis:scan_test:hash')}], 'hkeys');
 
-diag 'SSCAN';
+note 'SSCAN';
 $db->sadd('redis:scan_test:set', $_) for 1 .. ELEMENTS_COUNT;
 $cursor = $redis->cursor(smembers => 'redis:scan_test:set');
 is_deeply([sort @{$cursor->all}], [sort @{$db->smembers('redis:scan_test:set')}], 'smembers');

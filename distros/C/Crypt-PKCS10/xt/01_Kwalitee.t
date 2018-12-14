@@ -25,16 +25,22 @@ use Test::More 0.94;
 use File::Spec;
 
 BEGIN {
-        my $distdir = File::Spec->catdir( (File::Spec->splitpath($0))[0,1], File::Spec->updir );
-        chdir $distdir or die "$distdir: $!\n";
+    my @path = ( File::Spec->splitpath($0) )[ 0, 1 ];
+    if ( not $path[0] ) {
+        shift @path;
+    }
+    push @path, File::Spec->updir;
+    my $distdir = File::Spec->catdir(@path);
+    chdir $distdir or die "$distdir: $!\n";
 }
 
- use Test::More;
-  BEGIN {
-      plan skip_all => 'these tests are for release candidate testing'
-          unless $ENV{RELEASE_TESTING};
-  }
+use Test::More;
 
-  use Test::Kwalitee 'kwalitee_ok';
-  kwalitee_ok();
-  done_testing;
+BEGIN {
+    plan skip_all => 'these tests are for release candidate testing'
+      unless $ENV{RELEASE_TESTING};
+}
+
+use Test::Kwalitee 'kwalitee_ok';
+kwalitee_ok();
+done_testing;

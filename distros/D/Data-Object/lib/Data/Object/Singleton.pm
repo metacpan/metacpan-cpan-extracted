@@ -13,24 +13,25 @@ use Scalar::Util;
 
 use parent 'Moo';
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 fun import ($class, @args) {
 
-    my $target = caller;
-    my $state  = undef;
+  my $target = caller;
+  my $state  = undef;
 
-    eval "package $target; use Moo; 1;";
+  eval "package $target; use Moo; 1;";
 
-    my $new   = $target->can('new');
-    my $renew = $target->can('renew');
+  my $new   = $target->can('new');
+  my $renew = $target->can('renew');
 
-    no strict 'refs';
+  no strict 'refs';
 
-    *{"${target}::new"}   = sub { $state = $new->(@_)   if !$state; $state };
-    *{"${target}::renew"} = sub { $state = $new->(@_) } if !$renew;
+  *{"${target}::new"}   = sub { $state = $new->(@_) if !$state; $state };
+  *{"${target}::renew"} = sub { $state = $new->(@_) }
+    if !$renew;
 
-    return;
+  return;
 
 }
 
@@ -48,17 +49,17 @@ Data::Object::Singleton - Singleton Object for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    package Registry;
+  package Registry;
 
-    use Data::Object::Singleton;
+  use Data::Object::Singleton;
 
-    extends 'Environment';
+  extends 'Environment';
 
-    1;
+  1;
 
 =head1 DESCRIPTION
 
@@ -71,10 +72,10 @@ classes easier and more fun.
 
 =head2 renew
 
-    Registry->new;   # returns instance
-    Registry->new;   # returns instance
-    Registry->renew; # returns NEW instance
-    Registry->new;   # returns instance
+  Registry->new;   # returns instance
+  Registry->new;   # returns instance
+  Registry->renew; # returns NEW instance
+  Registry->new;   # returns instance
 
 The renew method performs the same function as the C<new> method, returning a
 new instance of the class, and makes the new instance a singleton.
@@ -171,7 +172,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

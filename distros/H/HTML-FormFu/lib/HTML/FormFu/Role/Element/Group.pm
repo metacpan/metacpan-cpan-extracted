@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Role::Element::Group;
-$HTML::FormFu::Role::Element::Group::VERSION = '2.06';
+$HTML::FormFu::Role::Element::Group::VERSION = '2.07';
 # ABSTRACT: Role for grouped form fields
 
 use Moose::Role;
@@ -399,7 +399,7 @@ HTML::FormFu::Role::Element::Group - Role for grouped form fields
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

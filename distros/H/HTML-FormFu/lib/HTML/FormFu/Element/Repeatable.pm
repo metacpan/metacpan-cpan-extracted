@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Repeatable;
-$HTML::FormFu::Element::Repeatable::VERSION = '2.06';
+$HTML::FormFu::Element::Repeatable::VERSION = '2.07';
 # ABSTRACT: repeatable block element
 
 use Moose;
@@ -336,7 +336,7 @@ HTML::FormFu::Element::Repeatable - repeatable block element
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

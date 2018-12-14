@@ -9,7 +9,7 @@ use Mojo::UserAgent;
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -39,6 +39,18 @@ has url_to_link => sub {
     'youtube.com'             => 'LinkEmbedder::Link::oEmbed',
   };
 };
+
+sub get {
+  my ($self, $args, $cb) = @_;
+
+  $self->get_p($args)->then(sub {
+    $self->$cb(shift);
+  })->catch(sub {
+    $self->$cb(LinkEmbedder::Link->new(error => shift));
+  });
+
+  return $self;
+}
 
 sub get_p {
   my ($self, $args) = @_;
@@ -259,6 +271,12 @@ Holds a L<Mojo::UserAgent> object.
 Holds a mapping between host names and L<link class|LinkEmbedder::Link> to use.
 
 =head1 METHODS
+
+=head2 get
+
+  $self = $self->get_p($url, sub { my ($self, $link) = @_ });
+
+Same as L</get_p>, but takes a callback instead of returning a L<Mojo::Promise>.
 
 =head2 get_p
 

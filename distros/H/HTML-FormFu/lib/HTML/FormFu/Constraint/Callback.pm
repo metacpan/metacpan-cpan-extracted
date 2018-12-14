@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::Callback;
-$HTML::FormFu::Constraint::Callback::VERSION = '2.06';
+$HTML::FormFu::Constraint::Callback::VERSION = '2.07';
 # ABSTRACT: Code Callback Constraint
 
 use Moose;
@@ -39,7 +39,7 @@ HTML::FormFu::Constraint::Callback - Code Callback Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

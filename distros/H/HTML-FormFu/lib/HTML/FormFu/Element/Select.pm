@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Select;
-$HTML::FormFu::Element::Select::VERSION = '2.06';
+$HTML::FormFu::Element::Select::VERSION = '2.07';
 # ABSTRACT: Select form field
 
 use Moose;
@@ -116,7 +116,7 @@ HTML::FormFu::Element::Select - Select form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

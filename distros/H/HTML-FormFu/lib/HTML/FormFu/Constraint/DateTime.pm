@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::DateTime;
-$HTML::FormFu::Constraint::DateTime::VERSION = '2.06';
+$HTML::FormFu::Constraint::DateTime::VERSION = '2.07';
 # ABSTRACT: DateTime constraint
 
 use Moose;
@@ -59,7 +59,7 @@ HTML::FormFu::Constraint::DateTime - DateTime constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -14,7 +14,7 @@ use parent 'Type::Tiny::Signatures';
 
 our @DEFAULTS = @Type::Tiny::Signatures::DEFAULTS = 'Data::Object::Library';
 
-our $VERSION = '0.59'; # VERSION
+our $VERSION = '0.60'; # VERSION
 
 1;
 
@@ -30,17 +30,17 @@ Data::Object::Signatures - Signatures Object for Perl 5
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 
-    use Data::Object::Signatures;
+  use Data::Object::Signatures;
 
-    method hello (Str $name) {
+  method hello (Str $name) {
 
-        say "Hello $name, how are you?";
+    say "Hello $name, how are you?";
 
-    }
+  }
 
 =head1 DESCRIPTION
 
@@ -140,7 +140,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Al Newkirk.
+This software is copyright (c) 2018 by Al Newkirk.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

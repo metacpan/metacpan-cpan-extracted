@@ -21,6 +21,7 @@ WriteMakefile(
         'File::Path::Tiny'      => 0.8,
         'Digest::MD5'           => 2.53,
         'File::Spec'            => 3.4801,
+        'Term::Sk'              => 0.18,
     },
     META_MERGE   => {
           requires  => { perl => '5.008008' },

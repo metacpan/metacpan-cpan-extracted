@@ -1,6 +1,6 @@
 package Method::ParamValidator;
 
-$Method::ParamValidator::VERSION   = '0.14';
+$Method::ParamValidator::VERSION   = '0.15';
 $Method::ParamValidator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator - Configurable method parameter validator.
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
@@ -276,7 +276,7 @@ sub BUILD {
 
 =head2 validate($method_name, \%params)
 
-Validates the given method C<$name> against the given parameters C<\%params>.
+Validates the given C<$method_name> against the given parameters C<\%params>.
 Throws exception if validation fail.
 
 =cut

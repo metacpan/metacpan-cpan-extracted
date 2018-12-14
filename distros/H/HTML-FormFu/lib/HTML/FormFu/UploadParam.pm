@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::UploadParam;
-$HTML::FormFu::UploadParam::VERSION = '2.06';
+$HTML::FormFu::UploadParam::VERSION = '2.07';
 # ABSTRACT: accessor class
 
 use Moose;
@@ -102,7 +102,7 @@ HTML::FormFu::UploadParam - accessor class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

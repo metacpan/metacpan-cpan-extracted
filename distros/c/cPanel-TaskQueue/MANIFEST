@@ -2,6 +2,7 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -48,7 +49,6 @@ t/statefile_filelocker_pid_clash.t
 t/statefile_filelocker_unlock_empty.t
 t/statefile_load.t
 t/statefile_load_save.t
-t/statefile_lock_replace.t
 t/statefile_logging_policy.t
 t/statefile_new_bad_args.t
 t/taskqueue_bad_statefile.t

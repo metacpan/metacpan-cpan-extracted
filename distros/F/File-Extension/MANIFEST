@@ -1,0 +1,9 @@
+lib/File/Extension.pm
+MANIFEST
+MYMETA.json
+MYMETA.yml
+t/00-load.t
+t/01-pod.t
+t/021-synopsis.t
+t/02-pod-coverage.t
+t/03-extension.t

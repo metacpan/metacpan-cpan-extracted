@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Number;
-$HTML::FormFu::Element::Number::VERSION = '2.06';
+$HTML::FormFu::Element::Number::VERSION = '2.07';
 # ABSTRACT: Number element with formatting
 
 use Moose;
@@ -46,7 +46,7 @@ HTML::FormFu::Element::Number - Number element with formatting
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::UpperCase;
-$HTML::FormFu::Filter::UpperCase::VERSION = '2.06';
+$HTML::FormFu::Filter::UpperCase::VERSION = '2.07';
 # ABSTRACT: filter transforming to upper case
 
 use Moose;
@@ -31,7 +31,7 @@ HTML::FormFu::Filter::UpperCase - filter transforming to upper case
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

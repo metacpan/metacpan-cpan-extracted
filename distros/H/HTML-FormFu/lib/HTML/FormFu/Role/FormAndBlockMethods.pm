@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::Role::FormAndBlockMethods;
-$HTML::FormFu::Role::FormAndBlockMethods::VERSION = '2.06';
+# ABSTRACT: role for form and block methods
+$HTML::FormFu::Role::FormAndBlockMethods::VERSION = '2.07';
 use Moose::Role;
 
 use HTML::FormFu::Util qw( _merge_hashes );
@@ -197,11 +198,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::Role::FormAndBlockMethods
+HTML::FormFu::Role::FormAndBlockMethods - role for form and block methods
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

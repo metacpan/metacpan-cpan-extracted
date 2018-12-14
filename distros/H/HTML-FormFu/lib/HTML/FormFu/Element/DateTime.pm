@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::DateTime;
-$HTML::FormFu::Element::DateTime::VERSION = '2.06';
+$HTML::FormFu::Element::DateTime::VERSION = '2.07';
 # ABSTRACT: Date / Time combo field
 
 use Moose;
@@ -188,7 +188,7 @@ HTML::FormFu::Element::DateTime - Date / Time combo field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

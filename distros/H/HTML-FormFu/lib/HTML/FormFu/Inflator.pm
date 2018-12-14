@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Inflator;
-$HTML::FormFu::Inflator::VERSION = '2.06';
+$HTML::FormFu::Inflator::VERSION = '2.07';
 # ABSTRACT: Inflator Base Class
 
 use Moose;
@@ -69,7 +69,7 @@ HTML::FormFu::Inflator - Inflator Base Class
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

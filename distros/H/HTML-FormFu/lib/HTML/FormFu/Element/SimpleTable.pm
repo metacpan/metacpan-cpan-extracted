@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::SimpleTable;
-$HTML::FormFu::Element::SimpleTable::VERSION = '2.06';
+$HTML::FormFu::Element::SimpleTable::VERSION = '2.07';
 # ABSTRACT: simple table element
 
 use Moose;
@@ -133,7 +133,7 @@ HTML::FormFu::Element::SimpleTable - simple table element
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

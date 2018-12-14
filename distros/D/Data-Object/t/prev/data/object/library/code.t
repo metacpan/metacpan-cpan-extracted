@@ -6,16 +6,16 @@ use Test::TypeTiny;
 
 use Data::Object qw(deduce);
 use Data::Object::Library qw(
-    CodeObj
-    CodeObject
-    Object
+  CodeObj
+  CodeObject
+  Object
 );
 
 ok_subtype Object, CodeObj;
 ok_subtype Object, CodeObject;
 
-my $data1 = sub {};
-my $data2 = deduce sub {};
+my $data1 = sub        { };
+my $data2 = deduce sub { };
 
 should_fail($data1, CodeObj);
 should_pass($data2, CodeObj);

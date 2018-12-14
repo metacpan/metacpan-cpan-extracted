@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub new {
     my ($class, %args) = @_;
@@ -18,7 +18,7 @@ sub import_intel_hex {
     my ($self, $hex_string) = @_;
 
     my $addr_high_dec = 0;
-
+    my $create_part = 0;
     for my $line (split m{\n\r?}, $hex_string) {
         my ($addr, $type, $bytes_str) = $line =~ m{
 		  : # intel hex start
@@ -33,15 +33,18 @@ sub import_intel_hex {
 
         # data line?
         if ($type == 0) {
-            $self->write($addr_high_dec + hex $addr, \@bytes);
+            $self->write($addr_high_dec + hex $addr, \@bytes, $create_part);
+            $create_part = 0;
         }
         # extended linear address type?
         elsif ($type == 4) {
             $addr_high_dec = hex( join '', @bytes ) << 16;
+            $create_part = 1;
         }
         # extended segment address type?
         elsif ($type == 2) {
             $addr_high_dec = hex( join '', @bytes ) << 4;
+            $create_part = 1;
         }
     }
 
@@ -91,7 +94,8 @@ sub import_srec_hex {
 }
 
 sub write {
-    my ($self, $from, $bytes_hex_ref) = @_;
+    my ($self, $from, $bytes_hex_ref, $create_part) = @_;
+    $create_part ||= 0;
 
     $self->remove($from, scalar @$bytes_hex_ref);
 
@@ -104,12 +108,12 @@ sub write {
         my $end_addr   = $part->{start} + $#{ $part->{bytes} };
 
         # merge with this part
-        if ($to == $start_addr) {
+        if ($create_part == 0 && $to == $start_addr) {
             $part->{start} = $from;
             unshift @{ $part->{bytes} }, @$bytes_hex_ref;
             return;
         }
-        elsif ($from == $end_addr + 1) {
+        elsif ($create_part == 0 && $from == $end_addr + 1) {
             push @{ $part->{bytes} }, @$bytes_hex_ref;
 
             return if $part_i+1 == @{ $self->{parts} };

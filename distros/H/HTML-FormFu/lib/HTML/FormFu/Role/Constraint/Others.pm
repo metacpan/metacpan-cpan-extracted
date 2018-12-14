@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Role::Constraint::Others;
-$HTML::FormFu::Role::Constraint::Others::VERSION = '2.06';
+$HTML::FormFu::Role::Constraint::Others::VERSION = '2.07';
 # ABSTRACT: Base class for constraints needing others() method
 
 use Moose::Role;
@@ -222,7 +222,7 @@ HTML::FormFu::Role::Constraint::Others - Base class for constraints needing othe
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 METHODS
 

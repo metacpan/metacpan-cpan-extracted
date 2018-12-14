@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Plugin::StashValid;
-$HTML::FormFu::Plugin::StashValid::VERSION = '2.06';
+$HTML::FormFu::Plugin::StashValid::VERSION = '2.07';
 # ABSTRACT: place valid params on form stash
 
 use Moose;
@@ -36,7 +36,7 @@ HTML::FormFu::Plugin::StashValid - place valid params on form stash
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::FakeQuery;
-$HTML::FormFu::FakeQuery::VERSION = '2.06';
+# ABSTRACT: fake query
+$HTML::FormFu::FakeQuery::VERSION = '2.07';
 use warnings;
 
 use Scalar::Util qw( reftype );
@@ -84,11 +85,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::FakeQuery
+HTML::FormFu::FakeQuery - fake query
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

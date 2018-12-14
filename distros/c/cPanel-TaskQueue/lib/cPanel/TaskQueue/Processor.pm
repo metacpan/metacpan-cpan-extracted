@@ -1,5 +1,5 @@
 package cPanel::TaskQueue::Processor;
-$cPanel::TaskQueue::Processor::VERSION = '0.901';
+$cPanel::TaskQueue::Processor::VERSION = '0.902';
 use strict;
 
 #use warnings;
@@ -105,7 +105,7 @@ use strict;
 {
 
     package cPanel::TaskQueue::Processor::CodeRef;
-$cPanel::TaskQueue::Processor::CodeRef::VERSION = '0.901';
+$cPanel::TaskQueue::Processor::CodeRef::VERSION = '0.902';
 use parent -norequire, 'cPanel::TaskQueue::Processor';
 
     {

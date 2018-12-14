@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.639   2018-12-14
+    - Update char-width tables.
+
 1.638   2018-11-30
     - Option 'll': don't create a length-array but only assign when required.
     - Bugfix option 'mouse'.

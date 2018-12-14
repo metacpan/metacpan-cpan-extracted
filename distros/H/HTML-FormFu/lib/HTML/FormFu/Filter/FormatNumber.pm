@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::FormatNumber;
-$HTML::FormFu::Filter::FormatNumber::VERSION = '2.06';
+$HTML::FormFu::Filter::FormatNumber::VERSION = '2.07';
 # ABSTRACT: Convert a formatted number from a known locale
 
 use Moose;
@@ -52,7 +52,7 @@ HTML::FormFu::Filter::FormatNumber - Convert a formatted number from a known loc
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

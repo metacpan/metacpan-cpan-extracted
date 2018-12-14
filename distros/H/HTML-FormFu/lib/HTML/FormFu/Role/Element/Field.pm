@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Role::Element::Field;
-$HTML::FormFu::Role::Element::Field::VERSION = '2.06';
+$HTML::FormFu::Role::Element::Field::VERSION = '2.07';
 # ABSTRACT: Role for all form-field elements
 
 use Moose::Role;
@@ -496,21 +496,22 @@ around render_data_non_recursive => sub {
     my ( $orig, $self, $args ) = @_;
 
     my $render = $self->$orig(
-        {   nested_name          => xml_escape( $self->nested_name ),
-            comment_attributes   => xml_escape( $self->comment_attributes ),
-            container_attributes => xml_escape( $self->container_attributes ),
-            label_attributes     => xml_escape( $self->label_attributes ),
-            comment              => xml_escape( $self->comment ),
-            label                => xml_escape( $self->label ),
-            field_filename       => $self->field_filename,
-            label_filename       => $self->label_filename,
-            label_tag            => $self->label_tag,
-            container_tag        => $self->container_tag,
-            error_container_tag  => $self->error_container_tag,
-            error_tag            => $self->error_tag,
-            reverse_single       => $self->reverse_single,
-            reverse_multi        => $self->reverse_multi,
-            javascript           => $self->javascript,
+        {   nested_name                => xml_escape( $self->nested_name ),
+            comment_attributes         => xml_escape( $self->comment_attributes ),
+            container_attributes       => xml_escape( $self->container_attributes ),
+            error_container_attributes => xml_escape( $self->error_container_attributes ),
+            label_attributes           => xml_escape( $self->label_attributes ),
+            comment                    => xml_escape( $self->comment ),
+            label                      => xml_escape( $self->label ),
+            field_filename             => $self->field_filename,
+            label_filename             => $self->label_filename,
+            label_tag                  => $self->label_tag,
+            container_tag              => $self->container_tag,
+            error_container_tag        => $self->error_container_tag,
+            error_tag                  => $self->error_tag,
+            reverse_single             => $self->reverse_single,
+            reverse_multi              => $self->reverse_multi,
+            javascript                 => $self->javascript,
             $args ? %$args : (),
         } );
 
@@ -1154,7 +1155,7 @@ HTML::FormFu::Role::Element::Field - Role for all form-field elements
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 
@@ -1520,6 +1521,12 @@ wrapped around all of the field error messages.
       error_tag: li
 
 Is an L<inheriting accessor|HTML::FormFu/INHERITING ACCESSORS>.
+
+=head3 error_container_attributes
+
+Set attributes on the container-tag, if L</error_container_tag> is set.
+
+Is an L<attribute accessor|HTML::FormFu/ATTRIBUTE ACCESSOR>.
 
 =head3 auto_error_container_class
 

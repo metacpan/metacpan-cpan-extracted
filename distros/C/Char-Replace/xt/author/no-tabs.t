@@ -11,7 +11,8 @@ my @files = (
     't/00-load.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/replace.t'
+    't/replace.t',
+    't/trim.t'
 );
 
 notabs_ok($_) foreach @files;

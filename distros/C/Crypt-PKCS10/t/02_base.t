@@ -85,7 +85,7 @@ if( defined $sslver && length $sslver) {
 pass( 'configuration' );
 diag( sprintf( "Perl %s version %vd%s\n", $^X, $^V, $sslver ) );
 $sslver = join( ', ', map { !eval "require $_;"? ( /^.*::(.*)$/, ): () }
-                ( qw/Crypt::OpenSSL::DSA Crypt::OpenSSL::RSA/ ) ); # Expose subtest skips
+                ( qw/Crypt::PK::DSA Crypt::PK::RSA/ ) ); # Expose subtest skips
 diag( "Skipping $sslver tests: no support\n" ) if( $sslver );
 undef $sslver;
 
@@ -273,7 +273,7 @@ RyY=
     is( $decoded->signature(2), undef, 'signature decoding' );
 
   SKIP: {
-        skip( "Crypt::OpenSSL::RSA not installed", 1 ) unless( eval { require Crypt::OpenSSL::RSA; } );
+        skip( "Crypt::PK::RSA not installed", 1 ) unless( eval { require Crypt::PK::RSA; } );
 
         ok( $decoded->checkSignature, 'verify RSA CSR signature' );
     }
@@ -356,7 +356,7 @@ RyY=
     my $bad;
 
   SKIP: {
-        skip( "Crypt::OpenSSL::RSA is not installed", 5 ) unless( eval { require Crypt::OpenSSL::RSA } );
+        skip( "Crypt::PK::RSA is not installed", 5 ) unless( eval { require Crypt::PK::RSA } );
 
         if( open( my $csr, '<', $file ) ) {
             $bad = Crypt::PKCS10->new( $csr, acceptPEM => 0, escapeStrings => 0 );
@@ -737,7 +737,7 @@ subtest 'DSA requests' => sub {
 
     is( $decoded->signature(2), undef, 'signature decoding' );
   SKIP: {
-        skip( "Crypt::OpenSSL::DSA is not installed", 1 ) unless( eval { require Crypt::OpenSSL::DSA; } );
+        skip( "Crypt::PK::DSA is not installed", 1 ) unless( eval { require Crypt::PK::DSA; } );
 
         ok( $decoded->checkSignature, "verify DSA signature" );
     }

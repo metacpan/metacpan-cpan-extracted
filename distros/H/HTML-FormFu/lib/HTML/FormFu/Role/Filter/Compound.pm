@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Role::Filter::Compound;
-$HTML::FormFu::Role::Filter::Compound::VERSION = '2.06';
+$HTML::FormFu::Role::Filter::Compound::VERSION = '2.07';
 # ABSTRACT: Role for Compound filters
 
 use Moose::Role;
@@ -48,7 +48,7 @@ HTML::FormFu::Role::Filter::Compound - Role for Compound filters
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 METHODS
 

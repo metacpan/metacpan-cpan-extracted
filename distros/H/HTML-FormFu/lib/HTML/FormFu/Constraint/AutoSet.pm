@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::AutoSet;
-$HTML::FormFu::Constraint::AutoSet::VERSION = '2.06';
+$HTML::FormFu::Constraint::AutoSet::VERSION = '2.07';
 # ABSTRACT: Set Constraint for Selects / Radiogroups / Checkboxgroups
 
 use Moose;
@@ -48,7 +48,7 @@ HTML::FormFu::Constraint::AutoSet - Set Constraint for Selects / Radiogroups / C
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

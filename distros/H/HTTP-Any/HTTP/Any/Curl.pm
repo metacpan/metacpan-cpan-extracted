@@ -177,8 +177,7 @@ sub _parse_headers {
 	$h =~ s/(,\r*\n)\s+/, /g; # fix for old standard, multyline header
 
 	my ($status_line, @h) = split /\r?\n/, $h;
-	my ($protocol, $status, $reason) = $status_line =~ m/(HTTP\/\d\.\d)\s+(\d+)(?:\s+(.+))?/;
-	# ToDo Когда $reason не указан, формировать на основе $status?
+	my ($protocol, $status, $reason) = $status_line =~ m/(HTTP\/\d(?:\.\d)?)\s+(\d+)(?:\s+(.+))?/;
 
 	my %h = ();
 	foreach (@h) {
@@ -190,7 +189,7 @@ sub _parse_headers {
 	return {
 		Protocol => $protocol,
 		Status   => $status,
-		Reason   => $reason,
+		Reason   => ($reason || ""),
 		URL      => $url,
 		map { $_ => join ",", @{$h{$_}} } keys %h
 	};

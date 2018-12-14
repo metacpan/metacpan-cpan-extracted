@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Deflator::CompoundSplit;
-$HTML::FormFu::Deflator::CompoundSplit::VERSION = '2.06';
+$HTML::FormFu::Deflator::CompoundSplit::VERSION = '2.07';
 # ABSTRACT: CompoundSplit deflator
 
 use Moose;
@@ -89,7 +89,7 @@ HTML::FormFu::Deflator::CompoundSplit - CompoundSplit deflator
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ Arguments: $string
 
 Default Value: C<' '>
 
-If spliting the value results in more parts than there are fields, any extra
+If splitting the value results in more parts than there are fields, any extra
 parts are joined again to form the value for the last field. The value of
 L</join> is used to join these values.
 

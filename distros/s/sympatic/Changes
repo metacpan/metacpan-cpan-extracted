@@ -1,15 +1,20 @@
 Revision history for Sympatic
 
+0.2    2018-12-14    Marc Chantreux
+
+* doc fixing and improvement
+* add Role support
+
 0.1    2018-12-08    Marc Chantreux
 
 * add documentation
 * add test suite
 
-also, as we expect
+also, we expect
 
 * beginners to not worry about gory details
   (default should be helpful)
-* extra behavior to be disable
+* extra behavior to be disabled
 
 0.0    2018-02-07    Marc Chantreux
 

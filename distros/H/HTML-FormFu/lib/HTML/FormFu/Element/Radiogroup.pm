@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Radiogroup;
-$HTML::FormFu::Element::Radiogroup::VERSION = '2.06';
+$HTML::FormFu::Element::Radiogroup::VERSION = '2.07';
 # ABSTRACT: Group of radiobutton form fields
 
 use Moose;
@@ -35,7 +35,7 @@ HTML::FormFu::Element::Radiogroup - Group of radiobutton form fields
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

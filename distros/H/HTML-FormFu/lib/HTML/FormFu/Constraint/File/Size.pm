@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Constraint::File::Size;
-$HTML::FormFu::Constraint::File::Size::VERSION = '2.06';
+$HTML::FormFu::Constraint::File::Size::VERSION = '2.07';
 # ABSTRACT: File Size Constraint
 
 use Moose;
@@ -111,7 +111,7 @@ HTML::FormFu::Constraint::File::Size - File Size Constraint
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

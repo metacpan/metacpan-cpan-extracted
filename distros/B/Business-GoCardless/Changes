@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.32     2018-12-14
+        - Fix PUT/POST requests when no content lenght (GH #13)
+
 0.31     2017-11-07
         - Fix sending of non-ASCII data in JSON requests to GoCardless
           by calling ->utf8 on the JSON object prior to ->encode

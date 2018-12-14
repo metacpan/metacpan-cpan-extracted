@@ -1,7 +1,8 @@
 use strict;
 
 package HTML::FormFu::I18N::ua;
-$HTML::FormFu::I18N::ua::VERSION = '2.06';
+# ABSTRACT: Ukranian
+$HTML::FormFu::I18N::ua::VERSION = '2.07';
 use utf8;
 
 use Moose;
@@ -79,11 +80,11 @@ __END__
 
 =head1 NAME
 
-HTML::FormFu::I18N::ua
+HTML::FormFu::I18N::ua - Ukranian
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 AUTHOR
 

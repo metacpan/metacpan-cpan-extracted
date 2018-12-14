@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Deflator::CompoundDateTime;
-$HTML::FormFu::Deflator::CompoundDateTime::VERSION = '2.06';
+$HTML::FormFu::Deflator::CompoundDateTime::VERSION = '2.07';
 # ABSTRACT: CompoundDateTime deflator
 
 use Moose;
@@ -70,7 +70,7 @@ HTML::FormFu::Deflator::CompoundDateTime - CompoundDateTime deflator
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

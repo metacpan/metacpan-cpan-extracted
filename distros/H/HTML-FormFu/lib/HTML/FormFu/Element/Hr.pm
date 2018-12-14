@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Hr;
-$HTML::FormFu::Element::Hr::VERSION = '2.06';
+$HTML::FormFu::Element::Hr::VERSION = '2.07';
 # ABSTRACT: horizontal-rule element
 
 use Moose;
@@ -34,7 +34,7 @@ HTML::FormFu::Element::Hr - horizontal-rule element
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 DESCRIPTION
 

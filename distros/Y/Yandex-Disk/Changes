@@ -11,4 +11,6 @@ Revision history for Perl extension Yandex::Disk.
 		-b 5.8.1 -XAn Yandex::Disk
 0.04  Wed Apr  25 11:07:00 2018
     - Changed bug with method deleteResource. Not work '-permanently' options
+0.05  Thu Dec  13 22:00:00 2018
+    - Added options to show progress bar on upload and download file
 

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Object Orientation for Perl 5",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Object",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.000001",
+            "Sub::Quote" : "2.005001",
+            "Type::Tiny" : "1.000005",
+            "Type::Tiny::Signatures" : "0.07",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "2.000001",
+            "Sub::Quote" : "2.005001",
+            "Type::Tiny" : "1.000005",
+            "Type::Tiny::Signatures" : "0.07",
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Data-Object/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Data-Object/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Data-Object.git",
+         "web" : "https://github.com/alnewkirk/Data-Object"
+      }
+   },
+   "version" : "0.60",
+   "x_authority" : "cpan:AWNCORP",
+   "x_contributors" : [
+      "Al Newkirk <al@iamalnewkirk.com>",
+      "Anthony Brummett <abrummet@genome.wustl.edu>"
+   ],
+   "x_generated_by_perl" : "v5.14.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

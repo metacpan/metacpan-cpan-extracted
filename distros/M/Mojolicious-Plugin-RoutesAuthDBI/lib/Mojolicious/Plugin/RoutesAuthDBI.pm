@@ -131,10 +131,6 @@ has log => sub {# object
     unless $conf->{disabled};
 }, weak => 1;
 
-#~ has model => sub {
-  #~ my $m = { map {$_ => load_class("Mojolicious::Plugin::RoutesAuthDBI::Model::$_")->new} qw(Profiles Namespaces Routes Refs Controllers Actions Roles Logins) };
-  
-#~ };
 
 sub register {
   my $self = shift;
@@ -364,7 +360,7 @@ sub model {
   
 };
 
-our $VERSION = '0.862';
+our $VERSION = '0.864';
 
 =pod
 
@@ -380,7 +376,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.862
+0.864
 
 =head1 NAME
 

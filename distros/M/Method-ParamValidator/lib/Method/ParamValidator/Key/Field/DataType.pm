@@ -1,6 +1,6 @@
 package Method::ParamValidator::Key::Field::DataType;
 
-$Method::ParamValidator::Key::Field::DataType::VERSION   = '0.14';
+$Method::ParamValidator::Key::Field::DataType::VERSION   = '0.15';
 $Method::ParamValidator::Key::Field::DataType::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Method::ParamValidator::Key::Field::DataType - Library of 'data types' for the f
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 

@@ -1,5 +1,12 @@
 Revision history for App-chkfacl
 
+0.5   2018-12-14
+        Updating for release of version 0.5
+        Added perl 5.26 and removed perl 5.8 (Ivan Wills)
+        Added config requires (Ivan Wills)
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.4   2016-11-27
         Updating for release of version 0.4
         Added perl 5.24 to travis build (Ivan Wills)

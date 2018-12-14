@@ -92,7 +92,7 @@ html_formfu_dumpconf.pl - dump configuration files
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

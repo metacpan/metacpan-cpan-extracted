@@ -5,7 +5,8 @@ use Hash::Merge qw( merge );
 use Digest::MD5 qw(md5_hex);
 
 my ($Init);
-has [qw(plugin controller namespace model)];
+has [qw(app plugin )], undef, weak=>1;
+has [qw(controller namespace model)]
 
 # state here for init and many news
 #~ has model => sub { shift->_model};

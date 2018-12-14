@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Filter::Regex;
-$HTML::FormFu::Filter::Regex::VERSION = '2.06';
+$HTML::FormFu::Filter::Regex::VERSION = '2.07';
 # ABSTRACT: regexp-based match/replace filter
 
 use Moose;
@@ -48,7 +48,7 @@ HTML::FormFu::Filter::Regex - regexp-based match/replace filter
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

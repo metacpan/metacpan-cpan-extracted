@@ -1,5 +1,8 @@
 Revision history for Method::ParamValidator
 
+0.15   Fri Dec 14 06:40:00 2018
+       - Fixed typo in the pod.
+
 0.14   Thu Dec 13 08:40:00 2018
        - Tidied up SYNOPSIS code.
 

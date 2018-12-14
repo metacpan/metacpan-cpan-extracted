@@ -27,7 +27,9 @@ use File::Spec;
 
 my $TOKEN = 'AQAAAAAMIzNAAASQpMKd0J_8iUSkr4fIYskC880';
 my $UPLOAD_FILE = File::Spec->catfile($Bin, 'small_file');
+my $BIG_UPLOAD_FILE = File::Spec->catfile($Bin, 'big_test_upload_file');
 my $DOWNLOAD_FILE = File::Spec->catfile($Bin, "download_file");
+my $BIG_DOWNLOAD_FILE = File::Spec->catfile($Bin, "big_download_file");
 File::Path::Tiny::rm ($DOWNLOAD_FILE);
 
 
@@ -52,6 +54,8 @@ testCompareFile();
 testDeleteResource();
 testPublic();
 testEmptyTrash();
+#testUploadFileWithTerm();
+#testDownloadFileWithTerm();
 
 File::Path::Tiny::rm ($DOWNLOAD_FILE);
 
@@ -72,6 +76,17 @@ sub testUploadFile {
     ok ($res, "Test uploadFile");
 }
 
+sub testUploadFileWithTerm {
+    can_ok("Yandex::Disk", "uploadFile");
+    my $res = $disk->uploadFile(
+                                    -overwrite          => 1,
+                                    -file               => $BIG_UPLOAD_FILE,
+                                    -remote_path        => "/Temp",
+                                    -show_progress_bar  => 1,
+                                );
+    ok ($res, "Test uploadFile with progress bar");
+}
+
 sub testDownloadFile {
     File::Path::Tiny::rm($DOWNLOAD_FILE);
     can_ok("Yandex::Disk", "downloadFile");
@@ -79,7 +94,20 @@ sub testDownloadFile {
                                     -path       => '/Temp/' . basename($UPLOAD_FILE),
                                     -file       => $DOWNLOAD_FILE,
                                 );
-    ok($res, "Test downloadFile");
+    ok (-e $DOWNLOAD_FILE, "Exists download file");
+    ok ($res, "Test downloadFile");
+}
+
+sub testDownloadFileWithTerm {
+    File::Path::Tiny::rm($BIG_DOWNLOAD_FILE);
+    can_ok("Yandex::Disk", "downloadFile");
+    my $res = $disk->downloadFile(
+                                    -path               => '/Temp/' . basename($BIG_UPLOAD_FILE),
+                                    -file               => $BIG_DOWNLOAD_FILE,
+                                    -show_progress_bar  => 1,
+                                );
+    ok (-e $BIG_DOWNLOAD_FILE, "Exists download file");
+    ok ($res, "Test downloadFile with progress bar");
 }
 
 sub testCompareFile {

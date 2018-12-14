@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::File;
-$HTML::FormFu::Element::File::VERSION = '2.06';
+$HTML::FormFu::Element::File::VERSION = '2.07';
 # ABSTRACT: File upload form field
 
 use Moose;
@@ -36,7 +36,7 @@ HTML::FormFu::Element::File - File upload form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 

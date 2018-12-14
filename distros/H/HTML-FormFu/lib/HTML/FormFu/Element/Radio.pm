@@ -1,7 +1,7 @@
 use strict;
 
 package HTML::FormFu::Element::Radio;
-$HTML::FormFu::Element::Radio::VERSION = '2.06';
+$HTML::FormFu::Element::Radio::VERSION = '2.07';
 # ABSTRACT: Radio form field
 
 use Moose;
@@ -36,7 +36,7 @@ HTML::FormFu::Element::Radio - Radio form field
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 
