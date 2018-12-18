@@ -13,7 +13,7 @@ has tmpl => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' .
 has _tmpl    => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
 has _is_ansi => ( init_arg => undef );
 
-const our $INDENT => q[ ] x 4;
+const our $INDENT => $SPACE x 4;
 
 sub BUILD ( $self, $args ) {
 

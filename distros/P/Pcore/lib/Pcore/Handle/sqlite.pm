@@ -8,6 +8,7 @@ use DBD::SQLite::Constants qw[:file_open];
 use Pcore::Util::Scalar qw[weaken is_blessed_ref looks_like_number is_plain_arrayref is_plain_coderef is_blessed_arrayref];
 use Pcore::Util::UUID qw[uuid_v1mc_str uuid_v4_str];
 use Pcore::Util::Data qw[to_json];
+use Pcore::Util::Text qw[encode_utf8];
 
 # NOTE http://habrahabr.ru/post/149635/
 # для вставки данных в цикле надо использовать h->begin_work ... h->commit
@@ -115,7 +116,7 @@ sub BUILD ( $self, $args ) {
 
     my $dbname = $self->{uri}->{path} ? $self->{uri}->{path}->to_string : ':memory:';
 
-    my $dbh = DBI->connect( "dbi:SQLite:dbname=$dbname", q[], q[], $attr );
+    my $dbh = DBI->connect( "dbi:SQLite:dbname=$dbname", $EMPTY, $EMPTY, $attr );
 
     $dbh->do('PRAGMA encoding = "UTF-8"');
     $dbh->do( 'PRAGMA temp_store = ' . $self->{temp_store} );
@@ -232,7 +233,7 @@ sub quote ( $self, $var ) {
     else {
 
         # quote \x00 in literal
-        if ( index( $var, "\x00" ) != -1 ) {
+        if ( index( $var, "\N{NULL}" ) != -1 ) {
             utf8::encode $var if utf8::is_utf8 $var;
 
             return q[CAST(x'] . unpack( 'H*', $var ) . q[' AS TEXT)];
@@ -334,7 +335,7 @@ sub _exec_sth ( $self, $query, @args ) {
 }
 
 sub _warn ($self) {
-    warn qq[DBI: "$DBI::errstr"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : q[] );
+    warn qq[DBI: "$DBI::errstr"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : $EMPTY );
 
     return;
 }
@@ -357,10 +358,15 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
             elsif ( $bind[$i]->[0] == $SQL_JSON ) {
                 $bind[$i] = to_json( $bind[$i]->[1] )->$*;
             }
+            elsif ( $bind[$i]->[0] == $SQL_BYTEA ) {
+                $bind[$i] = encode_utf8 $bind[$i]->[1];
+            }
             else {
                 $bind[$i] = $bind[$i]->[1];
             }
         }
+
+        # encode ArrayRef as JSON
         elsif ( is_plain_arrayref $bind[$i] ) {
             $sth->bind_param( $i + 1, undef, $SQLITE_BLOB );
 
@@ -756,18 +762,16 @@ sub attach ( $self, $name, $path = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 159                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
+## |    3 | 160                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 377                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
+## |    3 | 383                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (28)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 460                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 466                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 235                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    2 | 351                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 350                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 667                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 673                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

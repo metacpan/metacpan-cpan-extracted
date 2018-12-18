@@ -8,9 +8,9 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Itself ;
-$Config::Model::Itself::VERSION = '2.014';
+$Config::Model::Itself::VERSION = '2.016';
 use Mouse ;
-use Config::Model 2.114;
+use Config::Model 2.127;
 use 5.010;
 
 use IO::File ;
@@ -244,7 +244,10 @@ sub read_all {
         die "Cannot read from unknown dir ".$model_dir unless $model_dir->is_dir;
     }
 
-    my $apps = $self-> read_app_files($force_load, $read_from, delete $args{application});
+    my $apps = {};
+    if (my $app_name = delete $args{application}) {
+        $apps = $self-> read_app_files($force_load, $read_from, $app_name);
+    }
 
     my $root_model_arg = delete $args{root_model} || '';
     my $model = $apps->{$root_model_arg} || $root_model_arg ;
@@ -803,7 +806,7 @@ Config::Model::Itself - Model editor for Config::Model
 
 =head1 VERSION
 
-version 2.014
+version 2.016
 
 =head1 SYNOPSIS
 

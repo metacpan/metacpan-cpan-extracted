@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.503   2018-12-17
+        - Set SHOW_CURSOR.
+
 0.502   2018-11-14
         - Bugfix parameter validation.
 

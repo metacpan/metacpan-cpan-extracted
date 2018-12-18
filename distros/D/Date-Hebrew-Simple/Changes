@@ -1,5 +1,8 @@
 Revision history for Date::Hebrew::Simple
 
+0.10  Mon Dec 17 04:45:00 2018
+      - Updated dependency on Date::Utils v0.24.
+
 0.09  Thu Mar 15 18:20:00 2018
       - Used namespace::autoclean instead.
 

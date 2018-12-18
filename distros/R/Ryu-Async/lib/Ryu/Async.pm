@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 =head1 NAME
 
@@ -109,17 +109,19 @@ sub from {
     if(my $ref = ref $_[0]) {
         if($ref eq 'ARRAY') {
             my @pending = @{$_[0]};
+            weaken(my $weak_src = $src);
             my $code;
             $code = sub {
+                my $src = $weak_src;
+                $src->emit(shift @pending) if @pending and $src;
                 if(@pending) {
-                    $src->emit(shift @pending);
                     $self->loop->later($code);
                 } else {
                     $src->finish;
-                    weaken($_) for $src, $code, $self;
+                    weaken $_ for $self, $code;
                 }
             };
-            $code->();
+            $self->loop->later($code);
             return $src;
         } else {
             die "Unknown type $ref"
@@ -166,6 +168,9 @@ sub from_stream {
     # value every time the state changes:
     # 1 - we are active
     # 0 - we are paused
+    # through sheer coïncidence, this is also what the
+    # IO::Async::Stream `->want_(read|write)ready` methods
+    # expect.
     $src->flow_control
         ->each($stream->curry::weak::want_readready);
 
@@ -193,18 +198,22 @@ sub to_stream {
     my ($self, $stream) = @_;
 
     my $sink = $self->sink(label => 'from');
-    $sink->flow_control
-        ->each($stream->curry::weak::want_writeready);
+
+    $stream->configure(
+        on_writeable_start => $sink->curry::weak::resume,
+        on_writeable_stop  => $sink->curry::weak::pause,
+    );
     $sink->source
         ->each(sub {
             $stream->write($_)
         });
-#    unless($stream->parent) {
-#        $self->add_child($stream);
-#        $sink->source->on_ready(sub {
-#            $self->remove_child($stream) if $stream->parent;
-#        });
-#    }
+    unless($stream->parent) {
+        $self->add_child($stream);
+        $sink->completed->on_ready($self->$curry::weak(sub {
+            my ($self) = @_;
+            $self->remove_child($stream) if $stream->parent;
+        }));
+    }
     return $sink;
 }
 

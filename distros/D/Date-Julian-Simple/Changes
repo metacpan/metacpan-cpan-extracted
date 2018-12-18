@@ -1,5 +1,8 @@
 Revision history for Date::Julian::Simple
 
+0.06  Sat Dec 15 06:20:00 2018
+      - Updated dependency on Date::Utils v0.24.
+
 0.05  Mon Jan 22 16:40:00 2018
       - Added test script (t/date-julian-simple.t).
 

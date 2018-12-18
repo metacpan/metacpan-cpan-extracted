@@ -28,7 +28,6 @@ my $ANSI_RE           = qr/\e.+?m/sm;
 my $STD_OUTPUT_HANDLE = -11;
 my $STD_ERROR_HANDLE  = -12;
 my $MAX_BUFFER_SIZE   = 20_000;
-my $NULL              = qq[\x00];
 my $UTF16             = Encode::find_encoding('UTF-16LE');
 my $STD_HANDLE        = {
     $STD_OUTPUT_HANDLE => get_std_handle($STD_OUTPUT_HANDLE),
@@ -63,7 +62,7 @@ sub WRITE {
         utf8::decode($buf);    # decode octets to utf-8
 
         for my $str ( split /($ANSI_RE)/sm, $buf ) {
-            next if $str eq q[];
+            next if $str eq $EMPTY;
 
             if ( substr( $str, 0, 1 ) eq qq[\e] ) {    # ANSII escape sequence
 
@@ -73,7 +72,7 @@ sub WRITE {
             }
             else {                                     #
                 while ( length $str ) {
-                    write_console( $handle, $UTF16->encode( substr $str, 0, $MAX_BUFFER_SIZE, q[] ) . $NULL );
+                    write_console( $handle, $UTF16->encode( substr $str, 0, $MAX_BUFFER_SIZE, $EMPTY ) . "\N{NULL}" );
                 }
             }
         }
@@ -90,16 +89,6 @@ sub WRITE {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 31                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

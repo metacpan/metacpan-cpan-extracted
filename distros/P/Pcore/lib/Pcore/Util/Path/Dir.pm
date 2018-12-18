@@ -143,7 +143,7 @@ sub read_dir ( $self, @ ) {
         return;
     };
 
-    $read->( '', 1 );
+    $read->( $EMPTY, 1 );
 
     return $res;
 }
@@ -229,8 +229,6 @@ sub empty_dir ( $path, @ ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 56                   | Subroutines::ProhibitExcessComplexity - Subroutine "read_dir" with high complexity score (30)                  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 146                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 59                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

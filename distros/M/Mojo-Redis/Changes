@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojo-Redis
 
+3.17 2018-12-17T19:03:43+0900
+ - Made connection-lost.t more robust
+ - Add xread_structured() method
+ - Add failing test for xread and Protocol::Redis::XS
+
 3.16 2018-12-14T19:39:18+0900
  - Fix $db object from reconnecting #33
 

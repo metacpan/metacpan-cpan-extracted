@@ -10,6 +10,8 @@ use File::Spec::Functions;
 use File::Path qw/make_path/;
 
 use Etherpad;
+use Mojo::File;
+use Mojo::Util qw/encode/;
 use Term::ReadLine;
 use Config::YAML;
 use URI::Escape;
@@ -20,7 +22,7 @@ binmode STDOUT, ":utf8";
 BEGIN {
     use Exporter ();
     use vars qw($VERSION);
-    $VERSION     = '0.11';
+    $VERSION     = '0.13';
 }
 
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
@@ -146,14 +148,14 @@ if (defined $c->{browser}) {
     waitpid( $pid, 0 );
     my $xbro = $? >> 8;
     if ($xbro) {
-        printf 'ERROR: specified browser %s not found !'."\n", $c->{browser};
+        printf 'ERROR: specified browser %s not found!'."\n", $c->{browser};
         exit 7;
     }
     $ENV{BROWSER} = $c->{browser};
 }
 
 if (!defined $url || !defined $key) {
-    print STDERR 'ERROR: No configuration found and not enough arguments !', "\n";
+    print STDERR 'ERROR: No configuration found and not enough arguments!', "\n";
     HELP_MESSAGE();
     exit 3;
 }
@@ -182,7 +184,7 @@ if (!$ec->check_token()) {
 #################
 print <<EOF;
 Welcome on padconsole.
-Type 'help' to get some help, 'exit' to exit. Easy, isn't it ?
+Type 'help' to get some help, 'exit' to exit. Easy, isn't it?
 EOF
 
 my $term = Term::ReadLine->new('padconsole');
@@ -203,12 +205,12 @@ if (-f $history_file) {
 my $prompt = $alias.' $ ';
 
 # For autocomplete
-my @words = qw(exit    help   count
-               list    search delete
-               text    html   revcount
-               authors infos  writeconf
-               use     alist  current
-               open);
+my @words = qw(exit         help         count
+               list         search       delete
+               text         text_to_file html
+               html_to_file revcount     authors
+               infos        writeconf    use
+               alist        current      open);
 
 my @commands;
 while (defined($_ = $term->readline($prompt))) {
@@ -231,8 +233,12 @@ while (defined($_ = $term->readline($prompt))) {
         _delete()
     } elsif ($command eq 'text') {
         _text()
+    } elsif ($command eq 'text_to_file') {
+        _text_to_file()
     } elsif ($command eq 'html') {
         _html()
+    } elsif ($command eq 'html_to_file') {
+        _html_to_file()
     } elsif ($command eq 'revcount') {
         _revcount()
     } elsif ($command eq 'authors') {
@@ -262,23 +268,25 @@ _exit();
 sub _help {
     print <<EOF
 Available commands:
-  - help                 : print this message
-  - exit                 : exit program
-  - count                : print the number of existing pads
-  - list                 : list all the existing pads (20 items per page)
-  - search <PATTERN>     : print the list of the pads which name matches the pattern (Perl regex) (20 items per page)
-  - delete <pad1> <pad2> : delete the pads pad1 pad2 (have to be separated by space)
-  - text <pad> [rev]     : print the pad content, at the revision [rev] if defined
-  - html <pad> [rev]     : print the pad HTML export, at the revision [rev] if defined
-  - revcount <pad>       : print the number of revisions of a pad
-  - authors <pad>        : print the name of the differents authors who wrote on the pad
-  - infos <pad>          : print multiple informations about the pad
-  - writeconf            : write the configuration to $config_file
-  - use <alias>          : change connection to the etherpad instance which alias is <alias>
-  - alist                : print all the configured etherpads aliases
-  - current              : print configuration informations about the current etherpad instance
-  - open <pad>           : open pad in browser. If no pad is given, open the etherpad instance home page
-  - create <pad>         : create pad <pad>. If it already exists, print a warning
+  - help                            : print this message
+  - exit                            : exit program
+  - count                           : print the number of existing pads
+  - list                            : list all the existing pads (20 items per page)
+  - search <PATTERN>                : print the list of the pads which name matches the pattern (Perl regex) (20 items per page)
+  - delete <pad1> <pad2>            : delete the pads pad1 pad2 (have to be separated by space)
+  - text <pad> [rev]                : print the pad content, at the revision [rev] if defined
+  - text_to_file <file> <pad> [rev] : save the pad content to <file>, at the revision [rev] if defined
+  - html <pad> [rev]                : print the pad HTML export, at the revision [rev] if defined
+  - html_to_file <file> <pad> [rev] : save the pad HTML export to <file>, at the revision [rev] if defined
+  - revcount <pad>                  : print the number of revisions of a pad
+  - authors <pad>                   : print the name of the differents authors who wrote on the pad
+  - infos <pad>                     : print multiple informations about the pad
+  - writeconf                       : write the configuration to $config_file
+  - use <alias>                     : change connection to the etherpad instance which alias is <alias>
+  - alist                           : print all the configured etherpads aliases
+  - current                         : print configuration informations about the current etherpad instance
+  - open <pad>                      : open pad in browser. If no pad is given, open the etherpad instance home page
+  - create <pad>                    : create pad <pad>. If it already exists, print a warning
 EOF
 }
 
@@ -291,7 +299,7 @@ sub _create {
         if ($res) {
             print 'Pad created', "\n";
         } else {
-            print 'ERROR: pad creation unsuccessful !', "\n";
+            print 'ERROR: pad creation unsuccessful!', "\n";
         }
     }
 }
@@ -358,7 +366,7 @@ sub _use {
             print 'ERROR: Bad instance alias. Unable to get configuration for instance alias ', $alias, "\n";
         }
     } else {
-        print 'ERROR: no alias given !', "\n";
+        print 'ERROR: no alias given!', "\n";
     }
 }
 
@@ -389,7 +397,7 @@ sub _infos {
             printf '  Read only URL       : %s%s%s'."\n", $url, $separator, uri_escape($ec->get_read_only_id($pad));
         }
     } else {
-        print 'ERROR: no pad given !', "\n";
+        print 'ERROR: no pad given!', "\n";
     }
 }
 sub _authors {
@@ -402,7 +410,7 @@ sub _authors {
             printf 'Pad %s: %d authors'."\n".'  %s'."\n", $pad, scalar @authors, join "\n  ", @authors;
         }
     } else {
-        print 'ERROR: no pad given !', "\n";
+        print 'ERROR: no pad given!', "\n";
     }
 }
 
@@ -414,7 +422,7 @@ sub _revcount {
             printf 'Pad %s: %d revisions'."\n", $pad, $ec->get_revisions_count($pad);
         }
     } else {
-        print 'ERROR: no pad given !', "\n";
+        print 'ERROR: no pad given!', "\n";
     }
 }
 
@@ -429,7 +437,41 @@ sub _text {
             print $ec->get_text($pad);
         }
     } else {
-        print 'ERROR: no pad given !', "\n";
+        print 'ERROR: no pad given!', "\n";
+    }
+}
+
+sub _text_to_file {
+    my $path = shift @commands;
+    my $pad  = shift @commands;
+    my $rev  = shift @commands;
+
+    if (defined $path) {
+        my $file = Mojo::File->new($path);
+        if (-e $file->to_string) {
+            print 'The file already exists. Overwrite it? [y/N] ';
+            my $choice = <>;
+            chomp $choice;
+            if ($choice ne 'yes' && $choice ne 'y') {
+                $|++;
+                print 'Aborting command.', "\n";
+                $|--;
+                return;
+            }
+        }
+        if (defined $pad) {
+            my $text;
+            if (defined $rev) {
+                $text = $ec->get_text($pad, $rev);
+            } else {
+                $text = $ec->get_text($pad);
+            }
+            $file->spurt(encode 'UTF-8', $text);
+        } else {
+            print 'ERROR: no pad given!', "\n";
+        }
+    } else {
+        print 'ERROR: no file given!', "\n";
     }
 }
 
@@ -444,7 +486,41 @@ sub _html {
             print $ec->get_html($pad);
         }
     } else {
-        print 'ERROR: no pad given !', "\n";
+        print 'ERROR: no pad given!', "\n";
+    }
+}
+
+sub _html_to_file {
+    my $path = shift @commands;
+    my $pad  = shift @commands;
+    my $rev  = shift @commands;
+
+    if (defined $path) {
+        my $file = Mojo::File->new($path);
+        if (-e $file->to_string) {
+            print 'The file already exists. Overwrite it? [y/N] ';
+            my $choice = <>;
+            chomp $choice;
+            if ($choice ne 'yes' && $choice ne 'y') {
+                $|++;
+                print 'Aborting command.', "\n";
+                $|--;
+                return;
+            }
+        }
+        if (defined $pad) {
+            my $html;
+            if (defined $rev) {
+                $html = $ec->get_html($pad, $rev);
+            } else {
+                $html = $ec->get_html($pad);
+            }
+            $file->spurt(encode 'UTF-8', $html);
+        } else {
+            print 'ERROR: no pad given!', "\n";
+        }
+    } else {
+        print 'ERROR: no file given!', "\n";
     }
 }
 
@@ -471,7 +547,7 @@ sub _search {
 
         _pager(\@results);
     } else {
-        print 'ERROR: no pattern given !', "\n";
+        print 'ERROR: no pattern given!', "\n";
     }
 }
 
@@ -489,7 +565,7 @@ sub _exit {
     open my $hist, '>', $history_file or die "Unable to open $history_file: $!";
     print $hist join("\n", @history);
     close $hist;
-    print "\n", 'Good bye !', "\n";
+    print "\n", 'Good bye!', "\n";
     exit 0;
 }
 

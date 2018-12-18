@@ -29,6 +29,8 @@ lib/Data/Sah/Compiler/human/TH/buf.pm
 lib/Data/Sah/Compiler/human/TH/cistr.pm
 lib/Data/Sah/Compiler/human/TH/code.pm
 lib/Data/Sah/Compiler/human/TH/date.pm
+lib/Data/Sah/Compiler/human/TH/datenotime.pm
+lib/Data/Sah/Compiler/human/TH/datetime.pm
 lib/Data/Sah/Compiler/human/TH/duration.pm
 lib/Data/Sah/Compiler/human/TH/float.pm
 lib/Data/Sah/Compiler/human/TH/hash.pm
@@ -37,6 +39,7 @@ lib/Data/Sah/Compiler/human/TH/num.pm
 lib/Data/Sah/Compiler/human/TH/obj.pm
 lib/Data/Sah/Compiler/human/TH/re.pm
 lib/Data/Sah/Compiler/human/TH/str.pm
+lib/Data/Sah/Compiler/human/TH/timeofday.pm
 lib/Data/Sah/Compiler/human/TH/undef.pm
 lib/Data/Sah/Compiler/perl.pm
 lib/Data/Sah/Compiler/perl/TH.pm
@@ -48,6 +51,8 @@ lib/Data/Sah/Compiler/perl/TH/buf.pm
 lib/Data/Sah/Compiler/perl/TH/cistr.pm
 lib/Data/Sah/Compiler/perl/TH/code.pm
 lib/Data/Sah/Compiler/perl/TH/date.pm
+lib/Data/Sah/Compiler/perl/TH/datenotime.pm
+lib/Data/Sah/Compiler/perl/TH/datetime.pm
 lib/Data/Sah/Compiler/perl/TH/duration.pm
 lib/Data/Sah/Compiler/perl/TH/float.pm
 lib/Data/Sah/Compiler/perl/TH/hash.pm
@@ -56,6 +61,7 @@ lib/Data/Sah/Compiler/perl/TH/num.pm
 lib/Data/Sah/Compiler/perl/TH/obj.pm
 lib/Data/Sah/Compiler/perl/TH/re.pm
 lib/Data/Sah/Compiler/perl/TH/str.pm
+lib/Data/Sah/Compiler/perl/TH/timeofday.pm
 lib/Data/Sah/Compiler/perl/TH/undef.pm
 lib/Data/Sah/Human.pm
 lib/Data/Sah/Lang.pm
@@ -79,6 +85,8 @@ lib/Data/Sah/Type/buf.pm
 lib/Data/Sah/Type/cistr.pm
 lib/Data/Sah/Type/code.pm
 lib/Data/Sah/Type/date.pm
+lib/Data/Sah/Type/datenotime.pm
+lib/Data/Sah/Type/datetime.pm
 lib/Data/Sah/Type/duration.pm
 lib/Data/Sah/Type/float.pm
 lib/Data/Sah/Type/hash.pm
@@ -87,6 +95,7 @@ lib/Data/Sah/Type/num.pm
 lib/Data/Sah/Type/obj.pm
 lib/Data/Sah/Type/re.pm
 lib/Data/Sah/Type/str.pm
+lib/Data/Sah/Type/timeofday.pm
 lib/Data/Sah/Type/undef.pm
 lib/Data/Sah/Util/Func.pm
 lib/Data/Sah/Util/Role.pm
@@ -106,11 +115,14 @@ t/perl-misc.t
 t/perl-type-bool.t
 t/perl-type-code.t
 t/perl-type-date.t
+t/perl-type-datenotime.t
+t/perl-type-datetime.t
 t/perl-type-duration.t
 t/perl-type-float.t
 t/perl-type-obj.t
 t/perl-type-re.t
 t/perl-type-str.t
+t/perl-type-timeofday.t
 t/spectest-human.t-
 t/spectest-perl.t
 t/util-type-date.t

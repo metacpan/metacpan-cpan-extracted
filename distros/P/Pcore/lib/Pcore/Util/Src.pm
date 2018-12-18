@@ -99,7 +99,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 }
 
 sub cfg {
-    state $cfg = $ENV->{share}->read_cfg( 'Pcore', 'data', 'src.yaml' );
+    state $cfg = $ENV->{share}->read_cfg('/Pcore/data/src.yaml');
 
     return $cfg;
 }

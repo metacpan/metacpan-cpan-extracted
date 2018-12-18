@@ -183,7 +183,7 @@ sub finish ($self) {
         return $self->_render_line(5);
     }
     else {
-        return q[];
+        return $EMPTY;
     }
 }
 
@@ -247,7 +247,7 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
 
         $val = wrap $val, $col->{width} - ( $self->{padding} * 2 ), ansi => $self->{color}, align => $align;
 
-        $val = [ q[ ] x ( $col->{width} - $self->{padding} * 2 ) ] if !$val->@*;
+        $val = [ $SPACE x ( $col->{width} - $self->{padding} * 2 ) ] if !$val->@*;
 
         push @cells, $val;
 
@@ -262,7 +262,7 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
             my $cell_height = scalar $cell->@*;
 
             if ( $cell_height < $row_height ) {
-                my $tmpl = q[ ] x ( $col->{width} - $self->{padding} * 2 );
+                my $tmpl = $SPACE x ( $col->{width} - $self->{padding} * 2 );
 
                 my $valign = $header_row ? $col->{title_valign} : $col->{valign};
 
@@ -288,13 +288,13 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
         }
     }
 
-    my $padding = $self->{padding} ? q[ ] x $self->{padding} : q[];
+    my $padding = $self->{padding} ? $SPACE x $self->{padding} : $EMPTY;
 
     # render
     for my $line_idx ( 0 .. $row_height - 1 ) {
         $buf .= $grid->[0] if $grid && $self->{left_border};
 
-        $buf .= join $grid ? $grid->[1] : q[ ], map { $padding . $_->[$line_idx] . $padding } @cells;
+        $buf .= join $grid ? $grid->[1] : $SPACE, map { $padding . $_->[$line_idx] . $padding } @cells;
 
         $buf .= $grid->[2] if $grid && $self->{right_border};
 

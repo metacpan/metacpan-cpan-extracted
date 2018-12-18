@@ -4,9 +4,10 @@
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc, 2016-2018
 #-------------------------------------------------------------------------------
 # podDocumentation
+# need option for list of file to analyze or list of acceptable file extensions
 
 package Data::Edit::Xml::Xref;
-our $VERSION = 20181204;
+our $VERSION = 20181215;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -17,6 +18,11 @@ use Data::Table::Text qw(:all);
 use utf8;
 
 #D1 Cross reference                                                             # Check the cross references in a set of Dita files and report the results.
+
+sub lll(@)                                                                      # Write a message
+ {my (@m) = @_;                                                                 # Message text
+  say STDERR timeStamp, join "", " Xref: ", @_;
+ }
 
 sub xref(%)                                                                     # Check the cross references in a set of Dita files held in  L<inputFolder|/inputFolder> and report the results in the L<reports|/reports> folder. The possible attributes are defined in L<Data::Edit::Xml::Xref|/Data::Edit::Xml::Xref>
  {my (%attributes) = @_;                                                        # Attributes
@@ -60,7 +66,8 @@ sub xref(%)                                                                     
     topicRefs=>{},                                                              # {file}{href}++ References from bookmaps to topics via appendix, chapter, topicref.
     validationErrors=>{},                                                       # True means that Lint detected errors in the xml contained in the file
     xRefs=>{},                                                                  # {file}{href}++ Xrefs references.
-#    from=>{},                                                                   # Xrefs contributing to this xref by file
+    xrefBadScope=>{},                                                           # External xrefs with no scope=external
+    xrefBadFormat=>{},                                                          # External xrefs with no format=html
    );
   loadHash($xref, @_);                                                          # Load attributes complaining about any invalid ones
 
@@ -76,16 +83,15 @@ sub xref(%)                                                                     
                   reportAttributeCount reportTagCount reportDocTypeCount
                   reportFileExtensionCount reportFileTypes
                   reportValidationErrors reportBookMaps
-                  reportNotReferenced
+                  reportNotReferenced reportExternalXrefs
                  );
   for my $phase(@phases)                                                        # Perform analysis phases
    {$xref->$phase;
    }
 
-  if ($xref->fixBadRefs and my @files = sort keys %{$xref->fixedFiles})         # Fix files if requested
-   {for my $file(@files)
-     {fixOneFile($xref, $file);
-     }
+  if ($xref->fixBadRefs)                                                        # Fix files if requested
+   {lll "Fix bad references by moving them to the xtrf attribute";
+    $xref->fixFiles;
    }
 
   if (1)                                                                        # Summarize
@@ -111,6 +117,8 @@ sub xref(%)                                                                     
     $save->("validationErrors",  q(validation errors));
     $save->("parseFailed",       q(files failed to parse), q(file failed to parse));
     $save->("notReferenced",     q(files not referenced), q(file not referenced));
+    $save->("xrefBadScope",      q(External xrefs with no scope=external));
+    $save->("xrefBadFormat",     q(External xrefs with no format=html));
 
     $xref->statusLine = @o ? join " ",
       "Xref:", join ", ",
@@ -132,7 +140,7 @@ sub xref(%)                                                                     
 sub loadInputFiles($)                                                           #P Load the names of the files to be processed
  {my ($xref) = @_;                                                              # Cross referencer
   $xref->inputFiles = [searchDirectoryTreesForMatchingFiles
-    $xref->inputFolder, qw(.dita .ditamap .xml)];
+    $xref->inputFolder, qw(.dita .ditamap .xml .fodt)];
  }
 
 sub analyzeOneFile($)                                                           #P Analyze one input file
@@ -154,8 +162,15 @@ sub analyzeOneFile($)                                                           
      }
     if ($o->at_xref)                                                            # Xrefs but not to the web
      {if (my $h = $o->href)
-#      {if ($h !~ m(\A(https?://|mailto:))i)
-       {if ($o->attrX_format =~ m(\Adita)i)                                     # Check xref has format=dita
+       {if ($h =~ m(\A(https?://|mailto:|www.))i)                               # Check attributes on external links
+         {if ($o->attrX_scope !~ m(\Aexternal\Z)s)
+           {$xref->xrefBadScope->{$iFile}{$h} = -A $o;
+           }
+          if ($o->attrX_format !~ m(\Ahtml\Z)s)
+           {$xref->xrefBadFormat->{$iFile}{$h} = -A $o;
+           }
+         }
+        else #if ($o->attrX_format =~ m(\Adita)i)                               # Check xref has format=dita AW83 at 2018.12.13 01:10:33
          {$xref->xRefs->{$iFile}{$h}{$o->stringText}++;
          }
        }
@@ -196,8 +211,9 @@ sub analyzeOneFile($)                                                           
   $xref
  }
 
-sub fixOneFile($$)                                                              #P Analyze one input file
+sub fixOneFile($$)                                                              #P Fix one file by moving unresolved references to the xtrf attribute
  {my ($xref, $file) = @_;                                                       # Xref results, file to fix
+  my %c;                                                                        # Count of tags changed
 
   my $x = Data::Edit::Xml::new($file);                                          # Parse xml - should parse OK else otherwise how did we find out that this file needed to be fixed
 
@@ -207,25 +223,64 @@ sub fixOneFile($$)                                                              
      {if (my $h = $o->href)
        {if ($xref->fixedFiles->{$file}{$h})
          {$o->renameAttr_href_xtrf;
+          $c{$o->tag}++;
          }
        }
      }
     if (my $conref = $o->attr_conref)                                           # Conref
      {if ($xref->fixedFiles->{$file}{$conref})
-       {$o->renameAttr_href_xtrf;
+       {$o->renameAttr_conref_xtrf;
+        $c{conref}++;
        }
      }
    });
 
   if (1)                                                                        # Replace xml in source file
-   {my $S = my $s = readFile($file);
-    my $T = -p $x;
-    my $t = -t $x;
-    $s =~ s(<\s*$t.*<\s*\/\s*$t\s*>) ($T)is;
-    owf($file, $s) unless $s eq $S;
+   {my ($l, $L) = split m/\n/, readFile($file);
+    my $t = -p $x;
+
+    if ($l =~ m(\A<\?xml))                                                      # Check headers - should be improved
+     {owf($file, qq($l\n$L\n$t));
+     }
+    else
+     {owf($file, $t);
+     }
    }
 
-  $xref
+  \%c                                                                           # Return count of items fixed
+ }
+
+sub fixFiles($)                                                                 #P Fix files by moving unresolved references to the xtrf attribute
+ {my ($xref) = @_;                                                              # Xref results
+  my %c;                                                                        # Count of tags changed
+  if (my @files = sort keys %{$xref->fixedFiles})                               # Fix files if requested
+   {my @square = squareArray(@files);                                           # Divide the task
+
+    my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                # Process starter
+       $ps->processingTitle   = q(Xref);
+       $ps->totalToBeStarted  = scalar @square;
+       $ps->processingLogFile = fpe($xref->reports, qw(log xref fix txt));
+
+    for my $row(@square)                                                        # Each row of input files file
+     {$ps->start(sub
+       {my @r;                                                                  # Results
+        for my $col(@$row)                                                      # Each column in the row
+         {push @r, $xref->fixOneFile($col);                                     # Analyze one input file
+         }
+        [@r]                                                                    # Return results as a reference
+       });
+     }
+
+    for my $r(deSquareArray($ps->finish))                                       # Consolidate results
+     {for(sort keys %$r)
+       {$c{$_} += $$r{$_};
+       }
+     }
+   }
+
+  formatTable(\%c, [qw(Ref Count)],                                             # Report results
+    head=>qq(Data::Edit::Xml::Xref fixed the following failing references on DDDD),
+    file=>(my $f = fpe($xref->reports, qw(count referencesFixed txt))));
  }
 
 sub analyze($)                                                                  #P Analyze the input files
@@ -233,11 +288,10 @@ sub analyze($)                                                                  
   my @in = @{$xref->inputFiles};                                                # Input files
   my @square = squareArray(@in);                                                # Divide the task
 
-  my $process = temporaryFolder;
-  my $ps = newProcessStarter($xref->maximumNumberOfProcesses, $process);        # Process starter
+  my $ps = newProcessStarter($xref->maximumNumberOfProcesses);                  # Process starter
      $ps->processingTitle   = q(Xref);
      $ps->totalToBeStarted  = scalar @square;
-     $ps->processingLogFile = fpe($xref->reports, qw(log xref txt));
+     $ps->processingLogFile = fpe($xref->reports, qw(log xref analyze txt));
 
   for my $row(@square)                                                          # Each row of input files file
    {$ps->start(sub
@@ -250,19 +304,18 @@ sub analyze($)                                                                  
    }
 
   for my $x(deSquareArray($ps->finish))                                         # Merge results from each file analyzed
-   {#$xref->from->{$x->sourceFile} = $x;                                         # Record contribution
+   {#$xref->from->{$x->sourceFile} = $x;                                        # Record contribution
 
     for my $field(qw(parseFailed badXml1 badXml2
                      ids xRefs topicRefs images conRefs topicIds
-                     validationErrors docType attributeCount tagCount))         # Merge hashes by file names which are unique
+                     validationErrors docType attributeCount tagCount
+                     xrefBadScope xrefBadFormat))                               # Merge hashes by file names which are unique
      {next unless my $xf = $x->{$field};
       for my $f(sort keys %$xf)
        {$xref->{$field}{$f} = $xf->{$f};
        }
      }
    }
-
-  clearFolder($process, scalar @in);
  }
 
 sub reportDuplicateIds($)                                                       #P Report duplicate ids
@@ -614,7 +667,7 @@ sub reportAttributeCount($)                                                     
 
   formatTable(\%d, [qw(Attribute Count)],
     head=>qq(Data::Edit::Xml::Xref found NNNN different attributes on DDDD),
-    file=>(fpe($xref->reports, qw(count attributes txt))));
+    file=>(my $f = fpe($xref->reports, qw(count attributes txt))));
  }
 
 sub reportValidationErrors($)                                                   #P Report the files known to have validation errors
@@ -738,6 +791,34 @@ END
     file=>(my $f = fpe($xref->reports, qw(bad notReferenced txt))));
  }
 
+sub reportExternalXrefs($)                                                      #P Report external xrefs missing other attributes
+ {my ($xref) = @_;                                                              # Cross referencer
+
+  my @s;
+  for   my $f(sort keys %{$xref->xrefBadScope})
+   {for my $h(sort keys %{$xref->xrefBadScope->{$f}})
+     {my $s = $xref->xrefBadScope->{$f}{$h};
+      push @s, [q(Bad scope attribute), $h, $s, $f];
+     }
+   }
+
+  for   my $f(sort keys %{$xref->xrefBadFormat})
+   {for my $h(sort keys %{$xref->xrefBadFormat->{$f}})
+     {my $s = $xref->xrefBadFormat->{$f}{$h};
+      push @s, [q(Bad format attribute), $h, $s, $f];
+     }
+   }
+
+  formatTable(\@s, <<END,
+Reason          The reason why the xref is unsatisfactory
+Href            The href attribute of the xref in question
+Xref-Statement  The xref statement in question
+File            The file containing the xref statement in question
+END
+    head=>qq(Data::Edit::Xml::Xref found bad external xrefs on DDDD),
+    file=>(my $f = fpe($xref->reports, qw(bad externalXrefs txt))));
+ }
+
 sub createSampleInputFiles($)                                                   #P Create sample input files for testing. The attribute B<inputFolder> supplies the name of the folder in which to create the sample files.
  {my ($N) = @_;                                                                 # Number of sample files
   my $in = q(in);
@@ -782,6 +863,7 @@ END
       <title/>
       <xref  format="dita" href="act1.dita#c1/title"/>
       <xref  format="dita" href="9999#c1/title"/>
+      <xref  href="http://"/>
       <image href="9999.png"/>
       <p conref="9999.dita"/>
     </section>
@@ -1268,6 +1350,8 @@ Xref:
   8 missing image references,
   3 bad topicrefs,
   2 duplicate topic ids,
+  1 External xrefs with no format=html,
+  1 External xrefs with no scope=external,
   1 bad book map,
   1 file failed to parse,
   1 file not referenced

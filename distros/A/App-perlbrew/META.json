@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-perlbrew",
    "prereqs" : {
@@ -30,6 +30,7 @@
             "CPAN::Perl::Releases" : "3.66",
             "Capture::Tiny" : "0.36",
             "Devel::PatchPerl" : "1.52",
+            "ExtUtils::MakeMaker" : "6.86",
             "File::Temp" : "0.2304",
             "JSON::PP" : "0",
             "Pod::Parser" : "1.63",
@@ -39,11 +40,9 @@
       },
       "test" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.86",
             "File::Which" : "1.21",
             "IO::All" : "0.51",
             "Path::Class" : "0.33",
-            "Pod::Markdown" : "2.002",
             "Test::Exception" : "0.32",
             "Test::More" : "1.001002",
             "Test::NoWarnings" : "1.04",
@@ -55,12 +54,32 @@
       }
    },
    "provides" : {
+      "App::Perlbrew::Path" : {
+         "file" : "lib/App/Perlbrew/Path.pm"
+      },
+      "App::Perlbrew::Path::Installation" : {
+         "file" : "lib/App/Perlbrew/Path/Installation.pm"
+      },
+      "App::Perlbrew::Path::Installations" : {
+         "file" : "lib/App/Perlbrew/Path/Installations.pm"
+      },
+      "App::Perlbrew::Path::Root" : {
+         "file" : "lib/App/Perlbrew/Path/Root.pm"
+      },
       "App::perlbrew" : {
          "file" : "lib/App/perlbrew.pm",
-         "version" : "0.84"
+         "version" : "0.85"
       }
    },
    "release_status" : "stable",
-   "version" : "0.84",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gugod/App-perlbrew.git",
+         "web" : "https://github.com/gugod/App-perlbrew"
+      }
+   },
+   "version" : "0.85",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : "1"
 }

@@ -1,4 +1,5 @@
 .circleci/config.yml
+.drone.yml
 .perlcriticrc
 .travis.yml
 Build.PL

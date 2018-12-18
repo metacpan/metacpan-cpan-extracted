@@ -1,10 +1,10 @@
 # NAME
 
-Type::Tiny::Signatures - Method/Function Signatures w/Type::Tiny Constraints
+Type::Tiny::Signatures - Type::Tiny Method/Function Signatures
 
 # VERSION
 
-version 0.07
+version 0.71.0
 
 # SYNOPSIS
 
@@ -39,11 +39,11 @@ previously default lax-mode, i.e. strict-mode disabled.
 
 # AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 # CONTRIBUTOR
 
-Al Newkirk <al@iamalnewkirk.com>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 

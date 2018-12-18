@@ -55,7 +55,7 @@ around BUILDARGS => sub ( $orig, $self, $uri, @ ) {
 };
 
 sub set_token ( $self, $token = undef ) {
-    if ( $token // q[] ne $self->{token} // q[] ) {
+    if ( $token // $EMPTY ne $self->{token} // $EMPTY ) {
         $self->{token} = $token;
 
         $self->disconnect;

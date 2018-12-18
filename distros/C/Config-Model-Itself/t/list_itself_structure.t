@@ -2,6 +2,7 @@
 use ExtUtils::testlib;
 use Test::More;
 use Test::Memory::Cycle;
+use Path::Tiny;
 use Config::Model;
 use Config::Model::Tester::Setup qw/init_test/;
 use Config::Model::Itself ;
@@ -20,7 +21,9 @@ ok($meta_inst,"Read Itself::Model and created instance") ;
 
 my $meta_root = $meta_inst -> config_root ;
 
-my $model_dir = 'lib/Config/Model';
+my $model_dir = path($INC{'Config/Model/Itself.pm'})->parent;
+note("Reading models from $model_dir");
+
 my $rw_obj    = Config::Model::Itself->new(
     cm_lib_dir   => $model_dir,
     model_object => $meta_root

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 41 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce.pm',
@@ -15,20 +15,39 @@ my @module_files = (
     'Data/Sah/Coerce/js/date/float_epoch.pm',
     'Data/Sah/Coerce/js/date/obj_Date.pm',
     'Data/Sah/Coerce/js/date/str.pm',
+    'Data/Sah/Coerce/js/datenotime/float_epoch.pm',
+    'Data/Sah/Coerce/js/datenotime/obj_Date.pm',
+    'Data/Sah/Coerce/js/datenotime/str.pm',
+    'Data/Sah/Coerce/js/datetime/float_epoch.pm',
+    'Data/Sah/Coerce/js/datetime/obj_Date.pm',
+    'Data/Sah/Coerce/js/datetime/str.pm',
     'Data/Sah/Coerce/js/duration/float_secs.pm',
     'Data/Sah/Coerce/js/duration/str_iso8601.pm',
+    'Data/Sah/Coerce/js/timeofday/str_hms.pm',
     'Data/Sah/Coerce/perl/bool/str.pm',
     'Data/Sah/Coerce/perl/date/float_epoch.pm',
     'Data/Sah/Coerce/perl/date/float_epoch_always.pm',
     'Data/Sah/Coerce/perl/date/obj_DateTime.pm',
     'Data/Sah/Coerce/perl/date/obj_TimeMoment.pm',
     'Data/Sah/Coerce/perl/date/str_iso8601.pm',
+    'Data/Sah/Coerce/perl/datenotime/float_epoch.pm',
+    'Data/Sah/Coerce/perl/datenotime/float_epoch_always.pm',
+    'Data/Sah/Coerce/perl/datenotime/obj_DateTime.pm',
+    'Data/Sah/Coerce/perl/datenotime/obj_TimeMoment.pm',
+    'Data/Sah/Coerce/perl/datenotime/str_iso8601.pm',
+    'Data/Sah/Coerce/perl/datetime/float_epoch.pm',
+    'Data/Sah/Coerce/perl/datetime/float_epoch_always.pm',
+    'Data/Sah/Coerce/perl/datetime/obj_DateTime.pm',
+    'Data/Sah/Coerce/perl/datetime/obj_TimeMoment.pm',
+    'Data/Sah/Coerce/perl/datetime/str_iso8601.pm',
     'Data/Sah/Coerce/perl/duration/float_secs.pm',
     'Data/Sah/Coerce/perl/duration/obj_DateTimeDuration.pm',
     'Data/Sah/Coerce/perl/duration/str_human.pm',
     'Data/Sah/Coerce/perl/duration/str_iso8601.pm',
     'Data/Sah/Coerce/perl/float/str_percent.pm',
     'Data/Sah/Coerce/perl/int/str_percent.pm',
+    'Data/Sah/Coerce/perl/timeofday/obj_DateTimeOfDay.pm',
+    'Data/Sah/Coerce/perl/timeofday/str_hms.pm',
     'Data/Sah/CoerceCommon.pm',
     'Data/Sah/CoerceJS.pm'
 );

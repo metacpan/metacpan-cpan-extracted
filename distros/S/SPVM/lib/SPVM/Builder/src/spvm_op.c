@@ -169,6 +169,7 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "BEGIN",
   "REQUIRE",
   "IF_REQUIRE",
+  "CURRENT_PACKAGE",
 };
 
 SPVM_OP* SPVM_OP_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* type, const char* file, int32_t line) {
@@ -590,31 +591,6 @@ SPVM_OP* SPVM_OP_cut_op(SPVM_COMPILER* compiler, SPVM_OP* op_target) {
   }
   
   return op_stab;
-}
-
-SPVM_OP* SPVM_OP_build_constant(SPVM_COMPILER* compiler, SPVM_OP* op_constant) {
-  
-  SPVM_CONSTANT* constant = op_constant->uv.constant;
-  
-  // New String
-  if (SPVM_TYPE_is_string_type(compiler, constant->type->basic_type->id, constant->type->dimension, 0)) {
-    SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, op_constant->file, op_constant->line);
-    SPVM_OP_insert_child(compiler, op_new, op_new->last, op_constant);
-
-    // Add constant string to string pool
-    const char* string_value = constant->value.oval;
-    int32_t found_string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, string_value, constant->string_length + 1);
-    if (found_string_pool_id == 0) {
-      int32_t string_pool_id = SPVM_STRING_BUFFER_add_len(compiler->string_pool, constant->value.oval, constant->string_length + 1);
-      SPVM_HASH_insert(compiler->string_symtable, constant->value.oval, constant->string_length + 1, (void*)(intptr_t)string_pool_id);
-    }
-
-    return op_new;
-  }
-  // Constant
-  else {
-    return op_constant;
-  }
 }
 
 SPVM_OP* SPVM_OP_new_op_constant_byte(SPVM_COMPILER* compiler, int8_t value, const char* file, int32_t line) {
@@ -1449,6 +1425,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   SPVM_PACKAGE* package = SPVM_PACKAGE_new(compiler);
   
   package->load_path = compiler->cur_file;
+  package->load_rel_path = compiler->cur_rel_file;
   
   int32_t is_anon;
   if (op_type) {
@@ -1994,11 +1971,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       }
     }
     
-    // Clear current sub names
-    if (is_anon) {
-      compiler->current_sub_names = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
-    }
-    
     // Interface must have only one method
     if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
       if (package->subs->length != 1) {
@@ -2029,9 +2001,6 @@ SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op
     while ((op_sub_name = SPVM_OP_sibling(compiler, op_sub_name))) {
       const char* sub_name = op_sub_name->uv.name;
       SPVM_LIST_push(sub_names, (void*)sub_name);
-    
-      // Add current sub names
-      SPVM_LIST_push(compiler->current_sub_names, (void*)sub_name);
     }
     use->sub_names = sub_names;
   }
@@ -2399,9 +2368,6 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   // Subroutine is constant
   op_sub->uv.sub->flag |= SPVM_SUB_C_FLAG_ENUM;
   op_sub->uv.sub->call_type_id = SPVM_SUB_C_CALL_TYPE_ID_CLASS_METHOD;
-  
-  // Add current sub names
-  SPVM_LIST_push(compiler->current_sub_names, (void*)op_name->uv.name);
   
   return op_sub;
 }

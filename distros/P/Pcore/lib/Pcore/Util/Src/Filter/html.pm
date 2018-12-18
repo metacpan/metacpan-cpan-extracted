@@ -39,7 +39,7 @@ sub compress ($self) {
         }
     }
 
-    $self->{data}->$* = join '', @script;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = join $EMPTY, @script;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     # compress css
     my @css = split m[(<style[^>]*>)(.*?)(</style[^>]*>)]smi, $self->{data}->$*;
@@ -50,7 +50,7 @@ sub compress ($self) {
         }
     }
 
-    $self->{data}->$* = join '', @css;       ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = join $EMPTY, @css;       ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     require HTML::Packer;
 
@@ -67,8 +67,6 @@ sub compress ($self) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 57                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 42, 53               | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

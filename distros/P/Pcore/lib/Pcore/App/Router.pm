@@ -14,8 +14,8 @@ has hosts => ( required => 1 );    # HashRef
 has map           => ();           # HashRef, router path -> class name
 has host_api_path => ();           # HashRef
 
-has _path_class_cache     => ();   # HashRef, router path -> sigleton cache
-has _class_instance_cache => ();   # HashRef, class name -> sigleton cache
+has path_ctrl  => ();              # HashRef, router path -> sigleton cache
+has class_ctrl => ();              # HashRef, class name -> sigleton cache
 
 sub BUILD ( $self, $args ) {
 
@@ -88,7 +88,7 @@ sub _get_host_map ( $self, $host, $ns ) {
         die qq["$class" is not a consumer of "Pcore::App::Controller"] if !$class->can('does') || !$class->does('Pcore::App::Controller');
 
         # generate route path
-        my $route = lc( ( $class . '::' ) =~ s[\A$index_class:*][/]smr );
+        my $route = lc( $class =~ s[\A$index_class:*][/]smr );
 
         $route =~ s[::][/]smg;
 
@@ -98,14 +98,11 @@ sub _get_host_map ( $self, $host, $ns ) {
             path => $route,
         } );
 
-        # get obj route
-        $route = $obj->{path};
-
-        die qq[Route "$route" is not unique] if exists $self->{_path_class_cache}->{$host}->{$route};
+        die qq[Controller path "$route" is not unique] if exists $self->{path_ctrl}->{$host}->{$route};
 
         $map->{$route} = $class;
 
-        $self->{_class_instance_cache}->{$class} = $self->{_path_class_cache}->{$host}->{$route} = $obj;
+        $self->{class_ctrl}->{$class} = $self->{path_ctrl}->{$host}->{$route} = $obj;
 
         if ( $class->does('Pcore::App::Controller::API') ) {
 
@@ -124,13 +121,6 @@ sub _get_host_map ( $self, $host, $ns ) {
 
 sub run ( $self, $req ) {
     my $env = $req->{env};
-
-    my $path = P->path("/$env->{PATH_INFO}");
-
-    my $path_tail = $path->{filename} // '';
-
-    $path = $path->{dirname};
-    $path .= '/' if length $path > 1;    # add triling '/' to path
 
     my $map = $self->{map};
 
@@ -153,42 +143,53 @@ sub run ( $self, $req ) {
 
     $map = $map->{$host};
 
-    my $class;
+    my $path   = P->path("/$env->{PATH_INFO}");
+    my $is_dir = $path ne '/' && !defined $path->{filename};
+
+    my ( $req_path, $class );
 
     if ( exists $map->{$path} ) {
         $class = $map->{$path};
+
+        $req_path = P->path() if $is_dir;
     }
     else {
         my @labels = split m[/]sm, $path;
 
-        while (@labels) {
-            $path_tail = pop(@labels) . "/$path_tail";
+        shift @labels;
 
-            $path = join( '/', @labels ) . '/';
+        my $prefix;
 
-            if ( exists $map->{$path} ) {
-                $class = $map->{$path};
+        while () {
+            pop @labels;
 
-                last;
-            }
+            $prefix = '/' . join '/', @labels;
+
+            $class = $map->{$prefix};
+
+            last if defined $class;
         }
+
+        if ( $prefix eq '/' ) {
+            $req_path = substr $path, length $prefix;
+        }
+        else {
+            $req_path = substr $path, 1 + length $prefix;
+        }
+
+        $req_path = P->path( $is_dir ? "$req_path/" : $req_path );
     }
 
     # extend HTTP request
-    $req->{app}       = $self->{app};
-    $req->{host}      = $host;
-    $req->{path}      = $path;
-    $req->{path_tail} = length $path_tail ? P->path($path_tail) : undef;
+    $req->{app}  = $self->{app};
+    $req->{host} = $host;
+    $req->{path} = $req_path;
 
-    my $ctrl = $self->{_path_class_cache}->{$host}->{$path};
+    my $ctrl = $self->{class_ctrl}->{$class};
 
     Coro::async_pool { $ctrl->run($req) };
 
     return;
-}
-
-sub get_ctrl_by_class_name ( $self, $class_name ) {
-    return $self->{_class_instance_cache}->{$class_name};
 }
 
 sub get_host_api_path ( $self, $host ) {
@@ -198,16 +199,6 @@ sub get_host_api_path ( $self, $host ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 130                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -18,11 +18,11 @@ Text::Amuse::Preprocessor - Helpers for Text::Amuse document formatting.
 
 =head1 VERSION
 
-Version 0.57
+Version 0.58
 
 =cut
 
-our $VERSION = '0.57';
+our $VERSION = '0.58';
 
 
 =head1 SYNOPSIS
@@ -335,9 +335,7 @@ sub process {
         $line =~ s/\x{ad}\s*//g;
         if ($remove_nbsp) {
             $line =~ s/\x{a0}/ /g;
-        }
-        elsif ($show_nbsp) {
-            $line =~ s/\x{a0}/~~/g;
+            $line =~ s/~~/ /g;
         }
         if ($fixtypo) {
             $line =~ s/(?<=\.) (?=\.)//g; # collapse the dots
@@ -353,6 +351,9 @@ sub process {
         }
         if ($nbsp_filter) {
             $line = $nbsp_filter->($line);
+        }
+        if ($show_nbsp) {
+            $line =~ s/\x{a0}/~~/g;
         }
         print $auxfh $line;
     }

@@ -231,7 +231,7 @@ sub _parse_cmd ( $self, $argv ) {
             return $self->help_usage( [qq[command "$res->{cmd}" is unknown]] );
         }
         elsif ( $possible_commands->@* > 1 ) {
-            return $self->help_error( qq[command "$res->{cmd}" is ambiguous:$LF  ] . join q[ ], $possible_commands->@* );
+            return $self->help_error( qq[command "$res->{cmd}" is ambiguous:$LF  ] . join $SPACE, $possible_commands->@* );
         }
         else {
             unshift $res->{rest}->@*, '--help' if $res->{opt}->{help};
@@ -279,7 +279,7 @@ sub _parse_opt ( $self, $argv ) {
         no warnings qw[redefine];
 
         local $SIG{__WARN__} = sub {
-            push $res->{error}->@*, join q[], @_;
+            push $res->{error}->@*, join $EMPTY, @_;
 
             $res->{error}->[-1] =~ s/\n\z//sm;
 
@@ -326,7 +326,7 @@ sub _parse_opt ( $self, $argv ) {
         }
     }
 
-    return $self->help_usage( [qq[unexpected arguments]] ) if $parsed_args->@*;
+    return $self->help_usage( [q[unexpected arguments]] ) if $parsed_args->@*;
 
     # validate cli
     my $class = $self->{class};
@@ -387,11 +387,11 @@ sub _get_class_cmd ( $self, $class = undef ) {
 sub _help_class_abstract ( $self, $class = undef ) {
     my $spec = $class ? $self->_get_class_spec($class) : $self->spec;
 
-    return $spec->{abstract} // q[];
+    return $spec->{abstract} // $EMPTY;
 }
 
 sub _help_usage_string ($self) {
-    my $usage = join q[ ], P->path( $ENV->{SCRIPT_NAME} )->{filename}, $self->{cmd_path}->@*;
+    my $usage = join $SPACE, P->path( $ENV->{SCRIPT_NAME} )->{filename}, $self->{cmd_path}->@*;
 
     if ( $self->is_cmd ) {
         $usage .= ' [COMMAND] [OPTION]...';
@@ -406,7 +406,7 @@ sub _help_usage_string ($self) {
                 push @args, $arg->help_spec;
             }
 
-            $usage .= q[ ] . join q[ ], @args;
+            $usage .= $SPACE . join $SPACE, @args;
         }
     }
 
@@ -419,15 +419,15 @@ sub _help_alias ($self) {
     shift $cmd->@*;
 
     if ( $cmd->@* ) {
-        return 'aliases: ' . join q[ ], sort $cmd->@*;
+        return 'aliases: ' . join $SPACE, sort $cmd->@*;
     }
     else {
-        return q[];
+        return $EMPTY;
     }
 }
 
 sub _help ($self) {
-    my $help = $self->spec->{help} // q[];
+    my $help = $self->spec->{help} // $EMPTY;
 
     if ($help) {
         $help =~ s/^/    /smg;
@@ -454,11 +454,11 @@ sub _help_usage ($self) {
         $help = 'options ([+] - can be repeated, [!] - is required):' . $LF . $LF;
 
         for my $opt ( values $self->opt->%* ) {
-            $list->{ $opt->{name} } = [ $opt->help_spec, $opt->{desc} // '' ];
+            $list->{ $opt->{name} } = [ $opt->help_spec, $opt->{desc} // $EMPTY ];
         }
     }
 
-    return q[] if !$list->%*;
+    return $EMPTY if !$list->%*;
 
     my $max_key_len = 10;
 
@@ -469,11 +469,11 @@ sub _help_usage ($self) {
         $_->[1] =~ s/\n+\z//smg;
     }
 
-    my $desc_indent = $LF . q[    ] . ( q[ ] x $max_key_len );
+    my $desc_indent = $LF . q[    ] . ( $SPACE x $max_key_len );
 
     $help .= join $LF, map { sprintf( " %-${max_key_len}s   ", $list->{$_}->[0] ) . $list->{$_}->[1] =~ s/\n/$desc_indent/smgr } sort keys $list->%*;
 
-    return $help // q[];
+    return $help // $EMPTY;
 }
 
 sub _help_footer ($self) { return '(global options: --help, -h, -?, --version)' }
@@ -531,14 +531,14 @@ sub help_version ($self) {
         say $ENV->dist->version_string;
     }
     else {
-        say join q[ ], $ENV->{SCRIPT_NAME}, ( $main::VERSION ? version->new($main::VERSION)->normal : () );
+        say join $SPACE, $ENV->{SCRIPT_NAME}, ( $main::VERSION ? version->new($main::VERSION)->normal : () );
     }
 
     say $ENV->{pcore}->version_string if !$ENV->dist || $ENV->dist->name ne $ENV->{pcore}->name;
 
     say 'Perl ' . $^V->normal . " $Config{archname}";
 
-    say join $LF, q[], 'Image path: ' . $ENV{PAR_PROGNAME}, 'Temp dir: ' . $ENV{PAR_TEMP} if $ENV->{is_par};
+    say join $LF, $EMPTY, "Image path: $ENV{PAR_PROGNAME}", "Temp dir: $ENV{PAR_TEMP}" if $ENV->{is_par};
 
     exit 2;
 }
@@ -558,13 +558,9 @@ sub help_error ( $self, $msg ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 42                   | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 329                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 488, 516             | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "abstract"                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 108                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 457                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

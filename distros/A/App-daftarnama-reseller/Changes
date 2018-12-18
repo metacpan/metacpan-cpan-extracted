@@ -1,0 +1,10 @@
+0.002   2018-12-17 (PERLANCAR)
+
+	- Fix script Abstract.
+
+        - Bump prereq version WWW::Daftarnama::Reseller 0 -> 0.002.
+
+
+0.001   2018-12-17 (PERLANCAR)
+
+        - First public release.

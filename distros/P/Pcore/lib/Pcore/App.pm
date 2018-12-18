@@ -125,7 +125,7 @@ sub nginx_cfg ($self) {
         upstream          => P->uri( $self->{app_cfg}->{server}->{listen} )->to_nginx_upstream_server,
     };
 
-    for my $host ( keys $self->{router}->{_path_class_cache}->%* ) {
+    for my $host ( keys $self->{router}->{path_ctrl}->%* ) {
         my $host_name;
 
         if ( $host eq '*' ) {
@@ -137,8 +137,8 @@ sub nginx_cfg ($self) {
             $host_name = $host;
         }
 
-        for my $path ( keys $self->{router}->{_path_class_cache}->{$host}->%* ) {
-            my $ctrl = $self->{router}->{_path_class_cache}->{$host}->{$path};
+        for my $path ( keys $self->{router}->{path_ctrl}->{$host}->%* ) {
+            my $ctrl = $self->{router}->{path_ctrl}->{$host}->{$path};
 
             push $params->{host}->{$host_name}->{location}->@*, $ctrl->get_nginx_cfg;
         }
@@ -221,7 +221,7 @@ sub _init_reload ($self) {
                         say 'OK';
 
                         # clear app cache
-                        for my $class ( values $self->{router}->{_class_instance_cache}->%* ) {
+                        for my $class ( values $self->{router}->{class_ctrl}->%* ) {
                             if ( $class->does('Pcore::App::Controller::Ext') ) {
                                 $class->{_cache} = undef;
                             }

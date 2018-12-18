@@ -154,9 +154,9 @@ sub connect_socks4 ( $self, $uri, @args ) {
 
     my $buf = "\x04\x01" . pack( 'n', $self->{uri}->connect_port ) . AnyEvent::Socket::unpack_sockaddr( $target->[3] );
 
-    $buf .= $self->{uri}->{userinfo} // '';
+    $buf .= $self->{uri}->{userinfo} // $EMPTY;
 
-    $buf .= "\x00";
+    $buf .= "\N{NULL}";
 
     $h->write($buf) or return $h;
 
@@ -363,10 +363,8 @@ sub finish_thread ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 155, 159, 212, 217,  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 235, 273, 278, 283   |                                                                                                                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 157                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    2 | 155, 212, 217, 235,  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 273, 278, 283        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 165, 273, 278, 283   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

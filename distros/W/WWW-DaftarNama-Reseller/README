@@ -1,0 +1,545 @@
+NAME
+    WWW::DaftarNama::Reseller - Reseller API client for DaftarNama.id
+
+VERSION
+    This document describes version 0.002 of WWW::DaftarNama::Reseller (from
+    Perl distribution WWW-DaftarNama-Reseller), released on 2018-12-17.
+
+SYNOPSIS
+     use WWW::DaftarNama::Reseller qw(
+         get_dns
+         # ...
+     );
+
+     my $res = get_dns(
+         # to get these credentials, first sign up as a reseller at https://daftarnama.id
+         username => '...',
+         password => '...',
+         idkey    => '...',
+
+         domain   => 'shopee.co.id',
+     );
+
+DESCRIPTION
+    DaftarNama.id, <https://daftarnama.id>, is an Indonesian TLD (.id)
+    registrar. This module provides interface to the reseller API.
+
+FUNCTIONS
+  check_availability
+    Usage:
+
+     check_availability(%args) -> [status, msg, payload, meta]
+
+    Check the availability of a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete_ns
+    Usage:
+
+     delete_ns(%args) -> [status, msg, payload, meta]
+
+    Delete a nameserver.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   ns* => *net::hostname*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_contact
+    Usage:
+
+     get_contact(%args) -> [status, msg, payload, meta]
+
+    Get contact information for a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_epp
+    Usage:
+
+     get_epp(%args) -> [status, msg, payload, meta]
+
+    Get EPP Code for a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_lock_status
+    Usage:
+
+     get_lock_status(%args) -> [status, msg, payload, meta]
+
+    Get lock status for a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_ns
+    Usage:
+
+     get_ns(%args) -> [status, msg, payload, meta]
+
+    Get nameservers for a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_registrar
+    Usage:
+
+     get_registrar(%args) -> [status, msg, payload, meta]
+
+    Get registrar of a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  register
+    Usage:
+
+     register(%args) -> [status, msg, payload, meta]
+
+    Register a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   address* => *str*
+
+    *   city* => *str*
+
+    *   company* => *str*
+
+    *   country* => *str*
+
+    *   domain* => *domain::name*
+
+    *   email* => *str*
+
+    *   firstname* => *str*
+
+    *   idkey* => *str*
+
+    *   lastname* => *str*
+
+    *   ns1* => *net::hostname*
+
+    *   ns2* => *net::hostname*
+
+    *   ns3* => *net::hostname*
+
+    *   ns4* => *net::hostname*
+
+    *   password* => *str*
+
+    *   periode => *int*
+
+    *   phone* => *str*
+
+    *   state* => *str*
+
+    *   username* => *str*
+
+    *   zip* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  register_ns
+    Usage:
+
+     register_ns(%args) -> [status, msg, payload, meta]
+
+    Register a nameserver.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   ip* => *net::ipv4*
+
+    *   ns* => *net::hostname*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  renew
+    Usage:
+
+     renew(%args) -> [status, msg, payload, meta]
+
+    Renew a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   eppCode* => *str*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  transfer
+    Usage:
+
+     transfer(%args) -> [status, msg, payload, meta]
+
+    Transfer a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   eppCode* => *str*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  update_contact
+    Usage:
+
+     update_contact(%args) -> [status, msg, payload, meta]
+
+    Update contact information for a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   address* => *str*
+
+    *   city* => *str*
+
+    *   company* => *str*
+
+    *   contacttype* => *str*
+
+    *   country* => *str*
+
+    *   domain* => *domain::name*
+
+    *   email* => *str*
+
+    *   firstname* => *str*
+
+    *   idkey* => *str*
+
+    *   lastname* => *str*
+
+    *   password* => *str*
+
+    *   phone* => *str*
+
+    *   state* => *str*
+
+    *   username* => *str*
+
+    *   zip* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  update_lock_status
+    Usage:
+
+     update_lock_status(%args) -> [status, msg, payload, meta]
+
+    Update lock status for a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   password* => *str*
+
+    *   statusKey* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  update_ns
+    Usage:
+
+     update_ns(%args) -> [status, msg, payload, meta]
+
+    Update nameservers for a domain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   domain* => *domain::name*
+
+    *   idkey* => *str*
+
+    *   ns1* => *net::hostname*
+
+    *   ns2* => *net::hostname*
+
+    *   ns3* => *net::hostname*
+
+    *   ns4* => *net::hostname*
+
+    *   password* => *str*
+
+    *   username* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WWW-DaftarNama-Reseller>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WWW-DaftarNama-Reseller>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-DaftarNama-Resell
+    er>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

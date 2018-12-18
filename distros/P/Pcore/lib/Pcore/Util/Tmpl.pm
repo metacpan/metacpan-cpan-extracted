@@ -31,7 +31,7 @@ around new => sub ( $orig, $self, %args ) {
 
     my $path = [$string_tmpl_cache];    # virtual path
 
-    if ( my $tmpl_storage = $ENV->{share}->get_storage('tmpl') ) {
+    if ( my $tmpl_storage = $ENV->{share}->get_location('tmpl') ) {
         push $path->@*, $tmpl_storage->@*;
     }
 

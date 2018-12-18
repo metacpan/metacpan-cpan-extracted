@@ -7,7 +7,7 @@ our $DATA;
 
 sub _load_data {
     if ( !defined $DATA ) {
-        $DATA = $ENV->{share}->read_cfg( 'Pcore', 'data', 'mime.yaml' );    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+        $DATA = $ENV->{share}->read_cfg('/Pcore/data/mime.yaml');    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
         state $get_tags = sub ($data) {
             my $type = shift $data->@*;
@@ -46,7 +46,7 @@ sub update ($cb = undef) {
         'https://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=co',
         sub ($res) {
             if ($res) {
-                my $data = $ENV->{share}->read_cfg( 'Pcore', 'data', 'mime.yaml' );
+                my $data = $ENV->{share}->read_cfg('/Pcore/data/mime.yaml');
 
                 my $suffixes = $data->{suffix};
 
@@ -69,7 +69,7 @@ sub update ($cb = undef) {
                     }
                 }
 
-                $ENV->{share}->write( 'Pcore', 'data/mime.yaml', $data );
+                $ENV->{share}->write( '/Pcore/data/mime.yaml', $data );
 
                 undef $DATA;
             }

@@ -120,7 +120,7 @@ FUNCTIONS
 
 THANKS
 
-    This module was inspired by XMLRPC::Fast written by SÃÂ©bastien
+    This module was inspired by XMLRPC::Fast written by SÃ©bastien
     Aperghis-Tramoni.
 
     Mojo::XMLRPC was a port of that module initially to use the Mojo::DOM
@@ -136,9 +136,13 @@ AUTHOR
 
     Joel Berger, <joel.a.berger@gmail.com>
 
+CONTRIBUTORS
+
+    Andreas VÃ¶gele (voegelas)
+
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2017 by Joel Berger This library is free software; you
-    can redistribute it and/or modify it under the same terms as Perl
-    itself.
+    Copyright (C) 2017 by "AUTHOR" and "CONTRIBUTORS" This library is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
 

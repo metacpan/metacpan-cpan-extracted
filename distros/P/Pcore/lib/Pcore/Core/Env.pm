@@ -26,7 +26,6 @@ has START_DIR       => ();
 has SCRIPT_DIR      => ();
 has SCRIPT_NAME     => ();
 has TEMP_DIR        => ();                                         # OS temp dir
-has PCORE_TEMP_DIR  => ();                                         # TEMP_DIR/.pcore
 has DATA_DIR        => ();
 
 has SCANDEPS  => ();
@@ -114,7 +113,7 @@ sub _configure_inc {
 
             # find and add other dist libs to @INC
             if ( $ENV{PCORE_LIB} && -d $ENV{PCORE_LIB} ) {
-                for my $dir ( sort { $b cmp $a } P->file->read_dir( $ENV{PCORE_LIB}, full_path => 1 )->@* ) {
+                for my $dir ( reverse sort { $a cmp $b } P->file->read_dir( $ENV{PCORE_LIB}, full_path => 1 )->@* ) {
                     if ( !exists $inc_index->{qq[$dir/lib]} && -d qq[$dir/lib/] && Pcore::Dist->dir_is_dist_root($dir) ) {
                         $inc_index->{qq[$dir/lib]} = 1;
 
@@ -183,12 +182,12 @@ sub BUILD ( $self, $args ) {
     my $pcore_path = $INC{'Pcore.pm'};
 
     # remove "/Pcore.pm"
-    substr $pcore_path, -9, 9, '';
+    substr $pcore_path, -9, 9, $EMPTY;
 
     if ( -d "$pcore_path/../share" ) {
 
         # remove "/lib"
-        substr $pcore_path, -4, 4, '';
+        substr $pcore_path, -4, 4, $EMPTY;
 
         $self->{PCORE_SHARE_DIR} = "$pcore_path/share";
     }
@@ -229,8 +228,7 @@ sub BUILD1 ($self) {
 
     $self->{SCRIPT_PATH} = "$self->{SCRIPT_DIR}/$self->{SCRIPT_NAME}";
 
-    $self->{TEMP_DIR}       = P->path( File::Spec->tmpdir )->{path};
-    $self->{PCORE_TEMP_DIR} = P->path("$self->{TEMP_DIR}/.pcore")->{path};
+    $self->{TEMP_DIR} = P->path( File::Spec->tmpdir )->{path};
 
     # find main dist
     if ( $self->{is_par} ) {
@@ -421,18 +419,14 @@ END {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 207                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
-## |      | 331                  | * Subroutine "END" with high complexity score (23)                                                             |
+## |      | 206                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
+## |      | 329                  | * Subroutine "END" with high complexity score (23)                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 342                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 340                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 382                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 380                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 186, 191             | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 409                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 117                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    2 | 407                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

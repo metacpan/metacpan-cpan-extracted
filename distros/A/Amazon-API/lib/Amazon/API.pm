@@ -90,7 +90,7 @@ use vars qw/@EXPORT $VERSION/;
 
 @EXPORT=qw/$VERSION/;
 
-our $VERSION = '1.1.4'; $VERSION=~s/\-.*$//;
+our $VERSION = '1.1.4-1'; $VERSION=~s/\-.*$//;
 
 =pod
 

@@ -2,7 +2,7 @@ NAME
     Log::ger::App - An easy way to use Log::ger in applications
 
 VERSION
-    version 0.008
+    version 0.009
 
 SYNOPSIS
     In your script:
@@ -38,11 +38,11 @@ DESCRIPTION
     (not) a daemon. Or, you can set it via import argument (see "import").
 
   Setting general log level
-    The default is "warn" (like Log::ger's default).
+    Via import argument 'level'. You can set general log level via import
+    argument "level" (see "import") but users of your script will not be
+    able to customize it:
 
-    Via import argument. You can set general log level via import argument
-    (see "import") but users of your script will not be able to customize
-    it.
+     use Log::ger::App level => 'debug'; # hard-coded to debug, not recommended
 
     Via environment variables. You can also set general log level from
     environment using "LOG_LEVEL" (e.g. "LOG_LEVEL=trace" to set level to
@@ -50,12 +50,23 @@ DESCRIPTION
     to "trace" using "TRACE=1", or "debug" with "DEBUG=1", "info" with
     "VERBOSE=1", "error" with "QUIET=1".
 
+    Via import argument 'default_level'. If the environment variables does
+    not provide a value, next the import argument "default_level" is
+    consulted. This is the preferred method of setting default level:
+
+     use Log::ger::App default_level => 'info'; # be verbose by default. unless changed by env vars
+
+    "warn". The fallback level is warn, if all the above does not provide a
+    value.
+
   Setting per-output log level
-    The default is to use general level, but you can set a different level
-    for each output using
+    Via environment variables. You can set level for each output using
     *OUTPUT_NAME*_{"LOG_LEVEL|TRACE|DEBUG|VERBOSE|QUIET"} environment
     variables. For example, "SCREEN_DEBUG=1" to set screen level to "debug"
     or "FILE_LOG_LEVEL=off" to turn off file logging.
+
+    General level. If the environment variables do not provide a value, the
+    general level (see "Setting general log level") will be used.
 
   Showing timestamp
     Timestamps are shown in log files. On the screen, timestamps are not
@@ -80,15 +91,21 @@ FUNCTIONS
 
     Arguments:
 
-    *   level => str|num
+    *   level
 
-        Explicitly set level. Otherwise, the default will be taken from
-        environment variable like described previously in "DESCRIPTION".
+        str|num. Explicitly set a hard-coded level. Not recommended because
+        of lack of flexibility. See instead: "default_level".
 
-    *   name => str
+    *   default_level
 
-        Explicitly set program name. Otherwise, default will be taken from
-        $0 (after path and '.pl' suffix is removed) or set to "prog".
+        str|num. Instead of hard-coding level with "level", you can set a
+        default level. Environment variables will be consulted first (as
+        described in "DESCRIPTION") before falling back to this level.
+
+    *   name
+
+        str. Explicitly set program name. Otherwise, default will be taken
+        from $0 (after path and '.pl' suffix is removed) or set to "prog".
 
         Program name will be shown on the screen, e.g.:
 
@@ -97,20 +114,28 @@ FUNCTIONS
          myprog: Doing task 2 ...
          myprog: Exiting ...
 
-    *   daemon => bool
+    *   daemon
 
-        Explicitly tell Log::ger::App that your application is a daemon or
-        not. Otherwise, Log::ger::App will try some heuristics to guess
-        whether your application is a daemon: from the value of
+        bool. Explicitly tell Log::ger::App that your application is a
+        daemon or not. Otherwise, Log::ger::App will try some heuristics to
+        guess whether your application is a daemon: from the value of
         $main::IS_DAEMON and from the presence of modules like HTTP::Daemon,
         Proc::Daemon, etc.
 
-    *   outputs => hash
+    *   outputs
 
-        Specify extra outputs. Will be passed to Log::ger::Output::Composite
-        configuration.
+        hash. Specify extra outputs. Will be passed to
+        Log::ger::Output::Composite configuration.
+
+VARIABLES
+  $DEBUG
+    Default is false. If set to true, will show more details about how log
+    level, etc is set.
 
 ENVIRONMENT
+  LOG_GER_APP_DEBUG
+    Used to set the default for $DEBUG.
+
   LOG_ADD_TIMESTAMP
     Boolean. Default to false. If set to true, will add timestamps to the
     screen log. Normally, timestamps will only be added to the file log.

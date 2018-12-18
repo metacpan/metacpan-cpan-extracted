@@ -37,7 +37,7 @@ sub postamble
 	'	cover -test',
 	'',
 	'spellcheck:',
-	'	pod-spell-check --aspell',
+	'	pod-spell-check --aspell --ispell',
 	'',
 	'checkmeta:	spellcheck',
 	'	perl sandbox/genMETA.pl -c',

@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.641   2018-12-17
+    - Bugfix "meta_items".
+
+1.640   2018-12-16
+    - "clear_lines_to_end_of_screen" if not "clear_screen".
+
 1.639   2018-12-14
     - Update char-width tables.
 

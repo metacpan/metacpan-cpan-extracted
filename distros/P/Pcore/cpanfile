@@ -1,4 +1,4 @@
-requires 'perl',           v5.28.0;
+requires 'perl',           v5.28.1;
 requires 'common::header', v0.1.2;
 
 feature windows => sub {
@@ -123,7 +123,6 @@ requires 'Ref::Util::XS';
 # Pcore::Util::Src
 requires 'Perl::Tidy';
 on develop => sub {
-    requires 'BerkeleyDB';
     requires 'Perl::Stripper';
     requires 'Perl::Strip';
     requires 'Perl::Critic';

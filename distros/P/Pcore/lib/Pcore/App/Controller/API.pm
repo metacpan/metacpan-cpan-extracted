@@ -13,7 +13,7 @@ const our $WS_COMPRESSION      => 0;
 const our $TX_TYPE_RPC => 'rpc';
 
 sub run ( $self, $req ) {
-    if ( $req->{path_tail} ) {
+    if ( defined $req->{path} ) {
         $req->(404)->finish;
 
         return;

@@ -172,7 +172,7 @@ sub read_bin ( $path, % ) {
 
     my $fh = get_fh( $path, O_RDONLY, crlf => 0 );
 
-    my $tail = q[];
+    my $tail = $EMPTY;
 
   READ:
     my $bytes = read $fh, my $buf, $args{buf_size};
@@ -214,7 +214,7 @@ sub read_text ( $path, % ) {
 
     my $fh = get_fh( $path, O_RDONLY, crlf => $args{crlf}, binmode => $args{binmode} );
 
-    my $tail = q[];
+    my $tail = $EMPTY;
 
   READ:
     my $bytes = read $fh, my $buf, $args{buf_size};
@@ -257,7 +257,7 @@ sub read_lines ( $path, % ) {
 
     my $fh = get_fh( $path, O_RDONLY, crlf => $args{crlf}, binmode => $args{binmode} );
 
-    my $tail = q[];
+    my $tail = $EMPTY;
 
   READ:
     my $bytes = read $fh, my $buf, $args{buf_size};
@@ -282,14 +282,14 @@ sub read_lines ( $path, % ) {
                 else {
                     my $array_ref = [ split /\n+/sm, $buf ];
 
-                    # remove leading q[], preserved by split
-                    shift $array_ref->@* if defined $array_ref->[0] && $array_ref->[0] eq q[];
+                    # remove leading $EMPTY, preserved by split
+                    shift $array_ref->@* if defined $array_ref->[0] && $array_ref->[0] eq $EMPTY;
 
                     if ( substr( $buf, -1, 1 ) ne qq[\n] ) {
                         $tail = pop $array_ref->@*;
                     }
                     else {
-                        $tail = q[];
+                        $tail = $EMPTY;
                     }
 
                     if ( $array_ref->@* ) {
@@ -301,7 +301,7 @@ sub read_lines ( $path, % ) {
             goto READ;
         }
         else {
-            if ( $tail ne q[] ) {
+            if ( $tail ne $EMPTY ) {
                 return if !$args{cb}->( [$tail] );
             }
 
@@ -320,16 +320,16 @@ sub read_lines ( $path, % ) {
             if ( $args{empty_lines} ) {
                 my $array_ref = [ split /\n/sm, $tail, -1 ];
 
-                # remove trailing q[], preserved by split
-                pop $array_ref->@* if defined $array_ref->[-1] && $array_ref->[-1] eq q[];
+                # remove trailing $EMPTY, preserved by split
+                pop $array_ref->@* if defined $array_ref->[-1] && $array_ref->[-1] eq $EMPTY;
 
                 return $array_ref;
             }
             else {
                 my $array_ref = [ split /\n+/sm, $tail ];
 
-                # remove leading q[], preserved by split
-                shift $array_ref->@* if defined $array_ref->[0] && $array_ref->[0] eq q[];
+                # remove leading $EMPTY, preserved by split
+                shift $array_ref->@* if defined $array_ref->[0] && $array_ref->[0] eq $EMPTY;
 
                 return $array_ref;
             }
@@ -430,7 +430,7 @@ sub get_fh ( $path, $mode, @ ) {
 
         sysopen my $fh, $path, $mode, calc_chmod( $args{mode} ) or die qq[Can't open file "$path"];
 
-        my $binmode = q[];
+        my $binmode = $EMPTY;
 
         $args{crlf} //= $MSWIN ? 1 : 0;
 
@@ -594,12 +594,12 @@ sub tempdir (%args) {
 sub temppath {
     my %args = (
         base   => $ENV->{TEMP_DIR},
-        suffix => q[],
+        suffix => $EMPTY,
         tmpl   => 'temp-' . $$ . '-XXXXXXXX',
         @_,
     );
 
-    $args{suffix} = q[.] . $args{suffix} if defined $args{suffix} && $args{suffix} ne q[] && substr( $args{suffix}, 0, 1 ) ne q[.];
+    $args{suffix} = q[.] . $args{suffix} if defined $args{suffix} && $args{suffix} ne $EMPTY && substr( $args{suffix}, 0, 1 ) ne q[.];
 
     require Pcore::Util::File::TempFile;
 
@@ -717,7 +717,7 @@ sub move ( $from, $to, @ ) {
 sub where ( $filename ) {
     my $wantarray = wantarray;
 
-    state $env_path = q[];
+    state $env_path = $EMPTY;
 
     state $paths;
 
@@ -727,14 +727,14 @@ sub where ( $filename ) {
         $paths = [ q[.], grep {$_} split /$Config{path_sep}/sm, $ENV{PATH} ];
     }
 
-    state $env_pathext = q[];
+    state $env_pathext = $EMPTY;
 
-    state $pathext = [q[]];
+    state $pathext = [$EMPTY];
 
     if ( $MSWIN && $ENV{PATHEXT} && $env_pathext ne $ENV{PATHEXT} ) {
         $env_pathext = $ENV{PATHEXT};
 
-        $pathext = [ q[], grep {$_} split /$Config{path_sep}/sm, $ENV{PATHEXT} ];
+        $pathext = [ $EMPTY, grep {$_} split /$Config{path_sep}/sm, $ENV{PATHEXT} ];
     }
 
     my @res;

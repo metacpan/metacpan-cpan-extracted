@@ -1,7 +1,7 @@
 package SQL::Type::Guess;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -148,7 +148,7 @@ sub guess_data_type {
         $descriptor->{ this_value_type } ||= '';
         $descriptor->{ pre }    ||= 0;
         $descriptor->{ post }   ||= 0;
-        $descriptor->{ length } ||= length( $value );
+        $descriptor->{ length } ||= length( $value ) || 0;
 
         if( $type ) {
             if( $type =~ s/\s*\((\d+)\)// ) {

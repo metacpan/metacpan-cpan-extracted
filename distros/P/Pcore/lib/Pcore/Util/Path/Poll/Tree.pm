@@ -8,9 +8,9 @@ has interval => ( required => 1 );
 has cb       => ( required => 1 );
 has read_dir => ();
 
-has id => ( uuid_v1mc_str, init_arg => undef );
+has id => ( sub {uuid_v1mc_str}, init_arg => undef );
 has last_checked => ( 0, init_arg => undef );
-has stat         => ( sub { {} }, init_arg => undef );
+has stat => ( sub { {} }, init_arg => undef );
 
 const our $STAT_ID   => 0;
 const our $STAT_PATH => 1;

@@ -1,0 +1,24 @@
+0.004   2018-12-17 (PERLANCAR)
+
+	- Add overloads: cmp, eq, ne.
+
+	- Render nanosecond in stringify().
+
+	- [ux] from_hms(): Allow hh:mm in addition to hh:mm:ss.
+
+
+0.003   2018-12-16 (PERLANCAR)
+
+	- Add compare() and overloading of <=>.
+
+
+0.002   2018-12-16 (PERLANCAR)
+
+	- Add constructors from_hms() & from_float(). Add float().
+
+	- Some tweaks/fixes.
+
+
+0.001   2018-12-15 (PERLANCAR)
+
+         - First release.

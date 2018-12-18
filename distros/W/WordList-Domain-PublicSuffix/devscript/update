@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use Log::ger;
+use Log::ger::App default_level => 'info';
+
+use Encode::Simple qw(encode_lax decode_lax);
+use File::Slurper qw(read_text write_text write_binary);
+use HTTP::Tiny;
+
+my $psname = "public_suffix_list.dat";
+my $url = "https://publicsuffix.org/list/$psname";
+my $pspath = "$Bin/../devdata/$psname";
+
+unless ((-f $pspath) && (-M _) <= 1) {
+    log_info "Getting $url ...";
+    my $res = HTTP::Tiny->new->get($url);
+    $res->{success} or die "Can't get $url: $res->{status} - $res->{reason}";
+    write_binary $pspath, $res->{content};
+};
+
+my $content = read_text $pspath;
+my %entries;
+for my $line (split /^/, $content) {
+    $line =~ s/\R//;
+    next unless $line =~ /\S/;
+    next if $line =~ m!//!;
+    if ($entries{$line}++) {
+        die "Duplicate entry: $line";
+    }
+}
+
+my $modpath = "$Bin/../lib/WordList/Domain/PublicSuffix.pm";
+my $modcontent = read_text($modpath);
+$modcontent =~ s/^(__DATA__\R).*/$1 . join("", map {"$_\n"} sort keys %entries)/ems
+    or die "Can't replace DATA in $modpath";
+write_text($modpath, $modcontent);

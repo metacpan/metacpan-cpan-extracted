@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 =head1 NAME
 
@@ -684,27 +684,43 @@ sub sprintf_methods {
 }
 
 sub buffer {
-    my ($self, $count) = @_;
+    my $self = shift;
+    my %args;
+    %args = @_ != 1
+    ? @_
+    : (
+        low  => $_[0],
+        high => $_[0],
+    );
+    $args{low} //= $args{high};
+    $args{low} //= 10;
+    $args{high} //= $args{low};
+
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
     $src->{pause_propagation} = 0;
-    $count ||= 10;
     my @pending;
     $self->completed->on_ready(sub {
         shift->on_ready($src->completed) unless $src->completed->is_ready
     });
-    $src->flow_control
-        ->each($src->$curry::weak(sub {
-            my ($src) = @_;
-            return unless $_;
+    my $item_handler = do {
+        Scalar::Util::weaken(my $weak_self = $self);
+        Scalar::Util::weaken(my $weak_src = $src);
+        sub {
+            my $self = $weak_self;
+            my $src = $weak_src or return;
+            if(@pending >= $args{high} and $self and not $self->is_paused($src)) {
+                $self->pause($src);
+            }
             $src->emit(shift @pending) while @pending and not $src->is_paused;
-        }))->retain;
-    $self->each_while_source($self->$curry::weak(sub {
-        my ($self, $item) = @_;
-        push @pending, $item;
-        $self->pause($src) if @pending >= $count;
-        $src->emit(shift @pending) while @pending and not $src->is_paused;
-        $self->resume($src) if @pending < $count;
-    }), $src);
+            $self->resume($src) if @pending < $args{low} and $self and $self->is_paused($src);
+        }
+    };
+    $src->flow_control
+        ->each($item_handler)->retain;
+    $self->each_while_source(sub {
+        push @pending, $_;
+        $item_handler->()
+    }, $src);
 }
 
 sub retain {

@@ -55,3 +55,12 @@ use constant {
     BAR => 2,
 };
 say 42;
+
+## name constant used in ternery op
+## failures 0
+## cut
+
+use constant FOO => 1;
+use constant BAR => 2;
+
+$x = $y ? FOO : BAR;

@@ -1,7 +1,7 @@
 package Pcore::Dist::CLI::Docker::Create;
 
 use Pcore -class;
-use Pcore::API::DockerHub qw[:DOCKERHUB_SOURCE_TYPE];
+use Pcore::API::Docker::Hub qw[:DOCKERHUB_SOURCE_TYPE];
 
 extends qw[Pcore::Dist::CLI];
 

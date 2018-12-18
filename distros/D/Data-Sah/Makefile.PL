@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Dmp" => "0.21",
     "Data::Dump" => 0,
-    "Data::Sah::Coerce" => "0.025",
+    "Data::Sah::Coerce" => "0.031",
     "Data::Sah::CoerceCommon" => 0,
     "Data::Sah::Normalize" => "0.03",
     "Data::Sah::Resolve" => "0.003",
@@ -62,7 +62,7 @@ my %WriteMakefileArgs = (
     "lib::filter" => "0.03",
     "overload" => 0
   },
-  "VERSION" => "0.893",
+  "VERSION" => "0.895",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,7 +72,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::Dmp" => "0.21",
   "Data::Dump" => 0,
-  "Data::Sah::Coerce" => "0.025",
+  "Data::Sah::Coerce" => "0.031",
   "Data::Sah::CoerceCommon" => 0,
   "Data::Sah::Normalize" => "0.03",
   "Data::Sah::Resolve" => "0.003",

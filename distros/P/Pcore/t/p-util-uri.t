@@ -60,7 +60,7 @@ for my $pair ( pairs( $tests->@* ) ) {
         my $src  = shift $pair->key->@*;
         my %args = $pair->key->@*;
 
-        say sprintf qq["%s" + "%s" = "%s"\nEXPECTED: "%s"\n], $src, $args{base} // '', $uri->to_string, $pair->value;
+        say sprintf qq["%s" + "%s" = "%s"\nEXPECTED: "%s"\n], $src, $args{base} // $EMPTY, $uri->to_string, $pair->value;
     }
 
     ok( $uri->to_string eq $pair->value, 'p_util_uri_' . ++$i );
@@ -69,16 +69,6 @@ for my $pair ( pairs( $tests->@* ) ) {
 done_testing $TESTS;
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 63                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

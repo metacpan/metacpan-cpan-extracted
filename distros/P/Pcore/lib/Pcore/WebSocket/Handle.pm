@@ -8,9 +8,9 @@ use Pcore::Util::Data qw[to_b64 to_xor];
 use Pcore::Util::Digest qw[sha1];
 use Compress::Raw::Zlib;
 use overload    #
-  q[bool]  => sub { return $_[0]->{is_connected} },
-  q[0+]    => sub { return $_[0]->{status} },
-  q[""]    => sub { return $_[0]->{status} . q[ ] . $_[0]->{reason} },
+  'bool'   => sub { return $_[0]->{is_connected} },
+  '0+'     => sub { return $_[0]->{status} },
+  '""'     => sub { return "$_[0]->{status} $_[0]->{reason}" },
   fallback => 1;
 
 # Websocket v13 spec. https://tools.ietf.org/html/rfc6455
@@ -181,11 +181,11 @@ sub connect ( $self, $uri, %args ) {    ## no critic qw[Subroutines::ProhibitBui
     return $on_error->( $self, $h->{status}, $h->{reason} ) if !$h;
 
     # generate websocket key
-    my $sec_websocket_key = to_b64 rand 100_000, q[];
+    my $sec_websocket_key = to_b64 rand 100_000, $EMPTY;
 
     my @headers = (    #
         "GET @{[$uri->path_query]} HTTP/1.1",
-        'Host:' . ( $uri->{host} // '' ),
+        'Host:' . ( $uri->{host} // $EMPTY ),
         "User-Agent:Pcore-HTTP/$Pcore::VERSION",
         'Upgrade:websocket',
         'Connection:upgrade',
@@ -307,7 +307,7 @@ sub _set_status ( $self, $status, $reason = undef ) {
 
 # UTILS
 sub _get_challenge ( $self, $key ) {
-    return to_b64( sha1( ($key) . $WEBSOCKET_GUID ), q[] );
+    return to_b64( sha1( ($key) . $WEBSOCKET_GUID ), $EMPTY );
 }
 
 sub _build_frame ( $self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload_ref ) {
@@ -326,7 +326,7 @@ sub _build_frame ( $self, $fin, $rsv1, $rsv2, $rsv3, $op, $payload_ref ) {
 
         $deflate->flush( $out, Z_SYNC_FLUSH );
 
-        substr $out, -4, 4, q[];
+        substr $out, -4, 4, $EMPTY;
 
         $payload_ref = \$out;
     }
@@ -554,7 +554,7 @@ sub _on_frame ( $self, $header, $msg, $payload_ref ) {
                 -LimitOutput  => 1,
             );
 
-            $payload_ref->$* .= "\x00\x00\xff\xff";
+            $payload_ref->$* .= "\N{NULL}\N{NULL}\xff\xff";
 
             $inflate->inflate( $payload_ref, my $out );
 
@@ -594,7 +594,7 @@ sub _on_frame ( $self, $header, $msg, $payload_ref ) {
             my ( $status, $reason );
 
             if ( $payload_ref && length $payload_ref->$* >= 2 ) {
-                $status = unpack 'n', substr $payload_ref->$*, 0, 2, q[];
+                $status = unpack 'n', substr $payload_ref->$*, 0, 2, $EMPTY;
 
                 $reason = decode_utf8 $payload_ref->$* if length $payload_ref->$*;
             }
@@ -609,14 +609,14 @@ sub _on_frame ( $self, $header, $msg, $payload_ref ) {
         elsif ( $header->{op} == $WEBSOCKET_OP_PING ) {
 
             # reply pong automatically
-            $self->send_pong( $payload_ref ? $payload_ref->$* : q[] );
+            $self->send_pong( $payload_ref ? $payload_ref->$* : $EMPTY );
 
-            $self->{on_ping}->( $self, $payload_ref || \q[] ) if $self->{on_ping};
+            $self->{on_ping}->( $self, $payload_ref || \$EMPTY ) if $self->{on_ping};
         }
 
         # PONG message
         elsif ( $header->{op} == $WEBSOCKET_OP_PONG ) {
-            $self->{on_pong}->( $self, $payload_ref || \q[] ) if $self->{on_pong};
+            $self->{on_pong}->( $self, $payload_ref || \$EMPTY ) if $self->{on_pong};
         }
     }
 
@@ -640,8 +640,6 @@ sub _on_frame ( $self, $header, $msg, $payload_ref ) {
 ## |    3 | 485, 487, 489        | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 46, 557              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 188                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

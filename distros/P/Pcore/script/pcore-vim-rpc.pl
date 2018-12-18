@@ -23,7 +23,7 @@ sub on_accept ( $fh, $host, $port ) {
         # decode message, ignore invalid json
         eval { $msg = from_json $msg->$*; 1; } or last;
 
-        my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // q[] );
+        my $cmd = 'CMD_' . ( delete( $msg->[1]->{cmd} ) // $EMPTY );
 
         last if !$cmd || !main->can($cmd);
 

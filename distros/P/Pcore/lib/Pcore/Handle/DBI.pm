@@ -126,7 +126,7 @@ sub prepare_query ( $self, $query ) {
         }
     }
 
-    return join( q[ ], @sql ), @bind ? \@bind : undef;
+    return join( $SPACE, @sql ), @bind ? \@bind : undef;
 }
 
 1;

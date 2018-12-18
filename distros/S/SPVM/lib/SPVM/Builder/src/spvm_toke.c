@@ -101,10 +101,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
             else {
               // change :: to / and add ".spvm"
-              int32_t module_path_base_length = (int32_t)(strlen(package_name) + 6);
-              char* module_path_base = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, module_path_base_length + 1);
+              int32_t cur_rel_file_length = (int32_t)(strlen(package_name) + 6);
+              char* cur_rel_file = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, cur_rel_file_length + 1);
               const char* bufptr_orig = package_name;
-              char* bufptr_to = module_path_base;
+              char* bufptr_to = cur_rel_file;
               while (*bufptr_orig) {
                 if (*bufptr_orig == ':' && *(bufptr_orig + 1) == ':') {
                   *bufptr_to = '/';
@@ -131,9 +131,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   const char* include_path = (const char*) SPVM_LIST_fetch(compiler->module_include_pathes, i);
                   
                   // File name
-                  int32_t file_name_length = (int32_t)(strlen(include_path) + 1 + strlen(module_path_base));
+                  int32_t file_name_length = (int32_t)(strlen(include_path) + 1 + strlen(cur_rel_file));
                   cur_file = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, file_name_length + 1);
-                  sprintf(cur_file, "%s/%s", include_path, module_path_base);
+                  sprintf(cur_file, "%s/%s", include_path, cur_rel_file);
                   cur_file[file_name_length] = '\0';
                   
                   // Open source file
@@ -159,7 +159,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   continue;
                 }
                 else {
-                  fprintf(stderr, "Can't locate %s in @INC (@INC contains:", module_path_base);
+                  fprintf(stderr, "Can't locate %s in @INC (@INC contains:", cur_rel_file);
                   {
                     int32_t i;
                     for (i = 0; i < module_include_pathes_length; i++) {
@@ -174,6 +174,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               }
               
               compiler->cur_file = cur_file;
+              compiler->cur_rel_file = cur_rel_file;
               
               // Read file content
               fseek(fh, 0, SEEK_END);
@@ -212,8 +213,18 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       // Skip space character
       case ' ':
       case '\t':
+      case '\f':
+        compiler->bufptr++;
+        continue;
       case '\r':
         compiler->bufptr++;
+        if (*compiler->bufptr == '\n') {
+          compiler->bufptr++;
+          compiler->cur_line++;
+        }
+        else {
+          compiler->cur_line++;
+        }
         continue;
       case '\n':
         compiler->bufptr++;
@@ -623,59 +634,59 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           yylvalp->opval = op;
         return '~';
       }
+      // Character Literal
       case '\'': {
         compiler->bufptr++;
-        
-        char ch;
-        // Null string
-        if (*compiler->bufptr == '\'') {
-          ch = '\0';
+        char ch = 0;
+
+        if (*compiler->bufptr == '\\') {
+          compiler->bufptr++;
+          if (*compiler->bufptr == 'b') {
+            ch = '\b';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == 't') {
+            ch = '\t';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == 'n') {
+            ch = '\n';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == 'f') {
+            ch = '\f';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == 'r') {
+            ch = '\r';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == '"') {
+            ch = '\"';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == '\'') {
+            ch = '\'';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == '\\') {
+            ch = '\\';
+            compiler->bufptr++;
+          }
+          else {
+            SPVM_COMPILER_error(compiler, "Invalid escape character in charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+          }
+        }
+        else {
+          ch = *compiler->bufptr;
           compiler->bufptr++;
         }
-        // Escape sequence
-        else {
-          if (*compiler->bufptr == '\\') {
-            compiler->bufptr++;
-            if (*compiler->bufptr == 'r') {
-              ch = 0x0D;
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'n') {
-              ch = 0x0A;
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 't') {
-              ch = '\t';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'b') {
-              ch = '\b';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'f') {
-              ch = '\f';
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == '0') {
-              ch = '\0';
-              compiler->bufptr++;
-            }
-            else {
-              ch = *compiler->bufptr;
-              compiler->bufptr++;
-            }
-          }
-          else {
-            ch = *compiler->bufptr;
-            compiler->bufptr++;
-          }
           
-          if (*compiler->bufptr == '\'') {
-            compiler->bufptr++;
-          }
-          else {
-            SPVM_COMPILER_error(compiler, "Can't find constant char terminator \"'\" at %s line %d\n", compiler->cur_file, compiler->cur_line);
-          }
+        if (*compiler->bufptr == '\'') {
+          compiler->bufptr++;
+        }
+        else {
+          SPVM_COMPILER_error(compiler, "Can't find character literal terminiator at %s line %d\n", compiler->cur_file, compiler->cur_line);
         }
         
         // Constant 
@@ -1179,7 +1190,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
           
           if (expect_sub_name) {
-            SPVM_LIST_push(compiler->current_sub_names, keyword);
+            // None
           }
           else if (expect_field_name) {
             // None
@@ -1478,6 +1489,20 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 if (strcmp(keyword, "__END__") == 0) {
                   *compiler->bufptr = '\0';
                   continue;
+                }
+                else if (strcmp(keyword, "__PACKAGE__") == 0) {
+                  yylvalp->opval = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CURRENT_PACKAGE, compiler->cur_file, compiler->cur_line);
+                  return CURRENT_PACKAGE;
+                }
+                else if (strcmp(keyword, "__FILE__") == 0) {
+                  SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, compiler->cur_rel_file, strlen(compiler->cur_rel_file), compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_constant;
+                  return CONSTANT;
+                }
+                else if (strcmp(keyword, "__LINE__") == 0) {
+                  SPVM_OP* op_constant = SPVM_OP_new_op_constant_int(compiler, compiler->cur_line, compiler->cur_file, compiler->cur_line);
+                  yylvalp->opval = op_constant;
+                  return CONSTANT;
                 }
                 break;
             }

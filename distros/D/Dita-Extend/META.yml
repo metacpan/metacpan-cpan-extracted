@@ -1,0 +1,33 @@
+---
+abstract: 'Validate XML documents written as extensions of OASIS DITA.'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.4224'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dita-Extend
+provides:
+  Dita::Extend:
+    file: lib/Dita/Validate.pm
+    version: '20181215'
+requires:
+  Acme::Tools: '0'
+  Carp: '0'
+  Data::DFA: '20181027'
+  Data::Dump: '0'
+  Data::Edit::Xml: '20181216'
+  Data::Table::Text: '20181216'
+  Storable: '0'
+  Test2::API: '0'
+  Test::More: '0'
+  XML::Parser: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '20181217'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

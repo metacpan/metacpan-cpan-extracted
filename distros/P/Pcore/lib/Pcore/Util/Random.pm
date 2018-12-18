@@ -24,7 +24,7 @@ sub bytes_hex ($len) {
 }
 
 sub password ($len = $PASSWORD_LENGTH) {
-    return join q[], map { $_PASSWORD_RANGE->[ord] } split //sm, bytes($len);
+    return join $EMPTY, map { $_PASSWORD_RANGE->[ord] } split //sm, bytes($len);
 }
 
 1;

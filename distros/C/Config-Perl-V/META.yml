@@ -16,7 +16,7 @@ name: Config-Perl-V
 provides: 
   Config::Perl::V: 
     file: V.pm
-    version: '0.30'
+    version: '0.31'
 requires: 
   Config: 0
   Test::More: 0
@@ -25,4 +25,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Config-Perl-V
-version: '0.30'
+version: '0.31'

@@ -20,14 +20,48 @@ node:
     # see node server uri examples above
     listen:
 
+cdn:
+    native_cdn: 0
+    resources:
+        - Pcore-CDN-Static
+        - <: $dist_name :>
+    locations:
+        static:
+            bucket: s3
+            path: static
+            cache_control: public, max-age=30672000
+        <: $dist_path :>-static:
+            bucket: s3
+            path: <: $dist_path :>/static
+            cache_control: public, max-age=30672000
+        content:
+            bucket: local
+            path: <: $dist_path :>/dynamic
+            cache_control: public, private, must-revalidate, proxy-revalidate
+    buckets:
+        local:
+            type: local
+            locations:
+: my $DATA_DIR_VAR = "<: $DATA_DIR :>"
+                - <: $DATA_DIR_VAR | raw :>/cdn
+                - <: $dist_name :>
+                - Pcore-CDN-Static-Data
+        s3:
+            type: digitalocean
+            bucket:
+            region: nyc3
+            key:
+            secret:
+            edge_links: 0
+
 smtp:
-  username: no-reply@softvisio.net
-  password:
-  host: smtp.gmail.com
-  port: 465
-  tls: 1
-  to:
-  cc:
+    username: no-reply@softvisio.net
+    password:
+    host: smtp.gmail.com
+    port: 465
+    tls: 1
+    to:
+    cc:
 
 xmpp:
     username: no-reply@softvisio.net

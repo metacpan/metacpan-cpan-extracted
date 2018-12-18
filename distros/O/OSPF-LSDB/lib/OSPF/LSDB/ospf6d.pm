@@ -48,7 +48,7 @@ C<show database link>
 C<show database intra>
 is needed.
 It can be given as separate files or obtained dynamically.
-In the latter case B<sudo> is invoked if permissions are not
+In the latter case B<doas> is invoked if permissions are not
 sufficient to run B<ospf6ctl>.
 If the object has been created with the C<ssh> argument, the specified
 user and host are used to login and run B<ospf6ctl> there.
@@ -151,10 +151,10 @@ sub parse_router {
 	    if (/\(Interface ID $IP\)/) {
 		$l->{interface} = $1;
 	    }
-	} elsif (/^    Designated Router ID: $IP$/) {
+	} elsif (/^    (?:Designated )?Router ID: $IP$/) {
 	    $l->{routerid} = $1;
 	    $link = $1;
-	} elsif (/^    DR Interface ID: $IP$/) {
+	} elsif (/^    (?:DR )?Interface ID: $IP$/) {
 	    $l->{address} = $1;
 	    $link = "$1\@$link";
 	} elsif (/^    Metric: $RE{num}{int}{-keep}$/) {

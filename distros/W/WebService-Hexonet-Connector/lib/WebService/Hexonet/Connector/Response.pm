@@ -1,299 +1,568 @@
 package WebService::Hexonet::Connector::Response;
 
+use 5.026_000;
 use strict;
 use warnings;
-use WebService::Hexonet::Connector::Util;
-use overload
-  '%{}' => \&_as_hash_op,
-  '@{}' => \&as_list,
-  ;
+use WebService::Hexonet::Connector::Column;
+use WebService::Hexonet::Connector::Record;
+use parent qw(WebService::Hexonet::Connector::ResponseTemplate);
+use POSIX qw(ceil floor);
+use List::MoreUtils qw(first_index);
+use Readonly;
+Readonly my $INDEX_NOT_FOUND => -1;
 
-our $VERSION = '1.12';
+use version 0.9917; our $VERSION = version->declare('v2.0.1');
+
 
 sub new {
-    my $class    = shift;
-    my $response = shift;
-    my $self     = {};
+    my ( $class, $raw, $cmd ) = @_;
+    my $self = WebService::Hexonet::Connector::ResponseTemplate->new($raw);
+    $self = bless $self, $class;
+    $self->{command}     = $cmd;
+    $self->{columnkeys}  = [];
+    $self->{columns}     = [];
+    $self->{records}     = [];
+    $self->{recordIndex} = 0;
 
-    if ( ( ref $response ) eq "HASH" ) {
-        $self->{_response_hash} = $response;
+    my $h = $self->getHash();
+    if ( defined $h->{PROPERTY} ) {
+        my @keys  = keys %{ $h->{PROPERTY} };
+        my $count = 0;
+        foreach my $key (@keys) {
+            my @d = @{ $h->{PROPERTY}->{$key} };
+            $self->addColumn( $key, @d );
+            my $len = scalar @d;
+            if ( $len > $count ) {
+                $count = $len;
+            }
+        }
+        $count--;
+        for my $i ( 0 .. $count ) {
+            my %d = ();
+            foreach my $colkey (@keys) {
+                my $col = $self->getColumn($colkey);
+                if ( defined $col ) {
+                    my $v = $col->getDataByIndex($i);
+                    if ( defined $v ) {
+                        $d{$colkey} = $v;
+                    }
+                }
+            }
+            $self->addRecord( \%d );
+        }
     }
-    elsif ( !ref $response ) {
-        $self->{_response_string} = $response;
+    return $self;
+}
+
+
+sub addColumn {
+    my ( $self, $key, @data ) = @_;
+    push @{ $self->{columns} }, WebService::Hexonet::Connector::Column->new( $key, @data );
+    push @{ $self->{columnkeys} }, $key;
+    return $self;
+}
+
+
+sub addRecord {
+    my ( $self, $h ) = @_;
+    push @{ $self->{records} }, WebService::Hexonet::Connector::Record->new($h);
+    return $self;
+}
+
+
+sub getColumn {
+    my ( $self, $key ) = @_;
+    if ( $self->_hasColumn($key) ) {
+        my $idx = first_index { $_ eq $key } @{ $self->{columnkeys} };
+        return $self->{columns}[ $idx ];
     }
-    else {
-        die "Unsupported Class: " . ( ref $response );
+    return;
+}
+
+
+sub getColumnIndex {
+    my ( $self, $key, $idx ) = @_;
+    my $col = $self->getColumn($key);
+    return $col->getDataByIndex($idx) if defined $col;
+    return;
+}
+
+
+sub getColumnKeys {
+    my $self = shift;
+    return \@{ $self->{columnkeys} };
+}
+
+
+sub getColumns {
+    my $self = shift;
+    return \@{ $self->{columns} };
+}
+
+
+sub getCommand {
+    my $self = shift;
+    return $self->{command};
+}
+
+
+sub getCurrentPageNumber {
+    my $self  = shift;
+    my $first = $self->getFirstRecordIndex();
+    my $limit = $self->getRecordsLimitation();
+    if ( defined $first && $limit > 0 ) {
+        return floor( $first / $limit ) + 1;
     }
-
-    bless $self, $class;
-    $self->{test} = 1;
-
-    return bless $self, $class;
+    return $INDEX_NOT_FOUND;
 }
 
-sub as_string {
+
+sub getCurrentRecord {
     my $self = shift;
-
-    return $self->{_response_string};
+    return $self->{records}[ $self->{recordIndex} ]
+        if $self->_hasCurrentRecord();
+    return;
 }
 
-sub _as_hash_op {
+
+sub getFirstRecordIndex {
     my $self = shift;
-
-    # Don't hide the $self hash if called from within class
-    my ($pkg) = caller 0;
-    return $self if $pkg->isa('WebService::Hexonet::Connector::Response');
-    return $self->as_hash();
-}
-
-sub as_hash {
-    my $self = shift;
-
-    return $self->{_response_hash} if defined $self->{_response_hash};
-    $self->{_response_hash} =
-      WebService::Hexonet::Connector::Util::response_to_hash(
-        $self->{_response_string} );
-    return $self->{_response_hash};
-}
-
-sub as_list_hash {
-    my $self = shift;
-
-    return $self->{_response_list_hash} if defined $self->{_response_list_hash};
-    $self->{_response_list_hash} =
-      WebService::Hexonet::Connector::Util::response_to_list_hash(
-        $self->as_hash() );
-    return $self->{_response_list_hash};
-}
-
-sub as_list {
-    my $self      = shift;
-    my $list_hash = $self->as_list_hash();
-    if (wantarray) {
-        return @{ $list_hash->{ITEMS} };
+    my $col  = $self->getColumn('FIRST');
+    if ( defined $col ) {
+        my $f = $col->getDataByIndex(0);
+        if ( defined $f ) {
+            return int $f;
+        }
     }
-    return $list_hash->{ITEMS};
+    my $len = scalar @{ $self->{records} };
+    return 0 if ( $len > 0 );
+    return;
 }
 
-sub code {
+
+sub getLastRecordIndex {
     my $self = shift;
-    return $self->as_hash()->{CODE};
-}
-
-sub description {
-    my $self = shift;
-    return $self->as_hash()->{DESCRIPTION};
-}
-
-sub properties {
-    my $self = shift;
-    return $self->as_hash()->{PROPERTY};
-}
-
-sub runtime {
-    my $self = shift;
-    return $self->as_hash()->{RUNTIME};
-}
-
-sub queuetime {
-    my $self = shift;
-    return $self->as_hash()->{QUEUETIME};
-}
-
-sub property {
-    my $self     = shift;
-    my $property = shift;
-    my $index    = shift;
-    my $p        = $self->as_hash()->{PROPERTY};
-    if ( defined $index ) {
-        return undef
-          unless exists $p->{$property};
-        return $p->{$property}[$index];
+    my $col  = $self->getColumn('LAST');
+    if ( defined $col ) {
+        my $l = $col->getDataByIndex(0);
+        if ( defined $l ) {
+            return int $l;
+        }
     }
-    if (wantarray) {
-        return () unless exists $p->{$property};
-        return @{ $p->{$property} };
+    my $len = $self->getRecordsCount();
+    if ( $len > 0 ) {
+        return ( $len - 1 );
     }
-    return undef unless exists $p->{$property};
-
-    #TODO: we mixup here wantarray and LIST/SCALAR which does basically the same
-    return $p->{$property};
+    return;
 }
 
-sub is_success {
+
+sub getListHash {
     my $self = shift;
-    return $self->as_hash()->{CODE} =~ /^2/;
+    my @lh   = ();
+    foreach my $rec ( @{ $self->getRecords() } ) {
+        push @lh, $rec->getData();
+    }
+    my $r = {
+        LIST => \@lh,
+        meta => {
+            columns => $self->getColumnKeys(),
+            pg      => $self->getPagination()
+        }
+    };
+    return $r;
 }
 
-sub is_tmp_error {
+
+sub getNextRecord {
     my $self = shift;
-    return $self->as_hash()->{CODE} =~ /^4/;
+    return $self->{records}[ ++$self->{recordIndex} ]
+        if ( $self->_hasNextRecord() );
+    return;
 }
 
-sub columns  { my $self = shift; return $self->as_list_hash()->{COLUMNS}; }
-sub first    { my $self = shift; return $self->as_list_hash()->{FIRST}; }
-sub last     { my $self = shift; return $self->as_list_hash()->{LAST}; }
-sub count    { my $self = shift; return $self->as_list_hash()->{COUNT}; }
-sub limit    { my $self = shift; return $self->as_list_hash()->{LIMIT}; }
-sub total    { my $self = shift; return $self->as_list_hash()->{TOTAL}; }
-sub pages    { my $self = shift; return $self->as_list_hash()->{PAGES}; }
-sub page     { my $self = shift; return $self->as_list_hash()->{PAGE}; }
-sub prevpage { my $self = shift; return $self->as_list_hash()->{PREVPAGE}; }
 
-sub prevpagefirst {
+sub getNextPageNumber {
     my $self = shift;
-    return $self->as_list_hash()->{PREVPAGEFIRST};
-}
-sub nextpage { my $self = shift; return $self->as_list_hash()->{NEXTPAGE}; }
-
-sub nextpagefirst {
-    my $self = shift;
-    return $self->as_list_hash()->{NEXTPAGEFIRST};
+    my $cp   = $self->getCurrentPageNumber();
+    if ( $cp < 0 ) {
+        return $INDEX_NOT_FOUND;
+    }
+    my $page  = $cp + 1;
+    my $pages = $self->getNumberOfPages();
+    return $page if ( $page <= $pages );
+    return $pages;
 }
 
-sub lastpagefirst {
+
+sub getNumberOfPages {
+    my $self  = shift;
+    my $t     = $self->getRecordsTotalCount();
+    my $limit = $self->getRecordsLimitation();
+    if ( $t > 0 && $limit > 0 ) {
+        return ceil( $t / $limit );
+    }
+    return 0;
+}
+
+
+sub getPagination {
     my $self = shift;
-    return $self->as_list_hash()->{LASTPAGEFIRST};
+    my $r    = {
+        COUNT        => $self->getRecordsCount(),
+        CURRENTPAGE  => $self->getCurrentPageNumber(),
+        FIRST        => $self->getFirstRecordIndex(),
+        LAST         => $self->getLastRecordIndex(),
+        LIMIT        => $self->getRecordsLimitation(),
+        NEXTPAGE     => $self->getNextPageNumber(),
+        PAGES        => $self->getNumberOfPages(),
+        PREVIOUSPAGE => $self->getPreviousPageNumber(),
+        TOTAL        => $self->getRecordsTotalCount()
+    };
+    return $r;
+}
+
+
+sub getPreviousPageNumber {
+    my $self = shift;
+    my $cp   = $self->getCurrentPageNumber();
+    if ( $cp < 0 ) {
+        return $INDEX_NOT_FOUND;
+    }
+    my $np = $cp - 1;
+    return $np if ( $np > 0 );
+    return $INDEX_NOT_FOUND;
+}
+
+
+sub getPreviousRecord {
+    my $self = shift;
+    return $self->{records}[ --$self->{recordIndex} ]
+        if ( $self->_hasPreviousRecord() );
+    return;
+}
+
+
+sub getRecord {
+    my ( $self, $idx ) = @_;
+    if ( $idx >= 0 && $self->getRecordsCount() > $idx ) {
+        return $self->{records}[ $idx ];
+    }
+    return;
+}
+
+
+sub getRecords {
+    my $self = shift;
+    return \@{ $self->{records} };
+}
+
+
+sub getRecordsCount {
+    my $self = shift;
+    my $len  = scalar @{ $self->{records} };
+    return $len;
+}
+
+
+sub getRecordsTotalCount {
+    my $self = shift;
+    my $col  = $self->getColumn('TOTAL');
+    if ( defined $col ) {
+        my $t = $col->getDataByIndex(0);
+        if ( defined $t ) {
+            return int $t;
+        }
+    }
+    return $self->getRecordsCount();
+}
+
+
+sub getRecordsLimitation {
+    my $self = shift;
+    my $col  = $self->getColumn('LIMIT');
+    if ( defined $col ) {
+        my $l = $col->getDataByIndex(0);
+        if ( defined $l ) {
+            return int $l;
+        }
+    }
+    return $self->getRecordsCount();
+}
+
+
+sub hasNextPage {
+    my $self = shift;
+    my $cp   = $self->getCurrentPageNumber();
+    if ( $cp < 0 ) {
+        return 0;
+    }
+    my $np = $cp + 1;
+    if ( $np <= $self->getNumberOfPages() ) {
+        return 1;
+    }
+    return 0;
+}
+
+
+sub hasPreviousPage {
+    my $self = shift;
+    my $cp   = $self->getCurrentPageNumber();
+    if ( $cp < 0 ) {
+        return 0;
+    }
+    my $pp = $cp - 1;
+    if ( $pp > 0 ) {
+        return 1;
+    }
+    return 0;
+}
+
+
+sub rewindRecordList {
+    my $self = shift;
+    $self->{recordIndex} = 0;
+    return $self;
+}
+
+
+sub _hasColumn {
+    my ( $self, $key ) = @_;
+    my $idx = first_index { $_ eq $key } @{ $self->{columnkeys} };
+    return ( $idx > $INDEX_NOT_FOUND );
+}
+
+
+sub _hasCurrentRecord {
+    my $self = shift;
+    my $len  = scalar @{ $self->{records} };
+    return ( $len > 0 && $self->{recordIndex} >= 0 && $self->{recordIndex} < $len );
+}
+
+
+sub _hasNextRecord {
+    my $self = shift;
+    my $next = $self->{recordIndex} + 1;
+    my $len  = scalar @{ $self->{records} };
+    return ( $self->_hasCurrentRecord() && $next < $len );
+}
+
+
+sub _hasPreviousRecord {
+    my $self = shift;
+    return ( $self->{recordIndex} > 0 && $self->_hasCurrentRecord() );
 }
 
 1;
 
 __END__
 
+=pod
+
 =head1 NAME
 
-WebService::Hexonet::Connector::Response - package to provide functionality to deal with Backend
-API reponses.
+WebService::Hexonet::Connector::Response - Library to provide accessibility to API response data.
+
+=head1 SYNOPSIS
+
+This module is internally used by the L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> module.
+To be used in the way:
+
+    # specify the used API command (used for the request that responsed with $plain)
+    $command = {
+	    COMMAND => 'StatusAccount'
+    };
+  
+    # specify the API plain-text response (this is just an example that won't fit to the command above)
+    $plain = "[RESPONSE]\r\nCODE=200\r\nDESCRIPTION=Command completed successfully\r\nEOF\r\n";
+  
+    # create a new instance by
+    $r = WebService::Hexonet::Connector::Response->new($plain, $command);
 
 =head1 DESCRIPTION
 
-This package provides any functionality that you need to deal with Backend API responses.
+HEXONET Backend API always responds in plain-text format that needs to get parsed into a useful
+data structure. This module manages all this: parsing data into hash format, into columns and records.
+It provides different methods to access the data to fit your needs.
 
-The Response object itself can be instantiated by bytes array (basically the plaintext
-response from the Backend API), or by a hash format (an already parsed response).
-But the latter case is more for internal use.
+=head2 Methods
 
-=head1 METHODS WebService::Hexonet::Connector::Response
+=over
 
-=over 4
+=item C<new( $plain, $command )>
 
-=item C<new(response)>
+Returns a new L<WebService::Hexonet::Connector::Response|WebService::Hexonet::Connector::Response> object.
+Specify the plain-text API response by $plain.
+Specify the used command by $command.
 
-Create an new Response object using the given Backend API response data.
-This can be a bytes array (basically the plaintext response from the Backend API),
-or by a hash format (an already parsed response returned by method as_list_hash).
-The latter case is more for internal use.
+=item C<addColumn( $key, @data )>
 
-=item C<as_string()>
+Add a new column.
+Specify the column name by $key.
+Specify the column data by @data.
+Returns the current L<WebService::Hexonet::Connector::Response|WebService::Hexonet::Connector::Response> instance in use for method chaining.
 
-Returns the response as a string
+=item C<addRecord( $hash )>
 
-=item C<as_hash()>
+Add a new record.
+Specify the row data in hash notation by $hash.
+Where the hash key represents the column name.
+Where the hash value represents the row value for that column.
+Returns the current L<WebService::Hexonet::Connector::Response|WebService::Hexonet::Connector::Response> instance in use for method chaining.
 
-Returns the response as a hash
+=item C<getColumn( $key )>
 
-=item C<as_list_hash()>
+Get a column for the specified column name $key.
+Returns an instance of L<WebService::Hexonet::Connector::Column|WebService::Hexonet::Connector::Column>.
 
-Returns the response as a list hash
+=item C<getColumnIndex( $key, $index )> {
 
-=item C<as_list()>
+Get Data of the specified column $key for the given column index $index.
+Returns a scalar.
 
-Returns the response as a list
+=item C<getColumnKeys>
 
-=item C<code()>
+Get a list of available column names. NOTE: columns may differ in their data size.
+Returns an array.
 
-Returns the response code
+=item C<getCommand>
 
-=item C<description()>
+Get the command used within the request that resulted in this api response.
+This is in general the command you provided in the constructor.
+Returns a hash.
 
-Returns the response description
+=item C<getCurrentPageNumber>
 
-=item C<properties()>
+Returns the current page number we are in with this API response as int.
+Returns -1 if not found.
 
-Returns the response properties
+=item C<getCurrentRecord>
 
-=item C<runtime()>
+Returns the current record of the iteration. It internally uses recordIndex as iterator index.
+Returns an instance of L<WebService::Hexonet::Connector::Record|WebService::Hexonet::Connector::Record>.
+Returns undef if not found.
 
-Returns the response runtime
+=item C<getFirstRecordIndex>
 
-=item C<queuetime()>
+Returns the first record index of this api response as int.
+Returns undef if not found.
 
-Returns the response queutime
+=item C<getLastRecordIndex>
 
-=item C<property(index)>
+Returns the last record index of this api response as int.
+Returns undef if not found.
 
-Returns the property for a given index If no index given, the complete property list is returned
+=item C<getListHash>
 
-=item C<is_success()>
+Returns this api response in a List-Hash format.
+You will find the row data under hash key "LIST".
+You will find meta data under hash key "meta".
+Under "meta" data you will again find a hash, where
+hash key "columns" provides you a list of available
+column names and "pg" provides you useful paginator
+data.
+This method is thought to be used if you need
+something that helps you realizing tables with or 
+without a pager.
+Returns a Hash.
 
-Returns true if the results is a success Success = response code starting with 2
+=item C<getNextRecord>
 
-=item C<is_tmp_error()>
+Returns the next record of the current iteration.
+Returns an instance of L<WebService::Hexonet::Connector::Record|WebService::Hexonet::Connector::Record>.
+Returns undef if not found.
 
-Returns true if the results is a tmp error tmp error = response code starting with 4
+=item C<getNextPageNumber>
 
-=item C<columns()>
+Returns the number of the next api response page for the current request as int.
+Returns -1 if not found.
 
-Returns the columns
+=item C<getNumberOfPages>
 
-=item C<first()>
+Returns the total number of response pages in our API for the current request as int.
 
-Returns the index of the first element
+=item C<getPagination>
 
-=item C<last()>
+Returns paginator data of the current response / request.
+Returns a hash.
 
-Returns the index of the last element
+=item C<getPreviousPageNumber>
 
-=item C<count()>
+Returns the number of the previous api response page for the current request as int.
+Returns -1 if not found.
 
-Returns the number of list elements returned (= last - first + 1)
+=item C<getPreviousRecord>
 
-=item C<limit()>
+Returns the previous record of the current iteration.
+Returns undef if not found otherwise an instance of L<WebService::Hexonet::Connector::Record|WebService::Hexonet::Connector::Record>.
 
-Returns the limit of the response
+=item C<getRecord( $index )>
 
-=item C<total()>
+Returns the record of the specified record index $index.
+Returns undef if not found otherwise an instance of L<WebService::Hexonet::Connector::Record|WebService::Hexonet::Connector::Record>.
 
-Returns the total number of elements found (!= count)
+=item C<getRecords>
 
-=item C<pages()>
+Returns a list of available records.
+Returns an array of instances of L<WebService::Hexonet::Connector::Record|WebService::Hexonet::Connector::Record>.
 
-Returns the number of pages
+=item C<getRecordsCount>
 
-=item C<page()>
+Returns the amount of returned records for the current request as int.
 
-Returns the number of the current page (starts with 1)
+=item C<getRecordsTotalCount>
 
-=item C<prevpage()>
+Returns the total amount of available records for the current request as int.
 
-Returns the number of the previous page
+=item C<getRecordsLimitation>
 
-=item C<prevpagefirst()>
+Returns the limitation of the current request as int. LIMIT = ...
+NOTE: Our system comes with a default limitation if you do not specify
+a limitation in list commands to avoid data load in our systems.
+This limitation is then returned in column "LIMIT" at index 0.
 
-Returns the first index for the previous page
+=item C<hasNextPage>
 
-=item C<nextpage()>
+Checks if a next response page exists for the current query.
+Returns boolean 0 or 1.
 
-Returns the number of the next page
+=item C<hasPreviousPage>
 
-=item C<nextpagefirst()>
+Checks if a previous response page exists for the current query.
+Returns boolean 0 or 1.
 
-Returns the first index for the next page
+=item C<rewindRecordList>
 
-=item C<lastpagefirst()>
+Resets the current iteration to index 0.
 
-Returns the first index for the last page
+=item C<_hasColumn( $key )>
+
+Private method. Checks if a column specified by $key exists.
+Returns boolean 0 or 1.
+	
+=item C<_hasCurrentRecord>
+
+Private method. Checks if the current record exists in the iteration.
+Returns boolean 0 or 1.
+
+=item C<_hasNextRecord>
+
+Private method. Checks if the next record exists in the iteration.
+Returns boolean 0 or 1.
+
+=item C<_hasPreviousRecord>
+
+Private method. Checks if the previous record exists in the iteration.
+Returns boolean 0 or 1.
 
 =back
 
+=head1 LICENSE AND COPYRIGHT
+
+This program is licensed under the L<MIT License|https://raw.githubusercontent.com/hexonet/perl-sdk/master/LICENSE>.
+
 =head1 AUTHOR
 
-Hexonet GmbH
-
-L<https://www.hexonet.net>
-
-=head1 LICENSE
-
-MIT
+L<HEXONET GmbH|https://www.hexonet.net>
 
 =cut

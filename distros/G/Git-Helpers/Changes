@@ -1,5 +1,8 @@
 Revision history for Git-Helpers
 
+0.000016  2018-12-17 20:46:07Z
+    - Add is_inside_work_tree() function. (GH#8) (Olaf Alders)
+
 0.000015  2018-04-13 22:49:10Z
     - Use Term::Choose for a more intuitive UI
 

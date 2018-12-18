@@ -26,7 +26,7 @@ sub format_val ( $self, $val, $row ) {
         }
     }
 
-    return $val // q[];
+    return $val // $EMPTY;
 }
 
 1;

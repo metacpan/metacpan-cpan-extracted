@@ -52,7 +52,6 @@
       },
       "develop" : {
          "requires" : {
-            "BerkeleyDB" : "0",
             "CPAN::Changes" : "0",
             "CSS::Packer" : "0",
             "Devel::Cover" : "0",
@@ -140,7 +139,7 @@
             "XML::Hash::XS" : "v0.53.0",
             "YAML::XS" : "0",
             "common::header" : "v0.1.2",
-            "perl" : "v5.28.0"
+            "perl" : "v5.28.1"
          }
       },
       "test" : {
@@ -161,6 +160,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore/overview"
       }
    },
-   "version" : "v0.77.5",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v0.78.2",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

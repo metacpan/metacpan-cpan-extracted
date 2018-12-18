@@ -1,5 +1,8 @@
 Revision history for Net-Hadoop-Oozie
 
+0.115 2018-12-17 BURAK
+    - New method failed_workflows_last_n_hours_paged for paged error reporting.
+
 0.114 2018-06-07 BOOK
     - add support for resuming suspended jobs
 

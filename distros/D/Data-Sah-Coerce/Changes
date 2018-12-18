@@ -1,3 +1,19 @@
+0.030   2018-12-16 (PERLANCAR)
+
+	- [Bugfix] Default coerce_to for timeofday in perl should be
+	  str_hms, not float.
+
+
+0.029   2018-12-16 (PERLANCAR)
+
+	- Add standard coercion rules for timeofday.
+
+
+0.028   2018-12-15 (PERLANCAR)
+
+	- Add standard coercion rules for datenotime and datetime types.
+
+
 0.027   2018-10-30 (PERLANCAR)
 
 	- Add coercion rule: perl::date::float_epoch_always.

@@ -28,11 +28,11 @@ Struct::Path - Path for nested structures where path is also a structure
 
 =head1 VERSION
 
-Version 0.82
+Version 0.83
 
 =cut
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ our $VERSION = '0.82';
 Struct::Path provides functions to access/match/expand/list nested data
 structures.
 
-Why L<existed Path modules|/"SEE ALSO"> is not enough? This module has no
+Why L<existed modules|/"SEE ALSO"> are not enough? This module has no
 conflicts for paths like '/a/0/c', where C<0> may be an array index or a key
 for hash (depends on passed structure). This is vital in some cases, for
 example, when one need to define exact path in structure, but unable to
@@ -83,10 +83,10 @@ Path is a list of 'steps', each represents nested level in the structure.
 Arrayref as a step stands for ARRAY and must contain desired items indexes or
 be empty (means "all items"). Sequence for indexes define result sequence.
 
-Hashref represent HASH and may contain keys C<K>, C<R> or be empty. C<K> may
-contain list of desired keys, C<R> must contain list of compiled regular
-expressions. Empty hash or empty list for C<K> means all keys. Sequence in C<K>
-and C<R> lists define result sequence. C<K> have higher priority than C<R>.
+Hashref represent HASH and may contain key C<K> or be empty. C<K>'s value
+should be a list of desired keys and compiled regular expressions. Empty
+hash or empty list for C<K> means all keys, sequence in the list define
+resulting sequence.
 
 Coderef step is a hook - subroutine which may filter and/or modify
 structure. Path as first argument and a stack (arrayref) of refs to traversed
@@ -103,7 +103,7 @@ Sample:
     ];
 
 Struct::Path designed to be machine-friendly. See L<Struct::Path::PerlStyle>
-or L<Struct::Path::JsonPointer> for human friendly path definition.
+and L<Struct::Path::JsonPointer> for human friendly path definition.
 
 =head1 SUBROUTINES
 
@@ -123,6 +123,7 @@ sub implicit_step {
         return 1 if (exists $_[0]->{R} and @{$_[0]->{R}});
         return 1 unless (exists $_[0]->{K});
         return 1 unless (@{$_[0]->{K}});
+        ref $_ eq 'Regexp' && return 1 for (@{$_[0]->{K}})
     } else { # hooks
         return 1;
     }
@@ -224,11 +225,14 @@ sub path($$;@) {
 
     my @level = ([], [\$_[0]]); # alias - to be able to rewrite passed scalar
     my $sc = 0; # step counter
-    my ($items, @next, $steps, $refs, @types);
+    my ($items, @next, $steps, $refs, $step_type, @types);
 
     for my $step (@{$path}) {
         while (($steps, $refs) = splice @level, 0, 2) {
-            if (ref $step eq 'ARRAY') {
+            croak "Reference expected for refs stack entry, step #$sc"
+                unless (ref $refs->[-1]);
+
+            if (($step_type = ref $step) eq 'ARRAY') {
                 if (ref ${$refs->[-1]} ne 'ARRAY') {
                     croak "ARRAY expected on step #$sc, got " . ref ${$refs->[-1]}
                         if ($opts{strict});
@@ -262,7 +266,7 @@ sub path($$;@) {
                     map { splice(@{${$refs->[-1]}}, $_, 1) if ($_ < @{${$refs->[-1]}}) }
                         reverse sort @{$items};
                 }
-            } elsif (ref $step eq 'HASH') {
+            } elsif ($step_type eq 'HASH') {
                 if (ref ${$refs->[-1]} ne 'HASH') {
                     croak "HASH expected on step #$sc, got " . ref ${$refs->[-1]}
                         if ($opts{strict});
@@ -281,12 +285,17 @@ sub path($$;@) {
                     }
 
                     if ($t eq 'K') {
-                        for (@{$step->{K}}) {
-                            unless ($opts{expand} or exists ${$refs->[-1]}->{$_}) {
-                                croak "{$_} doesn't exist, step #$sc" if $opts{strict};
-                                next;
+                        for my $i (@{$step->{K}}) {
+                            if (ref $i eq 'Regexp') {
+                                push @{$items}, grep { $_ =~ $i }
+                                    keys %{${$refs->[-1]}};
+                            } else {
+                                unless ($opts{expand} or exists ${$refs->[-1]}->{$i}) {
+                                    croak "{$i} doesn't exist, step #$sc" if $opts{strict};
+                                    next;
+                                }
+                                push @{$items}, $i;
                             }
-                            push @{$items}, $_;
                         }
                     } else {
                         for my $g (@{$step->{R}}) {
@@ -299,7 +308,7 @@ sub path($$;@) {
                     push @next, [@{$steps}, {K => [$_]}], [@{$refs}, \${$refs->[-1]}->{$_}];
                     delete ${$refs->[-1]}->{$_} if ($opts{delete} and $sc == $#{$path});
                 }
-            } elsif (ref $step eq 'CODE') {
+            } elsif ($step_type eq 'CODE') {
                 local $_ = ${$refs->[-1]};
                 local $_{opts} = \%opts;
                 $step->($steps, $refs) and push @next, $steps, $refs;

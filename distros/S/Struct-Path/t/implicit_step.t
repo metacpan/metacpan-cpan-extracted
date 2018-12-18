@@ -3,7 +3,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 use Struct::Path qw(implicit_step);
 
@@ -43,8 +43,12 @@ ok(
 );
 
 ok(
+    implicit_step({K => ['a', qr/abc/]}),
+    "Hash regs"
+);
+
+ok(
     implicit_step(sub{}),
     "Filter"
 );
-
 

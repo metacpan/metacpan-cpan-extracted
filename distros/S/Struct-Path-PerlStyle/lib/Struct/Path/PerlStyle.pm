@@ -34,11 +34,11 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.90
+Version 0.91
 
 =cut
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 =head1 SYNOPSIS
 
@@ -99,32 +99,32 @@ Square brackets used for array indexes specification
 
 Expressions enclosed in parenthesis treated as hooks and evaluated using
 L<Safe> compartment. Almost all perl operators and core functions available,
-see L<Safe> for more info. Some additional path related functions provided by
+see L<Safe> for more info. Some path related functions provided by
 L<Struct::Path::PerlStyle::Functions>.
 
     [](/pattern/mods)           # match array values by regular expression
     []{foo}(eq "bar" && back)   # select hashes which have pair 'foo' => 'bar'
 
 There are two global variables available whithin safe compartment: C<$_> which
-refers to value and C<%_> provides current path via key C<path> (in
+refers to value and C<%_> which provides current path via key C<path> (in
 L<Struct::Path> notation) and structure levels refs stack via key C<refs>.
 
 =head2 Aliases
 
-String in angle brackets is an alias - shortcut mapped into specified sequence
-of steps. Aliases resolved recursively, so alias may also map into path with
+String in angle brackets is an alias - shortcut mapped into sequence of
+steps. Aliases resolved iteratively, so alias may also refer into path with
 another aliases.
 
-Aliases map may be defined via global variable
+Aliases may be defined via global variable
 
     $Struct::Path::PerlStyle::ALIASES = {
-        foo => '{some}{complex}{path}',
-        bar => '{and}{one}{more}'
+        foo => '{some}{long}{path}',
+        bar => '{and}{one}{more}{step}'
     };
 
 and then
 
-    <foo><bar>      # expands to '{some}{complex}{path}{and}{one}{more}'
+    <foo><bar>      # expands to '{some}{long}{path}{and}{one}{more}{step}'
 
 or as option for C<str2path>:
 
@@ -137,7 +137,6 @@ or as option for C<str2path>:
 our $ALIASES;
 
 my %ESCP = (
-#    '\\' => '\\\\', # single => double
     '"'  => '\"',
     "\a" => '\a',
     "\b" => '\b',
@@ -213,7 +212,7 @@ sub _push_hash {
             push @{$step{K}}, $body;
         } elsif ($delim eq '/' and !$type or $type eq 'm') {
             $mods = join('', sort(split('', $mods)));
-            eval { push @{$step{R}}, $QR_MAP->{$mods}->($body) };
+            eval { push @{$step{K}}, $QR_MAP->{$mods}->($body) };
             if ($@) {
                 (my $err = $@) =~ s/ at .+//s;
                 croak "Step #" . scalar @{$steps} . " $err";
@@ -320,12 +319,10 @@ sub str2path($;$) {
         } elsif ($type eq '(') {
             _push_hook(\@steps, $step);
         } else { # <>
-            if (exists $ALIASES->{$step}) {
-                substr $path, 0, 0, $ALIASES->{$step};
-                redo;
-            }
+            croak "Unknown alias '$step'" unless (exists $ALIASES->{$step});
 
-            croak "Unknown alias '$step'";
+            substr $path, 0, 0, $ALIASES->{$step};
+            redo;
         }
     }
 
@@ -372,44 +369,36 @@ sub path2str($) {
 
             $out .= "[" . join(",", @{items}) . "]";
         } elsif (ref $step eq 'HASH') {
-            my $types = [ grep { exists $step->{$_} } qw(K R) ];
-            if (keys %{$step} != @{$types}) {
-                $types = { map { $_, 1 } @{$types} };
-                my @errs = grep { !exists $types->{$_} } sort keys %{$step};
-                croak "Unsupported hash definition (" .
-                    join(',', @errs) . "), step #$sc"
-            }
+            my $keys;
 
             if (exists $step->{K}) {
                 croak "Unsupported hash keys definition, step #$sc"
                     unless (ref $step->{K} eq 'ARRAY');
+                croak "Unsupported hash definition (extra keys), step #$sc"
+                    if (keys %{$step} > 1);
+                $keys = $step->{K};
+            } elsif (keys %{$step}) {
+                croak "Unsupported hash definition (unknown keys), step #$sc";
+            } else {
+                $keys = [];
+            }
 
-                for my $k (@{$step->{K}}) {
-                    croak "Unsupported hash key type 'undef', step #$sc"
-                        unless (defined $k);
-                    croak "Unsupported hash key type '@{[ref $k]}', step #$sc"
-                        if (ref $k);
+            for my $k (@{$keys}) {
+                if (is_regexp($k)) {
+                    my ($patt, $mods) = regexp_pattern($k);
+                    $mods =~ s/[dlu]//g; # for Perl's internal use (c) perlre
+                    push @items, "/$patt/$mods";
 
+                } elsif (defined $k and ref $k eq '') {
                     push @items, $k;
 
                     unless ($k =~ /^$HASH_KEY_CHARS+$/) {
                         $items[-1] =~ s/([\Q$ESCP\E])/$ESCP{$1}/gs;    # escape
                         $items[-1] = qq("$items[-1]");                 # quote
                     }
-                }
-            }
-
-            if (exists $step->{R}) {
-                croak "Unsupported hash regexps definition, step #$sc"
-                    unless (ref $step->{R} eq 'ARRAY');
-
-                for my $r (@{$step->{R}}) {
-                    croak "Regexp expected for regexps item, step #$sc"
-                        unless (is_regexp($r));
-
-                    my ($patt, $mods) = regexp_pattern($r);
-                    $mods =~ s/[dlu]//g; # for Perl's internal use (c) perlre
-                    push @items, "/$patt/$mods";
+                } else {
+                    croak "Unsupported hash key type '" .
+                        (ref($k) || 'undef') . "', step #$sc"
                 }
             }
 

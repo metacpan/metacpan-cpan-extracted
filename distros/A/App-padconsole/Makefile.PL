@@ -11,7 +11,7 @@ WriteMakefile(
     'LICENSE'       => 'perl',
 
     'PREREQ_PM'     => {
-        'Etherpad'       => '1.2.10.3',
+        'Etherpad'       => '1.2.13.1',
         'Term::ReadLine' => 0,
         'Config::YAML'   => 0,
         'URI::Escape'    => 0,

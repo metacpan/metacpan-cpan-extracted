@@ -12,7 +12,7 @@ my ($filehandle, $filename) = tempfile(TMPDIR => 1);
 print $filehandle "user FOO\npassword BAR\n";
 close $filehandle;
 
-my $config = CPAN::Upload::Tiny::read_config_file($filename);
-is($config->{user}, 'FOO', 'Username is FOO');
-is($config->{password}, 'BAR', 'Password is BAR');
+my ($user, $password) = CPAN::Upload::Tiny::read_config_file($filename);
+is($user, 'FOO', 'Username is FOO');
+is($password, 'BAR', 'Password is BAR');
 

@@ -2,12 +2,16 @@ NAME
     alias::module - Alias one module as another
 
 VERSION
-    This document describes version 0.001 of alias::module (from Perl
-    distribution alias-module), released on 2018-01-06.
+    This document describes version 0.002 of alias::module (from Perl
+    distribution alias-module), released on 2018-12-15.
 
 SYNOPSIS
      package Your::Alias::Name;
      use alias::module 'Some::Real::Module::Name';
+
+    To avoid require()-ing:
+
+     use alias::module '-norequire', 'Some::Real::Module::Name';
 
 DESCRIPTION
     This module aliases one module name to another.
@@ -24,8 +28,9 @@ DESCRIPTION
      }
      use Package::Alias 'Your::Alias::Name' => 'Some::Real::Module::Name';
 
-    It is useful if you want to let users access a module's functionality
-    under a different (usually shorter) name.
+    except that this module does not use Package::Alias and is simpler. It
+    is useful if you want to let users access a module's functionality under
+    a different (usually shorter) name.
 
 HOMEPAGE
     Please visit the project's homepage at

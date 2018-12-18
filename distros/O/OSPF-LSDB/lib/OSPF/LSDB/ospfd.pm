@@ -46,7 +46,7 @@ C<show database asbr>,
 C<show database external>
 is needed.
 It can be given as separate files or obtained dynamically.
-In the latter case B<sudo> is invoked if permissions are not
+In the latter case B<doas> is invoked if permissions are not
 sufficient to run B<ospfctl>.
 If the object has been created with the C<ssh> argument, the specified
 user and host are used to login and run B<ospfctl> there.
@@ -88,9 +88,9 @@ sub ospfctl_show {
     if ($self->{ssh}) {
 	unshift @cmd, "ssh", $self->{ssh};
     } else {
-	# no sudo if user is root or in wheel group
+	# no doas if user is root or in wheel group
 	# srw-rw----  1 root  wheel  0 Jun 13 10:10 /var/run/ospfd.sock
-	unshift @cmd, "sudo" unless -w $self->{ospfsock};
+	unshift @cmd, "doas" unless -w $self->{ospfsock};
     }
     my @lines = wantarray ? `@cmd` : scalar `@cmd`;
     die "Command '@cmd' failed: $?\n" if $?;

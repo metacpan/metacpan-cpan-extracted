@@ -45,7 +45,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
                         # a cover domain should not contain a leading dot, like in .cats.com; if it does, the client should remove the leading do
                         $cover_domain =~ s/\A[.]+//sm;
 
-                        if ( $cover_domain ne q[] ) {
+                        if ( $cover_domain ne $EMPTY ) {
 
                             # the cover domain must cover (be a substring) the origin domain
                             if ( ".$origin_domain" =~ /\Q.$cover_domain\E\z/sm ) {
@@ -59,7 +59,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
                         }
                     }
                     elsif ( $key eq 'path' ) {
-                        $path = $1 if $1 ne q[];
+                        $path = $1 if $1 ne $EMPTY;
                     }
                     elsif ( $key eq 'expires' ) {
                         if ( !defined $cookie->{expires} ) {    # do not process expires attribute, if expires is already set by expires or max-age
@@ -90,7 +90,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
 
         next if !defined $cookie->{name};
 
-        $cookie->{val} //= q[];
+        $cookie->{val} //= $EMPTY;
         $domain        //= $origin_domain;
         $path          //= $origin_path;
 

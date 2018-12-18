@@ -8,12 +8,12 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.131';
+$Config::Model::Backend::Yaml::VERSION = '2.132';
 use 5.10.1;
 use Carp;
 use strict;
 use warnings;
-use Config::Model 2.130;
+use Config::Model 2.131;
 use Config::Model::Exception;
 use File::Path;
 use Log::Log4perl qw(get_logger :levels);
@@ -118,7 +118,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.131
+version 2.132
 
 =head1 SYNOPSIS
 

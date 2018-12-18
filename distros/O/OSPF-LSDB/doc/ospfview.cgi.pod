@@ -15,7 +15,7 @@ The router must run the OpenBSD B<ospfd> or B<ospf6d> routing daemon.
 To make this cgi script work, the web server must have access to
 the F</var/run/ospfd.sock> and F</var/run/ospf6d.sock> UNIX domain
 sockets.
-This can be achieved by file permissions or B<sudo> permissions for
+This can be achieved by file permissions or B<doas> permissions for
 B<ospfctl> and B<ospf6ctl>.
 The web server must not run chrooted.
 

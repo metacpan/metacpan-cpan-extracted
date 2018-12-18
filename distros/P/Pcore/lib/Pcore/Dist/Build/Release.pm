@@ -29,12 +29,12 @@ sub run ($self) {
 
     return if P->term->prompt( q[Continue release process?], [qw[yes no]], enter => 1 ) ne 'yes';
 
-    say q[];
+    say $EMPTY;
 
     # run tests
     return if !$self->{dist}->build->test( author => 1, release => 1 );
 
-    say q[];
+    say $EMPTY;
 
     # NOTE !!!WARNING!!! start release, next changes will be hard to revert
 
@@ -108,18 +108,18 @@ sub run ($self) {
         }
     }
 
-    if ( $self->{dist}->docker ) {
-        require Pcore::API::DockerHub;
+    if ( 0 && $self->{dist}->docker ) {
+        require Pcore::API::Docker::Hub;
 
-        my $dockerhub_api = Pcore::API::DockerHub->new;
+        my $dockerhub_api = Pcore::API::Docker::Hub->new;
 
       CREATE_DOCKERHUB_LATEST_TAG:
-        if ( !$self->{dist}->build->docker->create_tag( 'latest', 'latest', $Pcore::API::DockerHub::DOCKERHUB_SOURCE_TYPE_TAG, '/' ) ) {
+        if ( !$self->{dist}->build->docker->create_tag( 'latest', 'latest', $Pcore::API::Docker::Hub::DOCKERHUB_SOURCE_TYPE_TAG, '/' ) ) {
             goto CREATE_DOCKERHUB_LATEST_TAG if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
         }
 
       CREATE_DOCKERHUB_VERSION_TAG:
-        if ( !$self->{dist}->build->docker->create_tag( $new_ver, $new_ver, $Pcore::API::DockerHub::DOCKERHUB_SOURCE_TYPE_TAG, '/' ) ) {
+        if ( !$self->{dist}->build->docker->create_tag( $new_ver, $new_ver, $Pcore::API::Docker::Hub::DOCKERHUB_SOURCE_TYPE_TAG, '/' ) ) {
             goto CREATE_DOCKERHUB_VERSION_TAG if P->term->prompt( q[Repeat?], [qw[yes no]], enter => 1 ) eq 'yes';
         }
 
@@ -275,7 +275,7 @@ sub _create_changes ( $self, $ver, $issues ) {
     if ($issues) {
         my $group = {};
 
-        for my $issue ( sort { $b->priority_id <=> $a->priority_id } $issues->@* ) {
+        for my $issue ( reverse sort { $a->priority_id <=> $b->priority_id } $issues->@* ) {
             push $group->{ $issue->{metadata}->{kind} }->@*, qq[[$issue->{priority}] $issue->{title} (@{[$issue->url]})];
         }
 
@@ -342,9 +342,7 @@ TXT
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (26)                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 278                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (27)                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

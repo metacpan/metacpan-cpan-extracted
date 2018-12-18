@@ -61,7 +61,7 @@ around new => sub ( $orig, $self, $msg, %args ) {
 
     # cut trailing "\n" from $msg
     {
-        local $/ = q[];
+        local $/ = $EMPTY;
 
         chomp $msg;
     };

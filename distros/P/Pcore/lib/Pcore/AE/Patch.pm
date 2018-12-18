@@ -34,12 +34,12 @@ sub resolve_sockaddr : prototype($$$$$$) ( $node, $service, $proto, $family, $ty
         return $cb->() if $family || substr( $service, 0, 1 ) ne '/';
 
         # UDS socket
-        substr $service, 0, 1, '' if substr( $service, 0, 2 ) eq "/\x00";
+        substr $service, 0, 1, $EMPTY if substr( $service, 0, 2 ) eq "/\N{NULL}";
 
         return $cb->( [ AF_UNIX, defined $type ? $type : SOCK_STREAM, 0, Socket::pack_sockaddr_un $service] );
     }
 
-    my $cache_key = join q[-], map { $_ // q[] } @_[ 0 .. $#_ - 1 ];
+    my $cache_key = join q[-], map { $_ // $EMPTY } @_[ 0 .. $#_ - 1 ];
 
     if ( exists $SOCKADDR_CACHE->{$cache_key} ) {
         if ( $SOCKADDR_CACHE->{$cache_key}->[0] > time ) {
@@ -84,8 +84,8 @@ sub resolve_sockaddr : prototype($$$$$$) ( $node, $service, $proto, $family, $ty
 sub _tcp_bind : prototype($$$;$) ( $host, $service, $done, $prepare = undef ) {
 
     # hook for Linux abstract Unix Domain Sockets (UDS)
-    if ( defined $host && $host eq 'unix/' && substr( $service, 0, 2 ) eq "/\x00" ) {
-        substr $service, 0, 1, '';
+    if ( defined $host && $host eq 'unix/' && substr( $service, 0, 2 ) eq "/\N{NULL}" ) {
+        substr $service, 0, 1, $EMPTY;
 
         state $ipn_uds = pack 'S', AF_UNIX;
 
@@ -123,10 +123,6 @@ sub _tcp_bind : prototype($$$;$) ( $host, $service, $done, $prepare = undef ) {
 ## |    3 | 16, 23               | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 113                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 37, 88               | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 37, 87               | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

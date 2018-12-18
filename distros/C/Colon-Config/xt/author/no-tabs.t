@@ -12,7 +12,8 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/basic.t',
-    't/benchmark.t'
+    't/benchmark.t',
+    't/utf-8.t'
 );
 
 notabs_ok($_) foreach @files;

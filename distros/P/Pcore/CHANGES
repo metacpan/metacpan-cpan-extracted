@@ -1,3 +1,41 @@
+v0.78.2 2018-12-17T10:52:35Z
+ - bug fixed
+
+v0.78.1 2018-12-17T10:47:26Z
+ - docker build
+ - PCORE_TEMP_DIR removed
+
+v0.78.0 2018-12-16T20:35:52Z
+ - pod
+ - poll fixed
+ - cdn refactored
+ - cdn default_upload alias
+ - perl v5.28.1
+ - certs updated
+ - $EMPTY, $SPACE const added
+ - app tmpl updated
+ - app router refactored
+ - env share refactored
+ - sqlite encode blob automatically
+ - replace bdb with sqlite in perl compress cache
+ - uri unix socket support
+ - Pcore::API::DockerHub -> Pcore::API::Docker::Hub
+ - dump fixed
+ - SQL_TEXT type added
+ - docker engine api
+ - scm clone fixed
+ - scm_clone api changed
+ - scm_update api
+ - docker build
+ - dist-id.json renamed to dist-id.yaml
+ - is_cpan_dist renamed to is_installed
+ - desc removed from dist id
+ - unlink before storing tgz on dizt build
+ - hg timeout fixed
+ - docker build timeout 0
+ - dh params added
+ - handle dh param moved to file
+
 v0.77.5 2018-11-18T15:29:14Z
  - perltidy
  - app template updated

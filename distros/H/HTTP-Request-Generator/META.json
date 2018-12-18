@@ -55,7 +55,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-Generator"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

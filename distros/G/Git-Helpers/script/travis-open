@@ -24,7 +24,7 @@ travis-open - Open a browser window with the Travis-CI URL of the repository whi
 
 =head1 VERSION
 
-version 0.000015
+version 0.000016
 
 =head1 SYNOPSIS
 

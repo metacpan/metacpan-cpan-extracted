@@ -30,7 +30,7 @@ END {
 sub new ( $self, @ ) {
     my %args = (
         base      => $ENV->{TEMP_DIR},
-        suffix    => q[],
+        suffix    => $EMPTY,
         tmpl      => "temp-$$-XXXXXXXX",
         exclusive => 0,
         mode      => 'rw-------',
@@ -41,7 +41,7 @@ sub new ( $self, @ ) {
         splice @_, 1,
     );
 
-    $args{suffix} = q[.] . $args{suffix} if defined $args{suffix} && $args{suffix} ne q[] && substr( $args{suffix}, 0, 1 ) ne q[.];
+    $args{suffix} = q[.] . $args{suffix} if defined $args{suffix} && $args{suffix} ne $EMPTY && substr( $args{suffix}, 0, 1 ) ne q[.];
 
     P->file->mkpath( $args{base} ) if !-e $args{base};
 

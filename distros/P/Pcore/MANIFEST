@@ -11,7 +11,8 @@ lib/Pcore/AE/DNS/Cache.pm
 lib/Pcore/AE/Patch.pm
 lib/Pcore/API/BitBucket.pm
 lib/Pcore/API/Client.pm
-lib/Pcore/API/DockerHub.pm
+lib/Pcore/API/Docker/Engine.pm
+lib/Pcore/API/Docker/Hub.pm
 lib/Pcore/API/GitHub.pm
 lib/Pcore/API/IPPool.pm
 lib/Pcore/API/PAUSE.pm
@@ -86,6 +87,7 @@ lib/Pcore/Dist/CLI/Clean.pm
 lib/Pcore/Dist/CLI/Create.pm
 lib/Pcore/Dist/CLI/Deploy.pm
 lib/Pcore/Dist/CLI/Docker.pm
+lib/Pcore/Dist/CLI/Docker/Build.pm
 lib/Pcore/Dist/CLI/Docker/Create.pm
 lib/Pcore/Dist/CLI/Docker/From.pm
 lib/Pcore/Dist/CLI/Docker/Init.pm
@@ -224,12 +226,16 @@ script/pcore
 script/pcore-vim-rpc.pl
 script/src
 script/update-pcore-share.pl
-share/data/ca_file.pem
+share/data/cacert.pem
+share/data/dhparam-2048.pem
+share/data/dhparam-4096.pem
+share/data/dhparam-8192.pem
 share/data/mime.yaml
 share/data/par.ico
+share/data/pub-suffix.dat
 share/data/src.yaml
 share/data/status.yaml
-share/dist-id.json
+share/dist-id.yaml
 share/dist-tmpl/cfg.ini
 share/dist-tmpl/docker/.dockerignore
 share/dist-tmpl/docker/Dockerfile

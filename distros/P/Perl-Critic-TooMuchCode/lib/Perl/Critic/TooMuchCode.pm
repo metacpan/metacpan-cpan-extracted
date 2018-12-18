@@ -1,6 +1,21 @@
 package Perl::Critic::TooMuchCode;
 use strict;
-our $VERSION='0.10';
+our $VERSION='0.11';
+
+# Well, we need a place for this monkey-patching business.
+sub __get_terop_usage {
+    my ($used, $doc) = @_;
+    for my $question_mark (@{ $doc->find( sub { $_[1]->isa('PPI::Token::Operator') && $_[1]->content eq '?' }) ||[]}) {
+        my $el = $question_mark->snext_sibling;
+        next unless $el->isa('PPI::Token::Label');
+
+        my $tok = $el->content;
+        $tok =~ s/\s*:\z//;
+
+        $used->{$tok}++;
+    }
+}
+
 1;
 __END__
 

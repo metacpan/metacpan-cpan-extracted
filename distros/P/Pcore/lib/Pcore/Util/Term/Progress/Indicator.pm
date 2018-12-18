@@ -11,7 +11,7 @@ has id => ( required => 1 );
 
 has network => ();    # Bool
 
-has message => ('');  # Str
+has message => $EMPTY;    # Str
 
 has show_state => (1);    # Bool, show value/total/percent
 
@@ -29,7 +29,7 @@ has _format_percent => ( is => 'lazy', init_arg => undef );  # CodeRef
 has show_speed    => 1;                                      # Bool
 has speed_format  => '%.2f';                                 # Str | CodeRef
 has _format_speed => ( is => 'lazy', init_arg => undef );    # CodeRef
-has unit          => '';                                     # Str
+has unit          => $EMPTY;                                 # Str
 
 has show_time    => 1;                                       # Bool
 has time_format  => '%M:%S';                                 # Str | CodeRef
@@ -248,8 +248,6 @@ sub update ( $self, %args ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 236                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 14, 32               | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,3 +1,5 @@
+requires "Math::Int128" => "0";
+requires "Math::Int64" => "0";
 requires "MaxMind::DB::Metadata" => "0.040001";
 requires "MaxMind::DB::Reader::Role::HasMetadata" => "0";
 requires "MaxMind::DB::Types" => "0";
@@ -15,7 +17,6 @@ on 'build' => sub {
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
-  requires "Math::Int128" => "0";
   requires "MaxMind::DB::Reader" => "0";
   requires "Module::Implementation" => "0";
   requires "Net::Works::Network" => "0.21";

@@ -132,6 +132,17 @@
                 cargo_type        => 'node',
                 config_class_name => 'MasterModel::SlaveZ',
             },
+            integer_with_warn_if => {
+                type        => 'leaf',
+                value_type  => 'integer',
+                warn_if => {
+                    warn_test => {
+                        code => 'defined $_ && $_ < 9;',
+                        msg  => 'should be greater than 9',
+                        fix  => '$_ = 10;'
+                    }
+                },
+            },
             [qw/lista listb/] => {
                 type       => 'list',
                 cargo_type => 'leaf',

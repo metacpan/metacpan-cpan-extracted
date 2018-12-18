@@ -1,3 +1,11 @@
+0.009   2018-12-17 (PERLANCAR)
+
+        - Introduce import argument 'default_level' to set default log level.
+
+	- Observe LOG_GER_APP_DEBUG to show details on how level etc are
+	  set.
+
+
 0.008   2018-08-30 (PERLANCAR)
 
 	- No functional changes.

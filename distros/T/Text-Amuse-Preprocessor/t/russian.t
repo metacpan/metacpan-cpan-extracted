@@ -6,7 +6,7 @@ use utf8;
 binmode STDOUT, ":encoding(utf-8)";
 binmode STDIN, ":encoding(utf-8)";
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 use Data::Dumper;
 
 my $builder = Test::More->builder;
@@ -100,3 +100,17 @@ $pp = Text::Amuse::Preprocessor->new(input => \$out,
 $pp->process;
 is_deeply ([ split /\n/, $stripped],
            [ split /\n/, $in]);
+
+my $out2 = '';
+my $exp2 = $test;
+$exp2 =~ s/~/~~/g;
+$pp = Text::Amuse::Preprocessor->new(input => \$in,
+                                     output => \$out2,
+                                     debug => 0,
+                                     remove_nbsp => 1,
+                                     fix_nbsp => 1,
+                                     show_nbsp => 1,
+                                     fix_typography => 0);
+$pp->process;
+is_deeply ([ split /\n/, $out2],
+           [ split /\n/, $exp2]);

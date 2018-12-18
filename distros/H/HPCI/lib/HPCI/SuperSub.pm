@@ -78,8 +78,8 @@ sub _build_stage_list {
         # grep { defined }
         map  { ref($_) ? $_->_full_name : $_ }
         map  { ref($_) eq 'Regexp' ? ($self->_match_stages( $_ )) : ($_) }
-        map  { ref($_) eq 'ARRAY' ? @{$_} : ($_) }
         grep { defined }
+        map  { ref($_) eq 'ARRAY' ? @{$_} : ($_) }
         @_
 };
 

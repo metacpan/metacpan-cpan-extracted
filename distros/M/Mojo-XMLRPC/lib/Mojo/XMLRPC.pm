@@ -18,7 +18,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = (qw[decode_xmlrpc encode_xmlrpc from_xmlrpc to_xmlrpc]);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 $VERSION = eval $VERSION;
 
 my $message = Mojo::Template->new(
@@ -180,7 +180,16 @@ sub _decode_element {
     my $date = Mojo::Date->new($elem->text);
     unless ($date->epoch) {
       require Time::Piece;
-      $date->epoch(Time::Piece->strptime($elem->text, '%Y%m%dT%H:%M:%S')->epoch);
+      my $text = $elem->text;
+      PARSE: for my $time_format ('%H:%M:%S', '%H%M%S') {
+        for my $calendar_format ('%Y%m%d', '%Y-%m-%d') {
+          my $format = $calendar_format . 'T' . $time_format;
+          eval {
+            $date->epoch(Time::Piece->strptime($text, $format)->epoch);
+          };
+          last PARSE unless $@;
+        }
+      }
     }
     return $date;
   } elsif ($tag eq 'base64') {
@@ -416,8 +425,12 @@ L<http://github.com/jberger/Mojo-XMLRPC>
 
 Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
+=head1 CONTRIBUTORS
+
+Andreas Vögele (voegelas)
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Joel Berger
+Copyright (C) 2017 by L</AUTHOR> and L</CONTRIBUTORS>
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,5 +1,10 @@
 Revision history for Struct-Path
 
+0.83    2018-12-15
+        - throw correct error for nonrefs in refstack
+        - ref() calls reduced a bit
+        - regexps supported in hash keys list, R key is deprecated now
+
 0.82    2018-08-15
         - craches fixed for expand out-of range negative array indexes
         - expand-append experimental subopt removed

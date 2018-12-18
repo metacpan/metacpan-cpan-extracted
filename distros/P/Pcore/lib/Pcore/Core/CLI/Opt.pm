@@ -145,7 +145,7 @@ sub _build_type ($self) {
         }
     }
 
-    return q[];
+    return $EMPTY;
 }
 
 sub _build_getopt_spec ($self) {
@@ -178,9 +178,9 @@ sub _build_getopt_spec ($self) {
 }
 
 sub _build_help_spec ($self) {
-    my $spec = $self->short ? q[-] . $self->short . q[ ] : q[ ] x 3;
+    my $spec = $self->short ? q[-] . $self->short . $SPACE : $SPACE x 3;
 
-    $spec .= q[--];
+    $spec .= '--';
 
     $spec .= '[no[-]]' if $self->negated;
 
@@ -204,11 +204,11 @@ sub _build_help_spec ($self) {
 
     my @attrs;
 
-    push @attrs, q[+] if $self->is_repeatable;
+    push @attrs, '+' if $self->is_repeatable;
 
-    push @attrs, q[!] if $self->is_required;
+    push @attrs, '!' if $self->is_required;
 
-    $spec .= q[ ] . join q[], map {"[$_]"} @attrs if @attrs;
+    $spec .= $SPACE . join $EMPTY, map {"[$_]"} @attrs if @attrs;
 
     return $spec;
 }
@@ -236,7 +236,7 @@ sub validate ( $self, $opt ) {
             return;
         }
     }
-    elsif ( defined $self->{default_val} && $opt->{$name} eq '' ) {
+    elsif ( defined $self->{default_val} && $opt->{$name} eq $EMPTY ) {
 
         # apply default_val if opt is exists. but value is not specified
         $opt->{$name} = $self->{default_val};
@@ -287,8 +287,6 @@ sub validate ( $self, $opt ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 34                   | Subroutines::ProhibitExcessComplexity - Subroutine "BUILD" with high complexity score (35)                     |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 239                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

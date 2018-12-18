@@ -4,8 +4,13 @@ use warnings;
 use Capture::Tiny qw( capture_stderr );
 use File::Temp qw( tempdir );
 use File::Touch qw( touch );
-use Git::Helpers
-    qw( checkout_root current_branch_name remote_url travis_url );
+use Git::Helpers qw(
+    checkout_root
+    current_branch_name
+    is_inside_work_tree
+    remote_url
+    travis_url
+);
 use Git::Version ();
 use Git::Sub;
 use Test::Fatal;
@@ -61,6 +66,10 @@ SKIP: {
     diag $stderr;
 
     is( current_branch_name(), $file, 'current branch is ' . $file );
+
+    ok( is_inside_work_tree(), 'is_inside_work_tree' );
+    chdir('..');
+    ok( !is_inside_work_tree(), 'not is_inside_work_tree' );
 }
 
 {

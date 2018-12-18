@@ -22,7 +22,7 @@ sub upload ( $self, $path, $cb = undef ) {
 
     $self->_pack_multipart( \$body, $boundary, 'HIDDENNAME', \encode_utf8( $self->{username} ) );
 
-    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_subdirtext', \q[] );
+    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_subdirtext', \$EMPTY );
 
     $self->_pack_multipart( \$body, $boundary, 'CAN_MULTIPART', \1 );
 
@@ -30,11 +30,11 @@ sub upload ( $self, $path, $cb = undef ) {
 
     $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_httpupload', P->file->read_bin($path), $path->{filename} );
 
-    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_uri', \q[] );
+    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_uri', \$EMPTY );
 
     $self->_pack_multipart( \$body, $boundary, 'SUBMIT_pause99_add_uri_httpupload', \q[ Upload this file from my disk ] );
 
-    $body .= q[--] . $boundary . q[--] . $CRLF . $CRLF;
+    $body .= "--$boundary--" . $CRLF . $CRLF;
 
     return P->http->post(
         'https://pause.perl.org/pause/authenquery',

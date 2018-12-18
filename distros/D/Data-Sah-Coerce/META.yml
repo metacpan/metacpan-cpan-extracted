@@ -28,12 +28,13 @@ requires:
   PERLANCAR::Module::List: '0'
   perl: '5.010001'
   strict: '0'
+  subroutines: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Coerce
   homepage: https://metacpan.org/release/Data-Sah-Coerce
   repository: git://github.com/perlancar/perl-Data-Sah-Coerce.git
-version: '0.027'
+version: '0.030'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -340,7 +341,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

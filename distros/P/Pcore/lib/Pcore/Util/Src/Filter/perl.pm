@@ -1,6 +1,6 @@
 package Pcore::Util::Src::Filter::perl;
 
-use Pcore -class, -const, -res;
+use Pcore -class, -const, -res, -sql;
 use Pcore::Util::Text qw[decode_utf8 encode_utf8 rcut_all trim];
 use Clone qw[];
 
@@ -37,8 +37,8 @@ const our $SEVERITY         => {
 };
 
 sub decompress ( $self ) {
-    my $err = q[];
-    my $log = q[];
+    my $err = $EMPTY;
+    my $log = $EMPTY;
 
     # format heredocs
     $self->_format_heredoc;
@@ -53,7 +53,7 @@ sub decompress ( $self ) {
 
     my $perltidy_argv = $self->src_cfg->{perltidy};
 
-    $perltidy_argv .= '' . $self->dist_cfg->{perltidy} if $self->dist_cfg->{perltidy};
+    $perltidy_argv .= $EMPTY . $self->dist_cfg->{perltidy} if $self->dist_cfg->{perltidy};
 
     $perltidy_argv .= " $self->{perl_tidy}" if $self->{perl_tidy};
 
@@ -174,11 +174,11 @@ sub decompress ( $self ) {
                 my $policy = $v;
 
                 if ( keys $violations->{$v}->{desc}->%* > 1 ) {    # multiple violations with different descriptions
-                    $report .= $tbl->render_row( [ $violations->{$v}->{severity}, '', $policy ] );
+                    $report .= $tbl->render_row( [ $violations->{$v}->{severity}, $EMPTY, $policy ] );
 
                     # sorting descriptions by ascending first line number, then by description text
                     for my $desc ( sort { $violations->{$v}->{desc}->{$a}->{line}->[0] != $violations->{$v}->{desc}->{$b}->{line}->[0] ? $violations->{$v}->{desc}->{$a}->{line}->[0] <=> $violations->{$v}->{desc}->{$b}->{line}->[0] : $violations->{$v}->{desc}->{$a}->{text} cmp $violations->{$v}->{desc}->{$b}->{text} } keys $violations->{$v}->{desc}->%* ) {
-                        $report .= $tbl->render_row( [ '', join( ', ', sort { $a <=> $b } $violations->{$v}->{desc}->{$desc}->{line}->@* ), qq[* $violations->{$v}->{desc}->{$desc}->{text}] ] );
+                        $report .= $tbl->render_row( [ $EMPTY, join( ', ', sort { $a <=> $b } $violations->{$v}->{desc}->{$desc}->{line}->@* ), qq[* $violations->{$v}->{desc}->{$desc}->{text}] ] );
                     }
                 }
                 else {                                             # single violation
@@ -188,7 +188,7 @@ sub decompress ( $self ) {
                 }
 
                 # add diagnostic
-                $report .= $tbl->render_row( [ '', '', "\nDiagnostics:\n$violations->{$v}->{diag}" ] ) if $self->{perl_verbose} && $violations->{$v}->{severity} >= $PERLCRITIC_ERROR;
+                $report .= $tbl->render_row( [ $EMPTY, $EMPTY, "\nDiagnostics:\n$violations->{$v}->{diag}" ] ) if $self->{perl_verbose} && $violations->{$v}->{severity} >= $PERLCRITIC_ERROR;
 
                 # add table row line
                 if ( --$total_violations ) {
@@ -223,18 +223,25 @@ sub decompress ( $self ) {
 }
 
 sub compress ( $self ) {
-    state $cache = do {
-        require BerkeleyDB;
+    state $dbh = do {
+        my $_dbh = P->handle("sqlite:$ENV->{PCORE_USER_DIR}/perl-compress.sqlite");
 
-        my $path = "$ENV->{PCORE_USER_DIR}/perl-compress.bdb";
+        $_dbh->add_schema_patch(
+            1 => <<'SQL'
+                CREATE TABLE "cache" (
+                    "id" TEXT PRIMARY KEY NOT NULL,
+                    "code" BLOB NOT NULL
+                );
+SQL
+        );
 
-        tie my %cache, 'BerkeleyDB::Hash', -Filename => $path, -Flags => BerkeleyDB::DB_CREATE();
+        $_dbh->upgrade_schema;
 
-        \%cache;
+        $_dbh;
     };
 
     # cut __END__ or __DATA__ sections
-    my $data_section = q[];
+    my $data_section = $EMPTY;
 
     if ( $self->{data}->$* =~ s/(\n__(END|DATA)__(?:\n.*|))\z//sm ) {
         $data_section = $1 if $self->{perl_compress_end_section} || $2 eq 'DATA';
@@ -242,7 +249,7 @@ sub compress ( $self ) {
 
     my $md5 = P->digest->md5_hex( $self->{data}->$* );
 
-    my $key;
+    my ( $key, $code );
 
     if ( $self->{perl_compress} ) {
 
@@ -253,18 +260,24 @@ sub compress ( $self ) {
 
         $key = 'compress_' . $self->{perl_compress_keep_ln} . $optimise_size . $md5;
 
-        if ( !exists $cache->{$key} ) {
+        $code = $dbh->selectrow( 'SELECT "code" FROM "cache" WHERE "id" = ?', [$key] )->{data}->{code};
+
+        if ( !defined $code ) {
             require Perl::Strip;
 
             my $transform = Perl::Strip->new( optimise_size => $optimise_size, keep_nl => $self->{perl_compress_keep_ln} );
 
-            $cache->{$key} = rcut_all $transform->strip( $self->{data}->$* );
+            $code = rcut_all $transform->strip( $self->{data}->$* );
+
+            $dbh->do( 'INSERT INTO "cache" ("id", "code") VALUES (?, ?)', [ $key, SQL_BYTEA $code ] );
         }
     }
     else {
         $key = 'strip_' . $self->{perl_compress_keep_ln} . $self->{perl_strip_ws} . $self->{perl_strip_comment} . $self->{perl_strip_pod} . $md5;
 
-        if ( !exists $cache->{$key} ) {
+        $code = $dbh->selectrow( 'SELECT "code" FROM "cache" WHERE "id" = ?', [$key] )->{data}->{code};
+
+        if ( !defined $code ) {
             require Perl::Stripper;
 
             my $transform = Perl::Stripper->new(
@@ -275,11 +288,13 @@ sub compress ( $self ) {
                 strip_log      => 0,                                 # strip Log::Any log statements
             );
 
-            $cache->{$key} = rcut_all $transform->strip( $self->{data}->$* );
+            $code = rcut_all $transform->strip( $self->{data}->$* );
+
+            $dbh->do( 'INSERT INTO "cache" ("id", "code") VALUES (?, ?)', [ $key, SQL_BYTEA $code ] );
         }
     }
 
-    $self->{data}->$* = $cache->{$key} . $data_section;              ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = $code . $data_section;                       ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     return res $SEVERITY->{0};
 }
@@ -393,10 +408,6 @@ sub _cut_log ($self) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 39                   | Subroutines::ProhibitExcessComplexity - Subroutine "decompress" with high complexity score (29)                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 56, 177, 181, 191    | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 231                  | Miscellanea::ProhibitTies - Tied variable used                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 173                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

@@ -15,13 +15,16 @@ name: Perl-Critic-RENEEB
 provides:
   Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSplit:
     file: lib/Perl/Critic/Policy/RegularExpressions/RequireExtendedFormattingExceptForSplit.pm
-    version: '2.00'
+    version: '2.01'
+  Perl::Critic::Policy::Reneeb::Capitalization:
+    file: lib/Perl/Critic/Policy/Reneeb/Capitalization.pm
+    version: '2.01'
   Perl::Critic::Policy::Reneeb::ProhibitBlockEval:
     file: lib/Perl/Critic/Policy/Reneeb/ProhibitBlockEval.pm
-    version: '2.00'
+    version: '2.01'
   Perl::Critic::RENEEB:
     file: lib/Perl/Critic/RENEEB.pm
-    version: '2.00'
+    version: '2.01'
 requires:
   Perl::Critic: '1.105'
   Readonly: '1.03'
@@ -29,7 +32,7 @@ resources:
   bugtracker: http://github.com/reneeb/Perl-Critic-RENEEB/issues
   homepage: http://github.com/reneeb/Perl-Critic-RENEEB
   repository: http://github.com/reneeb/Perl-Critic-RENEEB.git
-version: '2.00'
+version: '2.01'
 x_contributors:
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'

@@ -9,9 +9,11 @@ README
 README.mkdn
 cpanfile
 lib/Type/Tiny/Signatures.pm
-perl5lib
 t/lib/MyApp/Types.pm
+t/lib/MyApp/Types.pm.tdy
 t/main-strict.t
 t/main.t
+t/main.t.tdy
 t/myapp-strict.t
 t/myapp.t
+test

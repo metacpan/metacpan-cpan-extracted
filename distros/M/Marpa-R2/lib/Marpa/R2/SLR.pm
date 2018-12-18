@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION $STRING_VERSION);
-$VERSION        = '6.000000';
+$VERSION        = '8.000000';
 $STRING_VERSION = $VERSION;
 ## no critic(BuiltinFunctions::ProhibitStringyEval)
 $VERSION = eval $VERSION;
@@ -982,7 +982,7 @@ sub Marpa::R2::Scanless::R::resume {
         $slr->[Marpa::R2::Internal::Scanless::R::TRACE_TERMINALS];
     my $trace_lexers = $slr->[Marpa::R2::Internal::Scanless::R::TRACE_LEXERS];
 
-    $thin_slr->pos_set( $start_pos, $length );
+    $thin_slr->pos_set( ($start_pos // $thin_slr->pos()), ($length // -1));
     $slr->[Marpa::R2::Internal::Scanless::R::EVENTS] = [];
     my $slg = $slr->[Marpa::R2::Internal::Scanless::R::GRAMMAR];
     my $thin_slg = $slg->[Marpa::R2::Internal::Scanless::G::C];
@@ -990,6 +990,7 @@ sub Marpa::R2::Scanless::R::resume {
     OUTER_READ: while (1) {
 
         my $problem_code = $thin_slr->read();
+
         last OUTER_READ if not $problem_code;
         my $pause =
             Marpa::R2::Internal::Scanless::convert_libmarpa_events($slr);
@@ -1779,9 +1780,23 @@ sub Marpa::R2::Scanless::R::lexeme_alternative {
 # Returns 0 on unthrown failure, current location on success
 sub Marpa::R2::Scanless::R::lexeme_complete {
     my ( $slr, $start, $length ) = @_;
+    Marpa::R2::exception( q{Bad call to $recce->lexeme_complete(): },
+        qq{start "$start" is not numeric})
+            if defined $start 
+               and not Scalar::Util::looks_like_number( $start );
+    Marpa::R2::exception( q{Bad call to $recce->lexeme_complete(): },
+        qq{length "$length" is not numeric})
+            if defined $length
+            and not Scalar::Util::looks_like_number( $length );
     my $thin_slr = $slr->[Marpa::R2::Internal::Scanless::R::C];
     $slr->[Marpa::R2::Internal::Scanless::R::EVENTS] = [];
-    my $return_value = $thin_slr->g1_lexeme_complete( $start, $length );
+    my $thin_pos = $thin_slr->pos();
+    $start //= $thin_pos;
+    if (not defined $length) {
+        my ($pause_start, $pause_length) = $thin_slr->pause_span();
+        $length = ($pause_start == $thin_pos) ? $pause_length : -1;
+    }
+    my $return_value = $thin_slr->g1_lexeme_complete($start, $length);
     Marpa::R2::Internal::Scanless::convert_libmarpa_events($slr);
     die q{} . $thin_slr->g1()->error() if $return_value == 0;
     return $return_value;

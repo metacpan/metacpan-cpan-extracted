@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use CPAN::Meta;
 use Carp qw/croak/;
@@ -91,6 +91,7 @@ sub detect_license {
 	for my $license_section (@license_sections) {
 		next unless defined ( my $license_pod = $data->pod($license_section) );
 		require Software::LicenseUtils;
+		Software::LicenseUtils->VERSION(0.103014);
 		my $content = "=head1 LICENSE\n" . $license_pod;
 		my @guess = Software::LicenseUtils->guess_license_from_pod($content);
 		next if not @guess;
@@ -157,6 +158,7 @@ sub new {
 				version    => '2',
 				url        => 'http://search.cpan.org/perldoc?CPAN::Meta::Spec'
 			},
+			x_spdx_expression => $license->spdx_expression,
 		};
 		if (%{$mergedata}) {
 			require CPAN::Meta::Merge;

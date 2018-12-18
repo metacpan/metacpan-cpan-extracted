@@ -11,7 +11,7 @@ use Perl::Critic::Utils qw{ :severities };
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '2.0';
+our $VERSION = '2.01';
 
 #-----------------------------------------------------------------------------
 
@@ -53,8 +53,7 @@ sub violates {
     return if $self->{_minimum_regex_length_to_complain_about} >= length $match;
     return if _is_used_to_split( $elem );
 
-    my $re = $doc->ppix_regexp_from_element( $elem )
-        or return;
+    my $re = $doc->ppix_regexp_from_element( $elem );
     $re->modifier_asserted( 'x' )
         or return $self->violation( $DESC, $EXPL, $elem );
 
@@ -102,7 +101,7 @@ Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSpli
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 DESCRIPTION
 
@@ -153,6 +152,36 @@ restrict this, turn on the C<strict> option.
     $string =~ m/Basset hounds got long ears/;  # no longer ok
 
 This option defaults to false.
+
+=head1 METHODS
+
+=head2 supported_parameters
+
+Currently only one parameter is supported: C<minimum_regex_length_to_complain_about>.
+
+Regular expressions that are shorter than this number, no violation is thrown.
+
+=head2 default_theme
+
+Default theme is C<reneeb>.
+
+=head2 default_severity
+
+Be default this policy is of medium severity.
+
+=head2 applies_to
+
+By default this policy applies to
+
+=over
+
+=item * PPI::Token::Regexp::Match
+
+=item * PPI::Token::Regexp::Substitute
+
+=item * PPI::Token::QuoteLike::Regexp
+
+=back
 
 =head1 NOTES
 

@@ -1,19 +1,21 @@
 package Pcore::CDN::Bucket;
 
 use Pcore -role;
-use Pcore::Util::UUID qw[uuid_v1mc_str];
-use overload '&{}' => sub ( $self, @ ) {
+use overload    #
+  '&{}' => sub ( $self, @ ) {
     return sub { $self->get_url(@_) }
   },
   fallback => 1;
 
 requires qw[upload];
 
-has id => sub {uuid_v1mc_str}, init_arg => undef;
+has can_upload => ( init_arg => undef );
 
-sub get_url ( $self, $path ) { return $self->{prefix} . $path }
+sub get_url ( $self, $path ) { return "$self->{prefix}/$path" }
 
-sub get_nginx_cfg ($self) {return}
+sub sync ( $self, @args ) {
+    die q[Can't sync with bucket];
+}
 
 1;
 __END__

@@ -78,7 +78,7 @@ sub get_key_bindings ( $self, $key, $cache = undef ) {
     if ( !exists $cache->{$key} ) {
         my $bindings = { $key => 1, '#' => 1 };
 
-        $gen->( $bindings, q[], [ split /[.]/sm, $key ] );
+        $gen->( $bindings, $EMPTY, [ split /[.]/sm, $key ] );
 
         $cache->{$key} = [ keys $bindings->%* ];
     }

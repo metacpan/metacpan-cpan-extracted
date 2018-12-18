@@ -25,4 +25,4 @@ requires:
   version: '0.77'
 resources:
   repository: https://github.com/hirose31/AWS-CLIWrapper.git
-version: '1.15'
+version: '1.16'

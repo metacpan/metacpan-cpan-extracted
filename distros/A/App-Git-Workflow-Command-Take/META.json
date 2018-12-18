@@ -16,19 +16,20 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::Git::Workflow::Command" : "v1.1.0",
             "Test::More" : "0.88",
             "Test::Warnings" : "0.026"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.38"
          }
       },
       "runtime" : {
          "requires" : {
-            "App::Git::Workflow" : "0.96009",
-            "App::Git::Workflow::Command" : "0.96009",
+            "App::Git::Workflow" : "v1.1.0",
+            "App::Git::Workflow::Command" : "v1.1.0",
             "Path::Tiny" : "0",
             "perl" : "5.008"
          }
@@ -37,7 +38,7 @@
    "provides" : {
       "App::Git::Workflow::Command::Take" : {
          "file" : "lib/App/Git/Workflow/Command/Take.pm",
-         "version" : "0.5"
+         "version" : "0.6"
       }
    },
    "release_status" : "stable",
@@ -52,6 +53,6 @@
          "url" : "git://github.com/ivanwills/App-Git-Workflow-Command-Take.git"
       }
    },
-   "version" : "0.5",
+   "version" : "0.6",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

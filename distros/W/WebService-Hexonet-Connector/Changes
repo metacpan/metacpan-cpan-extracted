@@ -1,5 +1,29 @@
 Revision history for Perl extension WebService::Hexonet::Connector.
 
+1.12  Tue Aug 07 12:00:00 2018
+    * added missing LWP::Protocol::https
+
+1.11  Mon Aug 06 12:00:00 2018
+    * updated documentation
+
+1.10  Mon Aug 06 12:00:00 2018
+    * added data logging; active for tests
+
+1.09  Fri Aug 03 12:00:00 2018
+    * reviewed dependencies in Makefile.PL
+
+1.08  Thu Aug 02 12:00:00 2018  
+    * reviewed buildversion.sh to consider rebuilding and including meta files
+
+1.07  Thu Aug 02 12:00:00 2018
+    * review PREREQ_PM matrix
+
+1.06  Wed Aug 01 12:00:00 2018
+    * reviewed tests to consider internet connection
+
+1.05  Thu Jul 24 15:00:00 2018
+    * whitelist README.md and CONTRIBUTING.md in MANIFEST.SKIP
+
 1.04  Thu Jul 24 15:00:00 2018
     * reviewed project documentation
 	

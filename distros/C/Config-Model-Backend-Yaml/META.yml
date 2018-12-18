@@ -23,7 +23,7 @@ meta-spec:
 name: Config-Model-Backend-Yaml
 requires:
   Carp: '0'
-  Config::Model: '2.130'
+  Config::Model: '2.131'
   Config::Model::Backend::Any: '0'
   Config::Model::Exception: '0'
   File::Path: '0'
@@ -39,6 +39,6 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-backend-yaml/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-backend-yaml.git
-version: '2.131'
+version: '2.132'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -47,10 +47,10 @@ around new => sub ( $orig, $self, $host ) {
     $host =~ s/[.]+/./smg if index( $host, q[..] ) != -1;
 
     # removing leading "."
-    substr $host, 0, 1, q[] if substr( $host, 0, 1 ) eq q[.];
+    substr $host, 0, 1, $EMPTY if substr( $host, 0, 1 ) eq q[.];
 
     # removing trailing "."
-    substr $host, -1, 1, q[] if substr( $host, -1, 1 ) eq q[.];
+    substr $host, -1, 1, $EMPTY if substr( $host, -1, 1 ) eq q[.];
 
     return bless { name => domain_to_ascii $host }, __PACKAGE__;
 };
@@ -67,7 +67,7 @@ sub update_all ( $self ) {
             $domains->{$domain_ascii} = domain_to_utf8($domain_ascii);
         }
 
-        $ENV->{share}->write( 'Pcore', 'data/tld.dat', \encode_utf8( join $LF, map {"$domains->{$_};$_"} sort { $domains->{$a} cmp $domains->{$b} } keys $domains->%* ) );
+        $ENV->{share}->write( '/Pcore/data/tld.dat', \encode_utf8( join $LF, map {"$domains->{$_};$_"} sort { $domains->{$a} cmp $domains->{$b} } keys $domains->%* ) );
 
         undef $TLD;
 
@@ -80,7 +80,7 @@ sub update_all ( $self ) {
     }
 
     # update pub. suffixes, should be updated after TLDs
-    print 'updating pub_suffix.dat ... ';
+    print 'updating pub-suffix.dat ... ';
 
     if ( my $res = P->http->get('https://publicsuffix.org/list/effective_tld_names.dat') ) {
         my $suffixes = {};
@@ -96,7 +96,7 @@ sub update_all ( $self ) {
             $domain_utf8 =~ s[//.*][]sm;
 
             # ignore empty lines
-            next if $domain_utf8 eq q[];
+            next if $domain_utf8 eq $EMPTY;
 
             $suffixes->{ domain_to_ascii( lc $domain_utf8 ) } = lc $domain_utf8;
         }
@@ -123,7 +123,7 @@ sub update_all ( $self ) {
             }
         }
 
-        $ENV->{share}->write( 'Pcore', 'data/pub_suffix.dat', \encode_utf8( join $LF, map {"$suffixes->{$_};$_"} sort { $suffixes->{$a} cmp $suffixes->{$b} } keys $suffixes->%* ) );
+        $ENV->{share}->write( '/Pcore/data/pub-suffix.dat', \encode_utf8( join $LF, map {"$suffixes->{$_};$_"} sort { $suffixes->{$a} cmp $suffixes->{$b} } keys $suffixes->%* ) );
 
         undef $PUB_SUFFIX;
 
@@ -158,7 +158,7 @@ sub pub_suffixes ( $self ) {
     $PUB_SUFFIX //= do {
         my $pub_suffix;
 
-        for my $rec ( split /\n/sm, P->file->read_text( $ENV->{share}->get('data/pub_suffix.dat') )->$* ) {
+        for my $rec ( split /\n/sm, P->file->read_text( $ENV->{share}->get('data/pub-suffix.dat') )->$* ) {
             my ( $utf8, $ascii ) = split /;/sm, $rec;
 
             $pub_suffix->{$ascii} = $utf8;
@@ -206,7 +206,7 @@ sub _build_is_ipv6 ($self) {
 }
 
 sub _build_is_domain ($self) {
-    return 0 if $self->{name} eq q[];
+    return 0 if $self->{name} eq $EMPTY;
 
     return $self->is_ip ? 0 : 1;
 }
@@ -242,7 +242,7 @@ sub _build_is_tld ($self) {
 
 sub _build_tld ($self) {
     if ( $self->is_ip ) {
-        return q[];
+        return $EMPTY;
     }
     else {
         return substr $self->{name}, rindex( $self->{name}, q[.] ) + 1;
@@ -260,7 +260,7 @@ sub _build_tld_is_valid ($self) {
 sub _build_canon ($self) {
     my $name = $self->{name};
 
-    substr $name, 0, 4, q[] if $name && index( $name, 'www.' ) == 0;
+    substr $name, 0, 4, $EMPTY if $name && index( $name, 'www.' ) == 0;
 
     return $name;
 }
@@ -279,7 +279,7 @@ sub _build_is_pub_suffix ($self) {
 # It represents the part of a domain name which is not under the control of the individual registrant.
 # TODO wildcards like *.*.foo.bar should be supported
 sub _build_pub_suffix ($self) {
-    return q[] unless $self->is_domain;
+    return $EMPTY unless $self->is_domain;
 
     my $pub_suffixes = $self->pub_suffixes;
 
@@ -320,7 +320,7 @@ sub _build_pub_suffix ($self) {
         }
     }
 
-    return $pub_suffix // q[];
+    return $pub_suffix // $EMPTY;
 }
 
 sub _build_pub_suffix_utf8 ($self) {
@@ -328,7 +328,7 @@ sub _build_pub_suffix_utf8 ($self) {
         return domain_to_utf8($pub_suffix);
     }
     else {
-        return q[];
+        return $EMPTY;
     }
 }
 
@@ -339,19 +339,19 @@ sub _build_is_root_domain ($self) {
 }
 
 sub _build_root_domain ($self) {
-    return q[] unless $self->is_domain;
+    return $EMPTY unless $self->is_domain;
 
     if ( my $pub_suffix = $self->pub_suffix ) {
         my $canon = $self->canon;
 
-        return q[] if length $pub_suffix >= length $canon;
+        return $EMPTY if length $pub_suffix >= length $canon;
 
         my $root = substr $canon, 0, length($canon) - length($pub_suffix) - 1;
 
         return ( split /[.]/sm, $root )[-1] . ".$pub_suffix";
     }
 
-    return q[];
+    return $EMPTY;
 }
 
 sub _build_root_domain_utf8 ($self) {
@@ -359,7 +359,7 @@ sub _build_root_domain_utf8 ($self) {
         return domain_to_utf8($root_domain);
     }
     else {
-        return q[];
+        return $EMPTY;
     }
 
 }
@@ -371,7 +371,7 @@ sub _build_root_label ($self) {
         return $root_domain;
     }
 
-    return q[];
+    return $EMPTY;
 }
 
 sub _build_root_label_utf8 ($self) {
@@ -381,7 +381,7 @@ sub _build_root_label_utf8 ($self) {
         return $root_domain_utf8;
     }
 
-    return q[];
+    return $EMPTY;
 }
 
 1;

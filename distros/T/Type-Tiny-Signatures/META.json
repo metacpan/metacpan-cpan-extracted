@@ -1,7 +1,7 @@
 {
-   "abstract" : "Method/Function Signatures w/Type::Tiny Constraints",
+   "abstract" : "Type::Tiny Method/Function Signatures",
    "author" : [
-      "Al Newkirk <anewkirk@ana.io>"
+      "Al Newkirk <al@iamalnewkirk.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
@@ -46,10 +46,10 @@
          "web" : "https://github.com/alnewkirk/Type-Tiny-Signatures"
       }
    },
-   "version" : "0.07",
+   "version" : "0.71.0",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
-      "Al Newkirk <al@iamalnewkirk.com>"
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_generated_by_perl" : "v5.14.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"

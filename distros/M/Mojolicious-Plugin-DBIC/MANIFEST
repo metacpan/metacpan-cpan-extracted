@@ -9,6 +9,7 @@ Makefile.PL
 README
 cpanfile
 dist.ini
+eg/.gitignore
 eg/README.md
 eg/cpanfile
 eg/data.db
@@ -25,6 +26,8 @@ t/lib/Local/Schema.pm
 t/lib/Local/Schema/Result/Events.pm
 t/lib/Local/Schema/Result/Notes.pm
 t/plugin.t
+t/templates/notes/delete.html.ep
+t/templates/notes/edit.html.ep
 t/templates/notes/get.html.ep
 t/templates/notes/get_extended.html.ep
 t/templates/notes/list.html.ep

@@ -13,28 +13,32 @@ use Text::Amuse::Preprocessor;
 my $in = <<'MUSE';
 
  hello  there
-<verbatim>  </verbatim>
+<verbatim>  ~~</verbatim>
 
 {{{
+~~
   
 }}}
 
  hello  there
 
+~~hello~~~~there
 MUSE
 
 {
     my $exp = <<'MUSE';
 
 ~~hello~~~~there
-<verbatim>  </verbatim>
+<verbatim>  ~~</verbatim>
 
 {{{
+~~
   
 }}}
 
 ~~hello~~~~there
 
+~~hello~~~~there
 MUSE
     my $out;
 
@@ -49,14 +53,16 @@ MUSE
     my $exp = <<'MUSE';
 
  hello  there
-<verbatim>  </verbatim>
+<verbatim>  ~~</verbatim>
 
 {{{
+~~
   
 }}}
 
  hello  there
 
+ hello  there
 MUSE
     my $out;
 

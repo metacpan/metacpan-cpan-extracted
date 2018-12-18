@@ -1,10 +1,25 @@
 package Pcore::API::SCM;
 
-use Pcore -const, -role;
+use Pcore -const, -role, -res;
 use Pcore::API::SCM::Const qw[:ALL];
 use Pcore::API::SCM::Upstream;
+use Pcore::Util::Scalar qw[is_callback];
 
-requires qw[_build_upstream scm_cmd scm_init scm_clone scm_id scm_releases scm_is_commited scm_addremove scm_commit scm_push scm_set_tag scm_get_changesets];
+requires qw[
+  _build_upstream
+  scm_cmd
+  scm_init
+  scm_clone
+  scm_update
+  scm_id
+  scm_releases
+  scm_is_commited
+  scm_addremove
+  scm_commit
+  scm_push
+  scm_set_tag
+  scm_get_changesets
+];
 
 has root     => ( required => 1 );
 has upstream => ( is       => 'lazy' );    # InstanceOf ['Pcore::API::SCM::Upstream'] ]
@@ -57,23 +72,48 @@ sub scm_init ( $self, $root, $scm_type = $SCM_TYPE_HG, $cb = undef ) {
     return $self->scm_init( $root, $cb );
 }
 
-sub scm_clone ( $self, $uri, $root, $scm_type = $SCM_TYPE_HG, $cb = undef ) {
+sub scm_clone ( $self, $uri, @args ) {
+    my $cb = is_callback $args[-1] ? pop @args : ();
+
+    my %args = (
+        type => $SCM_TYPE_HG,
+        root => undef,
+        @args,
+    );
 
     # can't clone to existing directory
-    if ( -d $root ) {
-        $cb->(undef) if $cb;
+    if ( defined $args{root} && -e $args{root} ) {
+        my $res = res [ 500, 'Clone target directory is already exists' ];
 
-        return;
+        $res = $cb->($res) if $cb;
+
+        return $res;
     }
-
-    $self = P->class->load( $SCM_TYPE_CLASS->{$scm_type} )->new( { root => $root } );
 
     my $temp = P->file1->tempdir;
 
-    return $self->scm_clone(
+    my $repo;
+
+    if ( defined $args{root} ) {
+        $repo = P->class->load( $SCM_TYPE_CLASS->{ $args{type} } )->new( { root => $args{root} } );
+    }
+    else {
+        $repo = P->class->load( $SCM_TYPE_CLASS->{ $args{type} } )->new( { root => $temp } );
+    }
+
+    return $repo->scm_clone(
         $temp, $uri,
         sub ($res) {
-            P->file->move( $temp, $root ) if $res;
+            if ($res) {
+                if ( defined $args{root} ) {
+                    P->file->move( $temp, $args{root} );
+
+                    $res->{root} = $args{root};
+                }
+                else {
+                    $res->{root} = $temp;
+                }
+            }
 
             return $cb ? $cb->($res) : $res;
         }
@@ -87,7 +127,7 @@ sub scm_clone ( $self, $uri, $root, $scm_type = $SCM_TYPE_HG, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 54, 60               | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 69                   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

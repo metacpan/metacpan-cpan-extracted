@@ -1,5 +1,5 @@
 package CPAN::Upload::Tiny;
-$CPAN::Upload::Tiny::VERSION = '0.008';
+$CPAN::Upload::Tiny::VERSION = '0.009';
 use strict;
 use warnings;
 
@@ -13,6 +13,8 @@ my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI} || 'https://pause.perl.org/pause
 
 sub new {
 	my ($class, $user, $password) = @_;
+	Carp::croak('No user set')     if not defined $user;
+	Carp::croak('No password set') if not defined $password;
 	return bless {
 		user     => $user,
 		password => $password,
@@ -21,8 +23,33 @@ sub new {
 
 sub new_from_config {
 	my ($class, $filename) = @_;
-	my $config = read_config_file($filename);
-	bless $config, $class;
+	return $class->new(read_config_file($filename));
+}
+
+my $has_readkey = eval { require Term::ReadKey };
+*read_key = $has_readkey ? \&Term::ReadKey::ReadMode : sub {};
+
+sub prompt {
+	my ($mess, $mode) = @_;
+
+	local $| = 1;
+	local $\;
+	print "$mess? ";
+
+	read_key($mode);
+	my $ans = <STDIN> // '';
+	read_key(0);
+	print "\n" if $mode > 1 && $has_readkey;
+	chomp $ans;
+	return $ans;
+}
+
+sub new_from_config_or_stdin {
+	my ($class, $filename) = @_;
+	my ($user, $pass) = read_config_file($filename);
+	$user ||= prompt("What is your PAUSE ID", 1);
+	$pass ||= prompt("What is your PAUSE password", 2);
+	return $class->new($user, $pass);
 }
 
 sub upload_file {
@@ -57,7 +84,7 @@ sub upload_file {
 
 sub read_config_file {
 	my $filename = shift || glob('~/.pause');
-	die 'Missing configuration file' unless -r $filename;
+	return unless -r $filename;
 
 	my %conf;
 	if ( eval { require Config::Identity } ) {
@@ -79,10 +106,8 @@ sub read_config_file {
 			}
 		}
 	}
-	Carp::croak('No user set in configuration file')     if not $conf{user};
-	Carp::croak('No password set in configuration file') if not $conf{password};
 
-	return \%conf;
+	return @conf{'user', 'password'};
 }
 
 1;
@@ -101,7 +126,7 @@ CPAN::Upload::Tiny - A tiny CPAN uploader
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

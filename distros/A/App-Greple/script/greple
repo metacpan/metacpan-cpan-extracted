@@ -63,7 +63,7 @@ greple - extensible grep with lexical expression and region handling
 =head1 VERSION
 
 
-Version 8.2901
+Version 8.3201
 
 
 =head1 SYNOPSIS
@@ -84,6 +84,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     -i                   ignore case
     --need=[+-]n         required positive match count
     --allow=[+-]n        acceptable negative match count
+    --matchcount=n[,m]   specify required match count for each block
   STYLE
     -l                   list filename only
     -c                   print count of matched block only
@@ -141,6 +142,7 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --prologue=func      call function before command execution
     --epilogue=func      call function after command execution
   OTHER
+    --usage[=expand]     show this message
     --norc               skip reading startup file
     --man                display command or module manual page
     --show               display module file
@@ -201,6 +203,7 @@ my $opt_clean;
 my $opt_readlist;
 my @opt_need;
 my @opt_allow;
+my $opt_matchcount;
 my $opt_strict = 0;
 my @opt_print;
 my $opt_continue;
@@ -237,6 +240,7 @@ my @optargs = (
     'fe=s'               => \@opt_fe,
     'need=s'             => \@opt_need,
     'allow=s'            => \@opt_allow,
+    'matchcount|mc=s'    => \$opt_matchcount,
     'i|ignore-case!'     => \$opt_i,
     'l'                  => \$opt_l,
     'c|count'            => \$opt_c,
@@ -505,8 +509,9 @@ for ([ \@opt_r,  FLAG_REGEX | FLAG_COOK | FLAG_REQUIRED ],
      [ \@opt_fe, FLAG_NONE                              ])
 {
     my($opt, $flag) = @$_;
+    next unless @$opt;
     $pat_holder->append({ flag => $FLAG_BASE | $flag, type => 'pattern' },
-			@$opt)->optimize() if @$opt;
+			@$opt)->optimize();
 }
 
 ##
@@ -547,6 +552,27 @@ my $count_allow = 0;
 	}
 	elsif (/^(\d+)$/) {	# --allow n
 	    $count_allow = $1;
+	}
+	else {
+	    die "$_ is not valid count.\n"
+	}
+    }
+}
+
+##
+## --matchcount
+##
+my $count_match_sub;
+if (my $pat = $opt_matchcount) {
+    my($min, $max);
+    $count_match_sub = do {
+	if ($pat =~ /\A(\d+)?,(\d+)\z/) {
+	    my($min, $max) = (int($1//0), int($2));
+	    sub { $min <= $_[0] and $_[0] <= $max }
+	}
+	elsif ($pat =~ /\A(\d+),?\z/) {
+	    my $min = int($1);
+	    sub { $min <= $_[0] }
 	}
 	else {
 	    die "$_ is not valid count.\n"
@@ -831,7 +857,7 @@ grep_files();
 
 for (@opt_epilogue) { $_->call() }
 
-if ($opt_uniqcolor and $opt_d{m}) {
+if ($opt_uniqcolor and $opt_d{c}) {
     dump_uniqcolor();
 }
 
@@ -1002,6 +1028,7 @@ sub grep_data {
 	block        => \@opt_block,
 	must         => $count_must,
 	need         => $count_need,
+	countcheck   => $count_match_sub,
 	allow        => $count_allow,
 	strict       => $opt_strict,
 	region_index => $opt_regioncolor,
@@ -1020,7 +1047,7 @@ sub grep_data {
     }
     elsif ($opt_c) {
 	print "$current_file:" if $need_filename;
-	print scalar $grep->blocks, "\n";
+	print scalar $grep->result, "\n";
     }
     elsif (@{$grep->result_ref}) {
 	# open output filter
@@ -1469,6 +1496,20 @@ command.
 When the count I<n> is negative value, it is subtracted from default
 value.
 
+=item B<--matchcount>=I<min>[,I<max>], B<--mc>=I<min>[,I<max>]
+
+When option B<--matchcount> is specified, only blocks which have given
+match count will be shown.  Count I<min> and I<max> can be omitted,
+and single number is taken as I<min>.  Next commands print lines
+including semicolons; 3 or more, exactly 3, and 3 or less,
+respectively.
+
+    greple --matchcount=3 ';' file
+
+    greple --matchcount=3,3 ';' file
+
+    greple --matchcount=,3 ';' file
+
 =item B<-f> I<file>, B<--file>=I<file>
 
 Specify the file which contains search pattern.  When file contains
@@ -1671,7 +1712,9 @@ Option B<--nocolor> is alias for B<--color>=I<never>.
 
 =item B<--colormap>=I<spec>
 
-Specify color map.
+Specify color map.  Becuase this option is mostly implemented by
+L<Getopt::EX::Colormap> module, consult its document for detail and
+up-to-date specification.
 
 Color specification is combination of single uppercase character
 representing basic colors, and (usually brighter) alternative colors in
@@ -1688,16 +1731,26 @@ lowercase :
 
 or RGB value and 24 grey levels if using ANSI 256 color terminal :
 
-    000000 .. FFFFFF : 24bit RGB colors
-    000 .. 555       : 6x6x6 RGB 216 colors
-    L00 .. L23       : 24 grey levels
+    (255,255,255)      : 24bit decimal RGB colors
+    #000000 .. #FFFFFF : 24bit hex RGB colors
+    #000    .. #FFF    : 12bit hex RGB 4096 colors
+    000 .. 555         : 6x6x6 RGB 216 colors
+    L00 .. L25         : Black (L00), 24 grey levels, White (L25)
 
 =over 4
 
-Note that, when values are all same in 24bit RGB, it is converted to
-24 grey level, otherwise 6x6x6 216 color.
+Begining # can be omitted in 24bit RGB notation.
+
+When values are all same in 24bit or 12bit RGB, it is converted to 24
+grey level, otherwise 6x6x6 216 color.
 
 =back
+
+or color names enclosed by angle bracket :
+
+    <red> <blue> <green> <cyan> <magenta> <yellow>
+    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <medium_aqua_marine>
 
 with other special effects :
 
@@ -1727,13 +1780,13 @@ effect, you can use them to improve readability, like C<SxD;K/544>.
 
 Example:
 
-    RGB  6x6x6    24bit           color
-    ===  =======  =============   ==================
-    B    005      0000FF        : blue foreground
-     /M     /505        /FF00FF : magenta background
-    K/W  000/555  000000/FFFFFF : black on white
-    R/G  500/050  FF0000/00FF00 : red on green
-    W/w  L03/L20  303030/c6c6c6 : grey on grey
+    RGB  6x6x6    12bit      24bit           color name
+    ===  =======  =========  =============  ==================
+    B    005      #00F       (0,0,255)      <blue>
+     /M     /505      /#F0F   /(255,0,255)  /<magenta>
+    K/W  000/555  #000/#FFF  000000/FFFFFF  <black>/<white>
+    R/G  500/050  #F00/#0F0  FF0000/00FF00  <red>/<green>
+    W/w  L03/L20  #333/#ccc  303030/c6c6c6  <dimgrey>/<lightgrey>
 
 Multiple colors can be specified separating by white space or comma,
 or by repeating options.  Those colors will be applied for each
@@ -2281,11 +2334,7 @@ interpreted as a bare word.
 
 =over 7
 
-=item B<--norc>
-
-Do not read startup file: F<~/.greplerc>.
-
-=item B<--usage>
+=item B<--usage>[=I<expand>]
 
 B<Greple> print usage and exit with option B<--usage>, or no valid
 parameter is not specified.  In this case, module option is displayed
@@ -2306,6 +2355,10 @@ Show module file contents.  Use with B<-M> option.
 =item B<--path>
 
 Show module file path.  Use with B<-M> option.
+
+=item B<--norc>
+
+Do not read startup file: F<~/.greplerc>.
 
 =item B<--require>=I<filename>
 
@@ -2621,3 +2674,4 @@ it under the same terms as Perl itself.
 #  LocalWords:  ocode gunzip gpg FILELABEL substr eval misc unicode
 #  LocalWords:  GREPLEOPTS shellwords Katakana builtin pgp autoload
 #  LocalWords:  ENV App ARGV mg Kazumasa Utashiro github colorindex
+#  LocalWords:  matchcount

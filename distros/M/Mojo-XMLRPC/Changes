@@ -1,5 +1,7 @@
 Revision history for Perl module Mojo::XMLRPC
 
+0.06 2018-12-16
+  - Improve date parsing (voegelas)
 0.05 2017-11-22
   - Remove file errantly included in previous release
 0.04 2017-11-22

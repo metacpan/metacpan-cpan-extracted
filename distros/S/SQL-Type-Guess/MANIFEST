@@ -13,6 +13,7 @@ README.mkdn
 t/00-load.t
 t/01_synopsis.t
 t/02_data_types.t
+t/03_RT128024_warnings.t
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t

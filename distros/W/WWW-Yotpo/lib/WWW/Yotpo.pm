@@ -2,12 +2,11 @@ package WWW::Yotpo;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 use LWP::UserAgent;
 use JSON;
-use MIME::Base64;
 use HTTP::Request;
 use vars qw/$errstr/;
 

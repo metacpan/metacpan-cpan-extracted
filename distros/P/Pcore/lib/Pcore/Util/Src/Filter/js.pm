@@ -15,7 +15,7 @@ sub decompress ($self) {
     $self->{data}->$* = JavaScript::Beautifier::js_beautify(    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
         $self->{data}->$*,
         {   indent_size               => 4,
-            indent_character          => q[ ],
+            indent_character          => $SPACE,
             preserve_newlines         => 1,
             space_after_anon_function => 1,
         }

@@ -40,7 +40,7 @@ for my $name ( keys $ANSI->%* ) {
 }
 
 our $EXPORT = {
-    CORE    => [qw[$MSWIN $CRLF $LF]],
+    CORE    => [qw[$MSWIN $CRLF $LF $EMPTY $SPACE]],
     DEFAULT => [':CORE'],
     ANSI    => [ map { '$' . $_ } keys $ANSI->%* ],
 };
@@ -48,6 +48,8 @@ our $EXPORT = {
 const our $MSWIN => $^O =~ /MSWin/sm ? 1 : 0;
 const our $CRLF  => qq[\x0D\x0A];                           ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
 const our $LF    => qq[\x0A];                               ## no critic qw[ValuesAndExpressions::ProhibitEscapedCharacters]
+const our $EMPTY => q[];
+const our $SPACE => q[ ];
 
 1;
 ## -----SOURCE FILTER LOG BEGIN-----

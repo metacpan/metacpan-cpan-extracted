@@ -17,7 +17,7 @@ sub load ( $class, @ ) {
 
         $class =~ s[/][::]smg;
 
-        substr $class, -3, 3, q[];
+        substr $class, -3, 3, $EMPTY;
     }
     else {
         $class = resolve_class_name( $class, $args{ns} );

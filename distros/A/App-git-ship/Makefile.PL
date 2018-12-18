@@ -6,7 +6,7 @@ my %WriteMakefileArgs = (
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/App/git/ship.pm',
   VERSION_FROM   => 'lib/App/git/ship.pm',
-  EXE_FILES      => [qw(bin/git-ship)],
+  EXE_FILES      => [qw(script/git-ship)],
   BUILD_REQUIRES => {}
 ,
   TEST_REQUIRES  => {
@@ -17,13 +17,13 @@ my %WriteMakefileArgs = (
   'Applify' => '0.06',
   'CPAN::Uploader' => '0.10',
   'ExtUtils::MakeMaker' => '6.00',
-  'File::Path' => '2.00',
   'IPC::Run3' => '0.04',
   'Module::CPANfile' => '1.00',
   'Module::Find' => '0.10',
+  'Mojolicious' => '8.00',
+  'Pod::Markdown' => '3.00',
   'Test::Pod' => '0',
-  'Test::Pod::Coverage' => '0',
-  'perl' => '5.014'
+  'Test::Pod::Coverage' => '0'
 }
 ,
   META_MERGE     => {
@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
       },
     },
   },
-  test => {S => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
+  test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.63_03') }) {

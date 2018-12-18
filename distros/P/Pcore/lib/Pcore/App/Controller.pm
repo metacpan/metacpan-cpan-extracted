@@ -12,6 +12,15 @@ sub run ( $self, $req ) {
     return;
 }
 
+sub get_abs_path ( $self, $path ) {
+    if ( $self->{path} eq '/' ) {
+        return "/$path";
+    }
+    else {
+        return "$self->{path}/$path";
+    }
+}
+
 sub get_nginx_cfg ($self) {
     return;
 }

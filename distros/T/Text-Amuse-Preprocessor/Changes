@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.58 2018-12-17
+
+ - Improve non-breaking space related functions. Thanks to @link2xt
+
 0.57 2018-07-28
 
  - Correct the inner quotes for russian. Thanks to @labdsf

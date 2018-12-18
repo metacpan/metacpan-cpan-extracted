@@ -3,7 +3,7 @@ package App::ModuleBuildTiny;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 use Exporter 5.57 'import';
 our @EXPORT = qw/modulebuildtiny/;
@@ -86,13 +86,9 @@ sub write_readme {
 	write_text('README', fill_in($template, \%opts));
 }
 
-sub get_home {
-	local $HOME = $USERPROFILE if $^O eq 'MSWin32';
-	return glob '~';
-}
-
 sub get_config {
-	return catfile(get_home(), qw/.mbtiny conf/);
+	local $HOME = $USERPROFILE if $^O eq 'MSWin32';
+	return catfile(glob('~'), qw/.mbtiny conf/);
 }
 
 sub read_json {
@@ -147,7 +143,8 @@ my %actions = (
 		my $name = $dist->meta->name . '-' . $dist->meta->version;
 		my $file = $dist->write_tarball($name);
 		require CPAN::Upload::Tiny;
-		my $uploader = CPAN::Upload::Tiny->new_from_config($config_file);
+		CPAN::Upload::Tiny->VERSION('0.009');
+		my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($config_file);
 		$uploader->upload_file($file);
 		print "Successfully uploaded $file\n" if not $silent;
 		return 0;
@@ -206,8 +203,7 @@ my %actions = (
 	},
 	configure => sub {
 		my @arguments = @_;
-		my $home = get_home;
-		my $config_file = catfile($home, qw/.mbtiny conf/);
+		my $config_file = get_config();
 
 		my $mode = @arguments ? $arguments[0] : 'upgrade';
 
@@ -282,7 +278,7 @@ App::ModuleBuildTiny - A standalone authoring tool for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 DESCRIPTION
 

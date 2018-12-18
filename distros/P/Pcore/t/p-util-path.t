@@ -9,7 +9,7 @@ our $TESTS = 0;
 
 my $parse_tests = [    #
     [ undef,                                   path => '.',               dirname => '.',           filename => undef,  suffix => undef ],
-    [ '',                                      path => '.',               dirname => '.',           filename => undef,  suffix => undef ],
+    [ $EMPTY,                                  path => '.',               dirname => '.',           filename => undef,  suffix => undef ],
     [ '.',                                     path => '.',               dirname => '.',           filename => undef,  suffix => undef ],
     [ '..',                                    path => '..',              dirname => '..',          filename => undef,  suffix => undef ],
     [ '/',                                     path => '/',               dirname => '/',           filename => undef,  suffix => undef ],
@@ -65,16 +65,6 @@ plan tests => $TESTS;
 done_testing $TESTS;
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 12                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

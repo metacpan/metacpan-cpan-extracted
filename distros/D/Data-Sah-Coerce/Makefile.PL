@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "Nodejs::Util" => "0.007",
     "PERLANCAR::Module::List" => 0,
     "strict" => 0,
+    "subroutines" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.027",
+  "VERSION" => "0.030",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,6 +58,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.98",
   "Test::Needs" => 0,
   "strict" => 0,
+  "subroutines" => 0,
   "warnings" => 0
 );
 

@@ -4,7 +4,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 # VERSION
 
-version 1.000006
+version 1.000007
 
 # SYNOPSIS
 
@@ -72,6 +72,7 @@ Bugs may be submitted through [https://github.com/maxmind/MaxMind-DB-Reader-XS/i
 - Florian Ragwitz <rafl@debian.org>
 - Greg Oschwald <goschwald@maxmind.com>
 - Hidenori Sugiyama <madogiwa@gmail.com>
+- Mark Fowler <mark@twoshortplanks.com>
 - Olaf Alders <oalders@maxmind.com>
 
 # COPYRIGHT AND LICENSE

@@ -8,8 +8,8 @@ with qw[Pcore::CDN::Bucket];
 has bucket   => ( required => 1 );
 has region   => ( required => 1 );
 has endpoint => ( required => 1 );
-has key      => ( required => 1 );
-has secret   => ( required => 1 );
+has key      => ();
+has secret   => ();
 has service  => 's3';
 
 has prefix => ( init_arg => undef );
@@ -18,23 +18,21 @@ has s3     => ( init_arg => undef );    # InstanceOf['Pcore::API::S3']
 sub BUILD ( $self, $args ) {
     $self->{prefix} = "https://$self->{bucket}.$self->{region}.$self->{endpoint}";
 
+    $self->{can_upload} = 1 if defined $self->{key} && defined $self->{secret};
+
+    $self->{s3} = Pcore::API::S3->new( $self->%{qw[key secret bucket region endpoint service]} );
+
     return;
 }
 
-sub s3 ($self) {
-    if ( !exists $self->{s3} ) {
-        $self->{s3} = Pcore::API::S3->new( $self->%{qw[key secret bucket region endpoint service]} );
-    }
-
-    return $self->{s3};
-}
-
 sub upload ( $self, $path, $data, @args ) {
-    return $self->s3->upload( $path, $data, @args );
+    die q[Can't upload to bucket] if !$self->{can_upload};
+
+    return $self->{s3}->upload( $path, $data, @args );
 }
 
 sub sync ( $self, @args ) {
-    return $self->s3->sync(@args);
+    return $self->{s3}->sync(@args);
 }
 
 1;

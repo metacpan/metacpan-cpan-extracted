@@ -4,15 +4,15 @@ use Pcore -const, -class, -export;
 use Pcore::AE::DNS::Cache;
 use Pcore::Util::CA;
 use HTTP::Parser::XS qw[];
-use Pcore::Util::Scalar qw[is_ref is_plain_scalarref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
+use Pcore::Util::Scalar qw[is_ref is_uri is_plain_scalarref is_plain_arrayref is_plain_coderef is_glob is_plain_hashref];
 use AnyEvent::Socket qw[];
 use Errno qw[];
 use IO::Socket::SSL qw[$SSL_ERROR SSL_WANT_READ SSL_WANT_WRITE SSL_VERIFY_NONE SSL_VERIFY_PEER];
 use Coro::EV qw[];
 use overload    #
-  q[bool]  => sub { return $_[0]->{is_connected} },
-  q[0+]    => sub { return $_[0]->{status} },
-  q[""]    => sub { return $_[0]->{status} . q[ ] . $_[0]->{reason} },
+  'bool'   => sub { return $_[0]->{is_connected} },
+  '0+'     => sub { return $_[0]->{status} },
+  '""'     => sub { return $_[0]->{status} . $SPACE . $_[0]->{reason} },
   fallback => 1;
 
 our $EXPORT = {
@@ -26,19 +26,17 @@ const our $TLS_CTX      => {
     $TLS_CTX_LOW => {
         $MSWIN ? ( SSL_ca_file => Pcore::Util::CA->ca_file ) : (),
         SSL_verify_mode => SSL_VERIFY_NONE,
-        dh              => undef,
+        SSL_dh_file     => undef,
+        SSL_dh          => undef,
+        SSL_ecdh_curve  => undef,
     },
     $TLS_CTX_HIGH => {
         $MSWIN ? ( SSL_ca_file => Pcore::Util::CA->ca_file ) : (),
         SSL_verify_mode => SSL_VERIFY_PEER,
-        dh              => 8192,
+        SSL_dh_file     => $ENV->{share}->get('data/dhparam-4096.pem'),
+        SSL_dh          => undef,
+        SSL_ecdh_curve  => 'secp384r1',                                   # prime256v1
     },
-};
-
-const our $DH_PARAM => {
-    2048 => q[MIIBCAKCAQEAhR5Fn9h3Tgnc+q4o3CMkZtre3lLUyDT+1bf3aiVOt22JdDQndZLc|FeKz8AqliB3UIgNExc6oDtuG4znKPgklfOnHv/a9tl1AYQbV+QFM/E0jYl6oG8tF|Epgxezt1GCivvtu64ql0s213wr64QffNMt3hva8lNqK1PXfqp13PzzLzAVsfghrv|fMAX7/bYm1T5fAJdcah6FeZkKof+mqbs8HtRjfvrUF2npEM2WdupFu190vcwABnN|TTJheXCWv2BF2f9EEr61q3OUhSNWIThtZP+NKe2bACm1PebT0drAcaxKoMz9LjKr|y5onGs0TOuQ7JmhtZL45Zr4LwBcyTucLUwIBAg==],
-    4096 => q[MIICCAKCAgEA5WwA5lQg09YRYqc/JILCd2AfBmYBkF19wmCEJB8G3JhTxv8EGvYk|xyP2ecKVUvHTG8Xw/qpW8nRqzPIyV8QRf6YFYSf33Qnx2xYhcnqOumU3nfC0SNOL|/w2q1BA9BbHtW4574P+6hOQx9ftRtbtZ2HPKBMRcAKGjpYZiKopv0+UAM4NpEC2p|bfajp7pyVLeb/Aqm/oWP3L63wPlY1SDp+XRzrOAKB+/uLGqEwV0bBaxxGL29BpOp|O2z1ALGXiDCcLs9WTn9WqUhWDzUN6fahm53rd7zxwpFCb6K2YhaK0peG95jzSUJ8|aoL0KgWuC6v5+gPJHRu0HrQIdfAdN4VchqYOKE46uNNkQl8VJGu4RjYB7lFBpRwO|g2HCsGMo2X7BRmA1st66fh+JOd1smXMZG/2ozTOooL+ixcx4spNneg4aQerWl5cb|nWXKtPCp8yPzt/zoNzL3Fon2Ses3sNgMos0M/ZbnigScDxz84Ms6V/X8Z0L4m/qX|mL42dP40tgvmgqi6BdsBzcIWeHlEcIhmGcsEBxxKEg7gjb0OjjvatpUCJhmRrGjJ|LtMkBR68qr42OBMN/PBB4KPOWNUqTauXZajfCwYdbpvV24ZhtkcRdw1zisyARBSh|aTKW/GV8iLsUzlYN27LgVEwMwnWQaoecW6eOTNKGUURC3In6XZSvVzsCAQI=],
-    8192 => q[MIIECAKCBAEA/SAEbRSSLenVxoInHiltm/ztSwehGOhOiUKfzDcKlRBZHlCC9jBl|S/aeklM6Ucg8E6J2bnfoh6CAdnE/glQOn6CifhZr8X/rnlL9/eP+r9m+aiAw4l0D|MBd8BondbEqwTZthMmLtx0SslnevsFAZ1Cj8WgmUNaSPOukvJ1N7aQ98U+E99Pw3|VG8ANBydXqLqW2sogS8FtZoMbVywcQuaGmC7M6i3Akxe3CCSIpR/JkEZIytREBSC|CH+x3oW/w+wHzq3w8DGB9hqz1iMXqDMiPIMSdXC0DaIPokLnd7X8u6N14yCAco2h|P0gspD3J8pS2FpUY8ZTVjzbVCjhNNmTryBZAxHSWBuX4xYcCHUtfGlUe/IGLSVE1|xIdFpZUfvlvAJjVq0/TtDMg3r2JSXrhQVlr8MPJwSApDVr5kOBHT/uABio4z+5yR|PAvundznfyo9GGAWhIA36GQqsxSQfoRTjWssFoR/cu+9aomRwwOLkvObu8nCVVLH|nLdKDk5cIR0TvNs9HZ6ZmkzL7ah7cPzEKl7U6eE6yZLVYMNecnPLS6PSAIG4gxcq|CVQrrZjQLfTDrJn0OGgpShX85RaDsuiRtp2bpDZ23YDqdwr4wRjvIargjqc2zcF+|jIb7dUS6ci7bVG/CGOQUuiMWAiXZ3a1f343SMf9A05/sf1xwnMeco6STBLZ3X+PA|4urU+grtpWaFtS/fPD2ILn8nrJ3WuSKKUeSnVM46mmJQsOkyn7z8l3jNLB17GYKo|qc+0UuU/2PM9qtZdZElSM/ACLV2vdCuaibop4B9UIP9z3F8kfZ72+zKxpGiE+Bo1|x8SfG8FQw90mYIx+qZzJ8MCvc2wh+l4wDX5KxrhwvcouE2tHQlwfDgv/DiIXp173|hAmUCV0+bPRW8IIJvBODdAWtJe9hNwxj1FFYmPA7l4wa3gXV4I6tb+iO1MbwVjZ/|116tD5MdCo3JuSisgPYCHfkQccwEO0FHEuBbmfN+fQimQ8H0dePP8XctwbkplsB+|aLT5hYKmva/j9smEswgyHglPwc3WvZ+2DgKk7A7DHi7a2gDwCRQlHaXtNWx3992R|dfNgkSeB1CvGSQoo95WpC9ZoqGmcSlVqdetDU8iglPmfYTKO8aIPA6TuTQ/lQ0IW|90LQmqP23FwnNFiyqX8+rztLq4KVkTyeHIQwig6vFxgD8N+SbZCW2PPiB72TVF2U|WePU8MRTv1OIGBUBajF49k28HnZPSGlILHtFEkYkbPvomcE5ENnoejwzjktOTS5d|/R3SIOvCauOzadtzwTYOXT78ORaR1KI1cm8DzkkwJTd/Rrk07Q5vnvnSJQMwFUeH|PwJIgWBQf/GZ/OsDHmkbYR2ZWDClbKw2mwIBAg==],
 };
 
 const our $HANDLE_STATUS_OK             => 200;
@@ -65,9 +63,9 @@ our $SCHEME_CACHE = {};
 
 has fh               => ();
 has read_size        => 1024 * 1024;
-has timeout          => 30;
+has timeout          => 30;              # undef - no timeout
 has timeout_is_fatal => 1;
-has connect_timeout  => 10;
+has connect_timeout  => 10;              # undef - no timeout
 has persistent       => ();
 has tls_ctx          => $TLS_CTX_HIGH;
 has bind_ip          => ();
@@ -116,7 +114,7 @@ around new => sub ( $orig, $self, $uri, @args ) {
         else {
 
             # convert to URI object
-            $uri = P->uri( $uri, base => 'tcp:' ) if !is_ref $uri;
+            $uri = P->uri( $uri, base => 'tcp:' ) if !is_uri $uri;
 
             my $scheme = $uri->{scheme};
 
@@ -281,6 +279,8 @@ sub read ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomon
 # $args{read_size}
 sub read_eof ( $self, %args ) {
     if ($self) {
+        $args{timeout} = $self->{timeout} if !exists $args{timeout};
+
         while ( $self->_read( $args{read_size}, $args{timeout} ) ) { }
     }
 
@@ -298,16 +298,16 @@ sub read_line ( $self, $eol, %args ) {
         my $idx = defined $self->{rbuf} ? index $self->{rbuf}, $eol, 0 : -1;
 
         if ( $idx == 0 ) {
-            substr $self->{rbuf}, 0, length $eol, q[];
+            substr $self->{rbuf}, 0, length $eol, $EMPTY;
 
-            my $buf = q[];
+            my $buf = $EMPTY;
 
             return \$buf;
         }
         elsif ( $idx > 0 ) {
-            my $buf = substr $self->{rbuf}, 0, $idx, q[];
+            my $buf = substr $self->{rbuf}, 0, $idx, $EMPTY;
 
-            substr $self->{rbuf}, 0, length $eol, q[];
+            substr $self->{rbuf}, 0, length $eol, $EMPTY;
 
             return \$buf;
         }
@@ -335,7 +335,7 @@ sub read_chunk ( $self, $length, %args ) {
 
         while () {
             if ( my $rlen = length $self->{rbuf} ) {
-                my $buf = substr $self->{rbuf}, 0, $length, q[];
+                my $buf = substr $self->{rbuf}, 0, $length, $EMPTY;
 
                 $total_bytes += my $blen = length $buf;
 
@@ -360,7 +360,7 @@ sub read_chunk ( $self, $length, %args ) {
                     return \delete( $self->{rbuf} );
                 }
                 elsif ( $rlen > $length ) {
-                    return \substr( $self->{rbuf}, 0, $length, q[] );
+                    return \substr $self->{rbuf}, 0, $length, $EMPTY;
                 }
             }
 
@@ -374,6 +374,7 @@ sub read_chunk ( $self, $length, %args ) {
 }
 
 # returns: undef or total bytes written
+# $args{timeout}
 sub write ( $self, $buf, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
@@ -462,7 +463,6 @@ sub starttls ( $self, %args ) {
 
     $ctx{SSL_startHandshake} = 0;
     $ctx{SSL_hostname}       = $ctx{SSL_verifycn_name} = $self->{peername};
-    $ctx{SSL_dh}             = $DH_PARAM->{ delete $ctx{dh} } if $ctx{dh};
 
     $ctx{SSL_npn_protocols} = ['h2'] if $args{http2};
 
@@ -640,7 +640,7 @@ sub _parse_http_headers ( $self, $buf ) {
     #             $res->{reason} = $3;
 
     #             while ( my $header = shift @lines ) {
-    #                 if ( substr( $header, 0, 1 ) eq q[ ] ) {
+    #                 if ( substr( $header, 0, 1 ) eq $SPACE ) {
     #                     if ($parsed_headers) {
     #                         $parsed_headers->[-1] .= $header;
     #                     }
@@ -709,7 +709,7 @@ sub read_http_chunked_data ( $self, %args ) {
 
             # no trailing headers
             if ( index( $self->{rbuf}, $CRLF, 0 ) == 0 ) {
-                substr $self->{rbuf}, 0, 2, q[];
+                substr $self->{rbuf}, 0, 2, $EMPTY;
 
                 return $args{on_read} ? $total_bytes_read : \$buf;
             }
@@ -760,7 +760,7 @@ sub read_http_chunked_data ( $self, %args ) {
 
             my $chunk = $self->read_chunk( $length + 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
-            substr $chunk->$*, -2, 2, q[];
+            substr $chunk->$*, -2, 2, $EMPTY;
 
             $total_bytes_read += length $chunk->$*;
 
@@ -788,8 +788,6 @@ sub read_http_chunked_data ( $self, %args ) {
 ## |    3 | 679                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_chunked_data" with high complexity score (26)    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 740                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 363                  | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

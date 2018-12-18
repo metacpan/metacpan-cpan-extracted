@@ -1,0 +1,23 @@
+Mon Dec 17 10:16:01 2018  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.1.4-1]:
+	* cpan/buildspec.yml: add ChangeLog
+	* cpan/Makefile.am
+	- rename tarball if minor relase
+	- PHONY, not PHONEY
+	* configure.ac: bump
+
+Fri Dec  7 13:44:32 2018  Rob Lauer  <rlauer6@comcast.net>
+
+	[1.1.4]:
+	* configure.ac: bump version
+	* Makefile.am: cpan
+	* cpan/Makfile.am: new
+	* cpan/buildspec.yml: remove ref to git project, build locally
+	* src/main/perl/Makefile.am: verbose mode for tests, add -v to prove
+	* src/main/perl/lib/Amazon/API.pm.in
+	- our $VERSION
+	(pod): indicate require args in new()
+	* src/main/perl/t/amazon-api.t: only need 1 test, provide getters()
+	* bootstrap: new
+	* ChangeLog: new

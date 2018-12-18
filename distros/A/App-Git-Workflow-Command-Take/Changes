@@ -1,5 +1,12 @@
 Revision history for App-Git-Workflow-Command-Take
 
+0.6   2018-12-16
+        Updating for release of version 0.6
+        Updating dependencies (Ivan Wills)
+        Adding test for take (Ivan Wills)
+        Adding Module::Build to dependencies (Ivan Wills)
+        Removing perl 5.8 as git-workflow doesn't support it any more (Ivan Wills)
+
 0.5   2018-04-02
         Updating for release of version 0.5
         Added perl 5.26 to travis builds (Ivan Wills)

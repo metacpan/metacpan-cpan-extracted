@@ -7,6 +7,8 @@ use PPIx::Utils::Traversal qw(get_constant_name_elements_from_declaring_statemen
 use Scalar::Util qw(refaddr);
 use parent 'Perl::Critic::Policy';
 
+use Perl::Critic::TooMuchCode;
+
 sub default_themes       { return qw( maintenance )     }
 sub applies_to           { return 'PPI::Document' }
 
@@ -37,6 +39,11 @@ sub violates {
             }
         }
     }
+
+    ## Look for the signature of misparsed ternary operator.
+    ## https://github.com/adamkennedy/PPI/issues/62
+    ## Once PPI is fixe, this workaround can be eliminated.
+    Perl::Critic::TooMuchCode::__get_terop_usage(\%used, $doc);
 
     my @violations;
     my @to_report = grep { !$used{$_} } (sort keys %defined_constants);

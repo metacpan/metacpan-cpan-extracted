@@ -1,5 +1,9 @@
 TO DO:
 
+0.05 2018-12-15
+    * Fix "undefined" warning in ->guess, reported and patched by Matthäus Kiem
+      This addresses RT 128024
+
 0.04 2018-11-29
     * Type recognizers are now a tiny bit configurable
     * Support for datetime recognition

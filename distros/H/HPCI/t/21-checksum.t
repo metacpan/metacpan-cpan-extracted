@@ -42,7 +42,7 @@ sub run_test {
     my $group = HPCI->group(
         cluster => $cluster,
         base_dir => "$dir_path/scratch",
-        file_system_delay => 30,	
+        file_system_delay => 30,
         name => "T_Checksum".($count++),
         );
 

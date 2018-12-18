@@ -51,7 +51,7 @@ sub init ( $self ) {
 
     $res = $self->create_user( 'root', $root_password, 1, undef );
 
-    say $res . ( $res ? ", password: $root_password" : q[] );
+    say $res . ( $res ? ", password: $root_password" : $EMPTY );
 
     return res 200;
 }

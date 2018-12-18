@@ -1,4 +1,8 @@
-NEXT
+2.132 2018-12-16
+
+  * Depends on Config::Model 2.131
+
+2.131 2018-12-10
 
   This module was spinned off Config::Model 2.130. Here are the changes
   since version 2.130:

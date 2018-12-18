@@ -1,6 +1,12 @@
 Release history for Perl::Critic::RENEEB
 ========================================
 
+2.01  2018-12-15 13:56:00
+
+  [MISC]
+  * add subclass of NamingConventions::Capitalization with parameter to exclude by 'Full qualified namespace'
+  * improve documentation
+
 2.0   2018-11-29 16:46:00
 
   [MISC]

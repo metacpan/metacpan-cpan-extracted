@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Itself::BackendDetector ;
-$Config::Model::Itself::BackendDetector::VERSION = '2.014';
+$Config::Model::Itself::BackendDetector::VERSION = '2.016';
 # since this package is mostly targeted for dev environments
 # let the detector detect models under development
 use lib 'lib';
@@ -102,7 +102,7 @@ Config::Model::Itself::BackendDetector - Detect available read/write backends us
 
 =head1 VERSION
 
-version 2.014
+version 2.016
 
 =head1 SYNOPSIS
 

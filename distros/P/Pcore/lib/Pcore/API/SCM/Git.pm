@@ -54,6 +54,12 @@ sub scm_clone ( $self, $root, $uri, $cb = undef ) {
     return $self->_scm_cmd( [ 'clone', $uri, $root ], undef, $cb );
 }
 
+sub scm_update ( $self, $rev, $cb = undef ) {
+    ...;
+
+    return;
+}
+
 sub scm_id ( $self, $cb = undef ) {
     ...;
 
@@ -110,7 +116,7 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 58, 64, 70, 76, 82,  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |      | 88, 94, 100          |                                                                                                                |
+## |      | 88, 94, 100, 106     |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 27                   | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

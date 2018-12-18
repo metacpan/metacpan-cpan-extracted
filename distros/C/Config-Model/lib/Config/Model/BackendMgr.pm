@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.130';
+$Config::Model::BackendMgr::VERSION = '2.131';
 use Mouse;
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ sub _build_backend_obj {
         if $self->rw_config->{function};
     # try to load a specific Backend class
     my $f = $self->rw_config->{function} || 'read';
-    my $c = load_backend_class( $backend, $f );
+    my $c = $self->load_backend_class( $backend, $f );
 
     no strict 'refs';
     return $c->new( node => $self->node, name => $backend );
@@ -146,6 +146,7 @@ sub open_read_file {
 # New subroutine "load_backend_class" extracted - Thu Aug 12 18:32:37 2010.
 #
 sub load_backend_class {
+    my $self = shift;
     my $backend  = shift;
     my $function = shift;
 
@@ -183,7 +184,8 @@ sub load_backend_class {
 
     if (not defined  $class_to_load) {
         Config::Model::Exception::Model->throw(
-            error => "backend error: cannot find Perl class for backend $backend ",
+            object => $self->node,
+            error => "backend error: cannot find Perl class for backend: '$backend'",
         );
     };
     my $file_to_load = $c{$class_to_load};
@@ -379,7 +381,7 @@ sub auto_write_init {
 
     my $wb;
     my $f = $rw_config->{function} || 'write';
-    my $backend_class = load_backend_class( $backend, $f );
+    my $backend_class = $self->load_backend_class( $backend, $f );
     my $location = $self->node->name;
     my $node = $self->node;     # closure
 
@@ -500,7 +502,7 @@ sub is_auto_write_for_type {
 __PACKAGE__->meta->make_immutable;
 
 package Config::Model::DeprecatedHandle;
-$Config::Model::DeprecatedHandle::VERSION = '2.130';
+$Config::Model::DeprecatedHandle::VERSION = '2.131';
 our $AUTOLOAD;
 
 sub new {
@@ -543,11 +545,13 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.130
+version 2.131
 
 =head1 SYNOPSIS
 
  # Use BackendMgr to write data in Yaml file
+ # This example requires Config::Model::Backend::Yaml which is now
+ # shipped outside of Config::Model. Please get it on CPAN
  use Config::Model;
 
  # define configuration tree object

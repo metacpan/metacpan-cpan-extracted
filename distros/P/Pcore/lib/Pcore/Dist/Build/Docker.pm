@@ -1,13 +1,13 @@
 package Pcore::Dist::Build::Docker;
 
-use Pcore -class, -ansi;
+use Pcore -class, -ansi, -res;
 use Pcore::Util::Scalar qw[is_plain_arrayref];
 
 has dist          => ();                                     # InstanceOf ['Pcore::Dist']
-has dockerhub_api => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::DockerHub']
+has dockerhub_api => ( is => 'lazy', init_arg => undef );    # InstanceOf ['Pcore::API::Docker::Hub']
 
 sub _build_dockerhub_api($self) {
-    return Pcore::API::DockerHub->new;
+    return Pcore::API::Docker::Hub->new;
 }
 
 sub init ( $self, $args ) {
@@ -67,7 +67,7 @@ sub init ( $self, $args ) {
         # copy files
         my $files = Pcore::Util::File::Tree->new;
 
-        $files->add_dir( $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . '/docker/' );
+        $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/docker/' );
 
         # do not overwrite Dockerfile
         $files->remove_file('Dockerfile') if -f "$self->{dist}->{root}/Dockerfile";
@@ -263,7 +263,7 @@ sub status ( $self ) {
     }
 
     # index builds
-    for my $build ( sort { $b->{id} <=> $a->{id} } values $build_history->{data}->%* ) {
+    for my $build ( reverse sort { $a->{id} <=> $b->{id} } values $build_history->{data}->%* ) {
 
         # skip build if it was completed successfully, and tag was removed
         next if $build->{status_text} eq 'success' && !exists $report->{ $build->{dockertag_name} };
@@ -341,7 +341,7 @@ sub build_status ( $self ) {
             $repo_id,
             sub ($res) {
                 if ( $res && $res->{data} ) {
-                    for my $autobuild ( sort { $b->{id} <=> $a->{id} } values $res->{data}->%* ) {
+                    for my $autobuild ( reverse sort { $a->{id} <=> $b->{id} } values $res->{data}->%* ) {
                         my $build_id = "$repo_id:$autobuild->{dockertag_name}";
 
                         if ( !exists $build_history->{$build_id} ) {
@@ -443,7 +443,7 @@ sub build_status ( $self ) {
 
                     my $days = int( $delta_hours / 24 );
 
-                    my $res = q[];
+                    my $res = $EMPTY;
 
                     $res .= "$days days " if $days;
 
@@ -469,7 +469,7 @@ sub build_status ( $self ) {
         }
     }
 
-    $report2 = [ sort { $b->{created_date} cmp $a->{created_date} } $report2->@* ];
+    $report2 = [ reverse sort { $a->{created_date} cmp $b->{created_date} } $report2->@* ];
 
     print $tbl->render_all( [ $report1->@*, $report2->@*, $report3->@* ] );
 
@@ -560,6 +560,159 @@ sub trigger_build ( $self, $tag ) {
     return $res;
 }
 
+sub build_local ( $self, $tag, $args ) {
+    require Pcore::API::SCM;
+    require Pcore::API::Docker::Engine;
+
+    my $dist = $self->{dist};
+
+    print 'Cloning ... ';
+
+    # my $res = Pcore::API::SCM->scm_clone( $dist->scm->upstream->get_clone_url );
+    my $res = Pcore::API::SCM->scm_clone( $dist->{root} );
+    say $res;
+    return $res if !$res;
+
+    my $root = $res->{root};
+
+    my $repo = Pcore::Dist->new($root);
+
+    print 'Checking out ... ';
+    $res = $repo->scm->scm_update($tag);
+    say $res;
+    return $res if !$res;
+
+    # create duild tags
+    my $id      = $repo->id;
+    my $repo_id = $repo->docker->{repo_id};
+
+    my @tags;
+
+    for ( $id->{bookmark}->@*, $id->{tags}->@* ) {
+        push @tags, "$repo_id:$_";
+    }
+
+    # add dist-id.yaml
+    P->cfg->write( "$repo->{root}/share/dist-id.yaml", $id );
+
+    my $dockerignore = $self->_build_dockerignore("$root/.dockerignore");
+
+    my $tar = do {
+        require Archive::Tar;
+
+        my $_tar = Archive::Tar->new;
+
+        for my $path ( $root->read_dir( max_depth => 0, is_dir => 0 )->@* ) {
+            next if $dockerignore->($path);
+
+            my $mode;
+
+            if ( $path =~ m[\A(script|t)/]sm ) {
+                $mode = P->file->calc_chmod('rwxr-xr-x');
+            }
+            else {
+                $mode = P->file->calc_chmod('rw-r--r--');
+            }
+
+            $_tar->add_data( "$path", P->file->read_bin("$root/$path")->$*, { mode => $mode } );
+        }
+
+        $_tar->write;
+    };
+
+    my $docker = Pcore::API::Docker::Engine->new;
+
+    print 'Building image ... ';
+    $res = $docker->image_build( $tar, \@tags );
+    say $res;
+
+    # docker image build error
+    if ( !$res ) {
+
+        # store build log
+        if ( defined $res->{log} ) {
+            my $logdir = "$dist->{root}/data/.build";
+
+            P->file->mkpath($logdir) if !-d $logdir;
+
+            P->file->write_text( "$logdir/docker-build.log", $res->{log} );
+        }
+
+        return $res;
+    }
+
+    # push images
+    if ( $args->{push} ) {
+        for my $tag (@tags) {
+            print qq[Pusing image "$tag" ... ];
+            $res = $docker->image_push($tag);
+            say $res;
+        }
+    }
+
+    if ( $args->{remove} ) {
+        for my $tag (@tags) {
+            print qq[Removing image "$tag" ... ];
+            $res = $docker->image_remove($tag);
+            say $res;
+        }
+    }
+
+    return res 200;
+}
+
+sub _build_dockerignore ( $self, $path ) {
+    my ( $exclude, $include );
+
+    # https://docs.docker.com/engine/reference/builder/#dockerignore-file
+    if ( -f $path ) {
+        my ( @exclude, @include );
+
+        for my $line ( P->file->read_lines($path)->@* ) {
+
+            # skip comments
+            next if $line =~ /\A\s*#/sm;
+
+            my $pattern = quotemeta $line;
+
+            $pattern =~ s[\\[?]][[^/]]smg;
+
+            $pattern =~ s[\\[*]][[^/]*]smg;
+
+            if ( substr( $line, 0, 2 ) eq '\!' ) {
+                substr $line, 0, 2, $EMPTY;
+
+                push @include, $pattern;
+            }
+            else {
+                push @exclude, $pattern;
+            }
+        }
+
+        if (@exclude) {
+            my $pattern = join '|', @exclude;
+
+            $exclude = qr/\A(?:$pattern)/sm;
+        }
+
+        if (@include) {
+            my $pattern = join '|', @include;
+
+            $include = qr/\A(?:$pattern)/sm;
+        }
+    }
+
+    my $sub = sub ($path) {
+        if ( defined $exclude && $path =~ $exclude ) {
+            return 1 if !defined $include || $path !~ $include;
+        }
+
+        return;
+    };
+
+    return $sub;
+}
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -572,8 +725,6 @@ sub trigger_build ( $self, $tag ) {
 ## |      | 302                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 479                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 266, 344, 472        | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

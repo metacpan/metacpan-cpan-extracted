@@ -9,13 +9,17 @@ my $builder = Module::Build->new(
     dist_version_from => 'lib/App/Git/Workflow/Command/Take.pm',
     requires          => {
         'perl'                        => 5.008,
-        'App::Git::Workflow'          => '0.96009',
-        'App::Git::Workflow::Command' => '0.96009',
+        'App::Git::Workflow'          => '1.1.0',
+        'App::Git::Workflow::Command' => '1.1.0',
         'Path::Tiny'                  => 0,
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     build_requires => {
-        'Test::More'     => '0.88',
-        'Test::Warnings' => '0.026',
+        'Test::Git::Workflow::Command' => '1.1.0',
+        'Test::More'                   => '0.88',
+        'Test::Warnings'               => '0.026',
     },
     add_to_cleanup     => [ 'App-Git-Workflow-Command-Take-*' ],
     create_license     => 1,

@@ -27,7 +27,7 @@ tool is invoked on the local machine to gather the information
 dynamically.
 For that the user must be I<root> or in group I<wheel> to access
 the F<ospfd.sock> or F<ospf6d.sock>.
-If necessary B<sudo> is used for calling B<ospfctl> or B<ospf6ctl>
+If necessary B<doas> is used for calling B<ospfctl> or B<ospf6ctl>
 to gain privileges.
 
 Optionally one output file can be given on command line, otherwise

@@ -100,7 +100,7 @@ sub load_locale : prototype($) ($locale) {
                     $str =~ s/\\"/"/smg;
                     $str =~ s/\\n/\n/smg;
 
-                    if ( $str ne q[] ) {
+                    if ( $str ne $EMPTY ) {
                         if ( $current_tag eq 'msgstr' ) {
                             $msg->{msgstr}->[0] .= $str;
                         }

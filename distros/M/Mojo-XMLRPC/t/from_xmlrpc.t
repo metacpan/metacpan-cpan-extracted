@@ -140,6 +140,25 @@ $msg = from_xmlrpc(<<'MESSAGE');
 <methodResponse>
    <params>
       <param>
+         <value><dateTime.iso8601>1969-12-31T235959</dateTime.iso8601></value>
+         </param>
+      </params>
+   </methodResponse>
+MESSAGE
+
+{
+  isa_ok $msg, 'Mojo::XMLRPC::Message::Response', 'correct message type';
+  ok !$msg->is_fault, 'not a fault';
+  my $date = $msg->parameters->[0];
+  isa_ok $date, 'Mojo::Date', 'got a Mojo::Date';
+  is $date->epoch, -1, 'got the correct date';
+}
+
+$msg = from_xmlrpc(<<'MESSAGE');
+<?xml version="1.0"?>
+<methodResponse>
+   <params>
+      <param>
          <value><base64>eW91IGNhbid0IHJlYWQgdGhpcyE=</base64></value>
          </param>
       </params>

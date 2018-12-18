@@ -1,0 +1,27 @@
+package Foo;
+
+use Type::Tiny::Signatures;
+
+fun hello() {
+  ;
+}
+
+package Bar;
+
+use Type::Tiny::Signatures;
+
+fun hello() {
+  ;
+}
+
+package Baz;
+
+use Type::Tiny::Signatures;
+
+fun hello() {
+  ;
+}
+
+package main;
+
+1;

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.130';
+$Config::Model::Value::VERSION = '2.131';
 use 5.10.1;
 
 use Mouse;
@@ -351,14 +351,14 @@ sub set_migrate_from {
 sub migrate_value {
     my $self = shift;
 
-    return undef if $self->{migration_done};
-    return undef if $self->instance->initial_load;
+    return if $self->{migration_done};
+    return if $self->instance->initial_load;
     $self->{migration_done} = 1;
 
     # avoid warning when reading deprecated values
     my $result = $self->{_migrate_from}->compute( check => 'skip' );
 
-    return undef unless defined $result;
+    return unless defined $result;
 
     # check if the migrated result fits with the constraints of the
     # Value object
@@ -904,14 +904,11 @@ sub check_value {
                 $self->{warn_unless_match} );
         }
 
-        $self->run_code_set_on_value( \$value, $apply_fix, \@error, "assert failure",
-            $self->{assert} )
+        $self->run_code_set_on_value( \$value, $apply_fix, \@error, $self->{assert} )
             if $self->{assert};
-        $self->run_code_set_on_value( \$value, $apply_fix, \@warn,
-            "warn_unless code check returned false", $self->{warn_unless} )
+        $self->run_code_set_on_value( \$value, $apply_fix, \@warn, $self->{warn_unless} )
             if $self->{warn_unless};
-        $self->run_code_set_on_value( \$value, $apply_fix, \@warn,
-            "warn_if code check returned true", $self->{warn_if}, 1 )
+        $self->run_code_set_on_value( \$value, $apply_fix, \@warn, $self->{warn_if}, 1 )
             if $self->{warn_if};
     }
 
@@ -992,20 +989,20 @@ sub run_code_on_value {
 }
 
 sub run_code_set_on_value {
-    my ( $self, $value_r, $apply_fix, $array, $msg, $w_info, $invert ) = @_;
+    my ( $self, $value_r, $apply_fix, $array, $w_info, $invert ) = @_;
 
     $self->set_val;
 
     foreach my $label ( sort keys %$w_info ) {
         my $code = $w_info->{$label}{code};
-        my $msg = $w_info->{$label}{msg} || $msg;
+        my $msg = $w_info->{$label}{msg} || $label;
         $logger->trace("eval'ed code is: '$code'");
         my $fix = $w_info->{$label}{fix};
 
         my $sub = sub {
             local $_ = shift;
             no warnings "uninitialized";
-            my $ret = eval($code);
+            my $ret = eval($code); ## no critic (ProhibitStringyEval)
             if ($@) {
                 Config::Model::Exception::Model->throw(
                     object  => $self,
@@ -1078,7 +1075,7 @@ sub apply_fix {
 
     $self->set_val;
 
-    eval($fix);
+    eval($fix); ## no critic (ProhibitStringyEval)
     if ($@) {
         Config::Model::Exception::Model->throw(
             object  => $self,
@@ -1758,7 +1755,7 @@ sub fetch {
             warn "Warning: fetch [".$self->name,"] skipping value $str because of the following errors:\n$msg\n\n"
                 if not $silent and $msg;
         }
-        return undef;
+        return;
     }
 
     Config::Model::Exception::WrongValue->throw(
@@ -1898,7 +1895,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.130
+version 2.131
 
 =head1 SYNOPSIS
 
@@ -2158,7 +2155,7 @@ perform the test. A warning is issued if the given code returns true.
 C<$_> contains the value to check. C<$self> contains the
 C<Config::Model::Value> object (use with care).
 
-The example below warns if value contaims a number:
+The example below warns if value contains a number:
 
  warn_if => {
     warn_test => {
@@ -2167,6 +2164,14 @@ The example below warns if value contaims a number:
         fix  => 's/\d//g;'
     }
  },
+
+Hash key is used in warning message when C<msg> is not set:
+
+ warn_if => {
+   'should begin with foo' => {
+        code => 'defined && /^foo/'
+   }
+ }
 
 Any operation or check on file must be done with C<file> sub
 (otherwise tests will break). This sub returns a L<Path::Tiny>
@@ -2185,9 +2190,8 @@ Like C<warn_if>, but issue a warning when the given C<code> returns false.
 The example below warns unless the value points to an existing directory:
 
  warn_unless => {
-     'dir' => {
+     'missing dir' => {
           code => '-d',
-          msg => 'missing dir',
           fix => "system(mkdir $_);" }
  }
 
@@ -2203,6 +2207,8 @@ given code returns false:
         fix  => 's/\d//g;'
     }
  },
+
+hash key can also be used to generate error message when C<msg> parameter is not set.
 
 =item grammar
 

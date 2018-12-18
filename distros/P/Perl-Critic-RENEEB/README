@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.00
+    version 2.01
 
 SYNOPSIS
 
@@ -25,6 +25,17 @@ DESCRIPTION
 
     Use try{...} from Try::Tiny <https://metacpan.org/pod/Try::Tiny>
     instead of eval{...}.
+
+ Perl::Critic::Policy::Reneeb::Capitalization
+
+    Checks for capitalization of package names, subroutines, etc. It's a
+    subclass of Perl::Critic::Policy::NamingConventions::Capitalization,
+    but it adds the parameter full_qualified_package_exemptions to exclude
+    packages by "full qualified namespace".
+
+        full_qualified_package_exemptions = Test::Command::.*
+
+    excludes all packages in the Test::Command:: namespace from the check.
 
 AUTHOR
 

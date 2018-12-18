@@ -5,7 +5,7 @@ use strict;
 
 # ABSTRACT: A collection of handy Perl::Critic policies
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 
 
 1; # End of Perl::Critic::RENEEB
@@ -22,7 +22,7 @@ Perl::Critic::RENEEB - A collection of handy Perl::Critic policies
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,16 @@ I wrote this policy to check all regular expressions in my programs but those us
 =head2 L<Perl::Critic::Policy::Reneeb::ProhibitBlockEval>
 
 Use C<try{...}> from L<Try::Tiny|https://metacpan.org/pod/Try::Tiny> instead of C<eval{...}>.
+
+=head2 L<Perl::Critic::Policy::Reneeb::Capitalization>
+
+Checks for capitalization of package names, subroutines, etc. It's a subclass of
+L<Perl::Critic::Policy::NamingConventions::Capitalization>, but it adds the parameter
+C<full_qualified_package_exemptions> to exclude packages by "full qualified namespace".
+
+    full_qualified_package_exemptions = Test::Command::.*
+
+excludes all packages in the C<Test::Command::> namespace from the check.
 
 =head1 AUTHOR
 

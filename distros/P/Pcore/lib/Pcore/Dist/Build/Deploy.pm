@@ -91,7 +91,7 @@ sub _deps ($self) {
             '--metacpan', '--installdeps', q[.],
         );
 
-        say join q[ ], @args;
+        say join $SPACE, @args;
 
         P->sys->run_proc( \@args ) or return;
     }

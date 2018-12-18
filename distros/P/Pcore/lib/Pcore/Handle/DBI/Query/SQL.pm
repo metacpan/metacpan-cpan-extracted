@@ -50,7 +50,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
         return;
     }
     else {
-        return join( q[ ], @sql ), \@bind;
+        return join( $SPACE, @sql ), \@bind;
     }
 }
 

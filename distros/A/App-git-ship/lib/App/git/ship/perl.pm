@@ -1,64 +1,27 @@
 package App::git::ship::perl;
-use App::git::ship -base;
-use Cwd ();
-use File::Basename qw(dirname basename);
-use File::Path 'make_path';
-use File::Spec;
+use Mojo::Base 'App::git::ship';
+
 use Module::CPANfile;
+use Mojo::File qw(path tempfile);
 use POSIX qw(setlocale strftime LC_TIME);
+use Pod::Markdown;
+
+use constant DEBUG => $ENV{GIT_SHIP_DEBUG} || 0;
 
 my $VERSION_RE = qr{\W*\b(\d+\.[\d_]+)\b};
-
-my %FILENAMES = (changelog => [qw(CHANGELOG.md Changes)]);
-
-has main_module_path => sub {
-  my $self = shift;
-  return $self->config->{main_module_path} if $self->config->{main_module_path};
-
-  my @path = split /-/, basename(Cwd::getcwd);
-  my $path = 'lib';
-  my @name;
-
-PATH_PART:
-  for my $p (@path) {
-    opendir my $DH, $path or $self->abort("Cannot find project name from $path: $!");
-
-    for my $f (readdir $DH) {
-      $f =~ s/\.pm$//;
-      next unless lc $f eq lc $p;
-      push @name, $f;
-      $path = File::Spec->catdir($path, $f);
-      next PATH_PART;
-    }
-  }
-
-  return "$path.pm";
-};
-
-has project_name => sub {
-  my $self = shift;
-
-  return $self->config->{project_name} if $self->config->{project_name};
-
-  my @name = File::Spec->splitdir($self->main_module_path);
-  shift @name if $name[0] eq 'lib';
-  $name[-1] =~ s!\.pm$!!;
-  join '::', @name;
-};
-
-has _cpanfile => sub { Module::CPANfile->load; };
 
 sub build {
   my $self = shift;
 
   $self->clean(0);
-  $self->system(prove => split /\s/, $self->config->{build_test_options})
-    if $self->config->{build_test_options};
+  $self->system(prove => split /\s/, $self->config('build_test_options'))
+    if $self->config('build_test_options');
   $self->clean(0);
   $self->run_hook('before_build');
-  $self->_render_makefile_pl;
+  $self->_render_makefile_pl if -e 'cpanfile';
   $self->_timestamp_to_changes;
   $self->_update_version_info;
+  $self->_render_readme;
   $self->_make('manifest');
   $self->_make('dist');
   $self->run_hook('after_build');
@@ -67,16 +30,8 @@ sub build {
 
 sub can_handle_project {
   my ($class, $file) = @_;
-  my $can_handle_project = 0;
-
-  if ($file) {
-    return $file =~ /\.pm$/ ? 1 : 0;
-  }
-  if (-d 'lib') {
-    File::Find::find(sub { $can_handle_project = 1 if /\.pm$/; }, 'lib');
-  }
-
-  return $can_handle_project;
+  return $file =~ /\.pm$/ ? 1 : 0 if $file;
+  return path('lib')->list_tree->grep(sub {/\.pm$/})->size;
 }
 
 sub clean {
@@ -84,34 +39,24 @@ sub clean {
   my $all   = shift // 1;
   my @files = qw(Makefile Makefile.old MANIFEST MYMETA.json MYMETA.yml);
 
+  $self->system(qw(make clean)) if -e 'Makefile';
+
   push @files, qw(Changes.bak META.json META.yml) if $all;
-  $self->_dist_files(sub { push @files, $_; });
+  push @files, $self->_dist_files->each;
 
   for my $file (@files) {
     next unless -e $file;
     unlink $file or warn "!! rm $file: $!" and next;
-    say "\$ rm $file" unless $self->silent;
+    say "\$ rm $file" unless $self->SILENT;
   }
 
   return $self;
 }
 
-sub exe_files {
-  my $self = shift;
-  my @files;
-
-  for my $d (qw(bin script)) {
-    opendir(my $BIN, $d) or next;
-    push @files, map {"$d/$_"} grep { /^\w/ and -x File::Spec->catfile($d, $_) } readdir $BIN;
-  }
-
-  return @files;
-}
-
 sub ship {
   my $self      = shift;
-  my $dist_file = $self->_dist_files(sub {1});
-  my $changelog = $self->_filename('changelog');
+  my $dist_file = $self->_dist_files->[0];
+  my $changelog = $self->config('changelog_filename');
   my $uploader;
 
   require CPAN::Uploader;
@@ -122,12 +67,12 @@ sub ship {
     $self->abort(
       "Project built. Run 'git ship' again to post dist to CPAN and remote repostitory.");
   }
-  unless ($self->next_version) {
+  unless ($self->config('next_version')) {
     close ARGV;
     local @ARGV = $changelog;
     while (<>) {
       /^$VERSION_RE\s*/ or next;
-      $self->next_version($1);
+      $self->config(next_version => $1);
       last;
     }
   }
@@ -143,26 +88,27 @@ sub ship {
 
 sub start {
   my $self      = shift;
-  my $changelog = $self->_filename('changelog');
+  my $changelog = $self->config('changelog_filename');
 
   if (my $file = $_[0]) {
-    $file = File::Spec->catfile(lib => $file) unless $file =~ m!^.?lib!;
-    $self->config({})->main_module_path($file);
+    $file = $file =~ m!^.?lib! ? path($file) : path(lib => $file);
+    $self->config(main_module_path => $file);
     unless (-e $file) {
-      my $work_dir = lc($self->project_name) =~ s!::!-!gr;
+      my $work_dir = lc($self->config('project_name')) =~ s!::!-!gr;
       mkdir $work_dir;
       chdir $work_dir or $self->abort("Could not chdir to $work_dir");
-      make_path dirname $self->main_module_path;
-      open my $MAINMODULE, '>>', $self->main_module_path
-        or $self->abort("Could not create %s", $self->main_module_path);
+      $self->config('main_module_path')->dirname->make_path;
+      open my $MAINMODULE, '>>', $self->config('main_module_path')
+        or $self->abort("Could not create %s", $self->config('main_module_path'));
     }
   }
 
   $self->SUPER::start(@_);
-  $self->render('cpanfile');
-  $self->render('Changes') if $changelog eq 'Changes';
-  $self->render('MANIFEST.SKIP');
-  $self->render('t/00-basic.t');
+  $self->render_template('.travis.yml');
+  $self->render_template('cpanfile');
+  $self->render_template('Changes') if $changelog eq 'Changes';
+  $self->render_template('MANIFEST.SKIP');
+  $self->render_template('t/00-basic.t');
   $self->system(qw(git add cpanfile MANIFEST.SKIP t), $changelog);
   $self->system(qw(git commit --amend -C HEAD --allow-empty)) if @_;
   $self;
@@ -185,33 +131,58 @@ sub test_coverage {
 }
 
 sub update {
-  my $self    = shift;
-  my $changes = $self->_filename('changelog');
+  my $self = shift;
 
-  $self->abort("Cannot update with .git directory. Forgot to run 'git ship start'?")
-    unless -d '.git';
-
-  $self->_render_makefile_pl;
-  $self->_update_changes if $changes eq 'Changes';
-  $self->render('t/00-basic.t', {force => 1});
+  $self->_render_makefile_pl if -e 'cpanfile';
+  $self->_update_changes if $self->config('changelog_filename') eq 'Changes';
+  $self->_render_readme;
+  $self->render_template('t/00-basic.t', {force => 1});
   $self;
 }
 
-sub _author {
-  my ($self, $format) = @_;
+sub _build_config_param_changelog_filename {
+  (grep {-w} qw(CHANGELOG.md Changes))[0] || 'Changes';
+}
 
-  open my $GIT, '-|', qw(git log), "--format=$format"
-    or $self->abort("git log --format=$format: $!");
-  my $author = readline $GIT;
-  $self->abort("Could not find any author in git log") unless $author;
-  chomp $author;
-  warn "[ship::author] $format = $author\n" if DEBUG;
-  return $author;
+sub _build_config_param_new_version_format {
+  return $ENV{GIT_SHIP_NEW_VERSION_FORMAT} || '%v %Y-%m-%dT%H:%M:%S%z';
+}
+
+sub _build_config_param_main_module_path {
+  my $self = shift;
+  return path($ENV{GIT_SHIP_MAIN_MODULE_PATH}) if $ENV{GIT_SHIP_MAIN_MODULE_PATH};
+
+  my @project_name = split /-/, path->basename;
+  my $path = path 'lib';
+
+PATH_PART:
+  for my $p (@project_name) {
+    opendir my $DH, $path or $self->abort("Cannot find project name from $path: $!");
+
+    for (sort { length $b <=> length $a } readdir $DH) {
+      my $f = "$_";
+      s!\.pm$!!;
+      next unless lc eq lc $p;
+      $path = path $path, $f;
+      last PATH_PART unless -d $path;
+      next PATH_PART;
+    }
+  }
+
+  return $path;
+}
+
+sub _build_config_param_project_name {
+  my $self = shift;
+  my @name = @{$self->config('main_module_path')};
+  shift @name if $name[0] eq 'lib';
+  $name[-1] =~ s!\.pm$!!;
+  return join '::', @name;
 }
 
 sub _changes_to_commit_message {
   my $self      = shift;
-  my $changelog = $self->_filename('changelog');
+  my $changelog = $self->config('changelog_filename');
   my ($version, @message);
 
   close ARGV;    # reset <> iterator
@@ -229,21 +200,21 @@ sub _changes_to_commit_message {
 }
 
 sub _dist_files {
-  my ($self, $cb) = @_;
-  my $name = lc($self->project_name) =~ s!::!-!gr;
+  my $self = shift;
+  my $name = $self->config('project_name') =~ s!::!-!gr;
 
-  opendir(my $DH, Cwd::getcwd);
-  while (readdir $DH) {
-    next unless /^$name.*\.tar/i;
-    return $_ if $self->$cb;
-  }
-
-  return undef;
+  return path->list->grep(sub {m!\b$name.*\.tar!i});
 }
 
-sub _filename {
-  opendir(my $DH, '');
-  return (grep {-w} @{$FILENAMES{$_[1]}})[0] || $FILENAMES{$_[1]}->[-1];
+sub _exe_files {
+  my $self = shift;
+  my @files;
+
+  for my $d (qw(bin script)) {
+    push @files, path($d)->list->grep(sub {-x})->each;
+  }
+
+  return @files;
 }
 
 sub _include_mskip_file {
@@ -273,7 +244,7 @@ sub _make {
 
 sub _render_makefile_pl {
   my $self    = shift;
-  my $prereqs = $self->_cpanfile->prereqs;
+  my $prereqs = Module::CPANfile->load->prereqs;
   my $args    = {force => 1};
   my $r;
 
@@ -283,19 +254,43 @@ sub _render_makefile_pl {
   $r                      = $prereqs->requirements_for(qw(test requires))->as_string_hash;
   $args->{TEST_REQUIRES}  = $r;
 
-  $self->render('Makefile.PL', $args);
+  $self->render_template('Makefile.PL', $args);
   $self->system(qw(perl -c Makefile.PL));    # test Makefile.PL
+}
+
+sub _render_readme {
+  my $self = shift;
+  my $skip;
+
+  if (-e 'README.md') {
+    my $re = "# NAME[\\n\\r\\s]+@{[$self->config('project_name')]}\\s-\\s";
+    $skip = path('README.md')->slurp =~ m!$re! ? undef : 'Custom README.md is in place';
+  }
+  elsif (my @alternative = path->list->grep(sub {/^README/i})->each) {
+    $skip = "@alternative exists.";
+  }
+
+  if ($skip) {
+    say "# Will not generate README.md: $skip" unless $self->SILENT;
+    return;
+  }
+
+  open my $README, '>', 'README.md' or die "Write README.md: $!";
+  my $parser = Pod::Markdown->new;
+  $parser->output_fh($README);
+  $parser->parse_string_document($self->config('main_module_path')->slurp);
+  say '# Generated README.md' unless $self->SILENT;
 }
 
 sub _timestamp_to_changes {
   my $self      = shift;
-  my $changelog = $self->_filename('changelog');
+  my $changelog = $self->config('changelog_filename');
   my $loc       = setlocale(LC_TIME);
   my $release_line;
 
   $release_line = sub {
-    my $v = shift;
-    my $str = $self->config->{new_version_format} || '%v %Y-%m-%dT%H:%M:%S%z';
+    my $v   = shift;
+    my $str = $self->config('new_version_format');
     $str =~ s!(%-?\d*)v!{ sprintf "${1}s", $v }!e;
     setlocale LC_TIME, 'C';
     $str = strftime $str, localtime;
@@ -306,48 +301,46 @@ sub _timestamp_to_changes {
   local @ARGV = $changelog;
   local $^I   = '';
   while (<>) {
-    $self->next_version($1)
+    $self->config(next_version => $1)
       if s/^$VERSION_RE\x20*(?:Not Released)?\x20*([\r\n]+)/{ $release_line->($1) . $2 }/e;
     print;    # print back to same file
   }
 
-  say '# Building version ', $self->next_version unless $self->silent;
-  $self->abort('Unable to add timestamp to ./%s', $changelog) unless $self->next_version;
+  say '# Building version ', $self->config('next_version') unless $self->SILENT;
+  $self->abort('Unable to add timestamp to ./%s', $changelog) unless $self->config('next_version');
 }
 
 sub _update_changes {
   my $self = shift;
-  my $changes;
 
   unless (eval "require CPAN::Changes; 1") {
-    say "# Cannot update './Changes' without CPAN::Changes. Install using cpanm CPAN::Changes"
-      unless $self->silent;
+    say "# Cannot update './Changes' without CPAN::Changes. Install using 'cpanm CPAN::Changes'."
+      unless $self->SILENT;
     return;
   }
 
-  $changes = CPAN::Changes->load('Changes');
+  my $changes = CPAN::Changes->load('Changes');
   $changes->preamble(
-    'Revision history for perl distribution ' . ($self->project_name =~ s!::!-!gr));
-  open my $FH, '>', 'Changes' or $self->abort("Could not write CPAN::Changes to Changes: $!");
-  print $FH $changes->serialize;
-  say "# Generated Changes" unless $self->silent;
+    'Revision history for perl distribution ' . ($self->config('project_name') =~ s!::!-!gr));
+  path('Changes')->spurt($changes->serialize);
+  say "# Generated Changes" unless $self->SILENT;
 }
 
 sub _update_version_info {
   my $self    = shift;
-  my $version = $self->next_version
+  my $version = $self->config('next_version')
     or $self->abort('Internal error: Are you sure Changes has a timestamp?');
-  my %r;
 
-  local @ARGV = ($self->main_module_path);
+  local @ARGV = ($self->config('main_module_path'));
   local $^I   = '';
+  my %r;
   while (<>) {
     $r{pod} ||= s/$VERSION_RE/$version/ if /^=head1 VERSION/ .. $r{pod} && /^=(cut|head1)/ || eof;
     $r{var} ||= s/((?:our)?\s*\$VERSION)\s*=.*/$1 = '$version';/;
     print;    # print back to same file
   }
 
-  $self->abort('Could not update VERSION in %s', $self->main_module_path) unless $r{var};
+  $self->abort('Could not update VERSION in %s', $self->config('main_module_path')) unless $r{var};
 }
 
 1;
@@ -358,42 +351,136 @@ sub _update_version_info {
 
 App::git::ship::perl - Ship your Perl module
 
+=head1 SYNOPSIS
+
+  # Set up basic files for a Perl repo
+  # (Not needed if you already have an existing repo)
+  $ git ship start lib/My/Project.pm
+  $ git ship start
+
+  # Make changes
+  $ $EDITOR lib/My/Project.pm
+
+  # Build first if you want to investigate the changes
+  $ git ship build
+
+  # Ship the project to git (and CPAN)
+  $ git ship ship
+
 =head1 DESCRIPTION
 
-L<App::git::ship::perl> is a module that can ship your Perl module.
+L<App::git::ship::perl> is a module that can ship your Perl module. This tool
+differs from other tools like dzil by *NOT* requiring any configuration, except
+for a file containing the credentials for uploading to CPAN.
 
-See L<App::git::ship/SYNOPSIS>
+See also L<App::git::ship/DESCRIPTION>.
 
-=head1 ATTRIBUTES
+Example structure and how L<App::git::ship> works on your files:
 
-=head2 main_module_path
+=over 4
 
-  $str = $self->main_module_path;
+=item * my-app/cpanfile and my-app/Makefile.PL
 
-Tries to guess the path to the main module in the repository. This is done by
-looking at the repo name and try to find a file by that name. Example:
+The C<cpanfile> is used to build the "PREREQ_PM" and "BUILD_REQUIRES"
+structures in the L<ExtUtils::MakeMaker> based C<Makefile.PL> build file.
+The reason for this is that C<cpanfile> is a more powerful format that can
+be used by L<Carton> and other tools, so generating C<cpanfile> from
+Makefile.PL would simply not be possible. Other data used to generate
+Makefile.PL are:
 
-  ./my-cool-project/.git
-  ./my-cool-project/lib/My/Cool/Project.pm
+Note that the C<cpanfile> is optional and C<Makefile.PL> will be kept untouched
+unless C<cpanfile> exists.
 
-This guessing is case-insensitive.
+"NAME" and "LICENSE" will have values from L</GIT_SHIP_PROJECT_NAME> and
+L</GIT_SHIP_LICENSE>.  "AUTHOR" will have the name and email from
+L</GIT_SHIP_AUTHOR> or the last git committer.  "ABSTRACT_FROM" and
+"VERSION_FROM" are fetched from the L<App::git::ship::perl/main_module_path>.
+"EXE_FILES" will be the files in C<bin/> and C<script/> which are executable.
+"META_MERGE" will use data from L</GIT_SHIP_BUGTRACKER>, L</GIT_SHIP_HOMEPAGE>,
+and L</repository>.
 
-Instead of guessing, you can put "main_module_path" in the config file.
+=item * my-app/Changes or my-app/CHANGELOG.md
 
-=head2 project_name
+The Changes file will be updated with the correct
+L</GIT_SHIP_NEW_VERSION_FORMAT>, from when you ran the L</build> action. The
+Changes file will also be the source for L</GIT_SHIP_NEXT_VERSION>. Both
+C<CHANGELOG.md> and C<Changes> are valid sources.  L<App::git::ship> looks for
+a version-timestamp line with the case-sensitive text "Not Released" as the the
+timestamp.
 
-  $str = $self->project_name;
+=item * my-app/lib/My/App.pm
 
-Tries to figure out the project name from L</main_module_path> unless the
-L</project_name> is specified in config file.
+This L<file|App::git::ship::perl/main_module_path> will be updated with the
+version number from the Changes file.
 
-Example result: "My::Perl::Project".
+=item * .gitignore and MANIFEST.SKIP
+
+Unless these files exist, they will be generated from a template which skips
+the most common files. The default content of these two files might change over
+time if new temp files are created by new editors or some other formats come
+along.
+
+=item * t/00-basic.t
+
+Unless this file exists, it will be created with a test for checking
+that your modules can compile and that the POD is correct. The file can be
+customized afterwards and will not be overwritten.
+
+=item * .git
+
+It is important to commit any uncommitted code to your git repository beforing
+building and that you have a remote setup in your git repository before
+shipping.
+
+=item * .pause
+
+You have to have a C<$HOME/.pause> file before shipping. It should look like this:
+
+  user yourcpanusername
+  password somethingsupersecret
+
+=back
+
+=head1 ENVIRONMENT VARIABLES
+
+See L<App::git::ship/ENVIRONMENT VARIABLES> for more variables.
+
+=head2 GIT_SHIP_BUILD_TEST_OPTIONS
+
+This holds the arguments for the test program to use when building the
+project. The default is to not automatically run the tests. Example value:
+
+  GIT_SHIP_BUILD_TEST_OPTIONS="-l -j4"
+
+=head2 GIT_SHIP_CHANGELOG_FILENAME
+
+Defaults to either "CHANGELOG.md" or "Changes".
+
+=head2 GIT_SHIP_MAIN_MODULE_PATH
+
+Path to the main module in your project.
+
+=head2 GIT_SHIP_NEXT_VERSION
+
+Defaults to the version number in L</GIT_SHIP_MAIN_MODULE_PATH> + "0.01".
+
+=head2 GIT_SHIP_NEW_VERSION_FORMAT
+
+Use this to specify the version format in your "Changes" file.
+The example below will result in "## 0.42 (2014-01-28)".
+
+  GIT_SHIP_NEW_VERSION_FORMAT="\#\# %v (%F)"
+
+"%v" will be replaced by the version, while the format arguments are passed
+on to L<POSIX/strftime>.
+
+The default is "%v %Y-%m-%dT%H:%M:%S%z".
 
 =head1 METHODS
 
-  $ git ship build
-
 =head2 build
+
+  $ git ship build
 
 Used to build a Perl distribution by running through these steps:
 
@@ -405,7 +492,7 @@ Call L</clean> to make sure the repository does not contain old build files.
 
 =item 2.
 
-Run L<prove|App::Prove> if C<build_test_options> is set in C<.ship.conf>.
+Run L<prove|App::Prove> if L</GIT_SHIP_BUILD_TEST_OPTIONS> is set in L</config>.
 
 =item 3.
 
@@ -450,15 +537,6 @@ Used to clean out build files:
 Makefile, Makefile.old, MANIFEST, MYMETA.json, MYMETA.yml, Changes.bak, META.json
 and META.yml.
 
-=head2 exe_files
-
-  @files = $self->exe_files;
-
-Returns a list of files in the "bin/" and "script/" directory that has the
-executable flag set.
-
-This method is used to build the C<EXE_FILES> list in C<Makefile.PL>.
-
 =head2 ship
 
   $ git ship
@@ -498,10 +576,12 @@ Run "after_ship" L<hook|App::git::ship/Hooks>.
 
   $ git ship start
 
-Used to create main module file template and generate C<cpanfile>, C<Changes>,
-C<MANIFEST.SKIP> and C<t/00-basic.t>.
+Used to create main module file template and generate C<.travis.yml>
+C<cpanfile>, C<Changes>, C<MANIFEST.SKIP> and C<t/00-basic.t>.
 
 =head2 test_coverage
+
+  $ git ship test-coverage
 
 Use L<Devel::Cover> to check test coverage for the distribution.
 
@@ -519,10 +599,6 @@ Action for updating the basic repo files.
 =head1 SEE ALSO
 
 L<App::git::ship>
-
-=head1 AUTHOR
-
-Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
 
@@ -544,12 +620,29 @@ __DATA__
 /META*
 /MYMETA*
 /pm_to_blib
+@@ .travis.yml
+# Enable Travis Continuous Integration at https://travis-ci.org
+# Learn more https://docs.travis-ci.com
+language: perl
+sudo: false
+perl:
+  - "5.28"
+  - "5.24"
+  - "5.16"
+  - "5.14"
+  - "5.10"
+install:
+  - "cpanm -n Devel::Cover Test::Pod Test::Pod::Coverage"
+  - "cpanm -n --installdeps --with-develop ."
+after_success: "cover -test -report coveralls"
+notifications:
+  email: false
 @@ cpanfile
-# You can install this project with curl -L http://cpanmin.us | perl - <%= $_[0]->repository =~ s!\.git$!!r %>/archive/master.tar.gz
+# You can install this project with curl -L http://cpanmin.us | perl - <%= $ship->config('repository') =~ s!\.git$!!r %>/archive/master.tar.gz
 requires "perl" => "5.10.0";
 test_requires "Test::More" => "0.88";
 @@ Changes
-Revision history for perl distribution <%= $self->project_name =~ s!::!-!gr %>
+Revision history for perl distribution <%= $ship->config('project_name') =~ s!::!-!gr %>
 
 0.01 Not Released
  - Started project
@@ -557,29 +650,29 @@ Revision history for perl distribution <%= $self->project_name =~ s!::!-!gr %>
 # Generated by git-ship. See 'git-ship --man' for help or https://github.com/jhthorsen/app-git-ship
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
-  NAME           => '<%= $_[0]->project_name %>',
-  AUTHOR         => '<%= $_[0]->_author("%an <%ae>") %>',
-  LICENSE        => '<%= $_[0]->config->{license} %>',
-  ABSTRACT_FROM  => '<%= $_[0]->main_module_path %>',
-  VERSION_FROM   => '<%= $_[0]->main_module_path %>',
-  EXE_FILES      => [qw(<%= join ' ', $_[0]->exe_files %>)],
-  BUILD_REQUIRES => <%= $_[1]->{BUILD_REQUIRES} %>,
-  TEST_REQUIRES  => <%= $_[1]->{TEST_REQUIRES} %>,
-  PREREQ_PM      => <%= $_[1]->{PREREQ_PM} %>,
+  NAME           => '<%= $ship->config('project_name') %>',
+  AUTHOR         => '<%= $ship->config('author') %>',
+  LICENSE        => '<%= $ship->config('license') %>',
+  ABSTRACT_FROM  => '<%= $ship->config('main_module_path') %>',
+  VERSION_FROM   => '<%= $ship->config('main_module_path') %>',
+  EXE_FILES      => [qw(<%= join ' ', $ship->_exe_files %>)],
+  BUILD_REQUIRES => <%= $ship->dump($BUILD_REQUIRES) %>,
+  TEST_REQUIRES  => <%= $ship->dump($TEST_REQUIRES) %>,
+  PREREQ_PM      => <%= $ship->dump($PREREQ_PM) %>,
   META_MERGE     => {
     'dynamic_config' => 0,
     'meta-spec'      => {version => 2},
     'resources'      => {
-      bugtracker => {web => '<%= $_[0]->config->{bugtracker} %>'},
-      homepage   => '<%= $_[0]->config->{homepage} %>',
+      bugtracker => {web => '<%= $ship->config('bugtracker') %>'},
+      homepage   => '<%= $ship->config('homepage') %>',
       repository => {
         type => 'git',
-        url  => '<%= $_[0]->repository %>',
-        web  => '<%= $_[0]->config->{homepage} %>',
+        url  => '<%= $ship->config('repository') %>',
+        web  => '<%= $ship->config('homepage') %>',
       },
     },
   },
-  test => {S => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
+  test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.63_03') }) {
@@ -589,11 +682,13 @@ unless (eval { ExtUtils::MakeMaker->VERSION('6.63_03') }) {
 
 WriteMakefile(%WriteMakefileArgs);
 @@ MANIFEST.SKIP
-<%= $_[0]->_include_mskip_file %>
+<%= $ship->_include_mskip_file %>
 \.swp$
 ^local/
 ^MANIFEST\.SKIP
+^README\.md
 ^README\.pod
+^\.travis.yml
 @@ t/00-basic.t
 use Test::More;
 use File::Find;
@@ -619,7 +714,7 @@ find(
   -e 'blib' ? 'blib' : 'lib',
 );
 
-plan tests => @files * 3 + <%= $_[0]->_filename('changelog') eq 'Changes' ? 4 : 0 %>;
+plan tests => @files * 3 + <%= $ship->config('changelog_filename') eq 'Changes' ? 4 : 0 %>;
 
 for my $file (@files) {
   my $module = $file; $module =~ s,\.pm$,,; $module =~ s,.*/?lib/,,; $module =~ s,/,::,g;
@@ -628,4 +723,4 @@ for my $file (@files) {
   Test::Pod::Coverage::pod_coverage_ok($module, { also_private => [ qr/^[A-Z_]+$/ ], });
 }
 
-<%= $_[0]->_filename('changelog') eq 'Changes' ? 'Test::CPAN::Changes::changes_file_ok();' : '' %>
+<%= $ship->config('changelog_filename') eq 'Changes' ? 'Test::CPAN::Changes::changes_file_ok();' : '' %>

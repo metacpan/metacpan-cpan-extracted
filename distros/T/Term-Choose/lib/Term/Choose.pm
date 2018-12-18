@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.639';
+our $VERSION = '1.641';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -541,7 +541,7 @@ sub __choose {
                         $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
                     }
                 }
-                elsif ( defined $self->{meta_items} ) {
+                if ( defined $self->{meta_items} && ! $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] ) {
                     for my $meta_item ( @{$self->{meta_items}} ) {
                         if ( $meta_item == $self->{rc2idx}[$self->{pos}[ROW]][$self->{pos}[COL]] ) {
                             $self->{marked}[$self->{pos}[ROW]][$self->{pos}[COL]] = 1;
@@ -766,6 +766,9 @@ sub __write_first_screen {
     }
     if ( $self->{clear_screen} ) {
         $self->{plugin}->__clear_screen();
+    }
+    else {
+        $self->{plugin}->__clear_lines_to_end_of_screen
     }
     if ( $self->{prompt_copy} ne '' ) {
         print $self->{prompt_copy};
@@ -1169,7 +1172,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.639
+Version 1.641
 
 =cut
 

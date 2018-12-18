@@ -12,6 +12,8 @@ use File::Copy::Recursive qw(fcopy rcopy dircopy);
 use warnings;
 use strict;
 
+$File::Copy::Recursive::KeepMode = 0;
+
 my ($meta_model, $trace) = init_test();
 
 my $wr_test = setup_test_dir ;
@@ -26,10 +28,13 @@ ok($inst,"Read Itself::Model and created instance") ;
 my $root = $inst -> config_root ;
 
 # copy itself model
-my $orig_cm_dir = path('lib/Config/Model');
+# avoid patching this file for Debian autopkgtest
+my $orig_cm_dir = path($INC{'Config/Model/Itself.pm'})->parent;
 my $orig_model_dir = $orig_cm_dir->child('models');
 my $target_cm_dir = $wr_test->child('lib/Config/Model');
 my $target_model_dir = $target_cm_dir->child('models');
+note("Copying models from $orig_model_dir");
+
 # start copy *below* models.
 # See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809294
 dircopy($orig_cm_dir->stringify, $target_cm_dir->stringify);

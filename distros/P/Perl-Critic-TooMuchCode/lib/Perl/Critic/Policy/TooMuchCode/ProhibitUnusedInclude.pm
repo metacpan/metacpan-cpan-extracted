@@ -250,4 +250,8 @@ For example, L<Try::Tiny> implicity introduce a C<try> subroutine that takes a b
 lonely C<use Try::Tiny> statement without a C<try { .. }> block somewhere in its scope is considered
 to be an "Unused Include".
 
+Notice: This module use a hard-coded list of commonly-used CPAN
+modules with symbols exported from them. Althoug it is relatively
+static, it needs to be revised from time to time.
+
 =cut

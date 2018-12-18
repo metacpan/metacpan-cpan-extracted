@@ -52,4 +52,5 @@ t/20-skip.t
 t/21-checksum.t
 t/22-file_params.t
 t/23-subgroup.t
+t/24-subgroup_obj_deps.t
 TODO

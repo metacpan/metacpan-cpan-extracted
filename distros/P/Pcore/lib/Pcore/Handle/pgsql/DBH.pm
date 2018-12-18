@@ -29,7 +29,7 @@ const our $PROTOCOL_VER => "\x00\x03\x00\x00";            # v3
 
 # FRONTEND
 const our $PG_MSG_BIND             => 'B';
-const our $PG_MSG_CANCEL_REQUEST   => q[];
+const our $PG_MSG_CANCEL_REQUEST   => $EMPTY;
 const our $PG_MSG_CLOSE            => 'C';
 const our $PG_MSG_CLOSE_STATEMENT  => 'S';
 const our $PG_MSG_CLOSE_PORTAL     => 'P';
@@ -40,8 +40,8 @@ const our $PG_MSG_FUNCTION_CALL    => 'F';
 const our $PG_MSG_PARSE            => 'P';
 const our $PG_MSG_PASSWORD_MESSAGE => 'p';
 const our $PG_MSG_QUERY            => 'Q';
-const our $PG_MSG_SSL_REQUEST      => q[];
-const our $PG_MSG_STARTUP_MESSAGE  => q[];
+const our $PG_MSG_SSL_REQUEST      => $EMPTY;
+const our $PG_MSG_STARTUP_MESSAGE  => $EMPTY;
 const our $PG_MSG_SYNC             => 'S';
 const our $PG_MSG_TERMINATE        => 'X';
 
@@ -171,9 +171,9 @@ sub _start_listen ($self) {
             my ( $type, $msg_len ) = unpack 'AN', $rbuf;
 
             if ( length $rbuf > $msg_len ) {
-                my $data = substr $rbuf, 0, $msg_len + 1, q[];
+                my $data = substr $rbuf, 0, $msg_len + 1, $EMPTY;
 
-                substr $data, 0, 5, q[];
+                substr $data, 0, 5, $EMPTY;
 
                 # GENERAL MESSAGES
                 if    ( $type eq $PG_MSG_AUTHENTICATION )   { $self->_ON_AUTHENTICATION( \$data ) }
@@ -221,7 +221,7 @@ sub _on_error ( $self, $reason, $fatal ) {
         $self->{state} = $STATE_DISCONNECTED;
     }
 
-    warn qq[DBI: "$reason"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : q[] );
+    warn qq[DBI: "$reason"] . ( defined $self->{query} ? qq[, current query: "$self->{query}->$*"] : $EMPTY );
 
     if ( $state == $STATE_BUSY ) {
         $self->{sth}->{error} = $reason;
@@ -239,7 +239,7 @@ sub _ON_AUTHENTICATION ( $self, $dataref ) {
     # we are expecting authentication messages only on connect state
     die q[Unexpected] if $self->{state} != $STATE_CONNECT;
 
-    my $auth_type = unpack 'N', substr $dataref->$*, 0, 4, q[];
+    my $auth_type = unpack 'N', substr $dataref->$*, 0, 4, $EMPTY;
 
     if ( $auth_type != $PG_MSG_AUTHENTICATION_OK ) {
         if ( $auth_type == $PG_MSG_AUTHENTICATION_CLEARTEXT_PASSWORD ) {
@@ -307,7 +307,7 @@ sub _ON_ERROR_RESPONSE ( $self, $dataref ) {
     my $error;
 
     for my $str ( split /\x00/sm, $dataref->$* ) {
-        my $str_type = substr $str, 0, 1, q[];
+        my $str_type = substr $str, 0, 1, $EMPTY;
 
         $error->{ $ERROR_STRING_TYPE->{$str_type} } = $str if exists $ERROR_STRING_TYPE->{$str_type};
     }
@@ -321,12 +321,12 @@ sub _ON_NOTICE_RESPONSE ( $self, $dataref ) {
     my $warn;
 
     for my $str ( split /\x00/sm, $dataref->$* ) {
-        my $str_type = substr $str, 0, 1, q[];
+        my $str_type = substr $str, 0, 1, $EMPTY;
 
         $warn->{ $ERROR_STRING_TYPE->{$str_type} } = $str if exists $ERROR_STRING_TYPE->{$str_type};
     }
 
-    warn join q[, ], $warn->{message} // q[], $warn->{hint} // q[];
+    warn join q[, ], $warn->{message} // $EMPTY, $warn->{hint} // $EMPTY;
 
     return;
 }
@@ -444,7 +444,7 @@ sub _ON_DATA_ROW ( $self, $dataref ) {
             }
         }
         else {
-            $col = q[];
+            $col = $EMPTY;
         }
 
         push $row->@*, $col;
@@ -592,8 +592,8 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
 
     # extended query mode
     else {
-        my $query_id  = $self->{sth}->{id} // q[];
-        my $portal_id = q[];                         # uuid_v1mc_str;
+        my $query_id  = $self->{sth}->{id} // $EMPTY;
+        my $portal_id = $EMPTY;                         # uuid_v1mc_str;
 
         # parse query
         if ( !$self->{sth}->{is_parse_complete} ) {
@@ -797,7 +797,7 @@ sub selectall ( $self, $query, @args ) {
                 for my $row ( $sth->{rows}->@* ) {
                     my $ref = $data;
 
-                    $ref = $ref->{ $row->[$_] // q[] } //= {} for @key_field_idx;
+                    $ref = $ref->{ $row->[$_] // $EMPTY } //= {} for @key_field_idx;
 
                     $ref->@{@cols_names} = $row->@*;
                 }

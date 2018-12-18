@@ -5,7 +5,7 @@ use warnings;
 use FFI::Platypus;
 
 # ABSTRACT: Platypus custom type for arrays of strings
-our $VERSION = '0.58'; # VERSION
+our $VERSION = '0.59'; # VERSION
 
 
 use constant _incantation =>
@@ -102,7 +102,7 @@ sub ffi_custom_type_api_1
     $config->{native_to_perl} = sub {
       return unless defined $_[0];
       my @pointer_pointer = unpack($incantation_count, unpack($pointer_buffer, pack(_incantation, $_[0])));
-      [map { defined $_ ? $_ : $default } map { unpack('p', pack(_incantation, $_)) } @pointer_pointer];
+      [map { $_ ? unpack('p', pack(_incantation, $_)) : $default } @pointer_pointer];
     };
 
   }
@@ -124,7 +124,7 @@ FFI::Platypus::Type::StringArray - Platypus custom type for arrays of strings
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

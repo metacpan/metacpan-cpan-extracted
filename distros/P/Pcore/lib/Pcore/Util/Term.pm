@@ -61,7 +61,7 @@ sub prompt ( $msg, $opt, @ ) {
         $default_match = 1 if defined $args{default} && $args{default} eq $val;
     }
 
-    die qq[Invalid default value] if defined $args{default} && !$default_match;
+    die q[Invalid default value] if defined $args{default} && !$default_match;
 
     die q[Default value should be specified if timeout is used] if $args{timeout} && !defined $args{default};
 
@@ -84,7 +84,7 @@ sub prompt ( $msg, $opt, @ ) {
             @possible = ();
 
             # stop reading if ENTER is pressed and has default value
-            return if !defined $char && $input eq q[] && defined $args{default};
+            return if !defined $char && $input eq $EMPTY && defined $args{default};
 
             # scan possible input values
             for my $val (@opt) {
@@ -120,7 +120,7 @@ sub prompt ( $msg, $opt, @ ) {
         }
     );
 
-    $possible[0] = $args{default} if $input eq q[];    # timeout, no user input
+    $possible[0] = $args{default} if $input eq $EMPTY;    # timeout, no user input
 
     print $possible[0];
 
@@ -166,7 +166,7 @@ sub read_input {
         @_,
     );
 
-    my $input = q[];
+    my $input = $EMPTY;
 
     my $add_char = sub ($char) {
         print $args{echo_char} // $char if $args{echo};
@@ -180,7 +180,7 @@ sub read_input {
         if ( length $input ) {
             print "\e[1D\e[K" if $args{echo};
 
-            substr $input, -1, 1, q[];
+            substr $input, -1, 1, $EMPTY;
         }
 
         return;
@@ -197,7 +197,7 @@ sub read_input {
     my $clear_input = sub {
         $clear_echo->();
 
-        $input = q[];
+        $input = $EMPTY;
 
         return;
     };
@@ -208,14 +208,14 @@ sub read_input {
     my $key = Term::ReadKey::ReadKey( $args{timeout} );
 
     if ( !defined $key ) {    # timeout
-        $input = q[];
+        $input = $EMPTY;
     }
     else {
         $args{timeout} = 0;    # drop timout if user start enter something
 
-        $key =~ s/\x0D|\x0A//smg;
+        $key =~ s/[\r\n]//smg;
 
-        if ( $key eq q[] ) {    # ENTER
+        if ( $key eq $EMPTY ) {    # ENTER
             if ( $args{on_read} ) {
                 my $on_read = $args{on_read}->( $input, undef );
 
@@ -286,10 +286,6 @@ sub read_input {
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 38                   | * Subroutine "prompt" with high complexity score (25)                                                          |
 ## |      | 158                  | * Subroutine "read_input" with high complexity score (28)                                                      |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 64                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 216                  | RegularExpressions::ProhibitSingleCharAlternation - Use [\x0D\x0A] instead of \x0D|\x0A                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

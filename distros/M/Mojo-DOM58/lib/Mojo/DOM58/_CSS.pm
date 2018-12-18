@@ -7,7 +7,7 @@ package Mojo::DOM58::_CSS;
 use strict;
 use warnings;
 
-our $VERSION = '1.005';
+our $VERSION = '2.000';
 
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
@@ -35,7 +35,7 @@ sub tree {
 
 sub matches {
   my $tree = shift->tree;
-  return $tree->[0] ne 'tag' ? undef : _match(_compile(shift), $tree, $tree);
+  return $tree->[0] ne 'tag' ? undef : _match(_compile(@_), $tree, $tree);
 }
 
 sub select     { _select(0, shift->tree, _compile(@_)) }
@@ -90,7 +90,7 @@ sub _combinator {
 }
 
 sub _compile {
-  my $css = "$_[0]";
+  my ($css, %ns) = ('' . shift, @_);
   $css =~ s/^\s+//;
   $css =~ s/\s+$//;
 
@@ -128,7 +128,7 @@ sub _compile {
       my ($name, $args) = (lc $1, $2);
 
       # ":matches" and ":not" (contains more selectors)
-      $args = _compile($args) if $name eq 'matches' || $name eq 'not';
+      $args = _compile($args, %ns) if $name eq 'matches' || $name eq 'not';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
@@ -144,7 +144,10 @@ sub _compile {
 
     # Tag
     elsif ($css =~ /\G((?:$ESCAPE_RE\s|\\.|[^,.#:[ >~+])+)/gco) {
-      push @$last, ['tag', _name($1)] unless $1 eq '*';
+      my $alias = (my $name = $1) =~ s/^([^|]*)\|// && $1 ne '*' ? $1 : undef;
+      return [['invalid']] if defined $alias && length $alias && !defined $ns{$alias};
+      my $ns = defined $alias && length $alias ? $ns{$alias} : $alias;
+      push @$last, ['tag', $name eq '*' ? undef : _name($name), _unescape($ns)];
     }
 
     else {last}
@@ -181,6 +184,21 @@ sub _match {
 
 sub _name {qr/(?:^|:)\Q@{[_unescape(shift)]}\E$/}
 
+sub _namespace {
+  my ($ns, $current) = @_;
+
+  my $attr = $current->[1] =~ /^([^:]+):/ ? "xmlns:$1" : 'xmlns';
+  while ($current) {
+    last if $current->[0] eq 'root';
+    return $current->[2]{$attr} eq $ns if exists $current->[2]{$attr};
+
+    $current = $current->[3];
+  }
+
+  # Failing to match yields true if searching for no namespace, false otherwise
+  return !length $ns;
+}
+
 sub _pc {
   my ($class, $args, $current) = @_;
 
@@ -200,26 +218,35 @@ sub _pc {
   # ":root"
   return $current->[3] && $current->[3][0] eq 'root' if $class eq 'root';
 
-  # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
-  if (ref $args) {
-    my $type = $class =~ /of-type$/ ? $current->[1] : undef;
-    my @siblings = @{_siblings($current, $type)};
-    @siblings = reverse @siblings if $class =~ /^nth-last/;
-
-    for my $i (0 .. $#siblings) {
-      next if (my $result = $args->[0] * $i + $args->[1]) < 1;
-      last unless my $sibling = $siblings[$result - 1];
-      return 1 if $sibling eq $current;
-    }
+  # ":link" and ":visited"
+  if ($class eq 'link' || $class eq 'visited') {
+    return undef unless $current->[0] eq 'tag' && exists $current->[2]{href};
+    return !!grep { $current->[1] eq $_ } qw(a area link);
   }
 
   # ":only-child" or ":only-of-type"
-  elsif ($class eq 'only-child' || $class eq 'only-of-type') {
+  if ($class eq 'only-child' || $class eq 'only-of-type') {
     my $type = $class eq 'only-of-type' ? $current->[1] : undef;
     $_ ne $current and return undef for @{_siblings($current, $type)};
     return 1;
   }
 
+  # ":nth-child", ":nth-last-child", ":nth-of-type" or ":nth-last-of-type"
+  if (ref $args) {
+    my $type = $class eq 'nth-of-type'
+      || $class eq 'nth-last-of-type' ? $current->[1] : undef;
+    my @siblings = @{_siblings($current, $type)};
+    @siblings = reverse @siblings
+      if $class eq 'nth-last-child' || $class eq 'nth-last-of-type';
+
+    for my $i (0 .. $#siblings) {
+      next if (my $result = $args->[0] * $i + $args->[1]) < 1;
+      return undef unless my $sibling = $siblings[$result - 1];
+      return 1 if $sibling eq $current;
+    }
+  }
+
+  # Everything else
   return undef;
 }
 
@@ -246,13 +273,19 @@ sub _selector {
     my $type = $s->[0];
 
     # Tag
-    if ($type eq 'tag') { return undef unless $current->[1] =~ $s->[1] }
+    if ($type eq 'tag') {
+      return undef if defined $s->[1] && $current->[1] !~ $s->[1];
+      return undef if defined $s->[2] && !_namespace($s->[2], $current);
+    }
 
     # Attribute
     elsif ($type eq 'attr') { return undef unless _attr(@$s[1, 2], $current) }
 
     # Pseudo-class
     elsif ($type eq 'pc') { return undef unless _pc(@$s[1, 2], $current) }
+
+    # Invalid selector
+    else { return undef }
   }
 
   return 1;
@@ -287,7 +320,7 @@ sub _siblings {
 }
 
 sub _unescape {
-  my $value = shift;
+  return undef unless defined(my $value = shift);
 
   # Remove escaped newlines
   $value =~ s/\\\n//g;
@@ -308,6 +341,9 @@ sub _value {
 
   # "~=" (word)
   return qr/(?:^|\s+)$value(?:\s+|$)/ if $op eq '~';
+
+  # "|=" (hyphen-separated)
+  return qr/^$value(?:-|$)/ if $op eq '|';
 
   # "*=" (contains)
   return qr/$value/ if $op eq '*';

@@ -50,6 +50,30 @@ my %warn_if_match_payload = (
     @warp_in_string_like_parameter,
 );
 
+my @warp_in_leaf_parameter = (
+    warp => {
+        follow => {
+            'type'  => '?type',
+            'vtype' => '?value_type',
+        },
+        'rules' => [
+            '$type eq "leaf"' => { level => 'normal', }
+        ]
+    },
+
+);
+
+my %warn_if = (
+    type       => 'hash',
+    index_type => 'string',
+    level      => 'hidden',
+    cargo      => {
+        type              => 'node',
+        config_class_name => 'Itself::CommonElement::WarnIfMatch',
+    },
+    @warp_in_leaf_parameter,
+);
+
 my %assert_payload = (
     type       => 'hash',
     index_type => 'string',
@@ -58,7 +82,7 @@ my %assert_payload = (
         type              => 'node',
         config_class_name => 'Itself::CommonElement::Assert',
     },
-    @warp_in_string_like_parameter,
+    @warp_in_leaf_parameter,
 );
 
 [

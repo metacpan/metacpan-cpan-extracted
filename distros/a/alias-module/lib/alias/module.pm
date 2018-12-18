@@ -1,17 +1,20 @@
 package alias::module;
 
-our $DATE = '2018-01-06'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-12-15'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 
 sub import {
     my $class = shift;
+    my $noreq = $_[0] eq '-norequire' ? shift : 0;
     my $orig  = shift;
 
     my $caller = caller();
 
-    (my $orig_pm = "$orig.pm") =~ s!::!/!g;
-    require $orig_pm;
+    unless ($noreq) {
+        (my $orig_pm = "$orig.pm") =~ s!::!/!g;
+        require $orig_pm;
+    }
     *{$caller . "::"} = \*{$orig . "::"};
 }
 
@@ -30,12 +33,16 @@ alias::module - Alias one module as another
 
 =head1 VERSION
 
-This document describes version 0.001 of alias::module (from Perl distribution alias-module), released on 2018-01-06.
+This document describes version 0.002 of alias::module (from Perl distribution alias-module), released on 2018-12-15.
 
 =head1 SYNOPSIS
 
  package Your::Alias::Name;
  use alias::module 'Some::Real::Module::Name';
+
+To avoid require()-ing:
+
+ use alias::module '-norequire', 'Some::Real::Module::Name';
 
 =head1 DESCRIPTION
 
@@ -53,7 +60,8 @@ is equivalent to:
  }
  use Package::Alias 'Your::Alias::Name' => 'Some::Real::Module::Name';
 
-It is useful if you want to let users access a module's functionality under a
+except that this module does not use L<Package::Alias> and is simpler. It is
+useful if you want to let users access a module's functionality under a
 different (usually shorter) name.
 
 =head1 HOMEPAGE

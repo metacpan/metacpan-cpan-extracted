@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.130';
+$Config::Model::VERSION = '2.131';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -1841,7 +1841,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.130
+version 2.131
 
 =head1 SYNOPSIS
 
@@ -2801,10 +2801,6 @@ L<Config::Model::Backend::PlainFile> <- L<Config::Model::Backend::Any>
 =item *
 
 L<Config::Model::Backend::ShellVar> <- L<Config::Model::Backend::Any>
-
-=item *
-
-L<Config::Model::Backend::Yaml> <- L<Config::Model::Backend::Any>
 
 =back
 

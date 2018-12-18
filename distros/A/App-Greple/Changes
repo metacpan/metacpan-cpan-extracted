@@ -1,5 +1,18 @@
 Revision history for Perl application 'greple'.
 
+8.3201 2018-12-17T11:38:08Z
+
+    - Update lib/line.pm and lib/NumberUtil.pm.
+
+8.31 2018-10-14T03:01:31Z
+
+    - Update for Getopt::EX::Colormap color spec change.
+
+8.30 2018-09-06T13:42:17Z
+
+    - Fix behavior of -c option.
+    - Introduce --matchcount option.
+
 8.2901 2018-08-16T05:40:16Z
 
     - Support https: as well as http:

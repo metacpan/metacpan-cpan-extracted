@@ -9,7 +9,7 @@ use XML::Simple;
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_accessors(qw/error api message_raw response content_type/);
 
-our $VERSION = '1.1.4'; $VERSION=~s/\-.*$//;
+our $VERSION = '1.1.4-1'; $VERSION=~s/\-.*$//;
 
 =pod
 

@@ -12,24 +12,23 @@ WriteMakefile(
     PL_FILES       => {},
     PREREQ_PM      => {
       'AWS::Signature4' => '1.02',
-      'Amazon::Credentials' => '1.0.7',
-      'Class::Accessor' => '0.31',
-      'Data::Dumper' => '2.145',
-      'Exporter' => '5.68',
-      'HTTP::Request' => '6.00',
-      'JSON' => '2.59',
-      'LWP::UserAgent' => '6.05',
+      'Amazon::Credentials' => '1.0.10',
+      'Class::Accessor' => '0.51',
+      'Data::Dumper' => '2.170',
+      'Exporter' => '5.73',
+      'HTTP::Request' => '6.18',
+      'JSON' => '4.00',
+      'LWP::UserAgent' => '6.36',
       'Scalar::Util' => '1.5',
-      'XML::Simple' => '2.20',
-      'parent' => '0.225',
-      'strict' => '1.07',
-      'vars' => '1.02',
-      'warnings' => '1.13'
+      'XML::Simple' => '2.25',
+      'parent' => '0.236',
+      'strict' => '1.11',
+      'vars' => '1.04',
+      'warnings' => '1.42'
     }
 ,
     TEST_REQUIRES  => {
-      'Amazon::API' => '1.1.4',
-      'Test::More' => '1.001014'
+      'Test::More' => '1.302133'
     }
 
 );

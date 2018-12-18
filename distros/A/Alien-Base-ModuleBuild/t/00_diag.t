@@ -7,6 +7,7 @@ my @mods = qw(
   Acme::Ford::Prefect::FFI
   Alien::Build
   Archive::Extract
+  Archive::Tar
   Capture::Tiny
   File::Spec
   File::Temp
@@ -16,6 +17,7 @@ my @mods = qw(
   Inline
   Inline::C
   Inline::CPP
+  LWP::UserAgent
   Module::Build
   Net::FTP
   Shell::Config::Generate

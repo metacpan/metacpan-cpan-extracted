@@ -1,28 +1,6 @@
 {
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-   },
-   "provides" : {
-      "Config::Perl::V" : {
-         "version" : "0.30",
-         "file" : "V.pm"
-      }
-   },
-   "version" : "0.30",
-   "generated_by" : "Author",
+   "version" : "0.31",
    "prereqs" : {
-      "test" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
-         }
-      },
-      "build" : {
-         "requires" : {
-            "perl" : "5.006"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -33,26 +11,48 @@
             "Config" : "0",
             "perl" : "5.006"
          }
+      },
+      "build" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::NoWarnings" : "0",
+            "Test::More" : "0"
+         }
       }
+   },
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
    },
    "name" : "Config-Perl-V",
    "dynamic_config" : 1,
-   "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "web" : "https://github.com/Tux/Config-Perl-V",
-         "url" : "https://github.com/Tux/Config-Perl-V",
-         "type" : "git"
-      },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+   "provides" : {
+      "Config::Perl::V" : {
+         "file" : "V.pm",
+         "version" : "0.31"
+      }
    },
-   "license" : [
-      "perl_5"
-   ],
+   "release_status" : "stable",
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>"
    ],
+   "generated_by" : "Author",
+   "license" : [
+      "perl_5"
+   ],
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tux/Config-Perl-V",
+         "web" : "https://github.com/Tux/Config-Perl-V"
+      }
+   },
    "abstract" : "Structured data retrieval of perl -V output"
 }

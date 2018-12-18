@@ -108,7 +108,7 @@ sub _respond ( $self, @ ) {
             $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $body->$*, encode_utf8 $body->$*;
         }
         elsif ( is_plain_arrayref $body ) {
-            my $buf1 = join q[], map { encode_utf8 $_} $body->@*;
+            my $buf1 = join $EMPTY, map { encode_utf8 $_} $body->@*;
 
             $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $buf1, $buf1;
         }

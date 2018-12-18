@@ -7,8 +7,8 @@ use 5.014000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Method/Function Signatures w/Type::Tiny Constraints",
-  "AUTHOR" => "Al Newkirk <anewkirk\@ana.io>",
+  "ABSTRACT" => "Type::Tiny Method/Function Signatures",
+  "AUTHOR" => "Al Newkirk <al\@iamalnewkirk.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Function::Parameters" => "2.001003",
     "Type::Tiny" => "1.004002"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.71.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

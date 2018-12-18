@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 82 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 91 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah.pm',
@@ -30,6 +30,8 @@ my @module_files = (
     'Data/Sah/Compiler/human/TH/cistr.pm',
     'Data/Sah/Compiler/human/TH/code.pm',
     'Data/Sah/Compiler/human/TH/date.pm',
+    'Data/Sah/Compiler/human/TH/datenotime.pm',
+    'Data/Sah/Compiler/human/TH/datetime.pm',
     'Data/Sah/Compiler/human/TH/duration.pm',
     'Data/Sah/Compiler/human/TH/float.pm',
     'Data/Sah/Compiler/human/TH/hash.pm',
@@ -38,6 +40,7 @@ my @module_files = (
     'Data/Sah/Compiler/human/TH/obj.pm',
     'Data/Sah/Compiler/human/TH/re.pm',
     'Data/Sah/Compiler/human/TH/str.pm',
+    'Data/Sah/Compiler/human/TH/timeofday.pm',
     'Data/Sah/Compiler/human/TH/undef.pm',
     'Data/Sah/Compiler/perl.pm',
     'Data/Sah/Compiler/perl/TH.pm',
@@ -49,6 +52,8 @@ my @module_files = (
     'Data/Sah/Compiler/perl/TH/cistr.pm',
     'Data/Sah/Compiler/perl/TH/code.pm',
     'Data/Sah/Compiler/perl/TH/date.pm',
+    'Data/Sah/Compiler/perl/TH/datenotime.pm',
+    'Data/Sah/Compiler/perl/TH/datetime.pm',
     'Data/Sah/Compiler/perl/TH/duration.pm',
     'Data/Sah/Compiler/perl/TH/float.pm',
     'Data/Sah/Compiler/perl/TH/hash.pm',
@@ -57,6 +62,7 @@ my @module_files = (
     'Data/Sah/Compiler/perl/TH/obj.pm',
     'Data/Sah/Compiler/perl/TH/re.pm',
     'Data/Sah/Compiler/perl/TH/str.pm',
+    'Data/Sah/Compiler/perl/TH/timeofday.pm',
     'Data/Sah/Compiler/perl/TH/undef.pm',
     'Data/Sah/Human.pm',
     'Data/Sah/Lang.pm',
@@ -75,6 +81,8 @@ my @module_files = (
     'Data/Sah/Type/cistr.pm',
     'Data/Sah/Type/code.pm',
     'Data/Sah/Type/date.pm',
+    'Data/Sah/Type/datenotime.pm',
+    'Data/Sah/Type/datetime.pm',
     'Data/Sah/Type/duration.pm',
     'Data/Sah/Type/float.pm',
     'Data/Sah/Type/hash.pm',
@@ -83,6 +91,7 @@ my @module_files = (
     'Data/Sah/Type/obj.pm',
     'Data/Sah/Type/re.pm',
     'Data/Sah/Type/str.pm',
+    'Data/Sah/Type/timeofday.pm',
     'Data/Sah/Type/undef.pm',
     'Data/Sah/Util/Func.pm',
     'Data/Sah/Util/Role.pm',

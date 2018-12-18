@@ -1,5 +1,9 @@
 Revision history for Struct-Path-PerlStyle
 
+0.91    2018-12-16
+        - move to new Struct::Path format for hash regs
+        - cosmetics
+
 0.90    2017-07-27
         - parser rewritten using Text::Balanced, angle brackets used for aliases
         - hooks now is a full featured perl expressions (evaluated using Safe.pm)

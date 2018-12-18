@@ -6,6 +6,15 @@
 
 =head2 read CSV
 
+    use Text::CSV_XS qw[];
+
+    my $data = Text::CSV_XS::csv(
+        in         => $tsv,
+        sep_char   => "\t",
+        quote_char => q["],      # undef
+        headers    => 'auto',    # undef to return ArrayRef[ArrayRef]
+    );
+
 =head2 write CSV
 
     use Text::CSV_XS qw[];

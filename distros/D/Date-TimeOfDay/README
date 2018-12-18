@@ -1,0 +1,83 @@
+NAME
+    Date::TimeOfDay - Represent time of day (hh:mm:ss)
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+     use Date::TimeOfDay;
+
+     my $tod = Date::TimeOfDay->new(
+         hour=>23, minute=>59, second=>59,
+         # nanosecond => 999_999_999, # optional
+     );
+
+DESCRIPTION
+    EARLY RELEASE, API MIGHT CHANGE WITHOUT NOTICE.
+
+    This is a simple module to represent time of day. Interface is modelled
+    after DateTime. Internal representation is currently float (number of
+    seconds from midnight 00:00:00). Currently does not handle leap second
+    nor time zone.
+
+    TODO:
+
+     * set
+     * strftime
+     * add DateTime + TimeOfDay
+     * add TimeOfDay + TimeOfDay
+     * convert to duration
+     * convert to another time zone
+
+METHODS
+  new
+  from_hms
+    Example:
+
+     my $tod = Date::TimeOfDay->from_hms(hms => "23:59:59");
+     say $tod; # => "23:59:59"
+
+  from_float
+    Example:
+
+     my $tod = Date::TimeOfDay->from_float(float => 86399);
+     say $tod; # => "23:59:59"
+
+  now_local
+  hires_now_local
+  now_utc
+  hires_now_utc
+  hour
+  minute
+  second
+  nanosecond
+  float
+  hms
+    Usage:
+
+     $tod->hms([ $sep ])
+
+    Default separator is ":".
+
+  (TODO) set
+  (TODO) strftime
+  stringify
+    Is also invoked via overload of q("").
+
+  compare
+    Example:
+
+     $tod->compare($tod2); # -1 if $tod is less than $tod2, 0 if equal, 1 if greater than
+
+SEE ALSO
+    DateTime
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

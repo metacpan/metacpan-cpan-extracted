@@ -4,13 +4,13 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.502';
+our $VERSION = '0.503';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
 
 use Term::Choose::LineFold  qw( line_fold print_columns cut_to_printwidth );
-use Term::Choose::Constants qw( :form );
+use Term::Choose::Constants qw( :form :screen );
 
 
 my $Plugin;
@@ -183,6 +183,7 @@ sub readline {
     $self->{i}{sep}       = '';
     local $| = 1;
     $self->__init_term();
+    print SHOW_CURSOR;
     $self->__prepare_width();
     $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
     $self->{i}{th} = 35 if $self->{i}{th} > 35;
@@ -771,6 +772,7 @@ sub fill_form {
     my $auto_up = $opt->{auto_up};
     $self->__init_term();
     local $| = 1;
+    print SHOW_CURSOR;
     my ( $maxcols, $maxrows ) = $self->{pg}->__get_term_size();
     $self->__prepare_size( $opt, $list, $maxcols, $maxrows );
     $self->__write_first_screen( $opt, $list, 0, $auto_up );
@@ -1051,7 +1053,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.502
+Version 0.503
 
 =cut
 

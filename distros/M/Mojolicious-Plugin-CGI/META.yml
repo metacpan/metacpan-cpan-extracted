@@ -24,5 +24,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-cgi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-cgi
   repository: https://github.com/jhthorsen/mojolicious-plugin-cgi.git
-version: '0.39'
+version: '0.40'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

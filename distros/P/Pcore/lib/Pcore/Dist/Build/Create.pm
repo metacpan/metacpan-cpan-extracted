@@ -67,7 +67,7 @@ sub run ($self) {
     # copy files
     my $files = Pcore::Util::File::Tree->new;
 
-    my $tmpl_cfg = P->cfg->read( $ENV->{share}->get( 'Pcore', 'dist-tmpl', 'cfg.ini' ) );
+    my $tmpl_cfg = $ENV->{share}->read_cfg('/Pcore/dist-tmpl/cfg.ini');
 
     my $tmpl_params = $self->tmpl_params;
 
@@ -76,7 +76,7 @@ sub run ($self) {
             __SUB__->($parent);
         }
 
-        my $tmpl_path = $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . "/tmpl-$name/";
+        my $tmpl_path = $ENV->{share}->get_location('/Pcore/dist-tmpl') . "/tmpl-$name/";
 
         $files->add_dir($tmpl_path) if -d $tmpl_path;
 
@@ -90,10 +90,10 @@ sub run ($self) {
     # add SCM files
     if ( $self->{upstream_hosting} ) {
         if ( $self->{local_scm_type} eq $SCM_TYPE_HG ) {
-            $files->add_dir( $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . '/hg/' );
+            $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/hg/' );
         }
         elsif ( $self->{local_scm_type} eq $SCM_TYPE_GIT ) {
-            $files->add_dir( $ENV->{share}->get_storage( 'Pcore', 'dist-tmpl' ) . '/git/' );
+            $files->add_dir( $ENV->{share}->get_location('Pcore/dist-tmpl') . '/git/' );
         }
     }
 
@@ -149,7 +149,7 @@ sub _create_upstream_repo ($self) {
 
     print qq[Cloning upstream repository "$clone_uri" ... ];
 
-    my $clone_res = Pcore::API::SCM->scm_clone( $clone_uri, $self->target_path, $self->{local_scm_type} );
+    my $clone_res = Pcore::API::SCM->scm_clone( $clone_uri, root => $self->target_path, type => $self->{local_scm_type} );
 
     say $clone_res;
 

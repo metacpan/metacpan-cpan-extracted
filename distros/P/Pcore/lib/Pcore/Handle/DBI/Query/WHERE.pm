@@ -217,7 +217,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
     }
 
     if (@sql) {
-        return ( $final ? 'WHERE (' : '(' ) . join( q[ ], @sql ) . ')', \@bind;
+        return ( $final ? 'WHERE (' : '(' ) . join( $SPACE, @sql ) . ')', \@bind;
     }
     else {
         return;

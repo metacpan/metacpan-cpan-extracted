@@ -9,7 +9,7 @@ use Config qw[%Config];
 use overload    #
   q[bool] => sub { return $_[0]->is_success },
   q[<=>]  => sub { return !$_[2] ? $_[0]->_get_exit_code <=> $_[1] : $_[1] <=> $_[0]->_get_exit_code },
-  q[""]   => sub { return $_[0]->{status} . q[ ] . $_[0]->{reason} },
+  q[""]   => sub { return $_[0]->{status} . $SPACE . $_[0]->{reason} },
   fallback => undef;
 
 has win32_alive_timeout => 0.5;
@@ -169,10 +169,10 @@ sub _create_process ( $self, $cmd, $win32_cflags, $restore ) {
         Win32::Process::Create(    #
             my $win32_proc,
             $ENV{COMSPEC},
-            q[/D /C "] . join( q[ ], $cmd->@* ) . q["],
+            '/D /C "' . join( $SPACE, $cmd->@* ) . '"',
             1,                     # inherit STD* handles
             $win32_cflags,
-            q[.]
+            '.'
         );
 
         $restore->();

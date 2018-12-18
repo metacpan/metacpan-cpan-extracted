@@ -8,11 +8,11 @@ use Mojo::mysql::Database;
 use Mojo::mysql::Migrations;
 use Mojo::URL;
 use Scalar::Util 'weaken';
-use SQL::Abstract;
+use SQL::Abstract::mysql;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
-has abstract        => sub { SQL::Abstract->new(quote_char => chr(96), name_sep => '.') };
+has abstract        => sub { SQL::Abstract::mysql->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
 has database_class  => 'Mojo::mysql::Database';
 has dsn             => 'dbi:mysql:dbname=test';
@@ -141,8 +141,15 @@ Mojo::mysql - Mojolicious and Async MySQL
 
   use Mojo::mysql;
 
-  # Create a table
+  # Connect to a local database
   my $mysql = Mojo::mysql->strict_mode('mysql://username@/test');
+
+  # Connect to a remote database
+  my $mysql = Mojo::mysql->strict_mode('mysql://username:password@hostname/test');
+  # MySQL >= 8.0:
+  my $mysql = Mojo::mysql->strict_mode('mysql://username:password@hostname/test;mysql_ssl=1');
+
+  # Create a table
   $mysql->db->query(
     'create table names (id integer auto_increment primary key, name text)');
 
@@ -164,7 +171,7 @@ Mojo::mysql - Mojolicious and Async MySQL
   say $db->query('insert into names (name) values (?)', 'Daniel')
     ->last_insert_id;
 
-  # Use SQL::Abstract to generate queries for you
+  # Use SQL::Abstract::mysql to generate queries for you
   $db->insert('names', {name => 'Isabel'});
   say $db->select('names', undef, {name => 'Isabel'})->hash->{id};
   $db->update('names', {name => 'Bel'}, {name => 'Isabel'});
@@ -286,9 +293,9 @@ L<Mojo::mysql> implements the following attributes.
 =head2 abstract
 
   $abstract = $mysql->abstract;
-  $mysql    = $mysql->abstract(SQL::Abstract->new);
+  $mysql    = $mysql->abstract(SQL::Abstract::mysql->new);
 
-L<SQL::Abstract> object used to generate CRUD queries for L<Mojo::mysql::Database>.
+L<SQL::Abstract::mysql> object used to generate CRUD queries for L<Mojo::mysql::Database>.
 
   # Generate statements and bind values
   my ($stmt, @bind) = $mysql->abstract->select('names');

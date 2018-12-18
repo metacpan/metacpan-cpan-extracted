@@ -1,5 +1,15 @@
+0.04 2018-12-17
+    * Plack prerequisite version is now 1.0047, also we now enforce the
+      HTTP::Request prerequisite version of 6+
+    * No need to upgrade
+
+0.03 2018-12-16
+    * Up the Plack::Request prerequisite in an attempt to narrow it down some
+      more (instead of setting it to 1.0047, the current version that is known
+      to work)
+
 0.02 2018-12-13
-    * Fixed test prerequisites
+    * Fixed test prerequisites (at least parts of Github #1)
     * Added bugtracker and license to the documentation
 
 0.01 2018-12-11

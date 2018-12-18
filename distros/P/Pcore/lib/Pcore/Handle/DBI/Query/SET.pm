@@ -63,7 +63,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
         return;
     }
     else {
-        return ( $final ? 'SET ' : q[] ) . join( q[ ], @sql ), \@bind;
+        return ( $final ? 'SET ' : $EMPTY ) . join( $SPACE, @sql ), \@bind;
     }
 }
 

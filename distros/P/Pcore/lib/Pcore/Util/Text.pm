@@ -212,7 +212,7 @@ sub table {
 
 sub remove_ansi {
     if ( defined wantarray ) {
-        return join q[], map {s/\e.+?m//smgr} @_;
+        return join $EMPTY, map {s/\e.+?m//smgr} @_;
     }
     else {
         for (@_) {    # convert in-place
@@ -273,9 +273,9 @@ sub escape_scalar {
         }
     }
     else {
-        my $esc_color = $args{esc_color} || q[];
+        my $esc_color = $args{esc_color} || $EMPTY;
 
-        my $reset_color = $args{esc_color} ? $args{reset_color} : q[];
+        my $reset_color = $args{esc_color} ? $args{reset_color} : $EMPTY;
 
         s/([\a\b\t\n\f\r\e])/${esc_color}$ESC_ANSI_CTRL{$1}${reset_color}/smg;    # escape ANSI
 
@@ -311,24 +311,24 @@ sub wrap ( $text, $width, % ) {
             else         {qr/(\s)/sm}
         };
 
-        my $buf = q[];
+        my $buf = $EMPTY;
 
         my $buf_len = 0;
 
-        for my $word ( grep { $_ ne q[] } split $wrap_re ) {
+        for my $word ( grep { $_ ne $EMPTY } split $wrap_re ) {
             if ( $ansi && $word =~ /\e.+?m/sm ) {
                 $buf .= $word;
             }
             elsif ( $buf_len + length $word > $width ) {
 
                 # wrap by any character
-                # $buf .= substr $word, 0, $width - $buf_len, q[];
+                # $buf .= substr $word, 0, $width - $buf_len, $EMPTY;
 
                 # drop current buf to @lines
-                push @lines, $buf if $buf ne q[];
+                push @lines, $buf if $buf ne $EMPTY;
 
                 while ( length $word > $width ) {
-                    push @lines, substr $word, 0, $width, q[];
+                    push @lines, substr $word, 0, $width, $EMPTY;
                 }
 
                 # init next buf
@@ -341,7 +341,7 @@ sub wrap ( $text, $width, % ) {
             }
         }
 
-        push @lines, $buf if $buf ne q[];
+        push @lines, $buf if $buf ne $EMPTY;
 
         return @lines;
     };
@@ -355,7 +355,7 @@ sub wrap ( $text, $width, % ) {
 
     # process ansi seq.
     if ( $args{ansi} ) {
-        my $ansi_prefix = q[];
+        my $ansi_prefix = $EMPTY;
 
         for my $line (@lines) {
             my $cur_ansi_prefix = $ansi_prefix;
@@ -364,10 +364,10 @@ sub wrap ( $text, $width, % ) {
                 if ( $ansi[-1] ne "\e[0m" ) {
                     $line .= "\e[0m";
 
-                    $ansi_prefix .= join q[], @ansi;
+                    $ansi_prefix .= join $EMPTY, @ansi;
                 }
                 else {
-                    $ansi_prefix = q[];
+                    $ansi_prefix = $EMPTY;
                 }
             }
             elsif ($cur_ansi_prefix) { $line .= "\e[0m" }
@@ -386,12 +386,12 @@ sub wrap ( $text, $width, % ) {
             if ( $args{align} == -1 ) {
 
                 # right
-                $line .= ( q[ ] x ( $width - $len ) );
+                $line .= ( $SPACE x ( $width - $len ) );
             }
             elsif ( $args{align} == 1 ) {
 
                 # left
-                $line = q[ ] x ( $width - $len ) . $line;
+                $line = $SPACE x ( $width - $len ) . $line;
             }
             elsif ( $args{align} == 0 ) {
 
@@ -399,7 +399,7 @@ sub wrap ( $text, $width, % ) {
                 my $left  = int( ( $width - $len ) / 2 );
                 my $right = $width - $len - $left;
 
-                $line = ( q[ ] x $left ) . $line . ( q[ ] x $right );
+                $line = ( $SPACE x $left ) . $line . ( $SPACE x $right );
             }
             else {
                 die q[Invalid align value];
@@ -448,14 +448,14 @@ sub expand_num ($num) {
 
     my ( $abs, $sign, $exp ) = ( $1, $2, $3 );
 
-    my $sig = $sign eq q[-] ? q[.] . ( $exp - 1 + length $abs ) : q[];
+    my $sig = $sign eq q[-] ? q[.] . ( $exp - 1 + length $abs ) : $EMPTY;
 
     return sprintf "%${sig}f", $num;
 }
 
 # pretty print number 1234567 -> 1_234_567
 sub add_num_sep ( $num, $sep = q[_] ) {
-    my $sign = $num =~ s/\A([^\d])//sm ? $1 : q[];
+    my $sign = $num =~ s/\A([^\d])//sm ? $1 : $EMPTY;
 
     my $fraction = $num =~ s/[.](\d+)\z//sm ? $1 : undef;
 

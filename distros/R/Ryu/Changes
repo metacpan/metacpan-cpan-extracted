@@ -1,5 +1,12 @@
 Revision history for Ryu
 
+0.032     2018-12-15 20:20:24+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->buffer now supports high/low watermark
+    - ->is_paused($obj) will check to see if the node is
+    paused on request from $obj
+
 0.031     2018-12-13 23:03:16+08:00 Asia/Kuala_Lumpur
     New features:
 

@@ -1,5 +1,17 @@
 Revision history for Ryu-Async
 
+0.013     2018-12-15 20:54:20+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support for the writeready events on IO::Async::Stream
+    for Ryu sink flow control
+
+    Bugs fixed:
+
+    - the initial value in a ->from arrayref was not deferred,
+    so it would be emitted before anything had a chance to attach
+    a chained handler
+
 0.012     2018-12-13 22:31:05+08:00 Asia/Kuala_Lumpur
     New features:
 

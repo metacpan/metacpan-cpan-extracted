@@ -1,3 +1,10 @@
+1.10 2018-12-17
+    - Perl 5.16.0 needs another dot directory to test libs.
+    - Replace sudo with doas on OpenBSD ospfd.
+      from Matthias Bauer
+    - Fix ospf6d parser to recognize point-to-point and virtual links.
+      reported and tested by Matthias Bauer
+
 1.09 2018-09-17
     - Use dot directory in tests for newer Perl.
     - Optionally parse options and metric in ospf6d intra area

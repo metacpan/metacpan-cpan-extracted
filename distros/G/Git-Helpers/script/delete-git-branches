@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Options;
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 use Moo;
 use MooX::Options;
 
@@ -22,7 +22,7 @@ option grep => (
 );
 
 package main;
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 use Capture::Tiny qw( capture );
 use Git::Sub;
 use String::Trim qw( trim );
@@ -110,7 +110,7 @@ delete-git-branches - Interactively delete git branches
 
 =head1 VERSION
 
-version 0.000015
+version 0.000016
 
 =head1 SYNOPSIS
 

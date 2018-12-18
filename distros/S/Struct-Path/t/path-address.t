@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 37;
+use Test::More tests => 40;
 
 use Struct::Path qw(path);
 
@@ -24,6 +24,10 @@ like($@, qr/^Arrayref expected for path/);
 # garbage in the path
 eval { path($s_mixed, [ 'a' ]) };
 like($@, qr/^Unsupported thing in the path, step #0/);
+
+# garbage in the refstack
+eval { path($s_mixed, [ sub { push @{$_[1]}, undef }, [0] ]) };
+like($@, qr/^Reference expected for refs stack entry, step #1/);
 
 # garbage in hash definitioni 1
 eval { path($s_mixed, [ {garbage => ['a']} ]) };
@@ -202,7 +206,7 @@ is_deeply(
     "get {a}[0]{a2c}"
 );
 
-# use regexps as keys specificators
+# deprecated
 @r = path($s_mixed, [ {R => [qr/a/]},[0],{R => [qr/a2(a|c)/]} ]);
 @r = sort { (keys %{${$a}})[0] cmp (keys %{${$b}})[0] } @r; # sort by key (random keys access)
 is_deeply(
@@ -211,7 +215,26 @@ is_deeply(
     "get {/a/}[0]{/a2(a|c)/}"
 );
 
+# deprecated
 @r = path($s_mixed, [ {R => [qr/a/]},[0],{K => ['a2c'], R => [qr/a2(a|c)/]} ]);
+push @r, sort { (keys %{${$a}})[0] cmp (keys %{${$b}})[0] } splice @r, 1; # sort last two items by key
+is_deeply(
+    \@r,
+    [\{a2ca => []},\{a2aa => 0},\{a2ca => []}],
+    "get {/a/}[0]{/a2(a|c)/,a2c} (keys has higher priority than regs)"
+);
+
+# regexps for keys specificators
+@r = path($s_mixed, [ {K => [qr/a/]},[0],{K => [qr/a2(a|c)/]} ]);
+@r = sort { (keys %{${$a}})[0] cmp (keys %{${$b}})[0] } @r; # sort by key (random keys access)
+is_deeply(
+    \@r,
+    [\{a2aa => 0},\{a2ca => []}],
+    "get {/a/}[0]{/a2(a|c)/}"
+);
+
+# mix regular keys and regexps
+@r = path($s_mixed, [ {K => [qr/a/]},[0],{K => ['a2c', qr/a2(a|c)/]} ]);
 push @r, sort { (keys %{${$a}})[0] cmp (keys %{${$b}})[0] } splice @r, 1; # sort last two items by key
 is_deeply(
     \@r,

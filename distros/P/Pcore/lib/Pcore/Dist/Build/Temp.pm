@@ -39,14 +39,15 @@ sub run ( $self, $keep = 0 ) {
     my $path;
 
     if ($keep) {
-        $path = P->path( "$ENV->{PCORE_TEMP_DIR}/build/" . $self->{dist}->name . '-' . P->uuid->v4_hex );
+        $path = P->path( "$self->{dist}->{root}/data/.build/" . $self->{dist}->name . '-' . P->uuid->v4_hex );
 
         $path->mkpath;
 
         $tree->write_to( $path, manifest => 1 );
     }
     else {
-        $path = $tree->write_to_temp( manifest => 1, prefix => "$ENV->{PCORE_TEMP_DIR}/build", name => $self->{dist}->name . '-' . P->uuid->v4_hex );
+        # $path = $tree->write_to_temp( manifest => 1, prefix => "$self->{dist}->{root}/data/.build", name => $self->{dist}->name . '-' . P->uuid->v4_hex );
+        $path = $tree->write_to_temp( manifest => 1 );
     }
 
     return $path;
@@ -122,8 +123,8 @@ sub _gather_files ($self) {
         $tree->add_file( $file, "$self->{dist}->{root}/$file" );
     }
 
-    # add dist-id.json
-    $tree->add_file( 'share/dist-id.json', P->data->to_json( $self->{dist}->id, readable => 1 ) );
+    # add dist-id.yaml
+    $tree->add_file( 'share/dist-id.yaml', P->data->to_yaml( $self->{dist}->id ) );
 
     # add "t/author-pod-syntax.t"
     my $t = <<'PERL';
@@ -275,7 +276,7 @@ PERL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 55                   | Subroutines::ProhibitExcessComplexity - Subroutine "_gather_files" with high complexity score (22)             |
+## |    3 | 56                   | Subroutines::ProhibitExcessComplexity - Subroutine "_gather_files" with high complexity score (22)             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -26,7 +26,7 @@ We have also a demo app available showing how to integrate and use our SDK. See 
 cpanm WebService::Hexonet::Connector
 
 # or by filename
-cpanm HEXONET/WebSservice-Hexonet-Connector-1.03.tar.gz
+cpanm HEXONET/WebSservice-Hexonet-Connector-v1.12.1.tar.gz
 ```
 
 NOTE: I got this only working by sudo'ing these commands.
@@ -38,40 +38,87 @@ Please have an eye on our [HEXONET Backend API documentation](https://github.com
 
 #### Session based API Communication
 
-Not yet available, this needs a review of the SDK.
-
-#### Sessionless API Communication
-
 ```perl
+use 5.026_000;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;
 
-my $api = WebService::Hexonet::Connector::connect(
-	{
-		url => "https://coreapi.1api.net/api/call.cgi",
-		entity => "1234",
-		login => "test.user",
-		password => "test.passw0rd"
-	}
-);
+my $cl = WebService::Hexonet::Connector::APIClient->new();
+$cl->useOTESystem();
+$cl->setCredentials('test.user', 'test.passw0rd');
+$cl->setRemoteIPAddress('1.2.3.4');
+
+my $response = $cl->login();
+# in case of 2FA use:
+# my $response = $cl->login("12345678");
+
+if ($response->isSuccess()) {
+    # now the session will be used for communication in background
+    # instead of the provided credentials
+    # if you need something to rebuild connection on next page visit,
+    # so in a frontend-session based environment, please consider
+    # saveSession and reuseSession methods
+
+    # Call a command
+    my $response = $cl->request(
+        {
+            COMMAND => 'QueryDomainList',
+            LIMIT => 5
+        }
+    );
+
+    # get the result in the format you want
+    my $res;
+    $res = $response->getListHash();
+    $res = $response->getHash();
+    $res = $response->getPlain();
+
+    # get the response code and the response description
+    my $code = $response->getCode();
+    my $description = $response->getDescription();
+
+    print "$code $description";
+
+    # close Backend API Session
+    # you may verify the result of the logout procedure
+    # like for the login procedure above
+    $cl->logout();
+}
+```
+
+#### Sessionless API Communication
+
+```perl
+use 5.026_000;
+use strict;
+use warnings;
+use WebService::Hexonet::Connector;
+
+my $cl = WebService::Hexonet::Connector::APIClient->new();
+$cl->useOTESystem();
+$cl->setCredentials('test.user', 'test.passw0rd');
+$cl->setRemoteIPAddress('1.2.3.4');
+# in case of 2FA use:
+# $cl->setOTP("12345678")
 
 # Call a command
-my $response = $api->call(
-	{
-		command => "QueryDomainList",
-		limit => 5
-	}
+my $response = $cl->request(
+    {
+        COMMAND => 'QueryDomainList',
+        LIMIT => 5
+    }
 );
 
 # get the result in the format you want
-my $res = $response->as_list();
-$res = $response->as_list_hash();
-$res = $response->as_hash();
+my $res;
+$res = $response->getListHash();
+$res = $response->getHash();
+$res = $response->getPlain();
 
 # get the response code and the response description
-my $code = $response->code();
-my $description = $response->description();
+my $code = $response->getCode();
+my $description = $response->getDescription();
 
 print "$code $description";
 ```

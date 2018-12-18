@@ -11,13 +11,13 @@ use lib 't';
 use _common qw(roundtrip t_dump);
 
 eval { path2str([{garbage => ['a']}]) };
-like($@, qr/^Unsupported hash definition \(garbage\), step #0 /);
+like($@, qr/^Unsupported hash definition \(unknown keys\), step #0 /);
 
 eval { path2str([{K => 'a'}]) };
 like($@, qr/^Unsupported hash keys definition, step #0 /);
 
 eval { path2str([{K => ['a'], garbage => ['b']}]) };
-like($@, qr/^Unsupported hash definition \(garbage\), step #0 /);
+like($@, qr/^Unsupported hash definition \(extra keys\), step #0 /);
 
 eval { path2str([{K => [undef]}]) };
 like($@, qr/^Unsupported hash key type 'undef', step #0 /);

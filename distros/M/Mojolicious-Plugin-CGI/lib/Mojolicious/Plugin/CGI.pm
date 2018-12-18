@@ -16,7 +16,7 @@ use constant IS_WINDOWS           => is_os_type('Windows');
 use constant READ                 => 0;
 use constant WRITE                => 1;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 our %ORIGINAL_ENV = %ENV;
 
 has env => sub { +{%ORIGINAL_ENV} };
@@ -260,7 +260,7 @@ Mojolicious::Plugin::CGI - Run CGI script from Mojolicious
 
 =head1 VERSION
 
-0.39
+0.40
 
 =head1 DESCRIPTION
 

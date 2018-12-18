@@ -12,7 +12,7 @@ mbtiny - A standalone authoring script for Module::Build::Tiny
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -62,14 +62,6 @@ In this workflow the generated files aren't written back to the file system, ins
 
 =over 4
 
-=item * dist
-
-This creates a distribution tarball.
-
-=item * distdir
-
-This creates a directory containing all of the files of the distribution.
-
 =item * test
 
 This runs all of the tests of a distribution. It takes two options that can both be negated:
@@ -98,6 +90,12 @@ This will cause mbtiny not to build the distribution before running the command.
 
 =back
 
+=item * upload
+
+This builds a tarball and uploads it to CPAN.
+
+Using a L<Config::Identity|Config::Identity> compatible F<.pause> file in your home directory is recommended, but if it's absent or incomplete your credentials will be asked on the console.
+
 =item * shell
 
 Runs the C<$SHELL>, this is equivalent to C<mbtiny run --no-build $SHELL>. It takes one argument.
@@ -109,6 +107,14 @@ Runs the C<$SHELL>, this is equivalent to C<mbtiny run --no-build $SHELL>. It ta
 This will cause mbtiny to build the distribution before running the shell.
 
 =back
+
+=item * dist
+
+This creates a distribution tarball.
+
+=item * distdir
+
+This creates a directory containing all of the files of the distribution.
 
 =item * listdeps
 

@@ -1,3 +1,4 @@
+ChangeLog
 lib/Amazon/API.pm
 lib/Amazon/API/Error.pm
 Makefile.PL

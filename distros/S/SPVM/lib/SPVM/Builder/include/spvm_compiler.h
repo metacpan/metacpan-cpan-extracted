@@ -18,6 +18,9 @@ enum {
 struct SPVM_compiler {
   // Current parsed file name
   const char* cur_file;
+  
+  // Current parsed file relative name
+  const char* cur_rel_file;
 
   // Current parsed source
   char* cur_src;
@@ -48,10 +51,6 @@ struct SPVM_compiler {
   
   // Current enum value
   int32_t current_enum_value;
-  
-  // Current sub names
-  // This is used to omit parenthes of subroutine
-  SPVM_LIST* current_sub_names;
   
   // Temporary variable length
   int32_t tmp_var_length;

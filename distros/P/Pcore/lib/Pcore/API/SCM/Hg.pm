@@ -55,50 +55,68 @@ sub _server ( $self ) {
 sub _read ( $self ) {
     my $hg = $self->_server;
 
-    my $header = $hg->{stdout}->read_chunk(5);
+    my $header = $hg->{stdout}->read_chunk( 5, timeout => undef );
 
-    my $channel = substr $header->$*, 0, 1, q[];
+    if ( !defined $header ) {
+        delete $self->{_server};
+
+        return [ 'er', $hg->{stdout} ? 'Unknown error' : "$hg->{stdout}" ];
+    }
+
+    my $channel = substr $header->$*, 0, 1, $EMPTY;
 
     my $data = $hg->{stdout}->read_chunk( unpack 'L>', $header->$* );
+
+    if ( !defined $data ) {
+        delete $self->{_server};
+
+        return [ 'er', $hg->{stdout} ? 'Unknown error' : "$hg->{stdout}" ];
+    }
 
     return [ $channel, $data->$* ];
 }
 
 # NOTE status + pattern (status *.txt) not works under linux - http://bz.selenic.com/show_bug.cgi?id=4526
 sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
-    my $buf = join "\x00", $cmd->@*;
+    my $buf = join "\N{NULL}", $cmd->@*;
 
-    $buf .= "\x00--repository\x00$root" if $root;
+    $buf .= "\N{NULL}--repository\N{NULL}$root" if $root;
 
     $buf = Encode::encode( $Pcore::WIN_ENC, $buf, Encode::FB_CROAK );
 
     my $hg = $self->_server;
 
-    $hg->{stdin}->write( qq[runcommand\x0A] . pack( 'L>', length $buf ) . $buf );
+    $hg->{stdin}->write( "runcommand$LF" . pack( 'L>', length $buf ) . $buf );
 
     my $res = {};
 
     while () {
         my $data = $self->_read;
 
-        if ( $data->[0] ne 'r' ) {
+        # "er" channel - error + return
+        if ( $data->[0] eq 'er' ) {
+            push $res->{'e'}->@*, $data->[1];
+
+            last;
+        }
+
+        # "r" channel - request is finished
+        elsif ( $data->[0] eq 'r' ) {
+            last;
+        }
+        else {
             chomp $data->[1];
 
             decode_utf8( $data->[1], encoding => $Pcore::WIN_ENC );
 
             push $res->{ $data->[0] }->@*, $data->[1];
-
-            next;
         }
-
-        # "r" channel - request is finished
-        last;
     }
 
     my $result;
 
     if ( exists $res->{e} ) {
-        $result = res [ 500, join q[ ], $res->{e}->@* ];
+        $result = res [ 500, join $SPACE, $res->{e}->@* ];
     }
     else {
         $result = res 200, $res->{o};
@@ -119,6 +137,10 @@ sub scm_clone ( $self, $root, $uri, $cb = undef ) {
     return $self->_scm_cmd( [ 'clone', $uri, $root ], undef, $cb );
 }
 
+sub scm_update ( $self, $rev, $cb = undef ) {
+    return $self->scm_cmd( [ 'update', '--clean', '--rev', $rev ], $cb );
+}
+
 sub scm_id ( $self, $cb = undef ) {
     return $self->scm_cmd(
         [ qw[log -r . --template], q[{node|short}\n{phase}\n{join(tags,'\x00')}\n{activebookmark}\n{branch}\n{desc}\n{date|rfc3339date}\n{latesttag('re:^v\d+[.]\d+[.]\d+$') % '{tag}\x00{distance}'}] ],
@@ -130,13 +152,12 @@ sub scm_id ( $self, $cb = undef ) {
                     tags             => undef,
                     bookmark         => undef,
                     branch           => undef,
-                    desc             => undef,
                     date             => undef,
                     release          => undef,
                     release_distance => undef,
                 );
 
-                ( $res{node}, $res{phase}, $res{tags}, $res{bookmark}, $res{branch}, $res{desc}, $res{date}, $res{release} ) = split /\n/sm, $res->{data}->[0];
+                ( $res{node}, $res{phase}, $res{tags}, $res{bookmark}, $res{branch}, my $desc, $res{date}, $res{release} ) = split /\n/sm, $res->{data}->[0];
 
                 $res{tags} = $res{tags} ? [ split /\x00/sm, $res{tags} ] : undef;
 
@@ -144,6 +165,11 @@ sub scm_id ( $self, $cb = undef ) {
                     ( $res{release}, $res{release_distance} ) = split /\x00/sm, $res{release};
 
                     $res{release} = undef if $res{release} eq 'null';
+                }
+
+                # fix release distance
+                if ( $res{release} && defined $res{release_distance} && $res{release_distance} == 1 ) {
+                    $res{release_distance} = 0 if $desc =~ /added tag.+$res{release}/smi;
                 }
 
                 $res->{data} = \%res;
@@ -240,9 +266,7 @@ sub scm_get_changesets ( $self, $tag = undef, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 69, 71, 77           | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 124                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |    1 | 146                  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

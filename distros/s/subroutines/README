@@ -1,0 +1,76 @@
+NAME
+    subroutines - Use subroutines from another module
+
+VERSION
+    This document describes version 0.001 of subroutines (from Perl
+    distribution subroutines), released on 2018-12-15.
+
+SYNOPSIS
+     package Your::Module;
+     use subroutines 'Another::Module';
+
+    To avoid require()-ing:
+
+     use subroutines '-norequire', 'Another::Module';
+
+DESCRIPTION
+    This pragma declares routines in your module that are copied from
+    another module.
+
+     package Your::Module;
+     use subroutines 'Another::Module';
+
+    is equivalent to this pseudo-code:
+
+     package Your::Module;
+     BEGIN {
+         require Another::Module;
+         for my $name (all_subroutines_in("Another::Module")) {
+             *{"Your::Module::$name"} = \&{"Another::Module::$name"};
+         }
+     }
+
+    This is a form of code reuse when you cannot do:
+
+     package Your::Module;
+     use parent 'Another::Module';
+
+    because the original subroutines do not expect to be called as methods,
+    and/or when your subroutines are not called as methods.
+
+    Another alternative is to declare "Your::Module" as an alias of
+    "Another::Module", e.g. using alias::module.
+
+     package Your::Module;
+     use alias::module 'Another::Module';
+
+    but this copies everythng, not just subroutines.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/subroutines>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-subroutines>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=subroutines>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    alias::module
+
+    parent, base
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

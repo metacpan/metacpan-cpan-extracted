@@ -1,0 +1,4 @@
+
+%= button_to 'Cancel' => 'notes.get'
+%= button_to 'Delete' => 'notes.delete', method => 'POST'
+

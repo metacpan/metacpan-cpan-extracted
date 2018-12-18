@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Exception;
-$Config::Model::Exception::VERSION = '2.130';
+$Config::Model::Exception::VERSION = '2.131';
 use warnings;
 use strict;
 use Data::Dumper;
@@ -100,19 +100,19 @@ sub full_message {
 }
 
 package Config::Model::Exception::Any;
-$Config::Model::Exception::Any::VERSION = '2.130';
+$Config::Model::Exception::Any::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception';
 
 package Config::Model::Exception::ModelDeclaration;
-$Config::Model::Exception::ModelDeclaration::VERSION = '2.130';
+$Config::Model::Exception::ModelDeclaration::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::Fatal';
 
 sub _desc {'configuration model declaration error' }
 
 package Config::Model::Exception::User ;
-$Config::Model::Exception::User::VERSION = '2.130';
+$Config::Model::Exception::User::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::Any';
 sub _desc {'user error' }
@@ -120,7 +120,7 @@ sub _desc {'user error' }
 
 ## old classes below
 package Config::Model::Exception::Syntax;
-$Config::Model::Exception::Syntax::VERSION = '2.130';
+$Config::Model::Exception::Syntax::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::Any';
 
@@ -141,7 +141,7 @@ sub full_message {
 }
 
 package Config::Model::Exception::LoadData;
-$Config::Model::Exception::LoadData::VERSION = '2.130';
+$Config::Model::Exception::LoadData::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -165,7 +165,8 @@ sub full_message {
 }
 
 package Config::Model::Exception::Model;
-$Config::Model::Exception::Model::VERSION = '2.130';
+$Config::Model::Exception::Model::VERSION = '2.131';
+use Carp;
 use Mouse;
 extends 'Config::Model::Exception::Fatal';
 
@@ -175,7 +176,8 @@ sub _desc { 'configuration model error'}
 sub full_message {
     my $self = shift;
 
-    my $obj = $self->object;
+    my $obj = $self->object
+        || croak "Internal error: no object parameter passed while throwing exception";
     my $msg;
     if ( $obj->isa('Config::Model::Node') ) {
         $msg = "Node '" . $obj->name . "' of class " . $obj->config_class_name . ' ';
@@ -198,7 +200,7 @@ sub full_message {
 }
 
 package Config::Model::Exception::Load;
-$Config::Model::Exception::Load::VERSION = '2.130';
+$Config::Model::Exception::Load::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -227,7 +229,7 @@ sub full_message {
 }
 
 package Config::Model::Exception::UnavailableElement;
-$Config::Model::Exception::UnavailableElement::VERSION = '2.130';
+$Config::Model::Exception::UnavailableElement::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -258,7 +260,7 @@ sub full_message {
 }
 
 package Config::Model::Exception::AncestorClass;
-$Config::Model::Exception::AncestorClass::VERSION = '2.130';
+$Config::Model::Exception::AncestorClass::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -266,7 +268,7 @@ sub _desc { 'unknown ancestor class'}
 
 
 package Config::Model::Exception::ObsoleteElement;
-$Config::Model::Exception::ObsoleteElement::VERSION = '2.130';
+$Config::Model::Exception::ObsoleteElement::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -291,7 +293,7 @@ sub full_message {
 }
 
 package Config::Model::Exception::UnknownElement;
-$Config::Model::Exception::UnknownElement::VERSION = '2.130';
+$Config::Model::Exception::UnknownElement::VERSION = '2.131';
 use Carp;
 
 use Mouse;
@@ -368,14 +370,14 @@ sub full_message {
 }
 
 package Config::Model::Exception::WarpError;
-$Config::Model::Exception::WarpError::VERSION = '2.130';
+$Config::Model::Exception::WarpError::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
 sub _desc { 'warp error'}
 
 package Config::Model::Exception::Fatal;
-$Config::Model::Exception::Fatal::VERSION = '2.130';
+$Config::Model::Exception::Fatal::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::Any';
 
@@ -383,7 +385,7 @@ sub _desc { 'fatal error' }
 
 
 package Config::Model::Exception::UnknownId;
-$Config::Model::Exception::UnknownId::VERSION = '2.130';
+$Config::Model::Exception::UnknownId::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -417,7 +419,7 @@ sub full_message {
 }
 
 package Config::Model::Exception::WrongValue;
-$Config::Model::Exception::WrongValue::VERSION = '2.130';
+$Config::Model::Exception::WrongValue::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -425,7 +427,7 @@ sub _desc { 'wrong value'};
 
 
 package Config::Model::Exception::WrongType;
-$Config::Model::Exception::WrongType::VERSION = '2.130';
+$Config::Model::Exception::WrongType::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
@@ -459,14 +461,14 @@ sub full_message {
 }
 
 package Config::Model::Exception::ConfigFile;
-$Config::Model::Exception::ConfigFile::VERSION = '2.130';
+$Config::Model::Exception::ConfigFile::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::User';
 
 sub _desc { 'error in configuration file' }
 
 package Config::Model::Exception::ConfigFile::Missing;
-$Config::Model::Exception::ConfigFile::Missing::VERSION = '2.130';
+$Config::Model::Exception::ConfigFile::Missing::VERSION = '2.131';
 use Mouse;
 use Mouse::Util::TypeConstraints;
 
@@ -485,14 +487,14 @@ sub full_message {
 }
 
 package Config::Model::Exception::Formula;
-$Config::Model::Exception::Formula::VERSION = '2.130';
+$Config::Model::Exception::Formula::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::Model';
 
 sub _desc { 'error in computation formula of the configuration model'}
 
 package Config::Model::Exception::Internal;
-$Config::Model::Exception::Internal::VERSION = '2.130';
+$Config::Model::Exception::Internal::VERSION = '2.131';
 use Mouse;
 extends 'Config::Model::Exception::Fatal';
 
@@ -514,7 +516,7 @@ Config::Model::Exception - Exception mechanism for configuration model
 
 =head1 VERSION
 
-version 2.130
+version 2.131
 
 =head1 SYNOPSIS
 

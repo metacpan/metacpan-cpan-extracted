@@ -1,3 +1,7 @@
+0.31	- 15 Dec 2018, H.Merijn Brand
+    * Fix pod links (PR#2)
+    * Add USE_THREAD_SAFE_LOCALE
+
 0.30	- 04 Jul 2018, H.Merijn Brand
     * It's 2018
     * Add test for 5.27.11 (r is for rsync checkout)

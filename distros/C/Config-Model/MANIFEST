@@ -26,7 +26,6 @@ lib/Config/Model/Backend/Json.pm
 lib/Config/Model/Backend/PerlFile.pm
 lib/Config/Model/Backend/PlainFile.pm
 lib/Config/Model/Backend/ShellVar.pm
-lib/Config/Model/Backend/Yaml.pm
 lib/Config/Model/BackendMgr.pm
 lib/Config/Model/BackendTrackOrder.pm
 lib/Config/Model/CheckList.pm
@@ -99,7 +98,6 @@ t/backend_ini_with_section_map.t
 t/backend_mgr.t
 t/backend_multiple.t
 t/backend_plainfile.t
-t/backend_yaml.t
 t/check_list.t
 t/check_list_warp.t
 t/cme-function.t
@@ -120,7 +118,6 @@ t/lib/Config/Model/models/Master.pl
 t/lib/DummyNode.pm
 t/lib/dump_load_model.pl
 t/lib/test_ini_backend_model.pl
-t/lib/test_yaml_model.pl
 t/load.t
 t/load_model_snippets.t
 t/loader_logs.t
@@ -143,10 +140,6 @@ t/model_tests.d/backend-plainfile-test-conf.pl
 t/model_tests.d/backend-shellvar-examples/debian-719256
 t/model_tests.d/backend-shellvar-examples/keep-order
 t/model_tests.d/backend-shellvar-test-conf.pl
-t/model_tests.d/backend-yaml-data-examples/basic
-t/model_tests.d/backend-yaml-data-test-conf.pl
-t/model_tests.d/backend-yaml-examples/basic
-t/model_tests.d/backend-yaml-test-conf.pl
 t/model_tests.d/fstab-examples/t0
 t/model_tests.d/fstab-examples/t1
 t/model_tests.d/fstab-test-conf.pl

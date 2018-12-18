@@ -6,10 +6,13 @@ package Mojo::DOM58::_HTML;
 
 use strict;
 use warnings;
+use Exporter 'import';
 use Mojo::DOM58::Entities qw(html_attr_unescape html_escape html_unescape);
 use Scalar::Util 'weaken';
 
-our $VERSION = '1.005';
+our $VERSION = '2.000';
+
+our @EXPORT_OK = 'tag_to_html';
 
 my $ATTR_RE = qr/
   ([^<>=\s\/]+|\/)                         # Key
@@ -56,9 +59,9 @@ my %END = (body => 'head', optgroup => 'optgroup', option => 'option');
 
 # HTML elements that break paragraphs
 $END{$_} = 'p' for
-  qw(address article aside blockquote details div dl fieldset figcaption),
-  qw(figure footer form h1 h2 h3 h4 h5 h6 header hgroup hr main menu nav ol p),
-  qw(pre section table ul);
+  qw(address article aside blockquote details dialog div dl fieldset),
+  qw(figcaption figure footer form h1 h2 h3 h4 h5 h6 header hgroup hr main),
+  qw(menu nav ol p pre section table ul);
 
 # HTML table elements with optional end tags
 my %TABLE = map { $_ => 1 } qw(colgroup tbody td tfoot th thead tr);
@@ -103,6 +106,10 @@ sub new {
   my $class = shift;
   bless @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {}, ref $class || $class;
 }
+
+sub tag { shift->tree(['root', _tag(@_)]) }
+
+sub tag_to_html { _render(_tag(@_), undef) }
 
 sub tree {
   my $self = shift;
@@ -218,12 +225,43 @@ sub _node {
 sub _render {
   my ($tree, $xml) = @_;
 
-  # Text (escaped)
+  # Tag
   my $type = $tree->[0];
+  if ($type eq 'tag') {
+
+    # Start tag
+    my $tag    = $tree->[1];
+    my $result = "<$tag";
+
+    # Attributes
+    for my $key (sort keys %{$tree->[2]}) {
+      my $value = $tree->[2]{$key};
+      $result .= $xml ? qq{ $key="$key"} : " $key" and next
+        unless defined $value;
+      $result .= qq{ $key="} . html_escape($value) . '"';
+    }
+
+    # No children
+    return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
+      unless $tree->[4];
+
+    # Children
+    no warnings 'recursion';
+    $result .= '>' . join '', map { _render($_, $xml) } @$tree[4 .. $#$tree];
+
+    # End tag
+    return "$result</$tag>";
+  }
+
+  # Text (escaped)
   return html_escape($tree->[1]) if $type eq 'text';
 
   # Raw text
   return $tree->[1] if $type eq 'raw';
+
+  # Root
+  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
+    if $type eq 'root';
 
   # DOCTYPE
   return '<!DOCTYPE' . $tree->[1] . '>' if $type eq 'doctype';
@@ -237,31 +275,8 @@ sub _render {
   # Processing instruction
   return '<?' . $tree->[1] . '?>' if $type eq 'pi';
 
-  # Root
-  return join '', map { _render($_, $xml) } @$tree[1 .. $#$tree]
-    if $type eq 'root';
-
-  # Start tag
-  my $tag    = $tree->[1];
-  my $result = "<$tag";
-
-  # Attributes
-  for my $key (sort keys %{$tree->[2]}) {
-    my $value = $tree->[2]{$key};
-    $result .= $xml ? qq{ $key="$key"} : " $key" and next unless defined $value;
-    $result .= qq{ $key="} . html_escape($value) . '"';
-  }
-
-  # No children
-  return $xml ? "$result />" : $EMPTY{$tag} ? "$result>" : "$result></$tag>"
-    unless $tree->[4];
-
-  # Children
-  no warnings 'recursion';
-  $result .= '>' . join '', map { _render($_, $xml) } @$tree[4 .. $#$tree];
-
-  # End tag
-  return "$result</$tag>";
+  # Everything else
+  return '';
 }
 
 sub _start {
@@ -287,6 +302,22 @@ sub _start {
   push @$$current, my $new = ['tag', $start, $attrs, $$current];
   weaken $new->[3];
   $$current = $new;
+}
+
+sub _tag {
+  my $tree = ['tag', shift, undef, undef];
+
+  # Content
+  push @$tree, ref $_[-1] eq 'CODE' ? ['raw', pop->()] : ['text', pop]
+    if @_ % 2;
+
+  # Attributes
+  my $attrs = $tree->[2] = {@_};
+  return $tree unless exists $attrs->{data} && ref $attrs->{data} eq 'HASH';
+  my $data = delete $attrs->{data};
+  @$attrs{map { y/_/-/; lc "data-$_" } keys %$data} = values %$data;
+
+  return $tree;
 }
 
 1;

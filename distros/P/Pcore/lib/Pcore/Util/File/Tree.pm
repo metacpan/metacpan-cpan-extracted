@@ -10,9 +10,9 @@ sub add_dir ( $self, $dir, $prefix = undef, $meta = undef ) {
     return if !-d $dir;
 
     if ( !defined $prefix ) {
-        $prefix = '';
+        $prefix = $EMPTY;
     }
-    elsif ( $prefix ne '' && substr( $prefix, -1, 1 ) ne '/' ) {
+    elsif ( $prefix ne $EMPTY && substr( $prefix, -1, 1 ) ne '/' ) {
         $prefix .= '/';
     }
 
@@ -113,16 +113,6 @@ sub write_to_temp ( $self, %args ) {
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 13, 15               | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -81,7 +81,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
                     push @row, q[ - ];
                 }
                 else {
-                    push @row, $WHITE . $ON_RED . q[ ] . $dist->id->{phase} . q[ ] . $RESET;
+                    push @row, $WHITE . $ON_RED . $SPACE . $dist->id->{phase} . $SPACE . $RESET;
                 }
             }
             else {

@@ -1,11 +1,25 @@
 #!/usr/bin/perl
-use Test::More tests => 1;
-use File::Extension qw(explain);
+use Test::More tests => 3;
+use File::Extension qw(extplain);
 
 
 
 is(
-  (explain('NES')),
+  (extplain('NES')),
   "Nintendo (NES) ROM File",
-  'explain() OK',
+  "extplain('NES') OK",
+);
+
+
+is(
+  (extplain('dwlibrary')),
+  "Paperless Document Library",
+  "extplain('dwlibrary') OK",
+);
+
+
+is(
+  (extplain('.p6')),
+  "Perl 6 Source Code File",
+  "extplain('.p6') OK",
 );

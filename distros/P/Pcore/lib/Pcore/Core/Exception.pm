@@ -80,7 +80,7 @@ $Coro::State::WARNHOOK = sub {
             return $_[0];
         }
         else {
-            return q[];
+            return $EMPTY;
         }
     };
 }
@@ -134,7 +134,7 @@ sub croak {
 
     if (@_) {
         if ( @_ > 1 ) {
-            $msg = join q[], @_;
+            $msg = join $EMPTY, @_;
         }
         else {
             $msg = $_[0];
@@ -158,7 +158,7 @@ sub cluck {
 
     if (@_) {
         if ( @_ > 1 ) {
-            $msg = join q[], @_;
+            $msg = join $EMPTY, @_;
         }
         else {
             $msg = $_[0];

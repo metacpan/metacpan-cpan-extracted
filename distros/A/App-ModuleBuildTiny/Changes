@@ -1,5 +1,9 @@
 Revision history for App-ModuleBuildTiny
 
+0.025     Sun Dec 16 22:09:12 CET 2018
+          - Allow fetching credentials from console
+          - Add SPDX support to meta files
+
 0.024
           - Write generated files as binary
           - Decode author names when POD is encoded

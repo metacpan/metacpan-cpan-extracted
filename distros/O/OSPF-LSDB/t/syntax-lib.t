@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Find;
+use lib '.';
 
 my @libs = qw(
     OSPF::LSDB
@@ -23,6 +24,7 @@ foreach (@libs) {
 }
 
 my %files = map { local $_ = $_; s,::,/,g; "lib/$_.pm" => 1 } @libs;
+warn map { "$_\n" } keys %files;
 sub wanted {
     /\.pm$/ && -f or return;
     ok($files{$File::Find::name}, "$File::Find::name file")

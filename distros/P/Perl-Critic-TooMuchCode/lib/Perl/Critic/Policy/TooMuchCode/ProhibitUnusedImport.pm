@@ -7,6 +7,7 @@ use parent 'Perl::Critic::Policy';
 
 # Part of Perl-Critic distribution
 use Perl::Critic::Policy::Variables::ProhibitUnusedVariables;
+use Perl::Critic::TooMuchCode;
 
 sub default_themes       { return qw( maintenance )     }
 sub applies_to           { return 'PPI::Document' }
@@ -53,7 +54,7 @@ sub gather_violations_generic {
     ## Look for the signature of misparsed ternary operator.
     ## https://github.com/adamkennedy/PPI/issues/62
     ## Once PPI is fixe, this workaround can be eliminated.
-    __get_terop_usage(\%used, $doc);
+    Perl::Critic::TooMuchCode::__get_terop_usage(\%used, $doc);
 
     Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_symbol_usage(\%used, $doc);
     Perl::Critic::Policy::Variables::ProhibitUnusedVariables::_get_regexp_symbol_usage(\%used, $doc);
@@ -67,19 +68,6 @@ sub gather_violations_generic {
     }
 
     return @violations;
-}
-
-sub __get_terop_usage {
-    my ($used, $doc) = @_;
-    for my $question_mark (@{ $doc->find( sub { $_[1]->isa('PPI::Token::Operator') && $_[1]->content eq '?' }) ||[]}) {
-        my $el = $question_mark->snext_sibling;
-        next unless $el->isa('PPI::Token::Label');
-
-        my $tok = $el->content;
-        $tok =~ s/\s*:\z//;
-
-        $used->{$tok}++;
-    }
 }
 
 1;

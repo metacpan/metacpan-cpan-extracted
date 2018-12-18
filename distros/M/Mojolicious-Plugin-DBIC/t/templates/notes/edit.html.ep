@@ -1,0 +1,8 @@
+
+%= form_for current_route, begin
+    %= csrf_field
+    %= text_field 'title'
+    %= text_area 'description'
+    %= submit_button
+% end
+

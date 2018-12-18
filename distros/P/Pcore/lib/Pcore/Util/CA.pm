@@ -3,7 +3,7 @@ package Pcore::Util::CA;
 use Pcore -class;
 
 sub update ($cb = undef) {
-    print 'updating ca_file.pem ... ';
+    print 'updating cacert.pem ... ';
 
     return P->http->get(
         'https://curl.haxx.se/ca/cacert.pem',
@@ -13,7 +13,7 @@ sub update ($cb = undef) {
             say $res;
 
             if ($res) {
-                $ENV->{share}->write( 'Pcore', 'data/ca_file.pem', $res->{data} );
+                $ENV->{share}->write( '/Pcore/data/cacert.pem', $res->{data} );
 
                 $status = 1;
             }
@@ -24,7 +24,7 @@ sub update ($cb = undef) {
 }
 
 sub ca_file {
-    return $ENV->{share}->get('data/ca_file.pem');
+    return $ENV->{share}->get('data/cacert.pem');
 }
 
 1;

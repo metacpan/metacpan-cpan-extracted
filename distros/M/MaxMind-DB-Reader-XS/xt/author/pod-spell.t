@@ -21,6 +21,7 @@ Dave
 Eilam
 Eilam's
 Florian
+Fowler
 GitHub
 Greg
 Hidenori
@@ -28,6 +29,7 @@ Inc
 Jack
 MAXMIND
 MAXMIND's
+Mark
 MaxMind
 MaxMind's
 Olaf
@@ -54,6 +56,7 @@ goschwald
 lib
 libmaxminddb
 madogiwa
+mark
 oalders
 rafl
 reilam

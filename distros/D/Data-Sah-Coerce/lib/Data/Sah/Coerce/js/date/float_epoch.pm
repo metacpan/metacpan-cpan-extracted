@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::js::date::float_epoch;
 
-our $DATE = '2018-10-30'; # DATE
-our $VERSION = '0.027'; # VERSION
+our $DATE = '2018-12-16'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,7 +49,7 @@ Data::Sah::Coerce::js::date::float_epoch - Coerce date from number (assumed to b
 
 =head1 VERSION
 
-This document describes version 0.027 of Data::Sah::Coerce::js::date::float_epoch (from Perl distribution Data-Sah-Coerce), released on 2018-10-30.
+This document describes version 0.030 of Data::Sah::Coerce::js::date::float_epoch (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
 
 =head1 DESCRIPTION
 

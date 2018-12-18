@@ -75,7 +75,7 @@ for my $method ( sort keys $test_data->%* ) {
         my $host = P->host( $test->[0] );
 
         my $res1 = $host->can($method) ? $host->$method : $host->{$method};
-        my $res2 = $test->[1] // q[];
+        my $res2 = $test->[1] // $EMPTY;
 
         if ( $res1 ne $res2 ) {
             say qq[RESULT: "$res1", EXPECTED: "$res2"];

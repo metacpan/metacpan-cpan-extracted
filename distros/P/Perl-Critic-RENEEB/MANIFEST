@@ -10,11 +10,13 @@ Makefile.PL
 README
 dist.ini
 lib/Perl/Critic/Policy/RegularExpressions/RequireExtendedFormattingExceptForSplit.pm
+lib/Perl/Critic/Policy/Reneeb/Capitalization.pm
 lib/Perl/Critic/Policy/Reneeb/ProhibitBlockEval.pm
 lib/Perl/Critic/RENEEB.pm
 t/00-load.t
 t/01_split_regex.t
 t/02_eval.t
+t/03_capitalization.t
 t/Module/ShortRegex.pm
 t/Module/ShortRegexOk.pm
 t/Module/SimpleRegex.pm

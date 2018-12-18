@@ -1,6 +1,6 @@
-package Pcore v0.77.5;
+package Pcore v0.78.2;
 
-use v5.28.0;
+use v5.28.1;
 no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
 use common::header;
 use Pcore::Core::Exporter qw[];

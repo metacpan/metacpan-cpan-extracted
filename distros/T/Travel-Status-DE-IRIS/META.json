@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Travel-Status-DE-IRIS",
    "prereqs" : {
@@ -52,15 +52,15 @@
    "provides" : {
       "Travel::Status::DE::IRIS" : {
          "file" : "lib/Travel/Status/DE/IRIS.pm",
-         "version" : "1.21"
+         "version" : "1.22"
       },
       "Travel::Status::DE::IRIS::Result" : {
          "file" : "lib/Travel/Status/DE/IRIS/Result.pm",
-         "version" : "1.21"
+         "version" : "1.22"
       },
       "Travel::Status::DE::IRIS::Stations" : {
          "file" : "lib/Travel/Status/DE/IRIS/Stations.pm",
-         "version" : "1.21"
+         "version" : "1.22"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-IRIS"
       }
    },
-   "version" : "1.21",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.22",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

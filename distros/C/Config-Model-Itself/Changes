@@ -1,3 +1,20 @@
+2.016 2018-12-17
+
+  Test fixes:
+    * use IniFile backend instead of Yaml
+
+2.015 2018-12-15
+
+  Model updates:
+    * integer value can use warn_if warn_unless assert
+    * model doc: help on value now accepts patterns
+      (requires Config::Model 2.127)
+
+  Bug fixes:
+    * better handle application parameter (i.e. fix "cme meta plugin" command)
+    * test: copy models from "use" location (this makes
+      Debian "autopkgtest" patch obsolete)
+
 2.014 2018-07-15
 
     * backend function parameter is deprecated

@@ -9,34 +9,34 @@ our $MESS_COLOR        = $BOLD . $YELLOW;
 our $BAR_COLOR         = $YELLOW;
 
 sub _draw ($self) {
-    my $info = q[];
+    my $info = $EMPTY;
 
     # state
     if ( $self->{show_state} ) {
 
         # precent, only if total is known
         if ( $self->{total} ) {
-            $info .= q[ ] . $self->_format_percent->( $self, int( $self->{value} / $self->{total} * 100 ) ) . q[%];
+            $info .= $SPACE . $self->_format_percent->( $self, int( $self->{value} / $self->{total} * 100 ) ) . '%';
         }
 
         # value
         my ( $value, $value_unit ) = $self->_format_value->( $self, $self->{value} );
 
-        $info .= q[  ] . $value;
+        $info .= "  $value";
 
         $value_unit ||= $self->{unit};
 
-        $info .= q[ ] . $value_unit if $value_unit;
+        $info .= $SPACE . $value_unit if $value_unit;
 
         # total
         if ( $self->{total} ) {
             my ( $total, $total_unit ) = $self->_format_total->( $self, $self->{total} );
 
-            $info .= q[ / ] . $total;
+            $info .= " / $total";
 
             $total_unit ||= $self->{unit};
 
-            $info .= q[ ] . $total_unit if $total_unit;
+            $info .= $SPACE . $total_unit if $total_unit;
         }
     }
 
@@ -51,10 +51,10 @@ sub _draw ($self) {
         if ($speed_unit) {
             $speed_unit =~ s[(.+?)(\s*)\z][$1/s$2]smg;
 
-            $info .= q[ ] . $speed_unit;
+            $info .= " $speed_unit";
         }
         else {
-            $info .= q[/s];
+            $info .= '/s';
         }
     }
 
@@ -70,7 +70,7 @@ sub _draw ($self) {
         }
     }
 
-    my $bar = q[];
+    my $bar = $EMPTY;
 
     # bar
     if ( $self->{total} ) {
@@ -94,7 +94,7 @@ sub _draw ($self) {
 
                 $bar .= $RESET;
 
-                $bar .= q[ ] x ( $bar_size - $current_pos );
+                $bar .= $SPACE x ( $bar_size - $current_pos );
             }
             elsif ( length $mess < $current_pos ) {    # hl full mess + bar symbols
                 if ($mess) {
@@ -111,10 +111,10 @@ sub _draw ($self) {
 
                 $bar .= $RESET;
 
-                $bar .= q[ ] x ( $bar_size - $current_pos );
+                $bar .= $SPACE x ( $bar_size - $current_pos );
             }
             else {    # hl mess part
-                my $mess_hl = substr $mess, 0, $current_pos, q[];
+                my $mess_hl = substr $mess, 0, $current_pos, $EMPTY;
 
                 $bar .= $MESS_COLOR;
 
@@ -124,7 +124,7 @@ sub _draw ($self) {
 
                 $bar .= $mess;
 
-                $bar .= q[ ] x abs $bar_size - length $self->{message};
+                $bar .= $SPACE x abs $bar_size - length $self->{message};
             }
         }
         else {
@@ -132,7 +132,7 @@ sub _draw ($self) {
                 $bar .= sprintf qq[%-${bar_size}s], $mess;
             }
             else {
-                $bar .= q[ ] x $bar_size;
+                $bar .= $SPACE x $bar_size;
             }
         }
 

@@ -1,0 +1,66 @@
+NAME
+    WordList::Domain::PublicSuffix - Mozilla Public Suffix
+
+VERSION
+    This document describes version 20181217.0.0 of
+    WordList::Domain::PublicSuffix (from Perl distribution
+    WordList-Domain-PublicSuffix), released on 2018-12-17.
+
+SYNOPSIS
+     use WordList::Domain::PublicSuffix;
+
+     my $wl = WordList::Domain::PublicSuffix->new;
+
+     # Pick a (or several) random word(s) from the list
+     my $word = $wl->pick;
+     my @words = $wl->pick(3);
+
+     # Check if a word exists in the list
+     if ($wl->word_exists('foo')) { ... }
+
+     # Call a callback for each word
+     $wl->each_word(sub { my $word = shift; ... });
+
+     # Get all the words
+     my @all_words = $wl->all_words;
+
+STATISTICS
+     +----------------------------------+------------------+
+     | key                              | value            |
+     +----------------------------------+------------------+
+     | avg_word_len                     | 10.5593594058257 |
+     | longest_word_len                 | 41               |
+     | num_words                        | 8617             |
+     | num_words_contains_nonword_chars | 7083             |
+     | num_words_contains_unicode       | 448              |
+     | num_words_contains_whitespace    | 0                |
+     | shortest_word_len                | 2                |
+     +----------------------------------+------------------+
+
+    The statistics is available in the %STATS package variable.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-Domain-PublicSuffix>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-Domain-PublicSuffix>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Domain-Publi
+    cSuffix>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

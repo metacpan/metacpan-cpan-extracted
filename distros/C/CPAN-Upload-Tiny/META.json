@@ -4,7 +4,7 @@
       "Leon Timmermans <leont@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -37,6 +37,7 @@
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Pod::Usage" : "0",
+            "Term::ReadKey" : "0",
             "strict" : "0",
             "warnings" : "0"
          },
@@ -54,7 +55,7 @@
    "provides" : {
       "CPAN::Upload::Tiny" : {
          "file" : "lib/CPAN/Upload/Tiny.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -69,7 +70,8 @@
          "web" : "https://github.com/Leont/cpan-upload-tiny"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
+   "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

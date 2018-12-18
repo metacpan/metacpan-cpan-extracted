@@ -27,7 +27,7 @@ sub get_query ( $self, $dbh, $final, $i ) {
         elsif ( is_plain_arrayref $token) {
             my $sort_order = $SQL_SORT_ORDER->{ lc $token->[1] } or die qq[SQL sort order "$token->[1]" is invalid];
 
-            push @sql, $dbh->quote_id( $token->[0] ) . q[ ] . $sort_order;
+            push @sql, $dbh->quote_id( $token->[0] ) . $SPACE . $sort_order;
         }
         else {
             die 'Unsupported ref type';

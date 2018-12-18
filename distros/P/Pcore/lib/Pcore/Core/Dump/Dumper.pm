@@ -46,7 +46,7 @@ our $DUMPERS = {
         my $res;
         my $tags;
 
-        $res .= q[] . $self;                            # stringify
+        $res .= $EMPTY . $self;                         # stringify
         $res .= ' [' . $self->time_zone->name . ']';    # timezone
 
         return $res, $tags;
@@ -70,7 +70,7 @@ our $DUMPERS = {
 };
 
 sub run ( $self, @ ) {
-    $self->{_indent} = q[ ] x ( $self->{indent} // 4 );
+    $self->{_indent} = $SPACE x ( $self->{indent} // 4 );
 
     if ( !$self->{color} ) {
         return remove_ansi $self->_dump( $_[1], path => '$VAR' );
@@ -83,7 +83,7 @@ sub run ( $self, @ ) {
 # INTERNAL METHODS
 sub _dump ( $self, @ ) {
     my %args = (
-        path    => '',
+        path    => $EMPTY,
         unbless => 0,
         splice @_, 2,
     );
@@ -202,7 +202,7 @@ sub _tied_to {
 sub UNKNOWN {
     my $self = shift;
     my %args = (
-        var_type => q[],
+        var_type => $EMPTY,
         @_,
     );
 
@@ -362,7 +362,7 @@ sub ARRAY {
         my $max_index_length = length( $#{$array_ref} ) + 2;
 
         for my $i ( 0 .. $array_ref->$#* ) {
-            my $index = sprintf( '%-*s', $max_index_length, "[$i]" ) . q[ ];
+            my $index = sprintf( '%-*s', $max_index_length, "[$i]" ) . $SPACE;
 
             $res .= $self->{_indent} . $COLOR->{array} . $index . $RESET;
 
@@ -413,7 +413,7 @@ sub HASH {
             };
 
             # hash key requires to be quoted
-            if ( $_ eq q[] || /[^[:alnum:]_]/sm ) {
+            if ( $_ eq $EMPTY || /[^[:alnum:]_]/sm ) {
                 $indexed_key->{escaped_key} = \( 'q[' . $indexed_key->{escaped_key}->$* . ']' );
             }
 
@@ -466,7 +466,7 @@ sub GLOB {
 
     my ( $res, $tags, $i );
     my $flags  = [];
-    my $layers = q[];
+    my $layers = $EMPTY;
 
     for ( PerlIO::Layers::get_layers( $_[0] ) ) {
         unless ($i) {
@@ -520,7 +520,7 @@ sub REGEXP {
 
     my ( $pat, $flags ) = re::regexp_pattern( $_[0] );
 
-    $flags //= q[];
+    $flags //= $EMPTY;
 
     return $COLOR->{regex} . qq[qr/$pat/$flags] . $RESET;
 }
@@ -542,13 +542,15 @@ sub LVALUE {
 }
 
 package Pcore::Core::Dump::Dumper::_Item {
+    use Pcore;
+
     use overload    #
       q[""] => sub {
         if ( $_[0]->{tags} ) {
-            return ( $_[0]->{prefix} // q[] ) . $_[0]->{text}->$* . ( $_[0]->{sep} // q[] ) . ' # ' . join q[, ], $_[0]->{tags}->@*;
+            return ( $_[0]->{prefix} // $EMPTY ) . $_[0]->{text}->$* . ( $_[0]->{sep} // $EMPTY ) . ' # ' . join q[, ], $_[0]->{tags}->@*;
         }
         else {
-            return ( $_[0]->{prefix} // q[] ) . $_[0]->{text}->$* . ( $_[0]->{sep} // q[] );
+            return ( $_[0]->{prefix} // $EMPTY ) . $_[0]->{text}->$* . ( $_[0]->{sep} // $EMPTY );
         }
       };
 }
@@ -560,8 +562,6 @@ package Pcore::Core::Dump::Dumper::_Item {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 86                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 76, 79, 228, 289     | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

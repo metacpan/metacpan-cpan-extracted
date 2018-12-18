@@ -68,7 +68,7 @@ around new => sub ( $orig, $self, $type, % ) {
     else {
         state $perl = do {
             if ( $ENV->{is_par} ) {
-                "$ENV{PAR_TEMP}/perl" . ( $MSWIN ? '.exe' : q[] );
+                "$ENV{PAR_TEMP}/perl" . ( $MSWIN ? '.exe' : $EMPTY );
             }
             else {
                 $^X;

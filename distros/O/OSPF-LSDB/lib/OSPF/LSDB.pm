@@ -62,7 +62,7 @@ upgrade the file.
 
 =cut
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 =pod
 
@@ -175,6 +175,10 @@ my %CONVERTER = (
     1.0 => sub {
 	my OSPF::LSDB $self = shift;
 	$self->{ospf}{version} = 1.0;
+    },
+    1.1 => sub {
+	my OSPF::LSDB $self = shift;
+	$self->{ospf}{version} = 1.1;
     },
 );
 

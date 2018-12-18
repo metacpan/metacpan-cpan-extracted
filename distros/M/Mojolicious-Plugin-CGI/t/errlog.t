@@ -1,4 +1,5 @@
 use lib '.';
+BEGIN { $ENV{MOJO_LOG_LEVEL} = 'warn' }
 use t::Helper;
 
 unlink 't/err.log';

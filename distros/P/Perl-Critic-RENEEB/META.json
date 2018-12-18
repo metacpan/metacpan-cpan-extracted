@@ -36,15 +36,19 @@
    "provides" : {
       "Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSplit" : {
          "file" : "lib/Perl/Critic/Policy/RegularExpressions/RequireExtendedFormattingExceptForSplit.pm",
-         "version" : "2.00"
+         "version" : "2.01"
+      },
+      "Perl::Critic::Policy::Reneeb::Capitalization" : {
+         "file" : "lib/Perl/Critic/Policy/Reneeb/Capitalization.pm",
+         "version" : "2.01"
       },
       "Perl::Critic::Policy::Reneeb::ProhibitBlockEval" : {
          "file" : "lib/Perl/Critic/Policy/Reneeb/ProhibitBlockEval.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       },
       "Perl::Critic::RENEEB" : {
          "file" : "lib/Perl/Critic/RENEEB.pm",
-         "version" : "2.00"
+         "version" : "2.01"
       }
    },
    "release_status" : "stable",
@@ -59,7 +63,7 @@
          "web" : "http://github.com/reneeb/Perl-Critic-RENEEB"
       }
    },
-   "version" : "2.00",
+   "version" : "2.01",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"

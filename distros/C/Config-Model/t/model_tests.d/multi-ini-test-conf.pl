@@ -44,9 +44,9 @@ $model->create_config_class(
         },
     ],
     rw_config => {
-        backend     => 'Yaml',
+        backend     => 'perl',
         config_dir  => '/etc/',
-        file        => 'service.yml',
+        file        => 'service.pl',
         auto_create => 1,
     },
 );
@@ -64,7 +64,7 @@ $model->create_config_class(
         file_check_sub => sub {
             my $list_ref = shift ;
             # file added because of default bar key
-            push @$list_ref, "/etc/service.yml" ;
+            push @$list_ref, "/etc/service.pl" ;
         },
     },
 );

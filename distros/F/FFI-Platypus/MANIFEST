@@ -91,6 +91,8 @@ lib/FFI/Platypus/Type.pod
 lib/FFI/Platypus/Type/PointerSizeBuffer.pm
 lib/FFI/Platypus/Type/StringArray.pm
 lib/FFI/Platypus/Type/StringPointer.pm
+maint/cip-before-install
+maint/cip-test
 maint/gen.pl
 share/README.txt
 t/00_diag.t

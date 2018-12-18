@@ -416,15 +416,24 @@ around BUILDARGS => sub {
     my @args  =  @_;
     my $argcnt = scalar @args;
 
-    if ($argcnt == 1 && ref $args[0] eq 'HASH' or $argcnt %2 == 0) {
+    die "argcnt ($argcnt) < 4 for HPCI::FILE object creation, minimum is file => FILE, stage => STAGE"
+        if $argcnt < 4;
+    if ($argcnt == 5 && ref $args[-1] eq 'HASH' or $argcnt %2 == 0) {
         return $class->$orig(@args);
     }
     else {
-        my $msg = "HPCI::File args must be a hasref or a key/value list\nArgs are:\n";
-        my $cnt = 0;
+        my $msg = "HPCI::File args must be a hashref or a key/value list\nArgs are:\n";
+		my $start = 0;
+        if ($args[0] eq 'file' && $args[2] eq 'stage') {
+            $msg .= "  File: $args[1]\n";
+            $start = 4;
+        }
+        else {
+            $msg .= "Warning: args do not start with file FILE stage STAGE\n";
+        }
         my @pref = ( "  Key:   ", "    Val:   " );
-
-        for my $arg (@args, '=== END OF ARG LIST ===') {
+        my $cnt = 0;
+        for my $arg (@args[$start..$#args], '=== END OF ARG LIST ===') {
             $msg .= $pref[$cnt] . $arg . "\n";
             $cnt = 1 - $cnt;
         }

@@ -7,10 +7,11 @@
 # To escape an open parenthesis in a regular expression use: \x28, for close use: \x29
 # perl Build.PL && perl Build test && sudo perl Build install
 # document and test foot option for format table
+# write binary data with out complaints about wide characters
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20181204;                                                        # Version
+our $VERSION = 20181218;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -20,6 +21,7 @@ use File::Glob qw(:bsd_glob);
 use File::Temp qw(tempfile tempdir);
 use POSIX qw(:sys_wait_h strftime);                                             # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Dump qw(dump);
+use IO::Socket::UNIX;
 use JSON;
 use MIME::Base64;
 use Scalar::Util qw(blessed reftype looks_like_number);
@@ -210,6 +212,13 @@ sub fileMd5Sum($)                                                               
   (split /\s+/, $s)[0];
  }
 
+sub guidFromMd5($)                                                              # Create a guid from an md5 hash.
+ {my ($m) = @_;                                                                 # Md5 hash
+  length($m) == 32 or confess "Not an md5 hash: ". ($m//"undef");
+  join '-', q(GUID), substr($m, 0, 8),  substr($m, 8, 4), substr($m, 12, 4),
+                     substr($m, 16, 4), substr($m, 20);
+ }
+
 sub fileModTime($)                                                              # Get the modified time of a file in seconds since the epoch.
  {my ($file) = @_;                                                              # File name
   (stat($file))[9] // 0
@@ -359,25 +368,6 @@ sub trackFiles($@)                                                              
  {my ($label, @files) = @_;                                                     # Label, files
   say STDERR "$label ", dump([map{[fileSize($_), $_]} @files]);
  } # trackFiles
-
-sub titleToUniqueFileName($$$$)                                                 # Create a file name from a title that is unique within the set %uniqueNames.
- {my ($uniqueFileNames, $title, $suffix, $ext) = @_;                            # Unique file names hash {} which will be updated by this method, title, file name suffix, file extension
-  my $t = $title;                                                               # Title
-     $t =~ s/[^a-z0-9_-]//igs;                                                  # Edit out characters that would produce annoying file names
-
-  my $n = 1 + keys %$uniqueFileNames;                                           # Make the file name unique
-  my $f = $t =~ m(\S) ?                                                         # File name without unique number if possible
-        fpe(qq(${t}_${suffix}), $ext):
-        fpe(        ${suffix},  $ext);
-
-     $f = $t =~ m(\S) ?                                                         # Otherwise file name with unique number
-      fpe(qq(${t}_${suffix}_${n}), $ext):
-      fpe(     qq(${suffix}_${n}), $ext)
-        if $$uniqueFileNames{$f};
-
-  $$uniqueFileNames{$f}++;
-  $f
- } # titleToUniqueFileName
 
 #D2 Position                                                                    # Position in the file system.
 
@@ -682,7 +672,7 @@ sub readFile($)                                                                 
     confess "Cannot open file for unicode input, file:\n$file\n$!\n";
   local $/ = undef;
   my $string = eval {<$F>};
-  $@ and confess $@;
+  $@ and confess "$@ reading file:\n$file\n";
   $string
  } # readFile
 
@@ -781,7 +771,7 @@ sub overWriteFile($$)                                                           
 
 BEGIN{*owf=*overWriteFile}
 
-sub writeFile($$)                                                               #I Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+sub writeFile($$)                                                               #I Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
  {my ($file, $string) = @_;                                                     # New file to write to or B<undef> for a temporary file,  string to write
   if (defined $file)
    {-e $file and confess "File already exists:\n$file\n";
@@ -1189,19 +1179,23 @@ sub mergeHashesBySummingValues(@)                                               
   \%h
  }
 
-sub setIntersectionOfTwoArraysOfWords($$)                                       # Intersection of two arrays of words.
- {my ($a, $b) = @_;                                                             # Reference to first array of words, reference to second array of words
-  my @a = @$a >  @$b ? @$a : @$b;
-  my @b = @$a <= @$b ? @$a : @$b;
-  my %a  = map {$_=>1} @a;
-  my %b  = map {$_=>1} @b;
-  grep {$a{$_}} sort keys %b
+sub setIntersectionOfSetsOfWords(@)                                             # Intersection of arrays of words.
+ {my (@s) = @_;                                                                 # A reference to an array of arrays of words
+  my %e;
+  for my $s(@s)                                                                 # Intersect each set
+   {reftype($s) =~ m(array)is or confess "Array reference required";
+    for my $e(@$s)                                                              # Count instances of each word
+     {$e{$e}++
+     }
+   }
+  my $S = @s;                                                                   # Set count
+  grep {$e{$_} == $S} sort keys %e;                                             # Return words that appear in all the sets
  }
 
-sub setUnionOfTwoArraysOfWords($$)                                              # Union of two arrays of words.
- {my ($a, $b) = @_;                                                             # Reference to first array of words, reference to second array of words
-  my %a = map {$_=>1} @$a, @$b;
-  sort keys %a
+sub setUnionOfWords(@)                                                          # Union of arrays of words.
+ {my (@a) = @_;                                                                 # Array of words or arrays of words
+  my %a = map {$_=>1} map {ref($_) ? @$_ : $_} @_;                              # Form union
+  sort keys %a                                                                  # Return words in union
  }
 
 sub contains($@)                                                                # Returns the indices at which an item matches elements of the specified array. If the item is a regular expression then it is matched as one, else it is a number it is matched as a number, else as a string.
@@ -1420,7 +1414,7 @@ sub formatTableH($;$)                                                           
   formatTableBasic($d);
  }
 
-sub formatTable($;$%)                                                           #I Format various data structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.\mOptionally create a report from the table using the following optional report B<%options>:\mB<file=E<gt>$file> the name of a file to write the report to.\mB<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time and NNNN will be replaced with the number of rows in the table.\mB<foot=E<gt>$foot> footer text that will be placed immediately after the table.\mB<summarize=E<gt>$summarize> if true and B<$data> is an array of arrays, then each column of the will be summarized by printing its distinct values and a count of how often each value occurs in a series of smaller tables following the main table.\mB<wide=E<gt>$wide>write a note explaining the need to scroll to the right if true.\mB<zero=E<gt>$zero> if true the report will be written to the specified file even if the report is empty.\mParameters:
+sub formatTable($;$%)                                                           #I Format various data structures as a table with titles as specified by B<$columnTitles>: either a reference to an array of column titles or a string each line of which contains the column title as the first word with the rest of the line describing that column.\mOptionally create a report from the table using the following optional report B<%options>:\mB<file=E<gt>$file> the name of a file to write the report to.\mB<head=E<gt>$head> a header line in which DDDD will be replaced with the data and time and NNNN will be replaced with the number of rows in the table.\mB<foot=E<gt>$foot> footer text that will be placed immediately after the table.\mB<summarize=E<gt>$summarize> if true and B<$data> is an array of arrays, then each column of the will be summarized by printing its distinct values and a count of how often each value occurs in a series of smaller tables following the main table.\mB<wide=E<gt>$wide>write a note explaining the need to scroll to the right if true.\mB<msg=E<gt>$msg> if true a summary of the situation will be written to STDERR including the first line of the header and the file being written to.\mB<zero=E<gt>$zero> if true the report will be written to the specified file even if the report is empty.\mParameters:
  {my ($data, $columnTitles, %options) = @_;                                     # Data to be formatted, optional reference to an array of titles or string of column descriptions, options
 
   my ($titleString, $title) = sub                                               # Title string, column headers
@@ -1480,23 +1474,30 @@ END
      file=>q(The name of a file to which to write the formatted table.),
      zero=>q(Write the report even if the table is empty.),
      wide=>q(Write a note explaining the need to scroll to the right if true),
+     msg =>q(Write a message to STDERR summarizing the situation if true),
     });
 
-  my ($head, $foot, $file, $zero, $summarize, $wide) = map{$options{$_}}        # Options requested
-    qw(head   foot   file   zero   summarize   wide);
+  my ($head, $foot, $file, $zero, $summarize, $wide, $msg) = map{$options{$_}}  # Options requested
+    qw(head   foot   file   zero   summarize   wide   msg);
 
   my @report;
   my $date = dateTimeStamp;
   my $N    = keyCount(1, $data);
-  push @report, ($head =~ s(DDDD) ($date)gr =~ s(NNNN) ($N)gr), q() if $head;
-  push @report, qq(This file: $file),                           q() if $file;
-  push @report, $titleString if $titleString;
-  push @report, <<END                                               if $wide;
+  my $H    = ($head//'') =~ s(DDDD) ($date)gr =~ s(NNNN) ($N)gr;
+  push @report, $H                        if $head;
+  push @report, qq(This file: $file), q() if $file;
+  push @report, $titleString              if $titleString;
+  push @report, <<END                     if $wide;
 Please note that this is a wide report: you might have to scroll
 a long way to the right to see all the columns of data available!
 END
   push @report, $formattedTable;
-  push @report, $foot                                               if $foot;
+  push @report, $foot                     if $foot;
+
+  if ($msg and $file and $head)
+   {say STDERR $H =~ s(\n.*\Z) ()gsr;
+    say STDERR qq(See file: $file);
+   }
 
   if ($summarize)                                                               # Summarize an array of arrays if requested
    {my $s = '';
@@ -1677,7 +1678,9 @@ sub genHash($%)                                                                 
   my $s;
   for my $m(sort keys %attributes)                                              # Add any attributes not already present
    {next if $h->can($m);
-    $s .= 'sub '.$bless.'::'.$m. ':lvalue {$_[0]{"'.$m.'"}}';                   # LValue version for get and set
+    my $R = reftype($attributes{$m});                                           # Type of thing referred to
+    my $r = !defined($R) ? q() : $R =~ m(array)i ? q( //= []) : q( //= {});     # Empty return type
+    $s .= 'sub '.$bless.'::'.$m. ':lvalue {$_[0]{"'.$m.qq("}$r});               # LValue version for get and set
     $s .= 'sub '.$bless.'::'.$m. 'X       {$_[0]{"'.$m.'"}//q()}';              # Default to blank for get
    }
   if ($s)                                                                       # Add any new methods needed
@@ -1788,10 +1791,10 @@ sub isSubInPackage($$)                                                          
   $r
  }
 
-sub overrideMethods($$@)                                                        # For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
+sub overrideMethods($$@)                                                        #S For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
  {my ($from, $to, @methods) = @_;                                               # Name of package from which to import methods, package into which to import the methods, list of methods to try importing.
   my @s;
-  for my $method(@methods)                                                      # Replaceable methods
+  for my $method(setUnionOfWords @methods)                                      # Replaceable methods
    {push @s, <<"END";
 if (isSubInPackage(q($from), q($method)))
  {undef &${to}::$method;
@@ -1994,6 +1997,80 @@ sub subScriptStringUndo($)                                                      
   $string
  }
 
+sub isFileUtf8($)                                                               # Return the file name quoted if its contents are in utf8 else return undef
+ {my ($file) = @_;                                                              # File to test
+  my $f = quoteFile($file);
+  qx(isutf8 -q $f);                                                             # Test
+  return $f unless $?;                                                          # File is utf8
+  undef                                                                         # File is not utf8
+ }
+
+#D1 Unix domain communications                                                  # Send messages between processes via a unix domain socket.
+
+sub newUdsr(@)                                                                  #P Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+ {my (@parms) = @_;                                                             # Attributes per L<Udsr Definition|/Udsr Definition>
+   my $u = genHash(q(Udsr),                                                     # Package name
+    client       => undef,                                                      # Client socket and connection socket
+    headerLength => 8,                                                          # Length of fixed header which carries the length of the following message
+    serverAction => undef,                                                      # Server action sub, which receives a communicator every time a client creates a new connection.
+    serverPid    => undef,                                                      # Server pid which can be used to kill the server via kill q(kill), $pid
+    socketPath   => qq(unix-domain-socket-test.sock),                           # Socket file
+    @_
+   );
+ }
+
+sub newUdsrServer(@)                                                          # Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+ {my (@parms) = @_;                                                             # Attributes per L<Udsr Definition|/Udsr Definition>
+  my $u = newUdsr(@_);
+  unlink $u->socketPath;
+  my $s = IO::Socket::UNIX->new(Type=>SOCK_STREAM(),
+                                Local=>$u->socketPath, Listen=>1);
+  if (my $pid = fork)                                                           # Run the server in a process by itself
+   {$u->serverPid = $pid;                                                       # Record server pid so it can be killed
+    return $u;
+   }
+  else                                                                          # Run the server action on a client connection
+   {while (my $con = $s->accept())
+     {$u->client = $con;
+      $u->serverAction->($u);                                                   # The server action sub should use the read and write routines on the passed communicator.
+      $con->close;
+     }
+    exit;
+   }
+ }
+
+sub newUdsrClient(@)                                                            # Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+ {my (@parms) = @_;                                                             # Attributes per L<Udsr Definition|/Udsr Definition>
+  my $u = newUdsr(@_);
+  $u->client = IO::Socket::UNIX->new(Type=>SOCK_STREAM(), Peer => $u->socketPath);
+  $u
+ }
+
+sub Udsr::write($$)                                                             # Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+ {my ($u, $msg) = @_;                                                           # Communicator, message
+  my $con = $u->client;
+  my $m = pad(length($msg), $u->headerLength).$msg;
+  $con->print($m);
+  $u
+ }
+
+sub Udsr::read($)                                                               # Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+ {my ($u) = @_;                                                                 # Communicator
+  my $con = $u->client;
+  $con->read(my $length, $u->headerLength);
+  $con->read(my $data,   $length);
+  $data
+ }
+
+sub Udsr::kill($)                                                               # Kill a communications server.
+ {my ($u) = @_;                                                                 # Communicator
+  my $p = $u->serverPid;                                                        # Server Pid
+  kill 'KILL', $p if $p;                                                        # Kill server
+  $u->serverPid = undef;                                                        # Server Pid
+  unlink $u->socketPath;                                                        # Remove socket
+  $u
+ }
+
 #D1 Cloud Cover                                                                 # Useful for operating across the cloud.
 
 sub makeDieConfess                                                              # Force die to confess where the death occurred.
@@ -2011,27 +2088,28 @@ sub ipAddressViaArp($)                                                          
   $ip                                                                           # Return ip address
  }
 
-sub saveCodeToS3($$$;$)                                                         # Save source code files.
- {my ($saveCodeEvery, $zipFileName, $bucket, $S3Parms) = @_;                    # Save every seconds, zip file name, bucket/key, additional S3 parameters like profile or region as a string
-  my $saveTimeFile = q(.codeSaveTimes);                                         # Get last save time if any
-  my $s3Parms = $S3Parms // '';
+sub saveCodeToS3($$$$;$)                                                        # Save source code files.
+ {my ($saveCodeEvery, $folder, $zipFileName, $bucket, $S3Parms) = @_;           # Save every seconds, folder to save, zip file name, bucket/key, additional S3 parameters like profile or region as a string
+@_ == 5 or confess;
+  my $saveTimeFile = fpe($folder, q(codeSaveTimes));                            # Get last save time if any
   my $lastSaveTime = -e $saveTimeFile ? retrieve($saveTimeFile) : undef;        # Get last save time
   return if $lastSaveTime and $lastSaveTime->[0] > time - $saveCodeEvery;       # Too soon
 
   return if fork;                                                               # Fork zip and upload
-  say STDERR &timeStamp." Saving latest version of code to S3";
+  my $target = fpe($bucket, $zipFileName, q(zip));                              # Target on S3
+  say STDERR &timeStamp.
+    " Saving latest version of code in $folder to s3://$target";
 
-  my $z = filePathExt($zipFileName, q(zip));                                    # Zip file
+  my $z = fpe($folder, $zipFileName, q(zip));                                   # Zip file
   unlink $z;                                                                    # Remove old zip file
 
-  if (my $c = <<END =~ s/\n/ /gsr)                                              # Zip command
-zip -qr $z *
-END
+  if (my $c = qq(cd $folder; zip -qr $z *))                                     # Zip command
    {my $r = qx($c);
     confess "$c\n$r\n" if $r =~ m(\S);                                          # Confirm zip
    }
 
-  if (my $c = "aws s3 cp $z s3://$bucket/$zipFileName.zip $s3Parms")            # Upload zip
+  my $s3Parms = $S3Parms // '';
+  if (my $c = "aws s3 cp $z s3://$target $s3Parms")                             # Upload zip
    {my $r = qx($c);
     confess "$c\n$r\n" if $r =~ m(\S);                                          # Confirm upload
    }
@@ -2595,7 +2673,8 @@ END
          }
         last if $nextLine =~ m/\A\s*\);/;                                       # Finish on closing bracket
         $N < $M or confess                                                      # Prevent overruns
-          "More than $M line genHash definition at line $l\n";
+          "More than $M line genHash definition at line $l\n".
+          join("\n", @lines[$l..$L]);
        }
      }
    }
@@ -3030,9 +3109,12 @@ END
     s(L<eval>)         (L<eval|http://perldoc.perl.org/functions/eval.html>);
     s(L<\$_>)          (L<\$_|http://perldoc.perl.org/perlvar.html#General-Variables>);
     s(L<our>)          (L<our|https://perldoc.perl.org/functions/our.html>);
-    s(L<Imagemagick>)  (L<Imagemagick|/https://www.imagemagick.org/script/index.php>);
+    s(L<Imagemagick>)  (L<Imagemagick|https://www.imagemagick.org/script/index.php>);
     s(L<Dita>)         (L<Dita|http://docs.oasis-open.org/dita/dita/v1.3/os/part2-tech-content/dita-v1.3-os-part2-tech-content.html>);
+    s(L<DitaOT>)       (L<DITA-OT|http://www.dita-ot.org/download>);
     s(L<Xml parser>)   (L<Xml parser|https://metacpan.org/pod/XML::Parser/>);
+    s(L<xmllint>)      (L<xmllint|http://xmlsoft.org/xmllint.html>);
+    s(L<OxygenFormat)  (L<https://www.oxygenxml.com/doc/versions/20.1/ug-author/topics/linked-output-messages-of-external-engine.html>);
     s(L<html table>)   (L<html table|https://www.w3.org/TR/html52/tabular-data.html#the-table-element>);
    }
 
@@ -3107,15 +3189,18 @@ formatTableBasic fpd fpe fpf fp fe fn fpn fne fullFileName
 genClass genHash
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
+guidFromMd5
 hostName htmlToc
-imageSize isSubInPackage overrideMethods indentString ipAddressViaArp isBlank
+imageSize isSubInPackage indentString ipAddressViaArp isBlank isFileUtf8
 javaPackage javaPackageAsFileName
 keyCount
 loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines
 loadHash loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
 makeDieConfess
 makePath matchPath max microSecondsSinceEpoch min
-newServiceIncarnation newProcessStarter numberOfLinesInFile numberOfLinesInString
+newServiceIncarnation newProcessStarter
+newUdsrServer newUdsrClient
+numberOfLinesInFile numberOfLinesInString
 nws
 overWriteBinaryFile overWriteFile owf
 pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName printQw
@@ -3123,8 +3208,8 @@ quoteFile
 readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs reloadHashes removeBOM removeFilePrefix
 retrieveFile
 saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
-setIntersectionOfTwoArraysOfWords setPackageSearchOrder
-setUnionOfTwoArraysOfWords squareArray startProcess
+setIntersectionOfSetsOfWords setPackageSearchOrder
+setUnionOfWords squareArray startProcess
 storeFile stringsAreNotEqual
 summarizeColumn
 superScriptString superScriptStringUndo subScriptString subScriptStringUndo
@@ -3307,7 +3392,7 @@ Data::Table::Text - Write data in tabular text format.
 Write data in tabular text format.
 
 
-Version 20181204.
+Version 20181218.
 
 
 The following sections describe the methods in each functional area of this
@@ -3353,6 +3438,8 @@ B<summarize=E<gt>$summarize> if true and B<$data> is an array of arrays, then ea
 
 B<wide=E<gt>$wide>write a note explaining the need to scroll to the right if true.
 
+B<msg=E<gt>$msg> if true a summary of the situation will be written to STDERR including the first line of the header and the file being written to.
+
 B<zero=E<gt>$zero> if true the report will be written to the specified file even if the report is empty.
 
 Parameters:
@@ -3379,7 +3466,7 @@ Combine zero or more absolute and relative file names
 
 L<writeFile|/writeFile>
 
-Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
 
 L<xxx|/xxx>
 
@@ -3605,6 +3692,26 @@ B<Example:>
 
 
     𝗳𝗶𝗹𝗲𝗠𝗱𝟱𝗦𝘂𝗺(q(/etc/hosts));                                                    
+  
+
+=head3 guidFromMd5($)
+
+Create a guid from an md5 hash.
+
+     Parameter  Description
+  1  $m         Md5 hash
+
+B<Example:>
+
+
+  if (1) {                                                                        
+    ok 𝗴𝘂𝗶𝗱𝗙𝗿𝗼𝗺𝗠𝗱𝟱(substr(join('', 0..9) x 4, 0, 32)) eq
+       q(GUID-01234567-8901-2345-6789-012345678901);
+  }
+  
+  #tttt
+  
+  1
   
 
 =head3 fileModTime($)
@@ -3905,41 +4012,6 @@ B<Example:>
 
 
   ok 𝘀𝘄𝗮𝗽𝗙𝗶𝗹𝗲𝗣𝗿𝗲𝗳𝗶𝘅(q(/aaa/bbb.txt), q(/aaa/), q(/AAA/)) eq q(/AAA/bbb.txt);      
-  
-
-=head4 titleToUniqueFileName($$$$)
-
-Create a file name from a title that is unique within the set %uniqueNames.
-
-     Parameter         Description
-  1  $uniqueFileNames  Unique file names hash {} which will be updated by this method
-  2  $title            Title
-  3  $suffix           File name suffix
-  4  $ext              File extension
-
-B<Example:>
-
-
-  ˢ{my $f = {};                                                                   
-    ok q(a_p.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
-    ok q(a_p_2.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
-    ok q(a_p_3.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
-    ok q(a_q.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
-    ok q(a_q_5.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
-    ok q(a_q_6.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
-   };
-  
-    ok q(a_p.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
-  
-    ok q(a_p_2.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
-  
-    ok q(a_p_3.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a p txt));                   
-  
-    ok q(a_q.txt)   eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
-  
-    ok q(a_q_5.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
-  
-    ok q(a_q_6.txt) eq &𝘁𝗶𝘁𝗹𝗲𝗧𝗼𝗨𝗻𝗶𝗾𝘂𝗲𝗙𝗶𝗹𝗲𝗡𝗮𝗺𝗲($f, qw(a q txt));                   
   
 
 =head2 Position
@@ -4431,7 +4503,7 @@ B<owf> is a synonym for L<overWriteFile|/overWriteFile>.
 
 =head3 writeFile($$)
 
-Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
 
      Parameter  Description
   1  $file      New file to write to or B<undef> for a temporary file
@@ -4876,7 +4948,7 @@ Image operations.
 
 =head2 imageSize($)
 
-Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+Return (width, height) of an image obtained via L<Imagemagick|https://www.imagemagick.org/script/index.php>.
 
      Parameter  Description
   1  $image     File containing image
@@ -4889,7 +4961,7 @@ B<Example:>
 
 =head2 convertImageToJpx($$$$)
 
-Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
+Convert an image to jpx format using L<Imagemagick|https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
 
      Parameter  Description
   1  $Source    Source file
@@ -4927,7 +4999,7 @@ Cut out the images embedded in a B<fodt> file, perhaps produced via L<convertDoc
 
   <image href="$imageFile" outputclass="imageType">.
 
-This conversion requires that you have both L<Imagemagick|/https://www.imagemagick.org/script/index.php> and L<unoconv|/https://github.com/dagwieers/unoconv> installed on your system:
+This conversion requires that you have both L<Imagemagick|https://www.imagemagick.org/script/index.php> and L<unoconv|/https://github.com/dagwieers/unoconv> installed on your system:
 
     sudo apt install sharutils  imagemagick unoconv
 
@@ -5092,36 +5164,33 @@ B<Example:>
    }
   
 
-=head2 setIntersectionOfTwoArraysOfWords($$)
+=head2 setIntersectionOfSetsOfWords(@)
 
-Intersection of two arrays of words.
+Intersection of arrays of words.
 
      Parameter  Description
-  1  $a         Reference to first array of words
-  2  $b         Reference to second array of words
+  1  @s         A reference to an array of arrays of words
 
 B<Example:>
 
 
-  is_deeply [qw(a b c)],                                                          
-  
-    [𝘀𝗲𝘁𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝗳𝗧𝘄𝗼𝗔𝗿𝗿𝗮𝘆𝘀𝗢𝗳𝗪𝗼𝗿𝗱𝘀([qw(e f g a b c )], [qw(a A b B c C)])];   
+  if (1) {                                                                        
+    is_deeply [qw(a b c)],
+     [𝘀𝗲𝘁𝗜𝗻𝘁𝗲𝗿𝘀𝗲𝗰𝘁𝗶𝗼𝗻𝗢𝗳𝗦𝗲𝘁𝘀𝗢𝗳𝗪𝗼𝗿𝗱𝘀([qw(e f g a b c )], [qw(a A b B c C)])];
+   }
   
 
-=head2 setUnionOfTwoArraysOfWords($$)
+=head2 setUnionOfWords(@)
 
-Union of two arrays of words.
+Union of arrays of words.
 
      Parameter  Description
-  1  $a         Reference to first array of words
-  2  $b         Reference to second array of words
+  1  @a         Array of words or arrays of words
 
 B<Example:>
 
 
-  is_deeply [qw(a b c)],                                                          
-  
-    [𝘀𝗲𝘁𝗨𝗻𝗶𝗼𝗻𝗢𝗳𝗧𝘄𝗼𝗔𝗿𝗿𝗮𝘆𝘀𝗢𝗳𝗪𝗼𝗿𝗱𝘀([qw(a b c )], [qw(a b)])];                        
+  is_deeply [qw(a b c)], [𝘀𝗲𝘁𝗨𝗻𝗶𝗼𝗻𝗢𝗳𝗪𝗼𝗿𝗱𝘀(qw(a b c a a b b b))];                  
   
 
 =head2 contains($@)
@@ -5236,6 +5305,8 @@ B<foot=E<gt>$foot> footer text that will be placed immediately after the table.
 B<summarize=E<gt>$summarize> if true and B<$data> is an array of arrays, then each column of the will be summarized by printing its distinct values and a count of how often each value occurs in a series of smaller tables following the main table.
 
 B<wide=E<gt>$wide>write a note explaining the need to scroll to the right if true.
+
+B<msg=E<gt>$msg> if true a summary of the situation will be written to STDERR including the first line of the header and the file being written to.
 
 B<zero=E<gt>$zero> if true the report will be written to the specified file even if the report is empty.
 
@@ -5361,7 +5432,6 @@ B<Example:>
   Sample report.
   
   Table has 2 rows.
-  
   
   This file: report.txt
   
@@ -5979,6 +6049,11 @@ B<Example:>
    }
   
 
+This is a static method and so should be invoked as:
+
+  Data::Table::Text::overrideMethods
+
+
 =head2 assertPackageRefs($@)
 
 Confirm that the specified references are to the specified package
@@ -6424,6 +6499,247 @@ B<Example:>
    }
   
 
+=head2 isFileUtf8($)
+
+Return the file name quoted if its contents are in utf8 else return undef
+
+     Parameter  Description
+  1  $file      File to test
+
+B<Example:>
+
+
+  if (0) {                                                                        
+    my $f = writeFile(undef, "aaa");
+    ok 𝗶𝘀𝗙𝗶𝗹𝗲𝗨𝘁𝗳𝟴 $f;
+   }
+  
+
+=head1 Unix domain communications
+
+Send messages between processes via a unix domain socket.
+
+=head2 newUdsrServer(@)
+
+Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+
+     Parameter  Description
+  1  @parms     Attributes per L<Udsr Definition|/Udsr Definition>
+
+B<Example:>
+
+
+  if (1) {                                                                            
+    my $N = 20;
+    my $s = 𝗻𝗲𝘄𝗨𝗱𝘀𝗿𝗦𝗲𝗿𝘃𝗲𝗿(serverAction=>sub
+     {my ($u) = @_;
+      my $r = $u->read;
+      $u->write(qq(Hello from server $r));
+     });
+  
+    my $p = newProcessStarter(min(100, $N));                                      # Run some clients
+    for my $i(1..$N)
+     {$p->start(sub
+       {my $count = 0;
+        for my $j(1..$N)
+         {my $c = newUdsrClient;
+          my $m = qq(Hello from client $i x $j);
+          $c->write($m);
+          my $r = $c->read;
+          ++$count if $r eq qq(Hello from server $m);
+         }
+        [$count]
+       });
+     }
+  
+    my $count;
+    for my $r($p->finish)                                                         # Consolidate results
+     {my ($c) = @$r;
+      $count += $c;
+     }
+  
+    ok $count == $N*$N;                                                           # Check results and kill
+    $s->kill;
+   }
+  
+
+=head2 newUdsrClient(@)
+
+Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+
+     Parameter  Description
+  1  @parms     Attributes per L<Udsr Definition|/Udsr Definition>
+
+B<Example:>
+
+
+  if (1) {                                                                            
+    my $N = 20;
+    my $s = newUdsrServer(serverAction=>sub
+     {my ($u) = @_;
+      my $r = $u->read;
+      $u->write(qq(Hello from server $r));
+     });
+  
+    my $p = newProcessStarter(min(100, $N));                                      # Run some clients
+    for my $i(1..$N)
+     {$p->start(sub
+       {my $count = 0;
+        for my $j(1..$N)
+         {my $c = 𝗻𝗲𝘄𝗨𝗱𝘀𝗿𝗖𝗹𝗶𝗲𝗻𝘁;
+          my $m = qq(Hello from client $i x $j);
+          $c->write($m);
+          my $r = $c->read;
+          ++$count if $r eq qq(Hello from server $m);
+         }
+        [$count]
+       });
+     }
+  
+    my $count;
+    for my $r($p->finish)                                                         # Consolidate results
+     {my ($c) = @$r;
+      $count += $c;
+     }
+  
+    ok $count == $N*$N;                                                           # Check results and kill
+    $s->kill;
+   }
+  
+
+=head2 Udsr::write($$)
+
+Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+
+     Parameter  Description
+  1  $u         Communicator
+  2  $msg       Message
+
+B<Example:>
+
+
+  if (1) {                                                                            
+    my $N = 20;
+    my $s = newUdsrServer(serverAction=>sub
+     {my ($u) = @_;
+      my $r = $u->read;
+      $u->write(qq(Hello from server $r));
+     });
+  
+    my $p = newProcessStarter(min(100, $N));                                      # Run some clients
+    for my $i(1..$N)
+     {$p->start(sub
+       {my $count = 0;
+        for my $j(1..$N)
+         {my $c = newUdsrClient;
+          my $m = qq(Hello from client $i x $j);
+          $c->write($m);
+          my $r = $c->read;
+          ++$count if $r eq qq(Hello from server $m);
+         }
+        [$count]
+       });
+     }
+  
+    my $count;
+    for my $r($p->finish)                                                         # Consolidate results
+     {my ($c) = @$r;
+      $count += $c;
+     }
+  
+    ok $count == $N*$N;                                                           # Check results and kill
+    $s->kill;
+   }
+  
+
+=head2 Udsr::read($)
+
+Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
+
+     Parameter  Description
+  1  $u         Communicator
+
+B<Example:>
+
+
+  if (1) {                                                                            
+    my $N = 20;
+    my $s = newUdsrServer(serverAction=>sub
+     {my ($u) = @_;
+      my $r = $u->read;
+      $u->write(qq(Hello from server $r));
+     });
+  
+    my $p = newProcessStarter(min(100, $N));                                      # Run some clients
+    for my $i(1..$N)
+     {$p->start(sub
+       {my $count = 0;
+        for my $j(1..$N)
+         {my $c = newUdsrClient;
+          my $m = qq(Hello from client $i x $j);
+          $c->write($m);
+          my $r = $c->read;
+          ++$count if $r eq qq(Hello from server $m);
+         }
+        [$count]
+       });
+     }
+  
+    my $count;
+    for my $r($p->finish)                                                         # Consolidate results
+     {my ($c) = @$r;
+      $count += $c;
+     }
+  
+    ok $count == $N*$N;                                                           # Check results and kill
+    $s->kill;
+   }
+  
+
+=head2 Udsr::kill($)
+
+Kill a communications server.
+
+     Parameter  Description
+  1  $u         Communicator
+
+B<Example:>
+
+
+  if (1) {                                                                            
+    my $N = 20;
+    my $s = newUdsrServer(serverAction=>sub
+     {my ($u) = @_;
+      my $r = $u->read;
+      $u->write(qq(Hello from server $r));
+     });
+  
+    my $p = newProcessStarter(min(100, $N));                                      # Run some clients
+    for my $i(1..$N)
+     {$p->start(sub
+       {my $count = 0;
+        for my $j(1..$N)
+         {my $c = newUdsrClient;
+          my $m = qq(Hello from client $i x $j);
+          $c->write($m);
+          my $r = $c->read;
+          ++$count if $r eq qq(Hello from server $m);
+         }
+        [$count]
+       });
+     }
+  
+    my $count;
+    for my $r($p->finish)                                                         # Consolidate results
+     {my ($c) = @$r;
+      $count += $c;
+     }
+  
+    ok $count == $N*$N;                                                           # Check results and kill
+    $s->kill;
+   }
+  
+
 =head1 Cloud Cover
 
 Useful for operating across the cloud.
@@ -6452,20 +6768,21 @@ B<Example:>
     𝗶𝗽𝗔𝗱𝗱𝗿𝗲𝘀𝘀𝗩𝗶𝗮𝗔𝗿𝗽(q(secarias));                                                 
   
 
-=head2 saveCodeToS3($$$$)
+=head2 saveCodeToS3($$$$$)
 
 Save source code files.
 
      Parameter       Description
   1  $saveCodeEvery  Save every seconds
-  2  $zipFileName    Zip file name
-  3  $bucket         Bucket/key
-  4  $S3Parms        Additional S3 parameters like profile or region as a string
+  2  $folder         Folder to save
+  3  $zipFileName    Zip file name
+  4  $bucket         Bucket/key
+  5  $S3Parms        Additional S3 parameters like profile or region as a string
 
 B<Example:>
 
 
-    𝘀𝗮𝘃𝗲𝗖𝗼𝗱𝗲𝗧𝗼𝗦𝟯(1200, q(projectName), q(bucket/folder), q(--only-show-errors));  
+    𝘀𝗮𝘃𝗲𝗖𝗼𝗱𝗲𝗧𝗼𝗦𝟯(1200, q(.), q(projectName), q(bucket/folder), q(--quiet));       
   
 
 =head2 addCertificate($)
@@ -6979,6 +7296,24 @@ B<b> - Definition of attribute bb.
 
 
 
+=head2 Udsr Definition
+
+
+Package name
+
+
+B<client> - Client socket and connection socket
+
+B<headerLength> - Length of fixed header which carries the length of the following message
+
+B<serverAction> - Server action sub, which receives a communicator every time a client creates a new connection.
+
+B<serverPid> - Server pid which can be used to kill the server via kill q(kill), $pid
+
+B<socketPath> - Socket file
+
+
+
 =head1 Private Methods
 
 =head2 denormalizeFolderName($)
@@ -7035,7 +7370,7 @@ B<Example:>
 
 =head2 convertImageToJpx690($$$$)
 
-Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.9.0 and above with optional image reduction.
+Convert an image to jpx format using versions of L<Imagemagick|https://www.imagemagick.org/script/index.php> version 6.9.0 and above with optional image reduction.
 
      Parameter  Description
   1  $Source    Source file
@@ -7120,6 +7455,13 @@ Create a map of all the keys within all the hashes within a tower of data struct
 
      Parameter  Description
   1  $d         Data structure
+
+=head2 newUdsr(@)
+
+Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+
+     Parameter  Description
+  1  @parms     Attributes per L<Udsr Definition|/Udsr Definition>
 
 =head2 saveSourceToS3($$)
 
@@ -7242,9 +7584,9 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 17 L<convertDocxToFodt|/convertDocxToFodt> - Convert a B<docx> file to B<fodt> using B<unoconv> which must not be running elsewhere at the time.
 
-18 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|/https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
+18 L<convertImageToJpx|/convertImageToJpx> - Convert an image to jpx format using L<Imagemagick|https://www.imagemagick.org/script/index.php> applying an optional scaling if required.
 
-19 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|/https://www.imagemagick.org/script/index.php> version 6.
+19 L<convertImageToJpx690|/convertImageToJpx690> - Convert an image to jpx format using versions of L<Imagemagick|https://www.imagemagick.org/script/index.php> version 6.
 
 20 L<convertUnicodeToXml|/convertUnicodeToXml> - Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents.
 
@@ -7390,191 +7732,205 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 90 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues> - Generate L<lvalue|http://perldoc.perl.org/perlsub.html#Lvalue-subroutines> scalar methods with default values in the current package.
 
-91 L<hostName|/hostName> - The name of the host we are running on.
+91 L<guidFromMd5|/guidFromMd5> - Create a guid from an md5 hash.
 
-92 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
+92 L<hostName|/hostName> - The name of the host we are running on.
 
-93 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|/https://www.imagemagick.org/script/index.php>.
+93 L<htmlToc|/htmlToc> - Generate a table of contents for some html.
 
-94 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
+94 L<imageSize|/imageSize> - Return (width, height) of an image obtained via L<Imagemagick|https://www.imagemagick.org/script/index.php>.
 
-95 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
+95 L<indentString|/indentString> - Indent lines contained in a string or formatted table by the specified string.
 
-96 L<isBlank|/isBlank> - Test whether a string is blank.
+96 L<ipAddressViaArp|/ipAddressViaArp> - Get the ip address of a server on the local network by hostname via arp
 
-97 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
+97 L<isBlank|/isBlank> - Test whether a string is blank.
 
-98 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
+98 L<isFileUtf8|/isFileUtf8> - Return the file name quoted if its contents are in utf8 else return undef
 
-99 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
+99 L<isSubInPackage|/isSubInPackage> - Test whether a subroutine is present in a package.
 
-100 L<keyCount|/keyCount> - Count keys down to the specified level.
+100 L<javaPackage|/javaPackage> - Extract the package name from a java string or file.
 
-101 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
+101 L<javaPackageAsFileName|/javaPackageAsFileName> - Extract the package name from a java string or file and convert it to a file name.
 
-102 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
+102 L<keyCount|/keyCount> - Count keys down to the specified level.
 
-103 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
+103 L<loadArrayArrayFromLines|/loadArrayArrayFromLines> - Load an array of arrays from lines of text: each line is an array of words.
 
-104 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
+104 L<loadArrayFromLines|/loadArrayFromLines> - Load an array from lines of text in a string.
 
-105 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
+105 L<loadArrayHashFromLines|/loadArrayHashFromLines> - Load an array of hashes from lines of text: each line is a hash of words.
 
-106 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
+106 L<loadHash|/loadHash> - Load the specified B<$hash> generated with L<genHash|/genHash> with B<%attributes>.
 
-107 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
+107 L<loadHashArrayFromLines|/loadHashArrayFromLines> - Load a hash of arrays from lines of text: the first word of each line is the key, the remaining words are the array contents.
 
-108 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
+108 L<loadHashFromLines|/loadHashFromLines> - Load a hash: first word of each line is the key and the rest is the value.
 
-109 L<makePath|/makePath> - Make the path for the specified file name or folder.
+109 L<loadHashHashFromLines|/loadHashHashFromLines> - Load a hash of hashes from lines of text: the first word of each line is the key, the remaining words are the sub hash contents.
 
-110 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
+110 L<makeDieConfess|/makeDieConfess> - Force die to confess where the death occurred.
 
-111 L<max|/max> - Find the maximum number in a list confessing to any ill defined values.
+111 L<makePath|/makePath> - Make the path for the specified file name or folder.
 
-112 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
+112 L<matchPath|/matchPath> - Given an absolute path find out how much of the path actually exists.
 
-113 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
+113 L<max|/max> - Find the maximum number in a list confessing to any ill defined values.
 
-114 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
+114 L<maximumLineLength|/maximumLineLength> - Find the longest line in a string
 
-115 L<min|/min> - Find the minimum number in a list confessing to any ill defined values.
+115 L<mergeHashesBySummingValues|/mergeHashesBySummingValues> - Merge the specified hashes by summing their values
 
-116 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
+116 L<microSecondsSinceEpoch|/microSecondsSinceEpoch> - Micro seconds since unix epoch.
 
-117 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
+117 L<min|/min> - Find the minimum number in a list confessing to any ill defined values.
 
-118 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
+118 L<newProcessStarter|/newProcessStarter> - Create a new L<process starter|/Data::Table::Text::Starter Definition> with which to start parallel processes up to a specified B<$maximumNumberOfProcesses> maximum number of parallel processes at a time, wait for all the started processes to finish and then optionally retrieve their saved results as an array from the folder named by B<$transferArea>.
 
-119 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
+119 L<newServiceIncarnation|/newServiceIncarnation> - Create a new service incarnation to record the start up of a new instance of a service and return the description as a L<Data::Exchange::Service Definition hash|/Data::Exchange::Service Definition>.
 
-120 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
+120 L<newUdsr|/newUdsr> - Create a communicator - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-121 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
+121 L<newUdsrClient|/newUdsrClient> - Create a new communications client - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-122 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+122 L<newUdsrServer|/newUdsrServer> - Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
 
-123 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
+123 L<numberOfLinesInFile|/numberOfLinesInFile> - The number of lines in a file
 
-124 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
+124 L<numberOfLinesInString|/numberOfLinesInString> - The number of lines in a string.
 
-125 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
+125 L<nws|/nws> - Normalize white space in a string to make comparisons easier.
 
-126 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
+126 L<overrideMethods|/overrideMethods> - For each method, if it exists in package B<$from> then export it to package B<$to> replacing any existing method in B<$to>, otherwise export the method from package B<$to> to package B<$from> in order to merge the behavior of the B<$from> and B<$to> packages with respect to the named methods with duplicates resolved if favour of package B<$from>.
 
-127 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
+127 L<overWriteBinaryFile|/overWriteBinaryFile> - Write a binary string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-128 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
+128 L<overWriteFile|/overWriteFile> - Write a unicode utf8 string to a file after creating a path to the file if necessary and return the name of the file on success else confess.
 
-129 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
+129 L<pad|/pad> - Pad a string with blanks or the specified padding character  to a multiple of a specified length.
 
-130 L<printQw|/printQw> - Print an array of words in qw() format.
+130 L<parseCommandLineArguments|/parseCommandLineArguments> - Classify the specified array of words referred to by B<$args> into positional and keyword parameters, call the specified B<sub> with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values then return the value returned by this sub.
 
-131 L<quoteFile|/quoteFile> - Quote a file name.
+131 L<parseFileName|/parseFileName> - Parse a file name into (path, name, extension).
 
-132 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
+132 L<perlPackage|/perlPackage> - Extract the package name from a perl string or file.
 
-133 L<readFile|/readFile> - Read a file containing unicode in utf8.
+133 L<powerOfTwo|/powerOfTwo> - Test whether a number is a power of two, return the power if it is else B<undef>.
 
-134 L<readFiles|/readFiles> - Read all the files in a folder into a hash
+134 L<printFullFileName|/printFullFileName> - Print a file name on a separate line with escaping so it can be used easily from the command line.
 
-135 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
+135 L<printQw|/printQw> - Print an array of words in qw() format.
 
-136 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
+136 L<quoteFile|/quoteFile> - Quote a file name.
 
-137 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
+137 L<readBinaryFile|/readBinaryFile> - Read binary file - a file whose contents are not to be interpreted as unicode.
 
-138 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+138 L<readFile|/readFile> - Read a file containing unicode in utf8.
 
-139 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
+139 L<readFiles|/readFiles> - Read all the files in a folder into a hash
 
-140 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
+140 L<readGZipFile|/readGZipFile> - Read the specified B<$file>, containing compressed utf8, through gzip
 
-141 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
+141 L<readUtf16File|/readUtf16File> - Read a file containing unicode in utf-16 format.
 
-142 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
+142 L<relFromAbsAgainstAbs|/relFromAbsAgainstAbs> - Derive a relative file name for the first absolute file name relative to the second absolute file name.
 
-143 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
+143 L<reloadHashes|/reloadHashes> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-144 L<saveSourceToS3|/saveSourceToS3> - Save source code.
+144 L<reloadHashes2|/reloadHashes2> - Ensures that all the hashes within a tower of data structures have LValue methods to get and set their current keys.
 
-145 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
+145 L<removeFilePrefix|/removeFilePrefix> - Removes a file prefix from an array of files.
 
-146 L<setIntersectionOfTwoArraysOfWords|/setIntersectionOfTwoArraysOfWords> - Intersection of two arrays of words.
+146 L<renormalizeFolderName|/renormalizeFolderName> - Normalize a folder name component by adding a trailing separator.
 
-147 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
+147 L<retrieveFile|/retrieveFile> - Retrieve a file created via L<Storable>.
 
-148 L<setUnionOfTwoArraysOfWords|/setUnionOfTwoArraysOfWords> - Union of two arrays of words.
+148 L<saveCodeToS3|/saveCodeToS3> - Save source code files.
 
-149 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
+149 L<saveSourceToS3|/saveSourceToS3> - Save source code.
 
-150 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
+150 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles> - Search the specified directory trees for the files (not folders) that match the specified extensions.
 
-151 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
+151 L<setIntersectionOfSetsOfWords|/setIntersectionOfSetsOfWords> - Intersection of arrays of words.
 
-152 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
+152 L<setPackageSearchOrder|/setPackageSearchOrder> - Set a package search order for methods requested in the current package via AUTOLOAD.
 
-153 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
+153 L<setUnionOfWords|/setUnionOfWords> - Union of arrays of words.
 
-154 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
+154 L<showHashes|/showHashes> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-155 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
+155 L<showHashes2|/showHashes2> - Create a map of all the keys within all the hashes within a tower of data structures.
 
-156 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
+156 L<squareArray|/squareArray> - Create a two dimensional square array from a one dimensional linear array.
 
-157 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
+157 L<startProcess|/startProcess> - Start new processes while the number of child processes recorded in B<%$pids> is less than the specified B<$maximum>.
 
-158 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
+158 L<storeFile|/storeFile> - Store a data structure to a file via L<Storable>.
 
-159 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
+159 L<stringsAreNotEqual|/stringsAreNotEqual> - Return the common start followed by the two non equal tails of two non equal strings or an empty list if the strings are equal.
 
-160 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
+160 L<subScriptString|/subScriptString> - Convert alphanumerics in a string to sub scripts
 
-161 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one,
+161 L<subScriptStringUndo|/subScriptStringUndo> - Undo alphanumerics in a string to sub scripts
 
-162 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
+162 L<sumAbsAndRel|/sumAbsAndRel> - Combine zero or more absolute and relative file names
 
-163 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
+163 L<summarizeColumn|/summarizeColumn> - Count the number of unique instances of each value a column in a table assumes.
 
-164 L<timeStamp|/timeStamp> - hours:minute:seconds
+164 L<superScriptString|/superScriptString> - Convert alphanumerics in a string to super scripts
 
-165 L<titleToUniqueFileName|/titleToUniqueFileName> - Create a file name from a title that is unique within the set %uniqueNames.
+165 L<superScriptStringUndo|/superScriptStringUndo> - Undo alphanumerics in a string to super scripts
 
-166 L<trackFiles|/trackFiles> - Track the existence of files.
+166 L<swapFilePrefix|/swapFilePrefix> - Swaps the start of a file name from a known name to a new one,
 
-167 L<trim|/trim> - Remove any white space from the front and end of a string.
+167 L<temporaryFile|/temporaryFile> - Create a temporary file that will automatically be L<unlinked|/unlink> during END processing.
 
-168 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
+168 L<temporaryFolder|/temporaryFolder> - Create a temporary folder that will automatically be L<rmdired|/rmdir> during END processing.
 
-169 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
+169 L<timeStamp|/timeStamp> - hours:minute:seconds
 
-170 L<userId|/userId> - The userid we are currently running under.
+170 L<trackFiles|/trackFiles> - Track the existence of files.
 
-171 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
+171 L<trim|/trim> - Remove any white space from the front and end of a string.
 
-172 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
+172 L<Udsr::kill|/Udsr::kill> - Kill a communications server.
 
-173 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
+173 L<Udsr::read|/Udsr::read> - Read a message from the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-174 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+174 L<Udsr::write|/Udsr::write> - Write a communications message to the L<newUdsrServer|/newUdsrServer> or the L<newUdsrClient|/newUdsrClient>.
 
-175 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
+175 L<updateDocumentation|/updateDocumentation> - Update documentation for a Perl module from the comments in its source code.
 
-176 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+176 L<updatePerlModuleDocumentation|/updatePerlModuleDocumentation> - Update the documentation in a perl file and show said documentation in a web browser.
 
-177 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+177 L<userId|/userId> - The userid we are currently running under.
 
-178 L<wwwDecode|/wwwDecode> - Percent decode a url per: https://en.
+178 L<versionCode|/versionCode> - YYYYmmdd-HHMMSS
 
-179 L<wwwEncode|/wwwEncode> - Percent encode a url per: https://en.
+179 L<versionCodeDashed|/versionCodeDashed> - YYYY-mm-dd-HH:MM:SS
 
-180 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+180 L<waitForAllStartedProcessesToFinish|/waitForAllStartedProcessesToFinish> - Wait until all the processes started by L<startProcess|/startProcess> have finished.
 
-181 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+181 L<writeBinaryFile|/writeBinaryFile> - Write a binary string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file does already exist.
 
-182 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+182 L<writeFile|/writeFile> - Write a unicode utf8 string to a new file that does not already exist after creating a path to the file if necessary and return the name of the file on success else confess if a problem occurred or the file already exists.
 
-183 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
+183 L<writeFiles|/writeFiles> - Write the values of a hash into files identified by the key of each value using L<overWriteFile|/overWriteFile>
+
+184 L<writeGZipFile|/writeGZipFile> - Write a unicode utf8 string through gzip to a file.
+
+185 L<wwwDecode|/wwwDecode> - Percent decode a url per: https://en.
+
+186 L<wwwEncode|/wwwEncode> - Percent encode a url per: https://en.
+
+187 L<xxx|/xxx> - Execute a shell command optionally checking its response.
+
+188 L<yyy|/yyy> - Execute a block of shell commands line by line after removing comments - stop if there is a non zero return code from any command.
+
+189 L<zzz|/zzz> - Execute lines of commands after replacing new lines with && then check that the pipeline execution results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+
+190 L<ˢ|/ˢ> - Immediately executed inline sub to allow a code block before B<if>.
 
 =head1 Installation
 
@@ -7637,7 +7993,7 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 462;
+use Test::More tests => 458;
 my $haiku     = $^O =~ m(haiku)i;
 my $windows   = $^O =~ m(MSWin32)i;
 my $mac       = $^O =~ m(darwin)i;
@@ -8176,11 +8532,13 @@ if (1)
   ok $r =~ m(\AInvalid parameter: --dDd=DDD);
  }
 
-is_deeply [qw(a b c)],                                                          #TsetIntersectionOfTwoArraysOfWords
-  [setIntersectionOfTwoArraysOfWords([qw(e f g a b c )], [qw(a A b B c C)])];   #TsetIntersectionOfTwoArraysOfWords
 
-is_deeply [qw(a b c)],                                                          #TsetUnionOfTwoArraysOfWords
-  [setUnionOfTwoArraysOfWords([qw(a b c )], [qw(a b)])];                        #TsetUnionOfTwoArraysOfWords
+if (1) {                                                                        #TsetIntersectionOfSetsOfWords
+  is_deeply [qw(a b c)],
+   [setIntersectionOfSetsOfWords([qw(e f g a b c )], [qw(a A b B c C)])];
+ }
+
+is_deeply [qw(a b c)], [setUnionOfWords(qw(a b c a a b b b))];                  #TsetUnionOfWords
 
 ok printQw(qw(a  b  c)) eq "qw(a b c)";
 
@@ -8312,15 +8670,6 @@ ok "/home/il/perl"          eq absFromAbsPlusRel("/home/la/perl/aaa",      "../.
 ok "/home/il/perl/"         eq absFromAbsPlusRel("/home/la/perl/",         "../../il/perl/");
 
 ok "aaa/bbb/ccc/ddd.txt"    eq sumAbsAndRel(qw(aaa/AAA/ ../bbb/bbb/BBB/ ../../ccc/ddd.txt)); #TsumAbsAndRel
-
-ˢ{my $f = {};                                                                   #TtitleToUniqueFileName
-  ok q(a_p.txt)   eq &titleToUniqueFileName($f, qw(a p txt));                   #TtitleToUniqueFileName
-  ok q(a_p_2.txt) eq &titleToUniqueFileName($f, qw(a p txt));                   #TtitleToUniqueFileName
-  ok q(a_p_3.txt) eq &titleToUniqueFileName($f, qw(a p txt));                   #TtitleToUniqueFileName
-  ok q(a_q.txt)   eq &titleToUniqueFileName($f, qw(a q txt));                   #TtitleToUniqueFileName
-  ok q(a_q_5.txt) eq &titleToUniqueFileName($f, qw(a q txt));                   #TtitleToUniqueFileName
-  ok q(a_q_6.txt) eq &titleToUniqueFileName($f, qw(a q txt));                   #TtitleToUniqueFileName
- };
 
 ok fp (q(a/b/c.d.e))  eq q(a/b/);                                               #Tfp
 ok fpn(q(a/b/c.d.e))  eq q(a/b/c.d);                                            #Tfpn
@@ -8458,7 +8807,7 @@ else
  }
 
 if (0) {
-  saveCodeToS3(1200, q(projectName), q(bucket/folder), q(--only-show-errors));  #TsaveCodeToS3
+  saveCodeToS3(1200, q(.), q(projectName), q(bucket/folder), q(--quiet));       #TsaveCodeToS3
   my ($width, $height) = imageSize(fpe(qw(a image jpg)));                       #TimageSize
   addCertificate(fpf(qw(.ssh cert)));                                           #TaddCertificate
   binModeAllUtf8;                                                               #TbinModeAllUtf8
@@ -8636,7 +8985,6 @@ Sample report.
 
 Table has 2 rows.
 
-
 This file: report.txt
 
       BC
@@ -8710,7 +9058,6 @@ ok $T eq <<END;
 Table of Tables.
 
 Table has 2 rows each of which contains a table.
-
 
    Description  Table
 1  See the         A  BB  CCC
@@ -9100,7 +9447,6 @@ if (1) {                                                                        
   ok $_ == countSquareArray         squareArray @{[1..$_]}  for 222;
  }
 
-
 if (1) {                                                                        #TsummarizeColumn
   is_deeply
    [summarizeColumn([map {[$_]} qw(A B D B C D C D A C D C B B D)], 0)],
@@ -9143,6 +9489,56 @@ Summary of column: Col-2
 4      2  A
 END
  }
+
+
+if (0) {                                                                        #TisFileUtf8
+  my $f = writeFile(undef, "aaa");
+  ok isFileUtf8 $f;
+ }
+
+if (0) {                                                                        # Needs direct testing on multiple sytems
+if (1) {                                                                        #TnewUdsrServer #TnewUdsrClient #TUdsr::read #TUdsr::write #TUdsr::kill
+  my $N = 20;
+  my $s = newUdsrServer(serverAction=>sub
+   {my ($u) = @_;
+    my $r = $u->read;
+    $u->write(qq(Hello from server $r));
+   });
+
+  my $p = newProcessStarter(min(100, $N));                                      # Run some clients
+  for my $i(1..$N)
+   {$p->start(sub
+     {my $count = 0;
+      for my $j(1..$N)
+       {my $c = newUdsrClient;
+        my $m = qq(Hello from client $i x $j);
+        $c->write($m);
+        my $r = $c->read;
+        ++$count if $r eq qq(Hello from server $m);
+       }
+      [$count]
+     });
+   }
+
+  my $count;
+  for my $r($p->finish)                                                         # Consolidate results
+   {my ($c) = @$r;
+    $count += $c;
+   }
+
+  ok $count == $N*$N;                                                           # Check results and kill
+  $s->kill;
+ }
+ }
+else
+ {ok 1 for 1..1;
+ }
+
+if (1) {                                                                        #TguidFromMd5
+  ok guidFromMd5(substr(join('', 0..9) x 4, 0, 32)) eq
+     q(GUID-01234567-8901-2345-6789-012345678901);
+}
+
 #tttt
 
 1

@@ -1,4 +1,4 @@
-# ABSTRACT: Method/Function Signatures w/Type::Tiny Constraints
+# ABSTRACT: Type::Tiny Method/Function Signatures
 package Type::Tiny::Signatures;
 
 use 5.14.0;
@@ -6,51 +6,69 @@ use 5.14.0;
 use strict;
 use warnings;
 
+our $VERSION = '0.71.0'; # VERSION
+
 require Function::Parameters;
 require Type::Registry;
 require Type::Tiny;
 
-our $CALLER   = caller;
 our @DEFAULTS = 'Types::Standard';
-our $SETTINGS = {};
-
-$SETTINGS->{fun} = {
-  check_argument_count => 0,
-  check_argument_types => 1,
-  default_arguments    => 1,
-  defaults             => 'function',
-  invocant             => 0,
-  name                 => 'optional',
-  named_parameters     => 1,
-  reify_type           => sub { Type::Registry->for_class($CALLER)->lookup($_[0]) },
-  runtime              => 1,
-  types                => 1,
-};
-
-$SETTINGS->{method} = {
-  attributes           => ':method',
-  check_argument_count => 0,
-  check_argument_types => 1,
-  default_arguments    => 1,
-  defaults             => 'method',
-  invocant             => 1,
-  name                 => 'optional',
-  named_parameters     => 1,
-  reify_type           => sub { Type::Registry->for_class($CALLER)->lookup($_[0]) },
-  runtime              => 1,
-  shift                => '$self',
-  types                => 1,
-};
-
-our $VERSION = '0.07'; # VERSION
 
 sub import {
-  shift;
+  my $class = shift;
+  my $reify = sub {
+    Type::Registry->for_class($class)->lookup($_[0])
+  };
 
-  Type::Registry->for_class($CALLER)->add_types($_) for @DEFAULTS, grep !/^:/, @_;
-  Function::Parameters->import($SETTINGS);
+  Function::Parameters->import($class->settings($reify));
+  Type::Registry->for_class($class)->add_types($_) for grep !/^:/, @DEFAULTS, @_;
 
   return;
+}
+
+sub settings {
+  my ($class, $reifier) = @_;
+
+  my $func_settings = $class->settings_for_func($reifier);
+  my $meth_settings = $class->settings_for_meth($reifier);
+
+  return { fun => $func_settings, method => $meth_settings };
+}
+
+sub settings_for_func {
+  my ($class, $reifier) = @_;
+
+  return {
+    check_argument_count => 0,
+    check_argument_types => 1,
+    default_arguments    => 1,
+    defaults             => 'function',
+    invocant             => 0,
+    name                 => 'optional',
+    named_parameters     => 1,
+    reify_type           => $reifier,
+    runtime              => 1,
+    types                => 1,
+  };
+}
+
+sub settings_for_meth {
+  my ($class, $reifier) = @_;
+
+  return {
+    attributes           => ':method',
+    check_argument_count => 0,
+    check_argument_types => 1,
+    default_arguments    => 1,
+    defaults             => 'method',
+    invocant             => 1,
+    name                 => 'optional',
+    named_parameters     => 1,
+    reify_type           => $reifier,
+    runtime              => 1,
+    shift                => '$self',
+    types                => 1,
+  };
 }
 
 1;
@@ -63,11 +81,11 @@ __END__
 
 =head1 NAME
 
-Type::Tiny::Signatures - Method/Function Signatures w/Type::Tiny Constraints
+Type::Tiny::Signatures - Type::Tiny Method/Function Signatures
 
 =head1 VERSION
 
-version 0.07
+version 0.71.0
 
 =head1 SYNOPSIS
 
@@ -102,13 +120,13 @@ previously default lax-mode, i.e. strict-mode disabled.
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 CONTRIBUTOR
 
-=for stopwords Al Newkirk
+=for stopwords Mohammad S Anwar
 
-Al Newkirk <al@iamalnewkirk.com>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 

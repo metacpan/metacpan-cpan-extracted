@@ -5924,14 +5924,12 @@ PPCODE:
 }
 
 void
-pos_set( slr, start_pos_sv, length_sv )
+pos_set( slr, start_pos, length )
     Scanless_R *slr;
-     SV* start_pos_sv;
-     SV* length_sv;
+     int start_pos;
+     int length;
 PPCODE:
 {
-  int start_pos = SvIOK(start_pos_sv) ? SvIV(start_pos_sv) : slr->perl_pos;
-  int length = SvIOK(length_sv) ? SvIV(length_sv) : -1;
   u_pos_set(slr, "slr->pos_set", start_pos, length);
   slr->lexer_start_pos = slr->perl_pos;
   XSRETURN_YES;
@@ -6554,21 +6552,16 @@ PPCODE:
 
  # Returns current position on success, 0 on unthrown failure
 void
-g1_lexeme_complete (slr, start_pos_sv, length_sv)
+g1_lexeme_complete (slr, start_pos_arg, lexeme_length_arg)
     Scanless_R *slr;
-     SV* start_pos_sv;
-     SV* length_sv;
+    int start_pos_arg;
+    int lexeme_length_arg;
 PPCODE:
 {
   int result;
   const int input_length = slr->pos_db_logical_size;
-
-  int start_pos = SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : slr->perl_pos;
-
-  int lexeme_length = SvIOK (length_sv) ? SvIV (length_sv)
-    : slr->perl_pos ==
-    slr->start_of_pause_lexeme ? (slr->end_of_pause_lexeme -
-				  slr->start_of_pause_lexeme) : -1;
+  int start_pos = start_pos_arg;
+  int lexeme_length = lexeme_length_arg;
 
   /* User intervention resets last |perl_pos| */
   slr->last_perl_pos = -1;
@@ -6577,8 +6570,8 @@ PPCODE:
   if (start_pos < 0 || start_pos > input_length)
     {
       /* Undef start_pos_sv should not cause error */
-      croak ("Bad start position in slr->g1_lexeme_complete(): %ld",
-	     (long) (SvIOK (start_pos_sv) ? SvIV (start_pos_sv) : -1));
+      croak ("Bad start position in slr->g1_lexeme_complete(... %ld, %ld)",
+	     (long) start_pos_arg, (long) lexeme_length_arg);
     }
   slr->perl_pos = start_pos;
 
@@ -6589,8 +6582,8 @@ PPCODE:
     if (end_pos < 0 || end_pos > input_length)
       {
 	/* Undef length_sv should not cause error */
-	croak ("Bad length in slr->g1_lexeme_complete(): %ld",
-	       (long) (SvIOK (length_sv) ? SvIV (length_sv) : -1));
+        croak ("Bad length in slr->g1_lexeme_complete(... %ld, %ld)",
+	     (long) start_pos_arg, (long) lexeme_length_arg);
       }
     lexeme_length = end_pos - start_pos;
   }

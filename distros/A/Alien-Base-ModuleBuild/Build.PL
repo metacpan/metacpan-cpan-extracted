@@ -34,6 +34,7 @@ my %build_args = (
     'JSON::PP'         => 0,
     'Path::Tiny'       => '0.077',
     'Alien::Base::PkgConfig' => '1.20',
+    'Archive::Tar'     => '1.40',
   },
   test_requires => {
     'Test2::V0'              => '0.000071',

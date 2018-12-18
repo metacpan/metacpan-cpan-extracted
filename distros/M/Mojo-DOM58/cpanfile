@@ -1,6 +1,6 @@
 requires 'perl' => '5.008001';
 requires 'Carp';
-requires 'Exporter';
+requires 'Exporter' => '5.57';
 requires 'List::Util';
 requires 'Scalar::Util';
 suggests 'Role::Tiny' => '2.000001';

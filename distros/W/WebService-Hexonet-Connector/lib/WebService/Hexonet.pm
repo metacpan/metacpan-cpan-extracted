@@ -1,15 +1,17 @@
 package WebService::Hexonet;
 
-use 5.026000;
+use 5.026_000;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;
 
-our $VERSION = '1.12';
+use version 0.9917; our $VERSION = version->declare('v2.0.1');
 
 1;
 
 __END__
+
+=pod
 
 =head1 NAME
 
@@ -26,18 +28,16 @@ Up to now we provide the following modules:
 
 =over 4
 
-=item L<WebService::Hexonet::Connector> - Connector Library for our Backend API.
+=item L<WebService::Hexonet::Connector|WebService::Hexonet::Connector> - Connector Library for our Backend API.
 
 =back
 
+=head1 LICENSE AND COPYRIGHT
+
+This program is licensed under the L<MIT License|https://raw.githubusercontent.com/hexonet/perl-sdk/master/LICENSE>.
+
 =head1 AUTHOR
 
-Hexonet GmbH
-
-L<https://www.hexonet.net>
-
-=head1 LICENSE
-
-MIT
+L<HEXONET GmbH|https://www.hexonet.net>
 
 =cut

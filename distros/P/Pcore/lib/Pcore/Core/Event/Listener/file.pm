@@ -16,7 +16,7 @@ has _path => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Path']
 has _h    => ( init_arg => undef );    # InstanceOf ['IO::File']
 has _init => ( init_arg => undef );
 
-const our $INDENT => q[ ] x 4;
+const our $INDENT => $SPACE x 4;
 
 sub _build_id ($self) { return "file:$self->{uri}->{path}->{path}" }
 

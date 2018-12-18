@@ -28,7 +28,7 @@ sub _build_tree ($self) {
 }
 
 sub _build_par_suffix ($self) {
-    return $MSWIN ? '.exe' : q[];
+    return $MSWIN ? '.exe' : $EMPTY;
 }
 
 sub _build_exe_filename ($self) {
@@ -55,7 +55,7 @@ sub _build_exe_filename ($self) {
 
 # TODO enable repack
 sub run ($self) {
-    say qq[\nBuilding ] . ( $self->{crypt} ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . q[ ] . $BLACK . $ON_GREEN . ( $self->{clean} ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}$LF];
+    say qq[\nBuilding ] . ( $self->{crypt} ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . $SPACE . $BLACK . $ON_GREEN . ( $self->{clean} ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}$LF];
 
     # add main script
     $self->_add_perl_source( $self->{script}->to_abs->{path}, 'script/main.pl' );
@@ -130,7 +130,7 @@ sub run ($self) {
 
     P->file->chmod( 'rwx------', $target_exe );
 
-    say 'final binary size: ' . $BLACK . $ON_GREEN . q[ ] . add_num_sep( -s $target_exe ) . q[ ] . $RESET . ' bytes';
+    say 'final binary size: ' . $BLACK . $ON_GREEN . $SPACE . add_num_sep( -s $target_exe ) . $SPACE . $RESET . ' bytes';
 
     $self->_gui($target_exe) if $self->{gui} && $MSWIN;
 
@@ -147,7 +147,7 @@ sub _gui ( $self, $file ) {
 
     # read IMAGE_DOS_HEADER structure
     read $exe, $record, 64 or die $!;
-    ( $magic, $offset ) = unpack "Sx58L", $record;
+    ( $magic, $offset ) = unpack 'Sx58L', $record;
 
     die "$file is not an MSDOS executable file.\n" unless $magic == 0x5a4d;    # "MZ"
 
@@ -155,17 +155,17 @@ sub _gui ( $self, $file ) {
     seek $exe, $offset, 0 or die $!;
     read $exe, $record, 4 + 20 + 2 or die $!;
 
-    ( $signature, $size, $magic ) = unpack "Lx16Sx2S", $record;
+    ( $signature, $size, $magic ) = unpack 'Lx16Sx2S', $record;
 
-    die "PE header not found" unless $signature == 0x4550;                     # "PE\0\0"
+    die 'PE header not found' unless $signature == 0x4550;                     # "PE\0\0"
 
-    die "Optional header is neither in NT32 nor in NT64 format"
+    die 'Optional header is neither in NT32 nor in NT64 format'
       unless ( $size == 224 && $magic == 0x10b )                               # IMAGE_NT_OPTIONAL_HDR32_MAGIC
       || ( $size == 240 && $magic == 0x20b );                                  # IMAGE_NT_OPTIONAL_HDR64_MAGIC
 
     # Offset 68 in the IMAGE_OPTIONAL_HEADER(32|64) is the 16 bit subsystem code
     seek $exe, $offset + 4 + 20 + 68, 0 or die $!;
-    print $exe pack "S", 2;                                                    # IMAGE_WINDOWS
+    print {$exe} pack 'S', 2;                                                  # IMAGE_WINDOWS
     close $exe or die $!;
 
     return;
@@ -209,7 +209,7 @@ sub _add_modules ($self) {
     }
 
     if ($not_found_modules) {
-        $self->_error( qq[required modules wasn't found: ] . join ', ', map {qq["$_"]} $not_found_modules->@* );
+        $self->_error( q[required modules wasn't found: ] . join ', ', map {qq["$_"]} $not_found_modules->@* );
     }
 
     return;
@@ -400,16 +400,16 @@ sub _add_dist ( $self, $dist ) {
         # add main dist share
         $self->tree->add_dir( $dist->{share_dir}, 'share' );
 
-        # add main dist dist-id.json
-        $self->tree->add_file( 'share/dist-id.json', P->data->to_json( $dist->id, readable => 1 ) );
+        # add main dist dist-id.yaml
+        $self->tree->add_file( 'share/dist-id.yaml', P->data->to_yaml( $dist->id ) );
     }
     else {
 
         # add dist share
         $self->tree->add_dir( $dist->{share_dir}, "lib/auto/share/dist/@{[ $dist->name ]}" );
 
-        # add dist-id.json
-        $self->tree->add_file( "lib/auto/share/dist/@{[ $dist->name ]}/dist-id.json", P->data->to_json( $dist->id, readable => 1 ) );
+        # add dist-id.yaml
+        $self->tree->add_file( "lib/auto/share/dist/@{[ $dist->name ]}/dist-id.yaml", P->data->to_yaml( $dist->id ) );
     }
 
     say 'dist added: ' . $dist->name;
@@ -434,7 +434,7 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
     # extract overlay
     # src = raw exe header
     # overlay = files sections + par zip section + cache id string
-    my $overlay = substr $src->$*, length( $src->$* ) - $overlay_length, $overlay_length, q[];
+    my $overlay = substr $src->$*, length( $src->$* ) - $overlay_length, $overlay_length, $EMPTY;
 
     # cut cache id, now overlay = files sections + par zip section
     $overlay =~ s/.{40}\x{00}CACHE\z//sm;
@@ -444,15 +444,15 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
     while (1) {
         last if $overlay !~ s/\AFILE//sm;
 
-        my $filename_length = unpack( 'N', substr( $overlay, 0, 4, q[] ) ) - 9;
+        my $filename_length = unpack( 'N', substr $overlay, 0, 4, $EMPTY ) - 9;
 
-        substr $overlay, 0, 9, q[];
+        substr $overlay, 0, 9, $EMPTY;
 
-        my $filename = substr $overlay, 0, $filename_length, q[];
+        my $filename = substr $overlay, 0, $filename_length, $EMPTY;
 
-        my $content_length = unpack( 'N', substr( $overlay, 0, 4, q[] ) );
+        my $content_length = unpack 'N', substr $overlay, 0, 4, $EMPTY;
 
-        my $content = substr $overlay, 0, $content_length, q[];
+        my $content = substr $overlay, 0, $content_length, $EMPTY;
 
         if ( $filename =~ /[.](?:pl|pm)\z/sm ) {
 
@@ -509,14 +509,14 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
     my $hash = $md5->hexdigest;
 
     # writing cache id
-    $fh->print( pack( 'Z40', $hash ) . qq[\x00CACHE] );
+    $fh->print( pack( 'Z40', $hash ) . "\N{NULL}CACHE" );
 
     # writing overlay length
-    $fh->print( pack( 'N', $fh->tell - $exe_header_length ) . "\x0APAR.pm\x0A" );
+    $fh->print( pack( 'N', $fh->tell - $exe_header_length ) . "\N{NULL}PAR.pm$LF" );
 
     my $out_len = $fh->tell;
 
-    say 'done, ', $BLACK . $ON_GREEN . q[ ] . add_num_sep( $out_len - $in_len ) . q[ ] . $RESET . ' bytes';
+    say 'done, ', $BLACK . $ON_GREEN . $SPACE . add_num_sep( $out_len - $in_len ) . $SPACE . $RESET . ' bytes';
 
     say 'hash: ' . $hash;
 
@@ -559,9 +559,6 @@ sub _error ( $self, $msg ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 141                  | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "record"                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 150, 158, 160, 162,  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |      | 168, 212             |                                                                                                                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 344                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 421                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_repack_parl' declared but not used |
@@ -569,12 +566,6 @@ sub _error ( $self, $msg ) {
 ## |    3 | 432                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 160                  | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 512, 515             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 168                  | InputOutput::RequireBracedFileHandleWithPrint - File handle for "print" or "printf" is not braced              |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 447, 453             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

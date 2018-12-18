@@ -80,7 +80,7 @@ my $build = $class->new
     'App::Cme' => '1.002',
     'App::Cme::Common' => '0',
     'Carp' => '0',
-    'Config::Model' => '2.114',
+    'Config::Model' => '2.127',
     'Config::Model::TkUI' => '0',
     'Config::Model::Value' => '0',
     'Data::Compare' => '0',
@@ -97,7 +97,11 @@ my $build = $class->new
     'Scalar::Util' => '0',
     'Tk' => '0',
     'YAML::Tiny' => '0',
-    'perl' => '5.010'
+    'base' => '0',
+    'lib' => '0',
+    'perl' => 'v5.10.1',
+    'strict' => '0',
+    'warnings' => '0'
   },
 
    add_to_cleanup => [qw/wr_test/] ,

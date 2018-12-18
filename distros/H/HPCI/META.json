@@ -74,7 +74,7 @@
       },
       "HPCI" : {
          "file" : "lib/HPCI.pm",
-         "version" : "0.74"
+         "version" : "0.75"
       },
       "HPCI::CommandScript" : {
          "file" : "lib/HPCI/CommandScript.pm"
@@ -137,6 +137,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.74",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.75",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

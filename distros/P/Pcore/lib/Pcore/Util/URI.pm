@@ -24,6 +24,7 @@ has username   => ();    # unescaped, utf8
 has password   => ();    # unescaped, utf8
 has host_port  => ();    # escaped
 has host       => ();    # object
+has socket     => ();    # unix socket
 has port       => ();    # int
 has path_query => ();    # escaped
 
@@ -41,7 +42,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
 
     my $base;
 
-    if ( $uri eq '' ) {
+    if ( $uri eq $EMPTY ) {
         if ( !$args{listen} ) {
             if ( !defined $args{base} ) {
 
@@ -76,7 +77,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
 
             # for linux use abstract UDS
             else {
-                $uri = "///\x00" . uuid_v4_str;
+                $uri = "///\N{NULL}" . uuid_v4_str;
             }
         }
     }
@@ -96,7 +97,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
     my $target;
 
     # create empty target uri
-    if ( $scheme ne '' ) {
+    if ( $scheme ne $EMPTY ) {
 
         # decode scheme
         $scheme = from_uri_utf8 $scheme;
@@ -138,7 +139,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
         $authority = $base->{authority};
 
         # if source path is empty (undef or "")
-        if ( $path eq '' ) {
+        if ( $path eq $EMPTY ) {
             $path = $base->{path}->clone;
 
             $query = $base->{query} if !$query;
@@ -153,11 +154,18 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
     }
 
     # authority is emtpy (undef or "")
-    if ( $authority eq '' ) {
+    if ( $authority eq $EMPTY ) {
         $target->{authority} = $authority;
     }
     else {
         $target->_set_authority($authority);
+    }
+
+    # extract unix socket from path
+    if ( !defined $target->{host} && substr( $path, 0, 6 ) eq '/unix:' && $path =~ m[\A/unix:([^:]+):?(.*)]sm ) {
+        $target->{socket} = $1;
+
+        $path = $2 // '/';
     }
 
     # path
@@ -167,16 +175,16 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
     else {
 
         # set path to '/' it has authority and path is empty
-        $path = '/' if defined $authority && $path eq '';
+        $path = '/' if defined $authority && $path eq $EMPTY;
 
-        $target->{path} = P->path( $path, from_uri => 1 ) if $path ne '';
+        $target->{path} = P->path( $path, from_uri => 1 ) if $path ne $EMPTY;
     }
 
     # set query, if query is not empty
-    $target->_set_query($query) if $query ne '';
+    $target->_set_query($query) if $query ne $EMPTY;
 
     # ser fragment, if fragment is not empty
-    $target->_set_fragment($fragment) if $fragment ne '';
+    $target->_set_fragment($fragment) if $fragment ne $EMPTY;
 
     if ( $args{listen} ) {
 
@@ -199,7 +207,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
 
             # for linux use abstract UDS
             else {
-                $target->{path} = P->path( "/\x00" . uuid_v4_str );
+                $target->{path} = P->path( "/\N{NULL}" . uuid_v4_str );
             }
         }
     }
@@ -218,7 +226,7 @@ sub set_authority ( $self, $val = undef ) {
     delete $self->@{qw[uri _canon authority userinfo _userinfo_b64 username password host_port host port]};
 
     # $val match undef or ''
-    if ( $val eq '' ) {
+    if ( $val eq $EMPTY ) {
         $self->{authority} = $val;
     }
     else {
@@ -308,7 +316,7 @@ sub set_password ( $self, $val = undef ) {
 
 # host_port
 sub set_host_port ( $self, $val = undef ) {
-    delete $self->@{qw[uri _canon authority host_port host port]};
+    delete $self->@{qw[uri _canon authority host_port host port socket]};
 
     $self->_set_host_port($val) if defined $val;
 
@@ -339,7 +347,7 @@ sub _get_host_port ( $self ) {
 sub set_host ( $self, $val = undef ) {
 
     # clear related attributes
-    delete $self->@{qw[uri _canon authority host_port host]};
+    delete $self->@{qw[uri _canon authority host_port host socket]};
 
     $self->{host} = P->host($val) if defined $val;
 
@@ -349,9 +357,23 @@ sub set_host ( $self, $val = undef ) {
     return $self;
 }
 
+# socket
+sub set_socket ( $self, $val = undef ) {
+
+    # clear related attributes
+    delete $self->@{qw[uri _canon authority host_port host]};
+
+    $self->{socket} = $val;
+
+    # rebuild uri
+    $self->_build;
+
+    return $self;
+}
+
 # port
 sub set_port ( $self, $val = undef ) {
-    delete $self->@{qw[uri _canon authority host_port port]};
+    delete $self->@{qw[uri _canon authority host_port port socket]};
 
     $self->{port} = $val;
 
@@ -368,11 +390,11 @@ sub set_path ( $self, $val = undef ) {
     delete $self->@{qw[uri _canon path path_query]};
 
     # $val is defined and not ''
-    if ( $val ne '' ) {
+    if ( $val ne $EMPTY ) {
         my $path = P->path( $val, from_uri => 1 );
 
         # only abs path is allowed if uri has authority
-        if ( defined $self->_get_authority ) {
+        if ( defined $self->_get_authority || defined $self->{socket} ) {
             if ( $path->{is_abs} ) {
                 $self->{path} = $path;
             }
@@ -400,7 +422,7 @@ sub set_query ( $self, $val = undef ) {
 
     no warnings qw[uninitialized];
 
-    $self->_set_query($val) if $val ne '';
+    $self->_set_query($val) if $val ne $EMPTY;
 
     # rebuild uri
     $self->_build;
@@ -415,7 +437,7 @@ sub set_fragment ( $self, $val = undef ) {
 
     no warnings qw[uninitialized];
 
-    $self->_set_fragment($val) if $val ne '';
+    $self->_set_fragment($val) if $val ne $EMPTY;
 
     # rebuild uri
     $self->_build;
@@ -439,7 +461,7 @@ sub to_abs ( $self, $base ) {
 
     $base = P->uri("$base") unless is_uri $base;
 
-    die qq[Can't convert URI to absolute] if !defined $base->{scheme};
+    die q[Can't convert URI to absolute] if !defined $base->{scheme};
 
     my $uri = P->uri( $self, base => $base );
 
@@ -484,6 +506,9 @@ sub connect ($self) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
     if ( defined $self->{host} ) {
         return $self->{host}, $self->{port} || $self->{default_port};
     }
+    elsif ( defined $self->{socket} ) {
+        return 'unix/', $self->{socket};
+    }
     else {
         return 'unix/', $self->{path}->{path};
     }
@@ -496,10 +521,10 @@ sub connect_port ($self) {
 sub userinfo_b64 ($self) {
     if ( !exists $self->{_userinfo_b64} ) {
         if ( defined $self->_get_userinfo ) {
-            $self->{_userinfo_b64} = to_b64 $self->{userinfo}, '';
+            $self->{_userinfo_b64} = to_b64 $self->{userinfo}, $EMPTY;
         }
         else {
-            $self->{_userinfo_b64} = '';
+            $self->{_userinfo_b64} = $EMPTY;
         }
     }
 
@@ -513,7 +538,7 @@ sub userinfo_b64 ($self) {
 # TODO
 sub to_nginx_upstream_server ($self) {
     if ( defined $self->{host} ) {
-        return "$self->{host}" . ( $self->{port} ? ":$self->{port}" : '' );
+        return "$self->{host}" . ( $self->{port} ? ":$self->{port}" : $EMPTY );
     }
     else {
         return 'unix:' . $self->{path}->{path};
@@ -536,7 +561,7 @@ sub to_nginx ( $self, $scheme = 'http' ) {
         return "$scheme://unix:$self->{path}";
     }
     else {
-        return "$scheme://" . ( $self->{host} || '*' ) . ( $self->{port} ? ":$self->{port}" : '' );
+        return "$scheme://" . ( $self->{host} || '*' ) . ( $self->{port} ? ":$self->{port}" : $EMPTY );
     }
 }
 
@@ -549,14 +574,14 @@ sub _set_authority ( $self, $val ) {
 
         my $host_port = substr $val, $idx + 1;
 
-        $self->_set_userinfo($userinfo) if $userinfo ne '';
+        $self->_set_userinfo($userinfo) if $userinfo ne $EMPTY;
 
-        $self->_set_host_port($host_port) if $host_port ne '';
+        $self->_set_host_port($host_port) if $host_port ne $EMPTY;
     }
 
     # no userinfo
     else {
-        $self->_set_host_port($val) if $val ne '';
+        $self->_set_host_port($val) if $val ne $EMPTY;
     }
 
     return;
@@ -586,7 +611,7 @@ sub _set_host_port ( $self, $val ) {
 
     my ( $host, $port ) = split /:/sm, $val, 2;
 
-    $self->{host} = P->host($host) if $host ne '';
+    $self->{host} = P->host($host) if $host ne $EMPTY;
 
     $self->{port} = $port;
 
@@ -613,7 +638,14 @@ sub _build ($self) {
 
         $uri .= "//$self->{authority}" if defined $self->_get_authority;
 
-        $uri .= $self->{path}->to_uri if defined $self->{path};
+        if ( !defined $self->{host} && defined $self->{socket} ) {
+            $uri .= "/unix:$self->{socket}";
+
+            $uri .= ':' . $self->{path}->to_uri if defined $self->{path};
+        }
+        else {
+            $uri .= $self->{path}->to_uri if defined $self->{path};
+        }
 
         $uri .= "?$self->{query}" if defined $self->{query};
 
@@ -642,21 +674,11 @@ sub canon ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (45)                               |
+## |    3 | 1                    | Modules::ProhibitExcessMainComplexity - Main code has high complexity score (48)                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 93                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
+## |    3 | 94                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 442                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 630                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 44, 99, 141, 156,    | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |      | 170, 172, 176, 179,  |                                                                                                                |
-## |      | 221, 371, 403, 418,  |                                                                                                                |
-## |      | 499, 502, 516, 539,  |                                                                                                                |
-## |      | 552, 554, 559, 589   |                                                                                                                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 79, 202              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    3 | 662                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

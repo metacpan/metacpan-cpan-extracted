@@ -4,13 +4,13 @@
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.022",
+   "generated_by" : "App::ModuleBuildTiny version 0.024",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-XMLRPC",
    "prereqs" : {
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.022"
+            "App::ModuleBuildTiny" : "0.024"
          }
       },
       "runtime" : {
@@ -33,7 +33,7 @@
    "provides" : {
       "Mojo::XMLRPC" : {
          "file" : "lib/Mojo/XMLRPC.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Mojo::XMLRPC::Base64" : {
          "file" : "lib/Mojo/XMLRPC/Base64.pm"
@@ -60,6 +60,6 @@
          "url" : "http://github.com/jberger/Mojo-XMLRPC"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

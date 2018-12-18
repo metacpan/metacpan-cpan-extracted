@@ -18,7 +18,7 @@ sub BUILDARGS ( $self, $args = undef ) {
 }
 
 sub _build__auth ($self) {
-    return 'Basic ' . P->data->to_b64( "$self->{username}:$self->{password}", '' );
+    return 'Basic ' . P->data->to_b64( "$self->{username}:$self->{password}", $EMPTY );
 }
 
 sub _req1 ( $self, $method, $endpoint, $data, $cb = undef ) {
@@ -290,8 +290,6 @@ sub update_issue ( $self, $repo_id, $issue_id, $data, $cb = undef ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 276, 281             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 21                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

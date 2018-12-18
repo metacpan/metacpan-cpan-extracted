@@ -1,17 +1,16 @@
 .perltidyrc
-.ship.conf
 .travis.yml
-bin/git-ship
 Changes
 cpanfile
 lib/App/git/ship.pm
 lib/App/git/ship/perl.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
+script/git-ship
 t/00-basic.t
 t/bin/git
-t/config-with-comments.t
+t/config.t
 t/data/with-comments.conf
 t/perl-basic.t
 t/perl-build.t
@@ -22,7 +21,6 @@ t/repository.t
 t/ship-basic.t
 t/ship-start.t
 t/silent.t
-t/use.t
 t/Util.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

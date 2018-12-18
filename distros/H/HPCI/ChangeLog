@@ -1,3 +1,7 @@
+0.75 - more cleanup on new error message for files attributes
+     - improve undef detection in add_deps (wasn't ignoring [ undef ])
+	 - added test using objects passed to add_deps instead of names
+
 0.74 - Moose doesn't die for odd number of args to new, just carps and
        continues.  Have to catch it myself to augment the error message.
 

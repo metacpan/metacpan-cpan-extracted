@@ -1,4 +1,7 @@
 .appveyor.yml
+.tom/install.pl6
+.tom/make-dist.pl6
+.tom/make-doc.pl6
 .travis.yml
 bin/sparrow
 Changes
@@ -36,18 +39,10 @@ examples/project/list/story.bash
 examples/project/list/story.check
 examples/project/remove/story.check
 examples/project/remove/story.pl
-examples/remote-task-run/private/git-setup/story.bash
-examples/remote-task-run/private/git-setup/story.check
 examples/remote-task-run/public/nano-rc/story.bash
 examples/remote-task-run/public/nano-rc/story.check
 examples/ruby-plg-run/story.bash
 examples/ruby-plg-run/story.check
-examples/sparrow-task-save/exceptions/dir-exists/hook.bash
-examples/sparrow-task-save/exceptions/dir-exists/story.bash
-examples/sparrow-task-save/exceptions/dir-exists/story.check
-examples/sparrow-task-save/exceptions/params/hook.bash
-examples/sparrow-task-save/exceptions/params/story.bash
-examples/sparrow-task-save/exceptions/params/story.check
 examples/suite.ini
 examples/task-box-run/json/story.bash
 examples/task-box-run/json/story.check
@@ -98,6 +93,3 @@ run-test.pl
 sparrowfile
 t/00.t
 todo.md
-utils/install.pl6
-utils/make-dist.pl6
-utils/make-doc.pl6

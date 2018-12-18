@@ -60,7 +60,7 @@ for my $module ( sort keys %modules ) {
         $expected_nr_violations = $result;
         my ($name, $value)      = split /=/, $param;
 
-        $pc->add_policy( -policy => POLICY, -params => { $name => $value // 1 } ); 
+        $pc->add_policy( -policy => POLICY, -params => { $name => defined $value ? $value : 1 } ); 
     }
     else {
         $pc->add_policy( -policy => POLICY );

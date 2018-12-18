@@ -41,10 +41,10 @@ __DATA__
     
         <tr style="border: 1px solid">
             <td style="background-color: gray">1</td>
-            <td >&lt;div&gt;html entities&lt;/div&gt;
+            <td >&lt;div&gt;html&nbsp;entities&lt;/div&gt;
 </td>
             <td style="background-color: gray">1</td>
-            <td >&lt;div&gt;html entities&lt;/div&gt;
+            <td >&lt;div&gt;html&nbsp;entities&lt;/div&gt;
 </td>
         </tr>
     

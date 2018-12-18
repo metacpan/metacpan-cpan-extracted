@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,13 +26,15 @@ no_index:
 provides:
   App::Greple:
     file: lib/App/Greple.pm
-    version: '8.2901'
+    version: '8.3201'
   App::Greple::Common:
     file: lib/App/Greple/Common.pm
   App::Greple::Filter:
     file: lib/App/Greple/Filter.pm
   App::Greple::Grep:
     file: lib/App/Greple/Grep.pm
+  App::Greple::NumberUtil:
+    file: lib/App/Greple/NumberUtil.pm
   App::Greple::Pattern:
     file: lib/App/Greple/Pattern.pm
   App::Greple::Pattern::Holder:
@@ -66,17 +68,18 @@ provides:
   UniqIndex:
     file: lib/App/Greple/Util.pm
 requires:
-  Getopt::EX: v1.8.0
+  Getopt::EX: v1.10.0
   List::Util: '1.45'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/kaz-utashiro/greple/issues
   homepage: https://github.com/kaz-utashiro/greple
   repository: git://github.com/kaz-utashiro/greple.git
-version: '8.2901'
+version: '8.3201'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kaz Utashiro <kaz@utashiro.com>'
   - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
   - 'Toshifumi Sakaguchi <sischkg@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

@@ -1,21 +1,52 @@
 package Log::ger::App;
 
-our $DATE = '2018-08-30'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2018-12-17'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 # IFUNBUILT
 # use strict;
 # use warnings;
 # END IFUNBUILT
 
-sub _level_from_env {
-    my $prefix = shift;
-    return $ENV{"${prefix}LOG_LEVEL"} if defined $ENV{"${prefix}LOG_LEVEL"};
-    return 'trace' if $ENV{"${prefix}TRACE"};
-    return 'debug' if $ENV{"${prefix}DEBUG"};
-    return 'info'  if $ENV{"${prefix}VERBOSE"};
-    return 'error' if $ENV{"${prefix}QUIET"};
-    undef;
+our $DEBUG = defined($ENV{LOG_GER_APP_DEBUG}) ? $ENV{LOG_GER_APP_DEBUG} : 0;
+
+sub _set_level {
+    my $name = shift;
+
+    while (my ($source, $param, $note) = splice @_, 0, 3) {
+        if ($source eq 'val') {
+            if (defined $param) {
+                warn "[lga] Setting $name to $param (from $note)\n" if $DEBUG;
+                return $param;
+            }
+        } elsif ($source eq 'envset') {
+            my $prefix = $param;
+            if (defined $ENV{"${prefix}LOG_LEVEL"}) {
+                my $val = $ENV{"${prefix}LOG_LEVEL"};
+                warn "[lga] Setting $name to $val (from environment ${prefix}LOG_LEVEL)\n" if $DEBUG;
+                return $val;
+            }
+            if ($ENV{"${prefix}TRACE"}) {
+                warn "[lga] Setting $name to trace (from environment ${prefix}TRACE)\n" if $DEBUG;
+                return 'trace';
+            }
+            if ($ENV{"${prefix}DEBUG"}) {
+                warn "[lga] Setting $name to debug (from environment ${prefix}DEBUG)\n" if $DEBUG;
+                return 'debug';
+            }
+            if ($ENV{"${prefix}VERBOSE"}) {
+                warn "[lga] Setting $name to info (from environment ${prefix}VERBOSE)\n" if $DEBUG;
+                return 'info';
+            }
+            if ($ENV{"${prefix}QUIET"}) {
+                warn "[lga] Setting $name to trace (from environment ${prefix}QUIET)\n" if $DEBUG;
+                return 'error';
+            }
+        } else {
+            die "BUG: Unknown level source '$source'";
+        }
+    }
+    'warn';
 }
 
 sub _is_daemon {
@@ -42,13 +73,20 @@ sub _is_daemon {
 }
 
 sub import {
+    no warnings 'once'; # $Log::ger::Current_Level
+
     my ($pkg, %args) = @_;
 
     require Log::ger;
     require Log::ger::Util;
 
-    my $level = $args{level};
-    $level = _level_from_env("") || 'warn' if !defined($level);
+    my $level = _set_level(
+        "general log level",
+        val => $args{level}, "import argument 'level'",
+        envset => "", "",
+        val => $args{default_level}, "import argument 'default_level'",
+        val => 'warn', "fallback value",
+    );
     $Log::ger::Current_Level = Log::ger::Util::numeric_level($level);
 
     my $is_daemon = $args{daemon};
@@ -73,12 +111,16 @@ sub import {
     # add Screen
     {
         last if $is_daemon;
-        my $level = _level_from_env("SCREEN_");
-        last if defined $level && $level eq 'off';
+        my $olevel = _set_level(
+            "screen log level",
+            envset => "SCREEN_", "",
+            val => $level, "general log level",
+        );
+        last if $olevel eq 'off';
         my $fmt = ($ENV{LOG_ADD_TIMESTAMP} ? '[%d] ': ''). '%m';
         $conf{outputs}{Screen} = {
             conf   => { formatter => sub { "$progname: $_[0]" } },
-            level  => $level,
+            level  => $olevel,
             layout => [Pattern => {format => $fmt}],
         };
     }
@@ -90,11 +132,15 @@ sub import {
         my $path = $> ?
             PERLANCAR::File::HomeDir::get_my_home_dir()."/$progname.log" :
               "/var/log/$progname.log";
-        my $level = _level_from_env("FILE_");
-        last if defined $level && $level eq 'off';
+        my $olevel = _set_level(
+            "file ($path) log level",
+            envset => "FILE_", "",
+            val => $level, "general log level",
+        );
+        last if $olevel eq 'off';
         $conf{outputs}{File} = {
             conf   => { path => $path },
-            level  => $level,
+            level  => $olevel,
             layout => [Pattern => {format => '[pid %P] [%d] %m'}],
         };
     }
@@ -102,11 +148,15 @@ sub import {
     # add Syslog
     {
         last unless $is_daemon;
-        my $level = _level_from_env("SYSLOG_");
-        last if defined $level && $level eq 'off';
+        my $olevel = _set_level(
+            "syslog log level",
+            envset => "SYSLOG_", "",
+            val => $level, "general log level",
+        );
+        last if $olevel eq 'off';
         $conf{outputs}{Syslog} = {
             conf => { ident => $progname, facility => 'daemon' },
-            level => $level,
+            level => $olevel,
         };
     }
 
@@ -134,7 +184,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -174,10 +224,11 @@ daemon. Or, you can set it via import argument (see L</"import">).
 
 =head2 Setting general log level
 
-The default is C<warn> (like L<Log::ger>'s default).
+B<Via import argument 'level'.> You can set general log level via import
+argument C<level> (see L</"import">) but users of your script will not be able
+to customize it:
 
-B<Via import argument.> You can set general log level via import argument (see
-L</"import">) but users of your script will not be able to customize it.
+ use Log::ger::App level => 'debug'; # hard-coded to debug, not recommended
 
 B<Via environment variables.> You can also set general log level from
 environment using C<LOG_LEVEL> (e.g. C<LOG_LEVEL=trace> to set level to trace or
@@ -185,12 +236,23 @@ C<LOG_LEVEL=0> to turn off logging). Alternatively, you can set to C<trace>
 using C<TRACE=1>, or C<debug> with C<DEBUG=1>, C<info> with C<VERBOSE=1>,
 C<error> with C<QUIET=1>.
 
+B<Via import argument 'default_level'>. If the environment variables does not
+provide a value, next the import argument C<default_level> is consulted. This is
+the preferred method of setting default level:
+
+ use Log::ger::App default_level => 'info'; # be verbose by default. unless changed by env vars
+
+C<warn>. The fallback level is warn, if all the above does not provide a value.
+
 =head2 Setting per-output log level
 
-The default is to use general level, but you can set a different level for each
-output using I<OUTPUT_NAME>_{C<LOG_LEVEL|TRACE|DEBUG|VERBOSE|QUIET>} environment
-variables. For example, C<SCREEN_DEBUG=1> to set screen level to C<debug> or
+B<Via environment variables.> You can set level for each output using
+I<OUTPUT_NAME>_{C<LOG_LEVEL|TRACE|DEBUG|VERBOSE|QUIET>} environment variables.
+For example, C<SCREEN_DEBUG=1> to set screen level to C<debug> or
 C<FILE_LOG_LEVEL=off> to turn off file logging.
+
+B<General level.> If the environment variables do not provide a value, the
+general level (see L</"Setting general log level">) will be used.
 
 =head2 Showing timestamp
 
@@ -220,15 +282,21 @@ Arguments:
 
 =over
 
-=item * level => str|num
+=item * level
 
-Explicitly set level. Otherwise, the default will be taken from environment
-variable like described previously in L</"DESCRIPTION">.
+str|num. Explicitly set a hard-coded level. Not recommended because of lack of
+flexibility. See instead: L</default_level>.
 
-=item * name => str
+=item * default_level
 
-Explicitly set program name. Otherwise, default will be taken from C<$0> (after
-path and '.pl' suffix is removed) or set to C<prog>.
+str|num. Instead of hard-coding level with L</level>, you can set a default
+level. Environment variables will be consulted first (as described in
+L</DESCRIPTION>) before falling back to this level.
+
+=item * name
+
+str. Explicitly set program name. Otherwise, default will be taken from C<$0>
+(after path and '.pl' suffix is removed) or set to C<prog>.
 
 Program name will be shown on the screen, e.g.:
 
@@ -237,21 +305,32 @@ Program name will be shown on the screen, e.g.:
  myprog: Doing task 2 ...
  myprog: Exiting ...
 
-=item * daemon => bool
+=item * daemon
 
-Explicitly tell Log::ger::App that your application is a daemon or not.
+bool. Explicitly tell Log::ger::App that your application is a daemon or not.
 Otherwise, Log::ger::App will try some heuristics to guess whether your
 application is a daemon: from the value of C<$main::IS_DAEMON> and from the
 presence of modules like L<HTTP::Daemon>, L<Proc::Daemon>, etc.
 
-=item * outputs => hash
+=item * outputs
 
-Specify extra outputs. Will be passed to L<Log::ger::Output::Composite>
+hash. Specify extra outputs. Will be passed to L<Log::ger::Output::Composite>
 configuration.
 
 =back
 
+=head1 VARIABLES
+
+=head2 $DEBUG
+
+Default is false. If set to true, will show more details about how log level,
+etc is set.
+
 =head1 ENVIRONMENT
+
+=head2 LOG_GER_APP_DEBUG
+
+Used to set the default for C<$DEBUG>.
 
 =head2 LOG_ADD_TIMESTAMP
 

@@ -10,7 +10,7 @@ use Carp;
 use HTML::Entities;
 use Time::Piece;
 
-our $VERSION = 0.04;
+our $VERSION = '0.05';
 
 sub new {
     my ($class, @param) = @_;
@@ -30,7 +30,8 @@ sub diff {
     NAME:
     for my $name ( qw/a b/ ) {
 
-        next NAME if ref $files{$name} && ref $files{$name} eq 'ARRAY';
+        croak 'Need either filename or array reference' if ref $files{$name} && ref $files{$name} ne 'ARRAY';
+        next NAME if ref $files{$name};
 
         croak $files{$name} . " is not a file" if !-f $files{$name};
         croak $files{$name} . " is not a readable file" if !-r $files{$name};
@@ -162,6 +163,9 @@ sub _add_tablerow {
     $line_a = encode_entities( $line_a // '' );
     $line_b = encode_entities( $line_b // '' );
 
+    $line_a =~ s{ }{&nbsp;}g;
+    $line_b =~ s{ }{&nbsp;}g;
+
     my $row = qq~
         <tr style="border: 1px solid">
             <td style="background-color: gray">$line_nr_a</td>
@@ -208,22 +212,22 @@ sub _read_file {
     
     return if !$file;
 
-    if ( $file && ref $file && ref $file eq 'ARRAY' ) {
+    if ( ref $file && ref $file eq 'ARRAY' ) {
         return @{ $file };
     }
 
     return if !-r $file;
     
     my @lines;
-    if ( open my $fh, '<', $file ) {
-        if ( $self->{encoding} ) {
-            binmode $fh, ':encoding(' . $self->{encoding} . ')';
-        }
-        
-        local $/ = $self->{eol} // "\n";
-        
-        @lines = <$fh>;
+    open my $fh, '<', $file;
+    if ( $self->{encoding} ) {
+        binmode $fh, ':encoding(' . $self->{encoding} . ')';
     }
+    
+    local $/ = $self->{eol} // "\n";
+    
+    @lines = <$fh>;
+    close $fh;
     
     return @lines;
 }
@@ -242,7 +246,7 @@ Algorithm::Diff::HTMLTable - Show differences of a file as a HTML table
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

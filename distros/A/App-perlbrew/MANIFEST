@@ -1,4 +1,7 @@
+.circleci/config.yml
+.perlcriticrc
 Build.PL
+CONTRIBUTING.md
 Changes
 LICENSE
 MANIFEST
@@ -9,12 +12,16 @@ README.md
 cpanfile
 doc/MIT-LICENSE
 doc/PERL-LICENSE
+lib/App/Perlbrew/Path.pm
+lib/App/Perlbrew/Path/Installation.pm
+lib/App/Perlbrew/Path/Installations.pm
+lib/App/Perlbrew/Path/Root.pm
 lib/App/perlbrew.pm
+metamerge.json
 script/perlbrew
 t/00.load.t
 t/01.options.t
 t/02.format_perl_version.t
-t/03.path_with_tilde.t
 t/03.test_get_available_versions.t
 t/04.find_available_perls.t
 t/05.get_current_perl.t
@@ -38,6 +45,10 @@ t/17.release-detail-cperl-local.t
 t/17.release-detail-cperl-remote.t
 t/18.release-detail-perl-local.t
 t/18.release-detail-perl-remote.t
+t/app-perlbrew-path-installation.t
+t/app-perlbrew-path.t
+t/bashrc_content.t
+t/builddir.t
 t/command-alias.t
 t/command-available.t
 t/command-compgen.t
@@ -57,6 +68,7 @@ t/failure-command-install-cpanm.t
 t/failure-command-install-patchperl.t
 t/fake-bin/curl
 t/get_blead_perl.t
+t/home.t
 t/http-program-control.t
 t/http-ua-detect-non-curl.t
 t/http-ua-detect.t
@@ -65,8 +77,6 @@ t/installation-perlbrew.t
 t/installation.t
 t/installation2.t
 t/installation3.t
-t/joinpath.t
-t/splitpath.t
 t/test.tar.gz
 t/test_helpers.pl
 t/unit-files-are-the-same.t

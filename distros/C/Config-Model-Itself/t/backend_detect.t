@@ -38,14 +38,14 @@ my $backend = $root->fetch_element('backend') ;
 
 my @choices = $backend->get_choice ;
 
-ok( (scalar grep { $_ eq 'Yaml'} @choices), "Yaml plugin backend was found") ;
+ok( (scalar grep { $_ eq 'IniFile'} @choices), "IniFile plugin backend was found") ;
 
 # test break when using directly Config::Model repo because get_help
 # retrieves info from NAME section which is added at build time by
 # Pod::Weaver
-my $help = $backend->get_help('Yaml') ;
-like($help,qr/provided by L<Config::Model::Backend::Yaml>/,
-   "Found Yaml NAME section from pod") ;
+my $help = $backend->get_help('IniFile') ;
+like($help,qr/provided by L<Config::Model::Backend::IniFile>/,
+   "Found IniFile NAME section from pod") ;
 
 $help = $backend->get_help('cds_file') ;
 is($help,"file ...", "cds_file help was kept") ;

@@ -53,7 +53,7 @@ __PACKAGE__->_add_method('nb,p'  => $_) for @BLOCKING_COMMANDS;
 __PACKAGE__->_add_method('bnb'   => qw(_exec EXEC));
 __PACKAGE__->_add_method('bnb'   => qw(_discard DISCARD));
 __PACKAGE__->_add_method('bnb'   => qw(_multi MULTI));
-__PACKAGE__->_add_method('bnb,p' => qw(info_structured info));
+__PACKAGE__->_add_method('bnb,p' => "${_}_structured", $_) for qw(info xread);
 __PACKAGE__->_add_method('bnb,p' => $_) for qw(unwatch watch);
 
 sub call {
@@ -198,6 +198,11 @@ sub _process_info_structured {
   }
 
   return keys %res == 1 ? $section : \%res;
+}
+
+sub _process_xread_structured {
+  return $_[1] unless ref $_[1] eq 'ARRAY';
+  return {map { ($_->[0] => $_->[1]) } @{$_[1]}};
 }
 
 sub DESTROY {
@@ -1672,6 +1677,21 @@ See L<https://redis.io/commands/xrange> for more information.
 Return never seen elements in multiple streams, with IDs greater than the ones reported by the caller for each stream. Can block.
 
 See L<https://redis.io/commands/xread> for more information.
+
+=head2 xread_structured
+
+Same as L</xread>, but the result is a data structure like this:
+
+  {
+    $stream_name => [
+      [ $id1 => [@data1] ],
+      [ $id2 => [@data2] ],
+      ...
+    ]
+  }
+
+This method is currently EXPERIMENTAL, but will only change if bugs are
+discovered.
 
 =head2 xreadgroup
 

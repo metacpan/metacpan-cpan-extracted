@@ -32,7 +32,7 @@ recommends:
 requires:
   Data::Dmp: '0.21'
   Data::Dump: '0'
-  Data::Sah::Coerce: '0.025'
+  Data::Sah::Coerce: '0.031'
   Data::Sah::CoerceCommon: '0'
   Data::Sah::Normalize: '0.03'
   Data::Sah::Resolve: '0.003'
@@ -66,7 +66,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah
   homepage: https://metacpan.org/release/Data-Sah
   repository: git://github.com/perlancar/perl-Data-Sah.git
-version: '0.893'
+version: '0.895'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -158,7 +158,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -377,7 +377,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -421,6 +421,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: recommends
+      name: TestRecommends
       version: '6.010'
     -
       class: Dist::Zilla::Plugin::Prereqs

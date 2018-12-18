@@ -10,7 +10,6 @@ has service => ( 's3', init_arg => undef );
 has endpoint => ( 'digitaloceanspaces.com', init_arg => undef );
 has prefix      => ( init_arg => undef );
 has prefix_edge => ( init_arg => undef );
-has s3          => ( init_arg => undef );    # InstanceOf['Pcore::API::S3']
 
 sub BUILD ( $self, $args ) {
     $self->{prefix_edge} = "https://$self->{bucket}.$self->{region}.cdn.$self->{endpoint}";
@@ -20,10 +19,10 @@ sub BUILD ( $self, $args ) {
 
 sub get_url ( $self, $path ) {
     if ( $self->{edge_links} ) {
-        return $self->{prefix_edge} . $path;
+        return "$self->{prefix_edge}/$path";
     }
     else {
-        return $self->{prefix} . $path;
+        return "$self->{prefix}/$path";
     }
 }
 

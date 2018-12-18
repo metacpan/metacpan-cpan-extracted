@@ -40,7 +40,7 @@ my $build = Module::Build->new(
   },
   'requires' => {
     'Carp' => '0',
-    'Config::Model' => '2.130',
+    'Config::Model' => '2.131',
     'Config::Model::Backend::Any' => '0',
     'Config::Model::Exception' => '0',
     'File::Path' => '0',

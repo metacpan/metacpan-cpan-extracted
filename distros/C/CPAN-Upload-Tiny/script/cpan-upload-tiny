@@ -12,7 +12,7 @@ GetOptions('config=s' => \my $config_file, 'help:1' => \my $help, 'silent' => \m
 pod2usage(-exitval => 0, -verbose => $help) if $help;
 die "No files given to upload\n" if not @ARGV;
 
-my $uploader = CPAN::Upload::Tiny->new_from_config($config_file);
+my $uploader = CPAN::Upload::Tiny->new_from_config_or_stdin($config_file);
 for my $filename (@ARGV) {
 	$uploader->upload_file($filename);
 	print "Successfully uploaded $filename\n" if not $silent;
@@ -32,7 +32,7 @@ cpan-upload-tiny
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 USAGE
 

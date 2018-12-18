@@ -13,6 +13,7 @@ lib/Mojo/Redis/Database.pm
 lib/Mojo/Redis/PubSub.pm
 Makefile.PL
 MANIFEST			This list of files
+README.md
 t/00-basic.t
 t/benchmark.t
 t/cache-offline.t
@@ -31,5 +32,6 @@ t/pubsub.t
 t/redis.t
 t/scripting.t
 t/txn.t
+t/xread.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

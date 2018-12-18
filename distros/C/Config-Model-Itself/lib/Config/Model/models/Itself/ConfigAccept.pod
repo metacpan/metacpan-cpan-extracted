@@ -61,7 +61,7 @@ Perl class name used to override the implementation of the configuration element
 
 =head2 morph
 
-When set, a recurse copy of the value from the old object to the new object is attemped. Old values are dropped when  a copy is not possible (usually because of mismatching types) I< Optional. Type boolean.  > 
+When set, a recurse copy of the value from the old object to the new object is attempted. Old values are dropped when  a copy is not possible (usually because of mismatching types). I< Optional. Type boolean.  > 
 
 =head2 refer_to
 
@@ -257,7 +257,7 @@ allow
 
 =head2 help
 
-Specify help string specific to possible values. E.g for "light" value, you could write " red => 'stop', green => 'walk' I< Optional. Type hash of string.  > 
+Specify help string applicable to values. The keys are regexp matched to the beggining of the value. See C<help> parameter of L<Config::Model::Value/DESCRIPTION> for more possibilities. I< Optional. Type hash of string.  > 
 
 =head2 status
 

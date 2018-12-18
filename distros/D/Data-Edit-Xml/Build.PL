@@ -1,4 +1,3 @@
-use 5.8.0;
 use Module::Build;
 
 my $b = Module::Build->new(
@@ -8,11 +7,11 @@ my $b = Module::Build->new(
   dist_author          => 'philiprbrenan@gmail.com',
   license              => 'perl',
   module_name          => 'Data::Edit::Xml',
-  perl                 => '5.8.0',
+  perl                 => '5.20',
   requires             => {
      Carp              => 0,
     'Data::Dump'       => 0,
-    'Data::Table::Text'=> q(20181204),
+    'Data::Table::Text'=> q(20181216),
      Storable          => 0,
     'Test::More'       => 0,
     'Test2::API'       => 0,

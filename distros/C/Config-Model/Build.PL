@@ -79,7 +79,6 @@ my $build = $class->new(
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Warn' => '0.11',
-    'YAML' => '0',
     'YAML::Tiny' => '0',
     'boolean' => '0',
     'lib' => '0'
@@ -90,8 +89,7 @@ my $build = $class->new(
   'recommends' => {
     'Fuse' => '0',
     'Term::ReadLine' => '0',
-    'Text::Levenshtein::Damerau' => '0',
-    'YAML::Tiny' => '0'
+    'Text::Levenshtein::Damerau' => '0'
   },
   'requires' => {
     'Carp' => '0',

@@ -40,7 +40,7 @@ has _to_url  => ( init_arg => undef );
 around new => sub ( $orig, $self, $path = undef, %args ) {
     $self = ref $self if is_blessed_hashref $self;
 
-    if ( !defined $path || $path eq '' || $path eq '.' ) {
+    if ( !defined $path || $path eq $EMPTY || $path eq '.' ) {
         return bless {
             path    => '.',
             dirname => '.',
@@ -127,7 +127,7 @@ sub to_uri ($self) {
             $self->{_to_uri} = '/';
         }
         elsif ( $path eq '.' ) {
-            $self->{_to_uri} = '';
+            $self->{_to_uri} = $EMPTY;
         }
         else {
             if ( $self->{volume} ) {
@@ -229,7 +229,7 @@ sub set_volume ( $self, $volume = undef ) {
         if ( $self->{volume} ) {
             $path = $self->{path};
 
-            substr $path, 0, 2, '';
+            substr $path, 0, 2, $EMPTY;
         }
 
         # nothing to do
@@ -288,7 +288,7 @@ sub set_filename_base ( $self, $filename_base = undef ) {
         return $self->set_filename;
     }
     else {
-        my $path = '';
+        my $path = $EMPTY;
 
         $path .= "$self->{dirname}/" if defined $self->{dirname};
 
@@ -303,13 +303,13 @@ sub set_filename_base ( $self, $filename_base = undef ) {
 sub set_suffix ( $self, $suffix = undef ) {
     return $self if !defined $self->{filename};
 
-    my $path = '';
+    my $path = $EMPTY;
 
     $path .= "$self->{dirname}/" if defined $self->{dirname};
 
     $path .= $self->{filename_base};
 
-    $path .= ".$suffix" if defined $suffix && $suffix ne '';
+    $path .= ".$suffix" if defined $suffix && $suffix ne $EMPTY;
 
     return $self->set_path($path);
 }
@@ -433,9 +433,6 @@ C
 ## |    3 | 14                   | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 203                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 43, 130, 232, 291,   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |      | 306, 312             |                                                                                                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

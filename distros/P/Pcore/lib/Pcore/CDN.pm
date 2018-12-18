@@ -1,24 +1,29 @@
 package Pcore::CDN;
 
 use Pcore -class;
-use Pcore::Util::Scalar qw[is_ref is_plain_arrayref is_plain_coderef];
+use Pcore::Util::Scalar qw[weaken is_ref is_plain_arrayref is_plain_coderef];
+use Pcore::Util::File::Tree;
 use overload '&{}' => sub ( $self, @ ) {
     sub { $self->get_url(@_) }
   },
   fallback => 1;
 
-has bucket    => ( init_arg => undef );
-has resources => ();                      # HashRef[CodeRef]
+has native_cdn => ( init_arg => undef );
+has resources  => ( init_arg => undef );    # HashRef[CodeRef]
+has buckets    => ( init_arg => undef );
+has locations  => ( init_arg => undef );
 
 around new => sub ( $orig, $self, $args ) {
     $self = $self->$orig;
 
-    # load resources
-    if ( my $resources = delete $args->{resources} ) {
+    $self->{native_cdn} = $args->{native_cdn};
+
+    # resources
+    if ( my $resources = $args->{resources} ) {
         for my $lib ( $resources->@* ) {
             P->class->load( $lib =~ s/-/::/smgr );
 
-            my $cdn_resources_path = $ENV->dist($lib)->{share_dir} . '/cdn-resources.perl';
+            my $cdn_resources_path = $ENV->dist($lib)->{share_dir} . '/cdn.perl';
 
             if ( -f $cdn_resources_path ) {
                 my $cdn_resources = P->cfg->read($cdn_resources_path);
@@ -28,110 +33,134 @@ around new => sub ( $orig, $self, $args ) {
         }
     }
 
-    # create buckets
-    while ( my ( $name, $cfg ) = each $args->%* ) {
-
-        # skip aliases
-        next if !is_ref $cfg;
-
-        $self->{bucket}->{$name} = P->class->load( $cfg->{type}, ns => 'Pcore::CDN::Bucket' )->new($cfg);
-
-        $self->{bucket}->{default} //= $name;
+    # buckets
+    while ( my ( $name, $cfg ) = each $args->{buckets}->%* ) {
+        $self->{buckets}->{$name} = P->class->load( $cfg->{type}, ns => 'Pcore::CDN::Bucket' )->new($cfg);
     }
 
-    # assign buckets aliases
-    while ( my ( $name, $target ) = each $args->%* ) {
-
-        # skip buckets
-        next if is_ref $target;
-
-        $self->{bucket}->{$name} = $self->{bucket}->{$target};
-    }
+    # locations
+    $self->{locations} = $args->{locations};
 
     return $self;
 };
 
 sub bucket ( $self, $name ) { return $self->{bucket}->{$name} }
 
-# $cdn->get_url($path);
-# $cdn->get_url( $bucket_name, $path );
-sub get_url ( $self, @ ) {
-    my ( $bucket_name, $path ) = @_ == 2 ? ( 'default', $_[1] ) : ( $_[1], $_[2] );
+sub get_url ( $self, $path ) {
+    my $location_name;
 
-    return $self->{bucket}->{ $bucket_name // 'default' }->get_url($path);
+    # extract bucket
+    if ( substr( $path, 0, 1 ) eq '/' ) {
+        $path = "$path" if is_ref $path;
+
+        $location_name = substr $path, 0, index( $path, '/', 1 ) + 1, $EMPTY;
+        substr $location_name, 0,  1, $EMPTY;
+        substr $location_name, -1, 1, $EMPTY;
+    }
+    else {
+        die 'Location is not specified';
+    }
+
+    my $location = $self->{locations}->{$location_name};
+
+    die qq[Location "$location_name" is not defined] if !defined $location;
+
+    my $bucket = $self->{buckets}->{ $location->{bucket} };
+
+    die qq[Bucket "$location->{bucket}" is not defined] if !defined $bucket;
+
+    return $bucket->get_url("$location->{path}/$path");
 }
-
-sub get_script_tag ( $self, @args ) { return qq[<script src="@{[ $self->get_url(@args) ]}" integrity="" crossorigin="anonymous"></script>] }
-
-sub get_css_tag ( $self, @args ) { return qq[<link rel="stylesheet" href="@{[ $self->get_url(@args) ]}" integrity="" crossorigin="anonymous" />] }
 
 sub get_resources ( $self, @resources ) {
     my @res;
 
     for my $name (@resources) {
-        my $res;
+        my %args;
 
         if ( is_plain_arrayref $name) {
-            $res = $self->{resources}->{ $name->[0] }->( $self, $name->@[ 1 .. $name->$#* ] );
-        }
-        else {
-            $res = $self->{resources}->{$name}->($self);
+            ( $name, %args ) = $name->@*;
         }
 
-        push @res, is_plain_arrayref $res ? $res->@* : $res;
+        my $resource = $self->{resources}->{$name};
+
+        die qq[CDN resource "$name" is not defined] if !defined $resource;
+
+        push @res, $resource->( $self, $args{native_cdn} // $self->{native_cdn}, \%args );
     }
 
     return \@res;
 }
 
-# $cdn->upload( $path, $data, %args );
-# $cdn->upload( $bucket_name, $path, $data, %args );
-sub upload ( $self, @ ) {
-    my ( $bucket_name, $path, $data, @args );
+sub get_resource_root ( $self, $name, %args ) {
+    my $resource = $self->{resources}->{$name};
 
-    my $cb = is_plain_coderef $_[-1] ? pop : ();
+    die qq[CDN resource "$name" is not defined] if !defined $resource;
 
-    if ( @_ % 2 ) {
-        ( $bucket_name, $path, $data, @args ) = ( 'default', @_[ 1 .. $#_ ] );
+    return scalar $resource->( $self, $args{native_cdn} // $self->{native_cdn}, \%args );
+}
+
+sub get_script_tag ( $self, $url ) { return qq[<script src="$url" integrity="" crossorigin="anonymous"></script>] }
+
+sub get_css_tag ( $self, $url ) { return qq[<link rel="stylesheet" href="$url" integrity="" crossorigin="anonymous" />] }
+
+sub upload ( $self, $path, $data, @args ) {
+    my $location_name;
+
+    # extract bucket
+    if ( substr( $path, 0, 1 ) eq '/' ) {
+        $path = "$path" if is_ref $path;
+
+        $location_name = substr $path, 0, index( $path, '/', 1 ) + 1, $EMPTY;
+        substr $location_name, 0,  1, $EMPTY;
+        substr $location_name, -1, 1, $EMPTY;
     }
     else {
-        ( $bucket_name, $path, $data, @args ) = @_[ 1 .. $#_ ];
+        die 'Location is not specified';
     }
 
-    return $self->{bucket}->{ $bucket_name // 'default' }->upload( $path, $data, @args, $cb || () );
+    my $location = $self->{locations}->{$location_name};
+
+    die qq[Location "$location_name" is not defined] if !defined $location;
+
+    my $bucket = $self->{buckets}->{ $location->{bucket} };
+
+    die qq[Bucket "$location->{bucket}" is not defined] if !defined $bucket;
+
+    return $bucket->upload( "$location->{path}/$path", $data, cache_control => $location->{cache_control}, @args );
 }
 
 sub sync ( $self, $local, $remote, @locations ) {
-    $local = $self->{bucket}->{$local};
+    $local  = $self->{buckets}->{$local}  // die qq[Bucket "$local" is not defined];
+    $remote = $self->{buckets}->{$remote} // die qq[Bucket "$remote" is not defined];
 
-    my $local_locations = $local->{locations};
+    die qq[Location is not local] if !$local->{is_local};
 
-    my $locations;
+    my $tree = Pcore::Util::File::Tree->new;
 
-    for my $location (@locations) {
-        my $match = '';
+    # create tree
+    for my $root ( $local->{locations}->@* ) {
+        for my $location_name (@locations) {
+            my $location = $self->{locations}->{$location_name};
 
-        for my $loc_cache ( keys $local_locations->%* ) {
-            $match = $loc_cache if length $loc_cache > length $match && index( $location, $loc_cache ) == 0;
+            die qq[Location "$location_name" is not defined] if !defined $location;
+
+            $tree->add_dir( "$root/$location->{path}", "/$location->{path}", { 'Cache-Control' => $location->{cache_control} } );
         }
-
-        $locations->{$location} = $match ? $local_locations->{$match} : undef;
     }
 
-    return $self->{bucket}->{$remote}->sync( $local->{libs}, $locations );
+    return $remote->sync( [ map { $_->{path} } $self->{locations}->@{@locations} ], $tree );
 }
 
 sub get_nginx_cfg($self) {
     my @buf;
 
-    my $processed;
+    while ( my ( $bucket_name, $bucket ) = each $self->{buckets}->%* ) {
+        next if !$bucket->{is_local};
 
-    for my $bucket ( $self->{bucket}->%* ) {
-        next if !$bucket->{is_local} || exists $processed->{ $bucket->{id} };
+        my @cache_control = grep { $_->{bucket} eq $bucket_name && $_->{cache_control} } values $self->{locations}->%*;
 
-        $processed->{ $bucket->{id} } = 1;
-
-        push @buf, $bucket->get_nginx_cfg;
+        push @buf, $bucket->get_nginx_cfg( \@cache_control );
     }
 
     return join $LF, @buf;
@@ -144,7 +173,7 @@ sub get_nginx_cfg($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 112                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |    3 | 137                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

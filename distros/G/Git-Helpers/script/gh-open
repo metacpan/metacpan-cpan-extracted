@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 use Browser::Open qw( open_browser );
-use Getopt::Long;
+use Getopt::Long qw( GetOptions );
 use Git::Helpers qw( https_remote_url );
 
 my $branch;
@@ -28,7 +28,7 @@ gh-open - Open a browser window with the GitHub URL of the repository which you 
 
 =head1 VERSION
 
-version 0.000015
+version 0.000016
 
 =head1 SYNOPSIS
 

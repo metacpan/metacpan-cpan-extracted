@@ -34,7 +34,7 @@ sub update ($cb = undef) {
 
                 local $YAML::XS::QuoteNumericStrings = 0;
 
-                $ENV->{share}->write( 'Pcore', 'data/status.yaml', $data );
+                $ENV->{share}->write( '/Pcore/data/status.yaml', $data );
 
                 $STATUS_REASON = $data;
             }
@@ -49,7 +49,7 @@ sub update ($cb = undef) {
 }
 
 sub _load_data {
-    $STATUS_REASON = $ENV->{share}->read_cfg( 'Pcore', 'data', 'status.yaml' );
+    $STATUS_REASON = $ENV->{share}->read_cfg('/Pcore/data/status.yaml');
 
     return;
 }

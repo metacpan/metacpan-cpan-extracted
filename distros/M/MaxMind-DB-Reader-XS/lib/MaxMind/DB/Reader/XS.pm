@@ -4,9 +4,13 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.000006';
+our $VERSION = '1.000007';
 
 use 5.010000;
+
+# We depend on these in the C/XS code.
+use Math::Int64  ();
+use Math::Int128 ();
 
 use MaxMind::DB::Metadata 0.040001;
 use MaxMind::DB::Types qw( Int Str );
@@ -112,7 +116,7 @@ MaxMind::DB::Reader::XS - Fast XS implementation of MaxMind DB reader
 
 =head1 VERSION
 
-version 1.000006
+version 1.000007
 
 =head1 SYNOPSIS
 
@@ -191,7 +195,7 @@ Ran Eilam <reilam@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack Chris Weyl Florian Ragwitz Greg Oschwald Hidenori Sugiyama Olaf Alders
+=for stopwords Andy Jack Chris Weyl Florian Ragwitz Greg Oschwald Hidenori Sugiyama Mark Fowler Olaf Alders
 
 =over 4
 
@@ -214,6 +218,10 @@ Greg Oschwald <goschwald@maxmind.com>
 =item *
 
 Hidenori Sugiyama <madogiwa@gmail.com>
+
+=item *
+
+Mark Fowler <mark@twoshortplanks.com>
 
 =item *
 

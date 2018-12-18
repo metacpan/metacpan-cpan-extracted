@@ -52,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/mojo-redis"
       }
    },
-   "version" : "3.16",
+   "version" : "3.17",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

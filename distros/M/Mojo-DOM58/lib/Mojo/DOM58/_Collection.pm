@@ -16,7 +16,7 @@ use constant REDUCE => ($] >= 5.008009 ? \&List::Util::reduce : \&_reduce);
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
-our $VERSION = '1.005';
+our $VERSION = '2.000';
 
 sub new {
   my $class = shift;
@@ -106,8 +106,8 @@ sub to_array { [@{shift()}] }
 sub uniq {
   my ($self, $cb) = (shift, shift);
   my %seen;
-  return $self->new(grep { !$seen{$_->$cb(@_)}++ } @$self) if $cb;
-  return $self->new(grep { !$seen{$_}++ } @$self);
+  return $self->new(grep { my $r = $_->$cb(@_); !$seen{defined $r ? $r : ''}++ } @$self) if $cb;
+  return $self->new(grep { !$seen{defined $_ ? $_ : ''}++ } @$self);
 }
 
 sub with_roles {

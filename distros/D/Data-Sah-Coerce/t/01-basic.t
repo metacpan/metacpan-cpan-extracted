@@ -3,14 +3,14 @@
 use 5.010001;
 use strict;
 use warnings;
+use Test::Exception;
+use Test::More 0.98;
+use Test::Needs;
 
 use Data::Sah::Coerce;
 use Data::Sah::CoerceCommon;
 use Data::Sah::CoerceJS;
 use Nodejs::Util qw(get_nodejs_path);
-use Test::Exception;
-use Test::More 0.98;
-use Test::Needs;
 
 sub test_no_dupes {
     my $rules = shift;

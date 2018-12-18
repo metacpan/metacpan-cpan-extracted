@@ -15,11 +15,12 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
 	3  => 'Feuerwehreinsatz neben der Strecke',
+	4  => 'Kurzfristiger Personalausfall',
 	5  => 'Ärztliche Versorgung eines Fahrgastes',
 	6  => 'Betätigen der Notbremse',
 	7  => 'Personen im Gleis',
@@ -47,6 +48,7 @@ my %translation = (
 	34 => 'Signalstörung',
 	35 => 'Streckensperrung',
 	36 => 'Technische Störung am Zug',
+	37 => 'Technische Störung am Wagen',
 	38 => 'Technische Störung an der Strecke',
 	39 => 'Anhängen von zusätzlichen Wagen',
 	40 => 'Stellwerksstörung/-ausfall',
@@ -219,7 +221,7 @@ sub new {
 	  || $ref->{route_pre}[0]
 	  || $ref->{station};
 
-	return bless( $ref, $obj );
+	return $ref;
 }
 
 sub parse_ts {
@@ -801,7 +803,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.21
+version 1.22
 
 =head1 DESCRIPTION
 
@@ -1228,6 +1230,8 @@ Source: Correlation between IRIS and DB RIS (bahn.de).
 =item d 35 : "Streckensperrung"
 
 =item d 36 : "Technische StE<ouml>rung am Zug"
+
+=item d 37 : "Technische StE<ouml>rung am Wagen"
 
 =item d 38 : "Technische StE<ouml>rung an der Strecke"
 

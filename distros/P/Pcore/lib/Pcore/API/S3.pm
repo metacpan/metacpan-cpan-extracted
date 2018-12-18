@@ -5,7 +5,6 @@ use Pcore::Util::Digest qw[sha256_hex hmac_sha256 hmac_sha256_hex];
 use Pcore::Util::Scalar qw[is_ref is_plain_coderef];
 use Pcore::Util::Data qw[to_uri_query from_xml];
 use Pcore::Util::Scalar qw[weaken];
-use Pcore::Util::File::Tree;
 use Pcore::Util::Term::Progress;
 use IO::Compress::Gzip qw[gzip];
 
@@ -101,12 +100,12 @@ sub _req1 ( $self, $args ) {
 
     $args->{path} = "/$args->{path}" if substr( $args->{path}, 0, 1 ) ne '/';
 
-    my $uri = P->uri( sprintf "https://%s%s.$self->{endpoint}%s?%s", $args->{bucket} ? "$args->{bucket}." : '', $args->{region} || $self->{region}, $args->{path}, defined $args->{query} ? to_uri_query $args->{query} : '' );
+    my $uri = P->uri( sprintf "https://%s%s.$self->{endpoint}%s?%s", $args->{bucket} ? "$args->{bucket}." : $EMPTY, $args->{region} || $self->{region}, $args->{path}, defined $args->{query} ? to_uri_query $args->{query} : $EMPTY );
 
     my $date          = P->date->now_utc;
     my $date_ymd      = $date->strftime('%Y%m%d');
     my $date_iso08601 = $date->strftime('%Y%m%dT%H%M%SZ');
-    my $data_hash     = sha256_hex( $args->{data} ? $args->{data}->$* : q[] );
+    my $data_hash     = sha256_hex( $args->{data} ? $args->{data}->$* : $EMPTY );
 
     $args->{headers}->{'Host'}                 = $uri->{host};
     $args->{headers}->{'X-Amz-Date'}           = $date_iso08601;
@@ -228,10 +227,10 @@ sub get_bucket_content ( $self, @args ) {
         method => 'GET',
         path   => '/',
         query  => [
-            delimiter  => $args{delim}  // '',
-            marker     => $args{marker} // '',
-            'max-keys' => $args{max}    // '',
-            prefix     => $args{prefix} // '',
+            delimiter  => $args{delim}  // $EMPTY,
+            marker     => $args{marker} // $EMPTY,
+            'max-keys' => $args{max}    // $EMPTY,
+            prefix     => $args{prefix} // $EMPTY,
         ],
         cb => sub ($res) {
             if ( $res && $res->{data} ) {
@@ -483,28 +482,24 @@ XML
     return $self->_req($args);
 }
 
-sub sync ( $self, $roots, $locations ) {
-    my $tree = Pcore::Util::File::Tree->new;
-
-    # load libs, add files
-    for my $path ( $roots->@* ) {
-        for my $location ( sort { length $a <=> length $b } keys $locations->%* ) {
-
-            $tree->add_dir( "$path/$location", $location, $locations->{$location} ? { 'Cache-Control' => $locations->{$location} } : () ) if -d "$path/$location";
-        }
-    }
-
+sub sync ( $self, $locations, $tree ) {
     my $remote_files;
 
     # get remote files
     {
         my $cv = P->cv->begin;
 
-        for my $location ( keys $locations->%* ) {
+        for my $location ( $locations->@* ) {
             $cv->begin;
 
+            # remove leading "/"
+            substr $location, 0, 1, $EMPTY if substr $location, 0, 1 eq '/';
+
+            # add trailing "/"
+            $location .= '/' if substr $location, -1, 1 ne '/';
+
             $self->get_all_bucket_content(
-                prefix => $location =~ s[\A/][]smr,
+                prefix => $location,
                 sub ($res) {
                     $remote_files->@{ keys $res->{data}->%* } = values $res->{data}->%*;
 
@@ -594,8 +589,7 @@ sub sync ( $self, $roots, $locations ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 104, 231, 232, 233,  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |      | 234                  |                                                                                                                |
+## |    3 | 496, 499             | ValuesAndExpressions::ProhibitMismatchedOperators - Mismatched operator                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

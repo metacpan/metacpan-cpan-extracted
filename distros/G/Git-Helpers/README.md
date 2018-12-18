@@ -4,7 +4,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 # VERSION
 
-version 0.000015
+version 0.000016
 
 # SYNOPSIS
 
@@ -43,6 +43,13 @@ Defaults to using `origin` as the remote if none is supplied.
 Defaults to master branch, but can also display current branch.
 
     my $current_branch_url = https_remote_url( 'origin', 1 );
+
+## is\_inside\_work\_tree
+
+Returns `true` if `git rev-parse --is-inside-git-dir` returns `true`.
+Otherwise returns `false`. This differs slightly from the behaviour of
+`--is-inside-git-dir` in real life, since it returns `fatal` rather than
+`false` if run outside of a git repository.
 
 ## remote\_url( $remote\_name )
 

@@ -9,6 +9,9 @@ my $cache      = $redis->cache(namespace => $0);
 my $n_computed = 0;
 my $res;
 
+# Using Protocol::Redis::XS 0.05 does not work
+$cache->connection($redis->_dequeue) if $ENV{TEST_XS};
+
 cleanup();
 
 for my $i (1 .. 2) {

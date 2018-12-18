@@ -4,13 +4,13 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-git-ship",
    "no_index" : {
@@ -33,13 +33,13 @@
             "Applify" : "0.06",
             "CPAN::Uploader" : "0.10",
             "ExtUtils::MakeMaker" : "6.00",
-            "File::Path" : "2.00",
             "IPC::Run3" : "0.04",
             "Module::CPANfile" : "1.00",
             "Module::Find" : "0.10",
+            "Mojolicious" : "8.00",
+            "Pod::Markdown" : "3.00",
             "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0",
-            "perl" : "5.014"
+            "Test::Pod::Coverage" : "0"
          }
       },
       "test" : {
@@ -60,6 +60,6 @@
          "web" : "https://github.com/jhthorsen/app-git-ship"
       }
    },
-   "version" : "0.27",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.31",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

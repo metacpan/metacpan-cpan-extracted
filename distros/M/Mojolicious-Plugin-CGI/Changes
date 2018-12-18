@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-CGI
 
+0.40 2018-12-15T15:59:53+0900
+ - Compatible with Mojolicious 8.06 #30
+
 0.39 2018-09-02T22:33:56+0200
  - Compatible with Mojolocious 7.90 #29
 

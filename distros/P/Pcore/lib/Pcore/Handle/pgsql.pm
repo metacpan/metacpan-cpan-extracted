@@ -46,7 +46,7 @@ sub _build_username ($self) {
 }
 
 sub _build_password ($self) {
-    return $self->{uri}->{password} // q[];
+    return $self->{uri}->{password} // $EMPTY;
 }
 
 sub _build_database ($self) {

@@ -176,7 +176,7 @@ sub add_attribute ( $caller, $attr, $spec, $is_base, $install_accessors ) {
     if ( my $current_spec = $REG{$caller}{attr}{$attr} ) {
         $override = 1;
 
-        if ( $spec->{is} and ( $spec->{is} // q[] ) ne ( $current_spec->{is} // q[] ) ) {
+        if ( $spec->{is} and ( $spec->{is} // $EMPTY ) ne ( $current_spec->{is} // $EMPTY ) ) {
             die qq[Class "$caller" attribute "$attr" not allowed to redefine parent attribute "is" property];
         }
 

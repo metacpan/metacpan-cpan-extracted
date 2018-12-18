@@ -1,5 +1,8 @@
 requires 'perl', '5.008005';
 
+requires 'JSON';
+requires 'LWP::UserAgent';
+
 # requires 'Some::Module', 'VERSION';
 
 on test => sub {

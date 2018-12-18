@@ -2,15 +2,19 @@ use strict;
 use warnings;
 
 package Git::Helpers;
-our $VERSION = '0.000015';
+our $VERSION = '0.000016';
 use Carp qw( croak );
 use Capture::Tiny 'capture_stderr';
 use File::pushd qw( pushd );
 use Git::Sub;
 use Sub::Exporter -setup => {
     exports => [
-        'checkout_root', 'current_branch_name', 'https_remote_url',
-        'remote_url',    'travis_url',
+        'checkout_root',
+        'current_branch_name',
+        'https_remote_url',
+        'is_inside_work_tree',
+        'remote_url',
+        'travis_url',
     ]
 };
 use Try::Tiny qw( catch try );
@@ -68,6 +72,16 @@ sub https_remote_url {
     return $uri;
 }
 
+sub is_inside_work_tree {
+    my $success;
+    capture_stderr {
+        try {
+            $success = git::rev_parse('--is-inside-work-tree');
+        };
+    };
+    return $success;
+}
+
 sub remote_url {
     my $remote = shift || 'origin';
     my $url;
@@ -112,7 +126,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 =head1 VERSION
 
-version 0.000015
+version 0.000016
 
 =head1 SYNOPSIS
 
@@ -151,6 +165,13 @@ Defaults to using C<origin> as the remote if none is supplied.
 Defaults to master branch, but can also display current branch.
 
     my $current_branch_url = https_remote_url( 'origin', 1 );
+
+=head2 is_inside_work_tree
+
+Returns C<true> if C<git rev-parse --is-inside-git-dir> returns C<true>.
+Otherwise returns C<false>. This differs slightly from the behaviour of
+C<--is-inside-git-dir> in real life, since it returns C<fatal> rather than
+C<false> if run outside of a git repository.
 
 =head2 remote_url( $remote_name )
 

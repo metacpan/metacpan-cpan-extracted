@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-openapi/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '2.06'
+version: '2.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

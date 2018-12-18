@@ -24,6 +24,7 @@ SYNOPSIS
     
       # Modify
       $dom->find('div p')->last->append('<p id="c">456</p>');
+      $dom->at('#c')->prepend($dom->new_tag('p', id => 'd', '789'));
       $dom->find(':not(p)')->map('strip');
     
       # Render
@@ -46,7 +47,7 @@ FORK INFO
     not related to these changes should be reported directly to the
     Mojolicious issue tracker.
 
-    This release of Mojo::DOM58 is up to date with version 7.62 of
+    This release of Mojo::DOM58 is up to date with version 8.09 of
     Mojolicious.
 
 NODES AND ELEMENTS
@@ -178,6 +179,13 @@ SELECTORS
         my $contains = $dom->find('input[name*="fo"]');
         my $contains = $dom->find('input[name*=fo]');
 
+    E[foo|="en"]
+
+      An E element whose foo attribute has a hyphen-separated list of
+      values beginning (from the left) with en.
+
+        my $english = $dom->find('link[hreflang|=en]');
+
     E:root
 
       An E element, root of the document.
@@ -264,6 +272,20 @@ SELECTORS
 
         my $empty = $dom->find(':empty');
 
+    E:link
+
+      An E element being the source anchor of a hyperlink of which the
+      target is not yet visited (:link) or already visited (:visited). Note
+      that Mojo::DOM58 is not stateful, therefore :link and :visited yield
+      exactly the same results.
+
+        my $links = $dom->find(':link');
+        my $links = $dom->find(':visited');
+
+    E:visited
+
+      Alias for "E:link".
+
     E:checked
 
       A user interface element E which is checked (for instance a
@@ -306,6 +328,20 @@ SELECTORS
       This selector is part of Selectors Level 4
       <http://dev.w3.org/csswg/selectors-4>, which is still a work in
       progress.
+
+    A|E
+
+      An E element that belongs to the namespace alias A from CSS
+      Namespaces Module Level 3 <https://www.w3.org/TR/css-namespaces-3/>.
+      Key/value pairs passed to selector methods are used to declare
+      namespace aliases.
+
+        my $elem = $dom->find('lq|elem', lq => 'http://example.com/q-markup');
+
+      Using an empty alias searches for an element that belongs to no
+      namespace.
+
+        my $div = $dom->find('|div');
 
     E F
 
@@ -378,6 +414,19 @@ OPERATORS
 
     Alias for "to_string".
 
+FUNCTIONS
+
+    Mojo::DOM58 implements the following functions, which can be imported
+    individually.
+
+ tag_to_html
+
+      my $str = tag_to_html 'div', id => 'foo', 'safe content';
+
+    Generate HTML/XML tag and render it right away. This is a significantly
+    faster alternative to "new_tag" for template systems that have to
+    generate a lot of tags.
+
 METHODS
 
     Mojo::DOM58 implements the following methods.
@@ -389,6 +438,45 @@ METHODS
 
     Construct a new scalar-based Mojo::DOM58 object and "parse" HTML/XML
     fragment if necessary.
+
+ new_tag
+
+      my $tag = Mojo::DOM58->new_tag('div');
+      my $tag = $dom->new_tag('div');
+      my $tag = $dom->new_tag('div', id => 'foo', hidden => undef);
+      my $tag = $dom->new_tag('div', 'safe content');
+      my $tag = $dom->new_tag('div', id => 'foo', 'safe content');
+      my $tag = $dom->new_tag('div', data => {mojo => 'rocks'}, 'safe content');
+      my $tag = $dom->new_tag('div', id => 'foo', sub { 'unsafe content' });
+
+    Construct a new Mojo::DOM58 object for an HTML/XML tag with or without
+    attributes and content. The data attribute may contain a hash reference
+    with key/value pairs to generate attributes from.
+
+      # "<br>"
+      $dom->new_tag('br');
+    
+      # "<div></div>"
+      $dom->new_tag('div');
+    
+      # "<div id="foo" hidden></div>"
+      $dom->new_tag('div', id => 'foo', hidden => undef);
+    
+      # "<div>test &amp; 123</div>"
+      $dom->new_tag('div', 'test & 123');
+    
+      # "<div id="foo">test &amp; 123</div>"
+      $dom->new_tag('div', id => 'foo', 'test & 123');
+    
+      # "<div data-foo="1" data-bar="test">test &amp; 123</div>""
+      $dom->new_tag('div', data => {foo => 1, Bar => 'test'}, 'test & 123');
+    
+      # "<div id="foo">test & 123</div>"
+      $dom->new_tag('div', id => 'foo', sub { 'test & 123' });
+    
+      # "<div>Hello<b>Mojo!</b></div>"
+      $dom->parse('<div>Hello</div>')->at('div')
+        ->append_content($dom->new_tag('b', 'Mojo!'))->root;
 
  all_text
 
@@ -414,6 +502,7 @@ METHODS
  append
 
       $dom = $dom->append('<p>I ♥ Mojo::DOM58!</p>');
+      $dom = $dom->append(Mojo::DOM58->new);
 
     Append HTML/XML fragment to this node (for all node types other than
     root).
@@ -429,6 +518,7 @@ METHODS
  append_content
 
       $dom = $dom->append_content('<p>I ♥ Mojo::DOM58!</p>');
+      $dom = $dom->append_content(Mojo::DOM58->new);
 
     Append HTML/XML fragment (for root and tag nodes) or raw content to
     this node's content.
@@ -447,6 +537,7 @@ METHODS
  at
 
       my $result = $dom->at('div ~ p');
+      my $result = $dom->at('svg|line', svg => 'http://www.w3.org/2000/svg');
 
     Find first descendant element of this element matching the CSS selector
     and return it as a Mojo::DOM58 object, or undef if none could be found.
@@ -454,6 +545,12 @@ METHODS
 
       # Find first element with "svg" namespace definition
       my $namespace = $dom->at('[xmlns\:svg]')->{'xmlns:svg'};
+
+    Trailing key/value pairs can be used to declare xml namespace aliases.
+
+      # "<rect />"
+      $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>')
+        ->at('svg|rect', svg => 'http://www.w3.org/2000/svg');
 
  attr
 
@@ -505,6 +602,7 @@ METHODS
 
       my $str = $dom->content;
       $dom    = $dom->content('<p>I ♥ Mojo::DOM58!</p>');
+      $dom    = $dom->content(Mojo::DOM58->new);
 
     Return this node's content or replace it with HTML/XML fragment (for
     root and tag nodes) or raw content.
@@ -548,6 +646,7 @@ METHODS
  find
 
       my $collection = $dom->find('div ~ p');
+      my $collection = $dom->find('svg|line', svg => 'http://www.w3.org/2000/svg');
 
     Find all descendant elements of this element matching the CSS selector
     and return a collection containing these elements as Mojo::DOM58
@@ -564,6 +663,12 @@ METHODS
     
       # Find elements with a class that contains dots
       my @divs = $dom->find('div.foo\.bar')->each;
+
+    Trailing key/value pairs can be used to declare xml namespace aliases.
+
+      # "<rect />"
+      $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>')
+        ->find('svg|rect', svg => 'http://www.w3.org/2000/svg')->first;
 
  following
 
@@ -590,6 +695,7 @@ METHODS
  matches
 
       my $bool = $dom->matches('div ~ p');
+      my $bool = $dom->matches('svg|line', svg => 'http://www.w3.org/2000/svg');
 
     Check if this element matches the CSS selector. All selectors listed in
     "SELECTORS" are supported.
@@ -601,6 +707,12 @@ METHODS
       # False
       $dom->parse('<p class="a">A</p>')->at('p')->matches('.b');
       $dom->parse('<p class="a">A</p>')->at('p')->matches('p[id]');
+
+    Trailing key/value pairs can be used to declare xml namespace aliases.
+
+      # True
+      $dom->parse('<svg xmlns="http://www.w3.org/2000/svg"><rect /></svg>')
+        ->matches('svg|rect', svg => 'http://www.w3.org/2000/svg');
 
  namespace
 
@@ -683,6 +795,7 @@ METHODS
  prepend
 
       $dom = $dom->prepend('<p>I ♥ Mojo::DOM58!</p>');
+      $dom = $dom->prepend(Mojo::DOM58->new);
 
     Prepend HTML/XML fragment to this node (for all node types other than
     root).
@@ -698,6 +811,7 @@ METHODS
  prepend_content
 
       $dom = $dom->prepend_content('<p>I ♥ Mojo::DOM58!</p>');
+      $dom = $dom->prepend_content(Mojo::DOM58->new);
 
     Prepend HTML/XML fragment (for root and tag nodes) or raw content to
     this node's content.
@@ -754,6 +868,7 @@ METHODS
  replace
 
       my $parent = $dom->replace('<div>I ♥ Mojo::DOM58!</div>');
+      my $parent = $dom->replace(Mojo::DOM58->new);
 
     Replace this node with HTML/XML fragment and return "root" (for root
     nodes) or "parent".
@@ -770,6 +885,18 @@ METHODS
       my $root = $dom->root;
 
     Return Mojo::DOM58 object for root node.
+
+ selector
+
+      my $selector = $dom->selector;
+
+    Get a unique CSS selector for this element.
+
+      # "ul:nth-child(1) > li:nth-child(2)"
+      $dom->parse('<ul><li>Test</li><li>123</li></ul>')->find('li')->last->selector;
+    
+      # "p:nth-child(1) > b:nth-child(1) > i:nth-child(1)"
+      $dom->parse('<p><b><i>Test</i></b></p>')->at('i')->selector;
 
  strip
 
@@ -899,6 +1026,7 @@ METHODS
  wrap
 
       $dom = $dom->wrap('<div></div>');
+      $dom = $dom->wrap(Mojo::DOM58->new);
 
     Wrap HTML/XML fragment around this node (for all node types other than
     root), placing it as the last child of the first innermost element.
@@ -918,6 +1046,7 @@ METHODS
  wrap_content
 
       $dom = $dom->wrap_content('<div></div>');
+      $dom = $dom->wrap_content(Mojo::DOM58->new);
 
     Wrap HTML/XML fragment around this node's content (for root and tag
     nodes), placing it as the last children of the first innermost element.
@@ -1137,7 +1266,8 @@ COLLECTION METHODS
 
     Create a new collection without duplicate elements, using the string
     representation of either the elements or the return value of the
-    callback/method.
+    callback/method to decide uniqueness. Note that undef and empty string
+    are treated the same.
 
       # Longer version
       my $new = $collection->uniq(sub { $_->$method(@args) });
