@@ -88,6 +88,24 @@ METHODS
     after this may fail until this class is reinstantiated, creating a new
     index.
 
+INHERITED METHODS
+
+    This Catmandu::Store implements:
+
+    Catmandu::Store
+
+    Catmandu::Droppable
+
+    Each Catmandu::Bag in this Catmandu::Store implements:
+
+    Catmandu::Bag
+
+    Catmandu::Droppable
+
+    Catmandu::Searchable
+
+    Catmandu::CQLSearchable
+
 INDEX MAP
 
     The index_mapping contains a Elasticsearch schema mappings for each bag
@@ -236,8 +254,8 @@ COMPATIBILITY
 
     This store expects version 1.0 or higher of the Elasticsearch server.
 
-    To talk to older versions of Elasticsearch the approriate client should
-    be installed.
+    To talk to older versions of Elasticsearch the appropriate client
+    should be installed.
 
         # Elasticsearch 2.x
         cpanm Search::Elasticsearch::Client::2_0::Direct
@@ -250,7 +268,7 @@ COMPATIBILITY
 
     Note that Elasticsearch >= 2.0 doesn't allow keys that start with an
     underscore such as _id. You can use the key_prefix option at store
-    level or id_prefix at bag level to handle this.
+    level or id_key at bag level to handle this.
 
         # in your catmandu.yml
         store:
@@ -290,14 +308,29 @@ ERROR HANDLING
     callback for index when creating a store. E.g. to create an error
     handler for the bag 'data' index use:
 
-        my $store = Catmandu::Store::ElasticSearch->new(
-                        index_name => 'catmandu'
-                        bags => { data => { on_error => \&error_handler } }
-                     });
-    
-        sub error_handler {
+        my $error_handler = sub {
             my ($action, $response, $i) = @_;
-        }
+            do_something_with_error($response);
+        };
+    
+        my $store = Catmandu::Store::ElasticSearch->new(
+            index_name => 'catmandu'
+            bags       => { data => { on_error => $error_handler } }
+        });
+
+    Instead of a callback, the following shortcuts are also accepted for
+    on_error:
+
+    log: log the response
+
+    throw: throw the response as an error
+
+    ignore: do nothing
+
+        my $store = Catmandu::Store::ElasticSearch->new(
+            index_name => 'catmandu'
+            bags       => { data => { on_error => 'log' } }
+        });
 
 SEE ALSO
 

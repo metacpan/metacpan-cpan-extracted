@@ -153,6 +153,10 @@ END {
                 'x-order' => 5,
                 type => [qw( boolean null )],
             },
+            phone => {
+                'x-order' => 6,
+                type => [qw( string null )],
+            },
         },
     },
     user => {
@@ -502,6 +506,13 @@ sub test_backend {
             $tb->ok( !@errors, 'no validation errors' )
                 or $tb->diag( $tb->explain( \@errors ) );
         } );
+
+        my $got_table = $be->read_schema( 'people' );
+        Test::More::is_deeply(
+            $got_table, $expect_schema->{ people },
+            'single schema read from database is correct',
+        ) or $tb->diag( $tb->explain( $got_table ) );
+
     });
 
 };

@@ -1,6 +1,9 @@
+requires "Browser::Open" => "0";
+requires "Git::Helpers" => "0.000016";
 requires "Module::Runtime" => "0";
 requires "Path::Tiny" => "0";
 requires "Try::Tiny" => "0";
+requires "URI" => "0";
 requires "perl" => "5.006";
 requires "strict" => "0";
 requires "warnings" => "0";
@@ -10,6 +13,7 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "Test::Differences" => "0";
   requires "Test::More" => "0";
+  requires "Test::Requires::Git" => "0";
   requires "perl" => "5.006";
 };
 

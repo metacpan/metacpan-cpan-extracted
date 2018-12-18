@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0509';
+our $VERSION = '0.0510';
 
 use Moo;
 use Search::Elasticsearch;
@@ -13,11 +13,12 @@ use namespace::clean;
 with 'Catmandu::Store';
 with 'Catmandu::Droppable';
 
-has index_name => (is => 'ro', required => 1);
-has index_settings => (is => 'ro', lazy => 1, default => sub { +{} });
-has index_mappings => (is => 'ro', lazy => 1, default => sub { +{} });
-has _es_args => (is => 'rw', lazy => 1, default => sub { +{} });
+has index_name     => (is => 'ro', required => 1);
+has index_settings => (is => 'ro', lazy     => 1, default => sub {+{}});
+has index_mappings => (is => 'ro', lazy     => 1, default => sub {+{}});
+has _es_args       => (is => 'rw', lazy     => 1, default => sub {+{}});
 has es => (is => 'lazy');
+
 # used internally
 has is_es_1_or_2 => (is => 'lazy');
 
@@ -38,6 +39,8 @@ sub _build_es {
 
 sub BUILD {
     my ($self, $args) = @_;
+
+    # TODO filter out own args
     $self->_es_args($args);
 }
 
@@ -48,8 +51,9 @@ sub drop {
 
 sub _build_is_es_1_or_2 {
     my ($self) = @_;
-    is_instance($self->es, 'Search::Elasticsearch::Client::1_0::Direct') ||
-        is_instance($self->es, 'Search::Elasticsearch::Client::2_0::Direct');
+    is_instance($self->es, 'Search::Elasticsearch::Client::1_0::Direct')
+        || is_instance($self->es,
+        'Search::Elasticsearch::Client::2_0::Direct');
 }
 
 1;
@@ -143,6 +147,32 @@ Optionally provide for each bag a C<cql_mapping> to map fields to CQL indexes.
 
 Deletes the Elasticsearch index backing this store. Calling functions after
 this may fail until this class is reinstantiated, creating a new index.
+
+=head1 INHERITED METHODS
+
+This Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Store>
+
+=item L<Catmandu::Droppable>
+
+=back
+
+Each Catmandu::Bag in this Catmandu::Store implements:
+
+=over 3
+
+=item L<Catmandu::Bag>
+
+=item L<Catmandu::Droppable>
+
+=item L<Catmandu::Searchable>
+
+=item L<Catmandu::CQLSearchable>
+
+=back
 
 =head1 INDEX MAP
 
@@ -290,7 +320,7 @@ name of the store, C<search> in this case:
 
 This store expects version 1.0 or higher of the Elasticsearch server.
 
-To talk to older versions of Elasticsearch the approriate client should be installed.
+To talk to older versions of Elasticsearch the appropriate client should be installed.
 
     # Elasticsearch 2.x
     cpanm Search::Elasticsearch::Client::2_0::Direct
@@ -302,7 +332,7 @@ And the client version should be specified in the options:
     Catmandu::Store::ElasticSearch->new(index_name => 'myindex', client => '1_0::Direct')
 
 Note that Elasticsearch >= 2.0 doesn't allow keys that start with an underscore such as
-C<_id>. You can use the C<key_prefix> option at store level or C<id_prefix> at
+C<_id>. You can use the C<key_prefix> option at store level or C<id_key> at
 bag level to handle this.
 
     # in your catmandu.yml
@@ -340,14 +370,28 @@ need have to L<install the delete by query plugin|https://www.elastic.co/guide/e
 Error handling can be activated by specifying an error handling callback for index when creating
 a store. E.g. to create an error handler for the bag 'data' index use:
 
-    my $store = Catmandu::Store::ElasticSearch->new(
-                    index_name => 'catmandu'
-                    bags => { data => { on_error => \&error_handler } }
-                 });
-
-    sub error_handler {
+    my $error_handler = sub {
         my ($action, $response, $i) = @_;
-    }
+        do_something_with_error($response);
+    };
+
+    my $store = Catmandu::Store::ElasticSearch->new(
+        index_name => 'catmandu'
+        bags       => { data => { on_error => $error_handler } }
+    });
+
+Instead of a callback, the following shortcuts are also accepted for on_error:
+
+log: log the response
+
+throw: throw the response as an error
+
+ignore: do nothing
+
+    my $store = Catmandu::Store::ElasticSearch->new(
+        index_name => 'catmandu'
+        bags       => { data => { on_error => 'log' } }
+    });
 
 =head1 SEE ALSO
 

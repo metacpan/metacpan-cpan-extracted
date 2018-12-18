@@ -1,5 +1,5 @@
 package Yancy::Backend::Dbic;
-our $VERSION = '1.017';
+our $VERSION = '1.018';
 # ABSTRACT: A backend for DBIx::Class schemas
 
 #pod =head1 SYNOPSIS
@@ -227,10 +227,10 @@ sub _is_type {
 }
 
 sub read_schema {
-    my ( $self ) = @_;
+    my ( $self, @table_names ) = @_;
     my %schema;
 
-    my @tables = $self->dbic->sources;
+    my @tables = @table_names ? @table_names : $self->dbic->sources;
     for my $table ( @tables ) {
         # ; say "Got table $table";
         my $source = $self->dbic->source( $table );
@@ -263,7 +263,7 @@ sub read_schema {
         }
     }
 
-    return \%schema;
+    return @table_names ? @schema{ @table_names } : \%schema;
 }
 
 sub _map_type {
@@ -318,7 +318,7 @@ Yancy::Backend::Dbic - A backend for DBIx::Class schemas
 
 =head1 VERSION
 
-version 1.017
+version 1.018
 
 =head1 SYNOPSIS
 

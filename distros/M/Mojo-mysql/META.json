@@ -53,6 +53,6 @@
          "web" : "https://github.com/jhthorsen/mojo-mysql"
       }
    },
-   "version" : "1.10",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

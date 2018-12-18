@@ -1,3 +1,12 @@
+0.2019.3	2018-12-18
+	* PAUSE not indexing without module version
+
+0.2019.2	2018-12-18
+	* correct build process and dependencies and readme
+
+0.2019.0	2018-12-17
+	+ exact dates for 2019
+
 0.2018.0	2017-12-01
 	* correct short business days in 2018 from 2017 release
 	+ add and correct all days for 2018

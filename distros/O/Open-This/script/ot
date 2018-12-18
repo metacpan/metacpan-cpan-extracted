@@ -3,14 +3,42 @@
 use strict;
 use warnings;
 
-use Open::This ();
+use Open::This qw(
+    editor_args_from_parsed_text
+    maybe_get_url_from_parsed_text
+    parse_text
+);
+use Path::Tiny qw( path );
 
-my @editor_args = Open::This::to_editor_args(@ARGV);
-
-if ( !@editor_args ) {
-    print "Could not locate file\n";
-    exit;
+my $browse;
+if ( $ARGV[0] eq '-b' ) {
+    shift @ARGV;
+    $browse = 1;
 }
+
+my $parsed = parse_text(@ARGV);
+if ( !$parsed ) {
+    print "Could not locate file\n";
+    exit(1);
+}
+
+if ($browse) {
+    my $url = maybe_get_url_from_parsed_text($parsed);
+    if ( !exists $parsed->{remote_file_url} ) {
+        print "Could not find remote repository\n";
+        exit(1);
+    }
+
+    # A relative path should be inside our repository
+    if ( path( $parsed->{remote_file_url} )->is_relative ) {
+        require Browser::Open;
+        Browser::Open::open_browser( $parsed->{remote_file_url} );
+        exit(0);
+    }
+    return undef;
+}
+
+my @editor_args = editor_args_from_parsed_text($parsed);
 
 exec $ENV{EDITOR}, @editor_args;
 
@@ -29,7 +57,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000012
+version 0.000013
 
 =head1 SYNOPSIS
 
@@ -53,6 +81,9 @@ version 0.000012
 
     # Open a core module at a function
     ot "Test::More::diag()"
+
+    # open Foo::Bar on the GitHub web site in your browser
+    ot -b Foo::Bar
 
 =head1 DESCRIPTION
 

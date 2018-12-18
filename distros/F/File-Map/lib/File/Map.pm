@@ -1,5 +1,5 @@
 package File::Map;
-$File::Map::VERSION = '0.65';
+$File::Map::VERSION = '0.66';
 # This software is copyright (c) 2008, 2009, 2010, 2011, 2012 by Leon Timmermans <leont@cpan.org>.
 #
 # This is free software; you can redistribute it and/or modify it under
@@ -120,7 +120,7 @@ File::Map - Memory mapping made simple and safe.
 
 =head1 VERSION
 
-version 0.65
+version 0.66
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ File::Map maps files or anonymous memory into perl variables.
 
 =item * Safety and Speed
 
-This module is safe yet fast. Alternatives are either fast but can cause segfaults or loose the mapping when not used correctly, or are safe but rather slow. File::Map is as fast as a normal string yet safe.
+This module is safe yet fast. Alternatives are either fast but can cause segfaults or lose the mapping when not used correctly, or are safe but rather slow. File::Map is as fast as a normal string yet safe.
 
 =item * Simplicity
 
@@ -254,7 +254,7 @@ On some systems there may be more values available, but this can not be relied o
 
 =head3 * protect $lvalue, $mode
 
-Change the memory protection of the mapping. $mode takes the same format as, but also accepts sys_map style constants.
+Change the memory protection of the mapping. $mode takes the same format as C<open>, but also accepts sys_map style constants.
 
 =head2 Locking
 
@@ -338,7 +338,7 @@ A zero length anonymous map is not possible (or in any way useful).
 
 =item * Can't remap a shared mapping
 
-An attempts was made to remap a mapping that is shared among different threads, this is not possible.
+An attempt was made to remap a mapping that is shared among different threads, this is not possible.
 
 =item * Window (<start>, <end>) is outside the file
 

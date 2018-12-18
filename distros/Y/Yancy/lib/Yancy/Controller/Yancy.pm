@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.017';
+our $VERSION = '1.018';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -367,13 +367,6 @@ sub get {
 #pod         template => $template_name,
 #pod     );
 #pod
-#pod B<NOTE:> Unless restricted to certain properties using the C<properties>
-#pod configuration, this method accepts all valid data configured for the
-#pod collection. The data being submitted can be more than just the fields
-#pod you make available in the form. If you do not want certain data to be
-#pod written through this form, you can prevent it by using the C<properties>
-#pod configuration.
-#pod
 #pod =cut
 
 sub set {
@@ -627,7 +620,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.017
+version 1.018
 
 =head1 SYNOPSIS
 
@@ -887,13 +880,6 @@ method, but with more code:
         collection => $collection_name,
         template => $template_name,
     );
-
-B<NOTE:> Unless restricted to certain properties using the C<properties>
-configuration, this method accepts all valid data configured for the
-collection. The data being submitted can be more than just the fields
-you make available in the form. If you do not want certain data to be
-written through this form, you can prevent it by using the C<properties>
-configuration.
 
 =head2 delete
 

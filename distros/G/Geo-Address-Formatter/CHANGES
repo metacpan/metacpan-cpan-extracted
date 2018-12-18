@@ -1,5 +1,13 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+1.69   2018-12-18
+       - removed debugging
+       - more tests for county_code
+       
+1.68   2018-12-18
+       - deal with case where state value is actually state_code
+       - newest address-formatting templates and tests       
+       
 1.67   2018-09-19
        - more Washington DC improvements
 

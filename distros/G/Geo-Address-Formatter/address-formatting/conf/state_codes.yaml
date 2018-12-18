@@ -54,6 +54,44 @@ CA:
     QC: Quebec
     SK: Saskatchewan
     YT: Yukon
+DE:
+    BB: Brandenburg
+    BE: Berlin
+    BW: Baden-Württemberg
+    BY: Bayern
+    HB: Bremen
+    HE: Hessen
+    HH: Hamburg
+    MV: Mecklenburg-Vorpommern
+    NI: Niedersachsen
+    NW: Nordrhein-Westfalen
+    RP: Rheinland-Pfalz
+    SH: Schleswig-Holstein
+    SL: Saarland
+    SN: Sachsen
+    ST: Sachsen-Anhalt
+    TH: Thüringen
+IT:
+    ABR: Abruzzo
+    BAS: Basilicata
+    CAL: Calabria
+    CAM: Campania
+    EMI: Emilia-Romagna
+    FRI: Friuli Venezia Giulia
+    LAZ: Lazio
+    LIG: Liguria
+    LOM: Lombardia
+    MAR: Marche
+    MOL: Molise
+    PIE: Piemonte
+    PUG: Puglia
+    SAR: Sardegna
+    SIC: Sicilia
+    TOS: Toscana
+    TRE: Trentino-Alto Adige
+    UMB: Umbria
+    VAL: Valle d'Aosta
+    VEN: Veneto
 US:
     # http://en.wikipedia.org/wiki/List_of_states_and_territories_of_the_United_States
     AL: Alabama

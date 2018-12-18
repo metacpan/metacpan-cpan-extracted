@@ -16,10 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "Perl::Critic::RENEEB",
   "PREREQ_PM" => {
-    "Perl::Critic" => "1.105",
+    "Perl::Critic" => "1.126",
     "Readonly" => "1.03"
   },
-  "VERSION" => "2.01",
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Perl::Critic" => "1.105",
+  "Perl::Critic" => "1.126",
   "Readonly" => "1.03"
 );
 

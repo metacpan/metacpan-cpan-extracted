@@ -1,0 +1,24 @@
+---
+abstract: 'Basic descriptive statistics (incl. min/max/skew/kurtosis) without the need to store data points, statistics are updated every time a new data point is added in'
+author:
+  - 'Andreas Hadjiprocopis <bliako@cpan.org>'
+build_requires:
+  Test::Harness: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Running-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

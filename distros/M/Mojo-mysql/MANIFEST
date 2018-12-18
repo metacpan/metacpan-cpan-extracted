@@ -44,6 +44,7 @@ t/results_methods.t
 t/sql-live.t
 t/sql.t
 t/strict-mode.t
+t/test-dbi-async.t
 t/utf8.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

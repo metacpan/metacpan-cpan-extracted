@@ -2,15 +2,24 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000012';
+our $VERSION = '0.000013';
 
 our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(parse_text to_editor_args);
+our @EXPORT_OK = qw(
+    maybe_get_url_from_parsed_text
+    editor_args_from_parsed_text
+    parse_text
+    to_editor_args
+);
 
-use Module::Runtime
-    qw( is_module_name module_notional_filename require_module );
+use Module::Runtime qw(
+    is_module_name
+    module_notional_filename
+    require_module
+);
 use Path::Tiny qw( path );
 use Try::Tiny qw( try );
+use URI qw();
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -19,43 +28,65 @@ sub parse_text {
 
     return undef if !$text;
     my $file_name;
-    my $orig;
+    my %parsed = ( original_text => $text );
 
-    my $line_number = _maybe_extract_line_number( \$text );
-    my $sub_name    = _maybe_extract_subroutine_name( \$text );
+    $parsed{line_number} = _maybe_extract_line_number( \$text );
+    $parsed{sub_name}    = _maybe_extract_subroutine_name( \$text );
 
     # Is this is an actual file.
-    $file_name = $text if -e path($text);
+    $parsed{file_name} = $text if -e path($text);
 
-    my $is_module_name = is_module_name($text);
+    $parsed{is_module_name} = is_module_name($text);
 
-    if ( !$file_name && $is_module_name ) {
-        $file_name = _maybe_find_local_file($text);
+    if ( !$parsed{file_name} && $parsed{is_module_name} ) {
+        $parsed{file_name} = _maybe_find_local_file($text);
     }
 
     # This is a loadable module.  Have this come after the local module checks
     # so that we don't default to installed modules.
-    if ( !$file_name && $is_module_name ) {
+    if ( !$parsed{file_name} && $parsed{is_module_name} ) {
         my $found = _module_to_filename($text);
         if ($found) {
-            $file_name = $found;
+            $parsed{file_name} = $found;
         }
     }
 
-    if ( !$line_number ) {
-        $line_number = _maybe_extract_line_number_via_sub_name(
-            $file_name,
-            $sub_name
+    if ( !$parsed{line_number} ) {
+        $parsed{line_number} = _maybe_extract_line_number_via_sub_name(
+            $parsed{file_name},
+            $parsed{sub_name}
         );
     }
 
-    return $file_name
-        ? {
-        file_name => $file_name,
-        $line_number ? ( line_number => $line_number ) : (),
-        $sub_name    ? ( sub_name    => $sub_name )    : (),
-        }
-        : undef;
+    my %return = map { $_ => $parsed{$_} }
+        grep { defined $parsed{$_} && $parsed{$_} ne q{} } keys %parsed;
+
+    return $return{file_name} ? \%return : undef;
+}
+
+sub maybe_get_url_from_parsed_text {
+    require Git::Helpers;
+
+    my $parsed = shift;
+    return undef unless $parsed && $parsed->{file_name};
+
+    my $url = Git::Helpers::https_remote_url();
+    return undef unless $url && $url->can('host');
+    $parsed->{remote_url} = $url;
+
+    my $clone = $url->clone;
+    my @parts = $clone->path_segments;
+    push(
+        @parts, 'blob', Git::Helpers::current_branch_name(),
+        $parsed->{file_name}
+    );
+    $clone->path( join '/', @parts );
+    if ( $parsed->{line_number} ) {
+        $clone->fragment( 'L' . $parsed->{line_number} );
+    }
+
+    $parsed->{remote_file_url} = $clone;
+    return $clone;
 }
 
 sub _module_to_filename {
@@ -69,17 +100,16 @@ sub _module_to_filename {
 }
 
 sub to_editor_args {
-    my $text = join q{ }, @_;
-    return unless $text;
+    return editor_args_from_parsed_text( parse_text(@_) );
+}
 
-    my $found = parse_text($text);
-
-    # Maybe this file is just being created
-    return unless $found;
+sub editor_args_from_parsed_text {
+    my $parsed = shift;
+    return unless $parsed;
 
     return (
-        ( $found->{line_number} ? '+' . $found->{line_number} : () ),
-        $found->{file_name}
+        ( $parsed->{line_number} ? '+' . $parsed->{line_number} : () ),
+        $parsed->{file_name}
     );
 }
 
@@ -164,7 +194,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000012
+version 0.000013
 
 =head1 DESCRIPTION
 
@@ -193,6 +223,18 @@ Copy/pasting a partial GitHub URL.
 
     ot lib/Foo/Bar.pm#100 # vim +100 Foo/Bar.pm
 
+Open a local file on the GitHub web site in your web browser.  From within a
+checked out copy of https://github.com/oalders/open-this
+
+    ot -b Foo::Bar
+
+Open a local file at the correct line on the GitHub web site in your web
+browser.  From within a checked out copy of
+https://github.com/oalders/open-this:
+
+    ot -b Open::This line 50
+    # https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L50
+
 =head1 FUNCTIONS
 
 =head2 parse_text
@@ -210,9 +252,10 @@ hash.
     my $with_sub_name = parse_text( 'Foo::Bar::do_something()' );
 
     # $with_sub_name = {
-    #     file_name   => 't/lib/Foo/Bar.pm',
-    #     line_number => 3,
-    #     sub_name    => 'do_something',
+    #     file_name     => 't/lib/Foo/Bar.pm',
+    #     line_number   => 3,
+    #     original_text => 't/lib/Foo/Bar.pm:32',
+    #     sub_name      => 'do_something',
     # };
 
 =head2 to_editor_args
@@ -223,9 +266,31 @@ which can be passed at the command line to an editor.
     my @args = to_editor_args('Foo::Bar::do_something()');
     # @args = ( '+3', 't/lib/Foo/Bar.pm' );
 
+=head2 editor_args_from_parsed_text
+
+If you have a C<hashref> from the C<parse_text> function, you can get editor
+args via this function.  (The faster way is just to call C<to_editor_args>
+directly.)
+
+    my @args
+        = editor_args_from_parsed_text( parse_text('t/lib/Foo/Bar.pm:32') );
+
+=head2 maybe_get_url_from_parsed_text
+
+Tries to return an URL to a Git repository for a checked out file.  The URL
+will be built using the C<origin> remote and the name of the current branch.  A
+line number will be attached if it can be parsed from the text.  This has only
+currently be tested with GitHub URLs and it assumes you're working on a branch
+which has already been pushed to your remote.
+
+    my $url = maybe_get_url_from_parsed_text( parse_text('t/lib/Foo/Bar.pm:32'));
+    # $url might be something like: https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L32
+
 =head1 ENVIRONMENT VARIABLES
 
-By default, C<ot> will search your C<lib> and C<t/lib> directories for local files.  You can override this via the C<$ENV{OPEN_THIS_LIBS}> variable.  It accepts a comma-separated list of libs.
+By default, C<ot> will search your C<lib> and C<t/lib> directories for local
+files.  You can override this via the C<$ENV{OPEN_THIS_LIBS}> variable.  It
+accepts a comma-separated list of libs.
 
 =head1 AUTHOR
 

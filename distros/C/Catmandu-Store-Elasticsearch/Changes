@@ -1,5 +1,8 @@
 Revision history for Catmandu-Store-ElasticSearch
 
+0.0510  2018-12-18 15:25:59 CET
+  - on_error log, throw and ignore shortcuts for easier debugging
+
 0.0509  2017-03-28 10:11:49 CEST
   - escape spaces in query string terms, remove quoting
 

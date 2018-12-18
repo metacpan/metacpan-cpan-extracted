@@ -76,6 +76,7 @@ t/backend/dbic.t
 t/backend/mysql.t
 t/backend/pg.t
 t/backend/sqlite.t
+t/config.t
 t/controller/multi_tenant.t
 t/controller/yancy.t
 t/examples/doc-site.t

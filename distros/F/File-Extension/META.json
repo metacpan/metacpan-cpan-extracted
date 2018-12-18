@@ -43,6 +43,6 @@
          "url" : "https://github.com/trapd00r/File-Extension"
       }
    },
-   "version" : "0.020",
+   "version" : "0.030",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

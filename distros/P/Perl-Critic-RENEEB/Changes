@@ -1,6 +1,11 @@
 Release history for Perl::Critic::RENEEB
 ========================================
 
+2.02  2018-12-17 15:40:00
+
+  [TESTS]
+  * Be more generic with error messages
+
 2.01  2018-12-15 13:56:00
 
   [MISC]

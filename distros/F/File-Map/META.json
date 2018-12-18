@@ -4,7 +4,7 @@
       "Leon Timmermans <fawaka@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "keywords" : [
       "mmap",
       "memory",
@@ -51,7 +51,7 @@
             "warnings" : "0"
          },
          "suggests" : {
-            "perl" : "5.018"
+            "perl" : "5.018000"
          }
       },
       "test" : {
@@ -72,7 +72,7 @@
    "provides" : {
       "File::Map" : {
          "file" : "lib/File/Map.pm",
-         "version" : "0.65"
+         "version" : "0.66"
       }
    },
    "release_status" : "stable",
@@ -87,12 +87,14 @@
          "web" : "https://github.com/Leont/file-map"
       }
    },
-   "version" : "0.65",
+   "version" : "0.66",
    "x_contributors" : [
+      "Doug Hoyte <doug@hcsw.org>",
       "Jan Dubois <jand@activestate.com>",
       "Sisyphus <sisyphus@cpan.org>",
       "Tim Jenness <t.jenness@jach.hawaii.edu>"
    ],
+   "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0215"
 }
 

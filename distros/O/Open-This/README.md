@@ -4,7 +4,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 # VERSION
 
-version 0.000012
+version 0.000013
 
 # DESCRIPTION
 
@@ -33,6 +33,18 @@ Copy/pasting a partial GitHub URL.
 
     ot lib/Foo/Bar.pm#100 # vim +100 Foo/Bar.pm
 
+Open a local file on the GitHub web site in your web browser.  From within a
+checked out copy of https://github.com/oalders/open-this
+
+    ot -b Foo::Bar
+
+Open a local file at the correct line on the GitHub web site in your web
+browser.  From within a checked out copy of
+https://github.com/oalders/open-this:
+
+    ot -b Open::This line 50
+    # https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L50
+
 # FUNCTIONS
 
 ## parse\_text
@@ -50,9 +62,10 @@ hash.
     my $with_sub_name = parse_text( 'Foo::Bar::do_something()' );
 
     # $with_sub_name = {
-    #     file_name   => 't/lib/Foo/Bar.pm',
-    #     line_number => 3,
-    #     sub_name    => 'do_something',
+    #     file_name     => 't/lib/Foo/Bar.pm',
+    #     line_number   => 3,
+    #     original_text => 't/lib/Foo/Bar.pm:32',
+    #     sub_name      => 'do_something',
     # };
 
 ## to\_editor\_args
@@ -63,9 +76,31 @@ which can be passed at the command line to an editor.
     my @args = to_editor_args('Foo::Bar::do_something()');
     # @args = ( '+3', 't/lib/Foo/Bar.pm' );
 
+## editor\_args\_from\_parsed\_text
+
+If you have a `hashref` from the `parse_text` function, you can get editor
+args via this function.  (The faster way is just to call `to_editor_args`
+directly.)
+
+    my @args
+        = editor_args_from_parsed_text( parse_text('t/lib/Foo/Bar.pm:32') );
+
+## maybe\_get\_url\_from\_parsed\_text
+
+Tries to return an URL to a Git repository for a checked out file.  The URL
+will be built using the `origin` remote and the name of the current branch.  A
+line number will be attached if it can be parsed from the text.  This has only
+currently be tested with GitHub URLs and it assumes you're working on a branch
+which has already been pushed to your remote.
+
+    my $url = maybe_get_url_from_parsed_text( parse_text('t/lib/Foo/Bar.pm:32'));
+    # $url might be something like: https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L32
+
 # ENVIRONMENT VARIABLES
 
-By default, `ot` will search your `lib` and `t/lib` directories for local files.  You can override this via the `$ENV{OPEN_THIS_LIBS}` variable.  It accepts a comma-separated list of libs.
+By default, `ot` will search your `lib` and `t/lib` directories for local
+files.  You can override this via the `$ENV{OPEN_THIS_LIBS}` variable.  It
+accepts a comma-separated list of libs.
 
 # AUTHOR
 

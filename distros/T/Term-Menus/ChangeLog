@@ -1,3 +1,24 @@
+2018-12-18  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.019
+
+        * Added Module::Build dependency to Makefile.PL.
+
+
+2018-12-15  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.018
+
+        * Updated META.yml.
+
+
+2018-12-12  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
+
+        * Version 3.017
+
+        * Added use lib '.' to Makefile.PL.
+
+
 2018-09-22  Brian M. Kelly  <Brian.Kelly@fullautosoftware.com>
 
         * Version 3.016

@@ -19,6 +19,7 @@ script/ot
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/Open/This.t
+t/git.t
 t/lib/Foo/Bar.pm
 t/other-lib/Foo/Baz.pm
 t/test-data/file

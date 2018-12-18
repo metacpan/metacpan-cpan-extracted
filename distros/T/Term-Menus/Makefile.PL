@@ -5,10 +5,11 @@ use inc::Module::Install;
 # Define metadata
 name            'Term-Menus';
 sign;
-author          'Brian M. Kelly <Brian.Kelly@fullautosoftware.net>';
+author          'Brian M. Kelly <Brian.Kelly@fullauto.com>';
 license         'agpl_3';
 all_from        'lib/Term/Menus.pm';
 
+requires        'Module::Build'             => 0;
 requires        'Data::Dump::Streamer'      => 0;
 requires        'PadWalker'                 => 0;
 requires        'Devel::Symdump'            => 0;

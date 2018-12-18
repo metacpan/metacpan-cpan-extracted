@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Searcher;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0509';
+our $VERSION = '0.0510';
 
 use Moo;
 use namespace::clean;
@@ -29,11 +29,12 @@ sub generator {
             my $body = {query => $self->query};
             $body->{sort} = $self->sort if $self->sort;
             my %args = (
-                index       => $store->index_name,
-                type        => $self->bag->name,
-                from        => $self->start,
-                size        => $self->bag->buffer_size, # TODO divide by number of shards
-                body        => $body,
+                index => $store->index_name,
+                type  => $self->bag->name,
+                from  => $self->start,
+                size =>
+                    $self->bag->buffer_size, # TODO divide by number of shards
+                body => $body,
             );
             if (!$self->sort && $store->is_es_1_or_2) {
                 $args{search_type} = 'scan';
@@ -52,7 +53,7 @@ sub generator {
     };
 }
 
-sub slice { # TODO constrain total?
+sub slice {    # TODO constrain total?
     my ($self, $start, $total) = @_;
     $start //= 0;
     $self->new(
@@ -71,9 +72,7 @@ sub count {
     $store->es->count(
         index => $store->index_name,
         type  => $self->bag->name,
-        body  => {
-            query => $self->query,
-        },
+        body  => {query => $self->query,},
     )->{count};
 }
 

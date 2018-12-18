@@ -1,5 +1,9 @@
 Revision history for Open-This
 
+0.000013  2018-12-18 16:57:31Z
+    - Add a -b (browse) option to ot. Also add editor_args_from_parsed_text()
+      and maybe_get_url_from_parsed_text (GH#5) (Olaf Alders)
+
 0.000012  2018-12-03 19:26:46Z
     - Parse line numbers from the fragments of GitHub URLs
 

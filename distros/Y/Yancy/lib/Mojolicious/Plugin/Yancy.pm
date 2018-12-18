@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.017';
+our $VERSION = '1.018';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -162,8 +162,8 @@ our $VERSION = '1.017';
 #pod of items, not the total count of items or any other value.
 #pod
 #pod This helper will also filter out any password fields in the returned
-#pod data. To get all the data, use the L</backend> helper to access the
-#pod backend methods directly.
+#pod data. To get all the data, use the L<backend|/yancy.backend> helper to
+#pod access the backend methods directly.
 #pod
 #pod =head2 yancy.get
 #pod
@@ -173,7 +173,8 @@ our $VERSION = '1.017';
 #pod C<$id> is the ID of the item to get. See L<Yancy::Backend/get>.
 #pod
 #pod This helper will filter out password values in the returned data. To get
-#pod all the data, use the L</backend> helper to access the backend directly.
+#pod all the data, use the L<backend|/yancy.backend> helper to access the
+#pod backend directly.
 #pod
 #pod =head2 yancy.set
 #pod
@@ -337,6 +338,10 @@ our $VERSION = '1.017';
 #pod Run the configured filters on the given C<$item_data>. C<$collection> is
 #pod a collection name. Returns the hash of C<$filtered_data>.
 #pod
+#pod The property-level filters will run before any collection-level filter,
+#pod so that collection-level filters can take advantage of any values set by
+#pod the inner filters.
+#pod
 #pod =head2 yancy.schema
 #pod
 #pod     my $schema = $c->yancy->schema( $name );
@@ -456,29 +461,39 @@ sub register {
         if ( $config->{read_schema} ) {
             my $schema = $app->yancy->backend->read_schema;
             for my $c ( keys %$schema ) {
-                my $coll = $config->{collections}{ $c } ||= {};
-                my $conf_props = $coll->{properties} ||= {};
-                my $schema_props = delete $schema->{ $c }{properties};
-                for my $k ( keys %{ $schema->{ $c } } ) {
-                    $coll->{ $k } ||= $schema->{ $c }{ $k };
-                }
-                for my $p ( keys %{ $schema_props } ) {
-                    my $conf_prop = $conf_props->{ $p } ||= {};
-                    my $schema_prop = $schema_props->{ $p };
-                    for my $k ( keys %$schema_prop ) {
-                        $conf_prop->{ $k } ||= $schema_prop->{ $k };
-                    }
-                }
+                _merge_schema( $config->{collections}{ $c } ||= {}, $schema->{ $c } );
             }
             # ; say 'Merged Config';
             # ; use Data::Dumper;
             # ; say Dumper $config;
+        }
+        # read_schema on collections
+        for my $schema_name ( keys %{ $config->{collections} } ) {
+            my $schema = $config->{collections}{ $schema_name };
+            if ( delete $schema->{read_schema} ) {
+                _merge_schema( $schema, $app->yancy->backend->read_schema( $schema_name ) );
+            }
+        }
+
+        # Sanity check for the schema.
+        for my $schema_name ( keys %{ $config->{collections} } ) {
+            my $schema = $config->{collections}{ $schema_name };
+            next if $schema->{ 'x-ignore' }; # XXX Should we just delete x-ignore collections?
+            my $props = $schema->{ properties };
+            my $id_field = $schema->{ 'x-id-field' } // 'id';
+            if ( !$props->{ $id_field } ) {
+                die sprintf "ID field missing in properties for collection '%s', field '%s'."
+                    . " Add x-id-field to configure the correct ID field name, or"
+                    . " add x-ignore to ignore this collection.",
+                        $schema_name, $id_field;
+            }
         }
 
         # Add OpenAPI spec
         $spec = $self->_openapi_spec_from_schema( $config );
     }
     $self->_openapi_spec_add_mojo( $spec, $config );
+
     my $openapi = $app->plugin( OpenAPI => {
         route => $route->any( '/api' )->name( 'yancy.api' ),
         spec => $spec,
@@ -924,14 +939,6 @@ sub _helper_filter_apply {
     my ( $self, $c, $coll_name, $item ) = @_;
     my $coll = $c->yancy->schema( $coll_name );
     my $filters = $self->_filters;
-    if ( my $coll_filters = $coll->{'x-filter'} ) {
-        for my $filter ( @{ $coll_filters } ) {
-            my $sub = $filters->{ $filter };
-            die "Unknown filter: $filter (collection: $coll_name)"
-                unless $sub;
-            $item = $sub->( $coll_name, $item, $coll );
-        }
-    }
     for my $key ( keys %{ $coll->{properties} } ) {
         next unless my $prop_filters = $coll->{properties}{ $key }{ 'x-filter' };
         for my $filter ( @{ $prop_filters } ) {
@@ -943,6 +950,14 @@ sub _helper_filter_apply {
             );
         }
     }
+    if ( my $coll_filters = $coll->{'x-filter'} ) {
+        for my $filter ( @{ $coll_filters } ) {
+            my $sub = $filters->{ $filter };
+            die "Unknown filter: $filter (collection: $coll_name)"
+                unless $sub;
+            $item = $sub->( $coll_name, $item, $coll );
+        }
+    }
     return $item;
 }
 
@@ -951,6 +966,26 @@ sub _helper_filter_add {
     $self->_filters->{ $name } = $sub;
 }
 
+# _merge_schema( $keep, $merge );
+#
+# Merge the given $merge schema into the given $keep schema. $keep is
+# modified in-place (but also returned)
+sub _merge_schema {
+    my ( $keep, $merge ) = @_;
+    my $keep_props = $keep->{properties} ||= {};
+    my $merge_props = delete $merge->{properties};
+    for my $k ( keys %$merge ) {
+        $keep->{ $k } ||= $merge->{ $k };
+    }
+    for my $p ( keys %{ $merge_props } ) {
+        my $keep_prop = $keep_props->{ $p } ||= {};
+        my $merge_prop = $merge_props->{ $p };
+        for my $k ( keys %$merge_prop ) {
+            $keep_prop->{ $k } ||= $merge_prop->{ $k };
+        }
+    }
+    return $keep;
+}
 1;
 
 __END__
@@ -963,7 +998,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.017
+version 1.018
 
 =head1 SYNOPSIS
 
@@ -1125,8 +1160,8 @@ method's arguments|Yancy::Backend/list>. This helper only returns the list
 of items, not the total count of items or any other value.
 
 This helper will also filter out any password fields in the returned
-data. To get all the data, use the L</backend> helper to access the
-backend methods directly.
+data. To get all the data, use the L<backend|/yancy.backend> helper to
+access the backend methods directly.
 
 =head2 yancy.get
 
@@ -1136,7 +1171,8 @@ Get an item from the backend. C<$collection> is the collection name.
 C<$id> is the ID of the item to get. See L<Yancy::Backend/get>.
 
 This helper will filter out password values in the returned data. To get
-all the data, use the L</backend> helper to access the backend directly.
+all the data, use the L<backend|/yancy.backend> helper to access the
+backend directly.
 
 =head2 yancy.set
 
@@ -1299,6 +1335,10 @@ And you configure this on the collection using C<< x-filter >>:
 
 Run the configured filters on the given C<$item_data>. C<$collection> is
 a collection name. Returns the hash of C<$filtered_data>.
+
+The property-level filters will run before any collection-level filter,
+so that collection-level filters can take advantage of any values set by
+the inner filters.
 
 =head2 yancy.schema
 

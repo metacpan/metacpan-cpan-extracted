@@ -1,5 +1,8 @@
 Revision history for Calendar::Hebrew
 
+0.07  Tue Nov 18 18:30:00 2018
+      - Updated dependency on Date::Hebrew::Simple v0.10.
+
 0.06  Mon Nov 12 14:10:00 2018
       - Used namespace::autoclean instead.
 

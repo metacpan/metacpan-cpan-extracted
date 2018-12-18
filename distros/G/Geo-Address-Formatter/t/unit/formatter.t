@@ -43,11 +43,50 @@ my $GAF = $CLASS->new( conf_path => $path );
 
 
 {
+  # keep in mind this is using the test conf, not the real address-formatting conf
   is( $GAF->_add_state_code( {} ), undef );
   is( $GAF->_add_state_code( { country_code => 'BR', state => 'Sao Paulo'} ), undef );
   is( $GAF->_add_state_code( { country_code => 'us', state => 'California'}), 'CA' );
+
+  # correct state and add state_code if code was in state field
+  my $rh_comp = {
+      country_code => 'IT',
+      state => 'PUG',
+  };
+  $GAF->_add_state_code($rh_comp);
+  is($rh_comp->{state}, 'Puglia', 'corrected state to Puglia');
+  is($rh_comp->{state_code}, 'PUG', 'state_code is PUG');
+
+  # correct state and add state_code if code was in state field
+  my $rh_comp2 = {
+      country_code => 'IT',
+      state        => 'PUG',
+      state_code   => 'PUG',      
+  };
+  $GAF->_add_state_code($rh_comp2);
+  is($rh_comp2->{state}, 'Puglia', 'corrected state to Puglia');
+  is($rh_comp2->{state_code}, 'PUG', 'state_code is PUG');  
+
+
+  # set state if only state_code supplied
+#  my $rh_comp3 = {
+#      country_code => 'IT',
+#      state_code   => 'PUG',
+#  };
+#  $GAF->_add_state_code($rh_comp3);
+#  is($rh_comp3->{state}, 'Puglia', 'corrected state to Puglia');
+#  is($rh_comp3->{state_code}, 'PUG', 'state_code is PUG');
 }
 
+{ # county code
+  my $rh_c = {
+      country_code => 'IT',
+      county       => 'RM',
+  };
+  $GAF->_add_county_code($rh_c);
+  is($rh_c->{county}, 'Roma', 'corrected county to Roma');
+  is($rh_c->{county_code}, 'RM', 'set county_code to RM');  
+}
 
 {
   my $components = {
@@ -97,3 +136,5 @@ my $GAF = $CLASS->new( conf_path => $path );
 
 
 done_testing();
+
+1;

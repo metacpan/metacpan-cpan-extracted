@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 
-our $VERSION = '0.020';
+our $VERSION = '0.030';
 
 # populated in BEGIN block
 my %ext;
@@ -33,6 +33,20 @@ sub filter_by_meta {
   return \%filtered;
 }
 
+sub filter_by_meta_reverse {
+  my $query = shift;
+
+  my %filtered;
+
+  while(my($extension, $desc) = each(%ext)) {
+    if($desc !~ m/$query/i) {
+      $filtered{$extension} = $desc;
+    }
+  }
+  return \%filtered;
+}
+
+
 #< begin
 BEGIN {
   use Exporter;
@@ -40,7 +54,7 @@ BEGIN {
   @ISA = qw(Exporter);
 
 
-  @EXPORT_OK = qw(extplain filter_by_meta);
+  @EXPORT_OK = qw(extplain filter_by_meta filter_by_meta_reverse);
 
   %ext = (
     '!bt'          => 'BitTorrent Incomplete Download File',
@@ -8375,7 +8389,7 @@ File::Extension - explain file extensions
 
 =head1 SYNOPSIS
 
-      use File::Extension qw(extplain filter_by_meta);
+      use File::Extension qw(extplain filter_by_meta filter_by_meta_reverse);
 
       my @filetypes = qw(nes pl pm gb p6);
 
@@ -8412,7 +8426,7 @@ Returns:    $explanation
 
 =head2 filter_by_meta()
 
-Parameters: $extension
+Parameters: $filter
 
 Returns:    \%filtered
 
@@ -8420,13 +8434,24 @@ Returns:    \%filtered
 
 Filters the hash by a raw string or regular expression, returning the results.
 
+
+=head2 filter_by_meta_reverse()
+
+Parameters: $filter
+
+Returns:    \%filtered
+
+  my $results = filter_by_meta_reverse('doc');
+
+Like filter_by_meta(), but returns the results that does not match the
+given filter.
+
 =head1 HISTORY
 
 This module was initially crafted while exploring ideas for generating
 the world's largest LS_COLORS file:
 
 L</https://github.com/trapd00r/LS_COLORS/issues/112>
-
 
 =head1 SEE ALSO
 

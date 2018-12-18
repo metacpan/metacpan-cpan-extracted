@@ -56,3 +56,5 @@ foreach my $filename (@files){
 }
 
 done_testing();
+
+1;

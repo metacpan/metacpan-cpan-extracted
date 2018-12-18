@@ -45,6 +45,11 @@ my $collections = {
                 type => 'boolean',
                 'x-order' => 5,
             },
+            phone => {
+                type => [ 'string', 'null' ],
+                'x-order' => 6,
+                format => 'tel',
+            },
         },
     },
     user => {
@@ -139,101 +144,6 @@ subtest 'read_schema collections' => \&test_api,
     } ),
     '/yancy/api';
 
-subtest 'schema completely from database' => sub {
-    my $t = Test::Mojo->new( Yancy => {
-        read_schema => 1,
-        backend => $backend_url,
-        collections => {},
-    });
-    $t->get_ok( '/yancy/api' )
-      ->status_is( 200 )
-      ->content_type_like( qr{^application/json} )
-      ->json_is( '/definitions/people' => {
-        type => 'object',
-        required => [qw( name )],
-        properties => {
-            id => {
-                'x-order' => 1,
-                type => 'integer',
-            },
-            name => {
-                'x-order' => 2,
-                type => 'string',
-            },
-            email => {
-                'x-order' => 3,
-                type => [ 'string', 'null' ],
-            },
-            age => {
-                type => [qw( integer null )],
-                'x-order' => 4,
-            },
-            contact => {
-                type => [qw( boolean null )],
-                'x-order' => 5,
-            },
-        },
-      } )
-      ->or( sub { diag explain shift->tx->res->json( '/definitions/people' ) } )
-
-      ->json_is( '/definitions/user' => {
-        type => 'object',
-        required => [qw( username email password )],
-        properties => {
-            id => {
-                'x-order' => 1,
-                type => 'integer',
-            },
-            username => {
-                'x-order' => 2,
-                type => 'string',
-            },
-            email => {
-                'x-order' => 3,
-                type => 'string',
-            },
-            password => {
-                'x-order' => 4,
-                type => 'string',
-            },
-            access => {
-                'x-order' => 5,
-                type => 'string',
-                enum => [qw( user moderator admin )],
-            },
-            age => {
-                'x-order' => 6,
-                type => [qw( integer null )],
-            },
-        },
-      } )
-      ->or( sub { diag explain shift->tx->res->json( '/definitions/user' ) } )
-
-};
-
-subtest 'x-ignore' => sub {
-    my $t = Test::Mojo->new( Yancy => {
-        read_schema => 1,
-        backend => $backend_url,
-        collections => { user => { 'x-ignore' => 1 } },
-    });
-    $t->get_ok( '/yancy/api' )
-      ->status_is( 200 )
-      ->content_type_like( qr{^application/json} )
-      ->json_has( '/definitions/people', 'people read from schema' )
-      ->json_hasnt( '/definitions/user', 'user ignored from schema' )
-      ;
-};
-
-subtest 'no collections AND openapi' => sub {
-    eval { Test::Mojo->new( Yancy => {
-        openapi => {},
-        backend => $backend_url,
-        collections => {},
-    }) };
-    isnt $@, '', 'openapi AND collections should be fatal';
-};
-
 my $openapi = decode_json path ( $Bin, 'share', 'openapi-spec.json' )->slurp;
 ( $backend_url, $backend, %items ) = init_backend( $collections, %data );
 subtest 'pass openapi' => \&test_api,
@@ -277,6 +187,11 @@ sub test_api {
                 contact => {
                     type => 'boolean',
                     'x-order' => 5,
+                },
+                phone => {
+                    type => [qw( string null )],
+                    'x-order' => 6,
+                    format => 'tel',
                 },
             },
           } )
@@ -578,6 +493,7 @@ sub test_api {
             id => 1,
             age => 35,
             contact => 1,
+            phone => '555 555-0199',
         };
         $t->put_ok( $api_path . '/people/' . $items{people}[0]{id} => json => $new_person )
           ->status_is( 200 )
@@ -622,6 +538,7 @@ sub test_api {
             id => 4,
             age => 3,
             contact => 0,
+            phone => undef,
         };
         $t->post_ok( $api_path . '/people' => json => $new_person )
           ->status_is( 201 )

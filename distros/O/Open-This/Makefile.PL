@@ -20,9 +20,12 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Open::This",
   "PREREQ_PM" => {
+    "Browser::Open" => 0,
+    "Git::Helpers" => "0.000016",
     "Module::Runtime" => 0,
     "Path::Tiny" => 0,
     "Try::Tiny" => 0,
+    "URI" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,9 +33,10 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::Differences" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "Test::Requires::Git" => 0
   },
-  "VERSION" => "0.000012",
+  "VERSION" => "0.000013",
   "test" => {
     "TESTS" => "t/*.t t/Open/*.t"
   }
@@ -40,13 +44,17 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Browser::Open" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "Git::Helpers" => "0.000016",
   "Module::Runtime" => 0,
   "Path::Tiny" => 0,
   "Test::Differences" => 0,
   "Test::More" => 0,
+  "Test::Requires::Git" => 0,
   "Try::Tiny" => 0,
+  "URI" => 0,
   "strict" => 0,
   "warnings" => 0
 );

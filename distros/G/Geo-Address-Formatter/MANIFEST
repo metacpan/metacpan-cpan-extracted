@@ -292,5 +292,6 @@ t/unit/test_conf-abbreviate/country2lang.yaml
 t/unit/test_conf-abbreviate/state_codes.yaml
 t/unit/test_conf-general/components.yaml
 t/unit/test_conf-general/countries/worldwide.yaml
+t/unit/test_conf-general/county_codes.yaml
 t/unit/test_conf-general/state_codes.yaml
 t/unit/testcases1/aa.yaml

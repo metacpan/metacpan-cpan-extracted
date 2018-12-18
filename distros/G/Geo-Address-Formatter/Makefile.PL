@@ -29,12 +29,12 @@ my %WriteMakefileArgs = (
     "Test::LWP::Recorder" => 0,
     "Test::More" => "0.88",
     "Test::Warn" => 0,
-    "Text::Hogan" => "1.01",
+    "Text::Hogan" => "1.06",
     "Text::Trim" => "1.02",
     "Try::Tiny" => 0,
     "YAML" => 0
   },
-  "VERSION" => "1.67",
+  "VERSION" => "1.69",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "Test::LWP::Recorder" => 0,
   "Test::More" => "0.88",
   "Test::Warn" => 0,
-  "Text::Hogan" => "1.01",
+  "Text::Hogan" => "1.06",
   "Text::Trim" => "1.02",
   "Try::Tiny" => 0,
   "YAML" => 0

@@ -11,7 +11,7 @@ use Perl::Critic::Utils qw{ :severities };
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 
 #-----------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSpli
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 DESCRIPTION
 

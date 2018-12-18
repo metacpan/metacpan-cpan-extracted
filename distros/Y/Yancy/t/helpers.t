@@ -76,6 +76,18 @@ my $collections = {
             },
         },
     },
+    blog => {
+        required => [ qw( title markdown ) ],
+        properties => {
+            id => { type => 'integer', readOnly => 1 },
+            user_id => { type => 'integer' },
+            title => { type => 'string' },
+            slug => { type => 'string' },
+            markdown => { type => 'string', format => 'markdown', 'x-html-field' => 'html' },
+            html => { type => 'string', 'x-hidden' => 1 },
+            is_published => { type => 'boolean' },
+        },
+    },
 };
 my ( $backend_url, $backend, %items ) = init_backend(
     $collections,
@@ -149,6 +161,7 @@ subtest 'set' => sub {
         email => 'doug@example.com',
         age => 35,
         contact => 0,
+        phone => '555 555-0199',
     };
     $t->app->yancy->set( people => $set_id => { %{ $new_person } });
     $new_person->{id} = $set_id;
@@ -179,75 +192,16 @@ subtest 'set' => sub {
     };
 
     subtest 'set numeric field with string containing number' => sub {
-        my $set_id = $items{people}[0]{id};
-        my $new_person = {
-            name => 'foobar',
-            email => 'doug@example.com',
-            age => 20,
-            contact => 0,
+        eval {
+            $t->app->yancy->set( people =>
+                $items{people}[0]{id},
+                { age => "20" },
+                properties => [ 'age' ]
+            )
         };
-        eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
         ok !$@, 'set() lives'
             or diag "Errors: \n" . join "\n", map { "\t$_" } @{ $@ };
-        $new_person->{id} = $set_id;
-        is_deeply $backend->get( people => $set_id ), $new_person;
-    };
-
-    subtest 'set boolean field' => sub {
-        subtest 'with 1 as true' => sub {
-            my $set_id = $items{people}[0]{id};
-            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => 1 };
-            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
-            ok !$@, 'set() lives'
-                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
-            $new_person->{id} = $set_id;
-            $new_person->{age} = 20;
-            is_deeply $backend->get( people => $set_id ), $new_person;
-        };
-
-        subtest 'with "true" as true' => sub {
-            my $set_id = $items{people}[0]{id};
-            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => "true" };
-            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
-            ok !$@, 'set() lives'
-                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
-            $new_person->{id} = $set_id;
-            $new_person->{age} = 20;
-            $new_person->{contact} = 1;
-            is_deeply $backend->get( people => $set_id ), $new_person;
-        };
-
-        subtest 'with "0" as false' => sub {
-            my $set_id = $items{people}[0]{id};
-            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => "0" };
-            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
-            ok !$@, 'set() lives'
-                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
-            $new_person->{id} = $set_id;
-            $new_person->{age} = 20;
-            is_deeply $backend->get( people => $set_id ), $new_person;
-        };
-
-        subtest 'with "false" as false' => sub {
-            my $set_id = $items{people}[0]{id};
-            my $new_person = { name => 'foobar', email => 'doug@example.com', contact => "false" };
-            eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
-            ok !$@, 'set() lives'
-                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
-            $new_person->{id} = $set_id;
-            $new_person->{age} = 20;
-            $new_person->{contact} = 0;
-            is_deeply $backend->get( people => $set_id ), $new_person;
-        };
-    };
-
-    subtest 'set date field with "" is an error' => sub {
-        my $set_id = $items{people}[0]{id};
-        my $new_person = { name => 'foobar', email => 'doug@example.com', birthdate => '' };
-        eval { $t->app->yancy->set( people => $set_id => { %{ $new_person } } ) };
-        ok $@, 'set() dies';
-        like $@->[0]{path}, qr{/birthdate}, 'birthdate is invalid';
-        like $@->[0]{message}, qr{Does not match date format}, 'format error correct';
+        is $backend->get( people => $items{people}[0]{id} )->{age}, 20;
     };
 
     subtest 'set partial (assume required fields are already set)' => sub {
@@ -267,6 +221,7 @@ subtest 'set' => sub {
             email => 'doug@example.com',
             contact => '0',
             age => 20,
+            phone => '555 555-0199',
             %$new_email,
         };
         is_deeply $backend->get( people => $set_id ), $new_person;
@@ -282,6 +237,73 @@ subtest 'set' => sub {
             like $@->[0]{path}, qr{/name}, 'name is missing';
             like $@->[0]{message}, qr{Missing}, 'missing error correct';
         };
+    };
+
+    subtest 'set boolean field' => sub {
+        subtest 'with 1 as true' => sub {
+            eval {
+                $t->app->yancy->set( people =>
+                    $items{people}[0]{id},
+                    { contact => 1 },
+                    properties => [ 'contact' ]
+                )
+            };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            is $backend->get( people => $items{people}[0]{id} )->{contact}, 1;
+        };
+
+        subtest 'with "true" as true' => sub {
+            eval {
+                $t->app->yancy->set( people =>
+                    $items{people}[0]{id},
+                    { contact => 'true' },
+                    properties => [ 'contact' ]
+                )
+            };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            is $backend->get( people => $items{people}[0]{id} )->{contact}, 1;
+        };
+
+        subtest 'with "0" as false' => sub {
+            eval {
+                $t->app->yancy->set( people =>
+                    $items{people}[0]{id},
+                    { contact => "0" },
+                    properties => [ 'contact' ]
+                )
+            };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            is $backend->get( people => $items{people}[0]{id} )->{contact}, 0;
+        };
+
+        subtest 'with "false" as false' => sub {
+            eval {
+                $t->app->yancy->set( people =>
+                    $items{people}[0]{id},
+                    { contact => "false" },
+                    properties => [ 'contact' ]
+                )
+            };
+            ok !$@, 'set() lives'
+                or diag "Errors: \n" . join "\n", map { "\t$_" } ref $@ ? @{$@} : $@;
+            is $backend->get( people => $items{people}[0]{id} )->{contact}, 0;
+        };
+    };
+
+    subtest 'set date field with "" is an error' => sub {
+        eval {
+            $t->app->yancy->set( people =>
+                $items{people}[0]{id},
+                { birthdate => "" },
+                properties => [ 'birthdate' ]
+            )
+        };
+        ok $@, 'set() dies';
+        like $@->[0]{path}, qr{/birthdate}, 'birthdate is invalid';
+        like $@->[0]{message}, qr{Does not match date format}, 'format error correct';
     };
 
     subtest 'backend method dies' => sub {
@@ -309,11 +331,26 @@ subtest 'create' => sub {
         email => 'bar@example.com',
         age => 28,
         contact => 0,
+        phone => undef,
     };
     my $got_id = $t->app->yancy->create( people => { %{ $new_person } });
     $new_person->{name} = 'foobar'; # filters are executed
     $added_id = $new_person->{id} = $got_id;
     is_deeply $backend->get( people => $got_id ), $new_person;
+
+    # Test 'markdown' format
+    my $new_blog = {
+        user_id => $items{user}[0]{id},
+        title => 'Bar',
+        slug => '/index',
+        markdown => '# Bar',
+        html => '',
+        is_published => 0,
+    };
+    my $blog_id = eval { $t->app->yancy->create( blog => { %{ $new_blog } }) };
+    ok !$@, 'create() lives' or diag explain $@;
+    $new_blog->{id} = $blog_id;
+    is_deeply $backend->get( blog => $blog_id ), $new_blog;
 
     my $count = $backend->list( 'people' )->{total};
     subtest 'create dies with missing fields' => sub {

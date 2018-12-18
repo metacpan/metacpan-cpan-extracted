@@ -28,27 +28,8 @@ INSTALLATION
 Perl 5.6.1 or later is required.
 Perl 5.8.1 or later is recommended.
 
-To install this module (XSUB: needs a C compiler), type the following:
+To install this module, type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
-
-If you want to install pure Perl (i.e. no-XSUB),
-type the following (!! "disableXS" must run before "Makefile.PL" !!):
-
-   perl disableXS
-   perl Makefile.PL
-   make
-   make test
-   make install
-
-After building no-XSUB, if you decide to install XSUB,
-type the following (!! "enableXS" must run before "Makefile.PL" !!):
-
-   make clean
-   perl enableXS
    perl Makefile.PL
    make
    make test
@@ -62,21 +43,6 @@ which are included in recent perl core distributions.
 
 - unicore/CombiningClass.pl (or unicode/CombiningClass.pl)
 - unicore/Decomposition.pl (or unicode/Decomposition.pl)
-
-NOTES
-
-(1) After these unicore/*.* files are updated:
-
-In the case of XSUB:
-    You must rebuild the module,
-    as the data will be compiled on building.
-
-In the case of pure perl:
-    Rebuilding is not necessary,
-    as the data will be read on requirement.
-
-(2) Normalize.pmN (a pure perl module) may work without any other file
-    in this distribution.  It must be renamed Normalize.pm, though.
 
 COPYRIGHT AND LICENSE
 

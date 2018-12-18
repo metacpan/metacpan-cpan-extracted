@@ -17,7 +17,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
 keywords:
   - mmap
   - memory
@@ -30,7 +30,7 @@ name: File-Map
 provides:
   File::Map:
     file: lib/File/Map.pm
-    version: '0.65'
+    version: '0.66'
 recommends:
   perl: '5.008008'
 requires:
@@ -45,9 +45,11 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=File-Map
   repository: git://github.com/Leont/file-map.git
-version: '0.65'
+version: '0.66'
 x_contributors:
+  - 'Doug Hoyte <doug@hcsw.org>'
   - 'Jan Dubois <jand@activestate.com>'
   - 'Sisyphus <sisyphus@cpan.org>'
   - 'Tim Jenness <t.jenness@jach.hawaii.edu>'
+x_generated_by_perl: v5.24.0
 x_serialization_backend: 'YAML::Tiny version 1.69'

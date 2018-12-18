@@ -89,45 +89,72 @@ use Test::Differences;
     );
 }
 
-eq_or_diff(
-    parse_text('t/lib/Foo/Bar.pm line 222.'),
-    { file_name => 't/lib/Foo/Bar.pm', line_number => 222, },
-    'line 222'
-);
+{
+    my $text = 't/lib/Foo/Bar.pm line 222.';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => 't/lib/Foo/Bar.pm',
+            line_number   => 222,
+            original_text => $text,
+        },
+        'line 222'
+    );
+}
 
-eq_or_diff(
-    parse_text( 't/lib/Foo/Bar.pm', 'line', '222.' ),
-    { file_name => 't/lib/Foo/Bar.pm', line_number => 222, },
-    'parse_text with list'
-);
+{
+    my @text = ( 't/lib/Foo/Bar.pm', 'line', '222.' );
+    eq_or_diff(
+        parse_text(@text),
+        {
+            file_name     => 't/lib/Foo/Bar.pm',
+            line_number   => 222,
+            original_text => join( q{ }, @text ),
+        },
+        'parse_text with list'
+    );
+}
 
-eq_or_diff(
-    parse_text('Foo::Bar::do_something()'),
-    {
-        file_name   => 't/lib/Foo/Bar.pm',
-        line_number => 3,
-        sub_name    => 'do_something',
-    },
-    'line 3'
-);
+{
+    my $text = 'Foo::Bar::do_something()';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name      => 't/lib/Foo/Bar.pm',
+            is_module_name => 1,
+            line_number    => 3,
+            original_text  => $text,
+            sub_name       => 'do_something',
+        },
+        'line 3'
+    );
+}
 
-eq_or_diff(
-    parse_text('t/test-data/foo/bar/baz.html.ep line 5. Blah'),
-    {
-        file_name   => 't/test-data/foo/bar/baz.html.ep',
-        line_number => 5,
-    },
-    'line 3 in Mojo template'
-);
+{
+    my $text = 't/test-data/foo/bar/baz.html.ep line 5. Blah';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => 't/test-data/foo/bar/baz.html.ep',
+            line_number   => 5,
+            original_text => $text,
+        },
+        'line 3 in Mojo template'
+    );
+}
 
-eq_or_diff(
-    parse_text('t/lib/Foo/Bar.pm:32'),
-    {
-        file_name   => 't/lib/Foo/Bar.pm',
-        line_number => 32,
-    },
-    'results from git-grep'
-);
+{
+    my $text = 't/lib/Foo/Bar.pm:32';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => 't/lib/Foo/Bar.pm',
+            line_number   => 32,
+            original_text => $text,
+        },
+        'results from git-grep'
+    );
+}
 
 eq_or_diff(
     parse_text('t/Does/Not/Exist'),
@@ -141,21 +168,31 @@ eq_or_diff(
     'undef on not found module'
 );
 
-eq_or_diff(
-    parse_text('t/lib/Foo/Bar.pm'),
-    { file_name => 't/lib/Foo/Bar.pm' },
-    'file name passed in'
-);
+{
+    my $text = 't/lib/Foo/Bar.pm';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => 't/lib/Foo/Bar.pm',
+            original_text => $text,
+        },
+        'file name passed in'
+    );
+}
 
-my $abs_path = path('t/lib/Foo/Bar.pm')->absolute;
-eq_or_diff(
-    parse_text("$abs_path line 41."),
-    {
-        file_name   => $abs_path->stringify,
-        line_number => 41,
-    },
-    'line 41 in absolute path: ' . $abs_path
-);
+{
+    my $abs_path = path('t/lib/Foo/Bar.pm')->absolute;
+    my $text     = "$abs_path line 41.";
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => $abs_path->stringify,
+            line_number   => 41,
+            original_text => $text,
+        },
+        'line 41 in absolute path: ' . $abs_path
+    );
+}
 
 eq_or_diff(
     parse_text('/Users/Foo Bar/something/or/other.txt'),
@@ -163,11 +200,17 @@ eq_or_diff(
     'spaces in file name but not found'
 );
 
-eq_or_diff(
-    parse_text('t/test-data/file with spaces'),
-    { file_name => 't/test-data/file with spaces' },
-    'spaces in file name and exists'
-);
+{
+    my $text = 't/test-data/file with spaces';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => 't/test-data/file with spaces',
+            original_text => $text,
+        },
+        'spaces in file name and exists'
+    );
+}
 
 eq_or_diff(
     [ to_editor_args('t/test-data/file with spaces') ],

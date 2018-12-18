@@ -169,3 +169,5 @@ if ( -d $path ){
 }
 
 done_testing();
+
+1;

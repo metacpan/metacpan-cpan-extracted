@@ -106,7 +106,7 @@ my $cnt = 1;
     }
     or do { $error = $@; };
 
-    like $error, qr/The value for the Reneeb::Capitalization "_full_qualified_package_exemptions" option \("\(\?:"\) is not a valid regular expression/;
+    like $error, qr/The value .*? "_full_qualified_package_exemptions" option \("\(\?:"\) is not a valid regular expression/;
 
     $cnt++;
 }

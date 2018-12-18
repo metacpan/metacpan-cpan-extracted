@@ -19,3 +19,5 @@ if ( $EVAL_ERROR ) {
 my $rcfile = File::Spec->catfile( 't', 'unit', 'perlcriticrc' );
 Test::Perl::Critic->import( -profile => $rcfile );
 all_critic_ok();
+
+1;

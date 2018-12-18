@@ -1,14 +1,10 @@
 Changes		# Changes
-disableXS	# perl script to disable XSUB
-enableXS	# perl script to enable XSUB
 LICENSE
 Makefile.PL
-MANIFEST	MANIFEST for XSUB
-MANIFEST.N	# MANIFEST for NoXSUB (pure perl)
-mkheader	perl script to make C header files for XSUB
-Normalize.pm	perl module for XSUB
-Normalize.pmN	# perl module for NoXSUB (pure perl)
-Normalize.xs	extension for XSUB
+MANIFEST	MANIFEST for pure perl
+mkheader	generate headers for xs code
+Normalize.pm	perl module for pure perl
+Normalize.xs	xs code
 README		# README
 t/fcdc.t
 t/form.t

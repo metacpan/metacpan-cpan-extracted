@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.017';
+our $VERSION = '1.018';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -260,7 +260,7 @@ sub delete_p {
 }
 
 sub read_schema {
-    my ( $self ) = @_;
+    my ( $self, @table_names ) = @_;
     my $database = $self->pg->db->query( 'SELECT current_schema()' )->array->[0];
 
     my %schema;
@@ -268,6 +268,9 @@ sub read_schema {
 SELECT * FROM information_schema.tables
 WHERE table_schema=?
 ENDQ
+    if ( @table_names ) {
+        $tables_q .= sprintf ' AND table_name IN ( %s )', join ', ', ('?') x @table_names;
+    }
 
     my $key_q = <<ENDQ;
 SELECT c.column_name FROM information_schema.table_constraints as tc
@@ -284,9 +287,9 @@ WHERE tc.table_schema=?
 ORDER BY ordinal_position ASC
 ENDQ
 
-    my @tables = @{ $self->pg->db->query( $tables_q, $database )->hashes };
+    my $tables = $self->pg->db->query( $tables_q, $database, @table_names )->hashes;
     my %keys;
-    for my $t ( @tables ) {
+    for my $t ( @$tables ) {
         my $table = $t->{table_name};
         my @keys = @{ $self->pg->db->query( $key_q, $database, $table )->hashes };
         $keys{ $table } = \@keys;
@@ -327,7 +330,7 @@ ENDQ
         }
     }
 
-    return \%schema;
+    return @table_names ? @schema{ @table_names } : \%schema;
 }
 
 sub _map_type {
@@ -381,7 +384,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.017
+version 1.018
 
 =head1 SYNOPSIS
 
