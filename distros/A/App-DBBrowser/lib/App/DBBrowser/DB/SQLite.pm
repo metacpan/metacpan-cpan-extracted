@@ -71,8 +71,12 @@ sub get_databases {
     if ( ! $self->{reset_search_cache} && @$databases ) {
         return $databases;
     }
-    my ( $ok, $change ) = ( '- Confirm dirs', '- Change dirs' );
-    my $choice = choose( [ undef, $ok, $change ], { prompt => 'SQLite DB directories: ' . join( ', ', @$dirs ), undef => '  BACK', layout => 3 } );
+    my ( $ok, $change ) = ( '- Confirm', '- Change' );
+    my $choice = choose(
+        [ undef, $ok, $change ],
+        { info => 'SQLite Databases', prompt =>  'Search path: ' . join( ', ', @$dirs ),
+          undef => '  BACK', layout => 3, clear_screen => 1 }
+    );
     if ( ! defined $choice ) {
         return $databases;
     }

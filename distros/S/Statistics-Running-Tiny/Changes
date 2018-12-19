@@ -1,5 +1,9 @@
 Revision history for Statistics-Running-Tiny
 
-0.01    Date/time
+0.02	2018-12-19
+	Make tests work for perl version < 5.10 by replacing
+	the defined-or operator: //
+
+0.01    2018-12-18
         First version, released on an unsuspecting world.
 

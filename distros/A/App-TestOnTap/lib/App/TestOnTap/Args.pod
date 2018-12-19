@@ -166,6 +166,11 @@ the parallelizability of a given test.
 
 For more on parallelization, see the L<manual regarding the 'parallelizable' config setting|App::TestOnTap/"THE SUITE CONFIG">.
 
+B<IMPORTANT NOTE:>
+On Windows in particular, fork() is constrained in the number of parallel forks, so this value will
+be capped to a maximum of 60 at this point, while defaulting to effectively 'infinite' on other platforms.
+To experiment with other maximums, set the environment variable C<_TESTONTAP_MAX_JOBS> to the desired number.
+
 =item B<--order E<lt>strategyE<gt>>
 
 Setting a strategy controls the ordering of the tests.

@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible;
 
-our $VERSION = '0.705';
+our $VERSION = '0.706';
 
 use strict;
 use warnings;
@@ -15,6 +15,8 @@ use Scalar::Util qw(blessed);
 use Session::Token;
 use Try::Tiny;
 use URI::Escape;
+use URI;
+use URI::QueryParam; # Needed to access query_form_hash(), although may be loaded anyway
 use Dancer2::Plugin;
 
 #
@@ -265,8 +267,7 @@ sub BUILD {
                     # User is already logged in so redirect elsewhere
                     # uncoverable condition false
                     $app->redirect(
-                             $app->request->query_parameters->get('return_url')
-                          || $weak_plugin->user_home_page );
+                             _return_url($app) || $weak_plugin->user_home_page );
                 }
 
                 # Reset password code submitted?
@@ -996,9 +997,16 @@ sub _check_for_login {
     }
 
     # old-fashioned redirect to login page with return_url set
+    my $forward = $request->path;
+    $forward .= "?".$request->query_string
+        if $request->query_string;
     return $plugin->app->redirect(
         $request->uri_for(
-            $plugin->login_page, { return_url => $request->request_uri }
+            # Do not use request_uri, as it is the raw string sent by the
+            # browser, not taking into account the application mount point.
+            # This means that when it is then concatenated with the base URL,
+            # the application mount point is specified twice. See GH PR #81
+            $plugin->login_page, { return_url => $forward }
         )
     );
 }
@@ -1165,6 +1173,19 @@ sub _send_email {
     }
 }
 
+sub _return_url {
+    my $app = shift;
+    my $return_url = $app->request->query_parameters->get('return_url')
+        || $app->request->body_parameters->get('return_url')
+            or return undef;
+    $return_url = uri_unescape($return_url);
+    my $uri = URI->new($return_url);
+    # Construct a URL using uri_for, which ensures that the correct base domain
+    # is used (preventing open URL redirection attacks). The query needs to be
+    # parsed and passed as an option, otherwise it is not encoded properly
+    return $app->request->uri_for($uri->path, $uri->query_form_hash);
+}
+
 #
 # routes
 #
@@ -1179,7 +1200,7 @@ sub _logout_route {
 
     $app->destroy_session;
 
-    if ( my $url = $req->parameters->get('return_url') ) {
+    if ( my $url = _return_url($app) ) {
         $app->redirect( $url );
     }
     elsif ($plugin->exit_page) {
@@ -1249,13 +1270,9 @@ sub _post_login_route {
         }
     }
 
-    my $return_url_escaped = uri_unescape(
-        $app->request->parameters->get('return_url')
-    );
-
     if ( $plugin->logged_in_user ) {
         # uncoverable condition false
-        $app->redirect( $return_url_escaped || $plugin->user_home_page );
+        $app->redirect( _return_url($app) || $plugin->user_home_page );
     }
 
     my $auth_realm = $params->{realm} || $params->{__auth_extensible_realm};
@@ -1273,7 +1290,7 @@ sub _post_login_route {
         $app->log( core => "Realm is $realm" );
         $plugin->execute_plugin_hook( 'after_login_success' );
         # uncoverable condition false
-        $app->redirect( $return_url_escaped || $plugin->user_home_page );
+        $app->redirect( _return_url($app) || $plugin->user_home_page );
     }
     else {
         $app->request->vars->{login_failed}++;
@@ -1330,7 +1347,7 @@ Designed to support multiple authentication realms and to be as extensible as
 possible, and to make secure password handling easy.  The base class for auth
 providers makes handling C<RFC2307>-style hashed passwords really simple, so you
 have no excuse for storing plain-text passwords.  A simple script called
-B<generate-crypted-password> to generate
+B<dancer2-generate-crypted-password> to generate
 RFC2307-style hashed passwords is included, or you can use L<Crypt::SaltedHash>
 yourself to do so, or use the C<slappasswd> utility if you have it installed.
 
@@ -1489,6 +1506,14 @@ page.
 
 See L<http://shadow.cat/blog/matt-s-trout/humane-login-screens/> for the
 original idea for this functionality.
+
+=head1 DEFAULT LOGIN TEMPLATE
+
+A default login template is used to render the login page unless otherwise configured.
+
+This template includes a hidden field C<csrf_token> that can be used to include
+a CSRF token in the login form if desired (by using for example the Dancer2
+C<before_template> hook).
 
 =head1 CUSTOMISING C</login> AND C</login/denied>
 

@@ -57,7 +57,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000013
+version 0.000014
 
 =head1 SYNOPSIS
 

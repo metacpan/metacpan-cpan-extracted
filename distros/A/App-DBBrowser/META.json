@@ -47,17 +47,17 @@
             "List::MoreUtils" : "0",
             "List::Util" : "0",
             "Pod::Usage" : "0",
+            "SQL::Type::Guess" : "0",
             "Scalar::Util" : "0",
             "Spreadsheet::Read" : "0",
-            "Term::Choose" : "1.638",
-            "Term::Choose::Constants" : "1.638",
-            "Term::Choose::LineFold" : "1.638",
+            "Term::Choose" : "1.641",
+            "Term::Choose::Constants" : "1.641",
+            "Term::Choose::LineFold" : "1.641",
             "Term::Choose::Util" : "0.068",
-            "Term::Form" : "0.502",
-            "Term::TablePrint" : "0.104",
+            "Term::Form" : "0.503",
+            "Term::TablePrint" : "0.106",
             "Text::CSV" : "0",
             "bytes" : "0",
-            "if" : "0",
             "open" : "0",
             "perl" : "5.008003",
             "strict" : "0",
@@ -73,6 +73,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.033",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.034",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

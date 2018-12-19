@@ -18,6 +18,9 @@
       <h1>Reset your password</h1>
       <p>Please click the button below to reset your password</p>
       <form method="post">
+      [%- IF csrf_token -%]
+        <input type="hidden" name="csrf_token" value="[% csrf_token %]">
+      [%- END -%]
       <input type="submit" name="confirm_reset" value="Reset password">
       </form>
 
@@ -42,6 +45,10 @@
 
       [%- IF return_url -%]
         <input type="hidden" name="return_url" value="[% return_url %]">
+      [%- END -%]
+
+      [%- IF csrf_token -%]
+        <input type="hidden" name="csrf_token" value="[% csrf_token %]">
       [%- END -%]
 
       [%- IF reset_password_handler -%]

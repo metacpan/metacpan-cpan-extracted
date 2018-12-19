@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.12.0 2018-12-19T04:58:28Z
+
+    - Introduce Getopt::EX::Numbers module.
+
 v1.11.0 2018-12-07T00:39:12Z
 
     Colormap.pm

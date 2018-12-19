@@ -20,16 +20,25 @@ meta-spec:
   version: '1.4'
 name: Sah-Schemas-Domain
 requires:
+  Data::Sah::Coerce::perl::str::str_tolower: '0.002'
   perl: '5.010001'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Domain
   homepage: https://metacpan.org/release/Sah-Schemas-Domain
   repository: git://github.com/perlancar/perl-Sah-Schemas-Domain.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::Sah::Schemas
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000033'
+          version: '0.006'
+      name: Sah::Schemas
+      version: '0.014'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -186,20 +195,16 @@ x_Dist_Zilla:
               name: '@CorePrep/H1Nester'
               version: '4.015'
             -
-              class: Pod::Weaver::Plugin::SingleEncoding
-              name: '@Default/SingleEncoding'
-              version: '4.015'
-            -
               class: Pod::Weaver::Section::Name
-              name: '@Default/Name'
+              name: '@Author::PERLANCAR/Name'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Version
-              name: '@Default/Version'
+              name: '@Author::PERLANCAR/Version'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: '@Default/prelude'
+              name: '@Author::PERLANCAR/prelude'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
@@ -227,20 +232,68 @@ x_Dist_Zilla:
               version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
-              name: '@Default/Leftovers'
+              name: '@Author::PERLANCAR/Leftovers'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Region
-              name: '@Default/postlude'
+              name: '@Author::PERLANCAR/postlude'
               version: '4.015'
             -
+              class: Pod::Weaver::Section::Completion::GetoptLongComplete
+              name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
+              version: '0.08'
+            -
+              class: Pod::Weaver::Section::Completion::GetoptLongSubcommand
+              name: '@Author::PERLANCAR/Completion::GetoptLongSubcommand'
+              version: '0.04'
+            -
+              class: Pod::Weaver::Section::Completion::GetoptLongMore
+              name: '@Author::PERLANCAR/Completion::GetoptLongMore'
+              version: '0.001'
+            -
+              class: Pod::Weaver::Section::Homepage::DefaultCPAN
+              name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
+              version: '0.05'
+            -
+              class: Pod::Weaver::Section::Source::DefaultGitHub
+              name: '@Author::PERLANCAR/Source::DefaultGitHub'
+              version: '0.07'
+            -
+              class: Pod::Weaver::Section::Bugs::DefaultRT
+              name: '@Author::PERLANCAR/Bugs::DefaultRT'
+              version: '0.06'
+            -
               class: Pod::Weaver::Section::Authors
-              name: '@Default/Authors'
+              name: '@Author::PERLANCAR/Authors'
               version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
-              name: '@Default/Legal'
+              name: '@Author::PERLANCAR/Legal'
               version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::Rinci
+              name: '@Author::PERLANCAR/Rinci'
+              version: '0.77'
+            -
+              class: Pod::Weaver::Plugin::AppendPrepend
+              name: '@Author::PERLANCAR/AppendPrepend'
+              version: '0.01'
+            -
+              class: Pod::Weaver::Plugin::EnsureUniqueSections
+              name: '@Author::PERLANCAR/EnsureUniqueSections'
+              version: '0.163250'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Author::PERLANCAR/SingleEncoding'
+              version: '4.015'
+            -
+              class: Pod::Weaver::Plugin::PERLANCAR::SortSections
+              name: '@Author::PERLANCAR/PERLANCAR::SortSections'
+              version: '0.06'
+            -
+              class: Pod::Weaver::Plugin::Sah::Schemas
+              name: -Sah::Schemas
+              version: '0.04'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use overload
 	'+' => \&concatenate,
@@ -219,23 +219,53 @@ sub     M2 { return $_[0]->{'M2'} }
 sub     M3 { return $_[0]->{'M3'} }
 sub     M4 { return $_[0]->{'M4'} }
 
+1;
+__END__
+# end program, below is the POD
+=pod
+
+=encoding UTF-8
+
+
 =head1 NAME
 
-Statistics::Running::Tiny - Basic descriptive statistics (incl. min/max/skew/kurtosis) without the need to store data points, statistics are updated every time a new data point is added in
+Statistics::Running::Tiny - Basic descriptive statistics (mean/stdev/min/max/skew/kurtosis) over data without the need to store data points ever. OOP style.
 
-Calculate basic descriptive statistics (mean, variance, standard deviation, skewness, kurtosis)
-without the need to store any data point/sample. Statistics are
-updated each time a new data point/sample comes in.
 
 =head1 VERSION
 
-Version 0.01
-
-=cut
+Version 0.02
 
 
 =head1 SYNOPSIS
 
+        use Statistics::Running::Tiny;
+        my $ru = Statistics::Running::Tiny->new();
+        for(1..100){
+                $ru->add(rand());
+        }
+        print "mean: ".$ru->mean()."\n";
+        $ru->add(12345);
+        print "mean: ".$ru->mean()."\n";
+
+        my $ru2 = Statistics::Running::Tiny->new();
+        for(1..100){
+                $ru2->add(rand());
+        }
+        my $ru3 = $ru + $ru2;
+        print "mean of concatenated data: ".$ru3->mean()."\n";
+
+        $ru += $ru2;
+        print "mean after appending data: ".$ru->mean()."\n";
+
+        print "stats: ".$ru->stringify()."\n";
+
+
+=head1 DESCRIPTION
+
+Calculate basic descriptive statistics (mean, variance, standard deviation, skewness, kurtosis)
+without the need to store any data point/sample. Statistics are
+updated each time a new data point/sample comes in.
 
 There are three amazing things about B.P.Welford's algorithm implemented here:
 
@@ -266,51 +296,40 @@ Here is a way to decrease those CO2 emissions.
 =back
 
 The basis for the code in this module is from 
-L<John D. Cook's article and C++ implementation at|https://www.johndcook.com/blog/skewness_kurtosis>
+L<John D. Cook's article and C++ implementation|https://www.johndcook.com/blog/skewness_kurtosis>
 
-        use Statistics::Running::Tiny;
-        my $ru = Statistics::Running::Tiny->new();
-        for(1..100){
-                $ru->add(rand());
-        }
-        print "mean: ".$ru->mean()."\n";
-        $ru->add(12345);
-        print "mean: ".$ru->mean()."\n";
-
-        my $ru2 = Statistics::Running::Tiny->new();
-        for(1..100){
-                $ru2->add(rand());
-        }
-        my $ru3 = $ru + $ru2;
-        print "mean of concatenated data: ".$ru3->mean()."\n";
-
-        $ru += $ru2;
-        print "mean after appending data: ".$ru->mean()."\n";
-
-        print "stats: ".$ru->stringify()."\n";
 
 =head1 EXPORT
 
+Nothing, this is an Object Oriented module. Once you instantiate
+an object all your methods are yours.
+
+
 =head1 SUBROUTINES/METHODS
+
 
 =head2 new
 
 Constructor, initialises internal variables.
 
+
 =head2 add
+
 Update our statistics after one more data point/sample (or an
 array of them) is presented to us.
 
         my $ru1 = Statistics::Running::Tiny->new();
         for(1..100){
                 $ru1->add(rand());
-                print $ru1->stringify()."\n";
+                print $ru1."\n";
         }
 
 Input can be a single data point (a scalar) or a reference
 to an array of data points.
 
+
 =head2 copy_from
+
 Copy state of input object into current effectively making us like
 them. Our previous state is forgotten. After that adding a new data point into
 us will be with the new state copied.
@@ -326,7 +345,9 @@ us will be with the new state copied.
         # copy the state of ru1 into ru2. state of ru1 is forgotten.
         $ru2->copy_from($ru1);
 
+
 =head2 clone
+
 Clone state of our object into a newly created object which is returned.
 Our object and returned object are identical at the time of cloning.
 
@@ -336,64 +357,115 @@ Our object and returned object are identical at the time of cloning.
         }
         my $ru2 = $ru1->clone();
 
+
 =head2 clear
+
 Clear our internal state as if no data points have ever added into us.
 As if we were just created. All state is forgotten and reset to zero.
 
+
 =head2 min
+
 Returns the minimum data sample added in us
 
+
 =head2 max
+
 Returns the maximum data sample added in us
 
+
 =head2 get_N
-Returns the number of data points/samples processed (added onto us) so far.
+
+Returns the number of data points/samples inserted, and had
+their descriptive statistics calculated, so far.
+
 
 =head2 variance
+
 Returns the variance of the data points/samples added onto us so far.
 
+
 =head2 standard_deviation
+
 Returns the standard deviation of the data points/samples added onto us so far. This is the square root of the variance.
 
+
 =head2 skewness
+
 Returns the skewness of the data points/samples added onto us so far.
 
+
 =head2 kurtosis
+
 Returns the kurtosis of the data points/samples added onto us so far.
 
+
 =head2 concatenate
+
 Concatenates our state with the input object's state and returns
 a newly created object with the combined state. Our object and
 input object are not modified. The overloaded symbol '+' points
 to this sub.
 
+
 =head2 append
+
 Appends input object's state into ours.
 Our state is modified. (input object's state is not modified)
 The overloaded symbol '+=' points
 to this sub.
 
+
 =head2 equals
+
 Check if our state (number of samples and all internal state) is
 the same with input object's state. Equality here implies that
 ALL statistics are equal (within a small number Statistics::Running::Tiny::SMALL_NUMBER_FOR_EQUALITY)
 
+
 =head2 equals_statistics
+
 Check if our statistics only (and not sample size)
 are the same with input object. E.g. it checks mean, variance etc.
 but not sample size (as with the real equals()).
 It returns 0 on non-equality. 1 if equal.
 
+
 =head2 stringify
+
 Returns a string description of descriptive statistics we know about
 (mean, standard deviation, kurtosis, skewness) as well as the
-number of data points/samples added onto us so far.
+number of data points/samples added onto us so far. Note that
+this method is not necessary because stringification is overloaded
+and the follow B<< print $stats_obj."\n" >> is equivalent to
+B<< print $stats_obj->stringify()."\n" >>
 
-=cut
+
+=head1 Overloaded functionality
+
+=over 3
+
+=item 1. Addition of two statistics objects: B<< my $ru3 = $ru1 + $ru2 >>
+
+=item 2. Test for equality: B<< if( $ru2 == $ru3 ){ ... } >>
+
+=item 3. Stringification: B<< print $ru1."\n" >>
+
+=back
+
+
+=head1 Testing for Equality
+
+In testing if two objects are the same, their means, standard deviations
+etc. are compared. This is done using
+B<< if( ($self->mean() - $other->mean()) < Statistics::Running::SMALL_NUMBER_FOR_EQUALITY ){ ... } >>
+
 
 =head1 BENCHMARKS
 
-Check B<< make bench >> for benchmarks
+Run B<< make bench >> for benchmarks which report the maximum number of data points inserted
+per second (in your system).
+
 
 =head1 SEE ALSO
 
@@ -401,9 +473,11 @@ Check B<< make bench >> for benchmarks
 
 =item 1. L<Wikipedia|http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm>
 
-=item 2. L<John D. Cook's article and C++ implementation at|https://www.johndcook.com/blog/skewness_kurtosis>
+=item 2. L<John D. Cook's article and C++ implementation|https://www.johndcook.com/blog/skewness_kurtosis>
+was used both as inspiration and as the basis for the formulas for B<< kurtosis() >> and B<< skewness() >>
 
-=item 3. L<Statistics::Welford> This module does not provide B<< kurtosis() >> and B<< skewness() >> which current module does.
+=item 3. L<Statistics::Welford> This module does not provide B<< kurtosis() >> and B<< skewness() >>
+which current module does.
 
 =item 4. L<Statistics::Running> This is the exact same module with the addition of
 a histogram logging each inserted data point. The histogram is in effect
@@ -412,6 +486,7 @@ points. The current module is the same as that bar the histogram. That
 makes it a bit faster. Check B<< make bench >> for benchmarks
 
 =back
+
 
 =head1 AUTHOR
 
@@ -455,7 +530,14 @@ L<http://search.cpan.org/dist/Statistics-Running/>
 =back
 
 
+=head1 DEDICATIONS
+
+Almaz
+
+
 =head1 ACKNOWLEDGEMENTS
+
+B.P.Welford, John Cook.
 
 
 =head1 LICENSE AND COPYRIGHT
@@ -497,8 +579,4 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
 =cut
-
-1; # End of Statistics::Running::Tiny

@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.050
+Version 0.052
 
 =head1 SYNOPSIS
 
@@ -198,6 +198,13 @@ Example:
   
 This would avoid the 'unfinished_test.pl' file and contents of any '_data' directories at any level of the suite.
  
+=item B<order>
+
+This is optional, and sets the default ordering strategy for the suite. It may be overridden by the commandline
+C<--order> flag.
+
+If not given, the default commandline setting applies (C<none>).
+
 =item B<preprocess>
 
 This is optional. If given, it should describe a simple command line for a command that will be run before tests and this command
@@ -262,7 +269,9 @@ them to run in parallel with anything else.
 Examples:
 
   parallelizable = regexp(.*)
-  
+
+(or perhaps better, use the 'true' primitive).
+
 In one stroke, this will allow all tests to be parallelizable. Obviously, using 'not' in front, will create a query
 that ends up acting as the default, i.e. tests are never parallelizable (but it will shut up the --jobs warning). 
 
@@ -270,12 +279,20 @@ that ends up acting as the default, i.e. tests are never parallelizable (but it 
   
 E.g. all tests are possible to run in parallel except two special ones.
 
-=item B<order>
+Also see C<--jobs> and C<parallelgroups>.
 
-This is optional, and sets the default ordering strategy for the suite. It may be overridden by the commandline
-C<--order> flag.
+=item B<[PARALLELGROUP E<lt>nameE<gt>]> (section)
 
-If not given, the default commandline setting applies (C<none>).
+There can be many sections of this kind, but they are optional. They only apply when parallelization is active.
+The name is required, but only used to distinguish between groups internally. 
+
+Each section defines, through a query, a set of tests that has a limit on how many of them can be concurrent
+at the same time.
+
+Each section should contain pairs of key/values named C<match> and C<maxconcurrent>, where the C<match> part defines a
+a L<Grep::Query> expression to match to test names, and the C<maxconcurrent> limits the concurrency of matching tests.
+
+Setting a max concurrency to 1 is obviously the same as making them non-parallelizable.
 
 =item B<execmap>
 
@@ -288,7 +305,7 @@ If not given, a default/internal list will be used.
 
 =item B<[EXECMAP E<lt>nameE<gt>]> (section)
 
-Every section mentioned in the list above must be present, but a section not listed is ignored.
+Every section mentioned in the C<execmap> list above must be present, but a section not listed is ignored.
 
 The sections together detail how to decide which files are tests and how they should be executed.
 

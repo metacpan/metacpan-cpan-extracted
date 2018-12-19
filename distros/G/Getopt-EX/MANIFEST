@@ -11,6 +11,7 @@ lib/Getopt/EX/LabeledParam.pm
 lib/Getopt/EX/Loader.pm
 lib/Getopt/EX/Long.pm
 lib/Getopt/EX/Module.pm
+lib/Getopt/EX/Numbers.pm
 lib/Getopt/EX/Util.pm
 minil.toml
 t/00_compile.t
@@ -19,6 +20,7 @@ t/02_module.t
 t/03_mode.t
 t/04_long.t
 t/05_colorlabel.t
+t/06_numbers.t
 t/home/lib/App/example/example_test.pm
 t/home/lib/App/example/mode_function.pm
 t/home/lib/App/example/mode_wildcard.pm

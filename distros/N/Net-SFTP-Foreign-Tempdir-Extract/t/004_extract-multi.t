@@ -2,17 +2,20 @@
 
 use strict;
 use warnings;
+use Cwd qw{cwd};
 use Test::More tests => 12;
+use Path::Class qw{dir};
 
 BEGIN {use_ok('Net::SFTP::Foreign::Tempdir::Extract');}
 
 my $run      = $ENV{"Net_SFTP_Foreign_Tempdir_Extract"}          || 0;
 
 SKIP: {
-  skip 'export Net_SFTP_Foreign_Tempdir_Extract=1 #to run', 11 unless $run;
+  skip 'export Net_SFTP_Foreign_Tempdir_Extract=1 #to run tests', 11 unless $run;
 
   my $host   = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_host"}     || "127.0.0.1";
-  my $folder = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_folder"}   || "/home/mdavis/test";
+  my $folder = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_folder"}   || dir(cwd(), "t/files");
+  diag("Folder: $folder");
 
   my $sftp   = Net::SFTP::Foreign::Tempdir::Extract->new(host=>$host);
   isa_ok ($sftp, 'Net::SFTP::Foreign::Tempdir::Extract');

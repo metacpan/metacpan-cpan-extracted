@@ -1,0 +1,48 @@
+diff --git a/share/html/Helpers/PreviewScrips b/share/html/Helpers/PreviewScrips
+index 437bf68ddf..836ff4ff06 100644
+--- a/share/html/Helpers/PreviewScrips
++++ b/share/html/Helpers/PreviewScrips
+@@ -122,12 +122,7 @@ $submitted{$_} = 1 for split /,/, $ARGS{TxnRecipients};
+                   <label for="TxnSendMailTo-<% $addr->address %>-<% $recips{$addr->address} %>"><& /Elements/ShowUser, Address => $addr &></label>
+ %                 $m->callback(CallbackName => 'AfterAddress', Ticket => $TicketObj, Address => $addr, Type => $type);
+ %                 unless ( $show_checkbox ) {
+-%                     if ( $type eq 'Cc' ) {
+-                          (<&|/l&>explicit one-time Cc</&>)
+-%                     }
+-%                     else {
+-                          (<&|/l&>explicit one-time Bcc</&>)
+-%                     }
++                      (<&|/l, $type&>explicit one-time [_1]</&>)
+ %                 }
+                   </li>
+ %             }
+diff --git a/share/html/Helpers/ShowSimplifiedRecipients b/share/html/Helpers/ShowSimplifiedRecipients
+index 0bb088f416..c31c4884ad 100644
+--- a/share/html/Helpers/ShowSimplifiedRecipients
++++ b/share/html/Helpers/ShowSimplifiedRecipients
+@@ -124,11 +124,7 @@ $submitted{$_} = 1 for split /,/, $ARGS{TxnRecipients};
+ %     }
+ %     for my $addr (sort {$a->address cmp $b->address} values %{$no_squelch{$type}}) {
+ <label><& /Elements/ShowUser, Address => $addr &></label>
+-%         if ( $type eq 'Cc' ) {
+-(<&|/l&>explicit one-time Cc</&>)
+-%         } else {
+-(<&|/l&>explicit one-time Bcc</&>)
+-%         }
++(<&|/l, $type&>explicit one-time [_1]</&>)
+ <br />
+ %     }
+ </td></tr>
+diff --git a/share/html/Ticket/Update.html b/share/html/Ticket/Update.html
+index 6e73b50a81..e630cb40aa 100644
+--- a/share/html/Ticket/Update.html
++++ b/share/html/Ticket/Update.html
+@@ -256,7 +256,7 @@ jQuery( function() {
+        jQuery('#UpdateContent').on('blur', updateScrips );
+    }
+ 
+-   jQuery("#ticket-update-metadata :input, #UpdateCc, #UpdateBcc").change( updateScrips );
++   jQuery("#ticket-update-metadata :input, #UpdateCc, #UpdateBcc, #UpdateTo").change( updateScrips );
+ 
+ });
+ </script>

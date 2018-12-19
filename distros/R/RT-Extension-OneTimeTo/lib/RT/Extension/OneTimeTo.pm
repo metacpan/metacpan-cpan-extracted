@@ -3,7 +3,7 @@ use strict;
 use warnings;
 no warnings 'redefine';
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 {
     # Includes RT-Send-To in the list of headers used to grab
@@ -114,6 +114,16 @@ RT::Extension::OneTimeTo - Adds a One-time To: box next to the One-time Cc/Bcc b
 
 This step may need root permissions.
 
+=item Patch RT(For RT 4.4)
+
+For RT 4.4.2+:
+
+    patch -p1 -d /opt/rt4 < patches/Support-UpdateTo-in-preview-scrips.patch
+
+For RT 4.4.0 and 4.4.1:
+
+    patch -p1 -d /opt/rt4 -F3 < patches/Support-UpdateTo-in-preview-scrips.patch
+
 =item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
 
 Add this line:
@@ -144,7 +154,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2010-2015 by Best Practical Solutions
+This software is Copyright (c) 2010-2018 by Best Practical Solutions
 
 This is free software, licensed under:
 

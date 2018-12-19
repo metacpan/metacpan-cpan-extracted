@@ -8,6 +8,15 @@ INSTALLATION
     make install
         This step may need root permissions.
 
+    Patch RT(For RT 4.4)
+        For RT 4.4.2+:
+
+            patch -p1 -d /opt/rt4 < patches/Support-UpdateTo-in-preview-scrips.patch
+
+        For RT 4.4.0 and 4.4.1:
+
+            patch -p1 -d /opt/rt4 -F3 < patches/Support-UpdateTo-in-preview-scrips.patch
+
     Edit your /opt/rt4/etc/RT_SiteConfig.pm
         Add this line:
 
@@ -31,7 +40,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-OneTimeTo>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2010-2015 by Best Practical Solutions
+    This software is Copyright (c) 2010-2018 by Best Practical Solutions
 
     This is free software, licensed under:
 

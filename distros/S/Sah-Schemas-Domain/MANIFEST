@@ -8,9 +8,11 @@ Makefile.PL
 README
 dist.ini
 lib/Sah/Schema/domain/name.pm
+lib/Sah/SchemaR/domain/name.pm
 lib/Sah/Schemas/Domain.pm
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/domain-name.t
+weaver.ini

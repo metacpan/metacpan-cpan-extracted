@@ -16,7 +16,9 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::Domain",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::str::str_tolower" => "0.002"
+  },
   "TEST_REQUIRES" => {
     "Data::Sah" => "0.893",
     "File::Spec" => 0,
@@ -26,7 +28,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,6 +37,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Sah" => "0.893",
+  "Data::Sah::Coerce::perl::str::str_tolower" => "0.002",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

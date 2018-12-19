@@ -5,3 +5,4 @@
 ^blib
 ^Makefile$
 ^Makefile.old$
+test.pl

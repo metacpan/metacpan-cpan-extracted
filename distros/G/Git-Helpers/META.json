@@ -106,7 +106,7 @@
          "web" : "https://github.com/oalders/git-helpers"
       }
    },
-   "version" : "0.000016",
+   "version" : "0.000017",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -147,7 +147,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@Author::OALDERS/MAXMIND::TidyAll",
-            "version" : "0.13"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
@@ -480,7 +480,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.0",
                   "repo_root" : "."
                }
             },
@@ -491,7 +491,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -599,7 +599,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -616,12 +616,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000016",
+                  "tag" : "v0.000017",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -671,7 +671,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -691,7 +691,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.1",
+                  "git_version" : "2.20.0",
                   "repo_root" : "."
                }
             },
@@ -764,6 +764,6 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

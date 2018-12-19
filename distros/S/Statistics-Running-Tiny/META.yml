@@ -1,5 +1,5 @@
 ---
-abstract: 'Basic descriptive statistics (incl. min/max/skew/kurtosis) without the need to store data points, statistics are updated every time a new data point is added in'
+abstract: 'Basic descriptive statistics (mean/stdev/min/max/skew/kurtosis) over data without the need to store data points ever. OOP style.'
 author:
   - 'Andreas Hadjiprocopis <bliako@cpan.org>'
 build_requires:
@@ -20,5 +20,5 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

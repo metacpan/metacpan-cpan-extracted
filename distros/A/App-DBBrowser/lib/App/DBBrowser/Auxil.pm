@@ -10,10 +10,11 @@ use Encode qw( encode );
 use Encode::Locale qw();
 use JSON           qw( decode_json );
 
-use Term::Choose           qw( choose );
-use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util     qw( term_width );
-use Term::Form             qw();
+use Term::Choose            qw( choose );
+use Term::Choose::Constants qw( :screen );
+use Term::Choose::LineFold  qw( line_fold );
+use Term::Choose::Util      qw( term_width insert_sep );
+use Term::Form              qw();
 
 
 sub new {
@@ -70,7 +71,8 @@ sub get_stmt {
                     push @tmp, $row_in . join ', ', map { defined $_ ? $_ : '' } @$row;
                 }
                 push @tmp, $row_in . '...';
-                push @tmp, $row_in . '[' . scalar( @{$sql->{insert_into_args}} ) . ' rows]';
+                my $row_count = scalar( @{$sql->{insert_into_args}} );
+                push @tmp, $row_in . '[' . insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ) . ' rows]';
             }
             else {
                 for my $row ( @{$sql->{insert_into_args}} ) {
@@ -117,7 +119,7 @@ sub __select_cols {
 
 
 sub print_sql {
-    my ( $sf, $sql, $stmt_typeS, $tmp ) = @_; ###
+    my ( $sf, $sql, $stmt_typeS, $tmp, $waiting ) = @_;
     return if ! defined $stmt_typeS;
     $tmp = {} if ! defined $tmp;
     my $pr_sql = { %$sql };
@@ -133,6 +135,11 @@ sub print_sql {
     $str .= "\n";
     print $sf->{i}{clear_screen};
     print line_fold( $str, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} );
+    if ( defined $waiting ) {
+        local $| = 1;
+        print HIDE_CURSOR;
+        print $waiting;
+    }
 }
 
 
@@ -212,12 +219,13 @@ sub backup_href {
 
 sub print_error_message {
     my ( $sf, $message, $title ) = @_;
-    print "$title:\n" if $title;
+    my $info;
+    $info = "$title:" if $title; #
     utf8::decode( $message );
-    print $message;
+    chomp( $message );
     choose(
         [ 'Press ENTER to continue' ],
-        { %{$sf->{i}{lyt_m}}, prompt => '' }
+        { %{$sf->{i}{lyt_m}}, prompt => $message, info => $info }
     );
 }
 

@@ -1,5 +1,11 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
+0.706 Mon 17 Oct 18:37:00 GMT 2018
+
+    [BUG FIXES]
+
+    * Fix various problems with return_url functionality
+
 0.705 Mon 16 Oct 11:54:34 CEST 2017
 
     [BUG FIXES]

@@ -1,3 +1,9 @@
+0.002   2018-12-19 (PERLANCAR)
+
+	- [dist] Forgot to add DZP/PWP plugin, which causes RT#128037
+	  (unspecified dependency to coerce modules).
+
+
 0.001   2018-12-17 (PERLANCAR)
 
         - First release.

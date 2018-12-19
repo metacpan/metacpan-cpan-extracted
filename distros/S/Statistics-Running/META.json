@@ -1,5 +1,5 @@
 {
-   "abstract" : "Basic descriptive statistics (incl. min/max/skew/kurtosis) without the need to store data points, statistics are updated every time a new data point is added in",
+   "abstract" : "Basic descriptive statistics (mean/stdev/min/max/skew/kurtosis) and discrete Probability Distribution (via histogram) over data without the need to store data points ever. OOP style.",
    "author" : [
       "Andreas Hadjiprocopis <bliako@cpan.org>"
    ],
@@ -40,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

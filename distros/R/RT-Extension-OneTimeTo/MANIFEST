@@ -20,6 +20,7 @@ lib/RT/Extension/OneTimeTo.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+patches/Support-UpdateTo-in-preview-scrips.patch
 README
 xt/basic.t
 xt/empty-update.t

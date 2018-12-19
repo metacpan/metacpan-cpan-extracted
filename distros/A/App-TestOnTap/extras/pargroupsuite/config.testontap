@@ -1,0 +1,26 @@
+# required to identify this suite
+#
+id = 243364a2-cc11-11e6-be89-8ea39edadb5b
+
+# all tests are potentially parallelizable
+#
+parallelizable = true
+
+# use the 'random' sorting order strategy by default
+# this helps illustrate that there is some evenness to the groups
+#
+order = random
+
+execmap = perl
+
+[EXECMAP perl]
+match = regexp(\.t$)
+cmd = perl
+
+[PARALLELGROUP foo]
+match = regexp(^sm\d+\.t$)
+maxconcurrent = 100
+
+[PARALLELGROUP bar]
+match = regexp(^lm\d+\.t$)
+maxconcurrent = 100

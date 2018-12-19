@@ -38,8 +38,6 @@ RaiseError
 Subqueries
 subqueries
 subquery
-substatement
 MERCHANTIBILITY
-incr
 SQ
 SGR

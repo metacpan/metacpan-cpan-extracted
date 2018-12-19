@@ -12,7 +12,7 @@ SKIP: {
   skip 'export Net_SFTP_Foreign_Tempdir_Extract=1 #to run', 8 unless $run;
 
   my $host     = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_host"}     || "127.0.0.1";
-  my $folder   = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_folder"}   || "/home/mdavis/test";
+  my $folder   = $ENV{"Net_SFTP_Foreign_Tempdir_Extract_folder"}   || "/var/www/html/perl/packages/Net-SFTP-Foreign-Tempdir-Extract/t/files";
 
   my $fileX="";
   {

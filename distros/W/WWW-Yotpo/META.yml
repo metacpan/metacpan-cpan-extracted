@@ -22,6 +22,7 @@ no_index:
     - t
     - xt
 requires:
+  HTTP::Request: '0'
   JSON: '0'
   LWP::UserAgent: '0'
   perl: '5.008005'
@@ -29,7 +30,8 @@ resources:
   bugtracker: https://github.com/fayland/perl-WWW-Yotpo/issues
   homepage: https://github.com/fayland/perl-WWW-Yotpo
   repository: https://github.com/fayland/perl-WWW-Yotpo.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'Fayland Lam <fayland@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

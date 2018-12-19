@@ -46,7 +46,7 @@ An existing file will not be overwritten.
 By using the C<--verbose> flag, pp verbosity can be raised.
 
 If you need to customize the creation of the binary, use the C<--_pp_script> option to generate a Perl
-script. Changing the output file name can easiest be done by using '--output E<lt>fileE<gt>', but
+script. Changing the output file name can easiest be done by using '--outfile E<lt>fileE<gt>', but
 for more advanced purposes, edit the script directly. The script should be run immediately after
 generation, i.e. before any config changes are made to the Perl installation, and not saved after that.
  

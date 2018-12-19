@@ -7,6 +7,7 @@ use 5.008003;
 
 use Term::Choose            qw( choose );
 use Term::Choose::Constants qw( :screen );
+use Term::Choose::Util      qw( insert_sep );
 use Term::TablePrint        qw( print_table );
 
 use App::DBBrowser::Auxil;
@@ -301,9 +302,8 @@ sub commit_sql {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     my $dbh = $sf->{d}{dbh};
-    local $| = 1;
-    print $sf->{i}{clear_screen};
-    print 'DB work ...' . "\n" if $sf->{o}{table}{progress_bar}; #
+    my $waiting = 'DB work ... ';
+    $ax->print_sql( $sql, $stmt_typeS, undef, $waiting );
     my $stmt_type = $stmt_typeS->[-1];
     my $rows_to_execute = [];
     my $row_count;
@@ -326,22 +326,26 @@ sub commit_sql {
         ) {
             $ax->print_error_message( "$@Fetching info: affected records ...\n", $stmt_type );
         }
-        my $prompt;
+        my $prompt = @$all_arrayref == 2 ? 'This record will be ' : 'These records will be ';
         if ( $stmt_type eq 'Update' ) {
             my $filled = $sql->{set_stmt};
             for my $val ( @{$sql->{set_args}} ) {
                 $filled =~ s/(?<=\ \=\ )\?/$val/;
             }
             $filled =~ s/^\s+//;
-            $prompt = "These records will be updated with [ $filled ]:\n";
+            $prompt .= "updated with [ $filled ]:\n";
         }
         else {
-            $prompt = "These records will be deleted:\n";
+            $prompt .= "deleted:\n";
         }
         if ( @$all_arrayref > 1 ) {
-            print_table( $all_arrayref, { %{$sf->{o}{table}}, prompt => $prompt, max_rows => 0, keep_header => 0 } ); #
+            print_table(
+                $all_arrayref,
+                { %{$sf->{o}{table}}, grid => 2, prompt => $prompt, max_rows => 0, keep_header => 1 }
+            );
         }
     }
+    $ax->print_sql( $sql, $stmt_typeS, undef, $waiting );
     my $transaction;
     eval {
         $dbh->{AutoCommit} = 1;
@@ -359,12 +363,14 @@ sub commit_sql {
             for my $values ( @$rows_to_execute ) {
                 $sth->execute( @$values );
             }
-            my $commit_ok = sprintf qq(  %s %d "%s"), 'COMMIT', $row_count, $stmt_type;
+
+            my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $stmt_type;
             $ax->print_sql( $sql, $stmt_typeS );
             # Choose
             my $choice = $stmt_v->choose(
                 [ undef,  $commit_ok ]
             );
+            $ax->print_sql( $sql, $stmt_typeS, undef, $waiting );
             if ( ! defined $choice || $choice ne $commit_ok ) {
                 $dbh->rollback;
                 $rolled_back = 1;
@@ -384,13 +390,14 @@ sub commit_sql {
         return 1;
     }
     else {
-        my $commit_ok = sprintf qq(  %s %d "%s"), 'EXECUTE', $row_count, $stmt_type;
+        my $commit_ok = sprintf qq(  %s %s "%s"), 'EXECUTE', insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $stmt_type;
         $ax->print_sql( $sql, $stmt_typeS ); #
         # Choose
         my $choice = $stmt_v->choose(
             [ undef,  $commit_ok ],
             { prompt => '' }
         );
+        $ax->print_sql( $sql, $stmt_typeS, undef, $waiting );
         if ( ! defined $choice || $choice ne $commit_ok ) {
             return;
         }

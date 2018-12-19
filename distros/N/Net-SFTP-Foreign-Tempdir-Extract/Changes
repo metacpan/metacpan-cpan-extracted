@@ -1,5 +1,24 @@
 Revision history for Perl module Net::SFTP::Foreign::Tempdir::Extract
 
+0.14 2018-12-18
+  - Fixed Makefile.PL and spec - version 0.08 replaced Archive::Zip for Archive::Extract - RT 128048 - Slaven
+  - Updated t/004_extract-multi.t to remove hardcoded path
+
+0.13 2018-01-31
+  - Updated lib/Net/SFTP/Foreign/Tempdir/Extract.pm
+    - Clear list cache when change folder or match
+    - Disconnect sftp when change host, port, user, or options
+
+0.12 2015-09-17
+  - Updated lib/Net/SFTP/Foreign/Tempdir/Extract.pm
+    - Added port support
+    - Updated error logging
+  - Added test t/007_port.t
+
+0.11 2015-09-24
+  - Added upload method
+  - Fixed file->extract method
+
 0.10 2015-06-08
   - Updated documentation
   - Update match default to qr//

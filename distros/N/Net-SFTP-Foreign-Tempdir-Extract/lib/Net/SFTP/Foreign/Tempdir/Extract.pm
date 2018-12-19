@@ -6,7 +6,7 @@ use File::Tempdir qw{};
 use Net::SFTP::Foreign qw{};
 use Net::SFTP::Foreign::Tempdir::Extract::File;
 
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 =head1 NAME
 
@@ -15,14 +15,14 @@ Net::SFTP::Foreign::Tempdir::Extract - Secure FTP client integrating Path::Class
 =head1 SYNOPSIS
 
   use Net::SFTP::Foreign::Tempdir::Extract;
-  my $sftp=Net::SFTP::Foreign::Tempdir::Extract->new(
-                           host   => $host,
-                           user   => $user,
-                           match  => qr/\.zip\Z/,
-                           backup => './backup', #default is not to backup
-                           delete => 1,          #default is not to delete
-                          );
-  my $file=$sftp->next;
+  my $sftp = Net::SFTP::Foreign::Tempdir::Extract->new(
+                                                       host   => $host,
+                                                       user   => $user,
+                                                       match  => qr/\.zip\Z/,
+                                                       backup => './backup', #default is not to backup
+                                                       delete => 1,          #default is not to delete
+                                                      );
+  my $file = $sftp->next;
 
 =head1 DESCRIPTION
 
@@ -37,16 +37,21 @@ This package assume SSH keys are correctly installed on local account and remote
 This is a simple file downloader implementation
 
   use Net::SFTP::Foreign::Tempdir::Extract;
-  my $sftp=Net::SFTP::Foreign::Tempdir::Extract->new(host=>$remote_host, user=>$remote_user);
-  my $file=$sftp->download($remote_folder, $remote_filename);
+  my $sftp = Net::SFTP::Foreign::Tempdir::Extract->new(host=>$remote_host, user=>$remote_user);
+  my $file = $sftp->download($remote_folder, $remote_filename);
 
 =head2 File Watcher
 
 This is a simple file watcher implementation
 
   use Net::SFTP::Foreign::Tempdir::Extract;
-  my $sftp=Net::SFTP::Foreign::Tempdir::Extract->new(host=>'remote_server', user=>'remote_account', match=>qr/\.zip\Z/, folder=>'/remote_folder');
-  my $file=$sftp->next or exit;        #nothing to process so exit
+  my $sftp = Net::SFTP::Foreign::Tempdir::Extract->new(
+                                                       host=>'remote_server',
+                                                       user=>'remote_account',
+                                                       match=>qr/\.zip\Z/,
+                                                       folder=>'/remote_folder'
+                                                      );
+  my $file = $sftp->next or exit;        #nothing to process so exit
   print "$file";                       #process file here
 
 =head2 Subclass
@@ -63,8 +68,8 @@ This is a typical subclass implementation for a particular infrastructure
     1;
   }
 
-  my $sftp=My::SFTP->new;
-  while (my $file=$sftp->next) {
+  my $sftp = My::SFTP->new;
+  while (my $file = $sftp->next) {
     printf "File %s is a %s\n", "$file", ref($file);
   }
 
@@ -84,24 +89,24 @@ Which outputs something like this.
 
 Downloads the named file in the folder.
 
-  my $file=$sftp->download('remote_file.zip');                   #isa Net::SFTP::Foreign::Tempdir::Extract::File
-  my $file=$sftp->download('/remote_folder', 'remote_file.zip'); #  which isa Path::Class::File object with an extract method
+  my $file = $sftp->download('remote_file.zip');                   #isa Net::SFTP::Foreign::Tempdir::Extract::File
+  my $file = $sftp->download('/remote_folder', 'remote_file.zip'); #  which isa Path::Class::File object with an extract method
 
 =cut
 
 sub download {
-  my $self   = shift;
-  my $sftp   = $self->sftp;
-  my $remote = pop or die('Error: filename required.');
-  my $folder = shift || $self->folder;
-  my $tmpdir  = File::Tempdir->new    or die('Error: Could not create File::Tempdir object');
-  my $local_folder = $tmpdir->name    or die('Error: Temporary directory not configured.');
-  $sftp->setcwd($folder)              or die(sprintf('Error: %s', $sftp->error));
-  $sftp->mget($remote, $local_folder) or die(sprintf('Error: %s', $sftp->error));
-  my $file=Net::SFTP::Foreign::Tempdir::Extract::File->new($local_folder => $remote);
+  my $self         = shift;
+  my $sftp         = $self->sftp;
+  my $remote       = pop                    or die('Error: filename required.');
+  my $folder       = shift                  || $self->folder;
+  my $tmpdir       = File::Tempdir->new     or die('Error: Could not create File::Tempdir object');
+  my $local_folder = $tmpdir->name          or die('Error: Temporary directory not configured.');
+  $sftp->setcwd($folder)                    or die(sprintf('Error: %s', $sftp->error));
+  $sftp->mget($remote, $local_folder)       or die(sprintf('Error: %s', $sftp->error));
+  my $file         = Net::SFTP::Foreign::Tempdir::Extract::File->new($local_folder => $remote);
   die("Error: Could not read $file.") unless -r $file;
   $file->{'__tmpdir'}=$tmpdir; #must keep tmpdir scope alive
-  my $backup=$self->backup;
+  my $backup = $self->backup;
   if ($backup) {
     $sftp->mkpath($backup)                    or die('Error: Cannot create backup directory');
     $sftp->rename($remote, "$backup/$remote") or die("Error: Cannot rename remote file $remote to $backup/$remote");
@@ -115,9 +120,9 @@ sub download {
 
 Downloads the next file in list and saves it locally to a temporary folder. Returns a L<Path::Class::File> object or undef if there are no more files.
 
-  my $file=$sftp->next or exit;        #get file or exit
+  my $file = $sftp->next or exit;  #get file or exit
 
-  while (my $file=$sftp->next) {
+  while (my $file = $sftp->next) {
     print "$file";
   }
 
@@ -148,7 +153,8 @@ sub list {
   $self->{'list'}=shift if @_;
   unless (defined($self->{'list'})) {
     #printf "%s: Listing files in folder: %s\n", DateTime->now, $self->folder;
-    $self->{'list'}=$self->sftp->ls($self->folder,
+    $self->{'list'}=$self->sftp->ls(
+                                    $self->folder,
                                     wanted     => $self->match,
                                     ordered    => 1,
                                     no_wanted  => qr/\A\.{1,2}\Z/,
@@ -158,6 +164,25 @@ sub list {
       unless (defined($self->{'list'}) and ref($self->{'list'}) eq 'ARRAY');
   }
   return wantarray ? @{$self->{'list'}} : $self->{'list'};
+}
+
+=head2 upload
+
+Uploads file to the folder and returns the count of uploaded files.
+
+  $sftp->folder("/remote_folder"); #or set on construction
+  $sftp->upload('local_file.zip');
+  $sftp->upload('local_file1.zip', 'local_file2.zip');
+
+The upload method is a simple wrapper around Net::SFTP::Foreign->mput that is parallel to download.
+
+=cut
+
+sub upload {
+  my $self   = shift;
+  my @files  = @_;
+  my $sftp   = $self->sftp;
+  return $sftp->mput(\@files, $self->folder);
 }
 
 =head1 PROPERTIES
@@ -172,13 +197,17 @@ SFTP server host name.
 
 sub host {
   my $self=shift;
-  $self->{'host'}=shift if @_;
+  if (@_) {
+    $self->{'host'} = shift;
+    delete $self->{'list'};
+    delete $self->{'sftp'};
+  }
   $self->{'host'}=$self->_host_default unless defined($self->{'host'});
   return $self->{'host'};
 }
 
 sub _host_default {
-  return "";
+  return '';
 }
 
 =head2 user
@@ -191,8 +220,31 @@ SFTP user name (defaults to current user)
 
 sub user {
   my $self=shift;
-  $self->{'user'}=shift if @_;
+  if (@_) {
+    $self->{'user'} = shift;
+    delete $self->{'list'};
+    delete $self->{'sftp'};
+  }
   return $self->{'user'};
+}
+
+=head2 port
+
+SFTP port number (defaults to undef not passed through)
+
+  $sftp->port(undef);        #default
+
+=cut
+
+sub port {
+  my $self=shift;
+  if (@_) {
+    $self->{'port'} = shift;
+    delete $self->{'list'};
+    delete $self->{'sftp'};
+  }
+  $self->{'port'}=undef unless defined $self->{'port'};
+  return $self->{'port'};
 }
 
 =head2 options
@@ -207,7 +259,11 @@ SSH options passed to the more property of L<Net::SFTP::Foreign> as an array ref
 
 sub options {
   my $self=shift;
-  $self->{'options'}=shift if @_;
+  if (@_) {
+    $self->{'options'} = shift;
+    delete $self->{'list'};
+    delete $self->{'sftp'};
+  }
   $self->{'options'}=['-q'] unless defined $self->{'options'};
   die 'Error: options must be an array reference.' unless ref($self->{'options'}) eq 'ARRAY';
   return $self->{'options'};
@@ -225,7 +281,10 @@ Note: Some SFTP servers put clients in a change rooted environment.
 
 sub folder {
   my $self=shift;
-  $self->{'folder'}=shift if @_;
+  if (@_) {
+    $self->{'folder'} = shift;
+    delete $self->{'list'};
+   }
   $self->{'folder'}=$self->_folder_default unless defined $self->{'folder'};
   return $self->{'folder'};
 }
@@ -246,7 +305,10 @@ Regular Expression to match file names for the next iterator
 
 sub match {
   my $self=shift;
-  $self->{'match'}=shift if @_;
+  if (@_) {
+    $self->{'match'} = shift;
+    delete $self->{'list'};
+  }
   $self->{'match'}=$self->_match_default unless defined($self->{'match'});
   return $self->{'match'};
 }
@@ -269,7 +331,7 @@ Note: If configured, backup overrides delete option.
 sub backup {
   my $self=shift;
   $self->{'backup'}=shift if @_;
-  $self->{'backup'}="" unless defined($self->{'backup'});
+  $self->{'backup'}='' unless defined($self->{'backup'});
   return $self->{'backup'};
 }
 
@@ -303,11 +365,19 @@ sub sftp {
   my $self=shift;
   unless (defined $self->{'sftp'}) {
     my %params      = ();
-    $params{'host'} = $self->host or die('Error: host required');
-    $params{'user'} = $self->user if $self->user;              #not required
+    $params{'host'} = $self->host    or die('Error: host required');
+    $params{'user'} = $self->user    if $self->user;           #not required
+    $params{'port'} = $self->port    if defined($self->port);  #not required
     $params{'more'} = $self->options if @{$self->options} > 0; #not required
     my $sftp        = Net::SFTP::Foreign->new($params{'host'}, %params);
-    die(sprintf("Error connecting to %s@%s: %s", $params{'user'}, $params{'host'}, $sftp->error)) if $sftp->error;
+    die(
+      sprintf("Error connecting to sftp://%s%s%s/ - %s", 
+                  ($params{'user'} ? $params{'user'} . '@' : ''),
+                  $params{'host'},
+                  ($params{'port'} ? ':' . $params{'port'} : ''),
+                  $sftp->error
+      )
+    ) if $sftp->error;
     $self->{'sftp'} = $sftp;
   }
   return $self->{'sftp'};

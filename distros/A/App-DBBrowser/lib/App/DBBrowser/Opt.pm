@@ -86,7 +86,7 @@ sub defaults {
         },
         create => {
             auto_inc_col_name    => 'Id',
-            default_data_type    => 'TEXT',
+            data_type_guessing   => 1,
         },
         split => {
             i_f_s                => ',',
@@ -124,7 +124,6 @@ sub __menu_insert {
             { name => '_parse_mode',       text => "- Parse Tool",       section => 'insert' },
             { name => 'file_encoding',     text => "- File Encoding",    section => 'insert' },
             { name => 'max_files',         text => "- File History",     section => 'insert' },
-            { name => '_create_table',     text => "- Create-table",     section => 'create' }, ##
         ],
         _module_Text_CSV => [
             { name => '_csv_char',    text => "- *_char attributes", section => 'csv' },
@@ -248,14 +247,6 @@ sub config_insert {
                 my $prompt = 'Separators (regexp)';
                 $sf->__group_readline( $section, $items, $prompt );
             }
-            elsif ( $opt eq '_create_table' ) {
-                my $items = [
-                    { name => 'auto_inc_col_name', prompt => "Auto incr col name" },
-                    { name => 'default_data_type', prompt => "Default data type " },
-                ];
-                my $prompt = 'Create-table defaults';
-                $sf->__group_readline( $section, $items, $prompt );
-            }
             else { die "Unknown option: $opt" }
         }
     }
@@ -274,6 +265,7 @@ sub __menus {
             { name => 'config_sql',      text => "- SQL",   },
             { name => 'config_output',   text => "- Output" },
             { name => 'config_insert',   text => "- Insert" },
+            { name => 'config_create',   text => "- Create" },
         ],
         config_database => [
             { name => 'plugins',      text => "- DB Plugins", section => 'G' },
@@ -307,6 +299,10 @@ sub __menus {
             { name => 'squash_spaces',      text => "- Squash spaces",     section => 'table' },
             { name => 'decimal_separator',  text => "- Decimal sep",       section => 'table' },
             { name => 'file_find_warnings', text => "- Warnings",          section => 'G' },
+        ],
+        config_create => [
+            { name => 'auto_inc_col_name',  text => "Auto increment column", section => 'create' },
+            { name => 'data_type_guessing', text => "Data type guessing",    section => 'create' },
         ],
     };
     return $menus->{$group};
@@ -421,7 +417,7 @@ sub set_options {
             }
             elsif ( $opt eq 'tab_width' ) {
                 my $digits = 3;
-                my $prompt = 'Tab width: ';
+                my $prompt = 'Set the tab width: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'grid' ) {
@@ -438,7 +434,7 @@ sub set_options {
             }
             elsif ( $opt eq 'color' ) {
                 my $prompt = '"ANSI color escapes"';
-                my $list = [ 'No', 'Yes' ]; # , 'Remove'
+                my $list = [ 'No', 'Yes' ];
                 my $sub_menu = [ [ $opt, "  ANSI color escapes", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -456,7 +452,7 @@ sub set_options {
             }
             elsif ( $opt eq 'min_col_width' ) {
                 my $digits = 3;
-                my $prompt = 'Min column width: ';
+                my $prompt = 'Set the minimum column width: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'undef' ) {
@@ -475,7 +471,7 @@ sub set_options {
             }
             elsif ( $opt eq 'progress_bar' ) {
                 my $digits = 7;
-                my $prompt = 'Threshold ProgressBar: ';
+                my $prompt = 'Set the threshold for the progress bar: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'file_find_warnings' ) {
@@ -486,7 +482,7 @@ sub set_options {
             }
             elsif ( $opt eq 'max_rows' ) {
                 my $digits = 7;
-                my $prompt = 'SQL auto LIMIT: ';
+                my $prompt = 'Set the SQL auto LIMIT: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
             elsif ( $opt eq 'lock_stmt' ) {
@@ -565,6 +561,19 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
+            elsif ( $opt eq 'auto_inc_col_name' ) {
+                my $items = [
+                    { name => 'auto_inc_col_name', prompt => "AI column name" },
+                ];
+                my $prompt = 'Default auto increment column name';
+                $sf->__group_readline( $section, $items, $prompt );
+            }
+            elsif ( $opt eq 'data_type_guessing' ) {
+                my $prompt = 'Data type guessing';
+                my $list = [ 'NO', 'YES' ];
+                my $sub_menu = [ [ $opt, "  Enable data type guessing", $list ] ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             else { die "Unknown option: $opt" }
         }
     }
@@ -602,11 +611,12 @@ sub __choose_a_number_wrap {
     my ( $sf, $section, $opt, $prompt, $digits ) = @_;
     my $current = $sf->{o}{$section}{$opt};
     my $w = $digits + int( ( $digits - 1 ) / 3 ) * length $sf->{o}{G}{thsd_sep};
-    my $info = ' Cur> ' . $prompt . sprintf( "%*s", $w, insert_sep( $current, $sf->{o}{G}{thsd_sep} ) );
-    my $name = ' New> ' . $prompt;
+    my $info = 'Cur> ' . sprintf( "%*s", $w, insert_sep( $current, $sf->{o}{G}{thsd_sep} ) );
+    my $name = 'New> ';
+    #$info = $prompt . "\n" . $info;
     # Choose_a_number
     my $choice = choose_a_number(
-        $digits, { name => $name, info => $info, mouse => $sf->{o}{table}{mouse}, clear_screen => 1 }
+        $digits, { prompt => $prompt, name => $name, info => $info, mouse => $sf->{o}{table}{mouse}, clear_screen => 1 }
     );
     return if ! defined $choice;
     $sf->{o}{$section}{$opt} = $choice;

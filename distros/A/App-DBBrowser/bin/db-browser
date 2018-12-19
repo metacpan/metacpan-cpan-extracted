@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.033';
+our $VERSION = '2.034';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.033
+Version 2.034
 
 =cut
 
@@ -120,12 +120,12 @@ To confirm a chosen menu item use the C<Return> key.
 
 In some sub-menus it is possible to select more then one item before C<Return> is pressed (for example I<Choose Rows>
 and I<Choose Columns> from the input filter - see L<Insert Into>); in such sub-menus the list of items marked with the
-C<SpaceBar> key including the highlighted item are added to the chosen items when C<Return> is pressed. If a mouse mode
-is enabled, it can be used the right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices
- - so for example with no items chosen C<Ctrl-SpaceBar> chooses everything.
+C<SpaceBar> are added to the chosen items when C<Return> is pressed. If a mouse mode is enabled, it can be used the
+right mouse key instead of the C<SpaceBar>. A C<Ctrl-SpaceBar> inverts the made choices - so for example with no items
+chosen C<Ctrl-SpaceBar> chooses everything.
 
-To leave a "readline" without entering anything enter the C<eof> control character (C<Ctrl-D> for *nix). Pressing only
-the C<Enter> key means entering an empty string.
+To leave a "readline" in a C<WHERE> or a C<HAVING> substatement without entering anything enter the C<eof> control
+character (C<Ctrl-D> for *nix). Pressing only the C<Enter> key means entering an empty string.
 
 =head1 MENUS
 
@@ -170,11 +170,7 @@ Create a table.
 Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
 data. In I<Settings> one can configure to how the data is parsed.
 
-C<SQLite> only: when ask for the column names the first entry is the C<ai> column if the option L<Auto incr col name> is
-set. If C<ai> is set, an auto-increment column is added automatically. One can disable this per table by removing the
-value from the C<ai> slot.
-
-See also L<Insert Into>.
+See also L</Create>.
 
 =item From File
 
@@ -182,7 +178,7 @@ Like I<Copy and Paste> with the difference that the data is read from a chosen f
 
 =item Settings
 
-Selecting I<Settings> allows one to set the options described in option group L<Create and Insert> for the current
+Selecting I<Settings> allows one to set the options described in option group L</Insert> for the current
 database.
 
 =back
@@ -267,6 +263,9 @@ Read the input from am file. Supported file formats: text files and file formats
 Setting the insert mode to I<From File> or to I<Copy and Paste> enables different filters: so it is possible to insert
 only selected columns or selected rows.
 
+If the input has rows with different numbers of columns, the filter I<choose_rows> sorts the rows in groups with the
+same number of columns. The user can then select the group which should be used.
+
 C<SQLite>: If the first column of a table is an auto-increment column, an C<INSERT INTO> statement is build without this
 first column.
 
@@ -289,6 +288,9 @@ To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu 
 =over
 
 =item SELECT
+
+It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
+C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
 
 If the option I<Subqueries in SELECT> is enabled, it is possible to use a sub-query instead a column by selecting C<(Q>.
 
@@ -597,15 +599,14 @@ to the default value (dot).
 
 Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
-=head2 Create and Insert
+=head2 Insert
 
 =head3 Parse Tool
 
 Set how to parse text files or the "multi row" input. Files where C<-T $filename> returns true are considered text
 files.
 
-If a file is not a text file, then it is always used C<Spreadsheet::Read> to parse the file regardless of this
-setting.
+If a file is not a text file, then it is always used C<Spreadsheet::Read> to parse the file regardless of this setting.
 
 =over
 
@@ -656,7 +657,7 @@ The values assigned to the IRS and the IFS are treated as regexps.
 
 Spreadsheet::Read
 
-If L<Spreadsheet::Read> is chosen, the default settings from C<Spreadsheet::Read> are used.
+If C<Spreadsheet::Read> is chosen, the default settings from L<Spreadsheet::Read> are used.
 
 C<Spreadsheet::Read> will use the first line of the file to auto-detect the separation character if the file is a
 csv-file.
@@ -701,13 +702,13 @@ Set the input field separator (regexp).
 
 Trim leading
 
-Expects a regex pattern. If set removes leading characters matching regexp from each field.
+Expects a regex pattern. If set, removes leading characters matching regexp from each field.
 
 =item
 
 Trim trailing
 
-Expects a regex pattern. If set removes trailing characters matching regexp from each field.
+Expects a regex pattern. If set, removes trailing characters matching regexp from each field.
 
 =back
 
@@ -719,16 +720,19 @@ How to decode text files.
 
 Set how many input file names should be saved. A value of C<0> disables the file history.
 
-=head3 Default data type
+=head2 Create
 
-The default data type of the columns.
+=head3 Data type guessing
 
-=head3 Auto incr col name
+If this option is enabled and a table is created, C<SQL::Type::Guess> is used to detect the data types. These data types
+are then used as default values when the user is asked for the data types.
+
+=head3 Auto increment
 
 C<SQLite> only:
 
-Set the auto-increment column name. If this option is set, a auto-increment column is added automatically to created
-tables.
+Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
+when creating a table. The value set here is then used as the default name for the auto increment column.
 
 =head1 CONFIGURATION FILES
 

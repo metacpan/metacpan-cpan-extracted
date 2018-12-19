@@ -3,7 +3,7 @@ Monit-HTTP
 This module exposes an interface to talk with Monit via its HTTP
 interface.
 You can use it to get the status of all the monitored services on that
-particular host such as CPU and Memory usage, current PID, parent PID, 
+particular host such as CPU and Memory usage, current PID, parent PID,
 current running status, current monitoring status and so on.
 
 INSTALLATION

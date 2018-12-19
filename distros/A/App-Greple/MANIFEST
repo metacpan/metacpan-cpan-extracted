@@ -11,7 +11,6 @@ lib/App/Greple.pm
 lib/App/Greple/Common.pm
 lib/App/Greple/Filter.pm
 lib/App/Greple/Grep.pm
-lib/App/Greple/NumberUtil.pm
 lib/App/Greple/Pattern.pm
 lib/App/Greple/Pattern/Holder.pm
 lib/App/Greple/PgpDecryptor.pm

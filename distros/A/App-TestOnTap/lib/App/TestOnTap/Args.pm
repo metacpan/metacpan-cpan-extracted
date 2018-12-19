@@ -7,7 +7,7 @@ package App::TestOnTap::Args;
 use strict;
 use warnings;
 
-use App::TestOnTap::Util qw(slashify expandAts);
+use App::TestOnTap::Util qw(slashify expandAts $IS_WINDOWS);
 use App::TestOnTap::Config;
 use App::TestOnTap::Preprocess;
 use App::TestOnTap::WorkDirManager;
@@ -193,12 +193,18 @@ sub __parseArgv
 
 	# make sure we have a valid jobs value
 	#
-	pod2usage(-message => "Invalid -jobs value: '$rawOpts{jobs}'", -exitval => 255, -verbose => 0) if $rawOpts{jobs} < 1;
-	if ($rawOpts{jobs} < 1)
+	my $maxJobs = $ENV{_TESTONTAP_MAX_JOBS} 
+					? 0 + $ENV{_TESTONTAP_MAX_JOBS}
+					: $IS_WINDOWS
+						? 60	# read about max being 64, leave room
+						: ~0;	# max int, e.g. almost 'infinite'
+	
+	if ($rawOpts{jobs} > $maxJobs)
 	{
-		$! = 255;
-		die("Invalid -jobs value: '$rawOpts{jobs}'\n");
+		$rawOpts{jobs} = $maxJobs;
+		warn("WARNING: Maximum jobs restricted, resetting to '--jobs $maxJobs' \n");
 	}
+	pod2usage(-message => "Invalid -jobs value: '$rawOpts{jobs}'", -exitval => 255, -verbose => 0) if $rawOpts{jobs} < 1;
 	$self->{jobs} = $rawOpts{jobs};
 	
 	# verify known order strategies
@@ -430,7 +436,7 @@ sub __findSuiteRoot
 			# need to dl it before unpacking
 			#
 			my $localzip = slashify("$tmpdir/local.zip");
-			print "Attempting to download '$suiteroot' => $localzip...\n" if $self->{v};
+			print "Downloading '$suiteroot' => $localzip...\n" if $self->{v};
 			my $ua = LWP::UserAgent->new();
 			$ua->ssl_opts(verify_hostname => 0);
 			my $response = $ua->get($suiteroot, ':content_file' => $localzip);
@@ -442,7 +448,7 @@ sub __findSuiteRoot
 			$zipfile = $localzip;
 		}
 		
-		print "Attempting to unpack '$zipfile'...\n" if $self->{v};
+		print "Unpacking '$zipfile'...\n" if $self->{v};
 		my $zipErr;
 		Archive::Zip::setErrorHandler(sub { $zipErr = $_[0]; chomp($zipErr) });
 		my $zip = Archive::Zip->new($zipfile);

@@ -21,7 +21,7 @@ use Test::Differences;
 }
 
 {
-    my $text        = 'lib/Open/This.pm#17';
+    my $text        = 'lib/Open/This.pm#L17';
     my $line_number = Open::This::_maybe_extract_line_number( \$text );
     is( $line_number, 17, 'GitHub line_number' );
     is( $text, 'lib/Open/This.pm', 'GitHub line number stripped' );
@@ -209,6 +209,19 @@ eq_or_diff(
             original_text => $text,
         },
         'spaces in file name and exists'
+    );
+}
+
+{
+    my $text = 'lib/Open/This.pm#L17';
+    eq_or_diff(
+        parse_text($text),
+        {
+            file_name     => 'lib/Open/This.pm',
+            line_number   => 17,
+            original_text => $text,
+        },
+        'line number parsed out of partial GitHub URL'
     );
 }
 

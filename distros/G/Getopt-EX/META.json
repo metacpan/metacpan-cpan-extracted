@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.18",
+   "generated_by" : "Minilla/v3.1.3",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,7 @@
             "Graphics::ColorNames" : "0",
             "Graphics::ColorNames::WWW" : "0",
             "List::Util" : "1.45",
+            "Moo" : "1.001",
             "perl" : "5.014"
          }
       },
@@ -57,7 +58,7 @@
    "provides" : {
       "Getopt::EX" : {
          "file" : "lib/Getopt/EX.pm",
-         "version" : "v1.11.0"
+         "version" : "v1.12.0"
       },
       "Getopt::EX::Colormap" : {
          "file" : "lib/Getopt/EX/Colormap.pm"
@@ -80,6 +81,9 @@
       "Getopt::EX::Module" : {
          "file" : "lib/Getopt/EX/Module.pm"
       },
+      "Getopt::EX::Numbers" : {
+         "file" : "lib/Getopt/EX/Numbers.pm"
+      },
       "Getopt::EX::ToggleValue" : {
          "file" : "lib/Getopt/EX/Util.pm"
       },
@@ -98,10 +102,11 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX"
       }
    },
-   "version" : "v1.11.0",
+   "version" : "v1.12.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <utashiro@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

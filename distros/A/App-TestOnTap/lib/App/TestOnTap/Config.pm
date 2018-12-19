@@ -6,6 +6,7 @@ use warnings;
 use App::TestOnTap::Util qw(slashify ensureArray);
 use App::TestOnTap::OrderStrategy;
 use App::TestOnTap::ExecMap;
+use App::TestOnTap::ParallelGroupManager;
 
 use Config::Std;
 use File::Spec;
@@ -102,7 +103,11 @@ sub __readCfgFile
 	# read the postprocess (optional) command
 	#
 	$self->{postprocesscmd} = ensureArray($blankSection->{postprocess});
-	
+
+	# set up optional ParallelGroup's 
+	#
+	$self->{parallelgroupmanager} = App::TestOnTap::ParallelGroupManager->new($cfg);
+
 	# set up the execmap, possibly as a delegate from a user defined one 
 	#
 	$self->{execmap} = App::TestOnTap::ExecMap->new($cfg);
@@ -142,7 +147,7 @@ sub __readCfgFile
 	
 	# finally check the config for unknown sections/keys...
 	#
-	my @validSections = (qr/^$/, qr/^DEPENDENCY\s/, qr/^EXECMAP\s+[^\s]+\s*$/);
+	my @validSections = (qr/^$/, qr/^DEPENDENCY\s/, qr/^EXECMAP\s+[^\s]+\s*$/, qr/^PARALLELGROUP\s+[^\s]+\s*$/);
 	foreach my $section (sort(keys(%$cfg)))
 	{
 		my $knownSection = 0;
@@ -273,6 +278,14 @@ sub getMatchesAndDependenciesForRule
 	die("No tests selected by 'dependson' in dependency rule '$depRuleName'\n") unless @dependencies;
 	 
 	return (\@matches, \@dependencies);
+}
+
+sub getParallelGroupManager
+{
+	my $self = shift;
+	my $testName = shift;
+
+	return $self->{parallelgroupmanager};	
 }
 
 1;

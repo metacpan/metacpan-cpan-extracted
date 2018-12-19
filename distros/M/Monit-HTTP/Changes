@@ -1,5 +1,14 @@
-Revision history for Monit-HTTP
+Revision history for Monit::HTTP
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.04    19 December 2018
+        - Various adjustments
 
+0.03    10 February 2016
+        - Rework constants
+        - Convert to Dist::Zilla
+
+0.02    05 February 2016
+        - Convert from LWP to HTTP::Tiny
+
+0.01    15 August 2009
+        - First version, released on an unsuspecting world.

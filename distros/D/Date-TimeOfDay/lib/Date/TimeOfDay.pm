@@ -1,12 +1,11 @@
 package Date::TimeOfDay;
 
-our $DATE = '2018-12-17'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2018-12-19'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use POSIX 'round';
 
 use overload (
     #fallback => 1,
@@ -153,7 +152,7 @@ sub _elements {
     my $hour   = int($n / 3600); $n -= $hour*3600;
     my $minute = int($n /   60); $n -= $minute*60;
     my $second = int($n);        $n -= $second;
-    my $nanosecond = round($n*1e9);
+    my $nanosecond = sprintf("%.0f", $n*1e9);
     ($hour, $minute, $second, $nanosecond);
 }
 
@@ -266,7 +265,7 @@ Date::TimeOfDay - Represent time of day (hh:mm:ss)
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,7 @@ use File::Touch qw( touch );
 use Git::Helpers qw(
     checkout_root
     current_branch_name
+    https_remote_url
     is_inside_work_tree
     remote_url
     travis_url
@@ -43,6 +44,16 @@ SKIP: {
         is(
             remote_url($remote_name), $remote_url,
             'remote_url is ' . $remote_url
+        );
+        is(
+            https_remote_url($remote_name),
+            'https://github.com/oalders/git-helpers',
+            'https_remote_url'
+        );
+        is(
+            https_remote_url('foobar'),
+            undef,
+            'https_remote_url with remote which does not exist'
         );
         is(
             travis_url($remote_name),

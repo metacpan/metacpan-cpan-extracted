@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Monit-HTTP</name>
+  <shortdesc>An OOP interface to Monit.</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Angelo &quot;pallotron&quot; Failla</foaf:name>
+      <foaf:mbox rdf:resource="mailto:pallotron@freaknet.org" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Dean Hamstead</foaf:name>
+      <foaf:mbox rdf:resource="mailto:dean@bytefoundry.com.au" />
+    </foaf:Person>
+  </developer>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/djzort/perl-monit-http-api" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/djzort/perl-monit-http-api" />
+      <location rdf:resource="https://github.com/djzort/perl-monit-http-api.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

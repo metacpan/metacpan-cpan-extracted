@@ -2,7 +2,7 @@ NAME
     Date::TimeOfDay - Represent time of day (hh:mm:ss)
 
 VERSION
-    version 0.004
+    version 0.005
 
 SYNOPSIS
      use Date::TimeOfDay;

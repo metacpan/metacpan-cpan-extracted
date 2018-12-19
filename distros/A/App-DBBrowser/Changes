@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.034    2018-12-19
+        - New option "guess data type".
+        - Update option "auto increment column".
+        - Bugfix in "insert_into" menu.
+        - Filename extension: max length from 3 to 4.
+        - Select columns: allow to select more than one column at a time.
+
 2.033    2018-12-10
         - "Term::Choose" minimum version: '1.638'.
         - "Term::TablePrint" mininum version: '0.104'.

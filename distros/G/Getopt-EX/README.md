@@ -4,7 +4,7 @@ Getopt::EX - Getopt Extender
 
 # VERSION
 
-Version v1.11.0
+Version v1.12.0
 
 # DESCRIPTION
 
@@ -179,6 +179,17 @@ or even simpler non-oo interface:
     print colorize("R", "FILE in Red\n");
     print colorize("G", "LINE in Blue\n");
     print colorize("B", "TEXT in Green\n");
+
+## [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers)
+
+Parse number parameter description and parse it, then produces number
+range list or number sequence.  Number format is composed by for
+elements: `start`, `end`, `step` and `length`, like this:
+
+    1           1
+    1:3         1,2,3
+    1:20:5      1,     6,     11,       16
+    1:20:5:3    1,2,3, 6,7,8, 11,12,13, 16,17,18
 
 # AUTHOR
 

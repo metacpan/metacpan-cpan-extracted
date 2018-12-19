@@ -104,23 +104,25 @@ sub columns {
         my $choices = [ @pre, @{$sql->{cols}} ];
         $ax->print_sql( $sql, [ $stmt_type ], $tmp );
         # Choose
-        my $col = $stmt_h->choose(
-            $choices
+        my @cols = $stmt_h->choose(
+            $choices, { meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], include_highlighted => 2 }
         );
-        if ( ! defined $col ) {
+        if ( ! defined $cols[0] ) {
             if ( @$bu ) {
                 ( $tmp->{chosen_cols}, $tmp->{alias} ) = @{pop @$bu};
                 next COLUMNS;
             }
             return;
         }
-        elsif ( $col eq $sf->{i}{ok} ) {
-            $tmp->{orig_chosen_cols} = [];
-            $tmp->{modified_cols}    = [];
+        elsif ( $cols[0] eq $sf->{i}{ok} ) {
+            shift @cols;
+            push @{$tmp->{chosen_cols}}, @cols;
+            $tmp->{orig_chosen_cols} = []; # keys of $tmp overwrite keys of $sql in Table.pm:
+            $tmp->{modified_cols}    = []; #     $sql->{$_} = $tmp->{$_} for keys;
             return $tmp;
         }
         push @$bu, [ [ @{$tmp->{chosen_cols}} ], { %{$tmp->{alias}} } ];
-        if ( $col eq $sq_col ) {
+        if ( $cols[0] eq $sq_col ) {
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type );
             if ( ! defined $subquery ) {
@@ -129,14 +131,14 @@ sub columns {
             }
             $subquery = "(" . $subquery . ")";
             push @{$tmp->{chosen_cols}}, $subquery;
-            my $alias = $ax->alias( $subquery ); ###
+            my $alias = $ax->alias( $subquery );
             if ( defined $alias && length $alias ) {
                 $tmp->{alias}{$subquery} = $ax->quote_col_qualified( [ $alias ] );
             }
             next COLUMNS;
         }
         else {
-            push @{$tmp->{chosen_cols}}, $col;
+            push @{$tmp->{chosen_cols}}, @cols;
         }
     }
 }
@@ -173,7 +175,7 @@ sub distinct {
 sub aggregate {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $tmp = {
-        aggr_cols   => [],
+        aggr_cols => [],
     };
 
     AGGREGATE: while ( 1 ) {

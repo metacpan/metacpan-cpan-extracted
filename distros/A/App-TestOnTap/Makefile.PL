@@ -87,6 +87,7 @@ WriteMakefile(
 			'Grep::Query'						=>	1.006,
 			'JSON'								=>	0,		# initial dev used: 2.90
 			'List::Util'						=>	0,		# Core 5.24
+			'List::MoreUtils'					=>	0.428,	# Must have 'singleton'
 			'LWP::Simple'						=>	0,		# initial dev used: 6.17
 			'Net::Domain'						=>	0,		# initial dev used: 3.07
 			'POSIX'								=>	0,		# initial dev used: 1.38_03

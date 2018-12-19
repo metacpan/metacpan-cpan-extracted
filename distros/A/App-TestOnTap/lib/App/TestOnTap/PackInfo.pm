@@ -280,12 +280,12 @@ sub usage
 {
 	print <<USAGE;
 Usage: \$0
-          [--output <file>]
+          [--outfile <file>]
           [--verbose || --no-verbose];
           [--info || --no-info]
 
 Creates a testontap binary with a default name of '$x_output'.
-Use '--output' to change.
+Use '--outfile' to change.
 
 Use '--verbose' or '--no-verbose' to turn on/off verboseness.
 Defaults to verboseness when script was created (currently '$x_verbose').

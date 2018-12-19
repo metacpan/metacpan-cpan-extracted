@@ -4,16 +4,26 @@ Git::Helpers - Shortcuts for common Git commands
 
 # VERSION
 
-version 0.000016
+version 0.000017
 
 # SYNOPSIS
 
-    use Git::Helpers qw( checkout_root remote_url);
-    my $root = checkout_root();
+    use Git::Helpers qw(
+        checkout_root
+        current_branch_name
+        https_remote_url
+        is_inside_work_tree
+        remote_url
+        travis_url
+    );
 
-    my $remote_url = remote_url('upstream');
+    my $dir              = '/path/to/folder/in/git/checkout';
+    my $root             = checkout_root($dir);
+    my $current_branch   = current_branch_name();
     my $https_remote_url = https_remote_url();
-    my $travis_url = travis_url();
+    my $inside_work_tree = is_inside_work_tree();
+    my $remote_url       = remote_url('upstream');
+    my $travis_url       = travis_url();
 
 ## checkout\_root( $dir )
 
@@ -46,9 +56,9 @@ Defaults to master branch, but can also display current branch.
 
 ## is\_inside\_work\_tree
 
-Returns `true` if `git rev-parse --is-inside-git-dir` returns `true`.
+Returns `true` if `git rev-parse --is-inside-work-tree` returns `true`.
 Otherwise returns `false`. This differs slightly from the behaviour of
-`--is-inside-git-dir` in real life, since it returns `fatal` rather than
+`--is-inside-work-tree` in real life, since it returns `fatal` rather than
 `false` if run outside of a git repository.
 
 ## remote\_url( $remote\_name )

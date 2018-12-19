@@ -2,7 +2,28 @@ NAME
     Sah::Schemas::Domain - Schemas related to domain names
 
 VERSION
-    version 0.001
+    This document describes version 0.002 of Sah::Schemas::Domain (from Perl
+    distribution Sah-Schemas-Domain), released on 2018-12-19.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-Schemas-Domain>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sah-Schemas-Domain>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Domain>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah - specification
+
+    Data::Sah
 
 AUTHOR
     perlancar <perlancar@cpan.org>

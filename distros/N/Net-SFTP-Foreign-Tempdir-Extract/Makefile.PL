@@ -11,6 +11,6 @@ WriteMakefile(
                      'Net::SFTP::Foreign' => 0,
                      'File::Tempdir'      => 0,
                      'Path::Class'        => 0,
-                     'Archive::Zip'       => 0,
+                     'Archive::Extract'   => 0,
                     },
 );

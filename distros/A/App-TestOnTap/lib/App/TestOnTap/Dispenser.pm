@@ -7,6 +7,7 @@ use App::TestOnTap::Util qw(slashify);
 use App::TestOnTap::OrderStrategy;
 
 use File::Find;
+use List::Util qw(shuffle);
 
 # CTOR
 #
@@ -96,7 +97,7 @@ sub getEligibleTests
 {
 	my $self = shift;
 	my $completed = shift || [];
-	
+
 	# remove items that have been completed from the graph
 	#
 	foreach my $t (@$completed)
@@ -108,7 +109,7 @@ sub getEligibleTests
 	# no more items to run at all - we're finished
 	#
 	return unless keys(%{$self->{graph}});
-	
+
 	# if we're still here, remove any references to completed tests
 	# from the remaining tests
 	#
@@ -149,7 +150,11 @@ sub getEligibleTests
 	@parallelizable = $orderstrategy->orderList(@parallelizable);
 	@nonParallelizable = $orderstrategy->orderList(@nonParallelizable);
 	
-	# now finally select those eligible - try to do away with parallelizabe first
+	# check the parallel groups for max concurrency and cull the overflow (don't forget to account for in progress jobs)
+	#
+	@parallelizable = $self->{args}->getConfig()->getParallelGroupManager()->cull([ keys(%{$self->{inprogress}}) ], \@parallelizable);
+	
+	# now finally select those eligible - try to do away with parallelizable first
 	#
 	my @eligible = @parallelizable;
 	
@@ -169,7 +174,7 @@ sub getEligibleTests
 	$self->{inprogress}->{$_} = 1 foreach (@eligible);
 
 	$self->{args}->getWorkDirManager()->recordDispensedOrder(@eligible);
-	
+
 	return \@eligible;
 }
 

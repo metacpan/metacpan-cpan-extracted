@@ -4,7 +4,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 # VERSION
 
-version 0.000013
+version 0.000014
 
 # DESCRIPTION
 
@@ -31,7 +31,7 @@ Copy/pasting a `git-grep` result.
 
 Copy/pasting a partial GitHub URL.
 
-    ot lib/Foo/Bar.pm#100 # vim +100 Foo/Bar.pm
+    ot lib/Foo/Bar.pm#L100 # vim +100 Foo/Bar.pm
 
 Open a local file on the GitHub web site in your web browser.  From within a
 checked out copy of https://github.com/oalders/open-this

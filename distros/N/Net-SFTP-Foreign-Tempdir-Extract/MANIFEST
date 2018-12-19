@@ -11,6 +11,8 @@ t/002_download.t
 t/003_extract.t
 t/004_extract-multi.t
 t/005_download_backup.t
+t/006_upload.t
+t/007_port.t
 perl-Net-SFTP-Foreign-Tempdir-Extract.spec
 scripts/Net-SFTP-Foreign-Tempdir-Extract-file.zip
 scripts/Net-SFTP-Foreign-Tempdir-Extract-download-example.pl

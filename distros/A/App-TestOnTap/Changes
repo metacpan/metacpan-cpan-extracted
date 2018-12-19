@@ -1,5 +1,18 @@
 Revision history for App-TestOnTap
 
+0.052	2018-12-19
+
+	Need a minimum version on List::MoreUtils
+
+0.051	2018-12-19
+
+	Improve parallelization configurability
+	
+	    Typos
+	    Allow to cap the --jobs max (on Windows by default capped to 60)
+	    Add configuration handling of 'parallel groups' in order to
+	    specify max concurrency for certain groups
+
 0.050	2017-12-28
 
 	

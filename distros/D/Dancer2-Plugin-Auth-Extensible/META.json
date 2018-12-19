@@ -4,13 +4,13 @@
       "David Precious <davidp@preshweb.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Dancer2-Plugin-Auth-Extensible",
    "no_index" : {
@@ -78,6 +78,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dancer"
    },
-   "version" : "0.705",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.706",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

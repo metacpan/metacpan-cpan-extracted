@@ -1,3 +1,4 @@
+logger: capture
 plugins:
     Auth::Extensible:
         realms:

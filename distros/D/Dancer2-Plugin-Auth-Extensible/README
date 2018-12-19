@@ -17,8 +17,8 @@ DESCRIPTION
     extensible as possible, and to make secure password handling easy. The
     base class for auth providers makes handling RFC2307-style hashed
     passwords really simple, so you have no excuse for storing plain-text
-    passwords. A simple script called generate-crypted-password to generate
-    RFC2307-style hashed passwords is included, or you can use
+    passwords. A simple script called dancer2-generate-crypted-password to
+    generate RFC2307-style hashed passwords is included, or you can use
     Crypt::SaltedHash yourself to do so, or use the slappasswd utility if
     you have it installed.
 

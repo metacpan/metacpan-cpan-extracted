@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000455';
+our $VERSION='1.0000456';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -288,6 +288,8 @@ if ($ARGV[0]=~/\.pem/) {
 our $system_type='';
 # Bullet Proof Test for AWS EC2
 # wget --tries=1 --timeout=5 -qO- http://169.254.169.254/latest/dynamic/instance-identity/document 2>&1
+my $aws=`wget --tries=1 --timeout=5 -qO- http://169.254.169.254/latest/dynamic/instance-identity/document 2>&1`;
+$aws=(-1<index $aws,'signature')?1:0;
 if ($^O eq 'linux' || $^O eq 'freebsd') {
    if ((-e "/etc/system-release-cpe") &&
          ((-1<index `cat /etc/system-release-cpe`,'amazon:linux') ||
@@ -297,13 +299,11 @@ if ($^O eq 'linux' || $^O eq 'freebsd') {
       #
       # sudo yum -y install cpan
 
-      $amazon{'ami'}='';
-      $system_type='ami';
+      $amazon{'amazon_linux'}='';
+      $system_type='amazon_linux';
    } elsif ((-e "/etc/os-release") &&
          (-1<index `cat /etc/os-release`,'ubuntu')) {
-      if (-e "/usr/bin/ec2metadata") {
-         $amazon{'ubuntu'}='';
-      }
+      $amazon{'ubuntu'}='' if $aws;
       $system_type='ubuntu';
    } elsif ($^O eq 'freebsd') {
 
@@ -312,22 +312,15 @@ if ($^O eq 'linux' || $^O eq 'freebsd') {
       # su
       # pkg_add -r perl
 
-      if ((-e "/usr/local/bin/aws") &&
-            (-1<index `cat /usr/local/bin/aws`,'aws.amazon')) {
-         $amazon{'freebsd'}='';
-      }
+      $amazon{'freebsd'}='' if $aws;
       $system_type='freebsd';
    } elsif (-e "/etc/SuSE-release") {
-      if (-e "/etc/profile.d/amazonEC2.sh") {
-         $amazon{'suse'}='';
-      }
+      $amazon{'suse'}='' if $aws;
       $system_type='suse';
    } elsif ((-e "/etc/system-release-cpe") &&
          (-1<index `cat /etc/system-release-cpe`,
          'fedoraproject')) {
-      if (-e "/etc/yum/pluginconf.d/amazon-id.conf") {
-         $amazon{'fedora'}='';
-      }
+      $amazon{'fedora'}='' if $aws;
       $system_type='fedora';
    } elsif ((-e "/etc/system-release-cpe") &&
          (-1<index `cat /etc/system-release-cpe`,
@@ -337,35 +330,25 @@ if ($^O eq 'linux' || $^O eq 'freebsd') {
       #
       # sudo yum -y install cpan
 
-      if (-e "/etc/yum/pluginconf.d/amazon-id.conf") {
-         $amazon{'rhel'}='';
-      }
+      $amazon{'rhel'}='' if $aws;
       $system_type='rhel';
    } elsif ((-e "/etc/system-release-cpe") &&
          (-1<index `cat /etc/system-release-cpe`,
-         'centos:linux')) {
+         'centos:')) {
 
       # Manual Setup CentOS host before CPAN:
       #
       # sudo yum -y groupinstall "Development tools"
       # sudo yum -y install cpan 
 
-      if ((-e "/sys/hypervisor/compilation/compiled_by") &&
-            (-1<index `cat /sys/hypervisor/compilation/compiled_by`,
-            'amazon')) {
-         $amazon{'centos'}='';
-      }
+      $amazon{'centos'}='' if $aws;
       $system_type='centos';
    } elsif (-e "/etc/gentoo-release") {
 
       # Manual Setup CentOS host before CPAN:
       #
 
-      if ((-e "/sys/hypervisor/compilation/compiled_by") &&
-            (-1<index `cat /sys/hypervisor/compilation/compiled_by`,
-            'amazon')) {
-         $amazon{'gentoo'}='';
-      }
+      $amazon{'gentoo'}='' if $aws;
       $system_type='gentoo';
    }
 } else { $system_type=$^O }
@@ -1137,7 +1120,7 @@ END
          exit 1;
       }
    }
-} elsif (!can_cc() && ((exists $amazon{'ami'}) ||
+} elsif (!can_cc() && ((exists $amazon{'amazon_linux'}) ||
       (exists $amazon{'rhel'}) ||
       (exists $amazon{'centos'}))) {
 
@@ -1472,7 +1455,7 @@ sub look_inside_dir {
          }
       }
       chdir $d;
-      if (($system_type eq 'ami') ||
+      if (($system_type eq 'amazon_linux') ||
             ($system_type eq 'ubuntu') ||
             ($system_type eq 'rhel') ||
             ($system_type eq 'centos')) {
@@ -1615,7 +1598,7 @@ sub fa_install_mod {
       }
       if (lc($task) eq 'install') {
          my $sudo='';
-         if (($system_type eq 'ami') ||
+         if (($system_type eq 'amazon_linux') ||
                ($system_type eq 'ubuntu') ||
                ($system_type eq 'rhel') ||
                ($system_type eq 'centos')) {
@@ -1718,7 +1701,7 @@ sub fa_install_mod {
          }
       } elsif (lc($task) eq 'install') {
          my $sudo=0;
-         if (($system_type eq 'ami') ||
+         if (($system_type eq 'amazon_linux') ||
                ($system_type eq 'ubuntu') ||
                ($system_type eq 'rhel') ||
                ($system_type eq 'centos')) {
