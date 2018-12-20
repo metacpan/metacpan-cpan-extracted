@@ -3,4 +3,7 @@ Revision history for Perl module REST::Client::CrossRef
 0.001 Thu Oct 11 07:34:27 2018
     - original version; created by ExtUtils::ModuleMaker 0.56
     - 2018/11/21 loaded to CPAN
-0.002
+0.002 
+    - removed my email from the pod...
+0.003
+    - corrected authors unfolding since occurence : first can be found twice

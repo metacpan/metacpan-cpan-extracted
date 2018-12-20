@@ -14,13 +14,13 @@ my $case_fold = $] >= 5.016		    ? eval 'sub { return CORE::fc $_[0] }'
 	      : $INC{'Unicode/CaseFold.pm'} ? eval 'sub { return Unicode:CaseFold::fc $_[0] }'
 	      : 			      eval 'sub { return lc $_[0] }';
 
-our $VERSION = '0.981';
+our $VERSION = '0.982';
 
 =head1 NAME
 
 HTTP::Validate - validate and clean HTTP parameter values according to a set of rules
 
-Version 0.981
+Version 0.982
 
 =head1 DESCRIPTION
 
@@ -3074,7 +3074,12 @@ sub boolean_value {
 
     my ($value, $context) = @_;
     
-    unless ( ref $value )
+    if ( ref($value) =~ /boolean/i )
+    {
+	return { value => $value };
+    }
+    
+    elsif ( ! ref $value )
     {
 	if ( $value =~ /^(?:1|yes|true|on)$/i )
 	{

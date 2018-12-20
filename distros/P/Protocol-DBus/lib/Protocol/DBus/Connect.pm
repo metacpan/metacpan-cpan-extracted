@@ -5,14 +5,20 @@ use warnings;
 
 use Socket;
 
-use Protocol::DBus::Path ();
-
 sub create_socket {
-    my ($address) = @_;
+    my ($addr_obj) = @_;
 
-    if ($address =~ m<\Aunix:path=(.+)>) {
-        my $path = $1;
-        $path =~ s<%([0-9a-fA-F]{2})><chr hex $1>ge;
+    if ($addr_obj->transport() eq 'unix') {
+        my $path = $addr_obj->attribute('abstract');
+
+        if ($path) {
+            substr($path, 0, 0, "\0");
+        }
+        else {
+            $path = $addr_obj->attribute('path') or do {
+                die( "No “path” nor “abstract”: " . $addr_obj->to_string() );
+            };
+        }
 
         socket my $s, Socket::AF_UNIX(), Socket::SOCK_STREAM(), 0 or do {
             die "socket(AF_UNIX, SOCK_STREAM): $!";
@@ -25,7 +31,9 @@ sub create_socket {
         return $s;
     }
 
-    die "Unrecognized path: $address";
+    # TODO: Handle TCP addresses.
+
+    die( "Unrecognized path: " . $addr_obj->to_string() );
 }
 
 1;

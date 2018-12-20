@@ -12,7 +12,7 @@ use Try::Tiny;
 
 use Moo::Role;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 has ok_exit_codes => (
     is      => 'ro',
@@ -36,7 +36,7 @@ sub _run_or_die {
             my $signal = $? & 127;
             my $msg    = "exited with $code";
             $msg .= " - received signal $signal" if $signal;
-            $msg .= " - output was:\n$output" if defined $output and length $output;
+            $msg .= " - output was:\n$output"    if defined $output and length $output;
             die "$msg\n";
         }
     }
@@ -75,7 +75,7 @@ commands
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 

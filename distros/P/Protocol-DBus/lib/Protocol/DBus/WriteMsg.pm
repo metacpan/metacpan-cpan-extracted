@@ -3,6 +3,10 @@ package Protocol::DBus::WriteMsg;
 use strict;
 use warnings;
 
+use Socket ();
+
+use Protocol::DBus::Socket ();
+
 use parent qw( IO::Framed::Write );
 
 my %fh_fds;
@@ -11,6 +15,8 @@ sub DESTROY {
     my ($self) = @_;
 
     my $fh = delete $fh_fds{ $self->get_write_fh() };
+
+    $self->SUPER::DESTROY() if IO::Framed::Write->can('DESTROY');
 
     return;
 }
@@ -47,7 +53,7 @@ sub WRITE {
             pack( 'I!*', @$fds_ar ),
         );
 
-        my $bytes = Socket::MsgHdr::sendmsg( $_[0], $msg );
+        my $bytes = Protocol::DBus::Socket::sendmsg_nosignal( $_[0], $msg, 0 );
 
         # NOTE: This assumes that, on an incomplete write, the ancillary
         # data (i.e., the FDs) will have been sent, and there is no need
@@ -60,7 +66,7 @@ sub WRITE {
         return $bytes;
     }
 
-    goto &IO::Framed::Write::WRITE;
+    return Protocol::DBus::Socket::send_nosignal( $_[0], $_[1], 0 );
 }
 
 1;

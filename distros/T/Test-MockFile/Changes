@@ -1,5 +1,18 @@
 Revision history for Test-MockFile
 
+0.014   12/20/2018
+ - Re-factor _find_file_or_fh to handle symlink following logic better. GH #26
+ - Make more standard use of _get_file_object when looking up a file path so we
+   properly handle abs path and symlink following
+
+0.013   12/20/2018
+ - Add a helper to determine if goto can be used. Where it's available is complicated
+ - First pass at bareword file handles for opendir and friends
+ - Fix errant docs for making a symlink mock
+ - Follow links for stat but not lstat
+ - Add support for readlink
+ - Try 2 to fix BSD issues with GH #20
+
 0.012   11/16/2018
  - Fix for #21 - length undef on perl 5.10
  - GH #20 - Add EPERM support for freebsd when unlinking directories

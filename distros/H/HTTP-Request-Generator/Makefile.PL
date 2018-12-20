@@ -45,11 +45,13 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Exporter' => 5,
+        'Exporter'           => 5,
+        'Carp'               => 0,
         'Filter::signatures' => 0,
-        'Algorithm::Loops' => 0,
-        'List::MoreUtils' => 0,
-        'URI::Escape' => 0,
+        'Algorithm::Loops'   => 0,
+        'List::MoreUtils'    => 0,
+        'URI'                => 0,
+        'URI::Escape'        => 0,
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.034';
+our $VERSION = '2.035';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.034
+Version 2.035
 
 =cut
 
@@ -85,8 +85,8 @@ Before using C<db-browser>, make sure you backed up your databases.
 
 Search and read in SQL databases: one can browse databases and their tables interactively.
 
-The database plugins bundled with C<App::DBBrowser> provide support for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>
-and C<DBD::Pg>. See L<App::DBBrowser::DB> how to write a database plugin.
+The database plugins bundled with C<App::DBBrowser> provide support for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>,
+C<DBD::MariaDB> and C<DBD::Pg>. See L<App::DBBrowser::DB> how to write a database plugin.
 
 Before the output leading and trailing spaces are removed from the elements and spaces are squashed to a single
 white-space if the option I<squash_spaces> is enabled.

@@ -1,9 +1,9 @@
 NAME
-    Test::MockFile - Lets tests validate code which interacts with files
-    without the file system ever being touched.
+    Test::MockFile - Allows tests to validate code that can interact with
+    files without touching the file system.
 
 VERSION
-    Version 0.012
+    Version 0.014
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take
@@ -57,7 +57,7 @@ IMPORT
 
         # This will not die.
         Test::MockFile->file("/bar", "...");
-        Test::MockFile->link("/foo", "/bar");
+        Test::MockFile->symlink("/foo", "/bar");
         -l "/foo" or print "ok\n";
         open(my $fh, ">", "/foo");
     
@@ -193,7 +193,7 @@ SUBROUTINES/METHODS
     returns the size of the file based on its contents.
 
   exists
-    returns true or false base on if the file exists right now.
+    returns true or false based on if the file exists right now.
 
   blocks
     Calculates the block count of the file based on its size.
@@ -273,8 +273,8 @@ SUBROUTINES/METHODS
 
     Any code which is loaded AFTER this happens will use the alternate open.
     This means you can place your "use Test::MockFile" statement after
-    statements you don't want mocked and there is no risk that that code
-    will ever be altered by Test::MockModule.
+    statements you don't want to be mocked and there is no risk that the
+    code will ever be altered by Test::MockModule.
 
     We oveload the following statements and then return tied handles to
     enable the rest of the IO functions to work properly. Only open /

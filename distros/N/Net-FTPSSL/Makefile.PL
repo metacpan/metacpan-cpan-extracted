@@ -25,6 +25,9 @@ if ($value eq "Y" || $value eq "y") {
    $req{"Net::HTTPTunnel"} = 0.50;
 }
 
+# These additional modules are required to run the test scripts ...
+$req{"Test::More"} = 0.88;
+$req{"File::Spec"} = 0.0;
 
 my %params = ( NAME         => 'Net::FTPSSL',
                VERSION_FROM => 'FTPSSL.pm',      # Finds $VERSION

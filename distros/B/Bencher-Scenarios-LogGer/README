@@ -2,26 +2,26 @@ NAME
     Bencher::Scenarios::LogGer - Scenarios for benchmarking Log::ger
 
 VERSION
-    This document describes version 0.012 of Bencher::Scenarios::LogGer
+    This document describes version 0.014 of Bencher::Scenarios::LogGer
     (from Perl distribution Bencher-Scenarios-LogGer), released on
-    2017-08-04.
+    2018-12-20.
 
 DESCRIPTION
     This distribution contains the following Bencher scenario modules:
 
     *   Bencher::Scenario::LogGer::Overhead
 
+    *   Bencher::Scenario::LogGer::InitTarget
+
     *   Bencher::Scenario::LogGer::OutputStartup
 
-    *   Bencher::Scenario::LogGer::LayoutStartup
-
-    *   Bencher::Scenario::LogGer::NullOutput
-
-    *   Bencher::Scenario::LogGer::InitTarget
+    *   Bencher::Scenario::LogGer::NumericLevel
 
     *   Bencher::Scenario::LogGer::StringLevel
 
-    *   Bencher::Scenario::LogGer::NumericLevel
+    *   Bencher::Scenario::LogGer::NullOutput
+
+    *   Bencher::Scenario::LogGer::LayoutStartup
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -43,7 +43,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,15 @@
+dbdimp.c
+dbdimp.h
+dbivport.h
+lib/DBD/mysqlx/GetInfo.pm
+lib/DBD/mysqlx.pm
+lib/DBD/mysqlx/TypeInfo.pm
+LICENSE
+Makefile.PL
+MANIFEST
+mysqlx.h
+mysqlx.xs
+README.md
+t/do1.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

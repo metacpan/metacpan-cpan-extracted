@@ -1,0 +1,4 @@
+! my-app.js
+# some comment
+< js/include-some-file.js       #some inline comment
+<   js/app.js # other comment

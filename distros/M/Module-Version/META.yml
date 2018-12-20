@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '6.56'
   File::Spec: '0'
   Test::More: '0'
+  Test::Output: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -18,18 +19,19 @@ name: Module-Version
 provides:
   Module::Version:
     file: lib/Module/Version.pm
-    version: '0.13'
+    version: '0.200'
   Module::Version::App:
     file: lib/Module/Version/App.pm
-    version: '0.13'
+    version: '0.200'
 requires:
   Carp: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '6.56'
   Getopt::Long: '0'
+  local::lib: '0'
   parent: '0'
 resources:
   repository: git://github.com/xsawyerx/module-version.git
-version: '0.13'
+version: '0.200'
 x_authority: cpan:XSAWYERX
 x_serialization_backend: 'YAML::Tiny version 1.73'

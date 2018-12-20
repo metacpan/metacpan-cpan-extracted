@@ -4,8 +4,7 @@ use warnings;
 
 my $dmodule = "-d:DumpTrace::noPPI";
 
-# exercise Devel::DumpTrace module in a simple
-# threaded demo
+# exercise Devel::DumpTrace module in a simple threaded demo
 
 if (!eval 'use threads;1') {
     ok(1,'# skip threads test - threads not configured') for 1..35;
@@ -41,6 +40,10 @@ for my $level (1, 2, 3) {
 
   ok(!!(grep m{>>>>> .*:6:.*\@d:\(5,3,34\) = \(\$a:5},@xh),
      "level=$level line 4-2 ok") or $keep++;
+
+  if ($level == 1 && $keep) {
+      diag @xh;
+  }
 
   unlink $file unless $keep;
 }
@@ -100,7 +103,6 @@ for my $level (4, 5) {
 
   unlink $file unless $keep;
 }
-
 
 # on threaded 5.8.8, this test spits out (harmlessly, as far as I can tell):
 #

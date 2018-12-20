@@ -1,9 +1,5 @@
 package Business::PxPay;
 
-BEGIN {
-    $Business::PxPay::VERSION = '0.04';
-}
-
 # ABSTRACT: PX Pay Interface for www.paymentexpress.com
 
 use warnings;
@@ -13,6 +9,8 @@ use URI::Escape qw/uri_escape/;
 use LWP::UserAgent;
 use XML::Simple qw/XMLin XMLout/;
 use vars qw/%TRANSACTIONS/;
+
+our $VERSION = '0.05';
 
 %TRANSACTIONS = (
     purchase      => 'Purchase',
@@ -24,7 +22,7 @@ use vars qw/%TRANSACTIONS/;
 
 sub new {
     my $class = shift;
-    my $args = scalar @_ % 2 ? shift : {@_};
+    my $args = scalar @_ % 2 ? shift : { @_ };
 
     # validate
     $args->{userid} or croak 'userid is required';
@@ -42,71 +40,56 @@ sub new {
 
 sub request {
     my $self = shift;
-    my $args = scalar @_ % 2 ? shift : {@_};
+    my $args = scalar @_ % 2 ? shift : { @_ };
 
     my $xml = $self->request_xml($args);
-    my $resp = $self->{ua}->post( $self->{url}, Content => $xml );
-    unless ( $resp->is_success ) {
+    my $resp = $self->{ua}->post($self->{url}, Content => $xml);
+    unless ($resp->is_success) {
         croak $resp->status_line;
     }
-    my $rtn = XMLin( $resp->content, SuppressEmpty => undef );
+    my $rtn = XMLin($resp->content, SuppressEmpty => undef);
     return $rtn;
 }
 
 sub request_xml {
     my $self = shift;
-    my $args = scalar @_ % 2 ? shift : {@_};
+    my $args = scalar @_ % 2 ? shift : { @_ };
 
     # validate
     my $TxnType = $args->{TxnType} || croak 'TxnType is required';
-    my $Amount =
-         $args->{Amount}
-      || $self->{Amount}
-      || croak 'Amount is required';
-    $Amount = sprintf( "%.2f", $Amount );    # .XX format
-    my $Currency =
-         $args->{Currency}
-      || $self->{Currency}
-      || croak 'Currency is required';
-    my $UrlFail =
-         $args->{UrlFail}
-      || $self->{UrlFail}
-      || croak 'UrlFail is required';
-    my $UrlSuccess =
-         $args->{UrlSuccess}
-      || $self->{UrlSuccess}
-      || croak 'UrlSuccess is required';
-    my $MerchantReference = $args->{MerchantReference}
-      || croak 'MerchantReference is required';
+    my $Amount = $args->{Amount} || $self->{Amount} || croak 'Amount is required';
+    $Amount = sprintf ("%.2f", $Amount); # .XX format
+    my $Currency   = $args->{Currency} || $self->{Currency} || croak 'Currency is required';
+    my $UrlFail    = $args->{UrlFail} || $self->{UrlFail} || croak 'UrlFail is required';
+    my $UrlSuccess = $args->{UrlSuccess} || $self->{UrlSuccess} || croak 'UrlSuccess is required';
+    my $MerchantReference = $args->{MerchantReference} || croak 'MerchantReference is required';
 
     # UrlFail can't contain '?' or '&'
     if ( $UrlFail =~ /\?/ or $UrlFail =~ /\&/ ) {
-        croak
-"UrlFail can't contain '?' or '&', please use TxnData1, TxnData2, TxnData3 or Opt\n";
+        croak "UrlFail can't contain '?' or '&', please use TxnData1, TxnData2, TxnData3 or Opt\n";
     }
     if ( $UrlSuccess =~ /\?/ or $UrlSuccess =~ /\&/ ) {
-        croak
-"UrlSuccess can't contain '?' or '&', please use TxnData1, TxnData2, TxnData3 or Opt\n";
+        croak "UrlSuccess can't contain '?' or '&', please use TxnData1, TxnData2, TxnData3 or Opt\n";
     }
 
     my $request = {
         GenerateRequest => {
-            PxPayUserId       => [ $self->{userid} ],
-            PxPayKey          => [ $self->{key} ],
-            AmountInput       => [$Amount],
-            CurrencyInput     => [$Currency],
-            MerchantReference => [$MerchantReference],
-            EmailAddress      => [ $args->{EmailAddress} ],
-            TxnData1          => [ $args->{TxnData1} ],
-            TxnData2          => [ $args->{TxnData2} ],
-            TxnData3          => [ $args->{TxnData3} ],
-            TxnType           => [$TxnType],
-            TxnId             => [ $args->{TxnId} ],
-            BillingId         => [ $args->{BillingId} ],
+            PxPayUserId => [ $self->{userid} ],
+            PxPayKey    => [ $self->{key} ],
+            AmountInput => [ $Amount ],
+            CurrencyInput => [ $Currency ],
+            MerchantReference => [ $MerchantReference ],
+            EmailAddress => [ $args->{EmailAddress} ],
+            TxnData1     => [ $args->{TxnData1} ],
+            TxnData2     => [ $args->{TxnData2} ],
+            TxnData3     => [ $args->{TxnData3} ],
+            TxnType      => [ $TxnType ],
+            TxnId        => [ $args->{TxnId} ],
+            BillingId    => [ $args->{BillingId} ],
             EnableAddBillCard => [ $args->{EnableAddBillCard} ],
-            UrlSuccess        => [$UrlSuccess],
-            UrlFail           => [$UrlFail],
-            Opt               => [ $args->{Opt} ],
+            UrlSuccess   => [ $UrlSuccess ],
+            UrlFail      => [ $UrlFail ],
+            Opt          => [ $args->{Opt} ],
         },
     };
     return XMLout( $request, KeepRoot => 1 );
@@ -116,11 +99,11 @@ sub result {
     my ( $self, $ResponseCode ) = @_;
 
     my $xml = $self->result_xml($ResponseCode);
-    my $resp = $self->{ua}->post( $self->{url}, Content => $xml );
-    unless ( $resp->is_success ) {
+    my $resp = $self->{ua}->post($self->{url}, Content => $xml);
+    unless ($resp->is_success) {
         croak $resp->status_line;
     }
-    my $rtn = XMLin( $resp->content, SuppressEmpty => undef );
+    my $rtn = XMLin($resp->content, SuppressEmpty => undef);
     return $rtn;
 }
 
@@ -131,23 +114,14 @@ sub result_xml {
         ProcessResponse => {
             PxPayUserId => [ $self->{userid} ],
             PxPayKey    => [ $self->{key} ],
-            Response    => [$ResponseCode],
+            Response    => [ $ResponseCode ],
         },
     };
     return XMLout( $request, KeepRoot => 1 );
 }
 
 1;
-
-=pod
-
-=head1 NAME
-
-Business::PxPay - PX Pay Interface for www.paymentexpress.com
-
-=head1 VERSION
-
-version 0.04
+__END__
 
 =head1 SYNOPSIS
 
@@ -157,7 +131,7 @@ version 0.04
         userid => 'TestAccount',
         key    => 'c9fff215b9e2add78d252b78e214880b46a906e73190a380483c1c29acab4157'
     );
-    
+
     # when submit the cart order
     if ( $submit_order ) {
         my $rtn = $pxpay->request($args); # $args from CGI params
@@ -270,7 +244,7 @@ Required when adding a card to the DPS system for recurring billing. Set element
 
 =item * C<TxnId>
 
-A value that uniquely identifies the transaction 
+A value that uniquely identifies the transaction
 
 =item * C<TxnData1>
 
@@ -335,18 +309,3 @@ and you can get the C<TxnData1> in
 
     my $rtn = $pxpay->result($ResponseCode);
     my $cart_id = $rtn->{TxnData1}
-
-=head1 AUTHOR
-
-Fayland Lam <fayland@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2011 by Fayland Lam.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut
-
-__END__

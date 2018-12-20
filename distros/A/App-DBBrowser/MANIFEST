@@ -6,6 +6,7 @@ lib/App/DBBrowser/Auxil.pm
 lib/App/DBBrowser/CreateTable.pm
 lib/App/DBBrowser/Credentials.pm
 lib/App/DBBrowser/DB.pm
+lib/App/DBBrowser/DB/MariaDB.pm
 lib/App/DBBrowser/DB/mysql.pm
 lib/App/DBBrowser/DB/Pg.pm
 lib/App/DBBrowser/DB/SQLite.pm

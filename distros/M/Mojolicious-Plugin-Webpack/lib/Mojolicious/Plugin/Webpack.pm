@@ -5,10 +5,12 @@ use Carp 'confess';
 use Mojo::File 'path';
 use Mojo::JSON;
 use Mojo::Path;
+use Mojo::Util;
 
-use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
+use constant DEBUG => $ENV{MOJO_WEBPACK_DEBUG} ? 1 : 0;
+use constant LAZY  => $ENV{MOJO_WEBPACK_LAZY}  ? 1 : 0;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub assets_dir { shift->{assets_dir} }
 
@@ -40,9 +42,17 @@ sub register {
   $self->{assets_dir} ||= path $app->home->rel_file('assets');
   $self->{out_dir} ||= $self->_build_out_dir($app);
 
+  $self->_migrate_from_assetpack;
   $self->dependencies->{$_} = $config->{dependencies}{$_} for keys %{$config->{dependencies} || {}};
-  $self->_webpack_run($app) if $ENV{MOJO_WEBPACK_ARGS} // 1;
+  $self->_webpack_run($app) if $ENV{MOJO_WEBPACK_RUN};
+  $self->_register_assets;
   $app->helper($helper => sub { $self->_helper(@_) });
+}
+
+sub url_for {
+  my ($self, $c, $name) = @_;
+  my $asset = $self->{assets}{$name} or confess qq(Unknown asset name "$name".);
+  return $c->url_for('webpack.asset', $asset->[1]);
 }
 
 sub _build_out_dir {
@@ -52,11 +62,16 @@ sub _build_out_dir {
   return path $app->static->paths->[0], @$path;
 }
 
+sub _custom_file {
+  return shift->assets_dir->child(sprintf 'webpack.%s.js', $ENV{WEBPACK_CUSTOM_NAME} || 'custom');
+}
+
 sub _helper {
   my ($self, $c, $name, @args) = @_;
   return $self if @_ == 2;
+  return $self->$name($c, @args) if $name =~ m!^\w+$!;
 
-  $self->_register_assets if !$self->{assets} or LAZY;    # Lazy read the generated markup
+  $self->_register_assets if LAZY;    # Lazy read the generated markup
   my $asset = $self->{assets}{$name} or confess qq(Unknown asset name "$name".);
   my ($tag_helper, $route_args) = @$asset;
   return $c->$tag_helper($c->url_for('webpack.asset', $route_args), @args);
@@ -74,13 +89,78 @@ sub _install_node_deps {
   for my $preset ('core', @{$self->{process}}) {
     for my $module (@{$self->dependencies->{$preset} || []}) {
       next if $package_json->{dependencies}{$module};
-      warn "[Webpack] npm install $module\n" if $ENV{MOJO_WEBPACK_DEBUG};
+      warn "[Webpack] npm install $module\n" if DEBUG;
       system npm => install => $module;
       $n++;
     }
   }
 
   return $n;
+}
+
+sub _migrate_from_assetpack {
+  my $self = shift;
+
+  my $assetpack_def = $self->assets_dir->child('assetpack.def');
+  return unless -e $assetpack_def;
+
+  my $webpack_custom = $self->_custom_file;
+  if (-s $webpack_custom) {
+    warn <<"HERE";
+[Webpack] Cannot migrate from AssetPack, since @{[$webpack_custom->basename]} exists.
+Please remove
+  $webpack_custom
+to migrate, or remove
+  $assetpack_def
+if you have migrated.
+HERE
+    return;
+  }
+
+  # Copy/paste from AssetPack.pm
+  my ($topic, %found);
+  for (split /\r?\n/, $assetpack_def->slurp) {
+    s/\s*\#.*//;
+    if (/^\<(\S*)\s+(\S+)\s*(.*)/) {
+      my ($class, $url, $args) = ($1, $2, $3);
+      $topic =~ s!\.\w+$!!;    # Remove extension
+      push @{$found{$topic}}, $url;
+    }
+    elsif (/^\!\s*(.+)/) { $topic = Mojo::Util::trim($1); }
+  }
+
+  my $entries = '';
+  for my $topic (sort keys %found) {
+    my $entry = $self->assets_dir->child("entry-$topic.js");
+    warn "[Webpack] Generate entrypoint: $entry\n";
+    $entry->spurt(join '', map {qq(import "./$_";\n)} @{$found{$topic}}) unless -e $entry;
+    $entries .= sprintf qq(    '%s': './%s/entry-%s.js',\n), $topic, $self->assets_dir->basename, $topic;
+  }
+
+  $entries =~ s!,\n$!!s;
+  warn "[Webpack] Generate webpack config: $webpack_custom\n";
+  $webpack_custom->spurt(<<"HERE");
+module.exports = function(config) {
+  config.entry = {
+$entries
+  };
+};
+HERE
+
+  warn <<"HERE";
+[Webpack] AssetPack .def file was migrated into webpack config file:
+
+$assetpack_def
+  => $webpack_custom
+
+You might want to remove old AssetPack files, such as:
+* @{[$self->assets_dir->child('assetpack.def')]}
+* @{[$self->assets_dir->child('assetpack.db')]}
+* @{[$self->assets_dir->child('cache')]}/*css
+* @{[$self->assets_dir->child('cache')]}/*js
+
+HERE
+
 }
 
 sub _render_to_file {
@@ -108,6 +188,13 @@ sub _register_assets {
   my $self           = shift;
   my $path_to_markup = $self->out_dir->child(sprintf 'webpack.%s.html',
     $ENV{WEBPACK_CUSTOM_NAME} || ($ENV{NODE_ENV} ne 'production' ? 'development' : 'production'));
+
+  unless (-e $path_to_markup) {
+    warn "[Webpack] Could not find $path_to_markup. Sure webpack has been run?"
+      if !$ENV{HARNESS_VERSION} or $ENV{HARNESS_IS_VERBOSE};
+    return,;
+  }
+
   my $markup  = Mojo::DOM->new($path_to_markup->slurp);
   my $name_re = qr{(.*)\.\w+\.(css|js)$}i;
 
@@ -127,31 +214,28 @@ sub _webpack_run {
 
   $self->_render_to_file($app, 'package.json');
   $self->_render_to_file($app, 'webpack.config.js');
-  $self->_render_to_file($app, 'webpack.custom.js',
-    $self->assets_dir->child(sprintf 'webpack.%s.js', $ENV{WEBPACK_CUSTOM_NAME} || 'custom'));
+  $self->_render_to_file($app, 'webpack.custom.js', $self->_custom_file);
   $self->_install_node_deps;
 
   my $env = $self->_webpack_environment;
-  map { warn "[Webpack] $_=$env->{$_}\n" } grep {/^WEBPACK_/} sort keys %$env if $ENV{MOJO_WEBPACK_DEBUG};
+  map { warn "[Webpack] $_=$env->{$_}\n" } grep {/^WEBPACK_/} sort keys %$env if DEBUG;
 
-  path($env->{WEBPACK_OUT_DIR})->make_path unless -e $env->{WEBPACK_OUT_DIR};
-  return $ENV{MOJO_WEBPACK_DEBUG} ? warn "[Webpack] Cannot write to $env->{WEBPACK_OUT_DIR}\n" : 1
-    unless -w $env->{WEBPACK_OUT_DIR};
+  path($env->{WEBPACK_OUT_DIR})->make_path unless -d $env->{WEBPACK_OUT_DIR};
+  return DEBUG ? warn "[Webpack] Cannot write to $env->{WEBPACK_OUT_DIR}\n" : 1 unless -w $env->{WEBPACK_OUT_DIR};
 
   my $config_file = $self->{files}{'webpack.config.js'}[1];
-  my @cmd = $ENV{MOJO_WEBPACK_BINARY} || path($config_file->dirname, qw(node_modules .bin webpack))->to_string;
+  my @cmd         = $ENV{MOJO_WEBPACK_BINARY} || path($config_file->dirname, qw(node_modules .bin webpack))->to_string;
+  my @extra       = split /\s+/, +($ENV{MOJO_WEBPACK_RUN} || '');
   push @cmd, '--config' => $config_file->to_string;
   push @cmd, '--progress', '--profile', '--verbose' if $ENV{MOJO_WEBPACK_VERBOSE};
-  push @cmd, split /\s+/, +($ENV{MOJO_WEBPACK_ARGS} || '');
-  warn "[Webpack] @cmd\n" if $ENV{MOJO_WEBPACK_DEBUG};
+  push @cmd, @extra unless @extra == 1 and $extra[0] eq '1';
+  warn "[Webpack] @cmd\n" if DEBUG;
 
   my $run_with = (grep {/--watch/} @cmd) ? 'exec' : 'system';
   my $CWD = Mojolicious::Plugin::Webpack::CWD->new($config_file->dirname);
+  local $!;    # Make sure only system/exec sets $!
   { local %ENV = %$env; $run_with eq 'exec' ? exec @cmd : system @cmd }
   die "[Webpack] $run_with @cmd: $!" if $!;
-
-  # Register generated assets if webpack was run with system above
-  $self->_register_assets;
 }
 
 sub _share_dir {
@@ -224,8 +308,8 @@ See L</register> for more config options.
 To include the generated assets in your template, you can use the L</asset>
 helper:
 
-  %= asset "my_app.css"
-  %= asset "my_app.js"
+  %= asset "myapp.css"
+  %= asset "myapp.js"
 
 =head2 Start application
 
@@ -234,7 +318,39 @@ server you want, but if you want rapid development you should use
 C<crushinator>, which is an alternative to C<morbo>:
 
   $ crushinator -h
-  $ crushinator ./my_app.pl
+  $ crushinator ./myapp.pl
+
+However if you want to use another daemon and make C<webpack> run, you need to
+set the C<MOJO_WEBPACK_RUN> environment variable to "1". Example:
+
+  MOJO_WEBPACK_RUN=1 ./myapp.pl daemon
+
+=head2 Testing
+
+If you want to make sure you have built all the assets, you can make a test
+file like "build-assets.t":
+
+  use Test::More;
+  use Test::Mojo;
+
+  # Run with TEST_BUILD_ASSETS=1 prove -vl t/build-assets.t
+  plan skip_all => "TEST_BUILD_ASSETS=1" unless $ENV{TEST_BUILD_ASSETS};
+
+  # Load the app and make a test object
+  $ENV{MOJO_MODE}        = 'production';
+  $ENV{MOJO_WEBPACK_RUN} = 1;
+  use FindBin;
+  require "$FindBin::Bin/../myapp.pl";
+  my $t = Test::Mojo->new;
+
+  # Find all the tags and make sure they can be loaded
+  $t->get_ok("/")->status_is(200);
+  $t->element_count_is('script[src], link[href][rel=stylesheet]', 2);
+  $t->tx->res->dom->find("script[src], link[href][rel=stylesheet]")->each(sub {
+    $t->get_ok($_->{href} || $_->{src})->status_is(200);
+  });
+
+  done_testing;
 
 =head1 DESCRIPTION
 
@@ -244,6 +360,19 @@ work with L<https://webpack.js.org/>.
 Note that L<Mojolicious::Plugin::Webpack> is currently EXPERIMENTAL, and
 changes might come without a warning.
 
+=head1 MIGRATING FROM ASSETPACK
+
+Are you already a user of L<Mojolicious::Plugin::AssetPack>?
+L<Mojolicious::Plugin::Webpack> will automatically detect your C<assetpack.def>
+file and convert it into a custom webpack config, so you don't have to do
+much, except changing how you load the plugin:
+
+  # AssetPack
+  $app->plugin(AssetPack => {pipes => [qw(Sass JavaScript)]});
+
+  # Webpack
+  $app->plugin(Webpack => {process => [qw(sass js)]});
+
 =head1 HELPERS
 
 =head2 asset
@@ -251,11 +380,16 @@ changes might come without a warning.
   warn $app->asset->out_dir;
   $c->asset("cool_beans.js", @args);
   %= asset "cool_beans.css", media => "print"
+  %= asset(url_for => "cool_beans.css")
+  %= asset->url_for($c, "cool_beans.css")
 
 This helper will return the plugin instance if no arguments is passed in, or a
 HTML tag created with either L<Mojolicious::Plugin::TagHelpers/javascript> or
 L<Mojolicious::Plugin::TagHelpers/stylesheet> if a valid asset name is passed
 in.
+
+You can also use it to call a method and pass on C<$c> by passing in a method
+name as the first argument, such as L</url_for>.
 
 =head1 ATTRIBUTES
 
@@ -324,6 +458,12 @@ Default: C<["js"]>.
 Set this to "0" if you do not want source maps generated.
 
 Default: enabled.
+
+=head2 url_for
+
+  $url = $self->url_for($c, $asset_name);
+
+Returns a L<Mojo::URL> for a given asset.
 
 =head1 AUTHOR
 

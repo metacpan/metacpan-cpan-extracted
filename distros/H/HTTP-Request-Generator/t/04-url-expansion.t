@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 11;
 use Data::Dumper;
 
 use HTTP::Request::Generator 'generate_requests';
@@ -22,7 +22,9 @@ sub expands_properly {
     my( $pattern, $expected, $name) = @_;
     $name ||= "$pattern expands properly";
 
-    is_deeply [sort {$a cmp $b} expand_url($pattern)], [sort @$expected], $name;
+    my $res = [sort {$a cmp $b} expand_url($pattern)];
+    is_deeply $res, [sort @$expected], $name
+        or diag Dumper $res;
 }
 
 expands_properly('https://example.com/{bar,baz}.html', [
@@ -33,12 +35,22 @@ expands_properly('http{s,}://example.com/', [
                  'http://example.com/',
                  'https://example.com/',
                  ], '{} keeps empty parts');
+{
+local $TODO = "Mixing host and path expansion needs rethinking";
 expands_properly('https://{example.com,localhost/foo}/{bar,baz}.html', [
                  'https://example.com/bar.html',
                  'https://example.com/baz.html',
                  'https://localhost/foo/bar.html',
                  'https://localhost/foo/baz.html',
                  ], "host parts don't get escaped");
+}
+expands_properly('https://{example.com,localhost}/{foo/bar,baz}.html', [
+                 'https://example.com/foo/bar.html',
+                 'https://example.com/baz.html',
+                 'https://localhost/foo/bar.html',
+                 'https://localhost/baz.html',
+                 ], "host parts don't get escaped");
+
 expands_properly('https://www[01..03].example.com',
                 ['https://www01.example.com',
                  'https://www02.example.com',
@@ -60,9 +72,17 @@ expands_properly('https://example.com/[a..b]/{index,error}.html', [
                  'https://example.com/b/index.html',
                  'https://example.com/b/error.html',
                  ], '[] and {} can be mixed');
+expands_properly('https://example.com:443/[a..b].html', [
+                 'https://example.com/a.html',
+                 'https://example.com/b.html',
+                 ], 'ports can be added but defaults get canonicalized');
+expands_properly('https://example.com:8443/[a..b].html', [
+                 'https://example.com:8443/a.html',
+                 'https://example.com:8443/b.html',
+                 ], 'ports can be added but non-defaults survive');
 
 my @urls = generate_requests(
-    pattern => '[0..11][0..11]',
+    pattern => '//f/[0..11][0..11]',
     limit   => 10,
 );
 is 0+@urls, 10, "We can limit the number of created items"

@@ -11,12 +11,12 @@ our @EXPORT_OK   = qw(colorize ansi_code csi_code);
 our @ISA         = qw(Getopt::EX::LabeledParam);
 
 use Carp;
-use Scalar::Util qw(blessed);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 
 use Getopt::EX::LabeledParam;
 use Getopt::EX::Util;
+use Getopt::EX::Func qw(callable);
 
 our $COLOR_RGB24 = 0;
 
@@ -285,7 +285,7 @@ sub cached_colorize {
 
 sub apply_color {
     my($cache, $color, $text) = @_;
-    if (blessed $color and $color->can('call')) {
+    if (callable $color) {
 	return $color->call for $text;
     }
     else {

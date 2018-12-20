@@ -3,7 +3,7 @@ use Exporter;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our @ISA = qw(Exporter);
 our @EXPORT = qw/
     DISPLAY_NONE DISPLAY_TERSE DISPLAY_GABBY

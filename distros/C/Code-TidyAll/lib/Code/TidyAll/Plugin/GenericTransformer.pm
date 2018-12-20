@@ -9,7 +9,7 @@ extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::GenericExecutable';
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 sub transform_file {
     my $self = shift;
@@ -38,13 +38,14 @@ transformer
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 
     # In your tidyall config
     [GenericTransformer / JSONOrderedTidy]
     cmd = json-ordered-tidy
+    argv = -stdout
     ok_exit_codes = 0 1
 
 =head1 DESCRIPTION

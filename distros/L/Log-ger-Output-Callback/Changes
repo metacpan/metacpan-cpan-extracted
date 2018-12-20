@@ -1,3 +1,10 @@
+0.004   2018-12-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add some description.
+
+
 0.003   2017-08-05 (PERLANCAR)
 
 	- Adjust test to Log::ger 0.023 [RT#122712].

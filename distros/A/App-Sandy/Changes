@@ -1,5 +1,11 @@
 Revision history for App-Sandy
 
+0.22      2018-12-20 16:18:05-02:00 America/Sao_Paulo
+
+	- Change docker repository to the namespace galantelab
+	- Change genome command option '--structural-variation'
+	  to '--genomic-variation'
+
 0.21      2018-09-18 20:07:39-03:00 America/Sao_Paulo
 
 	- Set expression-matrix as optional
@@ -8,6 +14,12 @@ Revision history for App-Sandy
 	  and transcriptome (abundance)
 	- Add compression level option
 	- Set minimum perl version to 5.014
+
+0.20      2018-09-14 01:49:09-03:00 America/Sao_Paulo
+
+	- Add .travis.yml
+	- Fix count file names
+	- Testing compression level option
 
 0.19      2018-08-10 21:10:27-03:00 America/Sao_Paulo
 

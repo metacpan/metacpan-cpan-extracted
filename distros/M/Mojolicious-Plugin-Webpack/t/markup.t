@@ -2,7 +2,7 @@ use lib '.';
 use t::Helper;
 
 my $cwd = t::Helper->cwd;
-my $t   = t::Helper->t(args => '');
+my $t   = t::Helper->t;
 my $c   = $t->app->build_controller;
 
 test_tag('foo.js', 'script', src => '/asset/foo.123.js');
@@ -10,6 +10,12 @@ test_tag('foo.css', 'link', href => '/asset/foo.456.css', rel => 'stylesheet');
 
 eval { $c->asset('bar.js') };
 like $@, qr{Unknown asset name "bar\.js"}, 'asset bar.js';
+
+eval { $c->asset->url_for($c, 'bar.js') };
+like $@, qr{Unknown asset name "bar\.js"}, 'url_for bar.js';
+
+is $c->asset->url_for($c, 'foo.css'), '/asset/foo.456.css', 'url_for foo.css';
+is $c->asset->url_for($c, 'foo.css'), $c->asset(url_for => 'foo.css'), 'can pass in method names';
 
 done_testing;
 

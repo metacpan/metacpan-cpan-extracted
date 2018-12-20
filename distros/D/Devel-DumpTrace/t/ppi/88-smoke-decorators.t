@@ -9,16 +9,16 @@ BEGIN {
 use strict;
 use warnings;
 
-# check output of Devel::DumpTrace module, compare with reference output.
-# run code that uses a core module, and see if we are doing what
-# we are supposed to about tracing through that core module
+# exercise tracing through flow-control structures that
+# the Devel::DumpTrace::PPI will "decorate", and verify
+# that the right decorations appear in the trace output.
 
-my $dmodule = "-d:DumpTrace::PPI";
+my $dmodule = "-d:DumpTrace::PPI=normal";
 
 open T, '>', "$0.pl";
 print T <<'EO_T;';
 
-# test program for t/ppi/88-smoke.t
+# test program for t/ppi/88-smoke-decorators.t
 # that contains a C-style for loop,
 # a while loop, an until loop, and a
 # complex if-elsif-else block.
@@ -30,8 +30,7 @@ for (my $i=1; $i<5; $i++) {
     } elsif ($i > 3) {
         $j = 0;
 	do {
-	   $k += 2 * $j;
-	   $j++;
+	   $k += 2 * $j++;
         } until $k > $j;
     } elsif ($i == 2) {
 	until ($j > 50) {
@@ -239,7 +238,7 @@ ok(@else_and_elseif_with_fileline_info ==
 ################# do-while / do-until ####################
 
 my @do_whileuntil_lines = grep {
-  $xh[$_] =~ /DO-[A-Z]{5}/
+    $xh[$_] =~ /DO-[A-Z]{5}/
 } 0..$#xh;
 my @do_whileuntil_lines_with_fileinfo = grep {
     $xh[$_] =~ /$0.pl:\d+:/
@@ -254,10 +253,10 @@ ok(@do_whileuntil_lines > 0,
    "output has DO-WHILE/DO-UNTIL decorators") or $keep++;
 ok(@do_whileuntil_lines_with_fileinfo == 0,
    "lines with DO-WHILE/DO-UNTIL do not have file & line info")
-   or $keep++;
+    or $keep++;
 ok(@precede_dowhile_lines_with_fileinfo == @do_whileuntil_lines,
    "lines that precede DO-WHILE/DO-UNTIL have file & line info")
-   or $keep++;
+    or $keep++;
 ok(@do == 1 && $do[0] < $do_whileuntil_lines[0],
    "'do' statement appears first")
   or $keep++;

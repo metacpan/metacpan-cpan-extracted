@@ -13,7 +13,7 @@ Protocol::DBus::Client
 
     my $dbus = Protocol::DBus::Client::system();
 
-    $dbus->do_authn();
+    $dbus->initialize();
 
 =head1 DESCRIPTION
 
@@ -48,9 +48,9 @@ methods.
 =cut
 
 sub system {
-    my $addr = Protocol::DBus::Path::system_message_bus();
+    my @addrs = Protocol::DBus::Path::system_message_bus();
 
-    return _create_local($addr);
+    return _create_local(@addrs);
 }
 
 =head2 login_session()
@@ -60,11 +60,13 @@ Like C<system()> but for the login session’s message bus.
 =cut
 
 sub login_session {
-    my $addr = Protocol::DBus::Path::login_session_message_bus() or do {
-        die "Failed to identify login system message bus!";
-    };
+    my @addrs = Protocol::DBus::Path::login_session_message_bus();
 
-    return _create_local($addr);
+    if (!@addrs) {
+        die "Failed to identify login system message bus!";
+    }
+
+    return _create_local(@addrs);
 }
 
 sub _create_local {
@@ -81,14 +83,20 @@ sub _create_local {
 
 =head1 METHODS
 
-=head2 $done_yn = I<OBJ>->do_authn()
+=head2 $done_yn = I<OBJ>->initialize()
 
-This returns truthy once the authn is complete and falsy until then.
-In blocking I/O contexts the call will block until authn is complete.
+This returns truthy once the connection is ready to use and falsy until then.
+In blocking I/O contexts the call will block.
+
+Note that this includes the initial C<Hello> message and its response.
+
+Previously this function was called C<do_authn()> and did not wait for
+the C<Hello> message’s response. The older name is retained
+as an alias for backward compatibility.
 
 =cut
 
-sub do_authn {
+sub initialize {
     my ($self) = @_;
 
     if ($self->{'_authn'}->go()) {
@@ -104,26 +112,51 @@ sub do_authn {
             );
         };
 
-        return 1;
+        if (!$self->{'_connection_name'}) {
+          GET_MESSAGE: {
+                if (my $msg = $self->SUPER::get_message()) {
+                    return 1 if $self->{'_connection_name'};
+
+                    push @{ $self->{'_pending_received_messages'} }, $msg;
+
+                    redo GET_MESSAGE;
+                }
+            }
+        }
     }
 
     return 0;
 }
 
+*do_authn = \*initialize;
+
 #----------------------------------------------------------------------
 
-=head2 $yn = I<OBJ>->authn_pending_send()
+=head2 $yn = I<OBJ>->init_pending_send()
 
-This indicates whether there is data queued up to send for the authn.
+This indicates whether there is data queued up to send for the initialization.
 Only useful with non-blocking I/O.
+
+This function was previously called C<authn_pending_send()>; the former
+name is retained for backward compatibility.
 
 =cut
 
-sub authn_pending_send {
+sub init_pending_send {
     my ($self) = @_;
+
+    if ($self->{'_connection_name'}) {
+        die "Don’t call this after initialize() is done!";
+    }
+
+    if ($self->{'_sent_hello'}) {
+        return $self->pending_send();
+    }
 
     return $self->{'_authn'}->pending_send();
 }
+
+*authn_pending_send = \*init_pending_send;
 
 #----------------------------------------------------------------------
 
@@ -149,21 +182,23 @@ its response are abstracted
 =cut
 
 sub get_message {
-    if ( my $msg = $_[0]->SUPER::get_message() ) {
+    my ($self) = @_;
 
-        no warnings 'redefine';
-        *get_message = Protocol::DBus::Peer->can('get_message');
+    die "initialize() is not finished!" if !$self->{'_connection_name'};
 
-        return $_[0]->get_message();
+    if ($self->{'_pending_received_messages'} && @{ $self->{'_pending_received_messages'} }) {
+        return shift @{ $self->{'_pending_received_messages'} };
     }
 
-    return undef;
+    no warnings 'redefine';
+    *get_message = Protocol::DBus::Peer->can('get_message');
+
+    return $_[0]->get_message();
 }
 
 =head2 $name = I<OBJ>->get_connection_name()
 
-Returns the name of the connection. This must only be called after at least
-one message is received; if it is called before then, an exception is thrown.
+Returns the name of the connection.
 
 =cut
 
@@ -171,7 +206,7 @@ sub get_connection_name {
     return $_[0]->{'_connection_name'} || die 'No connection name known yet!';
 }
 
-# undocumented
+# undocumented for now
 sub new {
     my ($class, %opts) = @_;
 
@@ -180,9 +215,9 @@ sub new {
         mechanism => $opts{'authn_mechanism'},
     );
 
-    my $self = bless { _socket => $opts{'socket'}, _authn => $authn }, $class;
+    my $self = $class->SUPER::new( $opts{'socket'} );
 
-    $self->_set_up_peer_io( $opts{'socket'} );
+    $self->{'_authn'} = $authn;
 
     return $self;
 }

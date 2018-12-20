@@ -15,9 +15,7 @@ BEGIN { use_ok('Ceph::Rados') };
 my $fail = 0;
 foreach my $constname (qw(
         CEPH_OSD_TMAP_CREATE CEPH_OSD_TMAP_HDR CEPH_OSD_TMAP_RM CEPH_OSD_TMAP_SET
-        LIBRADOS_CREATE_EXCLUSIVE LIBRADOS_CREATE_IDEMPOTENT
-        LIBRADOS_LOCK_FLAG_RENEW LIBRADOS_SNAP_DIR
-        LIBRADOS_SNAP_HEAD LIBRADOS_SUPPORTS_WATCH LIBRADOS_VERSION_CODE
+         LIBRADOS_SUPPORTS_WATCH LIBRADOS_VERSION_CODE
         LIBRADOS_VER_EXTRA LIBRADOS_VER_MAJOR LIBRADOS_VER_MINOR)) {
     next if (eval "my \$a = Ceph::Rados::$constname(); 1");
     if ($@ =~ /^Your vendor has not defined Ceph::Rados macro $constname/) {

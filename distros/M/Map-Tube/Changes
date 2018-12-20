@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.58  2018-12-20T11:00:00+00:00
+      - Used Test::Exception catching error.
+
 3.57  2018-09-27T17:00:00+00:00
       - Updated method is_valid_color() in the package Map::Tube::Utils to
         return hexcode if it is valid color.

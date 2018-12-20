@@ -32,6 +32,7 @@
             "Exporter" : "0",
             "ExtUtils::MakeMaker" : "6.56",
             "Getopt::Long" : "0",
+            "local::lib" : "0",
             "parent" : "0"
          }
       },
@@ -42,18 +43,19 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.56",
             "File::Spec" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "Test::Output" : "0"
          }
       }
    },
    "provides" : {
       "Module::Version" : {
          "file" : "lib/Module/Version.pm",
-         "version" : "0.13"
+         "version" : "0.200"
       },
       "Module::Version::App" : {
          "file" : "lib/Module/Version/App.pm",
-         "version" : "0.13"
+         "version" : "0.200"
       }
    },
    "release_status" : "stable",
@@ -64,7 +66,7 @@
          "web" : "https://github.com/xsawyerx/module-version"
       }
    },
-   "version" : "0.13",
+   "version" : "0.200",
    "x_authority" : "cpan:XSAWYERX",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }

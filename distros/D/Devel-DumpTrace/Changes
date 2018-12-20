@@ -1,6 +1,10 @@
 Revision history for Devel-DumpTrace
 
-0.27	2018-07-24
+0.28    2018-12-19
+	Fix issue with PPI and naked top-level blocks.
+	Overcome limitation of $30 regex matches.
+
+0.27    2018-07-24
 	Output condition that exits a for or while loop
 	Support for v5.8.1
 

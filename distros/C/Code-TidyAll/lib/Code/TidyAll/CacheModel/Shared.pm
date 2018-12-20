@@ -7,7 +7,7 @@ use Moo;
 
 extends 'Code::TidyAll::CacheModel';
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 sub _build_cache_key {
     my $self = shift;
@@ -43,7 +43,7 @@ Code::TidyAll::CacheModel::Shared - Shared cache model for Code::TidyAll
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.13.0 2018-12-20T07:52:59Z
+
+    - Introduce `callable' method in Func.pm.
+
 v1.12.0 2018-12-19T04:58:28Z
 
     - Introduce Getopt::EX::Numbers module.

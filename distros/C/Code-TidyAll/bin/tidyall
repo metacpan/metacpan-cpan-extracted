@@ -7,9 +7,9 @@ use Getopt::Long;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
-my $usage = '
+my $usage = <<'EOF';
 Usage: tidyall [options] [file] ...
 See https://metacpan.org/module/tidyall for full documentation.
 
@@ -17,31 +17,32 @@ Options:
    -a, --all                Process all files in project
    -i, --ignore             Ignore matching files (zglob syntax)
    -g, --git                Process all added/modified files according to git
-   -h, --help               Print help message
    -l, --list               List each file along with the plugins it matches
    -m, --mode               Mode (e.g. "editor", "commit") - affects which plugins run
    -p <path>, --pipe <path> Read from STDIN, output to STDOUT/STDERR
    -r, --recursive          Descend recursively into directories listed on command line
+   -j, --jobs               Number of parallel jobs to run - default is 1
    -s, --svn                Process all added/modified files according to svn
    -q, --quiet              Suppress output except for errors
    -v, --verbose            Show extra output
    -I I<path1,path2,...>    Add one or more paths to @INC
    --backup-ttl <duration>  Amount of time before backup files can be purged
-   --check-only             Just check each file, don\'t modify
+   --check-only             Just check each file, don't modify
    --plugins <name>         Explicitly run only the given plugins
    --conf-file <path>       Relative or absolute path to conf file
    --conf-name <name>       Conf file name to search for
    --data-dir <path>        Contains metadata, defaults to root/.tidyall.d
    --iterations <count>     Number of times to repeat each transform - default is 1
-   --no-backups             Don\'t back up files before processing
-   --no-cache               Don\'t cache last processed times
-   --no-cleanup             Don\'t clean up the temporary files
+   --no-backups             Don't back up files before processing
+   --no-cache               Don't cache last processed times
+   --no-cleanup             Don't clean up the temporary files
    --output-suffix <suffix> Suffix to add to tidied file
    --refresh-cache          Erase any existing cache info before processing each file
    --root-dir               Specify root directory explicitly
    --tidyall-class <class>  Subclass to use instead of Code::TidyAll
    --version                Show version
-';
+   -h, --help               Print help message
+EOF
 
 sub version {
     my $version = $Code::TidyAll::VERSION || 'unknown';
@@ -55,30 +56,25 @@ sub usage {
 }
 
 my (
-    %params, $all_files, $conf_file, $conf_name, $git_files,
-    $help,   $inc_dirs,  $pipe,      $svn_files, $version
+    %params,
+    $all_files,
+    $git_files,
+    $pipe,
+    $svn_files,
+    $conf_file,
+    $conf_name,
+    $iterations,
+    $inc_dirs,
+    $version,
+    $help,
 );
+
 my @conf_names = Code::TidyAll->default_conf_names;
 
 GetOptions(
-    'backup-ttl=i'    => \$params{backup_ttl},
-    'check-only'      => \$params{check_only},
-    'conf-file=s'     => \$conf_file,
-    'conf-name=s'     => \$conf_name,
-    'data-dir=s'      => \$params{data_dir},
-    'no-backups'      => \$params{no_backups},
-    'no-cache'        => \$params{no_cache},
-    'no-cleanup'      => \$params{no_cleanup},
-    'output-suffix=s' => \$params{output_suffix},
-    'plugins=s@'      => \$params{selected_plugins},
-    'refresh-cache'   => \$params{refresh_cache},
-    'root-dir=s'      => \$params{root_dir},
-    'tidyall-class=s' => \$params{tidyall_class},
-    'version'         => \$version,
     'a|all'           => \$all_files,
     'i|ignore=s@'     => \$params{ignore},
     'g|git'           => \$git_files,
-    'h|help'          => \$help,
     'l|list'          => \$params{list_only},
     'm|mode=s'        => \$params{mode},
     'p|pipe=s'        => \$pipe,
@@ -88,6 +84,22 @@ GetOptions(
     'q|quiet'         => \$params{quiet},
     'v|verbose'       => \$params{verbose},
     'I=s'             => \$inc_dirs,
+    'backup-ttl=i'    => \$params{backup_ttl},
+    'check-only'      => \$params{check_only},
+    'plugins=s@'      => \$params{selected_plugins},
+    'conf-file=s'     => \$conf_file,
+    'conf-name=s'     => \$conf_name,
+    'data-dir=s'      => \$params{data_dir},
+    'iterations=i'    => \$iterations,
+    'no-backups'      => \$params{no_backups},
+    'no-cache'        => \$params{no_cache},
+    'no-cleanup'      => \$params{no_cleanup},
+    'output-suffix=s' => \$params{output_suffix},
+    'refresh-cache'   => \$params{refresh_cache},
+    'root-dir=s'      => \$params{root_dir},
+    'tidyall-class=s' => \$params{tidyall_class},
+    'version'         => \$version,
+    'h|help'          => \$help,
 ) or usage();
 version() if $version;
 usage()   if $help;
@@ -99,6 +111,7 @@ unshift( @INC, split( /\s*,\s*/, $inc_dirs ) ) if defined($inc_dirs);
 for my $key (qw( data_dir root_dir )) {
     $params{$key} = path( $params{$key} ) if exists $params{$key};
 }
+$params{iterations} = $iterations if $iterations;
 
 ($conf_file) = ( grep { $_->is_file } map { $params{root_dir}->child($_) } @conf_names )
     if $params{root_dir} && !$conf_file;
@@ -139,7 +152,7 @@ else {
 }
 
 my @results = $ct->process_paths(@paths);
-my $status = ( grep { $_->error } @results ) ? 1 : 0;
+my $status  = ( grep { $_->error } @results ) ? 1 : 0;
 exit($status);
 
 sub handle_pipe {
@@ -149,7 +162,7 @@ sub handle_pipe {
     $params{$_} = 0 for ('verbose');
 
     $conf_file ||= $tidyall_class->find_conf_file( \@conf_names, $pipe_filename->parent );
-    my $ct = $tidyall_class->new_from_conf_file( $conf_file, %params );
+    my $ct     = $tidyall_class->new_from_conf_file( $conf_file, %params );
     my $source = do { local $/; <STDIN> };
 
     # Merge stdout and stderr and output all to stderr, so that stdout is
@@ -515,10 +528,6 @@ than once.
 
 Process all added or modified files in the current git working directory.
 
-=item -h, --help
-
-Print help message
-
 =item -l, --list
 
 List each file along with the list of plugins it matches (files without any
@@ -563,6 +572,12 @@ Recursively enter any directories listed on the command-line and process all
 the files within. By default, directories encountered on the command-line will
 generate a warning.
 
+=item -j, --jobs
+
+Specify how many jobs should run in parallel. By default, we only run 1, but if
+you have multiple cores this should cause tidyall to run faster, especially on
+larger code bases.
+
 =item -s, --svn
 
 Process all added or modified files in the current svn working directory.
@@ -593,6 +608,16 @@ tidied version is equal to its current version) and consider it an error if
 not. This is used by L<Test::Code::TidyAll> and the
 L<svn|Code::TidyAll::SVN::Precommit> and L<git|Code::TidyAll::Git::Precommit>
 pre-commit hooks, for example, to enforce that you've tidied your files.
+
+=item --plugins I<name>
+
+Only run the specified plugins. The name should match the name given in the
+config file exactly, including a leading "+" if one exists.
+
+This overrides the C<--mode> option.
+
+Note that plugins will still only run on files which match their C<select> and
+C<ignore> configuration.
 
 =item --conf-file I<path>
 
@@ -632,15 +657,9 @@ Don't backup files before processing.
 Don't cache last processed times; process all files every time. See also
 C<--refresh-cache>.
 
-=item --plugins I<name>
+=item --no-cleanup
 
-Only run the specified plugins. The name should match the name given in the
-config file exactly, including a leading "+" if one exists.
-
-This overrides the C<--mode> option.
-
-Note that plugins will still only run on files which match their C<select> and
-C<ignore> configuration.
+Don't clean up temporary files.
 
 =item --output-suffix I<suffix>
 
@@ -660,6 +679,14 @@ files or the current working directory.
 =item --tidyall-class I<class>
 
 Subclass to use instead of C<Code::TidyAll>.
+
+=item --version
+
+Show the version of L<Code::TidyAll> that this script invokes.
+
+=item -h, --help
+
+Print help message
 
 =back
 

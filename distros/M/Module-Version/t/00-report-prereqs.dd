@@ -17,6 +17,7 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'ExtUtils::MakeMaker' => '6.56',
                                       'Getopt::Long' => '0',
+                                      'local::lib' => '0',
                                       'parent' => '0'
                                     }
                     },
@@ -27,7 +28,8 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '6.56',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'Test::Output' => '0'
                                  }
                  }
      };

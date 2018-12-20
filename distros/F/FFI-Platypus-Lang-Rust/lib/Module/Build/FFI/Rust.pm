@@ -9,7 +9,7 @@ use File::chdir;
 use File::Copy qw( copy );
 use base qw( Module::Build::FFI );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -124,7 +124,19 @@ sub ffi_build_dynamic_lib
       exit 2 if $?;
     };
     
-    my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
+    # Note: $Config{dlext} is frequently the right extension to look for,
+    # some platforms however have exceptions.
+    my $dlext = $Config{dlext};
+    # On OS X rust produces a dynamic library, but Perl extensions are
+    # built as bundles.  Platypus can work with either and doesn't care
+    # about the extension, so we install the dylib as a bundle.
+    if($^O eq 'darwin')
+    { $dlext = 'dylib' }
+    # On Strawberry Perl of recent vintage they use .xs.dll as the dynamic
+    # library extension.
+    elsif($^O eq 'MSWin32')
+    { $dlext = 'dll' }
+
     my($build_dll) = bsd_glob("$src_dir/target/release/*.$dlext");
     copy($build_dll, $dll) || do {
       print STDERR "copy failed for\n";
@@ -213,7 +225,10 @@ sub ACTION_test
 
 =head1 EXAMPLES
 
-TODO
+For a complete example working example, see this module which calculates
+fibonacci numbers using Rust.
+
+L<https://github.com/plicease/Fibonacci-FFI>
 
 =head1 SUPPORT
 

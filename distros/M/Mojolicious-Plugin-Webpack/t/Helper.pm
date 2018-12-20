@@ -11,8 +11,8 @@ our ($CLEANUP, $OLD_DIR, $WORK_DIR) = (0, path, path);
 sub t {
   my ($class, %config) = @_;
   my $app = Mojolicious->new;
-  $ENV{MOJO_WEBPACK_ARGS} = delete $config{args} if defined $config{args};
-  $ENV{WEBPACK_CUSTOM_NAME} = path($0)->basename('.t');
+  $ENV{WEBPACK_CUSTOM_NAME} //= path($0)->basename('.t');
+  unlink path("public", "asset", "webpack.$ENV{WEBPACK_CUSTOM_NAME}.html") if $config{process};
   $app->plugin(Webpack => \%config);
   return Test::Mojo->new($app);
 }

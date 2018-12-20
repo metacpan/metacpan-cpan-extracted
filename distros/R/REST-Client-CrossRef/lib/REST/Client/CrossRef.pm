@@ -17,11 +17,11 @@ REST::Client::CrossRef - Read data from CrossRef using its REST API
 
 =cut
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 VERSION
 
-Version 0.002
+Version 0.003
 
 =cut
 
@@ -1033,27 +1033,48 @@ sub _unfold_array {
 
     $self->log->debug( "_unfold array1 key: ", $key );
     if ( $key eq "author" ) {
+        my @first;
+        my @groups;
         my $first;
         my @all;
         for my $aut (@$ar) {
             if ( $aut->{sequence} eq 'first' ) {
+                if ($aut->{family}) {
                 $first =
-                      $aut->{family}
+                      "\n". $aut->{family}
                     . ( defined $aut->{given} ? ", " . $aut->{given} : " " )
                     . $self->_unfold_affiliation( $aut->{affiliation} );
+                    push @first, $first;
+                } 
+                elsif ($aut->{name}) {
+                     $first = "\n" . $aut->{name}
+                    . $self->_unfold_affiliation( $aut->{affiliation} );
+                    push @groups, $first;
+
+                }
+             
 
             }
             else {
-#push @all, "\n" . $a->{family} . ", "  . $a->{given} . $self->_unfold_affiliation( $a->{affiliation} );
+                if ($aut->{family}) {
                 push @all,
                       "\n"
                     . $aut->{family}
                     . ( defined $aut->{given} ? ", " . $aut->{given} : " " )
                     . $self->_unfold_affiliation( $aut->{affiliation} );
+                }
+                elsif ($aut->{name}) {
+                    push @groups, "\n" . $aut->{name}
+                    . $self->_unfold_affiliation( $aut->{affiliation} );
+
+                }
             }
 
         }
-        unshift @all, $first;
+        # die Dumper(@groups);
+        unshift @all, @first;
+        unshift @all, @groups;
+        #print Dumper(@all);
         $res_hr->{$key} = join( "", @all );
 
     }

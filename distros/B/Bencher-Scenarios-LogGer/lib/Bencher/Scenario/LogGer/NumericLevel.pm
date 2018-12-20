@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::NumericLevel;
 
-our $DATE = '2017-08-04'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2018-12-20'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ Bencher::Scenario::LogGer::NumericLevel - Benchmark numeric_level()
 
 =head1 VERSION
 
-This document describes version 0.012 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-08-04.
+This document describes version 0.014 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2018-12-20.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Util> 0.023
+L<Log::ger::Util> 0.025
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -85,7 +85,7 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::NumericLevel >>):
 
@@ -93,20 +93,20 @@ Benchmark with default options (C<< bencher -m LogGer::NumericLevel >>):
  +---------+-----------+-----------+------------+---------+---------+
  | dataset | rate (/s) | time (ns) | vs_slowest |  errors | samples |
  +---------+-----------+-----------+------------+---------+---------+
- | warn    |   2290000 |       436 |       1    | 5.8e-11 |      20 |
- | 10      |   2480000 |       404 |       1.08 | 2.5e-10 |      22 |
+ | warn    |   2110000 |       475 |       1    | 1.5e-10 |      20 |
+ | 10      |   2500000 |       401 |       1.18 | 2.6e-10 |      20 |
  +---------+-----------+-----------+------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m LogGer::NumericLevel --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Util      | 0.56                         | 4                  | 20             |      12   |                    6.2 |        1   | 2.8e-05 |      20 |
- | perl -e1 (baseline) | 1.3                          | 4.7                | 20             |       5.8 |                    0   |        2.1 | 4.7e-05 |      22 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | Log::ger::Util      |      12   |                    6.4 |        1   | 5.1e-05 |      20 |
+ | perl -e1 (baseline) |       5.6 |                    0   |        2.1 | 3.2e-05 |      20 |
+ +---------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -133,7 +133,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

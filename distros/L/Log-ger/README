@@ -2,7 +2,7 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.023
+    version 0.025
 
 SYNOPSIS
     In your module (producer):
@@ -46,13 +46,22 @@ DESCRIPTION
         Low startup overhead. Only ~0.5-1ms. For comparison, strict
         ~0.2-0.5ms, warnings ~2ms, Log::Any 0.15 ~2-3ms, Log::Any 1.049
         ~8-10ms, Log::Log4perl ~35ms. This is measured on a 2014-2015 PC and
-        before doing any output configuration. For more benchmarks, see
-        Bencher::Scenarios::LogGer or try yourself e.g. with bencher-code:
+        before doing any output configuration. I strive to make "use
+        Log::ger;" statement to be roughly as light as "use strict;" or "use
+        warnings;" so the impact of adding the statement is really minimal
+        and you can just add logging without much thought to most of your
+        modules. This is important to me because I want logging to be
+        pervasive.
+
+        To test for yourself, try e.g. with bencher-code:
 
          % bencher-code 'use Log::ger' 'use Log::Any' --startup
 
         Fast. Low null-/stealth-logging overhead, about 1.5x faster than
-        Log::Any, 3x faster than Log4perl, and 5x faster than Log::Fast.
+        Log::Any, 3x faster than Log4perl, 5x faster than Log::Fast, ~40x
+        faster than Log::Contextual, and ~100x faster than Log::Dispatch.
+
+        For more benchmarks, see Bencher::Scenarios::LogGer.
 
         Conditional compilation. There is a plugin to optimize away unneeded
         logging statements, like assertion/conditional compilation, so they
@@ -99,11 +108,14 @@ SEE ALSO
     Some other popular logging frameworks: Log::Any, Log::Contextual,
     Log::Log4perl, Log::Dispatch, Log::Dispatchouli.
 
+    If you still prefer debugging using the good old "print()", there's
+    Debug::Print.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

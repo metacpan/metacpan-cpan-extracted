@@ -34,17 +34,19 @@
          "requires" : {
             "File::Basename" : "0",
             "File::Copy" : "0",
+            "File::Spec" : "0",
             "IO::Socket::INET" : "0",
             "IO::Socket::SSL" : "1.26",
             "Net::HTTPTunnel" : "0.5",
             "Net::SSLeay" : "0",
             "Net::SSLeay::Handle" : "0",
             "Sys::Hostname" : "0",
+            "Test::More" : "0.88",
             "Time::Local" : "0",
             "perl" : "5.006001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.40"
+   "version" : "0.41"
 }

@@ -9,7 +9,7 @@ extends 'Code::TidyAll::Plugin';
 
 with 'Code::TidyAll::Role::GenericExecutable';
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 sub validate_file {
     my $self = shift;
@@ -37,13 +37,14 @@ validator
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 
     # In your tidyall config
     [GenericValidator / JSONOrderedTidy]
     cmd = json-ordered-tidy
+    argv = -check
     ok_exit_codes = 0 1
 
 =head1 DESCRIPTION

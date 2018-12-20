@@ -36,7 +36,9 @@ if (which('gcc') and -e '/dev/null') {
     my $output = `echo '#include <rados/librados.h>' | cpp -H -o /dev/null 2>&1 | head -n1`;
     my ($path) = ($output =~ m!^\. (.*)$!);
     my @constants = extract_constants_from( $path );
-    @constants = grep { $_ ne 'CEPH_LIBRADOS_H' and $_ ne 'CEPH_RADOS_API' } @constants;
+    @constants = grep { $_ ne 'CEPH_LIBRADOS_H' and
+                        $_ ne 'CEPH_RADOS_API' and
+                        $_ ne 'VOIDPTR_RADOS_T'} @constants;
     # suppress help to STDERR
     open SAVERR, ">&STDERR";
     open STDERR, ">/dev/null";

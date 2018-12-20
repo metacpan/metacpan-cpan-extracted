@@ -25,7 +25,7 @@ use Plack::Util::Accessor qw(
     encoder
 );
 
-our $VERSION = '0.79';
+our $VERSION = '0.80';
 
 sub new {
     my ($class, %args) = @_;
@@ -206,7 +206,7 @@ sub psgi {
 
         1;
     } or do {
-        my $e = longmess($@);
+        my ($e) = longmess($@);
         $self->log(error => $e);
 
         my $msg = $ENV{PLACK_ENV}

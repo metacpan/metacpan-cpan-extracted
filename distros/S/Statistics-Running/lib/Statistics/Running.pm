@@ -4,7 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+use Data::Dumper;
+
+our $VERSION = '0.12';
 
 # overload these operators to have special meaning when
 # operand(s) are Statistics::Running:
@@ -18,9 +20,9 @@ use overload
 ;
 
 use Try::Tiny;
-
 use Statistics::Histogram;
 
+# this is for all numerical equality comparisons
 use constant SMALL_NUMBER_FOR_EQUALITY => 1E-10;
 
 # creates an obj. There are no input params
@@ -48,12 +50,18 @@ sub     new {
 			'num-bins' => -1,
 			'bins' => {
 				# b: [histo-left-boundary, bin1_right_boundary, bin2_right_boundary, ... binN-1_right_boundary, histo-right-boundary]
-				'b' => [], # length N+1
+				'b' => [], # length is 'num-bins'+1
 				# c: contains the counts, its size is equal to the number of bins
 				# the first cell contains counts in the interval [histo-left-boundary, bin1_right_boundary]
 				# the last cell contains counts of [binN-1_right_boundary, histo-right-boundary]
-				'c' => [], # length N
-			}
+				'c' => [], # length 'num-bins'
+			},
+			# cached stringified histogram, it is re-calculated only if data points added
+			# and asked to print histogram
+			'stringified' => undef,
+			# when asked to stringify a hist we actually use a cached string
+			# which needs to be recalculated whenever data is added or hist re-created
+			'needs-recalculate' => 1,
 		},
 	};
 	bless($self, $class);
@@ -94,23 +102,51 @@ sub     histogram_bins_stathash {
 # we first convert our hist to stathash format
 sub     histogram_stringify {
 	my ($self, @opts) = @_;
+	if( $self->{'histo'}->{'needs-recalculate'} == 1 ){ $self->_histogram_recalculate(@opts) }
+	return $self->{'histo'}->{'stringified'}
+}
+# we need to recalculate each time a new data is added.
+# but we do recalculate whenever it is needed, i.e. when we asked to print histogram
+sub	_histogram_recalculate {
+	my ($self, @stringify_opts) = @_;
 	my $histstr = "<no-bins>";
 	if( $self->{'histo'}->{'num-bins'} > 0 ){
 		Try::Tiny::try {
 			$histstr = Statistics::Histogram::print_histogram(
 				'hist' => $self->_bins2stathash(),
 				'x_min' => $self->{'histo'}->{'bins'}->{'b'}->[0],
-				@opts
+				use_linear_axes => 1,
+				@stringify_opts
 			)
 		} Try::Tiny::catch {
-			print STDERR "histogram_stringify() : error caught trying to stringify: $_\n";
+			print STDERR "_histogram_recalculate() : error caught trying to stringify: $_\n";
 			$histstr = "<no-bins>";
-		}
+		};
 	}
-	return $histstr
+	$self->{'histo'}->{'stringified'} = $histstr;
+	$self->{'histo'}->{'needs-recalculate'} = 0;
 }
-# set existing histogram to zero counts OR re-create histogram arrays with different bins
-sub     histogram_reset {
+# disable histogram logging, all existing histogram data is erased
+sub	histogram_disable {
+	my $self = $_[0];
+
+	$self->{'histo'}->{'num-bins'} = -1;
+	$self->{'histo'}->{'bins'}->{'b'} = [];
+	$self->{'histo'}->{'bins'}->{'c'} = [];
+	$self->{'histo'}->{'needs-recalculate'} = 1;
+}
+# returns the count in bin specified as 1st input param
+sub	histogram_count { return $_[0]->{'histo'}->{'c'}->[$_[1]] }
+
+# enables histogram logging
+# it expects some parameters for creating the histogram in various forms,
+# e.g. by specifying the number of bins, bin-width and left boundary or
+# by specifying a HASH or ARRAY of bin specifications for non-uniform bin
+# sizes. HASH must be of the form 'FROM:TO'->counts 
+# ARRAY of bin boundaries of the form
+# [histo-left-boundary, bin1_right_boundary, bin2_right_boundary, ... binN-1_right_boundary, histo-right-boundary]
+# the number of bins is 1 less than the length of this array
+sub	histogram_enable {
 	my $self = $_[0];
 	my $params = $_[1]; # $_[1] // {} does not work for perl<5.10, ? : requests $_[1] twice, so Cish if( ! defined below...
 
@@ -138,10 +174,19 @@ sub     histogram_reset {
 		# we re-create our own bins based on num-bins etc.
 		$self->_histogram_create_bins_from_spec($m1, $m2, $m3)
 	} else {
-		# no params, set all counts OF ALREADY EXISTING histogram to zero
-		$m1 = $self->{'histo'}->{'bins'}->{'c'};
-		for(my $i=$self->{'histo'}->{'num-bins'};$i-->0;){ $m1->[$i] = 0 }
+		# no params! we need params
+		print STDERR "enable_histogram() : failed to enable histogram because no histogram specification was supplied. Try enable_histogram({bin-width=>1, nun-bins=>10, left-boundary=>-5});\n";
 	}
+	$self->{'histo'}->{'needs-recalculate'} = 1;
+}
+# set existing histogram to zero counts
+sub     histogram_reset {
+	my $self = $_[0];
+
+	# no params, set all counts OF ALREADY EXISTING histogram to zero
+	my $m1 = $self->{'histo'}->{'bins'}->{'c'};
+	for(my $i=$self->{'histo'}->{'num-bins'};$i-->0;){ $m1->[$i] = 0 }
+	$self->{'histo'}->{'needs-recalculate'} = 1;
 }
 # push Data: a sample and process/update mean and all other stat measures
 # also insert it in histogram
@@ -247,8 +292,8 @@ sub     kurtosis {
 	;
 }
 # concatenates another Running obj with current
-# returns a new Running obj with concatenated stats
-# input objs are not modified.
+# AND returns a new Running obj with concatenated stats
+# Current object is not modified.
 sub     concatenate {
 	my $self = $_[0]; # us
 	my $other = $_[1]; # another Running obj
@@ -286,16 +331,22 @@ sub     concatenate {
 			+ 6.0*$delta2 * ($selfN*$selfN*$otherM2 + $otherN*$otherN*$selfM2)/($combN*$combN) +
 				  4.0*$delta*($selfN*$otherM3 - $otherN*$selfM3) / $combN
 	;
-	 
+
+	# add the histograms only if structure matches:
+	if( $self->_equals_histograms_structure($other) ){
+		$combined->_histogram_copy_from($self);
+		$combined->_add_histograms($other);
+	}
+
 	return $combined;
 }
 # appends another Running obj INTO current
+# histogram data is appended only if histogram specs are the same
 # current obj (self) IS MODIFIED
 sub     append {
 	my $self = $_[0]; # us
 	my $other = $_[1]; # another Running obj
 	$self->copy_from($self+$other);
-	# histogram is not appended!
 }
 # equality only wrt to stats BUT NOT histogram
 sub     equals {
@@ -314,23 +365,42 @@ sub     equals_statistics {
 		abs($self->M3()-$other->M3()) < Statistics::Running::SMALL_NUMBER_FOR_EQUALITY &&
 		abs($self->M4()-$other->M4()) < Statistics::Running::SMALL_NUMBER_FOR_EQUALITY
 }
+# checks if structure is same and then if bin contents (counts) are same
+# returns 1 if equals
+# returns 0 if either structure or counts are not the same
 sub     equals_histograms {
 	my $self = $_[0]; # us
 	my $other = $_[1]; # another Running obj
-	my $n = $self->{'histo'}->{'num-bins'};
-	if( $n != $other->{'histo'}->{'num-bins'} ){ return 0 }
-	my $x = $other->histogram();
-	my $selfB = $self->{'histo'}->{'bins'}->{'b'};
+
+	# structure is not the same
+	if( $self->_equals_histograms_structure($other) == 0 ){ return 0 }
+
 	my $selfC = $self->{'histo'}->{'bins'}->{'c'};
-	my $bB = $x->{'bins'}->{'b'};
-	my $bC = $x->{'bins'}->{'c'};
+	my $otherC = $other->{'histo'}->{'bins'}->{'c'};
 	my $i;
-	for($i=$n;$i-->0;){
-		if( $selfB->[$i] != $bB->[$i] ){ return 0 }
-		if( $selfC->[$i] != $bC->[$i] ){ return 0 }
+	for($i=$self->{'histo'}->{'num-bins'};$i-->0;){
+		if( $selfC->[$i] != $otherC->[$i] ){ return 0 }
 	}
-	if( $selfB->[$n] != $bB->[$n] ){ return 0 }
-	return 1 # equal
+	return 1 # equal in structure and counts
+}
+# adds counts of histograms to us from other
+# returns 0 if structures do not match
+# returns 1 if counts added OK
+sub     _add_histograms {
+	my $self = $_[0]; # us
+	my $other = $_[1]; # another Running obj
+
+	# structure is not the same
+	if( $self->_equals_histograms_structure($other) == 0 ){ return 0 }
+
+	my $selfC = $self->{'histo'}->{'bins'}->{'c'};
+	my $otherC = $other->{'histo'}->{'bins'}->{'c'};
+	my $i;
+	for($i=$self->{'histo'}->{'num-bins'};$i-->0;){
+		$selfC->[$i] += $otherC->[$i];
+	}
+	$self->{'histo'}->{'needs-recalculate'} = 1;
+	return 1 # counts added
 }
 # print object as a string, string concat/printing is overloaded on this method
 sub     stringify {
@@ -369,6 +439,7 @@ sub     _histogram_create_bins_from_spec {
 	}
 	$self->{'histo'}->{'bins'}->{'b'} = \@B;
 	$self->{'histo'}->{'bins'}->{'c'} = [(0)x$nb];
+	$self->{'histo'}->{'needs-recalculate'} = 1;
 }
 # add a datapoint to the histogram, this is usually called only via the public add()
 sub     _histogram_add {
@@ -380,6 +451,7 @@ sub     _histogram_add {
 	for($i=0;$i<$n;$i++){
 		if( ($x > $B->[$i]) && ($x <= $B->[$i+1]) ){
 			$self->{'histo'}->{'bins'}->{'c'}->[$i]++;
+			$self->{'histo'}->{'needs-recalculate'} = 1; # need to recalc stringify
 			return
 		}
 	}
@@ -437,6 +509,7 @@ sub     _hash2bins {
 	push(@B, $X[-1]);
 	$self->{'histo'}->{'bins'}->{'b'} = \@B;
 	$self->{'histo'}->{'bins'}->{'c'} = \@C;
+	$self->{'histo'}->{'needs-recalculate'} = 1;
 }
 # given a hash with keys
 # to-bin -> count
@@ -459,8 +532,29 @@ sub     _stathash2bins {
 	}
 	$self->{'histo'}->{'bins'}->{'b'} = \@B;
 	$self->{'histo'}->{'bins'}->{'c'} = \@C;
+	$self->{'histo'}->{'needs-recalculate'} = 1;
 }
+# compares the structure of the histograms of us and another obj
+# if histograms have same number of bins and same bin-specs (boundaries)
+# then histograms are equal and returns 1
+# if both histograms contain zero bins (not initialised) then also returns 1
+# else, histogram structure differs and returns 0
+sub	_equals_histograms_structure {
+	my ($self, $other) = @_;
 
+	my $NB1 = $self->{'histo'}->{'num-bins'};
+	if( $NB1 != $other->{'histo'}->{'num-bins'} ){ return 0 }
+
+	# no bins, so equal!
+	if( $NB1 == -1 ){ return 1 }
+
+	my $b1 = $self->{'histo'}->{'bins'}->{'b'};
+	my $b2 = $other->{'histo'}->{'bins'}->{'b'};
+	for(my $i=$NB1+1;$i-->0;){
+		if( $b1->[$i] != $b2->[$i] ){ return 0 }
+	}
+	return 1 # equal histogram STRUCTURES (not bincounts)
+}
 1;
 __END__
 # end program, below is the POD
@@ -476,7 +570,7 @@ Statistics::Running - Basic descriptive statistics (mean/stdev/min/max/skew/kurt
 
 =head1 VERSION
 
-Version 0.02
+Version 0.11
 
 
 =head1 SYNOPSIS
@@ -491,12 +585,17 @@ Version 0.02
 	print "mean: ".$ru->mean()."\n";
 
 	my $ru2 = Statistics::Running->new();
+	$ru2->histogram_enable({
+		'num-bins' => 10,
+		'bin-width' => 0.01,
+		'left-boundary' => 0
+	});
 	for(1..100){
 		$ru2->add(rand());
 	}
-	print "Probability Distribution of data:\n".$ru->histogram_stringify()."\n";
+	print "Probability Distribution of data:\n".$ru2->histogram_stringify()."\n";
 
-	# add two stat objects together (histograms are not and reset)
+	# add two stat objects together (histograms are not!)
 	my $ru3 = $ru + $ru2;
 	print "mean of concatenated data: ".$ru3->mean()."\n";
 
@@ -505,6 +604,18 @@ Version 0.02
 
 	print "stats: ".$ru->stringify()."\n";
 
+	# example output:
+	print $ru2."\n";
+N: 100, mean: 0.488978434779093, range: 0.0056063539679414 to 0.99129297226348, standard deviation: 0.298129905728534, kurtosis: -1.22046199974301, skewness: -0.0268827866000826, histogram:
+   0.000 -    0.010:     2 #####################################################
+   0.010 -    0.020:     2 #####################################################
+   0.020 -    0.030:     2 #####################################################
+   0.030 -    0.041:     2 #####################################################
+   0.041 -    0.051:     1 ###########################
+   0.051 -    0.062:     0 |
+   0.062 -    0.073:     2 #####################################################
+   0.073 -    0.083:     0 |
+   0.083 -    0.094:     1 ###########################
 
 =head1 DESCRIPTION
 
@@ -522,10 +633,10 @@ benefits of such an approach, B.P.Welford's method is also
 immune to accumulated precision errors. It is stable and accurate.
 
 For more details on the method and its stability look at this:
-L<John D. Cook's article and C++ implementation at|https://www.johndcook.com/blog/skewness_kurtosis>
+L<John D. Cook's article and C++ implementation|https://www.johndcook.com/blog/skewness_kurtosis>
 
 A version without the histogram exists under L<Statistics::Running::Tiny>
-and is faster, obviously.
+and is faster, obviously. About 25% faster.
 
 There are three amazing things about B.P.Welford's algorithm implemented here:
 
@@ -621,7 +732,7 @@ Our object and returned object are identical at the time of cloning.
 =head2 clear
 
 Clear our internal state as if no data points have ever been added into us.
-As if we were just created. All state is forgotten and reset to zero.
+As if we were just created. All state is forgotten and reset to zero, including histogram.
 
 
 =head2 min
@@ -676,6 +787,56 @@ The overloaded symbol '+=' points
 to this sub.
 
 
+=head2 histogram_enable
+
+Enables histogram logging by creating a histogram with specified
+parameters. These parameters can be of different formats:
+
+	my $ru1 = Statistics::Running->new();
+	$ru1->histogram_enable({
+		'num-bins' => 10,
+		'bin-width' => 0.01,
+		'left-boundary' => 0
+	});
+	# or, 2 bins: 0-1 and 1-2
+	$ru1->histogram_enable({
+		'0:1' => 0,
+		'1:2' => 1,
+	});
+	# or, 2 bins: 0-1 and 1-2
+	$ru1->histogram_enable([0,1,2]);
+
+
+=over 3
+
+=item 1. by specifying the number of bins, bin-width and left boundary as a
+parameters hash, e.g. C< $ru->enable_histogram({'num-bins'=>5, 'bin-width'=>1, 'left-boundary'=>-2}); >
+
+=item 2. by specifying a HASH where keys are 'FROM:TO' and values are the bin counts,
+which can be zero, or even a positive integer if you want to start with some counts already.
+
+=item 3. ARRAY of bin boundaries of the form
+  C< [histo-left-boundary, bin1_right_boundary, bin2_right_boundary, ... binN-1_right_boundary, histo-right-boundary] >
+It follows that the number of bins will be 1 less than the length of this array.
+
+=back
+
+=head2 histogram_disable
+
+Disable histogram logging, all existing histogram data is erased. Number of bins
+is forgotten, along with bin boundaries, etc.
+
+
+=head2 histogram_reset
+
+Set existing histogram to zero counts.
+
+
+=head2 histogram_count 
+
+Returns the count in bin specified by bin index (which is 0 to number-of-bins - 1)
+
+
 =head2 equals
 
 Check if our state (number of samples and all internal state) is
@@ -704,19 +865,19 @@ Returns a string description of descriptive statistics we know about
 (mean, standard deviation, kurtosis, skewness) as well as the
 number of data points/samples added onto us so far. Note that
 this method is not necessary because stringification is overloaded
-and the follow B<< print $stats_obj."\n" >> is equivalent to
-B<< print $stats_obj->stringify()."\n" >>
+and the follow C< print $stats_obj."\n" > is equivalent to
+C< print $stats_obj->stringify()."\n" >
 
 
 =head1 Overloaded functionality
 
 =over 3
 
-=item 1. Addition of two statistics objects: B<< my $ru3 = $ru1 + $ru2 >>
+=item 1. Addition of two statistics objects: C< my $ru3 = $ru1 + $ru2 >
 
-=item 2. Test for equality: B<< if( $ru2 == $ru3 ){ ... } >>
+=item 2. Test for equality: C< if( $ru2 == $ru3 ){ ... } >
 
-=item 3. Stringification: B<< print $ru1."\n" >>
+=item 3. Stringification: C< print $ru1."\n" >
 
 =back
 
@@ -725,12 +886,12 @@ B<< print $stats_obj->stringify()."\n" >>
 
 In testing if two objects are the same, their means, standard deviations
 etc. are compared. This is done using
-B<< if( ($self->mean() - $other->mean()) < Statistics::Running::SMALL_NUMBER_FOR_EQUALITY ){ ... } >>
+C< if( ($self->mean() - $other->mean()) < Statistics::Running::SMALL_NUMBER_FOR_EQUALITY ){ ... } >
 
 
 =head1 BENCHMARKS
 
-Run B<< make bench >> for benchmarks which report the maximum number of data points inserted
+Run C< make bench > for benchmarks which report the maximum number of data points inserted
 per second (in your system).
 
 
@@ -741,10 +902,11 @@ per second (in your system).
 =item 1. L<Wikipedia|http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Online_algorithm>
 
 =item 2. L<John D. Cook's article and C++ implementation|https://www.johndcook.com/blog/skewness_kurtosis>
-was used both as inspiration and as the basis for the formulas for B<< kurtosis() >> and B<< skewness() >>
+was used both as inspiration and as the basis for the formulas for C< kurtosis() >
+and C< skewness() >
 
 =item 3. L<Statistics::Welford> This module is equivalent but it
-does not provide B<< kurtosis() >> and B<< skewness() >> which
+does not provide C< kurtosis() > and C< skewness() > which
 current module does. Additionally,
 current module builds a Histogram for inserted data as a discrete
 approximation of the Probability Distribution data comes from.
@@ -755,8 +917,9 @@ a bit faster than current module only when data is inserted.
 Space-wise, the histogram does not take much
 space. It is just an array of bins and the number
 of items (not the original data items themselves!) it contains.
-Run B<< make bench >> to get a report on the maximum number
+Run C< make bench > to get a report on the maximum number
 of data point insertions per unit time in your system.
+L<Statistics::Running::Tiny> is approximately 25% faster than this module.
 
 =back
 

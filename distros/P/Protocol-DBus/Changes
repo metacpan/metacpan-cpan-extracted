@@ -1,5 +1,19 @@
 Revision history for Perl module Protocol::DBus
 
+0.07
+- Rename do_authn() to initialize(), and make it return falsy until the
+  “Hello” response arrives back. This removes the workflow state where
+  authn is done but the connection name is not yet established. I don’t
+  believe this should break anything since get_message() never actually
+  returned the “Hello” response.
+- Rename authn_pending_send() to init_pending_send().
+- Added DBUS_COOKIE_SHA1 authentication support.
+- Implement fallback when server indicates authn mechanisms
+  besides EXTERNAL.
+- EXTERNAL authn now attempts to auto-load Socket::MsgHdr except on
+  OSes (e.g., Linux, Cygwin) where it’s known not to make a difference.
+- Fix parsing of DBus addresses
+
 0.06 Sat 1 Dec 2018
 - Socket::MsgHdr is no longer required.
 - BREAKING CHANGE: Socket::MsgHdr must now be loaded prior to D-Bus

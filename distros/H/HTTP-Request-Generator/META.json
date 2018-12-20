@@ -33,9 +33,11 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Loops" : "0",
+            "Carp" : "0",
             "Exporter" : "5",
             "Filter::signatures" : "0",
             "List::MoreUtils" : "0",
+            "URI" : "0",
             "URI::Escape" : "0",
             "perl" : "5.006"
          }
@@ -55,7 +57,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-Generator"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

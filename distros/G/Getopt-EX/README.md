@@ -4,7 +4,7 @@ Getopt::EX - Getopt Extender
 
 # VERSION
 
-Version v1.12.0
+Version v1.13.0
 
 # DESCRIPTION
 
@@ -182,9 +182,9 @@ or even simpler non-oo interface:
 
 ## [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers)
 
-Parse number parameter description and parse it, then produces number
-range list or number sequence.  Number format is composed by for
-elements: `start`, `end`, `step` and `length`, like this:
+Parse number parameter description and produces number range list or
+number sequence.  Number format is composed by four elements: `start`,
+`end`, `step` and `length`, like this:
 
     1           1
     1:3         1,2,3
@@ -201,7 +201,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2015-2018 Kazumasa Utashiro
+Copyright (C) 2015-2018 Kazumasa Utashiro
 
 # LICENSE
 

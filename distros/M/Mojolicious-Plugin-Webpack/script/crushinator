@@ -1,8 +1,8 @@
 #!/usr/bin/env perl
 BEGIN {
-  $ENV{MOJO_WEBPACK_ARGS} = '';
   $ENV{MOJO_WEBPACK_DEBUG} //= $ENV{MORBO_VERBOSE} // 0;
   $ENV{MOJO_WEBPACK_LAZY} = 1;
+  $ENV{MOJO_WEBPACK_RUN}  = 1;
 
   # Ugly hack to prevent Mojo::Server::Morbo from exiting
   my $worker = $$;
@@ -41,7 +41,7 @@ sub run {
   # Start webpack daemon in worker
   die "Can't fork: $!" unless defined(my $webpack_pid = fork);
   unless ($webpack_pid) {
-    local $ENV{MOJO_WEBPACK_ARGS} = '--watch';
+    local $ENV{MOJO_WEBPACK_RUN} = '--watch';
     Mojo::Server->new->load_app($app);
     exit $!;
   }

@@ -11,6 +11,7 @@ README
 t/00-load.t
 t/file_access_hooks.t
 t/file_from_disk.t
+t/goto_is_available.t
 t/manifest.t
 t/mkdir.t
 t/mock_stat.t
@@ -19,6 +20,7 @@ t/opendir.t
 t/pod-coverage.t
 t/pod.t
 t/readline.t
+t/readlink.t
 t/rmdir.t
 t/sysopen.t
 t/Test-MockFile_file.t

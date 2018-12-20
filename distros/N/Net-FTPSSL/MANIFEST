@@ -4,10 +4,26 @@ LICENSE
 MANIFEST
 README
 t/00-basic.t
-t/05-readonly.t
-t/10-complex.t
-t/20-certificate.t
-t/test_file.tar.gz
+t/01-test-if-environment-ok.t
+t/02-ask-questions.t
+t/03-ask-questions-again.t
+t/05-check-new-cmd.t
+t/06-login.t
+t/07-prompt_validation.t
+t/20-test_multiple_connections.t
+t/22-supported.t
+t/24-dir_tests.t
+t/26-ccc_test.t
+t/28-put_get_delete_tests.t
+t/30-more_put_delete_tests.t
+t/32-rename_tests.t
+t/34-xput_tests.t
+t/36-quot_and_callback.t
+t/data/00-basic.txt
+t/data/test_file.tar.gz
+t/logs/abc
+t/test-helper/helper1234.pm
+t/work/abc
 FTPSSL.pm
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

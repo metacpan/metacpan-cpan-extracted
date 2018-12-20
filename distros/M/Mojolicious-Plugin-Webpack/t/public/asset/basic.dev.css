@@ -1,0 +1,6 @@
+html, body {
+  font-size: 16px; }
+
+.id:before {
+  content: "basic.scss"; }
+

@@ -1,7 +1,7 @@
 package Module::Version;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Get module versions
-$Module::Version::VERSION = '0.13';
+$Module::Version::VERSION = '0.200';
 use strict;
 use warnings;
 use parent 'Exporter';
@@ -34,7 +34,7 @@ Module::Version - Get module versions
 
 =head1 VERSION
 
-version 0.13
+version 0.200
 
 =head1 SYNOPSIS
 

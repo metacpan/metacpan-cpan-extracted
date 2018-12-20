@@ -25,29 +25,32 @@ eval {use PPI;
 *Devel::DumpTrace::evaluate_and_display_line = *evaluate_and_display_line_PPI;
 *Devel::DumpTrace::handle_deferred_output = *handle_deferred_output_PPI;
 
+*_display_style = *Devel::DumpTrace::_display_style;
 *evaluate = *Devel::DumpTrace::evaluate;
 *current_position_string = *Devel::DumpTrace::current_position_string;
 *dumptrace = *Devel::DumpTrace::dumptrace;
 
 
 
-$Devel::DumpTrace::PPI::VERSION = '0.27';
+$Devel::DumpTrace::PPI::VERSION = '0.28';
 use constant ADD_IMPLICIT_ => 1;
 use constant DECORATE_FOR => 1;
 use constant DECORATE_FOREACH => 1;
 use constant DECORATE_WHILE => 1;
 use constant DECORATE_ELSIF => 1;
 
-use constant _DECORATE_REVERSE => 0;
-
 # built-in functions that may use $_ implicitly
 # make %implicit_ a package, not lexical, variable on the off
 # chance that anyone wants to customize this list
-our %implicit_ = map {; $_ => 1 } qw(abs alarm chomp chop chr chroot cos
+my %implicit_ = map {; $_ => 1 } qw(abs alarm chomp chop chr chroot cos
         defined eval exp glob hex int lc lcfirst length log lstat mkdir
         oct ord pos print quotemeta readlink readpipe ref require
         reverse rmdir sin split sqrt stat study uc ucfirst unlink
         unpack say);
+
+# see  &preval
+my %assign_ops_ = map {; $_ => 1 } qw(= += -= *= /= %= &= |= ^= .= x= **= &&=
+                                       ||= //= <<= >>= ++ --);
 
 # for persisting the PPI documents we create
 my (%ppi_src, %ppi_doc);
@@ -56,7 +59,7 @@ my $last_file_sub_displayed = '';
 my $last_file_line_displayed = '';
 my %IGNORE_FILE_LINE = ();
 
-sub Devel::DumpTrace::PPI::import {
+sub import {
     foreach my $PPI_package (grep { m{^PPI[/.]} } keys %INC) {
 	$PPI_package =~ s/\.pm$//;
 	$PPI_package =~ s{/}{::}g;
@@ -99,14 +102,22 @@ sub _update_ppi_src_for_file {
     # be included ... ( if ($cond) { $x++ }\n   ===>   don't store  $x++ )
 
     my $statements = $doc->find('PPI::Statement') || [];
-
-    # use  reverse ... ?
-    # then the child statements will be decorated before their parents
-    # if use reverse, then _update_ppi_src_for_element should unshift not push
-
-    foreach my $element (_DECORATE_REVERSE ? reverse @$statements
-                                           : @$statements) {
+    foreach my $element (@$statements) {
 	my $_line = $element->line_number;
+
+        # 0.28: the first child of a compound statement might begin with one or 
+        # more "\n" tokens on the same line as its parent. Ignore these
+        # and treat the statement as starting at the line with the first
+        # darkspace.
+        if (ref($element) eq 'PPI::Statement') {
+            my $children = $element->{children};
+            while (ref($children->[0]) eq 'PPI::Token::Whitespace' &&
+                   $children->[0] =~ /\n/) {
+                shift @$children;
+                $_line++;
+            }
+        }
+        
 	__decorate1($element, $file, $doc);
 	next if _element_has_ancestor_on_same_line($element,$_line);
 	__decorate2($element, $file);
@@ -116,8 +127,11 @@ sub _update_ppi_src_for_file {
 }
 
 sub _element_has_ancestor_on_same_line {
+    # is the element in a BLOCK that starts on the same line?
+    # e.g.     if (cond) { ELEMENT1; ELEMENT2; }\n
+    
     my ($element,$_line) = @_;
-    #my $_line = $element->line_number;
+    return 0 if $element =~ /^\s*\n/;
     my $parent = $element->parent;
     while ($parent && ref($parent) ne 'PPI::Document') {
 	my $parent_line = $parent->line_number;
@@ -133,24 +147,15 @@ sub _element_has_ancestor_on_same_line {
 
 sub _update_ppi_src_for_element {
     my ($element, $file, $_line) = @_;
-    # my $_line = $element->line_number;
     $ppi_src{$file}[$_line] ||= [];
     if (ref($element) =~ /^PPI::Statement/) {
 	my ($d1, $d2) = (0,0);
 	my @zrc = _get_source($file, $_line, $element, $d1, $d2);
 	my $elem = { %$element };
 	$elem->{children} = [ @zrc ];
-        if (_DECORATE_REVERSE) {
-            unshift @{$ppi_src{$file}[$_line]}, bless $elem, ref $element;
-        } else {
-            push @{$ppi_src{$file}[$_line]}, bless $elem, ref $element;
-        }
+        push @{$ppi_src{$file}[$_line]}, bless($elem, ref $element);
     } else {
-        if (_DECORATE_REVERSE) {
-            unshift @{$ppi_src{$file}[$_line]}, $element;
-        } else {
-            push @{$ppi_src{$file}[$_line]}, $element;
-        }
+        push @{$ppi_src{$file}[$_line]}, $element;
     }
 }
 
@@ -166,15 +171,16 @@ sub __decorate1 {
     __decorate_first_statement_in_for_block($element, $file);
     __decorate_first_statement_in_foreach_block($element, $file);
     __decorate_first_statement_AFTER_for_block($element,$file);
+    __decorate_first_statement_AFTER_while_block($element, $file);
+    __decorate_first_statement_in_while_block($element, $file);
+    __decorate_statements_in_ifelse_block($element, $file);
+
     return;
 }
 
 sub __decorate2 {
     my ($element, $file) = @_;
     __remove_whitespace_and_comments_just_before_end_of_statement($element);
-    __decorate_first_statement_in_while_block($element, $file);
-    __decorate_first_statement_AFTER_while_block($element, $file);
-    __decorate_statements_in_ifelse_block($element, $file);
     __decorate_last_statement_in_dowhile_block($element, $file);
     return;
 }
@@ -186,16 +192,16 @@ sub _get_source {
     my ($file, $line, $node, undef, undef, @src) = @_;
     my @children = $node->elements;
 
-    for my $element (@children) {
+    for my $element (@children) { 
 	if (defined($element->line_number) && $element->line_number != $line) {
 	    $_[3]++;
 	}
 	last if $_[3] && $_[4];
-	if ($element->first_token ne $element) {
+        if ($element->first_token eq $element) {
+            push @src, $element;
+        } else {
 	    my @zrc = _get_source($file, $line, $element, $_[3], $_[4]);
 	    push @src, bless( { children=>[@zrc] }, ref($element) );
-	} else {
-	    push @src, $element;
 	}
 	if (ref $element eq 'PPI::Token::Structure' && $element eq '{') {
 	    $_[4]++;
@@ -295,7 +301,7 @@ sub evaluate_and_display_line_PPI {
 	$statements = [$doc->elements];
     }
 
-    my $style = Devel::DumpTrace::_display_style();
+    my $style = _display_style();
     my $code;
     my @s = _get_decorated_statements($statements, $style);
     $code = join '', map { "$_" } @s;
@@ -304,7 +310,7 @@ sub evaluate_and_display_line_PPI {
     $code =~ s/\n(.)/\n\t\t $1/g;
 
     if ($style > DISPLAY_TERSE) {
-	Devel::DumpTrace::separate();
+	Devel::DumpTrace::_separate();
         dumptrace(2,0,current_position_string($file,$line,$sub),"\n");
         dumptrace(3,1,$code);
 	unless ($IGNORE_FILE_LINE{"$file:$line"}) {
@@ -322,6 +328,7 @@ sub evaluate_and_display_line_PPI {
     #           our $ZZZ;
     # XXX - these expressions lifted from Devel::DumpTrace. Is that
     #       sufficient or should we analyze the PPI tokens?
+
     if ($code    =~ /^ \s* (my|our) \s*
                        [\$@%*\(] /x           # lexical declaration
 
@@ -413,7 +420,7 @@ sub preval {
     my $lao_index = 0;
     for my $i (0 .. $#e) {
 	if (ref($e[$i]) eq 'PPI::Token::Operator'
-	    && $e[$i]->is_assignment_operator) {
+	    && $assign_ops_{$e[$i]{content}}) {
 	    $lao_index = $i;
 	}
     }
@@ -425,7 +432,7 @@ sub preval {
 
 sub _preval_render {
 
-    # evaluate any PPI::Token::Symbol elements after element $z
+    # evaluate any PPI::Token::Symbol elements after all assignment ops, if any
     # tokenize other PPI::Token::* elements
     # pass other elements back to &preval recursively
 
@@ -464,7 +471,8 @@ sub _preval_render {
 }
 
 sub perform_variable_substitution_on_tokens {
-    # needed to evaluate complex lvalues
+    # needed to evaluate complex lvalues. 
+    # Called from handle_deferred_output_PPI()
     my ($elem, $style, $dpkg) = @_;
     my @out = ();
     my $ref = ref($elem);
@@ -503,11 +511,11 @@ sub handle_deferred_output_PPI {
     $Devel::DumpTrace::PAD_OUR = $deferred->{OUR_PAD};
     Devel::DumpTrace::refresh_pads();
 
-    my $style = Devel::DumpTrace::_display_style();
+    my $style = _display_style();
     for my $i (0 .. $#e) {
 	if (ref $e[$i] eq 'PPI::Token::Symbol') {
 	    perform_variable_substitution(@e, $i, $style, $deferred_pkg);
-	} elsif (ref $e[$i] eq 'PPI::Token::Magic') {
+	} elsif (ref($e[$i]) eq 'PPI::Token::Magic') {
 	    perform_variable_substitution(@e, $i, $style, '<magic>');
 	} elsif (ref $e[$i] eq 'PPI::Token::Cast') {
 	    eval { $e[$i] = "$e[$i]"; };
@@ -530,8 +538,8 @@ sub handle_deferred_output_PPI {
     if ($deferred->{DISPLAY_FILE_AND_LINE}
 	|| "$file:$sub" ne $last_file_sub_displayed) {
 
-	if (Devel::DumpTrace::_display_style() > DISPLAY_TERSE) {
-	    Devel::DumpTrace::separate();
+	if (_display_style() > DISPLAY_TERSE) {
+	    Devel::DumpTrace::_separate();
             dumptrace(4,0,current_position_string($file,$line,$sub),"\n");
             dumptrace(4,1,$undeferred_output);
             dumptrace(5,1,$deferred_output)
@@ -551,12 +559,16 @@ sub handle_deferred_output_PPI {
 }
 
 sub perform_variable_substitution {
+    # perform_variable_substitution(LIST,index,style,package)
+    #
+    # evaluate the symbol indicated by LIST[index] in the context
+    # of the given package and produce output in the given style
     my $pkg = pop @_;
     my $style = pop @_;
     my $i = pop @_;
 
     my $sigil = substr $_[$i], 0, 1;
-    return if $sigil eq '&' || $sigil eq '*';
+    return if $sigil eq '&' || $sigil eq '*' || $sigil eq "_";
     my $varname = substr $_[$i], 1;
     $varname =~ s/^\s+//;
     $varname =~ s/\s+$//;
@@ -644,15 +656,6 @@ sub evaluate_subscript {
     }
 }
 
-sub PPI::Token::Operator::is_assignment_operator {
-    my $op = $_[0]->{content};
-    for my $aop (qw(= += -= *= /= %= &= |= ^= .= x=
-		    **= &&= ||= //= <<= >>= ++ --)) {
-	return 1 if $op eq $aop;
-    }
-    return;
-}
-
 # 0.07: If a statement ends with whitespace and/or comments before the
 #       ';' token, remove them for appearances sake.
 sub __remove_whitespace_and_comments_just_before_end_of_statement {
@@ -706,7 +709,7 @@ sub __prepend_implicit_topic_for_readline_op {
     #      while (   <$foo>   )
     #      while ( readline($foo) )   # 
 
-    # also need to exclude:
+    # but also need to exclude:
 
     #   while (<$fh> && condition)
     #   while (condition || <$fh>)
@@ -780,6 +783,11 @@ sub __prepend_implicit_topic_to_naked_regexp {
     #
     # /pattern/    means    $_ =~ /pattern/
     #
+    # TODO: but    split(/pattern/,...)
+    #       is not split($_=~/pattern/,...)
+    # TODO: other functions that expect regexp
+    # TODO: functions that don't expect regexp but can accept them
+    #
     for (my $i = 0; $i < @$e; $i++) {
 	next unless ref($e->[$i]) =~ /^PPI::Token::Regexp/;
 	my $j = $i-1;
@@ -827,9 +835,8 @@ sub __append_implicit_topic_to_naked_builtins {
     #
     # func;    means   func($_);
     #
-    #
-    # 0.12: but       $hash{bareword} 
-    # should not be   $hash{bareword $_}
+    # but         $hash{barword}
+    # never means $hash{bareword $_}
     #
     for (my $i=0; $i<@$e; $i++) {
 	if (ref($e->[$i]) eq 'PPI::Token::Word' 
@@ -1235,7 +1242,6 @@ sub __decorate_first_statement_in_for_block {
 }
 
 sub __decorate_first_statement_AFTER_for_block {
-
    
     return unless DECORATE_FOR;
 
@@ -1384,7 +1390,6 @@ sub __decorate_first_statement_in_while_block {
 }
 
 sub __decorate_first_statement_AFTER_while_block {
-
    
     return unless DECORATE_WHILE;
 
@@ -1429,7 +1434,7 @@ sub __decorate_last_statement_in_dowhile_block {
     #     PPI::Statement                              $element
     #       ...
     #     PPI::Token::Structure       "}"
-    #   PPI::Token::Word              "while/until"
+    #   PPI::Token::Word              "while" or "until"
     #   ...                                           @condition
 
     my ($element, $file) = @_;
@@ -1516,26 +1521,29 @@ sub __decorate_statements_in_ifelse_block {
     my $cond = $gparent_elem[0];
     return if ref($cond) ne 'PPI::Structure::Condition';
 
-    my @gparent_blocks = grep { ref($_) eq 'PPI::Structure::Block' 
-                              } $gparent->elements();
+    my @gparent_blocks = grep {
+        ref($_) eq 'PPI::Structure::Block' 
+    } $gparent->elements();
     return if @gparent_blocks < 2 || $gparent_blocks[0] eq $parent;
 
-    my @gparent_cond = grep { ref($_) eq 'PPI::Structure::Condition' 
-			    } $gparent->elements();
+    my @gparent_cond = grep {
+        ref($_) eq 'PPI::Structure::Condition' 
+    } $gparent->elements();
 
     my $line = $gparent_cond[0]->line_number;
     $element->{__IF_LINE__} = "$file:$line";
     $element->{__DECORATED__} = 'if-elsif-else';
     $element->{__CONDITIONS__} = [];
     my $ws = '';
-    my $style = Devel::DumpTrace::_display_style();
+    my $style = _display_style();
     for (my $i=0; $i<@gparent_blocks; $i++) {
 	if ($i < @gparent_cond) {
 	    push @{$element->{__CONDITIONS__}}, 
 	        __new_token("${ws}ELSEIF "),
 	        $gparent_cond[$i]->clone();
 	} else {
-	    push @{$element->{__CONDITIONS__}}, __new_token("${ws}ELSE");
+	    push @{$element->{__CONDITIONS__}},
+                __new_token("${ws}ELSE");
 	}
 	if ($gparent_blocks[$i] eq $parent) {
 	    return;
@@ -1576,6 +1584,7 @@ sub main::TOKENIZE {
         my @e = $s->elements;
         for my $j (0 .. $#e) {
             my $w = "$e[$j]";
+            $w =~ s/\n/\\n/g;
             $w =~ s/^\s+//;
             $w =~ s/\s+$//;
             my $ref = ref($e[$j]);
@@ -1583,6 +1592,7 @@ sub main::TOKENIZE {
             printf "%d:%d\t%-20s\t%s\n", $i, $j, $ref, $w;
         }
     }
+    print "\n";
 }
 
 1;
@@ -1595,7 +1605,7 @@ Devel::DumpTrace::PPI - PPI-based version of Devel::DumpTrace
 
 =head1 VERSION
 
-0.27
+0.28
 
 =head1 SYNOPSIS
 
@@ -1635,7 +1645,7 @@ parser and makes a few other features available, including
 
 =over 4
 
-=item * handling statements with chained assignments of complex assignment
+=item * handling statements with chained assignments or complex assignment
 expressions
 
   $ perl -d:DumpTrace::noPPI=verbose -e '$a=$b[$c=2]="foo"'
@@ -1790,14 +1800,24 @@ C<DUMPTRACE_DUMB_ABBREV>.
 
 =back
 
-The PPI-based parser has more overhead than the simpler parser from
-L<Devel::DumpTrace|Devel::DumpTrace> (benchmarks forthcoming),
-so you may not want to always favor
-C<Devel::DumpTrace::PPI> over C<Devel::DumpTrace>.
-Plus it requires L<PPI|PPI> to be installed. You can force 
-the basic (non-PPI) parser to be used by either invoking your
-program with the C<-d:DumpTrace::noPPI> switch, or by setting
-the environment variable C<DUMPTRACE_NOPPI> to a true value.
+The PPI-based parser has significantly more overhead 
+than the simpler parser from L<Devel::DumpTrace|Devel::DumpTrace>
+(benchmarks show that the PPI-based parser runs 
+1.5-6  times slower than the regular parser [which already runs
+6-20   times slower than L<Devel::Trace|Devel::Trace>]).
+If this is too much of a disadvantage for your use case, you can force
+the basic parser to be used by either
+
+=over 4
+
+=item invoking your program with the C<-d:DumpTrace::noPPI> switch, or
+
+=item setting the environment value C<DUMPTRACE_NOPPI> to
+a true value
+
+=item and also by not having L<PPI|PPI> installed
+
+=back
 
 See L<Devel::DumpTrace|Devel::DumpTrace> for far more information
 about what this module is supposed to do, including the variables
@@ -2170,9 +2190,10 @@ None known.
 
 =head1 BUGS AND LIMITATIONS
 
-The PPI-based parser in this module runs 3-6 times slower than the
-basic parser (which runs 7-10 times slower than the basic
-L<Devel::Trace|Devel::Trace>).
+See "BUGS AND LIMITATIONS" section in 
+L<Devel::DumpTrace|Devel::DumpTrace/"BUGS AND LIMITATION">
+for description of some known issues in both the PPI parser
+and the basic parser.
 
 See L<Devel::DumpTrace/"SUPPORT"> for other support information.
 Report issues for this module with the C<Devel-DumpTrace> distribution.

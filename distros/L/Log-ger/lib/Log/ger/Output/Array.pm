@@ -1,7 +1,7 @@
 package Log::ger::Output::Array;
 
-our $DATE = '2017-08-03'; # DATE
-our $VERSION = '0.023'; # VERSION
+our $DATE = '2018-12-20'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ Log::ger::Output::Array - Log to array
 
 =head1 VERSION
 
-version 0.023
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -71,7 +71,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

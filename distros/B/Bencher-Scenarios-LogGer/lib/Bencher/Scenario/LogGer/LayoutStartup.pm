@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::LayoutStartup;
 
-our $DATE = '2017-08-04'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2018-12-20'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Bencher::Scenario::LogGer::LayoutStartup
 
 =head1 VERSION
 
-This document describes version 0.012 of Bencher::Scenario::LogGer::LayoutStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-08-04.
+This document describes version 0.014 of Bencher::Scenario::LogGer::LayoutStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2018-12-20.
 
 =head1 SYNOPSIS
 
@@ -113,34 +113,34 @@ L<Log::ger::Layout::YAML>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
 
 Benchmark with default options (C<< bencher -m LogGer::LayoutStartup >>):
 
  #table1#
- +--------------+-----------+-----------+------------+-----------+---------+
- | participant  | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
- +--------------+-----------+-----------+------------+-----------+---------+
- | load-YAML    |        55 |      18   |        1   |   0.00015 |      21 |
- | load-JSON    |        59 |      17   |        1.1 | 6.6e-05   |      20 |
- | load-LTSV    |        61 |      16   |        1.1 |   0.00011 |      20 |
- | load-Pattern |        61 |      16   |        1.1 |   0.00012 |      20 |
- | baseline     |       190 |       5.3 |        3.4 | 4.6e-05   |      20 |
- +--------------+-----------+-----------+------------+-----------+---------+
+ +--------------+-----------+-----------+------------+---------+---------+
+ | participant  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+ +--------------+-----------+-----------+------------+---------+---------+
+ | load-YAML    |        67 |      15   |        1   | 5.8e-05 |      21 |
+ | load-LTSV    |        70 |      14   |        1   |   6e-05 |      20 |
+ | load-JSON    |        71 |      14   |        1.1 | 3.2e-05 |      20 |
+ | load-Pattern |        71 |      14   |        1.1 | 5.5e-05 |      20 |
+ | baseline     |       190 |       5.3 |        2.8 | 2.7e-05 |      20 |
+ +--------------+-----------+-----------+------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m LogGer::LayoutStartup --module-startup >>):
 
  #table2#
- +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | participant               | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
- +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | Log::ger::Layout::JSON    | 2                            | 5                  | 20             |      20   |                   14.6 |        1   |   0.00018 |      20 |
- | Log::ger::Layout::YAML    | 2                            | 5                  | 20             |      20   |                   14.6 |        1   |   0.0002  |      20 |
- | Log::ger::Layout::LTSV    | 1.5                          | 5.1                | 25             |      17   |                   11.6 |        1.1 | 9.6e-05   |      21 |
- | Log::ger::Layout::Pattern | 1.5                          | 5                  | 25             |      16   |                   10.6 |        1.1 |   0.0001  |      20 |
- | perl -e1 (baseline)       | 0.56                         | 4                  | 20             |       5.4 |                    0   |        3.3 | 2.7e-05   |      20 |
- +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
+ +---------------------------+-----------+------------------------+------------+---------+---------+
+ | participant               | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------------+-----------+------------------------+------------+---------+---------+
+ | Log::ger::Layout::JSON    |        14 |                      9 |          1 | 8.8e-05 |      20 |
+ | Log::ger::Layout::YAML    |        14 |                      9 |          1 | 4.4e-05 |      20 |
+ | Log::ger::Layout::LTSV    |        14 |                      9 |          1 | 6.1e-05 |      20 |
+ | Log::ger::Layout::Pattern |        14 |                      9 |          1 | 2.4e-05 |      21 |
+ | perl -e1 (baseline)       |         5 |                      0 |          3 | 7.2e-05 |      20 |
+ +---------------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -167,7 +167,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -7,9 +7,9 @@ plan skip_all => $@ unless my $server_class = require($project_dir->child(qw(scr
 
 my $server = $server_class->new;
 
-is $ENV{MOJO_WEBPACK_ARGS},  '',  'MOJO_WEBPACK_ARGS';
-is $ENV{MOJO_WEBPACK_DEBUG}, '0', 'MOJO_WEBPACK_DEBUG';
-is $ENV{MOJO_WEBPACK_LAZY},  1,   'MOJO_WEBPACK_LAZY';
+is $ENV{MOJO_WEBPACK_DEBUG}, 0, 'MOJO_WEBPACK_DEBUG';
+is $ENV{MOJO_WEBPACK_LAZY},  1, 'MOJO_WEBPACK_LAZY';
+is $ENV{MOJO_WEBPACK_RUN},   1, 'MOJO_WEBPACK_RUN';
 
 is + ($server->parse_argv('my_app.pl'))[1], 'my_app.pl', 'arg my_app.pl';
 

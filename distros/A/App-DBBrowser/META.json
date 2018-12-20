@@ -73,6 +73,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.034",
+   "version" : "2.035",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

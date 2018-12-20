@@ -5,7 +5,7 @@ use warnings;
 
 use base qw(Config::INI::Reader);
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 my %multi_value = map { $_ => 1 } qw( ignore inc ok_exit_codes select shebang );
 
@@ -41,7 +41,7 @@ can handle a key appearing more than once
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SUPPORT
 

@@ -13,7 +13,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 # Public
 has conf_name                => ( is => 'ro' );
@@ -63,7 +63,7 @@ sub check {
         my %conf_files;
         foreach my $file (@files) {
             if ( my $conf_file = $self->find_conf_for_file($file) ) {
-                my $root = $conf_file->parent;
+                my $root     = $conf_file->parent;
                 my $rel_file = substr( $file, length($root) + 1 );
                 $conf_files{$conf_file}->{$rel_file}++;
             }
@@ -183,7 +183,7 @@ to be tidyall'd
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ use IPC::System::Simple qw(capturex);
 
 use Exporter qw(import);
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 our @EXPORT_OK = qw(svn_uncommitted_files);
 
@@ -17,7 +17,7 @@ sub svn_uncommitted_files {
 
     $dir = realpath($dir);
     my $output = capturex( 'svn', 'status', $dir );
-    my @lines = grep {/^[AM]/} split( "\n", $output );
+    my @lines  = grep {/^[AM]/} split( "\n", $output );
     my (@files) = grep {-f} ( $output =~ m{^[AM]\s+(.*)$}gm );
     return @files;
 }
@@ -38,7 +38,7 @@ Code::TidyAll::SVN::Util - Utility functions for SVN hooks
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SUPPORT
 

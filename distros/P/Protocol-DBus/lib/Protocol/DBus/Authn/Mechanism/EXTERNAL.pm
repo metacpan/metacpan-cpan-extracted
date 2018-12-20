@@ -5,76 +5,95 @@ use warnings;
 
 use parent 'Protocol::DBus::Authn::Mechanism';
 
+use Protocol::DBus::Socket ();
+
+# The methods of user credential retrieval that the reference D-Bus
+# server relies on prefer “out-of-band” methods like SO_PEERCRED
+# on Linux rather than SCM_CREDS. (See See dbus/dbus-sysdeps-unix.c.)
+# So for some OSes it’s just not necessary to do anything special to
+# send credentials.
+#
+# This list is exposed for the sake of tests.
+#
+our @_OS_NO_MSGHDR_LIST = (
+
+    # Reference server doesn’t need our help:
+    'linux',
+    'netbsd',   # via LOCAL_PEEREID, which dbus calls
+
+    # MacOS works, though … ??
+    'darwin',
+
+    # 'openbsd', ??? Still trying to test.
+
+    # No way to pass credentials via UNIX socket,
+    # so let’s just send EXTERNAL and see what happens.
+    # It’ll likely just fail over to DBUS_COOKIE_SHA1.
+    'cygwin',
+    'mswin32',
+);
+
 sub INITIAL_RESPONSE { unpack 'H*', $> }
 
-sub AFTER_OK {
-    my ($self) = @_;
-
-    return if $self->{'_skip_unix_fd'};
-
-    return (
-        [ 0 => 'NEGOTIATE_UNIX_FD' ],
-        [ 1 => \&_consume_agree_unix_fd ],
-    );
-}
-
-sub new {
-    my $self = $_[0]->SUPER::new(@_[ 1 .. $#_ ]);
-
-    $self->{'_skip_unix_fd'} = 1 if !Socket::MsgHdr->can('new') || !Socket->can('SCM_RIGHTS');
-
-    return $self;
-}
-
-sub _consume_agree_unix_fd {
-    my ($authn, $line) = @_;
-
-    if ($line eq 'AGREE_UNIX_FD') {
-        $authn->{'_negotiated_unix_fd'} = 1;
-    }
-    elsif (index($line, 'ERROR ') == 0) {
-        warn "Server rejected unix fd passing: " . substr($line, 6) . $/;
-    }
-
-    return;
-}
-
-sub skip_unix_fd {
-    my ($self) = @_;
-
-    $self->{'_skip_unix_fd'} = 1;
-
-    return $self;
-}
-
+# The reference server implementation does a number of things to try to
+# fetch the peer credentials. .
 sub must_send_initial {
     my ($self) = @_;
 
     if (!defined $self->{'_must_send_initial'}) {
 
-        # On Linux and BSD OSes this module doesn’t need to make any special
-        # effort to send credentials because the server will request them on
-        # its own. (Although Linux only sends the real credentials, we’ll
-        # send the EUID in the EXTERNAL handshake.)
-        #
-        my $can_skip_msghdr = Socket->can('SCM_CREDENTIALS');
+        my $can_skip_msghdr = grep { $_ eq $^O } @_OS_NO_MSGHDR_LIST;
 
-        # MacOS doesn’t appear to have an equivalent to SO_PASSCRED
-        # but does have SCM_CREDS, so we have to blacklist it specifically.
-        $can_skip_msghdr ||= Socket->can('SCM_CREDS') && !grep { $^O eq $_ } qw( darwin cygwin );
+        $can_skip_msghdr ||= eval { my $v = Socket::SO_PEERCRED(); 1 };
+        $can_skip_msghdr ||= eval { my $v = Socket::LOCAL_PEEREID(); 1 };
 
+        if (!$can_skip_msghdr) {
+            my $ok = eval {
+                require Socket::MsgHdr;
+                Socket::MsgHdr->VERSION(0.05);
+            };
+
+            if (!$ok) {
+                $self->{'_failed_socket_msghdr'} = $@;
+                $can_skip_msghdr = 1;
+            }
+        }
+
+        # As of this writing it seems FreeBSD and DragonflyBSD do require
+        # Socket::MsgHdr, even though they both have LOCAL_PEERCRED which
+        # should take care of that.
         $self->{'_must_send_initial'} = !$can_skip_msghdr;
     }
 
     return $self->{'_must_send_initial'};
 }
 
-sub send_initial {
+sub on_rejected {
     my ($self) = @_;
 
-    # There are no known platforms where sendmsg will achieve anything
-    # that plain write() doesn’t already get us.
-    die "Unsupported OS: $^O";
+    if ($self->{'_failed_socket_msghdr'}) {
+        warn "EXTERNAL authentication failed. Socket::MsgHdr failed to load earlier; maybe making it available would fix this? (Load failure was: $self->{'_failed_socket_msghdr'})";
+    }
+
+    return;
+}
+
+sub send_initial {
+    my ($self, $s) = @_;
+
+    my $msg = Socket::MsgHdr->new( buf => "\0" );
+
+    # The kernel should fill in the payload.
+    $msg->cmsghdr( Socket::SOL_SOCKET(), Socket::SCM_CREDS(), "\0" x 64 );
+
+    local $!;
+    my $ok = Protocol::DBus::Socket::sendmsg_nosignal($s, $msg, 0);
+
+    if (!$ok && !$!{'EAGAIN'}) {
+        die "sendmsg($s): $!";
+    }
+
+    return $ok;
 }
 
 1;

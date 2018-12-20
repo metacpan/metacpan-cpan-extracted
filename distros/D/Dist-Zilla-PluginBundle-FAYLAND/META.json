@@ -4,19 +4,22 @@
       "Fayland Lam <fayland@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-PluginBundle-FAYLAND",
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
@@ -35,7 +38,9 @@
             "Dist::Zilla::Plugin::PodWeaver" : "3.092971",
             "Dist::Zilla::Plugin::ReadmeFromPod" : "0.20",
             "Dist::Zilla::Plugin::Repository" : "0.08",
-            "Dist::Zilla::Plugin::Test::Compile" : "0.05"
+            "Dist::Zilla::Plugin::Test::Compile" : "0.05",
+            "Moose" : "0",
+            "Moose::Autobox" : "0"
          }
       },
       "test" : {
@@ -55,9 +60,11 @@
          "web" : "https://github.com/fayland/dist-zilla-pluginbundle-fayland"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
-      "Olivier Mengué <dolmen@cpan.org>"
-   ]
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }
 

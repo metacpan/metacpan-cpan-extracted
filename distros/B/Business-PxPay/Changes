@@ -1,5 +1,8 @@
 Revision history for Business-PxPay
 
+0.05  2018-12-20 20:02:25 CST
+        Added missing prereq URI::Escape (manwar)
+
 0.04    2011.07.19
         API URL changed to https://sec.paymentexpress.com/pxpay/pxaccess.aspx
 

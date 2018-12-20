@@ -1,5 +1,10 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.10  Thu 20 Dec 16:00:38 GMT 2018
+    - better filehandle detection
+    - more constant filtering
+    - bigfile content does not need to be random, speeding up test
+
 0.09  Fri 25 Aug 17:26:05 BST 2017
     - auto-generate constants using C::Scan::Constants, as they vary with librados version
 

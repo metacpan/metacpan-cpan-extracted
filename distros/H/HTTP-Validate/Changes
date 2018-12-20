@@ -1,5 +1,10 @@
 Revision history for HTTP-Validate
 
+0.982	2018-12-19
+
+	- The BOOLEAN_VALUE validator now accepts any reference with 'boolean' in its class name.
+	  This allows validation to work properly on data produced by JSON decoders.
+
 0.981   2016-09-03
 
 	- Fixed a bug in processing of 'at_most_one' and 'together' rules that refer to

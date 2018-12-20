@@ -1,3 +1,9 @@
+0.05 2018-12-19
+    * The "url" entry is now named "path"
+    * The "protocol" entry is now named "scheme"
+      This brings our nomenclature somewhat more in line with URI and
+      the rest of the world
+
 0.04 2018-12-17
     * Plack prerequisite version is now 1.0047, also we now enforce the
       HTTP::Request prerequisite version of 6+

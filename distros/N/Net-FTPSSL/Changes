@@ -2,19 +2,68 @@ Revision history for Perl extension Net::FTPSSL.
 
 TODO:
   - Implement a "find" function similar to Unix's find command.
-  - Support IPv6 as well as IPv4.  (started, I can detect if IPv6 is supported
+  - Support IPv6 as well as IPv4.  (Started, I can detect if IPv6 is supported
     by IO::Socket::SSL.) [I don't have access to a IPv6 network to test with.]
   - Fix so Trace isn't so verbose.  Such as making freqency a function of file
     size & block size.
-  - Fix to support MLSD & MLST commands.
 
-  - Replace useSSL with SSL_version in test scripts. (depreciated v0.39)
-    (use the new FTPSSL_SSL_VER environment variable for t/*.t progs)
-    Maybe put all question/answers into it's own helper module to simplify
-    keeping this mess in sync between test scripts.
 
 Version - YYYY/MM/DD
 --------------------
+0.41 2018/12/20 08:30:00
+  - Fixed supported() to say HELP isn't supported if OverriedHELP was used.
+    Wasn't doing this in 100% of the logic paths.
+  - Fixed nlst/list bug when filter patterns & callbacks were both in use. 
+    The results of the end callback wasn't having the pattern applied to filter
+    the results.  Patterns are now applied to filter things before & after the
+    callback is called, where before it was only done before the callback was
+    called.
+  - Fixed nlst/list to both call _common_list() instead of having list do both.
+  - The DebugLogFile option now turns autoflush on when the log file is opened.
+    I was loosing the log file contents on certain types of errors when
+    autoflush was turned off making it difficult to troubleshoot issues.
+  - Tweaked the ccc() hack slightly.  Also the above log file fix seems to have
+    stabilized the CCC hack when the logs are turned on when it works.  Though
+    some servers sometimes throw "Unexpeced EOF" errors after executing the CCC.
+    So I put in a couple of sleeps for 1 second each & the command became even
+    more stable.  Suggesting that the "Unexpected EOF" errors were caused by
+    timing issues.
+  - Added uput2() method to deal with the problem that uput() can't always
+    tell you the actual name of the file on the FTPS server and you really need
+    to know that filename. (slow)
+  - Rewrote the uput() POD to reflect what the command actually does instead
+    of what it's supposed to do.  Different servers implemented it differently.
+  - Tweaked the depreciated "useSSL" option to make it easier to remove in
+    the future.
+  - Minor tweaks to _help() & supported() dealing with OverrideHELP & _help()
+    can now include disabled commands in it's hash. (The key's value is 0 if
+    disabled.  Else non-zero if a supported command.)  Before it just silently
+    tossed disabled commands.
+  - Added mlsd() - List of files in machine readable format.
+  - Added mlst() - Get file details in machine readable foramt.
+  - Added parse_mlsx() to parse the returned values of mlsd() & mlst().
+  - Modified size() to have option of using MLST as an alternate way to get a
+    file's size.
+  - Modified is_dir() & is_file() to be able to use MLST as the prefered way
+    to do these tests.  Falls back on original tests if MLST isn't supported
+    or doesn't have the TYPE feature enabled.
+  - Redesigned all the test cases from scratch!  Rather than choose one of 3
+    huge scripts to run, everything has been replaced by a lot of smaller test
+    cases.  Makes it much simpler to verify everything is working without the
+    need for messy complex code or having to carefully examine log files
+    afterwards.
+  - The test cases no longer uses the depreciated "useSSL" option.  They use
+    the "SSL_version" option instead.
+  - t/test-helper/helper1234.pm, new helper module to centralize the asking
+    of questions and to share the answers between all the test cases.  So
+    that "make test" only prompts you a single time for your server info.
+  - No longer uses environment variables to "remember" answers.  Now uses
+    a dynamically built config file of options selected.  Just have to
+    answer the questions the 1st time run via "make test".
+  - MANIFEST - Added all the new test cases and removed the old ones.
+  - Updated the LISCENSE file to say 2018 (from 2017)
+  - Update the README file to say 2018 (from 2017) Then completly rewrote it.
+
 0.40 2018/02/26 08:30:00
   - Updated the copyright to 2018.
   - Updated README to reference the new FTPSSL_SSL_VER environment variable for
@@ -135,7 +184,7 @@ Version - YYYY/MM/DD
     the response in the logs.
   - Now prints the INET version in the log file.
   - Resets $ERRSTR to default in new() in case previous call had errors!
-  - Fixed t/10-complex.t func run_stat_test() to test the "is_file" & "is_dir()"
+  - Fixed t/10-complex.t func run_stat_test() to test the "is_file" & "is_dir"
     functions.  Some tests disable the "SIZE" command so it can test the new
     alternate size logic as well.
   - New test program t/05-simple.t that does a simple read only test against

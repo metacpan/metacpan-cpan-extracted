@@ -1,40 +1,65 @@
 {
    "abstract" : "PX Pay Interface for www.paymentexpress.com",
    "author" : [
-      "Fayland Lam <fayland@gmail.com>"
+      "unknown"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.102400",
+   "generated_by" : "Dist::Zilla version 5.048, Dist::Milla version v1.0.18, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-PxPay",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.18",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
-            "LWP::UserAgent" : 0,
-            "Net::SSLeay" : 0,
-            "XML::Simple" : 0
+            "LWP::UserAgent" : "0",
+            "Net::SSLeay" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fayland/business-pxpay/issues"
+      },
+      "homepage" : "https://github.com/fayland/business-pxpay",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/fayland/business-pxpay.git",
-         "web" : "http://github.com/fayland/business-pxpay"
+         "url" : "https://github.com/fayland/business-pxpay.git",
+         "web" : "https://github.com/fayland/business-pxpay"
       }
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_contributors" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
 }
 

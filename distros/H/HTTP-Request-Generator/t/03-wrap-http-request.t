@@ -18,7 +18,7 @@ if( !$ok) {
     exit;
 };
 
-plan tests => 4;
+plan tests => 7;
 
 my @requests = generate_requests(
     method => 'POST',
@@ -42,3 +42,28 @@ my %payload = map {s/\+/ /g; $_ } split /[=&]/, $requests[0]->decoded_content;
 is $payload{'comment'}, 'Some comment', "We retrieve the body";
 
 is $requests[0]->url->query_param('item'), '1', "We fetch the correct query parameter";
+
+@requests = generate_requests(
+    method   => 'GET',
+    host     => ['example.com', 'www.example.com'],
+    scheme   => ['http', 'https'],
+    port     => [443,8443],
+    url      => '/',
+    wrap => \&HTTP::Request::Generator::as_http_request,
+);
+is 0+@requests, 8, 'We generate parametrized GET requests';
+isa_ok $requests[0], 'HTTP::Request', 'Returned data';
+
+my @urls = sort { $a cmp $b } map { $_->uri } @requests;
+
+is_deeply \@urls, [
+    'http://example.com:443/',
+    'http://example.com:8443/',
+    'http://www.example.com:443/',
+    'http://www.example.com:8443/',
+    'https://example.com/',
+    'https://example.com:8443/',
+    'https://www.example.com/',
+    'https://www.example.com:8443/',
+], "scheme  s, hostnames and ports get iterated correctly"
+    or diag Dumper \@urls;

@@ -15,6 +15,9 @@ use Fcntl;    # O_RDONLY, etc.
 
 use constant SUPPORTED_SYSOPEN_MODES => O_RDONLY | O_WRONLY | O_RDWR | O_APPEND | O_TRUNC | O_EXCL | O_CREAT | O_NOFOLLOW;
 
+use constant BROKEN_SYMLINK   => bless {}, "A::BROKEN::SYMLINK";
+use constant CIRCULAR_SYMLINK => bless {}, "A::CIRCULAR::SYMLINK";
+
 # we're going to use carp but the errors should come from outside of our package.
 use Carp ();
 $Carp::Internal{__PACKAGE__}++;
@@ -25,9 +28,12 @@ use IO::File                   ();
 use Test::MockFile::FileHandle ();
 use Test::MockFile::DirHandle  ();
 use Scalar::Util               ();
+
+use Symbol;
+
 use Overload::FileCheck '-from-stat' => \&_mock_stat, q{:check};
 
-use Errno qw/EPERM ENOENT ELOOP EEXIST EISDIR ENOTDIR/;
+use Errno qw/EPERM ENOENT ELOOP EEXIST EISDIR ENOTDIR EINVAL/;
 
 use constant FOLLOW_LINK_MAX_DEPTH => 10;
 
@@ -37,11 +43,11 @@ Test::MockFile - Allows tests to validate code that can interact with files with
 
 =head1 VERSION
 
-Version 0.012
+Version 0.014
 
 =cut
 
-our $VERSION = '0.012';
+our $VERSION = '0.014';
 
 our %files_being_mocked;
 
@@ -106,7 +112,7 @@ For example:
 
     # This will not die.
     Test::MockFile->file("/bar", "...");
-    Test::MockFile->link("/foo", "/bar");
+    Test::MockFile->symlink("/foo", "/bar");
     -l "/foo" or print "ok\n";
     open(my $fh, ">", "/foo");
     
@@ -193,7 +199,7 @@ sub file {
     my ( $class, $file, $contents, @stats ) = @_;
 
     ( defined $file && length $file ) or die("No file provided to instantiate $class");
-    $files_being_mocked{$file} and die("It looks like $file is already being mocked. We don't support double mocking yet.");
+    _get_file_object($file) and die("It looks like $file is already being mocked. We don't support double mocking yet.");
 
     my %stats;
     if ( scalar @stats == 1 ) {
@@ -267,7 +273,7 @@ sub symlink {
     ( defined $file && length $file ) or die("No file provided to instantiate $class");
     ( !defined $readlink || length $readlink ) or die("No file provided for $file to point to in $class");
 
-    $files_being_mocked{$file} and die("It looks like $file is already being mocked. We don't support double mocking yet.");
+    _get_file_object($file) and die("It looks like $file is already being mocked. We don't support double mocking yet.");
 
     return $class->new(
         {
@@ -296,7 +302,7 @@ sub dir {
     my ( $class, $dir_name, $contents, @stats ) = @_;
 
     ( defined $dir_name && length $dir_name ) or die("No directory name provided to instantiate $class");
-    $files_being_mocked{$dir_name} and die("It looks like $dir_name is already being mocked. We don't support double mocking yet.");
+    _get_file_object($dir_name) and die("It looks like $dir_name is already being mocked. We don't support double mocking yet.");
 
     # Because undef means it's a missing dir.
     if ( defined $contents ) {
@@ -439,32 +445,37 @@ sub _mock_stat {
       : $type eq 'lstat' ? 0
       :                    die("Unexpected stat type '$type'");
 
+    # Overload::FileCheck should always send 2 args.
     if ( scalar @_ != 2 ) {
         _real_file_access_hook( $type, [$file_or_fh] );
         return FALLBACK_TO_REAL_OP();
     }
 
+    # Overload::FileCheck should always send something and be handling undef on its own??
     if ( !defined $file_or_fh || !length $file_or_fh ) {
         _real_file_access_hook( $type, [$file_or_fh] );
         return FALLBACK_TO_REAL_OP();
     }
 
+    # Find the path, following the symlink if required.
     my $file = _find_file_or_fh( $file_or_fh, $follow_link );
-    return $file if ref $file eq 'ARRAY';    # Allow an ELOOP to fall through here.
+
+    return [] if $file && $file eq BROKEN_SYMLINK;      # Allow an ELOOP to fall through here.
+    return [] if $file && $file eq CIRCULAR_SYMLINK;    # Allow an ELOOP to fall through here.
 
     if ( !defined $file or !length $file ) {
         _real_file_access_hook( $type, [$file_or_fh] );
         return FALLBACK_TO_REAL_OP();
     }
 
-    my $file_data = $files_being_mocked{$file};
+    my $file_data = _get_file_object($file);
     if ( !$file_data ) {
         _real_file_access_hook( $type, [$file_or_fh] );
         return FALLBACK_TO_REAL_OP();
     }
 
     # File is not present so no stats for you!
-    return [] if !defined $file_data->{'contents'};
+    return [] if !$file_data->is_link && !defined $file_data->{'contents'};
 
     # Make sure the file size is correct in the stats before returning its contents.
     return [ $file_data->stat ];
@@ -473,52 +484,61 @@ sub _mock_stat {
 sub _get_file_object {
     my ($file_path) = @_;
 
-    my $file = _find_file_or_fh($file_path);
+    my $file = _find_file_or_fh($file_path) or return;
 
     return $files_being_mocked{$file};
 }
 
+# This subroutine finds the absolute path to a file, returning the absolute path of what it ultimately points to.
+# If it is a broken link or what was passed in is undef or '', then we return undef.
+
 sub _find_file_or_fh {
-    my ( $file_or_fh, $follow_link, $depth, $parent ) = @_;
+    my ( $file_or_fh, $follow_link, $depth ) = @_;
 
-    my $file        = _fh_to_file($file_or_fh);
-    my $mock_object = $files_being_mocked{$file};
+    # Find the file handle or fall back to just using the abs path of $file_or_fh
+    my $absolute_path_to_file = _fh_to_file($file_or_fh) // _abs_path_to_file($file_or_fh) // '';
 
-    if ( $parent and !$mock_object ) {
-        die( sprintf( "Mocked file %s points to unmocked file %s", $parent, $file || '??' ) );
-    }
+    # Get the pointer to the object.
+    my $mock_object = $files_being_mocked{$absolute_path_to_file};
 
-    return $file unless $follow_link && $mock_object && $mock_object->is_link;
+    # If we're following a symlink and the path we came to is a dead end (broken symlink), then return BROKEN_SYMLINK up the stack.
+    return BROKEN_SYMLINK if $depth and !$mock_object;
 
-    if ( !$mock_object ) {
-        return [] if $depth;
-        return $file;
-    }
+    # If the link we followed isn't a symlink, then return it.
+    return $absolute_path_to_file unless $mock_object && $mock_object->is_link;
 
-    return $file unless $files_being_mocked{$file}->is_link;
+    # ##############
+    # From here on down we're only dealing with symlinks.
+    # ##############
 
-    $depth ||= 0;
+    # If we weren't told to follow the symlink then SUCCESS!
+    return $absolute_path_to_file unless $follow_link;
+
+    # This is still a symlink keep going. Bump our depth counter.
     $depth++;
 
-    #Protect against circular loops.
+    #Protect against circular symlink loops.
     if ( $depth > FOLLOW_LINK_MAX_DEPTH ) {
         $! = ELOOP;
-        return [];
+        return CIRCULAR_SYMLINK;
     }
 
-    return _find_file_or_fh( $files_being_mocked{$file}->readlink, 1, $depth, $file );
+    return _find_file_or_fh( $mock_object->readlink, 1, $depth );
 }
+
+# Tries to find $fh as a open file handle in one of the mocked files.
 
 sub _fh_to_file {
     my ($fh) = @_;
 
-    # Return if it's a string. Nothing to do here!
-    return _abs_path_to_file($fh) unless ref $fh;
+    return unless defined $fh && length $fh;
 
-    foreach my $file_name ( keys %files_being_mocked ) {
+    # See if $fh is a file handle. It might be a path.
+    foreach my $file_name ( sort keys %files_being_mocked ) {
         my $mock_fh = $files_being_mocked{$file_name}->{'fh'};
-        next unless $mock_fh;              # File isn't open.
-        next unless "$mock_fh" eq "$fh";
+
+        next unless $mock_fh;               # File isn't open.
+        next unless "$mock_fh" eq "$fh";    # This mock doesn't have this file handle open.
 
         return $file_name;
     }
@@ -568,7 +588,7 @@ sub contents {
     my ( $self, $new_contents ) = @_;
     $self or die;
 
-    die("checking or setting contents on a symlink is not supported") if $self->is_link;
+    Carp::confess("checking or setting contents on a symlink is not supported") if $self->is_link;
 
     # If 2nd arg was passed.
     if ( scalar @_ == 2 ) {
@@ -602,7 +622,7 @@ sub unlink {
     }
 
     if ( $self->is_dir ) {
-        if ( $^O eq 'freebsd' ) {
+        if ( $^O eq 'darwin' or $^O =~ m/bsd/i ) {
             $! = EPERM;
         }
         else {
@@ -751,6 +771,9 @@ returns the size of the file based on its contents.
 sub size {
     my ($self) = @_;
 
+    # Lstat for a symlink returns 1 for its size.
+    return 1 if $self->is_link;
+
     # length undef is 0 not undef in perl 5.10
     if ( $] < 5.012 ) {
         return undef unless $self->exists;
@@ -782,7 +805,7 @@ Calculates the block count of the file based on its size.
 sub blocks {
     my ($self) = @_;
 
-    my $blocks = $self->size / abs( $self->{'blksize'} || 1 );
+    my $blocks = int( $self->size / abs( $self->{'blksize'} ) + 1 );
     if ( int($blocks) > $blocks ) {
         $blocks = int($blocks) + 1;
     }
@@ -971,14 +994,26 @@ However B<opendir> file handles were never setup for tie so we have to override 
 
 =cut
 
+# goto doesn't work below 5.16
+#
+# goto messed up refcount between 5.22 and 5.26.
+# Broken in 7bdb4ff0943cf93297712faf504cdd425426e57f
+# Fixed  in https://rt.perl.org/Public/Bug/Display.html?id=115814
+sub _goto_is_available {
+    return 0 if $] < 5.015;
+    return 1 if $] < 5.021;
+    return 1 if $] > 5.027;
+    return 0;    # 5.
+}
+
 BEGIN {
     *CORE::GLOBAL::open = sub(*;$@) {
-        my $abs_path = _abs_path_to_file( $_[2] );
 
+        # We're not supporting 2 arg or 1 arg opens yet.
         # open(my $fh, ">filehere"); # Just don't do this. It's bad.
         if ( scalar @_ != 3 ) {
             _real_file_access_hook( "open", \@_ );
-            goto \&CORE::open if $] > 5.015;
+            goto \&CORE::open if _goto_is_available();
             if ( @_ == 1 ) {
                 return CORE::open( $_[0] );
             }
@@ -989,6 +1024,11 @@ BEGIN {
                 return CORE::open( $_[0], $_[1], @_[ 2 .. $#_ ] );
             }
         }
+
+        my $abs_path = _find_file_or_fh( $_[2], 1 );    # Follow the link.
+        die if ( !$abs_path );
+        die if $abs_path eq BROKEN_SYMLINK;
+        my $mock_file = _get_file_object($abs_path);
 
         my $mode = $_[1];
 
@@ -996,14 +1036,14 @@ BEGIN {
         $mode =~ s/(:.+$)//;
         my $encoding_mode = $1;
 
-        # TODO: We technically need to support this.
-        # open(my $fh, "-|", "/bin/hostname"); # Read from command
-        # open(my $fh, "|-", "/bin/passwd"); # Write to command
+        # TODO: We don't yet support |- or -|
+        # TODO: We don't yet support modes outside of > < >> +< +> +>>
+        # We just pass through to open if we're not mocking the file right now.
         if (   ( $mode eq '|-' || $mode eq '-|' )
             or !grep { $_ eq $mode } qw/> < >> +< +> +>>/
-            or !defined $files_being_mocked{$abs_path} ) {
+            or !defined $mock_file ) {
             _real_file_access_hook( "open", \@_ );
-            goto \&CORE::open if $] > 5.015;
+            goto \&CORE::open if _goto_is_available();
             if ( @_ == 1 ) {
                 return CORE::open( $_[0] );
             }
@@ -1015,8 +1055,7 @@ BEGIN {
             }
         }
 
-        #
-        my $mock_file = $files_being_mocked{$abs_path};
+        # At this point we're mocking the file. Let's do it!
 
         # If contents is undef, we act like the file isn't there.
         if ( !defined $mock_file->{'contents'} && grep { $mode eq $_ } qw/< +</ ) {
@@ -1033,16 +1072,16 @@ BEGIN {
 
         # This is how we tell if the file is open by something.
 
-        $files_being_mocked{$abs_path}->{'fh'} = $_[0];
+        $mock_file->{'fh'} = $_[0];
         Scalar::Util::weaken( $_[0] );    # Will this make it go out of scope?
 
         # Fix tell based on open options.
         if ( $mode eq '>>' or $mode eq '+>>' ) {
-            $files_being_mocked{$abs_path}->{'contents'} //= '';
-            seek $_[0], length( $files_being_mocked{$abs_path}->{'contents'} ), 0;
+            $mock_file->{'contents'} //= '';
+            seek $_[0], length( $mock_file->{'contents'} ), 0;
         }
         elsif ( $mode eq '>' or $mode eq '+>' ) {
-            $files_being_mocked{$abs_path}->{'contents'} = '';
+            $mock_file->{'contents'} = '';
         }
 
         return 1;
@@ -1062,15 +1101,14 @@ BEGIN {
     # 8 - O_NOFOLLOW - Fail if the last path component is a symbolic link.
 
     *CORE::GLOBAL::sysopen = sub(*$$;$) {
-        my $abs_path = _abs_path_to_file( $_[1] );
+        my $mock_file = _get_file_object( $_[1] );
 
-        if ( !defined $files_being_mocked{$abs_path} ) {
+        if ( !$mock_file ) {
             _real_file_access_hook( "sysopen", \@_ );
-            goto \&CORE::sysopen if $] > 5.015;
+            goto \&CORE::sysopen if _goto_is_available();
             return CORE::sysopen( $_[0], $_[1], @_[ 2 .. $#_ ] );
         }
 
-        my $mock_file    = $files_being_mocked{$abs_path};
         my $sysopen_mode = $_[2];
 
         # Not supported by my linux vendor: O_EXLOCK | O_SHLOCK
@@ -1114,6 +1152,8 @@ BEGIN {
             return;
         }
 
+        my $abs_path = $mock_file->{'file_name'};
+
         $_[0] = IO::File->new;
         tie *{ $_[0] }, 'Test::MockFile::FileHandle', $abs_path, $rw;
 
@@ -1135,165 +1175,167 @@ BEGIN {
     };
 
     *CORE::GLOBAL::opendir = sub(*$) {
+        my $mock_dir = _get_file_object( $_[1] );
 
-        my $abs_path = _abs_path_to_file( $_[1] );
-
-        if ( scalar @_ != 2 ) {
+        # 1 arg Opendir doesn't work??
+        if ( scalar @_ != 2 or !defined $_[1] ) {
             _real_file_access_hook( "opendir", \@_ );
-            if ( $] > 5.015 ) {
-                goto \&CORE::opendir;
-            }
+
+            goto \&CORE::opendir if _goto_is_available();
+
             return CORE::opendir( $_[0], @_[ 1 .. $#_ ] );
         }
 
-        if ( !defined $files_being_mocked{$abs_path} ) {
+        if ( !$mock_dir ) {
             _real_file_access_hook( "opendir", \@_ );
-            goto \&CORE::opendir if $] > 5.015;
+            print "Real open\n";
+            goto \&CORE::opendir if _goto_is_available();
             return CORE::opendir( $_[0], $_[1] );
         }
 
-        my $mock_dir = $files_being_mocked{$abs_path};
         if ( !defined $mock_dir->{'contents'} ) {
             $! = ENOENT;
             return undef;
         }
 
-        # This isn't a real IO::Dir.
-        $_[0] = Test::MockFile::DirHandle->new( $abs_path, $mock_dir->{'contents'} );
+        if ( !defined $_[0] ) {
+            $_[0] = Symbol::gensym;
+        }
+        elsif ( ref $_[0] ) {
+            no strict 'refs';
+            *{ $_[0] } = Symbol::geniosym;
+        }
 
         # This is how we tell if the file is open by something.
-        $files_being_mocked{$abs_path}->{'fh'} = $_[0];
-        Scalar::Util::weaken( $_[0] );    # Will this make it go out of scope?
+        my $abs_path = $mock_dir->{'file_name'};
+        $mock_dir->{'obj'} = Test::MockFile::DirHandle->new( $abs_path, $mock_dir->{'contents'} );
+        $mock_dir->{'fh'} = "$_[0]";
 
         return 1;
 
     };
 
     *CORE::GLOBAL::readdir = sub(*) {
-        my ($self) = @_;
+        my $mocked_dir = _get_file_object( $_[0] );
 
-        if ( $] > 5.015 ) {
-            goto \&CORE::readdir if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            goto \&CORE::readdir unless defined $files_being_mocked{ $self->{'dir'} };
-        }
-        else {
-            return CORE::readdir( $_[0] ) if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            return CORE::readdir( $_[0] ) unless defined $files_being_mocked{ $self->{'dir'} };
+        if ( !$mocked_dir ) {
+            _real_file_access_hook( "readdir", \@_ );
+            print "Real read\n";
+            goto \&CORE::readdir if _goto_is_available();
+            return CORE::readdir( $_[0] );
         }
 
-        if ( !defined $self->{'files_in_readdir'} ) {
+        my $obj = $mocked_dir->{'obj'};
+        if ( !$obj ) {
+            die("Read on a closed handle");
+        }
+
+        if ( !defined $obj->{'files_in_readdir'} ) {
             die("Did a readdir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
-        if ( !defined $self->{'tell'} ) {
+        if ( !defined $obj->{'tell'} ) {
             die("readdir called on a closed dirhandle");
         }
 
         # At EOF for the dir handle.
-        return undef if $self->{'tell'} > $#{ $self->{'files_in_readdir'} };
+        return undef if $obj->{'tell'} > $#{ $obj->{'files_in_readdir'} };
 
         if (wantarray) {
             my @return;
-            foreach my $pos ( $self->{'tell'} .. $#{ $self->{'files_in_readdir'} } ) {
-                push @return, $self->{'files_in_readdir'}->[$pos];
+            foreach my $pos ( $obj->{'tell'} .. $#{ $obj->{'files_in_readdir'} } ) {
+                push @return, $obj->{'files_in_readdir'}->[$pos];
             }
-            $self->{'tell'} = $#{ $self->{'files_in_readdir'} } + 1;
+            $obj->{'tell'} = $#{ $obj->{'files_in_readdir'} } + 1;
             return @return;
         }
 
-        return $self->{'files_in_readdir'}->[ $self->{'tell'}++ ];
+        return $obj->{'files_in_readdir'}->[ $obj->{'tell'}++ ];
     };
 
     *CORE::GLOBAL::telldir = sub(*) {
-        my ($self) = @_;
+        my ($fh) = @_;
+        my $mocked_dir = _get_file_object($fh);
 
-        if ( $] > 5.015 ) {
-            goto \&CORE::telldir if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            goto \&CORE::telldir unless defined $files_being_mocked{ $self->{'dir'} };
-        }
-        else {
-            return CORE::telldir($self) if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            return CORE::telldir($self) unless defined $files_being_mocked{ $self->{'dir'} };
+        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+            _real_file_access_hook( "telldir", \@_ );
+            goto \&CORE::telldir if _goto_is_available();
+            return CORE::telldir($fh);
         }
 
-        if ( !defined $self->{'files_in_readdir'} ) {
+        my $obj = $mocked_dir->{'obj'};
+
+        if ( !defined $obj->{'files_in_readdir'} ) {
             die("Did a telldir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
-        if ( !defined $self->{'tell'} ) {
+        if ( !defined $obj->{'tell'} ) {
             die("telldir called on a closed dirhandle");
         }
 
-        return $self->{'tell'};
+        return $obj->{'tell'};
     };
 
     *CORE::GLOBAL::rewinddir = sub(*) {
-        my ($self) = @_;
+        my ($fh) = @_;
+        my $mocked_dir = _get_file_object($fh);
 
-        if ( $] > 5.015 ) {
-            goto \&CORE::rewinddir if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            goto \&CORE::rewinddir unless defined $files_being_mocked{ $self->{'dir'} };
-        }
-        else {
-            return CORE::rewinddir($self) if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            return CORE::rewinddir($self) unless defined $files_being_mocked{ $self->{'dir'} };
+        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+            _real_file_access_hook( "rewinddir", \@_ );
+            goto \&CORE::rewinddir if _goto_is_available();
+            return CORE::rewinddir( $_[0] );
         }
 
-        if ( !defined $self->{'files_in_readdir'} ) {
+        my $obj = $mocked_dir->{'obj'};
+
+        if ( !defined $obj->{'files_in_readdir'} ) {
             die("Did a rewinddir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
-        if ( !defined $self->{'tell'} ) {
+        if ( !defined $obj->{'tell'} ) {
             die("rewinddir called on a closed dirhandle");
         }
 
-        $self->{'tell'} = 0;
+        $obj->{'tell'} = 0;
         return 1;
     };
 
     *CORE::GLOBAL::seekdir = sub(*$) {
-        my ( $self, $goto ) = @_;
+        my ( $fh, $goto ) = @_;
+        my $mocked_dir = _get_file_object($fh);
 
-        if ( $] > 5.015 ) {
-            goto \&CORE::seekdir if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            goto \&CORE::seekdir unless defined $files_being_mocked{ $self->{'dir'} };
-        }
-        else {
-            return CORE::seekdir( $self, $goto ) if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            return CORE::seekdir( $self, $goto ) unless defined $files_being_mocked{ $self->{'dir'} };
+        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+            _real_file_access_hook( "seekdir", \@_ );
+            goto \&CORE::seekdir if _goto_is_available();
+            return CORE::seekdir( $fh, $goto );
         }
 
-        if ( !defined $self->{'files_in_readdir'} ) {
+        my $obj = $mocked_dir->{'obj'};
+
+        if ( !defined $obj->{'files_in_readdir'} ) {
             die("Did a seekdir on an empty dir. This shouldn't have been able to have been opened!");
         }
 
-        if ( !defined $self->{'tell'} ) {
+        if ( !defined $obj->{'tell'} ) {
             die("seekdir called on a closed dirhandle");
         }
 
-        return $self->{'tell'} = $goto;
+        return $obj->{'tell'} = $goto;
     };
 
     *CORE::GLOBAL::closedir = sub(*) {
-        my ($self) = @_;
+        my ($fh) = @_;
+        my $mocked_dir = _get_file_object($fh);
 
-        if ( $] > 5.015 ) {
-            goto \&CORE::closedir if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            goto \&CORE::closedir unless defined $files_being_mocked{ $self->{'dir'} };
-        }
-        else {
-            return CORE::closedir($self) if !ref $self || ref $self ne 'Test::MockFile::DirHandle';
-            return CORE::closedir($self) unless defined $files_being_mocked{ $self->{'dir'} };
+        if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
+            _real_file_access_hook( "closedir", \@_ );
+            goto \&CORE::closedir if _goto_is_available();
+            return CORE::closedir($fh);
         }
 
-        if ( !defined $self->{'files_in_readdir'} ) {
-            die("Did a closedir on an empty dir. This shouldn't have been able to have been opened!");
-        }
+        delete $mocked_dir->{'obj'};
+        delete $mocked_dir->{'fh'};
 
-        # Already closed?
-        return if !defined $self->{'tell'};
-
-        delete $self->{'tell'};
         return 1;
     };
 
@@ -1317,6 +1359,28 @@ BEGIN {
 
     };
 
+    *CORE::GLOBAL::readlink = sub(_) {
+        my ($file) = @_;
+
+        if ( !defined $file ) {
+            warn 'Use of uninitialized value in readlink';
+            $! = ENOENT;
+            return;
+        }
+
+        my $mock_object = _get_file_object($file);
+        if ( !$mock_object ) {
+            goto \&CORE::readlink if _goto_is_available();
+            return CORE::readlink($file);
+        }
+
+        if ( !$mock_object->is_link ) {
+            $! = EINVAL;
+            return;
+        }
+        return $mock_object->readlink;
+    };
+
     # $file is always passed because of the prototype.
     *CORE::GLOBAL::mkdir = sub(_;$) {
         my ( $file, $perms ) = @_;
@@ -1334,12 +1398,9 @@ BEGIN {
         my $mock = _get_file_object($file);
 
         if ( !$mock ) {
-            if ( $] > 5.015 ) {
-                goto \&CORE::mkdir;
-            }
-            else {
-                return CORE::mkdir(@_);
-            }
+            goto \&CORE::mkdir if _goto_is_available();
+
+            return CORE::mkdir(@_);
         }
 
         # Because we've mocked this to be a file and it doesn't exist we are going to die here.
@@ -1373,12 +1434,8 @@ BEGIN {
         my $mock = _get_file_object($file);
 
         if ( !$mock ) {
-            if ( $] > 5.015 ) {
-                goto \&CORE::rmdir;
-            }
-            else {
-                return CORE::rmdir($file);
-            }
+            goto \&CORE::rmdir if _goto_is_available();
+            return CORE::rmdir($file);
         }
 
         # Because we've mocked this to be a file and it doesn't exist we are going to die here.

@@ -6,16 +6,21 @@ MANIFEST
 Makefile.PL
 README.md
 examples/anyevent.pl
+examples/credentials.pl
 examples/introspect.pl
 examples/introspect_nb.pl
 examples/packagekit.pl
 examples/receive.pl
+examples/sha1.pl
+examples/socket_cred.pl
 examples/unix_fds.pl
 lib/Protocol/DBus.pm
 lib/Protocol/DBus/.Connection.pm.swp
+lib/Protocol/DBus/Address.pm
 lib/Protocol/DBus/Authn.pm
-lib/Protocol/DBus/Authn/IO.pm
 lib/Protocol/DBus/Authn/Mechanism.pm
+lib/Protocol/DBus/Authn/Mechanism/DBUS_COOKIE_SHA1.pm
+lib/Protocol/DBus/Authn/Mechanism/DBUS_COOKIE_SHA1/Pieces.pm
 lib/Protocol/DBus/Authn/Mechanism/EXTERNAL.pm
 lib/Protocol/DBus/Client.pm
 lib/Protocol/DBus/Connect.pm
@@ -28,10 +33,22 @@ lib/Protocol/DBus/Parser/UnixFDs.pm
 lib/Protocol/DBus/Path.pm
 lib/Protocol/DBus/Peer.pm
 lib/Protocol/DBus/Signature.pm
+lib/Protocol/DBus/Socket.pm
 lib/Protocol/DBus/WriteMsg.pm
+lib/Protocol/DBus/X.pm
+lib/Protocol/DBus/X/Base.pm
+lib/Protocol/DBus/X/Rejected.pm
+t/Protocol-DBus-Address.t
+t/Protocol-DBus-Authn-Mechanism-DBUS_SESSION_SHA1-Pieces.t
+t/Protocol-DBus-Authn-Mechanism-DBUS_SESSION_SHA1.t
+t/Protocol-DBus-Authn-Mechanism-EXTERNAL.t
+t/Protocol-DBus-Connect.t
 t/Protocol-DBus-Marshal.t
 t/Protocol-DBus-Message.t
 t/Protocol-DBus-Parser-UnixFDs.t
 t/Protocol-DBus-Signature.t
+t/integration.t
+t/lib/ClientServer.pm
+t/lib/MockDBusServer.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -43,7 +43,6 @@ my $run = sub { $app->run() };
     # check run() without input
     $app->{'modules'} = ['Test::More'];
     my $ver = $Test::More::VERSION;
-    $ver = '1.3021350';
     $ver =~ s/0+$//;
     stdout_is( $run, "$ver\n", 'run() ok - regular' );
 }

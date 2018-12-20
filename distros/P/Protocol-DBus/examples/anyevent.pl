@@ -12,14 +12,14 @@ use Data::Dumper;
 use Protocol::DBus;
 use Protocol::DBus::Client;
 
-my $dbus = Protocol::DBus::Client::system();
+my $dbus = $> ? Protocol::DBus::Client::login_session() : Protocol::DBus::Client::system();
 $dbus->blocking(0);
 
 my $authenticated = AnyEvent->condvar;
 my $w;
 $w = AnyEvent->io(fh => $dbus->fileno(), poll => 'rw',
       cb => sub {
-         if ($dbus->do_authn()) {
+         if ($dbus->initialize()) {
             $authenticated->send();
             undef $w;
          }

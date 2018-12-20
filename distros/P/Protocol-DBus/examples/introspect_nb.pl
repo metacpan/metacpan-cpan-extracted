@@ -13,8 +13,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Protocol::DBus::Client;
 
-#my $dbus = Protocol::DBus::Client::system();
-my $dbus = Protocol::DBus::Client::login_session();
+my $dbus = $> ? Protocol::DBus::Client::login_session() : Protocol::DBus::Client::system();
 
 $SIG{'PIPE'} = 'IGNORE';
 
@@ -30,8 +29,8 @@ my $fileno = $dbus->fileno();
 # the following is quick and easy:
 vec( my $mask, $fileno, 1 ) = 1;
 
-while (!$dbus->do_authn()) {
-    if ($dbus->authn_pending_send()) {
+while (!$dbus->initialize()) {
+    if ($dbus->init_pending_send()) {
         select( undef, my $wout = $mask, undef, undef );
     }
     else {
@@ -39,7 +38,7 @@ while (!$dbus->do_authn()) {
     }
 }
 
-print "done authn\n";
+printf "done authn; connection name: %s\n", $dbus->get_connection_name();
 
 #----------------------------------------------------------------------
 

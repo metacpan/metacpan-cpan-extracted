@@ -4,7 +4,7 @@ use 5.014002;
 use strict;
 use warnings;
 use Carp;
-use Scalar::Util qw/blessed/;
+use Scalar::Util qw/blessed openhandle/;
 
 use Ceph::Rados::List;
 
@@ -34,12 +34,7 @@ sub DESTROY {
 
 sub write {
     my ($self, $oid, $source) = @_;
-    my $tell;
-    {
-        local $^W = 0;
-        $tell = tell($source)
-    }
-    if ($tell) {
+    if (openhandle($source)) {
         &write_handle;
     } else {
         &write_data;

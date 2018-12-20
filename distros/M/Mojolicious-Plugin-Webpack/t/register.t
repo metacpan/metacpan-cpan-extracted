@@ -2,7 +2,7 @@ use lib '.';
 use t::Helper;
 
 my $cwd   = t::Helper->cwd;
-my $t     = t::Helper->t(args => '');
+my $t     = t::Helper->t;
 my $asset = $t->app->asset;
 is $asset->route->render({name => 'foo.js'}), '/asset/foo.js', 'route';
 like $asset->assets_dir, qr{\bassets$},         'assets_dir';

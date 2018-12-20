@@ -166,7 +166,8 @@ sub type_is {
     my ($self, $name) = @_;
 
     return $_[0]->{'_type'} == (Protocol::DBus::Message::Header::MESSAGE_TYPE()->{$name} || do {
-        die "Invalid type name: $name";
+        my @valids = sort keys %{ Protocol::DBus::Message::Header::MESSAGE_TYPE() };
+        die "Invalid type name: $name (valids are: @valids)";
     });
 }
 
@@ -194,7 +195,8 @@ sub flags_have {
 
     for my $name (@names) {
         return 0 if !($_[0]->{'_flags'} & (Protocol::DBus::Message::Header::FLAG()->{$name} || do {
-        die "Invalid flag name: “$name”";
+            my @valids = sort keys %{ Protocol::DBus::Message::Header::FLAG() };
+            die "Invalid flag name: “$name” (valids are: @valids)";
         }));
     }
 

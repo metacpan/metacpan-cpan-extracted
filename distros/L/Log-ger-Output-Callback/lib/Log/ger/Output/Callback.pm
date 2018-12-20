@@ -1,7 +1,7 @@
 package Log::ger::Output::Callback;
 
-our $DATE = '2017-08-05'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2018-12-20'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -55,7 +55,7 @@ Log::ger::Output::Callback - Send logs to a subroutine
 
 =head1 VERSION
 
-This document describes version 0.003 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2017-08-05.
+This document describes version 0.004 of Log::ger::Output::Callback (from Perl distribution Log-ger-Output-Callback), released on 2018-12-20.
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,12 @@ This document describes version 0.003 of Log::ger::Output::Callback (from Perl d
  );
 
 =head1 DESCRIPTION
+
+This output plugin provides an easy way to do custom logging in L<Log::ger>. If
+you want to be more proper, you can also create your own output plugin, e.g.
+L<Log::ger::Output::Screen> or L<Log::ger::Output::File>. To do so, follow the
+tutorial in L<Log::ger::Manual::Tutorial::49_WritingAnOutputPlugin> or
+alternatively just peek at the source code of this module.
 
 =for Pod::Coverage ^(.+)$
 
@@ -102,7 +108,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

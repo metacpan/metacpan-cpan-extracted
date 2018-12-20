@@ -5,8 +5,10 @@ use feature 'signatures';
 no warnings 'experimental::signatures';
 use Algorithm::Loops 'NestedLoops';
 use List::MoreUtils 'zip';
+use URI;
 use URI::Escape;
 use Exporter 'import';
+use Carp 'croak';
 
 =head1 NAME
 
@@ -27,7 +29,8 @@ HTTP::Request::Generator - generate HTTP requests
 
     @requests = generate_requests(
         method => 'POST',
-        url    => '/profiles/:name',
+        host   => ['example.com','www.example.com'],
+        path   => '/profiles/:name',
         url_params => {
             name => ['Corion','Co-Rion'],
         },
@@ -48,7 +51,7 @@ HTTP::Request::Generator - generate HTTP requests
             },
         ],
     );
-    # Generates 16 requests out of the combinations
+    # Generates 32 requests out of the combinations
 
     for my $req (@requests) {
         $ua->request( $req );
@@ -56,7 +59,7 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request);
 
 sub unwrap($item,$default) {
@@ -79,9 +82,10 @@ sub fetch_all( $iterator, $limit=0 ) {
 
 our %defaults = (
     method       => ['GET'],
-    url          => ['/'],
-    port         => [80],
-    protocol     => ['http'],
+    path         => ['/'],
+    host         => [''],
+    port         => [0],
+    scheme       => ['http'],
 
     # How can we specify various values for the headers?
     headers      => [{}],
@@ -115,24 +119,53 @@ sub _makeref {
     } @_
 }
 
+sub _extract_enum( $name, $item ) {
+    # Explicitly enumerate all ranges
+    my @res = @{ $defaults{ $name } || []};
+
+    if( $item ) {
+        # Expand all ranges into the enumerated lists
+        $item =~ s!\[([^.]+)\.\.([^.]+)\]!"{" . join(",", $1..$2 )."}"!ge;
+
+        # Explode all enumerated items into their list
+        if( $item =~ /^([^{]*)\{([^}]+)\}([^{]*)$/ ) {
+            my($pre, $post) = ($1,$3);
+            @res = map { "$pre$_$post" } split /,/, $2, -1;
+        } else {
+            @res = $item;
+        };
+    };
+
+    return \@res
+}
+
 # Convert a curl-style https://{www.,}example.com/foo-[00..99].html to
 #                      https://:1example.com/foo-:2.html
 sub expand_pattern( $pattern ) {
     my %ranges;
 
-    my $idx = 0;
+    # Split up the URL pattern into a scheme, host(pattern), port number and
+    # path (pattern)
+    my( $scheme, $host, $port, $path ) = $pattern =~ m!^(?:([^:]+):)?/?/?(?:([^/:]+))(?::(\d+))?(.*)$!;
 
     # Explicitly enumerate all ranges
-    $pattern =~ s!\[([^.]+)\.\.([^.]+)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+    my $idx = 0;
+
+    $path =~ s!\[([^.]+)\.\.([^.]+)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
 
     # Move all explicitly enumerated parts into lists:
-    $pattern =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
 
-    return (
-        url        => $pattern,
+    my %res = (
+        path      => $path,
         url_params => \%ranges,
+        host       => _extract_enum( 'host', $host ),
+        scheme     => _extract_enum( 'scheme', $scheme ),
+        port       => _extract_enum( 'port', $port ),
         raw_params => 1,
     );
+
+    %res
 }
 
 sub _generate_requests_iter(%options) {
@@ -158,6 +191,7 @@ sub _generate_requests_iter(%options) {
     $args{ $_ } ||= {}
         for qw(query_params body_params url_params);
     my @loops = _makeref @args{ @keys };
+    #use Data::Dumper; warn Dumper \@loops, \@keys, \%options;
 
     # Turn all query_params into additional loops for each entry in keys %$query_params
     # Turn all body_params into additional loops over keys %$body_params
@@ -168,7 +202,7 @@ sub _generate_requests_iter(%options) {
     my @url_params = keys %$url_params;
     push @loops, _makeref values %$url_params;
 
-    #warn "Looping over " . Dumper \@loops;
+    #use Data::Dumper; warn "Looping over " . Dumper \@loops;
 
     my $iter = NestedLoops(\@loops,{});
 
@@ -178,12 +212,11 @@ sub _generate_requests_iter(%options) {
     for(qw(query_params body_params headers)) {
         $template{ $_ } = $options{ "fixed_$_" } || {};
     };
-    #warn "Template setup: " . Dumper \%template;
 
     return sub {
         my @v = $iter->();
         return unless @v;
-        #warn Dumper \@v;
+        #use Data::Dumper; warn Dumper \@v;
 
         # Patch in the new values
         my %values = %template;
@@ -205,15 +238,28 @@ sub _generate_requests_iter(%options) {
         if( @url_params ) {
             my %v;
             @v{ @url_params } = splice @v, 0, 0+@url_params;
-            $values{ url } = fill_url($values{ url }, \%v, $options{ raw_params });
+            #use Data::Dumper; warn Dumper \%values;
+            $values{ path } = fill_url($values{ path }, \%v, $options{ raw_params });
         };
+
+        $values{ url } = _build_uri( \%values );
 
         # Merge the headers as well
         #warn "Merging headers: " . Dumper($values{headers}). " + " . (Dumper $template{headers});
         %{$values{headers}} = (%{$template{headers}}, %{$values{headers} || {}});
-
         return $wrapper->(\%values);
     };
+}
+
+sub _build_uri( $req ) {
+    my $uri = URI->new( '', $req->{scheme} );
+    if( $req->{host}) {
+        $uri->host( $req->{host});
+        $uri->scheme( $req->{scheme});
+        $uri->port( $req->{port}) if( $req->{port} and $req->{port} != $uri->default_port );
+    };
+    $uri->path( $req->{path});
+    $uri
 }
 
 =head2 C<< generate_requests( %options ) >>
@@ -249,7 +295,7 @@ of choice.
   {
     method => 'GET',
     url => '/profiles/Mark',
-    protocol => 'http',
+    scheme => 'http',
     port => 80,
     headers => {},
     body_params => {},
@@ -308,6 +354,9 @@ Limit the number of requests generated.
 =cut
 
 sub generate_requests(%options) {
+    croak "Option 'protocol' is now named 'scheme'."
+        if $options{ protocol };
+
     my $i = _generate_requests_iter(%options);
     if( wantarray ) {
         return fetch_all($i, $options{ limit });
@@ -350,7 +399,7 @@ sub as_http_request($req) {
     };
 
     # Store metadata / generate "signature" for later inspection/isolation?
-    my $uri = URI->new( $req->{url} );
+    my $uri = _build_uri( $req );
     $uri->query_param( %{ $req->{query_params} || {} });
     my $res = HTTP::Request->new(
         $req->{method} => $uri,
@@ -392,18 +441,28 @@ sub as_dancer($req) {
         $headers = HTTP::Headers->new( %$headers );
     };
 
+    my $uri = _build_uri( $req );
+
     # Store metadata / generate "signature" for later inspection/isolation?
     local %ENV; # wipe out non-overridable default variables of Dancer::Request
     my $res = Dancer::Request->new_for_request(
-        $req->{method},
-        $req->{url},
+        $req->{method} =>  $uri->path,
         $req->{query_params},
         $body,
         $headers,
         { CONTENT_LENGTH => length($body),
-          CONTENT_TYPE => $form_ct },
+          CONTENT_TYPE   => $form_ct,
+          HTTP_HOST      => (join ":", $req->{host}, $req->{port}),
+          SERVER_NAME    => $req->{host},
+          SERVER_PORT    => $req->{port},
+          REQUEST_METHOD => $req->{ method },
+          REQUEST_URI    => $uri,
+          SCRIPT_NAME    => $uri->path,
+
+        },
     );
     $res->{_http_body}->add($body);
+    #use Data::Dumper; warn Dumper $res;
     $res
 }
 
@@ -427,12 +486,14 @@ sub as_plack($req) {
 
     my %env = %$req;
     $env{ 'psgi.version' } = '1.0';
-    $env{ 'psgi.url_scheme' } = delete $env{ protocol };
+    $env{ 'psgi.url_scheme' } = delete $env{ scheme };
     $env{ 'plack.request.query_parameters' } = [%{delete $env{ query_params }||{}} ];
     $env{ 'plack.request.body_parameters' } = [%{delete $env{ body_params }||{}} ];
     $env{ 'plack.request.headers' } = HTTP::Headers->new( %{ delete $req->{headers} });
     $env{ REQUEST_METHOD } = delete $env{ method };
-    $env{ SCRIPT_NAME } = delete $env{ url };
+    $env{ REQUEST_URI } = _build_uri( $req );
+    $env{ SCRIPT_NAME } = $env{ REQUEST_URI }->path;
+    delete $env{ url };
     $env{ QUERY_STRING } = ''; # not correct, but...
     $env{ SERVER_NAME } = delete $env{ host };
     $env{ SERVER_PORT } = delete $env{ port };

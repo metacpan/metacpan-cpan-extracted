@@ -15,7 +15,7 @@ use Fcntl qw(:flock :seek);
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 my $Time_HiRes_avail;
 my $color_avail;
@@ -174,8 +174,6 @@ sub import {
     }
     return;
 }
-
-our $ZZ = 0;
 
 sub DB__DB {
     return if __inGD();
@@ -407,7 +405,7 @@ sub evaluate_and_display_line {
     my $style = _display_style();
 
     if ($style > DISPLAY_TERSE) {
-	separate();
+	_separate();
         dumptrace(2,0, current_position_string($f,$l,$sub), "\n");
         dumptrace(3,1,$code);
     }
@@ -456,8 +454,10 @@ sub evaluate_and_display_line {
 
     if ($code    =~ /^ \s* (my|our) \s*
                     [\$@%*\(] /x           # lexical declaration
+
 	&& $code =~ / (?<!;) .* ;
-                    \s* (\# .* )? $/x   # single statement, single line
+                    \s* (\# .* )? $/x     # single statement, single line
+
 	&& $code !~ /=/) {                # NOT an assignment
 
 	$xcode = $code;
@@ -479,7 +479,7 @@ sub evaluate_and_display_line {
     return;
 }
 
-sub separate {
+sub _separate {
     our $SEPARATOR_USED;
     $SEPARATOR_USED++ && dumptrace(-1, 0, $SEPARATOR);
     return;
@@ -628,10 +628,11 @@ sub hash_repr {
                       %{$hashref};
         $hash = $cdh->{PHASH};
     } else {
-	# Hash::SafeKeys::safekeys will not reset an active `each` iterator
+	# use Hash::SafeKeys so we don't reset an active `each` iterator
         my $it = Hash::SafeKeys::save_iterator_state($hashref);
-	$hash = { map { dump_scalar($_) => dump_scalar($hashref->{$_}) } 
-		  keys %$hashref };
+	$hash = { map { 
+                      dump_scalar($_) => dump_scalar($hashref->{$_}) 
+                  } keys %$hashref };
         Hash::SafeKeys::restore_iterator_state($hashref,$it);
     }
 
@@ -644,7 +645,7 @@ sub hash_repr {
 	    $HASH_ENTRY_SEPARATOR,
 	    $HASH_PAIR_SEPARATOR, @keys );
     } else {
-	# safekeys does not reset an active `each` iterator (RT#77673)
+	# use Hash::Safekeys to not reset an active `each` iterator (RT#77673)
         my $it = Hash::SafeKeys::save_iterator_state($hash);
 	@r = map { [ $_ => $hash->{$_} ] } _condsort(keys %$hash);
         Hash::SafeKeys::restore_iterator_state($hash,$it);
@@ -738,7 +739,7 @@ sub handle_ALL_deferred_output {
 	my ($sub, $file) = split / : /, $context, 2;
 	handle_deferred_output($sub, $file);
     }
-    separate() if _display_style() > DISPLAY_TERSE;
+    _separate() if _display_style() > DISPLAY_TERSE;
     return;
 }
 
@@ -864,7 +865,6 @@ sub get_DB_args {
 # McCabe score: 49
 sub evaluate {
     my ($sigil, $varname, $deref_op, $index_op, $pkg, @keys) = @_;
-# return unless defined($sigil) && $sigil ne '';
     my $v;
     _reset_dump();
 
@@ -988,7 +988,8 @@ sub evaluate {
 		eval { $v = eval "\\$pkgvar" };
 		if (!defined $v) {
 		    print {$DUMPTRACE_FH} "Devel::DumpTrace: ",
-		        "Couldn't find $sigvar/$pkgvar in any appropriate scope.\n";
+		        "Couldn't find $sigvar/$pkgvar ",
+                        "in any appropriate scope.\n";
 		    $v = [];
 		}
 	    }
@@ -1023,14 +1024,14 @@ sub evaluate {
 }
 
 sub save_previous_regex_matches {
-    @matches = ($0,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,
-		$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,
-		$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,);
 
-    # XXX - if someone needs more than $30, submit a feature request
-    # (http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-DumpTrace,
-    # or email to bug-Devel-DumpTrace@rt.cpan.org)
-    # and I'll figure something out ...
+
+    if ($] > 5.025006) {
+        @matches = ($0,@{^CAPTURE});
+    } else {
+        no strict 'refs';
+        @matches = ($0, map { ${$_} } 1..$#+);
+    }
 
     return;
 }
@@ -1113,6 +1114,8 @@ sub Devel::DumpTrace::VerboseLevel::STORE {
     return $old;
 }
 
+sub Devel::DumpTrace::VerboseLevel::UNTIE { }
+
 1;
 
 __END__
@@ -1123,7 +1126,7 @@ Devel::DumpTrace - Evaluate and print out each line before it is executed.
 
 =head1 VERSION
 
-0.27
+0.28
 
 =head1 SYNOPSIS
 
@@ -1141,8 +1144,8 @@ L<Similar to Devel::Trace|Devel::Trace>, this module will cause a message
 to be printed to standard error for each line of source code that is
 executed. In addition, this module will attempt to identify variable names
 in the source code and substitute the values of those variables. In this
-way you can say the path of execution through your program as well
-as see the value of your variables at each step of the program.
+way you can see the path of execution through your program as well
+as the value of variables at each step of the program.
 
 For example, if your program looks like this:
 
@@ -1189,7 +1192,8 @@ for more details about the different levels of verbosity.
 
 This distribution comes with both a basic parser and a
 L<PPI-based parser|Devel::DumpTrace::PPI> (which relies on L<PPI>
-to understand your source code). If the L<PPI|PPI>
+to understand your source code). The PPI version has more features
+and fewer limitations than the basic parser. If the L<PPI|PPI>
 module is installed on your system, then this module will automatically
 use the PPI-based parser to analyze the traced code. You can
 force this module to use the basic parser by running with the
@@ -1550,7 +1554,8 @@ be incorrect or misleading include:
 
 
 All expressions on a line are evaluated, not just expressions in the statement
-currently being executed.
+currently being executed. Also see the basic parser limitation below concerning
+multiple lines for one statement.
 
 =head3 Statements with chained assignments; complex assignment expressions
 

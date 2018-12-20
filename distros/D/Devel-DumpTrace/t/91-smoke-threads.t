@@ -70,7 +70,10 @@ for my $level (4, 5) {
   my @linespec = grep $_ =~ $separate_line_for_line_and_file, @xh;
   ok(@linespec == 16 || @linespec == 15,
      "level $level separate lines for line & file")
-      or diag "had ",0+@linespec,++$keep;
+      or do {
+          diag "had ", 0+@xh," / ",0+@linespec;
+          $keep++;
+  };
 
   my @uneval_lhs = grep $xh[$_] =~ $uneval_lhs, 0..$#xh;
   ok(@uneval_lhs == 14, "level $level unevaluated source")
@@ -80,7 +83,8 @@ for my $level (4, 5) {
   for my $i (@uneval_lhs) {
       $eval_rhs++ if $xh[$i] =~ $uneval_rhs && $xh[$i+1] !~ $uneval_rhs;
   }
-  ok($eval_rhs, "level $level separate unevaluated and evaluated rhs") or ++$keep;
+  ok($eval_rhs, "level $level separate unevaluated and evaluated rhs")
+      or ++$keep;
 
   my $eval_lhs = 0;
   for my $i (@uneval_lhs) {
@@ -94,7 +98,7 @@ for my $level (4, 5) {
   unlink $file unless $keep;
 }
 
-# on 5.8.8, this test spits out (harmlessly, as far as I can tell):
+# on threaded 5.8.8, this test spits out (harmlessly, as far as I can tell):
 #
 #        (in cleanup) Can't call method "FETCH" on an undefined value at 
 #        blib/lib/Devel/DumpTrace.pm line 169 during global destruction.

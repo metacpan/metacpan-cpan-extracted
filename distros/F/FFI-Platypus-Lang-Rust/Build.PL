@@ -11,29 +11,14 @@ use lib 'lib';
 use My::ModuleBuild;
 use Env qw( @PATH );
 use File::Spec;
+use File::Which qw( which );
 
-my $rustc;
-
-foreach my $path (@PATH)
+unless(which('cargo'))
 {
-  my $try = File::Spec->catfile($path, "rustc");
-  if(-e $try)
-  {
-    my $version = `$try -V`;
-    if($? == 0)
-    {
-      print "found rustc:\n";
-      print "$version\n";
-      $rustc = $try;
-      last;
-    }
-  }
-}
-
-unless($rustc)
-{
-  print "Unable to find rustc.  Please make sure it is in the PATH.\n";
-  print "You should still be able to use pre-compiled rust dynamic libs.\n";
+  print STDERR <<DIAG;
+unable to find cargo in your PATH which you will likely need if you are
+going to build any extensions with bundled Rust code.
+DIAG
 }
 
 my $builder = My::ModuleBuild->new(
@@ -45,12 +30,14 @@ my $builder = My::ModuleBuild->new(
   configure_requires => {
     'Module::Build' => 0.38,
     'File::Which' => 0,
-    'Module::Build::FFI' => '0.18'
+    'Module::Build::FFI' => '0.18',
+    'File::chdir'   => 0,
   },
   build_requires => {
     'Module::Build' => 0.38,
     'File::Which' => 0,
-    'Module::Build::FFI' => '0.18'
+    'Module::Build::FFI' => '0.18',
+    'File::chdir'   => 0,
   },
   test_requires => {
     'FFI::CheckLib' => 0,

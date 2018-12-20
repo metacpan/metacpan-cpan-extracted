@@ -5,9 +5,14 @@ use warnings;
 
 use constant INITIAL_RESPONSE => ();
 use constant AFTER_AUTH => ();
-use constant AFTER_OK => ();
 
-sub new { return bless {}, shift }
+use constant on_rejected => ();
+
+sub new {
+    my $self = bless {}, shift;
+
+    return $self;
+}
 
 sub label {
     my $class = ref($_[0]) || $_[0];

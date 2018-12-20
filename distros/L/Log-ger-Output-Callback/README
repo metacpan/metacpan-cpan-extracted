@@ -2,9 +2,9 @@ NAME
     Log::ger::Output::Callback - Send logs to a subroutine
 
 VERSION
-    This document describes version 0.003 of Log::ger::Output::Callback
+    This document describes version 0.004 of Log::ger::Output::Callback
     (from Perl distribution Log-ger-Output-Callback), released on
-    2017-08-05.
+    2018-12-20.
 
 SYNOPSIS
      use Log::ger::Output Callback => (
@@ -13,6 +13,13 @@ SYNOPSIS
      );
 
 DESCRIPTION
+    This output plugin provides an easy way to do custom logging in
+    Log::ger. If you want to be more proper, you can also create your own
+    output plugin, e.g. Log::ger::Output::Screen or Log::ger::Output::File.
+    To do so, follow the tutorial in
+    Log::ger::Manual::Tutorial::49_WritingAnOutputPlugin or alternatively
+    just peek at the source code of this module.
+
 CONFIGURATION
 logging_cb => code
 detection_cb => code
@@ -41,7 +48,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

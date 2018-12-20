@@ -21,7 +21,8 @@ HTTP::Request::Generator - generate HTTP requests
 
     @requests = generate_requests(
         method => 'POST',
-        url    => '/profiles/:name',
+        host   => ['example.com','www.example.com'],
+        path   => '/profiles/:name',
         url_params => {
             name => ['Corion','Co-Rion'],
         },
@@ -42,7 +43,7 @@ HTTP::Request::Generator - generate HTTP requests
             },
         ],
     );
-    # Generates 16 requests out of the combinations
+    # Generates 32 requests out of the combinations
 
     for my $req (@requests) {
         $ua->request( $req );
@@ -81,7 +82,7 @@ of choice.
     {
       method => 'GET',
       url => '/profiles/Mark',
-      protocol => 'http',
+      scheme => 'http',
       port => 80,
       headers => {},
       body_params => {},

@@ -135,11 +135,31 @@ sub send_call {
     return $ret;
 }
 
-sub send_signal {
-    my ($self, %opts) = @_;
+sub send_return {
+    my ($self, $orig_msg, @opts_kv) = @_;
 
     return $self->_send_msg(
-        %opts,
+        @opts_kv,
+        reply_serial => $orig_msg->get_serial(),
+        type => 'METHOD_RETURN',
+    );
+}
+
+sub send_error {
+    my ($self, $orig_msg, @opts_kv) = @_;
+
+    return $self->_send_msg(
+        @opts_kv,
+        reply_serial => $orig_msg->get_serial(),
+        type => 'ERROR',
+    );
+}
+
+sub send_signal {
+    my ($self, @opts_kv) = @_;
+
+    return $self->_send_msg(
+        @opts_kv,
         type => 'SIGNAL',
     );
 }
@@ -225,6 +245,19 @@ to the server.
 
 sub pending_send {
     return !!$_[0]->{'_io'}->get_write_queue_count();
+}
+
+#----------------------------------------------------------------------
+
+# undocumented
+sub new {
+    my ($class, $socket) = @_;
+
+    my $self = bless { _socket => $socket }, $class;
+
+    $self->_set_up_peer_io( $socket );
+
+    return $self;
 }
 
 #----------------------------------------------------------------------

@@ -43,6 +43,9 @@ sub choose_subquery {
         push @$tmp_subqueries, $filled if defined $filled;
     }
     my $choices = [ @pre, map( '  ' . $_, @$saved_subqueries ), map( 't ' . $_, @$tmp_subqueries ) ];
+    if ( @$choices == @pre ) {
+        return; # no subqueries
+    }
     my $idx = $sf->__choose_see_long( $choices, $sql, $tmp, $stmt_type  );
     if ( ! $idx ) {
         return;

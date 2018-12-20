@@ -1,0 +1,96 @@
+NAME
+    Patch::DBI::WriteCSV - Patch DBI to also write CSV while fetching rows
+
+VERSION
+    This document describes version 0.002 of Patch::DBI::WriteCSV (from Perl
+    distribution Patch-DBI-WriteCSV), released on 2018-12-21.
+
+SYNOPSIS
+     use DBI;
+     require Patch:DBI::WriteCSV;
+     my $dbh = DBI->connect("dbi:mysql:database=mydb", "someuser", "somepass");
+
+     {
+         Patch::DBI::WriteCSV->import; # start writing CSV
+         my $sth = $dbh->prepare("SELECT * FROM member");
+         while (my $row = $sth->fetchrow_hashref) {
+             # do something with $row
+         }
+         Patch::DBI::WriteCSV->unimport; # no longer write CSV
+     }
+
+    The above code will print CSV to STDOUT, e.g.:
+
+     Name,Rank,Serial
+     alice,pvt,123456
+     bob,cpl,98765321
+     carol,"brig gen",8745
+
+DESCRIPTION
+    This package patches the following DBI methods:
+
+     fetchrow_array
+     fetchrow_arrayref
+     fetchrow_hashref
+     fetchall_arrayref
+     fetchall_hashref
+
+    to also write CSV while fetching row(s). By default it writes to STDOUT
+    but this can be customized (see "IMPORTS").
+
+    Compared to solution like DBIx::CSV, this solution does not introduce
+    new methods to DBI's database/statement handle, so producing CSV can be
+    easier when you do not use DBI directly, like when you use DBIx::Class.
+
+IMPORTS
+    Usage:
+
+     Patch::DBI::WriteCSV->import(%opts);
+
+    Known options:
+
+    *   csv
+
+        A Text::CSV object to use. If not specified, will instantiate a new
+        default one:
+
+         Text::CSV->new
+
+    *   handle
+
+        File handle to write CSV to. Defaults to STDOUT if this as well as
+        "filename" is not specified.
+
+    *   filename
+
+        File name to open (in append-mode) to write CSV to.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Patch-DBI-WriteCSV>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Patch-DBI-WriteCSV>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Patch-DBI-WriteCSV>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBIx::CSV
+
+    <https://www.perlmonks.org/?node_id=1227520>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

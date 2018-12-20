@@ -128,143 +128,143 @@
    "provides" : {
       "Code::TidyAll" : {
          "file" : "lib/Code/TidyAll.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Cache" : {
          "file" : "lib/Code/TidyAll/Cache.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::CacheModel" : {
          "file" : "lib/Code/TidyAll/CacheModel.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::CacheModel::Shared" : {
          "file" : "lib/Code/TidyAll/CacheModel/Shared.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Config::INI::Reader" : {
          "file" : "lib/Code/TidyAll/Config/INI/Reader.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Git::Precommit" : {
          "file" : "lib/Code/TidyAll/Git/Precommit.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Git::Prereceive" : {
          "file" : "lib/Code/TidyAll/Git/Prereceive.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Git::Util" : {
          "file" : "lib/Code/TidyAll/Git/Util.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin" : {
          "file" : "lib/Code/TidyAll/Plugin.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::CSSUnminifier" : {
          "file" : "lib/Code/TidyAll/Plugin/CSSUnminifier.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::GenericTransformer" : {
          "file" : "lib/Code/TidyAll/Plugin/GenericTransformer.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::GenericValidator" : {
          "file" : "lib/Code/TidyAll/Plugin/GenericValidator.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::JSBeautify" : {
          "file" : "lib/Code/TidyAll/Plugin/JSBeautify.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::JSHint" : {
          "file" : "lib/Code/TidyAll/Plugin/JSHint.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::JSLint" : {
          "file" : "lib/Code/TidyAll/Plugin/JSLint.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::JSON" : {
          "file" : "lib/Code/TidyAll/Plugin/JSON.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::MasonTidy" : {
          "file" : "lib/Code/TidyAll/Plugin/MasonTidy.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::PHPCodeSniffer" : {
          "file" : "lib/Code/TidyAll/Plugin/PHPCodeSniffer.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::PerlCritic" : {
          "file" : "lib/Code/TidyAll/Plugin/PerlCritic.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::PerlTidy" : {
          "file" : "lib/Code/TidyAll/Plugin/PerlTidy.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::PerlTidySweet" : {
          "file" : "lib/Code/TidyAll/Plugin/PerlTidySweet.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::PodChecker" : {
          "file" : "lib/Code/TidyAll/Plugin/PodChecker.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::PodSpell" : {
          "file" : "lib/Code/TidyAll/Plugin/PodSpell.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::PodTidy" : {
          "file" : "lib/Code/TidyAll/Plugin/PodTidy.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Plugin::SortLines" : {
          "file" : "lib/Code/TidyAll/Plugin/SortLines.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Result" : {
          "file" : "lib/Code/TidyAll/Result.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Role::GenericExecutable" : {
          "file" : "lib/Code/TidyAll/Role/GenericExecutable.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Role::HasIgnore" : {
          "file" : "lib/Code/TidyAll/Role/HasIgnore.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Role::RunsCommand" : {
          "file" : "lib/Code/TidyAll/Role/RunsCommand.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Role::Tempdir" : {
          "file" : "lib/Code/TidyAll/Role/Tempdir.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::SVN::Precommit" : {
          "file" : "lib/Code/TidyAll/SVN/Precommit.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::SVN::Util" : {
          "file" : "lib/Code/TidyAll/SVN/Util.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Util::Zglob" : {
          "file" : "lib/Code/TidyAll/Util/Zglob.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Code::TidyAll::Zglob" : {
          "file" : "lib/Code/TidyAll/Zglob.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       },
       "Test::Code::TidyAll" : {
          "file" : "lib/Test/Code/TidyAll.pm",
-         "version" : "0.71"
+         "version" : "0.72"
       }
    },
    "release_status" : "stable",
@@ -279,7 +279,7 @@
          "web" : "https://github.com/houseabsolute/perl-code-tidyall"
       }
    },
-   "version" : "0.71",
+   "version" : "0.72",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -388,7 +388,7 @@
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Meta",
             "name" : "@DROLSKY/GitHub::Meta",
-            "version" : "0.46"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::GitHub::Update",
@@ -398,7 +398,7 @@
                }
             },
             "name" : "@DROLSKY/GitHub::Update",
-            "version" : "0.46"
+            "version" : "0.47"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -690,7 +690,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -901,7 +901,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "name" : "@DROLSKY/InstallGuide",
-            "version" : "1.200011"
+            "version" : "1.200012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
@@ -943,7 +943,7 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -976,7 +976,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -1005,7 +1005,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1022,12 +1022,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.71",
+                  "tag" : "v0.72",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1047,7 +1047,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },
@@ -1087,7 +1087,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1107,7 +1107,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.19.0",
+                  "git_version" : "2.20.1",
                   "repo_root" : "."
                }
             },

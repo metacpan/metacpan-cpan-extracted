@@ -7,7 +7,7 @@ use Test2::Bundle::Extended;
 use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 
-use Errno qw/ENOENT EISDIR/;
+use Errno qw/ENOENT EISDIR EPERM/;
 
 use Test::MockFile ();
 
@@ -20,8 +20,12 @@ is( $link->unlink, 1, "unlink /link works." );
 is( $link->exists, 0, "/link is now gone" );
 {
     local $!;
-    is( $dir->unlink, 0,      "unlink /dir doesn't work." );
-    is( $! + 0,       EISDIR, "   ... and throws a \$\!" );
+    is( $dir->unlink, 0, "unlink /dir doesn't work." );
+    my $expected_error =
+        $^O =~ m/bsd/i  ? EPERM
+      : $^O eq 'darwin' ? EPERM
+      :                   EISDIR;
+    is( $! + 0, $expected_error, "   ... and throws a \$\!" );
 }
 
 like( dies { $dir->touch },  qr/^touch only supports files at \S/, "touch /dir doesn't work." );

@@ -3,12 +3,13 @@ abstract: 'Lightweight Routing Framework.'
 author:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 build_requires:
+  Test::Exception: '0'
   Test::More: '1.001014'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.13'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,28 +22,28 @@ no_index:
 provides:
   Map::Tube:
     file: lib/Map/Tube.pm
-    version: '3.57'
+    version: '3.58'
   Map::Tube::Line:
     file: lib/Map/Tube/Line.pm
-    version: '3.57'
+    version: '3.58'
   Map::Tube::Node:
     file: lib/Map/Tube/Node.pm
-    version: '3.57'
+    version: '3.58'
   Map::Tube::Pluggable:
     file: lib/Map/Tube/Pluggable.pm
-    version: '3.57'
+    version: '3.58'
   Map::Tube::Route:
     file: lib/Map/Tube/Route.pm
-    version: '3.57'
+    version: '3.58'
   Map::Tube::Table:
     file: lib/Map/Tube/Table.pm
-    version: '3.57'
+    version: '3.58'
   Map::Tube::Types:
     file: lib/Map/Tube/Types.pm
-    version: '3.57'
+    version: '3.58'
   Map::Tube::Utils:
     file: lib/Map/Tube/Utils.pm
-    version: '3.57'
+    version: '3.58'
 requires:
   File::Basename: '2.6'
   File::ShareDir: '1.114'
@@ -63,5 +64,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Map-Tube.git
-version: '3.57'
+version: '3.58'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

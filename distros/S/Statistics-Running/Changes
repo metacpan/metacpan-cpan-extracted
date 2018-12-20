@@ -1,4 +1,11 @@
-Revision history for Statistics-Running-Tiny
+Revision history for Statistics-Running
+
+0.12	2018-12-20
+	Fixed histogram-recalculate bugs
+
+0.03	2018-12-20
+	Added histogram_enable(), histogram_disable() and
+	histogram_reset() and enhanced histogram functionality
 
 0.02	2018-12-19
 	Make tests work for perl version < 5.10 by replacing

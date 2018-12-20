@@ -1,7 +1,23 @@
+0.025   2018-12-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Debug::Print.
+
+	- [doc] Also mention speed relative to Log::Contextual.
+
+
+0.024   2018-12-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention that Log::ger is ~100x faster than Log::Dispatch.
+
+
 0.023   2017-08-03 (PERLANCAR)
 
         - [Internal] Change the numeric values of level, to accomodate more room
-          for custom levels".
+          for custom levels.
 
 	- Defer set default null routines so other module can customize
 	  levels.
@@ -35,8 +51,8 @@
 
 0.018   2017-07-14 (PERLANCAR)
 
-	- use Log::ger::Format 'Foo' now sets for current package instead
-	  of globally (but the other plugins like Log::ger::Output or
+	- 'use Log::ger::Format "Foo"' now sets for current package instead of
+	  globally (but the other plugins like Log::ger::Output or
 	  Log::ger::Layout still defaults to setting globally).
 
 

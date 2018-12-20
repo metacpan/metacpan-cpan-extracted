@@ -17,6 +17,8 @@ use Test::MockFile qw/strict/;    # Everything below this can have its open over
 my ( undef, $temp_file ) = tempfile();
 my $temp_dir = tempdir( CLEANUP => 1 );
 
+note "-------------- REAL MODE --------------";
+
 like( dies { open( my $fh, "<", $temp_file ) }, qr/^Use of open to access unmocked file or directory '$temp_file' in strict mode at $0 line \d+/, "Using open on an unmocked file throws a croak" );
 like( dies { open( my $fh, "<abcd" ) }, qr/^Use of open to access unmocked file or directory '<abcd' in strict mode at $0 line \d+/, "Using a 2 arg open on an unmocked file throws a croak" );
 
@@ -32,6 +34,12 @@ like( dies { -e '' },        qr{^Use of stat to access unmocked file or director
 like( dies { -d $temp_dir }, qr{^Use of stat to access unmocked file or directory '$temp_dir' in strict mode at $0 line \d+},  "-d on an unmocked dir throws a croak" );
 like( dies { -l $temp_dir }, qr{^Use of lstat to access unmocked file or directory '$temp_dir' in strict mode at $0 line \d+}, "-l on an unmocked dir throws a croak" );
 
+note "-------------- MOCK MODE --------------";
+my @mocked_files;
+my $mock_file_name = 't/data/example_email.csv';
+push @mocked_files, Test::MockFile->file( $mock_file_name, "content" );    # Missing file but mocked.
+ok( -s $mock_file_name, "-s $mock_file_name" );
+
 package DynaLoader;
 main::is( __PACKAGE__, "DynaLoader", "Testing from a different source scope (DynaLoader)" );
 main::is( -d '/tmp',   1,            "-d is allowed in certain packages without a die (DynaLoader)" );
@@ -39,5 +47,6 @@ main::is( -d '/tmp',   1,            "-d is allowed in certain packages without 
 package main;
 
 is( open( my $fh, '<&STDIN' ), 1, "open STDIN isn't an error" );
-diag "$!";
+
+#diag "$!";
 done_testing();

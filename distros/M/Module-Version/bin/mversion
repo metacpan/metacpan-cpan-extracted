@@ -23,7 +23,7 @@ mversion - Program for querying Perl module versions
 
 =head1 VERSION
 
-version 0.13
+version 0.200
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,10 @@ This reads a list of modules from a file.
 
     mversion -i my_modules.txt
     mversion --input my_modules.txt
+
+=item -l, --local-lib DIR 
+
+Includes the L<local::lib> DIR in the module paths.
 
 =item -d, --dev
 

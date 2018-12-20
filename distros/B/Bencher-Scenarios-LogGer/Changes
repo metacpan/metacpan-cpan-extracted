@@ -1,3 +1,16 @@
+0.014   2018-12-20 (PERLANCAR)
+
+	- Add Mojo::Log as participant.
+
+
+0.013   2018-12-20 (PERLANCAR)
+
+	- Add Log::Dispatch and Log::Dispatch::Null as participants.
+
+	- NullOutput: bring down iteration from 1mil to 100k because it
+	  just takes to long (>1min) with Log::Dispatch.
+
+
 0.012   2017-08-04 (PERLANCAR)
 
 	- Adjust level benchmark to newest version of Log::ger.

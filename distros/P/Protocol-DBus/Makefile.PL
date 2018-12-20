@@ -31,15 +31,19 @@ WriteMakefile1(
         'X::Tiny'   => 0,
         'Module::Load'  => 0,
         'Call::Context' => 0,
-        'IO::Framed' => 0,
+        'IO::Framed' => 0.15,
+        'IO::SigGuard' => 0.13,
     },
 
     TEST_REQUIRES => {
         'autodie'         => 0,
         'FindBin'         => 0,
+        'File::Which'     => 0,
+        'Test::Exception' => 0,
         'Test::More'      => 0,
         'Test::Deep' => 0,
         'Test::FailWarnings' => 0,
+        'Test::SharedFork' => 0,
     },
 );
 

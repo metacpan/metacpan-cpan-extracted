@@ -11,6 +11,6 @@ package main;
 use 5.006;
 use strict; use warnings;
 use Test::More tests => 1;
+use Test::Exception;
 
-eval { InvalidMap->new };
-like($@, qr/ERROR/);
+throws_ok { InvalidMap->new } qr/ERROR/;

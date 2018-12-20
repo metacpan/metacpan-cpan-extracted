@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -214,7 +214,7 @@ sub _build_backup_ttl_secs {
 }
 
 sub _build_base_sig {
-    my $self = shift;
+    my $self           = shift;
     my $active_plugins = join( q{|}, map { $_->name } @{ $self->_plugin_objects } );
     return $self->_sig( [ $Code::TidyAll::VERSION || 0, $active_plugins ] );
 }
@@ -238,7 +238,7 @@ sub _build_plugins_to_run {
     my $self = shift;
 
     my $all_plugins = $self->plugins;
-    my %selected = map { $_ => 1 } @{ $self->selected_plugins };
+    my %selected    = map { $_ => 1 } @{ $self->selected_plugins };
     my %plugins;
 
     if (%selected) {
@@ -565,7 +565,7 @@ sub process_file {
     }
 
     my $contents = $cache_model->file_contents || $full_path->slurp;
-    my $result = $self->process_source( $contents, $path );
+    my $result   = $self->process_source( $contents, $path );
 
     if ( $result->state eq 'tidied' ) {
 
@@ -849,7 +849,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.71
+version 0.72
 
 =head1 SYNOPSIS
 

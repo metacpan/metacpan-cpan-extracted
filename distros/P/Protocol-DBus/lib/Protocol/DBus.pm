@@ -3,7 +3,7 @@ package Protocol::DBus;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =encoding utf8
 
@@ -17,7 +17,8 @@ Protocol::DBus - D-Bus in pure Perl
 
 For blocking I/O:
 
-    $dbus->do_authn();
+    # Authentication and “Hello” call/response:
+    $dbus->initialize();
 
     $dbus->send_call(
         path => '/org/freedesktop/DBus',
@@ -41,8 +42,8 @@ For non-blocking I/O:
     # the following is just for demonstration:
     vec( my $mask, $fileno, 1 ) = 1;
 
-    while (!$dbus->do_authn()) {
-        if ($dbus->authn_pending_send()) {
+    while (!$dbus->initialize()) {
+        if ($dbus->init_pending_send()) {
             select( undef, my $wout = $mask, undef, undef );
         }
         else {
@@ -98,7 +99,7 @@ See the distribution’s F<examples/> directory.
 =item * UNIX FD support requires that L<Socket::MsgHdr> be loaded at
 authentication time.
 
-=item * Currently EXTERNAL is the only supported authentication mechanism.
+=item * EXTERNAL and DBUS_COOKIE_SHA1 authentication is supported.
 
 =back
 
@@ -109,8 +110,6 @@ authentication time.
 =item * Add conveniences like match rule logic.
 
 =item * Improve parsing of bus paths in environment variables.
-
-=item * Add DBUS_COOKIE_SHA1 authentication.
 
 =item * Add more tests.
 

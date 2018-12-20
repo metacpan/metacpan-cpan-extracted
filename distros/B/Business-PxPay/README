@@ -1,12 +1,7 @@
-NAME
-    Business::PxPay - PX Pay Interface for www.paymentexpress.com
-
-VERSION
-    version 0.04
-
 SYNOPSIS
-        use Business::PxPay;
 
+        use Business::PxPay;
+    
         my $pxpay = Business::PxPay->new(
             userid => 'TestAccount',
             key    => 'c9fff215b9e2add78d252b78e214880b46a906e73190a380483c1c29acab4157'
@@ -32,39 +27,42 @@ SYNOPSIS
         }
 
 DESCRIPTION
-    PX Pay - Payment Express <http://www.paymentexpress.com/>
 
-  new
+    PX Pay - Payment Express http://www.paymentexpress.com/
+
+ new
+
         my $pxpay = Business::PxPay->new(
             userid => $user,
             key    => $key
         );
 
-    *   "userid" (required)
+      * userid (required)
 
-    *   "key" (required)
+      * key (required)
 
-        PxPayUserId & PxPayKey
+      PxPayUserId & PxPayKey
 
-    *   "ua"
+      * ua
 
-    *   "ua_args"
+      * ua_args
 
-        By default, we use LWP::UserAgent->new as the UserAgent. you can
-        pass "ua" or "ua_args" to use a different one.
+      By default, we use LWP::UserAgent->new as the UserAgent. you can pass
+      ua or ua_args to use a different one.
 
-    *   "url"
+      * url
 
-            my $pxpay = Business::PxPay->new(
-                userid => $user,
-                key    => $key,
-                url    => 'https://sec2.paymentexpress.com/pxpay/pxaccess.aspx', # to test?
-            );
+          my $pxpay = Business::PxPay->new(
+              userid => $user,
+              key    => $key,
+              url    => 'https://sec2.paymentexpress.com/pxpay/pxaccess.aspx', # to test?
+          );
 
-        The URL is 'https://www.paymentexpress.com/pxpay/pxaccess.aspx' by
-        default.
+      The URL is 'https://www.paymentexpress.com/pxpay/pxaccess.aspx' by
+      default.
 
-  Arguments
+ Arguments
+
     All those arguments can be passed into Business::PxPay->new() or pass
     into $pxpay->request later
 
@@ -80,63 +78,63 @@ DESCRIPTION
             TxnData3 => 'data3=C',
         };
 
-    *   "Amount" (required)
+      * Amount (required)
 
-        Amount value in d.cc format
+      Amount value in d.cc format
 
-    *   "Currency" (required)
+      * Currency (required)
 
-        <http://www.paymentexpress.com/technical_resources/ecommerce_hosted/
-        pxpay.html#currencyinput>
+      http://www.paymentexpress.com/technical_resources/ecommerce_hosted/pxpay.html#currencyinput
 
-    *   "UrlFail" (required)
+      * UrlFail (required)
 
-        URL of the merchant transaction failure page. No parameters ("&" or
-        "?") are permitted.
+      URL of the merchant transaction failure page. No parameters ("&" or
+      "?") are permitted.
 
-    *   "UrlSuccess" (required)
+      * UrlSuccess (required)
 
-        URL of the merchant transaction success page. No parameters ("&" or
-        "?") are permitted.
+      URL of the merchant transaction success page. No parameters ("&" or
+      "?") are permitted.
 
-    *   "TxnType" (required)
+      * TxnType (required)
 
-        "Auth" or "Purchase"
+      "Auth" or "Purchase"
 
-    *   "MerchantReference" (required)
+      * MerchantReference (required)
 
-        Reference field to appear on transaction reports
+      Reference field to appear on transaction reports
 
-    *   "BillingId"
+      * BillingId
 
-        Optional identifier when adding a card for recurring billing
+      Optional identifier when adding a card for recurring billing
 
-    *   "EmailAddress"
+      * EmailAddress
 
-        Optional email address
+      Optional email address
 
-    *   "EnableAddBillCard"
+      * EnableAddBillCard
 
-        Required when adding a card to the DPS system for recurring billing.
-        Set element to "1" for true
+      Required when adding a card to the DPS system for recurring billing.
+      Set element to "1" for true
 
-    *   "TxnId"
+      * TxnId
 
-        A value that uniquely identifies the transaction
+      A value that uniquely identifies the transaction
 
-    *   "TxnData1"
+      * TxnData1
 
-    *   "TxnData2"
+      * TxnData2
 
-    *   "TxnData3"
+      * TxnData3
 
-        Optional free text
+      Optional free text
 
-    *   "Opt"
+      * Opt
 
-        Optional additional parameter
+      Optional additional parameter
 
-  request
+ request
+
         my $xml = $pxpay->request_xml($args);
         my $rtn = $pxpay->request($args);
 
@@ -154,7 +152,8 @@ DESCRIPTION
 
     Usually you need redirect to the $rtn->{URI} when valid is 1
 
-  result
+ result
+
         my $xml = $pxpay->result_xml($ResponseCode);
         my $rtn = $pxpay->result($ResponseCode);
         if ( exists $rtn->{valid} and $rtn->{valid} == 1 ) {
@@ -163,12 +162,14 @@ DESCRIPTION
             print "Transaction Failed!\n";
         }
 
-    PxPay will POST to your "UrlSuccess" (or "UrlFail") when you finish the
+    PxPay will POST to your UrlSuccess (or UrlFail) when you finish the
     transaction (or click Cancel button). the POST would contain a param
     result which you can request to get the transaction status.
 
-  TIPS
-   I need params in "UrlSuccess"
+ TIPS
+
+  I need params in UrlSuccess
+
     For example, you want your UrlSuccess to be
     'http://mysite.com/cgi-bin/cart.cgi?cart_id=ABC'.
 
@@ -180,17 +181,8 @@ DESCRIPTION
             TxnData1 => 'ABC',
         );
 
-    and you can get the "TxnData1" in
+    and you can get the TxnData1 in
 
         my $rtn = $pxpay->result($ResponseCode);
         my $cart_id = $rtn->{TxnData1}
-
-AUTHOR
-    Fayland Lam <fayland@gmail.com>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2011 by Fayland Lam.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

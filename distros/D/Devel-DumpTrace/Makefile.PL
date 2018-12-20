@@ -45,6 +45,6 @@ WriteMakefile(
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => '5.008001',
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Devel-DumpTrace-* t/*.out.* MYMETA.*' },
+    clean               => { FILES => 'Devel-DumpTrace-* t/*.out.* t/ppi/*.out.* MYMETA.*' },
     test                => { TESTS => $TESTS },
 );

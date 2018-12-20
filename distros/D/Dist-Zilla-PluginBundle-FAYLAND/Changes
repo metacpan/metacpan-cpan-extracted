@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-FAYLAND
 
+0.15    2018-12-20
+        adding missing prereqs (manwar)
+
 0.14    2015-05-26
         fix requirements
 

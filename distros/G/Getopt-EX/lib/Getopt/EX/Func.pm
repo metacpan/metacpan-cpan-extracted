@@ -6,11 +6,17 @@ use Carp;
 
 use Exporter 'import';
 our @EXPORT      = qw();
-our @EXPORT_OK   = qw(parse_func);
+our @EXPORT_OK   = qw(parse_func callable);
 our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 
 use Data::Dumper;
 use Getopt::EX::Module;
+
+use Scalar::Util qw(blessed);
+sub callable {
+    my $target = shift;
+    blessed $target and $target->can('call');
+}
 
 sub new {
     my $class = shift;

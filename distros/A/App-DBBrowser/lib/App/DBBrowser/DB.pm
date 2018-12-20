@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.034';
+our $VERSION = '2.035';
 
 use Scalar::Util qw( looks_like_number );
 
@@ -133,7 +133,7 @@ sub get_schemas {
         if ( $driver eq 'SQLite' ) {
             $user_schema = [ 'main' ]; # [ undef ];
         }
-        elsif( $driver eq 'mysql' ) {
+        elsif( $driver =~ /^(?:mysql|MariaDB)\z/ ) {
             # MySQL 5.7 Reference Manual  /  MySQL Glossary:
             # In MySQL, physically, a schema is synonymous with a database.
             # You can substitute the keyword SCHEMA instead of DATABASE in MySQL SQL syntax,
@@ -190,7 +190,7 @@ sub regexp {
             return sprintf ' REGEXP(?,%s,%d)', $col, $case_sensitive;
         }
     }
-    elsif ( $sf->get_db_driver eq 'mysql' ) {
+    elsif ( $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/ ) {
         if ( $do_not_match ) {
             return ' '. $col . ' NOT REGEXP ?'        if ! $case_sensitive;
             return ' '. $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
@@ -220,7 +220,7 @@ sub concatenate {
         die $sf->message_method_undef_return( 'concatenate' ) if ! defined $concatenated;
         return $concatenated;
     }
-    return 'concat(' . join( ',', @$arg ) . ')'  if $sf->get_db_driver eq 'mysql';
+    return 'concat(' . join( ',', @$arg ) . ')'  if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;
 
     return join( ' || ', @$arg );
 }
@@ -234,7 +234,7 @@ sub epoch_to_datetime {
     return "DATETIME($col/$interval,'unixepoch','localtime')"     if $sf->get_db_driver eq 'SQLite';
 
     # mysql: FROM_UNIXTIME doesn't work with negative timestamps
-    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')"    if $sf->get_db_driver eq 'mysql';
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')"    if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;
 
     return "TO_TIMESTAMP(${col}::bigint/$interval)::timestamp"    if $sf->get_db_driver eq 'Pg';
 }
@@ -247,7 +247,7 @@ sub epoch_to_date {
 
     return "DATE($col/$interval,'unixepoch','localtime')"    if $sf->get_db_driver eq 'SQLite';
 
-    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"        if $sf->get_db_driver eq 'mysql';
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"        if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;
 
     return "TO_TIMESTAMP(${col}::bigint/$interval)::date"    if $sf->get_db_driver eq 'Pg';
 }
@@ -299,7 +299,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.034
+Version 2.035
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,174 @@
+NAME
+    Debug::Print - Make debugging with print() more awesome
+
+VERSION
+    This document describes version 0.001 of Debug::Print (from Perl
+    distribution Debug-Print), released on 2018-12-20.
+
+SYNOPSIS
+    Example script myscript.pl:
+
+     #!/usr/bin/env perl
+
+     sub f1 {
+         print "Doing stuffs in f1\n";
+         for (1..2) { f2(); sleep 1 }
+     }
+
+     sub f2 {
+         print "DEBUG: Doing sumtin' in f2\n";
+     }
+
+     f1;
+
+  Add more information to your print()
+    On the command-line:
+
+     % perl -MDebug::Print=template,'%d (%F:%L)> %m' myscript.pl
+
+    Sample output:
+
+     2018-12-20T20:55:00 (script.pl:4)> Doing stuffs in f1
+     2018-12-20T20:55:00 (script.pl:9)> DEBUG: Doing sumtin' in f2
+     2018-12-20T20:56:00 (script.pl:9)> DEBUG: Doing sumtin' in f2
+
+  Add color
+     % perl -MDebug::Print=template,'%d (%F:%L)> %m',color,green myscript.pl
+
+  Filter
+    Only show messages that start with "DEBUG:"
+
+     % perl -MDebug::Print=template,'%d (%F:%L)> %m',filter,'/\ADEBUG:/' myscript.pl
+
+    Sample output:
+
+     2018-12-20T20:55:00 (script.pl:9)> DEBUG: Doing sumtin' in f2
+     2018-12-20T20:56:00 (script.pl:9)> DEBUG: Doing sumtin' in f2
+
+    Don't show messages that start with "DEBUG:"
+
+     % perl -MDebug::Print=template,'%d (%F:%L)> %m',filter,'!/\ADEBUG:/' myscript.pl
+
+    Sample output:
+
+     2018-12-20T20:55:00 (script.pl:4)> Doing stuffs in f1
+
+DESCRIPTION
+    One of the simplest (and oldest) debugging technique is adding "print"
+    statements to your code. Although not very flexible, it forever remains
+    as one of programmers' favorites.
+
+    This module allows you to:
+
+    *   Add more information to your print()
+
+        For example: filename and line, timestamp.
+
+    *   Add color
+
+    *   Filtering
+
+        For example: don't output if string matches qr/\ADEBUG:/.
+
+    so debugging using "print()" can be more useful. (Although I still
+    recommend you to use a proper logging framework.)
+
+    Caveat: This module is still in its early development. API might change.
+    Current limitations:
+
+    *   Only print() to STDOUT is captured
+
+        Output to STDERR or other filehandles are currently not captured.
+
+        "printf()" is currently not captured.
+
+IMPORTS
+    Usage:
+
+     use Debug::Print %opts;
+
+    The following are known import options:
+
+  template
+    A "sprintf()"-like layout string to print the print() arguments itself
+    as well as additional information. The following are the known
+    conversions (which are modelled after Log::ger::Layout::Pattern):
+
+     %C Fully qualified package (or class) name of the caller
+     %d Current date in ISO8601 format (YYYY-MM-DD<T>hh:mm:ss) (localtime)
+     %D Current date in ISO8601 format (YYYY-MM-DD<T>hh:mm:ss) (GMT)
+     %F File where the print occurred
+     %H Hostname (if Sys::Hostname is available)
+     %l Fully qualified name of the calling method followed by the
+        callers source the file name and line number between
+        parentheses.
+     %L Line number within the file where the print statement was issued
+     %m The message to be printed (the actual print() arguments, joined)
+     %M Method or function where the print was issued
+     %n Newline (OS-independent)
+     %P pid of the current process
+     %r Number of seconds elapsed from program start to logging event
+     %R Number of seconds elapsed from last logging event to current
+        logging event
+     %T A stack trace of functions called
+     %% A literal percent (%) sign
+
+    If unspecified, the default template is "%m" (just the print()
+    arguments, without additional information).
+
+  color
+    A color name recognized by Term::ANSIColor.
+
+  filter
+    A coderef that will be passed the string to be printed. Should return
+    true if this message should be printed, or false otherwise. As a
+    convenience, the topic variable ($_) is also locally set to the string
+    to be printed.
+
+ENVIRONMENT
+  NO_COLOR
+    Force disabling color. Will be consulted before "COLOR". See
+    <https://no-color.org>.
+
+  COLOR
+    Force enabling/disabling color. If unset, will enable color when output
+    is interactive, disable otherwise.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Debug-Print>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Debug-Print>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Debug-Print>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Consider using logging framework instead. Some logging frameworks I
+    recommend: Log::ger, Log::Any. To switch from "print" to doing logging,
+    you typically just need to add an extra "use" statement and replace your
+    "print()" with "log_debug()" or some other routine. After that, you will
+    get: easy turning on/off of logging by level, customizable output, and
+    more. No need to modify your source code every time!
+
+    Devel::Confess can add call stack information to your "warn()"'s and
+    "die()"'s.
+
+    Capture::Tiny can capture the output of stdout and/or stderr, as is
+    Tie::STDOUT (which Debug::Print uses) or some other modules like
+    Tie::STDERR or IO::Capture::Stdout.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

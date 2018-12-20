@@ -4,15 +4,18 @@ author:
   - 'Felipe Gasper (FELIPE)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  File::Which: '0'
   FindBin: '0'
   Test::Deep: '0'
+  Test::Exception: '0'
   Test::FailWarnings: '0'
   Test::More: '0'
+  Test::SharedFork: '0'
   autodie: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +27,8 @@ no_index:
     - inc
 requires:
   Call::Context: '0'
-  IO::Framed: '0'
+  IO::Framed: '0.15'
+  IO::SigGuard: '0.13'
   Module::Load: '0'
   X::Tiny: '0'
   parent: '0'
@@ -32,4 +36,5 @@ requires:
 resources:
   bugtracker: https://github.com/FGasper/p5-Protocol-DBus/issues
   repository: git://github.com/FGasper/p5-Protocol-DBus.git
-version: '0.06'
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

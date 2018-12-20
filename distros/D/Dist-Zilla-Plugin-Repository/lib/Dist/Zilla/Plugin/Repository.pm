@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Repository;
-$Dist::Zilla::Plugin::Repository::VERSION = '0.23';
+$Dist::Zilla::Plugin::Repository::VERSION = '0.24';
 # ABSTRACT: Automatically sets repository URL from svn/svk/Git checkout for Dist::Zilla
 
 use Moose;
@@ -198,7 +198,7 @@ Dist::Zilla::Plugin::Repository - Automatically sets repository URL from svn/svk
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 

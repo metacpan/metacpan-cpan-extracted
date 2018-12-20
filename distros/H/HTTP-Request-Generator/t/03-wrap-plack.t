@@ -19,7 +19,7 @@ if( !$ok) {
     exit;
 };
 
-plan tests => 4;
+plan tests => 7;
 
 my @requests = generate_requests(
     method => 'POST',
@@ -40,3 +40,28 @@ isa_ok $requests[0], 'Plack::Request', 'Returned data';
 is $requests[0]->parameters->{'comment'}, 'Some comment', "We fetch the correct body parameter"
     or diag "Plack::Request version " . Plack::Request->VERSION;
 is $requests[0]->parameters->{'item'}, '1', "We fetch the correct query parameter";
+
+@requests = generate_requests(
+    method   => 'GET',
+    host     => ['example.com', 'www.example.com'],
+    scheme   => ['http', 'https'],
+    port     => [443,8443],
+    url      => '/',
+    wrap => \&HTTP::Request::Generator::as_plack,
+);
+is 0+@requests, 8, 'We generate parametrized GET requests';
+isa_ok $requests[0], 'Plack::Request', 'Returned data';
+
+my @urls = sort { $a cmp $b } map { $_->uri } @requests;
+
+is_deeply \@urls, [
+    'http://example.com:443/',
+    'http://example.com:8443/',
+    'http://www.example.com:443/',
+    'http://www.example.com:8443/',
+    'https://example.com/',
+    'https://example.com:8443/',
+    'https://www.example.com/',
+    'https://www.example.com:8443/',
+], "scheme  s, hostnames and ports get iterated correctly"
+    or diag Dumper \@urls;
