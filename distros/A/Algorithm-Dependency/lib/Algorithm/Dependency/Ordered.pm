@@ -1,39 +1,30 @@
 package Algorithm::Dependency::Ordered;
+# ABSTRACT: Implements an ordered dependency hierarchy
 
-=pod
-
-=head1 NAME
-
-Algorithm::Dependency::Ordered - Implements an ordered dependency heirachy
-
-=head1 DESCRIPTION
-
-Algorithm::Dependency::Ordered implements the most common variety of
-L<Algorithm::Dependency>, the one in which the dependencies of an item must
-be acted upon before the item itself can be acted upon.
-
-In use and semantics, this should be used in exactly the same way as for the
-main parent class. Please note that the output of the C<depends> method is
-NOT changed, as the order of the depends is not assumed to be important.
-Only the output of the C<schedule> method is modified to ensure the correct
-order.
-
-For API details, see L<Algorithm::Dependency>.
-
-=cut
+#pod =pod
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod Algorithm::Dependency::Ordered implements the most common variety of
+#pod L<Algorithm::Dependency>, the one in which the dependencies of an item must
+#pod be acted upon before the item itself can be acted upon.
+#pod
+#pod In use and semantics, this should be used in exactly the same way as for the
+#pod main parent class. Please note that the output of the C<depends> method is
+#pod NOT changed, as the order of the depends is not assumed to be important.
+#pod Only the output of the C<schedule> method is modified to ensure the correct
+#pod order.
+#pod
+#pod For API details, see L<Algorithm::Dependency>.
+#pod
+#pod =cut
 
 use 5.005;
 use strict;
 use Algorithm::Dependency ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.110';
-	@ISA     = 'Algorithm::Dependency';
-}
-
-
-
+our $VERSION = '1.111';
+our @ISA     = 'Algorithm::Dependency';
 
 
 sub schedule {
@@ -93,32 +84,52 @@ sub schedule {
 
 1;
 
+__END__
+
 =pod
 
-=head1 SUPPORT
+=encoding UTF-8
 
-Bugs should be submitted via the CPAN bug tracker, located at
+=head1 NAME
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-Dependency>
+Algorithm::Dependency::Ordered - Implements an ordered dependency hierarchy
 
-For general comments, contact the author.
+=head1 VERSION
 
-=head1 AUTHOR
+version 1.111
 
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+=head1 DESCRIPTION
+
+Algorithm::Dependency::Ordered implements the most common variety of
+L<Algorithm::Dependency>, the one in which the dependencies of an item must
+be acted upon before the item itself can be acted upon.
+
+In use and semantics, this should be used in exactly the same way as for the
+main parent class. Please note that the output of the C<depends> method is
+NOT changed, as the order of the depends is not assumed to be important.
+Only the output of the C<schedule> method is modified to ensure the correct
+order.
+
+For API details, see L<Algorithm::Dependency>.
 
 =head1 SEE ALSO
 
 L<Algorithm::Dependency>
 
-=head1 COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2003 - 2009 Adam Kennedy.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Dependency>
+(or L<bug-Algorithm-Dependency@rt.cpan.org|mailto:bug-Algorithm-Dependency@rt.cpan.org>).
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=head1 AUTHOR
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+Adam Kennedy <adamk@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

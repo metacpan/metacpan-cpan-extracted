@@ -9,7 +9,7 @@ use Module::Load;
 
 
 use Moo::Role;
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 with 'MooX::Attributes::Shadow::Role';
 
@@ -22,16 +22,16 @@ use namespace::clean;
 #
 # undefined values are the same as not specifying a value at all
 if ( 0 ) {
-around BUILDARGS => sub {
+    around BUILDARGS => sub {
 
-    my ( $orig, $class )  = ( shift, shift );
+        my ( $orig, $class ) = ( shift, shift );
 
-    my $attrs = $class->$orig( @_ );
+        my $attrs = $class->$orig( @_ );
 
-    delete @{$attrs}{ grep { ! defined $attrs->{$_} } keys %$attrs };
+        delete @{$attrs}{ grep { !defined $attrs->{$_} } keys %$attrs };
 
-    return $attrs;
-};
+        return $attrs;
+    };
 }
 
 sub _copy_attrs {
@@ -41,7 +41,7 @@ sub _copy_attrs {
     for my $attr ( @_ ) {
 
 
-        next unless $from->${\"has_$attr"};
+        next unless $from->${ \"has_$attr" };
 
         try {
             if ( defined( my $value = $from->$attr ) ) {
@@ -52,7 +52,7 @@ sub _copy_attrs {
 
             else {
 
-                $to->${\"clear_$attr"}
+                $to->${ \"clear_$attr" };
 
             }
         }
@@ -71,14 +71,14 @@ sub _copy_attrs {
 }
 
 
-#pod =method copy_from
-#pod
-#pod   $self->copy_from( $src );
-#pod
-#pod Copy attributes from the C<$src> object into the object.
-#pod
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 sub copy_from {
 
@@ -87,17 +87,17 @@ sub copy_from {
     return;
 }
 
-#pod =method clone
-#pod
-#pod   $object = $self->clone;
-#pod
-#pod Clone the object;
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 sub clone {
 
-    my $class = ref($_[0]);
+    my $class = ref( $_[0] );
     load $class;
 
     my $clone = $class->new;
@@ -107,14 +107,14 @@ sub clone {
     return $clone;
 }
 
-#pod =method new_from_attrs
-#pod
-#pod
-#pod    my $obj = IPC::PrettyPipe::Format->new_from_attrs( $container_obj, \%options );
-#pod
-#pod Create a new object using attributes from the C<$container_obj>.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
 
 sub new_from_attrs {
 
@@ -124,22 +124,22 @@ sub new_from_attrs {
     return $class->new( $class->xtract_attrs( @_ ) );
 }
 
-#pod =method new_from_hash
-#pod
-#pod
-#pod    my $obj = IPC::PrettyPipe::Format->new_from_hash( ?$container, \%attr );
-#pod
-#pod Create a new object using attributes from C<%attr> which are indicated as
-#pod being shadowed from C<$container>.  If C<$container> is not specified
-#pod it is taken from the Caller's class.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
 
 
 sub new_from_hash {
 
     my $contained = shift;
-    my $hash = pop;
+    my $hash      = pop;
 
     my $container = shift || caller();
 
@@ -148,7 +148,7 @@ sub new_from_hash {
     my $shadowed = $contained->shadowed_attrs( $container );
 
     my %attr;
-    while( my ( $alias, $orig ) = each %{ $shadowed } ) {
+    while ( my ( $alias, $orig ) = each %{$shadowed} ) {
 
         $attr{$orig} = $hash->{$alias} if exists $hash->{$alias};
 
@@ -181,7 +181,7 @@ IPC::PrettyPipe::Format - Format role
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 METHODS
 

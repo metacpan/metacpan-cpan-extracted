@@ -1,5 +1,9 @@
 Revision history for Alt-FFI-libffi
 
+0.05      2018-12-20 21:53:10 -0700
+  - Added test for FFI::Library
+  - Added address method on FFI::Library
+
 0.04      2018-06-06 08:33:26 -0400
   - Windows fixes
   - Floating point fixes to test

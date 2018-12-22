@@ -1,5 +1,9 @@
 Revision history for CatalystX-DebugFilter
 
+0.16      2018-12-22 15:02:27+00:00 Europe/London
+	* Distribution maintenance: add META.json (manwar)
+	* Distribution maintenance: add minimum Perl version (manwar)
+
 0.15      2018-11-01 13:20:51+00:00 Europe/London
         * Stable release of previous version
 

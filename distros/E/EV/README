@@ -238,10 +238,10 @@ BASIC INTERFACE
     $active = EV::run [$flags]
     $active = $loop->run ([$flags])
         Begin checking for events and calling callbacks. It returns when a
-        callback calls EV::break or the flasg are nonzero (in which case the
+        callback calls EV::break or the flags are nonzero (in which case the
         return value is true) or when there are no active watchers which
         reference the loop (keepalive is true), in which case the return
-        value will be false. The returnv alue can generally be interpreted
+        value will be false. The return value can generally be interpreted
         as "if true, there is more work left to do".
 
         The $flags argument can be one of the following:
@@ -278,7 +278,7 @@ BASIC INTERFACE
         "undef" for $fh_or_undef and 0 for $events).
 
         If timeout is "undef" or negative, then there will be no timeout.
-        Otherwise a EV::timer with this value will be started.
+        Otherwise an "EV::timer" with this value will be started.
 
         When an error occurs or either the timeout or I/O watcher triggers,
         then the callback will be called with the received event set (in
@@ -484,9 +484,9 @@ WATCHER TYPES
     $w = EV::timer_ns $after, $repeat, $callback
     $w = $loop->timer ($after, $repeat, $callback)
     $w = $loop->timer_ns ($after, $repeat, $callback)
-        Calls the callback after $after seconds (which may be fractional).
-        If $repeat is non-zero, the timer will be restarted (with the
-        $repeat value as $after) after the callback returns.
+        Calls the callback after $after seconds (which may be fractional or
+        negative). If $repeat is non-zero, the timer will be restarted (with
+        the $repeat value as $after) after the callback returns.
 
         This means that the callback would be called roughly after $after
         seconds, and then every $repeat seconds. The timer does his best not
@@ -558,8 +558,9 @@ WATCHER TYPES
         *   repeating interval timer ($interval > 0, $reschedule_cb = 0)
 
             In this mode the watcher will always be scheduled to time out at
-            the next "$at + N * $interval" time (for some integer N) and
-            then repeat, regardless of any time jumps.
+            the next "$at + N * $interval" time (for the lowest integer N)
+            and then repeat, regardless of any time jumps. Note that, since
+            "N" can be negative, the first trigger can happen before $at.
 
             This can be used to create timers that do not drift with respect
             to system time:
@@ -585,7 +586,7 @@ WATCHER TYPES
             *This callback MUST NOT stop or destroy this or any other
             periodic watcher, ever, and MUST NOT call any event loop
             functions or methods*. If you need to stop it, return 1e30 and
-            stop it afterwards. You may create and start a "EV::prepare"
+            stop it afterwards. You may create and start an "EV::prepare"
             watcher for this task.
 
             It must return the next time to trigger, based on the passed
@@ -595,17 +596,15 @@ WATCHER TYPES
             other times, too.
 
             This can be used to create very complex timers, such as a timer
-            that triggers on each midnight, local time (actually 24 hours
-            after the last midnight, to keep the example simple. If you know
-            a way to do it correctly in about the same space (without
-            requiring elaborate modules), drop me a note :):
+            that triggers on each midnight, local time (actually one day
+            after the last midnight, to keep the example simple):
 
                my $daily = EV::periodic 0, 0, sub {
                   my ($w, $now) = @_;
 
                   use Time::Local ();
                   my (undef, undef, undef, $d, $m, $y) = localtime $now;
-                  86400 + Time::Local::timelocal 0, 0, 0, $d, $m, $y
+                  Time::Local::timelocal_nocheck 0, 0, 0, $d + 1, $m, $y
                }, sub {
                   print "it's midnight or likely shortly after, now\n";
                };

@@ -12,10 +12,6 @@ sure you change the first line.
 
 Net::Async::Trello - low-level Trello API access
 
-=head1 VERSION
-
-version 0.001
-
 =head1 DESCRIPTION
 
 Provides a basic interface for interacting with the L<Trello|https://trello.com> webservice.
@@ -74,3 +70,4 @@ Tom Molesworth <TEAM@cpan.org>
 =head1 LICENSE
 
 Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.
+

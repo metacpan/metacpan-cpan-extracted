@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.10.0';
+$Git::Hooks::Notify::VERSION = '2.10.1';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -315,7 +315,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.10.0
+version 2.10.1
 
 =head1 SYNOPSIS
 

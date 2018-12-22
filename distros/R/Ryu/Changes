@@ -1,5 +1,11 @@
 Revision history for Ryu
 
+0.033     2018-12-21 15:35:22+08:00 Asia/Kuala_Lumpur
+    Bugs fixed:
+
+    - the ordered futures method ->resolve should not complete
+    until all incoming entries are received and resolved
+
 0.032     2018-12-15 20:20:24+08:00 Asia/Kuala_Lumpur
     New features:
 

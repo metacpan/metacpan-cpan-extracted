@@ -5,9 +5,14 @@ use Pcore -l10n;
 sub EXT_panel : Extend('Ext.Component') : Type('widget') {
     return {
         config => {
-            store       => undef,
-            chartConfig => undef,
-            dataHandler => undef,
+            store              => undef,
+            useCharts          => \1,
+            useMaps            => \0,
+            chartTheme         => 'material',
+            chartThemeAnimated => \0,
+            chartConfig        => undef,
+            chartInit          => undef,        # this.chartInit(chart)
+            chartDataHandler   => undef,        # this.chartDataHandler(chart, data)
         },
 
         layout              => 'fit',
@@ -50,19 +55,19 @@ JS
             };
 JS
 
-        # TODO remove copyright
         _loadCharts => func <<"JS",
             var urls = [],
-                chartConfig = this.getChartConfig(),
-                chartsBaseUrl = "@{[ $cdn->get_resources('amcharts4_path')->[0] ]}";
-                geoDataBaseUrl = "@{[ $cdn->get_resources('amcharts4_geodata_path')->[0] ]}";
+                chartTheme = this.getChartTheme(),
+                chartThemeAnimated = this.getChartThemeAnimated(),
+                chartsBaseUrl = "@{[ $cdn->get_resource_root('amcharts4') ]}",
+                geoDataBaseUrl = "@{[ $cdn->get_resource_root('amcharts4_geodata') ]}";
 
-            urls.push( chartsBaseUrl + 'core.js');
-            urls.push( chartsBaseUrl + 'charts.js');
+            if (!window.am4core) urls.push( chartsBaseUrl + '/core.js');
+            if (this.getUseCharts() && !window.am4charts) urls.push( chartsBaseUrl + '/charts.js');
+            if (this.getUseMaps() && !window.am4maps) urls.push( chartsBaseUrl + '/maps.js');
 
-            // if (chartConfig.theme && typeof AmCharts.themes[chartConfig.theme] == 'undefined') {
-                urls.push( chartsBaseUrl + 'themes/' + chartConfig.theme + '.js');
-            // }
+            if (chartThemeAnimated && !window.am4themes_animated) urls.push( chartsBaseUrl + '/themes/animated.js');
+            if (chartTheme && !window["am4themes_" + chartTheme]) urls.push( chartsBaseUrl + '/themes/' + chartTheme + '.js');
 
             if (urls.length) {
                 var me = this;
@@ -71,8 +76,6 @@ JS
                     url: urls,
                     cache: true,
                     onLoad: function () {
-                        // AmCharts.AmChart.prototype.brr = function () {};
-
                         me.chartsLoaded = true;
 
                         me._onReady();
@@ -88,9 +91,9 @@ JS
         setData => func ['data'], <<'JS',
             this._onReady();
 
-            this.chart.dataProvider = data;
+            if (!this.chart) return;
 
-            this.chart.validateData();
+            this.chart.data = data;
 JS
 
         _onReady => func <<'JS',
@@ -98,22 +101,30 @@ JS
             if (!this.rendered) return;
 
             if (!this.chart) {
-                var config = this.getChartConfig();
+                am4core.options.commercialLicense = true;
 
-                // TODO
-                am4core.useTheme(am4themes_material);
-                // am4core.useTheme(am4themes[config.theme]);
+                var config = this.getChartConfig(),
+                    chartTheme = this.getChartTheme(),
+                    chartThemeAnimated = this.getChartThemeAnimated(),
+                    chartInit = this.getChartInit();
+
+                // apply themes
+                am4core.unuseAllThemes();
+                if (chartThemeAnimated) am4core.useTheme(am4themes_animated);
+                if (chartTheme) am4core.useTheme(window["am4themes_" + chartTheme]);
 
                 this.chart = am4core.createFromConfig(config, this.innerElement.dom);
+
+                if (chartInit) chartInit.bind(this)(this.chart);
             }
 
             if (this.getStore()) {
                 var data = Ext.Array.pluck(this.getStore().data.items, 'data');
 
-                var dataHandler = this.getDataHandler();
+                var chartDataHandler = this.getChartDataHandler();
 
-                if (dataHandler) {
-                    this.chart.data = dataHandler.bind(this)(this.chart, data);
+                if (chartDataHandler) {
+                    this.chart.data = chartDataHandler.bind(this)(this.chart, data);
                 }
                 else {
                     this.chart.data = data;

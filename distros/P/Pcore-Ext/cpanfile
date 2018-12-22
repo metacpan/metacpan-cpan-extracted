@@ -1,2 +1,2 @@
-requires 'Pcore',            v0.24.5;
-requires 'Pcore::Resources', v0.1.0;
+requires 'Pcore',              v0.24.5;
+requires 'Pcore::CDN::Static', v0.1.0;

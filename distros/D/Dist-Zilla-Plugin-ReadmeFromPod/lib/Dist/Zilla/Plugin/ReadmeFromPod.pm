@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::ReadmeFromPod;
-our $AUTHORITY = 'cpan:AVAR';
-$Dist::Zilla::Plugin::ReadmeFromPod::VERSION = '0.36';
+our $AUTHORITY = 'cpan:FAYLAND';
+$Dist::Zilla::Plugin::ReadmeFromPod::VERSION = '0.37';
 use Moose;
 use List::Util 1.33 qw( first );
 with 'Dist::Zilla::Role::InstallTool' => { -version => 5 }; # after PodWeaver
@@ -8,6 +8,7 @@ with 'Dist::Zilla::Role::FilePruner';
 
 use IO::String;
 use Pod::Readme 'v1.2.0';
+use Path::Tiny 0.004;
 
 has filename => (
     is => 'ro',
@@ -89,7 +90,7 @@ sub setup_installer {
             'pod'      => 'pod'
         );
         foreach my $e (keys %ext) {
-            my $test_readme_file = $self->zilla->root->child($e ? "README.$e" : 'README');
+            my $test_readme_file = path($self->zilla->root)->child($e ? "README.$e" : 'README');
             if (-e "$test_readme_file") {
                 $readme_file = $test_readme_file;
                 $pod_class = $FORMATS{ $ext{$e} }->{class};

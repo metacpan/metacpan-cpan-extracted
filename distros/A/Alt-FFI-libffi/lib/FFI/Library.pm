@@ -3,50 +3,120 @@ package FFI::Library;
 use strict;
 use warnings;
 use Carp ();
-use FFI;
 use constant _is_win => $^O =~ /^(MSWin32|cygwin|msys2?)$/;
 
 # ABSTRACT: Perl Access to Dynamically Loaded Libraries
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 sub new
 {
-  my $class = shift;
-  my $libname = shift;
-  scalar(@_) <= 1
-    or Carp::croak('Usage: $lib = FFI::Library->new($filename, [, $flags ])');
-  my $lib;
-  if (_is_win)
+  my($class, $libname, $flags) = @_;
+  Carp::croak('Usage: $lib = FFI::Library->new($filename [, $flags ])')
+    unless @_ <= 3;
+
+  $flags ||= 0;
+
+  if(! defined $libname)
   {
-    require Win32;
-    $lib = Win32::LoadLibrary($libname) or return undef;
+    return bless {
+      impl => 'null',
+    }, $class;
+  }
+  elsif(ref $libname and int($libname) == int(\$0))
+  {
+    return $class->_dl_impl(undef, undef);
+  }
+  elsif(_is_win)
+  {
+    return $class->_dl_impl($libname, undef);
+  }
+  elsif(-e $libname)
+  {
+    return $class->_dl_impl(
+      $libname,
+      $flags == 0x01 ? FFI::Platypus::Lang::DL::RTLD_GLOBAL() : undef,
+    );
   }
   else
   {
     require DynaLoader;
-    my $so = $libname;
-    -e $so or $so = DynaLoader::dl_findfile($libname) || $libname;
-    $lib = DynaLoader::dl_load_file($so, @_)
-      or return undef;
+    my $so = DynaLoader::dl_findfile($libname) || $libname;
+    my $handle = DynaLoader::dl_load_file($so, $flags || 0);
+    return unless $handle;
+    return bless {
+      impl => 'dynaloader',
+      handle => $handle,
+    }, $class;
   }
-  bless \$lib, $class;
+}
+
+sub _dl_impl
+{
+  my($class, $path, $flags) = @_;
+  require FFI::Platypus::DL;
+  $flags = FFI::Platypus::DL::RTLD_PLATYPUS_DEFAULT()
+    unless defined $flags;
+  my $handle = FFI::Platypus::DL::dlopen($path, $flags);
+  return unless defined $handle;
+  bless { impl => 'dl', handle => $handle }, $class;
+}
+
+sub address
+{
+  my($self, $name) = @_;
+
+  if($self->{impl} eq 'dl')
+  {
+    return FFI::Platypus::DL::dlsym($self->{handle}, $name);
+  }
+  elsif($self->{impl} eq 'dynaloader')
+  {
+    return DynaLoader::dl_find_symbol($self->{handle}, $name);
+  }
+  elsif($self->{impl} eq 'null')
+  {
+    return;
+  }
+  else
+  {
+    Carp::croak("Unknown implementaton: @{[ $self->{impl} ]}");
+  }
 }
 
 sub function
 {
   my($self, $name, $sig) = @_;
-  my $addr = shift;
-  if(_is_win)
+
+  my $addr = $self->address($name);
+
+  Carp::croak("Unknown function $name")
+    unless defined $addr;
+
+  require FFI;
+  sub { FFI::call($addr, $sig, @_) };
+}
+
+sub DESTROY
+{
+  my($self) = @_;
+
+  if($self->{impl} eq 'dl')
   {
-    $addr = Win32::GetProcAddress($$self, $name);
+    FFI::Platypus::DL::dlclose($self->{handle});
+  }
+  elsif($self->{impl} eq 'dynaloader')
+  {
+    DynaLoader::dl_free_file($self->{handle})
+      if defined &DynaLoader::dl_free_file;
+  }
+  elsif($self->{impl} eq 'null')
+  {
+    # do nothing
   }
   else
   {
-    $addr = DynaLoader::dl_find_symbol($$self, $name);
+    Carp::croak("Unknown implementaton: @{[ $self->{impl} ]}");
   }
-  Carp::croak("Unknown function $name") unless defined $addr;
-  
-  sub { FFI::call($addr, $sig, @_) };
 }
 
 1;
@@ -63,14 +133,14 @@ FFI::Library - Perl Access to Dynamically Loaded Libraries
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
-    use FFI::Library;
-    $lib = FFI::Library->new("mylib");
-    $fn = $lib->function("fn", "signature");
-    $ret = $fn->(...);
+ use FFI::Library;
+ $lib = FFI::Library->new("mylib");
+ $fn = $lib->function("fn", "signature");
+ $ret = $fn->(...);
 
 =head1 DESCRIPTION
 
@@ -91,25 +161,32 @@ Creates an instance of C<FFI::Library>.
 
 =head1 FUNCTIONS
 
+=head2 address
+
+ my $address = $lib->address($function_name);
+
+Returns the symbol of the given function.  Returns C<undef> if
+the symbol is not found.
+
 =head2 function
 
- my $sub = $lib->function($function_name, $signature");
+ my $sub = $lib->function($function_name, $signature);
 
 Creates a code-reference like object which you can call.
 
 =head1 EXAMPLES
 
-    $clib_file = ($^O eq "MSWin32") ? "MSVCRT40.DLL" : "-lc";
-    $clib = FFI::Library->new($clib_file);
-    $strlen = $clib->function("strlen", "cIp");
-    $n = $strlen->($my_string);
+ $clib_file = ($^O eq "MSWin32") ? "MSVCRT40.DLL" : "-lc";
+ $clib = FFI::Library->new($clib_file);
+ $strlen = $clib->function("strlen", "cIp");
+ $n = $strlen->($my_string);
 
 =head1 SUPPORT
 
 Please open any support tickets with this project's GitHub repository 
 here:
 
-L<https://github.com/plicease/FFI/issues>
+L<https://github.com/Perl5-FFI/FFI/issues>
 
 =head1 SEE ALSO
 

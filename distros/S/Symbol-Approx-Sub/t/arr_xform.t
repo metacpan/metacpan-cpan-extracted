@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use Test::More;
 
 use Symbol::Approx::Sub (xform => [ sub { map { s/[^a-z]//ig; $_ } @_ },

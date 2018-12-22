@@ -17,12 +17,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Dist::Zilla::Plugin::ReadmeFromPod",
   "PREREQ_PM" => {
+    "Dist::Zilla" => "6.000",
     "Dist::Zilla::File::InMemory" => 0,
     "Dist::Zilla::Role::FilePruner" => 0,
     "Dist::Zilla::Role::InstallTool" => 5,
     "IO::String" => 0,
     "List::Util" => "1.33",
     "Moose" => 0,
+    "Path::Tiny" => "0.004",
     "Pod::Readme" => "1.2.0"
   },
   "TEST_REQUIRES" => {
@@ -30,10 +32,11 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0,
+    "blib" => "1.01",
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.36",
+  "VERSION" => "0.37",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +44,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Dist::Zilla" => "6.000",
   "Dist::Zilla::File::InMemory" => 0,
   "Dist::Zilla::Role::FilePruner" => 0,
   "Dist::Zilla::Role::InstallTool" => 5,
@@ -50,8 +54,10 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::Util" => "1.33",
   "Moose" => 0,
+  "Path::Tiny" => "0.004",
   "Pod::Readme" => "1.2.0",
   "Test::More" => 0,
+  "blib" => "1.01",
   "strict" => 0,
   "warnings" => 0
 );

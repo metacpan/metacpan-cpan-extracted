@@ -35,6 +35,7 @@ my @files = (
     't/dsl/iface.t',
     't/dsl/ppipe.t',
     't/lib/IPC/PrettyPipe/Render/Test.pm',
+    't/lib/My/Run.pm',
     't/lib/My/Tests.pm',
     't/ppipe/iface.t',
     't/ppipe/plugins.t',
@@ -46,7 +47,6 @@ my @files = (
     't/run/test.3',
     't/run/testprog.pl',
     't/run/user.t',
-    't/run/utils.pm',
     't/stream/iface.t',
     't/stream/parse_spec.t'
 );

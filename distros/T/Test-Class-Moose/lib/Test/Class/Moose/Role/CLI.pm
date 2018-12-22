@@ -4,14 +4,14 @@ package Test::Class::Moose::Role::CLI;
 
 use 5.010000;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 use Moose::Role 2.0000;
 use Carp;
 use namespace::autoclean;
 
 use File::Find qw( find );
-use JSON qw( encode_json );
+use JSON::MaybeXS qw( encode_json );
 use Module::Runtime qw( use_package_optimistically );
 use Module::Util qw( fs_path_to_module );
 use MooseX::Getopt 0.71;
@@ -202,7 +202,7 @@ sub _load_classes {
 sub _after_run { }
 
 {
-    my $meta = __PACKAGE__->meta;
+    my $meta     = __PACKAGE__->meta;
     my %attr_map = map { $_ => $_ }
       grep { $meta->get_attribute($_)->original_role->name eq __PACKAGE__ }
       grep { !/^_/ && $_ ne 'classes' } $meta->get_attribute_list;
@@ -335,7 +335,7 @@ Test::Class::Moose::Role::CLI - Role for command line argument handling and extr
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 

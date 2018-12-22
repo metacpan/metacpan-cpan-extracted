@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Creating and using dependency trees
 
 use strict;
@@ -139,6 +137,3 @@ isa_ok( $Missing, 'Algorithm::Dependency::Source' );
 ok( eval {$Missing->load;}, "Missing ->load returns true" );
 
 is_deeply( $Missing->missing_dependencies, [ 'C', 'E' ], "->missing_dependencies returns as expected when something missing" );
-
-1;
-

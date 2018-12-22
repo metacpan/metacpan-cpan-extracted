@@ -536,7 +536,9 @@ BOOT:
     SvREADONLY_on (sv);
   }
 #if !defined _WIN32 && !defined _MINIX && !EV_NO_ATFORK
-#if __linux
+/* unfortunately, musl neither implements the linux standard base,
+/* nor makes itself detectable via macros. yeah, right... */
+#if __linux && (__GLIBC__ || __UCLIBC__)
   int __register_atfork(void (*prepare) (void), void (*parent) (void), void (*child) (void), void *   __dso_handle);
   __register_atfork (0, 0, default_fork, 0);
 #else

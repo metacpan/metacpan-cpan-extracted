@@ -145,7 +145,7 @@ for my $test ( @tests ) {
 
         else {
 
-            push @ftests, $t
+            push @ftests, $t;
 
         }
 

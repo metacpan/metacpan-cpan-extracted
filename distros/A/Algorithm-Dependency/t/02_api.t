@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # API Testing for Algorithm::Dependency
 
 use strict;

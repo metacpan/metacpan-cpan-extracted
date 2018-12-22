@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use strict;
 use warnings;
 
-our $VERSION = '6.1'; # VERSION
+our $VERSION = '6.2'; # VERSION
 
 our $_OPTIONS_PARSED;
 our %_GLOBALS = ();
@@ -857,7 +857,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 6.1
+version 6.2
 
 =head1 SYNOPSIS
 
@@ -1349,7 +1349,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Shatlovsky Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Samit Badle Takumi Sakamoto
+=for stopwords Alexey Shatlovsky Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Mohammad S Anwar Samit Badle Takumi Sakamoto
 
 =over 4
 
@@ -1380,6 +1380,10 @@ Lisa Hare <lhare@inview.co.uk>
 =item *
 
 Markus Linnala <Markus.Linnala@cybercom.com>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -1439,7 +1443,7 @@ L<https://github.com/reyjrar/es-utils>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Brad Lhotsky.
+This software is Copyright (c) 2018 by Brad Lhotsky.
 
 This is free software, licensed under:
 

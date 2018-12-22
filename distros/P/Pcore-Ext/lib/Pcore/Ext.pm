@@ -1,4 +1,4 @@
-package Pcore::Ext v0.18.6;
+package Pcore::Ext v0.19.0;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Base;
@@ -165,7 +165,7 @@ sub _resolve_extend ( $self, $app, $tree ) {
                     my $ext_type = $APP->{ $class->{app_name} }->{ext_type};
 
                     # load extjs config, if not loaded
-                    $extjs->{$ext_ver}->{$ext_type} = $ENV->{share}->read_cfg( 'Pcore-Ext', 'data', "ext/$ext_ver/$ext_type.json" ) if !exists $extjs->{$ext_ver}->{$ext_type};
+                    $extjs->{$ext_ver}->{$ext_type} = $ENV->{share}->read_cfg("/Pcore-Ext/data/ext/$ext_ver/$ext_type.json") if !exists $extjs->{$ext_ver}->{$ext_type};
 
                     # base class is not exists
                     die qq[Invalid ExtJS class name "$class->{extend}"] if !exists $extjs->{$ext_ver}->{$ext_type}->{ $class->{extend} };

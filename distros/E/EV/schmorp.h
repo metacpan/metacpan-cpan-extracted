@@ -306,7 +306,7 @@ s_pipe (int filedes [2])
 
   closesocket (listener);
 
-#ifdef USE_SOCKETS_AS_HANDLES
+#if defined(USE_SOCKETS_AS_HANDLES) || PERL_VERSION_ATLEAST(5,18,0)
   /* when select isn't winsocket, we also expect socket, connect, accept etc.
    * to work on fds */
   filedes [0] = sock [0];
@@ -359,19 +359,23 @@ s_fd_prepare (int fd)
 
 #endif
 
-#if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 7))
-# define SCHMORP_H_HAVE_EVENTFD 1
-/* our minimum requirement is glibc 2.7 which has the stub, but not the header */
-# include <stdint.h>
-# ifdef __cplusplus
-extern "C" {
-# endif
-  int eventfd (unsigned int initval, int flags);
-# ifdef __cplusplus
-}
-# endif
+#if HAVE_EVENTFD
+# include <sys/eventfd.h>
 #else
-# define eventfd(initval,flags) -1
+# if __linux && (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 7))
+#  define SCHMORP_H_HAVE_EVENTFD 1
+/* our minimum requirement is glibc 2.7 which has the stub, but not the header */
+#  include <stdint.h>
+#  ifdef __cplusplus
+extern "C" {
+#  endif
+  int eventfd (unsigned int initval, int flags);
+#  ifdef __cplusplus
+}
+#  endif
+# else
+#  define eventfd(initval,flags) -1
+# endif
 #endif
 
 typedef struct {
@@ -438,11 +442,7 @@ s_epipe_signal (s_epipe *epp)
   DWORD dummy;
   WriteFile (S_TO_HANDLE (epp->fd [1]), (LPCVOID)&dummy, 1, &dummy, 0);
 #else
-# if SCHMORP_H_HAVE_EVENTFD
   static uint64_t counter = 1;
-# else
-  static char counter [8];
-# endif
   /* some modules accept fd's from outside, support eventfd here */
   if (write (epp->fd [1], &counter, epp->len) < 0
       && errno == EINVAL

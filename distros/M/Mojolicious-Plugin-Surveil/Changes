@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojolicious-Plugin-Surveil
 
+0.03 2018-12-21T09:44:00+0900
+ - Add "blur" and "focus" to default event list
+ - Add support for custom event handler
+ - Require enable param to be set
+
 0.02 2017-09-11T11:07:55+0200
  - Add support for console.surveil() on in JavaScript
 

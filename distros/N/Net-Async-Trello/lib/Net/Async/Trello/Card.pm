@@ -1,7 +1,9 @@
 package Net::Async::Trello::Card;
-$Net::Async::Trello::Card::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Trello::Generated::Card);
 
@@ -10,10 +12,6 @@ use Log::Any qw($log);
 =head1 NAME
 
 Net::Async::Trello::Card
-
-=head1 VERSION
-
-version 0.001
 
 =head1 DESCRIPTION
 
@@ -39,5 +37,16 @@ sub history {
     )
 }
 
+sub update {
+    my ($self, %args) = @_;
+    my $trello = $self->trello;
+	$trello->http_put(
+		uri => URI->new(
+            $trello->base_uri . 'cards/' . $self->id
+        ),
+        body => \%args
+	)
+}
 
 1;
+

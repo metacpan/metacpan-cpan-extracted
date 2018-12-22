@@ -4,7 +4,7 @@ package Test::Class::Moose::Report;
 
 use 5.010000;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 use Carp;
 use Moose;
@@ -56,13 +56,13 @@ sub current_class {
 }
 
 sub current_instance {
-    my $self = shift;
+    my $self          = shift;
     my $current_class = $self->current_class or return;
     return $current_class->current_instance;
 }
 
 sub current_method {
-    my $self = shift;
+    my $self             = shift;
     my $current_instance = $self->current_instance or return;
     return $current_instance->current_method;
 }
@@ -138,7 +138,7 @@ Test::Class::Moose::Report - Test information for Test::Class::Moose
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 

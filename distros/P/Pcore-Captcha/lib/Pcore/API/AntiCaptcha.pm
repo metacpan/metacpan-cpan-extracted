@@ -119,7 +119,7 @@ sub resolve ( $self, $captcha, $cb = undef ) {
             languagePool => $captcha->{type} == $ANTICAPTCHA_QUEUE_IMAGE_EN ? 'en' : 'ru',
             task         => {
                 type      => 'ImageToTextTask',
-                body      => to_b64( $captcha->{image}->$*, q[] ),
+                body      => to_b64( $captcha->{image}->$*, $EMPTY ),
                 phrase    => $captcha->{phrase} ? \1 : \0,
                 case      => $captcha->{case_sensitive} ? \1 : \0,
                 numeric   => $captcha->{numeric},

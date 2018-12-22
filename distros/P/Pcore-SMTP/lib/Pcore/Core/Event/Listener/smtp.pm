@@ -67,7 +67,7 @@ sub forward_event ( $self, $ev ) {
             $body = $LF . ( is_ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data} );
 
             # remove all trailing "\n"
-            local $/ = '';
+            local $/ = $EMPTY;
 
             chomp $body;
         }
@@ -95,8 +95,6 @@ sub forward_event ( $self, $ev ) {
 ## |======+======================+================================================================================================================|
 ## |    2 | 59                   | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 70                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 12                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
@@ -117,8 +115,8 @@ Pcore::Core::Event::Listener::smtp
         [   'smtp:',
             host     => 'smtp.gmail.com',
             port     => 465,
-            username => '',
-            password => '',
+            username => $EMPTY,
+            password => $EMPTY,
             tls      => 1,
             tls_ctx  => undef,
 

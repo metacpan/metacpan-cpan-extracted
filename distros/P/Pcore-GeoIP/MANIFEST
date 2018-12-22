@@ -9,7 +9,7 @@ lib/Build.PL
 lib/Pcore/GeoIP.pm
 lib/Pcore/Util/GeoIP.pm
 script/update-geoip-share.pl
-share/dist-id.json
+share/dist-id.yaml
 share/dist.yaml
 t/001-util-geoip.t
 t/author-pod-syntax.t

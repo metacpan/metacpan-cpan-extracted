@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-ReadmeFromPod
 
+0.37 2018-12-21 09:34:01
+    - fix path for Dist::Zilla v6+
+
 0.36 2018-10-29 21:29:16
     - Add Github Flavored Markdown ("gfm") as a format to generate.
 

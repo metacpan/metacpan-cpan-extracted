@@ -10,7 +10,7 @@ my %opts = (
         'realclean'    => { FILES => '*.xsi' },
         'PREREQ_PM'    => { 'DBI' => 1.609 },
         'OBJECT'       => '$(O_FILES)',
-        'INC'          => "-I$dbi_arch_dir -I/usr/include/mysql-cppconn-8",
+        'INC'          => "-I$dbi_arch_dir -I/usr/include/mysql-cppconn-8 -std=c99",
         'LIBS'         => '-lmysqlcppconn8',
 );
 

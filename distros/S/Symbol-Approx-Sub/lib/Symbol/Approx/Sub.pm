@@ -23,6 +23,9 @@ Symbol::Approx::Sub - Perl module for calling subroutines by approximate names!
                            match => \&my_matcher,
                            choose => \&my_chooser);
 
+New B<suggest> mode.
+
+  use Symbol::Approx::Sub (suggest => 1);
 
 =head1 DESCRIPTION
 
@@ -142,6 +145,55 @@ C<choose>.
 The default transformer, matcher and chooser are available as plug-ins
 called Text::Soundex, String::Equal and Random.
 
+=head2 Suggest mode
+
+Version 3.1.0 introduces a 'suggest' mode. In this mode, instead of just
+choosing and running an alternative subroutine, your program will still
+die as it would without Symbol::Approx::Sub, but the error message you
+see will include the suggested alternative subroutine. As an example,
+take this code:
+
+  sub aa {
+    print "Here's aa()";
+  }
+
+  a();
+
+Obviously, if you run this without loading Symbol::Approx::Sub, you'll
+get an error message. That message will say "Cannot find subroutine
+main::a". With Symbol::Approx::Sub loaded in its default mode, the
+module will find C<aa()> instead of C<a()> and will silently run that
+subroutine instead.
+
+And that's what makes Symbol::Approx::Sub nothing more than a clever
+party trick. It's really not at all useful to run a program when you're
+not really sure what subroutines will be called.
+
+But running in 'suggest' mode changes that behaviour. Instead of just
+running C<aa()> silently, the module will still C<die()> (as in the
+non-Symbol::Approx::Sub behaviour) but the message will be a little
+more helpful, as it will include the name of the subroutine that has
+been selected as the most likely correction for your typo.
+
+So, if you run this code:
+
+  use Symbol::Approx::Sub (suggest => 1);
+
+  sub aa {
+    print "Here's aa()";
+  }
+
+  a();
+
+Then your program will die with the error message "Cannot find
+subroutine main::a. Did you mean main::aa?".
+
+I like to think that some eighteen years or so after it was
+first released, Symbol::Approx::Sub has added a feature that
+might actually be of some use.
+
+Thanks to Alex Balhatchet for suggesting it.
+
 =cut
 
 package Symbol::Approx::Sub;
@@ -163,7 +215,7 @@ use Exception::Class (
   'SAS::Exception::InvalidParameter'           => { isa => 'SAS::Exception' },
 );
 
-$VERSION = '3.0.2';
+$VERSION = '3.1.0';
 
 use Carp;
 
@@ -194,9 +246,10 @@ sub import  {
   %param = @_ if @_;
 
   my %defaults = (
-    xform  => 'Text::Soundex',
-    match  => 'String::Equal',
-    choose => 'Random'
+    xform   => 'Text::Soundex',
+    match   => 'String::Equal',
+    choose  => 'Random',
+    suggest => 0,
   );
 
   foreach (keys %param) {
@@ -208,6 +261,8 @@ sub import  {
   _set_transformer(\%param, \%CONF, $defaults{xform});
   _set_matcher(\%param, \%CONF, $defaults{match});
   _set_chooser(\%param, \%CONF, $defaults{choose});
+
+  $CONF{suggest} = $param{suggest} // $defaults{suggest};
 
   # Now install appropriate AUTOLOAD routine in caller's package
 
@@ -399,7 +454,11 @@ sub _make_AUTOLOAD {
         ) unless defined $CONF{choose};
         $sub = "${pkg}::" . $orig[$CONF{choose}->(@subs)];
       }
-      goto &$sub;
+      if ($CONF{suggest}) {
+        croak "Cannot find subroutine $AUTOLOAD. Did you mean $sub?";
+      } else {
+        goto &$sub;
+      }
     } else {
       die "REALLY Undefined subroutine $AUTOLOAD called at $c[1] line $c[2]\n";
     }

@@ -16,7 +16,7 @@ Test::MockFile::DirHandle - Provides a class object for L<Test::MockFile> to giv
 
 =head1 VERSION
 
-Version 0.014
+Version 0.015
 
 =cut
 

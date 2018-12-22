@@ -5,7 +5,7 @@ package IPC::PrettyPipe::Stream::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use parent 'Exporter';
 
@@ -105,7 +105,7 @@ IPC::PrettyPipe::Stream::Utils - support utilities for streams
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

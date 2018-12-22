@@ -25,6 +25,7 @@ my @files = (
     't/mock-stat.t',
     't/recycle-stat.t',
     't/simple-test.t',
+    't/stack-corruption.t',
     't/stat-helpers.t',
     't/test-A.t',
     't/test-B-uppercase.t',

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 use Carp;
 use Class::MOP;
@@ -167,7 +167,7 @@ sub _augment_tags {
 
     for my $tag_definition ( @{$tags} ) {
         my $direction = substr( $tag_definition, 0, 1 );
-        my $tag = substr( $tag_definition, 1 );
+        my $tag       = substr( $tag_definition, 1 );
         if ( $direction eq '+' ) {
             $tag_list->{$tag} = 1;
         }
@@ -199,7 +199,7 @@ Test::Class::Moose::AttributeRegistry - Global registry of tags by class and met
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 

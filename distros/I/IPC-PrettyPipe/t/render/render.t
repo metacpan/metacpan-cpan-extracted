@@ -20,7 +20,7 @@ sub dump {
 sub ppx {
 
     my $pipe = eval( $_[0] )
-      or die( "error evaluation $_[0]: $@\n");
+      or die( "error evaluation $_[0]: $@\n" );
     $pipe->render( colorize => 0 );
 }
 
@@ -43,7 +43,7 @@ ppipe [ 'cmd1' ];
 ppipe [ 'cmd1', 'a' ];
 
 --- expected
-  cmd1	\
+  cmd1     \
     a
 
 === One command w/ one arg + value, no sep
@@ -52,7 +52,7 @@ ppipe [ 'cmd1', 'a' ];
 ppipe [ 'cmd1', [ 'a', 3 ] ];
 
 --- expected
-  cmd1	\
+  cmd1     \
     a 3
 
 === One command w/ one arg + blank value, no sep
@@ -61,7 +61,7 @@ ppipe [ 'cmd1', [ 'a', 3 ] ];
 ppipe [ 'cmd1', [ 'a', '' ] ];
 
 --- expected
-  cmd1	\
+  cmd1      \
     a ''
 
 === One command w/ one arg + value, sep
@@ -70,7 +70,7 @@ ppipe [ 'cmd1', [ 'a', '' ] ];
 ppipe [ 'cmd1', argsep '=', [ 'a', 3 ] ];
 
 --- expected
-  cmd1	\
+  cmd1     \
     a=3
 
 === One command w/ one arg + value, pfx, no sep
@@ -79,7 +79,7 @@ ppipe [ 'cmd1', argsep '=', [ 'a', 3 ] ];
 ppipe [ 'cmd1', argpfx '-', [ 'a', 3 ] ];
 
 --- expected
-  cmd1	\
+  cmd1      \
     -a 3
 
 === One command w/ one arg + value, pfx, sep
@@ -88,8 +88,8 @@ ppipe [ 'cmd1', argpfx '-', [ 'a', 3 ] ];
 ppipe [ 'cmd1', argpfx '--', argsep '=', [ 'a', 3 ], [ 'b', 'is after a' ] ];
 
 --- expected
-  cmd1	\
-    --a=3	\
+  cmd1                  \
+    --a=3               \
     --b='is after a'
 
 === One command w/ two args
@@ -98,8 +98,8 @@ ppipe [ 'cmd1', argpfx '--', argsep '=', [ 'a', 3 ], [ 'b', 'is after a' ] ];
 ppipe [ 'cmd1', 'a', 'b' ];
 
 --- expected
-  cmd1	\
-    a	\
+  cmd1     \
+    a      \
     b
 
 === One command w/ one stream
@@ -108,8 +108,8 @@ ppipe [ 'cmd1', 'a', 'b' ];
 ppipe [ 'cmd1', '>', 'file' ];
 
 --- expected
-  cmd1	\
-> file
+  cmd1        \
+    > file
 
 
 === One command w/ one stream, one arg
@@ -118,9 +118,9 @@ ppipe [ 'cmd1', '>', 'file' ];
 ppipe [ 'cmd1', '>', 'file', '-a' ];
 
 --- expected
-  cmd1	\
-    -a	\
-> file
+  cmd1        \
+    -a        \
+    > file
 
 === One command w/ two streams
 
@@ -128,9 +128,9 @@ ppipe [ 'cmd1', '>', 'file', '-a' ];
 ppipe [ 'cmd1', '>', 'stdout', '2>', 'stderr' ];
 
 --- expected
-  cmd1	\
-> stdout	\
-2> stderr
+  cmd1           \
+    > stdout     \
+    2> stderr
 
 === One command w/ two streams, one arg
 
@@ -138,11 +138,10 @@ ppipe [ 'cmd1', '>', 'stdout', '2>', 'stderr' ];
 ppipe [ 'cmd1', '>', 'stdout', '2>', 'stderr', '-a' ];
 
 --- expected
-  cmd1	\
-    -a	\
-> stdout	\
-2> stderr
-
+  cmd1           \
+    -a           \
+    > stdout     \
+    2> stderr
 
 === Two commands
 Two simple commands
@@ -151,7 +150,7 @@ Two simple commands
 ppipe ['cmd1' ], [ 'cmd2'];
 
 --- expected
-  cmd1	\
+  cmd1     \
 | cmd2
 
 
@@ -161,9 +160,9 @@ ppipe ['cmd1' ], [ 'cmd2'];
 ppipe ['cmd1', '-a' ], [ 'cmd2', '-b' ];
 
 --- expected
-  cmd1	\
-    -a	\
-| cmd2	\
+  cmd1     \
+    -a     \
+| cmd2     \
     -b
 
 
@@ -174,12 +173,12 @@ ppipe [ 'cmd1', '-a', '2>', 'stderr' ],
       [ 'cmd2', '-b', '>', 'stdout' ];
 
 --- expected
-  cmd1	\
-    -a	\
-2> stderr	\
-| cmd2	\
-    -b	\
-> stdout
+  cmd1            \
+    -a            \
+    2> stderr     \
+| cmd2            \
+    -b            \
+    > stdout
 
 === Two commands w/ args and two streams apiece
 
@@ -188,14 +187,14 @@ ppipe [ 'cmd1', '-a', '2>', 'stderr', '3>', 'out put' ],
       [ 'cmd2', '-b', '>', 0, '2>', 'std err' ];
 
 --- expected
-  cmd1	\
-    -a	\
-2> stderr	\
-3> 'out put'	\
-| cmd2	\
-    -b	\
-> 0	\
-2> 'std err'
+  cmd1               \
+    -a               \
+    2> stderr        \
+    3> 'out put'     \
+| cmd2               \
+    -b               \
+    > 0              \
+    2> 'std err'
 
 === Two commands + pipe streams
 
@@ -204,13 +203,10 @@ ppipe [ 'cmd1' ],
       [ 'cmd2' ], '>', 'stdout';
 
 --- expected
-(	\
-  cmd1	\
-| cmd2	\
-)	\
-> stdout
-
-
+(             \
+  cmd1        \
+| cmd2        \
+) > stdout
 
 === Two commands w/ args and one stream apiece + pipe streams
 
@@ -220,12 +216,45 @@ ppipe [ 'cmd 1', '-a', '2>', 'std err' ],
       '>', 0;
 
 --- expected
-(	\
-  'cmd 1'	\
-    -a	\
-2> 'std err'	\
-| 'cmd 2'	\
-    -b	\
-> 'std out'	\
-)	\
-> 0
+(                    \
+  'cmd 1'            \
+    -a               \
+    2> 'std err'     \
+| 'cmd 2'            \
+    -b               \
+    > 'std out'      \
+) > 0
+
+=== nested pipes, outer pipe streams
+
+--- input
+ppipe [ 'cmd 1', '-a', '2>', 'std err' ],
+      [ ppipe [ 'cmd 2', '-b', '>', 'std out' ] ],
+      '>', 0;
+
+--- expected
+(                       \
+  'cmd 1'               \
+    -a                  \
+    2> 'std err'        \
+|     'cmd 2'           \
+        -b              \
+        > 'std out'     \
+) > 0
+
+=== nested pipes, inner pipe streams
+
+--- input
+ppipe [ 'cmd 1', '-a', '2>', 'std err' ],
+      ppipe [ 'cmd 2', '-b', '>', 'std out' ] ,
+      '>', 0;
+
+--- expected
+  'cmd 1'               \
+    -a                  \
+    2> 'std err'        \
+| (                     \
+    'cmd 2'             \
+        -b              \
+        > 'std out'     \
+  ) > 0

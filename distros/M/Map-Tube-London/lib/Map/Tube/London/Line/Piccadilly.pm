@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Piccadilly;
 
-$Map::Tube::London::Line::Piccadilly::VERSION   = '1.25';
+$Map::Tube::London::Line::Piccadilly::VERSION   = '1.26';
 $Map::Tube::London::Line::Piccadilly::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Piccadilly - London Tube Map: Piccadilly Line.
 
 =head1 VERSION
 
-Version 1.25
+Version 1.26
 
 =head1 DESCRIPTION
 

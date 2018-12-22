@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 use File::Find;
 use File::Spec;
@@ -29,7 +29,7 @@ sub _load {
 
     $file =~ s{\.pm$}{};    # remove .pm extension
     $file =~ s{\\}{/}g;     # to make win32 happy
-    $dir =~ s{\\}{/}g;      # to make win32 happy
+    $dir  =~ s{\\}{/}g;     # to make win32 happy
     $file =~ s/^$dir//;
     my $_package = join '::' => grep $_ => File::Spec->splitdir($file);
 
@@ -89,7 +89,7 @@ Test::Class::Moose::Load - Load L<Test::Class::Moose> classes automatically.
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 

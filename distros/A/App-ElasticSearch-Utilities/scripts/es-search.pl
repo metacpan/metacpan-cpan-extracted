@@ -37,8 +37,9 @@ GetOptions(\%OPT, qw(
     help|h
     manual|m
     match-all
+    max-batch-size=i
     missing=s
-    no-header
+    no-decorators|no-header
     prefix=s@
     pretty
     show=s@
@@ -87,9 +88,10 @@ if( $OPT{bases} ) {
 my %CONFIG = (
     size      => (exists $OPT{size}      && $OPT{size} > 0)         ? int($OPT{size})         : 20,
     format    => (exists $OPT{format}    && length $OPT{format})    ? lc $OPT{format}         : 'yaml',
-    summary   => $OPT{top} && ( !$OPT{by} && !$OPT{with} && !$OPT{interval} ),
+    'max-batch-size' => $OPT{'max-batch-size'} || 50,
     $OPT{timestamp} ? ( timestamp => $OPT{timestamp} ) : (),
 );
+$OPT{'no-decorators'} = 1 if $CONFIG{format} eq 'json';
 #------------------------------------------------------------------------#
 # Handle Indices
 my $ORDER = exists $OPT{asc} && $OPT{asc} ? 'asc' : 'desc';
@@ -113,6 +115,8 @@ foreach my $index (sort by_index_age keys %indices) {
 $CONFIG{timestamp} ||= es_globals('timestamp') || '@timestamp';
 debug_var(\%by_age);
 my @AGES = sort { $ORDER eq 'asc' ? $b <=> $a : $a <=> $b } keys %by_age;
+# Figure out if we summarize
+$CONFIG{summary} = @AGES > 1 && $OPT{top} && ( !$OPT{by} && !$OPT{with} && !$OPT{interval} );
 debug({color=>"cyan"}, "Fields discovered.");
 
 if( $OPT{fields} ) {
@@ -202,6 +206,10 @@ if( exists $OPT{top} ) {
             next unless defined $field and defined $size and $size > 0;
 
             my $id = "$type.$field";
+            # If a term agg and we haven't used this field name, simplify it
+            if( $type =~ /terms$/ && !$sub_agg{$field} ) {
+                $id = $field;
+            }
 
             $sub_agg{$id} = {
                 $type => {
@@ -253,7 +261,7 @@ elsif(exists $OPT{tail}) {
     @AGES = ($AGES[-1]);
 }
 else {
-    $q->set_size( $CONFIG{size} > 50 ? 50 : $CONFIG{size} );
+    $q->set_size( $CONFIG{'max-batch-size'} );
 }
 
 my %displayed_indices = ();
@@ -283,7 +291,7 @@ AGES: while( !$DONE && @AGES ) {
 
     # Header
     if( !exists $AGES_SEEN{$age} ) {
-        output({color=>'yellow'}, "= Querying Indexes: " . join(',', @{ $by_age{$age} })) unless exists $OPT{'no-header'};
+        output({color=>'yellow'}, "= Querying Indexes: " . join(',', @{ $by_age{$age} })) unless $OPT{'no-decorators'};
         $AGES_SEEN{$age}=1;
         $header=0;
     }
@@ -326,7 +334,7 @@ AGES: while( !$DONE && @AGES ) {
     $TOTAL_HITS += $result->{hits}{total} if $result->{hits}{total};
 
     my @always = ($CONFIG{timestamp});
-    if(!exists $OPT{'no-header'} && !$header && @SHOW) {
+    if(!$OPT{'no-decorators'} && !$header && @SHOW) {
         output({color=>'cyan'}, join("\t", @always,@SHOW));
         $header++;
     }
@@ -345,7 +353,7 @@ AGES: while( !$DONE && @AGES ) {
                     output({color=>'cyan',clear=>1}, sprintf "%d\t%s", @{$step}{qw(doc_count key_as_string)});
                 }
                 if( @$aggs ) {
-                    output({color=>'cyan',indent=>$indent},$agg_header) unless $OPT{'no-header'};
+                    output({color=>'cyan',indent=>$indent},$agg_header) unless $OPT{'no-decorators'};
                     foreach my $agg ( @$aggs ) {
                         $AGGS_TOTALS{$agg->{key}} ||= 0;
                         $AGGS_TOTALS{$agg->{key}} += $agg->{doc_count};
@@ -495,7 +503,7 @@ AGES: while( !$DONE && @AGES ) {
                 $output = join("\t",@cols);
             }
             else {
-                $output = $CONFIG{format} eq 'json' ? to_json($record,{allow_nonref=>1,canonical=>1,pretty=>1})
+                $output = $CONFIG{format} =~ /^json/? to_json($record,{allow_nonref=>1,canonical=>1,pretty=>$CONFIG{format} eq 'jsonpretty'})
                         : Dump $record;
             }
 
@@ -528,11 +536,13 @@ output({stderr=>1,color=>'yellow'},
             scalar(keys %indices),
             join(',', sort keys %displayed_indices)
     ),
-);
+) unless $OPT{'no-decorators'};
 
 if($CONFIG{summary} && keys %AGGS_TOTALS) {
-    output({color=>'yellow'}, '#', '# Totals across batch', '#');
-    output({color=>'cyan'},$agg_header);
+    unless ( $OPT{'no-decorators'} ) {
+        output({color=>'yellow'}, '#', '# Totals across batch', '#');
+        output({color=>'cyan'},$agg_header);
+    }
     foreach my $k (sort { $AGGS_TOTALS{$b} <=> $AGGS_TOTALS{$a} } keys %AGGS_TOTALS) {
         output({data=>1,color=>'green'},"$AGGS_TOTALS{$k}\t$k");
     }
@@ -626,7 +636,7 @@ es-search.pl - Provides a CLI for quick searches of data in ElasticSearch daily 
 
 =head1 VERSION
 
-version 6.1
+version 6.2
 
 =head1 SYNOPSIS
 
@@ -653,9 +663,11 @@ Options:
     --asc               Sort by ascending timestamp
     --desc              Sort by descending timestamp (Default)
     --sort              List of fields for custom sorting
-    --format            When --show isn't used, use this method for outputting the record, supported: json, yaml
+    --format            When --show isn't used, use this method for outputting the record, supported: json, jsonpretty, yaml
+                        json assumes --no-decorator as we assume you're piping through jq
     --pretty            Where possible, use JSON->pretty
-    --no-header         Do not show the header with field names in the query results
+    --no-decorators     Do not show the header with field names in the query results
+    --no-header         Same as above
     --fields            Display the field list for this index!
     --bases             Display the index base list for this cluster.
     --timestamp         Field to use as the date object, default: @timestamp
@@ -1103,7 +1115,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Brad Lhotsky.
+This software is Copyright (c) 2018 by Brad Lhotsky.
 
 This is free software, licensed under:
 

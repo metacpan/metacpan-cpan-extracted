@@ -1,7 +1,9 @@
+use strict;
+use warnings;
 use Test::More;
 
 use Symbol::Approx::Sub(xform => undef,
-			match => \&always_bb);
+  match => \&always_bb);
 
 sub always_bb {
   my ($sub, @subs) = @_;

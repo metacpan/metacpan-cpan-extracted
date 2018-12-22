@@ -1,7 +1,9 @@
 package Net::Async::Trello::Board;
-$Net::Async::Trello::Board::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Trello::Generated::Board);
 
@@ -75,8 +77,9 @@ sub lists {
 sub cards {
 	my ($self, %args) = @_;
     $self->trello->api_get_list(
-		uri => 'boards/' . $self->id . '/cards',
+		uri => 'boards/' . $self->id . '/cards?filter=visible',
         class => 'Net::Async::Trello::Card',
+        per_page => 1000,
         extra => {
             board  => $self,
         },

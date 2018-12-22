@@ -1,7 +1,7 @@
 {
    "abstract" : "fold command handling ANSI terminal sequences",
    "author" : [
-      "Kazumasa Utashiro"
+      "- Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.3",
@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Getopt::EX" : "v1.12.0",
             "Text::ANSI::Fold" : "0.05",
             "perl" : "5.008001"
          }
@@ -55,7 +56,7 @@
    "provides" : {
       "App::ansifold" : {
          "file" : "lib/App/ansifold.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -69,10 +70,11 @@
          "web" : "https://github.com/kaz-utashiro/ansifold"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
-      "Kaz Utashiro <kaz@utashiro.com>"
+      "Kazumasa Utashiro <kaz@utashiro.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1

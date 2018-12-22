@@ -12,7 +12,7 @@ their options, and the options' values as separate entities so that it
 can produce nicely formatted output.
 
 It is designed to be used in conjunction with other modules which
-actually execute pipelines, such as IPC::Run
+actually execute pipelines, such as IPC::Run.
 
 This module (and its siblings IPC::PrettyPipe::Cmd,
 IPC::PrettyPipe::Arg, and IPC::PrettyPipe::Stream) present the

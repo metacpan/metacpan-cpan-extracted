@@ -3,8 +3,8 @@
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,7 +22,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::MakeMaker" : "7.24",
+            "FFI::Build" : "0.10",
             "perl" : "5.006"
          }
       },
@@ -45,12 +46,14 @@
       },
       "runtime" : {
          "requires" : {
-            "FFI::Platypus" : "0",
+            "FFI::Platypus" : "0.59",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
+            "FFI::Build" : "0.10",
+            "FFI::CheckLib" : "0.06",
             "Test::More" : "0.94",
             "perl" : "5.006"
          }
@@ -69,8 +72,9 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.29.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
    "x_use_unsafe_inc" : 0
 }
 

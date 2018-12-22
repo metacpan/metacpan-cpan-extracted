@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,7 +48,8 @@
             "Net::Async::HTTP" : "0.41",
             "Net::Async::WebSocket" : "0",
             "Path::Tiny" : "0.098",
-            "Ryu::Async" : "0.002",
+            "Ryu" : "0.031",
+            "Ryu::Async" : "0.013",
             "Syntax::Keyword::Try" : "0.04",
             "Time::Moment" : "0.41",
             "URI" : "1.71",
@@ -78,7 +79,8 @@
       },
       "homepage" : "http://search.cpan.org/dist/Net-Async-Github/"
    },
-   "version" : "0.003",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.004",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

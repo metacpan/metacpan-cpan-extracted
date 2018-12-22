@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 use 5.010000;
 
-our $VERSION = '0.95';
+our $VERSION = '0.96';
 
 use Moose::Role;
 
@@ -44,7 +44,7 @@ Test::Class::Moose::Role::ParameterizedInstances - run tests against multiple in
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SUPPORT
 

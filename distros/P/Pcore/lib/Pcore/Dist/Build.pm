@@ -150,7 +150,7 @@ sub tgz ($self) {
         $tgz->add_data( "$base_dir/$path", P->file->read_bin("$temp/$path")->$*, { mode => $mode } );
     }
 
-    my $path = "$self->{dist}->{root}/data/.build/$base_dir..tar.gz";
+    my $path = "$self->{dist}->{root}/data/.build/$base_dir.tar.gz";
 
     if ( -e $path ) {
         unlink $path or die qq[Can't unlink "$path"];

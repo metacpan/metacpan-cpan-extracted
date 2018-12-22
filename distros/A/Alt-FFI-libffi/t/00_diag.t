@@ -11,6 +11,8 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   ExtUtils::MakeMaker
+  FFI::Build
+  FFI::CheckLib
   FFI::Platypus
   Test::More
 );

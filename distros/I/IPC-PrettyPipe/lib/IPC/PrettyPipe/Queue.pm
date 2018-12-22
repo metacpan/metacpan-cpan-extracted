@@ -4,18 +4,18 @@ package IPC::PrettyPipe::Queue;
 
 use Moo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use namespace::clean;
 
 
 has elements => (
-              is => 'ro',
-              init_arg => undef,
-              default => sub { [] },
+    is       => 'ro',
+    init_arg => undef,
+    default  => sub { [] },
 );
 
-sub empty { ! !!@{ $_[0]->elements } }
+sub empty { !!!@{ $_[0]->elements } }
 
 sub nelements { scalar @{ $_[0]->elements } }
 
@@ -70,7 +70,7 @@ IPC::PrettyPipe::Queue - A simple queue
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,7 @@ Changes
 LICENSE
 MANIFEST
 META.json
+META.yml
 Makefile.PL
 README.mkdn
 dist.ini
@@ -24,6 +25,7 @@ lib/App/ElasticSearch/Utilities/QueryString/Ranges.pm
 lib/App/ElasticSearch/Utilities/QueryString/Underscored.pm
 lib/App/ElasticSearch/Utilities/VersionHacks.pm
 lib/Types/ElasticSearch.pm
+perlcritic.rc
 scripts/es-alias-manager.pl
 scripts/es-apply-settings.pl
 scripts/es-copy-index.pl

@@ -43,10 +43,7 @@ malfunction with future versions of Net::SNMP
 
 package Net::SNMP::XS;
 
-use strict qw(vars subs);
-no warnings;
-
-use Guard;
+use common::sense;
 
 use Net::SNMP ();
 use Net::SNMP::PDU ();
@@ -56,7 +53,7 @@ use Net::SNMP::MessageProcessing ();
 our $VERSION;
 
 BEGIN {
-   $VERSION = 1.32;
+   $VERSION = 1.33;
 
    # this overrides many methods inside Net::SNMP and it's submodules
    require XSLoader;

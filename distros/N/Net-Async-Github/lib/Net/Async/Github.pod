@@ -22,6 +22,10 @@ Net::Async::Github - support for L<https://github.com>'s REST API with L<IO::Asy
    token => '...',
   )
  );
+ # Give 'secret_team' pull access to all private repos
+ $gh->repos(visibility => 'private')
+    ->grant_team(secret_team => 'pull')
+    ->await;
 
 =head1 DESCRIPTION
 
@@ -241,5 +245,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2014-2018. Licensed under the same terms as Perl itself.
 

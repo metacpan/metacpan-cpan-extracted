@@ -18,7 +18,7 @@ name: Locale-TextDomain-OO
 provides:
   Locale::TextDomain::OO:
     file: lib/Locale/TextDomain/OO.pm
-    version: '1.033'
+    version: '1.034'
   Locale::TextDomain::OO::FunctionalInterface:
     file: lib/Locale/TextDomain/OO/FunctionalInterface.pm
     version: '1.000'
@@ -36,7 +36,7 @@ provides:
     version: '1.031'
   Locale::TextDomain::OO::Lexicon::Role::File:
     file: lib/Locale/TextDomain/OO/Lexicon/Role/File.pm
-    version: '1.031'
+    version: '1.034'
   Locale::TextDomain::OO::Lexicon::Role::GettextToMaketext:
     file: lib/Locale/TextDomain/OO/Lexicon/Role/GettextToMaketext.pm
     version: '1.000'
@@ -135,5 +135,5 @@ requires:
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.033'
+version: '1.034'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

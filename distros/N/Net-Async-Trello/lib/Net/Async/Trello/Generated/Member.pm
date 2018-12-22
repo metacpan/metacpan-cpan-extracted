@@ -1,17 +1,15 @@
 package Net::Async::Trello::Generated::Member;
-$Net::Async::Trello::Generated::Member::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Trello::Common);
 
 =head1 NAME
 
 Net::Async::Trello::Generated::Member
-
-=head1 VERSION
-
-version 0.001
 
 =head1 DESCRIPTION
 
@@ -242,3 +240,4 @@ Provides an accessor for C<avatarHash>.
 sub avatar_hash { shift->{avatarHash} }
 
 1;
+

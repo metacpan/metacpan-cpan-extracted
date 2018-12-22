@@ -1,6 +1,6 @@
 package Bencher::ScenarioR::TimeHiRes::usleep_accuracy;
 
-our $VERSION = 0.002; # VERSION
+our $VERSION = 0.003; # VERSION
 
 our $results = [];
 

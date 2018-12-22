@@ -1,5 +1,5 @@
 package MooseX::Role::Tempdir;
-$MooseX::Role::Tempdir::VERSION = '0.100';
+$MooseX::Role::Tempdir::VERSION = '0.101';
 use MooseX::Role::Parameterized;
 use File::Temp qw//;
 #ABSTRACT: Moose role providing temporary directory attributes
@@ -44,21 +44,6 @@ role {
       )
     }
   }
-  print "ok then\n";
-  #my $p = shift;
-  #my $opts = $p->tmpdir_opts();
-  #for my $dir (@{$p->dirs()}) {
-    #has $dir => (
-      #is => 'ro',
-      #isa => 'File::Temp::Dir',
-      #required => 1,
-      #lazy => 1,
-      #default => sub {
-        #my $p = shift;
-        #return File::Temp->newdir(%{$opts});
-      #},
-    #);
-  #}
 };
 
 1; # End of MooseX::Role::Tempdir
@@ -75,7 +60,7 @@ MooseX::Role::Tempdir - Moose role providing temporary directory attributes
 
 =head1 VERSION
 
-version 0.100
+version 0.101
 
 =head1 SYNOPSIS
 
@@ -149,7 +134,7 @@ Brad Barden <b at 13os.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Brad Barden.
+This software is Copyright (c) 2018 by Brad Barden.
 
 This is free software, licensed under:
 

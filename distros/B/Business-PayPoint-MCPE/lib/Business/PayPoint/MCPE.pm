@@ -2,7 +2,7 @@ package Business::PayPoint::MCPE;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use LWP::UserAgent;
 use Carp 'croak';
@@ -111,7 +111,7 @@ sub request {
     my @fltFields = ('APIVersion', 'Amount', 'OriginalAmount', 'SchAmount', 'FraudScore');
     my @datFields = ('Fulfillment');
 
-    $params{TestMode}   ||= $self->{TestMode};
+    $params{TestMode}   = $self->{TestMode} unless exists $params{TestMode};
     $params{InstID}     ||= $self->{InstID};
     $params{APIVersion} ||= $self->{APIVersion};
 

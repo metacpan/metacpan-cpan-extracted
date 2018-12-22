@@ -1,17 +1,15 @@
 package Net::Async::Trello::Generated::Card;
-$Net::Async::Trello::Generated::Card::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Trello::Common);
 
 =head1 NAME
 
 Net::Async::Trello::Generated::Card
-
-=head1 VERSION
-
-version 0.001
 
 =head1 DESCRIPTION
 
@@ -24,6 +22,14 @@ use URI ();
 =head1 METHODS
 
 =cut
+
+=head2 id
+
+Provides an accessor for C<id>.
+
+=cut
+
+sub id { shift->{id} }
 
 =head2 list
 
@@ -234,3 +240,4 @@ Provides an accessor for C<url>.
 sub url { shift->{url} }
 
 1;
+

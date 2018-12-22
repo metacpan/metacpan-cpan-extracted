@@ -1,14 +1,16 @@
 NAME
+
     Business::PayPoint::MCPE - PayPoint: Merchant Card Payment Engine
 
 SYNOPSIS
-        use Business::PayPoint::MCPE;
 
+        use Business::PayPoint::MCPE;
+    
         my $bpm = Business::PayPoint::MCPE->new(
             TestMode => 1,
             InstID => '123456',
         );
-
+    
         my %data = $bpm->payment(
             CartID => 654321,
             Desc   => 'description of goods',
@@ -26,18 +28,24 @@ SYNOPSIS
         print Dumper(\%data); use Data::Dumper;
 
 DESCRIPTION
+
     Business::PayPoint::MCPE is for
-    <https://www.paypoint.net/assets/guides/MCPE_Freedom+IMA_2.3.pdf>
+    https://www.paypoint.net/assets/guides/MCPE_Freedom+IMA_2.3.pdf
 
 METHODS
-  new
+
+ new
+
     InstID
-        required.
+
+      required.
 
     TestMode
-        1 or 0. default is 0.
 
-  payment
+      1 or 0. default is 0.
+
+ payment
+
         my %data = $bpm->payment(
             CartID => 654321,
             Desc   => 'description of goods',
@@ -54,7 +62,8 @@ METHODS
         );
         print Dumper(\%data);
 
-  refund
+ refund
+
         my $TransID = $data{TransID}; # from above payment
         my $SecurityToken = $data{SecurityToken};
         my %data = $bpm->refund(
@@ -63,7 +72,8 @@ METHODS
             Amount => '5.00',
         );
 
-  repeat
+ repeat
+
         my $TransID = $data{TransID}; # from above payment
         my $SecurityToken = $data{SecurityToken};
         my %data = $bpm->repeat(
@@ -72,7 +82,8 @@ METHODS
             Amount => '5.00',
         );
 
-  capture
+ capture
+
         my %data = $bpm->capture(
             TransID => $TransID,
             SecurityToken => $SecurityToken,
@@ -82,7 +93,8 @@ METHODS
 
     PreAuth Capture
 
-  void
+ void
+
         my %data = $bpm->void(
             TransID => $TransID,
             SecurityToken => $SecurityToken,
@@ -92,7 +104,8 @@ METHODS
 
     PreAuth Void
 
-  cancel
+ cancel
+
         my %data = $bpm->void(
             ScheduleID => $ScheduleID
         );
@@ -100,7 +113,8 @@ METHODS
 
     Subscription Cancellation
 
-  confirm
+ confirm
+
         my %data = $bpm->confirm(
             CartID => $CartID
         );
@@ -108,7 +122,8 @@ METHODS
 
     Transaction Confirm
 
-  nonauth
+ nonauth
+
         my %data = $bpm->nonauth(
             CartID => $CartID,
             Desc   => 'description of goods',
@@ -123,13 +138,17 @@ METHODS
         print Dumper(\%data);
 
 AUTHOR
+
     Fayland Lam <fayland@gmail.com>
 
 COPYRIGHT
+
     Copyright 2014- Fayland Lam
 
 LICENSE
+
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
 SEE ALSO
+

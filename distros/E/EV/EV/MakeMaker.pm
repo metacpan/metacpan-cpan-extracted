@@ -46,9 +46,9 @@ modules.
 
 =head1 DESCRIPTION
 
-For optimal performance, hook into EV at the C-level.  You'll need
-to make changes to your C<Makefile.PL> and add code to your C<xs> /
-C<c> file(s).
+For optimal performance, hook into EV at the C-level.  You'll need to make
+changes to your C<Makefile.PL>, load C<EV> in your C<pm> file and add
+code to your C<xs> / C<c> file(s).
 
 =head1 HOW TO
 
@@ -60,17 +60,23 @@ C<c> file(s).
 
   WriteMakefile (ev_args (%args));
 
-=head2 XS
+=head2 extension.pm
+
+  use EV (); # imports optional
+
+=head2 extension.xs
 
   #include "EVAPI.h"
 
+  [...]
+
   BOOT:
-    I_EV_API ("YourModule");
+    I_EV_API (HvNAME (GvSTASH (CvGV (cv))));
 
 =head1 API
 
-See the L<EVAPI.h|http://cvs.schmorp.de/EV/EV/EVAPI.h> header, which you should include instead
-of F<ev.h>.
+See the L<EVAPI.h|http://cvs.schmorp.de/EV/EV/EVAPI.h> header, which you
+should include instead of F<ev.h>.
 
 In short, all the functions and macros from F<ev.h> should work, except
 that the trailing underscore macros (C<EV_A_>, C<EV_DEFAULT_>) are not

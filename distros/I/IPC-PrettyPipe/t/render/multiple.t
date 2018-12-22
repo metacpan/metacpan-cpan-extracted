@@ -11,7 +11,9 @@ subtest 'default renderer' => sub {
     my $pipe     = IPC::PrettyPipe->new;
     my $renderer = $pipe->renderer;
 
-    isa_ok( $renderer, [ 'IPC::PrettyPipe::Render::Template::Tiny' ],
+    isa_ok(
+        $renderer,
+        ['IPC::PrettyPipe::Render::Template::Tiny'],
         'created correctly'
     );
 

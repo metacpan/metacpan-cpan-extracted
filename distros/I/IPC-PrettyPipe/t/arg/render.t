@@ -23,8 +23,8 @@ sub run_test {
                 $arg = IPC::PrettyPipe::Arg->new( $args{new} );
                 run_methods( $arg, @{ $args{methods} } );
             },
-           'run_methods'
-          );
+            'run_methods'
+        );
         is( [ $arg->render ], $args{expect}, 'rendered correctly' );
 
       }

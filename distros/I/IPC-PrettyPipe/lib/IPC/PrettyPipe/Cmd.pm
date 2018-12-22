@@ -25,7 +25,7 @@ use String::ShellQuote 'shell_quote';
 
 use Moo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 with 'IPC::PrettyPipe::Queue::Element';
 
@@ -35,8 +35,7 @@ use namespace::clean;
 # need access to has method which will get removed at the end of the
 # compilation of this module
 BEGIN {
-    IPC::PrettyPipe::Arg::Format
-        ->shadow_attrs( fmt => sub { 'arg' . shift } );
+    IPC::PrettyPipe::Arg::Format->shadow_attrs( fmt => sub { 'arg' . shift } );
 }
 
 has cmd => (
@@ -47,10 +46,10 @@ has cmd => (
 
 # delay building args until all attributes have been specified
 has _init_args => (
-    is       => 'ro',
-    init_arg => 'args',
-    coerce   =>  AutoArrayRef->coercion,
-    isa =>  ArrayRef,
+    is        => 'ro',
+    init_arg  => 'args',
+    coerce    => AutoArrayRef->coercion,
+    isa       => ArrayRef,
     predicate => 1,
     clearer   => 1,
 );
@@ -68,15 +67,15 @@ has streams => (
 );
 
 has argfmt => (
-  is => 'ro',
-  lazy => 1,
-  handles => IPC::PrettyPipe::Arg::Format->shadowed_attrs,
-  default => sub { IPC::PrettyPipe::Arg::Format->new_from_attrs( shift ) },
+    is      => 'ro',
+    lazy    => 1,
+    handles => IPC::PrettyPipe::Arg::Format->shadowed_attrs,
+    default => sub { IPC::PrettyPipe::Arg::Format->new_from_attrs( shift ) },
 );
 
-#pod =for Pod::Coverage BUILDARGS BUILD
-#pod
-#pod =cut
+
+
+
 
 sub BUILDARGS {
 
@@ -85,15 +84,15 @@ sub BUILDARGS {
     my $args
       = @_ == 1
       ? (
-        'HASH' eq ref( $_[0] )        ? $_[0]
+        'HASH' eq ref( $_[0] )
+        ? $_[0]
         : 'ARRAY' eq ref( $_[0] )
-          && @{ $_[0] } == 2          ? { cmd => $_[0][0], args => $_[0][1] }
-        :                               { cmd => $_[0] }
-        )
+          && @{ $_[0] } == 2 ? { cmd => $_[0][0], args => $_[0][1] }
+        : { cmd => $_[0] } )
       : {@_};
 
     ## no critic (ProhibitAccessOfPrivateData)
-    delete @{$args}{ grep { ! defined $args->{$_} }  keys %$args };
+    delete @{$args}{ grep { !defined $args->{$_} } keys %$args };
 
     return $args;
 }
@@ -113,7 +112,7 @@ sub BUILD {
     return;
 }
 
-sub quoted_cmd {  shell_quote( $_[0]->cmd )  }
+sub quoted_cmd { shell_quote( $_[0]->cmd ) }
 
 sub add {
 
@@ -162,7 +161,7 @@ sub add {
     elsif ( 'ARRAY' eq $ref ) {
 
         croak( "missing value for argument ", $arg->[-1] )
-          if  @$arg % 2;
+          if @$arg % 2;
 
         foreach ( pairs @$arg ) {
 
@@ -207,7 +206,7 @@ sub ffadd {
 
     my $argfmt = $self->argfmt->clone;
 
-    for ( my $idx = 0 ; $idx < @args ; $idx ++ ) {
+    for ( my $idx = 0 ; $idx < @args ; $idx++ ) {
 
         my $t = $args[$idx];
 
@@ -217,14 +216,14 @@ sub ffadd {
 
         }
 
-        elsif ( $t->$_isa( 'IPC::PrettyPipe::Arg' ) ){
+        elsif ( $t->$_isa( 'IPC::PrettyPipe::Arg' ) ) {
 
             $self->add( arg => $t );
 
 
         }
 
-        elsif( ref( $t ) =~ /^(ARRAY|HASH)$/ )  {
+        elsif ( ref( $t ) =~ /^(ARRAY|HASH)$/ ) {
 
             $self->add( arg => $t, argfmt => $argfmt->clone );
 
@@ -241,16 +240,16 @@ sub ffadd {
             try {
 
                 my $stream = IPC::PrettyPipe::Stream->new(
-                    spec     => $t,
+                    spec   => $t,
                     strict => 0,
                 );
 
                 if ( $stream->requires_file ) {
 
-                        croak( "arg[$idx]: stream operator $t requires a file\n" )
-                          if ++$idx == @args;
+                    croak( "arg[$idx]: stream operator $t requires a file\n" )
+                      if ++$idx == @args;
 
-                        $stream->file( $args[$idx] );
+                    $stream->file( $args[$idx] );
                 }
 
                 $self->stream( $stream );
@@ -286,8 +285,9 @@ sub stream {
     elsif ( !ref $spec ) {
 
         $self->streams->push(
-          IPC::PrettyPipe::Stream->new( spec => $spec, +@_ ? ( file => @_ ) : () )
-                             );
+            IPC::PrettyPipe::Stream->new(
+                spec => $spec,
+                +@_ ? ( file => @_ ) : () ) );
     }
 
     else {
@@ -312,26 +312,27 @@ sub valmatch {
 sub valsubst {
     my $self = shift;
 
-    my @args = ( shift, shift, @_ > 1 ? { @_ } : @_ );
+    my @args = ( shift, shift, @_ > 1 ? {@_} : @_ );
 
 
     ## no critic (ProhibitAccessOfPrivateData)
 
-    my ( $pattern, $value, $args ) =
-      validate( \@args,
-                RegexpRef,
-                Str,
-                Optional[ Dict[
-                            lastvalue  => Optional[ Str ],
-                            firstvalue => Optional[ Str ]
-                           ] ],
-              );
+    my ( $pattern, $value, $args ) = validate(
+        \@args,
+        RegexpRef,
+        Str,
+        Optional [
+            Dict [
+                lastvalue  => Optional [Str],
+                firstvalue => Optional [Str] ]
+        ],
+    );
 
     my $nmatch = $self->valmatch( $pattern );
 
     if ( $nmatch == 1 ) {
 
-        $args->{lastvalue} //= $args->{firstvalue} // $value;
+        $args->{lastvalue}  //= $args->{firstvalue} // $value;
         $args->{firstvalue} //= $args->{lastvalue};
 
     }
@@ -379,7 +380,7 @@ IPC::PrettyPipe::Cmd - A command in an B<IPC::PrettyPipe> pipeline
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

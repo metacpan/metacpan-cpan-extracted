@@ -1,35 +1,26 @@
 package Algorithm::Dependency::Source::Invert;
+# ABSTRACT: Logically invert a source
 
-=pod
-
-=head1 NAME
-
-Algorithm::Dependency::Source::Invert - Logically invert a source
-
-=head1 SYNOPSIS
-
-  my $inverted = Algorithm::Dependency::Source::Invert->new( $source );
-
-=head1 DESCRIPTION
-
-This class creates a source from another source, but with all dependencies
-reversed.
-
-=cut
+#pod =pod
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod   my $inverted = Algorithm::Dependency::Source::Invert->new( $source );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class creates a source from another source, but with all dependencies
+#pod reversed.
+#pod
+#pod =cut
 
 use 5.005;
 use strict;
 use Params::Util '_INSTANCE';
 use Algorithm::Dependency::Source::HoA ();
 
-use vars qw{$VERSION @ISA};
-BEGIN {
-	$VERSION = '1.110';
-	@ISA     = 'Algorithm::Dependency::Source::HoA';
-}
-
-
-
+our $VERSION = '1.111';
+our @ISA     = 'Algorithm::Dependency::Source::HoA';
 
 
 #####################################################################
@@ -56,32 +47,47 @@ sub new {
 
 1;
 
+__END__
+
 =pod
 
-=head1 SUPPORT
+=encoding UTF-8
 
-To file a bug against this module, use the CPAN bug tracking system
+=head1 NAME
 
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-Dependency>
+Algorithm::Dependency::Source::Invert - Logically invert a source
 
-For other comments, contact the author.
+=head1 VERSION
 
-=head1 AUTHOR
+version 1.111
 
-Adam Kennedy <adamk@cpan.org>
+=head1 SYNOPSIS
+
+  my $inverted = Algorithm::Dependency::Source::Invert->new( $source );
+
+=head1 DESCRIPTION
+
+This class creates a source from another source, but with all dependencies
+reversed.
 
 =head1 SEE ALSO
 
 L<Algorithm::Dependency::Source>, L<Algorithm::Dependency::Source::HoA>
 
-=head1 COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2003 - 2009 Adam Kennedy.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Dependency>
+(or L<bug-Algorithm-Dependency@rt.cpan.org|mailto:bug-Algorithm-Dependency@rt.cpan.org>).
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=head1 AUTHOR
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+Adam Kennedy <adamk@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

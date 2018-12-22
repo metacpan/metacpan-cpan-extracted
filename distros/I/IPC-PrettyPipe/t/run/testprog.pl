@@ -12,15 +12,15 @@ my @fh = ( [ \*STDIN, '<' ], [ \*STDOUT, '>' ], [ \*STDERR, '>' ], );
 
 my %opt;
 
-GetOptions( \%opt,
-            qw[
-                  logdir=s
-                  long=s
-                  sleep=i
-                  s=s
-                  name=s
-          ] )
-  or die;
+GetOptions(
+    \%opt,
+    qw[
+      logdir=s
+      long=s
+      sleep=i
+      s=s
+      name=s
+      ] ) or die;
 
 die( "must specify name\n" )
   unless defined $opt{name};
@@ -55,7 +55,7 @@ while ( @ARGV ) {
     }
     else {
 
-        $fh->say( "$opt{name} $fd");
+        $fh->say( "$opt{name} $fd" );
 
     }
 

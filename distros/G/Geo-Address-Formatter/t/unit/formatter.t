@@ -7,6 +7,7 @@ use Clone qw(clone);
 use File::Basename qw(dirname);
 use Data::Dumper;
 use Text::Hogan::Compiler;
+use utf8;
 
 my $CLASS = 'Geo::Address::Formatter';
 use_ok($CLASS);
@@ -134,6 +135,75 @@ my $GAF = $CLASS->new( conf_path => $path );
   );
 }
 
+
+# actually do some formatting
+
+{
+    my $af_path = dirname(__FILE__) . '/../../address-formatting';
+    my $conf_path = $af_path . '/conf/';
+    my $GAF = $CLASS->new( conf_path => $conf_path );
+
+    my $rh_components = {
+        'country_code'  => 'US',
+        'house_number'  => '301',
+        'road'          => 'Northwestern University Road',
+        'neighbourhood' => 'Crescent Park',
+        'city'          => 'Palo Alto',
+        'postcode'      => '94303',
+        'county'        => 'Santa Clara County',
+        'state'         => 'California',
+        'country'       => 'United States',
+    };
+
+    # final_components not yet set, so this should cause a warning
+    warning_like {
+       $GAF->final_components(); 
+    } qr/not yet set/, 'got final_components warning';
+    
+    my $formatted = $GAF->format_address($rh_components);
+    $formatted =~ s/\n$//g; # remove from end
+    $formatted =~ s/\n/, /g; # turn into commas
+    
+    is(
+        $formatted,
+        '301 Northwestern University Road, Palo Alto, CA 94303, United States of America',
+        'correctly formatted components'
+        );
+
+    # now we can get the final_components    
+    my $rh_fincomp = $GAF->final_components();
+    is($rh_fincomp->{state_code}, 'CA', 'set state_code correctly');
+
+    $rh_components = {    
+        'city' => 'Barcelona',
+        'city_district' => "Sarrià - Sant Gervasi",
+        'country' => 'Spain',
+        'country_code' => 'es',
+        'county' => 'Barcelona',
+        'house_number' => '68',
+        'postcode' => '08017',
+        'road' => 'Carrer de Calatrava',
+        'state' => 'Cataluña',
+        'suburb' => 'les Tres Torres'
+    };
+
+    $formatted = $GAF->format_address($rh_components);
+    $formatted =~ s/\n$//g; # remove from end
+    $formatted =~ s/\n/, /g; # turn into commas
+    
+    is(
+        $formatted,
+        'Carrer de Calatrava, 68, 08017 Barcelona, Spain',
+        'correctly formatted components'
+        );
+
+    # now we can get the final_components    
+    $rh_fincomp = $GAF->final_components();
+    is($rh_fincomp->{state_code}, 'CT', 'set state_code correctly');
+    is($rh_fincomp->{county_code}, 'B', 'set county_code correctly');    
+
+    
+}
 
 done_testing();
 

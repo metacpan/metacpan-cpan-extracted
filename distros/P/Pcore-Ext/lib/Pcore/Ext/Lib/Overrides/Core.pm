@@ -17,7 +17,7 @@ sub EXT_L10N : Define('Ext.L10N') : Ext('core') {
                     thousandSeparator => ',',
                     decimalSeparator  => '.',
                     currencySign      => '$',
-                    currencySpacer    => ' ',
+                    currencySpacer    => $SPACE,
                     currentcyAtEnd    => \0,
                     dateFormat        => 'm/d/Y',
                     firstDayOfWeek    => 0,
@@ -250,7 +250,7 @@ JS
 sub EXT_override_data_proxy_Direct : Override('Ext.data.proxy.Direct') : Ext('core') {
     return {
         batchActions => \1,
-        pageParam    => q[],
+        pageParam    => $EMPTY,
 
         reader => {
             type         => 'json',
@@ -480,16 +480,6 @@ JS
 }
 
 1;
-## -----SOURCE FILTER LOG BEGIN-----
-##
-## PerlCritic profile "pcore-script" policy violations:
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-## | Sev. | Lines                | Policy                                                                                                         |
-## |======+======================+================================================================================================================|
-## |    2 | 20                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
-##
-## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

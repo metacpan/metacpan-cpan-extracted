@@ -1,9 +1,58 @@
 ==================================================
-Changes from 2016-09-18 00:00:00 +0000 to present.
+Changes from 2016-12-21 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.1 at 2018-09-18 03:10:49 +0000
+version 6.2 at 2018-12-21 02:56:27 +0000
+----------------------------------------
+
+  Change: 81bae677ac93da9eba1c2a3b4859eded645782f9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-20 18:53:52 +0000
+
+    Documentation and release fixes
+
+    * Removed Test::Coverage::TrustPod and Test::Critic from requires and
+
+    moved them to the authordeps sections * Fixed Running of Extra Tests on
+    Release * Added a perlcritic.rc 
+
+  Change: 0eab9bf3babfb37064e4af13c579e42013a45057
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-20 18:37:13 +0000
+
+    Add 'jsonpretty' as a format
+
+    When using `--format 'json'`, default to setting `--no-decorators` since
+    we'll mostly use this with `jq`. 
+
+  Change: 1f6a51a1cca972d441fc9aca2dfd3169c815a87f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-20 18:21:56 +0000
+
+    Output tweaks for better usability
+
+    * Added `--no-decorators` option as an override for `--no-header` * When
+    using `--no-decorators`, disable outputting the footers as well * Only
+    display summary information when we're dealing with multi-day output * When
+    an agg is `terms` or `significant_terms` and no other collision
+
+    exists, suppress the `$type` prefix to be prettier 
+
+  Change: 1a8a5394e2c99f4cf59d670d36705ce06b41ae92
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-09-26 17:28:02 +0000
+
+    Allow the user to change the max-batch-size/scroll size 
+
+  Change: 298902bf52642fcc081059f9f85853ba7449d865
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2018-07-21 10:00:45 +0000
+
+    Autogenerate META.yml as suggested by CPANTS. 
+
+----------------------------------------
+version 6.1 at 2018-09-18 03:10:27 +0000
 ----------------------------------------
 
   Change: 020fddc36e35230b1a275c87c8edddae2fbb7c7b
@@ -478,30 +527,6 @@ version 5.2 at 2016-12-29 22:44:10 +0000
     since 1.x * Replace the last call to <index>/_status in my tools with
     <index>/stats 
 
-----------------------------------------
-version 5.1 at 2016-11-16 02:30:42 +0000
-----------------------------------------
-
-  Change: f20cbf1927d19c4aeac2c1bebf792cd77e4f7986
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-11-15 18:30:42 +0000
-
-    Added perl 5.24 testing to travis and bumped version numbers. 
-
-  Change: df93facfcc57614bc9ed011a6dadea4a0510f832
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-11-15 18:26:35 +0000
-
-    Improvements to the UI and the compatibility layer
-
-    * es-search.pl now supports sub aggregations using the --with parameter *
-    Fix a bug in the handling of es_indices with ES 2.x clusters. * Remove the
-    warning from the App::ElasticSearch::Utilities::HTTPRequest
-
-    object as I can see this moving out of this module soon. *
-    App::ElasticSearch::Utilities::Connection handles JSON error documents *
-    Fix case sensitivity bug in the --top option of es-search.pl 
-
 =================================================
-Plus 57 releases after 2016-09-18 00:00:00 +0000.
+Plus 58 releases after 2016-12-21 00:00:00 +0000.
 =================================================

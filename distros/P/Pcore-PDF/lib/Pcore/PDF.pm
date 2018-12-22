@@ -1,4 +1,4 @@
-package Pcore::PDF v0.5.9;
+package Pcore::PDF v0.5.10;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -83,11 +83,11 @@ has _signal  => sub { Coro::Signal->new };
 #         'color-conversion'      => 'none',             # 'none' | 'full'
 #     },
 #     metadata => {
-#         title    => q[],
-#         subject  => q[],
-#         author   => q[],
-#         keywords => q[],
-#         creator  => q[],
+#         title    => $EMPTY,
+#         subject  => $EMPTY,
+#         author   => $EMPTY,
+#         keywords => $EMPTY,
+#         creator  => $EMPTY,
 #     },
 #     raster => {                                        #
 #         dpi => 300,

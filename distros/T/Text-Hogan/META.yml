@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,6 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/kaoru/Text-Hogan/issues
   repository: git://github.com/kaoru/Text-Hogan
-version: '1.06'
-x_generated_by_perl: v5.26.2
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '1.07'
+x_serialization_backend: 'YAML::Tiny version 1.69'

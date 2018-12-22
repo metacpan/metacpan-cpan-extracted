@@ -3,6 +3,17 @@ Revision history for Perl extension EV
 Changes marked with (libev) are changes in libev, and have more
 documentation in the libev Changes file.
 
+4.25 Fri Dec 21 08:04:26 CET 2018
+	- (libev) updated to libev 4.25, minor fixes and enhancements.
+	- document the requirement to "use EV" when using EV::MakeMaker.
+	- only use __register_atfork with glibc and uclibc, as musl
+          defines __linux__, but doesn't implement the linux standard
+          base ABI, nor makes itself detectable via a macro, both apparently
+          by design, winning the "broken by design 2016 award" - well done.
+        - correct EV::periodic example 24h after midnight -> one day after
+          midnight (reported by Felix Ostmann).
+        - added stability canary support.
+
 4.22 Sun Dec 20 02:34:39 CET 2015
         - (libev) when epoll detects unremovable fds in the fd set, rebuild
           only the epoll descriptor, not the signal pipe, to avoid

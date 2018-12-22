@@ -1,4 +1,4 @@
-package Pcore::API::PayPal v0.3.4;
+package Pcore::API::PayPal v0.3.5;
 
 use Pcore -dist, -class, -res, -const;
 use Pcore::Util::Data qw[from_json to_json to_b64];
@@ -24,7 +24,7 @@ sub _get_access_token ( $self, $cb ) {
         headers => [
             'Content-Type' => 'application/x-www-form-urlencoded',
             Acccept        => 'application/json',
-            Authorization  => 'Basic ' . to_b64( "$self->{id}:$self->{secret}", q[] ),
+            Authorization  => 'Basic ' . to_b64( "$self->{id}:$self->{secret}", $EMPTY ),
         ],
         data => 'grant_type=client_credentials',
         sub ($res) {

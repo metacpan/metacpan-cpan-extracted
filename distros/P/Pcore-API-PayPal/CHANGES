@@ -1,3 +1,6 @@
+v0.3.5 2018-12-21T13:09:56Z
+ - $EMPTY, $SPACE const added
+
 v0.3.4 2018-11-11T14:16:21Z
  - Type::Tiny removed
 

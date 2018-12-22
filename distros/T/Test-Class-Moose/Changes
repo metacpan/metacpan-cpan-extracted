@@ -1,5 +1,13 @@
 Revision history for Perl distribution Test-Class-Moose
 
+0.96     2018-12-21
+
+  [ENHANCEMENTS]
+
+  * Converted uses of JSON.pm to JSON::MaybeXS. Implemented by Karen
+    Etheridge. PR #98.
+
+
 0.95     2018-11-03
 
   [ENHANCEMENTS]

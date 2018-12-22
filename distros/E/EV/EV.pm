@@ -121,7 +121,7 @@ package EV;
 use common::sense;
 
 BEGIN {
-   our $VERSION = 4.22;
+   our $VERSION = 4.25;
    use XSLoader;
    local $^W = 0; # avoid spurious warning
    XSLoader::load "EV", $VERSION;
@@ -298,10 +298,10 @@ or EV::BACKEND_EPOLL).
 =item $active = $loop->run ([$flags])
 
 Begin checking for events and calling callbacks. It returns when a
-callback calls EV::break or the flasg are nonzero (in which case the
+callback calls EV::break or the flags are nonzero (in which case the
 return value is true) or when there are no active watchers which reference
 the loop (keepalive is true), in which case the return value will be
-false. The returnv alue can generally be interpreted as "if true, there is
+false. The return value can generally be interpreted as "if true, there is
 more work left to do".
 
 The $flags argument can be one of the following:
@@ -344,7 +344,7 @@ you do not want to wait for some I/O event, specify C<undef> for
 C<$fh_or_undef> and C<0> for C<$events>).
 
 If timeout is C<undef> or negative, then there will be no
-timeout. Otherwise a EV::timer with this value will be started.
+timeout. Otherwise an C<EV::timer> with this value will be started.
 
 When an error occurs or either the timeout or I/O watcher triggers, then
 the callback will be called with the received event set (in general
@@ -600,9 +600,9 @@ Returns the previously set event mask and optionally set a new one.
 
 =item $w = $loop->timer_ns ($after, $repeat, $callback)
 
-Calls the callback after C<$after> seconds (which may be fractional). If
-C<$repeat> is non-zero, the timer will be restarted (with the $repeat
-value as $after) after the callback returns.
+Calls the callback after C<$after> seconds (which may be fractional or
+negative). If C<$repeat> is non-zero, the timer will be restarted (with
+the $repeat value as $after) after the callback returns.
 
 This means that the callback would be called roughly after C<$after>
 seconds, and then every C<$repeat> seconds. The timer does his best not
@@ -684,8 +684,9 @@ surpasses this time.
 =item * repeating interval timer ($interval > 0, $reschedule_cb = 0)
 
 In this mode the watcher will always be scheduled to time out at the
-next C<$at + N * $interval> time (for some integer N) and then repeat,
-regardless of any time jumps.
+next C<$at + N * $interval> time (for the lowest integer N) and then repeat,
+regardless of any time jumps. Note that, since C<N> can be negative, the
+first trigger can happen before C<$at>.
 
 This can be used to create timers that do not drift with respect to system
 time:
@@ -711,7 +712,7 @@ time as second argument.
 I<This callback MUST NOT stop or destroy this or any other periodic
 watcher, ever, and MUST NOT call any event loop functions or methods>. If
 you need to stop it, return 1e30 and stop it afterwards. You may create
-and start a C<EV::prepare> watcher for this task.
+and start an C<EV::prepare> watcher for this task.
 
 It must return the next time to trigger, based on the passed time value
 (that is, the lowest time value larger than or equal to to the second
@@ -719,17 +720,15 @@ argument). It will usually be called just before the callback will be
 triggered, but might be called at other times, too.
 
 This can be used to create very complex timers, such as a timer that
-triggers on each midnight, local time (actually 24 hours after the last
-midnight, to keep the example simple. If you know a way to do it correctly
-in about the same space (without requiring elaborate modules), drop me a
-note :):
+triggers on each midnight, local time (actually one day after the last
+midnight, to keep the example simple):
 
    my $daily = EV::periodic 0, 0, sub {
       my ($w, $now) = @_;
 
       use Time::Local ();
       my (undef, undef, undef, $d, $m, $y) = localtime $now;
-      86400 + Time::Local::timelocal 0, 0, 0, $d, $m, $y
+      Time::Local::timelocal_nocheck 0, 0, 0, $d + 1, $m, $y
    }, sub {
       print "it's midnight or likely shortly after, now\n";
    };

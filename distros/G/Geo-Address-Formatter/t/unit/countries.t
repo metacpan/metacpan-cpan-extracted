@@ -8,7 +8,7 @@ use File::Find::Rule;
 use File::Spec;
 use Test::Exception;
 use Test::More;
-use YAML qw(LoadFile);
+use YAML::XS qw(LoadFile);
 
 use utf8;
 # nicer output for diag and failures, see

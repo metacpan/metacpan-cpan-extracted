@@ -1,3 +1,11 @@
+0.16     2018-12-21
+
+- Remove the "sudo" key from any Travis configs. Travis moving all builds to a
+  VM-based system where you always have access to "sudo". See
+  https://blog.travis-ci.com/2018-10-04-combining-linux-infrastructures for
+  details.
+
+
 0.15     2018-11-03
 
 - The matrix.fast_finish key is now set to true for all Travis configs. See

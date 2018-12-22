@@ -18,5 +18,8 @@ SYNOPSIS
         [ReadmeFromPod]
         [CheckChangeLog]
         [MetaJSON]
+        [MinimumPerlFast]
         [Git::Contributors]
+
+  bundle_config
 

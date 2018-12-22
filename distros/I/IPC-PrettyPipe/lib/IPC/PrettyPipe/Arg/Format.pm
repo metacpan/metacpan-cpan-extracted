@@ -6,7 +6,7 @@ use Types::Standard qw[ Str ];
 
 use Moo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 with 'IPC::PrettyPipe::Format';
 
@@ -16,24 +16,24 @@ shadowable_attrs( qw[ pfx sep ] );
 use namespace::clean;
 
 
-#pod =method B<new>
-#pod
-#pod   $fmt = IPC::PrettyPipe::Arg::Format->new( %attr );
-#pod
-#pod The constructor.
-#pod
-#pod =cut
 
 
-#pod =attr pfx
-#pod
-#pod The prefix to apply to an argument
-#pod
-#pod =attr has_pfx
-#pod
-#pod A predicate for the C<pfx> attribute.
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 has pfx => (
     is        => 'rw',
@@ -42,17 +42,17 @@ has pfx => (
     predicate => 1,
 );
 
-#pod =attr sep
-#pod
-#pod The string which will separate option names and values.  If C<undef> (the default),
-#pod option names and values will be treated as separate entities.
-#pod
-#pod =attr has_sep
-#pod
-#pod A predicate for the C<sep> attribute.
-#pod
-#pod
-#pod =cut
+
+
+
+
+
+
+
+
+
+
+
 
 has sep => (
     is        => 'rw',
@@ -61,13 +61,13 @@ has sep => (
     predicate => 1,
 );
 
-#pod =method copy_into
-#pod
-#pod   $self->copy_into( $dest, @attrs );
-#pod
-#pod Copy the C<sep> and C<pfx> attributes from the object to the destination object.
-#pod
-#pod =cut
+
+
+
+
+
+
+
 
 sub copy_into { $_[0]->_copy_attrs( $_[1], 'sep', 'pfx' ); }
 
@@ -96,7 +96,7 @@ IPC::PrettyPipe::Arg::Format - Encapsulate argument formatting attributes
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

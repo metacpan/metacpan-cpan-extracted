@@ -13,7 +13,7 @@ use MooX::Types::MooseLike::Base qw(CodeRef);
 use Path::Tiny qw(path);
 use namespace::autoclean;
 
-our $VERSION = '1.031';
+our $VERSION = '1.034';
 
 with qw(
     Locale::TextDomain::OO::Lexicon::Role::GettextToMaketext
@@ -72,7 +72,7 @@ sub _decode_messages {
 sub _my_glob {
     my ($self, $file) = @_;
 
-    my $dirname  = $file->dirname;
+    my $dirname  = $file->parent;
     my $filename = $file->basename;
 
     # only one * allowed at all
@@ -88,7 +88,7 @@ sub _my_glob {
     if ( $file_star_count ) {
         ( my $file_regex = quotemeta $filename ) =~ s{\\[*]}{.*?}xms;
         return +(
-            sort +path($dirname)->children( qr{\A $file_regex \z}xms )
+            sort $dirname->children( qr{\A $file_regex \z}xms )
         );
     }
 
@@ -106,7 +106,7 @@ sub _my_glob {
             $_->is_file;
         }
         map {
-            path($_, $right_dir, $filename);
+            path("$_$right_dir")->child($filename);
         }
         @left_and_inner_dirs
     );
@@ -230,7 +230,7 @@ $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk
 
 =head1 VERSION
 
-1.031
+1.034
 
 =head1 DESCRIPTION
 
@@ -374,7 +374,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2017,
+Copyright (c) 2013 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

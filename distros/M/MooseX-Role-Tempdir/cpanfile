@@ -1,0 +1,2 @@
+requires 'Moose';
+requires 'MooseX::Role::Paramaterized';

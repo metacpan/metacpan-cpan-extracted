@@ -10,11 +10,10 @@ WriteMakefile(
 	           },
     NAME => "Net::SNMP::XS",
     VERSION_FROM => "XS.pm",
+    CONFIGURE_REQUIRES => { "ExtUtils::MakeMaker" => 6.52, "Canary::Stability" => 0 },
     PREREQ_PM    => {
-       Guard     => 1,
-       Net::SNMP => 0,
-       ExtUtils::MakeMaker => 6.52,
-       Canary::Stability   => 0,
+       common::sense => 3.74,
+       Net::SNMP     => 0,
     },
 );
 

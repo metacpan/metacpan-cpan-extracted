@@ -2,36 +2,27 @@
 
 use Test2::V0;
 
-use IPC::PrettyPipe::DSL qw[ ppipe ] ;
+use IPC::PrettyPipe::DSL qw[ ppipe ];
 
 try_ok {
-    is( ppipe( [ 'ls', [ '-a', '%OUTPUT%' ] ] )
-        ->valmatch( qr/%OUTPUT%/ ),
-        1
-      );
+    is( ppipe( [ 'ls', [ '-a', '%OUTPUT%' ] ] )->valmatch( qr/%OUTPUT%/ ), 1 );
 }
 'valmatch: value, matched';
 
 try_ok {
-    is( ppipe( [ 'ls', [ '-a', '%INPUT%' ] ] )
-        ->valmatch( qr/%OUTPUT%/ ),
-        0
-      );
+    is( ppipe( [ 'ls', [ '-a', '%INPUT%' ] ] )->valmatch( qr/%OUTPUT%/ ), 0 );
 }
 'valmatch: value, not matched';
 
 
 try_ok {
-    is( ppipe( [ 'ls', '-l' ] )->valmatch( qr/%INPUT%/ ),
-        0
-      );
+    is( ppipe( [ 'ls', '-l' ] )->valmatch( qr/%INPUT%/ ), 0 );
 }
 'valmatch: no value';
 
 try_ok {
     is(
-        ppipe( [ 'ls', [ '-a', '%OUTPUT%' ],
-                     [ '-b', '%OUTPUT%' ] ] )
+        ppipe( [ 'ls', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ] )
           ->valmatch( qr/%OUTPUT%/ ),
         1
     );
@@ -49,11 +40,7 @@ try_ok {
 
 try_ok {
 
-    my $pipe
-      = ppipe( [ 'a', [ '-a', '%OUTPUT%' ],
-                    [ '-b', '%OUTPUT%' ]
-             ]
-           );
+    my $pipe = ppipe( [ 'a', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ] );
     $pipe->valsubst( qr/%OUTPUT%/, 'foo' );
 
     is( $pipe->cmds->elements->[0]->args->elements->[0]->value, 'foo' );
@@ -64,10 +51,9 @@ try_ok {
 
 try_ok {
 
-    my $pipe
-      = ppipe( [ 'a', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ],
-             [ 'b', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ]
-           );
+    my $pipe = ppipe(
+        [ 'a', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ],
+        [ 'b', [ '-a', '%OUTPUT%' ], [ '-b', '%OUTPUT%' ] ] );
     $pipe->valsubst( qr/%OUTPUT%/, 'foo' );
 
     is( $pipe->cmds->elements->[0]->args->elements->[0]->value, 'foo' );
@@ -81,9 +67,7 @@ try_ok {
 try_ok {
 
     my $pipe
-      = ppipe( [ 'a', [ '-a', '%OUTPUT%' ] ],
-             [ 'b', [ '-b', '%OUTPUT%' ] ]
-           );
+      = ppipe( [ 'a', [ '-a', '%OUTPUT%' ] ], [ 'b', [ '-b', '%OUTPUT%' ] ] );
     $pipe->valsubst( qr/%OUTPUT%/, 'foo', lastvalue => 'last' );
 
     is( $pipe->cmds->elements->[0]->args->elements->[0]->value, 'foo' );
@@ -126,12 +110,9 @@ try_ok {
 try_ok {
 
     my $pipe
-      = ppipe( [ 'a', [ '-a', '%OUTPUT%' ] ],
-             [ 'b', [ '-b', '%OUTPUT%' ] ] );
+      = ppipe( [ 'a', [ '-a', '%OUTPUT%' ] ], [ 'b', [ '-b', '%OUTPUT%' ] ] );
 
-    is( $pipe->valsubst( qr/%OUTPUT%/, 'foo', firstvalue => 'first', ),
-        2
-      );
+    is( $pipe->valsubst( qr/%OUTPUT%/, 'foo', firstvalue => 'first', ), 2 );
 
     is( $pipe->cmds->elements->[0]->args->elements->[0]->value, 'first' );
     is( $pipe->cmds->elements->[1]->args->elements->[0]->value, 'foo' );
@@ -192,15 +173,9 @@ try_ok {
         [ 'c', [ '-a', '%INPUT%' ], [ '-b', '%OUTPUT%' ] ],
     );
 
-    $pipe->valsubst(
-        qr/%OUTPUT%/, 'stdout',
-        lastvalue  => 'output_file'
-    );
+    $pipe->valsubst( qr/%OUTPUT%/, 'stdout', lastvalue => 'output_file' );
 
-    $pipe->valsubst(
-        qr/%INPUT%/, 'stdin',
-        firstvalue  => 'input_file'
-    );
+    $pipe->valsubst( qr/%INPUT%/, 'stdin', firstvalue => 'input_file' );
 
     is( $pipe->cmds->elements->[0]->args->elements->[0]->value, 'input_file' );
     is( $pipe->cmds->elements->[0]->args->elements->[1]->value, 'stdout' );

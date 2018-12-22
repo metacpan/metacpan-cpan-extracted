@@ -31,11 +31,11 @@ brief, goes something like this:
    make install
 ```
 
-Where X.XX is the version number of the module which you are 
+Where X.XX is the version number of the module which you are
 installing.
 
-If this doesn't work for you then creating a directory called 
-Symbol/Approx somewhere in your Perl library path (@INC) and copying 
+If this doesn't work for you then creating a directory called
+Symbol/Approx somewhere in your Perl library path (@INC) and copying
 the Sub.pm file into this directory should also do the trick.
 
 
@@ -74,9 +74,6 @@ modify it under the same terms as Perl itself.
 If you have any further questions, please contact the author.
 
 ##Authors##
-Dave Cross 
+Dave Cross
 
 Email: dave@mag-sol.com
-
-
-

@@ -9,8 +9,7 @@ lib/Build.PL
 lib/Pcore/Service/Nginx.pm
 share/data/nginx/default.key
 share/data/nginx/default.pem
-share/data/nginx/dhparam-4096.pem
-share/dist-id.json
+share/dist-id.yaml
 share/dist.yaml
 share/tmpl/nginx/conf.nginx
 share/tmpl/nginx/host_conf.nginx

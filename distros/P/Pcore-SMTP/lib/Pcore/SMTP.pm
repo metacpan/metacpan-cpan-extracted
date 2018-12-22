@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.6.5;
+package Pcore::SMTP v0.6.6;
 
 use Pcore -dist, -const, -class, -res;
 use Pcore::Handle qw[:TLS_CTX];
@@ -63,7 +63,7 @@ sub sendmail ( $self, @ ) {
         subject  => undef,
         headers  => undef,    # ArrayRef
         body     => undef,    # Str, ScalarRef
-        splice @_, 1
+        splice @_, 1,
     );
 
     $args{to}  = undef if defined $args{to}  && !$args{to};
@@ -220,7 +220,7 @@ sub _AUTH ( $self, $h, $mechanisms ) {
         $str = $client->client_start;
     }
 
-    my $cmd = 'AUTH ' . $client->mechanism . ( defined $str and length $str ? q[ ] . to_b64 $str, q[] : q[] );
+    my $cmd = 'AUTH ' . $client->mechanism . ( defined $str and length $str ? $SPACE . to_b64 $str, $EMPTY : $EMPTY );
 
     while () {
         $h->write( $cmd . $CRLF );
@@ -231,7 +231,7 @@ sub _AUTH ( $self, $h, $mechanisms ) {
             return $res;
         }
         else {
-            $cmd = to_b64 $client->client_step( from_b64 $res->{data}->[0] ), q[];
+            $cmd = to_b64 $client->client_step( from_b64 $res->{data}->[0] ), $EMPTY;
         }
     }
 
@@ -306,7 +306,7 @@ sub _DATA ( $self, $h, $args ) {
     $h->write($buf);
 
     # send body
-    $buf = q[];
+    $buf = $EMPTY;
 
     if ( defined $args->{body} ) {
         if ( !is_ref $args->{body} ) {
@@ -418,8 +418,6 @@ sub _NOOP ( $self, $h, $cb ) {
 ## |      | 398                  | * Private subroutine/method '_NOOP' declared but not used                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 393                  | ControlStructures::ProhibitYadaOperator - yada operator (...) used                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 57                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

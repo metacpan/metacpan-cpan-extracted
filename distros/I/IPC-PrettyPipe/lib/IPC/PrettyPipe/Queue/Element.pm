@@ -6,17 +6,17 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 has last => (
-    is => 'rwp',
-    default => sub { 0 },
+    is       => 'rwp',
+    default  => sub { 0 },
     init_arg => undef,
 );
 
 has first => (
-    is => 'rwp',
-    default => sub { 0 },
+    is       => 'rwp',
+    default  => sub { 0 },
     init_arg => undef,
 );
 
@@ -45,7 +45,7 @@ IPC::PrettyPipe::Queue::Element - role for an element in an B<IPC::PrettyPipe::Q
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

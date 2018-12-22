@@ -1,0 +1,6 @@
+2018-12-21 Daniël van Eeden (0.002)
+* Rework dbd_st_FETCH_attrib (fixed $dbh->{Database}{Name} etc)
+* Instruct the compiler to use C99
+
+2018-12-20 Daniël van Eeden (0.001)
+* Initial release

@@ -3,7 +3,7 @@ package Net::Async::Github::RateLimit::Core;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 =head1 NAME
 

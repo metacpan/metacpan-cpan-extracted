@@ -1,56 +1,47 @@
 package Algorithm::Dependency::Source;
+# ABSTRACT: Implements a source of hierarchy items
 
-=pod
-
-=head1 NAME
-
-Algorithm::Dependency::Source - Implements a source of heirachy items
-
-=head1 DESCRIPTION
-
-The Algorithm::Dependency::Source class provides an abstract parent class for
-implementing sources for the heirachy data the algorithm will use. For an
-example of an implementation of this, see
-L<Algorithm::Dependency::Source::File>, which is bundled with the main
-L<Algorithm::Dependency> package.
-
-=head1 METHODS
-
-=cut
+#pod =pod
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod The Algorithm::Dependency::Source class provides an abstract parent class for
+#pod implementing sources for the hierarchy data the algorithm will use. For an
+#pod example of an implementation of this, see
+#pod L<Algorithm::Dependency::Source::File>, which is bundled with the main
+#pod L<Algorithm::Dependency> package.
+#pod
+#pod =head1 METHODS
+#pod
+#pod =cut
 
 use 5.005;
 use strict;
 use Algorithm::Dependency ();
 use Params::Util qw{_SET};
 
-use vars qw{$VERSION};
-BEGIN {
-	$VERSION = '1.110';
-}
-
-
-
+our $VERSION = '1.111';
 
 
 #####################################################################
 # Constructor
 
-=pod
-
-=head2 new @arguments
-
-Although you cannot directly use the C<new> constructor for
-C<Algorithm::Dependency::Source>, it will work the same in all subclasses.
-
-The constructor takes zero or more subclass specific arguments to define the
-location of the source of the items, and returns a new object. Alrough it
-may check that the arguments you passed are valid, the source will usually
-NOT actually load the items from the source, instead defering the loading
-until you need to use the items.
-
-Returns a new object on success, or C<undef> on error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 new @arguments
+#pod
+#pod Although you cannot directly use the C<new> constructor for
+#pod C<Algorithm::Dependency::Source>, it will work the same in all subclasses.
+#pod
+#pod The constructor takes zero or more subclass specific arguments to define the
+#pod location of the source of the items, and returns a new object. Although it
+#pod may check that the arguments you passed are valid, the source will usually
+#pod NOT actually load the items from the source, instead deferring the loading
+#pod until you need to use the items.
+#pod
+#pod Returns a new object on success, or C<undef> on error.
+#pod
+#pod =cut
 
 sub new {
 	my $class = shift;
@@ -75,19 +66,19 @@ sub new {
 	$self;
 }
 
-=pod
-
-=head2 load
-
-The C<load> method is the public method used to actually load the items from
-their storage location into the the source object. The method will
-automatically called, as needed, in most circumstances. You would generally
-only want to use C<load> manually if you think there may be some uncertainty
-that the source will load correctly, and want to check it will work.
-
-Returns true if the items are loaded successfully, or C<undef> on error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 load
+#pod
+#pod The C<load> method is the public method used to actually load the items from
+#pod their storage location into the the source object. The method will
+#pod automatically called, as needed, in most circumstances. You would generally
+#pod only want to use C<load> manually if you think there may be some uncertainty
+#pod that the source will load correctly, and want to check it will work.
+#pod
+#pod Returns true if the items are loaded successfully, or C<undef> on error.
+#pod
+#pod =cut
 
 sub load {
 	my $self = shift;
@@ -123,17 +114,17 @@ sub load {
 	$self->{loaded} = 1;
 }
 
-=pod
-
-=head2 item $name
-
-The C<item> method fetches and returns the item object specified by the
-name argument.
-
-Returns an L<Algorithm::Dependency::Item> object on success, or C<undef> if
-the named item does not exist in the source.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 item $name
+#pod
+#pod The C<item> method fetches and returns the item object specified by the
+#pod name argument.
+#pod
+#pod Returns an L<Algorithm::Dependency::Item> object on success, or C<undef> if
+#pod the named item does not exist in the source.
+#pod
+#pod =cut
 
 sub item {
 	my $self = shift;
@@ -144,18 +135,18 @@ sub item {
 	$self->{items_hash}->{$id};
 }
 
-=pod
-
-=head2 items
-
-The C<items> method returns, as a list of objects, all of the items
-contained in the source. The item objects will be returned in the same order
-as that in the storage location.
-
-Returns a list of L<Algorithm::Dependency::Item> objects on success, or
-C<undef> on error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 items
+#pod
+#pod The C<items> method returns, as a list of objects, all of the items
+#pod contained in the source. The item objects will be returned in the same order
+#pod as that in the storage location.
+#pod
+#pod Returns a list of L<Algorithm::Dependency::Item> objects on success, or
+#pod C<undef> on error.
+#pod
+#pod =cut
 
 sub items {
 	my $self = shift;
@@ -163,20 +154,20 @@ sub items {
 	@{ $self->{items_array} };
 }
 
-=pod
-
-=head2 missing_dependencies
-
-By default, we are leniant with missing dependencies if the item is neved 
-used. For systems where having a missing dependency can be very bad, the 
-C<missing_dependencies> method checks all Items to make sure their 
-dependencies exist.
-
-If there are any missing dependencies, returns a reference to an array of
-their ids. If there are no missing dependencies, returns 0. Returns 
-C<undef> on error.
-
-=cut
+#pod =pod
+#pod
+#pod =head2 missing_dependencies
+#pod
+#pod By default, we are lenient with missing dependencies if the item is never 
+#pod used. For systems where having a missing dependency can be very bad, the 
+#pod C<missing_dependencies> method checks all Items to make sure their 
+#pod dependencies exist.
+#pod
+#pod If there are any missing dependencies, returns a reference to an array of
+#pod their ids. If there are no missing dependencies, returns 0. Returns 
+#pod C<undef> on error.
+#pod
+#pod =cut
 
 sub missing_dependencies {
 	my $self = shift;
@@ -204,7 +195,80 @@ sub _load_item_list {
 
 1;
 
+__END__
+
 =pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Algorithm::Dependency::Source - Implements a source of hierarchy items
+
+=head1 VERSION
+
+version 1.111
+
+=head1 DESCRIPTION
+
+The Algorithm::Dependency::Source class provides an abstract parent class for
+implementing sources for the hierarchy data the algorithm will use. For an
+example of an implementation of this, see
+L<Algorithm::Dependency::Source::File>, which is bundled with the main
+L<Algorithm::Dependency> package.
+
+=head1 METHODS
+
+=head2 new @arguments
+
+Although you cannot directly use the C<new> constructor for
+C<Algorithm::Dependency::Source>, it will work the same in all subclasses.
+
+The constructor takes zero or more subclass specific arguments to define the
+location of the source of the items, and returns a new object. Although it
+may check that the arguments you passed are valid, the source will usually
+NOT actually load the items from the source, instead deferring the loading
+until you need to use the items.
+
+Returns a new object on success, or C<undef> on error.
+
+=head2 load
+
+The C<load> method is the public method used to actually load the items from
+their storage location into the the source object. The method will
+automatically called, as needed, in most circumstances. You would generally
+only want to use C<load> manually if you think there may be some uncertainty
+that the source will load correctly, and want to check it will work.
+
+Returns true if the items are loaded successfully, or C<undef> on error.
+
+=head2 item $name
+
+The C<item> method fetches and returns the item object specified by the
+name argument.
+
+Returns an L<Algorithm::Dependency::Item> object on success, or C<undef> if
+the named item does not exist in the source.
+
+=head2 items
+
+The C<items> method returns, as a list of objects, all of the items
+contained in the source. The item objects will be returned in the same order
+as that in the storage location.
+
+Returns a list of L<Algorithm::Dependency::Item> objects on success, or
+C<undef> on error.
+
+=head2 missing_dependencies
+
+By default, we are lenient with missing dependencies if the item is never 
+used. For systems where having a missing dependency can be very bad, the 
+C<missing_dependencies> method checks all Items to make sure their 
+dependencies exist.
+
+If there are any missing dependencies, returns a reference to an array of
+their ids. If there are no missing dependencies, returns 0. Returns 
+C<undef> on error.
 
 =head1 EXTENDING
 
@@ -235,31 +299,24 @@ Having completed these two things, your subclass should be completed. For
 an example of the code, have a look at the source for the simple subclass
 L<Algorithm::Dependency::Source::File>.
 
-=head1 SUPPORT
-
-For general comments, contact the author.
-
-To file a bug against this module, in a way you can keep track of, see the
-CPAN bug tracking system.
-
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Algorithm-Dependency>
-
-=head1 AUTHOR
-
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
-
 =head1 SEE ALSO
 
 L<Algorithm::Dependency>, L<Algorithm::Dependency::Source::File>
 
-=head1 COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2003 - 2009 Adam Kennedy.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Dependency>
+(or L<bug-Algorithm-Dependency@rt.cpan.org|mailto:bug-Algorithm-Dependency@rt.cpan.org>).
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=head1 AUTHOR
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+Adam Kennedy <adamk@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

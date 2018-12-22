@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Ordered dependency trees
 
 use strict;

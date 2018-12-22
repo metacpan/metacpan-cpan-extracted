@@ -8,7 +8,7 @@ cpanfile
 lib/Build.PL
 lib/Pcore/Chrome.pm
 lib/Pcore/Chrome/Tab.pm
-share/dist-id.json
+share/dist-id.yaml
 share/dist.yaml
 t/001.t
 t/author-pod-syntax.t

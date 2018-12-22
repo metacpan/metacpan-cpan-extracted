@@ -9,7 +9,7 @@ lib/Build.PL
 lib/Pcore/CDN/Static.pm
 lib/Pcore/CDN/Static/FA.pm
 share/cdn.perl
-share/dist-id.json
+share/dist-id.yaml
 share/dist.yaml
 share/tmpl/pcore-cdn-static-fa.pm.tmpl
 t/author-pod-syntax.t

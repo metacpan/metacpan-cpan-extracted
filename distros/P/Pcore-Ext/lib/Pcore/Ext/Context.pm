@@ -75,7 +75,7 @@ sub _resolve_class_path ( $self, $path ) {
 
     # path is related to the current context app_path
     if ( substr( $path, 0, 2 ) eq '//' ) {
-        substr $path, 0, 2, q[];
+        substr $path, 0, 2, $EMPTY;
 
         $resolved = P->path($path)->to_abs( $self->{ctx}->{app_path} );
     }
@@ -175,7 +175,7 @@ sub to_js ( $self ) {
 
     my $class_name = $self->{ctx}->{override} ? q[null] : qq["$self->{ctx}->{ext_class_name}"];
 
-    my $js = qq[Ext.define( $class_name, ] . P->data->to_json( $data, canonical => 1 )->$* . qq[@{[ defined $on_create_func ? ',"' . $on_create_func->TO_JSON . '"' : q[] ]})];
+    my $js = qq[Ext.define( $class_name, ] . P->data->to_json( $data, canonical => 1 )->$* . qq[@{[ defined $on_create_func ? ',"' . $on_create_func->TO_JSON . '"' : $EMPTY ]})];
 
     my $js_gen_cache = $self->{_js_gen_cache};
 

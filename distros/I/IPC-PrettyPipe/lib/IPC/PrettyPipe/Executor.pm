@@ -4,7 +4,7 @@ package IPC::PrettyPipe::Executor;
 
 use Moo::Role;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 requires qw[ run ];
 
@@ -34,7 +34,7 @@ IPC::PrettyPipe::Executor - role for executor backends
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

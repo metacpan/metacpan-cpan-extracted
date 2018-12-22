@@ -78,11 +78,9 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Pod::Coverage::TrustPod" => 0,
-    "Test::More" => 0,
-    "Test::Perl::Critic" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "6.1",
+  "VERSION" => "6.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -119,12 +117,10 @@ my %FallbackPrereqs = (
   "Net::CIDR::Lite" => 0,
   "Net::Netrc" => 0,
   "POSIX" => 0,
-  "Pod::Coverage::TrustPod" => 0,
   "Pod::Usage" => 0,
   "Ref::Util" => 0,
   "Sub::Exporter" => 0,
   "Test::More" => 0,
-  "Test::Perl::Critic" => 0,
   "Text::CSV_XS" => 0,
   "Time::HiRes" => 0,
   "Time::Local" => 0,

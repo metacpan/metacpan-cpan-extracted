@@ -1,7 +1,7 @@
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.69';
+$Geo::Address::Formatter::VERSION = '1.73';
 use strict;
 use warnings;
 use feature qw(say);
@@ -13,8 +13,8 @@ use File::Find::Rule;
 use List::Util qw(first);
 use Scalar::Util qw(looks_like_number);
 use Text::Hogan::Compiler;
-use Try::Tiny;
-use YAML qw(Load LoadFile);
+use Try::Catch;
+use YAML::XS qw(LoadFile);
 use utf8;
 
 my $THC = Text::Hogan::Compiler->new;
@@ -26,6 +26,7 @@ sub new {
 
     my $self = {};
     my $conf_path = $params{conf_path} || die "no conf_path set";
+    $self->{final_components} = undef;
     bless( $self, $class );
 
     $self->_read_configuration($conf_path);
@@ -115,6 +116,16 @@ sub _read_configuration {
 }
 
 
+sub final_components {
+    my $self = shift;
+    if (defined($self->{final_components})){
+        return $self->{final_components};
+    }
+    warn 'final_components not yet set';
+    return;
+}
+
+
 sub format_address {
     my $self       = shift;
     my $rh_components = clone(shift) || return;
@@ -193,6 +204,9 @@ sub format_address {
     $text = $self->_postformat($text,$rh_config->{postformat_replace});
     $text = $self->_clean($text);
 
+    # set final components
+    $self->{final_components} = $rh_components;
+    
     # all done
     return $text;
 }
@@ -659,7 +673,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.69
+version 1.73
 
 =head1 SYNOPSIS
 
@@ -670,7 +684,10 @@ version 1.69
   my $GAF = Geo::Address::Formatter->new( conf_path => '/path/to/templates' );
   my $components = { ... }
   my $text = $GAF->format_address($components, { country => 'FR' } );
+  my $rh_final_components = $GAF->final_components();
   #
+  # or if we want shorter output
+  # 
   my $short_text = $GAF->format_address($components, { country => 'FR', abbreviate => 1, });
 
 =head2 new
@@ -678,6 +695,13 @@ version 1.69
   my $GAF = Geo::Address::Formatter->new( conf_path => '/path/to/templates' );
 
 Returns one instance. The conf_path is required.
+
+=head2 final_components
+
+  my $rh_components = $GAF->final_components();
+
+returns a reference to a hash of the final components that are set at the
+completion of B<format_address>. Warns if called before they have been set.
 
 =head2 format_address
 

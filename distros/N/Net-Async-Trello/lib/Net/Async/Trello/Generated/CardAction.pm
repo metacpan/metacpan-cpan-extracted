@@ -1,17 +1,15 @@
 package Net::Async::Trello::Generated::CardAction;
-$Net::Async::Trello::Generated::CardAction::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Trello::Common);
 
 =head1 NAME
 
 Net::Async::Trello::Generated::CardAction
-
-=head1 VERSION
-
-version 0.001
 
 =head1 DESCRIPTION
 
@@ -218,3 +216,4 @@ Provides an accessor for C<url>.
 sub url { shift->{url} }
 
 1;
+

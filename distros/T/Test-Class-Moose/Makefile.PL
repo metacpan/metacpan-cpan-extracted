@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "File::Spec" => 0,
     "Import::Into" => 0,
-    "JSON" => 0,
+    "JSON::MaybeXS" => 0,
     "List::SomeUtils" => 0,
     "List::Util" => 0,
     "Module::Runtime" => 0,
@@ -69,7 +69,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.95",
+  "VERSION" => "0.96",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -85,7 +85,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "File::Temp" => 0,
   "Import::Into" => 0,
-  "JSON" => 0,
+  "JSON::MaybeXS" => 0,
   "List::SomeUtils" => 0,
   "List::Util" => 0,
   "Module::Runtime" => 0,

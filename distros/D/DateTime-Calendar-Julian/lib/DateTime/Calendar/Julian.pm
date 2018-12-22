@@ -1,10 +1,11 @@
 package DateTime::Calendar::Julian;
 
 use strict;
+use warnings;
 
 use vars qw($VERSION @ISA);
 
-$VERSION = '0.04';
+$VERSION = '0.100';
 
 use DateTime 0.08;
 @ISA = 'DateTime';
@@ -26,14 +27,14 @@ my @start_of_month = (0, 31, 61, 92, 122, 153, 184, 214, 245, 275, 306, 337);
 
 # This is the difference between Julian and Gregorian calendar:
 sub _is_leap_year {
-    my ($self, $year) = @_;
+    my (undef, $year) = @_;	# Invocant unused
 
     return ($year % 4 == 0);
 }
 
 # Algorithms from http://home.capecod.net/~pbaum/date/date0.htm
-sub _ymd2rd {
-    my ($self, $y, $m, $d) = @_;
+sub _ymd2rd {	## no critic (ProhibitUnusedPrivateSubroutines)
+    my (undef, $y, $m, $d) = @_;	# Invocant unused
 
     my $adj = _floor( ($m-3)/12 );
     $m -= 12 * $adj;
@@ -43,7 +44,7 @@ sub _ymd2rd {
     return $rd;
 }
 
-sub _rd2ymd {
+sub _rd2ymd {	## no critic (ProhibitUnusedPrivateSubroutines)
     my ($self, $rd, $extra) = @_;
 
     my $z = $rd + 308;
@@ -174,22 +175,37 @@ year 1BC (there was no year 0AD!), -1 the year 2BC, etc.
 Support for this module is provided via the datetime@perl.org email
 list. See http://lists.perl.org/ for more details.
 
+Bug reports will be accepted as RT tickets or by mail to Wyant.
+
 =head1 AUTHOR
 
 Eugene van der Pijll <pijll@gmx.net>
 
-=head1 COPYRIGHT
+Thomas R. Wyant, III F<wyant at cpan dot org>
 
-Copyright (c) 2003 Eugene van der Pijll.  All rights reserved.  This
-program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003 Eugene van der Pijll.  All rights reserved.
+
+Copyright (C) 2018 Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
 
 =head1 SEE ALSO
 
-L<DateTime>
+L<DateTime|/DateTime>
+
+L<DateTime::Calendar::Christian|DateTime::Calendar::Christian>
 
 datetime@perl.org mailing list
 
-http://datetime.perl.org/
+L<http://datetime.perl.org/>
 
 =cut
+
+# ex: set textwidth=72 :

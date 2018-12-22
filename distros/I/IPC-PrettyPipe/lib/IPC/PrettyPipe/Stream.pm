@@ -16,7 +16,7 @@ use Fcntl qw[ O_RDONLY O_WRONLY O_CREAT O_TRUNC O_APPEND ];
 
 use Moo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 
 with 'IPC::PrettyPipe::Queue::Element';
@@ -81,9 +81,9 @@ has strict => (
     isa     => Bool,
     default => sub { 1 } );
 
-#pod =for Pod::Coverage BUILDARGS BUILD
-#pod
-#pod =cut
+
+
+
 
 sub BUILDARGS {
 
@@ -112,7 +112,8 @@ sub BUILD {
 
     my $opc = parse_spec( $self->spec );
 
-    croak( __PACKAGE__, ': ', "cannot parse stream specification: ", $self->spec )
+    croak( __PACKAGE__, ': ', "cannot parse stream specification: ",
+        $self->spec )
       unless defined $opc->{type};
 
     $self->_set_requires_file( $opc->{param} );
@@ -137,7 +138,7 @@ sub BUILD {
     return;
 }
 
-sub quoted_file {  shell_quote( $_[0]->file )  }
+sub quoted_file { shell_quote( $_[0]->file ) }
 
 sub _redirect {
 
@@ -163,7 +164,7 @@ sub _redirect {
           // croak( "error: unrecognized operator: ", $self->Op, "\n" );
 
         $sub = sub {
-            my $nfd = POSIX::open( $file, $op, oct(644) )
+            my $nfd = POSIX::open( $file, $op, oct( 644 ) )
               or croak( 'error opening', $file, ": $!\n" );
             POSIX::dup2( $nfd, $N )
               or croak( "error in dup2( $nfd, $N ): $!\n" );
@@ -210,11 +211,11 @@ sub _dup {
 
 sub _redirect_stdout_stderr {
 
-        my $self = shift;
+    my $self = shift;
 
-        ( undef, my $sub_redir ) = $self->_redirect( *STDOUT );
-        ( undef, my $sub_dup   ) = $self->_dup( *STDERR, *STDOUT );
-        return sub { $sub_redir->(), $sub_dup->() },  *STDOUT, *STDERR;
+    ( undef, my $sub_redir ) = $self->_redirect( *STDOUT );
+    ( undef, my $sub_dup ) = $self->_dup( *STDERR, *STDOUT );
+    return sub { $sub_redir->(), $sub_dup->() }, *STDOUT, *STDERR;
 
 }
 
@@ -247,18 +248,18 @@ sub _close {
 
 sub apply {
 
-        my $self = shift;
+    my $self = shift;
 
-        my ( $N, $M ) =  do {
+    my ( $N, $M ) = do {
 
-                no warnings 'uninitialized';
+        no warnings 'uninitialized';
 
-                map { $fh_map{$_} } $self->N, $self->M;
+        map { $fh_map{$_} } $self->N, $self->M;
 
-        };
+    };
 
-        my $mth = '_' . $self->_type;
-        return $self->$mth( $N, $M );
+    my $mth = '_' . $self->_type;
+    return $self->$mth( $N, $M );
 }
 
 
@@ -287,7 +288,7 @@ IPC::PrettyPipe::Stream - An I/O stream for an B<IPC::PrettyPipe> pipeline or co
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

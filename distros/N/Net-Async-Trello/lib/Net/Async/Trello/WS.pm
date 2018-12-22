@@ -1,11 +1,13 @@
 package Net::Async::Trello::WS;
-$Net::Async::Trello::WS::VERSION = '0.002';
+
 use strict;
 use warnings;
 
-use Syntax::Keyword::Try;
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(IO::Async::Notifier);
+
+use Syntax::Keyword::Try;
 
 use JSON::MaybeXS;
 use Net::Async::WebSocket::Client;

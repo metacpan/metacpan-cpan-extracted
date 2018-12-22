@@ -1,5 +1,9 @@
 Revision history for Test-MockFile
 
+0.015   12/21/2018
+ - Remove errant debug messages from open
+ - Pass 3 to fix t/touch.t on BSD.
+
 0.014   12/20/2018
  - Re-factor _find_file_or_fh to handle symlink following logic better. GH #26
  - Make more standard use of _get_file_object when looking up a file path so we

@@ -55,7 +55,7 @@ has template => (
     is => 'rw',
 
     default => sub {
-        return <<"EOT"
+        return <<"EOT";
 [% IF pipe.streams.empty %][% ELSE %](\t\\
 [% END -%]
 [%- FOREACH cmd IN pipe.cmds.elements %]
@@ -111,12 +111,11 @@ sub render {
 
     my $self = shift;
 
-    my ( $args ) =
-      validate( \@_,
-                slurpy Dict[
-                            colorize => Optional[ Bool ],
-                           ]
-              );
+    my ( $args ) = validate(
+        \@_,
+        slurpy Dict [
+            colorize => Optional [Bool],
+        ] );
 
     $args->{colorize} //= 1;
 
@@ -134,7 +133,7 @@ sub render {
     Template::Tiny->new->process(
         \$self->template,
         {
-         ## no critic (ProhibitAccessOfPrivateData)
+            ## no critic (ProhibitAccessOfPrivateData)
             pipe => $self->pipe,
             $args->{colorize} ? ( color => \%color ) : (),
         },

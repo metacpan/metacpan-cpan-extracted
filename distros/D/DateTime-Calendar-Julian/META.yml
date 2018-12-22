@@ -1,0 +1,35 @@
+---
+abstract: 'DateTime object in the Julian calendar'
+author:
+  - 'Eugene van der Pijll <pijll@gmx.net>'
+  - 'Thomas R. Wyant, III <wyant at cpan dot org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Calendar-Julian
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - xt
+provides:
+  DateTime::Calendar::Julian:
+    file: lib/DateTime/Calendar/Julian.pm
+    version: '0.100'
+requires:
+  DateTime: '0.08'
+  perl: '5.008004'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Julian
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-DateTime-Calendar-Julian.git
+version: '0.100'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,7 @@
-use Test::More qw(); 
+use strict;
+use warnings;
 #Don't import anything or test routines become potential matches during the test
+use Test::More qw();
 
 use Symbol::Approx::Sub (
     xform => undef,
@@ -28,6 +30,7 @@ while($tries_left >= 0) {
     $tries_left--;
 }
 
-Test::More::ok !keys %remaining_returns, "Got all expected return values (covering all our subroutines) in <= $total_tries tries";
+Test::More::ok !keys %remaining_returns,
+  "Got all expected return values (covering all our subroutines) in <= $total_tries tries";
 
 Test::More::done_testing();

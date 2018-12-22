@@ -1,7 +1,7 @@
 package Bencher::Scenario::TimeHiRes::usleep_accuracy;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-12-21'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -54,7 +54,7 @@ Bencher::Scenario::TimeHiRes::usleep_accuracy - Demonstrate inaccuracy of doing 
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::TimeHiRes::usleep_accuracy (from Perl distribution Bencher-Scenarios-TimeHiRes), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenario::TimeHiRes::usleep_accuracy (from Perl distribution Bencher-Scenarios-TimeHiRes), released on 2018-12-21.
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

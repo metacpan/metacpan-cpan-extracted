@@ -19,7 +19,7 @@ has to   => ( required => 1 );        # Str
 has _tmpl => ( init_arg => undef );   # InstanceOf ['Pcore::Util::Tmpl']
 has _init => ( init_arg => undef );   # Bool
 
-const our $INDENT => q[ ] x 4;
+const our $INDENT => $SPACE x 4;
 
 sub _build_id ($self) { return "xmpp://$self->{host}:$self->{port}?username=$self->{username}&to=$self->{to}" }
 
@@ -59,7 +59,7 @@ sub forward_event ( $self, $ev ) {
             $ev->{text} =~ s/^/$INDENT/smg;
 
             # remove all trailing "\n"
-            local $/ = '';
+            local $/ = $EMPTY;
 
             chomp $ev->{text};
         }
@@ -83,8 +83,6 @@ sub forward_event ( $self, $ev ) {
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 48, 51               | Variables::ProhibitLocalVars - Variable declared as "local"                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 62                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 11                   | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
@@ -104,7 +102,7 @@ Pcore::Core::Event::Listener::xmpp
         'LOG.#',
         [   'xmpp:',
             username => 'user@gmail.com',
-            password => '',
+            password => $EMPTY,
             host     => 'talk.google.com',
             port     => 5222,
             to       => 'target@domain.net',

@@ -10,11 +10,13 @@ use My::Tests;
 
 sub new { IPC::PrettyPipe->new( @_ ); }
 
-ok( lives {
+ok(
+    lives {
 
-    IPC::PrettyPipe->new();
-},
-'new' );
+        IPC::PrettyPipe->new();
+    },
+    'new'
+);
 
 test_attr(
     \&new,
@@ -141,8 +143,8 @@ test_attr(
     },
 
     {
-        desc    => 'stream',
-        new     => [ cmds => 'ls' ],
+        desc => 'stream',
+        new => [ cmds => 'ls' ],
         methods => [ stream => [ '>', 'stdout' ] ],
         compare => [
             [ 'cmds->elements->[0]', { cmd => 'ls' } ],

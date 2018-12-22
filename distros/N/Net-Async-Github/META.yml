@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +32,8 @@ requires:
   Net::Async::HTTP: '0.41'
   Net::Async::WebSocket: '0'
   Path::Tiny: '0.098'
-  Ryu::Async: '0.002'
+  Ryu: '0.031'
+  Ryu::Async: '0.013'
   Syntax::Keyword::Try: '0.04'
   Time::Moment: '0.41'
   URI: '1.71'
@@ -41,5 +42,6 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-Github
   homepage: http://search.cpan.org/dist/Net-Async-Github/
-version: '0.003'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.004'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

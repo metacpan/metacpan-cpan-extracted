@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Creating and using dependency trees
 
 use strict;

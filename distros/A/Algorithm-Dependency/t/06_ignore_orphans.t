@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Check that errors are correctly ignored when the 'ignore_orphans' option
 # is turned on.
 

@@ -6,10 +6,14 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw($VERSION);
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 1;
 __END__
+
+=head1 NAME
+
+App::ansifold - fold command handling ANSI terminal sequences
 
 =head1 LICENSE
 

@@ -4,7 +4,7 @@ package IPC::PrettyPipe::Renderer;
 
 use Moo::Role;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use namespace::clean;
 
@@ -34,7 +34,7 @@ IPC::PrettyPipe::Renderer - role for renderer backends
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 SYNOPSIS
 

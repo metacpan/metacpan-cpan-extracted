@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 # shortcuts
 #  os and distros
@@ -968,7 +968,9 @@ sub mapping {
        [package => 'libadns1-dev']],
       [os_darwin,
        [package => 'adns']],
-      # no package available for CentOS7
+      [like_fedora,
+       [linuxdistro => 'fedora', # not available for CentOS6 or 7
+	[package => 'adns-devel']]],
      ],
 
      [cpanmod => 'Event::Lib',
@@ -1553,13 +1555,19 @@ sub mapping {
        [before_debian_stretch,
 	[package => ['libopencv-dev', 'libdecodeqr-dev']]],
        [package => []], # not available anymore in stretch, bionic or buster, but currently available in sid for at least arm64
-      ]],
+      ],
+      #[like_fedora,
+      # [package => 'opencv-devel']], # package for decodeqr missing
+     ],
 
      [cpanmod => ['Image::ObjectDetect', 'Image::Resize::OpenCV'],
       [os_freebsd,
        [package => 'opencv']],
       [like_debian,
-       [package => 'libopencv-dev']]],
+       [package => 'libopencv-dev']],
+      [like_fedora,
+       [package => 'opencv-devel']],
+     ],
 
      [cpanmod => 'Image::GeoTIFF::Tiled',
       [os_freebsd,
@@ -1635,7 +1643,10 @@ sub mapping {
       [os_freebsd,
        [package => 'opencv']],
       [like_debian,
-       [package => ['libcv-dev', 'libhighgui-dev']]]],
+       [package => ['libcv-dev', 'libhighgui-dev']]],
+      [like_fedora,
+       [package => 'opencv-devel']],
+     ],
 
      [cpanmod => 'Image::Scale',
       [os_freebsd,
@@ -2785,7 +2796,13 @@ sub mapping {
       [like_debian,
        [before_debian_stretch,
 	[package => []]],
-       [package => 'libvterm-dev']]],
+       [package => 'libvterm-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^6\.},
+	package => []], # N/A for centos6
+       [package => 'libvterm-devel']],
+     ],
 
      [cpanmod => 'Text::AI::CRM114',
       [os_freebsd,

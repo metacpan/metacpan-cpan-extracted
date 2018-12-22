@@ -84,9 +84,7 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Pod::Coverage::TrustPod" : "0",
             "Test::More" : "0",
-            "Test::Perl::Critic" : "0",
             "perl" : "5.010"
          }
       }
@@ -102,7 +100,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "6.1",
+   "version" : "6.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -319,6 +317,11 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "MetaYAML",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "MetaConfig",
             "version" : "6.012"
@@ -403,6 +406,21 @@
             "version" : "2.058"
          },
          {
+            "class" : "Dist::Zilla::Plugin::RunExtraTests",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "RunExtraTests",
+            "version" : "0.029"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckExtraTests",
+            "name" : "CheckExtraTests",
+            "version" : "0.029"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "AutoPrereqs",
             "version" : "6.012"
@@ -413,23 +431,13 @@
             "version" : "0.020"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Prereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs" : {
-                  "phase" : "test",
-                  "type" : "requires"
-               }
-            },
-            "name" : "TestRequires",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
                      "Changes",
                      "META.json",
+                     "META.yml",
                      "README.mkdn"
                   ],
                   "exclude_match" : [],
@@ -444,7 +452,7 @@
                }
             },
             "name" : "Git::GatherDir",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::NextVersion",
@@ -455,12 +463,12 @@
                   "version_regexp" : "(?^u:^release-(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.2",
                   "repo_root" : "."
                }
             },
             "name" : "Git::NextVersion",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::OurPkgVersion",
@@ -487,12 +495,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.2",
                   "repo_root" : "."
                }
             },
             "name" : "Git::Check",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
@@ -525,7 +533,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -533,7 +541,7 @@
                }
             },
             "name" : "Commit_Dirty_Files",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -542,12 +550,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-6.1",
+                  "tag" : "release-6.2",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -555,7 +563,7 @@
                }
             },
             "name" : "Git::Tag",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
@@ -578,7 +586,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -586,7 +594,7 @@
                }
             },
             "name" : "Commit_Changes",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -598,12 +606,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.18.0",
+                  "git_version" : "2.19.2",
                   "repo_root" : "."
                }
             },
             "name" : "Git::Push",
-            "version" : "2.043"
+            "version" : "2.045"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -672,6 +680,7 @@
       "Kang-min Liu <gugod@gugod.org>",
       "Lisa Hare <lhare@inview.co.uk>",
       "Markus Linnala <Markus.Linnala@cybercom.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Samit Badle <Samit.Badle@gmail.com>",
       "Takumi Sakamoto <takumi.saka@gmail.com>"
    ],

@@ -9,8 +9,17 @@ use Test2::Plugin::NoWarnings;
 
 use Errno qw/ENOENT EISDIR EPERM/;
 
+use File::Temp qw/tempfile tempdir/;
+
+note "-------------- REAL MODE --------------";
+my $temp_dir = tempdir( CLEANUP => 1 );
+$! = 0;
+is( unlink($temp_dir), 0, "unlink on a dir fails" );
+my $unlink_dir_errorno = $! + 0;
+
 use Test::MockFile ();
 
+note "-------------- MOCK MODE --------------";
 my @mock;
 my $file = Test::MockFile->file( '/file', "" );
 my $dir = Test::MockFile->dir( '/dir', [] );
@@ -21,11 +30,7 @@ is( $link->exists, 0, "/link is now gone" );
 {
     local $!;
     is( $dir->unlink, 0, "unlink /dir doesn't work." );
-    my $expected_error =
-        $^O =~ m/bsd/i  ? EPERM
-      : $^O eq 'darwin' ? EPERM
-      :                   EISDIR;
-    is( $! + 0, $expected_error, "   ... and throws a \$\!" );
+    is( $! + 0, $unlink_dir_errorno, "   ... and throws a \$\!" );
 }
 
 like( dies { $dir->touch },  qr/^touch only supports files at \S/, "touch /dir doesn't work." );

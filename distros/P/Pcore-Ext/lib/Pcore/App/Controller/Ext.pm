@@ -33,14 +33,14 @@ sub build_theme ( $self, $req, $type ) {
 }
 
 around run => sub ( $orig, $self, $req ) {
-    if ( $req->{path_tail} ) {
-        if ( $req->{path_tail} eq 'app.js' ) {
+    if ( defined $req->{path} ) {
+        if ( $req->{path} eq 'app.js' ) {
             $self->_return_app($req);
         }
-        elsif ( $req->{path_tail} eq 'overrides.js' ) {
+        elsif ( $req->{path} eq 'overrides.js' ) {
             $self->_return_overrides($req);
         }
-        elsif ( $req->{path_tail} eq 'locale.js' ) {
+        elsif ( $req->{path} eq 'locale.js' ) {
             $self->_return_locale($req);
         }
         else {
@@ -62,20 +62,26 @@ sub _return_html ( $self, $req ) {
     if ( !$self->{_cache}->{html}->{$theme} ) {
         my $resources = [ ( $self->build_resources( $req, $app->{ext_type} ) // [] )->@* ];
 
-        # pcore/api.js
-        push $resources->@*, qq[<script src="@{[ $self->{app}->{cdn}->("/static/pcore/api.js") ]}" integrity="" crossorigin="anonymous"></script>];
+        my $cdn = $self->{app}->{cdn};
 
         # CDN resources
-        push $resources->@*, $self->{app}->{cdn}->get_resources(
-            [ 'ext', $app->{ext_ver}, $app->{ext_type}, $theme, $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN, $self->{app}->{devel} ],
-            'fa',    # NOTE FontAwesme must be after ExtJS in resources or icons will not be displayed
+        push $resources->@*, $cdn->get_resources(
+            'pcore_api',
+            [   'extjs6',
+                ver           => $app->{ext_ver},
+                type          => $app->{ext_type},
+                theme         => $theme,
+                default_theme => $app->{ext_type} eq 'classic' ? $DEFAULT_THEME_CLASSIC : $DEFAULT_THEME_MODERN,
+                devel         => $self->{app}->{devel}
+            ],
+            'fa5',    # NOTE FontAwesme must be after ExtJS in resources or icons will not be displayed
         )->@*;
 
         # overrides
-        push $resources->@*, qq[<script src="$self->{path}overrides.js" integrity="" crossorigin="anonymous"></script>];
+        push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('overrides.js') );
 
         # TODO calc checksum 'sha384-' . P->digest->sha384_b64( $res->{body}->$* );
-        push $resources->@*, qq[<script src="$self->{path}app.js" integrity="" crossorigin="anonymous"></script>];
+        push $resources->@*, $cdn->get_script_tag( $self->get_abs_path('app.js') );
 
         # generate HTML tmpl
         $self->{_cache}->{html}->{$theme} = \P->text->encode_utf8(
@@ -131,7 +137,7 @@ sub _return_locale ( $self, $req ) {
     if ( !$self->{_cache}->{locale}->{$locale} ) {
         my $app = $Pcore::Ext::APP->{ $self->{ext_app} };
 
-        $locale_settings->{$locale} //= $ENV->{share}->read_cfg( 'data', "ext/locale/$locale.perl" );
+        $locale_settings->{$locale} //= $ENV->{share}->read_cfg("data/ext/locale/$locale.perl");
 
         # load locale
         Pcore::Core::L10N::load_locale($locale) if !exists $Pcore::Core::L10N::MESSAGES->{$locale};
@@ -218,7 +224,7 @@ sub _return_app ( $self, $req ) {
                     listenEvents: null,
                     onConnect: function(api) {},
                     onDisconnect: function(api, status, reason) {},
-                    onEvent: function(api, ev) { Ext.fireEvent('remoteEvent', ev) },
+                    onEvent: function(api, ev) { Ext.fireEvent('remoteEvent', ev); },
                     onListen: function(api, events) {},
                     onRpc: null
                 }),

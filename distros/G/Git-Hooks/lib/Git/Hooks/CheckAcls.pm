@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: [DEPRECATED] Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.10.0';
+$Git::Hooks::CheckAcls::VERSION = '2.10.1';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -140,7 +140,7 @@ Git::Hooks::CheckAcls - [DEPRECATED] Git::Hooks plugin for branch/tag access con
 
 =head1 VERSION
 
-version 2.10.0
+version 2.10.1
 
 =head1 SYNOPSIS
 

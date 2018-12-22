@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.4.5;
+package Pcore::Chrome v0.4.6;
 
 use Pcore -dist, -class, -res;
 use Pcore::Chrome::Tab;
@@ -86,7 +86,7 @@ around new => sub ( $orig, $self, %args ) {
         !$MSWIN ? '2>/dev/null' : (),
     ];
 
-    $self->{_proc} = P->sys->run_proc( join( q[ ], $cmd->@* ), win32_create_no_window => 1 );
+    $self->{_proc} = P->sys->run_proc( join( $SPACE, $cmd->@* ), win32_create_no_window => 1 );
 
     Coro::AnyEvent::sleep( $args{timeout} // 3 );
 

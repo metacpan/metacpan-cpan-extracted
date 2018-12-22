@@ -1,7 +1,7 @@
 ---
 abstract: 'fold command handling ANSI terminal sequences'
 author:
-  - 'Kazumasa Utashiro'
+  - '- Kazumasa Utashiro'
 build_requires:
   Test::More: '0.98'
 configure_requires:
@@ -26,17 +26,19 @@ no_index:
 provides:
   App::ansifold:
     file: lib/App/ansifold.pm
-    version: '0.02'
+    version: '0.03'
 requires:
+  Getopt::EX: v1.12.0
   Text::ANSI::Fold: '0.05'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/kaz-utashiro/ansifold/issues
   homepage: https://github.com/kaz-utashiro/ansifold
   repository: git://github.com/kaz-utashiro/ansifold.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
-  - 'Kaz Utashiro <kaz@utashiro.com>'
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

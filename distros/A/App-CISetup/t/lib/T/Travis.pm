@@ -56,7 +56,6 @@ sub test_create_and_update {
     like(
         $yaml,
         qr/
-              ^sudo:.+\n
               ^addons:.+\n
               ^language:.+\n
               ^perl:.+\n
@@ -72,7 +71,6 @@ sub test_create_and_update {
     is(
         $travis,
         {
-            sudo   => 'false',
             addons => {
                 apt => {
                     packages => [ 'aspell', 'aspell-en' ],
@@ -287,32 +285,9 @@ sub test_maybe_disable_sudo {
         force_threaded_perls => 0,
     )->update_file;
 
-    is(
-        LoadFile($file)->{sudo},
-        'false',
-        'sudo is disabled when it is not being used',
-    );
-    DumpFile(
-        $file, {
-            sudo           => 'true',
-            language       => 'perl',
-            before_install => [
-                'eval $(curl https://travis-perl.github.io/init) --auto --always-upgrade-modules'
-            ],
-            install => ['sudo foo'],
-            perl    => ['5.26'],
-        }
-    );
-
-    App::CISetup::Travis::ConfigFile->new(
-        file                 => $file,
-        force_threaded_perls => 0,
-    )->update_file;
-
-    is(
-        LoadFile($file)->{sudo},
-        'true',
-        'sudo is not disabled when it is being used',
+    ok(
+        !exists LoadFile($file)->{sudo},
+        'sudo key is deleted',
     );
 }
 

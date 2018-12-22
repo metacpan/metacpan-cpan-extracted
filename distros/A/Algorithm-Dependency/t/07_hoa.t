@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Tests for Algorithm::Dependency::HoA
 # Pretty much just copied from the 03_basics.t tests
 

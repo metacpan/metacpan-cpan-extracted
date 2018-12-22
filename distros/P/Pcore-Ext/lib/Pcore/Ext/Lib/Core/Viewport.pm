@@ -1,7 +1,7 @@
 package Pcore::Ext::Lib::Core::Viewport;
 
 use Pcore -l10n;
-use Pcore::Resources::FA qw[:ALL];
+use Pcore::CDN::Static::FA qw[:ALL];
 
 # VIEWPORT CONTROLLER
 sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
@@ -282,7 +282,7 @@ JS
                         Ext.toast($l10n->{'You have no permissions to access this area'}, 3000);
 
                         return;
-                    };
+                    }
 
                     // store API token
                     me.setToken(session.token, persistent);
@@ -403,16 +403,16 @@ sub EXT_signin_controller : Extend('Ext.app.ViewController') : Type('controller'
     return {
         submit => func [],
         <<"JS",
-                var me = this;
-                var view = this.getView();
-                var form = view.down('fieldpanel');
+                var me = this,
+                    view = this.getView(),
+                    form = view.down('fieldpanel');
 
                 if (form.validate()) {
                     Ext.fireEvent('signin',
                         form.getFields('username').getValue(),
                         form.getFields('password').getValue(),
                         this.lookup('remember_me').isChecked(),
-                        function (success) {if (success) view.destroy()}
+                        function (success) {if (success) view.destroy();}
                     );
                 }
 JS
@@ -520,7 +520,7 @@ sub EXT_change_password_controller : Extend('Ext.app.ViewController') : Type('co
                     function (success) {
                         Ext.fireEvent('unmask');
 
-                        if (success) me.close()
+                        if (success) me.close();
                     }
                 );
             }

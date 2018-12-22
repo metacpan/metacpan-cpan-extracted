@@ -40,8 +40,14 @@
 /* TODO: need to improve for Perl <= 5.014 */
 #define RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV() STMT_START { \
     if (gl_overload_ft->op[OP_STAT].is_mocked) { \
-      SV *const arg = *PL_stack_sp; \
-      GV *gv =  MAYBE_DEREF_GV(arg); \
+      SV *arg = *PL_stack_sp; GV *gv; \
+      if ( SvTYPE(arg) == SVt_PVAV ) arg = arg + AvMAX( arg ); \
+      /* GV *gv =  MAYBE_DEREF_GV(arg); */ \
+      if ( PL_op->op_flags & OPf_REF ) \
+        gv = cGVOP_gv; \
+      else { \
+        gv = MAYBE_DEREF_GV(arg); \
+       } \
       /* printf ("### XXX ---> arg %d %p vs GV %p vs defgv %p \n", SvFLAGS(arg), *PL_stack_sp, gv, PL_defgv ); */ \
       /* get the GV from the arg if it s not a GV */ \
       if ( SvTYPE(arg) == SVt_NULL || gv == PL_defgv ) { \
@@ -70,9 +76,9 @@ int _overload_ft_ops() {
   SV *const arg = *PL_stack_sp;
   int optype = PL_op->op_type;  /* this is the current op_type we are mocking */
   int check_status = -1;        /* 1 -> YES ; 0 -> FALSE ; -1 -> delegate */
+  int count;
 
   dSP;
-  int count;
 
   ENTER;
   SAVETMPS;
@@ -81,6 +87,7 @@ int _overload_ft_ops() {
   EXTEND(SP, 2);
   PUSHs(sv_2mortal(newSViv(optype)));
   PUSHs(arg);
+
   PUTBACK;
 
   count = call_pv("Overload::FileCheck::_check", G_SCALAR);
@@ -116,6 +123,7 @@ SV* _overload_ft_ops_sv() {
   EXTEND(SP, 2);
   PUSHs(sv_2mortal(newSViv(optype)));
   PUSHs(arg);
+
   PUTBACK;
 
   count = call_pv("Overload::FileCheck::_check", G_SCALAR);

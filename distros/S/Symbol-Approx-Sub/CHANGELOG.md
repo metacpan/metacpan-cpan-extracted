@@ -1,3 +1,8 @@
+## 3.1.0 - 2018-12-22
+
+* Various code improvements to please kritika.io
+* Added 'suggest' mode (thanks to Alex Balhatchet)
+
 ## 3.0.2 - 2016-12-07
 
 * Really made module versions consistant :-/

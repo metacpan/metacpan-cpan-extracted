@@ -1,0 +1,66 @@
+{
+   "abstract" : "DateTime object in the Julian calendar",
+   "author" : [
+      "Eugene van der Pijll <pijll@gmx.net>",
+      "Thomas R. Wyant, III <wyant at cpan dot org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTime-Calendar-Julian",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.08",
+            "perl" : "5.008004"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Calendar::Julian" : {
+         "file" : "lib/DateTime/Calendar/Julian.pm",
+         "version" : "0.100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Calendar-Julian"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-DateTime-Calendar-Julian.git",
+         "web" : "https://github.com/trwyant/perl-DateTime-Calendar-Julian"
+      }
+   },
+   "version" : "0.100",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

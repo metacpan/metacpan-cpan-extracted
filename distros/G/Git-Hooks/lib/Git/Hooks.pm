@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.10.0';
+$Git::Hooks::VERSION = '2.10.1';
 use 5.010;
 use utf8;
 use Carp;
@@ -34,7 +34,7 @@ BEGIN {                         ## no critic (RequireArgUnpacking)
         no strict 'refs';       ## no critic (ProhibitNoStrict)
         *{"Git::Hooks::$installer"} = sub (&) {
             push @{$Hooks{$hook}}, {
-                package => scalar(caller(1)),
+                package => scalar(caller),
                 sub     => shift(@_),
             };
         }
@@ -132,7 +132,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.10.0
+version 2.10.1
 
 =head1 SYNOPSIS
 

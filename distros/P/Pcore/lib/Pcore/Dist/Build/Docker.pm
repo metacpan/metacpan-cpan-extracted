@@ -289,8 +289,6 @@ sub status ( $self ) {
         }
 
         print $tbl->render_all( [ map { $report->{$_} } ( sort $version_tags->@* ), $report->{latest} ? 'latest' : (), ( sort $named_tags->@* ) ] );
-
-        say 'NOTE: if build tag is not set - repository will not be builded automatically, when build link will be updated';
     }
     else {
         say q[No docker tags were found.];
@@ -722,9 +720,9 @@ sub _build_dockerignore ( $self, $path ) {
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
 ## |      | 127                  | * Subroutine "status" with high complexity score (28)                                                          |
-## |      | 302                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 300                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 479                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 477                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

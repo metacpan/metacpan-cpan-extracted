@@ -1,5 +1,5 @@
 requires "IO::ReStoreFH" => "0.04";
-requires "IPC::Run" => "0";
+requires "IPC::Run" => "20180523.0";
 requires "List::MoreUtils" => "0";
 requires "List::Util" => "1.34";
 requires "Module::Load" => "0";

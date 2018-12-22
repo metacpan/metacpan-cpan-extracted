@@ -1,92 +1,95 @@
 Revision history for Perl extension Algorithm-Dependency
 
-1.110 Tue 14 Apr 2009
+1.111     2018-12-22 01:42:08Z
+        - distribution tooling updates
+
+1.110     2009-04-14
 	- Upgrading to Module::Install 0.83
 
-1.109 Wed  9 Apr 2009
+1.109     2009-04-09
 	- Upgrading to Module::Install 0.82
 	- Adding new method ->weight_merged
 
-1.108 Wed 10 Feb 2009
+1.108     2009-Feb-10
 	- Allow ->weight to take _STRING instead of only _IDENTIFIER
 
-1.107 Sun  8 Feb 2009
+1.107     2009-Feb-08
 	- Adding Algorithm::Dependency::Source::Invert
 
-1.106 Mon 14 Jan 2008
+1.106     2008-01-14
 	- Adding a slight change to 01_compile.t to prevent warnings
 
-1.105_01 Tue 11 Dec 2007
+1.105_01  2007-12-11
 	- Make test scripts more 5.005-compatible
 	- Removing the use of base.pm for 5.006-compatibility
 
-1.104 Mon 12 Nov 2007
+1.104     2007-11-12
 	- No functional changes
 	- Updating to Module::Install 0.68
 	- Updating bundled tests
 
-1.103 Thu 29 Jun 2007
+1.103     2007-06-29
 	- No functional changes, no need to upgrade
 	- Updating to Module::Install 0.65
 
-1.102 Sat 16 Apr 2006
+1.102     2006-04-16
 	- No functional changes, no need to upgrade
 	- Moving from old CVS to new SVN repository
 	- Doing some general cleaning up
 	- Updating to Module::Install 0.62
 
-1.101 Mon Oct 10 2005
+1.101     2005-10-10
 	- It appears I overtightened the naming rules. Reversed
 
-1.100 Mon Oct 10 2005
+1.100     2005-10-10
 	- Significant version bump to announce addition of major functionality
 	- Added Algorithm::Dependency::Weight
 	- Upgraded a few remaining things to Params::Util
 
-1.04 Wed Sep 14 2005
+1.04      2005-09-14
 	- Converted to Module::Install
 	- Added Algorithm::Dependency::Source::HoA by request
 	- Modernised the layout a little
 	- Upgraded from UNIVERSAL::isa to Params::Util to support more
 	  complex uses of objects like Adapaters and Decorators.
 
-1.03 Sat Aug 21 2004
+1.03      2004-08-21
 	- Because some smoke testers weren't installing Test::ClassAPI's
 	  dependencies properly, add them explicitly to the Makefile.PL
 
-1.02 Fri Aug 20 2004
+1.02      2004-08-20
 	- Change missing_dependencies to use ->item and ->items rather than
 	  accessing the internal directly. This means custom sub-classed
 	  Sources don't have to overload ->missing_dependencies. Currently
 	  in the documentation, we tell them they don't have to.
 
-1.01 Fri Aug 20 2004
+1.01      2004-08-20
 	- Fixed: ignore_orphans did not work for the ::Ordered subclass
 	- Changed to test data directory to the new standard
 
-1.0  Mon Jul 19 2004
+1.0       2004-07-19
 	- Updated copyright notice
 	- Updated test suite, and made it more cross-platform friendly
 	- No changes needed for a long time, so incrementing to version 1.0
 
-0.6  Wed Nov 19 2003
+0.6       2003-11-19
 	- Fixed several bugs in the POD documentation
 	- Updated version numbers correctly this time
 
-0.5  Wed Nov 12 2003
+0.5       2003-11-12
 	- Due to a bug I didn't notice until I had a bad Source, 
 	  the missing_dependencies method just outright didn't work.
 	  Bug fixed and tests added to catch the case in future.
 
-0.4  Sat Jun 21 10:19:21 2003
+0.4       2003-06-21 10:19:21
 	- Added the missing_dependencies method to the Source class
 
-0.3  Sun May 11 8:13:42 2003
+0.3       2003-05-11 08:13:42
 	- Made a stupid mistake in ->schedule_all
 	
-0.2  Sun May 11 6:54:32 2003
+0.2       2003-05-11 06:54:32
 	- Added the ->schedule_all method
 
-0.1  Wed Apr 16 21:01:52 2003
+0.1       2003-04-16 21:01:52
 	- original version
 

@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '2.10.0';
+$Git::Hooks::CheckCommit::VERSION = '2.10.1';
 use 5.010;
 use utf8;
 use Carp;
@@ -480,7 +480,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.10.0
+version 2.10.1
 
 =head1 SYNOPSIS
 

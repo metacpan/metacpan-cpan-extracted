@@ -1,3 +1,6 @@
+v0.10.12 2018-12-21T13:00:45Z
+ - $EMPTY, $SPACE const added
+
 v0.10.11 2018-11-18T15:46:16Z
  - perltidy
  - close

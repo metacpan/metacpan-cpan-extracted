@@ -1,5 +1,5 @@
 package Text::Hogan::Template;
-$Text::Hogan::Template::VERSION = '1.06';
+$Text::Hogan::Template::VERSION = '1.07';
 use strict;
 use warnings;
 
@@ -353,8 +353,6 @@ sub find_in_scope {
 sub create_specialized_partial {
     my ($instance, $subs, $partials, $stack_subs, $stack_partials, $stack_text) = @_;
 
-    my $key;
-
     my $Partial = clone($instance);
     $Partial->{'buf'} = "";
 
@@ -367,7 +365,7 @@ sub create_specialized_partial {
             $stack_subs->{$key} = $subs->{$key};
         }
     }
-    for my $Key (sort keys %$stack_subs) {
+    for my $key (sort keys %$stack_subs) {
         $Partial->{'subs'}{$key} = $stack_subs->{$key};
     }
 
@@ -402,7 +400,7 @@ Text::Hogan::Template - represent and render compiled templates
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

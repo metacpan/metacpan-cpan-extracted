@@ -2,6 +2,7 @@
 Build.PL
 Changes
 MANIFEST
+META.json
 META.yml
 README
 dist.ini

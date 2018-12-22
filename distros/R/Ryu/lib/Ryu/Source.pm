@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 =head1 NAME
 
@@ -992,11 +992,30 @@ This is a terrible name for a method, expect it to change.
 =cut
 
 sub ordered_futures {
+    use Scalar::Util qw(refaddr weaken);
+    use namespace::clean qw(refaddr weaken);
+
     my ($self) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    my %pending;
+    weaken(my $upstream_completed = $self->completed);
+    my $all_finished = 0;
+    $upstream_completed->on_ready(sub {
+        $all_finished = 1;
+        $src->completed->done unless %pending or $src->completed->is_ready;
+    });
     $self->each_while_source(sub {
+        my $k = refaddr $_;
+        $pending{$k} = 1;
+        $log->tracef('Ordered futures has %d pending', 0 + keys %pending);
         $_->on_done($src->curry::weak::emit)
           ->on_fail($src->curry::weak::fail)
+          ->on_ready(sub {
+              delete $pending{$k};
+              $log->tracef('Ordered futures now has %d pending after completion, upstream finish status is %d', 0 + keys(%pending), $all_finished);
+              return if %pending;
+              $src->completed->done if $all_finished and not $src->completed->is_ready;
+          })
           ->retain
     }, $src);
 }

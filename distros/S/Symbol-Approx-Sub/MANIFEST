@@ -23,6 +23,7 @@ t/ref.t
 t/str_choose.t
 t/str_xform.t
 t/string_approx.t
+t/suggest.t
 t/text_metaphone.t
 t/choose_sub.t
 t/match_undef.t

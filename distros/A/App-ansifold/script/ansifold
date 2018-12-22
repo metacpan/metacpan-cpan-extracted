@@ -16,13 +16,14 @@ ansifold - fold command handling ANSI terminal sequences
 
 ansifold [ options ]
 
-    --width=80, -w80         Folding width
-    --boundary=word, -s      Fold on word boundary
-    --padding                Padding to margin space
-    --padchar=_              Padding character
-    --ambiguous=narrow|wide  Unicode ambiguous character handling
-    --paragraph, -p          Print extra newline
-    --truncate               Truncate folded text
+    -w#, --width=#                Folding width
+    -s,  --boundary=word          Fold on word boundary
+         --padding                Padding to margin space
+         --padchar=_              Padding character
+         --ambiguous=narrow|wide  Unicode ambiguous character handling
+    -p,  --paragraph              Print extra newline
+         --separate=string        Set separator string (default newline)
+    -n                            Short cut for --separate ''
 
 =head1 DESCRIPTION
 
@@ -30,9 +31,51 @@ B<ansifold> is almost B<fold> compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
 sequences and Unicode multibyte characters properly.
 
+Opiton B<-w> takes width number to fold.  Unlike original fold(1)
+command, multiple numbers can be specified like:
+
+    ansifold -w 3,1,3,1,2
+
+Negative number fields are discarded.
+
+    $ LANG=C date | ansifold -w 3,-1,3,-1,2
+    Wed
+    Dec
+    19
+
+Single field is used repeatedly for the same line, but multiple fields
+are not.  Put comma at the end to discard the rest:
+
+    ansifold -w 80,
+
+Number description is handled by L<Getopt::EX::Numbers> module, and
+consists of C<start>, C<end>, C<step> and C<length> elements.  For
+example,
+
+    ansifold -w 2:10:2
+
+produces output like this:
+
+    AA
+    BBBB
+    CCCCCC
+    DDDDDDDD
+    EEEEEEEEEE
+
+Each folded strings are separated by newline.  Use C<--separate>
+option to set the separator string, and use C<-n> to set it empty.
+
+=head1 SEE ALSO
+
+L<github|https://github.com/kaz-utashiro/ansifold>
+
+L<github|https://github.com/kaz-utashiro/Text-ANSI-Fold>
+
+L<Getopt::EX::Numbers>
+
 =head1 LICENSE
 
-Copyright (C) Kazumasa Utashiro.
+Copyright (C) 2018- Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -49,19 +92,23 @@ binmode STDOUT, ":encoding(utf8)";
 binmode STDERR, ":encoding(utf8)";
 
 use Pod::Usage;
+use List::Util qw(min);
 use Text::ANSI::Fold;
+use Data::Dumper;
 
 my %opt = (
-    width => 80,
+    width => [],
+    separate => "\n",
     );
 my @optargs = (
-    "width|w=i"   => \$opt{width},
+    "width|w=s"   =>  $opt{width},
     "boundary=s"  => \$opt{boundary},
     "padding!"    => \$opt{padding},
     "padchar=s"   => \$opt{padchar},
     "ambiguous=s" => \$opt{ambiguous},
     "paragraph|p" => \$opt{paragraph},
-    "truncate!"   => \$opt{truncate},
+    "separate=s"  => \$opt{separate},
+    "n"           => sub { $opt{separate} = "" },
     "s" => sub {
 	$opt{boundary} = 'word';
     },
@@ -75,8 +122,42 @@ use Getopt::Long;
 Getopt::Long::Configure("bundling");
 GetOptions(@optargs) || pod2usage();
 
-if ($opt{truncate}) {
-    $opt{width} = [ $opt{width} ];
+my @width_map;
+my @width_index;
+
+use Getopt::EX::Numbers;
+my $numbers = new Getopt::EX::Numbers;
+
+@{$opt{width}} = do {
+    map {
+	push @width_map, $_ > 0;
+	$_ < 0 ? -$_ : $_;
+    }
+    map {
+	if    (/^$/)                 { 0 }		# empty
+	elsif (/^-?\d+$/)            { ($_) }		# 10
+	elsif (/^(-?[-\d:]+) (?:\{(\d+)\})? $/x) {	# a:b:c:d{5}
+	    ($numbers->parse($1)->sequence) x ($2 // 1);
+	}
+	else {
+	    die "$_: width format error.\n";
+	}
+    }
+    map { split /,/, $_, -1 }
+    @{$opt{width}};
+};
+if (@{$opt{width}} > 1 and grep { not $_ } @width_map) {
+    @width_index = grep { $width_map[$_] } 0 .. $#width_map;
+}
+
+if (@{$opt{width}} == 0) {
+    $opt{width} = 80;
+}
+elsif (@{$opt{width}} == 1) {
+    $opt{width} = $opt{width}->[0];
+}
+else {
+    @{$opt{width}} = grep { $_ } @{$opt{width}}; # remove zero
 }
 
 my $fold = new Text::ANSI::Fold do {
@@ -85,9 +166,21 @@ my $fold = new Text::ANSI::Fold do {
     qw(width boundary padding padchar ambiguous);
 };
 
+my $separator = do {
+    $opt{separate} =~ s{ ( \\ (.) ) } {
+	{ '\\' => '\\', n => "\n" }->{$2} // $1
+    }gexr;
+};
+
 while (<>) {
     my $chomped = chomp;
-    print join "\n", $fold->text($_)->chops;
+    my @chops = $fold->text($_)->chops;
+    if (@width_index > 0) {
+	@chops = grep { defined } @chops[@width_index];
+    }
+    print join $separator, @chops;
     print "\n" if $chomped;
     print "\n" if $opt{paragraph};
 }
+
+exit;

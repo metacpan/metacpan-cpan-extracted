@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::Plugin;
 use strict;
 use warnings;
 
-our $VERSION = '6.1'; # VERSION
+our $VERSION = '6.2'; # VERSION
 
 use Hash::Merge::Simple qw(clone_merge);
 use Moo::Role;
@@ -88,7 +88,7 @@ App::ElasticSearch::Utilities::QueryString::Plugin - Moo::Role for implementing 
 
 =head1 VERSION
 
-version 6.1
+version 6.2
 
 =head1 ATTRIBUTES
 
@@ -148,7 +148,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Brad Lhotsky.
+This software is Copyright (c) 2018 by Brad Lhotsky.
 
 This is free software, licensed under:
 

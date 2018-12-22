@@ -3,7 +3,7 @@
    "code_search_url" : "https://api.github.com/search/code?q={query}{&page,per_page,sort,order}",
    "commit_search_url" : "https://api.github.com/search/commits?q={query}{&page,per_page,sort,order}",
    "current_user_authorizations_html_url" : "https://github.com/settings/connections/applications{/client_id}",
-   "current_user_repositories_url" : "https://api.github.com/user/repos{?type,page,per_page,sort}",
+   "current_user_repositories_url" : "https://api.github.com/user/repos{?type,page,per_page,sort,visibility,affiliation,}",
    "current_user_url" : "https://api.github.com/user",
    "emails_url" : "https://api.github.com/user/emails",
    "emojis_url" : "https://api.github.com/emojis",
@@ -25,9 +25,12 @@
    "repository_url" : "https://api.github.com/repos/{owner}/{repo}",
    "starred_gists_url" : "https://api.github.com/gists/starred",
    "starred_url" : "https://api.github.com/user/starred{/owner}{/repo}",
-   "team_url" : "https://api.github.com/teams",
+   "team_url" : "https://api.github.com/orgs/{org}/teams",
+   "team_repo_url" : "https://api.github.com/teams/{team}/repos/{owner}/{repo}",
    "user_organizations_url" : "https://api.github.com/user/orgs",
    "user_repositories_url" : "https://api.github.com/users/{user}/repos{?type,page,per_page,sort}",
    "user_search_url" : "https://api.github.com/search/users?q={query}{&page,per_page,sort,order}",
-   "user_url" : "https://api.github.com/users/{user}"
+   "user_url" : "https://api.github.com/users/{user}",
+   "pull_request_merge_url" : "https://api.github.com/repos/{owner}/{repo}/pulls/{id}/merge",
+   "git_refs_url" : "https://api.github.com/repos/{owner}/{repo}/git/refs/{category}/{ref}"
 }

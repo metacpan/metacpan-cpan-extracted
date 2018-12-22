@@ -577,7 +577,7 @@ SV *
 _process_ipaddress (BUFOBJ self, ...)
 	CODE:
 {
-  	U32 length = process_length ();
+	U32 length = process_length ();
         if (length != 4)
           {
             error ("IP ADDRESS length not four");
@@ -594,7 +594,7 @@ SV *
 process (BUFOBJ self, SV *expected = &PL_sv_undef, SV *found = 0)
 	CODE:
 {
-  	int type;
+	int type;
 
         RETVAL = process_sv (&type);
 

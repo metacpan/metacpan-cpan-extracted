@@ -9,7 +9,7 @@ lib/Pcore/API/AntiCaptcha.pm
 lib/Pcore/Captcha.pm
 lib/Pcore/Captcha/API.pm
 lib/Pcore/Captcha/Generator.pm
-share/dist-id.json
+share/dist-id.yaml
 share/dist.yaml
 share/fonts/ball.ttf
 share/fonts/borzoi-regular.ttf

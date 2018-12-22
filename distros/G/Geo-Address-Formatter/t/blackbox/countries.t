@@ -10,7 +10,7 @@ use File::Spec;
 use Getopt::Long;
 use Test::Exception;
 use Test::More;
-use YAML qw(LoadFile);
+use YAML::XS qw(LoadFile);
 use utf8;
 use feature "unicode_strings";
 

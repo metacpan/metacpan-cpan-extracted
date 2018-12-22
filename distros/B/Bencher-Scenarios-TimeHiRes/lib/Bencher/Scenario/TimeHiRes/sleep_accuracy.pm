@@ -1,7 +1,7 @@
 package Bencher::Scenario::TimeHiRes::sleep_accuracy;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-12-21'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -54,7 +54,7 @@ Bencher::Scenario::TimeHiRes::sleep_accuracy - Demonstrate inaccuracy of doing l
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::TimeHiRes::sleep_accuracy (from Perl distribution Bencher-Scenarios-TimeHiRes), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenario::TimeHiRes::sleep_accuracy (from Perl distribution Bencher-Scenarios-TimeHiRes), released on 2018-12-21.
 
 =head1 SYNOPSIS
 
@@ -76,7 +76,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Time::HiRes> 1.9733
+L<Time::HiRes> 1.9741
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -134,32 +134,32 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
 
 Benchmark with default options (C<< bencher -m TimeHiRes::sleep_accuracy >>):
 
  #table1#
- +--------------+-----------+-------+------------+----------+---------+
- | participant  | rate (/s) |  time | vs_slowest |  errors  | samples |
- +--------------+-----------+-------+------------+----------+---------+
- | 1e-6 x100000 |      0.19 | 5.4   |        1   |   0.0059 |       7 |
- | 1e-5 x10000  |      1.6  | 0.63  |        8.6 |   0.0012 |       9 |
- | 1e-4 x1000   |      6.4  | 0.16  |       35   |   0.0004 |       7 |
- | 1e-3 x100    |      9.08 | 0.11  |       49   | 6.2e-05  |       6 |
- | 1e-2 x10     |      9.89 | 0.101 |       53.4 | 4.4e-05  |       7 |
- | 1e-1 x1      |      9.99 | 0.1   |       53.9 | 1.1e-05  |       7 |
- +--------------+-----------+-------+------------+----------+---------+
+ +--------------+-----------+---------+------------+-----------+---------+
+ | participant  | rate (/s) |    time | vs_slowest |  errors   | samples |
+ +--------------+-----------+---------+------------+-----------+---------+
+ | 1e-6 x100000 |    0.178  | 5.61    |      1     |   0.00068 |       6 |
+ | 1e-5 x10000  |    1.53   | 0.653   |      8.6   |   0.00058 |       6 |
+ | 1e-4 x1000   |    6.4    | 0.156   |     36     |   0.00014 |       6 |
+ | 1e-3 x100    |    9.33   | 0.107   |     52.4   | 3.8e-05   |       6 |
+ | 1e-2 x10     |    9.924  | 0.1008  |     55.71  | 9.8e-06   |       7 |
+ | 1e-1 x1      |    9.9911 | 0.10009 |     56.092 | 7.8e-07   |       6 |
+ +--------------+-----------+---------+------------+-----------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m TimeHiRes::sleep_accuracy --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Time::HiRes         | 1                            | 5                  | 20             |      10   |                    5.5 |        1   | 0.00012 |       7 |
- | perl -e1 (baseline) | 1.3                          | 4.6                | 20             |       4.5 |                    0   |        2.5 | 1e-05   |       6 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | Time::HiRes         |      12   |                    7.3 |        1   | 3.9e-05 |       7 |
+ | perl -e1 (baseline) |       4.7 |                    0   |        2.4 | 1.2e-05 |       6 |
+ +---------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -188,7 +188,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

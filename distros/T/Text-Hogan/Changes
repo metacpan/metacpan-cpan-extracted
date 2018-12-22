@@ -1,5 +1,8 @@
 Revision history for perl module Text::Hogan
 
+1.07 2018-12-21
+    * Variable $key and $Key typo (thanks Yanick Champoux!)
+
 1.06 2018-09-30
     * Update SEE ALSO section in POD (thanks Mohammad S Anwar :-))
 

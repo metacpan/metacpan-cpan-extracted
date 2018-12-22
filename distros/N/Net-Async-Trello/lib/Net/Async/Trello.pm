@@ -6,15 +6,11 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 =head1 NAME
 
 Net::Async::Trello - low-level Trello API access
-
-=head1 VERSION
-
-version 0.001
 
 =head1 DESCRIPTION
 
@@ -36,7 +32,7 @@ use URI::Template;
 use URI::wss;
 use HTTP::Request;
 
-use JSON::MaybeXS;
+use JSON::MaybeUTF8 qw(:v1);
 use Syntax::Keyword::Try;
 
 use File::ShareDir ();
@@ -57,8 +53,6 @@ use Net::Async::Trello::List;
 
 use Ryu::Async;
 use Adapter::Async::OrderedList::Array;
-
-my $json = JSON::MaybeXS->new;
 
 =head2 me
 
@@ -118,6 +112,21 @@ sub board {
 	)->transform(
         done => sub {
             Net::Async::Trello::Board->new(
+                %{ $_[0] },
+                trello => $self,
+            )
+        }
+    )
+}
+
+sub card {
+	my ($self, %args) = @_;
+    my $id = delete $args{id};
+	$self->http_get(
+		uri => URI->new($self->base_uri . 'cards/' . $id)
+	)->transform(
+        done => sub {
+            Net::Async::Trello::Card->new(
                 %{ $_[0] },
                 trello => $self,
             )
@@ -217,7 +226,7 @@ sub endpoints {
                 'endpoints.json'
             )
         ) unless $path->exists;
-        $json->decode($path->slurp_utf8)
+        decode_json_text($path->slurp_utf8)
     };
 }
 
@@ -250,7 +259,7 @@ sub http_get {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done($json->decode($resp->decoded_content))
+            return Future->done(decode_json_text($resp->decoded_content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -278,7 +287,7 @@ sub http_post {
 	$log->tracef("POST %s { %s }", ''. $args{uri}, \%args);
     $self->http->POST(
         (delete $args{uri}),
-        $json->encode(delete $args{body}),
+        encode_json_utf8(delete $args{body}),
         content_type => 'application/json',
 		%args
     )->then(sub {
@@ -287,7 +296,44 @@ sub http_post {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done($json->decode($resp->decoded_content))
+            return Future->done(decode_json_text($resp->decoded_content))
+        } catch {
+            $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
+            return Future->fail($@ => json => $resp);
+        }
+    })->else(sub {
+        my ($err, $src, $resp, $req) = @_;
+        $src //= '';
+        if($src eq 'http') {
+            $log->errorf("HTTP error %s, request was %s with response %s", $err, $req->as_string("\n"), $resp->as_string("\n"));
+        } else {
+            $log->errorf("Other failure (%s): %s", $src // 'unknown', $err);
+        }
+        Future->fail(@_);
+    })
+}
+
+sub http_put {
+	my ($self, %args) = @_;
+
+	$args{headers}{Authorization} = $self->oauth->authorization_header(
+		method => 'PUT',
+		uri    => $args{uri}
+	);
+
+	$log->tracef("PUT %s { %s }", ''. $args{uri}, \%args);
+    $self->http->PUT(
+        (delete $args{uri}),
+        encode_json_utf8(delete $args{body}),
+        content_type => 'application/json',
+		%args
+    )->then(sub {
+        my ($resp) = @_;
+        $log->tracef("%s => %s", $args{uri}, $resp->decoded_content);
+        return { } if $resp->code == 204;
+        return { } if 3 == ($resp->code / 100);
+        try {
+            return Future->done(decode_json_text($resp->decoded_content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -418,17 +464,22 @@ sub _add_to_loop {
         $self->{ryu} = Ryu::Async->new
     );
 
-    $self->add_child(
-        $self->{ws} = Net::Async::Trello::WS->new(
-            trello => $self,
-            token => $self->ws_token,
-        )
-    );
 }
 
-sub ws { shift->{ws} }
+sub ws {
+    my ($self) = @_;
+    $self->{ws} //= do {
+        $self->add_child(
+            my $ws = Net::Async::Trello::WS->new(
+                trello => $self,
+                token  => $self->ws_token,
+            )
+        );
+        $ws
+    }
+}
 
-sub websocket { shift->{ws}->connection }
+sub websocket { shift->ws->connection }
 
 sub oauth_request {
     my ($self, $code) = @_;
@@ -522,3 +573,4 @@ Tom Molesworth <TEAM@cpan.org>
 =head1 LICENSE
 
 Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.
+

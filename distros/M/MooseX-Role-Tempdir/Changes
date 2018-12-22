@@ -1,0 +1,11 @@
+0.101 2018-12-20
+
+- Remove spurious print and some dead code. Thanks to Petr Písař RT#119368.
+
+0.100 2016-06-13
+
+- Added per-temdir-attribute options
+
+0.032 2012-07-25
+
+- Parameterized directories added

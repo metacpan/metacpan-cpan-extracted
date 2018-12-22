@@ -18,14 +18,15 @@ my %module_build_args = (
     "Brian Phillips <bphillips\@cpan.org>"
   ],
   "dist_name" => "CatalystX-DebugFilter",
-  "dist_version" => "0.15",
+  "dist_version" => "0.16",
   "license" => "perl",
   "module_name" => "CatalystX::DebugFilter",
   "recursive_test_files" => 1,
   "requires" => {
     "Moose::Role" => 0,
     "Scalar::Util" => 0,
-    "namespace::autoclean" => 0
+    "namespace::autoclean" => 0,
+    "perl" => "5.008"
   },
   "test_requires" => {
     "Catalyst" => 0,

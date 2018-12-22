@@ -4,11 +4,7 @@ use Test2::V0;
 
 use IPC::PrettyPipe::DSL ':all';
 
-ok(
-    dies { pparg },
-    qr/missing required/i,
-    'no args'
-);
+ok( dies { pparg }, qr/missing required/i, 'no args' );
 
 subtest 'arg' => sub {
     my $arg;

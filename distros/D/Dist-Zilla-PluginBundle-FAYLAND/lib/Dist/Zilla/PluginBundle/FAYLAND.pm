@@ -1,5 +1,5 @@
 package Dist::Zilla::PluginBundle::FAYLAND;
-$Dist::Zilla::PluginBundle::FAYLAND::VERSION = '0.15';
+$Dist::Zilla::PluginBundle::FAYLAND::VERSION = '0.16';
 # ABSTRACT: Dist::Zilla like FAYLAND when you build your dists
 
 use Moose;
@@ -30,6 +30,7 @@ sub bundle_config {
         [ReadmeFromPod       => {}],
         [CheckChangeLog      => {}],
         [MetaJSON            => {}],
+        [MinimumPerlFast     => {}],
         ['Git::Contributors' => {}]);
 
     push @plugins, @extra;
@@ -56,7 +57,7 @@ Dist::Zilla::PluginBundle::FAYLAND - Dist::Zilla like FAYLAND when you build you
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -78,7 +79,10 @@ It is equivalent to:
     [ReadmeFromPod]
     [CheckChangeLog]
     [MetaJSON]
+    [MinimumPerlFast]
     [Git::Contributors]
+
+=head3 bundle_config
 
 =head1 AUTHOR
 

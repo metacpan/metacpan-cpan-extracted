@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::Test;
 # ABSTRACT: Git::Hooks testing utilities
-$Git::Hooks::Test::VERSION = '2.10.0';
+$Git::Hooks::Test::VERSION = '2.10.1';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
 use 5.010;
@@ -121,11 +121,11 @@ EOS
     chmod 0755 => $hook_pl;
 
     @hooks = qw/ applypatch-msg pre-applypatch post-applypatch
-        pre-commit prepare-commit-msg commit-msg
-        post-commit pre-rebase post-checkout post-merge
-        pre-receive update post-receive post-update
-        pre-auto-gc post-rewrite /
-            unless @hooks;
+                 pre-commit prepare-commit-msg commit-msg
+                 post-commit pre-rebasen post-checkout post-merge
+                 pre-push pre-receive update post-receive post-update
+                 push-to-checkout pre-auto-gc post-rewrite
+               / unless @hooks;
 
     foreach my $hook (@hooks) {
         my $hookfile = $hooks_dir->child($hook);
@@ -141,6 +141,7 @@ EOS
                 or BAIL_OUT("can't path('$hookfile')->spew('$script')\n");
             chmod 0755 => $hookfile;
         } else {
+            $hookfile->remove;  # in case we're replacing the hooks
             symlink 'hook.pl', $hookfile
                 or BAIL_OUT("can't symlink '$hooks_dir', '$hook': $!");
         }
@@ -321,7 +322,7 @@ Git::Hooks::Test - Git::Hooks testing utilities
 
 =head1 VERSION
 
-version 2.10.0
+version 2.10.1
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 

@@ -4,33 +4,34 @@
       "Fayland Lam <fayland@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Dist::Zilla version 5.048, Dist::Milla version v1.0.18, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Business-PayPoint-MCPE",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -38,6 +39,7 @@
          "requires" : {
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
+            "URI::Escape" : "0",
             "perl" : "5.008005"
          }
       },
@@ -59,6 +61,9 @@
          "web" : "https://github.com/fayland/perl-Business-PayPoint-MCPE"
       }
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
 }
 

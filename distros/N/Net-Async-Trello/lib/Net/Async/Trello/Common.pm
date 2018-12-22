@@ -1,7 +1,9 @@
 package Net::Async::Trello::Common;
-$Net::Async::Trello::Common::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 =head2 new
 

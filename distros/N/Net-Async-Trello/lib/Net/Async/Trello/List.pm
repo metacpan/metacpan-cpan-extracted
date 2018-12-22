@@ -1,17 +1,15 @@
 package Net::Async::Trello::List;
-$Net::Async::Trello::List::VERSION = '0.002';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.003'; # VERSION
 
 use parent qw(Net::Async::Trello::Generated::List);
 
 =head1 NAME
 
 Net::Async::Trello::List
-
-=head1 VERSION
-
-version 0.001
 
 =head1 DESCRIPTION
 
@@ -31,3 +29,4 @@ sub cards {
 }
 
 1;
+

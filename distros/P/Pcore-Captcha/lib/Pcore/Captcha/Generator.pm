@@ -31,12 +31,12 @@ sub generate {
     my @words            = split /\s/sm, $options{text};
     my $width_per_symbol = ( $options{width} - $options{padding_x} * 2 ) / length $options{text};
 
-    $task->{1}->{text} = @words == 1 ? shift @words : join( q[ ], splice( @words, 0, ( rand( @words - 1 ) + 1 ) ) );
+    $task->{1}->{text} = @words == 1 ? shift @words : join( $SPACE, splice( @words, 0, ( rand( @words - 1 ) + 1 ) ) );
     $task->{1}->{font} = $fonts_keys[ rand @fonts_keys ];
     $task->{1}->{left} = $options{padding_x};
 
     if (@words) {
-        $task->{2}->{text} = q[ ] . join q[ ], @words;
+        $task->{2}->{text} = $SPACE . join $SPACE, @words;
 
         @fonts_keys = grep { $_ ne $task->{1}->{font} } @fonts_keys if @fonts_keys > 1;
         $task->{2}->{font} = $fonts_keys[ rand @fonts_keys ];
@@ -48,7 +48,7 @@ sub generate {
         $task->{$t}->{font_size} = 1000;
         $task->{$t}->{width}     = int( $width_per_symbol * length( $task->{$t}->{text} ) );
         $task->{$t}->{height}    = $options{height} - $options{padding_y} * 2;
-        $task->{$t}->{font_obj}  = Imager::Font->new( file => $ENV->{share}->get( 'www/static/fonts/' . $task->{$t}->{font} ), type => 'ft2' ) or die Imager->errstr;
+        $task->{$t}->{font_obj}  = Imager::Font->new( file => $ENV->{share}->get("fonts/$task->{$t}->{font}"), type => 'ft2' ) or die Imager->errstr;
         $task->{$t}->{matrix}    = $options{rotate} ? Imager::Matrix2d->rotate( degrees => $task->{$t}->{angle} ) : Imager::Matrix2d->shear( x => sin( $task->{$t}->{angle} * ( $PI / 180 ) ) / cos( $task->{$t}->{angle} * ( $PI / 180 ) ) );
         $task->{$t}->{font_obj}->transform( matrix => $task->{$t}->{matrix} );
     }

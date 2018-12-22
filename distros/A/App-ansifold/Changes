@@ -1,5 +1,10 @@
 Revision history for `ansifold' command.
 
+0.03 2018-12-21T15:54:32Z
+
+    - Discard --truncate option and use Getopt::EX::Numbers module.
+    - Introduce --separate, -n option.
+
 0.02 2018-12-12T23:21:16Z
 
     - Add --truncate option.

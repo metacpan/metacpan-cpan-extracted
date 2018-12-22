@@ -1,7 +1,7 @@
 package Bencher::Scenarios::TimeHiRes;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2018-12-21'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Scenarios related to Time::HiRes
@@ -18,7 +18,7 @@ Bencher::Scenarios::TimeHiRes - Scenarios related to Time::HiRes
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenarios::TimeHiRes (from Perl distribution Bencher-Scenarios-TimeHiRes), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenarios::TimeHiRes (from Perl distribution Bencher-Scenarios-TimeHiRes), released on 2018-12-21.
 
 =head1 DESCRIPTION
 
@@ -29,6 +29,8 @@ This distribution contains the following L<Bencher> scenario modules:
 =item * L<Bencher::Scenario::TimeHiRes::usleep_accuracy>
 
 =item * L<Bencher::Scenario::TimeHiRes::sleep_accuracy>
+
+=item * L<Bencher::Scenario::TimeHiRes::time>
 
 =back
 
@@ -56,7 +58,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

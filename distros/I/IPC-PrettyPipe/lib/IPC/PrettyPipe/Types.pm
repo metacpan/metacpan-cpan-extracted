@@ -5,16 +5,16 @@ package IPC::PrettyPipe::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 use Type::Library
   -base,
-  -declare =>
-  qw[
-      Arg
-      AutoArrayRef
-      Cmd
-   ];
+  -declare => qw[
+  Arg
+  AutoArrayRef
+  Cmd
+  Pipe
+];
 
 use Type::Utils -all;
 use Types::Standard -types;
@@ -23,8 +23,9 @@ use List::Util qw[ pairmap ];
 
 declare AutoArrayRef, as ArrayRef;
 coerce AutoArrayRef,
-  from Any, via { [ $_ ] };
+  from Any, via { [$_] };
 
+class_type Pipe, { class => 'IPC::PrettyPipe' };
 class_type Cmd, { class => 'IPC::PrettyPipe::Cmd' };
 class_type Arg, { class => 'IPC::PrettyPipe::Arg' };
 
@@ -53,7 +54,7 @@ IPC::PrettyPipe::Types - Types
 
 =head1 VERSION
 
-version 0.08
+version 0.12
 
 =head1 BUGS
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
-our $VERSION = '6.1'; # VERSION
+our $VERSION = '6.2'; # VERSION
 
 use JSON::MaybeXS;
 use Ref::Util qw(is_ref is_arrayref is_hashref);
@@ -58,7 +58,7 @@ App::ElasticSearch::Utilities::HTTPRequest - Allow for strange content elements 
 
 =head1 VERSION
 
-version 6.1
+version 6.2
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2012 by Brad Lhotsky.
+This software is Copyright (c) 2018 by Brad Lhotsky.
 
 This is free software, licensed under:
 

@@ -67,7 +67,7 @@ sub update ( $type, $cb = undef ) {
 
                     IO::Uncompress::Gunzip::gunzip( $res->{data}->{path}, $temp->{path}, BinModeOut => 1 ) or die "gunzip failed: $IO::Uncompress::Gunzip::GunzipError\n";
 
-                    $ENV->{share}->write( 'Pcore-GeoIP', $RES->{$type}->[0], $temp );
+                    $ENV->{share}->write( "/Pcore-GeoIP/$RES->{$type}->[0]", $temp );
 
                     # empty cache
                     delete $H->{$type};

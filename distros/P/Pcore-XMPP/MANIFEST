@@ -7,7 +7,7 @@ README.md
 cpanfile
 lib/Pcore/Core/Event/Listener/xmpp.pm
 lib/Pcore/XMPP.pm
-share/dist-id.json
+share/dist-id.yaml
 share/dist.yaml
 t/001.t
 t/author-pod-syntax.t

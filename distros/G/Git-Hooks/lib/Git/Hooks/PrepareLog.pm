@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::PrepareLog;
 # ABSTRACT: Git::Hooks plugin to prepare commit messages before being edited
-$Git::Hooks::PrepareLog::VERSION = '2.10.0';
+$Git::Hooks::PrepareLog::VERSION = '2.10.1';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -147,7 +147,7 @@ Git::Hooks::PrepareLog - Git::Hooks plugin to prepare commit messages before bei
 
 =head1 VERSION
 
-version 2.10.0
+version 2.10.1
 
 =head1 SYNOPSIS
 

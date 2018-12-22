@@ -3,7 +3,7 @@ use strict;
 use HTTP::Request::Generator qw(generate_requests);
 use Data::Dumper;
 
-use Test::More tests => 26;
+use Test::More tests => 28;
 
 my @requests = generate_requests();
 is 0+@requests, 1;
@@ -48,7 +48,7 @@ is 0+@without_session, 0, 'Fixed parameters get added everywhere'
     },
 );
 is 0+@requests, 8, 'We generate parametrized URLs';
-is $requests[0]->{url}, '/profiles/Corion/1', 'The first pathmatches'
+is $requests[0]->{url}, '/profiles/Corion/1?foo=2&session=my_session_id', 'The first path matches'
     or diag Dumper $requests[0];
 is $requests[0]->{query_params}->{foo}, 2, 'Get parameters vary'
     or diag Dumper \@requests;
@@ -66,7 +66,7 @@ is_deeply $requests[0], {
         session => 'my_session_id',
         foo => 2,
     },
-    url => URI->new('/profiles/Corion/1', 'http'),
+    url => URI->new('/profiles/Corion/1?foo=2&session=my_session_id', 'http'),
 }, "The structure is as we expect"
 or diag Dumper $requests[0];
 
@@ -142,3 +142,25 @@ is $requests[1]->{host}, 'www.example.com', "Hostnames work";
 );
 is 0+@requests, 8, 'We generate parametrized GET requests'
     or diag Dumper \@requests;
+
+    
+@requests = generate_requests(
+    pattern  => '{http,https}://example.com/foo?q=test&s=bar',
+);
+is 0+@requests, 2, 'We generate parametrized GET requests'
+    or diag Dumper \@requests;
+is_deeply $requests[0], {
+    method => 'GET',
+    path   => '/foo',
+    scheme => 'http',
+    port   => 0,
+    host => 'example.com',
+    headers => {},
+    body_params => {},
+    query_params => {
+        "q" => 'test',
+        "s" => 'bar',
+    },
+    url => URI->new('http://example.com/foo?q=test&s=bar', 'http'),
+}, "The structure is as we expect"
+or diag Dumper $requests[0];

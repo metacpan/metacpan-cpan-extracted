@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,13 +28,14 @@ requires:
   Future: '0.34'
   HTTP::Request: '0'
   IO::Async::SSL: '0.19'
+  JSON::MaybeUTF8: '1.000'
   JSON::MaybeXS: '1.003008'
   Log::Any: '1.045'
   Net::Async::HTTP: '0.41'
   Net::Async::OAuth::Client: '0'
   Net::Async::WebSocket::Client: '0'
   Path::Tiny: '0.098'
-  Ryu: '0.011'
+  Ryu: '0.031'
   Ryu::Async: '0.003'
   Syntax::Keyword::Try: '0.04'
   Time::Moment: '0.41'
@@ -45,7 +46,8 @@ requires:
   curry: '1.000'
   indirect: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Net-Async-Trello
-  homepage: http://search.cpan.org/dist/Net-Async-Trello/
-version: '0.002'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  bugtracker: https://github.com/team-at-cpan/Net-Async-Trello/issues
+  repository: git://github.com/team-at-cpan/Net-Async-Trello.git
+version: '0.003'
+x_generated_by_perl: v5.28.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -43,6 +43,7 @@ lib/FFI/Build/File/Library.pm
 lib/FFI/Build/File/Object.pm
 lib/FFI/Build/MM.pm
 lib/FFI/Build/Platform.pm
+maint/cip-before-install
 t/00_diag.t
 t/01_use.t
 t/app_fbx.t

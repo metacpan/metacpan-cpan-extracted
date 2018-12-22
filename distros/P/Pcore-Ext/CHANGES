@@ -1,3 +1,14 @@
+v0.19.0 2018-12-21T13:14:15Z
+ - old lib removed
+ - amcharts3 removed
+ - amcharts
+ - cdn refactored
+ - ext warnings fixed
+ - Pcore::CDN::Static
+ - $EMPTY, $SPACE const added
+ - app router refactored
+ - env share refactored
+
 v0.18.6 2018-11-11T14:20:00Z
  - cdn resources renamed
  - ENV refactored

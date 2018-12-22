@@ -1,5 +1,3 @@
-#!/usr/bin/perl
-
 # Basic load and method existance tests for Algorithm::Dependency
 
 use strict;
