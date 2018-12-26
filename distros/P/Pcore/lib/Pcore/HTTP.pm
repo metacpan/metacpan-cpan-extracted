@@ -364,46 +364,46 @@ sub _request ($args) {
 sub _write_headers ( $h, $args, $res ) {
     my $request_path;
 
-    my $headers = join $EMPTY, map {"$_->[0]:$_->[1]$CRLF"} grep { defined $_->[1] } P->list->pairs( $args->{headers}->@* );
+    my $headers = join $EMPTY, map {"$_->[0]:$_->[1]\r\n"} grep { defined $_->[1] } P->list->pairs( $args->{headers}->@* );
 
     if ( $h->{proxy_type} && $h->{proxy_type} == $PROXY_TYPE_HTTP ) {
         $request_path = $res->{url}->{uri};
 
-        $headers .= 'Proxy-Authorization:Basic ' . $h->{proxy}->{uri}->userinfo_b64 . $CRLF if $h->{proxy}->{uri}->{userinfo};
+        $headers .= 'Proxy-Authorization:Basic ' . $h->{proxy}->{uri}->userinfo_b64 . "\r\n" if $h->{proxy}->{uri}->{userinfo};
     }
     else {
         $request_path = $res->{url}->path_query;
     }
 
     # add "Host" header
-    $headers .= 'Host:' . ( defined $res->{url}->{host} ? $res->{url}->{host}->{name} : $EMPTY ) . $CRLF if !$args->{norm_headers}->{host};
+    $headers .= 'Host:' . ( defined $res->{url}->{host} ? $res->{url}->{host}->{name} : $EMPTY ) . "\r\n" if !$args->{norm_headers}->{host};
 
     # prepare content related headers
     if ( defined $args->{data} ) {
         if ( is_plain_coderef $args->{data} ) {
-            $headers .= 'Transfer-Encoding:chunked' . $CRLF;
+            $headers .= "Transfer-Encoding:chunked\r\n";
         }
         else {
-            $headers .= 'Content-Length:' . bytes::length( is_ref $args->{data} ? $args->{data}->$* : $args->{data} ) . $CRLF;
+            $headers .= 'Content-Length:' . bytes::length( is_ref $args->{data} ? $args->{data}->$* : $args->{data} ) . "\r\n";
         }
     }
 
     # add basic authorization
     if ( $res->{url}->{userinfo} ) {
-        $headers .= 'Authorization:Basic ' . $res->{url}->userinfo_b64 . $CRLF;
+        $headers .= 'Authorization:Basic ' . $res->{url}->userinfo_b64 . "\r\n";
     }
 
     # close connection, if not persistent
     if ( !$args->{persistent} ) {
-        $headers .= 'Connection:close' . $CRLF;
+        $headers .= "Connection:close\r\n";
     }
 
     if ( $args->{cookies} && ( my $cookies = $args->{cookies}->get_cookies( $res->{url} ) ) ) {
-        $headers .= 'Cookie:' . join( ';', $cookies->@* ) . $CRLF;
+        $headers .= 'Cookie:' . join( ';', $cookies->@* ) . "\r\n";
     }
 
     # write headers
-    $h->write( "$args->{method} $request_path HTTP/1.1" . $CRLF . $headers . $CRLF );
+    $h->write("$args->{method} $request_path HTTP/1.1\r\n$headers\r\n");
 
     # write error
     if ( !$h ) {
@@ -424,10 +424,10 @@ sub _write_data ( $h, $args, $res ) {
 
             if ( defined $chunk ) {
                 if ( is_ref $chunk) {
-                    $h->write( sprintf "%X$CRLF%s$CRLF", length $chunk->$*, $chunk->$* );
+                    $h->write( sprintf "%X\r\n%s\r\n", length $chunk->$*, $chunk->$* );
                 }
                 else {
-                    $h->write( sprintf "%X$CRLF%s$CRLF", length $chunk, $chunk );
+                    $h->write( sprintf "%X\r\n%s\r\n", length $chunk, $chunk );
                 }
 
                 last if !$h;
@@ -435,7 +435,7 @@ sub _write_data ( $h, $args, $res ) {
 
             # last chunk
             else {
-                $h->write( '0' . $CRLF . $CRLF );
+                $h->write("0\r\n\r\n");
 
                 last;
             }

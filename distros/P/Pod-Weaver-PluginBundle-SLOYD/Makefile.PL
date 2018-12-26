@@ -16,9 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Pod::Weaver::PluginBundle::SLOYD",
   "PREREQ_PM" => {
-    "Pod::Elemental::Transformer::List" => 0,
+    "Pod::Elemental::Transformer::List" => "0.102",
     "Pod::Weaver::Config::Assembler" => 0,
-    "Pod::Weaver::Plugin::Include" => 0,
+    "Pod::Weaver::Plugin::Include" => "0.1.9",
+    "Pod::Weaver::Section::Contributors" => "0.009",
     "namespace::autoclean" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -26,7 +27,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.0003",
+  "VERSION" => "0.0004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,9 +35,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Pod::Elemental::Transformer::List" => 0,
+  "Pod::Elemental::Transformer::List" => "0.102",
   "Pod::Weaver::Config::Assembler" => 0,
-  "Pod::Weaver::Plugin::Include" => 0,
+  "Pod::Weaver::Plugin::Include" => "0.1.9",
+  "Pod::Weaver::Section::Contributors" => "0.009",
   "Test::More" => 0,
   "namespace::autoclean" => 0,
   "strict" => 0,

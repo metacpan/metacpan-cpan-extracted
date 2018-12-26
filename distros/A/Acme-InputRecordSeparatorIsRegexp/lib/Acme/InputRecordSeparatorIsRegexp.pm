@@ -8,7 +8,7 @@ use Carp;
 use IO::Handle;
 require Exporter;
 our @ISA = 'Exporter';
-our @EXPORT_OK = ('open','autochomp','input_record_separator');
+our @EXPORT_OK = ('open','autochomp','input_record_separator','binmode');
 our %EXPORT_TAGS = ( all =>  [ @EXPORT_OK ] );
 
 BEGIN {
@@ -16,7 +16,7 @@ BEGIN {
     *{ 'Acme::IRSRegexp' . "::" } = \*{ __PACKAGE__ . "::" };
 }
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub TIEHANDLE {
     my ($pkg, @opts) = @_;
@@ -43,6 +43,35 @@ sub TIEHANDLE {
     return $self;
 }
 
+# We abuse the PerlIO layers syntax to attach
+# a regexp specification to a filehandle. This
+# function extracts an ':irs(REGEXP)' layer from
+# a string.
+sub _extract_irs {
+    my ($mode) = @_;
+    
+    my $irs = "";
+    my $p0 = index($mode,":irs(");
+    my $p1 = $p0 + 5;
+    my $nest = 1;
+    while ($nest) {
+        my $c = eval { substr($mode,$p1++,1) };
+        if ($@ || !defined($c)) {
+            carp "Argument list not closed for PerlIO layer \"$irs\"";
+            return;
+        }
+        if ($c eq "\\") {
+            $c .= substr($mode,$p1++,1);
+        }
+        if ($c eq "(") { $nest++ }
+        if ($c eq ")") { $nest-- }
+        if ($nest) { $irs .= $c; }
+    }
+    substr($mode,$p0,length($irs)+6, "");
+    $_[0] = $mode;
+    return $irs;
+}
+
 sub open (*;$@) {
     no strict 'refs';        # or else bareword file handles will break
     my (undef,$mode,$expr,@list) = @_;
@@ -52,28 +81,10 @@ sub open (*;$@) {
     my $glob = $_[0];
     if (!ref($glob) && $glob !~ /::/) {
         $glob = join("::",caller(0) || "", $glob);
-        print STDERR "new glob is $glob\n";
     }
 
     if ($mode && index($mode,":irs(") >= 0) {
-        my $irs = "";
-        my $p0 = index($mode,":irs(");
-        my $p1 = $p0 + 5;
-        my $nest = 1;
-        while ($nest) {
-            my $c = eval { substr($mode,$p1++,1) };
-            if ($@ || !defined($c)) {
-                carp "Argument list not closed for PerlIO layer \"$irs\"";
-                return;
-            }
-            if ($c eq "\\") {
-                $c .= substr($mode,$p1++,1);
-            }
-            if ($c eq "(") { $nest++ }
-            if ($c eq ")") { $nest-- }
-            if ($nest) { $irs .= $c; }
-        }
-        substr($mode,$p0,length($irs)+6, "");
+        my $irs = _extract_irs($mode);
         my $z = @list ? CORE::open *$glob, $mode, $expr, @list
                       : CORE::open *$glob, $mode, $expr;
         tie *$glob, __PACKAGE__, *$glob, $irs;
@@ -88,6 +99,18 @@ sub open (*;$@) {
     } else {
         return CORE::open(*$glob);
     }
+}
+
+sub binmode (*;$) {
+    my ($glob,$mode) = @_;
+    $mode ||= ":raw";
+
+    if (index($mode,":irs(") >= 0) {
+        my $irs = _extract_irs($mode);
+        input_record_separator($glob,$irs);
+        return 1 unless $mode;
+    }
+    return CORE::binmode($glob,$mode);
 }
 
 sub _compile_rs {
@@ -140,7 +163,6 @@ sub _populate_buffer {
     my $handle = $self->{handle};
     return if !$handle || eof($handle);
     
-#    my $rs = $self->{rsc} || $self->{rs};
     my @rec;
     {
 	my $buffer = '';
@@ -308,9 +330,9 @@ sub BINMODE {
     my $self = shift;
     my $handle = $self->{handle};
     if (@_) {
-	binmode $handle, @_;
+	CORE::binmode $handle, @_;
     } else {
-	binmode $handle;
+	CORE::binmode $handle;
     }    
 }
 
@@ -430,7 +452,7 @@ Acme::InputRecordSeparatorIsRegexp - awk doesn't have to be better at something.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -448,9 +470,15 @@ Version 0.06
     open $fh, '<', 'file-with-ambiguous-line-endings';
     $line = <$fh>;
 
-    # import open function and use :irs layer
+    # import open function and use :irs pseudo-layer
     use Acme::InputRecordSeparatorIsRegexp 'open';
     open my $fh, '<:irs(\r\n|\r|\n)', 'ambiguous.txt';
+    $line = <$fh>;
+
+    # import binmode and use :irs pseudo-layer
+    use Acme::InputRecordSeparatorIsRegexp 'binmode';
+    open my $fh, '<', 'ambiguous.txt';
+    binmode $fh, ':irs(\r\n|\r|\n)';
     $line = <$fh>;
 
 =head1 DESCRIPTION
@@ -515,7 +543,7 @@ the features of this package.
 Another way of using this package to attach a regular expression
 to the input record separator of a file handle, available since
 v0.04,  is to import this package's C<open> function and to
-specify an C<:irs(...)> layer.
+specify an C<:irs(...)> I<pseudo-layer>.
 
    use Acme::InputRecordSeparatorIsRegexp 'open';
    $result = open FILEHANDLE, "<:irs(REGEXP)", EXPR
@@ -528,6 +556,8 @@ The C<:irs(...)> layer may be combined with other layers.
 
    open my $fh, "<:encoding(UTF-16):irs(\R)", "ambiguous.txt"
 
+See also: L<"binmode">
+
 =head2 autochomp
 
 Returns the current setting, or sets the C<autochomp> attribute
@@ -538,7 +568,7 @@ or C<< <> >> operator will be returned with the (custom) line
 endings automatically removed.
 
     use Acme::InputRecordSeparatorIsRegexp 'open','autochomp';
-    open my $fh, "<:irs(\R)", 'ambiguous.txt';
+    open my $fh, '<:irs(\R)', 'ambiguous.txt';
     autochomp($fh,1);           # enable autochomp
     my $is_autochomped = autochomp($fh);
     autochomp(tied(*$fh), 0);   # disable
@@ -558,6 +588,16 @@ function provides an (inefficient) way to do that to
 arbitrary file handles.
 
 The default attribute value is false.
+
+=head2 binmode FILEHANDLE, LAYER
+
+Overrides Perl's builtin L<binmode|perlfunc/"binmode"> function. 
+If the I<pseudo-layer> C<:irs(...)> is specified, then apply the 
+given regular expression as the dynamic input record separator for 
+the given filehandle.
+Any other layers specified are passed to Perl's builtin C<binmode>
+function.
+
 
 =head2 input_record_separator
 
@@ -658,10 +698,11 @@ package will operate with C<$/>, B<not> with the regular expression
 associated with the tied file handle. Use the construction
 C<< tied(*$fh)->chomp(...) >> to perform the chomp operation on
 a filehandle that has customized its input record separator with
-this package.
+this package. Or see the L<< C<autochomp>|"autochomp" >> method
+to automatically get chomped input.
 
 Please report any bugs or feature requests to 
-C<bug-tie-handle-regexpirs at rt.cpan.org>, or through
+C<bug-acme-inputrecordseparatorisregexp at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-InputRecordSeparatorIsRegexp>.  
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
@@ -698,7 +739,7 @@ L<http://search.cpan.org/dist/Acme-InputRecordSeparatorIsRegexp/>
 
 =head1 ACKNOWLEDGEMENTS
 
-L<perlvar>
+L<perlvar|perlvar/"$INPUT_RECORD_SEPARATOR">
 
 =head1 LICENSE AND COPYRIGHT
 

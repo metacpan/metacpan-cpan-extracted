@@ -1,0 +1,62 @@
+NAME
+    Acme::CPANModules::NO_COLOR - Modules that follow the NO_COLOR
+    convention
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::NO_COLOR
+    (from Perl distribution Acme-CPANModules-NO_COLOR), released on
+    2018-12-22.
+
+DESCRIPTION
+    Modules that follow the NO_COLOR convention.
+
+    The NO_COLOR convention (see https://no-color.org) lets user disable
+    color output of console programs by defining an environment variable
+    called NO_COLOR. The existence of said environment variable, regardless
+    of its value, signals that programs should not use colored output.
+
+INCLUDED MODULES
+    *   Color::ANSI::Util
+
+    *   Data::Dump::Color
+
+    *   Debug::Print
+
+    *   Term::ANSIColor::Conditional
+
+    *   Term::ANSIColor::Patch::Conditional
+
+    *   Term::App::Roles
+
+    *   Text::ANSITable
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-NO_COLOR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-NO_COLOR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-NO_C
+    OLOR>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

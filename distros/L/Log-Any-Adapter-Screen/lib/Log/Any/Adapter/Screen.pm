@@ -1,7 +1,7 @@
 package Log::Any::Adapter::Screen;
 
-our $DATE = '2016-10-04'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2018-12-22'; # DATE
+our $VERSION = '0.140'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,15 @@ sub init {
     my ($self) = @_;
     $self->{default_level} //= 'warning';
     $self->{stderr}    //= 1;
-    $self->{use_color} //= $ENV{COLOR} // (-t STDOUT);
+    $self->{use_color} //= do {
+        if (exists $ENV{NO_COLOR}) {
+            0;
+        } elsif (defined $ENV{COLOR}) {
+            $ENV{COLOR};
+        } else {
+            (-t STDOUT);
+        }
+    };
     if ($self->{colors}) {
         require Term::ANSIColor;
         # convert color names to escape sequence
@@ -133,7 +141,7 @@ Log::Any::Adapter::Screen - Send logs to screen, with colors and some other feat
 
 =head1 VERSION
 
-This document describes version 0.13 of Log::Any::Adapter::Screen (from Perl distribution Log-Any-Adapter-Screen), released on 2016-10-04.
+This document describes version 0.140 of Log::Any::Adapter::Screen (from Perl distribution Log-Any-Adapter-Screen), released on 2018-12-22.
 
 =head1 SYNOPSIS
 
@@ -222,7 +230,11 @@ level.
 
 =head1 ENVIRONMENT
 
-=head2 COLOR => bool
+=head2 NO_COLOR
+
+If defined, will disable color. Consulted before L</COLOR>.
+
+=head2 COLOR
 
 Can be set to 0 to explicitly disable colors. The default is to check for C<<-t
 STDOUT>>.
@@ -279,7 +291,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

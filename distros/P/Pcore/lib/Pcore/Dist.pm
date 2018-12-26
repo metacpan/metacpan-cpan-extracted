@@ -318,7 +318,7 @@ sub _build_docker ($self) {
 
         my $dockerfile = P->file->read_bin("$self->{root}/Dockerfile");
 
-        if ( $dockerfile->$* =~ /^FROM\s+([^:]+):?(.*?)$/sm ) {
+        if ( $dockerfile =~ /^FROM\s+([^:]+):?(.*?)$/sm ) {
             $docker->{from_repo_id} = $1;
 
             $docker->{from_tag} = $2 // 'latest';

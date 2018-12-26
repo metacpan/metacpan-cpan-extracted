@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -323,8 +323,8 @@ bool flushWriters();
 		</para>
 
 <pre>
-bool nextXtray(bool wait = true, const struct timespec &abstime =
-	*(const struct timespec *)NULL);
+bool nextXtray(bool wait = true, const struct timespec *abstime =
+	(const struct timespec *)NULL);
 </pre>
 
 		<para>
@@ -332,7 +332,7 @@ bool nextXtray(bool wait = true, const struct timespec &abstime =
 		after processing. The rest works in the same way as described in Perl,
 		however this is a combination of Perl's <pre>nextXtray()</pre>, <pre>nextXtrayNoWait()</pre>
 		and <pre>nextXtrayTimeLimit()</pre> in one method. If <pre>wait</pre> is false, this method will never
-		wait. If <pre>wait</pre> is true and the <pre>abstime</pre> reference is not NULL, it might
+		wait. If <pre>wait</pre> is true and the <pre>abstime</pre> is not NULL, it might
 		wait but not past that absolute time. Otherwise it will wait until the
 		data becomes available or the thread is requested to die.
 		</para>

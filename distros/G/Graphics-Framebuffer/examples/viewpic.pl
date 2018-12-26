@@ -14,16 +14,22 @@ use Getopt::Long;
 
 my $file = $ARGV[-1];
 
-my $full = 0;
+my $full    = 0;
+my $noclear = 0;
+my $delay   = 10;
+my $alpha   = 255;
 
 GetOptions(
-    'full' => \$full,
+    'full'    => \$full,
+    'wait=i'  => \$delay,
+    'noclear' => \$noclear,
+    'alpha=i' => \$alpha,
 );
 
 my $f = Graphics::Framebuffer->new(
     'SPLASH'      => 0,
     'SHOW_ERRORS' => 0,
-    'RESET'       => 1,
+    'RESET'       => 1 - $noclear,
 );
 
 system('clear');
@@ -42,13 +48,21 @@ if ($full) {
 my $image = $f->load_image(\%p);
 
 if (ref($image) eq 'ARRAY') {
-    my $s = time + 10;
+    my $s = time + $delay;
     while (time < $s) {
         $f->play_animation($image,1);
     }
 } else {
+    if ($alpha < 255) {
+        my $size = length($image->{'image'}) / $f->{'BYTES'};
+        $image->{'image'} &= pack('C4',255,255,255,0) x $size;
+        $image->{'image'} |= pack('C4',0,0,0,$alpha) x $size;
+        $f->alpha_mode();
+    } else {
+        $f->normal_mode();
+    }
     $f->blit_write($image);
-    sleep 10;
+    sleep $delay if ($delay);
 }
 
 =head1 NAME

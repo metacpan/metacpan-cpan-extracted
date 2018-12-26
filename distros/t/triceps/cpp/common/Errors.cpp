@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -51,7 +51,7 @@ bool Errors::append(const string &msg, Autoref<Errors> clde)
 	bool ce = clde->error_;
 	error_ = (error_ || ce);
 
-	if (clde->isEmpty()) { // nothing in there
+	if (clde->containsNothing()) { // nothing in there
 		if (ce) { // but there was an error indication, so append the message
 			elist_.push_back(Epair(msg, NULL));
 		}
@@ -71,7 +71,7 @@ bool Errors::absorb(Autoref<Errors> clde)
 	bool ce = clde->error_;
 	error_ = (error_ || ce);
 
-	if (clde->isEmpty()) { // nothing in there
+	if (clde->containsNothing()) { // nothing in there
 		return ce;
 	}
 
@@ -108,15 +108,7 @@ void Errors::replaceMsg(const string &msg)
 		elist_[n-1].msg_ = msg;
 }
 
-bool Errors::isEmpty()
-{
-	if (this == NULL)
-		return true;
-
-	return elist_.empty();
-}
-
-void Errors::printTo(string &res, const string &indent, const string &subindent)
+void Errors::printTo(string &res, const string &indent, const string &subindent) const
 {
 	size_t i, n = elist_.size();
 	for (i = 0; i < n; i++) {
@@ -127,7 +119,7 @@ void Errors::printTo(string &res, const string &indent, const string &subindent)
 	}
 }
 
-string Errors::print(const string &indent, const string &subindent)
+string Errors::print(const string &indent, const string &subindent) const
 {
 	string res;
 	printTo(res, indent, subindent);
@@ -144,7 +136,7 @@ void Errors::clear()
 
 bool Erref::fAppend(Autoref<Errors> clde, const char *fmt, ...)
 {
-	if (!clde->hasError())
+	if (clde.isNull() || !clde->containsError())
 		return false;
 
 	va_list ap;

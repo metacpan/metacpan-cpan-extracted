@@ -337,9 +337,7 @@ used for session data storage.
    <td> use_magick </td>
    <td><i>FALSE</i></td>
    <td>False value: <b>GD</b> will be used; True value: <b>Image::Magick</b> 
-       will be used. If you use GD, please do not use a prehistoric version.
-       The module itself is highly compatible with older versions, but this demo 
-       needs <b>\$GD::VERSION >= 1.31</b>
+       will be used.</b>
    </td>
 </tr>
 

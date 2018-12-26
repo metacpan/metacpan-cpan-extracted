@@ -2,24 +2,38 @@
 abstract: 'Validation framework that can be configured with YAML files'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::Exception: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Validate-WithYAML
+provides:
+  Data::Validate::WithYAML:
+    file: lib/Data/Validate/WithYAML.pm
+    version: '0.17'
 requires:
   Carp: '0'
   Scalar::Util: '0'
-  Test::Exception: '0'
-  Test::More: '0'
-  YAML::Tiny: '1.03'
+  YAML::Tiny: '1.70'
 resources:
   bugtracker: http://github.com/reneeb/Data-Validate-WithYAML/issues
   homepage: http://github.com/reneeb/Data-Validate-WithYAML
   repository: http://github.com/reneeb/Data-Validate-WithYAML.git
-version: '0.16'
+version: '0.17'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+  - 'reneeb <reneeb@dca9f4a1-6dba-46ad-9046-e9fb5d59a48b>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

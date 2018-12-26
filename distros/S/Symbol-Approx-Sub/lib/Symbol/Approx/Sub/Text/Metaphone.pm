@@ -17,7 +17,7 @@ use strict;
 
 our ($VERSION, @ISA, $AUTOLOAD);
 
-$VERSION = '3.0.2';
+$VERSION = '3.1.2';
 
 use Carp;
 use Text::Metaphone;

@@ -168,6 +168,10 @@ Specifically:
 - check\_digit\_fast() and check\_digit\_rff() return -1 on failure, but
         check\_digit() returns undef.
 
+Also, be careful with passing long numbers around.  Perl will, depending 
+on the context, convert things like 12345678912345 to 1.2345678912345e+1.
+Try to keep things in "string context".
+
 # SEE ALSO
 
 [Algorithm::LUHN](https://metacpan.org/pod/Algorithm::LUHN) is the original pure perl module this is based on.

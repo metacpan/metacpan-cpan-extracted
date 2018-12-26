@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.0003
+    version 0.0004
 
 OVERVIEW
 
@@ -32,6 +32,7 @@ OVERVIEW
         [Leftovers]
         [Region  / postlude]
         [Authors]
+        [Contributors]
         [Legal]
     
         [-Transformer / Lists]

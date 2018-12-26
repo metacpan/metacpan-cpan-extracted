@@ -3,26 +3,42 @@ abstract: 'Alternate reftype() interface'
 author:
   - 'Burak Gursoy <burak@cpan.org>'
 build_requires:
-  Test::More: '0.40'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
 configure_requires:
-  Module::Build: '0.42'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - scalar
+  - reftype
+  - util
+  - utility
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Scalar-Util-Reftype
-no_index:
-  directory:
-    - monolithic_version
-    - builder
-    - t
-    - xt
 requires:
+  Carp: '0'
+  Exporter: '0'
   Scalar::Util: '0'
+  base: '0'
+  constant: '0'
+  overload: '0'
+  perl: '5.010'
+  re: '0'
+  strict: '0'
+  subs: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/burak/cpan-scalar-util-reftype/
-version: '0.44'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/burak/CPAN-Scalar-Util-Reftype/issues
+  repository: git://github.com/burak/CPAN-Scalar-Util-Reftype.git
+version: '0.46'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

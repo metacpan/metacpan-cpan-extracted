@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2015 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -9,7 +9,7 @@ package Triceps::LookupJoin;
 
 sub CLONE_SKIP { 1; }
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.1.0';
 
 use Carp;
 
@@ -189,11 +189,10 @@ sub new # (class, optionName => optionValue ...)
 	# translate the index
 	my @idxkeys;
 	if (defined $self->{rightIdxPath}) {
-		($self->{rightIdxType}, @idxkeys) = $self->{rightTable}->getType()->findIndexKeyPath(@{$self->{rightIdxPath}});
+		Triceps::wrapfess
+			"The rightIdxPath is invalid:",
+			sub { ($self->{rightIdxType}, @idxkeys) = $self->{rightTable}->getType()->findIndexKeyPath(@{$self->{rightIdxPath}}); };
 		# if not found, would already confess
-		my $ixid  = $self->{rightIdxType}->getIndexId();
-		Carp::confess("The index '" . join('.', @{$self->{rightIdxPath}}) . "' is of kind '" . &Triceps::indexIdString($ixid) . "', not the required 'IT_HASHED'")
-			unless ($ixid == &Triceps::IT_HASHED);
 	} else {
 		# try to find the index by keys automatically;
 		# start by extracting the right side of "by"

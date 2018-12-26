@@ -3,28 +3,28 @@ require 5.006001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PL_FILES' => {},
-  'EXE_FILES' => [],
-  'VERSION_FROM' => 'lib/Locale/MO/File.pm',
-  'NAME' => 'Locale::MO::File',
   'PREREQ_PM' => {
-                   'Test::NoWarnings' => 0,
-                   'charnames' => 0,
-                   'English' => 0,
                    'Test::More' => 0,
-                   'MooX::Types::MooseLike::Base' => 0,
-                   'Params::Validate' => 0,
-                   'Test::HexDifferences' => 0,
+                   'IO::File' => 0,
                    'namespace::autoclean' => 0,
                    'Const::Fast' => 0,
-                   'Test::Differences' => '0.60',
-                   'Hash::Util' => 0,
-                   'MooX::StrictConstructor' => 0,
                    'Test::Exception' => 0,
+                   'Test::HexDifferences' => 0,
+                   'charnames' => 0,
+                   'MooX::StrictConstructor' => 0,
                    'Encode' => 0,
+                   'Params::Validate' => 0,
+                   'Hash::Util' => 0,
+                   'Test::NoWarnings' => 0,
+                   'MooX::Types::MooseLike::Base' => 0,
+                   'Test::Differences' => '0.60',
                    'Moo' => '1.003001',
-                   'IO::File' => 0
+                   'English' => 0
                  },
-  'INSTALLDIRS' => 'site'
+  'INSTALLDIRS' => 'site',
+  'EXE_FILES' => [],
+  'PL_FILES' => {},
+  'VERSION_FROM' => 'lib/Locale/MO/File.pm',
+  'NAME' => 'Locale::MO::File'
 )
 ;

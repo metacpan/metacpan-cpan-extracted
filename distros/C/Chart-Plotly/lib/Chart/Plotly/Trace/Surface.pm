@@ -12,9 +12,8 @@ use Chart::Plotly::Trace::Surface::Hoverlabel;
 use Chart::Plotly::Trace::Surface::Lighting;
 use Chart::Plotly::Trace::Surface::Lightposition;
 use Chart::Plotly::Trace::Surface::Stream;
-use Chart::Plotly::Trace::Surface::Transform;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: The data the describes the coordinates of the surface is set in `z`. Data in `z` should be a {2D array}. Coordinates in `x` and `y` can either be 1D {arrays} or {2D arrays} (e.g. to graph parametric surfaces). If not provided in `x` and `y`, the x and y coordinates are assumed to be linear starting at 0 with a unit step. The color scale corresponds to the `z` values by default. For custom color scales, use `surfacecolor` which should be a {2D array}, where its bounds can be controlled using `cmin` and `cmax`.
 
@@ -47,25 +46,31 @@ sub type {
 }
 
 has autocolorscale => (
-            is            => "rw",
-            isa           => "Bool",
-            documentation => "Determines whether or not the colorscale is picked using the sign of the input z values.",
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether the colorscale is a default palette (`autocolorscale: true`) or the palette determined by `colorscale`. In case `colorscale` is unspecified or `autocolorscale` is true, the default  palette will be chosen according to whether numbers in the `color` array are all positive, all negative or mixed.",
 );
 
 has cauto => (
-          is            => "rw",
-          isa           => "Bool",
-          documentation => "Determines the whether or not the color domain is computed with respect to the input data.",
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not the color domain is computed with respect to the input data (here z or surfacecolor) or the bounds set in `cmin` and `cmax`  Defaults to `false` when `cmin` and `cmax` are set by the user.",
 );
 
-has cmax => ( is            => "rw",
-              isa           => "Num",
-              documentation => "Sets the upper bound of color domain.",
+has cmax => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the upper bound of the color domain. Value should have the same units as z or surfacecolor and if set, `cmin` must be set as well.",
 );
 
-has cmin => ( is            => "rw",
-              isa           => "Num",
-              documentation => "Sets the lower bound of color domain.",
+has cmin => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the lower bound of the color domain. Value should have the same units as z or surfacecolor and if set, `cmax` must be set as well.",
 );
 
 has colorbar => ( is  => "rw",
@@ -74,7 +79,7 @@ has colorbar => ( is  => "rw",
 has colorscale => (
     is => "rw",
     documentation =>
-      "Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in z space, use zmin and zmax",
+      "Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in color space, use`cmin` and `cmax`. Alternatively, `colorscale` may be a palette name string of the following list: Greys,YlGnBu,Greens,YlOrRd,Bluered,RdBu,Reds,Blues,Picnic,Rainbow,Portland,Jet,Hot,Blackbody,Earth,Electric,Viridis,Cividis.",
 );
 
 has contours => ( is  => "rw",
@@ -149,9 +154,11 @@ has opacity => ( is            => "rw",
                  documentation => "Sets the opacity of the surface.",
 );
 
-has reversescale => ( is            => "rw",
-                      isa           => "Bool",
-                      documentation => "Reverses the colorscale.",
+has reversescale => (
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Reverses the color mapping if true. If true, `cmin` will correspond to the last color in the array and `cmax` will correspond to the first color.",
 );
 
 has scene => (
@@ -204,11 +211,15 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
-has transforms => ( is  => "rw",
-                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Surface::Transform]", );
-
 has uid => ( is  => "rw",
              isa => "Str", );
+
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
 
 has visible => (
     is => "rw",
@@ -288,7 +299,7 @@ Chart::Plotly::Trace::Surface - The data the describes the coordinates of the su
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -353,25 +364,25 @@ Trace type.
 
 =item * autocolorscale
 
-Determines whether or not the colorscale is picked using the sign of the input z values.
+Determines whether the colorscale is a default palette (`autocolorscale: true`) or the palette determined by `colorscale`. In case `colorscale` is unspecified or `autocolorscale` is true, the default  palette will be chosen according to whether numbers in the `color` array are all positive, all negative or mixed.
 
 =item * cauto
 
-Determines the whether or not the color domain is computed with respect to the input data.
+Determines whether or not the color domain is computed with respect to the input data (here z or surfacecolor) or the bounds set in `cmin` and `cmax`  Defaults to `false` when `cmin` and `cmax` are set by the user.
 
 =item * cmax
 
-Sets the upper bound of color domain.
+Sets the upper bound of the color domain. Value should have the same units as z or surfacecolor and if set, `cmin` must be set as well.
 
 =item * cmin
 
-Sets the lower bound of color domain.
+Sets the lower bound of the color domain. Value should have the same units as z or surfacecolor and if set, `cmax` must be set as well.
 
 =item * colorbar
 
 =item * colorscale
 
-Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in z space, use zmin and zmax
+Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in color space, use`cmin` and `cmax`. Alternatively, `colorscale` may be a palette name string of the following list: Greys,YlGnBu,Greens,YlOrRd,Bluered,RdBu,Reds,Blues,Picnic,Rainbow,Portland,Jet,Hot,Blackbody,Earth,Electric,Viridis,Cividis.
 
 =item * contours
 
@@ -423,7 +434,7 @@ Sets the opacity of the surface.
 
 =item * reversescale
 
-Reverses the colorscale.
+Reverses the color mapping if true. If true, `cmin` will correspond to the last color in the array and `cmax` will correspond to the first color.
 
 =item * scene
 
@@ -459,9 +470,11 @@ Sets the text elements associated with each z value. If trace `hoverinfo` contai
 
 Sets the source reference on plot.ly for  text .
 
-=item * transforms
-
 =item * uid
+
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
 
 =item * visible
 

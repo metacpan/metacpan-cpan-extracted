@@ -10,6 +10,8 @@ example/package-lock.json
 example/package.json
 example/webpack.config.js
 lib/Mojolicious/Plugin/Webpack.pm
+lib/Mojolicious/Plugin/Webpack/Builder.pm
+lib/Mojolicious/Plugin/Webpack/my_app.js
 lib/Mojolicious/Plugin/Webpack/package.json
 lib/Mojolicious/Plugin/Webpack/webpack.config.js
 lib/Mojolicious/Plugin/Webpack/webpack.custom.js
@@ -28,6 +30,7 @@ t/assets/webpack.custom.js
 t/assets/webpack.process-css.js
 t/assets/webpack.process-js.js
 t/assets/webpack.process-sass.js
+t/builder.t
 t/crushinator.t
 t/cwd.t
 t/example-build-assets.t
@@ -40,6 +43,8 @@ t/migrate-from-assetpack/assets/js/app.js
 t/migrate-from-assetpack/assets/js/include-some-file.js
 t/migrate-from-assetpack/package-lock.json
 t/migrate-from-assetpack/package.json
+t/MyApp.pm
+t/MyApp/Plugin/Helper.pm
 t/process-css.t
 t/process-js.t
 t/process-sass.t
@@ -59,5 +64,6 @@ t/public/asset/webpack.process-sass.html
 t/public/asset/webpack.production.html
 t/public/asset/webpack.register.html
 t/register.t
+t/shim.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

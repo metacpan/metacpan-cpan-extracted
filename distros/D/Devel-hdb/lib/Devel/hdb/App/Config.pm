@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Devel::hdb::App::Base';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 __PACKAGE__->add_route('post', qr{/loadconfig/(.+)}, \&loadconfig);
 __PACKAGE__->add_route('post', qr{/saveconfig/(.+)}, \&saveconfig);
@@ -13,17 +13,20 @@ __PACKAGE__->add_route('post', qr{/saveconfig/(.+)}, \&saveconfig);
 sub loadconfig {
     my($class, $app, $env, $file) = @_;
 
-    my $result = eval { $app->load_settings_from_file($file) };
+    local $@;
+    my $settings = eval { $app->load_settings_from_file($file) };
     if ($@) {
         return [ 400,
-                [ 'Content-Type' => 'text/html' ],
+                [ 'Content-Type' => 'text/plain' ],
                 [ $@ ] ];
 
-    } elsif ($result ) {
-        return [ 204, [], [] ];
+    } elsif ($settings) {
+        return [ 200,
+                ['Content-Type' => 'application/json'],
+                [ $app->encode_json($settings) ] ];
     } else {
         return [ 404,
-                [ 'Content-Type' => 'text/html' ],
+                [ 'Content-Type' => 'text/plain' ],
                 [ "File $file not found" ] ];
     }
 }
@@ -31,11 +34,15 @@ sub loadconfig {
 sub saveconfig {
     my($class, $app, $env, $file) = @_;
 
-    $file = eval { $app->save_settings_to_file($file) };
+    my $body = $class->_read_request_body($env);
+    my $additional = $app->decode_json($body);
+
+    local $@;
+    $file = eval { $app->save_settings_to_file($file, $additional) };
     if ($@) {
         return [ 400,
                 [ 'Content-Type' => 'text/html' ],
-                [ "Problem loading $file: $@" ] ];
+                [ "Problem saving $file: $@" ] ];
     } else {
         return [ 204, [], [] ];
     }

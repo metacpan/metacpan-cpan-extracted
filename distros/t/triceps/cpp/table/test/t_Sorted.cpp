@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -151,7 +151,7 @@ UTESTCASE primaryIndex(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -177,19 +177,19 @@ UTESTCASE tableops(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
 
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 
 	// other instance, for checking of errors
 	Autoref<Table> t2 = tt->makeTable(unit, "t2");
 	UT_ASSERT(!t2.isNull());
 	IndexType *prim2 = tt->findSubIndex("primary");
-	UT_ASSERT(prim2 != NULL);
+	UT_ASSERT(prim2 != NO_INDEX_TYPE);
 
 	// 3rd instance, with its own type, for checking of errors
 	Autoref<TableType> tt3 = (new TableType(rt1))
@@ -200,7 +200,7 @@ UTESTCASE tableops(Utest *utest)
 	Autoref<Table> t3 = tt3->makeTable(unit, "t3");
 	UT_ASSERT(!t3.isNull());
 	IndexType *prim3 = tt3->findSubIndex("primary");
-	UT_ASSERT(prim3 != NULL);
+	UT_ASSERT(prim3 != NO_INDEX_TYPE);
 
 	// above here was a copy of primaryIndex()
 
@@ -373,10 +373,10 @@ UTESTCASE tableops_exception(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 
 	FdataVec dv;
 	mkfdata(dv);

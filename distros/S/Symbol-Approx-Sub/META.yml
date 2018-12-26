@@ -21,22 +21,22 @@ name: Symbol-Approx-Sub
 provides:
   Symbol::Approx::Sub:
     file: lib/Symbol/Approx/Sub.pm
-    version: v3.1.0
+    version: v3.1.2
   Symbol::Approx::Sub::Random:
     file: lib/Symbol/Approx/Sub/Random.pm
-    version: v3.0.2
+    version: v3.1.2
   Symbol::Approx::Sub::String::Approx:
     file: lib/Symbol/Approx/Sub/String/Approx.pm
-    version: v3.0.2
+    version: v3.1.2
   Symbol::Approx::Sub::String::Equal:
     file: lib/Symbol/Approx/Sub/String/Equal.pm
-    version: v3.0.2
+    version: v3.1.2
   Symbol::Approx::Sub::Text::Metaphone:
     file: lib/Symbol/Approx/Sub/Text/Metaphone.pm
-    version: v3.0.2
+    version: v3.1.2
   Symbol::Approx::Sub::Text::Soundex:
     file: lib/Symbol/Approx/Sub/Text/Soundex.pm
-    version: v3.0.2
+    version: v3.1.2
 recommends:
   String::Approx: '0'
   Text::Metaphone: '0'
@@ -46,9 +46,9 @@ requires:
   Devel::Symdump: '0'
   Exception::Class: '0'
   Module::Load: '0'
-  perl: '5.006'
+  perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/symbol-approx-sub.git
-version: v3.1.0
+version: v3.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

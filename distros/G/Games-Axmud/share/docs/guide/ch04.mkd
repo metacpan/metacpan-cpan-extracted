@@ -290,7 +290,17 @@ Here's a summary of the most important buttons.
 
 ![Broom icon](img/ch04/icon_broom.png) Clears the command entry box. If commands are being sent to the world, one character at a time, clicking this button tells Axmud that you're about to start typing a new world command
 
+![Add icon](img/ch04/icon_add.png) Axmud provides three entry boxes. The main one, which is always visible, is where you type commands. The other two are optional; you can make one or both of them appear if you keep clicking this button. 
+
+Anything you type in the other boxes is added to a world command before it's sent to the world. For example, if you want to have a long conversation, you can type **say** in the box on the left - then, you don't need to type **say** every time you type something in the main box.
+
+This only works with world commands. It doesn't work with other types of command, such as client commands, speedwalk commands or forced world commands beginning with **,,**.
+
 ![Exclamation mark icon](img/ch04/icon_console.png) Opens the Session Console window. If Axmud is unable to display system messages in the main window (for whatever reason) they're displayed here instead
+
+![Plus icon](img/ch04/icon_input.png) Opens the Quick Input window, from which you can send multiple lines of text to the world at a time.
+
+![Search icon](img/ch04/icon_search.png) Opens a search box, which you can use to search text for terms like gold or big hairy orc. If you click the **Use regex** button, you can use a pattern/regular expression like **\d+ gold coin**).
 
 ![Lock icon](img/ch04/icon_lock.png) Stops the window from scrolling when text is received from the world
 

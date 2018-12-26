@@ -44,7 +44,7 @@
    "provides" : {
       "Python::Version" : {
          "file" : "lib/Python/Version.pm",
-         "version" : "0.0001"
+         "version" : "0.0002"
       }
    },
    "release_status" : "stable",
@@ -53,7 +53,10 @@
          "url" : "https://github.com/stphnlyd/perl5-Python-Version.git"
       }
    },
-   "version" : "0.0001",
+   "version" : "0.0002",
+   "x_contributors" : [
+      "perlancar <perlancar@cpan.org>"
+   ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

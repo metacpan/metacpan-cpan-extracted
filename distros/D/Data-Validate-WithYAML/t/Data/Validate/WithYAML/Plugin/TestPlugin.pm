@@ -1,4 +1,5 @@
-package Data::Validate::WithYAML::Plugin::TestPlugin;
+package
+    Data::Validate::WithYAML::Plugin::TestPlugin;
 
 use strict;
 use warnings;

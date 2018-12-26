@@ -1,83 +1,87 @@
 Revision history for Perl extension Time::Elapsed.
 
+0.33 2018-12-25 BURAK
+     - Migrate to dzil.
+     - Remove obsolete perl support
+
 0.32 Tue Jul  5 00:26:23 2016
-    => Bump version.
-    => New Danish language file (jonasbn)
+     - Bump version.
+     - New Danish language file (jonasbn)
 
 0.31 Tue Sep 22 02:05:24 2009
-   => Perl::Critic refactoring.
+    - Perl::Critic refactoring.
 
 0.30 Wed Jun 24 00:42:57 2009
-   => Added "week" suport to the output. Disabled by default.
-   => Extended the second parameter to elapsed() to a hashref.
+    - Added "week" suport to the output. Disabled by default.
+    - Extended the second parameter to elapsed() to a hashref.
 
 0.29 Wed Apr 22 02:58:29 2009
-   => elapsed() is now exported by default.
+    - elapsed() is now exported by default.
 
 0.28 Wed Apr 22 00:37:33 2009
-   => Remove duplicated code.
+    - Remove duplicated code.
 
 0.27 Tue Apr 21 22:52:14 2009
-   => Updating distro tools.
+    - Updating distro tools.
 
 0.26 Tue Apr 21 07:03:56 2009
-   => Update build tools.
+    - Update build tools.
 
 0.25 Sat Apr 18 06:56:15 2009
-   => Update distro tools.
+    - Update distro tools.
 
 0.24 Sun Jan 20 00:56:45 2008
-   => Fixed a logic error when handling year values.
+    - Fixed a logic error when handling year values.
 
 0.23 Mon Nov 19 23:04:22 2007
-   => Fixed a nasty logic error.
+    - Fixed a nasty logic error.
 
 0.22 Wed Nov 14 23:17:43 2007
-   => Updated the tests to run under legacy perl.
+    - Updated the tests to run under legacy perl.
 
 0.21 Mon Nov 12 22:07:43 2007
-   => Code cleanup.
-   => German language file (can have errors).
+    - Code cleanup.
+    - German language file (can have errors).
 
 0.20 Wed May  9 00:41:49 2007
-   => Pod update.
-   => Internal cleanup.
-   => Fix for calculation.
-   => Removed template parameter, since it seems useless.
-   => Implemented a language cache.
-   => Added -compile import parameter.
-   => Added :all import key.
-   => Test::More 0.40 is now required for tests.
+    - Pod update.
+    - Internal cleanup.
+    - Fix for calculation.
+    - Removed template parameter, since it seems useless.
+    - Implemented a language cache.
+    - Added -compile import parameter.
+    - Added :all import key.
+    - Test::More 0.40 is now required for tests.
 
 0.17 Fri May  4 11:45:44 2007
-   => A fix for zero case per RT#26908. Thanks to Ron Savage.
+    - A fix for zero case per RT#26908. Thanks to Ron Savage.
 
 0.16 Thu May  3 14:45:10 2007
-   => Pod fixes.
-   => False values will now return "0 second" instead of undef.
+    - Pod fixes.
+    - False values will now return "0 second" instead of undef.
       But undefined parameters will return undef. (RT#26908)
-   => New tests.
+    - New tests.
 
 0.15 Tue May  1 00:45:45 2007
-   => Fixed a calculation error.
-   => Updated Pod.
+    - Fixed a calculation error.
+    - Updated Pod.
 
 0.14 Thu Apr 26 12:25:38 2007
-   => Another release for failures. It looks like
+    - Another release for failures. It looks like
       the cause is rounding error. I'm not sure
       about the cause, since the tests pass on other
       systems.
 
 0.13 Wed Apr 25 20:47:27 2007
-   => Another fix for tests.
-   => Test::More is now required.
+    - Another fix for tests.
+    - Test::More is now required.
 
 0.12 Tue Apr 24 18:15:25 2007
-   => Fixed 01-pod.t for legacy perls. This test is now
+    - Fixed 01-pod.t for legacy perls. This test is now
       skipped if perl version is < 5.008.
 
 0.11 Tue Apr 24 00:36:53 2007
-   => Fixed Pod typos.
+    - Fixed Pod typos.
 
 0.10 Mon Apr 23 22:01:22 2007
 	=> First release.

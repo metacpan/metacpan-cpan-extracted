@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -401,7 +401,7 @@ public:
 	ScopeFnBind(Onceref<FnReturn> ret, Onceref<FnBinding> binding);
 	// Pops the binding on destruction.
 	// May throw an Exception if the binding stack got messed up.
-	~ScopeFnBind();
+	~ScopeFnBind() noexcept(false);
 
 protected:
 	Autoref<FnReturn> ret_;

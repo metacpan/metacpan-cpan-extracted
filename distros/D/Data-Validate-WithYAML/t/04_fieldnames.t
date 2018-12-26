@@ -1,7 +1,7 @@
 #!perl 
 
 use strict;
-use Test::More tests => 3;
+use Test::More;
 use Data::Dumper;
 use FindBin;
 
@@ -38,3 +38,5 @@ my %test_default;
 @test_default{$validator->fieldnames('default')} = undef;
 
 is_deeply( \%test_default, \%default );
+
+done_testing();

@@ -1,0 +1,6 @@
+---
+step1:
+    field1:
+        type: required
+        plugin: TestPluginDoesNotExist
+        checkvalue: check

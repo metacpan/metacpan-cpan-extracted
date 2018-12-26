@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -99,18 +99,17 @@ public:
 	//        last error record
 	void replaceMsg(const string &msg);
 
-	// Check recursively whether ethere are no messages.
-	// May be called on a NULL pointer as well.
+	// Check whether there are no messages.
 	// @return - true if there are no messages throughout hierarchy
-	bool isEmpty();
-
-	// Check if has an error.
-	// May be called on a NULL pointer as well.
-	// @return - true if has an error
-	bool hasError()
+	bool containsNothing() const
 	{
-		if (this == NULL)
-			return false;
+		return elist_.empty();
+	}
+
+	// Check if contains an error.
+	// @return - true if contains an error
+	bool containsError() const
+	{
 		return error_;
 	}
 	
@@ -118,13 +117,13 @@ public:
 	// @param res - the resulting string to append to
 	// @param indent - initial indentation characters
 	// @param subindent - indentation characters to add on each level
-	void printTo(string &res, const string &indent = "", const string &subindent = "  ");
+	void printTo(string &res, const string &indent = "", const string &subindent = "  ") const;
 
 	// Print in a simple way and return the result string.
 	// @param indent - initial indentation characters
 	// @param subindent - indentation characters to add on each level
 	// @return - the result string
-	string print(const string &indent = "", const string &subindent = "  ");
+	string print(const string &indent = "", const string &subindent = "  ") const;
 
 	// Get the number of messages (without taking nesting into account).
 	// (useful mostly for testing)
@@ -174,6 +173,26 @@ public:
 	Erref(const Autoref<OtherTarget> &ar) :
 		Parent(ar)
 	{ }
+
+	// Check if has an error in the pointed object. The name is intentionally
+	// different from containsError() to avoid confusion.
+	// @return - true if the referrence ia not NULL and Errors has an error.
+	bool hasError() const
+	{
+		if (isNull())
+			return false;
+		return get()->containsError();
+	}
+
+	// Check whether there are no messages. The name is intentionally
+	// different from containsNothing() to avoid confusion.
+	// @return - true if there are no messages throughout hierarchy
+	bool isEmpty() const
+	{
+		if (isNull())
+			return true;
+		return get()->containsNothing();
+	}
 
 	// Add information about a child's errors, allocating an Errors
 	// object if needed. The Erref may initially contain a NULL,

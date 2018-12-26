@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -113,7 +113,7 @@ UTESTCASE x_fields(Utest *utest)
 	fields1.push_back(RowType::Field("d", Type::findSimpleType("uint8"), RowType::Field::AR_VARIABLE));
 
 	Autoref<RowType> rt1 = new CompactRowType(fields1);
-	if (rt1->getErrors()->hasError())
+	if (rt1->getErrors().hasError())
 		throw Exception(rt1->getErrors(), true);
 
 	const RowType::FieldVec &f = rt1->fields();
@@ -122,7 +122,7 @@ UTESTCASE x_fields(Utest *utest)
 	RowType::FieldVec fields3 = rt1->fields();
 	fields3.push_back(RowType::Field("z", Type::r_string));
 	Autoref<RowType> rt3 = new CompactRowType(fields3);
-	if (rt3->getErrors()->hasError())
+	if (rt3->getErrors().hasError())
 		throw Exception(rt3->getErrors(), true);
 }
 
@@ -159,7 +159,7 @@ UTESTCASE x_data(Utest *utest)
 	fields4.push_back(RowType::Field("a", Type::r_int64, RowType::Field::AR_VARIABLE));
 
 	Autoref<RowType> rt4 = new CompactRowType(fields4);
-	if (rt4->getErrors()->hasError())
+	if (rt4->getErrors().hasError())
 		throw Exception(rt4->getErrors(), true);
 
 	FdataVec fd4;
@@ -502,12 +502,14 @@ UTESTCASE hold_row_types(Utest *utest)
 	Autoref<RowType> cp4 = hrt1->copy(NULL); // a NULL begets NULL
 	UT_ASSERT(cp4.isNull());
 
-	Autoref<HoldRowTypes> hrt2 = NULL; // a NULL holder causes dumb copies
+	// check that the default holder can be autoreffed
+	Autoref<HoldRowTypes> ref(NO_HOLD_ROW_TYPES);
 
-	Autoref<RowType> cp5 = hrt2->copy(rt1);
+	// dumb copies
+	Autoref<RowType> cp5 = NO_HOLD_ROW_TYPES->copy(rt1);
 	UT_ASSERT(!cp5.isNull());
 	UT_ASSERT(cp5 != rt1);
-	Autoref<RowType> cp6 = hrt2->copy(rt1);
+	Autoref<RowType> cp6 = NO_HOLD_ROW_TYPES->copy(rt1);
 	UT_ASSERT(!cp6.isNull());
 	UT_ASSERT(cp6 != rt1);
 	UT_ASSERT(cp6 != cp5);

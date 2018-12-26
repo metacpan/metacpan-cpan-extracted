@@ -1,53 +1,62 @@
 Revision history for Perl extension Sys::Info::Base.
 
+0.7807 2018-12-25 BURAK
+    - Distro fix.
+
+0.7806 2018-12-25 BURAK
+    - Distro fix.
+
+0.7805 2018-12-25 BURAK
+    - Migrate to dzil.
+
 0.7803 Fri May 10 01:06:29 EEST 2013
-   => Bump version for new release.
+    - Bump version for new release.
 
 0.7802 Sun Jul 31 03:21:23 2011
-   => Fix device('available'). Reported by Matthäus Kiem.
+    - Fix device('available'). Reported by Matthäus Kiem.
 
 0.7801 Sun Jul 31 01:39:17 2011
-   => Remove Linux specific constants.
+    - Remove Linux specific constants.
 
 0.78 Sat Apr 16 15:18:44 2011
-   => Enable OSX driver
+    - Enable OSX driver
 
 0.74 Sat Jul 17 02:19:44 2010
-    => Cleanup.
+     - Cleanup.
 
 0.73 Sun Jan 10 07:36:19 2010
-    => NEW_PERL constant.
-    => os->locale method.
-    => Base method uname().
-    => Removed all constants related to uname().
-    => Perl::Critic refactoring.
+     - NEW_PERL constant.
+     - os->locale method.
+     - Base method uname().
+     - Removed all constants related to uname().
+     - Perl::Critic refactoring.
 
 0.72 Thu Apr 23 16:36:03 2009
-    => Update builder.
+     - Update builder.
 
 0.71 Sat Apr 11 03:37:15 2009
-    => Update build tool.
+     - Update build tool.
 
 0.70 Mon Apr  6 03:54:23 2009
-    => Bump version for new stable release.
+     - Bump version for new stable release.
 
 0.69_11 Sat Apr  4 06:06:39 2009
-    => Remove bitness from cpu. This'll be implemented in driver.
+     - Remove bitness from cpu. This'll be implemented in driver.
 
 0.69_10 Fri Apr  3 22:00:43 2009
-    => Update tests.
+     - Update tests.
 
 0.69_06 Sat Mar 14 15:55:08 2009
-    => Add support for BSD driver.
+     - Add support for BSD driver.
 
 0.69_05 Sat Mar 14 01:57:38 2009
-    => Bump version.
+     - Bump version.
 
 0.69_03 Thu Mar 12 03:49:58 2009
-    => Remove cache from ::CPU.
+     - Remove cache from ::CPU.
 
 0.69_02 Thu Mar  5 02:25:32 2009
-    => Fix date2time test.
+     - Fix date2time test.
 
 0.69_01 Thu Mar  5 02:25:32 2009
-    => Separation from Sys::Info.
+     - Separation from Sys::Info.

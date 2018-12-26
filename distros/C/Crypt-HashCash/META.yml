@@ -39,5 +39,5 @@ requires:
   Math::BaseCnv: '1.14'
   Math::Prime::Util: '0'
   Persistence::Object::Simple: '0'
-version: '1.129'
+version: '1.130'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,18 +6,29 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Validate-WithYAML-Plugin-EMail
+provides:
+  Data::Validate::WithYAML::Plugin::EMail:
+    file: lib/Data/Validate/WithYAML/Plugin/EMail.pm
+    version: '0.04'
 requires:
   Data::Validate::WithYAML: '0.08'
   Perl::Critic: '0'
   Regexp::Common::Email::Address: '1.01'
+  perl: '5.008'
 resources:
-  bugtracker: http://github.com/reneeb/Data-Validate-WithYAML-EMail/issues
-  homepage: http://github.com/reneeb/Data-Validate-WithYAML-EMail
-  repository: http://github.com/reneeb/Data-Validate-WithYAML-EMail.git
-version: '0.03'
+  bugtracker: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EMail/issues
+  homepage: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EMail
+  repository: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EMail.git
+version: '0.04'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+  - 'reneeb <reneeb@dca9f4a1-6dba-46ad-9046-e9fb5d59a48b>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

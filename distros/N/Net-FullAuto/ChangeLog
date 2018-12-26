@@ -20,6 +20,29 @@
 #######################################################################
 
 
+2018-12-25  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000459 released
+
+	* MERRY CHRISTMAS!
+
+        * Added -y to yum rpmfusion install.
+
+
+2018-12-24  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000458 released
+
+        * Replaced non-maintained RPMforge with RPMfusion.
+
+
+2018-12-23  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000457 released
+
+        * Updated Local ISet Wordpress_is.pm.
+
+
 2018-12-19  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000456 released

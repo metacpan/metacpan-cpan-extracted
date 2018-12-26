@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -149,6 +149,7 @@ See the file COPYRIGHT for the copyright notice and license information
 	<xi:include href="file:///DOCS/830fifoidx.xml"/>
 	<xi:include href="file:///DOCS/832hashidx.xml"/>
 	<xi:include href="file:///DOCS/834sortidx.xml"/>
+	<xi:include href="file:///DOCS/836ordidx.xml"/>
 	<xi:include href="file:///DOCS/840gadget.xml"/>
 	<xi:include href="file:///DOCS/842table.xml"/>
 	<xi:include href="file:///DOCS/844rowhandle.xml"/>

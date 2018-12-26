@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2015 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -17,7 +17,7 @@ package Triceps::X::ThreadedClient;
 
 sub CLONE_SKIP { 1; }
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.1.0';
 
 use Carp;
 use IO::Socket;
@@ -127,20 +127,22 @@ sub collectorT # (@opts)
 	#### local functions ###
 
 	# Check if the client's new data matches its pattern, and if so then
-	# move its data to %recv and sent a reply to the global thread.
+	# send a reply with the collected data to the global thread.
+	# Otherwise, move the data to %recv.
 	my $checkPattern = sub { # ($client)
 		my $client = shift;
 		if (exists $pattern{$client} && exists $newrecv{$client}) {
 			my $p = $pattern{$client};
 
-			my $sz = $#{$newrecv{$client}};
-			my $i;
-			for ($i = 0; $i <= $sz; $i++) {
-				if ($newrecv{$client}[$i] =~ /$p/) {
+			while ($#{$newrecv{$client}} >= 0) {
+				my $line = shift @{$newrecv{$client}};
+				if ($line =~ /$p/) {
 					my $text;
-					for (my $j = 0; $j <= $i; $j++) {
-						$text .= shift(@{$newrecv{$client}});
+					if (exists $recv{$client}) {
+						$text = join('', @{$recv{$client}});
+						delete $recv{$client};
 					}
+					$text .= $line;
 					if ($#{$newrecv{$client}} < 0) {
 						delete $newrecv{$client};
 					}
@@ -150,11 +152,14 @@ sub collectorT # (@opts)
 						client => $client,
 						arg => $text,
 					);
-					last;
+					return;
+				} else {
+					push @{$recv{$client}}, $line;
 				}
 			}
+			my $sz = $#{$recv{$client}};
 			# If received an EOF, report an error immediately.
-			if ($i > $sz && $newrecv{$client}[$sz] eq "__EOF__\n") {
+			if ($sz >= 0 && $recv{$client}[$sz] eq "__EOF__\n") {
 				$unit->makeHashCall($lbRepMsg, "OP_INSERT", 
 					cmd => "error",
 					client => $client,
@@ -182,10 +187,16 @@ sub collectorT # (@opts)
 		} elsif ($cmd eq "cancel") {
 			# if not replied already, confirm the cancellation
 			if (exists $pattern{$client}) {
+				my $text;
+				if (exists $recv{$client}) {
+					$text = join('', @{$recv{$client}});
+					delete $recv{$client};
+				}
+				$text .= "Timed out when expecting " . $pattern{$client};
 				$unit->makeHashCall($lbRepMsg, "OP_INSERT", 
 					cmd => "error",
 					client => $client,
-					arg => "Timed out when expecting " . $pattern{$client},
+					arg => $text,
 				);
 				delete $pattern{$client};
 			}

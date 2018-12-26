@@ -1,3 +1,10 @@
+0.2019.5	2018-12-26
+	+ strict mode for die in not package cover dates
+
+0.2019.4	2018-12-25
+	change dist build from ExtUtils::MakeMaker to Module::Build
+	minor fixes
+
 0.2019.3	2018-12-18
 	* PAUSE not indexing without module version
 

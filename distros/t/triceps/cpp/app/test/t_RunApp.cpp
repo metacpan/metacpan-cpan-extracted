@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -1110,7 +1110,7 @@ UTESTCASE interrupt_fd_loop(Utest *utest)
 	sched_yield();
 	sched_yield();
 	sched_yield();
-	// sleep(1); // if want to be extra sure
+	sleep(1); // if want to be extra sure
 
 	tt.a1->shutdown(); // request all the threads to die
 
@@ -1430,7 +1430,7 @@ UTESTCASE nextXtray_timeout(Utest *utest)
 	tm.tv_sec = 0;
 	tm.tv_nsec = 0;
 
-	UT_ASSERT(!ow1->nextXtray(true, tm));
+	UT_ASSERT(!ow1->nextXtray(true, &tm));
 	UT_ASSERT(!ow1->nextXtrayTimeout(0, 1)); // 1 nsec is short enough
 
 	ow1->markDead();

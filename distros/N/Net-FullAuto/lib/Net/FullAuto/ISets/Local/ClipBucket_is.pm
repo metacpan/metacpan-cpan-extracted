@@ -2021,7 +2021,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('..');
    $handle->{_cmd_handle}->print('opam init');
-   my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    $prompt=~s/\$$//;
    my $m=1;
    while ($m==1) {
@@ -2044,7 +2044,7 @@ END
    ($stdout,$stderr)=$handle->cmd(
       'opam switch create ocaml-base-compiler',600,'__display__');
    $handle->{_cmd_handle}->print('opam install google-drive-ocamlfuse');
-   my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    $prompt=~s/\$$//;
    my $n=1;
    while ($n==1) {

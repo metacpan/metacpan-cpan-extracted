@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -49,6 +49,20 @@ See the file COPYRIGHT for the copyright notice and license information
 		</varlistentry>
 
 		<varlistentry>
+			<term>Ordered</term>
+			<listitem>
+			Provides quick random access based on the key field comparison, expressed
+			similarly to the SQL ORDER BY statement. This is somewhat slower than the
+			Hashed index, especially, when the string fields are involved, but the
+			ordering goes as expected by humans. May be leaf or non-leaf.
+			As usual, the NULL values in the key fields are permitted, and are
+			considered less than any non-NULL value.  The array fields may also be
+			used as keys in the ordered indexes. The comparison of the strings
+			honors the order defined in the locale.
+			</listitem>
+		</varlistentry>
+
+		<varlistentry>
 			<term>FIFO</term>
 			<listitem>
 			Keeps the rows in the order they were received. There is no
@@ -63,18 +77,17 @@ See the file COPYRIGHT for the copyright notice and license information
 			<term>PerlSorted</term>
 			<listitem>
 			Provides random access based on the key field comparison, expressed
-			as a Perl function. This results in a predictable order of rows but
-			the execution of the Perl code makes it slower than the Hashed
-			index. May be leaf or non-leaf. Often also called simply <quote>Sorted</quote>.
+			as a Perl function. Provides the most flexibility for the Perl code
+			at the cost of the massively lower performance.
+			May be leaf or non-leaf. Often also called in the text simply <quote>Sorted</quote>.
 			</listitem>
 		</varlistentry>
 
 		<varlistentry>
 			<term>SimpleOrdered</term>
 			<listitem>
-			A Perl template on top of the PerlSorted index,
-			that allows to specify the keys in a more convenient way. 
-			Often also called simply <quote>Ordered</quote>.
+			Largely obsolete, the Perl implementation of the ordered index.
+			It is kept only as an educational example.
 			</listitem>
 		</varlistentry>
 		</variablelist>
@@ -97,6 +110,25 @@ $it = Triceps::IndexType->newHashed($optionName => $optionValue, ...);
 		</varlistentry>
 		</variablelist>
 
+<pre>
+$it = Triceps::IndexType->newOrdered($optionName => $optionValue, ...);
+</pre>
+
+		<para>
+		Creates an Ordered index type.  The only available and mandatory option is:
+		</para>
+		
+		<variablelist>
+		<varlistentry>
+			<term><pre>key => [ @fields ]</pre></term>
+			<listitem>
+			The argument is a reference to an array of strings
+			that specify the names of the key fields (<pre>key => ["f1", "!f2"]</pre>).
+			If the field name is prepended with a <quote>!</quote>, the ordering by this
+			field goes in the descending order, otherwise ascending.
+			</listitem>
+		</varlistentry>
+		</variablelist>
 
 <pre>
 $it = Triceps::IndexType->newFifo($optionName => $optionValue, ...);
@@ -360,9 +392,23 @@ $result = $it->isLeaf();
 
 		<para>
 		Returns the array of field names forming the key of this index. 
-		Currently works only on the Hashed index types. On the other index
+		Currently works only on the Hashed and Ordered index types. On the other index
 		types it returns an empty array, though probably a better support would
-		be available for the PerlSorted/SimpleOrdered indexes in the future.
+		be available for the PerlSorted indexes in the future.
+		</para>
+
+<pre>
+@fields = $indexType->getKeyExpr();
+</pre>
+
+		<para>
+		The array returned depends on the index type and is an "expression"
+		that can be used to build another instance of the same index type. For
+		the Hashed index it simply returns the same data as getKey(). For the
+		Ordered index it returns the list of keys with indications or order (so
+		the descending field names get prepended with a <quote>!</quote>. For the
+		indexes with Perl conditions it currently returns nothing, though in the
+		future might be used to store the condition.
 		</para>
 
 <pre>

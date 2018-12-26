@@ -1,15 +1,32 @@
 package Scalar::Util::Reftype;
+$Scalar::Util::Reftype::VERSION = '0.46';
+use 5.010;
 use strict;
 use warnings;
-use vars qw( $VERSION @ISA $OID @EXPORT @EXPORT_OK );
+
 use constant RESET_COUNTER  => -1;
-use constant HAS_FORMAT_REF => $] >= 5.008; # old ones don't have it
+# being kept for backwards compatibility, 5.10 and later have it
+use constant HAS_FORMAT_REF =>  1;
 use constant PRIMITIVES     => qw(
-    Regexp IO SCALAR ARRAY HASH CODE GLOB REF LVALUE
-),
-( HAS_FORMAT_REF ? qw(FORMAT) : () )
-;
-use subs qw( container class reftype type blessed object );
+    ARRAY
+    CODE
+    FORMAT
+    GLOB
+    HASH
+    IO
+    LVALUE
+    REF
+    Regexp
+    SCALAR
+);
+use subs qw(
+    blessed
+    class
+    container
+    object
+    reftype
+    type
+);
 use overload bool     => '_bool',
              fallback => 1,
             ;
@@ -17,11 +34,11 @@ use re           ();
 use Scalar::Util ();
 use base qw( Exporter );
 
-BEGIN {
-    $VERSION   = '0.44';
-    @EXPORT    = qw( reftype  );
-    @EXPORT_OK = qw( type  HAS_FORMAT_REF );
+our @EXPORT    = qw( reftype  );
+our @EXPORT_OK = qw( type  HAS_FORMAT_REF );
 
+my $OID;
+BEGIN {
     $OID = RESET_COUNTER;
     foreach my $type ( PRIMITIVES ) {
         constant->import( 'TYPE_' . $type,             ++$OID );
@@ -38,11 +55,12 @@ BEGIN {
     *class  = \*container;
     *type   = \*reftype;
     *object = \*blessed;
-    my @types;
+    my(@types, @obj_idx);
     no strict 'refs';
     foreach my $sym ( keys %{ __PACKAGE__ . q{::} } ) {
         if ( $sym =~ m{ \A TYPE_ (.+?) \z }xms ) {
             push @types, $1;
+            push @obj_idx, $sym;
         }
     }
 
@@ -54,13 +72,18 @@ BEGIN {
         }
     }
 
-    # http://perlmonks.org/?node_id=665339
-    if ( ! defined &re::is_regexp ) {
-        *re::is_regexp = sub($) {
-            require Data::Dump::Streamer;
-            return Data::Dump::Streamer::regex( shift );
+    *_dump = sub {
+        my $self = shift;
+        my %type = map { $self->$_() => $_          } @obj_idx;
+        my %val  = map { $type{$_}   => $self->[$_] } 0..$#obj_idx;
+        my $max  = ( sort { $b <=> $a } map { length $_ } keys %val)[0];
+        my $rm   = 'TYPE_';
+        $max -= length $rm;
+        for my $name ( sort { lc $a cmp lc $b } keys %val) {
+            (my $display = $name) =~ s{ \A $rm }{}xms;
+            printf "% ${max}s: %s\n", $display, $val{ $name } ? 'true' : '';
         }
-    }
+    };
 }
 
 sub reftype {
@@ -95,6 +118,7 @@ sub _analyze {
             last;
         }
     }
+
     return $self;
 }
 
@@ -105,6 +129,17 @@ sub _object {
     my($self, $object, $type)= @_;
     my $blessed = Scalar::Util::blessed( $object ) || return;
     my $rt      = Scalar::Util::reftype( $object );
+
+    # new perl (5.24+ ?) messes the detection
+    if (   $rt
+        && $blessed
+        #            new               5.10
+        && ( $rt eq 'REGEXP' || $rt eq 'SCALAR')
+        && $blessed eq 'Regexp'
+    ) {
+        return;
+    }
+
     $self->[BLESSED] = 1;
 
     if ( $rt eq 'IO' ) { # special case: IO
@@ -139,13 +174,15 @@ __END__
 
 =pod
 
-=head1 DEPRECATION NOTICE
-
-This module is B<DEPRECATED>. Please use L<Ref::Util> instead.
+=encoding UTF-8
 
 =head1 NAME
 
-Scalar::Util::Reftype - Alternate reftype() interface
+Scalar::Util::Reftype
+
+=head1 VERSION
+
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -169,6 +206,14 @@ This module is B<DEPRECATED>. Please use L<Ref::Util> instead.
 This is an alternate interface to C<Scalar::Util>'s C<reftype> function.
 Instead of manual type checking you can just call methods on the result
 to see if matches the desired type.
+
+=head1 DEPRECATION NOTICE
+
+This module is B<DEPRECATED>. Please use L<Ref::Util> instead.
+
+=head1 NAME
+
+Scalar::Util::Reftype - Alternate reftype() interface
 
 =head1 FUNCTIONS
 
@@ -352,5 +397,16 @@ C<t/op/ref.t> in perl source
 C<ref> in L<perlfunc>.
 
 =back
+
+=head1 AUTHOR
+
+Burak Gursoy <burak@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Burak Gursoy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

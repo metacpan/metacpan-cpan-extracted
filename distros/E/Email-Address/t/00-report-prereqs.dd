@@ -27,7 +27,8 @@ do { my $x = {
                                    'Encode::MIME::Header' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Test::More' => '0.96'
+                                   'Test::More' => '0.96',
+                                   'Time::HiRes' => '0'
                                  }
                  }
      };

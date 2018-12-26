@@ -1,5 +1,5 @@
 package Array::FIFO;
-$Array::FIFO::VERSION = '0.10';
+$Array::FIFO::VERSION = '0.12';
 use Moose;
 use List::Util qw(sum0);
 
@@ -12,7 +12,7 @@ Array::FIFO - A Simple limitable FIFO array, with sum and average methods
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ around add => sub {
     $last;
 };
 
-has sum     => ( is => 'rw', isa => 'Int', clearer => 'clear_sum'    , lazy => 1, builder => '_build_sum' );
+has sum     => ( is => 'rw', isa => 'Num', clearer => 'clear_sum'    , lazy => 1, builder => '_build_sum' );
 has average => ( is => 'rw', isa => 'Num', clearer => 'clear_average', lazy => 1, builder => '_build_average' );
 
 

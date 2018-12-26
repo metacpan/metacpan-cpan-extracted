@@ -104,11 +104,11 @@ sub connect_connect ( $self, $uri, @args ) {
     # connect error
     return $h if !$h;
 
-    my $buf = "CONNECT $uri->{host}:" . $uri->connect_port . " HTTP/1.1$CRLF";
+    my $buf = "CONNECT $uri->{host}:" . $uri->connect_port . " HTTP/1.1\r\n";
 
-    $buf .= 'Proxy-Authorization: Basic ' . $self->{uri}->userinfo_b64 . $CRLF if $self->{uri}->{userinfo};
+    $buf .= 'Proxy-Authorization: Basic ' . $self->{uri}->userinfo_b64 . "\r\n" if $self->{uri}->{userinfo};
 
-    $buf .= $CRLF;
+    $buf .= "\r\n";
 
     $h->write($buf) or return $h;
 
@@ -156,7 +156,7 @@ sub connect_socks4 ( $self, $uri, @args ) {
 
     $buf .= $self->{uri}->{userinfo} // $EMPTY;
 
-    $buf .= "\N{NULL}";
+    $buf .= "\x00";
 
     $h->write($buf) or return $h;
 
@@ -363,9 +363,6 @@ sub finish_thread ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    2 | 155, 212, 217, 235,  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 273, 278, 283        |                                                                                                                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 165, 273, 278, 283   | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##

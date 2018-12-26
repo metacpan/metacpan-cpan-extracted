@@ -21,8 +21,10 @@ foreach my $file (@modules) {
     my $fail;
     if (open ERR, '<err') {
         my $stderr = join('', <ERR>);
-        if ($stderr !~ /^$file syntax OK$/) {
+        if ($stderr !~ /^$file syntax OK$/m) {
             $fail = $stderr;
+            # it's a terrible job to whitewash warnings we cannot prevent
+            $fail =~ s/Argument \S+ isn't numeric.*\s*//;
         }
     } else {
         $fail = "Could not open 'err' file after running $file";

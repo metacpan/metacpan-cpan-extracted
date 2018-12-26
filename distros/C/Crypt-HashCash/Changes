@@ -1,5 +1,8 @@
 Revision history for Crypt-HashCash
 
+1.130   Sat Dec 22 18:42:25 2018 -0800
+        Fix vaultid serialization bug in keygen
+
 1.129   Tue Oct 16 16:56:36 2018 -0700
     	Change license to OAL 2.0
 

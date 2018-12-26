@@ -1,8 +1,7 @@
 package Task::Lingua::Any::Numbers;
+$Task::Lingua::Any::Numbers::VERSION = '0.20';
 use strict;
 use warnings;
-
-our $VERSION = '0.19';
 
 1;
 
@@ -10,11 +9,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-Task::Lingua::Any::Numbers - Installs all number to word modules.
+Task::Lingua::Any::Numbers
+
+=head1 VERSION
+
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -22,11 +25,12 @@ None.
 
 =head1 DESCRIPTION
 
-This document describes version C<0.19> of C<Task::Lingua::Any::Numbers>
-released on C<5 July 2016>.
-
 This is a tool to install everything needed for a full L<Lingua::Any::Numbers>
 interface. See the L<Task> module for the rationale.
+
+=head1 NAME
+
+Task::Lingua::Any::Numbers - Installs all number to word modules.
 
 =head1 PREREQUISITIES
 
@@ -58,15 +62,13 @@ L<Lingua::Any::Numbers>, L<Task>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

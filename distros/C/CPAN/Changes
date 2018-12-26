@@ -1,3 +1,155 @@
+2018-12-23  k  <andk@cpan.org>
+
+	* release 2.22
+
+	* one week after the TRIAL release cpantesters have produced 306
+	pass and 0 fail reports on 157 different configurations
+
+	* no functional change over 2.22-TRIAL; only one change in the
+	distroprefs directory which is not used per default and a minor
+	change in the Makefile.PL to ensure that the signature for the
+	tarball is produced with the current version of Module::Signature.
+
+2018-12-16  k  <andk@cpan.org>
+
+	* release 2.22-TRIAL
+
+	* fix: erroneous propagation from build_requires to requires
+	(Andreas Koenig)
+
+	* fix: ensure that the post install hook is always called (Andreas
+	Koenig)
+
+	* fix: the single blank line output that initializing CPAN does
+	when it's not having to report anything (Achim Gratz)
+
+	* doc fix: Correct spelling of Perl 5 command-line switch (James E
+	Keenan)
+
+	* doc fix: clarify use of pop/splice in the manpage of the
+	Specfile plugin (Andreas Koenig)
+
+	* a tiny amount of new and updated distroprefs files
+
+2018-09-22  k  <andk@cpan.org>
+
+	* release 2.21-TRIAL
+
+	* Avoid hash slice autovivification (Reini Urban)
+
+	* make chdir argument always stringified (Reini Urban)
+
+	* support JSON::PP as fallback for `reports` command when no YAML
+	is available (Michiel Beijen)
+
+	* fix #116507: cpan -j relative path issue (brian d foy)
+
+	* Bug fix for plugin `Specfile`: Build.PL script_files may be
+	non-ARRAY (Bernhard Graf)
+
+	* Fix tiny POD error (Aaron Crane)
+
+	* Added suggestion to the user to fix the common 'Terminal does
+	not support AddHistory error.' (Howard)
+
+	* fix #87474: build_require_install_policy=no: runtime dependency
+	not installed if also listed as build_require (Olivier Mengue, Slaven
+	Rezić, Peter Rabbitson, Andreas König)
+
+	* We are finally under the Travis umbrella (Katherine Spice)
+
+	* Adapt Jim Keenan's patch for _download status checking (brian d
+	foy)
+
+	* Use the right key in cpan(1) -g log message (brian d foy)
+
+	* address #124726: check for having EEXIST before using it (thanks
+	to Sergey Aleynikov for debugging)
+
+	* fix an unini warning from recompile() (thanks to frederick for
+	reporting)
+
+	* fix recently introduced bug: isa_perl() returns perl version
+	again and a test is added to ensure that (thanks to frederick for
+	reporting)
+
+	* a modest amount of new, imported and updated distroprefs files
+
+2017-11-26  k  <andk@cpan.org>
+
+	* release 2.20-TRIAL
+
+	* bugfix #123691: fix wrong wording of result message when r
+	command hits an empty set (Thank to lorenzo taviani for reporting)
+
+	* bugfix: remove spurious .= operator where an ordinary assignment
+	was intended (Andreas Koenig)
+
+2017-11-05  k  <andk@cpan.org>
+
+	* release 2.19-TRIAL
+
+	* bugfix #118921: make the null logger a non-null logger (Thanks
+	to Alexandr Ciornii and Zefram for reporting)
+
+	* tighten regexp in isa_perl (#123482) so that perl5-0.21 be
+	recognized as module (Thanks to Father Chrysostomos for the
+	request)
+
+	* bugfix for cleanup_after_install: do not attempt to cleanup the
+	current directory when the current directory is the build
+	directory
+
+	* improve robustness when CPAN::Reporter::record_command fails
+
+	* improve diagnostics when CPAN::Meta::Requirements is too old or
+	missing; bootstrapping older perls with new CPAN.pm should be
+	easier now
+
+	* improve robustness on file open issues
+
+	* improve robustness when yaml files cannot be loaded
+
+	* bugfix #121914: cpan client may fail when something is
+	both recommended AND required (Thanks to Sergey Aleynikov for the
+	report)
+
+	* package the PAUSE2019.pub public key for signatures
+
+	* bugfix on cpan script regarding -x option (H.Merijn Brand)
+
+	* couple of updates on distroprefs and minor fixes
+
+2017-03-30  k  <andk@cpan.org>
+
+	* release 2.18-TRIAL
+
+	* inject PERL_USE_UNSAFE_INC=1 also in "install" (Graham Knop,
+	Leon Timmermans, Andreas Koenig)
+
+	* bugfix: address #120781; protect circular Bundle definitions
+	from deep recursion (Andreas Koenig)
+
+	* various distroprefs files updated
+
+2017-02-16  k  <andk@cpan.org>
+
+	* release 2.17-TRIAL2
+
+	* bump version number for CPAN/Distribution.pm
+
+2017-02-15  k  <andk@cpan.org>
+
+	* release 2.17-TRIAL
+
+	* address #108: inject PERL_USE_UNSAFE_INC=1 on prepare, make, and
+	test; survival strategy for perls compiled with
+	-Ddefault_inc_excludes_dot (Todd Rinaldo, Graham Knop, Andreas
+	Koenig)
+
+	* make tests more robust against parallel runs and missing unzip
+	program (Andreas Koenig)
+
 2017-02-14  k  <andk@cpan.org>
 
 	* release 2.16

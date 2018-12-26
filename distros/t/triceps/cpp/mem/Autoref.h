@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -34,6 +34,7 @@ class Autoref
 {
 public:
 	typedef Target *Ptr;
+	typedef const Target *ConstPtr;
 
 	// Casting NULL to Autoref is not easy, so provide an obvious way.
 	static Ptr null()
@@ -135,23 +136,32 @@ public:
 		return *this;
 	}
 
-	bool operator==(const Autoref &ar)
+	bool operator==(const Autoref &ar) const
 	{
 		return (ref_ == ar.ref_);
 	}
-	bool operator!=(const Autoref &ar)
+	bool operator!=(const Autoref &ar) const
 	{
 		return (ref_ != ar.ref_);
 	}
 
+	bool eq(ConstPtr p) const
+	{
+		return (ref_ == p);
+	}
+	bool ne(ConstPtr p) const
+	{
+		return (ref_ != p);
+	}
+
 	// This is for the automatic casts of the content pointer types
 	template <typename OtherTarget>
-	bool operator==(const Autoref<OtherTarget> &ar)
+	bool operator==(const Autoref<OtherTarget> &ar) const
 	{
 		return (ref_ == ar.get());
 	}
 	template <typename OtherTarget>
-	bool operator!=(const Autoref<OtherTarget> &ar)
+	bool operator!=(const Autoref<OtherTarget> &ar) const
 	{
 		return (ref_ != ar.get());
 	}
@@ -210,6 +220,7 @@ public:
 // once, such as when returning a newly allocated value from a function,
 // and then this reference just moved to autoref. It's kind_of like STL autoptr.
 // But for now just default to the same as Autoref.
+// In C++14 it can be replaced with the move semantics.
 
 template <typename Target>
 class Onceref : public Autoref<Target>

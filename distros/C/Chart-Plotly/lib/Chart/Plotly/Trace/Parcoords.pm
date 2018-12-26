@@ -8,7 +8,6 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Parcoords::Dimension;
 use Chart::Plotly::Trace::Parcoords::Domain;
-use Chart::Plotly::Trace::Parcoords::Hoverlabel;
 use Chart::Plotly::Trace::Parcoords::Labelfont;
 use Chart::Plotly::Trace::Parcoords::Line;
 use Chart::Plotly::Trace::Parcoords::Rangefont;
@@ -16,7 +15,7 @@ use Chart::Plotly::Trace::Parcoords::Stream;
 use Chart::Plotly::Trace::Parcoords::Tickfont;
 use Chart::Plotly::Trace::Parcoords::Transform;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: Parallel coordinates for multidimensional exploratory data analysis. The samples are specified in `dimensions`. The colors are set in `line.color`.
 
@@ -77,9 +76,6 @@ has hoverinfosrc => ( is            => "rw",
                       isa           => "Str",
                       documentation => "Sets the source reference on plot.ly for  hoverinfo .",
 );
-
-has hoverlabel => ( is  => "rw",
-                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcoords::Hoverlabel", );
 
 has ids => (
     is  => "rw",
@@ -144,6 +140,13 @@ has transforms => ( is  => "rw",
 has uid => ( is  => "rw",
              isa => "Str", );
 
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
+
 has visible => (
     is => "rw",
     documentation =>
@@ -165,7 +168,7 @@ Chart::Plotly::Trace::Parcoords - Parallel coordinates for multidimensional expl
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -264,8 +267,6 @@ Determines which trace information appear on hover. If `none` or `skip` are set,
 
 Sets the source reference on plot.ly for  hoverinfo .
 
-=item * hoverlabel
-
 =item * ids
 
 Assigns id labels to each datum. These ids for object constancy of data points during animation. Should be an array of strings, not numbers or any other type.
@@ -307,6 +308,10 @@ Determines whether or not an item corresponding to this trace is shown in the le
 =item * transforms
 
 =item * uid
+
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
 
 =item * visible
 

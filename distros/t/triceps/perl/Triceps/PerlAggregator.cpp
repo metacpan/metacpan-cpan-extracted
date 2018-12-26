@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -39,9 +39,9 @@ PerlAggregatorType::PerlAggregatorType(const string &name, const RowType *rt,
 
 PerlAggregatorType::PerlAggregatorType(const PerlAggregatorType &agg, HoldRowTypes *holder):
 	AggregatorType(agg, holder),
-	cbInit_(agg.cbInit_->deepCopy()),
-	cbConstructor_(agg.cbConstructor_->deepCopy()),
-	cbHandler_(agg.cbHandler_->deepCopy()),
+	cbInit_(PerlCallback::deepCopy(agg.cbInit_)),
+	cbConstructor_(PerlCallback::deepCopy(agg.cbConstructor_)),
+	cbHandler_(PerlCallback::deepCopy(agg.cbHandler_)),
 	hrt_(holder)
 { }
 
@@ -112,7 +112,7 @@ void PerlAggregatorType::initialize(TableType *tabtype, IndexType *intype)
 	if (initialized_)
 		return; // skip the second initialization
 
-	if (errors_->hasError())
+	if (errors_.hasError())
 		return; // already failed, don't try any more
 
 	dSP;
@@ -137,7 +137,7 @@ void PerlAggregatorType::initialize(TableType *tabtype, IndexType *intype)
 
 	hrt_ = NULL; // its work is done
 
-	if (errors_->hasError()) {
+	if (errors_.hasError()) {
 		return; // no point in going further
 	}
 

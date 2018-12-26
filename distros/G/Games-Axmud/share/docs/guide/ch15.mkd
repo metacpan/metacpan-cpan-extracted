@@ -819,7 +819,7 @@ Using this toolbar is as simple as clicking on a coloured button, then clicking 
 
 If you click on a selected room, the room flag is toggled in any other selected rooms at the same time. (If you're not careful, this can mean that a particular room flag is turned *on* in some rooms, and turned *off* in others!)
 
-The **Quick paint without resetting** button, when selected, allows you to click on rooms several times without having to click the coloured button each time.
+The **Quick paint without resetting**, when selected, allows you to click on rooms several times without having to click the coloured button each time.
 
 ##<a name="15.23">15.23 Colouring the background map</a>
 

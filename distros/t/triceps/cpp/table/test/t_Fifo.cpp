@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -59,7 +59,7 @@ UTESTCASE fifoIndex(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -69,7 +69,7 @@ UTESTCASE fifoIndex(Utest *utest)
 	UT_IS(t->getLabel()->getName(), "t.out");
 
 	Autoref<IndexType> revixt = tt->findSubIndex("reverse");
-	UT_ASSERT(revixt);
+	UT_ASSERT(revixt.ne(NO_INDEX_TYPE));
 
 	// create a matrix of records
 
@@ -202,7 +202,7 @@ UTESTCASE fifoIndexLimit(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -305,7 +305,7 @@ UTESTCASE fifoIndexJumping(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -413,7 +413,7 @@ UTESTCASE fifoIndexLimitReplace(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -423,7 +423,7 @@ UTESTCASE fifoIndexLimitReplace(Utest *utest)
 	UT_IS(t->getLabel()->getName(), "t.out");
 
 	IndexType *fifot = tt->findSubIndex("fifo");
-	UT_ASSERT(fifot != NULL);
+	UT_ASSERT(fifot != NO_INDEX_TYPE);
 
 	// create a matrix of records
 
@@ -553,7 +553,7 @@ UTESTCASE fifoIndexLimitNoReplace(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -665,23 +665,23 @@ UTESTCASE deepNested(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
 
 	Autoref<IndexType> parallel1 = tt->findSubIndex("parallel1");
-	UT_ASSERT(!parallel1.isNull());
+	UT_ASSERT(parallel1.ne(NO_INDEX_TYPE));
 	Autoref<IndexType> level1 = tt->findSubIndex("level1");
-	UT_ASSERT(!level1.isNull());
+	UT_ASSERT(level1.ne(NO_INDEX_TYPE));
 	Autoref<IndexType> parallel2 = tt->findSubIndex("level1")->findSubIndex("parallel2");
-	UT_ASSERT(!parallel2.isNull());
+	UT_ASSERT(parallel2.ne(NO_INDEX_TYPE));
 	Autoref<IndexType> level2 = tt->findSubIndex("level1")->findSubIndex("level2");
-	UT_ASSERT(!level2.isNull());
+	UT_ASSERT(level2.ne(NO_INDEX_TYPE));
 	Autoref<IndexType> parallel3 = tt->findSubIndex("level1")->findSubIndex("level2")->findSubIndex("parallel3");
-	UT_ASSERT(!parallel3.isNull());
+	UT_ASSERT(parallel3.ne(NO_INDEX_TYPE));
 	Autoref<IndexType> level3 = tt->findSubIndex("level1")->findSubIndex("level2")->findSubIndex("level3");
-	UT_ASSERT(!level3.isNull());
+	UT_ASSERT(level3.ne(NO_INDEX_TYPE));
 
 	// create a matrix of records
 

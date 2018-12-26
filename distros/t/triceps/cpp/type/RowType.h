@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -89,6 +89,7 @@ public:
 	virtual bool equals(const Type *t) const;
 	virtual bool match(const Type *t) const;
 	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const;
+	virtual int cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const;
 
 	// just make the guts visible read-only to anyone
 	const vector<Field> &fields() const
@@ -105,6 +106,14 @@ public:
 	// @param fname - field name
 	// @return - index of the field or -1
 	int findIdx(const string &fname) const;
+
+	// Get the size of one object of the field's type.
+	// @param nf - field number, starting from 0
+	// @return - size of one object of the field's type
+	int fieldTypeSize(int nf) const
+	{
+		return fields_[nf].type_->getSize();
+	}
 
 	// Get the count of fields
 	int fieldCount() const;
@@ -123,9 +132,37 @@ public:
 	// @param row - row to operate on
 	// @param nf - field number, starting from 0
 	// @param ptr - returned pointer to field data
-	// @param len - returned field data length; for a NULL field will be 0
+	// @param len - returned field data length in bytes; for a NULL field will be 0
 	// @return - true if field is NOT null
 	virtual bool getField(const Row *row, int nf, const char *&ptr, intptr_t &len) const = 0;
+
+	// Get all information to access the array field data.
+	// @param row - row to operate on
+	// @param nf - field number, starting from 0
+	// @param ptr - returned pointer to field data
+	// @param sz - returned field array size; for a NULL field will be 0
+	// @return - true if field is NOT null
+	template<typename Valtype>
+	bool getArrayField(const Row *row, int nf, const Valtype *&ptr, intptr_t &sz)
+	{
+		const char *cptr;
+		bool res = getField(row, nf, cptr, sz);
+		ptr = (const Valtype *)cptr;
+		sz /= fieldTypeSize(nf);
+		return res;
+	}
+
+	// Get the array size information for a field.
+	// @param row - row to operate on
+	// @param nf - field number, starting from 0
+	// @return - field array size; for a NULL field will be 0
+	intptr_t getArraySize(const Row *row, int nf)
+	{
+		const char *cptr;
+		intptr_t sz;
+		getField(row, nf, cptr, sz);
+		return sz / fieldTypeSize(nf);
+	}
 
 	// the rows are immutable, so the only way to change a row 
 	// is by building a new one

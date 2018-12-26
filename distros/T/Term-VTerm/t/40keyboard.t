@@ -11,6 +11,9 @@ use Term::VTerm;
 my $vt = Term::VTerm->new( cols => 80, rows => 25 );
 $vt->set_utf8( 1 );
 
+# Symbolic keys require state
+$vt->obtain_state;
+
 # idle
 {
    my $len = $vt->output_read( my $buf, 128 );
@@ -44,6 +47,17 @@ $vt->set_utf8( 1 );
    my $len = $vt->output_read( my $buf, 128 );
    is( $len, 2, '->output_read after keyboard push unichar high' );
    is( $buf, do { no utf8; "é" }, '$buf from output_read contains UTF-8 bytes' );
+}
+
+# symbolic key
+{
+   use Term::VTerm qw( :keys );
+
+   $vt->keyboard_key( KEY_ENTER );
+
+   my $len = $vt->output_read( my $buf, 128 );
+   is( $len, 1, '->output_read after keyboard push symbolic ENTER' );
+   is( $buf, chr 0x0d, '$buf from output_read' );
 }
 
 done_testing;

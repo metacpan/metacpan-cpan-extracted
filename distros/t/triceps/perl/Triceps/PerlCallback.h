@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -54,13 +54,16 @@ public:
 	// since it may have a longer life than the thread that created it.
 	// Otherwise the Perl memory management will go haywired.
 	//
-	// The pointer to this object may be NULL, this will transparently
-	// result in NULL returned.
+	// This method can safely copy a NULL pointer.
 	//
 	// This is an unusual deep copy since it doesn't restore
 	// the row types preserved in the PerlValues, and so it doesn't
 	// need the HoldRowTypes. Instead it's needed for initialize().
-	PerlCallback *deepCopy();
+	static inline PerlCallback *deepCopy(PerlCallback *orig) {
+		if (orig == NULL)
+			return NULL;
+		return new PerlCallback(orig);
+	}
 
 	// Clear the contents, decrementing the references to objects.
 	void clear();

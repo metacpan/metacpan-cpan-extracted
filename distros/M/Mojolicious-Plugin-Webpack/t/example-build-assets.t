@@ -1,12 +1,12 @@
 use Test::More;
 use Test::Mojo;
 
-# Run with MOJO_WEBPACK_RUN=1 prove -vl t/build-assets.t
+# Run with MOJO_WEBPACK_BUILD=1 prove -vl t/build-assets.t
 plan skip_all => "TEST_BUILD_ASSETS=1" unless $ENV{TEST_BUILD_ASSETS} or $ENV{TEST_ALL};
 
 # Load the app and make a test object
-$ENV{MOJO_MODE}        = 'production';
-$ENV{MOJO_WEBPACK_RUN} = 1;
+$ENV{MOJO_MODE}          = 'production';
+$ENV{MOJO_WEBPACK_BUILD} = 1;
 use Mojolicious::Lite;
 plugin 'Webpack', {process => [qw(css js)]};
 get '/' => 'index';

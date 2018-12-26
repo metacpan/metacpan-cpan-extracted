@@ -1,6 +1,18 @@
+# PODNAME: Lingua::TR::Numbers - Turkish documentation
+
+__END__
+
 =pod
 
-=encoding utf8
+=encoding UTF-8
+
+=head1 NAME
+
+Lingua::TR::Numbers - Turkish documentation
+
+=head1 VERSION
+
+version 0.34
 
 =head1 AD
 
@@ -78,7 +90,7 @@ Burak Gürsoy, E<lt>burakE<64>cpan.orgE<gt>
 
 =head1 TELİF
 
-Telif hakkı: (c) 2006-2009 Burak Gürsoy. Tüm hakları saklıdır.
+Telif hakkı: (c) 2006-2019 Burak Gürsoy. Tüm hakları saklıdır.
 
 Bu modül, Sean M. Burke' ün Lingua::EN::Numbers
 modülü üzerine inşa edilmiştir, ve ilgili modülün
@@ -91,5 +103,16 @@ Lingua::EN::Numbers telif hakkı: (c) 2005, Sean M. Burke.
 Bu kütüphane ücretsiz bir yazılımdır; Perl sürüm 5.10.1 veya istediğiniz
 taktirde, daha yüksek bir Perl 5 sürümünün lisansına bağlı olarak; Perl ile
 aynı lisans altında tekrar dağıtabilir ve/veya değiştirebilirsiniz.
+
+=head1 AUTHOR
+
+Burak Gursoy <burak@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Burak Gursoy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

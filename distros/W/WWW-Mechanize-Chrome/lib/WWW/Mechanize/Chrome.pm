@@ -21,7 +21,7 @@ use Time::HiRes qw(usleep);
 use Storable 'dclone';
 use HTML::Selector::XPath 'selector_to_xpath';
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 our @CARP_NOT;
 
 =encoding utf-8
@@ -509,8 +509,8 @@ sub _find_free_port( $class, $start ) {
     $port;
 }
 
-sub _wait_for_socket_connection( $class, $host, $port, $timeout ) {
-    my $wait = time + ($timeout || 20);
+sub _wait_for_socket_connection( $class, $host, $port, $timeout=20 ) {
+    my $wait = time + $timeout;
     while ( time < $wait ) {
         my $t = time;
         my $socket = IO::Socket::INET->new(
@@ -520,11 +520,18 @@ sub _wait_for_socket_connection( $class, $host, $port, $timeout ) {
         );
         if( $socket ) {
             close $socket;
-            sleep 1;
+            sleep(1);
             last;
         };
-        sleep 1 if time - $t < 1;
+        sleep(1) if time - $t < 1;
     }
+    my $res = 1;
+    if( time >= $wait ) {
+        # No logger available yet
+        #warn "Got timeout while waiting for Chrome at $host:$port";
+        $res = 0;
+    };
+    $res
 };
 
 sub spawn_child_win32( $self, @cmd ) {
@@ -635,7 +642,10 @@ sub new($class, %options) {
         $self->{ kill_pid } = 1;
 
         # Just to give Chrome time to start up, make sure it accepts connections
-        $self->_wait_for_socket_connection( $host, $self->{port}, $self->{startup_timeout} || 20);
+        my $ok = $self->_wait_for_socket_connection( $host, $self->{port}, $self->{startup_timeout} || 20);
+        if( ! $ok) {
+            die "Timeout while connecting to $host:$self->{port}. Do you maybe have a non-debug instance of Chrome already running?";
+        };
     } else {
 
         # Assume some defaults for the already running Chrome executable
@@ -683,9 +693,9 @@ sub _setup_driver_future( $self, %options ) {
 sub _connect( $self, %options ) {
     my $err;
     $self->_setup_driver_future( %options )
-        ->catch( sub(@args) {
+    ->catch( sub(@args) {
         $err = $args[0];
-        Future->done( @args );
+        Future->fail( @args );
     })->get;
 
     # if Chrome started, but so slow or unresponsive that we cannot connect
@@ -695,7 +705,7 @@ sub _connect( $self, %options ) {
             local $SIG{CHLD} = 'IGNORE';
             kill 'SIGKILL' => $pid;
         };
-        die $err;
+        croak $err;
     }
 
     # Create new world if needed
@@ -1804,6 +1814,15 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
             $response = $self->httpResponseFromChromeResponse( $res );
             $response->request( $request );
 
+    } elsif ( $res = $events{ 'Page.navigatedWithinDocument' }) {
+        # A fake response, just in case anybody checks
+        $response = HTTP::Response->new(
+            200, # is 0 for files?!
+            "OK",
+            HTTP::Headers->new(),
+        );
+        $response->request( $request );
+
     } elsif( $res = $events{ 'Network.loadingFailed' }) {
     #warn "Network.loadingFailed";
         $response = $self->httpResponseFromChromeNetworkFail( $res );
@@ -1849,7 +1868,10 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
     } else {
         require Data::Dumper;
         warn Data::Dumper::Dumper( $events );
-        die "Didn't see a 'Network.responseReceived' event for frameId $frameId, requestId $requestId, cannot synthesize response";
+        die join " ", "Chrome behaviour problem: Didn't see a",
+                      "'Network.responseReceived' event for frameId $frameId,",
+                      "requestId $requestId, cannot synthesize response.",
+                      "I saw " . join ",", sort keys %events;
     };
     $response
 }
@@ -3812,8 +3834,7 @@ sub _field_by_name {
     @fields
 }
 
-sub get_set_value {
-    my ($self,%options) = @_;
+sub get_set_value($self,%options) {
     my $set_value = exists $options{ value };
     my $value = delete $options{ value };
     my $pre   = delete $options{pre}  || $self->{pre_value};
@@ -3971,8 +3992,8 @@ sub submit($self,$dom_form = $self->current_form) {
 
 This method lets you select a form from the previously fetched page,
 fill in its fields, and submit it. It combines the form_number/form_name,
-set_fields and click methods into one higher level call. Its arguments are
-a list of key/value pairs, all of which are optional.
+C<< ->set_fields >> and C<< ->click methods >> into one higher level call. Its
+arguments are a list of key/value pairs, all of which are optional.
 
 =over 4
 
@@ -4006,8 +4027,7 @@ will be ignored.
 
 =cut
 
-sub submit_form {
-    my ($self,%options) = @_;
+sub submit_form($self,%options) {;
 
     my $form = delete $options{ form };
     my $fields;
@@ -4057,8 +4077,7 @@ has the field value and its number as the 2 elements.
 
 =cut
 
-sub set_fields {
-    my ($self, %fields) = @_;
+sub set_fields($self, %fields) {;
     my $f = $self->current_form;
     if (! $f) {
         croak "Can't set fields: No current form set.";
@@ -4837,6 +4856,9 @@ out of them or dumps them to disk as sequential images.
   $mech->setScreenFrameCallback( \&saveFrame );
   ... do stuff ...
   $mech->setScreenFrameCallback( undef ); # stop recording
+
+If you want a premade screencast receiver for debugging headless Chrome
+sessions, see L<Mojolicious::Plugin::PNGCast>.
 
 =cut
 

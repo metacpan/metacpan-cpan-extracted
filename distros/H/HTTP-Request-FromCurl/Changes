@@ -1,3 +1,26 @@
+0.09 2018-12-19
+    * Sequence expansion
+      Curl and this module now support specifying sequences of URLs such as
+      C< https://example.com/[1-100] > , which expands to
+      C< https://example.com/1 >, C< https://example.com/2 > ...
+      C< https://example.com/100 >
+
+      Such sequences are expanded in-memory at this time, courtesy of
+      Cartesian Products
+
+    * List expansion
+
+      Curl supports specifying sequences of URLs such as
+      C< https://{www,ftp}.example.com/ > , which expands to
+      C< https://www.example.com/ >, C< https://ftp.example.com/ >.
+
+      Such sequences are expanded in-memory at this time, courtesy of
+      Cartesian Products
+    * Added option to limit the number of expanded requests
+    * Added ->clone() method to HTTP::Request::CurlOptions
+    * We now need HTTP::Request::Generator 0.06, for bug fixes in URL generation
+      in that module
+
 0.08 2018-12-06
     * Add C<implicit_headers> option to leave out headers when generating code
     * Handle -L , --location

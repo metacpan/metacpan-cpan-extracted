@@ -1,11 +1,10 @@
 package Lingua::TR::Numbers;
-use 5.006;
+$Lingua::TR::Numbers::VERSION = '0.34';
+use 5.010;
 use utf8;
 use strict;
 use warnings;
 use subs qw( _log );
-
-our $VERSION = '0.32';
 
 use constant RE_E2TR => qr{
     \A
@@ -268,26 +267,17 @@ sub _log {
 
 1;
 
-__END__
-
-#1 milyon    1.000.000
-#1 milyar    1.000.000.000
-#1 trilyon   1.000.000.000.000
-#1 katrilyon 1.000.000.000.000.000
-#1 kentilyon 1.000.000.000.000.000.000
-#1 seksilyon 1.000.000.000.000.000.000.000
-#1 septilyon 1.000.000.000.000.000.000.000.000
-#1 oktilyon  1.000.000.000.000.000.000.000.000.000
-#1 nobilyon  1.000.000.000.000.000.000.000.000.000.000
-#1 desilyon  1.000.000.000.000.000.000.000.000.000.000.000
-
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-Lingua::TR::Numbers - Converts numbers into Turkish text.
+Lingua::TR::Numbers
+
+=head1 VERSION
+
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -305,9 +295,6 @@ prints:
 
 =head1 DESCRIPTION
 
-This document describes version C<0.32> of C<Lingua::TR::Numbers>
-released on C<5 July 2016>.
-
 Lingua::TR::Numbers turns numbers into Turkish text. It exports
 (upon request) two functions, C<num2tr> and C<num2tr_ordinal>. 
 Each takes a scalar value and returns a scalar value. The return 
@@ -321,6 +308,10 @@ This module also understands exponential notation -- it turns "4E9" into
 into "sonsuz", "eksi sonsuz" and "sayı-değil" respectively.
 
 Any commas in the input numbers are ignored.
+
+=head1 NAME
+
+Lingua::TR::Numbers - Converts numbers into Turkish text.
 
 =head1 FUNCTIONS
 
@@ -373,15 +364,27 @@ Lingua::EN::Numbers is Copyright (c) 2005, Sean M. Burke.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut
+
+__END__
+
+#1 milyon    1.000.000
+#1 milyar    1.000.000.000
+#1 trilyon   1.000.000.000.000
+#1 katrilyon 1.000.000.000.000.000
+#1 kentilyon 1.000.000.000.000.000.000
+#1 seksilyon 1.000.000.000.000.000.000.000
+#1 septilyon 1.000.000.000.000.000.000.000.000
+#1 oktilyon  1.000.000.000.000.000.000.000.000.000
+#1 nobilyon  1.000.000.000.000.000.000.000.000.000.000
+#1 desilyon  1.000.000.000.000.000.000.000.000.000.000.000
+

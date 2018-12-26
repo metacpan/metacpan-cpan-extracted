@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 0.06
 
 SYNOPSIS
 
@@ -23,7 +23,8 @@ DESCRIPTION
     Modifies Makefile.PL or Build.PL
 
       Adds code to change the install location so that your dist won't be
-      installed unless the environment variable PERL_ALT_INSTALL is set.
+      installed unless the environment variable PERL_ALT_INSTALL is set to
+      OVERWRITE.
 
     Updates the no_index meta
 
@@ -32,9 +33,10 @@ DESCRIPTION
 
     Sets the dist name property
 
-      If it isn't already specified in your dist.ini file. It will
-      determine this from the Alt:: module in your distribution. If you
-      have more than one Alt:: module it is an error.
+      If the name isn't already set in your dist.ini by some other means,
+      this plugin will set the name based on the Alt module. If you have
+      more than one Alt module (which would be unusual) then it is an error
+      unless you set the name by some other means.
 
 CAVEATS
 

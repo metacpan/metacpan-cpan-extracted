@@ -56,9 +56,7 @@ my $build = Module::Build->new(
       'Test::More' => '0.88', # done_testing
       'Test::Refcount' => 0,
    },
-   auto_configure_requires => 1,
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

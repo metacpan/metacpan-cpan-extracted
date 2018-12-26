@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Transaction;
-$RT::Client::REST::Transaction::VERSION = '0.55';
+$RT::Client::REST::Transaction::VERSION = '0.56';
 use base 'RT::Client::REST::Object';
 
 use Params::Validate qw(:types);
@@ -143,7 +143,7 @@ RT::Client::REST::Transaction - transaction object representation.
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 SYNOPSIS
 

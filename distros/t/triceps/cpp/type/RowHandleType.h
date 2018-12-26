@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -36,6 +36,7 @@ public:
 	// from Type
 	virtual Erref getErrors() const;
 	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const;
+	virtual int cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const;
 
 	// Factory for the new handles.
 	// @param r - the row to refer, the caller must have it already incref-ed.

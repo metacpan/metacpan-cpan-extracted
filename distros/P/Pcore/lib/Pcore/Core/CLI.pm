@@ -231,7 +231,7 @@ sub _parse_cmd ( $self, $argv ) {
             return $self->help_usage( [qq[command "$res->{cmd}" is unknown]] );
         }
         elsif ( $possible_commands->@* > 1 ) {
-            return $self->help_error( qq[command "$res->{cmd}" is ambiguous:$LF  ] . join $SPACE, $possible_commands->@* );
+            return $self->help_error( qq[command "$res->{cmd}" is ambiguous:\n  ] . join $SPACE, $possible_commands->@* );
         }
         else {
             unshift $res->{rest}->@*, '--help' if $res->{opt}->{help};
@@ -444,14 +444,14 @@ sub _help_usage ($self) {
     my $list = {};
 
     if ( $self->is_cmd ) {
-        $help = 'list of commands:' . $LF . $LF;
+        $help = "list of commands:\n\n";
 
         for my $class ( $self->cmd->@* ) {
             $list->{ $self->_get_class_cmd($class)->[0] } = [ $self->_get_class_cmd($class)->[0], $self->_help_class_abstract($class) ];
         }
     }
     else {
-        $help = 'options ([+] - can be repeated, [!] - is required):' . $LF . $LF;
+        $help = "options ([+] - can be repeated, [!] - is required):\n\n";
 
         for my $opt ( values $self->opt->%* ) {
             $list->{ $opt->{name} } = [ $opt->help_spec, $opt->{desc} // $EMPTY ];
@@ -469,9 +469,9 @@ sub _help_usage ($self) {
         $_->[1] =~ s/\n+\z//smg;
     }
 
-    my $desc_indent = $LF . q[    ] . ( $SPACE x $max_key_len );
+    my $desc_indent = "\n    " . ( $SPACE x $max_key_len );
 
-    $help .= join $LF, map { sprintf( " %-${max_key_len}s   ", $list->{$_}->[0] ) . $list->{$_}->[1] =~ s/\n/$desc_indent/smgr } sort keys $list->%*;
+    $help .= join "\n", map { sprintf( " %-${max_key_len}s   ", $list->{$_}->[0] ) . $list->{$_}->[1] =~ s/\n/$desc_indent/smgr } sort keys $list->%*;
 
     return $help // $EMPTY;
 }
@@ -479,25 +479,25 @@ sub _help_usage ($self) {
 sub _help_footer ($self) { return '(global options: --help, -h, -?, --version)' }
 
 sub help ($self) {
-    say $self->_help_usage_string, $LF;
+    print $self->_help_usage_string, "\n\n";
 
     if ( my $alias = $self->_help_alias ) {
-        say $alias, $LF;
+        say $alias, "\n";
     }
 
     if ( my $abstract = $self->_help_class_abstract ) {
-        say $abstract, $LF;
+        print "$abstract\n\n";
     }
 
     if ( my $help = $self->_help ) {
-        say $help, $LF;
+        print "$help\n\n";
     }
 
     if ( my $help_usage = $self->_help_usage ) {
-        say $help_usage, $LF;
+        print "$help_usage\n\n";
     }
 
-    say $self->_help_footer, $LF;
+    say $self->_help_footer, "\n";
 
     exit 2;
 }
@@ -508,20 +508,20 @@ sub help_usage ( $self, $invalid_options = undef ) {
             say;
         }
 
-        print $LF;
+        print "\n";
     }
 
-    say $self->_help_usage_string, $LF;
+    say $self->_help_usage_string, "\n";
 
     if ( my $abstract = $self->_help_class_abstract ) {
-        say $abstract, $LF;
+        print "$abstract\n\n";
     }
 
     if ( my $help_usage = $self->_help_usage ) {
-        say $help_usage, $LF;
+        print "$help_usage\n\n";
     }
 
-    say $self->_help_footer, $LF;
+    say $self->_help_footer, "\n";
 
     exit 2;
 }
@@ -538,13 +538,13 @@ sub help_version ($self) {
 
     say 'Perl ' . $^V->normal . " $Config{archname}";
 
-    say join $LF, $EMPTY, "Image path: $ENV{PAR_PROGNAME}", "Temp dir: $ENV{PAR_TEMP}" if $ENV->{is_par};
+    say join "\n", $EMPTY, "Image path: $ENV{PAR_PROGNAME}", "Temp dir: $ENV{PAR_TEMP}" if $ENV->{is_par};
 
     exit 2;
 }
 
 sub help_error ( $self, $msg ) {
-    say $msg, $LF if defined $msg;
+    print "$msg\n\n" if defined $msg;
 
     exit 2;
 }

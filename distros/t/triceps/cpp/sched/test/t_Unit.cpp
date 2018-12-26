@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -111,9 +111,9 @@ UTESTCASE mklabel(Utest *utest)
 	UT_IS(lab3->getType(), rt3.get());
 	UT_IS(lab4->getType(), rt4.get());
 
-	UT_ASSERT(!lab1->chain(lab2)->hasError());
+	UT_ASSERT(!lab1->chain(lab2).hasError());
 	Erref ec3 = lab1->chain(lab3);
-	if (!UT_ASSERT(ec3->hasError())) {
+	if (!UT_ASSERT(ec3.hasError())) {
 		UT_IS(ec3->print(), 
 			"can not chain labels with non-equal row types\n"
 			"  lab1:\n"
@@ -134,10 +134,10 @@ UTESTCASE mklabel(Utest *utest)
 			"    }\n"
 		);
 	}
-	UT_ASSERT(lab1->chain(lab4)->hasError());
+	UT_ASSERT(lab1->chain(lab4).hasError());
 
 	Erref ecloop = lab2->chain(lab1); // this tries to create a circular chain
-	if (!UT_ASSERT(ecloop->hasError())) {
+	if (!UT_ASSERT(ecloop.hasError())) {
 		UT_IS(ecloop->print(), 
 			"labels must not be chained in a loop\n"
 			"  lab2->lab1->lab2\n"
@@ -145,7 +145,7 @@ UTESTCASE mklabel(Utest *utest)
 	}
 
 	ecloop = lab2->chain(lab2); // this tries to create a circular chain of label to itself
-	if (!UT_ASSERT(ecloop->hasError())) {
+	if (!UT_ASSERT(ecloop.hasError())) {
 		UT_IS(ecloop->print(), 
 			"labels must not be chained in a loop\n"
 			"  lab2->lab2\n"
@@ -159,8 +159,8 @@ UTESTCASE mklabel(Utest *utest)
 	lab1->clearChained(); // undoes the endless loop
 	UT_ASSERT(!lab1->hasChained());
 	UT_IS(lab1->getChain().size(), 0);
-	UT_ASSERT(!lab1->chain(lab11)->hasError());
-	UT_ASSERT(!lab1->chain(lab12)->hasError());
+	UT_ASSERT(!lab1->chain(lab11).hasError());
+	UT_ASSERT(!lab1->chain(lab12).hasError());
 	UT_IS(lab1->getChain().size(), 2);
 	UT_ASSERT(lab1->getChain()[0] == lab11);
 	UT_ASSERT(lab1->getChain()[1] == lab12);
@@ -168,9 +168,9 @@ UTESTCASE mklabel(Utest *utest)
 	lab1->clearChained(); // clear again and chain from the front
 	UT_ASSERT(!lab1->hasChained());
 	UT_IS(lab1->getChain().size(), 0);
-	UT_ASSERT(!lab1->chain(lab11, true)->hasError());
-	UT_ASSERT(!lab1->chain(lab12, true)->hasError());
-	UT_ASSERT(!lab1->chain(lab13, true)->hasError());
+	UT_ASSERT(!lab1->chain(lab11, true).hasError());
+	UT_ASSERT(!lab1->chain(lab12, true).hasError());
+	UT_ASSERT(!lab1->chain(lab13, true).hasError());
 	UT_IS(lab1->getChain().size(), 3);
 	UT_ASSERT(lab1->getChain()[0] == lab13);
 	UT_ASSERT(lab1->getChain()[1] == lab12);
@@ -577,9 +577,9 @@ UTESTCASE chaining(Utest *utest)
 	Autoref<Label> lab3 = new DummyLabel(unit, rt1, "lab3");
 
 	// add chaining
-	UT_ASSERT(!lab1->chain(lab2)->hasError());
-	UT_ASSERT(!lab1->chain(lab3)->hasError());
-	UT_ASSERT(!lab2->chain(lab3)->hasError());
+	UT_ASSERT(!lab1->chain(lab2).hasError());
+	UT_ASSERT(!lab1->chain(lab3).hasError());
+	UT_ASSERT(!lab2->chain(lab3).hasError());
 
 	Autoref<Rowop> op1 = new Rowop(lab1, Rowop::OP_INSERT, r1);
 	Autoref<Rowop> op2 = new Rowop(lab1, Rowop::OP_DELETE, r2);

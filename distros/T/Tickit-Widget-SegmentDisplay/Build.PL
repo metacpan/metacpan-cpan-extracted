@@ -9,12 +9,13 @@ my $build = Module::Build->new(
       'Tickit::Test' => '0.12',
       'Tickit::Widget' => '0.36',
    },
-   build_requires => {
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
+   test_requires => {
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
 );

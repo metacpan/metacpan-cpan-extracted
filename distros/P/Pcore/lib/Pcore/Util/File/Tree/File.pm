@@ -10,7 +10,7 @@ has content     => ( is => 'lazy' );    # ScalarRef
 has meta        => ();                  # HashRef
 
 sub _build_content ($self) {
-    return P->file->read_bin( $self->{source_path} );
+    return \P->file->read_bin( $self->{source_path} );
 }
 
 sub remove ($self) {

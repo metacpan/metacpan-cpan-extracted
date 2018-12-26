@@ -4,7 +4,7 @@
       "Dan Burke <dburke@addictmud.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -23,7 +23,8 @@
          "requires" : {
             "List::Util" : "0",
             "Moose" : "0",
-            "namespace::autoclean" : "0"
+            "namespace::autoclean" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
@@ -43,6 +44,8 @@
          "web" : "https://github.com/dwburke/perl-Array-FIFO"
       }
    },
-   "version" : "0.10"
+   "version" : "0.12",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

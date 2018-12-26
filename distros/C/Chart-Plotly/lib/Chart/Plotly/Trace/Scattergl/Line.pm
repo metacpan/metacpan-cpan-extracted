@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scattergl.
 
@@ -41,6 +41,11 @@ has dash => ( is            => "rw",
               documentation => "Sets the style of the lines.",
 );
 
+has shape => ( is            => "rw",
+               isa           => enum( [ "linear", "hv", "vh", "hvh", "vhv" ] ),
+               documentation => "Determines the line shape. The values correspond to step-wise line shapes.",
+);
+
 has width => ( is            => "rw",
                isa           => "Num",
                documentation => "Sets the line width (in px).",
@@ -61,7 +66,7 @@ Chart::Plotly::Trace::Scattergl::Line - This attribute is one of the possible op
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -118,6 +123,10 @@ Sets the line color.
 =item * dash
 
 Sets the style of the lines.
+
+=item * shape
+
+Determines the line shape. The values correspond to step-wise line shapes.
 
 =item * width
 

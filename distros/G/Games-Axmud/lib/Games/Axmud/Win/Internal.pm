@@ -2732,6 +2732,19 @@
         }
 
         # Menu bar items that require a 'main' window with a visible session whose status is
+        #   'connected' or 'offline' and a Connections task
+        @list = (
+            # 'Tasks' column
+            'edit_connections_task',
+        );
+
+        if ($openFlag && $self->visibleSession->connectionsTask) {
+            push (@sensitiseList, @list);
+        } else {
+            push (@desensitiseList, @list);
+        }
+
+        # Menu bar items that require a 'main' window with a visible session whose status is
         #   'connected' or 'offline' and an Attack task
         @list = (
             # 'Tasks' column
@@ -2862,19 +2875,6 @@
         }
 
         # Menu bar items that require a 'main' window with a visible session whose status is
-        #   'connected' or 'offline' and a TaskList task
-        @list = (
-            # 'Tasks' column
-            'edit_task_list_task',
-        );
-
-        if ($openFlag && $self->visibleSession->taskListTask) {
-            push (@sensitiseList, @list);
-        } else {
-            push (@desensitiseList, @list);
-        }
-
-        # Menu bar items that require a 'main' window with a visible session whose status is
         #   'connected' or 'offline' and a Watch task
         @list = (
             # 'Tasks' column
@@ -2895,10 +2895,25 @@
             'recording_add_line', 'recording_add_break',
             'recording_set_insertion', 'recording_cancel_insertion',
             'recording_delete_line', 'recording_delete_multi', 'recording_delete_last',
-            'show_recording', 'copy_recording',
         );
 
         if ($openFlag && $self->visibleSession->recordingFlag) {
+            push (@sensitiseList, @list);
+        } else {
+            push (@desensitiseList, @list);
+        }
+
+        # Menu bar items that require a require a 'main' window with a visible session whose status
+        #   is 'connected' or 'offline', and either GA::Session->recordingFlag or ->recordingList
+        @list = (
+            # 'Recordings' column
+            'show_recording', 'copy_recording',
+        );
+
+        if (
+            $openFlag
+            && ($self->visibleSession->recordingFlag || $self->visibleSession->recordingList)
+        ) {
             push (@sensitiseList, @list);
         } else {
             push (@desensitiseList, @list);
@@ -3905,6 +3920,7 @@
         #   'tool' / 'toolbar' / 'tool_bar'                 - converts to GA::Strip::Toolbar
         #   'table'                                         - converts to GA::Strip::Table
         #   'gauge' / 'gaugebox' / 'gauge_box'              - converts to GA::Strip::GaugeBox
+        #   'search' / 'searchbox' / 'search_box'           - converts to GA::Strip::SearchBox
         #   'entry'                                         - converts to GA::Strip::Entry
         #   'connect' / 'info' / 'connectinfo' / 'connect_info'
         #                                                   - converts to GA::Strip::ConnectInfo
@@ -3955,6 +3971,7 @@
         #   'tool' / 'toolbar' / 'tool_bar'                 - converts to GA::Strip::Toolbar
         #   'table'                                         - converts to GA::Strip::Table
         #   'gauge' / 'gaugebox' / 'gauge_box'              - converts to GA::Strip::GaugeBox
+        #   'search' / 'searchbox' / 'search_box'           - converts to GA::Strip::SearchBox
         #   'entry'                                         - converts to GA::Strip::Entry
         #   'connect' / 'info' / 'connectinfo' / 'connect_info'
         #                                                   - converts to GA::Strip::ConnectInfo
@@ -3995,6 +4012,11 @@
             lc($string) eq 'gauge' || lc($string) eq 'gaugebox' || lc($string) eq 'gauge_box'
         ) {
             $packageName = 'Games::Axmud::Strip::GaugeBox';
+
+        } elsif (
+            lc($string) eq 'search' || lc($string) eq 'searchbox' || lc($string) eq 'search_box'
+        ) {
+            $packageName = 'Games::Axmud::Strip::SearchBox';
 
         } elsif (lc($string) eq 'entry') {
 

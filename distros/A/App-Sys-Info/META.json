@@ -3,58 +3,81 @@
    "author" : [
       "Burak Gursoy <burak@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "app",
+      "sys",
+      "info",
+      "systeminfo"
+   ],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Sys-Info",
-   "no_index" : {
-      "directory" : [
-         "monolithic_version",
-         "builder",
-         "t",
-         "xt"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.40"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Format::Human::Bytes" : "0",
+            "POSIX" : "0",
             "Sys::Info" : "0.73",
+            "Sys::Info::Constants" : "0",
             "Text::Table" : "0",
-            "Time::Elapsed" : "0"
+            "Time::Elapsed" : "0",
+            "constant" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "App::Sys::Info" : {
-         "file" : "lib/App/Sys/Info.pm",
-         "version" : "0.24"
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.010"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "bugtracker" : {
+         "web" : "https://github.com/burak/CPAN-App-Sys-Info/issues"
+      },
       "repository" : {
-         "url" : "http://github.com/burak/cpan-app-sys-info/"
+         "type" : "git",
+         "url" : "git://github.com/burak/CPAN-App-Sys-Info.git",
+         "web" : "https://github.com/burak/CPAN-App-Sys-Info"
       }
    },
-   "version" : "0.24"
+   "version" : "0.25",
+   "x_contributors" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
+

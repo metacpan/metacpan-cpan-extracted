@@ -16,7 +16,7 @@ name: Python-Version
 provides:
   Python::Version:
     file: lib/Python/Version.pm
-    version: '0.0001'
+    version: '0.0002'
 requires:
   Sort::Versions: '0'
   constant: '0'
@@ -26,5 +26,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-Python-Version.git
-version: '0.0001'
+version: '0.0002'
+x_contributors:
+  - 'perlancar <perlancar@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

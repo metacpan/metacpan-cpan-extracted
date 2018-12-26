@@ -1,5 +1,15 @@
 Revision history for Term-VTerm
 
+0.03    2018-12-23 18:59:17
+        [CHANGES]
+         * Support symbolic keys
+         * Wrap the new VTermColor structure that provides index as well as
+           RGB
+         * Added an example to demonstrate building a Tickit widget
+
+        [BUGFIXES]
+         * ->input_write takes raw UTF-8 bytes, not Unicode strings
+
 0.02    2015/06/18 22:44:12
         [CHANGES]
          * Wrap VTermScreen as Term::VTerm::Screen

@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -213,7 +213,7 @@ sub initHourly #  (@args)
 		The tables are defined and connected thusly:
 		</para>
 
-<!-- x/xTrafficAgg.t doHourly -->
+<!-- t/xTrafficAgg.t doHourly -->
 <pre>
 # the full stats for the recent time
 our $ttPackets = Triceps::TableType->new($rtPacket)
@@ -238,10 +238,10 @@ our $tPackets = $uTraffic->makeTable($ttPackets, "tPackets");
 
 # the aggregated hourly stats, kept longer
 our $ttHourly = Triceps::TableType->new($rtHourly)
-	->addSubIndex("byAggr", 
-		Triceps::SimpleOrderedIndex->new(
-			time => "ASC", local_ip => "ASC", remote_ip => "ASC")
-	)
+    ->addSubIndex("byAggr",
+        Triceps::IndexType->newOrdered(key =>
+            ["time", "local_ip", "remote_ip"])
+    )
 ;
 
 $ttHourly->initialize();
@@ -269,7 +269,7 @@ $tPackets->getAggregatorLabel("aggrHourly")->chain($tHourly->getInputLabel());
 		The table of hourly aggregated stats uses the same kind of index, only
 		now there is no need for a FIFO because there is only one row per this
 		key. And the timestamp is already rounded to the hour right in the
-		rows, so a SimpleOrderedIndex can be used without writing a manual
+		rows, so an Ordered index can be used without writing a manual
 		comparison function, and the ip fields have been merged into it too.
 		</para>
 
@@ -631,16 +631,16 @@ sub computeHourlywDay # (table, context, aggop, opcode, rh, state, args...)
 <pre>
 # the aggregated hourly stats, kept longer
 our $ttHourly = Triceps::TableType->new($rtHourly)
-	->addSubIndex("byAggr", 
-		Triceps::SimpleOrderedIndex->new(
-			time => "ASC", local_ip => "ASC", remote_ip => "ASC")
-	)
-	->addSubIndex("byDay", 
-		Triceps::IndexType->newHashed(key => [ "day" ])
-		->addSubIndex("group",
-			Triceps::IndexType->newFifo()
-		)
-	)
+    ->addSubIndex("byAggr",
+        Triceps::IndexType->newOrdered(key =>
+            ["time", "local_ip", "remote_ip"])
+    )
+    ->addSubIndex("byDay",
+        Triceps::IndexType->newHashed(key => [ "day" ])
+        ->addSubIndex("group",
+            Triceps::IndexType->newFifo()
+        )
+    )
 ;
 
 $ttHourly->initialize();

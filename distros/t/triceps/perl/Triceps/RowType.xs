@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -60,7 +60,7 @@ Triceps::RowType::new(...)
 			}
 			Onceref<RowType> rt = new CompactRowType(fld);
 			Erref err = rt->getErrors();
-			if (err->hasError()) {
+			if (err.hasError()) {
 				throw Exception::f(err, "Triceps::RowType::new: incorrect specification:");
 			}
 

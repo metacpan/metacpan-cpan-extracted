@@ -1,5 +1,9 @@
 Revision history for Dancer2-Logger-Console-Colored
 
+0.007     2018-12-22 21:17:42+00:00 Europe/London
+	- Transfer module ownership to simbabque
+	- Make new logger format options in Dancer2 work
+
 0.006     2017-10-13 18:11:06+02:00 Europe/Berlin
 	- Rerelease the previous version because it was broken.
 

@@ -79,7 +79,7 @@ sub run ( $type, $args ) {
 
         my $data = to_cbor { pid => $$ };
 
-        $fh->write( unpack( 'H*', $data->$* ) . $LF );
+        $fh->write( unpack( 'H*', $data ) . "\n" );
 
         # blocks until $fh is closed
         # TODO not working under windows if parent process killed in task manager

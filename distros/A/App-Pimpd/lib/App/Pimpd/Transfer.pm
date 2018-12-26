@@ -16,12 +16,18 @@ use Carp qw(confess);
 use File::Copy;
 use App::Pimpd;
 use App::Pimpd::Validate;
+use File::Basename qw(basename);
 
 sub cp_album {
   my $destination = shift;
 
   my $album   = $mpd->current->album;
   my $artist  = $mpd->current->artist;
+
+  if(!defined($album)) {
+    warn "song doesn't have any album tag!\n";
+    return;
+  }
 
   my @tracks = grep {
     $artist eq $_->artist
@@ -38,9 +44,9 @@ sub cp_album {
 
   else {
     for(@tracks) {
-      $_ = escape($_);
+      #$_ = escape($_);
       if(copy($_, $destination)) {
-        printf("%40.40s => %s\n", $_, $destination);
+        printf("%40.40s => %s\n", basename($_), $destination);
       }
       else {
         warn("cp_album: $!");
@@ -55,10 +61,10 @@ sub cp {
   #is_existing_dir($destination); # FIXME
 
   if(empty_playlist()) {
-    return 1;
+    return;
   }
 
-  my $file; # = $mpd->current->file;
+  my $file;
   if($config{music_directory} =~ m|.+/$|m) {
     $file = $config{music_directory} .= $mpd->current->file;
   }
@@ -71,7 +77,6 @@ sub cp {
   }
 
   else {
-    $file = escape($file);
     if(copy($file, $destination)) {
       return 1;
     }
@@ -84,11 +89,12 @@ sub cp {
 
 sub _scp {
   my($source, $dest) = @_;
+  $source = escape($source);
 
   system('scp', '-r',
     "-P $config{ssh_port}",
-    "$config{ssh_host}:'$source'", $dest
-  ) == 0 or confess("scp: $!");
+    qq($config{ssh_host}:$source), $dest
+  ) == 0;# or confess("scp: $!");
 
   return;
 }

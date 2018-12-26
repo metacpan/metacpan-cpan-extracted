@@ -144,23 +144,6 @@ in the raw body content and the `Content-Length` header.
     is slurped into memory completely. This can be problematic for large files
     and little available memory.
 
-- Sequence expansion
-
-    Curl supports speficying sequences of URLs such as
-    ` https://example.com/[1-100] ` , which expands to
-    ` https://example.com/1 `, ` https://example.com/2 ` ...
-    ` https://example.com/100 `
-
-    This is not (yet) supported.
-
-- List expansion
-
-    Curl supports speficying sequences of URLs such as
-    ` https://{www,ftp}.example.com/ ` , which expands to
-    ` https://www.example.com/ `, ` https://ftp.example.com/ `.
-
-    This is not (yet) supported.
-
 - Multiple sets of parameters from the command line
 
     Curl supports the `--next` command line switch which resets

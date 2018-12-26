@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Devel::hdb::App::Base';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 __PACKAGE__->add_route('get', qr(^/db/(.*)), \&assets);
 __PACKAGE__->add_route('get', qr(^/img/(.*)), \&assets);
@@ -31,6 +31,12 @@ sub assets {
         $type = 'text/html';
     } elsif ($file =~ m/\.css$/) {
         $type = 'text/css';
+    } elsif ( $file =~ m/\.png$/) {
+        $type = 'image/png';
+        $fh->binmode();
+    } elsif ( $file =~ m/\.ico$/) {
+        $type = 'image/x-icon';
+        $fh->binmode();
     } else {
         $type = 'text/plain';
     }

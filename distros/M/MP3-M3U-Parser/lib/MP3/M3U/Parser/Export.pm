@@ -1,12 +1,11 @@
 package MP3::M3U::Parser::Export;
+$MP3::M3U::Parser::Export::VERSION = '2.33';
 use strict;
 use warnings;
-use vars qw( $VERSION );
+
 use Carp qw( croak );
 use MP3::M3U::Parser::Constants;
 use MP3::M3U::Parser::Dummy;
-
-$VERSION = '2.32';
 
 my %DEFAULT = (
     format    => 'html',
@@ -346,11 +345,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-MP3::M3U::Parser::Export - Exports playlist to HTML/XML
+MP3::M3U::Parser::Export
+
+=head1 VERSION
+
+version 2.33
 
 =head1 SYNOPSIS
 
@@ -358,10 +361,11 @@ Private module.
 
 =head1 DESCRIPTION
 
-This document describes version C<2.32> of C<MP3::M3U::Parser::Export>
-released on C<5 July 2016>.
-
 -
+
+=head1 NAME
+
+MP3::M3U::Parser::Export - Exports playlist to HTML/XML
 
 =head1 METHODS
 
@@ -375,15 +379,13 @@ L<MP3::M3U::Parser>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2003 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

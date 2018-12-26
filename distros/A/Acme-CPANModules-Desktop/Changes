@@ -1,0 +1,8 @@
+0.002   2018-12-22 (PERLANCAR)
+
+        - Rename module/distro from Acme::CPANModules::Desktop{Modules,}.
+
+
+0.001   2018-10-30 (PERLANCAR)
+
+        - First release.

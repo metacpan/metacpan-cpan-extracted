@@ -1,6 +1,8 @@
-#!perl -T
+#!perl
 
-use Test::More tests => 12;
+use strict;
+use warnings;
+use Test::More;
 
 BEGIN {
     use_ok( 'Data::Validate::WithYAML::Plugin::EMail' );
@@ -33,3 +35,13 @@ for my $check ( @blacklist ){
     my $retval = $module->check( $check );
     ok( !$retval );
 }
+
+my $error;
+eval {
+    $module->check( undef );
+    1;
+} or $error = $@;
+
+like $error, qr/no value to check/;
+
+done_testing();

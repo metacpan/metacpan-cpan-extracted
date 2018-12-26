@@ -3,43 +3,32 @@ abstract: 'Compatibility layer for Sys::Info'
 author:
   - 'Burak Gursoy <burak@cpan.org>'
 build_requires:
-  Test::More: 0.40
-  Test::Sys::Info: 0.20
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Sys::Info: '0.20'
 configure_requires:
-  Module::Build: 0.38
-dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - sys
+  - system
+  - info
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Sys-Info-Driver-Unknown
-no_index:
-  directory:
-    - monolithic_version
-    - builder
-    - t
-provides:
-  Sys::Info::Driver::Unknown:
-    file: lib/Sys/Info/Driver/Unknown.pm
-    version: 0.78
-  Sys::Info::Driver::Unknown::Device:
-    file: lib/Sys/Info/Driver/Unknown/Device.pm
-    version: 0.78
-  Sys::Info::Driver::Unknown::Device::CPU:
-    file: lib/Sys/Info/Driver/Unknown/Device/CPU.pm
-    version: 0.78
-  Sys::Info::Driver::Unknown::Device::CPU::Env:
-    file: lib/Sys/Info/Driver/Unknown/Device/CPU/Env.pm
-    version: 0.78
-  Sys::Info::Driver::Unknown::OS:
-    file: lib/Sys/Info/Driver/Unknown/OS.pm
-    version: 0.78
 recommends:
-  Unix::Processors: 0
+  Unix::Processors: '0'
 requires:
-  Sys::Info::Base: 0.78
+  Sys::Info::Base: '0.78'
+  perl: '5.010'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://bitbucket.org/burak/cpan-sys-info-driver-unknown/
-version: 0.78
+  bugtracker: https://github.com/burak/CPAN-Sys-Info-Driver-Unknown/issues
+  repository: git://github.com/burak/CPAN-Sys-Info-Driver-Unknown.git
+version: '0.79'
+x_serialization_backend: 'YAML::Tiny version 1.69'

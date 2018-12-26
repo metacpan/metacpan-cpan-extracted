@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -613,16 +613,16 @@ sub __pre_text_row_count {
     if ( ! defined $self->{i}{pre_text} ) {  # empty info add newline
         return;
     }
-    $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, $self->{i}{term_w}, 0, 0 );
+    $self->{i}{pre_text} = line_fold( $self->{i}{pre_text}, ( $self->{pg}->__get_term_size() )[0] );
     $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ s/\n/\n/g;
     $self->{i}{pre_text_row_count} += 1;
 }
 
 
 sub __prepare_size {
-    my ( $self, $opt, $list, $maxcols, $maxrows ) = @_;
-    $self->{i}{term_w} = $maxcols - 1;
-    $self->{i}{avail_h} = $maxrows;
+    my ( $self, $opt, $list, $term_w, $term_h ) = @_;
+    $self->{i}{term_w} = $term_w - 1;
+    $self->{i}{avail_h} = $term_h;
     if ( defined $self->{i}{pre_text} ) {
         $self->__pre_text_row_count();
         my $backup_height = $self->{i}{avail_h};
@@ -773,8 +773,8 @@ sub fill_form {
     $self->__init_term();
     local $| = 1;
     print SHOW_CURSOR;
-    my ( $maxcols, $maxrows ) = $self->{pg}->__get_term_size();
-    $self->__prepare_size( $opt, $list, $maxcols, $maxrows );
+    my ( $term_w, $term_h ) = $self->{pg}->__get_term_size();
+    $self->__prepare_size( $opt, $list, $term_w, $term_h );
     $self->__write_first_screen( $opt, $list, 0, $auto_up );
     my $m = $self->__string_and_pos( $list );
     $self->__calculate_threshold( $m ); #
@@ -801,10 +801,10 @@ sub fill_form {
         }
         next KEY if $key == NEXT_get_key;
         next KEY if $key == KEY_TAB;
-        my ( $tmp_maxcols, $tmp_maxrows ) = $self->{pg}->__get_term_size();
-        if ( $tmp_maxcols != $maxcols || $tmp_maxrows != $maxrows && $tmp_maxrows < ( @$list + 1 ) ) {
-            ( $maxcols, $maxrows ) = ( $tmp_maxcols, $tmp_maxrows );
-            $self->__prepare_size( $opt, $list, $maxcols, $maxrows );
+        my ( $tmp_term_w, $tmp_term_h ) = $self->{pg}->__get_term_size();
+        if ( $tmp_term_w != $term_w || $tmp_term_h != $term_h && $tmp_term_h < ( @$list + 1 ) ) {
+            ( $term_w, $term_h ) = ( $tmp_term_w, $tmp_term_h );
+            $self->__prepare_size( $opt, $list, $term_w, $term_h );
             $self->{pg}->__clear_screen();
             $self->__write_first_screen( $opt, $list, 1, $auto_up ); # 1
             $m = $self->__string_and_pos( $list );
@@ -1053,7 +1053,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.503
+Version 0.504
 
 =cut
 

@@ -1,7 +1,7 @@
 #!perl 
 
 use strict;
-use Test::More tests => 3;
+use Test::More;
 use Data::Dumper;
 use FindBin;
 
@@ -18,3 +18,9 @@ $validator->set_required( 'plz' );
 
 my $plz_required = $validator->check( 'plz', undef );
 is( $plz_required, 0 );
+
+$validator->set_required( 'does_not_exist' );
+my $dne = $validator->check('does_not_exist', undef);
+is $dne, 1;
+
+done_testing();

@@ -36,8 +36,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
         }
     }
 
-    say q[Changelog since release: ] . $dist->version . $LF;
-    say $log;
+    print 'Changelog since release: ' . $dist->version . "\n$log\n\n";
 
     return;
 }

@@ -253,7 +253,7 @@ sub spawn_shell {
     'add-album'       => sub {
       add_to_playlist( map{ $_->file } get_album_songs(@_));
     },
-    'playlists'       => sub { print "$_\n" for list_all_playlists(); },
+    'lsplaylists'     => sub { print "$_\n" for list_all_playlists(); },
     'add'             => sub {
 
       if($_[0] eq 'songs') {
@@ -359,6 +359,9 @@ sub spawn_shell {
       print "$status\n";
     },
 
+    'stats'            => sub { stats(); },
+    'status'           => sub { print status(), "\n"; },
+
     'randomtrack'      => sub {
       play_pos_from_playlist(random_track_in_playlist());
       print current(), "\n";
@@ -378,6 +381,7 @@ sub spawn_shell {
     },
 
     'delete-album'     => \&delete_album,
+    'stats'            => sub { App::Pimpd::Info::stats() },
 
     'rmalbum'          => sub { remove_album_from_playlist(@_); },
     'exit'             => sub { exit(0); },

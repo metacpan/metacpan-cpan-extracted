@@ -1,9 +1,8 @@
 package MP3::M3U::Parser::Constants;
+$MP3::M3U::Parser::Constants::VERSION = '2.33';
 use strict;
 use warnings;
-use vars qw( $VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS $OID );
-
-$VERSION = '2.32';
+use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS $OID );
 
 # Data table key map
 use constant PATH    => $OID++;
@@ -61,11 +60,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-MP3::M3U::Parser::Constants - Constants for MP3::M3U::Parser
+MP3::M3U::Parser::Constants
+
+=head1 VERSION
+
+version 2.33
 
 =head1 SYNOPSIS
 
@@ -73,10 +76,11 @@ Private module.
 
 =head1 DESCRIPTION
 
-This document describes version C<2.32> of C<MP3::M3U::Parser::Constants>
-released on C<5 July 2016>.
-
 -
+
+=head1 NAME
+
+MP3::M3U::Parser::Constants - Constants for MP3::M3U::Parser
 
 =head1 SEE ALSO
 
@@ -84,15 +88,13 @@ L<MP3::M3U::Parser>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2003 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

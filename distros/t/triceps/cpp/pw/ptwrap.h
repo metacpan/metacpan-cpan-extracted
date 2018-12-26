@@ -634,7 +634,7 @@ public:
 		unsigned s = ++seq_;
 		do {
 			cond_.wait();
-			if (seqpulse_ - s >= 0)
+			if (int(seqpulse_ - s) >= 0)
 				return 0;
 		} while (!signaled_);
 		return 0;
@@ -657,7 +657,7 @@ public:
 		do {
 			if (cond_.timedwait(abstime) == ETIMEDOUT)
 				return ETIMEDOUT;
-			if (seqpulse_ - s >= 0)
+			if (int(seqpulse_ - s) >= 0)
 				return 0;
 		} while (!signaled_);
 		return 0;

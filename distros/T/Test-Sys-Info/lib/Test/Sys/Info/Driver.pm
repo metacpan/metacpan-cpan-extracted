@@ -1,7 +1,8 @@
 package Test::Sys::Info::Driver;
+$Test::Sys::Info::Driver::VERSION = '0.23';
 use strict;
 use warnings;
-use vars qw( $VERSION );
+
 use Test::More;
 use Carp qw( croak );
 use constant DRIVER_MODULES => (
@@ -14,12 +15,14 @@ use constant DRIVER_MODULES => (
     'Sys::Info::Driver::%s::Device::CPU',
 );
 
-$VERSION = '0.21';
-
 sub new {
     my $class = shift;
     my $id    = shift || croak 'Driver ID is missing';
-    my @suite = map { sprintf $_, $id } DRIVER_MODULES;
+    my @suite = map {
+        my $name = $_;
+        $name =~ m{ \%s }xms ? sprintf( $name, $id ) : $name;
+    } DRIVER_MODULES;
+
     foreach my $module ( @suite ) {
         require_ok( $module );
         ok( $module->import || 1, "$module imported" );
@@ -135,9 +138,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Test::Sys::Info::Driver - Tests Sys::Info driver integrity.
+Test::Sys::Info::Driver
+
+=head1 VERSION
+
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -145,10 +154,11 @@ Test::Sys::Info::Driver - Tests Sys::Info driver integrity.
 
 =head1 DESCRIPTION
 
-This document describes version C<0.21> of C<Test::Sys::Info::Driver>
-released on C<5 July 2016>.
-
 Can not be used directly. See L<Test::Sys::Info> for more information.
+
+=head1 NAME
+
+Test::Sys::Info::Driver - Tests Sys::Info driver integrity.
 
 =head1 METHODS
 
@@ -174,15 +184,13 @@ L<Sys::Info>, L<Test::Sys::Info>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

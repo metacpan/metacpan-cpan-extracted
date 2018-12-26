@@ -1,39 +1,42 @@
 Revision history for Perl extension MP3::M3U::Parser.
 
+2.33 2018-12-25 BURAK
+    - Distro fixes.
+
 2.32 Tue Jul  5 01:13:42 2016
-    => Bump version.
+    - Bump version.
 
 2.31 Sun Jul  8 01:50:04 2012
-    => Bump version.
+    - Bump version.
 
 2.30 Thu Dec 31 04:39:58 2009
-    => Perl::Critic refactoring.
-    => HTML::Entities is now an optional dependency.
-    => New tests.
+    - Perl::Critic refactoring.
+    - HTML::Entities is now an optional dependency.
+    - New tests.
 
 2.24 Thu Sep  3 02:02:02 2009
-    => Pod & distro fixes. Also correct a typo after __END__.
+    - Pod & distro fixes. Also correct a typo after __END__.
 
 2.23 Thu Apr 23 14:50:16 2009
-    => Update builder.
+    - Update builder.
 
 2.22 Sat Apr 18 06:23:24 2009
-    => Update distro tools.
+    - Update distro tools.
 
 2.21 Sun Mar 29 08:20:01 2009
-    => Fixed an issue related to network paths.
+    - Fixed an issue related to network paths.
        Reported by Paul Miller <jettero@cpan.org>.
-    => Converted the distro files to LF from CRLF.
-    => Updated test suite.
-    => Test::More 0.40 is now required.
+    - Converted the distro files to LF from CRLF.
+    - Updated test suite.
+    - Test::More 0.40 is now required.
 
 2.20 Sun Jun 18 03:58:36 2006
-    => SIGNATURE sent to oblivion :p
-    => Added Build.PL
-    => Updated Makefile.PL
-    => Updated tests
-    => Updated copyright & license
-    => Private methods (including template() & search())
+    - SIGNATURE sent to oblivion :p
+    - Added Build.PL
+    - Updated Makefile.PL
+    - Updated tests
+    - Updated copyright & license
+    - Private methods (including template() & search())
        renamed to include an initial underscore:
           search() -> _search()
           template -> _template()
@@ -41,119 +44,119 @@ Revision history for Perl extension MP3::M3U::Parser.
        Beware() if you->are('sub-classing');
 
 2.1 Tue Sep 14 20:47:09 2004
-    => export() now has the ability to dump the generated data
+    - export() now has the ability to dump the generated data
        to a scalar instead of exporting to a file. Useful for
        web programming and dynamic generation. To enable this,
        -toscalar option must be passed with a scalar ref.
-    => Module now require()s IO::File, File::Spec and Cwd if needed.
+    - Module now require()s IO::File, File::Spec and Cwd if needed.
        Because, we won't need this modules, if the user works with
        scalars instead of disk files. This will save some memory 
        and incerase speed I believe. If you are parsing scalar
        data and do not use export(), then no external modules 
        will be loaded.
-    => Updated HTML and XML templates for -toscalar compatibility.
-    => Updated Makefile.PL
-    => Updated pod.
-    => Added new tests to demonstrate -toscalar option.
-    => Added a CGI example code to distro.
-    => Some minor fixes.
+    - Updated HTML and XML templates for -toscalar compatibility.
+    - Updated Makefile.PL
+    - Updated pod.
+    - Added new tests to demonstrate -toscalar option.
+    - Added a CGI example code to distro.
+    - Some minor fixes.
 
 2.01 Mon Jul 26 19:54:14 2004
-    => Minor fix in Pod.
-    => SONG element was including ".mp3" if it is 
+    - Minor fix in Pod.
+    - SONG element was including ".mp3" if it is 
        extracted from PATH. Fixed.
-    => ARTIST element was including path info. Fixed.
+    - ARTIST element was including path info. Fixed.
        But, if the song name or artist includes slash or backslash,
        we have a problem
 
 2.0 Fri Jul 23 23:19:48 2004
-    => BEWARE!!! THIS NEW VERSION BREAKS THE OLD CODE!
-    => Now the module looks *like* a module. It was
+    - BEWARE!!! THIS NEW VERSION BREAKS THE OLD CODE!
+    - Now the module looks *like* a module. It was
        like a program code before. With this version
        it does only the parsing job. 
-    => Removed directory reading codes. 
-    => Removed some parameters passed to new()
-    => Removed ignore chars thingies.
-    => Removed Dump() method.
-    => parse() now accepts file_paths/filehandles/scalars as 
+    - Removed directory reading codes. 
+    - Removed some parameters passed to new()
+    - Removed ignore chars thingies.
+    - Removed Dump() method.
+    - parse() now accepts file_paths/filehandles/scalars as 
        parameters. You can mix and use these types together; the 
        parser is now smart enough to do the right job with the 
        related type.
-    => parse() now returns the object itself. 
+    - parse() now returns the object itself. 
        Use the brand new result() method to get the parsed tree.
        This new behaviour is a result of adding the chaining
        ability of public methods.
-    => Object table structure and m3u key orders are changed.
+    - Object table structure and m3u key orders are changed.
        Object table is now more complex and verbose.
-    => Returned result set is now an array not hash.
-    => Module now checks if the file is a valid m3u file, 
+    - Returned result set is now an array not hash.
+    - Module now checks if the file is a valid m3u file, 
        before parsing it. Dies if it is invalid.
-    => The new method reset() resets the parser object. Might
+    - The new method reset() resets the parser object. Might
        be usefull in loops. For example: you can export each
        m3u to it's separate file with reset() without any extra work.
-    => The module no longer requires Data::Dumper, but it now requires
+    - The module no longer requires Data::Dumper, but it now requires
        Cwd and Text::Template.
-    => Exported HTML file is now fully templated. You can subclass
+    - Exported HTML file is now fully templated. You can subclass
        the module and override template() method to change the HTML 
        template. Currently, I'm not planning to add a template for 
        XML type.
-    => Added new namespace MP3::M3U::Parser::Dummy for Text::Template.
-    => Added tcompile() method for compiling templates.
-    => drive key returned from info() is now an array.
-    => Added locate_file() method to get the full path of a file,
+    - Added new namespace MP3::M3U::Parser::Dummy for Text::Template.
+    - Added tcompile() method for compiling templates.
+    - drive key returned from info() is now an array.
+    - Added locate_file() method to get the full path of a file,
        if the file is in the current working directory.
-    => Parser now tries to extract the artist and song infos into 
+    - Parser now tries to extract the artist and song infos into 
        a separate data field.
-    => New option '-overwrite' added to new() and export(). It 
+    - New option '-overwrite' added to new() and export(). It 
        controls the behaviour of module in export() globally or 
        locally depending on where you set it.
-    => export() checks if the export file already exists. Dies
+    - export() checks if the export file already exists. Dies
        if it exists and you didn't select to overwrite it.
-    => Pod updated.
-    => Subclassing examples added to Pod.
-    => You can now set the encoding of exported files 
+    - Pod updated.
+    - Subclassing examples added to Pod.
+    - You can now set the encoding of exported files 
        from new() globally via -encoding option.
-    => You can now set the format of exported files from 
+    - You can now set the format of exported files from 
        new() globally via -expformat option.
-    => You can now set the -drives option for export() from 
+    - You can now set the -drives option for export() from 
        new() globally via -expdrives option.
-    => But parameters passed to export() has the priority.
-    => XML element names changed.
+    - But parameters passed to export() has the priority.
+    - XML element names changed.
 
 1.1 Mon Aug 25 21:42:31 2003
-    => Better XML escaping.
-    => Added '-ignore_chars' parameter.
-    => Fixed a bug in seconds()
-    => Moved module to ./lib/MP3/M3U in the 
+    - Better XML escaping.
+    - Added '-ignore_chars' parameter.
+    - Fixed a bug in seconds()
+    - Moved module to ./lib/MP3/M3U in the 
        distribution package.
 
 1.04 Sun Jun 22 15:54:43 2003
-    => Removed sort() from export() method (the module was using 
+    - Removed sort() from export() method (the module was using 
        it on the $self->{M3U}{$cd} object table). 
        Thanks to Patrick Bourdon.
 
 1.03 Tue Jun 10 22:38:53 2003
-    => HTML code is valid HTML 4.01 & valid CSS. But you can get 
+    - HTML code is valid HTML 4.01 & valid CSS. But you can get 
        "non SGML character number" errors if your list(s) have 
        some of the undefined chars. I may add a filter to 
        escape these in the future.
-    => Some minor fixes.
+    - Some minor fixes.
 
 1.02 Mon Mar 10 22:33:04 2003
-    => Fixed the comma bug. Reported by Brandon Lederer.
-    => Fixed a bug in the formatting seconds part.
-    => Empty result keys (if a search didn't find any matches 
+    - Fixed the comma bug. Reported by Brandon Lederer.
+    - Fixed a bug in the formatting seconds part.
+    - Empty result keys (if a search didn't find any matches 
        in a list for example) are ignored when exporting to xml.
-    => Fixed the html playlist (css code was wrong and only 
+    - Fixed the html playlist (css code was wrong and only 
        IE was displaying it correctly).
-    => Updated the POD.
+    - Updated the POD.
 
 1.01 Wed Feb 26 18:14:51 2003
-    => Fixed definition of Dump() in the POD. 
-    => Added the definition of the parsed data structure to 
+    - Fixed definition of Dump() in the POD. 
+    - Added the definition of the parsed data structure to 
        the POD. 
-    => Added the test 't/use.t' to the distribution. Module's 
+    - Added the test 't/use.t' to the distribution. Module's 
        code didn't changed.
 
 1.00 Tue Feb 25 19:23:14 2003
-    => First release.
+    - First release.

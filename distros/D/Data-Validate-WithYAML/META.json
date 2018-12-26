@@ -1,0 +1,74 @@
+{
+   "abstract" : "Validation framework that can be configured with YAML files",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Validate-WithYAML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "YAML::Tiny" : "1.70"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Validate::WithYAML" : {
+         "file" : "lib/Data/Validate/WithYAML.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Data-Validate-WithYAML/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Data-Validate-WithYAML",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Data-Validate-WithYAML.git",
+         "web" : "http://github.com/reneeb/Data-Validate-WithYAML"
+      }
+   },
+   "version" : "0.17",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "reneeb <reneeb@dca9f4a1-6dba-46ad-9046-e9fb5d59a48b>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

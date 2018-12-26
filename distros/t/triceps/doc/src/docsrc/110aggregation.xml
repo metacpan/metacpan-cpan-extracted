@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -661,7 +661,7 @@ while(&readLine) {
 		grouping happening by its combined key fields (that is, all the
 		key fields of all the indexes in the path starting from the root).
 		For aggregation the working or non-working method <pre>getKey()</pre> doesn't matter,
-		so any of the Hashed, Ordered and Sorted index types can be used.
+		so any of the Hashed, Ordered and Sorted/SimpleOrdered index types can be used.
 		The index type where the aggregator type is attached determines the
 		order of the rows in the groups. If you use FIFO, the rows will
 		be in the order of arrival. If you use Ordered or Sorted, the rows
@@ -1251,7 +1251,7 @@ my $ttWindow = Triceps::TableType->new($rtTrade)
 	->addSubIndex("bySymbol", 
 		Triceps::IndexType->newHashed(key => [ "symbol" ])
 		->addSubIndex("orderById",
-			Triceps::SimpleOrderedIndex->new(id => "ASC",)
+			Triceps::IndexType->newOrdered(key => [ "id" ])
 			->setAggregator(Triceps::AggregatorType->new(
 				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage3)
 			)
@@ -2150,7 +2150,11 @@ AO_COLLAPSE OP_NOP 0 NULL
 		I've mentioned before that the floating numbers are tricky to handle.
 		Even without additive aggregation the result depends on the rounding.
 		Which in turn depends on the order in which the operations are done.
-		Let's look at a version of the aggregation code that highlights this
+		Mostly. The modern Perl (at least as of 5.26.1) appears to be smart enough
+		to preserve the extra precision in the computations, so the example
+		below would work correctly anyway and not show the problem. But the older versions of Perl, and the
+		&Cpp; code would show this issue, so I think it's still worth looking at.
+		So let's look at a version of the aggregation code that might display this
 		issue.
 		</para>
 
@@ -2320,7 +2324,7 @@ my $ttWindow = Triceps::TableType->new($rtTrade)
 			)
 		)
 		->addSubIndex("byPrice",
-			Triceps::SimpleOrderedIndex->new(price => "ASC",)
+			Triceps::IndexType->newOrdered(key => [ "price" ])
 			->addSubIndex("multi", Triceps::IndexType->newFifo())
 		)
 	)
@@ -2347,7 +2351,7 @@ $idxByPrice = $ttWindow->findIndexPath("bySymbol", "byPrice");
 		Here another index type is added, ordered by price. It has to be
 		non-leaf, with a FIFO index type nested in it, to allow for multiple
 		rows having the same price in them. That would work out more
-		efficiently if the ordered index could have a multimap mode, but that
+		efficiently if the Ordered index could have a multimap mode, but that
 		is not supported yet.
 		</para>
 
@@ -2457,7 +2461,7 @@ my $ttWindow = Triceps::TableType->new($rtTrade)
 			Triceps::IndexType->newFifo(limit => 4)
 		)
 		->addSubIndex("byPrice",
-			Triceps::SimpleOrderedIndex->new(price => "ASC",)
+			Triceps::IndexType->newOrdered(key => [ "price" ])
 			->addSubIndex("multi", Triceps::IndexType->newFifo())
 			->setAggregator(Triceps::AggregatorType->new(
 				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage12)

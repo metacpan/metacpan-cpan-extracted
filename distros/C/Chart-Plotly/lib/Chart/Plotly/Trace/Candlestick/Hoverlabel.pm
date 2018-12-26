@@ -8,7 +8,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Candlestick::Hoverlabel::Font;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace candlestick.
 
@@ -70,6 +70,11 @@ has namelengthsrc => ( is            => "rw",
                        documentation => "Sets the source reference on plot.ly for  namelength .",
 );
 
+has split => ( is            => "rw",
+               isa           => "Bool",
+               documentation => "Show hover information (open, close, high, low) in separate labels.",
+);
+
 __PACKAGE__->meta->make_immutable();
 1;
 
@@ -85,7 +90,7 @@ Chart::Plotly::Trace::Candlestick::Hoverlabel - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -152,6 +157,10 @@ Sets the length (in number of characters) of the trace name in the hover labels 
 =item * namelengthsrc
 
 Sets the source reference on plot.ly for  namelength .
+
+=item * split
+
+Show hover information (open, close, high, low) in separate labels.
 
 =back
 

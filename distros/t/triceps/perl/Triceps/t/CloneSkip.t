@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -17,7 +17,7 @@ use strict;
 use threads;
 
 use Test;
-BEGIN { plan tests => 92 };
+BEGIN { plan tests => 94 };
 use Triceps;
 ok(5); # If we made it this far, we're ok.
 
@@ -78,6 +78,8 @@ my $it2 = Triceps::SimpleOrderedIndex->new(
 	a => "ASC",
 );
 ok(ref $it2, "Triceps::SimpleOrderedIndex");
+
+my $it3 = Triceps::IndexType->newOrdered(key => [ "b", "c" ]);
 
 my $tt1 = Triceps::TableType->new($rt1)
 	->addSubIndex("grouping", $it1)
@@ -152,8 +154,6 @@ ok(ref $fa1, "Triceps::Facet");
 
 my $nx1 = $fa1->nexus();
 ok(ref $nx1, "Triceps::Nexus");
-
-# XXX add AutoDrain
 
 my $collapse = Triceps::Collapse->new(
 	unit => $u1,
@@ -261,6 +261,9 @@ ok(ref $it1, "Triceps::IndexType");
 ok($it1->same($it1));
 
 ok(ref $it2, "Triceps::SimpleOrderedIndex");
+
+ok(ref $it3, "Triceps::IndexType");
+ok($it3->same($it3));
 
 ok(ref $agt1, "Triceps::AggregatorType");
 ok($agt1->same($agt1));

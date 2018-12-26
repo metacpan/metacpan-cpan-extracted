@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -444,7 +444,7 @@ public:
 	//         (or with wait==false, when no more data in the queues, or
 	//         with the time limit when the limit has expired)
 	bool nextXtray(bool wait = true, 
-		const struct timespec &abstime = *(const struct timespec *)NULL);
+		const struct timespec *abstime = (const struct timespec *)NULL);
 
 	// A convenience wrapper.
 	bool nextXtrayNoWait()

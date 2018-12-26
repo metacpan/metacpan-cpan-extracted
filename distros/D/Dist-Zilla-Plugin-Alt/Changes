@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Alt
 
+0.06      2018-12-23 14:45:48 -0700
+  - Added workaround for MSWin32 where DESTDIR doesn't work.
+
 0.05      2017-08-24 16:08:46 -0400
   - Require Perl 5.14, Dist::Zilla 6.00
     (cpantesters suggests that it doesn't work on 5.x or earlier anyway)

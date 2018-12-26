@@ -1,10 +1,8 @@
 package GD::SecurityImage::Styles;
+$GD::SecurityImage::Styles::VERSION = '1.75';
 use strict;
 use warnings;
-use vars qw[$VERSION];
 use constant ARC_END_DEGREES => 360;
-
-$VERSION = '1.73';
 
 sub style_default {
    return shift->_drcommon(' \\ lines will be drawn ');
@@ -98,9 +96,17 @@ sub _drcommon {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-GD::SecurityImage::Styles - Drawing styles for GD::SecurityImage.
+GD::SecurityImage::Styles
+
+=head1 VERSION
+
+version 1.75
 
 =head1 SYNOPSIS
 
@@ -108,12 +114,13 @@ See L<GD::SecurityImage>.
 
 =head1 DESCRIPTION
 
-This document describes version C<1.73> of C<GD::SecurityImage::Styles>
-released on C<21 January 2015>.
-
 This module contains the styles used in the security image.
 
 Used internally by L<GD::SecurityImage>. Nothing public here.
+
+=head1 NAME
+
+GD::SecurityImage::Styles - Drawing styles for GD::SecurityImage.
 
 =head1 METHODS
 
@@ -137,15 +144,13 @@ L<GD::SecurityImage>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2015 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2004 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.12.4 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

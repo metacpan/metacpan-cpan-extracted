@@ -1,5 +1,10 @@
 Revision history for Data::Tabulate::Plugin::HTMLTable
 
+0.05    2018-12-23 11:57:00
+
+        + add tests
+        + improve documentation
+
 0.03    Tue Sep 14 08:52:31 2010
         - require version >= 2.08 of HTML::Table
         - switch to Dist::Zilla

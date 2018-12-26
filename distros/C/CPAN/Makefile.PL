@@ -19,7 +19,7 @@ my $HAVE_MAKE = basename($Config::Config{make}) eq "make"; # file-scoped!
 
 my $version_diff = 0; # we'll have to die if this becomes true
 my $version_from;
-my $trial;
+my $trial = 0;
 my $version;
 {
   local $^W;
@@ -43,6 +43,9 @@ if ($trial) {
         if $ExtUtils::MakeMaker::VERSION < 6.4502;
     die "Your MakeMaker doesn't do the sign woodoo" unless
         MM->can("signature_target");
+    require Module::Signature;
+    die "Your Module::Signature is a bit dated[$Module::Signature::VERSION].\nDo not make a release with it\n"
+        if $Module::Signature::VERSION < 0.83;
     shift @ARGV;
     my $st;
     local $ENV{LANG} = "C";
@@ -103,6 +106,7 @@ for my $interesting_module (qw(
         CPAN::Checksums
         CPAN::Meta
         CPAN::Meta::YAML
+        CPAN::Perl::Releases
         Compress::Bzip2
         Compress::Zlib
         Data::Dumper
@@ -119,6 +123,7 @@ for my $interesting_module (qw(
         IO::Compress::Base
         IO::Zlib
         JSON::PP
+        Log::Log4perl
         LWP::UserAgent
         MIME::Base64
         Module::Build
@@ -196,7 +201,7 @@ WriteMakefile(
                (MIN_PERL_VERSION => '5.006002') : (),
               ),
               clean => {
-                        FILES => "lib/CPAN/Config.pm t/dot-cpan/FTPstats.yml cpan-home",
+                        FILES => "lib/CPAN/Config.pm t/dot-cpan/FTPstats.yml cpan-home t/dot-cpan*",
                        },
               @sign,
               ($] >= 5.005 ?
@@ -224,8 +229,12 @@ WriteMakefile(
               # I took it from RT-CPAN ticket 30098:
               ($ExtUtils::MakeMaker::VERSION >= 6.4502 ?
                (META_ADD => {
+                             'meta-spec' => { version => 2 },
                              resources => {
-                                 repository => "git://github.com/andk/cpanpm.git",
+                                 repository => {
+                                     type => 'git', 
+                                     url => 'https://github.com/andk/cpanpm'
+                                 }
                              },
                              keywords => ['CPAN','module','module installation'],
                             }) : ()),
@@ -312,6 +321,7 @@ release :: disttest
 	rm -rf $(DISTVNAME)
 	$(NOECHO) $(ECHO) '#### Suggested next steps (if all looks good):'
 	$(NOECHO) $(ECHO) '#### Consider "make pull-request" for perl5-porters'
+	$(NOECHO) $(ECHO) make reversion AGAINST_TAG=__previous_release__
 	$(NOECHO) $(ECHO) git tag -m '"This is $(VERSION)"' '"$(VERSION)"'
 	$(NOECHO) $(ECHO) '  git push --tags origin master'
 
@@ -375,7 +385,7 @@ upload-batch-signing-key:
 	gpg --send-key 450F89EC
 
 download-batch-signing-key:
-	gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-key 450F89EC
+	gpg --keyserver hkp://pool.sks-keyservers.net --recv-key 450F89EC
 
 export-armor-batch-signing-key:
 	gpg --export --armor 450F89EC

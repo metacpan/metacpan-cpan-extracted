@@ -4,55 +4,66 @@
       "Burak Gursoy <burak@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "sys",
+      "system",
+      "info"
+   ],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sys-Info",
-   "no_index" : {
-      "directory" : [
-         "monolithic_version",
-         "builder",
-         "t"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.40",
-            "Test::Sys::Info" : "0.20"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
             "Sys::Info::Base" : "0.78",
-            "Sys::Info::Driver::OSX" : "0.78"
+            "perl" : "5.010"
          }
-      }
-   },
-   "provides" : {
-      "Sys::Info" : {
-         "file" : "lib/Sys/Info.pm",
-         "version" : "0.78"
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Sys::Info" : "0.20"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "bugtracker" : {
+         "web" : "https://github.com/burak/CPAN-Sys-Info/issues"
+      },
       "repository" : {
-         "url" : "http://bitbucket.org/burak/cpan-sys-info/"
+         "type" : "git",
+         "url" : "git://github.com/burak/CPAN-Sys-Info.git",
+         "web" : "https://github.com/burak/CPAN-Sys-Info"
       }
    },
-   "version" : "0.78"
+   "version" : "0.7811",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
+

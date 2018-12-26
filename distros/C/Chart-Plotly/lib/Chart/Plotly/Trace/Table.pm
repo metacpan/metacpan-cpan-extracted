@@ -11,9 +11,8 @@ use Chart::Plotly::Trace::Table::Domain;
 use Chart::Plotly::Trace::Table::Header;
 use Chart::Plotly::Trace::Table::Hoverlabel;
 use Chart::Plotly::Trace::Table::Stream;
-use Chart::Plotly::Trace::Table::Transform;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: Table view for detailed data viewing. The data are arranged in a grid of rows and columns. Most styling can be specified for columns, rows or individual cells. Table is using a column-major order, ie. the grid is represented as a vector of column vectors.
 
@@ -150,11 +149,15 @@ has showlegend => (
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Table::Stream", );
 
-has transforms => ( is  => "rw",
-                    isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Table::Transform]", );
-
 has uid => ( is  => "rw",
              isa => "Str", );
+
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
 
 has visible => (
     is => "rw",
@@ -177,7 +180,7 @@ Chart::Plotly::Trace::Table - Table view for detailed data viewing. The data are
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -321,9 +324,11 @@ Determines whether or not an item corresponding to this trace is shown in the le
 
 =item * stream
 
-=item * transforms
-
 =item * uid
+
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
 
 =item * visible
 

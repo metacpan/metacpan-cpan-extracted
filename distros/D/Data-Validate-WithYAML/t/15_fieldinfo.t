@@ -1,8 +1,8 @@
 #!perl
 
 use strict;
-use Test::More tests => 3;
-use Data::Dumper;
+
+use Test::More;
 use FindBin;
 
 BEGIN {
@@ -19,3 +19,6 @@ my $age_check      = { type => 'required', min => 18, max => 67 };
 
 is_deeply $validator->fieldinfo( 'greeting' ), $greeting_check;
 is_deeply $validator->fieldinfo( 'age2' ), $age_check;
+is $validator->fieldinfo('field_does_not_exist'), undef;
+
+done_testing();

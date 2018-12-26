@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -896,7 +896,8 @@ Autoref<SeqSortCondition> sc = dynamic_cast<SeqSortCondition *>(ixt->getConditio
 		<para>
 		You don't have to use the dynamic cast but it's safer, and since you'd
 		normally do it once at the model setup time and then just keep using
-		the value, there is no noticeable performance penalty for it.
+		the value, there is no noticeable performance penalty for it. The dynamic
+		cast would convert <pre>NO_INDEX_TYPE</pre> to NULL.
 		</para>
 
 	</sect1>

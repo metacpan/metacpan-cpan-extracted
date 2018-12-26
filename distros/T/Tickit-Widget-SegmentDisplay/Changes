@@ -1,5 +1,9 @@
 Revision history for Tickit-Widget-SegmentDisplay
 
+0.05    2018-12-23 21:32:55
+        [CHANGES]
+         * Support rendering using Unicode line-drawing characters
+
 0.04    2015/10/26 01:04:18
         [CHANGES]
          * Support rendering using Unicode block-drawing characters

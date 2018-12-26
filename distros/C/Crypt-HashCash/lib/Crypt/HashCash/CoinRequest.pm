@@ -3,7 +3,7 @@
 # Crypt::HashCash::CoinRequest - HashCash Digital Cash Coin Request
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/CoinRequest.pm v1.129 Tue Oct 16 16:56:37 PDT 2018 $
+# $Id: lib/Crypt/HashCash/CoinRequest.pm v1.130 Sat Dec 22 18:42:26 PST 2018 $
 
 package Crypt::HashCash::CoinRequest;
 
@@ -14,7 +14,7 @@ use Crypt::HashCash qw (_dec _hex);
 use Compress::Zlib;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.129 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.130 $' =~ /\s+([\d\.]+)/;
 
 sub from_string {
   my ($class, $str) = @_; $str =~ s/\s*$//;
@@ -62,8 +62,8 @@ Crypt::HashCash::CoinRequest - HashCash Digital Cash Coin Request
 
 =head1 VERSION
 
- $Revision: 1.129 $
- $Date: Tue Oct 16 16:56:37 PDT 2018 $
+ $Revision: 1.130 $
+ $Date: Sat Dec 22 18:42:26 PST 2018 $
 
 =head1 SYNOPSIS
 

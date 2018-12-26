@@ -1,4 +1,5 @@
 package CGI::Auth::Basic;
+$CGI::Auth::Basic::VERSION = '1.24';
 use strict;
 use warnings;
 use constant EMPTY_STRING        => q{};
@@ -8,8 +9,6 @@ use constant MAX_PASSWORD_LENGTH => 32;
 use constant CRYP_CHARS          => q{.}, q{,}, q{/}, 0..9, q{A}..q{Z}, q{a}..q{z};
 use constant RANDOM_NUM          => 64;
 use Carp qw( croak );
-
-our $VERSION = '1.23';
 
 our $RE = qr{\A\w\./}xms; # regex for passwords
 our $FATAL_HEADER;
@@ -569,6 +568,7 @@ sub _fatal {
       $rep[1]    =~ s{.*[\\/]}{}xms;
       $caller[1] =~ s{.*[\\/]}{}xms;
    my $class     = ref $self;
+   my $version   = $self->VERSION;
    my $fatal     = $self->fatal_header;
       $fatal    .= <<"FATAL";
 <html>
@@ -581,7 +581,7 @@ sub _fatal {
       </style>
    </head>
    <body>
-      <h1>$class $VERSION - Fatal Error</h1>
+      <h1>$class $version - Fatal Error</h1>
       <span class="error">$error</span> 
       <br>
       <br>
@@ -630,11 +630,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-CGI::Auth::Basic - Basic CGI authentication interface.
+CGI::Auth::Basic
+
+=head1 VERSION
+
+version 1.24
 
 =head1 SYNOPSIS
 
@@ -664,9 +668,6 @@ or you can just say:
    # J2dmER4GGQfzA == blah
 
 =head1 DESCRIPTION
-
-This document describes version C<1.23> of C<CGI::Auth::Basic>
-released on C<21 January 2015>.
 
 This module adds a simple (may be a little complex if you use all
 features) user validation system on top of your program. If you have 
@@ -933,6 +934,10 @@ Call before creating the object.
 
 Passwords are checked with C<$CGI::Auth::Basic::RE> class variable.
 
+=head1 NAME
+
+CGI::Auth::Basic - Basic CGI authentication interface.
+
 =head1 ERROR HANDLING
 
 Your script will die on any perl syntax error. But the API errors
@@ -960,15 +965,13 @@ L<CGI> and L<CGI::Auth>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2015 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2004 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

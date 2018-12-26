@@ -2,11 +2,12 @@ package Data::Tabulate::Plugin::HTMLTable;
 
 use warnings;
 use strict;
+
 use HTML::Table;
 
 # ABSTRACT: HTML::Table plugin for Data::Tabulate
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 sub new{
@@ -19,8 +20,9 @@ sub output {
     
     my %atts = $self->attributes();
     my $obj  = HTML::Table->new(%atts);
-    for(@data){
-        my @row = map{defined($_) ? $_ : '&nbsp;'}@$_;
+
+    for my $row_data ( @data ){
+        my @row = map{ defined $_ ? $_ : '&nbsp;' }@{$row_data};
         $obj->addRow(@row);
     }
     
@@ -30,11 +32,11 @@ sub output {
 
 sub attributes{
     my ($self,%atts) = @_;
+
     $self->{attributes} = {%atts} if keys %atts;
-    my %return = ();
-    if(defined $self->{attributes} and ref($self->{attributes}) eq 'HASH'){
-        %return = %{$self->{attributes}}
-    }
+
+    my %return = %{ $self->{attributes} || {} };
+
     return %return;
 }
 
@@ -52,7 +54,7 @@ Data::Tabulate::Plugin::HTMLTable - HTML::Table plugin for Data::Tabulate
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -70,13 +72,33 @@ This module renders the table for HTML
 
 create a new object of C<Data::Tabulate::Plugin::HTMLTable>.
 
+    my $obj = Data::Tabulate::Plugin::HTML::Table->new;
+
 =head2 output
 
 returns a string that contains the HTML source for the table
 
+    my $html_table = $obj->output(
+        ['a1', 'b1', 'c1' ],
+        ['a2', 'b2', 'c2' ],
+        ['a3', 'b3', 'c3' ],
+    );
+
 =head2 attributes
 
 set some attributes for L<HTML::Table>.
+
+    my $obj = Data::Tabulate::Plugin::HTML::Table->new;
+    $obj->attributes(
+        -border => 1,
+        -bgcolor => 'red',
+    );
+
+    my $html_table = $obj->output(
+        ['a1', 'b1', 'c1' ],
+        ['a2', 'b2', 'c2' ],
+        ['a3', 'b3', 'c3' ],
+    );
 
 =head1 AUTHOR
 

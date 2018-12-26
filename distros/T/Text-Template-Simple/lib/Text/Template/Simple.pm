@@ -1,8 +1,7 @@
 package Text::Template::Simple;
+$Text::Template::Simple::VERSION = '0.91';
 use strict;
 use warnings;
-
-our $VERSION = '0.90';
 
 use File::Spec;
 
@@ -228,9 +227,17 @@ sub DESTROY {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Text::Template::Simple - Simple text template engine
+Text::Template::Simple
+
+=head1 VERSION
+
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -252,15 +259,16 @@ Where C<hello.tts> has this content:
 
 =head1 DESCRIPTION
 
-This document describes version C<0.90> of C<Text::Template::Simple>
-released on C<5 July 2016>.
-
 This is a simple template module. There is no extra template/mini 
 language. Instead, it uses Perl as the template language. Templates
 can be cached on disk or inside the memory via the internal cache 
 manager. It is also possible to use static/dynamic includes,
 pass parameters to includes and apply filters on them.
 Also see L<Text::Template::Simple::API> for the full C<API> reference.
+
+=head1 NAME
+
+Text::Template::Simple - Simple text template engine
 
 =head1 SYNTAX
 
@@ -669,15 +677,13 @@ However, be aware that the monolithic version is B<not supported>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2004 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -65,9 +65,9 @@ bool AggregatorType::equals(const Type *t) const
 
 	const AggregatorType *at = static_cast<const AggregatorType *>(t);
 
-	if ((rowType_ != NULL) ^ (at->getRowType() != NULL))
+	if (rowType_.isNull() ^ (at->getRowType() == NULL))
 		return false;
-	if (rowType_ != NULL && !rowType_->equals(at->getRowType()))
+	if (!rowType_.isNull() && !rowType_->equals(at->getRowType()))
 		return false;
 
 	if (name_ != at->getName())
@@ -91,9 +91,9 @@ bool AggregatorType::match(const Type *t) const
 
 	const AggregatorType *at = static_cast<const AggregatorType *>(t);
 
-	if ((rowType_ != NULL) ^ (at->getRowType() != NULL))
+	if (rowType_.isNull() ^ (at->getRowType() == NULL))
 		return false;
-	if (rowType_ != NULL && !rowType_->match(at->getRowType())) {
+	if (!rowType_.isNull() && !rowType_->match(at->getRowType())) {
 		return false;
 	}
 
@@ -115,6 +115,11 @@ void AggregatorType::printTo(string &res, const string &indent, const string &su
 	newlineTo(res, indent);
 	res.append(") ");
 	res.append(name_);
+}
+
+int AggregatorType::cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const
+{
+	return CMP_NOT_SUPPORTED;
 }
 
 }; // TRICEPS_NS

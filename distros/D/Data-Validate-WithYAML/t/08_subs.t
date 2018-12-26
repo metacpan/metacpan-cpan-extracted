@@ -1,8 +1,7 @@
 #!perl 
 
 use strict;
-use Test::More tests => 4;
-use Data::Dumper;
+use Test::More;
 use FindBin;
 
 BEGIN {
@@ -22,3 +21,8 @@ is( $ip_ranges_ok3->[0], 0 );
 
 my $ip_ranges_ok2 = $validator->check_list( 'ip_ranges', ['8.2'] );
 is( $ip_ranges_ok2->[0], 1 );
+
+is $validator->check_list( 'ip_ranges' ), undef;
+is $validator->check_list( 'ip_ranges', {} ), undef;
+
+done_testing();

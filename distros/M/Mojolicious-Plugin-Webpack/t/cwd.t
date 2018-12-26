@@ -1,6 +1,6 @@
 use Mojo::Base -strict;
 use Test::More;
-use Mojolicious::Plugin::Webpack;
+use Mojolicious::Plugin::Webpack::Builder;
 
 my $cwd = Mojo::File->new;
 eval { my $CWD = Mojolicious::Plugin::Webpack::CWD->new('nope') };

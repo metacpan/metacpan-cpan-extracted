@@ -1,8 +1,7 @@
 package Sys::Info::Driver::OSX::OS;
+$Sys::Info::Driver::OSX::OS::VERSION = '0.7959';
 use strict;
 use warnings;
-
-our $VERSION = '0.7958';
 
 use base qw( Sys::Info::Base );
 use Carp qw( croak );
@@ -329,9 +328,17 @@ sub _populate_osversion {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Sys::Info::Driver::OSX::OS - OSX backend
+Sys::Info::Driver::OSX::OS
+
+=head1 VERSION
+
+version 0.7959
 
 =head1 SYNOPSIS
 
@@ -339,10 +346,11 @@ Sys::Info::Driver::OSX::OS - OSX backend
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7958> of C<Sys::Info::Driver::OSX::OS>
-released on C<23 October 2013>.
-
 -
+
+=head1 NAME
+
+Sys::Info::Driver::OSX::OS - OSX backend
 
 =head1 METHODS
 
@@ -387,15 +395,13 @@ L<http://osxdaily.com/2010/10/08/mac-virtual-memory-swap/>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2010 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2010 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

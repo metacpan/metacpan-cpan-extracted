@@ -1,12 +1,10 @@
 package MP3::M3U::Parser;
+$MP3::M3U::Parser::VERSION = '2.33';
 use strict;
 use warnings;
-use vars qw( $VERSION );
 use base qw( MP3::M3U::Parser::Export );
 use Carp qw( croak );
 use MP3::M3U::Parser::Constants;
-
-$VERSION = '2.32';
 
 my %LOADED;
 
@@ -373,11 +371,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-MP3::M3U::Parser - MP3 playlist parser.
+MP3::M3U::Parser
+
+=head1 VERSION
+
+version 2.33
 
 =head1 SYNOPSIS
 
@@ -416,9 +418,6 @@ MP3::M3U::Parser - MP3 playlist parser.
     $parser->export;
 
 =head1 DESCRIPTION
-
-This document describes version C<2.32> of C<MP3::M3U::Parser>
-released on C<5 July 2016>.
 
 B<MP3::M3U::Parser> is a parser for M3U mp3 playlist files. It also 
 parses the EXTINF lines (which contains id3 song name and time) if 
@@ -692,7 +691,6 @@ See the tests in the distribution for examples.
 Note that, if there is an error, the module will die with that error. So, 
 using C<eval> for all method calls can be helpful if you don't want to die:
 
-
     my $eval_ok = eval {
        $parser->parse( @list );
        1;
@@ -701,6 +699,10 @@ using C<eval> for all method calls can be helpful if you don't want to die:
 
 As you can see, if there is an error, you can catch this with C<eval> and 
 access the error message with the special Perl variable C<$@>.
+
+=head1 NAME
+
+MP3::M3U::Parser - MP3 playlist parser.
 
 =head1 EXAMPLES
 
@@ -738,15 +740,13 @@ L<HTML::Entities>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2003 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

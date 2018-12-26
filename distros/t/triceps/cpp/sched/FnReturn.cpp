@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -58,7 +58,7 @@ FnReturn *FnReturn::addFromLabel(const string &lname, Autoref<Label>from, bool f
 			Autoref<RetLabel> lb = new RetLabel(unit_, rtype, name_ + "." + lname, this, szpre);
 			labels_.push_back(lb);
 			Erref cherr = from->chain(lb, front);
-			if (cherr->hasError())
+			if (cherr.hasError())
 				type_->appendErrors()->append("Failed the chaining of label '" + lname + "':", cherr);
 		}
 	}
@@ -310,7 +310,7 @@ ScopeFnBind::ScopeFnBind(Onceref<FnReturn> ret, Onceref<FnBinding> binding)
 	binding_ = binding;
 }
 
-ScopeFnBind::~ScopeFnBind()
+ScopeFnBind::~ScopeFnBind() noexcept(false)
 {
 	try {
 		ret_->pop(binding_);
@@ -350,7 +350,7 @@ void AutoFnBind::clear()
 		}
 	}
 	rets_.clear(); bindings_.clear();
-	if (err->hasError()) {
+	if (err.hasError()) {
 		// fprintf(stderr, "DEBUG AutoFnBind::clear throwing\n");
 		throw Exception(err, false); // no need to add stack, already in the messages
 	}

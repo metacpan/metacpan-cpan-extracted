@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -65,6 +65,42 @@ newHashed(char *CLASS, ...)
 			}
 
 			RETVAL = new WrapIndexType(new HashedIndexType(key));
+		} while(0); } TRICEPS_CATCH_CROAK;
+	OUTPUT:
+		RETVAL
+
+#// create an OrderedIndex
+#// options go in pairs  name => value 
+WrapIndexType *
+newOrdered(char *CLASS, ...)
+	CODE:
+		static char funcName[] =  "Triceps::IndexType::newOrdered";
+		RETVAL = NULL; // shut up the warning
+		try { do {
+			clearErrMsg();
+			Autoref<NameSet> key;
+
+			if (items % 2 != 1) {
+				throw Exception::f("Usage: %s(CLASS, optionName, optionValue, ...), option names and values must go in pairs", funcName);
+			}
+			for (int i = 1; i < items; i += 2) {
+				const char *opt = (const char *)SvPV_nolen(ST(i));
+				SV *val = ST(i+1);
+				if (!strcmp(opt, "key")) {
+					if (!key.isNull()) {
+						throw Exception::f("%s: option 'key' can not be used twice", funcName);
+					}
+					key = parseNameSet(funcName, "key", val); // may throw
+				} else {
+					throw Exception::f("%s: unknown option '%s'", funcName, opt);
+				}
+			}
+
+			if (key.isNull()) {
+				throw Exception::f("%s: the required option 'key' is missing", funcName);
+			}
+
+			RETVAL = new WrapIndexType(new OrderedIndexType(key));
 		} while(0); } TRICEPS_CATCH_CROAK;
 	OUTPUT:
 		RETVAL
@@ -310,7 +346,7 @@ findSubIndex(WrapIndexType *self, char *subname)
 		IndexType *ixt = self->get();
 		IndexType *ixsub = ixt->findSubIndex(subname);
 		try { do {
-			if (ixsub == NULL) {
+			if (ixsub == NO_INDEX_TYPE) {
 				throw Exception::f("%s: unknown nested index '%s'", funcName, subname);
 			}
 		} while(0); } TRICEPS_CATCH_CROAK;
@@ -329,7 +365,7 @@ findSubIndexSafe(WrapIndexType *self, char *subname)
 		clearErrMsg();
 		IndexType *ixt = self->get();
 		IndexType *ixsub = ixt->findSubIndex(subname);
-		if (ixsub == NULL)
+		if (ixsub == NO_INDEX_TYPE)
 			XSRETURN_UNDEF; // not a croak!
 
 		RETVAL = new WrapIndexType(ixsub);
@@ -352,7 +388,7 @@ findSubIndexById(WrapIndexType *self, SV *idarg)
 			IndexType::IndexId id = parseIndexId(funcName, idarg); // may throw
 
 			IndexType *ixsub = ixt->findSubIndexById(id);
-			if (ixsub == NULL) {
+			if (ixsub == NO_INDEX_TYPE) {
 				throw Exception::f("%s: no nested index with type id '%s' (%d)", funcName, IndexType::indexIdString(id), id);
 			}
 			RETVAL = new WrapIndexType(ixsub);
@@ -459,6 +495,23 @@ getKey(WrapIndexType *self)
 		IndexType *ixt = self->get();
 
 		const NameSet *key = ixt->getKey();
+		if (key != NULL) {
+			for (NameSet::const_iterator it = key->begin(); it != key->end(); ++it) {
+				const string &s = *it;
+				XPUSHs(sv_2mortal(newSVpvn(s.c_str(), s.size())));
+			}
+		}
+
+#// returns the key expression of this index,
+#// in the native form of this index type
+#// (may be empty if the index is not keyed by fields)
+SV *
+getKeyExpr(WrapIndexType *self)
+	PPCODE:
+		clearErrMsg();
+		IndexType *ixt = self->get();
+
+		const NameSet *key = ixt->getKeyExpr();
 		if (key != NULL) {
 			for (NameSet::const_iterator it = key->begin(); it != key->end(); ++it) {
 				const string &s = *it;

@@ -4,7 +4,7 @@ use Pcore -class, -ansi;
 
 with qw[Pcore::Util::Term::Progress::Indicator];
 
-our $PROGRESS_BAR_CHAR = q[■];
+our $PROGRESS_BAR_CHAR = '■';
 our $MESS_COLOR        = $BOLD . $YELLOW;
 our $BAR_COLOR         = $YELLOW;
 
@@ -44,7 +44,7 @@ sub _draw ($self) {
     if ( $self->{show_speed} ) {
         my ( $speed, $speed_unit ) = $self->_format_speed->( $self, $self->{speed} );
 
-        $info .= q[  ] . $speed;
+        $info .= $SPACE x 2 . $speed;
 
         $speed_unit ||= $self->{unit};
 
@@ -60,7 +60,7 @@ sub _draw ($self) {
 
     # time
     if ( $self->{show_time} ) {
-        $info .= q[  ];
+        $info .= $SPACE x 2;
 
         if ( $self->{is_finished} ) {
             $info .= $self->_format_time->( $self, $self->{total_time} );

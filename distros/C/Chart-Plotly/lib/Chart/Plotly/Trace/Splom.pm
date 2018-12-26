@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Splom::Stream;
 use Chart::Plotly::Trace::Splom::Transform;
 use Chart::Plotly::Trace::Splom::Unselected;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: Splom traces generate scatter plot matrix visualizations. Each splom `dimensions` items correspond to a generated axis. Values for each of those dimensions are set in `dimensions[i].values`. Splom traces support all `scattergl` marker style attributes. Specify `layout.grid` attributes and/or layout x-axis and y-axis attributes for more control over the axis positioning and style.
 
@@ -161,6 +161,13 @@ has transforms => ( is  => "rw",
 has uid => ( is  => "rw",
              isa => "Str", );
 
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
+
 has unselected => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Splom::Unselected", );
 
@@ -174,14 +181,14 @@ has xaxes => (
     is  => "rw",
     isa => "ArrayRef|PDL",
     documentation =>
-      "Sets the list of x axes corresponding to this splom trace. By default, a splom will match the first N xaxes where N is the number of input dimensions.",
+      "Sets the list of x axes corresponding to dimensions of this splom trace. By default, a splom will match the first N xaxes where N is the number of input dimensions. Note that, in case where `diagonal.visible` is false and `showupperhalf` or `showlowerhalf` is false, this splom trace will generate one less x-axis and one less y-axis.",
 );
 
 has yaxes => (
     is  => "rw",
     isa => "ArrayRef|PDL",
     documentation =>
-      "Sets the list of y axes corresponding to this splom trace. By default, a splom will match the first N yaxes where N is the number of input dimensions.",
+      "Sets the list of y axes corresponding to dimensions of this splom trace. By default, a splom will match the first N yaxes where N is the number of input dimensions. Note that, in case where `diagonal.visible` is false and `showupperhalf` or `showlowerhalf` is false, this splom trace will generate one less x-axis and one less y-axis.",
 );
 
 __PACKAGE__->meta->make_immutable();
@@ -199,7 +206,7 @@ Chart::Plotly::Trace::Splom - Splom traces generate scatter plot matrix visualiz
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -344,6 +351,10 @@ Sets the source reference on plot.ly for  text .
 
 =item * uid
 
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
+
 =item * unselected
 
 =item * visible
@@ -352,11 +363,11 @@ Determines whether or not this trace is visible. If *legendonly*, the trace is n
 
 =item * xaxes
 
-Sets the list of x axes corresponding to this splom trace. By default, a splom will match the first N xaxes where N is the number of input dimensions.
+Sets the list of x axes corresponding to dimensions of this splom trace. By default, a splom will match the first N xaxes where N is the number of input dimensions. Note that, in case where `diagonal.visible` is false and `showupperhalf` or `showlowerhalf` is false, this splom trace will generate one less x-axis and one less y-axis.
 
 =item * yaxes
 
-Sets the list of y axes corresponding to this splom trace. By default, a splom will match the first N yaxes where N is the number of input dimensions.
+Sets the list of y axes corresponding to dimensions of this splom trace. By default, a splom will match the first N yaxes where N is the number of input dimensions. Note that, in case where `diagonal.visible` is false and `showupperhalf` or `showlowerhalf` is false, this splom trace will generate one less x-axis and one less y-axis.
 
 =back
 

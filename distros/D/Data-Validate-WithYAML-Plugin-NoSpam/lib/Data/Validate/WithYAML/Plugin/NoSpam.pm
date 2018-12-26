@@ -7,7 +7,7 @@ use Carp;
 
 # ABSTRACT: Plugin to check that a given text is no spam.
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 sub check {
@@ -29,7 +29,10 @@ sub check {
 1; # End of Data::Validate::WithYAML::Plugin::NoSpam
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -37,7 +40,7 @@ Data::Validate::WithYAML::Plugin::NoSpam - Plugin to check that a given text is 
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -133,4 +136,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

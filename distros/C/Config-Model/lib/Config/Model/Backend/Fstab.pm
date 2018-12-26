@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Fstab;
-$Config::Model::Backend::Fstab::VERSION = '2.131';
+$Config::Model::Backend::Fstab::VERSION = '2.132';
 use Mouse;
 use Carp;
 use Log::Log4perl qw(get_logger :levels);
@@ -160,7 +160,7 @@ Config::Model::Backend::Fstab - Read and write config from fstab file
 
 =head1 VERSION
 
-version 2.131
+version 2.132
 
 =head1 SYNOPSIS
 

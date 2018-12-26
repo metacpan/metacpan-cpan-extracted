@@ -1,9 +1,8 @@
 package Sys::Info::OS;
+$Sys::Info::OS::VERSION = '0.7807';
 use strict;
 use warnings;
-use vars qw( $VERSION );
 use subs qw( LC_TYPE  );
-use vars qw( @ISA     );
 use base                 qw( Sys::Info::Base );
 use Carp                 qw( croak );
 use Sys::Info::Constants qw( OSID  );
@@ -24,8 +23,6 @@ BEGIN {
     };
     *LC_CTYPE = sub () {} if $@ || ! $eok;
 }
-
-$VERSION = '0.7804';
 
 BEGIN {
     CREATE_SYNONYMS_AND_UTILITY_METHODS: {
@@ -114,11 +111,17 @@ sub locale {
 
 1;
 
-__END__
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Sys::Info::OS - Detailed os information.
+Sys::Info::OS
+
+=head1 VERSION
+
+version 0.7807
 
 =head1 SYNOPSIS
 
@@ -160,10 +163,11 @@ Example:
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7804> of C<Sys::Info::OS>
-released on C<21 January 2015>.
-
 Supplies detailed operating system information.
+
+=head1 NAME
+
+Sys::Info::OS - Detailed os information.
 
 =head1 METHODS
 
@@ -234,11 +238,7 @@ vary among different systems.
 
 =head2 host_name
 
-
-
 =head2 time_zone
-
-
 
 =head2 product_type
 
@@ -384,18 +384,19 @@ L<http://msdn.microsoft.com/library/en-us/sysinfo/base/osversioninfoex_str.asp>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2015 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut
+
+__END__
+
 
 use Socket;
 sub network_name {

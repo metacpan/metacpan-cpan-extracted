@@ -7,6 +7,7 @@ WriteMakefile(
     'VERSION_FROM' => 'lib/Crypt/Random.pm',
     'EXE_FILES'    => [ 'bin/makerandom' ],
     'PREREQ_PM'    => { 'Math::Pari' => '2.001804', 
-                        'Class::Loader' => '2.00' 
+                        'Class::Loader' => '2.00',
+                        'Statistics::ChiSquare' => '1.0000'
                       } 
 );

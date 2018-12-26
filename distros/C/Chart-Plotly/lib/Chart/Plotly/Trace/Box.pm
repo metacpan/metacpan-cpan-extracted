@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Box::Stream;
 use Chart::Plotly::Trace::Box::Transform;
 use Chart::Plotly::Trace::Box::Unselected;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: In vertical (horizontal) box plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one box per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. That box position is then positioned with with `name` or with `x0` (`y0`) if provided. Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2) is marked by a line inside the box. By default, the whiskers correspond to the box' edges +/- 1.5 times the interquartile range (IQR = Q3-Q1), see *boxpoints* for other options.
 
@@ -201,6 +201,13 @@ has transforms => ( is  => "rw",
 has uid => ( is  => "rw",
              isa => "Str", );
 
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
+
 has unselected => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Box::Unselected", );
 
@@ -292,7 +299,7 @@ Chart::Plotly::Trace::Box - In vertical (horizontal) box plots, statistics are c
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -450,6 +457,10 @@ Sets the source reference on plot.ly for  text .
 =item * transforms
 
 =item * uid
+
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
 
 =item * unselected
 

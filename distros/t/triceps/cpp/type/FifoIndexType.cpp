@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -126,14 +126,14 @@ void FifoIndexType::initialize()
 
 	rhOffset_ = tabtype_->rhType()->allocate(sizeof(FifoIndex::RhSection));
 
-	if (!errors_->hasError() && errors_->isEmpty())
+	if (!errors_.hasError() && errors_.isEmpty())
 		errors_ = NULL;
 }
 
 Index *FifoIndexType::makeIndex(const TableType *tabtype, Table *table) const
 {
 	if (!isInitialized() 
-	|| errors_->hasError())
+	|| errors_.hasError())
 		return NULL; 
 	return new FifoIndex(tabtype, table, this);
 }

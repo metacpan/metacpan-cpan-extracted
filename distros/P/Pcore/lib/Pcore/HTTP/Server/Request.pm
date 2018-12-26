@@ -85,12 +85,12 @@ sub _respond ( $self, @ ) {
         $buf .= "Transfer-Encoding:chunked\r\n";
 
         # keepalive
-        $buf .= 'Connection:' . ( $self->{keepalive} ? 'keep-alive' : 'close' ) . $CRLF;
+        $buf .= 'Connection:' . ( $self->{keepalive} ? 'keep-alive' : 'close' ) . "\r\n";
 
         # add custom headers
-        $buf .= join( $CRLF, map {"$_->[0]:$_->[1]"} pairs $_[2]->@* ) . $CRLF if $_[2] && $_[2]->@*;
+        $buf .= join( "\r\n", map {"$_->[0]:$_->[1]"} pairs $_[2]->@* ) . "\r\n" if $_[2] && $_[2]->@*;
 
-        $buf .= $CRLF;
+        $buf .= "\r\n";
 
         \$body = \$_[3] if $_[3];
 
@@ -102,15 +102,15 @@ sub _respond ( $self, @ ) {
 
     if ($body) {
         if ( !is_ref $body ) {
-            $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $body, encode_utf8 $body;
+            $buf .= sprintf "%x\r\n%s\r\n", bytes::length $body, encode_utf8 $body;
         }
         elsif ( is_plain_scalarref $body ) {
-            $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $body->$*, encode_utf8 $body->$*;
+            $buf .= sprintf "%x\r\n%s\r\n", bytes::length $body->$*, encode_utf8 $body->$*;
         }
         elsif ( is_plain_arrayref $body ) {
             my $buf1 = join $EMPTY, map { encode_utf8 $_} $body->@*;
 
-            $buf .= sprintf "%x$CRLF%s$CRLF", bytes::length $buf1, $buf1;
+            $buf .= sprintf "%x\r\n%s\r\n", bytes::length $buf1, $buf1;
         }
         else {
 
@@ -147,10 +147,10 @@ sub finish ( $self, $trailing_headers = undef ) {
 
         # write trailing headers
         # https://tools.ietf.org/html/rfc7230#section-3.2
-        $buf .= ( join $CRLF, map {"$_->[0]:$_->[1]"} pairs $trailing_headers->@* ) . $CRLF if $trailing_headers && $trailing_headers->@*;
+        $buf .= ( join "\r\n", map {"$_->[0]:$_->[1]"} pairs $trailing_headers->@* ) . "\r\n" if $trailing_headers && $trailing_headers->@*;
 
         # close response
-        $buf .= $CRLF;
+        $buf .= "\r\n";
 
         $self->{_h}->write($buf);
 
@@ -193,11 +193,11 @@ sub accept_websocket ( $self, $headers = undef ) {
 
     $buf .= "Server:$self->{_server}->{server_tokens}\r\n" if $self->{_server}->{server_tokens};
 
-    $buf .= ( join $CRLF, map {"$_->[0]:$_->[1]"} pairs $headers->@* ) . $CRLF if $headers && $headers->@*;
+    $buf .= ( join "\r\n", map {"$_->[0]:$_->[1]"} pairs $headers->@* ) . "\r\n" if $headers && $headers->@*;
 
     my $h = delete $self->{_h};
 
-    $h->write( $buf . $CRLF );
+    $h->write("$buf\r\n");
 
     $self->{_cb}->(1);
 

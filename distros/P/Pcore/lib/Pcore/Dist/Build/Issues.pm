@@ -156,7 +156,7 @@ sub print_issue ( $self, $issue, $print_content = 1 ) {
 
     print $tbl->finish;
 
-    say $LF, $issue->{content} || 'No content' if $print_content;
+    say "\n" . ( $issue->{content} || 'No content' ) if $print_content;
 
     return;
 }

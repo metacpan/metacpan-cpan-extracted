@@ -198,7 +198,7 @@ Thanks to Alex Balhatchet for suggesting it.
 
 package Symbol::Approx::Sub;
 
-require 5.006_000;
+require 5.010_000;
 use strict;
 use warnings;
 
@@ -215,7 +215,7 @@ use Exception::Class (
   'SAS::Exception::InvalidParameter'           => { isa => 'SAS::Exception' },
 );
 
-$VERSION = '3.1.0';
+$VERSION = '3.1.2';
 
 use Carp;
 

@@ -55,13 +55,13 @@ sub _build_exe_filename ($self) {
 
 # TODO enable repack
 sub run ($self) {
-    say qq[\nBuilding ] . ( $self->{crypt} ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . $SPACE . $BLACK . $ON_GREEN . ( $self->{clean} ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}$LF];
+    say qq[\nBuilding ] . ( $self->{crypt} ? $BLACK . $ON_GREEN . ' crypted ' : $BOLD . $WHITE . $ON_RED . q[ not crypted ] ) . $RESET . $SPACE . $BLACK . $ON_GREEN . ( $self->{clean} ? ' clean ' : ' cached ' ) . $RESET . qq[ "@{[$self->exe_filename]}" for $Config{archname}\n];
 
     # add main script
     $self->_add_perl_source( $self->{script}->to_abs->{path}, 'script/main.pl' );
 
     # add META.yml
-    $self->tree->add_file( 'META.yml', P->data->to_yaml( { par => { clean => 1 } } ) ) if $self->{clean};
+    $self->tree->add_file( 'META.yml', \P->data->to_yaml( { par => { clean => 1 } } ) ) if $self->{clean};
 
     # add modules
     print 'adding modules ... ';
@@ -342,7 +342,7 @@ sub _process_main_modules ($self) {
 }
 
 sub _add_perl_source ( $self, $source, $target, $is_cpan_module = 0, $module = undef ) {
-    my $src = P->file->read_bin($source);
+    my $src = \P->file->read_bin($source);
 
     if ($module) {
 
@@ -401,7 +401,7 @@ sub _add_dist ( $self, $dist ) {
         $self->tree->add_dir( $dist->{share_dir}, 'share' );
 
         # add main dist dist-id.yaml
-        $self->tree->add_file( 'share/dist-id.yaml', P->data->to_yaml( $dist->id ) );
+        $self->tree->add_file( 'share/dist-id.yaml', \P->data->to_yaml( $dist->id ) );
     }
     else {
 
@@ -409,7 +409,7 @@ sub _add_dist ( $self, $dist ) {
         $self->tree->add_dir( $dist->{share_dir}, "lib/auto/share/dist/@{[ $dist->name ]}" );
 
         # add dist-id.yaml
-        $self->tree->add_file( "lib/auto/share/dist/@{[ $dist->name ]}/dist-id.yaml", P->data->to_yaml( $dist->id ) );
+        $self->tree->add_file( "lib/auto/share/dist/@{[ $dist->name ]}/dist-id.yaml", \P->data->to_yaml( $dist->id ) );
     }
 
     say 'dist added: ' . $dist->name;
@@ -421,7 +421,7 @@ sub _add_dist ( $self, $dist ) {
 sub _repack_parl ( $self, $parl_path, $zip ) {
     print 'repacking parl ... ';
 
-    my $src = P->file->read_bin($parl_path);
+    my $src = \P->file->read_bin($parl_path);
 
     my $in_len = length $src->$*;
 
@@ -491,7 +491,7 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
 
     # adding files sections
     for my $filename ( sort keys $file_section->%* ) {
-        my $content = ref $file_section->{$filename} ? $file_section->{$filename} : P->file->read_bin( $file_section->{$filename} );
+        my $content = ref $file_section->{$filename} ? $file_section->{$filename} : \P->file->read_bin( $file_section->{$filename} );
 
         $fh->print( 'FILE' . pack( 'N', length($filename) + 9 ) . sprintf( '%08x', Archive::Zip::computeCRC32( $content->$* ) ) . q[/] . $filename . pack( 'N', length $content->$* ) . $content->$* );
 
@@ -509,10 +509,10 @@ sub _repack_parl ( $self, $parl_path, $zip ) {
     my $hash = $md5->hexdigest;
 
     # writing cache id
-    $fh->print( pack( 'Z40', $hash ) . "\N{NULL}CACHE" );
+    $fh->print( pack( 'Z40', $hash ) . "\x00CACHE" );
 
     # writing overlay length
-    $fh->print( pack( 'N', $fh->tell - $exe_header_length ) . "\N{NULL}PAR.pm$LF" );
+    $fh->print( pack( 'N', $fh->tell - $exe_header_length ) . "\x00PAR.pm\n" );
 
     my $out_len = $fh->tell;
 

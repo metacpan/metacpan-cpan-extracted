@@ -147,7 +147,7 @@ sub tgz ($self) {
             $mode = P->file->calc_chmod('rw-r--r--');
         }
 
-        $tgz->add_data( "$base_dir/$path", P->file->read_bin("$temp/$path")->$*, { mode => $mode } );
+        $tgz->add_data( "$base_dir/$path", P->file->read_bin("$temp/$path"), { mode => $mode } );
     }
 
     my $path = "$self->{dist}->{root}/data/.build/$base_dir.tar.gz";

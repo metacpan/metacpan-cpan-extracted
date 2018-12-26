@@ -3,7 +3,7 @@
 # Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 # Copyright (c) 2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.129 Tue Oct 16 16:56:38 PDT 2018 $
+# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.130 Sat Dec 22 18:42:26 PST 2018 $
 
 package Crypt::HashCash::Vault::Bitcoin;
 
@@ -20,7 +20,7 @@ use Business::Bitcoin;
 use Authen::TuringImage;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.129 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.130 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -91,7 +91,7 @@ sub keygen {
   $keydb->{vaultsigpub} = $vaultcfg->{vaultsigpub} = unpack('H*',$spk);
   $keydb->{vaultsec} = unpack('H*',$sk);
   $keydb->{vaultpub} = $vaultcfg->{vaultpub} = unpack('H*',$pk);
-  $keydb->{id} = $vaultcfg->{id} = $vaultid;
+  $keydb->{id} = $vaultcfg->{id} = "$vaultid";
   $keydb->{fees} = $vaultcfg->{fees} = $arg{Fees};
   $keydb->commit; $vaultcfg->commit;
 }
@@ -475,8 +475,8 @@ Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.129 $
- $Date: Tue Oct 16 16:56:38 PDT 2018 $
+ $Revision: 1.130 $
+ $Date: Sat Dec 22 18:42:26 PST 2018 $
 
 =head1 SYNOPSIS
 

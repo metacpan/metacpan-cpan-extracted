@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000456';
+our $VERSION='1.0000459';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1153,20 +1153,15 @@ END
    unless (-1<index $yins,'openssl-devel') {
       fa_system("sudo yum -y install 'openssl-devel'");
    }
-   if ((exists $amazon{'rhel'}) ||
+   if ((exists $amazon{'amazon_linux'}) ||
+         (exists $amazon{'rhel'}) ||
          (exists $amazon{'centos'})) {
       unless (-1<index $yins,'wget') {
          fa_system("sudo yum -y install 'wget'");
       }
-      my $wget_url='http://pkgs.repoforge.org/rpmforge-release/'.
-                   'rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm';
-      #my=$wget_url='http://dl.fedoraproject.org/pub/epel/beta/7'.
-      #             '/x86_64/epel-release-7-0.2.noarch.rpm';
-      fa_system("sudo wget $wget_url");
-      #my $rpm='epel-release-7-0.2.noarch.rpm';
-      my $rpm='rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm';
-      fa_system("sudo rpm -ivh $rpm");
-      fa_system("sudo rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt");
+      fa_system('sudo yum -y localinstall --nogpgcheck '.
+         'https://download1.rpmfusion.org/free/el/'.
+         'rpmfusion-free-release-7.noarch.rpm');
    }
    unless (-1<index $yins,'figlet') {
       fa_system("sudo yum -y install 'figlet'");
@@ -1179,7 +1174,7 @@ END
    $log->close() if $log && -1<index $log,'*';
    exec "sudo $^X Makefile.PL $argvs";
 
-} elsif (exists $amazon{'centos'}) {
+} elsif ((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'})) {
 
    # Most Amazon images need a lot of helper software like compilers
    # to install all module dependencies. It is assumed users attempting
@@ -1196,15 +1191,9 @@ END
       fa_system("sudo yum -y install 'wget'");
    }
    if ($new_wget) {
-      my $wget_url='http://pkgs.repoforge.org/rpmforge-release/'.
-                   'rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm';
-      #my=$wget_url='http://dl.fedoraproject.org/pub/epel/beta/7'.
-      #             '/x86_64/epel-release-7-0.2.noarch.rpm';
-      fa_system("sudo wget $wget_url");
-      #my $rpm='epel-release-7-0.2.noarch.rpm';
-      my $rpm='rpmforge-release-0.5.3-1.el6.rf.x86_64.rpm';
-      fa_system("sudo rpm -ivh $rpm");
-      fa_system("sudo rpm --import http://apt.sw.be/RPM-GPG-KEY.dag.txt");
+      fa_system('sudo yum -y localinstall --nogpgcheck '.
+         'https://download1.rpmfusion.org/free/el/'.
+         'rpmfusion-free-release-7.noarch.rpm');
    }
    unless (-1<index $yins,'figlet') {
       fa_system("sudo yum -y install 'figlet'");
@@ -1961,7 +1950,8 @@ END
                      exit;
                   } alarm 0;
                };
-               if (($system_type eq 'rhel') ||
+               if (($system_type eq 'amazon_linux') ||
+                     ($system_type eq 'rhel') ||
                      ($system_type eq 'centos') ||
                      ($system_type eq 'fedora')) {
                   fa_system("sudo yum -y install 'openssl-devel'");

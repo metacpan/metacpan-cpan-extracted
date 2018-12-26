@@ -4,14 +4,18 @@ author:
   - 'Renee Baecker <reneeb@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Tabulate-Plugin-ASCIITable
+provides:
+  Data::Tabulate::Plugin::ASCIITable:
+    file: lib/Data/Tabulate/Plugin/ASCIITable.pm
+    version: '0.04'
 requires:
   Test::CheckManifest: '1.0'
   Text::Table::Tiny: '0'
@@ -19,4 +23,9 @@ resources:
   bugtracker: http://github.com/reneeb/Data-Tabulate-Plugin-ASCIITable/issues
   homepage: http://github.com/reneeb/Data-Tabulate-Plugin-ASCIITable
   repository: http://github.com/reneeb/Data-Tabulate-Plugin-ASCIITable.git
-version: '0.03'
+version: '0.04'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

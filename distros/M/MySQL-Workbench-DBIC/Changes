@@ -1,6 +1,10 @@
 Change history for MySQL::Workbench::DBIC
 =========================================
 
+1.11 2018-12-26 09:49:00
+
+  * Handle table and column comments correctly (fix #6, #7)
+
 1.10 2018-12-06 10:08:00
 
   * do not run tests in taint mode

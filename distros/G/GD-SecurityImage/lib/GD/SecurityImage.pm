@@ -1,7 +1,8 @@
 package GD::SecurityImage;
+$GD::SecurityImage::VERSION = '1.75';
 use strict;
 use warnings;
-use vars qw[@ISA $VERSION $BACKEND];
+use vars qw[@ISA $BACKEND];
 use GD::SecurityImage::Styles;
 use Carp qw(croak);
 use constant RGB_WHITE   => ( 255, 255, 255 );
@@ -18,8 +19,6 @@ use constant DEFAULT_LINES  => 10;
 use constant MAX_RGB_VALUE  => 255;
 use constant PARTICLE_MULTIPLIER => 20;
 use constant MAX_RGB_PARAMS => 3;
-
-$VERSION = '1.73';
 
 sub import {
    my($class, @args) = @_;
@@ -154,7 +153,8 @@ sub backends {
 
    return @list if defined wantarray;
 
-   my $report = "Available back-ends in $class v$VERSION are:\n\t"
+   my $version = $self->VERSION;
+   my $report = "Available back-ends in $class v$version are:\n\t"
                . join("\n\t", @list)
                . "\n\n"
                . "Search directories:\n\t"
@@ -257,11 +257,6 @@ sub create {
         text  => $self->cconvert($col1),
         lines => $self->cconvert($col2),
    };
-
-   # be a smart module and auto-disable ttf if we are under a prehistoric GD
-   if ( not $self->{IS_MAGICK} ) {
-      $method = 'normal' if $self->_versionlt( '1.20' );
-   }
 
    if ( $method eq 'normal' && ! $self->{gd_font} ) {
       $self->{gd_font} = $self->gdf('giant');
@@ -413,9 +408,17 @@ sub is_hex {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-GD::SecurityImage - Security image (captcha) generator.
+GD::SecurityImage
+
+=head1 VERSION
+
+version 1.75
 
 =head1 SYNOPSIS
 
@@ -474,9 +477,6 @@ modules will not be loaded and probably, you'll C<die()>.
 
 =head1 DESCRIPTION
 
-This document describes version C<1.73> of C<GD::SecurityImage>
-released on C<21 January 2015>.
-
 The (so called) I<"Security Images"> are so popular. Most internet 
 software use these in their registration screens to block robot programs
 (which may register tons of  fake member accounts). Security images are
@@ -496,6 +496,10 @@ taste. But there are some I<captcha handlers> for several Perl FrameWorks.
 If you are an user of one of these frameworks, see  
 L</"GD::SecurityImage Implementations"> in L</"SEE ALSO"> section
 for information.
+
+=head1 NAME
+
+GD::SecurityImage - Security image (captcha) generator.
 
 =head1 COLOR PARAMETERS
 
@@ -640,8 +644,7 @@ none are mandatory.
 
 C<$method> can be B<C<normal>> or B<C<ttf>>.
 
-C<$style> can be one of the following (some of the styles may not work 
-if you are using a really old version of GD):
+C<$style> can be one of the following:
 
 =over 4
 
@@ -679,9 +682,6 @@ and circles.
 Draws nothing. See L</"OTHER USES">.
 
 =back
-
-I<Note>: if you have a (too) old version of GD, you may not be able 
-to use some of the styles.
 
 You can use this code to get all available style names:
 
@@ -786,9 +786,7 @@ long texts, be sure to adjust the image, or clipping will occur.
 =head2 out
 
 This method finally returns the created image, the mime type of the 
-image and the random number(s) generated. Older versions of GD only support
-C<gif> type, while new versions support C<jpeg> and C<png> 
-(B<update>: beginning with v2.15, GD resumed gif support).
+image and the random number(s) generated.
 
 The returned mime type is C<png> or C<gif> or C<jpeg> for C<GD> and 
 C<gif> for C<Image::Magick> (if you do not C<force> some other format).
@@ -918,8 +916,6 @@ this mandatory methods.
    ellipse		draws an ellipse
    arc			draws an arc
    setThickness		sets the thickness of the lines when drawing something
-   _versiongt           backend version is greater or equal to supplied param?
-   _versionlt           backend version is smaller than supplied param?
 
 and
 
@@ -947,160 +943,9 @@ C<GD::SecurityImage>.
 Download the distribution from a CPAN mirror near you, if you 
 don't have the files.
 
-=begin html
+Running the test suite will also create some sample images.
 
-<!-- this h1 part is for search.cpan.org -->
-<h1>
-<a class = 'u' 
-   href  = '#___top'
-   title ='click to go to top of document'
-   name  = "IMAGE SAMPLES"
->IMAGE SAMPLES</a>
-</h1>
-
-<p>
-All TTF samples generated with the bundled font <i>StayPuft.ttf</i>,
-unless stated otherwise. Most of the samples here can be generated with 
-running the test suite that comes with the GD::SecurityImage distribution. 
-However, images that are generated with random angles will indeed be a 
-little different after you run the test suite on your system.
-</p>
-
-<p>
-All random codes have a length of six (6) characters, unless stated otherwise.
-So, (for example) there is no clipping in <code>ELLIPS</code>.
-</p>
-
-<table border      = "1"
-       cellpadding = "4"
-       cellspacing = "1"
->
-   <tr>
-      <td colspan="2" style="text-align:center;font-weight:bold">
-         <br />
-         Images generated with GD
-         <br />
-         <br />
-      </td>
-   </tr>
-
-   <tr><td colspan="2">&#160;</td></tr>
-
-   <tr>
-      <td> Standard interface. Font: <b>gdGiantFont</b> </td>
-      <td> Style: <b>rect</b>                           </td>
-   </tr>
-   <tr>
-      <td><img border="0" src="http://img505.imageshack.us/img505/1365/gdnormal03boxvi9.png" /></td>
-      <td><img border="0" src="http://img524.imageshack.us/img524/9065/gdttf02rectiz2.png"   /></td>
-   </tr>
-
-   <tr><td colspan="2">&#160;</td></tr>
-
-   <tr>
-      <td>Style: <b>rect</b>. Scrambled with random angles.</td>
-      <td>Style: <b>circle</b>. Scrambled with a fixed angle.</td>
-   </tr>
-   <tr>
-      <td><img border="0" src="http://img505.imageshack.us/img505/8893/gdttfscramble02rectma0.png" /></td>
-      <td><img border="0" src="http://img512.imageshack.us/img512/8207/gdttfscramblefixed04cirwt1.png" /></td>
-   </tr>
-
-   <tr><td colspan="2">&#160;</td></tr>
-
-   <tr>
-      <td>Style: <b>default</b>. Scrambled with a fixed angle. <br />Info text at the top right.</td>
-      <td>Style: <b>circle</b>. Scrambled with random angles. <br />Font is: <i>Transformers.ttf</i></td>
-   </tr>
-   <tr>
-      <td><img border="0" src="http://img524.imageshack.us/img524/1452/gdttfscramblefixedinfotuz9.png"  /></td>
-      <td><img border="0" src="http://img505.imageshack.us/img505/739/differentdz6.png" /></td>
-   </tr>
-
-</table>
-
-<p>&nbsp;</p>
-
-<table border      = "1"
-       cellpadding = "4"
-       cellspacing = "2"
->
-   <tr>
-      <td colspan="2" style="text-align:center;font-weight:bold">
-         <br />
-         Images generated with Image::Magick
-         <br />
-         <br />
-      </td>
-   </tr>
-
-   <tr><td colspan="2">&#160;</td></tr>
-
-   <tr>
-      <td>Style: <b>circle</b>.</td>
-      <td>Style: <b>box</b>. Scrambled with random angles.</td>
-   </tr>
-   <tr>
-      <td><img border="0" src="http://img524.imageshack.us/img524/1233/magick04circleru3.png"       /></td>
-      <td><img border="0" src="http://img521.imageshack.us/img521/7235/magickscramble03boxmb2.png" /></td>
-   </tr>
-
-   <tr><td colspan="2">&#160;</td></tr>
-   <tr>
-      <td>Style: <b>circle</b>. Scrambled with a fixed angle.</td>
-      <td>Style: <b>ellipse</b>. Scrambled with a fixed angle.<br /> Info text at the top right.</td>
-   </tr>
-
-   <tr>
-      <td><img border="0" src="http://img139.imageshack.us/img139/7227/magickscramblefixed04cihd4.png" /></td>
-      <td><img border="0" src="http://img440.imageshack.us/img440/2647/magickscramblefixed05elnz6.png" /></td>
-   </tr>
-
-   <tr><td colspan="2">&#160;</td></tr>
-
-   <tr>
-      <td>Style: <b>ec</b>. Scrambled with random angles.<br /> Info text at the top right.</td>
-      <td>Style: <b>ec</b>. Scrambled with random angles<b><sup>1</sup>.</b></td>
-   </tr>
-   <tr>
-      <td><img border="0" src="http://img139.imageshack.us/img139/9587/magickscrambleinfotext0bz8.png" /></td>
-      <td><img border="0" src="http://img505.imageshack.us/img505/347/burakrw7.gif" /></td>
-   </tr>
-
-</table>
-
-
-<p>
-<sup><b>1</b></sup>: This image is generated with this code:</p>
-<p>
-<pre>
-<span style="color: #8B008B; font-weight:bold;">use</span> <span style="color: #000000;">GD::SecurityImage</span> <span style="color: #000000;">backend</span> <span style="color: #000000;">=&gt;</span> <span style="color: #CD5555;">'Magick'</span><span style="color: #000000;">;</span>
-<span style="color: #8B008B; font-weight:bold;">my</span><span style="color: #000000;">(</span><span style="color: #00688B;">$data</span><span style="color: #000000;">,</span> <span style="color: #00688B;">$mime</span><span style="color: #000000;">,</span> <span style="color: #00688B;">$rnd</span><span style="color: #000000;">)</span> = <span style="color: #000000;">GD::SecurityImage</span>
-<span style="color: #000000;">-&gt;new</span><span style="color: #000000;">(</span>
-   <span style="color: #000000;">width</span>      <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">420</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">height</span>     <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">100</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">ptsize</span>     <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">40</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">lines</span>      <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">20</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">thickness</span>  <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">4</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">rndmax</span>     <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">5</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">scramble</span>   <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">1</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">send_ctobg</span> <span style="color: #000000;">=&gt;</span> <span style="color: #B452CD;">1</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">bgcolor</span>    <span style="color: #000000;">=&gt;</span> <span style="color: #CD5555;">'#009999'</span><span style="color: #000000;">,</span>
-   <span style="color: #000000;">font</span>       <span style="color: #000000;">=&gt;</span> <span style="color: #CD5555;">'StayPuft.ttf'</span><span style="color: #000000;">,</span>
-<span style="color: #000000;">)</span>
-<span style="color: #00688B;">-&gt;random</span><span style="color: #000000;">(</span><span style="color: #CD5555;">'BURAK'</span><span style="color: #000000;">)</span>
-<span style="color: #00688B;">-&gt;create</span><span style="color: #000000;">(</span> <span style="color: #CD5555;">qw/ ttf ec #0066CC #0066CC /</span> <span style="color: #000000;">)</span>
-<span style="color: #00688B;">-&gt;particle</span><span style="color: #000000;">(</span><span style="color: #B452CD;">300</span><span style="color: #000000;">,</span> <span style="color: #B452CD;">500</span><span style="color: #000000;">)</span>
-<span style="color: #00688B;">-&gt;out</span><span style="color: #000000;">;</span>
-
-</pre>
-</p>
-
-<p>Images hosted by <a href="http://imageshack.us">ImageShack</a>.</p>
-
-=end html
-
-=head2 OTHER USES
+=head2 OTHER USE CASES
 
 C<GD::SecurityImage> drawing capabilities can also be used for 
 I<counter image> generation or displaying arbitrary messages:
@@ -1144,21 +989,6 @@ I<counter image> generation or displaying arbitrary messages:
    print header -type => "image/$mime";
    print $data;
 
-=begin html
-
-<p>
-The generated graphic will be:
-<br/>
-<br/>
-<img src    = "http://img101.imageshack.us/img101/4770/gdsicountered2.png"
-     border = "0"
-     alt    = "Image Hosted by ImageShack.us" />
-</p>
-
-<p>Image hosted by <a href="http://imageshack.us">ImageShack</a>.</p>
-
-=end html
-
 =head1 ERROR HANDLING
 
 C<die> is called in some methods if something fails. You may need to 
@@ -1186,19 +1016,6 @@ may prevent this.
 
 See the L</SUPPORT> section if you have a bug or 
 request to report.
-
-=head2 Image::Magick bug
-
-There is a bug in PerlMagick' s C<QueryFontMetrics()> method. ImageMagick
-versions smaller than 6.0.4 is affected. Below text is from the ImageMagick 
-6.0.4 Changelog: L<http://www.imagemagick.org/www/Changelog.html>.
-
-"2004-05-06 PerlMagick's C<QueryFontMetrics()> incorrectly reports `unrecognized 
-attribute'` for the `font' attribute."
-
-Please upgrade to ImageMagick 6.0.4 or any newer version, if your ImageMagick 
-version is smaller than 6.0.4 and you want to use Image::Magick as the backend
-for GD::SecurityImage.
 
 =head2 GD bug
 
@@ -1298,33 +1115,6 @@ The internal random code generator is used B<only> for demonstration
 purposes for this module. It may not be I<effective>. You must supply 
 your own random code and use this module to display it.
 
-=item *
-
-B<[GD] png compression>
-
-Support for compression level argument to png() added in v2.07. If
-your GD version is smaller than this, compress option to C<out()>
-will be silently ignored.
-
-=item *
-
-B<[GD] setThickness>
-
-setThickness implemented in GD v2.07. If your GD version is smaller
-than that and you set thickness option, nothing will happen.
-
-=item *
-
-B<[GD] ellipse>
-
-C<ellipse()> method added in GD 2.07. 
-
-If your GD version is smaller than 2.07 and you use C<ellipse>, 
-the C<default> style will be returned.
-
-If your GD is smaller than 2.07 and you use C<ec>, only the circles will
-be drawn.
-
 =back
 
 =head1 SEE ALSO
@@ -1388,43 +1178,15 @@ L<Angerwhale::Controller::Captcha>
 
 =back
 
-=head2 Software Using GD::SecurityImage
-
-If your software uses C<GD::SecurityImage> for captcha generation and
-want to appear in this document, contact the author.
-
-=head1 SUPPORT
-
-=head2 BUG REPORTS
-
-All bug reports and wishlist items B<must> be reported via
-the CPAN RT system. It is accessible at
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=GD-SecurityImage>.
-
-=head2 DISCUSSION FORUM
-
-C<CPAN::Forum> is a place for discussing C<CPAN>
-modules. It also has a C<GD::SecurityImage> section at
-L<http://www.cpanforum.com/dist/GD-SecurityImage>.
-
-=head2 RATINGS
-
-If you like or hate or have some suggestions about
-C<GD::SecurityImage>, you can comment/rate the distribution via 
-the C<CPAN Ratings> system: 
-L<http://cpanratings.perl.org/dist/GD-SecurityImage>.
-
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2015 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2004 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.12.4 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

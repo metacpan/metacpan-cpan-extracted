@@ -6,7 +6,7 @@ use experimental 'smartmatch';
 
 # ABSTRACT: Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
-our $VERSION = '2.2.3'; # VERSION
+our $VERSION = '2.3'; # VERSION
 
 use LWP::UserAgent;
 use HTTP::Cookies 6.04;
@@ -60,6 +60,13 @@ has 'api_key_field' => (
 );
 
 
+has 'api_version' => (
+    is      => 'rw',
+    isa     => 'Int',
+    default => sub { 1 },
+);
+
+
 has 'mapping' => (is => 'rw');
 
 
@@ -80,6 +87,13 @@ has 'auth_type' => (
     is      => 'rw',
     isa     => 'Str',
     default => sub { 'none' },
+);
+
+
+has 'auth_header' => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => sub { 'Authorization' },
 );
 
 
@@ -391,6 +405,10 @@ sub talk {
     # handle different auth_types
     given (lc $self->auth_type) {
         when ('basic') { $uri->userinfo($self->user . ':' . $self->api_key); }
+        when ('header') {
+            $self->header->{ $self->auth_header } =
+                "Token token=" . $self->api_key;
+        }
         when ('hash_key') {
             my $api_key_field = $self->api_key_field;
             if ($self->mapping and not $command->{no_mapping}) {
@@ -459,14 +477,11 @@ sub talk {
     $uri = $oauth_req->to_url if ($self->auth_type eq 'oauth_params');
 
     # build headers
-    my %header;
+    my %header = %{ $self->header };
     if (exists $command->{headers} and ref $command->{headers} eq 'HASH') {
-        %header = (%{ $self->header }, %{ $command->{headers} });
+        %header = (%header, %{ $command->{headers} });
     }
-    else {
-        %header = %{ $self->header };
-    }
-    my $headers = HTTP::Headers->new(%header, "Accept" => $content_type->{in});
+    my $headers = HTTP::Headers->new("Accept" => $content_type->{in}, %header);
 
     if ($self->debug) {
         $self->log("uri: $method $uri");
@@ -708,6 +723,7 @@ sub format_response {
     my $answer;
 
     if ($response) {
+
         # collect response headers
         my $response_headers;
         $response_headers->{$_} = $response->header($_)
@@ -715,12 +731,14 @@ sub format_response {
 
         # decode content if necessary
         unless ($self->_decoded_response) {
-            $self->_decoded_response(
-                eval {
-                    $self->decode($response->decoded_content,
-                        ($response_headers->{'Content-Type'} || $ct));
-                });
-            $error ||= $@;
+            if (length($response->decoded_content) > 0) {
+                $self->_decoded_response(
+                    eval {
+                        $self->decode($response->decoded_content,
+                            ($response_headers->{'Content-Type'} || $ct));
+                    });
+                $error ||= $@;
+            }
         }
 
         # search for and expose errors
@@ -799,7 +817,7 @@ sub build_content_type {
 }
 
 
-sub DESTROY {}
+sub DESTROY { }
 
 
 sub AUTOLOAD {
@@ -862,7 +880,7 @@ Web::API - Web::API - A Simple base module to implement almost every RESTful API
 
 =head1 VERSION
 
-version 2.2.3
+version 2.3
 
 =head1 SYNOPSIS
 
@@ -1026,6 +1044,12 @@ get/set API username/account name
 get/set name of the hash key that has to hold the C<api_key>
 e.g. in POST content payloads
 
+=head2 api_version (optional)
+
+get/set API version to be used
+
+default: 1
+
 =head2 mapping (optional)
 
 supply mapping table, hashref of format { "key" => "value", ... }
@@ -1050,9 +1074,16 @@ get/set custom headers sent with every request
 
 =head2 auth_type
 
-get/set authentication type. currently supported are only 'basic', 'hash_key', 'get_params', 'oauth_header', 'oauth_params' or 'none'
+get/set authentication type. currently supported are only 'basic', 'header',
+'hash_key', 'get_params', 'oauth_header', 'oauth_params' or 'none'
 
 default: none
+
+=head2 auth_header (optional)
+
+get/set the name of the header used for Authorization credentials
+
+default: Authorization
 
 =head2 default_method (optional)
 

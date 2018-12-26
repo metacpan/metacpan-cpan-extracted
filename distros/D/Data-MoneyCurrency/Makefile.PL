@@ -24,9 +24,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Data::MoneyCurrency",
   "PREREQ_PM" => {
+    "Cpanel::JSON::XS" => 0,
     "File::ShareDir" => 0,
-    "JSON" => 0,
-    "JSON::XS" => 0,
     "Pod::Coverage" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.88",
@@ -35,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Types::Serialiser" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,9 +42,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Cpanel::JSON::XS" => 0,
   "File::ShareDir" => 0,
-  "JSON" => 0,
-  "JSON::XS" => 0,
   "Pod::Coverage" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.88",

@@ -1,5 +1,8 @@
 Revision history
 
+0.0004      2018-12-24
+    - Use Pod::Weaver::Section::Contributors.
+
 0.0003      2018-12-09
     - Put "STATUS" section near to top of generated pod. 
 

@@ -6,16 +6,6 @@ use Text::Xslate qw[mark_raw unmark_raw];
 
 our $ENC_CACHE = {};
 
-our %ESC_ANSI_CTRL = (
-    qq[\a] => q[\a],
-    qq[\b] => q[\b],
-    qq[\t] => q[\t],
-    qq[\n] => q[\n],
-    qq[\f] => q[\f],
-    qq[\r] => q[\r],
-    qq[\e] => q[\e],
-);
-
 our $EXPORT = [ qw[
       cut
       cut_all
@@ -27,7 +17,7 @@ our $EXPORT = [ qw[
       encode_html_attr
       encode_js_string
       encode_utf8
-      escape_scalar
+      escape_perl
       expand_num
       add_num_sep
       fullchomp
@@ -210,82 +200,103 @@ sub table {
     return Pcore::Util::Text::Table->new( {@_} );
 }
 
-sub remove_ansi {
+sub remove_ansi ($str) {
+    $str =~ s/\e.+?m//smg;
+
     if ( defined wantarray ) {
-        return join $EMPTY, map {s/\e.+?m//smgr} @_;
+        return $str;
     }
     else {
-        for (@_) {    # convert in-place
-            s/\e.+?m//smg;
-        }
+        $_[0] = $str;
 
         return;
     }
 }
 
-sub escape_scalar {
-    local $_;
+sub escape_perl ( $str, @args ) {
+    state @map = do {
+        my @_map;
 
-    if ( defined wantarray ) {
-        $_ = $_[0];
-    }
-    else {
-        \$_ = \$_[0];
-    }
+        $_map[ ord "\a" ] = '\a';
+        $_map[ ord "\b" ] = '\b';
+        $_map[ ord "\e" ] = '\e';
+        $_map[ ord "\f" ] = '\f';
+        $_map[ ord "\n" ] = '\n';
+        $_map[ ord "\r" ] = '\r';
+        $_map[ ord "\t" ] = '\t';
+
+        for ( 0x00 .. 0x1F, 0x7F .. 0xFF ) { $_map[$_] = sprintf '\x%02X', $_ if !defined $_map[$_] }
+
+        for ( 0x20 .. 0x7E ) { $_map[$_] = chr if !defined $_map[$_] }
+
+        @_map;
+    };
 
     my %args = (
-        bin         => undef,    # if TRUE - always treats scalar as binary data
-        utf8_encode => 1,        # if FALSE - in bin mode escape utf8 multi-byte chars as \x{...}
-        esc_color   => undef,
-        reset_color => $RESET,
-        splice @_, 1,
+        quote       => 1,              # 1 - always quote, 2 - quote for fat-comma ("=>")
+        readable    => 0,
+        color       => 0,
+        color_ctrl  => $BOLD . $RED,
+        color_reset => $RESET,
+        @args,
     );
 
-    # automatically detect scalar type
-    if ( !defined $args{bin} ) {
-        if ( utf8::is_utf8 $_ ) {    # UTF-8 scalar
-            $args{bin} = 0;
+    if ( $str eq $EMPTY ) {
+        if ( defined wantarray ) {
+            return $args{quote} ? q[''] : $EMPTY;
         }
-        elsif (/[[:^ascii:]]/sm) {    # latin1 octets
-            $args{bin} = 1;
-        }
-        else {                        # ASCII bytes
-            $args{bin} = 0;
+        else {
+            $_[0] = $args{quote} ? q[''] : $EMPTY;
+
+            return;
         }
     }
 
-    # escape scalar
-    if ( $args{bin} ) {
-        if ( utf8::is_utf8 $_ ) {
-            if ( $args{utf8_encode} ) {
-                encode_utf8 $_;
+    my $color_ctrl  = $args{color} && $args{color_ctrl}  ? $args{color_ctrl}  : $EMPTY;
+    my $color_reset = $color_ctrl  && $args{color_reset} ? $args{color_reset} : $EMPTY;
 
-                s/(.)/sprintf '\x%02X', ord $1/smge;
-            }
-            else {
-                s/([[:ascii:]])/sprintf '\x%02X', ord $1/smge;
+    my $interpolation;
 
-                s/([[:^ascii:]])/sprintf '\x{%X}', ord $1/smge;
-            }
+    # downgrade, if possible
+    Encode::_utf8_off $str if utf8::is_utf8 $str && length $str == bytes::length $str;
+
+    # escape '/'
+    $str =~ s[/][\/]smg if $args{quote};
+
+    # escape control characters
+    $interpolation = 1 if $str =~ s/([\x00-\x1F\x7F])/$color_ctrl . $map[ ord $1 ] . $color_reset/smge;
+
+    if ( utf8::is_utf8 $str) {
+        if ( $args{readable} ) {
+            $interpolation = 1 if $str =~ s/([\x80-\xFF])/$map[ ord $1 ]/smge;
         }
         else {
-            s/(.)/sprintf '\x%02X', ord $1/smge;
+            $interpolation = 1 if $str =~ s[([[:^ascii:]])][$map[ ord $1 ] // sprintf '\x{%X}', ord $1]smge;
+
+            Encode::_utf8_off $str;
         }
     }
     else {
-        my $esc_color = $args{esc_color} || $EMPTY;
+        $interpolation = 1 if $str =~ s/([[:^ascii:]])/$map[ ord $1 ]/smge;
+    }
 
-        my $reset_color = $args{esc_color} ? $args{reset_color} : $EMPTY;
-
-        s/([\a\b\t\n\f\r\e])/${esc_color}$ESC_ANSI_CTRL{$1}${reset_color}/smg;    # escape ANSI
-
-        s/([\x00-\x1A\x1C-\x1F\x7F])/$esc_color . sprintf( '\x%02X', ord $1 ) . $reset_color/smge;    # hex ANSI non-printable chars
+    if ( $args{quote} ) {
+        if ($interpolation) {
+            $str =~ s/"/\\"/smg;
+            $str = qq["$str"];
+        }
+        elsif ( $args{quote} != 2 || $str =~ /[^A-Za-z0-9_]/sm ) {
+            $str =~ s/'/\\'/smg;
+            $str = qq['$str'];
+        }
     }
 
     if ( defined wantarray ) {
-        return $_;
+        return $str;
     }
     else {
+        $_[0] = $str;
+
         return;
     }
 }
@@ -448,13 +459,13 @@ sub expand_num ($num) {
 
     my ( $abs, $sign, $exp ) = ( $1, $2, $3 );
 
-    my $sig = $sign eq q[-] ? q[.] . ( $exp - 1 + length $abs ) : $EMPTY;
+    my $sig = $sign eq '-' ? '.' . ( $exp - 1 + length $abs ) : $EMPTY;
 
     return sprintf "%${sig}f", $num;
 }
 
 # pretty print number 1234567 -> 1_234_567
-sub add_num_sep ( $num, $sep = q[_] ) {
+sub add_num_sep ( $num, $sep = '_' ) {
     my $sign = $num =~ s/\A([^\d])//sm ? $1 : $EMPTY;
 
     my $fraction = $num =~ s/[.](\d+)\z//sm ? $1 : undef;
@@ -574,18 +585,24 @@ sub to_camel_case {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 203                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 193                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 227, 415             | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
+## |      | 216                  | * Subroutine "escape_perl" with high complexity score (31)                                                     |
+## |      | 304                  | * Subroutine "wrap" with high complexity score (28)                                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 293                  | Subroutines::ProhibitExcessComplexity - Subroutine "wrap" with high complexity score (28)                      |
+## |    3 | 261, 276             | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | NamingConventions::ProhibitAmbiguousNames                                                                      |
-## |      | 399, 400             | * Ambiguously named variable "left"                                                                            |
-## |      | 400                  | * Ambiguously named variable "right"                                                                           |
+## |      | 410, 411             | * Ambiguously named variable "left"                                                                            |
+## |      | 411                  | * Ambiguously named variable "right"                                                                           |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 10, 11, 12, 13, 14,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
-## |      | 15, 16               |                                                                                                                |
+## |    3 | 426                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 220, 221, 222, 223,  | ValuesAndExpressions::RequireInterpolationOfMetachars - String *may* require interpolation                     |
+## |      | 224, 225, 226, 228   |                                                                                                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 288                  | RegularExpressions::ProhibitEnumeratedClasses - Use named character classes ([^A-Za-z0-9_] vs. \W)             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

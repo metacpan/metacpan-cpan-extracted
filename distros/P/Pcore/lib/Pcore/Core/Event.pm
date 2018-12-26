@@ -133,8 +133,8 @@ Pcore::Core::Event - Pcore event broker
     );
 
     P->bind_events( 'log.test.*', 'stderr:' );                                                   # pipe
-    P->bind_events( 'log.test.*', [ 'stderr:',      tmpl => "<: \$key :>$LF<: \$text :>" ] );    # pipe with params
-    P->bind_events( 'log.test.*', [ 'file:123.log', tmpl => "<: \$key :>$LF<: \$text :>" ] );    # pipe with params
+    P->bind_events( 'log.test.*', [ 'stderr:',      tmpl => "<: \$key :>\n<: \$text :>" ] );    # pipe with params
+    P->bind_events( 'log.test.*', [ 'file:123.log', tmpl => "<: \$key :>\n<: \$text :>" ] );    # pipe with params
 
     P->fire_event( 'test.1234.aaa', $data );
 

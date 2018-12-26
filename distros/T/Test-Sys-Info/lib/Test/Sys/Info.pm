@@ -1,7 +1,7 @@
 package Test::Sys::Info;
+$Test::Sys::Info::VERSION = '0.23';
 use strict;
 use warnings;
-use vars qw( $VERSION @ISA @EXPORT );
 use Carp qw( croak );
 use base qw( Exporter );
 use Test::More;
@@ -12,8 +12,7 @@ BEGIN {
     $test->no_plan if ! $test->has_plan;
 }
 
-$VERSION = '0.21';
-@EXPORT  = qw( driver_ok );
+our @EXPORT  = qw( driver_ok );
 
 sub driver_ok {
     require_ok('Test::Sys::Info::Driver');
@@ -29,9 +28,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Test::Sys::Info - Centralized test suite for Sys::Info.
+Test::Sys::Info
+
+=head1 VERSION
+
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -40,10 +45,11 @@ Test::Sys::Info - Centralized test suite for Sys::Info.
 
 =head1 DESCRIPTION
 
-This document describes version C<0.21> of C<Test::Sys::Info>
-released on C<5 July 2016>.
-
 This is a centralized test suite for Sys::Info Drivers.
+
+=head1 NAME
+
+Test::Sys::Info - Centralized test suite for Sys::Info.
 
 =head1 TESTS
 
@@ -57,15 +63,13 @@ L<Sys::Info>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

@@ -32,7 +32,7 @@ sub CLI_RUN ( $self, $opt, $arg, $rest ) {
 
     say $res;
 
-    say join $LF, $res->{data}->@* if $res->{data};
+    say join "\n", $res->{data}->@* if $res->{data};
 
     return;
 }

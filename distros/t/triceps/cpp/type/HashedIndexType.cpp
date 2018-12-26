@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -258,7 +258,7 @@ void HashedIndexType::initialize()
 Index *HashedIndexType::makeIndex(const TableType *tabtype, Table *table) const
 {
 	if (!isInitialized() 
-	|| errors_->hasError())
+	|| errors_.hasError())
 		return NULL; 
 	// no need to report the errors, so can just use the same less_,
 	// without creating a copy with the table pointer

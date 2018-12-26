@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace pie.
 
@@ -33,20 +33,36 @@ sub TO_JSON {
     return \%hash;
 }
 
-has color => ( is => "rw", );
+has color => ( is  => "rw",
+               isa => "Maybe[ArrayRef]", );
+
+has colorsrc => ( is            => "rw",
+                  isa           => "Str",
+                  documentation => "Sets the source reference on plot.ly for  color .",
+);
 
 has description => ( is      => "ro",
                      default => "Sets the font used for `textinfo` lying outside the pie.", );
 
 has family => (
     is  => "rw",
-    isa => "Str",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The plotly service (at https://plot.ly or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.",
 );
 
+has familysrc => ( is            => "rw",
+                   isa           => "Str",
+                   documentation => "Sets the source reference on plot.ly for  family .",
+);
+
 has size => ( is  => "rw",
-              isa => "Num", );
+              isa => "Num|ArrayRef[Num]", );
+
+has sizesrc => ( is            => "rw",
+                 isa           => "Str",
+                 documentation => "Sets the source reference on plot.ly for  size .",
+);
 
 __PACKAGE__->meta->make_immutable();
 1;
@@ -63,7 +79,7 @@ Chart::Plotly::Trace::Pie::Outsidetextfont - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -103,13 +119,25 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * color
 
+=item * colorsrc
+
+Sets the source reference on plot.ly for  color .
+
 =item * description
 
 =item * family
 
 HTML font family - the typeface that will be applied by the web browser. The web browser will only be able to apply a font if it is available on the system which it operates. Provide multiple font families, separated by commas, to indicate the preference in which to apply fonts if they aren't available on the system. The plotly service (at https://plot.ly or on-premise) generates images on a server, where only a select number of fonts are installed and supported. These include *Arial*, *Balto*, *Courier New*, *Droid Sans*,, *Droid Serif*, *Droid Sans Mono*, *Gravitas One*, *Old Standard TT*, *Open Sans*, *Overpass*, *PT Sans Narrow*, *Raleway*, *Times New Roman*.
 
+=item * familysrc
+
+Sets the source reference on plot.ly for  family .
+
 =item * size
+
+=item * sizesrc
+
+Sets the source reference on plot.ly for  size .
 
 =back
 

@@ -10,7 +10,6 @@ use Pod::Usage;
 
 # use Data::Dumper::Simple;
 
-my $path;
 my $errors     = 0;
 my $auto       = 0;
 my $fullscreen = 0;
@@ -25,13 +24,11 @@ GetOptions(
     'full'        => \$fullscreen,
     'showall|all' => \$showall,
     'help'        => \$help,
-    'delay=i'     => \$delay,
+    'delay|wait=i'     => \$delay,
     'nosplash'    => \$nosplash,
 );
 
-if (scalar(@ARGV) && ! $help) {
-    $path = $ARGV[-1];
-} else {
+unless (scalar(@ARGV) && ! $help) {
     $help = 2;
 }
 
@@ -50,36 +47,37 @@ my $FB = Graphics::Framebuffer->new(
 system('clear');
 $FB->cls('OFF');
 
-my $p = gather($FB,$path);
+my $p = gather($FB,@ARGV);
 
 $FB->cls();
-
 
 show($FB, $p);
 
 exit(0);
 
 sub gather {
-    my $FB = shift;
-    my $path = shift;
+    my $FB    = shift;
+    my @paths = @_;
     my @pics;
-    chop($path) if ($path =~ /\/$/);
-    $FB->rbox({'x' => 0, 'y' => 0, 'width' => $FB->{'XRES'}, 'height' => 32, 'filled' => 1, 'gradient' => {'direction' => 'vertical', 'colors' => {'red' => [0,0], 'green' => [0,0], 'blue' => [64,128]}}});
-    print_it($FB,"Scanning - $path");
-    opendir(my $DIR, "$path") || die "Problem reading $path directory";
-    chomp(my @dir = readdir($DIR));
-    closedir($DIR);
+    foreach my $path (@paths) {
+        chop($path) if ($path =~ /\/$/);
+        $FB->rbox({'x' => 0, 'y' => 0, 'width' => $FB->{'XRES'}, 'height' => 32, 'filled' => 1, 'gradient' => {'direction' => 'vertical', 'colors' => {'red' => [0,0], 'green' => [0,0], 'blue' => [64,128]}}});
+        print_it($FB,"Scanning - $path");
+        opendir(my $DIR, "$path") || die "Problem reading $path directory";
+        chomp(my @dir = readdir($DIR));
+        closedir($DIR);
 
-    return if (! $showall && grep(/^\.nomedia$/, @dir));
-    foreach my $file (@dir) {
-        next if ($file =~ /^\.+/);
-        if (-d "$path/$file") {
-            my $r = gather($FB,"$path/$file");
-            if (defined($r)) {
-                @pics = (@pics,@{$r});
+        return if (! $showall && grep(/^\.nomedia$/, @dir));
+        foreach my $file (@dir) {
+            next if ($file =~ /^\.+/);
+            if (-d "$path/$file") {
+                my $r = gather($FB,"$path/$file");
+                if (defined($r)) {
+                    @pics = (@pics,@{$r});
+                }
+            } elsif (-f "$path/$file" && $file =~ /\.(jpg|jpeg|gif|tiff|bmp|png)$/i) {
+                push(@pics, "$path/$file");
             }
-        } elsif (-f "$path/$file" && $file =~ /\.(jpg|jpeg|gif|tiff|bmp|png)$/i) {
-            push(@pics, "$path/$file");
         }
     }
     return(\@pics);

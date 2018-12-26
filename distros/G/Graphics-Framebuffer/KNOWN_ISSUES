@@ -6,3 +6,13 @@ mode.  Use double-buffering and "blit_flip" to overcome this.
 blit_transform - flip_horizontal - has known issues.  Try instead rotating
 180 degrees and then flip_vertical.
 
+Some framebuffer drivers are tearfully slow.  I have noticed that the
+Nouveau framebuffer driver for NVidia is Molasses slow.  Perhaps it's
+because it is mirroring the same display on three 4K monitors (I'd
+rather it not, but it does).  Regardless, it's amazing how slow it is.
+Other framebuffer drivers are amazingly fast.  It's clear the Nouveau
+framebuffer driver is in dire need of optimization, or at the very
+least hardware accelerated buffer copy.  I'll be looking into finding
+ways to overcome this issue.  Maybe turning off the mirroring would
+help.
+

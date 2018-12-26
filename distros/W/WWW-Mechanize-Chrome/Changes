@@ -13,8 +13,34 @@
     * Tested against Chromium HeadlessChrome/69.0.3497.100
     * Tested against Chromium HeadlessChrome/70.0.3538.77
     * Tested against Chromium HeadlessChrome/70.0.3538.102
-    * Tested against Chromium HeadlessChrome/71.0.3576.0
-    * Tested against Chrome   HeadlessChrome/72.0.3602.0
+    * Tested against Chromium HeadlessChrome/71.0.3578.98
+    * Tested against Chrome   HeadlessChrome/72.0.3623.0
+    * Tested against Chrome   HeadlessChrome/73.0.3650.0
+
+0.27 2018-12-23
+    * Properly handle Page.navigatedWithinDocument instead of raising an error.
+      The synthetic response object doesn't help much, but on the other side,
+      it's much better than raising an error and stopping the script.
+      Reported by Steve Dondley, Github issue GH #34
+    * Makefile.PL now specifies a minimum EU::MM version, thanks to Lorenzo
+
+0.26 2018-12-09
+    * Actually do something if we timeout when connecting to Chrome.
+      The main cause of the connetcion to Chrome failing is that there already
+      is a non-devtools instance of Chrome running and is brought to the
+      foreground instead of a new DevTools-enabled instance being launched.
+      The best workaround is to launch it as
+
+      use File::Temp 'tempdir';
+      # create a fresh Chrome every time
+      my $mech = WWW::Mechanize::Chrome->new(
+          data_directory => tempdir(CLEANUP => 1 ),
+      );
+
+    * More log output in Chrome::DevToolsProtocol
+    * Now testing up to Chrome 73
+    * ExtUtils::MakeMaker minimum version 5.52_01, contributed by LorenzoTa
+    * Fix the test skip counts for several tests
 
 0.25 2018-11-23
     * Added one stray test to the distribution

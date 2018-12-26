@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.014'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,7 @@ resources:
   bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-Alt/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::Alt
   repository: git://github.com/plicease/Dist-Zilla-Plugin-Alt.git
-version: '0.05'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.06'
+x_generated_by_perl: v5.29.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

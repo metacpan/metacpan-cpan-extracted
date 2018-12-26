@@ -11,16 +11,11 @@ int   _al_vc[256];
 
 /* you may be asking...why? */
 /* well, windows and older versions of MacOS don't have strndup, so... */
-char * _al_substr(const char* src, const int offset, const int len) {
-    char * sub = (char*)malloc(len+1);
+unsigned char * _al_substr(unsigned const char* src, const int offset, const int len) {
+    unsigned char * sub = (unsigned char*)malloc(len+1);
     memcpy(sub, src + offset, len);
     sub[len] = 0;
     return sub;
-}
-
-/* needed for Devel::Cover */
-void _al_test_croak() {
-    S_croak_memory_wrap();
 }
 
 /* not thread safe, don't use this module with perl threads */
@@ -39,12 +34,12 @@ int _al_init_vc(SV* hash_ref) {
     hash_entry = hv_iternext(hash);
     sv_key = hv_iterkeysv(hash_entry);
     sv_val = hv_iterval(hash, hash_entry);
-    _al_vc[(SvPV(sv_key,PL_na))[0]]=atoi(SvPV(sv_val,PL_na)); /* #uncoverable statment */ 
+    _al_vc[(SvPV(sv_key,PL_na))[0]]=atoi(SvPV(sv_val,PL_na)); 
   }
   return 1;
 }
 
-int check_digit_rff(char *input) {
+int check_digit_rff(unsigned char *input) {
     int len=strlen(input)-1;
     if (len < 1) { 
         return -1;
@@ -66,7 +61,7 @@ int check_digit_rff(char *input) {
     return(checksum%10);
 }
 
-int check_digit_fast(char *input) {
+int check_digit_fast(unsigned char *input) {
     int i, sum, ch, num, twoup, len;
     len = strlen(input);
     if (len < 1) { 
@@ -83,8 +78,8 @@ int check_digit_fast(char *input) {
         num=_al_vc[input[i]];
         if (num == -1)  { 
           /* Don't change the error text, perl tests depend on the exact words */ 
-          char err[MAX_ERROR_LEN];
-          snprintf(err,MAX_ERROR_LEN,"Invalid character '%c', in check_digit calculation",input[i]);
+          unsigned char err[MAX_ERROR_LEN];
+          snprintf(err,MAX_ERROR_LEN,"Invalid character '%c', in check_digit calculation string [%s]",input[i],input);
           SV *error;
           error=get_sv("Algorithm::LUHN_XS::ERROR",GV_ADD);
           sv_setpv(error,err);
@@ -101,7 +96,7 @@ int check_digit_fast(char *input) {
     return((10-(sum %10)) % 10);
 }
 
-SV* check_digit(char *input) {
+SV* check_digit(unsigned char *input) {
     int len=strlen(input);
     if (len < 1) {
         return &PL_sv_undef;
@@ -114,10 +109,10 @@ SV* check_digit(char *input) {
     }
 }
 
-SV* is_valid(char *input) {
+SV* is_valid(unsigned char *input) {
     int len=strlen(input);
     if (len < 2) {
-        char err[MAX_ERROR_LEN];
+        unsigned char err[MAX_ERROR_LEN];
         snprintf(err,MAX_ERROR_LEN,
             "is_valid: you must supply input of at least 2 characters");
         SV *error;
@@ -126,9 +121,9 @@ SV* is_valid(char *input) {
         SV* rv=newSVpv(NULL,1);
         return rv;
     }
-    char *leftmost=_al_substr(input,0,len-1); 
-    char cd=input[len-1];
-    char c=check_digit_fast(leftmost)+'0';
+    unsigned char *leftmost=_al_substr(input,0,len-1); 
+    unsigned char cd=input[len-1];
+    unsigned char c=check_digit_fast(leftmost)+'0';
     free(leftmost);
     if (c < 48) {
         SV* rv=newSVpv(NULL,1);
@@ -137,7 +132,7 @@ SV* is_valid(char *input) {
         if (cd == c) {
             return(newSViv(1));
         } else {
-            char err[MAX_ERROR_LEN];
+            unsigned char err[MAX_ERROR_LEN];
             snprintf(err,MAX_ERROR_LEN,
                 "Check digit incorrect. Expected %c",c);
             SV *error;
@@ -149,14 +144,14 @@ SV* is_valid(char *input) {
     }
 }
 
-int is_valid_fast(char *input) {
+int is_valid_fast(unsigned char *input) {
     int len=strlen(input);
     if (len < 2) {
         return 0;
     }
-    char *leftmost=_al_substr(input,0,len-1); 
-    char cd=input[len-1];
-    char c=check_digit_fast(leftmost)+'0';
+    unsigned char *leftmost=_al_substr(input,0,len-1); 
+    unsigned char cd=input[len-1];
+    unsigned char c=check_digit_fast(leftmost)+'0';
     free(leftmost);
 
     if (c < 48) {
@@ -165,7 +160,7 @@ int is_valid_fast(char *input) {
         if (cd == c) {
             return 1;
         } else {
-            char err[MAX_ERROR_LEN];
+            unsigned char err[MAX_ERROR_LEN];
             snprintf(err,MAX_ERROR_LEN,
                 "Check digit incorrect. Expected %c",c);
             SV *error;
@@ -176,14 +171,14 @@ int is_valid_fast(char *input) {
     }
 }
 
-int is_valid_rff(char *input) {
-    char csum;
+int is_valid_rff(unsigned char *input) {
+    unsigned char csum;
     int len=strlen(input);
     if (len < 2) {
         return 0;
     }
-    char cd=input[len-1];
-    char *leftmost=_al_substr(input,0,len-1); 
+    unsigned char cd=input[len-1];
+    unsigned char *leftmost=_al_substr(input,0,len-1); 
     int d=check_digit_rff(leftmost);
     csum=d+'0';
     free(leftmost);
@@ -209,27 +204,24 @@ _al_init_vc (hash_ref)
 
 int
 check_digit_rff (input)
-	char *	input
+	unsigned char *	input
 
 int
 check_digit_fast (input)
-	char *	input
+	unsigned char *	input
 
 SV*
 check_digit(input)
-	char *	input
+	unsigned char *	input
 
 SV*
 is_valid(input)
-	char *	input
+	unsigned char *	input
 
 int
 is_valid_fast(input)
-	char *	input
+	unsigned char *	input
 
 int
 is_valid_rff(input)
-	char *	input
-
-void
-_al_test_croak()
+	unsigned char *	input

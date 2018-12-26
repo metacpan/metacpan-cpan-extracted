@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -72,7 +72,7 @@ $rt2 = eval { Triceps::RowType->new(
 	e => "string[]",
 ); };
 ok(!defined $rt2);
-ok($@, qr/^Triceps::RowType::new: field 'e' string array type is not supported\nTriceps::RowType::new: The specification was: {\n  a => void\n  b => int32\n  c => int64\n  d => float64\n  e => string\[\]\n} at/);
+ok($@, qr/^Triceps::RowType::new: field 'e' string array type is not supported\nTriceps::RowType::new: The specification was: \{\n  a => void\n  b => int32\n  c => int64\n  d => float64\n  e => string\[\]\n\} at/);
 
 $rt2 = eval { Triceps::RowType->new(
 	a => "void",

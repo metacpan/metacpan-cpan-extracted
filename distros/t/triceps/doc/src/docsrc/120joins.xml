@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -62,7 +62,7 @@ See the file COPYRIGHT for the copyright notice and license information
 		the equi-joins to start with. The other systems are much more efficient
 		on the equi-joins than on the other kinds of joins. At the moment
 		Triceps follows the fashion of having the advanced support only for the
-		equi-joins. Even though the Sorted/Ordered indexes in Triceps should allow the
+		equi-joins. Even though the Sorted and Ordered indexes in Triceps should allow the
 		range-based comparisons to be efficient too, at the moment there are no
 		table methods for the look-up of ranges, they are left for the future
 		work. Of course, nothing stops you from copying an equi-join template
@@ -468,7 +468,7 @@ while(&readLine) {
 		This option is optional: if it's missing, the template will automatically
 		find the index that matches the key fields. The index must exist though,
 		if it doesn't exist, LookupJoin can't create it and can't work without
-		it either. The index must be a Hashed index.
+		it either. The index must be a Hashed or Ordered index.
 		</para>
 
 		<indexterm>
@@ -484,7 +484,7 @@ while(&readLine) {
 			<secondary>keys</secondary>
 		</indexterm>
 		<para>
-		There is no particular reason for it not being a Sorted/Ordered index, other
+		There is no particular reason for it not being a Sorted index, other
 		that the <pre>getKey()</pre> call does not work for these indexes yet, and
 		that's what the LookupJoin uses to check that the right-side index key
 		matches the join key in <quote>by</quote>. The order of the fields in the
@@ -742,16 +742,17 @@ join.out OP_DELETE acct="2" id="3" amount="200"
 		the right side for an incoming row. The situation itself is obviously
 		useful and normal, just it's not what normally happens with the
 		account id translation, and I was too lazy to invent another
-		realistically-looking example.
+		realistically-looking example. And just to show that the Ordered indexes
+		can be used too, let's use them here.
 		</para>
 
 <!-- t/xJoin.t, doLookupLeftMulti and the type def before it, removed saveJoinerTo -->
 <pre>
 our $ttAccounts2 = Triceps::TableType->new($rtAccounts)
 	->addSubIndex("iterateSrc", # for iteration in order grouped by source
-		Triceps::IndexType->newHashed(key => [ "source" ])
+		Triceps::IndexType->newOrdered(key => [ "source" ])
 		->addSubIndex("lookupSrcExt",
-			Triceps::IndexType->newHashed(key => [ "external" ])
+			Triceps::IndexType->newOrdered(key => [ "external" ])
 			->addSubIndex("grouping", Triceps::IndexType->newFifo())
 		)
 	)
@@ -1564,7 +1565,7 @@ our $ttToUsd = Triceps::TableType->new($rtToUsd)
 		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
 	)
 	->addSubIndex("byDate", # for cleaning by date
-		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		Triceps::IndexType->newOrdered(key => [ "date" ])
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 ;
@@ -1580,7 +1581,7 @@ our $ttPosition = Triceps::TableType->new($rtPosition)
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 	->addSubIndex("byDate", # for cleaning by date
-		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		Triceps::IndexType->newOrdered(key => [ "date" ])
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 ;
@@ -1624,7 +1625,7 @@ while(&readLine) {
 		</para>
 
 		<para>
-		Both of the joined tables must provide a Hashed index for the efficient
+		Both of the joined tables must provide a Hashed or Ordered index for the efficient
 		joining. In this case it will be <quote>currencyLookup</quote> on the left and
 		<quote>primary</quote> on the right, found automatically by the key fields.
 		The index may be leaf (selecting one row per key) or non-leaf
@@ -1679,9 +1680,9 @@ our $join = Triceps::JoinTwo->new(
 			<secondary>hashed</secondary>
 		</indexterm>
 		<para>
-		Same as with LookupJoin, currently only the Hashed indexes are
+		Same as with LookupJoin, currently only the Hashed and Ordered indexes are
 		supported, and must go through all the path. The outer index <quote>byDate</quote>
-		here can not be a Sorted/Ordered index, that would be an error and the
+		here cannot be a Sorted index, that would be an error and the
 		join will refuse to accept it.
 		</para>
 
@@ -2442,7 +2443,7 @@ our $ttToUsd = Triceps::TableType->new($rtToUsd)
 		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
 	)
 	->addSubIndex("byDate", # for cleaning by date
-		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		Triceps::IndexType->newOrdered(key => [ "date" ])
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 ;
@@ -2458,7 +2459,7 @@ our $ttPosition = Triceps::TableType->new($rtPosition)
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 	->addSubIndex("byDate", # for cleaning by date
-		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		Triceps::IndexType->newOrdered(key => [ "date" ])
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 ;

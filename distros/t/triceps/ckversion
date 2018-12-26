@@ -10,6 +10,14 @@ shift
 } >&2
 
 RET=0
+
+RELNOTES="doc/src/docsrc/990relnotes.xml"
+PATTERN=">Release $VERSION<"
+fgrep "$PATTERN" $RELNOTES >/dev/null || { echo "Missing '$PATTERN' in $RELNOTES" >&2; RET=1; }
+VER_UNDER=`echo "$VERSION" | tr . _`
+PATTERN="id=\"sc_notes_$VER_UNDER\""
+fgrep "$PATTERN" $RELNOTES >/dev/null || { echo "Missing '$PATTERN' in $RELNOTES" >&2; RET=1; }
+
 for f in `find perl/Triceps/lib ! -path '*/.svn/*' -name '*.pm'`
 do {
 	v=`perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift)' "$f"`

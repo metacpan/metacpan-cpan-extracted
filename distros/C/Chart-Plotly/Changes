@@ -1,3 +1,6 @@
+0.021 2018-12-23 20:00:00+0000
+  - Update to plotly.js 1.43.1
+  - Add new trace types: barpolar, streamtube, parcats
 0.019 2018-05-04 20:00:00+0000
   - Update to plotly.js 1.37.1
 0.016 2018-04-01 19:34:00+0000

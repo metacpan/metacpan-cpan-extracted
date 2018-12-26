@@ -4,32 +4,31 @@
       "Burak Gursoy <burak@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "task",
+      "belike"
+   ],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Task-BeLike-BURAK",
-   "no_index" : {
-      "directory" : [
-         "monolithic_version",
-         "builder",
-         "t",
-         "xt"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.40"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
@@ -39,7 +38,6 @@
             "CGI::Auth::Basic" : "1.21",
             "Capture::Tiny" : "0.22",
             "Devel::Size" : "0.73",
-            "Device::CableModem::Motorola::SB4200" : "0.10",
             "File::HomeDir" : "0",
             "GD::SecurityImage" : "1.70",
             "GD::Thumbnail" : "1.35",
@@ -62,19 +60,42 @@
             "Text::Template::Simple" : "0.83",
             "Time::Elapsed" : "0.31",
             "Unicode::Casing" : "0.12",
-            "criticism" : "1.02"
+            "criticism" : "1.02",
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.012"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "bugtracker" : {
+         "web" : "https://github.com/burak/CPAN-Task-BeLike-BURAK/issues"
+      },
       "repository" : {
-         "url" : "http://github.com/burak/cpan-task-belike-burak/"
+         "type" : "git",
+         "url" : "git://github.com/burak/CPAN-Task-BeLike-BURAK.git",
+         "web" : "https://github.com/burak/CPAN-Task-BeLike-BURAK"
       }
    },
-   "version" : "0.19",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.20",
+   "x_contributors" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
+

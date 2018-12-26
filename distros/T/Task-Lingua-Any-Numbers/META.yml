@@ -3,22 +3,25 @@ abstract: 'Installs all number to word modules.'
 author:
   - 'Burak Gursoy <burak@cpan.org>'
 build_requires:
-  Test::More: '0.40'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
 configure_requires:
-  Module::Build: '0.42'
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - lingua
+  - numbers
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Task-Lingua-Any-Numbers
-no_index:
-  directory:
-    - monolithic_version
-    - builder
-    - t
-    - xt
 requires:
   Lingua::AF::Numbers: '0'
   Lingua::Any::Numbers: '0.41'
@@ -41,8 +44,13 @@ requires:
   Lingua::SV::Numbers: '0'
   Lingua::TR::Numbers: '0'
   Lingua::ZH::Numbers: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/burak/cpan-task-lingua-any-numbers/
-version: '0.19'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/burak/CPAN-Task-Lingua-Any-Numbers/issues
+  repository: git://github.com/burak/CPAN-Task-Lingua-Any-Numbers.git
+version: '0.20'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

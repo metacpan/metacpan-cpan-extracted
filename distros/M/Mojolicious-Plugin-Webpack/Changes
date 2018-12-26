@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojolicious-Plugin-Webpack
 
+0.04 2018-12-26T13:53:46+0900
+ - Fix typo in webpack.custom.js
+ - Add M::P::Webpack::Builder to make M::P::Webpack a production shim
+ - M::P::Webpack::Builder can install a shim into your application
+
 0.03 2018-12-20T12:50:22+0900
  - Add url_for() method
  - Will migrate assetpack.def from AssetPack into webpack custom config

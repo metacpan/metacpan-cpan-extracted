@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -41,14 +41,14 @@ public:
 	// Create a copy of the type, also copying all the contents including the row types.
 	// The copy is also uninitialized. The errors will not be copied.
 	//
-	// Here there is no use in the holder having the default of NULL
+	// Here there is no use in the holder having the default of NO_HOLD_ROW_TYPES
 	// because it would produce something seriously undesirable.
 	// Just use copy() instead if you don't need the deepness.
 	//
 	// @param holder - helper object that makes sure that multiple
 	//        references to the same row type stay multiple references
 	//        to the same copied row type, not multiple row types
-	//        (unless it's NULL, which reverts to plain copying).
+	//        (unless it's NO_HOLD_ROW_TYPES, which reverts to plain copying).
 	//        The caller has to keep a reference to the holder for
 	//        the duration.
 	TableType *deepCopy(HoldRowTypes *holder) const;
@@ -58,6 +58,7 @@ public:
 	virtual bool equals(const Type *t) const;
 	virtual bool match(const Type *t) const;
 	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const;
+	virtual int cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const;
 
 	// The idea of the configuration methods is that they return back "this",
 	// making possible to chain them together with "->".
@@ -109,13 +110,13 @@ public:
 	// Find an index type by name.
 	// Works only after initialization.
 	// @param name - name of the index
-	// @return - index, or NULL if not found
+	// @return - index, or NO_INDEX_TYPE if not found
 	IndexType *findSubIndex(const string &name) const;
 
 	// Find the first index type of given IndexId
 	// Works only after initialization.
 	// @param it - type enum of the nested index
-	// @return - pointer to the nested index or NULL if none matches
+	// @return - pointer to the nested index or NO_INDEX_TYPE if none matches
 	IndexType *findSubIndexById(IndexType::IndexId it) const;
 
 	// Return the vector of nested indexes, for iteration

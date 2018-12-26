@@ -1,5 +1,10 @@
 Revision history for Perl extension UPnP.
 
+2018-12-23 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.6
+        * Thank you Florian Schlichting
+        * Update ControlPoint::serach() not to abort when the HTTP request is failed
+
 2018-11-09 Satoshi Konno <skonno@cybergarage.org>
 	* v1.4.5
         * Thanks for Ted Lyngmo <ted@lyncon.se>
@@ -11,6 +16,7 @@ Revision history for Perl extension UPnP.
 	* Bugfix: Unusual device locations should not crash the program.
 
 2013-12-27 Thomas Liske <thomas at fiasko-nw.net>
+	* v1.4.3
 	* Implement handling of chunked "Transfer-Encoding".
 
 2010-08-07 Satoshi Konno <skonno@cybergarage.org>

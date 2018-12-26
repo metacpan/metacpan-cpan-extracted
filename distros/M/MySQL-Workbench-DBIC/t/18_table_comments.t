@@ -59,7 +59,7 @@ my $check = q~__PACKAGE__->add_columns\\(
         'passphrase_check_method' => 'check_passphrase',
         'passphrase_class' => 'SaltedDigest'
     \\},
-    another_phrase => \\{
+    another_phrase => \\{ # A comment in JSON
         data_type          => 'VARCHAR',
         is_nullable        => 1,
         size               => 45,
@@ -68,13 +68,19 @@ my $check = q~__PACKAGE__->add_columns\\(
 \\);~;
 
 my $content = do{ local (@ARGV, $/) = $role_class; <> };
-like( $content, qr/$check/ );
-
+like $content, qr/$check/;
 like $content, qr/__PACKAGE__->load_components\([^\)]+PassphraseColumn/;
+like $content, qr/another_phrase => \{ # A comment in JSON/;
+like $content, qr/=head1 \s+ DESCRIPTION \s+ A \s+ table \s+ comment \s+ in \s+ JSON/x;
+
+my $comment_table = do { local (@ARGV, $/) = $subpath . '/DBIC_Schema/Result/another_comment.pm'; <> };
+like $comment_table, qr/=head1 \s+ DESCRIPTION \s+ In \s+ this \s+ table/x;
+like $comment_table, qr/comment_id => \{ # A column comment/;
+like $comment_table, qr/comment_text => \{ # A multiline\n\s{22}# comment/;
 
 eval{
-#    rmtree( $output_path );
-#    rmdir $output_path;
+    rmtree( $output_path );
+    rmdir $output_path;
 };
 
 done_testing();

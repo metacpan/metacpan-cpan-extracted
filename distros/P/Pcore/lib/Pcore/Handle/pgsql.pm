@@ -201,9 +201,9 @@ sub quote ( $self, $var ) {
             # encode and quote
             $var = $self->encode_json( $var->[1] );
 
-            $var->$* =~ s/'/''/smg;
+            $var =~ s/'/''/smg;
 
-            return q['] . $var->$* . q['];
+            return "'$var'";
         }
         else {
             die 'Unsupported SQL type';

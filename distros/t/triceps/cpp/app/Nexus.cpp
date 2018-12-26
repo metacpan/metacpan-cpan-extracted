@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -98,7 +98,7 @@ void Nexus::deleteReader(ReaderQueue *rq)
 	ReaderVec::Vec::const_iterator it = readers_->v().begin();
 	ReaderVec::Vec::const_iterator end = readers_->v().end();
 	for (; it != end; ++it)
-		if (*it != rq)
+		if (it->ne(rq))
 			rnew->v_.push_back(*it);
 
 	{
@@ -118,7 +118,7 @@ void Nexus::deleteReader(ReaderQueue *rq)
 
 		end = rnew->v().end();
 		for (it = rnew->v().begin(); it != end; ++it) {
-			if (*it == rfirst)
+			if (it->eq(rfirst))
 				continue;
 			pw::lockmutex lm((*it)->mutex());
 			(*it)->setLastIdL(idx);

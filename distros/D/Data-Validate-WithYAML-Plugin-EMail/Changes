@@ -1,6 +1,10 @@
 Revision history for Data::Validate::WithYAML::Plugin::EMail
 ============================================================
 
+0.04    2018-12-26 10:20:00
+
+        + improve tests
+
 0.03    2015-02-18
 
         [MISC]

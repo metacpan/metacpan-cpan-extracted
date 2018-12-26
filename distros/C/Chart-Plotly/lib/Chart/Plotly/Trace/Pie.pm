@@ -13,9 +13,10 @@ use Chart::Plotly::Trace::Pie::Marker;
 use Chart::Plotly::Trace::Pie::Outsidetextfont;
 use Chart::Plotly::Trace::Pie::Stream;
 use Chart::Plotly::Trace::Pie::Textfont;
+use Chart::Plotly::Trace::Pie::Title;
 use Chart::Plotly::Trace::Pie::Transform;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
 
@@ -91,6 +92,18 @@ has hoverinfosrc => ( is            => "rw",
 
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Hoverlabel", );
+
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `label`, `color`, `value`, `percent` and `text`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\".",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
 
 has hovertext => (
     is  => "rw",
@@ -210,7 +223,7 @@ has text => (
     is  => "rw",
     isa => "ArrayRef|PDL",
     documentation =>
-      "Sets text elements associated with each sector. If trace `textinfo` contains a *text* flag, these elements will seen on the chart. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
+      "Sets text elements associated with each sector. If trace `textinfo` contains a *text* flag, these elements will be seen on the chart. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
 );
 
 has textfont => ( is  => "rw",
@@ -234,11 +247,21 @@ has textsrc => ( is            => "rw",
                  documentation => "Sets the source reference on plot.ly for  text .",
 );
 
+has title => ( is  => "rw",
+               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Title", );
+
 has transforms => ( is  => "rw",
                     isa => "ArrayRef|ArrayRef[Chart::Plotly::Trace::Pie::Transform]", );
 
 has uid => ( is  => "rw",
              isa => "Str", );
+
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
 
 has values => ( is  => "rw",
                 isa => "ArrayRef|PDL",
@@ -272,7 +295,7 @@ Chart::Plotly::Trace::Pie - A data visualized by the sectors of the pie is set i
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -358,6 +381,14 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
 
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `label`, `color`, `value`, `percent` and `text`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>".
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
 =item * hovertext
 
 Sets hover text elements associated with each sector. If a single string, the same string appears for all data points. If an array of string, the items are mapped in order of this trace's sectors. To be seen, trace `hoverinfo` must contain a *text* flag.
@@ -436,7 +467,7 @@ Determines whether or not the sectors are reordered from largest to smallest.
 
 =item * text
 
-Sets text elements associated with each sector. If trace `textinfo` contains a *text* flag, these elements will seen on the chart. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.
+Sets text elements associated with each sector. If trace `textinfo` contains a *text* flag, these elements will be seen on the chart. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.
 
 =item * textfont
 
@@ -456,9 +487,15 @@ Sets the source reference on plot.ly for  textposition .
 
 Sets the source reference on plot.ly for  text .
 
+=item * title
+
 =item * transforms
 
 =item * uid
+
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
 
 =item * values
 

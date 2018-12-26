@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -36,9 +36,8 @@ public:
 	// and remembered. If it was seen, the previous mapping will be
 	// returned.
 	//
-	// The special feature is that this object may be NULL. This
-	// allows to do a simple-minded copy without having a HoldRowTypes
-	// object, just passing a NULL for it.
+	// To do a simnple-minded copy withotu having a HoldRowTypes
+	// object, use the special object NO_HOLD_ROW_TYPES.
 	//
 	// @param orig - the original row type to copy, if it's NULL then a NULL
 	//        will be returned
@@ -51,6 +50,19 @@ protected:
 
 	Map map_;
 };
+
+class NoHoldRowTypes: public HoldRowTypes
+{
+public:
+	// A special way to create the static objects of HoldRowTypes that can get
+	// referenced by AutoRef and still never get destroyed.
+	NoHoldRowTypes();
+};
+
+// The default holder that doesn't hold anything, just copies
+// everything passed to it.
+extern NoHoldRowTypes NO_HOLD_ROW_TYPES_OBJECT;
+extern HoldRowTypes * const NO_HOLD_ROW_TYPES;
 
 }; // TRICEPS_NS
 

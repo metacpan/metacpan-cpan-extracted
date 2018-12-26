@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Symbol-Approx-Sub",
    "prereqs" : {
@@ -40,34 +40,34 @@
             "Devel::Symdump" : "0",
             "Exception::Class" : "0",
             "Module::Load" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "Symbol::Approx::Sub" : {
          "file" : "lib/Symbol/Approx/Sub.pm",
-         "version" : "v3.1.0"
+         "version" : "v3.1.2"
       },
       "Symbol::Approx::Sub::Random" : {
          "file" : "lib/Symbol/Approx/Sub/Random.pm",
-         "version" : "v3.0.2"
+         "version" : "v3.1.2"
       },
       "Symbol::Approx::Sub::String::Approx" : {
          "file" : "lib/Symbol/Approx/Sub/String/Approx.pm",
-         "version" : "v3.0.2"
+         "version" : "v3.1.2"
       },
       "Symbol::Approx::Sub::String::Equal" : {
          "file" : "lib/Symbol/Approx/Sub/String/Equal.pm",
-         "version" : "v3.0.2"
+         "version" : "v3.1.2"
       },
       "Symbol::Approx::Sub::Text::Metaphone" : {
          "file" : "lib/Symbol/Approx/Sub/Text/Metaphone.pm",
-         "version" : "v3.0.2"
+         "version" : "v3.1.2"
       },
       "Symbol::Approx::Sub::Text::Soundex" : {
          "file" : "lib/Symbol/Approx/Sub/Text/Soundex.pm",
-         "version" : "v3.0.2"
+         "version" : "v3.1.2"
       }
    },
    "release_status" : "stable",
@@ -81,6 +81,6 @@
          "web" : "https://github.com/davorg/symbol-approx-sub"
       }
    },
-   "version" : "v3.1.0",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v3.1.2",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -45,6 +45,11 @@ void RowHandleType::printTo(string &res, const string &indent, const string &sub
 {
 	// this never should get actually printed
 	res.append("**rowHandle**");
+}
+
+int RowHandleType::cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const
+{
+	return CMP_NOT_SUPPORTED;
 }
 
 }; // TRICEPS_NS

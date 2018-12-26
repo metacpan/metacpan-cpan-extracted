@@ -2,20 +2,32 @@ Date-Holidays-BY
 
 Determine Belarus official holidays and business days in 2017-2019
 
+Source https://ru.wikipedia.org/wiki/Праздники_Белоруссии
+
 
 INSTALLATION
 
-Classic:
-	perl Makefile.PL
-	make
-	make install
+Install from CPAN:
 
-Using cpanminus:
+	cpan Date::Holidays::BY
+
+or use cpanminus:
 
 	cpanm Date::Holidays::BY
 
 
-DEVELOP
+To install this package from source:
+
+	perl Build.PL
+	./Build
+	./Build install
+
+or use cpanminus:
+
+	cpanm .
+
+
+DEVELOP CPAN RELEASE
 
 Install Carton ( https://metacpan.org/pod/Carton ), then dependencies:
 	perl dev/dev.pl

@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -201,7 +201,7 @@ UTESTCASE rowset(Utest *utest)
 	UT_ASSERT(set6->getErrors().isNull());
 	UT_ASSERT(set6->isInitialized());
 
-	Autoref<RowSetType> set7 = set6->deepCopy(); // with default NULL holder
+	Autoref<RowSetType> set7 = set6->deepCopy(); // with default holder
 	UT_ASSERT(set7->equals(set7));
 	UT_ASSERT(!set7->isInitialized());
 

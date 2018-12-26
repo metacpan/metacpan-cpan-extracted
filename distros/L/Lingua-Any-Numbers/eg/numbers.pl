@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
-# (c) 2007 Burak Gursoy <burak[at]cpan[dot]org>
-# This sample code needs several other modules
-# and perl 5.008 at least.
-use 5.008;
+# (c) 2007-2019 Burak Gursoy <burak[at]cpan[dot]org>
+# This sample code needs several other modules.
+#
+use 5.010;
 use strict;
 use warnings;
 use Data::Dumper;

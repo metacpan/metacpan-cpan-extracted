@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -51,12 +51,12 @@ ok(!defined $res);
 ok($@, qr/^Code snippet: failed to compile the source code
 Compilation error: syntax error at .*
 The source code was:
-     1 sub {
+     1 sub \{
      2 1 \) 2
-     3 }
+     3 \}
  at .*\/Code.pm line \d*\.?
-\tTriceps::Code::compile\('1 \) 2'\) called at .*\/Code.t line \d*\.?
-\teval {...} called at .*\/Code.t line \d*\.?
+\tTriceps::Code::compile\(.*\) called at .*\/Code.t line \d*\.?
+\teval \{...\} called at .*\/Code.t line \d*\.?
 /);
 
 $res = eval { Triceps::Code::compile("1 ) 2", "test code"); };
@@ -65,12 +65,12 @@ ok(!defined $res);
 ok($@, qr/^test code: failed to compile the source code
 Compilation error: syntax error at .*
 The source code was:
-     1 sub {
+     1 sub \{
      2 1 \) 2
      3 }
  at .*\/Code.pm line \d*\.?
-\tTriceps::Code::compile\('1 \) 2', 'test code'\) called at .*\/Code.t line \d*\.?
-\teval {...} called at .*\/Code.t line \d*\.?
+\tTriceps::Code::compile\(.*\) called at .*\/Code.t line \d*\.?
+\teval \{...\} called at .*\/Code.t line \d*\.?
 /);
 
 # a completely wrong value

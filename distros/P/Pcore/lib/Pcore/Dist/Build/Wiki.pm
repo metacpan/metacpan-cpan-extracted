@@ -84,7 +84,7 @@ MD
         # add abstract
         $toc_md .= " - $toc->{$link}" if $toc->{$link};
 
-        $toc_md .= "  $LF";    # two spaces make single line break
+        $toc_md .= "  \n";    # two spaces make single line break
     }
 
     # write POD.md

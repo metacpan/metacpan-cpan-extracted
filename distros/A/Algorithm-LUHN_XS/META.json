@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Algorithm-LUHN_XS",
    "no_index" : {
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.06",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

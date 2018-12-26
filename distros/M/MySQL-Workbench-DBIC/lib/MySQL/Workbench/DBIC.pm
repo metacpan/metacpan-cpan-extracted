@@ -13,7 +13,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 has output_path         => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                => ( is => 'ro', required => 1 );
@@ -28,7 +28,6 @@ has version_add         => ( is => 'ro', required => 1, default => sub { 0.01 } 
 has column_details      => ( is => 'ro', required => 1, default => sub { 0 } );
 has use_fake_dbic       => ( is => 'ro', required => 1, default => sub { 0 } );
 has skip_indexes        => ( is => 'ro', required => 1, default => sub { 0 } );
-has table_comments      => ( is => 'ro', required => 1, default => sub { 0 } );
 has belongs_to_prefix   => ( is => 'ro', required => 1, default => sub { '' } );
 has has_many_prefix     => ( is => 'ro', required => 1, default => sub { '' } );
 has has_one_prefix      => ( is => 'ro', required => 1, default => sub { '' } );
@@ -265,12 +264,21 @@ sub _class_template{
     my $comment = $table->comment // '{}';
 
     my $data;
+    my $table_comment_perl = '';
     eval {
         $data = JSON->new->utf8(1)->decode( $comment );
     };
 
     if ( !ref $data || 'HASH' ne ref $data ) {
-        $data = {};
+        $data               = {};
+        $table_comment_perl = $comment if $comment;
+    }
+    elsif ( $data->{comment} ) {
+        $table_comment_perl = $data->{comment};
+    }
+
+    if ( $table_comment_perl ) {
+        $table_comment_perl = sprintf "\n\n=head1 DESCRIPTION\n\n%s", $table_comment_perl;
     }
 
     my @core_components = $self->inherit_from_core ? () : qw(PK::Auto Core);
@@ -327,32 +335,53 @@ sub _class_template{
             push @options, "retrieve_on_insert => 1," if first{ $name eq $_ }@{ $table->primary_key };
             push @options, "is_foreign_key     => 1," if $foreign_keys{$name};
 
+            my $column_comment_perl_raw = '';
+
             if ( ( $data && $data->{column_info}->{$name} ) || $col_comment ) {
                 local $Data::Dumper::Sortkeys = 1;
                 local $Data::Dumper::Indent   = 1;
                 local $Data::Dumper::Pad      = '      ';
 
-                my $comment_data = eval {
-                    JSON->new->utf8(1)->decode( $col_comment );
+                my $comment_data;
+                eval {
+                    $comment_data = JSON->new->utf8(1)->decode( $col_comment );
+                    1;
                 };
+
+                if ( !$comment_data || 'HASH' ne ref $comment_data ) {
+                    $column_comment_perl_raw = $col_comment;
+                    $comment_data            = {};
+                }
+                else {
+                    $column_comment_perl_raw = delete $comment_data->{comment} // '';
+                }
 
                 my %hash = (
                     %{ $data->{column_info}->{$name} || {} },
                     %{ $comment_data || {} },
                 );
 
-                my $dump = Dumper( \%hash );
-                $dump    =~ s{\$VAR1 \s+ = \s* \{ \s*? $}{}xms;
-                $dump    =~ s{\A\s+\n\s{8}}{}xms;
-                $dump    =~ s{\n[ ]+\};\s*\z}{}xms;
+                if ( %hash ) {
+                    my $dump = Dumper( \%hash );
+                    $dump    =~ s{\$VAR1 \s+ = \s* \{ \s*? $}{}xms;
+                    $dump    =~ s{\A\s+\n\s{8}}{}xms;
+                    $dump    =~ s{\n[ ]+\};\s*\z}{}xms;
 
-                push @options, $dump;
+                    push @options, $dump;
+                }
             }
 
             my $option_string = join "\n        ", @options;
 
+            my @column_comment_lines = split /\r?\n/, $column_comment_perl_raw;
+            my $column_comment_perl  = '';
+            if ( @column_comment_lines ) {
+                my $sep = sprintf "\n%s%s%s# ", ' ' x 4, ' ' x length $name, ' ' x 6;
+                $column_comment_perl = ' # ' . join ( $sep, @column_comment_lines );
+            }
+
             $column_string .= <<"            COLUMN";
-    $name => {
+    $name => {$column_comment_perl
         $option_string
     },
             COLUMN
@@ -368,7 +397,7 @@ sub _class_template{
 
     my $template = qq~package $package;
 
-# ABSTRACT: Result class for $name
+# ABSTRACT: Result class for $name$table_comment_perl
 
 use strict;
 use warnings;
@@ -551,7 +580,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 SYNOPSIS
 
@@ -712,12 +741,6 @@ When C<skip_indexes> is true, the sub C<sqlt_deploy_hook> that adds the indexes 
 =head2 classes
 
 =head2 file
-
-=head2 table_comments
-
-When this flag is used, C<MySQL::Workbench::DBIC> assumes that (some) tables
-have stored extra information for columns in the table comments. This must
-be in JSON format.
 
 =head2 inherit_from_core
 

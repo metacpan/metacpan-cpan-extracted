@@ -1,11 +1,10 @@
 package Time::Elapsed::Lang::TR;
+$Time::Elapsed::Lang::TR::VERSION = '0.33';
 use strict;
 use warnings;
 use vars qw( $VERSION        );
 use subs qw( singular plural );
 use utf8;
-
-$VERSION = '0.32';
 
 *plural = \&singular;
 
@@ -35,11 +34,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-Time::Elapsed::Lang::TR - Turkish language file.
+Time::Elapsed::Lang::TR
+
+=head1 VERSION
+
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -47,10 +50,11 @@ Private module.
 
 =head1 DESCRIPTION
 
-This document describes version C<0.32> of C<Time::Elapsed::Lang::TR>
-released on C<5 July 2016>.
-
 Private module.
+
+=head1 NAME
+
+Time::Elapsed::Lang::TR - Turkish language file.
 
 =head1 METHODS
 
@@ -66,15 +70,13 @@ L<Time::Elapsed>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2007 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2007 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

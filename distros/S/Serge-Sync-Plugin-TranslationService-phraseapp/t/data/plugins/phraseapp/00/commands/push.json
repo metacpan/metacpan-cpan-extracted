@@ -1,0 +1,5 @@
+[
+   {
+      "command" : "phraseapp push --wait"
+   }
+]

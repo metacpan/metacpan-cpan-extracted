@@ -1,56 +1,59 @@
 Revision history for Perl extension Sys::Info.
 
+0.7811 2018-12-25 BURAK
+    - Migrate to dzil.
+
 0.78 Sat Apr 16 15:20:46 2011
-    => Enable OSX driver
+    - Enable OSX driver
 
 0.73 Thu Jan 14 03:24:05 2010
-    => Perl::Critic refactoring.
-    => Driver updates:
+    - Perl::Critic refactoring.
+    - Driver updates:
             Windows: Windows 7 support, bitness fixes.
             Linux  : Merged Linux::Distribution as ::OS::Distribution.
             BSD    : CPU bitness & flags. Swap file detection.
 
 0.72 Thu Apr 23 17:22:31 2009
-    => Update builder.
+    - Update builder.
 
 0.70 Mon Apr  6 03:54:23 2009
-    => Bump version for new stable release.
+    - Bump version for new stable release.
 
 0.69_11 Sat Apr  4 22:19:04 2009
-    => Bump version to test bitness().
+    - Bump version to test bitness().
 
 0.69_10 Fri Apr  3 21:17:29 2009
-    => Updated the build tools and tests.
+    - Updated the build tools and tests.
 
 0.69_07 Sat Mar 14 15:57:56 2009
-    => Support for BSD driver.
+    - Support for BSD driver.
 
 0.69_06 Sat Mar 14 06:42:17 2009
-    => Test suite update.
+    - Test suite update.
 
 0.69_05 Sat Mar 14 01:59:01 2009
-    => Bump version.
+    - Bump version.
 
 0.69_01 Thu Mar  5 03:41:57 2009
-    => Removed deprecated parts.
-    => Moved drivers and base classes into separate distributions. This distro
+    - Removed deprecated parts.
+    - Moved drivers and base classes into separate distributions. This distro
        is now something like Task::, but has some function of its own.
 
 0.63 Thu Aug  7 22:18:39 2008
-    => Fix for Win32::TieRegistry loading routine.
+    - Fix for Win32::TieRegistry loading routine.
 
 0.62 Tue Jul 15 23:20:50 2008
-    => Fix for cdkey test. It can fail on restricted environments.
+    - Fix for cdkey test. It can fail on restricted environments.
 
 0.61 Tue Jul 15 11:44:45 2008
-    => Removed 99-all-modules-have-the-same-version.t for now, until I find a
+    - Removed 99-all-modules-have-the-same-version.t for now, until I find a
        safer way for this test. This fixes RT#37660.
-    => Added support for Debian version/edition.
+    - Added support for Debian version/edition.
 
 0.60 Sun Jul 13 16:08:35 2008
-    => Minor code cleanup.
-    => Added a test to check the module versions.
-    => Bump the version for the new stable release after 7+ months :)
+    - Minor code cleanup.
+    - Added a test to check the module versions.
+    - Bump the version for the new stable release after 7+ months :)
         * More unified (if not 100% same) interface between drivers
             - Improved Windows OS detection
             - Improved Linux distro detection
@@ -58,76 +61,76 @@ Revision history for Perl extension Sys::Info.
         * Some deprecated parts (all to be removed in v0.70 or at the end of 2008)
 
 0.52_92 Sat Jul 12 20:22:44 2008
-    => Pod fixes.
-    => Code cleanup.
+    - Pod fixes.
+    - Code cleanup.
 
 0.52_91 Sat Jun 28 17:35:50 2008
-    => Removed HASAPI() from Windows driver.
-    => All files now have Pod.
-    => Moved all constant definitions to Sys::Info::Constants.
+    - Removed HASAPI() from Windows driver.
+    - All files now have Pod.
+    - Moved all constant definitions to Sys::Info::Constants.
 
 0.52_9 Fri Jun 27 00:20:40 2008
-    => ::Linux
+    - ::Linux
         * Implemented various OS meta keys.
         * Implemented CPU architecture key.
 
 0.52_8 Thu Jun 26 01:02:15 2008
-    => ::Linux
+    - ::Linux
         * Implement ::OS::tz()
         * Implement ::OS::edition() for Ubuntu.
         * Implement manufacturer meta key.
         * ::OS::build() now returns the timestamp instead of time string.
             Use it as: print( scalar localtime $os->build ) to get a string.
-    => Updated unknown tests.
+    - Updated unknown tests.
 
 0.52_7 Tue Jun 24 23:55:04 2008
-    => Fix broken ::CPU under linux.
-    => Unix::Processors is now required under linux.
+    - Fix broken ::CPU under linux.
+    - Unix::Processors is now required under linux.
 
 0.52_6 Sun Jun 22 00:27:02 2008
-    => Fix for available devices list.
-    => ::CPU
+    - Fix for available devices list.
+    - ::CPU
         * ::ht() method now returns the number of threads
         * Removed disable_si option from ::CPU.
         * Fixed load() for Windows.
 
 0.52_5 Fri Jun 20 00:45:24 2008
-    => Moved CPU::load() into the base class to make the checks for all drivers.
-    => New subclass Sys::Info::Constants.
-    => Some fixes.
+    - Moved CPU::load() into the base class to make the checks for all drivers.
+    - New subclass Sys::Info::Constants.
+    - Some fixes.
 
 0.52_4 Wed Jun 18 01:53:56 2008
-    => Tidied ::Windows::OS.
-    => New ::Windows::OS method cdkey().
-    => Fix for ::CPU::hyper_threading():
+    - Tidied ::Windows::OS.
+    - New ::Windows::OS method cdkey().
+    - Fix for ::CPU::hyper_threading():
 
 0.52_3 Wed Jun 11 21:11:46 2008
-    => $os->login_name_real() is now deprecated. Use $os->login_name( real => 1 )
+    - $os->login_name_real() is now deprecated. Use $os->login_name( real => 1 )
 
 0.52_2 Sun Jun  8 01:07:47 2008
-    => Improved driver loading mechanism.
-    => $os->long_name deprecated. Use $os->name( long => 1 )
+    - Improved driver loading mechanism.
+    - $os->long_name deprecated. Use $os->name( long => 1 )
 
 0.52_1 Fri Jun  6 00:11:05 2008
-    => Improved OS detection for Windows. Now the editions can also be detected.
-    => Windows Server 2008 is now supported.
-    => Added new method edition() to Sys::Info::OS.
-    => $os->name & $os->long_name & $os->version are now accept parameters.
-    => Added a way to detect if Win32::API is available or not under Windows.
-    => Initiated a XS interface to Win32 API functions.
+    - Improved OS detection for Windows. Now the editions can also be detected.
+    - Windows Server 2008 is now supported.
+    - Added new method edition() to Sys::Info::OS.
+    - $os->name & $os->long_name & $os->version are now accept parameters.
+    - Added a way to detect if Win32::API is available or not under Windows.
+    - Initiated a XS interface to Win32 API functions.
            TODO: Improve XS interface and disable WMI where possible as it is so slow
            TODO: Consider Win32::API usage.
-    => Added a Core 2 detection code to Sys::Info::Driver::Unknown::Device::CPU::Env.
+    - Added a Core 2 detection code to Sys::Info::Driver::Unknown::Device::CPU::Env.
 
 0.51 Sun Dec 30 23:08:52 2007
-    => Fix for pod coverage test.
+    - Fix for pod coverage test.
 
 0.50 Sun Dec 30 21:44:11 2007
-    => Added 'multiplier' key to CPU metadata (WMI).
-    => Implemented CPU load for Windows. However,
+    - Added 'multiplier' key to CPU metadata (WMI).
+    - Implemented CPU load for Windows. However,
        it is not recommended to use if you want speed.
-    => Moved ::CPU into ::Device::CPU. A lot of changes took place.
-    => New driver model.
+    - Moved ::CPU into ::Device::CPU. A lot of changes took place.
+    - New driver model.
 
 0.2 Wed Nov 29 22:56:05 2006
-    => First public release.
+    - First public release.

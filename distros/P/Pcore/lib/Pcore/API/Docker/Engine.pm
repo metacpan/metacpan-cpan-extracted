@@ -74,7 +74,7 @@ sub image_push ( $self, $tag ) {
                 P->data->to_json( {
                     username => $self->{username},
                     password => $self->{password},
-                } )->$*,
+                } ),
                 $EMPTY
             ),
         ],

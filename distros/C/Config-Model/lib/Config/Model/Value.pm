@@ -8,8 +8,11 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.131';
+$Config::Model::Value::VERSION = '2.132';
 use 5.10.1;
+
+use strict;
+use warnings;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -351,14 +354,21 @@ sub set_migrate_from {
 sub migrate_value {
     my $self = shift;
 
-    return if $self->{migration_done};
-    return if $self->instance->initial_load;
+    # migrate value is always used as a scalar, even in list
+    # context. Not returning undef would break a hash assignment done
+    # with something like:
+    # my %args =  (value => $obj->migrate_value, fix => 1).
+
+    ## no critic(Subroutines::ProhibitExplicitReturnUndef)
+
+    return undef if $self->{migration_done};
+    return undef if $self->instance->initial_load;
     $self->{migration_done} = 1;
 
     # avoid warning when reading deprecated values
     my $result = $self->{_migrate_from}->compute( check => 'skip' );
 
-    return unless defined $result;
+    return undef unless defined $result;
 
     # check if the migrated result fits with the constraints of the
     # Value object
@@ -1086,6 +1096,7 @@ sub apply_fix {
     no warnings "uninitialized";
     if ( $_ ne $$value_r ) {
         $fix_logger->info( $self->location . ": fix changed value from '$$value_r' to '$_'" );
+        $DB::single =1 if $self-> element_name =~ /undef/;
         $self->_store_fix( $$value_r, $_, $msg );
         $$value_r = $_; # so chain of fixes work
     }
@@ -1101,11 +1112,18 @@ sub _store_fix {
 
     if ( $fix_logger->is_trace ) {
         $fix_logger->trace(
-            "fix change: '" . ( $old // '<undef>' ) . "' -> '" . ( $new // '<undef>' ) . "'" );
+            "fix change: '" . ( $old // '<undef>' ) . "' -> '" . ( $new // '<undef>' ) . "'"
+        );
     }
 
     my $new_v = $new // $self->_fetch_std ;
-    my $old_v => $old // $self->_fetch_std;
+    my $old_v = $old // $self->_fetch_std;
+
+    if ( $fix_logger->is_trace ) {
+        $fix_logger->trace(
+            "fix change (with std value)): '" . ( $old // '<undef>' ) . "' -> '" . ( $new // '<undef>' ) . "'"
+        );
+    }
 
     no warnings "uninitialized";
     # in case $old is the default value and $new is undef
@@ -1755,7 +1773,9 @@ sub fetch {
             warn "Warning: fetch [".$self->name,"] skipping value $str because of the following errors:\n$msg\n\n"
                 if not $silent and $msg;
         }
-        return;
+        # this method is supposed to return a scalar
+        return undef; ## no critic(Subroutines::ProhibitExplicitReturnUndef)
+
     }
 
     Config::Model::Exception::WrongValue->throw(
@@ -1895,7 +1915,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.131
+version 2.132
 
 =head1 SYNOPSIS
 

@@ -77,7 +77,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
 
             # for linux use abstract UDS
             else {
-                $uri = "///\N{NULL}" . uuid_v4_str;
+                $uri = "///\x00" . uuid_v4_str;
             }
         }
     }
@@ -207,7 +207,7 @@ around new => sub ( $orig, $self, $uri = undef, %args ) {
 
             # for linux use abstract UDS
             else {
-                $target->{path} = P->path( "/\N{NULL}" . uuid_v4_str );
+                $target->{path} = P->path( "/\x00" . uuid_v4_str );
             }
         }
     }

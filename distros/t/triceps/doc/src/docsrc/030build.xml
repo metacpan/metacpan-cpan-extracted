@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -64,7 +64,7 @@ See the file COPYRIGHT for the copyright notice and license information
 		</para>
 
 <pre>
-svn co http://svn.code.sf.net/p/triceps/code/trunk
+svn co https://svn.code.sf.net/p/triceps/code/trunk
 </pre>
 
 		<para>
@@ -103,19 +103,18 @@ svn co svn+ssh://your_username@svn.code.sf.net/p/triceps/code/trunk
 
 		<para>
 		Currently you must use the GNU Linux toolchain: GNU make, GNU &Cpp; 
-		compiler (version 4.4.1 has been tested), glibc, valgrind. You can build
+		compiler (version 7.3.0 has been tested), glibc, valgrind. You can build
 		without valgrind by running only the non-valgrind tests.
 		</para>
 
 		<para>
-		The older GNU compiler 4.1 and the newer compiler versions have been reported 
-		to work as well. But if you build the trunk code checked out from SVN
+		If you build the trunk code checked out from SVN
 		(or otherwise in the directory named <quote><pre>trunk</pre></quote>),
 		there is a catch with the warning flags. This kind of build treats almost all
 		warnings as errors, and this causes varying results
-		with the different compiler versions. The version 4.1
-		doesn't have the option <pre>-Wno-sign-conversion</pre> and
-		will fail on it. The newer compiler versions may have some extra warnings
+		with the different compiler versions. The older compiler versions might
+		not have some of the warning exclusion flags used and will fail.
+		The newer compiler versions may have some extra warnings
 		that will be treated as errors (and since my reference compiler doesn't
 		check for them, the code may trigger them). The fix for this situation is
 		to edit <pre>cpp/Makefile.inc</pre> and change the
@@ -133,7 +132,7 @@ svn co svn+ssh://your_username@svn.code.sf.net/p/triceps/code/trunk
 		</para>
 
 		<para>
-		The tested Perl versions are 5.10.0 and 5.19.0, and should work on any recent version
+		The tested Perl version is 5.26.1, and should work on any recent version
 		as well. With the earlier versions your luck may vary. The Makefile.PL
 		has been configured to require at least 5.8.0. The older versions
 		have a different threading module and definitely won't work.
@@ -308,13 +307,13 @@ make -C doc/dbtools
 		</para>
 
 		<para>
-		The build also uses Ghostscript for converting the figues
-		from the EPS format. The luck with Ghostscript versions
-		also varies. The version 8.70 works for me.
-		I've seen some versions crash on this conversion.
-		Fortunately, it was crashing after the conversion actually
-		succeeded, so a workaround was to ignore the exit code
-		from Ghostscript.
+		The build also uses Inkscape for converting the figues
+		from the EPS format. The earlier versions used Ghostscript,
+		but the last version of Ghostscript that is known to work is 8.70, which is quite
+		antique by now. The later versions started crashing in the
+		SVG driver, and then they've <quote>fixed</quote> it by removing
+		the SVG driver altogether. Fortunately, Inkscape provides a
+		better replacement.
 		</para>
 
 		<para>

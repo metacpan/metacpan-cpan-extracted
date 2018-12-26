@@ -60,7 +60,7 @@ my $check = q~__PACKAGE__->add_columns\\(
         'passphrase_check_method' => 'check_passphrase',
         'passphrase_class' => 'SaltedDigest'
     \\},
-    another_phrase => \\{
+    another_phrase => \\{ # A comment in JSON
         data_type          => 'VARCHAR',
         is_nullable        => 1,
         size               => 45,
@@ -75,8 +75,8 @@ like $content, qr/use base qw\(DBIx::Class::Core\);/, 'inherit from DBIx::Class:
 like $content, qr/__PACKAGE__->load_components\([^\)]+PassphraseColumn/;
 
 eval{
-#    rmtree( $output_path );
-#    rmdir $output_path;
+    rmtree( $output_path );
+    rmdir $output_path;
 };
 
 done_testing();

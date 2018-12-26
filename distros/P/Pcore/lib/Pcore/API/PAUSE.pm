@@ -28,13 +28,13 @@ sub upload ( $self, $path, $cb = undef ) {
 
     $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_upload', \$path->{filename} );
 
-    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_httpupload', P->file->read_bin($path), $path->{filename} );
+    $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_httpupload', \P->file->read_bin($path), $path->{filename} );
 
     $self->_pack_multipart( \$body, $boundary, 'pause99_add_uri_uri', \$EMPTY );
 
     $self->_pack_multipart( \$body, $boundary, 'SUBMIT_pause99_add_uri_httpupload', \q[ Upload this file from my disk ] );
 
-    $body .= "--$boundary--" . $CRLF . $CRLF;
+    $body .= "--$boundary--\r\n\r\n";
 
     return P->http->post(
         'https://pause.perl.org/pause/authenquery',
@@ -110,17 +110,17 @@ sub clean ( $self, @args ) {
 }
 
 sub _pack_multipart ( $self, $body, $boundary, $name, $content, $filename = undef ) {
-    $body->$* .= q[--] . $boundary . $CRLF;
+    $body->$* .= "--$boundary\r\n";
 
     $body->$* .= qq[Content-Disposition: form-data; name="$name"];
 
     $body->$* .= qq[; filename="$filename"] if $filename;
 
-    $body->$* .= $CRLF x 2;
+    $body->$* .= "\r\n" x 2;
 
     $body->$* .= $content->$*;
 
-    $body->$* .= $CRLF;
+    $body->$* .= "\r\n";
 
     return;
 }

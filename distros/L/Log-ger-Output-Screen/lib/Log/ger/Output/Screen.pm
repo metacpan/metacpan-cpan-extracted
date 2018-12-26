@@ -1,7 +1,7 @@
 package Log::ger::Output::Screen;
 
-our $DATE = '2017-08-03'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2018-12-22'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
@@ -56,9 +56,17 @@ sub get_hooks {
     my $stderr = $conf{stderr};
     $stderr = 1 unless defined $stderr;
     my $handle = $stderr ? \*STDERR : \*STDOUT;
-    my $use_color = $conf{use_color};
-    $use_color = $ENV{COLOR} unless defined $use_color;
-    $use_color = (-t STDOUT) unless defined $use_color;
+    my $use_color = do {
+        if (defined $conf{use_color}) {
+            $conf{use_color};
+        } elsif (exists $ENV{NO_COLOR}) {
+            0;
+        } elsif (defined $ENV{COLOR}) {
+            $ENV{COLOR};
+        } else {
+            (-t STDOUT);
+        }
+    };
     my $formatter = $conf{formatter};
 
     return {
@@ -125,13 +133,13 @@ Log::ger::Output::Screen - Output log to screen
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
  use Log::ger::Output Screen => (
      # stderr => 1,    # set to 0 to print to stdout instead of stderr
-     # use_color => 0, # set to 1/0 to force usage of color, default is from COLOR or (-t STDOUT)
+     # use_color => 0, # set to 1/0 to force usage of color, default is from NO_COLOR/COLOR or (-t STDOUT)
      # formatter => sub { ... },
  );
  use Log::ger;
@@ -144,23 +152,31 @@ version 0.007
 
 =head1 CONFIGURATION
 
-=head2 stderr => bool (default: 1)
+=head2 stderr
 
-Whether to print to STDERR (the default) or st=head2 use_color => bool
+Bool, default 1. Whether to print to STDERR (the default) or st=head2 use_color
+=> bool
 
-=head2 use_color => bool
+=head2 use_color
 
-The default is to look at the COLOR environment variable, or 1 when in
-interactive mode and 0 when not in interactive mode.
+Bool. The default is to look at the NO_COLOR and COLOR environment variables, or
+1 when in interactive mode and 0 when not in interactive mode.
 
-=head2 formatter => code
+=head2 formatter
 
-When defined, will pass the formatted message (but being applied with colors) to
-this custom formatter.
+Coderef. When defined, will pass the formatted message (but being applied with
+colors) to this custom formatter.
 
 =head1 ENVIRONMENT
 
-=head2 COLOR => bool
+=head2 NO_COLOR
+
+Can be set (to anything) to disable color by default, if C</use_color> is not
+set. Consulted before L</COLOR>.
+
+=head2 COLOR
+
+Can be set to disable/enable color by default, if C</use_color> is not set.
 
 =head1 SEE ALSO
 
@@ -172,7 +188,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,8 +1,7 @@
 #!perl 
 
 use strict;
-use Test::More tests => 2;
-use Data::Dumper;
+use Test::More;
 use FindBin;
 
 BEGIN {
@@ -11,4 +10,8 @@ BEGIN {
 
 my $validator = Data::Validate::WithYAML->new( $FindBin::Bin . '/test2.yml' );
 my $message   = $validator->message( 'password' );
-is( $message, 'Test' );
+is $message, 'Test';
+
+is $validator->message( 'does_not_exist' ), '';
+
+done_testing();

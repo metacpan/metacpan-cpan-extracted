@@ -4,69 +4,68 @@
       "Burak Gursoy <burak@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "sys",
+      "system",
+      "info"
+   ],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Sys-Info-Driver-OSX",
-   "no_index" : {
-      "directory" : [
-         "monolithic_version",
-         "builder",
-         "t",
-         "xt"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.40",
-            "Test::Sys::Info" : "0.20"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
             "Capture::Tiny" : "0",
             "Mac::PropertyList" : "0",
-            "Sys::Info::Base" : "0.7802"
+            "Sys::Info::Base" : "0.7802",
+            "perl" : "5.010"
          }
-      }
-   },
-   "provides" : {
-      "Sys::Info::Driver::OSX" : {
-         "file" : "lib/Sys/Info/Driver/OSX.pm",
-         "version" : "0.7958"
       },
-      "Sys::Info::Driver::OSX::Device" : {
-         "file" : "lib/Sys/Info/Driver/OSX/Device.pm",
-         "version" : "0.7958"
-      },
-      "Sys::Info::Driver::OSX::Device::CPU" : {
-         "file" : "lib/Sys/Info/Driver/OSX/Device/CPU.pm",
-         "version" : "0.7958"
-      },
-      "Sys::Info::Driver::OSX::OS" : {
-         "file" : "lib/Sys/Info/Driver/OSX/OS.pm",
-         "version" : "0.7958"
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Sys::Info" : "0.20"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "bugtracker" : {
+         "web" : "https://github.com/burak/CPAN-Sys-Info-Driver-OSX/issues"
+      },
       "repository" : {
-         "url" : "http://bitbucket.org/burak/cpan-sys-info-driver-osx/"
+         "type" : "git",
+         "url" : "git://github.com/burak/CPAN-Sys-Info-Driver-OSX.git",
+         "web" : "https://github.com/burak/CPAN-Sys-Info-Driver-OSX"
       }
    },
-   "version" : "0.7958"
+   "version" : "0.7959",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
+

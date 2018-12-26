@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -14,10 +14,10 @@
 
 namespace TRICEPS_NS {
 
-// A special reference to a string, passed around to indicate that the
+// A special string constant, passed around to indicate that the
 // printing must be done without line breaks.
 // Doesn't work on all printing functions, just where supported.
-extern const string &NOINDENT;
+extern const string NOINDENT;
 
 // Compute the print indent string to pass to the next level.
 // This is a bit complicated by the NOINDENT that has to be passed

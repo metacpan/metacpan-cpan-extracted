@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -42,14 +42,19 @@ See the file COPYRIGHT for the copyright notice and license information
 			</listitem>
 
 			<listitem>
-			IT_SORTED. 
+			IT_SORTED, 
+			</listitem>
+
+			<listitem>
+			IT_ORDERED. 
 			</listitem>
 		</itemizedlist>
 
 		<para>
-		There is
-		also the semi-hidden type IT_ROOT: you can't create it directly but
-		every table type creates one implicitly, as the root of its index tree.
+		There also are some special semi-hidden helper index types. IT_ROOT is created
+		in every table as the root of its index tree. IT_NONE is used to construct
+		the special object NO_INDEX_TYPE that is used as the return value of failed
+		search for a nested index.
 		And the value IT_LAST is defined past the last actual type, so if you ever
 		need to iterate through the types, you can do it as
 		</para>
@@ -136,31 +141,24 @@ IndexType *findSubIndexById(IndexId it) const;
 
 		<para>
 		Find the sub-index by name or id, works in the same way as for
-		TableType. A special feature is that it can be applied on a NULL object
-		reference, like this:
-		</para>
-
-<pre>
-Autoref<IndexType> it; // NULL by default
-Autoref<IndexType> itsub = it->findSubIndex("xxx"); // doesn't crash, returns NULL
-</pre>
-
-		<para>
-		The idea here is to allow the safe chaining of <pre>findSubIndex()</pre> for the
-		look-ups of the nested types:
+		TableType.  If the index is not found, returns the special value
+		NO_INDEX_TYPE.  The idea here is to allow the safe chaining of
+		<pre>findSubIndex()</pre> for the look-ups of the nested types:
 		</para>
 
 <pre>
 Autoref<IndexType> it = tt->findSubIndex("level1")->findSubIndex("level2");
-if (it.isNull()) {
+if (it.eq(NO_INDEX_TYPE)) {
 	// not found
 }
 </pre>
 
 		<para>
 		If any of the elements in the path are missing, the end result will be
-		NULL, conveniently. But it won't tell you, which one was missing,
-		inconveniently.
+		<pre>NO_INDEX_TYPE</pre>, conveniently. But it won't tell you, which one was missing,
+		inconveniently. Even though the object pointed by <pre>NO_INDEX_TYPE</pre> is a static one, it's
+		safe to use an AutoRef on it, because its reference count gets initialized to 1,
+		and AutoRef would never free it.
 		</para>
 
 <pre>
@@ -189,6 +187,18 @@ const NameSet *getKey() const;
 		It will work with any kind of index, but will return a NULL if the
 		index doesn't support the key. There is no matching method to
 		set it, setting the key is up to the subclasses.
+		</para>
+
+<pre>
+const NameSet *getKeyExpr() const;
+</pre>
+
+		<para>
+		Get the key information from the index in the way it was used
+		to construct the index. So for the Ordered index the names of
+		descending fields will be prepended by a <quote>!</quote>.
+		It will work with any kind of index, but will return a NULL if the
+		index doesn't support the key.
 		</para>
 
 <pre>

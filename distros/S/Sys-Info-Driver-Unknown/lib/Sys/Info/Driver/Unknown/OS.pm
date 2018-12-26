@@ -1,11 +1,10 @@
 package Sys::Info::Driver::Unknown::OS;
+$Sys::Info::Driver::Unknown::OS::VERSION = '0.79';
 use strict;
 use warnings;
-use vars qw( $VERSION );
+
 use POSIX ();
 use Sys::Info::Constants qw( :unknown );
-
-$VERSION = '0.78';
 
 # So, we don't support $^O yet, but we can try to emulate some features
 
@@ -100,9 +99,17 @@ sub bitness {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Sys::Info::Driver::Unknown::OS - Compatibility layer for unsupported platforms
+Sys::Info::Driver::Unknown::OS
+
+=head1 VERSION
+
+version 0.79
 
 =head1 SYNOPSIS
 
@@ -110,10 +117,11 @@ Sys::Info::Driver::Unknown::OS - Compatibility layer for unsupported platforms
 
 =head1 DESCRIPTION
 
-This document describes version C<0.78> of C<Sys::Info::Driver::Unknown::OS>
-released on C<17 April 2011>.
-
 -
+
+=head1 NAME
+
+Sys::Info::Driver::Unknown::OS - Compatibility layer for unsupported platforms
 
 =head1 METHODS
 
@@ -155,16 +163,13 @@ L<Sys::Info>, L<Sys::Info::OS>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2011 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify 
-it under the same terms as Perl itself, either Perl version 5.12.3 or, 
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

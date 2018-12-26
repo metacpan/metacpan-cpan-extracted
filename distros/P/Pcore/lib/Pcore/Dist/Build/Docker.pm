@@ -92,11 +92,11 @@ sub set_from_tag ( $self, $tag ) {
     my $dockerfile = P->file->read_bin("$self->{dist}->{root}/Dockerfile");
 
     if ( !defined $tag ) {
-        $dockerfile->$* =~ /^FROM\s+([^:]+)(.*?)$/sm;
+        $dockerfile =~ /^FROM\s+([^:]+)(.*?)$/sm;
 
         say qq[Docker base image is "$1$2"];
     }
-    elsif ( $dockerfile->$* =~ s/^FROM\s+([^:]+)(.*?)$/FROM $1:$tag/sm ) {
+    elsif ( $dockerfile =~ s/^FROM\s+([^:]+)(.*?)$/FROM $1:$tag/sm ) {
         if ( "$1$2" eq "$1:$tag" ) {
             say q[Docker base image wasn't changed];
         }
@@ -118,7 +118,7 @@ sub set_from_tag ( $self, $tag ) {
         }
     }
     else {
-        say q[Error updating docker base image];
+        say 'Error updating docker base image';
     }
 
     return;
@@ -612,7 +612,7 @@ sub build_local ( $self, $tag, $args ) {
                 $mode = P->file->calc_chmod('rw-r--r--');
             }
 
-            $_tar->add_data( "$path", P->file->read_bin("$root/$path")->$*, { mode => $mode } );
+            $_tar->add_data( "$path", P->file->read_bin("$root/$path"), { mode => $mode } );
         }
 
         $_tar->write;

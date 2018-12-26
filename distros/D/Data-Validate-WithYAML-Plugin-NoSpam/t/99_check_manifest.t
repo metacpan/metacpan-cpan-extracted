@@ -6,4 +6,4 @@ use Test::More;
 
 eval "use Test::CheckManifest 1.24";
 plan skip_all => "Test::CheckManifest 1.24 required" if $@;
-ok_manifest();
+ok_manifest({ exclude => ['/.build', '/cover_db'], filter => [ qr/MYMETA/ ] });

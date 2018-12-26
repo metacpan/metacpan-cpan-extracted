@@ -13,7 +13,7 @@ use Scalar::Util qw(reftype);
 
 use Devel::hdb::Utils;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Exception::Class (
         'Devel::hdb::Client::Exception',
@@ -415,14 +415,14 @@ sub load_config {
     my $response = $self->_POST(join('/', 'loadconfig', $escaped_filename));
     _assert_success($response, "Loading config from $filename failed: " . $response->content);
 
-    return 1;
+    return $JSON->decode($response->content);
 }
 
 sub save_config {
-    my($self, $filename) = @_;
+    my($self, $filename, $additional) = @_;
 
     my $escaped_filename = URI::Escape::uri_escape($filename);
-    my $response = $self->_POST(join('/', 'saveconfig', $escaped_filename));
+    my $response = $self->_POST(join('/', 'saveconfig', $escaped_filename), $additional);
     _assert_success($response, "Save config to $filename failed: " . $response->content);
 
     return 1;

@@ -1,8 +1,7 @@
 package Text::Template::Simple::Tokenizer;
+$Text::Template::Simple::Tokenizer::VERSION = '0.91';
 use strict;
 use warnings;
-
-our $VERSION = '0.90';
 
 use constant CMD_CHAR             => 0;
 use constant CMD_ID               => 1;
@@ -325,9 +324,17 @@ sub DESTROY {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Text::Template::Simple::Tokenizer - C<Tokenizer>
+Text::Template::Simple::Tokenizer
+
+=head1 VERSION
+
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -343,10 +350,11 @@ Text::Template::Simple::Tokenizer - C<Tokenizer>
 
 =head1 DESCRIPTION
 
-This document describes version C<0.90> of C<Text::Template::Simple::Tokenizer>
-released on C<5 July 2016>.
-
 Splits the input into tokens with the defined delimiter pair.
+
+=head1 NAME
+
+Text::Template::Simple::Tokenizer - C<Tokenizer>
 
 =head1 METHODS
 
@@ -372,15 +380,13 @@ Escapes double quotes.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2004 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

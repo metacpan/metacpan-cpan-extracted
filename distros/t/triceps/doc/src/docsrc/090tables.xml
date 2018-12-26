@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -159,13 +159,18 @@ Received 'table' 2 times
 			<primary>index</primary>
 			<secondary>hashed</secondary>
 		</indexterm>
+		<indexterm>
+			<primary>index</primary>
+			<secondary>ordered</secondary>
+		</indexterm>
 		<para>
 		A table type gets the row type and at least one index. Here it's a
-		hashed index by the key field <pre>address</pre>. "Hashed" means that
+		Hashed index by the key field <pre>address</pre>. "Hashed" means that
 		you can look up the rows by the key value but there are no promises
 		about any specific row order. And the hashing is used to make the
-		key comparisons more efficient. The key of a hashed index may
-		consist of multiple fields.
+		key comparisons more efficient. The key of a Hashed index may
+		consist of multiple fields. Another index type, Ordered, is similar to Hashed but
+		also keeps the human-readable order.
 		</para>
 
 		<para>
@@ -178,7 +183,7 @@ Received 'table' 2 times
 		</indexterm>
 		<para>
 		The rows can then be inserted into the table (and removed too, not
-		shown in this example yet). The default behavior of the hashed index is to
+		shown in this example yet). The default behavior of the Hashed index is to
 		replace the old row if a new row with the same key is inserted.
 		</para>
 
@@ -513,7 +518,7 @@ address="table" count="2"
 
 		<para>
 		The order of the rows in the printout is the same as the order of rows
-		in the table's index. Which is no particular order, since it's a hashed
+		in the table's index. Which is no particular order, since it's a Hashed
 		index. As long as you stay with the same 64-bit AMD64 architecture
 		(with LSB-first byte order), it will stay the same on consecutive runs.
 		But switching to a 32-bit machine or to an MSB-first byte order (such
@@ -1298,7 +1303,7 @@ our $ttPosition = Triceps::TableType->new($rtPosition)
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 	->addSubIndex("byDate", # for cleaning by date
-		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		Triceps::IndexType->newOrdered(key => [ "date" ])
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 ;
@@ -1602,16 +1607,51 @@ Average price: Undefined
 		</para>
 	</sect1>
 
+	<sect1 id="sc_table_ordered">
+		<title>Ordered index</title>
+
+		<indexterm>
+			<primary>index</primary>
+			<secondary>ordered</secondary>
+		</indexterm>
+		<indexterm>
+			<primary>locale</primary>
+		</indexterm>
+		<para>
+		The Ordered index works very similarly to the Hashed index but it keeps
+		the records in the sorted order, similar to the SQL statement ORDER BY.
+		Depending on the types of the fields involved, it can be almost as fast
+		as the Hashed index on the integer fields, and a good deal slower on the
+		string fields (but it's smart enough to compare the strings according to
+		the locale settings). It is created very similarly to a Hashed index:
+		</para>
+
+<pre>
+$it = Triceps::IndexType->newOrdered(key => [ @fields ])
+</pre>
+
+		<para>
+		To specify that some key field must be ordered in the descending order,
+		its name needs to be prepended with a <quote>!</quote>. So, to order
+		by the date ascending and customer descending, use:
+		</para>
+
+<pre>
+$it = Triceps::IndexType->newOrdered(key => [ "date", "!customer" ])
+</pre>
+
+	</sect1>
+
 	<sect1 id="sc_table_sorted">
 		<title>Sorted index</title>
 
 		<para>
-		The hashed index provides a way to store rows indexed by a key. It is fast
-		but it has a price to pay for that speed: when iterating through it,
-		the records come in an unpredictable (though repeatable, within a
-		particular machine architecture) order determined by the hash function.
-		If the order doesn't matter, that's fine. But often the order does
-		matter, and is desirable even at the tradeoff of the reduced performance.
+		The Ordered index is a relatively recent addition to Triceps,
+		the previous way to order the rows in a particular order was to
+		use the Sorted index implemented in Perl. The Sorted index might still
+		be useful if you want to implement some very custom sorting. It's
+		much slower than the indexes implemented in the compiled code, but
+		sometimes the flexibility might be worth the overhead.
 		</para>
 
 		<indexterm>
@@ -1619,8 +1659,7 @@ Average price: Undefined
 			<secondary>sorted</secondary>
 		</indexterm>
 		<para>
-		The sorted index provides a solution for this problem. It is created
-		with:
+		The sorted index is created with:
 		</para>
 
 <pre>
@@ -1629,8 +1668,7 @@ $it = Triceps::IndexType->newPerlSorted($sortName,
 </pre>
 
 		<para>
-		The <quote>Perl</quote> in <quote>newPerlSorted</quote> refers to the
-		fact that the sorting order is specified as a Perl comparison function.
+		The sorting order is specified as a Perl comparison function.
 		</para>
 
 		<para>
@@ -1878,12 +1916,12 @@ $idxt->setComparator($compareFunc);
 		</para>
 	</sect1>
 
-	<sect1 id="sc_table_ordered">
-		<title>Ordered index</title>
+	<sect1 id="sc_table_simple_ordered">
+		<title>SimpleOrdered index</title>
 
 		<indexterm>
 			<primary>index</primary>
-			<secondary>ordered</secondary>
+			<secondary>simple ordered</secondary>
 		</indexterm>
 		<indexterm>
 			<primary>template</primary>
@@ -1892,15 +1930,23 @@ $idxt->setComparator($compareFunc);
 			<primary>code generation</primary>
 		</indexterm>
 		<para>
-		To specify the sorting order in a more SQL-like fashion, Triceps
-		has the class SimpleOrderedIndex. It's implemented entirely in Perl, on
-		top of the sorted index. Besides being useful by itself, it shows off
-		two concepts: the initialization function of the sorted index, and the
+		The SimpleOrdered index was the older analog of the modern Ordered index,
+		specifying the sorting order in a more SQL-like fashion. There is not much
+		reason to use it any more other than if you want to look at how the indexes
+		work inside without digging into the &Cpp; code, and maybe to use it as
+		a base for some custom index implementation. If you're not up to it, feel free
+		to skip over this section.
+		</para>
+		
+		<para>
+		The SimpleOrdered index is implemented on top of Sorted index, and its
+		internals show off
+		two concepts: the initialization function of the Sorted index, and the
 		template with code generation on the fly.
 		</para>
 
 		<para>
-		First, how to create an ordered index:
+		First, how to create a SimpleOrdered index:
 		</para>
 
 <pre>
@@ -1924,7 +1970,7 @@ my $tabType = Triceps::TableType->new($rowType)
 </pre>
 
 		<para>
-		When it gets translated into a sorted index, the comparison function
+		When it gets translated into a Sorted index, the comparison function
 		gets generated automatically. It's smart enough to generate the string
 		comparisons for the <pre>string</pre> and <pre>uint8</pre> fields, and the numeric
 		comparisons for the numeric fields. It's not smart enough to do the
@@ -1963,15 +2009,15 @@ PerlSortedIndex(SimpleOrder a ASC, b DESC, )
 </pre>
 
 		<para>
-		The contents of the parenthesis is a sort name from the sorted index'es
-		standpoint. It's an arbitrary string. But when the ordered index
-		prepares this string to pass to the sorted index, it puts its
+		The contents of the parenthesis is a sort name from the Sorted index'es
+		standpoint. It's an arbitrary string. But when the SimpleOrdered index
+		prepares this string to pass to the Sorted index, it puts its
 		arguments into it.
 		</para>
 
 		<para>
 		Now the interesting part, I want to show the implementation of the
-		ordered index. It's not too big and it shows the flexibility and the
+		SimpleOrdered index. It's not too big and it shows the flexibility and the
 		extensibility of Triceps:
 		</para>
 
@@ -2082,7 +2128,7 @@ sub init # ($tabt, $idxt, $rowt, @args)
 		It goes through all the arguments, looks up the fields in the row type,
 		and checks them for correctness. It tries to collect as much of the
 		error information as possible. The returned error messages may contain
-		multiple lines separated by <quote>\n</quote>, and the ordered index makes use of
+		multiple lines separated by <quote>\n</quote>, and the SimpleOrdered index makes use of
 		it. The error messages get propagated back to the table type level,
 		nicely indented and returned from the table initialization. If the init
 		function finds any errors, it appends the printout of the row type too,
@@ -2124,7 +2170,7 @@ $idxt->setComparator($cmpfunc)
 		<para>
 		If you uncomment the debugging printout line (and run <quote><pre>make</pre></quote>, and maybe
 		<quote><pre>make install</pre></quote> afterwards), you can see the auto-generated code printed
-		on stderr when you use the simple ordered index. It will look somewhat
+		on stderr when you use the SimpleOrdered index. It will look somewhat
 		like this:
 		</para>
 
@@ -2168,8 +2214,8 @@ sub {
 		</para>
 
 		<para>
-		At the moment the Hashed, Sorted and Ordered index types can be used
-		only in both leaf and non-leaf positions. The FIFO index types must
+		At the moment the Hashed, Ordered, Sorted and SimpleOrdered index types can be used
+		in both leaf and non-leaf positions. The FIFO index types must
 		always be in the leaf position, they don't allow the further nesting.
 		</para>
 
@@ -2431,7 +2477,7 @@ TableType
 		handles contain not only the index iterators but also the cached
 		information from the rows, to make the comparisons faster. The exact
 		kind of cached information varies by the index type. The FIFO,
-		Sorted and Ordered indexes
+		Ordered, Sorted and SimpleOrdered indexes
 		use none. The Hashed indexes calculate a hash of the key field values,
 		that will be used as a quick differentiator for the search. This
 		information gets created when the row handle gets created. Whether the
@@ -2719,9 +2765,9 @@ id=2
 
 		<para>
 		Which is probably not the best outcome. It might be tolerable with a
-		FIFO index and a hashed index but gets even more annoying if there are
+		FIFO index and a Hashed index but gets even more annoying if there are
 		two FIFO index types in the table: one top-level limiting the total
-		number of rows, another one nested under a hashed index, limiting the
+		number of rows, another one nested under a Hashed index, limiting the
 		number of rows per group, and they start conflicting this way with each
 		other.
 		</para>
@@ -2757,7 +2803,7 @@ TableType
 		then the replacement policy of the index type B would run first, find
 		that nothing has been displaced yet, and displace the row id=1. After
 		that the replacement policy of the index type A will run, and being a
-		hashed index, it doesn't have a choice, it has to replace the row id=2.
+		Hashed index, it doesn't have a choice, it has to replace the row id=2.
 		And both rows end up displaced.
 		</para>
 
@@ -2897,9 +2943,9 @@ $itLast2 = $ttWindow->findIndexPath([ "bySymbol", "last2" ]);
 
 		<para>
 		It can be used on any kind of index types but actually returns the data
-		only for the Hashed index types.  On the other index types it returns an 
-		empty array, though a better support will be available for the 
-		Sorted and Ordered indexes in the future.
+		only for the Hashed and Ordered index types.  On the other index types it returns an 
+		empty array, though a better support might be available for the 
+		Sorted indexes in the future.
 		</para>
 
 		<para>
@@ -2911,6 +2957,20 @@ $itLast2 = $ttWindow->findIndexPath([ "bySymbol", "last2" ]);
 		</para>
 
 <pre>
+@fields = $indexType->getKeyExpr();
+</pre>
+
+		<para>
+		The array returned depends on the index type and is an "expression"
+		that can be used to build another instance of the same index type. For
+		the Hashed index it simply returns the same data as getKey(). For the
+		Ordered index it returns the list of keys with indications or order (so
+		the descending field names get prepended with a <quote>!</quote>. For the
+		indexes with Perl conditions it currently returns nothing, though in the
+		future might be used to store the condition.
+		</para>
+
+<pre>
 ($idxType, @keys) = $tabType->findIndexKeyPath(\@path);
 </pre>
 
@@ -2919,7 +2979,7 @@ $itLast2 = $ttWindow->findIndexPath([ "bySymbol", "last2" ]);
 		finds by path an index type that allows the direct look-up by key
 		fields. It requires that every index type in the path returns a
 		non-empty array of fields in <pre>getKey()</pre>. In practice it means that every
-		index in the path must be a Hashed index. Otherwise the method
+		index in the path must be a Hashed or Ordered index. Otherwise the method
 		confesses. When the Sorted and maybe other index types will support
 		<pre>getKey()</pre>, they will be usable with this method too.
 		</para>
@@ -3038,10 +3098,13 @@ $id = $idxType->getIndexId();
 		<listitem>
 		<pre>&Triceps::IT_SORTED</pre>
 		</listitem>
+		<listitem>
+		<pre>&Triceps::IT_ORDERED</pre>
+		</listitem>
 		</itemizedlist>
 
 		<para>
-		There is no different id for the ordered index, because it's
+		There is no different id for the SimpleOrdered index, because it's
 		built on top of the sorted index, and would return <pre>&Triceps::IT_SORTED</pre>.
 		</para>
 
@@ -3069,7 +3132,8 @@ $itSub = $idxType->findSubIndexById($indexTypeId);
 
 		<para>
 		where <pre>$indexTypeId</pre> is one of either of Triceps constants or the
-		matching strings <pre>"IT_HASHED"</pre>, <pre>"IT_FIFO"</pre>, <pre>"IT_SORTED"</pre>.
+		matching strings <pre>"IT_HASHED"</pre>, <pre>"IT_FIFO"</pre>, <pre>"IT_SORTED"</pre>,
+		<pre>"IT_ORDERED"</pre>.
 		</para>
 
 		<para>
@@ -3164,9 +3228,11 @@ $result = $idxType1->match($idxType2);
 		The names of the sub-indexes may differ.
 		As far as the type-specific parameters are concerned, it depends on the
 		kind of the index type. The FIFO type considers any parameters matching.
-		For a Hashed index the key fields must be the same. For a Sorted index
+		For a Hashed index the key fields must be the same. For an Ordered index
+		the key fields and their ascending/descending order must be the same.
+		For a Sorted index
 		the sorted condition must also be the same, and by extension this
-		means the same condition for the Ordered index.
+		means the same condition for the SimpleOrdered index.
 		</para>
 	</sect1>
 

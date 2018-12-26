@@ -86,6 +86,8 @@
 <p>Click on the <strong>Attributes</strong> tab.</p>
 <p><img alt="Trigger attributes tab" src="img/ch07/trigger_attributes.png"></p>
 <p>We'll talk about rewriter triggers in <a href="#7.1.4">Section 7.1.4</a> and splitter triggers in <a href="#7.1.6">Section 7.1.6</a>. First, let's examine the other attributes.</p>
+<p><strong>Igore the trigger response (e.g. just apply a style)</strong></p>
+<p>When this checkbutton is selected, nothing happens when the trigger fires (but any trigger style is still applied - see <a href="#7.1.3">Section 7.1.3</a>.</p>
 <p><strong>Ignore case</strong></p>
 <p>When the checkbutton is selected, this trigger doesn't care about capital letters. So, the pattern <strong>You kill the orc</strong> will match all of the following lines:</p>
 <pre><code>    you kill the orc
@@ -93,6 +95,8 @@
     YOU KILL THE ORC
 </code></pre>
 <p>From your reading of <a href="ch06.html">Section 6</a> you'll remember that patterns are usually case-sensitive. De-select the button to make the pattern <strong>You kill the orc</strong> match only the first line above.</p>
+<p><strong>Keep checking triggers after a match</strong></p>
+<p>If the checkbutton is not selected, when this trigger's pattern matches a line, Axmud will not check any other triggers. If the checkbutton is selected, Axmud will continue checking the line against other triggers.</p>
 <p><strong>Only fire in session's default pane</strong></p>
 <p>A pane is an area of an Axmud window containing (multiple lines of) text. Most windows, including the main window, contain only one pane by default. Text received from the world is displayed in the main window's single pane by default.</p>
 <p>When the checkbutton is selected, the trigger only applies to text received from the world and displayed in that default pane. When it's not selected, the trigger applies to text received from the world and displayed in any pane (including in other windows).</p>
@@ -113,8 +117,6 @@
 <p>When the checkbutton is selected, any line which matches the trigger's pattern is <em>not</em> displayed in the main window.</p>
 <p><strong>Omit (gag) from logfile</strong></p>
 <p>When the checkbutton is selected, any line which matches the trigger's pattern is <em>not</em> written to any logfiles.</p>
-<p><strong>Keep checking triggers after a match</strong></p>
-<p>If the checkbutton is not selected, when this trigger's pattern matches a line, Axmud will not check any other triggers. If the checkbutton is selected, Axmud will continue checking the line against other triggers.</p>
 <p><strong>Temporary trigger</strong></p>
 <p>If the checkbutton is selected, the trigger only fires once. After that, the active trigger becomes an inactive trigger - it will be available again, the next time you connect to the world, but it will not be available again during this session.</p>
 <p><strong>Cooldown (in seconds)</strong></p>
@@ -122,7 +124,7 @@
 <h3><a name="7.1.3">7.1.3 Trigger styles</a></h3>
 <p>Now click on <strong>Page 2</strong> of the <strong>Attributes</strong> tab.</p>
 <p><img alt="Trigger styles tab" src="img/ch07/trigger_styles.png"></p>
-<p>Triggers are able to change the way matching lines are displayed. This is really useful if you want to change the colour of something like <strong>The orc drops its treasure</strong>, so that it stands out against the surrounding text.</p>
+<p>Triggers are able to change the way matching lines are displayed. This is really useful if you want to change the colour of <strong>The orc drops its treasure</strong>, so that it stands out against the surrounding text.</p>
 <p>Trigger styles are turned <em>off</em> by default. When you turn them on, you need to decide whether the new style should apply to the whole line, or just the portion of the line that matches the trigger's pattern.</p>
 <p>If the trigger's pattern contains groups (see <a href="ch06.html#6.1.5">Section 6.1.5</a>), you can also apply a style just to that portion of text. For example, if you use the pattern <strong>You have (.*) gold coins</strong>, which matches the line:</p>
 <pre><code>    You have 100 gold coins
@@ -130,6 +132,21 @@
 <p>...you can draw attention to the <strong>100</strong> by clicking on <strong>Mode n</strong>, then selecting the number 1 (meaning, the substring matching the first group in the pattern) in the box just below.</p>
 <p>The trigger style can combine colours and other typographical features. <strong>Foreground colour</strong> is the colour of the text itself.  <strong>Underlay colour</strong> is the colour of the background immediately below the text. (Bold colours are shown in CAPITAL LETTERS). If you don't specify a colour, the line's normal colours are not changed.</p>
 <p>You can also apply italics, strikethrough, blinking text and underlines (underscores). If you apply the <strong>link</strong> style, the text will be a clickable link which Axmud will try to open in a web browser.</p>
+<p>Axmud triggers have a <em>stimulus</em> and a <em>response</em>. If you just want to apply the style and do nothing else, you can tell Axmud to ignore this trigger's response. </p>
+<ul>
+<li>From the main window menu, click <strong>Edit &gt; World triggers</strong></li>
+<li>In the <strong>Trigger stimulus</strong> box, enter <strong>The orc drops its treasure</strong></li>
+<li>In the <strong>Trigger response</strong> box, enter anything you like <ul>
+<li>There must be a response, even though it's ignored</li>
+</ul>
+</li>
+<li>Click on <strong>Page 1</strong></li>
+<li>Select the <strong>Ignore the trigger response (e.g. just apply a style)</strong> button</li>
+<li>Now click on <strong>Page 2</strong></li>
+<li>Click the <strong>Mode -2 Apply style to matched text</strong> button</li>
+<li>In the drop-down box below <strong>Text colour</strong>, select a colour like <strong>red</strong>, and then click the <strong>Set</strong> button</li>
+<li>Click the <strong>OK</strong> button to close the window</li>
+</ul>
 <h3><a name="7.1.4">7.1.4 Rewriter triggers</a></h3>
 <p>All interfaces have a stimulus and a response. Most triggers have a pattern (stimulus) and an instruction (response), but there is a special class of trigger called a <em>rewriter trigger</em>.</p>
 <p>For rewriter triggers, the text matching the pattern is <em>substituted</em> for the text of the response.</p>
@@ -444,8 +461,10 @@
 <p><strong>Cooldown (in seconds)</strong></p>
 <p>You can prevent a macro from firing too often by setting a cooldown period. For example, if you set the cooldown to 10, after firing the macro won't be able to fire again for another 10 seconds. The default value is 0, meaning no cooldown period is used.</p>
 <h2><a name="7.4">7.4 Timers</a></h2>
-<p>Timers allow you to execute an instruction repeatedly at regular intervals. They can also be used to execute an instruction once, after a certain period of time.</p>
-<p>Like all interfaces, Axmud timers have a <em>stimulus</em> and a <em>response</em>.  The stimulus is a time interval, expressed in seconds. When this interval has passed, we say that the timer <em>fires</em>.</p>
+<p>Timers allow you to execute an instruction repeatedly at regular intervals. They can also be used to execute an instruction once, after a certain period of time. They can even be used to execute an instruction once a day, at the same time each day (or once an hour, at the same number of minutes past the hour).</p>
+<p>Like all interfaces, Axmud timers have a <em>stimulus</em> and a <em>response</em>.  The stimulus is usually a time interval, expressed in seconds. The minimum value is 0.1 seconds. When this interval has passed, we say that the timer <em>fires</em>.</p>
+<p>The stimulus can also a 24-hour clock time in the form HH:MM (for example, 00:00 for midnight, 12:00 for midday, 13:30 for half past one in the afternoon). If you use a clock time, the timer fires at the time, once a day.</p>
+<p>Axmud recognises special clock times in the form 99:MM. For example, a timer whose stimulus is 99:00 will fire once an hour, on the hour. A timer whose stimulus is 99:15 will fire once an hour, at a quarter past the hour.</p>
 <p>The response can be any kind of instruction. It's usually a world command like <strong>score</strong>, but it could be a client command like <strong>;playsoundeffect beep</strong> or any other kind of instruction (see <a href="ch04.html#4.4">Section 4.4</a>).</p>
 <h3><a name="7.4.1">7.4.1 Adding timers</a></h3>
 <p>Let's create a timer which will <em>fire</em> every 60 seconds, and which sends the world command <strong>score</strong> each time it fires.</p>

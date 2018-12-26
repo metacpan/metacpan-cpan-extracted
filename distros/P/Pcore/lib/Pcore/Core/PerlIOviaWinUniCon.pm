@@ -5,23 +5,48 @@ use Encode qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
 use Inline(
     C => <<'C',
-void* get_std_handle(U32 std_handle) {
+# include "windows.h"
+
+void *get_std_handle(U32 std_handle) {
     return GetStdHandle(std_handle);
 }
 
-bool is_console(void* handle) {
+bool is_console(void *handle) {
     CONSOLE_SCREEN_BUFFER_INFO info;
 
     return GetConsoleScreenBufferInfo(handle, &info);
 }
 
-bool write_console(void* handle, wchar_t* buff) {
+bool write_console(void *handle, wchar_t *buff) {
     U32 write_size;
 
     return WriteConsoleW(handle, buff, wcslen(buff), &write_size, NULL);
 }
+
+// TODO convert ANSI ESC sequeces to windows, look at Win32::Console::ANSI
+bool write_console1 ( void *handle, char *buf, size_t len ) {
+    size_t len16 = MultiByteToWideChar(CP_UTF8, 0, buf, len, NULL, 0);
+
+    if (len16) {
+        wchar_t *buf16;
+        Newx(buf16, len16, wchar_t);
+
+        MultiByteToWideChar(CP_UTF8, 0, buf, len, buf16, len16);
+
+        U32 write_size;
+
+        return WriteConsoleW(handle, buf16, len16, &write_size, NULL);
+    }
+    else {
+        return 0;
+    }
+}
+
 C
-    ccflagsex => '-Wall -Wextra -Ofast -std=c11',
+    ccflagsex => '-Wall -Wextra -Wno-unused-parameter -Ofast -std=c11',
+
+    # build_noisy => 1,
+    # force_build => 1,
 );
 
 my $ANSI_RE           = qr/\e.+?m/sm;
@@ -34,28 +59,17 @@ my $STD_HANDLE        = {
     $STD_ERROR_HANDLE  => get_std_handle($STD_ERROR_HANDLE),
 };
 
-sub PUSHED {
-    my $self = shift;
-    my $mode = shift;
-    my $fh   = shift;
+sub UTF8 { return 1 }
 
+sub PUSHED ( $self, $mode, $fh ) {
     return bless \*PUSHED, $self;
 }
 
-sub UTF8 {
-    my $self = shift;
-
-    return 1;
-}
-
-sub WRITE {
-    my $self = shift;
-    my $buf  = shift;
-    my $fh   = shift;
-
+sub WRITE ( $self, $buf, $fh ) {
     my $handle = $fh->fileno == fileno STDOUT ? $STD_HANDLE->{$STD_OUTPUT_HANDLE} : $STD_HANDLE->{$STD_ERROR_HANDLE};
 
-    if ( is_console($handle) ) {    # console handle
+    # console handle
+    if ( is_console($handle) ) {
 
         # PerlIO perform utf8::encode($buf) for scalars without UTF8 flag if filehandle has :utf8 layer
         # so we need to decode
@@ -64,21 +78,28 @@ sub WRITE {
         for my $str ( split /($ANSI_RE)/sm, $buf ) {
             next if $str eq $EMPTY;
 
-            if ( substr( $str, 0, 1 ) eq qq[\e] ) {    # ANSII escape sequence
+            # ANSII escape sequence
+            if ( substr( $str, 0, 1 ) eq "\e" ) {
 
                 print {$fh} $str;
 
                 $fh->flush;
             }
-            else {                                     #
+
+            # text
+            else {
                 while ( length $str ) {
-                    write_console( $handle, $UTF16->encode( substr $str, 0, $MAX_BUFFER_SIZE, $EMPTY ) . "\N{NULL}" );
+                    write_console( $handle, $UTF16->encode( substr $str, 0, $MAX_BUFFER_SIZE, $EMPTY ) . "\x00" );
                 }
             }
         }
     }
-    else {                                             # redirected filehandle, |, >, ...
-        $buf =~ s/$ANSI_RE//smg;                       # strip ANSI escape sequencies
+
+    # redirected filehandle, |, >, ...
+    else {
+
+        # strip ANSI escape sequencies
+        $buf =~ s/$ANSI_RE//smg;
 
         print {$fh} $buf;
 
@@ -89,6 +110,16 @@ sub WRITE {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    2 | 92                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

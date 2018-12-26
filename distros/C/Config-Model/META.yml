@@ -76,6 +76,6 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.131'
+version: '2.132'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

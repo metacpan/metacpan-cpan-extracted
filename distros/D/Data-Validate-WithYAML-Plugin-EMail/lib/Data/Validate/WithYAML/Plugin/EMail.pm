@@ -8,7 +8,7 @@ use Regexp::Common qw[Email::Address];
 
 # ABSTRACT: Plugin for Data::Validate::WithYAML to check email addresses
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub check {
     my ($class, $value) = @_;
@@ -38,7 +38,7 @@ Data::Validate::WithYAML::Plugin::EMail - Plugin for Data::Validate::WithYAML to
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

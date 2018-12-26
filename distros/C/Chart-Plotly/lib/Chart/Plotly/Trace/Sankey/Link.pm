@@ -6,9 +6,10 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
+use Chart::Plotly::Trace::Sankey::Link::Hoverlabel;
 use Chart::Plotly::Trace::Sankey::Link::Line;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace sankey.
 
@@ -49,6 +50,28 @@ has colorsrc => ( is            => "rw",
 
 has description => ( is      => "ro",
                      default => "The links of the Sankey plot.", );
+
+has hoverinfo => (
+    is  => "rw",
+    isa => enum( [ "all", "none", "skip" ] ),
+    documentation =>
+      "Determines which trace information appear when hovering links. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
+);
+
+has hoverlabel => ( is  => "rw",
+                    isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Link::Hoverlabel", );
+
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `value` and `label`. Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\".",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
 
 has label => ( is            => "rw",
                isa           => "ArrayRef|PDL",
@@ -108,7 +131,7 @@ Chart::Plotly::Trace::Sankey::Link - This attribute is one of the possible optio
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -172,6 +195,20 @@ Sets the `link` color. It can be a single value, or an array for specifying colo
 Sets the source reference on plot.ly for  color .
 
 =item * description
+
+=item * hoverinfo
+
+Determines which trace information appear when hovering links. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.
+
+=item * hoverlabel
+
+=item * hovertemplate
+
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available. variables `value` and `label`. Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>".
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
 
 =item * label
 

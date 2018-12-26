@@ -1,5 +1,6 @@
 package App::Pimpd::Validate;
 use strict;
+no warnings 'experimental::smartmatch';
 
 BEGIN {
   use Exporter;
@@ -93,7 +94,7 @@ sub isa_valid_playlist {
 
 sub escape {
   my $str = shift;
-  $str =~ s/([;<>\*\|`&\$!#\(\)\[\]\{\}:'"])/\\$1/gm;
+  $str =~ s/([;<>*|`&\$!#()[\]{}:'" ])/\\$1/g;
 
   return $str;
 }

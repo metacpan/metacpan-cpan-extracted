@@ -1,5 +1,5 @@
 module.exports = function(config) {
   config.entry = {
-    "my_app": + './assets/js/app.js',
+    "my_app": "./assets/my_app.js",
   };
 };

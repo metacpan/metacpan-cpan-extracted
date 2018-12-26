@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -674,9 +674,9 @@ qr/^index error:
 qr/^Triceps::IndexType::newPerlSorted\(initialize\): failed to compile the source code
 Compilation error: Global symbol \"\$zz\" requires explicit package name .*
 The source code was:
-  sub {
+  sub \{
   \$zz\+\+;
-  } at/);
+  \} at/);
 }
 
 {
@@ -686,9 +686,9 @@ The source code was:
 qr/^Triceps::IndexType::newPerlSorted\(compare\): failed to compile the source code
 Compilation error: Global symbol \"\$zz\" requires explicit package name .*
 The source code was:
-  sub {
+  sub \{
   \$zz\+\+;
-  } at/);
+  \} at/);
 }
 
 {
@@ -700,9 +700,9 @@ The source code was:
 qr/^Triceps::IndexType::setComparator: failed to compile the source code
 Compilation error: Global symbol \"\$zz\" requires explicit package name .*
 The source code was:
-  sub {
+  sub \{
   \$zz\+\+;
-  } at/);
+  \} at/);
 }
 
 #########################

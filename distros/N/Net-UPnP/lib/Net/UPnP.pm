@@ -11,7 +11,7 @@ use warnings;
 use vars qw($VERSION $DEBUG $SSDP_ADDR $SSDP_PORT);
 
 
-$VERSION  = '1.4.5';
+$VERSION  = '1.4.6';
 $DEBUG = 0;
 
 $SSDP_ADDR = '239.255.255.250';

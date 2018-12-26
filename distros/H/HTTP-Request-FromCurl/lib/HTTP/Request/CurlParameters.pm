@@ -13,7 +13,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -231,7 +231,7 @@ sub as_snippet( $self, %options ) {
 
     my @preamble;
     push @preamble, @{ $options{ preamble } } if $options{ preamble };
-    
+
     my $request_args = join ", ",
                                  '$r',
                            $self->_pairlist([
@@ -272,6 +272,10 @@ sub as_snippet( $self, %options ) {
     my \$res = \$ua->request( $request_args );
 SNIPPET
 };
+
+sub clone( $self, %options ) {
+    (ref $self)->new( %$self, %options )
+}
 
 1;
 

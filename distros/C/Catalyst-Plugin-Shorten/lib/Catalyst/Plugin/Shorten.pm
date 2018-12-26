@@ -1,5 +1,5 @@
 package Catalyst::Plugin::Shorten;
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.04';
 
 use Bijection qw/all/;
 use Scalar::Util qw/reftype/;
@@ -57,7 +57,7 @@ sub shorten_delete {
 
 	if (!$args{$short}) {
 		unless ($args{$short} = $c->req->param($short)) {
-			Catalyst::Exception->throw(sprintf 'Unable to find %s to delete', $short);		
+			Catalyst::Exception->throw(sprintf 'Unable to find %s to delete', $short);
 		}
 	}
 
@@ -69,18 +69,19 @@ sub shorten_extract {
 	my ($c, %args) = @_;
 
 	$args{params} = $c->req->params unless $args{params}; # 100% the conditionals, ||= would always be true :)
+	$args{allow_missing} = 1;
 	if (my $sparams = $c->shorten_params(%args)) {
 		delete $args{params}->{$short};
 		$sparams = {%{$sparams}, %{$args{params}}} unless $args{no_merge};
 		$c->req->parameters($sparams);
 	}
 
-	1;	
+	1;
 }
-
+use Data::Dumper;
 sub shorten_params {
 	my ($c, %args) = @_;
-	$args{params} = $c->req->params unless $args{params};
+	$args{params} = $c->req->params || {} unless $args{params};
 	if ($args{params}->{$short}) {
 		my $id = inverse($args{params}->{$short});
 		my $shorten = $c->shorten_get_data($id);
@@ -88,10 +89,12 @@ sub shorten_params {
 			$shorten = $args{cb}->($c, $shorten);
 		}
 		return $shorten->{$pkey} if $shorten; # reftype for blessed
-		Catalyst::Exception->throw(sprintf 'Unable to find params for: %s -> %s : %s', 
+		Catalyst::Exception->throw(sprintf 'Unable to find params for: %s -> %s : %s',
 			$args{params}->{$short}, $id, $pkey);
-	
 	}
+	Catalyst::Exception->throw(sprintf 'Unable to find short in params for: %s', $short)
+			unless ( $args{allow_missing} );
+	undef;
 }
 
 sub shorten_redirect {
@@ -102,7 +105,7 @@ sub shorten_redirect {
 		$shorten = $args{cb}->($c, $shorten);
 	}
 	return $c->res->redirect($shorten->{$ukey}) if $shorten;
-	Catalyst::Exception->throw(sprintf 'Unable to find uri to redirect for: %s -> %s', $args{$short}, $id);	
+	Catalyst::Exception->throw(sprintf 'Unable to find uri to redirect for: %s -> %s', $args{$short}, $id);
 }
 
 sub shorten_bijection_set {
@@ -130,7 +133,7 @@ Catalyst::Plugin::Shorten - The great ancient URI shortner!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -145,7 +148,7 @@ Version 0.02
 		my ($self, $c) = @_;
 		$c->shorten_extract; # checks whether the shorten param exists if it does merges the stored params into the request
 	}
-	
+
 	........
 
 	sub endpoint :Chained('base') :PathPart('ending') :Args('0') {
@@ -154,14 +157,14 @@ Version 0.02
 		my $str = $c->shorten(); # returns bijection references to an ID in the store.
 		my $url = $c->shorten(as_uri => 1); # return a url to the current endpoint replacing all params with localhost:300/ending?s=GH
 	}
-	
+
 	-------
 
 	use Catalyst qw/
 		Shorten
 		Shorten::Store::Dummy
 	/;
-	
+
 	__PACKAGE__->config(
 		......
 		'Plugin::Shorten' => {
@@ -182,7 +185,7 @@ Version 0.02
 	BEGIN {
 		extends 'Catalyst::Controller';
 	}
-		
+
 	sub g :Chained('/') :PathPart('g') :Args('1') {
 		my ($self, $c, $cap) = @_;
 		$c->shorten_redirect(g => $cap);
@@ -210,8 +213,8 @@ Delete from storage.
 
 Check for the param (default is 's'), if defined attempt to inverse and then right merge with the current requests params.
 
-This always returns true and you can later access the merged params using - 
-	
+This always returns true and you can later access the merged params using -
+
 	$c->req->params;
 
 =cut

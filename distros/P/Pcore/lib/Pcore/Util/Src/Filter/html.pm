@@ -18,7 +18,7 @@ sub decompress ($self) {
 
     my $proc = P->sys->run_proc( qq[html-beautify --quiet --indent-scripts separate --replace "$temp"], win32_create_no_window => 1 )->wait;
 
-    $self->{data}->$* = P->file->read_bin($temp)->$*;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = P->file->read_bin($temp);    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     return res 200;
 }

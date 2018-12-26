@@ -10,7 +10,7 @@ sub _build_upstream ($self) {
     if ( -f "$self->{root}/.git/config" ) {
         my $config = P->file->read_text("$self->{root}/.git/config");
 
-        return Pcore::API::SCM::Upstream->new( { uri => $1, local_scm_type => $SCM_TYPE_GIT } ) if $config->$* =~ /\s*url\s*=\s*(.+?)$/sm;
+        return Pcore::API::SCM::Upstream->new( { uri => $1, local_scm_type => $SCM_TYPE_GIT } ) if $config =~ /\s*url\s*=\s*(.+?)$/sm;
     }
 
     return;

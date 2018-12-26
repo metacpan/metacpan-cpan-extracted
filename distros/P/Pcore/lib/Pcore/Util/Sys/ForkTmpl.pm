@@ -49,7 +49,7 @@ sub run_node ( $type, $args ) {
         args => $args,
     };
 
-    syswrite $CHILD_FH, pack( 'L', length $msg->$* ) . $msg->$* or die $!;
+    syswrite $CHILD_FH, pack( 'L', length $msg ) . $msg or die $!;
 
     IO::FDPass::send fileno $CHILD_FH, $args->{fh};
 

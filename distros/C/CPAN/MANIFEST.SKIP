@@ -5,6 +5,8 @@
 \.rej$
 \.out$
 \.svn
+\.gpg
+\.xml
 \bRCS/
 ^CPAN-.+/.+
 ^CPAN-.+gz$
@@ -31,6 +33,7 @@
 ^cpan_reports_
 ^cpantesters-show/
 ^dagolden-reversion-gist.pl
+^distroprefs/.*\.dd
 ^distroprefs/ttt.nodbi.yml
 ^distroprefs/ttt.nodbi.yml.bak
 ^distroprefs/ttt.nomailsend.yml
@@ -98,6 +101,7 @@ cpanstats.db
 ^cpandb
 ^_eumm
 ^revert-planning.txt
+^typescript
 [0-9]+.*\.patch
 
 # a test that helped me diagnose HARNESS_OPTIONS stuff during development:

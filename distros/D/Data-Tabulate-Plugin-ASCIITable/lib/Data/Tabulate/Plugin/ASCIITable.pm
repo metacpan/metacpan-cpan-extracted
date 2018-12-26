@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Text::Table::Tiny;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 sub new{
@@ -33,13 +33,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Tabulate::Plugin::ASCIITable - generate ASCII tables with Data::Tabulate 
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

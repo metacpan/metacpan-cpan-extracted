@@ -195,11 +195,11 @@ sub return_xxx ( $self, $h, $status, $close_connection = 1 ) {
 
     my $buf = "HTTP/1.1 $status $reason\r\nContent-Length:0\r\n";
 
-    $buf .= 'Connection:' . ( $close_connection ? 'close' : 'keep-alive' ) . $CRLF;
+    $buf .= 'Connection:' . ( $close_connection ? 'close' : 'keep-alive' ) . "\r\n";
 
     $buf .= "Server:$self->{server_tokens}\r\n" if $self->{server_tokens};
 
-    $h->write( $buf . $CRLF );
+    $h->write("$buf\r\n");
 
     return;
 }
@@ -212,8 +212,6 @@ sub return_xxx ( $self, $h, $status, $close_connection = 1 ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 47                   | Subroutines::ProhibitExcessComplexity - Subroutine "_on_accept" with high complexity score (32)                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 38                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

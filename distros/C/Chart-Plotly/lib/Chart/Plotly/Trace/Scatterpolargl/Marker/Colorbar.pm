@@ -8,9 +8,9 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Scatterpolargl::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Scatterpolargl::Marker::Colorbar::Tickformatstop;
-use Chart::Plotly::Trace::Scatterpolargl::Marker::Colorbar::Titlefont;
+use Chart::Plotly::Trace::Scatterpolargl::Marker::Colorbar::Title;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatterpolargl.
 
@@ -223,18 +223,8 @@ has tickwidth => ( is            => "rw",
                    documentation => "Sets the tick width (in px).",
 );
 
-has title => ( is            => "rw",
-               isa           => "Str",
-               documentation => "Sets the title of the color bar.",
-);
-
-has titlefont => ( is  => "rw",
-                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scatterpolargl::Marker::Colorbar::Titlefont", );
-
-has titleside => ( is            => "rw",
-                   isa           => enum( [ "right", "top", "bottom" ] ),
-                   documentation => "Determines the location of the colorbar title with respect to the color bar.",
-);
+has title => ( is  => "rw",
+               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scatterpolargl::Marker::Colorbar::Title", );
 
 has x => ( is            => "rw",
            isa           => "Num",
@@ -285,7 +275,7 @@ Chart::Plotly::Trace::Scatterpolargl::Marker::Colorbar - This attribute is one o
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -463,14 +453,6 @@ Sets the source reference on plot.ly for  tickvals .
 Sets the tick width (in px).
 
 =item * title
-
-Sets the title of the color bar.
-
-=item * titlefont
-
-=item * titleside
-
-Determines the location of the colorbar title with respect to the color bar.
 
 =item * x
 

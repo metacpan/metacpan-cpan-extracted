@@ -19,7 +19,7 @@ use Devel::hdb::Router;
 
 use vars qw( $parent_pid ); # when running in the test harness
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 our $APP_OBJ;
 sub get {
@@ -148,6 +148,7 @@ sub init_debugger {
     require Devel::hdb::App::AnnounceChild;
     require Devel::hdb::App::WatchPoint;
 
+    local $@;
     eval { $self->load_settings_from_file() };
 
 }
@@ -362,9 +363,9 @@ sub load_settings_from_file {
         my $fh = IO::File->new($file, 'r') || die "Can't open file $file for reading: $!";
         $buffer = <$fh>;
     }
+    local $@;
     my $settings = eval $buffer;
     die $@ if $@;
-
 
     my @set_breakpoints;
     foreach my $bp ( @{ $settings->{breakpoints}} ) {
@@ -375,12 +376,13 @@ sub load_settings_from_file {
         push @set_breakpoints,
             Devel::hdb::App::Action->set_and_respond($self, $action);
     }
-    return 1;
+    return $settings;
 }
 
 sub save_settings_to_file {
     my $self = shift;
     my $file = shift;
+    my $additional = shift;
 
     unless (defined $file) {
         $file = $self->settings_file();
@@ -395,7 +397,7 @@ sub save_settings_to_file {
     my @breakpoints = map { $serializer->($_) } $self->get_breaks();
     my @actions = map { $serializer->($_) } $self->get_actions();
     my $fh = IO::File->new($file, 'w') || die "Can't open $file for writing: $!";
-    my $config = { breakpoints => \@breakpoints, actions => \@actions };
+    my $config = { breakpoints => \@breakpoints, actions => \@actions, additional => $additional };
     $fh->print( Data::Dumper->new([ $config ])->Terse(1)->Dump());
     return $file;
 }

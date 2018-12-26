@@ -3,7 +3,7 @@ use t::Helper;
 
 plan skip_all => 'TEST_PROCESS_SASS=1' unless $ENV{TEST_PROCESS_SASS} or $ENV{TEST_ALL};
 
-$ENV{MOJO_WEBPACK_RUN} //= 1;
+$ENV{MOJO_WEBPACK_BUILD} //= 1;
 my $cwd = t::Helper->cwd;
 my $t = t::Helper->t(process => ['js', 'sass']);
 

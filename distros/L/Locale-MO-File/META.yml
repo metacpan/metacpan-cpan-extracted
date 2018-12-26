@@ -19,7 +19,7 @@ name: Locale-MO-File
 provides:
   Locale::MO::File:
     file: lib/Locale/MO/File.pm
-    version: '0.08'
+    version: '0.09'
 recommends:
   Test::Pod: '1.14'
   Test::Pod::Coverage: '1.04'
@@ -37,5 +37,5 @@ requires:
   perl: '5.006001'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

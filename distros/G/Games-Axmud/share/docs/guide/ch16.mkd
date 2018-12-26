@@ -32,6 +32,8 @@ Many of the remaining windows will ask you to type something, such as a characte
 
 If you specify a character name and a password, Axmud can usually login to the world on your behalf. If not, you'll have to type the name and password every time you connect to the world.
 
+(You can tell Axmud to automatically connect to a world, if you like. See [Section 16.3.2](#16.3.2)
+
 ##16.3 Playing the game
 
 Axmud normally runs with multiple windows. There is a main window, in which most of the text received from the world is displayed. There are task windows, which typically display information about your character's health, the current location, and so on.  There is also an automapper window and a great many edit windows used to modify Axmud's stored data.
@@ -54,11 +56,19 @@ Another useful client command is the **;save** command - typed as a semicolon, f
 
 If you get disconnected, the main window will not close.  You can use the **;reconnect** command (a semicolon, followed by the world **reconnect**) to re-establish a connection to the same world.
 
-Alternatively, you can use the **;connect** command to connect to a different world. If you want to connect to *Discworld MUD*, you can type **;connect discworld**. If you have already set up a character profile called Gandalf, you can type **;connect discworld gandalf**.
+Alternatively, you can use the **;connect** command to connect to a different world. If you want to connect to *Discworld MUD*, you can type **;connect discworld**. If you have already set up a character profile called Gandalf, you can type **;connect discworld gandalf**. 
 
 After disconnecting, you can halt Axmud by typing the **;stopclient** command. (**stopclient** is typed as a single word with no spaces.)
 
 You can use the **;speak** command to test Axmud's text-to-speech abilities. **;speak** will read out a test message, but you can specify your own message with a command like **;speak hello world**.
+
+###16.3.2 Auto-connecting to a world
+
+If you want to skip the initial dialogue windows, you can tell Axmud to automatically connect to a world.
+
+This is done using the **;setautoworld** command. (**setautoworld** is typed as a single word with no spaces.)
+
+The command should be followed by the name of the world profile, for example **discworld**. You can add the name of a character after that, if you like.
 
 ##16.4 Enabling/disabling text-to-speech
 
@@ -146,20 +156,19 @@ If you specify a voice that isn't available on your system (or if you misspell t
 
 You can use the **;speak** command to test this configuration's new voice. The command to use is **;speak receive**.
 
-###16.5.2 Configuring the speed, pitch and volume
+###16.5.2 Configuring the speed, rate, pitch and volume
 
 Now we'll customise the rest of the configuration. Make sure you're using the eSpeak engine by typing the command **;config receive engine espeak**.
 
-To change the voice speed, type the command **;config receive speed 120**. This will slow down the voice. To speed it up, type **;config receive speed 180**. The speed can be anything between 10 and 200 words per minute.
+Axmud uses a set range of values for the word speed, word rate, pitch and volume. Regardless of the engine, the range is zero to a hundred.
 
-The Festival and Swift engines use a word rate, rather than a word speed. The 'normal' rate is 1.  To make the voice 50% slower, type **;config receive rate 0.5**. To make it 100% faster, type **;config receive rate 2**.  The rate can be any value between 0.5 and 2.
+To change the voice speed, type the command **;config receive speed 50**. This will slow down the voice. To speed it up, type **;config receive speed 90**. 
 
-To make the word pitch higher, type **;config receive pitch 80**. To make it lower, type **;config receive pitch 20**.  With the eSpeak engine, the pitch can be any value between 0 and 99.
+The Festival and Swift engines use a word rate, rather than a word speed. To change the rate, type **;config receive rate 50** or **;config receive rate 90**. 
 
-The Swift engine uses a different pitch scale.  To make the pitch 50% lower, type **;config receive pitch 0.5**. To make it 100% higher, type **;config receive pitch 2**. The value can be anything between 0.1 and 5.
+To make the word pitch higher, type **;config receive pitch 80**. To make it lower, type **;config receive pitch 20**.  
 
-The eSpeak engine doesn't allow us to change the volume, but if you've modified the configuration to use the Festival or Swift engines, you can can increase the volume by typing
-**;config receive volume 2**. The volume can be any value between 0.33 and 6.
+The eSpeak engine doesn't allow us to change the volume, but if you've modified the configuration to use the Festival or Swift engines, you can can reduce the volume by typing **;config receive volume 50**. 
 
 Again, to reset the voice, speed, rate, pitch and volume to default values for this engine, type **;config receive engine espeak**.
 

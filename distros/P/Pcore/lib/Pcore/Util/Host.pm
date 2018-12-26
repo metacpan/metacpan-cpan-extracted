@@ -67,7 +67,7 @@ sub update_all ( $self ) {
             $domains->{$domain_ascii} = domain_to_utf8($domain_ascii);
         }
 
-        $ENV->{share}->write( '/Pcore/data/tld.dat', \encode_utf8( join $LF, map {"$domains->{$_};$_"} sort { $domains->{$a} cmp $domains->{$b} } keys $domains->%* ) );
+        $ENV->{share}->write( '/Pcore/data/tld.dat', \encode_utf8( join "\n", map {"$domains->{$_};$_"} sort { $domains->{$a} cmp $domains->{$b} } keys $domains->%* ) );
 
         undef $TLD;
 
@@ -123,7 +123,7 @@ sub update_all ( $self ) {
             }
         }
 
-        $ENV->{share}->write( '/Pcore/data/pub-suffix.dat', \encode_utf8( join $LF, map {"$suffixes->{$_};$_"} sort { $suffixes->{$a} cmp $suffixes->{$b} } keys $suffixes->%* ) );
+        $ENV->{share}->write( '/Pcore/data/pub-suffix.dat', \encode_utf8( join "\n", map {"$suffixes->{$_};$_"} sort { $suffixes->{$a} cmp $suffixes->{$b} } keys $suffixes->%* ) );
 
         undef $PUB_SUFFIX;
 
@@ -142,7 +142,7 @@ sub tlds ( $self ) {
     $TLD //= do {
         my $tlds;
 
-        for my $rec ( split /\n/sm, P->file->read_text( $ENV->{share}->get('data/tld.dat') )->$* ) {
+        for my $rec ( split /\n/sm, P->file->read_text( $ENV->{share}->get('data/tld.dat') ) ) {
             my ( $utf8, $ascii ) = split /;/sm, $rec;
 
             $tlds->{$ascii} = $utf8;
@@ -158,7 +158,7 @@ sub pub_suffixes ( $self ) {
     $PUB_SUFFIX //= do {
         my $pub_suffix;
 
-        for my $rec ( split /\n/sm, P->file->read_text( $ENV->{share}->get('data/pub-suffix.dat') )->$* ) {
+        for my $rec ( split /\n/sm, P->file->read_text( $ENV->{share}->get('data/pub-suffix.dat') ) ) {
             my ( $utf8, $ascii ) = split /;/sm, $rec;
 
             $pub_suffix->{$ascii} = $utf8;

@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -136,7 +136,7 @@ UTESTCASE badName(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(!tt->getErrors().isNull());
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "duplicate aggregator/label name 'out'\nduplicate aggregator/label name 'in'\n");
 }
 
@@ -171,16 +171,16 @@ UTESTCASE tableops(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
 
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 
 	IndexType *sec = prim->findSubIndex("level2");
-	UT_ASSERT(sec != NULL);
+	UT_ASSERT(sec != NO_INDEX_TYPE);
 
 	// above here was a copy of primaryIndex(), with aggregators added
 	
@@ -481,7 +481,7 @@ UTESTCASE tableops_fret(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -490,10 +490,10 @@ UTESTCASE tableops_fret(Utest *utest)
 	UT_ASSERT(!fret.isNull());
 
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 
 	IndexType *sec = prim->findSubIndex("level2");
-	UT_ASSERT(sec != NULL);
+	UT_ASSERT(sec != NO_INDEX_TYPE);
 
 	// create a matrix of records, across both axes of indexing
 
@@ -569,7 +569,7 @@ UTESTCASE bad_fret(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -649,7 +649,7 @@ UTESTCASE aggLast(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -797,7 +797,7 @@ UTESTCASE aggBasicSum(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -1028,7 +1028,7 @@ UTESTCASE aggSum(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	if (UT_ASSERT(!tt->getErrors()->hasError())) {
+	if (UT_ASSERT(!tt->getErrors().hasError())) {
 		printf("Agg errors:\n%s", tt->getErrors()->print().c_str());
 		return;
 	}

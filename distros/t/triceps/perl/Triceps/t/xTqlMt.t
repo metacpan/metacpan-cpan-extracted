@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -56,7 +56,7 @@ sub appCoreT # (@opts)
 
 	my $ttWindow = Triceps::TableType->new($rtTrade)
 		->addSubIndex("byId", 
-			Triceps::SimpleOrderedIndex->new(id => "ASC")
+			Triceps::IndexType->newOrdered(key => ["id"])
 		)
 	;
 	$ttWindow->initialize();
@@ -70,7 +70,7 @@ sub appCoreT # (@opts)
 
 	my $ttSymbol = Triceps::TableType->new($rtSymbol)
 		->addSubIndex("bySymbol", 
-			Triceps::SimpleOrderedIndex->new(symbol => "ASC")
+			Triceps::IndexType->newOrdered(key => ["symbol"])
 		)
 	;
 	$ttSymbol->initialize();
@@ -363,7 +363,7 @@ c1|__EOF__
 
 			# a weird query that doesn't make a whole lot of sense
 			# but tests the join of the same table twice in the
-			# same query
+			# same query; and tests the dynamic creation of an index on eps by join
 			$client->send(c1 => "querysub,q2,query2,"
 				. '{read table window}'
 				. '{join table symbol byLeft {symbol} type left}'

@@ -1,7 +1,7 @@
 #!perl
 
 use strict;
-use Test::More tests => 2;
+use Test::More;
 use Data::Dumper;
 use FindBin;
 use File::Basename;
@@ -20,3 +20,6 @@ BEGIN {
 my $validator = Data::Validate::WithYAML->new( $FindBin::Bin . '/test4.yml' );
 
 is $validator->check('field1','check'), 1;
+is $validator->check('field1',''), 0;
+
+done_testing();

@@ -1,6 +1,6 @@
 package Algorithm::LUHN_XS;
-$Algorithm::LUHN_XS::VERSION = '1.06';
-require XSLoader; # uncoverable statement
+$Algorithm::LUHN_XS::VERSION = '1.08';
+require XSLoader;
 XSLoader::load('Algorithm::LUHN_XS', $VERSION);
 use 5.006;
 use strict;
@@ -239,6 +239,10 @@ Specifically:
         check_digit() returns undef.
 
 =back
+
+Also, be careful with passing long numbers around.  Perl will, depending 
+on the context, convert things like 12345678912345 to 1.2345678912345e+1.
+Try to keep things in "string context".
 
 
 =head1 SEE ALSO

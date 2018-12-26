@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -323,9 +323,9 @@ join.out OP_DELETE acct="2" id="3" amount="200"
 
 our $ttAccounts2 = Triceps::TableType->new($rtAccounts)
 	->addSubIndex("iterateSrc", # for iteration in order grouped by source
-		Triceps::IndexType->newHashed(key => [ "source" ])
+		Triceps::IndexType->newOrdered(key => [ "source" ])
 		->addSubIndex("lookupSrcExt",
-			Triceps::IndexType->newHashed(key => [ "external" ])
+			Triceps::IndexType->newOrdered(key => [ "external" ])
 			->addSubIndex("grouping", Triceps::IndexType->newFifo())
 		)
 	)
@@ -565,7 +565,7 @@ our $ttToUsd = Triceps::TableType->new($rtToUsd)
 		Triceps::IndexType->newHashed(key => [ "date", "currency" ])
 	)
 	->addSubIndex("byDate", # for cleaning by date
-		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		Triceps::IndexType->newOrdered(key => [ "date" ])
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 ;
@@ -581,7 +581,7 @@ our $ttPosition = Triceps::TableType->new($rtPosition)
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 	->addSubIndex("byDate", # for cleaning by date
-		Triceps::SimpleOrderedIndex->new(date => "ASC")
+		Triceps::IndexType->newOrdered(key => [ "date" ])
 		->addSubIndex("grouping", Triceps::IndexType->newFifo())
 	)
 ;

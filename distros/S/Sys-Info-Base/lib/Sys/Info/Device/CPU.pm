@@ -1,14 +1,12 @@
 package Sys::Info::Device::CPU;
+$Sys::Info::Device::CPU::VERSION = '0.7807';
 use strict;
 use warnings;
-use vars qw( $VERSION );
 use subs qw(hyper_threading ht);
 use base qw( Sys::Info::Base );
 use Sys::Info::Constants qw( OSID );
 use Carp qw( croak );
 use base __PACKAGE__->load_subclass('Sys::Info::Driver::%s::Device::CPU');
-
-$VERSION = '0.7804';
 
 BEGIN {
     # define aliases
@@ -95,9 +93,17 @@ sub _serve_from_cache {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Sys::Info::Device::CPU - CPU information.
+Sys::Info::Device::CPU
+
+=head1 VERSION
+
+version 0.7807
 
 =head1 SYNOPSIS
 
@@ -115,9 +121,6 @@ Example:
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7804> of C<Sys::Info::Device::CPU>
-released on C<21 January 2015>.
-
 Collects and returns information about the Central Processing Unit
 (CPU) on the host machine.
 
@@ -125,6 +128,10 @@ Some platforms can limit the available information under some
 user accounts and this will affect the accessible amount of
 data. When this happens, some methods will not return
 anything usable.
+
+=head1 NAME
+
+Sys::Info::Device::CPU - CPU information.
 
 =head1 METHODS
 
@@ -218,15 +225,13 @@ L<Sys::Info>, L<Sys::Info::OS>, L<Sys::Info::Device>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2015 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

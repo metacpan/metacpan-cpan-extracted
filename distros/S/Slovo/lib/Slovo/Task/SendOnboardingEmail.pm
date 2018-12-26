@@ -10,29 +10,18 @@ use Mojo::Collection 'c';
 
 my $CONF = {};
 
-my sub _send_mail_by_net_smtp ($message, $to_user, $app) {
+sub send_mail_by_net_smtp ($message, $to_user, $app) {
   state $DEV = $app->mode =~ /^dev/;
 
   return 1 if $DEV;
 
-  my $cnf  = $CONF->{smtp};
-  my $smtp = eval {
-    Net::SMTP->new(
-                   $cnf->{mailhost},
-                   Timeout => $cnf->{timeout},
-                   Debug   => $DEV,
-                   SSL     => $cnf->{ssl},
-                   Port    => $cnf->{port},
-                  );
-    }
-    or do {
-    my $error = 'Net::SMTP could not establish connection to '
-      . $cnf->{mailhost} . ": $@";
+  my $smtp = eval { Net::SMTP->new(%{$CONF->{'Net::SMTP'}{new}}); } or do {
+    my $error = "Net::SMTP could not instantiate: $@";
     $app->log->error($error);
     Mojo::Exception->throw($error);
-    };
-  $smtp->auth($cnf->{username}, $cnf->{password});
-  $smtp->mail($cnf->{mail_from});
+  };
+  $smtp->auth(@{$CONF->{'Net::SMTP'}{auth}});
+  $smtp->mail($CONF->{'Net::SMTP'}{mail});
 
   if ($smtp->to($to_user->{email})) {
     $smtp->data;
@@ -46,7 +35,7 @@ my sub _send_mail_by_net_smtp ($message, $to_user, $app) {
   $smtp->quit;
 
   return 1;
-};
+}
 
 # Sends a message for first login to $to_user and returns the generated token
 # The token will be deleted by _delete_first_login_token($job,$token).
@@ -80,7 +69,7 @@ my sub _mail_message ($t, $from_user, $to_user, $app, $domain) {
     . $domain;
   my $message = <<"MAIL";
 To: $to_user->{email}
-From: $CONF->{smtp}{mail_from}
+From: $CONF->{'Net::SMTP'}{mail}
 Subject: =?UTF-8?B?${\ b64_encode(encode('UTF-8', $subject), '') }?=
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -93,7 +82,7 @@ ${\ encode('UTF-8', $body)}
 MAIL
 
   $app->debug('Message to be send:' . $/ . $message);
-  _send_mail_by_net_smtp($message, $to_user, $app);
+  send_mail_by_net_smtp($message, $to_user, $app);
   return $token;
 };
 
@@ -132,14 +121,32 @@ my sub _delete_first_login ($job, $uid, $token) {
 };
 
 sub register ($self, $app, $conf) {
-  $CONF = $conf;
+  $CONF = $self->validate_conf($conf);
   $app->minion->add_task(mail_first_login   => \&_mail_first_login);
   $app->minion->add_task(delete_first_login => \&_delete_first_login);
   return $self;
 }
 
-1;
+sub validate_conf ($self, $conf) {
+  my $ME = 'Mojo::Exception';
+  $ME->throw(
+    q|Parameters to Net::SMT->new ('Net::SMTP'->{new}) must be a reference to hash.|
+    )
+    unless ref($conf->{'Net::SMTP'}{new}) eq 'HASH';
+  $ME->throw(
+       q|Username ('Net::SMTP'->{auth}[0]) is a mandatory configuration value.|)
+    unless $conf->{'Net::SMTP'}{auth} && $conf->{'Net::SMTP'}{auth}[0];
+  $ME->throw(
+       q|Password ('Net::SMTP'->{auth}[1]) is a mandatory configuration value.|)
+    unless $conf->{'Net::SMTP'}{auth} && $conf->{'Net::SMTP'}{auth}[1];
+  $ME->throw(  q|Mail ('Net::SMTP'->{mail}) is a mandatory configuration value.|
+             . 'It must be a valid email')
+    unless $conf->{'Net::SMTP'}{mail}
+    =~ /^[\w\-\+\.]{1,154}\@[\w\-\+\.]{1,100}$/x;
+  return $conf;
+}
 
+1;
 
 =encoding utf8
 
@@ -149,38 +156,45 @@ Slovo::Task::SendOnboardingEmail - Send an email with link for first time login
 
 =head1 SYNOPSIS
 
+  # common configuration for similar Tasks in slovo.conf
+  my $mail_cfg = {
+    token_valid_for => 24 * 3600,
+    'Net::SMTP'     => {
+      new => {
+        Host => 'mail.example.org',
+
+        #Debug          => 1,
+        SSL             => 1,
+        SSL_version     => 'TLSv1',
+        SSL_verify_mode => 0,
+        Timeout         => 60,
+             },
+      auth => ['slovo@example.org', 'Pa55w03D'],
+      mail => 'slovo@example.org',
+    },
+  };
+
   #load the plugin via slovo.conf
   plugins => [
     #...
     #Tasks
-        {
-         'Task::SendOnboardingEmail' => {
-            token_valid_for => 24 * 3600, #24 hours
-            smtp            => {
-                  ssl       => 1,
-                  port      => 465,
-                  timeout   => 30,
-                  mailhost  => 'mail.example.com',
-                  mail_from => 'onboarding@example.com',
-                  username  => 'onboarding@example.com',
-                  password  => 'pas5w0r4',
-            },
-         }
-        },
-    ],
+    {'Task::SendOnboardingEmail' => $mail_cfg},
+    {'Task::SendPasswEmail'      => $mail_cfg},
+  ],
 
 =head1 DESCRIPTION
 
 This is the first L<Minion> task implemented in L<Slovo>.
 
-Slovo is not integrated with any social network. A plugin can be relatively
-easily written and there are maybe already some L<Mojolicious::Plugin> written.
-L<Ado|https://github.com/kberov/Ado> had L<such
+Slovo is not integrated with any social network. A plugin for such integration
+can be relatively easily written and there are maybe already some
+L<Mojolicious::Plugin> written.  L<Ado|https://github.com/kberov/Ado> had
+L<such
 functionality|https://github.com/kberov/Ado/blob/master/etc/plugins/auth.conf>
 by leveraging L<Mojolicious::Plugin::OAuth2>.
 
 Slovo takes another approach. Its users can invite each other to join the set
-of sites one Slovo instance manages. Slovo is the social network it self. We
+of sites that one Slovo instance manages. Slovo is the social network it self. We
 may use L<Mojolicious::Plugin::OAuth2::Server> at some point.
 
 A user in Slovo can create others users' accounts. Upon creation of the new
@@ -194,15 +208,55 @@ the following functionality.
 
 =head1 METHODS
 
-Only one method is implemented.
+The following methods are implemented.
 
-=head1 register
+=head2 register
 
 Reads the configuration and adds the implemented tasks to L<Minion>.
 
+=head2 validate_conf
+
+Validates provided in slovo.conf configuration and throws a L<Mojo::Exception>
+in case some values are invalid.
+
+
+=head1 FUNCTIONS
+
+The following functions are implemented.
+
+=head2 send_mail_by_net_smtp
+
+Arguments: C<$message, $to_user, $app>
+
+C<$message> must be already fully prepared and looks something like:
+
+    my $message = <<"MAIL";
+  To: $to_user->{email}
+  From: $CONF->{'Net::SMTP'}{mail}
+  Subject: =?UTF-8?B?${\ b64_encode(encode('UTF-8', $subject), '') }?=
+  Content-Type: text/plain; charset="utf-8"
+  Content-Transfer-Encoding: 8bit
+  Message-Id: <acc-msg-to-$to_user->{login_name}${\ time}\@$domain>
+  Date: ${\ Mojo::Date->new->to_datetime }
+  MIME-Version: 1.0
+  
+  ${\ encode('UTF-8', $body)}
+  
+  MAIL
+
+C<$to_user> is a hash reference containing at least C<$to_user-E<gt>{email}>
+and C<$to_user-E<gt>{id}>.
+
+C<$app> is the current L<Slovo> instance.
+
+This function sends the prepared message using L<Net::SMTP>.
+
+  $app->debug('Message to be send:' . $/ . $message);
+  send_mail_by_net_smtp($message, $to_user, $app);
+
 =head1 TASKS
 
-The following tasks are provided.
+The following tasks are implemented.
 
 =head2 mail_first_login
 
@@ -212,13 +266,13 @@ of the new account. The first time sign in is implemented in L<Slovo::Controller
 
 =head2 delete_first_login
 
-Deletes the record with the login token fro the new user. The task is enqued by
+Deletes the record with the login token for the new user. The task is enqued by
 L</mail_first_login> with delay C<token_valid_for> as configured. Defaults to
 24 hours after creation of the account.
 
 =head1 SEE ALSO
 
-L<Slovo::Controller::Auth>
+L<Slovo::Controller::Auth>, L<Slovo::Task::SendPasswEmail>.
 
 =cut
 

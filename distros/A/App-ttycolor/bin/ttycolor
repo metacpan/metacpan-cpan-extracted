@@ -1,0 +1,121 @@
+#!/usr/bin/perl
+my $APP = 'ttycolor';
+use vars qw($VERSION);
+$VERSION = '0.15';
+
+use strict;
+use warnings;
+no warnings 'experimental::smartmatch';
+
+use Term::ExtendedColor::TTY qw(set_tty_color);
+use Term::ExtendedColor::TTY::Colorschemes;
+use Getopt::Long;
+use Pod::Usage;
+
+
+GetOptions(
+  'l|list'    => sub { print "$_\n" for get_colorschemes(); exit 0; },
+  't|tty=i'   => \(my $tty = ''),
+  'r|reset'   => \my $reset,
+
+  'h|help'    => sub { pod2usage(verbose => 1); },
+  'm|man'     => sub { pod2usage(verbose => 3); },
+  'v|version' => sub { print "$APP v$VERSION\n" and exit 0; },
+);
+
+if($ENV{DISPLAY}) {
+  print STDERR "ttycolor only works in a TTY; not in X.\n";
+  print STDERR "Proceed anyway? [N/y] ";
+  chomp(my $choice = <STDIN>);
+  if(lc($choice) ne 'y') {
+    exit 0;
+  }
+}
+
+
+my $colorscheme = shift // 'woldrich';
+my @colorschemes  = get_colorschemes();
+
+if( !($colorscheme  ~~ @colorschemes) ) {
+  $colorscheme = grab_new_colorscheme($colorscheme);
+}
+
+$colorscheme = set_tty_color( get_colorscheme($colorscheme) );
+
+open(my $fh, '>', "/dev/tty$tty") or die("Can't open tty: $!");
+
+
+if($reset) {
+  syswrite $fh, "\033]R";
+  exit;
+}
+
+for my $index(sort(keys(%{$colorscheme}))) {
+  syswrite $fh, $colorscheme->{$index};
+}
+
+sub grab_new_colorscheme {
+  my $c = shift;
+  print "No such colorscheme '$c'\n";
+RERUN:
+  print "Available colorschemes:\n";
+  print "$_\n" for @colorschemes;
+  print "> ";
+  chomp(my $choice = <STDIN>);
+
+  if(!($choice ~~ @colorschemes)) {
+    goto RERUN;
+  }
+  else {
+    return $choice;
+  }
+}
+
+=pod
+
+=head1 NAME
+
+ttycolor - set the colors in the TTY / Linux Virtual Console
+
+=head1 SYNOPSIS
+
+B<ttycolor> [OPTIONS] [colorscheme]
+
+=head1 DESCRIPTION
+
+ttycolor allows you to change the colors in a Virtual Console.
+It uses L<Term::ExtendedColor::TTY> and L<Term::ExtendedColor::TTY::Colorschemes>
+to perform that magic.
+
+=head1 OPTIONS
+
+  -l, --list    list available colorschemes
+  -t, --tty=N   specify TTY
+  -r, --reset   reset to default TTY palette
+
+  -h, --help    show the help and exit
+  -v, --version show version info and exit
+  -m, --man     show the manual and exit
+
+=head1 SEE ALSO
+
+L<Term::ExtendedColor::TTY>, L<Term::ExtendedColor::TTY::Colorschemes>
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  m@japh.se
+  http://japh.se
+
+=head1 REPORTING BUGS
+
+Report bugs on rt.cpan.org or to m@japh.se
+
+=head1 COPYRIGHT
+
+Copyright (C) 2010, 2011, 2018 Magnus Woldrich. All right reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

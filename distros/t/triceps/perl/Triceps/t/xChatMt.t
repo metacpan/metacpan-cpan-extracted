@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -568,7 +568,7 @@ c1|Unexpected EOF when expecting .*:zzz\)
 
 		$client->startClient("c1", $port);
 		$client->expect("c1", 'zzz', 0.1);
-		ok($@, qr/^Timed out when expecting \(.*:zzz\)/);
+		ok($@, qr/^!ready,cliconn1\nTimed out when expecting \(.*:zzz\)/);
 		$client->send("c1", "shutdown\n");
 		$client->expect("c1", '__EOF__'); # makes sure of flusing the socket
 
@@ -612,7 +612,7 @@ qr/^c1|Timed out when expecting \(.*:zzz\)
 
 		$client->startClient("c1", $port);
 		$client->expect("c1", 'zzz');
-		ok($@, qr/^Timed out when expecting \(.*:zzz\)/);
+		ok($@, qr/^!ready,cliconn1\nTimed out when expecting \(.*:zzz\)/);
 		$client->send("c1", "shutdown\n");
 		$client->expect("c1", '__EOF__', 0); # 0 disables the timeout
 
@@ -656,7 +656,7 @@ qr/^c1|Timed out when expecting \(.*:zzz\)
 
 		$client->startClient("c1", $port);
 		$client->expect("c1", 'zzz');
-		ok($@, qr/^Timed out when expecting \(.*:zzz\)/);
+		ok($@, qr/^!ready,cliconn1\nTimed out when expecting \(.*:zzz\)/);
 		$client->expect("c1", 'yyy');
 		ok($@, qr/^Timed out when expecting \(.*:yyy\)/);
 		$client->send("c1", "shutdown\n");

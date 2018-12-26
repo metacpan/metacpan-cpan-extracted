@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -261,6 +261,7 @@ class const_Autoref : public Autoref<const Target>
 
 <pre>
 typedef Target *Ptr;
+typedef const Target *ConstPtr;
 static Ptr null();
 Autoref();
 Autoref(Target *t);
@@ -273,10 +274,12 @@ operator Ptr() const; // type conversion to pointer
 bool isNull() const;
 Autoref &operator=(const Autoref &ar);
 Autoref &operator=(const Autoref<OtherTarget> &ar);
-bool operator==(const Autoref &ar);
-bool operator!=(const Autoref &ar);
-bool operator==(const Autoref<OtherTarget> &ar);
-bool operator!=(const Autoref<OtherTarget> &ar);
+bool operator==(const Autoref &ar) const;
+bool operator!=(const Autoref &ar) const;
+bool eq(ConstPtr p) const;
+bool ne(ConstPtr p) const;
+bool operator==(const Autoref<OtherTarget> &ar) const;
+bool operator!=(const Autoref<OtherTarget> &ar) const;
 void swap(Autoref &other);
 </pre>
 
@@ -348,14 +351,19 @@ ref1 != ref2
 </pre>
 
 		<para>
-		To compare them to pointers, use <pre>get()</pre>. Except for one special case:
-		the comparison to NULL happens so often that a special method is
-		provided for it:
+		To compare them to pointers, use:
 		</para>
 
 <pre>
+ref1.eq(ptr2)
+ref1.ne(ptr2)
 ref1.isNull()
 </pre>
+
+		<para>
+		Or you can anways get the underlying pointer out with <pre>get()</pre> and compare it to
+		the other pointers.
+		</para>
 
 		<para>
 		Two Autorefs may swap their values, without changing the reference

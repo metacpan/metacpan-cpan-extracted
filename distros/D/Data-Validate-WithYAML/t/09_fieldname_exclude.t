@@ -1,8 +1,7 @@
 #!perl 
 
 use strict;
-use Test::More tests => 3;
-use Data::Dumper;
+use Test::More;
 use FindBin;
 
 BEGIN {
@@ -40,3 +39,21 @@ my %test_default;
 @test_default{$validator->fieldnames('default')} = undef;
 
 is_deeply( \%test_default, \%default );
+
+{
+    my @names = eval { $validator->fieldnames( exclude => [ 'age' ] ) };
+    my %test_hash;
+    @test_hash{@names} = undef;
+
+    is_deeply( \%test_hash, {} );
+}
+
+{
+    my @names = eval { $validator->fieldnames( 'step_five' ); };
+    my %test_hash;
+    @test_hash{@names} = undef;
+
+    is_deeply( \%test_hash, {} );
+}
+
+done_testing();

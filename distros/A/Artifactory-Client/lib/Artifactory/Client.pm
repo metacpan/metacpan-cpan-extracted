@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.6.1
+Version 1.7.0
 
 =cut
 
-our $VERSION = 'v1.6.1';
+our $VERSION = 'v1.7.0';
 
 =head1 SYNOPSIS
 
@@ -2094,6 +2094,19 @@ sub calculate_debian_repository_metadata {
     return $self->_handle_repository_reindex( "/deb/reindex/$repository", %args );
 }
 
+=head2 calculate_cached_remote_debian_repository_coordinates( 'repokey' )
+
+Calculates/recalculates the Debian packages coordinates
+
+=cut
+
+sub calculate_cached_remote_debian_repository_coordinates {
+    my ( $self, $repo_key ) = @_;
+    my $repository = $repo_key || $self->repository();
+    my $url = $self->_api_url() . "/deb/indexCached/$repository";
+    return $self->post($url);
+}
+
 =head2 calculate_opkg_repository_metadata( async => 0/1, writeProps => 1 )
 
 Calculates/recalculates the Packages and Release metadata for this repository,based on the ipk packages in it (in each
@@ -2370,6 +2383,40 @@ sub get_reverse_proxy_snippet {
 
     my $url = $self->_api_url() . "/system/configuration/reverseProxy/nginx";
     return $self->get($url);
+}
+
+=head2 start_sha256_migration_task( "batchThreshold" => 10, etc etc )
+
+Starts the SHA-256 migration process.
+
+=cut
+
+sub start_sha256_migration_task {
+    my ( $self, %data ) = @_;
+
+    my $url = $self->_api_url() . "/system/migration/sha2/start";
+    return $self->post(
+        $url,
+        'Content-Type' => 'application/json',
+        content        => $self->_json->encode( \%data )
+    );
+}
+
+=head2 stop_sha256_migration_task( "sleepIntervalMillis" => 5000, etc etc )
+
+Stops the SHA-256 migration process
+
+=cut
+
+sub stop_sha256_migration_task {
+    my ( $self, %data ) = @_;
+
+    my $url = $self->_api_url() . "/system/migration/sha2/stop";
+    return $self->post(
+        $url,
+        'Content-Type' => 'application/json',
+        content        => $self->_json->encode( \%data )
+    );
 }
 
 =head1 PLUGINS

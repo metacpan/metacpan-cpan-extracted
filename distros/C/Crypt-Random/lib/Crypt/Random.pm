@@ -2,11 +2,9 @@
 ##
 ## Crypt::Random -- Interface to /dev/random and /dev/urandom.
 ##
-## Copyright (c) 1998, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 1998-2018, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
-##
-## $Id: Random.pm,v 1.11 2001/07/12 15:59:47 vipul Exp $
 
 package Crypt::Random; 
 require Exporter;
@@ -23,7 +21,7 @@ use Data::Dumper;
 use Class::Loader;
 use Crypt::Random::Generator;
 
-$VERSION     = 1.25;
+$VERSION     = 1.52;
 
 
 sub _pickprovider { 
@@ -55,6 +53,8 @@ sub makerandom {
     my $r = $po->get_data( %params );
 
     my $size     = $params{Size};
+    unless ($size) { die "makerandom() called without 'Size' parameter." }
+
     my $down     = $size - 1;
 
     unless ($uniform) { 
@@ -67,10 +67,10 @@ sub makerandom {
 
     } else { 
 
-        # If $uniform is set $size of 2 could return 00 
+        # If $uniform is set, $size of 2 could return 00 
         # and 01 in addition to 10 and 11. 00 and 01 can 
         # be represented in less than 2 bits, but 
-        # the result of this generation is uniformally 
+        # the result of this generation is uniformaly 
         # distributed.
 
         $y = unpack "H*",     pack "B*", '0' x ( $size%8 ? 8-$size % 8 : 0 ).
@@ -90,11 +90,15 @@ sub makerandom_itv {
     my $a  = $params{ Lower } || 0; $a = PARI ( $a ); 
     my $b  = $params{ Upper }; $b = PARI ( $b );
 
+    unless ($b) { 
+        die "makerandom_itv needs 'Upper' parameter."
+    }
+
     my $itv    = Mod ( 0, $b - $a );
     my $size   = length ( $itv ) * 5;
     my $random = makerandom %params, Size => $size;
 
-    do { $random = makerandom %params, Size => $size } 
+    do { $random = makerandom %params, Size => $size, Uniform => 1 } # should always be uniform
     while ( $random >= (PARI(2)**$size) - ((PARI(2)**$size) % lift($b-$a)));
 
     $itv += $random; 
@@ -144,7 +148,7 @@ Crypt::Random is an interface module to the /dev/random device found on
 most modern unix systems. It also interfaces with egd, a user space
 entropy gathering daemon, available for systems where /dev/random (or
 similar) devices are not available. When Math::Pari is installed,
-Crypt::Random can generate random integers of arbritary size of a given
+Crypt::Random can generate random integers of arbitrary size of a given
 bitsize or in a specified interval.
 
 =head1 BLOCKING BEHAVIOUR
@@ -197,7 +201,7 @@ Alternate device to request random bits from.
 
 Value of 0 (default) implies that the high bit of the generated random
 number is always set, ensuring the bitsize of the generated random will be
-exactly Size bits. For uniformally distributed random numbers, Uniform
+exactly Size bits. For uniformly distributed random numbers, Uniform
 should be set to 1.
 
 =back 
@@ -243,9 +247,7 @@ the random device.
 
 =head1 DEPENDENCIES
 
-Crypt::Random needs Math::Pari 2.001802 or higher. As of this writing, the
-latest version of Math::Pari isn't available from CPAN. Fetch it from
-ftp://ftp.math.ohio-state.edu/pub/users/ilya/perl/modules/
+Crypt::Random needs Math::Pari 2.001802 or higher. 
 
 =head1 BIBLIOGRAPHY 
 

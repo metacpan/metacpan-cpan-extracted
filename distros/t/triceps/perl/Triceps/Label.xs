@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -90,7 +90,7 @@ chain(WrapLabel *self, WrapLabel *other)
 
 		try { do {
 			Erref err = lab->chain(olab);
-			if (err->hasError())
+			if (err.hasError())
 				throw Exception::f(err, "Triceps::Label::chain: failed");
 		} while(0); } TRICEPS_CATCH_CROAK;
 		RETVAL = 1;
@@ -108,7 +108,7 @@ chainFront(WrapLabel *self, WrapLabel *other)
 
 		try { do {
 			Erref err = lab->chain(olab, true);
-			if (err->hasError())
+			if (err.hasError())
 				throw Exception::f(err, "Triceps::Label::chainFront: failed");
 		} while(0); } TRICEPS_CATCH_CROAK;
 		RETVAL = 1;

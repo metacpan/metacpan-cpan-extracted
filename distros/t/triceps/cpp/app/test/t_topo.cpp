@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -501,11 +501,11 @@ UTESTCASE check(Utest *utest)
 			}
 			UT_IS(msg, // printed in opposite direction
 				"In application 'a1' detected an illegal direct loop:\n"
-				"  thread 't2'\n"
-				"  nexus 't1/nx2'\n"
 				"  thread 't1'\n"
 				"  nexus 't1/nx1'\n"
-				"  thread 't2'\n");
+				"  thread 't2'\n"
+				"  nexus 't1/nx2'\n"
+				"  thread 't1'\n");
 		}
 	}
 	// a figure 8 of 2 touching loops
@@ -533,11 +533,11 @@ UTESTCASE check(Utest *utest)
 			}
 			UT_IS(msg, // printed in opposite direction
 				"In application 'a1' detected an illegal reverse loop:\n"
-				"  thread 't4'\n"
-				"  nexus 't1/nx3'\n"
 				"  thread 't3'\n"
 				"  nexus 't1/nx2'\n"
-				"  thread 't4'\n");
+				"  thread 't4'\n"
+				"  nexus 't1/nx3'\n"
+				"  thread 't3'\n");
 		}
 	}
 	
@@ -1033,11 +1033,11 @@ UTESTCASE check_loops_twodir(Utest *utest)
 		}
 		UT_IS(msg, // printed in opposite direction
 			"In application 'a1' detected an illegal direct loop:\n"
-			"  thread 't4'\n"
-			"  nexus 't4/nx3'\n"
 			"  thread 't3'\n"
 			"  nexus 't2/nx2'\n"
-			"  thread 't4'\n");
+			"  thread 't4'\n"
+			"  nexus 't4/nx3'\n"
+			"  thread 't3'\n");
 		UT_IS(a1->getAbortedBy(), "t1");
 		UT_IS(a1->getAbortedMsg(), msg);
 	}

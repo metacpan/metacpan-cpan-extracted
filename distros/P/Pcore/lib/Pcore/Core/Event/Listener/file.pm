@@ -9,7 +9,7 @@ use Time::HiRes qw[];
 
 with qw[Pcore::Core::Event::Listener];
 
-has tmpl => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>' . $LF . '<: $text | raw :>';
+has tmpl => '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>][<: $channel :>][<: $level :>] <: $title | raw :>' . "\n" . '<: $text | raw :>';
 
 has _tmpl => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
 has _path => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Path']
@@ -26,7 +26,7 @@ sub forward_event ( $self, $ev ) {
         # init template
         $self->{_tmpl} = P->tmpl;
 
-        $self->{_tmpl}->add_tmpl( message => "$self->{tmpl}$LF" );
+        $self->{_tmpl}->add_tmpl( message => "$self->{tmpl}\n" );
 
         # init path
         if ( $self->{uri}->{path}->{is_abs} ) {
@@ -61,7 +61,7 @@ sub forward_event ( $self, $ev ) {
         if ( defined $ev->{data} ) {
 
             # serialize reference
-            $ev->{text} = is_ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data};
+            $ev->{text} = is_ref $ev->{data} ? to_json $ev->{data}, readable => 1 : $ev->{data};
 
             # indent
             $ev->{text} =~ s/^/$INDENT/smg;

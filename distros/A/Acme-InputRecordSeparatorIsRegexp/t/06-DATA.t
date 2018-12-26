@@ -3,6 +3,15 @@ use Acme::InputRecordSeparatorIsRegexp;
 use strict;
 use warnings;
 
+if ($] < 5.010000) {
+    diag "readline on this package is sloooow for Perl $]. ",
+        "Skipping this set of tests which is a near duplicate of ",
+        "another set of tests.";
+    ok(1, "# skip $0 tests on Perl $]");
+    done_testing();
+    exit;
+}
+
 tie *DAT, 'Acme::InputRecordSeparatorIsRegexp', *DATA, '1.43|T.44|E...XD';
 ok(tied(*DAT), 'return tied handle');
 

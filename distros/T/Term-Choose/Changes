@@ -1,6 +1,9 @@
 Revision history for Term::Choose
 
 
+1.642   2018-12-25
+    - Bugfix "line_fold".
+
 1.641   2018-12-17
     - Bugfix "meta_items".
 

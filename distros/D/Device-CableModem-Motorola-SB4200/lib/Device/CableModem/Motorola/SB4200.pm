@@ -1,4 +1,5 @@
 package Device::CableModem::Motorola::SB4200;
+$Device::CableModem::Motorola::SB4200::VERSION = '0.14';
 use strict;
 use warnings;
 use constant DEFAULT_IP        => '192.168.100.1';
@@ -26,9 +27,7 @@ use Exception::Class (
     },
 );
 
-our $VERSION = '0.12';
-
-my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, $VERSION;
+my  $AGENT   = sprintf q{%s/%s}, __PACKAGE__, __PACKAGE__->VERSION;
 my  %PAGE    = (
     status => 'startupdata.html',
     signal => 'signaldata.html',
@@ -387,11 +386,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-Device::CableModem::Motorola::SB4200 - Interface to Motorola SurfBoard 4200 Cable Modem
+Device::CableModem::Motorola::SB4200
+
+=head1 VERSION
+
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -415,13 +418,14 @@ Device::CableModem::Motorola::SB4200 - Interface to Motorola SurfBoard 4200 Cabl
 
 =head1 DESCRIPTION
 
-This document describes version C<0.12> of C<Device::CableModem::Motorola::SB4200>
-released on C<5 July 2016>.
-
 This module can be used to manage/fetch every setting available via the modem's
 web interface. It is also possible to restart/reset the modem.
 
 All methods will die upon failure.
+
+=head1 NAME
+
+Device::CableModem::Motorola::SB4200 - Interface to Motorola SurfBoard 4200 Cable Modem
 
 =head1 GENERAL METHODS
 
@@ -498,15 +502,13 @@ L<Device::CableModem::SURFboard>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

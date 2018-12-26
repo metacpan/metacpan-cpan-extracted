@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -113,7 +113,7 @@ findSubIndex(WrapTableType *self, char *subname)
 		TableType *tbt = self->get();
 		IndexType *ixsub = tbt->findSubIndex(subname);
 		try { do {
-			if (ixsub == NULL) 
+			if (ixsub == NO_INDEX_TYPE) 
 				throw Exception::f("%s: unknown nested index '%s'", funcName, subname);
 		} while(0); } TRICEPS_CATCH_CROAK;
 		RETVAL = new WrapIndexType(ixsub);
@@ -131,7 +131,7 @@ findSubIndexSafe(WrapTableType *self, char *subname)
 		clearErrMsg();
 		TableType *tbt = self->get();
 		IndexType *ixsub = tbt->findSubIndex(subname);
-		if (ixsub == NULL) 
+		if (ixsub == NO_INDEX_TYPE) 
 			XSRETURN_UNDEF; // not croak!
 		RETVAL = new WrapIndexType(ixsub);
 	OUTPUT:
@@ -153,7 +153,7 @@ findSubIndexById(WrapTableType *self, SV *idarg)
 			IndexType::IndexId id = parseIndexId(funcName, idarg); // may throw
 
 			IndexType *ixsub = tbt->findSubIndexById(id);
-			if (ixsub == NULL)
+			if (ixsub == NO_INDEX_TYPE)
 				throw Exception::f("%s: no nested index with type id '%s' (%d)", funcName, IndexType::indexIdString(id), id);
 			RETVAL = new WrapIndexType(ixsub);
 		} while(0); } TRICEPS_CATCH_CROAK;
@@ -219,7 +219,7 @@ initialize(WrapTableType *self)
 		Erref err = tbt->getErrors();
 		RETVAL = 1;
 		try { do {
-			if (err->hasError())
+			if (err.hasError())
 				throw Exception(err, false);
 		} while(0); } TRICEPS_CATCH_CROAK;
 	OUTPUT:

@@ -8,7 +8,7 @@ use Time::HiRes qw[];
 
 with qw[Pcore::Core::Event::Listener];
 
-has tmpl => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' . $BOLD . $YELLOW . '[<: $channel :>]' . $BOLD . $RED . '[<: $level :>]' . $RESET . ' <: $title | raw :>' . $LF . '<: $text | raw :>';
+has tmpl => $BOLD . $GREEN . '[<: $date.strftime("%Y-%m-%d %H:%M:%S.%4N") :>]' . $BOLD . $YELLOW . '[<: $channel :>]' . $BOLD . $RED . '[<: $level :>]' . $RESET . ' <: $title | raw :>' . "\n" . '<: $text | raw :>';
 
 has _tmpl    => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
 has _is_ansi => ( init_arg => undef );
@@ -20,7 +20,7 @@ sub BUILD ( $self, $args ) {
     # init template
     $self->{_tmpl} = P->tmpl;
 
-    $self->{_tmpl}->add_tmpl( message => "$self->{tmpl}$LF" );
+    $self->{_tmpl}->add_tmpl( message => "$self->{tmpl}\n" );
 
     # check ansi support
     $self->{_is_ansi} //= -t *STDERR ? 1 : 0;    ## no critic qw[InputOutput::ProhibitInteractiveTest]
@@ -44,7 +44,7 @@ sub forward_event ( $self, $ev ) {
         if ( defined $ev->{data} ) {
 
             # serialize reference
-            $ev->{text} = is_ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data};
+            $ev->{text} = is_ref $ev->{data} ? to_json $ev->{data}, readable => 1 : $ev->{data};
 
             # indent
             $ev->{text} =~ s/^/$INDENT/smg;

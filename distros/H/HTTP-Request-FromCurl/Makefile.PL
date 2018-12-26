@@ -45,16 +45,17 @@ my %module = (
     },
 
     PREREQ_PM => {
-        'Getopt::Long'          => '2.39', # for ->getoptionsfromarray
-        'Filter::signatures'    => '0.09',
-        'Moo'                   => '2',
-        'HTTP::Request'         => '6.07',
-        'HTTP::Request::Common' => '6.07',
-        'URI'                   => 0,
-        'URL::Encode'           => 0,
-        'List::Util'            => '1.29', # for pairmap
-        'PerlX::Maybe'          => 0,
-        'MIME::Base64'          => 0,
+        'Getopt::Long'             => '2.39', # for ->getoptionsfromarray
+        'Filter::signatures'       => '0.09',
+        'Moo'                      => '2',
+        'HTTP::Request'            => '6.07',
+        'HTTP::Request::Common'    => '6.07',
+        'HTTP::Request::Generator' => '0.06', # earlier versions are buggy
+        'URI'                      => 0,
+        'URL::Encode'              => 0,
+        'List::Util'               => '1.29', # for pairmap
+        'PerlX::Maybe'             => 0,
+        'MIME::Base64'             => 0,
     },
     TEST_REQUIRES => {
         'Test::More'              => 0,

@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Area::Marker;
 use Chart::Plotly::Trace::Area::Stream;
 use Chart::Plotly::Trace::Area::Transform;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT:
 
@@ -102,10 +102,11 @@ has opacity => ( is            => "rw",
                  documentation => "Sets the opacity of the trace.",
 );
 
-has r => ( is  => "rw",
-           isa => "ArrayRef|PDL",
-           documentation =>
-             "For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the radial coordinates.",
+has r => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the radial coordinates for legacy polar chart only.",
 );
 
 has rsrc => ( is            => "rw",
@@ -129,10 +130,11 @@ has showlegend => (
 has stream => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Area::Stream", );
 
-has t => ( is  => "rw",
-           isa => "ArrayRef|PDL",
-           documentation =>
-             "For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the angular coordinates.",
+has t => (
+    is  => "rw",
+    isa => "ArrayRef|PDL",
+    documentation =>
+      "Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the angular coordinates for legacy polar chart only.",
 );
 
 has transforms => ( is  => "rw",
@@ -145,6 +147,13 @@ has tsrc => ( is            => "rw",
 
 has uid => ( is  => "rw",
              isa => "Str", );
+
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
 
 has visible => (
     is => "rw",
@@ -167,7 +176,7 @@ Chart::Plotly::Trace::Area -
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -265,7 +274,7 @@ Sets the opacity of the trace.
 
 =item * r
 
-For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the radial coordinates.
+Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the radial coordinates for legacy polar chart only.
 
 =item * rsrc
 
@@ -283,7 +292,7 @@ Determines whether or not an item corresponding to this trace is shown in the le
 
 =item * t
 
-For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the angular coordinates.
+Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the angular coordinates for legacy polar chart only.
 
 =item * transforms
 
@@ -292,6 +301,10 @@ For legacy polar chart only.Please switch to *scatterpolar* trace type.Sets the 
 Sets the source reference on plot.ly for  t .
 
 =item * uid
+
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
 
 =item * visible
 

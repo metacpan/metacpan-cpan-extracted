@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -371,7 +371,7 @@ sub storeDailyT # (@opts)
 	# the daily stats for the recent time, this time no further aggregation
 	my $ttDaily = Triceps::TableType->new($faIn->getLabel("daily")->getRowType())
 		->addSubIndex("byDay", 
-			Triceps::SimpleOrderedIndex->new(time => "ASC",)
+			Triceps::IndexType->newOrdered(key => ["time"])
 			->addSubIndex("byIP", 
 				Triceps::IndexType->newHashed(key => [ "local_ip", "remote_ip" ])
 			)
@@ -588,18 +588,18 @@ sub readerT # (@opts)
 	# table type that can be used to store the packets
 	my $ttPackets = Triceps::TableType->new($rtPacket)
 		->addSubIndex("key", 
-			Triceps::SimpleOrderedIndex->new(
-				year => "ASC",
-				month => "ASC",
-				day => "ASC",
-				hour => "ASC",
-				min => "ASC",
-				sec => "ASC",
-				local_ip => "ASC",
-				remote_ip => "ASC",
-				local_port => "ASC", 
-				remote_port => "ASC",
-			)->addSubIndex("group", 
+			Triceps::IndexType->newOrdered(key => [
+				"year",
+				"month",
+				"day",
+				"hour",
+				"min",
+				"sec",
+				"local_ip",
+				"remote_ip",
+				"local_port", 
+				"remote_port",
+			])->addSubIndex("group", 
 				Triceps::IndexType->newFifo()
 			)
 		)
@@ -701,14 +701,14 @@ sub rawToHourlyT # (@opts)
 	# because the index "key" is all different).
 	my $ttPackets = Triceps::TableType->new($faIn->getLabel("packet")->getRowType())
 		->addSubIndex("key", 
-			Triceps::SimpleOrderedIndex->new(
-				year => "ASC",
-				month => "ASC",
-				day => "ASC",
-				hour => "ASC",
-				local_ip => "ASC",
-				remote_ip => "ASC",
-			)->addSubIndex("group", 
+			Triceps::IndexType->newOrdered(key => [
+				"year",
+				"month",
+				"day",
+				"hour",
+				"local_ip",
+				"remote_ip",
+			])->addSubIndex("group", 
 				Triceps::IndexType->newFifo()
 			)
 		)
@@ -742,14 +742,14 @@ sub rawToHourlyT # (@opts)
 			$tPackets->getAggregatorLabel("hourly")->getRowType()
 		)
 		->addSubIndex("key", 
-			Triceps::SimpleOrderedIndex->new(
-				year => "ASC",
-				month => "ASC",
-				day => "ASC",
-				hour => "ASC",
-				local_ip => "ASC",
-				remote_ip => "ASC",
-			)
+			Triceps::IndexType->newOrdered(key => [
+				"year",
+				"month",
+				"day",
+				"hour",
+				"local_ip",
+				"remote_ip",
+			])
 		)
 	;
 

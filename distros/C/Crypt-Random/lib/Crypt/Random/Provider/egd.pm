@@ -1,12 +1,8 @@
 #!/usr/bin/perl -sw
 ##
-##
-##
-## Copyright (c) 2001, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 1998-2018, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
-##
-## $Id: egd.pm,v 1.5 2001/07/12 15:59:48 vipul Exp $
 
 package Crypt::Random::Provider::egd;
 use strict;

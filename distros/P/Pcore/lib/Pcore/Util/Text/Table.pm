@@ -298,7 +298,7 @@ sub _render_row ( $self, $row, $header_row = 0 ) {
 
         $buf .= $grid->[2] if $grid && $self->{right_border};
 
-        $buf .= $LF;
+        $buf .= "\n";
     }
 
     return $buf;
@@ -316,7 +316,7 @@ sub _render_line ( $self, $idx ) {
 
     $buf .= $grid->[1] if $self->{right_border};
 
-    return $buf . $LF;
+    return "$buf\n";
 }
 
 1;

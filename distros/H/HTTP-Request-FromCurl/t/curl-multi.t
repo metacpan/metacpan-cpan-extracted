@@ -17,6 +17,9 @@ my $curl = 'curl';
 
 my @tests = (
     { cmd => [ '--verbose', '-s', '$url', '$url?foo=bar', ] },
+    { cmd => [ '--verbose', '-s', '$url?foo={bar,baz}', ] },
+    { cmd => [ '--verbose', '-s', '-g', '$url', '$url?foo={bar,baz}', ] },
+    { cmd => [ '--verbose', '-s', '--globoff', '$url', '$url?foo={bar,baz}', ] },
 );
 
 sub curl( @args ) {
@@ -112,6 +115,8 @@ sub request_identical_ok {
     if( $requests != @res ) {
         is $requests, 0+@res, "$name (requests)";
         diag join " ", @{ $test->{cmd} };
+        diag Dumper \@r;
+        SKIP: { skip "Weird number of requests", 0+@res; };
         return;
     };
 

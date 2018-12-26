@@ -1,14 +1,69 @@
+NAME
 
+    Data::Validate::WithYAML::Plugin::PasswordPolicy - Plugin to check
+    passwords against a policy
 
-This archive contains the distribution Data-Validate-WithYAML-Plugin-PasswordPolicy,
-version 0.02:
+VERSION
 
-  Plugin to check passwords against a policy 
+    version 0.03
 
-This software is Copyright (c) 2014 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+        use Data::Validate::WithYAML::Plugin::PasswordPolicy;
+    
+        my $foo = Data::Validate::WithYAML::Plugin::PasswordPolicy->check( 'mypassword' );
+        ...
+        
+        # use the plugin via Data::Validate::WithYAML
+        
+        use Data::Validate::WithYAML;
+        
+        my $password  = 'mypassword';
+        my $validator = Data::Validate::WithYAML->new( 'test.yml' );
+        print "yes" if $validator->check( 'password', $password );
+      
+        # it allows extra params to define the policy
+        my $password  = 'mypassword';
+        my $validator = Data::Validate::WithYAML->new( 'test.yml' );
+        print "yes" if $validator->check( 
+            'password',
+            $password,
+            {
+                'x-policy' => { length => '3,', chars => [ 'A-Z', 'def', '$§!', '\d' ] },
+            }
+        );
 
-  The Artistic License 2.0 (GPL Compatible)
+    test.yml
 
+      ---
+      step1:
+          password:
+              plugin: PasswordPolicy
+              type: required
+
+SUBROUTINES
+
+ check
+
+POLICY RULES
+
+    Those rules are allowed in the policy:
+
+      * length
+
+      * chars
+
+      * chars_blacklist
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2014 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

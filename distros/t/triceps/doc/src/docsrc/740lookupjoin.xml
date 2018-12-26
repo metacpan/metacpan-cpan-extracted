@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -81,7 +81,7 @@ $joiner = Triceps::LookupJoin->new(optionName => optionValue, ...);
 			<listitem>
 			Array reference containing the path name of index type in table
 			used for the look-up. 
-			The index absolutely must be a Hash (leaf or non-leaf), not of any
+			The index must absolutely be a Hashed or Ordered one (leaf or non-leaf), not of any
 			other kind. Optional.
 			Default: automatically found by the set of key fields. Whether
 			explicitly specified or automatically found, the index must be available

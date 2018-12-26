@@ -39,7 +39,7 @@ AnyEvent::Handle::register_read_type http_headers => sub ( $self, $cb ) {
     return sub {
         return unless defined $_[0]{rbuf};
 
-        if ( ( my $idx_crlf = index $_[0]{rbuf}, $CRLF ) >= 0 ) {
+        if ( ( my $idx_crlf = index $_[0]{rbuf}, "\r\n" ) >= 0 ) {
             if ( $idx_crlf == 0 ) {    # first line is empty, no headers, used to read possible trailing headers
                 $cb->( $_[0], substr( $_[0]{rbuf}, 0, 2, q[] ) );
 
@@ -309,10 +309,10 @@ sub read_http_body ( $self, $on_read, @ ) {
                                 return;
                             }
                             else {
-                                # read trailing chunk $CRLF
+                                # read trailing chunk "\r\n"
                                 $h->unshift_read(
                                     line => sub ( $h, @ ) {
-                                        if ( length $_[1] ) {                # error, chunk traililg can contain only $CRLF
+                                        if ( length $_[1] ) {                # error, chunk traililg can contain only "\r\n"
                                             undef $read_chunk;
 
                                             $on_read_buf->( undef, 'Garbled chunked transfer encoding (last chunk)' );
@@ -472,8 +472,6 @@ sub get_connect ($connect) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 | 240                  | Subroutines::ProhibitExcessComplexity - Subroutine "read_http_body" with high complexity score (27)            |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 48                   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 160                  | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|

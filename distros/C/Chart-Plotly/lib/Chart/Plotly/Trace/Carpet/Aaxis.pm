@@ -8,9 +8,9 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 
 use Chart::Plotly::Trace::Carpet::Aaxis::Tickfont;
 use Chart::Plotly::Trace::Carpet::Aaxis::Tickformatstop;
-use Chart::Plotly::Trace::Carpet::Aaxis::Titlefont;
+use Chart::Plotly::Trace::Carpet::Aaxis::Title;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace carpet.
 
@@ -300,19 +300,8 @@ has tickvalssrc => ( is            => "rw",
                      documentation => "Sets the source reference on plot.ly for  tickvals .",
 );
 
-has title => ( is            => "rw",
-               isa           => "Str",
-               documentation => "Sets the title of this axis.",
-);
-
-has titlefont => ( is  => "rw",
-                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Aaxis::Titlefont", );
-
-has titleoffset => (
-             is            => "rw",
-             isa           => "Num",
-             documentation => "An additional amount by which to offset the title from the tick labels, given in pixels",
-);
+has title => ( is  => "rw",
+               isa => "Maybe[HashRef]|Chart::Plotly::Trace::Carpet::Aaxis::Title", );
 
 __PACKAGE__->meta->make_immutable();
 1;
@@ -329,7 +318,7 @@ Chart::Plotly::Trace::Carpet::Aaxis - This attribute is one of the possible opti
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -560,14 +549,6 @@ Sets the values at which ticks on this axis appear. Only has an effect if `tickm
 Sets the source reference on plot.ly for  tickvals .
 
 =item * title
-
-Sets the title of this axis.
-
-=item * titlefont
-
-=item * titleoffset
-
-An additional amount by which to offset the title from the tick labels, given in pixels
 
 =back
 

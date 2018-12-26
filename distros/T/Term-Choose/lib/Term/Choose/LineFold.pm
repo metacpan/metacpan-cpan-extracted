@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.641';
+our $VERSION = '1.642';
 
 use Exporter qw( import );
 
@@ -96,7 +96,7 @@ sub line_fold {
     my ( $string, $avail_width, $init_tab, $subseq_tab ) = @_; #copy
     # return if ! length $string;
     for ( $init_tab, $subseq_tab ) {
-        if ( $_ ) {
+        if ( defined $_ && length $_ ) {
             s/\t/ /g;
             s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g;
             s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;

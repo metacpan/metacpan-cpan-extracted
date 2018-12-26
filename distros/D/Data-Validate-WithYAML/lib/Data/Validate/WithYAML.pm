@@ -9,7 +9,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our $errstr  = '';
 
 
@@ -90,7 +90,6 @@ sub validate{
         $fields{$name} = $optional->{$name} if exists $optional->{$name};
         $fields{$name} = $required->{$name} if exists $required->{$name};
 
-        next if !$fields{$name};
         next if $fields{$name}->{no_validate};
         
         my $value = $hash{$name};
@@ -235,8 +234,7 @@ sub check{
             eval "use $module";
             
             if( not $@ and $module->can('check') ){
-                my $retval = $module->check($value, $subhash);
-                $bool = 0 unless $retval;
+                $bool = $module->check($value, $subhash);
             }
             else{
                 croak "Can't check with $module";
@@ -262,8 +260,13 @@ sub _yaml_config{
     my ($self,$file) = @_;
     
     if(defined $file and -e $file){
-        $self->{config} = YAML::Tiny->read( $file ) or 
-                (($errstr = YAML::Tiny->errstr()) && return undef);
+        eval {
+            $self->{config} = YAML::Tiny->read( $file );
+            1;
+        } or do { 
+            $errstr = $@;
+            return undef;
+        };
 
         if ( $self->_no_steps ) {
             $self->_add_fields( $self->{config}->[0], '' );
@@ -278,6 +281,9 @@ sub _yaml_config{
     elsif(defined $file){
         $errstr = 'file does not exist';
         return undef;
+    }
+    else {
+        $errstr = 'Need path to YAML file';
     }
 
     return $self->{config};
@@ -389,13 +395,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Validate::WithYAML - Validation framework that can be configured with YAML files
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 

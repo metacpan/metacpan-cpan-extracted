@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -77,7 +77,7 @@ public:
 		if (rt_->fieldCount() <= idx_)
 			errors.f("The row type must contain at least %d fields.", idx_+1);
 
-		if (!errors->hasError()) { // can be checked only if index is within range
+		if (!errors.hasError()) { // can be checked only if index is within range
 			const RowType::Field &fld = rt_->fields()[idx_];
 			if (fld.type_->getTypeId() != Type::TT_INT32)
 				errors.f("The field at index %d must be an int32.", idx_);

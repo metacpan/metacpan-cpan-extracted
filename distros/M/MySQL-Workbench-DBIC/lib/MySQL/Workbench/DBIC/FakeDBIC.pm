@@ -43,7 +43,7 @@ MySQL::Workbench::DBIC::FakeDBIC - provide some DBIx::Class method stubs when DB
 
 =head1 VERSION
 
-version 1.10
+version 1.11
 
 =head1 DESCRIPTION
 
@@ -54,17 +54,13 @@ should be used. This fails when L<DBIx::Class> is not installed. So we fake it.
 
 =head2 DBIx::Class::Schema
 
-=over 4
-
-=item * load_namespaces
-
-=back
+=head3 load_namespaces
 
 =head2 DBIx::Class
 
 =over 4
 
-=item * load_components
+=item * DBIx::Class::load_components
 
 =item * DBIx::Class::table
 

@@ -1,10 +1,9 @@
 package Sys::Info::Driver::Unknown::Device::CPU::Env;
+$Sys::Info::Driver::Unknown::Device::CPU::Env::VERSION = '0.79';
 use strict;
 use warnings;
-use vars qw( $VERSION );
-use constant RE_VENDOR => qr/(.+?), \s (?:Genuine(Intel)|Authentic(AMD))/xms;
 
-$VERSION = '0.78';
+use constant RE_VENDOR => qr/(.+?), \s (?:Genuine(Intel)|Authentic(AMD))/xms;
 
 my(%INTEL, %AMD, %OTHER_ID, %OTHER, %CPU, $INSTALLED);
 
@@ -133,8 +132,8 @@ sub _INTEL {
             '7'     => 'Pentium III (Katmai)',
             '8'     => 'Pentium III (Coppermine)',
             '9'     => 'Mobile Pentium III',
-            '10'    => 'Pentium III (0.18 µm)',
-            '11'    => 'Pentium III (0.13 µm)',
+            '10'    => 'Pentium III (0.18 Âµm)',
+            '11'    => 'Pentium III (0.13 Âµm)',
 
             '13'    => 'Celeron M', # ???
             '15'    => 'Core 2 Duo (Merom)', # ???
@@ -143,10 +142,10 @@ sub _INTEL {
             '0'     => 'Itanium (IA-64)',
     },
     '15' => {
-            '0'     => 'Pentium IV (0.18 µm)',
-            '1'     => 'Pentium IV (0.18 µm)',
-            '2'     => 'Pentium IV (0.13 µm)',
-            '3'     => 'Pentium IV (0.09 µm)',
+            '0'     => 'Pentium IV (0.18 Âµm)',
+            '1'     => 'Pentium IV (0.18 Âµm)',
+            '2'     => 'Pentium IV (0.13 Âµm)',
+            '3'     => 'Pentium IV (0.09 Âµm)',
             # Itanium 2 (IA-64)?
     },
 }
@@ -174,9 +173,9 @@ sub _AMD {
         '13'    => 'K6-2+ or K6-III+',
     },
     '6'  => {
-        '0'     => 'Athlon (25 µm)',
-        '1'     => 'Athlon (25 µm)',
-        '2'     => 'Athlon (18 µm)',
+        '0'     => 'Athlon (25 Âµm)',
+        '1'     => 'Athlon (25 Âµm)',
+        '2'     => 'Athlon (18 Âµm)',
         '3'     => 'Duron',
         '4'     => 'Athlon (Thunderbird)',
         '6'     => 'Athlon (Palamino)',
@@ -272,18 +271,21 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Sys::Info::Driver::Unknown::Device::CPU::Env - Fetch CPU information from %ENV
+Sys::Info::Driver::Unknown::Device::CPU::Env
+
+=head1 VERSION
+
+version 0.79
 
 =head1 SYNOPSIS
 
 Nothing public here.
 
 =head1 DESCRIPTION
-
-This document describes version C<0.78> of C<Sys::Info::Driver::Unknown::Device::CPU::Env>
-released on C<17 April 2011>.
 
 These C<%ENV> keys are recognised by this module:
 
@@ -292,6 +294,10 @@ These C<%ENV> keys are recognised by this module:
    PROCESSOR_ARCHITECTURE
    PROCESSOR_REVISION
    PROCESSOR_LEVEL
+
+=head1 NAME
+
+Sys::Info::Driver::Unknown::Device::CPU::Env - Fetch CPU information from %ENV
 
 =head1 METHODS
 
@@ -311,16 +317,13 @@ L<http://www.paradicesoftware.com/specs/cpuid/index.htm>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2011 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify 
-it under the same terms as Perl itself, either Perl version 5.12.3 or, 
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

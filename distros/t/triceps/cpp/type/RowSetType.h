@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -10,10 +10,9 @@
 #define __Triceps_RowSetType_h__
 
 #include <type/RowType.h>
+#include <type/HoldRowTypes.h>
 
 namespace TRICEPS_NS {
-
-class HoldRowTypes;
 
 // This is used primarily as the type of FnReturn but may have other
 // uses too.
@@ -52,7 +51,7 @@ public:
 	//        (unless it's NULL, which reverts to plain copying).
 	//        The caller has to keep a reference to the holder for
 	//        the duration.
-	RowSetType *deepCopy(HoldRowTypes *holder = NULL) const;
+	RowSetType *deepCopy(HoldRowTypes *holder = &NO_HOLD_ROW_TYPES_OBJECT) const;
 
 	// A convenience wrapper for the constructor
 	static RowSetType *make()
@@ -139,6 +138,7 @@ public:
 	// and the names are not important.
 	virtual bool match(const Type *t) const;
 	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const;
+	virtual int cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const;
 
 protected:
 	NameMap nameMap_; // mapping of names to indexes

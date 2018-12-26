@@ -3,32 +3,43 @@ abstract: 'Application of Sys::Info to gather information from the system'
 author:
   - 'Burak Gursoy <burak@cpan.org>'
 build_requires:
-  Test::More: 0.40
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
 configure_requires:
-  Module::Build: 0.40
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131560'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - app
+  - sys
+  - info
+  - systeminfo
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-Sys-Info
-no_index:
-  directory:
-    - monolithic_version
-    - builder
-    - t
-    - xt
-provides:
-  App::Sys::Info:
-    file: lib/App/Sys/Info.pm
-    version: 0.24
 requires:
-  Format::Human::Bytes: 0
-  Sys::Info: 0.73
-  Text::Table: 0
-  Time::Elapsed: 0
+  Carp: '0'
+  Format::Human::Bytes: '0'
+  POSIX: '0'
+  Sys::Info: '0.73'
+  Sys::Info::Constants: '0'
+  Text::Table: '0'
+  Time::Elapsed: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/burak/cpan-app-sys-info/
-version: 0.24
+  bugtracker: https://github.com/burak/CPAN-App-Sys-Info/issues
+  repository: git://github.com/burak/CPAN-App-Sys-Info.git
+version: '0.25'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

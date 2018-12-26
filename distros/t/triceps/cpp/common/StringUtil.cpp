@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -13,7 +13,7 @@
 
 namespace TRICEPS_NS {
 
-const string &NOINDENT;
+const string NOINDENT;
 
 const string &nextindent(const string &indent, const string &subindent, string &target)
 {

@@ -1,6 +1,7 @@
 use lib '.';
 use t::Helper;
 use Mojo::File;
+use Mojolicious::Plugin::Webpack::Builder;
 
 plan skip_all => 'TEST_ASSETPACK=1' unless $ENV{TEST_ASSETPACK} or $ENV{TEST_ALL};
 
@@ -12,6 +13,7 @@ cleanup();
 ok !-e f('assets/entry-my-app.js'), 'entry-my-app.js does not exist';
 
 note 'migrate';
+$ENV{MOJO_WEBPACK_BUILD}  = 1;
 $ENV{WEBPACK_CUSTOM_NAME} = '';
 my $t = t::Helper->t(process => ['js']);
 

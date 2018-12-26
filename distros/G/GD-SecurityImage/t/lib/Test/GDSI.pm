@@ -3,11 +3,8 @@ package Test::GDSI;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.50';
 
-use constant GD      => defined($GD::VERSION)            ? $GD::VERSION            : 0;
-use constant MAGICK  => defined($Image::Magick::VERSION) ? $Image::Magick::VERSION : '0.0.0';
-use constant PROBLEM => GD && GD < 2.07 ? 1 : 0;
 use Carp qw(croak);
 
 my(%options, %info_text);
@@ -36,9 +33,6 @@ sub options {
 sub has_method {
     my $self = shift;
     my $name = shift || q{};
-    if ( PROBLEM && ($name eq 'ellipse' or $name eq 'ec') ) {
-        return 'circle';
-    }
     return $name;
 }
 
@@ -52,7 +46,6 @@ sub set_options {
     my($class, @args) = @_;
     my %o = @args % 2 ? () : @args;
     foreach ( keys %o ) {
-        next if $_ eq 'thickness' && PROBLEM;
         $options{$_} = $o{$_};
     }
     return $class;

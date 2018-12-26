@@ -1,3 +1,20 @@
+v0.78.4 2018-12-25T22:10:18Z
+ - dockerhub api refactored
+ - windows unicode console output fixed
+ - $CR, $LF replaced with meta chars
+ - escape_scalar improved
+ - escape_scalar speed improved
+ - escape_scalar -> escape_perl
+ - remove_static refactored
+ - to_json return plain scalar
+ - to_cbor return plain scalar
+ - to_perl return plain scalar
+ - to_yaml return plain scalar
+ - to_xml, to_ini return plain scalar
+ - read_text returns plain scalar
+ - read_bin returns plain scalar
+ - reload l10n locales on new dist registered
+
 v0.78.3 2018-12-21T19:48:21Z
  - note removed
  - fix cpan tgz name

@@ -35,10 +35,10 @@ sub _update {
 
     for my $id ( sort keys $INDICATOR->%* ) {
         if ( !defined $INDICATOR->{$id} ) {
-            $buffer .= $LF;    # move cursor to the next line, skip rendering
+            $buffer .= "\n";    # move cursor to the next line, skip rendering
         }
         else {
-            $buffer .= $INDICATOR->{$id}->_draw . $LF;
+            $buffer .= $INDICATOR->{$id}->_draw . "\n";
         }
     }
 

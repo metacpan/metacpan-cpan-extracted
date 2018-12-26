@@ -14,7 +14,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(Bool Str ArrayRef FileHandle);
 use Params::Validate qw(validate_with SCALAR ARRAYREF);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 const my $INTEGER_LENGTH     => length pack 'N', 0;
 const my $REVISION_OFFSET    => $INTEGER_LENGTH;
@@ -172,11 +172,7 @@ sub _unpack_message {
     }
 
     # split translation
-    @plurals = split
-        m{ \Q$PLURAL_SEPARATOR\E }xms,
-        $msgstr,
-        # get back also all hanging empty stings
-        1 + do { my @separators = $msgstr =~ m{ \Q$PLURAL_SEPARATOR\E }xmsg };
+    @plurals = split m{ \Q$PLURAL_SEPARATOR\E }xms, $msgstr, -1; ## no critic (MagicNumbers)
     if ( $is_plural ) {
         $message{msgstr_plural} = \@plurals;
     }
@@ -402,13 +398,13 @@ __END__
 
 Locale::MO::File - Write/read gettext MO files
 
-$Id: File.pm 638 2017-10-01 19:05:33Z steffenw $
+$Id: File.pm 645 2018-12-24 10:16:32Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/dbd-po/code/Locale-MO-File/trunk/lib/Locale/MO/File.pm $
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 SYNOPSIS
 
@@ -594,7 +590,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 - 2017,
+Copyright (c) 2011 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

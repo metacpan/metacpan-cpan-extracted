@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
 
 package Term::VTerm::Screen;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -20,38 +20,52 @@ C<Term::VTerm::Screen> - provides access to the screen layer of F<libvterm>
 
 =cut
 
-=head2 $screen->enable_altscreen( $enabled )
+=head2 enable_altscreen
+
+   $screen->enable_altscreen( $enabled )
 
 Controls whether the altscreen buffer is enabled. Doing so allows the DEC
 altscreen mode to switch between regular and alternate screen buffers, but
 consumes more memory.
 
-=head2 $screen->flush_damage
+=head2 flush_damage
+
+   $screen->flush_damage
 
 Flushes all pending damage through the screen to the damage callback.
 
-=head2 $screen->set_damage_merge( $size )
+=head2 set_damage_merge
+
+   $screen->set_damage_merge( $size )
 
 Sets the damage merge size, as one of the C<DAMAGE_*> constants.
 
-=head2 $screen->reset( $hard )
+=head2 reset
+
+   $screen->reset( $hard )
 
 Resets the terminal state; performing either a soft or hard reset depending on
 the (optional) boolean value given.
 
-=head2 $cell = $screen->get_cell( $pos )
+=head2 get_cell
+
+   $cell = $screen->get_cell( $pos )
 
 Returns a C<VTermScreenCell> object representing the current state of the cell
 at the given location. Note that this is an instantaneous snapshot - the
 returned object will not update to reflect later changes in the screen's
 state.
 
-=head2 $str = $screen->get_text( $rect )
+=head2 get_text
+
+   $str = $screen->get_text( $rect )
 
 Returns a UTF-8 string containing the text in the screen buffer within the
 given C<VTermRect>.
 
-=head2 $screen->set_callbacks( %cbs )
+=head2 set_callbacks
+
+   $screen->set_callbacks( %cbs )
 
 Sets the screen-layer callbacks. Takes the following named arguments:
 
@@ -91,6 +105,12 @@ the property type - see similar to C<get_penattr>.
  $on_resize->( $rows, $cols )
 
 =back
+
+=head2 convert_color_to_rgb
+
+   $col = $screen->convert_color_to_rgb( $col )
+
+Converts a C<VTermColor> structure from indexed to RGB form.
 
 =cut
 

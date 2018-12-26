@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::User;
-$RT::Client::REST::User::VERSION = '0.55';
+$RT::Client::REST::User::VERSION = '0.56';
 use base 'RT::Client::REST::Object';
 
 use Params::Validate qw(:types);
@@ -179,7 +179,7 @@ RT::Client::REST::User - user object representation.
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head1 SYNOPSIS
 

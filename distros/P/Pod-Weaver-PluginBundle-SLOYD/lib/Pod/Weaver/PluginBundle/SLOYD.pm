@@ -5,12 +5,18 @@ package Pod::Weaver::PluginBundle::SLOYD;
 use strict;
 use warnings;
 
-our $VERSION = '0.0003'; # VERSION
+our $VERSION = '0.0004'; # VERSION
 
 
 use namespace::autoclean;
 
 use Pod::Weaver::Config::Assembler;
+
+# dependencies
+use Pod::Weaver::Section::Contributors 0.009 ();
+use Pod::Elemental::Transformer::List 0.102  ();
+use Pod::Weaver::Plugin::Include 0.1.9 ();
+
 sub _exp { Pod::Weaver::Config::Assembler->expand_package( $_[0] ) }
 
 sub mvp_bundle_config {
@@ -35,8 +41,9 @@ sub mvp_bundle_config {
 
         [ '@Default/postlude', _exp('Region'), { region_name => 'postlude' } ],
 
-        [ '@Default/Authors', _exp('Authors'), {} ],
-        [ '@Default/Legal',   _exp('Legal'),   {} ],
+        [ '@Default/Authors',    _exp('Authors'),      {} ],
+        [ '@SLOYD/Contributors', _exp('Contributors'), {} ],
+        [ '@Default/Legal',      _exp('Legal'),        {} ],
     );
 
     push @plugins,
@@ -69,7 +76,7 @@ Pod::Weaver::PluginBundle::SLOYD - SLOYD's default Pod::Weaver configuration
 
 =head1 VERSION
 
-version 0.0003
+version 0.0004
 
 =head1 OVERVIEW
 
@@ -96,6 +103,7 @@ It is nearly equivalent to the following:
     [Leftovers]
     [Region  / postlude]
     [Authors]
+    [Contributors]
     [Legal]
 
     [-Transformer / Lists]

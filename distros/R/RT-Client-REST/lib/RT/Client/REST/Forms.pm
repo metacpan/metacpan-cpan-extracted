@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Forms;
-$RT::Client::REST::Forms::VERSION = '0.55';
+$RT::Client::REST::Forms::VERSION = '0.56';
 use Exporter;
 
 use vars qw(@EXPORT @ISA);
@@ -70,7 +70,7 @@ sub form_parse {
                 my $f     = $1;
                 my $value = $2;
                 my $spaces = ' ' x length($f);
-                $f =~ s/:\s$//;
+                $f =~ s/:\s?$//;
 
                 # Read continuation lines, if any.
                 while (@lines && ($lines[0] eq '' || $lines[0] =~ m/^\s+/)) {
@@ -227,7 +227,7 @@ RT::Client::REST::Forms - This package provides functions from RT::Interface::RE
 
 =head1 VERSION
 
-version 0.55
+version 0.56
 
 =head2 METHODS
 

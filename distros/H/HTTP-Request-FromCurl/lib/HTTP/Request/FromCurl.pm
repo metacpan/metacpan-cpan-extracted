@@ -7,6 +7,7 @@ use URI;
 use Getopt::Long;
 use File::Spec::Unix;
 use HTTP::Request::CurlParameters;
+use HTTP::Request::Generator 'generate_requests';
 use PerlX::Maybe;
 use MIME::Base64 'encode_base64';
 
@@ -14,7 +15,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -153,6 +154,7 @@ our @option_spec = (
     'referrer|e=s',
     'form|F=s@',
     'get|G',
+    'globoff|g',
     'head|I',
     'header|H=s@',
     'include|i',         # ignored
@@ -191,7 +193,7 @@ sub new( $class, %options ) {
 
     return
         wantarray ? map { $class->_build_request( $_, \%curl_options, %options ) } @$cmd
-                  :       $class->_build_request( $cmd->[0], \%curl_options, %options )
+                  :       ($class->_build_request( $cmd->[0], \%curl_options, %options ))[0]
                   ;
 }
 
@@ -227,146 +229,157 @@ sub squash_uri( $class, $uri ) {
 
 sub _build_request( $self, $uri, $options, %build_options ) {
     my $body;
-    $uri = URI->new( $uri );
 
     my @headers = @{ $options->{header} || []};
     my $method = $options->{request};
     my @post_data = @{ $options->{data} || $options->{'data-binary'} || []};
     my @form_args = @{ $options->{form} || []};
 
-    $uri = $self->squash_uri( $uri );
+    # expand the URI here if wanted
+    my @uris = ($uri);
+    if( ! $options->{ globoff }) {
+        @uris = map { $_->{url} } generate_requests( pattern => shift @uris, limit => $build_options{ limit } );
+    }
 
-    # Sluuuurp
-    if( $build_options{ read_files }) {
-        @post_data = map {
-            /^\@(.*)/ ? do {
-                             open my $fh, '<', $1
-                                 or die "$1: $!";
-                             local $/;
-                             binmode $fh;
-                             <$fh>
-                           }
-                      : $_
-        } @post_data;
-    } else {
-        @post_data = map {
-            /^\@(.*)/ ? "... contents of $1 ..."
-                      : $_
-        } @post_data;
-    };
+    my @res;
+    for my $uri (@uris) {
+        $uri = URI->new( $uri );
+        $uri = $self->squash_uri( $uri );
 
-    if( @form_args) {
-        $method = 'POST';
+        # Sluuuurp
+        if( $build_options{ read_files }) {
+            @post_data = map {
+                /^\@(.*)/ ? do {
+                                open my $fh, '<', $1
+                                    or die "$1: $!";
+                                local $/;
+                                binmode $fh;
+                                <$fh>
+                            }
+                        : $_
+            } @post_data;
+        } else {
+            @post_data = map {
+                /^\@(.*)/ ? "... contents of $1 ..."
+                        : $_
+            } @post_data;
+        };
 
-        my $req = HTTP::Request::Common::POST(
-            'https://example.com',
-            Content_Type => 'form-data',
-            Content => [ map { /^([^=]+)=(.*)$/ ? ($1 => $2) : () } @form_args ],
-        );
-        $body = $req->content;
-        unshift @headers, 'Content-Type: ' . join "; ", $req->headers->content_type;
+        if( @form_args) {
+            $method = 'POST';
 
-    } elsif( $options->{ get }) {
-        $method = 'GET';
-        # Also, append the POST data to the URL
-        if( @post_data ) {
-            my $q = $uri->query;
-            if( defined $q and length $q ) {
-                $q .= "&";
-            } else {
-                $q = "";
+            my $req = HTTP::Request::Common::POST(
+                'https://example.com',
+                Content_Type => 'form-data',
+                Content => [ map { /^([^=]+)=(.*)$/ ? ($1 => $2) : () } @form_args ],
+            );
+            $body = $req->content;
+            unshift @headers, 'Content-Type: ' . join "; ", $req->headers->content_type;
+
+        } elsif( $options->{ get }) {
+            $method = 'GET';
+            # Also, append the POST data to the URL
+            if( @post_data ) {
+                my $q = $uri->query;
+                if( defined $q and length $q ) {
+                    $q .= "&";
+                } else {
+                    $q = "";
+                };
+                $q .= join "", @post_data;
+                $uri->query( $q );
             };
-            $q .= join "", @post_data;
-            $uri->query( $q );
+
+        } elsif( $options->{ head }) {
+            $method = 'HEAD';
+
+        } elsif( @post_data ) {
+            $method = 'POST';
+            $body = join "", @post_data;
+            unshift @headers, 'Content-Type: application/x-www-form-urlencoded';
+
+        } else {
+            $method ||= 'GET';
         };
 
-    } elsif( $options->{ head }) {
-        $method = 'HEAD';
-
-    } elsif( @post_data ) {
-        $method = 'POST';
-        $body = join "", @post_data;
-        unshift @headers, 'Content-Type: application/x-www-form-urlencoded';
-
-    } else {
-        $method ||= 'GET';
-    };
-
-    if( defined $body ) {
-        unshift @headers, sprintf 'Content-Length: %d', length $body;
-    };
-
-    if( $options->{ 'oauth2-bearer' } ) {
-        push @headers, sprintf 'Authorization: Bearer %s', $options->{'oauth2-bearer'};
-    };
-
-    if( $options->{ 'user' } ) {
-        if(    $options->{anyauth}
-            || $options->{ntlm}
-            || $options->{negotiate}
-            ) {
-            # Nothing to do here, just let LWP::UserAgent do its thing
-            # This means one additional request to fetch the appropriate
-            # 401 response asking for credentials, but ...
-        } else {
-            # $options->{basic} or none at all
-            my $info = delete $options->{'user'};
-            # We need to bake this into the header here?!
-            push @headers, sprintf 'Authorization: Basic %s', encode_base64( $info );
-        }
-    };
-
-    my $host = $uri->can( 'host_port' ) ? $uri->host_port : "$uri";
-    my %headers = (
-        %default_headers,
-        'Host' => $host,
-        (map { /^\s*([^:\s]+)\s*:\s*(.*)$/ ? ($1 => $2) : () } @headers),
-    );
-
-    if( defined $options->{ referrer }) {
-        $headers{ Referer } = $options->{ 'referrer' };
-    };
-
-    if( defined $options->{ 'cookie-jar' }) {
-            $options->{'cookie-jar-options'}->{ 'write' } = 1;
-    };
-
-    if( defined( my $c = $options->{ cookie })) {
-        if( $c =~ /=/ ) {
-            $headers{ Cookie } = $options->{ 'cookie' };
-        } else {
-            $options->{'cookie-jar'} = $c;
-            $options->{'cookie-jar-options'}->{ 'read' } = 1;
+        if( defined $body ) {
+            unshift @headers, sprintf 'Content-Length: %d', length $body;
         };
-    };
 
-    if( defined $options->{ agent }) {
-        $headers{ 'User-Agent' } = $options->{ 'agent' };
-    };
+        if( $options->{ 'oauth2-bearer' } ) {
+            push @headers, sprintf 'Authorization: Bearer %s', $options->{'oauth2-bearer'};
+        };
 
-    # Curl 7.61.0 ignores these:
-    #if( $options->{ keepalive }) {
-    #    $headers{ 'Keep-Alive' } = 1;
-    #} elsif( exists $options->{ keepalive }) {
-    #    $headers{ 'Keep-Alive' } = 0;
-    #};
+        if( $options->{ 'user' } ) {
+            if(    $options->{anyauth}
+                || $options->{ntlm}
+                || $options->{negotiate}
+                ) {
+                # Nothing to do here, just let LWP::UserAgent do its thing
+                # This means one additional request to fetch the appropriate
+                # 401 response asking for credentials, but ...
+            } else {
+                # $options->{basic} or none at all
+                my $info = delete $options->{'user'};
+                # We need to bake this into the header here?!
+                push @headers, sprintf 'Authorization: Basic %s', encode_base64( $info );
+            }
+        };
 
-    if( $options->{ compressed }) {
-        my $compressions = HTTP::Message::decodable();
-        $headers{ 'Accept-Encoding' } = $compressions;
-    };
+        my $host = $uri->can( 'host_port' ) ? $uri->host_port : "$uri";
+        my %headers = (
+            %default_headers,
+            'Host' => $host,
+            (map { /^\s*([^:\s]+)\s*:\s*(.*)$/ ? ($1 => $2) : () } @headers),
+        );
 
-    HTTP::Request::CurlParameters->new({
-        method => $method,
-        uri    => $uri,
-        headers => \%headers,
-        body   => $body,
-        maybe credentials => $options->{ user },
-        maybe output => $options->{ output },
-        maybe timeout => $options->{ 'max-time' },
-        maybe cookie_jar => $options->{'cookie-jar'},
-        maybe cookie_jar_options => $options->{'cookie-jar-options'},
-    });
+        if( defined $options->{ referrer }) {
+            $headers{ Referer } = $options->{ 'referrer' };
+        };
+
+        if( defined $options->{ 'cookie-jar' }) {
+                $options->{'cookie-jar-options'}->{ 'write' } = 1;
+        };
+
+        if( defined( my $c = $options->{ cookie })) {
+            if( $c =~ /=/ ) {
+                $headers{ Cookie } = $options->{ 'cookie' };
+            } else {
+                $options->{'cookie-jar'} = $c;
+                $options->{'cookie-jar-options'}->{ 'read' } = 1;
+            };
+        };
+
+        if( defined $options->{ agent }) {
+            $headers{ 'User-Agent' } = $options->{ 'agent' };
+        };
+
+        # Curl 7.61.0 ignores these:
+        #if( $options->{ keepalive }) {
+        #    $headers{ 'Keep-Alive' } = 1;
+        #} elsif( exists $options->{ keepalive }) {
+        #    $headers{ 'Keep-Alive' } = 0;
+        #};
+
+        if( $options->{ compressed }) {
+            my $compressions = HTTP::Message::decodable();
+            $headers{ 'Accept-Encoding' } = $compressions;
+        };
+
+        push @res, HTTP::Request::CurlParameters->new({
+            method => $method,
+            uri    => $uri,
+            headers => \%headers,
+            body   => $body,
+            maybe credentials => $options->{ user },
+            maybe output => $options->{ output },
+            maybe timeout => $options->{ 'max-time' },
+            maybe cookie_jar => $options->{'cookie-jar'},
+            maybe cookie_jar_options => $options->{'cookie-jar-options'},
+        });
+    }
+
+    return @res
 };
 
 1;
@@ -415,27 +428,6 @@ File uploads / content from files
 While file uploads and reading POST data from files are supported, the content
 is slurped into memory completely. This can be problematic for large files
 and little available memory.
-
-=item *
-
-Sequence expansion
-
-Curl supports speficying sequences of URLs such as
-C< https://example.com/[1-100] > , which expands to
-C< https://example.com/1 >, C< https://example.com/2 > ...
-C< https://example.com/100 >
-
-This is not (yet) supported.
-
-=item *
-
-List expansion
-
-Curl supports speficying sequences of URLs such as
-C< https://{www,ftp}.example.com/ > , which expands to
-C< https://www.example.com/ >, C< https://ftp.example.com/ >.
-
-This is not (yet) supported.
 
 =item *
 

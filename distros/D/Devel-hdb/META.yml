@@ -49,5 +49,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/brummett/Devel-hdb.git
-version: '0.24'
+version: '0.25'
 x_serialization_backend: 'YAML::Tiny version 1.70'

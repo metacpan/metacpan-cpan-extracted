@@ -1,4 +1,9 @@
 Revision history for Data::Validate::WithYAML::Plugin::URL
+==========================================================
+
+0.02    2018-12-26 10:35:00
+
+        + improve tests
 
 0.01    04.01.2012 
         First version, released on an unsuspecting world.

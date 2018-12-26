@@ -30,7 +30,7 @@ sub pause {
 
     Term::ReadKey::ReadMode(1);
 
-    print $LF;
+    print "\n";
 
     return;
 }
@@ -124,7 +124,7 @@ sub prompt ( $msg, $opt, @ ) {
 
     print $possible[0];
 
-    print $LF;
+    print "\n";
 
     return $possible[0];
 }
@@ -145,7 +145,7 @@ sub read_password {
         echo_char => $args{echo_char},
     );
 
-    print $LF;
+    print "\n";
 
     return $input;
 }

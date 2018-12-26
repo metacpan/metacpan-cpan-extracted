@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -118,7 +118,7 @@ $ttAccounts = Triceps::TableType->new($rtAccounts)
 	# muliple indexes can be defined for different purposes
 	# (though of course each extra index adds overhead)
 	->addSubIndex("lookupSrcExt", # quick look-up by source and external id
-		Triceps::IndexType->newHashed(key => [ "source", "external" ])
+		Triceps::IndexType->newOrdered(key => [ "source", "external" ])
 	)
 	->addSubIndex("iterateSrc", # for iteration in order grouped by source
 		Triceps::IndexType->newHashed(key => [ "source" ])
@@ -1267,15 +1267,15 @@ sub tryMissingOptValue # (optName)
 }
 
 &tryMissingOptValue("unit");
-ok($@ =~ /^Triceps::LookupJoin::new: option unit must be specified/);
+ok($@, qr/^Triceps::LookupJoin::new: option unit must be specified/);
 &tryMissingOptValue("name");
-ok($@ =~ /^Option 'name' must be specified for class 'Triceps::LookupJoin'/);
+ok($@, qr/^Option 'name' must be specified for class 'Triceps::LookupJoin'/);
 &tryMissingOptValue("leftRowType");
-ok($@ =~ /^Triceps::LookupJoin::new: must have exactly one of options leftRowType or leftFromLabel/);
+ok($@, qr/^Triceps::LookupJoin::new: must have exactly one of options leftRowType or leftFromLabel/);
 &tryMissingOptValue("rightTable");
-ok($@ =~ /^Option 'rightTable' must be specified for class 'Triceps::LookupJoin'/);
+ok($@, qr/^Option 'rightTable' must be specified for class 'Triceps::LookupJoin'/);
 &tryMissingOptValue("by");
-ok($@ =~ /^Triceps::LookupJoin::new: must have exactly one of options by or byLeft, got none of them/);
+ok($@, qr/^Triceps::LookupJoin::new: must have exactly one of options by or byLeft, got none of them/);
 
 sub tryBadOptValue # (optName, optValue)
 {
@@ -1300,44 +1300,44 @@ sub tryBadOptValue # (optName, optValue)
 }
 
 &tryBadOptValue("unit", 9);
-ok($@ =~ /^Option 'unit' of class 'Triceps::LookupJoin' must be a reference to 'Triceps::Unit', is ''/);
+ok($@, qr/^Option 'unit' of class 'Triceps::LookupJoin' must be a reference to 'Triceps::Unit', is ''/);
 &tryBadOptValue("leftRowType", 9);
-ok($@ =~ /^Option 'leftRowType' of class 'Triceps::LookupJoin' must be a reference to 'Triceps::RowType', is ''/);
+ok($@, qr/^Option 'leftRowType' of class 'Triceps::LookupJoin' must be a reference to 'Triceps::RowType', is ''/);
 &tryBadOptValue("rightTable", 9);
-ok($@ =~ /^Option 'rightTable' of class 'Triceps::LookupJoin' must be a reference to 'Triceps::Table', is ''/);
+ok($@, qr/^Option 'rightTable' of class 'Triceps::LookupJoin' must be a reference to 'Triceps::Table', is ''/);
 &tryBadOptValue("rightIdxPath", [$vu2]);
-ok($@ =~ /^Option 'rightIdxPath' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY' '', is 'ARRAY' 'Triceps::Unit'/);
+ok($@, qr/^Option 'rightIdxPath' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY' '', is 'ARRAY' 'Triceps::Unit'/);
 &tryBadOptValue("leftFields", 9);
-ok($@ =~ /^Option 'leftFields' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
+ok($@, qr/^Option 'leftFields' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
 &tryBadOptValue("rightFields", 9);
-ok($@ =~ /^Option 'rightFields' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
+ok($@, qr/^Option 'rightFields' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
 &tryBadOptValue("by", 9);
-ok($@ =~ /^Option 'by' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
+ok($@, qr/^Option 'by' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
 &tryBadOptValue("byLeft", 9);
-ok($@ =~ /^Option 'byLeft' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
+ok($@, qr/^Option 'byLeft' of class 'Triceps::LookupJoin' must be a reference to 'ARRAY', is ''/);
 &tryBadOptValue("saveJoinerTo", 9);
-ok($@ =~ /^Option 'saveJoinerTo' of class 'Triceps::LookupJoin' must be a reference to a scalar, is ''/);
+ok($@, qr/^Option 'saveJoinerTo' of class 'Triceps::LookupJoin' must be a reference to a scalar, is ''/);
 &tryBadOptValue("oppositeOuter", 1, "automatic", 0);
-ok($@ =~ /^The option 'oppositeOuter' may be enabled only in the automatic mode/);
+ok($@, qr/^The option 'oppositeOuter' may be enabled only in the automatic mode/);
 &tryBadOptValue("groupSizeCode", 1, "oppositeOuter", 1);
-ok($@ =~ /^Option 'groupSizeCode' of class 'Triceps::LookupJoin' must be a reference to 'CODE', is ''/);
+ok($@, qr/^Option 'groupSizeCode' of class 'Triceps::LookupJoin' must be a reference to 'CODE', is ''/);
 &tryBadOptValue("groupSizeCode", sub { 1; }, "automatic", 1);
-ok($@ =~ /^The option 'groupSizeCode' may be used only when the option 'oppositeOuter' is enabled/);
+ok($@, qr/^The option 'groupSizeCode' may be used only when the option 'oppositeOuter' is enabled/);
 
 &tryBadOptValue("by", [ 'aaa' => 'bbb' ]);
-ok($@ =~ /^Option 'by' contains an unknown left-side field 'aaa'/);
+ok($@, qr/^Option 'by' contains an unknown left-side field 'aaa'/);
 &tryBadOptValue("by", [ 'acctSrc' => 'bbb' ]);
-ok($@ =~ /^Option 'by' contains a right-side field 'bbb' that is not in the index key,
+ok($@, qr/^Option 'by' contains a right-side field 'bbb' that is not in the index key,
   right key: \(external, source\)
   by: \(acctSrc, bbb\)/);
 &tryBadOptValue("by", [ 'acctSrc' => 'internal' ]);
-ok($@ =~ /^Option 'by' contains a right-side field 'internal' that is not in the index key,
+ok($@, qr/^Option 'by' contains a right-side field 'internal' that is not in the index key,
   right key: \(external, source\)
   by: \(acctSrc, internal\)
 /);
 
 &tryBadOptValue("byLeft", [ "acctSrc/source", "acctXtrId/external" ]);
-ok($@ =~ /^Triceps::LookupJoin::new: must have only one of options by or byLeft, got both by and byLeft/);
+ok($@, qr/^Triceps::LookupJoin::new: must have only one of options by or byLeft, got both by and byLeft/);
 
 {
 	eval {
@@ -1353,14 +1353,14 @@ ok($@ =~ /^Triceps::LookupJoin::new: must have only one of options by or byLeft,
 			automatic => 1,
 		);
 	};
-	ok($@ =~ /^Triceps::LookupJoin::new: option 'byLeft': result definition error:
+	ok($@, qr/^Triceps::LookupJoin::new: option 'byLeft': result definition error:
   the field in definition 'acct\/external' is not found
 The available fields are:
   acctSrc, acctXtrId, amount/);
 }
 
 &tryBadOptValue("rightIdxPath", [ 'lookupIntGroup', 'lookupInt' ]);
-ok($@ =~ /^Triceps::TableType::findIndexKeyPath: the index type at path 'lookupIntGroup.lookupInt' does not have a key, table type is:/);
+ok($@, qr/^The rightIdxPath is invalid:\n  Triceps::TableType::findIndexKeyPath: the index type at path 'lookupIntGroup.lookupInt' does not have a key, table type is:/);
 
 {
 	my $tt = Triceps::TableType->new($rtAccounts)
@@ -1387,29 +1387,29 @@ ok($@ =~ /^Triceps::TableType::findIndexKeyPath: the index type at path 'lookupI
 			automatic => 1,
 		);
 	};
-	ok($@, qr/^The rightTable does not have an index that matches the key set\n  right key: \(source, internal\)\n  by: \(acctSrc, source, acctXtrId, internal\)\n  right table type:\n    table \(\n      row {\n        string source,\n        string external,\n        int32 internal,\n      }\n    \) {\n      index HashedIndex\(source, external, \) {\n        index FifoIndex\(\) fifo,\n      } lookupSrcExt,\n    }\n  at/);
+	ok($@, qr/^The rightTable does not have an index that matches the key set\n  right key: \(source, internal\)\n  by: \(acctSrc, source, acctXtrId, internal\)\n  right table type:\n    table \(\n      row \{\n        string source,\n        string external,\n        int32 internal,\n      \}\n    \) \{\n      index HashedIndex\(source, external, \) \{\n        index FifoIndex\(\) fifo,\n      \} lookupSrcExt,\n    }\n  at/);
 }
 
 &tryBadOptValue(rightFields => [ "internal/acct", "duck" ]),
-ok($@ =~ /^Triceps::LookupJoin::new: option 'rightFields': result definition error:
+ok($@, qr/^Triceps::LookupJoin::new: option 'rightFields': result definition error:
   the field in definition 'duck' is not found
 The available fields are:
   source, external, internal/);
 
 &tryBadOptValue(leftFields => [ "acctSrc", "duck" ]),
-ok($@ =~ /^Triceps::LookupJoin::new: option 'leftFields': result definition error:
+ok($@, qr/^Triceps::LookupJoin::new: option 'leftFields': result definition error:
   the field in definition 'duck' is not found
 The available fields are:
   acctSrc, acctXtrId, amount/);
 
 &tryBadOptValue(rightFields => [ "internal/acctSrc" ]),
-ok($@ =~ /^A duplicate field 'acctSrc' is produced from  right-side field 'internal'; the preceding fields are: \(acctSrc, acctXtrId, amount\)/);
+ok($@, qr/^A duplicate field 'acctSrc' is produced from  right-side field 'internal'; the preceding fields are: \(acctSrc, acctXtrId, amount\)/);
 
 {
 	my $lb = $vu2->makeDummyLabel($rtInTrans, "in");
 	ok(ref $lb, "Triceps::Label");
 	&tryBadOptValue(leftFromLabel => $lb),
-	ok($@ =~ /^Triceps::LookupJoin::new: must have only one of options leftRowType or leftFromLabel/);
+	ok($@, qr/^Triceps::LookupJoin::new: must have only one of options leftRowType or leftFromLabel/);
 }
 
 # test the match of array-ness in the join fields
@@ -1473,7 +1473,7 @@ ok($@ =~ /^A duplicate field 'acctSrc' is produced from  right-side field 'inter
 			automatic => 1,
 		);
 	};
-	ok($@ =~ /^Option 'by' fields 'acctSrc'='arr1' mismatch the array-ness, with types 'string' and 'int32\[\]'/);
+	ok($@, qr/^Option 'by' fields 'acctSrc'='arr1' mismatch the array-ness, with types 'string' and 'int32\[\]'/);
 }
 
 # automatic joins don't do lookup()
@@ -1493,7 +1493,7 @@ ok($@ =~ /^A duplicate field 'acctSrc' is produced from  right-side field 'inter
 	eval {
 		$j->lookup($rtInTrans->makeRowArray());
 	};
-	ok($@ =~ /^Joiner 'join' was created with automatic option and does not support the manual lookup\(\) call/);
+	ok($@, qr/^Joiner 'join' was created with automatic option and does not support the manual lookup\(\) call/);
 }
 
 

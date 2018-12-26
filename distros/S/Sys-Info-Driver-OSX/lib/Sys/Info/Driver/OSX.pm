@@ -1,4 +1,5 @@
 package Sys::Info::Driver::OSX;
+$Sys::Info::Driver::OSX::VERSION = '0.7959';
 use strict;
 use warnings;
 use base qw( Exporter Sys::Info::Base );
@@ -20,7 +21,6 @@ use Capture::Tiny qw( capture );
 use Carp          qw( croak   );
 use Mac::PropertyList;
 
-our $VERSION = '0.7958';
 our @EXPORT  = qw(
     fsysctl
     nsysctl
@@ -224,9 +224,17 @@ sub _sysctl_not_exists {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Sys::Info::Driver::OSX - OSX driver for Sys::Info
+Sys::Info::Driver::OSX
+
+=head1 VERSION
+
+version 0.7959
 
 =head1 SYNOPSIS
 
@@ -234,10 +242,11 @@ Sys::Info::Driver::OSX - OSX driver for Sys::Info
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7958> of C<Sys::Info::Driver::OSX>
-released on C<23 October 2013>.
-
 This is the main module in the C<OSX> driver collection.
+
+=head1 NAME
+
+Sys::Info::Driver::OSX - OSX driver for Sys::Info
 
 =head1 METHODS
 
@@ -271,15 +280,13 @@ Converts a file or raw plist data into a Perl structure.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2010 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2010 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

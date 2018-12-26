@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
 
 package Tickit::Widget::SegmentDisplay;
 
@@ -10,10 +10,11 @@ use warnings;
 use 5.010; # //
 use base qw( Tickit::Widget );
 use Tickit::Style;
+use Tickit::RenderBuffer qw( LINE_SINGLE LINE_THICK );
 
 use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp;
 
@@ -37,7 +38,7 @@ C<Tickit::Widget::SegmentDisplay> - show a single character like a segmented dis
 
 =head1 DESCRIPTION
 
-This class provides a widget that immitates a segmented LED or LCD display. It
+This class provides a widget that imitates a segmented LED or LCD display. It
 shows a single character by lighting or shading fixed rectangular bars.
 
 =head1 STYLE
@@ -129,11 +130,20 @@ If true, vertical resolution of rendered block characters is effectively
 doubled by using half-filled Unicode block-drawing characters. Setting this
 option implies C<use_unicode>.
 
+=item use_linedraw => BOOL
+
+If true, use Unicode linedrawing instead of erased or solid blocks. This style
+is more readable on smaller sizes, but is only supported by C<seven> and
+C<colon> types.
+
 =item thickness => INT
 
 Gives the number of columns wide and half-lines tall that LED bars will be
 drawn in. Note that unless C<use_halfline> is set, this value ought to be an
 even number. Defaults to 2.
+
+When C<use_linedraw> is in effect, if C<thickness> is greater than 1 then
+C<LINE_THICK> segments will be used for drawing. Defaults to 1.
 
 =back
 
@@ -161,19 +171,51 @@ sub new
    defined $method or croak "Unrecognised type name '$type'";
 
    $self->{reshape_method} = $self->can( "reshape_${method}" );
-   $self->{render_method}  = $self->can( "render_${method}_to_rb" );
 
    my $use_halfline = $args{use_halfline};
    $self->{use_halfline} = $use_halfline;
 
-   my $use_unicode  = $args{use_unicode};
+   my $use_linedraw = $args{use_linedraw};
 
-   $self->{flush_method} = $self->can(
-      $use_halfline ? "flush_halfline" :
-      $use_unicode  ? "flush_unicode"  :
-                      "flush" );
+   if( $use_linedraw and my $code = $self->can( "render_${method}_as_linedraw" ) ) {
+      $self->{linestyle} = ( $args{thickness} // 1 ) > 1 ? LINE_THICK : LINE_SINGLE;
+      $self->{render_to_rb} = $code;
+   }
+   else {
+      my $render = $self->can( "render_${method}" );
 
-   $self->{thickness} = $args{thickness} // 2;
+      my $use_unicode  = $args{use_unicode};
+
+      my $flush = $self->can(
+         $use_halfline ? "flush_halfline" :
+         $use_unicode  ? "flush_unicode"  :
+                         "flush" );
+
+      $self->{render_to_rb} = sub {
+         my $self = shift;
+         my ( $rb, $rect ) = @_;
+         my @buff;
+
+         # TODO: sizing?
+         $render->( $self, \@buff );
+
+         $rb->eraserect( $rect );
+
+         $flush->( $self, \@buff, $rb, $rect );
+      };
+   }
+
+   $self->{hthickness} = $args{thickness} // 2;
+
+   $self->{vthickness} = $self->{hthickness};
+   $self->{vthickness} /= 2 unless $self->{use_halfline};
+
+   if( $use_linedraw ) {
+      $self->{hthickness} = 1;
+      $self->{vthickness} = 1;
+   }
+
+   $self->{margin} = $use_linedraw ? 0 : 1;
 
    $self->{value} = $args{value} // "";
 
@@ -245,16 +287,7 @@ use constant {
 sub render_to_rb
 {
    my $self = shift;
-   my ( $rb, $rect ) = @_;
-
-   my @buff;
-
-   # TODO: sizing?
-   $self->{render_method}->( $self, \@buff );
-
-   $rb->eraserect( $rect );
-
-   $self->{flush_method}->( $self, \@buff, $rb, $rect );
+   $self->{render_to_rb}->( $self, @_ );
 }
 
 sub flush
@@ -350,11 +383,9 @@ sub _fill
    my ( $buff, $startline, $endline, $startcol, $endcol, $val ) = @_;
    $val //= LIT;
 
-   my $thickness = $self->{thickness};
-   my @colrange = ( $startcol .. $endcol + $thickness - 1 );
+   my @colrange = ( $startcol .. $endcol + $self->{hthickness} - 1 );
 
-   $thickness /= 2 unless $self->{use_halfline};
-   my @linerange = ( $startline .. $endline + $thickness - 1 );
+   my @linerange = ( $startline .. $endline + $self->{vthickness} - 1 );
 
    foreach my $line ( @linerange ) {
       vec( $buff->[$line], $_, 2 ) = $val for @colrange;
@@ -399,30 +430,32 @@ sub reshape_seven
    my $self = shift;
    my ( $lines, $cols, $top, $left ) = @_;
 
-   my $thickness = $self->{thickness};
+   my $margin = $self->{margin};
 
-   my $right = $left + $cols - $thickness;
+   my $hthickness = $self->{hthickness};
+
+   my $right = $left + $cols - $hthickness;
 
    $self->{FE_col}       = $left;
-   $self->{AGD_startcol} = $left + $thickness;
-   $self->{AGD_endcol}   = $right - $thickness;
+   $self->{AGD_startcol} = $left + $hthickness * $margin;
+   $self->{AGD_endcol}   = $right - $hthickness * $margin;
    $self->{BC_col}       = $right;
 
-   $thickness /= 2 unless $self->{use_halfline};
+   my $vthickness = $self->{vthickness};
 
-   my $bottom = $top + $lines - $thickness;
+   my $bottom = $top + $lines - $vthickness;
    my $mid    = int( ( $top + $bottom ) / 2 );
 
    $self->{A_line}       = $top;
-   $self->{BF_startline} = $top + $thickness;
-   $self->{BF_endline}   = $mid - $thickness;
+   $self->{BF_startline} = $top + $vthickness * $margin;
+   $self->{BF_endline}   = $mid - $vthickness * $margin;
    $self->{G_line}       = $mid;
-   $self->{CE_startline} = $mid + $thickness;
-   $self->{CE_endline}   = $bottom - $thickness;
+   $self->{CE_startline} = $mid + $vthickness * $margin;
+   $self->{CE_endline}   = $bottom - $vthickness * $margin;
    $self->{D_line}       = $bottom;
 }
 
-sub render_seven_to_rb
+sub render_seven
 {
    my $self = shift;
    my ( $buff ) = @_;
@@ -437,6 +470,27 @@ sub render_seven_to_rb
    $self->_fill( $buff, $self->{CE_startline}, $self->{CE_endline}, ( $self->{BC_col} ) x 2, $self->_val_for_seg( "C" ) );
 }
 
+sub render_seven_as_linedraw
+{
+   my $self = shift;
+   my ( $rb, $rect ) = @_;
+
+   $rb->eraserect( $rect );
+
+   $rb->setpen( $self->{lit_pen} );
+
+   my $linestyle = $self->{linestyle};
+
+   $rb->hline_at( $self->{A_line}, $self->{AGD_startcol}, $self->{AGD_endcol}, $linestyle ) if $self->_val_for_seg( "A" ) == LIT;
+   $rb->hline_at( $self->{G_line}, $self->{AGD_startcol}, $self->{AGD_endcol}, $linestyle ) if $self->_val_for_seg( "G" ) == LIT;
+   $rb->hline_at( $self->{D_line}, $self->{AGD_startcol}, $self->{AGD_endcol}, $linestyle ) if $self->_val_for_seg( "D" ) == LIT;
+
+   $rb->vline_at( $self->{BF_startline}, $self->{BF_endline}, $self->{FE_col}, $linestyle ) if $self->_val_for_seg( "F" ) == LIT;
+   $rb->vline_at( $self->{BF_startline}, $self->{BF_endline}, $self->{BC_col}, $linestyle ) if $self->_val_for_seg( "B" ) == LIT;
+   $rb->vline_at( $self->{CE_startline}, $self->{CE_endline}, $self->{FE_col}, $linestyle ) if $self->_val_for_seg( "E" ) == LIT;
+   $rb->vline_at( $self->{CE_startline}, $self->{CE_endline}, $self->{BC_col}, $linestyle ) if $self->_val_for_seg( "C" ) == LIT;
+}
+
 # 7-Segment with DP
 sub reshape_seven_dp
 {
@@ -449,7 +503,7 @@ sub reshape_seven_dp
    $self->{DP_col}  = $left + $cols  - 2;
 }
 
-sub render_seven_dp_to_rb
+sub render_seven_dp
 {
    my $self = shift;
    my ( $buff ) = @_;
@@ -466,7 +520,7 @@ sub render_seven_dp_to_rb
       $self->{value} = $value;
    }
 
-   $self->render_seven_to_rb( $buff );
+   $self->render_seven( $buff );
 
    $self->_dot( $buff, $self->{DP_line}, $self->{DP_col}, $dp ? LIT : UNLIT );
 }
@@ -486,7 +540,7 @@ sub reshape_colon
    $self->{B_line} = $bottom - $ofs;
 }
 
-sub render_colon_to_rb
+sub render_colon
 {
    my $self = shift;
    my ( $buff ) = @_;
@@ -494,6 +548,20 @@ sub render_colon_to_rb
    my $col = $self->{colon_col};
    $self->_dot( $buff, $self->{A_line}, $col );
    $self->_dot( $buff, $self->{B_line}, $col );
+}
+
+sub render_colon_as_linedraw
+{
+   my $self = shift;
+   my ( $rb, $rect ) = @_;
+
+   $rb->eraserect( $rect );
+
+   $rb->setpen( $self->{lit_pen} );
+
+   # U+2022 BULLET
+   $rb->char_at( $self->{A_line}, $self->{colon_col}, 0x2022 );
+   $rb->char_at( $self->{B_line}, $self->{colon_col}, 0x2022 );
 }
 
 # Symbol drawing
@@ -550,7 +618,7 @@ sub _roundpos
       int($c) + ( $c > int($c) && $c > $self->{mid_col}  );
 }
 
-sub render_symb_to_rb
+sub render_symb
 {
    my $self = shift;
    my ( $buff ) = @_;

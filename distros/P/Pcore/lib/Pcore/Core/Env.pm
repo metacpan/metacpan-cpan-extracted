@@ -12,7 +12,8 @@ use Pcore::Util::Scalar qw[is_ref];
 has is_par        => ( init_arg => undef );                        # process run from PAR distribution
 has main_dist     => ( init_arg => undef );                        # Maybe [ InstanceOf ['Pcore::Dist'] ], main dist
 has pcore         => ( init_arg => undef );                        # InstanceOf ['Pcore::Dist'], pcore dist
-has _dist_idx     => ( init_arg => undef );                        # HashRef, registered dists. index
+has dists         => ( init_arg => undef );                        # HashRef, registered dists. index
+has dists_order   => ( init_arg => undef );                        # ArrayRef, registered dists in load order
 has cli           => ( init_arg => undef );                        # HashRef, parsed CLI data
 has share         => ( init_arg => undef );                        # InstanceOf ['Pcore::Core::Env::Share'], share object
 has user_cfg_path => ( is       => 'lazy', init_arg => undef );
@@ -306,20 +307,24 @@ sub register_dist ( $self, $dist ) {
     die qq[Invlaid Pcore -dist pragma usage, "$dist" is not a Pcore dist main module] if !$dist;
 
     # dist is already registered
-    return if exists $self->{_dist_idx}->{ $dist->name };
+    return if exists $self->{dists}->{ $dist->name };
 
     # add dist to the dists index
-    $self->{_dist_idx}->{ $dist->name } = $dist;
+    $self->{dists}->{ $dist->name } = $dist;
+
+    push $self->{dists_order}->@*, $dist;
 
     # register dist share lib
     $self->{share}->register_lib( $dist->name, $dist->{share_dir} );
+
+    $Pcore::Core::L10N::PROCESSED = 0;
 
     return;
 }
 
 sub dist ( $self, $dist_name = undef ) {
     if ($dist_name) {
-        return $self->{_dist_idx}->{ $dist_name =~ s/::/-/smgr };
+        return $self->{dists}->{ $dist_name =~ s/::/-/smgr };
     }
     else {
         return $self->{main_dist};
@@ -419,14 +424,14 @@ END {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 206                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
-## |      | 329                  | * Subroutine "END" with high complexity score (23)                                                             |
+## |      | 207                  | * Subroutine "BUILD1" with high complexity score (23)                                                          |
+## |      | 334                  | * Subroutine "END" with high complexity score (23)                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 340                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
+## |    3 | 345                  | Variables::RequireInitializationForLocalVars - "local" variable not initialized                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 380                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 385                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 407                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
+## |    2 | 412                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 5                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

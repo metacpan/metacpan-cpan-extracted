@@ -1,14 +1,251 @@
+NAME
 
+    Data::Validate::WithYAML - Validation framework that can be configured
+    with YAML files
 
-This archive contains the distribution Data-Validate-WithYAML,
-version 0.16:
+VERSION
 
-  Validation framework that can be configured with YAML files
+    version 0.17
 
-This software is Copyright (c) 2014 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+    Perhaps a little code snippet.
 
-  The Artistic License 2.0 (GPL Compatible)
+        use Data::Validate::WithYAML;
+    
+        my $foo = Data::Validate::WithYAML->new( 'test.yml' );
+        my %map = (
+            name     => 'Test Person',
+            password => 'xasdfjakslr453$',
+            plz      => 64569,
+            word     => 'Herr',
+            age      => 55,
+        );
+        
+        for my $field ( keys %map ){
+            print "ok: ",$map{$field},"\n" if $foo->check( $field, $map{$field} );
+        }
 
+    data.yml
+
+      ---
+      step1:
+          name:
+              type: required
+              length: 8,122
+          password:
+              type: required
+              length: 10,
+          plz:
+              regex: ^\d{4,5}$
+              type: optional
+          word:
+              enum:
+                  - Herr
+                  - Frau
+                  - Firma
+          age:
+              type: required
+              min: 18
+              max: 65
+
+METHODS
+
+ new
+
+      my $foo = Data::Validate::WithYAML->new( 'filename' );
+      my $foo = Data::Validate::WithYAML->new(
+          'filename',
+          allow_subs => 1,
+          no_steps   => 1,
+      );
+
+    creates a new object.
+
+ set_optional
+
+    This method makes a field optional if it was required
+
+ set_required
+
+    This method makes a field required if it was optional
+
+ validate
+
+    This subroutine validates one form. You have to pass the form name (key
+    in the config file), a hash with fieldnames and its values
+
+        my %fields = (
+            username => $cgi->param('user'),
+            passwort => $password,
+        );
+        $foo->validate( 'step1', %fields );
+
+ fieldnames
+
+ errstr
+
+ message
+
+    returns the message if specified in YAML
+
+      $obj->message( 'fieldname' );
+
+ check_list
+
+      $obj->check_list('fieldname',['value','value2']);
+
+    Checks if the values match the validation criteria. Returns an arrayref
+    with checkresults:
+
+        [
+            1,
+            0,
+        ] 
+
+ check
+
+      $obj->check('fieldname','value');
+
+    checks if a value is valid. returns 1 if the value is valid, otherwise
+    it returns 0.
+
+ fieldinfo
+
+    Returns the config for the given field.
+
+    Your test.yml:
+
+      ---
+      age:
+        type: required
+        min: 18
+        max: 65
+
+    Your script:
+
+        my $info = $validator->fieldinfo( 'age' );
+
+    $info is a hashreference then:
+
+        {
+            type => 'required',
+            min  => 18,
+            max  => 65,
+        }
+
+FIELDCONFIG
+
+    These config options can be used to configure a field:
+
+      * type
+
+      mandatory. It defines if a value is required or optional
+
+      * regex
+
+      A value for this field is valid if the value matches this regular
+      expression
+
+      * min
+
+      For numeric fields. A valid value must be greater than the value
+      given for min
+
+      * max
+
+      Also for numeric fields. A valid value must be lower than the value
+      given for max
+
+      * enum
+
+      A list of valid values.
+
+      * sub
+
+      e.g.
+
+        sub: { $_ eq 'test' }
+
+      A codeblock that is evaled. You can only use this option when you set
+      allow_subs in constructor call.
+
+      * length
+
+      A value for the field must be of length within this range
+
+        length: 1,
+
+      longer than 1 char.
+
+        length: 3,5
+
+      length must be between 3 and 5 chars
+
+        length: ,5
+
+      Value must be at longest 5 chars.
+
+        length: 3
+
+      Length must be exactly 3 chars
+
+      * depends_on
+
+      Change the config for a field depending on an other field. This only
+      works when validate is called.
+
+      * case
+
+      List of values the field it depends on can have. In case the field it
+      depends on has a value listed in case, the default config for the
+      file is changed.
+
+        password:
+           type: required
+           length: 1,
+           depends_on: group
+           case:
+               admin:
+                   length: 10,
+               agent:
+                   length: 5,
+
+      If the value for group is "admin", the given password must be longer
+      than 10 chars, for agents the password must be longer than 5 chars
+      and for every other group the password must be longer than 1 char.
+
+      * depends_lax
+
+      Without this setting, a value for the field this field depends on
+      must be given.
+
+      * datatype
+
+      For a few types of values there are predefined checks.
+
+	* num
+
+	* int
+
+	* positive_int
+
+      * plugin
+
+      Use a plugin (e.g. Data::Validate::WithYAML::Plugin::EMail) to check
+      the value.
+
+        plugin: EMail
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2014 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

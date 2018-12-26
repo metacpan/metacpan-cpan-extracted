@@ -20,7 +20,7 @@ sub BUILD ( $self, $args ) {
     P->bind_events(
         ['log.#'],
         sub ( $ev ) {
-            my $data = ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data};
+            my $data = ref $ev->{data} ? to_json $ev->{data}, readable => 1 : $ev->{data};
 
             my $values->@{qw[created channel level title data]} = ( SQL [ 'to_timestamp(', \$ev->{timestamp}, ')' ], $ev->@{qw[channel level title]}, $data );
 

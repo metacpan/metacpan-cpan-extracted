@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -75,7 +75,7 @@ UTESTCASE emptyTable(Utest *utest)
 	UT_IS(tt->getFirstLeaf(), NULL);
 
 	tt->initialize();
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "no indexes are defined\n");
 }
 
@@ -97,12 +97,12 @@ UTESTCASE hashedIndex(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	// repeated initialization should be fine
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	const char *expect =
 		"table (\n"
@@ -127,22 +127,29 @@ UTESTCASE hashedIndex(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 	UT_IS(tt->findSubIndexById(IndexType::IT_HASHED), prim);
 	UT_IS(tt->getFirstLeaf(), prim);
 
 	Autoref<NameSet> expectKey = (new NameSet())->add("a")->add("e");
-	const NameSet *key = prim->getKey();
-	UT_ASSERT(key != NULL);
-	UT_ASSERT(key->equals(expectKey));
+	{
+		const NameSet *key = prim->getKey();
+		UT_ASSERT(key != NULL);
+		UT_ASSERT(key->equals(expectKey));
+	}
+	{
+		const NameSet *key = prim->getKeyExpr();
+		UT_ASSERT(key != NULL);
+		UT_ASSERT(key->equals(expectKey));
+	}
 
-	UT_IS(tt->findSubIndexById(IndexType::IT_LAST), NULL);
-	UT_IS(tt->findSubIndex("nosuch"), NULL);
+	UT_IS(tt->findSubIndexById(IndexType::IT_LAST), NO_INDEX_TYPE);
+	UT_IS(tt->findSubIndex("nosuch"), NO_INDEX_TYPE);
 
-	UT_IS(prim->findSubIndex("nosuch"), NULL);
-	UT_IS(prim->findSubIndex("nosuch")->findSubIndex("nothat"), NULL);
-	UT_IS(prim->findSubIndexById(IndexType::IT_LAST), NULL);
-	UT_IS(prim->findSubIndex("nosuch")->findSubIndexById(IndexType::IT_LAST), NULL);
+	UT_IS(prim->findSubIndex("nosuch"), NO_INDEX_TYPE);
+	UT_IS(prim->findSubIndex("nosuch")->findSubIndex("nothat"), NO_INDEX_TYPE);
+	UT_IS(prim->findSubIndexById(IndexType::IT_LAST), NO_INDEX_TYPE);
+	UT_IS(prim->findSubIndex("nosuch")->findSubIndexById(IndexType::IT_LAST), NO_INDEX_TYPE);
 }
 
 UTESTCASE badRow(Utest *utest)
@@ -152,7 +159,7 @@ UTESTCASE badRow(Utest *utest)
 	fld[1].name_ = "a"; // duplicate field name
 
 	Autoref<RowType> rt1 = new CompactRowType(fld);
-	UT_ASSERT(rt1->getErrors()->hasError());
+	UT_ASSERT(rt1->getErrors().hasError());
 
 	Autoref<TableType> tt = (new TableType(rt1))
 		->addSubIndex("primary", new HashedIndexType(
@@ -163,7 +170,7 @@ UTESTCASE badRow(Utest *utest)
 	tt->initialize();
 	if (UT_ASSERT(!tt->getErrors().isNull()))
 		return;
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "row type error:\n  duplicate field name 'a' for fields 2 and 1\n");
 }
 
@@ -178,7 +185,7 @@ UTESTCASE nullRow(Utest *utest)
 	UT_ASSERT(tt);
 	if (UT_ASSERT(!tt->getErrors().isNull()))
 		return;
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "the row type is not set\n");
 }
 
@@ -199,7 +206,7 @@ UTESTCASE badIndexName(Utest *utest)
 	tt->initialize();
 	if (UT_ASSERT(!tt->getErrors().isNull()))
 		return;
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "index error:\n  nested index 1 is not allowed to have an empty name\n");
 }
 
@@ -219,7 +226,7 @@ UTESTCASE nullIndex(Utest *utest)
 	tt->initialize();
 	if (UT_ASSERT(!tt->getErrors().isNull()))
 		return;
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "index error:\n  nested index 1 'primary' reference must not be NULL\n");
 }
 
@@ -250,7 +257,7 @@ UTESTCASE dupIndexName(Utest *utest)
 		return;
 
 	// also test checkOrThrow()
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	try {
 		checkOrThrow(tt);
 	} catch (Exception e) {
@@ -270,7 +277,7 @@ UTESTCASE throwOnBad(Utest *utest)
 	fld[1].name_ = "a"; // duplicate field name
 
 	Autoref<RowType> rt1 = new CompactRowType(fld);
-	UT_ASSERT(rt1->getErrors()->hasError());
+	UT_ASSERT(rt1->getErrors().hasError());
 
 	try {
 		Autoref<TableType> tt = initializeOrThrow(TableType::make(rt1)
@@ -295,7 +302,7 @@ UTESTCASE throwModInitalized(Utest *utest)
 	mkfields(fld);
 
 	Autoref<RowType> rt1 = new CompactRowType(fld);
-	UT_ASSERT(!rt1->getErrors()->hasError());
+	UT_ASSERT(!rt1->getErrors().hasError());
 
 	Autoref<TableType> tt = TableType::make(rt1
 		)->addSubIndex("primary", HashedIndexType::make(
@@ -305,7 +312,7 @@ UTESTCASE throwModInitalized(Utest *utest)
 		);
 
 	tt->initialize();
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	msg.clear();
 	try {
@@ -316,7 +323,7 @@ UTESTCASE throwModInitalized(Utest *utest)
 	UT_IS(msg, "Attempted to add a sub-index 'zzz' to an initialized table type\n");
 
 	HashedIndexType *primary = dynamic_cast<HashedIndexType *>(tt->findSubIndex("primary"));
-	UT_ASSERT(primary != NULL);
+	UT_ASSERT(primary != NO_INDEX_TYPE);
 
 	msg.clear();
 	try {
@@ -343,7 +350,7 @@ UTESTCASE throwModInitalized(Utest *utest)
 	UT_IS(msg, "Attempted to set the key on an initialized Hashed index type\n");
 
 	FifoIndexType *secondary = dynamic_cast<FifoIndexType *>(primary->findSubIndex("secondary"));
-	UT_ASSERT(secondary != NULL);
+	UT_ASSERT(secondary != NO_INDEX_TYPE);
 
 	msg.clear();
 	try {
@@ -417,18 +424,18 @@ UTESTCASE hashedNested(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("primary");
-	if (UT_ASSERT(prim != NULL))
+	if (UT_ASSERT(prim != NO_INDEX_TYPE))
 		return;
 	UT_IS(tt->findSubIndexById(IndexType::IT_HASHED), prim);
 
 	IndexType *sec = prim->findSubIndex("level2");
-	if (UT_ASSERT(sec != NULL))
+	if (UT_ASSERT(sec != NO_INDEX_TYPE))
 		return;
 	UT_IS(prim->getTabtype(), tt);
 	UT_IS(prim->findSubIndexById(IndexType::IT_HASHED), sec);
 
-	UT_IS(sec->findSubIndex("nosuch"), NULL);
-	UT_IS(sec->findSubIndexById(IndexType::IT_LAST), NULL);
+	UT_IS(sec->findSubIndex("nosuch"), NO_INDEX_TYPE);
+	UT_IS(sec->findSubIndexById(IndexType::IT_LAST), NO_INDEX_TYPE);
 }
 
 UTESTCASE hashedBadField(Utest *utest)
@@ -449,7 +456,7 @@ UTESTCASE hashedBadField(Utest *utest)
 	tt->initialize();
 	if (UT_ASSERT(!tt->getErrors().isNull()))
 		return;
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "index error:\n  nested index 1 'primary':\n    can not find the key field 'x'\n");
 }
 
@@ -468,12 +475,12 @@ UTESTCASE fifoIndex(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	// repeated initialization should be fine
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	const char *expect =
 		"table (\n"
@@ -498,11 +505,17 @@ UTESTCASE fifoIndex(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("fifo");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 	UT_IS(tt->findSubIndexById(IndexType::IT_FIFO), prim);
 
-	const NameSet *key = prim->getKey();
-	UT_ASSERT(key == NULL);
+	{
+		const NameSet *key = prim->getKey();
+		UT_ASSERT(key == NULL);
+	}
+	{
+		const NameSet *key = prim->getKeyExpr();
+		UT_ASSERT(key == NULL);
+	}
 }
 
 UTESTCASE fifoIndexLimit(Utest *utest)
@@ -520,12 +533,12 @@ UTESTCASE fifoIndexLimit(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	// repeated initialization should be fine
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	const char *expect =
 		"table (\n"
@@ -550,7 +563,7 @@ UTESTCASE fifoIndexLimit(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("fifo");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 	UT_IS(tt->findSubIndexById(IndexType::IT_FIFO), prim);
 }
 
@@ -579,12 +592,12 @@ UTESTCASE fifoIndexJumping(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	// repeated initialization should be fine
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	const char *expect =
 		"table (\n"
@@ -609,7 +622,7 @@ UTESTCASE fifoIndexJumping(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("fifo");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 	UT_IS(tt->findSubIndexById(IndexType::IT_FIFO), prim);
 }
 
@@ -638,12 +651,12 @@ UTESTCASE fifoIndexReverse(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	// repeated initialization should be fine
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	const char *expect =
 		"table (\n"
@@ -668,7 +681,7 @@ UTESTCASE fifoIndexReverse(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("fifo");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 	UT_IS(tt->findSubIndexById(IndexType::IT_FIFO), prim);
 }
 
@@ -689,7 +702,7 @@ UTESTCASE fifoBadJumping(Utest *utest)
 	tt->initialize();
 	if (UT_ASSERT(!tt->getErrors().isNull()))
 		return;
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "index error:\n  nested index 1 'fifo':\n    FifoIndexType requires a non-0 limit for the jumping mode\n");
 }
 
@@ -713,7 +726,7 @@ UTESTCASE fifoBadNested(Utest *utest)
 	tt->initialize();
 	if (UT_ASSERT(!tt->getErrors().isNull()))
 		return;
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 	UT_IS(tt->getErrors()->print(), "index error:\n  nested index 1 'fifo':\n    FifoIndexType currently does not support further nested indexes\n");
 }
 
@@ -794,11 +807,11 @@ UTESTCASE sortedIndex(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	// repeated initialization should not be an issue
 	tt->initialize();
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	const char *expect =
 		"table (\n"
@@ -824,10 +837,10 @@ UTESTCASE sortedIndex(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 	UT_IS(tt->findSubIndexById(IndexType::IT_SORTED), prim);
 	UT_IS(tt->getFirstLeaf(), prim);
-	UT_IS(tt->findSubIndexById(IndexType::IT_HASHED), NULL);
+	UT_IS(tt->findSubIndexById(IndexType::IT_HASHED), NO_INDEX_TYPE);
 }
 
 UTESTCASE sortedIndexBad(Utest *utest)
@@ -845,7 +858,7 @@ UTESTCASE sortedIndexBad(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(!tt->getErrors().isNull());
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 
 	UT_IS(tt->getErrors()->print(), 
 		"index error:\n"
@@ -899,12 +912,12 @@ UTESTCASE sortedNested(Utest *utest)
 
 	// get back the initialized types
 	IndexType *prim = tt->findSubIndex("primary");
-	if (UT_ASSERT(prim != NULL))
+	if (UT_ASSERT(prim != NO_INDEX_TYPE))
 		return;
 	UT_IS(tt->findSubIndexById(IndexType::IT_SORTED), prim);
 
 	IndexType *sec = prim->findSubIndex("level2");
-	if (UT_ASSERT(sec != NULL))
+	if (UT_ASSERT(sec != NO_INDEX_TYPE))
 		return;
 	UT_IS(prim->getTabtype(), tt);
 	UT_IS(prim->findSubIndexById(IndexType::IT_HASHED), sec);
@@ -1084,8 +1097,8 @@ UTESTCASE aggregator(Utest *utest)
 		->addSubIndex("primary", (new HashedIndexType(
 			(new NameSet())->add("a")->add("e")))
 			->setAggregator(agt1)
-			->addSubIndex("level2", new HashedIndexType(
-				(new NameSet())->add("a")->add("e"))
+			->addSubIndex("level2", new OrderedIndexType(
+				(new NameSet())->add("a")->add("!e"))
 			)
 		)
 		;
@@ -1106,13 +1119,13 @@ UTESTCASE aggregator(Utest *utest)
 			;
 		UT_ASSERT(ttbad);
 		ttbad->initialize();
-		UT_ASSERT(ttbad->getErrors()->hasError());
+		UT_ASSERT(ttbad->getErrors().hasError());
 		string s = ttbad->getErrors()->print();
 		UT_IS(s, "index error:\n  nested index 1 'primary':\n    aggregator 'onPrimary' internal error: the result row type is not initialized\n");
 	}
 	
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 	const AggregatorType *agt2 = prim->getAggregator();
 	UT_ASSERT(agt2 != NULL);
 	UT_ASSERT(agt2 != agt1.get()); // it must have been copied when set
@@ -1147,7 +1160,7 @@ UTESTCASE aggregator(Utest *utest)
 		"  }\n"
 		") {\n"
 		"  index HashedIndex(a, e, ) {\n"
-		"    index HashedIndex(a, e, ) level2,\n"
+		"    index OrderedIndex(a, !e, ) level2,\n"
 		"  } {\n"
 		"    aggregator (\n"
 		"      row {\n"
@@ -1167,7 +1180,7 @@ UTESTCASE aggregator(Utest *utest)
 		printf("---\n");
 		fflush(stdout);
 	}
-	UT_IS(tt->print(NOINDENT), "table ( row { uint8[10] a, int32[] b, int64 c, float64 d, string e, } ) { index HashedIndex(a, e, ) { index HashedIndex(a, e, ) level2, } { aggregator ( row { uint8[10] a, int32[] b, int64 c, float64 d, string e, } ) onPrimary } primary, }");
+	UT_IS(tt->print(NOINDENT), "table ( row { uint8[10] a, int32[] b, int64 c, float64 d, string e, } ) { index HashedIndex(a, e, ) { index OrderedIndex(a, !e, ) level2, } { aggregator ( row { uint8[10] a, int32[] b, int64 c, float64 d, string e, } ) onPrimary } primary, }");
 
 }
 
@@ -1192,6 +1205,7 @@ UTESTCASE copy(Utest *utest)
 	Autoref<AggregatorType> agt1 = new BasicAggregatorType("onPrimary", rt1, dummyAggregator);
 	Autoref<AggregatorType> agt2 = new BasicAggregatorType("onSecondary", rt1, dummyAggregator);
 	Autoref<AggregatorType> agt3 = new BasicAggregatorType("onTertiary", rt1, dummyAggregator);
+	Autoref<AggregatorType> agt4 = new BasicAggregatorType("onFourth", rt1, dummyAggregator); 
 	
 	// now build the table type
 	Autoref<TableType> tt = (new TableType(rt1))
@@ -1205,27 +1219,38 @@ UTESTCASE copy(Utest *utest)
 			->setAggregator(agt3)
 			->addSubIndex("level2", new FifoIndexType)
 		)
+		->addSubIndex("fourth", (new HashedIndexType(
+			(new NameSet())->add("a")->add("!e")))
+			->setAggregator(agt4)
+			->addSubIndex("level2", new FifoIndexType)
+			)
 		;
 
 	// Check that it matches before the deep-copying.
 	{
 		IndexType *prim = tt->findSubIndex("primary");
-		UT_ASSERT(prim != NULL);
+		UT_ASSERT(prim != NO_INDEX_TYPE);
 		const AggregatorType *cpagt1 = prim->getAggregator();
 		UT_ASSERT(cpagt1 != NULL);
 		UT_IS(tt->rowType(), cpagt1->getRowType());
 
 		IndexType *sec = prim->findSubIndex("level2");
-		UT_ASSERT(sec != NULL);
+		UT_ASSERT(sec != NO_INDEX_TYPE);
 		const AggregatorType *cpagt2 = sec->getAggregator();
 		UT_ASSERT(cpagt2 != NULL);
 		UT_IS(tt->rowType(), cpagt2->getRowType());
 
 		IndexType *tert = tt->findSubIndex("tertiary");
-		UT_ASSERT(tert != NULL);
+		UT_ASSERT(tert != NO_INDEX_TYPE);
 		const AggregatorType *cpagt3 = tert->getAggregator();
 		UT_ASSERT(cpagt3 != NULL);
 		UT_IS(tt->rowType(), cpagt3->getRowType());
+
+		IndexType *four = tt->findSubIndex("fourth");
+		UT_ASSERT(four != NO_INDEX_TYPE);
+		const AggregatorType *cpagt4 = four->getAggregator();
+		UT_ASSERT(cpagt4 != NULL);
+		UT_IS(tt->rowType(), cpagt4->getRowType());
 	}
 
 	// check the shallow copy
@@ -1233,29 +1258,35 @@ UTESTCASE copy(Utest *utest)
 		Autoref<TableType> cptt = tt->copy();
 
 		IndexType *prim = cptt->findSubIndex("primary");
-		UT_ASSERT(prim != NULL);
+		UT_ASSERT(prim != NO_INDEX_TYPE);
 		const AggregatorType *cpagt1 = prim->getAggregator();
 		UT_IS(rt1, cpagt1->getRowType());
 		UT_ASSERT(cpagt1 != NULL);
 		UT_IS(cptt->rowType(), cpagt1->getRowType());
 
 		IndexType *sec = prim->findSubIndex("level2");
-		UT_ASSERT(sec != NULL);
+		UT_ASSERT(sec != NO_INDEX_TYPE);
 		const AggregatorType *cpagt2 = sec->getAggregator();
 		UT_ASSERT(cpagt2 != NULL);
 		UT_IS(cptt->rowType(), cpagt2->getRowType());
 
 		IndexType *tert = cptt->findSubIndex("tertiary");
-		UT_ASSERT(tert != NULL);
+		UT_ASSERT(tert != NO_INDEX_TYPE);
 		const AggregatorType *cpagt3 = tert->getAggregator();
 		UT_ASSERT(cpagt3 != NULL);
 		UT_IS(cptt->rowType(), cpagt3->getRowType());
+
+		IndexType *four = cptt->findSubIndex("fourth");
+		UT_ASSERT(four != NO_INDEX_TYPE);
+		const AggregatorType *cpagt4 = four->getAggregator();
+		UT_ASSERT(cpagt4 != NULL);
+		UT_IS(cptt->rowType(), cpagt4->getRowType());
 	}
 
 	// check the flat copy
 	{
 		IndexType *prim0 = tt->findSubIndex("primary");
-		UT_ASSERT(prim0 != NULL);
+		UT_ASSERT(prim0 != NO_INDEX_TYPE);
 
 		Autoref<IndexType> prim1 = prim0->copy(true);
 		UT_ASSERT(!prim1.isNull());
@@ -1263,18 +1294,26 @@ UTESTCASE copy(Utest *utest)
 		UT_ASSERT(prim1->isLeaf()); // all the sun-indexes are gone
 
 		Autoref<IndexType> sec0 = prim0->findSubIndex("level2");
-		UT_ASSERT(!sec0.isNull());
+		UT_ASSERT(sec0.ne(NO_INDEX_TYPE));
 
 		Autoref<IndexType> sec1 = sec0->copy(true);
 		UT_ASSERT(!sec1.isNull());
 
 		Autoref<IndexType> tert0 = tt->findSubIndex("tertiary");
-		UT_ASSERT(!tert0.isNull());
+		UT_ASSERT(tert0.ne(NO_INDEX_TYPE));
 
 		Autoref<IndexType> tert1 = tert0->copy(true);
 		UT_ASSERT(!tert1.isNull());
 		UT_ASSERT(tert1->getAggregator() == NULL);
 		UT_ASSERT(tert1->isLeaf()); // all the sun-indexes are gone
+
+		Autoref<IndexType> four0 = tt->findSubIndex("fourth");
+		UT_ASSERT(four0.ne(NO_INDEX_TYPE));
+
+		Autoref<IndexType> four1 = four0->copy(true);
+		UT_ASSERT(!four1.isNull());
+		UT_ASSERT(four1->getAggregator() == NULL);
+		UT_ASSERT(four1->isLeaf()); // all the sun-indexes are gone
 	}
 
 	// deep copy with a holder
@@ -1283,44 +1322,56 @@ UTESTCASE copy(Utest *utest)
 		Autoref<TableType> cptt = tt->deepCopy(hrt1);
 
 		IndexType *prim = cptt->findSubIndex("primary");
-		UT_ASSERT(prim != NULL);
+		UT_ASSERT(prim != NO_INDEX_TYPE);
 		const AggregatorType *cpagt1 = prim->getAggregator();
 		UT_ASSERT(cpagt1 != NULL);
 		UT_IS(cptt->rowType(), cpagt1->getRowType());
 
 		IndexType *sec = prim->findSubIndex("level2");
-		UT_ASSERT(sec != NULL);
+		UT_ASSERT(sec != NO_INDEX_TYPE);
 		const AggregatorType *cpagt2 = sec->getAggregator();
 		UT_ASSERT(cpagt2 != NULL);
 		UT_IS(cptt->rowType(), cpagt2->getRowType());
 
 		IndexType *tert = cptt->findSubIndex("tertiary");
-		UT_ASSERT(tert != NULL);
+		UT_ASSERT(tert != NO_INDEX_TYPE);
 		const AggregatorType *cpagt3 = tert->getAggregator();
 		UT_ASSERT(cpagt3 != NULL);
 		UT_IS(cptt->rowType(), cpagt3->getRowType());
+
+		IndexType *four = cptt->findSubIndex("fourth");
+		UT_ASSERT(four != NO_INDEX_TYPE);
+		const AggregatorType *cpagt4 = four->getAggregator();
+		UT_ASSERT(cpagt4 != NULL);
+		UT_IS(cptt->rowType(), cpagt4->getRowType());
 	}
 
 	// deep copy without a holder
 	{
-		Autoref<TableType> cptt = tt->deepCopy(NULL);// the default NULL holder
+		Autoref<TableType> cptt = tt->deepCopy(NO_HOLD_ROW_TYPES);
 		IndexType *prim = cptt->findSubIndex("primary");
-		UT_ASSERT(prim != NULL);
+		UT_ASSERT(prim != NO_INDEX_TYPE);
 		const AggregatorType *cpagt1 = prim->getAggregator();
 		UT_ASSERT(cpagt1 != NULL);
 		UT_ASSERT(cptt->rowType() != cpagt1->getRowType());
 
 		IndexType *sec = prim->findSubIndex("level2");
-		UT_ASSERT(sec != NULL);
+		UT_ASSERT(sec != NO_INDEX_TYPE);
 		const AggregatorType *cpagt2 = sec->getAggregator();
 		UT_ASSERT(cpagt2 != NULL);
 		UT_ASSERT(cptt->rowType() != cpagt2->getRowType());
 
 		IndexType *tert = cptt->findSubIndex("tertiary");
-		UT_ASSERT(tert != NULL);
+		UT_ASSERT(tert != NO_INDEX_TYPE);
 		const AggregatorType *cpagt3 = tert->getAggregator();
 		UT_ASSERT(cpagt3 != NULL);
 		UT_ASSERT(cptt->rowType() != cpagt3->getRowType());
+
+		IndexType *four = cptt->findSubIndex("fourth");
+		UT_ASSERT(four != NO_INDEX_TYPE);
+		const AggregatorType *cpagt4 = four->getAggregator();
+		UT_ASSERT(cpagt4 != NULL);
+		UT_ASSERT(cptt->rowType() != cpagt4->getRowType());
 	}
 }
 

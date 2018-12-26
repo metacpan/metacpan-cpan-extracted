@@ -1,7 +1,8 @@
 package Sys::Info::Base;
+$Sys::Info::Base::VERSION = '0.7807';
 use strict;
 use warnings;
-use vars qw( $VERSION );
+
 use IO::File;
 use Carp qw( croak );
 use File::Spec;
@@ -10,8 +11,6 @@ use constant DRIVER_FAIL_MSG => q{Operating system identified as: '%s'. }
                               . q{Native driver can not be loaded: %s. }
                               . q{Falling back to compatibility mode};
 use constant YEAR_DIFF => 1900;
-
-$VERSION = '0.7804';
 
 my %LOAD_MODULE; # cache
 my %UNAME;       # cache
@@ -133,10 +132,17 @@ sub uname {
 
 __END__
 
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Sys::Info::Base - Base class for Sys::Info
+Sys::Info::Base
+
+=head1 VERSION
+
+version 0.7807
 
 =head1 SYNOPSIS
 
@@ -149,10 +155,11 @@ Sys::Info::Base - Base class for Sys::Info
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7804> of C<Sys::Info::Base>
-released on C<21 January 2015>.
-
 Includes some common methods.
+
+=head1 NAME
+
+Sys::Info::Base - Base class for Sys::Info
 
 =head1 METHODS
 
@@ -195,15 +202,13 @@ L<Sys::Info>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2015 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

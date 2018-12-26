@@ -1,8 +1,18 @@
+# PODNAME: Text::Template::Simple::API
+
+__END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Text::Template::Simple::API - Simple text template engine API reference
+Text::Template::Simple::API
+
+=head1 VERSION
+
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -29,6 +39,10 @@ language. Instead, it uses Perl as a template language. Templates
 can be cached on disk or inside the memory via internal cache 
 manager. It is also possible to use static/dynamic includes,
 pass parameters to includes and allpt filters on them.
+
+=head1 NAME
+
+Text::Template::Simple::API - Simple text template engine API reference
 
 =head1 METHODS
 
@@ -119,7 +133,7 @@ and then you can use it (without defining) inside any template that
 is compiled with C<$tts> object:
 
    Foo is <%=$foo%>
-   
+
 =head3 include_paths
 
 An ARRAY reference. If you want to use relative file paths when
@@ -549,5 +563,16 @@ use the C<SHARE> commad instead to explicitly share variables with includes.
 =head1 SEE ALSO
 
 L<Text::Template::Simple>.
+
+=head1 AUTHOR
+
+Burak Gursoy <burak@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2004 by Burak Gursoy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

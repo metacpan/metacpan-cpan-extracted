@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -553,22 +553,22 @@ ok($@, qr/^Triceps::FnBinding::new: invalid arguments:\n  Unknown return label n
 ok($@, qr/^Triceps::FnBinding::new: invalid arguments:
   Attempted to add a mismatching label 'lbind1' to name 'two'.
     The expected row type:
-    row {
+    row \{
         uint8 a,
         int32 b,
         int64 c,
         float64 d,
         string e,
         int32 f,
-      }
+      \}
     The row type of actual label 'lbind1':
-    row {
+    row \{
         uint8 a,
         int32 b,
         int64 c,
         float64 d,
         string e,
-      }/);
+      \}/);
 #print "$@";
 
 ######################### 

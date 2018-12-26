@@ -8,7 +8,7 @@ use Devel::hdb::TraceFollow;
 use IO::Socket::INET;
 use IO::File;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 sub import {
     my $class = shift;
@@ -115,6 +115,13 @@ subroutine.
 =item Run
 
 Resumes execution of the program until the next breakpoint.
+
+=item Run/to
+
+Opens a dialog that allows setting a one-shot breakpoint.  The program will
+then continue until the next breakpoint, likely the one just entered.  This
+breakpoint is entered in the same manner as the Quick Breakpoints described
+below.
 
 =item Exit
 

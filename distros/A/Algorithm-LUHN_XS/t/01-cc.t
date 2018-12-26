@@ -7,7 +7,7 @@ use Algorithm::LUHN_XS qw/check_digit check_digit_fast check_digit_rff
 BEGIN { plan tests => 69 }
 
 # Check some straight-forward, numeric only values
-my @values = qw/424242424242424 2 83764912 8 123456781234567 0 4992739871 6/;
+my @values=qw/424242424242424 2 83764912 8 123456781234567 0 4992739871 6/;
 while (@values) {
   my ($v, $expected) = splice @values, 0, 2;
   my $c = check_digit($v);
@@ -18,15 +18,16 @@ while (@values) {
   ok($c, $expected, "check_digit_rff($v): expected $expected; got $c\n");
 
   ok(is_valid("$v$expected"));
-  ok(!is_valid($v.9-$expected));
+  # sprintf() avoids perl turning 123456789 into 1.23456789e+1
+  ok(!is_valid($v.sprintf("%d",9-$expected)));
   ok($Algorithm::LUHN_XS::ERROR, qr/^Check digit/,
-   "  Did not get the expected error. Got $Algorithm::LUHN_XS::ERROR\n");
+   "Did not get the expected error. Got $Algorithm::LUHN_XS::ERROR\n");
 
   ok(is_valid_fast("$v$expected"));
-  ok(!is_valid_fast($v.9-$expected));
+  ok(!is_valid_fast($v.sprintf("%d",9-$expected)));
    
   ok(is_valid_rff("$v$expected"));
-  ok(!is_valid_rff($v.9-$expected));
+  ok(!is_valid_rff($v.sprintf("%d",9-$expected)));
 }
 # Check a value including alphas (should fail).
 my ($v, $c);

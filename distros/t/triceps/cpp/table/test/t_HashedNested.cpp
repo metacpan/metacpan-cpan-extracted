@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -79,7 +79,7 @@ UTESTCASE primaryIndex(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -123,7 +123,7 @@ UTESTCASE withError(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(!tt->getErrors().isNull());
-	UT_ASSERT(tt->getErrors()->hasError());
+	UT_ASSERT(tt->getErrors().hasError());
 
 	UT_IS(tt->getErrors()->print(), "index error:\n  nested index 1 'primary':\n    nested index 1 'level2':\n      can not find the key field 'x'\n");
 
@@ -157,16 +157,16 @@ UTESTCASE tableops(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
 
 	IndexType *prim = tt->findSubIndex("primary");
-	UT_ASSERT(prim != NULL);
+	UT_ASSERT(prim != NO_INDEX_TYPE);
 
 	IndexType *sec = prim->findSubIndex("level2");
-	UT_ASSERT(sec != NULL);
+	UT_ASSERT(sec != NO_INDEX_TYPE);
 
 	// above here was a copy of primaryIndex()
 
@@ -338,7 +338,7 @@ UTESTCASE queuing(Utest *utest)
 	UT_ASSERT(tt0);
 	tt0->initialize();
 	UT_ASSERT(tt0->getErrors().isNull());
-	UT_ASSERT(!tt0->getErrors()->hasError());
+	UT_ASSERT(!tt0->getErrors().hasError());
 
 	Autoref<Table> t0 = tt0->makeTable(unit, "t0");
 	UT_ASSERT(!t0.isNull());
@@ -349,13 +349,13 @@ UTESTCASE queuing(Utest *utest)
 	UT_ASSERT(tt1);
 	tt1->initialize();
 	UT_ASSERT(tt1->getErrors().isNull());
-	UT_ASSERT(!tt1->getErrors()->hasError());
+	UT_ASSERT(!tt1->getErrors().hasError());
 
 	Autoref<Table> t1 = tt1->makeTable(unit, "t1");
 	UT_ASSERT(!t1.isNull());
 
 	// connect the tables
-	UT_ASSERT(!t0->getLabel()->chain(t1->getInputLabel())->hasError());
+	UT_ASSERT(!t0->getLabel()->chain(t1->getInputLabel()).hasError());
 
 	// create a matrix of records, across both axes of indexing
 	RowHandle *iter;

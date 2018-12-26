@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -15,7 +15,7 @@
 use ExtUtils::testlib;
 
 use Test;
-BEGIN { plan tests => 170 };
+BEGIN { plan tests => 174 };
 use Triceps;
 ok(1); # If we made it this far, we're ok.
 
@@ -45,11 +45,13 @@ ok(&Triceps::TW_AFTER_CHAINED, 3);
 ok(&Triceps::TW_BEFORE_DRAIN, 4);
 ok(&Triceps::TW_AFTER_DRAIN, 5);
 
-ok(&Triceps::IT_ROOT, 0);
-ok(&Triceps::IT_HASHED, 1);
-ok(&Triceps::IT_FIFO, 2);
-ok(&Triceps::IT_SORTED, 3);
-ok(&Triceps::IT_LAST, 4);
+ok(&Triceps::IT_NONE, 0);
+ok(&Triceps::IT_ROOT, 1);
+ok(&Triceps::IT_HASHED, 2);
+ok(&Triceps::IT_FIFO, 3);
+ok(&Triceps::IT_SORTED, 4);
+ok(&Triceps::IT_ORDERED, 5);
+ok(&Triceps::IT_LAST, 6);
 
 ok(&Triceps::AO_BEFORE_MOD, 0);
 ok(&Triceps::AO_AFTER_DELETE, 1);
@@ -104,6 +106,7 @@ ok($@, qr/^Triceps::humanStringTracerWhen: bad human-readable TracerWhen string 
 ok(&Triceps::humanStringTracerWhenSafe("after-drain"), &Triceps::TW_AFTER_DRAIN);
 ok(&Triceps::humanStringTracerWhenSafe("xxx"), undef);
 
+ok(&Triceps::stringIndexId("IT_NONE"), &Triceps::IT_NONE);
 ok(&Triceps::stringIndexId("IT_ROOT"), &Triceps::IT_ROOT);
 ok(&Triceps::stringIndexId("IT_HASHED"), &Triceps::IT_HASHED);
 ok(&Triceps::stringIndexId("IT_FIFO"), &Triceps::IT_FIFO);
@@ -169,6 +172,7 @@ ok($@, qr/^Triceps::tracerWhenHumanString: TracerWhen value '999' not defined in
 ok(&Triceps::tracerWhenHumanStringSafe(&Triceps::TW_AFTER_DRAIN), "after-drain");
 ok(&Triceps::tracerWhenHumanStringSafe(999), undef);
 
+ok(&Triceps::indexIdString(&Triceps::IT_NONE), "IT_NONE");
 ok(&Triceps::indexIdString(&Triceps::IT_ROOT), "IT_ROOT");
 ok(&Triceps::indexIdString(&Triceps::IT_HASHED), "IT_HASHED");
 ok(&Triceps::indexIdString(&Triceps::IT_FIFO), "IT_FIFO");
@@ -271,4 +275,4 @@ sub sub2 {
 }
 
 eval { &sub2; };
-ok($@, qr/^Triceps::Unit::schedule\(\): self is not a blessed SV reference to WrapUnitPtr at \S+ line \S+\n\tmain::sub1 called at \S+ line \S+\n\tmain::sub2 called at \S+ line \S+\n\teval {...} called at \S+ line \S+/);
+ok($@, qr/^Triceps::Unit::schedule\(\): self is not a blessed SV reference to WrapUnitPtr at \S+ line \S+\n\tmain::sub1 called at \S+ line \S+\n\tmain::sub2 called at \S+ line \S+\n\teval \{...\} called at \S+ line \S+/);

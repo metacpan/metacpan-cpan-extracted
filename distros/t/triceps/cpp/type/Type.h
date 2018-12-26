@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -44,9 +44,10 @@ public:
 
 	// @param simple - flag: this is a simple type (must be consistent with typeid)
 	// @param id - 
-	Type(bool simple, TypeId id) :
+	Type(bool simple, TypeId id, int size = 0) :
 		typeId_(id),
-		simple_(simple) 
+		simple_(simple),
+		size_(size)
 	{ }
 		
 	virtual ~Type()
@@ -64,6 +65,12 @@ public:
 		return typeId_;
 	}
 
+	// @return - the size of a basic element, or 0 if not applicable
+	int getSize() const
+	{
+		return size_;
+	}
+
 	// A convenience function to find a simple type by name (including void).
 	// @param name - name of the type
 	// @return - the type reference (one of r_*) or NULL if not found
@@ -73,7 +80,6 @@ public:
 	// The checkOrThrow() from common/Initialize.h can be used to throw on errors.
 	// @return - errors reference, may be NULL
 	virtual Erref getErrors() const = 0;
-
 
 	// The types can be equal in one of 3 ways, in order or decreasting exactness:
 	// 1. Exactly the same Type object.
@@ -109,6 +115,19 @@ public:
 	// @return - the result string
 	string print(const string &indent = "", const string &subindent = "  ") const;
 
+	// Compare two values of this type. Returns -1 if the left value is less
+	// than the right one, 1 if greater, and 0 if equal. Returns -2 (CMP_NOT_SUPPORTED)
+	// if the comparison is not supported for this type.
+	//
+	// @param left - the left value to compare
+	// @param szleft - size in bytes of the left value; if the values of this type
+	//        are represented as fixed-length, the method may ignore this length
+	// @param right - the right value to compare
+	// @param szright - size in bytes of the right value; if the values of this type
+	//        are represented as fixed-length, the method may ignore this length
+	enum { CMP_NOT_SUPPORTED = -2 };
+	virtual int cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const = 0;
+
 public:
 	// the global copies of the simple types that can be reused everywhere
 	static Autoref<const SimpleType> r_void;
@@ -121,6 +140,7 @@ public:
 protected:
 	enum TypeId typeId_; // allows to do switching and casting on it
 	bool simple_; // flag: this is a simple type
+	int size_; // size of the basic element of this type (0 if not a simple type)
 
 private:
 	Type();

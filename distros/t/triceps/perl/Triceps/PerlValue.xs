@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -66,7 +66,7 @@ Erref PerlValue::parse(SV *v)
 			for (int i = 0; i < len; i++) {
 				v_[i] = new PerlValue;
 				Erref e = v_[i]->parse(*av_fetch(arr, i, 0));
-				if (e->hasError())
+				if (e.hasError())
 					return new Errors(strprintf("invalid value at array index %d:", i), e); 
 			}
 		} else if (SvTYPE(ref) == SVt_PVHV) {
@@ -80,7 +80,7 @@ Erref PerlValue::parse(SV *v)
 				Autoref<PerlValue> pv = new PerlValue;
 
 				Erref e = pv->parse(val);
-				if (e->hasError())
+				if (e.hasError())
 					return new Errors(strprintf("invalid value at hash key '%s':", key), e); 
 
 				k_.push_back(string(key, keylen));
@@ -234,7 +234,7 @@ PerlValue *PerlValue::make(SV *v)
 {
 	PerlValue *pv = new PerlValue();
 	Erref e = pv->parse(v);
-	if (e->hasError()) {
+	if (e.hasError()) {
 		delete pv;
 		throw Exception(e.get(), false);
 	}

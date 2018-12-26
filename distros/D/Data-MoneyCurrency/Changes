@@ -1,5 +1,10 @@
 Revision history for Data-MoneyCurrency
 
+0.08    Sun Dec 23 10:56:29 CET 2018
+        use Cpanel::JSON::XS rathr than JSON
+        new ruby-money conf
+        changed Author in pod
+
 0.07    Sa 17 Nov 2018 16:19:26 CET
         new ruby-money conf to get new currency for Venezuala
 

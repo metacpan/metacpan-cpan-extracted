@@ -476,7 +476,7 @@ sub _strptime_compile_pattern ( $self, $pattern, $use_cache = 1 ) {
                     goto NEXT;
                 }
 
-                $sub .= "        $code;$LF";
+                $sub .= "        $code;\n";
             }
         }
     }

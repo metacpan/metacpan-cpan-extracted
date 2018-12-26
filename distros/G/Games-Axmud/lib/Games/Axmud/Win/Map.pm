@@ -309,13 +309,83 @@
             treeViewPointerHash         => {},
 
             # Canvas widgets (on the right)
+            # ->canvas and ->canvasBackground store widgets for the current region and level (or the
+            #   empty background map, if no region/level are visible)
             canvas                      => undef,
-            canvasRoot                  => undef,
+            canvasBackground            => undef,
             canvasFrame                 => undef,
             canvasScroller              => undef,
             canvasHAdjustment           => undef,
             canvasVAdjustment           => undef,
-            canvasBackground            => undef,
+
+            # Blessed reference of the currently displayed GA::Obj::Regionmap ('undef' if no region
+            #   is displayed; not necessarily the same region as the character's current location)
+            currentRegionmap            => undef,
+            # Blessed reference of the currently displayed GA::Obj::Parchment ('undef' if no region
+            #   is displayed; not necessarily the same region as the character's current location)
+            currentParchment            => undef,
+            # List of the names of regions that have been the current region recently. Does not
+            #   include the current region, nor any duplicates, nor more than three regions. The
+            #   most recent current region is the first one in the list. The list is modified
+            #   whenever $self->setCurrentRegion is called
+            recentRegionList            => [],
+            # Because of performance issues for very big maps (with thousands of rooms), when a
+            #   region is completely redrawn (by a call to $self->redrawRegions), we can't simply
+            #   call ->destroy on all of its drawn canvas objects. Current solution is to add them
+            #   all to a destruction queue, and allow $self->winUpdate to destroy them a few at a
+            #   time
+            destroyQueueList            => [],
+            # The maximum number of canvas widgets/objects to destroy in every call to
+            #   $self->winUpdate
+            constDestroyQueueMax        => 100,
+            # If the user changes GA::Obj::WorldModel->queueDrawMaxObjs to 0, no more objects are
+            #   queued to be drawn, but we still continue drawing anything that's already queued.
+            #   This IV sets the number of queued objects to draw in every call to $self->winUpdate
+            #   (represents the same value, if other IVs have their default value
+            drawQueueDefault            => 50,
+
+            # Flag set to TRUE if the visible map is the empty background map (created by a call to
+            #   $self->resetMap). Set to FALSE if the visible map is a region (created by a call to
+            #   $self->refreshMap). Set to FALSE if neither ->resetMap nor ->refreshMap have been
+            #   called yet
+            emptyMapFlag                => FALSE,
+            # The first call to $self->winUpdate calls $self->preparePreDraw to compile a list of
+            #   regions which should be drawn by background processes (i.e. regular calls to
+            #   $self->winUpdate). It then sets this flag to TRUE so it knows no further calls to
+            #   $self->preparePreDraw are necessary
+            winUpdateCalledFlag         => FALSE,
+            # If a call to $self->doDraw fails because a drawing cycle (i.e. another call to
+            #   ->doDraw) is already in progress, then this flag is set to TRUE. When set to TRUE,
+            #   $self->winUpdate knows that it must make another call to ->doDraw
+            winUpdateForceFlag          => FALSE,
+            # When $self->doDraw fails on a call from $self->setCurrentRegion or ->redrawRegions,
+            #   this flag is also set to TRUE, as additional action is required. It remains set to
+            #   FALSE when calls to ->doDraw fail for any other reason
+            winUpdateShowFlag           => FALSE,
+
+            # Hash of parchment objects (GA::Obj::Parchment), once for each region which has been
+            #   drawn (or is being drawn)
+            # Hash in the form
+            #   $parchmentHash{region_name} = blessed_reference_to_parchment_object
+            parchmentHash               => {},
+            # Parchment objects can be in states - fully drawn, or partially drawn. Firstly, a hash
+            #   of parchment objects which are fully drawn, in the form
+            #   $parchmentReadyHash{region_name} = blessed_reference_to_parchment_object
+            parchmentReadyHash          => {},
+            # Secondly, a list of parchment objects which are partially drawn, Background processes
+            #   draw canvas objects in the first parchment object in the list, before moving it to
+            #   ->parchmentReadyHash; then they start drawing the next parchment object in the list
+            #   until the list is empty
+            parchmentQueueList          => [],
+            # Depending on the values specified in the world model, when a new current region is
+            #   set, the old region's drawn map is either retained in memory (for larger maps) or
+            #   removed from memory (for smaller maps). This prevents Axmud swallowing huge amounts
+            #   of memory for canvas widgets that might not be made visible again
+            # When a drawn map (stored in a parchment object) is removed from memory, the parchment
+            #   object is recycled (all of its IVs are reset, but the canvas widgets are retained,
+            #   ready for re-use)
+            # A recycled parchment object, which is ready for use, is stored here until required
+            spareParchmentObj           => undef,
 
             # Tooltips
             # The current canvas object for which a tooltip is displayed ('undef' if no canvas
@@ -328,15 +398,6 @@
             #   over a canvas object, ->canvasTooltipObj is set and this IV is set to TRUE; if the
             #   next event is a 'leave-notify' event, it is ignored
             canvasTooltipFlag           => FALSE,
-
-            # Blessed reference of the currently displayed GA::Obj::Regionmap ('undef' if no region
-            #   is displayed; not necessarily the same region as the character's current location)
-            currentRegionmap            => undef,
-            # List of the names of regions that have been the current region recently. Does not
-            #   include the current region, nor any duplicates, nor more than three regions. The
-            #   most recent current region is the first one in the list. The list is modified
-            #   whenever $self->setCurrentRegion is called
-            recentRegionList            => [],
 
             # Objects on the map can be selected. There are three modes of selection:
             #   (1) There is a single room, OR a single room tag, OR a single room guild, OR a
@@ -397,100 +458,20 @@
             # The blessed reference of the twin exit's parent room
             pairedTwinRoom              => undef,
 
-            # The map itself is just a collection of GA::ModelObj::Room objects, GA::Obj::Exit
-            #   objects and GA::Obj::MapLabel objects. They are stored in each region's
-            #   GA::Obj::Regionmap
-            # The currently displayed level of the currently displayed region consists of a
-            #   collection of Gnome2::Canvas::Item objects.
-            # These hashes work in parallel with the regionmap's ->gridRoomHash, ->gridRoomTagHash,
-            #   ->gridRoomGuildHash, ->gridExitHash, ->gridExitTagHash and ->gridLabelHash. The keys
-            #   are the same for each, but the values in these hashes contain a reference to a list
-            #   of Gnome2::Canvas::Items
-            # Only one room is allowed per gridblock, but exits and labels can be drawn freely.
-            # These hashes contain drawn objects, not necessarily every object stored in the
-            #   regionmap
-            # Hash of drawn rooms from this regionmap, in the form
-            #   $drawnRoomHash{'x_y_z'} = [canvas_object, canvas_object...]
-            drawnRoomHash               => {},
-            # A subset of key-value pairs from ->drawnRoomHash, containing only those rooms which
-            #   have been drawn with a double-size border (current, ghost and lost rooms, but only
-            #   when GA::Obj::WorldModel->currentRoomMode is 'double'
-            dummyRoomHash               => {},
-            # Hash of drawn room echos from this regionmap, in the form
-            #   $drawnRoomEchoHash{'x_y_z'} = [canvas_object, canvas_object...]
-            drawnRoomEchoHash           => {},
-            # Hash of drawn rooms with room tags from this regionmap, in the form
-            #   $drawnRoomTagHash{'x_y_z'} =  [canvas_object, canvas_object...]
-            drawnRoomTagHash            => {},
-            # Hash of drawn rooms with room guilds from this regionmap, in the form
-            #   $drawnRoomGuildHash{'x_y_z'} =  [canvas_object, canvas_object...]
-            drawnRoomGuildHash          => {},
-            # Hash of drawn rooms that have text drawn within their interiors, in the form
-            #   $drawnRoomTextHash{'x_y_z'} = [canvas_object, canvas_object...]
-            drawnRoomTextHash           => {},
-            # Hash of drawn exits from this regionmap (not necessarily all the exits in all the
-            #   rooms), in the form
-            #       $drawnExitHash{exit_model_number} = [canvas_object, canvas_object...]
-            drawnExitHash               => {},
-            # Hash of drawn exits with exit tags from this regionmap, in the form
-            #   $drawnExitTagHash{exit_model_number} = [canvas_object, canvas_object...]
-            drawnExitTagHash            => {},
-            # Hash of drawn exits from this regionmap that have exit ornaments, in the form
-            #   $drawnOrnamentHash{exit_model_number} = [canvas_object, canvas_object...]
-            drawnOrnamentHash           => {},
-            # Hash of (all) labels that exist in this regionmap, in the form
-            #   $drawnLabelHash{label_number} = [canvas_object, canvas_object...]
-            drawnLabelHash              => {},
-            # Hash of checked directions for each room, if they have been drawn. Checked directions
-            #   can't be clicked (selelected), so all the canvas objects for checked directions in
-            #   a room are stored together as a single key-value pair. Hash in the form
-            #   $drawnCheckedDirHash{'x_y_z'} = [canvas_object, canvas_object...]
-            drawnCheckedDirHash         => {},
-            # Hash of coloured gridblocks (for background colouring, not a clickable object on the
-            #   map), in the form
-            #   $colouredSquareHash{'x_y'} = canvas_object
-            colouredSquareHash          => {},
-            # Hash of coloured rectangles (for background colouring, not a clickable object on the
-            #   map), in the form
-            #   $colouredRectHash{grid_colour_object_number} = canvas_object
-            colouredRectHash            => {},
             # Flag that can be set to TRUE by any code that wants to prevent a drawing operation
             #   from starting (temporarily); the operation will be able to start when the flag is
             #   set back to FALSE
+            # Is set to TRUE by ->doDraw itself, so that a second call to that function can't be
+            #   processed while an earlier one is still in progress
             delayDrawFlag               => FALSE,
 
-            # When we need to draw (or redraw) objects on the canvas, sometimes we want to draw the
-            #   objects right away and sometimes we want to wait until something is finished before
-            #   we do the drawing
-            # To draw thing right away, we call $self->doDraw. To draw things later, we call
-            #   $self->markObjs to add entries to these IVs; then, at some later time, $self->doDraw
-            #   is called to draw them
-            # Since we're using hashes, it's safe to add the same object multiple times
-            # Drawing a room will redraw any room tags/room guilds associated with that room. If
-            #   the room tag/room guild has already been drawn, it is not drawn a second time during
-            #   any call to $self->doDraw.
-            # The same applies for exits; drawing an exit will redraw its exit tag. If the exit tag
-            #   has already been drawn, it is not drawn a second time during any call to
-            #   $self->doDraw
-            # Hash of rooms to be drawn, in the form
-            #   $markedRoomHash{model_number} = blessed_reference_to_room_object
-            markedRoomHash              => {},
-            # Hash of room tags to be drawn, in the form
-            #   $markedRoomTagHash{model_number} = blessed_reference_to_room_object
-            markedRoomTagHash           => {},
-            # Hash of room guilds to be drawn, in the form
-            #   $markedRoomGuildHash{model_number} = blessed_reference_to_room_object
-            markedRoomGuildHash         => {},
-            # Hash of exits to be drawn, in the form
-            #   $markedExitHash{exit_model_number} = blessed_reference_to_exit_object
-            markedExitHash              => {},
-            # Hash of exit tagss to be drawn, in the form
-            #   $markedExitTagHash{exit_model_number} = blessed_reference_to_exit_object
-            markedExitTagHash           => {},
-            # Hash of labels to be drawn, in the form
-            #   $markedLabelHash{label_number} = blessed_reference_to_label_object
-            markedLabelHash             => {},
-
+            # Drawing cycle IVs, set during each call to $self->drawObjs
+            #
+            # During the draw cycle, regions are drawn one at a time. For each region, these IVs is
+            #   set so individual drawing functions can quickly look up the regionmap and parchment
+            #   object being drawn
+            drawRegionmap               => undef,
+            drawParchment               => undef,
             # $self->drawCycleExitHash contains a list of exits that have been drawn during the
             #   current drawing cycle. Before drawing an exit, we can check whether it has a twin
             #   exit (which occupies the same space) and, if so, we don't need to draw it a second
@@ -498,17 +479,38 @@
             #   $self->drawObjs. Hash in the form
             #       $drawCycleExitHash{exit_model_number} = blessed_reference_to_exit_object
             drawCycleExitHash           => {},
-            # The (pango) size of room interior text. This value is set by $self->doDraw, at the
-            #   start of every drawing cycle, to be a little bit smaller than half the width of the
-            #   room (which depends on the draw exit mode in effect)
+            # The (pango) size of room interior text. This value is set by $self->prepareDraw, at
+            #   the start of every drawing cycle, to be a little bit smaller than half the width of
+            #   the room (which depends on the draw exit mode in effect)
             drawRoomTextSize            => undef,
             # For room interior text, the size of the usable area (which depends on the draw exit
             #   mode in effect). The values are also set by $self->doDraw, once per drawing cycle
             drawRoomTextWidth           => undef,
             drawRoomTextHeight          => undef,
-            # The (pango) sizes of text drawn on the map. Also set by $self->doDraw, based on the
-            #   size of a room when exits are being drawn
-            drawMapTextSize             => undef,
+            # The (pango) size of other text drawn on the map, besides room interior text (includes
+            #   room tags, room guilds, exit tags and labels). Also set by $self->prepareDraw, based
+            #   on the size of a room when exits are being drawn
+            drawOtherTextSize           => undef,
+            # The (pango) size of that text, without magnification applied
+            drawDefaultTextSize         => undef,
+            # Hashes set by $self->preDrawPositions and $self->preDrawExits (see the comments in
+            #   those functions for a longer explanation)
+            # Calculates the position of each type of exit, and of a few room components, relative
+            #   to their gridblocks, to make the drawing of rooms and exits much quicker
+            blockCornerXPosPixels       => undef,
+            blockCornerYPosPixels       => undef,
+            blockCentreXPosPixels       => undef,
+            blockCentreYPosPixels       => undef,
+            borderCornerXPosPixels      => undef,
+            borderCornerYPosPixels      => undef,
+            preDrawnIncompleteExitHash  => {},
+            preDrawnUncertainExitHash   => {},
+            preDrawnLongExitHash        => {},
+            preDrawnSquareExitHash      => {},
+            # Also calculates which primary directions should be used, if counting checked/
+            #   checkeable directions (i.e. when $self->worldModelObj->roomInteriorMode is set to
+            #   'checked_count')
+            preCountCheckedHash         => {},
 
             # What happens when the user clicks on the map
             #   'default' - normal operation. Any selected objects are unselected
@@ -776,26 +778,6 @@
                 northwest               => 'GTK_ANCHOR_SE',
                 northnorthwest          => 'GTK_ANCHOR_S',  # Same as N
             },
-
-            # Hashes set at the beginning of every draw cycle (i.e. every call to $self->drawObjs)
-            #   by $self->preDrawPositions and $self->preDrawExits (see the comments in these
-            #   functions for a longer explanation)
-            # Calculates the position of each type of exit, and of a few room components, relative
-            #   to their gridblocks, to make the drawing of rooms and exits much quicker
-            blockCornerXPosPixels       => undef,
-            blockCornerYPosPixels       => undef,
-            blockCentreXPosPixels       => undef,
-            blockCentreYPosPixels       => undef,
-            borderCornerXPosPixels      => undef,
-            borderCornerYPosPixels      => undef,
-            preDrawnIncompleteExitHash  => {},
-            preDrawnUncertainExitHash   => {},
-            preDrawnLongExitHash        => {},
-            preDrawnSquareExitHash      => {},
-            # Also calculates which primary directions should be used, if counting checked/
-            #   checkeable directions (i.e. when $self->worldModelObj->roomInteriorMode is set to
-            #   'checked_count')
-            preCountCheckedHash         => {},
 
             # Magnfication list. A list of standard magnification factors used for zooming in or out
             #   from the map
@@ -1621,12 +1603,16 @@
         $self->ivPoke('mapObj', $mapObj);
         $self->ivPoke('worldModelObj', $self->session->worldModelObj);
 
-        # Reset the map, which destroys all existing canvas objects. The FALSE argument sets the
-        #   background colour to (default) white, to show there's no current region
-        $self->resetMap(FALSE);
-
         # Reset the current region
         $self->ivUndef('currentRegionmap');
+        $self->ivUndef('currentParchment');
+        $self->ivEmpty('recentRegionList');
+
+        # Reset parchment objects (which destroys all canvas widgets except the empty one created
+        #   by the call to ->resetMap)
+        $self->ivEmpty('parchmentHash');
+        $self->ivEmpty('parchmentReadyHash');
+        $self->ivEmpty('parchmentQueueList');
 
         # Reset selected objects
         $self->ivUndef('selectedRoom');
@@ -1644,6 +1630,8 @@
         $self->reset_freeClickMode();
         $self->ivPoke('mode', 'wait');
         $self->ivUndef('showChar');     # Show character visits for the current character
+        $self->ivPoke('emptyMapFlag', FALSE);
+        $self->ivPoke('winUpdateCalledFlag', FALSE);
 
         # Reset the title bar
         $self->setWinTitle();
@@ -1656,18 +1644,23 @@
     sub winUpdate {
 
         # Called by GA::Session->spinMaintainLoop or by any other code
-        # Lets the Automapper window do anything it needs to do, in order to update itself. At the
-        #   moment, we only draw any objects which have been marked to be drawn, but other code
-        #   might be added here later
+        # Check all of the automapper window's parchment objects (Games::Axmud::Obj::Parchment)
+        # If there are any canvas objects waiting in queue to be drawn, mark a number of them to be
+        #   drawn
+        # Then draw everything that's been marked to be drawn
         #
         # Expected arguments
         #   (none besides $self)
         #
         # Return values
-        #   'undef' on improper arguments
+        #   'undef' on improper arguments or if a drawing cycle (i.e. a call to $self->doDraw) is
+        #       already in progress
         #   1 otherwise
 
         my ($self, $check) = @_;
+
+        # Local variables
+        my ($forceFlag, $wmObj, $count, $max, $parchmentObj);
 
         # Check for improper arguments
         if (defined $check) {
@@ -1675,8 +1668,240 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->winUpdate', @_);
         }
 
-        # If any objects have been marked to be drawn, draw them
-        $self->doDraw();
+        # In response to user input (e.g. a click on the map), $self->doDraw can be called at any
+        #   time. If a drawing cycle (another call to ->doDraw) is already in progress,
+        #   $self->winUpdateForceFlag is set to TRUE
+        # Remember the value of the flag, as it is now. If it's TRUE, we can set it back to FALSE
+        #   at the end of this function. However, if $self->winUpdateForceFlag is FALSE but becomes
+        #   TRUE during this function, we don't want to reset it until the next call to this
+        #   function
+        $forceFlag = $self->winUpdateForceFlag;
+
+        # If a drawing cycle (i.e. a call to $self->doDraw) is already in progress, don't do
+        #   anything this time; wait for the next spin of the session's maintain loop
+        if ($self->delayDrawFlag || ! $self->mapObj) {
+
+            return undef;
+        }
+
+        # If this is the first call to this function since the window opened (or was reset),
+        #   compile a list of regions that should be pre-drawn
+        if (! $self->winUpdateCalledFlag) {
+
+            $self->ivPoke('winUpdateCalledFlag', TRUE);
+            $self->preparePreDraw();
+        }
+
+        # Import the world model (for speed)
+        $wmObj = $self->worldModelObj;
+
+        # Set the number of objects that can be drawn during the current call to this function
+        #   (e.g. if GA::Obj::WorldModel->queueDrawMaxObjs is 500 and the session's maintain loop is
+        #   spinning ten times a second, then draw 500/10 = 50 objects per call)
+        $max = $wmObj->queueDrawMaxObjs * $self->session->maintainLoopDelay;
+        # If the user changes GA::Obj::WorldModel->queueDrawMaxObjs to 0, code in this automapper
+        #   window no longer adds objects to GA::Obj::Parchment->queueRoomHash, ->queueExitHash etc
+        # However, there might be some objects that were already queued to be drawn; perhaps a lot
+        #   of objects
+        # In this situation, continue drawing objects, a few at a time, until the existing queues
+        #   are emptied
+        if (! $max) {
+
+            $max = $self->drawQueueDefault;
+        }
+
+        # We only draw things from the first parchment object in the list (if any)
+        $parchmentObj = $self->ivFirst('parchmentQueueList');
+        # Stop marking objects as soon as $count reaches $max
+        $count = 0;
+
+        # (If ->queueDrawMaxObjs is 0, no queued drawing takes place)
+        if ($parchmentObj && $max) {
+
+            OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomHash')) {
+
+                # (Check the room still exists. This check, and the similar checks below, check for
+                #   momentary inconsistencies while some other process takes place; code in the
+                #   world model GA::Obj::WorldModel should update parchment objects automatically)
+                $parchmentObj->ivDelete('queueRoomHash', $roomObj->number);
+                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
+
+                    next OUTER;
+                }
+
+                $parchmentObj->ivAdd('markedRoomHash', $roomObj->number, $roomObj);
+                # Drawing a room also draws its room tags, room guilds, exits and exit tags, so we
+                #   can remove them from the queue
+                $parchmentObj->ivDelete('markedRoomTagHash', $roomObj->number);
+                $parchmentObj->ivDelete('markedRoomGuildHash', $roomObj->number);
+
+                foreach my $exitNum ($roomObj->ivValues('exitNumHash')) {
+
+                    $parchmentObj->ivDelete('markedExitHash', $exitNum);
+                    $parchmentObj->ivDelete('markedExitTagHash', $exitNum);
+                }
+
+                $count++;
+                if ($count >= $max) {
+
+                    last OUTER;
+                }
+            }
+
+            if ($count < $max) {
+
+                OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomTagHash')) {
+
+                    # (Check the room still exists and still has a room tag)
+                    $parchmentObj->ivDelete('queueRoomTagHash', $roomObj->number);
+                    if (
+                        ! $wmObj->ivExists('modelHash', $roomObj->number)
+                        || ! defined $roomObj->roomTag
+                    ) {
+                        next OUTER;
+                    }
+
+                    $parchmentObj->ivAdd('markedRoomTagHash', $roomObj->number, $roomObj);
+
+                    $count++;
+                    if ($count >= $max) {
+
+                        last OUTER;
+                    }
+                }
+            }
+
+            if ($count < $max) {
+
+                OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomGuildHash')) {
+
+                    # (Check the room still exists and still has a room tag)
+                    $parchmentObj->ivDelete('queueRoomGuildHash', $roomObj->number);
+                    if (
+                        ! $wmObj->ivExists('modelHash', $roomObj->number)
+                        || ! defined $roomObj->roomGuild
+                    ) {
+                        next OUTER;
+                    }
+
+                    $parchmentObj->ivAdd('markedRoomGuildHash', $roomObj->number, $roomObj);
+
+                    $count++;
+                    if ($count >= $max) {
+
+                        last OUTER;
+                    }
+                }
+            }
+
+            if ($count < $max) {
+
+                OUTER: foreach my $exitObj ($parchmentObj->ivValues('queueExitHash')) {
+
+                    # (Check the exit still exists)
+                    $parchmentObj->ivDelete('queueExitHash', $exitObj->number);
+                    if (! $wmObj->ivExists('exitModelHash', $exitObj->number)) {
+
+                        next OUTER;
+                    }
+
+                    $parchmentObj->ivAdd('markedExitHash', $exitObj->number, $exitObj);
+
+                    $count++;
+                    if ($count >= $max) {
+
+                        last OUTER;
+                    }
+                }
+            }
+
+            if ($count < $max) {
+
+                OUTER: foreach my $exitObj ($parchmentObj->ivValues('queueExitTagHash')) {
+
+                    # (Check the exit still exists and has an exit tag)
+                    $parchmentObj->ivDelete('queueExitTagHash', $exitObj->number);
+                    if (
+                        ! $wmObj->ivExists('exitModelHash', $exitObj->number)
+                        || ! defined $exitObj->exitTag
+                    ) {
+                        next OUTER;
+                    }
+
+                    $parchmentObj->ivAdd('markedExitTagHash', $exitObj->number, $exitObj);
+
+                    $count++;
+                    if ($count >= $max) {
+
+                        last OUTER;
+                    }
+                }
+            }
+
+            if ($count < $max) {
+
+                OUTER: foreach my $labelObj ($parchmentObj->ivValues('queueLabelHash')) {
+
+                    my $regionmapObj;
+
+                    # (Check the label still exists)
+                    $parchmentObj->ivDelete('queueLabelHash', $labelObj->number);
+                    $regionmapObj = $wmObj->ivShow('regionmapHash', $labelObj->region);
+                    if (
+                        ! $regionmapObj
+                        || ! $regionmapObj->ivExists('gridLabelHash', $labelObj->number)
+                    ) {
+                        next OUTER;
+                    }
+
+                    $parchmentObj->ivAdd('markedLabelHash', $labelObj->number, $labelObj);
+
+                    $count++;
+                    if ($count >= $max) {
+
+                        last OUTER;
+                    }
+                }
+            }
+
+            # If the parchment has no more queued objects, we can remove it from the queue
+            if (
+                ! $parchmentObj->queueRoomHash && ! $parchmentObj->queueRoomTagHash
+                && ! $parchmentObj->queueRoomGuildHash && ! $parchmentObj->queueExitHash
+                && ! $parchmentObj->queueExitTagHash && ! $parchmentObj->queueLabelHash
+            ) {
+                $self->ivShift('parchmentQueueList');
+                $self->ivAdd('parchmentReadyHash', $parchmentObj->name, $parchmentObj);
+            }
+        }
+
+        # If any objects have been marked to be drawn (by this function), call ->doDraw to draw them
+        # If a recent call to $self->doDraw failed because a drawing cycle was already in progress,
+        #   call ->doDraw again to complete that operation
+        if ($count || $forceFlag) {
+
+            if ($self->doDraw() && $forceFlag) {
+
+                # Only call ->doDraw on the next call to this function if there are additional
+                #   objects marked to be drawn
+                $self->ivPoke('winUpdateForceFlag', FALSE);
+
+                # If the failed call to ->doDraw came from ->setCurrentRegion, then we can make the
+                #   current region's canvas widget visible, now that the map is fully drawn
+                if ($self->winUpdateShowFlag) {
+
+                    $self->ivPoke('winUpdateShowFlag', FALSE);
+                    $self->swapCanvasWidget();
+                }
+            }
+        }
+
+        # Also destroy some canvas widgets/canvas objects that have been added to the destruction
+        #   queue by $self->refreshMap
+        # In testing, simply emptying the list (and relying on Perl's garbage collection) is
+        #   consistently 10-15% faster than calling ->destroy on thousands of objects, so we'll do
+        #   that
+        $self->ivSplice('destroyQueueList', 0, $self->constDestroyQueueMax);
 
         return 1;
     }
@@ -2012,12 +2237,15 @@
         }
 
         $self->ivUndef('canvas');
-        $self->ivUndef('canvasRoot');
-        $self->ivUndef('canvasFrame');
-        $self->ivUndef('canvasScroller');
+        $self->ivUndef('canvasBackground');
+        # (For some reason, commenting out these lines increases the draw time, during a call to
+        #   $self->redrawWidgets, by about 40%. The IVs receive their correct values anyway when
+        #   ->enableCanvas is called)
+#        $self->ivUndef('canvasFrame');
+#        $self->ivUndef('canvasScroller');
         $self->ivUndef('canvasHAdjustment');
         $self->ivUndef('canvasVAdjustment');
-        $self->ivUndef('canvasBackground');
+
         $self->ivUndef('canvasTooltipObj');
         $self->ivUndef('canvasTooltipObjType');
         $self->ivUndef('canvasTooltipFlag');
@@ -2200,7 +2428,7 @@
 
         $column_file->append(Gtk2::SeparatorMenuItem->new());   # Separator
 
-        my $item_mergeModel = Gtk2::MenuItem->new('_Merge world model...');
+        my $item_mergeModel = Gtk2::MenuItem->new('_Merge world models...');
         $item_mergeModel->signal_connect('activate' => sub {
 
             $self->session->pseudoCmd('mergemodel')
@@ -3108,7 +3336,7 @@
                     $self->worldModelObj->switchMode(
                         'currentRoomMode',
                         'single',           # New value of ->currentRoomMode
-                        FALSE,              # No call to ->drawRegion; the current room is redrawn
+                        FALSE,              # No call to ->redrawRegions; current room is redrawn
                         'normal_current_mode',
                     );
                 }
@@ -3130,7 +3358,7 @@
                     $self->worldModelObj->switchMode(
                         'currentRoomMode',
                         'double',           # New value of ->currentRoomMode
-                        FALSE,              # No call to ->drawRegion; the current room is redrawn
+                        FALSE,              # No call to ->redrawRegions; current room is redrawn
                         'empahsise_current_room',
                     );
                 }
@@ -3151,7 +3379,7 @@
                     $self->worldModelObj->switchMode(
                         'currentRoomMode',
                         'interior',         # New value of ->currentRoomMode
-                        FALSE,              # No call to ->drawRegion; the current room is redrawn
+                        FALSE,              # No call to ->redrawRegions; current room is redrawn
                         'fill_in_current_room',
                     );
                 }
@@ -3176,7 +3404,7 @@
                     $self->worldModelObj->toggleFlag(
                         'allRoomFiltersFlag',
                         $item_releaseAllFilters->get_active(),
-                        TRUE,      # Do call $self->drawRegion
+                        TRUE,      # Do call $self->redrawRegions
                         'release_all_filters',
                         'icon_release_all_filters',
                     );
@@ -3297,7 +3525,7 @@
                     $self->worldModelObj->switchMode(
                         'drawExitMode',
                         'ask_regionmap',    # New value of ->drawExitMode
-                        TRUE,               # Do call $self->drawRegion
+                        TRUE,               # Do call $self->redrawRegions
                         'draw_defer_exits',
                         'icon_draw_defer_exits',
                     );
@@ -3320,7 +3548,7 @@
                     $self->worldModelObj->switchMode(
                         'drawExitMode',
                         'no_exit',          # New value of ->drawExitMode
-                        TRUE,               # Do call $self->drawRegion
+                        TRUE,               # Do call $self->redrawRegions
                         'draw_no_exits',
                         'icon_draw_no_exits',
                     );
@@ -3342,7 +3570,7 @@
                     $self->worldModelObj->switchMode(
                         'drawExitMode',
                         'simple_exit',      # New value of ->drawExitMode
-                        TRUE,               # Do call $self->drawRegion
+                        TRUE,               # Do call $self->redrawRegions
                         'draw_simple_exits',
                         'icon_draw_simple_exits',
                     );
@@ -3367,7 +3595,7 @@
                     $self->worldModelObj->switchMode(
                         'drawExitMode',
                         'complex_exit',     # New value of ->drawExitMode
-                        TRUE,               # Do call $self->drawRegion
+                        TRUE,               # Do call $self->redrawRegions
                         'draw_complex_exits',
                         'icon_draw_complex_exits',
                     );
@@ -3388,7 +3616,7 @@
                     $self->worldModelObj->toggleFlag(
                         'drawOrnamentsFlag',
                         $item_drawOrnaments->get_active(),
-                        TRUE,      # Do call $self->drawRegion
+                        TRUE,      # Do call $self->redrawRegions
                         'draw_ornaments',
                         'icon_draw_ornaments',
                     );
@@ -3670,7 +3898,7 @@
                     $self->worldModelObj->toggleFlag(
                         'trackPosnFlag',
                         $item_trackCurrentRoom->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'track_current_room',
                         'icon_track_current_room',
                     );
@@ -3869,7 +4097,8 @@
                 if ($self->mapObj->currentRoom) {
 
                     $self->ivAdd('graffitiHash', $self->mapObj->currentRoom->number);
-                    $self->doDraw('room', $self->mapObj->currentRoom);
+                    $self->markObjs('room', $self->mapObj->currentRoom);
+                    $self->doDraw();
                 }
 
                 # Initialise graffitied room counts
@@ -3882,7 +4111,7 @@
                 foreach my $num ($self->ivKeys('graffitiHash')) {
 
                     my $roomObj = $self->worldModelObj->ivShow('modelHash', $num);
-                    if ($roomObj && $roomObj->parent == $self->currentRegionmap->number) {
+                    if ($roomObj) {
 
                         push (@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $num));
                     }
@@ -3893,7 +4122,8 @@
                 # Redraw any graffitied rooms
                 if (@redrawList) {
 
-                    $self->doDraw(@redrawList);
+                    $self->markObjs(@redrawList);
+                    $self->doDraw();
                 }
 
                 # Remove graffitied room counts
@@ -3930,7 +4160,7 @@
                     $self->worldModelObj->toggleFlag(
                         'matchTitleFlag',
                         $item_matchTitle->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'match_title',
                     );
                 }
@@ -3948,7 +4178,7 @@
                     $self->worldModelObj->toggleFlag(
                         'matchDescripFlag',
                         $item_matchDescrip->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'match_descrip',
                     );
                 }
@@ -3966,7 +4196,7 @@
                     $self->worldModelObj->toggleFlag(
                         'matchExitFlag',
                         $item_matchExit->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'match_exit',
                     );
                 }
@@ -3984,7 +4214,7 @@
                     $self->worldModelObj->toggleFlag(
                         'matchSourceFlag',
                         $item_matchSource->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'match_source',
                     );
                 }
@@ -4002,7 +4232,7 @@
                     $self->worldModelObj->toggleFlag(
                         'matchVNumFlag',
                         $item_matchVNum->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'match_vnum',
                     );
                 }
@@ -4036,7 +4266,7 @@
                     $self->worldModelObj->toggleFlag(
                         'updateTitleFlag',
                         $item_updateTitle->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'update_title',
                     );
                 }
@@ -4054,7 +4284,7 @@
                     $self->worldModelObj->toggleFlag(
                         'updateDescripFlag',
                         $item_updateDescrip->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'update_descrip',
                     );
                 }
@@ -4072,7 +4302,7 @@
                     $self->worldModelObj->toggleFlag(
                         'updateExitFlag',
                         $item_updateExit->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'update_exit',
                     );
                 }
@@ -4091,7 +4321,7 @@
                     $self->worldModelObj->toggleFlag(
                         'updateOrnamentFlag',
                         $item_updateOrnament->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'update_ornament',
                     );
                 }
@@ -4109,7 +4339,7 @@
                     $self->worldModelObj->toggleFlag(
                         'updateSourceFlag',
                         $item_updateSource->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'update_source',
                     );
                 }
@@ -4127,7 +4357,7 @@
                     $self->worldModelObj->toggleFlag(
                         'updateVNumFlag',
                         $item_updateVNum->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'update_vnum',
                     );
                 }
@@ -4145,7 +4375,7 @@
                     $self->worldModelObj->toggleFlag(
                         'updateRoomCmdFlag',
                         $item_updateRoomCmd->get_active(),
-                        FALSE,          # Do call $self->drawRegion
+                        FALSE,          # Do call $self->redrawRegions
                         'update_room_cmd',
                     );
                 }
@@ -4165,7 +4395,7 @@
                     $self->worldModelObj->toggleFlag(
                         'analyseDescripFlag',
                         $item_analyseDescrip->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'analyse_descrip',
                     );
                 }
@@ -4514,7 +4744,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autoRescueFlag',
                         $item_autoRescueEnable->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'auto_rescue',
                     );
                 }
@@ -4536,7 +4766,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autoRescueFirstFlag',
                         $item_autoRescueFirst->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'auto_rescue_prompt',
                     );
                 }
@@ -4554,7 +4784,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autoRescuePromptFlag',
                         $item_autoRescuePrompt->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'auto_rescue_prompt',
                     );
                 }
@@ -4574,7 +4804,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autoRescueNoMoveFlag',
                         $item_autoRescueNoMove->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'auto_rescue_no_move',
                     );
                 }
@@ -4594,7 +4824,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autoRescueVisitsFlag',
                         $item_autoRescueVisits->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'auto_rescue_visits',
                     );
                 }
@@ -4614,7 +4844,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autoRescueForceFlag',
                         $item_autoRescueForce->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'auto_rescue_force',
                     );
                 }
@@ -4789,7 +5019,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autoOpenWinFlag',
                         $item_autoOpenWindow->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'auto_open_win',
                     );
                 }
@@ -4807,7 +5037,7 @@
                     $self->worldModelObj->toggleFlag(
                         'pseudoWinFlag',
                         $item_pseudoWin->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'pseudo_win',
                     );
                 }
@@ -4825,7 +5055,7 @@
                     $self->worldModelObj->toggleFlag(
                         'allowTrackAloneFlag',
                         $item_allowTrackAlone->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'keep_following',
                     );
                 }
@@ -4850,7 +5080,7 @@
                     $self->worldModelObj->toggleFlag(
                         'capitalisedRoomTagFlag',
                         $item_roomTagsInCaps->get_active(),
-                        TRUE,      # Do call $self->drawRegion
+                        TRUE,      # Do call $self->redrawRegions
                         'room_tags_capitalised',
                     );
                 }
@@ -4868,7 +5098,7 @@
                     $self->worldModelObj->toggleFlag(
                         'drawBentExitsFlag',
                         $item_drawBentExits->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'draw_bent_exits',
                     );
                 }
@@ -4886,7 +5116,7 @@
                     $self->worldModelObj->toggleFlag(
                         'drawRoomEchoFlag',
                         $item_drawRoomEcho->get_active(),
-                        TRUE,      # Do call $self->drawRegion
+                        TRUE,      # Do call $self->redrawRegions
                         'draw_room_echo',
                     );
                 }
@@ -4916,7 +5146,7 @@
                     $self->worldModelObj->toggleFlag(
                         'showNotesFlag',
                         $item_showNotes->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'show_notes',
                     );
                 }
@@ -4924,6 +5154,87 @@
             $subMenu_drawingFlags->append($item_showNotes);
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_notes', $item_showNotes);
+
+            $subMenu_drawingFlags->append(Gtk2::SeparatorMenuItem->new()); # Separator
+
+                # 'Preserve size during zoom' sub-submenu
+                my $subSubMenu_duringZoom = Gtk2::Menu->new();
+
+                my $item_zoomRoomTag = Gtk2::CheckMenuItem->new('Room _tags');
+                $item_zoomRoomTag->set_active($self->worldModelObj->fixedRoomTagFlag);
+                $item_zoomRoomTag->signal_connect('toggled' => sub {
+
+                    if (! $self->ignoreMenuUpdateFlag) {
+
+                        $self->worldModelObj->toggleFlag(
+                            'fixedRoomTagFlag',
+                            $item_zoomRoomTag->get_active(),
+                            TRUE,      # Do call $self->redrawRegions
+                            'fixed_room_tag',
+                        );
+                    }
+                });
+                $subSubMenu_duringZoom->append($item_zoomRoomTag);
+                # (Never desensitised)
+                $self->ivAdd('menuToolItemHash', 'fixed_room_tag', $item_zoomRoomTag);
+
+                my $item_zoomRoomGuild = Gtk2::CheckMenuItem->new('Room _guilds');
+                $item_zoomRoomGuild->set_active($self->worldModelObj->fixedRoomGuildFlag);
+                $item_zoomRoomGuild->signal_connect('toggled' => sub {
+
+                    if (! $self->ignoreMenuUpdateFlag) {
+
+                        $self->worldModelObj->toggleFlag(
+                            'fixedRoomGuildFlag',
+                            $item_zoomRoomGuild->get_active(),
+                            TRUE,      # Do call $self->redrawRegions
+                            'fixed_room_guild',
+                        );
+                    }
+                });
+                $subSubMenu_duringZoom->append($item_zoomRoomGuild);
+                # (Never desensitised)
+                $self->ivAdd('menuToolItemHash', 'fixed_room_guild', $item_zoomRoomGuild);
+
+                my $item_zoomExitTag = Gtk2::CheckMenuItem->new('_Exit tags');
+                $item_zoomExitTag->set_active($self->worldModelObj->fixedExitTagFlag);
+                $item_zoomExitTag->signal_connect('toggled' => sub {
+
+                    if (! $self->ignoreMenuUpdateFlag) {
+
+                        $self->worldModelObj->toggleFlag(
+                            'fixedExitTagFlag',
+                            $item_zoomExitTag->get_active(),
+                            TRUE,      # Do call $self->redrawRegions
+                            'fixed_exit_tag',
+                        );
+                    }
+                });
+                $subSubMenu_duringZoom->append($item_zoomExitTag);
+                # (Never desensitised)
+                $self->ivAdd('menuToolItemHash', 'fixed_exit_tag', $item_zoomExitTag);
+
+                my $item_zoomLabel = Gtk2::CheckMenuItem->new('_Labels');
+                $item_zoomLabel->set_active($self->worldModelObj->fixedLabelFlag);
+                $item_zoomLabel->signal_connect('toggled' => sub {
+
+                    if (! $self->ignoreMenuUpdateFlag) {
+
+                        $self->worldModelObj->toggleFlag(
+                            'fixedLabelFlag',
+                            $item_zoomLabel->get_active(),
+                            TRUE,      # Do call $self->redrawRegions
+                            'fixed_label',
+                        );
+                    }
+                });
+                $subSubMenu_duringZoom->append($item_zoomLabel);
+                # (Never desensitised)
+                $self->ivAdd('menuToolItemHash', 'fixed_label', $item_zoomLabel);
+
+            my $item_duringZoom = Gtk2::MenuItem->new('_Preserve size during zoom');
+            $item_duringZoom->set_submenu($subSubMenu_duringZoom);
+            $subMenu_drawingFlags->append($item_duringZoom);
 
         my $item_drawingFlags = Gtk2::MenuItem->new('_Drawing flags');
         $item_drawingFlags->set_submenu($subMenu_drawingFlags);
@@ -4941,7 +5252,7 @@
                     $self->worldModelObj->toggleFlag(
                         'assistedMovesFlag',
                         $item_allowAssisted->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'allow_assisted_moves',
                     );
 
@@ -4966,7 +5277,7 @@
                     $self->worldModelObj->toggleFlag(
                         'assistedBreakFlag',
                         $item_assistedBreak->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'break_before_move',
                     );
                 }
@@ -4984,7 +5295,7 @@
                     $self->worldModelObj->toggleFlag(
                         'assistedPickFlag',
                         $item_assistedPick->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'pick_before_move',
                     );
                 }
@@ -5002,7 +5313,7 @@
                     $self->worldModelObj->toggleFlag(
                         'assistedUnlockFlag',
                         $item_assistedUnlock->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'unlock_before_move',
                     );
                 }
@@ -5020,7 +5331,7 @@
                     $self->worldModelObj->toggleFlag(
                         'assistedOpenFlag',
                         $item_assistedOpen->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'open_before_move',
                     );
                 }
@@ -5038,7 +5349,7 @@
                     $self->worldModelObj->toggleFlag(
                         'assistedCloseFlag',
                         $item_assistedClose->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'close_after_move',
                     );
                 }
@@ -5056,7 +5367,7 @@
                     $self->worldModelObj->toggleFlag(
                         'assistedLockFlag',
                         $item_assistedLock->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'lock_after_move',
                     );
                 }
@@ -5076,7 +5387,7 @@
                     $self->worldModelObj->toggleFlag(
                         'protectedMovesFlag',
                         $item_allowProtected->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'allow_protected_moves',
                     );
 
@@ -5099,7 +5410,7 @@
                     $self->worldModelObj->toggleFlag(
                         'superProtectedMovesFlag',
                         $item_allowSuper->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'allow_super_protected_moves',
                     );
                 }
@@ -5119,7 +5430,7 @@
                     $self->worldModelObj->toggleFlag(
                         'craftyMovesFlag',
                         $item_allowCrafty->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'allow_crafty_moves',
                     );
                 }
@@ -5144,7 +5455,7 @@
                     $self->worldModelObj->toggleFlag(
                         'allowModelScriptFlag',
                         $item_allowModelScripts->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'allow_model_scripts',
                     );
                 }
@@ -5164,7 +5475,7 @@
                     $self->worldModelObj->toggleFlag(
                         'allowRoomScriptFlag',
                         $item_allowRoomScripts->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'allow_room_scripts',
                     );
                 }
@@ -5182,7 +5493,7 @@
                     $self->worldModelObj->toggleFlag(
                         'countVisitsFlag',
                         $item_countVisits->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'count_char_visits',
                     );
                 }
@@ -5215,7 +5526,7 @@
                     $self->worldModelObj->toggleFlag(
                         'explainGetLostFlag',
                         $item_explainGetLost->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'explain_get_lost',
                     );
                 }
@@ -5233,7 +5544,7 @@
                     $self->worldModelObj->toggleFlag(
                         'followAnchorFlag',
                         $item_followAnchor->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'follow_anchor',
                     );
                 }
@@ -5251,7 +5562,7 @@
                     $self->worldModelObj->toggleFlag(
                         'allowCtrlCopyFlag',
                         $item_allowCtrlCopy->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'allow_ctrl_copy',
                     );
                 }
@@ -5269,7 +5580,7 @@
                     $self->worldModelObj->toggleFlag(
                         'showAllPrimaryFlag',
                         $item_showAllPrimary->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'show_all_primary',
                     );
                 }
@@ -5515,6 +5826,52 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'current_region', $item_currentRegion);
 
+            # 'Pre-drawn regions' submenu
+            my $subMenu_preDrawRegion = Gtk2::Menu->new();
+
+            my $item_setPreDrawSize = Gtk2::MenuItem->new('Set pre-draw minimum size');
+            $item_setPreDrawSize->signal_connect('activate' => sub {
+
+                $self->preDrawSizeCallback();
+            });
+            $subMenu_preDrawRegion->append($item_setPreDrawSize);
+
+            my $item_setRetainSize = Gtk2::MenuItem->new('Set retain minimum size');
+            $item_setRetainSize->signal_connect('activate' => sub {
+
+                $self->retainDrawSizeCallback();
+            });
+            $subMenu_preDrawRegion->append($item_setRetainSize);
+
+            my $item_setPreDrawSpeed = Gtk2::MenuItem->new('Set pre-draw speed');
+            $item_setPreDrawSpeed->signal_connect('activate' => sub {
+
+                $self->preDrawSpeedCallback();
+            });
+            $subMenu_preDrawRegion->append($item_setPreDrawSpeed);
+
+            $subMenu_preDrawRegion->append(Gtk2::SeparatorMenuItem->new());  # Separator
+
+            my $item_redrawRegion = Gtk2::MenuItem->new('Redraw this region');
+            $item_redrawRegion->signal_connect('activate' => sub {
+
+                $self->redrawRegions($self->currentRegionmap, TRUE);
+            });
+            $subMenu_preDrawRegion->append($item_redrawRegion);
+            # (Requires $self->currentRegionmap)
+            $self->ivAdd('menuToolItemHash', 'redraw_region', $item_redrawRegion);
+
+            my $item_redrawAllRegions = Gtk2::MenuItem->new('Redraw all drawn regions');
+            $item_redrawAllRegions->signal_connect('activate' => sub {
+
+                $self->redrawRegionsCallback();
+            });
+            $subMenu_preDrawRegion->append($item_redrawAllRegions);
+
+        my $item_preDrawRegion = Gtk2::MenuItem->new('_Pre-drawn regions');
+        $item_preDrawRegion->set_submenu($subMenu_preDrawRegion);
+        $column_regions->append($item_preDrawRegion);
+
             # 'Screenshots' submenu
             my $subMenu_screenshots = Gtk2::Menu->new();
 
@@ -5720,7 +6077,7 @@
             my $item_resetFacing = Gtk2::MenuItem->new('Reset f_acing direction...');
             $item_resetFacing->signal_connect('activate' => sub {
 
-                $self->session->mapObj->set_facingDir();
+                $self->resetFacingCallback();
             });
             $subMenu_locatorTask->append($item_resetFacing);
 
@@ -5776,7 +6133,7 @@
                 $self->worldModelObj->toggleFlag(
                     'postProcessingFlag',
                     $item_allowPostProcessing->get_active(),
-                    FALSE,      # Don't call $self->drawRegion
+                    FALSE,      # Don't call $self->redrawRegions
                     'allow_post_process',
                 );
             });
@@ -5791,7 +6148,7 @@
                 $self->worldModelObj->toggleFlag(
                     'avoidHazardsFlag',
                     $item_avoidHazardousRooms->get_active(),
-                    FALSE,      # Don't call $self->drawRegion
+                    FALSE,      # Don't call $self->redrawRegions
                     'allow_hazard_rooms',
                 );
             });
@@ -5808,7 +6165,7 @@
                 $self->worldModelObj->toggleFlag(
                     'quickPathFindFlag',
                     $item_doubleClickPathFind->get_active(),
-                    FALSE,      # Don't call $self->drawRegion
+                    FALSE,      # Don't call $self->redrawRegions
                     'allow_quick_path_find',
                 );
             });
@@ -6696,7 +7053,7 @@
                     $self->worldModelObj->toggleFlag(
                         'setTwinOrnamentFlag',
                         $item_setTwinOrnament->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'also_set_twin_exits',
                     );
                 }
@@ -7050,7 +7407,7 @@
                     $self->worldModelObj->toggleFlag(
                         'autocompleteExitsFlag',
                         $item_autocomplete->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'autcomplete_uncertain',
                     );
                 }
@@ -7070,7 +7427,7 @@
                     $self->worldModelObj->toggleFlag(
                         'intelligentExitsFlag',
                         $item_intUncertain->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'intelligent_uncertain',
                     );
                 }
@@ -7092,7 +7449,7 @@
                     $self->worldModelObj->toggleFlag(
                         'collectCheckedDirsFlag',
                         $item_collectChecked->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'collect_checked_dirs',
                     );
                 }
@@ -7112,7 +7469,7 @@
                     $self->worldModelObj->toggleFlag(
                         'drawCheckedDirsFlag',
                         $item_drawChecked->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'draw_checked_dirs',
                     );
                 }
@@ -7120,7 +7477,7 @@
                 # Redraw the region, if one is visible
                 if ($self->currentRegionmap) {
 
-                    $self->drawRegion();
+                    $self->redrawRegions();
                 }
             });
             $subMenu_exitOptions->append($item_drawChecked);
@@ -7351,7 +7708,7 @@
                     $self->worldModelObj->toggleFlag(
                         'mapLabelTextViewFlag',
                         $item_useMultiLine->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'use_multi_line',
                     );
                 }
@@ -8600,11 +8957,11 @@
             $self->addBendCallback();
         });
         $menu_exits->append($item_addExitBend);
-        # (Also requires a $self->selectedExit that's a one-way or two-way broken exit, and also
-        #   defined values for $self->exitClickXPosn and $self->exitClickYPosn)
+        # (Also requires a $self->selectedExit that's a one-way or two-way broken exit, not a region
+        #   exit, and also defined values for $self->exitClickXPosn and $self->exitClickYPosn)
         if (
             (! $self->selectedExit->oneWayFlag && ! $self->selectedExit->twinExit)
-            || ! $self->selectedExit->brokenFlag
+            || $self->selectedExit->regionFlag
             || ! defined $self->exitClickXPosn
             || ! defined $self->exitClickYPosn
         ) {
@@ -8672,7 +9029,7 @@
                     $self->worldModelObj->toggleFlag(
                         'setTwinOrnamentFlag',
                         $item_setTwinOrnament->get_active(),
-                        FALSE,      # Don't call $self->drawRegion
+                        FALSE,      # Don't call $self->redrawRegions
                         'also_set_twin_exits',
                     );
                 }
@@ -10023,7 +10380,7 @@
                 $self->worldModelObj->switchMode(
                     'drawExitMode',
                     'ask_regionmap',    # New value of ->drawExitMode
-                    TRUE,               # Do call $self->drawRegion
+                    TRUE,               # Do call $self->redrawRegions
                     'draw_defer_exits',
                     'icon_draw_defer_exits',
                 );
@@ -10053,7 +10410,7 @@
                 $self->worldModelObj->switchMode(
                     'drawExitMode',
                     'no_exit',          # New value of ->drawExitMode
-                    TRUE,               # Do call $self->drawRegion
+                    TRUE,               # Do call $self->redrawRegions
                     'draw_no_exits',
                     'icon_draw_no_exits',
                 );
@@ -10083,7 +10440,7 @@
                 $self->worldModelObj->switchMode(
                     'drawExitMode',
                     'simple_exit',      # New value of ->drawExitMode
-                    TRUE,               # Do call $self->drawRegion
+                    TRUE,               # Do call $self->redrawRegions
                     'draw_simple_exits',
                     'icon_draw_simple_exits',
                 );
@@ -10113,7 +10470,7 @@
                 $self->worldModelObj->switchMode(
                     'drawExitMode',
                     'complex_exit',     # New value of ->drawExitMode
-                    TRUE,               # Do call $self->drawRegion
+                    TRUE,               # Do call $self->redrawRegions
                     'draw_complex_exits',
                     'icon_draw_complex_exits',
                 );
@@ -10160,7 +10517,7 @@
                 $self->worldModelObj->toggleFlag(
                     'drawOrnamentsFlag',
                     $toggleButton_drawExitOrnaments->get_active(),
-                    TRUE,      # Do call $self->drawRegion
+                    TRUE,      # Do call $self->redrawRegions
                     'draw_ornaments',
                     'icon_draw_ornaments',
                 );
@@ -11140,7 +11497,7 @@
                 $self->worldModelObj->toggleFlag(
                     'trackPosnFlag',
                     $toggleButton_trackCurrentRoom->get_active(),
-                    FALSE,      # Don't call $self->drawRegion
+                    FALSE,      # Don't call $self->redrawRegions
                     'track_current_room',
                     'icon_track_current_room',
                 );
@@ -11516,7 +11873,7 @@
                 $self->worldModelObj->toggleFlag(
                     'allRoomFiltersFlag',
                     $radioButton_releaseAllFilters->get_active(),
-                    TRUE,      # Do call $self->drawRegion
+                    TRUE,      # Do call $self->redrawRegions
                     'release_all_filters',
                     'icon_release_all_filters',
                 );
@@ -12681,8 +13038,8 @@
 
     sub enableCanvas {
 
-        # Called by $self->drawWidgets
-        # Sets up the Automapper window's canvas widget
+        # Called by $self->drawWidgets and ->redrawWidgets (only)
+        # Sets up canvas widgets
         #
         # Expected arguments
         #   (none besides $self)
@@ -12711,43 +13068,43 @@
         # Set the scrolling policy
         $canvasScroller->set_policy('always','always');
 
-        # Create the canvas and store it as an IV (immediately)
-        my $canvas = Gnome2::Canvas->new();
-        $self->ivPoke('canvas', $canvas);
-        # Get the canvas group (root) and store it immediately
-        my $canvasRoot = $canvas->root();
-        $self->ivPoke('canvasRoot', $canvasRoot);
-
-        # Set the default canvas size
-        $canvas->set_scroll_region(
-            0,
-            0,
-            $self->worldModelObj->defaultMapWidthPixels,
-            $self->worldModelObj->defaultMapHeightPixels,
-        );
-        $canvas->set_center_scroll_region(1);
-
-        # Add the canvas to the scrolled window
-        $canvasScroller->add($canvas);
         # Add the scrolled window to the frame
         $canvasFrame->add($canvasScroller);
 
-        # Handle mouse button scrolls from here, though
-        $canvas->signal_connect('scroll-event' => sub {
+        # Store the remaining widgets
+        $self->ivPoke('canvasFrame', $canvasFrame);
+        $self->ivPoke('canvasScroller', $canvasScroller);
+        $self->ivPoke('canvasHAdjustment', $canvasHAdjustment);
+        $self->ivPoke('canvasVAdjustment', $canvasVAdjustment);
 
-            my ($widget, $event) = @_;
+        # Set up tooltips
+        $self->enableTooltips();
+        # Draw the empty background map (default is white)
+        $self->resetMap();
 
-            if ($event->direction eq 'up') {
+        # Setup complete
+        return $canvasFrame;
+    }
 
-                # Zoom in
-                $self->zoomCallback('in');
+    sub enableTooltips {
 
-            } elsif ($event->direction eq 'down') {
+        # Called by $self->enableCanvas (only)
+        # Sets up tooltips
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
 
-                # Zoom out
-                $self->zoomCallback('out');
-            }
-        });
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->enableTooltips', @_);
+        }
 
         # Create a Gtk2::Window to act as a tooltip, being visible (or not) as appropriate
         my $tooltipLabel = Gtk2::Label->new();
@@ -12759,20 +13116,13 @@
         $tooltipWin->modify_bg('normal', Gtk2::Gdk::Color->parse('yellow'));
         $tooltipWin->add($tooltipLabel);
 
-        # Draw the background in the no-map colour (default is white)
-        $self->resetMap(FALSE);
-
-        # Store the remaining widgets
-        $self->ivPoke('canvasFrame', $canvasFrame);
-        $self->ivPoke('canvasScroller', $canvasScroller);
-        $self->ivPoke('canvasHAdjustment', $canvasHAdjustment);
-        $self->ivPoke('canvasVAdjustment', $canvasVAdjustment);
+        # Update IVs
         $self->ivPoke('canvasTooltipObj', undef);
         $self->ivPoke('canvasTooltipObjType', undef);
         $self->ivPoke('canvasTooltipFlag', FALSE);
 
         # Setup complete
-        return $canvasFrame;
+        return 1;
     }
 
     sub setMapPosn {
@@ -13153,66 +13503,76 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->doZoom', @_);
         }
 
-        # Set the visible map's size. The Gnome2::Canvas automatically takes care of its position,
-        #   so that the same part of the visible map is at the centre
-        $self->canvas->set_pixels_per_unit($self->currentRegionmap->magnification);
+        # Set the visible map's size. Each Gnome2::Canvas automatically takes care of its position,
+        #   so that the same part of the map is visible in the window
+        foreach my $canvasWidget ($self->currentParchment->ivValues('canvasWidgetHash')) {
+
+            $canvasWidget->set_pixels_per_unit($self->currentRegionmap->magnification);
+        }
 
         # Gnome2::Canvas helpfully redraws text after a zoom, so it's the same size it was before.
         #   Therefore, we have to redraw any rooms with interior text/room tags/room guilds, and
-        #   any exits with exit tags, and also all labels (but only if they're on the current level)
+        #   any exits with exit tags, and also all labels
         # Create a list of objects that must be redrawn. Use %newHash to make sure the same room
         #   isn't drawn more than once
-        foreach my $posn ($self->ivKeys('drawnRoomTagHash')) {
+        foreach my $levelObj ($self->currentParchment->ivValues('levelHash')) {
 
-            my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
-            if ($roomNum && ! exists $newHash{$roomNum}) {
+            foreach my $posn ($levelObj->ivKeys('drawnRoomTagHash')) {
 
-                push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
-                $newHash{$roomNum} = undef;
+                my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
+                if ($roomNum && ! exists $newHash{$roomNum}) {
+
+                    push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
+                    $newHash{$roomNum} = undef;
+                }
             }
-        }
 
-        foreach my $posn ($self->ivKeys('drawnRoomGuildHash')) {
+            foreach my $posn ($levelObj->ivKeys('drawnRoomGuildHash')) {
 
-            my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
-            if ($roomNum && ! exists $newHash{$roomNum}) {
+                my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
+                if ($roomNum && ! exists $newHash{$roomNum}) {
 
-                push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
-                $newHash{$roomNum} = undef;
+                    push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
+                    $newHash{$roomNum} = undef;
+                }
             }
-        }
 
-        foreach my $posn ($self->ivKeys('drawnRoomTextHash')) {
+            foreach my $posn ($levelObj->ivKeys('drawnRoomTextHash')) {
 
-            my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
-            if ($roomNum && ! exists $newHash{$roomNum}) {
+                my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
+                if ($roomNum && ! exists $newHash{$roomNum}) {
 
-                push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
-                $newHash{$roomNum} = undef;
+                    push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
+                    $newHash{$roomNum} = undef;
+                }
             }
-        }
 
-        foreach my $number ($self->ivKeys('drawnExitTagHash')) {
+            foreach my $number ($levelObj->ivKeys('drawnExitTagHash')) {
 
-            if ($self->currentRegionmap->ivExists('gridExitTagHash', $number)) {
+                if ($self->currentRegionmap->ivExists('gridExitTagHash', $number)) {
 
-                push (@redrawList, 'exit', $self->worldModelObj->ivShow('exitModelHash', $number));
+                    push (
+                        @redrawList,
+                        'exit',
+                        $self->worldModelObj->ivShow('exitModelHash', $number),
+                    );
+                }
             }
-        }
 
-        foreach my $number ($self->ivKeys('drawnLabelHash')) {
+            foreach my $number ($levelObj->ivKeys('drawnLabelHash')) {
 
-            my $labelObj = $self->currentRegionmap->ivShow('gridLabelHash', $number);
-            if ($labelObj) {
+                my $labelObj = $self->currentRegionmap->ivShow('gridLabelHash', $number);
+                if ($labelObj) {
 
-                push (@redrawList, 'label', $labelObj);
+                    push (@redrawList, 'label', $labelObj);
+                }
             }
         }
 
         # Redraw any rooms or labels that must be redrawn, to get text the right size
         if (@redrawList) {
 
-            $self->doDraw(@redrawList);
+            $self->worldModelObj->updateMaps(@redrawList);
         }
 
         # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
@@ -13261,16 +13621,13 @@
             'select', 'unselect_all',
             'selected_objs',
             'set_follow_mode', 'icon_set_follow_mode',
-#            'zoom_sub',
-#            'level_sub',
-#            'centre_map_middle_grid', 'icon_centre_map_middle_grid',
-#            'centre_map_sub',
             'screenshots', 'icon_visible_screenshot',
             'drag_mode', 'icon_drag_mode',
             'graffiti_mode', 'icon_graffiti_mode',
             'edit_region',
             'edit_regionmap',
             'current_region',
+            'redraw_region',
             'recalculate_paths',
             'exit_tags',
             'exit_options',
@@ -13283,8 +13640,6 @@
             'room_text',
             'other_room_features',
             'select_label',
-#            'move_up_level', 'icon_move_up_level',
-#            'move_down_level', 'icon_move_down_level',
             'report_region',
             'report_visits_2',
             'report_guilds_2',
@@ -14623,7 +14978,8 @@
         # Work out which gridblock is underneath the mouse click
         ($clickXPosBlocks, $clickYPosBlocks) = $self->findGridBlock(
             $clickXPosPixels,
-            $clickYPosPixels
+            $clickYPosPixels,
+            $self->currentRegionmap,
         );
 
         # If $self->freeClickMode and/or $self->bgColourMode aren't set to 'default', left-clicking
@@ -14781,7 +15137,7 @@
                 return 1;
             }
 
-        } elsif ($roomObj && $clickType eq 'single' && $self->drawnExitHash) {
+        } elsif ($roomObj && $clickType eq 'single' && $self->currentRegionmap->gridExitHash) {
 
             # Usually, when we click on the map on an empty pixel, all selected objects are
             #   unselected
@@ -14795,13 +15151,19 @@
             # (NB If no exits have been drawn, don't bother checking)
 
             # Now we check if they clicked near an exit, or in open space
-            $exitObj = $self->findClickedExit($clickXPosPixels, $clickYPosPixels, $roomObj);
+            $exitObj = $self->findClickedExit(
+                $clickXPosPixels,
+                $clickYPosPixels,
+                $roomObj,
+                $self->currentRegionmap,
+            );
+
             if ($exitObj) {
 
                 if ($button eq 'left' && $event->state =~ m/mod5-mask/) {
 
                     # This is a drag operation on the nearby exit
-                    $listRef = $self->ivShow('drawnExitHash', $exitObj->number);
+                    $listRef = $self->currentParchment->getDrawnExit($exitObj);
                     if (defined $listRef) {
 
                         $self->startDrag(
@@ -15352,6 +15714,333 @@
         return 1;
     }
 
+    sub deleteCanvasObj {
+
+        # Called by numerous functions
+        #
+        # When a region object, room object, room tag, room guild, exit, exit tag or label is being
+        #   drawn, redrawn or deleted from the world model, this function must be called
+        # The function checks whether the model object is currently drawn on a map as one or more
+        #   canvas objects and, if it is, destroys the canvas objects
+        #
+        # This function also handles coloured blocks and rectangles on the background map, details
+        #   of which are stored in the regionmap object (GA::Obj::Regionmap), not the world model
+        # The function checks whether a canvas object for the coloured block/rectangle is currently
+        #   displayed on the map as a canvas object and, if so, destroys the canvas object
+        #
+        # Expected arguments
+        #   $type       - Set to 'region', 'room', 'room_tag', 'room_guild', 'exit', 'exit_tag' or
+        #                   'label' for world model objects, 'checked_dir' for checked directions
+        #                   and 'square', 'rect' for coloured blocks/rectangles
+        #   $modelObj   - The GA::ModelObj::Region, GA::ModelObj::Room, GA::Obj::Exit or
+        #                   GA::Obj::MapLabel being drawn /redrawn / deleted
+        #               - For checked directions, the GA::ModelObj::Room in which the checked
+        #                   direction is stored
+        #               - For coloured squares, it's not a blessed reference, but a coordinate in
+        #                   the form 'x_y' (to delete canvas objects on all levels), or 'x_y_z' (to
+        #                   delete the canvas object on one level)
+        #               - For coloured rectangles, it's not a blessed reference, but a key in the
+        #                   form 'object-number' (to delete canvas objects on all levels), or
+        #                   'object-number_level' (to delete the canvas object on one level)
+        #
+        # Optional arguments
+        #   $regionmapObj, $parchmentObj
+        #               - The regionmap and parchment object for $modelObj. If not set, this
+        #                   function fetches them. Both must be specified if $type is 'square' or
+        #                   'rect')
+        #   $deleteFlag - Set to TRUE if the object is being deleted from the world model, FALSE
+        #                   (or 'undef') if not. Never TRUE for coloured blocks/rectangles which
+        #                   are not stored in the world model
+        #
+        # Return values
+        #   'undef' on improper arguments, if there's an error or if there are no canvas objects to
+        #       destroy
+        #   1 otherwise
+
+        my ($self, $type, $modelObj, $regionmapObj, $parchmentObj, $deleteFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $roomObj,
+            @redrawList,
+            %redrawHash,
+        );
+
+        # Check for improper arguments
+        if (! defined $type || ! defined $modelObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->deleteCanvasObj', @_);
+        }
+
+        # Fetch the regionmap and parchment object, if not specified
+        if (! $regionmapObj) {
+
+            if ($type eq 'region') {
+
+                $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $modelObj->name);
+
+            } elsif (
+                $type eq 'room' || $type eq 'room_tag' || $type eq 'room_guild'
+                || $type eq 'checked_dir'
+            ) {
+                $regionmapObj = $self->findRegionmap($modelObj->parent);
+
+            } elsif ($type eq 'exit' || $type eq 'exit_tag') {
+
+                $roomObj = $self->worldModelObj->ivShow('modelHash', $modelObj->parent);
+                $regionmapObj = $self->findRegionmap($roomObj->parent);
+
+            } elsif ($type eq 'label') {
+
+                $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $modelObj->region);
+
+            } else {
+
+                # $type is 'square' or 'rect', for which $regionmapObj should have been be specified
+                return undef;
+            }
+        }
+
+        if ($regionmapObj && ! $parchmentObj) {
+
+            $parchmentObj = $self->ivShow('parchmentHash', $regionmapObj->name);
+        }
+
+        if (! $parchmentObj) {
+
+            # No parchment object for this region exists, so there are no canvas objects to destroy
+            return undef;
+        }
+
+        # Handle a region deletion
+        if ($type eq 'region' && $deleteFlag) {
+
+            # Reset the treeview, so that the deleted region is no longer visible in it
+            $self->resetTreeView();
+
+            if ($self->currentRegionmap && $self->currentRegionmap eq $regionmapObj) {
+
+                # The currently displayed region was the one deleted. Draw an empty map
+                $self->resetMap();
+
+            } else {
+
+                # Redraw all rooms containing region exits (which automatically redraws the exits)
+                foreach my $otherRegionmap ($self->worldModelObj->ivValues('regionmapHash')) {
+
+                    # The same room can have more than one region exit; add affected rooms to a hash
+                    #   to eliminate duplicates
+                    foreach my $number ($otherRegionmap->ivKeys('regionExitHash')) {
+
+                        my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
+                        if ($exitObj) {
+
+                            $redrawHash{$exitObj->parent} = undef;
+                        }
+                    }
+                }
+
+                # Having eliminated duplicates, compile the list of rooms to redraw
+                foreach my $number (keys %redrawHash) {
+
+                    my $thisRoomObj = $self->worldModelObj->ivShow('modelHash', $number);
+                    if ($thisRoomObj) {
+
+                           push (@redrawList, 'room', $thisRoomObj);
+                    }
+                }
+
+                # Redraw the affected rooms
+                $self->markObjs(@redrawList);
+                $self->doDraw();
+
+                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+                $self->restrictWidgets();
+            }
+
+        # Handle a room draw/redraw/deletion
+        } elsif ($type eq 'room') {
+
+            if ($deleteFlag) {
+
+                # Unselect the room, if selected
+                $self->unselectObj(
+                    $modelObj,
+                    undef,              # A room, not a room tag or room guild
+                    TRUE,               # No re-draw
+                );
+
+                # Also unselect the room tag and/or room guild, if either is selected
+                if (defined $modelObj->roomTag) {
+
+                    $self->unselectObj(
+                        $modelObj,
+                        'room_tag',
+                        TRUE,           # No re-draw
+                    );
+                }
+
+                if (defined $modelObj->roomGuild) {
+
+                    $self->unselectObj(
+                        $modelObj,
+                        'room_guild',
+                        TRUE,           # No re-draw
+                    );
+                }
+            }
+
+            if (! defined $modelObj->xPosBlocks) {
+
+                # No canvas objects to destroy
+                return undef;
+            }
+
+            # (The TRUE argument means to destroy canvas objects for the room, and also for any
+            #   room echoes/room tags/room guilds/room text/checked directions)
+            $parchmentObj->deleteDrawnRoom($modelObj, TRUE);
+
+        # Handle a room tag deletion
+        } elsif ($type eq 'room_tag') {
+
+            if ($deleteFlag) {
+
+                # Unselect the room tag, if selected
+                $self->unselectObj(
+                    $modelObj,
+                    'room_tag',
+                    TRUE,           # No re-draw
+                );
+            }
+
+            if (! defined $modelObj->xPosBlocks) {
+
+                # No canvas objects to destroy
+                return undef;
+            }
+
+            $parchmentObj->deleteDrawnRoomTag($modelObj);
+
+        # Handle a room guild deletion
+        } elsif ($type eq 'room_guild') {
+
+            if ($deleteFlag) {
+
+                # Unselect the room guild, if selected
+                $self->unselectObj(
+                    $modelObj,
+                    'room_guild',
+                    TRUE,           # No re-draw
+                );
+            }
+
+            if (! defined $modelObj->xPosBlocks) {
+
+                # No canvas objects to destroy
+                return undef;
+            }
+
+            $parchmentObj->deleteDrawnRoomGuild($modelObj);
+
+        # Handle an exit deletion
+        } elsif ($type eq 'exit') {
+
+            # Unselect the exit, if selected
+            if ($deleteFlag) {
+
+                $self->unselectObj(
+                    $modelObj,
+                    undef,              # An exit, not an exit tag
+                    TRUE,               # No re-draw
+                );
+
+                # Also unselect the exit tag, if it is selected
+                if (defined $modelObj->exitTag) {
+
+                    $self->unselectObj(
+                        $modelObj,
+                        'exit_tag',
+                        TRUE,           # No re-draw
+                    );
+                }
+            }
+
+            # (The TRUE argument means to destroy canvas objects for the exit, and also for any
+            #   exit tags/ornaments)
+            $parchmentObj->deleteDrawnExit($modelObj, undef, TRUE);
+
+        # Handle an exit tag deletion
+        } elsif ($type eq 'exit_tag') {
+
+            if ($deleteFlag) {
+
+                # Unselect the exit tag, if selected
+                $self->unselectObj(
+                    $modelObj,
+                    'exit_tag',
+                    TRUE,               # No re-draw
+                );
+            }
+
+            $parchmentObj->deleteDrawnExitTag($modelObj);
+
+        # Handle a label deletion
+        } elsif ($type eq 'label') {
+
+            if ($deleteFlag) {
+
+                # Unselect the label, if selected
+                $self->unselectObj(
+                    $modelObj,
+                    undef,              # A label, not a room tag or room guild
+                    TRUE,               # No re-draw
+                );
+            }
+
+            $parchmentObj->deleteDrawnLabel($modelObj);
+
+        # Handle a checked direction deletion
+        } elsif ($type eq 'checked_dir') {
+
+            # (Checked directions can't be selected)
+
+            if (! defined $modelObj->xPosBlocks) {
+
+                # No canvas objects to destroy
+                return undef;
+            }
+
+            $parchmentObj->deleteDrawnCheckedDir($modelObj);
+
+        # Handle a coloured block deletion
+        } elsif ($type eq 'square') {
+
+            # (Coloured squares can't be selected)
+
+            # For coloured squares, $modelObj is not a blessed reference, but a coordinate in the
+            #   form 'x_y' (to delete canvas objects on all levels), or 'x_y_z' (to delete the
+            #   canvas object on one level)
+            $parchmentObj->deleteColouredSquare($modelObj)
+
+        # Handle a coloured rectangle deletion
+        } elsif ($type eq 'rect') {
+
+            # (Coloured rectangles can't be selected)
+
+            # For coloured rectangles, $modelObj is not a blessed reference, but a key in the form
+            #   'object-number' (to delete canvas objects on all levels), or 'object-number_level'
+            #   (to delete the canvas object on one level)
+            $parchmentObj->deleteColouredRect($modelObj)
+
+        } else {
+
+            # Unrecognised object type
+            return undef;
+        }
+
+        return 1;
+    }
+
     sub startDrag {
 
         # Called by $self->setupCanvasObjEvent and ->canvasEventHandler at the start of a drag
@@ -15374,7 +16063,10 @@
         my ($self, $type, $canvasObj, $modelObj, $event, $xPos, $yPos, $check) = @_;
 
         # Local variables
-        my (@canvasObjList, @fakeRoomList);
+        my (
+            $mode,
+            @canvasObjList, @fakeRoomList,
+        );
 
         # Check for improper arguments
         if (
@@ -15383,10 +16075,6 @@
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->startDrag', @_);
         }
-
-        # Gtk2 can return fractional values for $xPos, $yPos. We definitely want only integers
-        $xPos = int($xPos);
-        $yPos = int($yPos);
 
         # Double-clicking on a canvas object can cause this function to be called twice; the second
         #   time, don't do anything
@@ -15398,19 +16086,24 @@
         # If the tooltips are visible, hide them
         $self->hideTooltips();
 
-        if ($type eq 'room') {
+        # Gtk2 can return fractional values for $xPos, $yPos. We definitely want only integers
+        $xPos = int($xPos);
+        $yPos = int($yPos);
 
-            my $mode;
+        # For dragged rooms/exits, we need a $mode value the same as would be used during a draw
+        #   cycle
+        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+            $mode = $self->currentRegionmap->drawExitMode;
+        } else {
+            $mode = $self->worldModelObj->drawExitMode;
+        }
+
+        if ($type eq 'room') {
 
             # If the room(s) have been drawn emphasised (a normal box with a border, plus an extra
             #   square just outside it, in the same colour as the border, giving the impression of a
             #   thicker border), we need to re-draw them without emphasis - otherwise the extra
-            #   square will be left behind on the canvas, while the room is being dragged around
-            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-                $mode = $self->currentRegionmap->drawExitMode;
-            } else {
-                $mode = $self->worldModelObj->drawExitMode;
-            }
+            #   square will be left behind on the canvas while the room is being dragged around
 
             # Check that the room is selected. If not, we need to select it (which unselects any
             #   other selected rooms/labels)
@@ -15425,6 +16118,13 @@
                 $self->setSelectedObj([$modelObj, 'room']);
             }
 
+            # Temporarily set a few draw cycle IVs, which allows the drawing functions to work as if
+            #   we were in a draw cycle (i.e. a call to $self->doDraw). They are reset by
+            #   $self->stopDrag
+            $self->ivPoke('drawRegionmap', $self->currentRegionmap);
+            $self->ivPoke('drawParchment', $self->currentParchment);
+            $self->prepareDraw($mode);
+
             # If multiple rooms/labels are selected, they are all dragged alongside $canvasObj (as
             #   long as they're in the same region as $roomObj)
             foreach my $roomObj ($self->compileSelectedRooms) {
@@ -15436,14 +16136,12 @@
 
                     # Redraw the room without extra markings like interior text or an emphasised
                     #   border
+                    # (NB Calling $self->drawRoom here, instead of calling ->markObjs then ->doDraw
+                    #   as usual, is allowed. Because of the TRUE argument, ->drawRoom is expecting
+                    #   a call from this function
                     $self->drawRoom($roomObj, $mode, TRUE);
 
-                    $listRef = $self->ivShow(
-                        'drawnRoomHash',
-                        $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_'
-                        . $roomObj->zPosBlocks,
-                    );
-
+                    $listRef = $self->currentParchment->getDrawnRoom($roomObj);
                     $thisCanvasObj = $$listRef[0];
                     push (@canvasObjList, $thisCanvasObj);
 
@@ -15455,6 +16153,7 @@
 
                     # Draw a fake room at the same position, so that $modelObj's exits don't look
                     #   odd
+                    # (NB $self->drawFakeRoomBox is only called by this function, never by ->doDraw)
                     $fakeRoomObj = $self->drawFakeRoomBox($roomObj);
                     if ($fakeRoomObj) {
 
@@ -15472,15 +16171,13 @@
 
             foreach my $labelObj ($self->compileSelectedLabels) {
 
-                my ($region, $listRef, $thisCanvasObj, $thisCanvasObj2);
+                my ($listRef, $thisCanvasObj, $thisCanvasObj2);
 
                 # Drag both the label and its box (if it has one), as long as it's in the same
                 #   region
-                $region = $self->currentRegionmap->name;
+                if ($labelObj->region eq $self->currentRegionmap->name) {
 
-                if ($labelObj->region eq $region) {
-
-                    $listRef = $self->ivShow('drawnLabelHash', $labelObj->number);
+                    $listRef = $self->currentParchment->getDrawnLabel($labelObj);
                     ($thisCanvasObj, $thisCanvasObj2) = @$listRef;
 
                     if ($thisCanvasObj2) {
@@ -15505,6 +16202,13 @@
 
                 $twinExitObj = $self->worldModelObj->ivShow('exitModelHash', $modelObj->twinExit);
             }
+
+            # Temporarily set a few draw cycle IVs, which allows the drawing functions to work as if
+            #   we were in a draw cycle (i.e. a call to $self->doDraw). They are reset by
+            #   $self->stopDrag
+            $self->ivPoke('drawRegionmap', $self->currentRegionmap);
+            $self->ivPoke('drawParchment', $self->currentParchment);
+            $self->prepareDraw($mode);
 
             # See if the click was near a bend
             $bendNum = $self->findExitBend($modelObj, $xPos, $yPos);
@@ -15548,7 +16252,13 @@
             } else {
 
                 # Destroy the existing canvas object
-                $self->deleteCanvasObj('exit', $modelObj);
+                $self->deleteCanvasObj(
+                    'exit',
+                    $modelObj,
+                    $self->currentRegionmap,
+                    $self->currentParchment,
+                );
+
                 # The canvas objects for the exit may have been drawn associated with $exitObj, or
                 #   with its twin exit (if any); make sure those canvas objects are destroyed, too
                 #   (except for normal broken exits, region exits, impassable exits and mystery
@@ -15562,7 +16272,12 @@
                         && $twinExitObj->exitOrnament ne 'mystery'
                     )
                 ) {
-                    $self->deleteCanvasObj('exit', $twinExitObj);
+                    $self->deleteCanvasObj(
+                        'exit',
+                        $twinExitObj,
+                        $self->currentRegionmap,
+                        $self->currentParchment,
+                    );
                 }
 
                 # Draw a draggable exit, starting from $exitObj's normal start position, and ending
@@ -15580,7 +16295,7 @@
 
             # If the label has a box, the user might have clicked on either the label or the box.
             #   In either case, both objects need to be dragged
-            $listRef = $self->ivShow('drawnLabelHash', $modelObj->number);
+            $listRef = $self->currentParchment->getDrawnLabel($modelObj);
 
             foreach my $thisCanvasObj (reverse @$listRef) {
 
@@ -15705,7 +16420,13 @@
                 }
 
                 # Destroy the bending exit's existing canvas objects
-                $self->deleteCanvasObj('exit', $self->dragModelObj);
+                $self->deleteCanvasObj(
+                    'exit',
+                    $self->dragModelObj,
+                    $self->currentRegionmap,
+                    $self->currentParchment,
+                );
+
                 # Redraw the bending exit, with the dragged bend in its new position
                 $self->drawBentExit(
                     $self->worldModelObj->ivShow('modelHash', $self->dragModelObj->parent),
@@ -15714,9 +16435,19 @@
                     $twinExitObj,
                 );
 
+                if ($twinExitObj) {
+
+                    $self->deleteCanvasObj(
+                        'exit',
+                        $twinExitObj,
+                        $self->currentRegionmap,
+                        $self->currentParchment,
+                    );
+                }
+
                 # Get the new canvas object to grab. Since the bending exit consists of several
                 #   canvas objects, use the first one
-                $listRef = $self->ivShow('drawnExitHash', $self->dragModelObj->number);
+                $listRef = $self->currentParchment->getDrawnExit($self->dragModelObj);
                 $canvasObj = $$listRef[0];
 
             # If dragging a draggable exit...
@@ -15783,6 +16514,10 @@
         # Mark the drag operation as finished
         $self->ivPoke('dragFlag', FALSE);
 
+        # If rooms have been dragged, there may be some entries in ->drawCycleExitHash. Empty it,
+        #   allowing the exits in all affected rooms to be redrawn
+        $self->ivEmpty('drawCycleExitHash');
+
         # Respond to the end of the drag operation
         if ($self->dragModelObjType eq 'room') {
 
@@ -15838,7 +16573,8 @@
                     push (@drawList, 'label', $labelObj);
                 }
 
-                $self->doDraw(@drawList);
+                $self->markObjs(@drawList);
+                $self->doDraw();
 
             # If the dragged room is the current room, and the automapper object is set up to merge
             #   rooms, and one of its matching rooms is the one occupying the dragged room's new
@@ -15866,7 +16602,8 @@
                         push (@drawList, 'label', $labelObj);
                     }
 
-                    $self->doDraw(@drawList);
+                    $self->markObjs(@drawList);
+                    $self->doDraw();
                 }
 
             # If a single room and no labels are selected...
@@ -15877,7 +16614,8 @@
 
                     # The room has been dragged to an occupied gridblock. Don't move the room, just
                     #   redraw it at its original position
-                    $self->doDraw('room', $self->dragModelObj);
+                    $self->markObjs('room', $self->dragModelObj);
+                    $self->doDraw();
 
                 } else {
 
@@ -15945,7 +16683,8 @@
                         push (@drawList, 'label', $labelObj);
                     }
 
-                    $self->doDraw(@drawList);
+                    $self->markObjs(@drawList);
+                    $self->doDraw();
 
                 } else {
 
@@ -15983,7 +16722,8 @@
 
                     # No connection to make. Redraw the original exit, at its original size and
                     #   position
-                   $self->doDraw('exit', $self->dragModelObj);
+                    $self->markObjs('exit', $self->dragModelObj);
+                    $self->doDraw();
 
                 } else {
 
@@ -16028,6 +16768,9 @@
         $self->ivUndef('dragBendTwinInitXPos');
         $self->ivUndef('dragBendTwinInitYPos');
         $self->ivUndef('dragExitDrawMode');
+
+        # Also reset the draw cycle IVs set by $self->startDrag
+        $self->tidyUpDraw();
 
         return 1;
     }
@@ -16094,13 +16837,19 @@
         my ($self, $event, $check) = @_;
 
         # Local variables
-        my ($x1, $y1, $x2, $y2, $canvasObj);
+        my ($canvasWidget, $x1, $y1, $x2, $y2, $canvasObj);
 
         # Check for improper arguments
         if (! defined $event || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->continueSelectBox', @_);
         }
+
+        # Get the canvas widget for the current level
+        $canvasWidget = $self->currentParchment->ivShow(
+            'canvasWidgetHash',
+            $self->currentRegionmap->currentLevel,
+        );
 
         # Deleting the existing canvas object (if one has already been drawn)
         if ($self->selectBoxCanvasObj) {
@@ -16138,7 +16887,7 @@
 
             # Draw the new canvas object
             $canvasObj = Gnome2::Canvas::Item->new(
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Rect',
                 x1 => $x1,
                 y1 => $y1,
@@ -16356,9 +17105,11 @@
 
         if ($self->selectedRoom) {
 
-            # There is only one selected room. Is it on the current level?
-            if ($self->selectedRoom->zPosBlocks == $self->currentRegionmap->currentLevel) {
-
+            # There is only one selected room. Is it in the current region's current level?
+            if (
+                $self->selectedRoom->parent == $self->currentRegionmap->number
+                && $self->selectedRoom->zPosBlocks == $self->currentRegionmap->currentLevel
+            ) {
                 # It's on the current level
                 $startX = $self->selectedRoom->xPosBlocks;
                 $startY = $self->selectedRoom->yPosBlocks;
@@ -16377,30 +17128,41 @@
             $count = 0;
             foreach my $roomObj ($self->ivValues('selectedRoomHash')) {
 
-                $count++;
+                if (
+                    $roomObj->parent == $self->currentRegionmap->number
+                    && $roomObj->zPosBlocks == $self->currentRegionmap->currentLevel
+                ) {
+                    $count++;
 
-                if ($count == 1) {
+                    if ($count == 1) {
 
-                    # This is the first room processed
-                    $startX = $roomObj->xPosBlocks;
-                    $startY = $roomObj->yPosBlocks;
-                    $stopX = $roomObj->xPosBlocks;
-                    $stopY = $roomObj->yPosBlocks;
-
-                } else {
-
-                    if ($roomObj->xPosBlocks < $startX) {
+                        # This is the first room processed
                         $startX = $roomObj->xPosBlocks;
-                    } elsif ($roomObj->xPosBlocks > $stopX) {
-                        $stopX = $roomObj->xPosBlocks;
-                    }
-
-                    if ($roomObj->yPosBlocks < $startY) {
                         $startY = $roomObj->yPosBlocks;
-                    } elsif ($roomObj->yPosBlocks > $stopY) {
+                        $stopX = $roomObj->xPosBlocks;
                         $stopY = $roomObj->yPosBlocks;
+
+                    } else {
+
+                        if ($roomObj->xPosBlocks < $startX) {
+                            $startX = $roomObj->xPosBlocks;
+                        } elsif ($roomObj->xPosBlocks > $stopX) {
+                            $stopX = $roomObj->xPosBlocks;
+                        }
+
+                        if ($roomObj->yPosBlocks < $startY) {
+                            $startY = $roomObj->yPosBlocks;
+                        } elsif ($roomObj->yPosBlocks > $stopY) {
+                            $stopY = $roomObj->yPosBlocks;
+                        }
                     }
                 }
+            }
+
+            if (! $count) {
+
+                # No selected rooms in the current region's current level
+                return @emptyList;
             }
 
         } else {
@@ -16564,7 +17326,7 @@
         $self->ivEmpty('selectedLabelHash');
 
         # Finally, re-draw all objects that have either been selected or unselected. Compile a list
-        #   to send to ->doDraw, in the form (type, object, type, object, ...)
+        #   to send to ->markObjs, in the form (type, object, type, object, ...)
         foreach my $obj (values %newHash) {
 
             push (@redrawList, 'room', $obj);
@@ -16601,7 +17363,8 @@
         }
 
         # Actually redraw the affected objects
-        $self->doDraw(@redrawList);
+        $self->markObjs(@redrawList);
+        $self->doDraw();
 
         # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
         $self->restrictWidgets();
@@ -16649,8 +17412,8 @@
         $level = $self->currentRegionmap->currentLevel;
 
         # Convert canvas (pixel) coordinates to gridblock coordinates
-        ($xBlocks1, $yBlocks1) = $self->findGridBlock($x1, $y1);
-        ($xBlocks2, $yBlocks2) = $self->findGridBlock($x2, $y2);
+        ($xBlocks1, $yBlocks1) = $self->findGridBlock($x1, $y1, $self->currentRegionmap);
+        ($xBlocks2, $yBlocks2) = $self->findGridBlock($x2, $y2, $self->currentRegionmap);
 
         # Get the position of a room's border drawn within its gridblock
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
@@ -16693,11 +17456,8 @@
         if ($xBlocks1 == $xBlocks2 && $yBlocks1 == $yBlocks2) {
 
             # Special case - if it's only one block, then don't check every room in the region
-            $coord = $xBlocks1 . '_' . $xBlocks2 . '_' . $level;
+            $coord = $xBlocks1 . '_' . $yBlocks1 . '_' . $level;
             if ($self->currentRegionmap->ivExists('gridRoomHash', $coord)) {
-
-
-                my $roomNum = $self->currentRegionmap->ivShow('gridRoomHash', $coord);
 
                 push (
                     @selectList,
@@ -16740,26 +17500,29 @@
 
                 my ($listRef, $canvasObj, $labelX1, $labelY1, $labelX2, $labelY2);
 
-                $listRef = $self->ivShow('drawnLabelHash', $labelObj->number);
-                if (defined $listRef && $labelObj->level == $level) {
+                if ($labelObj->level == $level) {
 
-                    # If the label has a box, use the boundaries of the box; otherwise use the
-                    #   boundaries of the label text
-                    if ($labelObj->boxFlag && defined $$listRef[1]) {
-                        $canvasObj = $$listRef[1];
-                    } else {
-                        $canvasObj = $$listRef[0];
-                    }
+                    $listRef = $self->currentParchment->getDrawnLabel($labelObj);
+                    if (defined $listRef) {
 
-                    ($labelX1, $labelY1, $labelX2, $labelY2) = $canvasObj->get_bounds();
+                        # If the label has a box, use the boundaries of the box; otherwise use the
+                        #   boundaries of the label text
+                        if ($labelObj->boxFlag && defined $$listRef[1]) {
+                            $canvasObj = $$listRef[1];
+                        } else {
+                            $canvasObj = $$listRef[0];
+                        }
 
-                    if (
-                        $labelX1 <= $x2
-                        && $labelX2 >= $x1
-                        && $labelY1 <= $y2
-                        && $labelY2 >= $y1
-                    ) {
-                        push (@selectList, $labelObj, 'label');
+                        ($labelX1, $labelY1, $labelX2, $labelY2) = $canvasObj->get_bounds();
+
+                        if (
+                            $labelX1 <= $x2
+                            && $labelX2 >= $x1
+                            && $labelY1 <= $y2
+                            && $labelY2 >= $y1
+                        ) {
+                            push (@selectList, $labelObj, 'label');
+                        }
                     }
                 }
             }
@@ -17116,464 +17879,6 @@
         }
 
         return ($clickType, $button, $shiftFlag, $ctrlFlag);
-    }
-
-    sub deleteCanvasObj {
-
-        # Called by numerous functions
-        #
-        # When a region object, room object, room tag, room guild, exit, exit tag or label is being
-        #   drawn, redrawn or deleted from the world model, this function must be called
-        # The function checks whether the model object is currently displayed on the map as one or
-        #   more canvas objects and, if it is, destroys the canvas objects
-        #
-        # This function also handles coloured blocks and rectangles on the background map, details
-        #   of which are stored in the regionmap object (GA::Obj::Regionmap), not the world model
-        # The function checks whether a canvas object for the coloured block/rectangle is currently
-        #   displayed on the map as a canvas object and, if so, destroys the canvas object
-        #
-        # Expected arguments
-        #   $type       - Set to 'region', 'room', 'room_tag', 'room_guild', 'exit', 'exit_tag' or
-        #                   'label' for world model objects, 'checked_dir' for checked directions
-        #                   (which are not world model objects), and 'square', 'rect' for coloured
-        #                   blocks/rectangles
-        #   $modelObj   - The GA::ModelObj::Region, GA::ModelObj::Room, GA::Obj::Exit or
-        #                   GA::Obj::MapLabel being drawn /redrawn / deleted
-        #               - For checked directions, the GA::ModelObj::Room in which the checked
-        #                   direction is stored
-        #               - For coloured blocks, it's not a blessed reference, but a coordinate in the
-        #                   form 'x_y'. For coloured rectangles, it's a GA::Obj::GridColour
-        #
-        # Optional arguments
-        #   $deleteFlag - Set to TRUE if the object is being deleted from the world model, FALSE
-        #                   (or 'undef') if not. Never TRUE for coloured blocks/rectangles which
-        #                   are not stored in the world model
-        #
-        # Return values
-        #   'undef' on improper arguments, if there is no current regionmap or if the model object
-        #       isn't currently displayed on the map
-        #   1 otherwise
-
-        my ($self, $type, $modelObj, $deleteFlag, $check) = @_;
-
-        # Local variables
-        my (
-            $regionmapObj, $posn, $listRef, $roomObj, $twinModelObj, $thisCanvasObj,
-            @redrawList,
-            %redrawHash,
-        );
-
-        # Check for improper arguments
-        if (! defined $type || ! defined $modelObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->deleteCanvasObj', @_);
-        }
-
-        if (! $self->currentRegionmap) {
-
-            # No current regionmap, so no canvas objects can exist
-            return undef;
-        }
-
-        # Handle a region deletion
-        if ($type eq 'region' && $deleteFlag) {
-
-            # Reset the treeview, so that the deleted region is no longer visible in it
-            $self->resetTreeView();
-
-            # Because we can be sure that all of the region's children have now been deleted, we can
-            #   go ahead and redraw the current regionmap right away
-            $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $modelObj->name);
-
-            if ($regionmapObj && $regionmapObj eq $self->currentRegionmap) {
-
-                # The currently displayed region was the one deleted. Redraw the canvas with no map
-                #   displayed
-                $self->resetMap(FALSE);
-
-            } else {
-
-                # Redraw all rooms containing region exits (which automatically redraws the exits)
-                if ($self->currentRegionmap->regionExitHash) {
-
-                    # The same room can have more than one region exit; add affected rooms to a hash
-                    #   to eliminate duplicates
-                    foreach my $number ($self->currentRegionmap->ivKeys('regionExitHash')) {
-
-                        my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
-                        if ($exitObj) {
-
-                            $redrawHash{$exitObj->parent} = undef;
-                        }
-                    }
-
-                    # Having eliminated duplicates, compile the list of rooms to redraw
-                    foreach my $number (keys %redrawHash) {
-
-                        my $thisRoomObj = $self->worldModelObj->ivShow('modelHash', $number);
-                        if ($thisRoomObj) {
-
-                            push (@redrawList, 'room', $thisRoomObj);
-                        }
-                    }
-
-                    # Redraw the affected rooms
-                    $self->doDraw(@redrawList);
-
-                    # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-                    $self->restrictWidgets();
-                }
-            }
-
-        # Handle a room draw/redraw/deletion
-        } elsif ($type eq 'room') {
-
-            if ($deleteFlag) {
-
-                # Unselect the room, if selected
-                $self->unselectObj(
-                    $modelObj,
-                    undef,          # A room, not a room tag or room guild
-                    TRUE,           # No re-draw
-                );
-            }
-
-            # Get a string representing the room's position
-            if (! defined $modelObj->xPosBlocks) {
-
-                # No canvas object to remove
-                return undef;
-
-            } else {
-
-                $posn = $modelObj->xPosBlocks . '_' . $modelObj->yPosBlocks . '_'
-                            . $modelObj->zPosBlocks;
-            }
-
-            # See if the room has been drawn on the current map by looking up its canvas object
-            $listRef = $self->ivShow('drawnRoomHash', $posn);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnRoomHash', $posn);
-                # (If there's an entry in the hash containing a sub-set of key-value pairs from
-                #   $self->drawnRoomHash, delete that entry, too)
-                $self->ivDelete('dummyRoomHash', $posn);
-            }
-
-            $listRef = $self->ivShow('drawnRoomEchoHash', $posn);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnRoomEchoHash', $posn);
-            }
-
-            # Delete the associated room tag, if there is one
-            $listRef = $self->ivShow('drawnRoomTagHash', $posn);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnRoomTagHash', $posn);
-            }
-
-            # Delete the associated room guild, if there is one
-            $listRef = $self->ivShow('drawnRoomGuildHash', $posn);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnRoomGuildHash', $posn);
-            }
-
-            # Delete one or more associated room text items (the text drawn in the room's interior),
-            #   if there are any
-            $listRef = $self->ivShow('drawnRoomTextHash', $posn);
-            if (defined $listRef) {
-
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnRoomTextHash', $posn);
-            }
-
-            # Delete one or more associated checked directions, if there are any
-            $listRef = $self->ivShow('drawnCheckedDirHash', $posn);
-            if (defined $listRef) {
-
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnCheckedDirHash', $posn);
-            }
-
-        # Handle a room tag deletion
-        } elsif ($type eq 'room_tag') {
-
-            if ($deleteFlag) {
-
-                # Unselect the room tag, if selected
-                $self->unselectObj(
-                    $modelObj,
-                    'room_tag',
-                    TRUE,           # No re-draw
-                );
-            }
-
-            # Get a string representing the room's position
-            if (! defined $modelObj->xPosBlocks) {
-
-                # No canvas object to remove
-                return undef;
-
-            } else {
-
-                $posn = $modelObj->xPosBlocks . '_' . $modelObj->yPosBlocks . '_'
-                            . $modelObj->zPosBlocks;
-            }
-
-            # See if the room tag has been drawn on the current map by looking up its canvas object
-            $listRef = $self->ivShow('drawnRoomTagHash', $posn);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnRoomTagHash', $posn);
-            }
-
-        # Handle a room guild deletion
-        } elsif ($type eq 'room_guild') {
-
-            if ($deleteFlag) {
-
-                # Unselect the room guild, if selected
-                $self->unselectObj(
-                    $modelObj,
-                    'room_guild',
-                    TRUE,           # No re-draw
-                );
-            }
-
-            # Get a string representing the room's position
-            if (! defined $modelObj->xPosBlocks) {
-
-                # No canvas object to remove
-                return undef;
-
-            } else {
-
-                $posn = $modelObj->xPosBlocks . '_' . $modelObj->yPosBlocks . '_'
-                            . $modelObj->zPosBlocks;
-            }
-
-            # See if the room guild has been drawn on the current map by looking up its canvas
-            #   object
-            $listRef = $self->ivShow('drawnRoomGuildHash', $posn);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnRoomGuildHash', $posn);
-            }
-
-        # Handle an exit deletion
-        } elsif ($type eq 'exit') {
-
-            # Unselect the exit, if selected
-            if ($deleteFlag) {
-
-                $self->unselectObj(
-                    $modelObj,
-                    undef,          # An exit, not an exit tag
-                    TRUE,           # No re-draw
-                );
-            }
-
-            # See if the exit has been drawn on the current map by looking up its canvas object
-            $listRef = $self->ivShow('drawnExitHash', $modelObj->number);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnExitHash', $modelObj->number);
-            }
-
-            # Delete the associated exit tag, if there is one
-            $listRef = $self->ivShow('drawnExitTagHash', $modelObj->number);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnExitTagHash', $modelObj->number);
-            }
-
-            # Delete the associated exit ornaments, if there are any
-            $listRef = $self->ivShow('drawnOrnamentHash', $modelObj->number);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnOrnamentHash', $modelObj->number);
-            }
-
-        # Handle an exit tag deletion
-        } elsif ($type eq 'exit_tag') {
-
-            if ($deleteFlag) {
-
-                # Unselect the exit tag, if selected
-                $self->unselectObj(
-                    $modelObj,
-                    'exit_tag',
-                    TRUE,           # No re-draw
-                );
-            }
-
-            # See if the eixt tag has been drawn on the current map by looking up its canvas object
-            $listRef = $self->ivShow('drawnExitTagHash', $modelObj->number);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnExitTagHash', $modelObj->number);
-            }
-
-        # Handle a label deletion
-        } elsif ($type eq 'label') {
-
-            if ($deleteFlag) {
-
-                # Unselect the label, if selected
-                $self->unselectObj(
-                    $modelObj,
-                    undef,          # A label, not a room tag or room guild
-                    TRUE,           # No re-draw
-                );
-            }
-
-            # See if the label has been drawn on the current map by looking up its canvas object
-            $listRef = $self->ivShow('drawnLabelHash', $modelObj->number);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnLabelHash', $modelObj->number);
-            }
-
-        # Handle a checked direction deletion
-        } elsif ($type eq 'checked_dir') {
-
-            # (Checked directions can't be selected)
-
-            # Get a string representing the room's position
-            if (! defined $modelObj->xPosBlocks) {
-
-                # No canvas object to remove
-                return undef;
-
-            } else {
-
-                $posn = $modelObj->xPosBlocks . '_' . $modelObj->yPosBlocks . '_'
-                            . $modelObj->zPosBlocks;
-            }
-
-            # See if the room has any checked directions drawn on the current map by looking up
-            #   their canvas objects
-            $listRef = $self->ivShow('drawnCheckedDirHash', $posn);
-            if (defined $listRef) {
-
-                # Delete these canvas objects
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-
-                $self->ivDelete('drawnCheckedDirHash', $posn);
-            }
-
-        # Handle a coloured block deletion
-        } elsif ($type eq 'square') {
-
-            # See if the coloured block exists as a canvas object on the current map
-            # NB In this case, $modelObj is a coordinate in the form 'x_y', not a world model object
-            $thisCanvasObj = $self->ivShow('colouredSquareHash', $modelObj);
-            if ($thisCanvasObj) {
-
-                # Delete this canvas object
-                $thisCanvasObj->destroy;
-                $self->ivDelete('colouredSquareHash', $modelObj);
-            }
-
-        # Handle a coloured rectangle deletion
-        } elsif ($type eq 'rect') {
-
-            # See if the coloured rectangle exists as a canvas object on the current map
-            # NB In this case, $modelObj is a GA::Obj::GridColour object, not a world model object
-            $thisCanvasObj = $self->ivShow('colouredRectHash', $modelObj->number);
-            if ($thisCanvasObj) {
-
-                # Delete this canvas object
-                $thisCanvasObj->destroy;
-                $self->ivDelete('colouredRectHash', $modelObj->number);
-            }
-
-        } else {
-
-            # Unrecognised object type
-            return undef;
-        }
-
-        return 1;
     }
 
     sub showTooltips {
@@ -18308,8 +18613,8 @@
             $self->ivPoke('selectedLabelHash', %labelHash);
         }
 
-        # Redraw the current level, to show all the changes
-        $self->drawRegion();
+        # Redraw the current region
+        $self->redrawRegions();
 
         # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
         $self->restrictWidgets();
@@ -18486,8 +18791,10 @@
             $self->ivPoke('selectedLabelHash', %labelHash);
         }
 
-        # Redraw the current level, to show all the changes
-        $self->drawRegion();
+        # Redraw the current region's current level now, and mark all other levels in the same
+        #   region (as well as any other regions for which a parchment exists) as needing to be
+        #   drawn
+        $self->drawAllRegions();
 
         # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
         $self->restrictWidgets();
@@ -18857,8 +19164,10 @@
                 $self->ivAdd('selectedExitHash', $number, $obj);
             }
 
-            # Redraw the current level, to show all the changes
-            $self->drawRegion();
+            # Redraw the current region's current level now, and mark all other levels in the same
+            #   region (as well as any other regions for which a parchment exists) as needing to be
+            #   drawn
+            $self->drawAllRegions();
 
             # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
             $self->restrictWidgets();
@@ -19277,17 +19586,10 @@
         # Check for improper arguments
         if (defined $check) {
 
-            return $axmud::CLIENT->writeImproper(
-                $self->_objClass . '->resetRoomDataCallback',
-                @_,
-            );
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->resetRoomDataCallback', @_);
         }
 
-        # Standard callback check
-        if (! $self->currentRegionmap) {
-
-            return undef;
-        }
+        # (No standard callback check)
 
         # Prepare combobox lists
         @list = (
@@ -19322,20 +19624,23 @@
 
         } until (! @list);
 
-        if ($self->mapObj->currentRoom) {
 
-            push (@list2, 'Current room', 'current');
+        if ($self->currentRegionmap) {
+
+            if ($self->mapObj->currentRoom) {
+
+                push (@list2, 'Current room', 'current');
+            }
+
+            if ($self->selectedRoom || $self->selectedRoomHash) {
+
+                push (@list2, 'Selected rooms', 'selected');
+            }
+
+            push (@list2, 'Rooms in this region', 'region');
         }
 
-        if ($self->selectedRoom || $self->selectedRoomHash) {
-
-            push (@list2, 'Selected rooms', 'selected');
-        }
-
-        push (@list2,
-            'Rooms in this region'      => 'region',
-            'Rooms in all regions'      => 'all_rooms',
-        );
+        push (@list2, 'Rooms in all regions', 'all_rooms');
 
         do {
 
@@ -19423,11 +19728,29 @@
         }
 
         # Tell the world model to reset the specified data in the specified rooms
-        $self->worldModelObj->resetRoomData(
-            TRUE,               # Update automapper windows now
-            $choice,
-            @roomList,
-        );
+        if (
+            ! $self->worldModelObj->resetRoomData(
+                TRUE,               # Update automapper windows now
+                $choice,
+                @roomList,
+            )
+        ) {
+            $self->showMsgDialogue(
+                'Reset room data',
+                'error',
+                'Operation failed (internal error)',
+                'ok',
+            );
+
+        } else {
+
+            $self->showMsgDialogue(
+                'Reset room data',
+                'info',
+                'Operation complete',
+                'ok',
+            );
+        }
 
         return 1;
     }
@@ -19461,11 +19784,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->resetVisitsCallback', @_);
         }
 
-        # Standard callback check
-        if (! $self->currentRegionmap) {
-
-            return undef;
-        }
+        # (No standard callback check)
 
         # Prepare a list of character strings for a combobox
         foreach my $profObj ($self->session->ivValues('profHash')) {
@@ -19492,9 +19811,14 @@
         push (@charStringList, $allCharString, $unCharString, @charNameList);
 
         # Prepare region strings for a second combobox
-        $thisRegionString = 'Current region (' . $self->currentRegionmap->name . ')';
+        if ($self->currentRegionmap) {
+
+            $thisRegionString = 'Current region (' . $self->currentRegionmap->name . ')';
+            push (@regionStringList, $thisRegionString);
+        }
+
         $allRegionString = 'All regions';
-        push (@regionStringList, $thisRegionString, $allRegionString);
+        push (@regionStringList, $allRegionString);
 
         # Prompt the user to specify which characters/regions to reset
         ($charChoice, $regionChoice) = $self->showDoubleComboDialogue(
@@ -19739,16 +20063,11 @@
                 $self->ivPoke('showChar', $choiceObj->name);
             }
 
-            # If there is a current regionmap, and if we are drawing room interiors in
-            #   'visit_count' mode, redraw the regionmap to show character visits for the selected
-            #   character
-            # (Don't redraw the region if the character hasn't changed)
-            if (
-                $redrawFlag
-                && $self->currentRegionmap
-                && $self->worldModelObj->roomInteriorMode eq 'visit_count'
-            ) {
-                $self->drawRegion();
+            # If we are drawing room interiors in 'visit_count' mode, redraw maps to show character
+            #   visits for the selected character (but not if the character hasn't changed)
+            if ($redrawFlag&& $self->worldModelObj->roomInteriorMode eq 'visit_count') {
+
+                $self->drawAllRegions();
             }
         }
 
@@ -20218,8 +20537,8 @@
 
         # Local variables
         my (
-            $noParentString, $title, $name, $parentName, $parentNumber, $result,
-            @objList, @nameList,
+            $successFlag, $name, $parentName, $width, $height, $parentNumber, $regionObj, $title,
+            $regionmapObj,
         );
 
         # Check for improper arguments
@@ -20230,41 +20549,23 @@
 
         # (No standard callback checks for this function)
 
-        # Get a sorted list of region objects
-        @objList = sort {lc($a->name) cmp lc($b->name)}
-                    ($self->worldModelObj->ivValues('regionModelHash'));
-        # Convert this list into region names
-        foreach my $obj (@objList) {
+        # Prompt the user for a region name, parent region name and map size
+        ($successFlag, $name, $parentName, $width, $height) = $self->promptNewRegion($tempFlag);
+        if (! $successFlag) {
 
-            push (@nameList, $obj->name);
-        }
+            # User cancelled the operation
+            return undef;
 
-        # The first item on the list should be an option to choose no parent at all
-        $noParentString = '<no parent region>';
-        unshift(@nameList, $noParentString);
-
-        if ($tempFlag) {
-            $title = 'New temporary region';
         } else {
-            $title = 'New region';
-        }
-
-        # Prompt the user for a region name and, optionally, a parent region
-        ($name, $parentName) = $self->showEntryComboDialogue(
-            $title,
-            "Enter a name for the new region (max 32 chars),\n"
-            . "or leave empty to generate a generic name",
-            '(Optional) select the parent region',
-            \@nameList,
-            32,
-        );
-
-        # If the user clicked the 'Cancel' button, $name is 'undef' If they left the entry box
-        #   empty, it'll be an empty string
-        if (defined $name) {
 
             # Check the name is not already in use
-            if ($name ne '' && $self->worldModelObj->ivExists('regionmapHash', $name)) {
+            if (defined $name && $self->worldModelObj->ivExists('regionmapHash', $name)) {
+
+                if ($tempFlag) {
+                    $title = 'New temporary region';
+                } else {
+                    $title = 'New region';
+                }
 
                 $self->showMsgDialogue(
                     $title,
@@ -20277,21 +20578,22 @@
             }
 
             # If a parent was specified, find its world model number
-            if ($parentName) {
+            if (defined $parentName) {
 
                 $parentNumber = $self->findRegionNum($parentName);
             }
 
             # Create the region object
-            if (
-                ! $self->worldModelObj->addRegion(
-                    $self->session,
-                    TRUE,               # Update Automapper windows now
-                    $name,              # May be an empty string
-                    $parentNumber,
-                    $tempFlag,
-                )
-            ) {
+            $regionObj = $self->worldModelObj->addRegion(
+                $self->session,
+                TRUE,               # Update Automapper windows now
+                $name,              # May be an empty string
+                $parentNumber,
+                $tempFlag,
+            );
+
+            if (! $regionObj) {
+
                 # Operation failed
                 $self->showMsgDialogue(
                     'New region',
@@ -20304,14 +20606,19 @@
 
             } else {
 
+                # Set the new region's size
+                $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $regionObj->name);
+                $regionmapObj->ivPoke('gridWidthBlocks', $width);
+                $regionmapObj->ivPoke('gridHeightBlocks', $height);
+                $regionmapObj->ivPoke('mapWidthPixels', $width * $regionmapObj->blockWidthPixels);
+                $regionmapObj->ivPoke(
+                    'mapHeightPixels',
+                    $height * $regionmapObj->blockHeightPixels,
+                );
+
                 # Make it the selected region, and draw it on the map
-                return $self->setCurrentRegion($name);
+                return $self->setCurrentRegion($regionObj->name);
             }
-
-        } else {
-
-            # User cancelled the operation
-            return undef;
         }
     }
 
@@ -21312,6 +21619,183 @@
         }
     }
 
+    sub preDrawSizeCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Prompts the user to set the minimum size for regions that should be pre-drawn when the
+        #   automapper window opens
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the user declines to modify the current value
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $choice;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->preDrawSizeCallback', @_);
+        }
+
+        # (No standard callback check)
+
+        # Prompt the user
+        $choice = $self->showEntryDialogue(
+            'Pre-drawn regions',
+            "Set the minimum size (in rooms) of any regions that\n"
+            . "should be pre-drawn when the Automapper window\n"
+            . "opens (or use 0 to pre-draw all regions)",
+            undef,              # No maximum characters
+            $self->worldModelObj->preDrawMinRooms,
+        );
+
+        if (defined $choice && $axmud::CLIENT->intCheck($choice, 0)) {
+
+            $self->worldModelObj->set_preDrawMinRooms($choice);
+        }
+
+        return 1;
+    }
+
+    sub retainDrawSizeCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Prompts the user to set the minimum size for drawn parchments that should be retained in
+        #   memory when a new current region is set
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the user declines to modify the current value
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $choice;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->retainDrawSizeCallback', @_);
+        }
+
+        # (No standard callback check)
+
+        # Prompt the user
+        $choice = $self->showEntryDialogue(
+            'Retain drawn regions',
+            "Set the minimum size (in rooms) of any regions that\n"
+            . "should be retained in memory when they're not\n"
+            . "visible (or use 0 to retain all drawn regions)",
+            undef,              # No maximum characters
+            $self->worldModelObj->retainDrawMinRooms,
+        );
+
+        if (defined $choice && $axmud::CLIENT->intCheck($choice, 0)) {
+
+            $self->worldModelObj->set_retainDrawMinRooms($choice);
+        }
+
+        return 1;
+    }
+
+    sub preDrawSpeedCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Prompts the user to set the number of queued canvas objects that should be drawn per
+        #   second (an approximate measure)
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the user declines to modify the current value
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $choice;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->preDrawSpeedCallback', @_);
+        }
+
+        # (No standard callback check)
+
+        # Prompt the user
+        $choice = $self->showEntryDialogue(
+            'Pre-drawn regions',
+            "When pre-drawing regions, set the approximate\n"
+            . "number of objects that should be drawn per\n"
+            . "second (or use 0 to prevent pre-drawn regions)\n",
+            undef,              # No maximum characters
+            $self->worldModelObj->queueDrawMaxObjs,
+        );
+
+        if (defined $choice && $axmud::CLIENT->intCheck($choice, 0)) {
+
+            $self->worldModelObj->set_queueDrawMaxObjs($choice);
+        }
+
+        return 1;
+    }
+
+    sub redrawRegionsCallback {
+
+        # Called by $self->enableRegionsColumn
+        # Prompts the user to confirm that all drawn regions should be redrawn, then performs the
+        #   operation
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the user declines to modify the current value
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $choice;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->redrawRegionsCallback', @_);
+        }
+
+        # Standard callback check
+        if (! $self->currentRegionmap) {
+
+            return undef;
+        }
+
+        # Prompt the user
+        $choice = $self->showMsgDialogue(
+            'Redraw drawn regions',
+            'question',
+            'This operation can reduce performance, perhaps for several minutes. Are you sure you'
+            . ' want to proceed?',
+            'yes-no',
+        );
+
+        if (defined $choice && $choice eq 'yes') {
+
+            $self->redrawRegions();
+        }
+    }
+
     sub recalculatePathsCallback {
 
         # Called by $self->enableRegionsColumn
@@ -21657,9 +22141,11 @@
         # Compare the Locator task's current room with every room in @roomList
         foreach my $roomNum (@roomList) {
 
-            my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+            my ($roomObj, $result);
 
-            if ($self->worldModelObj->locateRoom($self->session, $roomObj)) {
+            $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+            ($result) = $self->worldModelObj->compareRooms($self->session, $roomObj);
+            if ($result) {
 
                 push (@selectList, $roomObj);
                 # Add the parent region to a hash so we can quickly check how many regions
@@ -21874,7 +22360,12 @@
                         my ($x, $y) = split (/_/, $coord);
 
                         $self->currentRegionmap->removeSquare($coord);
-                        $self->deleteCanvasObj('square', $x . '_' . $y);
+                        $self->deleteCanvasObj(
+                            'square',
+                            $x . '_' . $y,
+                            $self->currentRegionmap,
+                            $self->currentParchment,
+                        );
                     }
                 }
 
@@ -21883,7 +22374,12 @@
                     if ($obj->colour eq $choice) {
 
                         $self->currentRegionmap->removeRect($obj);
-                        $self->deleteCanvasObj('rect', $obj);
+                        $self->deleteCanvasObj(
+                            'rect',
+                            $obj->number,
+                            $self->currentRegionmap,
+                            $self->currentParchment,
+                        );
                     }
                 }
 
@@ -21951,13 +22447,23 @@
                     my ($x, $y) = split (/_/, $coord);
 
                     $self->currentRegionmap->removeSquare($coord);
-                    $self->deleteCanvasObj('square', $x . '_' . $y);
+                    $self->deleteCanvasObj(
+                        'square',
+                        $x . '_' . $y,
+                        $self->currentRegionmap,
+                        $self->currentParchment,
+                    );
                 }
 
                 foreach my $obj (@rectList) {
 
                     $self->currentRegionmap->removeRect($obj);
-                    $self->deleteCanvasObj('rect', $obj);
+                    $self->deleteCanvasObj(
+                        'rect',
+                        $obj->number,
+                        $self->currentRegionmap,
+                        $self->currentParchment,
+                    );
                 }
 
                 # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
@@ -22080,7 +22586,7 @@
 
         # Local variables
         my (
-            $regionObj, $msg, $result,
+            $regionObj, $msg, $result, $total,
             @roomList, @otherList, @labelList,
         );
 
@@ -22137,12 +22643,22 @@
             }
         }
 
+        # For large regions, show the pause window
+        $total = scalar @roomList + scalar @labelList;
+        if ($total > $self->worldModelObj->drawPauseNum) {
+
+            $self->showPauseWin();
+        }
+
         # Delete the region
         $self->worldModelObj->deleteRegions(
             $self->session,
             TRUE,              # Update Automapper windows now
             $regionObj,
         );
+
+        # Make the pause window invisible
+        $self->hidePauseWin();
 
         return 1;
     }
@@ -22164,7 +22680,7 @@
 
         # Local variables
         my (
-            $msg, $result,
+            $msg, $result, $total,
             @tempList,
         );
 
@@ -22225,11 +22741,30 @@
             }
         }
 
+        # Work out roughly how many rooms and labels will be deleted. If it's a lot, show a pause
+        #   window
+        $total = 0;
+        foreach my $regionObj (@tempList) {
+
+            my $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $regionObj);
+
+            $total += $regionmapObj->ivPairs('gridRoomHash');
+            $total += $regionmapObj->ivPairs('gridLabelHash');
+        }
+
+        if ($total > $self->worldModelObj->drawPauseNum) {
+
+            $self->showPauseWin();
+        }
+
         # Delete each temporary region in turn
         $self->worldModelObj->deleteTempRegions(
             $self->session,
             TRUE,              # Update Automapper windows now
         );
+
+        # Make the pause window invisible
+        $self->hidePauseWin();
 
         return 1;
     }
@@ -22332,6 +22867,42 @@
 
             $self->session->mapObj->set_facingDir($choice);
         }
+
+        return 1;
+    }
+
+    sub resetFacingCallback {
+
+        # Called by $self->enableRoomsColumn
+        # Resets the direction the character is facing
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->resetFacingCallback', @_);
+        }
+
+        # (No standard callback check)
+
+        # Reset the facing direction
+        $self->session->mapObj->set_facingDir();
+
+        # Show a confirmation
+        $self->showMsgDialogue(
+            'Reset facing direction',
+            'info',
+            'The direction your character is facing has been reset',
+            'ok',
+        );
 
         return 1;
     }
@@ -24430,7 +25001,7 @@
             push (@drawList, 'room', $roomObj);
         }
 
-        $self->markObjs(@drawList);
+        $self->worldModelObj->updateMaps(@drawList);
 
         # Show a confirmation, but only if the selected room(s) are on a different level or in a
         #   different region altogether
@@ -24546,7 +25117,8 @@
         }
 
         # Redraw the room(s) with graffiti on or off
-        $self->doDraw(@drawList);
+        $self->markObjs(@drawList);
+        $self->doDraw();
         # Update room counts in the window's title bar
         $self->setWinTitle();
 
@@ -25958,9 +26530,6 @@
             return undef;
         }
 
-        # Get the parent room object
-        $roomObj = $self->worldModelObj->ivShow('modelHash', $self->selectedExit->parent);
-
         # When a user selects an exit, they may be referring either to the exit stored in
         #   $self->selectedExit, its twin exit (if there is one) or its shadow exit (if there is
         #   one). Prompt the user to find out which
@@ -25970,6 +26539,9 @@
             # User clicked the 'cancel' button, or closed the 'dialogue' window
             return undef;
         }
+
+        # Get the parent room object
+        $roomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->parent);
 
         # If this exit has been allocated a shadow exit, then the 'change direction' operation
         #   merely reassigns it as an unallocated exit
@@ -26707,9 +27279,6 @@
 
         my ($self, $check) = @_;
 
-        # Local variables
-        my $exitObj;
-
         # Check for improper arguments
         if (defined $check) {
 
@@ -26722,69 +27291,27 @@
             return undef;
         }
 
-        # Import the selected exit (for convenience)
-        $exitObj = $self->selectedExit;
-
-        if ($exitObj->destRoom) {
-
-            if ($exitObj->twinExit) {
-
-                # Two-way exit
-                $self->worldModelObj->abandonTwinExit(
-                    TRUE,           # Update Automapper windows now
-                    $exitObj,
-                );
-
-            } elsif ($exitObj->retraceFlag) {
-
-                # Retracing exit
-                $self->worldModelObj->restoreRetracingExit(
-                    TRUE,           # Update Automapper windows now
-                    $exitObj,
-                );
-
-            } elsif ($exitObj->oneWayFlag) {
-
-                # One-way exit
-                $self->worldModelObj->abandonOneWayExit(
-                    TRUE,           # Update Automapper windows now
-                    $exitObj,
-                );
-
-            } elsif ($exitObj->randomType ne 'none') {
-
-                # Random exit
-                $self->worldModelObj->restoreRandomExit(
-                    TRUE,           # Update Automapper windows now
-                    $exitObj,
-                );
-
-            } else {
-
-                # Uncertain exit
-                $self->worldModelObj->abandonUncertainExit(
-                    TRUE,           # Update Automapper windows now
-                    $exitObj,
-                );
-            }
-
-        } elsif ($exitObj->randomType ne 'none') {
-
-            # Random exit
-            $self->worldModelObj->restoreRandomExit(
+        # Perform the disconnection
+        if (
+            ! $self->worldModelObj->disconnectExit(
                 TRUE,           # Update Automapper windows now
-                $exitObj,
-            );
-
-        } else {
-
+                $self->selectedExit,
+            )
+        ) {
             # Not a connected exit
             $self->showMsgDialogue(
                 'Disconnect exit',
                 'error',
-                'The selected exit (#' . $exitObj->number . ') is not connected to a room',
+                'The selected exit (#' . $self->selectedExit->number
+                . ') is not connected to a room',
                 'ok',
             );
+
+        } else {
+
+            # If a twin exit was selected, there are now two incomplete exits, one selected, the
+            #   other not. Unselect both because that looks odd
+            $self->setSelectedObj();
         }
 
         return 1;
@@ -28649,7 +29176,7 @@
         }
 
         # Redraw the exits immediately
-        $self->doDraw(@drawList);
+        $self->worldModelObj->updateMaps(@drawList);
 
         return 1;
     }
@@ -29382,7 +29909,7 @@
             ! $self->currentRegionmap
             || ! $self->selectedExit
             || (! $self->selectedExit->oneWayFlag && ! $self->selectedExit->twinExit)
-            || ! $self->selectedExit->brokenFlag
+            || $self->selectedExit->regionFlag
             || ! defined $self->exitClickXPosn
             || ! defined $self->exitClickYPosn
         ) {
@@ -29451,7 +29978,7 @@
             # If the click was too close to an existing bend, show a message explaining why nothing
             #   has happened (don't bother showing a message for other values of $resultType, which
             #   probably can't be returned to this function anyway)
-            if ($resultType == 3) {
+            if ($resultType eq 'near_bend') {
 
                 $self->showMsgDialogue(
                     'Add bend',
@@ -29524,6 +30051,7 @@
 
             # Remove this bend
             $self->worldModelObj->removeExitBend(
+                $self->session,
                 TRUE,                   # Update Automapper windows now
                 $self->selectedExit,
                 $index,                 # Remove this bend (first bend is numbered 0)
@@ -29538,6 +30066,7 @@
                 );
 
                 $self->worldModelObj->removeExitBend(
+                    $self->session,
                     TRUE,               # Update Automapper windows now
                     $twinExitObj,
                     ((scalar $self->selectedExit->bendOffsetList / 2) - $index - 1),
@@ -30161,6 +30690,1273 @@
         );
     }
 
+    # IV setting functions
+
+    sub setMode {
+
+        # Can be called by anything
+        # Sets the automapper's operating mode and updates other IVs/widgets
+        # NB If the Locator isn't running, a call to this function always sets the mode to 'wait'
+        #
+        # Expected arguments
+        #   $mode   - The new mode:
+        #               'wait'      - The automapper isn't doing anything
+        #               'follow'    - The automapper is following the character's position, but not
+        #                               updating the world model
+        #               'update'    - The automapper is updating the world model as the character
+        #                               moves around
+        #
+        # Return values
+        #   'undef' on improper arguments, or if an attempt to switch to 'update' mode fails because
+        #       the Locator task is expecting room descriptions
+        #   1 otherwise
+
+        my ($self, $mode, $check) = @_;
+
+        # Local variables
+        my (
+            $taskObj, $title, $oldMode, $menuItemName, $radioMenuItem, $toolbarButtonName,
+            $toolbarButton,
+        );
+
+        # Check for improper arguments
+        if (
+            ! defined $mode || ($mode ne 'wait' && $mode ne 'follow' && $mode ne 'update')
+            || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setMode', @_);
+        }
+
+        # Import the current session's Locator task
+        $taskObj = $self->session->locatorTask;
+
+        # If the Locator isn't running or if there is no current regionmap, the mode must be set to
+        #   'wait'
+        if (! $taskObj || ! $self->currentRegionmap) {
+
+            $mode = 'wait';
+
+        } elsif ($self->mode eq 'update' && $self->worldModelObj->disableUpdateModeFlag) {
+
+            # This function is called just after GA::Obj::WorldModel->toggleDisableUpdateModeFlag
+            #   has set ->disableUpdateModeFlag to TRUE. Now that update mode has been disabled,
+            #   switch to 'follow' mode
+            $mode = 'follow';
+
+        } elsif (
+            ($self->mode ne 'update' && $mode eq 'update')
+            || ($self->mode eq 'wait' && $mode eq 'follow')
+        ) {
+            # Don't switch to update mode if it is disabled, or if the session is in 'connect
+            #   offline' mode
+            if (
+                $mode eq 'update'
+                && (
+                    $self->worldModelObj->disableUpdateModeFlag
+                    || $self->session->status eq 'offline'
+                )
+            ) {
+                # Retain the current mode ('wait' or 'follow')
+                $mode = $self->mode;
+
+            # If we're trying to switch from 'wait' to 'follow' mode, or from 'wait/'follow' to
+            #   'update' mode, the Locator task must not be expecting room descriptions (doing this
+            #   prevents the map from adding rooms based on junk data, or from getting lost
+            #   immediately because it expected the wrong room)
+            # If the Locator is expecting descriptions, refuse to switch mode
+            } elsif ($taskObj->moveList) {
+
+                if ($taskObj->moveList == 1) {
+                    $title = 'Set mode (1 missing room statement)';
+                } else {
+                    $title = 'Set mode (' . scalar $taskObj->moveList . ' missing room statements)';
+                }
+
+                $self->showMsgDialogue(
+                    $title,
+                    'warning',
+                    'The automapper can\'t switch to \'' . $mode . '\' mode until the Locator task'
+                    . ' is no longer expecting any rooms (try: Rooms - Locator task - Reset'
+                    . ' Locator)',
+                    'ok',
+                );
+
+                # Retain the current mode ('wait' or 'follow')
+                $mode = $self->mode;
+            }
+        }
+
+        # We need to compare the old/new settings of $self->mode in a moment
+        $oldMode = $self->mode;
+        # Set the automapper's new operating mode
+        $self->ivPoke('mode', $mode);
+
+        # Even if $self->mode hasn't changed, it might not match the menu items and the toolbar
+        #   button; so we must make sure the right ones are activated. Use
+        #   $self->ignoreMenuUpdateFlag so that toggling a menu item doesn't toggle a toolbar icon
+        #   (and vice-versa)
+        $self->ivPoke('ignoreMenuUpdateFlag', TRUE);
+
+        # Update radio buttons in the menu (if the menu is visible)
+        $menuItemName = 'set_'. $mode . '_mode';
+        if ($self->menuBar && $self->ivExists('menuToolItemHash', $menuItemName)) {
+
+            $radioMenuItem = $self->ivShow('menuToolItemHash', $menuItemName);
+            $radioMenuItem->set_active(TRUE);
+        }
+
+        # Update toolbar buttons in the toolbar (if the toolbar is visible)
+        $toolbarButtonName = 'icon_set_'. $mode . '_mode';
+        if ($self->toolbarList && $self->ivExists('menuToolItemHash', $toolbarButtonName)) {
+
+            $toolbarButton = $self->ivShow('menuToolItemHash', $toolbarButtonName);
+            $toolbarButton->set_active(TRUE);
+        }
+
+        # Make sure that the radio/toolbar buttons for 'update mode' are sensitive, or not
+        $self->restrictUpdateMode();
+        $self->ivPoke('ignoreMenuUpdateFlag', FALSE);
+
+        # In case the automapper object's ghost room gets set to the wrong room, switching to
+        #   'wait' mode temporarily must reset it
+        if ($self->mode eq 'wait' && $self->mapObj->ghostRoom) {
+
+            $self->mapObj->setGhostRoom();      # Automatically redraws the room
+
+        # If switching from 'wait' to 'follow'/'update' mode and there is a current room set, the
+        #   ghost room will not be set, so st it
+        } elsif (
+            $oldMode eq 'wait'
+            && $self->mode ne 'wait'
+            && $self->mapObj->currentRoom
+            && ! $self->mapObj->ghostRoom
+        ) {
+            $self->mapObj->setGhostRoom($self->mapObj->currentRoom);
+        }
+
+        if ($self->mapObj->currentRoom) {
+
+            # Redraw the current room in its correct colour (default pink in 'wait' mode, default
+            #   red in 'follow'/'update' mode)
+            $self->markObjs('room', $self->mapObj->currentRoom);
+            $self->doDraw();
+        }
+
+        return 1;
+    }
+
+    sub setCurrentRegion {
+
+        # Called by $self->treeViewRowActivated and $self->newRegionCallback. Also called by
+        #   GA::Obj::Map->setCurrentRoom
+        # Sets the new current region and draws its map (if not already drawn)
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Optional arguments
+        #   $name       - The name of the region (matches a key in
+        #                   GA::Obj::WorldModel->regionmapHash). If set to 'undef', there is no
+        #                   current region (and an empty map must be displayed)
+        #   $forceFlag  - Set to TRUE when called by GA::Obj::Map->setCurrentRoom. Changes the
+        #                   $name region's current level to show the current room, if there is one
+        #                   (otherwise, the current level is only changed when the automapper is in
+        #                   'follow' or 'update' mode)
+        #
+        # Return values
+        #   'undef' on improper arguments or if a specified region $name doesn't match a known
+        #       regionmap
+        #   1 otherwise
+
+        my ($self, $name, $forceFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $oldRegionmapObj, $oldParchmentObj, $count, $recycleFlag, $scrollXPos, $scrollYPos,
+            $regionmapObj, $index, $parchmentObj, $currentRoom, $recycleObj,
+            @newList,
+            %occupyHash,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setCurrentRegion', @_);
+        }
+
+        # If the tooltips are visible, hide them
+        $self->hideTooltips();
+
+        # If there's already a visible map...
+        if ($self->currentRegionmap) {
+
+            # Remember the current position of the scrollbars so that, the next time this region is
+            #   opened, it can be shown in the same position (and at the same magnification)
+            ($scrollXPos, $scrollYPos) = $self->getMapPosn();
+            $self->currentRegionmap->ivPoke('scrollXPos', $scrollXPos);
+            $self->currentRegionmap->ivPoke('scrollYPos', $scrollYPos);
+
+            # Count the number of rooms in the region, so we can decide whether to retain the
+            #   parchment object in memory
+            $oldRegionmapObj = $self->currentRegionmap;
+            $oldParchmentObj = $self->currentParchment;
+            $count = $self->currentRegionmap->ivPairs('gridRoomHash');
+
+            # If this region contains fewer rooms than the minimum (or if the region has just been
+            #   deleted), then its parchment object will not be retained in memory
+            # If the region has no rooms, the map is not retained in memory, regardless of the value
+            #   of GA::Obj::WorldModel->retainDrawMinRooms
+            if (
+                (! $count || $count < $self->worldModelObj->retainDrawMinRooms)
+                && $self->worldModelObj->ivExists('regionmapHash', $oldRegionmapObj->name)
+            ) {
+                $recycleFlag = TRUE;
+            }
+        }
+
+        # If no region was specified...
+        if (! defined $name) {
+
+            # Reset the current region
+            $self->ivUndef('currentRegionmap');
+            $self->ivUndef('currentParchment');
+            $self->ivEmpty('recentRegionList');
+
+            # Change the window title back to its default
+            $self->setWinTitle();
+            # Redraw the drawing area widget, which will be without a map showing. Also redraw the
+            #   menu bar and title bar, so that the various checkbuttons/radiobuttons are showing
+            #   their neutral positions
+            $self->redrawWidgets('menu_bar', 'toolbar', 'canvas');
+
+            # Set the automapper's mode back to 'wait'
+            $self->setMode('wait');
+            # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+            $self->restrictWidgets();
+
+            # Any previously drawn map should be recycled, if required (otherwise, its parchment
+            #   object is retained in memory)
+            if ($recycleFlag) {
+
+                $self->recycleMap($oldParchmentObj);
+            }
+
+            return 1;
+        }
+
+        # Otherwise, find the regionmap matching the specified region
+        $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $name);
+        if (! $regionmapObj) {
+
+            # Region $name doesn't seem to exist
+            return undef;
+        }
+
+        # Store the current region (if any) in the list of recent regionmap names
+        if ($self->currentRegionmap) {
+
+            foreach my $otherName ($self->recentRegionList) {
+
+                if ($otherName ne $name && $otherName ne $self->currentRegionmap->name) {
+
+                    push (@newList, $otherName);
+                   }
+            }
+
+            if ($self->currentRegionmap ne $regionmapObj) {
+
+                unshift (@newList, $self->currentRegionmap->name);
+            }
+
+            if ((scalar @newList) > 3) {
+
+                @newList = splice(@newList, 0, 3);
+            }
+
+            $self->ivPoke('recentRegionList', @newList);
+        }
+
+        # If a parchment object for this regionmap exists, use it
+        if ($self->ivExists('parchmentHash', $regionmapObj->name)) {
+
+            # Set this regionmap as the new current region
+            $self->ivPoke('currentRegionmap', $regionmapObj);
+
+            # Use its existing parchment object
+            $self->ivPoke('currentParchment', $self->ivShow('parchmentHash', $regionmapObj->name));
+
+            # Move the parchment object to top of the queue
+            $self->ivDelete('parchmentReadyHash', $regionmapObj->name);
+            $index = $self->ivFind('parchmentQueueList', $self->currentParchment);
+            if (defined $index) {
+
+                $self->ivSplice('parchmentQueueList', $index, 1);
+            }
+
+            $self->ivUnshift('parchmentQueueList', $self->currentParchment);
+
+            # At the end of this function, any previously drawn map should be recycled, if required
+            #   (otherwise, its parchment object is retained in memory)
+            if ($recycleFlag && $oldRegionmapObj ne $regionmapObj) {
+
+                $recycleObj = $oldParchmentObj;
+            }
+
+        # Otherwise, create a new parchment or re-use an existing one
+        } else {
+
+            # If the previously-drawn map is marked to be recycled, then perform the recycling
+            #   operation now, retaining its existing canvas widgets
+            if ($recycleFlag) {
+
+                $self->recycleMap($oldParchmentObj);
+            }
+
+            # If a recycled parchment object is waiting to be re-used (either as a result of the
+            #   code just above, or from an earlier call to this function), then reuse it
+            if ($self->spareParchmentObj) {
+
+                # Set the parchment object IVs to match the new region
+                $parchmentObj = $self->spareParchmentObj;
+                $self->ivUndef('spareParchmentObj');
+
+                $parchmentObj->{_objName} = $regionmapObj->name;
+                $parchmentObj->ivPoke('name', $regionmapObj->name);
+
+                # Update our own IVs
+                $self->ivAdd('parchmentHash', $parchmentObj->name, $parchmentObj);
+                $self->ivPoke('currentRegionmap', $regionmapObj);
+                $self->ivPoke('currentParchment', $parchmentObj);
+                $self->ivUnshift('parchmentQueueList', $parchmentObj);
+
+            # Otherwise, create a new parchment object
+            } else {
+
+                # Create the new parchment object
+                $parchmentObj = Games::Axmud::Obj::Parchment->new(
+                    $regionmapObj->name,
+                    $self->worldModelObj,
+                );
+
+                # Update our own IVs
+                $self->ivAdd('parchmentHash', $parchmentObj->name, $parchmentObj);
+                $self->ivPoke('currentRegionmap', $regionmapObj);
+                $self->ivPoke('currentParchment', $parchmentObj);
+                $self->ivUnshift('parchmentQueueList', $parchmentObj);
+            }
+
+            # Create a hash of levels in the region that are occupied by rooms and/or labels (exits
+            #   can't exist independently of rooms, so no need to check them)
+            # At the same time, mark all rooms and labels to be drawn
+            foreach my $roomNum ($regionmapObj->ivValues('gridRoomHash')) {
+
+                my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+
+                $occupyHash{$roomObj->zPosBlocks} = undef;
+                $parchmentObj->ivAdd('markedRoomHash', $roomObj->number, $roomObj);
+            }
+
+            foreach my $mapLabelObj ($regionmapObj->ivValues('gridLabelHash')) {
+
+                $occupyHash{$mapLabelObj->level} = undef;
+                $parchmentObj->ivAdd('markedLabelHash', $mapLabelObj->number, $mapLabelObj);
+            }
+
+            # We'll need a canvas widget at level 0, even if there are no rooms/labels at that
+            #   level, in the expectation that we're going to need it
+            $occupyHash{0} = undef;
+
+            # At each occupied level, either create a canvas widget, or (if the parchment object was
+            #   previously recycled, and a canvas widget for the level still exists), re-use the
+            #   existing one
+            foreach my $level (keys %occupyHash) {
+
+                $self->createMap($regionmapObj, $parchmentObj, $level);
+            }
+
+            # If the parchment object was previously recycled, any canvas widgets that are no longer
+            #   needed can now be destroyed
+            foreach my $level ($parchmentObj->ivKeys('canvasWidgetHash')) {
+
+                my $canvasWidget;
+
+                if (! exists $occupyHash{$level}) {
+
+                    $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $level);
+                    $canvasWidget->destroy();
+
+                    $parchmentObj->ivDelete('canvasWidgetHash', $level);
+                }
+            }
+        }
+
+        # If there's a current room and it is in this region, and assuming that we are in
+        #   follow/update mode (or if the calling function set $forceFlag to TRUE), and if that
+        #   room's map level isn't the one that's about to be displayed, change the current
+        #   level to the one containing the room
+        $currentRoom = $self->mapObj->currentRoom;
+        if (
+            ($self->mode eq 'follow' || $self->mode eq 'update' || $forceFlag)
+            && $currentRoom
+            && $currentRoom->parent       # Check that the room is in a region
+            && $self->currentRegionmap->number == $currentRoom->parent
+            && $self->currentRegionmap->currentLevel != $currentRoom->zPosBlocks
+        ) {
+            # Set the new current level to the same level as the current room
+            $self->setCurrentLevel(
+                $currentRoom->zPosBlocks,
+                TRUE,                       # Don't call ->showRegion yet
+            );
+        }
+
+        # Change the window title to display the current region
+        $self->setWinTitle();
+        # Redraw the menu bar and title bar, so that the various checkbuttons/radiobuttons are
+        #   showing settings for the new current region
+        $self->redrawWidgets('menu_bar', 'toolbar');
+
+        # Make sure all canvas objects on the new current region's current level have been drawn
+        #   (i.e. aren't in the queue to be drawn)
+        $self->showRegion();
+
+        # If ->showRegion's call to ->doDraw failed, because a drawing cyle was already in progress,
+        #   $self->winUpdateForceFlag will be set. If we change the visible canvas widget now, the
+        #   user will see a half-drawn map. Instead, let's wait for the next call to
+        #   $self->winUpdate
+        if ($self->winUpdateForceFlag) {
+
+            # Wait for the next call to $self->winUpdate
+            $self->ivPoke('winUpdateShowFlag', TRUE);
+
+        } else {
+
+            # Make the current region visible now
+            $self->swapCanvasWidget();
+        }
+
+        # If an old parchment object is marked to be recycled, and hasn't been recycled yet, then
+        #   perform that operation
+        if ($recycleObj) {
+
+            $self->recycleMap($recycleObj);
+        }
+
+        return 1;
+    }
+
+    sub setCurrentLevel {
+
+        # Can be called by anything
+        # Changes the current regionmap's currently level, and redraws the map to show this level
+        #
+        # Expected arguments
+        #   $level          - The new current level, matching GA::Obj::Regionmap->currentLevel
+        #
+        # Optional arguments
+        #   $noDrawFlag     - If set to TRUE, this function doesn't call ->drawRegion or
+        #                       ->showRegion, because the calling function is going to call it
+        #                       anyway (and we don't want to do the drawing operation twice).
+        #                       Otherwise set to FALSE (or 'undef')
+        #
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $level, $noDrawFlag, $check) = @_;
+
+        # Local variables
+        my ($scrollXPos, $scrollYPos, $oldLevel, $high, $low);
+
+        # Check for improper arguments
+        if (! defined $level || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setCurrentLevel', @_);
+        }
+
+        # Store the current position of the scrollbars so that the new level's canvas widget is
+        #   displayed at the same position
+        ($scrollXPos, $scrollYPos) = $self->getMapPosn();
+        $self->currentRegionmap->ivPoke('scrollXPos', $scrollXPos);
+        $self->currentRegionmap->ivPoke('scrollYPos', $scrollYPos);
+        # Temporarily remember the old level
+        $oldLevel = $self->currentRegionmap->currentLevel;
+
+        # Set the new level
+        $self->currentRegionmap->ivPoke('currentLevel', $level);
+        # If a canvas widget for this level doesn't exist, create it
+        if (! $self->currentParchment->ivExists('canvasWidgetHash', $level)) {
+
+            $self->createMap(
+                $self->currentRegionmap,
+                $self->currentParchment,
+                $level,
+            );
+        }
+
+        # Change the window's title
+        $self->setWinTitle();
+
+        if (! $noDrawFlag) {
+
+            # Make sure all canvas objects on the new current region's current level have been drawn
+            #   (i.e. aren't in the queue to be drawn)
+            $self->showRegion();
+
+            # Make the canvas visible
+            $self->swapCanvasWidget();
+        }
+
+        # We can remove canvas widgets from the current parchment object, if they're no longer
+        #   occupied
+        if (! defined $self->currentRegionmap->highestLevel) {
+
+            $high = 0;
+            $low = 0;
+
+        } else {
+
+            $high = $self->currentRegionmap->highestLevel;
+            $low = $self->currentRegionmap->lowestLevel;
+        }
+
+        if ($self->currentRegionmap->currentLevel > $high) {
+            $high = $self->currentRegionmap->currentLevel;
+        } elsif ($self->currentRegionmap->currentLevel < $low) {
+            $low = $self->currentRegionmap->currentLevel;
+        }
+
+        # Increase the highest/lowest occupied level by 1 so that room echos remain drawn
+        $high++;
+        $low--;
+
+        # Remove any redundant canvas widgets
+        foreach my $thisLevel ($self->currentParchment->ivKeys('canvasWidgetHash')) {
+
+            if ($thisLevel > $high || $thisLevel < $low) {
+
+                $self->currentParchment->ivDelete('canvasWidgetHash', $thisLevel);
+                $self->currentParchment->ivDelete('bgCanvasObjHash', $thisLevel);
+                $self->currentParchment->ivDelete('levelHash', $thisLevel);
+            }
+        }
+
+        return 1;
+    }
+
+    sub setSelectedObj {
+
+        # Called by $self->mouseClickEvent or any other function
+        # Sets the currently selected object(s) - rooms, room tags, room guilds, exits, exit tags
+        #   and labels - or adds the object(s) to the existing hashes of selected objects
+        # Redraws the object(s) object along with any objects that are being unselected
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Optional arguments
+        #   $listRef        - If set, a reference to a list containing pairs of elements, each
+        #                       representing a room, room tag, room guild, exit, exit tag or label
+        #                   - The list is in the form (blessed_ref, mode, blessed_ref, mode...)
+        #                       where 'mode' is one of the strings 'room', 'exit', 'label',
+        #                       'room_tag', 'room_guild' or 'exit_tag'
+        #   $multipleFlag   - If set to TRUE, the object(s) were selected while holding down the
+        #                       CTRL key, so the object(s) are added to any existing selected
+        #                       objects
+        #                   - If set to FALSE (or 'undef'), all existing selected objects are
+        #                       unselected, before the first object in $listRef is selected (the
+        #                       others are ignored)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $listRef, $multipleFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $pairedRoomObj, $thisObj, $thisMode, $shadowExitObj,
+            @objList, @drawList,
+            %selectedRoomHash, %selectedRoomTagHash, %selectedRoomGuildHash, %selectedExitHash,
+            %selectedExitTagHash, %selectedLabelHash, %drawHash,
+        ) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setSelectedObj', @_);
+        }
+
+        # Selected broken/region exits have a paired twin exit and its parent room, which are drawn
+        #   a different colour. Whatever the new selected object(s) is going to be, a paired exit &
+        #   room must be reset and marked to be redrawn, if they exist
+        if ($self->pairedTwinRoom) {
+
+            # (Redrawing the paired room also redraws its paired exit, if there is one)
+            $pairedRoomObj = $self->pairedTwinRoom;
+            $self->ivUndef('pairedTwinRoom');
+            $self->ivUndef('pairedTwinExit');
+
+            # Mark the room to be redrawn
+            $self->markObjs('room', $pairedRoomObj);
+        }
+
+        # For quick lookup, import the hashes of selected rooms, room tags, room guilds, exits,
+        #   exit tags and labels
+        # NB No need to import the scalar IVs ->selectedRoom, ->selectedExit, etc
+        %selectedRoomHash = $self->selectedRoomHash;
+        %selectedRoomTagHash = $self->selectedRoomTagHash;
+        %selectedRoomGuildHash = $self->selectedRoomGuildHash;
+        %selectedExitHash = $self->selectedExitHash;
+        %selectedExitTagHash = $self->selectedExitTagHash;
+        %selectedLabelHash = $self->selectedLabelHash;
+
+        # Get the list referenced by $listRef (if it was specified - if not, use an empty list)
+        if ($listRef) {
+
+            @objList = @$listRef;
+        }
+
+        # If $multipleFlag isn't set to TRUE, $$listRef[0] is the only object which should now be
+        #   drawn as selected
+        if (! $multipleFlag) {
+
+            # @objList should contain 0 or 2 elements, representing 0 or 1 selected objects. If
+            #   there are more selected objects in the list, ignore all but the first one
+            if (@objList > 2) {
+
+                $thisObj = shift @objList;
+                $thisMode = shift @objList;
+
+                @objList = ($thisObj, $thisMode);
+            }
+
+            # Mark all existing selected objects as no longer selected, and add them to the redraw
+            #   list
+            if ($self->selectedRoom) {
+
+                push (@drawList, 'room', $self->selectedRoom);
+                $self->ivUndef('selectedRoom');
+            }
+
+            if (%selectedRoomHash) {
+
+                foreach my $number (keys %selectedRoomHash) {
+
+                    push (@drawList, 'room', $selectedRoomHash{$number});
+                }
+
+                %selectedRoomHash = ();
+            }
+
+            if ($self->selectedRoomTag) {
+
+                push (@drawList, 'room_tag', $self->selectedRoomTag);
+                $self->ivUndef('selectedRoomTag');
+            }
+
+            if (%selectedRoomTagHash) {
+
+                foreach my $number (keys %selectedRoomTagHash) {
+
+                    push (@drawList, 'room_tag', $selectedRoomTagHash{$number});
+                }
+
+                %selectedRoomTagHash = ();
+            }
+
+            if ($self->selectedRoomGuild) {
+
+                push (@drawList, 'room_guild', $self->selectedRoomGuild);
+                $self->ivUndef('selectedRoomGuild');
+            }
+
+            if (%selectedRoomGuildHash) {
+
+                foreach my $number (keys %selectedRoomGuildHash) {
+
+                    push (@drawList, 'room_guild', $selectedRoomGuildHash{$number});
+                }
+
+                %selectedRoomGuildHash = ();
+            }
+
+            if ($self->selectedExit) {
+
+                push (@drawList, 'exit', $self->selectedExit);
+
+                # If the selected exit has a shadow exit, the shadow exit will be drawn a different
+                #   colour, so it must also be redrawn
+                if ($self->selectedExit->shadowExit) {
+
+                    $shadowExitObj = $self->worldModelObj->ivShow(
+                        'exitModelHash',
+                        $self->selectedExit->shadowExit,
+                    );
+
+                    if ($shadowExitObj) {
+
+                        push (@drawList, 'exit', $shadowExitObj);
+                    }
+               }
+
+                $self->ivUndef('selectedExit');
+            }
+
+            if (%selectedExitHash) {
+
+                foreach my $number (keys %selectedExitHash) {
+
+                    push (@drawList, 'exit', $selectedExitHash{$number});
+                }
+
+                %selectedExitHash = ();
+            }
+
+            if ($self->selectedExitTag) {
+
+                push (@drawList, 'exit_tag', $self->selectedExitTag);
+                $self->ivUndef('selectedExitTag');
+            }
+
+            if (%selectedExitTagHash) {
+
+                foreach my $number (keys %selectedExitTagHash) {
+
+                    push (@drawList, 'exit_tag', $selectedExitTagHash{$number});
+                }
+
+                %selectedExitTagHash = ();
+            }
+
+            if ($self->selectedLabel) {
+
+                push (@drawList, 'label', $self->selectedLabel);
+                $self->ivUndef('selectedLabel');
+            }
+
+            if (%selectedLabelHash) {
+
+                foreach my $id (keys %selectedLabelHash) {
+
+                    push (@drawList, 'label', $selectedLabelHash{$id});
+                }
+
+                %selectedLabelHash = ();
+            }
+        }
+
+        # Now, select each object in turn (if any were specified), and add them to the redraw list
+        if (@objList) {
+
+            do {
+
+                my ($obj, $mode, $noSelectedFlag, $twinExitObj, $twinRoomObj);
+
+                $obj = shift @objList;
+                $mode = shift @objList;
+
+                # If there is already a single selected object, it must be moved from one IV to
+                #   another before a second object is selected
+                if ($self->selectedRoom) {
+
+                    $selectedRoomHash{$self->selectedRoom->number} = $self->selectedRoom;
+                    $self->ivUndef('selectedRoom');
+
+                } elsif ($self->selectedRoomTag) {
+
+                    $selectedRoomTagHash{$self->selectedRoomTag->number} = $self->selectedRoomTag;
+                    $self->ivUndef('selectedRoomTag');
+
+                } elsif ($self->selectedRoomGuild) {
+
+                    $selectedRoomGuildHash{$self->selectedRoomGuild->number}
+                        = $self->selectedRoomGuild;
+                    $self->ivUndef('selectedRoomGuild');
+
+                } elsif ($self->selectedExit) {
+
+                    $selectedExitHash{$self->selectedExit->number} = $self->selectedExit;
+                    $self->ivUndef('selectedExit');
+
+                } elsif ($self->selectedExitTag) {
+
+                    $selectedExitTagHash{$self->selectedExitTag->number} = $self->selectedExitTag;
+                    $self->ivUndef('selectedExitTag');
+
+                } elsif ($self->selectedLabel) {
+
+                    $selectedLabelHash{$self->selectedLabel->id} = $self->selectedLabel;
+                    $self->ivUndef('selectedLabel');
+
+                } elsif (
+                    ! %selectedRoomHash
+                    && ! %selectedRoomTagHash
+                    && ! %selectedRoomGuildHash
+                    && ! %selectedExitHash
+                    && ! %selectedExitTagHash
+                    && ! %selectedLabelHash
+                ) {
+                    # There are currently no selected objects at all
+                    $noSelectedFlag = TRUE;
+                }
+
+                # Rooms
+                if ($mode eq 'room') {
+
+                    push (@drawList, 'room', $obj);
+
+                    if (! $noSelectedFlag) {
+                        $selectedRoomHash{$obj->number} = $obj;
+                    } else {
+                        $self->ivPoke('selectedRoom', $obj);
+                    }
+
+                # Room tags
+                } elsif ($mode eq 'room_tag') {
+
+                    push (@drawList, 'room_tag', $obj);
+
+                    if (! $noSelectedFlag) {
+                        $selectedRoomTagHash{$obj->number} = $obj;
+                    } else {
+                        $self->ivPoke('selectedRoomTag', $obj);
+                    }
+
+                # Room guilds
+                } elsif ($mode eq 'room_guild') {
+
+                    push (@drawList, 'room_guild', $obj);
+
+                    if (! $noSelectedFlag) {
+                        $selectedRoomGuildHash{$obj->number} = $obj;
+                    } else {
+                        $self->ivPoke('selectedRoomGuild', $obj);
+                    }
+
+                # Exits
+                } elsif ($mode eq 'exit') {
+
+                    push (@drawList, 'exit', $obj);
+
+                    if (! $noSelectedFlag) {
+
+                        $selectedExitHash{$obj->number} = $obj;
+
+                    } else {
+
+                        $self->ivPoke('selectedExit', $obj);
+
+                        # If the selected exit is a broken or region exit, we need to mark the
+                        #   destination room (and the twin exit, if there is one) to be drawn a
+                        #   different colour
+                        # (NB Doesn't apply to bent broken exits)
+                        if (
+                            ($obj->brokenFlag && ! $obj->bentFlag)
+                            || $obj->regionFlag
+                        ) {
+                            $twinRoomObj
+                                = $self->worldModelObj->ivShow('modelHash', $obj->destRoom);
+                            if ($twinRoomObj) {
+
+                                $self->ivPoke('pairedTwinRoom', $twinRoomObj);
+                            }
+
+                            if ($obj->twinExit) {
+
+                                # Since the twin exit exists, it gets painted the same colour
+                                $twinExitObj = $self->worldModelObj->ivShow(
+                                        'exitModelHash',
+                                        $obj->twinExit,
+                                    );
+
+                                if ($twinExitObj) {
+
+                                    $self->ivPoke('pairedTwinExit', $twinExitObj);
+                                }
+
+                            } else {
+
+                                # Make sure the IV has been reset
+                                $self->ivUndef('pairedTwinExit');
+                            }
+
+                            # Redrawing the room redraws its exit
+                            push (@drawList, 'room', $twinRoomObj);
+                       }
+                    }
+
+                # Exit tags
+                } elsif ($mode eq 'exit_tag') {
+
+                    push (@drawList, 'exit_tag', $obj);
+
+                    if (! $noSelectedFlag) {
+                        $selectedExitTagHash{$obj->number} = $obj;
+                    } else {
+                        $self->ivPoke('selectedExitTag', $obj);
+                    }
+
+                # Labels
+                } elsif ($mode eq 'label') {
+
+                    push (@drawList, 'label', $obj);
+
+                    if (! $noSelectedFlag) {
+                        $selectedLabelHash{$obj->id} = $obj;
+                    } else {
+                        $self->ivPoke('selectedLabel', $obj);
+                    }
+                }
+
+            } until (! @objList);
+        }
+
+        # Store the selected object hashes (any or all of which may be empty)
+        $self->ivPoke('selectedRoomHash', %selectedRoomHash);
+        $self->ivPoke('selectedRoomTagHash', %selectedRoomTagHash);
+        $self->ivPoke('selectedRoomGuildHash', %selectedRoomGuildHash);
+        $self->ivPoke('selectedExitHash', %selectedExitHash);
+        $self->ivPoke('selectedExitTagHash', %selectedExitTagHash);
+        $self->ivPoke('selectedLabelHash', %selectedLabelHash);
+
+        if (@drawList) {
+
+            # Redraw all objects that must be redrawn ($self->markObjs will eliminate any duplicates
+            #   in @drawList)
+            $self->markObjs(@drawList);
+            $self->doDraw();
+        }
+
+        # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+        $self->restrictWidgets();
+
+        return 1;
+    }
+
+    sub unselectObj {
+
+        # Called by $self->canvasEventHandler, ->canvasObjEventHandler and $self->deleteCanvasObj
+        # When an object is to be unselected, we need to be careful about updating the IVs. This
+        #   function is called to see whether a room, room tag, room guild, exit, exit tag or label
+        #   is selected and, if so, unselects it
+        #
+        # Expected arguments
+        #   $obj    - The object to be unselected. For rooms, exits and labels, a blessed reference
+        #               of a GA::ModelObj::Room, GA::Obj::Exit or GA::Obj::MapLabel. For room tags
+        #               and room guilds, the blessed reference of the GA::ModelObj::Room to which
+        #               they belong. For exit tags, the blessed reference of the GA::Obj::Exit to
+        #               which they belong
+        #
+        # Optional arguments
+        #   $mode   - Set to 'room_tag', 'room_guild', 'exit_tag' or 'undef' for everything else
+        #               (i.e. rooms, exits and labels; so that we know that when $obj is a room
+        #               object, whether it's the room itself, the room's room tag or its room guild
+        #               which is to be selected; or so that we know whether to select an exit or an
+        #               exit tag)
+        #   $noRedrawFlag
+        #           - Set to TRUE if the object shouldn't be redrawn (because it is about to be
+        #               deleted)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the object isn't already selected
+        #   1 otherwise
+
+        my ($self, $obj, $mode, $noRedrawFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $singleObj, $singleType, $pairedRoomObj,
+            @drawList, @importList,
+        );
+
+        # Check for improper arguments
+        if (! defined $obj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->unselectObj', @_);
+        }
+
+        # Selected broken/region exits have a paired twin exit which is drawn a different colour,
+        #   as is its parent room. Whatever objects are going to be unselected, a paired exit & room
+        #   must be reset and redrawn, if they exist
+        if ($self->pairedTwinExit) {
+
+            # (Redrawing the paired room also redraws its paired exit, if there is one)
+            $pairedRoomObj = $self->pairedTwinRoom;
+            $self->ivUndef('pairedTwinRoom');
+            $self->ivUndef('pairedTwinExit');
+
+            # Mark the room to be redrawn
+            $self->markObjs('room', $pairedRoomObj);
+        }
+
+        # Unselect the object, and add it to the redraw list
+
+        if ($obj->_objClass eq 'Games::Axmud::ModelObj::Room') {
+
+            # Rooms
+            if (! $mode) {
+
+                push (@drawList, 'room', $obj);
+
+                if ($self->selectedRoom && $self->selectedRoom eq $obj) {
+
+                    $self->ivUndef('selectedRoom');
+
+                } elsif ($self->ivExists('selectedRoomHash', $obj->number)) {
+
+                    $self->ivDelete('selectedRoomHash', $obj->number);
+
+                } else {
+
+                    # This room wasn't already selected
+                    return undef;
+                }
+
+            # Room tags
+            } elsif ($mode eq 'room_tag') {
+
+                push (@drawList, 'room_tag', $obj);
+
+                if ($self->selectedRoomTag && $self->selectedRoomTag eq $obj) {
+
+                    $self->ivUndef('selectedRoomTag');
+
+                } elsif ($self->ivExists('selectedRoomTagHash', $obj->number)) {
+
+                    $self->ivDelete('selectedRoomTagHash', $obj->number);
+
+                } else {
+
+                    # This room tag wasn't already selected
+                    return undef;
+                }
+
+            # Room guilds
+            } elsif ($mode eq 'room_guild') {
+
+                push (@drawList, 'room_guild', $obj);
+
+                if ($self->selectedRoomGuild && $self->selectedRoomGuild eq $obj) {
+
+                    $self->ivUndef('selectedRoomGuild');
+
+                } elsif ($self->ivExists('selectedRoomGuildHash', $obj->number)) {
+
+                    $self->ivDelete('selectedRoomGuildHash', $obj->number);
+
+                } else {
+
+                    # This room guild wasn't already selected
+                    return undef;
+                }
+            }
+
+        } elsif ($obj->_objClass eq 'Games::Axmud::Obj::Exit') {
+
+            # Exits
+            if (! $mode) {
+
+                push (@drawList, 'exit', $obj);
+
+                if ($self->selectedExit && $self->selectedExit eq $obj) {
+
+                    $self->ivUndef('selectedExit');
+
+                } elsif ($self->ivExists('selectedExitHash', $obj->number)) {
+
+                    $self->ivDelete('selectedExitHash', $obj->number);
+
+                } else {
+
+                    # This exit wasn't already selected
+                    return undef;
+                }
+
+            # Exit tags
+            } elsif ($mode eq 'exit_tag') {
+
+                push (@drawList, 'exit_tag', $obj);
+
+                if ($self->selectedExitTag && $self->selectedExitTag eq $obj) {
+
+                    $self->ivUndef('selectedExitTag');
+
+                } elsif ($self->ivExists('selectedExitTagHash', $obj->number)) {
+
+                    $self->ivDelete('selectedExitTagHash', $obj->number);
+
+                } else {
+
+                    # This exit tag wasn't already selected
+                    return undef;
+                }
+            }
+
+        # Labels
+        } elsif ($obj->_objClass eq 'Games::Axmud::Obj::MapLabel') {
+
+            push (@drawList, 'label', $obj);
+
+            if ($self->selectedLabel && $self->selectedLabel eq $obj) {
+
+                $self->ivUndef('selectedLabel');
+
+            } elsif ($self->ivExists('selectedLabelHash', $obj->id)) {
+
+                $self->ivDelete('selectedLabelHash', $obj->id);
+
+            } else {
+
+                # This label wasn't already selected
+                return undef;
+            }
+        }
+
+        # Redraw the item removed (unless it's about to be deleted)
+        if (! $noRedrawFlag) {
+
+            $self->markObjs(@drawList);
+            $self->doDraw();
+        }
+
+        # Now, we check these five hashes. If, between them, they contain a single selected object,
+        #   then we need to move it out of the hashes and into the IVs $self->selectedRoom,
+        #   ->selectedExit (etc)
+        if ($self->ivPairs('selectedRoomHash') == 1) {
+
+            @importList = $self->selectedRoomHash;
+            $singleObj = $importList[1];
+            $singleType = 'room';
+        }
+
+        if ($self->ivPairs('selectedRoomTagHash') == 1) {
+
+            if ($singleObj) {
+
+                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+                $self->restrictWidgets();
+                # More than one selected object. Give up
+                return 1;
+
+            } else {
+
+                @importList = $self->selectedRoomTagHash;
+                $singleObj = $importList[1];
+                $singleType = 'room_tag';
+            }
+        }
+
+        if ($self->ivPairs('selectedRoomGuildHash') == 1) {
+
+            if ($singleObj) {
+
+                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+                $self->restrictWidgets();
+                # More than one selected object. Give up
+                return 1;
+
+            } else {
+
+                @importList = $self->selectedRoomGuildHash;
+                $singleObj = $importList[1];
+                $singleType = 'room_guild';
+            }
+        }
+
+        if ($self->ivPairs('selectedExitHash') == 1) {
+
+            if ($singleObj) {
+
+                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+                $self->restrictWidgets();
+                # More than one selected object. Give up
+                return 1;
+
+            } else {
+
+                @importList = $self->selectedExitHash;
+                $singleObj = $importList[1];
+                $singleType = 'exit';
+            }
+        }
+
+        if ($self->ivPairs('selectedExitTagHash') == 1) {
+
+            if ($singleObj) {
+
+                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+                $self->restrictWidgets();
+                # More than one selected object. Give up
+                return 1;
+
+            } else {
+
+                @importList = $self->selectedExitTagHash;
+                $singleObj = $importList[1];
+                $singleType = 'exit_tag';
+            }
+        }
+
+        if ($self->ivPairs('selectedLabelHash') == 1) {
+
+            if ($singleObj) {
+
+                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+                $self->restrictWidgets();
+                # More than one selected object. Give up
+                return 1;
+
+            } else {
+
+                @importList = $self->selectedLabelHash;
+                $singleObj = $importList[1];
+                $singleType = 'label';
+            }
+        }
+
+        if ($singleObj) {
+
+            # There is exactly one selected object left in the six hashes. Remove it from its hash,
+            #   and set the single-object IV
+            if ($singleType eq 'room') {
+
+                $self->ivEmpty('selectedRoomHash');
+                $self->ivPoke('selectedRoom', $singleObj);
+
+            } elsif ($singleType eq 'room_tag') {
+
+                $self->ivEmpty('selectedRoomTagHash');
+                $self->ivPoke('selectedRoomTag', $singleObj);
+
+            } elsif ($singleType eq 'room_guild') {
+
+                $self->ivEmpty('selectedRoomGuildHash');
+                $self->ivPoke('selectedRoomGuild', $singleObj);
+
+            } elsif ($singleType eq 'exit') {
+
+                $self->ivEmpty('selectedExitHash');
+                $self->ivPoke('selectedExit', $singleObj);
+
+            } elsif ($singleType eq 'exit_tag') {
+
+                $self->ivEmpty('selectedExitTagHash');
+                $self->ivPoke('selectedExitTag', $singleObj);
+
+            } elsif ($singleType eq 'label') {
+
+                $self->ivEmpty('selectedLabelHash');
+                $self->ivPoke('selectedLabel', $singleObj);
+            }
+        }
+
+        # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+        $self->restrictWidgets();
+
+        return 1;
+    }
+
     # Graphical operations - window and background
 
     sub setWinTitle {
@@ -30279,31 +32075,126 @@
         return 1;
     }
 
-    sub resetMap {
+    sub preparePreDraw {
 
-        # Can be called by anything (first called by $self->enableCanvas)
-        # Deletes all canvas objects drawn on the canvas, ready to redraw new ones
-        # Resets the background used as the currently displayed map, changing its colour
+        # Called by $self->winUpdate (on the first call to that function since the window opened or
+        #   was reset)
+        # Compiles a list of regions that should be pre-drawn using background processes (i.e.
+        #   regular calls to $self->winUpdate). For any regions selected, creates parchment objects
+        #   (GA::Obj::Parchment) ready for the drawing functions to use
         #
         # Expected arguments
         #   (none besides $self)
-        #
-        # Optional arguments
-        #   $mapFlag    - If set to TRUE, the background colour is set as the standard map colour
-        #                   (default is cream). If set to FALSE (or 'undef'), the no-background
-        #                   colour is used to show there is no map displayed (default is white)
         #
         # Return values
         #   'undef' on improper arguments
         #   1 otherwise
 
-        my ($self, $mapFlag, $check) = @_;
+        my ($self, $check) = @_;
 
         # Local variables
         my (
-            $colour, $newObj,
-            @objList,
+            $firstRegion,
+            @sortedList,
+            %regionHash,
         );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->preparePreDraw', @_);
+        }
+
+        # Any regions that contain more rooms than the number specified by
+        #   GA::Obj::WorldModel->preDrawMinRooms must be added to the queue now
+        if ($self->worldModelObj->queueDrawMaxObjs) {
+
+            # Compile a hash of affected regionmaps. Store the number of rooms so we can draw those
+            #   regions, largest first
+            foreach my $regionmapObj ($self->worldModelObj->ivValues('regionmapHash')) {
+
+                my $count = $regionmapObj->ivPairs('gridRoomHash');
+
+                if ($count > $self->worldModelObj->preDrawMinRooms) {
+
+                    $regionHash{$regionmapObj->name} = $count;
+                }
+            }
+
+            # If GA::Obj::WorldModel->firstRegion is set and it's going to be pre-drawn, draw it
+            #   first
+            $firstRegion = $self->worldModelObj->firstRegion;
+            if (defined $firstRegion && $regionHash{$firstRegion}) {
+
+                push (@sortedList, $firstRegion);
+                delete $regionHash{$firstRegion};
+            }
+
+            push (@sortedList, sort {$regionHash{$b} <=> $regionHash{$a}} (keys %regionHash));
+
+            # Now set up pre-drawing of all the regions in @sortedList
+            foreach my $name (@sortedList) {
+
+                my (
+                    $regionmapObj, $parchmentObj,
+                    %occupyHash,
+                );
+
+                $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $name);
+
+                # Create a new parchment object
+                $parchmentObj = Games::Axmud::Obj::Parchment->new($name, $self->worldModelObj);
+                $self->ivAdd('parchmentHash', $name, $parchmentObj);
+                $self->ivUnshift('parchmentQueueList', $parchmentObj);
+
+                # Create a hash of levels in the region that are occupied by rooms and/or labels
+                #   (exits can't exist independently of rooms, so no need to check them)
+                # At the same time, add all rooms and labels to the drawing queue
+                foreach my $roomNum ($regionmapObj->ivValues('gridRoomHash')) {
+
+                    my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+
+                    $occupyHash{$roomObj->zPosBlocks} = undef;
+                    $parchmentObj->ivAdd('queueRoomHash', $roomObj->number, $roomObj);
+                }
+
+                foreach my $mapLabelObj ($regionmapObj->ivValues('gridLabelHash')) {
+
+                    $occupyHash{$mapLabelObj->level} = undef;
+                    $parchmentObj->ivAdd('queueLabelHash', $mapLabelObj->number, $mapLabelObj);
+                }
+
+                # Create a canvas widget at level 0, even if there are no rooms/labels at that
+                #   level, in the expectation that we're going to need it
+                $occupyHash{0} = undef;
+
+                # Add a canvas widget for each of these levels
+                foreach my $level (keys %occupyHash) {
+
+                    $self->createMap($regionmapObj, $parchmentObj, $level);
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    sub resetMap {
+
+        # Can be called by anything (first called by $self->enableCanvas)
+        # Draws an empty (default white) background map
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my $colour;
 
         # Check for improper arguments
         if (defined $check) {
@@ -30311,229 +32202,873 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->resetMap', @_);
         }
 
+        # If an empty background map is already visible, there's nothing to do
+        if ($self->emptyMapFlag) {
+
+            return 1;
+        }
+
         # If the tooltips are visible, hide them
         $self->hideTooltips();
 
-        # Draw up a list of existing canvas objects that must be destroyed
-        foreach my $listRef ($self->ivValues('drawnRoomHash')) {
+        # Create the canvas widget
+        my $canvas = Gnome2::Canvas->new();
 
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnRoomEchoHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnRoomTagHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnRoomGuildHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnRoomTextHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnExitHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnExitTagHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnOrnamentHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnLabelHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        foreach my $listRef ($self->ivValues('drawnCheckedDirHash')) {
-
-            push (@objList, @$listRef);
-        }
-
-        push (@objList,
-            $self->ivValues('colouredSquareHash'),
-            $self->ivValues('colouredRectHash'),
+        # Add the canvas widget to its scrolled window and set its default size
+        $canvas->set_scroll_region(
+            0,
+            0,
+            $self->worldModelObj->defaultMapWidthPixels,
+            $self->worldModelObj->defaultMapHeightPixels,
         );
 
-        # Also delete the background object itself, if it exists
-        if ($self->canvasBackground) {
+        $canvas->set_center_scroll_region(1);
+        $canvas->set_pixels_per_unit(1);
 
-            push (@objList, $self->canvasBackground);
+        foreach my $child ($self->canvasScroller->get_children() ) {
+
+            $self->canvasScroller->remove($child);
         }
 
-        # Destroy each existing canvas object
-        foreach my $obj (@objList) {
+        $self->canvasScroller->add($canvas);
 
-            $obj->destroy();
-        }
+        # Draw the background canvas object (default colour: white), encompassing the whole map
+        $colour = $self->worldModelObj->noBackgroundColour;
 
-        # Empty the IVs that contained these now-destroyed objects
-        $self->ivEmpty('drawnRoomHash');
-        $self->ivEmpty('dummyRoomHash');        # (Subset of ->drawnRoomHash)
-        $self->ivEmpty('drawnRoomEchoHash');
-        $self->ivEmpty('drawnRoomTagHash');
-        $self->ivEmpty('drawnRoomGuildHash');
-        $self->ivEmpty('drawnRoomTextHash');
-        $self->ivEmpty('drawnExitHash');
-        $self->ivEmpty('drawnExitTagHash');
-        $self->ivEmpty('drawnOrnamentHash');
-        $self->ivEmpty('drawnLabelHash');
-        $self->ivEmpty('drawnCheckedDirHash');
-        $self->ivEmpty('colouredSquareHash');
-        $self->ivEmpty('colouredRectHash');
+        my $canvasObj = Gnome2::Canvas::Item->new(
+            $canvas->root(),
+            'Gnome2::Canvas::Rect',
+            x1 => 0,
+            y1 => 0,
+            x2 => $self->worldModelObj->defaultMapWidthPixels,
+            y2 => $self->worldModelObj->defaultMapHeightPixels,
+            fill_color => $colour,
+            outline_color => $colour,
+        );
 
-        # Any objects that were marked to be drawn (or re-drawn) can now be removed
-        $self->ivEmpty('markedRoomHash');
-        $self->ivEmpty('markedRoomTagHash');
-        $self->ivEmpty('markedRoomGuildHash');
-        $self->ivEmpty('markedExitHash');
-        $self->ivEmpty('markedExitTagHash');
-        $self->ivEmpty('markedLabelHash');
+        # Update IVs
+        $self->ivPoke('canvas', $canvas);
+        $self->ivPoke('canvasBackground', $canvasObj);
+        $self->ivPoke('emptyMapFlag', TRUE);
 
-        if ($mapFlag) {
-
-            # Draw a map background (default colour: cream)
-            $colour = $self->worldModelObj->backgroundColour;
-            $self->canvas->set_pixels_per_unit($self->currentRegionmap->magnification);
-
-            # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new (
-                $self->canvasRoot,
-                'Gnome2::Canvas::Rect',
-                x1 => 0,
-                y1 => 0,
-                x2 => $self->currentRegionmap->mapWidthPixels,
-                y2 => $self->currentRegionmap->mapHeightPixels,
-                fill_color => $colour,
-                outline_color => $colour,
-            );
-
-            $self->canvas->set_scroll_region(
-                0,
-                0,
-                $self->currentRegionmap->mapWidthPixels,
-                $self->currentRegionmap->mapHeightPixels,
-            );
-            $self->canvas->set_center_scroll_region(1);
-
-        } else {
-
-            # Draw a no-map background (default colour: white)
-            $colour = $self->worldModelObj->noBackgroundColour;
-            $self->canvas->set_pixels_per_unit(1);
-
-            # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new (
-                $self->canvasRoot,
-                'Gnome2::Canvas::Rect',
-                x1 => 0,
-                y1 => 0,
-                x2 => $self->worldModelObj->defaultMapWidthPixels,
-                y2 => $self->worldModelObj->defaultMapHeightPixels,
-                fill_color => $colour,
-                outline_color => $colour,
-            );
-
-            $self->canvas->set_scroll_region(
-                0,
-                0,
-                $self->worldModelObj->defaultMapWidthPixels,
-                $self->worldModelObj->defaultMapHeightPixels,
-            );
-            $self->canvas->set_center_scroll_region(1);
-        }
-
-        # The background is lower than anything else
-        $self->setMapLevel($newObj);
-        # Set up the event handler for the background map
-        $self->setupCanvasEvent($newObj);
-
-        # Store the IV
-        $self->ivPoke('canvasBackground', $newObj);
+        # The background canvas object created here is lower than any other canvas object
+        $self->setMapStackPosn($canvasObj);
+        # Set up the event handler for clicks on the background canvas object
+        $self->setupCanvasEvent($canvasObj);
 
         return 1;
     }
 
-    sub drawRegion {
+    sub createMap {
 
-        # Called by $self->setCurrentRegion or by any other function
-        # Draws one level of the current region on the map - namely, the level specified by
-        #   $self->currentRegionmap->currentLevel
+        # Called by $self->setCurrentRegion, ->setCurrentLevel, ->preparePreDraw and ->refreshMap
+        # Also called by the drawing functions ->drawRoom, ->drawLabel and ->drawRoomEcho if, for
+        #   some reason, a canvas widget for the room's/label's level doesn't exist
+        #
+        # Creates a canvas widget for a single level in a single regionmap, and stores it in the
+        #   region's parchment object
+        #
+        # Expected arguments
+        #   $regionmapObj       - The regionmap (GA::Obj::Regionmap)
+        #   $parchmentObj       - The parchment object (GA::Obj::Parchment) in which the canvas
+        #                           widget should be stored
+        #   $level              - The level drawn, matching a possible value of
+        #                           $regionmapObj->currentLevel
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $regionmapObj, $parchmentObj, $level, $check) = @_;
+
+        # Local variables
+        my ($canvas, $colour, $levelObj);
+
+        # Check for improper arguments
+        if (
+            ! defined $regionmapObj || ! defined $parchmentObj || ! defined $level
+            || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->createMap', @_);
+        }
+
+        # If the tooltips are visible, hide them
+        $self->hideTooltips();
+
+        # If the parchment object has been recycled and a canvas widget at this level already
+        #   exists, use it; otherwise create a new one
+        $canvas = $parchmentObj->ivShow('canvasWidgetHash', $level);
+        if (! $canvas) {
+
+            $canvas = Gnome2::Canvas->new();
+        }
+
+        # Set the default size
+        $canvas->set_scroll_region(
+            0,
+            0,
+            $regionmapObj->mapWidthPixels,
+            $regionmapObj->mapHeightPixels,
+        );
+
+        $canvas->set_center_scroll_region(1);
+        $canvas->set_pixels_per_unit($regionmapObj->magnification);
+
+        # Handle mouse button scrolls from here
+        $canvas->signal_connect('scroll-event' => sub {
+
+            my ($widget, $event) = @_;
+
+            if ($event->direction eq 'up') {
+
+                # Zoom in
+                $self->zoomCallback('in');
+
+            } elsif ($event->direction eq 'down') {
+
+                # Zoom out
+                $self->zoomCallback('out');
+            }
+        });
+
+        # Draw the background canvas object (default colour: cream), encompassing the whole map
+        $colour = $self->worldModelObj->backgroundColour;
+
+        my $canvasObj = Gnome2::Canvas::Item->new(
+            $canvas->root(),
+            'Gnome2::Canvas::Rect',
+            x1 => 0,
+            y1 => 0,
+            x2 => $regionmapObj->mapWidthPixels,
+            y2 => $regionmapObj->mapHeightPixels,
+            fill_color => $colour,
+            outline_color => $colour,
+        );
+
+        # Create a parchment level object to store all the canvas objects drawn on this $level
+        $levelObj = Games::Axmud::Obj::ParchmentLevel->new($regionmapObj->name, $level);
+
+        # Update IVs
+        $parchmentObj->ivAdd('canvasWidgetHash', $level, $canvas);
+        $parchmentObj->ivAdd('bgCanvasObjHash', $level, $canvasObj);
+        $parchmentObj->ivAdd('levelHash', $level, $levelObj);
+
+        # The background canvas object created here is lower than any other canvas object
+        $self->setMapStackPosn($canvasObj);
+        # Set up the event handler for clicks on the background canvas object
+        $self->setupCanvasEvent($canvasObj);
+
+        # Draw coloured squares and rectangles for this level (but not for the default canvas)
+        if (defined $level) {
+
+            $self->doColourIn($regionmapObj, $level, $parchmentObj);
+        }
+
+        return 1;
+    }
+
+    sub refreshMap {
+
+        # Called by $self->redrawRegions (only)
+        # Resets IVs in a region's parchment object (GA::Obj::Parchment). Any canvas objects drawn
+        #   in that region are added to the destruction queue, as are the canvas widgets themselves
+        # Then creates new canvas widgets for every occupied level. It's up to the calling function
+        #   to mark rooms/exits/labels to be drawn now, or to add them to the drawing queue
+        #
+        # Expected arguments
+        #   $regionmapObj   - The regionmap whose canvas widget should be refreshed. If not
+        #                       specified, $self->currentRegionmap is used
+        #   $parchmentObj   - The corresponding parchment object (GA::Obj::Parchment), if already
+        #                       known; otherwise this function fetches the corresponding parchment
+        #                       object
+        #
+        # Return values
+        #   'undef' on improper arguments or if there's an error
+        #   1 otherwise
+
+        my ($self, $regionmapObj, $parchmentObj, $check) = @_;
+
+        # Local variables
+        my (
+            $index,
+            @destroyList,
+            %occupyHash,
+        );
+
+        # Check for improper arguments
+        if (! defined $regionmapObj || ! defined $parchmentObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->refreshMap', @_);
+        }
+
+        # The region is no longer completely drawn
+        $self->ivDelete('parchmentReadyHash', $regionmapObj->name);
+        # Remove the parchment from the queue; it's up to the calling function to decide if it
+        #   should be added to the beginning of the queue, or the end
+        $index = $self->ivFind('parchmentQueueList', $parchmentObj);
+        if (defined $index) {
+
+            $self->ivSplice('parchmentQueueList', $index, 1);
+        }
+
+        # Because of performance issues for very big maps (with thousands of rooms), we can't simply
+        #   call ->destroy on every existing canvas object. Current solution is to add them all to a
+        #   destruction queue, and allow $self->winUpdate to destroy them a few at a time
+        foreach my $levelObj ($parchmentObj->ivValues('levelHash')) {
+
+            # Briefly store which levels are occupied by canvas objects
+            $occupyHash{$levelObj->level} = undef;
+
+            # Now add the level's canvas objects to the destruction queue
+            foreach my $listRef (
+                $levelObj->ivValues('drawnRoomHash'),
+                $levelObj->ivValues('drawnRoomEchoHash'),
+                $levelObj->ivValues('drawnRoomTagHash'),
+                $levelObj->ivValues('drawnRoomGuildHash'),
+                $levelObj->ivValues('drawnRoomTextHash'),
+                $levelObj->ivValues('drawnExitHash'),
+                $levelObj->ivValues('drawnExitTagHash'),
+                $levelObj->ivValues('drawnOrnamentHash'),
+                $levelObj->ivValues('drawnLabelHash'),
+                $levelObj->ivValues('drawnCheckedDirHash'),
+            ) {
+                push (@destroyList, @$listRef);
+            }
+
+            # Also destroy the background canvas object
+            push (@destroyList, $parchmentObj->ivShow('bgCanvasObjHash', $levelObj->level));
+
+            # Once all of its canvas objects have been destroyed, the canvas widget can also be
+            #   destroyed
+            push (@destroyList, $parchmentObj->ivShow('canvasWidgetHash', $levelObj->level));
+        }
+
+        # Update IVs
+        $self->ivPush('destroyQueueList', @destroyList);
+
+        # Discard every canvas widget, and all the canvas objects drawn on them
+        $parchmentObj->ivEmpty('canvasWidgetHash');
+        $parchmentObj->ivEmpty('bgCanvasObjHash');
+        $parchmentObj->ivEmpty('levelHash');
+
+        $parchmentObj->ivEmpty('colouredSquareHash');
+        $parchmentObj->ivEmpty('colouredRectHash');
+
+        # Any objects that were marked to be drawn (or re-drawn) can now be removed
+        $parchmentObj->ivEmpty('markedRoomHash');
+        $parchmentObj->ivEmpty('markedRoomTagHash');
+        $parchmentObj->ivEmpty('markedRoomGuildHash');
+        $parchmentObj->ivEmpty('markedExitHash');
+        $parchmentObj->ivEmpty('markedExitTagHash');
+        $parchmentObj->ivEmpty('markedLabelHash');
+
+        $parchmentObj->ivEmpty('queueRoomHash');
+        $parchmentObj->ivEmpty('queueRoomTagHash');
+        $parchmentObj->ivEmpty('queueRoomGuildHash');
+        $parchmentObj->ivEmpty('queueExitHash');
+        $parchmentObj->ivEmpty('queueExitTagHash');
+        $parchmentObj->ivEmpty('queueLabelHash');
+
+        # Draw new canvas widgets for every occupied level, ready for the calling function to call
+        #   $self->doDraw when it's ready
+        foreach my $level (keys %occupyHash) {
+
+            $self->createMap($regionmapObj, $parchmentObj, $level);
+        }
+
+        return 1;
+    }
+
+    sub recycleMap {
+
+        # Called by $self->setCurrentRegion (only)
+        # When a new current region is set, the old region's parchment object can sometimes be
+        #   recycled, which means that its existing canvas widgets (Gnome2::Canvas objects) can be
+        #   re-used
+        # This prevents Axmud swallowing up huge amounts of memory. Large regions are drawn once
+        #   and then retained in memory, even when not visible. Smaller regions are drawn when
+        #   required, and when no longer visible, are removed from memory
+        #
+        # Expected arguments
+        #   $parchmentObj       - The parchment object (GA::Obj::Parchment) to be recycled
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $check) = @_;
+
+        # Local variables
+        my $index;
+
+        # Check for improper arguments
+        if (! defined $parchmentObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->recycleMap', @_);
+        }
+
+        # Remove the parchment object from our registries...
+        $self->ivDelete('parchmentHash', $parchmentObj->name);
+        $self->ivDelete('parchmentReadyHash', $parchmentObj->name);
+        $index = $self->ivFind('parchmentQueueList', $parchmentObj);
+        if (defined $index) {
+
+            $self->ivSplice('parchmentQueueList', $index, 1);
+        }
+
+        # ...but mark it as being available to be re-used
+        $self->ivPoke('spareParchmentObj', $parchmentObj);
+
+        # Destroy all of the parchment's canvas objects (but retain its canvas widgets)
+        # Because the parchment might be re-used almost immediately, we don't add canvas objects to
+        #   the usual queue, but we destroy them immediately
+        foreach my $levelObj ($parchmentObj->ivValues('levelHash')) {
+
+            foreach my $listRef (
+                $levelObj->ivValues('drawnRoomHash'),
+                $levelObj->ivValues('drawnRoomEchoHash'),
+                $levelObj->ivValues('drawnRoomTagHash'),
+                $levelObj->ivValues('drawnRoomGuildHash'),
+                $levelObj->ivValues('drawnRoomTextHash'),
+                $levelObj->ivValues('drawnExitHash'),
+                $levelObj->ivValues('drawnExitTagHash'),
+                $levelObj->ivValues('drawnOrnamentHash'),
+                $levelObj->ivValues('drawnLabelHash'),
+                $levelObj->ivValues('drawnCheckedDirHash'),
+            ) {
+                foreach my $canvasObj (@$listRef) {
+
+                    $canvasObj->destroy();
+                }
+            }
+        }
+
+        foreach my $canvasObj (
+            $parchmentObj->ivValues('bgCanvasObjHash'),
+            $parchmentObj->ivValues('colouredSquareHash'),
+            $parchmentObj->ivValues('colouredRectHash'),
+        ) {
+            $canvasObj->destroy();
+        }
+
+        # Reset the parchment object's IVs (but retain its canvas widgets, so they can be reused)
+        $parchmentObj->{_objName} = undef;
+        $parchmentObj->ivUndef('name');
+
+        $parchmentObj->ivEmpty('bgCanvasObjHash');
+        $parchmentObj->ivEmpty('levelHash');
+
+        $parchmentObj->ivEmpty('colouredSquareHash');
+        $parchmentObj->ivEmpty('colouredRectHash');
+
+        $parchmentObj->ivEmpty('markedRoomHash');
+        $parchmentObj->ivEmpty('markedRoomTagHash');
+        $parchmentObj->ivEmpty('markedRoomGuildHash');
+        $parchmentObj->ivEmpty('markedExitHash');
+        $parchmentObj->ivEmpty('markedExitTagHash');
+        $parchmentObj->ivEmpty('markedLabelHash');
+
+        $parchmentObj->ivEmpty('queueRoomHash');
+        $parchmentObj->ivEmpty('queueRoomTagHash');
+        $parchmentObj->ivEmpty('queueRoomGuildHash');
+        $parchmentObj->ivEmpty('queueExitHash');
+        $parchmentObj->ivEmpty('queueExitTagHash');
+        $parchmentObj->ivEmpty('queueLabelHash');
+
+        # Operation complete
+        return 1;
+    }
+
+    sub redrawRegions {
+
+        # Can be called by anything
+        # Redraws one or more regions. If there is a current regionmap and it's one of those which
+        #   is to be redrawn, the drawing operation for the regionmap's current level takes place
+        #   immediately. All other regions and levels are queued to be redrawn
+        # NB If GA::Obj::WorldModel->queueDrawMaxObjs is 0, all parchment objects except the
+        #   visible one are simply destroyed (since rooms, exits and labels can't be queued to be
+        #   drawn)
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Optional arguments
+        #   $regionmapObj   - The regionmap which should be drawn/redrawn. If not specified,
+        #                       $self->currentRegionmap is used
+        #   $onlyFlag       - If TRUE, only one regionmap (the specified one, or the current one if
+        #                       no regionmap is specified) is to be redrawn. If FALSE or 'undef',
+        #                       all regions for which a parchemnt object exists are redrawn
+        #
+        # Return values
+        #   'undef' on improper arguments or if there is nothing to redraw
+        #   1 otherwise
+
+        my ($self, $regionmapObj, $onlyFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $doDrawFlag,
+            @parchmentList,
+            %regionHash,
+        );
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->redrawRegions', @_);
+        }
+
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
+        if (! $regionmapObj && ! $self->parchmentHash) {
+
+            # There is nothing to redraw
+            return undef;
+        }
+
+        # Previous calls to this function transferred all canvas widgets/objects which are no longer
+        #   needed to a destruction list, $self->destroyQueueList. Objects in this list are
+        #   destroyed, a few at a time, by $self->winUpdate
+        # After a few rapid successive calls to this function, however, the Gnome2::Canvas code
+        #   seems to run out of memory, or something, and the overall time to complete this function
+        #   quadruples
+        # Therefore we must call ->destroy for all the canvas widgets/objects that haven't been
+        #   destroyed yet. In testing, simply emptying the list (and relying on Perl's garbage
+        #   collection) is consistently 10-15% faster than calling ->destroy on thousands of
+        #   objects, so we'll do that
+        #
+        # Show a pause window, if necessary
+        if ($self->destroyQueueList > 1000) {
+
+            # If the tooltips are visible, hide them
+            $self->hideTooltips();
+            # Show the pause window
+            $self->showPauseWin();
+        }
+
+        # Now empty the destruction queue
+        $self->ivEmpty('destroyQueueList');
+
+        # Compile a list of parchment objects to redraw, starting with the one for which ->doDraw
+        #   must be called now (all others are added to a queue)
+        if ($regionmapObj) {
+
+            push (@parchmentList, $self->ivShow('parchmentHash', $regionmapObj->name));
+        }
+
+        if (! $onlyFlag) {
+
+            # Prepare a hash of regionmaps and the number of rooms they contain, so we can add
+            #   parchments objects to the queue, largest first
+            foreach my $thisRegionmapObj ($self->worldModelObj->ivValues('regionmapHash')) {
+
+                $regionHash{$thisRegionmapObj->name} = $thisRegionmapObj->ivPairs('gridRoomHash');
+            }
+
+            foreach my $thisParchmentObj (
+                sort {$regionHash{$b->name} <=> $regionHash{$a->name}}
+                ($self->ivValues('parchmentHash'))
+            ) {
+                if (! $regionmapObj || $regionmapObj->name ne $thisParchmentObj->name) {
+
+                    push (@parchmentList, $thisParchmentObj);
+                }
+            }
+        }
+
+        # Deal with each parchment object in turn
+        foreach my $thisParchmentObj (@parchmentList) {
+
+            my $thisRegionmapObj;
+
+            # Get the corresponding regionmap object
+            $thisRegionmapObj
+                = $self->worldModelObj->ivShow('regionmapHash', $thisParchmentObj->name);
+
+            # Refresh the parchment object, removing any canvas objects that have been drawn, ready
+            #   for this function to draw new ones
+            $self->refreshMap($thisRegionmapObj, $thisParchmentObj);
+            if ($self->currentRegionmap && $self->currentRegionmap eq $thisRegionmapObj) {
+
+                # Add the parchment object to the front of the queue. Canvas objects in the current
+                #   level are drawn below; canvas objects on other levels are the first to be drawn
+                #   by regular calls to $self->winUpdate
+                # (NB $self->refreshMap removed the parchment object from the queue, if it was due
+                #   to be drawn)
+                $self->ivUnshift('parchmentQueueList', $thisParchmentObj);
+
+                # Mark any rooms and labels in the current level to be drawn now; rooms and labels
+                #   on other levels are queued to be drawn
+                if ($self->worldModelObj->queueDrawMaxObjs) {
+
+                    foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+
+                        my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+
+                        if ($roomObj->zPosBlocks == $thisRegionmapObj->currentLevel) {
+                            $thisParchmentObj->ivAdd('markedRoomHash', $roomNum, $roomObj);
+                        } else {
+                            $thisParchmentObj->ivAdd('queueRoomHash', $roomNum, $roomObj);
+                        }
+                    }
+
+                    foreach my $mapLabelObj ($thisRegionmapObj->ivValues('gridLabelHash')) {
+
+                        if ($mapLabelObj->level == $regionmapObj->currentLevel) {
+
+                            $thisParchmentObj->ivAdd(
+                                'markedLabelHash',
+                                $mapLabelObj->number,
+                                $mapLabelObj,
+                            );
+
+                        } else {
+
+                            $thisParchmentObj->ivAdd(
+                                'queueLabelHash',
+                                $mapLabelObj->number,
+                                $mapLabelObj,
+                            );
+                        }
+                    }
+
+                } else {
+
+                    # Nothing can be queued to be drawn, so makr everything to be drawn now
+                    foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+
+                        $thisParchmentObj->ivAdd(
+                            'markedRoomHash',
+                            $roomNum,
+                            $self->worldModelObj->ivShow('modelHash', $roomNum),
+                        );
+                    }
+
+                    foreach my $mapLabelObj ($thisRegionmapObj->ivValues('gridLabelHash')) {
+
+                        $thisParchmentObj->ivAdd(
+                            'markedLabelHash',
+                            $mapLabelObj->number,
+                            $mapLabelObj,
+                        );
+                    }
+                }
+
+                # In the code just below, call ->doDraw
+                $doDrawFlag = TRUE;
+
+            } elsif ($self->worldModelObj->queueDrawMaxObjs) {
+
+                # Add the parchment object to the end of the queue. Canvas objects on all levels are
+                #   drawn by regular calls to $self->winUpdate
+                $self->ivPush('parchmentQueueList', $thisParchmentObj);
+
+                # Add all rooms and labels to the queue (any room tags, room guilds, exits or exits
+                #   tags will be automatically drawn alongside them)
+                foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+
+                    $thisParchmentObj->ivAdd(
+                        'queueRoomHash',
+                        $roomNum,
+                        $self->worldModelObj->ivShow('modelHash', $roomNum),
+                    );
+                }
+
+                foreach my $mapLabelObj ($thisRegionmapObj->ivValues('gridLabelHash')) {
+
+                    $thisParchmentObj->ivAdd('queueLabelHash', $mapLabelObj->number, $mapLabelObj);
+                }
+            }
+
+            # Draw coloured squares and rectangles on the background map
+            $self->doColourIn($thisRegionmapObj, undef, $thisParchmentObj);
+        }
+
+        if ($doDrawFlag) {
+
+            # Perform a drawing cycle so that the current region can be redrawn, if it's one of
+            #   those that has just been updated
+            if (! $self->doDraw()) {
+
+                # Draw cycle was already in operation. $self->winUpdate will try again; when it
+                #   succeeds, make the replacement canvas widget visible
+                $self->ivPoke('winUpdateShowFlag', TRUE);
+
+            } else {
+
+                # Make the replacement canvas widget visible
+                $self->swapCanvasWidget();
+            }
+        }
+
+        # Make the pause window invisible, if visible
+        $self->hidePauseWin();
+
+        return 1;
+    }
+
+    sub showRegion {
+
+        # Called by $self->setCurrentRegion or ->setCurrentLevel (only)
+        # Checks all canvas objects in the current regionmap's queue of canvas objects to draw. Any
+        #   objects on the current level which are in that queue are marked as needing to be drawn
+        #   now
+        # Then calls $self->doDraw to draw them now
         #
         # Expected arguments
         #   (none besides $self)
         #
         # Return values
-        #   'undef' on improper arguments or if there is no current regionmap
+        #   'undef' on improper arguments or if there's no current regionmap
         #   1 otherwise
 
         my ($self, $check) = @_;
 
         # Local variables
-        my @drawList;
+        my ($regionmapObj, $level, $parchmentObj, $index);
 
         # Check for improper arguments
         if (defined $check) {
 
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRegion', @_);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->showRegion', @_);
         }
 
-        # If the tooltips are visible, hide them
-        $self->hideTooltips();
+        # Import the current regionmap and parchment objects (for convenience)
+        if (! $self->currentRegionmap) {
 
-        # Don't draw anything if there is no current region
+            return undef;
+
+        } else {
+
+            $regionmapObj = $self->currentRegionmap;
+            $level = $regionmapObj->currentLevel;
+            $parchmentObj = $self->currentParchment;
+        }
+
+        # Check all canvas objects in the drawing queue, and mark any which should be drawn now
+        foreach my $obj ($parchmentObj->ivValues('queueRoomHash')) {
+
+            if ($obj->zPosBlocks == $level) {
+
+                $parchmentObj->ivAdd('markedRoomHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueRoomHash', $obj->number);
+            }
+        }
+
+        foreach my $obj ($parchmentObj->ivValues('queueRoomTagHash')) {
+
+            if ($obj->zPosBlocks == $level) {
+
+                $parchmentObj->ivAdd('markedRoomTagHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueRoomTagHash', $obj->number);
+            }
+        }
+
+        foreach my $obj ($parchmentObj->ivValues('queueRoomGuildHash')) {
+
+            if ($obj->zPosBlocks == $level) {
+
+                $parchmentObj->ivAdd('markedRoomGuildHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueRoomGuildHash', $obj->number);
+            }
+        }
+
+        foreach my $obj ($parchmentObj->ivValues('queueExitHash')) {
+
+            my $roomObj = $self->worldModelObj->ivShow('modelHash', $obj->parent);
+
+            if ($roomObj->zPosBlocks == $level) {
+
+                $parchmentObj->ivAdd('markedExitHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueExitHash', $obj->number);
+            }
+        }
+
+        foreach my $obj ($parchmentObj->ivValues('queueExitTagHash')) {
+
+            my $roomObj = $self->worldModelObj->ivShow('modelHash', $obj->parent);
+
+            if ($roomObj->zPosBlocks == $level) {
+
+                $parchmentObj->ivAdd('markedExitTagHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueExitTagHash', $obj->number);
+            }
+        }
+
+        foreach my $obj ($parchmentObj->ivValues('queueLabelHash')) {
+
+            if ($obj->level == $level) {
+
+                $parchmentObj->ivAdd('markedLabelHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueLabelHash', $obj->number);
+            }
+        }
+
+        # If any canvas objects need to be drawn, draw them now
+        if (
+            $parchmentObj->markedRoomHash
+            || $parchmentObj->markedRoomTagHash
+            || $parchmentObj->markedRoomGuildHash
+            || $parchmentObj->markedExitHash
+            || $parchmentObj->markedExitTagHash
+            || $parchmentObj->markedLabelHash
+        ) {
+            # If tooltips are visible, hide them
+            $self->hideTooltips();
+
+            # Draw the canvas object(s) (which empties $parchmentObj->markedRoomHash, etc)
+            if (
+                $self->doDraw()
+                && ! $parchmentObj->queueRoomHash
+                && ! $parchmentObj->queueRoomTagHash
+                && ! $parchmentObj->queueRoomGuildHash
+                && ! $parchmentObj->queueExitHash
+                && ! $parchmentObj->queueExitTagHash
+                && ! $parchmentObj->queueLabelHash
+            ) {
+                # Mark this parchment object as fully drawn
+                $self->ivAdd('parchmentReadyHash', $parchmentObj->name, $parchmentObj);
+                $index = $self->ivFind('parchmentQueueList', $parchmentObj);
+                if (defined $index) {
+
+                    $self->ivSplice('parchmentQueueList', $index, 1);
+                }
+            }
+        }
+
+        return 1;
+    }
+
+    sub swapCanvasWidget {
+
+        # Called by $self->->winUpdate, ->setCurrentRegion, ->setCurrentLevel and ->redrawRegions
+        # Removes the visible canvas widget (Gnome2::Canvas), if any, and replaces it with the
+        #   canvas widget for the current region's current level
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if there's no current regionmap
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Local variables
+        my ($canvasWidget, $matchFlag);
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->swapCanvasWidget', @_);
+        }
+
+        # Check that a current regionmap actually exists
         if (! $self->currentRegionmap) {
 
             return undef;
         }
 
-        # Reset the map, which empties all objects currently drawn on it, and makes sure the
-        #   background is the right colour
-        $self->resetMap(TRUE);
+        # Reduce the time required for replacing the canvas widget as much as possible, by updating
+        #   everything so far
+        $self->winShowAll($self->_objClass . '->setCurrentRegion');
+        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->setCurrentRegion');
 
-        # Colour in the background
-        $self->doColourIn();
+        # For very large maps, if we simply remove the canvas widget (Gnome2::Canvas) from its
+        #   scrolled window (Gtk2::ScrolledWindow), the user sees a grey background momentarily
+        # To avoid this, we have to take a roundabout route - create a new scrolled window, add the
+        #   replacement canvas widget to it, call ->show_al
+        # Then we replace the old scrolled window with the new one
+        # Finally we remove the previous canvas widget from the defunct scrolled window, so it's
+        #   ready for the next time it's made visible
 
-        # Compose a list of objects to draw. If there are any rooms in this region, on this level,
-        #   add them (any room tags, room guilds, exits or exits tags will be automatically drawn
-        #   too)
-        if ($self->currentRegionmap->gridRoomHash) {
+        # Get the replacement canvas widget
+        $canvasWidget = $self->currentParchment->ivShow(
+            'canvasWidgetHash',
+            $self->currentRegionmap->currentLevel,
+        );
 
-            foreach my $number ($self->currentRegionmap->ivValues('gridRoomHash')) {
+        # If the replacement canvas widget is the same as the previous canvas widget, the code below
+        #   will fail (because the canvas widget will be given two parents)
+        # We need to check for that situation and, if detected, don't try to replace the canvas
+        #   widget at all
+        OUTER: foreach my $child ($self->canvasScroller->get_children() ) {
 
-                push (@drawList, 'room', $self->worldModelObj->ivShow('modelHash', $number));
+            if ($child eq $canvasWidget) {
+
+                $matchFlag = TRUE;
+                last OUTER;
             }
         }
 
-        # If there are any labels in this region, on this level, add them to the list
-        if ($self->currentRegionmap->gridLabelHash) {
+        if (! $matchFlag) {
 
-            foreach my $obj ($self->currentRegionmap->ivValues('gridLabelHash')) {
+            # Create a new scrolled window
+            my $canvasScroller = Gtk2::ScrolledWindow->new();
+            my $canvasHAdjustment = $canvasScroller->get_hadjustment();
+            my $canvasVAdjustment = $canvasScroller->get_vadjustment();
+            $canvasScroller->set_border_width(3);
+            # Set the scrolling policy
+            $canvasScroller->set_policy('always','always');
 
-                push (@drawList, 'label', $obj);
+            # Add the replacement canvas widget to the new scrolled window
+            $canvasScroller->add($canvasWidget);
+
+            # This line is the one that prevents the grey background from appearing momentarily
+            $canvasScroller->show_all();
+
+            # Remove the old canvas scroller from its parent Gtk2::Frame, and insert the new one
+            foreach my $child ($self->canvasFrame->get_children() ) {
+
+                $self->canvasFrame->remove($child);
             }
+
+            $self->canvasFrame->add($canvasScroller);
+
+            # Remove the previous canvas widget from its scroller, ready to be re-inserted again at
+            #   some point in the future
+            foreach my $child ($self->canvasScroller->get_children() ) {
+
+                $self->canvasScroller->remove($child);
+            }
+
+            # Update IVs
+            $self->ivPoke('canvas', $canvasWidget);
+            $self->ivPoke(
+                'canvasBackground',
+                $self->currentParchment->ivShow(
+                    'bgCanvasObjHash',
+                    $self->currentRegionmap->currentLevel,
+                ),
+            );
+
+            $self->ivPoke('canvasScroller', $canvasScroller);
+            $self->ivPoke('canvasHAdjustment', $canvasHAdjustment);
+            $self->ivPoke('canvasVAdjustment', $canvasVAdjustment);
+
+            # Move the scrollbars to their former position
+            $self->setMapPosn(
+                $self->currentRegionmap->scrollXPos,
+                $self->currentRegionmap->scrollYPos,
+            );
         }
 
-        # If any objects need to be drawn, draw them now
-        if (@drawList) {
+        # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
+        $self->restrictWidgets();
 
-            $self->doDraw(@drawList);
-        }
+        # Make sure the correct region is highlighted in the treeview region list
+        $self->treeViewSelectLine($self->currentRegionmap->name);
+
+        # Make the changes visible
+        $self->winShowAll($self->_objClass . '->setCurrentRegion');
+        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->setCurrentRegion');
+
+        # Update IVs
+        $self->ivPoke('emptyMapFlag', FALSE);
 
         return 1;
     }
@@ -30541,11 +33076,16 @@
     sub markObjs {
 
         # Can be called by anything
-        # Adds a list of objects which need to be drawn to the ->markedRoomHash (etc) IVs; they
-        #   will be drawn the next time $self->doDraw is called
-        # The objects can be rooms, room tags, room guilds, exits, exit tags or labels. (If the list
-        #   contains any rooms, the room's associated room tags, room guilds, exits and exit tags
-        #   are automatically redrawn when ->doDraw eventually gets called)
+        # Called with a list of objects (rooms, room tags, room guilds, exits, exit tags or labels)
+        #   that should be marked to be drawn on the next call to $self->doDraw (if they're on the
+        #   current regionmap's current level), or else added to the queue to be drawn by
+        #   background processes (if not)
+        # If the list contains any rooms, the room's associated room tags, room guilds, exits and
+        #   exit tags are automatically redrawn when ->doDraw eventually gets called, so the calling
+        #   code can specify either specify them or not
+        # If the objects are in a region for which no parchment object (GA::Obj::Parchment) exists,
+        #   meaning that we don't want to draw the region at the moment, then the objects are
+        #   ignored
         #
         # Expected arguments
         #   (none besides $self)
@@ -30558,63 +33098,137 @@
         #                   GA::Obj::Exit or GA::Obj::MapLabel
         #
         # Return values
-        #   'undef' if there is no current regionmap (so nothing can be drawn) or if an unrecognised
-        #       'type' is specified
-        #   1 otherwise
+        #   'undef' if an unrecognised 'type' is specified
+        #   1 otherwise (including when @drawList is empty)
 
         my ($self, @drawList) = @_;
 
+        # Local variables
+        my ($currentRegion, $errorMsg);
+
         # (No improper arguments to check)
 
-        # If there's no current regionmap, then nothing can be drawn
-        if (! $self->currentRegionmap) {
+        # Import the current regionmap name, if any (to save time)
+        if ($self->currentRegionmap) {
 
-            return undef;
+            $currentRegion = $self->currentRegionmap->name;
         }
 
         if (@drawList) {
 
             do {
 
-                my ($type, $obj, $posn);
+                my ($type, $obj, $parchmentObj, $regionObj, $roomObj);
 
                 $type = shift @drawList;
                 $obj = shift @drawList;
 
                 if (! $obj) {
 
-                    # Unrecognised $type
-                    return $self->session->writeError(
-                        'Undefined object type in draw list',
-                        $self->_objClass . '->markObjs',
-                    );
+                    # Unrecognised $type; show the first error message at the end of this function
+                    if (! $errorMsg) {
 
-                # Mark the object to be drawn
-                } elsif ($type eq 'room') {
-                    $self->ivAdd('markedRoomHash', $obj->number, $obj);
-                } elsif ($type eq 'room_tag') {
-                    $self->ivAdd('markedRoomTagHash', $obj->number, $obj);
-                } elsif ($type eq 'room_guild') {
-                    $self->ivAdd('markedRoomGuildHash', $obj->number, $obj);
-                } elsif ($type eq 'exit') {
-                    $self->ivAdd('markedExitHash', $obj->number, $obj);
-                } elsif ($type eq 'exit_tag') {
-                    $self->ivAdd('markedExitTagHash', $obj->number, $obj);
+                        $errorMsg = 'Undefined object type in draw list';
+                    }
+
+                # Mark the object to be drawn or add them to the queue
+                } elsif ($type eq 'room' || $type eq 'room_tag' || $type eq 'room_guild') {
+
+                    $regionObj = $self->worldModelObj->ivShow('modelHash', $obj->parent);
+                    $parchmentObj = $self->ivShow('parchmentHash', $regionObj->name);
+                    # (Ignore objects for which no parchment object exists)
+                    if ($parchmentObj) {
+
+                        if (
+                            $self->worldModelObj->queueDrawMaxObjs
+                            && (! defined $currentRegion || $currentRegion ne $parchmentObj->name)
+                        ) {
+
+                            if ($type eq 'room') {
+                                $parchmentObj->ivAdd('queueRoomHash', $obj->number, $obj);
+                            } elsif ($type eq 'room_tag') {
+                                $parchmentObj->ivAdd('queueRoomTagHash', $obj->number, $obj);
+                            } else {
+                                $parchmentObj->ivAdd('queueRoomGuildHash', $obj->number, $obj);
+                            }
+
+                        } else {
+
+                            if ($type eq 'room') {
+                                $parchmentObj->ivAdd('markedRoomHash', $obj->number, $obj);
+                            } elsif ($type eq 'room_tag') {
+                                $parchmentObj->ivAdd('markedRoomTagHash', $obj->number, $obj);
+                            } else {
+                                $parchmentObj->ivAdd('markedRoomGuildHash', $obj->number, $obj);
+                            }
+                        }
+                    }
+
+                } elsif ($type eq 'exit' || $type eq 'exit_tag') {
+
+                    $roomObj = $self->worldModelObj->ivShow('modelHash', $obj->parent);
+                    $regionObj = $self->worldModelObj->ivShow('modelHash', $roomObj->parent);
+                    $parchmentObj = $self->ivShow('parchmentHash', $regionObj->name);
+                    # (Ignore objects for which no parchment object exists)
+                    if ($parchmentObj) {
+
+                        if (
+                            $self->worldModelObj->queueDrawMaxObjs
+                            && (! defined $currentRegion || $currentRegion ne $parchmentObj->name)
+                        ) {
+                            if ($type eq 'exit') {
+                                $parchmentObj->ivAdd('queueExitHash', $obj->number, $obj);
+                            } elsif ($type eq 'exit_tag') {
+                                $parchmentObj->ivAdd('queueExitTagHash', $obj->number, $obj);
+                            }
+
+                        } else {
+
+                            if ($type eq 'exit') {
+                                $parchmentObj->ivAdd('markedExitHash', $obj->number, $obj);
+                            } elsif ($type eq 'exit_tag') {
+                                $parchmentObj->ivAdd('markedExitTagHash', $obj->number, $obj);
+                            }
+                        }
+                    }
+
                 } elsif ($type eq 'label') {
-                    $self->ivAdd('markedLabelHash', $obj->number, $obj);
+
+                    $parchmentObj = $self->ivShow('parchmentHash', $obj->region);
+                    # (Ignore objects for which no parchment object exists)
+                    if ($parchmentObj) {
+
+                        if (
+                            $self->worldModelObj->queueDrawMaxObjs
+                            && (! defined $currentRegion || $currentRegion ne $parchmentObj->name)
+                        ) {
+                            $parchmentObj->ivAdd('queueLabelHash', $obj->number, $obj);
+                        } else {
+                            $parchmentObj->ivAdd('markedLabelHash', $obj->number, $obj);
+                        }
+                    }
+
                 } else {
 
-                    # Unrecognised $type
-                    return $self->session->writeError(
-                        'Unrecognised object type \'' . $type . '\'',
-                        $self->_objClass . '->markObjs',
-                    );
+                    # Unrecognised $type; show the first error message at the end of this function
+                    if (! $errorMsg) {
+
+                        $errorMsg = 'Unrecognised object type \'' . $type . '\' in draw list';
+                    }
                 }
 
             } until (! @drawList);
         }
 
         # Operation complete
+        if ($errorMsg) {
+
+            return $self->session->writeError(
+                $errorMsg,
+                $self->_objClass . '->markObjs',
+            );
+        }
+
         return 1;
     }
 
@@ -30622,24 +33236,30 @@
 
     sub doColourIn {
 
-        # Called by $self->drawRegion
-        # Draws all coloured blocks and rectangles that are visible for the current regionmap's
-        #   current level
+        # Called by $self->redrawRegions and ->createMap
+        # Draws all coloured blocks and rectangles for the specified regionmap
         #
         # Expected arguments
-        #   (none besides $self)
+        #   $regionmapObj   - The regionmap (GA::Obj::Regionmap) on which to draw
+        #
+        # Optional arguments
+        #   $level          - The level (matches a possible value of
+        #                       GA::Obj::Regionmap->currentLevel). If not specified, coloured blocks
+        #                       and rectangles are drawn on every level
+        #   $parchmentObj   - The regionmap's corresponding parchment object, if known. If 'undef',
+        #                       this function fetches it
         #
         # Return values
         #   'undef' on improper arguments
         #   1 otherwise
 
-        my ($self, $check) = @_;
+        my ($self, $regionmapObj, $level, $parchmentObj, $check) = @_;
 
         # Local variables
         my (%blockHash, %objHash);
 
         # Check for improper arguments
-        if (defined $check) {
+        if (! defined $regionmapObj || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->doColourIn', @_);
         }
@@ -30648,32 +33268,54 @@
         #   cycle to take place while this function is working
         $self->ivPoke('delayDrawFlag', TRUE);
 
+        # Fetch the parchment object, if none was specified
+        if (! $parchmentObj) {
+
+            $parchmentObj = $self->ivShow('parchmentHash', $regionmapObj->name);
+        }
+
         # Colour in individual gridblocks. Import the IV for speed
-        %blockHash = $self->currentRegionmap->gridColourBlockHash;
+        %blockHash = $regionmapObj->gridColourBlockHash;
         foreach my $coord (%blockHash) {
 
-            my ($x, $y, $level, $colour);
+            my ($x, $y, $z, $colour);
 
-            ($x, $y, $level) = split (/_/, $coord);
+            # $coord is in the form 'x_y_z' or 'x_y'
+            ($x, $y, $z) = split (/_/, $coord);
             $colour = $blockHash{$coord};
 
-            # $level can be undefined. There's no reason why $x and $y should be undefined, but
-            #   we'll check anyway
-            if (
-                defined $y
-                && defined $colour
-            ) {
-                $self->drawColouredSquare($colour, $x, $y, $level);
+            # $z, representing the level, can be undefined. There's no reason why $x and $y should
+            #   be undefined, but we'll check anyway
+            if (defined $y && defined $colour) {
+
+                if (! defined $level) {
+
+                    # Draw on every level
+                    $self->drawColouredSquare($regionmapObj, $colour, $x, $y, undef, $parchmentObj);
+
+                } elsif (! defined $z || $z == $level) {
+
+                    # Draw on a single level
+                    $self->drawColouredSquare(
+                        $regionmapObj,
+                        $colour,
+                        $x,
+                        $y,
+                        $level,
+                        $parchmentObj,
+                    );
+                }
             }
         }
 
-        # Colour in rectangles
-        %objHash = $self->currentRegionmap->gridColourObjHash;
+        # Colour in rectangles, stored as GA::Obj::GridColour objects. Because they may overlap,
+        #   they must be drawn in a consistent order
+        %objHash = $regionmapObj->gridColourObjHash;
         foreach my $obj (
             sort {$a->number <=> $b->number}
-            ($self->currentRegionmap->ivValues('gridColourObjHash'))
+            ($regionmapObj->ivValues('gridColourObjHash'))
         ) {
-            $self->drawColouredRect($obj);
+            $self->drawColouredRect($regionmapObj, $obj, $level, $parchmentObj);
         }
 
         # Allow new drawing cycles to take place
@@ -30685,324 +33327,453 @@
     sub drawColouredSquare {
 
         # Called by $self->doColourIn and ->setColouredSquare
-        # Draws a coloured square on the (background) map, comprising the space taken by a single
-        #   gridblock
+        # Draws a coloured square in the specified regionmap. The coloured square comprises the
+        #   space occupied by a single gridblock
         #
         # Expected arguments
-        #   $colour     - The RGB colour to use, e.g. '#ABCDEF' (case-insensitive)
-        #   $x          - The block's x coordinate
-        #   $y          - The block's y coordinate
+        #   $regionmapObj   - The regionmap (GA::Obj::Regionmap) on which to draw
+        #   $colour         - The RGB colour to use, e.g. '#ABCDEF' (case-insensitive)
+        #   $x              - The block's x coordinate
+        #   $y              - The block's y coordinate
         #
         # Optional arguments
-        #   $level      - The block's z coordinate. If undefined, the block is coloured in on all
-        #                   levels
+        #   $level          - The block's z coordinate. If undefined, the coloured square is drawn
+        #                       on all levels
+        #   $parchmentObj   - The regionmap's corresponding parchment object, if known. If 'undef',
+        #                       this function fetches it
         #
         # Return values
         #   'undef' on improper arguments or if the block can't be coloured in
         #   1 otherwise
 
-        my ($self, $colour, $x, $y, $level, $check) = @_;
+        my ($self, $regionmapObj, $colour, $x, $y, $level, $parchmentObj, $check) = @_;
 
         # Local variables
-        my ($coord, $xPos, $yPos, $newObj);
+        my (
+            $blockWidth, $blockHeight, $xPos, $yPos,
+            @list,
+        );
 
         # Check for improper arguments
-        if (! defined $colour || ! defined $x || ! defined $y || defined $check) {
-
+        if (
+            ! defined $regionmapObj || ! defined $colour || ! defined $x || ! defined $y
+            || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawColouredSquare', @_);
         }
 
-        # Don't colour in this block if it's not on the currently-displayed level (unless $level is
-        #   undefined, in which case the block is coloured in on every level)
-        if (defined $level && $self->currentRegionmap->currentLevel != $level) {
+        # Fetch the parchment object, if none was specified
+        if (! $parchmentObj) {
 
-            return undef;
+            $parchmentObj = $self->ivShow('parchmentHash', $regionmapObj->name);
         }
 
-        # Before drawing the canvas object for this coloured block, destroy the existing canvas
-        #   object from the last time the block was coloured
-        $coord = $x . '_' . $y;
-        $self->deleteCanvasObj('square', $coord);
+        # Compile a list of levels on which the coloured square should be drawn
+        if (! defined $level) {
+            push (@list, $parchmentObj->ivKeys('canvasWidgetHash'));
+        } else {
+            push (@list, $level);
+        }
 
-        # Get the position of the gridblock
-        $xPos = $x * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $y * $self->currentRegionmap->blockHeightPixels;
+        # Get the block width/height, in pixels
+        $blockWidth = $regionmapObj->blockWidthPixels;
+        $blockHeight = $regionmapObj->blockHeightPixels;
+        # Get the position of the gridblock (it's the same on each level)
+        $xPos = $x * $blockWidth;
+        $yPos = $y * $blockHeight;
 
-        # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
-            'Gnome2::Canvas::Rect',
-            x1 => $xPos,
-            y1 => $yPos,
-            x2 => $xPos + $self->currentRegionmap->blockWidthPixels - 1,
-            y2 => $yPos + $self->currentRegionmap->blockHeightPixels - 1,
-            outline_color => $colour,
-            fill_color => $colour,
-        );
+        # Draw a coloured square on each of those levels
+        OUTER: foreach my $z (@list) {
 
-        # Set the object's position in the canvas drawing stack
-        $self->setSquareLevel($newObj);
-        # Set up the event handler for the canvas object
-        $self->setupCanvasObjEvent('square', $newObj);
-        # Store the canvas object
-        $self->ivAdd('colouredSquareHash', $coord, $newObj);
+            my ($coord, $canvasWidget, $newObj);
+
+            # Before drawing the canvas object for this coloured square, destroy the existing canvas
+            #   object from the last time the square was drawn
+            $coord = $x . '_' . $y . '_' . $z;
+            $self->deleteCanvasObj('square', $coord, $regionmapObj, $parchmentObj);
+
+            # Get the canvas widget for this level
+            $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $z);
+
+            # Draw the canvas object
+            $newObj = Gnome2::Canvas::Item->new(
+                $canvasWidget->root(),
+                'Gnome2::Canvas::Rect',
+                x1 => $xPos,
+                y1 => $yPos,
+                x2 => $xPos + $blockWidth - 1,
+                y2 => $yPos + $blockHeight - 1,
+                outline_color => $colour,
+                fill_color => $colour,
+            );
+
+            # Set the object's position in the canvas drawing stack
+            $self->setSquareStackPosn($newObj);
+            # Set up the event handler for the canvas object
+            $self->setupCanvasObjEvent('square', $newObj);
+            # Store the canvas object
+            $parchmentObj->ivAdd('colouredSquareHash', $coord, $newObj);
+        }
 
         return 1;
     }
 
     sub drawColouredRect {
 
-        # Called by $self->doColourIn and ->setColouredREct
-        # Draws a coloured rectangle on the (background) map, comprising the space taken by a
-        #   multiple gridblocks in a rectangular shape (either or both of the x and y dimensions can
-        #   have a length of a single gridblock, so it doesn't have to be rectangular)
+        # Called by $self->doColourIn and ->setColouredRect
+        # Draws a coloured rectangle in the specified regionmap. The coloured rectangle comprises
+        #   the space occupied by multiple gridblocks in a rectangular shape (either or both of the
+        #   x and y dimensions can have a length of a single gridblock, so it doesn't have to be
+        #   rectangular)
         #
         # Expected arguments
-        #   $colourObj  The GA::Obj::GridColour object, stored in the current regionmap, to draw
+        #   $regionmapObj   - The regionmap (GA::Obj::Regionmap) on which to draw
+        #   $colourObj      - The grid colour object (GA::Obj::GridColour) which stores details of
+        #                       the rectangle's size, position and colour
+        #
+        # Optional arguments
+        #   $level          - The rectangle's z coordinate. If defined, the rectangle can only be
+        #                       drawn on that level (and won't be drawn at all, if the grid colour
+        #                       object itself specifies a different level). If not defined, the
+        #                       grid colour object specifies on which levels the rectangle should be
+        #                       drawn
+        #   $parchmentObj   - The regionmap's corresponding parchment object, if known. If 'undef',
+        #                       this function fetches it
         #
         # Return values
         #   'undef' on improper arguments or if the rectangle can't be coloured in
         #   1 otherwise
 
-        my ($self, $colourObj, $check) = @_;
+        my ($self, $regionmapObj, $colourObj, $level, $parchmentObj, $check) = @_;
 
         # Local variables
-        my $newObj;
+        my (
+            $blockWidth, $blockHeight,
+            @list,
+        );
 
         # Check for improper arguments
-        if (defined $check) {
+        if (! defined $regionmapObj || ! defined $colourObj || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawColouredRect', @_);
         }
 
-        # Don't colour in this rectangle if it's not on the currently-displayed level (unless it's
-        #   set to be seen on every level)
-        if (
-            ! $colourObj
-            || (
-                defined $colourObj->level
-                && $self->currentRegionmap->currentLevel != $colourObj->level
-            )
-        ) {
-            return undef;
+        # Fetch the parchment object, if none was specified
+        if (! $parchmentObj) {
+
+            $parchmentObj = $self->ivShow('parchmentHash', $regionmapObj->name);
         }
 
-        # Before drawing the canvas object for this coloured rectangle, destroy the existing canvas
-        #   object from the last time the rectangle was coloured
-        $self->deleteCanvasObj('rect', $colourObj);
+        # Compile a list of levels on which the coloured rectangle should be drawn
+        if (! defined $level) {
 
-        # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
-            'Gnome2::Canvas::Rect',
-            x1 => $colourObj->x1 * $self->currentRegionmap->blockWidthPixels,
-            y1 => $colourObj->y1 * $self->currentRegionmap->blockHeightPixels,
-            x2 => ((($colourObj->x2) + 1) * $self->currentRegionmap->blockWidthPixels) - 1,
-            y2 => ((($colourObj->y2) + 1) * $self->currentRegionmap->blockHeightPixels) - 1,
-            outline_color => $colourObj->colour,
-            fill_color => $colourObj->colour,
-        );
+            if (! defined $colourObj->level) {
+                push (@list, $parchmentObj->ivKeys('canvasWidgetHash'));
+            } else {
+                push (@list, $colourObj->level);
+            }
 
-        # Set the object's position in the canvas drawing stack
-        $self->setRectLevel($newObj);
-        # Set up the event handler for the canvas object
-        $self->setupCanvasObjEvent('rect', $newObj);
-        # Store the canvas object
-        $self->ivAdd('colouredRectHash', $colourObj->number, $newObj);
+        } elsif (! defined $colourObj->level || $colourObj->level == $level) {
+
+            push (@list, $level);
+        }
+
+        # Get the block width/height, in pixels
+        $blockWidth = $regionmapObj->blockWidthPixels;
+        $blockHeight = $regionmapObj->blockHeightPixels;
+
+        # Draw a coloured rectangle on each of those levels
+        OUTER: foreach my $z (@list) {
+
+            my ($key, $canvasWidget, $newObj);
+
+            # Before drawing the canvas object for this coloured rectangle, destroy the existing
+            #   canvas object from the last time the rectangle was drawn
+            $key = $colourObj->number . '_' . $z;
+            $self->deleteCanvasObj('rect', $key, $regionmapObj, $parchmentObj);
+
+            # Get the canvas widget for this level
+            $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $z);
+
+            # Draw the canvas object
+            $newObj = Gnome2::Canvas::Item->new(
+                $canvasWidget->root(),
+                'Gnome2::Canvas::Rect',
+                x1 => $colourObj->x1 * $blockWidth,
+                y1 => $colourObj->y1 * $blockHeight,
+                x2 => ((($colourObj->x2) + 1) * $blockWidth) - 1,
+                y2 => ((($colourObj->y2) + 1) * $blockHeight) - 1,
+                outline_color => $colourObj->colour,
+                fill_color => $colourObj->colour,
+            );
+
+            # Set the object's position in the canvas drawing stack
+            $self->setRectStackPosn($parchmentObj, $newObj);
+            # Set up the event handler for the canvas object
+            $self->setupCanvasObjEvent('rect', $newObj);
+            # Store the canvas object
+            $parchmentObj->ivAdd('colouredRectHash', $key, $newObj);
+        }
 
         return 1;
     }
 
-    # Graphical operations - map objects
+    # Graphical operations - drawing canvas objects
 
     sub doDraw {
 
         # Can be called by anything
-        # All the objects which have been marked to be drawn (or re-drawn) are stored in
-        #   $self->markedRoomHash, ->markedRoomTagHash, ->markedRoomGuildHash, ->markedExitHash,
-        #   ->markedExitTag Hash and $self->markedLabelHash
-        # In addition, a list of objects can be specified, which are added to any stored in those
-        #   IVs (any duplicates are eliminated)
+        # Checks every parchment object (GA::Obj::Parchment), each of which stores objects to be
+        #   drawn in its ->markedRoomHash, ->markedRoomTagHash, ->markedRoomGuildHash,
+        #   ->markedExitHash, ->markedExitTag Hash and ->markedLabelHash IVs
+        # Draws all of those objects, one region at a time
+        # Before calling this function, code should call $self->markObjs to add items to the hashes
+        #   above
         #
         # Expected arguments
         #   (none besides $self)
-        #
-        # Optional arguments
-        #   @drawList   - A list of objects to be drawn (or redrawn), in the form
-        #                   (type, object, type, object, ...)
-        #               - ...where 'type' is one of the strings 'room', 'room_tag', 'room_guild',
-        #                   'exit', 'exit_tag' and 'label', and 'object' is a GA::ModelObj::Room,
-        #                   GA::Obj::Exit or GA::Obj::MapLabel
         #
         # Return values
         #   'undef' if there is no current regionmap (so nothing can be drawn), if
         #       $self->delayDrawFlag is set or if no objects have been marked for drawing
         #   1 otherwise
 
-        my ($self, @drawList) = @_;
+        my ($self, $check) = @_;
 
         # Local variables
         my (
-            $drawCount, $flag, $mode,
-            %markedRoomHash, %markedRoomTagHash, %markedRoomGuildHash, %markedExitHash,
-            %markedExitTagHash, %markedLabelHash,
+            $drawCount,
+            @parchmentList,
+            %parchmentHash,
         );
 
-        # (No improper arguments to check)
+        # Check for improper arguments
+        if (defined $check) {
 
-        # Don't draw anything if there is no current region
-        if (! $self->currentRegionmap) {
-
-            # Any objects which were marked to be drawn, can now be ignored (including any specified
-            #   in @drawList)
-            $self->ivEmpty('markedRoomHash');
-            $self->ivEmpty('markedRoomTagHash');
-            $self->ivEmpty('markedRoomGuildHash');
-            $self->ivEmpty('markedExitHash');
-            $self->ivEmpty('markedExitTagHash');
-            $self->ivEmpty('markedLabelHash');
-
-            return undef;
-        }
-
-        # Remember the number of items to be drawn (before we empty @drawList)
-        $drawCount = (scalar @drawList) / 2;
-
-        # Import the hashes of objects already marked to be drawn
-        %markedRoomHash = $self->markedRoomHash;
-        %markedRoomTagHash = $self->markedRoomTagHash;
-        %markedRoomGuildHash = $self->markedRoomGuildHash;
-        %markedExitHash = $self->markedExitHash;
-        %markedExitTagHash = $self->markedExitTagHash;
-        %markedLabelHash = $self->markedLabelHash;
-
-        # If @drawList was specified, add them to the hashes
-        if (@drawList) {
-
-            do {
-
-                my ($type, $obj, $posn);
-
-                $type = shift @drawList;
-                $obj = shift @drawList;
-
-                if (! $obj) {
-
-                    # Unrecognised $type
-                    $self->session->writeWarning(
-                        'Undefined object (type \'' . $type . '\') in draw list',
-                        $self->_objClass . '->doDraw',
-                    );
-
-                } elsif (! $obj->isa('Games::Axmud')) {
-
-                    # Unrecognised $obj - not sure what causes this to happen yet, so added a check
-                    #   to prevent a crash
-                    $self->session->writeWarning(
-                        'Non-blessed reference \'' . $obj . '\' (type \'' . $type
-                        . '\') in draw list',
-                        $self->_objClass . '->doDraw',
-                    );
-
-                # Mark the object to be drawn
-                } elsif ($type eq 'room') {
-                    $markedRoomHash{$obj->number} = $obj;
-                } elsif ($type eq 'room_tag') {
-                    $markedRoomTagHash{$obj->number} = $obj;
-                } elsif ($type eq 'room_guild') {
-                    $markedRoomGuildHash{$obj->number} = $obj;
-                } elsif ($type eq 'exit') {
-                    $markedExitHash{$obj->number} = $obj;
-                } elsif ($type eq 'exit_tag') {
-                    $markedExitTagHash{$obj->number} = $obj;
-                } elsif ($type eq 'label') {
-                    $markedLabelHash{$obj->number} = $obj;
-                } else {
-
-                    # Unrecognised $type
-                    return $self->session->writeError(
-                        'Unrecognised object type \'' . $type . '\'',
-                        $self->_objClass . '->doDraw',
-                    );
-                }
-
-            } until (! @drawList);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->doDraw', @_);
         }
 
         # If there is already a drawing cycle in progress (i.e. another call to this function), or
-        #   if some other part of the code has set $self->delayDrawFlag to TRUE, store the hashes so
-        #   that the objects can be drawn in the next cycle
-        # Also, if nothing has been marked to be drawn, we can exit the function now (all the
-        #   hashes we're about to store will be empty
-        if (
-            # Some other job must finish first
-            $self->delayDrawFlag
-            # Nothing has been marked to be drawn
-            || (
-                ! %markedRoomHash && ! %markedRoomTagHash && ! %markedRoomGuildHash
-                && ! %markedExitHash && ! %markedExitTagHash && ! %markedLabelHash
-            )
-        ) {
-            $self->ivPoke('markedRoomHash', %markedRoomHash);
-            $self->ivPoke('markedRoomTagHash', %markedRoomTagHash);
-            $self->ivPoke('markedRoomGuildHash', %markedRoomGuildHash);
-            $self->ivPoke('markedExitHash', %markedExitHash);
-            $self->ivPoke('markedExitTagHash', %markedExitTagHash);
-            $self->ivPoke('markedLabelHash', %markedLabelHash);
+        #   if there's a drag operation in progress, do nothing
+        if ($self->delayDrawFlag || $self->dragFlag) {
+
+            # Force another call to $self->doDraw on the next call to ->winUpdate, to complete
+            #   whatever drawing operations the calling function wanted
+            $self->ivPoke('winUpdateForceFlag', TRUE);
 
             return undef;
+
+        } else {
+
+            # One call to this function represents a single drawing cycle. Once a cycle starts, it
+            #   must not be interrupted by another call to this function.
+            $self->ivPoke('delayDrawFlag', TRUE);
         }
 
         # If the tooltips are visible, hide them
         $self->hideTooltips();
 
-        # One call to this function represents a single drawing cycle. Once a cycle starts, it must
-        #   not be interrupted by another call to this function. (We store the current value of
-        #   the flag, so that we can restore its value at the end of the function)
-        $flag = $self->delayDrawFlag;
-        $self->ivPoke('delayDrawFlag', TRUE);
+        # Do a quick count of the number of rooms and labels to be drawn, which gives us a rough
+        #   approximation of how much drawing needs to be done
+        $drawCount = 0;
+        foreach my $parchmentObj ($self->ivValues('parchmentHash')) {
 
-        # (We don't need two copies of the marked object hashes, so empty the IVs right away
-        $self->ivEmpty('markedRoomHash');
-        $self->ivEmpty('markedRoomTagHash');
-        $self->ivEmpty('markedRoomGuildHash');
-        $self->ivEmpty('markedExitHash');
-        $self->ivEmpty('markedExitTagHash');
-        $self->ivEmpty('markedLabelHash');
+            $drawCount += $parchmentObj->ivPairs('markedRoomHash') +
+                        $parchmentObj->ivPairs('markedLabelHash');
+        }
 
-        # During the drawing cycle, we keep track of the exits we've drawn, so that we don't draw
-        #   (for example) both an exit and its twin exit, which occupy the same space on the map
-        # Empty the hash, following any previous call to this function
-        $self->ivEmpty('drawCycleExitHash');
-
-        # When thousands of objects are being drawn (default value: 500, not including exits whose
-        #   rooms are also being drawn), the drawing process can take a little time. Make the pause
-        #   window visible for the duration
+        # If this value is greater than the one specified by the world model IV (default: 500),
+        #   make the pause window visible for the duration of the draw cycle
         if ($drawCount > $self->worldModelObj->drawPauseNum) {
 
             $self->showPauseWin();
         }
 
-        # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
-        #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
-        #   ->drawExitMode is any of these values except 'ask_regionmap'
-        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $mode = $self->currentRegionmap->drawExitMode;
-        } else {
-            $mode = $self->worldModelObj->drawExitMode;
+        # Draw marked objects in each parchment, one at a time. If there's a current regionmap,
+        #   draw that region first
+        %parchmentHash = $self->parchmentHash;
+        if ($self->currentParchment) {
+
+            delete $parchmentHash{$self->currentParchment->name};
+            push (@parchmentList, $self->currentParchment);
+        }
+
+        push (@parchmentList, values %parchmentHash);
+
+        OUTER: foreach my $parchmentObj (@parchmentList) {
+
+            my (
+                $index, $mode,
+                %markedRoomHash, %markedRoomTagHash, %markedRoomGuildHash, %markedExitHash,
+                %markedExitTagHash, %markedLabelHash,
+            );
+
+            # For speed, import the parchment object's hashes of objects marked to be drawn
+            #   drawn
+            %markedRoomHash = $parchmentObj->markedRoomHash;
+            %markedRoomTagHash = $parchmentObj->markedRoomTagHash;
+            %markedRoomGuildHash = $parchmentObj->markedRoomGuildHash;
+            %markedExitHash = $parchmentObj->markedExitHash;
+            %markedExitTagHash = $parchmentObj->markedExitTagHash;
+            %markedLabelHash = $parchmentObj->markedLabelHash;
+
+            if (
+                ! %markedRoomHash && ! %markedRoomTagHash && ! %markedRoomGuildHash
+                && ! %markedExitHash && ! %markedExitTagHash && ! %markedLabelHash
+            ) {
+                # Nothing to draw
+                next OUTER;
+            }
+
+            # Those hashes can now be emptied...
+            $parchmentObj->ivEmpty('markedRoomHash');
+            $parchmentObj->ivEmpty('markedRoomTagHash');
+            $parchmentObj->ivEmpty('markedRoomGuildHash');
+            $parchmentObj->ivEmpty('markedExitHash');
+            $parchmentObj->ivEmpty('markedExitTagHash');
+            $parchmentObj->ivEmpty('markedLabelHash');
+
+            # ...and if the parchment has no queued objects, it can be marked as fully drawn
+            if (
+                ! $parchmentObj->queueRoomHash && ! $parchmentObj->queueRoomTagHash
+                && ! $parchmentObj->queueRoomGuildHash && ! $parchmentObj->queueExitHash
+                && ! $parchmentObj->queueExitTagHash && ! $parchmentObj->queueLabelHash
+            ) {
+                $self->ivAdd('parchmentReadyHash', $parchmentObj->name, $parchmentObj);
+                $index = $self->ivFind('parchmentQueueList', $parchmentObj);
+                if (defined $index) {
+
+                    $self->ivSplice('parchmentQueueList', $index, 1);
+                }
+            }
+
+            # Set IV so that individual draw functions can quickly look up the regionmap and
+            #   parchment objects being drawn
+            $self->ivPoke('drawParchment', $parchmentObj);
+            $self->ivPoke(
+                'drawRegionmap',
+                $self->worldModelObj->ivShow('regionmapHash', $parchmentObj->name),
+            );
+
+            # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
+            #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
+            #   ->drawExitMode is any of these values except 'ask_regionmap'
+            if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+                $mode = $self->drawRegionmap->drawExitMode;
+            } else {
+                $mode = $self->worldModelObj->drawExitMode;
+            }
+
+            # Optimise the drawing process by doing many of the size and position calculations in
+            #   advance
+            $self->prepareDraw($mode);
+
+            # Now we can do some drawing
+
+            # Draw rooms
+            foreach my $number (keys %markedRoomHash) {
+
+                my $roomObj = $markedRoomHash{$number};
+
+                $self->drawRoom($roomObj, $mode);
+
+                # We don't need to draw the room tag and room guild (if any) for this room a second
+                #   time, so we can delete the equivalent entries in those hashes
+                # ($self->drawCycleExitHash prevents us from drawing the same exit twice)
+                delete $markedRoomTagHash{number};
+                delete $markedRoomTagHash{number};
+            }
+
+            # Draw room tags
+            foreach my $roomObj (values %markedRoomTagHash) {
+
+                $self->drawRoomTag($roomObj);
+            }
+
+            # Draw room guilds
+            foreach my $roomObj (values %markedRoomGuildHash) {
+
+                $self->drawRoomGuild($roomObj);
+            }
+
+            # Draw exits and exit tags (except in mode 'no_exit')
+            if ($mode ne 'no_exit') {
+
+                foreach my $exitObj (values %markedExitHash) {
+
+                    $self->drawExit($exitObj, $mode);
+                }
+
+                foreach my $exitObj (values %markedExitTagHash) {
+
+                    $self->drawExitTag($exitObj);
+                }
+            }
+
+            # Draw labels
+            foreach my $labelObj (values %markedLabelHash) {
+
+                $self->drawLabel($labelObj);
+            }
+
+            # If this region is the current one, make it visible now
+            if ($self->currentRegionmap && $self->currentRegionmap->name eq $parchmentObj->name) {
+
+                # Update the event queue to make the changes visible
+                $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->doDraw');
+            }
+        }
+
+        # Make the pause window invisible
+        $self->hidePauseWin();
+
+        # Update the event queue to make the changes visible
+        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->doDraw');
+
+        # Tidy up by resetting draw cycle IVs
+        $self->tidyUpDraw();
+
+        # Further calls to this function are now allowed
+        $self->ivPoke('delayDrawFlag', FALSE);
+
+        # Operation complete
+        return 1;
+    }
+
+    sub prepareDraw {
+
+        # During a drawing cycle, called by $self->doDraw for each region in which canvas objects
+        #   will be drawn (also called, outside of a drawing cycle, by $self->startDrag)
+        # Optimises the drawing process by doing many of the size and position calculations in
+        #   advance
+        #
+        # Expected arguments
+        #   $mode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $mode, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $mode || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->prepareDraw', @_);
         }
 
         # Decide on the size of the area in which room interior text is drawn - half the width of a
         #   room, less some extra pixels so the text doesn't touch the edge of the room
         if ($mode eq 'no_exit') {
 
-            $self->ivPoke('drawRoomTextWidth', $self->currentRegionmap->blockWidthPixels);
-            $self->ivPoke('drawRoomTextHeight', $self->currentRegionmap->blockHeightPixels);
+            $self->ivPoke('drawRoomTextWidth', $self->drawRegionmap->blockWidthPixels);
+            $self->ivPoke('drawRoomTextHeight', $self->drawRegionmap->blockHeightPixels);
 
         } else {
 
-            $self->ivPoke('drawRoomTextWidth', $self->currentRegionmap->roomWidthPixels);
-            $self->ivPoke('drawRoomTextHeight', $self->currentRegionmap->roomHeightPixels);
+            $self->ivPoke('drawRoomTextWidth', $self->drawRegionmap->roomWidthPixels);
+            $self->ivPoke('drawRoomTextHeight', $self->drawRegionmap->roomHeightPixels);
         }
 
         # Decide on the size of room interior text. The value is based on the size of the room, by
@@ -31013,102 +33784,89 @@
             (
                 ($self->drawRoomTextWidth - 3) / 2
                 * Gtk2::Pango->scale()
-                * $self->currentRegionmap->magnification
+                * $self->drawRegionmap->magnification
             ),
         );
 
         # Decide on the size of text drawn for labels, room tags, room guilds and exit tags. The
         #   value is the size of text used by room tags, by default; the value can be increased (or
-        #   decreased) by the text size ratios stored in the world model
+        #   (decreased) by the text size ratios stored in the world model
         $self->ivPoke(
-            'drawMapTextSize',
+            'drawOtherTextSize',
             (
-                ($self->currentRegionmap->roomWidthPixels - 3) / 2
+                ($self->drawRegionmap->roomWidthPixels - 3) / 2
                 * Gtk2::Pango->scale()
-                * $self->currentRegionmap->magnification
+                * $self->drawRegionmap->magnification
             ),
         );
 
-        # To save time during a single drawing cycle, we work out the position of each kind of exit
-        #   in the sixteen cardinal directions, as if they were to be drawn at the top-left
-        #   gridblock
+        # (This value is used, when magnification is not applied to the size)
+        $self->ivPoke(
+            'drawDefaultTextSize',
+            (($self->drawRegionmap->roomWidthPixels - 3) / 2 * Gtk2::Pango->scale()),
+        );
+
+        # Work out the position of each kind of exit in the sixteen cardinal directions, as if they
+        #   were to be drawn at the top-left gridblock
         $self->preDrawPositions($mode);
-#        if ($mode eq 'simple_exit' || $mode eq 'complex_exit') {
-#
-#            $self->preDrawExits($mode);
-#        }
-        # v1.0.469 Even if we're not drawing exits on this map, we still need to call ->preDrawExits
-        #   because room tags (etc) are drawn at the same position as an exit
         $self->preDrawExits($mode);
 
         # Quickly compile a hash of (custom) primary directions that should be counted, if
-        #   $self->worldModelObj->roomInteriorMode is set to 'checked_count'. Otherwise, just empty
-        #   the hash
+        #   $self->worldModelObj->roomInteriorMode is set to 'checked_count'
+        # Store it as $self->preCountCheckedHash (or empty that hash, if appropriate)
         $self->prepareCheckedCounts();
 
-        # Draw rooms
-        foreach my $number (keys %markedRoomHash) {
+        return 1;
+    }
 
-            my $roomObj = $markedRoomHash{$number};
+    sub tidyUpDraw {
 
-            $self->drawRoom($roomObj, $mode);
+        # Called by $self->doDraw at the end of a drawing cycle (also called, outside of a drawing
+        #   cycle, by $self->stopDrag)
+        # Resets all drawing cycle IVs
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
 
-            # We don't need to draw the room tag and room guild (if any) for this room a second
-            #   time, so we can delete the equivalent entries in those hashes
-            # ($self->drawCycleExitHash prevents us from drawing the same exit twice)
-            delete $markedRoomTagHash{number};
-            delete $markedRoomTagHash{number};
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->tidyUpDraw', @_);
         }
 
-        # Draw room tags
-        foreach my $roomObj (values %markedRoomTagHash) {
+        $self->ivUndef('drawRegionmap');
+        $self->ivUndef('drawParchment');
+        $self->ivEmpty('drawCycleExitHash');
+        $self->ivUndef('drawRoomTextSize');
+        $self->ivUndef('drawRoomTextWidth');
+        $self->ivUndef('drawRoomTextHeight');
+        $self->ivUndef('drawOtherTextSize');
+        $self->ivUndef('drawDefaultTextSize');
 
-            $self->drawRoomTag($roomObj);
-        }
+        $self->ivUndef('blockCornerXPosPixels');
+        $self->ivUndef('blockCornerYPosPixels');
+        $self->ivUndef('blockCentreXPosPixels');
+        $self->ivUndef('blockCentreYPosPixels');
+        $self->ivUndef('borderCornerXPosPixels');
+        $self->ivUndef('borderCornerYPosPixels');
+        $self->ivEmpty('preDrawnIncompleteExitHash');
+        $self->ivEmpty('preDrawnUncertainExitHash');
+        $self->ivEmpty('preDrawnLongExitHash');
+        $self->ivEmpty('preDrawnSquareExitHash');
+        $self->ivEmpty('preCountCheckedHash');
 
-        # Draw room guilds
-        foreach my $roomObj (values %markedRoomGuildHash) {
-
-            $self->drawRoomGuild($roomObj);
-        }
-
-        # Draw exits and exit tags (except in mode 'no_exit')
-        if ($mode ne 'no_exit') {
-
-            foreach my $exitObj (values %markedExitHash) {
-
-                $self->drawExit($exitObj, $mode);
-            }
-
-            foreach my $exitObj (values %markedExitTagHash) {
-
-                $self->drawExitTag($exitObj);
-            }
-        }
-
-        # Draw labels
-        foreach my $labelObj (values %markedLabelHash) {
-
-            $self->drawLabel($labelObj);
-        }
-
-        # Make the pause window invisible
-        $self->hidePauseWin();
-
-        # Update the event queue to make the changes visible
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->doDraw');
-
-        # Restore the delay flag's previous value, allowing the next drawing cycle to take place if
-        #   it was previously set to FALSE
-        $self->ivPoke('delayDrawFlag', $flag);
-
-        # Operation complete
         return 1;
     }
 
     sub preDrawPositions {
 
-        # Called by $self->doDraw, once per drawing cycle
+        # Called by $self->prepareDraw for each region in which canvas objects will be drawn
         # Works out the coordinates of the
         #   - top-left corner of the gridblock
         #   - centre of the gridblock (and of the room)
@@ -31117,9 +33875,8 @@
         #   takes to draw objects in the gridblock
         #
         # Expected arguments
-        #   $mode   - Matches GA::Obj::WorldModel->drawExitMode or
-        #               $self->currentRegionmap->drawExitMode; set to 'no_exit', 'simple_exit' or
-        #               'complex_exit'
+        #   $mode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or $self->drawRegionmap;
+        #               set to 'no_exit', 'simple_exit' or 'complex_exit'
         #
         # Return values
         #   'undef' on improper arguments
@@ -31141,10 +33898,11 @@
 
         # Find the coordinates of the pixel occupying the centre of the block (and of the room)
         ($blockCentreXPosPixels, $blockCentreYPosPixels) = $self->getBlockCentre(
-            0,      # $roomObj->xPosBlocks,
-            0,      # $roomObj->yPosBlocks,
-            0,      # $blockCornerXPosPixels,
-            0,      # $blockCornerYPosPixels,
+            0,                          # $roomObj->xPosBlocks,
+            0,                          # $roomObj->yPosBlocks,
+            0,                          # $blockCornerXPosPixels,
+            0,                          # $blockCornerYPosPixels,
+            $self->drawRegionmap,
         );
 
         # Find the coordinates of the pixel at the top-left corner of the room's border
@@ -31158,10 +33916,11 @@
             # Draw exit modes 'simple_exit'/'complex_exit': The room takes up the central part of
             #   the gridblock
             ($borderCornerXPosPixels, $borderCornerYPosPixels) = $self->getBorderCorner(
-                0,  # $roomObj->xPosBlocks,
-                0,  # $roomObj->yPosBlocks,
-                0,  # $blockCornerXPosPixels,
-                0,  # $blockCornerYPosPixels,
+                0,                      # $roomObj->xPosBlocks,
+                0,                      # $roomObj->yPosBlocks,
+                0,                      # $blockCornerXPosPixels,
+                0,                      # $blockCornerYPosPixels,
+                $self->drawRegionmap,
             );
         }
 
@@ -31178,15 +33937,13 @@
 
     sub preDrawExits {
 
-        # Called by $self->doDraw, once per drawing cycle, straight after the call to
-        #   $self->preDrawPositions
+        # Called by $self->prepareDraw for each region in which canvas objects will be drawn
         # Works out the position of each kind of exit relative to its gridblock, and stores the
         #   values as IVs. This cuts down on the time it takes to draw objects in the gridblock
         #
         # Expected arguments
-        #   $mode   - Matches GA::Obj::WorldModel->drawExitMode or
-        #               $self->currentRegionmap->drawExitMode; set to 'simple_exit' or
-        #               'complex_exit'
+        #   $mode   - Matches the ->drawExitMode IV in GA::Obj::WorldModel or $self->drawRegionmap;
+        #               set to 'no_exit', 'simple_exit' or 'complex_exit'
         #
         # Return values
         #   'undef' on improper arguments
@@ -31276,6 +34033,7 @@
                 $self->blockCentreYPosPixels,
                 $self->borderCornerXPosPixels,
                 $self->borderCornerYPosPixels,
+                $self->drawRegionmap,
             );
 
             if ($mode eq 'complex_exit') {
@@ -31288,6 +34046,7 @@
                     $vectorRef,
                     $self->blockCentreXPosPixels,
                     $self->blockCentreYPosPixels,
+                    $self->drawRegionmap,
                 );
 
             } else {
@@ -31300,6 +34059,7 @@
                     $vectorRef,
                     $self->blockCentreXPosPixels,
                     $self->blockCentreYPosPixels,
+                    $self->drawRegionmap,
                 );
             }
 
@@ -31333,6 +34093,7 @@
                 $self->blockCentreYPosPixels,
                 $self->borderCornerXPosPixels,
                 $self->borderCornerYPosPixels,
+                $self->drawRegionmap,
             );
 
             # Find the coordinates of the pixel at the edge of the gridblock, which is intersected
@@ -31343,6 +34104,7 @@
                 $vectorRef,
                 $self->blockCentreXPosPixels,
                 $self->blockCentreYPosPixels,
+                $self->drawRegionmap,
             );
 
             # Store the coordinates as a list reference
@@ -31382,6 +34144,7 @@
                 $self->blockCentreYPosPixels,
                 $self->borderCornerXPosPixels,
                 $self->borderCornerYPosPixels,
+                $self->drawRegionmap,
             );
 
             # Find the coordinates of the pixel at the edge of the gridblock, which is intersected
@@ -31392,6 +34155,7 @@
                 $vectorRef,
                 $self->blockCentreXPosPixels,
                 $self->blockCentreYPosPixels,
+                $self->drawRegionmap,
             );
 
             # Find the coordinates of the pixel at the edge of the destination room, just outside
@@ -31404,6 +34168,7 @@
                 $self->blockCentreYPosPixels,
                 $self->borderCornerXPosPixels,
                 $self->borderCornerYPosPixels,
+                $self->drawRegionmap,
             );
 
             # Store the coordinates as a list reference
@@ -31441,6 +34206,7 @@
                 $self->blockCentreYPosPixels,
                 $self->borderCornerXPosPixels,
                 $self->borderCornerYPosPixels,
+                $self->drawRegionmap,
             );
 
             # Find the coordinates of the pixel near (but not at) the edge of the gridblock, which
@@ -31451,6 +34217,7 @@
                 $vectorRef,
                 $self->blockCentreXPosPixels,
                 $self->blockCentreYPosPixels,
+                $self->drawRegionmap,
             );
 
             # Adjust the coordinates of the two pixels at either end of the exit, so that it's
@@ -31555,9 +34322,8 @@
 
     sub prepareCheckedCounts {
 
-        # Called by $self->doDraw, once per drawing cycle, straight after the call to
-        #   $self->preDrawExits
-        # Compiles a has of custom primary directions which should be counted, if
+        # Called by $self->prepareDraw for each region in which canvas objects will be drawn
+        # Compiles a hash of custom primary directions which should be counted, if
         #   $self->worldModelObj->roomInteriorMode is set to 'checked_count'. If not, just empties
         #   the existing hash
         #
@@ -31569,13 +34335,6 @@
         #   1 otherwise
 
         my ($self, $check) = @_;
-
-        # Local variables
-        my (
-            $mode, $dictObj,
-            @list,
-            %hash,
-        );
 
         # Check for improper arguments
         if (defined $check) {
@@ -31607,9 +34366,8 @@
         #
         # Expected arguments
         #   $roomObj    - Blessed reference of the GA::ModelObj::Room to draw
-        #   $mode       - Matches GA::Obj::WorldModel->drawExitMode or
-        #                   $self->currentRegionmap->drawExitMode; set to 'no_exit', 'simple_exit'
-        #                   or 'complex_exit'
+        #   $mode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
         #
         # Optional arguments
         #   $dragFlag   - Set to TRUE when called by $self->startDrag in which case we don't draw
@@ -31623,7 +34381,7 @@
 
         # Local variables
         my (
-            $regionObj, $xPos, $yPos, $unallocatedCount, $unallocatableCount, $shadowCount,
+            $canvasWidget, $xPos, $yPos, $unallocatedCount, $unallocatableCount, $shadowCount,
             $regionCount, $superRegionCount, $checkedCount, $roomTagCanvasObj,
         );
 
@@ -31633,65 +34391,41 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoom', @_);
         }
 
-        # Get the room's parent region
-        if ($roomObj->parent) {
-
-            $regionObj = $self->worldModelObj->ivShow('modelHash', $roomObj->parent);
-        }
-
         # Don't draw this room if:
-        #   1. It doesn't have a parent region
-        #   2. Its position on the map has not been set
-        #   3. The room isn't on the currently-displayed level
-        #   4. The room is not in the currently-displayed region
+        #   1. Its position on the map has not been set
+        #   2. The room isn't in the right region
         if (
-            ! defined $roomObj->parent
-            || ! $regionObj
-            || ! defined $roomObj->xPosBlocks
-            || ! defined $roomObj->yPosBlocks
-            || ! defined $roomObj->zPosBlocks
-            || $regionObj->name ne $self->currentRegionmap->name
+            # (We'll assume that if ->xPosBlocks is set, so are ->yPosBlocks and ->zPosBlocks)
+            ! defined $roomObj->xPosBlocks
+            || $roomObj->parent != $self->drawRegionmap->number
         ) {
             return undef;
         }
 
-        # For rooms immediately above/below the current level, call a different function to draw a
-        #   room echo (if allowed)
-        if ($self->worldModelObj->drawRoomEchoFlag) {
+        # If the parchment object doesn't have a canvas widget for this room's level, create one
+        if (! $self->drawParchment->ivExists('canvasWidgetHash', $roomObj->zPosBlocks)) {
 
-            if ($roomObj->zPosBlocks == ($self->currentRegionmap->currentLevel + 1)) {
-
-                # Before drawing the canvas object for the echo, destroy any existing canvas objects
-                #   from the last time the room was drawn
-                $self->deleteCanvasObj('room', $roomObj);
-
-                return $self->drawRoomEcho($roomObj, 1);
-
-            } elsif ($roomObj->zPosBlocks == ($self->currentRegionmap->currentLevel - 1)) {
-
-                # Before drawing the canvas object for the echo, destroy any existing canvas objects
-                #   from the last time the room was drawn
-                $self->deleteCanvasObj('room', $roomObj);
-
-                return $self->drawRoomEcho($roomObj, -1);
-            }
+            $self->createMap($self->drawRegionmap, $self->drawParchment, $roomObj->zPosBlocks);
         }
 
-        # Otherwise, only draw a room on this level
-        if ($roomObj->zPosBlocks != $self->currentRegionmap->currentLevel) {
-
-            return undef;
-        }
+        $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
 
         # Before drawing the canvas objects that make up this room, destroy any existing canvas
         #   objects from the last time the room was drawn
-        $self->deleteCanvasObj('room', $roomObj);
+        $self->deleteCanvasObj('room', $roomObj, $self->drawRegionmap, $self->drawParchment);
         # Also destroy the canvas objects for any checked directions
-        $self->deleteCanvasObj('checked_dir', $roomObj);
+        $self->deleteCanvasObj('checked_dir', $roomObj, $self->drawRegionmap, $self->drawParchment);
+
+        # Draw a room echo on the level immediately below and above the room's level (if allowed)
+        if (! $dragFlag && $self->worldModelObj->drawRoomEchoFlag) {
+
+            $self->drawRoomEcho($roomObj, $mode, 1);
+            $self->drawRoomEcho($roomObj, $mode, -1);
+        }
 
         # Get the position of $roomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+        $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+        $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
         # Draw the room's border and interior
         $self->drawRoomBox(
@@ -31699,6 +34433,7 @@
             $roomObj,
             $self->borderCornerXPosPixels + $xPos,
             $self->borderCornerYPosPixels + $yPos,
+            $canvasWidget,
             $dragFlag,
         );
 
@@ -31755,13 +34490,22 @@
                             && ($exitObj->mapDir eq 'up' || $exitObj->mapDir eq 'down')
                         )
                     ) {
-                        $self->drawExit($exitObj, $mode, $roomObj, $regionObj);
+                        $self->drawExit(
+                            $exitObj,
+                            $mode,
+                            $canvasWidget,
+                            $roomObj,
+                        );
                     }
 
                     # Draw the exit tag, if any, but not in mode 'no_exit'
                     if ($mode ne 'no_exit' && $exitObj->exitTag) {
 
-                        $self->drawExitTag($exitObj, $roomObj, $regionObj);
+                        $self->drawExitTag(
+                            $exitObj,
+                            $canvasWidget,
+                            $roomObj,
+                        );
                     }
                 }
             }
@@ -31773,7 +34517,7 @@
 
                 foreach my $dir ($roomObj->ivKeys('checkedDirHash')) {
 
-                    my $canvasObj = $self->drawCheckedDir($roomObj, $dir);
+                    my $canvasObj = $self->drawCheckedDir($roomObj, $canvasWidget, $dir);
                     if ($canvasObj) {
 
                         push (@newObjList, $canvasObj);
@@ -31786,12 +34530,7 @@
                     #   for the room in a single entry in the hash
                     # (Also, there is no event handler for the canvas object(s) - clicking a checked
                     #   direction does nothing)
-                    $self->ivAdd(
-                        'drawnCheckedDirHash',
-                        $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_'
-                        . $roomObj->zPosBlocks,
-                        \@newObjList,
-                    );
+                    $self->drawnParchment->addDrawnCheckedDir($roomObj, \@newObjList);
                 }
             }
         }
@@ -31805,6 +34544,7 @@
 
                 $self->drawRoomInteriorInfo(
                     $roomObj,
+                    $canvasWidget,
                     $self->borderCornerXPosPixels + $xPos,
                     $self->borderCornerYPosPixels + $yPos,
                     $unallocatedCount,
@@ -31818,7 +34558,7 @@
             #   room box
             if ($unallocatableCount) {
 
-                $self->drawUnallocatableCount($roomObj, $unallocatableCount);
+                $self->drawUnallocatableCount($roomObj, $canvasWidget, $unallocatableCount);
             }
         }
 
@@ -31828,6 +34568,7 @@
             # Draw the room tag
             $self->drawRoomTag(
                 $roomObj,
+                $canvasWidget,
                 $xPos,
                 $yPos,
             );
@@ -31839,6 +34580,7 @@
             # Draw the room guild
             $self->drawRoomGuild(
                 $roomObj,
+                $canvasWidget,
                 $xPos,
                 $yPos,
             );
@@ -31853,20 +34595,22 @@
         # Draws a single exit (and its exit tag, if necessary)
         #
         # Expected arguments
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit to draw
-        #   $mode       - Matches GA::Obj::WorldModel->drawExitMode or
-        #                   $self->currentRegionmap->drawExitMode; set to 'no_exit', 'simple_exit'
-        #                   or 'complex_exit'
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit to draw
+        #   $mode           - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap; set to 'no_exit', 'simple_exit' or
+        #                       'complex_exit'
         #
         # Optional arguments
-        #   $roomObj    - The parent room object, if known ('undef' otherwise)
-        #   $regionObj  - The parent room's region, if known ('undef' otherwise)
+        #   $canvasWidget, $roomObj
+        #               - Set when called by $self->drawRoom; the Gnome2::Canvas on which the room
+        #                   is drawn and the parent room itself. If not set, this function fetches
+        #                   them
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $exitObj, $mode, $roomObj, $regionObj, $check) = @_;
+        my ($self, $exitObj, $mode, $canvasWidget, $roomObj, $check) = @_;
 
         # Local variables
         my $twinExitObj;
@@ -31877,16 +34621,11 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawExit', @_);
         }
 
-        # Get the parent room, if not specified by the calling function
-        if (! $roomObj) {
+        # Set the canvas widget on which the room is drawn, if not already set
+        if (! $canvasWidget) {
 
             $roomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->parent);
-        }
-
-        # Get the room's region,  if not specified by the calling function
-        if (! $regionObj && $roomObj->parent) {
-
-            $regionObj = $self->worldModelObj->ivShow('modelHash', $roomObj->parent);
+            $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
         }
 
         # Get the twin exit, if there is one
@@ -31897,21 +34636,17 @@
 
         # Don't draw this exit if:
         #   1. It has already been drawn during this drawing cycle (initiated by $self->doDraw)
-        #   2. The exit doesn't have a parent room, or the parent room doesn't have a parent region
-        #   3. The exit isn't on the current regionmap and current level
-        #   4. It has a twin exit which has already been drawn - unless it's a region or normal
+        #   2. The exit doesn't have a parent room
+        #   3. It has a twin exit which has already been drawn - unless it's a region or normal
         #       (un-bent) broken exit, in which case we must draw both the exit and its twin during
         #       a drawing cycle, and unless it's an up/down exit, in which case we must draw it,
         #       in case the twin exit (which might already have been drawn) is in the 'east'
         #       direction, or something
-        #   5. The exit has a shadow exit (e.g. 'enter cave' which leads to the same room as the
+        #   4. The exit has a shadow exit (e.g. 'enter cave' which leads to the same room as the
         #       exit 'west'; only the exit 'west' should be drawn)
         if (
             $self->ivExists('drawCycleExitHash', $exitObj->number)
             || ! $roomObj
-            || ! $regionObj
-            || $regionObj->name ne $self->currentRegionmap->name
-            || $roomObj->zPosBlocks != $self->currentRegionmap->currentLevel
             || (
                 $twinExitObj
                 && $self->ivExists('drawCycleExitHash', $twinExitObj->number)
@@ -31928,7 +34663,7 @@
 
         # Before drawing the canvas objects that make up this exit, destroy any existing canvas
         #   objects from the last time the exit was drawn
-        $self->deleteCanvasObj('exit', $exitObj);
+        $self->deleteCanvasObj('exit', $exitObj, $self->drawRegionmap, $self->drawParchment);
         # The canvas objects for the exit may have been drawn associated with $exitObj, or with its
         #   twin exit (if any); make sure those canvas objects are destroyed, too (except for
         #   normal broken exits, region exits, impassable exits and mystery exits)
@@ -31941,6 +34676,7 @@
                 && $twinExitObj->exitOrnament ne 'mystery'
             )
         ) {
+            # (Twin's region might not be the same, so let ->deleteCanvasObj fetch it)
             $self->deleteCanvasObj('exit', $twinExitObj);
         }
 
@@ -31960,77 +34696,82 @@
         ) {
             # It's an impassable or mystery exit. The impassable/mystery ornament and the exit are
             #   drawn together by this one function
-            $self->drawImpassableExit($roomObj, $exitObj, $twinExitObj);
+            $self->drawImpassableExit($roomObj, $exitObj, $canvasWidget, $twinExitObj);
 
         } elsif ($exitObj->brokenFlag) {
 
             # It's a broken exit
             if ($exitObj->bentFlag) {
-                $self->drawBentExit($roomObj, $exitObj, $mode, $twinExitObj);
+                $self->drawBentExit($roomObj, $exitObj, $mode, $twinExitObj, $canvasWidget);
             } else {
-                $self->drawBrokenExit($roomObj, $exitObj);
+                $self->drawBrokenExit($roomObj, $exitObj, $canvasWidget);
             }
 
         } elsif ($exitObj->regionFlag) {
 
             # It's a region exit
-            $self->drawRegionExit($roomObj, $exitObj);
+            $self->drawRegionExit($roomObj, $exitObj, $canvasWidget);
 
         } elsif ($exitObj->drawMode eq 'temp_alloc') {
 
             # It's an unallocated exit, temporarily allocated to a primary direction
             # NB Unallocated exits, not temporarily allocated to a primary direction because none
             #   are available (->drawMode is 'temp_unalloc') are dealth with by ->drawRoom
-            $self->drawUnallocatedExit($roomObj, $exitObj);
+            $self->drawUnallocatedExit($roomObj, $exitObj, $canvasWidget);
 
         } elsif ($exitObj->destRoom) {
 
             if ($exitObj->twinExit) {
 
                 # If it's a two-way exit (we can come back in the opposite direction)
-                $self->drawTwoWayExit($roomObj, $exitObj, $mode);
+                $self->drawTwoWayExit($roomObj, $exitObj, $canvasWidget, $mode);
 
             } elsif ($exitObj->retraceFlag) {
 
                 # It's a retracing exit (leading back to the same room)
-                $self->drawRetracingExit($roomObj, $exitObj);
+                $self->drawRetracingExit($roomObj, $exitObj, $canvasWidget);
 
             } elsif ($exitObj->oneWayFlag) {
 
                 # It's a one-way exit
-                $self->drawOneWayExit($roomObj, $exitObj);
+                $self->drawOneWayExit($roomObj, $exitObj, $canvasWidget);
 
             } elsif ($exitObj->randomType ne 'none') {
 
                 # It's a random exit (leading to a random room)
-                $self->drawRandomExit($roomObj, $exitObj);
+                $self->drawRandomExit($roomObj, $exitObj, $canvasWidget);
 
             } else {
 
                 # It's an uncertain exit - we know we can go 'north' from A to B, but we don't yet
                 #   know if we can go 'south' from B to A
-                $self->drawUncertainExit($roomObj, $exitObj);
+                $self->drawUncertainExit($roomObj, $exitObj, $canvasWidget);
             }
 
         } elsif ($exitObj->randomType ne 'none') {
 
             # It's a random exit (leads to a random location)
-            $self->drawRandomExit($roomObj, $exitObj);
+            $self->drawRandomExit($roomObj, $exitObj, $canvasWidget);
 
         } else {
 
             # We don't know where this exit is going. Draw an incomplete exit (almost to
             #   the edge of the room's gridblock)
-            $self->drawIncompleteExit($roomObj, $exitObj);
+            $self->drawIncompleteExit($roomObj, $exitObj, $canvasWidget);
         }
 
         # Record the fact that we've drawn this exit, so that we don't draw it (or its twin) again
         #   during the current drawing cycle
-        # Exceptions: draw both and exit and its twin if they are broken or regions exits
-
+        # Exceptions: draw both and exit and its twin if they are broken or regions exits, but do
+        #   draw both if the twin's map direction is 'up' or 'down'
         $self->ivAdd('drawCycleExitHash', $exitObj->number, $exitObj);
-        if ($twinExitObj && ! $twinExitObj->brokenFlag && ! $twinExitObj->regionFlag) {
-
+        if (
+            $twinExitObj
+            && $twinExitObj->mapDir ne 'up'
+            && $twinExitObj->mapDir ne 'down'
+            && (! $twinExitObj->brokenFlag || $exitObj->bentFlag)
+            && ! $twinExitObj->regionFlag
+        ) {
             $self->ivAdd(
                 'drawCycleExitHash',
                 $twinExitObj->number,
@@ -32039,16 +34780,17 @@
 
             # Delete the twin's canvas object (if it has one), so that $exitObj isn't drawn on
             #   top of its twin exit
+            # (Twin's region might not be the same, so let ->deleteCanvasObj fetch it)
             $self->deleteCanvasObj('exit', $twinExitObj);
         }
 
         # Also update the regionmap's hash of drawn exits
-        $self->currentRegionmap->storeExit($exitObj);
+        $self->drawRegionmap->storeExit($exitObj);
 
         # Draw the exit tag, if any, but not in mode 'no_exit'
         if ($mode ne 'no_exit' && $exitObj->exitTag) {
 
-            $self->drawExitTag($exitObj, $roomObj, $regionObj);
+            $self->drawExitTag($exitObj, $canvasWidget, $roomObj);
         }
 
         return 1;
@@ -32060,21 +34802,25 @@
         # Draws (or redraws) a room tag, close to the room itself
         #
         # Expected arguments
-        #   $roomObj    - The GA::ModelObj::Room whose tag is being drawn
+        #   $roomObj        - The GA::ModelObj::Room whose tag is being drawn
         #
         # Optional arguments
+        #   $canvasWidget   - Set when called by $self->drawRoom; the Gnome2::Canvas on which the
+        #                       room is drawn. If not set, this function fetches its
         #   $blockCornerXPosPixels, $blockCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's gridblock,
-        #                   if known (both set to 'undef', otherwise)
+        #                   - Coordinates of the pixel at the top-left corner of the room's
+        #                       gridblock. If not set, this function fetches them
         #
         # Return values
         #   'undef' on improper arguments or if the room tag can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $blockCornerXPosPixels, $blockCornerYPosPixels, $check) = @_;
+        my (
+            $self, $roomObj, $canvasWidget, $blockCornerXPosPixels, $blockCornerYPosPixels, $check,
+        ) = @_;
 
         # Local variables
-        my ($regionObj, $posnListRef, $text, $newObj, $adjust, $posn);
+        my ($posnListRef, $text, $textSize, $newObj, $adjust);
 
         # Check for improper arguments
         if (! defined $roomObj || defined $check) {
@@ -32082,26 +34828,20 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomTag', @_);
         }
 
-        # Get the room's parent region
-        if ($roomObj->parent) {
+        # Set the canvas widget on which the room is drawn, if not already set
+        if (! $canvasWidget) {
 
-            $regionObj = $self->worldModelObj->ivShow('modelHash', $roomObj->parent);
+            $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
         }
 
         # Don't draw this room tag if:
-        #   1. The room doesn't have a parent region
-        #   2. The room's position on the map has not been set
-        #   3. The room isn't on the currently-displayed level
-        #   4. The room is not in the currently-displayed region
-        #   5. The room doesn't have a room tag set
+        #   1. The room's position on the map has not been set
+        #   2. The room isn't in the right region
+        #   3. The room doesn't have a room tag set
         if (
-            ! defined $roomObj->parent
-            || ! $regionObj
-            || ! defined $roomObj->xPosBlocks
-            || ! defined $roomObj->yPosBlocks
-            || ! defined $roomObj->zPosBlocks
-            || $roomObj->zPosBlocks != $self->currentRegionmap->currentLevel
-            || $regionObj->name ne $self->currentRegionmap->name
+            # (We'll assume that if ->xPosBlocks is set, so are ->yPosBlocks and ->zPosBlocks)
+            ! defined $roomObj->xPosBlocks
+            || $roomObj->parent != $self->drawRegionmap->number
             || ! $roomObj->roomTag
         ) {
             return undef;
@@ -32109,7 +34849,7 @@
 
         # Before drawing the canvas objects that make up this room tag, destroy any existing canvas
         #   objects from the last time the room tag was drawn
-        $self->deleteCanvasObj('room_tag', $roomObj);
+        $self->deleteCanvasObj('room_tag', $roomObj, $self->drawRegionmap, $self->drawParchment);
 
         # Get the coordinates of the room's gridblock, if they weren't specified by the calling
         #   function
@@ -32119,6 +34859,7 @@
             ($blockCornerXPosPixels, $blockCornerYPosPixels) = $self->getBlockCorner(
                 $roomObj->xPosBlocks,
                 $roomObj->yPosBlocks,
+                $self->drawRegionmap,
             );
         }
 
@@ -32138,28 +34879,34 @@
             $text = $roomObj->roomTag;
         }
 
+        # Set the text size
+        if (! $self->worldModelObj->fixedRoomTagFlag) {
+            $textSize = int($self->drawOtherTextSize * $self->worldModelObj->roomTagRatio);
+        } else {
+            $textSize = int($self->drawDefaultTextSize * $self->worldModelObj->roomTagRatio);
+        }
+
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Text',
             x => ($blockCornerXPosPixels + $$posnListRef[2] + $roomObj->roomTagXOffset),
             y => ($blockCornerYPosPixels + $$posnListRef[3] + $roomObj->roomTagYOffset),
             fill_color => $self->getRoomTagColour($roomObj),
             font => $self->worldModelObj->mapFont,
-            size => int($self->drawMapTextSize * $self->worldModelObj->roomTagRatio),
+            size => $textSize,
             anchor => 'GTK_ANCHOR_CENTER',   # Default position is at the hypothetical exit
             text => $text,
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setTagLevel($newObj);
+        $self->setTagStackPosn($self->drawParchment, $newObj, $roomObj);
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('room_tag', $newObj, $roomObj);
 
         # Store the canvas object
-        $posn = $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_' . $roomObj->zPosBlocks;
-        $self->ivAdd('drawnRoomTagHash', $posn, [$newObj]);
+        $self->drawParchment->addDrawnRoomTag($roomObj, [$newObj]);
 
         return 1;
     }
@@ -32170,21 +34917,25 @@
         # Draws (or redraws) a room guild, close to the room itself
         #
         # Expected arguments
-        #   $roomObj    - The GA::ModelObj::Room whose tag is being drawn
+        #   $roomObj        - The GA::ModelObj::Room whose tag is being drawn
         #
         # Optional arguments
+        #   $canvasWidget   - Set when called by $self->drawRoom; the Gnome2::Canvas on which the
+        #                       room is drawn. If not set, this function fetches its
         #   $blockCornerXPosPixels, $blockCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's gridblock,
-        #                   if known (both set to 'undef', otherwise)
+        #                   - Coordinates of the pixel at the top-left corner of the room's
+        #                       gridblock. If not set, this function fetches them
         #
         # Return values
         #   'undef' on improper arguments or if the room guild can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $blockCornerXPosPixels, $blockCornerYPosPixels, $check) = @_;
+        my (
+            $self, $roomObj, $canvasWidget, $blockCornerXPosPixels, $blockCornerYPosPixels, $check,
+        ) = @_;
 
         # Local variables
-        my ($regionObj, $posnListRef, $newObj, $adjust, $posn);
+        my ($posnListRef, $textSize, $newObj, $adjust);
 
         # Check for improper arguments
         if (! defined $roomObj || defined $check) {
@@ -32192,26 +34943,20 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomGuild', @_);
         }
 
-        # Get the room's parent region
-        if ($roomObj->parent) {
+        # Set the canvas widget on which the room is drawn, if not already set
+        if (! $canvasWidget) {
 
-            $regionObj = $self->worldModelObj->ivShow('modelHash', $roomObj->parent);
+            $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
         }
 
         # Don't draw this room guild if:
-        #   1. The room doesn't have a parent region
-        #   2. The room's position on the map has not been set
-        #   3. The room isn't on the currently-displayed level
-        #   4. The room is not in the currently-displayed region
-        #   5. The room doesn't have a room guild set
+        #   1. The room's position on the map has not been set
+        #   2. The room isn't in the right region
+        #   3. The room doesn't have a room guild set
         if (
-            ! defined $roomObj->parent
-            || ! $regionObj
-            || ! defined $roomObj->xPosBlocks
-            || ! defined $roomObj->yPosBlocks
-            || ! defined $roomObj->zPosBlocks
-            || $roomObj->zPosBlocks != $self->currentRegionmap->currentLevel
-            || $regionObj->name ne $self->currentRegionmap->name
+            # (We'll assume that if ->xPosBlocks is set, so are ->yPosBlocks and ->zPosBlocks)
+            ! defined $roomObj->xPosBlocks
+            || $roomObj->parent != $self->drawRegionmap->number
             || ! $roomObj->roomGuild
         ) {
             return undef;
@@ -32219,7 +34964,7 @@
 
         # Before drawing the canvas objects that make up this room guild, destroy any existing
         #   canvas objects from the last time the room guild was drawn
-        $self->deleteCanvasObj('room_guild', $roomObj);
+        $self->deleteCanvasObj('room_guild', $roomObj, $self->drawRegionmap, $self->drawParchment);
 
         # Get the coordinates of the room's gridblock, if they weren't specified by the calling
         #   function
@@ -32229,6 +34974,7 @@
             ($blockCornerXPosPixels, $blockCornerYPosPixels) = $self->getBlockCorner(
                 $roomObj->xPosBlocks,
                 $roomObj->yPosBlocks,
+                $self->drawRegionmap,
             );
         }
 
@@ -32236,28 +34982,34 @@
         #   room. Find the hypothetical exit's position
         $posnListRef = $self->ivShow('preDrawnLongExitHash', 'south');
 
+        # Set the text size
+        if (! $self->worldModelObj->fixedRoomGuildFlag) {
+            $textSize = int($self->drawOtherTextSize * $self->worldModelObj->roomGuildRatio);
+        } else {
+            $textSize = int($self->drawDefaultTextSize * $self->worldModelObj->roomGuildRatio);
+        }
+
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Text',
             x => ($blockCornerXPosPixels + $$posnListRef[2] + $roomObj->roomGuildXOffset),
             y => ($blockCornerYPosPixels + $$posnListRef[3] + $roomObj->roomGuildYOffset),
             fill_color => $self->getRoomGuildColour($roomObj),
             font => $self->worldModelObj->mapFont,
-            size => int($self->drawMapTextSize * $self->worldModelObj->roomGuildRatio),
+            size => $textSize,
             anchor => 'GTK_ANCHOR_CENTER',  # Default position is at the hypothetical exit
             text => $roomObj->roomGuild,
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setTagLevel($newObj);
+        $self->setTagStackPosn($self->drawParchment, $newObj, $roomObj);
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('room_guild', $newObj, $roomObj);
 
         # Store the canvas object
-        $posn = $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_' . $roomObj->zPosBlocks;
-        $self->ivAdd('drawnRoomGuildHash', $posn, [$newObj]);
+        $self->drawParchment->addDrawnRoomGuild($roomObj, [$newObj]);
 
         return 1;
     }
@@ -32268,20 +35020,22 @@
         # Draws (or redraws) an exit tag, close to the exit itself
         #
         # Expected arguments
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit to draw
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit to draw
         #
         # Optional arguments
-        #   $roomObj    - The parent room object, if known ('undef' otherwise)
-        #   $regionObj  - The parent room's region, if known ('undef' otherwise)
+        #   $canvasWidget, $roomObj
+        #               - Set when called by $self->drawRoom/->drawExit; the Gnome2::Canvas on which
+        #                   the room is drawn and the parent room itself. If not set, this function
+        #                   fetches them
         #
         # Return values
         #   'undef' on improper arguments or if the room tag can't be drawn
         #   1 otherwise
 
-        my ($self, $exitObj, $roomObj, $regionObj, $check) = @_;
+        my ($self, $exitObj, $canvasWidget, $roomObj, $check) = @_;
 
         # Local variables
-        my ($posnListRef, $colour, $xPos, $yPos, $newObj);
+        my ($posnListRef, $colour, $textSize, $xPos, $yPos, $newObj);
 
         # Check for improper arguments
         if (! defined $exitObj || defined $check) {
@@ -32289,31 +35043,20 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawExitTag', @_);
         }
 
-        # Get the parent room, if not specified by the calling function
-        if (! $roomObj) {
+        # Set the canvas widget on which the room is drawn, if not already set
+        if (! $canvasWidget) {
 
             $roomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->parent);
-        }
-
-        # Get the room's region,  if not specified by the calling function
-        if (! $regionObj && $roomObj->parent) {
-
-            $regionObj = $self->worldModelObj->ivShow('modelHash', $roomObj->parent);
+            $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
         }
 
         # Don't draw this exit tag if:
-        #   1. The exit doesn't have a parent room, or the parent room doesn't have a parent region
-        #   2. The exit isn't on the current regionmap and current level
-        #   3. The exit has a shadow exit (e.g. 'enter cave' which leads to the same room as the
+        #   1. The exit has a shadow exit (e.g. 'enter cave' which leads to the same room as the
         #       exit 'west'; only the exit 'west' should be drawn)
-        #   4. The exit hasn't been allocated a primary direction (stored in ->mapDir)
-        #   5. The exit doesn't have an exit tag set
+        #   2. The exit hasn't been allocated a primary direction (stored in ->mapDir)
+        #   3. The exit doesn't have an exit tag set
         if (
-            ! $roomObj
-            || ! $regionObj
-            || $regionObj->name ne $self->currentRegionmap->name
-            || $roomObj->zPosBlocks != $self->currentRegionmap->currentLevel
-            || $exitObj->shadowExit
+            $exitObj->shadowExit
             || ! $exitObj->mapDir
             || ! $exitObj->exitTag
         ) {
@@ -32322,7 +35065,7 @@
 
         # Before drawing the canvas objects that make up this exit tag, destroy any existing canvas
         #   objects from the last time the exit tag was drawn
-        $self->deleteCanvasObj('exit_tag', $exitObj);
+        $self->deleteCanvasObj('exit_tag', $exitObj, $self->drawRegionmap, $self->drawParchment);
 
         # Find the exit's position, if it had been drawn as an uncertain exit. For exits drawn as
         #   up/down, draw the exit tag as if it were at the north/south exit, by default
@@ -32337,31 +35080,38 @@
         # Decide which colour to use
         $colour = $self->getExitTagColour($exitObj);
 
+        # Set the text size
+        if (! $self->worldModelObj->fixedExitTagFlag) {
+            $textSize = int($self->drawOtherTextSize * $self->worldModelObj->exitTagRatio);
+        } else {
+            $textSize = int($self->drawDefaultTextSize * $self->worldModelObj->exitTagRatio);
+        }
+
         # Get the position of $roomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+        $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+        $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Text',
             x => ($$posnListRef[2] + $xPos + $exitObj->exitTagXOffset),
             y => ($$posnListRef[3] + $yPos + $exitObj->exitTagYOffset),
             fill_color => $colour,
             font => $self->worldModelObj->mapFont,
-            size => int($self->drawMapTextSize * $self->worldModelObj->exitTagRatio),
+            size => $textSize,
             anchor => $self->ivShow('constGtkAnchorHash', $exitObj->mapDir), # e.g. 'GTK_ANCHOR_S'
             text => $exitObj->exitTag,
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setTagLevel($newObj);
+        $self->setTagStackPosn($self->drawParchment, $newObj, $roomObj);
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('exit_tag', $newObj, $exitObj);
 
         # Store the canvas object
-        $self->ivAdd('drawnExitTagHash', $exitObj->number, [$newObj]);
+        $self->drawParchment->addDrawnExitTag($roomObj, $exitObj, [$newObj]);
 
         return 1;
     }
@@ -32372,7 +35122,7 @@
         # Draws (or redraws) a map label
         #
         # Expected arguments
-        #   $labelObj   - The GA::Obj::MapLabel being drawn
+        #   $labelObj       - The GA::Obj::MapLabel being drawn
         #
         # Return values
         #   'undef' on improper arguments or if the label can't be drawn
@@ -32382,7 +35132,8 @@
 
         # Local variables
         my (
-            $styleObj, $useObj, $colour, $markup, $newObj, $newObj2, $x1, $y1, $x2, $y2,
+            $canvasWidget, $styleObj, $useObj, $colour, $markup, $textSize, $newObj, $newObj2, $x1,
+            $y1, $x2, $y2,
             @newObjList,
         );
 
@@ -32394,25 +35145,29 @@
 
         # Don't draw this room tag if:
         #   1. The label's position on the map has not been set
-        #   2. The label isn't on the currently-displayed level
-        #   3. The label isn't on the currently-displayed region
-        #   4. The label doesn't contain any text
+        #   2. The label isn't in the right region
+        #   3. The label doesn't contain any text
         if (
+            # (We'll assume that if ->xPosBlocks is set, so are ->yPosBlocks and ->zPosBlocks)
             ! defined $labelObj->xPosPixels
-            || ! defined $labelObj->yPosPixels
-            || ! defined $labelObj->level
-            || $labelObj->level != $self->currentRegionmap->currentLevel
-            || ! defined $labelObj->region
-            || $labelObj->region ne $self->currentRegionmap->name
+            || $labelObj->region ne $self->drawRegionmap->name
             || ! defined $labelObj->name
             || $labelObj->name eq ''
         ) {
             return undef;
         }
 
+        # If the parchment object doesn't have a canvas widget for this label's level, create one
+        if (! $self->drawParchment->ivExists('canvasWidgetHash', $labelObj->level)) {
+
+            $self->createMap($self->drawRegionmap, $self->drawParchment, $labelObj->level);
+        }
+
+        $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $labelObj->level);
+
         # Before drawing the canvas objects that make up this label, destroy any existing canvas
         #   objects from the last time the label was drawn
-        $self->deleteCanvasObj('label', $labelObj);
+        $self->deleteCanvasObj('label', $labelObj, $self->drawRegionmap, $self->drawParchment);
 
         # Set the colour and style
         if (defined $labelObj->style) {
@@ -32489,16 +35244,28 @@
         # Gnome2::Canvas will complain about & characters, so replace them with an entity
         $markup =~ s/\&/&amp;/;
 
+        # Set the text size
+        if (! $self->worldModelObj->fixedLabelFlag) {
+
+            $textSize = int(
+                $self->drawOtherTextSize * $self->worldModelObj->labelRatio * $useObj->relSize
+            );
+
+        } else {
+
+            $textSize = int(
+                $self->drawDefaultTextSize * $self->worldModelObj->labelRatio * $useObj->relSize
+            );
+        }
+
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Text',
             x => $labelObj->xPosPixels,
             y => $labelObj->yPosPixels,
             font => $self->worldModelObj->mapFont,
-            size => int(
-                $self->drawMapTextSize * $self->worldModelObj->labelRatio * $useObj->relSize
-            ),
+            size => $textSize,
             anchor => 'GTK_ANCHOR_W',   # Draw text to the right of the original mouse click
             markup => $markup,
         );
@@ -32513,7 +35280,7 @@
             if (! $useObj->underlayColour) {
 
                 $newObj2 = Gnome2::Canvas::Item->new(
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Rect',
                     x1 => $x1 - 10,
                     y1 => $y1 - 10,
@@ -32527,7 +35294,7 @@
                 # Use the fill colour as the text's underlay colour, so everything inside the box
                 #   border is coloured
                 $newObj2 = Gnome2::Canvas::Item->new(
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Rect',
                     x1 => $x1 - 10,
                     y1 => $y1 - 10,
@@ -32545,7 +35312,7 @@
         #   the text
         foreach my $canvasObj (reverse @newObjList) {
 
-            $self->setLabelLevel($canvasObj);
+            $self->setLabelStackPosn($canvasObj);
         }
 
         # Set up the event handler for the canvas object (only for the text - not the box)
@@ -32556,330 +35323,7 @@
         }
 
         # Store the canvas object(s)
-        $self->ivAdd('drawnLabelHash', $labelObj->number, \@newObjList);
-
-        return 1;
-    }
-
-    # Graphical operations - map object stack functions
-
-    sub setMapLevel {
-
-        # Called by $self->resetMap (only)
-        # Sets the map background's position in the canvas drawing stack
-        #
-        # The canvas drawing stack is organised like this:
-        #   8   - labels and draggable exits (placed at the top of the stack)
-        #   7   - room tags, room guilds and exit tags (lowered from the top)
-        #   6   - exits, exit ornaments and checked directions (lowered from the top)
-        #   5   - room interior text (raised from the bottom)
-        #   4   - room boxes (raised from the bottom)
-        #   3   - room echoes and fake room boxes (raised from the bottom)
-        #   2   - coloured rectangles on the map background (raised from the bottom)
-        #   1   - coloured blocks on the map background (raised from the bottom)
-        #   0   - map background (placed at the bottom of the stack)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setMapLevel', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-
-        return 1;
-    }
-
-    sub setSquareLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Coloured blocks are drawn at level 1 (above the map background)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setSquareLevel', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(1);
-
-        return 1;
-    }
-
-    sub setRectLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Coloured rectangles are drawn at level 2 (above the map background and coloured blocks)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setRectLevel', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(
-            $self->ivPairs('colouredSquareHash')
-            # The younger rectangle must be drawn above older rectangles
-            + $self->ivPairs('colouredRectHash')
-            + 1,
-        );
-
-        return 1;
-    }
-
-    sub setEchoLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room echos and fake room boxes are drawn at level 3 (above the map background, coloured
-        #   blocks and coloured rectangles)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setEchoLevel', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(
-            $self->ivPairs('colouredSquareHash')
-            + $self->ivPairs('colouredRectHash')
-            + 1,
-        );
-
-        return 1;
-    }
-
-    sub setRoomLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room boxes are drawn at level 4 (above the map background, coloured squares, coloured
-        #   rectangles, room echos and fake room boxes)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Optional arguments
-        #   $level          - If this function has just been called by the same room-drawing
-        #                       function, we don't need to calculate the stack position; we can use
-        #                       the same one. Set to 'undef' otherwise
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   Otherwise returns the canvas object's drawing stack position, in case the same calling
-        #       function wants to call this function again
-
-        my ($self, $canvasObj, $level, $roomObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setRoomLevel', @_);
-        }
-
-        if (! defined $level) {
-
-            $level = $self->ivPairs('colouredSquareHash') + $self->ivPairs('colouredRectHash')
-                        + $self->ivPairs('drawnRoomEchoHash') + 1;
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise($level);
-
-        return $level;
-    }
-
-    sub setTextLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room interior text is drawn at level 5 (above the map background, coloured blocks,
-        #   coloured rectangles, room echos, fake room boxes and real room boxes)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setTextLevel', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(
-            $self->ivPairs('colouredSquareHash')
-            + $self->ivPairs('colouredRectHash')
-            + $self->ivPairs('drawnRoomEchoHash')
-            + $self->ivPairs('drawnRoomHash')
-            + $self->ivPairs('dummyRoomHash')
-            + 1
-        );
-
-        return 1;
-    }
-
-    sub setExitLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Exits and exit ornaments are drawn at level 6 (below labels, draggable exits, room tags,
-        #   room guilds and exit tags)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Optional arguments
-        #   $level          - If this function has just been called by the same exit-drawing
-        #                       function, we don't need to calculate the stack position; we can use
-        #                       the same one. Set to 'undef' otherwise
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   Otherwise returns the canvas object's drawing stack position, in case the same calling
-        #       function wants to call this function again
-
-        my ($self, $canvasObj, $level, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setExitLevel', @_);
-        }
-
-        if (! $level) {
-
-            $level = $self->ivPairs('drawnLabelHash') + $self->ivPairs('drawnRoomTagHash')
-                        + $self->ivPairs('drawnRoomGuildHash') + $self->ivPairs('drawnExitTagHash');
-        }
-
-        $canvasObj->raise_to_top();
-
-        # (The call to $canvasObj->lower won't accept a value of 0, so only call it for a positive
-        #   value)
-        if ($level) {
-
-            $canvasObj->lower($level);
-        }
-
-        return $level;
-    }
-
-    sub setTagLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room tags, room guilds and exit tags are drawn at level 7 (below labels and draggable
-        #   exits)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Local variables
-        my $level;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setTagLevel', @_);
-        }
-
-        $canvasObj->raise_to_top();
-
-        # (The call to $canvasObj->lower won't accept a value of 0, so only call it for a positive
-        #   value)
-        $level = $self->ivPairs('drawnLabelHash');
-        if ($level) {
-
-            $canvasObj->lower($level);
-        }
-
-        return 1;
-
-    }
-
-    sub setLabelLevel {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Labels (and draggable exits) are drawn at level 8 (above everything else)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setLabelLevel', @_);
-        }
-
-        $canvasObj->raise_to_top();
+        $self->drawParchment->addDrawnLabel($labelObj, \@newObjList);
 
         return 1;
     }
@@ -32892,33 +35336,32 @@
         #   (and some graffiti, if this room has been tagged with graffiti)
         #
         # Expected arguments
-        #   $mode
-        #       - Matches GA::Obj::WorldModel->drawExitMode
-        #           / $self->currentRegionmap->drawExitMode; set to 'no_exit', 'simple_exit' or
-        #           'complex_exit'
-        #   $roomObj
-        #       - Blessed reference of the GA::ModelObj::Room being drawn
+        #   $mode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                   $self->drawRegionmap; set to 'no_exit', 'simple_exit' or 'complex_exit'
+        #   $roomObj    - Blessed reference of the GA::ModelObj::Room being drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #       - Coordinates of the pixel at the top-left corner of the room's border
+        #               - Coordinates of the pixel at the top-left corner of the room's border
         #
         # Optional arguments
-        #   $dragFlag
-        #       - Set to TRUE when called by $self->drawRoom was itself called by $self->startDrag,
-        #           in which case we don't draw extra markings like interior text or an emphasised
-        #           border
+        #   $canvasWidget
+        #               - Set when called by $self->drawRoom; the Gnome2::Canvas on which the room
+        #                   box is drawn. If not set, this function fetches it
+        #   $dragFlag   - Set to TRUE when called by $self->drawRoom was itself called by
+        #                   $self->startDrag, in which case we don't draw extra markings like
+        #                   interior text or an emphasised border
         #
         # Return values
         #   'undef' on improper arguments
         #   1 otherwise
 
         my (
-            $self, $mode, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $self, $mode, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $canvasWidget,
             $dragFlag, $check,
         ) = @_;
 
         # Local variables
         my (
-            $x2, $y2, $posn, $borderColour, $currentMode, $roomColour, $newObj, $newObj2, $newObj3,
+            $x2, $y2, $borderColour, $currentMode, $roomColour, $newObj, $newObj2, $newObj3,
             $newObj4, $newObj5, $newObj6, $gap, $posnSet, $origColour, $fillColour, $centreX,
             $centreY, $xSize, $ySize,
             @objList,
@@ -32932,20 +35375,26 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomBox', @_);
         }
 
+        # Set the canvas widget on which the room is drawn, if not already set
+        if (! $canvasWidget) {
+
+            $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
+        }
+
         # In draw exit mode 'no_exit' (draw no exits), the room takes up the whole gridblock
         if ($mode eq 'no_exit') {
 
             # Delete 2 pixels to allow a 1-pixel border on each side of the room box; otherwise,
             #   the room's borders touch and will look like double-width lines
-            $x2 = $borderCornerXPosPixels + $self->currentRegionmap->blockWidthPixels - 3;
-            $y2 = $borderCornerYPosPixels + $self->currentRegionmap->blockHeightPixels - 3;
+            $x2 = $borderCornerXPosPixels + $self->drawRegionmap->blockWidthPixels - 3;
+            $y2 = $borderCornerYPosPixels + $self->drawRegionmap->blockHeightPixels - 3;
 
         # In draw exit mode 'simple_exit'/'complex_exit', the room takes up the middle part of the
         #   gridblock
         } else {
 
-            $x2 = $borderCornerXPosPixels + $self->currentRegionmap->roomWidthPixels - 1;
-            $y2 = $borderCornerYPosPixels + $self->currentRegionmap->roomHeightPixels - 1;
+            $x2 = $borderCornerXPosPixels + $self->drawRegionmap->roomWidthPixels - 1;
+            $y2 = $borderCornerYPosPixels + $self->drawRegionmap->roomHeightPixels - 1;
         }
 
         # Get the border colour. If $roomObj is the current, last known or ghost room, $currentMode
@@ -32966,7 +35415,7 @@
 
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Rect',
             x1 => $borderCornerXPosPixels,
             y1 => $borderCornerYPosPixels,
@@ -32985,7 +35434,7 @@
             if ($currentMode eq 'double') {
 
                 $newObj2 = Gnome2::Canvas::Item->new(
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Rect',
                     x1 => ($borderCornerXPosPixels - 1),
                     y1 => ($borderCornerYPosPixels - 1),
@@ -33010,7 +35459,7 @@
             if ($self->graffitiModeFlag && $self->ivExists('graffitiHash', $roomObj->number)) {
 
                 $newObj3 = Gnome2::Canvas::Item->new(
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [
                         ($borderCornerXPosPixels + $gap),
@@ -33024,7 +35473,7 @@
                 );
 
                 $newObj4 = Gnome2::Canvas::Item->new(
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [
                         ($x2 - $gap),
@@ -33049,18 +35498,17 @@
                     $fillColour = $roomColour;          # Empty circle
                 }
 
-                $centreX = $borderCornerXPosPixels
-                            + int($self->currentRegionmap->roomWidthPixels / 2);
+                $centreX = $borderCornerXPosPixels + int($self->drawRegionmap->roomWidthPixels / 2);
                 $centreY = $borderCornerYPosPixels
-                            + int($self->currentRegionmap->roomHeightPixels / 2);
-                $xSize = int($self->currentRegionmap->roomWidthPixels / 10); # Either side of centre
-                $ySize = int($self->currentRegionmap->roomHeightPixels / 5); # One side of centre
+                    + int($self->drawRegionmap->roomHeightPixels / 2);
+                $xSize = int($self->drawRegionmap->roomWidthPixels / 10);    # Either side of centre
+                $ySize = int($self->drawRegionmap->roomHeightPixels / 5);    # One side of centre
 
                 # Don't draw a circle of zero size/width
                 if ($xSize && $ySize) {
 
                     $newObj5 = Gnome2::Canvas::Item->new(
-                        $self->canvasRoot,
+                        $canvasWidget->root(),
                         'Gnome2::Canvas::Ellipse',
                         x1 => $centreX - $xSize,
                         y1 => $centreY,
@@ -33084,11 +35532,11 @@
                 if (! defined $centreX) {
 
                     $centreX = $borderCornerXPosPixels
-                                    + int($self->currentRegionmap->roomWidthPixels / 2);
+                        + int($self->drawRegionmap->roomWidthPixels / 2);
                     $centreY = $borderCornerYPosPixels
-                                    + int($self->currentRegionmap->roomHeightPixels / 2);
-                    $xSize = int($self->currentRegionmap->roomWidthPixels / 10);
-                    $ySize = int($self->currentRegionmap->roomHeightPixels / 5);
+                        + int($self->drawRegionmap->roomHeightPixels / 2);
+                    $xSize = int($self->drawRegionmap->roomWidthPixels / 10);
+                    $ySize = int($self->drawRegionmap->roomHeightPixels / 5);
                 }
 
                 # Don't draw a square of zero size/width
@@ -33099,7 +35547,7 @@
                     if ($self->mapObj->ivNumber('currentMatchList') == 1) {
 
                         $newObj6 = Gnome2::Canvas::Item->new(
-                            $self->canvasRoot,
+                            $canvasWidget->root(),
                             'Gnome2::Canvas::Rect',
                             x1 => $centreX - $xSize,
                             y1 => $centreY,
@@ -33111,7 +35559,7 @@
                     } else {
 
                         $newObj6 = Gnome2::Canvas::Item->new(
-                            $self->canvasRoot,
+                            $canvasWidget->root(),
                             'Gnome2::Canvas::Rect',
                             x1 => $centreX - $xSize,
                             y1 => $centreY,
@@ -33128,7 +35576,7 @@
             # Set the objects' positions in the canvas drawing stack
             if ($newObj5) {
 
-                $posnSet = $self->setRoomLevel($newObj5);
+                $posnSet = $self->setRoomStackPosn($self->drawParchment, $newObj5, $roomObj);
 
                 # Set up the event handlers for the canvas objects
                 $self->setupCanvasObjEvent('room', $newObj5, $roomObj);
@@ -33137,7 +35585,12 @@
             if ($newObj6) {
 
                 # $posnSet 'undef' if room not in wilderness mode
-                $posnSet = $self->setRoomLevel($newObj6, $posnSet);
+                $posnSet = $self->setRoomStackPosn(
+                    $self->drawParchment,
+                    $newObj6,
+                    $roomObj,
+                    $posnSet,
+                );
 
                 # Set up the event handlers for the canvas objects
                 $self->setupCanvasObjEvent('room', $newObj6, $roomObj);
@@ -33145,8 +35598,19 @@
 
             if ($newObj3) {
 
-                $posnSet = $self->setRoomLevel($newObj3, $posnSet);
-                $posnSet = $self->setRoomLevel($newObj4, $posnSet);
+                $posnSet = $self->setRoomStackPosn(
+                    $self->drawParchment,
+                    $newObj3,
+                    $roomObj,
+                    $posnSet,
+                );
+
+                $posnSet = $self->setRoomStackPosn(
+                    $self->drawParchment,
+                    $newObj4,
+                    $roomObj,
+                    $posnSet,
+                );
 
                 # Set up the event handlers for the canvas objects
                 $self->setupCanvasObjEvent('room', $newObj3, $roomObj);
@@ -33155,7 +35619,12 @@
 
             if ($newObj2) {
 
-                $posnSet = $self->setRoomLevel($newObj2, $posnSet);
+                $posnSet = $self->setRoomStackPosn(
+                    $self->drawParchment,
+                    $newObj2,
+                    $roomObj,
+                    $posnSet,
+                );
 
                 # Set up the event handler for the canvas object
                 $self->setupCanvasObjEvent('room', $newObj2, $roomObj);
@@ -33163,18 +35632,15 @@
         }
 
         # $posnSet 'undef' if room not emphasised
-        $self->setRoomLevel($newObj, $posnSet);
+        $self->setRoomStackPosn($self->drawParchment, $newObj, $roomObj, $posnSet);
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('room', $newObj, $roomObj);
 
         # Store the canvas object(s)
-        $posn = $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_' . $roomObj->zPosBlocks;
-
-        $self->ivAdd('drawnRoomHash', $posn, \@objList);
+        $self->drawParchment->addDrawnRoom($roomObj, \@objList);
         if ($newObj2) {
 
-            # Subset of ->drawnRoomHash
-            $self->ivAdd('dummyRoomHash', $posn, \@objList);
+            $self->drawParchment->addDrawnDummyRoom($roomObj, \@objList);
         }
 
         return 1;
@@ -33196,7 +35662,7 @@
         my ($self, $roomObj, $check) = @_;
 
         # Local variables
-        my ($regionObj, $mode, $xPos, $yPos, $x1, $y1, $x2, $y2, $newObj);
+        my ($canvasWidget, $mode, $xPos, $yPos, $x1, $y1, $x2, $y2, $newObj);
 
         # Check for improper arguments
         if (! defined $roomObj || defined $check) {
@@ -33204,28 +35670,21 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawFakeRoomBox', @_);
         }
 
-        # Get the dragged room's parent region
-        if ($roomObj->parent) {
-
-            $regionObj = $self->worldModelObj->ivShow('modelHash', $roomObj->parent);
-        }
-
         # Don't draw this fake room if:
-        #   1. The dragged room doesn't have a parent region
-        #   2. The dragged room's position on the map has not been set
-        #   3. The dragged room isn't on the currently-displayed level
-        #   4. The dragged room is not in the currently-displayed region
+        #   1. The dragged room's position on the map has not been set
+        #   2. The dragged room isn't on the currently-displayed level
+        #   3. The dragged room is not in the currently-displayed region
         if (
-            ! defined $roomObj->parent
-            || ! $regionObj
-            || ! defined $roomObj->xPosBlocks
-            || ! defined $roomObj->yPosBlocks
-            || ! defined $roomObj->zPosBlocks
+            # (We'll assume that if ->xPosBlocks is set, so are ->yPosBlocks and ->zPosBlocks)
+            ! defined $roomObj->xPosBlocks
             || $roomObj->zPosBlocks != $self->currentRegionmap->currentLevel
-            || $regionObj->name ne $self->currentRegionmap->name
+            || $roomObj->parent != $self->currentRegionmap->number
         ) {
             return undef;
         }
+
+        # Get the canvas widget for the current level
+        $canvasWidget = $self->currentParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
 
         # Get the draw exit mode in operation, which determines the size of the rooms drawn
         if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
@@ -33256,7 +35715,7 @@
         # The fake room has a normal border colour (default black) and the same interior colour as
         #   the map itself (default cream)
         $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Rect',
             x1 => $x1,
             y1 => $y1,
@@ -33267,7 +35726,8 @@
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setEchoLevel($newObj);   # Same level as room echos, 1 above map background
+        # (Same priority as room echos, 1 above map background)
+        $self->setEchoStackPosn($self->currentParchment, $newObj);
 
         # The calling function stores $newObj in an IV
         return $newObj;
@@ -33279,58 +35739,69 @@
         # Draws a room echo for a room just above or just below the current level
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the GA::ModelObj::Room that's about to be dragged
-        #   $echoMode   - Set to -1 if the room echo is for a room just below the current level,
-        #                   set to +1 if the room echo is for a room just above the current level
+        #   $roomObj        - Blessed reference of the GA::ModelObj::Room for which a room echo
+        #                       should be drawn
+        #   $exitMode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap; set to 'no_exit', 'simple_exit' or
+        #                       'complex_exit'
+        #   $echoMode       - Set to -1 if the room echo is drawn just below $roomObj, +1 if it's
+        #                       drawn just above $roomObj
         #
         # Return values
         #   'undef' on improper arguments or if the room echo can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $echoMode, $check) = @_;
+        my ($self, $roomObj, $exitMode, $echoMode, $check) = @_;
 
         # Local variables
         my (
-            $drawExitMode, $xPos, $yPos, $x1, $y1, $x2, $y2, $xMod, $yMod, $outlineColour,
-            $fillColour, $posn, $newObj,
+            $canvasWidget, $xPos, $yPos, $x1, $y1, $x2, $y2, $xMod, $yMod, $outlineColour,
+            $fillColour, $newObj,
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $echoMode || defined $check) {
+        if (! defined $roomObj || ! defined $exitMode || ! defined $echoMode || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomEcho', @_);
         }
 
-        # Get the draw exit mode in operation, which determines the size of the rooms drawn
-        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
-            $drawExitMode = $self->currentRegionmap->drawExitMode;
-        } else {
-            $drawExitMode = $self->worldModelObj->drawExitMode;
+        # If the parchment object doesn't have a canvas widget for this room's level, create one
+        if (
+            ! $self->drawParchment->ivExists('canvasWidgetHash', ($roomObj->zPosBlocks + $echoMode))
+        ) {
+            $self->createMap(
+                $self->drawRegionmap,
+                $self->drawParchment,
+                ($roomObj->zPosBlocks + $echoMode),
+            );
         }
 
+        $canvasWidget
+            = $self->drawParchment->ivShow('canvasWidgetHash', ($roomObj->zPosBlocks + $echoMode));
+
         # Get the position of $roomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+        $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+        $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
         # Get the coordinates of the top-left corner of the room's border
         $x1 = $self->borderCornerXPosPixels + $xPos;
         $y1 = $self->borderCornerYPosPixels + $yPos;
         # Get the coordinates of the bottom-right corner of the room's border
-        if ($drawExitMode eq 'no_exit') {
+        if ($exitMode eq 'no_exit') {
 
-            $x2 = $x1 + $self->currentRegionmap->blockWidthPixels - 3;
-            $y2 = $y1 + $self->currentRegionmap->blockHeightPixels - 3;
+            $x2 = $x1 + $self->drawRegionmap->blockWidthPixels - 3;
+            $y2 = $y1 + $self->drawRegionmap->blockHeightPixels - 3;
 
         } else {
 
-            $x2 = $x1 + $self->currentRegionmap->roomWidthPixels - 1;
-            $y2 = $y1 + $self->currentRegionmap->roomHeightPixels - 1;
+            $x2 = $x1 + $self->drawRegionmap->roomWidthPixels - 1;
+            $y2 = $y1 + $self->drawRegionmap->roomHeightPixels - 1;
         }
 
         # A room above the current level should be drawn slightly northwest of the usual position.
         #   A room below the current level should be drawn slightly southeast
-        $xMod = int($echoMode * ($self->currentRegionmap->roomWidthPixels / 5));
-        $yMod = int($echoMode * ($self->currentRegionmap->roomHeightPixels / 5));
+        $xMod = int($echoMode * ($self->drawRegionmap->roomWidthPixels / 5));
+        $yMod = int($echoMode * ($self->drawRegionmap->roomHeightPixels / 5));
 
         # Set the colours to use
         if ($echoMode == 1) {
@@ -33346,7 +35817,7 @@
 
         # Draw the room echo
         $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Rect',
             x1 => ($x1 - $xMod),        # Use minus so that rooms above are drawn to northwest...
             y1 => ($y1 - $yMod),        # ...and rooms below are drawn to southeast
@@ -33357,15 +35828,14 @@
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setEchoLevel($newObj);
+        $self->setEchoStackPosn($self->drawParchment, $newObj);
 
         # Set up the event handler for the canvas object. Pretend that it was a click on the map
         #   background by calling ->setupCanvasEvent, not ->setupCanvasObjEvent
         $self->setupCanvasEvent($newObj);
 
         # Store the canvas object(s)
-        $posn = $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_' . $roomObj->zPosBlocks;
-        $self->ivAdd('drawnRoomEchoHash', $posn, [$newObj]);
+        $self->drawParchment->addDrawnRoomEcho($roomObj, $echoMode, [$newObj]);
 
         # The calling function stores $newObj in an IV
         return $newObj;
@@ -33379,25 +35849,26 @@
         #   living and non-living things in the Locator's current room is displayed)
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the GA::ModelObj::Room being drawn
+        #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's border
+        #                   - Coordinates of the pixel at the top-left corner of the room's border
         #
         # Optional arguments
         #   $unallocatedCount, $shadowCount
-        #               - The number of exits in this room which are unallocated, and the number
-        #                   which have have shadow exits (needed in mode 'shadow_count')
+        #                   - The number of exits in this room which are unallocated, and the number
+        #                       which have have shadow exits (needed in mode 'shadow_count')
         #   $regionCount, $superRegionCount
-        #               - The number of exits in this room which are region exits, and the number
-        #                   which are super-region exits (needed in mode 'region_count')
+        #                   - The number of exits in this room which are region exits, and the
+        #                       number which are super-region exits (needed in mode 'region_count')
         #
         # Return values
         #   'undef' on improper arguments
         #   1 otherwise
 
         my (
-            $self, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $unallocatedCount,
-            $shadowCount, $regionCount, $superRegionCount, $check
+            $self, $roomObj, $canvasWidget, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $unallocatedCount, $shadowCount, $regionCount, $superRegionCount, $check
         ) = @_;
 
         # Local variables
@@ -33410,7 +35881,7 @@
 
         # Check for improper arguments
         if (
-            ! defined $roomObj || ! defined $borderCornerXPosPixels
+            ! defined $roomObj || ! defined $canvasWidget || ! defined $borderCornerXPosPixels
             || ! defined $borderCornerYPosPixels || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomInteriorInfo', @_);
@@ -33424,6 +35895,7 @@
 
             $self->drawInteriorCounts(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 $unallocatedCount,
@@ -33435,6 +35907,7 @@
 
             $self->drawInteriorCounts(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 $regionCount,
@@ -33464,6 +35937,7 @@
 
             $self->drawInteriorCounts(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 $checkedCount,
@@ -33506,6 +35980,7 @@
 
                 $self->drawInteriorCounts(
                     $roomObj,
+                    $canvasWidget,
                     $borderCornerXPosPixels,
                     $borderCornerYPosPixels,
                     $livingCount,
@@ -33521,14 +35996,14 @@
             $livingCount = 0;
             $nonLivingCount = 0;
 
-            if ($self->currentRegionmap->ivExists('livingCountHash', $roomObj->number)) {
+            if ($self->drawRegionmap->ivExists('livingCountHash', $roomObj->number)) {
 
-                $livingCount = $self->currentRegionmap->ivShow('livingCountHash', $roomObj->number);
+                $livingCount = $self->drawRegionmap->ivShow('livingCountHash', $roomObj->number);
             }
 
-            if ($self->currentRegionmap->ivExists('nonLivingCountHash', $roomObj->number)) {
+            if ($self->drawRegionmap->ivExists('nonLivingCountHash', $roomObj->number)) {
 
-                $nonLivingCount = $self->currentRegionmap->ivShow(
+                $nonLivingCount = $self->drawRegionmap->ivShow(
                     'nonLivingCountHash',
                     $roomObj->number,
                 );
@@ -33538,6 +36013,7 @@
 
                 $self->drawInteriorCounts(
                     $roomObj,
+                    $canvasWidget,
                     $borderCornerXPosPixels,
                     $borderCornerYPosPixels,
                     $livingCount,
@@ -33550,6 +36026,7 @@
 
             $self->drawInteriorCounts(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 $roomObj->ivNumber('nounList'),
@@ -33561,6 +36038,7 @@
 
             $self->drawRoomFlagText(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 $roomObj->lastRoomFlag,
@@ -33571,6 +36049,7 @@
 
             $self->drawInteriorVisits(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
             );
@@ -33583,6 +36062,7 @@
         ) {
             $self->drawInteriorCounts(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 scalar ($self->mapObj->currentMatchList),
@@ -33594,6 +36074,7 @@
 
             $self->drawInteriorProfiles(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
             );
@@ -33603,6 +36084,7 @@
 
             $self->drawInteriorCounts(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 $roomObj->ivNumber('titleList'),
@@ -33629,6 +36111,7 @@
 
             $self->drawInteriorCounts(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 $assistedCount,
@@ -33640,6 +36123,7 @@
 
             $self->drawRoomSourceText(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
             );
@@ -33651,10 +36135,644 @@
             #   can do about it)
             $self->drawInteriorText(
                 $roomObj,
+                $canvasWidget,
                 $borderCornerXPosPixels,
                 $borderCornerYPosPixels,
                 0,          # Top-left corner
                 $roomObj->ivShow('protocolRoomHash', 'vnum'),
+            );
+        }
+
+        return 1;
+    }
+
+    sub drawInteriorText {
+
+        # Called by $self->drawUpDown, ->drawInteriorCounts, ->drawInteriorVisits,
+        #   ->drawInteriorText and ->drawRoomFlagText
+        # Draws some pango text in a room's interior at ones of five positions - the top-left or
+        #   top-right corners, or at the bottom-left, bottom-centre or bottom-right
+        #
+        # Expected arguments
+        #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $borderCornerXPosPixels, $borderCornerYPosPixels
+        #                   - Coordinates of the pixel at the top-left corner of the room's border
+        #   $corner         - Which corner to use
+        #                       - 0 for top-left
+        #                       - 1 for top-right
+        #                       - 2 for bottom-left     (reserved for 'up' exits)
+        #                       - 3 for bottom-centre   (reserved for unallocatable exits)
+        #                       - 4 for bottom-right    (reserved for 'down' exits)
+        #
+        # Optional arguments
+        #   $text           - The text to draw. If an empty string or 'undef', nothing is drawn
+        #   $style          - The text's style, 'normal', 'oblique' or 'italic'. If 'undef',
+        #                       'normal' is used
+        #   $underline      - The text's underline, 'none', 'single', 'double' or 'error'. If
+        #                       'undef', 'none' is used (NB Only intended to be used for up/down
+        #                       exits)
+        #   $weight         - The text's weight. A normal weight is 400; a bold weight is 600. If
+        #                       'undef', 400 is used (NB Only intended to be used for up/down exits)
+        #
+        # Return values
+        #   'undef' on improper arguments, or if the text is too small to be drawn
+        #   1 otherwise
+
+        my (
+            $self, $roomObj, $canvasWidget, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $corner, $text, $style, $underline, $weight, $check
+        ) = @_;
+
+        # Local variables
+        my ($textXPosPixels, $textYPosPixels, $textSizePixels, $listRef, $newObj, $yMod);
+
+        # Check for improper arguments
+        if (
+            ! defined $roomObj || ! $canvasWidget || ! defined $borderCornerXPosPixels
+            || ! defined $borderCornerYPosPixels || ! defined $corner || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorText', @_);
+        }
+
+        # Check that, for very small rooms, we don't try to draw text with a size of less than 1
+        #   pixel
+        if ($self->drawRoomTextSize < 1) {
+
+            # Draw nothing
+            return undef;
+        }
+
+        # Set the text's position
+        if ($corner == 0) {
+
+            # Top-left corner
+            $textXPosPixels = $borderCornerXPosPixels + 1;
+            $textYPosPixels = $borderCornerYPosPixels + 1;
+
+        } elsif ($corner == 1) {
+
+            # Top-right corner
+            $textXPosPixels = $borderCornerXPosPixels + int($self->drawRoomTextWidth / 2) + 1;
+            $textYPosPixels = $borderCornerYPosPixels + 1;
+
+        } elsif ($corner == 2) {
+
+            # Bottom-left corner (reserved for 'up')
+            $textXPosPixels = $borderCornerXPosPixels + 1;
+            $textYPosPixels = $borderCornerYPosPixels + int($self->drawRoomTextHeight / 2) + 1;
+
+        } elsif ($corner == 3) {
+
+            # Bottom-centre (reserved for unallocatable exits)
+            $textXPosPixels = $borderCornerXPosPixels + int($self->drawRoomTextWidth / 3) + 1;
+            $textYPosPixels = $borderCornerYPosPixels + int($self->drawRoomTextHeight / 2) + 1;
+
+        } elsif ($corner == 4) {
+
+            # Bottom right-corner (reserved for 'down')
+            $textXPosPixels = $borderCornerXPosPixels + int(($self->drawRoomTextWidth * 2) / 3);
+            $textYPosPixels = $borderCornerYPosPixels + int($self->drawRoomTextHeight / 2) + 1;
+        }
+
+        # Set the style, if not specified
+        if (! $style) {
+
+            $style = 'normal';
+        }
+
+        # Set the underline, if not specified. Some underline settings need us to move the
+        #   character up a few pixels, in which case $yMod is set
+        $yMod = 0;
+
+        if (! $underline) {
+            $underline = 'none';
+        } elsif ($underline eq 'single') {
+            $yMod = -2;
+        } elsif ($underline eq 'error') {
+            $yMod = -2;     # -3 would be consistent with other values
+        } elsif ($underline eq 'double') {
+            $yMod = -4;     # not currently used by any text
+        }
+
+        # Set the weight, if not specified
+        if (! $weight) {
+
+            $weight = 400;
+        }
+
+        # Draw the canvas object
+        $newObj = Gnome2::Canvas::Item->new(
+            $canvasWidget->root(),
+            'Gnome2::Canvas::Text',
+            x => $textXPosPixels,
+            y => $textYPosPixels + $yMod,
+            font => $self->worldModelObj->mapFont,
+            size => int($self->drawRoomTextSize * $self->worldModelObj->roomTextRatio),
+            fill_color => $self->worldModelObj->roomTextColour,
+            anchor => 'GTK_ANCHOR_NW',
+            text => $text,
+            style => $style,
+            underline => $underline,
+            weight => $weight,
+        );
+
+        # Set the object's position in the canvas drawing stack
+        $self->setTextStackPosn($self->drawParchment, $newObj, $roomObj);
+
+        # (No event handler for this canvas object)
+
+        # Store the canvas object
+        $self->drawParchment->addDrawnRoomText($roomObj, [$newObj]);
+
+        return 1;
+    }
+
+    sub drawUnallocatableCount {
+
+        # Called by $self->drawRoom to display the number of unallocatable exits for this room in
+        #   the bottom-centre of the room box
+        #
+        # Expected arguments
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $count          - The number of unallocatable exits in this room
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $roomObj, $canvasWidget, $count, $check) = @_;
+
+        # Local variables
+        my ($xPos, $yPos, $text);
+
+        # Check for improper arguments
+        if (! defined $roomObj || ! defined $canvasWidget || ! defined $count || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawUnallocatableCount', @_);
+        }
+
+        # There's only room to draw a single figure so, if $count > 9, draw a '+'
+        if ($count > 9) {
+
+            $count = '+';
+        }
+
+        # Get the position of $roomObj's gridblock
+        $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+        $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
+
+        # Draw the letter
+        $self->drawInteriorText(
+            $roomObj,
+            $canvasWidget,
+            $self->borderCornerXPosPixels + $xPos,
+            $self->borderCornerYPosPixels + $yPos,
+            3,          # Bottom-centre
+            $count,
+            'normal',
+        );
+
+        return 1;
+    }
+
+    sub drawInteriorCounts {
+
+        # Called by $self->drawRoomInteriorInfo
+        # Draws up to two numbers in the room's interior, giving information about its exits and/or
+        #   contents
+        # Because of limited space, the maximum number drawn is 9. Numbers above that are drawn as a
+        #   '+'. The number 0 is not drawn at all
+        #
+        # Expected arguments
+        #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $borderCornerXPosPixels, $borderCornerYPosPixels
+        #                   - Coordinates of the pixel at the top-left corner of the room's border
+        #   $leftCount      - The number drawn in the top-left of the room's interior
+        #   $rightCount     - The number drawn in the top-right of the room's interior
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my (
+            $self, $roomObj, $canvasWidget, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $leftCount, $rightCount, $check,
+        ) = @_;
+
+        # Check for improper arguments
+        if (
+            ! defined $roomObj || ! defined $canvasWidget || ! defined $borderCornerXPosPixels
+            || ! defined $borderCornerYPosPixels || ! defined $leftCount || ! defined $rightCount
+            || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorCounts', @_);
+        }
+
+        # Set maximum numbers
+        if ($leftCount && $leftCount > 9) {
+
+            $leftCount = '+';
+        }
+
+        if ($rightCount && $rightCount > 9) {
+
+            $rightCount = '+';
+        }
+
+        if ($leftCount) {
+
+            # Draw the count
+            $self->drawInteriorText(
+                $roomObj,
+                $canvasWidget,
+                $borderCornerXPosPixels,
+                $borderCornerYPosPixels,
+                0,          # Top-left corner
+                $leftCount,
+            );
+        }
+
+        if ($rightCount) {
+
+            # Draw the count
+            $self->drawInteriorText(
+                $roomObj,
+                $canvasWidget,
+                $borderCornerXPosPixels,
+                $borderCornerYPosPixels,
+                1,          # Top-right corner
+                $rightCount,
+            );
+        }
+
+        return 1;
+    }
+
+    sub drawRoomFlagText {
+
+        # Called by $self->drawRoomInteriorInfo
+        # Draws the room flag text - two letters which are equivalent to the room's highest-priority
+        #   room flag - in the room's interior
+        #
+        # Expected arguments
+        #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $borderCornerXPosPixels, $borderCornerYPosPixels
+        #                   - Coordinates of the pixel at the top-left corner of the room's border
+        #   $roomFlag       - The room flag to draw. Matches a key in
+        #                       GA::Obj::WorldModel->roomFlagHash
+        #
+        # Return values
+        #   'undef' on improper arguments, or if the correct room flag text can't be found
+        #   1 otherwise
+
+        my (
+            $self, $roomObj, $canvasWidget, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $roomFlag, $check,
+        ) = @_;
+
+        # Local variables
+        my $roomFlagObj;
+
+        # Check for improper arguments
+        if (
+            ! defined $roomObj || ! defined $canvasWidget || ! defined $borderCornerXPosPixels
+            || ! defined $borderCornerYPosPixels || ! defined $roomFlag || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomFlagText', @_);
+        }
+
+        # Get the short name itself (A two-letter scalar, e.g. 'St' for stash rooms)
+        $roomFlagObj = $self->worldModelObj->ivShow('roomFlagHash', $roomFlag);
+        if ($roomFlagObj) {
+
+            # Draw the label
+            $self->drawInteriorText(
+                $roomObj,
+                $canvasWidget,
+                $borderCornerXPosPixels,
+                $borderCornerYPosPixels,
+                0,          # Top-left corner
+                $roomFlagObj->shortName,
+            );
+        }
+
+        return 1;
+    }
+
+    sub drawRoomSourceText {
+
+        # Called by $self->drawRoomInteriorInfo
+        # Draws the first four letters of the room's filename in the room's interior (this function
+        #   assumes that the room has a ->sourceCodePath value set)
+        #
+        # Expected arguments
+        #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $borderCornerXPosPixels, $borderCornerYPosPixels
+        #                   - Coordinates of the pixel at the top-left corner of the room's border
+        #
+        # Return values
+        #   'undef' on improper arguments, or if the correct room flag text can't be found
+        #   1 otherwise
+
+        my (
+            $self, $roomObj, $canvasWidget, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my $text;
+
+        # Check for improper arguments
+        if (
+            ! defined $roomObj || ! defined $canvasWidget || ! defined $borderCornerXPosPixels
+            || ! defined $borderCornerYPosPixels || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomSourceText', @_);
+        }
+
+        # Split a file path like /home/name/ds/lib/domains/town/room/start.c into path,
+        #   filename and extension (we only want the filename)
+        $roomObj->sourceCodePath =~ m/^(.*\/)?(?:$|(.+?)(?:(\.[^.]*$)|$))/;
+        # Get the first three characters of the filename (e.g. 'sta')
+        $text = substr($2, 0, 3);
+        if ($text) {
+
+            # Draw the text
+            $self->drawInteriorText(
+                $roomObj,
+                $canvasWidget,
+                $borderCornerXPosPixels,
+                $borderCornerYPosPixels,
+                0,          # Top-left corner
+                $text,
+            );
+        }
+
+        return 1;
+    }
+
+    sub drawInteriorVisits {
+
+        # Called by $self->drawRoomInteriorInfo
+        # Draws a single number in the room's interior, showing the number of times a character has
+        #   visited the room
+        # Because of limited space, the maximum number drawn is 999. Numbers above that are drawn
+        #   as '1k', '2k', or even '1m' (etc). The number 0 is not drawn at all
+        #
+        # Expected arguments
+        #   $roomObj        - The GA::ModelObj::Room being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $borderCornerXPosPixels, $borderCornerYPosPixels
+        #                   - Coordinates of the pixel at the top-left corner of the room's border
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my (
+            $self, $roomObj, $canvasWidget, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my ($name, $visitCount);
+
+        # Check for improper arguments
+        if (
+            ! defined $roomObj || ! defined $canvasWidget || ! defined $borderCornerXPosPixels
+            || ! defined $borderCornerYPosPixels || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorVisits', @_);
+        }
+
+        # If $self->showChar specifies a character, show that character's visits. Otherwise, show
+        #   visits of the current character (if there is one)
+        if ($self->showChar) {
+            $name = $self->showChar;
+        } elsif ($self->session->currentChar) {
+            $name = $self->session->currentChar->name;
+        }
+
+        if ($name && $roomObj->ivExists('visitHash', $name)) {
+
+            # Get the number of times character $name has visited the room $roomObj
+            $visitCount = $roomObj->ivShow('visitHash', $name);
+
+            # Set maximum number to draw (because of limited space inside the room)
+            if ($visitCount && $visitCount > 999999) {
+
+                $visitCount = '1m+';        # Absolute maximum
+
+            } elsif ($visitCount > 999) {
+
+                $visitCount = int($visitCount / 1000) . 'k';
+            }
+
+            # Draw the number of visits
+            $self->drawInteriorText(
+                $roomObj,
+                $canvasWidget,
+                $borderCornerXPosPixels,
+                $borderCornerYPosPixels,
+                0,          # Top-left corner
+                $visitCount,
+            );
+        }
+
+        return 1;
+    }
+
+    sub drawInteriorProfiles {
+
+        # Called by $self->drawRoomInteriorInfo
+        # Draws two bits of text in the room's interior - a symbol to show whether the room's
+        #   ->exclusiveFlag is set, and the number of exclusive profiles for the room (if there
+        #   is only one, the first two characters of the profile's name are drawn instead)
+        #
+        # Expected arguments
+        #   $roomObj        - The GA::ModelObj::Room being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $borderCornerXPosPixels, $borderCornerYPosPixels
+        #                   - Coordinates of the pixel at the top-left corner of the room's border
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my (
+            $self, $roomObj, $canvasWidget, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $check,
+        ) = @_;
+
+        # Local variables
+        my (
+            $string,
+            @profList,
+        );
+
+        # Check for improper arguments
+        if (
+            ! defined $roomObj || ! defined $canvasWidget || ! defined $borderCornerXPosPixels
+            || ! defined $borderCornerYPosPixels || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorProfiles', @_);
+        }
+
+        # Create a string to draw
+        if ($roomObj->exclusiveFlag) {
+            $string = '*';
+        } else {
+            $string = ' ';
+        }
+
+        if ($roomObj->exclusiveHash) {
+
+            @profList = $roomObj->ivKeys('exclusiveHash');
+
+            # Only one exclusive profile, so use its name
+            if (@profList == 1) {
+
+                $string .= substr($profList[0], 0, 3);
+
+            # More than one exclusive profile, so use the number of profiles
+            } elsif (@profList > 99) {
+
+                # Number is too large to fit
+                $string .= '99+';
+
+            } else {
+
+                $string .= scalar @profList;
+            }
+        }
+
+        # Draw the string
+        $self->drawInteriorText(
+            $roomObj,
+            $canvasWidget,
+            $borderCornerXPosPixels,
+            $borderCornerYPosPixels,
+            0,          # Top-left corner
+            $string,
+        );
+
+        return 1;
+    }
+
+    sub drawUpDown {
+
+        # Called by $self->drawIncompleteExit, $self->drawOneWayExit, $self->drawTwoWayExit (etc)
+        # To show the exits 'up' and 'down', draws the letter 'U' or 'D' in one of the bottom
+        #   corners of a room on the map
+        #
+        # Expected arguments
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
+
+        # Local variables
+        my ($mapDir, $xPos, $yPos, $text, $style, $weight, $underline);
+
+        # Check for improper arguments
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawUpDown', @_);
+        }
+
+        # Get the primary direction ('up' or 'down'). The calling function should already have
+        #   eliminated exits whose ->mapDir is set to other values (or to 'undef')
+        $mapDir = $exitObj->mapDir;
+
+        # Get the position of $roomObj's gridblock
+        $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+        $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
+
+        # Broken/region exits are drawn with an underline
+        if ($exitObj->brokenFlag) {
+            $underline = 'single';
+        } elsif ($exitObj->regionFlag) {
+            $underline = 'error';       # Wavy line
+        }
+
+        # Impassable, mystery and retracing exits are drawn bold. Other exit ornaments are drawn
+        #   oblique
+        if (
+            $exitObj->exitOrnament eq 'impass'
+            || $exitObj->exitOrnament eq 'mystery'
+            || $exitObj->retraceFlag
+        ) {
+            $weight = 600;
+            $style = 'normal';
+
+        } else {
+
+            $weight = 400;
+
+            if ($exitObj->exitOrnament ne 'none') {
+                $style = 'oblique';
+            } elsif ($exitObj->randomType ne 'none') {
+                $style = 'italic';
+            } else {
+                $style = 'normal';
+            }
+        }
+
+        # Set the letter to be used, and its size and position
+        if ($mapDir eq 'up') {
+
+            # Decide which letter to use (upper case for 1-way/2-way exits, lower case for
+            #   uncertain/incomplete exits)
+            if ($exitObj->twinExit || $exitObj->oneWayFlag) {
+                $text = 'U';
+            } else {
+                $text = 'u';
+            }
+
+            # Draw the letter
+            $self->drawInteriorText(
+                $roomObj,
+                $canvasWidget,
+                $self->borderCornerXPosPixels + $xPos,
+                $self->borderCornerYPosPixels + $yPos,
+                2,          # Bottom-left corner
+                $text,
+                $style,
+                $underline,
+                $weight,
+            );
+
+        } elsif ($mapDir eq 'down') {
+
+            # Decide which letter to use (upper case for 1-way/2-way exits, lower case for
+            #   uncertain/incomplete exits)
+            if ($exitObj->twinExit || $exitObj->oneWayFlag) {
+                $text = 'D';
+            } else {
+                $text = 'd';
+            }
+
+            # Draw the letter
+            $self->drawInteriorText(
+                $roomObj,
+                $canvasWidget,
+                $self->borderCornerXPosPixels + $xPos,
+                $self->borderCornerYPosPixels + $yPos,
+                4,          # Bottom-right corner
+                $text,
+                $style,
+                $underline,
+                $weight,
             );
         }
 
@@ -33668,20 +36786,21 @@
         #   necessarily lead to adjacent rooms
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj);
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawIncompleteExit', @_);
         }
@@ -33697,7 +36816,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -33708,12 +36827,12 @@
             $colour = $self->getExitColour($exitObj);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Draw the canvas object
             $newObj = Gnome2::Canvas::Item->new (
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Line',
                 points => [
                     $$posnListRef[0] + $xPos,
@@ -33727,19 +36846,20 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitLevel($newObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
             # Store the canvas object
-            $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
 
             # Draw ornaments for this exit, if there are any (and if allowed)
             if ($exitObj->exitOrnament ne 'none' && $self->worldModelObj->drawOrnamentsFlag) {
 
                 $self->drawExitOrnaments(
                     $exitObj,
+                    $canvasWidget,
                     $colour,
                     $xPos,
                     $yPos,
@@ -33762,20 +36882,21 @@
         #   two linked exits we already know about, and which we don't
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my ($mapDir, $xPos, $yPos, $posnListRef, $colour, $newObj);
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawUncertainExit', @_);
         }
@@ -33791,7 +36912,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -33802,12 +36923,12 @@
             $colour = $self->getExitColour($exitObj);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Draw the canvas object
             $newObj = Gnome2::Canvas::Item->new (
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Line',
                 points => [
                     $$posnListRef[0] + $xPos,
@@ -33821,19 +36942,20 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitLevel($newObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
             # Store the canvas object
-            $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
 
             # Draw ornaments for this exit, if there are any (and if allowed)
             if ($exitObj->exitOrnament ne 'none' && $self->worldModelObj->drawOrnamentsFlag) {
 
                 $self->drawExitOrnaments(
                     $exitObj,
+                    $canvasWidget,
                     $colour,
                     $xPos,
                     $yPos,
@@ -33854,14 +36976,15 @@
         #   room to the other. (Also called by $self->drawBentExit in certain circumstances)
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my (
@@ -33870,7 +36993,7 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawOneWayExit', @_);
         }
@@ -33887,7 +37010,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -33907,8 +37030,8 @@
                 # Find the exit's position
                 $posnListRef = $self->ivShow('preDrawnLongExitHash', $mapDir);
                 # Get the position of the destination room's gridblock
-                $destXPos = $destRoomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-                $destYPos = $destRoomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+                $destXPos = $destRoomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+                $destYPos = $destRoomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
                 # If ->mapDir and ->oneWayDir are not opposites, then we can't use
                 #   $self->preDrawnLongExitHash to draw the far end of the exit
@@ -33933,8 +37056,8 @@
             }
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
             # Decide which colour to use
             $colour = $self->getExitColour($exitObj);
 
@@ -33944,7 +37067,7 @@
                 # Draw this exit all the way to the destination room, where $mapDir and $oneWayDir
                 #   are opposites
                 $newObj = Gnome2::Canvas::Item->new (
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [
                         $$posnListRef[0] + $xPos,
@@ -33963,7 +37086,7 @@
                 # Draw this exit all the way to the destination room, where $mapDir and $oneWayDir
                 #   are not opposites
                 $newObj = Gnome2::Canvas::Item->new (
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [
                         $$posnListRef[0] + $xPos,
@@ -33984,7 +37107,7 @@
 
                 # Draw this exit to the edge of its own gridblock
                 $newObj = Gnome2::Canvas::Item->new (
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [
                         $$posnListRef[0] + $xPos,
@@ -34001,6 +37124,7 @@
             # Draw the canvas objects for the arrowhead part of the exit
             ($newObj2, $newObj3) = $self->drawArrowHead(
                 $exitObj,
+                $canvasWidget,
                 $xPos,
                 $yPos,
                 $posnListRef,
@@ -34009,16 +37133,23 @@
 
             # Set the objects' position in the canvas drawing stack (this has already been done for
             #   $newObj2 and $newObj3)
-            $self->setExitLevel($newObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handlers for the canvas objects (this has already been done for
             #   $newObj2 and $newObj3)
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
             if ($newObj2 && $newObj3) {
-                $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj, $newObj2, $newObj3]);
+
+                $self->drawParchment->addDrawnExit(
+                    $roomObj,
+                    $exitObj,
+                    [$newObj, $newObj2, $newObj3],
+                );
+
             } else {
-                $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+
+                $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
             }
 
             # Draw ornaments for this exit and/or the twin exit, if there are any (and if allowed)
@@ -34036,6 +37167,7 @@
                 ) {
                     $self->drawExitOrnaments(
                         $exitObj,
+                        $canvasWidget,
                         $colour,
                         $xPos,
                         $yPos,
@@ -34057,6 +37189,7 @@
         #
         # Expected arguments
         #   $exitObj        - The GA::Obj::Exit for which an arrowhead is being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $xPos, $yPos    - The position of the parent room's gridblock on the map
         #   $posnListRef    - Reference to a list of coordinates describing the start and end of
         #                       the line section nearest to the parent room (only the first four
@@ -34068,18 +37201,18 @@
         #   Otherwise, returns a list of canvas objects for the arrowhead, which the calling
         #       function can add to the other canvas objects that comprise the drawn exit
 
-        my ($self, $exitObj, $xPos, $yPos, $posnListRef, $colour, $check) = @_;
+        my ($self, $exitObj, $canvasWidget, $xPos, $yPos, $posnListRef, $colour, $check) = @_;
 
         # Local variables
         my (
-            $arrowVectorRef, $newObj, $newObj2, $posnSet,
+            $arrowVectorRef, $newObj, $newObj2, $posnSet, $roomObj,
             @emptyList,
         );
 
         # Check for improper arguments
         if (
-            ! defined $exitObj || ! defined $xPos || ! defined $yPos || ! defined $posnListRef
-            || ! defined $colour || defined $check
+            ! defined $exitObj || ! defined $canvasWidget || ! defined $xPos || ! defined $yPos
+            || ! defined $posnListRef || ! defined $colour || defined $check
         ) {
             $axmud::CLIENT->writeImproper($self->_objClass . '->drawArrowHead', @_);
             return @emptyList;
@@ -34094,21 +37227,21 @@
 
         # Draw the arrowhead canvas objects
         $newObj = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => [
                 $$posnListRef[2] + $xPos,
                 $$posnListRef[3] + $yPos,
                 $$posnListRef[2] + $xPos + (
                     $$arrowVectorRef[0] * int(
-                        ($self->currentRegionmap->blockWidthPixels
-                            - $self->currentRegionmap->roomWidthPixels) / 3
+                        ($self->drawRegionmap->blockWidthPixels
+                            - $self->drawRegionmap->roomWidthPixels) / 3
                     )
                 ),
                 $$posnListRef[3] + $yPos + (
                     $$arrowVectorRef[1] * int(
-                        ($self->currentRegionmap->blockHeightPixels
-                            - $self->currentRegionmap->roomHeightPixels) / 3
+                        ($self->drawRegionmap->blockHeightPixels
+                            - $self->drawRegionmap->roomHeightPixels) / 3
                     )
                 ),
             ],
@@ -34118,21 +37251,21 @@
         );
 
         $newObj2 = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => [
                 $$posnListRef[2] + $xPos,
                 $$posnListRef[3] + $yPos,
                 $$posnListRef[2] + $xPos + (
                     $$arrowVectorRef[2] * int(
-                        ($self->currentRegionmap->blockWidthPixels
-                            - $self->currentRegionmap->roomWidthPixels) / 3
+                        ($self->drawRegionmap->blockWidthPixels
+                            - $self->drawRegionmap->roomWidthPixels) / 3
                     )
                 ),
                 $$posnListRef[3] + $yPos + (
                     $$arrowVectorRef[3] * int(
-                        ($self->currentRegionmap->blockHeightPixels
-                            - $self->currentRegionmap->roomHeightPixels) / 3
+                        ($self->drawRegionmap->blockHeightPixels
+                            - $self->drawRegionmap->roomHeightPixels) / 3
                     )
                 ),
             ],
@@ -34142,8 +37275,10 @@
         );
 
         # Set the objects' position in the canvas drawing stack
-        $posnSet = $self->setExitLevel($newObj);
-        $self->setExitLevel($newObj2, $posnSet);
+        $roomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->parent);
+        $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+
+        $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
 
         # Set up the event handlers for the canvas objects
         $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -34158,17 +37293,17 @@
         #   all the way from one room to the other
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
-        #   $mode       - Matches GA::Obj::WorldModel->drawExitMode or
-        #                   $self->currentRegionmap->drawExitMode; set to 'simple_exit' or
-        #                   'complex_exit'
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $mode           - Mathces the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap; set to 'simple_exit' or 'complex_exit'
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $mode, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $mode, $check) = @_;
 
         # Local variables
         my (
@@ -34177,8 +37312,10 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
-
+        if (
+            ! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || ! defined $mode
+            || defined $check
+        ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawTwoWayExit', @_);
         }
 
@@ -34193,7 +37330,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -34211,12 +37348,12 @@
             $colour = $self->getExitColour($exitObj);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
             # Get the position of the destination room's griblock
             $destRoomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->destRoom);
-            $destXPos = $destRoomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $destYPos = $destRoomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $destXPos = $destRoomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $destYPos = $destRoomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             if ($mode eq 'complex_exit') {
 
@@ -34232,7 +37369,7 @@
 
                     # It's a diagonal two-way exit
                     $newObj = Gnome2::Canvas::Item->new (
-                        $self->canvasRoot,
+                        $canvasWidget->root(),
                         'Gnome2::Canvas::Line',
                         points => [
                             $$posnListRef[0] + $xPos + $$doubleVectorRef[0],
@@ -34246,7 +37383,7 @@
                     );
 
                     $newObj2 = Gnome2::Canvas::Item->new (
-                        $self->canvasRoot,
+                        $canvasWidget->root(),
                         'Gnome2::Canvas::Line',
                         points => [
                             $$posnListRef[0] + $xPos + $$doubleVectorRef[2],
@@ -34263,7 +37400,7 @@
 
                     # It's not a diagonal two-way exit
                     $newObj = Gnome2::Canvas::Item->new (
-                        $self->canvasRoot,
+                        $canvasWidget->root(),
                         'Gnome2::Canvas::Line',
                         points => [
                             $$posnListRef[0] + $xPos + $$doubleVectorRef[0],
@@ -34277,7 +37414,7 @@
                     );
 
                     $newObj2 = Gnome2::Canvas::Item->new (
-                        $self->canvasRoot,
+                        $canvasWidget->root(),
                         'Gnome2::Canvas::Line',
                         points => [
                             $$posnListRef[0] + $xPos + $$doubleVectorRef[2],
@@ -34292,21 +37429,25 @@
                 }
 
                 # Set the object's position in the canvas drawing stack
-                $posnSet = $self->setExitLevel($newObj);
-                $self->setExitLevel($newObj2, $posnSet);
+                $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+                $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
 
                 # Set up the event handlers for the canvas objects
                 $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
                 $self->setupCanvasObjEvent('exit', $newObj2, $exitObj);
 
                 # Store the canvas objects together
-                $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj, $newObj2]);
+                $self->drawParchment->addDrawnExit(
+                    $roomObj,
+                    $exitObj,
+                    [$newObj, $newObj2],
+                );
 
             } else {
 
                 # (Simple exits) Draw the canvas object
                 $newObj = Gnome2::Canvas::Item->new (
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [
                         $$posnListRef[0] + $xPos,
@@ -34320,13 +37461,13 @@
                 );
 
                 # Set the object's position in the canvas drawing stack
-                $self->setExitLevel($newObj);
+                $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
                 # Set up the event handler for the canvas object
                 $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
                 # Store the canvas object
-                $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+                $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
             }
 
             # Draw ornaments for this exit and/or the twin exit, if there are any (and if allowed)
@@ -34344,6 +37485,7 @@
                 ) {
                     $self->drawExitOrnaments(
                         $exitObj,
+                        $canvasWidget,
                         $colour,
                         $xPos,
                         $yPos,
@@ -34366,20 +37508,21 @@
         # The exit is drawn as an 'x'
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $newObj2, $posnSet);
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawUnallocatedExit', @_);
         }
@@ -34395,7 +37538,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -34406,12 +37549,12 @@
             $colour = $self->getExitColour($exitObj);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Draw the canvas objects
             $newObj = Gnome2::Canvas::Item->new (
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Line',
                 points => [
                     $$posnListRef[0] + $xPos,
@@ -34425,7 +37568,7 @@
             );
 
             $newObj2 = Gnome2::Canvas::Item->new (
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Line',
                 points => [
                     $$posnListRef[2] + $xPos,
@@ -34439,15 +37582,19 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $posnSet = $self->setExitLevel($newObj);
-            $self->setExitLevel($newObj2, $posnSet);
+            $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
 
             # Set up the event handlers for the canvas objects
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
             $self->setupCanvasObjEvent('exit', $newObj2, $exitObj);
 
             # Store the canvas objects together
-            $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj, $newObj2]);
+            $self->drawParchment->addDrawnExit(
+                $roomObj,
+                $exitObj,
+                [$newObj, $newObj2],
+            );
         }
 
         return 1;
@@ -34468,6 +37615,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Optional arguments
         #   $twinExitObj    - The twin GA::Obj::Exit, if there is one ('undef' otherwise)
@@ -34476,7 +37624,7 @@
         #   'undef' on improper arguments
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $twinExitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $twinExitObj, $check) = @_;
 
         # Local variables
         my (
@@ -34485,7 +37633,7 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawImpassableExit', @_);
         }
@@ -34552,15 +37700,15 @@
                 # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
                 if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-                    $self->drawUpDown($thisRoomObj, $thisExitObj);
+                    $self->drawUpDown($thisRoomObj, $thisExitObj, $canvasWidget);
 
                 # Draw cardinal directions (the sixteen primary directions which aren't 'up' and
                 #   'down')
                 } else {
 
                     # Get the position of $thisRoomObj's gridblock
-                    $xPos = $thisRoomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-                    $yPos = $thisRoomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+                    $xPos = $thisRoomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+                    $yPos = $thisRoomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
                     if (
                         $thisExitObj->exitOrnament eq 'impass'
@@ -34582,7 +37730,7 @@
 
                         # Draw the canvas object
                         $newObj = Gnome2::Canvas::Item->new (
-                            $self->canvasRoot,
+                            $canvasWidget->root(),
                             'Gnome2::Canvas::Rect',
                             x1 => $squareStartXPosPixels + $xPos,
                             y1 => $squareStartYPosPixels + $yPos,
@@ -34593,7 +37741,7 @@
                         );
 
                         # Set the object's position in the canvas drawing stack
-                        $self->setExitLevel($newObj);
+                        $self->setExitStackPosn($self->drawParchment, $newObj, $thisRoomObj);
 
                         # Set up the event handler for the canvas object (using the first exit in
                         #   @exitList, even if there are two)
@@ -34609,7 +37757,7 @@
 
                         # Draw the canvas object
                         $newObj = Gnome2::Canvas::Item->new (
-                            $self->canvasRoot,
+                            $canvasWidget->root(),
                             'Gnome2::Canvas::Line',
                             points => [
                                 $$posnListRef[0] + $xPos,
@@ -34623,7 +37771,7 @@
                         );
 
                         # Set the object's position in the canvas drawing stack
-                        $self->setExitLevel($newObj);
+                        $self->setExitStackPosn($self->drawParchment, $newObj, $thisRoomObj);
 
                         # Set up the event handler for the canvas object (using the first exit in
                         #   @exitList, even if there are two)
@@ -34639,7 +37787,7 @@
         # Store the canvas objects (assuming at least one was created)
         if (@newObjList) {
 
-            $self->ivAdd('drawnExitHash', $exitObj->number, \@newObjList);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, \@newObjList);
         }
 
         return 1;
@@ -34652,13 +37800,14 @@
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $dir            - The checked direction (a custom primary or secondary direction)
         #
         # Return values
         #   'undef' on improper arguments or if the exit isn't drawn
         #   Returns the new canvas object on success
 
-        my ($self, $roomObj, $dir, $check) = @_;
+        my ($self, $roomObj, $canvasWidget, $dir, $check) = @_;
 
         # Local variables
         my (
@@ -34667,7 +37816,7 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $dir || defined $check) {
+        if (! defined $roomObj || ! defined $canvasWidget || ! defined $dir || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawCheckedDir', @_);
         }
@@ -34679,8 +37828,8 @@
         }
 
         # Get the position of $thisRoomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+        $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+        $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
         # Find the position of an exit drawn in this direction
         $posnListRef = $self->ivShow('preDrawnSquareExitHash', $dir);
@@ -34701,7 +37850,7 @@
 
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Rect',
             x1 => $squareStartXPosPixels + $xPos,
             y1 => $squareStartYPosPixels + $yPos,
@@ -34712,14 +37861,13 @@
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setExitLevel($newObj);
+        $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
         # (There is no event handler for the canvas object - clicking the checked direction does
         #   nothing)
 
-
         # The canvas objects for checked directions in each room are stored together, so let the
-        #   calling function add an entry to $self->drawnCheckedHash
+        #   calling function add an entry to GA::Obj::Parchment->drawnCheckedDirHash
         return $newObj;
     }
 
@@ -34728,23 +37876,24 @@
         # Called by $self->drawExit to draw an exit that leads to another room at an arbitrary
         #   position in this region (and not necessarily on the same level). 'Bent' broken exits are
         #   drawn as a line with one or more bends
+        # (Also called by $self->continueDrag)
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $mode           - Matches GA::Obj::WorldModel->drawExitMode or
-        #                       $self->currentRegionmap->drawExitMode; set to 'simple_exit' or
-        #                       'complex_exit'
+        #   $mode           - Mathces the ->drawExitMode IV in GA::Obj::WorldModel or
+        #                       $self->drawRegionmap; set to 'simple_exit' or 'complex_exit'
         #
         # Optional arguments
         #   $twinExitObj    - The exit's twin (if it has one - must be specified, if so; set to
         #                       'undef', if not)
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $mode, $twinExitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $mode, $twinExitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my (
@@ -34757,7 +37906,13 @@
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || ! defined $mode || defined $check) {
 
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawBrokenExit', @_);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawBentExit', @_);
+        }
+
+        # Set the canvas widget on which the room is drawn, if not already set
+        if (! $canvasWidget) {
+
+            $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
         }
 
         # For one-way exits, if the destination room has an exit drawn in the primary used by
@@ -34767,12 +37922,12 @@
         $destRoomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->destRoom);
         if ($exitObj->oneWayFlag && $destRoomObj->ivExists('exitNumHash', $exitObj->oneWayDir)) {
 
-            return $self->drawOneWayExit($roomObj, $exitObj);
+            return $self->drawOneWayExit($roomObj, $exitObj, $canvasWidget);
 
         # For uncertain exits, draw the exit as a normal uncertain exit
         } elsif (! $exitObj->oneWayFlag && ! $twinExitObj) {
 
-            return $self->drawUncertainExit($roomObj, $exitObj);
+            return $self->drawUncertainExit($roomObj, $exitObj, $canvasWidget);
         }
 
         # Fetch the equivalent primary direction (the direction in which the exit is drawn on the
@@ -34786,14 +37941,14 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
             # Decide which colour to use
             $colour = $self->getExitColour($exitObj);
 
@@ -34839,8 +37994,8 @@
             #   by the user)
             # Otherwise, we use the uncertain exit in the opposite direction that $exitObj is drawn
             #   (e.g. west - east)
-            $destXPos = $destRoomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $destYPos = $destRoomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $destXPos = $destRoomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $destYPos = $destRoomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             if ($twinExitObj) {
 
@@ -34953,7 +38108,7 @@
 
                 # Draw the canvas objects
                 $newObj = Gnome2::Canvas::Item->new (
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [@pointList2],
                     fill_color => $colour,
@@ -34962,7 +38117,7 @@
                 );
 
                 $newObj2 = Gnome2::Canvas::Item->new (
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [@pointList3],
                     fill_color => $colour,
@@ -34971,8 +38126,8 @@
                 );
 
                 # Set the object's position in the canvas drawing stack
-                $posnSet = $self->setExitLevel($newObj);
-                $self->setExitLevel($newObj2, $posnSet);
+                $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+                $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
 
                 # Set up the event handlers for the canvas objects
                 $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -34987,7 +38142,7 @@
 
                 # Draw the canvas object
                 $newObj = Gnome2::Canvas::Item->new (
-                    $self->canvasRoot,
+                    $canvasWidget->root(),
                     'Gnome2::Canvas::Line',
                     points => [@pointList],
                     fill_color => $colour,
@@ -35001,6 +38156,7 @@
                     # Draw the canvas objects for the arrowhead part of the exit
                     ($newObj2, $newObj3) = $self->drawArrowHead(
                         $exitObj,
+                        $canvasWidget,
                         $xPos,
                         $yPos,
                         $posnListRef,
@@ -35010,7 +38166,7 @@
 
                 # Set the object's position in the canvas drawing stack (this has already been done
                 #   for $newObj2 and $newObj3, if set)
-                $self->setExitLevel($newObj);
+                $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
                 # Set up the event handler for the canvas object (this has already been done for
                 #   $newObj2 and $newObj3, if set)
@@ -35051,7 +38207,7 @@
 
                     # Draw the canvas object
                     $bendObj = Gnome2::Canvas::Item->new(
-                        $self->canvasRoot,
+                        $canvasWidget->root(),
                         'Gnome2::Canvas::Rect',
                         x1 => $xPos + $offsetXPos - $bendSize,
                         y1 => $yPos + $offsetYPos - $bendSize,
@@ -35062,7 +38218,7 @@
                     );
 
                     # Set the object's position in the canvas drawing stack
-                    $self->setExitLevel($newObj);
+                    $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
                     # Set up the event handler for the canvas object
                     $self->setupCanvasObjEvent('exit', $bendObj, $exitObj);
@@ -35073,7 +38229,7 @@
             }
 
             # Store the canvas objects together
-            $self->ivAdd('drawnExitHash', $exitObj->number, \@canvasObjList);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, \@canvasObjList);
 
             # Draw ornaments for this exit and/or the twin exit, if there are any (and if allowed)
             if ($self->worldModelObj->drawOrnamentsFlag) {
@@ -35084,6 +38240,7 @@
                 ) {
                     $self->drawExitOrnaments(
                         $exitObj,
+                        $canvasWidget,
                         $colour,
                         $xPos,
                         $yPos,
@@ -35210,7 +38367,7 @@
 
         # Local variables
         my (
-            $mapDir, $roomObj, $xPos, $yPos, $posnListRef, $newObj,
+            $mapDir, $roomObj, $xPos, $yPos, $posnListRef, $canvasWidget, $newObj,
             @pointList,
         );
 
@@ -35252,8 +38409,13 @@
         push (@pointList, $mouseXPos, $mouseYPos);
 
         # Draw the canvas object
+        $canvasWidget = $self->currentParchment->ivShow(
+            'canvasWidgetHash',
+            $self->currentRegionmap->currentLevel,
+        );
+
         $newObj = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => [@pointList],
             fill_color => $self->worldModelObj->dragExitColour,
@@ -35262,7 +38424,7 @@
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setLabelLevel($newObj);
+        $self->setLabelStackPosn($newObj);
         # Set up the event handlers for the canvas objects
         $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
@@ -35276,14 +38438,15 @@
         #   are drawn as a filled-in square
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my (
@@ -35292,7 +38455,7 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawBrokenExit', @_);
         }
@@ -35308,7 +38471,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -35319,8 +38482,8 @@
             $colour = $self->getExitColour($exitObj);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Invert the coordinates of the square occupied by the exit so that
             #   ($squareStartXPosPixels, $squareStartYPosPixels) is the top-left corner, rather than
@@ -35332,7 +38495,7 @@
 
             # Draw the canvas object
             $newObj = Gnome2::Canvas::Item->new(
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Rect',
                 x1 => $squareStartXPosPixels + $xPos,
                 y1 => $squareStartYPosPixels + $yPos,
@@ -35343,13 +38506,13 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitLevel($newObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
             # Store the canvas object
-            $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
         }
 
         return 1;
@@ -35361,14 +38524,15 @@
         #   - currently drawn as an unfilled-in square
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my (
@@ -35377,7 +38541,7 @@
         );
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRegionExit', @_);
         }
@@ -35393,7 +38557,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -35402,8 +38566,8 @@
             $posnListRef = $self->ivShow('preDrawnSquareExitHash', $mapDir);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Invert the coordinates of the square occupied by the exit so that
             #   ($squareStartXPosPixels, $squareStartYPosPixels) is the top-left corner, rather than
@@ -35415,7 +38579,7 @@
 
             # Draw the canvas object
             $newObj = Gnome2::Canvas::Item->new(
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Rect',
                 x1 => $squareStartXPosPixels + $xPos,
                 y1 => $squareStartYPosPixels + $yPos,
@@ -35425,13 +38589,13 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitLevel($newObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
             # Store the canvas object
-            $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
         }
 
         return 1;
@@ -35442,14 +38606,15 @@
         # Called by $self->drawExit to draw an exit that leads to a random location
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $outlineColour, $fillColour);
@@ -35457,7 +38622,7 @@
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || defined $check) {
 
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRegionExit', @_);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRandomExit', @_);
         }
 
         # Fetch the equivalent primary direction (the direction in which the exit is drawn on the
@@ -35471,7 +38636,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -35480,8 +38645,8 @@
             $posnListRef = $self->ivShow('preDrawnSquareExitHash', $mapDir);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Set the exit colour
             $colour = $self->getExitColour($exitObj);
@@ -35513,7 +38678,7 @@
 
             # Draw the canvas object
             $newObj = Gnome2::Canvas::Item->new(
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Ellipse',
                 x1 => $$posnListRef[0] + $xPos,
                 y1 => $$posnListRef[1] + $yPos,
@@ -35524,13 +38689,13 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitLevel($newObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
             # Store the canvas object
-            $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
         }
 
         return 1;
@@ -35542,20 +38707,21 @@
         #   triangle)
         #
         # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
+        #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
+        #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
         #   1 otherwise
 
-        my ($self, $roomObj, $exitObj, $check) = @_;
+        my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
         my ($mapDir, $lineListRef, $squareListRef, $triangleListRef, $xPos, $yPos, $newObj);
 
         # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
+        if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRetracingExit', @_);
         }
@@ -35571,7 +38737,7 @@
         # Draw 'up' and 'down' - the letters 'U' and 'D' in the bottom corners of the room
         if ($mapDir eq 'up' || $mapDir eq 'down') {
 
-            $self->drawUpDown($roomObj, $exitObj);
+            $self->drawUpDown($roomObj, $exitObj, $canvasWidget);
 
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
@@ -35599,12 +38765,12 @@
             $triangleListRef = $self->ivShow('constTriangleCornerHash', $mapDir);
 
             # Get the position of $roomObj's gridblock
-            $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-            $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
+            $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+            $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Draw the canvas object
             $newObj = Gnome2::Canvas::Item->new(
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Polygon',
                 points => [
                     # Triangle corner nearest the room
@@ -35624,633 +38790,14 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitLevel($newObj);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
             # Store the canvas object
-            $self->ivAdd('drawnExitHash', $exitObj->number, [$newObj]);
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
         }
-
-        return 1;
-    }
-
-    sub drawInteriorText {
-
-        # Called by $self->drawUpDown, ->drawInteriorCounts, ->drawInteriorVisits,
-        #   ->drawInteriorText and ->drawRoomFlagText
-        # Draws some pango text in a room's interior at ones of five positions - the top-left or
-        #   top-right corners, or at the bottom-left, bottom-centre or bottom-right
-        #
-        # Expected arguments
-        #   $roomObj    - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's border
-        #   $corner     - Which corner to use
-        #                   - 0 for top-left
-        #                   - 1 for top-right
-        #                   - 2 for bottom-left     (reserved for 'up' exits)
-        #                   - 3 for bottom-centre   (reserved for unallocatable exits)
-        #                   - 4 for bottom-right    (reserved for 'down' exits)
-        #
-        # Optional arguments
-        #   $text       - The text to draw. If an empty string or 'undef', nothing is drawn
-        #   $style      - The text's style, 'normal', 'oblique' or 'italic'. If 'undef', 'normal' is
-        #                   used
-        #   $underline  - The text's underline, 'none', 'single', 'double' or 'error'. If 'undef',
-        #                   'none' is used (NB Only intended to be used for up/down exits)
-        #   $weight     - The text's weight. A normal weight is 400; a bold weight is 600. If
-        #                   'undef', 400 is used (NB Only intended to be used for up/down exits)
-        #
-        # Return values
-        #   'undef' on improper arguments, or if the text is too small to be drawn
-        #   1 otherwise
-
-        my (
-            $self, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $corner,
-            $text, $style, $underline, $weight, $check
-        ) = @_;
-
-        # Local variables
-        my (
-            $textXPosPixels, $textYPosPixels, $textSizePixels, $listRef, $newObj, $posn, $yMod,
-            @newList,
-        );
-
-        # Check for improper arguments
-        if (
-            ! defined $roomObj || ! defined $borderCornerXPosPixels
-            || ! defined $borderCornerYPosPixels || ! defined $corner || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorText', @_);
-        }
-
-        # Check that, for very small rooms, we don't try to draw text with a size of less than 1
-        #   pixel
-        if ($self->drawRoomTextSize < 1) {
-
-            # Draw nothing
-            return undef;
-        }
-
-        # Set the text's position
-        if ($corner == 0) {
-
-            # Top-left corner
-            $textXPosPixels = $borderCornerXPosPixels + 1;
-            $textYPosPixels = $borderCornerYPosPixels + 1;
-
-        } elsif ($corner == 1) {
-
-            # Top-right corner
-            $textXPosPixels = $borderCornerXPosPixels + int($self->drawRoomTextWidth / 2) + 1;
-            $textYPosPixels = $borderCornerYPosPixels + 1;
-
-        } elsif ($corner == 2) {
-
-            # Bottom-left corner (reserved for 'up')
-            $textXPosPixels = $borderCornerXPosPixels + 1;
-            $textYPosPixels = $borderCornerYPosPixels + int($self->drawRoomTextHeight / 2) + 1;
-
-        } elsif ($corner == 3) {
-
-            # Bottom-centre (reserved for unallocatable exits)
-            $textXPosPixels = $borderCornerXPosPixels + int($self->drawRoomTextWidth / 3) + 1;
-            $textYPosPixels = $borderCornerYPosPixels + int($self->drawRoomTextHeight / 2) + 1;
-
-        } elsif ($corner == 4) {
-
-            # Bottom right-corner (reserved for 'down')
-            $textXPosPixels = $borderCornerXPosPixels + int(($self->drawRoomTextWidth * 2) / 3);
-            $textYPosPixels = $borderCornerYPosPixels + int($self->drawRoomTextHeight / 2) + 1;
-        }
-
-        # Set the style, if not specified
-        if (! $style) {
-
-            $style = 'normal';
-        }
-
-        # Set the underline, if not specified. Some underline settings need us to move the
-        #   character up a few pixels, in which case $yMod is set
-        $yMod = 0;
-
-        if (! $underline) {
-            $underline = 'none';
-        } elsif ($underline eq 'single') {
-            $yMod = -2;
-        } elsif ($underline eq 'error') {
-            $yMod = -2;     # -3 would be consistent with other values
-        } elsif ($underline eq 'double') {
-            $yMod = -4;     # not currently used by any text
-        }
-
-        # Set the weight, if not specified
-        if (! $weight) {
-
-            $weight = 400;
-        }
-
-        # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $self->canvasRoot,
-            'Gnome2::Canvas::Text',
-            x => $textXPosPixels,
-            y => $textYPosPixels + $yMod,
-            font => $self->worldModelObj->mapFont,
-            size => int($self->drawRoomTextSize * $self->worldModelObj->roomTextRatio),
-            fill_color => $self->worldModelObj->roomTextColour,
-            anchor => 'GTK_ANCHOR_NW',
-            text => $text,
-            style => $style,
-            underline => $underline,
-            weight => $weight,
-        );
-
-        # Set the object's position in the canvas drawing stack
-        $self->setTextLevel($newObj);
-
-        # (No event handler for this canvas object)
-
-        # Store the canvas object
-        $posn = $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_' . $roomObj->zPosBlocks;
-        if ($self->ivExists('drawnRoomTextHash', $posn)) {
-
-            $listRef = $self->ivShow('drawnRoomTextHash', $posn);
-            @newList = (@$listRef, $newObj);
-
-        } else {
-
-            @newList = ($newObj);
-        }
-
-        $self->ivAdd('drawnRoomTextHash', $posn, \@newList);
-
-        return 1;
-    }
-
-    sub drawUpDown {
-
-        # Called by $self->drawIncompleteExit, $self->drawOneWayExit, $self->drawTwoWayExit (etc)
-        # To show the exits 'up' and 'down', draws the letter 'U' or 'D' in one of the bottom
-        #   corners of a room on the map
-        #
-        # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $exitObj    - Blessed reference of the GA::Obj::Exit being drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $roomObj, $exitObj, $check) = @_;
-
-        # Local variables
-        my ($mapDir, $xPos, $yPos, $text, $style, $weight, $underline);
-
-        # Check for improper arguments
-        if (! defined $roomObj || ! defined $exitObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawUpDown', @_);
-        }
-
-        # Get the primary direction ('up' or 'down'). The calling function should already have
-        #   eliminated exits whose ->mapDir is set to other values (or to 'undef')
-        $mapDir = $exitObj->mapDir;
-
-        # Get the position of $roomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
-
-        # Broken/region exits are drawn with an underline
-        if ($exitObj->brokenFlag) {
-            $underline = 'single';
-        } elsif ($exitObj->regionFlag) {
-            $underline = 'error';       # Wavy line
-        }
-
-        # Impassable, mystery and retracing exits are drawn bold. Other exit ornaments are drawn
-        #   oblique
-        if (
-            $exitObj->exitOrnament eq 'impass'
-            || $exitObj->exitOrnament eq 'mystery'
-            || $exitObj->retraceFlag
-        ) {
-            $weight = 600;
-            $style = 'normal';
-
-        } else {
-
-            $weight = 400;
-
-            if ($exitObj->exitOrnament ne 'none') {
-                $style = 'oblique';
-            } elsif ($exitObj->randomType ne 'none') {
-                $style = 'italic';
-            } else {
-                $style = 'normal';
-            }
-        }
-
-        # Set the letter to be used, and its size and position
-        if ($mapDir eq 'up') {
-
-            # Decide which letter to use (upper case for 1-way/2-way exits, lower case for
-            #   uncertain/incomplete exits)
-            if ($exitObj->twinExit || $exitObj->oneWayFlag) {
-                $text = 'U';
-            } else {
-                $text = 'u';
-            }
-
-            # Draw the letter
-            $self->drawInteriorText(
-                $roomObj,
-                $self->borderCornerXPosPixels + $xPos,
-                $self->borderCornerYPosPixels + $yPos,
-                2,          # Bottom-left corner
-                $text,
-                $style,
-                $underline,
-                $weight,
-            );
-
-        } elsif ($mapDir eq 'down') {
-
-            # Decide which letter to use (upper case for 1-way/2-way exits, lower case for
-            #   uncertain/incomplete exits)
-            if ($exitObj->twinExit || $exitObj->oneWayFlag) {
-                $text = 'D';
-            } else {
-                $text = 'd';
-            }
-
-            # Draw the letter
-            $self->drawInteriorText(
-                $roomObj,
-                $self->borderCornerXPosPixels + $xPos,
-                $self->borderCornerYPosPixels + $yPos,
-                4,          # Bottom-right corner
-                $text,
-                $style,
-                $underline,
-                $weight,
-            );
-        }
-
-        return 1;
-    }
-
-    sub drawUnallocatableCount {
-
-        # Called by $self->drawRoom to display the number of unallocatable exits for this room in
-        #   the bottom-centre of the room box
-        #
-        # Expected arguments
-        #   $roomObj    - Blessed reference of the parent GA::ModelObj::Room
-        #   $count      - The number of unallocatable exits in this room
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $roomObj, $count, $check) = @_;
-
-        # Local variables
-        my ($xPos, $yPos, $text);
-
-        # Check for improper arguments
-        if (! defined $roomObj || ! defined $count || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawUnallocatedCount', @_);
-        }
-
-        # There's only room to draw a single figure so, if $count > 9, draw a '+'
-        if ($count > 9) {
-
-            $count = '+';
-        }
-
-        # Get the position of $roomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
-
-        # Draw the letter
-        $self->drawInteriorText(
-            $roomObj,
-            $self->borderCornerXPosPixels + $xPos,
-            $self->borderCornerYPosPixels + $yPos,
-            3,          # Bottom-centre
-            $count,
-            'normal',
-        );
-
-        return 1;
-    }
-
-    sub drawInteriorCounts {
-
-        # Called by $self->drawRoomInteriorInfo
-        # Draws up to two numbers in the room's interior, giving information about its exits and/or
-        #   contents
-        # Because of limited space, the maximum number drawn is 9. Numbers above that are drawn as a
-        #   '+'. The number 0 is not drawn at all
-        #
-        # Expected arguments
-        #   $roomObj    - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's border
-        #   $leftCount  - The number drawn in the top-left of the room's interior
-        #   $rightCount - The number drawn in the top-right of the room's interior
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my (
-            $self, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $leftCount,
-            $rightCount, $check
-        ) = @_;
-
-        # Check for improper arguments
-        if (
-            ! defined $roomObj || ! defined $borderCornerXPosPixels
-            || ! defined $borderCornerYPosPixels || ! defined $leftCount || ! defined $rightCount
-            || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorCounts', @_);
-        }
-
-        # Set maximum numbers
-        if ($leftCount && $leftCount > 9) {
-
-            $leftCount = '+';
-        }
-
-        if ($rightCount && $rightCount > 9) {
-
-            $rightCount = '+';
-        }
-
-        if ($leftCount) {
-
-            # Draw the count
-            $self->drawInteriorText(
-                $roomObj,
-                $borderCornerXPosPixels,
-                $borderCornerYPosPixels,
-                0,          # Top-left corner
-                $leftCount,
-            );
-        }
-
-        if ($rightCount) {
-
-            # Draw the count
-            $self->drawInteriorText(
-                $roomObj,
-                $borderCornerXPosPixels,
-                $borderCornerYPosPixels,
-                1,          # Top-right corner
-                $rightCount,
-            );
-        }
-
-        return 1;
-    }
-
-    sub drawRoomFlagText {
-
-        # Called by $self->drawRoomInteriorInfo
-        # Draws the room flag text - two letters which are equivalent to the room's highest-priority
-        #   room flag - in the room's interior
-        #
-        # Expected arguments
-        #   $roomObj    - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's border
-        #   $roomFlag   - The room flag to draw. Matches a key in
-        #                   GA::Obj::WorldModel->roomFlagHash
-        #
-        # Return values
-        #   'undef' on improper arguments, or if the correct room flag text can't be found
-        #   1 otherwise
-
-        my (
-            $self, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $roomFlag, $check,
-        ) = @_;
-
-        # Local variables
-        my $roomFlagObj;
-
-        # Check for improper arguments
-        if (
-            ! defined $roomObj || ! defined $borderCornerXPosPixels
-            || ! defined $borderCornerYPosPixels || ! defined $roomFlag || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomFlagText', @_);
-        }
-
-        # Get the short name itself (A two-letter scalar, e.g. 'St' for stash rooms)
-        $roomFlagObj = $self->worldModelObj->ivShow('roomFlagHash', $roomFlag);
-        if ($roomFlagObj) {
-
-            # Draw the label
-            $self->drawInteriorText(
-                $roomObj,
-                $borderCornerXPosPixels,
-                $borderCornerYPosPixels,
-                0,          # Top-left corner
-                $roomFlagObj->shortName,
-            );
-        }
-
-        return 1;
-    }
-
-    sub drawRoomSourceText {
-
-        # Called by $self->drawRoomInteriorInfo
-        # Draws the first four letters of the room's filename in the room's interior (this function
-        #   assumes that the room has a ->sourceCodePath value set)
-        #
-        # Expected arguments
-        #   $roomObj    - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's border
-        #
-        # Return values
-        #   'undef' on improper arguments, or if the correct room flag text can't be found
-        #   1 otherwise
-
-        my ($self, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $check) = @_;
-
-        # Local variables
-        my $text;
-
-        # Check for improper arguments
-        if (
-            ! defined $roomObj || ! defined $borderCornerXPosPixels
-            || ! defined $borderCornerYPosPixels || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawRoomSourceText', @_);
-        }
-
-        # Split a file path like /home/name/ds/lib/domains/town/room/start.c into path,
-        #   filename and extension (we only want the filename)
-        $roomObj->sourceCodePath =~ m/^(.*\/)?(?:$|(.+?)(?:(\.[^.]*$)|$))/;
-        # Get the first three characters of the filename (e.g. 'sta')
-        $text = substr($2, 0, 3);
-        if ($text) {
-
-            # Draw the text
-            $self->drawInteriorText(
-                $roomObj,
-                $borderCornerXPosPixels,
-                $borderCornerYPosPixels,
-                0,          # Top-left corner
-                $text,
-            );
-        }
-
-        return 1;
-    }
-
-    sub drawInteriorVisits {
-
-        # Called by $self->drawRoomInteriorInfo
-        # Draws a single number in the room's interior, showing the number of times a character has
-        #   visited the room
-        # Because of limited space, the maximum number drawn is 999. Numbers above that are drawn
-        #   as '1k', '2k', or even '1m' (etc). The number 0 is not drawn at all
-        #
-        # Expected arguments
-        #   $roomObj    - The GA::ModelObj::Room being drawn
-        #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's border
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $check) = @_;
-
-        # Local variables
-        my ($name, $visitCount);
-
-        # Check for improper arguments
-        if (
-            ! defined $roomObj || ! defined $borderCornerXPosPixels
-            || ! defined $borderCornerYPosPixels || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorVisits', @_);
-        }
-
-        # If $self->showChar specifies a character, show that character's visits. Otherwise, show
-        #   visits of the current character (if there is one)
-        if ($self->showChar) {
-            $name = $self->showChar;
-        } elsif ($self->session->currentChar) {
-            $name = $self->session->currentChar->name;
-        }
-
-        if ($name && $roomObj->ivExists('visitHash', $name)) {
-
-            # Get the number of times character $name has visited the room $roomObj
-            $visitCount = $roomObj->ivShow('visitHash', $name);
-
-            # Set maximum number to draw (because of limited space inside the room)
-            if ($visitCount && $visitCount > 999999) {
-
-                $visitCount = '1m+';        # Absolute maximum
-
-            } elsif ($visitCount > 999) {
-
-                $visitCount = int($visitCount / 1000) . 'k';
-            }
-
-            # Draw the number of visits
-            $self->drawInteriorText(
-                $roomObj,
-                $borderCornerXPosPixels,
-                $borderCornerYPosPixels,
-                0,          # Top-left corner
-                $visitCount,
-            );
-        }
-
-        return 1;
-    }
-
-    sub drawInteriorProfiles {
-
-        # Called by $self->drawRoomInteriorInfo
-        # Draws two bits of text in the room's interior - a symbol to show whether the room's
-        #   ->exclusiveFlag is set, and the number of exclusive profiles for the room (if there
-        #   is only one, the first two characters of the profile's name are drawn instead)
-        #
-        # Expected arguments
-        #   $roomObj    - The GA::ModelObj::Room being drawn
-        #   $borderCornerXPosPixels, $borderCornerYPosPixels
-        #               - Coordinates of the pixel at the top-left corner of the room's border
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $roomObj, $borderCornerXPosPixels, $borderCornerYPosPixels, $check) = @_;
-
-        # Local variables
-        my (
-            $string,
-            @profList,
-        );
-
-        # Check for improper arguments
-        if (
-            ! defined $roomObj || ! defined $borderCornerXPosPixels
-            || ! defined $borderCornerYPosPixels || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->drawInteriorProfiles', @_);
-        }
-
-        # Create a string to draw
-        if ($roomObj->exclusiveFlag) {
-            $string = '*';
-        } else {
-            $string = ' ';
-        }
-
-        if ($roomObj->exclusiveHash) {
-
-            @profList = $roomObj->ivKeys('exclusiveHash');
-
-            # Only one exclusive profile, so use its name
-            if (@profList == 1) {
-
-                $string .= substr($profList[0], 0, 3);
-
-            # More than one exclusive profile, so use the number of profiles
-            } elsif (@profList > 99) {
-
-                # Number is too large to fit
-                $string .= '99+';
-
-            } else {
-
-                $string .= scalar @profList;
-            }
-        }
-
-        # Draw the string
-        $self->drawInteriorText(
-            $roomObj,
-            $borderCornerXPosPixels,
-            $borderCornerYPosPixels,
-            0,          # Top-left corner
-            $string,
-        );
 
         return 1;
     }
@@ -36266,6 +38813,7 @@
         # Expected arguments
         #   $exitObj        - The GA::Obj::Exit being drawn in a drawing cycle initiated by
         #                       $self->doDraw
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by GA::Obj::Exit's parent room
         #
@@ -36285,14 +38833,14 @@
         #   1 otherwise
 
         my (
-            $self, $exitObj, $colour, $xPos, $yPos, $twinExitObj, $destXPos, $destYPos,
-            $posnListRef, $check,
+            $self, $exitObj, $canvasWidget, $colour, $xPos, $yPos, $twinExitObj, $destXPos,
+            $destYPos, $posnListRef, $check,
         ) = @_;
 
         # Check for improper arguments
         if (
-            ! defined $exitObj || ! defined $colour || ! defined $xPos || ! defined $yPos
-            || defined $check
+            ! defined $exitObj || ! defined $canvasWidget || ! defined $colour || ! defined $xPos
+            || ! defined $yPos || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawExitOrnaments', @_);
         }
@@ -36303,36 +38851,48 @@
             if ($exitObj->exitOrnament eq 'break') {
 
                 $self->drawBreakableOrnament(
-                    $exitObj, $exitObj,
+                    $exitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $xPos, $yPos,
+                    $xPos,
+                    $yPos,
                     $posnListRef,
                 );
 
             } elsif ($exitObj->exitOrnament eq 'pick') {
 
                 $self->drawPickableOrnament(
-                    $exitObj, $exitObj,
+                    $exitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $xPos, $yPos,
+                    $xPos,
+                    $yPos,
                     $posnListRef,
                 );
 
             } elsif ($exitObj->exitOrnament eq 'lock') {
 
                 $self->drawLockableOrnament(
-                    $exitObj, $exitObj,
+                    $exitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $xPos, $yPos,
+                    $xPos,
+                    $yPos,
                     $posnListRef,
                 );
 
             } elsif ($exitObj->exitOrnament eq 'open') {
 
                 $self->drawOpenableOrnament(
-                    $exitObj, $exitObj,
+                    $exitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $xPos, $yPos,
+                    $xPos,
+                    $yPos,
                     $posnListRef,
                 );
             }
@@ -36344,36 +38904,48 @@
             if ($twinExitObj->exitOrnament eq 'break') {
 
                 $self->drawBreakableOrnament(
-                    $twinExitObj, $exitObj,
+                    $twinExitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $destXPos, $destYPos,
+                    $destXPos,
+                    $destYPos,
                     $posnListRef,
                 );
 
             } elsif ($twinExitObj->exitOrnament eq 'pick') {
 
                 $self->drawPickableOrnament(
-                    $twinExitObj, $exitObj,
+                    $twinExitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $destXPos, $destYPos,
+                    $destXPos,
+                    $destYPos,
                     $posnListRef,
                 );
 
             } elsif ($twinExitObj->exitOrnament eq 'lock') {
 
                 $self->drawLockableOrnament(
-                    $twinExitObj, $exitObj,
+                    $twinExitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $destXPos, $destYPos,
+                    $destXPos,
+                    $destYPos,
                     $posnListRef,
                 );
 
             } elsif ($twinExitObj->exitOrnament eq 'open') {
 
                 $self->drawOpenableOrnament(
-                    $twinExitObj, $exitObj,
+                    $twinExitObj,
+                    $exitObj,
+                    $canvasWidget,
                     $colour,
-                    $destXPos, $destYPos,
+                    $destXPos,
+                    $destYPos,
                     $posnListRef,
                 );
             }
@@ -36395,6 +38967,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -36409,21 +38982,23 @@
         #   'undef' on improper arguments or if the ornament can't be drawn
         #   1 otherwise
 
-        my ($self, $parentObj, $drawObj, $colour, $xPos, $yPos, $posnListRef, $check) = @_;
+        my (
+            $self, $parentObj, $drawObj, $canvasWidget, $colour, $xPos, $yPos, $posnListRef, $check,
+        ) = @_;
 
         # Local variables
         my (
             $vectorRef, $perpVectorRef, $startXPosPixels, $startYPosPixels, $stopXPosPixels,
             $stopYPosPixels, $exitMiddleXPosPixels, $exitMiddleYPosPixels, $perpStartXPosPixels,
             $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels, $newObj, $newObj2,
-            $newObj3, $listRef, $posnSet,
+            $newObj3, $listRef, $roomObj, $posnSet,
             @polygonList,
         );
 
         # Check for improper arguments
         if (
-            ! defined $parentObj || ! defined $drawObj || ! defined $colour || ! defined $xPos
-            || ! defined $yPos || defined $check
+            ! defined $parentObj || ! defined $drawObj || ! defined $canvasWidget
+            || ! defined $colour || ! defined $xPos || ! defined $yPos || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawBreakableOrnament', @_);
         }
@@ -36469,37 +39044,37 @@
         # Find the ends of each half of the perpendicular line
         $perpStartXPosPixels = $exitMiddleXPosPixels + (
             $$perpVectorRef[0] * int(
-                ($self->currentRegionmap->blockWidthPixels
-                    - $self->currentRegionmap->roomWidthPixels
+                ($self->drawRegionmap->blockWidthPixels
+                    - $self->drawRegionmap->roomWidthPixels
                 ) / 3
             )
         );
         $perpStartYPosPixels = $exitMiddleYPosPixels + (
             $$perpVectorRef[1] * int(
-                ($self->currentRegionmap->blockHeightPixels
-                    - $self->currentRegionmap->roomHeightPixels
+                ($self->drawRegionmap->blockHeightPixels
+                    - $self->drawRegionmap->roomHeightPixels
                 ) / 3
             )
         );
 
         $perpStopXPosPixels = $exitMiddleXPosPixels + (
             $$perpVectorRef[2] * int(
-                ($self->currentRegionmap->blockWidthPixels
-                    - $self->currentRegionmap->roomWidthPixels
+                ($self->drawRegionmap->blockWidthPixels
+                    - $self->drawRegionmap->roomWidthPixels
                 ) / 3
             )
         );
         $perpStopYPosPixels = $exitMiddleYPosPixels + (
             $$perpVectorRef[3] * int(
-                ($self->currentRegionmap->blockHeightPixels
-                    - $self->currentRegionmap->roomHeightPixels
+                ($self->drawRegionmap->blockHeightPixels
+                    - $self->drawRegionmap->roomHeightPixels
                 ) / 3
             )
         );
 
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => [
                 $perpStartXPosPixels,
@@ -36515,24 +39090,30 @@
         # Now get the vertices of the polygon that would have been drawn in a pickable
         #   ornament
         push (@polygonList, $self->findPerpendicular(
-                $vectorRef, $perpVectorRef, -1,
+                $vectorRef,
+                $perpVectorRef,
+                -1,
                 $exitMiddleXPosPixels,
                 $exitMiddleYPosPixels,
+                $self->drawRegionmap,
             )
         );
 
         ($startXPosPixels, $startYPosPixels, $stopXPosPixels, $stopYPosPixels)
             = $self->findPerpendicular(
-                $vectorRef, $perpVectorRef, 1,
+                $vectorRef,
+                $perpVectorRef,
+                1,
                 $exitMiddleXPosPixels,
                 $exitMiddleYPosPixels,
+                $self->drawRegionmap,
             );
 
         push (@polygonList, $stopXPosPixels, $stopYPosPixels, $startXPosPixels, $startYPosPixels);
 
         # Draw lines between adjacent points on the polygon
         $newObj2 = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => [
                 $polygonList[0], $polygonList[1],
@@ -36544,7 +39125,7 @@
         );
 
         $newObj3 = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => [
                 $polygonList[2], $polygonList[3],
@@ -36556,9 +39137,10 @@
         );
 
         # Set the objects' position in the canvas drawing stack
-        $posnSet = $self->setExitLevel($newObj);
-        $self->setExitLevel($newObj2, $posnSet);
-        $self->setExitLevel($newObj3, $posnSet);
+        $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
+        $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+        $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
+        $self->setExitStackPosn($self->drawParchment, $newObj3, $roomObj, $posnSet);
 
         # Set up the event handler for the canvas objects
         $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
@@ -36566,13 +39148,11 @@
         $self->setupCanvasObjEvent('exit', $newObj3, $drawObj);
 
         # Store the canvas objects
-        if ($self->ivExists('drawnOrnamentHash', $drawObj->number)) {
-
-            $listRef = $self->ivShow('drawnOrnamentHash', $drawObj->number);
-        }
-
-        push (@$listRef, $newObj, $newObj2, $newObj3);
-        $self->ivAdd('drawnOrnamentHash', $drawObj->number, $listRef);
+        $self->drawParchment->addDrawnOrnament(
+            $roomObj,
+            $drawObj,
+            [$newObj, $newObj2, $newObj3],
+        );
 
         return 1;
     }
@@ -36590,6 +39170,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -36604,19 +39185,22 @@
         #   'undef' on improper arguments or if the ornament can't be drawn
         #   1 otherwise
 
-        my ($self, $parentObj, $drawObj, $colour, $xPos, $yPos, $posnListRef, $check) = @_;
+        my (
+            $self, $parentObj, $drawObj, $canvasWidget, $colour, $xPos, $yPos, $posnListRef, $check,
+        ) = @_;
 
         # Local variables
         my (
             $vectorRef, $perpVectorRef, $startXPosPixels, $startYPosPixels, $stopXPosPixels,
             $stopYPosPixels, $exitMiddleXPosPixels, $exitMiddleYPosPixels, $newObj, $listRef,
+            $roomObj,
             @polygonList,
         );
 
         # Check for improper arguments
         if (
-            ! defined $parentObj || ! defined $drawObj || ! defined $colour || ! defined $xPos
-            || ! defined $yPos || defined $check
+            ! defined $parentObj || ! defined $drawObj || ! defined $canvasWidget
+            || ! defined $colour || ! defined $xPos || ! defined $yPos || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawPickableOrnament', @_);
         }
@@ -36653,17 +39237,23 @@
         #   in @polygonList - a sequential list of coordinates of the vertices of the polygon,
         #   i.e. (x, y, x, y, ...)
         push (@polygonList, $self->findPerpendicular(
-                $vectorRef, $perpVectorRef, -1,
+                $vectorRef,
+                $perpVectorRef,
+                -1,
                 $exitMiddleXPosPixels,
                 $exitMiddleYPosPixels,
+                $self->drawRegionmap,
             )
         );
 
         ($startXPosPixels, $startYPosPixels, $stopXPosPixels, $stopYPosPixels)
             = $self->findPerpendicular(
-                $vectorRef, $perpVectorRef, 1,
+                $vectorRef,
+                $perpVectorRef,
+                1,
                 $exitMiddleXPosPixels,
                 $exitMiddleYPosPixels,
+                $self->drawRegionmap,
             );
 
         push (@polygonList, $stopXPosPixels, $stopYPosPixels, $startXPosPixels, $startYPosPixels);
@@ -36674,7 +39264,7 @@
 
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => \@polygonList,
             fill_color => $colour,
@@ -36683,19 +39273,14 @@
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setExitLevel($newObj);
+        $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
+        $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
 
         # Store the canvas object
-        if ($self->ivExists('drawnOrnamentHash', $drawObj->number)) {
-
-            $listRef = $self->ivShow('drawnOrnamentHash', $drawObj->number);
-        }
-
-        push (@$listRef, $newObj);
-        $self->ivAdd('drawnOrnamentHash', $drawObj->number, $listRef);
+        $self->drawParchment->addDrawnOrnament($roomObj, $drawObj, [$newObj]);
 
         return 1;
     }
@@ -36713,6 +39298,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -36727,20 +39313,22 @@
         #   'undef' on improper arguments or if the ornament can't be drawn
         #   1 otherwise
 
-        my ($self, $parentObj, $drawObj, $colour, $xPos, $yPos, $posnListRef, $check) = @_;
+        my (
+            $self, $parentObj, $drawObj, $canvasWidget, $colour, $xPos, $yPos, $posnListRef, $check,
+        ) = @_;
 
         # Local variables
         my (
             $exitMiddleXPosPixels, $exitMiddleYPosPixels, $vectorRef, $perpVectorRef,
             $perpStartXPosPixels, $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels,
-            $listRef,
+            $listRef, $roomObj,
             @factorList, @newObjList,
         );
 
         # Check for improper arguments
         if (
-            ! defined $parentObj || ! defined $drawObj || ! defined $colour || ! defined $xPos
-            || ! defined $yPos || defined $check
+            ! defined $parentObj || ! defined $drawObj || ! defined $canvasWidget
+            || ! defined $colour || ! defined $xPos || ! defined $yPos || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawLockableOrnament', @_);
         }
@@ -36786,11 +39374,12 @@
                     $factor,
                     $exitMiddleXPosPixels,
                     $exitMiddleYPosPixels,
+                    $self->drawRegionmap,
                 );
 
             # Draw the canvas object
             $newObj = Gnome2::Canvas::Item->new (
-                $self->canvasRoot,
+                $canvasWidget->root(),
                 'Gnome2::Canvas::Line',
                 points => [
                     $perpStartXPosPixels,
@@ -36804,7 +39393,8 @@
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitLevel($newObj);
+            $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
+            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
@@ -36813,13 +39403,7 @@
         }
 
         # Store the canvas objects
-        if ($self->ivExists('drawnOrnamentHash', $drawObj->number)) {
-
-            $listRef = $self->ivShow('drawnOrnamentHash', $drawObj->number);
-        }
-
-        push (@$listRef, @newObjList);
-        $self->ivAdd('drawnOrnamentHash', $drawObj->number, $listRef);
+        $self->drawParchment->addDrawnOrnament($roomObj, $drawObj, \@newObjList);
 
         return 1;
     }
@@ -36837,6 +39421,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
+        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -36851,18 +39436,22 @@
         #   'undef' on improper arguments, or if the ornament can't be drawn
         #   1 otherwise
 
-        my ($self, $parentObj, $drawObj, $colour, $xPos, $yPos, $posnListRef, $check) = @_;
+        my (
+            $self, $parentObj, $drawObj, $canvasWidget, $colour, $xPos, $yPos, $posnListRef,
+            $check,
+        ) = @_;
 
         # Local variables
         my (
             $exitMiddleXPosPixels, $exitMiddleYPosPixels, $perpVectorRef, $perpStartXPosPixels,
             $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels, $newObj, $listRef,
+            $roomObj,
         );
 
         # Check for improper arguments
         if (
-            ! defined $parentObj || ! defined $drawObj || ! defined $colour || ! defined $xPos
-            || ! defined $yPos || defined $check
+            ! defined $parentObj || ! defined $drawObj || ! defined $canvasWidget
+            || ! defined $colour || ! defined $xPos || ! defined $yPos || defined $check
         ) {
             return $axmud::CLIENT->writeImproper($self->_objClass . '->drawOpenableOrnament', @_);
         }
@@ -36893,37 +39482,37 @@
         # Find the ends of each half of the perpendicular line
         $perpStartXPosPixels = $exitMiddleXPosPixels + (
             $$perpVectorRef[0] * int(
-                ($self->currentRegionmap->blockWidthPixels
-                    - $self->currentRegionmap->roomWidthPixels
+                ($self->drawRegionmap->blockWidthPixels
+                    - $self->drawRegionmap->roomWidthPixels
                 ) / 3
             )
         );
         $perpStartYPosPixels = $exitMiddleYPosPixels + (
             $$perpVectorRef[1] * int(
-                ($self->currentRegionmap->blockHeightPixels
-                    - $self->currentRegionmap->roomHeightPixels
+                ($self->drawRegionmap->blockHeightPixels
+                    - $self->drawRegionmap->roomHeightPixels
                 ) / 3
             )
         );
 
         $perpStopXPosPixels = $exitMiddleXPosPixels + (
             $$perpVectorRef[2] * int(
-                ($self->currentRegionmap->blockWidthPixels
-                    - $self->currentRegionmap->roomWidthPixels
+                ($self->drawRegionmap->blockWidthPixels
+                    - $self->drawRegionmap->roomWidthPixels
                 ) / 3
             )
         );
         $perpStopYPosPixels = $exitMiddleYPosPixels + (
             $$perpVectorRef[3] * int(
-                ($self->currentRegionmap->blockHeightPixels
-                    - $self->currentRegionmap->roomHeightPixels
+                ($self->drawRegionmap->blockHeightPixels
+                    - $self->drawRegionmap->roomHeightPixels
                 ) / 3
             )
         );
 
         # Draw the canvas object
         $newObj = Gnome2::Canvas::Item->new (
-            $self->canvasRoot,
+            $canvasWidget->root(),
             'Gnome2::Canvas::Line',
             points => [
                 $perpStartXPosPixels,
@@ -36937,19 +39526,371 @@
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setExitLevel($newObj);
+        $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
+        $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
 
         # Store the canvas object
-        if ($self->ivExists('drawnOrnamentHash', $drawObj->number)) {
+        $self->drawParchment->addDrawnOrnament($roomObj, $drawObj, [$newObj]);
 
-            $listRef = $self->ivShow('drawnOrnamentHash', $drawObj->number);
+        return 1;
+    }
+
+    # Graphical operations - map object stack functions
+
+    sub setMapStackPosn {
+
+        # Called by $self->resetMap and ->refreshMap
+        # Sets the background canvas object's position in the canvas drawing stack
+        #
+        # The canvas drawing stack is organised like this:
+        #   8   - labels and draggable exits (placed at the top of the stack)
+        #   7   - room tags, room guilds and exit tags (lowered from the top)
+        #   6   - exits, exit ornaments and checked directions (lowered from the top)
+        #   5   - room interior text (raised from the bottom)
+        #   4   - room boxes (raised from the bottom)
+        #   3   - room echoes and fake room boxes (raised from the bottom)
+        #   2   - coloured rectangles on the map background (raised from the bottom)
+        #   1   - coloured blocks on the map background (raised from the bottom)
+        #   0   - map background (placed at the bottom of the stack)
+        #
+        # Expected arguments
+        #   $canvasObj      - The background canvas object which has just been drawn
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $canvasObj, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $canvasObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setMapStackPosn', @_);
         }
 
-        push (@$listRef, $newObj);
-        $self->ivAdd('drawnOrnamentHash', $drawObj->number, $listRef);
+        $canvasObj->lower_to_bottom();
+
+        return 1;
+    }
+
+    sub setSquareStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Coloured blocks are drawn as priority 1 (above the map background)
+        #
+        # Expected arguments
+        #   $canvasObj      - The canvas object which has just been drawn
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $canvasObj, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $canvasObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setSquareStackPosn', @_);
+        }
+
+        $canvasObj->lower_to_bottom();
+        $canvasObj->raise(1);
+
+        return 1;
+    }
+
+    sub setRectStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Coloured rectangles are drawn as priority 2 (above the map background and coloured blocks)
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
+        #   $canvasObj      - The canvas object which has just been drawn
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $canvasObj, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $parchmentObj || ! defined $canvasObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setRectStackPosn', @_);
+        }
+
+        $canvasObj->lower_to_bottom();
+        $canvasObj->raise(
+            $parchmentObj->ivPairs('colouredSquareHash')
+            # The younger rectangle must be drawn above older rectangles
+            + $parchmentObj->ivPairs('colouredRectHash')
+            + 1,
+        );
+
+        return 1;
+    }
+
+    sub setEchoStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Room echos and fake room boxes are drawn as priority 3 (above the map background, coloured
+        #   blocks and coloured rectangles)
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
+        #   $canvasObj      - The canvas object which has just been drawn
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $canvasObj, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $parchmentObj || ! defined $canvasObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setEchoStackPosn', @_);
+        }
+
+        $canvasObj->lower_to_bottom();
+        $canvasObj->raise(
+            $parchmentObj->ivPairs('colouredSquareHash')
+            + $parchmentObj->ivPairs('colouredRectHash')
+            + 1,
+        );
+
+        return 1;
+    }
+
+    sub setRoomStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Room boxes are drawn as priority 4 (above the map background, coloured squares, coloured
+        #   rectangles, room echos and fake room boxes)
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
+        #   $canvasObj      - The canvas object which has just been drawn
+        #   $roomObj        - The room model object which has just been drawn
+        #
+        # Optional arguments
+        #   $posn           - If this function has just been called by the same room-drawing
+        #                       function, we don't need to calculate the stack position; we can use
+        #                       the same one. Set to 'undef' otherwise
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   Otherwise returns the canvas object's drawing stack position, in case the same calling
+        #       function wants to call this function again
+
+        my ($self, $parchmentObj, $canvasObj, $roomObj, $posn, $check) = @_;
+
+        # Local variables
+        my $levelObj;
+
+        # Check for improper arguments
+        if (
+            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setRoomStackPosn', @_);
+        }
+
+        if (! defined $posn) {
+
+            $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
+
+            $posn = $parchmentObj->ivPairs('colouredSquareHash')
+                        + $parchmentObj->ivPairs('colouredRectHash')
+                        + $levelObj->ivPairs('drawnRoomEchoHash')
+                        + 1;
+        }
+
+        $canvasObj->lower_to_bottom();
+        $canvasObj->raise($posn);
+
+        return $posn;
+    }
+
+    sub setTextStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Room interior text is drawn as priority 5 (above the map background, coloured blocks,
+        #   coloured rectangles, room echos, fake room boxes and real room boxes)
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
+        #   $canvasObj      - The canvas object which has just been drawn
+        #   $roomObj        - The room model object which has just been drawn
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $canvasObj, $roomObj, $check) = @_;
+
+        # Local variables
+        my $levelObj;
+
+        # Check for improper arguments
+        if (
+            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setTextStackPosn', @_);
+        }
+
+        $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
+
+        $canvasObj->lower_to_bottom();
+        $canvasObj->raise(
+            $parchmentObj->ivPairs('colouredSquareHash')
+            + $parchmentObj->ivPairs('colouredRectHash')
+            + $levelObj->ivPairs('drawnRoomEchoHash')
+            + $levelObj->ivPairs('drawnRoomHash')
+            + $levelObj->ivPairs('drawnDummyRoomHash')
+            + 1
+        );
+
+        return 1;
+    }
+
+    sub setExitStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Exits and exit ornaments are drawn as priority 6 (below labels, draggable exits, room
+        #   tags, room guilds and exit tags)
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
+        #   $canvasObj      - The canvas object which has just been drawn
+        #   $roomObj        - The exit's parent room model object
+        #
+        # Optional arguments
+        #   $posn           - If this function has just been called by the same exit-drawing
+        #                       function, we don't need to calculate the stack position; we can use
+        #                       the same one. Set to 'undef' otherwise
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   Otherwise returns the canvas object's drawing stack position, in case the same calling
+        #       function wants to call this function again
+
+        my ($self, $parchmentObj, $canvasObj, $roomObj, $posn, $check) = @_;
+
+        # Local variables
+        my $levelObj;
+
+        # Check for improper arguments
+        if (
+            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setExitStackPosn', @_);
+        }
+
+        if (! $posn) {
+
+            $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
+
+            $posn = $levelObj->ivPairs('drawnLabelHash')
+                        + $levelObj->ivPairs('drawnRoomTagHash')
+                        + $levelObj->ivPairs('drawnRoomGuildHash')
+                        + $levelObj->ivPairs('drawnExitTagHash');
+        }
+
+        $canvasObj->raise_to_top();
+
+        # (The call to $canvasObj->lower won't accept a value of 0, so only call it for a positive
+        #   value)
+        if ($posn) {
+
+            $canvasObj->lower($posn);
+        }
+
+        return $posn;
+    }
+
+    sub setTagStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Room tags, room guilds and exit tags are drawn as priority 7 (below labels and draggable
+        #   exits)
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
+        #   $canvasObj      - The canvas object which has just been drawn
+        #   $roomObj        - The room model object (for exit tags, the exit's parent room)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $canvasObj, $roomObj, $check) = @_;
+
+        # Local variables
+        my ($levelObj, $posn);
+
+        # Check for improper arguments
+        if (
+            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
+        ) {
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setTagStackPosn', @_);
+        }
+
+        $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
+        $posn = $levelObj->ivPairs('drawnLabelHash');
+
+        $canvasObj->raise_to_top();
+
+        # (The call to $canvasObj->lower won't accept a value of 0, so only call it for a positive
+        #   value)
+        if ($posn) {
+
+            $canvasObj->lower($posn);
+        }
+
+        return 1;
+    }
+
+    sub setLabelStackPosn {
+
+        # Called by various drawing functions
+        # Sets the canvas object's position in the canvas drawing stack
+        #
+        # Labels (and draggable exits) are drawn as priority 8 (above everything else)
+        #
+        # Expected arguments
+        #   $canvasObj      - The canvas object which has just been drawn
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $canvasObj, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $canvasObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->setLabelStackPosn', @_);
+        }
+
+        $canvasObj->raise_to_top();
 
         return 1;
     }
@@ -36959,7 +39900,7 @@
     sub getBlockCorner {
 
         # Called by various functions
-        # Find the coordinates on the pixmap of the pixel occupying the top-left corner of the
+        # Find the coordinates on the canvas of the pixel occupying the top-left corner of the
         #   specified gridblock
         #
         # Expected arguments
@@ -36967,6 +39908,8 @@
         #           - Grid coordinates of a gridblock
         #
         # Optional arguments
+        #   $regionmapObj
+        #           - The regionmap to use. If not specified, $self->currentRegionmap is used
         #   $flag   - If set to TRUE, the gridblock coordinates are checked for validity. If set to
         #               FALSE (or 'undef'), we assume that they're valid
         #
@@ -36974,7 +39917,7 @@
         #   An empty list on improper arguments
         #   Otherwise, returns the pixel's coordinates as a list in the form (x, y)
 
-        my ($self, $xPosBlocks, $yPosBlocks, $flag, $check) = @_;
+        my ($self, $xPosBlocks, $yPosBlocks, $regionmapObj, $flag, $check) = @_;
 
         # Local variables
         my @emptyList;
@@ -36986,14 +39929,20 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Check the arguments, if necessary
         if ($flag) {
 
             if (
-                ! $self->currentRegionmap->checkGridBlock(
+                ! $regionmapObj->checkGridBlock(
                     $xPosBlocks,
                     $yPosBlocks,
-                    $self->currentRegionmap->currentLevel,
+                    $regionmapObj->currentLevel,
                 )
             ) {
                 return @emptyList;
@@ -37002,15 +39951,15 @@
 
         # Return the coordinates
         return (
-            $xPosBlocks * $self->currentRegionmap->blockWidthPixels,
-            $yPosBlocks * $self->currentRegionmap->blockHeightPixels,
+            $xPosBlocks * $regionmapObj->blockWidthPixels,
+            $yPosBlocks * $regionmapObj->blockHeightPixels,
         );
     }
 
     sub getBlockCentre {
 
         # Called by various functions
-        # Find the coordinates on the pixmap of the pixel occupying the centre of the specified
+        # Find the coordinates on the canvas of the pixel occupying the centre of the specified
         #   gridblock (and of the room, if there is one)
         #
         # Expected arguments
@@ -37022,6 +39971,8 @@
         #           - The coordinates of the top-left pixel of the gridblock (the return values of
         #               $self->getBlockCorner). If not specified, $self->getBlockCorner is called to
         #               get them)
+        #   $regionmapObj
+        #           - The regionmap to use. If not specified, $self->currentRegionmap is used
         #   $flag   - If set to TRUE, the gridblock coordinates are checked for validity. If set to
         #               FALSE (or 'undef'), we assume that they're valid
         #
@@ -37030,8 +39981,8 @@
         #   Otherwise, the pixel's coordinates in a list in the form (x, y)
 
         my (
-            $self, $xPosBlocks, $yPosBlocks, $blockCornerXPosPixels, $blockCornerYPosPixels, $flag,
-            $check
+            $self, $xPosBlocks, $yPosBlocks, $blockCornerXPosPixels, $blockCornerYPosPixels,
+            $regionmapObj, $flag, $check,
         ) = @_;
 
         # Local variables
@@ -37044,14 +39995,20 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Check the arguments, if necessary
         if ($flag) {
 
             if (
-                ! $self->currentRegionmap->checkGridBlock(
+                ! $regionmapObj->checkGridBlock(
                     $xPosBlocks,
                     $yPosBlocks,
-                    $self->currentRegionmap->currentLevel,
+                    $regionmapObj->currentLevel,
                 )
             ) {
                 return @emptyList;
@@ -37062,20 +40019,20 @@
         if (! defined $blockCornerXPosPixels) {
 
             ($blockCornerXPosPixels, $blockCornerYPosPixels)
-                = $self->getBlockCorner($xPosBlocks, $yPosBlocks);
+                = $self->getBlockCorner($xPosBlocks, $yPosBlocks, $regionmapObj);
         }
 
         # Return the coordinates
         return (
-            $blockCornerXPosPixels + int($self->currentRegionmap->blockWidthPixels / 2),
-            $blockCornerYPosPixels + int($self->currentRegionmap->blockHeightPixels / 2),
+            $blockCornerXPosPixels + int($regionmapObj->blockWidthPixels / 2),
+            $blockCornerYPosPixels + int($regionmapObj->blockHeightPixels / 2),
         );
     }
 
     sub getBorderCorner {
 
         # Called by various functions
-        # Find the coordinates on the pixmap of the pixel occupying the top-left corner of a room's
+        # Find the coordinates on the canvas of the pixel occupying the top-left corner of a room's
         #   border in the specified gridblock (if a room is drawn in this gridblock)
         #
         # Expected arguments
@@ -37087,6 +40044,8 @@
         #           - The coordinates of the top-left pixel of the gridblock (the return values of
         #               $self->getBlockCorner). If not specified, $self->getBlockCorner is called to
         #               get them)
+        #   $regionmapObj
+        #           - The regionmap to use. If not specified, $self->currentRegionmap is used
         #   $flag   - If set to TRUE, the gridblock coordinates are checked for validity. If set to
         #               FALSE (or 'undef'), we assume that they're valid
         #
@@ -37095,8 +40054,8 @@
         #   Otherwise, the pixel's coordinates in a list in the form (x, y)
 
         my (
-            $self, $xPosBlocks, $yPosBlocks, $blockCornerXPosPixels, $blockCornerYPosPixels, $flag,
-            $check
+            $self, $xPosBlocks, $yPosBlocks, $blockCornerXPosPixels, $blockCornerYPosPixels,
+            $regionmapObj, $flag, $check,
         ) = @_;
 
         # Local variables
@@ -37109,14 +40068,20 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Check the arguments, if necessary
         if ($flag) {
 
             if (
-                ! $self->currentRegionmap->checkGridBlock(
+                ! $regionmapObj->checkGridBlock(
                     $xPosBlocks,
                     $yPosBlocks,
-                    $self->currentRegionmap->currentLevel,
+                    $regionmapObj->currentLevel,
                 )
             ) {
                 return @emptyList;
@@ -37127,22 +40092,16 @@
         if (! defined $blockCornerXPosPixels) {
 
             ($blockCornerXPosPixels, $blockCornerYPosPixels)
-                = $self->getBlockCorner($xPosBlocks, $yPosBlocks);
+                = $self->getBlockCorner($xPosBlocks, $yPosBlocks, $regionmapObj);
         }
 
         # Return the coordinates
         return (
             $blockCornerXPosPixels + int(
-                (
-                    $self->currentRegionmap->blockWidthPixels
-                        - $self->currentRegionmap->roomWidthPixels
-                ) / 2
+                ($regionmapObj->blockWidthPixels - $regionmapObj->roomWidthPixels) / 2
             ),
             $blockCornerYPosPixels + int(
-                (
-                    $self->currentRegionmap->blockHeightPixels
-                        - $self->currentRegionmap->roomHeightPixels
-                ) / 2
+                ($regionmapObj->blockHeightPixels - $regionmapObj->roomHeightPixels) / 2
             ),
         );
     }
@@ -37150,7 +40109,7 @@
     sub getBlockEdge {
 
         # Called by various functions
-        # Find the coordinates on the pixmap of the pixel at the edge of a gridblock which is
+        # Find the coordinates on the canvas of the pixel at the edge of a gridblock which is
         #   intersected by a cardinal exit
         #
         # Expected arguments
@@ -37165,6 +40124,8 @@
         #   $blockCentreXPosPixels, $blockCentreYPosPixels
         #           - The coordinates of the pixel at the centre of the gridblock (and of the room,
         #               if one is drawn there)
+        #   $regionmapObj
+        #           - The regionmap to use. If not specified, $self->currentRegionmap is used
         #   $flag   - If set to TRUE, the gridblock coordinates are checked for validity. If set to
         #               FALSE (or 'undef'), we assume that they're valid
         #
@@ -37174,7 +40135,7 @@
 
         my (
             $self, $xPosBlocks, $yPosBlocks, $vectorRef, $blockCentreXPosPixels,
-            $blockCentreYPosPixels, $flag, $check,
+            $blockCentreYPosPixels, $regionmapObj, $flag, $check,
         ) = @_;
 
         # Local variables
@@ -37188,14 +40149,20 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Check the arguments, if necessary
         if ($flag) {
 
             if (
-                ! $self->currentRegionmap->checkGridBlock(
+                ! $regionmapObj->checkGridBlock(
                     $xPosBlocks,
                     $yPosBlocks,
-                    $self->currentRegionmap->currentLevel,
+                    $regionmapObj->currentLevel,
                 )
             ) {
                 return @emptyList;
@@ -37206,20 +40173,16 @@
         if (! defined $blockCentreXPosPixels) {
 
             ($blockCentreXPosPixels, $blockCentreYPosPixels)
-                = $self->getBlockCentre($xPosBlocks, $yPosBlocks);
+                = $self->getBlockCentre($xPosBlocks, $yPosBlocks, undef, undef, $regionmapObj);
         }
 
         # Return the coordinates
         return (
             $blockCentreXPosPixels + (
-                $$vectorRef[0] * int(
-                    $self->currentRegionmap->blockWidthPixels / 2
-                )
+                $$vectorRef[0] * int($regionmapObj->blockWidthPixels / 2)
             ),
             $blockCentreYPosPixels + (
-                $$vectorRef[1] * int(
-                    $self->currentRegionmap->blockHeightPixels / 2
-                )
+                $$vectorRef[1] * int($regionmapObj->blockHeightPixels / 2)
             ),
         );
     }
@@ -37227,7 +40190,7 @@
     sub getNearBlockEdge {
 
         # Called by various functions
-        # Find the coordinates on the pixmap of the pixel near to the edge of a gridblock which is
+        # Find the coordinates on the canvas of the pixel near to the edge of a gridblock which is
         #   intersected by a cardinal exit (but not actually at the edge)
         #
         # Expected arguments
@@ -37242,6 +40205,8 @@
         #   $blockCentreXPosPixels, $blockCentreYPosPixels
         #           - The coordinates of the pixel at the centre of the gridblock (and of the room,
         #               if one is drawn there)
+        #   $regionmapObj
+        #           - The regionmap to use. If not specified, $self->currentRegionmap is used
         #   $flag   - If set to TRUE, the gridblock coordinates are checked for validity. If set to
         #               FALSE (or 'undef'), we assume that they're valid
         #
@@ -37251,7 +40216,7 @@
 
         my (
             $self, $xPosBlocks, $yPosBlocks, $vectorRef, $blockCentreXPosPixels,
-            $blockCentreYPosPixels, $flag, $check,
+            $blockCentreYPosPixels, $regionmapObj, $flag, $check,
         ) = @_;
 
         # Local variables
@@ -37266,14 +40231,20 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Check the arguments, if necessary
         if ($flag) {
 
             if (
-                ! $self->currentRegionmap->checkGridBlock(
+                ! $regionmapObj->checkGridBlock(
                     $xPosBlocks,
                     $yPosBlocks,
-                    $self->currentRegionmap->currentLevel,
+                    $regionmapObj->currentLevel,
                 )
             ) {
                 return @emptyList;
@@ -37284,24 +40255,22 @@
         if (! defined $blockCentreXPosPixels) {
 
             ($blockCentreXPosPixels, $blockCentreYPosPixels)
-                = $self->getBlockCentre($xPosBlocks, $yPosBlocks);
+                = $self->getBlockCentre($xPosBlocks, $yPosBlocks, undef, undef, $regionmapObj);
         }
 
         # Return the coordinates
         return (
             $blockCentreXPosPixels + (
                 $$vectorRef[0] * (
-                    int($self->currentRegionmap->blockWidthPixels / 2) - int(
-                        ($self->currentRegionmap->blockWidthPixels
-                            - $self->currentRegionmap->roomWidthPixels) / 4
+                    int($regionmapObj->blockWidthPixels / 2) - int(
+                        ($regionmapObj->blockWidthPixels - $regionmapObj->roomWidthPixels) / 4
                     )
                 )
             ),
             $blockCentreYPosPixels + (
                 $$vectorRef[1] * (
-                    int($self->currentRegionmap->blockHeightPixels / 2) - int(
-                        ($self->currentRegionmap->blockHeightPixels
-                            - $self->currentRegionmap->roomHeightPixels) / 4
+                    int($regionmapObj->blockHeightPixels / 2) - int(
+                        ($regionmapObj->blockHeightPixels - $regionmapObj->roomHeightPixels) / 4
                     )
                 )
             ),
@@ -37311,7 +40280,7 @@
     sub getExitStart {
 
         # Called by various functions
-        # Find the coordinates on the pixmap of the pixel at the edge of the room (i.e. one pixel
+        # Find the coordinates on the canvas of the pixel at the edge of the room (i.e. one pixel
         #   outside its border), from which a cardinal exit starts
         #
         # Expected arguments
@@ -37328,6 +40297,8 @@
         #               if one is drawn there)
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #           - Coordinates of the pixel at the top-left corner of the room's border
+        #   $regionmapObj
+        #           - The regionmap to use. If not specified, $self->currentRegionmap is used
         #   $flag   - If set to TRUE, the gridblock coordinates are checked for validity. If set to
         #               FALSE (or 'undef'), we assume that they're valid
         #
@@ -37337,8 +40308,8 @@
 
         my (
             $self, $xPosBlocks, $yPosBlocks, $vectorRef, $blockCentreXPosPixels,
-            $blockCentreYPosPixels, $borderCornerXPosPixels, $borderCornerYPosPixels, $flag,
-            $check
+            $blockCentreYPosPixels, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $regionmapObj, $flag, $check,
         ) = @_;
 
         # Local variables
@@ -37355,14 +40326,20 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Check the arguments, if necessary
         if ($flag) {
 
             if (
-                ! $self->currentRegionmap->checkGridBlock(
+                ! $regionmapObj->checkGridBlock(
                     $xPosBlocks,
                     $yPosBlocks,
-                    $self->currentRegionmap->currentLevel,
+                    $regionmapObj->currentLevel,
                 )
             ) {
                 return @emptyList;
@@ -37374,26 +40351,22 @@
         if (! defined $blockCentreXPosPixels) {
 
             ($blockCentreXPosPixels, $blockCentreYPosPixels)
-                = $self->getBlockCentre($xPosBlocks, $yPosBlocks);
+                = $self->getBlockCentre($xPosBlocks, $yPosBlocks, undef, undef, $regionmapObj);
         }
 
         if (! defined $borderCornerXPosPixels) {
 
             ($borderCornerXPosPixels, $borderCornerYPosPixels)
-                = $self->getBorderCorner($xPosBlocks, $yPosBlocks);
+                = $self->getBorderCorner($xPosBlocks, $yPosBlocks, undef, undef, $regionmapObj);
         }
 
         # Get the coordinates
         $exitStartXPosPixels = $blockCentreXPosPixels + (
-            $$vectorRef[0] * (
-                int($self->currentRegionmap->roomWidthPixels / 2) + 1
-            )
+            $$vectorRef[0] * (int($regionmapObj->roomWidthPixels / 2) + 1)
         );
 
         $exitStartYPosPixels = $blockCentreYPosPixels + (
-            $$vectorRef[1] * (
-                int($self->currentRegionmap->roomHeightPixels / 2) + 1
-            )
+            $$vectorRef[1] * (int($regionmapObj->roomHeightPixels / 2) + 1)
         );
 
         # This algorithm can produce a pixel located on the border itself, not just outside it.
@@ -37403,8 +40376,7 @@
             $exitStartXPosPixels--;
 
         } elsif (
-            $exitStartXPosPixels
-                == ($borderCornerXPosPixels + $self->currentRegionmap->roomWidthPixels - 1)
+            $exitStartXPosPixels == ($borderCornerXPosPixels + $regionmapObj->roomWidthPixels - 1)
         ) {
             $exitStartXPosPixels++;
         }
@@ -37414,8 +40386,7 @@
             $exitStartYPosPixels--;
 
         } elsif (
-            $exitStartYPosPixels
-                == ($borderCornerYPosPixels + $self->currentRegionmap->roomHeightPixels - 1)
+            $exitStartYPosPixels == ($borderCornerYPosPixels + $regionmapObj->roomHeightPixels - 1)
         ) {
             $exitStartYPosPixels++;
         }
@@ -37956,12 +40927,16 @@
         # Expected arguments
         #   $xPosPixels, $yPosPixels    - The coordinates of a pixel
         #
+        # Optional arguments
+        #   $regionmapObj
+        #           - The regionmap to use. If not specified, $self->currentRegionmap is used
+        #
         # Return values
         #   An empty list on improper argument or if no corresponding block exists (because the
         #       pixel coordinates are invalid)
         #   Otherwise, a list containing coordinates of the gridblock, in the form (x, y)
 
-        my ($self, $xPosPixels, $yPosPixels, $check) = @_;
+        my ($self, $xPosPixels, $yPosPixels, $regionmapObj, $check) = @_;
 
         # Local variables
         my (
@@ -37976,27 +40951,27 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Check that ($xPosPixels, $yPosPixels) is a set of coordinates that's actually on the
-        #   pixmap
+        #   canvas
         if (
             $xPosPixels < 0
             || $yPosPixels < 0
-            || $xPosPixels >= (
-                    $self->currentRegionmap->gridWidthBlocks
-                        * $self->currentRegionmap->blockWidthPixels
-                )
-            || $yPosPixels >= (
-                    $self->currentRegionmap->gridHeightBlocks
-                        * $self->currentRegionmap->blockHeightPixels
-                )
+            || $xPosPixels >= ($regionmapObj->gridWidthBlocks * $regionmapObj->blockWidthPixels)
+            || $yPosPixels >= ($regionmapObj->gridHeightBlocks * $regionmapObj->blockHeightPixels)
         ) {
             # Mouse click didn't occur in a gridblock
             return @emptyList;
         }
 
         # Find the block
-        $xPosBlocks = int ($xPosPixels / $self->currentRegionmap->blockWidthPixels);
-        $yPosBlocks = int ($yPosPixels / $self->currentRegionmap->blockHeightPixels);
+        $xPosBlocks = int ($xPosPixels / $regionmapObj->blockWidthPixels);
+        $yPosBlocks = int ($yPosPixels / $regionmapObj->blockHeightPixels);
 
         return ($xPosBlocks, $yPosBlocks);
     }
@@ -38016,11 +40991,15 @@
         #               - The coordinates of the clicked pixel
         #   $roomObj    - The GA::ModelObj::Room in this gridblock
         #
+        # Optional arguments
+        #   $regionmapObj
+        #               - The regionmap to use. If not specified, $self->currentRegionmap is used
+        #
         # Return values
         #   'undef' on improper arguments, or if the click isn't on (or very near) an exit
         #   Otherwise, returns the blessed reference of the closest GA::Obj::Exit
 
-        my ($self, $clickXPosPixels, $clickYPosPixels, $roomObj, $check) = @_;
+        my ($self, $clickXPosPixels, $clickYPosPixels, $roomObj, $regionmapObj, $check) = @_;
 
         # Local variables
         my (
@@ -38038,14 +41017,21 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->findClickedExit', @_);
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Get some coordinates that we'll need to pass to the functions that tell us where the exits
         #   are drawn
 
-        # Find the coordinates on the pixmap of the pixel occupying the top-left corner of the
+        # Find the coordinates on the canvas of the pixel occupying the top-left corner of the
         #   gridblock specified by $roomObj
         ($blockCornerXPosPixels, $blockCornerYPosPixels) = $self->getBlockCorner(
             $roomObj->xPosBlocks,
             $roomObj->yPosBlocks,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel occupying the centre of the block (and of the room)
@@ -38054,6 +41040,7 @@
             $roomObj->yPosBlocks,
             $blockCornerXPosPixels,
             $blockCornerYPosPixels,
+            $regionmapObj,
         );
         # Find the coordinates of the pixel at the top-left corner of the room's border
         ($borderCornerXPosPixels, $borderCornerYPosPixels) = $self->getBorderCorner(
@@ -38061,6 +41048,7 @@
             $roomObj->yPosBlocks,
             $blockCornerXPosPixels,
             $blockCornerYPosPixels,
+            $regionmapObj,
         );
 
         # Now, for each exit in this room...
@@ -38102,8 +41090,12 @@
                 #   ($stopXPosPixels, $stopYPosPixels)
                 ($startXPosPixels, $startYPosPixels, $stopXPosPixels, $stopYPosPixels)
                     = $self->findSquareExit(
-                        $roomObj, $exitObj, $mapDir,
-                        $blockCentreXPosPixels, $blockCentreYPosPixels,
+                        $roomObj,
+                        $exitObj,
+                        $mapDir,
+                        $blockCentreXPosPixels,
+                        $blockCentreYPosPixels,
+                        $regionmapObj,
                     );
 
                 if (
@@ -38130,11 +41122,14 @@
                 # It's a two-way exit or one-way exit (more than one gridblock)
                 ($startXPosPixels, $startYPosPixels, $stopXPosPixels, $stopYPosPixels)
                     = $self->findLongExit(
-                        $roomObj, $exitObj, $mapDir,
+                        $roomObj,
+                        $exitObj,
+                        $mapDir,
                         $blockCentreXPosPixels,
                         $blockCentreYPosPixels,
                         $borderCornerXPosPixels,
                         $borderCornerYPosPixels,
+                        $regionmapObj,
                     );
 
             } else {
@@ -38143,9 +41138,12 @@
                 # It's a two-way exit or one-way exit (more than one gridblock)
                 ($startXPosPixels, $startYPosPixels, $stopXPosPixels, $stopYPosPixels)
                     = $self->findShortExit(
-                        $roomObj, $exitObj, $mapDir,
+                        $roomObj,
+                        $exitObj,
+                        $mapDir,
                         $blockCentreXPosPixels,
                         $blockCentreYPosPixels,
+                        $regionmapObj,
                     );
             }
 
@@ -38359,6 +41357,8 @@
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #               - Coordinates of the pixel at the top-left corner of the room's border (if
         #                   'undef', calculated by this function)
+        #   $regionmapObj
+        #               - The regionmap to use. If not specified, $self->currentRegionmap is used
         #
         # Return values
         #   An empty list on improper arguments
@@ -38367,7 +41367,8 @@
 
         my (
             $self, $roomObj, $exitObj, $cardinalDir, $blockCentreXPosPixels,
-            $blockCentreYPosPixels, $borderCornerXPosPixels, $borderCornerYPosPixels, $check
+            $blockCentreYPosPixels, $borderCornerXPosPixels, $borderCornerYPosPixels,
+            $regionmapObj, $check,
         ) = @_;
 
         # Local variables
@@ -38387,14 +41388,21 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # If the four optional arguments weren't supplied, get them now
         if (! defined $borderCornerXPosPixels || ! defined $blockCentreXPosPixels) {
 
-            # Find the coordinates on the pixmap of the pixel occupying the top-left corner of the
+            # Find the coordinates on the canvas of the pixel occupying the top-left corner of the
             #   gridblock specified by $roomObj
             ($blockCornerXPosPixels, $blockCornerYPosPixels) = $self->getBlockCorner(
                 $roomObj->xPosBlocks,
                 $roomObj->yPosBlocks,
+                $regionmapObj,
             );
 
             # Find the coordinates of the pixel occupying the centre of the block (and of the room)
@@ -38403,6 +41411,7 @@
                 $roomObj->yPosBlocks,
                 $blockCornerXPosPixels,
                 $blockCornerYPosPixels,
+                $regionmapObj,
             );
 
             # Find the coordinates of the pixel at the top-left corner of the room's border
@@ -38411,6 +41420,7 @@
                 $roomObj->yPosBlocks,
                 $blockCornerXPosPixels,
                 $blockCornerYPosPixels,
+                $regionmapObj,
             );
         }
 
@@ -38436,13 +41446,15 @@
             $blockCentreYPosPixels,
             $borderCornerXPosPixels,
             $borderCornerYPosPixels,
+            $regionmapObj,
         );
 
-        # Find the coordinates on the pixmap of the pixel occupying the top-left corner of the
+        # Find the coordinates on the canvas of the pixel occupying the top-left corner of the
         #   gridblock occupied by the arrival room
         ($newBlockCornerXPosPixels, $newBlockCornerYPosPixels) = $self->getBlockCorner(
             $destRoomObj->xPosBlocks,
             $destRoomObj->yPosBlocks,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel occupying the centre of this block (and of its room)
@@ -38451,12 +41463,16 @@
             $destRoomObj->yPosBlocks,
             $newBlockCornerXPosPixels,
             $newBlockCornerYPosPixels,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel occupying the top-left corner of the room's border
         ($newBorderCornerXPosPixels, $newBorderCornerYPosPixels) = $self->getBorderCorner(
             $destRoomObj->xPosBlocks,
             $destRoomObj->yPosBlocks,
+            undef,
+            undef,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel at the edge of the arrival room, just outside the
@@ -38469,6 +41485,7 @@
             $newBlockCentreYPosPixels,
             $newBorderCornerXPosPixels,
             $newBorderCornerYPosPixels,
+            $regionmapObj,
         );
 
         # Return the coordinates of each end of the exit
@@ -38498,6 +41515,8 @@
         #   $blockCentreXPosPixels, $blockCentreYPosPixels
         #       - Coordinates of the pixel occupying the centre of the block (and of the room) (if
         #           'undef', calculated by this function)
+        #   $regionmapObj
+        #       - The regionmap to use. If not specified, $self->currentRegionmap is used
         #
         # Return values
         #   An empty list on improper arguments
@@ -38506,7 +41525,7 @@
 
         my (
             $self, $roomObj, $exitObj, $cardinalDir, $blockCentreXPosPixels, $blockCentreYPosPixels,
-            $check
+            $regionmapObj, $check,
         ) = @_;
 
         # Local variables
@@ -38524,14 +41543,21 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # If the two optional arguments weren't supplied, get them now
         if (! defined $blockCentreXPosPixels) {
 
-            # Find the coordinates on the pixmap of the pixel occupying the top-left corner of the
+            # Find the coordinates on the canvas of the pixel occupying the top-left corner of the
             #   gridblock specified by $roomObj
             ($blockCornerXPosPixels, $blockCornerYPosPixels) = $self->getBlockCorner(
                 $roomObj->xPosBlocks,
                 $roomObj->yPosBlocks,
+                $regionmapObj,
             );
 
             # Find the coordinates of the pixel occupying the centre of the block (and of the room)
@@ -38540,6 +41566,7 @@
                 $roomObj->yPosBlocks,
                 $blockCornerXPosPixels,
                 $blockCornerYPosPixels,
+                $regionmapObj,
             );
         }
 
@@ -38551,6 +41578,9 @@
         ($borderCornerXPosPixels, $borderCornerYPosPixels) = $self->getBorderCorner(
             $roomObj->xPosBlocks,
             $roomObj->yPosBlocks,
+            undef,
+            undef,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel at the edge of the room, just outside the border, from
@@ -38563,6 +41593,7 @@
             $blockCentreYPosPixels,
             $borderCornerXPosPixels,
             $borderCornerYPosPixels,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel at the edge of the gridblock, which is intersected by a
@@ -38573,6 +41604,7 @@
             $vectorRef,
             $blockCentreXPosPixels,
             $blockCentreYPosPixels,
+            $regionmapObj,
         );
 
         # Return the coordinates of each end of the exit
@@ -38601,6 +41633,8 @@
         #   $blockCentreXPosPixels, $blockCentreYPosPixels
         #               - Coordinates of the pixel occupying the centre of the block (and of the
         #                   room) (if 'undef', calculated by this function)
+        #   $regionmapObj
+        #               - The regionmap to use. If not specified, $self->currentRegionmap is used
         #
         # Return values
         #   An empty list on improper arguments
@@ -38611,7 +41645,7 @@
 
         my (
             $self, $roomObj, $exitObj, $cardinalDir, $blockCentreXPosPixels, $blockCentreYPosPixels,
-            $check
+            $regionmapObj, $check
         ) = @_;
 
         # Local variables
@@ -38630,6 +41664,12 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Find the exit's vector - a reference to a list of 3d coordinates, (x, y, z)
         #   e.g. northeast > (1, 1, 0)
         $vectorRef = $self->ivShow('constVectorHash', $cardinalDir);
@@ -38638,6 +41678,9 @@
         ($borderCornerXPosPixels, $borderCornerYPosPixels) = $self->getBorderCorner(
             $roomObj->xPosBlocks,
             $roomObj->yPosBlocks,
+            undef,
+            undef,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel at the edge of the room, just outside the border, from
@@ -38650,6 +41693,7 @@
             $blockCentreYPosPixels,
             $borderCornerXPosPixels,
             $borderCornerYPosPixels,
+            $regionmapObj,
         );
 
         # Find the coordinates of the pixel near (but not at) the edge of the gridblock, which is
@@ -38660,6 +41704,7 @@
             $vectorRef,
             $blockCentreXPosPixels,
             $blockCentreYPosPixels,
+            $regionmapObj,
         );
 
         # Adjust the coordinates of the two pixels at either end of the exit, so that it's easier to
@@ -38761,6 +41806,11 @@
         #   $exitMiddleXPosPixels, $exitMiddleYPosPixels
         #                   - The coordinates of the pixel in the middle of the exit line
         #
+        # Optional arguments
+        #   $regionmapObj
+        #                   - The regionmap to use. If not specified, $self->currentRegionmap is
+        #                       used
+        #
         # Return values
         #   An empty list on improper arguments
         #   Otherwise, returns the coordinates of the two pixels as a list in the form
@@ -38768,7 +41818,7 @@
 
         my (
             $self, $vectorRef, $perpVectorRef, $factor, $exitMiddleXPosPixels,
-            $exitMiddleYPosPixels, $check
+            $exitMiddleYPosPixels, $regionmapObj, $check,
         ) = @_;
 
         # Local variables
@@ -38786,40 +41836,38 @@
             return @emptyList;
         }
 
+        # Use the current regionmap, if none specified
+        if (! $regionmapObj) {
+
+            $regionmapObj = $self->currentRegionmap;
+        }
+
         # Find the ends of the perpendicular line
         $startXPosPixels =
             $exitMiddleXPosPixels + ($$vectorRef[0] * $factor) + (
                 $$perpVectorRef[0] * int(
-                    ($self->currentRegionmap->blockWidthPixels
-                        - $self->currentRegionmap->roomWidthPixels
-                    ) / 3
+                    ($regionmapObj->blockWidthPixels - $regionmapObj->roomWidthPixels) / 3
                 )
             );
 
         $startYPosPixels =
             $exitMiddleYPosPixels + ($$vectorRef[1] * $factor) + (
                 $$perpVectorRef[1] * int(
-                    ($self->currentRegionmap->blockHeightPixels
-                        - $self->currentRegionmap->roomHeightPixels
-                    ) / 3
+                    ($regionmapObj->blockHeightPixels - $regionmapObj->roomHeightPixels) / 3
                 )
             );
 
         $stopXPosPixels =
             $exitMiddleXPosPixels + ($$vectorRef[0] * $factor) + (
                 $$perpVectorRef[2] * int(
-                    ($self->currentRegionmap->blockWidthPixels
-                        - $self->currentRegionmap->roomWidthPixels
-                    ) / 3
+                    ($regionmapObj->blockWidthPixels - $regionmapObj->roomWidthPixels) / 3
                 )
             );
 
         $stopYPosPixels =
             $exitMiddleYPosPixels + ($$vectorRef[1] * $factor) + (
                 $$perpVectorRef[3] * int(
-                    ($self->currentRegionmap->blockHeightPixels
-                        - $self->currentRegionmap->roomHeightPixels
-                    ) / 3
+                    ($regionmapObj->blockHeightPixels - $regionmapObj->roomHeightPixels) / 3
                 )
             );
 
@@ -38931,7 +41979,8 @@
         }
 
         # Get the gridblock over which the mouse is positioned
-        ($xBlocks, $yBlocks) = $self->findGridBlock($clickXPosPixels, $clickYPosPixels);
+        ($xBlocks, $yBlocks)
+            = $self->findGridBlock($clickXPosPixels, $clickYPosPixels, $self->currentRegionmap);
         # Fetch the room at that gridblock, if any
         $destRoomNum = $self->currentRegionmap->fetchRoom(
             $xBlocks,
@@ -38980,6 +42029,7 @@
                 0,  # $roomObj->yPosBlocks,
                 0,  # $blockCornerXPosPixels,
                 0,  # $blockCornerYPosPixels,
+                $self->currentRegionmap,
             );
         }
 
@@ -39048,10 +42098,13 @@
         #   ...where 'start_section_x', 'start_section_y' are absolute coordinates of the start
         #       of the bending section, and where 'mouse_click_x', 'mouse_click_y', 'end_section_x'
         #       and 'end_section_y' are coordinates relative to the start, and 'result_type' gives
-        #       more information about the click: 1 if the click took place in the parent room's
-        #       gridblock, 2 if the click took place in the destination room's gridblock, 3 if the
-        #       click took place close enough to an existing bend, that no additional bend can be
-        #       added there, or 0 otherwise
+        #       more information about the click:
+        #
+        #       'parent_block' if the click took place in the parent room's gridblock
+        #       'dest_block' if the click took place in the destination room's gridblock
+        #       'near_bend' if the click took place close enough to an existing bend, that no
+        #           additional bend can be added there
+        #       'undef' otherwise
 
         my ($self, $exitObj, $clickXPos, $clickYPos, $check) = @_;
 
@@ -39127,7 +42180,7 @@
             && $clickYPos < ($yPos + $self->currentRegionmap->blockHeightPixels)
         ) {
             # Click took place inside the parent room's gridblock
-            $resultType = 1;
+            $resultType = 'parent_block';
 
         } elsif (
             $clickXPos >= $destXPos
@@ -39136,7 +42189,7 @@
             && $clickYPos < ($destYPos + $self->currentRegionmap->blockHeightPixels)
         ) {
             # Click took place inside the destination room's gridblock
-            $resultType = 2;
+            $resultType = 'dest_block';
 
         } else {
 
@@ -39163,17 +42216,12 @@
                     ) {
                         # Click took place close enough to a bend, that no additional bend can be
                         #   added at this point
-                        $resultType = 3;
+                        $resultType = 'near_bend';
                         # Don't check any remaining bends
                         @offsetList = ();
                     }
 
                 } until (! @offsetList);
-            }
-
-            if (! defined $resultType) {
-
-                $resultType = 0;
             }
         }
 
@@ -39545,7 +42593,7 @@
         # Returns a list containing the selected exit, its twin exit (if it has one), and any exits
         #   for which those two are the shadow exits
         # Also returns a hash, ready for display in a combobox, so that the user can select the
-        #   exit(s) on which to operate
+        #   exit(s) on which to perform an operation
         #
         # Expected arguments
         #   (none besides $self)
@@ -39556,7 +42604,7 @@
         #       to %exitHash
         #   %exitHash is in the form
         #       $exitHash{long_string_describing_exit} = blessed_ref_of_exit_object
-        #   @string contains a list of keys in %exitHash, in the order in which they were added
+        #   @stringList contains a list of keys in %exitHash, in the order in which they were added
 
         my ($self, $check) = @_;
 
@@ -39809,6 +42857,221 @@
         }
     }
 
+    sub promptNewRegion {
+
+        # Called by $self->newRegionCallback
+        # Prompts the user to enter a region name, parent region and size, and returns the values
+        #   entered
+        #
+        # Expected arguments
+        #   $tempFlag   - FALSE for a normal region, or TRUE for a temporary region
+        #
+        # Return values
+        #   On improper arguments or if the user clicks the cancel button, returns an empty list
+        #   Otherwise returns a list in the form:
+        #       (success_flag, region_name, parent_region_name, width_height)
+        #   ...where 'success_flag' is TRUE, and 'region_name' and/or 'parent_region_name' are
+        #       'undef' or a non-empty string
+
+        my ($self, $tempFlag, $check) = @_;
+
+        # Local variables
+        my (
+            $title, $spacing, $noParentString, $response, $name, $parentName, $string, $width,
+            $height,
+            @emptyList, @objList, @comboList, @sizeList, @comboList2,
+            %widthHash, %heightHash,
+        );
+
+        # Check for improper arguments
+        if (! defined $tempFlag || defined $check) {
+
+            $axmud::CLIENT->writeImproper($self->_objClass . '->promptNewRegion', @_);
+            return @emptyList;
+        }
+
+        # Set the 'dialogue' window title
+        if ($tempFlag) {
+            $title = 'New temporary region';
+        } else {
+            $title = 'New region';
+        }
+
+        # Set the correct spacing size for 'dialogue' windows
+        $spacing = $axmud::CLIENT->constFreeSpacingPixels;
+
+        # Get a sorted list of region objects
+        @objList = sort {lc($a->name) cmp lc($b->name)}
+                    ($self->worldModelObj->ivValues('regionModelHash'));
+        # Convert this list into region names
+        foreach my $obj (@objList) {
+
+            push (@comboList, $obj->name);
+        }
+
+        # The first item on the list should be an option to choose no parent at all
+        $noParentString = '<no parent region>';
+        unshift(@comboList, $noParentString);
+
+        # Prepare a list of map sizes
+        @sizeList = (
+            'Default (' . $self->worldModelObj->defaultGridWidthBlocks . '/'
+            . $self->worldModelObj->defaultGridHeightBlocks. ')',
+                $self->worldModelObj->defaultGridWidthBlocks,
+                $self->worldModelObj->defaultGridHeightBlocks,
+            'Tiny (11x11)',
+                11,
+                11,
+            'Very small (21x21)',
+                21,
+                21,
+            'Small (51x51)',
+                51,
+                51,
+            'Compact (101x101)',
+                101,
+                101,
+            'Normal (201x201)',
+                201,
+                201,
+            'Large (501x501)',
+                501,
+                501,
+            'Enormous (1001x1001)',
+                1001,
+                1001,
+        );
+
+        do {
+
+            my ($descrip, $width, $height);
+
+            $descrip = shift @sizeList;
+            $width = shift @sizeList;
+            $height = shift @sizeList;
+
+            # (The maximum size of a map shouldn't change, but check anyway)
+            if (
+                $width <= $self->worldModelObj->maxGridWidthBlocks
+                && $height <= $self->worldModelObj->maxGridHeightBlocks
+            ) {
+                push (@comboList2, $descrip);
+                $widthHash{$descrip} = $width;
+                $heightHash{$descrip} = $height;
+            }
+
+        } until (! @sizeList);
+
+        # That completes the setup. Now, show the 'dialogue' window
+        my $dialogueWin = Gtk2::Dialog->new(
+            $title,
+            $self->winWidget,
+            [qw/modal destroy-with-parent/],
+            'gtk-cancel'    => 'reject',
+            'gtk-ok'        => 'accept',
+        );
+
+        $dialogueWin->set_position('center-always');
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+
+        $dialogueWin->signal_connect('delete-event' => sub {
+
+            $dialogueWin->destroy();
+            $self->restoreFocus();
+
+            return @emptyList;
+        });
+
+        # Add widgets to the 'dialogue' window
+        my $vBox = $dialogueWin->vbox;
+        # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
+        #   Gtk2::VBox on the right, into which we put everything
+        my $vBox2 = $self->addDialogueIcon($vBox);
+
+        # Add widgets
+        my $label = Gtk2::Label->new();
+        $vBox2->pack_start($label, FALSE, FALSE, $spacing);
+        $label->set_alignment(0, 0);
+        $label->set_markup(
+            "Enter a name for the new region (max 32 chars),\n"
+            . "or leave empty to generate a generic name",
+        );
+
+        my $entry = Gtk2::Entry->new_with_max_length(32);
+        $vBox2->pack_start($entry, FALSE, FALSE, $spacing);
+
+        my $label2 = Gtk2::Label->new();
+        $vBox2->pack_start($label2, FALSE, FALSE, $spacing);
+        $label2->set_alignment(0, 0);
+        $label2->set_markup('(Optional) select the parent region');
+
+        my $combo = Gtk2::ComboBox->new_text();
+        $vBox2->pack_start($combo, FALSE, FALSE, $spacing);
+        foreach my $item (@comboList) {
+
+            $combo->append_text($item);
+        }
+
+        $combo->set_active(0);
+
+        my $label3 = Gtk2::Label->new();
+        $vBox2->pack_start($label3, FALSE, FALSE, $spacing);
+        $label3->set_alignment(0, 0);
+        $label3->set_markup('(Optional) change the map size');
+
+        my $combo2 = Gtk2::ComboBox->new_text();
+        $vBox2->pack_start($combo2, FALSE, FALSE, $spacing);
+        foreach my $item (@comboList2) {
+
+            $combo2->append_text($item);
+        }
+
+        $combo2->set_active(0);
+
+        # Display the 'dialogue' window
+        $vBox->show_all();
+
+        # Get the response
+        $response = $dialogueWin->run();
+
+        # If the user clicked 'cancel', $response will be 'reject'
+        if ($response ne 'accept') {
+
+            $dialogueWin->destroy();
+            # Restore focus to the Automapper window
+            $self->restoreFocus();
+
+            return @emptyList;
+
+        # Otherwise, user clicked 'ok', and we need to interpret the values types
+        } else {
+
+            $name = $entry->get_text();
+            if ($name eq '') {
+
+                $name = undef;
+            }
+
+            $parentName = $combo->get_active_text();
+            if ($parentName eq $noParentString) {
+
+                $parentName = undef;
+            }
+
+            $string = $combo2->get_active_text();
+            $width = $widthHash{$string};
+            $height = $heightHash{$string};
+
+            # Destroy the 'dialogue' window
+            $dialogueWin->destroy();
+            # Restore focus to the Automapper window
+            $self->restoreFocus();
+
+            # Return the specified data
+            return (TRUE, $name, $parentName, $width, $height);
+        }
+    }
+
     sub promptNewExit {
 
         # Called by $self->addExitCallback, ->changeDirCallback or ->setAssistedMoveCallback
@@ -39950,8 +43213,8 @@
             $title,
             $self->winWidget,
             [qw/modal destroy-with-parent/],
-            'gtk-cancel' => 'reject',
-            'gtk-ok'    => 'accept',
+            'gtk-cancel'    => 'reject',
+            'gtk-ok'        => 'accept',
         );
 
         $dialogueWin->set_position('center-always');
@@ -41318,1068 +44581,6 @@
         }
     }
 
-    # IV setting functions
-
-    sub setMode {
-
-        # Can be called by anything
-        # Sets the automapper's operating mode and updates other IVs/widgets
-        # NB If the Locator isn't running, a call to this function always sets the mode to 'wait'
-        #
-        # Expected arguments
-        #   $mode   - The new mode:
-        #               'wait'      - The automapper isn't doing anything
-        #               'follow'    - The automapper is following the character's position, but not
-        #                               updating the world model
-        #               'update'    - The automapper is updating the world model as the character
-        #                               moves around
-        #
-        # Return values
-        #   'undef' on improper arguments, or if an attempt to switch to 'update' mode fails because
-        #       the Locator task is expecting room descriptions
-        #   1 otherwise
-
-        my ($self, $mode, $check) = @_;
-
-        # Local variables
-        my (
-            $taskObj, $title, $oldMode, $menuItemName, $radioMenuItem, $toolbarButtonName,
-            $toolbarButton,
-        );
-
-        # Check for improper arguments
-        if (
-            ! defined $mode || ($mode ne 'wait' && $mode ne 'follow' && $mode ne 'update')
-            || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setMode', @_);
-        }
-
-        # Import the current session's Locator task
-        $taskObj = $self->session->locatorTask;
-
-        # If the Locator isn't running or if there is no current regionmap, the mode must be set to
-        #   'wait'
-        if (! $taskObj || ! $self->currentRegionmap) {
-
-            $mode = 'wait';
-
-        } elsif ($self->mode eq 'update' && $self->worldModelObj->disableUpdateModeFlag) {
-
-            # This function is called just after GA::Obj::WorldModel->toggleDisableUpdateModeFlag
-            #   has set ->disableUpdateModeFlag to TRUE. Now that update mode has been disabled,
-            #   switch to 'follow' mode
-            $mode = 'follow';
-
-        } elsif (
-            ($self->mode ne 'update' && $mode eq 'update')
-            || ($self->mode eq 'wait' && $mode eq 'follow')
-        ) {
-            # Don't switch to update mode if it is disabled, or if the session is in 'connect
-            #   offline' mode
-            if (
-                $mode eq 'update'
-                && (
-                    $self->worldModelObj->disableUpdateModeFlag
-                    || $self->session->status eq 'offline'
-                )
-            ) {
-                # Retain the current mode ('wait' or 'follow')
-                $mode = $self->mode;
-
-            # If we're trying to switch from 'wait' to 'follow' mode, or from 'wait/'follow' to
-            #   'update' mode, the Locator task must not be expecting room descriptions (doing this
-            #   prevents the map from adding rooms based on junk data, or from getting lost
-            #   immediately because it expected the wrong room)
-            # If the Locator is expecting descriptions, refuse to switch mode
-            } elsif ($taskObj->moveList) {
-
-                if ($taskObj->moveList == 1) {
-                    $title = 'Set mode (1 missing room statement)';
-                } else {
-                    $title = 'Set mode (' . scalar $taskObj->moveList . ' missing room statements)';
-                }
-
-                $self->showMsgDialogue(
-                    $title,
-                    'warning',
-                    'The automapper can\'t switch to \'' . $mode . '\' mode until the Locator task'
-                    . ' is no longer expecting any rooms (try: Rooms - Locator task - Reset'
-                    . ' Locator)',
-                    'ok',
-                );
-
-                # Retain the current mode ('wait' or 'follow')
-                $mode = $self->mode;
-            }
-        }
-
-        # We need to compare the old/new settings of $self->mode in a moment
-        $oldMode = $self->mode;
-        # Set the automapper's new operating mode
-        $self->ivPoke('mode', $mode);
-
-        # Even if $self->mode hasn't changed, it might not match the menu items and the toolbar
-        #   button; so we must make sure the right ones are activated. Use
-        #   $self->ignoreMenuUpdateFlag so that toggling a menu item doesn't toggle a toolbar icon
-        #   (and vice-versa)
-        $self->ivPoke('ignoreMenuUpdateFlag', TRUE);
-
-        # Update radio buttons in the menu (if the menu is visible)
-        $menuItemName = 'set_'. $mode . '_mode';
-        if ($self->menuBar && $self->ivExists('menuToolItemHash', $menuItemName)) {
-
-            $radioMenuItem = $self->ivShow('menuToolItemHash', $menuItemName);
-            $radioMenuItem->set_active(TRUE);
-        }
-
-        # Update toolbar buttons in the toolbar (if the toolbar is visible)
-        $toolbarButtonName = 'icon_set_'. $mode . '_mode';
-        if ($self->toolbarList && $self->ivExists('menuToolItemHash', $toolbarButtonName)) {
-
-            $toolbarButton = $self->ivShow('menuToolItemHash', $toolbarButtonName);
-            $toolbarButton->set_active(TRUE);
-        }
-
-        # Make sure that the radio/toolbar buttons for 'update mode' are sensitive, or not
-        $self->restrictUpdateMode();
-        $self->ivPoke('ignoreMenuUpdateFlag', FALSE);
-
-        # In case the automapper object's ghost room gets set to the wrong room, switching to
-        #   'wait' mode temporarily must reset it
-        if ($self->mode eq 'wait' && $self->mapObj->ghostRoom) {
-
-            $self->mapObj->setGhostRoom();      # Automatically redraws the room
-
-        # If switching from 'wait' to 'follow'/'update' mode and there is a current room set, the
-        #   ghost room will not be set, so st it
-        } elsif (
-            $oldMode eq 'wait'
-            && $self->mode ne 'wait'
-            && $self->mapObj->currentRoom
-            && ! $self->mapObj->ghostRoom
-        ) {
-            $self->mapObj->setGhostRoom($self->mapObj->currentRoom);
-        }
-
-        if ($self->mapObj->currentRoom) {
-
-            # Redraw the current room in its correct colour (default pink in 'wait' mode, default
-            #   red in 'follow'/'update' mode)
-            $self->doDraw('room', $self->mapObj->currentRoom);
-        }
-
-        return 1;
-    }
-
-    sub setCurrentRegion {
-
-        # Called by $self->treeViewRowActivated and $self->newRegionCallback. Also called by
-        #   GA::Obj::Map->setCurrentRoom
-        # Sets the new current region, and draws it on the map
-        #
-        # Expected arguments
-        #   (none besides $self)
-        #
-        # Optional arguments
-        #   $name       - The name of the region (matches a key in
-        #                   GA::Obj::WorldModel->regionmapHash). If set to 'undef', there is no
-        #                   current region (and an empty pixmap must be displayed)
-        #   $forceFlag  - Set to TRUE when called by GA::Obj::Map->setCurrentRoom. Changes the
-        #                   $name region's current level to show the current room, if there is one
-        #                   (otherwise, the current level is only changed when the automapper is in
-        #                   'follow' or 'update' mode)
-        #
-        # Return values
-        #   'undef' on improper arguments or if a specified region $name doesn't match a known
-        #       regionmap
-        #   1 otherwise
-
-        my ($self, $name, $forceFlag, $check) = @_;
-
-        # Local variables
-        my (
-            $scrollXPos, $scrollYPos, $regionmapObj, $currentRoom,
-            @newList,
-        );
-
-        # Check for improper arguments
-        if (defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setCurrentRegion', @_);
-        }
-
-        # If the tooltips are visible, hide them
-        $self->hideTooltips();
-
-        if ($self->currentRegionmap) {
-
-            # Remember the current position of the scrollbars so that, the next time this region is
-            #   opened, it can be shown in the same position (and at the same magnification)
-            ($scrollXPos, $scrollYPos) = $self->getMapPosn();
-            $self->currentRegionmap->ivPoke('scrollXPos', $scrollXPos);
-            $self->currentRegionmap->ivPoke('scrollYPos', $scrollYPos);
-        }
-
-        # If no region was specified...
-        if (! defined $name) {
-
-            # Reset the current region
-            $self->ivUndef('currentRegionmap');
-            $self->ivEmpty('recentRegionList');
-
-            # Change the window title back to its default
-            $self->setWinTitle();
-            # Redraw the drawing area widget, which will be without a map showing. Also redraw the
-            #   menu bar and title bar, so that the various checkbuttons/radiobuttons are showing
-            #   their neutral positions
-            $self->redrawWidgets('menu_bar', 'toolbar', 'canvas');
-
-            # Set the automapper's mode back to 'wait'
-            $self->setMode('wait');
-            # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-            $self->restrictWidgets();
-
-            return 1;
-        }
-
-        # Otherwise, find the regionmap matching the specified region
-        $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $name);
-        if ($regionmapObj) {
-
-            # Store the current region (if any) in the list of recent regionmap names
-            if ($self->currentRegionmap) {
-
-                foreach my $otherName ($self->recentRegionList) {
-
-                    if ($otherName ne $name && $otherName ne $self->currentRegionmap->name) {
-
-                        push (@newList, $otherName);
-                    }
-                }
-
-                if ($self->currentRegionmap ne $regionmapObj) {
-
-                    unshift (@newList, $self->currentRegionmap->name);
-                }
-
-                if ((scalar @newList) > 3) {
-
-                    @newList = splice(@newList, 0, 3);
-                }
-
-                $self->ivPoke('recentRegionList', @newList);
-            }
-
-            # Set this regionmap as the new current region
-            $self->ivPoke('currentRegionmap', $regionmapObj);
-
-            # If there's a current room and it is in this region, and assuming that we are in
-            #   follow/update mode (or if the calling function set $forceFlag to TRUE), and if that
-            #   room's map level isn't the one that's about to be displayed, change the current
-            #   level to the one containing the room
-            $currentRoom = $self->mapObj->currentRoom;
-            if (
-                ($self->mode eq 'follow' || $self->mode eq 'update' || $forceFlag)
-                && $currentRoom
-                && $currentRoom->parent       # Check that the room is in a region
-                && $self->currentRegionmap->number == $currentRoom->parent
-                && $self->currentRegionmap->currentLevel != $currentRoom->zPosBlocks
-            ) {
-                # Set the new current level to the same level as the current room
-                $self->setCurrentLevel(
-                    $currentRoom->zPosBlocks,
-                    TRUE,                       # Don't call ->drawRegion yet
-                );
-            }
-
-            # Change the window title to display the current region
-            $self->setWinTitle();
-            # Redraw the menu bar and title bar, so that the various checkbuttons/radiobuttons are
-            #   showing settings for the new current region
-            $self->redrawWidgets('menu_bar', 'toolbar');
-
-            # Draw the new current region
-            $self->drawRegion();
-            # Move the scrollbars to their former position
-            $self->setMapPosn(
-                $self->currentRegionmap->scrollXPos,
-                $self->currentRegionmap->scrollYPos,
-            );
-
-            # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-            $self->restrictWidgets();
-
-            # Make sure the correct region is highlighted in the treeview region list
-            $self->treeViewSelectLine($name);
-
-            return 1;
-
-        } else {
-
-            # Region $name doesn't seem to exist
-            return undef;
-        }
-    }
-
-    sub setCurrentLevel {
-
-        # Can be called by anything
-        # Changes the current regionmap's currently level, and redraws the map to show this level
-        #
-        # Expected arguments
-        #   $level          - The new current level, matching GA::Obj::Regionmap->currentLevel
-        #
-        # Optional arguments
-        #   $noDrawFlag     - If set to TRUE, this function doesn't call ->drawRegion, because the
-        #                       calling function is going to call it anyway (and we don't want to
-        #                       draw the region twice). Otherwise set to FALSE (or 'undef')
-        #
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $level, $noDrawFlag, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $level || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setCurrentLevel', @_);
-        }
-
-        # Set the new level
-        $self->currentRegionmap->ivPoke('currentLevel', $level);
-
-        # Change the window's title
-        $self->setWinTitle();
-
-        if (! $noDrawFlag) {
-
-            # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-            $self->restrictWidgets();
-
-            # Redraw the map to show this level
-            return $self->drawRegion();
-
-        } else {
-
-            # Assume that the calling function will call ->drawRegion
-            return 1;
-        }
-    }
-
-    sub setSelectedObj {
-
-        # Called by $self->mouseClickEvent or any other function
-        # Sets the currently selected object(s) - rooms, room tags, room guilds, exits, exit tags
-        #   and labels - or adds the object(s) to the existing hashes of selected objects
-        # Redraws the object(s) object along with any objects that are being unselected
-        #
-        # Expected arguments
-        #   (none besides $self)
-        #
-        # Optional arguments
-        #   $listRef        - If set, a reference to a list containing pairs of elements, each
-        #                       representing a room, room tag, room guild, exit, exit tag or label
-        #                   - The list is in the form (blessed_ref, mode, blessed_ref, mode...)
-        #                       where 'mode' is one of the strings 'room', 'exit', 'label',
-        #                       'room_tag', 'room_guild' or 'exit_tag'
-        #   $multipleFlag   - If set to TRUE, the object(s) were selected while holding down the
-        #                       CTRL key, so the object(s) are added to any existing selected
-        #                       objects
-        #                   - If set to FALSE (or 'undef'), all existing selected objects are
-        #                       unselected, before the first object in $listRef is selected (the
-        #                       others are ignored)
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $listRef, $multipleFlag, $check) = @_;
-
-        # Local variables
-        my (
-            $pairedRoomObj, $thisObj, $thisMode, $shadowExitObj,
-            @objList, @drawList,
-            %selectedRoomHash, %selectedRoomTagHash, %selectedRoomGuildHash, %selectedExitHash,
-            %selectedExitTagHash, %selectedLabelHash, %drawHash,
-        ) = @_;
-
-        # Check for improper arguments
-        if (defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setSelectedObj', @_);
-        }
-
-        # Selected broken/region exits have a paired twin exit and its parent room, which are drawn
-        #   a different colour. Whatever the new selected object(s) is going to be, a paired exit &
-        #   room must be reset and marked to be redrawn, if they exist
-        if ($self->pairedTwinRoom) {
-
-            # (Redrawing the paired room also redraws its paired exit, if there is one)
-            $pairedRoomObj = $self->pairedTwinRoom;
-            $self->ivUndef('pairedTwinRoom');
-            $self->ivUndef('pairedTwinExit');
-
-            # Mark the room to be redrawn
-            $self->markObjs('room', $pairedRoomObj);
-        }
-
-        # For quick lookup, import the hashes of selected rooms, room tags, room guilds, exits,
-        #   exit tags and labels
-        # NB No need to import the scalar IVs ->selectedRoom, ->selectedExit, etc
-        %selectedRoomHash = $self->selectedRoomHash;
-        %selectedRoomTagHash = $self->selectedRoomTagHash;
-        %selectedRoomGuildHash = $self->selectedRoomGuildHash;
-        %selectedExitHash = $self->selectedExitHash;
-        %selectedExitTagHash = $self->selectedExitTagHash;
-        %selectedLabelHash = $self->selectedLabelHash;
-
-        # Get the list referenced by $listRef (if it was specified - if not, use an empty list)
-        if ($listRef) {
-
-            @objList = @$listRef;
-        }
-
-        # If $multipleFlag isn't set to TRUE, $$listRef[0] is the only object which should now be
-        #   drawn as selected
-        if (! $multipleFlag) {
-
-            # @objList should contain 0 or 2 elements, representing 0 or 1 selected objects. If
-            #   there are more selected objects in the list, ignore all but the first one
-            if (@objList > 2) {
-
-                $thisObj = shift @objList;
-                $thisMode = shift @objList;
-
-                @objList = ($thisObj, $thisMode);
-            }
-
-            # Mark all existing selected objects as no longer selected, and add them to the redraw
-            #   list
-            if ($self->selectedRoom) {
-
-                push (@drawList, 'room', $self->selectedRoom);
-                $self->ivUndef('selectedRoom');
-            }
-
-            if (%selectedRoomHash) {
-
-                foreach my $number (keys %selectedRoomHash) {
-
-                    push (@drawList, 'room', $selectedRoomHash{$number});
-                }
-
-                %selectedRoomHash = ();
-            }
-
-            if ($self->selectedRoomTag) {
-
-                push (@drawList, 'room_tag', $self->selectedRoomTag);
-                $self->ivUndef('selectedRoomTag');
-            }
-
-            if (%selectedRoomTagHash) {
-
-                foreach my $number (keys %selectedRoomTagHash) {
-
-                    push (@drawList, 'room_tag', $selectedRoomTagHash{$number});
-                }
-
-                %selectedRoomTagHash = ();
-            }
-
-            if ($self->selectedRoomGuild) {
-
-                push (@drawList, 'room_guild', $self->selectedRoomGuild);
-                $self->ivUndef('selectedRoomGuild');
-            }
-
-            if (%selectedRoomGuildHash) {
-
-                foreach my $number (keys %selectedRoomGuildHash) {
-
-                    push (@drawList, 'room_guild', $selectedRoomGuildHash{$number});
-                }
-
-                %selectedRoomGuildHash = ();
-            }
-
-            if ($self->selectedExit) {
-
-                push (@drawList, 'exit', $self->selectedExit);
-
-                # If the selected exit has a shadow exit, the shadow exit will be drawn a different
-                #   colour, so it must also be redrawn
-                if ($self->selectedExit->shadowExit) {
-
-                    $shadowExitObj = $self->worldModelObj->ivShow(
-                        'exitModelHash',
-                        $self->selectedExit->shadowExit,
-                    );
-
-                    if ($shadowExitObj) {
-
-                        push (@drawList, 'exit', $shadowExitObj);
-                    }
-               }
-
-                $self->ivUndef('selectedExit');
-            }
-
-            if (%selectedExitHash) {
-
-                foreach my $number (keys %selectedExitHash) {
-
-                    push (@drawList, 'exit', $selectedExitHash{$number});
-                }
-
-                %selectedExitHash = ();
-            }
-
-            if ($self->selectedExitTag) {
-
-                push (@drawList, 'exit_tag', $self->selectedExitTag);
-                $self->ivUndef('selectedExitTag');
-            }
-
-            if (%selectedExitTagHash) {
-
-                foreach my $number (keys %selectedExitTagHash) {
-
-                    push (@drawList, 'exit_tag', $selectedExitTagHash{$number});
-                }
-
-                %selectedExitTagHash = ();
-            }
-
-            if ($self->selectedLabel) {
-
-                push (@drawList, 'label', $self->selectedLabel);
-                $self->ivUndef('selectedLabel');
-            }
-
-            if (%selectedLabelHash) {
-
-                foreach my $id (keys %selectedLabelHash) {
-
-                    push (@drawList, 'label', $selectedLabelHash{$id});
-                }
-
-                %selectedLabelHash = ();
-            }
-        }
-
-        # Now, select each object in turn (if any were specified), and add them to the redraw list
-        if (@objList) {
-
-            do {
-
-                my ($obj, $mode, $noSelectedFlag, $twinExitObj, $twinRoomObj);
-
-                $obj = shift @objList;
-                $mode = shift @objList;
-
-                # If there is already a single selected object, it must be moved from one IV to
-                #   another before a second object is selected
-                if ($self->selectedRoom) {
-
-                    $selectedRoomHash{$self->selectedRoom->number} = $self->selectedRoom;
-                    $self->ivUndef('selectedRoom');
-
-                } elsif ($self->selectedRoomTag) {
-
-                    $selectedRoomTagHash{$self->selectedRoomTag->number} = $self->selectedRoomTag;
-                    $self->ivUndef('selectedRoomTag');
-
-                } elsif ($self->selectedRoomGuild) {
-
-                    $selectedRoomGuildHash{$self->selectedRoomGuild->number}
-                        = $self->selectedRoomGuild;
-                    $self->ivUndef('selectedRoomGuild');
-
-                } elsif ($self->selectedExit) {
-
-                    $selectedExitHash{$self->selectedExit->number} = $self->selectedExit;
-                    $self->ivUndef('selectedExit');
-
-                } elsif ($self->selectedExitTag) {
-
-                    $selectedExitTagHash{$self->selectedExitTag->number} = $self->selectedExitTag;
-                    $self->ivUndef('selectedExitTag');
-
-                } elsif ($self->selectedLabel) {
-
-                    $selectedLabelHash{$self->selectedLabel->id} = $self->selectedLabel;
-                    $self->ivUndef('selectedLabel');
-
-                } elsif (
-                    ! %selectedRoomHash
-                    && ! %selectedRoomTagHash
-                    && ! %selectedRoomGuildHash
-                    && ! %selectedExitHash
-                    && ! %selectedExitTagHash
-                    && ! %selectedLabelHash
-                ) {
-                    # There are currently no selected objects at all
-                    $noSelectedFlag = TRUE;
-                }
-
-                # Rooms
-                if ($mode eq 'room') {
-
-                    push (@drawList, 'room', $obj);
-
-                    if (! $noSelectedFlag) {
-                        $selectedRoomHash{$obj->number} = $obj;
-                    } else {
-                        $self->ivPoke('selectedRoom', $obj);
-                    }
-
-                # Room tags
-                } elsif ($mode eq 'room_tag') {
-
-                    push (@drawList, 'room_tag', $obj);
-
-                    if (! $noSelectedFlag) {
-                        $selectedRoomTagHash{$obj->number} = $obj;
-                    } else {
-                        $self->ivPoke('selectedRoomTag', $obj);
-                    }
-
-                # Room guilds
-                } elsif ($mode eq 'room_guild') {
-
-                    push (@drawList, 'room_guild', $obj);
-
-                    if (! $noSelectedFlag) {
-                        $selectedRoomGuildHash{$obj->number} = $obj;
-                    } else {
-                        $self->ivPoke('selectedRoomGuild', $obj);
-                    }
-
-                # Exits
-                } elsif ($mode eq 'exit') {
-
-                    push (@drawList, 'exit', $obj);
-
-                    if (! $noSelectedFlag) {
-
-                        $selectedExitHash{$obj->number} = $obj;
-
-                    } else {
-
-                        $self->ivPoke('selectedExit', $obj);
-
-                        # If the selected exit is a broken or region exit, we need to mark the
-                        #   destination room (and the twin exit, if there is one) to be drawn a
-                        #   different colour
-                        # (NB Doesn't apply to bent broken exits)
-                        if (
-                            ($obj->brokenFlag && ! $obj->bentFlag)
-                            || $obj->regionFlag
-                        ) {
-                            $twinRoomObj
-                                = $self->worldModelObj->ivShow('modelHash', $obj->destRoom);
-                            if ($twinRoomObj) {
-
-                                $self->ivPoke('pairedTwinRoom', $twinRoomObj);
-                            }
-
-                            if ($obj->twinExit) {
-
-                                # Since the twin exit exists, it gets painted the same colour
-                                $twinExitObj = $self->worldModelObj->ivShow(
-                                        'exitModelHash',
-                                        $obj->twinExit,
-                                    );
-
-                                if ($twinExitObj) {
-
-                                    $self->ivPoke('pairedTwinExit', $twinExitObj);
-                                }
-
-                            } else {
-
-                                # Make sure the IV has been reset
-                                $self->ivUndef('pairedTwinExit');
-                            }
-
-                            # Redrawing the room redraws its exit
-                            push (@drawList, 'room', $twinRoomObj);
-                       }
-                    }
-
-                # Exit tags
-                } elsif ($mode eq 'exit_tag') {
-
-                    push (@drawList, 'exit_tag', $obj);
-
-                    if (! $noSelectedFlag) {
-                        $selectedExitTagHash{$obj->number} = $obj;
-                    } else {
-                        $self->ivPoke('selectedExitTag', $obj);
-                    }
-
-                # Labels
-                } elsif ($mode eq 'label') {
-
-                    push (@drawList, 'label', $obj);
-
-                    if (! $noSelectedFlag) {
-                        $selectedLabelHash{$obj->id} = $obj;
-                    } else {
-                        $self->ivPoke('selectedLabel', $obj);
-                    }
-                }
-
-            } until (! @objList);
-        }
-
-        # Store the selected object hashes (any or all of which may be empty)
-        $self->ivPoke('selectedRoomHash', %selectedRoomHash);
-        $self->ivPoke('selectedRoomTagHash', %selectedRoomTagHash);
-        $self->ivPoke('selectedRoomGuildHash', %selectedRoomGuildHash);
-        $self->ivPoke('selectedExitHash', %selectedExitHash);
-        $self->ivPoke('selectedExitTagHash', %selectedExitTagHash);
-        $self->ivPoke('selectedLabelHash', %selectedLabelHash);
-
-        if (@drawList) {
-
-            # Redraw all objects that must be redrawn ($self->doDraw will eliminate any duplicates
-            #   in @drawList)
-            $self->doDraw(@drawList);
-        }
-
-        # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-        $self->restrictWidgets();
-
-        return 1;
-    }
-
-    sub unselectObj {
-
-        # Called by $self->canvasEventHandler, ->canvasObjEventHandler and $self->deleteCanvasObj
-        # When an object is to be unselected, we need to be careful about updating the IVs. This
-        #   function is called to see whether a room, room tag, room guild, exit, exit tag or label
-        #   is selected and, if so, unselects it
-        #
-        # Expected arguments
-        #   $obj    - The object to be unselected. For rooms, exits and labels, a blessed reference
-        #               of a GA::ModelObj::Room, GA::Obj::Exit or GA::Obj::MapLabel. For room tags
-        #               and room guilds, the blessed reference of the GA::ModelObj::Room to which
-        #               they belong. For exit tags, the blessed reference of the GA::Obj::Exit to
-        #               which they belong
-        #
-        # Optional arguments
-        #   $mode   - Set to 'room_tag', 'room_guild', 'exit_tag' or 'undef' for everything else
-        #               (i.e. rooms, exits and labels; so that we know that when $obj is a room
-        #               object, whether it's the room itself, the room's room tag or its room guild
-        #               which is to be selected; or so that we know whether to select an exit or an
-        #               exit tag)
-        #   $noRedrawFlag
-        #           - Set to TRUE if the object shouldn't be redrawn (because it is about to be
-        #               deleted)
-        #
-        # Return values
-        #   'undef' on improper arguments or if the object isn't already selected
-        #   1 otherwise
-
-        my ($self, $obj, $mode, $noRedrawFlag, $check) = @_;
-
-        # Local variables
-        my (
-            $singleObj, $singleType, $pairedRoomObj,
-            @drawList, @importList,
-        );
-
-        # Check for improper arguments
-        if (! defined $obj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->unselectObj', @_);
-        }
-
-        # Selected broken/region exits have a paired twin exit which is drawn a different colour,
-        #   as is its parent room. Whatever objects are going to be unselected, a paired exit & room
-        #   must be reset and redrawn, if they exist
-        if ($self->pairedTwinExit) {
-
-            # (Redrawing the paired room also redraws its paired exit, if there is one)
-            $pairedRoomObj = $self->pairedTwinRoom;
-            $self->ivUndef('pairedTwinRoom');
-            $self->ivUndef('pairedTwinExit');
-
-            # Mark the room to be redrawn
-            $self->markObjs('room', $pairedRoomObj);
-        }
-
-        # Unselect the object, and add it to the redraw list
-
-        if ($obj->_objClass eq 'Games::Axmud::ModelObj::Room') {
-
-            # Rooms
-            if (! $mode) {
-
-                push (@drawList, 'room', $obj);
-
-                if ($self->selectedRoom && $self->selectedRoom eq $obj) {
-
-                    $self->ivUndef('selectedRoom');
-
-                } elsif ($self->ivExists('selectedRoomHash', $obj->number)) {
-
-                    $self->ivDelete('selectedRoomHash', $obj->number);
-
-                } else {
-
-                    # This room wasn't already selected
-                    return undef;
-                }
-
-            # Room tags
-            } elsif ($mode eq 'room_tag') {
-
-                push (@drawList, 'room_tag', $obj);
-
-                if ($self->selectedRoomTag && $self->selectedRoomTag eq $obj) {
-
-                    $self->ivUndef('selectedRoomTag');
-
-                } elsif ($self->ivExists('selectedRoomTagHash', $obj->number)) {
-
-                    $self->ivDelete('selectedRoomTagHash', $obj->number);
-
-                } else {
-
-                    # This room tag wasn't already selected
-                    return undef;
-                }
-
-            # Room guilds
-            } elsif ($mode eq 'room_guild') {
-
-                push (@drawList, 'room_guild', $obj);
-
-                if ($self->selectedRoomGuild && $self->selectedRoomGuild eq $obj) {
-
-                    $self->ivUndef('selectedRoomGuild');
-
-                } elsif ($self->ivExists('selectedRoomGuildHash', $obj->number)) {
-
-                    $self->ivDelete('selectedRoomGuildHash', $obj->number);
-
-                } else {
-
-                    # This room guild wasn't already selected
-                    return undef;
-                }
-            }
-
-        } elsif ($obj->_objClass eq 'Games::Axmud::Obj::Exit') {
-
-            # Exits
-            if (! $mode) {
-
-                push (@drawList, 'exit', $obj);
-
-                if ($self->selectedExit && $self->selectedExit eq $obj) {
-
-                    $self->ivUndef('selectedExit');
-
-                } elsif ($self->ivExists('selectedExitHash', $obj->number)) {
-
-                    $self->ivDelete('selectedExitHash', $obj->number);
-
-                } else {
-
-                    # This exit wasn't already selected
-                    return undef;
-                }
-
-            # Exit tags
-            } elsif ($mode eq 'exit_tag') {
-
-                push (@drawList, 'exit_tag', $obj);
-
-                if ($self->selectedExitTag && $self->selectedExitTag eq $obj) {
-
-                    $self->ivUndef('selectedExitTag');
-
-                } elsif ($self->ivExists('selectedExitTagHash', $obj->number)) {
-
-                    $self->ivDelete('selectedExitTagHash', $obj->number);
-
-                } else {
-
-                    # This exit tag wasn't already selected
-                    return undef;
-                }
-            }
-
-        # Labels
-        } elsif ($obj->_objClass eq 'Games::Axmud::Obj::MapLabel') {
-
-            push (@drawList, 'label', $obj);
-
-            if ($self->selectedLabel && $self->selectedLabel eq $obj) {
-
-                $self->ivUndef('selectedLabel');
-
-            } elsif ($self->ivExists('selectedLabelHash', $obj->id)) {
-
-                $self->ivDelete('selectedLabelHash', $obj->id);
-
-            } else {
-
-                # This label wasn't already selected
-                return undef;
-            }
-        }
-
-        # Redraw the item removed (unless it's about to be deleted)
-        if (! $noRedrawFlag) {
-
-            $self->doDraw(@drawList);
-        }
-
-        # Now, we check these five hashes. If, between them, they contain a single selected object,
-        #   then we need to move it out of the hashes and into the IVs $self->selectedRoom,
-        #   ->selectedExit (etc)
-        if ($self->ivPairs('selectedRoomHash') == 1) {
-
-            @importList = $self->selectedRoomHash;
-            $singleObj = $importList[1];
-            $singleType = 'room';
-        }
-
-        if ($self->ivPairs('selectedRoomTagHash') == 1) {
-
-            if ($singleObj) {
-
-                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-                $self->restrictWidgets();
-                # More than one selected object. Give up
-                return 1;
-
-            } else {
-
-                @importList = $self->selectedRoomTagHash;
-                $singleObj = $importList[1];
-                $singleType = 'room_tag';
-            }
-        }
-
-        if ($self->ivPairs('selectedRoomGuildHash') == 1) {
-
-            if ($singleObj) {
-
-                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-                $self->restrictWidgets();
-                # More than one selected object. Give up
-                return 1;
-
-            } else {
-
-                @importList = $self->selectedRoomGuildHash;
-                $singleObj = $importList[1];
-                $singleType = 'room_guild';
-            }
-        }
-
-        if ($self->ivPairs('selectedExitHash') == 1) {
-
-            if ($singleObj) {
-
-                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-                $self->restrictWidgets();
-                # More than one selected object. Give up
-                return 1;
-
-            } else {
-
-                @importList = $self->selectedExitHash;
-                $singleObj = $importList[1];
-                $singleType = 'exit';
-            }
-        }
-
-        if ($self->ivPairs('selectedExitTagHash') == 1) {
-
-            if ($singleObj) {
-
-                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-                $self->restrictWidgets();
-                # More than one selected object. Give up
-                return 1;
-
-            } else {
-
-                @importList = $self->selectedExitTagHash;
-                $singleObj = $importList[1];
-                $singleType = 'exit_tag';
-            }
-        }
-
-        if ($self->ivPairs('selectedLabelHash') == 1) {
-
-            if ($singleObj) {
-
-                # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-                $self->restrictWidgets();
-                # More than one selected object. Give up
-                return 1;
-
-            } else {
-
-                @importList = $self->selectedLabelHash;
-                $singleObj = $importList[1];
-                $singleType = 'label';
-            }
-        }
-
-        if ($singleObj) {
-
-            # There is exactly one selected object left in the six hashes. Remove it from its hash,
-            #   and set the single-object IV
-            if ($singleType eq 'room') {
-
-                $self->ivEmpty('selectedRoomHash');
-                $self->ivPoke('selectedRoom', $singleObj);
-
-            } elsif ($singleType eq 'room_tag') {
-
-                $self->ivEmpty('selectedRoomTagHash');
-                $self->ivPoke('selectedRoomTag', $singleObj);
-
-            } elsif ($singleType eq 'room_guild') {
-
-                $self->ivEmpty('selectedRoomGuildHash');
-                $self->ivPoke('selectedRoomGuild', $singleObj);
-
-            } elsif ($singleType eq 'exit') {
-
-                $self->ivEmpty('selectedExitHash');
-                $self->ivPoke('selectedExit', $singleObj);
-
-            } elsif ($singleType eq 'exit_tag') {
-
-                $self->ivEmpty('selectedExitTagHash');
-                $self->ivPoke('selectedExitTag', $singleObj);
-
-            } elsif ($singleType eq 'label') {
-
-                $self->ivEmpty('selectedLabelHash');
-                $self->ivPoke('selectedLabel', $singleObj);
-            }
-        }
-
-        # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
-        $self->restrictWidgets();
-
-        return 1;
-    }
-
     # Canvas object functions
 
     sub connectExitToRoom {
@@ -42584,13 +44785,23 @@
             my ($x, $y) = split (/_/, $coord);
 
             $self->currentRegionmap->removeSquare($coord);
-            $self->deleteCanvasObj('square', $x . '_' . $y);
+            $self->deleteCanvasObj(
+                'square',
+                $x . '_' . $y,
+                $self->currentRegionmap,
+                $self->currentParchment,
+            );
         }
 
         foreach my $obj (@rectList) {
 
             $self->currentRegionmap->removeRect($obj);
-            $self->deleteCanvasObj('rect', $obj);
+            $self->deleteCanvasObj(
+                'rect',
+                $obj->number,
+                $self->currentRegionmap,
+                $self->currentParchment,
+            );
         }
 
         if ($self->bgColourChoice) {
@@ -42605,7 +44816,14 @@
                 )
             ) {
                 # Draw the coloured block
-                $self->drawColouredSquare($self->bgColourChoice, $xBlocks, $yBlocks);
+                $self->drawColouredSquare(
+                    $self->currentRegionmap,
+                    $self->bgColourChoice,
+                    $xBlocks,
+                    $yBlocks,
+                    $level,
+                    $self->currentParchment,
+                );
             }
         }
 
@@ -42678,7 +44896,12 @@
 
                 # Draw the coloured rectangle. If any other rectangle(s) already exist in the same
                 #   space, this rectangle is drawn on top of them
-                $self->drawColouredRect($colourObj);
+                $self->drawColouredRect(
+                    $self->currentRegionmap,
+                    $colourObj,
+                    $self->currentRegionmap->currentLevel,
+                    $self->currentParchment,
+                );
             }
 
         } else {
@@ -42726,13 +44949,23 @@
                         my ($x, $y) = split (/_/, $coord);
 
                         $self->currentRegionmap->removeSquare($coord);
-                        $self->deleteCanvasObj('square', $x . '_' . $y);
+                        $self->deleteCanvasObj(
+                            'square',
+                            $x . '_' . $y,
+                            $self->currentRegionmap,
+                            $self->currentParchment,
+                        );
                     }
 
                     foreach my $obj (@rectList) {
 
                         $self->currentRegionmap->removeRect($obj);
-                        $self->deleteCanvasObj('rect', $obj);
+                        $self->deleteCanvasObj(
+                            'rect',
+                            $obj->number,
+                            $self->currentRegionmap,
+                            $self->currentParchment,
+                        );
                     }
                 }
             }
@@ -44621,26 +46854,12 @@
     ##################
     # Accessors - set
 
-    sub del_drawObj {
-
-        # (Called by GA::Obj::WorldModel->deleteRooms, ->deleteExits and ->deleteLabels)
-
-        my ($self, $iv, $number, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $iv || ! defined $number || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->del_drawObj', @_);
-        }
-
-        $self->ivDelete($iv, $number);
-
-        return 1;
-    }
-
     sub set_freeClickMode {
 
         my ($self, $mode, $check) = @_;
+
+        # Local variables
+        my $gdkWindow;
 
         # Check for improper arguments
         if (! defined $mode || defined $check) {
@@ -44654,12 +46873,30 @@
             $self->ivPoke('bgColourMode', 'rect_start');
         }
 
+        # Set the mouse icon accordingly
+        $gdkWindow = $self->winWidget->get_window();
+        if ($gdkWindow) {
+
+            if ($mode eq 'add_room' || $mode eq 'add_label') {
+                $gdkWindow->set_cursor($axmud::CLIENT->constMapAddCursor);
+            } elsif ($mode eq 'connect_exit' || $mode eq 'move_room') {
+                $gdkWindow->set_cursor($axmud::CLIENT->constMapConnectCursor);
+            } elsif ($mode eq 'merge_room') {
+                $gdkWindow->set_cursor($axmud::CLIENT->constMapMergeCursor);
+            } else {
+                $gdkWindow->set_cursor($axmud::CLIENT->constMapCursor);
+            }
+        }
+
         return 1;
     }
 
     sub reset_freeClickMode {
 
         my ($self, $check) = @_;
+
+        # Local variables
+        my $gdkWindow;
 
         # Check for improper arguments
         if (defined $check) {
@@ -44668,6 +46905,13 @@
         }
 
         $self->ivPoke('freeClickMode', 'default');
+
+        # Reset the mouse icon
+        $gdkWindow = $self->winWidget->get_window();
+        if ($gdkWindow) {
+
+            $gdkWindow->set_cursor($axmud::CLIENT->constMapCursor);
+        }
 
         return 1;
     }
@@ -44752,60 +46996,6 @@
         return 1;
     }
 
-    sub del_markedExit {
-
-        # (Called by GA::Obj::WorldModel->deleteExits)
-
-        my ($self, $number, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $number || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->del_markedExit', @_);
-        }
-
-        $self->ivDelete('markedExitHash', $number);
-        $self->ivDelete('markedExitTagHash', $number);
-
-        return 1;
-    }
-
-    sub del_markedLabel {
-
-        # (Called by GA::Obj::WorldModel->deleteLabels)
-
-        my ($self, $number, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $number || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->del_markedLabel', @_);
-        }
-
-        $self->ivDelete('markedLabelHash', $number);
-
-        return 1;
-    }
-
-    sub del_markedRoom {
-
-        # (Called by GA::Obj::WorldModel->deleteRooms)
-
-        my ($self, $number, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $number || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->del_markedRoom', @_);
-        }
-
-        $self->ivDelete('markedRoomHash', $number);
-        $self->ivDelete('markedRoomTagHash', $number);
-        $self->ivDelete('markedRoomGuildHash', $number);
-
-        return 1;
-    }
-
     sub set_pairedTwinExit {
 
         my ($self, $exitObj, $check) = @_;
@@ -44834,6 +47024,54 @@
 
         # Update IVs
         $self->ivPoke('pairedTwinRoom', $roomObj);
+
+        return 1;
+    }
+
+    sub add_parchment {
+
+        my ($self, $parchmentObj, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $parchmentObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->add_parchment', @_);
+        }
+
+        # Update IVs
+        $self->ivAdd('parchmentHash', $parchmentObj->name, $parchmentObj);
+
+        return 1;
+    }
+
+    sub del_parchment {
+
+        my ($self, $name, $check) = @_;
+
+        # Local variables
+        my $count;
+
+        # Check for improper arguments
+        if (! defined $name || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->del_parchment', @_);
+        }
+
+        # Update IVs
+        $self->ivDelete('parchmentHash', $name);
+        $self->ivDelete('parchmentReadyHash', $name);
+
+        $count = -1;
+        OUTER: foreach my $obj ($self->parchmentQueueList) {
+
+            $count++;
+
+            if ($obj->name eq $name) {
+
+                $self->ivSplice('parchmentQueueList', $count, 1);
+                last OUTER;
+            }
+        }
 
         return 1;
     }
@@ -44980,8 +47218,8 @@
 
     sub canvas
         { $_[0]->{canvas} }
-    sub canvasRoot
-        { $_[0]->{canvasRoot} }
+    sub canvasBackground
+        { $_[0]->{canvasBackground} }
     sub canvasFrame
         { $_[0]->{canvasFrame} }
     sub canvasScroller
@@ -44990,8 +47228,6 @@
         { $_[0]->{canvasHAdjustment} }
     sub canvasVAdjustment
         { $_[0]->{canvasVAdjustment} }
-    sub canvasBackground
-        { $_[0]->{canvasBackground} }
 
     sub canvasTooltipObj
         { $_[0]->{canvasTooltipObj} }
@@ -45002,8 +47238,34 @@
 
     sub currentRegionmap
         { $_[0]->{currentRegionmap} }
+    sub currentParchment
+        { $_[0]->{currentParchment} }
     sub recentRegionList
         { my $self = shift; return @{$self->{recentRegionList}}; }
+    sub destroyQueueList
+        { my $self = shift; return @{$self->{destroyQueueList}}; }
+    sub constDestroyQueueMax
+        { $_[0]->{constDestroyQueueMax} }
+    sub drawQueueDefault
+        { $_[0]->{drawQueueDefault} }
+
+    sub emptyMapFlag
+        { $_[0]->{emptyMapFlag} }
+    sub winUpdateCalledFlag
+        { $_[0]->{winUpdateCalledFlag} }
+    sub winUpdateForceFlag
+        { $_[0]->{winUpdateForceFlag} }
+    sub winUpdateShowFlag
+        { $_[0]->{winUpdateShowFlag} }
+
+    sub parchmentHash
+        { my $self = shift; return %{$self->{parchmentHash}}; }
+    sub parchmentReadyHash
+        { my $self = shift; return %{$self->{parchmentReadyHash}}; }
+    sub parchmentQueueList
+        { my $self = shift; return @{$self->{parchmentQueueList}}; }
+    sub spareParchmentObj
+        { $_[0]->{spareParchmentObj} }
 
     sub selectedRoom
         { $_[0]->{selectedRoom} }
@@ -45036,48 +47298,13 @@
     sub pairedTwinRoom
         { $_[0]->{pairedTwinRoom} }
 
-    sub drawnRoomHash
-        { my $self = shift; return %{$self->{drawnRoomHash}}; }
-    sub dummyRoomHash
-        { my $self = shift; return %{$self->{dummyRoomHash}}; }
-    sub drawnRoomEchoHash
-        { my $self = shift; return %{$self->{drawnRoomEchoHash}}; }
-    sub drawnRoomTagHash
-        { my $self = shift; return %{$self->{drawnRoomTagHash}}; }
-    sub drawnRoomGuildHash
-        { my $self = shift; return %{$self->{drawnRoomGuildHash}}; }
-    sub drawnRoomTextHash
-        { my $self = shift; return %{$self->{drawnRoomTextHash}}; }
-    sub drawnExitHash
-        { my $self = shift; return %{$self->{drawnExitHash}}; }
-    sub drawnExitTagHash
-        { my $self = shift; return %{$self->{drawnExitTagHash}}; }
-    sub drawnOrnamentHash
-        { my $self = shift; return %{$self->{drawnOrnamentHash}}; }
-    sub drawnLabelHash
-        { my $self = shift; return %{$self->{drawnLabelHash}}; }
-    sub drawnCheckedDirHash
-        { my $self = shift; return %{$self->{drawnCheckedDirHash}}; }
-    sub colouredSquareHash
-        { my $self = shift; return %{$self->{colouredSquareHash}}; }
-    sub colouredRectHash
-        { my $self = shift; return %{$self->{colouredRectHash}}; }
     sub delayDrawFlag
         { $_[0]->{delayDrawFlag} }
 
-    sub markedRoomHash
-        { my $self = shift; return %{$self->{markedRoomHash}}; }
-    sub markedRoomTagHash
-        { my $self = shift; return %{$self->{markedRoomTagHash}}; }
-    sub markedRoomGuildHash
-        { my $self = shift; return %{$self->{markedRoomGuildHash}}; }
-    sub markedExitHash
-        { my $self = shift; return %{$self->{markedExitHash}}; }
-    sub markedExitTagHash
-        { my $self = shift; return %{$self->{markedExitTagHash}}; }
-    sub markedLabelHash
-        { my $self = shift; return %{$self->{markedLabelHash}}; }
-
+    sub drawRegionmap
+        { $_[0]->{drawRegionmap} }
+    sub drawParchment
+        { $_[0]->{drawParchment} }
     sub drawCycleExitHash
         { my $self = shift; return %{$self->{drawCycleExitHash}}; }
     sub drawRoomTextSize
@@ -45086,8 +47313,32 @@
         { $_[0]->{drawRoomTextWidth} }
     sub drawRoomTextHeight
         { $_[0]->{drawRoomTextHeight} }
-    sub drawMapTextSize
-        { $_[0]->{drawMapTextSize} }
+    sub drawOtherTextSize
+        { $_[0]->{drawOtherTextSize} }
+    sub drawDefaultTextSize
+        { $_[0]->{drawDefaultTextSize} }
+    sub blockCornerXPosPixels
+        { $_[0]->{blockCornerXPosPixels} }
+    sub blockCornerYPosPixels
+        { $_[0]->{blockCornerYPosPixels} }
+    sub blockCentreXPosPixels
+        { $_[0]->{blockCentreXPosPixels} }
+    sub blockCentreYPosPixels
+        { $_[0]->{blockCentreYPosPixels} }
+    sub borderCornerXPosPixels
+        { $_[0]->{borderCornerXPosPixels} }
+    sub borderCornerYPosPixels
+        { $_[0]->{borderCornerYPosPixels} }
+    sub preDrawnIncompleteExitHash
+        { my $self = shift; return %{$self->{preDrawnIncompleteExitHash}}; }
+    sub preDrawnUncertainExitHash
+        { my $self = shift; return %{$self->{preDrawnUncertainExitHash}}; }
+    sub preDrawnLongExitHash
+        { my $self = shift; return %{$self->{preDrawnLongExitHash}}; }
+    sub preDrawnSquareExitHash
+        { my $self = shift; return %{$self->{preDrawnSquareExitHash}}; }
+    sub preCountCheckedHash
+        { my $self = shift; return %{$self->{preCountCheckedHash}}; }
 
     sub freeClickMode
         { $_[0]->{freeClickMode} }
@@ -45139,29 +47390,6 @@
         { my $self = shift; return %{$self->{constTriangleCornerHash}}; }
     sub constGtkAnchorHash
         { my $self = shift; return %{$self->{constGtkAnchorHash}}; }
-
-    sub blockCornerXPosPixels
-        { $_[0]->{blockCornerXPosPixels} }
-    sub blockCornerYPosPixels
-        { $_[0]->{blockCornerYPosPixels} }
-    sub blockCentreXPosPixels
-        { $_[0]->{blockCentreXPosPixels} }
-    sub blockCentreYPosPixels
-        { $_[0]->{blockCentreYPosPixels} }
-    sub borderCornerXPosPixels
-        { $_[0]->{borderCornerXPosPixels} }
-    sub borderCornerYPosPixels
-        { $_[0]->{borderCornerYPosPixels} }
-    sub preDrawnIncompleteExitHash
-        { my $self = shift; return %{$self->{preDrawnIncompleteExitHash}}; }
-    sub preDrawnUncertainExitHash
-        { my $self = shift; return %{$self->{preDrawnUncertainExitHash}}; }
-    sub preDrawnLongExitHash
-        { my $self = shift; return %{$self->{preDrawnLongExitHash}}; }
-    sub preDrawnSquareExitHash
-        { my $self = shift; return %{$self->{preDrawnSquareExitHash}}; }
-    sub preCountCheckedHash
-        { my $self = shift; return %{$self->{preCountCheckedHash}}; }
 
     sub constMagnifyList
         { my $self = shift; return @{$self->{constMagnifyList}}; }

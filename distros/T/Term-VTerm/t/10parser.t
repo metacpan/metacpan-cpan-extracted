@@ -9,6 +9,8 @@ use Test::Refcount;
 
 use Term::VTerm;
 
+use Encode qw( encode_utf8 );
+
 my $vt = Term::VTerm->new( cols => 80, rows => 25 );
 $vt->set_utf8( 1 );
 
@@ -31,7 +33,7 @@ is_refcount( \$var, 3, '\$var has refcount 3 when captured by callback closure' 
 
    is( $text, "abcde", '$text after ->input_write' );
 
-   $len = $vt->input_write( "fĝh" );
+   $len = $vt->input_write( encode_utf8 "fĝh" );
    is( $len, 4, '->input_write consumed 4 bytes of UTF-8 text' );
 
    is( $text, "fĝh", '$text after ->input_write UTF-8' );

@@ -3,7 +3,7 @@
 # Crypt::HashCash - HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash.pm v1.129 Tue Oct 16 16:56:37 PDT 2018 $
+# $Id: lib/Crypt/HashCash.pm v1.130 Sat Dec 22 18:42:25 PST 2018 $
 
 package Crypt::HashCash;
 
@@ -18,7 +18,7 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(breakamt changecoin _hex _dec __dec _squish _unsquish _dectob85 _b85todec);
 
-our ( $VERSION ) = '$Revision: 1.129 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.130 $' =~ /\s+([\d\.]+)/;
 
 sub breakamt {          # Return denominations of lowest number of coins to make an amount
   my $amt = shift; my %d;
@@ -142,8 +142,8 @@ Crypt::HashCash - HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.129 $
- $Date: Tue Oct 16 16:56:37 PDT 2018 $
+ $Revision: 1.130 $
+ $Date: Sat Dec 22 18:42:25 PST 2018 $
 
 =head1 SYNOPSIS
 

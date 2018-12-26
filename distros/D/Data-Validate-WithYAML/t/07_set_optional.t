@@ -18,3 +18,7 @@ $validator->set_optional( 'age' );
 
 my $age_optional = $validator->check( 'age', undef );
 is( $age_optional, 1 );
+
+$validator->set_optional( 'age_virtual' );
+$validator->set_optional( 'virtually_created' );
+

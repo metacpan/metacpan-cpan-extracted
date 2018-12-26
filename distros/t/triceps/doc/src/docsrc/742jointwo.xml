@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -100,7 +100,7 @@ $joiner = Triceps::JoinTwo->new(optionName => optionValue, ...);
 			<term><pre>leftIdxPath => [ @path ]</pre></term>
 			<listitem>
 			An array reference containing the path name of an index type in the
-			left table used for look-up. The index absolutely must be a Hash
+			left table used for look-up. The index must absolutely be a Hashed or Ordered one
 			(leaf or not), not of any other kind. The number and order of key
 			fields in the left and right indexes must match, since indexes define
 			the fields used for the join. The types of key fields have to
@@ -113,7 +113,7 @@ $joiner = Triceps::JoinTwo->new(optionName => optionValue, ...);
 			<term><pre>rightIdxPath => [ @path ]</pre></term>
 			<listitem>
 			An array reference containing the path name of an index type in the
-			right table used for look-up. The index absolutely must be a Hash
+			left table used for look-up. The index must absolutely be a Hashed or Ordered one
 			(leaf or not), not of any other kind. The number and order of key
 			fields in the left and right indexes must match, since indexes define
 			the fields used for the join. The types of key fields have to

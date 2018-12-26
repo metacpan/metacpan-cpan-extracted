@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -20,21 +20,11 @@ class SimpleType : public Type
 {
 public:
 	SimpleType(TypeId id, int size) :
-		Type(true, id),
-		size_(size)
+		Type(true, id, size)
 	{ }
-
-	// get the size of a basic element
-	int getSize() const
-	{
-		return size_;
-	}
 
 	// from Type
 	virtual Erref getErrors() const;
-
-protected:
-	int size_; // size of the basic element of this type
 
 private:
 	SimpleType();

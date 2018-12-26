@@ -11,7 +11,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(Str);
 use namespace::autoclean;
 
-our $VERSION = '1.027';
+our $VERSION = '1.035';
 
 with qw(
     Locale::TextDomain::OO::Role::Logger
@@ -189,7 +189,7 @@ sub translate { ## no critic (ExcessComplexity ManyArgs)
             ? $self->_calculate_multiplural_index($count, $plural_code, $lexicon, $lexicon_key)
             : $plural_code->($count);
         my $msgstr_plural = $msg_ref->{msgstr_plural}->[$multiplural_index];
-        if ( ! defined $msgstr_plural ) { # fallback
+        if ( ! defined $msgstr_plural || ! length $msgstr_plural ) { # fallback
             $msgstr_plural = $plural_code->($count)
                 ? $msgid_plural
                 : $msgid;
@@ -219,7 +219,7 @@ sub translate { ## no critic (ExcessComplexity ManyArgs)
     my $msgstr = exists $msg_ref->{msgstr}
         ? $msg_ref->{msgstr}
         : ();
-    if ( ! defined $msgstr ) { # fallback
+    if ( ! defined $msgstr || ! length $msgstr ) { # fallback
         $msgstr = $msgid;
         my $text = $lexicon
             ? qq{Using lexicon "$lexicon_key".}
@@ -271,7 +271,7 @@ $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk
 
 =head1 VERSION
 
-1.027
+1.035
 
 =head1 DESCRIPTION
 
@@ -356,7 +356,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013 - 2017,
+Copyright (c) 2013 - 2018,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

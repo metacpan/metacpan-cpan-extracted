@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -160,7 +160,7 @@ Facet *Facet::exportTableType(const string &name, Autoref<TableType> tt)
 		return this;
 	}
 	{
-		Autoref<TableType> copytt = tt->deepCopy(NULL); // no holder doesn't matter here
+		Autoref<TableType> copytt = tt->deepCopy(NO_HOLD_ROW_TYPES); // the holder doesn't matter here
 		copytt->initialize();
 		if (err_.fAppend(copytt->getErrors(), "Can not export the table type '%s' containing errors:", name.c_str()))
 			return this;

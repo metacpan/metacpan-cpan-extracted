@@ -42,18 +42,22 @@ LIBRARY := triceps
 # for the annoying few. For the release build, just build with the minimum of
 # flags and don't fail on warnings, since the warnings and their names
 # differ by the GCC versions.
+# The optimization is normally disabled for the build from the trunk to make
+# the debugging easier but enabled for the releases.
 ifeq ($(notdir $(realpath ../..)), trunk)
 	# Option useful for the newer GCC: -Wno-int-to-pointer-cast
-	CFLAGS_WARNINGS = -Wall -Wno-sign-conversion -Wno-sign-compare -Werror
+	CFLAGS_WARNINGS = -Wall -Wno-sign-conversion -Wno-sign-compare -Wno-int-to-pointer-cast -Werror
+	CFLAGS_OPTIMIZE = -O3 -fno-strict-aliasing
 else
 	CFLAGS_WARNINGS =
+	CFLAGS_OPTIMIZE = -O3 -fno-strict-aliasing
 endif
 
 OBJEXT := .o
 BINEXT := 
 BUILDDIR := build
 CPPFLAGS := -I.. $(TRICEPS_CONF)
-CFLAGS := -g -fPIC -pthread -rdynamic $(CPPFLAGS) $(CFLAGS_WARNINGS) $(TRICEPS_CONF)
+CFLAGS := -g -fPIC -pthread -rdynamic $(CPPFLAGS) $(CFLAGS_WARNINGS) $(CFLAGS_OPTIMIZE) $(TRICEPS_CONF)
 CXXFLAGS := $(CFLAGS)
 LDFLAGS := -L../build -l$(LIBRARY) $(TRICEPS_XLIB)
 TESTLDFLAGS := $(LDFLAGS) -L../utest/build -Wl,-rpath='$$ORIGIN/../../../build' \

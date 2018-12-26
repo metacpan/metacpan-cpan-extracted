@@ -1,7 +1,7 @@
 tsl / toggleshortlink         Toggles detection of short weblinks
  
    Format:
-      ;tsl                    Toggles popup windows
+      ;tsl                    Toggles detection of short weblinks
       
    Notes:
       Many parts of the Axmud code, particularly the code dealing with text

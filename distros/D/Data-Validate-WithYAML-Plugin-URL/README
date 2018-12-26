@@ -1,14 +1,66 @@
+NAME
 
+    Data::Validate::WithYAML::Plugin::URL - Plugin to check URL
 
-This archive contains the distribution Data-Validate-WithYAML-Plugin-URL,
-version 0.01:
+VERSION
 
-  Plugin to check URL
+    version 0.02
 
-This software is Copyright (c) 2012 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+        use Data::Validate::WithYAML::Plugin::URL;
+    
+        my $foo = Data::Validate::WithYAML::Plugin::URL->check( 'http://test.de/' );
+        ...
+        
+        # use the plugin via Data::Validate::WithYAML
+        
+        use Data::Validate::WithYAML;
+        
+        my $URL     = 'http://test.de/';
+        my $validator = Data::Validate::WithYAML->new( 'test.yml' );
+        print "yes" if $validator->check( 'URL', $URL );
 
-  The Artistic License 2.0 (GPL Compatible)
+    test.yml
 
+      ---
+      step1:
+          URL:
+              plugin: URL
+              type: required
+
+SUBROUTINES
+
+ check
+
+AUTHOR
+
+    Renee Baecker, <module at renee-baecker.de>
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Validate::WithYAML::Plugin::URL
+
+ACKNOWLEDGEMENTS
+
+COPYRIGHT & LICENSE
+
+    Copyright 2011 Renee Baecker, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of Artistic License 2.0
+
+AUTHOR
+
+    Renee Baecker <module@renee-baecker.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

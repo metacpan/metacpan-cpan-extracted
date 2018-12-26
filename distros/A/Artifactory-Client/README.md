@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.6.1
+Version 1.7.0
 
 # SYNOPSIS
 
@@ -674,6 +674,10 @@ Calculates Maven metadata on the specified path (local repositories only)
 Calculates/recalculates the Packages and Release metadata for this repository,based on the Debian packages in it.
 Calculation can be synchronous (the default) or asynchronous.
 
+## calculate\_cached\_remote\_debian\_repository\_coordinates( 'repokey' )
+
+Calculates/recalculates the Debian packages coordinates
+
 ## calculate\_opkg\_repository\_metadata( async => 0/1, writeProps => 1 )
 
 Calculates/recalculates the Packages and Release metadata for this repository,based on the ipk packages in it (in each
@@ -756,6 +760,14 @@ Updates the reverse proxy configuration
 ## get\_reverse\_proxy\_snippet
 
 Gets the reverse proxy configuration snippet in text format
+
+## start\_sha256\_migration\_task( "batchThreshold" => 10, etc etc )
+
+Starts the SHA-256 migration process.
+
+## stop\_sha256\_migration\_task( "sleepIntervalMillis" => 5000, etc etc )
+
+Stops the SHA-256 migration process
 
 # PLUGINS
 

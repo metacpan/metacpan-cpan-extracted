@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Log::Any::Adapter::Screen - Send logs to screen, with colors and some
+    other features
 
+VERSION
+    This document describes version 0.140 of Log::Any::Adapter::Screen (from
+    Perl distribution Log-Any-Adapter-Screen), released on 2018-12-22.
+
+SYNOPSIS
      use Log::Any::Adapter;
      Log::Any::Adapter->set('Screen',
          # min_level => 'debug', # default is 'warning'
@@ -10,101 +17,110 @@ SYNOPSIS
      );
 
 DESCRIPTION
-
-    This Log::Any adapter prints log messages to screen (STDERR/STDOUT).
-    The messages are colored according to level (unless coloring is turned
-    off). It has a few other features: allow passing formatter, allow
-    setting level from some environment variables, add prefix/timestamps.
+    This Log::Any adapter prints log messages to screen (STDERR/STDOUT). The
+    messages are colored according to level (unless coloring is turned off).
+    It has a few other features: allow passing formatter, allow setting
+    level from some environment variables, add prefix/timestamps.
 
     Parameters:
 
-      * min_level => STRING
+    *   min_level => STRING
 
-      Set logging level. Default is warning. If LOG_LEVEL environment
-      variable is set, it will be used instead. If TRACE environment
-      variable is set to true, level will be set to 'trace'. If DEBUG
-      environment variable is set to true, level will be set to 'debug'. If
-      VERBOSE environment variable is set to true, level will be set to
-      'info'.If QUIET environment variable is set to true, level will be
-      set to 'error'.
+        Set logging level. Default is warning. If LOG_LEVEL environment
+        variable is set, it will be used instead. If TRACE environment
+        variable is set to true, level will be set to 'trace'. If DEBUG
+        environment variable is set to true, level will be set to 'debug'.
+        If VERBOSE environment variable is set to true, level will be set to
+        'info'.If QUIET environment variable is set to true, level will be
+        set to 'error'.
 
-      * use_color => BOOL
+    *   use_color => BOOL
 
-      Whether to use color or not. Default is true only when running
-      interactively (-t STDOUT returns true).
+        Whether to use color or not. Default is true only when running
+        interactively (-t STDOUT returns true).
 
-      * colors => HASH
+    *   colors => HASH
 
-      Customize colors. Hash keys are the logging methods, hash values are
-      colors supported by Term::ANSIColor.
+        Customize colors. Hash keys are the logging methods, hash values are
+        colors supported by Term::ANSIColor.
 
-      The default colors are:
+        The default colors are:
 
-       method/level                 color
-       ------------                 -----
-       trace                        yellow
-       debug                        (none, terminal default)
-       info, notice                 green
-       warning                      bold blue
-       error                        magenta
-       critical, alert, emergency   red
+         method/level                 color
+         ------------                 -----
+         trace                        yellow
+         debug                        (none, terminal default)
+         info, notice                 green
+         warning                      bold blue
+         error                        magenta
+         critical, alert, emergency   red
 
-      * stderr => BOOL
+    *   stderr => BOOL
 
-      Whether to print to STDERR, default is true. If set to 0, will print
-      to STDOUT instead.
+        Whether to print to STDERR, default is true. If set to 0, will print
+        to STDOUT instead.
 
-      * formatter => CODEREF
+    *   formatter => CODEREF
 
-      Allow formatting message. If defined, message will be passed before
-      being colorized. Coderef will be passed:
+        Allow formatting message. If defined, message will be passed before
+        being colorized. Coderef will be passed:
 
-       ($self, $message)
+         ($self, $message)
 
-      and is expected to return the formatted message.
+        and is expected to return the formatted message.
 
-      The default formatter can optionally prefix the message with extra
-      stuffs, depending on the content of LOG_PREFIX environment variable,
-      such as: elapsed time (e.g. [0.023ms]) if LOG_PREFIX is elapsed.
+        The default formatter can optionally prefix the message with extra
+        stuffs, depending on the content of LOG_PREFIX environment variable,
+        such as: elapsed time (e.g. "[0.023ms]") if LOG_PREFIX is "elapsed".
 
-      NOTE: Log::Any 1.00+ now has a proxy object which allows
-      formatting/customization of message before it is sent to adapter(s),
-      so formatting does not have to be done on a per-adapter basis. As an
-      alternative to this attribute, you can also consider using the proxy
-      object or the (upcoming?) global proxy object.
+        NOTE: Log::Any 1.00+ now has a proxy object which allows
+        formatting/customization of message before it is sent to adapter(s),
+        so formatting does not have to be done on a per-adapter basis. As an
+        alternative to this attribute, you can also consider using the proxy
+        object or the (upcoming?) global proxy object.
 
-      * default_level => STR (default: warning)
+    *   default_level => STR (default: warning)
 
-      If no level-setting environment variables are defined, will default
-      to this level.
+        If no level-setting environment variables are defined, will default
+        to this level.
 
 ENVIRONMENT
+  NO_COLOR
+    If defined, will disable color. Consulted before "COLOR".
 
- COLOR => bool
-
+  COLOR
     Can be set to 0 to explicitly disable colors. The default is to check
-    for <-t STDOUT>.
+    for "<-t STDOUT">.
 
- LOG_LEVEL => str
+  LOG_LEVEL => str
+  QUIET => bool
+  VERBOSE => bool
+  DEBUG => bool
+  TRACE => bool
+    These environment variables can set the default for "min_level". See
+    documentation about "min_level" for more details.
 
- QUIET => bool
-
- VERBOSE => bool
-
- DEBUG => bool
-
- TRACE => bool
-
-    These environment variables can set the default for min_level. See
-    documentation about min_level for more details.
-
- LOG_PREFIX => str
-
+  LOG_PREFIX => str
     The default formatter groks these variables. See documentation about
-    formatter about more details.
+    "formatter" about more details.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-Any-Adapter-Screen>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-Any-Adapter-ScreenColoredLevel>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-Adapter-Scree
+    n>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Originally inspired by Log::Log4perl::Appender::ScreenColoredLevel. The
     old name for this adapter is Log::Any::Adapter::ScreenColoredLevel but
     at some point I figure using a shorter name is better for my fingers.
@@ -114,4 +130,14 @@ SEE ALSO
     Log::Log4perl::Appender::ScreenColoredLevel
 
     Term::ANSIColor
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2015, 2014, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -681,8 +681,8 @@ ok($@ =~ /Triceps::Table::deleteRow: table and row types are not equal, in table
 	ok(ref $u9, "Triceps::Unit");
 
 	my $tt9 = Triceps::TableType->new($rt1)
-		->addSubIndex("bc", Triceps::SimpleOrderedIndex->new("b" => "ASC", "c" => "ASC"))
-		->addSubIndex("cb", Triceps::SimpleOrderedIndex->new("c" => "ASC", "b" => "ASC"))
+		->addSubIndex("bc", Triceps::IndexType->newOrdered(key => ["b", "c"]))
+		->addSubIndex("cb", Triceps::IndexType->newOrdered(key => ["c", "b"]))
 		;
 	ok(ref $tt9, "Triceps::TableType");
 	ok($tt9->initialize(), 1);

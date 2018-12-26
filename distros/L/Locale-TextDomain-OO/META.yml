@@ -18,7 +18,7 @@ name: Locale-TextDomain-OO
 provides:
   Locale::TextDomain::OO:
     file: lib/Locale/TextDomain/OO.pm
-    version: '1.034'
+    version: '1.035'
   Locale::TextDomain::OO::FunctionalInterface:
     file: lib/Locale/TextDomain/OO/FunctionalInterface.pm
     version: '1.000'
@@ -102,7 +102,7 @@ provides:
     version: '1.014'
   Locale::TextDomain::OO::Translator:
     file: lib/Locale/TextDomain/OO/Translator.pm
-    version: '1.027'
+    version: '1.035'
 recommends:
   Test::Pod: '1.14'
   Test::Pod::Coverage: '1.04'
@@ -115,7 +115,7 @@ requires:
   Hash::Util: '0'
   JSON: '2.50'
   JSON::PP: '0'
-  Locale::MO::File: '0.08'
+  Locale::MO::File: '0.09'
   Locale::PO: '0.24'
   Locale::TextDomain::OO::Util: '2.002'
   Locale::TextDomain::OO::Util::ExtractHeader: '3.006'
@@ -135,5 +135,5 @@ requires:
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.034'
+version: '1.035'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

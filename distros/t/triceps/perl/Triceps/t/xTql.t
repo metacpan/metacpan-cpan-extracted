@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -37,7 +37,7 @@ our $rtTrade = Triceps::RowType->new(
 
 our $ttWindow = Triceps::TableType->new($rtTrade)
 	->addSubIndex("bySymbol", 
-		Triceps::SimpleOrderedIndex->new(symbol => "ASC")
+		Triceps::IndexType->newOrdered(key => ["symbol"])
 			->addSubIndex("last2",
 				Triceps::IndexType->newFifo(limit => 2)
 			)

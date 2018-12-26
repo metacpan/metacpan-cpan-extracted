@@ -3,6 +3,32 @@
            $Id: Changes,v 1.6 2001/07/12 15:59:46 vipul Exp $
 
 --------------------------------------------------------------------------
+1.52                                                     December 22, 2018
+
+  * Add a chi square statistical test.  t/chisquare.t
+
+  * Uniform can be passed to the constructor of Crypt::Random::Generator.  
+    This should be the default, and will likely be in the next release. 
+
+  * Fixed minor bugs & typos.
+
+
+1.51                                                     December 22, 2018
+
+  * Test no longer looks for non-eq of two generated numbers as these can be 
+    correctly the same if test is run enough number of times.  
+    https://rt.cpan.org/Ticket/Display.html?id=99880
+
+  * Removed outdated dependency info.
+    https://rt.cpan.org/Ticket/Display.html?id=94441
+
+  * Removed /dev/random read from the test, as it can hang when there is 
+    insufficient entropy.
+    https://rt.cpan.org/Ticket/Display.html?id=30423
+
+  * Removed potentially unsafe include in bin/makerandom.
+    https://rt.cpan.org/Ticket/Display.html?id=128062
+  
 
 1.25                                                        March 07, 2005
 

@@ -106,8 +106,8 @@ if ($DB) {                                # If double buffering is on, then enab
     alarm($ALARM);
 } ## end if ($DB)
 print_it($F, ' ', '00FFFFFF');
-$F->splash($VERSION);
-my $LOGO = $F->blit_read();    # Get a memory copy of the splash screen
+$F->splash($VERSION) unless($nosplash);
+
 my $DORKSMILE;
 foreach my $file (@files) {
     next if ($file =~ /^\.+/ || $file =~ /Test|gif/ || -d "$images_path/$file");
@@ -144,11 +144,9 @@ foreach my $file (@files) {
 
 } ## end foreach my $file (@files)
 
-$F->wait_for_console(!$rpi);
 $F->cls('OFF');
 
 $DIRTY = 1;    # Set this to signal the buffer needs flipping
-sleep 4;
 
 # if (0) { # This line only used for debugging
 color_mapping();
@@ -1207,10 +1205,11 @@ sub blit_move {
 
     print_it($F, 'Testing Image blitting');
 
+    $F->attribute_reset();
     my $image = $SMALL_IMAGES[int(rand(scalar(@IMAGES)))];
-    $F->blit_write({ %{$image}, 'x' => 0, 'y' => 0 });
-    my $x = 0;
-    my $y = 0;
+    $F->blit_write({ %{$image}, 'x' => 10, 'y' => 10 });
+    my $x = 10;
+    my $y = 10;
     my $w = $image->{'width'};
     my $h = $image->{'height'};
     my $s = time + $factor;
@@ -1218,7 +1217,7 @@ sub blit_move {
         $F->blit_move({ 'x' => abs($x), 'y' => abs($y), 'width' => $w, 'height' => $h, 'x_dest' => abs($x) + 4, 'y_dest' => abs($y) + 2 });
         $x += 4;
         $y += 2;
-        sleep(1 / 60);
+#        sleep(1 / 60);
         $DIRTY = 1;
 
     } ## end while (time < $s)
@@ -1458,27 +1457,40 @@ sub mode_drawing {
     $F->blit_write($image);
     $DIRTY = 1;
 
-    sleep 2;
+    sleep 1;
 
     $F->{'DRAW_MODE'} = $mode;
     $F->blit_write($image2);
     $DIRTY = 1;
-
-    sleep 2;
 
     my $size = int(($YY - $F->{'Y_CLIP'}) / 3);
     my $mid  = int($XX / 2);
 
     $F->set_color({ 'red' => 255, 'green' => 0, 'blue' => 0 });
     $F->circle({ 'x' => $mid - ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
+    $DIRTY = 1;
 
     $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 0 });
     $F->circle({ 'x' => $mid, 'y' => $F->{'Y_CLIP'} + $size, 'radius' => $size, 'filled' => 1 });
+    $DIRTY = 1;
 
     $F->set_color({ 'red' => 0, 'green' => 0, 'blue' => 255 });
     $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
     $DIRTY = 1;
 
+    if ($mode == XOR_MODE) {
+        sleep 1;
+        $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
+        $DIRTY = 1;
+        $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 0 });
+        $F->circle({ 'x' => $mid, 'y' => $F->{'Y_CLIP'} + $size, 'radius' => $size, 'filled' => 1 });
+        $DIRTY = 1;
+        $F->set_color({ 'red' => 255, 'green' => 0, 'blue' => 0 });
+        $F->circle({ 'x' => $mid - ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
+        $DIRTY = 1;
+        $F->blit_write($image2);
+        $DIRTY = 1;
+    }
     sleep $factor;
 } ## end sub mode_drawing
 

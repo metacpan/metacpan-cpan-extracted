@@ -98,7 +98,8 @@ SSDP_SEARCH_MSG
 		
 		$http_req = Net::UPnP::HTTP->new();
 		$post_res = $http_req->post($dev_addr, $dev_port, "GET", $dev_path, "", "");
-
+		next if ! $post_res;
+		
 		if ($Net::UPnP::DEBUG) {
 			print $post_res->getstatus() . "\n";
 			print $post_res->getheader() . "\n";

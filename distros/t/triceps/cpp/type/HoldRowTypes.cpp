@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -15,7 +15,7 @@ RowType *HoldRowTypes::copy(const RowType *orig)
 	if (orig == NULL)
 		return NULL;
 
-	if (this == NULL)
+	if (this == NO_HOLD_ROW_TYPES)
 		return orig->copy();
 
 	Map::iterator it = map_.find(orig);
@@ -27,5 +27,14 @@ RowType *HoldRowTypes::copy(const RowType *orig)
 		return rt;
 	}
 }
+
+NoHoldRowTypes::NoHoldRowTypes()
+{ 
+	// Makes sure that this object gets never destroyed by Autoref.
+	incref();
+}
+
+NoHoldRowTypes NO_HOLD_ROW_TYPES_OBJECT;
+HoldRowTypes * const NO_HOLD_ROW_TYPES = &NO_HOLD_ROW_TYPES_OBJECT;
 
 }; // TRICEPS_NS

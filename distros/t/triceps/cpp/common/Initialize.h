@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -30,7 +30,7 @@ namespace TRICEPS_NS {
 //
 // Autoref<SomeType> x = (new SomeType)->addSomething();
 // x->initialize();
-// if (x->getErrors()->hasError()) {
+// if (x->getErrors().hasError()) {
 //     ...
 // }
 //
@@ -69,7 +69,7 @@ template<class T>
 Onceref<T> initializeOrThrow(Onceref<T> arg)
 {
 	arg->initialize();
-	if (arg->getErrors()->hasError())
+	if (arg->getErrors().hasError())
 		throw Exception(arg->getErrors(), true);
 	return arg;
 };
@@ -78,7 +78,7 @@ template<class T>
 Onceref<T> initializeOrThrow(Autoref<T> arg)
 {
 	arg->initialize();
-	if (arg->getErrors()->hasError())
+	if (arg->getErrors().hasError())
 		throw Exception(arg->getErrors(), true);
 	return arg;
 };
@@ -88,7 +88,7 @@ Onceref<T> initializeOrThrow(T *ptr)
 {
 	Onceref<T> arg = ptr;
 	arg->initialize();
-	if (arg->getErrors()->hasError())
+	if (arg->getErrors().hasError())
 		throw Exception(arg->getErrors(), true);
 	return arg;
 };
@@ -96,7 +96,7 @@ Onceref<T> initializeOrThrow(T *ptr)
 template<class T>
 Onceref<T> checkOrThrow(Onceref<T> arg)
 {
-	if (arg->getErrors()->hasError())
+	if (arg->getErrors().hasError())
 		throw Exception(arg->getErrors(), true);
 	return arg;
 };
@@ -104,7 +104,7 @@ Onceref<T> checkOrThrow(Onceref<T> arg)
 template<class T>
 Onceref<T> checkOrThrow(Autoref<T> arg)
 {
-	if (arg->getErrors()->hasError())
+	if (arg->getErrors().hasError())
 		throw Exception(arg->getErrors(), true);
 	return arg;
 };
@@ -113,7 +113,7 @@ template<class T>
 Onceref<T> checkOrThrow(T *ptr)
 {
 	Onceref<T> arg = ptr;
-	if (arg->getErrors()->hasError())
+	if (arg->getErrors().hasError())
 		throw Exception(arg->getErrors(), true);
 	return arg;
 };

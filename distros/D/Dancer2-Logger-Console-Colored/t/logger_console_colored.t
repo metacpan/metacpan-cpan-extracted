@@ -128,13 +128,13 @@ for my $level (qw( core debug info warning error )) {
         hello
         \s
         \e\[36m                 # cyan, we set that above
-            foobar  
+            foobar
         \e\[0m                  # end of coloring
         \s
         hello
         \s
         \e\[36m                 # cyan, we set that above
-            foobar  
+            foobar
         \e\[0m                  # end of coloring
         \s                      # whitespace
         in                      # "in"
@@ -158,14 +158,14 @@ for my $level (qw( core debug info warning error )) {
             info                # name of the level
         \e\[0m                  # end of coloring
     }x, "... and the level is unaffected";
-    
+
     $stderr = capture_stderr { $l->info("asdf 1234") };
-    
+
     like $stderr, qr{
         asdf
         \s
         \e\[35m                 # magenta, we set that above
-            1234  
+            1234
         \e\[0m                  # end of coloring
         \s                      # whitespace
         in                      # "in"
@@ -179,7 +179,19 @@ for my $level (qw( core debug info warning error )) {
         \e\[92m                 # bright green for the origin, we set that above
             \d+                 # line
         \e\[0m                  # end of coloring
-        }x, "call with regex color where two different pattern match";
+    }x, "call with regex color where two different pattern match";
+}
+
+{
+    $l->log_format('%t');
+    my $stderr = capture_stderr { $l->info('foo') };
+    like $stderr, qr{
+        ^                       # there is no color for the date by default
+        \d+/[a-zA-Z]+/\d{4}     # date
+        \s                      # whitespace
+        \d\d:\d\d:\d\d          # time
+        $
+    }x, 'regression gh-11: %t works';
 }
 
 done_testing;

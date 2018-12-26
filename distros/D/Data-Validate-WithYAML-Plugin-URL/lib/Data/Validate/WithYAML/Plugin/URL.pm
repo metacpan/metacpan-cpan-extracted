@@ -9,8 +9,7 @@ use Regexp::Common qw(URI);
 
 # ABSTRACT: Plugin to check URL
 
-
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 sub check {
@@ -29,7 +28,10 @@ sub check {
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -37,7 +39,7 @@ Data::Validate::WithYAML::Plugin::URL - Plugin to check URL
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -61,10 +63,6 @@ test.yml
       URL:
           plugin: URL
           type: required
-
-=head1 VERSION
-
-Version 0.01
 
 =head1 SUBROUTINES
 
@@ -102,4 +100,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-

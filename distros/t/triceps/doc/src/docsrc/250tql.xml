@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -460,12 +460,12 @@ our $rtTrade = Triceps::RowType->new(
 );
 
 our $ttWindow = Triceps::TableType->new($rtTrade)
-	->addSubIndex("bySymbol", 
-		Triceps::SimpleOrderedIndex->new(symbol => "ASC")
-			->addSubIndex("last2",
-				Triceps::IndexType->newFifo(limit => 2)
-			)
-	)
+    ->addSubIndex("bySymbol",
+        Triceps::IndexType->newOrdered(key => ["symbol"])
+            ->addSubIndex("last2",
+                Triceps::IndexType->newFifo(limit => 2)
+            )
+    )
 ;
 $ttWindow->initialize();
 
@@ -678,7 +678,7 @@ sub appCoreT # (@opts)
 
 	my $ttWindow = Triceps::TableType->new($rtTrade)
 		->addSubIndex("byId", 
-			Triceps::SimpleOrderedIndex->new(id => "ASC")
+			Triceps::IndexType->newOrdered(key => ["id"])
 		)
 	;
 	$ttWindow->initialize();
@@ -692,7 +692,7 @@ sub appCoreT # (@opts)
 
 	my $ttSymbol = Triceps::TableType->new($rtSymbol)
 		->addSubIndex("bySymbol", 
-			Triceps::SimpleOrderedIndex->new(symbol => "ASC")
+			Triceps::IndexType->newOrdered(key => ["symbol"])
 		)
 	;
 	$ttSymbol->initialize();

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
 package Term::VTerm;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
 
@@ -23,6 +23,7 @@ our %EXPORT_TAGS = (
    props  => [ grep m/^PROP_/, @EXPORT_OK ],
    mod    => [ grep m/^MOD_/, @EXPORT_OK ],
    damage => [ grep m/^DAMAGE_/, @EXPORT_OK ],
+   keys   => [ grep m/^KEY_/, @EXPORT_OK ],
 );
 
 =head1 NAME
@@ -48,9 +49,17 @@ Attribute constants for pen attributes.
 
 Property constants for terminal properties.
 
+=head2 MOD_* (:mod)
+
+Keyboard modifier bitmask constants for C<keyboard_*> and C<mouse_*>.
+
 =head2 DAMAGE_* (:damage)
 
 Size constants for C<VTermScreen> damage merging.
+
+=head2 KEY_* (:keys)
+
+Key symbol constants for C<keyboard_key>.
 
 =cut
 
@@ -58,7 +67,9 @@ Size constants for C<VTermScreen> damage merging.
 
 =cut
 
-=head2 $vterm = Term::VTerm->new( %args )
+=head2 new
+
+   $vterm = Term::VTerm->new( %args )
 
 Constructs a new C<Term::VTerm> instance of the initial size given by the
 arguments.
@@ -88,48 +99,72 @@ sub new
 
 =cut
 
-=head2 ( $rows, $cols ) = $vterm->get_size
+=head2 get_size
+
+   ( $rows, $cols ) = $vterm->get_size
 
 Returns the current size of the terminal area.
 
 =cut
 
-=head2 $vterm->set_size( $rows, $cols )
+=head2 set_size
+
+   $vterm->set_size( $rows, $cols )
 
 Sets the new size of the terminal area.
 
 =cut
 
-=head2 $utf8 = $vterm->get_utf8
+=head2 get_utf8
 
-=head2 $vterm->set_utf8( $utf8 )
+=head2 set_utf8
+
+   $utf8 = $vterm->get_utf8
+
+   $vterm->set_utf8( $utf8 )
 
 Return or set UTF-8 mode on the parser.
 
 =cut
 
-=head2 $len = $vterm->input_write( $str )
+=head2 input_write
+
+   $len = $vterm->input_write( $str )
 
 Writes the bytes of the given string into the terminal parser buffer.
 
 =cut
 
-=head2 $len = $vterm->output_read( $buf, $maxlen )
+=head2 output_read
+
+   $len = $vterm->output_read( $buf, $maxlen )
 
 Reads bytes from the output buffer of the terminal into the given variable, up
 to the maximum length requested. Returns the number of bytes actually read.
 
 =cut
 
-=head2 $vterm->keyboard_unichar( $char, $mod )
+=head2 keyboard_unichar
+
+   $vterm->keyboard_unichar( $char, $mod )
 
 Sends a keypress to the output buffer, encoding the given Unicode character
 I<number> (i.e. not a string), with the optional modifier (as a bitmask of one
 or more of the C<MOD_*> constants).
 
+=head2 keyboard_key
+
+   $vterm->keyboard_key( $key, $mod )
+
+Sends a keypress to the output buffer, encoding the given key symbol (as a
+C<KEY_*> constant), with the optional modifier (as a bitmask of one or more of
+the C<MOD_*> constants).
+
 =cut
 
-=head2 $vterm->mouse_move( $row, $col, $mod )
+=head2 mouse_move
+
+   $vterm->mouse_move( $row, $col, $mod )
 
 Moves the mouse cursor to the given position, with optional modifier (as a
 bitmask of one or more of the C<MOD_*> constants). It is OK to call this
@@ -138,7 +173,9 @@ events or drag events then no output will be generated.
 
 =cut
 
-=head2 $vterm->mouse_button( $button, $is_pressed, $mod )
+=head2 mouse_button
+
+   $vterm->mouse_button( $button, $is_pressed, $mod )
 
 Performs a mouse button report event on the given button, to either press or
 release it, with optional modifier (as a bitmask of one or more of the
@@ -147,7 +184,9 @@ mode; if mouse reporting is disabled then no output will be generated.
 
 =cut
 
-=head2 $vterm->parser_set_callbacks( %cbs )
+=head2 parser_set_callbacks
+
+   $vterm->parser_set_callbacks( %cbs )
 
 Sets the parser-layer callbacks. Takes the following named arguments:
 
@@ -190,7 +229,9 @@ reference containing sub-arguments. Each sub-argument may be C<undef>.
 
 =cut
 
-=head2 $state = $vterm->obtain_state
+=head2 obtain_state
+
+   $state = $vterm->obtain_state
 
 Returns a L<Term::VTerm::State> object representing the terminal state layer,
 creating it if necessary. After calling this method, any parser callbacks will
@@ -198,7 +239,9 @@ no longer work.
 
 =cut
 
-=head2 $screen = $vterm->obtain_screen
+=head2 obtain_screen
+
+   $screen = $vterm->obtain_screen
 
 Returns a L<Term::VTerm::Screen> object representing the terminal screen
 layer, creating it if necessary. After calling this method, any parser or
@@ -214,24 +257,43 @@ A C<VTermColor> instance can be constructed by
 
 A C<VTermColor> instance has the following field accessors:
 
+=head2 $bool = $color->is_indexed
+
+True if the colour is a palette index.
+
+=head2 $bool = $color->is_rgb
+
+True if the colour contains RGB values directly.
+
+=head2 $idx = $color->index
+
+The palette index for indexed colours.
+
 =head2 $r = $color->red
 
 =head2 $g = $color->green
 
 =head2 $b = $color->blue
 
-The components of the colour as an integer between 0 and 255.
+The components of the colour as an integer between 0 and 255 for RGB colours.
 
 =head2 $hex = $color->rgb_hex
 
 A 6-character string containing the three colour components, hex encoded.
+
+=head2 $bool = $color->is_default_fg
+
+=head2 $bool = $color->is_default_bg
+
+True if the colour is the default colour for terminal foreground or
+background.
 
 =cut
 
 sub Term::VTerm::Color::new
 {
    my ( $class, %args ) = @_;
-   $class->_new( $args{red}, $args{green}, $args{blue} );
+   $class->_new_rgb( $args{red}, $args{green}, $args{blue} );
 }
 
 sub Term::VTerm::Color::rgb_hex
@@ -316,11 +378,15 @@ The following utility functions are also exported.
 
 =cut
 
-=head2 $type = get_attr_type( $attr )
+=head2 get_attr_type
+
+   $type = get_attr_type( $attr )
 
 Returns the type of the given pen attribute.
 
-=head2 $type = get_prop_type( $prop )
+=head2 get_prop_type
+
+   $type = get_prop_type( $prop )
 
 Returns the type of the given terminal property.
 

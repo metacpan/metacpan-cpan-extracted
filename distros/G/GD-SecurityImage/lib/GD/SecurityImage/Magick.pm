@@ -1,8 +1,9 @@
 package GD::SecurityImage::Magick;
+$GD::SecurityImage::Magick::VERSION = '1.75';
 # GD method emulation class for Image::Magick
 use strict;
 use warnings;
-use vars qw($VERSION);
+
 # Magick related
 use constant XPPEM        => 0; # character width 
 use constant YPPEM        => 1; # character height
@@ -19,8 +20,6 @@ use constant MAX_COMPRESS => 100;
 use constant FULL_CIRCLE  => 360;
 
 use Image::Magick;
-
-$VERSION = '1.73';
 
 sub init {
    # Create the image object
@@ -190,22 +189,6 @@ sub setThickness { ## no critic (NamingConventions::Capitalization)
    return;
 }
 
-sub _versiongt {
-   my $self  = shift;
-   my $check = $self->_tovstr(shift);
-   my $gt    = $Image::Magick::VERSION gt $check;
-   my $eq    = $Image::Magick::VERSION eq $check;
-   my $ok    = $gt || $eq;
-   return $ok ? 1 : 0;
-}
-
-sub _versionlt {
-   my $self   = shift;
-   my $check  = $self->_tovstr(shift);
-   my $lt = $Image::Magick::VERSION lt $check ? 1 : 0;
-   return $lt;
-}
-
 sub _tovstr {
    my $self  = shift;
    my $thing = shift || return '0.0.0';
@@ -224,9 +207,17 @@ sub gdbox_empty { return 0 }
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-GD::SecurityImage::Magick -  Image::Magick backend for GD::SecurityImage.
+GD::SecurityImage::Magick
+
+=head1 VERSION
+
+version 1.75
 
 =head1 SYNOPSIS
 
@@ -234,12 +225,13 @@ See L<GD::SecurityImage>.
 
 =head1 DESCRIPTION
 
-This document describes version C<1.73> of C<GD::SecurityImage::Magick>
-released on C<21 January 2015>.
-
 Includes GD method emulations for Image::Magick.
 
 Used internally by L<GD::SecurityImage>. Nothing public here.
+
+=head1 NAME
+
+GD::SecurityImage::Magick -  Image::Magick backend for GD::SecurityImage.
 
 =head1 METHODS
 
@@ -271,15 +263,13 @@ L<GD::SecurityImage>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2015 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2004 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.12.4 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

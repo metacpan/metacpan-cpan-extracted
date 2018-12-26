@@ -4,7 +4,7 @@
 # vault.pl - Vault server for HashCash Digital Cash
 # Copyright (c) 2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: bin/vault.pl v1.129 Tue Oct 16 16:56:38 PDT 2018 $
+# $Id: bin/vault.pl v1.130 Sat Dec 22 18:42:26 PST 2018 $
 
 use strict;
 use warnings;
@@ -98,8 +98,8 @@ vault.pl - Vault for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.129 $
- $Date: Tue Oct 16 16:56:38 PDT 2018 $
+ $Revision: 1.130 $
+ $Date: Sat Dec 22 18:42:26 PST 2018 $
 
 =head1 SYNOPSIS
 

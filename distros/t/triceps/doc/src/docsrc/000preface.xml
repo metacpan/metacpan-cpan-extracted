@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -67,7 +67,8 @@ See the file COPYRIGHT for the copyright notice and license information
 		it is that it's better to have an imperfect manual now than
 		a perfect one in some distant future. It had already been too
 		long in the works, writing the manual for the version 2.0
-		had taken a whole year.
+		had taken a whole year, and then it has baan a long time between
+		versions 2.0 and 2.1.
 		</para>
 	</sect1>
 

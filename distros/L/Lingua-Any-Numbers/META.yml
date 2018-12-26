@@ -3,29 +3,45 @@ abstract: 'Converts numbers into (any available language) string.'
 author:
   - 'Burak Gursoy <burak@cpan.org>'
 build_requires:
-  Test::More: '0.40'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+  utf8: '0'
+  vars: '0'
 configure_requires:
-  Module::Build: '0.42'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - lingua
+  - numbers
+  - numbertostring
+  - num2str
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Lingua-Any-Numbers
-no_index:
-  directory:
-    - monolithic_version
-    - builder
-    - t
-    - xt
 recommends:
   Task::Lingua::Any::Numbers: '0.11'
 requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Spec: '0'
   I18N::LangTags::Detect: '0'
   Lingua::EN::Numbers: '0'
+  Symbol: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  subs: '0'
+  warnings: '0'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/burak/cpan-lingua-any-numbers/
-version: '0.46'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/burak/CPAN-Lingua-Any-Numbers/issues
+  repository: git://github.com/burak/CPAN-Lingua-Any-Numbers.git
+version: '0.50'
+x_contributors:
+  - 'Burak Gursoy <burak@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

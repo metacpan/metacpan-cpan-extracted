@@ -1,7 +1,7 @@
 package App::hr;
 
-our $DATE = '2016-06-17'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2018-12-22'; # DATE
+our $VERSION = '0.260'; # VERSION
 
 use feature 'say';
 use strict 'subs', 'vars';
@@ -39,7 +39,20 @@ sub hr {
     if ($^O =~ /MSWin/) {
         substr($hr, -1, 1) = '';
     }
-    if ($color) {
+
+    # should we actually output color?
+    my $do_color = do {
+        if (exists $ENV{NO_COLOR}) {
+            0;
+        } elsif (defined $ENV{COLOR}) {
+            $ENV{COLOR};
+        } else {
+            (-t STDOUT);
+        }
+    };
+    undef $color unless $do_color;
+
+    if (defined $color) {
         require Term::ANSIColor;
         $hr = Term::ANSIColor::colored([$color], $hr);
     }
@@ -52,9 +65,9 @@ $SPEC{hr_app} = {
     summary => 'Print horizontal bar on the terminal',
     description => <<'_',
 
-`hr` can be useful as a marker/separator, especially if you use other commands
-that might produce a lot of output, and you need to scroll back lots of pages to
-see previous output. Example:
+<prog:hr> can be useful as a marker/separator, especially if you use other
+commands that might produce a lot of output, and you need to scroll back lots of
+pages to see previous output. Example:
 
     % hr; command-that-produces-lots-of-output
     ============================================================================
@@ -90,7 +103,7 @@ Usage:
 
     % hr --help
 
-If you use Perl, you can also use the `hr` function in `App::hr` module.
+If you use Perl, you can also use the `hr` function in <pm:App::hr> module.
 
 _
     args_rels => {
@@ -221,7 +234,7 @@ App::hr - Print horizontal bar on the terminal
 
 =head1 VERSION
 
-This document describes version 0.25 of App::hr (from Perl distribution App-hr), released on 2016-06-17.
+This document describes version 0.260 of App::hr (from Perl distribution App-hr), released on 2018-12-22.
 
 =head1 SYNOPSIS
 
@@ -248,33 +261,46 @@ You can also use the provided CLI L<hr>.
 
 =for Pod::Coverage ^(pick)$
 
+=head1 NO_COLOR
+
+=head2 COLOR
+
 =head1 FUNCTIONS
 
-=head2 hr([ PATTERN [, COLOR ] ]) => optional STR
+=head2 hr([ $pattern [, $color ] ]) => optional STR
 
 Print (under void context) or return (under scalar/array context) a horizontal
 ruler with the width of the terminal.
 
 Terminal width is determined using L<Term::Size>.
 
-C<PATTERN> is optional, can be multicharacter, but cannot be empty string. The
+C<$pattern> is optional, can be multicharacter, but cannot be empty string. The
 defautl is C<=>.
 
 Under Windows, will shave one character at the end because the terminal cursor
 will move a line down when printing at the last column.
+
+If C<$color> is set (to a color supported by L<Term::ANSIColor>) I<and> colored
+output is enabled, output will be colored. Colored output is enabled if: 1) no
+C<NO_COLOR> environment variable is defined; 2) C<COLOR> is undefined or true,
+or program is run interactively.
 
 =head2 hr_r => optional STR
 
 Like C<hr>, but will set random pattern and random color.
 
 
-=head2 hr_app(%args) -> [status, msg, result, meta]
+=head2 hr_app
+
+Usage:
+
+ hr_app(%args) -> [status, msg, payload, meta]
 
 Print horizontal bar on the terminal.
 
-C<hr> can be useful as a marker/separator, especially if you use other commands
-that might produce a lot of output, and you need to scroll back lots of pages to
-see previous output. Example:
+L<hr> can be useful as a marker/separator, especially if you use other
+commands that might produce a lot of output, and you need to scroll back lots of
+pages to see previous output. Example:
 
  % hr; command-that-produces-lots-of-output
  ============================================================================
@@ -310,7 +336,7 @@ Usage:
  
  % hr --help
 
-If you use Perl, you can also use the C<hr> function in C<App::hr> module.
+If you use Perl, you can also use the C<hr> function in L<App::hr> module.
 
 This function is not exported.
 
@@ -349,11 +375,13 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
+=head1 ENVIRONMENT
 
 =head1 HOMEPAGE
 
@@ -381,7 +409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

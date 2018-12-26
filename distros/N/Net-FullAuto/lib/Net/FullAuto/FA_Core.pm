@@ -164,9 +164,19 @@ package Net::FullAuto::FA_Core;
 #
 #  echo fullauto.com | nc whois.tucows.com 43
 #
-## Snowden
+## Backup to Google Drive
 #
-#  https://www.youtube.com/watch?v=98eabjjAEz8
+#  https://www.experts-exchange.com/articles/29279/Backup-Linux-Servers-to-Google-Drive.html
+#
+#  wget -O drive https://drive.google.com/uc?id=0B3X9GlR6EmbnMHBMVWtKaEZXdDg 
+#  mv drive /usr/sbin/drive 
+#  chmod 755 /usr/sbin/drive
+#  drive
+#
+#  BOOTDRIVE="$(fdisk -l | grep '^/dev/[a-z]*[0-9]' |
+#     awk '$2 == "*"' | cut -d ' ' -f 1)"  # or awk 'NR==2'
+#  sudo dd conv=sparse if=${BOOTDRIVE} | gzip -c --fast |
+#     drive upload --stdin --title bootdrive.gz
 #
 ## *************************************************************
 

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Find all (direct) superclasses of a class",
+   "author" : [
+      "Renee Baecker <module@renee-baecker.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Superclasses",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "PPI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Superclasses" : {
+         "file" : "lib/Class/Superclasses.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Class-Superclasses/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Class-Superclasses",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Class-Superclasses.git",
+         "web" : "http://github.com/reneeb/Class-Superclasses"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

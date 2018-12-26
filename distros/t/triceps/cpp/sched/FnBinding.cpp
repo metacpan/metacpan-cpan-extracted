@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -54,9 +54,10 @@ FnBinding *FnBinding::addLabel(const string &name, Autoref<Label> lb, bool autoc
 		return this;
 	} 
 
-	if (labels_.size() < idx+1) // should never happen but just in case
+	if (labels_.size() < idx+1) { // should never happen but just in case
 		labels_.resize(idx+1);
 		autoclear_.resize(idx+1);
+	}
 
 	if (!labels_[idx].isNull()) {
 		if (errors_.isNull())

@@ -1,4 +1,9 @@
 Revision history for Data::Tabulate::Plugin::ASCIITable
+=======================================================
+
+0.04    2018-12-23 12:02:00
+
+        * improve dist
 
 0.03    2014-07-15
 

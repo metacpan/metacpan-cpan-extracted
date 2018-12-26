@@ -163,7 +163,7 @@ sub get_nginx_cfg($self) {
         push @buf, $bucket->get_nginx_cfg( \@cache_control );
     }
 
-    return join $LF, @buf;
+    return join "\n", @buf;
 }
 
 1;

@@ -8,6 +8,8 @@ use Test::More;
 
 our ($CLEANUP, $OLD_DIR, $WORK_DIR) = (0, path, path);
 
+sub builder {$t::Helper::builder}
+
 sub t {
   my ($class, %config) = @_;
   my $app = Mojolicious->new;

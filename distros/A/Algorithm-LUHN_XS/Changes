@@ -1,4 +1,11 @@
 Revision history for Perl module Algorithm::LUHN_XS
+1.08 2018-12-24 KSCHWAB
+    - Change tests to avoid perl converting long number into
+      1.234e+1 format
+
+1.07 2018-12-23 KSCHWAB
+    - Explicitly use unsigned char
+
 1.06 2018-12-08 KSCHWAB
     - Fix memory leak
     - Improve test coverage

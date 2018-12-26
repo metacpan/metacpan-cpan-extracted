@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -15,7 +15,7 @@
 use ExtUtils::testlib;
 
 use Test;
-BEGIN { plan tests => 16 };
+BEGIN { plan tests => 15 };
 use Triceps;
 use Triceps::X::TestFeed qw(:all);
 use Carp;
@@ -337,7 +337,7 @@ my $ttWindow = Triceps::TableType->new($rtTrade)
 	->addSubIndex("bySymbol", 
 		Triceps::IndexType->newHashed(key => [ "symbol" ])
 		->addSubIndex("orderById",
-			Triceps::SimpleOrderedIndex->new(id => "ASC",)
+			Triceps::IndexType->newOrdered(key => [ "id" ])
 			->setAggregator(Triceps::AggregatorType->new(
 				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage3)
 			)
@@ -1062,7 +1062,7 @@ sub computeAverage10 # (table, context, aggop, opcode, rh, state, args...)
 	return if ($context->groupSize()==0
 		|| $opcode != &Triceps::OP_INSERT);
 
-	my $sum = 0;
+	my $sum = 0.;
 	my $count = 0;
 	for (my $rhi = $context->begin(); !$rhi->isNull(); 
 			$rhi = $context->next($rhi)) {
@@ -1179,7 +1179,7 @@ my $ttWindow = Triceps::TableType->new($rtTrade)
 			)
 		)
 		->addSubIndex("byPrice",
-			Triceps::SimpleOrderedIndex->new(price => "ASC",)
+			Triceps::IndexType->newOrdered(key => [ "price" ])
 			->addSubIndex("multi", Triceps::IndexType->newFifo())
 		)
 	)
@@ -1222,6 +1222,9 @@ while(&readLine) {
 setInputLines(@inputOrder);
 &doNonAdditive3();
 #print &getResultLines();
+if (0) {
+# the new Perl is smart enough to keep the extra precision,
+# so this text doesn't work as intended any more
 ok(&getResultLines(), 
 '> OP_INSERT,1,AAA,1,10
 1
@@ -1240,6 +1243,7 @@ ok(&getResultLines(),
 > OP_INSERT,8,BBB,1,10
 2500000000000000
 ');
+}
 
 setInputLines(@inputOrder);
 &doOrderedSum();
@@ -1326,7 +1330,7 @@ my $ttWindow = Triceps::TableType->new($rtTrade)
 			Triceps::IndexType->newFifo(limit => 4)
 		)
 		->addSubIndex("byPrice",
-			Triceps::SimpleOrderedIndex->new(price => "ASC",)
+			Triceps::IndexType->newOrdered(key => [ "price" ])
 			->addSubIndex("multi", Triceps::IndexType->newFifo())
 			->setAggregator(Triceps::AggregatorType->new(
 				$rtAvgPrice, "aggrAvgPrice", undef, \&computeAverage12)

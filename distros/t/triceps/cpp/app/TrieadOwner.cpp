@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -74,7 +74,7 @@ Onceref<Facet> TrieadOwner::exportNexus(Autoref<Facet> facet, bool import)
 		throw Exception::fTrace("In app '%s' thread '%s' can not re-export the imported facet '%s'.",
 			app_->getName().c_str(), get()->getName().c_str(), facet->getFullName().c_str());
 	Erref err = facet->getErrors();
-	if (err->hasError()) {
+	if (err.hasError()) {
 		throw Exception::fTrace(err, "In app '%s' thread '%s' can not export the facet '%s' with an error:",
 			app_->getName().c_str(), get()->getName().c_str(), name.c_str());
 	}
@@ -167,7 +167,7 @@ bool TrieadOwner::refillRound(Triead::FacetPtrRound &vec)
 	return found;
 }
 
-bool TrieadOwner::nextXtray(bool wait, const struct timespec &abstime)
+bool TrieadOwner::nextXtray(bool wait, const struct timespec *abstime)
 {
 	if (!appReady_)
 		throw Exception::fTrace("Can not read the facets in thread '%s' before waiting for App readiness.",
@@ -231,10 +231,10 @@ bool TrieadOwner::nextXtray(bool wait, const struct timespec &abstime)
 		if (wait) {
 			if (triead_->rqDead_)
 				return false;
-			if (&abstime == NULL)
+			if (abstime == NULL)
 				triead_->qev_->wait(); // wait for more data
 			else 
-				if (triead_->qev_->timedwait(abstime) == ETIMEDOUT)
+				if (triead_->qev_->timedwait(*abstime) == ETIMEDOUT)
 					return false;
 			if (triead_->rqDead_)
 				return false;
@@ -253,7 +253,7 @@ bool TrieadOwner::nextXtrayTimeout(int64_t sec, int32_t nsec)
 		tm.tv_nsec -= 1000000000;
 		tm.tv_sec++;
 	}
-	return nextXtray(true, tm);
+	return nextXtray(true, &tm);
 }
 
 void TrieadOwner::mainLoop()

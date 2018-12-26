@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -29,36 +29,43 @@ See the file COPYRIGHT for the copyright notice and license information
 <pre>
 $ TRICEPS_PERF_COUNT=100000 perl t/Perf.t
 Performance test, 100000 iterations, real time.
-Empty Perl loop 0.006801 s, 14702927.05 per second.
-Empty Perl function of 5 args 0.031918 s, 3133046.99 per second.
-Empty Perl function of 10 args 0.027418 s, 3647284.30 per second.
-Row creation from array and destruction 0.277232 s, 360708.19 per second.
-Row creation from hash and destruction 0.498189 s, 200727.04 per second.
-Rowop creation and destruction 0.155996 s, 641043.69 per second.
-Calling a dummy label 0.098480 s, 1015437.21 per second.
-Calling a chained dummy label 0.110546 s, 904601.83 per second.
-  Pure chained call 0.012066 s, 8287664.25 per second.
-Calling a Perl label 0.512559 s, 195099.61 per second.
-Row handle creation and destruction 0.195778 s, 510781.66 per second.
-Repeated table insert (single hashed idx, direct) 0.772934 s, 129377.12 per second.
-Repeated table insert (single hashed idx, direct & Perl construct) 1.109781 s, 90107.89 per second.
-  RowHandle creation overhead in Perl 0.336847 s, 296871.05 per second.
-Repeated table insert (single sorted idx, direct) 2.122350 s, 47117.59 per second.
-Repeated table insert (single hashed idx, call) 0.867846 s, 115227.88 per second.
-Table insert makeRowArray (single hashed idx, direct) 1.224588 s, 81660.14 per second.
-  Excluding makeRowArray 0.947355 s, 105557.02 per second.
-Table insert makeRowArray (double hashed idx, direct) 1.443053 s, 69297.51 per second.
-  Excluding makeRowArray 1.165821 s, 85776.47 per second.
-  Overhead of second index 0.218466 s, 457738.04 per second.
-Table insert makeRowArray (single sorted idx, direct) 29.880962 s, 3346.61 per second.
-  Excluding makeRowArray 29.603730 s, 3377.95 per second.
-Table lookup (single hashed idx) 0.287407 s, 347938.44 per second.
-Table lookup (single sorted idx) 9.160540 s, 10916.39 per second.
-Lookup join (single hashed idx) 3.940388 s, 25378.21 per second.
-Nexus pass (1 row/flush) 0.578993 s, 172713.78 per second.
-Nexus pass (10 rows/flush) 2.266709 s, 441168.31 per row per second.
-  Overhead of each row 0.187524 s, 533265.07 per second.
-  Overhead of flush 0.391469 s, 255448.33 per second.
+Empty Perl loop 0.004426 s, 22592534.34 per second.
+Empty Perl function of 5 args 0.017969 s, 5565025.41 per second.
+Empty Perl function of 10 args 0.021972 s, 4551308.65 per second.
+Row creation from array and destruction 0.169338 s, 590536.61 per second.
+Row creation from hash and destruction 0.192646 s, 519086.75 per second.
+Rowop creation and destruction 0.074600 s, 1340491.48 per second.
+Calling a dummy label 0.029692 s, 3367945.01 per second.
+Calling a chained dummy label 0.031990 s, 3125995.16 per second.
+  Pure chained call 0.002298 s, 43513891.48 per second.
+Calling a Perl label 0.168692 s, 592796.78 per second.
+Row handle creation and destruction 0.077752 s, 1286142.62 per second.
+Repeated table insert (single hashed idx, direct) 0.114952 s, 869927.66 per second.
+Repeated table insert (single hashed idx, direct & Perl construct) 0.214694 s, 465778.63 per second.
+  RowHandle creation overhead in Perl 0.099742 s, 1002584.92 per second.
+Repeated table insert (single ordered int idx, direct) 0.119679 s, 835568.66 per second.
+Repeated table insert (single perl sorted idx, direct) 0.619665 s, 161377.42 per second.
+Repeated table insert (single hashed idx, call) 0.122374 s, 817165.07 per second.
+Table insert makeRowArray (single hashed idx, direct) 0.410910 s, 243362.22 per second.
+  Excluding makeRowArray 0.241573 s, 413954.20 per second.
+Table insert makeRowArray (double hashed idx, direct) 0.484066 s, 206583.19 per second.
+  Excluding makeRowArray 0.314729 s, 317733.69 per second.
+  Overhead of second index 0.073156 s, 1366935.21 per second.
+Table insert makeRowArray (single ordered int idx, direct) 0.460580 s, 217117.61 per second.
+  Excluding makeRowArray 0.291242 s, 343356.65 per second.
+Table insert makeRowArray (single ordered string idx, direct) 0.907807 s, 110155.59 per second.
+  Excluding makeRowArray 0.738469 s, 135415.23 per second.
+Table insert makeRowArray (single perl sorted idx, direct) 12.140260 s, 8237.06 per second.
+  Excluding makeRowArray 11.970923 s, 8353.57 per second.
+Table lookup (single hashed idx) 0.088578 s, 1128951.72 per second.
+Table lookup (single ordered int idx) 0.127015 s, 787309.36 per second.
+Table lookup (single ordered string idx) 0.258478 s, 386879.52 per second.
+Table lookup (single perl sorted idx) 3.727754 s, 26825.81 per second.
+Lookup join (single hashed idx) 1.635421 s, 61146.32 per second.
+Nexus pass (1 row/flush) 0.194848 s, 513219.77 per second.
+Nexus pass (10 rows/flush) 0.796733 s, 1255125.02 per row per second.
+  Overhead of each row 0.066876 s, 1495302.06 per second.
+  Overhead of flush 0.127972 s, 781419.84 per second.
 </pre>
 
 		<para>
@@ -85,13 +92,19 @@ Nexus pass (10 rows/flush) 2.266709 s, 441168.31 per row per second.
 
 		<para>
 		I've had an opportunity to run the performance tests on a few more
-		laptops. Al of the same Core2 generation, but with the different CPU
+		laptops. All of the same Core2 generation, but with the different CPU
 		frequencies. The 2GHz version showed expectedly an about 30% lower
 		performance proportionally. A 2.2GHz CPU also showed an about proportional
 		change, except for the inter-thread communication through the
 		nexus, it went down more than proportional.
 		I'm not sure, what was up with the 2.2GHz CPU, maybe
 		the timing worked out just wrong to add more overhead.
+		</para>
+
+		<para>
+		The speed is improved a lot by the high optimization levels, the numbers
+		above were produced with GCC -O3. The newer versions of both the GCC
+		and Perl produce a marked improvement of performance on the old ones.
 		</para>
 
 		<para>
@@ -109,9 +122,9 @@ Performance test, 100000 iterations, real time.
 		</para>
 
 <pre>
-Empty Perl loop 0.006801 s, 14702927.05 per second.
-Empty Perl function of 5 args 0.031918 s, 3133046.99 per second.
-Empty Perl function of 10 args 0.027418 s, 3647284.30 per second.
+Empty Perl loop 0.004426 s, 22592534.34 per second.
+Empty Perl function of 5 args 0.017969 s, 5565025.41 per second.
+Empty Perl function of 10 args 0.021972 s, 4551308.65 per second.
 </pre>
 
 		<para>
@@ -121,7 +134,7 @@ Empty Perl function of 10 args 0.027418 s, 3647284.30 per second.
 		</para>
 
 <pre>
-Row creation from array and destruction 0.277232 s, 360708.19 per second.
+Row creation from array and destruction 0.169338 s, 590536.61 per second.
 </pre>
 
 		<para>
@@ -130,7 +143,7 @@ Row creation from array and destruction 0.277232 s, 360708.19 per second.
 		</para>
 
 <pre>
-Row creation from hash and destruction 0.498189 s, 200727.04 per second.
+Row creation from hash and destruction 0.192646 s, 519086.75 per second.
 </pre>
 
 		<para>
@@ -138,7 +151,7 @@ Row creation from hash and destruction 0.498189 s, 200727.04 per second.
 		</para>
 
 <pre>
-Rowop creation and destruction 0.155996 s, 641043.69 per second.
+Rowop creation and destruction 0.074600 s, 1340491.48 per second.
 </pre>
 
 		<para>
@@ -147,7 +160,7 @@ Rowop creation and destruction 0.155996 s, 641043.69 per second.
 		</para>
 
 <pre>
-Calling a dummy label 0.098480 s, 1015437.21 per second.
+Calling a dummy label 0.029692 s, 3367945.01 per second.
 </pre>
 
 		<para>
@@ -157,8 +170,8 @@ Calling a dummy label 0.098480 s, 1015437.21 per second.
 		</para>
 
 <pre>
-Calling a chained dummy label 0.110546 s, 904601.83 per second.
-  Pure chained call 0.012066 s, 8287664.25 per second.
+Calling a chained dummy label 0.031990 s, 3125995.16 per second.
+  Pure chained call 0.002298 s, 43513891.48 per second.
 </pre>
 
 		<para>
@@ -168,7 +181,7 @@ Calling a chained dummy label 0.110546 s, 904601.83 per second.
 		</para>
 
 <pre>
-Calling a Perl label 0.512559 s, 195099.61 per second.
+Calling a Perl label 0.168692 s, 592796.78 per second.
 </pre>
 
 		<para>
@@ -178,7 +191,7 @@ Calling a Perl label 0.512559 s, 195099.61 per second.
 		</para>
 
 <pre>
-Row handle creation and destruction 0.195778 s, 510781.66 per second.
+Row handle creation and destruction 0.077752 s, 1286142.62 per second.
 </pre>
 
 		<para>
@@ -187,7 +200,7 @@ Row handle creation and destruction 0.195778 s, 510781.66 per second.
 		</para>
 
 <pre>
-Repeated table insert (single hashed idx, direct) 0.772934 s, 129377.12 per second.
+Repeated table insert (single hashed idx, direct) 0.114952 s, 869927.66 per second.
 </pre>
 
 		<para>
@@ -202,8 +215,8 @@ Repeated table insert (single hashed idx, direct) 0.772934 s, 129377.12 per seco
 		</para>
 
 <pre>
-Repeated table insert (single hashed idx, direct & Perl construct) 1.109781 s, 90107.89 per second.
-  RowHandle creation overhead in Perl 0.336847 s, 296871.05 per second.
+Repeated table insert (single hashed idx, direct & Perl construct) 0.214694 s, 465778.63 per second.
+  RowHandle creation overhead in Perl 0.099742 s, 1002584.92 per second.
 </pre>
 
 		<para>
@@ -215,17 +228,27 @@ Repeated table insert (single hashed idx, direct & Perl construct) 1.109781 s, 9
 		</para>
 
 <pre>
-Repeated table insert (single sorted idx, direct) 2.122350 s, 47117.59 per second.
+Repeated table insert (single ordered int idx, direct) 0.119679 s, 835568.66 per second.
 </pre>
 
 		<para>
-		The same thing, only for a table that uses a Sorted index that executes
-		a Perl comparison on the same <pre>int32</pre> field. As you can see, it gets 
-		almost 3 times slower.
+		The same thing, only for a table that uses an Ordered index that executes
+		a comparison on the same <pre>int32</pre> field. The performance is very
+		close to the hashed index.
 		</para>
 
 <pre>
-Repeated table insert (single hashed idx, call) 0.867846 s, 115227.88 per second.
+Repeated table insert (single perl sorted idx, direct) 0.619665 s, 161377.42 per second.
+</pre>
+
+		<para>
+		The same thing, only for a table that uses a PerlSorted index that executes
+		a Perl comparison on the same <pre>int32</pre> field. As you can see, it gets 
+		about 5 times slower.
+		</para>
+
+<pre>
+Repeated table insert (single hashed idx, call) 0.122374 s, 817165.07 per second.
 </pre>
 
 		<para>
@@ -234,8 +257,8 @@ Repeated table insert (single hashed idx, call) 0.867846 s, 115227.88 per second
 		</para>
 
 <pre>
-Table insert makeRowArray (single hashed idx, direct) 1.224588 s, 81660.14 per second.
-  Excluding makeRowArray 0.947355 s, 105557.02 per second.
+Table insert makeRowArray (single hashed idx, direct) 0.410910 s, 243362.22 per second.
+  Excluding makeRowArray 0.241573 s, 413954.20 per second.
 </pre>
 
 		<para>
@@ -252,9 +275,9 @@ Table insert makeRowArray (single hashed idx, direct) 1.224588 s, 81660.14 per s
 		</para>
 
 <pre>
-Table insert makeRowArray (double hashed idx, direct) 1.443053 s, 69297.51 per second.
-  Excluding makeRowArray 1.165821 s, 85776.47 per second.
-  Overhead of second index 0.218466 s, 457738.04 per second.
+Table insert makeRowArray (double hashed idx, direct) 0.484066 s, 206583.19 per second.
+  Excluding makeRowArray 0.314729 s, 317733.69 per second.
+  Overhead of second index 0.073156 s, 1366935.21 per second.
 </pre>
 
 		<para>
@@ -264,18 +287,32 @@ Table insert makeRowArray (double hashed idx, direct) 1.443053 s, 69297.51 per s
 		</para>
 
 <pre>
-Table insert makeRowArray (single sorted idx, direct) 29.880962 s, 3346.61 per second.
-  Excluding makeRowArray 29.603730 s, 3377.95 per second.
+Table insert makeRowArray (single ordered int idx, direct) 0.460580 s, 217117.61 per second.
+  Excluding makeRowArray 0.291242 s, 343356.65 per second.
+Table insert makeRowArray (single ordered string idx, direct) 0.907807 s, 110155.59 per second.
+  Excluding makeRowArray 0.738469 s, 135415.23 per second.
 </pre>
 
 		<para>
-		Similar but for a table with a Sorted index with a Perl expression. As
-		you can see, with the makeRowArray overhead excluded it's about 30 times
-		slower (and it gets even worse for the larger row sets).
+		Similar but for a table with an Ordered index. This version on an int field
+		is just slightly slower. Using a string key instead of an integer makes the index
+		about 3 times slower.
 		</para>
 
 <pre>
-Table lookup (single hashed idx) 0.287407 s, 347938.44 per second.
+Table insert makeRowArray (single perl sorted idx, direct) 12.140260 s, 8237.06 per second.
+  Excluding makeRowArray 11.970923 s, 8353.57 per second.
+</pre>
+
+		<para>
+		Similar but for a table with a PerlSorted index that executes the comparison
+		in a Perl expression. As you can see, with the makeRowArray overhead
+		excluded it's about 50 times slower than the ordering done in &Cpp;
+		(and it gets even worse for the larger row sets).
+		</para>
+
+<pre>
+Table lookup (single hashed idx) 0.088578 s, 1128951.72 per second.
 </pre>
 
 		<para>
@@ -284,17 +321,29 @@ Table lookup (single hashed idx) 0.287407 s, 347938.44 per second.
 		</para>
 
 <pre>
-Table lookup (single sorted idx) 9.160540 s, 10916.39 per second.
+Table lookup (single ordered int idx) 0.127015 s, 787309.36 per second.
+Table lookup (single ordered string idx) 0.258478 s, 386879.52 per second.
+</pre>
+
+		<para>
+		Finding a row in a table of 100K (or however many iterations
+		requested) rows by an ordered index, with an integer and string field
+		used as a key.
+		</para>
+
+<pre>
+Table lookup (single perl sorted idx) 3.727754 s, 26825.81 per second.
 </pre>
 
 		<para>
 		Finding a row in a table of 100K (or however many iterations
 		requested) rows by a Perl sorted index. Just like row insertion,
-		it's 30-odd times slower than a hashed index.
+		it's massively slower than the ordering in &Cpp; but not quite
+		that much, only by a factor of 30 rather than 50.
 		</para>
 
 <pre>
-Lookup join (single hashed idx) 3.940388 s, 25378.21 per second.
+Lookup join (single hashed idx) 1.635421 s, 61146.32 per second.
 </pre>
 
 		<para>
@@ -306,10 +355,10 @@ Lookup join (single hashed idx) 3.940388 s, 25378.21 per second.
 		</para>
 
 <pre>
-Nexus pass (1 row/flush) 0.578993 s, 172713.78 per second.
-Nexus pass (10 rows/flush) 2.266709 s, 441168.31 per row per second.
-  Overhead of each row 0.187524 s, 533265.07 per second.
-  Overhead of flush 0.391469 s, 255448.33 per second.
+Nexus pass (1 row/flush) 0.194848 s, 513219.77 per second.
+Nexus pass (10 rows/flush) 0.796733 s, 1255125.02 per row per second.
+  Overhead of each row 0.066876 s, 1495302.06 per second.
+  Overhead of flush 0.127972 s, 781419.84 per second.
 </pre>
 
 		<para>

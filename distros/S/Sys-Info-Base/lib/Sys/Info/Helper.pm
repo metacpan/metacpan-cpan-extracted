@@ -1,8 +1,7 @@
 package Sys::Info::Helper;
-use 5.006;
+$Sys::Info::Helper::VERSION = '0.7807';
 use strict;
 use warnings;
-use vars qw( $VERSION @EXPORT );
 use base qw(Exporter);
 use File::Spec::Functions qw( catdir catfile );
 use File::Path;
@@ -12,8 +11,7 @@ use Carp qw( croak );
 use Data::Dumper;
 use Text::Template::Simple;
 
-$VERSION = '0.7804';
-@EXPORT  = qw( new_driver );
+our @EXPORT  = qw( new_driver );
 
 sub new {
     my($class, @args) = @_;
@@ -142,24 +140,8 @@ Sys::Info::Driver::<%ID%>::Device - Base class for <%ID%> device drivers
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7804> of C<Sys::Info::Helper>
-released on C<21 January 2015>.
-
 Base class for <%ID%> device drivers.
 
-=head1 AUTHOR
-
-Burak Gursoy <burak@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright 2006 - 2015 Burak Gursoy. All rights reserved.
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut
 
 TEMPLATE
@@ -375,13 +357,23 @@ __END__
 
 =pod
 
-=head1 NAME 
+=encoding UTF-8
 
-Sys::Info::Helper - Helps to create new Sys::Info drivers.
+=head1 NAME
+
+Sys::Info::Helper
+
+=head1 VERSION
+
+version 0.7807
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
+
+=head1 NAME 
+
+Sys::Info::Helper - Helps to create new Sys::Info drivers.
 
 =head1 METHODS
 
@@ -394,5 +386,16 @@ Sys::Info::Helper - Helps to create new Sys::Info drivers.
 =head1 SEE ALSO
 
 L<Sys::Info>.
+
+=head1 AUTHOR
+
+Burak Gursoy <burak@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2006 by Burak Gursoy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

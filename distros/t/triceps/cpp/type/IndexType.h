@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -60,13 +60,13 @@ public:
 
 	// Find the nested index by name.
 	// @param name - name of the nested index
-	// @return - pointer to the nested index or NULL if unknown name
+	// @return - pointer to the nested index or NO_INDEX_TYPE if unknown name
 	IndexType *find(const string &name) const;
 	
 	// Find the first nested index of given type.
 	// @param it - IndexType::IndexId enum of the nested index
 	//           (can't use the index type here because it's not defined yet)
-	// @return - pointer to the nested index or NULL if none matches
+	// @return - pointer to the nested index or NO_INDEX_TYPE if none matches
 	IndexType *findByIndexId(int it) const;
 
 	// Initialize and validate all indexes in the vector.
@@ -127,10 +127,12 @@ class IndexType : public Type
 public:
 	// subtype of index
 	enum IndexId {
+		IT_NONE, // NoIndexType
 		IT_ROOT, // RootIndexType
 		IT_HASHED, // HashedIndexType
 		IT_FIFO, // FifoIndexType
 		IT_SORTED, // SortedIndexType
+		IT_ORDERED, // OrderedIndexType
 		// add new types here
 		IT_LAST
 	};
@@ -143,6 +145,7 @@ public:
 	virtual Erref getErrors() const; 
 	virtual bool equals(const Type *t) const;
 	virtual bool match(const Type *t) const;
+	virtual int cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const;
 
 	// Convert the IndexId to string and back
 	// @param enval - enum value
@@ -179,9 +182,22 @@ public:
 	}
 
 	// Get the list of field names that this index uses as keys.
+	//
 	// May be NULL if the index has no keys at all or if the key is
 	// calculated as some expression on the fields.
 	virtual const NameSet *getKey() const = 0;
+
+	// Get the list of expressions that this index uses as keys in the
+	// format that was used to set the key. The expressions may be the
+	// simple field names or the field names with whatever extra
+	// decorators supported by the particular index type, or some
+	// sorting expression in whatever format.
+	//
+	// The default implementation returns getKey().
+	//
+	// May be NULL if the index has no keys at all or if the key is
+	// calculated as some expression on the fields.
+	virtual const NameSet *getKeyExpr() const;
 
 	// Define an aggregator on this index. Each aggregator instance
 	// will work on the instance of this index.
@@ -240,27 +256,22 @@ public:
 		return nested_.empty();
 	}
 
-	// Find the nested index by name.
-	// It's safe to call with this==NULL, so the calls can be safely chained,
+	// Find the nested index by name. The calls can be safely chained,
 	// checking only the final result.
 	// @param name - name of the index
-	// @return - index type, or NULL if not found
+	// @return - index type, or NO_INDEX_TYPE if not found
 	IndexType *findSubIndex(const string &name) const
 	{
-		if (this == NULL)
-			return NULL;
 		return nested_.find(name);
 	}
 
 	// Find the first nested index having the given index type id.
-	// It's safe to call with this==NULL, so the calls can be safely chained,
+	// The calls can be safely chained,
 	// checking only the final result.
 	// @param it - type enum of the nested index
-	// @return - index type, or NULL if not found
+	// @return - index type, or NO_INDEX_TYPE if not found
 	IndexType *findSubIndexById(IndexId it) const
 	{
-		if (this == NULL)
-			return NULL;
 		return nested_.findByIndexId(it);
 	}
 
@@ -650,6 +661,44 @@ private:
 	IndexType(const IndexType &orig); 
 	void operator=(const IndexType &);
 };
+
+// This is a pseudo-type, used when the finding of sub-indexes needs to
+// return "no index was found". Using this pseudo-types allows to chain
+// such find operations safely.
+class NoIndexType : public IndexType
+{
+public:
+	NoIndexType();
+
+	// A special way to create the static objects of this type that can get
+	// referenced by AutoRef and still never get destroyed. Setting isStatic
+	// to true adds one to the reference count.
+	NoIndexType(bool isStatic);
+
+	// from Type
+	virtual bool equals(const Type *t) const;
+	virtual void printTo(string &res, const string &indent = "", const string &subindent = "  ") const;
+
+	// from IndexType
+	virtual const NameSet *getKey() const;
+	virtual IndexType *copy(bool flat = false) const;
+	virtual IndexType *deepCopy(HoldRowTypes *holder) const;
+	virtual void initialize();
+	virtual Index *makeIndex(const TableType *tabtype, Table *table) const;
+	virtual void initRowHandleSection(RowHandle *rh) const;
+	virtual void clearRowHandleSection(RowHandle *rh) const;
+	virtual void copyRowHandleSection(RowHandle *rh, const RowHandle *fromrh) const;
+
+protected:
+	// used by copy()
+	NoIndexType(const NoIndexType &orig, bool flat);
+	// used by deepCopy()
+	NoIndexType(const NoIndexType &orig, HoldRowTypes *holder);
+};
+
+// Pointer to this object is returned when the nested index type is not found.
+extern NoIndexType NO_INDEX_TYPE_OBJECT;
+extern IndexType * const NO_INDEX_TYPE;
 
 }; // TRICEPS_NS
 

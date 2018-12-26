@@ -1,14 +1,99 @@
+NAME
 
+    Data::Validate::WithYAML::Plugin::NoSpam - Plugin to check that a given
+    text is no spam.
 
-This archive contains the distribution Data-Validate-WithYAML-Plugin-NoSpam,
-version 0.02:
+VERSION
 
-  Plugin to check that a given text is no spam.
+    version 0.03
 
-This software is Copyright (c) 2012 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+    The check is done with heuristics. It checks that there are no <a
+    href="..."> or [url=""] tags in the text...
 
-  The Artistic License 2.0 (GPL Compatible)
+        use Data::Validate::WithYAML::Plugin::NoSpam;
+    
+        my $foo = Data::Validate::WithYAML::Plugin::NoSpam->check(
+           'This is a <a href="anything">Spam-Link</a>',
+        );
+        ...
+        
+        # use the plugin via Data::Validate::WithYAML
+        
+        use Data::Validate::WithYAML;
+        
+        my $text      = 'This is a <a href="anything">Spam-Link</a>';
+        my $validator = Data::Validate::WithYAML->new( 'test.yml' );
+        print "yes" if $validator->check( 'textfield', $text );
 
+    test.yml
+
+      ---
+      step1:
+          textfield:
+              plugin: NoSpam
+              type: required
+
+SUBROUTINES
+
+ check
+
+AUTHOR
+
+    Renee Baecker, <module at renee-baecker.de>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-data-validate-withyaml-plugin-NoSpam at rt.cpan.org, or through the
+    web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Validate-WithYAML-Plugin-NoSpam.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Validate::WithYAML::Plugin::NoSpam
+
+    You can also look for information at:
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Data::Validate::WithYAML::Plugin::NoSpam
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Data::Validate::WithYAML::Plugin::NoSpam
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data::Validate::WithYAML::Plugin::NoSpam
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Data::Validate::WithYAML::Plugin::NoSpam
+
+ACKNOWLEDGEMENTS
+
+COPYRIGHT & LICENSE
+
+    Copyright 2007 Renee Baecker, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+
+    Renee Baecker <module@renee-baecker.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

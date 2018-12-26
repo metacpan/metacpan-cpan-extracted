@@ -224,7 +224,7 @@ __END__
 
 Locale::TextDomain::OO::Lexicon::Role::File - Helper role to add lexicon from file
 
-$Id: File.pm 698 2017-09-28 05:21:05Z steffenw $
+$Id: File.pm 722 2018-12-21 12:24:14Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Lexicon/Role/File.pm $
 

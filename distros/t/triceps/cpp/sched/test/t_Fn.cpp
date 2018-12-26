@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -517,8 +517,8 @@ UTESTCASE call_bindings(Utest *utest)
 
 	// to test the chaining order, chain lb[12]z first, and then
 	// it will get displaced
-	UT_ASSERT(!lb1->chain(lb1z)->hasError());
-	UT_ASSERT(!lb2->chain(lb2z)->hasError());
+	UT_ASSERT(!lb1->chain(lb1z).hasError());
+	UT_ASSERT(!lb2->chain(lb2z).hasError());
 
 	// make the return
 	Autoref<MyFnCtx> ctx1 = new MyFnCtx;

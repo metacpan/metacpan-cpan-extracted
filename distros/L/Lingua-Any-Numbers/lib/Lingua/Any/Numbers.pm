@@ -1,9 +1,7 @@
 package Lingua::Any::Numbers;
+$Lingua::Any::Numbers::VERSION = '0.50';
 use strict;
 use warnings;
-use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
-
-$VERSION = '0.46';
 
 use subs qw(
    to_string
@@ -28,6 +26,8 @@ use constant RE_LEGACY_PERL => qr{
 use File::Spec;
 use base qw( Exporter );
 use Carp qw(croak);
+
+our(@EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
 BEGIN {
    *num2str         = *number_to_string    = \&to_string;
@@ -251,7 +251,7 @@ sub _merge_into_numbers {
       no strict qw( refs ); ## no critic (ProhibitProlongedStrictureOverride)
       *{ $n } =   \&{ $card    } if $words && ! $c->can('num2tr');
       *{ $o } =   \&{ $ord     } if $ords  && ! $c->can('num2ord');
-      *{ $v } = sub { $VERSION } if           ! $c->can('VERSION');
+      *{ $v } = sub { __PACKAGE__->VERSION } if ! $c->can('VERSION');
       *{ $f } = sub { return { words => $words, ords => $ords } };
 
       return;
@@ -349,9 +349,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Lingua::Any::Numbers - Converts numbers into (any available language) string.
+Lingua::Any::Numbers
+
+=head1 VERSION
+
+version 0.50
 
 =head1 SYNOPSIS
 
@@ -370,9 +376,6 @@ or test all available languages
 
 =head1 DESCRIPTION
 
-This document describes version C<0.46> of C<Lingua::Any::Numbers>
-released on C<5 July 2016>.
-
 The most popular C<Lingua> modules are seem to be the ones that convert
 numbers into words. These kind of modules exist for a lot of languages.
 However, there is no standard interface defined for them. Most
@@ -386,6 +389,10 @@ supported modules listed in the L</SEE ALSO> section.
 
 L<Task::Lingua::Any::Numbers> can be installed to get all the available modules
 related to L<Lingua::Any::Numbers> on C<CPAN>.
+
+=head1 NAME
+
+Lingua::Any::Numbers - Converts numbers into (any available language) string.
 
 =head1 IMPORT PARAMETERS
 
@@ -544,15 +551,13 @@ the bogus modules:
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2007 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2007 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

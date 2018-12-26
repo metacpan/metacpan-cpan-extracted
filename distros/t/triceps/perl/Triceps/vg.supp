@@ -6,128 +6,45 @@
 {
    <insert a suppression name here>
    Memcheck:Leak
-   fun:calloc
-   fun:*
+   ...
    fun:Perl_yyparse
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
-   fun:*
-   fun:*
-   fun:*
+   ...
 }
 {
    <insert a suppression name here>
    Memcheck:Leak
-   fun:calloc
-   fun:*
+   ...
    fun:Perl_yylex
-   fun:*
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
-   fun:*
-   fun:*
-   fun:*
+   ...
 }
 {
-   <insert a suppression name here>
+   <insert_a_suppression_name_here>
    Memcheck:Leak
-   fun:calloc
-   obj:*
-   fun:*
-   fun:Perl_yyparse
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
-   fun:*
-   fun:*
-   fun:*
+   match-leak-kinds: definite
+   fun:malloc
+   fun:Perl_safesysmalloc
+   ...
+   fun:perl_construct
+   fun:main
 }
 {
-   <insert a suppression name here>
+   <insert_a_suppression_name_here>
    Memcheck:Leak
-   fun:calloc
-   fun:*
-   obj:*
-   fun:Perl_yylex
-   fun:Perl_yyparse
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
-   fun:*
-   fun:*
+   match-leak-kinds: definite
+   fun:malloc
+   fun:Perl_safesysmalloc
+   ...
+   fun:perl_parse
+   fun:main
 }
 {
-   <insert a suppression name here>
+   <insert_a_suppression_name_here>
    Memcheck:Leak
-   fun:calloc
-   fun:*
-   fun:*
-   fun:Perl_yyparse
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
-   fun:*
-   fun:*
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   obj:*
-   obj:*
-   fun:Perl_re_compile
-   fun:*
-   fun:Perl_yyparse
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:calloc
-   fun:*
-   fun:*
-   fun:*
-   fun:Perl_yyparse
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
-   fun:*
-}
-{
-   <insert a suppression name here>
-   Memcheck:Leak
-   fun:*
-   fun:*
-   fun:*
-   fun:*
-   fun:*
-   fun:Perl_yyparse
-   obj:*
-   fun:*
-   fun:*
-   fun:*
-   fun:*
-   obj:*
+   match-leak-kinds: definite
+   fun:malloc
+   fun:Perl_safesysmalloc
+   ...
+   fun:Perl_runops_standard
+   fun:perl_run
+   fun:main
 }

@@ -2,12 +2,12 @@ NAME
     Log::ger::Output::Screen - Output log to screen
 
 VERSION
-    version 0.007
+    version 0.008
 
 SYNOPSIS
      use Log::ger::Output Screen => (
          # stderr => 1,    # set to 0 to print to stdout instead of stderr
-         # use_color => 0, # set to 1/0 to force usage of color, default is from COLOR or (-t STDOUT)
+         # use_color => 0, # set to 1/0 to force usage of color, default is from NO_COLOR/COLOR or (-t STDOUT)
          # formatter => sub { ... },
      );
      use Log::ger;
@@ -16,19 +16,28 @@ SYNOPSIS
 
 DESCRIPTION
 CONFIGURATION
-  stderr => bool (default: 1)
-    Whether to print to STDERR (the default) or st=head2 use_color => bool
+  stderr
+    Bool, default 1. Whether to print to STDERR (the default) or st=head2
+    use_color => bool
 
-  use_color => bool
-    The default is to look at the COLOR environment variable, or 1 when in
-    interactive mode and 0 when not in interactive mode.
+  use_color
+    Bool. The default is to look at the NO_COLOR and COLOR environment
+    variables, or 1 when in interactive mode and 0 when not in interactive
+    mode.
 
-  formatter => code
-    When defined, will pass the formatted message (but being applied with
-    colors) to this custom formatter.
+  formatter
+    Coderef. When defined, will pass the formatted message (but being
+    applied with colors) to this custom formatter.
 
 ENVIRONMENT
-  COLOR => bool
+  NO_COLOR
+    Can be set (to anything) to disable color by default, if "/use_color" is
+    not set. Consulted before "COLOR".
+
+  COLOR
+    Can be set to disable/enable color by default, if "/use_color" is not
+    set.
+
 SEE ALSO
     Modelled after Log::Any::Adapter::Screen.
 
@@ -36,7 +45,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

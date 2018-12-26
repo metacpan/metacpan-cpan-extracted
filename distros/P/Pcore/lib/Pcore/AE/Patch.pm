@@ -34,7 +34,7 @@ sub resolve_sockaddr : prototype($$$$$$) ( $node, $service, $proto, $family, $ty
         return $cb->() if $family || substr( $service, 0, 1 ) ne '/';
 
         # UDS socket
-        substr $service, 0, 1, $EMPTY if substr( $service, 0, 2 ) eq "/\N{NULL}";
+        substr $service, 0, 1, $EMPTY if substr( $service, 0, 2 ) eq "/\x00";
 
         return $cb->( [ AF_UNIX, defined $type ? $type : SOCK_STREAM, 0, Socket::pack_sockaddr_un $service] );
     }
@@ -84,7 +84,7 @@ sub resolve_sockaddr : prototype($$$$$$) ( $node, $service, $proto, $family, $ty
 sub _tcp_bind : prototype($$$;$) ( $host, $service, $done, $prepare = undef ) {
 
     # hook for Linux abstract Unix Domain Sockets (UDS)
-    if ( defined $host && $host eq 'unix/' && substr( $service, 0, 2 ) eq "/\N{NULL}" ) {
+    if ( defined $host && $host eq 'unix/' && substr( $service, 0, 2 ) eq "/\x00" ) {
         substr $service, 0, 1, $EMPTY;
 
         state $ipn_uds = pack 'S', AF_UNIX;

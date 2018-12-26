@@ -1,4 +1,13 @@
 
+0.12 - 2018/12/26
+    - Added minimum perl version as suggested by CPANTS.
+      thanks to Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+
+0.11 - 2018/12/25
+    - Make sum work with numeric values insted of integer.
+      thanks to schwinn <schwinni@espionage.de>
+
 0.10 - 2015/11/13
     - removed unused call to 'size'
     - update description for clarity

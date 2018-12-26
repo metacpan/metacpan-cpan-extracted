@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -534,7 +534,7 @@ groupSizeIdx(WrapTable *self, WrapIndexType *widx, SV *rowarg)
 		static char CLASS[] = "Triceps::RowHandle";
 		static char funcName[] =  "Triceps::Table::groupSizeIdx";
 
-		RETVAL = NULL; // shut up the warning
+		RETVAL = 0; // shut up the warning
 		try { do {
 			clearErrMsg();
 			Table *t = self->get();

@@ -540,13 +540,13 @@ function Debugger(sel) {
     }
 
     var quick_bp_dialog_open = false;
-    this.quickBreakpointDialog = function() {
+    function breakpoint_and_continue_to_dialog_handler(params) {
         if (quick_bp_dialog_open) {
             return;
         }
         quick_bp_dialog_open = true;
 
-        var modal = $(this.templates.quickBreakpointModal());
+        var modal = $(this.templates.quickBreakpointModal(params['dialog']));
 
         modal.appendTo($elt)
             .modal({ backdrop: true, keyboard: true, show: true })
@@ -569,9 +569,7 @@ function Debugger(sel) {
                     var bp_text = $(e.target).find('[name=breakpoint]').val();
 
                     parseQuickBreakpointText(bp_text)
-                        .done(function(filename, line) {
-                            dbg.breakpointManager.createBreakpoint({filename: filename, line: line});
-                        })
+                        .done(params['done'])
                         .fail(function(message) {
                             alert(message);
                         })
@@ -586,7 +584,6 @@ function Debugger(sel) {
         if (text.match(/^\.$/)) {  // A single period
             var current_frameno = $('div#stack-panes .tab-pane.active').attr('data-frameno'),
                 stack_frame = dbg.stackManager.frame(current_frameno);
-            debugger;
             d.resolve(stack_frame.filename, stack_frame.line);
         } else {
             d.reject(undefined);
@@ -726,13 +723,11 @@ function Debugger(sel) {
         QB_unparsable,
     ];
     function parseQuickBreakpointText(text) {
-        var i = 0,
-            d = $.Deferred();
+        var d = $.Deferred();
 
-        function tryNextResolver() {
+        function tryBreakpointResolver(i) {
             var resolver = quick_breakpoint_resolvers[i],
                 p = resolver(text);
-            i++;
 
             p.done(function(filename, line) {
                 d.resolve(filename, line);  // try just putting d in the done()?
@@ -741,14 +736,47 @@ function Debugger(sel) {
                 if (message) {
                     d.reject(message);
                 } else {
-                    tryNextResolver();
+                    tryBreakpointResolver(i + 1);
                 }
             })
         }
 
-        tryNextResolver();
+        tryBreakpointResolver(0);
         return d.promise();
     }
+
+    this.quickBreakpointDialog = function() {
+        breakpoint_and_continue_to_dialog_handler.call(this, {
+            dialog: {
+                title: 'Quick-add Breakpoint',
+                prompt: 'New breakpoint',
+                ok_button: 'Add'
+            },
+            done: function(filename, line) {
+                dbg.breakpointManager.createBreakpoint({filename: filename, line: line});
+            }
+        });
+    };
+
+    this.continueToDialog = function() {
+        breakpoint_and_continue_to_dialog_handler.call(this, {
+            dialog: {
+                title: 'Continue To...',
+                prompt: 'Continue to',
+                ok_button: 'Continue'
+            },
+            done: function(filename, line) {
+                restInterface.createBreakpoint({
+                    filename: filename,
+                    line: line,
+                    once: 1,
+                    code: '1'
+                });
+                $control_buttons.filter('[data-action="continue"]')
+                                        .click();
+            }
+        });
+    };
                                     
     var $breakpointPane = $('#breakpoint-container'),
         $breakpointToggleIcon = $('#breakpoint-container-handle-icon');
@@ -906,12 +934,28 @@ function Debugger(sel) {
         $filePane.remove();
     }
 
+    function _loadConfig_response_handler_for_saveLoadBreakpoints(settings) {
+        dbg.breakpointManager.sync();
+
+        if (settings['additional'] && settings['additional']['watch_expressions']) {
+            var watch_expressions = settings['additional']['watch_expressions'];
+            for (var i = 0; i < watch_expressions.length; i++) {
+                dbg.watchedExpressionManager.addExpression( watch_expressions[i], false);
+            }
+        }
+    }
+
+    this.defaultConfigFileName = function() {
+        return this.programName + '.hdb';
+    };
+
     function saveLoadBreakpoints(e) {
         e.preventDefault();
         var isSave = $(e.currentTarget).attr('id') === 'save-breakpoints',
+            savefile = dbg.defaultConfigFileName(),
             modal = $(this.templates.saveLoadBreakpointsModal({
                                             action: isSave ? 'Save' : 'Load',
-                                            filename: this.programName + '.hdb'
+                                            filename: savefile
                                         }));
         modal.appendTo($elt)
              .modal({ backdrop: true, keyboard: true, show: true })
@@ -921,17 +965,22 @@ function Debugger(sel) {
         modal.find('form')
              .submit(function(e) {
                     e.preventDefault();
-                    var savefile = $(e.target).find('[name=filename]').val(),
-                        ri_method = restInterface[isSave ? 'saveConfig' : 'loadConfig'];
+                    var ri_method = restInterface[isSave ? 'saveConfig' : 'loadConfig'];
+                        additional = {};
 
-                    ri_method.call(restInterface, savefile)
+                    if (isSave) {
+                        additional['watch_expressions'] = dbg.watchedExpressionManager.expressions();
+                        console.log(additional);
+                    }
+
+                    ri_method.call(restInterface, savefile, additional)
                              .fail(function(jqxhr, text_status, error_thrown) {
                                 alert((isSave ? 'Saving' : 'Loading')
                                         + ' config failed: ' + error_thrown);
                                 })
-                            .done(function() {
+                            .done(function(settings) {
                                  if (! isSave) {
-                                    dbg.breakpointManager.sync();
+                                    _loadConfig_response_handler_for_saveLoadBreakpoints(settings)
                                 }
                             })
                             .always(function() {
@@ -946,6 +995,13 @@ function Debugger(sel) {
             $elt.find('li#program-name a').html(program_name)
                                           .attr('title', program_name);
             dbg.programName = program_name;
+        })
+        .done(function() {
+            // This has to happen after the above where it sets the programName
+            dbg.restInterface.loadConfig(dbg.defaultConfigFileName())
+                            .done(function(settings) {
+                                _loadConfig_response_handler_for_saveLoadBreakpoints(settings);
+                            });
         });
     this.fileManager = new FileManager(this.restInterface);
 
@@ -959,11 +1015,15 @@ function Debugger(sel) {
         .done(function(status) {
                 done_after_stack_update.call(dbg);
                 dbg.setCurrentStatementForCodeTable(status.next_statement);
-                dbg.breakpointManager.sync();
         });
 
     // Events
-    $elt.on('click', '.control-button[disabled!="disabled"]', this.controlButtonClicked.bind(this))
+    $elt.on('click', '.control-button[name="stepin"][disabled!="disabled"]',    this.controlButtonClicked.bind(this))
+        .on('click', '.control-button[name="stepout"][disabled!="disabled"]',   this.controlButtonClicked.bind(this))
+        .on('click', '.control-button[name="stepover"][disabled!="disabled"]',  this.controlButtonClicked.bind(this))
+        .on('click', '.control-button[name="continue"][disabled!="disabled"]',  this.controlButtonClicked.bind(this))
+        .on('click', '.control-button[name="exit"][disabled!="disabled"]',      this.controlButtonClicked.bind(this))
+        .on('click', '.control-button[name="continue-to"][disabled!="disabled"]', this.continueToDialog.bind(this))
         .on('mouseenter', '.popup-perl-var', popoverPerlVar.bind(this))
         .on('mouseleave', '.popup-perl-var', removePopoverPerlVar.bind(this))
         .on('contextmenu', '.popup-perl-var', addPerlVarToWatchExpressions.bind(this))

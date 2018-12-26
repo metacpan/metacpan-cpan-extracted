@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -153,7 +153,7 @@ ok(ref $rop2, "Triceps::Rowop");
 ok($rop2->printP(), "tab1.in OP_DELETE a=\"123\" b=\"456\" c=\"3000000000000000\" d=\"3.14\" e=\"text\" ");
 
 eval { $lb->makeRowop("OP_INSERT", $row3, "EM_CALL"); };
-ok($@, qr/^Triceps::Label::makeRowop: row types do not match\n  Label:\n    row {\n      uint8 a,\n      int32 b,\n      int64 c,\n      float64 d,\n      string e,\n    }\n  Row:\n    row {\n      string e,\n      uint8 a,\n      int32 b,\n      int64 c,\n      float64 d,\n    }/);
+ok($@, qr/^Triceps::Label::makeRowop: row types do not match\n  Label:\n    row \{\n      uint8 a,\n      int32 b,\n      int64 c,\n      float64 d,\n      string e,\n    \}\n  Row:\n    row \{\n      string e,\n      uint8 a,\n      int32 b,\n      int64 c,\n      float64 d,\n    \}/);
 
 ####
 # convenience factories
@@ -291,21 +291,21 @@ ok(!defined $ropx1);
 ok($@, 
 qr/^Triceps::Label::adopt: row types do not match
   Label:
-    row {
+    row \{
       string e,
       uint8 a,
       int32 b,
       int64 c,
       float64 d,
-    }
+    \}
   Row:
-    row {
+    row \{
       uint8 a,
       int32 b,
       int64 c,
       float64 d,
       string e,
-    }/);
+    \}/);
 
 # an unmatching unit is OK
 $ropx1 = $laby1->adopt($rop1);

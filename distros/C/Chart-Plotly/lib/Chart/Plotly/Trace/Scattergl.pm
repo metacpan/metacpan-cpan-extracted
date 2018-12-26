@@ -13,10 +13,11 @@ use Chart::Plotly::Trace::Scattergl::Line;
 use Chart::Plotly::Trace::Scattergl::Marker;
 use Chart::Plotly::Trace::Scattergl::Selected;
 use Chart::Plotly::Trace::Scattergl::Stream;
+use Chart::Plotly::Trace::Scattergl::Textfont;
 use Chart::Plotly::Trace::Scattergl::Transform;
 use Chart::Plotly::Trace::Scattergl::Unselected;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines is set in `x` and `y` using the WebGL plotting engine. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to a numerical arrays.
 
@@ -87,7 +88,7 @@ has fill => (
     is  => "rw",
     isa => enum( [ "none", "tozeroy", "tozerox", "tonexty", "tonextx", "toself", "tonext" ] ),
     documentation =>
-      "Sets the area to fill with a solid color. Use with `fillcolor` if not *none*. *tozerox* and *tozeroy* fill to x=0 and y=0 respectively. *tonextx* and *tonexty* fill between the endpoints of this trace and the endpoints of the trace before it, connecting those endpoints with straight lines (to make a stacked area graph); if there is no trace before it, they behave like *tozerox* and *tozeroy*. *toself* connects the endpoints of the trace (or each segment of the trace if it has gaps) into a closed shape. *tonext* fills the space between two traces if one completely encloses the other (eg consecutive contour lines), and behaves like *toself* if there is no trace before it. *tonext* should not be used if one trace does not enclose the other.",
+      "Sets the area to fill with a solid color. Defaults to *none* unless this trace is stacked, then it gets *tonexty* (*tonextx*) if `orientation` is *v* (*h*) Use with `fillcolor` if not *none*. *tozerox* and *tozeroy* fill to x=0 and y=0 respectively. *tonextx* and *tonexty* fill between the endpoints of this trace and the endpoints of the trace before it, connecting those endpoints with straight lines (to make a stacked area graph); if there is no trace before it, they behave like *tozerox* and *tozeroy*. *toself* connects the endpoints of the trace (or each segment of the trace if it has gaps) into a closed shape. *tonext* fills the space between two traces if one completely encloses the other (eg consecutive contour lines), and behaves like *toself* if there is no trace before it. *tonext* should not be used if one trace does not enclose the other. Traces in a `stackgroup` will only fill to (or be filled to) other traces in the same group. With multiple `stackgroup`s or some traces stacked and some not, if fill-linked traces are not already consecutive, the later ones will be pushed down in the drawing order.",
 );
 
 has fillcolor => (
@@ -111,10 +112,28 @@ has hoverinfosrc => ( is            => "rw",
 has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scattergl::Hoverlabel", );
 
-has hoveron => (
-    is => "rw",
+has hovertemplate => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
-      "Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.",
+      "Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example \"y: %{y}\". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example \"Price: %{y:\$.2f}\". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example \"<extra>{fullData.name}</extra>\".",
+);
+
+has hovertemplatesrc => ( is            => "rw",
+                          isa           => "Str",
+                          documentation => "Sets the source reference on plot.ly for  hovertemplate .",
+);
+
+has hovertext => (
+    is  => "rw",
+    isa => "Str|ArrayRef[Str]",
+    documentation =>
+      "Sets hover text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. To be seen, trace `hoverinfo` must contain a *text* flag.",
+);
+
+has hovertextsrc => ( is            => "rw",
+                      isa           => "Str",
+                      documentation => "Sets the source reference on plot.ly for  hovertext .",
 );
 
 has ids => (
@@ -178,7 +197,37 @@ has text => (
     is  => "rw",
     isa => "Str|ArrayRef[Str]",
     documentation =>
-      "Sets text elements associated with each (x,y) pair to appear on hover. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates.",
+      "Sets text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.",
+);
+
+has textfont => ( is  => "rw",
+                  isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scattergl::Textfont", );
+
+has textposition => (
+                   is  => "rw",
+                   isa => union(
+                                 [
+                                   enum(
+                                         [ "top left",
+                                           "top center",
+                                           "top right",
+                                           "middle left",
+                                           "middle center",
+                                           "middle right",
+                                           "bottom left",
+                                           "bottom center",
+                                           "bottom right"
+                                         ]
+                                   ),
+                                   "ArrayRef"
+                                 ]
+                   ),
+                   documentation => "Sets the positions of the `text` elements with respects to the (x,y) coordinates.",
+);
+
+has textpositionsrc => ( is            => "rw",
+                         isa           => "Str",
+                         documentation => "Sets the source reference on plot.ly for  textposition .",
 );
 
 has textsrc => ( is            => "rw",
@@ -191,6 +240,13 @@ has transforms => ( is  => "rw",
 
 has uid => ( is  => "rw",
              isa => "Str", );
+
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
 
 has unselected => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scattergl::Unselected", );
@@ -280,7 +336,7 @@ Chart::Plotly::Trace::Scattergl - The data visualized as scatter point or lines 
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -372,7 +428,7 @@ Sets the y coordinate step. See `y0` for more info.
 
 =item * fill
 
-Sets the area to fill with a solid color. Use with `fillcolor` if not *none*. *tozerox* and *tozeroy* fill to x=0 and y=0 respectively. *tonextx* and *tonexty* fill between the endpoints of this trace and the endpoints of the trace before it, connecting those endpoints with straight lines (to make a stacked area graph); if there is no trace before it, they behave like *tozerox* and *tozeroy*. *toself* connects the endpoints of the trace (or each segment of the trace if it has gaps) into a closed shape. *tonext* fills the space between two traces if one completely encloses the other (eg consecutive contour lines), and behaves like *toself* if there is no trace before it. *tonext* should not be used if one trace does not enclose the other.
+Sets the area to fill with a solid color. Defaults to *none* unless this trace is stacked, then it gets *tonexty* (*tonextx*) if `orientation` is *v* (*h*) Use with `fillcolor` if not *none*. *tozerox* and *tozeroy* fill to x=0 and y=0 respectively. *tonextx* and *tonexty* fill between the endpoints of this trace and the endpoints of the trace before it, connecting those endpoints with straight lines (to make a stacked area graph); if there is no trace before it, they behave like *tozerox* and *tozeroy*. *toself* connects the endpoints of the trace (or each segment of the trace if it has gaps) into a closed shape. *tonext* fills the space between two traces if one completely encloses the other (eg consecutive contour lines), and behaves like *toself* if there is no trace before it. *tonext* should not be used if one trace does not enclose the other. Traces in a `stackgroup` will only fill to (or be filled to) other traces in the same group. With multiple `stackgroup`s or some traces stacked and some not, if fill-linked traces are not already consecutive, the later ones will be pushed down in the drawing order.
 
 =item * fillcolor
 
@@ -388,9 +444,21 @@ Sets the source reference on plot.ly for  hoverinfo .
 
 =item * hoverlabel
 
-=item * hoveron
+=item * hovertemplate
 
-Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.
+Template string used for rendering the information that appear on hover box. Note that this will override `hoverinfo`. Variables are inserted using %{variable}, for example "y: %{y}". Numbers are formatted using d3-format's syntax %{variable:d3-format}, for example "Price: %{y:$.2f}". See https://github.com/d3/d3-format/blob/master/README.md#locale_format for details on the formatting syntax. The variables available in `hovertemplate` are the ones emitted as event data described at this link https://plot.ly/javascript/plotlyjs-events/#event-data. Additionally, every attributes that can be specified per-point (the ones that are `arrayOk: true`) are available.  Anything contained in tag `<extra>` is displayed in the secondary box, for example "<extra>{fullData.name}</extra>".
+
+=item * hovertemplatesrc
+
+Sets the source reference on plot.ly for  hovertemplate .
+
+=item * hovertext
+
+Sets hover text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. To be seen, trace `hoverinfo` must contain a *text* flag.
+
+=item * hovertextsrc
+
+Sets the source reference on plot.ly for  hovertext .
 
 =item * ids
 
@@ -434,7 +502,17 @@ Determines whether or not an item corresponding to this trace is shown in the le
 
 =item * text
 
-Sets text elements associated with each (x,y) pair to appear on hover. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates.
+Sets text elements associated with each (x,y) pair. If a single string, the same string appears over all the data points. If an array of string, the items are mapped in order to the this trace's (x,y) coordinates. If trace `hoverinfo` contains a *text* flag and *hovertext* is not set, these elements will be seen in the hover labels.
+
+=item * textfont
+
+=item * textposition
+
+Sets the positions of the `text` elements with respects to the (x,y) coordinates.
+
+=item * textpositionsrc
+
+Sets the source reference on plot.ly for  textposition .
 
 =item * textsrc
 
@@ -443,6 +521,10 @@ Sets the source reference on plot.ly for  text .
 =item * transforms
 
 =item * uid
+
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
 
 =item * unselected
 

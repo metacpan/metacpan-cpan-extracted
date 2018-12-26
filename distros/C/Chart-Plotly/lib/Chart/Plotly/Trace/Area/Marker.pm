@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace area.
 
@@ -37,7 +37,7 @@ has color => (
     is  => "rw",
     isa => "Maybe[ArrayRef]",
     documentation =>
-      "Sets the marker color. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `cmin` and `cmax` if set.",
+      "Area traces are deprecated! Please switch to the *barpolar* trace type. Sets themarkercolor. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `marker.cmin` and `marker.cmax` if set.",
 );
 
 has colorsrc => ( is            => "rw",
@@ -45,9 +45,10 @@ has colorsrc => ( is            => "rw",
                   documentation => "Sets the source reference on plot.ly for  color .",
 );
 
-has opacity => ( is            => "rw",
-                 isa           => "Num|ArrayRef[Num]",
-                 documentation => "Sets the marker opacity.",
+has opacity => (
+    is            => "rw",
+    isa           => "Num|ArrayRef[Num]",
+    documentation => "Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the marker opacity.",
 );
 
 has opacitysrc => ( is            => "rw",
@@ -55,9 +56,10 @@ has opacitysrc => ( is            => "rw",
                     documentation => "Sets the source reference on plot.ly for  opacity .",
 );
 
-has size => ( is            => "rw",
-              isa           => "Num|ArrayRef[Num]",
-              documentation => "Sets the marker size (in px).",
+has size => ( is  => "rw",
+              isa => "Num|ArrayRef[Num]",
+              documentation =>
+                "Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the marker size (in px).",
 );
 
 has sizesrc => ( is            => "rw",
@@ -69,7 +71,7 @@ has symbol => (
     is  => "rw",
     isa => "Maybe[ArrayRef]",
     documentation =>
-      "Sets the marker symbol type. Adding 100 is equivalent to appending *-open* to a symbol name. Adding 200 is equivalent to appending *-dot* to a symbol name. Adding 300 is equivalent to appending *-open-dot* or *dot-open* to a symbol name.",
+      "Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the marker symbol type. Adding 100 is equivalent to appending *-open* to a symbol name. Adding 200 is equivalent to appending *-dot* to a symbol name. Adding 300 is equivalent to appending *-open-dot* or *dot-open* to a symbol name.",
 );
 
 has symbolsrc => ( is            => "rw",
@@ -92,7 +94,7 @@ Chart::Plotly::Trace::Area::Marker - This attribute is one of the possible optio
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -136,7 +138,7 @@ Serialize the trace to JSON. This method should be called only by L<JSON> serial
 
 =item * color
 
-Sets the marker color. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `cmin` and `cmax` if set.
+Area traces are deprecated! Please switch to the *barpolar* trace type. Sets themarkercolor. It accepts either a specific color or an array of numbers that are mapped to the colorscale relative to the max and min values of the array or relative to `marker.cmin` and `marker.cmax` if set.
 
 =item * colorsrc
 
@@ -144,7 +146,7 @@ Sets the source reference on plot.ly for  color .
 
 =item * opacity
 
-Sets the marker opacity.
+Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the marker opacity.
 
 =item * opacitysrc
 
@@ -152,7 +154,7 @@ Sets the source reference on plot.ly for  opacity .
 
 =item * size
 
-Sets the marker size (in px).
+Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the marker size (in px).
 
 =item * sizesrc
 
@@ -160,7 +162,7 @@ Sets the source reference on plot.ly for  size .
 
 =item * symbol
 
-Sets the marker symbol type. Adding 100 is equivalent to appending *-open* to a symbol name. Adding 200 is equivalent to appending *-dot* to a symbol name. Adding 300 is equivalent to appending *-open-dot* or *dot-open* to a symbol name.
+Area traces are deprecated! Please switch to the *barpolar* trace type. Sets the marker symbol type. Adding 100 is equivalent to appending *-open* to a symbol name. Adding 200 is equivalent to appending *-dot* to a symbol name. Adding 300 is equivalent to appending *-open-dot* or *dot-open* to a symbol name.
 
 =item * symbolsrc
 

@@ -665,6 +665,7 @@ static int screen_damage(VTermRect rect, void *user)
   dSP;
   Term__VTerm__Screen self = user;
   CV *cb = self->cb.damage;
+  SV *retsv;
   int ret;
 
   if(!cb)
@@ -682,7 +683,12 @@ static int screen_damage(VTermRect rect, void *user)
 
   SPAGAIN;
 
-  ret = POPi;
+  // TODO: This can raise 'Use of uninitialised value in subroutine entry' warnings
+  retsv = POPs;
+  if(!SvOK(retsv))
+    Perl_warn(aTHX_ "Term::VTerm::Screen on_damage callback returned undef");
+  else
+    ret = SvIV(retsv);
 
   PUTBACK;
   FREETMPS;
@@ -873,6 +879,22 @@ static void setup_constants(void)
   DO_CONSTANT(VTERM_DAMAGE_ROW);
   DO_CONSTANT(VTERM_DAMAGE_SCREEN);
   DO_CONSTANT(VTERM_DAMAGE_SCROLL);
+
+  DO_CONSTANT(VTERM_KEY_ENTER);
+  DO_CONSTANT(VTERM_KEY_TAB);
+  DO_CONSTANT(VTERM_KEY_BACKSPACE);
+  DO_CONSTANT(VTERM_KEY_ESCAPE);
+  DO_CONSTANT(VTERM_KEY_UP);
+  DO_CONSTANT(VTERM_KEY_DOWN);
+  DO_CONSTANT(VTERM_KEY_LEFT);
+  DO_CONSTANT(VTERM_KEY_RIGHT);
+  DO_CONSTANT(VTERM_KEY_INS);
+  DO_CONSTANT(VTERM_KEY_DEL);
+  DO_CONSTANT(VTERM_KEY_HOME);
+  DO_CONSTANT(VTERM_KEY_END);
+  DO_CONSTANT(VTERM_KEY_PAGEUP);
+  DO_CONSTANT(VTERM_KEY_PAGEDOWN);
+  DO_CONSTANT(VTERM_KEY_FUNCTION_0);
 }
 
 MODULE = Term::VTerm        PACKAGE = Term::VTerm
@@ -953,7 +975,9 @@ input_write(self,str)
   Term::VTerm  self
   SV          *str
   CODE:
-    RETVAL = vterm_input_write(self->vt, SvPVutf8_nolen(str), SvCUR(str));
+    if(SvUTF8(str))
+      warn("Wide string in Term::VTerm::input_write()");
+    RETVAL = vterm_input_write(self->vt, SvPV_nolen(str), SvCUR(str));
   OUTPUT:
     RETVAL
 
@@ -986,6 +1010,19 @@ keyboard_unichar(self,c,mod=&PL_sv_undef)
       m = SvIV(mod);
     m &= VTERM_MOD_SHIFT|VTERM_MOD_CTRL|VTERM_MOD_ALT;
     vterm_keyboard_unichar(self->vt, c, m);
+
+void
+keyboard_key(self,key,mod=&PL_sv_undef)
+  Term::VTerm  self
+  int          key
+  SV          *mod
+  INIT:
+    VTermModifier m = 0;
+  CODE:
+    if(SvOK(mod))
+      m = SvIV(mod);
+    m &= VTERM_MOD_SHIFT|VTERM_MOD_CTRL|VTERM_MOD_ALT;
+    vterm_keyboard_key(self->vt, key, m);
 
 void
 mouse_move(self,row,col,mod=&PL_sv_undef)
@@ -1102,7 +1139,7 @@ get_prop_type(prop)
 MODULE = Term::VTerm        PACKAGE = Term::VTerm::Color
 
 SV *
-_new(package,red,green,blue)
+_new_rgb(package,red,green,blue)
   char *package
   int   red
   int   green
@@ -1110,9 +1147,7 @@ _new(package,red,green,blue)
   INIT:
     VTermColor color;
   CODE:
-    color.red   = red;
-    color.green = green;
-    color.blue  = blue;
+    vterm_color_rgb(&color, red, green, blue);
     RETVAL = newSVcolor(&color);
   OUTPUT:
     RETVAL
@@ -1123,6 +1158,34 @@ DESTROY(self)
   CODE:
     Safefree(self);
 
+bool
+is_indexed(self)
+  Term::VTerm::Color self
+  ALIAS:
+    is_indexed    = 0
+    is_rgb        = 1
+    is_default_fg = 2
+    is_default_bg = 3
+  CODE:
+    switch(ix) {
+      case 0: RETVAL = VTERM_COLOR_IS_INDEXED(self);    break;
+      case 1: RETVAL = VTERM_COLOR_IS_RGB(self);        break;
+      case 2: RETVAL = VTERM_COLOR_IS_DEFAULT_FG(self); break;
+      case 3: RETVAL = VTERM_COLOR_IS_DEFAULT_BG(self); break;
+    }
+  OUTPUT:
+    RETVAL
+
+int
+index(self)
+  Term::VTerm::Color self
+  CODE:
+    if(!VTERM_COLOR_IS_INDEXED(self))
+      XSRETURN_UNDEF;
+    RETVAL = self->indexed.idx;
+  OUTPUT:
+    RETVAL
+
 int
 red(self)
   Term::VTerm::Color self
@@ -1131,10 +1194,12 @@ red(self)
     green = 1
     blue  = 2
   CODE:
+    if(!VTERM_COLOR_IS_RGB(self))
+      XSRETURN_UNDEF;
     switch(ix) {
-      case 0: RETVAL = self->red;   break;
-      case 1: RETVAL = self->green; break;
-      case 2: RETVAL = self->blue;  break;
+      case 0: RETVAL = self->rgb.red;   break;
+      case 1: RETVAL = self->rgb.green; break;
+      case 2: RETVAL = self->rgb.blue;  break;
     }
   OUTPUT:
     RETVAL
@@ -1428,6 +1493,16 @@ set_callbacks(self,...)
         *cvp = NULL;
     }
 
+SV *
+convert_color_to_rgb(self,col)
+  Term::VTerm::Screen self
+  Term::VTerm::Color  col
+  CODE:
+    vterm_screen_convert_color_to_rgb(self->screen, col);
+    RETVAL = newSVcolor(col);
+  OUTPUT:
+    RETVAL
+
 
 MODULE = Term::VTerm        PACKAGE = Term::VTerm::Screen::Cell
 
@@ -1641,6 +1716,16 @@ set_callbacks(self,...)
       else
         *cvp = NULL;
     }
+
+SV *
+convert_color_to_rgb(self,col)
+  Term::VTerm::State self
+  Term::VTerm::Color col
+  CODE:
+    vterm_state_convert_color_to_rgb(self->state, col);
+    RETVAL = newSVcolor(col);
+  OUTPUT:
+    RETVAL
 
 
 BOOT:

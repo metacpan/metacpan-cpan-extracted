@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
 package Term::VTerm::State;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -20,38 +20,52 @@ C<Term::VTerm::State> - provides access to the state layer of F<libvterm>
 
 =cut
 
-=head2 $state->reset( $hard )
+=head2 reset
+
+   $state->reset( $hard )
 
 Resets the terminal state; performing either a soft or hard reset depending on
 the (optional) boolean value given.
 
 =cut
 
-=head2 $pos = $state->get_cursorpos
+=head2 get_cursorpos
+
+   $pos = $state->get_cursorpos
 
 Returns the current cursor position as a C<VTermPos> object.
 
-=head2 ( $fg, $bg ) = $state->get_default_colors
+=head2 get_default_colors
+
+   ( $fg, $bg ) = $state->get_default_colors
 
 Returns the default foreground and background colors from the palette as
 instances of C<VTermColor>.
 
-=head2 $state->set_default_colors( $fg, $bg )
+=head2 set_default_colors
+
+   $state->set_default_colors( $fg, $bg )
 
 Sets the default foreground and backgroudn colors to the palette from
 instances of C<VTermColor>.
 
-=head2 $col = $state->get_palette_color( $index )
+=head2 get_palette_color
+
+   $col = $state->get_palette_color( $index )
 
 Returns the palette color at the given index as an instance of C<VTermColor>.
 
-=head2 $value = $state->get_penattr( $attr )
+=head2 get_penattr
+
+   $value = $state->get_penattr( $attr )
 
 Returns the current value of the given pen attribute (as one of the C<ATTR_*>
 constants). Boolean, integer or string attributes are represented as native
 perl values. Color attributes return an instance of C<VTermColor>.
 
-=head2 $state->set_callbacks( %cbs )
+=head2 set_callbacks
+
+   $state->set_callbacks( %cbs )
 
 Sets the state-layer callbacks. Takes the following named arguments:
 
@@ -124,6 +138,12 @@ C<$row> is an integer. C<$lineinfo> and C<$oldlineinfo> are C<VTermLineInfo>
 structures.
 
 =back
+
+=head2 convert_color_to_rgb
+
+   $col = $state->convert_color_to_rgb( $col )
+
+Converts a C<VTermColor> structure from indexed to RGB form.
 
 =cut
 

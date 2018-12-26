@@ -1,4 +1,9 @@
 Revision history for Data::Validate::WithYAML::Plugin::NoSpam
+=============================================================
+
+0.03    2018-12-26 10:28:00
+
+        + improve tests
 
 0.02    05.01.2012
         + fix bug in prereq list

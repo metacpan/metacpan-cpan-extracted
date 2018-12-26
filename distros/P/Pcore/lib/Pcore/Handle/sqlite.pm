@@ -84,7 +84,7 @@ sub BUILD ( $self, $args ) {
         # HandleError => sub {
         #     my $msg = shift;
         #
-        #     # escape_scalar $msg;
+        #     # escape_perl $msg;
         #
         #     P->sendlog( 'Pcore-DBH.ERROR', $msg );
         #
@@ -194,7 +194,7 @@ sub quote ( $self, $var ) {
             $var = $var->[1] ? 1 : 0;
         }
         elsif ( $var->[0] == $SQL_JSON ) {
-            $var = to_json( $var->[1] )->$*;
+            $var = to_json $var->[1];
         }
         else {
             $var = $var->[1];
@@ -206,7 +206,7 @@ sub quote ( $self, $var ) {
         if ( is_plain_arrayref $var) {
             $type = $SQLITE_BLOB;
 
-            $var = to_json($var)->$*;
+            $var = to_json $var;
         }
         else {
             $type = $SQLITE_TEXT;
@@ -233,7 +233,7 @@ sub quote ( $self, $var ) {
     else {
 
         # quote \x00 in literal
-        if ( index( $var, "\N{NULL}" ) != -1 ) {
+        if ( index( $var, "\x00" ) != -1 ) {
             utf8::encode $var if utf8::is_utf8 $var;
 
             return q[CAST(x'] . unpack( 'H*', $var ) . q[' AS TEXT)];
@@ -356,7 +356,7 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
                 $bind[$i] = $bind[$i]->[1] ? 1 : 0;
             }
             elsif ( $bind[$i]->[0] == $SQL_JSON ) {
-                $bind[$i] = to_json( $bind[$i]->[1] )->$*;
+                $bind[$i] = to_json $bind[$i]->[1];
             }
             elsif ( $bind[$i]->[0] == $SQL_BYTEA ) {
                 $bind[$i] = encode_utf8 $bind[$i]->[1];
@@ -370,7 +370,7 @@ sub _execute ( $self, $sth, $bind, $bind_pos ) {
         elsif ( is_plain_arrayref $bind[$i] ) {
             $sth->bind_param( $i + 1, undef, $SQLITE_BLOB );
 
-            $bind[$i] = to_json( $bind[$i] )->$*;
+            $bind[$i] = to_json $bind[$i];
         }
     }
 

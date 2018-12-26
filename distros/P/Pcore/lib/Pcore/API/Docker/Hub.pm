@@ -57,7 +57,7 @@ sub _login ( $self, $cb ) {
     return if $self->{_req_queue}->{$endpoint}->@* > 1;
 
     return $self->_req(
-        'post',
+        'POST',
         $endpoint,
         undef,
         {   username => $self->{username},
@@ -84,8 +84,9 @@ sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb = undef ) {
     my $cv = P->cv;
 
     my $request = sub {
-        P->http->$method(
-            $BASE_URL . $endpoint,
+        P->http->request(
+            method  => $method,
+            url     => $BASE_URL . $endpoint,
             headers => [
                 'Content-Type' => 'application/json',
                 $require_auth ? ( Authorization => 'JWT ' . $self->{_login_token} ) : (),
@@ -131,16 +132,16 @@ sub _req ( $self, $method, $endpoint, $require_auth, $data, $cb = undef ) {
 
 # USER / NAMESPACE
 sub get_user ( $self, $username, $cb = undef ) {
-    return $self->_req( 'get', "/users/$username/", undef, undef, $cb );
+    return $self->_req( 'GET', "/users/$username/", undef, undef, $cb );
 }
 
 sub get_user_registry_settings ( $self, $username, $cb = undef ) {
-    return $self->_req( 'get', "/users/$username/registry-settings/", 1, undef, $cb );
+    return $self->_req( 'GET', "/users/$username/registry-settings/", 1, undef, $cb );
 }
 
 sub get_user_orgs ( $self, $cb = undef ) {
     return $self->_req(
-        'get',
+        'GET',
         "/user/orgs/?page_size=$DEF_PAGE_SIZE&page=1",
         1, undef,
         sub ($res) {
@@ -172,7 +173,7 @@ sub create_repo ( $self, $repo_id, $desc, @args ) {
     my ( $namespace, $name ) = split m[/]sm, $repo_id;
 
     return $self->_req(
-        'post',
+        'POST',
         '/repositories/',
         1,
         {   namespace        => $namespace,
@@ -206,7 +207,7 @@ sub create_autobuild ( $self, $repo_id, $scm_provider, $scm_repo_id, $desc, @arg
             {   name                => '{sourceref}',                                                # docker build tag name
                 source_type         => $DOCKERHUB_SOURCE_TYPE_NAME->{$DOCKERHUB_SOURCE_TYPE_TAG},    # Branch, Tag
                 source_name         => '/.*/',                                                       # barnch / tag name in the source repository
-                dockerfile_location => q[/],
+                dockerfile_location => '/',
             },
         ];
     }
@@ -221,7 +222,7 @@ sub create_autobuild ( $self, $repo_id, $scm_provider, $scm_repo_id, $desc, @arg
     }
 
     return $self->_req(
-        'post',
+        'POST',
         "/repositories/$repo_id/autobuild/",
         1,
         {   namespace           => $namespace,
@@ -242,7 +243,7 @@ sub create_autobuild ( $self, $repo_id, $scm_provider, $scm_repo_id, $desc, @arg
 # REPO
 sub get_all_repos ( $self, $namespace, $cb = undef ) {
     return $self->_req(
-        'get',
+        'GET',
         "/users/$namespace/repositories/",
         1, undef,
         sub ($res) {
@@ -265,7 +266,7 @@ sub get_all_repos ( $self, $namespace, $cb = undef ) {
 
 sub get_repo ( $self, $repo_id, $cb = undef ) {
     return $self->_req(
-        'get',
+        'GET',
         "/repositories/$repo_id/",
         1, undef,
         sub($res) {
@@ -279,22 +280,22 @@ sub get_repo ( $self, $repo_id, $cb = undef ) {
 }
 
 sub remove_repo ( $self, $repo_id, $cb = undef ) {
-    return $self->_req( 'delete', "/repositories/$repo_id/", 1, undef, $cb );
+    return $self->_req( 'DELETE', "/repositories/$repo_id/", 1, undef, $cb );
 }
 
 sub set_desc ( $self, $repo_id, $desc, $cb = undef ) {
-    return $self->_req( 'patch', "/repositories/$repo_id/", 1, { description => $desc }, $cb );
+    return $self->_req( 'PATCH', "/repositories/$repo_id/", 1, { description => $desc }, $cb );
 }
 
 sub set_full_desc ( $self, $repo_id, $desc, $cb = undef ) {
-    return $self->_req( 'patch', "/repositories/$repo_id/", 1, { full_description => $desc }, $cb );
+    return $self->_req( 'PATCH', "/repositories/$repo_id/", 1, { full_description => $desc }, $cb );
 }
 
 # REPO TAGS
 # TODO gel all pages
 sub get_tags ( $self, $repo_id, $cb = undef ) {
     return $self->_req(
-        'get',
+        'GET',
         "/repositories/$repo_id/tags/?page_size=$DEF_PAGE_SIZE&page=1",
         1, undef,
         sub ($res) {
@@ -314,18 +315,18 @@ sub get_tags ( $self, $repo_id, $cb = undef ) {
 }
 
 sub delete_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
-    return $self->_req( 'delete', "/repositories/$repo_id/tags/$tag_name/", 1, undef, $cb );
+    return $self->_req( 'DELETE', "/repositories/$repo_id/tags/$tag_name/", 1, undef, $cb );
 }
 
 # REPO WEBHOOKS
 # TODO get all pages
 sub get_webhooks ( $self, $repo_id, $cb = undef ) {
-    return $self->_req( 'get', "/repositories/$repo_id/webhooks/?page_size=$DEF_PAGE_SIZE&page=1", 1, undef, $cb );
+    return $self->_req( 'GET', "/repositories/$repo_id/webhooks/?page_size=$DEF_PAGE_SIZE&page=1", 1, undef, $cb );
 }
 
 sub create_webhook ( $self, $repo_id, $webhook_name, $webhook_url, $cb = undef ) {
     return $self->_req(
-        'post',
+        'POST',
         "/repositories/$repo_id/webhook_pipeline/",
         1,
         {   name                  => $webhook_name,
@@ -340,13 +341,13 @@ sub create_webhook ( $self, $repo_id, $webhook_name, $webhook_url, $cb = undef )
 }
 
 sub delete_webhook ( $self, $repo_id, $webhook_name, $cb = undef ) {
-    return $self->_req( 'delete', "/repositories/$repo_id/webhook_pipeline/$webhook_name/", 1, undef, $cb );
+    return $self->_req( 'DELETE', "/repositories/$repo_id/webhook_pipeline/$webhook_name/", 1, undef, $cb );
 }
 
 # AUTOBUILD LINKS
 sub get_autobuild_links ( $self, $repo_id, $cb = undef ) {
     return $self->_req(
-        'get',
+        'GET',
         "/repositories/$repo_id/links/",
         1, undef,
         sub ($res) {
@@ -366,18 +367,18 @@ sub get_autobuild_links ( $self, $repo_id, $cb = undef ) {
 }
 
 sub create_autobuild_link ( $self, $repo_id, $target_repo_id, $cb = undef ) {
-    return $self->_req( 'post', "/repositories/$repo_id/links/", 1, { to_repo => $target_repo_id }, $cb );
+    return $self->_req( 'POST', "/repositories/$repo_id/links/", 1, { to_repo => $target_repo_id }, $cb );
 }
 
 sub delete_autobuild_link ( $self, $repo_id, $link_id, $cb = undef ) {
-    return $self->_req( 'delete', "/repositories/$repo_id/links/$link_id/", 1, undef, $cb );
+    return $self->_req( 'DELETE', "/repositories/$repo_id/links/$link_id/", 1, undef, $cb );
 }
 
 # BUILD
 # TODO get all pages
 sub get_build_history ( $self, $repo_id, $cb = undef ) {
     return $self->_req(
-        'get',
+        'GET',
         "/repositories/$repo_id/buildhistory/?page_size=$DEF_PAGE_SIZE&page=1",
         1, undef,
         sub ($res) {
@@ -399,7 +400,7 @@ sub get_build_history ( $self, $repo_id, $cb = undef ) {
 }
 
 sub get_autobuild_settings ( $self, $repo_id, $cb = undef ) {
-    return $self->_req( 'get', "/repositories/$repo_id/autobuild/", 1, undef, $cb );
+    return $self->_req( 'GET', "/repositories/$repo_id/autobuild/", 1, undef, $cb );
 }
 
 sub unlink_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
@@ -447,7 +448,7 @@ sub unlink_tag ( $self, $repo_id, $tag_name, $cb = undef ) {
 # AUTOBUILD TAGS
 sub get_autobuild_tags ( $self, $repo_id, $cb = undef ) {
     return $self->_req(
-        'get',
+        'GET',
         "/repositories/$repo_id/autobuild/tags/",
         1, undef,
         sub ($res) {
@@ -470,7 +471,7 @@ sub create_autobuild_tag ( $self, $repo_id, $tag_name, $source_name, $source_typ
     my ( $namespace, $name ) = split m[/]sm, $repo_id;
 
     return $self->_req(
-        'post',
+        'POST',
         "/repositories/$repo_id/autobuild/tags/",
         1,
         {   name                => $tag_name,
@@ -486,7 +487,7 @@ sub create_autobuild_tag ( $self, $repo_id, $tag_name, $source_name, $source_typ
 }
 
 sub delete_autobuild_tag_by_id ( $self, $repo_id, $autobuild_tag_id, $cb = undef ) {
-    return $self->_req( 'delete', "/repositories/$repo_id/autobuild/tags/$autobuild_tag_id/", 1, undef, $cb );
+    return $self->_req( 'DELETE', "/repositories/$repo_id/autobuild/tags/$autobuild_tag_id/", 1, undef, $cb );
 }
 
 sub delete_autobuild_tag_by_name ( $self, $repo_id, $autobuild_tag_name, $cb = undef ) {
@@ -529,7 +530,7 @@ sub delete_autobuild_tag_by_name ( $self, $repo_id, $autobuild_tag_name, $cb = u
 
 sub trigger_autobuild ( $self, $repo_id, $source_name, $source_type, $cb = undef ) {
     return $self->_req(
-        'post',
+        'POST',
         "/repositories/$repo_id/autobuild/trigger-build/",
         1,
         {   source_name         => $source_name,
@@ -585,12 +586,12 @@ sub trigger_autobuild_by_tag_name ( $self, $repo_id, $autobuild_tag_name, $cb = 
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 83, 188, 316, 326,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |      | 342, 368, 372, 405,  |                                                                                                                |
-## |      | 469, 488, 492, 530,  |                                                                                                                |
-## |      | 543                  |                                                                                                                |
+## |    3 | 83, 189, 317, 327,   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |      | 343, 369, 373, 406,  |                                                                                                                |
+## |      | 470, 489, 493, 531,  |                                                                                                                |
+## |      | 544                  |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 166                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 167                  | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.504   2018-12-25
+        - Bugfix "line_fold".
+
 0.503   2018-12-17
         - Set SHOW_CURSOR.
 

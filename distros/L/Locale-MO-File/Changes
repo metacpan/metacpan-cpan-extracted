@@ -1,5 +1,8 @@
 Revision history for Perl extension Locale::MO::File.
 
+0.09  Mon Dec 24 10:58:52 2018
+- code improvement
+
 0.08  Tue Oct  3 06:58:56 2017
 - fixed broken version 0.07, fixed split agian
 

@@ -36,6 +36,7 @@
             "Getopt::Long" : "2.39",
             "HTTP::Request" : "6.07",
             "HTTP::Request::Common" : "6.07",
+            "HTTP::Request::Generator" : "0.06",
             "List::Util" : "1.29",
             "MIME::Base64" : "0",
             "Moo" : "2",
@@ -67,7 +68,7 @@
          "web" : "https://github.com/Corion/HTTP-Request-FromCurl"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

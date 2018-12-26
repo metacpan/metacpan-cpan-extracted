@@ -1,8 +1,9 @@
 package Time::Elapsed;
+$Time::Elapsed::VERSION = '0.33';
 use strict;
 use warnings;
 use utf8;
-use vars qw( $VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+
 # time constants
 use constant SECOND     =>   1;
 use constant MINUTE     =>  60 * SECOND;
@@ -27,11 +28,8 @@ use constant T_MONTH  => 30;
 use constant T_MONTHW =>  4;
 use constant T_YEAR   => 12;
 
-BEGIN {
-   $VERSION     = '0.32';
-   @EXPORT      = qw( elapsed  );
-   %EXPORT_TAGS = ( all => [ @EXPORT, @EXPORT_OK ] );
-}
+our @EXPORT      = qw( elapsed  );
+our %EXPORT_TAGS = ( all => [ @EXPORT ] );
 
 # elapsed time formatter keys
 my $EC = 0;
@@ -248,11 +246,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-Time::Elapsed - Displays the elapsed time as a human readable string.
+Time::Elapsed
+
+=head1 VERSION
+
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -278,6 +280,10 @@ This module transforms the elapsed seconds into a human readable string.
 It can be used for (for example) rendering C<uptime> values into
 a human readable form. The resulting string will be an approximation.
 See the L</CAVEATS> section for more information.
+
+=head1 NAME
+
+Time::Elapsed - Displays the elapsed time as a human readable string.
 
 =head1 IMPORT PARAMETERS
 
@@ -385,5 +391,16 @@ language will probably need unicode support.
 
 L<PTools::Time::Elapsed>, L<DateTime>, L<DateTime::Format::Duration>,
 L<Time::Duration>.
+
+=head1 AUTHOR
+
+Burak Gursoy <burak@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2007 by Burak Gursoy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

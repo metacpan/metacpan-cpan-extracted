@@ -1,4 +1,5 @@
 package Sys::Info::Driver::OSX::Device::CPU;
+$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7959';
 use strict;
 use warnings;
 use base qw(Sys::Info::Base);
@@ -6,8 +7,6 @@ use Carp qw( croak );
 use POSIX ();
 use Sys::Info::Driver::OSX;
 use constant RE_SPACE => qr{\s+}xms;
-
-our $VERSION = '0.7958';
 
 sub identify {
     my $self = shift;
@@ -58,7 +57,11 @@ sub identify {
         my($cache_size) = $c2  ? split RE_SPACE, $c2  : 0;
         my($speed)      = $cps ? split RE_SPACE, $cps : 0;
         $cache_size    *= 1024 if $cache_size;
-        $speed         *= 1000 if $speed;
+        if ( $speed ) {
+            # locale might change the decimal separator
+            $speed =~ s{ [,] }{.}xms;
+            $speed *= 1000;
+        }
 
         push @{ $self->{META_DATA} }, {
             serial_number                => $cpu->{serial_number},
@@ -115,9 +118,17 @@ sub bitness {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Sys::Info::Driver::OSX::Device::CPU - OSX CPU Device Driver
+Sys::Info::Driver::OSX::Device::CPU
+
+=head1 VERSION
+
+version 0.7959
 
 =head1 SYNOPSIS
 
@@ -125,10 +136,11 @@ Sys::Info::Driver::OSX::Device::CPU - OSX CPU Device Driver
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7958> of C<Sys::Info::Driver::OSX::Device::CPU>
-released on C<23 October 2013>.
-
 Identifies the CPU with system commands, L<POSIX>.
+
+=head1 NAME
+
+Sys::Info::Driver::OSX::Device::CPU - OSX CPU Device Driver
 
 =head1 METHODS
 
@@ -152,15 +164,13 @@ L<POSIX>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2010 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2010 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

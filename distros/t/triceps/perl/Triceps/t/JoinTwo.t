@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -1180,72 +1180,72 @@ ok($@, qr/^Unknown value 'xxx' of option 'type', must be one of inner|left|right
 &tryBadOptValue(rightFromLabel => $tTrans3->getOutputLabel());
 ok($@, qr/^The rightFromLabel row type does not match rightTable,
 in label:
-  row {
+  row \{
     int32 id,
     string acctSrc,
     string acctXtrId,
     int32 amount,
-  }
+  \}
 in table:
-  row {
+  row \{
     string source,
     string external,
     int32 internal,
-  }
+  \}
 /);
 &tryBadOptValue(leftFromLabel => $tAccounts3->getOutputLabel());
 ok($@, qr/^The leftFromLabel row type does not match leftTable,
 in label:
-  row {
+  row \{
     string source,
     string external,
     int32 internal,
-  }
+  \}
 in table:
-  row {
+  row \{
     int32 id,
     string acctSrc,
     string acctXtrId,
     int32 amount,
-  }
+  \}
 /);
 
 &tryBadOptValue(leftIdxPath => [ "lookupIntGroup", "lookupInt" ]);
 ok($@, qr/^Triceps::TableType::findIndexKeyPath: unable to find the index type at path 'lookupIntGroup', table type is:
 table \(
-  row {
+  row \{
     int32 id,
     string acctSrc,
     string acctXtrId,
     int32 amount,
-  }
-\) {
+  \}
+\) \{
   index HashedIndex\(id, \) primary,
-  index HashedIndex\(acctSrc, acctXtrId, \) {
+  index HashedIndex\(acctSrc, acctXtrId, \) \{
     index FifoIndex\(\) data,
-  } byAccount,
-  index HashedIndex\(acctXtrId, acctSrc, \) {
+  \} byAccount,
+  index HashedIndex\(acctXtrId, acctSrc, \) \{
     index FifoIndex\(\) data,
-  } byAccountBackwards,
-}/);
+  \} byAccountBackwards,
+\}/);
 
 &tryBadOptValue(rightIdxPath => [ "lookupIntGroup", "lookupInt" ]);
 ok($@, qr/^Triceps::TableType::findIndexKeyPath: the index type at path 'lookupIntGroup.lookupInt' does not have a key, table type is:
 table \(
-  row {
+  row \{
     string source,
     string external,
     int32 internal,
-  }
-\) {
+  \}
+\) \{
   index HashedIndex\(source, external, \) lookupSrcExt,
-  index HashedIndex\(source, \) {
+  index HashedIndex\(source, \) \{
     index HashedIndex\(external, \) iterateSrcExt,
-  } iterateSrc,
-  index HashedIndex\(internal, \) {
+  \} iterateSrc,
+  index HashedIndex\(internal, \) \{
     index FifoIndex\(\) lookupInt,
-  } lookupIntGroup,
-}/);
+  \} lookupIntGroup,
+\}/);
 
 &tryBadOptValue(rightIdxPath => ["iterateSrc"]);
 ok($@, qr/^The count of key fields in left and right indexes doesnt match

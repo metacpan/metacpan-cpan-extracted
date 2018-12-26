@@ -142,6 +142,75 @@ my $module = 'Data::Validate::WithYAML::Plugin::PasswordPolicy';
     }
 }
 
+{
+    my @passwords = qw($!§ "$!! aa$$ 123 aaxxs i135);
+    my @blacklist = (0, 'AA', 'z7', '&1', 124325, 'tester', '31$!$!$"', 'AAA', 'PEIVA', 'P135');
+
+    for my $password ( @passwords, @blacklist ){
+        ok( $module->check($password, {}), "test: $password -> " . flatten($config) );
+    }
+
+    ok !$module->check( '', {} );
+    ok !$module->check( undef, {} );
+}
+
+{
+    my @passwords = qw($!§ "$!! aa$$ 123 aaxxs i135);
+    my @blacklist = (0, 'AA', 'z7', '&1', 124325, 'tester', '31$!$!$"', 'AAA', 'PEIVA', 'P135');
+
+    for my $password ( @passwords, @blacklist ){
+        ok( $module->check($password, { 'x-policy' => {} }), "test: $password -> " . flatten($config) );
+    }
+
+    ok !$module->check( '', { 'x-policy' => {} } );
+    ok !$module->check( undef, { 'x-policy' => {} } );
+}
+
+{
+    my $config    = {length => '5'};
+    my @passwords = qw($!baz "b$!! aa$-$ 12345 aaxxs ai135);
+    my @blacklist = (undef, '', 0, 'AA', 'z7', '&1', 124325, 'tester', '31$!$!$"', 'AAA', 'P135');
+
+    for my $password ( @passwords ){
+        ok( $module->check($password, {'x-policy' => $config}), "test: $password -> " . flatten($config) );
+    }
+
+    for my $check ( @blacklist ){
+        my $retval = $module->check( $check, {'x-policy' => $config} );
+        ok( !$retval, "test: $check -> " .  flatten($config) );
+    }
+}
+
+{
+    my $config    = {chars => ['A-Z']};
+    my @passwords = qw(A AB AAA BAZ DEF KIL);
+    my @blacklist = (undef, '', 0, 'test', 'averylongpasswordtocheck','62348$!', 'tes', 'teester', 123, 1234);
+
+    for my $password ( @passwords ){
+        ok( $module->check($password, {'x-policy' => $config}), "test: $password -> " . flatten($config) );
+    }
+
+    for my $check ( @blacklist ){
+        my $retval = $module->check( $check, {'x-policy' => $config} );
+        ok( !$retval, "test: $check -> " .  flatten($config) );
+    }
+}
+
+{
+    my $config    = {length => ','};
+    my @passwords = qw($!baz "b$!! aa$-$ 12345 aaxxs ai135);
+    my @blacklist = (undef, '', );
+
+    for my $password ( @passwords ){
+        ok( $module->check($password, {'x-policy' => $config}), "test: $password -> " . flatten($config) );
+    }
+
+    for my $check ( @blacklist ){
+        my $retval = $module->check( $check, {'x-policy' => $config} );
+        ok( !$retval, "test: $check -> " .  flatten($config) );
+    }
+}
+
 done_testing();
 
 sub flatten {

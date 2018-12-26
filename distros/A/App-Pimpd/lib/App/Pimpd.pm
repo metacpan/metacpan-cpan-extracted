@@ -1,13 +1,13 @@
 package App::Pimpd;
 use strict;
-use encoding 'utf8';
+#use encoding 'utf8';
 use open qw(:utf8 :std);
 
 BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT);
 
-  $VERSION = '0.304';
+  $VERSION = '0.308';
   @ISA = qw(Exporter);
   @EXPORT = qw(
     @c
@@ -22,13 +22,6 @@ BEGIN {
 
 use Audio::MPD;
 use Config::General;
-use Data::Dumper;
-$Data::Dumper::Terse     = 1;
-$Data::Dumper::Indent    = 1;
-$Data::Dumper::Useqq     = 1;
-$Data::Dumper::Deparse   = 1;
-$Data::Dumper::Quotekeys = 0;
-$Data::Dumper::Sortkeys  = 1;
 
 our ($mpd, %config, @c);
 
@@ -48,8 +41,7 @@ sub player_cmdline {
     }
     return "$config{player} $config{player_stream} $config{player_opts}";
   }
-  print STDERR "No player configured\n";
-  return 1;
+  return;
 }
 
 #sub get_color_support {
@@ -90,7 +82,6 @@ sub mpd_init {
       );
     }
   }
-  return;
 }
 
 sub abs_playlist_path {
@@ -101,7 +92,10 @@ sub abs_playlist_path {
 
 sub config_init {
   my $config;
-  if(-e "$ENV{HOME}/.config/pimpd2/pimpd2.conf") {
+  if(-e "$ENV{XDG_CONFIG_HOME}/pimpd2/pimpd2.conf") {
+    $config = "$ENV{XDG_CONFIG_HOME}/pimpd2/pimpd2.conf";
+  }
+  elsif(-e "$ENV{HOME}/.config/pimpd2/pimpd2.conf") {
     $config = "$ENV{HOME}/.config/pimpd2/pimpd2.conf";
   }
   elsif(-e "$ENV{HOME}/.pimpd2.conf") {

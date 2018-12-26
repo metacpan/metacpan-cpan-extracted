@@ -274,7 +274,7 @@ sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = unde
     # read file
     if ( !defined $data ) {
         if ( defined $path && -f $path ) {
-            $data = P->file->read_bin( $path->encoded )->$*;
+            $data = P->file->read_bin( $path->encoded );
 
             $write_data = 1;
         }
@@ -307,7 +307,7 @@ sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = unde
 
     # trim
     if ( $action eq 'decompress' ) {
-        decode_eol $data;    # decode CRLF to internal \n representation
+        decode_eol $data;    # decode "\r\n" to internal "\n" representation
 
         lcut_all $data;      # trim leading horizontal whitespaces
 
@@ -317,7 +317,7 @@ sub _process_file ( $args, $action, $filter_profile, $path = undef, $data = unde
 
         $data =~ s/\t/    /smg;    # convert tabs to spaces
 
-        $data .= $LF;
+        $data .= "\n";
     }
 
     my $out_md5 = md5_hex $data;
@@ -469,8 +469,6 @@ sub _report_total ( $total ) {
 ## |    3 | 161                  | Subroutines::ProhibitExcessComplexity - Subroutine "_process_files" with high complexity score (32)            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 265, 369             | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 227                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 302                  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

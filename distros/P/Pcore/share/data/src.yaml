@@ -81,6 +81,7 @@ perlcritic:
             equivalent_modules: common::header Pcore
         TestingAndDebugging::RequireUseWarnings:
             equivalent_modules: common::header Pcore
+        ValuesAndExpressions::ProhibitEscapedCharacters: ~
         ValuesAndExpressions::ProhibitInterpolationOfLiterals:
             severity: 3
         ValuesAndExpressions::ProhibitMagicNumbers: ~

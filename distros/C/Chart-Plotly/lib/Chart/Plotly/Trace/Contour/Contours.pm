@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Contour::Contours::ImpliedEdits;
 use Chart::Plotly::Trace::Contour::Contours::Labelfont;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace contour.
 
@@ -112,7 +112,7 @@ Chart::Plotly::Trace::Contour::Contours - This attribute is one of the possible 
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

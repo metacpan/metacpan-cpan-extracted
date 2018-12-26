@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -131,12 +131,12 @@ UTESTCASE make_facet(Utest *utest)
 			->addLabel("one", rt1)
 		;
 		err = fretbad->getErrors();
-		UT_ASSERT(err->hasError());
+		UT_ASSERT(err.hasError());
 		UT_IS(err->print(), "duplicate row name 'one'\n");
 
 		Autoref<Facet> fabad = Facet::makeReader(fretbad);
 		err = fabad->getErrors();
-		UT_ASSERT(err->hasError());
+		UT_ASSERT(err.hasError());
 		UT_IS(err->print(), "Errors in the underlying FnReturn:\n  duplicate row name 'one'\n");
 
 		// the exception gets thrown at export attempt
@@ -165,7 +165,7 @@ UTESTCASE make_facet(Utest *utest)
 			->addLabel("two", rt1)
 		;
 		err = fretbad->getErrors();
-		UT_ASSERT(!err->hasError());
+		UT_ASSERT(!err.hasError());
 
 		fretbad->initialize();
 
@@ -176,7 +176,7 @@ UTESTCASE make_facet(Utest *utest)
 		{
 			Autoref<Facet> fabad = Facet::makeWriter(fretbad); // can't use a faceted FnReturn for a writer
 			err = fabad->getErrors();
-			UT_ASSERT(err->hasError());
+			UT_ASSERT(err.hasError());
 			UT_IS(err->print(), "The FnReturn is already connected to a writer facet, can not do it twice.\n");
 
 			UT_ASSERT(!fabad->isWriter()); // this error resets the writer flag
@@ -201,7 +201,7 @@ UTESTCASE make_facet(Utest *utest)
 		{
 			// however that same FnReturn with Xtray can be used fine for a reader
 			Autoref<Facet> fagood = Facet::makeReader(fretbad);
-			UT_ASSERT(!fagood->getErrors()->hasError());
+			UT_ASSERT(!fagood->getErrors().hasError());
 		}
 		
 		// After the reader Facet is destroyed, the FnReturn must stay faceted
@@ -215,7 +215,7 @@ UTESTCASE make_facet(Utest *utest)
 		;
 		fretbad->initialize();
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(),
 			"If the FnReturn is initialized, it must already contain the _BEGIN_ label.\n"
 			"If the FnReturn is initialized, it must already contain the _END_ label.\n");
@@ -228,7 +228,7 @@ UTESTCASE make_facet(Utest *utest)
 		;
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
 		UT_IS(fabad->exportRowType("rta", NULL), fabad);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), "Can not export a NULL row type with name 'rta'.\n");
 	}
 
@@ -238,7 +238,7 @@ UTESTCASE make_facet(Utest *utest)
 		;
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
 		fabad->exportRowType("", rt1);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), "Can not export a row type with an empty name.\n");
 	}
 
@@ -248,7 +248,7 @@ UTESTCASE make_facet(Utest *utest)
 		;
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
 		fabad->setQueueLimit(0);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), "Can not set the queue size limit to 0, must be greater than 0.\n");
 	}
 
@@ -259,7 +259,7 @@ UTESTCASE make_facet(Utest *utest)
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
 		fabad->exportRowType("rt1", rt1); // this one is OK
 		fabad->exportRowType("rt1", rt1);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), "Can not export a duplicate row type name 'rt1'.\n");
 	}
 
@@ -272,9 +272,9 @@ UTESTCASE make_facet(Utest *utest)
 		mkfields(fld);
 		fld[1].name_ = "a"; // a duplicate name
 		Autoref<RowType> rtbad = new CompactRowType(fld);
-		UT_ASSERT(rtbad->getErrors()->hasError());
+		UT_ASSERT(rtbad->getErrors().hasError());
 		fabad->exportRowType("rtb", rtbad);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), 
 			"Can not export a row type 'rtb' containing errors:\n"
 			"  duplicate field name 'a' for fields 2 and 1\n");
@@ -287,7 +287,7 @@ UTESTCASE make_facet(Utest *utest)
 		;
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
 		UT_IS(fabad->exportTableType("tta", NULL), fabad);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), "Can not export a NULL table type with name 'tta'.\n");
 	}
 
@@ -297,7 +297,7 @@ UTESTCASE make_facet(Utest *utest)
 		;
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
 		fabad->exportTableType("", tt1);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), "Can not export a table type with an empty name.\n");
 	}
 
@@ -308,7 +308,7 @@ UTESTCASE make_facet(Utest *utest)
 		Autoref<Facet> fabad = Facet::make(fretbad, true);
 		fabad->exportTableType("tt1", tt1); // this one is OK
 		fabad->exportTableType("tt1", tt1);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), "Can not export a duplicate table type name 'tt1'.\n");
 	}
 
@@ -321,13 +321,13 @@ UTESTCASE make_facet(Utest *utest)
 		mkfields(fld);
 		fld[1].name_ = "a"; // a duplicate name
 		Autoref<RowType> rtbad = new CompactRowType(fld);
-		UT_ASSERT(rtbad->getErrors()->hasError());
+		UT_ASSERT(rtbad->getErrors().hasError());
 		Autoref<TableType> ttbad = TableType::make(rtbad)
 			->addSubIndex("primary", HashedIndexType::make(
 				NameSet::make()->add("a")->add("e")))
 		;
 		fabad->exportTableType("ttb", ttbad);
-		UT_ASSERT(fabad->getErrors()->hasError());
+		UT_ASSERT(fabad->getErrors().hasError());
 		UT_IS(fabad->getErrors()->print(), 
 			"Can not export the table type 'ttb' containing errors:\n"
 			"  row type error:\n"

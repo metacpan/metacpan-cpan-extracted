@@ -14,9 +14,14 @@
    },
    "name" : "Date-Holidays-BY",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build" : "0.28"
          }
       },
       "develop" : {
@@ -32,8 +37,10 @@
             "List::Util" : "0",
             "Time::Piece" : "0",
             "base" : "0",
+            "perl" : "5.008",
             "strict" : "0",
             "utf8" : "0",
+            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -52,7 +59,7 @@
          "web" : "https://github.com/bes-internal/Date-Holidays-BY"
       }
    },
-   "version" : "0.2019.3",
+   "version" : "0.2019.5",
    "x_generated_by_perl" : "v5.24.3",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

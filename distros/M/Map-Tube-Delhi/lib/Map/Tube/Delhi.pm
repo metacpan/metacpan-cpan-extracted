@@ -1,13 +1,13 @@
 package Map::Tube::Delhi;
 $Map::Tube::Delhi::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Delhi::VERSION = '0.79';
+$Map::Tube::Delhi::VERSION = '0.80';
 =head1 NAME
 
 Map::Tube::Delhi - Interface to the Delhi Metro Map.
 
 =head1 VERSION
 
-version 0.79
+version 0.80
 
 =cut
 

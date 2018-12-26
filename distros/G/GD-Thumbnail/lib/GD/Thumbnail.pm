@@ -1,9 +1,7 @@
 package GD::Thumbnail;
+$GD::Thumbnail::VERSION = '1.44';
 use strict;
 use warnings;
-use vars qw($VERSION %TMP);
-
-$VERSION = '1.42';
 
 use GD;
 use Carp qw( croak );
@@ -30,7 +28,7 @@ use constant RATIO_CONSTANT       =>  100;
 use constant RE_FILE_EXTENSION    => qr{ [.] (png|gif|jpg|jpe|jpeg) \z }xmsi;
 use constant RE_RATIO             => qr{ (\d+)(?:\s+|)% }xms;
 
-%TMP = ( # global template. so that one can change the text
+our %TMP = ( # global template. so that one can change the text
    GB   => '%.2f GB',
    MB   => '%.2f MB',
    KB   => '%.2f KB',
@@ -343,11 +341,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-GD::Thumbnail - Thumbnail maker for GD
+GD::Thumbnail
+
+=head1 VERSION
+
+version 1.44
 
 =head1 SYNOPSIS
 
@@ -374,9 +376,6 @@ or
 
 =head1 DESCRIPTION
 
-This document describes version C<1.42> of C<GD::Thumbnail>
-released on C<5 July 2016>.
-
 This is a thumbnail maker. Thumbnails are smaller versions of the
 original image/graphic/picture and are used for preview purposes,
 where bigger images can take a long time to load. They are also 
@@ -395,6 +394,10 @@ the thumbnail generator population on C<CPAN>.
 
 The module can raise an exception if something goes wrong.
 So, you may have to use an C<eval block> to catch them. 
+
+=head1 NAME
+
+GD::Thumbnail - Thumbnail maker for GD
 
 =head1 METHODS
 
@@ -620,15 +623,13 @@ L<Image::Magick::Thumbnail>, L<Image::Magick::Thumbnail::Fixed>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

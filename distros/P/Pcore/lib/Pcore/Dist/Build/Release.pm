@@ -23,11 +23,11 @@ sub run ($self) {
 
     return if !$new_ver;
 
-    say qq[${LF}Current version is: $cur_ver];
+    say "\nCurrent version is: $cur_ver";
 
-    say qq[New version will be: $new_ver$LF];
+    say "New version will be: $new_ver\n";
 
-    return if P->term->prompt( q[Continue release process?], [qw[yes no]], enter => 1 ) ne 'yes';
+    return if P->term->prompt( 'Continue release process?', [qw[yes no]], enter => 1 ) ne 'yes';
 
     say $EMPTY;
 

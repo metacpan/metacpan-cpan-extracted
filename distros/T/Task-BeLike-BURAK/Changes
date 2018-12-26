@@ -1,16 +1,19 @@
 Revision history for Perl extension Task::BeLike::BURAK
 
+0.20 2018-12-25 BURAK
+    - Migrate to dzil.
+
 0.19 Tue Jul  5 00:46:43 2016
-    => Update repo url
+    - Update repo url
 
 0.18 Thu Jan  9 02:19:00 2014
-    => Remove obsolete modules.
+    - Remove obsolete modules.
 
 0.17 Sun Jul 28 08:21:37 2013
-    => Add new modules, remove some unused things.
+    - Add new modules, remove some unused things.
 
 0.16 Sun Jul  8 01:50:04 2012
-    => Bump version.
+    - Bump version.
 
 0.15 Sat Nov 12 22:55:01 2011
    => Add LWP::Protocol::https

@@ -1,11 +1,10 @@
 package Lingua::TR::ASCII::Data;
+$Lingua::TR::ASCII::Data::VERSION = '0.16';
 use strict;
 use warnings;
 use base qw(Exporter);
 use utf8;
 use constant CONTEXT_SIZE => 10;
-
-our $VERSION = '0.14';
 
 our @EXPORT = qw(
     $PATTERN
@@ -3406,11 +3405,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-Lingua::TR::ASCII::Data - Data sets for Lingua::TR::ASCII
+Lingua::TR::ASCII::Data
+
+=head1 VERSION
+
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -3418,10 +3421,11 @@ None.
 
 =head1 DESCRIPTION
 
-This document describes version C<0.14> of C<Lingua::TR::ASCII::Data>
-released on C<5 July 2016>.
-
 Private module.
+
+=head1 NAME
+
+Lingua::TR::ASCII::Data - Data sets for Lingua::TR::ASCII
 
 =head1 SEE ALSO
 
@@ -3429,15 +3433,13 @@ L<Lingua::TR::ASCII>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2011 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2011 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

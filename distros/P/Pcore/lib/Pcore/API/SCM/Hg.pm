@@ -16,7 +16,7 @@ sub _build_upstream ($self) {
     if ( -f "$self->{root}/.hg/hgrc" ) {
         my $hgrc = P->file->read_text("$self->{root}/.hg/hgrc");
 
-        return Pcore::API::SCM::Upstream->new( { uri => $1, local_scm_type => $SCM_TYPE_HG } ) if $hgrc->$* =~ /default\s*=\s*(.+?)$/sm;
+        return Pcore::API::SCM::Upstream->new( { uri => $1, local_scm_type => $SCM_TYPE_HG } ) if $hgrc =~ /default\s*=\s*(.+?)$/sm;
     }
 
     return;
@@ -78,15 +78,15 @@ sub _read ( $self ) {
 
 # NOTE status + pattern (status *.txt) not works under linux - http://bz.selenic.com/show_bug.cgi?id=4526
 sub _scm_cmd ( $self, $cmd, $root = undef, $cb = undef ) {
-    my $buf = join "\N{NULL}", $cmd->@*;
+    my $buf = join "\x00", $cmd->@*;
 
-    $buf .= "\N{NULL}--repository\N{NULL}$root" if $root;
+    $buf .= "\x00--repository\x00$root" if $root;
 
     $buf = Encode::encode( $Pcore::WIN_ENC, $buf, Encode::FB_CROAK );
 
     my $hg = $self->_server;
 
-    $hg->{stdin}->write( "runcommand$LF" . pack( 'L>', length $buf ) . $buf );
+    $hg->{stdin}->write( "runcommand\n" . pack( 'L>', length $buf ) . $buf );
 
     my $res = {};
 

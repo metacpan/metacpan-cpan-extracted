@@ -1,7 +1,7 @@
 package Pcore::Util::Data;
 
 use Pcore -const, -export;
-use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar trim];
+use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_perl trim];
 use Pcore::Util::List qw[pairs];
 use Sort::Naturally qw[nsort];
 use Pcore::Util::Scalar qw[is_ref is_blessed_ref is_plain_scalarref is_plain_arrayref is_plain_hashref];
@@ -45,7 +45,7 @@ our $JSON_CACHE;
 # JSON can't serialize ScalarRefs
 # objects should have TO_JSON method, otherwise object will be serialized as null
 # base64 encoder is used by default, it generates more compressed data
-sub encode_data ( $type, $data, @ ) {
+sub encode_data ( $type, $data, @args ) {
     my %args = (
         readable           => undef,               # make serialized data readable for humans
         compress           => undef,               # use compression
@@ -57,7 +57,7 @@ sub encode_data ( $type, $data, @ ) {
         cipher             => $DATA_CIPHER_DES,    # cipher to use
         json               => undef,               # HashRef with additional params for Cpanel::JSON::XS
         xml                => undef,               # HashRef with additional params for XML::Hash::XS
-        splice @_, 2,
+        @args,
     );
 
     if ( $args{readable} && $type != $DATA_TYPE_CBOR ) {
@@ -94,11 +94,11 @@ sub encode_data ( $type, $data, @ ) {
 
     # compress
     if ( $args{compress} ) {
-        if ( bytes::length $res->$* >= $args{compress_threshold} ) {
+        if ( bytes::length $res >= $args{compress_threshold} ) {
             if ( $args{compress} == $DATA_COMPRESS_ZLIB ) {
                 require Compress::Zlib;
 
-                $res = \Compress::Zlib::compress( $res->$* );
+                $res = Compress::Zlib::compress($res);
             }
             else {
                 die qq[Unknown compressor type "$args{compress}"];
@@ -123,10 +123,10 @@ sub encode_data ( $type, $data, @ ) {
         if ( defined $secret ) {
             require Crypt::CBC;
 
-            $res = \Crypt::CBC->new(
+            $res = Crypt::CBC->new(
                 -key    => $secret,
                 -cipher => $CIPHER_NAME->{ $args{cipher} },
-            )->encrypt( $res->$* );
+            )->encrypt($res);
         }
         else {
             $args{secret} = undef;
@@ -136,10 +136,10 @@ sub encode_data ( $type, $data, @ ) {
     # encode
     if ( $args{encode} ) {
         if ( $args{encode} == $DATA_ENC_B64 ) {
-            $res = \to_b64_url( $res->$* );
+            $res = to_b64_url($res);
         }
         elsif ( $args{encode} == $DATA_ENC_HEX ) {
-            $res = \unpack 'H*', $res->$*;
+            $res = unpack 'H*', $res;
         }
         else {
             die qq[Unknown encoder "$args{encode}"];
@@ -148,7 +148,7 @@ sub encode_data ( $type, $data, @ ) {
 
     # add token
     if ( $args{token} ) {
-        $res->$* .= sprintf( '#%x', ( $args{compress} // 0 ) . ( defined $args{secret} ? $args{cipher} : 0 ) . ( $args{secret_index} // 0 ) . ( $args{encode} // 0 ) . $type ) . sprintf '#%x', bytes::length $res->$*;
+        $res .= sprintf( '#%x', ( $args{compress} // 0 ) . ( defined $args{secret} ? $args{cipher} : 0 ) . ( $args{secret_index} // 0 ) . ( $args{encode} // 0 ) . $type ) . sprintf '#%x', bytes::length $res;
     }
 
     return $res;
@@ -156,8 +156,8 @@ sub encode_data ( $type, $data, @ ) {
 
 # JSON data should be without UTF8 flag
 # objects aren't deserialized automatically from JSON
-sub decode_data ( $type, @ ) {
-    my $data_ref = ref $_[1] ? $_[1] : \$_[1];
+sub decode_data ( $type, $data_ref, @args ) {
+    $data_ref = \$data_ref if !is_ref $_[1];
 
     my %args = (
         compress     => undef,
@@ -169,7 +169,7 @@ sub decode_data ( $type, @ ) {
         json         => undef,              # HashRef with additional params for Cpanel::JSON::XS
         xml          => undef,              # HashRef with additional params for XML::Hash::XS
         return_token => 0,                  # return token
-        splice( @_, 2 ),
+        @args,
         type => $type,
     );
 
@@ -278,47 +278,36 @@ sub to_perl ( $data, %args ) {
         return [ nsort keys $_[0]->%* ];
     };
 
-    local $Data::Dumper::Indent     = 0;
-    local $Data::Dumper::Purity     = 1;
-    local $Data::Dumper::Pad        = $EMPTY;
-    local $Data::Dumper::Terse      = 1;
-    local $Data::Dumper::Deepcopy   = 0;
-    local $Data::Dumper::Quotekeys  = 0;
-    local $Data::Dumper::Pair       = '=>';
-    local $Data::Dumper::Maxdepth   = 0;
-    local $Data::Dumper::Deparse    = 0;
-    local $Data::Dumper::Sparseseen = 1;
-    local $Data::Dumper::Useperl    = 1;
-    local $Data::Dumper::Useqq      = 1;
-    local $Data::Dumper::Sortkeys   = $args{readable} ? $sort_keys : 0;
-
     my $res;
 
     if ( !defined $data ) {
-        $res = \'undef';
+        $res = 'undef';
     }
     else {
         no warnings qw[redefine];
 
-        local *Data::Dumper::qquote = sub {
-            if ( $_[0] eq $EMPTY ) {
-                return q[''];
-            }
-            elsif ( $_[0] =~ /[^[:alnum:]_]/sm ) {
-                return 'qq[' . encode_utf8( escape_scalar $_[0] ) . ']';
-            }
-            else {
-                return "'$_[0]'";
-            }
-        };
+        local $Data::Dumper::Indent     = 0;
+        local $Data::Dumper::Purity     = 1;
+        local $Data::Dumper::Pad        = $EMPTY;
+        local $Data::Dumper::Terse      = 1;
+        local $Data::Dumper::Deepcopy   = 0;
+        local $Data::Dumper::Quotekeys  = 0;
+        local $Data::Dumper::Pair       = '=>';
+        local $Data::Dumper::Maxdepth   = 0;
+        local $Data::Dumper::Deparse    = 0;
+        local $Data::Dumper::Sparseseen = 1;
+        local $Data::Dumper::Useperl    = 1;
+        local $Data::Dumper::Useqq      = 1;
+        local $Data::Dumper::Sortkeys   = $args{readable} ? $sort_keys : 0;
+        local *Data::Dumper::qquote     = sub ( $str, $use_qqote ) { return escape_perl $str };
 
-        $res = \Data::Dumper->Dump( [$data] );
+        $res = Data::Dumper->Dump( [$data] );
     }
 
     if ( $args{readable} ) {
-        $res = \P->src->decompress(
+        $res = P->src->decompress(
             path   => 'config.perl',    # mark file as perl config
-            data   => $res->$*,
+            data   => $res,
             filter => {
                 perl_tidy   => '--comma-arrow-breakpoints=0',
                 perl_critic => 0,
@@ -374,17 +363,17 @@ sub to_json ( $data, %args ) {
     my $readable = delete $args{readable};
 
     if (%args) {
-        return \get_json(%args)->encode($data);
+        return get_json(%args)->encode($data);
     }
     elsif ($readable) {
         state $json = get_json( utf8 => 1, canonical => 1, indent => 1, indent_length => 4, space_after => 1 );
 
-        return \$json->encode($data);
+        return $json->encode($data);
     }
     else {
         state $json = get_json( ascii => 1, utf8 => 1 );
 
-        return \$json->encode($data);
+        return $json->encode($data);
     }
 }
 
@@ -426,7 +415,7 @@ sub get_cbor ( @args ) {
 sub to_cbor ( $data, @ ) {
     state $cbor = get_cbor();
 
-    return \$cbor->encode($data);
+    return $cbor->encode($data);
 }
 
 sub from_cbor ( $data, @ ) {
@@ -443,7 +432,7 @@ sub to_yaml ( $data, @ ) {
     local $YAML::XS::DumpCode = 0;
     local $YAML::XS::Indent   = 4;
 
-    return \YAML::XS::Dump($data);
+    return YAML::XS::Dump($data);
 }
 
 sub from_yaml ( $data, @ ) {
@@ -495,12 +484,12 @@ sub to_xml ( $data, %args ) {
     my $readable = delete $args{readable};
 
     if (%args) {
-        return \$xml->hash2xml( $data, %args );
+        return $xml->hash2xml( $data, %args );
     }
     else {
         my $root = ( keys $data->%* )[0];
 
-        return \$xml->hash2xml( $data->{$root}, root => $root, utf8 => 0, $readable ? ( canonical => 1, indent => 4 ) : () );
+        return $xml->hash2xml( $data->{$root}, root => $root, utf8 => 0, $readable ? ( canonical => 1, indent => 4 ) : () );
     }
 }
 
@@ -541,7 +530,7 @@ sub to_ini ( $data, @ ) {
 
     encode_utf8 $buf;
 
-    return \$buf;
+    return $buf;
 }
 
 sub from_ini ( $data, @ ) {
@@ -1049,10 +1038,10 @@ sub from_uri_query_utf8 : prototype($) ($uri) {
 ## |      | 159                  | * Subroutine "decode_data" with high complexity score (27)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 |                      | ControlStructures::ProhibitPostfixControls                                                                     |
-## |      | 368, 421             | * Postfix control "for" used                                                                                   |
-## |      | 629                  | * Postfix control "while" used                                                                                 |
+## |      | 357, 410             | * Postfix control "for" used                                                                                   |
+## |      | 618                  | * Postfix control "while" used                                                                                 |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 964                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 953                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

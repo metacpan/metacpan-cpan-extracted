@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.10
+    version 1.11
 
 SYNOPSIS
 
@@ -175,12 +175,6 @@ ATTRIBUTES
  classes
 
  file
-
- table_comments
-
-    When this flag is used, MySQL::Workbench::DBIC assumes that (some)
-    tables have stored extra information for columns in the table comments.
-    This must be in JSON format.
 
  inherit_from_core
 

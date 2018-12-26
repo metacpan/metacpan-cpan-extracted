@@ -1265,4 +1265,16 @@ Revision history for Graphics-Framebuffer
        
        Improvements made to the examples scripts.
 
-       The 32 bit alpha routines have been optimized.
+       The 32 bit alpha routines have been optimized, and by optimized, I mean
+       REALLY optimized.  They are considerably faster than they were before.
+
+6.11   Dec 23, 2018
+
+       I consolidated a lot of Perl and C code to make things for efficient and
+       to make more sense (in the source code).  Blitting and converting for
+       example.
+
+       Modified the code to recognize pixel bit size instead of byte size.  I
+       did this to make ready for adding single bit pixel sizes (for monochrome
+       screens).  Someone asked if the module was capable of working in
+       single bit monochrome, and currently it does not, but will be soon!

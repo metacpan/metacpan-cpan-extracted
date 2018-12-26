@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -102,6 +102,11 @@ void TableType::printTo(string &res, const string &indent, const string &subinde
 	root_->printTo(res, indent, subindent);
 }
 
+int TableType::cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const
+{
+	return CMP_NOT_SUPPORTED;
+}
+
 void TableType::initialize()
 {
 	if (initialized_)
@@ -147,13 +152,13 @@ void TableType::initialize()
 	root_->initializeNested();
 	errors_->append("index error:", root_->getErrors());
 
-	if (!errors_->hasError() && errors_->isEmpty())
+	if (!errors_.hasError() && errors_.isEmpty())
 		errors_ = NULL;
 }
 
 Onceref<Table> TableType::makeTable(Unit *unit, const string &name) const
 {
-	if (!initialized_ || errors_->hasError())
+	if (!initialized_ || errors_.hasError())
 		return NULL;
 
 	return new Table(unit, name, this, rowType_, rhType_);

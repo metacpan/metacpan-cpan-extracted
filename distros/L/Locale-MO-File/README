@@ -1,4 +1,4 @@
-Locale::MO::File version 0.08
+Locale::MO::File version 0.09
 =============================
 
 Write or read gettext MO files.
@@ -30,7 +30,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2011 - 2017,
+Copyright (c) 2011 - 2018,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

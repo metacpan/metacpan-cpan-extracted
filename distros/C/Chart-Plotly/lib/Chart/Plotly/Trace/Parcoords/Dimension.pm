@@ -6,7 +6,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
     Moose::Util::TypeConstraints::type('PDL');
 }
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace parcoords.
 
@@ -55,11 +55,25 @@ has multiselect => ( is            => "rw",
                      documentation => "Do we allow multiple selection ranges or just a single range?",
 );
 
+has name => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "When used in a template, named items are created in the output figure in addition to any items the figure already has in this array. You can modify these items in the output figure by making your own item with `templateitemname` matching this `name` alongside your modifications (including `visible: false` or `enabled: false` to hide it). Has no effect outside of a template.",
+);
+
 has range => (
     is  => "rw",
     isa => "ArrayRef|PDL",
     documentation =>
       "The domain range that represents the full, shown axis extent. Defaults to the `values` extent. Must be an array of `[fromValue, toValue]` with finite numbers as elements.",
+);
+
+has templateitemname => (
+    is  => "rw",
+    isa => "Str",
+    documentation =>
+      "Used to refer to a named item in this array in the template. Named items from the template will be created even without a matching item in the input figure, but you can modify one by making an item with `templateitemname` matching its `name`, alongside your modifications (including `visible: false` or `enabled: false` to hide it). If there is no template or no matching item, this item will be hidden unless you explicitly show it with `visible: true`.",
 );
 
 has tickformat => (
@@ -126,7 +140,7 @@ Chart::Plotly::Trace::Parcoords::Dimension - This attribute is one of the possib
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -203,9 +217,17 @@ The shown name of the dimension.
 
 Do we allow multiple selection ranges or just a single range?
 
+=item * name
+
+When used in a template, named items are created in the output figure in addition to any items the figure already has in this array. You can modify these items in the output figure by making your own item with `templateitemname` matching this `name` alongside your modifications (including `visible: false` or `enabled: false` to hide it). Has no effect outside of a template.
+
 =item * range
 
 The domain range that represents the full, shown axis extent. Defaults to the `values` extent. Must be an array of `[fromValue, toValue]` with finite numbers as elements.
+
+=item * templateitemname
+
+Used to refer to a named item in this array in the template. Named items from the template will be created even without a matching item in the input figure, but you can modify one by making an item with `templateitemname` matching its `name`, alongside your modifications (including `visible: false` or `enabled: false` to hide it). If there is no template or no matching item, this item will be hidden unless you explicitly show it with `visible: true`.
 
 =item * tickformat
 

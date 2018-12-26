@@ -1,8 +1,10 @@
 Revision history for Data::Validate::WithYAML
 =============================================
 
-0.16    2014-03-03
-        - removed -T from t/ scripts
+0.16    2018-12-26 08:53:00
+
+        + improve tests
+        + improved error checking
 
 0.15    2014-01-16
         + added "datatype" (incl. tests)

@@ -1,53 +1,56 @@
 Revision history for Perl extension Sys::Info::Driver::OSX.
 
+0.7959 2018-12-25 BURAK
+    - Migrate to dzil.
+
 0.7958 Wed Oct 23 06:57:04 2013
-    => Update the editions list for 10.[89]
+     - Update the editions list for 10.[89]
 
 0.7957 Sat May 11 07:35:30 2013
-    => Fix memory stats.
-    => Use full paths for system calls.
+     - Fix memory stats.
+     - Use full paths for system calls.
 
 0.7956 Sat May 11 06:05:40 2013
-    => Fix OS bitness detection
+     - Fix OS bitness detection
 
 0.7955 Fri May 10 04:35:40 2013
-    => Handle plist blow ups correctly.
+     - Handle plist blow ups correctly.
 
 0.7954 Sun Dec 16 05:06:50 2012
-    => Fix ram value.
+     - Fix ram value.
 
 0.7953 Mon Aug  1 02:03:22 2011
-    => Use the new constant.
+     - Use the new constant.
 
 0.7952 Sat Jul 30 23:39:00 2011
-    => Better error checking for plist parser.
+     - Better error checking for plist parser.
 
 0.7951 Thu May 19 01:13:52 2011
-    => Use gmtime for parser tests.
-    => Another fix for sysctl parser.
+     - Use gmtime for parser tests.
+     - Another fix for sysctl parser.
 
 0.795 Mon May 16 04:09:54 2011
-    => Swap support.
+     - Swap support.
 
 0.794 Thu May 12 05:48:29 2011
-    => Implement install date.
-    => Improve sysctl parsers.
+     - Implement install date.
+     - Improve sysctl parsers.
 
 0.793 Tue May 10 03:02:09 2011
-    => sysctl parser regex fix.
-    => More verbose error message.
+     - sysctl parser regex fix.
+     - More verbose error message.
 
 0.792 Tue May 10 03:02:09 2011
-    => sysctl parser fix.
+     - sysctl parser fix.
 
 0.791 Mon May  9 01:45:35 2011
-    => Another bitness fix.
+     - Another bitness fix.
 
 0.79 Sun Apr 24 00:21:09 2011
-    => Check the values in cpu::bitness to prevent die()ing.
+     - Check the values in cpu::bitness to prevent die()ing.
 
 0.78 Sat Apr 16 15:45:12 2011
-    => Just increased the version number.
+     - Just increased the version number.
 
 0.73 Tue Jan 11 02:13:45 2011
-    => First release. Currently not enabled in Sys::Info.
+     - First release. Currently not enabled in Sys::Info.

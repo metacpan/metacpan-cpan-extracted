@@ -8,6 +8,7 @@ BEGIN {
     require local_utils;
     local_utils::cleanup_dot_cpan();
     local_utils::prepare_dot_cpan();
+    local_utils::read_myconfig();
     require CPAN::MyConfig;
     require CPAN;
 
@@ -46,6 +47,7 @@ use File::Basename qw/basename/;
 use lib "inc";
 use lib "t";
 use local_utils;
+use version;
 
 # prepare local CPAN
 local_utils::cleanup_dot_cpan();
@@ -55,9 +57,11 @@ END{ local_utils::cleanup_dot_cpan(); }
 
 use Test::More;
 
-my (@tarball_suffixes, @meta_yml_tests); # defined later in BEGIN blocks
+*note = Test::More->can("note") || sub { warn shift };
 
-plan tests => 1 + @tarball_suffixes + 3 * @meta_yml_tests;
+my (@tarball_suffixes, @meta_yml_tests, $isa_perl_tests); # defined later in BEGIN blocks
+
+plan tests => 1 + @tarball_suffixes + 3 * @meta_yml_tests + $isa_perl_tests;
 
 require_ok( "CPAN" );
 
@@ -74,7 +78,7 @@ BEGIN {
         .tar.Z
         .zip
     );
-}     
+}
 
 {
         my $dist_base = "Bogus-Module-1.234";
@@ -167,6 +171,51 @@ BEGIN {
             pass( "$label\: no requirement checks apply" );
         }
     }
+}
+
+my @CPR;
+BEGIN {
+    @CPR = eval { require CPAN::Perl::Releases } ? CPAN::Perl::Releases::perl_versions() : ();
+    $isa_perl_tests = @CPR ? 2 + @CPR : 1;
+}
+
+{
+    {
+        no strict;
+        package Silent;
+        for my $m (qw(myprint mydie mywarn mysleep)){
+            *$m = sub {
+                return;
+            }
+        }
+    }
+    $CPAN::Frontend = $CPAN::Frontend = "Silent";
+    if (@CPR) {
+        my @fail;
+        for (@CPR){
+            if (/-(RC|TRIAL)\d*$/){
+                pass("ignoring $_ due $1");
+                next;
+            }
+            my $basename = basename CPAN::Perl::Releases::perl_tarballs($_)->{"tar.gz"};
+            my $d = $CPAN::META->instance('CPAN::Distribution' => "X/XX/XXX/$basename");
+            if (my $v = $d->isa_perl()){
+                $v =~ s/_.*//;
+                cmp_ok(version->new($v)->numify, '>', 5, "$v > 5");
+            } else {
+                push @fail, $_;
+            }
+        }
+        ok !@fail, "no perl distros unrecognized; fail=(@fail)";
+    } else {
+        note("No CPAN::Perl::Releases installed");
+    }
+    my @fail;
+    for my $distro (qw(INGY/perl5-0.21.tar.gz)) {
+        my $d = $CPAN::META->instance('CPAN::Distribution' => $distro);
+        push @fail, $distro if $d->isa_perl();
+    }
+    ok !@fail, "no legit distros taken for perls; fail=(@fail)";
 }
 
 # Local Variables:

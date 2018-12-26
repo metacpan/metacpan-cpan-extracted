@@ -1,6 +1,11 @@
 Revision history for Perl extension Class::Superclass.
 ======================================================
 
+0.08  2018-12-23 11:26:00
+
+     * added support for several Moo-like frameworks
+     * added tests
+
 0.07  2014-01-13
 
      [MISC]

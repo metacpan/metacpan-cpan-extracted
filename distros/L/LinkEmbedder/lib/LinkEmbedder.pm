@@ -9,7 +9,7 @@ use Mojo::UserAgent;
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -90,10 +90,10 @@ sub serve {
     return $c->render(data => $link->html) if $format eq 'html';
 
     my $json = $err ? {err => $err->{code} || 500} : $link->TO_JSON;
-    $c->render(json => $json) unless $format eq 'jsonp';
+    return $c->render(json => $json) unless $format eq 'jsonp';
 
     my $name = $c->param('callback') || 'oembed';
-    $c->render(data => sprintf '%s(%s)', $name, Mojo::JSON::to_json($json));
+    return $c->render(data => sprintf '%s(%s)', $name, Mojo::JSON::to_json($json));
   })->catch(sub { $c->reply->exception(shift) });
 
   return $self;

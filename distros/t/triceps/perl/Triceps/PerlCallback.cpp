@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -47,13 +47,6 @@ PerlCallback::PerlCallback(const PerlCallback *other) :
 PerlCallback::~PerlCallback()
 {
 	clear();
-}
-
-PerlCallback *PerlCallback::deepCopy()
-{
-	if (this == NULL)
-		return NULL;
-	return new PerlCallback(this);
 }
 
 void PerlCallback::clear()
@@ -109,7 +102,7 @@ void PerlCallback::setCodeVa(SV *code, const char *fmt, va_list ap)
 
 		Erref err = compileCodeVa(fmt, ap);
 
-		if (err->hasError()) {
+		if (err.hasError()) {
 			throw Exception(err, false); // XXX add a heading message?
 		}
 	} else { 
@@ -222,9 +215,9 @@ bool PerlCallback::equals(const PerlCallback *other) const
 
 void PerlCallback::initialize(HoldRowTypes *holder)
 {
-	if (threadable_ && deepCopied_ && !errt_->hasError()) {
+	if (threadable_ && deepCopied_ && !errt_.hasError()) {
 		errt_ = compileCodeFmt("recompilation in a new thread");
-		if (errt_->hasError())
+		if (errt_.hasError())
 			return; // error remembered, nothing else to do
 
 		for (PerlValueVec::iterator it = argst_.begin(); it != argst_.end(); ++it)
@@ -296,7 +289,7 @@ Erref PerlCallback::compileCodeVa(const char *fmt, va_list ap)
 
 	FREETMPS; LEAVE;
 
-	if (!err->hasError()) {
+	if (!err.hasError()) {
 		if (code == NULL) {
 			va_list copy_ap;
 			va_copy(copy_ap, ap);
@@ -312,7 +305,7 @@ Erref PerlCallback::compileCodeVa(const char *fmt, va_list ap)
 		}
 	}
 
-	if (err->hasError()) {
+	if (err.hasError()) {
 		err.fAppend(new Errors(subcode), "The source code was:");
 	} else {
 		code_ = newSV(0);

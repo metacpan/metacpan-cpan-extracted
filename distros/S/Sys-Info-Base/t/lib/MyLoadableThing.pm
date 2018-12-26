@@ -1,4 +1,5 @@
 package MyLoadableThing;
+
 use strict;
 use warnings;
 

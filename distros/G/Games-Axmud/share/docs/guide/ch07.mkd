@@ -82,6 +82,10 @@ Click on the **Attributes** tab.
 
 We'll talk about rewriter triggers in [Section 7.1.4](#7.1.4) and splitter triggers in [Section 7.1.6](#7.1.6). First, let's examine the other attributes.
 
+**Igore the trigger response (e.g. just apply a style)**
+
+When this checkbutton is selected, nothing happens when the trigger fires (but any trigger style is still applied - see [Section 7.1.3](#7.1.3).
+
 **Ignore case**
 
 When the checkbutton is selected, this trigger doesn't care about capital letters. So, the pattern **You kill the orc** will match all of the following lines:
@@ -91,6 +95,10 @@ When the checkbutton is selected, this trigger doesn't care about capital letter
         YOU KILL THE ORC
 
 From your reading of [Section 6](ch06.html) you'll remember that patterns are usually case-sensitive. De-select the button to make the pattern **You kill the orc** match only the first line above.
+
+**Keep checking triggers after a match**
+
+If the checkbutton is not selected, when this trigger's pattern matches a line, Axmud will not check any other triggers. If the checkbutton is selected, Axmud will continue checking the line against other triggers.
 
 **Only fire in session's default pane**
 
@@ -129,10 +137,6 @@ When the checkbutton is selected, any line which matches the trigger's pattern i
 
 When the checkbutton is selected, any line which matches the trigger's pattern is *not* written to any logfiles.
 
-**Keep checking triggers after a match**
-
-If the checkbutton is not selected, when this trigger's pattern matches a line, Axmud will not check any other triggers. If the checkbutton is selected, Axmud will continue checking the line against other triggers.
-
 **Temporary trigger**
 
 If the checkbutton is selected, the trigger only fires once. After that, the active trigger becomes an inactive trigger - it will be available again, the next time you connect to the world, but it will not be available again during this session.
@@ -147,7 +151,7 @@ Now click on **Page 2** of the **Attributes** tab.
 
 ![Trigger styles tab](img/ch07/trigger_styles.png)
 
-Triggers are able to change the way matching lines are displayed. This is really useful if you want to change the colour of something like **The orc drops its treasure**, so that it stands out against the surrounding text.
+Triggers are able to change the way matching lines are displayed. This is really useful if you want to change the colour of **The orc drops its treasure**, so that it stands out against the surrounding text.
 
 Trigger styles are turned *off* by default. When you turn them on, you need to decide whether the new style should apply to the whole line, or just the portion of the line that matches the trigger's pattern.
 
@@ -160,6 +164,19 @@ If the trigger's pattern contains groups (see [Section 6.1.5](ch06.html#6.1.5)),
 The trigger style can combine colours and other typographical features. **Foreground colour** is the colour of the text itself.  **Underlay colour** is the colour of the background immediately below the text. (Bold colours are shown in CAPITAL LETTERS). If you don't specify a colour, the line's normal colours are not changed.
 
 You can also apply italics, strikethrough, blinking text and underlines (underscores). If you apply the **link** style, the text will be a clickable link which Axmud will try to open in a web browser.
+
+Axmud triggers have a *stimulus* and a *response*. If you just want to apply the style and do nothing else, you can tell Axmud to ignore this trigger's response. 
+
+* From the main window menu, click **Edit > World triggers**
+* In the **Trigger stimulus** box, enter **The orc drops its treasure**
+* In the **Trigger response** box, enter anything you like 
+    * There must be a response, even though it's ignored
+* Click on **Page 1**
+* Select the **Ignore the trigger response (e.g. just apply a style)** button
+* Now click on **Page 2**
+* Click the **Mode -2 Apply style to matched text** button
+* In the drop-down box below **Text colour**, select a colour like **red**, and then click the **Set** button
+* Click the **OK** button to close the window
 
 ###<a name="7.1.4">7.1.4 Rewriter triggers</a>
 
@@ -536,9 +553,13 @@ You can prevent a macro from firing too often by setting a cooldown period. For 
 
 ##<a name="7.4">7.4 Timers</a>
 
-Timers allow you to execute an instruction repeatedly at regular intervals. They can also be used to execute an instruction once, after a certain period of time.
+Timers allow you to execute an instruction repeatedly at regular intervals. They can also be used to execute an instruction once, after a certain period of time. They can even be used to execute an instruction once a day, at the same time each day (or once an hour, at the same number of minutes past the hour).
 
-Like all interfaces, Axmud timers have a *stimulus* and a *response*.  The stimulus is a time interval, expressed in seconds. When this interval has passed, we say that the timer *fires*.
+Like all interfaces, Axmud timers have a *stimulus* and a *response*.  The stimulus is usually a time interval, expressed in seconds. The minimum value is 0.1 seconds. When this interval has passed, we say that the timer *fires*.
+
+The stimulus can also a 24-hour clock time in the form HH:MM (for example, 00:00 for midnight, 12:00 for midday, 13:30 for half past one in the afternoon). If you use a clock time, the timer fires at the time, once a day.
+
+Axmud recognises special clock times in the form 99:MM. For example, a timer whose stimulus is 99:00 will fire once an hour, on the hour. A timer whose stimulus is 99:15 will fire once an hour, at a quarter past the hour.
 
 The response can be any kind of instruction. It's usually a world command like **score**, but it could be a client command like **;playsoundeffect beep** or any other kind of instruction (see [Section 4.4](ch04.html#4.4)).
 

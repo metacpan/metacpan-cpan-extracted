@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -26,6 +26,90 @@ See the file COPYRIGHT for the copyright notice and license information
 	</sect1>
 
 -->
+
+	<sect1 id="sc_notes_2_1_0">
+		<title>Release 2.1.0</title>
+
+		<itemizedlist>
+			<listitem>
+			Added the fast ordered index: OrderedIndexType in the &Cpp; API
+			and <pre>IndexType::newOrdered</pre> in Perl.
+			</listitem>
+
+			<listitem>
+			Added the methods for comparison of simple values in the &Cpp; API.
+			</listitem>
+
+			<listitem>
+			Added the methods for reading the unaligned values in the &Cpp; API.
+			</listitem>
+
+			<listitem>
+			Added the method <pre>IndexType::getKeyExpr()</pre>.
+			</listitem>
+
+			<listitem>
+			<pre>StringType::getSize()</pre> now returns 0 instead of 1.
+			</listitem>
+
+			<listitem>
+			Moved the method <pre>getSize()</pre> from SimpleType to Type in the &Cpp; API.
+			</listitem>
+
+			<listitem>
+			Added the methods <pre>RowType::fieldTypeSize()</pre>,
+			<pre>RowType::getArrayField()</pre>,
+			<pre>RowType::getArraySize()</pre> in the &Cpp; API.
+			</listitem>
+
+			<listitem>
+			The <pre>X::ThreadedClient</pre> now returns all the received 
+			data when the wait for the expected pattern times out.
+			</listitem>
+
+			<listitem>
+			Adapted to the new versions of &Cpp; and Perl:
+
+				<itemizedlist>
+					<listitem>
+					<pre>TrieadOwner::nextXtray()</pre> now uses a pointer to absolute time instead of a reference,
+					since the newer compilers seem unhappy about the NULL references.
+					</listitem>
+
+					<listitem>
+					Moved the <pre>Errors</pre> methods that accepted the calls on NULL pointers to <pre>Erref</pre>,
+					since the newer &Cpp; standard forbids such calls. Renamed the original methods to avoid
+					confusion.
+					</listitem>
+
+					<listitem>
+					Changed the <pre>IndexType</pre> and <pre>TableType</pre> methods <pre>findSubIndex()</pre>
+					and <pre>findSubIndexById()</pre> to return a special value <pre>NO_INDEX_TYPE</pre>
+					instead of NULL, since the new &Cpp; standard does not allow to calll the methods
+					on a NULL pointer, and thus would break the chaining of the <pre>find</pre> methods.
+					</listitem>
+
+					<listitem>
+					Added the methods <pre>eq()</pre> and <pre>ne()</pre> to <pre>Autoref</pre> for an easier
+					comparison to pointers.
+					</listitem>
+
+					<listitem>
+					The <pre>HoldRowTypes</pre> argument of <pre>deepCopy()</pre> in the table-related types
+					cannot be NULL any more, it must be <pre>NO_HOLD_ROW_TYPES</pre> instead.
+					</listitem>
+				</itemizedlist>
+			</listitem>
+
+			<listitem>
+			Enabled the optimization for the build of the releases.
+			</listitem>
+
+			<listitem>
+			In the docs build, replaced Ghostscript with Inkscape for the EPS-to-SVG conversion.
+			</listitem>
+		</itemizedlist>
+	</sect1>
 
 	<sect1 id="sc_notes_2_0_1">
 		<title>Release 2.0.1</title>

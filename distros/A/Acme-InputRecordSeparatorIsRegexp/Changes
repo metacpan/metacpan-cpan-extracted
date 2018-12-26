@@ -22,3 +22,7 @@ Revision history for Acme-InputRecordSeparatorIsRegexp
 
 0.06	2018-08-30
 	Test fixes for MSWin32 and this time I mean it.
+
+0.07	2018-12-23
+	Custom  binmode  function which supports  :irs(REGEXP)  layer to
+        set record separator, and auto-tie-ing file handles to this package.

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5CR3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.5CR3/docbookx.dtd" [
+<!ENTITY % userents SYSTEM "file:///ENTS/user.ent" >
+%userents;
+]>
+
+<!--
+(C) Copyright 2011-2018 Sergey A. Babkin.
+This file is a part of Triceps.
+See the file COPYRIGHT for the copyright notice and license information
+-->
+
+	<sect1 id="sc_cpp_ordidx">
+		<title>OrderedIndexType reference</title>
+
+		<indexterm>
+			<primary>OrderedIndexType</primary>
+		</indexterm>
+		<para>
+		The OrderedIndexType is defined in <pre>type/OrderedIndexType.h</pre>.
+		It allows to specify its only argument, the selection of the key fields,
+		in the constructor, or set it later with a chainable call:
+		</para>
+
+<pre>
+OrderedIndexType(NameSet *key = NULL);
+static OrderedIndexType *make(NameSet *key = NULL);
+OrderedIndexType *setKey(NameSet *key);
+</pre>
+
+		<para>
+		The ascending or descending order of sorting by a particular field
+		is encoded in the field name. If the name is prepended with a <quote>!</quote>,
+		the order is descending, otherwise ascending.
+		</para>
+
+		<para>
+		As usual, the NULL values in the key fields are permitted, and are
+		considered less than any non-NULL value.  The array fields may also be
+		used as keys in the ordered indexes. The comparison of the strings
+		honors the order defined in the locale.
+		</para>
+
+		<para>
+		The key can be read back using the parent class methods
+		<pre>IndexType::getKey()</pre> and <pre>IndexType::getKeyExpr()</pre>. The
+		value returned there is a <pre>const NameSet*</pre>, telling you that
+		the key NameSet must not be changed afterward. <pre>getKeyExpr()</pre>
+		returns the key as it was specified during construction, <pre>getKey()</pre>
+		strips any <quote>!</quote> prefixes and returns purely the names of
+		the fields.
+		</para>
+
+	</sect1>
+

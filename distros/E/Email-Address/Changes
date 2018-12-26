@@ -1,5 +1,11 @@
 Release history for Email-Address
 
+1.911     2018-12-22 11:30:28-05:00 America/New_York
+        - just like 1.910, but with doc updates and undeprecation by Jim Brandt
+
+1.910     2018-12-17 21:27:28-05:00 America/New_York (TRIAL RELEASE)
+        - update parsing to mitigate pathological cases (thanks, sunnavy!)
+
 1.909     2018-03-04 22:07:12-05:00 America/New_York
         - add some docs saying "don't use this, it can be busted"
 

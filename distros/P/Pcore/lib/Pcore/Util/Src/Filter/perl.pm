@@ -317,7 +317,7 @@ sub _append_log ( $self, $log ) {
             $self->{data}->$* =~ s/^__${section}__$/${log}__${section}__/sm;
         }
         else {
-            $self->{data}->$* .= $LF . $log;
+            $self->{data}->$* .= "\n$log";
         }
     }
 

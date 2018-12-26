@@ -3,52 +3,70 @@
    "author" : [
       "Burak Gursoy <burak@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4204",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "gd",
+      "securityimage",
+      "captcha"
+   ],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "GD-SecurityImage",
-   "no_index" : {
-      "directory" : [
-         "monolithic_version",
-         "builder",
-         "t",
-         "xt"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Test::More" : "0.40"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "recommends" : {
-            "Image::Magick" : "v6.0.4"
+            "Image::Magick" : "6.66"
          },
          "requires" : {
-            "GD" : "0"
+            "GD" : "2.45",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "bugtracker" : {
+         "web" : "https://github.com/burak/CPAN-GD-SecurityImage/issues"
+      },
       "repository" : {
-         "url" : "http://github.com/burak/cpan-gd-securityimage/"
+         "type" : "git",
+         "url" : "git://github.com/burak/CPAN-GD-SecurityImage.git",
+         "web" : "https://github.com/burak/CPAN-GD-SecurityImage"
       }
    },
-   "version" : "1.73"
+   "version" : "1.75",
+   "x_contributors" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
+

@@ -1,4 +1,5 @@
 Things that need to be done:
+* replace Onceref with the C++14 move semantics
 * make a Triceps version of confess() - see blog 255*, 256*
 * check the labels for belonging to a right unit when enqueueing?
 * in Rowop construction replace asserts with exceptions
@@ -137,6 +138,7 @@ Things that need to be done:
 * doc: reference for all the X classes in Perl
 * doc: for all Perl examples, show in the text the file that contains them
 * doc: a better "Hello, world"
+* doc: incorporate OrderedIndex
 
 App ideas:
 * queries on CSV files - already done in DBD::CSV?
@@ -146,4 +148,4 @@ App ideas:
 * look at the use with RabbitMQ
 
 tangent 144, 157, 191, 197, 199, 204, 206, 271, 272, 274, 277, 279, 286, 292-294
-*** next 297
+*** next 299

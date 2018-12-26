@@ -1,3 +1,8 @@
+0.008   2018-12-22 (PERLANCAR)
+
+	- Observe NO_COLOR.
+
+
 0.007   2017-08-03 (PERLANCAR)
 
         - Colors now can handle custom levels (will pick nearest level when

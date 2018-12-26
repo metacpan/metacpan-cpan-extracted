@@ -196,7 +196,7 @@ sub connect ( $self, $uri, %args ) {    ## no critic qw[Subroutines::ProhibitBui
     );
 
     # write headers
-    $h->write( join( $CRLF, @headers ) . $CRLF . $CRLF );
+    $h->write( join( "\r\n", @headers ) . "\r\n\r\n" );
 
     # write headers error
     return $on_error->( $self, $h->{status}, $h->{reason} ) if !$h;
@@ -554,7 +554,7 @@ sub _on_frame ( $self, $header, $msg, $payload_ref ) {
                 -LimitOutput  => 1,
             );
 
-            $payload_ref->$* .= "\N{NULL}\N{NULL}\xff\xff";
+            $payload_ref->$* .= "\x00\x00\xff\xff";
 
             $inflate->inflate( $payload_ref, my $out );
 
@@ -638,8 +638,6 @@ sub _on_frame ( $self, $header, $msg, $payload_ref ) {
 ## |    3 | 257, 263, 313        | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 485, 487, 489        | NamingConventions::ProhibitAmbiguousNames - Ambiguously named variable "second"                                |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 46, 557              | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

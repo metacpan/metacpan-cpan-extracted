@@ -37,7 +37,7 @@
             "Hash::Util" : "0",
             "JSON" : "2.50",
             "JSON::PP" : "0",
-            "Locale::MO::File" : "0.08",
+            "Locale::MO::File" : "0.09",
             "Locale::PO" : "0.24",
             "Locale::TextDomain::OO::Util" : "2.002",
             "Locale::TextDomain::OO::Util::ExtractHeader" : "3.006",
@@ -61,7 +61,7 @@
    "provides" : {
       "Locale::TextDomain::OO" : {
          "file" : "lib/Locale/TextDomain/OO.pm",
-         "version" : "1.034"
+         "version" : "1.035"
       },
       "Locale::TextDomain::OO::FunctionalInterface" : {
          "file" : "lib/Locale/TextDomain/OO/FunctionalInterface.pm",
@@ -173,7 +173,7 @@
       },
       "Locale::TextDomain::OO::Translator" : {
          "file" : "lib/Locale/TextDomain/OO/Translator.pm",
-         "version" : "1.027"
+         "version" : "1.035"
       }
    },
    "release_status" : "stable",
@@ -182,6 +182,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.034",
+   "version" : "1.035",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

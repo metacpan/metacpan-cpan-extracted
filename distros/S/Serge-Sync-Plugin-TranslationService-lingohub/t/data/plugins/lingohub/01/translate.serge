@@ -1,0 +1,15 @@
+sync
+{
+    ts
+    {
+        plugin                      lingohub
+
+        data
+        {
+            project                 SergeTest
+            root_directory          ./not-found
+            resource_directory      resources
+            destination_locales     de es fr-ca
+        }
+    }
+}

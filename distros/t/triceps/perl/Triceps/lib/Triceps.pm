@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2015 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -51,7 +51,7 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = 'v2.0.1';
+our $VERSION = 'v2.1.0';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -303,7 +303,7 @@ Sergey A. Babkin, E<lt>babkin@users.sf.netE<gt> or E<lt>sab123@hotmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-(C) Copyright 2011-2015 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 
 This library distributed under the Triceps edition of Lesser GPL license version 3.0.
 

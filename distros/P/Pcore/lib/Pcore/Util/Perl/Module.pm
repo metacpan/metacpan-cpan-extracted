@@ -122,7 +122,7 @@ sub _build_lib ($self) {
 }
 
 sub _build_content ($self) {
-    return P->file->read_bin( $self->path ) if $self->path;
+    return \P->file->read_bin( $self->path ) if $self->path;
 
     return;
 }

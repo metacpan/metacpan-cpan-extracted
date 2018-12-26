@@ -118,9 +118,9 @@ test/$(BUILDDIR)/%.main.cpp: test/%.cpp ../utest/genmain.pl
 test/$(BUILDDIR)/%$(BINEXT): Makefile ../Makefile.inc
 
 test/$(BUILDDIR)/%$(BINEXT): test/%.cpp test/$(BUILDDIR)/%.main.cpp
-	$(CXX) $(CXXFLAGS) $(TESTLDFLAGS) -o $@ $< test/$(BUILDDIR)/$*.main.cpp
+	$(CXX) $(CXXFLAGS) -o $@ $< test/$(BUILDDIR)/$*.main.cpp $(TESTLDFLAGS)
 
 # the C code, if any appears, doesn't use the common unit test driver
 test/$(BUILDDIR)/%$(BINEXT): test/%.c Makefile ../Makefile.inc
-	$(CC) $(CFLAGS) $(TESTLDFLAGS) -o $@ $<
+	$(CC) $(CFLAGS) -o $@ $< $(TESTLDFLAGS)
 

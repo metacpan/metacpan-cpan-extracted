@@ -1,5 +1,8 @@
 ﻿Revision history for Perl module RT::Client::REST
 
+0.56 Mon Dec 24 2018 "Dean Hamstead" <dean@fragfest.com.au>
+  - Fix for GH#18 (more fixes)
+
 0.55 Sat Dec 08 2018 "Dean Hamstead" <dean@fragfest.com.au>
   - Fix for GH#18
 

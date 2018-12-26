@@ -1,5 +1,9 @@
 Revision history for Perl extension Locale::TextDomain::OO.
 
+1.035  Fri Dec 21 13:12:05 2018
+- updated dependency to Locale::MO::File
+- fixed translator in case of empty plural translations
+
 1.034  Fri Dec 21 13:12:05 2018
 - Path::Tiny dirname ist deprecated
   https://rt.cpan.org/Ticket/Display.html?id=128079

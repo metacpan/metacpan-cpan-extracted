@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -230,7 +230,7 @@ $r1 = eval { $rt1->makeRowArray(
 	"e"
 ); };
 ok(!defined $r1);
-ok($@, qr/^Triceps::RowType::makeRowArray: 7 args, only 5 fields in row { uint8 a, int32 b, int64 c, float64 d, string e, } at/);
+ok($@, qr/^Triceps::RowType::makeRowArray: 7 args, only 5 fields in row \{ uint8 a, int32 b, int64 c, float64 d, string e, \} at/);
 
 # array fields
 $r1 = $rt3->makeRowArray(

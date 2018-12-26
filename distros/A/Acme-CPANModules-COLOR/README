@@ -1,0 +1,107 @@
+NAME
+    Acme::CPANModules::COLOR - Modules that follow the COLOR convention
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::COLOR (from
+    Perl distribution Acme-CPANModules-COLOR), released on 2018-12-22.
+
+DESCRIPTION
+    Modules that follow the COLOR convention.
+
+    The NO_COLOR convention (see https://no-color.org) lets user disable
+    color output of console programs by defining an environment variable
+    called NO_COLOR. The existence of said environment variable, regardless
+    of its value, signals that programs should not use colored output.
+
+    Another similar convention is the use of the COLOR environment variable.
+    False value (empty string or the value 0) means that programs should
+    disable colored output, while true value (values other than the
+    mentioned false values) means that programs should enable colored
+    output. This convention allows force-enabling colored output instead of
+    just force-disabling it, although programs supporting it need to add a
+    line of code or two to check the value of the environment variable.
+
+    If you know of other modules that should be listed here, please contact
+    me.
+
+INCLUDED MODULES
+    *   AppBase::Grep
+
+    *   App::abgrep
+
+    *   App::diffdb
+
+    *   App::diffwc
+
+    *   App::hr
+
+    *   App::riap
+
+    *   App::wordlist
+
+    *   Color::ANSI::Util
+
+    *   Data::Dump::Color
+
+    *   Data::Format::Pretty::JSON
+
+    *   Data::Format::Pretty::Perl
+
+    *   Data::Format::Pretty::YAML
+
+    *   Debug::Print
+
+    *   Log::Any::Adapter::Screen
+
+    *   Log::ger::Output::Screen
+
+    *   Perinci::CmdLine::Classic
+
+    *   Perinci::CmdLine::Lite
+
+    *   Perinci::Result::Format
+
+    *   Perinci::Result::Format::Lite
+
+    *   Progress::Any::Output::TermProgressBar
+
+    *   Term::ANSIColor::Conditional
+
+    *   Term::ANSIColor::Patch::Conditional
+
+    *   Term::App::Roles
+
+    *   Text::ANSITable
+
+    *   Text::DiffU
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-COLOR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-COLOR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-COLO
+    R>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

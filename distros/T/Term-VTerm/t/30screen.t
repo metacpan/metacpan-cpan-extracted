@@ -8,6 +8,8 @@ use Test::More;
 
 use Term::VTerm;
 
+use Encode qw( encode_utf8 );
+
 my $vt = Term::VTerm->new( cols => 80, rows => 25 );
 $vt->set_utf8( 1 );
 
@@ -53,13 +55,15 @@ my $homepos = Term::VTerm::Pos->new( row => 0, col => 0 );
    ok( !$cell->strike,    '$cell is not strikethrough' );
    ok( !$cell->font,      '$cell has no altfont' );
 
+   ok( $cell->fg->is_default_fg, '$cell->fg is default' );
    is( $cell->fg->rgb_hex, "ffffff", '$cell->fg' );
+   ok( $cell->bg->is_default_bg, '$cell->bg is default' );
    is( $cell->bg->rgb_hex, "000000", '$cell->bg' );
 }
 
 # get_cell Unicode + combining
 {
-   $vt->input_write( "e\x{301}" );
+   $vt->input_write( encode_utf8 "e\x{301}" );
 
    my $cell = $screen->get_cell( Term::VTerm::Pos->new( row => 0, col => 1 ) );
 
@@ -76,7 +80,14 @@ my $homepos = Term::VTerm::Pos->new( row => 0, col => 0 );
 
    ok( $cell->bold,   '$cell is bold' );
    ok( $cell->italic, '$cell is italic' );
-   ok( $cell->fg->green > 0, '$cell->fg has green' );
+
+   my $fg = $cell->fg;
+   ok( $fg->is_indexed, '$cell->fg is indexed' );
+   is( $fg->index, 2, '$cell->fg is green' );
+
+   my $fg_rgb = $screen->convert_color_to_rgb( $fg );
+   ok( $fg->green > 160, '$fg_rgb has much green' );
+   ok( $fg->red < 32, '$fg_rgb has little red' );
 }
 
 # altscreen switching

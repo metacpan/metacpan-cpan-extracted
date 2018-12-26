@@ -31,3 +31,7 @@ increase in speed won't hurt either.
 * Make double-buffering the default for 16 bit and make it seamless. *
 
 It's close right now
+
+* Add single bit monochrome drawing
+
+* Add 8 bit palletized drawing.

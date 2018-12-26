@@ -116,7 +116,7 @@ my $configure_wordpress=sub {
       $ip=~s/^.*?(\d+.\d+.\d+.\d+).*$/$1/s;
    }
    my $userhome=$handle->cmd('pwd');
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       "perl -e \'use CPAN;".
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
    $builddir=$stdout;
@@ -145,22 +145,20 @@ my $configure_wordpress=sub {
          '/var/www/html/wordpress','__display__');
    }
 #&Net::FullAuto::FA_Core::cleanup;
-$do=1;
+$do=0;
 if ($do==1) {
    unless ($^O eq 'cygwin') {
-      if ($hostname eq 'jp-01ld.get-wisdom.com') {
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "service nginx stop",'__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "service mysqld stop",'__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "service php-fpm stop",'__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "rm -rvf /etc/nginx/ ~/WordPress ~/fa\* /var/www/html\*",
-            '__display__');
-         ($stdout,$stderr)=$handle->cmd($sudo.
-            "mkdir -vp /var/www/html",'__display__');
-      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "service nginx stop",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "service mysqld stop",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "service php-fpm stop",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "rm -rvf /opt/source ~/fa\* /var/www/html/wordpress",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "mkdir -vp /var/www/html",'__display__');
       ($stdout,$stderr)=$handle->cmd($sudo."chmod 755 ~");
       ($stdout,$stderr)=$handle->cmd("sudo yum clean all");
       ($stdout,$stderr)=$handle->cmd("sudo yum grouplist hidden");
@@ -178,6 +176,7 @@ if ($do==1) {
          ' freetype-devel.x86_64',
          '__display__');
    } else {
+      # https://www.digitalocean.com/community/questions/how-to-change-port-80-into-8080-on-my-wordpress
       my $cygcheck=`/bin/cygcheck -c` || die $!;
       my $uname=`/bin/uname` || die $!;
       my $uname_all=`/bin/uname -a` || die $!;
@@ -194,7 +193,7 @@ if ($do==1) {
             "cygrunsrv --stop nginx_first_time",'__display__');
          ($stdout,$stderr)=$handle->cmd("cygrunsrv -R nginx_first_time");
          ($stdout,$stderr)=$handle->cmd(
-            "rm -rvf ${home_dir}WordPress/deps/nginx*",
+            "rm -rvf /opt/source/nginx*",
             '__display__');
       }
       if ($srvout=~/memcached/) {
@@ -202,7 +201,7 @@ if ($do==1) {
             '__display__');
          ($stdout,$stderr)=$handle->cmd("cygrunsrv -R memcached");
          ($stdout,$stderr)=$handle->cmd(
-            "rm -rvf ${home_dir}WordPress/deps/memcached*",
+            "/opt/source/memcached*",
             '__display__');
       }
       if ($uname_all=~/x86_64/) {
@@ -363,9 +362,9 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install uuid-devel '.
          'pkgconfig libtool gcc-c++','__display__');
    }
-   ($stdout,$stderr)=$handle->cmd('mkdir -vp WordPress/deps',
+   ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /opt/source',
       '__display__');
-   ($stdout,$stderr)=$handle->cwd("WordPress/deps");
+   ($stdout,$stderr)=$handle->cwd("/opt/source");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".
       "http://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz",
@@ -373,15 +372,15 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chown -v $username:$username autoconf-latest.tar.gz",'__display__')
       if $^O ne 'cygwin';
-   ($stdout,$stderr)=$handle->cmd("tar zxvf autoconf-latest.tar.gz",
+   ($stdout,$stderr)=$handle->cmd($sudo.'tar zxvf autoconf-latest.tar.gz',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf autoconf-latest.tar.gz',
       '__display__');
    ($stdout,$stderr)=$handle->cwd("autoconf-*");
-   ($stdout,$stderr)=$handle->cmd("./configure",'__display__');
-   ($stdout,$stderr)=$handle->cmd("make",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."./configure",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."make",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo."make install",'__display__');
-   ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd("wget --version");
    $stdout=~s/^.*?\d[.](\d+).*$/$1/s;
    if ($stdout<18 && !(-e '/usr/local/bin/wget')) {
@@ -397,9 +396,11 @@ if ($do==1) {
          "--sysconfdir=/etc --with-ssl=openssl",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "make && make install",'__display__');
+         "make",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "make install",'__display__');
    }
-   ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "python --version",'__display__');
    if ($stderr=~/Python /) {
@@ -422,63 +423,47 @@ if ($do==1) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "make && make altinstall",'__display__');
    }
+   ($stdout,$stderr)=$handle->cwd('/opt/source'); 
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "https://bootstrap.pypa.io/ez_setup.py",'__display__');
-   if ($^O eq 'cygwin') {
-      # ez_setup.py uses curl by default which is broken with --location
-      # in Cygwin. So using wget instead by forcing return False.
-      ($stdout,$stderr)=$handle->cmd(
-         "sed -i '/has_curl()/areturn False' ez_setup.py");
-      $handle->cmd_raw(
-         "sed -i 's/\\(^return False$\\\)/    \\1/' ez_setup.py");
-   } else {
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "chown -v $username:$username ez_setup.py",'__display__');
-   }
-   if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      ($stdout,$stderr)=$handle->cmd('/usr/local/bin/python2.7 ez_setup.py',
-         '__display__');
-   } else {
-      ($stdout,$stderr)=$handle->cmd('python ez_setup.py',
-         '__display__');
-   }
-   ($stdout,$stderr)=$handle->cmd('easy_install pip','__display__');
-   ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
-   ($stdout,$stderr)=$handle->cmd('pip install pyasn1','__display__');
-   ($stdout,$stderr)=$handle->cmd('pip install pyasn1-modules',
+      'python -m ensurepip --default-pip','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'python -m pip install --upgrade pip setuptools wheel','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'pip install pyasn1-modules',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd(
+   ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://github.com/google/oauth2client.git','__display__');
    ($stdout,$stderr)=$handle->cwd('oauth2client');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      '/usr/local/bin/python2.7 setup.py install',
+      'python setup.py install',
       '__display__');
-   ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    if ($^O ne 'cygwin' && $hostname ne 'jp-01ld.get-wisdom.com') {
       ($stdout,$stderr)=$handle->cmd($sudo.'pip install httplib2',
          '__display__');
+      my $siteloc='/usr/local/lib/python2.7';
+      $siteloc='/usr/lib/python2.7' if -e '/usr/lib/python2.7';
       ($stdout,$stderr)=$handle->cmd($sudo."ls -1 ".
-         "/usr/local/lib/python2.7/site-packages",'__display__');
+         "$siteloc/site-packages",'__display__');
       $stdout=~s/^.*(httplib2.*?egg).*$/$1/s;
       ($stdout,$stderr)=$handle->cmd($sudo."chmod o+r -v -R ".
-         "/usr/local/lib/python2.7/site-packages/$stdout",
+         "$siteloc/site-packages/$stdout",
          '__display__');
    }
    ($stdout,$stderr)=$handle->cmd($sudo.'pip install oauth2','__display__');
    unless ($^O eq 'cygwin') {
       ($stdout,$stderr)=$handle->cmd('echo /usr/local/lib > '.
-         'local.conf','__display__');
-      ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 local.conf',
+         '~/local.conf','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 644 ~/local.conf',
          '__display__');
-      ($stdout,$stderr)=$handle->cmd(
-         $sudo.'mv -v local.conf /etc/ld.so.conf.d','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mv -v ~/local.conf /etc/ld.so.conf.d','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'ldconfig');
    } else {
       ($stdout,$stderr)=$handle->cmd('pip install awscli','__display__');
    }
 }
-$do=1;
+$do=0;
 if ($do==1) { # NGINX
 print "DOING NGINX\n";
    # https://nealpoole.com/blog/2011/04/setting-up-php-fastcgi-and-nginx
@@ -490,37 +475,43 @@ print "DOING NGINX\n";
    #    Manual/Deployment/nginx/FastCGI.pod
    # https://serverfault.com/questions/171047/why-is-php-request-array-empty
    # https://codex.wordpress.org/Nginx
-   my $nginx='nginx-1.13.7';
-   $nginx='nginx-1.9.13' if $^O eq 'cygwin';
-   ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
-      "http://nginx.org/download/$nginx.tar.gz",'__display__');
+   # https://www.sitepoint.com/setting-up-php-behind-nginx-with-fastcgi/
+   # http://codingsteps.com/install-php-fpm-nginx-mysql-on-ec2-with-amazon-linux-ami/
+   # http://code.tutsplus.com/tutorials/revisiting-open-source-social-networking-installing-gnu-social--cms-22456
+   # https://wiki.loadaverage.org/clipbucket/installation_guides/install_like_loadaverage
+   # https://karp.id.au/social/index.html
+   # http://jeffreifman.com/how-to-install-your-own-private-e-mail-server-in-the-amazon-cloud-aws/
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "chown -v $username:$username $nginx.tar.gz",'__display__')
-      if $^O ne 'cygwin';
-   ($stdout,$stderr)=$handle->cmd("tar xvf $nginx.tar.gz",'__display__');
+      'rm -rvf /usr/local/nginx','__display__');
+   my $nginx='nginx-1.14.0'; # updated from 1.10.0
+   $nginx='nginx-1.9.13' if $^O eq 'cygwin';
+   ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
+      "http://nginx.org/download/$nginx.tar.gz",300,'__display__');
+   ($stdout,$stderr)=$handle->cmd("sudo tar xvf $nginx.tar.gz",'__display__');
    ($stdout,$stderr)=$handle->cwd($nginx);
-   ($stdout,$stderr)=$handle->cmd("mkdir -vp objs/lib",'__display__');
+   ($stdout,$stderr)=$handle->cmd("sudo mkdir -vp objs/lib",'__display__');
    ($stdout,$stderr)=$handle->cwd("objs/lib");
    my $pcre='pcre-8.40';
    my $checksum='';
-   ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
-      "ftp://ftp.csx.cam.ac.uk/pub/software/".
-      "programming/pcre/$pcre.tar.gz",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "chown -v $username:$username $pcre.tar.gz",'__display__')
-      if $^O ne 'cygwin';
-   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf $pcre.tar.gz",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."wget -qO- http://zlib.net/index.html");
+   foreach my $cnt (1..3) {
+      ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
+         "ftp://ftp.csx.cam.ac.uk/pub/software/".
+         "programming/pcre/$pcre.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cmd("sudo tar xvf $pcre.tar.gz",'__display__');
+      last unless $stderr;
+      ($stdout,$stderr)=$handle->cmd("sudo rm -rfv $pcre.tar.gz",'__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd("sudo wget -qO- http://zlib.net/index.html");
    my $zlib_ver=$stdout;
    my $sha__256=$stdout;
    $zlib_ver=~s/^.*? source code, version (\d+\.\d+\.\d+).*$/$1/s;
-   $sha__256=~s/^.*?tar.gz.*?SHA-256 hash [<]tt[>](.*?)[<][\/]tt[>].*$/$1/s;
+   $sha__256=~s/^.*?SHA-256 hash [<]tt[>](.*?)[<][\/]tt[>].*$/$1/s;
    foreach my $count (1..3) {
-      ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
+      ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
          "http://zlib.net/zlib-$zlib_ver.tar.gz",'__display__');
       $checksum=$sha__256;
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "sha256sum -c - <<<\"$checksum *zlib-$zlib_ver.tar.gz\"",
+      ($stdout,$stderr)=$handle->cmd(
+         "sudo sha256sum -c - <<<\"$checksum zlib-$zlib_ver.tar.gz\"",
          '__display__');
       unless ($stderr) {
          print(qq{ + CHECKSUM Test for zlib-$zlib_ver *PASSED* \n});
@@ -531,32 +522,34 @@ print "DOING NGINX\n";
                "after $count attempts\n";
          &Net::FullAuto::FA_Core::cleanup;
       }
-      ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf zlib-$zlib_ver.tar.gz",
+      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf zlib-$zlib_ver.tar.gz",
          '__display__');
    }
-   ($stdout,$stderr)=$handle->cmd($sudo."tar xvf zlib-$zlib_ver.tar.gz",
+   ($stdout,$stderr)=$handle->cmd("sudo tar xvf zlib-$zlib_ver.tar.gz",
       '__display__');
    my $ossl='openssl-1.0.2h';
-   $checksum='577585f5f5d299c44dd3c993d3c0ac7a219e4949';
-   ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
-      "https://www.openssl.org/source/$ossl.tar.gz",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "chown -v $username:$username $ossl.tar.gz",'__display__')
-      if $^O ne 'cygwin';
-   ($stdout,$stderr)=$handle->cmd("sha1sum -c - <<<\"$checksum *$ossl.tar.gz\"",
-      '__display__');
-   unless ($stderr) {
-      print(qq{ + CHECKSUM Test for $ossl *PASSED* \n});
-   } else {
-      ($stdout,$stderr)=$handle->cmd("rm -rvf $ossl.tar.gz",'__display__');
-      my $dc=1;
-      print "FATAL ERROR! : CHECKSUM Test for $ossl.tar.gz *FAILED* ",
-            "after $dc attempts\n";
-      &Net::FullAuto::FA_Core::cleanup;
+   foreach my $count (1..3) {
+      $checksum='577585f5f5d299c44dd3c993d3c0ac7a219e4949';
+      ($stdout,$stderr)=$handle->cmd("sudo wget --random-wait --progress=dot ".
+         "https://www.openssl.org/source/$ossl.tar.gz",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd(
+         "sudo sha1sum -c - <<<\"$checksum $ossl.tar.gz\"",'__display__');
+      unless ($stderr) {
+         print(qq{ + CHECKSUM Test for $ossl *PASSED* \n});
+         last
+      } elsif ($count>=3) {
+         print "FATAL ERROR! : CHECKSUM Test for $ossl.tar.gz *FAILED* ",
+               "after $count attempts\n";
+         &Net::FullAuto::FA_Core::cleanup;
+      }
+      ($stdout,$stderr)=$handle->cmd("sudo rm -rvf $ossl.tar.gz",'__display__');
    }
-   ($stdout,$stderr)=$handle->cmd("tar xvf $ossl.tar.gz",'__display__');
-   ($stdout,$stderr)=$handle->cwd("~/WordPress/deps/$nginx");
+   ($stdout,$stderr)=$handle->cmd("sudo tar xvf $ossl.tar.gz",'__display__');
+   ($stdout,$stderr)=$handle->cwd("/opt/source");
+   # https://www.liberiangeek.net/2015/10/
+   # how-to-install-self-signed-certificates-on-nginx-webserver/
+   ($stdout,$stderr)=$handle->cwd("/opt/source/$nginx");
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
    #          and replace these characters with thier HEX
@@ -1032,7 +1025,7 @@ END
             "$nginx_path/nginx/nginx.conf");
          ($stdout,$stderr)=$handle->cmd("service nginx start",
             '__display__');
-         ($stdout,$stderr)=$handle->cwd("/etc/nginx");
+         ($stdout,$stderr)=$handle->cwd("/usr/local/nginx");
          sleep 3;
          ($stdout,$stderr)=&Net::FullAuto::FA_Core::clean_filehandle($handle);
          $handle->{_cmd_handle}->print($sudo.
@@ -1165,7 +1158,7 @@ if ($do==1) {
             }
          }
       }
-      ($stdout,$stderr)=$handle->cwd("~/WordPress/deps")
+      ($stdout,$stderr)=$handle->cwd("/opt/source")
    }
 }
    my $install_wordpress=<<'END';
@@ -1195,7 +1188,7 @@ if ($do==1) {
 
 END
 
-   ($stdout,$stderr)=$handle->cwd("~/WordPress");
+   ($stdout,$stderr)=$handle->cwd("/opt/source");
    print $install_wordpress;
    sleep 5;
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1247,7 +1240,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       "mkdir -vp /var/www/html/wordpress",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "rsync -avP ~/WordPress/wordpress/ ".
+      "rsync -avP /opt/source/wordpress/ ".
       "/var/www/html/wordpress",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -Rv www-data:www-data /var/www','__display__');
@@ -1286,60 +1279,285 @@ END
                        |_____/                            DATABASE
 END
    print $install_mysql;sleep 10;
-   ($stdout,$stderr)=$handle->cwd("~/WordPress/deps");
+   ($stdout,$stderr)=$handle->cwd("/opt/source");
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'rpm -ivh mysql57-community-release-el7-11.noarch.rpm','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."service mysqld stop",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."rm -rf /var/log/mysqld.log",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."rm -rf /var/lib/mysql",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo."yum -y erase ".
-      "mysql-community-server.x86_64 ".
-      "mysql-community-common.x86_64 ".
-      "mysql-community-client.x86_64 ".
-      "mysql-community-devel.x86_64 ".
-      "mysql-connector-python.x86_64",'__display__');
-   #($stdout,$stderr)=$handle->cmd($sudo."yum -y install ".
-   #   "mysql-community-server.x86_64 ".
-   #   "mysql-community-common.x86_64 ".
-   #   "mysql-community-client.x86_64 ".
-   #   "mysql-community-devel.x86_64 ".
-   #   "mysql-connector-python.x86_64",'__display__');
-   my $ad=<<END;
-[mariadb]
-name = MariaDB
-baseurl = http://yum.mariadb.org/5.5/centos6-amd64
-gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-gpgcheck=1
+      'ls -1 /opt/source/mariadb','__display__');
+   if ($stdout=~/[Mm]aria[Dd][Bb].*rpm/) {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /opt/mariadb','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source/mariadb');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mv -fv *rpm /opt/mariadb','__display__');
+   }
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.'which mysql');
+   my $msstatus='';my $msversion='';
+   if ($stdout=~/\/mysql/) {
+      ($msversion,$stderr)=$handle->cmd($sudo.
+         'mysql --version','__display__');
+      $msversion=~s/^mysql\s+Ver\s+(.*?)\s+Distrib.*$/$1/;
+      ($msstatus,$stderr)=$handle->cmd($sudo.
+         'sudo service mysql status','__display__');
+   }
+   if ($msversion<15.1 || $msstatus!~/SUCCESS/) {
+   #my $u=1;
+   #if ($u==1) {
+      # https://docs.couchbase.com/server/6.0/install/thp-disable.html
+      my $do_thp=1;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cat /sys/kernel/mm/transparent_hugepage/enabled');
+      if ($stdout!~/never/) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'cat /sys/kernel/mm/redhat_transparent_hugepage/enabled');
+         if ($stdout!~/never/ || $stdout=~/\[never\]/) {
+            $do_thp=0;
+         }
+      } elsif ($stdout=~/\[never\]/) {
+         $do_thp=0;
+      }
+      if ($do_thp==1) {
+         #
+         # echo-ing/streaming files over ssh can be tricky. Use echo -e
+         #          and replace these characters with thier HEX
+         #          equivalents (use an external editor for quick
+         #          search and replace - and paste back results.
+         #          use copy/paste or cat file and copy/paste results.):
+         #
+         #          !  -   \\x21     `  -  \\x60   * - \\x2A
+         #          "  -   \\x22     \  -  \\x5C
+         #          $  -   \\x24     %  -  \\x25
+         #
+         # https://www.lisenet.com/2014/ - bash approach to conversion
+         my $thp=<<END;
+#\\x21/bin/bash
+### BEGIN INIT INFO
+# Provides:          disable-thp
+# Required-Start:    \\x24local_fs
+# Required-Stop:
+# X-Start-Before:    mysql
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Disable THP
+# Description:       disables Transparent Huge Pages (THP) on boot
+### END INIT INFO
+
+case \\x241 in
+start)
+  if [ -d /sys/kernel/mm/transparent_hugepage ]; then
+    echo 'never' > /sys/kernel/mm/transparent_hugepage/enabled
+    echo 'never' > /sys/kernel/mm/transparent_hugepage/defrag
+  elif [ -d /sys/kernel/mm/redhat_transparent_hugepage ]; then
+    echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/enabled
+    echo 'never' > /sys/kernel/mm/redhat_transparent_hugepage/defrag
+  else
+    return 0
+  fi
+;;
+esac
 END
-   ($stdout,$stderr)=$handle->cmd(
-      "echo -e \"$ad\" > maria.repo");
-   ($stdout,$stderr)=$handle->cmd(
-      "sudo yum-config-manager --add-repo maria.repo",'__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      "sudo rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      'sudo /etc/init.d/mysql stop','__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      "sudo yum -y erase MariaDB-server MariaDB-client",'__display__');
-   ($stdout,$stderr)=$handle->cmd(
-      "sudo yum -y install MariaDB-server MariaDB-client",'__display__');
-   ($stdout,$stderr)=$handle->cmd("sudo /etc/init.d/mysql start",
-      '__display__');
-   #if ($stderr) {
-   #   ($stdout,$stderr)=$handle->cmd(
-   #      "sudo yum -y install MariaDB-server MariaDB-client",'__display__');
-   #   ($stdout,$stderr)=$handle->cmd("sudo /etc/init.d/mysql start",
-   #      '__display__');
-   #}
-   $handle->{_cmd_handle}->print('sudo mysql_secure_installation');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "echo -e \"$thp\" > disable-thp");
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -fv disable-thp /etc/init.d/disable-thp',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'chmod -v 755 /etc/init.d/disable-thp',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'service disable-thp start','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'sudo chkconfig disable-thp on','__display__');
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl stop mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'systemctl stop mariadb','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum list installed | grep "[Mm]aria\|[Mm][Yy][Ss][Qq][Ll]"',
+         '__display__');
+      my @pkgs=split "\n", $stdout;
+      foreach my $pkg (@pkgs) {
+         $pkg=~s/^(.*?)\s+.*$/$1/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "yum -y erase $pkg",'__display__');
+      }
+      # https://zapier.com/engineering/celery-python-jemalloc/
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone --branch master '.
+         'https://github.com/jemalloc/jemalloc.git',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('jemalloc');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './autogen.sh','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ls -1 /opt','__display__');
+      if ($stdout!~/mariadb/i) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mkdir -vp mariadb','__display__');
+         ($stdout,$stderr)=$handle->cwd('mariadb');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://github.com/MariaDB/server.git',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'yum-builddep -y mariadb-server',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            '/bin/cmake -DRPM=centos7 server/',
+            '__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make install',600,'__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make package',600,'__display__');
+      } else {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'mv -fv /opt/mariadb /opt/source/mariadb',
+            '__display__');
+         ($stdout,$stderr)=$handle->cwd('mariadb');
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'groupadd mysql');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'useradd -r -g mysql mysql');
+      my @rpm_files=split "\n", $stdout;
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-common/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-client/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'yum -y install galera perl-DBI','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service mysql stop','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 1777 /tmp','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /var/lib/mysql','__display__');
+      # https://dba.stackexchange.com/questions/49446/mysql-failures-after-changing-innodb-flush-method-to-o-direct-and-innodb-log-fil
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-server/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      # To see mysql log locations:
+      # mysql -se "SHOW VARIABLES" | grep -e log_error
+      # -e general_log -e slow_query_log
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-backup/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-connect/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-rocksdb/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-toku/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-shared/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      foreach my $rpm (@rpm_files) {
+         next if $rpm!~/64-test/;
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            "rpm -ivh $rpm",'__display__');
+         last;
+      }
+      #foreach my $rpm (@rpm_files) {
+      #   next if $rpm!~/-gssapi/;
+      #   ($stdout,$stderr)=$handle->cmd($sudo.
+      #      "rpm -ivh $rpm",'__display__');
+      #   last;
+      #}
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service mysql stop','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'rm -rvf /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mysql_install_db --user=mysql --basedir=/usr '.
+         '--datadir=/var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 755 /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chgrp -v mysql /var/lib/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chgrp -v mysql /var/lib/mysql/mysql','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /etc/my.cnf.d','__display__');
+      # to make tokudb the default storage engine,
+      # you have to start mysqld with: --default-storage-engine=tokudb
+      my $toku_cnf=<<END;
+[mariadb]
+# See https://mariadb.com/kb/en/tokudb-differences/ for differences
+# between TokuDB in MariaDB and TokuDB from http://www.tokutek.com/
+
+plugin-load-add=ha_tokudb.so
+
+[mysqld_safe]
+malloc-lib=/usr/local/lib/libjemalloc.so.2
+END
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "echo -e \"$toku_cnf\" > /opt/source/tokudb.cnf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v /opt/source/tokudb.cnf /etc/my.cnf.d/tokudb.cnf',
+         '__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'rm -rvf /opt/source/tokudb.cnf','__display__');
+      # https://github.com/arslancb/clipbucket/issues/429
+      my $sql_mode_cnf=<<END;
+[mysqld]
+sql_mode=IGNORE_SPACE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+END
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "echo -e \"$sql_mode_cnf\" > /opt/source/sql_mode.cnf");
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v /opt/source/sql_mode.cnf /etc/my.cnf.d/sql_mode.cnf',
+         '__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   'rm -rvf /opt/source/sql_mode.cnf','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'service mysql start','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 711 /var/lib/mysql/mysql','__display__');
+      print "MYSQL START STDOUT=$stdout and STDERR=$stderr<==\n";sleep 5;
+      print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
+      sleep 5;
+   }
+   # HOW TO CHECK MYSQL FOR ERRORS
+   # mkdir /var/run/mysqld/
+   # chown mysql: /var/run/mysqld/
+   # mysqld --basedir=/usr --datadir=/var/lib/mysql
+   # --user=mysql --socket=/var/run/mysqld/mysqld.sock
+   $handle->{_cmd_handle}->print($sudo.'mysql_secure_installation');
    $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
    while (1) {
       my $output=Net::FullAuto::FA_Core::fetch($handle);
@@ -1366,48 +1584,8 @@ END
          next;
       }
    }
-my $r=0;
-if ($r==1) {
-   ($stdout,$stderr)=$handle->cmd($sudo."service mysqld start",
-      '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "grep 'temporary password' /var/log/mysqld.log");
-   my $tmppas=$stdout;
-   $tmppas=~s/^.*localhost: (.*)$/$1/s;
-   $handle->{_cmd_handle}->print($sudo.'mysql_secure_installation');
-   my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-   while (1) {
-      my $output=Net::FullAuto::FA_Core::fetch($handle);
-      last if $output=~/$prompt/;
-      print $output;
-      if (-1<index $output,'Enter password for user root:') {
-         $handle->{_cmd_handle}->print($tmppas);
-         next;
-      } elsif (-1<index $output,'New password:') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
-         next;
-      } elsif (-1<index $output,'Re-enter new password:') {
-         $handle->{_cmd_handle}->print($service_and_cert_password);
-         next;
-      } elsif (-1<index $output,'password for root') {
-         $handle->{_cmd_handle}->print('n');
-         next;
-      } elsif (-1<index $output,'Remove anonymous users?') {
-         $handle->{_cmd_handle}->print('y');
-         next;
-      } elsif (-1<index $output,'Disallow root login remotely?') {
-         $handle->{_cmd_handle}->print('y');
-         next;
-      } elsif (-1<index $output,
-            'Remove test database and access to it?') {
-         $handle->{_cmd_handle}->print('y');
-         next;
-      } elsif (-1<index $output,'Reload privilege tables now?') {
-         $handle->{_cmd_handle}->print('y');
-         next;
-      }
-   }
-}
+   $handle->cmd("echo");
+   #$handle->{_cmd_handle}->print($sudo.'mysql -u root -p 2>&1');
    #$handle->{_cmd_handle}->print('mysql -u root -p'.
    #   $service_and_cert_password);
    $handle->{_cmd_handle}->print('mysql -u root');
@@ -1474,17 +1652,100 @@ if ($r==1) {
    }
    # https://shaunfreeman.name/compiling-php-7-on-centos/
    # https://www.vultr.com/docs/how-to-install-php-7-x-on-centos-7
-   #$do=1;
-   #if ($do==1) {
-   if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      #($stdout,$stderr)=$handle->cmd($sudo.
-      #   'mkdir -p /usr/local/php7');
-      ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'ls -1 /opt/source/mariadb','__display__');
+   if ($stdout=~/[Mm]aria[Dd][Bb].*rpm/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git clone https://github.com/php/php-src.git','__display__');
+         'mkdir -vp /opt/mariadb','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source/mariadb');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mv -fv *rpm /opt/mariadb','__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf /opt/source',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /opt/source',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'chmod -Rv 777 /opt/source',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   if (-1==index `php -v`,'PHP') {
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'wget --random-wait --progress=dot -O libmcrypt-2.5.8.tar.gz '.
+         'https://sourceforge.net/projects/mcrypt/files/Libmcrypt/2.5.8/'.
+         'libmcrypt-2.5.8.tar.gz/download','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "tar zxvf libmcrypt-2.5.8.tar.gz",'__display__');
+      ($stdout,$stderr)=$handle->cwd('libmcrypt-2.5.8');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cmake --version','__display__');
+      $stdout=~s/^.*?\s(\d+\.\d+).*$/$1/;
+      if (!(-e '/usr/local/bin/cmake') && $stdout<3.02) {
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'git clone https://gitlab.kitware.com/cmake/cmake',
+            '__display__');
+         ($stdout,$stderr)=$handle->cwd('cmake');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            './configure','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make','__display__');
+         ($stdout,$stderr)=$handle->cmd($sudo.
+            'make install','__display__');
+         ($stdout,$stderr)=$handle->cwd('/opt/source');
+      }
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/nih-at/libzip.git',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('libzip');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git tag -l','__display__');
+      $stdout=~s/^.*\n(.*)$/$1/s;
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "git checkout $stdout",'__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp build','__display__');
+      ($stdout,$stderr)=$handle->cwd('build');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '/usr/local/bin/cmake ..','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v libzip.pc /usr/lib64/pkgconfig','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ../xcode/zipconf.h /usr/local/include','__display__');
+      ($stdout,$stderr)=$handle->cmd(
+         "echo -e /usr/local/lib64 | ${sudo}tee -a /etc/ld.so.conf",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'ldconfig -v','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/jedisct1/libsodium',
+         '__display__');
+      ($stdout,$stderr)=$handle->cwd('libsodium');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git checkout -b remotes/origin/stable',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './autogen.sh','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'make install','__display__');
+      ($stdout,$stderr)=$handle->cwd('/opt/source');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/php/php-src.git',
+         '__display__');
       ($stdout,$stderr)=$handle->cwd('php-src');
+      # https://clipbucket.com/cb-install-requirements/
       ($stdout,$stderr)=$handle->cmd($sudo.
-         'git checkout PHP-7.0.2','__display__');
+         'git checkout php-7.0.27','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          './buildconf --force','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1504,6 +1765,7 @@ if ($r==1) {
          '--enable-intl '.
          '--enable-mbstring '.
          '--with-mcrypt '.
+         #'--with-sodium '.
          '--enable-mysqlnd '.
          '--with-mysql-sock=/var/lib/mysql/mysql.sock '.
          '--with-mysqli=mysqlnd '.
@@ -1518,6 +1780,7 @@ if ($r==1) {
          '--enable-xmlreader '.
          '--enable-xmlwriter '.
          '--enable-zip '.
+         #'--with-libzip=/opt/source/libzip '.
          '--with-zlib','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make -j2','__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__');
@@ -1532,14 +1795,34 @@ if ($r==1) {
          'cp -v ./php.ini-production /usr/local/php7/lib/php.ini',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -vp /usr/local/php7/etc/php-fpm.d','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./sapi/fpm/www.conf /usr/local/php7/etc/php-fpm.d/www.conf',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php7/etc/php-fpm.conf',
          '__display__');
+      my $wcnf=<<END;
+catch_workers_output = yes
+
+php_flag[display_errors] = on
+php_admin_value[error_log] = /usr/local/php7/var/log/fpm-php.www.log
+php_admin_flag[log_errors] = on
+END
+      ($stdout,$stderr)=$handle->cmd(
+         "echo -e \"$wcnf\" | ${sudo}tee -a ".
+         '/usr/local/php7/etc/php-fpm.d/www.conf',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'touch /var/log/fpm-php.www.log');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'chmod -v 777 /var/log/fpm-php.www.log','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'cp -v ./sapi/fpm/php-fpm.conf /usr/local/php7/etc/php-fpm.conf',
+         '__display__');
       my $zend=<<END;
-# Zend OPcache
-zend_extension=opcache.so
+; Zend OPcache
+extension=opcache.so
 END
       ($stdout,$stderr)=$handle->cmd("echo -e \"$zend\" > ".
          '/usr/local/php7/etc/conf.d/modules.ini');
@@ -1548,6 +1831,9 @@ END
          '/usr/local/php7/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "sed -i 's/group = nobody/group = www-data/' ".
+         '/usr/local/php7/etc/php-fpm.d/www.conf');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "sed -i 's/\;env.PATH./env[PATH]/' ".
          '/usr/local/php7/etc/php-fpm.d/www.conf');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'ln -s /usr/local/php7/sbin/php-fpm /usr/sbin/php-fpm');
@@ -1564,7 +1850,7 @@ END
       #          "  -   \\x22     \  -  \\x5C
       #          $  -   \\x24     %  -  \\x25
       #
-      my $fpmsrv=<<END;
+   my $fpmsrv=<<END;
 [Unit]
 Description=The PHP FastCGI Process Manager
 After=syslog.target network.target
@@ -1572,19 +1858,30 @@ After=syslog.target network.target
 [Service]
 Type=simple
 PIDFile=/run/php-fpm/php-fpm.pid
-ExecStart=/usr/sbin/php-fpm --nodaemonize --fpm-config /usr/local/php7/etc/php-fpm.conf
+ExecStart=/usr/local/php7/sbin/php-fpm --nodaemonize --fpm-config /usr/local/php7/etc/php-fpm.conf
 ExecReload=/bin/kill -USR2 \\x24MAINPID
 
 [Install]
 WantedBy=multi-user.target
 END
       ($stdout,$stderr)=$handle->cmd("echo -e \"$fpmsrv\" > ".
-         '/usr/lib/systemd/system/php-fpm.service');
-      ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /run/php-fpm');
+         '~/php-fpm.service');
+      ($stdout,$stderr)=$handle->cmd($sudo.'mv -fv ~/php-fpm.service '.
+         '/usr/lib/systemd/system');
+      ($stdout,$stderr)=$handle->cwd("/opt/source");
+      ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /run/php-fpm',
+         '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'chkconfig --levels 235 php-fpm on');
-      ($stdout,$stderr)=$handle->cmd('service php-fpm start','__display__');
-   } else {
+      ($stdout,$stderr)=$handle->cmd($sudo.'service php-fpm start',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '/usr/local/php7/bin/pecl channel-update pecl.php.net',
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         '/usr/local/php7/bin/pecl install mailparse-3.0.2',
+         '__display__');
+   } elsif (-e '/opt/cpanel/ea-php70') {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'cp -v /opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf.default '.
          '/opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf','__display__');
@@ -1599,33 +1896,43 @@ END
       "chmod -v +x wp-cli.phar",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "mv -v wp-cli.phar /usr/local/bin/wp",'__display__');
-   ($stdout,$stderr)=$handle->cwd('~');
-   $ade=uri_escape($ade);
-   my $wppass=uri_escape($service_and_cert_password);
-   $tit=uri_escape($tit);
-   $adu=uri_escape($adu); 
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   #$ade=uri_escape($ade);
+   #my $wppass=uri_escape($service_and_cert_password);
+   #$tit=uri_escape($tit);
+   #$adu=uri_escape($adu); 
    my $urll='';
+   $avail_port=8080;
    if ($hostname eq 'jp-01ld.get-wisdom.com') {
       $urll='www.get-wisdom.com';
    } else {
       $urll=$ip.":".$avail_port;
    }
-   my $cmd="sudo wget -d -qO- --random-wait --wait=3 ".
-         "--no-check-certificate --post-data='weblog_title=".
-         $tit."&user_name=".$adu."&admin_password=".
-         $wppass."&pass1-text=".
-         $wppass."&admin_password2=".
-         $wppass."&admin_email=".$ade.
-         "&Submit=Install+WordPress&language=' https://".
-         $urll."/wp-admin/install.php?step=2";
-   ($stdout,$stderr)=$handle->cmd($cmd);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/wp core install '.
+      '--title=getwisdom.com '.
+      "--url=http://$urll ".
+      "--admin_user=$adu ".
+      "--admin_email=$ade ".
+      "--admin_password=$service_and_cert_password ".
+      '--allow-root --path=/var/www/html/wordpress',
+      '__display__');
+   #my $cmd="sudo wget -d -qO- --random-wait --wait=3 ".
+   #      "--no-check-certificate --post-data='weblog_title=".
+   #      $tit."&user_name=".$adu."&admin_password=".
+   #      $wppass."&pass1-text=".
+   #      $wppass."&admin_password2=".
+   #      $wppass."&admin_email=".$ade.
+   #      "&Submit=Install+WordPress&language=' https://".
+   #      $urll."/wp-admin/install.php?step=2";
+   #($stdout,$stderr)=$handle->cmd($cmd);
 #&Net::FullAuto::FA_Core::cleanup;
-   if ($hostname eq 'jp-01ld.get-wisdom.com') {
-      ($stdout,$stderr)=$handle->cwd("/var/www/html/wordpress/wp-content".
-         "/themes"); 
-   } else {
-      ($stdout,$stderr)=$handle->cwd("WordPress/wordpress");
-   }
+   #if ($hostname eq 'jp-01ld.get-wisdom.com') {
+   #   ($stdout,$stderr)=$handle->cwd("/var/www/html/wordpress/wp-content".
+   #      "/themes"); 
+   #} else {
+   #   ($stdout,$stderr)=$handle->cwd("/opt/source/wordpress");
+   #}
    my $the='memberlite';
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget --random-wait --progress=dot '.
@@ -1828,69 +2135,125 @@ END
    # http://www.theblogmaven.com/best-wordpress-plugins/
 
    my $listt=<<'END';
-+-------------------------------------------------+--------+--------+---------+
-| name                                            | status | update | version |
-+-------------------------------------------------+--------+--------+---------+
-| addons-for-elementor                            | active | none   | 1.5     |
-| bbpress                                         | active | none   | 2.5.14  |
-| better-recent-comments                          | active | none   | 1.0.4   |
-| black-studio-tinymce-widget                     | active | none   | 2.6.1   |
-| check-email                                     | active | none   | 0.5.5   |
-| commentluv                                      | active | none   | 2.94.7  |
-| comment-redirect                                | active | none   | 1.1.3   |
-| comment-reply-email-notification                | active | none   | 1.4.2   |
-| contact-form-7                                  | active | none   | 4.9.2   |
-| custom-dashboard-widgets                        | active | none   | 1.3.1   |
-| easy-google-fonts                               | active | none   | 1.4.3   |
-| elementor                                       | active | none   | 1.8.11  |
-| google-analytics-dashboard-for-wp               | active | none   | 5.1.2.5 |
-| jetpack                                         | active | none   | 5.6.1   |
-| maxbuttons                                      | active | none   | 6.25    |
-| meks-easy-ads-widget                            | active | none   | 2.0.3   |
-| meks-flexible-shortcodes                        | active | none   | 1.3.1   |
-| meks-simple-flickr-widget                       | active | none   | 1.1.3   |
-| meks-smart-author-widget                        | active | none   | 1.1.1   |
-| meks-smart-social-widget                        | active | none   | 1.3.4   |
-| meks-themeforest-smart-widget                   | active | none   | 1.2     |
-| memberlite-shortcodes                           | active | none   | 1.1     |
-| menu-icons                                      | active | none   | 0.10.2  |
-| menu-icons-icomoon                              | active | none   | 0.3.0   |
-| multiple-post-thumbnails                        | active | none   | 1.6.6   |
-| nav-menu-roles                                  | active | none   | 1.9.1   |
-| paid-memberships-pro                            | active | none   | 1.9.4.2 |
-| pmpro-bbpress                                   | active | none   | 1.5.4   |
-| pmpro-nav-menus                                 | active | none   | .3.2    |
-| pmpro-woocommerce                               | active | none   | 1.4.5   |
-| read-more-without-refresh                       | active | none   | 2.3     |
-| simple-share-buttons-adder                      | active | none   | 7.3.10  |
-| simple-trackback-validation-with-topsy-blocker  | active | none   | 1.2.7   |
-| text-hover                                      | active | none   | 3.7.1   |
-| theme-my-login                                  | active | none   | 6.4.9   |
-| updraftplus                                     | active | none   | 1.14.2  |
-| woocommerce                                     | active | none   | 3.2.6   |
-| woocommerce-gateway-paypal-powered-by-braintree | active | none   | 2.0.4   |
-| woocommerce-services                            | active | none   | 1.9.1   |
-| woocommerce-gateway-stripe                      | active | none   | 3.2.3   |
-| wpfront-notification-bar                        | active | none   | 1.7     |
-| wp-mail-smtp                                    | active | none   | 1.2.1   |
-| wp-to-twitter                                   | active | none   | 3.3.1   |
-| wordpress-seo                                   | active | none   | 6.0     |
-+-------------------------------------------------+--------+--------+---------+
++-------------------------------------------------+----------+-----------+-----------+
+| name                                            | status   | update    | version   |
++-------------------------------------------------+----------+-----------+-----------+
+| add-from-server                                 | active   | none      | 3.3.3     |
+| codepress-admin-columns                         | active   | none      | 3.3.1     |
+| akismet                                         | active   | none      | 4.1       |
+| amazon-auto-links                               | active   | available | 3.8.0     |
+| avatar-manager                                  | active   | none      | 1.6.1     |
+| bbp-private-groups                              | active   | none      | 3.6.9     |
+| bbpress                                         | active   | none      | 2.5.14    |
+| bbpress-enable-tinymce-visual-tab               | active   | none      | 1.0.1     |
+| better-recent-comments                          | active   | none      | 1.0.6     |
+| black-studio-tinymce-widget                     | active   | none      | 2.6.4     |
+| blank-slate                                     | active   | none      | 1.1.4     |
+| capability-manager-enhanced                     | active   | none      | 1.5.11    |
+| check-email                                     | active   | none      | 0.5.5     |
+| clip_press                                      | inactive | none      |           |
+| commentluv                                      | active   | available | 3.0.1     |
+| comment-redirect                                | active   | none      | 1.1.3     |
+| comment-reply-email-notification                | active   | none      | 1.8.0     |
+| contact-form-7                                  | active   | available | 5.1       |
+| contact-form-7-modules/hidden                   | active   | none      | 2.0.2     |
+| contact-form-7-modules/send-all-fields          | inactive | none      | 2.0.2     |
+| convertkit-for-paid-memberships-pro             | active   | none      | 1.0.2     |
+| custom-dashboard-widgets                        | active   | none      | 1.3.1     |
+| display-posts-shortcode                         | active   | none      | 2.9.0     |
+| download-monitor                                | active   | none      | 4.1.1     |
+| duplicate-post                                  | active   | none      | 3.2.2     |
+| dw-question-answer-pro                          | active   | none      | 1.1.7     |
+| easy-google-fonts                               | active   | none      | 1.4.3     |
+| elasticpress                                    | active   | none      | 2.7.0     |
+| elementor                                       | active   | available | 2.3.6     |
+| flamingo                                        | active   | none      | 1.9       |
+| gd-bbpress-attachments                          | active   | none      | 3.0.1     |
+| google-analytics-dashboard-for-wp               | active   | none      | 5.3.7     |
+| insert-php-code-snippet                         | active   | none      | 1.2.6     |
+| jetpack                                         | active   | none      | 6.8.1     |
+| addons-for-elementor                            | inactive | none      | 2.5.2     |
+| memberlite-elements                             | inactive | available | 1.0       |
+| memberlite-shortcodes                           | active   | none      | 1.3.1     |
+| menu-icons                                      | active   | none      | 0.11.4    |
+| menu-icons-icomoon                              | active   | none      | 0.3.0     |
+| multiple-post-thumbnails                        | active   | none      | 1.7       |
+| nav-menu-roles                                  | active   | none      | 1.9.2     |
+| elementor-templater                             | active   | none      | 1.2.9     |
+| paid-memberships-pro                            | active   | none      | 1.9.5.6   |
+#| pmpro-advanced-levels-shortcode-master          | active   | none      | .2.4      |
+| pmpro-bbpress                                   | active   | none      | 1.5.5     |
+| pmpro-cpt                                       | active   | none      | .2.1      |
+| pmpro-donations                                 | active   | none      | .5        |
+| pmpro-download-monitor                          | active   | none      | .2.1      |
+| pmpro-email-confirmation                        | active   | none      | .5        |
+| pmpro-member-badges                             | active   | none      | .3.1      |
+| pmpro-nav-menus                                 | active   | none      | .3.2      |
+| pmpro-proration                                 | active   | none      | .3        |
+| pmpro-recurring-emails                          | active   | none      | .5.1      |
+#| pmpro-subscription-delays                       | active   | none      | .4.6      |
+| pmpro-woocommerce                               | active   | none      | 1.6.1     |
+| pixelyoursite                                   | active   | none      | 5.3.3     |
+| pmpro-reason-for-cancelling                     | active   | none      | .1.1      |
+| pmpro-roles                                     | active   | none      | 1.0       |
+| post-grid                                       | active   | none      | 2.0.29    |
+| post-tags-and-categories-for-pages              | active   | none      | 1.4.1     |
+| post-type-switcher                              | active   | none      | 3.1.0     |
+| printaura-woocommerce-api                       | inactive | none      | 3.4.8     |
+| printify-for-woocommerce                        | active   | none      | 1.1       |
+| quick-pagepost-redirect-plugin                  | active   | none      | 5.1.8     |
+| quotes-collection                               | active   | none      | 2.0.10    |
+| read-more-without-refresh                       | inactive | none      | 3.1       |
+| redux-framework                                 | active   | none      | 3.6.15    |
+| shortcode-in-menus                              | active   | none      | 3.4       |
+| shortcode-redirect                              | active   | none      | 1.0.02    |
+| simple-ajax-chat                                | active   | none      | 20181114  |
+| simple-sitemap                                  | active   | none      | 2.6       |
+| simple-trackback-validation-with-topsy-blocker  | active   | none      | 1.2.7     |
+| revslider                                       | active   | none      | 5.4.8.1   |
+| revslider-liquideffect-addon                    | inactive | none      | 1.0.2     |
+| text-hover                                      | active   | none      | 3.8       |
+| theme-my-login                                  | active   | none      | 7.0.11    |
+| tidio-live-chat                                 | active   | none      | 3.3.3     |
+| updraftplus                                     | active   | available | 2.15.7.24 |
+| use-clients-time-zone                           | active   | none      | 1.1.4     |
+| user-notes                                      | active   | none      | 1.0.1     |
+| user-switching                                  | active   | none      | 1.4.0     |
+| themestrike_video_intro                         | active   | none      | 2.0.10    |
+| woocommerce                                     | active   | available | 3.5.2     |
+| woocommerce-bulk-discount                       | active   | none      | 2.4.5     |
+| woocommerce-gateway-paypal-powered-by-braintree | active   | none      | 2.2.0     |
+| woocommerce-services                            | active   | none      | 1.18.0    |
+| woocommerce-gateway-stripe                      | active   | none      | 4.1.13    |
+| wordpress-importer                              | active   | none      | 0.6.4     |
+| wordpress-popular-posts                         | active   | none      | 4.2.2     |
+| wordpress-social-login                          | active   | none      | 2.3.3     |
+| wp-postratings                                  | active   | available | 1.85      |
+| wp-emoji-one                                    | active   | none      | 0.6.0     |
+| wpfront-notification-bar                        | active   | none      | 1.7.1     |
+| wp-hide-post                                    | active   | none      | 2.0.10    |
+| wp-mail-smtp                                    | active   | none      | 1.4.1     |
+| wp-security-audit-log                           | active   | none      | 3.3       |
+| wp-to-twitter                                   | active   | none      | 3.3.9     |
+| yith-donations-for-woocommerce                  | active   | none      | 1.1.1     |
+| wordpress-seo                                   | active   | available | 9.2.1     |
++-------------------------------------------------+----------+-----------+-----------+
 END
 
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp plugin install paid-memberships-pro '.
       '--allow-root --activate --path=/var/www/html/wordpress',
       '__display__');
+&Net::FullAuto::FA_Core::cleanup;
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/wp plugin install pmpro-nav-menus.zip '.
       '--allow-root --activate --path=/var/www/html/wordpress',
       '__display__');
    # https://www.paidmembershipspro.com/add-ons/pmpro-advanced-levels-shortcode/
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      '/usr/local/bin/wp plugin install master.zip '.
-      '--allow-root --activate --path=/var/www/html/wordpress',
-      '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   '/usr/local/bin/wp plugin install master.zip '.
+   #   '--allow-root --activate --path=/var/www/html/wordpress',
+   #   '__display__');
 
 $do=1;
 if ($do==1) {
@@ -1925,7 +2288,8 @@ if ($do==1) {
          wp-mail-smtp
 
    );
-   foreach my $plugin (@wp_plugins) {
+   #foreach my $plugin (@wp_plugins) {
+   foreach my $plugin ($listt=~/^..([^-n].*?)\s+.*$/mg) {
       next if $plugin=~/^#/;
       ($stdout,$stderr)=$handle->cmd(
          "/usr/local/bin/wp plugin install $plugin --allow-root ".
@@ -2033,7 +2397,7 @@ if ($do==1) {
    my $one=1;
    foreach (1..5) {
       $handle->{_cmd_handle}->print($nonce_cmd);
-      my $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+      $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
       $handle->{_cmd_handle}->print($nonce_cmd);
       while (1) {
          my $output.=Net::FullAuto::FA_Core::fetch($handle);
@@ -2604,7 +2968,7 @@ Content-Disposition: form-data; name="_wp_http_referer"
 END
 
    chomp($stripe_info);
-   $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
+   my $cmd="curl -k -L -b ~/cookies.txt 'https://".$urll.
           "/wp-admin/admin.php?page=wc-settings&tab=checkout&section=stripe' ".
       "-H 'Host: ".$urll."' ".
       "-H 'Connection: keep-alive' ".
@@ -3004,7 +3368,7 @@ if ($do==1) {
    # https://www.cloudways.com/blog/elasticsearch-on-wordpress/
    ($stdout,$stderr)=$handle->cmd($sudo.
       'yum -y install java-1.8.0-openjdk.x86_64','__display__');
-   ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".
       "https://artifacts.elastic.co/downloads/".

@@ -1,4 +1,7 @@
 #!/usr/bin/perl
+
+# PODNAME: tts
+
 use strict;
 use warnings;
 use File::Spec;
@@ -222,9 +225,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-C<tts> - Command line interface to Text::Template::Simple
+tts
+
+=head1 VERSION
+
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -232,6 +241,14 @@ You have to either pass a file name or pass C<-e> with a template string.
 
     tts -e 'My perl is at <%= $^X %>'
     tts /home/burak/template.tts
+
+=head1 DESCRIPTION
+
+This a command line front end to L<Text::Template::Simple>.
+
+=head1 NAME
+
+tts - Command line interface to Text::Template::Simple
 
 =head1 OPTIONS
 
@@ -265,22 +282,29 @@ You have to either pass a file name or pass C<-e> with a template string.
     --compile-map-keys      Flag. Enable map keys interface?
     --compile-chkmt         Flag. Check modification time of the template?
 
-=head1 DESCRIPTION
-
-This a command line front end to L<Text::Template::Simple>.
-
 =head1 AUTHOR
 
 C<Burak Gursoy>, E<lt>burakE<64>cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2004-2012 C<Burak Gursoy>. All rights reserved.
+Copyright 2004-2017 C<Burak Gursoy>. All rights reserved.
 
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify 
 it under the same terms as Perl itself, either Perl version 5.12.0 or, 
 at your option, any later version of Perl 5 you may have available.
+
+=head1 AUTHOR
+
+Burak Gursoy <burak@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2004 by Burak Gursoy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

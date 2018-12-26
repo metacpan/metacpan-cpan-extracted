@@ -12,11 +12,10 @@ get '/oembed' => sub {
   my $url = $c->param('url');
 
   if ($c->stash('restricted') and !grep { $_ eq $url } @{$c->stash('predefined')}) {
-    $c->render(json => {error => "LINK_EMBEDDER_RESTRICTED is set."});
+    return $c->render(json => {error => "LINK_EMBEDDER_RESTRICTED is set."});
   }
-  else {
-    $c->embedder->serve($c);
-  }
+
+  $c->embedder->serve($c);
 };
 
 app->defaults(
@@ -49,6 +48,12 @@ app->defaults(
     "spotify:track:0aBi2bHHOf3ZmVjt3x00wv",
   ]
 );
+
+$ENV{X_REQUEST_BASE} and hook before_dispatch => sub {
+  my $c = shift;
+  return unless my $base = $c->req->headers->header('X-Request-Base');
+  $c->req->url->base(Mojo::URL->new($base));
+};
 
 app->start;
 

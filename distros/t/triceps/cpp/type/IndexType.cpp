@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -82,7 +82,7 @@ void IndexTypeVec::initialize(TableType *tabtype, IndexType *parent, Erref paren
 		st->setNestPos(tabtype, parent, i);
 		st->initialize();
 	}
-	if (parentErr->hasError())
+	if (parentErr.hasError())
 		return; // don't even try the nested stuff
 	// do it in the depth-last order
 	for (size_t i = 0; i < n; i++) {
@@ -144,7 +144,7 @@ IndexType *IndexTypeVec::find(const string &name) const
 	for (size_t i = 0; i < n; i++) 
 		if((*this)[i].name_ == name)
 			return (*this)[i].index_;
-	return NULL;
+	return NO_INDEX_TYPE;
 }
 
 IndexType *IndexTypeVec::findByIndexId(int it) const
@@ -153,7 +153,7 @@ IndexType *IndexTypeVec::findByIndexId(int it) const
 	for (size_t i = 0; i < n; i++) 
 		if((*this)[i].index_->getIndexId() == it)
 			return (*this)[i].index_;
-	return NULL;
+	return NO_INDEX_TYPE;
 }
 
 /////////////////////// IndexType ////////////////////////////
@@ -217,6 +217,11 @@ IndexType *IndexType::setAggregator(Onceref<AggregatorType> agg)
 	return this;
 }
 
+const NameSet *IndexType::getKeyExpr() const
+{
+	return getKey();
+}
+
 Erref IndexType::getErrors() const
 {
 	return errors_;
@@ -244,7 +249,7 @@ bool IndexType::equals(const Type *t) const
 			return false;
 	}
 
-	if ((agg_ != 0) ^ (it->agg_ != 0))
+	if (agg_.isNull() ^ it->agg_.isNull())
 		return false;
 	if (agg_ && !agg_->equals(it->agg_))
 		return false;
@@ -273,12 +278,17 @@ bool IndexType::match(const Type *t) const
 			return false;
 	}
 
-	if ((agg_ != 0) ^ (it->agg_ != 0))
+	if (agg_.isNull() ^ it->agg_.isNull())
 		return false;
 	if (agg_ && !agg_->match(it->agg_))
 		return false;
 		
 	return true;
+}
+
+int IndexType::cmpValue(const void *left, intptr_t szleft, const void *right, intptr_t szright) const
+{
+	return CMP_NOT_SUPPORTED;
 }
 
 void IndexType::initializeNested()
@@ -312,7 +322,7 @@ void IndexType::initializeNested()
 
 	nested_.initialize(tabtype_, this, errors_);
 	
-	if (errors_->hasError())
+	if (errors_.hasError())
 		return; // skip the aggregators
 
 	// initialize the aggregators
@@ -326,7 +336,7 @@ void IndexType::initializeNested()
 	}
 
 	// optimize by nullifying the empty error set
-	if (!errors_->hasError() && errors_->isEmpty())
+	if (!errors_.hasError() && errors_.isEmpty())
 		errors_ = NULL;
 }
 
@@ -865,10 +875,12 @@ size_t IndexType::groupSizeOfRecord(const Table *table, const RowHandle *what) c
 }
 
 Valname indexids[] = {
+	{ IndexType::IT_NONE, "IT_NONE" },
 	{ IndexType::IT_ROOT, "IT_ROOT" },
 	{ IndexType::IT_HASHED, "IT_HASHED" },
 	{ IndexType::IT_FIFO, "IT_FIFO" },
 	{ IndexType::IT_SORTED, "IT_SORTED" },
+	{ IndexType::IT_ORDERED, "IT_ORDERED" },
 	{ IndexType::IT_LAST, "IT_LAST" },
 	{ -1, NULL }
 };
@@ -882,5 +894,82 @@ int IndexType::stringIndexId(const char *str)
 {
 	return string2enum(indexids, str);
 }
+
+///////////////////// NoIndexType ////////////////////////////
+
+NoIndexType::NoIndexType() :
+	IndexType(IT_NONE)
+{ 
+}
+
+NoIndexType::NoIndexType(bool isStatic) :
+	IndexType(IT_NONE)
+{ 
+	if (isStatic) {
+		incref();
+	}
+}
+
+NoIndexType::NoIndexType(const NoIndexType &orig, bool flat) :
+	IndexType(orig, flat)
+{
+}
+
+NoIndexType::NoIndexType(const NoIndexType &orig, HoldRowTypes *holder) :
+	IndexType(orig, holder)
+{
+}
+
+const NameSet *NoIndexType::getKey() const
+{
+	return NULL; // no keys
+}
+
+bool NoIndexType::equals(const Type *t) const
+{
+	if (this == t)
+		return true; // self-comparison, shortcut
+
+	return IndexType::equals(t);
+}
+
+void NoIndexType::printTo(string &res, const string &indent, const string &subindent) const
+{
+	res.append("index NoIndex");
+}
+
+IndexType *NoIndexType::copy(bool flat) const
+{
+	return new NoIndexType(*this, flat);
+}
+
+IndexType *NoIndexType::deepCopy(HoldRowTypes *holder) const
+{
+	return new NoIndexType(*this, holder);
+}
+
+void NoIndexType::initialize()
+{
+	initialized_ = true;
+}
+
+Index *NoIndexType::makeIndex(const TableType *tabtype, Table *table) const
+{
+	return NULL; 
+}
+
+void NoIndexType::initRowHandleSection(RowHandle *rh) const
+{ }
+
+void NoIndexType::clearRowHandleSection(RowHandle *rh) const
+{ }
+
+void NoIndexType::copyRowHandleSection(RowHandle *rh, const RowHandle *fromrh) const
+{ }
+
+/////////////////////// NO_INDEX_TYPE ///////////////////////////
+
+NoIndexType NO_INDEX_TYPE_OBJECT(true);
+IndexType * const NO_INDEX_TYPE = &NO_INDEX_TYPE_OBJECT;
 
 }; // TRICEPS_NS

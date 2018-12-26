@@ -1,12 +1,8 @@
 #!/usr/bin/perl -sw
 ##
-##
-##
-## Copyright (c) 2001, Vipul Ved Prakash.  All rights reserved.
+## Copyright (c) 1998-2018, Vipul Ved Prakash.  All rights reserved.
 ## This code is free software; you can redistribute it and/or modify
 ## it under the same terms as Perl itself.
-##
-## $Id: Generator.pm,v 1.2 2001/06/22 03:43:51 vipul Exp $
 
 package Crypt::Random::Generator; 
 use Crypt::Random qw(makerandom makerandom_itv makerandom_octet);
@@ -22,6 +18,7 @@ sub new {
     my $self = { _STRENGTH => \%STRENGTH, _PROVIDERS => \@PROVIDERS  };
 
     $$self{Strength} = $params{Strength} || 0;
+    $$self{Uniform} = $params{Uniform} || 0;
     $$self{Provider} = $params{Provider} || "";  
     $$self{ProviderParams} = $params{ProviderParams} || "";
 
@@ -71,6 +68,7 @@ sub integer {
                 Size => $params{Size}, 
                 Provider => $$self{Provider}, 
                 Verbosity => $params{Verbosity} || $$self{Verbosity},
+                Uniform => $params{Uniform} || $$self{Uniform},
                 %{$$self{ProviderParams}},
         )
     } elsif ($params{Upper}) {
@@ -79,6 +77,7 @@ sub integer {
                 Upper => $params{Upper},
                 Provider => $$self{Provider}, 
                 Verbosity => $params{Verbosity} || $$self{Verbosity},
+                Uniform => $params{Uniform} || $$self{Uniform},
                 %{$$self{ProviderParams}},
         )
     }

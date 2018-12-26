@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -191,29 +191,27 @@ IndexType *findSubIndex(const string &name) const;
 </pre>
 
 		<para>
-		Find the index by name. Returns NULL if not found.  This looks only for
-		the top-level indexes, to find the nested indexes, the similar calls
-		have to be continued on the further levels. At the moment there is no
-		ready method to resolve a whole index path in &Cpp;, however the
-		same method in IndexType has a special feature that allows to
-		do it by simple chaining:
+		Find the index by name.  If the index is not found, returns the special
+		value <pre>NO_INDEX_TYPE</pre>.  This looks only for the top-level
+		indexes, to find the nested indexes, the similar calls have to be
+		continued on the further levels. At the moment there is no ready method
+		to resolve a whole index path in &Cpp;, however the same method in
+		IndexType allows to do it by simple chaining:
 		</para>
 
 <pre>
 Autoref<IndexType> it = tt->findSubIndex("level1")->findSubIndex("level2");
-if (it.isNull()) {
+if (it == NO_INDEX_TYPE) {
 	// not found
 }
 </pre>
 
 		<para>
-		That special feature is that <pre>findSubIndex()</pre> in IndexType works
-		even on a NULL reference, simply returning NULL. So if 
-		<pre>findSubIndex("level1")</pre> returns NULL,
-		<pre>findSubIndex("level2")</pre> will simply propagate that NULL.
-		The downside compared with the path-resolving method in Perl
-		is that this chain doesn't tell you, which of the indexes in the
-		path were not found.
+		Even though <pre>NO_INDEX_TYPE</pre> is a pointer to a static value, it's safe to
+		store it in an AutoRef, because this object's reference count gets initialized to
+		1, and AutoRef would never free it.  The downside of the chaining
+		compared with the path-resolving method in Perl is that this chain
+		doesn't tell you, which of the indexes in the path were not found.
 		</para>
 
 <pre>
@@ -221,8 +219,8 @@ IndexType *findSubIndexById(IndexType::IndexId it) const;
 </pre>
 
 		<para>
-		Finds the first index type of a particular kind (or NULL if none
-		found). The ids are like IndexType::IT_HASHED, IndexType::IT_FIFO,
+		Finds the first index type of a particular kind (or <pre>NO_INDEX_TYPE</pre> if none were
+		found, similarly to <pre>findSubIndex()</pre>). The ids are like IndexType::IT_HASHED, IndexType::IT_FIFO,
 		IndexType::IT_SORTED.
 		</para>
 

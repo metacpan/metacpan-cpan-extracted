@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2016-10-21 00:00:00 +0000 to present.
+Changes from 2017-12-25 00:00:00 +0000 to present.
 ==================================================
 
-------------------------------------------
-version 2.2.3 at 2017-10-21 05:34:20 +0000
-------------------------------------------
+----------------------------------------
+version 2.3 at 2018-12-25 10:23:22 +0000
+----------------------------------------
+
+  Change: 6975533993cbdf4030ae42ccb3eb19e13dc0ab69
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2018-12-25 23:23:14 +0000
+
+    api_version and auth method 'header' via Token, bump to 2.3 
+
+  Change: a63841d5d55eb3d4d1c2e918ef6c74428c4aaff6
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2017-10-21 18:34:38 +0000
+
+    v2.2.3 
 
   Change: 17fb57d4f3f7484b7b20744db938204fdc435b40
   Author: Tobias Kirschstein <lev@ideegeo.com>
@@ -119,5 +131,5 @@ version 2.2.3 at 2017-10-21 05:34:20 +0000
     use caller with parenthesis to silence warning. fixes #18 
 
 =================================================
-Plus 22 releases after 2016-10-21 00:00:00 +0000.
+Plus 22 releases after 2017-12-25 00:00:00 +0000.
 =================================================

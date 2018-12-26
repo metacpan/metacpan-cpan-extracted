@@ -15,7 +15,7 @@ sub CLI ($self) {
         name     => 'new',
         opt      => {
             tmpl => {
-                desc => 'template name:' . $LF . join( $LF, map {"\t\t$_\t$tmpl_cfg->{$_}->{desc}"} keys $tmpl_cfg->%* ),
+                desc => "template name:\n" . join( "\n", map {"\t\t$_\t$tmpl_cfg->{$_}->{desc}"} keys $tmpl_cfg->%* ),
                 isa  => [ keys $tmpl_cfg->%* ],
                 min  => 1,
             },

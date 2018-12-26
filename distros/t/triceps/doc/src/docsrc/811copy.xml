@@ -7,7 +7,7 @@
 ]>
 
 <!--
-(C) Copyright 2011-2014 Sergey A. Babkin.
+(C) Copyright 2011-2018 Sergey A. Babkin.
 This file is a part of Triceps.
 See the file COPYRIGHT for the copyright notice and license information
 -->
@@ -236,20 +236,16 @@ Autoref<RowType> rt2 = holder->copy(rt);
 		</para>
 
 		<para>
-		A special feature is that you can pass the holder pointer as NULL, and
-		the deep copy will still work, only it obviously won't be able to share
-		the underlying row types. So if you don't care about sharing, you can
-		always use NULL as an argument. It even works for the direct copying:
+		If you don't care about sharing, you can
+		use a special static value <pre>NO_HOLD_ROW_TYPES</pre> as an argument.
+		Even though <pre>NO_HOLD_ROW_TYPES</pre> is a pointer to a static value, it's safe to
+		store it in an AutoRef, because this object's reference count gets initialized to
+		1, and AutoRef would never free it.
 		</para>
 
-<pre>
-HoldRowTypes *holder = NULL;
-Autoref <RowType> rt2 = holder->copy(rt);
-</pre>
-
 		<para>
-		Its method <pre>copy()</pre> is smart enough to recognize the <pre>this</pre> being NULL and
-		do the correct thing.
+		The method <pre>copy()</pre> is smart enough to recognize the <pre>this</pre> 
+		being equal to <pre>NO_HOLD_ROW_TYPES</pre> and do the plain copy.
 		</para>
 
 		<para>

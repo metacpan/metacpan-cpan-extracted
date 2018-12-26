@@ -26,7 +26,7 @@ sub read ( $path, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomon
 
     $type = $EXT_TYPE_MAP->{ $path->{suffix} } if !$type && defined $path->{suffix};
 
-    my $data = P->file->read_bin($path);
+    my $data = \P->file->read_bin($path);
 
     if ( defined $args{params} ) {
         state $tmpl = P->tmpl;

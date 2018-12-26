@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    App::hr - Print horizontal bar on the terminal
 
+VERSION
+    This document describes version 0.260 of App::hr (from Perl distribution
+    App-hr), released on 2018-12-22.
+
+SYNOPSIS
      use App::hr qw(hr hr_r);
      hr;
 
@@ -21,26 +27,140 @@ SYNOPSIS
 
     You can also use the provided CLI hr.
 
-prepend:FUNCTIONS
-
- hr([ PATTERN [, COLOR ] ]) => optional STR
-
+NO_COLOR
+  COLOR
+FUNCTIONS
+  hr([ $pattern [, $color ] ]) => optional STR
     Print (under void context) or return (under scalar/array context) a
     horizontal ruler with the width of the terminal.
 
     Terminal width is determined using Term::Size.
 
-    PATTERN is optional, can be multicharacter, but cannot be empty string.
-    The defautl is =.
+    $pattern is optional, can be multicharacter, but cannot be empty string.
+    The defautl is "=".
 
     Under Windows, will shave one character at the end because the terminal
     cursor will move a line down when printing at the last column.
 
- hr_r => optional STR
+    If $color is set (to a color supported by Term::ANSIColor) *and* colored
+    output is enabled, output will be colored. Colored output is enabled if:
+    1) no "NO_COLOR" environment variable is defined; 2) "COLOR" is
+    undefined or true, or program is run interactively.
 
-    Like hr, but will set random pattern and random color.
+  hr_r => optional STR
+    Like "hr", but will set random pattern and random color.
+
+  hr_app
+    Usage:
+
+     hr_app(%args) -> [status, msg, payload, meta]
+
+    Print horizontal bar on the terminal.
+
+    hr can be useful as a marker/separator, especially if you use other
+    commands that might produce a lot of output, and you need to scroll back
+    lots of pages to see previous output. Example:
+
+     % hr; command-that-produces-lots-of-output
+     ============================================================================
+     Command output
+     ...
+     ...
+     ...
+ 
+     % hr -r; some-command; hr -r; another-command
+
+    Usage:
+
+     % hr
+     ============================================================================
+ 
+     % hr -c red  ;# will output the same bar, but in red
+ 
+     % hr --random-color  ;# will output the same bar, but in random color
+ 
+     % hr x----
+     x----x----x----x----x----x----x----x----x----x----x----x----x----x----x----x
+ 
+     % hr -- -x-  ;# specify a pattern that starts with a dash
+     % hr -p -x-  ;# ditto
+ 
+     % hr --random-pattern
+     vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+ 
+     % hr --random-pattern
+     *---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---*---
+ 
+     % hr -r  ;# shortcut for --random-pattern --random-color
+ 
+     % hr --help
+
+    If you use Perl, you can also use the "hr" function in App::hr module.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   color => *str*
+
+        Specify a color (see Term::ANSIColor).
+
+    *   height => *int* (default: 1)
+
+        Specify height (number of rows).
+
+    *   pattern => *str*
+
+        Specify a pattern.
+
+    *   random_color => *bool*
+
+    *   random_pattern => *bool*
+
+    *   space_after => *int* (default: 0)
+
+        Number of empty rows after drawing the bar.
+
+    *   space_before => *int* (default: 0)
+
+        Number of empty rows before drawing the bar.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-hr>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-hr>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-hr>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     ruler (App::ruler)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

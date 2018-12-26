@@ -1,11 +1,11 @@
 package Lingua::TR::ASCII;
+$Lingua::TR::ASCII::VERSION = '0.16';
 use strict;
 use warnings;
 use utf8;
 use base qw( Exporter );
 use Lingua::TR::ASCII::Data;
 
-our $VERSION = '0.14';
 our @EXPORT  = qw( ascii_to_turkish turkish_to_ascii );
 
 sub ascii_to_turkish {
@@ -128,11 +128,15 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
-Lingua::TR::ASCII - (De)asciify Turkish texts.
+Lingua::TR::ASCII
+
+=head1 VERSION
+
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -142,9 +146,6 @@ Lingua::TR::ASCII - (De)asciify Turkish texts.
     );
 
 =head1 DESCRIPTION
-
-This document describes version C<0.14> of C<Lingua::TR::ASCII>
-released on C<5 July 2016>.
 
 If you try to write Turkish with a non-Turkish keyboard (assuming you
 can't change the layout or can't touch-type) this will result with the
@@ -160,6 +161,10 @@ on 1 million words of Turkish news text using the GPA algorithm". See
 the links below for more information.
 
 This module is based on the previous Python and Ruby implementations.
+
+=head1 NAME
+
+Lingua::TR::ASCII - (De)asciify Turkish texts.
 
 =head1 FUNCTIONS
 
@@ -215,15 +220,13 @@ L<https://addons.mozilla.org/en-US/firefox/addon/turkish-deasciifier>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2011 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2011 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

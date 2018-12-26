@@ -8,7 +8,7 @@ use overload    #
   q[""] => sub {
 
     # string overloading can happens only from perl internals calls, such as eval in "use" or "require" (or other compilation errors), or not handled "die", so we don't need full trace here
-    return $_[0]->{msg} . $LF;
+    return "$_[0]->{msg}\n";
   },
   q[0+] => sub {
     return $_[0]->exit_code;
@@ -74,7 +74,7 @@ around new => sub ( $orig, $self, $msg, %args ) {
         push @frames, "$frame[3] at $frame[1] line $frame[2]";
     }
 
-    $args{call_stack} = \join $LF, @frames if @frames;
+    $args{call_stack} = \join "\n", @frames if @frames;
 
     $args{timestamp} = Time::HiRes::time();
 
@@ -98,7 +98,7 @@ sub _build_exit_code ($self) {
 
 sub _build_longmess ($self) {
     if ( $self->{call_stack} ) {
-        return $self->{msg} . $LF . ( $self->{call_stack}->$* =~ s/^/    /smgr );
+        return "$self->{msg}\n" . ( $self->{call_stack}->$* =~ s/^/    /smgr );
     }
     else {
         return $self->{msg};

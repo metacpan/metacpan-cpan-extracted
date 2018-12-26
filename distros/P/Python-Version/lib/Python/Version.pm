@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0001'; #VERSION
+our $VERSION = '0.0002'; #VERSION
 
 use Sort::Versions;
 
@@ -244,7 +244,7 @@ Python::Version - Python PEP440 compatible version string parser in Perl
 
 =head1 VERSION
 
-version 0.0001
+version 0.0002
 
 =head1 SYNOPSIS
 
@@ -257,13 +257,13 @@ version 0.0001
 
     # Comparing versions
      
-    if ( version->parse($vstr1) == version->parse($vstr2) ) {
+    if ( Python::Version->parse($vstr1) == Python::Version->parse($vstr2) ) {
       # do stuff
     }
      
     # Sorting versions
      
-    my @ordered = sort { version->parse($a) <=> version->parse($b) } @list;
+    my @ordered = sort { Python::Version->parse($a) <=> Python::Version->parse($b) } @list;
 
 =head1 DESCRIPTION
 
@@ -318,6 +318,12 @@ PEP 440 L<https://www.python.org/dev/peps/pep-0440/>
 =head1 AUTHOR
 
 Stephan Loyd <sloyd@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords perlancar
+
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

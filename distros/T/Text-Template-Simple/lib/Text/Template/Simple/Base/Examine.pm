@@ -1,12 +1,11 @@
 ## no critic (ProhibitUnusedPrivateSubroutines)
 package Text::Template::Simple::Base::Examine;
+$Text::Template::Simple::Base::Examine::VERSION = '0.91';
 use strict;
 use warnings;
 
 use Text::Template::Simple::Util qw(:all);
 use Text::Template::Simple::Constants qw(:all);
-
-our $VERSION = '0.90';
 
 sub _examine {
    my $self   = shift;
@@ -70,9 +69,17 @@ sub _examine_type {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Text::Template::Simple::Base::Examine - Base class for Text::Template::Simple
+Text::Template::Simple::Base::Examine
+
+=head1 VERSION
+
+version 0.91
 
 =head1 SYNOPSIS
 
@@ -80,22 +87,21 @@ Private module.
 
 =head1 DESCRIPTION
 
-This document describes version C<0.90> of C<Text::Template::Simple::Base::Examine>
-released on C<5 July 2016>.
-
 Private module.
+
+=head1 NAME
+
+Text::Template::Simple::Base::Examine - Base class for Text::Template::Simple
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2004 - 2016 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2004 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

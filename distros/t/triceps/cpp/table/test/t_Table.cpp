@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -58,7 +58,7 @@ UTESTCASE preLabel(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -243,7 +243,7 @@ UTESTCASE exceptions(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());
@@ -438,10 +438,10 @@ UTESTCASE groupSize(Utest *utest)
 	UT_ASSERT(tt);
 	tt->initialize();
 	UT_ASSERT(tt->getErrors().isNull());
-	UT_ASSERT(!tt->getErrors()->hasError());
+	UT_ASSERT(!tt->getErrors().hasError());
 
 	Autoref<IndexType> bcixt = tt->findSubIndex("bc");
-	UT_ASSERT(bcixt);
+	UT_ASSERT(bcixt.ne(NO_INDEX_TYPE));
 
 	Autoref<Table> t = tt->makeTable(unit, "t");
 	UT_ASSERT(!t.isNull());

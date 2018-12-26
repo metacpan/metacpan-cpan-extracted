@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -183,7 +183,7 @@ ok(ref $it2, "Triceps::IndexType");
 
 $it2 = eval { $tt1->findSubIndexById(&Triceps::IT_ROOT); };
 ok(!defined $it2);
-ok($@, qr/^Triceps::TableType::findSubIndexById: no nested index with type id 'IT_ROOT' \(0\)/);
+ok($@, qr/^Triceps::TableType::findSubIndexById: no nested index with type id 'IT_ROOT' \(1\)/);
 
 $it2 = eval { $tt1->findSubIndexById(999); };
 ok(!defined $it2);
@@ -274,18 +274,18 @@ table \(
 	#print STDERR "$@\n";
 	ok($@ =~ /Triceps::TableType::findIndexKeyPath: the path 'xab.xbc' involves the key field 'b' twice, table type is:
 table \(
-  row {
+  row \{
     uint8 a,
     int32 b,
     int64 c,
     float64 d,
     string e,
-  }
-\) {
-  index HashedIndex\(a, b, \) {
+  \}
+\) \{
+  index HashedIndex\(a, b, \) \{
     index HashedIndex\(b, c, \) xbc,
-  } xab,
-}/);
+  \} xab,
+\}/);
 }
 
 {
@@ -305,18 +305,18 @@ table \(
 	# print STDERR "$@\n";
 	ok($@ =~ /Triceps::TableType::findIndexKeyPath: the index type at path 'xab.xbc' does not have a key, table type is:
 table \(
-  row {
+  row \{
     uint8 a,
     int32 b,
     int64 c,
     float64 d,
     string e,
-  }
-\) {
-  index HashedIndex\(a, b, \) {
+  \}
+\) \{
+  index HashedIndex\(a, b, \) \{
     index PerlSortedIndex\(SimpleOrder a ASC, c DESC, \) xbc,
-  } xab,
-}/);
+  \} xab,
+\}/);
 }
 
 ###################### findIndexPathForKeys ###########################
@@ -343,7 +343,7 @@ table \(
 		->addSubIndex("by_c",
 			Triceps::IndexType->newHashed(key => [ "c" ])
 			->addSubIndex("by_ab",
-				Triceps::IndexType->newHashed(key => [ "a", "b" ])
+				Triceps::IndexType->newOrdered(key => [ "a", "b" ])
 			)
 		)
 	;
@@ -443,7 +443,7 @@ ok($@, qr/^Triceps::TableType::addSubIndex: table is already initialized, can no
 			->addSubIndex(a => Triceps::IndexType->newFifo()
 				->setAggregator(Triceps::AggregatorType->new($rt1, "ag-two-a", undef, ' '))
 			)
-			->addSubIndex(b => Triceps::IndexType->newHashed(key => [ "d" ])
+			->addSubIndex(b => Triceps::IndexType->newOrdered(key => [ "d" ])
 				->setAggregator(Triceps::AggregatorType->new($rt1, "ag-two-b", undef, ' '))
 			)
 			->setAggregator(Triceps::AggregatorType->new($rt1, "ag-two", undef, ' '))
@@ -475,7 +475,7 @@ ok($@, qr/^Triceps::TableType::addSubIndex: table is already initialized, can no
 	{
 		# put the second index first, also "+" under a leaf index
 		my $ttcopy = $ttorig->copyFundamental([ "two", "b" ], [ "one", "a", "+" ], "NO_FIRST_LEAF", );
-		ok($ttcopy->print(undef), 'table ( row { uint8 a, int32 b, int64 c, float64 d, string e, } ) { index PerlSortedIndex(SimpleOrder b ASC, c ASC, ) { index HashedIndex(d, ) b, } two, index HashedIndex(b, c, ) { index FifoIndex() a, } one, }');
+		ok($ttcopy->print(undef), 'table ( row { uint8 a, int32 b, int64 c, float64 d, string e, } ) { index PerlSortedIndex(SimpleOrder b ASC, c ASC, ) { index OrderedIndex(d, ) b, } two, index HashedIndex(b, c, ) { index FifoIndex() a, } one, }');
 	}
 
 	# errors
@@ -531,7 +531,7 @@ ok($@, qr/^Triceps::TableType::addSubIndex: table is already initialized, can no
 	$tt2 = $ttProto->copy();
 	ok(ref $tt2, "Triceps::TableType");
 	eval { $tt2->findOrAddIndex("a", "zzz"); };
-	ok($@, qr/^Triceps::TableType::findOrAddIndex: can not use a non-existing field 'zzz' to create an index\n  table row type:\n  row {\n    uint8 a,\n    int32 b,\n    int64 c,\n    float64 d,\n    string e,\n  }\n  at/);
+	ok($@, qr/^Triceps::TableType::findOrAddIndex: can not use a non-existing field 'zzz' to create an index\n  table row type:\n  row \{\n    uint8 a,\n    int32 b,\n    int64 c,\n    float64 d,\n    string e,\n  \}\n  at/);
 
 	# an empty field list
 	eval { $tt2->findOrAddIndex(); };

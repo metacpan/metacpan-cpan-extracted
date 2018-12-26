@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -558,7 +558,7 @@ void App::markTrieadReadyL(TrieadUpd *upd, Triead *t)
 			err.fAppend(upd->interruptL(), 
 				"Failed to interrupt the thread '%s' of application '%s':",
 				t->getName().c_str(), name_.c_str());
-			if (err->hasError())
+			if (err.hasError())
 				throw Exception(err, false);
 		}
 
@@ -657,7 +657,7 @@ bool App::harvestOnce()
 				disposeL(upd->t_->getName());
 		}
 		
-		if (err->hasError())
+		if (err.hasError())
 			// j still keeps a reference, so it's OK to refer by it
 			throw Exception::f(err, "Failed to join the thread '%s' of application '%s':",
 						j->getName().c_str(), name_.c_str());
@@ -694,7 +694,7 @@ void App::harvester(bool throwAbort)
 		err.f("App '%s' has been aborted by thread '%s': %s",
 			appName.c_str(), abThread.c_str(), abMsg.c_str());
 
-	if (err->hasError())
+	if (err.hasError())
 		throw Exception(err, false);
 }
 
@@ -953,10 +953,18 @@ void App::checkGraphL(Graph &g, const char *direction) const
 
 			// print it from this point
 			Erref eloop = new Errors;
-			eloop->appendMsg(true, node->print());
-			for (NxTr *cur = node->links_.front(); cur != node; cur = cur->links_.front())
+			// For consistency, find the Triead with the lowest name as the starting point.
+			NxTr *first = node;
+			for (NxTr *cur = node->links_.front(); cur != node; cur = cur->links_.front()) {
+				if (!first->tr_
+				|| (cur->tr_ && cur->tr_->getName() < first->tr_->getName())) {
+					first = cur;
+				}
+			}
+			eloop->appendMsg(true, first->print());
+			for (NxTr *cur = first->links_.front(); cur != first; cur = cur->links_.front())
 				eloop->appendMsg(true, cur->print());
-			eloop->appendMsg(true, node->print()); // repeat the initial node to emphasise the loop
+			eloop->appendMsg(true, first->print()); // repeat the initial node to emphasise the loop
 			throw Exception::fTrace(eloop, "In application '%s' detected an illegal %s loop:",
 				name_.c_str(), direction);
 		}

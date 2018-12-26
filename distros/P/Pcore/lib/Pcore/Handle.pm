@@ -563,11 +563,11 @@ sub set_protocol_error ( $self, $reason = undef ) {
 sub read_http_req_headers ( $self, %args ) {
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
-    my $buf_ref = $self->read_line( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+    my $buf_ref = $self->read_line( "\r\n" x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
     my $env = {};
 
-    my $res = HTTP::Parser::XS::parse_http_request( $buf_ref->$* . $CRLF . $CRLF, $env );
+    my $res = HTTP::Parser::XS::parse_http_request( $buf_ref->$* . "\r\n\r\n", $env );
 
     # headers are corrupted
     if ( $res == -1 ) {
@@ -592,9 +592,9 @@ sub read_http_req_headers ( $self, %args ) {
 sub read_http_res_headers ( $self, %args ) {
     $args{timeout} = $self->{timeout} if !exists $args{timeout};
 
-    my $buf_ref = $self->read_line( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+    my $buf_ref = $self->read_line( "\r\n" x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
-    $buf_ref->$* .= $CRLF x 2;
+    $buf_ref->$* .= "\r\n" x 2;
 
     my $res = $self->_parse_http_headers( $buf_ref->$* );
 
@@ -683,7 +683,7 @@ sub read_http_chunked_data ( $self, %args ) {
     my $total_bytes_read = 0;
 
     while () {
-        my $length = $self->read_line( $CRLF, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+        my $length = $self->read_line( "\r\n", read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
         # invalid chunk length
         if ( $length->$* =~ /([^[:xdigit:]])/sm ) {
@@ -708,17 +708,17 @@ sub read_http_chunked_data ( $self, %args ) {
             # 0\r\nheader1\r\nheader2\r\n\r\n
 
             # no trailing headers
-            if ( index( $self->{rbuf}, $CRLF, 0 ) == 0 ) {
+            if ( index( $self->{rbuf}, "\r\n", 0 ) == 0 ) {
                 substr $self->{rbuf}, 0, 2, $EMPTY;
 
                 return $args{on_read} ? $total_bytes_read : \$buf;
             }
 
-            my $headers_buf_ref = $self->read_line( $CRLF x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
+            my $headers_buf_ref = $self->read_line( "\r\n" x 2, read_size => $args{read_size}, timeout => $args{timeout} ) // return;
 
             # parse and update trailing headers
             if ( $args{headers} ) {
-                my $headers = $self->_parse_http_headers( 'HTTP/1.1 200 OK' . $CRLF . $headers_buf_ref->$* . $CRLF . $CRLF );
+                my $headers = $self->_parse_http_headers( "HTTP/1.1 200 OK\r\n" . $headers_buf_ref->$* . "\r\n\r\n" );
 
                 # headers are incomplete
                 if ( $headers->{len} == -1 ) {

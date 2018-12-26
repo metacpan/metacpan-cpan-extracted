@@ -2512,6 +2512,15 @@ subtest 'calculate_debian_repository_metadata', sub {
     like( $url_in_response, qr|/api/deb/reindex/$repository\?async=1|, 'requsted URL looks sane' );
 };
 
+subtest 'calculate_cached_remote_debian_repository_coordinates', sub {
+    my $client = setup();
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->calculate_cached_remote_debian_repository_coordinates('foo');
+    is( $resp->code, 200, 'request succeeded' );
+};
+
 subtest 'calculate_opkg_repository_metadata', sub {
     my $client = setup();
     my %args   = (
@@ -2843,6 +2852,32 @@ subtest 'get_reverse_proxy_snippet', sub {
         return $mock_responses{http_200};
     };
     my $resp = $client->get_reverse_proxy_snippet();
+    is( $resp->code, 200, 'request succeeded' );
+};
+
+subtest 'start_sha256_migration_task', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my %data = (
+        "batchThreshold" => 10,
+    );
+    my $resp = $client->start_sha256_migration_task(%data);
+    is( $resp->code, 200, 'request succeeded' );
+};
+
+subtest 'stop_sha256_migration_task', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my %data = (
+        "sleepIntervalMillis" => 5000,
+    );
+    my $resp = $client->stop_sha256_migration_task(%data);
     is( $resp->code, 200, 'request succeeded' );
 };
 

@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2011-2014 Sergey A. Babkin.
+# (C) Copyright 2011-2018 Sergey A. Babkin.
 # This file is a part of Triceps.
 # See the file COPYRIGHT for the copyright notice and license information
 #
@@ -154,7 +154,7 @@ ok($@, qr/^Nested error:
   A manual error at .*
 	main::throwAnError\(\) called at .*
 	main::__ANON__ called at .*
-	Triceps::wrapfess\('Nested error:', 'CODE.*'\) called at .*
+	Triceps::wrapfess\(.*\) called at .*
 	eval \{\.\.\.\} called at .*
 $/);
 
@@ -170,7 +170,7 @@ ok($@, qr/^Nested error:
   A manual error at .*
 	main::throwAnError\(\) called at .*
 	main::__ANON__ called at .*
-	Triceps::wrapfess\('SCALAR.*', 'CODE.*'\) called at .*
+	Triceps::wrapfess\(.*\) called at .*
 	eval \{\.\.\.\} called at .*
 $/);
 
@@ -188,7 +188,7 @@ ok($@, qr/^Nested error:
   \} at .*
 	main::makeBadRowType\(\) called at .*
 	main::__ANON__ called at .*
-	Triceps::wrapfess\('CODE.*', 'CODE.*'\) called at .*
+	Triceps::wrapfess\(.*\) called at .*
 	eval \{\.\.\.\} called at .*
 $/);
 
@@ -207,7 +207,7 @@ ok($@, qr/^Nested error:
   \} at .*
 	main::makeBadRowType\(\) called at .*
 	main::__ANON__ called at .*
-	Triceps::wrapfess\('REF.*', 'CODE.*'\) called at .*
+	Triceps::wrapfess\(.*\) called at .*
 	eval \{\.\.\.\} called at .*
 $/);
 
@@ -227,20 +227,20 @@ eval {
 #print "$@";
 ok($@, qr/^Wrapped the error
   Exceeded the unit recursion depth limit 3 \(attempted 4\) on the label 'reclab'. at .*
-	main::__ANON__\('Triceps::Label=.*', 'Triceps::Rowop=.*'\) called at .*
+	main::__ANON__\(.*\) called at .*
 	eval \{\.\.\.\} called at .*
   Detected in the unit 'u1' label 'reclab' execution handler.
   Called through the label 'reclab'. at .*
-	main::__ANON__\('Triceps::Label=.*', 'Triceps::Rowop=.*'\) called at .*
+	main::__ANON__\(.*\) called at .*
 	eval \{\.\.\.\} called at .*
   Detected in the unit 'u1' label 'reclab' execution handler.
   Called through the label 'reclab'. at .*
-	main::__ANON__\('Triceps::Label=.*', 'Triceps::Rowop=.*'\) called at .*
+	main::__ANON__\(.*\) called at .*
 	eval \{\.\.\.\} called at .*
   Detected in the unit 'u1' label 'reclab' execution handler.
   Called through the label 'reclab'. at .*
 	main::__ANON__ called at .*
-	Triceps::wrapfess\('Wrapped the error', 'CODE.*'\) called at .*
+	Triceps::wrapfess\(.Wrapped the error.*\) called at .*
 	eval \{\.\.\.\} called at .*
 $/);
 

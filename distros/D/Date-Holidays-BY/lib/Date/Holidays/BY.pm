@@ -1,20 +1,15 @@
 package Date::Holidays::BY;
-
-$Date::Holidays::BY::VERSION = '0.2019.3';
-
-# ABSTRACT: Determine Belorussian official holidays and business days.
+our $VERSION = '0.2019.5'; # VERSION
 
 =encoding utf8
 
 =head1 NAME
 
-Date::Holidays::BY
+Date::Holidays::BY - Determine Belorussian official holidays and business days.
 
 =head1 SYNOPSIS
 
     use Date::Holidays::BY qw( is_holiday holidays is_business_day );
-
-    binmode STDOUT, ':encoding(UTF-8)';
 
     my ( $year, $month, $day ) = ( localtime )[ 5, 4, 3 ];
     $year  += 1900;
@@ -37,6 +32,10 @@ Date::Holidays::BY
         print "2015-04-30 is short business day\n";
     }
 
+    $Date::Holidays::BY::strict=1;
+    # here we die because time outside from $HOLIDAYS_VALID_SINCE to $INACCURATE_TIMES_SINCE
+    holidays( 9001 );
+
 =cut
 
 use warnings;
@@ -51,20 +50,33 @@ our @EXPORT_OK = qw(
     is_business_day
     is_short_business_day
 );
+use vars qw($strict $HOLIDAYS_VALID_SINCE $INACCURATE_TIMES_SINCE);
+
+=head2 $Date::Holidays::BY::HOLIDAYS_VALID_SINCE, $Date::Holidays::BY::INACCURATE_TIMES_SINCE
+
+HOLIDAYS_VALID_SINCE before this year package doesn't matter
+INACCURATE_TIMES_SINCE after this year dates of holidays and working day shift are not accurate, but you can most likely be sure of historical holidays
+
+=cut
+
+$HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
+$INACCURATE_TIMES_SINCE = 2020;
+
+
+=head2 $Date::Holidays::BY::strict
+
+Allows you to return an error if the requested date is outside the determined times.
+Default is 0.
+
+=cut
+
+$strict = 0;
 
 use Carp;
 use Time::Piece;
 use List::Util qw/ first /;
 
-
-my $HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
-my $BUSINESS_DAYS_VALID_SINCE = 2017;
-
-# sources:
-#   https://ru.wikipedia.org/wiki/Праздники_Белоруссии
-
 # internal date formatting alike ISO 8601: MMDD
-
 my @REGULAR_HOLIDAYS = (
     {
         name => 'Новый год',
@@ -128,7 +140,6 @@ Determine whether this date is a BY holiday. Returns holiday name or undef.
 
 sub is_holiday {
     my ( $year, $month, $day ) = @_;
-
     croak 'Bad params'  unless $year && $month && $day;
 
     return holidays( $year )->{ _get_date_key($month, $day) };
@@ -168,6 +179,9 @@ sub holidays {
 sub _get_regular_holidays_by_year {
     my ($year) = @_;
     croak "BY holidays is not valid before $HOLIDAYS_VALID_SINCE"  if $year < $HOLIDAYS_VALID_SINCE;
+    if ($strict) {
+		croak "BY holidays is not valid after @{[ $INACCURATE_TIMES_SINCE - 1 ]}"  if $year >= $INACCURATE_TIMES_SINCE;
+    }
 
     my %day;
     for my $holiday (@REGULAR_HOLIDAYS) {
@@ -245,10 +259,29 @@ sub _get_date_key {
     return sprintf '%02d%02d', $month, $day;
 }
 
+=head1 LICENSE
+
+This software is copyright (c) 2019 by Vladimir Varlamov.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+Terms of the Perl programming language system itself
+
+a) the GNU General Public License as published by the Free
+   Software Foundation; either version 1, or (at your option) any
+   later version, or
+b) the "Artistic License"
+
+=cut
+
+
 =head1 AUTHOR
 
 Vladimir Varlamov, C<< <bes.internal@gmail.com> >>
 
 =cut
+
+
 
 1;

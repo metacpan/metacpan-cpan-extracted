@@ -2,7 +2,7 @@ package Pcore::Core::Dump::Dumper;
 
 use Pcore -class, -ansi;
 use Pcore::Util::Scalar qw[refaddr isweak reftype blessed looks_like_number tainted];
-use Pcore::Util::Text qw[escape_scalar remove_ansi add_num_sep];
+use Pcore::Util::Text qw[escape_perl remove_ansi add_num_sep];
 use re qw[];
 use Sort::Naturally qw[nsort];
 use PerlIO::Layers qw[];
@@ -30,7 +30,7 @@ our $COLOR = {
     refs    => $BOLD . $WHITE,
     unknown => $BLACK . $ON_YELLOW,                  # potential new Perl datatypes
     undef   => $BOLD . $RED,                         # the 'undef' value
-    escaped => $BOLD . $RED,                         # escaped characters (\t, \n, etc)
+    ctrl    => $BOLD . $RED,                         # escaped control characters (\t, \n, etc)
     seen    => $WHITE . $ON_RED,                     # references to seen values
 };
 
@@ -308,7 +308,8 @@ sub SCALAR {
         my $item         = $_[0];                  # scalar become untied
         my $bytes_length = bytes::length($item);
         my $length       = length $item;
-        escape_scalar( $item, esc_color => $COLOR->{escaped}, reset_color => $COLOR->{string} );
+
+        escape_perl( $item, readable => 1, quote => 1, color => 1, color_ctrl => $COLOR->{ctrl}, color_reset => $COLOR->{string} );
 
         if ( utf8::is_utf8 $item ) {               # characters
             push $tags->@*, 'UTF8';
@@ -335,7 +336,7 @@ sub SCALAR {
 
         push $tags->@*, 'tied to ' . ref tied $_[0] if tainted $_[0];
 
-        $res = 'qq[' . $COLOR->{string} . $item . $RESET . ']';
+        $res = $COLOR->{string} . $item . $RESET;
     }
 
     $self->_tied_to( tied $_[0], $tags );
@@ -357,7 +358,7 @@ sub ARRAY {
         $res = $COLOR->{refs} . '[]' . $RESET;
     }
     else {
-        $res = $COLOR->{refs} . '[' . $RESET . $LF;
+        $res = "$COLOR->{refs}\[$RESET\n";
 
         my $max_index_length = length( $#{$array_ref} ) + 2;
 
@@ -400,7 +401,7 @@ sub HASH {
         $res = $COLOR->{refs} . '{}' . $RESET;
     }
     else {
-        $res = $COLOR->{refs} . '{' . $RESET . $LF;
+        $res = "$COLOR->{refs}\{$RESET\n";
 
         my $keys;
         my $max_length = 0;
@@ -409,13 +410,8 @@ sub HASH {
         for ( nsort keys $hash_ref->%* ) {
             my $indexed_key = {
                 raw_key     => $_,
-                escaped_key => \escape_scalar( $_, esc_color => $COLOR->{escaped}, reset_color => $COLOR->{hash} ),
+                escaped_key => \escape_perl( $_, quote => 2, readable => 1, color => 1, color_ctrl => $COLOR->{ctrl}, color_reset => $COLOR->{hash} ),
             };
-
-            # hash key requires to be quoted
-            if ( $_ eq $EMPTY || /[^[:alnum:]_]/sm ) {
-                $indexed_key->{escaped_key} = \( 'q[' . $indexed_key->{escaped_key}->$* . ']' );
-            }
 
             $indexed_key->{escaped_key_nc} = $indexed_key->{escaped_key}->$*;
 

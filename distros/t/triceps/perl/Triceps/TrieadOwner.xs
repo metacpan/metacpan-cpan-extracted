@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -668,7 +668,7 @@ nextXtrayTimeLimit(WrapTrieadOwner *self, double limit)
 			timespec tm;
 			tm.tv_sec = (int64_t)limit;
 			tm.tv_nsec = (limit - (int64_t)limit)*1000000000;
-			RETVAL = self->get()->nextXtray(true, tm);
+			RETVAL = self->get()->nextXtray(true, &tm);
 		} while(0); } TRICEPS_CATCH_CROAK;
 	OUTPUT:
 		RETVAL

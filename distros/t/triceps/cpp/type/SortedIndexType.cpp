@@ -1,5 +1,5 @@
 //
-// (C) Copyright 2011-2014 Sergey A. Babkin.
+// (C) Copyright 2011-2018 Sergey A. Babkin.
 // This file is a part of Triceps.
 // See the file COPYRIGHT for the copyright notice and license information
 //
@@ -149,7 +149,7 @@ void SortedIndexType::initialize()
 	const RowType *rt = tabtype_->rowType();
 	sc_->setRowType(rt);
 	sc_->initialize(errors_, tabtype_, this);
-	if (!errors_->hasError()) {
+	if (!errors_.hasError()) {
 		rhOffset_ = tabtype_->rhType()->allocate(sc_->sizeOfRhSection());
 		sc_->setRhOffset(rhOffset_);
 	}
@@ -158,7 +158,7 @@ void SortedIndexType::initialize()
 Index *SortedIndexType::makeIndex(const TableType *tabtype, Table *table) const
 {
 	if (!isInitialized() 
-	|| errors_->hasError())
+	|| errors_.hasError())
 		return NULL; 
 
 	// give the index a custom copy of the comparator that can report

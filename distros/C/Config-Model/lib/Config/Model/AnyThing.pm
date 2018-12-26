@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::AnyThing;
-$Config::Model::AnyThing::VERSION = '2.131';
+$Config::Model::AnyThing::VERSION = '2.132';
 use Mouse;
 
 # FIXME: must cleanup warp mechanism to implement this
@@ -327,7 +327,7 @@ Config::Model::AnyThing - Base class for configuration tree item
 
 =head1 VERSION
 
-version 2.131
+version 2.132
 
 =head1 SYNOPSIS
 

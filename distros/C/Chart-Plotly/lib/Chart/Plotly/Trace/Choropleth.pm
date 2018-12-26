@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Choropleth::Stream;
 use Chart::Plotly::Trace::Choropleth::Transform;
 use Chart::Plotly::Trace::Choropleth::Unselected;
 
-our $VERSION = '0.020';    # VERSION
+our $VERSION = '0.021';    # VERSION
 
 # ABSTRACT: The data that describes the choropleth value-to-color mapping is set in `z`. The geographic locations corresponding to each value in `z` are set in `locations`.
 
@@ -47,9 +47,10 @@ sub type {
 }
 
 has autocolorscale => (
-            is            => "rw",
-            isa           => "Bool",
-            documentation => "Determines whether or not the colorscale is picked using the sign of the input z values.",
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether the colorscale is a default palette (`autocolorscale: true`) or the palette determined by `colorscale`. In case `colorscale` is unspecified or `autocolorscale` is true, the default  palette will be chosen according to whether numbers in the `color` array are all positive, all negative or mixed.",
 );
 
 has colorbar => ( is  => "rw",
@@ -58,7 +59,7 @@ has colorbar => ( is  => "rw",
 has colorscale => (
     is => "rw",
     documentation =>
-      "Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in z space, use zmin and zmax",
+      "Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in color space, use`zmin` and `zmax`. Alternatively, `colorscale` may be a palette name string of the following list: Greys,YlGnBu,Greens,YlOrRd,Bluered,RdBu,Reds,Blues,Picnic,Rainbow,Portland,Jet,Hot,Blackbody,Earth,Electric,Viridis,Cividis.",
 );
 
 has customdata => (
@@ -142,9 +143,11 @@ has opacity => ( is            => "rw",
                  documentation => "Sets the opacity of the trace.",
 );
 
-has reversescale => ( is            => "rw",
-                      isa           => "Bool",
-                      documentation => "Reverses the colorscale.",
+has reversescale => (
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.",
 );
 
 has selected => ( is  => "rw",
@@ -187,6 +190,13 @@ has transforms => ( is  => "rw",
 has uid => ( is  => "rw",
              isa => "Str", );
 
+has uirevision => (
+    is  => "rw",
+    isa => "Any",
+    documentation =>
+      "Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.",
+);
+
 has unselected => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Choropleth::Unselected", );
 
@@ -202,19 +212,24 @@ has z => ( is            => "rw",
 );
 
 has zauto => (
-          is            => "rw",
-          isa           => "Bool",
-          documentation => "Determines the whether or not the color domain is computed with respect to the input data.",
+    is  => "rw",
+    isa => "Bool",
+    documentation =>
+      "Determines whether or not the color domain is computed with respect to the input data (here in `z`) or the bounds set in `zmin` and `zmax`  Defaults to `false` when `zmin` and `zmax` are set by the user.",
 );
 
-has zmax => ( is            => "rw",
-              isa           => "Num",
-              documentation => "Sets the upper bound of color domain.",
+has zmax => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the upper bound of the color domain. Value should have the same units as in `z` and if set, `zmin` must be set as well.",
 );
 
-has zmin => ( is            => "rw",
-              isa           => "Num",
-              documentation => "Sets the lower bound of color domain.",
+has zmin => (
+    is  => "rw",
+    isa => "Num",
+    documentation =>
+      "Sets the lower bound of the color domain. Value should have the same units as in `z` and if set, `zmax` must be set as well.",
 );
 
 has zsrc => ( is            => "rw",
@@ -237,7 +252,7 @@ Chart::Plotly::Trace::Choropleth - The data that describes the choropleth value-
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -424,13 +439,13 @@ Trace type.
 
 =item * autocolorscale
 
-Determines whether or not the colorscale is picked using the sign of the input z values.
+Determines whether the colorscale is a default palette (`autocolorscale: true`) or the palette determined by `colorscale`. In case `colorscale` is unspecified or `autocolorscale` is true, the default  palette will be chosen according to whether numbers in the `color` array are all positive, all negative or mixed.
 
 =item * colorbar
 
 =item * colorscale
 
-Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in z space, use zmin and zmax
+Sets the colorscale. The colorscale must be an array containing arrays mapping a normalized value to an rgb, rgba, hex, hsl, hsv, or named color string. At minimum, a mapping for the lowest (0) and highest (1) values are required. For example, `[[0, 'rgb(0,0,255)', [1, 'rgb(255,0,0)']]`. To control the bounds of the colorscale in color space, use`zmin` and `zmax`. Alternatively, `colorscale` may be a palette name string of the following list: Greys,YlGnBu,Greens,YlOrRd,Bluered,RdBu,Reds,Blues,Picnic,Rainbow,Portland,Jet,Hot,Blackbody,Earth,Electric,Viridis,Cividis.
 
 =item * customdata
 
@@ -490,7 +505,7 @@ Sets the opacity of the trace.
 
 =item * reversescale
 
-Reverses the colorscale.
+Reverses the color mapping if true. If true, `zmin` will correspond to the last color in the array and `zmax` will correspond to the first color.
 
 =item * selected
 
@@ -520,6 +535,10 @@ Sets the source reference on plot.ly for  text .
 
 =item * uid
 
+=item * uirevision
+
+Controls persistence of some user-driven changes to the trace: `constraintrange` in `parcoords` traces, as well as some `editable: true` modifications such as `name` and `colorbar.title`. Defaults to `layout.uirevision`. Note that other user-driven trace attribute changes are controlled by `layout` attributes: `trace.visible` is controlled by `layout.legend.uirevision`, `selectedpoints` is controlled by `layout.selectionrevision`, and `colorbar.(x|y)` (accessible with `config: {editable: true}`) is controlled by `layout.editrevision`. Trace changes are tracked by `uid`, which only falls back on trace index if no `uid` is provided. So if your app can add/remove traces before the end of the `data` array, such that the same trace has a different index, you can still preserve user-driven changes if you give each trace a `uid` that stays with it as it moves.
+
 =item * unselected
 
 =item * visible
@@ -532,15 +551,15 @@ Sets the color values.
 
 =item * zauto
 
-Determines the whether or not the color domain is computed with respect to the input data.
+Determines whether or not the color domain is computed with respect to the input data (here in `z`) or the bounds set in `zmin` and `zmax`  Defaults to `false` when `zmin` and `zmax` are set by the user.
 
 =item * zmax
 
-Sets the upper bound of color domain.
+Sets the upper bound of the color domain. Value should have the same units as in `z` and if set, `zmin` must be set as well.
 
 =item * zmin
 
-Sets the lower bound of color domain.
+Sets the lower bound of the color domain. Value should have the same units as in `z` and if set, `zmax` must be set as well.
 
 =item * zsrc
 

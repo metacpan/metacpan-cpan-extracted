@@ -19,7 +19,7 @@ default:
 step1:
     street:
         type: optional
-        regex: ^[A-Z].+$
+        regex: ^[A-ZÄÜÖ].+$
     age:
         type: required
         min: 18
