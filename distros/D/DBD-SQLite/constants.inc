@@ -112,6 +112,250 @@ _const_compile_time_library_version_numbers()
     OUTPUT:
         RETVAL
 
+#if SQLITE_VERSION_NUMBER >= 3007000
+
+IV
+_const_database_connection_configuration_options_3007000()
+    ALIAS:
+        SQLITE_DBCONFIG_LOOKASIDE = SQLITE_DBCONFIG_LOOKASIDE
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3007000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_LOOKASIDE = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3007006
+
+IV
+_const_database_connection_configuration_options_3007006()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_FKEY = SQLITE_DBCONFIG_ENABLE_FKEY
+        SQLITE_DBCONFIG_ENABLE_TRIGGER = SQLITE_DBCONFIG_ENABLE_TRIGGER
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3007006_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_FKEY = 1
+        SQLITE_DBCONFIG_ENABLE_TRIGGER = 2
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3012002
+
+IV
+_const_database_connection_configuration_options_3012002()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER = SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3012002_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3013000
+
+IV
+_const_database_connection_configuration_options_3013000()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION = SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3013000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3015000
+
+IV
+_const_database_connection_configuration_options_3015000()
+    ALIAS:
+        SQLITE_DBCONFIG_MAINDBNAME = SQLITE_DBCONFIG_MAINDBNAME
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3015000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_MAINDBNAME = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3016000
+
+IV
+_const_database_connection_configuration_options_3016000()
+    ALIAS:
+        SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE = SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3016000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3020000
+
+IV
+_const_database_connection_configuration_options_3020000()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_QPSG = SQLITE_DBCONFIG_ENABLE_QPSG
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3020000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_ENABLE_QPSG = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3022000
+
+IV
+_const_database_connection_configuration_options_3022000()
+    ALIAS:
+        SQLITE_DBCONFIG_TRIGGER_EQP = SQLITE_DBCONFIG_TRIGGER_EQP
+        SQLITE_DBCONFIG_MAX = SQLITE_DBCONFIG_MAX
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3022000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_TRIGGER_EQP = 1
+        SQLITE_DBCONFIG_MAX = 2
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3024000
+
+IV
+_const_database_connection_configuration_options_3024000()
+    ALIAS:
+        SQLITE_DBCONFIG_RESET_DATABASE = SQLITE_DBCONFIG_RESET_DATABASE
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3024000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_RESET_DATABASE = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3026000
+
+IV
+_const_database_connection_configuration_options_3026000()
+    ALIAS:
+        SQLITE_DBCONFIG_DEFENSIVE = SQLITE_DBCONFIG_DEFENSIVE
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_database_connection_configuration_options_3026000_zero()
+    ALIAS:
+        SQLITE_DBCONFIG_DEFENSIVE = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 #if SQLITE_VERSION_NUMBER >= 3006002
 
 IV
@@ -646,6 +890,88 @@ _const_extended_result_codes_3021000_zero()
 
 #endif
 
+#if SQLITE_VERSION_NUMBER >= 3022000
+
+IV
+_const_extended_result_codes_3022000()
+    ALIAS:
+        SQLITE_ERROR_MISSING_COLLSEQ = SQLITE_ERROR_MISSING_COLLSEQ
+        SQLITE_ERROR_RETRY = SQLITE_ERROR_RETRY
+        SQLITE_READONLY_CANTINIT = SQLITE_READONLY_CANTINIT
+        SQLITE_READONLY_DIRECTORY = SQLITE_READONLY_DIRECTORY
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_extended_result_codes_3022000_zero()
+    ALIAS:
+        SQLITE_ERROR_MISSING_COLLSEQ = 1
+        SQLITE_ERROR_RETRY = 2
+        SQLITE_READONLY_CANTINIT = 3
+        SQLITE_READONLY_DIRECTORY = 4
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3024000
+
+IV
+_const_extended_result_codes_3024000()
+    ALIAS:
+        SQLITE_LOCKED_VTAB = SQLITE_LOCKED_VTAB
+        SQLITE_CORRUPT_SEQUENCE = SQLITE_CORRUPT_SEQUENCE
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_extended_result_codes_3024000_zero()
+    ALIAS:
+        SQLITE_LOCKED_VTAB = 1
+        SQLITE_CORRUPT_SEQUENCE = 2
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3025000
+
+IV
+_const_extended_result_codes_3025000()
+    ALIAS:
+        SQLITE_ERROR_SNAPSHOT = SQLITE_ERROR_SNAPSHOT
+        SQLITE_CANTOPEN_DIRTYWAL = SQLITE_CANTOPEN_DIRTYWAL
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_extended_result_codes_3025000_zero()
+    ALIAS:
+        SQLITE_ERROR_SNAPSHOT = 1
+        SQLITE_CANTOPEN_DIRTYWAL = 2
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
 IV
 _const_flags_for_file_open_operations()
     ALIAS:
@@ -848,6 +1174,72 @@ _const_result_codes_3007017_zero()
     ALIAS:
         SQLITE_NOTICE = 1
         SQLITE_WARNING = 2
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+IV
+_const_run_time_limit_categories()
+    ALIAS:
+        SQLITE_LIMIT_LENGTH = SQLITE_LIMIT_LENGTH
+        SQLITE_LIMIT_SQL_LENGTH = SQLITE_LIMIT_SQL_LENGTH
+        SQLITE_LIMIT_COLUMN = SQLITE_LIMIT_COLUMN
+        SQLITE_LIMIT_EXPR_DEPTH = SQLITE_LIMIT_EXPR_DEPTH
+        SQLITE_LIMIT_COMPOUND_SELECT = SQLITE_LIMIT_COMPOUND_SELECT
+        SQLITE_LIMIT_VDBE_OP = SQLITE_LIMIT_VDBE_OP
+        SQLITE_LIMIT_FUNCTION_ARG = SQLITE_LIMIT_FUNCTION_ARG
+        SQLITE_LIMIT_ATTACHED = SQLITE_LIMIT_ATTACHED
+        SQLITE_LIMIT_LIKE_PATTERN_LENGTH = SQLITE_LIMIT_LIKE_PATTERN_LENGTH
+        SQLITE_LIMIT_VARIABLE_NUMBER = SQLITE_LIMIT_VARIABLE_NUMBER
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#if SQLITE_VERSION_NUMBER >= 3006018
+
+IV
+_const_run_time_limit_categories_3006018()
+    ALIAS:
+        SQLITE_LIMIT_TRIGGER_DEPTH = SQLITE_LIMIT_TRIGGER_DEPTH
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_run_time_limit_categories_3006018_zero()
+    ALIAS:
+        SQLITE_LIMIT_TRIGGER_DEPTH = 1
+    CODE:
+        RETVAL = 0;
+    OUTPUT:
+        RETVAL
+
+#endif
+
+#if SQLITE_VERSION_NUMBER >= 3008007
+
+IV
+_const_run_time_limit_categories_3008007()
+    ALIAS:
+        SQLITE_LIMIT_WORKER_THREADS = SQLITE_LIMIT_WORKER_THREADS
+    CODE:
+        RETVAL = ix;
+    OUTPUT:
+        RETVAL
+
+#else
+
+IV
+_const_run_time_limit_categories_3008007_zero()
+    ALIAS:
+        SQLITE_LIMIT_WORKER_THREADS = 1
     CODE:
         RETVAL = 0;
     OUTPUT:

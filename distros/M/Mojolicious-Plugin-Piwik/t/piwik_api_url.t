@@ -3,23 +3,42 @@ use Test::Mojo;
 use Test::More;
 use Mojolicious::Lite;
 use Mojo::JSON;
+use Mojo::File qw/path/;
 use Mojo::UserAgent;
 use Data::Dumper;
 use utf8;
 
-use lib '../lib';
-
-our $ft = 'auth.pl';
-
+#####################
+# Start Fake server #
+#####################
 my $t = Test::Mojo->new;
+
+# Mount mock Piwik instance
+my $server_path = path(Mojo::File->new(__FILE__)->dirname, 'server');
+my $fake_backend = $t->app->plugin(
+  Mount => {
+    '/piwik-server' =>
+      $server_path->child('mock.pl')
+    }
+);
+
+# Configure fake backend
+$fake_backend->pattern->defaults->{app}->log($t->app->log);
 
 my $app = $t->app;
 
+my %param = (
+  token_auth => 'xyz',
+  site_id => 1
+);
+
 $app->mode('production');
 
-$app->plugin(Piwik => {
-  url => 'sojolicio.us/piwik'
+# Use server
+$app->plugin('Piwik' => {
+  url => '/piwik-server/'
 });
+
 
 # API test
 my $url = $app->piwik->api_url('API.get' => {
@@ -30,7 +49,7 @@ my $url = $app->piwik->api_url('API.get' => {
   secure => 1
 });
 
-like($url, qr{^https://sojolicio.us/piwik\?}, 'Piwik API URL 1');
+like($url, qr{^/piwik-server\/\?}, 'Piwik API URL 1');
 like($url, qr{module=API}, 'Piwik API URL 2');
 like($url, qr{method=API\.get}, 'Piwik API URL 3');
 like($url, qr{format=JSON}, 'Piwik API URL 4');
@@ -41,28 +60,6 @@ like($url, qr{token_auth=anonymous}, 'Piwik API URL 8');
 like($url, qr{urls%5B0%5D=http.+?grimms-abenteuer\.de}, 'Piwik API URL 9');
 like($url, qr{urls%5B1%5D=http.+?khm\.li}, 'Piwik API URL 10');
 like($url, qr{idSite=4.+?5}, 'Piwik API URL 11');
-
-# Life tests:
-# Testing the piwik api is hard to do ...
-my (%param, $f);
-if (
-  -f ($f = 't/' . $ft) ||
-    -f ($f = $ft) ||
-      -f ($f = '../t/' . $ft) ||
-	-f ($f = '../../t/' . $ft)
-      ) {
-  if (open (CFG, '<' . $f)) {
-    my $cfg = join('', <CFG>);
-    close(CFG);
-    %param = %{ eval $cfg };
-  };
-};
-
-unless ($param{url}) {
-  done_testing;
-  exit;
-};
-
 
 ok($url = $app->piwik->api_url(
   'ExampleAPI.getPiwikVersion' => {

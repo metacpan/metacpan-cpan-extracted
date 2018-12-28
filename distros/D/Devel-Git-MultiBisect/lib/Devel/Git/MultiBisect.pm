@@ -7,7 +7,6 @@ use Devel::Git::MultiBisect::Auxiliary qw(
     clean_outputfile
     hexdigest_one_file
     validate_list_sequence
-    get_current_branch
 );
 use Carp;
 use Cwd;
@@ -15,7 +14,7 @@ use File::Spec;
 use File::Temp;
 use List::Util qw(sum);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -508,7 +507,7 @@ sub _configure_build_one_commit {
     my ($self, $commit) = @_;
     chdir $self->{gitdir} or croak "Unable to change to $self->{gitdir}";
     system(qq|git clean --quiet -dfx|) and croak "Unable to 'git clean --quiet -dfx'";
-    my $starting_branch = get_current_branch();
+    my $starting_branch = $self->{branch};
 
     system(qq|git checkout --quiet $commit|) and croak "Unable to 'git checkout --quiet $commit'";
     say "Running '$self->{configure_command}'" if $self->{verbose};
@@ -603,7 +602,7 @@ or through the web interface at L<http://rt.cpan.org>.
 James E. Keenan (jkeenan at cpan dot org).  When sending correspondence, please
 include 'Devel::Git::MultiBisect' or 'Devel-Git-MultiBisect' in your subject line.
 
-Creation date:  November 20 2016. Last modification date:  November 20 2016.
+Creation date:  October 12 2016. Last modification date:  December 28 2018.
 
 Development repository: L<https://github.com/jkeenan/devel-git-multibisect>
 
@@ -629,7 +628,7 @@ For diagnosis of regex problems in http://perlmonks.org/?node_id=1175983.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016 James E. Keenan.  United States.  All rights reserved.
+Copyright (c) 2016-2018 James E. Keenan.  United States.  All rights reserved.
 This is free software and may be distributed under the same terms as Perl
 itself.
 

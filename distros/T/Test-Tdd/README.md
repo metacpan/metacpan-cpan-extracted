@@ -4,6 +4,8 @@ This is a tool that runs your Perl tests continuouslly when files change, helpin
 
 ## How to use
 
+Install it with `cpan install Test::Tdd` and then:
+
 ```bash
 provetdd t/path/to/Test.t
 ```

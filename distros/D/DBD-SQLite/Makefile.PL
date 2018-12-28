@@ -244,6 +244,11 @@ if ($ENV{SQLITE_ENABLE_FTS3_TOKENIZER}) {
 	push @CC_DEFINE, '-DSQLITE_ENABLE_FTS3_TOKENIZER'; # for sqlite >= 3.11.0
 }
 
+if ($ENV{SQLITE_MAX_LENGTH} && $ENV{SQLITE_MAX_LENGTH} =~ m/^[0-9]+$/) {
+	push @CC_DEFINE, join '=', '-DSQLITE_MAX_LENGTH', $ENV{SQLITE_MAX_LENGTH}
+		if $ENV{SQLITE_MAX_LENGTH} >= 100 && $ENV{SQLITE_MAX_LENGTH} <= ((2**31)-1);
+}
+
 if (DEVELOPER_ONLY) {
 	# for sqlite >= 3.8.8
 	push @CC_DEFINE, '-DSQLITE_ENABLE_API_ARMOR';
@@ -376,7 +381,7 @@ WriteMakefile(
 			},
 			resources => {
 				license     => 'http://dev.perl.org/licenses/',
-				bugtracker  => 'http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-SQLite',
+				bugtracker  => 'https://github.com/DBD-SQLite/DBD-SQLite/issues',
 				repository  => 'https://github.com/DBD-SQLite/DBD-SQLite',
 				MailingList => 'http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbd-sqlite',
 			},

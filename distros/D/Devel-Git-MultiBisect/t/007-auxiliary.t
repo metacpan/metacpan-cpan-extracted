@@ -8,11 +8,13 @@ use Devel::Git::MultiBisect::Auxiliary qw(
     hexdigest_one_file
     validate_list_sequence
 );
-use Test::More tests => 45;
+use Test::More tests => 55;
 use Cwd;
 use File::Copy;
 use File::Spec;
 use File::Temp qw(tempfile tempdir);
+use List::Util qw( sum );
+#use Data::Dump qw(pp);
 
 my $cwd = cwd();
 my $datadir = File::Spec->catfile($cwd, qw| t lib | );
@@ -247,6 +249,48 @@ my $datadir = File::Spec->catfile($cwd, qw| t lib | );
         "d7125615b2e5dbb4750ff107bbc1bad3",
     ];
 
+    $rv = validate_list_sequence($observed);
+    ok($rv, "validate_list_sequence() returned true value");
+    is(ref($rv), 'ARRAY', "validate_list_sequence() returned array ref");
+    is(scalar(@$rv), 1, "validate_list_sequence() returned array with 1 element");
+    ok($rv->[0], "validate_list_sequence() has true status");
+
+    #####
+
+    note("Another problematic list");
+    my @values = (
+        "09431b9e74d329ef9ae0940eb0d279fb",
+        "01ec704681e4680f683eaaaa6f83f79c",
+        "b29d11b703576a350d91e1506674fd80",
+        "481032a28823c8409a610e058b34a047",
+    );
+    my @counts = ( 55, 4, 6, 155 );
+    $observed = [
+        (("$values[0]") x $counts[0]),
+        (("$values[1]") x $counts[1]),
+        (("$values[2]") x $counts[2]),
+        (("$values[0]") x $counts[3]),
+    ];
+    $rv = validate_list_sequence($observed);
+    my $expfail = sum(@counts[0..2]);
+    ok($rv, "validate_list_sequence() returned true value");
+    is(ref($rv), 'ARRAY', "validate_list_sequence() returned array ref");
+    is(scalar(@$rv), 3, "validate_list_sequence() returned array with 3 elements");
+    is($rv->[0], 0, "list not validated");
+    is($rv->[1], $expfail, "Failure to validate at index $expfail");
+    is($rv->[2], "$values[0] previously observed", "element $values[0] previously observed");
+
+    #####
+
+    note("List with only one non-undef value seen");
+    @counts = ( 1, 109, 1, 108, 1 );
+    $observed = [
+        (("$values[0]") x $counts[0]),
+        ((undef) x $counts[1]),
+        (("$values[0]") x $counts[2]),
+        ((undef) x $counts[3]),
+        (("$values[0]") x $counts[4]),
+    ];
     $rv = validate_list_sequence($observed);
     ok($rv, "validate_list_sequence() returned true value");
     is(ref($rv), 'ARRAY', "validate_list_sequence() returned array ref");

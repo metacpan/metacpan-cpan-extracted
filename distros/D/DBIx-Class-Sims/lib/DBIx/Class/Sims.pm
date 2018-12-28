@@ -5,7 +5,7 @@ use 5.010_001;
 
 use strictures 2;
 
-our $VERSION = '0.303000';
+our $VERSION = '0.310000';
 
 {
   # Do **NOT** import a clone() function into the DBIx::Class::Schema namespace
@@ -189,6 +189,7 @@ sub load_sims {
       # Set this to false to throw a warning if a non-null auto-increment column
       # has a value set. It defaults to false. Set to true to disable.
       allow_pk_set_value => $opts->{allow_pk_set_value} // 0,
+      strict_mode => $opts->{strict_mode} // 1,
     );
 
     $rows = eval {
@@ -720,6 +721,12 @@ This defaults to 1.
 =head2 seed
 
 If set, this will be the srand() seed used for this invocation.
+
+=head2 strict_mode
+
+If set to 0, this will ignore table names that don't exist in the schema.
+
+This defaults to 1.
 
 =head2 toposort
 

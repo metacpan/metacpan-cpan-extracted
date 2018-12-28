@@ -27,8 +27,8 @@ requires:
   Tie::Hash: '0'
 resources:
   MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbd-sqlite
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-SQLite
+  bugtracker: https://github.com/DBD-SQLite/DBD-SQLite/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DBD-SQLite/DBD-SQLite
-version: '1.60'
+version: '1.62'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,31 @@
+---
+abstract: 'test files if they match format'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  File::Temp: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Format
+requires:
+  Exporter: '0'
+  JSON::PP: '0'
+  Test::More: '0'
+  open: '0'
+  perl: v5.8.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bessarabov/Test-Format/issues
+  homepage: https://github.com/bessarabov/Test-Format
+  repository: https://github.com/bessarabov/Test-Format.git
+version: 1.0.0
+x_generated_by_perl: v5.18.2
+x_serialization_backend: 'YAML::Tiny version 1.73'

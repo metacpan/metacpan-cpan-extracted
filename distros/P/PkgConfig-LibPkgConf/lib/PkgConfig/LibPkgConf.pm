@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Exporter );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our @EXPORT = qw(
   pkgconf_cflags
   pkgconf_libs

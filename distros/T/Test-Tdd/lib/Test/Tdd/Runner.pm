@@ -6,6 +6,7 @@ use Filesys::Notify::Simple;
 use Test::More;
 use Cwd 'cwd';
 use File::Find qw(finddepth);
+use Class::MOP;
 
 # Ignore warnings for subroutines redefined, source: https://www.perlmonks.org/bare/?node_id=539512
 $SIG{__WARN__} = sub{
@@ -39,13 +40,19 @@ sub clear_cache {
 		my $is_test = $file =~ m/\.t$/;
 		next if $is_test;
 
+		my $module_key;
 		unless (scalar @broken_files) {
-			my $module_key = (grep {$INC{$_} eq $file} (keys %INC))[0];
+			$module_key = (grep {$INC{$_} eq $file} (keys %INC))[0];
 			next unless $module_key;
 
 			delete $INC{$module_key};
+
+			my $class = $module_key;
+			$class =~ s/\//::/g;
+			$class =~ s/\.pm//g;
+			Class::MOP::remove_metaclass_by_name($class);
 		}
-		require $file;
+		require ($module_key || $file);
 	}
 }
 

@@ -13,28 +13,51 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 
-has output_path         => ( is => 'ro', required => 1, default => sub { '.' } );
-has file                => ( is => 'ro', required => 1 );
-has uppercase           => ( is => 'ro' );
-has inherit_from_core   => ( is => 'ro' );
-has namespace           => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
-has result_namespace    => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
-has resultset_namespace => ( is => 'ro', isa => sub { $_[0] =~ m{ \A [A-Z]\w*(::\w+)* \z }xms }, required => 1, default => sub { '' } );
-has schema_name         => ( is => 'rwp', isa => sub { $_[0] =~ m{ \A [A-Za-z0-9_]+ \z }xms } );
-has parser              => ( is => 'rwp' );
-has version_add         => ( is => 'ro', required => 1, default => sub { 0.01 } );
-has column_details      => ( is => 'ro', required => 1, default => sub { 0 } );
-has use_fake_dbic       => ( is => 'ro', required => 1, default => sub { 0 } );
-has skip_indexes        => ( is => 'ro', required => 1, default => sub { 0 } );
-has belongs_to_prefix   => ( is => 'ro', required => 1, default => sub { '' } );
-has has_many_prefix     => ( is => 'ro', required => 1, default => sub { '' } );
-has has_one_prefix      => ( is => 'ro', required => 1, default => sub { '' } );
-has many_to_many_prefix => ( is => 'ro', required => 1, default => sub { '' } );
+has output_path              => ( is => 'ro', required => 1, default => sub { '.' } );
+has file                     => ( is => 'ro', required => 1 );
+has uppercase                => ( is => 'ro' );
+has inherit_from_core        => ( is => 'ro' );
+has namespace                => ( is => 'ro', isa => \&_check_namespace, required => 1, default => sub { '' } );
+has result_namespace         => ( is => 'ro', isa => \&_check_namespace, required => 1, default => sub { '' } );
+has resultset_namespace      => ( is => 'ro', isa => \&_check_namespace, required => 1, default => sub { '' } );
+has load_result_namespace    => ( is => 'ro', isa => \&_check_namespace_array, default => sub { '' } );
+has load_resultset_namespace => ( is => 'ro', isa => \&_check_namespace_array, default => sub { '' } );
+has schema_name              => ( is => 'rwp', isa => sub { $_[0] =~ m{ \A [A-Za-z0-9_]+ \z }xms } );
+has parser                   => ( is => 'rwp' );
+has version_add              => ( is => 'ro', required => 1, default => sub { 0.01 } );
+has column_details           => ( is => 'ro', required => 1, default => sub { 0 } );
+has use_fake_dbic            => ( is => 'ro', required => 1, default => sub { 0 } );
+has skip_indexes             => ( is => 'ro', required => 1, default => sub { 0 } );
+has belongs_to_prefix        => ( is => 'ro', required => 1, default => sub { '' } );
+has has_many_prefix          => ( is => 'ro', required => 1, default => sub { '' } );
+has has_one_prefix           => ( is => 'ro', required => 1, default => sub { '' } );
+has many_to_many_prefix      => ( is => 'ro', required => 1, default => sub { '' } );
+has utf8                     => ( is => 'ro', required => 1, default => sub { 0 } );
 
 has version => ( is => 'rwp' );
 has classes => ( is => 'rwp', isa => sub { ref $_[0] && ref $_[0] eq 'ARRAY' }, default => sub { [] } );
+
+sub _check_namespace {
+    my ($namespace) = @_;
+
+    return $namespace =~ m{ \A [A-Z]\w*(::\w+)* \z }xms;
+}
+
+sub _check_namespace_array {
+    my ($namespaces) = @_;
+
+    if ( !ref $namespaces ) {
+        return _check_namespace( $namespaces );
+    }
+
+    for my $namespace ( @{ $namespaces || [] } ) {
+        return if !_check_namespace( $namespace );
+    }
+
+    return 1;
+}
 
 around new => sub {
     my ($next, $class, %args) = @_;
@@ -77,7 +100,7 @@ sub create_schema{
 
     my @files;
     for my $table ( @tables ){
-        my $custom_code = $self->_custom_code( $table );
+        my $custom_code = $self->_custom_code_table( $table );
         push @files, $self->_class_template( $table, $relations{$table->name}, $custom_code );
     }
 
@@ -86,7 +109,7 @@ sub create_schema{
     $self->_write_files( @files );
 }
 
-sub _custom_code {
+sub _custom_code_table {
     my ($self, $table) = @_;
 
     my $name = $table->name;
@@ -107,6 +130,12 @@ sub _custom_code {
     );
 
     return '' if !-f $path;
+
+    return $self->_custom_code( $path );
+}
+
+sub _custom_code {
+    my ($self, $path) = @_;
 
     my $content = do { local (@ARGV, $/) = $path; <> };
 
@@ -136,6 +165,10 @@ sub _write_files{
         }
 
         if( open my $fh, '>', $dir . '/' . $file . '.pm' ){
+            if ( $self->utf8 ) {
+                binmode $fh, ':encoding(utf-8)';
+            }
+
             print $fh $files{$package};
             close $fh;
         }
@@ -262,11 +295,12 @@ sub _class_template{
     my ($has_many, $belongs_to) = ('','');
 
     my $comment = $table->comment // '{}';
+    utf8::upgrade( $comment );
 
     my $data;
     my $table_comment_perl = '';
     eval {
-        $data = JSON->new->utf8(1)->decode( $comment );
+        $data = JSON->new->decode( $comment );
     };
 
     if ( !ref $data || 'HASH' ne ref $data ) {
@@ -278,7 +312,7 @@ sub _class_template{
     }
 
     if ( $table_comment_perl ) {
-        $table_comment_perl = sprintf "\n\n=head1 DESCRIPTION\n\n%s", $table_comment_perl;
+        $table_comment_perl = sprintf "\n\n=head1 DESCRIPTION\n\n%s\n\n=cut", $table_comment_perl;
     }
 
     my @core_components = $self->inherit_from_core ? () : qw(PK::Auto Core);
@@ -342,10 +376,16 @@ sub _class_template{
                 local $Data::Dumper::Indent   = 1;
                 local $Data::Dumper::Pad      = '      ';
 
+                utf8::upgrade( $col_comment );
+
                 my $comment_data;
                 eval {
-                    $comment_data = JSON->new->utf8(1)->decode( $col_comment );
+                    $comment_data = JSON->new->decode( $col_comment );
                     1;
+                } or do {
+                    if ( $col_comment =~ /\{/ ) {
+                    print STDERR $col_comment, ": ", $@;
+                    }
                 };
 
                 if ( !$comment_data || 'HASH' ne ref $comment_data ) {
@@ -394,13 +434,14 @@ sub _class_template{
     my $primary_key   = join " ", @{ $table->primary_key };
     my $version       = $self->version;
     my $inherit_from  = $self->inherit_from_core ? '::Core' : '';
+    my $use_utf8      = $self->utf8 ? "\nuse utf8;" : '';
 
     my $template = qq~package $package;
 
 # ABSTRACT: Result class for $name$table_comment_perl
 
 use strict;
-use warnings;
+use warnings;$use_utf8
 use base qw(DBIx::Class$inherit_from);
 
 our \$VERSION = $version;
@@ -522,12 +563,38 @@ sub _main_template{
         1;
     } or warn $@;
 
+    my $custom_code;
+    if ( $version ) {
+        (my $path       = $namespace) =~ s{::}{/}g;
+        my $schema_file = $self->output_path . '/' . $path . '.pm';
+        $custom_code    = $self->_custom_code( $schema_file );
+    }
+
+    $custom_code //= '';
+
     my %all_namespaces_to_load;
     if ( $self->resultset_namespace ) {
-        $all_namespaces_to_load{resultset_namespace} = $self->resultset_namespace;
+        push @{ $all_namespaces_to_load{resultset_namespace} }, sprintf "'%s'", $self->resultset_namespace;
     }
+
+    if ( $self->load_resultset_namespace ) {
+        push @{ $all_namespaces_to_load{resultset_namespace} }, map { "'$_'" }
+            ref $self->load_resultset_namespace ?
+                @{ $self->load_resultset_namespace } :
+                $self->load_resultset_namespace;
+    }
+
+    if ( $self->load_result_namespace ) {
+        push @{ $all_namespaces_to_load{result_namespace} }, map { "'$_'" }
+            ref $self->load_result_namespace ?
+                @{ $self->load_result_namespace } :
+                $self->load_result_namespace;
+    }
+
     if ( $self->result_namespace ) {
-        $all_namespaces_to_load{result_namespace} = $self->result_namespace;
+        my $namespace = sprintf "'%s::Result'", $self->result_namespace;
+        my $found     = grep { $namespace eq $_ }@{ $all_namespaces_to_load{result_namespace} };
+        unshift @{ $all_namespaces_to_load{result_namespace} }, $namespace if !$found;
     }
 
     if ( $version ) {
@@ -538,27 +605,38 @@ sub _main_template{
 
     $self->_set_version( $version );
 
-    my $namespaces_to_load = '';
-    if ( %all_namespaces_to_load ) {
-        $namespaces_to_load = "(" .
-            ( join '', map{
-                "\n    " . $_ . " => '" . $all_namespaces_to_load{$_} . "',"
-            }sort keys %all_namespaces_to_load ) .
-            "\n)";
+    my @namespace_types;
+    for my $namespace_type ( sort keys %all_namespaces_to_load ) {
+        my @namespaces = @{ $all_namespaces_to_load{$namespace_type} };
+
+        push @namespace_types, sprintf "\n    %s => %s,",
+            $namespace_type,
+            ( @namespaces == 1 ? $namespaces[0] : '[' . (join ', ', @namespaces ) . ']' );
     }
+
+    my $namespaces_to_load = '';
+    $namespaces_to_load    = "(" . (join '', @namespace_types) . "\n)" if @namespace_types;
+
+    my $use_utf8 = $self->utf8 ? "\nuse utf8;" : '';
 
     my $template = qq~package $namespace;
 
 # ABSTRACT: Schema class
 
 use strict;
-use warnings;
+use warnings;$use_utf8
 
 use base qw/DBIx::Class::Schema/;
 
 our \$VERSION = $version;
 
 __PACKAGE__->load_namespaces$namespaces_to_load;
+
+# ---
+# Put your own code below this comment
+# ---
+$custom_code
+# ---
 
 1;~;
 
@@ -580,7 +658,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.11
+version 1.13
 
 =head1 SYNOPSIS
 
@@ -705,6 +783,41 @@ have a table named 'MyTable', the class for 'MyTable' is named 'Test::DBIC_Schem
 sets / gets the name of an optional resultset namespace. If you set the resultset_namespace to 'Core' and you
 have a table named 'MyTable', the resultset class for 'MyTable' is named 'Test::DBIC_Scheme::Core::ResultSet::MyTable'
 
+=head2 load_result_namespace
+
+Additional namespaces to be loaded from the main schema class:
+
+  my $foo = MySQL::Workbench::DBIC->new(
+    output_path       => '/path/to/dir',
+    input_file        => '/path/to/dbdesigner.file',
+    result_namespace  => 'Core',
+    load_result_namespace  => 'Virtual', # can be an arrayref, too
+  );
+
+The schema class loads all namespaces:
+
+  __PACKAGE__->load_namespaces(
+    result_namespace => ['Core', 'Virtual'],
+  );
+
+=head2 load_resultset_namespace
+
+Additional namespaces to be loaded from the main schema class:
+
+  my $foo = MySQL::Workbench::DBIC->new(
+    output_path       => '/path/to/dir',
+    input_file        => '/path/to/dbdesigner.file',
+    result_namespace  => 'Core',
+    load_resultset_namespace => [ 'Test', 'Virtual' ], # can be a string, too
+  );
+
+The schema class loads all namespaces:
+
+  __PACKAGE__->load_namespaces(
+    resultset_namespace => ['Test', 'Virtual'],
+    result_namespace    => 'Core';
+  );
+
 =head2 prefix
 
 In relationships the accessor for the objects of the "other" table shouldn't have the name of the column.
@@ -725,6 +838,11 @@ I<groups>, the package names would be I<*::User>, I<*::UserGroups> and I<*::Grou
 =head2 skip_indexes
 
 When C<skip_indexes> is true, the sub C<sqlt_deploy_hook> that adds the indexes to the table is not created
+
+=head2 utf8
+
+If you use non-ASCII characters in table or column comments, you should set the C<utf8> attribute to a true value.
+Then every generated class has a C<use utf8;> in it.
 
 =head2 belongs_to_prefix
 

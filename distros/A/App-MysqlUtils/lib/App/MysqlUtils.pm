@@ -2,8 +2,8 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2018-12-05'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2018-12-27'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -311,6 +311,92 @@ sub mysql_drop_tables {
             log_info("Dropping table %s ...", $name);
             $dbh->do("DROP TABLE $name");
             $res->add_result(200, "OK", {item_id=>$name});
+        }
+    }
+    $res->as_struct;
+}
+
+$SPEC{mysql_drop_dbs} = {
+    v => 1.1,
+    summary => 'Drop MySQL databases',
+    description => <<'_',
+
+For safety, the default is dry-run mode. To actually drop the databases, you
+must supply `--no-dry-run` or DRY_RUN=0.
+
+Examples:
+
+    # Drop dbs D1, D2, D3 (dry-run mode)
+    % mysql-drop-dbs D1 D2 D3
+
+    # Drop all dbs with names matching /^testdb/ (dry-run mode)
+    % mysql-drop-dbs --db-pattern ^testdb
+
+    # Actually drop all dbs with names matching /^testdb/, don't delete more than 5 dbs
+    % mysql-drop-dbs --db-pattern ^testdb --limit 5 --no-dry-run
+
+_
+    args => {
+        %args_common,
+        dbs => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'db',
+            schema => ['array*', of=>'str*'],
+            element_completion => \&_complete_database,
+            pos => 1,
+            greedy => 1,
+        },
+        db_pattern => {
+            schema => 're*',
+        },
+        limit => {
+            summary => "Don't delete more than this number of databases",
+            schema => 'posint*',
+        },
+    },
+    args_rels => {
+        req_one => [qw/dbs db_pattern/],
+    },
+    features => {
+        dry_run => {default=>1},
+    },
+};
+sub mysql_drop_dbs {
+    my %args = @_;
+
+    my $dbh = _connect(%args);
+
+    my $sth = $dbh->prepare("SHOW DATABASES");
+    $sth->execute;
+
+    my $res = envresmulti();
+    my $n = 0;
+  DB:
+    while (my ($db) = $sth->fetchrow_array) {
+        if ($args{dbs}) {
+            my $found;
+            for (@{ $args{dbs} }) {
+                if ($_ eq $db) {
+                    $found++; last;
+                }
+            }
+            next DB unless $found;
+        }
+        if ($args{db_pattern}) {
+            next DB unless $db =~ /$args{db_pattern}/;
+        }
+        $n++;
+        if (defined $args{limit} && $n > $args{limit}) {
+            last;
+        }
+
+        if ($args{-dry_run}) {
+            log_info("[DRY_RUN] Dropping database %s ...", $db);
+            $res->add_result(304, "OK (dry-run)", {item_id=>$db});
+        } else {
+            log_info("Dropping database %s ...", $db);
+            $dbh->do("DROP DATABASE `$db`");
+            $res->add_result(200, "OK", {item_id=>$db});
         }
     }
     $res->as_struct;
@@ -927,7 +1013,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.013 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2018-12-05.
+This document describes version 0.014 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2018-12-27.
 
 =head1 SYNOPSIS
 
@@ -1088,6 +1174,81 @@ Arguments ('*' denotes required arguments):
 =item * B<database>* => I<str>
 
 =item * B<host> => I<str> (default: "localhost")
+
+=item * B<password> => I<str>
+
+Will try to get default from C<~/.my.cnf>.
+
+=item * B<port> => I<int> (default: 3306)
+
+=item * B<username> => I<str>
+
+Will try to get default from C<~/.my.cnf>.
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 mysql_drop_dbs
+
+Usage:
+
+ mysql_drop_dbs(%args) -> [status, msg, payload, meta]
+
+Drop MySQL databases.
+
+For safety, the default is dry-run mode. To actually drop the databases, you
+must supply C<--no-dry-run> or DRY_RUN=0.
+
+Examples:
+
+ # Drop dbs D1, D2, D3 (dry-run mode)
+ % mysql-drop-dbs D1 D2 D3
+ 
+ # Drop all dbs with names matching /^testdb/ (dry-run mode)
+ % mysql-drop-dbs --db-pattern ^testdb
+ 
+ # Actually drop all dbs with names matching /^testdb/, don't delete more than 5 dbs
+ % mysql-drop-dbs --db-pattern ^testdb --limit 5 --no-dry-run
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<db_pattern> => I<re>
+
+=item * B<dbs> => I<array[str]>
+
+=item * B<host> => I<str> (default: "localhost")
+
+=item * B<limit> => I<posint>
+
+Don't delete more than this number of databases.
 
 =item * B<password> => I<str>
 

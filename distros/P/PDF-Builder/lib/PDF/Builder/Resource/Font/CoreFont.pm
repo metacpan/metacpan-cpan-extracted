@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use File::Basename;
 
@@ -53,6 +53,65 @@ See I<perl's Encode> for the supported values.
 I<-pdfname> ... changes the reference-name of the font from its default.
 The reference-name is normally generated automatically and can be
 retrieved via C<$pdfname=$font->name()>.
+
+=back
+
+=head2 Supported typefaces
+
+B<standard PDF types>
+
+=over
+
+=item helvetica helveticaoblique helveticabold helvetiaboldoblique
+
+May have Arial substituted on some systems (e.g., Windows)
+
+=item courier courieroblique courierbold courierboldoblique
+
+Fixed pitch, may have Courier New substituted on some systems (e.g., Windows)
+
+=item timesroman timesitalic timesbold timesbolditalic
+
+May have Times New Roman substituted on some systems (e.g., Windows)
+
+=item symbol zapfdingbats
+
+=back
+
+B<Primarily Windows typefaces>
+
+=over
+
+=item georgia georgiaitalic georgiabold georgiabolditalic
+
+=item verdana verdanaitalic verdanabold verdanabolditalic
+
+=item trebuchet trebuchetitalic trebuchetbold trebuchetbolditalic
+
+=item bankgothic bankgothicitalic bankgothicbold bankgothicitalic
+
+Free versions of Bank Gothic are often only medium weight.
+
+=item webdings wingdings
+
+=back
+
+Keep in mind that only font metrics (widths) are provided with PDF::Builder;
+the fonts themselves are provided by the reader's machine (often packaged
+with the operating system, or obtained separately by the user). To use a
+specific font may require you to obtain one or more files from some source.
+
+If a font (typeface and variant) is not available on a given reader's
+machine, a substitution I<may> be automatically made. For example, Helvetica is
+usually not shipped with Windows machines, and Arial might be substituted.
+For most characters, the glyph widths will be the same, but this can not be 
+guaranteed!
+
+PDF::Builder currently uses the [typeface].pm files to map glyph names to
+code points (single byte encodings only) and to look up the glyph widths for
+character positioning. There is no guarantee that a given font file includes
+all the desired glyphs, nor that the widths will be absolutely the same, even
+in different releases of the same font.
 
 =cut
 
@@ -163,6 +222,8 @@ sub new {
     return $self;
 }
 
+=over
+
 =item PDF::Builder::Resource::Font::CoreFont->loadallfonts()
 
 "Requires in" all fonts available as corefonts.
@@ -171,12 +232,14 @@ sub new {
 
 sub loadallfonts {
     foreach my $f (qw[
+	    bankgothic bankgothicbold bankgothicbolditalic bankgothicitalic
         courier courierbold courierboldoblique courieroblique
         georgia georgiabold georgiabolditalic georgiaitalic
         helveticaboldoblique helveticaoblique helveticabold helvetica
         symbol
         timesbolditalic timesitalic timesroman timesbold
         verdana verdanabold verdanabolditalic verdanaitalic
+        trebuchet trebuchetbold trebuchetbolditalic trebuchetitalic
         webdings
         wingdings
         zapfdingbats
@@ -186,15 +249,11 @@ sub loadallfonts {
     return;
 }
 
+# not yet supported
 #    andalemono
 #    arialrounded
-#    bankgothic
 #    impact
 #    ozhandicraft
-#    trebuchet
-#    trebuchetbold
-#    trebuchetbolditalic
-#    trebuchetitalic
 
 BEGIN
 {
@@ -219,26 +278,26 @@ BEGIN
     };
 
     $subs = {
-        #'bankgothicbold' => {
-        #    'apiname'       => 'Bg2',
-        #    '-alias'        => 'bankgothic',
-        #    'fontname'      => 'BankGothicMediumBT,Bold',
-        #    'flags'         => 32+262144,
-        #},
-        #'bankgothicbolditalic' => {
-        #    'apiname'       => 'Bg3',
-        #    '-alias'        => 'bankgothic',
-        #    'fontname'      => 'BankGothicMediumBT,BoldItalic',
-        #    'italicangle'   => -15,
-        #    'flags'         => 96+262144,
-        #},
-        #'bankgothicitalic' => {
-        #    'apiname'       => 'Bg4',
-        #    '-alias'        => 'bankgothic',
-        #    'fontname'      => 'BankGothicMediumBT,Italic',
-        #    'italicangle'   => -15,
-        #    'flags'         => 96,
-        #},
+         'bankgothicbold' => {
+             'apiname'       => 'Bg2',
+             '-alias'        => 'bankgothic',
+             'fontname'      => 'BankGothicMediumBT,Bold',
+             'flags'         => 32+262144,
+         },
+         'bankgothicbolditalic' => {
+             'apiname'       => 'Bg3',
+             '-alias'        => 'bankgothic',
+             'fontname'      => 'BankGothicMediumBT,BoldItalic',
+             'italicangle'   => -15,
+             'flags'         => 96+262144,
+         },
+         'bankgothicitalic' => {
+             'apiname'       => 'Bg4',
+             '-alias'        => 'bankgothic',
+             'fontname'      => 'BankGothicMediumBT,Italic',
+             'italicangle'   => -15,
+             'flags'         => 96,
+         },
         #  'impactitalic'      => {
         #            'apiname' => 'Imp2',
         #            '-alias'  => 'impact',
@@ -302,42 +361,6 @@ BEGIN
 1;
 
 __END__
-
-=back
-
-=head1 SUPPORTED FONTS
-
-=over
-
-=item PDF::Builder::CoreFont supports the following 'Adobe Core Fonts':
-
-  Courier
-  Courier-Bold
-  Courier-BoldOblique
-  Courier-Oblique
-  Helvetica
-  Helvetica-Bold
-  Helvetica-BoldOblique
-  Helvetica-Oblique
-  Symbol
-  Times-Bold
-  Times-BoldItalic
-  Times-Italic
-  Times-Roman
-  ZapfDingbats
-
-=item PDF::Builder::CoreFont supports the following 'Windows Fonts':
-
-  Georgia
-  Georgia,Bold
-  Georgia,BoldItalic
-  Georgia,Italic
-  Verdana
-  Verdana,Bold
-  Verdana,BoldItalic
-  Verdana,Italic
-  Webdings
-  Wingdings
 
 =back
 

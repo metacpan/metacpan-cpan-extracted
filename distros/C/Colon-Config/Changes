@@ -1,5 +1,11 @@
 Revision history for Overload-FileCheck
 
+0.004     2018-12-28 10:33:56-07:00 America/Denver
+
+- handle '\r\n' as line endings
+- add field option to read value from a custom field
+- read_as_hash is returning an empty HashRef instead of undef
+
 0.003     2018-12-14 17:49:18-06:00 America/Chicago
 
 - basic support for UTF-8

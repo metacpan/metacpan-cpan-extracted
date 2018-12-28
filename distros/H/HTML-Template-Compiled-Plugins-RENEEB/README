@@ -1,14 +1,57 @@
+NAME
 
+    HTML::Template::Compiled::Plugin::HTML2 - Do not escape all HTML
+    entities
 
-This archive contains the distribution HTML-Template-Compiled-Plugins-RENEEB,
-version 0.02:
+VERSION
 
-  Do not escape all HTML entities
+    version 0.03
 
-This software is Copyright (c) 2013 by Renee Baecker.
+SYNOPSIS
 
-This is free software, licensed under:
+        my $template = '<%= test ESCAPE=HTML_WITHOUT_NBSP %>';
+        my $text     = 'hello>';
+    
+        my $tmpl = HTML::Template::Compiled->new(
+            scalarref => \$template,
+            plugin    => [ 'HTML::Template::Compiled::Plugin::HTML2' ],
+        );
+    
+        $tmpl->param( test => $text );
+        my $output = $tmpl->output;
+    
+        is $output, 'hello&gt;', '> => &gt;';
+    
+        my $template = '<%= test ESCAPE=HTML_WITHOUT_NBSP %>';
+        my $text     = '&nbsp; hello<br />';
+    
+        my $tmpl = HTML::Template::Compiled->new(
+            scalarref => \$template,
+            plugin    => [ 'HTML::Template::Compiled::Plugin::HTML2' ],
+        );
+    
+        $tmpl->param( test => $text );
+        my $output = $tmpl->output;
+    
+        is $output, '&nbsp; hello<br />', 'test';
 
-  The Artistic License 2.0 (GPL Compatible)
+DESCRIPTION
 
+METHODS
+
+ register
+
+ escape_html
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2013 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
 

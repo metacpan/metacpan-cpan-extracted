@@ -649,9 +649,11 @@ sub run {
 
   return $self->schema->txn_do(sub {
     $self->{rows} = {};
+    my %still_to_use = map { $_ => 1 } keys %{$self->{spec}};
     while (1) {
       foreach my $name ( @{$self->{toposort}} ) {
         next unless $self->{spec}{$name};
+        delete $still_to_use{$name};
 
         while ( my $item = shift @{$self->{spec}{$name}} ) {
           if ($self->{allow_pk_set_value}) {
@@ -669,6 +671,14 @@ sub run {
 
       last unless $self->has_pending();
       $self->clear_pending();
+    }
+
+    # Things were passed in, but don't exist in the schema.
+    if ($self->{strict_mode} && %still_to_use) {
+      my $msg = "The following names are in the spec, but not the schema:\n";
+      $msg .= join ',', sort keys %still_to_use;
+      $msg .= "\n";
+      die $msg;
     }
 
     return $self->{rows};

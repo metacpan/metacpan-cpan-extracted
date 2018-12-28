@@ -1,3 +1,8 @@
+0.014   2018-12-27 (PERLANCAR)
+
+	- Add utility: mysql-drop-dbs.
+
+
 0.013   2018-12-05 (PERLANCAR)
 
 	- Add utilities: mysql-find-identical-rows, mysql-copy-rows-adjust-pk.

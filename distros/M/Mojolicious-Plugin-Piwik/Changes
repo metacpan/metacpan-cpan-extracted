@@ -1,3 +1,8 @@
+0.25 2018-12-28
+        - Added "piwik.api_p" method.
+        - Make it possible to override dnt.
+        - Added mock server.
+
 0.24 2018-11-13
         - Added stash value "piwik.embed".
 

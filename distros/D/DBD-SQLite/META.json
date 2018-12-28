@@ -45,7 +45,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-SQLite"
+         "web" : "https://github.com/DBD-SQLite/DBD-SQLite/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -55,6 +55,6 @@
       },
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbd-sqlite"
    },
-   "version" : "1.60",
+   "version" : "1.62",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

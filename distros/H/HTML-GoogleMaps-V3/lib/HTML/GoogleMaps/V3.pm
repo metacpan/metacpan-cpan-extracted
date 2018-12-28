@@ -10,7 +10,7 @@ HTML::GoogleMaps::V3 - a simple wrapper around the Google Maps API
 
 =head1 VERSION
 
-0.12
+0.14
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ use warnings;
 
 use Template;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub new {
     my ( $class,%opts ) = @_;
@@ -110,10 +110,12 @@ sub _text_to_point {
                 return 0;
             }
 
-            return [
-                $location->{geometry}{location}{lat},
-                $location->{geometry}{location}{lng},
-            ];
+            if(defined($location->{geometry}{location}{lat}) && defined($location->{geometry}{location}{lng})) {
+                return [
+                    $location->{geometry}{location}{lat},
+                    $location->{geometry}{location}{lng},
+                ];
+            }
         }
     }
 
@@ -407,7 +409,7 @@ This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. If you would like to contribute documentation,
 features, bug fixes, or anything else then please raise an issue / pull request:
 
-    https://github.com/Humanstate/business-fixflo
+    https://github.com/Humanstate/html-googlemaps-v3
 
 =cut
 

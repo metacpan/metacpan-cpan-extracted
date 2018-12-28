@@ -2,7 +2,10 @@
 abstract: 'HTML::Table plugin for Data::Tabulate'
 author:
   - 'Renee Baecker <module@renee-baecker.de>'
-build_requires: {}
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::CheckManifest: '1.22'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,17 +18,16 @@ name: Data-Tabulate-Plugin-HTMLTable
 provides:
   Data::Tabulate::Plugin::HTMLTable:
     file: lib/Data/Tabulate/Plugin/HTMLTable.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Data::Tabulate: '0.06'
   HTML::Table: '2.08'
-  Test::CheckManifest: '1.22'
-  Test::More: '0'
+  perl: '5.008'
 resources:
   bugtracker: http://github.com/reneeb/Data-Tabulate-Plugin-HTMLTable/issues
   homepage: http://github.com/reneeb/Data-Tabulate-Plugin-HTMLTable
   repository: http://github.com/reneeb/Data-Tabulate-Plugin-HTMLTable.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'

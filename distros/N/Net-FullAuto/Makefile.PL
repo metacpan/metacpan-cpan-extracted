@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000459';
+our $VERSION='1.0000460';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1169,10 +1169,6 @@ END
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
    }
-   my $argvs=join " ", @ARGV;
-   select STDOUT;
-   $log->close() if $log && -1<index $log,'*';
-   exec "sudo $^X Makefile.PL $argvs";
 
 } elsif ((exists $amazon{'amazon_linux'}) || (exists $amazon{'centos'})) {
 
@@ -1208,10 +1204,6 @@ END
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
    }
-   my $argvs=join " ", @ARGV;
-   select STDOUT;
-   $log->close() if $log && -1<index $log,'*';
-   exec "sudo $^X Makefile.PL $argvs";
 
 } elsif (!can_cc() && (exists $amazon{'suse'})) {
 

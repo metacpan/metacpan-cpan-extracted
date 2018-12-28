@@ -10,7 +10,7 @@ HTML::Template::Compiled->register(__PACKAGE__);
 
 use HTML::Entities;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub register{
     my ($class) = @_;
@@ -47,13 +47,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::Template::Compiled::Plugin::HTML2 - Do not escape all HTML entities
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -84,6 +86,12 @@ version 0.02
     is $output, '&nbsp; hello<br />', 'test';
 
 =head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 register
+
+=head2 escape_html
 
 =head1 AUTHOR
 

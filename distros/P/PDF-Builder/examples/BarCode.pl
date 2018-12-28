@@ -9,8 +9,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -22,8 +22,8 @@ use List::Util qw(min max);
 
 use PDF::Builder;
 
-my $compress = 'flate';  # compressed streams
-#my $compress = 'none';  # no stream compression, for debugging
+#my $compress = 'flate';  # compressed streams
+my $compress = 'none';  # no stream compression, for debugging
 
 my $PDFname = $0;
    $PDFname =~ s/\..*$//;  # remove extension
@@ -48,6 +48,7 @@ nextPage();
 my $fontR = $pdf->corefont('Times-Roman');
 my $fontI = $pdf->corefont('Times-Italic');
 my $fontC = $pdf->corefont('Courier');
+my $fontH = $pdf->corefont('Helvetica');
 
 # page title
 $text->textlabel(40,765, $fontR,20, "1D Barcodes");
@@ -94,7 +95,7 @@ $barcode = $pdf->xo_codabar(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -138,7 +139,7 @@ $barcode = $pdf->xo_code128(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -183,7 +184,7 @@ $barcode = $pdf->xo_code128(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -224,7 +225,7 @@ $barcode = $pdf->xo_code128(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -271,7 +272,7 @@ $barcode = $pdf->xo_code128(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -313,7 +314,7 @@ $barcode = $pdf->xo_3of9(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -354,7 +355,7 @@ $barcode = $pdf->xo_3of9(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -395,7 +396,7 @@ $barcode = $pdf->xo_3of9(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -436,7 +437,7 @@ $barcode = $pdf->xo_3of9(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils,
 );
@@ -496,7 +497,7 @@ $barcode = $pdf->xo_ean13(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils*2,
 );
@@ -538,7 +539,7 @@ $barcode = $pdf->xo_2of5int(
     -zone => $bar_height,
     -umzn => 0,
     -lmzn => 10,
-    -font => $pdf->corefont('Helvetica'),
+    -font => $fontH,
     -fnsz => 10,
     -mils => $mils*2,
 );
@@ -598,6 +599,8 @@ $grfx->restore();
 $pdf->saveas($PDFname);
 
 # =====================================================================
+# note that formimage() will output to absolute position on page, and
+# not relative to the graphics current position!
 sub centerbc {
   my ($img, $wcapacity,$hcapacity, @base) = @_;
 

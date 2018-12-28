@@ -1,0 +1,48 @@
+{
+   "abstract" : "run tests continuously, detecting changes",
+   "author" : [
+      "Rogerio Chaves <rogeriocfj@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-Tdd",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::MOP" : "0",
+            "Cwd" : "0",
+            "File::Find" : "0",
+            "Filesys::Notify::Simple" : "0",
+            "Getopt::Long" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/rogeriochaves/perl-tdd-runner",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/rogeriochaves/perl-tdd-runner.git",
+         "web" : "https://github.com/rogeriochaves/perl-tdd-runner"
+      }
+   },
+   "version" : "0.003",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+}
+

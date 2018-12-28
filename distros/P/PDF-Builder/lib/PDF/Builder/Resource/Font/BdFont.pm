@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -103,7 +103,7 @@ sub new {
         $char->{'Filter'} = PDFArray(PDFName('FlateDecode'));
         ## $char->{' stream'} = $widths[$w->{'ENCODING'}] . " 0 " . join(' ', map { int($_) } $self->fontbbox()) . " d1\n";
         $char->{' stream'} = $widths[$w->{'ENCODING'}] . " 0 d0\n";
-        $char->{'Comment'} = PDFStr("N='" . $w->{'NAME'} . "' C=(" . $w->{'ENCODING'} . ")");
+        $char->{'Comment'} = PDFString("N='" . $w->{'NAME'} . "' C=(" . $w->{'ENCODING'} . ")", 'x');
         $procs->{$w->{'NAME'}} = $char;
         @bbx = map { $_ * 1000 / $self->data()->{'upm'} } @bbx;
         if ($y == 0) {

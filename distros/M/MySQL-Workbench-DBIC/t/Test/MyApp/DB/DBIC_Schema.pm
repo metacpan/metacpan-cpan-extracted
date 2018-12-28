@@ -9,6 +9,9 @@ use base qw/DBIx::Class::Schema/;
 
 our $VERSION = 0.01;
 
-__PACKAGE__->load_namespaces;
+__PACKAGE__->load_namespaces(
+    result_namespace => ['Core', 'Virtual'],
+    resultset_namespace => 'Virtual',
+);
 
 1;

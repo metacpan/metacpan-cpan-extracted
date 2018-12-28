@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::bankgothic;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.002'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -157,7 +157,7 @@ sub data { return {
         'braceright',                            # C+0x7D # U+0x007D
         'asciitilde',                            # C+0x7E # U+0x007E
         'bullet',                                # C+0x7F # U+0x2022
-        '.notdef',                               # C+0x80 # U+0x0000
+        'Euro',                                  # C+0x80 # U+0x0000
         'bullet',                                # C+0x81 # U+0x2022
         'quotesinglbase',                        # C+0x82 # U+0x201A
         'florin',                                # C+0x83 # U+0x0192
@@ -204,13 +204,13 @@ sub data { return {
         'logicalnot',                            # C+0xAC # U+0x00AC
         'hyphen',                                # C+0xAD # U+0x002D
         'registered',                            # C+0xAE # U+0x00AE
-        '.notdef',                               # C+0xAF # U+0x0000
+        'macron',                                # C+0xAF # U+0x0000
         'degree',                                # C+0xB0 # U+0x00B0
         'plusminus',                             # C+0xB1 # U+0x00B1
         'twosuperior',                           # C+0xB2 # U+0x00B2
         'threesuperior',                         # C+0xB3 # U+0x00B3
         'acute',                                 # C+0xB4 # U+0x00B4
-        '.notdef',                               # C+0xB5 # U+0x0000
+        'mu',                                    # C+0xB5 # U+0x00B5
         'paragraph',                             # C+0xB6 # U+0x00B6
         'periodcentered',                        # C+0xB7 # U+0x00B7
         'cedilla',                               # C+0xB8 # U+0x00B8
@@ -422,11 +422,13 @@ sub data { return {
         'guillemotleft' => '563',                # C+0xAB # U+0x00AB
         'logicalnot' => '834',                   # C+0xAC # U+0x00AC
         'registered' => '834',                   # C+0xAE # U+0x00AE
+        'macron' => '300',                       # C+0xAF # U+0x00AF
         'degree' => '330',                       # C+0xB0 # U+0x00B0
         'plusminus' => '834',                    # C+0xB1 # U+0x00B1
         'twosuperior' => '510',                  # C+0xB2 # U+0x00B2
         'threesuperior' => '510',                # C+0xB3 # U+0x00B3
         'acute' => '500',                        # C+0xB4 # U+0x00B4
+        'mu' => '689',                           # C+0xB5 # U+0x00B5
         'paragraph' => '500',                    # C+0xB6 # U+0x00B6
         'periodcentered' => '332',               # C+0xB7 # U+0x00B7
         'cedilla' => '500',                      # C+0xB8 # U+0x00B8
@@ -468,7 +470,7 @@ sub data { return {
         'Udieresis' => '847',                    # C+0xDC # U+0x00DC
         'Yacute' => '672',                       # C+0xDD # U+0x00DD
         'Thorn' => '744',                        # C+0xDE # U+0x00DE
-        'germandbls' => '1327',                  # C+0xDF # U+0x00DF
+        'germandbls' => '847',                   # C+0xDF # U+0x00DF
         'agrave' => '646',                       # C+0xE0 # U+0x00E0
         'aacute' => '646',                       # C+0xE1 # U+0x00E1
         'acircumflex' => '646',                  # C+0xE2 # U+0x00E2
@@ -510,9 +512,10 @@ sub data { return {
         'ring' => '500',                         # U+0x02DA
         'ogonek' => '500',                       # U+0x02DB
         'hungarumlaut' => '500',                 # U+0x02DD
+	    'dblgravecmb' => '500',                  # U+0x030F
         'fraction' => '167',                     # U+0x2044
         'Euro' => '773',                         # U+0x20AC
-        'euro' => '773',                         # U+0x20AC
+       #'euro' => '773',                         # U+0x20AC
         'minus' => '834',                        # U+0x2212
         'fi' => '841',                           # U+0xFB01
         'fl' => '1103',                          # U+0xFB02

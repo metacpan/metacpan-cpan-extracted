@@ -1,0 +1,23 @@
+
+This archive contains the distribution PDF::Builder.
+See Changes file for the version.
+
+  Facilitates the creation and modification of PDF files
+
+The installable Perl package may be obtained from https://www.cpan.org, 
+as PDF::Builder.
+
+This software is Copyright (c) 2017-2018 by Phil M. Perry.
+
+This is free software, licensed under:
+
+  The GNU Lesser General Public License, Version 2.1, February 1999
+
+See INFO/SUPPORT file for information on reporting bugs, etc. via GitHub Issues.
+See INFO/DEPRECATED file for information on deprecated features.
+See INFO/KNOWN_INCOMP file for known incompatibilities with PDF::API2.
+See INFO/Changes* files for older change logs.
+See INFO/PATENTS file for information on patents.
+See INFO/LICENSE file for the license.
+
+INFO/old/ also has some build and test tool files that are not currently used.

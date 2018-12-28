@@ -10,7 +10,6 @@ use File::Basename 'basename', 'dirname';
 use SPVM::Data;
 use SPVM::Data::Array;
 use SPVM::Data::Package;
-use SPVM::Data::String;
 
 use SPVM::Builder;
 use SPVM::ExchangeAPI;
@@ -19,7 +18,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0403';
+our $VERSION = '0.0405';
 
 my $SPVM_ENV;
 my $BUILDER;

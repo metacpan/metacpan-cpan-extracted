@@ -27,7 +27,7 @@ use Carp;
     my $fixtures;
     eval { $fixtures = create_fixtures(); 1 } or skip_all "Fail to create fixtures files: $@";
 
-    my %forbidden = map { $_ => 1 } (
+    my @SKIP = (
         'T-/dev/tty1',             # .
         'B-/dev/tty1',             # .
         'T-./my-sample.socket',    # .
@@ -35,6 +35,10 @@ use Carp;
         'T-/dev/random',           # .
         'B-/dev/random',           # .
     );
+
+    push @SKIP, 'k-/tmp' if $^O =~ qr{darwin}i;
+
+    my %forbidden = map { $_ => 1 } @SKIP;
 
     foreach my $f (@$fixtures) {
 

@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::timesroman;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -414,6 +414,7 @@ sub data { return {
         'H'                  => 722,
         'h'                  => 500,
         'hungarumlaut'       => 333,
+	    'dblgravecmb'        => 333,
         'hyphen'             => 333,
         'I'                  => 333,
         'i'                  => 278,
@@ -452,7 +453,7 @@ sub data { return {
         'lslash'             => 278,
         'M'                  => 889,
         'm'                  => 778,
-        'macron'             => 333,
+        'macron'             => 520,
         'minus'              => 564,
         'mu'                 => 500,
         'multiply'           => 564,

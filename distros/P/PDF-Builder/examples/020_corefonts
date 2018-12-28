@@ -47,6 +47,9 @@ my @fns=qw{
     Symbol
     ZapfDingbats
     bankgothic
+    bankgothicbold
+    bankgothicbolditalic
+    bankgothicitalic
     georgia
     georgiaitalic
     georgiabold
@@ -158,12 +161,18 @@ foreach my $fn (@fns) {
 
 		    # bounding box cell around character
                     $gfx->strokecolor('lightblue');
+		    if ($plane->wxMissingByEnc($ci)) { $gfx->fillcolor(1.0, 0.7, 0.7); }
                     $gfx->move($gLLx+($sx*$x)    ,$gLLy+($sy*$y)+$fx);
                     $gfx->line($gLLx+($sx*$x)    ,$gLLy+($sy*$y)+$u);
                     $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)+$u);
                     $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)+$fx);
                     $gfx->close();
-                    $gfx->stroke();
+		    if ($plane->wxMissingByEnc($ci)) {
+                        $gfx->fillstroke();
+                        $gfx->fillcolor('black');
+		    } else {
+			$gfx->stroke();
+		    }
 
 		    # baseline
                     $gfx->strokecolor('gray');

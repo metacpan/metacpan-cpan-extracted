@@ -148,6 +148,7 @@ foreach my $fn (@fontnames) {
     $pdf->save();
     $pdf->end();
 } # while loop, done with this font. repeat with next
+print STDERR "\n";
 
 exit;
 

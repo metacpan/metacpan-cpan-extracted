@@ -23,7 +23,6 @@ sub add_to_files {
 plan tests => scalar @files;
 
 # test each one, skipping over certain name patterns
-my @win32_modules;
 my @opt_modules;
 
 foreach my $file (@files) {
@@ -31,31 +30,48 @@ foreach my $file (@files) {
     $file =~ s|/|::|g;
     if ($file =~ /Win32/) {  # require Windows system to run
 	                     # not currently under lib/ anyway
-        push @win32_modules, $file;
-        next;
+#	"SKIP Windows module(s) not currently used"
+#       next;
     }
     if ($file =~ /_GT$/) {   # require Graphics::TIFF be installed
 	                     # but rarely is on test platforms
-        push @opt_modules, $file;
-        next;
+	# check for Graphics::TIFF installed, and if so, run use test
+        my $rc = eval {
+        	require Graphics::TIFF;
+        	1;
+    	};
+    	if (!defined $rc) { $rc = 0; }  # else is 1
+    	if ($rc) {
+		# fall through to use test
+	} else {
+		push @opt_modules, $file;
+ 		next;
+	}
     }
     if ($file =~ /_IPL$/) {  # require Image::PNG::Libpng be installed
 	                     # but rarely is on test platforms
-        push @opt_modules, $file;
-        next;
+	# check for Image::PNG::Libpng installed, and if so, run use test
+        my $rc = eval {
+        	require Image::PNG::Libpng;
+        	1;
+    	};
+    	if (!defined $rc) { $rc = 0; }  # else is 1
+    	if ($rc) {
+		# fall through to use test
+	} else {
+		push @opt_modules, $file;
+ 		next;
+	}
     }
     use_ok($file);
 }
 
 # special message and automatic pass for skipped-over modules
 TODO: {
-    local $TODO = q{Win32 modules currently die when "use"d on non-Win32 platforms, _GT modules die if no Graphics::TIFF installed, _IPL if no Image::PNG::Libpng};
+    local $TODO = q{skipped due to optional library not installed};
 
-    foreach my $file (@win32_modules) {
-        ok($file);
-    }
     foreach my $file (@opt_modules) {
-        ok($file);
+	    ok($file);
     }
 }
 

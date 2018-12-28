@@ -21,7 +21,7 @@ Version 0.29
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -34,6 +34,8 @@ our $VERSION = '0.29';
                               user => $ENV{DBI_USER},
                               span => 1); 
 
+ my $util = MySQL::Util->new( dbh => $dbh );
+                              
  my $aref = $util->describe_table('mytable');
  print "table: mytable\n";
  foreach my $href (@$aref) {
@@ -79,13 +81,13 @@ our $VERSION = '0.29';
 has 'dsn' => (
 	is       => 'ro',
 	isa      => 'Str',
-	required => 1
+	required => 0
 );
 
 has 'user' => (
 	is       => 'ro',
 	isa      => 'Str',
-	required => 1
+	required => 0
 );
 
 has 'pass' => (
@@ -99,6 +101,11 @@ has 'span' => (
 	isa      => 'Int',
 	required => 0,
 	default  => 0
+);
+
+has 'dbh' => (
+	is  => 'rw',
+	isa => 'Object',
 );
 
 #
@@ -154,9 +161,8 @@ has _verbose_funcs => (
 	default  => sub { {} },
 );
 
-#
-# this gets automatically invoked sub the constructor#__AFTER
-#
+##############################################################################
+
 sub BUILD {
 	my $self = shift;
 
@@ -170,18 +176,24 @@ sub BUILD {
 		$self->_verbose_funcs($vf);
 	}
 
-	my $dbh = DBI->connect(
-		$self->dsn,
-		$self->user,
-		$self->pass,
-		{   RaiseError       => 1,
-			FetchHashKeyName => 'NAME_uc',
-			AutoCommit       => 0,           # dbd::mysql workaround
-			PrintError       => 0
-		}
-	);
+	my $dbh = $self->dbh;
 
-	$dbh->{AutoCommit} = 1;                  # dbd::mysql workaround
+	if ( !$dbh ) {
+
+		$dbh = DBI->connect(
+			$self->dsn,
+			$self->user,
+			$self->pass,
+			{
+				RaiseError       => 1,
+				FetchHashKeyName => 'NAME_uc',
+				AutoCommit       => 0,           # dbd::mysql workaround
+				PrintError       => 0
+			}
+		);
+
+		$dbh->{AutoCommit} = 1;                  # dbd::mysql workarounda
+	}
 
 	my $schema = $dbh->selectrow_arrayref("select schema()")->[0];
 	if ($schema) {
@@ -258,13 +270,13 @@ sub _get_indexes_arrayref {
 sub _fq {
 	args
 
-		# required
-		my $self  => 'Object',
-		my $table => 'Str',
+	  # required
+	  my $self  => 'Object',
+	  my $table => 'Str',
 
-		# optional
-		my $fq     => { isa => 'Int',       optional => 1, default => 1 },
-		my $schema => { isa => 'Str|Undef', optional => 1 };
+	  # optional
+	  my $fq     => { isa => 'Int',       optional => 1, default => 1 },
+	  my $schema => { isa => 'Str|Undef', optional => 1 };
 
 	if ($fq) {
 		if ( $table =~ /\w\.\w/ ) {
@@ -281,9 +293,9 @@ sub _fq {
 		my $curr = $self->_schema;
 
 		confess "can't remove schema name from table name $table because we "
-			. "are not in the same db context (incoming fq table = $table, "
-			. "current schema = $curr"
-			if $curr ne $1;
+		  . "are not in the same db context (incoming fq table = $table, "
+		  . "current schema = $curr"
+		  if $curr ne $1;
 
 		return $2;
 	}
@@ -294,9 +306,9 @@ sub _fq {
 sub _un_fq {
 	args_pos
 
-		# required
-		my $self  => 'Object',
-		my $table => 'Str';
+	  # required
+	  my $self  => 'Object',
+	  my $table => 'Str';
 
 	if ( $table =~ /^(\w+)\.(\w+)$/ ) {
 		return ( $1, $2 );
@@ -354,12 +366,12 @@ sub _column_exists {
 sub _verbose {
 	args_pos
 
-		# required
-		my $self => 'Object',
-		my $msg  => 'Str',
+	  # required
+	  my $self => 'Object',
+	  my $msg  => 'Str',
 
-		# optional
-		my $func_counter => { isa => 'Str', default => 0, optional => 1 };
+	  # optional
+	  my $func_counter => { isa => 'Str', default => 0, optional => 1 };
 
 	my $caller_func = ( caller(1) )[3];
 	my $caller_line = ( caller(0) )[2];
@@ -382,12 +394,12 @@ sub _verbose {
 sub _verbose_sql {
 	args_pos
 
-		# required
-		my $self => 'Object',
-		my $sql  => 'Str',
+	  # required
+	  my $self => 'Object',
+	  my $sql  => 'Str',
 
-		# optional
-		my $func_counter => { isa => 'Int', default => 0, optional => 1 };
+	  # optional
+	  my $func_counter => { isa => 'Int', default => 0, optional => 1 };
 
 	my $caller_func = ( caller(1) )[3];
 	my $caller_line = ( caller(0) )[2];
@@ -442,9 +454,9 @@ having to worry about the object's internal cache (see clear_cache()).
 sub apply_ddl {
 	args_pos
 
-		# required
-		my $self       => 'Object',
-		my $stmts_aref => 'ArrayRef';
+	  # required
+	  my $self       => 'Object',
+	  my $stmts_aref => 'ArrayRef';
 
 	foreach my $stmt (@$stmts_aref) {
 		$self->_dbh->do($stmt);
@@ -473,10 +485,10 @@ See MySQL documentation for more info on "describe <table>".
 sub describe_column {
 	args
 
-		# required
-		my $self   => 'Object',
-		my $table  => 'Str',
-		my $column => 'Str';
+	  # required
+	  my $self   => 'Object',
+	  my $table  => 'Str',
+	  my $column => 'Str';
 
 	if ( !$self->_column_exists( table => $table, column => $column ) ) {
 		confess "column $column does not exist in table $table";
@@ -643,7 +655,7 @@ sub get_ak_indexs {
 
 sub get_ak_indexes {
 	args_pos my $self => 'Object',
-		my $table     => 'Str';
+	  my $table       => 'Str';
 
 	if ( $table !~ /\./ ) {
 		$table = $self->_schema . ".$table";
@@ -698,13 +710,13 @@ Hash elements for each column:
 sub get_constraint {
 	args
 
-		# required
-		my $self => 'Object',
-		my $name => 'Str',
+	  # required
+	  my $self => 'Object',
+	  my $name => 'Str',
 
-		# optional
-		my $schema => { isa => 'Str', optional => 1 },
-		my $table  => { isa => 'Str', optional => 1 };
+	  # optional
+	  my $schema => { isa => 'Str', optional => 1 },
+	  my $table  => { isa => 'Str', optional => 1 };
 
 	my ( $unfq_schema, $unfq_table, $fq_table );
 
@@ -921,11 +933,11 @@ sub get_depth {
 	my $depth = 0;
 
 	foreach my $fk_name ( keys(%$fk_cons) ) {
-		my $parent_table
-			= $fk_cons->{$fk_name}->[0]->{REFERENCED_TABLE_SCHEMA} . '.'
-			. $fk_cons->{$fk_name}->[0]->{REFERENCED_TABLE_NAME};
+		my $parent_table =
+		    $fk_cons->{$fk_name}->[0]->{REFERENCED_TABLE_SCHEMA} . '.'
+		  . $fk_cons->{$fk_name}->[0]->{REFERENCED_TABLE_NAME};
 
-		if ( $parent_table eq $table ) {next}    # self referencing table
+		if ( $parent_table eq $table ) { next }    # self referencing table
 
 		my $parent_depth = $self->get_depth($parent_table);
 		if ( $parent_depth >= $depth ) { $depth = $parent_depth + 1 }
@@ -947,12 +959,12 @@ that participate an any foreign key constraint on the table.
 sub get_fk_column_names {
 	args
 
-		# required
-		my $self  => 'Object',
-		my $table => 'Str',
+	  # required
+	  my $self  => 'Object',
+	  my $table => 'Str',
 
-		# optional
-		my $name => { isa => 'Str', optional => 1 };
+	  # optional
+	  my $name => { isa => 'Str', optional => 1 };
 
 	$table = $self->_fq( table => $table, fq => 1 );
 
@@ -992,11 +1004,11 @@ See "get_constraints" for a list of the hash elements in each column.
 sub get_fk_constraints {
 	args_pos
 
-		# required
-		my $self => 'Object',
+	  # required
+	  my $self => 'Object',
 
-		# optional
-		my $table => { isa => 'Str', optional => 1 };
+	  # optional
+	  my $table => { isa => 'Str', optional => 1 };
 
 	if ( defined($table) and $table !~ /\./ ) {
 		$table = $self->_schema . ".$table";
@@ -1051,7 +1063,7 @@ See "get_indexes" for a list of the hash elements in each column.
 
 sub get_fk_indexes {
 	args_pos my $self => 'Object',
-		my $table     => 'Str';
+	  my $table       => 'Str';
 
 	if ( $table !~ /\./ ) {
 		$table = $self->_schema . ".$table";
@@ -1070,7 +1082,7 @@ sub get_fk_indexes {
 			if ( scalar(@con_cols) == scalar(@index_cols) ) {
 
 				my $match = 1;
-				for ( my $i = 0; $i < scalar(@con_cols); $i++ ) {
+				for ( my $i = 0 ; $i < scalar(@con_cols) ; $i++ ) {
 					if ( $index_cols[$i]->{COLUMN_NAME} ne
 						$con_cols[$i]->{COLUMN_NAME} )
 					{
@@ -1178,7 +1190,7 @@ See "get_constraints" for a list of the hash elements in each column.
 
 sub get_other_constraints {
 	args_pos my $self => 'Object',
-		my $table     => 'Str';
+	  my $table       => 'Str';
 
 	if ( $table !~ /\./ ) {
 		$table = $self->_schema . ".$table";
@@ -1218,9 +1230,10 @@ See "get_indexes" for a list of the hash elements in each column.
 
 sub get_other_indexes {
 	args_pos
-		# required
-		my $self  => 'Object',
-		my $table => 'Str';
+
+	  # required
+	  my $self  => 'Object',
+	  my $table => 'Str';
 
 	if ( $table !~ /\./ ) {
 		$table = $self->_schema . ".$table";
@@ -1339,7 +1352,7 @@ sub get_tables {
 	my $dbh = $self->_dbh;
 
 	my $tables = undef;
-	my $sth    = $dbh->prepare("show full tables where Table_Type = 'BASE TABLE'");
+	my $sth = $dbh->prepare("show full tables where Table_Type = 'BASE TABLE'");
 	$sth->execute;
 
 	while ( my ($table) = $sth->fetchrow_array ) {
@@ -1434,10 +1447,10 @@ Returns true if column is nullable or false if it is not.
 sub is_column_nullable {
 	args
 
-		# required
-		my $self   => 'Object',
-		my $table  => 'Str',
-		my $column => 'Str';
+	  # required
+	  my $self   => 'Object',
+	  my $table  => 'Str',
+	  my $column => 'Str';
 
 	my $desc = $self->describe_column( table => $table, column => $column );
 
@@ -1487,12 +1500,12 @@ the constraint provided.
 sub is_self_referencing {
 	args
 
-		# required
-		my $self  => 'Object',
-		my $table => 'Str',
+	  # required
+	  my $self  => 'Object',
+	  my $table => 'Str',
 
-		# optional
-		my $name => { isa => 'Str', optional => 1 };
+	  # optional
+	  my $name => { isa => 'Str', optional => 1 };
 
 	my $fq_table = $self->_fq( table => $table, fq => 1 );
 
@@ -1630,9 +1643,9 @@ returned dbh will also be in that same context.
 sub clone_dbh {
 	my $self = shift;
 
-	my $dbh
-		= $self->_dbh->clone( { AutoCommit => 0 } );  # workaround dbd:mysql bug
-	$dbh->{AutoCommit} = 1;                           # workaround dbd:mysql bug
+	my $dbh =
+	  $self->_dbh->clone( { AutoCommit => 0 } );    # workaround dbd:mysql bug
+	$dbh->{AutoCommit} = 1;                         # workaround dbd:mysql bug
 	$dbh->do( "use " . $self->_schema );
 
 	return $dbh;

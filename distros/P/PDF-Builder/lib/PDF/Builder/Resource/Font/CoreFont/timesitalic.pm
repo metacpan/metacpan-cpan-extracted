@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::timesitalic;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -426,7 +426,7 @@ sub data { return {
         'guillemotleft' => '500',                # C+0xAB # U+0x00AB
         'logicalnot' => '674',                   # C+0xAC # U+0x00AC
         'registered' => '759',                   # C+0xAE # U+0x00AE
-        'macron' => '333',                       # C+0xAF # U+0x00AF
+        'macron' => '520',                       # C+0xAF # U+0x00AF
         'degree' => '399',                       # C+0xB0 # U+0x00B0
         'plusminus' => '548',                    # C+0xB1 # U+0x00B1
         'twosuperior' => '299',                  # C+0xB2 # U+0x00B2
@@ -516,6 +516,7 @@ sub data { return {
         'ring' => '333',                         # U+0x02DA
         'ogonek' => '333',                       # U+0x02DB
         'hungarumlaut' => '333',                 # U+0x02DD
+	    'dblgravecmb' => '333',                  # U+0x030F
         'fraction' => '166',                     # U+0x2044
         'minus' => '674',                        # U+0x2212
         'fi' => '500',                           # U+0xFB01

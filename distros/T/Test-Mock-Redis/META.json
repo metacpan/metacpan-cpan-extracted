@@ -49,7 +49,7 @@
    "provides" : {
       "Test::Mock::Redis" : {
          "file" : "lib/Test/Mock/Redis.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Test::Mock::Redis::Hash" : {
          "file" : "lib/Test/Mock/Redis.pm"
@@ -79,6 +79,6 @@
          "url" : "http://github.com/jlavallee/Test-Mock-Redis/"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

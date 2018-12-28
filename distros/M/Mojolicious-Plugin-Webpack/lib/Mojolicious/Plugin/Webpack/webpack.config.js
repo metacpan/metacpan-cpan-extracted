@@ -38,8 +38,8 @@ const config = {
 };
 
 if (process.env.WEBPACK_RULE_FOR_JS) {
-  const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-  config.optimization.minimizer.push(new UglifyJsPlugin({cache: true, parallel: true, sourceMap: sourceMap}));
+  const TerserPlugin = require('terser-webpack-plugin');
+  config.optimization.minimizer.push(new TerserPlugin({cache: true, parallel: true, sourceMap: sourceMap}));
   config.module.rules.push({
     test: /\.js$/,
     exclude: /node_modules/,

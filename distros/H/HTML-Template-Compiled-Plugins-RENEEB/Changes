@@ -1,6 +1,11 @@
 Changelog for HTML::Template::Compiled::Plugins::RENEEB
 =======================================================
 
+0.03  2018-12-28 15:11:00
+
+      + Fix documentation
+      + improve tests
+
 0.02  2013-10-30
 
       + update Changes

@@ -2,21 +2,21 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'Test::Mock::Redis',
-  'INSTALLDIRS' => 'site',
-  'VERSION_FROM' => 'lib/Test/Mock/Redis.pm',
-  'PL_FILES' => {},
   'EXE_FILES' => [],
+  'PL_FILES' => {},
   'PREREQ_PM' => {
+                   'namespace::clean' => 0,
                    'Test::Deep::UnorderedPairs' => 0,
-                   'Try::Tiny' => 0,
-                   'Class::Method::Modifiers' => 0,
                    'Test::More' => '0.88',
                    'Scalar::Util' => 0,
-                   'Test::Deep' => 0,
-                   'namespace::clean' => 0,
                    'Test::Fatal' => 0,
+                   'Try::Tiny' => 0,
+                   'Class::Method::Modifiers' => 0,
+                   'Test::Deep' => 0,
                    'Package::Stash' => '0.34'
-                 }
+                 },
+  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/Test/Mock/Redis.pm',
+  'NAME' => 'Test::Mock::Redis'
 )
 ;

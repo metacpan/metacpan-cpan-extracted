@@ -1,11 +1,13 @@
 lib/Mojolicious/Plugin/Piwik.pm
 t/piwik_api.t
+t/piwik_api_p.t
 t/piwik_api-track.t
 t/piwik_api_url.t
 t/piwik_tag.t
 t/piwik_tag-opt-out.t
 t/piwik_tag-as-script.t
 t/piwik_tag-embed.t
+t/server/mock.pl
 Changes
 MANIFEST
 LICENSE

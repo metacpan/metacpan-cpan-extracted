@@ -455,8 +455,18 @@ sqlite_db_login6(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pa
     imp_dbh->extended_result_codes     = extended;
     imp_dbh->stmt_list                 = NULL;
     imp_dbh->began_transaction         = FALSE;
+    imp_dbh->prefer_numeric_type       = FALSE;
 
     sqlite3_busy_timeout(imp_dbh->db, SQL_TIMEOUT);
+
+    if (hv) {
+        if (hv_exists(hv, "sqlite_defensive", 16)) {
+            val = hv_fetch(hv, "sqlite_defensive", 16, 0);
+            if (val && SvIOK(*val)) {
+                sqlite3_db_config(imp_dbh->db, SQLITE_DBCONFIG_DEFENSIVE, SvIV(*val), 0);
+            }
+        }
+    }
 
 #if 0
     /*
@@ -737,6 +747,10 @@ sqlite_db_STORE_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
         sqlite3_extended_result_codes(imp_dbh->db, imp_dbh->extended_result_codes);
         return TRUE;
     }
+    if (strEQ(key, "sqlite_prefer_numeric_type")) {
+        imp_dbh->prefer_numeric_type = !(! SvTRUE(valuesv));
+        return TRUE;
+    }
     if (strEQ(key, "sqlite_unicode")) {
 #if PERL_UNICODE_DOES_NOT_WORK_WELL
         sqlite_trace(dbh, imp_dbh, 3, form("Unicode support is disabled for this version of perl."));
@@ -780,6 +794,9 @@ sqlite_db_FETCH_attrib(SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
    }
    if (strEQ(key, "sqlite_extended_result_codes")) {
        return sv_2mortal(newSViv(imp_dbh->extended_result_codes ? 1 : 0));
+   }
+   if (strEQ(key, "sqlite_prefer_numeric_type")) {
+       return sv_2mortal(newSViv(imp_dbh->prefer_numeric_type ? 1 : 0));
    }
    if (strEQ(key, "sqlite_unicode")) {
 #if PERL_UNICODE_DOES_NOT_WORK_WELL
@@ -1358,15 +1375,18 @@ sqlite_st_FETCH_attrib(SV *sth, imp_sth_t *imp_sth, SV *keysv)
         av_extend(av, i);
         retsv = sv_2mortal(newRV_noinc((SV*)av));
         for (n = 0; n < i; n++) {
-            const char *fieldtype = sqlite3_column_decltype(imp_sth->stmt, n);
-            int type = sqlite3_column_type(imp_sth->stmt, n);
-            /* warn("got type: %d = %s\n", type, fieldtype); */
-            type = sqlite_type_to_odbc_type(type);
-            /* av_store(av, n, newSViv(type)); */
-            if (fieldtype)
-                av_store(av, n, newSVpv(fieldtype, 0));
-            else
-                av_store(av, n, newSVpv("VARCHAR", 0));
+            if (imp_dbh->prefer_numeric_type) {
+                int type = sqlite3_column_type(imp_sth->stmt, n);
+                /* warn("got type: %d = %s\n", type, fieldtype); */
+                type = sqlite_type_to_odbc_type(type);
+                av_store(av, n, newSViv(type));
+            } else {
+                const char *fieldtype = sqlite3_column_decltype(imp_sth->stmt, n);
+                if (fieldtype)
+                    av_store(av, n, newSVpv(fieldtype, 0));
+                else
+                    av_store(av, n, newSVpv("VARCHAR", 0));
+            }
         }
     }
     else if (strEQ(key, "NULLABLE")) {
@@ -2604,6 +2624,49 @@ sqlite_db_backup_from_file(pTHX_ SV *dbh, char *filename)
 #endif
 }
 
+int
+sqlite_db_backup_from_dbh(pTHX_ SV *dbh, SV *from)
+{
+    D_imp_dbh(dbh);
+
+#if SQLITE_VERSION_NUMBER >= 3006011
+    int rc;
+    sqlite3_backup *pBackup;
+
+    imp_dbh_t *imp_dbh_from = (imp_dbh_t *)DBIh_COM(from);
+
+    if (!DBIc_ACTIVE(imp_dbh)) {
+        sqlite_error(dbh, -2, "attempt to backup from file on inactive database handle");
+        return FALSE;
+    }
+
+    if (!DBIc_ACTIVE(imp_dbh_from)) {
+        sqlite_error(dbh, -2, "attempt to backup from inactive database handle");
+        return FALSE;
+    }
+
+    croak_if_db_is_null();
+
+    /* COMPAT: sqlite3_backup_* are only available for 3006011 or newer */
+    pBackup = sqlite3_backup_init(imp_dbh->db, "main", imp_dbh_from->db, "main");
+    if (pBackup) {
+        (void)sqlite3_backup_step(pBackup, -1);
+        (void)sqlite3_backup_finish(pBackup);
+    }
+    rc = sqlite3_errcode(imp_dbh->db);
+
+    if ( rc != SQLITE_OK ) {
+        sqlite_error(dbh, rc, form("sqlite_backup_from_file failed with error %s", sqlite3_errmsg(imp_dbh->db)));
+        return FALSE;
+    }
+
+    return TRUE;
+#else
+    sqlite_error(dbh, SQLITE_ERROR, form("backup feature requires SQLite 3.6.11 and newer"));
+    return FALSE;
+#endif
+}
+
 /* Accesses the SQLite Online Backup API, and copies the currently loaded
  * database into the passed filename.
  * Usual usage of this would be when you're operating on the :memory:
@@ -2650,6 +2713,91 @@ sqlite_db_backup_to_file(pTHX_ SV *dbh, char *filename)
     sqlite_error(dbh, SQLITE_ERROR, form("backup feature requires SQLite 3.6.11 and newer"));
     return FALSE;
 #endif
+}
+
+int
+sqlite_db_backup_to_dbh(pTHX_ SV *dbh, SV *to)
+{
+    D_imp_dbh(dbh);
+
+#if SQLITE_VERSION_NUMBER >= 3006011
+    int rc;
+    sqlite3_backup *pBackup;
+
+    imp_dbh_t *imp_dbh_to = (imp_dbh_t *)DBIh_COM(to);
+
+    if (!DBIc_ACTIVE(imp_dbh)) {
+        sqlite_error(dbh, -2, "attempt to backup to file on inactive database handle");
+        return FALSE;
+    }
+
+    if (!DBIc_ACTIVE(imp_dbh_to)) {
+        sqlite_error(dbh, -2, "attempt to backup to inactive database handle");
+        return FALSE;
+    }
+
+    croak_if_db_is_null();
+
+    /* COMPAT: sqlite3_backup_* are only available for 3006011 or newer */
+    pBackup = sqlite3_backup_init(imp_dbh_to->db, "main", imp_dbh->db, "main");
+    if (pBackup) {
+        (void)sqlite3_backup_step(pBackup, -1);
+        (void)sqlite3_backup_finish(pBackup);
+    }
+    rc = sqlite3_errcode(imp_dbh_to->db);
+
+    if ( rc != SQLITE_OK ) {
+        sqlite_error(dbh, rc, form("sqlite_backup_to_file failed with error %s", sqlite3_errmsg(imp_dbh->db)));
+        return FALSE;
+    }
+
+    return TRUE;
+#else
+    sqlite_error(dbh, SQLITE_ERROR, form("backup feature requires SQLite 3.6.11 and newer"));
+    return FALSE;
+#endif
+}
+
+int
+sqlite_db_limit(pTHX_ SV *dbh, int id, int new_value)
+{
+    D_imp_dbh(dbh);
+    return sqlite3_limit(imp_dbh->db, id, new_value);
+}
+
+int
+sqlite_db_config(pTHX_ SV *dbh, int id, int new_value)
+{
+    D_imp_dbh(dbh);
+    int ret;
+    int rc = -1;
+    switch (id) {
+        case SQLITE_DBCONFIG_LOOKASIDE:
+            sqlite_error(dbh, rc, "SQLITE_DBCONFIG_LOOKASIDE is not supported");
+            return FALSE;
+        case SQLITE_DBCONFIG_MAINDBNAME:
+            sqlite_error(dbh, rc, "SQLITE_DBCONFIG_MAINDBNAME is not supported");
+            return FALSE;
+        case SQLITE_DBCONFIG_ENABLE_FKEY:
+        case SQLITE_DBCONFIG_ENABLE_TRIGGER:
+        case SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER:
+        case SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION:
+        case SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE:
+        case SQLITE_DBCONFIG_ENABLE_QPSG:
+        case SQLITE_DBCONFIG_TRIGGER_EQP:
+        case SQLITE_DBCONFIG_RESET_DATABASE:
+        case SQLITE_DBCONFIG_DEFENSIVE:
+            rc = sqlite3_db_config(imp_dbh->db, id, new_value, &ret);
+            break;
+        default:
+            sqlite_error(dbh, rc, form("Unknown config id: %d", id));
+            return FALSE;
+    }
+    if ( rc != SQLITE_OK ) {
+        sqlite_error(dbh, rc, form("sqlite_db_config failed with error %s", sqlite3_errmsg(imp_dbh->db)));
+        return FALSE;
+    }
+    return ret;
 }
 
 #include "dbdimp_tokenizer.inc"

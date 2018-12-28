@@ -48,5 +48,5 @@ nytprof.out
 ^t/lib/dummyrepo/.cvsignore
 ^.git/objects/
 ^README.md
-^README.pod
+^.README.pod
 ^.version_info.pl

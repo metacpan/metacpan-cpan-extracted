@@ -5,7 +5,7 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
+our $VERSION = '3.013'; # VERSION
 my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 use POSIX qw(floor);

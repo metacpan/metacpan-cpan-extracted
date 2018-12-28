@@ -50,7 +50,7 @@ like_string $content,
     /xms;
 
 my $schema_content = do{ local (@ARGV, $/) = $subpath . '/DBIC_Schema.pm'; <> };
-like_string $schema_content, qr/result_namespace => 'Core',/, 'load_namespace set';
+like_string $schema_content, qr/result_namespace => 'Core::Result',/, 'load_namespace set';
 
 done_testing();
 

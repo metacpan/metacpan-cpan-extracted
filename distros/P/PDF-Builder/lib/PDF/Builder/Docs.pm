@@ -3,7 +3,7 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
+our $VERSION = '3.013'; # VERSION
 my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
@@ -51,6 +51,28 @@ register a new CPAN project (that's what we did, I<forking> PDF::API2). Please
 don't just assume that we don't want your changes -- at least propose what you 
 want to do in writing, so we can consider it. We're always looking for people to
 help out and expand PDF::Builder.
+
+=head2 Optional Libraries
+
+PDF::Builder can make use of some optional libraries, which are not I<required>
+for a successful installation. If you want improved speed and capabilities for
+certain functions, you may want to install and use these libraries:
+
+B<*> Graphics::TIFF -- PDF::Builder inherited a rather slow, buggy, and limited 
+TIFF image library from PDF::API2. If Graphics::TIFF (available on CPAN, uses 
+libtiff.a) is installed, PDF::Builder will use that instead, unless you specify 
+that it is to use the old, pure Perl library. The only time you might want to 
+consider this is when you need to pass an open filehandle to C<image_tiff> 
+instead of a file name. See resolved bug reports RT 84665 and RT 118047, as well
+as C<image_tiff>, for more information.
+
+B<*> Image::PNG::Libpng -- PDF::Builder inherited a rather slow and buggy pure 
+Perl PNG image library from PDF::API2. If Image::PNG::Libpng (available on 
+CPAN, uses libpng.a) is installed, PDF::Builder will use that instead, unless 
+you specify that it is to use the old, pure Perl library. Using the new library 
+will give you improved speed, the ability to use 16 bit samples, and the 
+ability to read interlaced PNG files. See resolved bug report RT 124349, as well
+as C<image_png>, for more information.
 
 =head2 Strings (Character Text)
 

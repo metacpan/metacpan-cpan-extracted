@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Glyphs;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -82,7 +82,7 @@ our $u2n = {
     '11' => 'dotaccent',
     '12' => 'hungarumlaut',
     '13' => 'cedilla',
-    '14' => 'dblgrave',
+    '14' => 'dblgravecmb',  # was dblgrave U+F6D6
     '15' => 'controlSI',
     '16' => 'controlDLE',
     '17' => 'controlDC1',
@@ -604,6 +604,7 @@ our $u2n = {
     '537' => 'scommaaccent',
     '538' => 'Tcommaaccent',
     '539' => 'tcommaaccent',
+    '567' => 'dotlessj', # formerly 63166
     '592' => 'aturned',
     '593' => 'ascript',
     '594' => 'ascriptturned',
@@ -3752,7 +3753,7 @@ our $u2n = {
     '61693' => 'boxxmarkbld',
     '61694' => 'boxcheckbld',
     '61695' => 'windowslogo',
-    '63166' => 'dotlessj',
+#   '63166' => 'dotlessj',
     '63167' => 'LL',
     '63168' => 'll',
     '63169' => 'Scedilla',
@@ -6537,7 +6538,7 @@ our $n2u = {
     'dotbelowcomb' => '803',
     'dotkatakana' => '12539',
     'dotlessi' => '305',
-    'dotlessj' => '63166',
+    'dotlessj' => '567',  # formerly U+F6BE/63166
     'dotlessjstrokehook' => '644',
     'dotmath' => '8901',
     'dottedcircle' => '9676',
@@ -7189,6 +7190,7 @@ our $n2u = {
     'hukatakanahalfwidth' => '65420',
     'hungarumlaut' => '733',
     'hungarumlautcmb' => '779',
+# consider dblacute or dblacutecmb as aliases for above two entries
     'hv' => '405',
     'hybull' => '8259',
     'hyphen' => '45',

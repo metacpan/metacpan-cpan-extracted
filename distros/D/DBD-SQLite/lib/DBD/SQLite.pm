@@ -5,7 +5,7 @@ use strict;
 use DBI   1.57 ();
 use DynaLoader ();
 
-our $VERSION = '1.60';
+our $VERSION = '1.62';
 our @ISA     = 'DynaLoader';
 
 # sqlite_version cache (set in the XS bootstrap)
@@ -47,6 +47,8 @@ sub driver {
         DBD::SQLite::db->install_method('sqlite_set_authorizer');
         DBD::SQLite::db->install_method('sqlite_backup_from_file');
         DBD::SQLite::db->install_method('sqlite_backup_to_file');
+        DBD::SQLite::db->install_method('sqlite_backup_from_dbh');
+        DBD::SQLite::db->install_method('sqlite_backup_to_dbh');
         DBD::SQLite::db->install_method('sqlite_enable_load_extension');
         DBD::SQLite::db->install_method('sqlite_load_extension');
         DBD::SQLite::db->install_method('sqlite_register_fts3_perl_tokenizer');
@@ -57,6 +59,8 @@ sub driver {
         DBD::SQLite::db->install_method('sqlite_db_status', { O => 0x0004 });
         DBD::SQLite::st->install_method('sqlite_st_status', { O => 0x0004 });
         DBD::SQLite::db->install_method('sqlite_create_module');
+        DBD::SQLite::db->install_method('sqlite_limit');
+        DBD::SQLite::db->install_method('sqlite_db_config');
 
         $methods_are_installed++;
     }
@@ -180,7 +184,7 @@ sub install_collation {
 
 # default implementation for sqlite 'REGEXP' infix operator.
 # Note : args are reversed, i.e. "a REGEXP b" calls REGEXP(b, a)
-# (see http://www.sqlite.org/vtab.html#xfindfunction)
+# (see https://www.sqlite.org/vtab.html#xfindfunction)
 sub regexp {
     use locale;
     return if !defined $_[0] || !defined $_[1];
@@ -189,6 +193,8 @@ sub regexp {
 
 package # hide from PAUSE
     DBD::SQLite::db;
+
+use DBI qw/:sql_types/;
 
 sub prepare {
     my $dbh = shift;
@@ -745,7 +751,7 @@ sub statistics_info {
                             NON_UNIQUE    => $row->{unique} ? 0 : 1, 
                             INDEX_QUALIFIER => undef,
                             INDEX_NAME      => $row->{name},
-                            TYPE            => 'btree', # see http://www.sqlite.org/version3.html esp. "Traditional B-trees are still used for indices"
+                            TYPE            => 'btree', # see https://www.sqlite.org/version3.html esp. "Traditional B-trees are still used for indices"
                             ORDINAL_POSITION => $info->{seqno} + 1,
                             COLUMN_NAME      => $info->{name},
                             ASC_OR_DESC      => undef,
@@ -772,45 +778,68 @@ sub statistics_info {
     return $sponge_sth;
 }
 
+my @TypeInfoKeys = qw/
+    TYPE_NAME
+    DATA_TYPE
+    COLUMN_SIZE
+    LITERAL_PREFIX
+    LITERAL_SUFFIX
+    CREATE_PARAMS
+    NULLABLE
+    CASE_SENSITIVE
+    SEARCHABLE
+    UNSIGNED_ATTRIBUTE
+    FIXED_PREC_SCALE
+    AUTO_UNIQUE_VALUE
+    LOCAL_TYPE_NAME
+    MINIMUM_SCALE
+    MAXIMUM_SCALE
+    SQL_DATA_TYPE
+    SQL_DATETIME_SUB
+    NUM_PREC_RADIX
+    INTERVAL_PRECISION
+/;
+
+my %TypeInfo = (
+    SQL_INTEGER ,=> {
+        TYPE_NAME => 'INTEGER',
+        DATA_TYPE => SQL_INTEGER,
+        NULLABLE => 2, # no for integer primary key, otherwise yes
+        SEARCHABLE => 3,
+    },
+    SQL_DOUBLE ,=> {
+        TYPE_NAME => 'REAL',
+        DATA_TYPE => SQL_DOUBLE,
+        NULLABLE => 1,
+        SEARCHABLE => 3,
+    },
+    SQL_VARCHAR ,=> {
+        TYPE_NAME => 'TEXT',
+        DATA_TYPE => SQL_VARCHAR,
+        LITERAL_PREFIX => "'",
+        LITERAL_SUFFIX => "'",
+        NULLABLE => 1,
+        SEARCHABLE => 3,
+    },
+    SQL_BLOB ,=> {
+        TYPE_NAME => 'BLOB',
+        DATA_TYPE => SQL_BLOB,
+        NULLABLE => 1,
+        SEARCHABLE => 3,
+    },
+    SQL_UNKNOWN_TYPE ,=> {
+        DATA_TYPE => SQL_UNKNOWN_TYPE,
+    },
+);
+
 sub type_info_all {
-    return; # XXX code just copied from DBD::Oracle, not yet thought about
-#    return [
-#        {
-#            TYPE_NAME          =>  0,
-#            DATA_TYPE          =>  1,
-#            COLUMN_SIZE        =>  2,
-#            LITERAL_PREFIX     =>  3,
-#            LITERAL_SUFFIX     =>  4,
-#            CREATE_PARAMS      =>  5,
-#            NULLABLE           =>  6,
-#            CASE_SENSITIVE     =>  7,
-#            SEARCHABLE         =>  8,
-#            UNSIGNED_ATTRIBUTE =>  9,
-#            FIXED_PREC_SCALE   => 10,
-#            AUTO_UNIQUE_VALUE  => 11,
-#            LOCAL_TYPE_NAME    => 12,
-#            MINIMUM_SCALE      => 13,
-#            MAXIMUM_SCALE      => 14,
-#            SQL_DATA_TYPE      => 15,
-#            SQL_DATETIME_SUB   => 16,
-#            NUM_PREC_RADIX     => 17,
-#        },
-#        [ 'CHAR', 1, 255, '\'', '\'', 'max length', 1, 1, 3,
-#            undef, '0', '0', undef, undef, undef, 1, undef, undef
-#        ],
-#        [ 'NUMBER', 3, 38, undef, undef, 'precision,scale', 1, '0', 3,
-#            '0', '0', '0', undef, '0', 38, 3, undef, 10
-#        ],
-#        [ 'DOUBLE', 8, 15, undef, undef, undef, 1, '0', 3,
-#            '0', '0', '0', undef, undef, undef, 8, undef, 10
-#        ],
-#        [ 'DATE', 9, 19, '\'', '\'', undef, 1, '0', 3,
-#            undef, '0', '0', undef, '0', '0', 11, undef, undef
-#        ],
-#        [ 'VARCHAR', 12, 1024*1024, '\'', '\'', 'max length', 1, 1, 3,
-#            undef, '0', '0', undef, undef, undef, 12, undef, undef
-#        ]
-#    ];
+    my $idx = 0;
+
+    my @info = ({map {$_ => $idx++} @TypeInfoKeys});
+    for my $id (sort {$a <=> $b} keys %TypeInfo) {
+        push @info, [map {$TypeInfo{$id}{$_}} @TypeInfoKeys];
+    }
+    return \@info;
 }
 
 my @COLUMN_INFO = qw(
@@ -987,7 +1016,7 @@ DBD::SQLite - Self-contained RDBMS in a DBI Driver
 =head1 DESCRIPTION
 
 SQLite is a public domain file-based relational database engine that
-you can find at L<http://www.sqlite.org/>.
+you can find at L<https://www.sqlite.org/>.
 
 B<DBD::SQLite> is a Perl DBI driver for SQLite, that includes
 the entire thing in the distribution.
@@ -1001,7 +1030,7 @@ SQLite supports the following features:
 
 =item Implements a large subset of SQL92
 
-See L<http://www.sqlite.org/lang.html> for details.
+See L<https://www.sqlite.org/lang.html> for details.
 
 =item A complete DB in a single disk file
 
@@ -1028,7 +1057,7 @@ are limited by the typeless nature of the SQLite database.
 =head1 SQLITE VERSION
 
 DBD::SQLite is usually compiled with a bundled SQLite library
-(SQLite version S<3.25.2> as of this release) for consistency.
+(SQLite version S<3.26.0> as of this release) for consistency.
 However, a different version of SQLite may sometimes be used for
 some reasons like security, or some new experimental features.
 
@@ -1072,7 +1101,7 @@ If the filename C<$dbfile> is an empty string, then a private,
 temporary on-disk database will be created. This private database will
 be automatically deleted as soon as the database connection is closed.
 
-As of 1.41_01, you can pass URI filename (see L<http://www.sqlite.org/uri.html>)
+As of 1.41_01, you can pass URI filename (see L<https://www.sqlite.org/uri.html>)
 as well for finer control:
 
   my $dbh = DBI->connect("dbi:SQLite:uri=file:$path_to_dbfile?mode=rwc");
@@ -1089,7 +1118,7 @@ You can set sqlite_open_flags (only) when you connect to a database:
     sqlite_open_flags => SQLITE_OPEN_READONLY,
   });
 
-See L<http://www.sqlite.org/c3ref/open.html> for details.
+See L<https://www.sqlite.org/c3ref/open.html> for details.
 
 As of 1.49_05, you can also make a database read-only by setting
 C<ReadOnly> attribute to true (only) when you connect to a database.
@@ -1207,7 +1236,7 @@ like this while executing:
 
   SELECT bar FROM foo GROUP BY bar HAVING count(*) > "5";
 
-There are three workarounds for this.
+There are four workarounds for this.
 
 =over 4
 
@@ -1290,7 +1319,7 @@ SQLite supports several placeholder expressions, including C<?>
 and C<:AAAA>. Consult the L<DBI> and SQLite documentation for
 details. 
 
-L<http://www.sqlite.org/lang_expr.html#varparam>
+L<https://www.sqlite.org/lang_expr.html#varparam>
 
 Note that a question mark actually means a next unused (numbered)
 placeholder. You're advised not to use it with other (numbered or
@@ -1360,7 +1389,7 @@ in the worst case. See also L</"Performance"> section below.
 
 =back
 
-See L<http://www.sqlite.org/pragma.html> for more details.
+See L<https://www.sqlite.org/pragma.html> for more details.
 
 =head2 Foreign Keys
 
@@ -1388,7 +1417,7 @@ SQLite, be prepared, and please do extensive testing to ensure
 that your applications will continue to work when the foreign keys
 support is enabled by default.
 
-See L<http://www.sqlite.org/foreignkeys.html> for details.
+See L<https://www.sqlite.org/foreignkeys.html> for details.
 
 =head2 Transactions
 
@@ -1442,7 +1471,7 @@ automatically begin if you execute another statement.
 
 This C<AutoCommit> mode is independent from the autocommit mode
 of the internal SQLite library, which always begins by a C<BEGIN>
-statement, and ends by a C<COMMIT> or a <ROLLBACK>.
+statement, and ends by a C<COMMIT> or a C<ROLLBACK>.
 
 =head2 Transaction and Database Locking
 
@@ -1511,7 +1540,7 @@ of the rest (since 1.30_01, and without creating DBI's statement
 handles internally since 1.47_01). If you do need to use C<prepare>
 or C<prepare_cached> (which I don't recommend in this case, because
 typically there's no placeholder nor reusable part in a dump),
-you can look at << $sth->{sqlite_unprepared_statements} >> to retrieve
+you can look at C<< $sth->{sqlite_unprepared_statements} >> to retrieve
 what's left, though it usually contains nothing but white spaces.
 
 =head2 TYPE statement attribute
@@ -1522,6 +1551,10 @@ the DBI specification. This value is also less useful for SQLite
 users because SQLite uses dynamic type system (that means,
 the datatype of a value is associated with the value itself, not
 with its container).
+
+As of version 1.61_02, if you set C<sqlite_prefer_numeric_type>
+database handle attribute to true, C<TYPE> statement handle
+attribute returns an array of integer, as an experiment.
 
 =head2 Performance
 
@@ -1571,7 +1604,7 @@ Your sweet spot probably lies somewhere in between.
 =item sqlite_version
 
 Returns the version of the SQLite library which B<DBD::SQLite> is using,
-e.g., "2.8.0". Can only be read.
+e.g., "3.26.0". Can only be read.
 
 =item sqlite_unicode
 
@@ -1581,7 +1614,7 @@ for perl < 5.8.5). For more details on the UTF-8 flag see
 L<perlunicode>. The default is for the UTF-8 flag to be turned off.
 
 Also note that due to some bizarreness in SQLite's type system (see
-L<http://www.sqlite.org/datatype3.html>), if you want to retain
+L<https://www.sqlite.org/datatype3.html>), if you want to retain
 blob-style behavior for B<some> columns under C<< $dbh->{sqlite_unicode} = 1
 >> (say, to store images in the database), you have to state so
 explicitly using the 3-argument form of L<DBI/bind_param> when doing
@@ -1625,7 +1658,12 @@ for details.
 =item sqlite_extended_result_codes
 
 If set to true, DBD::SQLite uses extended result codes where appropriate
-(see L<http://www.sqlite.org/rescode.html>).
+(see L<https://www.sqlite.org/rescode.html>).
+
+=item sqlite_defensive
+
+If set to true, language features that allow ordinary SQL to deliberately
+corrupt the database file are prohibited.
 
 =back
 
@@ -1799,7 +1837,7 @@ returns true if the database file exists (or the database is in-memory), and the
 The following methods can be called via the func() method with a little
 tweak, but the use of func() method is now discouraged by the L<DBI> author
 for various reasons (see DBI's document
-L<http://search.cpan.org/dist/DBI/lib/DBI/DBD.pm#Using_install_method()_to_expose_driver-private_methods>
+L<https://metacpan.org/pod/DBI::DBD#Using-install_method()-to-expose-driver-private-methods>
 for details). So, if you're using L<DBI> >= 1.608, use these C<sqlite_>
 methods. If you need to use an older L<DBI>, you can call these like this:
 
@@ -2176,6 +2214,19 @@ special :memory: database, and you wish to populate it from an existing DB.
 This method accesses the SQLite Online Backup API, and will take a backup of
 the currently connected database, and write it out to the named file.
 
+=head2 $dbh->sqlite_backup_from_dbh( $another_dbh )
+
+This method accesses the SQLite Online Backup API, and will take a backup of
+the database for the passed handle, copying it to, and overwriting, your current database
+connection. This can be particularly handy if your current connection is to the
+special :memory: database, and you wish to populate it from an existing DB.
+You can use this to backup from an in-memory database to another in-memory database.
+
+=head2 $dbh->sqlite_backup_to_dbh( $another_dbh )
+
+This method accesses the SQLite Online Backup API, and will take a backup of
+the currently connected database, and write it out to the passed database handle.
+
 =head2 $dbh->sqlite_enable_load_extension( $bool )
 
 Calling this method with a true value enables loading (external)
@@ -2248,16 +2299,37 @@ is for internal use only.
 
 =head2 $dbh->sqlite_db_status()
 
-Returns a hash reference that holds a set of status information of database connection such as cache usage. See L<http://www.sqlite.org/c3ref/c_dbstatus_options.html> for details. You may also pass 0 as an argument to reset the status.
+Returns a hash reference that holds a set of status information of database connection such as cache usage. See L<https://www.sqlite.org/c3ref/c_dbstatus_options.html> for details. You may also pass 0 as an argument to reset the status.
 
 =head2 $sth->sqlite_st_status()
 
-Returns a hash reference that holds a set of status information of SQLite statement handle such as full table scan count. See L<http://www.sqlite.org/c3ref/c_stmtstatus_counter.html> for details. Statement status only holds the current value.
+Returns a hash reference that holds a set of status information of SQLite statement handle such as full table scan count. See L<https://www.sqlite.org/c3ref/c_stmtstatus_counter.html> for details. Statement status only holds the current value.
 
   my $status = $sth->sqlite_st_status();
   my $cur = $status->{fullscan_step};
 
 You may also pass 0 as an argument to reset the status.
+
+=head2 $dbh->sqlite_db_config( $id, $new_integer_value )
+
+You can change how the connected database should behave like this:
+
+  use DBD::SQLite::Constants qw/:database_connection_configuration_options/;
+  
+  my $dbh = DBI->connect('dbi:SQLite::memory:');
+
+  # This disables language features that allow ordinary SQL
+  # to deliberately corrupt the database file
+  $dbh->sqlite_db_config( SQLITE_DBCONFIG_DEFENSIVE, 1 );
+  
+  # This disables two-arg version of fts3_tokenizer.
+  $dbh->sqlite_db_config( SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER, 0 );
+
+C<sqlite_db_config> returns the new value after the call. If you just want to know the current value without changing anything, pass a negative integer value.
+
+  my $current_value = $dbh->sqlite_db_config( SQLITE_DBCONFIG_DEFENSIVE, -1 );
+
+As of this writing, C<sqlite_db_config> only supports options that set an integer value. C<SQLITE_DBCONFIG_LOOKASIDE> and C<SQLITE_DBCONFIG_MAINDBNAME> are not supported. See also C<https://www.sqlite.org/capi3ref.html#sqlite3_db_config> for details.
 
 =head2 $dbh->sqlite_create_module()
 
@@ -2265,6 +2337,13 @@ Registers a name for a I<virtual table module>. Module names must be
 registered before creating a new virtual table using the module and
 before using a preexisting virtual table for the module.
 Virtual tables are explained in L<DBD::SQLite::VirtualTable>.
+
+=head2 $dbh->sqlite_limit( $category_id, $new_value )
+
+Sets a new run-time limit for the category, and returns the current limit.
+If the new value is a negative number (or omitted), the limit is unchanged
+and just returns the current limit. Category ids (SQLITE_LIMIT_LENGTH,
+SQLITE_LIMIT_VARIABLE_NUMBER, etc) can be imported from DBD::SQLite::Constants. 
 
 =head1 DRIVER FUNCTIONS
 
@@ -2276,7 +2355,7 @@ library is old or compiled with SQLITE_OMIT_COMPILEOPTION_DIAGS.
 
 =head2 DBD::SQLite::sqlite_status()
 
-Returns a hash reference that holds a set of status information of SQLite runtime such as memory usage or page cache usage (see L<http://www.sqlite.org/c3ref/c_status_malloc_count.html> for details). Each of the entry contains the current value and the highwater value.
+Returns a hash reference that holds a set of status information of SQLite runtime such as memory usage or page cache usage (see L<https://www.sqlite.org/c3ref/c_status_malloc_count.html> for details). Each of the entry contains the current value and the highwater value.
 
   my $status = DBD::SQLite::sqlite_status();
   my $cur  = $status->{memory_used}{current};
@@ -2310,7 +2389,7 @@ DELETE operation would be written as follows :
 
 The list of constants implemented in C<DBD::SQLite> is given
 below; more information can be found ad
-at L<http://www.sqlite.org/c3ref/constlist.html>.
+at L<https://www.sqlite.org/c3ref/constlist.html>.
 
 =head2 Authorizer Return Codes
 
@@ -2370,7 +2449,7 @@ associated strings.
 SQLite v3 provides the ability for users to supply arbitrary
 comparison functions, known as user-defined "collation sequences" or
 "collating functions", to be used for comparing two text values.
-L<http://www.sqlite.org/datatype3.html#collation>
+L<https://www.sqlite.org/datatype3.html#collation>
 explains how collations are used in various SQL expressions.
 
 =head2 Builtin collation sequences
@@ -2534,7 +2613,7 @@ then query which buildings overlap or are contained within a specified region:
                         $minLong, $maxLong, $minLat, $maxLat);  
 
 For more detail, please see the SQLite R-Tree page
-(L<http://www.sqlite.org/rtree.html>). Note that custom R-Tree
+(L<https://www.sqlite.org/rtree.html>). Note that custom R-Tree
 queries using callbacks, as mentioned in the prior link, have not been
 implemented yet.
 
@@ -2618,13 +2697,17 @@ Reading/writing into blobs using C<sqlite2_blob_open> / C<sqlite2_blob_close>.
 =head2 Support for custom callbacks for R-Tree queries
 
 Custom queries of a R-Tree index using a callback are possible with
-the SQLite C API (L<http://www.sqlite.org/rtree.html>), so one could
+the SQLite C API (L<https://www.sqlite.org/rtree.html>), so one could
 potentially use a callback that narrowed the result set down based
 on a specific need, such as querying for overlapping circles.
 
 =head1 SUPPORT
 
-Bugs should be reported via the CPAN bug tracker at
+Bugs should be reported to GitHub issues:
+
+L<https://github.com/DBD-SQLite/DBD-SQLite/issues>
+
+or via RT if you prefer:
 
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBD-SQLite>
 

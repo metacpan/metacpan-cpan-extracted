@@ -1,28 +1,28 @@
 package Exception::SendMail;
-$Exception::SendMail::VERSION = '0.007';
+$Exception::SendMail::VERSION = '0.008';
 use base qw(Exception);
 
 package Exception::SendMail::BadAddress;
-$Exception::SendMail::BadAddress::VERSION = '0.007';
+$Exception::SendMail::BadAddress::VERSION = '0.008';
 use base qw(Exception::SendMail);
 
 package QBit::Application::Model::SendMail;
-$QBit::Application::Model::SendMail::VERSION = '0.007';
+$QBit::Application::Model::SendMail::VERSION = '0.008';
 use qbit;
 use base qw(QBit::Application::Model);
 use MIME::Base64 qw(encode_base64);
 use MIME::Lite;
 
 our %MESSAGE_STRUCT = (
-    from     => {type => 'email', max      => 1, required => 1},
-    to       => {type => 'email', required => 1},
-    cc       => {type => 'email'},
-    bcc      => {type => 'email'},
-    reply_to => {type => 'email'},
+    from         => {type => 'email',       max      => 1, required => 1},
+    to           => {type => 'email',       required => 1},
+    cc           => {type => 'email'},
+    bcc          => {type => 'email'},
+    reply_to     => {type => 'email'},
     subject      => {type => 'str',         required => 1},
     content_type => {type => 'contenttype', default  => 'text/plain'},
     body         => {type => 'str',         conv_raw => 1, required => 1},
-    attachments => {
+    attachments  => {
         type   => 'struct',
         struct => {
             data         => {type => 'str',         conv_raw => 1},
@@ -96,10 +96,10 @@ our %FIELD_TYPE;
                         ', ',
                         map({
                                 utf8::encode($_->{'name'});
-                                  $_->{'name'}
-                                ? '=?UTF-8?B?' . encode_base64($_->{'name'}, '') . '?= <' . $_->{'email'} . '>'
-                                : $_->{'email'}
-                            } @$data)
+                                $_->{'name'}
+                                  ? '=?UTF-8?B?' . encode_base64($_->{'name'}, '') . '?= <' . $_->{'email'} . '>'
+                                  : $_->{'email'}
+                        } @$data)
                     );
                 },
             ],
@@ -323,14 +323,8 @@ sub send {
 
     $self->_before_send($mail);
 
-    if ($self->get_option('via', 'sendmail') eq 'sendmail') {
-        $mail->send_by_sendmail(%{$self->get_option('sendmail')})
-          || throw Exception::SendMail gettext("Can't send message");
-    } elsif ($self->get_option('via') eq 'smtp') {
-        $mail->send_by_smtp(%{$self->get_option('smtp')});
-    } elsif ($self->get_option('via') eq 'testfile') {
-        $mail->send_by_testfile($self->get_option('testfile'));
-    }
+    my $meth = $self->get_option('via', 'sendmail');
+    $mail->send($meth, @{$self->get_option($meth, [])});
 
     $self->_after_send($mail);
 }
@@ -360,12 +354,8 @@ https://github.com/QBitFramework/QBit-Application-Model-SendMail
 
 cpanm QBit::Application::Model::SendMail
 
-=item *
-
-apt-get install libqbit-application-model-sendmail-perl (http://perlhub.ru/)
-
 =back
 
-For more information. please, see code.
+For more information, please, see code.
 
 =cut

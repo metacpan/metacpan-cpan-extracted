@@ -1470,7 +1470,6 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
           stack_index += type_width;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
@@ -1924,10 +1923,10 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
       case SPVM_OPCODE_C_ID_NEGATE_DOUBLE:
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_negate(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_DOUBLE, opcode->operand0, opcode->operand1);
         break;
-      case SPVM_OPCODE_C_ID_COMPLEMENT_INT:
+      case SPVM_OPCODE_C_ID_BIT_NOT_INT:
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_complement(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_INT, opcode->operand0, opcode->operand1);
         break;
-      case SPVM_OPCODE_C_ID_COMPLEMENT_LONG:
+      case SPVM_OPCODE_C_ID_BIT_NOT_LONG:
         SPVM_CSOURCE_BUILDER_PRECOMPILE_add_complement(env, string_buffer, SPVM_CSOURCE_BUILDER_PRECOMPILE_C_CTYPE_ID_LONG, opcode->operand0, opcode->operand1);
         break;
       case SPVM_OPCODE_C_ID_CONVERT_SHORT_TO_BYTE:
@@ -5079,7 +5078,6 @@ void SPVM_CSOURCE_BUILDER_PRECOMPILE_build_sub_implementation(SPVM_ENV* env, SPV
   // No exception
   SPVM_STRING_BUFFER_add(string_buffer, "  if (!exception_flag) {\n");
   switch (sub->return_runtime_type) {
-    case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
     case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
     case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
     case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:

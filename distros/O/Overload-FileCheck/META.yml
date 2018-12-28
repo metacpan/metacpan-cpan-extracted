@@ -22,16 +22,16 @@ name: Overload-FileCheck
 provides:
   Overload::FileCheck:
     file: lib/Overload/FileCheck.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   perl: '5.010'
 resources:
   bugtracker: https://github.com/CpanelInc/Overload-FileCheck/issues
   repository: https://github.com/CpanelInc/Overload-FileCheck.git
-version: '0.007'
+version: '0.008'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.026002'
   plugins:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
@@ -208,7 +208,7 @@ x_Dist_Zilla:
             - 'gh HEAD:refs/heads/released'
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: '2.17.2 (Apple Git-113)'
           repo_root: .
       name: Git::Push
       version: '2.045'
@@ -241,7 +241,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: '2.17.2 (Apple Git-113)'
           repo_root: .
       name: '@Git/Check'
       version: '2.045'
@@ -262,7 +262,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: '2.17.2 (Apple Git-113)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -275,11 +275,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.007
+          tag: v0.008
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: '2.17.2 (Apple Git-113)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -294,7 +294,7 @@ x_Dist_Zilla:
             - 'gh HEAD:refs/heads/released'
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: '2.17.2 (Apple Git-113)'
           repo_root: .
       name: '@Git/Push'
       version: '2.045'
@@ -327,7 +327,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: '2.17.2 (Apple Git-113)'
           repo_root: .
       name: Git::NextVersion
       version: '2.045'
@@ -468,5 +468,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

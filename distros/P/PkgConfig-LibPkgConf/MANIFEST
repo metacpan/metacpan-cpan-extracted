@@ -17,6 +17,8 @@ lib/PkgConfig/LibPkgConf/XS.pm
 LibPkgConf.xs
 LICENSE
 maint/buildpkgconf
+maint/cip-before-install
+maint/cip-before-install-pkgconf-master
 maint/releaseprep
 Makefile.PL
 MANIFEST			This list of files

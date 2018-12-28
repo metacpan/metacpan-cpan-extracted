@@ -57,7 +57,7 @@ CF_END
 };
 plan skip_all => "failed to set up a test distribution" if $@;
 
-ok !system("$^X Makefile.PL"), "ran Makefile.PL";
+ok !system($^X, "Makefile.PL"), "ran Makefile.PL";
 ok -f "Makefile", "generated Makefile";
 
 my $makefile = do { local $/; open my $fh, '<', "Makefile"; <$fh> };

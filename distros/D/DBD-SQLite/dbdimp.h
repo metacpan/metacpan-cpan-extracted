@@ -53,6 +53,7 @@ struct imp_dbh_st {
     int extended_result_codes;
     stmt_list_s * stmt_list;
     bool began_transaction;
+    bool prefer_numeric_type;
 };
 
 /* Statement Handle */
@@ -116,6 +117,8 @@ int sqlite_bind_col( SV *sth, imp_sth_t *imp_sth, SV *col, SV *ref, IV sql_type,
 int sqlite_db_busy_timeout (pTHX_ SV *dbh, SV *timeout );
 int sqlite_db_backup_from_file(pTHX_ SV *dbh, char *filename);
 int sqlite_db_backup_to_file(pTHX_ SV *dbh, char *filename);
+int sqlite_db_backup_from_dbh(pTHX_ SV *dbh, SV *from);
+int sqlite_db_backup_to_dbh(pTHX_ SV *dbh, SV *to);
 void sqlite_db_collation_needed(pTHX_ SV *dbh, SV *callback );
 SV* sqlite_db_commit_hook( pTHX_ SV *dbh, SV *hook );
 SV* sqlite_db_rollback_hook( pTHX_ SV *dbh, SV *hook );
@@ -131,6 +134,8 @@ int sqlite_db_register_fts3_perl_tokenizer(pTHX_ SV *dbh);
 HV* _sqlite_status(int reset);
 HV* _sqlite_st_status(pTHX_ SV *sth, int reset);
 int sqlite_db_create_module(pTHX_ SV *dbh, const char *name, const char *perl_class);
+int sqlite_db_limit(pTHX_ SV *dbh, int id, int new_value);
+int sqlite_db_config(pTHX_ SV *dbh, int id, int new_value);
 int sqlite_db_do_sv(SV *dbh, imp_dbh_t *imp_dbh, SV *sv_statement);
 void init_cxt();
 

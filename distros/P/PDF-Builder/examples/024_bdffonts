@@ -147,6 +147,7 @@ $myName =~ s/\.bdf$//i;  # trim off extension
 $pdf->saveas("$0.$myName.pdf");
 
 $pdf->end();
+print STDERR "\n";
 
 
 __END__

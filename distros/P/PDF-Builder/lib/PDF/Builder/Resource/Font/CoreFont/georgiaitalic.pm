@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::georgiaitalic;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -640,6 +640,7 @@ sub data { return {
         'ring' => '572',                         # U+0x02DA
         'ogonek' => '500',                       # U+0x02DB
         'hungarumlaut' => '500',                 # U+0x02DD
+        'dblgravecmb' => '500',                  # U+0x030F
         'tonos' => '500',                        # U+0x0384
         'dieresistonos' => '500',                # U+0x0385
         'Alphatonos' => '675',                   # U+0x0386

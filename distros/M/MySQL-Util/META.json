@@ -1,0 +1,60 @@
+{
+   "abstract" : "Utility functions for working with MySQL.",
+   "author" : [
+      "John Gravatt <gravattj@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MySQL-Util",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "0",
+            "DBD::mysql" : "0",
+            "DBI" : "0",
+            "DBIx::DataFactory" : "0",
+            "Data::Compare" : "1.22",
+            "List::MoreUtils" : "0",
+            "Modern::Perl" : "0",
+            "Module::Load" : "0",
+            "Moose" : "1.24",
+            "Moose::Role" : "0",
+            "SQL::Beautify" : "0",
+            "Smart::Args" : "0",
+            "String::Util" : "0",
+            "Symbol::Util" : "0",
+            "Test::More" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.31",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

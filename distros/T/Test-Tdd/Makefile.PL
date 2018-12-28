@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Test::Tdd",
   "PREREQ_PM" => {
+    "Class::MOP" => 0,
     "Cwd" => 0,
     "File::Find" => 0,
     "Filesys::Notify::Simple" => 0,
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => ""
   }
@@ -35,6 +36,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Class::MOP" => 0,
   "Cwd" => 0,
   "File::Find" => 0,
   "Filesys::Notify::Simple" => 0,

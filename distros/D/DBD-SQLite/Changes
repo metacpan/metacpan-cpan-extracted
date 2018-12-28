@@ -1,5 +1,31 @@
 Changes for Perl extension DBD-SQLite
 
+1.62 2018-12-29
+    - Switched to a production version
+
+1.61_04 2018-12-22
+    - Added sqlite_db_config method and new constants for it
+    - Added sqlite_defensive option to disallow dangerous SQLite features
+    - Exposed some of the hidden extended result codes
+
+1.61_03 2018-12-19
+    - Upgraded SQLite to 3.26.0, which reportedly has a security fix
+
+1.61_02 2018-12-01
+    - Added sqlite_backup_from_dbh/sqlite_backup_to_dbh methods
+    - Introduced sqlite_prefer_numeric_type database handle attribute
+      that changes the value of TYPE statement handle attribute
+      from an array of string to an array of integer, as an experimental
+      feature. Setting this may break your applications.
+    - Changed preferred bugtracker
+
+1.61_01 2018-12-01
+    - Added ability to configure SQLITE_MAX_LENGT with environmental
+      variable (Roy Storey)
+    - Added sqlite_limit database handle method to change run-time limits
+    - Upgraded SQLite to 3.25.3
+    - Updated constants
+
 1.60 2018-12-01
     - Switched to a production version
 

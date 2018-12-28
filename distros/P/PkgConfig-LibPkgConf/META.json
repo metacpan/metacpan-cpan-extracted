@@ -25,7 +25,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.98"
          }
       },
       "runtime" : {
@@ -35,7 +35,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94"
+            "Test::More" : "0.98"
          }
       }
    },
@@ -53,6 +53,6 @@
       "x_IRC" : "irc://irc.perl.org/#native",
       "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
    },
-   "version" : "0.09",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

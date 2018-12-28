@@ -76,7 +76,7 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "POST_INC",
   "PRE_DEC",
   "POST_DEC",
-  "COMPLEMENT",
+  "NOT",
   "NEGATE",
   "PLUS",
   "EQ",
@@ -97,9 +97,9 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "LEFT_SHIFT",
   "RIGHT_SHIFT",
   "RIGHT_SHIFT_UNSIGNED",
-  "AND",
-  "OR",
-  "NOT",
+  "COND_AND",
+  "COND_OR",
+  "COND_NOT",
   "ARRAY_ACCESS",
   "ASSIGN",
   "CALL_SUB",
@@ -246,12 +246,12 @@ int32_t SPVM_OP_is_rel_op(SPVM_COMPILER* compiler, SPVM_OP* op) {
   (void)compiler;
   
   switch (op->id) {
-    case SPVM_OP_C_ID_EQ:
-    case SPVM_OP_C_ID_NE:
-    case SPVM_OP_C_ID_GT:
-    case SPVM_OP_C_ID_GE:
-    case SPVM_OP_C_ID_LT:
-    case SPVM_OP_C_ID_LE:
+    case SPVM_OP_C_ID_NUMERIC_EQ:
+    case SPVM_OP_C_ID_NUMERIC_NE:
+    case SPVM_OP_C_ID_NUMERIC_GT:
+    case SPVM_OP_C_ID_NUMERIC_GE:
+    case SPVM_OP_C_ID_NUMERIC_LT:
+    case SPVM_OP_C_ID_NUMERIC_LE:
     case SPVM_OP_C_ID_STRING_EQ:
     case SPVM_OP_C_ID_STRING_NE:
     case SPVM_OP_C_ID_STRING_GT:
@@ -910,9 +910,9 @@ SPVM_OP* SPVM_OP_build_for_statement(SPVM_COMPILER* compiler, SPVM_OP* op_for, S
   SPVM_OP_insert_child(compiler, op_loop_increment, op_loop_increment->last, op_term_increment);
   
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_term_init);
+  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_condition);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_block_statements);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_loop_increment);
-  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_condition);
   
   SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_block_init);
   
@@ -945,9 +945,9 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
   SPVM_OP_insert_child(compiler, op_loop_increment, op_loop_increment->last, op_term_increment);
   
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_term_init);
+  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_condition);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_block_statements);
   SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_loop_increment);
-  SPVM_OP_insert_child(compiler, op_block_init, op_block_init->last, op_condition);
   
   SPVM_OP_insert_child(compiler, op_loop, op_loop->last, op_block_init);
   
@@ -1097,12 +1097,12 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
       type = package->op_type->uv.type;
       break;
     }
-    case SPVM_OP_C_ID_EQ:
-    case SPVM_OP_C_ID_NE:
-    case SPVM_OP_C_ID_GT:
-    case SPVM_OP_C_ID_GE:
-    case SPVM_OP_C_ID_LT:
-    case SPVM_OP_C_ID_LE:
+    case SPVM_OP_C_ID_NUMERIC_EQ:
+    case SPVM_OP_C_ID_NUMERIC_NE:
+    case SPVM_OP_C_ID_NUMERIC_GT:
+    case SPVM_OP_C_ID_NUMERIC_GE:
+    case SPVM_OP_C_ID_NUMERIC_LT:
+    case SPVM_OP_C_ID_NUMERIC_LE:
     case SPVM_OP_C_ID_BOOL:
     case SPVM_OP_C_ID_STRING_EQ:
     case SPVM_OP_C_ID_STRING_NE:
@@ -1163,7 +1163,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_BIT_XOR:
     case SPVM_OP_C_ID_BIT_OR:
     case SPVM_OP_C_ID_BIT_AND:
-    case SPVM_OP_C_ID_COMPLEMENT:
+    case SPVM_OP_C_ID_BIT_NOT:
     case SPVM_OP_C_ID_PLUS:
     case SPVM_OP_C_ID_NEGATE:
     case SPVM_OP_C_ID_NEW:
@@ -2610,7 +2610,7 @@ SPVM_OP* SPVM_OP_build_not(SPVM_COMPILER* compiler, SPVM_OP* op_not, SPVM_OP* op
   
   // Convert ! to if statement
   // before
-  //  NOT
+  //  COND_NOT
   //    first
   
   // after 

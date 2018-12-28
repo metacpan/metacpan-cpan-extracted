@@ -472,86 +472,87 @@ OUTPUT:
 
 
 BOOT:
-if (!gl_overload_ft) {
-     HV *stash;
-     SV *sv;
-     int ix = 0;
+    if (!gl_overload_ft) {
+         HV *stash;
+         SV *sv;
+         int ix = 0;
 
-     Newxz( gl_overload_ft, 1, OverloadFTOps);
+         Newxz( gl_overload_ft, 1, OverloadFTOps);
 
-     stash = gv_stashpvn("Overload::FileCheck", 19, TRUE);
+         stash = gv_stashpvn("Overload::FileCheck", 19, TRUE);
 
-     newCONSTSUB(stash, "_loaded", newSViv(1) );
+         newCONSTSUB(stash, "_loaded", newSViv(1) );
 
-     /* provide constants to standardize return values from mocked functions */
-     newCONSTSUB(stash, "CHECK_IS_TRUE",         &PL_sv_yes );   /* could use newSViv(1) or &PL_sv_yes */
-     newCONSTSUB(stash, "CHECK_IS_FALSE",        &PL_sv_no );    /* could use newSViv(0) or &PL_sv_no  */
-     newCONSTSUB(stash, "CHECK_IS_NULL",         &PL_sv_undef ); /* FIXME: need to handle this as a valid answer */
-     newCONSTSUB(stash, "FALLBACK_TO_REAL_OP",  newSVnv(-1) );
+         /* provide constants to standardize return values from mocked functions */
+         newCONSTSUB(stash, "CHECK_IS_TRUE",         &PL_sv_yes );   /* could use newSViv(1) or &PL_sv_yes */
+         newCONSTSUB(stash, "CHECK_IS_FALSE",        &PL_sv_no );    /* could use newSViv(0) or &PL_sv_no  */
+         newCONSTSUB(stash, "CHECK_IS_NULL",         &PL_sv_undef ); /* FIXME: need to handle this as a valid answer */
+         newCONSTSUB(stash, "FALLBACK_TO_REAL_OP",  newSVnv(-1) );
 
-     /* provide constants to add entry in a fake stat array */
+         /* provide constants to add entry in a fake stat array */
 
-     newCONSTSUB(stash, "ST_DEV",                newSViv(ix++) );
-     newCONSTSUB(stash, "ST_INO",                newSViv(ix++) );
-     newCONSTSUB(stash, "ST_MODE",               newSViv(ix++) );
-     newCONSTSUB(stash, "ST_NLINK",              newSViv(ix++) );
-     newCONSTSUB(stash, "ST_UID",                newSViv(ix++) );
-     newCONSTSUB(stash, "ST_GID",                newSViv(ix++) );
-     newCONSTSUB(stash, "ST_RDEV",               newSViv(ix++) );
-     newCONSTSUB(stash, "ST_SIZE",               newSViv(ix++) );
-     newCONSTSUB(stash, "ST_ATIME",              newSViv(ix++) );
-     newCONSTSUB(stash, "ST_MTIME",              newSViv(ix++) );
-     newCONSTSUB(stash, "ST_CTIME",              newSViv(ix++) );
-     newCONSTSUB(stash, "ST_BLKSIZE",            newSViv(ix++) );
-     newCONSTSUB(stash, "ST_BLOCKS",             newSViv(ix++) );
-     assert(STAT_T_MAX == ix);
-     newCONSTSUB(stash, "STAT_T_MAX",            newSViv(STAT_T_MAX) );
+         newCONSTSUB(stash, "ST_DEV",                newSViv(ix++) );
+         newCONSTSUB(stash, "ST_INO",                newSViv(ix++) );
+         newCONSTSUB(stash, "ST_MODE",               newSViv(ix++) );
+         newCONSTSUB(stash, "ST_NLINK",              newSViv(ix++) );
+         newCONSTSUB(stash, "ST_UID",                newSViv(ix++) );
+         newCONSTSUB(stash, "ST_GID",                newSViv(ix++) );
+         newCONSTSUB(stash, "ST_RDEV",               newSViv(ix++) );
+         newCONSTSUB(stash, "ST_SIZE",               newSViv(ix++) );
+         newCONSTSUB(stash, "ST_ATIME",              newSViv(ix++) );
+         newCONSTSUB(stash, "ST_MTIME",              newSViv(ix++) );
+         newCONSTSUB(stash, "ST_CTIME",              newSViv(ix++) );
+         newCONSTSUB(stash, "ST_BLKSIZE",            newSViv(ix++) );
+         newCONSTSUB(stash, "ST_BLOCKS",             newSViv(ix++) );
+         assert(STAT_T_MAX == ix);
+         newCONSTSUB(stash, "STAT_T_MAX",            newSViv(STAT_T_MAX) );
 
-     /* copy the original OP then plug our own custom OP function */
-     /* view pp_sys.c for complete list */
+         /* copy the original OP then plug our own custom OP function */
+         /* view pp_sys.c for complete list */
 
-     /* PP(pp_ftrread) - yes/no/undef */
-     INIT_FILECHECK_MOCK( "OP_FTRREAD",   OP_FTRREAD,   &Perl_pp_overload_ft_yes_no);   /* -R */
-     INIT_FILECHECK_MOCK( "OP_FTRWRITE",  OP_FTRWRITE,  &Perl_pp_overload_ft_yes_no);   /* -W */
-     INIT_FILECHECK_MOCK( "OP_FTREXEC",   OP_FTREXEC,   &Perl_pp_overload_ft_yes_no);   /* -X */
-     INIT_FILECHECK_MOCK( "OP_FTEREAD",   OP_FTEREAD,   &Perl_pp_overload_ft_yes_no);   /* -r */
-     INIT_FILECHECK_MOCK( "OP_FTEWRITE",  OP_FTEWRITE,  &Perl_pp_overload_ft_yes_no);   /* -w */
-     INIT_FILECHECK_MOCK( "OP_FTEEXEC",   OP_FTEEXEC,   &Perl_pp_overload_ft_yes_no);   /* -x */
+         /* PP(pp_ftrread) - yes/no/undef */
+         INIT_FILECHECK_MOCK( "OP_FTRREAD",   OP_FTRREAD,   &Perl_pp_overload_ft_yes_no);   /* -R */
+         INIT_FILECHECK_MOCK( "OP_FTRWRITE",  OP_FTRWRITE,  &Perl_pp_overload_ft_yes_no);   /* -W */
+         INIT_FILECHECK_MOCK( "OP_FTREXEC",   OP_FTREXEC,   &Perl_pp_overload_ft_yes_no);   /* -X */
+         INIT_FILECHECK_MOCK( "OP_FTEREAD",   OP_FTEREAD,   &Perl_pp_overload_ft_yes_no);   /* -r */
+         INIT_FILECHECK_MOCK( "OP_FTEWRITE",  OP_FTEWRITE,  &Perl_pp_overload_ft_yes_no);   /* -w */
+         INIT_FILECHECK_MOCK( "OP_FTEEXEC",   OP_FTEEXEC,   &Perl_pp_overload_ft_yes_no);   /* -x */
 
-     /* PP(pp_ftis) - yes/undef/true/false */
-     INIT_FILECHECK_MOCK( "OP_FTIS",      OP_FTIS,      &Perl_pp_overload_ft_yes_no);   /* -e */
-     INIT_FILECHECK_MOCK( "OP_FTSIZE",    OP_FTSIZE,    &Perl_pp_overload_ft_int);   /* -s */
-     INIT_FILECHECK_MOCK( "OP_FTMTIME",   OP_FTMTIME,   &Perl_pp_overload_ft_nv);   /* -M */
-     INIT_FILECHECK_MOCK( "OP_FTCTIME",   OP_FTCTIME,   &Perl_pp_overload_ft_nv);   /* -C */
-     INIT_FILECHECK_MOCK( "OP_FTATIME",   OP_FTATIME,   &Perl_pp_overload_ft_nv);   /* -A */
+         /* PP(pp_ftis) - yes/undef/true/false */
+         INIT_FILECHECK_MOCK( "OP_FTIS",      OP_FTIS,      &Perl_pp_overload_ft_yes_no);   /* -e */
+         INIT_FILECHECK_MOCK( "OP_FTSIZE",    OP_FTSIZE,    &Perl_pp_overload_ft_int);   /* -s */
+         INIT_FILECHECK_MOCK( "OP_FTMTIME",   OP_FTMTIME,   &Perl_pp_overload_ft_nv);   /* -M */
+         INIT_FILECHECK_MOCK( "OP_FTCTIME",   OP_FTCTIME,   &Perl_pp_overload_ft_nv);   /* -C */
+         INIT_FILECHECK_MOCK( "OP_FTATIME",   OP_FTATIME,   &Perl_pp_overload_ft_nv);   /* -A */
 
-     /* PP(pp_ftrowned) yes/no/undef */
-     INIT_FILECHECK_MOCK( "OP_FTROWNED",  OP_FTROWNED,  &Perl_pp_overload_ft_yes_no);   /* -O */
-     INIT_FILECHECK_MOCK( "OP_FTEOWNED",  OP_FTEOWNED,  &Perl_pp_overload_ft_yes_no);   /* -o */
-     INIT_FILECHECK_MOCK( "OP_FTZERO",    OP_FTZERO,    &Perl_pp_overload_ft_yes_no);   /* -z */
-     INIT_FILECHECK_MOCK( "OP_FTSOCK",    OP_FTSOCK,    &Perl_pp_overload_ft_yes_no);   /* -S */
-     INIT_FILECHECK_MOCK( "OP_FTCHR",     OP_FTCHR,     &Perl_pp_overload_ft_yes_no);   /* -c */
-     INIT_FILECHECK_MOCK( "OP_FTBLK",     OP_FTBLK,     &Perl_pp_overload_ft_yes_no);   /* -b */
-     INIT_FILECHECK_MOCK( "OP_FTFILE",    OP_FTFILE,    &Perl_pp_overload_ft_yes_no);   /* -f */
-     INIT_FILECHECK_MOCK( "OP_FTDIR",     OP_FTDIR,     &Perl_pp_overload_ft_yes_no);   /* -d */
-     INIT_FILECHECK_MOCK( "OP_FTPIPE",    OP_FTPIPE,    &Perl_pp_overload_ft_yes_no);   /* -p */
-     INIT_FILECHECK_MOCK( "OP_FTSUID",    OP_FTSUID,    &Perl_pp_overload_ft_yes_no);   /* -u */
-     INIT_FILECHECK_MOCK( "OP_FTSGID",    OP_FTSGID,    &Perl_pp_overload_ft_yes_no);   /* -g */
-     INIT_FILECHECK_MOCK( "OP_FTSVTX",    OP_FTSVTX,    &Perl_pp_overload_ft_yes_no);   /* -k */
+         /* PP(pp_ftrowned) yes/no/undef */
+         INIT_FILECHECK_MOCK( "OP_FTROWNED",  OP_FTROWNED,  &Perl_pp_overload_ft_yes_no);   /* -O */
+         INIT_FILECHECK_MOCK( "OP_FTEOWNED",  OP_FTEOWNED,  &Perl_pp_overload_ft_yes_no);   /* -o */
+         INIT_FILECHECK_MOCK( "OP_FTZERO",    OP_FTZERO,    &Perl_pp_overload_ft_yes_no);   /* -z */
+         INIT_FILECHECK_MOCK( "OP_FTSOCK",    OP_FTSOCK,    &Perl_pp_overload_ft_yes_no);   /* -S */
+         INIT_FILECHECK_MOCK( "OP_FTCHR",     OP_FTCHR,     &Perl_pp_overload_ft_yes_no);   /* -c */
+         INIT_FILECHECK_MOCK( "OP_FTBLK",     OP_FTBLK,     &Perl_pp_overload_ft_yes_no);   /* -b */
+         INIT_FILECHECK_MOCK( "OP_FTFILE",    OP_FTFILE,    &Perl_pp_overload_ft_yes_no);   /* -f */
+         INIT_FILECHECK_MOCK( "OP_FTDIR",     OP_FTDIR,     &Perl_pp_overload_ft_yes_no);   /* -d */
+         INIT_FILECHECK_MOCK( "OP_FTPIPE",    OP_FTPIPE,    &Perl_pp_overload_ft_yes_no);   /* -p */
+         INIT_FILECHECK_MOCK( "OP_FTSUID",    OP_FTSUID,    &Perl_pp_overload_ft_yes_no);   /* -u */
+         INIT_FILECHECK_MOCK( "OP_FTSGID",    OP_FTSGID,    &Perl_pp_overload_ft_yes_no);   /* -g */
+         INIT_FILECHECK_MOCK( "OP_FTSVTX",    OP_FTSVTX,    &Perl_pp_overload_ft_yes_no);   /* -k */
 
-     /* PP(pp_ftlink) - yes/no/undef */
-     INIT_FILECHECK_MOCK( "OP_FTLINK",    OP_FTLINK,    &Perl_pp_overload_ft_yes_no);   /* -l */
+         /* PP(pp_ftlink) - yes/no/undef */
+         INIT_FILECHECK_MOCK( "OP_FTLINK",    OP_FTLINK,    &Perl_pp_overload_ft_yes_no);   /* -l */
 
-     /* PP(pp_fttty) - yes/no/undef */
-     INIT_FILECHECK_MOCK( "OP_FTTTY",     OP_FTTTY,     &Perl_pp_overload_ft_yes_no);   /* -t */
+         /* PP(pp_fttty) - yes/no/undef */
+         INIT_FILECHECK_MOCK( "OP_FTTTY",     OP_FTTTY,     &Perl_pp_overload_ft_yes_no);   /* -t */
 
-    /* PP(pp_fttext) - yes/no/undef */
-     INIT_FILECHECK_MOCK( "OP_FTTEXT",    OP_FTTEXT,    &Perl_pp_overload_ft_yes_no);   /* -T */
-     INIT_FILECHECK_MOCK( "OP_FTBINARY",  OP_FTBINARY,  &Perl_pp_overload_ft_yes_no);   /* -B */
+        /* PP(pp_fttext) - yes/no/undef */
+         INIT_FILECHECK_MOCK( "OP_FTTEXT",    OP_FTTEXT,    &Perl_pp_overload_ft_yes_no);   /* -T */
+         INIT_FILECHECK_MOCK( "OP_FTBINARY",  OP_FTBINARY,  &Perl_pp_overload_ft_yes_no);   /* -B */
 
-     /* PP(pp_stat) also used for: pp_lstat() */
-     INIT_FILECHECK_MOCK( "OP_STAT",      OP_STAT,      &Perl_pp_overload_stat);        /* stat */
-     INIT_FILECHECK_MOCK( "OP_LSTAT",     OP_LSTAT,     &Perl_pp_overload_stat);        /* lstat */
+         /* PP(pp_stat) also used for: pp_lstat() */
+         INIT_FILECHECK_MOCK( "OP_STAT",      OP_STAT,      &Perl_pp_overload_stat);        /* stat */
+         INIT_FILECHECK_MOCK( "OP_LSTAT",     OP_LSTAT,     &Perl_pp_overload_stat);        /* lstat */
 
-     1;
-}
+    }
+
+

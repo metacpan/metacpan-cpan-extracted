@@ -1,3 +1,9 @@
+libqbit-application-model-sendmail-perl (0.008) raring; urgency=low
+
+  * fix arguments
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 27 Dec 2018 00:55:18 +0300
+
 libqbit-application-model-sendmail-perl (0.007) raring; urgency=low
 
   * upload to cpan

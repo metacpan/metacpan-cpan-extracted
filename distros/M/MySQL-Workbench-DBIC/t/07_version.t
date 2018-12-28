@@ -73,8 +73,8 @@ eval{
 is $version, 1.02, 'check version 1.02';
 
 eval{
-#    rmtree( $output_path );
-#    rmdir $output_path;
+    rmtree( $output_path );
+    rmdir $output_path;
 };
 
 sub rmtree{

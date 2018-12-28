@@ -259,6 +259,28 @@ backup_to_file(dbh, filename)
     OUTPUT:
         RETVAL
 
+static int
+backup_from_dbh(dbh, from)
+    SV *dbh
+    SV *from
+    ALIAS:
+        DBD::SQLite::db::sqlite_backup_from_dbh = 1
+    CODE:
+        RETVAL = sqlite_db_backup_from_dbh(aTHX_ dbh, from);
+    OUTPUT:
+        RETVAL
+
+static int
+backup_to_dbh(dbh, to)
+    SV *dbh
+    SV *to
+    ALIAS:
+        DBD::SQLite::db::sqlite_backup_to_dbh = 1
+    CODE:
+        RETVAL = sqlite_db_backup_to_dbh(aTHX_ dbh, to);
+    OUTPUT:
+        RETVAL
+
 HV*
 table_column_metadata(dbh, dbname, tablename, columnname)
     SV* dbh
@@ -318,6 +340,33 @@ create_module(dbh, name, perl_class)
     OUTPUT:
         RETVAL
 
+static int
+limit(dbh, id, new_value = -1)
+    SV *dbh
+    int id
+    int new_value
+    ALIAS:
+        DBD::SQLite::db::sqlite_limit = 1
+    CODE:
+    {
+        RETVAL = sqlite_db_limit(aTHX_ dbh, id, new_value);
+    }
+    OUTPUT:
+        RETVAL
+
+static int
+db_config(dbh, id, new_value = -1)
+    SV *dbh
+    int id
+    int new_value
+    ALIAS:
+        DBD::SQLite::db::sqlite_db_config = 1
+    CODE:
+    {
+        RETVAL = sqlite_db_config(aTHX_ dbh, id, new_value);
+    }
+    OUTPUT:
+        RETVAL
 
 MODULE = DBD::SQLite          PACKAGE = DBD::SQLite::st
 

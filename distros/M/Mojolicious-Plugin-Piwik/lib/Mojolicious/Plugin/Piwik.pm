@@ -3,9 +3,10 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/deprecated quote/;
 use Mojo::ByteStream 'b';
 use Mojo::UserAgent;
+use Mojo::Promise;
 use Mojo::IOLoop;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 # Todo:
 # - Better test tracking API support
@@ -18,6 +19,8 @@ our $VERSION = '0.24';
 # - Introduce piwik_widget helper
 # - Support site_id and url both in piwik('track_script')
 #   shortcut and in piwik_tag 'as_script'
+
+has 'ua';
 
 # Register plugin
 sub register {
@@ -38,6 +41,18 @@ sub register {
 
   # No script route defined
   my $script_route = 0;
+
+
+  # Create Mojo::UserAgent
+  $plugin->ua(
+    Mojo::UserAgent->new(
+      connect_timeout => 15,
+      max_redirects => 2
+    )
+  );
+
+  # Set app to server
+  $plugin->ua->server->app($mojo);
 
   # Add 'piwik_tag' helper
   $mojo->helper(
@@ -189,21 +204,23 @@ SCRIPTTAG
     }
   );
 
-  # Add 'piwik->api' helper
-  $mojo->helper(
-    'piwik.api' => sub {
-      my ($c, $method, $param, $cb) = @_;
 
-      # Get api_test parameter
-      my $api_test = delete $param->{api_test};
+  # Establish 'piwik.api_url' helper
+  $mojo->helper(
+    'piwik.api_url' => sub {
+      my ($c, $method, $param) = @_;
 
       # Get piwik url
       my $url = delete($param->{url}) || $plugin_param->{url};
 
-      if ($url =~ s{^(?:http(s)?:)?//}{}i && $1) {
-        $param->{secure} = 1;
+      # TODO:
+      #   Simplify and deprecate secure parameter
+      if (index($url, '/') != 0) {
+        if ($url =~ s{^(?:http(s)?:)?//}{}i && $1) {
+          $param->{secure} = 1;
+        };
+        $url = ($param->{secure} ? 'https' : 'http') . '://' . $url;
       };
-      $url = ($param->{secure} ? 'https' : 'http') . '://' . $url;
 
       # Create request URL
       $url = Mojo::URL->new($url);
@@ -229,9 +246,6 @@ SCRIPTTAG
         # Request Headers
         my $header = $c->req->headers;
 
-        # Respect do not track
-        return if $header->dnt;
-
         # Set default values
         for ($param)  {
           $_->{ua}     //= $header->user_agent if $header->user_agent;
@@ -244,6 +258,17 @@ SCRIPTTAG
           # Todo: maybe make optional with parameter
           # $_->{_id} = rand ...
         };
+
+
+        # Respect do not track
+        if (defined $param->{dnt}) {
+          return if $param->{dnt};
+          delete $param->{dnt};
+        }
+        elsif ($header->dnt) {
+          return;
+        };
+
 
         # Resolution
         if ($param->{res} && ref $param->{res}) {
@@ -317,55 +342,92 @@ SCRIPTTAG
       $url->query($param);
 
       # Return string for api testing
-      return $url if $api_test;
+      return $url;
+    }
+  );
 
-      # Create Mojo::UserAgent
-      my $ua = Mojo::UserAgent->new(max_redirects => 2);
+
+  # Establish 'piwik.api' helper
+  $mojo->helper(
+    'piwik.api' => sub {
+      my ($c, $method, $param, $cb) = @_;
+
+      # Get api_test parameter
+      my $api_test = delete $param->{api_test};
+
+      # Get URL
+      my $url = $c->piwik->api_url($method, $param)
+        or return;
+
+      return $url if $api_test;
 
       # Todo: Handle json errors!
 
       # Blocking
       unless ($cb) {
-        my $tx = $ua->get($url);
+        my $tx = $plugin->ua->get($url);
 
         # Return prepared response
         return _prepare_response($tx->res) unless $tx->error;
 
         return;
-      }
+      };
 
       # Non-Blocking
-      else {
 
-        # Create delay object
-        my $delay = Mojo::IOLoop->delay(
-          sub {
-            # Return prepared response
-            my $res = pop->success;
+      # Create delay object
+      my $delay = Mojo::IOLoop->delay(
+        sub {
+          # Return prepared response
+          my $res = pop->success;
 
-            # Release callback with json object
-            $cb->( $res ? _prepare_response($res) : {} );
-          }
-        );
+          # Release callback with json object
+          $cb->( $res ? _prepare_response($res) : {} );
+        }
+      );
 
-        # Get resource non-blocking
-        $ua->get($url => $delay->begin);
+      # Get resource non-blocking
+      $plugin->ua->get($url => $delay->begin);
 
-        # Start IOLoop if not started already
-        $delay->wait unless Mojo::IOLoop->is_running;
-      };
-    });
-
-  # Establish 'piwik.api_url' helper
-  $mojo->helper(
-    'piwik.api_url' => sub {
-      my ($c, $method, $param) = @_;
+      # Start IOLoop if not started already
+      $delay->wait unless Mojo::IOLoop->is_running;
 
       # Set api_test to true
-      $param->{api_test} = 1;
-      return $c->piwik->api($method => $param);
+      return $delay;
     }
   );
+
+
+  # Establish 'piwik.api_p' helper
+  $mojo->helper(
+    'piwik.api_p' => sub {
+      my ($c, $method, $param) = @_;
+
+      # Get api_test parameter
+      my $api_test = delete $param->{api_test};
+
+      # Get URL
+      my $url = $c->piwik->api_url($method, $param)
+        or return;
+
+      return Mojo::Promise->resolve($url) if $api_test;
+
+      # Create promise
+      return $plugin->ua->get_p($url)->then(
+        sub {
+          my $tx = shift;
+          my $res = _prepare_response($tx->res);
+
+          # Check for error
+          if (ref $res eq 'HASH' && $res->{error}) {
+            return Mojo::Promise->reject($res->{error});
+          };
+          return Mojo::Promise->resolve($res);
+        }
+      );
+    }
+  );
+
 
   # Add legacy 'piwik_api' helper
   $mojo->helper(
@@ -375,6 +437,7 @@ SCRIPTTAG
       return $c->piwik->api(@_);
     }
   );
+
 
   # Establish 'piwik_api_url' helper
   $mojo->helper(
@@ -391,6 +454,11 @@ SCRIPTTAG
 sub _prepare_response {
   my $res = shift;
   my $ct = $res->headers->content_type;
+
+  # No response - fine
+  unless ($res->body) {
+    return { body => '' };
+  };
 
   # Return json response
   if (index($ct, 'json') >= 0) {
@@ -622,7 +690,7 @@ with request parameters as described in the
 L<Piwik API|https://matomo.org/docs/analytics-api/>, and
 optionally a callback, if the request is meant to be non-blocking.
 
-The L<Tracking API|https://matomo.org/docs/tracking-api/reference/>
+The L<Tracking API|https://developer.matomo.org/api-reference/tracking-api>
 uses the method name C<Track> and will forward user agent and
 referrer information based on the controller request as well as the
 url of the requested resource, unless
@@ -660,6 +728,10 @@ C<secure> - Boolean value that indicates a request using the C<https> scheme.
 Defaults to false, in case the C<url> is given without or
 with a C<http> scheme.
 
+=item
+
+C<dnt> - Override the Do-Not-Track setting, in rare cases, this is required.
+
 =back
 
 C<idSite> is an alias of C<site_id> and C<idsite> and defaults to the id
@@ -675,12 +747,34 @@ for example C<idSite> (for analysis), C<date> (for ranges) and C<res> (for track
       secure  => 1
     });
 
-In case of an error, C<piwik.api> tries to response with a meaningsful
+In case of an error, C<piwik.api> tries to response with a meaningful
 description in the hash value of C<error>.
 If an image is expected instead of a JSON object
 (as for the Tracking or the C<ImageGraph> API), the image is base64
 encoded and mime-type prefixed in the hash value of C<image>,
 ready to be embedded as the C<src> of an C<E<lt>img /E<gt>> tag.
+
+
+=head2 piwik.api_p
+
+  $c->piwik->api_p(
+    'API.get' => {
+      site_id => [4,5],
+      period  => 'range',
+      date    => ['2012-11-01', '2012-12-01'],
+      secure  => 1
+    }
+  )->then(
+    sub {
+      my $res = shift;
+      ...
+    }
+  )->wait;
+
+Same as L<piwik.api|/piwik.api>, but returns a L<Mojo::Promise>
+object.
+
+B<The promise variant is EXPERIMENTAL and may change without warnings!>
 
 
 =head2 piwik.api_url

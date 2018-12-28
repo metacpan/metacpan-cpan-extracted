@@ -1,5 +1,9 @@
 Revision history for `optex' command.
 
+v0.2.3 2018-12-27T08:08:49Z
+
+    - requires 'Getopt::EX', 'v1.13.1';
+
 v0.2.2 2018-09-18T09:12:11Z
 
     - Support UTF-8 file name and alias.

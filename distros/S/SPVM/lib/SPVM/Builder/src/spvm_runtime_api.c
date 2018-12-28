@@ -161,6 +161,8 @@ SPVM_ENV* SPVM_RUNTIME_API_create_env(SPVM_RUNTIME* runtime) {
     SPVM_RUNTIME_API_enter_scope,
     SPVM_RUNTIME_API_push_mortal,
     SPVM_RUNTIME_API_leave_scope,
+    SPVM_RUNTIME_API_type_name_raw,
+    SPVM_RUNTIME_API_type_name,
   };
   
   int32_t env_length = 255;
@@ -387,9 +389,41 @@ int32_t SPVM_RUNTIME_API_call_sub(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* sta
     int32_t (*native_address)(SPVM_ENV*, SPVM_VALUE*) = runtime->sub_cfunc_addresses[sub->id];
     int32_t exception_flag = (*native_address)(env, stack);
     
+    // Increment ref count of return value
+    if (!exception_flag) {
+      switch (sub->return_runtime_type) {
+        case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
+        case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
+        {
+          if (*(void**)&stack[0] != NULL) {
+            SPVM_RUNTIME_API_INC_REF_COUNT_ONLY(*(void**)&stack[0]);
+          }
+        }
+      }
+    }
+
     // Leave scope
     SPVM_RUNTIME_API_leave_scope(env, original_mortal_stack_top);
 
+    // Decrement ref count of return value
+    if (!exception_flag) {
+      switch (sub->return_runtime_type) {
+        case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
+        case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
+        case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_VALUE_ARRAY:
+        case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
+        {
+          if (*(void**)&stack[0] != NULL) {
+            SPVM_RUNTIME_API_DEC_REF_COUNT_ONLY(*(void**)&stack[0]);
+          }
+        }
+      }
+    }
+    
     // Set default exception message
     if (exception_flag && env->exception_object == NULL) {
       void* exception = env->new_str_raw(env, "Error", 0);
@@ -633,7 +667,6 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
           stack_index += type_width;
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
@@ -786,6 +819,8 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
         int32_t constant_pool_id = opcode->operand1;
         int32_t check_basic_type_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
         int32_t check_type_dimension = runtime->constant_pool[package->constant_pool_base + constant_pool_id + 1];
+
+        assert(check_basic_type_id != SPVM_BASIC_TYPE_C_ID_STRING);
         
         if (object) {
           int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);
@@ -1018,10 +1053,10 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
       case SPVM_OPCODE_C_ID_NEGATE_DOUBLE:
         double_vars[opcode->operand0] = -double_vars[opcode->operand1];
         break;
-      case SPVM_OPCODE_C_ID_COMPLEMENT_INT:
+      case SPVM_OPCODE_C_ID_BIT_NOT_INT:
         int_vars[opcode->operand0] = ~int_vars[opcode->operand1];
         break;
-      case SPVM_OPCODE_C_ID_COMPLEMENT_LONG:
+      case SPVM_OPCODE_C_ID_BIT_NOT_LONG:
         long_vars[opcode->operand0] = ~long_vars[opcode->operand1];
         break;
       case SPVM_OPCODE_C_ID_CONVERT_INT_TO_LONG:
@@ -2691,6 +2726,8 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
           int32_t check_basic_type_id = runtime->constant_pool[package->constant_pool_base + constant_pool_id];
           int32_t check_type_dimension = runtime->constant_pool[package->constant_pool_base + constant_pool_id + 1];
           
+          assert(check_basic_type_id != SPVM_BASIC_TYPE_C_ID_STRING);
+          
           int32_t object_basic_type_id = *(int32_t*)((intptr_t)object + (intptr_t)env->object_basic_type_id_offset);
           int32_t object_type_dimension = *(uint8_t*)((intptr_t)object + (intptr_t)env->object_type_dimension_offset);
           
@@ -4073,7 +4110,6 @@ int32_t SPVM_RUNTIME_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* 
   // Decrement ref count of return value
   if (!exception_flag) {
     switch (sub->return_runtime_type) {
-      case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
       case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
       case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
       case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
@@ -4233,6 +4269,53 @@ void SPVM_RUNTIME_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object) {
     
     object->ref_count++;
   }
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_type_name_raw(SPVM_ENV* env, SPVM_OBJECT* object) {
+  (void)env;
+  
+  assert(object);
+  
+  SPVM_RUNTIME* runtime = env->runtime;
+  
+  int32_t basic_type_id = object->basic_type_id;
+  int32_t type_dimension = object->type_dimension;
+  
+  SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
+  const char* basic_type_name = &runtime->string_pool[basic_type->name_id];
+  
+  int32_t length = 0;
+  
+  // Basic type
+  length += strlen(basic_type_name);
+  
+  // []
+  length += type_dimension * 2;
+  
+  void* type_name_barray = env->new_barray_raw(env, length);
+  
+  char* cur = (char*)env->belems(env, type_name_barray);
+  
+  sprintf(cur, "%s", basic_type_name);
+  cur += strlen(basic_type_name);
+  
+  int32_t dim_index;
+  for (dim_index = 0; dim_index < type_dimension; dim_index++) {
+    sprintf(cur, "[]");
+    cur += 2;
+  }
+  
+  return type_name_barray;
+}
+
+SPVM_OBJECT* SPVM_RUNTIME_API_type_name(SPVM_ENV* env, SPVM_OBJECT* object_in) {
+  (void)env;
+  
+  SPVM_OBJECT* object = SPVM_RUNTIME_API_type_name_raw(env, object_in);
+  
+  SPVM_RUNTIME_API_push_mortal(env, object);
+  
+  return object;
 }
 
 void SPVM_RUNTIME_API_leave_scope(SPVM_ENV* env, int32_t original_mortal_stack_top) {
@@ -4944,9 +5027,9 @@ SPVM_OBJECT* SPVM_RUNTIME_API_new_str_raw(SPVM_ENV* env, const char* bytes, int3
 
   SPVM_OBJECT* object = SPVM_RUNTIME_API_new_barray_raw(env, length);
   
-  object->basic_type_id = SPVM_BASIC_TYPE_C_ID_STRING;
-  object->type_dimension = 0;
-  object->runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_STRING;
+  object->basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
+  object->type_dimension = 1;
+  object->runtime_type = SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY;
   
   if (length > 0) {
     if (bytes == NULL) {

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -ex
+
+cd /tmp
+git clone https://git.dereferenced.org/pkgconf/pkgconf.git
+cd pkgconf
+./autogen.sh
+./configure --with-pic --disable-shared
+make
+make install

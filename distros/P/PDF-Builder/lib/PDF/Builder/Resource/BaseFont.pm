@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use Encode qw(:all);
@@ -85,7 +85,7 @@ sub descrByData {
             $des->{'Style'} = PDFDict();
             $des->{'Style'}->{'Panose'} = PDFStrHex($self->data()->{'panose'});
         }
-        $des->{'FontFamily'} = PDFStr($self->data()->{'fontfamily'})
+        $des->{'FontFamily'} = PDFString($self->data()->{'fontfamily'}, 'x')
             if defined $self->data()->{'fontfamily'};
         $des->{'FontWeight'} = PDFNum($self->data()->{'fontweight'})
             if defined $self->data()->{'fontweight'};
@@ -138,8 +138,8 @@ sub tounicodemap {
     $tuni->{'Type'} = PDFName('CMap');
     $tuni->{'CMapName'} = PDFName(sprintf(qq|pdfbldr-%s+0|, $self->name()));
     $tuni->{'CIDSystemInfo'} = PDFDict();
-    $tuni->{'CIDSystemInfo'}->{'Registry'} = PDFStr($self->name());
-    $tuni->{'CIDSystemInfo'}->{'Ordering'} = PDFStr('XYZ');
+    $tuni->{'CIDSystemInfo'}->{'Registry'} = PDFString($self->name(), 'x');
+    $tuni->{'CIDSystemInfo'}->{'Ordering'} = PDFString('XYZ', 'x');
     $tuni->{'CIDSystemInfo'}->{'Supplement'} = PDFNum(0);
 
     $self->{' apipdf'}->new_obj($tuni);
@@ -636,6 +636,22 @@ sub wxByEnc {
    	$ret = 300;
     }
     return $ret;
+}
+
+=item $flag = $font->wxMissingByEnc($char)
+
+Returns true if the character's width (based on the current encoding) is
+supplied by "missing width" of font.
+
+=cut
+
+sub wxMissingByEnc {
+    my ($self, $e) = @_;
+
+    my $g = $self->glyphByEnc($e);
+    my $ret = $self->data()->{'wx'}->{$g};
+
+    return !defined($ret);
 }
 
 =item $width = $font->wxByMap($char)

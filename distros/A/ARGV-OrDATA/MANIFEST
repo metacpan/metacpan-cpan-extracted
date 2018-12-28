@@ -1,0 +1,16 @@
+Changes
+lib/ARGV/OrDATA.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-data.t
+t/01-file.t
+t/02-stdin.t
+t/03-package.t
+t/04-unimport.t
+t/input.txt
+t/My.pm
+t/pipe.pl
+t/script.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

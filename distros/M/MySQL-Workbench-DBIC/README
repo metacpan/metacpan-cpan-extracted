@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.11
+    version 1.13
 
 SYNOPSIS
 
@@ -136,6 +136,41 @@ ATTRIBUTES
     resultset class for 'MyTable' is named
     'Test::DBIC_Scheme::Core::ResultSet::MyTable'
 
+ load_result_namespace
+
+    Additional namespaces to be loaded from the main schema class:
+
+      my $foo = MySQL::Workbench::DBIC->new(
+        output_path       => '/path/to/dir',
+        input_file        => '/path/to/dbdesigner.file',
+        result_namespace  => 'Core',
+        load_result_namespace  => 'Virtual', # can be an arrayref, too
+      );
+
+    The schema class loads all namespaces:
+
+      __PACKAGE__->load_namespaces(
+        result_namespace => ['Core', 'Virtual'],
+      );
+
+ load_resultset_namespace
+
+    Additional namespaces to be loaded from the main schema class:
+
+      my $foo = MySQL::Workbench::DBIC->new(
+        output_path       => '/path/to/dir',
+        input_file        => '/path/to/dbdesigner.file',
+        result_namespace  => 'Core',
+        load_resultset_namespace => [ 'Test', 'Virtual' ], # can be a string, too
+      );
+
+    The schema class loads all namespaces:
+
+      __PACKAGE__->load_namespaces(
+        resultset_namespace => ['Test', 'Virtual'],
+        result_namespace    => 'Core';
+      );
+
  prefix
 
     In relationships the accessor for the objects of the "other" table
@@ -159,6 +194,12 @@ ATTRIBUTES
 
     When skip_indexes is true, the sub sqlt_deploy_hook that adds the
     indexes to the table is not created
+
+ utf8
+
+    If you use non-ASCII characters in table or column comments, you should
+    set the utf8 attribute to a true value. Then every generated class has
+    a use utf8; in it.
 
  belongs_to_prefix
 

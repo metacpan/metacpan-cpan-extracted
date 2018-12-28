@@ -3,7 +3,7 @@ package PDF::Builder::Resource::Colors;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
+our $VERSION = '3.013'; # VERSION
 my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 =head1 NAME

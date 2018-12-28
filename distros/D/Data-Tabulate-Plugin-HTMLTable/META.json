@@ -30,6 +30,12 @@
          "requires" : {
             "Data::Tabulate" : "0.06",
             "HTML::Table" : "2.08",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
             "Test::CheckManifest" : "1.22",
             "Test::More" : "0"
          }
@@ -38,7 +44,7 @@
    "provides" : {
       "Data::Tabulate::Plugin::HTMLTable" : {
          "file" : "lib/Data/Tabulate/Plugin/HTMLTable.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -53,7 +59,7 @@
          "web" : "http://github.com/reneeb/Data-Tabulate-Plugin-HTMLTable"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",

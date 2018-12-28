@@ -79,6 +79,18 @@ $track = $c->piwik->api(
 
 ok(!$track, 'Do not track');
 
+$track = $c->piwik->api(
+  Track => {
+    idsite => [qw/4 5 6/],
+    api_test => 1,
+    res => '1024x768',
+    action_url => 'http://khm.li/Rapunzel',
+    action_name => 'Märchen/Rapunzel',
+    dnt => 0
+  });
+
+ok($track, 'Track although dnt is set');
+
 # Life tests:
 # Testing the piwik api is hard to do ...
 my (%param, $f);

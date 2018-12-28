@@ -1,6 +1,17 @@
 Change history for MySQL::Workbench::DBIC
 =========================================
 
+1.13 2018-12-28 08:43:00
+
+  * Allow custom codes in schema file (fix #9)
+  * Handle custom namespace loading correctly (fix #9)
+
+1.12 2018-12-27 12:58:00
+
+  * Fix handling of umlauts in table and column comments (fix #8)
+  * Fix generated DESCRIPTION section in pod (add '=cut') (fix #10)
+  * allow custom code and overwrite namespaces in schema file (fix #9)
+
 1.11 2018-12-26 09:49:00
 
   * Handle table and column comments correctly (fix #6, #7)

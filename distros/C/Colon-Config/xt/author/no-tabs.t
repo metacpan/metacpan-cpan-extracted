@@ -11,8 +11,11 @@ my @files = (
     't/00-load.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/backslash-r.t',
     't/basic.t',
-    't/benchmark.t',
+    't/example-fruits.t',
+    't/passwd-read.t',
+    't/use-field.t',
     't/utf-8.t'
 );
 

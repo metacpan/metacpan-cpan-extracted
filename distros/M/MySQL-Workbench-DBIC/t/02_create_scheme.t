@@ -49,6 +49,7 @@ my $schema_content = do {
 };
 
 like $schema_content, qr/->load_namespaces;/;
+like $schema_content, qr/Put your own code/;
 
 eval{
     rmtree( $output_path );

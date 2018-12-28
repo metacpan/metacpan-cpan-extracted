@@ -6,8 +6,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -28,7 +28,7 @@ my $compress = 'none';
 #my $compress = 'flate';
 
 my $pdf = PDF::Builder->new(-compress => $compress);
-my ($page, $grfx, $text); # objects for page, graphics, text
+my ($page, $textUnder, $grfx, $text); # objects for page, graphics, text
 my (@base, @styles, @points, $i, $lw, $angle, @npts);
 my (@cellLoc, @cellSize, $font, $width, $d1, $d2, $d3, $d4);
 my @axisOffset = (5, 5); # clear the edge of the cell
@@ -1599,8 +1599,75 @@ drawCaption(['fillstroke() w/ non-zero', 'winding and even-odd'], 'LC');
 $grfx->restore();
 
 # ----------------------------------------------------
+# 36A. demonstrate multiple text and graphics layers
+@cellLoc = makeCellLoc(0);
+@cellSize = (170, 131); 
+$grfx->save();
+
+makeCell(@cellLoc, @cellSize);
+@base=@cellLoc;
+#$base[0] += 10;
+#$base[1] += 10;
+$width=80;
+
+$grfx->strokecolor('black');
+$grfx->fillcolor('#999');
+$grfx->linewidth(1);
+$text->font($fontC, 16);
+$grfx->translate(@base);
+
+# draw using same text for over and under
+# since grfx defined before text, both text done after
+$grfx->save();
+
+$text->translate($base[0]+5,$base[1]+100);
+$text->font($fontC, 12);
+$text->fillcolor('black');
+$text->text("Text under the graphic");
+
+$grfx->fillcolor('red');
+$grfx->strokecolor('green');
+$grfx->linewidth(3);
+$grfx->circle(80,95, 20);
+$grfx->fillstroke();
+
+$text->translate($base[0]+10,$base[1]+82);
+$text->font($fontC, 12);
+$text->fillcolor('black');
+$text->text("Text over the graphic");
+
+$grfx->restore();
+
+# draw using a second text object for under
+# since textUnder defined earlier than grfx, text s/b under
+$grfx->save();
+
+$textUnder->translate($base[0]+5,$base[1]+40);
+$textUnder->font($fontC, 12);
+$textUnder->fillcolor('black');
+$textUnder->text("Text under the graphic");
+
+$grfx->fillcolor('red');
+$grfx->strokecolor('green');
+$grfx->linewidth(3);
+$grfx->circle(80,35, 20);
+$grfx->fillstroke();
+
+$text->translate($base[0]+10,$base[1]+22);
+$text->font($fontC, 12);
+$text->fillcolor('black');
+$text->text("Text over the graphic");
+
+$grfx->restore();
+
+# caption
+drawCaption(['multiple text and', 'graphic objs'], 'LC');
+
+$grfx->restore();
+
+# ----------------------------------------------------
 # 37. clip(): filled circle with box cut out
-@cellLoc = makeCellLoc(1);
+@cellLoc = makeCellLoc(0);
 @cellSize = (170, 131); 
 $grfx->save();
 
@@ -1771,6 +1838,7 @@ $grfx->restore();
 
 # ----------------------------------------------------
 # 40. image(): display an image, 640x480 scaled to 160x120
+#     also rotate and clip, just to show off
 @cellLoc = makeCellLoc(0);
 @cellSize = (170, 131); 
 $grfx->save();
@@ -1785,13 +1853,24 @@ $grfx->strokecolor('black');
 $grfx->fillcolor('#999');
 $grfx->linewidth(2);
 $text->font($fontC, 16);
-$grfx->translate(@base);
 
-my $img_obj = $pdf->image_jpeg('examples\resources\aptfrontview.jpg');
+  # define clip port, paint image
+  $grfx->save();
+
+  # frame 2pt wide, so size to -1 each side
+  $grfx->rect($base[0]+1,$base[1]+1, 168,129);
+  $grfx->clip();
+  $grfx->endpath();  # necessary for separating the clip and paint
+
+$grfx->translate($base[0]+60,$base[1]-30);
+  $grfx->rotate(35);
+
+my $img_obj = $pdf->image_jpeg('examples/resources/aptfrontview.jpg');
 $grfx->image($img_obj, 5,5, 160,120);
+   $grfx->restore();
 
 # caption
-drawCaption(['image()'], 'LC');
+drawCaption(['image() rotate + clip'], 'LC');
 
 $grfx->restore();
 
@@ -1813,7 +1892,7 @@ $grfx->linewidth(2);
 $text->font($fontC, 16);
 $grfx->translate(@base);
 
-$img_obj = $pdf->image_jpeg('examples\resources\aptfrontview.jpg');
+$img_obj = $pdf->image_jpeg('examples/resources/aptfrontview.jpg');
 $grfx->formimage($img_obj, 5,5, 0.25*$img_obj->width(),0.25*$img_obj->height());
 
 # caption
@@ -1839,7 +1918,7 @@ $grfx->linewidth(2);
 $text->font($fontC, 16);
 $grfx->translate(@base);
 
-$img_obj = $pdf->image_jpeg('examples\resources\aptfrontview.jpg');
+$img_obj = $pdf->image_jpeg('examples/resources/aptfrontview.jpg');
 $grfx->formimage($img_obj, 45,5, 0.125*$img_obj->width(),0.25*$img_obj->height());
 
 # caption
@@ -2409,6 +2488,7 @@ sub greenLine {
 sub nextPage {
   $pageNo++;
   $page = $pdf->page();
+  $textUnder = $page->text(); # special
   $grfx = $page->gfx();
   $text = $page->text();
   $page->mediabox('Universal');
@@ -2531,7 +2611,7 @@ sub makeCellLoc {
   my ($X, $Y) = @_;
 
   my @cellX = (36, 212, 388);        # horizontal (column positions L to R)
-  my @cellY = (625, 458, 281, 104);  # vertical (row positions T to B)
+  my @cellY = (635, 458, 281, 104);  # vertical (row positions T to B)
   my $add;
 
   if (defined $Y) {

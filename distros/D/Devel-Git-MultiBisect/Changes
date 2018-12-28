@@ -26,3 +26,8 @@ Revision history for Perl module Devel::Git::MultiBisect
 
 0.08 Sun Nov 20 09:11:55 EST 2016
     - Exclude from Windows.
+
+0.09 Fri Dec 28 09:27:44 EST 2018
+    - Mostly a maintenance release intended to prepare for addition of
+      functionality for build-time multisection in upcoming release.  Use of
+      get_current_branch() discontinued.

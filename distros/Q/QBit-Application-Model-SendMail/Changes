@@ -1,25 +1,25 @@
 ==================================================
-Changes from 2015-09-05 00:00:00 +0000 to present.
+Changes from 2017-12-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2016-09-04 21:09:38 +0000
+version 0.008 at 2018-12-26 21:55:18 +0000
 ------------------------------------------
 
-  Change: f0f575d8272d4fc8e8aed6b4d35011bc236b3832
+  Change: b9bc0481f2c0c5cd25187acdd66237be1c8599cd
   Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-09-05 01:08:58 +0000
+  Date : 2018-12-27 00:54:39 +0000
 
-    Merge pull request #7 from Madskill/upload_to_cpan
+    Merge pull request #8 from Madskill/fix_arguments
 
-    upload to cpan 
+    fix arguments 
 
-  Change: a832dcacfb390180a1105b719a976b9e78a41331
+  Change: 94f2c207e97fb8f6c121599e59c8498f8f086356
   Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-05 00:08:09 +0000
+  Date : 2018-12-27 00:53:04 +0000
 
-    upload to cpan 
+    fix arguments 
 
 ================================================
-Plus 6 releases after 2015-09-05 00:00:00 +0000.
+Plus 7 releases after 2017-12-26 00:00:00 +0000.
 ================================================

@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojolicious-Plugin-Webpack
 
+0.05 2018-12-27T13:21:34+0900
+ - Use terser-webpack-plugin instead of uglifyjs-webpack-plugin
+
 0.04 2018-12-26T13:53:46+0900
  - Fix typo in webpack.custom.js
  - Add M::P::Webpack::Builder to make M::P::Webpack a production shim

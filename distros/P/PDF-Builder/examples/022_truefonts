@@ -246,6 +246,7 @@ foreach my $fn (@ARGV) {
     $pdf->save();
     $pdf->end();
 } # loop through a font name. go to next command line name.
+print STDERR "\n";
 
 exit;
 

@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2018-12-27  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000460 released
+
+        * Fixed Makefile.PL
+
+
 2018-12-25  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000459 released

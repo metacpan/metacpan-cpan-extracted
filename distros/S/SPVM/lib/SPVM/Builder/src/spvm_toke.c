@@ -26,6 +26,7 @@
 #include "spvm_string_buffer.h"
 #include "spvm_sub.h"
 #include "spvm_package.h"
+#include "spvm_unicode.h"
 
 SPVM_OP* SPVM_TOKE_newOP(SPVM_COMPILER* compiler, int32_t type) {
   
@@ -196,6 +197,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               compiler->bufptr = cur_src;
               compiler->befbufptr = cur_src;
               compiler->cur_line = 1;
+              compiler->bufptr_line_start = cur_src;
               break;
             }
           }
@@ -225,10 +227,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         else {
           compiler->cur_line++;
         }
+        compiler->bufptr_line_start = compiler->bufptr;
         continue;
       case '\n':
         compiler->bufptr++;
         compiler->cur_line++;
+        compiler->bufptr_line_start = compiler->bufptr;
         continue;
       // Cancat
       case '.': {
@@ -406,9 +410,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         // Or
         if (*compiler->bufptr == '|') {
           compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_OR);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_COND_OR);
           yylvalp->opval = op;
-          return OR;
+          return COND_OR;
         }
         else if (*compiler->bufptr == '=') {
           compiler->bufptr++;
@@ -430,9 +434,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         // Or
         if (*compiler->bufptr == '&') {
           compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_AND);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_COND_AND);
           yylvalp->opval = op;
-          return AND;
+          return COND_AND;
         }
         else if (*compiler->bufptr == '=') {
           compiler->bufptr++;
@@ -443,11 +447,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           return SPECIAL_ASSIGN;
         }
-        // AMPERSAND - Bit and or type reference
+        // & - Bit AND operator or type reference
         else {
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BIT_AND);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NULL);
           yylvalp->opval = op;
-          return AMPERSAND;
+          return '&';
         }
       
       // Comment
@@ -500,9 +504,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           // ==
           if (*compiler->bufptr == '=') {
             compiler->bufptr++;
-            SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_EQ);
+            SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NUMERIC_EQ);
             yylvalp->opval = op;
-            return REL;
+            return NUMEQ;
           }
           // =>
           if (*compiler->bufptr == '>') {
@@ -544,16 +548,16 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         // <=
         else if (*compiler->bufptr == '=') {
           compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LE);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NUMERIC_LE);
           yylvalp->opval = op;
-          return REL;
+          return NUMLE;
         }
         // <
         else {
           compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LT);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NUMERIC_LT);
           yylvalp->opval = op;
-          return REL;
+          return NUMLT;
         }
       
       case '>':
@@ -602,37 +606,36 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         // >=
         else if (*compiler->bufptr == '=') {
           compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_GE);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NUMERIC_GE);
           yylvalp->opval = op;
-          return REL;
+          return NUMGE;
         }
         // >
         else {
           compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_GT);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NUMERIC_GT);
           yylvalp->opval = op;
-          return REL;
+          return NUMGT;
         }
       case '!':
         compiler->bufptr++;
         
         if (*compiler->bufptr == '=') {
           compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NE);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NUMERIC_NE);
           yylvalp->opval = op;
-          return REL;
+          return NUMNE;
         }
         else {
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NOT);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_COND_NOT);
           yylvalp->opval = op;
-          return NOT;
+          return COND_NOT;
         }
-        
       case '~': {
         compiler->bufptr++;
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_COMPLEMENT);
+          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BIT_NOT);
           yylvalp->opval = op;
-        return '~';
+        return BIT_NOT;
       }
       // Character Literal
       case '\'': {
@@ -641,37 +644,71 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
 
         if (*compiler->bufptr == '\\') {
           compiler->bufptr++;
-          if (*compiler->bufptr == 'b') {
+          if (*compiler->bufptr == '0') {
+            ch = '\0';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == 'a') {
+            ch = '\a';
+            compiler->bufptr++;
+          }
+          else if (*compiler->bufptr == 'b') {
             ch = '\b';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 't') {
-            ch = '\t';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 'n') {
-            ch = '\n';
             compiler->bufptr++;
           }
           else if (*compiler->bufptr == 'f') {
             ch = '\f';
             compiler->bufptr++;
           }
+          else if (*compiler->bufptr == 't') {
+            ch = '\t';
+            compiler->bufptr++;
+          }
           else if (*compiler->bufptr == 'r') {
             ch = '\r';
             compiler->bufptr++;
           }
-          else if (*compiler->bufptr == '"') {
-            ch = '\"';
+          else if (*compiler->bufptr == 'n') {
+            ch = '\n';
             compiler->bufptr++;
           }
           else if (*compiler->bufptr == '\'') {
             ch = '\'';
             compiler->bufptr++;
           }
+          else if (*compiler->bufptr == '"') {
+            ch = '\"';
+            compiler->bufptr++;
+          }
           else if (*compiler->bufptr == '\\') {
             ch = '\\';
             compiler->bufptr++;
+          }
+          // Hex ascii code
+          else if (*compiler->bufptr == 'x') {
+            compiler->bufptr++;
+            if (*compiler->bufptr == '0' || *compiler->bufptr == '1' || *compiler->bufptr == '2' || *compiler->bufptr == '3' || *compiler->bufptr == '4' || *compiler->bufptr == '5' || *compiler->bufptr == '6' || *compiler->bufptr == '7') {
+              char* num_str = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 3);
+              num_str[0] = *compiler->bufptr;
+              compiler->bufptr++;
+              if (
+                isdigit(*compiler->bufptr)
+                || *compiler->bufptr == 'a'  || *compiler->bufptr == 'b'  || *compiler->bufptr == 'c'  || *compiler->bufptr == 'd'  || *compiler->bufptr == 'e'  || *compiler->bufptr == 'f'
+                || *compiler->bufptr == 'A'  || *compiler->bufptr == 'B'  || *compiler->bufptr == 'C'  || *compiler->bufptr == 'D'  || *compiler->bufptr == 'E'  || *compiler->bufptr == 'F'
+              )
+              {
+                num_str[1] = *compiler->bufptr;
+                compiler->bufptr++;
+                char *end;
+                ch = (char)strtol(num_str, &end, 16);
+              }
+              else {
+                SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+              }
+            }
+            else {
+              SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+            }
           }
           else {
             SPVM_COMPILER_error(compiler, "Invalid escape character in charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
@@ -749,7 +786,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             continue;
           }
           
-          int32_t str_tmp_len = (int32_t)(compiler->bufptr - cur_token_ptr);
+          int32_t str_tmp_len = (int32_t)(compiler->bufptr - cur_token_ptr) * 4;
 
           compiler->bufptr++;
           
@@ -759,34 +796,145 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             while (char_ptr != compiler->bufptr - 1) {
               if (*char_ptr == '\\') {
                 char_ptr++;
-                if (*char_ptr == 'r') {
-                  str[str_length] = 0x0D;
+                if (*char_ptr == '0') {
+                  str[str_length] = '\0';
+                  str_length++;
+                  char_ptr++;
                 }
-                else if (*char_ptr == 'n') {
-                  str[str_length] = 0x0A;
-                }
-                else if (*char_ptr == 't') {
-                  str[str_length] = '\t';
+                else if (*char_ptr == 'a') {
+                  str[str_length] = '\a';
+                  str_length++;
+                  char_ptr++;
                 }
                 else if (*char_ptr == 'b') {
                   str[str_length] = '\b';
+                  str_length++;
+                  char_ptr++;
                 }
                 else if (*char_ptr == 'f') {
                   str[str_length] = '\f';
+                  str_length++;
+                  char_ptr++;
                 }
-                else if (*char_ptr == '0') {
-                  str[str_length] = '\0';
+                else if (*char_ptr == 't') {
+                  str[str_length] = '\t';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 'r') {
+                  str[str_length] = '\r';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == 'n') {
+                  str[str_length] = '\n';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == '\'') {
+                  str[str_length] = '\'';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == '"') {
+                  str[str_length] = '\"';
+                  str_length++;
+                  char_ptr++;
+                }
+                else if (*char_ptr == '\\') {
+                  str[str_length] = '\\';
+                  str_length++;
+                  char_ptr++;
+                }
+                // Hex ascii code
+                else if (*char_ptr == 'x') {
+                  char_ptr++;
+                  if (*char_ptr == '0' || *char_ptr == '1' || *char_ptr == '2' || *char_ptr == '3' || *char_ptr == '4' || *char_ptr == '5' || *char_ptr == '6' || *char_ptr == '7') {
+                    char* num_str = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 3);
+                    num_str[0] = *char_ptr;
+                    char_ptr++;
+                    if (
+                      isdigit(*char_ptr)
+                      || *char_ptr == 'a'  || *char_ptr == 'b'  || *char_ptr == 'c'  || *char_ptr == 'd'  || *char_ptr == 'e'  || *char_ptr == 'f'
+                      || *char_ptr == 'A'  || *char_ptr == 'B'  || *char_ptr == 'C'  || *char_ptr == 'D'  || *char_ptr == 'E'  || *char_ptr == 'F'
+                    )
+                    {
+                      num_str[1] = *char_ptr;
+                      char_ptr++;
+                      char *end;
+                      ch = (char)strtol(num_str, &end, 16);
+                      str[str_length] = ch;
+                      str_length++;
+                    }
+                    else {
+                      SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of string literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                    }
+                  }
+                  else {
+                    SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of string literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                  }
+                }
+                // Unicode code point. This is converted to UTF-8
+                else if (*char_ptr == 'N') {
+                  char_ptr++;
+                  if (*char_ptr == '{' && *(char_ptr + 1) == 'U' && *(char_ptr + 2) == '+') {
+                    char_ptr += 3;
+                    char* char_start_ptr = char_ptr;
+                    int32_t unicode_chars_length = 0;
+                    
+                    while (
+                      isdigit(*char_ptr)
+                      || *char_ptr == 'a'  || *char_ptr == 'b'  || *char_ptr == 'c'  || *char_ptr == 'd'  || *char_ptr == 'e'  || *char_ptr == 'f'
+                      || *char_ptr == 'A'  || *char_ptr == 'B'  || *char_ptr == 'C'  || *char_ptr == 'D'  || *char_ptr == 'E'  || *char_ptr == 'F'
+                    )
+                    {
+                      char_ptr++;
+                      unicode_chars_length++;
+                    }
+                    if (*char_ptr == '}') {
+                      char_ptr++;
+                      if (unicode_chars_length < 1) {
+                        SPVM_COMPILER_error(compiler, "Unicode code point is empty at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                      }
+                      else if (unicode_chars_length > 8) {
+                        SPVM_COMPILER_error(compiler, "Too big unicode code point at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                      }
+                      else {
+                        char* unicode_chars = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, unicode_chars_length + 1);
+                        memcpy(unicode_chars, char_start_ptr, unicode_chars_length);
+                        char *end;
+                        int32_t unicode = (int32_t)strtoll(unicode_chars, &end, 16);
+                        int32_t valid = SPVM_UNICODE_codepoint_valid(unicode);
+                        if (valid) {
+                          char utf8_chars[4];
+                          int32_t byte_length = SPVM_UNICODE_convert_unicode_to_utf8(unicode, (uint8_t*)utf8_chars);
+                          for (int32_t byte_index = 0; byte_index < byte_length; byte_index++) {
+                            str[str_length] = utf8_chars[byte_index];
+                            str_length++;
+                          }
+                        }
+                        else {
+                          SPVM_COMPILER_error(compiler, "Invalid unicode code point at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                        }
+                      }
+                    }
+                    else {
+                      SPVM_COMPILER_error(compiler, "Unicode escape need close bracket at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                    }
+                  }
+                  else {
+                    SPVM_COMPILER_error(compiler, "Invalid unicode escape of string literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                  }
                 }
                 else {
-                  str[str_length] = *char_ptr;
+                  SPVM_COMPILER_error(compiler, "Invalid escape character in string literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
                 }
-                str_length++;
               }
               else {
                 str[str_length] = *char_ptr;
                 str_length++;
+                char_ptr++;
               }
-              char_ptr++;
             }
           }
           str[str_length] = '\0';
@@ -1245,7 +1393,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 else if (strcmp(keyword, "eq") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_EQ);
-                  return REL;
+                  return STREQ;
                 }
                 else if (strcmp(keyword, "eval") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_EVAL);
@@ -1265,11 +1413,11 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               case 'g' :
                 if (strcmp(keyword, "gt") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_GT);
-                  return REL;
+                  return STRGT;
                 }
                 else if (strcmp(keyword, "ge") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_GE);
-                  return REL;
+                  return STRGE;
                 }
                 break;
               case 'h' :
@@ -1312,13 +1460,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_LT);
                   yylvalp->opval = op;
                   
-                  return REL;
+                  return STRLT;
                 }
                 else if (strcmp(keyword, "le") == 0) {
                   SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_LE);
                   yylvalp->opval = op;
                   
-                  return REL;
+                  return STRLE;
                 }
                 else if (strcmp(keyword, "long") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_LONG);
@@ -1341,7 +1489,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 else if (strcmp(keyword, "ne") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_STRING_NE);
-                  return REL;
+                  return STRNE;
                 }
                 else if (strcmp(keyword, "next") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_NEXT);

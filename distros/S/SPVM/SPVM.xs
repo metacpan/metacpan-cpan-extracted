@@ -569,7 +569,7 @@ new_str_from_bin(...)
   env->inc_ref_count(env, string);
 
   // New sv array
-  SV* sv_string = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::Data::String");
+  SV* sv_string = SPVM_XS_UTIL_new_sv_object(env, string, "SPVM::Data::Array");
   
   XPUSHs(sv_string);
   XSRETURN(1);
@@ -1769,7 +1769,6 @@ call_sub(...)
           }
           break;
         }
-        case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
         case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
         case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
         case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
@@ -2228,7 +2227,6 @@ call_sub(...)
       }
       break;
     }
-    case SPVM_TYPE_C_RUNTIME_TYPE_STRING:
     case SPVM_TYPE_C_RUNTIME_TYPE_ANY_OBJECT:
     case SPVM_TYPE_C_RUNTIME_TYPE_PACKAGE:
     case SPVM_TYPE_C_RUNTIME_TYPE_NUMERIC_ARRAY:
@@ -2242,10 +2240,7 @@ call_sub(...)
         if (return_value != NULL) {
           env->inc_ref_count(env, return_value);
           
-          if (sub->return_runtime_type == SPVM_TYPE_C_RUNTIME_TYPE_STRING) {
-            sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, "SPVM::Data::String");
-          }
-          else if (sub->return_type_dimension > 0) {
+          if (sub->return_type_dimension > 0) {
             sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, "SPVM::Data::Array");
           }
           else if (sub->return_type_dimension == 0) {
@@ -2485,8 +2480,8 @@ to_elems(...)
   // Runtime
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
-  // Array must be SPVM::Data::Array or SPVM::Data::String
-  if (!(SvROK(sv_array) && (sv_derived_from(sv_array, "SPVM::Data::Array") || sv_derived_from(sv_array, "SPVM::Data::String")))) {
+  // Array must be SPVM::Data::Array or SPVM::Data::Array
+  if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::Data::Array"))) {
     croak("Array must be SPVM::Data::Array object");
   }
   
@@ -2500,17 +2495,7 @@ to_elems(...)
   int32_t is_array_type = dimension > 0;
   
   AV* av_values = (AV*)sv_2mortal((SV*)newAV());
-  if (array->runtime_type == SPVM_TYPE_C_RUNTIME_TYPE_STRING) {
-    int8_t* elems = env->belems(env, array);
-    {
-      int32_t i;
-      for (i = 0; i < length; i++) {
-        SV* sv_value = sv_2mortal(newSViv(elems[i]));
-        av_push(av_values, SvREFCNT_inc(sv_value));
-      }
-    }
-  }
-  else if (is_array_type) {
+  if (is_array_type) {
     SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
     int32_t element_type_dimension = dimension - 1;
 
@@ -2698,8 +2683,8 @@ to_bin(...)
   SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
 
   // Array must be SPVM::Data::Array object or SPVM::Data::Sgtring
-  if (!(SvROK(sv_array) && (sv_derived_from(sv_array, "SPVM::Data::Array") || sv_derived_from(sv_array, "SPVM::Data::String")))) {
-    croak("Data must be SPVM::Data::Array or SPVM::Data::String");
+  if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::Data::Array"))) {
+    croak("Data must be SPVM::Data::Array");
   }
   
   // Get object
@@ -2712,12 +2697,7 @@ to_bin(...)
   int32_t is_array_type = dimension > 0;
   
   SV* sv_bin;
-  if (array->runtime_type == SPVM_TYPE_C_RUNTIME_TYPE_STRING) {
-    int8_t* elems = env->belems(env, array);
-    
-    sv_bin = sv_2mortal(newSVpvn((char*)elems, length));
-  }
-  else if (is_array_type) {
+  if (is_array_type) {
     SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
     int32_t element_type_dimension = dimension - 1;
 

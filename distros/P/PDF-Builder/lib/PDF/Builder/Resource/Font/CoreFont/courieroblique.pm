@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::courieroblique;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -515,6 +515,7 @@ sub data { return {
         'ring' => '600',                         # U+0x02DA
         'ogonek' => '600',                       # U+0x02DB
         'hungarumlaut' => '600',                 # U+0x02DD
+        'dblgravecmb' => '600',                  # U+0x030F
         'fraction' => '600',                     # U+0x2044
         'minus' => '600',                        # U+0x2212
         'fi' => '600',                           # U+0xFB01

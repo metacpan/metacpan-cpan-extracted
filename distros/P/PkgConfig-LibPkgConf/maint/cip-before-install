@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -ex
+
+case $CIP_TAG in
+  *fedora*)
+    cip sudo yum install -y libpkgconf-devel
+    ;;
+esac
+
+if cip exec perl -e 'exit !! ($] > 5.020)'; then
+  cip exec cpanm -n ExtUtils::MakeMaker@6.98
+fi
+
+if [ "x$INSTALL_PKGCONF_FROM_GIT" == "x1" ]; then
+  cip sudo apt-get update
+  cip sudo apt-get -y install git automake autoconf libtool
+  cip sudo ./maint/cip-before-install-pkgconf-master
+fi

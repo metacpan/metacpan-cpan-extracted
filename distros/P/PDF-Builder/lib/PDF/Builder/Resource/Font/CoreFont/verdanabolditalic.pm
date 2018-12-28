@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::verdanabolditalic;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -624,6 +624,7 @@ sub data { return {
         'ring' => '710',                         # U+0x02DA
         'ogonek' => '710',                       # U+0x02DB
         'hungarumlaut' => '710',                 # U+0x02DD
+        'dblgravecmb' => '710',                  # U+0x030F
         'gravecomb' => '0',                      # U+0x0300
         'acutecomb' => '0',                      # U+0x0301
         'tildecomb' => '0',                      # U+0x0303
@@ -821,7 +822,8 @@ sub data { return {
         'afii61289' => '414',                    # U+0x2113
         'afii61352' => '1293',                   # U+0x2116
         'estimated' => '748',                    # U+0x212E
-        'gimel' => '0',                          # U+0x2137
+# gimel was 0 width, still doesn't show up
+        'gimel' => '620',                        # U+0x2137
         'oneeighth' => '1181',                   # U+0x215B
         'threeeighths' => '1181',                # U+0x215C
         'fiveeighths' => '1181',                 # U+0x215D

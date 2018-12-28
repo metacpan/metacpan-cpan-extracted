@@ -2,7 +2,7 @@ package Devel::Git::MultiBisect::Auxiliary;
 use strict;
 use warnings;
 use v5.10.0;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     clean_outputfile
@@ -165,8 +165,6 @@ Does not qualify, as the sub-list starting with C<beta> ends with an C<undef>.
 
 Does not qualify, as C<alpha> occurs in both the first and third sub-lists.
 
-Qualifies.
-
 =item * C<['alpha', 'alpha', undef, 'alpha', 'beta', undef, 'beta']>
 
 Qualifies.
@@ -184,7 +182,8 @@ Reference to an array holding scalars.
 =item * Return Value
 
 Array reference consisting of either 1 or 3 elements.  If the list qualifies,
-the array holds just one element which is a Perl-true value.  If the list qualifies, the array hold 3 elements as follows:
+the array holds just one element which is a Perl-true value.  If the list does
+B<not> qualify, the array hold 3 elements as follows:
 
 =over 4
 

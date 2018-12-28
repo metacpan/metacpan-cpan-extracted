@@ -12,7 +12,7 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.007;
+our $VERSION = 0.008;
 
 extends qw/App::BitBucketCli::Base/;
 
@@ -55,7 +55,7 @@ App::BitBucketCli::Project - Stores a projects details
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Project version 0.007
+This documentation refers to App::BitBucketCli::Project version 0.008
 
 =head1 SYNOPSIS
 

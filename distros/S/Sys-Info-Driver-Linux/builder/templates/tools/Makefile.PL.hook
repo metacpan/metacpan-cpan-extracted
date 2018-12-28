@@ -1,5 +1,0 @@
-my $eok = eval <<'THIS_IS_SOME_IDENTIFIER';
-[%HOOK%]
-THIS_IS_SOME_IDENTIFIER
-
-die "Error compiling initialization_hook: $@\n" if $@;

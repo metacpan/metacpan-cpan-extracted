@@ -1,5 +1,12 @@
 Revision history for HTML::GoogleMaps::V3
 
+0.14 2018-12-28
+        - update github repo in POD/README (GH #21)
+
+0.13 2018-12-28
+        - handle 40* responses from maps API (GH #20)
+        - thanks to Nigel Horne for the above patch
+
 0.12 2018-09-04
         - add missing meta spec to dist (GH #19)
         - thanks to Mohammad S Anwar for the above patch

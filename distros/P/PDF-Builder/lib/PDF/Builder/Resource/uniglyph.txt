@@ -27,7 +27,7 @@
 0x000C ; controlFF                           ; 6    # Adobe Glyph List (Sept/02) # <control>
 0x000D ; cedilla                             ; 1    # Substitution Candidate
 0x000D ; controlCR                           ; 6    # Adobe Glyph List (Sept/02) # <control>
-0x000E ; dblgrave                            ; 1    # Substitution Candidate
+0x000E ; dblgravecmb                         ; 1    # Substitution Candidate (formerly dblgrave)
 0x000E ; controlSO                           ; 6    # Adobe Glyph List (Sept/02) # <control>
 0x000F ; controlSI                           ; 6    # Adobe Glyph List (Sept/02) # <control>
 0x0010 ; controlDLE                          ; 6    # Adobe Glyph List (Sept/02) # <control>
@@ -756,6 +756,7 @@
 0x0219 ; scommaaccent                        ; 0    # Adobe Glyph List FN (v1.3) # LATIN SMALL LETTER S WITH COMMA BELOW
 0x021A ; Tcommaaccent                        ; 0    # Adobe Glyph List           # LATIN CAPITAL LETTER T WITH COMMA BELOW
 0x021B ; tcommaaccent                        ; 0    # Adobe Glyph List           # LATIN SMALL LETTER T WITH COMMA BELOW
+0x0237 ; dotlessj                            ; 0    # Adobe Glyph List (Sept/02) # was U+F6BE, still not displayed
 0x0250 ; aturned                             ; 0    # Adobe Glyph List (Sept/02) # LATIN SMALL LETTER TURNED A
 0x0251 ; ascript                             ; 0    # Adobe Glyph List (Sept/02) # LATIN SMALL LETTER ALPHA
 0x0252 ; ascriptturned                       ; 0    # Adobe Glyph List (Sept/02) # LATIN SMALL LETTER TURNED ALPHA
@@ -888,6 +889,7 @@
 0x02DC ; tilde                               ; 0    # Adobe Glyph List FN (v1.3) # SMALL TILDE
 0x02DC ; ilde                                ; 6    # Adobe Glyph List (Sept/02)
 0x02DD ; hungarumlaut                        ; 0    # Adobe Glyph List FN (v1.3) # DOUBLE ACUTE ACCENT
+# consider dblacute or dblacutecmb as alias for above
 0x02DD ; dblac                               ; 5    # SGML Substitute
 0x02DE ; rhotichookmod                       ; 0    # Adobe Glyph List (Sept/02) # MODIFIER LETTER RHOTIC HOOK
 0x02E0 ; gammasuperior                       ; 0    # Adobe Glyph List (Sept/02) # MODIFIER LETTER SMALL GAMMA
@@ -4861,7 +4863,7 @@
 0xF0FD ; boxxmarkbld                         ; 2    # MS Wingdings               #
 0xF0FE ; boxcheckbld                         ; 2    # MS Wingdings               #
 0xF0FF ; windowslogo                         ; 2    # MS Wingdings               #
-0xF6BE ; dotlessj                            ; 0    # Adobe Glyph List (Sept/02) #
+#0xF6BE ; dotlessj                           ; 0    # Adobe Glyph List (Sept/02) #
 0xF6BF ; LL                                  ; 0    # Adobe Glyph List (Sept/02) #
 0xF6C0 ; ll                                  ; 0    # Adobe Glyph List (Sept/02) #
 0xF6C1 ; Scedilla                            ; 0    # Adobe Glyph List           #

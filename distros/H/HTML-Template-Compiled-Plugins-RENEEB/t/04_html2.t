@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More;
 use HTML::Template::Compiled;
 
 {
@@ -95,3 +95,19 @@ use HTML::Template::Compiled;
 
     is $output, '&nbsp; hello<br />', 'test';
 }
+
+{
+    my $template = '<%= test ESCAPE=HTML_WITHOUT_NBSP %>';
+
+    my $tmpl = HTML::Template::Compiled->new(
+        scalarref => \$template,
+        plugin    => [ 'HTML::Template::Compiled::Plugin::HTML2' ],
+    );
+
+    $tmpl->param( test => undef );
+    my $output = $tmpl->output;
+
+    is $output, '', 'test - undef';
+}
+
+done_testing;

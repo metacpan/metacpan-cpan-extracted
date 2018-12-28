@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Pod::Coverage::TrustPod" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "1.11",
+  "VERSION" => "1.13",
   "test" => {
     "TESTS" => "t/*.t"
   }

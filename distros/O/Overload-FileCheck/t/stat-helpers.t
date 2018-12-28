@@ -40,9 +40,12 @@ if ( $> == 0 ) {
     'stat_as_file( uid => root, gid => root )';
 }
 
-{
+SKIP: {
     my $daemon_uid = getpwnam('daemon');
+    skip "daemon uid unknown" unless $daemon_uid;
+
     my $wheel_gid  = getgrnam('wheel');
+    skip "wheel gid unknown" unless $wheel_gid;
 
     if ( $daemon_uid && $wheel_gid ) {
         is stat_as_file( uid => 'daemon', gid => 'wheel' ),

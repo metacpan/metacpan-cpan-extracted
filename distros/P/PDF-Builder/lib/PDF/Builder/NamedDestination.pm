@@ -5,8 +5,13 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+
+# TBD: do -rect and -border apply to Named Destinations (link, url, file)? 
+#      There is nothing to implement these options. Perhaps the code was copied 
+#      from Annotations and never cleaned up? Disable mention of these options 
+#      for now (in the POD). Only link handles the destination page fit option.
 
 use Encode qw(:all);
 
@@ -22,6 +27,14 @@ PDF::Builder::NamedDestination - Add named destination shortcuts to a PDF
 =over
 
 =item $dest = PDF::Builder::NamedDestination->new($pdf)
+
+Returns a named destination object.
+
+=back
+
+=head2 Destination types
+
+=over
 
 =cut
 
@@ -52,7 +65,7 @@ sub new_api {
 =item $dest->link($page)
 
 Defines the destination as launch-page with page C<$page> and
-options %opts (-rect, -border or 'dest-options').
+options %opts for target page fit.
 
 =cut
 
@@ -70,7 +83,7 @@ sub link {
 =item $dest->url($url)
 
 Defines the destination as launch-url with url C<$url> and
-options %opts (-rect and/or -border).
+page-fit options %opts.
 
 =cut
 
@@ -78,19 +91,8 @@ sub url {
     my ($self, $url, %opts) = @_;
 
     $self->{'S'} = PDFName('URI');
-    if (is_utf8($url)) {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
-    $self->{'URI'} = PDFStr($url);
+    $self->{'URI'} = PDFString($url, 'u');
 
-    # this will come again -- since the utf8 urls are coming !
-    # -- fredo
-    #if (is_utf8($url) || utf8::valid($url)) {
-    #    $self->{'URI'} = PDFUtf($url);
-    #} else {
-    #    $self->{'URI'} = PDFStr($url);
-    #}
     return $self;
 }
 
@@ -99,7 +101,7 @@ sub url {
 =item $dest->file($file)
 
 Defines the destination as launch-file with filepath C<$file> and
-options %opts (-rect and/or -border).
+page-fit options %opts.
 
 =cut
 
@@ -107,19 +109,8 @@ sub file {
     my ($self, $url, %opts) = @_;
 
     $self->{'S'} = PDFName('Launch');
-    if (is_utf8($url)) {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
-    $self->{'F'} = PDFStr($url);
+    $self->{'F'} = PDFString($url, 'u');
 
-    # this will come again -- since the utf8 urls are coming !
-    # -- fredo
-    #if (is_utf8($url) || utf8::valid($url)) {
-    #    $self->{'F'} = PDFUtf($url);
-    #} else {
-    #    $self->{'F'} = PDFStr($url);
-    #}
     return $self;
 }
 
@@ -146,19 +137,7 @@ sub pdf_file {
     my ($self, $url, $pnum, %opts) = @_;
 
     $self->{'S'} = PDFName('GoToR');
-    if (is_utf8($url)) {
-        # URI must be 7-bit ascii
-        utf8::downgrade($url);
-    }
-    $self->{'F'} = PDFStr($url);
-
-    # this will come again -- since the utf8 urls are coming !
-    # -- fredo
-    #if (is_utf8($url) || utf8::valid($url)) {
-    #    $self->{'F'} = PDFUtf($url);
-    #} else {
-    #    $self->{'F'} = PDFStr($url);
-    #}
+    $self->{'F'} = PDFString($url, 'u');
 
     $self->dest(PDFNum($pnum), %opts);
 
@@ -196,7 +175,7 @@ in the other dimension.
 
 =item $dest->dest($page, -fitb => 1)
 
-(PDF 1.1) Display the page designated by C<$page>, with its contents magnified 
+Display the page designated by C<$page>, with its contents magnified 
 just enough to fit its bounding box entirely within the window both horizontally
 and vertically. If the required horizontal and vertical magnification factors 
 are different, use the smaller of the two, centering the bounding box within the
@@ -204,14 +183,14 @@ window in the other dimension.
 
 =item $dest->dest($page, -fitbh => $top)
 
-(PDF 1.1) Display the page designated by C<$page>, with the vertical coordinate 
+Display the page designated by C<$page>, with the vertical coordinate 
 C<$top> positioned at the top edge of the window and the contents of the page 
 magnified just enough to fit the entire width of its bounding box within the 
 window.
 
 =item $dest->dest($page, -fitbv => $left)
 
-(PDF 1.1) Display the page designated by C<$page>, with the horizontal 
+Display the page designated by C<$page>, with the horizontal 
 coordinate C<$left> positioned at the left edge of the window and the contents 
 of the page magnified just enough to fit the entire height of its bounding box 
 within the window.
@@ -224,14 +203,15 @@ magnified by the factor C<$zoom>. A zero (0) value for any of the parameters
 C<$left>, C<$top>, or C<$zoom> specifies that the current value of that 
 parameter is to be retained unchanged.
 
+This is the B<default> fit setting, with position (left and top) and zoom
+the same as the calling page's.
+
 =cut
 
 sub dest {
     my ($self, $page, %opts) = @_;
 
     if (ref $page) {
-        $opts{'-xyz'} = [undef,undef,undef] if scalar(keys %opts) < 1;
-
         if      (defined $opts{'-fit'}) {
             $self->{'D'} = PDFArray($page, PDFName('Fit'));
         } elsif (defined $opts{'-fith'}) {
@@ -249,6 +229,10 @@ sub dest {
             $self->{'D'} = PDFArray($page, PDFName('FitR'), map {PDFNum($_)} @{$opts{'-fitr'}});
         } elsif (defined $opts{'-xyz'}) {
             die "Insufficient parameters to ->dest(page, -xyz => []) " unless scalar @{$opts{'-xyz'}} == 3;
+            $self->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{'-xyz'}});
+	} else {
+	    # no "fit" option found. use default.
+            $opts{'-xyz'} = [undef,undef,undef];
             $self->{'D'} = PDFArray($page, PDFName('XYZ'), map {defined $_ ? PDFNum($_) : PDFNull()} @{$opts{'-xyz'}});
         }
     }

@@ -1,5 +1,11 @@
 Revision history for MySQL-Util
 
+0.31    - fixed 127712
+
+0.30    - added functionality to allow for a DBI handle to be passed in via
+          the constructor
+        - fixed 110104
+
 0.29    fixed 0.28 empty dist
 
 0.28    added Module::Load to the prereqs because DBIx::Inspector needs it

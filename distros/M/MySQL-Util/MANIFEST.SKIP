@@ -1,0 +1,10 @@
+.travis.yml
+.project
+.gitignore
+.git/
+build.sh
+cpan-upload.sh
+Makefile.old
+MANIFEST.bak
+Makefile$
+blib/

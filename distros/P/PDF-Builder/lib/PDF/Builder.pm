@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -84,6 +84,12 @@ PDF::Builder - Facilitates the creation and modification of PDF files
 There are four levels of involvement with PDF::Builder. Depending on what you
 want to do, different kinds of installs are recommended.
 See L<PDF::Builder::Docs> section B<Software Development Kit> for suggestions.
+
+=head2 OPTIONAL LIBRARIES
+
+PDF::Builder can make use of some optional libraries, which are not I<required>
+for a successful installation, but improve speed and capabilities. See 
+L<PDF::Builder::Docs> section B<Optional Libraries> for more information.
 
 =head2 STRINGS (CHARACTER TEXT)
 
@@ -692,13 +698,7 @@ sub info {
     if (scalar @_) {
         foreach my $k (@{$self->{'infoMeta'}}) {
             next unless defined $opt{$k};
-            if (is_utf8($opt{$k})) {
-                $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
-	   #} elsif (is_utf8($opt{$k}) || utf8::valid($opt{$k})) {
-           #    $self->{'pdf'}->{'Info'}->{$k} = PDFUtf($opt{$k} || 'NONE');
-            } else {
-                $self->{'pdf'}->{'Info'}->{$k} = PDFStr($opt{$k} || 'NONE');
-            }
+            $self->{'pdf'}->{'Info'}->{$k} = PDFString($opt{$k} || 'NONE', 'm');
         }
         $self->{'pdf'}->out_obj($self->{'pdf'}->{'Info'});
     }
@@ -858,7 +858,7 @@ sub pageLabel {
 	}
 
         if (defined $opts->{'-prefix'}) {
-            $d->{'P'} = PDFStr($opts->{'-prefix'});
+            $d->{'P'} = PDFString($opts->{'-prefix'}, 's');
         }
 
         if (defined $opts->{'-start'}) {
@@ -2499,14 +2499,14 @@ sub named_destination {
 
     my @names = sort {$a cmp $b} keys %{$root->{'Names'}->{$cat}->{'-vals'}};
 
-    $root->{'Names'}->{$cat}->{'Limits'}->{' val'}->[0] = PDFStr($names[0]);
-    $root->{'Names'}->{$cat}->{'Limits'}->{' val'}->[1] = PDFStr($names[-1]);
+    $root->{'Names'}->{$cat}->{'Limits'}->{' val'}->[0] = PDFString($names[0], 'n');
+    $root->{'Names'}->{$cat}->{'Limits'}->{' val'}->[1] = PDFString($names[-1], 'n');
 
     @{$root->{'Names'}->{$cat}->{'Names'}->{' val'}} = ();
 
     foreach my $k (@names) {
         push @{$root->{'Names'}->{$cat}->{'Names'}->{' val'}},
-        (   PDFStr($k),
+        (   PDFString($k, 'n'),
             $root->{'Names'}->{$cat}->{'-vals'}->{$k}
         );
     }

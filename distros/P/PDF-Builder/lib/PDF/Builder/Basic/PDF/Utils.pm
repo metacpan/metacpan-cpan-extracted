@@ -15,8 +15,8 @@ package PDF::Builder::Basic::PDF::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -43,7 +43,7 @@ use Exporter;
 use vars qw(@EXPORT @ISA);
 @ISA = qw(Exporter);
 @EXPORT = qw(PDFBool PDFArray PDFDict PDFName PDFNull
-             PDFNum PDFStr PDFStrHex PDFUtf);
+             PDFNum PDFString PDFStr PDFStrHex PDFUtf);
 
 =head2 PDFBool()
 
@@ -105,9 +105,85 @@ sub PDFNum {
     return PDF::Builder::Basic::PDF::Number->new(@_);
 }
 
+=head2 PDFString($text, $usage)
+
+Returns either PDFStr($text) or PDFUtf($text), depending on whether C<$text>
+is already in UTF-8 and whether the C<$usage> permits UTF-8. If UTF-8 is I<not>
+permitted, C<downgrade> will be called on a UTF-8 formatted C<$text>.
+
+C<$usage> is a single character string indicating the use for which C<$text>
+is to be applied. Some uses permit UTF-8, while others (currently) forbid it:
+
+=over
+
+=item 's'
+
+An ordinary B<string>, where UTF-8 text is permitted.
+
+=item 'n'
+
+A B<named destination>, where UTF-8 text is permitted.
+
+=item 'o'
+
+An B<outline title>, where UTF-8 text is permitted.
+
+=item 'p'
+
+A B<popup title>, where UTF-8 text is permitted.
+
+=item 'm'
+
+B<metadata>, where UTF-8 text is permitted.
+
+=item 'f'
+
+A B<file path and/or name>, where UTF-8 text is currently B<not> permitted.
+
+=item 'u'
+
+A B<URL>, where UTF-8 text is currently B<not> permitted.
+
+=item 'x'
+
+Any other usage where UTF-8 text is B<not> permitted.
+
+=back
+
+=cut
+
+sub PDFString {
+    my ($text, $usage) = @_;
+
+   # some old code also checked valid(), but that seems to always give a true
+   #   return on non-UTF-8 text
+   #my $isUTF8 = utf8::is_utf8($text) || utf8::valid($text);
+    my $isUTF8 = utf8::is_utf8($text);
+    my $isPermitted = 0;  # default NO
+    # someone is bound to forget whether it's upper or lowercase!
+    if ($usage =~ m/^[snopm]/i) { 
+        $isPermitted = 1;
+    }
+
+    if ($isPermitted) { 
+		if ($isUTF8) {
+	    	return PDFUtf($text); 
+        } else {
+	    	return PDFStr($text); 
+		}
+    } else {
+	if ($isUTF8) {
+	    utf8::downgrade($text); # force 7 bit ASCII
+        }
+	return PDFStr($text); 
+    }
+}
+
 =head2 PDFStr()
 
 Creates a string via PDF::Builder::Basic::PDF::String->new()
+
+B<DEPRECATED.> It is preferable that you use C<PDFString> instead.
 
 =cut
 
@@ -130,6 +206,8 @@ sub PDFStrHex {
 =head2 PDFUtf()
 
 Creates a utf8-string via PDF::Builder::Basic::PDF::String->new()
+
+B<DEPRECATED.> It is preferable that you use C<PDFString> instead.
 
 =cut
 

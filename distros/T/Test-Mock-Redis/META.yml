@@ -26,7 +26,7 @@ no_index:
 provides:
   Test::Mock::Redis:
     file: lib/Test/Mock/Redis.pm
-    version: '0.20'
+    version: '0.21'
   Test::Mock::Redis::Hash:
     file: lib/Test/Mock/Redis.pm
   Test::Mock::Redis::List:
@@ -47,5 +47,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-Mock-Redis
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jlavallee/Test-Mock-Redis/
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

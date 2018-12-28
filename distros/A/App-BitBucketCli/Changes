@@ -1,5 +1,10 @@
 Revision history for App-bitbucket-cli
 
+0.008   2018-12-27
+        Updating for release of version 0.008
+        Adding email and participand to filters for PRs (Ivan Wills)
+        Fixing the generating of the email list (Ivan Wills)
+
 0.007   2018-11-17
         Updating for release of version 0.007
         Only passing on defined params to core (Ivan Wills)

@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.6.1 2018-12-27T06:48:31Z
+
+    - requires 'Getopt::EX', 'v1.13.1';
+
 4.6.0 2018-10-26T03:25:40Z
 
     - Introduce -B option to watchdiff command.

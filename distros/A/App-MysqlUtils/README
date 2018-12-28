@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.013 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2018-12-05.
+    This document describes version 0.014 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2018-12-27.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -139,6 +139,70 @@ FUNCTIONS
     *   database* => *str*
 
     *   host => *str* (default: "localhost")
+
+    *   password => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    *   port => *int* (default: 3306)
+
+    *   username => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_drop_dbs
+    Usage:
+
+     mysql_drop_dbs(%args) -> [status, msg, payload, meta]
+
+    Drop MySQL databases.
+
+    For safety, the default is dry-run mode. To actually drop the databases,
+    you must supply "--no-dry-run" or DRY_RUN=0.
+
+    Examples:
+
+     # Drop dbs D1, D2, D3 (dry-run mode)
+     % mysql-drop-dbs D1 D2 D3
+ 
+     # Drop all dbs with names matching /^testdb/ (dry-run mode)
+     % mysql-drop-dbs --db-pattern ^testdb
+ 
+     # Actually drop all dbs with names matching /^testdb/, don't delete more than 5 dbs
+     % mysql-drop-dbs --db-pattern ^testdb --limit 5 --no-dry-run
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_pattern => *re*
+
+    *   dbs => *array[str]*
+
+    *   host => *str* (default: "localhost")
+
+    *   limit => *posint*
+
+        Don't delete more than this number of databases.
 
     *   password => *str*
 

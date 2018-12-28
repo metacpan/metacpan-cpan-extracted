@@ -1,0 +1,11 @@
+Revision history for ARGV-OrDATA
+
+0.003   2018-12-28
+        Skip tests when stdin is not a terminal.
+
+0.002   2018-12-28
+        Fix tests on MSWin and with non-standard Perl executable path.
+
+0.001   2017-06-09
+        First version, released on an unsuspecting world.
+

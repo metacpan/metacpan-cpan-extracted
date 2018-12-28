@@ -1,5 +1,10 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.310000 Dec 26 2018 14:30:00 PDT
+   - THIS RELEASE CONTAINS A POTENTIALLY BREAKING BEHAVIOR CHANGE.
+   - Add a strict_mode (defaults to true)
+      - Throws an error when a tablename doesn't exist
+
 0.303000 Nov 25 2018 14:30:00 PDT
    - Find the best match including all parentage. (Re-enabled feature)
    - Don't call update() in fix_deferred_fks if no columns are dirty.

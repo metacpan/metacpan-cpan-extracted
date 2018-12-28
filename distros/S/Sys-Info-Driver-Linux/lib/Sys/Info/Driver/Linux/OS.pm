@@ -1,7 +1,7 @@
 package Sys::Info::Driver::Linux::OS;
+$Sys::Info::Driver::Linux::OS::VERSION = '0.7904';
 use strict;
 use warnings;
-use vars qw( $VERSION );
 use base qw( Sys::Info::Base );
 use POSIX ();
 use Cwd;
@@ -11,8 +11,6 @@ use Sys::Info::Driver::Linux::Constants qw( :all );
 use constant FSTAB_LENGTH => 6;
 
 ##no critic (InputOutput::ProhibitBacktickOperators)
-
-$VERSION = '0.7903';
 
 sub init {
     my $self = shift;
@@ -117,7 +115,7 @@ sub node_name { return shift->uname->{nodename} }
 
 sub domain_name {
     my $self = shift;
-    # hmmmm...
+    #Â hmmmm...
     foreach my $line ( $self->read_file( proc->{resolv} ) ) {
         chomp $line;
         if ( $line =~ m{\A domain \s+ (.*) \z}xmso ) {
@@ -163,7 +161,7 @@ sub _parse_meminfo {
     foreach my $line ( split /\n/xms, $self->slurp( proc->{meminfo} ) ) {
         chomp $line;
         my($k, $v) = split /:/xms, $line;
-        # units in KB
+        #Â units in KB
         $mem{ $k } = (split /\s+/xms, $self->trim( $v ) )[0];
     }
     return %mem;
@@ -259,29 +257,17 @@ sub _fs_attributes {
 
 1;
 
-__END__
-
-sub _fetch_user_info {
-    my %user;
-    $user{NAME}               = POSIX::getlogin();
-    $user{REAL_USER_ID}       = POSIX::getuid();  # $< uid
-    $user{EFFECTIVE_USER_ID}  = POSIX::geteuid(); # $> effective uid
-    $user{REAL_GROUP_ID}      = POSIX::getgid();  # $( guid
-    $user{EFFECTIVE_GROUP_ID} = POSIX::getegid(); # $) effective guid
-    my %junk;
-    # quota, comment & expire are unreliable
-    @junk{qw(name  passwd  uid  gid
-             quota comment gcos dir shell expire)} = getpwnam($user{NAME});
-    $user{REAL_NAME} = defined $junk{gcos}    ? $junk{gcos}    : '';
-    $user{COMMENT}   = defined $junk{comment} ? $junk{comment} : '';
-    return %user;
-}
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Sys::Info::Driver::Linux::OS - Linux backend
+Sys::Info::Driver::Linux::OS
+
+=head1 VERSION
+
+version 0.7904
 
 =head1 SYNOPSIS
 
@@ -289,10 +275,11 @@ Sys::Info::Driver::Linux::OS - Linux backend
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7903> of C<Sys::Info::Driver::Linux::OS>
-released on C<8 May 2013>.
-
 -
+
+=head1 NAME
+
+Sys::Info::Driver::Linux::OS - Linux backend
 
 =head1 METHODS
 
@@ -338,15 +325,32 @@ L<http://www.redhat.com/docs/manuals/linux/RHL-9-Manual/ref-guide/s1-proc-topfil
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut
+
+__END__
+
+sub _fetch_user_info {
+    my %user;
+    $user{NAME}               = POSIX::getlogin();
+    $user{REAL_USER_ID}       = POSIX::getuid();  # $< uid
+    $user{EFFECTIVE_USER_ID}  = POSIX::geteuid(); # $> effective uid
+    $user{REAL_GROUP_ID}      = POSIX::getgid();  # $( guid
+    $user{EFFECTIVE_GROUP_ID} = POSIX::getegid(); # $) effective guid
+    my %junk;
+    # quota, comment & expire are unreliable
+    @junk{qw(name  passwd  uid  gid
+             quota comment gcos dir shell expire)} = getpwnam($user{NAME});
+    $user{REAL_NAME} = defined $junk{gcos}    ? $junk{gcos}    : '';
+    $user{COMMENT}   = defined $junk{comment} ? $junk{comment} : '';
+    return %user;
+}
+

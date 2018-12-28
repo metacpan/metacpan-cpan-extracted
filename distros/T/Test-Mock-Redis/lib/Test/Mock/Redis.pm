@@ -17,11 +17,11 @@ Test::Mock::Redis - use in place of Redis for unit testing
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
@@ -529,17 +529,22 @@ sub lset {
 sub lrem {
     my ( $self, $key, $count, $value ) = @_;
     my $removed;
-    my @indicies = $count < 0
-                 ? ($#{ $self->_stash->{$key} }..0)
-                 : (0..$#{ $self->_stash->{$key} })
-    ;
+    my @indicies = (0..$#{ $self->_stash->{$key} });
+    @indicies = reverse @indicies if $count < 0;
     $count = abs $count;
 
+    my @to_remove;
     for my $index (@indicies){
         if($self->_stash->{$key}->[$index] eq $value){
-            splice @{ $self->_stash->{$key} }, $index, 1;
-            last if $count && ++$removed >= $count;
+            push @to_remove, $index;
+            $removed++;
+            last if $count && $removed >= $count;
         }
+    }
+
+    # reverse sort so that the higher indecies are removed first
+    for my $rm_idx (sort { $b <=> $a } @to_remove){
+        splice @{ $self->_stash->{$key} }, $rm_idx, 1;
     }
 
     return $removed;
@@ -1222,13 +1227,15 @@ The following people have contributed to I<Test::Mock::Redis>:
 
 =item * Nigel Gregoire
 
+=item * Thomas Bloor
+
 =item * Yaakov Shaul
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2015 Jeff Lavallee.
+Copyright 2018 Jeff Lavallee.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

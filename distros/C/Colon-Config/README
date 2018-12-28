@@ -1,5 +1,5 @@
 This archive contains the distribution Colon-Config,
-version 0.003:
+version 0.004:
 
   XS helper to read a configuration file using ':' as separator
 

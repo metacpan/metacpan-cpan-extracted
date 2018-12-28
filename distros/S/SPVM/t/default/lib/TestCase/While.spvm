@@ -1,0 +1,40 @@
+package TestCase::While {
+  use TestCase::Minimal;
+  
+  sub basic : int () {
+  
+    my $success_while = 0;
+    {
+      my $total = 0;
+      my $i = 0;
+      while ($i <= 3) {
+        $total = $total + $i;
+        $i++;
+      }
+      
+      if ($total == 6) {
+        $success_while = 1;
+      }
+    }
+    
+    unless ($success_while) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  sub condition_my : int () {
+    
+    my $num = 5;
+    while (my $num = 3) {
+      if ($num == 3) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    return 0;
+  }
+}

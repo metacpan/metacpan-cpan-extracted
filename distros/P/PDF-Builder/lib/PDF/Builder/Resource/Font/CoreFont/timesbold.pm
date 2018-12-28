@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::timesbold;
 use strict;
 use warnings;
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -425,7 +425,7 @@ sub data { return {
         'guillemotleft' => '500',                # C+0xAB # U+0x00AB
         'logicalnot' => '570',                   # C+0xAC # U+0x00AC
         'registered' => '747',                   # C+0xAE # U+0x00AE
-        'macron' => '333',                       # C+0xAF # U+0x00AF
+        'macron' => '520',                       # C+0xAF # U+0x00AF
         'degree' => '400',                       # C+0xB0 # U+0x00B0
         'plusminus' => '570',                    # C+0xB1 # U+0x00B1
         'twosuperior' => '300',                  # C+0xB2 # U+0x00B2
@@ -515,6 +515,7 @@ sub data { return {
         'ring' => '333',                         # U+0x02DA
         'ogonek' => '333',                       # U+0x02DB
         'hungarumlaut' => '333',                 # U+0x02DD
+	    'dblgravecmb' => '333',                  # U+0x030F
         'fraction' => '167',                     # U+0x2044
         'minus' => '570',                        # U+0x2212
         'fi' => '556',                           # U+0xFB01

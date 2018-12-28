@@ -14,19 +14,21 @@ use English qw/ -no_match_vars /;
 
 extends 'App::BitBucketCli';
 
-our $VERSION = 0.007;
+our $VERSION = 0.008;
 
 sub options {
     return [qw/
         colors|c=s%
         force|f!
         author|a=s
+        emails|e=s
         to_branch|to-branch|t=s
         from_branch|from-branch|f=s
         title|T=s
         state|S=s
         long|l
         project|p=s
+        participant|P=s
         regexp|R
         remote|m=s
         repository|r=s
@@ -48,19 +50,25 @@ sub pull_requests {
     my $to_branch   = $self->opt->to_branch();
     my $from_branch = $self->opt->from_branch();
     my $title       = $self->opt->title();
+    my $emails      = $self->opt->emails();
+    my $participant = $self->opt->participant();
     for my $pull_request (@pull_requests) {
         next if $author && $pull_request->author->{user}{displayName} !~ /$author/;
         next if $to_branch && $pull_request->toRef->{displayId} !~ /$to_branch/;
         next if $from_branch && $pull_request->fromRef->{displayId} !~ /$from_branch/;
         next if $title && $pull_request->title !~ /$title/;
+        next if $emails && ! grep { /$emails/ } @{ $pull_request->emails };
+        next if $participant && ! grep { $_->{user}{displayName} =~ /$participant/ } @{ $pull_request->participants };
 
+        my $tasks = eval { $pull_request->{openTasks}->[0] } || 0;
         push @prs, {
             id     => $pull_request->id,
             title  => $pull_request->title,
             author => $pull_request->author->{user}{displayName},
             from   => $pull_request->fromRef->{displayId},
             to     => $pull_request->toRef->{displayId},
-            tasks  => $pull_request->{openTasks}->[0] || 0,
+            emails => $pull_request->emails,
+            tasks  => $tasks,
         };
         chomp $prs[-1]{title};
         for my $key (keys %{ $prs[-1] }) {
@@ -73,6 +81,9 @@ sub pull_requests {
         printf "%-$max{author}s ", $pr->{author};
         printf "%-$max{tasks}s ", $pr->{tasks};
         print "$pr->{title}\n";
+        if ( $self->opt->long ) {
+            print '  ', ( join ', ', @{ $pr->{emails} } ), "\n";
+        }
     }
 }
 
@@ -86,7 +97,7 @@ App::BitBucketCli::Command::PullRequests - Show the pull requests of a repositor
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Command::PullRequests version 0.007
+This documentation refers to App::BitBucketCli::Command::PullRequests version 0.008
 
 =head1 SYNOPSIS
 
@@ -111,6 +122,11 @@ This documentation refers to App::BitBucketCli::Command::PullRequests version 0.
   -t --test         ??
   -a --author[=]regex
                     Show only pull requests by this author
+  -e --emails[=]regex
+                    Show only pull requests involving anyone with an email
+                    matching matching this regex.
+  -P --participant[=]regex
+                    Show only pull requests with participants matching this regex
   -t --to-branch[=]regex
                     Show only pull requests to this branch
   -f --from-branch[=]rege

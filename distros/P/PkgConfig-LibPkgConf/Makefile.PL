@@ -9,7 +9,7 @@ BEGIN {
   }
 }
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.98;
 use Config;
 
 my $cc = $Config{cc};
@@ -30,6 +30,7 @@ sub try
 
   foreach my $cmd ($ENV{PKG_CONFIG}, qw( pkgconf pkg-config ppkg-config pkg-config.pl ))
   {
+    next unless defined $cmd;
     do {
       no warnings 'exec';
       system $cmd, '--exists', $name;
@@ -154,13 +155,13 @@ my %args = (
   OPTIMIZE           => $optimize,
 
   CONFIGURE_REQUIRES => {
-    "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::MakeMaker" => '6.98',
   },
   BUILD_REQUIRES     => {
     ($alien ? ('Alien::pkgconf' => $alien_ver) : ()),
   },
   TEST_REQUIRES      => {
-    'Test::More' => '0.94',
+    'Test::More' => '0.98',
   },
   PREREQ_PM          => {
     #
@@ -188,19 +189,5 @@ my %args = (
     FILES => '*.log *.bak',
   }
 );
-
-my %fallback = (
-  %{ $args{TEST_REQUIRES} },
-  %{ $args{PREREQ_PM} },
-);
-
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
-  $args{PREREQ_PM} = \%fallback;
-  delete $args{TEST_REQUIRES};
-  delete $args{BUILD_REQUIRES};
-}
-
-delete $args{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%args);

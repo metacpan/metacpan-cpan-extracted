@@ -90,5 +90,6 @@ foreach my $block (0,1,2,3,4,5,0x26,0x27,0xf0) {
 
 $api->saveas("$0.pdf");
 $api->end();
+print STDERR "\n";
 
 __END__

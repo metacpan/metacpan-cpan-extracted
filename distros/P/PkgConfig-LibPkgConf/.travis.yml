@@ -1,23 +1,36 @@
-language: perl
+language: minimal
+dist: xenial
+services:
+  - docker
+
+before_install:
+  - curl https://raw.githubusercontent.com/plicease/cip/master/bin/travis-bootstrap | bash
+  - cip before-install
 
 install:
-  - mkdir /tmp/pkgconf
-  - git clone https://github.com/pkgconf/pkgconf.git /tmp/pkgconf/src
-  - bash -c 'cd /tmp/pkgconf/src; ./autogen.sh && ./configure --prefix=/tmp/pkgconf --with-pic --disable-shared && make && make install'
-  - env PKG_CONFIG_PATH=/tmp/pkgconf/lib/pkgconfig cpanm --installdeps -n -v .
+  - cip diag
+  - cip install
 
-perl:
-  - "5.8"
-  - "5.10"
-  - "5.12"
-  - "5.14"
-  - "5.16"
-  - "5.18"
-  - "5.20"
-  - "5.22"
-  - "5.24"
-  
 script:
-  - env PKG_CONFIG_PATH=/tmp/pkgconf/lib/pkgconfig perl Makefile.PL
-  - make
-  - make test TEST_VERBOSE=1
+  - cip script
+
+jobs:
+  include:
+    - env: CIP_TAG=5.29
+    - env: CIP_TAG=5.28-fedora29
+    - env: CIP_TAG=5.28 INSTALL_PKGCONF_FROM_GIT=1
+    - env: CIP_TAG=5.28
+    - env: CIP_TAG=5.26
+    - env: CIP_TAG=5.24
+    - env: CIP_TAG=5.22
+    - env: CIP_TAG=5.20
+    - env: CIP_TAG=5.18
+    - env: CIP_TAG=5.16
+    - env: CIP_TAG=5.14
+    - env: CIP_TAG=5.12
+    - env: CIP_TAG=5.10
+    - env: CIP_TAG=5.8.8
+
+cache:
+  directories:
+    - "$HOME/.cip"

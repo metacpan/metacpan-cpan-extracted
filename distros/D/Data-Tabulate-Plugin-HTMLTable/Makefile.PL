@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,14 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Data-Tabulate-Plugin-HTMLTable",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Data::Tabulate::Plugin::HTMLTable",
   "PREREQ_PM" => {
     "Data::Tabulate" => "0.06",
-    "HTML::Table" => "2.08",
+    "HTML::Table" => "2.08"
+  },
+  "TEST_REQUIRES" => {
+    "Pod::Coverage::TrustPod" => 0,
     "Test::CheckManifest" => "1.22",
     "Test::More" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,6 +35,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::Tabulate" => "0.06",
   "HTML::Table" => "2.08",
+  "Pod::Coverage::TrustPod" => 0,
   "Test::CheckManifest" => "1.22",
   "Test::More" => 0
 );

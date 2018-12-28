@@ -12,7 +12,7 @@ use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = 0.007;
+our $VERSION = 0.008;
 
 extends qw/App::BitBucketCli::Base/;
 
@@ -34,7 +34,13 @@ has [qw/
     is  => 'rw',
 );
 
-sub emails {
+has emails => (
+    is      => 'rw',
+    builder => '_emails',
+    lazy    => 1,
+);
+
+sub _emails {
     my $self = shift;
     my %emails;
 
@@ -44,9 +50,8 @@ sub emails {
             warn "No $users in " . $self->from_branch . "!\n";
             next;
         }
-        $self->$users( [$self->{$users}] ) if ref $self->$users ne 'ARRAY';
 
-        for my $user (@{ $self->{$users} }) {
+        for my $user (@{ ref $self->$users eq 'ARRAY' ? $self->{$users} : [$self->{$users}] }) {
             $emails{ $user->{user}{emailAddress} }++;
         }
     }
@@ -109,7 +114,7 @@ App::BitBucketCli::PullRequest - Stores details about a pull request
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::PullRequest version 0.007
+This documentation refers to App::BitBucketCli::PullRequest version 0.008
 
 =head1 SYNOPSIS
 

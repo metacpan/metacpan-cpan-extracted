@@ -1,6 +1,8 @@
 package Sys::Info::Driver::Linux::OS::Distribution;
+$Sys::Info::Driver::Linux::OS::Distribution::VERSION = '0.7904';
 use strict;
 use warnings;
+
 use constant STD_RELEASE     => 'lsb-release';
 use constant STD_RELEASE_DIR => 'lsb-release.d';
 use constant DEBIAN_RELEASE  => 'os-release';
@@ -12,8 +14,6 @@ use Sys::Info::Driver::Linux;
 use Sys::Info::Driver::Linux::Constants qw( :all );
 use Sys::Info::Driver::Linux::OS::Distribution::Conf;
 use File::Spec;
-
-our $VERSION = '0.7903';
 
 # XXX: <REMOVE>
 my $RELX = sub {
@@ -318,10 +318,17 @@ sub _get_file_info {
 
 __END__
 
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Sys::Info::Driver::Linux::OS::Distribution - Linux distribution probe
+Sys::Info::Driver::Linux::OS::Distribution
+
+=head1 VERSION
+
+version 0.7904
 
 =head1 SYNOPSIS
 
@@ -338,9 +345,6 @@ Sys::Info::Driver::Linux::OS::Distribution - Linux distribution probe
 
 =head1 DESCRIPTION
 
-This document describes version C<0.7903> of C<Sys::Info::Driver::Linux::OS::Distribution>
-released on C<8 May 2013>.
-
 This is a simple module that tries to guess on what linux distribution
 we are running by looking for release's files in /etc.  It now looks for
 'lsb-release' first as that should be the most correct and adds ubuntu support.
@@ -353,6 +357,10 @@ adamantix, yoper, arch-linux, libranet, gentoo, ubuntu and redflag.
 It has function to get the version for debian, suse, redhat, gentoo, slackware,
 redflag and ubuntu(lsb). People running unsupported distro's are greatly
 encouraged to submit patches.
+
+=head1 NAME
+
+Sys::Info::Driver::Linux::OS::Distribution - Linux distribution probe
 
 =head1 METHODS
 
@@ -390,15 +398,13 @@ and it's authors are:
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2006 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

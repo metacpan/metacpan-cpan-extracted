@@ -14,7 +14,7 @@ use Cwd;
 use File::Temp;
 use List::Util qw(first sum);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -69,7 +69,7 @@ you can use another package in this library, F<Devel::Git::MultiBisect::AllCommi
 =head1 METHODS
 
 This package inherits methods from F<Devel::Git::MultiBisect>.  Only methods unique to
-F<Devel::Git::MultiBisect::AllCommits> are documented here.  See the documentation for
+F<Devel::Git::MultiBisect::Transitions> are documented here.  See the documentation for
 F<Devel::Git::MultiBisect> for all other methods, including:
 
     new()
@@ -339,7 +339,6 @@ sub _multisect_one_target {
 
 sub _evaluate_status_one_target_run {
     my ($self, $target_idx) = @_;
-    my $stub = $self->{targets}->[$target_idx]->{stub};
     my @trans = ();
     for my $o (@{$self->{all_outputs}}) {
         push @trans,

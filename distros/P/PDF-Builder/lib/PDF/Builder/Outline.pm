@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.012'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.013'; # VERSION
+my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -116,7 +116,7 @@ Set the title of the outline.
 sub title {
     my ($self, $txt) = @_;
 
-    $self->{'Title'} = PDFStr($txt);
+    $self->{'Title'} = PDFString($txt, 'o');
     return $self;
 }
 
@@ -230,9 +230,12 @@ magnified by the factor C<$zoom>. A zero (0) value for any of the parameters
 C<$left>, C<$top>, or C<$zoom> specifies that the current value of that 
 parameter is to be retained unchanged.
 
+This is the B<default> fit setting, with position (left and top) and zoom
+the same as the calling page's.
+
 =item $otl->dest($name)
 
-(PDF 1.2) Connect the Outline to a "Named Destination" defined elsewhere.
+Connect the Outline to a "Named Destination" defined elsewhere.
 
 =cut
 
@@ -240,8 +243,6 @@ sub dest {
     my ($self, $page, %opts) = @_;
 
     if (ref $page) {
-        $opts{'-xyz'} = [undef,undef,undef] if scalar(keys %opts) < 1;
-
         if      (defined $opts{'-fit'}) {
             $self->{'Dest'} = PDFArray($page, PDFName('Fit'));
         } elsif (defined $opts{'-fith'}) {
@@ -260,9 +261,13 @@ sub dest {
         } elsif (defined $opts{'-xyz'}) {
             die "Insufficient parameters to ->dest(page, -xyz => []) " unless scalar @{$opts{'-xyz'}} == 3;
             $self->{'Dest'} = PDFArray($page, PDFName('XYZ'), map {defined $_? PDFNum($_): PDFNull()} @{$opts{'-xyz'}});
-        }
+        } else {
+	    # no "fit" option found. use default.
+            $opts{'-xyz'} = [undef,undef,undef];
+            $self->{'Dest'} = PDFArray($page, PDFName('XYZ'), map {defined $_? PDFNum($_): PDFNull()} @{$opts{'-xyz'}});
+		}
     } else {
-        $self->{'Dest'} = PDFStr($page);
+        $self->{'Dest'} = PDFString($page, 'n');
     }
     return $self;
 }
@@ -281,7 +286,7 @@ sub url {
     delete $self->{'Dest'};
     $self->{'A'} = PDFDict();
     $self->{'A'}->{'S'} = PDFName('URI');
-    $self->{'A'}->{'URI'} = PDFStr($url);
+    $self->{'A'}->{'URI'} = PDFString($url, 'u');
     return $self;
 }
 
@@ -299,7 +304,7 @@ sub file {
     delete $self->{'Dest'};
     $self->{'A'} = PDFDict();
     $self->{'A'}->{'S'} = PDFName('Launch');
-    $self->{'A'}->{'F'} = PDFStr($file);
+    $self->{'A'}->{'F'} = PDFString($file, 'f');
     return $self;
 }
 
@@ -328,7 +333,7 @@ sub pdf_file {
     delete $self->{'Dest'};
     $self->{'A'} = PDFDict();
     $self->{'A'}->{'S'} = PDFName('GoToR');
-    $self->{'A'}->{'F'} = PDFStr($file);
+    $self->{'A'}->{'F'} = PDFString($file, 'f');
     if      (defined $opts{'-fit'}) {
         $self->{'A'}->{'D'} = PDFArray(PDFNum($pnum), PDFName('Fit'));
     } elsif (defined $opts{'-fith'}) {

@@ -14,7 +14,7 @@ has dependencies => sub {
   return {
     core => [qw(webpack webpack-cli webpack-md5-hash html-webpack-plugin)],
     css  => [qw(css-loader mini-css-extract-plugin optimize-css-assets-webpack-plugin)],
-    js   => [qw(@babel/core @babel/preset-env babel-loader uglifyjs-webpack-plugin)],
+    js   => [qw(@babel/core @babel/preset-env babel-loader terser-webpack-plugin)],
     sass => [qw(node-sass sass-loader)],
     vue  => [qw(vue vue-loader vue-template-compiler)],
   };
@@ -311,7 +311,7 @@ it depends on. Example:
   $app->plugin("Webpack" => {
     dependencies => {
       css  => [qw(css-loader mini-css-extract-plugin optimize-css-assets-webpack-plugin)],
-      js   => [qw(@babel/core @babel/preset-env babel-loader uglifyjs-webpack-plugin)],
+      js   => [qw(@babel/core @babel/preset-env babel-loader terser-webpack-plugin)],
       sass => [qw(node-sass sass-loader)],
     }
   });
