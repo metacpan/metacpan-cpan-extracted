@@ -1,152 +1,164 @@
 revision history for NetPacket
 
-1.6.0 2015-03-13
- [ENHANCEMENTS]
- - Clean up inheritance code (Philip Prindeville).
- - Add a truckload of constants (Philip Prindeville).
+1.7.0 2018-12-30
+  [ ENHANCEMENTS ]
+    - Setup aliases at compile time (Nicolas R, GH#11)
+    - add recommended Net::Pcap{,Utils} from README (Zak B. Elep, GH#12)
 
- [STATISTICS]
- - code churn: 12 files changed, 343 insertions(+), 220 deletions(-)
+  [ NEW FEATURES ]
+    - adds back basic support for IPv6. (Dan Book, GH#10)
+
+  [ STATISTICS ]
+    - code churn: 16 files changed, 1177 insertions(+), 48 deletions(-)
+
+1.6.0 2015-03-13
+  [ ENHANCEMENTS ]
+    - Clean up inheritance code (Philip Prindeville).
+    - Add a truckload of constants (Philip Prindeville).
+
+  [ STATISTICS ]
+    - code churn: 12 files changed, 343 insertions(+), 220 deletions(-)
 
 1.5.0 2014-06-15
- [ENHANCEMENTS]
- - Addition of NetPacket::IPX. (Daniel Collins)
- - NetPacket::Ethernet implements 'encode'. (RT#93928, Guido Hungerbuehler)
+  [ ENHANCEMENTS ]
+    - Addition of NetPacket::IPX. (Daniel Collins)
+    - NetPacket::Ethernet implements 'encode'. (RT#93928, Guido
+      Hungerbuehler)
 
- [STATISTICS]
- - code churn: 7 files changed, 337 insertions(+), 13 deletions(-)
+  [ STATISTICS ]
+    - code churn: 7 files changed, 337 insertions(+), 13 deletions(-)
 
 1.4.4 2013-11-30
- [BUG FIXES]
- - NetPacket::USBMon: also handle big endian perl without quad type. 
-   (GH#5, Andreas Schwab)
- - Typo fix in comments. (GH#6, fschlich)
+  [ BUG FIXES ]
+    - NetPacket::USBMon: also handle big endian perl without quad type. 
+      (GH#5, Andreas Schwab)
+    - Typo fix in comments. (GH#6, fschlich)
 
- [STATISTICS]
- - code churn: 3 files changed, 13 insertions(+), 4 deletions(-)
+  [ STATISTICS ]
+    - code churn: 3 files changed, 13 insertions(+), 4 deletions(-)
 
 1.4.3 2013-10-03
- [BUG FIXES]
- - Unpack data in LittleEndian format. (GH#4, k0da)
+  [ BUG FIXES ]
+    - Unpack data in LittleEndian format. (GH#4, k0da)
 
- [STATISTICS]
- - code churn: 3 files changed, 62 insertions(+), 27 deletions(-)
+  [ STATISTICS ]
+    - code churn: 3 files changed, 62 insertions(+), 27 deletions(-)
 
 1.4.2 2013-09-25
- [BUG FIXES]
- - Dist::Zilla::Plugin::Test::Compile was causing test to potentially hang
-   on Windows. (reported by Karen Etheridge)
+  [ BUG FIXES ]
+    - Dist::Zilla::Plugin::Test::Compile was causing test to potentially
+      hang on Windows. (reported by Karen Etheridge)
 
- [MISC]
- - Tidy up the changelog. (GH#3, Neil Bowers)
+  [ MISC ]
+    - Tidy up the changelog. (GH#3, Neil Bowers)
 
- [STATISTICS]
- - code churn: 2 files changed, 46 insertions(+), 20 deletions(-)
+  [ STATISTICS ]
+    - code churn: 2 files changed, 46 insertions(+), 20 deletions(-)
 
 1.4.1 2013-09-05
- [BUG FIXES]
- - Test was using Errno constant and failing on some platforms.
+  [ BUG FIXES ]
+    - Test was using Errno constant and failing on some platforms.
 
- [STATISTICS]
- - code churn: 2 files changed, 15 insertions(+), 7 deletions(-)
+  [ STATISTICS ]
+    - code churn: 2 files changed, 15 insertions(+), 7 deletions(-)
 
 1.4.0 2013-08-26
- [DOCUMENTATION]
- - Fixing NetPacked::UDP documentation. (RT#85361, Ben Magistro)
+  [ DOCUMENTATION ]
+    - Fixing NetPacked::UDP documentation. (RT#85361, Ben Magistro)
 
- [ENHANCEMENTS]
- - New NetPacket::USBMon. (GH#2, lkundrak)
+  [ ENHANCEMENTS ]
+    - New NetPacket::USBMon. (GH#2, lkundrak)
 
- [STATISTICS]
- - code churn: 8 files changed, 595 insertions(+), 16 deletions(-)
+  [ STATISTICS ]
+    - code churn: 8 files changed, 595 insertions(+), 16 deletions(-)
 
 1.3.3 2013-05-15
- [BUG FIXES]
- - Parse SACK option and fix TSecr parsing. (GH#1, Robin Lee)
+  [ BUG FIXES ]
+    - Parse SACK option and fix TSecr parsing. (GH#1, Robin Lee)
 
- [STATISTICS]
- - code churn: 5 files changed, 46 insertions(+), 7 deletions(-)
+  [ STATISTICS ]
+    - code churn: 5 files changed, 46 insertions(+), 7 deletions(-)
 
 1.3.2 2013-05-03
- [BUG FIXES]
- - Fix NetPacket::UDP's strip. (RT#85038, reported by Stan Schwertly)
+  [ BUG FIXES ]
+    - Fix NetPacket::UDP's strip. (RT#85038, reported by Stan Schwertly)
 
- [STATISTICS]
- - code churn: 12 files changed, 71 insertions(+), 21 deletions(-)
+  [ STATISTICS ]
+    - code churn: 12 files changed, 71 insertions(+), 21 deletions(-)
 
 1.3.1 2011-11-23
- [BUG FIXES]
- - Use of constant withotu parenthesis made test fail under 5.6.2.
+  [ BUG FIXES ]
+    - Use of constant withotu parenthesis made test fail under 5.6.2.
 
 1.3.0 2011-11-13
- [ENHANCEMENTS]
- - 'parse_tcp_options()' method added to NetPacket::TCP (patch by Tom
-   Linden) [RT#71320]
+  [ ENHANCEMENTS ]
+    - 'parse_tcp_options()' method added to NetPacket::TCP (patch by Tom
+      Linden) [RT#71320]
 
 1.2.0 2011-07-26
- [ENHANCEMENTS]
- - Add support for Ethernet VLAN (thanks to Kai Chan)
+  [ ENHANCEMENTS ]
+    - Add support for Ethernet VLAN (thanks to Kai Chan)
 
 1.1.2 2011-06-20
- [BUG FIXES]
- - Add a INSTALL file
+  [ BUG FIXES ]
+    - Add a INSTALL file
 
 1.1.1 2011-02-07
- - Add the new Ethernet types to the export list.  (thanks to Sergey, again
-   :-) ) (RT#64799)
+  - Add the new Ethernet types to the export list.  (thanks to Sergey,
+    again :-) ) (RT#64799)
 
 1.1.0 2011-01-15
- - Add a few Ethernet types. (thanks to Sergey) (RT#64799)
+  - Add a few Ethernet types. (thanks to Sergey) (RT#64799)
 
 1.0.1 2010-10-19
- - Make the example verbatim in pod in NetPacket::UDP (rt#62097)
+  - Make the example verbatim in pod in NetPacket::UDP (rt#62097)
 
 1.0.0 2010-10-17
- - Remove modules NetPacket::ICMPv6, NetPacket::IPv6 and NetPacket::PFLog
-   as the license of the patch clashes with the license of the
-   distribution. (RT#62197)
+  - Remove modules NetPacket::ICMPv6, NetPacket::IPv6 and NetPacket::PFLog
+    as the license of the patch clashes with the license of the
+    distribution. (RT#62197)
 
 0.43.2 2010-10-11
- - Change the COPYRIGHT sections of the pods to match the Artistic 2.0
-   license. (RT#60954)
+  - Change the COPYRIGHT sections of the pods to match the Artistic 2.0
+    license. (RT#60954)
 
 0.43.1 2010-06-11
- - Change a test to use explicit number of tests instead of 'done_testing'.
+  - Change a test to use explicit number of tests instead of
+    'done_testing'.
 
 0.43.0 2010-05-23
- - Fixed UDP checksum. Thanks to Hal Finkel. (RT#56235)
- - Added Joel Knight's code for IPv6 support from 
-   http://www.packetmischief.ca/code/netpacket/.  Thanks to Doug Farley for
-   the bug report. (RT#57560)
+  - Fixed UDP checksum. Thanks to Hal Finkel. (RT#56235)
+  - Added Joel Knight's code for IPv6 support from 
+    http://www.packetmischief.ca/code/netpacket/.  Thanks to Doug Farley
+    for the bug report. (RT#57560)
 
 0.42.0 2010-03-25
- - Updated license to Artistic 2.0
- - Fixed bad call to 'data()' in ICMP. Thanks to Ventz Petkov. (RT#52627)
+  - Updated license to Artistic 2.0
+  - Fixed bad call to 'data()' in ICMP. Thanks to Ventz Petkov. (RT#52627)
 
 0.41.1 2009-01-06
- - Fixed bug 37931: export of ICMP_MASKREQ
- - Fixed UDP and TCP checksums for odd-sized packets
- - Fixed import from NetPacket::UDP
- - Fixed bug 37931: export of ICMP_MASKREQ
- - Added git repo and bug tracking info to META.yml
+  - Fixed bug 37931: export of ICMP_MASKREQ
+  - Fixed UDP and TCP checksums for odd-sized packets
+  - Fixed import from NetPacket::UDP
+  - Fixed bug 37931: export of ICMP_MASKREQ
+  - Added git repo and bug tracking info to META.yml
 
 0.41.0_0 2008-12-20
- - Fixed bug 18941 - NetPacket::IP includes trailing  trash bytes in
-   $ip->{data}
- - Fixed bug 7010 - IP flags field lost in IP::encode()
- - Added Build.PL 
- - Moved history off the README file into this one (Changes)
- - Moved module structure to /lib
- - Version now gathered from NetPacket.pm
- - META.yml added to MANIFEST
- - Added myself (Yanick) as author
- - Switched to major.minor.revision version notation
+  - Fixed bug 18941 - NetPacket::IP includes trailing  trash bytes in
+    $ip->{data}
+  - Fixed bug 7010 - IP flags field lost in IP::encode()
+  - Added Build.PL 
+  - Moved history off the README file into this one (Changes)
+  - Moved module structure to /lib
+  - Version now gathered from NetPacket.pm
+  - META.yml added to MANIFEST
+  - Added myself (Yanick) as author
+  - Switched to major.minor.revision version notation
 
 0.04 2003-05-21
- - Checksum offset fix, thanks to J. Hoagland for pointing this out.
+  - Checksum offset fix, thanks to J. Hoagland for pointing this out.
 
 0.03 2001-07-30
 
 0.01 1999-04-24
- - First release by TIMPOTTER
-
+  - First release by TIMPOTTER

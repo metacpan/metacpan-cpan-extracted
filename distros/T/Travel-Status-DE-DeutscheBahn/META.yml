@@ -18,16 +18,16 @@ name: Travel-Status-DE-DeutscheBahn
 provides:
   Travel::Status::DE::DeutscheBahn:
     file: lib/Travel/Status/DE/DeutscheBahn.pm
-    version: '2.03'
+    version: '2.04'
   Travel::Status::DE::HAFAS:
     file: lib/Travel/Status/DE/HAFAS.pm
-    version: '2.03'
+    version: '2.04'
   Travel::Status::DE::HAFAS::Result:
     file: lib/Travel/Status/DE/HAFAS/Result.pm
-    version: '2.03'
+    version: '2.04'
   Travel::Status::DE::HAFAS::StopFinder:
     file: lib/Travel/Status/DE/HAFAS/StopFinder.pm
-    version: '2.03'
+    version: '2.04'
 requires:
   Carp: '0'
   Class::Accessor: '0.16'
@@ -43,5 +43,6 @@ requires:
   perl: v5.14.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.03'
+  repository: https://github.com/derf/Travel-Status-DE-DeutscheBahn
+version: '2.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

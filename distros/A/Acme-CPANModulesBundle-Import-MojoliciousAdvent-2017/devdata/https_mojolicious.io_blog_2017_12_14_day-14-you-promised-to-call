@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+  <meta content="https://mojolicious.io/blog/2017/12/14/day-14-you-promised-to-call/" property="og:url">
+  <meta content="Day 14: You Promised To Call!" property="og:title">
+    <meta content="Learn about Promises and their new prominent role in Mojolicious." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/14/day-14-you-promised-to-call/pinky_swear.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 14: You Promised To Call! - mojolicious.io</title>
+  <meta content="Ed J" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 14: You Promised To Call!</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-14">Dec 14, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Two hands with interlocked pinkies, a pinky swear" src="/blog/2017/12/14/day-14-you-promised-to-call/pinky_swear.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>A new feature of <a href="http://mojolicious.org/">Mojolicious</a>, as of <a href="https://metacpan.org/release/SRI/Mojolicious-7.49">7.49</a>, is the implementation of the <a href="https://promisesaplus.com/implementations#in-other-languages">Promises/A+ specification</a>. In this posting, we&#39;re going to use promises to implement non-blocking, parallel fetching of a number of web pages.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Background</h2>
+
+<p>&quot;Normal&quot; Perl code runs synchronously: it does each step it is told to, one at a time, and only that. This is also known as &quot;blocking&quot;, since the program cannot do anything else.</p>
+
+<p>The essence of a non-blocking code framework is that if you are waiting for something, you can register with the framework what to do when that thing happens. It can then do other processing tasks in the meantime. This means you don&#39;t have lots of processes (or possibly threads) sitting there, hogging operating-system resources, just blocked waiting for something else to finish; only the bare minimum of information is kept, about what to wait for, and what to do then.</p>
+
+<p>Originally this was done just using callbacks, but this lead to what is known as &quot;callback hell&quot;: each callback contains the next callback, at an increasing level of indentation. Even harder to keep track of is if the functions are kept separate. Avoiding this lead to the development of Promises, then Promises/A+.</p>
+
+<p>Promises are used to easily add processing steps to a transaction: one can keep adding code for what to do &quot;then&quot; - after a previous stage has finished. Best of all, each &quot;callback&quot; is small and separate, with each one placed in succession. The resulting code reads like sequential, synchronous code, even though it runs asynchronously.</p>
+
+<p>First let&#39;s get web pages, one after the other, synchronously. Obviously, that means the code will block anything else while it&#39;s running.</p>
+
+<pre><code># refers to a previously-set-up @urls
+sub fetchpages {
+  while (my $url = shift @urls) {
+    # Fetch, show title
+    say $ua-&gt;get($url)-&gt;result-&gt;dom-&gt;at(&#39;title&#39;)-&gt;text;
+  }
+}
+</code></pre>
+
+<h2>With a callback</h2>
+
+<p>This you could realistically have running as part of a web service, since with any kind of callback it will run asynchronously, therefore non-blocking, as discussed above.</p>
+
+<pre><code>sub fetchpages {
+  # Stop if there are no more URLs
+  return unless my $url = shift @urls;
+  # Fetch the next title
+  $ua-&gt;get($url, sub {
+    my ($tx) = @_;
+    say &quot;$url: &quot;, $tx-&gt;result-&gt;dom-&gt;at(&#39;title&#39;)-&gt;text;
+    fetchpages();
+  });
+}
+</code></pre>
+
+<h2>Promises</h2>
+
+<p>With promises, we&#39;re going to split the processing, still in a single &quot;stream&quot; of activity, into two steps, to show the use of <code>then</code>. Notice the first <code>then</code> doesn&#39;t return a Promise, just a normal object. When using <code>then</code>, that&#39;s fine!</p>
+
+<pre><code>sub fetchpages {
+  # Stop if there are no more URLs
+  return unless my $url = shift @urls;
+  # Fetch the next title
+  $ua-&gt;get_p($url)-&gt;then(sub {
+    my ($tx) = @_;
+    $tx-&gt;result;
+  })-&gt;then(sub {
+    my ($result) = @_;
+    say &quot;$url: &quot;, $result-&gt;dom-&gt;at(&#39;title&#39;)-&gt;text;
+    fetchpages(); # returns a promise, but of a whole new page to process
+  });
+}
+</code></pre>
+
+<p>Here you&#39;ll see we&#39;re using <a href="http://mojolicious.org/perldoc/Mojo/UserAgent#get_p"><code>get_p</code></a>. This is just like <a href="http://mojolicious.org/perldoc/Mojo/UserAgent#get"><code>get</code></a>, but instead of taking a callback, it returns a Promise.</p>
+
+<h2>Promises with two streams</h2>
+
+<p>Given that a Promise is a single chain of processing steps, how can we have a number of them running concurrently, without making all the requests at once? We&#39;ll use two ideas: chaining (shown above - the key is each &quot;then&quot; returns a new Promise), and <a href="http://mojolicious.org/perldoc/Mojo/Promise#all"><code>Mojo::Promise-&gt;all</code></a> - it will wait until all the promises it&#39;s given are finished. Combining them gives us multiple streams of concurrent, but sequenced, activity.</p>
+
+<pre><code>sub fetchpages {
+  # Stop if there are no more URLs
+  return unless my $url = shift @urls;
+  # Fetch the next title
+  $ua-&gt;get_p($url)-&gt;then(sub {
+    my ($tx) = @_;
+    $tx-&gt;result;
+  })-&gt;then(sub {
+    my ($result) = @_;
+    say &quot;$url: &quot;, $result-&gt;dom-&gt;at(&#39;title&#39;)-&gt;text;
+    fetchpages(); # returns a promise, but of a whole new page to process
+  });
+}
+
+# Process two requests at a time
+my @promises = map fetchpages(), 1 .. 2;
+Mojo::Promise-&gt;all(@promises)-&gt;wait if @promises;
+</code></pre>
+
+<p>Another option for dealing with a number of concurrent activities, if you just want the first one that completes, is <a href="http://mojolicious.org/perldoc/Mojo/Promise#race"><code>race</code></a>.</p>
+
+<h2>What if something doesn&#39;t work?</h2>
+
+<p>In the above, we assumed that everything worked. What if it doesn&#39;t? Promises as a standard offer two other methods: <code>catch</code>, and <code>finally</code>.</p>
+
+<p><code>catch</code> is given a code-ref, which will be called when a Promise is &quot;rejected&quot;. When things work as above, each Promise is &quot;resolved&quot;. That means the value it was resolved with gets passed to the next <code>then</code>. If it is &quot;rejected&quot;, then the error it is rejected with gets passed to the next <code>catch</code> in the chain, however far along that is. E.g.:</p>
+
+<pre><code>sub fetchpage {
+  $ua-&gt;get_p($url)-&gt;then(sub { ... })-&gt;then(sub { ... })-&gt;catch(sub {
+    # either log, or report, or something else
+  });
+}
+</code></pre>
+
+<p>If either the initial <code>get_p</code>, or either of the <code>then</code>s get rejected, then execution will skip to the <code>catch</code>. Another way to get this behaviour is to give a second code-ref to <code>then</code>.</p>
+
+<p><code>finally</code> is given a code-ref which will be called with either the successful (i.e. resolved) value, or the failure (i.e. the rejection) value.</p>
+
+<h2>The task at hand</h2>
+
+<p>We have to synchronise the work between the multiple &quot;streams&quot; of execution, so that nothing gets missed, or done twice. Luckily, in the asynchronous but single-threaded context we have here, we can just pass around a reference to a single &quot;queue&quot;, a Perl array. Let&#39;s build that array, at the start of our script:</p>
+
+<pre><code>#!/usr/bin/env perl
+
+# cut down from https://stackoverflow.com/questions/15152633/perl-mojo-and-json-for-simultaneous-requests/15166898#15166898
+sub usage { die &quot;Usage: bulkget-delay urlbase outdir suffixesfile\n&quot;, @_ };
+# each line of suffixesfile is a suffix
+# it gets appended to urlbase, then requested non-blocking
+# output in outdir with suffix as filename
+
+use Mojo::Base -strict;
+use Mojo::UserAgent;
+use Mojo::Promise;
+use Mojo::File &#39;path&#39;;
+
+my $MAXREQ = 20;
+
+my ($urlbase, $outdir, $suffixesfile) = @ARGV;
+usage &quot;No URL&quot; if !$urlbase;
+usage &quot;$outdir: $!&quot; if ! -d $outdir;
+usage &quot;$suffixesfile: $!&quot; if ! -f $suffixesfile;
+
+my $outpath = path($outdir);
+my @suffixes = getsuffixes($suffixesfile, $outpath);
+my $ua = Mojo::UserAgent-&gt;new;
+
+sub getsuffixes {
+  my ($suffixesfile, $outpath) = @_;
+  open my $fh, &#39;&lt;&#39;, $suffixesfile or die $!;
+  grep { !-f $outpath-&gt;child($_); } map { chomp; $_ } &lt;$fh&gt;;
+}
+</code></pre>
+
+<p>We also want a procedure to handle results that are ready, to store them in a file if successful:</p>
+
+<pre><code>sub handle_result {
+  my ($outpath, $tx, $s) = @_;
+  if ($tx-&gt;res-&gt;is_success) {
+    print &quot;got $s\n&quot;;
+    $outpath-&gt;child($s)-&gt;spurt($tx-&gt;res-&gt;body);
+  } else {
+    print &quot;error $s\n&quot;;
+  }
+}
+</code></pre>
+
+<p>And now, the Promise part:</p>
+
+<pre><code>my @promises = map makepromise($urlbase, $ua, \@suffixes, $outpath), (1..$MAXREQ);
+Mojo::Promise-&gt;all(@promises)-&gt;wait if @promises;
+
+sub makepromise {
+  my ($urlbase, $ua, $suffixes, $outpath) = @_;
+  my $s = shift @$suffixes;
+  return if !defined $s;
+  my $url = $urlbase . $s;
+  print &quot;getting $url\n&quot;;
+  $ua-&gt;get_p($url)-&gt;then(sub {
+    my ($tx) = @_;
+    handle_result($outpath, $tx, $s);
+    makepromise($urlbase, $ua, $suffixes, $outpath);
+  });
+}
+</code></pre>
+
+<p>Once each stream runs out of suffixes to process, it will finish. If we wanted to add the ability to add to the queue that could keep as many streams as we started, we would restructure so that each stream is subscribed to a queue, and if the queue is empty, to wait (asynchronously!) until it is not. That&#39;s absolutely idiomatic for Promises, but we&#39;ll look at that another time!</p>
+
+<h2>See also</h2>
+
+<ul>
+<li>The Mojolicious Cookbook shows how to implement non-blocking requests <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Concurrent-blocking-requests">with promises</a>.</li>
+<li>The new <a href="http://mojolicious.org/perldoc/Mojo/Promise">Mojo::Promise</a> class documentation.</li>
+<li>This script is now available as a <code>Mojolicious::Command</code>: <a href="https://metacpan.org/pod/Mojolicious::Command::bulkget">Mojolicious::Command::bulkget</a>!</li>
+</ul>
+
+              </section>
+              <small><p><a href="https://www.flickr.com/photos/elsabordelossegundos/15418211523">Image</a> by <a href="https://www.flickr.com/photos/elsabordelossegundos/">mariadelajuana</a>, <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/non-blocking/">non-blocking</a>,
+                  <a href="/blog/tag/promises/">promises</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/c6e74e4e0ab61c61db655f0e60c9f8a6.jpg">
+                      </div>
+                      <div class="about">
+                        <h5>Ed J</h5>
+                        <p>Ed J (aka &quot;mohawk&quot; on IRC) has been using Perl for a long time. He is currently porting the reference <a href="http://graphql.org/">GraphQL</a> implementation from the <a href="http://graphql.org/graphql-js/">JavaScript version</a> to <a href="https://metacpan.org/pod/GraphQL">Perl</a>. Find out more by <a href="https://chat.mibbit.com/?channel=%23graphql-perl&amp;server=irc.perl.org">joining the <code>#graphql-perl</code> channel on irc.perl.org</a>!</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/13/day-13-more-about-roles/index.html" rel="prev"><strong>Previous Article</strong> Day 13: More About Roles</a></li>
+                  <li class="next"><a href="/blog/2017/12/15/day-15-start-a-new-yancy-app/index.html" rel="next"><strong>Next Article</strong> Day 15: Start a New Yancy App </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

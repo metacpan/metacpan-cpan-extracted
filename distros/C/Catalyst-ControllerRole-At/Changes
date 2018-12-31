@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::ControllerRole::At
 
+0.006   30 December 2018
+        - Silence a silly warning with At()
+
 0.005   30 September 2016
         - Support default values in query parameters
 

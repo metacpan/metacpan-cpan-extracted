@@ -1,25 +1,37 @@
 ---
-abstract: 'Mojolicious Plugin'
+abstract: 'Add addtional validation checks'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
 build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojolicious-Plugin-AdditionalValidationChecks
+provides:
+  Mojolicious::Plugin::AdditionalValidationChecks:
+    file: lib/Mojolicious/Plugin/AdditionalValidationChecks.pm
+    version: '0.15'
 requires:
   Email::Valid: '1.192'
   Mojolicious: '5.42'
   Net::Domain::TLD: '0'
   Scalar::Util: '0'
   Time::Piece: '0'
+  perl: '5.010'
 resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks
   repository: http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks.git
-version: '0.14'
+version: '0.15'
+x_contributors:
+  - 'Florian Heyer <info@heyer-it.de>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+  - 'Renee <reb@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

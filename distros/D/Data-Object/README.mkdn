@@ -4,7 +4,7 @@ Data::Object - Object Orientation for Perl 5
 
 # VERSION
 
-version 0.60
+version 0.61
 
 # SYNOPSIS
 
@@ -340,12 +340,11 @@ function takes all arguments accepted by the [Data::Object::Exception](https://m
 
 # AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
-# CONTRIBUTORS
+# CONTRIBUTOR
 
-- Al Newkirk <al@iamalnewkirk.com>
-- Anthony Brummett <abrummet@genome.wustl.edu>
+Anthony Brummett <abrummet@genome.wustl.edu>
 
 # COPYRIGHT AND LICENSE
 

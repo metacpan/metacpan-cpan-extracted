@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.035';
+our $VERSION = '2.036';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -15,8 +15,9 @@ use Encode::Locale qw( decode_argv );
 use File::HomeDir  qw();
 use File::Which    qw( which );
 
-use Term::Choose     qw( choose );
-use Term::TablePrint qw( print_table );
+use Term::Choose            qw( choose );
+use Term::Choose::Constants qw( :screen );
+use Term::TablePrint        qw( print_table );
 
 #use App::DBBrowser::AttachDB;    # 'require'-d
 use App::DBBrowser::Auxil;
@@ -147,6 +148,7 @@ sub run {
         if ( @{$sf->{o}{G}{plugins}} == 1 ) {
             $auto_one++;
             $plugin = $sf->{o}{G}{plugins}[0];
+            print CLEAR_SCREEN;
         }
         else {
             # Choose
@@ -362,12 +364,9 @@ sub run {
 
                 # TABLES
 
-                my @tables;
                 my ( $tables_info, $user_tables, $sys_tables );
                 if ( ! eval {
                     ( $tables_info, $user_tables, $sys_tables ) = $sf->__tables_data( $schema );
-                    @tables = (                     map( "- $_", sort @$user_tables ),
-                                $sf->{o}{G}{meta} ? map( "  $_", sort @$sys_tables ) : () );
                     1 }
                 ) {
                     $ax->print_error_message( $@, 'Get table names' );
@@ -384,17 +383,18 @@ sub run {
 
                 TABLE: while ( 1 ) {
 
-                    my ( $join, $union, $subquery, $db_setting ) = ( '  Join', '  Union', '  select from (SQ)', '  DB settings' );
+                    my ( $join, $union, $from_subquery, $db_setting ) = ( '  Join', '  Union', '  From(SQ)', '  DB settings' );
                     my $hidden = $db_string;
                     my $table;
                     if ( $sf->{redo_table} ) {
                         $table = delete $sf->{redo_table};
                     }
                     else {
-                        my $choices_table = [ $hidden, undef, @tables ];
-                        push @$choices_table, $subquery      if $sf->{o}{G}{subqueries_table};
+                        my $choices_table = [ $hidden, undef, map( "- $_", sort @$user_tables ) ];
+                        push @$choices_table, map( "  $_", sort @$sys_tables ) if $sf->{o}{G}{meta};
+                        push @$choices_table, $from_subquery                   if $sf->{o}{G}{subqueries_table};
                         push @$choices_table, $join, $union;
-                        push @$choices_table, $db_setting    if $sf->{i}{db_settings};
+                        push @$choices_table, $db_setting                      if $sf->{i}{db_settings};
                         my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
                         $ENV{TC_RESET_AUTO_UP} = 0;
@@ -443,8 +443,8 @@ sub run {
                         my $old_idx_hdn = exists $sf->{old_idx_hdn} ? delete $sf->{old_idx_hdn} : 0;
 
                         HIDDEN: while ( 1 ) {
-                            my ( $create_table, $drop_table, $attach_databases, $detach_databases, $edit_sq_file ) = (
-                                '- CREATE table', '- DROP   table', '- Attach DB', '- Detach DB', '  SQ-file'
+                            my ( $create_table, $drop_table, $attach_databases, $detach_databases ) = (
+                                '- CREATE table', '- DROP   table', '- Attach DB', '- Detach DB',
                             );
                             my $choices_hidden = [ undef ];
                             push @$choices_hidden, $create_table if $sf->{o}{G}{create_table_ok};
@@ -453,7 +453,6 @@ sub run {
                                 push @$choices_hidden, $attach_databases;
                                 push @$choices_hidden, $detach_databases if $sf->{db_attached};
                             }
-                            push @$choices_hidden, $edit_sq_file if $sf->{i}{subqueries};
                             if ( @$choices_hidden == 0 ) {
                                 next TABLE;
                             }
@@ -463,7 +462,10 @@ sub run {
                                 $choices_hidden,
                                 { prompt => $db_string, index => 1, default => $old_idx_hdn, undef => $sf->{i}{_back} }
                             );
-                            my $choice = $choices_hidden->[$idx_hdn] if defined $idx_hdn;
+                            my $choice; ##
+                            if ( defined $idx_hdn ) {
+                                $choice = $choices_hidden->[$idx_hdn];
+                            }
                             if ( ! defined $choice ) {
                                 next TABLE;
                             }
@@ -529,10 +531,6 @@ sub run {
                                 $dbh->disconnect();
                                 next DATABASE;
                             }
-                            elsif ( $choice eq $edit_sq_file ) {
-                                my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                                $sq->edit_sq_file( $db );
-                            }
                         }
                     }
                     my ( $qt_table, $qt_columns );
@@ -555,18 +553,20 @@ sub run {
                         }
                         next TABLE if ! defined $qt_table;
                     }
-                    elsif ( $table eq $subquery ) {
-                        $sf->{i}{multi_tbl} = 'subquery';
+                    elsif ( $table eq $from_subquery ) {
+                        $sf->{i}{multi_tbl} = 'subquery'; #
                         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
                         my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        my $tmp = {};
+                        my $tmp = { table => '(?)' };
                         $ax->reset_sql( $tmp );
-                        my $subquery = $sq->choose_subquery( {}, $tmp, 'Select' );
+                        my $subquery = $sq->choose_subquery( {}, $tmp, 'Select', 'from' );
                         if ( ! defined $subquery ) {
                             next TABLE;
                         }
                         $qt_table = "(" . $subquery . ")";
-                        my $alias = $ax->alias( $qt_table );
+                        $tmp->{table} = $qt_table;
+                        $ax->print_sql( {}, [ 'Select' ], $tmp );
+                        my $alias = $ax->alias( 'subqueries', 'AS: ', 'From_SQ' ); ##
                         if ( defined $alias && length $alias ) {
                             $qt_table .= " AS " . $alias;
                         }
@@ -574,6 +574,7 @@ sub run {
                             my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
                             $sth->execute() if $driver ne 'SQLite';
                             $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
+                            $sth->finish();
                             1 }
                         ) {
                             $ax->print_error_message( $@, 'Subquery table' );
@@ -696,7 +697,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.035
+Version 2.036
 
 =head1 DESCRIPTION
 

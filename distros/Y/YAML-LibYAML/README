@@ -11,7 +11,7 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Kirill Siminov's libyaml is arguably the best YAML implementation. The
+    Kirill Simonov's libyaml is arguably the best YAML implementation. The
     C library is written precisely to the YAML 1.1 specification. It was
     originally bound to Python and was later bound to Ruby.
 
@@ -95,6 +95,12 @@ CONFIGURATION
 
       If you simply need to load "perl booleans" that are true or false in
       boolean context, you will be fine with the default setting.
+
+    $YAML::XS::Indent (since v0.76)
+
+      Default is 2.
+
+      Sets the number of spaces for indentation for Dump.
 
 USING YAML::XS WITH UNICODE
 

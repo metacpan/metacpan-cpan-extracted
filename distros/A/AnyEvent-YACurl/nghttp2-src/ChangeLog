@@ -1,0 +1,27 @@
+commit 6384375098da3dd46e864f3042790ededf6236a8 (HEAD, tag: v1.35.1, origin/v1.35.x, origin/HEAD, v1.35.x)
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-12-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-12-10
+
+    Update manual pages
+
+commit 27801e98ae4e63746bebf78b84d35cbbe030bce9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-12-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-12-10
+
+    Bump up version number to 1.35.1
+
+commit 60e020a85bf37bb9561d93347ae89492df43d501
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-12-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-12-10
+
+    nghttpx: Fix broken trailing slash handling
+    
+    nghttpx allows a pattern with trailing slash to match a request path
+    without it.  Previously, under certain pattern registration, this does
+    not work.

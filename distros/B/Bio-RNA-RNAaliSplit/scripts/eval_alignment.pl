@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Last changed Time-stamp: <2018-01-10 16:18:47 mtw>
+# Last changed Time-stamp: <2018-12-28 12:47:12 mtw>
 # -*-CPerl-*-
 #
 # A structural alignment evaluator
@@ -7,7 +7,7 @@
 # usage: eval_alignment.pl -a myaln.stk --statistics RAFS
 #
 
-use version; our $VERSION = qv('0.05.3');
+use version; our $VERSION = qv('0.07');
 use strict;
 use warnings;
 use File::Basename;
@@ -36,15 +36,16 @@ my $have_logfile=0;
 use diagnostics;
 
 Getopt::Long::config('no_ignore_case');
-pod2usage(-verbose => 1) unless GetOptions("a|aln=s"        => \$stkfile,
-					   "s|statistic=s"  => \$stat,
-					   "o|out=s"        => \$outdir,
-					   "l|log=s"        => \&set_logfile,
-					   "n|nofigures"    => sub{$nofigures = 1},
-                                           "version"        => sub{$show_version = 1},
-                                           "man"            => sub{pod2usage(-verbose => 2)},
-                                           "help|h"         => sub{pod2usage(1)}
-                                           );
+pod2usage(-verbose => 1) unless
+  GetOptions("a|aln=s"        => \$stkfile,
+	     "s|statistic=s"  => \$stat,
+	     "o|out=s"        => \$outdir,
+	     "l|log=s"        => \&set_logfile,
+	     "n|nofigures"    => sub{$nofigures = 1},
+	     "version"        => sub{$show_version = 1},
+	     "man"            => sub{pod2usage(-verbose => 2)},
+	     "help|h"         => sub{pod2usage(1)}
+	    );
 
 if ($show_version == 1){
   print "eval_alignment.pl $VERSION\n";
@@ -77,7 +78,8 @@ $out = Bio::AlignIO->new(-file   => ">$alnfile" ,
 			 -format => "ClustalW");
 
 while ( my $aln = $in->next_aln ) {
-    $out->write_aln($aln);
+  my $clean = remove_gaponly($aln);
+  $out->write_aln($clean);
 }
 
 my $r = Bio::RNA::RNAaliSplit::WrapRscape->new(ifile => $stkfile,
@@ -97,18 +99,44 @@ if ($r->cseq <= 1){ # stk file had only one sequence
 else{ # normal stk file
   my $hint = "-";
   my $prob=sprintf("%6.4f",$z->P);
-  ($prob>0.9 && $r->TP>1) ? ($hint = "*") : ($hint = "-");
-  print $handle join("\t",$hint,$stkfile,$prob,$r->statistic,$r->TP,$r->alen,$r->nbpairs,$r->nseq)."\n";
+  my $str;
+  if ($r->status == 0){ # R-scape went through and gave results
+    ($prob>0.9 && $r->TP>1) ? ($hint = "*") : ($hint = "-");
+    $str = join("\t",$hint,$stkfile,$prob,$r->statistic,$r->TP,$r->alen,$r->nbpairs,$r->nseq)."\n";
+  }
+  else{
+    $str = join("\t",$hint,$stkfile,$prob,"nodata")."\n";
+  }
+  print $handle $str;
 }
-
-
-
 
 
 sub set_logfile {
   $logfile=$_[1];
   $have_logfile=1;
 }
+
+sub remove_gaponly {
+  my $a = shift;
+  $a->set_displayname_flat();
+  my $l =  $a->length;
+  my $dim =  $a->num_sequences;
+  #print "+++ $dim sequences with length $l  in alignment +++\n";
+  my $gapstring = ("-"x$l);
+  #print "gapstring\n$gapstring\n\n\n";
+  my @keep = ();
+
+  foreach my $i (1..$dim){
+    my $alnT = $a->get_seq_by_pos($i);
+    my $seq = $alnT->seq();
+    # check if we have a gap-only substring of length $l
+    index($seq,$gapstring) == 0 ? next : 1;
+    push @keep, $i;
+    #print "keep $seq\n";
+  }
+  return ( $a->select_noncont(@keep) );
+}
+
 
 __END__
 
@@ -136,12 +164,15 @@ covariance statistic, the number of SSCBP, the lenth of the alignment,
 as well as the number of base pairs and sequences to stdout. R-scapoe
 and RNAz output files are written to a user-defined directory.
 
+Note that this script removes gap-only sequences from the alignment
+since RNAz does not accept them.
+
 =head1 DISCLAIMER
 
 This script employs a simple R-scape/RNAz warpper. As such, it does
 not implement (and pass through) all R-scape/RNAz options.
 
-Please ensure that R-scape >v0.6.1 is installed on your machine and
+Please ensure that R-scape v0.6.1 is installed on your machine and
 available for your Perl interpreter.
 
 =head1 OPTIONS

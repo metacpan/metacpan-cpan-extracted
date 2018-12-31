@@ -1,15 +1,15 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2018-02-28 18:08:40 mtw>
+# Last changed Time-stamp: <2018-12-28 12:21:49 mtw>
 
 # Bio::RNA::RNAaliSplit::WrapAnalyseDists.pm: Wrapper for computing
 # split decompositions
 #
-# Requires AnalyseDists executable from the ViennaRNA poackage
+# Requires AnalyseDists executable from the ViennaRNA package
 # available to the Perl interpreter
 
 package Bio::RNA::RNAaliSplit::WrapAnalyseDists;
 
-use version; our $VERSION = qv('0.06');
+use version; our $VERSION = qv('0.07');
 use Carp;
 use Data::Dumper;
 use Moose;

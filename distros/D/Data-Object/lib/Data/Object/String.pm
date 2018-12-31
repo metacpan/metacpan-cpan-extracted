@@ -14,7 +14,7 @@ use Scalar::Util;
 
 with 'Data::Object::Role::String';
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 method new ($class: @args) {
 
@@ -59,7 +59,7 @@ Data::Object::String - String Object for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -76,11 +76,6 @@ representing characters. Users of strings should be aware of the methods that
 modify the string itself as opposed to returning a new string. Unless stated, it
 may be safe to assume that the following methods copy, modify and return new
 strings based on their function.
-
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::String>
-role and implements proxy methods as documented herewith.
 
 =head1 METHODS
 
@@ -527,6 +522,11 @@ The words method splits the string into a list of strings, separating each
 group of characters by 1 or more consecutive spaces, and returns that list as an
 array reference. This method returns a L<Data::Object::Array> object.
 
+=head1 COMPOSITION
+
+This package inherits all functionality from the L<Data::Object::Role::String>
+role and implements proxy methods as documented herewith.
+
 =head1 ROLES
 
 This package is comprised of the following roles.
@@ -663,7 +663,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -14,7 +14,7 @@ use Scalar::Util;
 
 with 'Data::Object::Role::Code';
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 method new ($class: @args) {
 
@@ -59,7 +59,7 @@ Data::Object::Code - Code Object for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -71,36 +71,6 @@ version 0.60
 
 Data::Object::Code provides routines for operating on Perl 5 code
 references. Code methods work on code references.
-
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Code>
-role and implements proxy methods as documented herewith.
-
-=head1 CODIFICATION
-
-Certain methods provided by the this module support codification, a process
-which converts a string argument into a code reference which can be used to
-supply a callback to the method called. A codified string can access its
-arguments by using variable names which correspond to letters in the alphabet
-which represent the position in the argument list. For example:
-
-  $code->example('$a + $b * $c', 100);
-
-  # if the example method does not supply any arguments automatically then
-  # the variable $a would be assigned the user-supplied value of 100,
-  # however, if the example method supplies two arguments automatically then
-  # those arugments would be assigned to the variables $a and $b whereas $c
-  # would be assigned the user-supplied value of 100
-
-  # e.g.
-
-  $code->conjoin('$code->(123)');
-
-  # etc
-
-Any place a codified string is accepted, a coderef or L<Data::Object::Code>
-object is also valid. Arguments are passed through the usual C<@_> list.
 
 =head1 METHODS
 
@@ -277,6 +247,36 @@ If captured this method returns a L<Data::Object::Exception> object.
 The type method returns a string representing the internal data type object name.
 This method returns a L<Data::Object::String> object.
 
+=head1 COMPOSITION
+
+This package inherits all functionality from the L<Data::Object::Role::Code>
+role and implements proxy methods as documented herewith.
+
+=head1 CODIFICATION
+
+Certain methods provided by the this module support codification, a process
+which converts a string argument into a code reference which can be used to
+supply a callback to the method called. A codified string can access its
+arguments by using variable names which correspond to letters in the alphabet
+which represent the position in the argument list. For example:
+
+  $code->example('$a + $b * $c', 100);
+
+  # if the example method does not supply any arguments automatically then
+  # the variable $a would be assigned the user-supplied value of 100,
+  # however, if the example method supplies two arguments automatically then
+  # those arugments would be assigned to the variables $a and $b whereas $c
+  # would be assigned the user-supplied value of 100
+
+  # e.g.
+
+  $code->conjoin('$code->(123)');
+
+  # etc
+
+Any place a codified string is accepted, a coderef or L<Data::Object::Code>
+object is also valid. Arguments are passed through the usual C<@_> list.
+
 =head1 ROLES
 
 This package is comprised of the following roles.
@@ -397,7 +397,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

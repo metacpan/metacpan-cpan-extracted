@@ -14,7 +14,7 @@ use Scalar::Util;
 
 with 'Data::Object::Role::Hash';
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 method new ($class: @args) {
 
@@ -67,7 +67,7 @@ Data::Object::Hash - Hash Object for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -83,40 +83,6 @@ be aware of the methods that modify the array reference itself as opposed to
 returning a new array reference. Unless stated, it may be safe to assume that
 the following methods copy, modify and return new hash references based on their
 function.
-
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Hash>
-role and implements proxy methods as documented herewith.
-
-=head1 CODIFICATION
-
-Certain methods provided by the this module support codification, a process
-which converts a string argument into a code reference which can be used to
-supply a callback to the method called. A codified string can access its
-arguments by using variable names which correspond to letters in the alphabet
-which represent the position in the argument list. For example:
-
-  $hash->example('$a + $b * $c', 100);
-
-  # if the example method does not supply any arguments automatically then
-  # the variable $a would be assigned the user-supplied value of 100,
-  # however, if the example method supplies two arguments automatically then
-  # those arugments would be assigned to the variables $a and $b whereas $c
-  # would be assigned the user-supplied value of 100
-
-  # e.g.
-
-  $hash->each('the value at $key is $value');
-
-  # or
-
-  $hash->each_n_values(4, 'the value at $key0 is $value0');
-
-  # etc
-
-Any place a codified string is accepted, a coderef or L<Data::Object::Code>
-object is also valid. Arguments are passed through the usual C<@_> list.
 
 =head1 METHODS
 
@@ -654,6 +620,40 @@ L<Data::Object::Hash> object.
 The values method returns an array reference consisting of the values of the
 elements in the hash. This method returns a L<Data::Object::Array> object.
 
+=head1 COMPOSITION
+
+This package inherits all functionality from the L<Data::Object::Role::Hash>
+role and implements proxy methods as documented herewith.
+
+=head1 CODIFICATION
+
+Certain methods provided by the this module support codification, a process
+which converts a string argument into a code reference which can be used to
+supply a callback to the method called. A codified string can access its
+arguments by using variable names which correspond to letters in the alphabet
+which represent the position in the argument list. For example:
+
+  $hash->example('$a + $b * $c', 100);
+
+  # if the example method does not supply any arguments automatically then
+  # the variable $a would be assigned the user-supplied value of 100,
+  # however, if the example method supplies two arguments automatically then
+  # those arugments would be assigned to the variables $a and $b whereas $c
+  # would be assigned the user-supplied value of 100
+
+  # e.g.
+
+  $hash->each('the value at $key is $value');
+
+  # or
+
+  $hash->each_n_values(4, 'the value at $key0 is $value0');
+
+  # etc
+
+Any place a codified string is accepted, a coderef or L<Data::Object::Code>
+object is also valid. Arguments are passed through the usual C<@_> list.
+
 =head1 ROLES
 
 This package is comprised of the following roles.
@@ -790,7 +790,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

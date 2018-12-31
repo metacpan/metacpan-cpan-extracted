@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::OS;
-$Sys::Info::Driver::Linux::OS::VERSION = '0.7904';
+$Sys::Info::Driver::Linux::OS::VERSION = '0.7905';
 use strict;
 use warnings;
 use base qw( Sys::Info::Base );
@@ -267,7 +267,7 @@ Sys::Info::Driver::Linux::OS
 
 =head1 VERSION
 
-version 0.7904
+version 0.7905
 
 =head1 SYNOPSIS
 

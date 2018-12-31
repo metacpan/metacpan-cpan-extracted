@@ -1,5 +1,5 @@
 package Devel::TraceUse;
-$Devel::TraceUse::VERSION = '2.095';
+$Devel::TraceUse::VERSION = '2.096';
 # detect being loaded via -d:TraceUse and disable the debugger features we
 # don't need. better names for evals (0x100) and anon subs (0x200).
 BEGIN {
@@ -8,17 +8,33 @@ BEGIN {
     }
 }
 
-BEGIN
-{
-    unshift @INC, \&trace_use unless grep { "$_" eq \&trace_use . '' } @INC;
+BEGIN {
+    unshift @INC, \&trace_use;
+    *CORE::GLOBAL::require = sub {
+        my ($arg) = @_;
+
+        # ensure our hook remains first in @INC
+        @INC = ( \&trace_use, grep "$_" ne \&trace_use . '', @INC )
+          if $INC[0] ne \&trace_use;
+
+        # let require do the heavy lifting
+        CORE::require($arg);
+    };
 }
 
 # initialize the tree of require calls
 my $root = (caller)[1];
-my %used;        # track loaded modules by "filename" (parameter to require)
-my %loaded;      # track "filename"s loaded  by "filepath" (value from %INC)
+
+# keys in %TRACE:
+# - ranked:    modules load attemps in chronological order
+# - loaded_by: track "filename"s loaded by "filepath" (value from %INC)
+# - used:      track loaded modules by "filename" (parameter to require)
+# - loader:    track potential proxy modules
+#
+# %TRACE is built incrementally by trace_use, and augmented by post_process
+my %TRACE;
+
 my %reported;    # track reported "filename"
-my %loader;      # track potential proxy modules
 my $rank  = 0;   # record the loading order of modules
 my $quiet = 1;   # no output until decided otherwise
 my $output_fh;   # optional write filehandle where results will be output
@@ -46,8 +62,10 @@ sub import {
 
 my @caller_info = qw( package filepath line );
 
+### %TRACE CONSTRUCTION
+
 # Keys used in the data structure:
-# - filename: parameter given to use/require
+# - filename: parameter passed to use/require
 # - module:   module, computed from filename
 # - rank:     rank of loading
 # - eval:     was this use/require done in an eval?
@@ -59,18 +77,14 @@ sub trace_use
 {
     my ( $code, $filename ) = @_;
 
-    # ensure our hook remains first in @INC
-    @INC = ( $code, grep { $_ ne $code } @INC )
-        if $INC[0] ne $code;
-
     # $filename may be an actual filename, e.g. with do()
     # try to compute a module name from it
     my $module = $filename;
     $module =~ s{/}{::}g
         if $module =~ s/\.pm$//;
 
-    # info about the module being loaded
-    push @{ $used{$filename} }, my $info = {
+    # chronological list of modules we tried to load
+    push @{ $TRACE{ranked} }, my $info = {
         filename => $filename,
         module   => $module,
         rank     => ++$rank,
@@ -78,8 +92,9 @@ sub trace_use
     };
 
     # info about the loading module
+    # (our require override adds one frame)
     my $caller = $info->{caller} = {};
-    @{$caller}{@caller_info} = caller;
+    @{$caller}{@caller_info} = caller(1);
 
     # try to compute a "filename" (as received by require)
     $caller->{filename} = $caller->{filepath};
@@ -103,69 +118,53 @@ sub trace_use
     $caller->{filepackage} =~ s{/}{::}g
         if $caller->{filepackage} =~ s/\.pm$//;
 
-    # record who tried to load us
-    push @{ $loaded{ $caller->{filepath} } }, $info->{filename};
+    # record who tried to load us (and store our index)
+    push @{ $TRACE{loaded_by}{ $caller->{filepath} } }, $info->{rank} - 1;
 
     # record potential proxies
     if ( $caller->{filename} ) {
-        my($subroutine, $level);
+        my $level = 1;    # our require override adds one frame
+        my $subroutine;
         while ( $subroutine = ( caller ++$level )[3] || '' ) {
             last if $subroutine =~ /::/;
         }
-        $loader{ join "\0", @{$caller}{qw( filename line )}, $subroutine }++;
+        $TRACE{loader}{ join "\0", @{$caller}{qw( filename line )}, $subroutine }++;
     }
 
     # let Perl ultimately find the required file
     return;
 }
 
-sub show_trace_visitor
-{
-    my ( $mod, $pos, $output_cb, @args ) = @_;
+# some post-processing that requires the modules to have been actually loaded
+sub post_process {
 
-    my $caller = $mod->{caller};
-    my $message = sprintf( '%4s.', $mod->{rank} ) . '  ' x $pos;
-    $message .= "$mod->{module}";
-    my $version = ${"$mod->{module}\::VERSION"};
-    $message .= defined $version ? " $version," : ',';
-    $message .= " $caller->{filename}"
-        if defined $caller->{filename};
-    $message .= " line $caller->{line}"
-        if defined $caller->{line};
-    $message .= " $mod->{eval}"
-        if $mod->{eval};
-    $message .= " [$caller->{package}]"
-        if $caller->{package} ne $caller->{filepackage};
-    $message .= " (FAILED)"
-        if !exists $INC{$mod->{filename}};
+    # process the list of loading attempts in reverse order:
+    # if a module shows up more than once, then all occurences
+    # are failures to load, except maybe the last one
+    for my $module ( reverse @{ $TRACE{ranked} || [] } ) {
+        my $filename = $module->{filename};
 
-    $output_cb->($message, @args);
-}
-
-sub visit_trace
-{
-    my ( $visitor, $mod, $pos, @args ) = @_;
-
-    my $hide = 0;
-
-    if ( ref $mod ) {
-        $mod = shift @$mod;
-
-        if($hide_core) {
-            $hide = exists $Module::CoreList::version{$hide_core}{$mod->{module}};
+        # module was successfully loaded
+        if ( exists $INC{$filename} ) {
+            $TRACE{used}{$filename} ||= $module;
         }
-
-        $visitor->( $mod, $pos, @args ) unless $hide;
-
-        $reported{$mod->{filename}}++;
-    }
-    else {
-        $mod = { loaded => delete $loaded{$mod} };
     }
 
-    visit_trace( $visitor, $used{$_}, $hide ? $pos : $pos + 1, @args )
-        for map { $INC{$_} || $_ } @{ $mod->{loaded} };
+    # map "filename" to "filepath" for everything that was loaded
+    while ( my ( $filename, $filepath ) = each %INC ) {
+        if ( exists $TRACE{used}{$filename} ) {
+            $TRACE{used}{$filename}{loaded} = delete $TRACE{loaded_by}{$filepath} || [];
+            $TRACE{used}{$filename}{filepath} = $filepath;
+        }
+    }
+
+    # extract version
+    for my $mod ( @{ $TRACE{ranked} } ) {
+        $mod->{version} = ${"$mod->{module}\::VERSION"};
+    }
 }
+
+### UTILITY FUNCTIONS
 
 # we don't want to use version.pm on old Perls
 sub numify {
@@ -177,14 +176,58 @@ sub numify {
     return 0+ join '', shift @parts, '.', map sprintf( '%03s', $_ ), @parts;
 }
 
+### OUTPUT FORMATTERS
+
+sub show_trace_visitor {
+    my ( $mod, $pos, $output_cb, @args ) = @_;
+
+    my $caller = $mod->{caller};
+    my $message = sprintf( '%4s.', $mod->{rank} ) . '  ' x $pos;
+    $message .= "$mod->{module}";
+    $message .= defined $mod->{version} ? " $mod->{version}," : ',';
+    $message .= " $caller->{filename}"
+        if defined $caller->{filename};
+    $message .= " line $caller->{line}"
+        if defined $caller->{line};
+    $message .= " $mod->{eval}"
+        if $mod->{eval};
+    $message .= " [$caller->{package}]"
+        if $caller->{package} ne $caller->{filepackage};
+    $message .= " (FAILED)"
+        if !exists $mod->{filepath};
+
+    $output_cb->($message, @args);
+}
+
+sub visit_trace
+{
+    my ( $visitor, $mod, $pos, @args ) = @_;
+
+    my $hide = 0;
+
+    if ( ref $mod ) {
+        if($hide_core) {
+            $hide = exists $Module::CoreList::version{$hide_core}{$mod->{module}};
+        }
+        $visitor->( $mod, $pos, @args ) unless $hide;
+        $reported{$mod->{filename}}++;
+    }
+    else {
+        $mod = { loaded => delete $TRACE{loaded_by}{$mod} };
+    }
+
+    visit_trace( $visitor, $_, $hide ? $pos : $pos + 1, @args )
+        for map $TRACE{ranked}[$_], @{ $mod->{loaded} };
+}
+
 sub dump_proxies
 {
     my $output = shift;
 
     my @hot_loaders =
-        sort { $loader{$b} <=> $loader{$a} }
-        grep { $loader{$_} > 1 }
-        keys %loader;
+      sort { $TRACE{loader}{$b} <=> $TRACE{loader}{$a} }
+      grep { $TRACE{loader}{$_} > 1 }
+      keys %{ $TRACE{loader} };
 
     return unless @hot_loaders;
 
@@ -193,9 +236,9 @@ sub dump_proxies
     for my $loader (@hot_loaders) {
         my ( $filename, $line, $subroutine ) = split /\0/, $loader;
         $output->(sprintf("%4d %s line %d%s",
-                $loader{$loader},
+                $TRACE{loader}{$loader},
                 $filename, $line,
-                    (defined($subroutine) ? ", sub $subroutine" : '')));
+                    (length($subroutine) ? ", sub $subroutine" : '')));
     }
 }
 
@@ -203,13 +246,7 @@ sub dump_result
 {
     return if $quiet;
 
-    # map "filename" to "filepath" for everything that was loaded
-    while ( my ( $filename, $filepath ) = each %INC ) {
-        if ( exists $used{$filename} ) {
-            $used{$filename}[0]{loaded} = delete $loaded{$filepath} || [];
-            $used{$filepath} = delete $used{$filename};
-        }
-    }
+    post_process();
 
     # let people know more accurate information is available
     warn "Use -d:TraceUse for more accurate information.\n" if !$^P;
@@ -218,6 +255,7 @@ sub dump_result
     if ($hide_core) {
         local @INC = grep { $_ ne \&trace_use } @INC;
         local %INC = %INC;    # don't report it loaded
+        local *trace_use = sub {};
         require Module::CoreList;
         warn sprintf "Module::CoreList %s doesn't know about Perl %s\n",
             $Module::CoreList::VERSION, $hide_core
@@ -233,8 +271,9 @@ sub dump_result
     visit_trace( \&show_trace_visitor, $root, 0, $output );
 
     # anything left?
-    if (%loaded) {
-        visit_trace( \&show_trace_visitor, $_, 0, $output ) for sort keys %loaded;
+    if ( %{ $TRACE{loaded_by} } ) {
+        visit_trace( \&show_trace_visitor, $_, 0, $output )
+          for sort keys %{ $TRACE{loaded_by} };
     }
 
     # did we miss some modules?
@@ -252,7 +291,8 @@ sub dump_result
     close $output_fh if defined $output_fh;
 }
 
-# Install the final hook
+### HOOK INSTALLATION
+
 # If perl runs with -c we want to dump
 CHECK {
     # "perl -c" ?
@@ -262,6 +302,7 @@ CHECK {
 END { dump_result() }
 
 1;
+
 __END__
 
 =encoding iso-8859-1
@@ -269,6 +310,10 @@ __END__
 =head1 NAME
 
 Devel::TraceUse - show the modules your program loads, recursively
+
+=head1 VERSION
+
+version 2.096
 
 =head1 SYNOPSIS
 
@@ -510,21 +555,15 @@ You can also look for information at:
 
 O'Reilly Media, 2006.
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Devel-TraceUse>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Devel-TraceUse>
+L<http://shop.oreilly.com/product/9780596526740.do>
 
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-TraceUse>
 
-=item * Search CPAN
+=item * MetaCPAN
 
-L<http://search.cpan.org/dist/Devel-TraceUse>
+L<https://metacpan.org/release/Devel-TraceUse>
 
 =back
 
@@ -532,7 +571,7 @@ L<http://search.cpan.org/dist/Devel-TraceUse>
 
 Copyright 2006 chromatic, most rights reserved.
 
-Copyright 2010-2016 Philippe Bruhat (BooK), for the rewrite.
+Copyright 2010-2018 Philippe Bruhat (BooK), for the rewrite.
 
 =head1 LICENSE
 
@@ -540,4 +579,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-

@@ -83,9 +83,10 @@ Modules used from -e:
 OUT
     [ << "OUT", '-d:TraceUse', "-Mlib=$tlib2", '-MM8', '-e1' ],
 Modules used from -e:
-   0.  lib$vlib, -e line 0 [main]
-Modules used, but not reported:
-  M8.pm
+   1.  lib$vlib, -e line 0 [main]
+   5.  M8, -e line 0 [main]
+Possible proxies:
+   2 -e line 0, sub main::BEGIN
 OUT
     [ << "OUT", '-d:TraceUse', "-Mlib=$tlib2", '-MM1', '-MM8', '-e1' ],
 Modules used from -e:
@@ -324,12 +325,15 @@ sub run_test {
     }
 
     # remove version number of core modules used in testing
-    s/(strict )[^,]+,/$1%%%,/g for @errput;
+    s/\b(strict )[^,]+,/$1%%%,/g for @errput;
 
     # compare the results
     my @expected = map { s/[\015\012]*$//; $_ } split /^/, $errput;
     @expected = map { s/^(\s*\d+)\./%%%%./; $_ } @expected if !$nums;
     unshift @expected, @$warns;
+
+    # ignore the eval numbers
+    s/\b(eval )[0-9]+/$1%%%/g for @errput, @expected;
 
     is_deeply( \@errput, \@expected, $mesg )
         or diag map ( {"$_\n"} '--- Got ---', @errput ),

@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -87,18 +87,19 @@ my %translation = (
 	86 => 'Keine Reservierungsanzeige',
 	87 => 'Einzelne Wagen ohne Reservierungsanzeige',
 	88 => 'Keine Qualitätsmängel',  # r 80 82 83 85 86 87 90 91 92 93 96 97 98
-	89  => 'Reservierungen sind wieder vorhanden',
-	90  => 'Kein Bordrestaurant/Bordbistro',
-	91  => 'Eingeschränkte Fahrradmitnahme',
-	92  => 'Klimaanlage in einzelnen Wagen ausgefallen',
-	93  => 'Fehlende oder gestörte behindertengerechte Einrichtung',
-	94  => 'Ersatzbewirtschaftung',
-	95  => 'Ohne behindertengerechtes WC',
-	96  => 'Der Zug ist stark überbesetzt',                            # r 97
-	97  => 'Der Zug ist überbesetzt',                                  # r 96
-	98  => 'Sonstige Qualitätsmängel',
-	99  => 'Verzögerungen im Betriebsablauf',
-	900 => 'Anschlussbus wartet(?)',
+	89 => 'Reservierungen sind wieder vorhanden',                     # -> 86 87
+	90 => 'Kein Bordrestaurant/Bordbistro',
+	91 => 'Eingeschränkte Fahrradmitnahme',
+	92 => 'Klimaanlage in einzelnen Wagen ausgefallen',
+	93 => 'Fehlende oder gestörte behindertengerechte Einrichtung',
+	94 => 'Ersatzbewirtschaftung',
+	95 => 'Ohne behindertengerechtes WC',
+	96 => 'Der Zug ist stark überbesetzt',                           # r 97
+	97 => 'Der Zug ist überbesetzt',                                 # r 96
+	98 => 'Sonstige Qualitätsmängel',
+	99 => 'Verzögerungen im Betriebsablauf',
+
+	#900 => 'Anschlussbus wartet(?)',
 );
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
@@ -592,9 +593,10 @@ sub qos_messages {
 		}
 		@ret = grep { $_->[2] != $msg->[2] } @ret;
 
-		# 88 is "no qos shortcomings" and only required to filter previous
-		# qos messages
-		if ( $msg->[2] != 88 ) {
+		# 88 is "no qos shortcomings" and only required to cancel previous qos
+		# messages. Same for 84 ("correct wagon order") and 89 ("reservations
+		# display is working again").
+		if ( $msg->[2] != 84 and $msg->[2] != 88 and $msg->[2] != 89 ) {
 			push( @ret, $msg );
 		}
 	}
@@ -683,8 +685,11 @@ sub route_interesting {
 	my ( @via_main, @via_show, $last_stop );
 	$max_parts //= 3;
 
+	# Centraal: dutch main station (Hbf in .nl)
+	# HB:  swiss main station (Hbf in .ch)
+	# hl.n.: czech main station (Hbf in .cz)
 	for my $stop (@via) {
-		if ( $stop =~ m{ HB $ | Hbf | Centraal | Flughafen }x ) {
+		if ( $stop =~ m{ HB $ | hl\.n\. $ | Hbf | Centraal | Flughafen }x ) {
 			push( @via_main, $stop );
 		}
 	}
@@ -723,7 +728,7 @@ sub route_interesting {
 	}
 
 	for (@via_show) {
-		s{ ?Hbf}{};
+		s{ \s? Hbf .* }{}x;
 	}
 
 	return @via_show;
@@ -755,6 +760,7 @@ sub superseded_messages {
 	my %superseded = (
 		84 => [ 80, 82, 83, 85 ],
 		88 => [ 80, 82, 83, 85, 86, 87, 90, 91, 92, 93, 96, 97, 98 ],
+		89 => [ 86, 87 ],
 		96 => [97],
 		97 => [96],
 	);
@@ -803,7 +809,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 DESCRIPTION
 
@@ -1411,10 +1417,6 @@ Verified by L<https://iris.noncd.db.de/irisWebclient/Configuration>.
 Might also mean "Kein rollstuhlgerechter Wagen" (source: frubi).
 
 =item d 99 : "VerzE<ouml>gerungen im Betriebsablauf"
-
-=item f 900 : "Anschlussbus wartet(?)"
-
-Verified by correlation. Not sure yet.
 
 =back
 

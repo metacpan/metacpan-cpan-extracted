@@ -1,0 +1,15 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/MathML/itex2MML.pm
+t/test.pl
+itex2MML.h
+itex2MML_perl.c
+lex.yy.c
+y.tab.c
+y.tab.h
+Makefile.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

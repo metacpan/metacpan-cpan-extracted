@@ -14,7 +14,7 @@ use Scalar::Util;
 
 with 'Data::Object::Role::Number';
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 method new ($class: @args) {
 
@@ -63,7 +63,7 @@ Data::Object::Number - Number Object for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -80,11 +80,6 @@ representing numberic characters (0-9). Users of numbers should be aware of the
 methods that modify the number itself as opposed to returning a new number.
 Unless stated, it may be safe to assume that the following methods copy, modify
 and return new numbers based on their function.
-
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Number>
-role and implements proxy methods as documented herewith.
 
 =head1 METHODS
 
@@ -420,6 +415,11 @@ The upto method returns an array reference containing integer increasing
 values up to and including the limit. This method returns a
 L<Data::Object::Array> object.
 
+=head1 COMPOSITION
+
+This package inherits all functionality from the L<Data::Object::Role::Number>
+role and implements proxy methods as documented herewith.
+
 =head1 ROLES
 
 This package is comprised of the following roles.
@@ -556,7 +556,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/burak/CPAN-Sys-Info-Driver-Linux/issues
   repository: git://github.com/burak/CPAN-Sys-Info-Driver-Linux.git
-version: '0.7904'
+version: '0.7905'
 x_serialization_backend: 'YAML::Tiny version 1.69'

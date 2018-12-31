@@ -1834,6 +1834,11 @@ use strict;
 				olson_description => "Mangghystau/Mankistau",
 				timezone_name => "Asia/Aqtau",
 			},
+			"Qostanay/Kostanay/Kustanay" => {
+				location_coords => "+5312+06337",
+				olson_description => "Qostanay/Kostanay/Kustanay",
+				timezone_name => "Asia/Qostanay",
+			},
 			"Qyzylorda/Kyzylorda/Kzyl-Orda" => {
 				location_coords => "+4448+06528",
 				olson_description => "Qyzylorda/Kyzylorda/Kzyl-Orda",
@@ -2685,11 +2690,6 @@ use strict;
 				olson_description => "MSK+00 - Moscow area",
 				timezone_name => "Europe/Moscow",
 			},
-			"MSK+00 - Volgograd" => {
-				location_coords => "+4844+04425",
-				olson_description => "MSK+00 - Volgograd",
-				timezone_name => "Europe/Volgograd",
-			},
 			"MSK+01 - Astrakhan" => {
 				location_coords => "+4621+04803",
 				olson_description => "MSK+01 - Astrakhan",
@@ -2709,6 +2709,11 @@ use strict;
 				location_coords => "+5420+04824",
 				olson_description => "MSK+01 - Ulyanovsk",
 				timezone_name => "Europe/Ulyanovsk",
+			},
+			"MSK+01 - Volgograd" => {
+				location_coords => "+4844+04425",
+				olson_description => "MSK+01 - Volgograd",
+				timezone_name => "Europe/Volgograd",
 			},
 			"MSK+02 - Urals" => {
 				location_coords => "+5651+06036",

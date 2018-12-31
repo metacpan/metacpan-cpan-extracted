@@ -154,29 +154,19 @@ sub on_table {
             print HIDE_CURSOR;
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $select = $ax->get_stmt( $sql, 'Select', 'prepare' );
+            my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
+            if ( $sf->{i}{subqueries} && $sf->{i}{multi_tbl} ne 'subquery' ) { ##
+                unshift @{$sf->{i}{history}{ $sf->{d}{db} }{print}}, [ $select, \@arguments ];
+                if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
+                    $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;
+                }
+            }
             if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
                 $select .= " LIMIT " . $sf->{o}{G}{max_rows};
                 $sf->{o}{table}{max_rows} = $sf->{o}{G}{max_rows};
             }
             else {
                 $sf->{o}{table}{max_rows} = 0;
-            }
-            my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
-            if ( $sf->{i}{subqueries} ) {
-                my $tmp;
-                if ( @{$sf->{i}{stmt_history}||[]} ) {
-                    if ( $select . join( ',', @arguments ) ne $sf->{i}{stmt_history}[0] . join( ',', @{$sf->{i}{stmt_history}[1]||[]} ) ) {
-                        $tmp = $select;
-                    }
-                }
-                else {
-                    $tmp = $select;
-                }
-                if ( $sf->{o}{G}{max_rows} && ! $sql->{limit_stmt} ) {
-                    $tmp =~ s/ LIMIT \Q$sf->{o}{G}{max_rows}\E\z//;
-                }
-                unshift @{$sf->{i}{stmt_history}}, [ $tmp, \@arguments ];
-                $#{$sf->{i}{stmt_history}} = 19 if $#{$sf->{i}{stmt_history}} > 19;
             }
             my $sth = $sf->{d}{dbh}->prepare( $select );
             $sth->execute( @arguments );
@@ -332,8 +322,16 @@ sub commit_sql {
             for my $val ( @{$sql->{set_args}} ) {
                 $filled =~ s/(?<=\ \=\ )\?/$val/;
             }
-            $filled =~ s/^\s+//;
-            $prompt .= "updated with [ $filled ]:\n";
+            $filled =~ s/^\s*SET\s*//;
+            my @items = split( /\s*,\s*/, $filled );
+            $prompt .= "updated with:\n";
+            if ( @items > 4 ) {
+                $prompt .= join ', ', @items;
+            }
+            else {
+                $prompt .= '  ' . join "\n  ", @items;
+            }
+            $prompt .= "\n";
         }
         else {
             $prompt .= "deleted:\n";
@@ -363,7 +361,6 @@ sub commit_sql {
             for my $values ( @$rows_to_execute ) {
                 $sth->execute( @$values );
             }
-
             my $commit_ok = sprintf qq(  %s %s "%s"), 'COMMIT', insert_sep( $row_count, $sf->{o}{G}{thsd_sep} ), $stmt_type;
             $ax->print_sql( $sql, $stmt_typeS );
             # Choose

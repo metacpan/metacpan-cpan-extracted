@@ -4,11 +4,13 @@ NetPacket - assemble/disassemble network packets at the protocol level
 
 # VERSION
 
-version 1.6.0
+version 1.7.0
 
 # SYNOPSIS
 
-    # NetPacket is a base class only
+```
+# NetPacket is a base class only
+```
 
 # DESCRIPTION
 
@@ -43,14 +45,16 @@ This will hopefully lead to a consistent namespace making the
 Content names are all lowercase, with underscores separating multiple
 words.  The following abbreviations are recommended:
 
-            Word                Abbreviation
-            --------------------------------
-            source              src
-            destination         dest
-            checksum            cksum
-            identifier          id
-            version             ver
-            protocol            proto          
+```
+        Word                Abbreviation
+        --------------------------------
+        source              src
+        destination         dest
+        checksum            cksum
+        identifier          id
+        version             ver
+        protocol            proto          
+```
 
 ## Required Methods
 

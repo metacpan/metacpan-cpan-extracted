@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -251,6 +251,13 @@ sub get_station {
 		}
 
 		push( @seen, $station_node->getAttribute('eva') );
+
+		if ( $station_node->getAttribute('name') =~ m{ ZOB} ) {
+
+			# There are no departures from a ZOB ("Zentraler Omnibus-Bahnhof" /
+			# Central Omnibus Station). Ignore it entirely.
+			next;
+		}
 
 		push(
 			@ret,
@@ -603,7 +610,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 DESCRIPTION
 

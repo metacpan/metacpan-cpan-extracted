@@ -16,7 +16,7 @@ use Travel::Status::DE::HAFAS::Result;
 use Travel::Status::DE::HAFAS::StopFinder;
 use XML::LibXML;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 my %hafas_instance = (
 	BVG => {
@@ -154,7 +154,7 @@ sub new {
 		  . '</wrap>';
 	}
 
-	if ( defined $service and $service eq 'NVV' ) {
+	if ( defined $service and $service =~ m{ ^ VBB | NVV $ }x ) {
 
 		# Returns invalid XML with tags inside HIMMessage's lead attribute.
 		# Fix this.
@@ -425,7 +425,7 @@ monitors
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

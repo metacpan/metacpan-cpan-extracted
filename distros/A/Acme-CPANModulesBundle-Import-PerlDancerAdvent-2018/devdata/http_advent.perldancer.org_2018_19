@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> Logging with Dancer2::Logger::Log4perl | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="logging_with_dancer2__logger__log4perl"></a>Logging with Dancer2::Logger::Log4perl</h1>
+
+<h2><a name="history"></a>History</h2>
+
+<p>It's late summer 2018, and there has been a hole in the logging ecosystem of Dancer2 for some time 
+now - we've been missing a Log4perl plugin. There are certainly a lot of great logging options 
+available (<code>Dancer2::Logger::LogAny</code>, <code>Dancer2::Logger::Syslog</code>, and <code>Dancer2::Logger::LogReport</code> 
+to name a few), and a couple of them even include appenders for Log4perl. In looking at our own
+needs, however, they all seemed to be overkill.</p>
+<p>At <code>$work</code>, everything is based on Log4perl (and, in our client-facing Java apps, Log4j), so 
+there has never been need for another logger. We'd been happily using <code>Dancer::Logger::Log4perl</code>
+for years, and wanted to continue to use something familar to us. Before investing some time in
+writing our own Log4perl plugin for Dancer2, we expanded our search beyond metacpan, and were
+rewarded in doing so.</p>
+<p>We stumbled across a project from Ryan Larscheidt and Jon Miner at the University of Wisconsin.
+They wrote a Log4perl plugin for Dancer2 with the intent of releasing it, but as their priorities
+and projects shifted, it never made its way to CPAN. I used to go to MadMongers (Madison Perl Mongers),
+so before long, I was able to track them down and they gave me their blessing to release it.</p>
+<p>A little packaging and a few tests later, <code>Dancer2::Logger::Log4perl</code> was on its way to CPAN!</p>
+<h2><a name="configuration"></a>Configuration</h2>
+
+<p>First, we need to create a basic Log4perl configuration. Create a new Dancer2 application (I'll call
+mine <code>TestLog4perl</code>), and in the application directory create a <i>log4perl.conf</i> file with the following:</p>
+<pre class="prettyprint">log4perl.rootLogger              = DEBUG, LOG1
+
+log4perl.appender.LOG1           = Log::Log4perl::Appender::File
+log4perl.appender.LOG1.filename  = logs/mylog.log
+log4perl.appender.LOG1.mode      = append
+log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n</pre>
+
+<p>The first one defines our root application logger. The first parameter after the equals sign says
+what is the minimum level we should log. Since we are saying the minimum log level should be <code>DEBUG</code>,
+any messages from Dancer2 itself, and anything logged at the <code>core</code> level will be ignored.</p>
+<p>After the minimum log level is a comma-separated list of appenders to write to. For now, we will create a
+single appender named <code>LOG1</code> (we will see how to add a second appender below).  This will write
+to a file in the <i>logs/</i> directory named <i>mylog.log</i>, using the <a href="https://metacpan.org/pod/Log::Log4perl::Appender::File">Log::Log4perl::Appender::File</a>
+appender. When the app is started, it will append to an existing log file of that name (or create the file
+if necessary), and will write to it with a format specified by <a href="https://metacpan.org/pod/Log::Log4perl::Layout::PatternLayout">Log::Log4perl::Layout::PatternLayout</a>.</p>
+<p>Each appender can have its own configuration directives. Please consult the pod for each appender for a list
+of its configuration parameters.</p>
+<p>Next, we have to tell our application that we are using <code>Dancer2::Logger::Log4perl</code> as our preferred logger.
+Edit your <i>environments/development.yml</i> file, and comment out the <code>logger: "console"</code> line. Replace it
+with the following:</p>
+<pre class="prettyprint">logger: log4perl
+log: core
+engines:
+   logger:
+      log4perl:
+         config_file: log4perl.conf</pre>
+
+<p>This tells Dancer2 to use <code>Dancer2::Logger::Log4perl</code> as its logging engine, and to send all levels of message to
+it. Finally, Log4perl should look for its configuration file in the root application directory in a file called
+<i>log4perl.conf</i>.</p>
+<h2><a name="usage"></a>Usage</h2>
+
+<p>Using Log4perl is simple: use the logging keywords you are already familiar with in Dancer:</p>
+<pre class="prettyprint">get '/' =&gt; sub {
+    debug "I'M IN UR INDEX";
+    template 'index' =&gt; { 'title' =&gt; 'TestLog4perl' };
+};</pre>
+
+<p>Start your application and visit <code>http://localhost:5000/</code>. You will see the following in your <i>logs/mylog.log</i> file:</p>
+<pre class="prettyprint">2018/12/18 21:36:02 DEBUG I'M IN UR INDEX</pre>
+
+<h2><a name="hey__i_can_t_see_my_log_messages_on_the_screen_"></a>Hey, I can't see my log messages on the screen!</h2>
+
+<p>That's because we didn't add a screen appender! With Log4perl, adding another appender is easy. Let's
+add another section to our <i>log4perl.conf</i> file:</p>
+<pre class="prettyprint">log4perl.appender.SCREEN         = Log::Log4perl::Appender::Screen
+log4perl.appender.SCREEN.stderr  = 0
+log4perl.appender.SCREEN.layout  = Log::Log4perl::Layout::PatternLayout
+log4perl.appender.SCREEN.layout.ConversionPattern = %m %n</pre>
+
+<p>This creates another appender named <code>SCREEN</code>. We then need to tell our root logger to use this appender
+as well:</p>
+<pre class="prettyprint">log4perl.rootLogger = DEBUG, LOG1, SCREEN</pre>
+
+<p>Now, restart your application, and visit a route that has logging installed, and you will see your log
+message not only goes to the <i>logs/mylog.log</i> file, but also displays on the console running your
+application. Easy!</p>
+<h2><a name="some_gotchas"></a>Some Gotchas</h2>
+
+<p>There are a couple of important nuances you should be aware of:</p>
+<ul>
+<li><a name="item_Environment_configuration_replaces_logging_configuration"></a><b>Environment configuration replaces logging configuration</b>
+<p>If you put your logging configuration in <i>config.yml</i> rather than one of your environment-specific
+configuration files (such as <i>environments/development.yml</i>), you stand a good chance of not using
+the logging configuration you think you are using. The default configuration file for the development
+environment, for example, logs only to the console. If you put your Log4perl configuration in <i>config.yml</i>
+and don't change your development configuration file, your Log4perl configuration will be passed over
+for the default console logger.</p>
+<p>From my own experience, <b>always</b> configure your logger in your environment-specific configuration, unless
+you use the same configuration across all environments (I don't endorse this practice).</p>
+</li>
+<li><a name="item_Core_level_messages_are_passed_as_log_level_trace__but_will_not_be_passed_unless_Dancer2_s_log_level_is_core_"></a><b>Core level messages are passed as log level trace, but will not be passed unless Dancer2's log level is core.</b>
+<p>Since <code>core</code> doesn't have a good corresponding level in Log4perl, <code>core</code> level messages are sent 
+over to Log4perl at the <code>trace</code> log level. This <b>only</b> happens when you set Dancer2's log level in your
+<i>config.yml</i> file to <code>core</code> however. So your preferred log level setting is respected, even if <code>core</code> level 
+messages have to be reported at a different level.</p>
+</li>
+<li><a name="item__code_log__code__should_be_set_a_lower_priority_than_the_lowest_priority_as_set_in_your_Log4perl_configuration_"></a><b><code>log</code> should be set a lower priority than the lowest priority as set in your Log4perl configuration.</b>
+<p>If it isn't, the log messages will not be passed to Log4perl.</p>
+</li>
+</ul>
+<h2><a name="conclusion"></a>Conclusion</h2>
+
+<p>If Log4perl is all the logging you need in your Dancer2 applications, then <code>Dancer2::Logger::Log4perl</code> is well worth
+a look. It gives you much of the functionality available to Log4perl while using the logging syntax built into Dancer2.
+This article should give you sufficient grounding to get going with Log4perl in your Dancer2 applications.</p>
+<h2><a name="further_reading"></a>Further Reading</h2>
+
+<ul>
+<li><a name="item__a_href__https___metacpan_org_pod_Dancer2__Logger__Log4perl__Dancer2__Logger__Log4perl__a_"></a><b><a href="https://metacpan.org/pod/Dancer2::Logger::Log4perl">Dancer2::Logger::Log4perl</a></b>
+</li>
+<li><a name="item__a_href__https___metacpan_org_pod_Log__Log4perl__Log4perl__a_"></a><b><a href="https://metacpan.org/pod/Log::Log4perl">Log4perl</a></b>
+</li>
+<li><a name="item__a_href__https___www_perl_com_pub_2002_09_11_log4perl_html___Log4Perl_Tutorial__a_"></a><b><a href="https://www.perl.com/pub/2002/09/11/log4perl.html/">Log4Perl Tutorial</a></b>
+</li>
+</ul>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Jason Crome (CromeDome) for the Perl Dancer 
+Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+<p>Jason A. Crome</p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

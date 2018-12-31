@@ -1,5 +1,10 @@
 Revision history for Package-Stash
 
+0.38      2018-12-31 03:25:07Z
+     - avoid new warning in 5.21.x regarding too many arguments for
+       printf/sprintf (Renée Bäcker)
+     - canonical repository moved to https://github.com/moose/Package-Stash
+
 0.37  2014-09-21
       - fix spurious warning in taint mode (Niko Tyni, #12)
 

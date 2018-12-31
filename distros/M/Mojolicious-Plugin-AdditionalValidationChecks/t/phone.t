@@ -13,7 +13,7 @@ get '/' => sub {
   my $validation = $c->validation;
   $validation->input( $c->req->params->to_hash );
 
-  $validation->required( 'phone' )->phone();
+  $validation->optional('phone')->phone();
 
   my $result = $validation->has_error() ? 0 : 1;
   $c->render(text => $result );
@@ -35,7 +35,8 @@ my %phones = (
     '+49 5102 1234'      => 1,
     '+230 123 222'       => 1,
     '00230123333'        => 1,
-    '+49 5361 90'        => 1
+    '+49 5361 90'        => 1,
+    ''                   => 1,
 );
 
 my $t = Test::Mojo->new;

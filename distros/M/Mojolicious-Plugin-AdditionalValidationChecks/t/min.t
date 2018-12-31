@@ -12,6 +12,9 @@ get '/' => sub {
   my $validation = $c->validation;
   my $params     = $c->req->params->to_hash;
 
+  $params->{min} = ''    if $params->{min} eq '';
+  $params->{min} = undef if $params->{min} eq '<undef>';
+
   $validation->input( $params );
   $validation->required( 'nr' )->min( $params->{min} );
 
@@ -20,15 +23,17 @@ get '/' => sub {
 };
 
 my %nrs = (
-    '-3'  => [ '-10', 1 ],
-    '-3'  => [ '-1',  0 ],
-    '3'   => [ '-1',  1 ],
-    '3'   => [ '4',   0 ],
-    '3'   => [ '3',   1 ],
-    'a'   => [ '4',   0 ],
-    '3.3' => [ '3',   1 ],
-    '3.0' => [ '3',   1 ],
-    '2.9' => [ '3',   0 ],
+    '-3'  => [ '-10',     1 ],
+    '-3'  => [ '-1',      0 ],
+    '3'   => [ '-1',      1 ],
+    '3'   => [ '4',       0 ],
+    '3'   => [ '3',       1 ],
+    'a'   => [ '4',       0 ],
+    '3.3' => [ '3',       1 ],
+    '3.0' => [ '3',       1 ],
+    '2.9' => [ '3',       0 ],
+    '2.9' => [ '',        1 ],
+    '2.9' => [ '<undef>', 1 ],
 );
 
 my $t = Test::Mojo->new;

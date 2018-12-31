@@ -48,7 +48,7 @@ use Unicode::LineBreak qw(:all);
 ### Globals
 
 ### The package Version
-our $VERSION = '2016.00702';
+our $VERSION = '2018.012';
 
 ### Public Configuration Attributes
 our $Config = {
@@ -63,67 +63,67 @@ our $Config = {
 
 my %FORMAT_FUNCS = (
     'FIXED' => sub {
-	my $self = shift;
-	my $action = shift;
-	my $str = shift;
-	if ($action =~ /^so[tp]/) {
-	    $self->{_} = {};
-	    $self->{_}->{'ColMax'} = $self->config('ColMax');
-	    $self->config('ColMax' => 0) if $str =~ /^>/;
-	} elsif ($action eq "") {
-	    $self->{_}->{line} = $str;
-	} elsif ($action eq "eol") {
-	    return $self->config('Newline');
-	} elsif ($action =~ /^eo/) {
-	    if (length $self->{_}->{line} and $self->config('ColMax')) {
-		$str = $self->config('Newline').$self->config('Newline');
-	    } else {
-		$str = $self->config('Newline');
-	    }
-	    $self->config('ColMax' => $self->{_}->{'ColMax'});
-	    delete $self->{_};
-	    return $str;
-	}
-	undef;
+        my $self = shift;
+        my $action = shift;
+        my $str = shift;
+        if ($action =~ /^so[tp]/) {
+            $self->{_} = {};
+            $self->{_}->{'ColMax'} = $self->config('ColMax');
+            $self->config('ColMax' => 0) if $str =~ /^>/;
+        } elsif ($action eq "") {
+            $self->{_}->{line} = $str;
+        } elsif ($action eq "eol") {
+            return $self->config('Newline');
+        } elsif ($action =~ /^eo/) {
+            if (length $self->{_}->{line} and $self->config('ColMax')) {
+                $str = $self->config('Newline').$self->config('Newline');
+            } else {
+                $str = $self->config('Newline');
+            }
+            $self->config('ColMax' => $self->{_}->{'ColMax'});
+            delete $self->{_};
+            return $str;
+        }
+        undef;
     },
     'FLOWED' => sub { # RFC 3676
-	my $self = shift;
-	my $action = shift;
-	my $str = shift;
-	if ($action eq 'sol') {
-	    if ($self->{_}->{prefix}) {
-		return $self->{_}->{prefix}.' '.$str;
-	    }
-	} elsif ($action =~ /^so/) {
-	    $self->{_} = {};
-	    if ($str =~ /^(>+)/) {
-		$self->{_}->{prefix} = $1;
-	    } else {
-		$self->{_}->{prefix} = '';
-	    }
-	} elsif ($action eq "") {
-	    if ($str =~ /^(?: |From )/
-		or $str =~ /^>/ and !length $self->{_}->{prefix}) {
-		return $self->{_}->{line} = ' ' . $str;
-	    }
-	    $self->{_}->{line} = $str;
-	} elsif ($action eq 'eol') {
-	    $str = ' ' if length $str;
-	    return $str.' '.$self->config('Newline');
-	} elsif ($action =~ /^eo/) {
-	    if (length $self->{_}->{line} and !length $self->{_}->{prefix}) {
-		$str = ' '.$self->config('Newline').$self->config('Newline');
-	    } else {
-		$str = $self->config('Newline');
-	    }
-	    delete $self->{_};
-	    return $str;
-	}
-	undef;
+        my $self = shift;
+        my $action = shift;
+        my $str = shift;
+        if ($action eq 'sol') {
+            if ($self->{_}->{prefix}) {
+                return $self->{_}->{prefix}.' '.$str;
+            }
+        } elsif ($action =~ /^so/) {
+            $self->{_} = {};
+            if ($str =~ /^(>+)/) {
+                $self->{_}->{prefix} = $1;
+            } else {
+                $self->{_}->{prefix} = '';
+            }
+        } elsif ($action eq "") {
+            if ($str =~ /^(?: |From )/
+                or $str =~ /^>/ and !length $self->{_}->{prefix}) {
+                return $self->{_}->{line} = ' ' . $str;
+            }
+            $self->{_}->{line} = $str;
+        } elsif ($action eq 'eol') {
+            $str = ' ' if length $str;
+            return $str.' '.$self->config('Newline');
+        } elsif ($action =~ /^eo/) {
+            if (length $self->{_}->{line} and !length $self->{_}->{prefix}) {
+                $str = ' '.$self->config('Newline').$self->config('Newline');
+            } else {
+                $str = $self->config('Newline');
+            }
+            delete $self->{_};
+            return $str;
+        }
+        undef;
     },
     'PLAIN' => sub {
-	return $_[0]->config('Newline') if $_[1] =~ /^eo/;
-	undef;
+        return $_[0]->config('Newline') if $_[1] =~ /^eo/;
+        undef;
     },
 );
 
@@ -227,24 +227,24 @@ sub config {
 
     # Get config.
     if (scalar @_ == 1) {
-	if ($opts{uc $_[0]}) {
-	    return $self->{$opts{uc $_[0]}};
-	}
-	return $self->SUPER::config($_[0]);
+        if ($opts{uc $_[0]}) {
+            return $self->{$opts{uc $_[0]}};
+        }
+        return $self->SUPER::config($_[0]);
     }
 
     # Set config.
     my @o = ();
-    my %params = @_;
-    foreach my $k (keys %params) {
-        my $v = $params{$k};
-	if ($opts{uc $k}) {
-	    $self->{$opts{uc $k}} = $v;
-	} elsif (uc $k eq uc 'Newline') {
-	    $newline = $v;
-	} else {
-	    push @o, $k => $v;
-	}
+    while (scalar @_) {
+        my $k = shift;
+        my $v = shift;
+        if ($opts{uc $k}) {
+            $self->{$opts{uc $k}} = $v;
+        } elsif (uc $k eq uc 'Newline') {
+            $newline = $v;
+        } else {
+            push @o, $k => $v;
+        }
     }
     $self->SUPER::config(@o) if scalar @o;
 
@@ -258,51 +258,51 @@ sub config {
     $self->{Charset} = $self->{_charset}->as_string;
     my $ocharset = uc($self->{OutputCharset} || $self->{Charset});
     $ocharset = MIME::Charset->new($ocharset)
-	unless ref $ocharset eq 'MIME::Charset' or $ocharset eq '_UNICODE_';
+        unless ref $ocharset eq 'MIME::Charset' or $ocharset eq '_UNICODE_';
     unless ($ocharset eq '_UNICODE_') {
-	$self->{_charset}->encoder($ocharset);
-	$self->{OutputCharset} = $ocharset->as_string;
+        $self->{_charset}->encoder($ocharset);
+        $self->{OutputCharset} = $ocharset->as_string;
     }
     $self->{Language} = uc($self->{Language} || $Config->{Language});
 
     ## Context
     $self->SUPER::config(Context =>
-			 context(Charset => $self->{Charset},
-				 Language => $self->{Language}));
+                         context(Charset => $self->{Charset},
+                                 Language => $self->{Language}));
 
     ## Set sizing method.
     $self->SUPER::config(Sizing => sub {
-	my ($self, $cols, $pre, $spc, $str) = @_;
+        my ($self, $cols, $pre, $spc, $str) = @_;
 
-	my $tabsize = $self->{TabSize};
-	my $spcstr = $spc.$str;
-	$spcstr->pos(0);
-	while (!$spcstr->eos and $spcstr->item->lbc == LB_SP) {
-	    my $c = $spcstr->next;
-	    if ($c eq "\t") {
-		$cols += $tabsize - $cols % $tabsize if $tabsize;
-	    } else {
-		$cols += $c->columns;
-	    }
-	}
-	return $cols + $spcstr->substr($spcstr->pos)->columns;
+        my $tabsize = $self->{TabSize};
+        my $spcstr = $spc.$str;
+        $spcstr->pos(0);
+        while (!$spcstr->eos and $spcstr->item->lbc == LB_SP) {
+            my $c = $spcstr->next;
+            if ($c eq "\t") {
+                $cols += $tabsize - $cols % $tabsize if $tabsize;
+            } else {
+                $cols += $c->columns;
+            }
+        }
+        return $cols + $spcstr->substr($spcstr->pos)->columns;
     });
 
     ## Classify horizontal tab as line breaking class SP.
     $self->SUPER::config(LBClass => [ord("\t") => LB_SP]);
     ## Tab size
     if (defined $self->{TabSize}) {
-	croak "Invalid TabSize option" unless $self->{TabSize} =~ /^\d+$/;
-	$self->{TabSize} += 0;
+        croak "Invalid TabSize option" unless $self->{TabSize} =~ /^\d+$/;
+        $self->{TabSize} += 0;
     } else {
-	$self->{TabSize} = $Config->{TabSize};
+        $self->{TabSize} = $Config->{TabSize};
     }
 
     ## Newline
     if (defined $newline) {
-	$newline = $self->{_charset}->decode($newline)
-	    unless is_utf8($newline);
-	$self->SUPER::config(Newline => $newline);
+        $newline = $self->{_charset}->decode($newline)
+            unless is_utf8($newline);
+        $self->SUPER::config(Newline => $newline);
     }
 }
 
@@ -355,63 +355,63 @@ sub fold {
     my $str;
 
     if (2 < scalar @_) {
-	my $initial_tab = shift || '';
-	$initial_tab = $self->{_charset}->decode($initial_tab)
-	    unless is_utf8($initial_tab);
-	my $subsequent_tab = shift || '';
-	$subsequent_tab = $self->{_charset}->decode($subsequent_tab)
-	    unless is_utf8($subsequent_tab);
-	my @str = @_;
+        my $initial_tab = shift || '';
+        $initial_tab = $self->{_charset}->decode($initial_tab)
+            unless is_utf8($initial_tab);
+        my $subsequent_tab = shift || '';
+        $subsequent_tab = $self->{_charset}->decode($subsequent_tab)
+            unless is_utf8($subsequent_tab);
+        my @str = @_;
 
-	## Decode and concat strings.
-	$str = shift @str;
-	$str = $self->{_charset}->decode($str) unless is_utf8($str);
-	foreach my $s (@str) {
-	    next unless defined $s and length $s;
+        ## Decode and concat strings.
+        $str = shift @str;
+        $str = $self->{_charset}->decode($str) unless is_utf8($str);
+        foreach my $s (@str) {
+            next unless defined $s and length $s;
 
-	    $s = $self->{_charset}->decode($s) unless is_utf8($s);
-	    unless (length $str) {
-		$str = $s;
-	    } elsif ($str =~ /(\s|$special_break)$/ or
-		     $s =~ /^(\s|$special_break)/) {
-		$str .= $s;
-	    } else {
-		$str .= ' ' if $self->breakingRule($str, $s) == INDIRECT;
-		$str .= $s;
-	    }
-	}
+            $s = $self->{_charset}->decode($s) unless is_utf8($s);
+            unless (length $str) {
+                $str = $s;
+            } elsif ($str =~ /(\s|$special_break)$/ or
+                     $s =~ /^(\s|$special_break)/) {
+                $str .= $s;
+            } else {
+                $str .= ' ' if $self->breakingRule($str, $s) == INDIRECT;
+                $str .= $s;
+            }
+        }
 
-	## Set format method.
-	$self->SUPER::config(Format => sub {
-	    my $self = shift;
-	    my $event = shift;
-	    my $str = shift;
-	    if ($event =~ /^eo/) { return $self->config('Newline'); }
-	    if ($event =~ /^so[tp]/) { return $initial_tab.$str; }
-	    if ($event eq 'sol') { return $subsequent_tab.$str; }
-	    undef;
-	});
+        ## Set format method.
+        $self->SUPER::config(Format => sub {
+            my $self = shift;
+            my $event = shift;
+            my $str = shift;
+            if ($event =~ /^eo/) { return $self->config('Newline'); }
+            if ($event =~ /^so[tp]/) { return $initial_tab.$str; }
+            if ($event eq 'sol') { return $subsequent_tab.$str; }
+            undef;
+        });
     } else {
-	$str = shift;
-	my $method = uc(shift || '');
-	return '' unless defined $str and length $str;
+        $str = shift;
+        my $method = uc(shift || '');
+        return '' unless defined $str and length $str;
 
-	## Decode string.
-	$str = $self->{_charset}->decode($str) unless is_utf8($str);
+        ## Decode string.
+        $str = $self->{_charset}->decode($str) unless is_utf8($str);
 
-	## Set format method.
-	$self->SUPER::config(Format => $FORMAT_FUNCS{$method} ||
-			     $FORMAT_FUNCS{'PLAIN'});
+        ## Set format method.
+        $self->SUPER::config(Format => $FORMAT_FUNCS{$method} ||
+                             $FORMAT_FUNCS{'PLAIN'});
     }
 
     ## Do folding.
     my $result = '';
     foreach my $s (split $special_break, $str) {
-	if ($s =~ $special_break) {
-	    $result .= $s;
-	} else {
-	    $result .= $self->break($str);
-	}
+        if ($s =~ $special_break) {
+            $result .= $s;
+        } else {
+            $result .= $self->break($str);
+        }
     }
 
     ## Encode result.
@@ -478,85 +478,85 @@ sub unfold {
     ## Do unfolding.
     my $result = '';
     foreach my $s (split $special_break, $str) {
-	if ($s eq '') {
-	    next;
-	} elsif ($s =~ $special_break) {
-	    $result .= $s;
-	    next;
-	} elsif ($method eq 'FIXED') {
-	    pos($s) = 0;
-	    while ($s !~ /\G\z/cg) {
-		if ($s =~ /\G\n/cg) {
-		    $result .= $self->config('Newline');
-		} elsif ($s =~ /\G(.+)\n\n/cg) {
-		    $result .= $1.$self->config('Newline');
-		} elsif ($s =~ /\G(>.*)\n/cg) {
-		    $result .= $1.$self->config('Newline');
-		} elsif ($s =~ /\G(.+)\n(?=>)/cg) {
-		    $result .= $1.$self->config('Newline');
-		} elsif ($s =~ /\G(.+?)( *)\n(?=(.+))/cg) {
-		    my ($l, $s, $n) = ($1, $2, $3);
-		    $result .= $l;
-		    if ($n =~ /^ /) {
-			$result .= $self->config('Newline');
-		    } elsif (length $s) {
-			$result .= $s;
-		    } elsif (length $l) {
-			$result .= ' '
-			    if $self->breakingRule($l, $n) == INDIRECT;
-		    }
-		} elsif ($s =~ /\G(.+)\n/cg) {
-		    $result .= $1.$self->config('Newline');
-		} elsif ($s =~ /\G(.+)/cg) {
-		    $result .= $1.$self->config('Newline');
-		    last;
-		}
-	    }
-	} elsif ($method eq 'FLOWED' or $method eq 'FLOWEDSP' or
-		 $method eq 'OBSFLOWED') {
-	    my $prefix = undef;
-	    pos($s) = 0;
-	    while ($s !~ /\G\z/cg) {
-		if ($s =~ /\G(>+) ?(.*?)( ?)\n/cg) {
-		    my ($p, $l, $s) = ($1, $2, $3);
-		    unless (defined $prefix) {
-			$result .= $p.' '.$l;
-		    } elsif ($p ne $prefix) {
-			$result .= $self->config('Newline');
-			$result .= $p.' '.$l;
-		    } else {
-			$result .= $l;
-		    }
-		    unless (length $s) {
-			$result .= $self->config('Newline');
-			$prefix = undef;
-		    } else {
-			$prefix = $p;
-			$result .= $s unless $delsp;
-		    }
-		} elsif ($s =~ /\G ?(.*?)( ?)\n/cg) {
-		    my ($l, $s) = ($1, $2);
-		    unless (defined $prefix) {
-			$result .= $l;
-		    } elsif ('' ne $prefix) {
-			$result .= $self->config('Newline');
-			$result .= $l;
-		    } else {
-			$result .= $l;
-		    }
-		    unless (length $s) {
-			$result .= $self->config('Newline');
-			$prefix = undef;
-		    } else {
-			$result .= $s unless $delsp;
-			$prefix = '';
-		    }
-		} elsif ($s =~ /\G ?(.*)/cg) {
-		    $result .= $1.$self->config('Newline');
-		    last;
-		}
-	    }
-	}
+        if ($s eq '') {
+            next;
+        } elsif ($s =~ $special_break) {
+            $result .= $s;
+            next;
+        } elsif ($method eq 'FIXED') {
+            pos($s) = 0;
+            while ($s !~ /\G\z/cg) {
+                if ($s =~ /\G\n/cg) {
+                    $result .= $self->config('Newline');
+                } elsif ($s =~ /\G(.+)\n\n/cg) {
+                    $result .= $1.$self->config('Newline');
+                } elsif ($s =~ /\G(>.*)\n/cg) {
+                    $result .= $1.$self->config('Newline');
+                } elsif ($s =~ /\G(.+)\n(?=>)/cg) {
+                    $result .= $1.$self->config('Newline');
+                } elsif ($s =~ /\G(.+?)( *)\n(?=(.+))/cg) {
+                    my ($l, $s, $n) = ($1, $2, $3);
+                    $result .= $l;
+                    if ($n =~ /^ /) {
+                        $result .= $self->config('Newline');
+                    } elsif (length $s) {
+                        $result .= $s;
+                    } elsif (length $l) {
+                        $result .= ' '
+                            if $self->breakingRule($l, $n) == INDIRECT;
+                    }
+                } elsif ($s =~ /\G(.+)\n/cg) {
+                    $result .= $1.$self->config('Newline');
+                } elsif ($s =~ /\G(.+)/cg) {
+                    $result .= $1.$self->config('Newline');
+                    last;
+                }
+            }
+        } elsif ($method eq 'FLOWED' or $method eq 'FLOWEDSP' or
+                 $method eq 'OBSFLOWED') {
+            my $prefix = undef;
+            pos($s) = 0;
+            while ($s !~ /\G\z/cg) {
+                if ($s =~ /\G(>+) ?(.*?)( ?)\n/cg) {
+                    my ($p, $l, $s) = ($1, $2, $3);
+                    unless (defined $prefix) {
+                        $result .= $p.' '.$l;
+                    } elsif ($p ne $prefix) {
+                        $result .= $self->config('Newline');
+                        $result .= $p.' '.$l;
+                    } else {
+                        $result .= $l;
+                    }
+                    unless (length $s) {
+                        $result .= $self->config('Newline');
+                        $prefix = undef;
+                    } else {
+                        $prefix = $p;
+                        $result .= $s unless $delsp;
+                    }
+                } elsif ($s =~ /\G ?(.*?)( ?)\n/cg) {
+                    my ($l, $s) = ($1, $2);
+                    unless (defined $prefix) {
+                        $result .= $l;
+                    } elsif ('' ne $prefix) {
+                        $result .= $self->config('Newline');
+                        $result .= $l;
+                    } else {
+                        $result .= $l;
+                    }
+                    unless (length $s) {
+                        $result .= $self->config('Newline');
+                        $prefix = undef;
+                    } else {
+                        $result .= $s unless $delsp;
+                        $prefix = '';
+                    }
+                } elsif ($s =~ /\G ?(.*)/cg) {
+                    $result .= $1.$self->config('Newline');
+                    last;
+                }
+            }
+        }
     }
     ## Encode result.
     if ($self->{OutputCharset} eq '_UNICODE_') {

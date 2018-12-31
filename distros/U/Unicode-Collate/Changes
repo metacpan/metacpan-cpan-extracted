@@ -1,5 +1,10 @@
 Revision history for Perl module Unicode::Collate.
 
+1.26  Mon Dec 31 14:32:07 2018
+    - U::C::Locale newly supports locale: cu.
+    - modified locale: kk.
+    - added loc_cu.t in t.
+
 1.25  Wed Nov 22 20:48:48 2017
     - Makefile.PL: [rt.cpan.org #123631] Switch Unicode::Collate to XSLoader
 

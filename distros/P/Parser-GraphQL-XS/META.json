@@ -4,13 +4,13 @@
       "Gonzalo Diethelm (gonzus@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parser-GraphQL-XS",
    "no_index" : {
@@ -52,6 +52,6 @@
          "web" : "https://github.com/gonzus/Parser-GraphQL-XS"
       }
    },
-   "version" : "0.000003",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.000004",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

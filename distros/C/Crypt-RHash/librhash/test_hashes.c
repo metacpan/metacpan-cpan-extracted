@@ -48,6 +48,18 @@
 	0
 };
 
+ const char* crc32c_tests[] = {
+	"", "00000000",
+	"a", "C1D04330",
+	"abc", "364B3FB7",
+	"message digest", "02BD79D0",
+	"abcdefghijklmnopqrstuvwxyz", "9EE6EF25",
+	"The quick brown fox jumps over the lazy dog", "22620404",
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", "A245D57D",
+	"12345678901234567890123456789012345678901234567890123456789012345678901234567890", "477A6781",
+	0
+};
+
 const char* md4_tests[] = {
 	"", "31D6CFE0D16AE931B73C59D7E0C089C0",
 	"a", "BDE52CB31DE33E46245E05FBDBD6FB24",
@@ -459,6 +471,7 @@ struct test_vectors_t {
  */
 struct test_vectors_t short_test_vectors[] = {
 	{ RHASH_CRC32, crc32_tests },
+	{ RHASH_CRC32C, crc32c_tests },
 	{ RHASH_MD4, md4_tests },
 	{ RHASH_MD5, md5_tests },
 	{ RHASH_SHA1, sha1_tests },
@@ -497,11 +510,6 @@ struct test_vectors_t short_test_vectors[] = {
  */
 static int g_errors = 0;
 
-#ifdef UNDER_CE /* if Windows CE */
-/* string buffer to store error messages */
-static char *g_msg = NULL;
-#endif
-
 /**
  * Print a formatted message to the message log.
  * @param format the format of the message
@@ -509,19 +517,9 @@ static char *g_msg = NULL;
 static void log_message(char* format, ...)
 {
 	va_list vl;
-#ifndef UNDER_CE /* not Windows CE */
 	va_start(vl, format);
 	vprintf(format, vl);
 	fflush(stdout);
-#else
-	char str[300];
-	int add_nl = (g_msg == NULL);
-	va_start(vl, format);
-	vsprintf(str, format, vl);
-	g_msg = (char*)realloc(g_msg, (g_msg ? strlen(g_msg) : 0) + strlen(str) + 3);
-	if (add_nl) strcat(g_msg, "\r\n");
-	strcat(g_msg, str);
-#endif
 	va_end(vl);
 }
 
@@ -622,7 +620,7 @@ static void assert_hash(unsigned hash_id, const char* msg, const char* expected_
  */
 static void assert_rep_hash(unsigned hash_id, char ch, size_t msg_size, const char* hash, int set_filename)
 {
-	char ALIGN_ATTR(16) msg_chunk[8192]; /* 8 KiB */
+	char ALIGN_ATTR(64) msg_chunk[8192]; /* 8 KiB */
 	char msg_name[20];
 	memset(msg_chunk, ch, 8192);
 	if (ch >= 32) sprintf(msg_name, "\"%c\"x%d", ch, (int)msg_size);
@@ -695,6 +693,7 @@ static void test_long_strings(void)
 
 	struct id_to_hash_t tests[] = {
 		{ RHASH_CRC32, "DC25BFBC" }, /* verified with cksfv */
+		{ RHASH_CRC32C, "436FE240" },
 		{ RHASH_MD4, "BBCE80CC6BB65E5C6745E30D4EECA9A4" }, /* checked by md4sum */
 		{ RHASH_MD5, "7707D6AE4E027C70EEA2A935C2296F21" }, /* checked by md5sum */
 		{ RHASH_SHA1, "34AA973CD4C4DAA4F61EEB2BDBAD27316534016F" }, /* checked by sha1sum */
@@ -928,12 +927,40 @@ static unsigned find_hash(const char* name)
 	return 0;
 }
 
-/* The program entry point */
+/**
+ * Print status of OpenSSL plugin.
+ */
+static void print_openssl_status(void)
+{
+	rhash_uptr_t available = rhash_get_openssl_available_mask();
+	rhash_uptr_t supported = rhash_get_openssl_supported_mask();
+	int has_openssl = rhash_is_openssl_supported();
 
-#ifndef UNDER_CE /* if not Windows CE */
+	printf("OpenSSL %s", (has_openssl ? "supported" : "not supported"));
+	if (has_openssl && available != RHASH_ERROR)
+	{
+		printf(", %s", (available ? "loaded" : "not loaded"));
+		if (available)
+		{
+			unsigned hash_id;
+			printf(":");
+			available &= RHASH_ALL_HASHES;
+			for (hash_id = 1; hash_id <= available; hash_id <<= 1) {
+				if (!!(hash_id & available))
+					printf(" %s", rhash_get_name(hash_id));
+			}
+			supported &= (~available & RHASH_ALL_HASHES);
+			for (hash_id = 1; hash_id <= supported; hash_id <<= 1) {
+				if (!!(hash_id & supported))
+					printf(" -%s", rhash_get_name(hash_id));
+			}
+		}
+	}
+	printf("\n");
+}
 
 /**
- * The application entry point for Linux and Windows.
+ * The program entry point.
  *
  * @param argc number of arguments including the program name
  * @param argv program arguments including the program name
@@ -956,10 +983,11 @@ int main(int argc, char *argv[])
 			test_known_strings(hash_id);
 
 			rhash_run_benchmark(hash_id, 0, stdout);
-		} else if (strcmp(argv[1], "--flags") == 0) {
+		} else if (strcmp(argv[1], "--info") == 0) {
 			printf("%s", compiler_flags);
+			print_openssl_status();
 		} else {
-			printf("Options: [--speed [HASH_NAME]| --flags]\n");
+			printf("Options: [--speed [HASH_NAME]| --info]\n");
 		}
 	} else {
 		test_all_known_strings();
@@ -975,48 +1003,3 @@ int main(int argc, char *argv[])
 
 	return (g_errors == 0 ? 0 : 1);
 }
-#else /* UNDER_CE */
-
-#include <windows.h>
-#include <commctrl.h>
-
-/**
- * Convert a single-byte string to a two-byte (wchar_t*).
- *
- * @param str the string to convert
- * @return converted string of wchar_t
- */
-wchar_t *char2wchar(char* str)
-{
-	size_t origsize;
-	wchar_t *wmsg;
-
-	origsize = strlen(str) + 1;
-	wmsg = (wchar_t*)malloc(origsize * 2);
-	mbstowcs(wmsg, str, origsize);
-	return wmsg;
-}
-
-/**
- * The program entry point for Windows CE
- *
- * @param argc number of arguments including the program name
- * @param argv program arguments including the program name
- */
-int _tmain(int argc, _TCHAR* argv[])
-{
-	wchar_t *wmsg;
-	(void)argc;
-	(void)argv;
-
-	test_known_strings();
-	test_alignment();
-
-	wmsg = char2wchar(g_msg ? g_msg : "Success!\r\nAll sums are working properly.");
-	MessageBox(NULL, wmsg, _T("caption"), MB_OK | MB_ICONEXCLAMATION);
-	free(wmsg);
-	free(g_msg);
-
-	return (g_errors == 0 ? 0 : 1);
-}
-#endif /* UNDER_CE */

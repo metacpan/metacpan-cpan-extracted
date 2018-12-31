@@ -1,9 +1,7 @@
 package NetPacket::IP;
-BEGIN {
-  $NetPacket::IP::AUTHORITY = 'cpan:YANICK';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble IP (Internet Protocol) packets.
-$NetPacket::IP::VERSION = '1.6.0';
+$NetPacket::IP::VERSION = '1.7.0';
 use strict;
 use warnings;
 
@@ -14,9 +12,9 @@ our @EXPORT_OK = qw(ip_strip
 		    IP_PROTO_IPIP IP_PROTO_TCP IP_PROTO_EGP
 		    IP_PROTO_EGP IP_PROTO_PUP IP_PROTO_UDP
 		    IP_PROTO_IDP IP_PROTO_TP IP_PROTO_DCCP
-		    IP_PROTO_IPV6 IP_PROTO_ROUTING IP_PROTO_FRAGMENT
+		    IP_PROTO_IPV6 IP_PROTO_IPv6 IP_PROTO_ROUTING IP_PROTO_FRAGMENT
 		    IP_PROTO_RSVP IP_PROTO_GRE IP_PROTO_ESP
-		    IP_PROTO_AH IP_PROTO_ICMPV6 IP_PROTO_NONE
+		    IP_PROTO_AH IP_PROTO_ICMPV6 IP_PROTO_ICMPv6 IP_PROTO_NONE
 		    IP_PROTO_DSTOPTS IP_PROTO_MTP IP_PROTO_ENCAP
 		    IP_PROTO_PIM IP_PROTO_COMP IP_PROTO_SCTP
 		    IP_PROTO_UDPLITE
@@ -46,9 +44,9 @@ our %EXPORT_TAGS = (
     protos      => [qw(IP_PROTO_IP IP_PROTO_ICMP IP_PROTO_IGMP IP_PROTO_IPIP
 		       IP_PROTO_TCP IP_PROTO_EGP IP_PROTO_PUP
 		       IP_PROTO_UDP IP_PROTO_IDP IP_PROTO_TP IP_PROTO_DCCP
-		       IP_PROTO_IPV6 IP_PROTO_ROUTING IP_PROTO_FRAGMENT
+		       IP_PROTO_IPV6 IP_PROTO_IPv6 IP_PROTO_ROUTING IP_PROTO_FRAGMENT
 		       IP_PROTO_RSVP IP_PROTO_GRE IP_PROTO_ESP IP_PROTO_AH
-		       IP_PROTO_ICMPV6 IP_PROTO_NONE IP_PROTO_DSTOPTS
+		       IP_PROTO_ICMPV6 IP_PROTO_ICMPv6 IP_PROTO_NONE IP_PROTO_DSTOPTS
 		       IP_PROTO_MTP IP_PROTO_ENCAP IP_PROTO_PIM IP_PROTO_COMP
 		       IP_PROTO_SCTP IP_PROTO_UDPLITE)],
     versions    => [qw(IP_VERSION_IPv4)],
@@ -90,6 +88,7 @@ use constant IP_PROTO_IDP  => 22;      # XNS IDP Protocol
 use constant IP_PROTO_TP   => 29;      # SO Transport Protocol Class 4
 use constant IP_PROTO_DCCP => 33;      # Datagram Congestion Control Protocol
 use constant IP_PROTO_IPV6 => 41;      # IPv6 header
+use constant IP_PROTO_IPv6 => 41;      # IPv6 header (alias)
 use constant IP_PROTO_ROUTING => 43;   # IPv6 routing header
 use constant IP_PROTO_FRAGMENT => 44;  # IPv6 fragmentation header
 use constant IP_PROTO_RSVP => 46;      # Reservation Protocol
@@ -97,6 +96,7 @@ use constant IP_PROTO_GRE  => 47;      # General Routing Encapsulation
 use constant IP_PROTO_ESP  => 50;      # encapsulating security payload
 use constant IP_PROTO_AH   => 51;      # authentication header
 use constant IP_PROTO_ICMPV6 => 58;    # ICMPv6
+use constant IP_PROTO_ICMPv6 => 58;    # ICMPv6 (alias)
 use constant IP_PROTO_NONE => 59;      # IPv6 no next header
 use constant IP_PROTO_DSTOPTS => 60;   # IPv6 destination options
 use constant IP_PROTO_MTP => 92;       # Multicast Transport Protocol
@@ -254,8 +254,9 @@ sub decode {
 # Strip header from packet and return the data contained in it
 #
 
-undef &ip_strip;           # Create ip_strip alias
-*ip_strip = \&strip;
+sub ip_strip { # Create ip_strip alias
+  goto \&strip;
+}
 
 sub strip {
     my ($pkt) = @_;
@@ -330,7 +331,7 @@ NetPacket::IP - Assemble and disassemble IP (Internet Protocol) packets.
 
 =head1 VERSION
 
-version 1.6.0
+version 1.7.0
 
 =head1 SYNOPSIS
 

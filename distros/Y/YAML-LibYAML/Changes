@@ -1,5 +1,10 @@
+0.76 Sun Dec 30 20:10:16 CET 2018
+ - Add $Indent - number of spaces when dumping. PR#89 @zdm++
+ - Fix typo in docs. PR#87 @mr-mixas++
+ - Fix links in docs. @manwar++
+
 0.75 Sat Nov  3 14:17:28 CET 2018
- - Implement $LoadCode
+ - Implement $LoadCode (tinita)
 
 0.74 Fri Aug 31 18:06:17 PDT 2018
  - Fix tests on older perls

@@ -1,9 +1,7 @@
 package NetPacket;
-BEGIN {
-  $NetPacket::AUTHORITY = 'cpan:YANICK';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: assemble/disassemble network packets at the protocol level
-$NetPacket::VERSION = '1.6.0';
+$NetPacket::VERSION = '1.7.0';
 use strict;
 use warnings;
 
@@ -90,7 +88,7 @@ NetPacket - assemble/disassemble network packets at the protocol level
 
 =head1 VERSION
 
-version 1.6.0
+version 1.7.0
 
 =head1 SYNOPSIS
 

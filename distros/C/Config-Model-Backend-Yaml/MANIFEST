@@ -14,6 +14,7 @@ t/README.md
 t/backend_yaml.t
 t/lib/test_yaml_model.pl
 t/model_tests.d/backend-yaml-data-examples/basic
+t/model_tests.d/backend-yaml-data-examples/utf8_data
 t/model_tests.d/backend-yaml-data-test-conf.pl
 t/model_tests.d/backend-yaml-examples/basic
 t/model_tests.d/backend-yaml-test-conf.pl

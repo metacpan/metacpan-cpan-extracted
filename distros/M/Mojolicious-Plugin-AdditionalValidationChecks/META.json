@@ -1,0 +1,68 @@
+{
+   "abstract" : "Add addtional validation checks",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-AdditionalValidationChecks",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Email::Valid" : "1.192",
+            "Mojolicious" : "5.42",
+            "Net::Domain::TLD" : "0",
+            "Scalar::Util" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::AdditionalValidationChecks" : {
+         "file" : "lib/Mojolicious/Plugin/AdditionalValidationChecks.pm",
+         "version" : "0.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks.git",
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-AdditionalValidationChecks"
+      }
+   },
+   "version" : "0.15",
+   "x_contributors" : [
+      "Florian Heyer <info@heyer-it.de>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Renee <reb@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

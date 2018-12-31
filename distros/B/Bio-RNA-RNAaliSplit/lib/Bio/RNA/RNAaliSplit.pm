@@ -1,11 +1,11 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2018-02-27 23:22:24 mtw>
+# Last changed Time-stamp: <2018-12-28 12:19:53 mtw>
 
 # Bio::RNA::RNAaliSplit.pm: Handler for horizontally splitting alignments
 
 package Bio::RNA::RNAaliSplit;
 
-use version; our $VERSION = qv('0.06');
+use version; our $VERSION = qv('0.07');
 use Carp;
 use Data::Dumper;
 use Moose;
@@ -206,7 +206,7 @@ sequence alignments
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -240,23 +240,15 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
-=over 4
+=over 2
+
+=item * metaCPAN
+
+L<https://metacpan.org/release/Bio-RNA-RNAaliSplit>
 
 =item * RT: CPAN's request tracker (report bugs here)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-RNA-RNAaliSplit>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Bio-RNA-RNAaliSplit>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Bio-RNA-RNAaliSplit>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Bio-RNA-RNAaliSplit/>
 
 =back
 

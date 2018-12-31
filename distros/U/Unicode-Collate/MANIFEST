@@ -20,6 +20,7 @@ Collate/Locale/be.pl		Unicode::Collate::Locale
 Collate/Locale/bn.pl		Unicode::Collate::Locale
 Collate/Locale/ca.pl		Unicode::Collate::Locale
 Collate/Locale/cs.pl		Unicode::Collate::Locale
+Collate/Locale/cu.pl		Unicode::Collate::Locale
 Collate/Locale/cy.pl		Unicode::Collate::Locale
 Collate/Locale/da.pl		Unicode::Collate::Locale
 Collate/Locale/de_at_ph.pl	Unicode::Collate::Locale
@@ -106,6 +107,7 @@ data/be.txt		# preparating Unicode::Collate::Locale
 data/bn.txt		# preparating Unicode::Collate::Locale
 data/ca.txt		# preparating Unicode::Collate::Locale
 data/cs.txt		# preparating Unicode::Collate::Locale
+data/cu.txt		# preparating Unicode::Collate::Locale
 data/cy.txt		# preparating Unicode::Collate::Locale
 data/da.txt		# preparating Unicode::Collate::Locale
 data/de_at_ph.txt	# preparating Unicode::Collate::Locale
@@ -239,6 +241,7 @@ t/loc_ca.t	test Unicode::Collate::Locale
 t/loc_cjk.t	test Unicode::Collate::Locale
 t/loc_cjkc.t	test Unicode::Collate::Locale
 t/loc_cs.t	test Unicode::Collate::Locale
+t/loc_cu.t	test Unicode::Collate::Locale
 t/loc_cy.t	test Unicode::Collate::Locale
 t/loc_cyrl.t	test Unicode::Collate::Locale
 t/loc_da.t	test Unicode::Collate::Locale

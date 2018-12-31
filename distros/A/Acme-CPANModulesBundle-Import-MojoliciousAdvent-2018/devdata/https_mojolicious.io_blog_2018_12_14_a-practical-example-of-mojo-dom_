@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+  <meta content="https://mojolicious.io/blog/2018/12/14/a-practical-example-of-mojo-dom/" property="og:url">
+  <meta content="Day 14: A Practical Example of Mojo::DOM" property="og:title">
+    <meta content="Use Mojo::DOM to parse XML" property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/14/a-practical-example-of-mojo-dom/banner.png" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 14: A Practical Example of Mojo::DOM - mojolicious.io</title>
+  <meta content="Chris Seigman" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 14: A Practical Example of Mojo::DOM</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-14">Dec 14, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="A typical industrial platform model overlaid with a laser scan" src="/blog/2018/12/14/a-practical-example-of-mojo-dom/banner.png">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>With recent versions of Mojolicious, <a href="https://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a> gained a lot of power that I have been excited to try, but haven&#39;t had the time for.  Recently, I had a problem at my real job (in Engineering, Procurement, and Construction, or EPC for short) that I solved with Mojo::DOM (and other parts of Mojolicious) in a very short time â including learning how to use Mojo::DOM, which I had never done before.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>The task - simple, but tedious.</h2>
+
+<p>3D models and drawings are fantastic tools, but in reality things are not so perfect.  Construction tolerances being what they are, our company relies a lot on <a href="https://www.youtube.com/watch?v=H-uNzEmt5sw">laser scanning</a>, where we go out to a project site and create a point cloud of the as-built conditions.  This generates hundreds of files that take many hours to process - a recent project had over 3 <em>billion</em> individual points.  These are critical for engineering, modeling, and construction throughout every project we do.</p>
+
+<p>The problem is when our 3D modeling software (<a href="https://www.tekla.com/products/tekla-structures">Tekla Structures</a>) processes the point clouds, it changes the file names of each one from something human readable, such as <code>Pipe Rack Area1</code>, to a hash, like <code>2e9d52829f973c5b98f60935d8a9fa2b</code>.  This is not very user friendly when one project could have dozens of areas, and you only really want to load one or two at a time (an <em>average</em> area is 15gb!).</p>
+
+<p><img alt="Point clouds add information that is not available in the 3D model" src="pointcloud1.jpg">
+<em>Point clouds provide critical information that is either too difficult or too costly to model directly</em></p>
+
+<p>Fortunately, Tekla uses a lot of standard file formats that anyone can edit â including using XML to describe each point cloud it has processed.  Of course, I could just hand edit them to change the names, but that would have to be done for every scan and every project - not a good solution.</p>
+
+<p>Conveniently, the XML file contains both the hash name and the original file name â so I knew I could use Mojo::DOM to parse the XML and rename the point clouds to be human readable. This simple task is the perfect example of how Mojolicious can accomplish a lot of work with relatively short code. The result is the script below:</p>
+
+<pre><code>#!/usr/bin/perl
+use Mojo::Base -strict;
+use Mojo::Util qw(getopt);
+use Mojo::File;
+use Mojo::DOM;
+
+getopt &#39;p|path=s&#39; =&gt; \my $path;
+
+sub main {
+  # look in xml elements for laserscans that have hashes for names
+  my $file = Mojo::File-&gt;new($path, &#39;pointclouds.xml&#39;);
+  my $dom  = Mojo::DOM-&gt;new($file-&gt;slurp);
+  # if &#39;Hash&#39; is populated, rename_files(); otherwise ignore
+  for my $e ($dom-&gt;find(&#39;PointCloudData&#39;)-&gt;each) {
+    $e-&gt;{Folder} = rename_files($e) and $e-&gt;{Hash} = &#39;&#39; if $e-&gt;{Hash};
+  }
+  # save xml file so we don&#39;t try to rename the pointclouds again
+  $file-&gt;spurt($dom);
+}
+
+sub rename_files {
+  # rename pointcloud folder and database file
+  my $e = shift;
+  my $newname = $e-&gt;{Folder} =~ s/$e-&gt;{Hash}/$e-&gt;{Name}/r;
+  say &quot;renaming: $e-&gt;{Folder} to:\n$newname&quot;;
+  rename $e-&gt;{Folder},       $newname       || die $!;
+  rename $e-&gt;{Folder}.&#39;.db&#39;, $newname.&#39;.db&#39; || die $!;
+  return ($newname);
+}
+
+main() if $path || die &#39;Please enter a path to the example files.&#39;;
+</code></pre>
+
+<h2>Not a web app</h2>
+
+<p>Not every use of Mojolicious has to be a full app - parts of it can be used like any other Perl module. For a simple script, it can make getting to your actual purpose much quicker.  I use following line now all the time, even if I&#39;m not building a full Mojolicious app. <a href="https://mojolicious.org/perldoc/Mojo/Base">Mojo::Base</a> saves me from typing additional boiler plate and enables strict, warnings, and other goodies I often want to use.</p>
+
+<pre><code>use Mojo::Base -strict;
+</code></pre>
+
+<h2>Mojo::Util - just for fun</h2>
+
+<p>The production version of my utility actually loads a dummy Mojolicious <code>$app</code> so that I can use <a href="https://mojolicious.org/perldoc/Mojolicious/Plugin/Config">Mojolicious::Plugin::Config</a> to locate the point cloud files in <code>myapp.conf</code>, but in this version I&#39;m using <a href="https://mojolicious.org/perldoc/Mojo/Util">Mojo::Util</a> to get the point cloud file path with a command line option <code>--p</code>.</p>
+
+<pre><code>getopt &#39;p|path=s&#39; =&gt; \my $path;
+</code></pre>
+
+<p>To the run my <a href="tekla_utility.pl">utility</a> on the <a href="a-practical-example-of-mojo-dom.rar">example files</a>, you must first change the contents of <code>Folder</code> in <code>pointclouds.xml</code> to wherever you&#39;ve saved them.</p>
+
+<pre><code>$ perl tekla_utility.pl --p &#39;path to example files&#39;
+</code></pre>
+
+<h2>Mojo::File - never manually write file code again!</h2>
+
+<p><a href="https://mojolicious.org/perldoc/Mojo/File">Mojo::File</a> makes reading <code>pointclouds.xml</code> so I can parse it with Mojo::DOM simple:</p>
+
+<pre><code>my $file = Mojo::File-&gt;new($path, &#39;pointclouds.xml&#39;);
+my $dom  = Mojo::DOM-&gt;new($file-&gt;slurp);
+</code></pre>
+
+<p>In the <a href="https://cgi-lib.berkeley.edu/2.18/cgi-lib.pl.txt">bad old days</a>, I probably hand wrote 15 lines of (horrible) code every time I wanted to read a file.</p>
+
+<h2>Mojo::DOM - what can&#39;t it do?</h2>
+
+<p>And of course, <a href="https://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a> makes finding the right values in the XML easy - it also handles HTML and CSS selectors.  Basically, I just iterate through the contents of <code>PointCloudData</code>, which contains the <code>Folder</code>, <code>Hash</code>, and <code>Name</code> keys for each point cloud Tekla has processed:</p>
+
+<pre><code>for my $e ($dom-&gt;find(&#39;PointCloudData&#39;)-&gt;each) {
+  $e-&gt;{Folder} = rename_files($e) and $e-&gt;{Hash} = &#39;&#39; if $e-&gt;{Hash};
+}
+</code></pre>
+
+<p>I only run <code>rename_files</code> if <code>Hash</code> is populated, and if it is, I empty it so I don&#39;t try to rename them again.  <code>rename_files</code> is about the only Perl code I had to write myself - almost everything else was copied and pasted straight from the excellent <a href="https://mojolicious.org/perldoc">Mojolicious docs</a>!</p>
+
+<p>A substitution stores the desired file &amp; folder name in <code>$newname</code> (non-destructive modifier <code>/r</code> allows me to work on a copy of <code>$e</code> without changing the original).  Then I simply rename the point cloud folder and the *.db file (which contains the actual point cloud data).</p>
+
+<pre><code>my $newname = $e-&gt;{Folder} =~ s/$e-&gt;{Hash}/$e-&gt;{Name}/r;
+</code></pre>
+
+<p>When I&#39;m finished renaming the point clouds, I use <a href="https://mojolicious.org/perldoc/Mojo/File">Mojo::File</a> to save the contents of <code>$dom</code> back to <code>pointclouds.xml</code> with one line:</p>
+
+<pre><code>$file-&gt;spurt($dom)
+</code></pre>
+
+<p>The neat thing is, when I altered the contents of <code>$e-&gt;{Folder}</code> and <code>$e-&gt;{Hash}</code> in my loop, saving it back just works - I don&#39;t need to think too much about the XML structure at all.  Interestingly, saving <code>$dom</code> alpabetizes the keys, but Tekla doesn&#39;t seem to notice.</p>
+
+<p><img alt="Point clouds are not perfect, but are still a valuable tool" src="pointcloud2.jpg">
+<em>Note the grainy nature of the point cloud - since they are just points with no area, the closer you get, the grainier it looks</em></p>
+
+<h2>Useful for all skill levels</h2>
+
+<p>This is just one example of how I have used Mojolicious in my day job.  Sometimes, existing software doesn&#39;t do what you want, or does it in a format that&#39;s not useful - problems that can be solved with the many tools Mojolicious provides.  You don&#39;t even have to be a real programmer (I&#39;m not), or work in the software industry at all.</p>
+
+<p>My next project idea is to rebuild a reporting tool I wrote for Material Take Offs (MTOs) to work with Tekla, which our engineers loved with our old modeling software - and I&#39;m sure I will continue to find good uses for Mojolicious well into the future.</p>
+
+              </section>
+              <small><p>Original screenshots by maschine, released under CC-BY-SA 4.0.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/xml/">xml</a>,
+                  <a href="/blog/tag/non-web/">non-web</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="/static/seigman.png">
+                      </div>
+                      <div class="about">
+                        <h5>Chris Seigman (maschine)</h5>
+                        <p>Chris has been using Perl to develop websites and other tools for more than 20 years, but mostly as a hobby.  Since discovering Mojolicious, his Perl skills have improved dramatically, and he has expanded beyond simple CGI scripts to using Mojolicious for everything from large websites to short utilities.  His most ambitious project ever, which is a Mojolicious web app - can be found at <a href="https://www.bimmerlabs.com">Bimmerlabs</a></p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/13/taking-on-roles/index.html" rel="prev"><strong>Previous Article</strong> Day 13: Taking on Roles</a></li>
+                  <li class="next"><a href="/blog/2018/12/15/practical-web-content-munging/index.html" rel="next"><strong>Next Article</strong> Day 15: Practical Web Content Munging </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

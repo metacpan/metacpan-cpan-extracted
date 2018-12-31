@@ -65,7 +65,7 @@ sub col_function {
         if ( $idx <= $#{$sql->{group_by_cols}} ) {
             $cols_type = 'group_by_cols';
         }
-        elsif ( $idx <= $#{$sql->{aggr_cols}} ) {
+        elsif ( $idx <= @{$sql->{group_by_cols}} + $#{$sql->{aggr_cols}} ) {
             $idx -= @{$sql->{group_by_cols}};
             $cols_type = 'aggr_cols';
         }
@@ -103,10 +103,10 @@ sub col_function {
         }
         # modify columns:
         $sql->{$cols_type}[$idx] = $col_with_func;
-        my $alias = $ax->alias( $col_with_func );
-        if ( defined $alias && length $alias ) {
+        my $alias = $ax->alias( 'functions', 'AS: ', undef, $col_with_func );
+        #if ( defined $alias && length $alias ) {
             $sql->{alias}{$col_with_func} = $ax->quote_col_qualified( [ $alias ] );
-        }
+        #}
         if ( $cols_type eq 'group_by_cols' ) {
             $sql->{group_by_stmt} = " GROUP BY " . join( ', ', @{$sql->{group_by_cols}} );
         }

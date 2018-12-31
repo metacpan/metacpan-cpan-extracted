@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Travel-Status-DE-DeutscheBahn",
    "prereqs" : {
@@ -46,27 +46,30 @@
    "provides" : {
       "Travel::Status::DE::DeutscheBahn" : {
          "file" : "lib/Travel/Status/DE/DeutscheBahn.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Travel::Status::DE::HAFAS" : {
          "file" : "lib/Travel/Status/DE/HAFAS.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Travel::Status::DE::HAFAS::Result" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Result.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Travel::Status::DE::HAFAS::StopFinder" : {
          "file" : "lib/Travel/Status/DE/HAFAS/StopFinder.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/derf/Travel-Status-DE-DeutscheBahn"
+      }
    },
-   "version" : "2.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "2.04",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

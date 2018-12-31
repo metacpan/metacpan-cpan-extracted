@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@ssoriche" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2018/12/07/openapi/" property="og:url">
+  <meta content="Day 7: MetaCPAN, Mojolicious and OpenAPI" property="og:title">
+    <meta content="Overview of how OpenAPI was integrated into MetaCPAN with Mojolicious." property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/07/openapi/banner.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 7: MetaCPAN, Mojolicious and OpenAPI - mojolicious.io</title>
+  <meta content="Shawn Sorichetti" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 7: MetaCPAN, Mojolicious and OpenAPI</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-07">Dec  7, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Contract signing" src="/blog/2018/12/07/openapi/banner.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>During this years <a href="http://www.olafalders.com/2018/11/21/metahack-3-wrap-report/">meta::hack 3</a>, I was extremely fortunate to work with <a href="https://twitter.com/joelaberger">Joel Berger</a> on integrating/documenting OpenAPI with the MetaCPAN API via Mojolicious.</p>
+
+<h2>What is it?</h2>
+
+<p>OpenAPI is a specification for designing, documenting, validating and driving your RESTful API. It can be used to provide documentation to an existing API, or when creating a new one.</p>
+
+<p>The OpenAPI Specification originated as the Swagger specification and was renamed to separate the API description format (OpenAPI) from the open source tooling (Swagger). The specification moved into a new GitHub repository, but did not change.</p>
+
+<p>In the case of the MetaCPAN API, we set out to provide documentation to the existing API, but quickly moved into supporting validation to API calls as well.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>The tools</h2>
+
+<p>OpenAPI has many tools available to help, including discovery tools that will assist in writing the specification. We chose to write the definition by hand (in vim of course) and use tools to generate the documentation and to integrate the specification into MetaCPAN.</p>
+
+<ul>
+<li><a href="https://github.com/Rebilly/ReDoc">ReDoc</a> â OpenAPI/Swagger-generated API Reference Documentation</li>
+</ul>
+
+<p>ReDoc creates an interactive page providing documentation and examples based on the details provided in the OpenAPI specification file. ReDoc includes a <a href="https://github.com/Rebilly/ReDoc#tldr">HTML template</a> to be served as a static file for customizing how the documentation is displayed.</p>
+
+<ul>
+<li><a href="https://metacpan.org/pod/Mojolicious::Plugin::OpenAPI">Mojolicious::Plugin::OpenAPI</a> â OpenAPI / Swagger plugin for Mojolicious</li>
+</ul>
+
+<p>Reads the OpenAPI specification file and adds the appropriate routes and validations for your Mojolicious based application.</p>
+
+<ul>
+<li><a href="https://metacpan.org/pod/JSON::Validator">JSON::Validator</a> â Validate data against a JSON schema</li>
+</ul>
+
+<p>Integrated into the Mojolicious::Plugin::OpenAPI module, provides the input and output validation, as well as providing validation for the specification file itself.</p>
+
+<h2>Getting Started</h2>
+
+<p>The following strategy was used when implementing the MetaCPAN OpenAPI specification.</p>
+
+<h3>The OpenAPI Specification File</h3>
+
+<p>With support for multiline attribute values making it much easier to read and write with less formatting, we chose YAML. JSON is also supported.</p>
+
+<pre><code># Define the version of the OpenAPI spec to use. Version 2.0 still uses
+# swagger as the key
+swagger: &quot;2.0&quot;
+# general information about the API
+info:
+  version: &quot;1.0.0&quot;
+  title: &quot;MetaCPAN API&quot;
+# common path shared throughout the API
+basePath: &quot;/v1&quot;
+</code></pre>
+
+<h4>Defining an Endpoint</h4>
+
+<p>Each of the paths available to the API are defined within the paths object.</p>
+
+<pre><code>paths:
+  # The path to the endpoint
+  /search/web:
+    # The HTTP method that the endpoint accepts
+    get:
+      # A unique identifier for the method
+      operationId: search_web
+      # This attribute points to the name of the class in the appliction
+      # and the method to call separated by `#`
+      x-mojo-to: Search#web
+      # A description of the API Endpoint
+      summary: Perform API search in the same fashion as the Web UI
+</code></pre>
+
+<h4>Defining Parameters</h4>
+
+<p>Each method can define its own parameters.</p>
+
+<pre><code># The parameters that the HTTP method accepts
+parameters:
+  # The name of the parameter
+  - name: q
+    # The location to parse the parameter from
+    in: query
+    # Document what the parameter is. This example uses the YAML HEREDOC
+    # syntax to make the description easier to read and write.
+    description: |
+      The query search term. If the search term contains a term with the
+      tags `dist:` or `module:` results will be in expanded form, otherwise
+      collapsed form.
+
+      See also `collapsed`
+    # The type of the value that the API accepts
+    type: string
+    # Define the attribute as required
+    required: true
+  # The rest of the parameters that the API accepts
+  - name: from
+    in: query
+    description: The offset to use in the result set
+    type: integer
+    # If the API applies a default to an attribute if it isn&#39;t specified.
+    # Let the us know what it is.
+    default: 0
+  - name: size
+    in: query
+    description: Number of results per page
+    type: integer
+    default: 20
+  - name: collapsed
+    in: query
+    description: |
+        Force a collapsed even when searching for a particular
+        distribution or module name.
+    type: boolean
+</code></pre>
+
+<h4>Defining the Response</h4>
+
+<p>The OpenAPI specification allows you to define each response to a method call, this includes both specific and generic error handling. Definitions are defined per HTTP status code.</p>
+
+<pre><code>responses:
+  # HTTP 200 response
+  200:
+    description: Search response
+    # The schema defines what the result will look like
+    schema:
+      type: object
+      properties:
+        total:
+          type: integer
+        took:
+          type: number
+        collapsed:
+          type: boolean
+        results:
+          title: Results
+          type: array
+          items:
+            # While items can be further broken into properties per item,
+            # type `object` is a catch all
+            type: object
+</code></pre>
+
+<h3>Advanced Definitions</h3>
+
+<h4>Reusing definitions through references</h4>
+
+<p>The specification allows for reuse by means of <a href="https://tools.ietf.org/html/draft-pbryan-zyp-json-ref-03">JSON references</a>. The <code>$ref</code> attribute is a relative pointer to the file and section (again separated by <code>#</code>) to include at the indicated point.</p>
+
+<pre><code>        results:
+          title: Results
+          type: array
+          items:
+            $ref: &quot;../definitions/results.yml#/search_result_items&quot;
+</code></pre>
+
+<p>The v2.0 specification does have restrictions on where references can be use, which does cause repetition in the specification file. The v3.0 specification has corrected these issues, and also allows for <code>http</code> references.</p>
+
+<h4>Might be <code>null</code></h4>
+
+<p>There are times that a property of an object might be <code>null</code>. In the MetaCPAN API the favourite count may either be an integer representing how many people have favourited the distribution, or <code>null</code>. Using a list for the property <code>type</code> allows the property to contain both.</p>
+
+<pre><code>favorites:
+  type:
+    - &quot;integer&quot;
+    - &quot;null&quot;
+</code></pre>
+
+<h3>The MetaCPAN Specification</h3>
+
+<p>The entire specification doesnât need to be complete in order to get OpenAPI up and running. When documenting an existing API, itâs possible to with one portion of the API. With MetaCPAN we started with the search endpoints.</p>
+
+<p>The <a href="https://github.com/metacpan/metacpan-api/blob/master/root/static/v1.yml">spec file can be viewed here</a> and the <a href="https://fastapi.metacpan.org/static/index.html">API documentation here</a></p>
+
+<h2>Further Reading</h2>
+
+<p>The <a href="https://github.com/OAI/OpenAPI-Specification">OpenAPI Specification repository</a> includes full documentation and many examples of varying levels of details.</p>
+
+<p>The <a href="https://openapi-map.apihandyman.io">OpenAPI Map</a> is an interactive site to aid in working with the OpenAPI Specification.</p>
+
+              </section>
+              <small><p>Photo by <a href="https://unsplash.com/photos/GJao3ZTX9gU">Cytonn Photography on Unsplash</a></p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/development/">development</a>,
+                  <a href="/blog/tag/openapi/">openapi</a>,
+                  <a href="/blog/tag/api/">api</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/b6d0ff68c2e0d081aba1a94e0f413e8c">
+                      </div>
+                      <div class="about">
+                        <h5>Shawn Sorichetti</h5>
+                        <p>Shawn is a long time Perl developer, with a tendency toward infrastructure, tooling, databases and devops.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/06/making-a-list-with-yancy/index.html" rel="prev"><strong>Previous Article</strong> Day 6: Making A List with Yancy</a></li>
+                  <li class="next"><a href="/blog/2018/12/08/authenticating-with-ldap/index.html" rel="next"><strong>Next Article</strong> Day 8: Authenticating with LDAP </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

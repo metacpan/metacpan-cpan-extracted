@@ -17,7 +17,7 @@ map with($_), our @ROLES = qw(
   Data::Object::Role::Value
 );
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 method defined () {
 
@@ -87,7 +87,7 @@ Data::Object::Role::Universal - Universal Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -389,7 +389,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

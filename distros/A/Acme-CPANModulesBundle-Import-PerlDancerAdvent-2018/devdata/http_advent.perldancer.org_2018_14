@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> Dancer Survey Result Recap | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="dancer_survey_result_recap"></a>Dancer Survey Result Recap</h1>
+
+<p>Well, it's been way longer than it should have been, but I wanted to provide some information about the results of the 2017 Dancer Survey.</p>
+<h2><a name="statistics"></a>Statistics</h2>
+
+<p>Let's start off with some overall statistics:</p>
+<ul>
+<li><a name="item_There_were_112_responses_to_the_survey"></a><b>There were 112 responses to the survey</b>
+</li>
+<li><a name="item_86_respondents__76_8___are_currently_using_Dancer_1_"></a><b>86 respondents (76.8%) are currently using Dancer(1)</b>
+</li>
+<li><a name="item_60_5__of_those_who_responded_are_using_Dancer2"></a><b>60.5% of those who responded are using Dancer2</b>
+</li>
+<li><a name="item_89_5__of_respondents_would_recommend_Dancer_to_another_Perl_developer__and_46_5__would_recommend_it_to_a_non_Perl_developer"></a><b>89.5% of respondents would recommend Dancer to another Perl developer, and 46.5% would recommend it to a non-Perl developer</b>
+</li>
+<li><a name="item_41_2__of_Dancer_1__users_are_planning_to_migrate_Dancer2"></a><b>41.2% of Dancer(1) users are planning to migrate Dancer2</b>
+</li>
+<li><a name="item_48_2__of_you_wanted_web_sockets___and_now_you_got_them___"></a><b>48.2% of you wanted web sockets - and now you got them :)</b>
+</li>
+<li><a name="item_51_8__of_respondents_are_happy_with_the_community_"></a><b>51.8% of respondents are happy with the community.</b>
+</li>
+</ul>
+<p>Oddly enough, 37.2% of you love the docs, and 37.2% of you hate them.</p>
+<p>This does give us some good insight into the direction users of Dancer are going. There are a number of Dancer users out there, with a growing shift towards Dancer2, and by and large, Dancer
+developers seem pretty happy. But we aren't content with merely happy, so let's see what people like and don't like, so we can see what can be improved.</p>
+<h2><a name="common_reasons_for_recommending"></a>Common reasons for recommending</h2>
+
+<p>There was a common theme among those who responded as to why they liked Dancer:</p>
+<ul>
+<li><a name="item_Simplicity_ease_of_use"></a><b>Simplicity/ease of use</b>
+</li>
+<li><a name="item_Non_opinionated"></a><b>Non-opinionated</b>
+</li>
+<li><a name="item_Lightweight"></a><b>Lightweight</b>
+</li>
+<li><a name="item_Quality_of_documentation"></a><b>Quality of documentation</b>
+</li>
+<li><a name="item_Stability"></a><b>Stability</b>
+</li>
+</ul>
+<h2><a name="common_reasons_for_not_recommending"></a>Common reasons for not recommending</h2>
+
+<ul>
+<li><a name="item_Documentation"></a><b>Documentation</b>
+</li>
+<li><a name="item_Plugin_selection"></a><b>Plugin selection</b>
+<p>While we've seen the addition of some new plugins recently (for websockets, 
+Log4perl, and CHI, among others), we would love to see more.</p>
+</li>
+<li><a name="item_Negative_public_perception_of_Perl"></a><b>Negative public perception of Perl</b>
+<p>This is a hard problem to solve, and not one that is going to be solved by us alone.</p>
+</li>
+</ul>
+<h2><a name="areas_of_improvement_things_to_improve"></a>Areas of improvement/things to improve</h2>
+
+<p>There were some things that our community were anxious to see improved. I've listed items that came up multiple times:</p>
+<ul>
+<li><a name="item_Deployment_docs__specifically__lack_of_IIS_"></a><b>Deployment docs (specifically, lack of IIS)</b>
+</li>
+<li><a name="item_Presentation_of_docs_on_Dancer_website"></a><b>Presentation of docs on Dancer website</b>
+</li>
+<li><a name="item_How_to_construct_larger_apps"></a><b>How to construct larger apps</b>
+</li>
+<li><a name="item_Improve_async_documentation"></a><b>Improve async documentation</b>
+</li>
+<li><a name="item_Configuration"></a><b>Configuration</b>
+</li>
+<li><a name="item_Be_more_community_active"></a><b>Be more community active</b>
+<p>This last item refers to the core team being more active on Stack Overflow, Perl Monks, and the like. To the best of our abilities, we will
+try to do so!</p>
+</li>
+</ul>
+<p>This comment in particular stood out to me:</p>
+<pre class="prettyprint">"More tutorials. Especially about deployment. I believe the greatest 
+hurdle for new developers (as in new new, who start doing web stuff 
+in Perl, or programming in general, with Dancer) is not to get started, 
+but to get done. There is a lot of good content in all the major 
+frameworks in the Perl ecosystem on how to build an application, but 
+all of them lack in-depth tutorials with different alternatives for how 
+to deploy them. This includes telling inexperienced users what hosting a 
+web application means, what the different deployment types with PSGI do 
+and which one to pick. I think having a really good guide would set 
+Dancer apart from other frameworks."</pre>
+
+<p>This is certainly one area we have set out to improve in the documentation.</p>
+<h2><a name="cool_uses_of_dancer"></a>Cool uses of Dancer</h2>
+
+<p>Our users shared with us some of the cool things they have done with Dancer. 
+I'm considering doing some writeups on the Dancer website about some of them:</p>
+<ul>
+<li><a name="item_Service_monitoring_dashboard"></a><b>Service monitoring dashboard</b>
+</li>
+<li><a name="item_VOIP_provisioning_app"></a><b>VOIP provisioning app</b>
+</li>
+<li><a name="item_Benefits_management_software"></a><b>Benefits management software</b>
+</li>
+<li><a name="item_thegamecrafter_com__and_their_family_of_sites_applications_"></a><b>thegamecrafter.com (and their family of sites/applications)</b>
+</li>
+<li><a name="item_Unattended_installation_portal"></a><b>Unattended installation portal</b>
+</li>
+</ul>
+<h2><a name="wrapping_it_all_up"></a>Wrapping it all up</h2>
+
+<p>We received a lot of constructive feedback from this process, and while we might
+not do a survey every year, from time to time, this will be a good barometer
+of where things are and where we need to go.</p>
+<p>Some of the feedback we received has already been acted upon (websockets, doc
+improvements), and you can look forward to us addressing your other feedback
+as we are able. Right now, we are working on a better manual that has more 
+information about the things you'd most like to see. Stay tuned!</p>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Jason Crome (CromeDome) for the Perl Dancer 
+Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+<p>Jason A. Crome</p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

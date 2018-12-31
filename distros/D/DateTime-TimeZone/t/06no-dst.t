@@ -30,7 +30,7 @@ use DateTime;
 # This tests a bug that happened when a time zone has a final rule
 # that does not repeat (no DST changes), such as America/Caracas.
 {
-    my $tz = DateTime::TimeZone->new( name => 'America/Caracas' );
+    my $tz         = DateTime::TimeZone->new( name => 'America/Caracas' );
     my @last_spans = @{ $tz->{spans} }[ -2, -1 ];
 
     # This is basically a meta-test to make sure that America/Caracas

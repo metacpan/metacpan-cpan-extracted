@@ -1,3 +1,11 @@
+version 0.201809; 2018-12-31
+
+  * Olson database version 2018i: 389 canonical zones, 204 links
+
+version 0.201808; 2018-12-29
+
+  * Olson database version 2018h: 389 canonical zones, 204 links
+
 version 0.201807; 2018-10-27
 
   * Olson database version 2018g: 388 canonical zones, 204 links

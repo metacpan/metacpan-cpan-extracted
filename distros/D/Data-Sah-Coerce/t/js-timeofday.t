@@ -18,6 +18,8 @@ subtest "coerce_to=float" => sub {
         is($c->(1), 1);
     };
     subtest "from hms string" => sub {
+        is($c->("1:2:3"), 3723);
+        is($c->("1:2"), 3720);
         is($c->("23:59:59"), 86399);
     };
 };

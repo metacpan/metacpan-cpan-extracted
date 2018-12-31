@@ -12,6 +12,9 @@ get '/' => sub {
   my $validation = $c->validation;
   my $params     = $c->req->params->to_hash;
 
+  $params->{max} = ''    if $params->{max} eq '';
+  $params->{max} = undef if $params->{max} eq '<undef>';
+
   $validation->input( $params );
   $validation->required( 'nr' )->max( $params->{max} );
 
@@ -20,15 +23,17 @@ get '/' => sub {
 };
 
 my %nrs = (
-    '-3'  => [ '-10', 0 ],
-    '-3'  => [ '-1',  1 ],
-    '3'   => [ '-1',  0 ],
-    '3'   => [ '4',   1 ],
-    '3'   => [ '3',   1 ],
-    'a'   => [ '4',   0 ],
-    '4.3' => [ '4',   0 ],
-    '4.0' => [ '4',   1 ],
-    '2.9' => [ '3',   1 ],
+    '-3'  => [ '-10',     0 ],
+    '-3'  => [ '-1',      1 ],
+    '3'   => [ '-1',      0 ],
+    '3'   => [ '4',       1 ],
+    '3'   => [ '3',       1 ],
+    'a'   => [ '4',       0 ],
+    '4.3' => [ '4',       0 ],
+    '4.0' => [ '4',       1 ],
+    '2.9' => [ '3',       1 ],
+    '2.9' => [ '',        1 ],
+    '2.9' => [ '<undef>', 1 ],
 );
 
 my $t = Test::Mojo->new;

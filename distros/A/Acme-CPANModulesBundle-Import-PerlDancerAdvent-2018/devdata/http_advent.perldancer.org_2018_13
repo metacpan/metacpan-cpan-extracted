@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> The Twelve Days of Dancer | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="the_twelve_days_of_dancer"></a>The Twelve Days of Dancer</h1>
+
+<p>Hello and goodbye, 2018! It seems like we hardly knew you. It's been a few 
+years since our last calendar, and while everyone here is busy with other 
+projects, we still wanted to give you a mini-advent-calendar this year. 
+Welcome to the Twelve Days of Dancer!</p>
+<p>This year's calendar features twelve posts that cover a wide range of topics.
+We feature several new authors, cover some new ground (for us!) with an
+article on accessibility, and even have a crossover post showing how Dancer
+can be used with other frameworks.</p>
+<p>Without further ado, let's dance!</p>
+<h2><a name="state_of_the_dancer"></a>State of the Dancer</h2>
+
+<p>In 2017 and 2018, we saw fewer but more significant updates to Dancer and 
+Dancer2. With Dancer (1) being in maintenance mode, updates come only when
+significant bugs are found, security vulnerabilities are found, or when a 
+change is proposed that greatly improve the lives of Dancer developers. 
+David Precious has been the light that guides Dancer(1) through the night,
+and has been an excellent resource for both the Dancer and Dancer2 communities
+on IRC and email.</p>
+<p>Meanwhile, Dancer2 continues to grow and evolve, though at a less frantic rate
+than earlier in its lifetime. Throughout the last two years, we've seen a 
+growing list of contributions from our community, through documentation 
+improvements, bug fixes, and new features.</p>
+<p>At the end of 2017, the Dancer Core Team ran a survey of Dancer developers to
+get community input on the Dancer project. We received an excellent response 
+to the survey, and it is being used to help guide the future direction of 
+Dancer and its community. The results of this survey will be discussed in 
+tomorrow's article.</p>
+<h2><a name="new_features"></a>New Features</h2>
+
+<p>Several significant new features came to pass since the last Advent Calendar:</p>
+<h3><a name="websockets"></a>Websockets</h3>
+
+<p>You asked, and Yanick delivered! <a href="https://metacpan.org/pod/Dancer2::Plugin::WebSocket">Dancer2::Plugin::Websocket</a>
+enables websockets from within your Dancer2 applications. To make this work
+properly, a non-blocking, streaming Plack server is needed (such as Twiggy).</p>
+<h3><a name="mutable_serializer"></a>Mutable Serializer</h3>
+
+<p>Dancer2 can now properly deserialize and serialize content based upon the 
+request headers. Even better, it's completely and easily configurable! Thanks
+to veryrusty for spearheading the effort to get this working!</p>
+<h3><a name="no_default_middleware"></a>No Default Middleware</h3>
+
+<p>To support ETags and other similar features, the default Plack middleware used
+by Dancer2 can get in the way. To get around this, veryrusty added a 
+<code>no_default_middleware</code> configuration option to Dancer2's <i>config.yml</i> file
+to keep your application from using the default bundling of Plack middleware.</p>
+<h2><a name="better_documentation"></a>Better Documentation</h2>
+
+<p>Several dozen bug fixes, clarifications, and other enhancements have been made
+to the documentation, primarily by the Dancer2 community. As a result, the 
+quality of existing docs has been greatly improved.</p>
+<p>Several new examples have been added to both the Dancer2 distribution as well
+as the tutorial.</p>
+<p>Sawyer has started a significant project to rebuild the Dancer2 documentation 
+from scratch. The current docs lack a good description of why Dancer does 
+things a certain way, and doesn't give new users a good grounding in web 
+application design to know how and why some things should be done the way
+we've recommended. The new doc project aims to address this by detailing 
+important concepts in a clear and simple way.</p>
+<h2><a name="performance_improvements"></a>Performance Improvements</h2>
+
+<p>Several important performance improvements were made to Dancer2, the most
+important of which being the migration from <code>MooX::Types</code> to <code>Type::Tiny</code>. 
+When <code>Type::Tiny::XS</code> is used, the boost is even more significant.</p>
+<h2><a name="security_improvements"></a>Security Improvements</h2>
+
+<p>Two important security features were added:</p>
+<p>The session engine now requires a <code>validate_id()</code> method to be implemented in
+the various session engines. This requirement shuts down an attack vector by
+making session IDs conform to a known format.</p>
+<p>SysPete implemented a <code>change_session_id</code> keyword to easily change the 
+current session ID. This is a common (and recommended) security practice,
+especially when privilege level changes within an application.</p>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Jason Crome (CromeDome) for the Perl Dancer 
+Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+<p>Jason A. Crome</p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

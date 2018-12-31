@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@preaction" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2018/12/06/making-a-list-with-yancy/" property="og:url">
+  <meta content="Day 6: Making A List with Yancy" property="og:title">
+    <meta content="Santa&#39;s list building just got easier!" property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/06/making-a-list-with-yancy/banner.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 6: Making A List with Yancy - mojolicious.io</title>
+  <meta content="Doug Bell" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 6: Making A List with Yancy</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-06">Dec  6, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Santa making a list" src="/blog/2018/12/06/making-a-list-with-yancy/banner.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>In these modern times, with billions of people in the world, Santa needs a
+modern system to keep track of his naughty/nice list. Lucky for Santa, modern
+Perl has a modern web framework, <a href="http://mojolicious.org">Mojolicious</a>.</p>
+
+              </section>
+              <section id="section-2">
+                  <h1>Step 1: Build The List</h1>
+
+<p>First, we need a database schema. Santa only really needs to know if someone
+has been naughty or nice, so our schema is pretty simple. We&#39;ll start our
+<a href="https://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Mojolicious::Lite</a>
+app by connecting to a <a href="http://sqlite.org">SQLite</a> database using
+<a href="https://metacpan.org/pod/Mojo::SQLite">Mojo::SQLite</a> and loading our database
+schema from the <a href="https://perldoc.perl.org/perldata.html#Special-Literals"><strong>DATA</strong> section of our
+script</a> using
+<a href="https://metacpan.org/pod/Mojo::SQLite::Migrations">Mojo::SQLite migrations</a>:</p>
+
+<pre><code>use v5.28;
+use Mojolicious::Lite;
+use Mojo::SQLite;
+
+# Connect to the SQLite database and load our schema from the
+# &#39;@@ migrations&#39; section, below
+my $db = Mojo::SQLite-&gt;new( &#39;sqlite:thelist.db&#39; );
+$db-&gt;auto_migrate(1)-&gt;migrations-&gt;from_data();
+
+# Start the app. Must be the last code of the script.
+app-&gt;start;
+
+__DATA__
+@@ migrations
+-- 1 up
+CREATE TABLE the_list (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR NOT NULL,
+    address VARCHAR NOT NULL,
+    is_nice BOOLEAN DEFAULT FALSE,
+    is_delivered BOOLEAN DEFAULT FALSE
+);
+</code></pre>
+
+<p>With our schema created, we can add
+<a href="http://metacpan.org/pod/Yancy">Yancy</a>. Yancy is a simple CMS for
+editing content and streamlining data-driven website development. We&#39;ll
+tell Yancy to read our database schema to configure itself, but we&#39;ll
+also give it a few hints to make editing content easier.</p>
+
+<pre><code># Configure Yancy
+plugin Yancy =&gt; {
+    backend =&gt; { sqlite =&gt; $db },
+    # Read the schema configuration from the database
+    read_schema =&gt; 1,
+    collections =&gt; {
+        the_list =&gt; {
+            # Show these columns in the Yancy editor
+            &#39;x-list-columns&#39; =&gt; [qw( name address is_nice is_delivered )],
+            properties =&gt; {
+                # `id` is auto-increment, so hide it when creating rows
+                id =&gt; { readOnly =&gt; 1 },
+            },
+        },
+    },
+};
+</code></pre>
+
+<p>If we run our app (<code>perl myapp.pl daemon</code>) and go to
+<code>http://127.0.0.1:3000/yancy</code>, we can edit the list data.</p>
+
+<p><img alt="Browser window showing a form to edit a list
+entry" src="editor-form-screenshot.png"></p>
+
+<p>Now Santa&#39;s data entry elves get to work entering the data for all the
+people in the universe!</p>
+
+<p><img alt="Browser window showing the list of data entered
+in" src="editor-list-screenshot.png"></p>
+
+<h1>Step 2: View The List</h1>
+
+<p>With our data entry Neptunians working hard, we can build a way to view
+the list. With four arms, they can enter data twice as fast!</p>
+
+<p><img alt="Three Futurama Neptunians in front of baby strollers containing
+one-eared rabbit dolls" src="neptunians.png"></p>
+
+<p>Yancy comes with controllers that let us easily list our data just by
+configuring a route and creating a template to render. First we
+configure the route to use <a href="https://metacpan.org/pod/Yancy::Controller::Yancy#list">Yancy::Controller::Yancy <code>list</code>
+method</a>:</p>
+
+<pre><code># Display the naughty rows of the list
+get &#39;/&#39;, {
+    controller =&gt; &#39;yancy&#39;,
+    action =&gt; &#39;list&#39;,
+    template =&gt; &#39;the_list&#39;,
+    collection =&gt; &#39;the_list&#39;,
+    filter =&gt; {
+        is_nice =&gt; 0,
+    },
+}, &#39;the_list.list&#39;;
+</code></pre>
+
+<p>Now we build our template. Yancy comes with a <a href="http://getbootstrap.com">Bootstrap
+4</a> we can use to make a pretty list of names
+and addresses.</p>
+
+<pre><code>@@ layouts/default.html.ep
+&lt;head&gt;
+    &lt;script src=&quot;/yancy/jquery.js&quot;&gt;&lt;/script&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;/yancy/bootstrap.css&quot;&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;main class=&quot;container&quot;&gt;
+        %= content
+    &lt;/main&gt;
+&lt;/body&gt;
+
+@@ the_list.html.ep
+% layout &#39;default&#39;;
+&lt;h1&gt;Naughty List&lt;/h1&gt;
+&lt;ul class=&quot;list-group&quot;&gt;
+    % for my $item ( @$items ) {
+        &lt;li class=&quot;list-group-item d-flex justify-content-between&quot;&gt;
+            &lt;div&gt;
+                %= $item-&gt;{name}
+                &lt;br/&gt;
+                %= $item-&gt;{address}
+            &lt;/div&gt;
+            % end
+        &lt;/li&gt;
+    % }
+&lt;/ul&gt;
+</code></pre>
+
+<h1>Step 3: Complete Delivery</h1>
+
+<p>Santa&#39;s a busy robot, and all that ordnance is expensive. Once he&#39;s done
+a delivery, he needs to mark it as done so he can move on to all the
+other deserving people.</p>
+
+<p><img alt="Santa Robot (from Futurama) writing on his list with a quill
+pen" src="editing-list.png"></p>
+
+<p>Stopping to check people off manually really slows down the murder and
+mayhem.</p>
+
+<p>Yancy makes it easy to update the data, this time with the <a href="https://metacpan.org/pod/Yancy::Controller::Yancy#set">&quot;set&quot; action
+in Yancy::Controller::Yancy</a>:</p>
+
+<pre><code># Set the delivered state of a list row
+post &#39;/deliver/:id&#39;, {
+    controller =&gt; &#39;yancy&#39;,
+    action =&gt; &#39;set&#39;,
+    collection =&gt; &#39;the_list&#39;,
+    properties =&gt; [qw( is_delivered )],
+    forward_to =&gt; &#39;the_list.list&#39;,
+}, &#39;the_list.deliver&#39;;
+</code></pre>
+
+<p>With the route configured, we need to add a form to our template. We&#39;ll
+use <a href="https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#form_for">the <code>form_for</code> helper from
+Mojolicious</a>.
+The form will display a yes/no toggle button for every row. Yancy is
+secure by default, so we need to make sure that our form contains the
+<a href="https://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Cross-site-request-forgery">CSRF token</a>
+(using <a href="https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#csrf_field">the <code>csrf_field</code> helper</a>)
+to prevent cross-site requests.</p>
+
+<pre><code>@@ the_list.html.ep
+% layout &#39;default&#39;;
+&lt;h1&gt;Naughty List&lt;/h1&gt;
+&lt;ul class=&quot;list-group&quot;&gt;
+    % for my $item ( @$items ) {
+        &lt;li class=&quot;list-group-item d-flex justify-content-between&quot;&gt;
+            &lt;div&gt;
+                %= $item-&gt;{name}
+                &lt;br/&gt;
+                %= $item-&gt;{address}
+            &lt;/div&gt;
+            %= form_for &#39;the_list.deliver&#39;, $item, begin
+                Delivered:
+                %= csrf_field
+                % my $delivered = $item-&gt;{is_delivered};
+                &lt;div class=&quot;btn-group btn-group-toggle&quot;&gt;
+                    &lt;label class=&quot;btn btn-xs &lt;%= $delivered ? &#39;btn-success active&#39; : &#39;btn-outline-success&#39; %&gt;&quot;&gt;
+                        &lt;input type=&quot;radio&quot; name=&quot;is_delivered&quot; value=&quot;true&quot; &lt;%== $delivered ? &#39;checked&#39; : &#39;&#39; %&gt;&gt; Yes
+                    &lt;/label&gt;
+                    &lt;label class=&quot;btn btn-xs &lt;%= $delivered ? &#39;btn-outline-danger&#39; : &#39;btn-danger active&#39; %&gt;&quot;&gt;
+                        &lt;input type=&quot;radio&quot; name=&quot;is_delivered&quot; value=&quot;false&quot; &lt;%== $delivered ? &#39;&#39; : &#39;checked&#39; %&gt;&gt; No
+                    &lt;/label&gt;
+                &lt;/div&gt;
+            % end
+        &lt;/li&gt;
+    % }
+&lt;/ul&gt;
+</code></pre>
+
+<p>We&#39;ll add some jQuery at the end (using <a href="https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#javascript">the <code>javascript</code>
+helper</a>)
+to automatically submit the form when the value is changed.</p>
+
+<pre><code>%= javascript begin
+    // Automatically submit the form when an input changes
+    $( &#39;form input&#39; ).change( function ( e ) {
+        $(this).parents(&quot;form&quot;).submit();
+    } );
+% end
+</code></pre>
+
+<p>Now our webapp looks like this:</p>
+
+<p><img alt="A browser window showing the completed webapp. A set of rows with name
+and address on the left, and a Delivered button with Yes and No options
+on the right.  Some rows have the No button checked, others the Yes
+button" src="finished-screenshot.png"></p>
+
+<p>We can view our entire list, and check off the ones who we&#39;ve delivered to already!
+<a href="myapp.pl">View the entire app here</a>.</p>
+
+<p><img alt="Santa Robot in his sleigh with burning buildings in the foreground and
+background" src="success.png"></p>
+
+<p>Another successful Xmas, powered by <a href="http://mojolicious.org">Mojolicious</a>!</p>
+
+              </section>
+              <small><p><a href="https://pxhere.com/en/photo/1263707">Banner image</a> CC0 Public Domain</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/yancy/">yancy</a>,
+                  <a href="/blog/tag/example/">example</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/4bdc4922059d58a0fcbf8f35652dc254.png">
+                      </div>
+                      <div class="about">
+                        <h5>Doug Bell</h5>
+                        <p>Doug (<a href="http://preaction.me">preaction</a>) is a long time Perl user.
+He is the current maintainer of <a href="http://www.cpantesters.org/">CPAN Testers</a> and the author of many <a href="https://metacpan.org/author/PREACTION">CPAN modules</a> including the <a href="http://preaction.me/statocles/">Statocles</a> blog engine that powers this site.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/05/compound-selectors/index.html" rel="prev"><strong>Previous Article</strong> Day 5: Compound Selectors are Easier than Regexes</a></li>
+                  <li class="next"><a href="/blog/2018/12/07/openapi/index.html" rel="next"><strong>Next Article</strong> Day 7: MetaCPAN, Mojolicious and OpenAPI </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@preaction" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/07/day-7-using-template-variants-for-a-beta-landing-page/" property="og:url">
+  <meta content="Day 7: Using Template Variants For a Beta Landing Page" property="og:title">
+    <meta content="Doug demonstrates using Mojolicious template variants to show a new landing page for a beta-testing website" property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/07/day-7-using-template-variants-for-a-beta-landing-page/1280px-Single_yellow_tulip_in_a_field_of_red_tulips.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 7: Using Template Variants For a Beta Landing Page - mojolicious.io</title>
+  <meta content="Doug Bell" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 7: Using Template Variants For a Beta Landing Page</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-07">Dec  7, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Single yellow tulip in a field of red tulips" src="/blog/2017/12/07/day-7-using-template-variants-for-a-beta-landing-page/1280px-Single_yellow_tulip_in_a_field_of_red_tulips.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p><a href="http://cpantesters.org">CPAN Testers</a> is a pretty big project with a long,
+storied history. At its heart is a data warehouse holding all the test reports
+made by people installing CPAN modules. Around that exists an ecosystem of
+tools and visualizations that use this data to provide useful insight into the
+status of CPAN distributions.</p>
+
+<p>For the <a href="http://github.com/cpan-testers/cpantesters-web">CPAN Testers webapp
+project</a>, I needed a way to
+show off some pre-release tools with some context about what they are and how
+they might be made ready for release. I needed a &quot;beta&quot; website with a front
+page that introduced the beta projects. But, I also needed the same
+<a href="http://mojolicious.org">Mojolicious</a> application to serve (in the future) as a
+production website. The front page of the production website would be
+completely different from the front page of the beta testing website.</p>
+
+<p>To achieve this, I used <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Template-variants">Mojolicious&#39;s template variants
+feature</a>.</p>
+
+              </section>
+              <section id="section-2">
+                  <p>First, I created a variant of my index.html template for my beta site
+and called it <code>index.html+beta.ep</code>.</p>
+
+<pre><code class="hljs"><span class="hljs-keyword">&lt;h1&gt;</span>CPAN Testers Beta<span class="hljs-keyword">&lt;/h1&gt;</span>
+<span class="hljs-keyword">&lt;p&gt;</span>This site shows off some new features currently being tested.<span class="hljs-keyword">&lt;/p&gt;</span>
+<span class="hljs-keyword">&lt;h2&gt;&lt;a</span> href=<span class="hljs-string">&quot;/chart.html&quot;</span><span class="hljs-keyword">&gt;</span>Release Dashboard<span class="hljs-keyword">&lt;/a&gt;&lt;/h2&gt;</span>
+</code></pre>
+
+<p>Next, I told Mojolicious to use the &quot;beta&quot; variant when in &quot;beta&quot; mode
+by passing <code>$app-&gt;mode</code> to the <code>variant</code> stash variable.</p>
+
+<pre><code class="hljs"><span class="hljs-comment"># myapp.pl</span><span class="hljs-comment">
+</span><span class="hljs-keyword">use</span> <span class="hljs-function">Mojolicious::Lite</span>;
+get &#39;<span class="hljs-string">/*path</span>&#39;, { path =&gt; &#39;<span class="hljs-string">index</span>&#39; }, <span class="hljs-keyword">sub </span>{
+    <span class="hljs-keyword">my</span> ( <span class="hljs-type">$c</span> ) = <span class="hljs-type">@_</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">render</span>(
+        template =&gt; <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">stash</span>( &#39;<span class="hljs-string">path</span>&#39; ),
+        variant =&gt; <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">app</span>-&gt;<span class="hljs-type">mode</span>,
+    );
+};
+app-&gt;start;
+</code></pre>
+
+<p>The mode is set by passing the <code>-m beta</code> option to Mojolicious&#39;s <code>daemon</code> or
+<code>prefork</code> command.</p>
+
+<pre><code>$ perl myapp.pl daemon -m beta
+</code></pre>
+
+<p>This gives me the <a href="http://beta.cpantesters.org">new landing page for beta.cpantesters.org</a>.</p>
+
+<pre><code>$ perl myapp.pl get / -m beta
+&lt;h1&gt;CPAN Testers Beta&lt;/h1&gt;
+&lt;p&gt;This site shows off some new features currently being tested.&lt;/p&gt;
+&lt;h2&gt;&lt;a href=&quot;/chart.html&quot;&gt;Release Dashboard&lt;/a&gt;&lt;/h2&gt;
+</code></pre>
+
+<p>But now I also need to replace the original landing page (index.html.ep)
+so it can still be seen on the beta website. I do this with a simple
+trick: I created a new template called <code>web.html+beta.ep</code> that imports
+the original template and unsets the <code>variant</code> stash variable. Now
+I can see the <a href="http://beta.cpantesters.org/web">main index page on the beta site at
+http://beta.cpantesters.org/web</a>.</p>
+
+<pre><code class="hljs">%= include &#39;index&#39;, variant =&gt; undef
+</code></pre>
+
+<pre><code>$ perl myapp.pl get /web -m beta
+&lt;h1&gt;CPAN Testers&lt;/h1&gt;
+&lt;p&gt;This is the main CPAN Testers application.&lt;/p&gt;
+</code></pre>
+
+<p>Template variants are a useful feature in some edge cases, and this isn&#39;t the
+first time I&#39;ve found a good use for them. I&#39;ve also used them to provide a
+different layout template in &quot;development&quot; mode to display a banner saying
+&quot;You&#39;re on the development site&quot;. Useful for folks who are undergoing user
+acceptance testing. The best part is that if the desired variant for that
+specific template is not found, Mojolicious falls back to the main template. I
+built a mock JSON API application which made extensive use of this fallback
+feature, but that&#39;s another blog post for another time.</p>
+
+              </section>
+              <small><p><a href="https://commons.wikimedia.org/w/index.php?curid=2147460">Image</a> by Photo by and (c)2007 <a href="//commons.wikimedia.org/wiki/User:Jina_Lee" title="User:Jina Lee">Jina Lee</a> - <span class="int-own-work" lang="en">Own work</span>, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/rendering/">rendering</a>,
+                  <a href="/blog/tag/templates/">templates</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/4bdc4922059d58a0fcbf8f35652dc254.png">
+                      </div>
+                      <div class="about">
+                        <h5>Doug Bell</h5>
+                        <p>Doug (<a href="http://preaction.me">preaction</a>) is a long time Perl user.
+He is the current maintainer of <a href="http://www.cpantesters.org/">CPAN Testers</a> and the author of many <a href="https://metacpan.org/author/PREACTION">CPAN modules</a> including the <a href="http://preaction.me/statocles/">Statocles</a> blog engine that powers this site.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/06/day-6-adding-your-own-commands/index.html" rel="prev"><strong>Previous Article</strong> Day 6: Adding Your Own Commands</a></li>
+                  <li class="next"><a href="/blog/2017/12/08/day-8-mocking-a-rest-api/index.html" rel="next"><strong>Next Article</strong> Day 8: Mocking a REST API </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

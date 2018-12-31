@@ -1,3 +1,8 @@
+0.4.5 2018-12-29  k  <andk@cpan.org>
+
+	* Change the repository URL to https; thanks to Jim Keenan for the
+	request (https://rt.cpan.org/Ticket/Display.html?id=128129)
+
 0.4.4 2018-05-09  k  <andk@cpan.org>
 
 	* Repair more impacts of the recently changed formatting of the

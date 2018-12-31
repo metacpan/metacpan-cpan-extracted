@@ -412,6 +412,7 @@ Punta_Arenas
 Pyongyang
 QA
 Qatar
+Qostanay
 Qyzylorda
 RO
 RW

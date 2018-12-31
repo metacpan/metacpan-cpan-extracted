@@ -1,0 +1,35 @@
+---
+abstract: 'Object Orientation for Perl 5'
+author:
+  - 'Al Newkirk <al@iamalnewkirk.com>'
+build_requires:
+  Moo: '2.000001'
+  Sub::Quote: '2.005001'
+  Type::Tiny: '1.000005'
+  Type::Tiny::Signatures: '0.08'
+  perl: v5.14.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Object
+requires:
+  Moo: '2.000001'
+  Sub::Quote: '2.005001'
+  Type::Tiny: '1.000005'
+  Type::Tiny::Signatures: '0.08'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/iamalnewkirk/data-object/issues
+  homepage: http://metacpan.org/release/Data-Object/
+  repository: git://github.com/iamalnewkirk/data-object.git
+version: '0.61'
+x_authority: cpan:AWNCORP
+x_contributors:
+  - 'Anthony Brummett <abrummet@genome.wustl.edu>'
+x_generated_by_perl: v5.14.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

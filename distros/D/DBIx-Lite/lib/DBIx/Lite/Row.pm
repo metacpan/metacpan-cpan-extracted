@@ -1,5 +1,5 @@
 package DBIx::Lite::Row;
-$DBIx::Lite::Row::VERSION = '0.31';
+$DBIx::Lite::Row::VERSION = '0.32';
 use strict;
 use warnings;
 
@@ -110,6 +110,12 @@ sub AUTOLOAD {
         $method, ref($self), $selfs->{table}{name};
 }
 
+sub db {
+    my ($self) = @_;
+
+    return $self->__dbix_lite_row_storage->{dbix_lite};
+}
+
 sub DESTROY {}
 
 1;
@@ -126,7 +132,7 @@ DBIx::Lite::Row
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 OVERVIEW
 
@@ -183,6 +189,10 @@ object.
     $dbix->schema->one_to_many('authors.id' => 'books.author_id');
     my $book = $author->insert_related('books', { title => 'Camel Tales' });
 
+=head2 db
+
+This method returns the L<DBIx::Lite> object from which this record was retrieved.
+
 =for Pod::Coverage get _pk
 
 =head1 AUTHOR
@@ -191,7 +201,7 @@ Alessandro Ranellucci <aar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alessandro Ranellucci.
+This software is copyright (c) 2018 by Alessandro Ranellucci.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

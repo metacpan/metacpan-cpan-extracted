@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@swelljoe" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2018/12/15/practical-web-content-munging/" property="og:url">
+  <meta content="Day 15: Practical Web Content Munging" property="og:title">
+    <meta content="Working with ugly old websites using Mojo::UserAgent and Mojo::DOM" property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/15/practical-web-content-munging/banner.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 15: Practical Web Content Munging - mojolicious.io</title>
+  <meta content="Joe Cooper" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 15: Practical Web Content Munging</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-15">Dec 15, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="An eyeball of alarming size" src="/blog/2018/12/15/practical-web-content-munging/banner.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>Following brian d foy&#39;s great <a href="https://mojolicious.io/blog/2018/12/05/compound-selectors/">write-up of using Mojo::DOM selectors from Day 5</a>, I thought it&#39;d be fun to talk about some website migration scripts I recently built using <a href="https://mojolicious.org/perldoc/Mojo/UserAgent">Mojo::UserAgent</a> and <a href="https://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a>, in order to show some basic practical usage of these modules. I&#39;ve never really used Mojo before, but I recently needed to migrate a website that hasn&#39;t had a redesign in about 15 years, and it seemed like a great fit for my content mangling needs. In the past I would have used regexes, and probably would have spent at least as much time manually massaging the input or output into the right shape as I spent writing code. Mojo::DOM made it easy for me, a Mojolicious beginner, to get the results I wanted really quickly.</p>
+
+<h2>From Static Site to Static Site Generator</h2>
+
+<p>The problem I set out to solve was taking an old static website that was once hosted on SourceForge.net and migrating it to an exciting new...um...static website. But, this time, it&#39;ll be a modern take on a static website. Instead of editing HTML by hand and using home-built page munging scripts that would do things like insert news items or changelog entries at the top of the content div using regexes, I&#39;ll be using a modern static website generator. There are several to choose from, including the well-known Jekyll, which is written in Ruby, Hugo, built with Go, and Statocles, which is in Perl and runs this site. For my project, I chose <a href="https://gohugo.io">Hugo</a>, for its speed and maturity.</p>
+
+              </section>
+              <section id="section-2">
+                  <p>Hugo, like most modern static site generators, expects content to be in Markdown format with some metadata at the top of the file. I want to convert our crusty old HTML, as you&#39;ll see an example of below, into something that looks a bit like this:</p>
+
+<pre><code>---
+title: &quot;Frobnitz 3.141593 released&quot;
+date: 2016-10-10
+description: &quot;This release includes a fog-flavored bauble of three equal sides, providing the restless...&quot;
+categories: []
+aliases: []
+toc: false
+draft: false
+---
+This release includes a fog-flavored bauble of three equal sides, providing 
+the restless digital spirits a brief respite from their painful awareness of
+impermanence.
+
+You can find the new version under the usual shadowy bridge.
+</code></pre>
+
+<p>So, to start out, I need to fetch the old site. I could have bothered the old maintainer of the site about it and gotten the original sources, but I decided just to fetch them from the web. One option would be to use wget or curl; the stuff we do later with Mojo::DOM can work with HTML from anywhere, including local files. But, it seemed simpler to do it all in Perl. So, we&#39;ll fetch a list of page paths, and then do stuff with them. Mojo::UserAgent does the hard work. The simplest example might look something like this:</p>
+
+<pre><code>use Mojo::UserAgent;
+
+my $url = &#39;intro&#39;;
+my $ua  = Mojo::UserAgent-&gt;new;
+my $tx = $ua-&gt;get(&quot;example.tld/$url.html&quot;);
+</code></pre>
+
+<p>That&#39;s it! We just fetched a web page. You might be tempted to print out $tx to see what&#39;s in it (that&#39;s what I did, rather than reading the docs, at first). But, it&#39;s a <a href="https://mojolicious.org/perldoc/Mojo/Transaction/HTTP">Mojo::Transaction::HTTP</a> object. We have to reach down through the hierarchy, first looking at the <code>res</code> attribute, which is a <a href="https://mojolicious.org/perldoc/Mojo/Message/Response">Mojo::Message::Response</a> object, which has a <code>body</code> method:</p>
+
+<pre><code>print $tx-&gt;res-&gt;body();
+</code></pre>
+
+<p>This will display the response body with its HTML contents. But, that&#39;s not really very interesting. But, we can do much more interesting and powerful things very easily with a Mojo response.</p>
+
+<h2>CSS Selectors</h2>
+
+<p>The <code>res</code> response object provides a <code>dom</code> object, that gives the ability to select parts of an HTML document using CSS selectors. So, if I have a document with a <code>#main</code> div, I can retrieve just the contents of that div using something like:</p>
+
+<pre><code>my $main = $tx-&gt;res-&gt;dom-&gt;find(&quot;#main&quot;);
+</code></pre>
+
+<p>Of course, if you&#39;re familiar with CSS selectors, you know it can be more precise than that. So, let&#39;s talk about something concrete. In my case, I have a couple of different types of page. One is a page of news items, which is lots of sections that are clearly delineated to a human reader, but they aren&#39;t in their own divs or otherwise grouped as far as the HTML parser can tell. They&#39;re just a bunch of vaguely similar shapes of HTML.</p>
+
+<p>I want to divide those news items out into their own individual pages, which can then be aggregated in whatever way I like, such as having them available in a paginated list or having the most recent items included in a div on the front page of the website.</p>
+
+<p>Those news items look something like this on the old site:</p>
+
+<pre><code>&lt;h1&gt;Latest News&lt;/h1&gt;
+
+&lt;h3&gt;Frobnitz 4.5 released&lt;/h3&gt;
+&lt;p&gt;
+This release improves castigation of the widely formed sonterols.
+&lt;br&gt;
+Current users may upgrade by applying coil oil to application points A, C, W, 
+DF, Y0, IN34, RS232, and Frank, then gently inserting the conjubilant apparatus
+into the ferulic treeble socket.
+&lt;/p&gt;
+&lt;p class=&quot;post-footer align-right&quot;&gt;
+&lt;span class=&quot;date&quot;&gt;December 2, 2018&lt;/span&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;Frobnitz 4.4 released&lt;/h3&gt;
+&lt;p&gt;
+This release is effulgent and wavering gently.
+&lt;br&gt;
+Becomes bees.
+&lt;/p&gt;
+&lt;p class=&quot;post-footer align-right&quot;&gt;
+&lt;span class=&quot;date&quot;&gt;November 30, 2018&lt;/span&gt;
+&lt;/p&gt;
+</code></pre>
+
+<p>Notice that the structure of this is regular but not selectable with any one div or piece of markup. I can use the selector <code>h3</code> to get the headings, but the text of each news item is just a paragraph, and we also want to grab the date separately.</p>
+
+<p>So, I want to grab all of the titles, and the paragraph following the title, and the date, and put them all into some sort of data structure so I can spit them out into pages of their own.</p>
+
+<p>Let&#39;s start with the titles, as it&#39;ll show a neat trick Mojo has up its sleeves.</p>
+
+<pre><code>my $main = $tx-&gt;res-&gt;dom-&gt;at(&#39;#main&#39;);
+my @headers = $main-&gt;find(&#39;h3&#39;)-&gt;map(&#39;text&#39;)-&gt;each;
+</code></pre>
+
+<p>Do you see it? The <code>find</code> method here is returning a <a href="https://mojolicious.org/perldoc/Mojo/Collection">Mojo::Collection</a>. &quot;Collection&quot; is kind of a fancy way to say &quot;list&quot;, but these lists have a bunch of useful utility methods, similar to some core Perl functions that operate on lists, as well as methods found in <code>List::Util</code>. It has the usual suspects, like <code>join</code>, <code>grep</code>, <code>map</code>, and <code>each</code>. So, collections are fancy, and they deserve a fancy name. In the above, <code>map</code> calls the method <code>text</code> on every item returned by <code>find</code> and <code>each</code> returns the results as a list.</p>
+
+<p>After this, <code>@headers</code> will contain all of the titles. There&#39;s no way I could do that as simply with regexes (and, we could have chained all of this, including finding <code>#main</code>, into one line, but I&#39;m re-using <code>#main</code> again so I put it into a variable).</p>
+
+<p>Now, an even trickier thing to do with regexes would be to find the immediately subsequent sibling of these headers. But, with Mojo::DOM, we can grab it with just a few more lines of code (there&#39;s probably a way to do it with even less code, but this is what I came up with in a few minutes of experimentation).</p>
+
+<pre><code>my @paras;
+for my $header ($main-&gt;find(&#39;h3&#39;)-&gt;each) {
+  push (@paras, $header-&gt;next-&gt;content);
+}
+</code></pre>
+
+<p>This, once again selects the <code>h3</code> elements, and iterates over the resulting collection of DOM objects, putting each one into <code>$header</code> as it loops. Then we pick out the <code>content</code> of the <code>next</code> element (which, in my case, is always a single paragraph, sometimes containing one or more <code>br</code> tags), and pushes them all into <code>@paras</code>.</p>
+
+<p>So, now we&#39;ve got an array of headers, an array of the following paragraphs, and we just need to get the dates. This one is actually very easy, because the HTML template marks the date using a <code>date</code> class.</p>
+
+<pre><code>my @dates = $main-&gt;find(&#39;.date&#39;)-&gt;map(&#39;text&#39;)-&gt;each;
+</code></pre>
+
+<p>Pow! We&#39;re done. OK, not quite. We&#39;ve yet to deliver on the &quot;munging&quot; part of the title of this post. We have the data from our crusty old HTML site, now let&#39;s do something with it.</p>
+
+<h2>Munging the Dates</h2>
+
+<p>As shown in the example Hugo content item above, I want to include a date in the metadata. Luckily, we have dates associated with each news item. Unluckily, they aren&#39;t in the format that Hugo expects. I did a little digging on the CPAN and found <a href="https://metacpan.org/pod/Time::Piece">Time::Piece</a>, which is a clever module that parses and converts times and dates in most common formats.</p>
+
+<p>I need my dates to look like <code>2017-09-30</code>, so I used the following code (assume this is inside a loop that&#39;s putting each subsequent date in the <code>@dates</code> array we made above into <code>$date</code>):</p>
+
+<pre><code>use Time::Piece;
+my $tp = Time::Piece-&gt;strptime($date, &quot;%B %d, %Y&quot;);
+my $fixed = $tp-&gt;strftime(&quot;%Y-%m-%d&quot;);
+</code></pre>
+
+<h2>Munging Into Markdown</h2>
+
+<p>I&#39;ll also need to convert to Markdown. I&#39;ve used <a href="https://metacpan.org/pod/HTML::WikiConverter">HTML::WikiConverter</a> for the task.</p>
+
+<p>In its simplest form, we could do something like this (again assuming we&#39;re in a loop where <code>$para</code> gets a value from <code>@paras</code> on each iteration:</p>
+
+<pre><code>use HTML::WikiConverter;
+my $wc = new HTML::WikiConverter(dialect =&gt; &#39;Markdown&#39;);
+my $md = $wc-&gt;html2wiki( $para );
+</code></pre>
+
+<p>Done!</p>
+
+<h2>Generating the Metadata</h2>
+
+<p>As we saw earlier, Hugo posts have metadata that precede the Markdown content, and contains information like author information, date of publication, description, etc. Some are optional, but some are mandatory (and I need dates so I can show the most recent news items on the front page of the new site). I need to automatically generate all of this based on the information I gathered from the original HTML.</p>
+
+<p>I&#39;m going to gloss over how the <code>@entries</code> data structure was built, but I will mention that it&#39;s an array of hashes containing the three pieces of data we found above. I&#39;ll also link to a GitHub repo with the real world code at the end, if you want to see the gritty details.</p>
+
+<pre><code>use Mojo::File;
+use String::Truncate qw(elide);
+
+for my $e (@entries) {
+  my $desc = elide($e-&gt;{&#39;text&#39;}, 100, {at_space =&gt; 1});
+  my $md = &lt;&lt;&quot;EOF&quot;;
+---
+title: &quot;$e-&gt;{&#39;title&#39;}&quot;
+date: $e-&gt;{&#39;date&#39;}
+description: &quot;$desc&quot;
+categories: []
+aliases: []
+toc: false
+draft: false
+---
+$e-&gt;{&#39;text&#39;}
+EOF
+
+  my $filename = lc $e-&gt;{&#39;title&#39;};
+  $filename =~ s/\s/-/g;
+  $filename =~ s/[!,()&#39;&quot;\/]//g;
+  my $file = Mojo::File-&gt;new(&quot;content/news/$filename.md&quot;);
+  $file-&gt;spurt($md);
+}
+</code></pre>
+
+<p>There&#39;s a lot going on here, and I&#39;ll only briefly explain some of it, since it&#39;s not Mojo-related.</p>
+
+<p>The first line of the loop creates a description, which is usually a summary or whatever. In my case, the main site will show the description as a clickable link, so the user will get a short summary of the news item on the main page, and then the ability to click it to see the whole item. I&#39;m using the <a href="https://metacpan.org/pod/String::Truncate">String::Truncate</a> module, which has an <code>elide</code> method that will truncate a string on word boundaries and add an ellipsis to indicate text was left out.</p>
+
+<p>Then, in the here document, I fill in all the metadata, using values from <code>$e</code>, each of which is just a reference to a hash. Then we write it to a file using the <code>spurt</code> method of <a href="https://mojolicious.org/perldoc/Mojo/File">Mojo::File</a>. That&#39;s it! When this is done in a loop over a page with any number of news items in the expected format, we get a bunch of nice new Hugo posts.</p>
+
+<p>In the interest of clarity and brevity (and because it&#39;s basic Perl and not Mojo-related) I&#39;ve left out the loops and building of the data structure that I used when generating metadata. If you want to see it all in one place, with some ugly bits to workaround broken dates and things that just don&#39;t work well in Markdown (like tables), you can see the code (still in progress, but nearly ready to migrate our cranky old site!) in the <a href="https://github.com/swelljoe/webmin-com-extractor">repository on GitHub</a>. I didn&#39;t make it pretty, because it only needs to run once, but it will do the job, and it didn&#39;t take much time to build, thanks to Mojolicious and a few other modules from the CPAN.</p>
+
+              </section>
+              <small><p>Banner image: <a href="https://flic.kr/p/Rqj9Jj">An eyeball looking at Dallas</a> by <a href="https://www.flickr.com/photos/nerdnomad/">Joe Cooper</a> licensed <a href="https://creativecommons.org/licenses/by-nc-sa/2.0/">CC BY-NC-SA 2.0</a></p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/css/">css</a>,
+                  <a href="/blog/tag/html/">html</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://s.gravatar.com/avatar/a8081467b81cb4bf3d22248cbb5b44c5">
+                      </div>
+                      <div class="about">
+                        <h5>Joe Cooper</h5>
+                        <p>Joe works on a lot of cranky old Perl, as well as a little bit of friendly modern Perl. Sometimes, he wrangles robots (but not with Perl...yet).</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/14/a-practical-example-of-mojo-dom/index.html" rel="prev"><strong>Previous Article</strong> Day 14: A Practical Example of Mojo::DOM</a></li>
+                  <li class="next"><a href="/blog/2018/12/16/browser-diet/index.html" rel="next"><strong>Next Article</strong> Day 16: A pre-Christmas Diet for Mojolicious - A Children&#39;s Story </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

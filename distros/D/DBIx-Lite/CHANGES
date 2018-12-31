@@ -1,184 +1,30 @@
 ==================================================
-Changes from 2016-02-15 00:00:00 +0000 to present.
+Changes from 2017-12-30 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.31 at 2017-02-14 09:15:38 +0000
+version 0.32 at 2018-12-30 20:05:29 +0000
 -----------------------------------------
 
-  Change: ffae2b880a96b6a1fb99af0b2fb02eeb62297c58
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2017-02-10 18:25:12 +0000
+  Change: 4176d124d7f8a214890300244f9383722d236a41
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-12-29 14:45:49 +0000
 
-    Implement CTEs and subqueries 
+    Add a DBIx::Lite::Row::db() method 
 
------------------------------------------
-version 0.30 at 2017-02-02 10:24:21 +0000
------------------------------------------
+  Change: 5e71ab2f9bdee754328dcf220b8e6bd12168d1c5
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-12-29 14:33:22 +0000
 
-  Change: a02475255b066890c6656857a2e43cb9462494ac
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2017-02-02 11:24:21 +0000
+    Bugfix: pk() did not accept a list of values as suggested by docs.
+    #17 
 
-    v0.30 
+  Change: 0affe3275dfb455997f295c661c83200a8b42c5d
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2018-12-29 14:32:50 +0000
 
-  Change: 39c83cafdcdb892efa987f7662c58140f150c305
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2017-02-01 15:42:13 +0000
-
-    Merge pull request #13 from manuelm/master
-
-    Verify if DBIx::Connector connection is successful 
-
-  Change: 3b0dd139c5bceff77ada89ac3fc4a0737d46ae3b
-  Author: Manuel Mausz <manuel@mausz.at>
-  Date : 2017-01-31 21:45:27 +0000
-
-    Verify if DBIx::Connector connection is successful
-
-    If `DBIx::Connector` connection fails (e.g. invalid password)
-    `$self->{connector}->dbh` is undefined, which results in a fatal
-    error inside `DBIx::Lite`. Make sure to verify the handle beforehand. 
-
-  Change: 1c1742bed6dafcc3acede1ebbf6cb7f5f1175fcb
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-12-06 19:28:33 +0000
-
-    Implement ->for() 
-
------------------------------------------
-version 0.29 at 2016-10-22 09:20:56 +0000
------------------------------------------
-
-  Change: 256a67a89e19729caf1e8b4437ec831cc3806cc4
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-10-22 11:20:56 +0000
-
-    v0.29 
-
-  Change: c98e15dc83bb5ae3c0e6c2163da4b8031075af87
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-10-22 11:16:39 +0000
-
-    Use the DEFAULT VALUES syntax for INSERT because Postgres doesn't
-    support empty VALUES () clause 
-
------------------------------------------
-version 0.28 at 2016-08-24 10:49:27 +0000
------------------------------------------
-
-  Change: 110292de87f68f7c3b0da93b12058fae700afec6
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-08-24 12:49:27 +0000
-
-    v0.28 
-
-  Change: ac69a1ab028881d51ad89a760f6d960ad6de8db2
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-08-17 20:17:30 +0000
-
-    New clear_search() and clear_join() methods 
-
------------------------------------------
-version 0.27 at 2016-07-25 12:34:02 +0000
------------------------------------------
-
-  Change: 378813df5fe5b94da7951751beff495aa035d93c
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-07-25 14:34:02 +0000
-
-    v0.27 
-
-  Change: 3458bbcb05fad7d58e23c3afab27264df8a26d50
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-07-25 14:33:10 +0000
-
-    Prepend me. to PKs when calling find() 
-
-  Change: 7cef706daea1a771ec5efa9682df2f91ffb08759
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-07-11 11:01:09 +0000
-
-    Document DBIx::Lite::Row::get() 
-
------------------------------------------
-version 0.26 at 2016-07-02 08:53:14 +0000
------------------------------------------
-
-  Change: 648f4f4e423be852236047a381feeaae20789348
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-07-02 10:53:14 +0000
-
-    Added where_sql() 
-
------------------------------------------
-version 0.25 at 2016-03-27 08:50:15 +0000
------------------------------------------
-
-  Change: 38256a69cf2ab60fcfb54ff0861f0c24cac4d881
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-03-27 10:50:15 +0000
-
-    v0.25 
-
-  Change: 85b8fd529d2409646510fafaad24c428150f4dac
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-03-25 15:53:35 +0000
-
-    Bugfix: driver_name was not correctly parsed 
-
-  Change: 039f0e16676d8faee32e69a42c31c537f05ea984
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-03-25 15:42:26 +0000
-
-    Merge branch 'master' of github.com:alexrj/DBIx-Lite 
-
-  Change: 160d48522cb456fe1b4889929722473c895406cc
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-02-29 19:27:16 +0000
-
-    Prevent deep recursion and return a meaningful error if the custom
-    Row class does not supply the configured storage method 
-
-  Change: b04e5a70b44584e77a398680da4c3c86b86bce9d
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-02-29 18:35:11 +0000
-
-    Handle single-argument form for insert_related() 
-
------------------------------------------
-version 0.24 at 2016-02-23 11:34:01 +0000
------------------------------------------
-
-  Change: a2ca2bb541446e569fd53206d188f5a4c7b35278
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-02-23 12:34:01 +0000
-
-    v0.24 
-
-  Change: e3490035ce5c7afb68f0744c26b6384bd3265efa
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-02-23 12:31:04 +0000
-
-    Use the 'me' table alias also for deletion in PostgreSQL and other
-    databases supporting it 
-
------------------------------------------
-version 0.23 at 2016-02-19 09:50:24 +0000
------------------------------------------
-
-  Change: a8e854181d6aed238c4a033737ff697403176953
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-02-19 10:50:24 +0000
-
-    v0.23 
-
-  Change: 5b223eec18ae2bbffeb64b16b711d0b3513a571d
-  Author: Alessandro Ranellucci <aar@cpan.org>
-  Date : 2016-02-18 23:57:20 +0000
-
-    Croak if the class storage method doesn't return a hashref 
+    Add .vscode to .gitignore 
 
 =================================================
-Plus 13 releases after 2016-02-15 00:00:00 +0000.
+Plus 22 releases after 2017-12-30 00:00:00 +0000.
 =================================================

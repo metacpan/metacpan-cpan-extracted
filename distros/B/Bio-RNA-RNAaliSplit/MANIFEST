@@ -19,7 +19,6 @@ share/aln/all.SL.YFVG.aln
 t/00-load.t
 t/01-prereq.t
 t/02-version.t
-t/10-WrapRscape.t
 t/11-WrapRNAalifold.t
 t/12-WrapRscape.t
 t/manifest.t

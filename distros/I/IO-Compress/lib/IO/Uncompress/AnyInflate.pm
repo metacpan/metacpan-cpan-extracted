@@ -6,22 +6,22 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.081 ();
+use IO::Compress::Base::Common  2.083 ();
 
-use IO::Uncompress::Adapter::Inflate  2.081 ();
+use IO::Uncompress::Adapter::Inflate  2.083 ();
 
 
-use IO::Uncompress::Base  2.081 ;
-use IO::Uncompress::Gunzip  2.081 ;
-use IO::Uncompress::Inflate  2.081 ;
-use IO::Uncompress::RawInflate  2.081 ;
-use IO::Uncompress::Unzip  2.081 ;
+use IO::Uncompress::Base  2.083 ;
+use IO::Uncompress::Gunzip  2.083 ;
+use IO::Uncompress::Inflate  2.083 ;
+use IO::Uncompress::RawInflate  2.083 ;
+use IO::Uncompress::Unzip  2.083 ;
 
 require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyInflateError);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 $AnyInflateError = '';
 
 @ISA = qw(IO::Uncompress::Base Exporter);
@@ -48,7 +48,7 @@ sub anyinflate
 
 sub getExtraParams
 {
-    use IO::Compress::Base::Common  2.081 qw(:Parse);
+    use IO::Compress::Base::Common  2.083 qw(:Parse);
     return ( 'rawinflate' => [Parse_boolean,  0] ) ;
 }
 
@@ -342,10 +342,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeOut => 0|1 >>
 
-When writing to a file or filehandle, set C<binmode> before writing to the
-file.
-
-Defaults to 0.
+This option is now a no-op. All files will be written  in binmode.
 
 =item C<< Append => 0|1 >>
 

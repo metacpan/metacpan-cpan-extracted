@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.035';
+our $VERSION = '2.036';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.035
+Version 2.036
 
 =cut
 
@@ -62,10 +62,10 @@ Version 2.035
 
     db-browser
 
-    db-browser [database-name, ...]
+    db-browser database-name, ...
 
 When the C<db-browser> is called with the argument C<-h|--help>, it shows a menu. The menu entry I<HELP> shows this
-documentation - see L</OPTIONS>.
+documentation - see L<OPTIONS>.
 
 If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin. The
 database is chosen automatically if only one database is available. With the C<SQLite> driver in use, the option
@@ -75,7 +75,7 @@ If C<db-browser> is called with arguments, the arguments are used as the availab
 
 =head2 SQLite
 
-    db-browser [-s|--search]
+    db-browser -s|--search
 
 C<db-browser> called with C<-s|--search> causes a new search for C<SQLite> databases instead of using the cached data.
 
@@ -87,13 +87,6 @@ Search and read in SQL databases: one can browse databases and their tables inte
 
 The database plugins bundled with C<App::DBBrowser> provide support for the DBI drivers C<DBD::SQLite>, C<DBD::mysql>,
 C<DBD::MariaDB> and C<DBD::Pg>. See L<App::DBBrowser::DB> how to write a database plugin.
-
-Before the output leading and trailing spaces are removed from the elements and spaces are squashed to a single
-white-space if the option I<squash_spaces> is enabled.
-
-The elements are right-justified if they look like a number else they are left-justified.
-
-See L<Term::TablePrint|Term::TablePrint/DESCRIPTION> for more details.
 
 =head1 NAVIGATION
 
@@ -127,6 +120,21 @@ chosen C<Ctrl-SpaceBar> chooses everything.
 To leave a "readline" in a C<WHERE> or a C<HAVING> substatement without entering anything enter the C<eof> control
 character (C<Ctrl-D> for *nix). Pressing only the C<Enter> key means entering an empty string.
 
+=head1 OUTPUT
+
+The elements are right-justified if they look like a number else they are left-justified.
+
+Leading and trailing spaces are removed from the elements and spaces are squashed to a single white-space if the option
+I<squash_spaces> is enabled.
+
+Tab characters (C<\t>) are replaces with a space.
+
+Vertical spaces (C<\v>) are squashed to two spaces
+
+Control characters, code points of the surrogate ranges and non-characters are removed.
+
+See also the option group L<Output>.
+
 =head1 MENUS
 
 =head2 Plugin Menu
@@ -157,7 +165,7 @@ Selecting the prompt line (the database name) opens a menu with this entries:
 
 =head4 Create Table
 
-Selecting I<CREATE Table> opens a sub-menu with this entries:
+Selecting I<Create Table> opens a sub-menu with this entries:
 
 =over
 
@@ -170,7 +178,7 @@ Create a table.
 Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
 data. In I<Settings> one can configure to how the data is parsed.
 
-See also L</Create>.
+See also L</Create Table>.
 
 =item From File
 
@@ -178,7 +186,7 @@ Like I<Copy and Paste> with the difference that the data is read from a chosen f
 
 =item Settings
 
-Selecting I<Settings> allows one to set the options described in option group L</Insert> for the current
+Selecting I<Settings> allows one to set the options described in option group L</Insert Into> for the current
 database.
 
 =back
@@ -196,24 +204,15 @@ database.
 
 This entry is available if a C<SQLite> database has attached databases.
 
-=head4 SQ File
-
-This menu entry is available if at least one of the sub-queries options is enabled.
-
-Selecting this entry allow one to edit the file with the saved statements. It is possible to add, remove and
-edit statements. Adding a statement can be done by entering a string via C<readline> or by choosing a statement from the
-list of the temporary saved statements. (The last 20 statements from a printed table are saved in memory until the current
-database goes out of scope).
-
 =head3 Tables
 
 Choosing a table leads to the I<SQL Menu>.
 
-=head3 SQ
+=head3 From(SQ)
 
-Choosing this entry allows one to enter a sub-query instead of table name.
+Choosing this entry allows one to enter a subquery instead of table name.
 
-This entry is available only if L<Subqueries as table> is enabled.
+This entry is available only if L</Subqueries as table> is enabled.
 
 =head3 Join
 
@@ -273,26 +272,28 @@ first column.
 
 Update records.
 
-If the option L<Subqueries as SET value> is enabled, one can use the result of a sub-queries as the value of C<SET>.
+See also L</Subqueries>
 
 =head4 Delete
 
 Delete records.
 
-=head3 The Sub Statements
+=head3 Print TABLE
 
-Use I<Print TABLE> to get the output from the formed statement.
+Select I<Print TABLE> to show the result from the formed statement on the screen.
+
+=head3 The Sub-Statements
 
 To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
+
+See also L</Subqueries>, L</Parentheses>, L</Operators>
 
 =over
 
 =item SELECT
 
-It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
-C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
-
-If the option I<Subqueries in SELECT> is enabled, it is possible to use a sub-query instead a column by selecting C<(Q>.
+Choose the required columns. It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If
+columns are marked with the C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
 
 =item AGGREGATE
 
@@ -302,17 +303,9 @@ Chosen aggregate functions are added automatically to the SELECT columns.
 
 =item WHERE
 
-If the option I<Subqueries in WHERE/HAVING> is enabled, one can use sub-queries on the left side of an operator by
-selecting C<(Q> and on the right side of an operator by selecting C<=(Q>.
-
-=item GROUP BY
-
-Chosen C<GROUP BY> columns are added automatically to the SELECT columns.
+=item GROUP BY Chosen C<GROUP BY> columns are added automatically to the SELECT columns.
 
 =item HAVING
-
-If the option I<Subqueries in WHERE/HAVING> is enabled, one can use sub-queries on the right side of an operator by
-selecting C<=(Q>.
 
 =item ORDER BY
 
@@ -334,28 +327,15 @@ The available scalar functions are:
 
 =head4 Truncate
 
-With C<SQLite> the function C<TRUNCATE> is a user-defined function which returns stringified values.
-
-    return sprintf "%.*f", $places, int( $number * 10 ** $places ) / 10 ** $places;
-
-When comparing in C<WHERE> or C<HAVING> clauses with numbers, take the non-truncated (original) value for the
-comparison.
-
-Also to get a numeric sort in an C<ORDER BY> clause use the non-truncated (original) values for the ordering.
-
 =head4 Bit_Length
 
-With C<SQLite> the function C<Bit_Length> is a user-defined function which uses the Perl builtin C<length>. To make
-C<length> return the number of bytes the C<bytes> pragma is C<use>d.
-
 =head4 Char_Length
-
-With C<SQLite> the function C<Char_Length> is a user-defined function which uses the Perl builtin C<length> to get the
-number of characters.
 
 =head3 Lk1
 
 Changing the I<lock> mode (C<Lk0>,C<Lk1>) resets the entire SQL.
+
+See option L</Lock>.
 
 =head1 OPTIONS
 
@@ -363,7 +343,7 @@ The options menu is called with C<db-browser -h>.
 
 =head2 HELP
 
-Show this Info.
+Show this documentation.
 
 =head2 Path
 
@@ -379,8 +359,8 @@ Choose the required database plugins.
 
 These driver specific I<DB Settings> are used as the default database settings.
 
-There is also in each L<Tables Menu> the entry I<Settings> to make database specific settings. If no database
-specific settings are set, these global (to the database plugin) I<DB Settings> are used.
+There is also in each L<Table Menu> the entry I<Settings> to make database specific settings. If no database specific
+settings are set, these global (to the database plugin) I<DB Settings> are used.
 
 User defined database plugins: it depends on the plugin which items are offered to set in each option and whether the
 selections made by the user are considered.
@@ -474,47 +454,78 @@ To disable the automatic limit set I<Auto Limit> to C<0>.
 
 =head3 Subqueries
 
-If at least one of the following sub-query options is enabled, the last 20 I<Print TABLE>-statements are saved
-temporary.
+Selecting a subquery menu-entry opens a subquery sub-menu which allows one the enter a subquery (I<Read-Line>).
 
-Available sub-queries: the statements saved in the L<SQ File> and the temporarily saved statements.
+If saved or temporary saved subqueries are available, its is also possible the select one of those subqueries instead of
+entering a subquery.
+
+A subquery can be saved or removed in the sub-menu which opens by selecting the prompt line of a subquery menu
+(I<Choose SQ:>).
+
+Temporary saved subqueries are the last subqueries entered previously in the subquery menu and the last statements
+printed with I<Print TABLE>.
 
 =over
 
-=item I<Subqueries in SELECT>
+=item Subqueries in SELECT
 
-Choose C<(Q> to add a query as a SELECT column.
+If this option is enabled, it is possible to add a subquery as a column in a C<SELECT> sub-statement by selecting
+C<(Q>.
 
-=item I<Subqueries in WHERE/HAVING>
+=item Subqueries in WHERE/HAVING
 
-Choose C<(Q> to use a query instead of a column in a C<WHERE> clause.
+C<WHERE>: If this option is enabled, one can use a subquery on the left side of an operator by selecting C<(Q> or/and
+on the right side of an operator by selecting C<=(Q>.
 
-Choose C<=(Q> to use a query as a value in a C<WHERE> or C<HAVING> clause.
+C<HAVING>: If this option is enabled, one can use a subquery on the right side of an operator by selecting C<=(Q>.
 
-=item I<Subqueries as SET value>
+=item Subqueries as SET value
 
-Choose C<=(Q> to use a query as a C<SET> value in an C<UPDATE>.
+If this option is enabled, one can choose C<=(Q> end enter/select a subquery as the C<SET> value in an C<UPDATE>.
 
-=item I<Subqueries as table>
+=item Subqueries as table
 
-Choose C<SQ> in the I<Tables Menu> to use a query instead of a table.
+If this option is enable, one can choose C<FROM(SQ)>. This allows one to enter/select a subquery which is then used as a
+derived table.
 
 =back
 
 =head3 I<Alias for complex columns>
 
-If enable, it is asked for an alias for columns with a function, for sub-queries, for joined tables and for unions. If
-entered nothing, no alias is added except for joined tables and unions which get a default alias.
+If enabled, it is asked for an alias. If entered nothing, no alias is added except for joined tables and unions and for
+derived tables which get then a default alias.
 
-=head3 I<Parentheses>
+=over
+
+=item Aggregate
+
+=item Functions
+
+=item Join
+
+=item Subqueries
+
+=item Union
+
+=back
+
+=head3 Parentheses
 
 Enable parentheses in C<WHERE> and/or C<HAVING> clauses.
 
 =head3 Identifiers
 
-- I<Qualified table names>: if set to C<YES> qualified table names are used in SQL statements.
+=over
 
-- I<Quote identifiers>:  if set to C<YES> SQL identifiers are quoted.
+=item Qualified table names
+
+If set to C<YES>, qualified table names are used in SQL statements.
+
+=item Quote identifiers
+
+If set to C<YES>, SQL identifiers are quoted.
+
+=back
 
 C<SQLite>:
 
@@ -592,14 +603,14 @@ If I<squash_spaces> is enabled, consecutive spaces are squashed to one space and
 Set the decimal separator. Numbers with a decimal separator are formatted as number if this option is set to the right
 value.
 
-Allowed values: a character with a print width of C<1>. If an invalid values is passed, I<decimal_separator> falls back
+Allowed values: a character with a print width of C<1>. If an invalid value is passed, I<decimal_separator> falls back
 to the default value (dot).
 
 =head3 Warnings
 
 Enable/disable C<File::Find> warnings when searching for C<SQLite> databases.
 
-=head2 Insert
+=head2 Insert Into
 
 =head3 Parse Tool
 
@@ -720,7 +731,7 @@ How to decode text files.
 
 Set how many input file names should be saved. A value of C<0> disables the file history.
 
-=head2 Create
+=head2 Create Table
 
 =head3 Data type guessing
 

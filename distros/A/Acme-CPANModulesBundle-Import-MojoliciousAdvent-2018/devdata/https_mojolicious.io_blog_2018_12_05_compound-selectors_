@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@briandfoy_perl" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2018/12/05/compound-selectors/" property="og:url">
+  <meta content="Day 5: Compound Selectors are Easier than Regexes" property="og:title">
+    <meta content="Extract HTML quickly and easily with Mojo::DOM" property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/05/compound-selectors/banner.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 5: Compound Selectors are Easier than Regexes - mojolicious.io</title>
+  <meta content="brian d foy" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 5: Compound Selectors are Easier than Regexes</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-05">Dec  5, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Sled dogs waiting to run" src="/blog/2018/12/05/compound-selectors/banner.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>When people tell me that I can&#39;t (they mean shouldn&#39;t) parse HTML with a regex, I say &quot;hold my beer&quot;. It isn&#39;t a matter of skill or attitude so much as convenience. Doing it the right way was not always so easy (I remember HTML 0.9 being a big deal). Lately, though, I&#39;ve been using <a href="https://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a> to do it for me. It&#39;s easier than the old, expedient way.</p>
+
+              </section>
+              <section id="section-2">
+                  <p>The trick was always to isolate the interesting HTML. I could do that excising all of the data around the interesting parts:</p>
+
+<pre><code>my $html = ...;
+$html =~ s/.*?&lt;table class=&quot;foo&quot;.*?&gt;//;
+$html =~ s/&lt;\/table&gt;.*//;
+</code></pre>
+
+<p>Now I don&#39;t have to parse all of HTML; I can think about the table. Even though that&#39;s expedient it&#39;s not so nice. Before I replace that with something nicer, I&#39;ll take a quick detour.</p>
+
+<h2>Cascading Style Sheets</h2>
+
+<p>You may know about Cascading Style Sheets (CSS) for making your web pages look beautiful (but not mine, really). You can add meta data to tags:</p>
+
+<pre><code>&lt;img id=&quot;bender&quot; class=&quot;robot&quot; src=&quot;...&quot; /&gt;
+&lt;img id=&quot;fry&quot; class=&quot;human&quot; src=&quot;...&quot; /&gt;
+&lt;img id=&quot;leela&quot; class=&quot;mutant&quot; src=&quot;...&quot; /&gt;
+</code></pre>
+
+<p>CSS rules can address these items by their ID or class to apply styles to them. This addressing is a &quot;selector&quot; and people with better skills than me use these to make the presentation pretty:</p>
+
+<pre><code>img#fry   { border: 1px; }
+
+img.robot { margin: 20px; }
+</code></pre>
+
+<p>The HTML can be a bit more complicated. Perhaps those interesting tags are in a list. That wraps another layer of HTML structure around the data:</p>
+
+<pre><code>&lt;ul class=&quot;employees&quot;&gt;
+&lt;li&gt;&lt;img id=&quot;bender&quot; class=&quot;robot&quot; src=&quot;...&quot; /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;img id=&quot;fry&quot; class=&quot;human&quot; src=&quot;...&quot; /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;img id=&quot;leela&quot; class=&quot;mutant&quot; src=&quot;...&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+
+<p>If I&#39;d like to affect only those images in that list but only the items in that list. I can specify the ancestry with a compound selector (two or more used together). With just a space between the selectors, this means that the second selector is contained in the first (a &quot;descendent&quot;):</p>
+
+<pre><code>ul.employees img.human { border: 1px; }
+
+ul.employees img.robot { margin: 20px; }
+</code></pre>
+
+<p>However, this article isn&#39;t about all the fancy things that you can do with selectors. You know that they exist and you can see the possibilities in <a href="https://mojolicious.org/perldoc/Mojo/DOM/CSS">Mojo::CSS::Selectors</a>. I&#39;ll show you a few examples in the next section.</p>
+
+<h2>Using Selectors with Mojo</h2>
+
+<p>But you can do much more with these. With <a href="https://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a>, which supports CSS Selectors <a href="https://www.w3.org/TR/2018/PR-selectors-3-20180911/">Level 3</a> (and some stuff from <a href="https://www.w3.org/TR/selectors-4/">Level 4</a>), you can use the same addressing to extract data.</p>
+
+<p>Start with some HTML. Note the fancy new <a href="https://www.effectiveperlprogramming.com/2016/12/strip-leading-spaces-from-here-docs-with-v5-26/">indented here doc syntax introduced in Perl 5.26</a>:</p>
+
+<pre><code>use v5.28;
+use utf8;
+use strict;
+use warnings;
+
+use Mojo::DOM;
+
+my $selector = $ARGV[0] // &#39;img&#39;;
+
+my $html =&lt;&lt;~&#39;HTML&#39;;
+
+    &lt;img id=&quot;farnworth &quot; class=&quot;human&quot; src=&quot;...&quot; /&gt;
+    &lt;ul class=&quot;employees&quot;&gt;
+    &lt;li&gt;&lt;img id=&quot;bender&quot; class=&quot;robot&quot; src=&quot;...&quot; /&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;img id=&quot;fry&quot; class=&quot;human&quot; src=&quot;...&quot; /&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;img id=&quot;leela&quot; class=&quot;mutant&quot; src=&quot;...&quot; /&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+    HTML
+
+my $dom = Mojo::DOM-&gt;new( $html );
+
+say $dom-&gt;find( $selector )-&gt;join( &quot;\n&quot; );
+</code></pre>
+
+<p>Run this with no argument and I see all the <code>img</code> tags:</p>
+
+<pre><code>$ perl html.pl
+&lt;img class=&quot;human&quot; id=&quot;farnworth &quot; src=&quot;...&quot;&gt;
+&lt;img class=&quot;robot&quot; id=&quot;bender&quot; src=&quot;...&quot;&gt;
+&lt;img class=&quot;human&quot; id=&quot;fry&quot; src=&quot;...&quot;&gt;
+&lt;img class=&quot;mutant&quot; id=&quot;leela&quot; src=&quot;...&quot;&gt;
+</code></pre>
+
+<p>With an argument I can choose any part that I like. Here I get the parts starting with the <code>li</code> tag:</p>
+
+<pre><code>$ perl html.pl li
+&lt;li&gt;&lt;img class=&quot;robot&quot; id=&quot;bender&quot; src=&quot;...&quot;&gt;&lt;/li&gt;
+&lt;li&gt;&lt;img class=&quot;human&quot; id=&quot;fry&quot; src=&quot;...&quot;&gt;&lt;/li&gt;
+&lt;li&gt;&lt;img class=&quot;mutant&quot; id=&quot;leela&quot; src=&quot;...&quot;&gt;&lt;/li&gt;
+</code></pre>
+
+<p>I can select all the images with a certain class:</p>
+
+<pre><code>$ perl html.pl img.human
+&lt;img class=&quot;human&quot; id=&quot;farnworth &quot; src=&quot;...&quot;&gt;
+&lt;img class=&quot;human&quot; id=&quot;fry&quot; src=&quot;...&quot;&gt;
+</code></pre>
+
+<p>But what if I wanted just the human images in the list? I have to work a little bit harder. I specify a compound selector that notes that the <code>img</code> has to be in an <code>li</code> tag:</p>
+
+<pre><code>$ perl html.pl &quot;li img.human&quot;
+&lt;img class=&quot;human&quot; id=&quot;fry&quot; src=&quot;...&quot;&gt;
+</code></pre>
+
+<p>Imagine, then, more complicated HTML with other lists that also had images? I could add another selector to say it has to be in a certain sort of <code>ul</code> tag:</p>
+
+<pre><code>$ perl html.pl &quot;ul.employees li img.human&quot;
+&lt;img class=&quot;human&quot; id=&quot;fry&quot; src=&quot;...&quot;&gt;
+</code></pre>
+
+<p>If nothing should be between those tags. I can connect the selector with <code>&gt;</code> to mean those should be immediate children instead of descendants:</p>
+
+<pre><code>$ perl html.pl &quot;ul.employees &gt; li &gt; img.human&quot;
+&lt;img class=&quot;human&quot; id=&quot;fry&quot; src=&quot;...&quot;&gt;
+</code></pre>
+
+<p>Now, consider how much work I&#39;ve done there. Almost nothing. I made a DOM object, applied a selector, and I&#39;ve isolated parts of the data. This is the same thing I was doing the hard way before. This way is better and isn&#39;t more work. That&#39;s why I like Mojolicious!</p>
+
+<h2>How about those new emojis?</h2>
+
+<p>While writing about the <a href="https://www.effectiveperlprogramming.com/2018/08/find-the-new-emojis-in-perls-unicode-support/">Unicode 9 updates in Perl v5.26</a>, I wondered what I could show that might be interesting. How about figuring out which new emoji showed up?</p>
+
+<p>My first attempt simply trawled through every character and compared the various Unicode properties to see which code numbers changed from <code>Unassigned</code> to <code>Present_In</code>. That was fine, but then I found that someone was already listing all the new emoji and I could scrape their site.</p>
+
+<p>I won&#39;t explain everything in this program. Trust me that it uses <a href="https://mojolicious.org/perldoc/Mojo/UserAgent">Mojo::UserAgent</a> to fetch the data, extracts the DOM, and finds the text I want by using the compound selector <code>ul:not( [class] ) li a</code>. The rest is merely transforms on that extracted list. Those <code>map</code>s and the <code>join</code> come from <a href="https://mojolicious.org/perldoc/Mojo/Collection">Mojo::Collection</a>. This is much easier than trying to do this with regexes:</p>
+
+<pre><code>use v5.28;
+use utf8;
+use strict;
+use warnings;
+use open qw(:std :utf8);
+use charnames qw();
+
+use Mojo::UserAgent;
+my $ua = Mojo::UserAgent-&gt;new;
+
+my $url = &#39;https://blog.emojipedia.org/new-unicode-9-emojis/&#39;;
+my $tx = $ua-&gt;get( $url );
+
+die &quot;That didn&#39;t work!\n&quot; if $tx-&gt;error;
+
+say $tx-&gt;result
+    -&gt;dom
+    -&gt;find( &#39;ul:not( [class] ) li a&#39; )
+    -&gt;map( &#39;text&#39; )
+    -&gt;map( sub {
+        my $c = substr $_, 0, 1;
+        [ $c, ord($c), charnames::viacode( ord($c) ) ]
+        })
+    -&gt;sort( sub { $a-&gt;[1] &lt;=&gt; $b-&gt;[1] } )
+    -&gt;map( sub {
+        sprintf &#39;%s (U+%05X) %s&#39;, $_-&gt;@*
+        } )
+    -&gt;join( &quot;\n&quot; );
+</code></pre>
+
+<p>This makes a nice list that starts like this:</p>
+
+<pre><code>ðº (U+1F57A) MAN DANCING
+ð¤ (U+1F5A4) BLACK HEART
+ð (U+1F6D1) OCTAGONAL SIGN
+ð (U+1F6D2) SHOPPING TROLLEY
+ð´ (U+1F6F4) SCOOTER
+ðµ (U+1F6F5) MOTOR SCOOTER
+ð¶ (U+1F6F6) CANOE
+</code></pre>
+
+<p>I used the same program to find <a href="https://www.effectiveperlprogramming.com/2018/08/use-unicode-10-in-perl-v5-28/">the Unicode 10 updates in v5.28</a> too.</p>
+
+<h2>Extracting columns from a table</h2>
+
+<p>Not impressed yet? How about slicing a table with CSS Selectors? Here&#39;s a short table that has ID, name, and score columns. I want to sum all of the scores.</p>
+
+<p>I&#39;m not afraid of doing with this with regexes (emphasize plural there!) but it&#39;s easier with <a href="https://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a>. The compound selector finds the table by its class, selects each row, and addresses the table cell by position (in this case, <code>:last-child</code>):</p>
+
+<pre><code>use v5.26;
+use utf8;
+use strict;
+use warnings;
+
+use List::Util qw(sum);
+use Mojo::DOM;
+
+my $html = &lt;&lt;~&#39;HTML&#39;;
+    &lt;table class=&quot;scores&quot;&gt;
+    &lt;tr&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Score&lt;/th&gt;&lt;/tr&gt;
+
+    &lt;tr&gt;&lt;td&gt;1&lt;/td&gt; &lt;td&gt;Nibbler&lt;/td&gt; &lt;td&gt;1023&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;27&lt;/td&gt;&lt;td&gt;Scruffy&lt;/td&gt; &lt;td&gt;39&lt;/td&gt;  &lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;5&lt;/td&gt; &lt;td&gt;Zoidberg&lt;/td&gt;&lt;td&gt;5834&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+    HTML
+
+my @scores = Mojo::DOM-&gt;new( $html )
+    -&gt;find( &#39;table.scores &gt; tr &gt; td:last-child&#39; )
+    -&gt;map( &#39;text&#39; )
+    -&gt;each
+    ;
+
+my $grand = sum( @scores );
+say &quot;Grand total: $grand&quot;;
+</code></pre>
+
+<p><em style="font-size: 10px">
+Editor&#39;s note: Unfortunately this example breaks our syntax highlighter. This is the site&#39;s fault not the author. We&#39;re trying to find a better way to render it short of rewriting the rendering engine.
+</em></p>
+
+<h2>Conclusion</h2>
+
+<p>Even for an old programmer like me, dealing with HTML through CSS Selectors applied by Mojolicious is much easier than what I was doing before (which was dirty and much easier than doing it correctly). With a little skill creating compound selectors, I can get to just about any part I want.</p>
+
+              </section>
+              <small><p><a class="external text" href="https://www.flickr.com/photos/feuilllu/101083313/in/photolist-9W5xK-SWEcv6-qmMqBb-9W66e-umaBj-7Gkg2a-bnmWDf-jZPHK7-bAgNFi-bnmW3J-Hd8y3-dYNuYc-Hd9o9-22MW7qW-6qZWkL-7yzScF-24W5o6o-bBNUMi-5QPxcD-boz5qm-VmkEd7-bBeNyD-5ZuaNe-eFvSS-5ZubhH-hroLWM-dyiEjD-7x18L-6qVKL2-5BtJpc-Tat77P-V2rCfA-HdcdK-bpyFMR-qmUynZ-bBtZU6-zYsqAQ-bBNVia-RSZkN5-Hd8zq-bBtY8M-4okvTd-bBeMZz-EnynD-feMXov-qUSFPR-boTZGE-9mfjyh-9e8KsD-kspqik" rel="nofollow">Image</a> by <a href="https://www.flickr.com/photos/feuilllu/">Pierre Metivier</a> <a href="https://creativecommons.org/licenses/by-sa/2.0" title="Creative Commons Attribution-Share Alike 2.0">CC BY-SA 2.0</a></p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/promises/">promises</a>,
+                  <a href="/blog/tag/advent/">advent</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/168427dea0a034607ee7850f3de98ea2.jpg">
+                      </div>
+                      <div class="about">
+                        <h5>brian d foy</h5>
+                        <p><a href="http://www252.pair.com/~comdog/">brian d foy</a> is the author of <a href="https://www.masteringperl.org/">Mastering Perl</a> and <a href="https://www.learningperl6.com/">Learning Perl 6</a>, and the co-author of <a href="https://www.learning-perl.com/">Learning Perl</a>, <a href="https://www.intermediateperl.com">Intermediate Perl</a>, <a href="https://www.programmingperl.org/">Programming Perl</a>, and <a href="https://www.effectiveperlprogramming.com/">Effective Perl Programming</a>.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/04/testing-hooks-and-helpers/index.html" rel="prev"><strong>Previous Article</strong> Day 4: Testing Hooks and Helpers</a></li>
+                  <li class="next"><a href="/blog/2018/12/06/making-a-list-with-yancy/index.html" rel="next"><strong>Next Article</strong> Day 6: Making A List with Yancy </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

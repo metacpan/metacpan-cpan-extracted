@@ -12,7 +12,7 @@ use Scalar::Util;
 use Type::Library -base;
 use Type::Utils -all;
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 extends 'Types::Standard';
 extends 'Types::Common::Numeric';
@@ -454,7 +454,7 @@ Data::Object::Library - Type Library for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -466,9 +466,7 @@ Data::Object::Library is a L<Type::Tiny> type library that extends the
 L<Types::Standard>, L<Types::Common::Numeric>, and L<Types::Common::String>
 libraries and adds type constraints and coercions for L<Data::Object> objects.
 
-=head1 TYPES
-
-=head2 Any
+=type Any
 
   has data => (
     is  => 'rw',
@@ -481,7 +479,7 @@ used to throw an exception is the argument can not be validated. The C<is_Any>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 AnyObj
+=type AnyObj
 
   has data => (
     is  => 'rw',
@@ -494,7 +492,7 @@ C<assert_AnyObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_AnyObj> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 AnyObject
+=type AnyObject
 
   has data => (
     is  => 'rw',
@@ -507,7 +505,7 @@ C<assert_AnyObject> function can be used to throw an exception if the argument c
 not be validated. The C<is_AnyObject> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 ArrayObj
+=type ArrayObj
 
   has data => (
     is  => 'rw',
@@ -520,7 +518,7 @@ C<assert_ArrayObj> function can be used to throw an exception if the argument ca
 not be validated. The C<is_ArrayObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 ArrayObject
+=type ArrayObject
 
   has data => (
     is  => 'rw',
@@ -533,7 +531,7 @@ C<assert_ArrayObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_ArrayObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 ArrayRef
+=type ArrayRef
 
   has data => (
     is  => 'rw',
@@ -546,7 +544,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_ArrayRef> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Bool
+=type Bool
 
   has data => (
     is  => 'rw',
@@ -559,7 +557,7 @@ used to throw an exception if the argument can not be validated. The C<is_Bool>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 ClassName
+=type ClassName
 
   has data => (
     is  => 'rw',
@@ -572,7 +570,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_ClassName> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 CodeObj
+=type CodeObj
 
   has data => (
     is  => 'rw',
@@ -585,7 +583,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_CodeObj> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 CodeObject
+=type CodeObject
 
   has data => (
     is  => 'rw',
@@ -598,7 +596,7 @@ C<assert_CodeObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_CodeObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 CodeRef
+=type CodeRef
 
   has data => (
     is  => 'rw',
@@ -611,7 +609,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_CodeRef> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 ConsumerOf
+=type ConsumerOf
 
   has data => (
     is  => 'rw',
@@ -624,7 +622,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_ConsumerOf> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 Defined
+=type Defined
 
   has data => (
     is  => 'rw',
@@ -637,7 +635,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_Defined> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 Dict
+=type Dict
 
   has data => (
     is  => 'rw',
@@ -650,7 +648,7 @@ used to throw an exception if the argument can not be validated. The C<is_Dict>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Enum
+=type Enum
 
   has data => (
     is  => 'rw',
@@ -663,7 +661,7 @@ used to throw an exception if the argument can not be validated. The C<is_Enum>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 FileHandle
+=type FileHandle
 
   has data => (
     is  => 'rw',
@@ -676,7 +674,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_FileHandle> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 FloatObj
+=type FloatObj
 
   has data => (
     is  => 'rw',
@@ -689,7 +687,7 @@ C<assert_FloatObj> function can be used to throw an exception if the argument ca
 not be validated. The C<is_FloatObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 FloatObject
+=type FloatObject
 
   has data => (
     is  => 'rw',
@@ -702,7 +700,7 @@ C<assert_FloatObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_FloatObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 GlobRef
+=type GlobRef
 
   has data => (
     is  => 'rw',
@@ -715,7 +713,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_GlobRef> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 HasMethods
+=type HasMethods
 
   has data => (
     is  => 'rw',
@@ -728,7 +726,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_HasMethods> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 HashObj
+=type HashObj
 
   has data => (
     is  => 'rw',
@@ -741,7 +739,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_HashObj> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 HashObject
+=type HashObject
 
   has data => (
     is  => 'rw',
@@ -754,7 +752,7 @@ C<assert_HashObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_HashObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 HashRef
+=type HashRef
 
   has data => (
     is  => 'rw',
@@ -767,7 +765,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_HashRef> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 InstanceOf
+=type InstanceOf
 
   has data => (
     is  => 'rw',
@@ -780,7 +778,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_InstanceOf> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 Int
+=type Int
 
   has data => (
     is  => 'rw',
@@ -793,7 +791,7 @@ used to throw an exception if the argument can not be validated. The C<is_Int>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 IntObj
+=type IntObj
 
   has data => (
     is  => 'rw',
@@ -806,7 +804,7 @@ C<assert_IntObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_IntObj> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 IntObject
+=type IntObject
 
   has data => (
     is  => 'rw',
@@ -819,7 +817,7 @@ C<assert_IntObject> function can be used to throw an exception if the argument c
 not be validated. The C<is_IntObject> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 IntegerObj
+=type IntegerObj
 
   has data => (
     is  => 'rw',
@@ -832,7 +830,7 @@ C<assert_IntegerObj> function can be used to throw an exception if the argument
 can not be validated. The C<is_IntegerObj> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 IntegerObject
+=type IntegerObject
 
   has data => (
     is  => 'rw',
@@ -845,7 +843,7 @@ C<assert_IntegerObject> function can be used to throw an exception if the argume
 can not be validated. The C<is_IntegerObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 Item
+=type Item
 
   has data => (
     is  => 'rw',
@@ -858,7 +856,7 @@ used to throw an exception if the argument can not be validated. The C<is_Item>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 LaxNum
+=type LaxNum
 
   has data => (
     is  => 'rw',
@@ -871,7 +869,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_LaxNum> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 LowerCaseSimpleStr
+=type LowerCaseSimpleStr
 
   has data => (
     is  => 'rw',
@@ -885,7 +883,7 @@ argument can not be validated. The C<is_LowerCaseSimpleStr> function can be used
 to return true or false if the argument can not be validated.
 information.
 
-=head2 LowerCaseStr
+=type LowerCaseStr
 
   has data => (
     is  => 'rw',
@@ -898,7 +896,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Map
+=type Map
 
   has data => (
     is  => 'rw',
@@ -911,7 +909,7 @@ used to throw an exception if the argument can not be validated. The C<is_Map>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Maybe
+=type Maybe
 
   has data => (
     is  => 'rw',
@@ -924,7 +922,7 @@ used to throw an exception if the argument can not be validated. The C<is_Maybe>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 NegativeInt
+=type NegativeInt
 
   has data => (
     is  => 'rw',
@@ -937,7 +935,7 @@ C<assert_NegativeInt> function can be used to throw an exception if the argument
 can not be validated. The C<is_NegativeInt> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 NegativeNum
+=type NegativeNum
 
   has data => (
     is  => 'rw',
@@ -950,7 +948,7 @@ C<assert_NegativeNum> function can be used to throw an exception if the argument
 can not be validated. The C<is_NegativeNum> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 NegativeOrZeroInt
+=type NegativeOrZeroInt
 
   has data => (
     is  => 'rw',
@@ -964,7 +962,7 @@ argument can not be validated. The C<is_NegativeOrZeroInt> function can be used 
 return true or false if the argument can not be validated.
 information.
 
-=head2 NegativeOrZeroNum
+=type NegativeOrZeroNum
 
   has data => (
     is  => 'rw',
@@ -978,7 +976,7 @@ be validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 information.
 
-=head2 NonEmptySimpleStr
+=type NonEmptySimpleStr
 
   has data => (
     is  => 'rw',
@@ -992,7 +990,7 @@ be validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 information.
 
-=head2 NonEmptyStr
+=type NonEmptyStr
 
   has data => (
     is  => 'rw',
@@ -1005,7 +1003,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_type> function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Num
+=type Num
 
   has data => (
     is  => 'rw',
@@ -1018,7 +1016,7 @@ used to throw an exception if the argument can not be validated. The C<is_Num>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 NumObj
+=type NumObj
 
   has data => (
     is  => 'rw',
@@ -1031,7 +1029,7 @@ C<assert_NumObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_NumObj> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 NumObject
+=type NumObject
 
   has data => (
     is  => 'rw',
@@ -1044,7 +1042,7 @@ C<assert_NumObject> function can be used to throw an exception if the argument c
 not be validated. The C<is_NumObject> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 NumberObj
+=type NumberObj
 
   has data => (
     is  => 'rw',
@@ -1057,7 +1055,7 @@ C<assert_NumberObj> function can be used to throw an exception if the argument c
 not be validated. The C<is_NumberObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 NumberObject
+=type NumberObject
 
   has data => (
     is  => 'rw',
@@ -1070,7 +1068,7 @@ C<assert_NumberObject> function can be used to throw an exception if the argumen
 can not be validated. The C<is_NumberObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 NumericCode
+=type NumericCode
 
   has data => (
     is  => 'rw',
@@ -1083,7 +1081,7 @@ C<assert_NumericCode> function can be used to throw an exception if the argument
 can not be validated. The C<is_NumericCode> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 Object
+=type Object
 
   has data => (
     is  => 'rw',
@@ -1096,7 +1094,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_Object> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 OptList
+=type OptList
 
   has data => (
     is  => 'rw',
@@ -1109,7 +1107,7 @@ can be used to throw an exception if the argument can not be validated. The
 C<is_OptList> function can be used to return true or false if the argument can not
 be validated.
 
-=head2 Optional
+=type Optional
 
   has data => (
     is  => 'rw',
@@ -1122,7 +1120,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_Optional> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Overload
+=type Overload
 
   has data => (
     is  => 'rw',
@@ -1135,7 +1133,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_Overload> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Password
+=type Password
 
   has data => (
     is  => 'rw',
@@ -1148,7 +1146,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_Password> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 PositiveInt
+=type PositiveInt
 
   has data => (
     is  => 'rw',
@@ -1161,7 +1159,7 @@ C<assert_PositiveInt> function can be used to throw an exception if the argument
 can not be validated. The C<is_PositiveInt> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 PositiveNum
+=type PositiveNum
 
   has data => (
     is  => 'rw',
@@ -1174,7 +1172,7 @@ C<assert_PositiveNum> function can be used to throw an exception if the argument
 can not be validated. The C<is_PositiveNum> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 PositiveOrZeroInt
+=type PositiveOrZeroInt
 
   has data => (
     is  => 'rw',
@@ -1188,7 +1186,7 @@ argument can not be validated. The C<is_PositiveOrZeroInt> function can be used 
 return true or false if the argument can not be validated.
 information.
 
-=head2 PositiveOrZeroNum
+=type PositiveOrZeroNum
 
   has data => (
     is  => 'rw',
@@ -1202,7 +1200,7 @@ be validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 information.
 
-=head2 Ref
+=type Ref
 
   has data => (
     is  => 'rw',
@@ -1215,7 +1213,7 @@ used to throw an exception if the argument can not be validated. The C<is_type>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 RegexpObj
+=type RegexpObj
 
   has data => (
     is  => 'rw',
@@ -1228,7 +1226,7 @@ C<assert_RegexpObj> function can be used to throw an exception if the argument c
 not be validated. The C<is_RegexpObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 RegexpObject
+=type RegexpObject
 
   has data => (
     is  => 'rw',
@@ -1241,7 +1239,7 @@ C<assert_RegexpObject> function can be used to throw an exception if the argumen
 can not be validated. The C<is_RegexpObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 RegexpRef
+=type RegexpRef
 
   has data => (
     is  => 'rw',
@@ -1254,7 +1252,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_RegexpRef> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 RoleName
+=type RoleName
 
   has data => (
     is  => 'rw',
@@ -1267,7 +1265,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_RoleName> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 ScalarObj
+=type ScalarObj
 
   has data => (
     is  => 'rw',
@@ -1280,7 +1278,7 @@ C<assert_ScalarObj> function can be used to throw an exception if the argument c
 not be validated. The C<is_ScalarObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 ScalarObject
+=type ScalarObject
 
   has data => (
     is  => 'rw',
@@ -1293,7 +1291,7 @@ C<assert_ScalarObject> function can be used to throw an exception if the argumen
 can not be validated. The C<is_ScalarObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 ScalarRef
+=type ScalarRef
 
   has data => (
     is  => 'rw',
@@ -1306,7 +1304,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_ScalarRef> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 SimpleStr
+=type SimpleStr
 
   has data => (
     is  => 'rw',
@@ -1319,7 +1317,7 @@ C<assert_SimpleStr> function can be used to throw an exception if the argument c
 not be validated. The C<is_SimpleStr> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 SingleDigit
+=type SingleDigit
 
   has data => (
     is  => 'rw',
@@ -1332,7 +1330,7 @@ C<assert_SingleDigit> function can be used to throw an exception if the argument
 can not be validated. The C<is_SingleDigit> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 Str
+=type Str
 
   has data => (
     is  => 'rw',
@@ -1345,7 +1343,7 @@ used to throw an exception if the argument can not be validated. The C<is_Str>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 StrMatch
+=type StrMatch
 
   has data => (
     is  => 'rw',
@@ -1358,7 +1356,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_StrMatch> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 StrObj
+=type StrObj
 
   has data => (
     is  => 'rw',
@@ -1371,7 +1369,7 @@ C<assert_StrObj> function can be used to throw an exception if the argument can
 not be validated. The C<is_StrObj> function can be used to return true or false if
 the argument can not be validated.
 
-=head2 StrObject
+=type StrObject
 
   has data => (
     is  => 'rw',
@@ -1384,7 +1382,7 @@ C<assert_StrObject> function can be used to throw an exception if the argument c
 not be validated. The C<is_StrObject> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 StrictNum
+=type StrictNum
 
   has data => (
     is  => 'rw',
@@ -1397,7 +1395,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_StrictNum> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 StringObj
+=type StringObj
 
   has data => (
     is  => 'rw',
@@ -1410,7 +1408,7 @@ C<assert_StringObj> function can be used to throw an exception if the argument c
 not be validated. The C<is_StringObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 StringObject
+=type StringObject
 
   has data => (
     is  => 'rw',
@@ -1423,7 +1421,7 @@ C<assert_StringObject> function can be used to throw an exception if the argumen
 can not be validated. The C<is_StringObject> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 StrongPassword
+=type StrongPassword
 
   has data => (
     is  => 'rw',
@@ -1436,7 +1434,7 @@ C<assert_StrongPassword> function can be used to throw an exception if the
 argument can not be validated. The C<is_StrongPassword> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 Tied
+=type Tied
 
   has data => (
     is  => 'rw',
@@ -1449,7 +1447,7 @@ used to throw an exception if the argument can not be validated. The C<is_Tied>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Tuple
+=type Tuple
 
   has data => (
     is  => 'rw',
@@ -1462,7 +1460,7 @@ used to throw an exception if the argument can not be validated. The C<is_Tuple>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 Undef
+=type Undef
 
   has data => (
     is  => 'rw',
@@ -1475,7 +1473,7 @@ used to throw an exception if the argument can not be validated. The C<is_Undef>
 function can be used to return true or false if the argument can not be
 validated.
 
-=head2 UndefObj
+=type UndefObj
 
   has data => (
     is  => 'rw',
@@ -1488,7 +1486,7 @@ C<assert_UndefObj> function can be used to throw an exception if the argument ca
 not be validated. The C<is_UndefObj> function can be used to return true or false
 if the argument can not be validated.
 
-=head2 UndefObject
+=type UndefObject
 
   has data => (
     is  => 'rw',
@@ -1501,7 +1499,7 @@ C<assert_UndefObject> function can be used to throw an exception if the argument
 can not be validated. The C<is_UndefObject> function can be used to return true or
 false if the argument can not be validated.
 
-=head2 UniversalObj
+=type UniversalObj
 
   has data => (
     is  => 'rw',
@@ -1514,7 +1512,7 @@ C<assert_UniversalObj> function can be used to throw an exception if the argumen
 can not be validated. The C<is_UniversalObj> function can be used to return true
 or false if the argument can not be validated.
 
-=head2 UniversalObject
+=type UniversalObject
 
   has data => (
     is  => 'rw',
@@ -1527,7 +1525,7 @@ C<assert_UniversalObject> function can be used to throw an exception if the
 argument can not be validated. The C<is_UniversalObject> function can be used to
 return true or false if the argument can not be validated.
 
-=head2 UpperCaseSimpleStr
+=type UpperCaseSimpleStr
 
   has data => (
     is  => 'rw',
@@ -1541,7 +1539,7 @@ argument can not be validated. The C<is_UpperCaseSimpleStr> function can be used
 to return true or false if the argument can not be validated.
 information.
 
-=head2 UpperCaseStr
+=type UpperCaseStr
 
   has data => (
     is  => 'rw',
@@ -1554,7 +1552,7 @@ function> can be used to throw an exception if the argument can not be
 validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 
-=head2 Value
+=type Value
 
   has data => (
     is  => 'rw',
@@ -1655,7 +1653,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

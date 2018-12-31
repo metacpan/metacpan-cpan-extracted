@@ -1,4 +1,4 @@
-Unicode/Collate version 1.25
+Unicode/Collate version 1.26
 ===============================
 
 NAME
@@ -109,7 +109,7 @@ HOW TO CHANGE DUCET (NOT WARRANTED)
 AUTHOR, COPYRIGHT AND LICENSE
 
 The Unicode::Collate module for perl was written by SADAHIRO Tomoyuki,
-<SADAHIRO@cpan.org>. This module is Copyright(C) 2001-2017,
+<SADAHIRO@cpan.org>. This module is Copyright(C) 2001-2018,
 SADAHIRO Tomoyuki. Japan. All rights reserved.
 
 This module is free software; you can redistribute it and/or

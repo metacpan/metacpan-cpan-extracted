@@ -1,9 +1,7 @@
 package NetPacket::ARP;
-BEGIN {
-  $NetPacket::ARP::AUTHORITY = 'cpan:YANICK';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble ARP (Address Resolution Protocol) packets.
-$NetPacket::ARP::VERSION = '1.6.0';
+$NetPacket::ARP::VERSION = '1.7.0';
 use strict;
 use warnings;
 
@@ -102,8 +100,9 @@ sub decode {
 # packets contain no encapsulated data.
 #
 
-undef &arp_strip;
-*arp_strip = \&strip;
+sub arp_strip {
+  goto \&strip;
+}
 
 sub strip {
     return undef;
@@ -129,7 +128,7 @@ NetPacket::ARP - Assemble and disassemble ARP (Address Resolution Protocol) pack
 
 =head1 VERSION
 
-version 1.6.0
+version 1.7.0
 
 =head1 SYNOPSIS
 

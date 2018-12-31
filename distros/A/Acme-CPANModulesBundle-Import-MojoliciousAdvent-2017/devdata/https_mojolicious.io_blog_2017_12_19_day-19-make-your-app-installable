@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@joelaberger" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/19/day-19-make-your-app-installable/" property="og:url">
+  <meta content="Day 19: Make Your App Installable" property="og:title">
+    <meta content="A few simple changes to make your application installable." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/19/day-19-make-your-app-installable/container_ship.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 19: Make Your App Installable - mojolicious.io</title>
+  <meta content="Joel Berger" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 19: Make Your App Installable</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-19">Dec 19, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Container ship loading at the dock" src="/blog/2017/12/19/day-19-make-your-app-installable/container_ship.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>Thus far we have always run our applications from the local directory.
+That is usually the project root directory and/or the repository checkout.
+But did you know that with only a few changes you can make your application installable like other Perl modules?</p>
+
+<p>While, you must do this if you want to upload your application to CPAN, even if you don&#39;t intend to do that, it still has benefits.
+You can install the application on your personal computer, especially if you want to be able to run the script while in other directories.
+Having an installable module also means that you can use a so-called &quot;DarkPAN&quot; and related tools to build yourself a local &quot;CPAN&quot;.
+If you have multiple Perl modules at your company (or as part of any project) using a DarkPAN can ease integration and deployment immensely!
+N.B. there is even a DarkPAN tool written using Mojolicious called <a href="https://metacpan.org/pod/App::opan">opan</a>.</p>
+
+<p>And hey if you needed even more more reason, it cleans up your project root directory somewhat too!</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>The Challenge</h2>
+
+<p>The hardest part of this process is managing static files.
+There are several Perl install tools that each handle static files slightly differently.
+Some will happily bundle any files in the project directory, others will only bundle Perl files by default.</p>
+
+<p>Then once installed that bundle location is usually different that what it was during development (even relative to the project).
+It can be a challenge to make it so that you application can find those file both during development and after installation.</p>
+
+<h2>TIMTOWTDI</h2>
+
+<p>Before we get started, I should mention that there are many ways to accomplish this task.
+If your application small and already located in a <code>script</code> directory and has no external static files, you&#39;re probably already done!
+That isn&#39;t the case for most applications of any real size, however.</p>
+
+<p>If you&#39;ve read the <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook">Cookbook</a>, you&#39;ve already seen that there is a section on <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Making-your-application-installable">Making your application installable</a>.
+While that&#39;s true, it makes its recommendations without using external modules and for one specific installation tool.
+It also assumes that your application <a href="http://mojolicious.org/perldoc/Mojolicious#home"><code>home</code></a> should be related to the installation directory, which isn&#39;t always the case.</p>
+
+<p>Yours truly has even written a <a href="https://metacpan.org/pod/Mojolicious::Plugin::InstallablePaths">module</a> that was intended to ease this process somewhat.
+While it does that, and I don&#39;t intend to deprecate it, I think there are even easier patterns now.</p>
+
+<h2>The Share Directory</h2>
+
+<p>Perl has a lesser known and somewhat informal functionality for bundling static files called a &quot;share directory&quot;.
+Create a directory in your project root called <code>share</code> which will serve for this purpose.
+Then move the <code>templates</code> and <code>public</code> directories from your project root into that directory.
+You should also move any other static files like say database migration files (e.g. <code>wishlist.sql</code> from <a href="https://mojolicious.io/blog/2017/12/18/day-18-the-wishlist-model/">yesterday</a>).</p>
+
+<p>Although each install tool has different ways of specifying where the share directory is located during the development phase, none is espectially difficult to work with.
+One reason I chose the name <code>share</code> is because my preferred installation tool <a href="https://metacpan.org/pod/Module::Build::Tiny">Module::Build::Tiny</a> (which I use via <a href="https://metacpan.org/pod/App::ModuleBuildTiny">App::ModuleBuildTiny</a>) requires it to be called that.
+The others are configurable in the install scripts themselves (Makefile.PL/Build.PL/dist.ini).
+For <a href="https://metacpan.org/pod/Module::Build">Module::Build</a>, you set the <a href="https://metacpan.org/pod/Module::Build::API#share_dir"><code>share_dir</code></a> parameter</p>
+
+<pre><code>share_dir =&gt; &#39;share&#39;
+</code></pre>
+
+<p>For <a href="https://metacpan.org/pod/ExtUtils::MakeMaker">ExtUtils::MakeMaker</a> use <a href="https://metacpan.org/pod/File::ShareDir::Install">File::ShareDir::Install</a></p>
+
+<pre><code>use File::ShareDir::Install;
+install_share &#39;share&#39;;
+</code></pre>
+
+<p>And <a href="https://metacpan.org/pod/Dist::Zilla">Dist::Zilla</a> has a <a href="https://metacpan.org/pod/Dist::Zilla::Plugin::ShareDir">plugin</a>.</p>
+
+<pre><code>[ShareDir]
+</code></pre>
+
+<p>whose default is <code>share</code>.
+I&#39;m sure other installers have ways to handle it too.</p>
+
+<h2>File::Share Saves the Day</h2>
+
+<p>Since we earlier moved the location of templates and static files, we now need to tell the application where we put them.
+The major innovation that makes this method possible and so painless is the module <a href="https://metacpan.org/pod/File::Share">File::Share</a>.
+While it isn&#39;t <a href="https://metacpan.org/pod/File::ShareDir">the original module</a> used to locate share directories after installation, it is the best one since it also works before hand during development too.
+To do so it uses the heuristic of looking to see if a directory exists named <code>share</code> in that particular location (and a few checks for sanity), thus the second reason we call the directory that.</p>
+
+<p>When used we get the absolute path to the share directory of your distribution.
+Usually the name of the distribution is the name of your main module with the <code>::</code> replaced by <code>-</code>.</p>
+
+<h2>Use in Mojolicious Apps</h2>
+
+<p>To use File::Share in a Mojolicious (Full) app I recommend wrapping it in a <a href="http://mojolicious.org/perldoc/Mojo/File">Mojo::File</a> object and storing it in an attirbute on the app.
+The attribute can be named anything, perhaps even as simple as <code>files</code>, though for the <a href="https://github.com/jberger/Wishlist/blob/blog_post/installable/lib/Wishlist.pm#L10-L14">Wishlist app</a> I have used the name <code>dist_dir</code> since that is meaningful to me.</p>
+
+<p>Why <code>dist_dir</code>?
+Well that is the name of the function provided by File::Share.</p>
+
+<pre><code>package Wishlist;
+use Mojo::Base &#39;Mojolicious&#39;;
+
+...
+use File::Share;
+
+has dist_dir =&gt; sub {
+  return Mojo::File-&gt;new(
+    File::Share::dist_dir(&#39;Wishlist&#39;)
+  );
+};
+...
+</code></pre>
+
+<p>Mojo::File is an object class represeting files and directories on file systems.
+By having this object, creating derived paths from it is simple.</p>
+
+<pre><code>has sqlite =&gt; sub {
+  my $app = shift;
+
+  # determine the storage location
+  my $file = $app-&gt;config-&gt;{database} || &#39;wishlist.db&#39;;
+  ...
+
+  my $sqlite = Mojo::SQLite-&gt;new
+    -&gt;from_filename(&quot;$file&quot;)
+    -&gt;auto_migrate(1);
+
+  # attach migrations file
+  $sqlite-&gt;migrations-&gt;from_file(
+    $app-&gt;dist_dir-&gt;child(&#39;wishlist.sql&#39;)
+  )-&gt;name(&#39;wishlist&#39;);
+
+  return $sqlite;
+};
+
+sub startup {
+  my $app = shift;
+
+  $app-&gt;renderer-&gt;paths([
+    $app-&gt;dist_dir-&gt;child(&#39;templates&#39;),
+  ]);
+  $app-&gt;static-&gt;paths([
+    $app-&gt;dist_dir-&gt;child(&#39;public&#39;),
+  ]);
+
+  ...
+}
+</code></pre>
+
+<h2>What About The App Home?</h2>
+
+<p>So far we have been focusing on bundled static files.
+As we saw in the Cookbook entry, one other consideration for installable applications is its <code>home</code>.</p>
+
+<p>Apart from setting the above paths, which we no longer need it to do, the other main job of the <code>home</code> is to locate data from the application user rather than the application&#39;s own files.
+Here it is still amply useful!</p>
+
+<p>The first and most import example of this is loading configuration via say <a href="http://mojolicious.org/perldoc/Mojolicious/Plugin/Config#file">Mojolicious::Plugin::Config</a>.
+The user will be provide configuration and almost certainly not from the installed location of the application, unlike its bundled support files.</p>
+
+<p>This also provides another conundrum, if the home is used to load the configuration, then it cannot be set by via the configuration.
+No, the home really needs to be set by the user via the <code>MOJO_HOME</code> environment variable <a href="http://mojolicious.org/perldoc/Mojo/Home#detect">as documented</a>.
+If this isn&#39;t desirable, some other environment variable could be used by providing your own in your class, overriding the one from the parent.</p>
+
+<pre><code>has home =&gt; sub {
+  Mojo::Home-&gt;new($ENV{WISHLIST_HOME});
+};
+</code></pre>
+
+<p>Though <code>MOJO_HOME</code> is likely a fine place to start.</p>
+
+<p>From there, you might (in some cases) want the users to be able to provide their own static files and/or templates.
+Say if your application could be themed.
+To do so, you could get values from the configuration and add them to the paths we set above.</p>
+
+<p>Those might be raw paths.</p>
+
+<pre><code>my $templates = $app-&gt;config-&gt;{theme}{templates};
+</code></pre>
+
+<p>Or you could allow them to be relative to the home.</p>
+
+<pre><code>$templates = Mojo::File-&gt;new($templates);
+if ($templates-&gt;is_abs) {
+  $templates = $app-&gt;home-&gt;child(&quot;$templates&quot;);
+}
+</code></pre>
+
+<p>Set these directories before the bundled versions so that if a file exists within them, they get used while defaulting to the bundled ones otherwise.</p>
+
+<pre><code>if (-d $templates) {
+  unshift @{ $app-&gt;renderer-&gt;paths }, $templates;
+}
+</code></pre>
+
+<p>Note that you could use that kind of process to allow other configured files to be relative to the home.
+The application home is a great place to put data like a sqlite database; the sqlite database file seen earlier, which as show had to be an absolute path.
+Indeed such a transform exists already exists in the Wishlist app but was omitted above for clarity.</p>
+
+<h2>In Conclusion</h2>
+
+<p>I have made some of these changes to the <a href="https://github.com/jberger/Wishlist/compare/blog_post/sqlite_model...blog_post/installable">Wishlist App</a>.
+You&#39;ll see that it it really isn&#39;t much to do.</p>
+
+<p>You also see that I only used as much of these instructions as I needed; you can do the same.
+There is no magic in any of what you&#39;ve seen (other than perhaps File::Share).
+If you don&#39;t need to think about theming or customizing the environment variable, then don&#39;t worry about it.
+But if you find yourself in that situation, you&#39;ll know you can make such features available to your users.</p>
+
+<p>And hey, if it is a useful application, consider uploading it to CPAN.
+Though I warn you, once you start contributing to CPAN it can be addictive!</p>
+
+              </section>
+              <small><p><a href="https://en.wikipedia.org/w/index.php?curid=31630711">Image</a> by Gnovick - Own work, <a href="https://creativecommons.org/licenses/by/3.0/" title="Creative Commons Attribution 3.0">CC BY 3.0</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/wishlist/">wishlist</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/cc767569f5863a7c261991ee5b23f147">
+                      </div>
+                      <div class="about">
+                        <h5>Joel Berger</h5>
+                        <p>Joel has Ph.D. in Physics from the University of Illinois at Chicago.
+He an avid Perl user and <a href="https://metacpan.org/author/JBERGER">author</a> and is a member of the Mojolicious Core Team.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/18/day-18-the-wishlist-model/index.html" rel="prev"><strong>Previous Article</strong> Day 18: The Wishlist Model</a></li>
+                  <li class="next"><a href="/blog/2017/12/20/day-20-practical-testing/index.html" rel="next"><strong>Next Article</strong> Day 20: Practical Testing </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

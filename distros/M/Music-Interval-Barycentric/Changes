@@ -1,5 +1,19 @@
 Revision history for Music-Interval-Barycentric
 
+0.0301 2018-12-30 20:48:58
+    - Fix the eg/synopsis code.
+    - Enhance the description documentation.
+
+0.0300 2018-12-30 19:55:17
+    - Export all functions.
+    - Improve synopsis documentation appropriately.
+
+0.02 2018-02-14 20:36:27
+    - Improved documentation.
+    - Improved the eg/synopsis code.
+    - Added the missing 1; to the end of the module!
+    - Dropped the discouraged Readonly module.
+
 0.0105 2015-10-19
     - Fixed SYNOPSIS syntax.
     - Added an eg/synopsis script.

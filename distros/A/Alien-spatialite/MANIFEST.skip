@@ -1,0 +1,15 @@
+_alien
+
+.git
+
+.travis.yml
+appveyor.yml
+
+MANIFEST.bak
+
+^Makefile$
+
+MYMETA.json
+MYMETA.yml
+
+blib

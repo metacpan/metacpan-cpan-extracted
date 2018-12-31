@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> Dancer2::Logger::Console::Colored | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="dancer2__logger__console__colored"></a>Dancer2::Logger::Console::Colored</h1>
+
+<p>During development the console output of your app is often one of the most important tools.
+But sometimes there is just too much noise, and changing the log settings all the time is not convenient.
+Of course you can grep the log or scroll, but wouldn't it be nice to get visual clues for what you're looking for?</p>
+<p>With <a href="https://metacpan.org/module/Dancer2::Logger::Console::Colored">Dancer2::Logger::Console::Colored</a> you can do that. It's a drop-in replacement for the default
+console logger, but with color. It will make the message appear in color depending on the levels. You can turn
+it on by setting your logger in your environment config file:</p>
+<pre class="prettyprint">logger: "Console::Colored"</pre>
+
+<p>Your log will instantly become cheerful and seasonal according to this default configuration:</p>
+<pre class="prettyprint"># config.yml (these are the defaults)
+engines:
+  logger:
+    Console::Colored:
+      colored_origin: "cyan"
+      colored_levels:
+        core: "bold bright_white"
+        debug: "bold bright_blue"
+        info: "bold green"
+        warning: "bold yellow"
+        error: "bold yellow on_red"
+      colored_messages:
+        core: "bold bright_white"
+        debug: "bold bright_blue"
+        info: "bold green"
+        warning: "bold yellow"
+        error: "bold yellow on_red"</pre>
+
+<img src="/images/2018/23/log-1.png">
+
+<p>The <code>colored_origin</code> refers to the part of the message that shows the package that this
+message originated in, as well as the file name and line.</p>
+<pre class="prettyprint">&gt;&gt; Dancer2 v0.207000 server 28764 listening on http://0.0.0.0:3000
+[main:28764] debug @2018-12-19 20:31:06&gt; Hello World in test.pl l. 6
+ ^^^^                                                   ^^^^^^^    ^</pre>
+
+<p>The <code>colored_levels</code> are the log levels themselves.</p>
+<pre class="prettyprint">[main:28764] debug @2018-12-19 20:31:06&gt; Hello World in test.pl l. 6
+             ^^^^^</pre>
+
+<p>And the <code>colored_messages</code> refer to the actual message.</p>
+<pre class="prettyprint">[main:28764] debug @2018-12-19 20:31:06&gt; Hello World in test.pl l. 6
+                                         ^^^^^^^^^^^</pre>
+
+<p>The colors are the same kind of color strings used by <a href="https://metacpan.org/module/Term::ANSIColor">Term::ANSIColor</a>. The first
+color refers to the foreground, and the second one to the background. You can add an optional <code>bold</code>.</p>
+<pre class="prettyprint">[bold] [foreground] [on_background]</pre>
+
+<h2><a name="changing_the_log_message"></a>Changing the log message</h2>
+
+<p>If you don't like the default log format, you can change it with the <code>log_format</code> setting, which is
+documented in detail in <a href="https://metacpan.org/module/Dancer2::Core::Role::Logger">Dancer2::Core::Role::Logger</a>. You can just stick it in with the other configuration.</p>
+<pre class="prettyprint"># config.yml (this is the default)
+engines:
+  logger:
+    Console::Colored:
+      log_format: "[%a:%P] %L @%T&gt; %m in %f l. %l"</pre>
+
+<p>Usually you would run a single-worker server during development, so there is no need for request IDs.
+And since the message is now colored, we can also drop the log level. How about a simple format like
+the following:</p>
+<pre class="prettyprint">%t %f:%l&gt; %m
+# 20/Dec/2018 16:41:07 MyApp.pm:22&gt; Hello World</pre>
+
+<h2><a name="i_know_regular_expressions_"></a>I know regular expressions!</h2>
+
+<p>Sometimes just reading the log is not enough. You're looking for a specific piece of information. There
+are three pages of log for a single request, and debugging is hard work. Grepping is an option,
+but you need to look for a complex pattern. Maybe a product SKU, a date or some other piece of information.</p>
+<p>With Dancer2::Logger::Console::Colored you can actually make it come out with a background color so you
+can spot it easily, without having to change your code (or your added debugging log statements). Instead,
+you can put a regular expression into your configuration file.</p>
+<pre class="prettyprint"># config.yml
+engines:
+  logger:
+    Console::Colored:
+      colored_regex:
+       - re: "customer number \d+"
+         color: "bold red"</pre>
+
+<p>This will find customer numbers according to the pattern and make them bold and red. You can supply
+a regular expression pattern and a color setting.</p>
+<img src="/images/2018/23/log-2.png">
+
+<p>Note that there is a list under the <code>colored_regex</code> key. This means you can actually have
+multiple patterns. Even really simple ones that make <code>print</code> style debugging easy
+and attractive.</p>
+<pre class="prettyprint"># config.yml
+engines:
+  logger:
+    Console::Colored:
+      colored_regex:
+       - re: "customer number \d+"
+         color: "bold red"
+       - re: "\bhere\b"
+         color: "white on_green"</pre>
+
+<p>If you want to highlight an entire log message in a specific color, you can set a pattern that captures
+everything. However, this works on the message only, and not on the entire formatted line of log output.
+(Patches welcome!)</p>
+<pre class="prettyprint"># config.yml
+engines:
+  logger:
+    Console::Colored:
+      colored_regex:
+        - re: ".+here.+"
+          color: "white on_red"</pre>
+
+<img src="/images/2018/23/log-3.png">
+
+<p>This opens up a lot of possibilities, for debugging as well as for general logging during development.</p>
+<h2><a name="what_else"></a>What else?</h2>
+
+<p>There are still some feature ideas in the backlog, but it's already pretty useful. If you would
+like to see additional features, please feel free to
+[open an issue on github](https://github.com/simbabque/Dancer2-Logger-Console-Colored/issues).</p>
+<p>And if you happen to use Mojolicious as well and need something similar, take a look at
+<a href="https://metacpan.org/module/Mojo::Log::Colored">Mojo::Log::Colored</a>, which is in the early stages of development, but works quite well.</p>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Julien Fiegehenn (simbabque) for the Perl Dancer 
+Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

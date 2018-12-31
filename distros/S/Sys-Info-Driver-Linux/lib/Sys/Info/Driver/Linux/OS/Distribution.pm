@@ -1,5 +1,5 @@
 package Sys::Info::Driver::Linux::OS::Distribution;
-$Sys::Info::Driver::Linux::OS::Distribution::VERSION = '0.7904';
+$Sys::Info::Driver::Linux::OS::Distribution::VERSION = '0.7905';
 use strict;
 use warnings;
 
@@ -112,17 +112,33 @@ sub _probe_release {
 sub _probe_version {
     my $self    = shift;
     my $release = $self->_get_lsb_info('DISTRIB_RELEASE');
-    return $release if $release;
+    my $dist_id = $self->{DISTRIB_ID};
 
-    if ( ! $self->{DISTRIB_ID} && ! $self->name ) {
+    if ( ! $dist_id && ! $self->name ) {
+        # centos will return a string, but if couldn't detect the thing, it is
+        # better to return that instead.
+        return $release if $release;
         croak 'No version because no distribution';
     }
 
-    my $slot         = $CONF{ lc $self->{DISTRIB_ID} };
-    $self->{pattern} = exists $slot->{version_match} ? $slot->{version_match} : q{};
-    $release         = $self->_get_file_info;
-    $self->{DISTRIB_RELEASE} = $release;
-    return $release;
+    my $slot = $CONF{ lc $dist_id };
+
+    $self->{pattern} = exists $slot->{version_match}
+                        ? $slot->{version_match}
+                        : q{};
+
+    # There might be an override
+    local $self->{release_file} = $slot->{release}
+        if $slot->{release};
+
+    my $vrelease = $self->_get_file_info;
+
+    # Set to the original if we got any, othwerwise try the version
+    $self->{DISTRIB_RELEASE} = $release || $vrelease;
+
+    # Opposite of above as we want a version number
+    # if we were able locate one
+    return $vrelease || $release;
 }
 
 sub _probe_edition {
@@ -301,16 +317,36 @@ sub _get_file_info {
     $FH->open( $file, '<' ) || croak "Can't open $file: $!";
     my @raw = <$FH>;
     $FH->close || croak "Can't close FH($file): $!";
+    my $new_pattern =
+          $self->{pattern} =~ m{ \A DISTRIB_ID      \b }xms ? '^ID=(.+)'
+        : $self->{pattern} =~ m{ \A DISTRIB_RELEASE \b }xms ? '^PRETTY_NAME=(.+)'
+        : undef;
     my $rv;
     foreach my $line ( @raw ){
         chomp $line;
+        next if ! $line;
+
         ## no critic (RequireExtendedFormatting)
         my($info) = $line =~ m/$self->{pattern}/ms;
         if ( $info ) {
             $rv = "\L$info";
             last;
         }
+        elsif ( $new_pattern ) {
+            ## no critic (RequireExtendedFormatting)
+            my($info2) = $line =~ m/$new_pattern/ms;
+            if ( $info2 ) {
+                $rv = "\L$info2";
+                last;
+            }
+        }
     }
+
+    if ( $rv ) {
+        $rv =~ s{ \A ["]    }{}xms;
+        $rv =~ s{    ["] \z }{}xms;
+    }
+
     return $rv;
 }
 
@@ -328,7 +364,7 @@ Sys::Info::Driver::Linux::OS::Distribution
 
 =head1 VERSION
 
-version 0.7904
+version 0.7905
 
 =head1 SYNOPSIS
 

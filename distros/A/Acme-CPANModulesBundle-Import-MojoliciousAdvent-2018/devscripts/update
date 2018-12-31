@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use App::CreateAcmeCPANModulesImportModules;
+use Perinci::Sub::Util qw(gen_curried_sub);
+use Perinci::CmdLine::Any;
+
+my %add_modules = (
+    # not linked
+    #"04" => ["Mojo::DOM"],
+);
+
+my %typos = (
+    #'Perl::PrereqScanner::NotSoLite' => 'Perl::PrereqScanner::NotQuiteLite',
+);
+
+my %daily_urls = (
+    "01" => "https://mojolicious.io/blog/2018/12/01/welcome-mojoconf-recap/",
+    "02" => "https://mojolicious.io/blog/2018/12/02/automatic-reload-for-rapid-development/",
+    "03" => "https://mojolicious.io/blog/2018/12/03/higher-order-promises/",
+    "04" => "https://mojolicious.io/blog/2018/12/04/testing-hooks-and-helpers/",
+    "05" => "https://mojolicious.io/blog/2018/12/05/compound-selectors/",
+    "06" => "https://mojolicious.io/blog/2018/12/06/making-a-list-with-yancy/",
+    "07" => "https://mojolicious.io/blog/2018/12/07/openapi/",
+    "08" => "https://mojolicious.io/blog/2018/12/08/authenticating-with-ldap/",
+    "09" => "https://mojolicious.io/blog/2018/12/09/add-a-theme-system-to-your-mojolicious-app/",
+    "10" => "https://mojolicious.io/blog/2018/12/10/minion-stands-alone/",
+    "11" => "https://mojolicious.io/blog/2018/12/11/who-watches-the-minions/",
+    "12" => "https://mojolicious.io/blog/2018/12/12/dancer-and-minion/",
+    "13" => "https://mojolicious.io/blog/2018/12/13/taking-on-roles/",
+    "14" => "https://mojolicious.io/blog/2018/12/14/a-practical-example-of-mojo-dom/",
+    "15" => "https://mojolicious.io/blog/2018/12/15/practical-web-content-munging/",
+    "16" => "https://mojolicious.io/blog/2018/12/16/browser-diet/",
+    "17" => "https://mojolicious.io/blog/2018/12/17/a-website-for-yancy/",
+    "18" => "https://mojolicious.io/blog/2018/12/18/a-view-to-a-pod/",
+    "19" => "https://mojolicious.io/blog/2018/12/19/you-only-export-twice/",
+    "20" => "https://mojolicious.io/blog/2018/12/20/testing-dancer/",
+    "21" => "https://mojolicious.io/blog/2018/12/21/a-little-christmas-template-cooking/",
+    "22" => "https://mojolicious.io/blog/2018/12/22/use-carton-for-your-mojolicious-app-deployment/",
+    "23" => "https://mojolicious.io/blog/2018/12/23/mojolicious-and-angular/",
+    "24" => "https://mojolicious.io/blog/2018/12/24/async-await-the-mojo-way/",
+    "25" => "https://mojolicious.io/blog/2018/12/25/special-thanks/",
+);
+
+gen_curried_sub(
+    'App::CreateAcmeCPANModulesImportModules::create_acme_cpanmodules_import_modules',
+    {
+        modules => [
+            {
+                name => '2018',
+                url => "https://mojolicious.io/",
+                extract_urls => [map {$daily_urls{$_}} "01".."25"],
+                summary => 'Modules mentioned in Mojolicious Advent Calendar 2018',
+                add_modules => [map {@$_} values %add_modules],
+            },
+            (map {
+                +{
+                    name => "2018_12_$_",
+                    url => $daily_urls{$_},
+                    summary => "Modules mentioned in Mojolicious Advent Calendar 2018 (day $_)",
+                    add_modules => [@{ $add_modules{$_} // [] }],
+                },
+            } "01".."25"),
+        ],
+        typos => \%typos,
+        ignore_empty => 1,
+        namespace => 'Acme::CPANModules::Import::MojoliciousAdvent',
+        user_agent => 'Mozilla/5.0',
+        dist_dir => "$Bin/..",
+    },
+    'app',
+);
+
+Perinci::CmdLine::Any->new(
+    url => '/main/app',
+    log => 1,
+)->run;

@@ -12,7 +12,11 @@ BEGIN {
 	use_ok( 'MySQL::Workbench::DBIC' );
 }
 
-use MySQL::Workbench::DBIC::FakeDBIC;
+eval {
+    require DBIx::Class;
+} or do {
+    require MySQL::Workbench::DBIC::FakeDBIC;
+};
 
 my $bin         = $FindBin::Bin;
 my $file        = $bin . '/test.mwb';

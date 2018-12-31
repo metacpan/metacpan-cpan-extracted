@@ -1,3 +1,34 @@
+2019.001  Sat Dec 29
+# No new features.
+! Makefile.PL
+  - GH PR#4: Added timeout to wget call in Makefile.PL by J. Bargsten.
+  - CPAN RT#125079: Installation stuck after a wget.
+    Fixed by changing scheme from ftp to https.
+! lib/Text/LineFold.pm
+! t/04fold.t
+  - Fix: Text::LineFold: new() & config() did not allow multiple Prep option
+! t/01break.t
+! t/02hangul.t
+! t/03ns.t
+! t/04fold.t
+! t/05urgent.t
+! t/06context.t
+! t/07sea.t
+! t/08partial.t
+! t/09uri.t
+! t/11format.t
+! t/12fold2.t
+! t/13flowedsp.t
+! t/14sea_al.t
+! t/15array.t
+! t/16regex.t
+! t/17prop.t
+! t/18currency.t
+  - CPAN RT #120535: Fails tests when no "." in @INC.
+
+2018.012  Sat Dec 29 2018
+# Withdrawn.
+
 2018.003  Thu Mar 29 2018
 # No new features.
 ! Makefile.PL.sombok

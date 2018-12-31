@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@jhthorsen" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/22/day-22-how-to-build-a-public-rest-api/" property="og:url">
+  <meta content="Day 22: A RESTful API with OpenAPI" property="og:title">
+    <meta content="How to build a public REST API for your Mojolicious application" property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/22/day-22-how-to-build-a-public-rest-api/hammock_beach.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 22: A RESTful API with OpenAPI - mojolicious.io</title>
+  <meta content="Jan Henning Thorsen" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 22: A RESTful API with OpenAPI</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-22">Dec 22, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="A hammock on a beach" src="/blog/2017/12/22/day-22-how-to-build-a-public-rest-api/hammock_beach.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>The <a href="https://www.openapis.org/">OpenAPI</a> Specification (formerly named
+Swagger) is an API description format for REST APIs. An API specification
+written using the the rules set by the Open API Initiative can be used to
+describe:</p>
+
+<ul>
+<li>All the available endpoints. An endpoint is a unique resource that can
+access or modify a given object.</li>
+<li>Input parameters, such as headers, query parameters and/or body parameters.</li>
+<li>The structure of the response, including headers status codes and the body -
+if any.</li>
+<li>Authentication methods</li>
+<li>Contact information, license, terms of use and other information</li>
+</ul>
+
+<p>This post look into how to write an API specification and how to use it
+together with
+<a href="https://metacpan.org/pod/Mojolicious::Plugin::OpenAPI">Mojolicious::Plugin::OpenAPI</a>
+and <a href="https://metacpan.org/pod/OpenAPI::Client">OpenAPI::Client</a>.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Why would you use OpenAPI</h2>
+
+<p>This question comes up quite often after telling people about OpenAPI:
+&quot;but...why?&quot; The people asking this often come from the same background as
+myself, where you both write the producer (backend web server) and consumer
+(JavaScript, ...) of the data. When you&#39;re in complete control of both sides
+you don&#39;t really need to write any formal specification or document your API,
+since you already <em>know</em> how it works. This can be very true - at least if you
+make sure you have tests of all your endpoints.</p>
+
+<p>Personally I&#39;m a <a href="http://www.linkognito.com/images/05-08-08/metal.gif">huge fan</a>
+of documenting as well as testing. I often say that if you can&#39;t document
+(describe) the API/method/whatever, something is wrong and you should reconsider
+what you&#39;re coding. Documenting an API on the other hand is awful in my opinion,
+especially during rapid prototyping/developing where it&#39;s hard to keep the
+code and documentation up to date.</p>
+
+<p>So how does OpenAPI fix this? Since the input/ouput Perl code is generated
+<em>from</em> the OpenAPI Specification, you know that the backend is always running
+code accordingly to the specification. Also, since the documentation you
+generate is not hand written, but generated from the same OpenAPI document you
+can with certainty know that the code the server is running, is in sync with
+the documentation.</p>
+
+<p>By &quot;generated code&quot; I don&#39;t just mean the routes/endpoints, but also input and
+output validation. This means that when any data has made it through to your
+controller action, you know that the data is valid. On the other side, the
+consumer (let&#39;s say a JavaScript that cares about the difference between an
+integer and string) will know that it has received the correct data, since
+invalid output will result in a
+<a href="https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#5xx_Server_Error">500 - Internal Server Error</a>.</p>
+
+<p>So... If you don&#39;t care about documentation or collaboration with others, then
+I&#39;m not sure if I would care much about OpenAPI either.</p>
+
+<p>Note that the OpenAPI spec is not just for the server, but can also be used to
+generate <a href="int://github.com/swagger-api/swagger-js">JavaScript</a> and
+<a href="https://metacpan.org/pod/OpenAPI::Client">Perl client side code</a>.</p>
+
+<h2>Prerequisites</h2>
+
+<p>To run any of the example code below, you need to install the following
+modules:</p>
+
+<pre><code>$ cpanm Mojolicious::Plugin::OpenAPI # server side plugin
+$ cpanm OpenAPI::Client              # client to talk with the server
+$ cpanm YAML::XS                     # to read YAML formatted specifications
+</code></pre>
+
+<h2>How to write the specification</h2>
+
+<p>Some people like to generate the specification from code, but I truly believe
+that writing the specification by hand and the generate code is the right way
+to do it. The reasoning behind this is &quot;seperation of concern&quot;: Having the
+specification in a common format (JSON or YAML) allow other non-perl developer
+to contribute and read the document.</p>
+
+<p>The API need to follow the rules set by the
+<a href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md">OpenAPI specification</a>.
+In this post we will use the 2.0 version, but version
+<a href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md">3.0</a>
+will be available soon, so you might consider looking at that as well.</p>
+
+<p>Here is an example API, written in YAML:</p>
+
+<pre><code>swagger: &#39;2.0&#39;
+info:
+  version: &#39;0.42&#39;
+  title: Dummy example
+schemes: [ http ]
+basePath: &quot;/api&quot;
+paths:
+  /echo:
+    post:
+      x-mojo-to: &quot;echo#index&quot;
+      operationId: echo
+      parameters:
+      - in: body
+        name: body
+        schema:
+          type: object
+      responses:
+        200:
+          description: Echo response
+          schema:
+            type: object
+</code></pre>
+
+<p>There&#39;s a bunch of things to dive into, but here is a quick overview:</p>
+
+<ul>
+<li><code>swagger</code> is just to specify the version of the spec</li>
+<li><code>info</code> is to give some meta-information about the API</li>
+<li><code>schemes</code> is a list of valid HTTP schemes that can be used to access the API</li>
+<li>All the resources under <code>paths</code> will be relative to <code>basePath</code>, meaning that
+you need to use <code>/api/echo</code> to access the &quot;echo&quot; resource.</li>
+<li>The key <code>post</code> under <code>/echo</code> tells you which HTTP method you need to use to
+access the resource.</li>
+<li><code>x-mojo-to</code> is specific for
+<a href="https://metacpan.org/pod/Mojolicious::Plugin::OpenAPI">Mojolicious::Plugin::OpenAPI</a>,
+and will be passed on to the route&#39;s
+<a href="https://metacpan.org/pod/Mojolicious::Routes::Route#to">to()</a> method.</li>
+<li><code>operationId</code> is used by
+<a href="https://metacpan.org/pod/OpenAPI::Client">OpenAPI::Client</a> and other
+clients to generate a method that can be used to access the resource from
+the client side.</li>
+<li><code>parameters</code> and <code>responses</code> contains a description of the acceptable input
+and output.</li>
+</ul>
+
+<p>While the remainder of this article will focus on Full apps, you can also use
+the plugin for Lite apps as well. In that case, the key to getting your routes
+recognised is to make them have the right path (in this case, <code>/echo</code> - it will
+get moved by the plugin under <code>/api</code>) and the right <code>name</code> (the third parameter
+to eg <code>get</code>) to match either the <code>x-mojo-name</code> or <code>operationId</code>.</p>
+
+<h2>How to use the specification in your Mojolicious application</h2>
+
+<p>The example application will use the specification above to generate routes and
+input/output validation rules. To start off, we can use the
+<a href="http://mojolicious.org/perldoc/Mojolicious/Command/generate/app"><code>generate</code></a>
+command to create the app:</p>
+
+<pre><code>$ mojo generate app MyApp
+</code></pre>
+
+<p>Check it works right by running the provided test:</p>
+
+<pre><code>$ prove -l t
+</code></pre>
+
+<p>After that, edit <code>lib/MyApp.pm</code> to make it look like this:</p>
+
+<pre><code>package MyApp;
+use Mojo::Base &quot;Mojolicious&quot;;
+
+sub startup {
+  my $self = shift;
+
+  # Load the &quot;api.yaml&quot; specification from the public directory
+  $self-&gt;plugin(OpenAPI =&gt; {spec =&gt; $self-&gt;static-&gt;file(&quot;api.yaml&quot;)-&gt;path});
+}
+
+1;
+</code></pre>
+
+<p>Then copy/paste the specification from above and save it to <code>public/api.yaml</code>.</p>
+
+<p>Next you must create a controller <code>lib/MyApp/Controller/Echo.pm</code> to match
+<code>x-mojo-to</code> in the API specification:</p>
+
+<pre><code>package MyApp::Controller::Echo;
+use Mojo::Base &quot;Mojolicious::Controller&quot;;
+
+sub index {
+  # Validate input request or return an error document
+  my $self = shift-&gt;openapi-&gt;valid_input or return;
+
+  # Render back the same data as you received using the &quot;openapi&quot; handler
+  $self-&gt;render(openapi =&gt; $self-&gt;req-&gt;json);
+}
+
+1;
+</code></pre>
+
+<p>Last, you should update the test. Change <code>t/basic.t</code> so the line with
+<code>get_ok</code> reads:</p>
+
+<pre><code>$t-&gt;post_ok(&#39;/api/echo&#39;, &#39;{&quot;i&quot;:&quot;work&quot;}&#39;)-&gt;status_is(200)-&gt;json_is({i=&gt;&quot;work&quot;});
+</code></pre>
+
+<p>Check it all works right:</p>
+
+<pre><code>$ prove -l t
+</code></pre>
+
+<p>And you&#39;re done creating an OpenAPI powered application!</p>
+
+<h2>Running your application</h2>
+
+<p>To see what you just created, you can run your application using the
+<a href="http://mojolicious.org/perldoc/Mojolicious/Command/routes"><code>routes</code></a> command:</p>
+
+<pre><code>$ ./script/my_app routes
+/api      *        api
+  +/      GET
+  +/echo  POST     &quot;echo&quot;
+  +/echo  OPTIONS  echo
+</code></pre>
+
+<p>From the output above, we can see that the expected route <code>/api/echo</code> is
+generated, so let&#39;s see if we can send/receive any data to the server. To try
+it out, we use the &quot;openapi&quot; sub command which was installed with
+<a href="https://metacpan.org/pod/OpenAPI::Client">OpenAPI::Client</a>.</p>
+
+<p>In this first example we try to send invalid body data using the <code>-c</code> switch:</p>
+
+<pre><code>$ MOJO_LOG_LEVEL=info ./script/my_app openapi /api echo -c &#39;[42]&#39;
+{&quot;errors&quot;:[{&quot;message&quot;:&quot;Expected object - got array.&quot;,&quot;path&quot;:&quot;\/body&quot;}]}
+</code></pre>
+
+<p>This next example should succeed, since we change from sending an array to
+sending an object, as described in the API specification:</p>
+
+<pre><code>$ MOJO_LOG_LEVEL=info ./script/my_app openapi /api echo -c &#39;{&quot;age&quot;:42}&#39;
+{&quot;age&quot;:42}
+</code></pre>
+
+<p>Yay! We see that the same input data was echoed back to us, without any error
+message. Mission accomplished!</p>
+
+<h2>See also</h2>
+
+<p>Did you find OpenAPI interesting? Check out these resources to find out more:</p>
+
+<ul>
+<li><a href="https://metacpan.org/release/Mojolicious-Plugin-OpenAPI">Mojolicious::Plugin::OpenAPI</a>
+contains guides and synopsis to get you started.</li>
+<li><a href="https://metacpan.org/pod/OpenAPI::Client">OpenAPI::Client</a>&#39;s manual
+contains more information about how the client side works.</li>
+<li><a href="https://swagger.io/docs/specification/about/">Swagger&#39;s about page</a> has
+information about the specification and OpenAPI.</li>
+<li><a href="https://www.openapis.org/">OAI</a> is the official OpenAPI resource page.</li>
+<li><a href="https://metacpan.org/pod/JSON::Validator">JSON::Validator</a> is the &quot;brain&quot;
+behind both the plugin and client side in Perl. Check it out, if you&#39;re
+interested in JSON-Schema.</li>
+</ul>
+
+              </section>
+              <small><p><a href="https://www.pexels.com/photo/hammock-palm-trees-bungalows-bora-bora-104750">Image</a> by Chris McClave, in the Public Domain.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/api/">api</a>,
+                  <a href="/blog/tag/openapi/">openapi</a>,
+                  <a href="/blog/tag/rest/">rest</a>,
+                  <a href="/blog/tag/swagger/">swagger</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/806800a3aeddbad6af673dade958933b">
+                      </div>
+                      <div class="about">
+                        <h5>Jan Henning Thorsen</h5>
+                        <p>Jan (aka batman) is a self taught Perl hacker and a member of the Mojolicious Core Team. He likes to work with anything that has to do with web - both frontend and backend. Got more questions? Send him an <a href="mailto:jhthorsen@cpan.org">e-mail</a> or contact him in the <code>#swagger</code> channel on <a href="http://www.irc.perl.org/">irc.perl.org</a>.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/21/day-21-virtually-a-lumberjack/index.html" rel="prev"><strong>Previous Article</strong> Day 21: Virtual(ly a) Lumberjack</a></li>
+                  <li class="next"><a href="/blog/2017/12/23/day-23-one-liners-for-fun-and-profit/index.html" rel="next"><strong>Next Article</strong> Day 23: One-Liners for Fun and Profit </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

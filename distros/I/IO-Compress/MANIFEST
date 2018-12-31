@@ -145,6 +145,8 @@ t/compress/prime.pl
 t/compress/tied.pl
 t/compress/truncate.pl
 t/compress/zlib-generic.pl
+t/files/meta.xml
+t/files/test.ods
 t/globmapper.t
 t/Test/Builder.pm
 t/Test/More.pm

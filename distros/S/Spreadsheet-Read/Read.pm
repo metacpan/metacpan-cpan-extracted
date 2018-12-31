@@ -36,7 +36,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.79";
+our $VERSION = "0.80";
 sub  Version { $VERSION }
 
 use Carp;
@@ -56,7 +56,7 @@ my @parsers = (
     [ ods  => "Spreadsheet::ReadSXC",			"0.20"		],
     [ sxc  => "Spreadsheet::ReadSXC",			"0.20"		],
     [ xls  => "Spreadsheet::ParseExcel",		"0.34"		],
-    [ xlsx => "Spreadsheet::ParseXLSX",			"0.13"		],
+    [ xlsx => "Spreadsheet::ParseXLSX",			"0.24"		],
     [ xlsx => "Spreadsheet::XLSX",			"0.13"		],
     [ prl  => "Spreadsheet::Perl",			""		],
 
@@ -1007,6 +1007,17 @@ sub add {
     return $book;
     } # add
 
+package Spreadsheet::Read::Attribute;
+
+use Carp;
+use vars qw( $AUTOLOAD );
+
+sub AUTOLOAD {
+    my $self = shift;
+    (my $attr = $AUTOLOAD) =~ s/.*:://;
+    $self->{$attr};
+    } # AUTOLOAD
+
 package Spreadsheet::Read::Sheet;
 
 sub cell {
@@ -1019,11 +1030,12 @@ sub cell {
 
 sub attr {
     my ($sheet, @id) = @_;
+    my $class = "Spreadsheet::Read::Attribute";
     @id == 2 && $id[0] =~ m/^[0-9]+$/ && $id[1] =~ m/^[0-9]+$/ and
-	return $sheet->{attr}[$id[0]][$id[1]];
+	return bless $sheet->{attr}[$id[0]][$id[1]] => $class;
     if (@id && $id[0] && exists $sheet->{$id[0]}) {
 	my ($c, $r) = $sheet->cell2cr ($id[0]);
-	return $sheet->{attr}[$c][$r];
+	return bless $sheet->{attr}[$c][$r] => $class;
 	}
     undef;
     } # attr
@@ -1632,10 +1644,14 @@ For CSV, this can be overruled using the I<label> attribute:
  my $ss = Spreadsheet::Read->new ("/some/place/test.csv", label => "Test");
 
 =head2 Cell Attributes
-X<merged>
+X<attr>
 
-If the constructor was called with C<attr> having a true value, effort
-is made to analyze and store field attributes like this:
+If the constructor was called with C<attr> having a true value,
+
+ my $book = ReadData ("book.xls", attr => 1);
+ my $book = Spreadsheet::Read->new ("book.xlsx", attr => 1);
+
+effort is made to analyze and store field attributes like this:
 
     { label  => "Sheet 1",
       maxrow => 5,
@@ -1686,6 +1702,8 @@ is made to analyze and store field attributes like this:
       B5     => "Nugget",
       },
 
+The entries C<maxrow> and C<maxcol> are 1-based.
+
 This has now been partially implemented, mainly for Excel, as the other
 parsers do not (yet) support all of that. YMMV.
 
@@ -1693,9 +1711,20 @@ If a cell itself is not hidden, but the parser holds the information that
 either the row or the column (or both) the field is in is hidden, the flag
 is inherited into the cell attributes.
 
-The entries C<maxrow> and C<maxcol> are 1-based.
+You can get the attributes of a cell (as a hash-ref) like this:
+
+ my $attr = $book[1]{attr}[1][3];          # Direct structure
+ my $attr = $book->sheet (1)->attr (1, 3); # Same using OO
+ my $attr = $book->sheet (1)->attr ("A3"); # Same using OO
+
+To get to the C<font> attribute, use any of these:
+
+ my $font = $book[1]{attr}[1][3]{font};
+ my $font = $book->sheet (1)->attr (1, 3)->{font};
+ my $font = $book->sheet (1)->attr ("A3")->font;
 
 =head3 Merged cells
+X<merged>
 
 Note that only
 L<Spreadsheet::ReadSXC|https://metacpan.org/release/Spreadsheet-ReadSXC>

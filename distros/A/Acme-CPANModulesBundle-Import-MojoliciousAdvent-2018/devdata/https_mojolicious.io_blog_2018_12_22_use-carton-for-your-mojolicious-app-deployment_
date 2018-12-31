@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+  <meta content="https://mojolicious.io/blog/2018/12/22/use-carton-for-your-mojolicious-app-deployment/" property="og:url">
+  <meta content="Day 22: Use Carton for your Mojolicious app deployment" property="og:title">
+    <meta content="https://mojolicious.io/blog/2018/12/22/use-carton-for-your-mojolicious-app-deployment/banner.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 22: Use Carton for your Mojolicious app deployment - mojolicious.io</title>
+  <meta content="Luc Didry" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 22: Use Carton for your Mojolicious app deployment</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-22">Dec 22, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Brown cardboard boxes on a white floor" src="/blog/2018/12/22/use-carton-for-your-mojolicious-app-deployment/banner.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>You have a lovely Mojolicious app, itâs time to deploy it!</p>
+
+<p>Butâ¦ itâs not working on the production server! What is going on? Oh no, the modules you rely on are not on the same version that on your development server. What can you do?</p>
+
+              </section>
+              <section id="section-2">
+                  <p>Indeed, some modules evolve fast (Hello Mojolicious!) which is not bad but can lead to incompatible changes.</p>
+
+<p>Thereâs also the bugs which can be resolved or introduced in a version and that you encounter if you have the wrong version.</p>
+
+<h2>Cpanfile to the rescue</h2>
+
+<p><a href="https://metacpan.org/pod/cpanfile">Cpanfile</a> is a format for describing CPAN dependencies for Perl applications.</p>
+
+<p>With <code>cpanfile</code>, we can list the modules we need, but we can also force the minimal versions of the modules, their maximum versionsâ¦ or say &quot;I want this exact version of that module&quot;.</p>
+
+<p>But we can also list optional modules: you can support different databases, but users shouldnât have to install MySQL-related modules if they want to use PostgreSQL.</p>
+
+<p>Hereâs an example of <code>cpanfile</code>:</p>
+
+<pre><code># Do not ask for a specific version
+requires &#39;DateTime&#39;;
+# Ask a specific version
+requires &#39;Plack&#39;, &#39;== 1.0&#39;;
+# Ask a minimal version
+requires &#39;Net::DNS&#39;, &#39;&gt;= 1.12&#39;;
+# Or
+requires &#39;Net::DNS&#39;, &#39;1.12&#39;;
+# Ask a maximal version
+requires &#39;Locale::Maketext&#39;, &#39;&lt; 1.28&#39;;
+# Give a range
+requires &#39;Mojolicious&#39;, &#39;&gt;= 7.0, &lt; 8.0&#39;;
+
+# Optional modules
+feature &#39;postgresql&#39;, &#39;PostgreSQL support&#39; =&gt; sub {
+    requires &#39;Mojo::Pg&#39;;
+};
+feature &#39;mysql&#39;, &#39;MySQL support&#39; =&gt; sub {
+    requires &#39;Mojo::mysql&#39;;
+};
+feature &#39;ldap&#39;, &#39;LDAP authentication support&#39; =&gt; sub {
+    requires &#39;Net::LDAP&#39;;
+};
+</code></pre>
+
+<p>Cpanfile format can do more (recommended modules, requirements for a specific phase (<code>configure</code>, <code>test</code>â¦), using modules not published on CPANâ¦), but this is a post about Carton: I let you read cpanfile documentation ð</p>
+
+<p>Nota bene: be careful to list non-Perl dependencies in README file<span class="superscript" id="back-to-1"><a href="#footnote-1">1</a></span>, like <code>libpq-dev</code> for <a href="https://mojolicious.org/perldoc/Mojo/Pg"><code>Mojo::Pg</code></a> ð</p>
+
+<p>Cpanfile can be used by <a href="https://metacpan.org/pod/cpanm">cpanminus</a> or <a href="https://metacpan.org/pod/Carton">Carton</a>.</p>
+
+<p>Go to the directory containing your <code>cpanfile</code> and do:</p>
+
+<pre><code>cpanm --installdeps .
+</code></pre>
+
+<p><em>Et voilÃ Â !</em></p>
+
+<p>Note that the modules in <code>features</code> has not been installed. You can install them with:</p>
+
+<pre><code>cpanm --installdeps . --with-feature postgresql
+</code></pre>
+
+<p>Or, to install all <code>features</code> modules, but not the <code>mysql</code> one:</p>
+
+<pre><code>cpanm --installdeps . --with-all-features --without-feature mysql
+</code></pre>
+
+<p>So, now, we can be sure that we have the good version of our applicationâs dependencies on the system.</p>
+
+<p>But what if we host other applications on that system, that have conflicting requirements?</p>
+
+<p>Cpanm is able to install modules in a specific folder (thank you, <a href="https://metacpan.org/pod/local::lib">local::lib</a>), but wouldnât it be convenient to install our dependencies in the directory of our application?
+We would always know where our dependencies are.</p>
+
+<h2>Here comes Carton</h2>
+
+<p><a href="https://metacpan.org/pod/Carton">Carton</a> is Perl module dependency manager. Think <code>bundler</code> in Ruby. Think <code>npm</code> in Node.js.</p>
+
+<p>Like <code>npm</code> does, Carton installs the dependencies in the directory of the application.</p>
+
+<h3>Deployment</h3>
+
+<p>First, install Carton:</p>
+
+<pre><code>cpanm Carton
+</code></pre>
+
+<p>Then, we can install our dependencies with:</p>
+
+<pre><code>carton install
+</code></pre>
+
+<p>Our dependencies will be installed in a directory named <code>local</code>.
+But there is more: Carton will generate a <code>cpanfile.snapshot</code> file, containing the exact version of our dependencies, allowing us to enforce those exact version (ship it with your application).</p>
+
+<p>In our <code>cpanfile</code> example, we asked for a Mojolicious version greater or equal than 7.0 and lesser than 8.0.
+Between the installation on our development server and the installation on the production server, some newer versions of modules we depend on may have been published.
+Letâs say that we have Mojolicious 7.77 in our development environment and 7.90 and that something has changed, which leads to problems (for example, the delay helper from <a href="https://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers">Mojolicious::Plugin::DefaultHelpers</a> has been <a href="https://github.com/mojolicious/mojo/blob/47d1369fd11b09af47a76f7f7192985a30ce2409/Changes#L243">deprecated in 7.78</a> and <a href="https://github.com/mojolicious/mojo/blob/47d1369fd11b09af47a76f7f7192985a30ce2409/Changes#L150">removed in 7.90</a>).</p>
+
+<p>Both 7.77 and 7.90 versions are in our range, but our application does not work on the production serverâ¦ we need to make the production environment as identical as possible as the development one.</p>
+
+<p>For that, since we have a <code>cpanfile.snapshot</code> file from our development server, we can do:</p>
+
+<pre><code>carton install --deployment
+</code></pre>
+
+<p>That installs the exact versions of modules listed in your snapshot.</p>
+
+<h3>Features</h3>
+
+<p>Per default, <code>carton install</code> will install all the <em>features</em> dependencies, but we can deactivate some:</p>
+
+<pre><code>carton install --deployment --without mysql
+</code></pre>
+
+<p>In order to provide the correct version for all modules, even the optional ones, do a <code>carton install</code> on the development server, and use <code>--without</code> (note that this isn&#39;t <code>--without-feature</code> like <code>cpanm</code>) only while deploying your application: you need to have a <code>cpanfile.snapshot</code> containing all modules.</p>
+
+<h3>Start your application</h3>
+
+<p>In order to be able to use the <code>local</code> directory containing the dependencies, you can prefix your commands with <code>carton exec</code>.
+So, to start a Mojolicious application with the built-in server <a href="https://mojolicious.org/perldoc/Mojo/Server/Hypnotoad">hypnotoad</a>, do:</p>
+
+<pre><code>carton exec -- hypnotoad script/my_application
+</code></pre>
+
+<p>That works for all that you can do with your application. Example:</p>
+
+<pre><code>carton exec -- script/my_application routes
+</code></pre>
+
+<p>Note the two dashes: they avoid carton to interpret arguments passed to the script.
+This will show your applicationâs help message:</p>
+
+<pre><code>carton exec -- script/my_application --help
+</code></pre>
+
+<p>This will show cartonâs help message:</p>
+
+<pre><code>carton exec script/my_application --help
+</code></pre>
+
+<p>See the difference? ð</p>
+
+<h3>Bundling the dependencies</h3>
+
+<p>To make installation quicker, carton can bundle all the tarballs for your dependencies into a directory so that you can even install dependencies that are not available on CPAN, such as internal distribution aka DarkPAN:</p>
+
+<pre><code>carton bundle
+</code></pre>
+
+<p>This will bundle the tarballs in <code>vendor/cache</code>.
+You can now install your dependencies with:</p>
+
+<pre><code>carton install --cached
+</code></pre>
+
+<p>Combined with <code>--deployment</code> option, you can avoid querying for a database like CPAN Meta DB or downloading files from CPAN mirrors.</p>
+
+<p>You may even avoid the need to install Carton on the production server,</p>
+
+<pre><code>cpanm -L local --from &quot;$PWD/vendor/cache&quot; --installdeps --notest --quiet .
+</code></pre>
+
+<p>but then you will need to add the <code>local/lib/perl5</code> directory to <code>@INC</code> to start your application, since you canât use <code>carton exec</code>.
+You can do so using the core <a href="https://metacpan.org/pod/lib">lib</a> module, the handy <a href="https://metacpan.org/pod/lib::relative">lib::relative</a> from CPAN, <a href="https://perldoc.pl/perlrun#PERL5LIB">PERL5LIB</a> environment variable, or <a href="https://perldoc.pl/perlrun#-Idirectory">-I</a> switch.</p>
+
+<h2>Conclusion</h2>
+
+<p>Carton and cpanfile are a great way to ease Mojolicious apps deployment.
+Not only it avoids to list all the dependencies needed by your application in the README or the INSTALL file, but it speeds up deployments and make them more safer, since it sure lowers the risks of bugs due to bad versions of dependencies.</p>
+
+<p><small id="footnote-1">1: or INSTALL, or wherever you put your installation documentation <a href="#back-to-1">â©ï¸</a><small></small></small></p>
+
+              </section>
+              <small><p><a href="https://unsplash.com/photos/mTkXSSScrzw">Photo</a> by <a href="https://unsplash.com/@fempreneurstyledstock">Leone Venter</a>, <a href="https://unsplash.com/license">Unsplash license</a> (quite similar to public domain)</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/deployment/">deployment</a>,
+                  <a href="/blog/tag/carton/">carton</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="/static/ldidry.png">
+                      </div>
+                      <div class="about">
+                        <h5>Luc Didry</h5>
+                        <p>Luc Didry is a sysAdmin and Perl developer, in love with Perl since he discovered it 10 years ago, and a Mojolicious enthusiast.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/21/a-little-christmas-template-cooking/index.html" rel="prev"><strong>Previous Article</strong> Day 21: A Little Christmas Template Cooking</a></li>
+                  <li class="next"><a href="/blog/2018/12/23/mojolicious-and-angular/index.html" rel="next"><strong>Next Article</strong> Day 23: Mojolicious and Angular </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

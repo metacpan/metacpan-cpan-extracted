@@ -405,6 +405,16 @@ my %TOP = (
                                   TopLevel => 'unppmd',
                                   Raw      => 0,
                                 },
+    'IO::Compress::Zstd' => { Inverse  => 'IO::Uncompress::UnZstd',
+                              Error    => 'ZstdError',
+                              TopLevel => 'zstd',
+                              Raw      => 0,
+                            },
+    'IO::Uncompress::UnZstd' => { Inverse  => 'IO::Compress::Zstd',
+                                  Error    => 'UnZstdError',
+                                  TopLevel => 'unzstd',
+                                  Raw      => 0,
+                                },
 
     'IO::Compress::DummyComp' => { Inverse  => 'IO::Uncompress::DummyUnComp',
                                    Error    => 'DummyCompError',
@@ -494,7 +504,7 @@ sub compressBuffer
 our ($AnyUncompressError);
 BEGIN
 {
-    eval ' use IO::Uncompress::AnyUncompress qw($AnyUncompressError); ';
+    eval ' use IO::Uncompress::AnyUncompress qw(anyuncompress $AnyUncompressError); ';
 }
 
 sub anyUncompress

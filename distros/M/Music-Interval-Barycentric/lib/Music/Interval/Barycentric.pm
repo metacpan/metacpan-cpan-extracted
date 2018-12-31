@@ -1,17 +1,29 @@
 package Music::Interval::Barycentric;
 our $AUTHORITY = 'cpan:GENE';
+
 # ABSTRACT: Compute barycentric musical interval space
 
 use strict;
 use warnings;
 
-our $VERSION = '0.0105';
+our $VERSION = '0.0301';
 
 use List::Util qw( min );
-use Readonly;
 
-Readonly my $SIZE  => 3;  # Triad chord
-Readonly my $SCALE => 12; # Scale notes
+require Exporter;
+use vars qw(@ISA @EXPORT);
+@ISA    = qw(Exporter);
+@EXPORT = qw(
+    barycenter
+    distance
+    evenness_index
+    orbit_distance
+    forte_distance
+    cyclic_permutation
+);
+
+my $SIZE  = 3;  # Triad chord
+my $SCALE = 12; # Scale notes
 
 
 sub barycenter {
@@ -72,6 +84,8 @@ sub evenness_index {
     return $i;
 }
 
+1;
+
 __END__
 
 =pod
@@ -84,21 +98,32 @@ Music::Interval::Barycentric - Compute barycentric musical interval space
 
 =head1 VERSION
 
-version 0.0105
+version 0.0301
 
 =head1 SYNOPSIS
 
  use Music::Interval::Barycentric;
- print join(', ', Music::Interval::Barycentric::barycenter(3)), "\n";
  my @chords = ([3, 4, 5], [0, 4, 7]);
- printf "D: %.3f\n", Music::Interval::Barycentric::distance($chords[0], $chords[1]);
- print Music::Interval::Barycentric::evenness_index($chords[0]);
- print Music::Interval::Barycentric::orbit_distance(@chords), "\n";
- print Music::Interval::Barycentric::forte_distance(@chords), "\n";
+ print 'Barycenter: ', join(', ', barycenter(3)), "\n";
+ printf "Distance: %.3f\n", distance($chords[0], $chords[1]);
+ print 'Evenness index: ', evenness_index($chords[0]), "\n";
+ print 'Orbit distance: ', orbit_distance(@chords), "\n";
+ print 'Forte distance: ', forte_distance(@chords), "\n";
 
 =head1 DESCRIPTION
 
 Barycentric chord analysis
+
+From the Amazon link below:
+
+"An intervallic representation of the chord leads naturally to a discrete
+barycentric condition. This condition itself leads to a convenient geometric
+representation of the chordal space as a simplicial grid.
+
+Chords appear as points in this grid and musical inversions of the chord would
+generate beautiful polyhedra inscribed in concentric spheres centered at the
+barycenter. The radii of these spheres would effectively quantify the evenness
+and thus the consonance of the chord."
 
 =head1 FUNCTIONS
 
@@ -154,7 +179,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2018 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

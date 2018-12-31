@@ -4,13 +4,19 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "devel",
+      "trace",
+      "use",
+      "require"
+   ],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Devel-TraceUse",
    "prereqs" : {
@@ -35,12 +41,12 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Data::Dumper" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "lib" : "0",
             "perl" : "5.006",
             "strict" : "0",
@@ -60,7 +66,7 @@
          "web" : "http://github.com/book/Devel-TraceUse"
       }
    },
-   "version" : "2.095",
+   "version" : "2.096",
    "x_contributors" : [
       "Neil Bowers <neilb@cpan.org>",
       "Graham Knop <haarg@cpan.org>",
@@ -69,6 +75,8 @@
       "David Leadbeater <dgl@cpan.org>",
       "Apocalypse <apocal@cpan.org>",
       "chromatic <chromatic@cpan.org>"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

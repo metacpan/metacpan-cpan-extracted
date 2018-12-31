@@ -1,0 +1,83 @@
+NAME
+    MathML::itex2MML - Convert itex equations to MathML
+
+SYNOPSIS
+     use MathML::itex2MML;
+ 
+     $text    = 'This is an inline equation: $\sin(\pi/2)=1$.';
+ 
+     # convert embedded itex equations to MathML:
+     $converted = itex_html_filter($text);    # This is an inline equation: <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math>.
+
+     # just the equations:
+     $converted = itex_filter($text);    # <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math>
+
+     $text    = '\sin(\pi/2)=1';
+
+     # inline equation (without the $'s)
+     $converted = itex_inline_filter($text);    # <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math>
+
+     # block equation (without the $$'s)
+     $converted = itex_block_filter($text);    # <math xmlns='http://www.w3.org/1998/Math/MathML' display='block'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math>
+
+DESCRIPTION
+    MathML::itex2MML converts itex (a dialect of LaTeX) equations into
+    MathML. Inline equations are demarcated by $..$ or \(...\). Display
+    equations are demarcated by $$...$$ or \[...\]. The syntax supported
+    is described at https://golem.ph.utexas.edu/~distler/blog/itex2MMLcommands.html .
+
+    It is strongly suggested that you run the output through MathML::Entities,
+    to convert named entities into either numeric character references or UTF-8 characters,
+    if you intend putting the result on the Web.
+
+    MathML::itex2MML is based on the commandline converter, itex2MML.
+
+FUNCTIONS
+    The following functions are exported by default.
+
+    * itex_html_filter
+        Converts the equations, passing the rest of the text through, unchanged.
+
+    * itex_filter
+        Outputs just the converted equations.
+
+    * itex_inline_filter
+        Converts an inline equation (without the $'s).
+
+    * itex_block_filter
+        Converts a block equation (without the $$'s)
+
+INSTALLATION ON UNIX
+
+You install MathML::itex2MML as you would install any perl module library,
+by running these commands:
+
+From the command line, type the following:
+
+   > perl Makefile.PL
+   > make
+   > make test
+   > make install
+
+INSTALLATION ON WIN32 PLATFORMS
+
+   > perl Makefile.PL
+   > nmake
+   > nmake test
+   > nmake install
+
+
+AUTHOR
+        Jacques Distler <distler@golem.ph.utexas.edu>
+
+COPYRIGHT
+        Copyright (c) 2018 Jacques Distler. All rights reserved.
+
+        This library is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+
+SEE ALSO
+        MathML::Entities,
+        <https://golem.ph.utexas.edu/~distler/blog/itex2MMLcommands.html>,
+        <https://rubygems.org/gems/itextomml>
+

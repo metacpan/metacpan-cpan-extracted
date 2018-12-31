@@ -1,6 +1,28 @@
 CHANGES
 -------
 
+  2.083 30 December 2018
+
+      * IO::Compress::*
+      * IO::Uncompress::*
+        The BinModeIn and BinModeOut options in are now no-ops. 
+        ALL files will be read/written in binmode.
+
+      * IO::Uncompress::Unzip
+        Fixed issue with unziping a member from a streamed zip file.
+        Issue triggered by a libreoffice document.
+        Test added to 105oneshot-zip-only.t
+        Thanks to Fabrizio Pivari for the bug report.
+
+      * Added U64::isZero
+
+      * bin/zipdetails
+        Added 'Data Stream Alignment' (tag 0xa11e) to extra fields.
+        Field sourced from https://support.pkware.com/display/PKZIP/Proposed+ZIP+Format+Specification+Additions
+
+      * Compress::Zlib.pm
+        #125140: Tiny POD error in Compress::Zlib
+
   2.081 4 April 2018
 
       * previous release used $^W instead of use warnings. Fixed.

@@ -1,6 +1,9 @@
+0.000004    2018-12-31
+            * Fix compilation errors on Ubuntu.
+
 0.000003    2018-10-31
-            * Fix docs and add link to original C++ library
-            * Update links for github repo
+            * Fix docs and add link to original C++ library.
+            * Update links for github repo.
 
 0.000002    2018-09-24
             * Initial release.

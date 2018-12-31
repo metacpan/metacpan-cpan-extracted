@@ -89,8 +89,8 @@ sub get_databases {
         }
     }
     $databases = [];
-
-    print 'Searching ...' . "\n";
+    local $| = 1;
+    print 'Searching ... ';
     if ( $self->{file_find_warnings} ) {
         for my $dir ( @$dirs ) {
             File::Find::find( {

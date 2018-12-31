@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@cromedome" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2018/12/12/dancer-and-minion/" property="og:url">
+  <meta content="Day 12: Using Minion in Dancer Apps" property="og:title">
+    <meta content="Overview of how to use Minion from within a Dancer application." property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/12/dancer-and-minion/banner.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 12: Using Minion in Dancer Apps - mojolicious.io</title>
+  <meta content="Jason Crome" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 12: Using Minion in Dancer Apps</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-12">Dec 12, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Stylistic photograph of Disney-style minion toys" src="/blog/2018/12/12/dancer-and-minion/banner.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>At <code>$work</code>, we have built an API with <a href="https://metacpan.org/pod/Dancer">Dancer</a> that generates PDF documents and XML files. This API is a critical component of an insurance enrollment system: PDFs are generated to deliver to the client in a web browser
+immediately, and the XML is delivered to the carrier as soon as it becomes available. Since the XML often takes a significant amount of time to generate, the job is generated in the background so as not to tie up the
+application server for an extended amount of time. When this was done, a homegrown process management system was developed, and works by <code>fork()</code>ing a process, tracking its pid, and hoping we can later successfully
+reap the completed process.</p>
+
+<p>There have been several problems with this approach:
+- it&#39;s fragile
+- it doesn&#39;t scale
+- it&#39;s too easy to screw something up as a developer</p>
+
+<p>In 2019, we have to ramp up to take on a significantly larger workload. The current solution simply will not handle the amount of work we anticipate needing to handle. Enter <a href="https://metacpan.org/pod/Minion">Minion</a>.</p>
+
+<p><em>Note:</em> The techniques used in this article work equally well with Dancer or <a href="https://metacpan.org/pod/Dancer2">Dancer2</a>.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Why Minion?</h2>
+
+<p>We looked at several alternatives to Minion, including <a href="https://beanstalkd.github.io/">beanstalkd</a> and <a href="http://www.celeryproject.org/">celeryd</a>. Using either one of these meant involving our already over-taxed
+infrastructure team, however; using Minion allowed us to use expertise that my team already has without having to burden someone else with assisting us. From a development standpoint, using a product that
+was developed in Perl gave us the quickest time to implementation.</p>
+
+<p>Scaling our existing setup was near impossible. It&#39;s not only difficult to get a handle on what resources are consumed by processes we&#39;ve forked, but it was impossible to run the jobs on more than one server.
+Starting over with Minion also gave us a much needed opportunity to clean up some code in sore need of refactoring. With a minimal amount of work, we were able to clean up our XML rendering code and make it work
+from Minion. This cleanup allowed us to more easily get information as to how much memory and CPU was consumed by an XML rendering job. This information is vital for us in planning future capacity.</p>
+
+<h2>Accessing Minion</h2>
+
+<p>Since we are a Dancer shop, and not Mojolicious, a lot of convenience you&#39;d get from Mojolicious for working with Minion isn&#39;t as available to us. Given we are also sharing some Minion-based
+code with our business models, we had to build some of our own plumbing around Minion:</p>
+
+<pre><code>package MyJob::JobQueue;
+
+use Moose;
+use Minion;
+
+use MyJob::Models::FooBar;
+with &#39;MyJob::Roles::ConfigReader&#39;;
+
+has &#39;runner&#39; =&gt; (
+    is      =&gt; &#39;ro&#39;,
+    isa     =&gt; &#39;Minion&#39;,
+    lazy    =&gt; 1,
+    default =&gt; sub( $self ) {
+        $ENV{ MOJO_PUBSUB_EXPERIMENTAL } = 1;
+        Minion-&gt;new( mysql =&gt; MyJob::DBConnectionManager-&gt;new-&gt;get_connection_uri({
+            db_type =&gt; &#39;feeds&#39;,
+            io_type =&gt; &#39;rw&#39;,
+        }));
+    },
+);
+</code></pre>
+
+<p>We wrapped a simple Moose class around Minion to make it easy to add to any class or Dancer application with the extra functionality we wanted.</p>
+
+<p>We ran into an issue at one point where jobs weren&#39;t running since we added them to a queue that no worker was configured to handle. To prevent this from happening to us again,
+we added code to prevent us from adding code to a queue that didn&#39;t exist:</p>
+
+<pre><code>my @QUEUE_TYPES = qw( default InstantXML PayrollXML ChangeRequest );
+
+sub has_invalid_queues( $self, @queues ) {
+    return 1 if $self-&gt;get_invalid_queues( @queues );
+    return 0;
+}
+
+sub get_invalid_queues( $self, @queues ) {
+    my %queue_map;
+    @queue_map{ @QUEUE_TYPES } = ();
+    my @invalid_queues = grep !exists $queue_map{ $_ }, @queues;
+    return @invalid_queues;
+}
+</code></pre>
+
+<p>With that in place, it was easy for our <code>queue_job()</code> method to throw an error if the developer tried to add a job to an invalid queue:</p>
+
+<pre><code>sub queue_job( $self, $args ) {
+    my $job_name = $args-&gt;{ name     } or die &quot;queue_job(): must define job name!&quot;;
+    my $guid     = $args-&gt;{ guid     } or die &quot;queue_job(): must have GUID to process!&quot;;
+    my $title    = $args-&gt;{ title    } // $job_name;
+    my $queue    = $args-&gt;{ queue    } // &#39;default&#39;;
+    my $job_args = $args-&gt;{ job_args };
+
+    die &quot;queue_job(): Invalid job queue &#39;$queue&#39; specified&quot; if $self-&gt;has_invalid_queues( $queue );
+
+    my %notes = ( title =&gt; $title, guid  =&gt; $guid );
+
+    return $self-&gt;runner-&gt;enqueue( $job_name =&gt; $job_args =&gt; { notes =&gt; \%notes, queue =&gt; $queue });
+}
+</code></pre>
+
+<h2>Creating Jobs</h2>
+
+<p>In our base model class (Moose-based), we would create an attribute for our job runner:</p>
+
+<pre><code>has &#39;job_runner&#39; =&gt; (
+    is      =&gt; &#39;ro&#39;,
+    isa     =&gt; &#39;MyJob::JobQueue&#39;,
+    lazy    =&gt; 1,
+    default =&gt; sub( $self ) { return MyJob::JobQueue-&gt;new-&gt;runner; },
+);
+</code></pre>
+
+<p>And in the models themselves, creating a new queueable task was as easy as:</p>
+
+<pre><code>$self-&gt;runner-&gt;add_task( InstantXML =&gt;
+    sub( $job, $request_path, $guid, $company_db, $force, $die_on_error = 0 ) {
+        $job-&gt;note(
+            request_path =&gt; $request_path,
+            feed_id      =&gt; 2098,
+            group        =&gt; $company_db,
+        );
+        MyJob::Models::FooBar-&gt;new( request_path =&gt; $request_path )-&gt;generate_xml({
+            pdf_guid     =&gt; $guid,
+            group        =&gt; $company_db,
+            force        =&gt; $force,
+            die_on_error =&gt; $die_on_error,
+        });
+});
+</code></pre>
+
+<h2>Running Jobs</h2>
+
+<p>Starting a job from Dancer was super easy:</p>
+
+<pre><code>use Dancer2;
+use MyJob::JobQueue;
+
+sub job_queue {
+    return MyJob::JobQueue-&gt;new;
+}
+
+get &#39;/my/api/route/:guid/:group/:force&#39; =&gt; sub {
+    my $guid  = route_parameters-&gt;get( &#39;guid&#39; );
+    my $group = route_parameters-&gt;get( &#39;group&#39; );
+    my $force = route_parameters-&gt;get( &#39;force&#39; );
+
+    debug &quot;GENERATING XML ONLY FOR $guid&quot;;
+    job_queue-&gt;queue_job({
+        name     =&gt; &quot;InstantXML&quot;,
+        guid     =&gt; $guid,
+        title    =&gt; &quot;Instant XML Generator&quot;,
+        queue    =&gt; &#39;InstantXML&#39;,
+        job_args =&gt; [ $self-&gt;request_path, $guid, $group, $force ],
+    });
+}
+</code></pre>
+
+<h2>Creating and Configuring the Job Queue Worker</h2>
+
+<p>We wanted to easily configure our Minions for all hosts and environments in one spot. Since we use a lot of YAML in Dancer, specifying the Minion configuration in YAML made a lot of sense
+to us:</p>
+
+<pre><code># What port does the dashboard listen on?
+dashboard_port: 4000
+
+# Add the rest later.
+dashboards:
+    UNKNOWN: http://localhost:3000/
+    DEV: http://my.development.host.tld:8001/
+
+# Hosts that have no entry assume the default configuration
+default:
+    max_children: 4
+    queues:
+        - default
+
+# Host-specific settings
+jcrome-precision-3510:
+    max_children: 8
+    queues:
+        - default
+        - InstantXML
+        - PayrollXML
+        - ChangeRequest
+</code></pre>
+
+<p>Our job queue workers look like:</p>
+
+<pre><code>#!/usr/bin/env perl
+
+use MyJob::Base;
+use MyJob::JobQueue;
+use MyJob::Log4p;
+use MyJob::Util::Logger;
+use MyJob::Util::SysTools qw(get_hostname);
+
+my $config     = MyJob::Config-&gt;new-&gt;config;
+my $hostconfig = get_hostconfig();
+my $minion     = MyJob::JobQueue-&gt;new;
+my $worker     = $minion-&gt;runner-&gt;worker;
+
+my $log_eng = MyJob::Log4p-&gt;new({ logger_name =&gt; &quot;Minion&quot; });
+my $logger  = MyJob::Util::Logger-&gt;new-&gt;logger($log_eng);
+</code></pre>
+
+<p>The above is mostly typical boilerplate for us. Read our configuration, and create a logger the worker can use.</p>
+
+<p>Next, when a job is dequeued, we want to log that the worker picked up a job (needed for auditing purposes) and we alter the process name so if a process hangs, we know what that process
+was attempting to run. If an unchecked exception occurs in a job, the worker will catch it and log it for us:</p>
+
+<pre><code>$worker-&gt;on( dequeue =&gt; sub( $worker, $job ) {
+    my $id    = $job-&gt;id;
+    my $notes = $job-&gt;info-&gt;{ notes };
+    my $title = $notes-&gt;{ title };
+    my $guid  = $notes-&gt;{ guid };
+
+    $job-&gt;on( spawn =&gt; sub( $job, $pid ) {
+        $0 = &quot;$title $guid&quot;;
+        $logger-&gt;info( &quot;$title: Created child process $pid for job $id by parent $$ - $guid&quot;);
+    });
+
+    $job-&gt;on( failed =&gt; sub( $job, $error ) {
+        chomp $error;
+        $logger-&gt;error( $error );
+    });
+});
+</code></pre>
+
+<p>To help us for future capacity planning, we want our workers to tell us if they are running at peak capacity, so log when this event occurs:</p>
+
+<pre><code>$worker-&gt;on( busy =&gt; sub( $worker ) {
+    my $max = $worker-&gt;status-&gt;{ jobs };
+    $logger-&gt;log( &quot;$0: Running at capacity (performing $max jobs).&quot; );
+});
+</code></pre>
+
+<p>Now, we apply the configuration (read below) to the worker. When the worker starts, it tells us information about how it was configured (this was really useful during development):</p>
+
+<pre><code>my $max_jobs = $hostconfig-&gt;{ max_children };
+my @queues   = @{ $hostconfig-&gt;{ queues }};
+
+if( $minion-&gt;has_invalid_queues( @queues ) ){
+    print &quot;Invalid job queues specified: &quot; . join( &#39;,&#39;, $minion-&gt;get_invalid_queues( @queues ) );
+    say &quot;. Aborting!&quot;;
+    exit 1;
+}
+
+say &quot;Starting Job Queue Worker on &quot; . get_hostname();
+say &quot;- Configured to run a max of $max_jobs jobs&quot;;
+say &quot;- Listening for jobs on queues: &quot;, join(&#39;, &#39;, @queues );
+$worker-&gt;status-&gt;{ jobs }   = $max_jobs;
+$worker-&gt;status-&gt;{ queues } = \@queues;
+$worker-&gt;run;
+</code></pre>
+
+<p>Remember the YAML file we used to configure things up above? This last bit pulls the information for the host this worker is running on (<code>get_hostname()</code> is a home-grown
+hostname function):</p>
+
+<pre><code>sub get_hostconfig {
+    my $minion_config = MyJob::Config-&gt;new({ filename =&gt; &quot;environments/minions.yml&quot; })-&gt;config;
+    my $hostname      = get_hostname();
+
+    if( exists $minion_config-&gt;{ $hostname }) {
+        return $minion_config-&gt;{ $hostname };
+    } else {
+        return $minion_config-&gt;{ default };
+    }
+}
+</code></pre>
+
+<h2>Monitoring the Workers</h2>
+
+<p>Our Minion dashboard was virtually identical to the one that @preaction posted in <a href="https://mojolicious.io/blog/2018/12/11/who-watches-the-minions/#section-2">Who Watches the Minions?</a>.
+If you&#39;d like to know more, I highly recommend reading his article.</p>
+
+<h2>Outcome</h2>
+
+<p>Within about a two-week timespan, we went from having zero practical knowledge of Minion to having things up and running. We&#39;ve made some refinements and improvements along the way, but the quick turnaround
+is a true testament to the simplicity of working with Minion.</p>
+
+<p>We now have all the necessary pieces in place to scale our XML rendering both horizontally and vertically: thanks to Minion, we can easily run XML jobs across multiple boxes, and can more efficiently run
+more jobs concurrently on the same hardware as before. This setup allows us to grow as quickly as our customer base does.</p>
+
+<h2>Further Reading</h2>
+
+<ul>
+<li><a href="https://metacpan.org/pod/Dancer">Dancer</a></li>
+<li><a href="https://metacpan.org/pod/Dancer2">Dancer2</a></li>
+<li><a href="https://metacpan.org/pod/Minion">Minion</a></li>
+</ul>
+
+              </section>
+              <small><p>Banner image: <a href="https://www.flickr.com/photos/enerva/9068467267">One Eyed Minion</a> by <a href="https://www.flickr.com/photos/enerva/">Sonny Abesamis</a> licensed <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/development/">development</a>,
+                  <a href="/blog/tag/dancer/">dancer</a>,
+                  <a href="/blog/tag/minion/">minion</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="http://0.gravatar.com/avatar/fcf781200bb62080ccf106bac3d24937">
+                      </div>
+                      <div class="about">
+                        <h5>Jason Crome</h5>
+                        <p>Jason is a Dancer Core Team member, pilot, and hockey-player-wannabe. He likes hacking Perl for fun and profit, but neither piÃ±a coladas nor getting caught in the rain.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/11/who-watches-the-minions/index.html" rel="prev"><strong>Previous Article</strong> Day 11: Who Watches The Minions</a></li>
+                  <li class="next"><a href="/blog/2018/12/13/taking-on-roles/index.html" rel="next"><strong>Next Article</strong> Day 13: Taking on Roles </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

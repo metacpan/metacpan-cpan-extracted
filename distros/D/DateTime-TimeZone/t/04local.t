@@ -30,7 +30,7 @@ DateTime::TimeZone::Local->_load_subclass() =~ /Unix$/
 
 my $IsMaintainer = hostname() =~ /houseabsolute|quasar/ && -d '.hg';
 my $CanWriteEtcLocaltime = -w '/etc/localtime' && -l '/etc/localtime';
-my $CanSymlink = try {
+my $CanSymlink           = try {
 ## no critic (InputOutput::RequireCheckedSyscalls)
     symlink q{}, q{};
     1;

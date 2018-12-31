@@ -1,0 +1,115 @@
+#!perl
+
+use strict;
+use warnings;
+use File::Spec;
+use File::Temp;
+use Getopt::Long::Modern qw(auto_help auto_version);
+use HTTP::Tinyish;
+use IPC::Open3;
+use Pod::Usage;
+
+our $VERSION = '0.001';
+
+GetOptions(
+  'notest|n' => \my $notest,
+  'quiet|q'  => \my $quiet,
+) or die "Invalid options passed\n";
+
+my ($src, $dest) = @ARGV;
+pod2usage() unless defined $src and defined $dest;
+
+foreach my $perl ($src, $dest) {
+  $perl = File::Spec->rel2abs($perl) unless File::Spec->file_name_is_absolute($perl);
+  $perl = File::Spec->catfile($perl, 'bin', 'perl') if -d $perl;
+  die "Could not find perl executable at $perl\n" unless !-d $perl && -x _;
+}
+
+print "Migrating CPAN modules from $src to $dest\n";
+
+my $ua = HTTP::Tinyish->new;
+my $tempdir = File::Temp->newdir;
+my $cpanm = File::Spec->catfile($tempdir, 'cpanm');
+my $url = 'https://cpanmin.us';
+my $response = $ua->mirror($url, $cpanm);
+unless ($response->{success}) {
+  die "Failed to download $url: $response->{content}\n" if $response->{status} == 599;
+  die "Failed to download $url: $response->{status} $response->{reason}\n";
+}
+
+my $list_pid = open3 undef, my $list_out, '>&STDERR', $src, '-MExtUtils::Installed', '-e',
+  'for (ExtUtils::Installed->new(skip_cwd => 1)->modules) {next if /\APerl\z/; print $_, "\n";}';
+
+my @opts;
+push @opts, '-n' if $notest;
+push @opts, '-q' if $quiet;
+
+my $install_pid = open3 my $install_in, '>&STDOUT', '>&STDERR', $dest, $cpanm, @opts;
+
+while (my $line = readline $list_out) { print $install_in $line }
+close $list_out;
+close $install_in;
+
+waitpid $list_pid, 0;
+my $list_exit = $? >> 8;
+waitpid $install_pid, 0;
+my $install_exit = $? >> 8;
+
+die "Module listing failed with exit status $list_exit\n" if $list_exit;
+die "CPAN install failed with exit status $install_exit\n" if $install_exit;
+
+print "Migrated CPAN modules from $src to $dest\n";
+
+=head1 NAME
+
+perl-migrate-modules - Migrate installed CPAN modules from one Perl to another
+
+=head1 SYNOPSIS
+
+  perl-migrate-modules [OPTIONS] <src-path> <dest-path>
+
+    perl-migrate-modules /path/to/perl-5.28.0 /path/to/perl-5.28.1
+    perl-migrate-modules -nq /usr/bin/perl ~/bin/perl
+
+  Options:
+    -h, --help                   Show this message
+    -n, --notest                 Skip testing and test dependencies
+    -q, --quiet                  Show only installation successes and failures
+    -v, --version                Show the version of this script
+
+=head1 DESCRIPTION
+
+Reinstalls all modules found in the source Perl into the destination Perl,
+similar to the C<clone-modules> command for L<perlbrew> or the
+C<migrate-modules> command for L<plenv|https://github.com/tokuhirom/plenv>. The
+Perls may be passed as paths to the base installation directory or paths to the
+F<perl> executable itself.
+
+=head1 CAVEATS
+
+Only modules with F<.packlist> will be migrated, this will include any module
+installed by CPAN clients, but generally not modules installed by vendor
+packages or core modules.
+
+Migrated modules will be installed at their latest indexed version, not the
+version that exists in the source Perl.
+
+=head1 BUGS
+
+Report any issues on the public bugtracker.
+
+=head1 AUTHOR
+
+Dan Book <dbook@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Dan Book.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=head1 SEE ALSO
+
+L<perlbrew/"COMMAND: CLONE-MODULES">

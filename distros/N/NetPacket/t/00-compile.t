@@ -2,20 +2,22 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.051
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.052
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'NetPacket.pm',
     'NetPacket/ARP.pm',
     'NetPacket/Ethernet.pm',
     'NetPacket/ICMP.pm',
+    'NetPacket/ICMPv6.pm',
     'NetPacket/IGMP.pm',
     'NetPacket/IP.pm',
     'NetPacket/IPX.pm',
+    'NetPacket/IPv6.pm',
     'NetPacket/TCP.pm',
     'NetPacket/UDP.pm',
     'NetPacket/USBMon.pm'

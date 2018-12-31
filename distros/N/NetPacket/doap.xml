@@ -40,6 +40,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Dan Book</foaf:name>
+      <foaf:mbox rdf:resource="mailto:grinnz@grinnz.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Daniel Collins</foaf:name>
       <foaf:mbox rdf:resource="mailto:solemnwarning@solemnwarning.net" />
     </foaf:Person>
@@ -48,6 +54,12 @@
     <foaf:Person>
       <foaf:name>Dinar Valeev</foaf:name>
       <foaf:mbox rdf:resource="mailto:dvaleev@suse.de" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>fschlich</foaf:name>
+      <foaf:mbox rdf:resource="mailto:fsfs@debian.org" />
     </foaf:Person>
   </helper>
   <helper>
@@ -64,14 +76,14 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Robin Lee</foaf:name>
-      <foaf:mbox rdf:resource="mailto:cheeselee@fedoraproject.org" />
+      <foaf:name>Nicolas R</foaf:name>
+      <foaf:mbox rdf:resource="mailto:atoomic@cpan.org" />
     </foaf:Person>
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>Stan Schwertly</foaf:name>
-      <foaf:mbox rdf:resource="mailto:stan@linode.com" />
+      <foaf:name>Robin Lee</foaf:name>
+      <foaf:mbox rdf:resource="mailto:cheeselee@fedoraproject.org" />
     </foaf:Person>
   </helper>
   <helper>
@@ -88,8 +100,8 @@
   </helper>
   <helper>
     <foaf:Person>
-      <foaf:name>fschlich</foaf:name>
-      <foaf:mbox rdf:resource="mailto:fsfs@debian.org" />
+      <foaf:name>Zak B. Elep</foaf:name>
+      <foaf:mbox rdf:resource="mailto:zakame@zakame.net" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://www.perlfoundation.org/artistic_license_2_0" />
@@ -249,6 +261,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.5.0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-06-15</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.6.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-03-13</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

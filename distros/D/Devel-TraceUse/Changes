@@ -1,5 +1,12 @@
 Revision history for Devel-TraceUse
 
+2.096 2018-12-30 BOOK
+    - Properly separate different attempts at loading the same module
+    - Override CORE::GLOBAL::require to ensure the hook is always first
+      (so `use lib` won't hide the module loaded right after it)
+    - Refactorized some of the internals
+    - Updated some links in the documentation
+
 2.095 2016-12-04 BOOK
     - Improve detection of sitecustomize.pl (Debian patch)
     - Minor documentation fixes

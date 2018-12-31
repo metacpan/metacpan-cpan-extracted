@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@joelaberger" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/13/day-13-more-about-roles/" property="og:url">
+  <meta content="Day 13: More About Roles" property="og:title">
+    <meta content="Investigating Mojo::Base&#39;s recently-added role support." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/13/day-13-more-about-roles/amsterdam_hats.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 13: More About Roles - mojolicious.io</title>
+  <meta content="Joel Berger" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 13: More About Roles</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-13">Dec 13, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Pile of hats" src="/blog/2017/12/13/day-13-more-about-roles/amsterdam_hats.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>Before we get ahead of ourselves, what are roles?
+Briefly stated, roles enable composing functionality (usually methods) into a class without without implying a change of inheritence.
+Said another way, roles let you specify what a class does without changing what it is.
+For a better description, check out Toby Inkster&#39;s article <a href="http://radar.oreilly.com/2014/01/horizontal-reuse-an-alternative-to-inheritance.html">Horizontal Reuse: An Alternative to Inheritance</a>.</p>
+
+<p>An important utility of roles is that you can easily use more than one role at the same time in the same consuming class.
+With inheritance, especially of third-party functionality, you have to choose one set of extensions to utilize.
+This is because the author of the subclass establishes the inheritance.
+In roles, the user determines which roles to compose into the base class.</p>
+
+<p><a href="/blog/2017/12/12/day-12-more-than-a-base-class">Yesterday</a> I ended the discussion of <a href="http://mojolicious.org/perldoc/Mojo/Base">Mojo::Base</a> before discussing the roles support.
+Added in several installments between Mojolicious versions <a href="https://metacpan.org/release/SRI/Mojolicious-7.40">7.40</a> and <a href="https://metacpan.org/release/SRI/Mojolicious-7.55">7.55</a>, this role support is one of the most recently added features in the ecosystem (along with <a href="http://mojolicious.org/perldoc/Mojo/Promise">promises</a>, which will be covered in <a href="/blog/2017/12/14/day-14-you-promised-to-call">an upcoming article</a>).
+The role handling comes from <a href="https://metacpan.org/pod/Role::Tiny">Role::Tiny</a> which is an optional dependency in Mojolicious, but is required in order to use the functionality that I will describe.</p>
+
+              </section>
+              <section id="section-2">
+                  <p>This is not to say that roles couldn&#39;t be or weren&#39;t used in Mojolicious before then, only that Mojo::Base didn&#39;t include any special handling to make it user-friendly.
+Prior to the functionality being formally available from Mojo::Base, a few roles were available for Mojo stack classes on CPAN.
+To my knowledge they all used Role::Tiny, but they had to roll their own composition mechanisms, presenting some barrier to use.</p>
+
+<h2>Creating Roles</h2>
+
+<p>A role itself looks like a class at first glance.
+It has a package name and probably has methods.
+Rather than using the <code>-base</code> flag or specifying a parent class, a role uses the <code>-role</code> flag.
+Once again, an optional <code>-signatures</code> flag is allowed too.</p>
+
+<p>Let&#39;s look at a (contrived) example.
+Say we want to make a role that finds all the tags matching elements in a <a href="http://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a> based on a selector stored in an attribute.</p>
+
+<pre><code>package Mojo::DOM::Role::FindCustom;
+use Mojo::Base -role;
+
+requires &#39;find&#39;;
+
+has custom_selector =&gt; &#39;a&#39;;
+
+sub find_custom {
+  my $self = shift;
+  return $self-&gt;find($self-&gt;custom_selector);
+}
+</code></pre>
+
+<p>This example shows three interesting features.
+First is that even though it is not a class, the package still gets Mojo::Base&#39;s <a href="http://mojolicious.org/perldoc/Mojo/Base#has">has</a> keyword, used to make accessors for attributes.
+Second is that a new keyword, <code>requires</code>, has been added, coming from <a href="https://metacpan.org/pod/Role::Tiny#requires">Role::Tiny</a>.
+This keyword tells the role that it can only be composed into a class that provides a <code>find</code> method.
+Consider the new <code>find_custom</code> method, since it uses <code>find</code> if the class it is composed into didn&#39;t provide that method our new method couldn&#39;t behave as expected.</p>
+
+<p>Indeed several keywords are imported from Role::Tiny including <code>with</code> to compose other roles and several method modifiers coming from <a href="https://metacpan.org/pod/Class::Method::Modifiers">Class::Method::Modifiers</a> (which is an optional dependency only required if used).
+While I won&#39;t discuss these in depth, if you need to change how a method from a consuming class works by adding behavior before and/or after that method, check out method modifiers.</p>
+
+<p>The third thing you might notice is the name of the package that I chose.
+The only thing that limits what classes the role can be consumed by is the <code>requires</code> keyword.
+However clearly this role is intended to work with functionality provided by Mojo::DOM and so this name is a good choice.</p>
+
+<h2>Composing Roles</h2>
+
+<p>Now that we know how to create a role, how is it used?
+Well, let&#39;s continue with the prior example.</p>
+
+<p>A role cannot be instantiated on its own, indeed it doesn&#39;t even have a constructor (e.g. a <code>new</code> method).
+To use the role we employ the <a href="http://mojolicious.org/perldoc/Mojo/Base#with_roles"><code>with_roles</code></a> method, provided by Mojo::Base, to compose it with Mojo::DOM.</p>
+
+<p>This method is slightly different when used on class versus when it is used on an object.
+When used as a class method, the return value is a new semi-anonymous class that composes all the given roles.</p>
+
+<pre><code>my $class = Mojo::DOM-&gt;with_roles(&#39;Mojo::DOM::Role::FindCustom&#39;);
+my $dom = $class-&gt;new(&#39;&lt;html&gt;&lt;a href=&quot;http://mojolicious.org&quot;&gt;Mojolicious&lt;/a&gt;&lt;/html&gt;&#39;);
+my $anchors = $dom-&gt;find_custom;
+</code></pre>
+
+<p>While this is conceptually a new class which inherits from the consuming class, this is really an implementation detail because of how Perl does namespacing and packages.
+You are encouraged to think of this new class as just the old one with more behaviors.
+Usually however, the returned class is just used to instantiate an object anyway, so we can skip storing it.</p>
+
+<pre><code>my $dom = Mojo::DOM-&gt;with_roles(&#39;Mojo::DOM::Role::FindCustom&#39;)-&gt;new(
+  &#39;&lt;html&gt;&lt;a href=&quot;http://mojolicious.org&quot;&gt;Mojolicious&lt;/a&gt;&lt;/html&gt;&#39;
+);
+my $anchors = $dom-&gt;find_custom;
+</code></pre>
+
+<p>That looks less awkward, but now that&#39;s a lot to type before instantiating.
+Remember that choice of package name for the role, turns out when you compose a role into a class whose name starts with <code>&lt;CLASS&gt;::Role::</code> there is a shortcut you can use.
+Just replace all of that common prefix with a <code>+</code> sign!</p>
+
+<pre><code>my $dom = Mojo::DOM-&gt;with_roles(&#39;+FindCustom&#39;)-&gt;new(
+  &#39;&lt;html&gt;&lt;a href=&quot;http://mojolicious.org&quot;&gt;Mojolicious&lt;/a&gt;&lt;/html&gt;&#39;
+);
+my $anchors = $dom-&gt;find_custom;
+</code></pre>
+
+<p>And finally that looks quite nice.
+It should be noted that this shortcut usage is different from some other plugin systems on CPAN, some of which use <code>+</code> to indicate a literal (ie non-shortened) class name.
+We feel that you should be explicit about requesting a non-literal class name and so we made this choice.</p>
+
+<p>Now sometimes you don&#39;t instantiate the class, sometimes you have an instance given to you.
+For example say the Mojo::DOM document came from a <a href="http://mojolicious.org/perldoc/Mojo/UserAgent">Mojo::UserAgent</a> request.
+In this case you can still use <code>with_roles</code>.
+What happens in this case is that a little magic happens in the background to add the functionality to the instance.</p>
+
+<pre><code>my $dom = $ua
+  -&gt;get(&#39;http://mojolicious.org&#39;)
+  -&gt;res
+  -&gt;dom
+  -&gt;with_roles(&#39;+FindCustom&#39;);
+my $anchors = $dom-&gt;find_custom;
+</code></pre>
+
+<p>Finally, when you are checking if a class consumes a role, you don&#39;t check with <code>-&gt;isa</code> as if it were inheritance.
+Rather you check with <code>-&gt;does</code>.
+You cannot use the shortened forms of roles when using this check however.</p>
+
+<pre><code>if ($dom-&gt;does(&#39;Mojo::DOM::Role::FindCustom&#39;)) {
+  $dom-&gt;find_custom-&gt;each(sub{ say });
+}
+</code></pre>
+
+<h2>Roles on CPAN</h2>
+
+<p>The first part of the ecosystem to embrace roles was testing.
+Given the interface of <a href="http://mojolicious.org/perldoc/Test/Mojo">Test::Mojo</a>, adding additional test methods isn&#39;t as easy as is generally true of other testers in the <a href="https://metacpan.org/pod/Test::More">Test::More</a> landscape.
+Roles fill that gap nicely, and therefore such roles predated Mojo::Base&#39;s own role handling and even inspired adding it to the core.</p>
+
+<p>As I&#39;ve mentioned <a href="/blog/2017/12/09/day-9-the-best-way-to-test">earlier in this series</a>, <a href="https://metacpan.org/pod/Test::Mojo::Role::Debug">Test::Mojo::Role::Debug</a> adds methods to run a callback on failed tests.
+<a href="https://metacpan.org/pod/Test::Mojo::Role::TestDeep">Test::Mojo::Role::TestDeep</a> lets you test responses with the comparison functions from <a href="https://metacpan.org/pod/Test::Deep">Test::Deep</a>.
+<a href="https://metacpan.org/pod/Test::Mojo::Role::PSGI">Test::Mojo::Role::PSGI</a> lets you use Test::Mojo with non-Mojolicious web frameworks!
+You can even use them all together.</p>
+
+<pre><code>use Mojo::Base -strict;
+use Test::More;
+use Test::Mojo;
+use Test::Deep; # for its keywords
+
+my $t = Test::Mojo
+  -&gt;with_roles(&#39;+PSGI&#39;, &#39;+TestDeep&#39;, &#39;+Debug&#39;)
+  -&gt;new(&#39;/path/to/app.psgi&#39;);
+
+$t-&gt;get_ok(&#39;/&#39;)
+  -&gt;text_deeply(
+    &#39;nav a&#39;,
+    [qw( Home Blog Projects About Contact )],
+    &#39;nav link text matches site section titles&#39;,
+  )-&gt;d(sub{ diag $t-&gt;tx-&gt;req-&gt;body });
+</code></pre>
+
+<p>This example loads a hypothetical psgi application from the filesystem, tests it for text elements and if that test fails dumps the response body to the console.</p>
+
+<p>There are three modules (only two on CPAN so far) that let you run javascript on pages via external processes.
+<a href="https://metacpan.org/pod/Test::Mojo::Role::Phantom">Test::Mojo::Role::Phantom</a> and <a href="https://metacpan.org/pod/Test::Mojo::Role::Selenium">Test::Mojo::Role::Selenium</a> use <a href="http://phantomjs.org/">PhantomJS</a> and <a href="http://www.seleniumhq.org/">Selenium</a> respectively.
+PhantomJS is abandoned however so <a href="https://github.com/jberger/Mojo-Chrome">Test::Mojo::Role::Chrome</a> is in development on my Github and will replace the PhantomJS role.</p>
+
+<p>Note that several of these modules depend on a module named <a href="https://metacpan.org/pod/Test::Mojo::WithRoles">Test::Mojo::WithRoles</a> which is essentially obsolete at this point.
+It can be safely ignored and authors can remove it from their module&#39;s dependencies when convenient.</p>
+
+<p>Apart from testing, other roles include</p>
+
+<ul>
+<li><a href="https://metacpan.org/pod/Mojo::Log::Role::Clearable">Mojo::Role::Log::Clearable</a> allowing the Mojo::Log to cleanly change paths</li>
+<li><a href="https://metacpan.org/pod/Mojo::DOM::Role::PrettyPrinter">Mojo::DOM::Role::PrettyPrinter</a> pretty prints Mojo::DOM documents</li>
+<li><a href="https://metacpan.org/pod/Mojo::Collection::Role::UtilsBy">Mojo::Collection::Role::UtilsBy</a> adds <a href="https://metacpan.org/pod/List::UtilsBy">List::UtilsBy</a> methods to <a href="http://mojolicious.org/perldoc/Mojo/Collection">Mojo::Collection</a></li>
+<li><a href="https://metacpan.org/pod/distribution/Mojo-UserAgent-CookieJar-Role-Persistent/lib/Mojo/UserAgent/CookieJar/Role/Persistent.pod">Mojo::UserAgent::CookieJar::Role::Persistent</a> can store cookies from Mojo::UserAgent requests persistently for use between runs/processes</li>
+</ul>
+
+<p>... as well as others.
+And the list is sure to grow now that Mojo::Base can natively compose these roles.</p>
+
+              </section>
+              <small><p><a href="https://commons.wikimedia.org/w/index.php?curid=15179120">Image</a> Â© Jorge RoyanÂ /Â <a class="external free" href="http://www.royan.com.ar" rel="nofollow">http://www.royan.com.ar</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/roles/">roles</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/cc767569f5863a7c261991ee5b23f147">
+                      </div>
+                      <div class="about">
+                        <h5>Joel Berger</h5>
+                        <p>Joel has Ph.D. in Physics from the University of Illinois at Chicago.
+He an avid Perl user and <a href="https://metacpan.org/author/JBERGER">author</a> and is a member of the Mojolicious Core Team.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/12/day-12-more-than-a-base-class/index.html" rel="prev"><strong>Previous Article</strong> Day 12: More Than a Base Class</a></li>
+                  <li class="next"><a href="/blog/2017/12/14/day-14-you-promised-to-call/index.html" rel="next"><strong>Next Article</strong> Day 14: You Promised To Call! </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

@@ -14,7 +14,7 @@ use Scalar::Util;
 
 with 'Data::Object::Role::Scalar';
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 method new ($class: @args) {
 
@@ -60,7 +60,7 @@ Data::Object::Scalar - Scalar Object for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -72,11 +72,6 @@ version 0.60
 
 Data::Object::Scalar provides routines for operating on Perl 5 scalar
 objects. Scalar methods work on data that meets the criteria for being a scalar.
-
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Scalar>
-role and implements proxy methods as documented herewith.
 
 =head1 METHODS
 
@@ -235,6 +230,11 @@ If captured this method returns a L<Data::Object::Exception> object.
 The type method returns a string representing the internal data type object name.
 This method returns a L<Data::Object::String> object.
 
+=head1 COMPOSITION
+
+This package inherits all functionality from the L<Data::Object::Role::Scalar>
+role and implements proxy methods as documented herewith.
+
 =head1 ROLES
 
 This package is comprised of the following roles.
@@ -367,7 +367,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

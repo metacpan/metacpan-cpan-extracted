@@ -1,7 +1,7 @@
 package CPAN::Info::FromURL;
 
-our $DATE = '2017-06-09'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2018-12-30'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,7 +17,7 @@ our $re_author   = qr/(?:\w+)/;
 our $re_dist     = qr/(?:\w+(?:-\w+)*)/;
 our $re_mod      = qr/(?:\w+(?:::\w+)*)/;
 our $re_version  = qr/(?:v?[0-9]+(?:\.[0-9]+)*(?:_[0-9]+|-TRIAL)?)/;
-our $re_end_or_q = qr/(?:[?&]|\z)/;
+our $re_end_or_q = qr/(?:[?&#]|\z)/;
 
 sub _normalize_mod {
     my $mod = shift;
@@ -186,6 +186,18 @@ _
         },
 
         {
+            name => "mojo",
+            args => {url=>'https://mojolicious.org/perldoc/Mojo/DOM/CSS'},
+            result => {site=>'mojo', module=>'Mojo::DOM::CSS'},
+        },
+
+        {
+            name => "anchor in url",
+            args => {url=>'https://mojolicious.org/perldoc/Mojo/DOM/CSS#Foo'},
+            result => {site=>'mojo', module=>'Mojo::DOM::CSS'},
+        },
+
+        {
             name => 'unknown',
             args => {url=>'https://www.google.com/'},
             result => undef,
@@ -204,7 +216,7 @@ sub extract_cpan_info_from_url {
         # note: /module is the old URL. /pod might misreport a script as a
         # module, e.g. metacpan.org/pod/cpanm.
         if ($url =~ m!\A(?:pod|module)/
-                      ($re_mod)(?:[?&]|\z)!x) {
+                      ($re_mod)(?:[?&#]|\z)!x) {
             $res->{module} = $1;
         } elsif ($url =~ s!\A(?:pod/release/|source/)
                            ($re_author)/($re_dist)-($re_version)/?!!x) {
@@ -259,20 +271,20 @@ sub extract_cpan_info_from_url {
             $res->{module} = URI::Escape::uri_unescape($1);
         } elsif ($url =~ m!\Asearch\?!) {
             # used by perlmonks.org
-            if ($url =~ m![?&]mode=module(?:&|\z)! && $
-                    url =~ m![?&]query=(.+?)(?:&|\z)!) {
+            if ($url =~ m![?&#]mode=module(?:&|\z)! && $
+                    url =~ m![?&#]query=(.+?)(?:&|\z)!) {
                 require URI::Escape;
                 $res->{module} = _normalize_mod(URI::Escape::uri_unescape($1));
-            } elsif ($url =~ m![?&]mode=dist(?:&|\z)! && $
+            } elsif ($url =~ m![?&#]mode=dist(?:&|\z)! && $
                     url =~ m![?&]query=(.+?)(?:&|\z)!) {
                 require URI::Escape;
                 $res->{dist} = URI::Escape::uri_unescape($1);
-            } elsif ($url =~ m![?&]mode=author(?:&|\z)! && $
-                    url =~ m![?&]query=(.+?)(?:&|\z)!) {
+            } elsif ($url =~ m![?&#]mode=author(?:&|\z)! && $
+                    url =~ m![?&#]query=(.+?)(?:&|\z)!) {
                 require URI::Escape;
                 $res->{author} = URI::Escape::uri_unescape($1);
             # used by some articles
-            } elsif ($url =~ m![?&]module=(.+?)(?:&|\z)!) {
+            } elsif ($url =~ m![?&#]module=(.+?)(?:&|\z)!) {
                 require URI::Escape;
                 $res->{module} = _normalize_mod(URI::Escape::uri_unescape($1));
             }
@@ -314,10 +326,19 @@ sub extract_cpan_info_from_url {
 
         $res->{site} = 'rt';
         if ($url =~ m!\A(?:Public/)?Dist/Display\.html!) {
-            if ($url =~ m![?&](?:Queue|Name)=(.+?)(?:&|\z)!) {
+            if ($url =~ m![?&#](?:Queue|Name)=(.+?)(?:&|#|\z)!) {
                 require URI::Escape;
                 $res->{dist} = URI::Escape::uri_unescape($1);
             }
+        }
+
+    } elsif ($url =~ s!\A$re_proto_http?mojolicious\.org/?!!i) {
+
+        $res->{site} = 'mojo';
+        if ($url =~ m!\Aperldoc/([^?&#]+)!) {
+            my $mod = $1;
+            $mod =~ s!/!::!g;
+            $res->{module} = $mod;
         }
 
     } elsif ($url =~ m!/authors/id/(\w)/\1(\w)/(\1\2\w+)
@@ -352,7 +373,7 @@ CPAN::Info::FromURL - Extract/guess information from a URL
 
 =head1 VERSION
 
-This document describes version 0.08 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2017-06-09.
+This document describes version 0.090 of CPAN::Info::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2018-12-30.
 
 =head1 FUNCTIONS
 
@@ -577,7 +598,23 @@ Result:
 
  { dist => "Perinci-Sub-Gen-AccessTable-DBI", site => "rt" }
 
-=item * Example #26 (unknown):
+=item * Example #26 (mojo):
+
+ extract_cpan_info_from_url("https://mojolicious.org/perldoc/Mojo/DOM/CSS");
+
+Result:
+
+ { module => "Mojo::DOM::CSS", site => "mojo" }
+
+=item * Example #27 (anchor in url):
+
+ extract_cpan_info_from_url("https://mojolicious.org/perldoc/Mojo/DOM/CSS#Foo");
+
+Result:
+
+ { module => "Mojo::DOM::CSS", site => "mojo" }
+
+=item * Example #28 (unknown):
 
  extract_cpan_info_from_url("https://www.google.com/"); # -> undef
 
@@ -636,7 +673,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

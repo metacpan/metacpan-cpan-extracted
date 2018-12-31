@@ -31,3 +31,11 @@ Revision history for Perl module Devel::Git::MultiBisect
     - Mostly a maintenance release intended to prepare for addition of
       functionality for build-time multisection in upcoming release.  Use of
       get_current_branch() discontinued.
+
+0.10 Sat Dec 29 12:11:47 EST 2018
+    - Combine four test files into one to avoid problems where tester
+      (especially a CPANtester) has envvar HARNESS_OPTIONS set to j2 or 
+      greater.  The four test files in question each touch the submodules
+      in t/lib/.  Parallel testing disturbed these in unexpected ways.
+      Thanks to Slaven Rezić and Andreas König
+      (https://github.com/cpan-testers/cpantesters-web/issues/24).

@@ -16,7 +16,7 @@ use CompTestUtils;
 
 my $XZ ;
 
-sub ExtarnalXzWorks
+sub ExternalXzWorks
 {
     my $lex = new LexFile my $outfile;
     my $content = qq {
@@ -103,7 +103,7 @@ BEGIN
         if ! $XZ ;
 
     plan(skip_all => "$name doesn't work as expected")
-        if ! ExtarnalXzWorks();
+        if ! ExternalXzWorks();
     
     # use Test::NoWarnings, if available
     my $extra = 0 ;

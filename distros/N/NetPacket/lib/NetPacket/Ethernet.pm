@@ -1,9 +1,7 @@
 package NetPacket::Ethernet;
-BEGIN {
-  $NetPacket::Ethernet::AUTHORITY = 'cpan:YANICK';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble ethernet packets.
-$NetPacket::Ethernet::VERSION = '1.6.0';
+$NetPacket::Ethernet::VERSION = '1.7.0';
 use strict;
 use warnings;
 
@@ -110,8 +108,9 @@ $pkt);
 # Strip header from packet and return the data contained in it
 #
 
-undef &eth_strip;        # Create eth_strip alias
-*eth_strip = \&strip;
+sub eth_strip {
+  goto \&strip;
+}
 
 sub strip {
     my ($pkt) = @_;
@@ -150,7 +149,7 @@ NetPacket::Ethernet - Assemble and disassemble ethernet packets.
 
 =head1 VERSION
 
-version 1.6.0
+version 1.7.0
 
 =head1 SYNOPSIS
 

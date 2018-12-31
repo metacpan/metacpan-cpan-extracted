@@ -5,14 +5,15 @@ author:
   - 'Stephanie Wehner <atrak@itsx.com>'
   - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0.88'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,37 +22,47 @@ name: NetPacket
 provides:
   NetPacket:
     file: lib/NetPacket.pm
-    version: v1.6.0
+    version: v1.7.0
   NetPacket::ARP:
     file: lib/NetPacket/ARP.pm
-    version: v1.6.0
+    version: v1.7.0
   NetPacket::Ethernet:
     file: lib/NetPacket/Ethernet.pm
-    version: v1.6.0
+    version: v1.7.0
   NetPacket::ICMP:
     file: lib/NetPacket/ICMP.pm
-    version: v1.6.0
+    version: v1.7.0
+  NetPacket::ICMPv6:
+    file: lib/NetPacket/ICMPv6.pm
+    version: v1.7.0
   NetPacket::IGMP:
     file: lib/NetPacket/IGMP.pm
-    version: v1.6.0
+    version: v1.7.0
   NetPacket::IP:
     file: lib/NetPacket/IP.pm
-    version: v1.6.0
+    version: v1.7.0
   NetPacket::IPX:
     file: lib/NetPacket/IPX.pm
-    version: v1.6.0
+    version: v1.7.0
+  NetPacket::IPv6:
+    file: lib/NetPacket/IPv6.pm
+    version: v1.7.0
   NetPacket::TCP:
     file: lib/NetPacket/TCP.pm
-    version: v1.6.0
+    version: v1.7.0
   NetPacket::UDP:
     file: lib/NetPacket/UDP.pm
-    version: v1.6.0
+    version: v1.7.0
   NetPacket::USBMon:
     file: lib/NetPacket/USBMon.pm
-    version: v1.6.0
+    version: v1.7.0
+recommends:
+  Net::Pcap: '0'
+  Net::PcapUtils: '0'
 requires:
   Carp: '0'
   Exporter: '0'
+  Socket: '1.87'
   constant: '0'
   parent: '0'
   perl: v5.10.0
@@ -61,17 +72,23 @@ resources:
   bugtracker: https://github.com/yanick/netpacket/issues
   homepage: https://github.com/yanick/netpacket
   repository: https://github.com/yanick/netpacket.git
-version: 1.6.0
+version: 1.7.0
 x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.01
 x_contributors:
   - 'Andreas Schwab <schwab@suse.de>'
   - 'Ben Magistro <koncept1@gmail.com>'
+  - 'Dan Book <grinnz@grinnz.com>'
   - 'Daniel Collins <solemnwarning@solemnwarning.net>'
   - 'Dinar Valeev <dvaleev@suse.de>'
+  - 'fschlich <fsfs@debian.org>'
   - 'Lubomir Rintel <lkundrak@v3.sk>'
   - 'Neil Bowers <neil@bowers.com>'
+  - 'Nicolas R <atoomic@cpan.org>'
   - 'Robin Lee <cheeselee@fedoraproject.org>'
-  - 'Stan Schwertly <stan@linode.com>'
   - 'Stephanie Wehner <atrak@cpan.org>'
   - 'Tim Potter <timpotter@cpan.org>'
-  - 'fschlich <fsfs@debian.org>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_generated_by_perl: v5.20.2
+x_serialization_backend: 'YAML::Tiny version 1.67'

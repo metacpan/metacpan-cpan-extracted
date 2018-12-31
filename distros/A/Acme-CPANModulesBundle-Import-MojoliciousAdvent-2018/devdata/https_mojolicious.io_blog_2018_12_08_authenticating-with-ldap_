@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+  <meta content="https://mojolicious.io/blog/2018/12/08/authenticating-with-ldap/" property="og:url">
+  <meta content="Day 8: Authenticating with LDAP" property="og:title">
+    <meta content="Learn how to add LDAP authentication to a Mojolicious full app" property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/08/authenticating-with-ldap/banner.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 8: Authenticating with LDAP - mojolicious.io</title>
+  <meta content="Boyd Duffee" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 8: Authenticating with LDAP</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-08">Dec  8, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Who goes there?" src="/blog/2018/12/08/authenticating-with-ldap/banner.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>There are still quite a few people using LDAP in production,
+but for those who are new to it,
+LDAP is a directory with a tree-structure that&#39;s optimised for very fast lookups.
+It used to be very common as a centralised authentication system
+and if you&#39;re using Active Directory, you&#39;re using LDAP (mostly).
+I wander through the wilderness of authentication,
+ending with my solution on how to add LDAP authentication to your App.</p>
+
+              </section>
+              <section id="section-2">
+                  <p>This post is based on a
+<a href="https://docs.google.com/presentation/d/14ZbARlTj_3mxEf_9Bvbrz0AUYjQdFjIXfYuttb_J7uU">talk</a>
+I gave at
+<a href="https://act.yapc.eu/lpw2018">London Perl Workshop</a>
+in 2018.
+It&#39;s a little optimistic thinking that they&#39;ll get through
+editing all the videos before Christmas, but we could hope
+for an epiphany.
+LDAP is just a small part of the authentication cycle here, so
+this post generalises fairly well for those cases where you have
+to write your own credential checker.
+Oh, and the talk and writing this post has done exactly what was intended
+and raised issues that I hadn&#39;t considered which I&#39;ve included here.
+As a result, it&#39;s starting to read like
+<a href="https://en.wikipedia.org/wiki/Alice%27s_Restaurant_Massacree">Alice&#39;s Restaurant</a>
+without the full orchestration and five part harmony.
+I hope this cautionary tale helps you to avoid the same pitfalls that I fell into.</p>
+
+<p>In the meantime, have a
+<a href="https://www.youtube.com/watch?v=t-BEo467pUI">Lightning Talk</a>
+from MojoConf 2018.</p>
+
+<h3>Route - lib/MyApp.pm</h3>
+
+<p>First off, a confession.  I never really got into Lite Apps.
+I know it&#39;s <a href="https://www.youtube.com/watch?v=ycAXeOKLCGc">easy</a>
+to <a href="https://mojolicious.org/perldoc/Mojolicious/Guides/Growing">grow them into Full Apps</a>,
+but I was under pressure to crank out a solution when I started and never got back to it.
+The result is that this post is about authenticating a <strong>Full App</strong> and isn&#39;t as
+svelte as the other posts talking about their Lite apps.</p>
+
+<p>Jumping straight in, let&#39;s assume that you already have a Login page
+in your templates and it has a form which posts data to <code>/login</code>.
+If you&#39;ve got a route like this</p>
+
+<pre><code>$r-&gt;post(&#39;/login&#39;)-&gt;name(&#39;do_login&#39;)-&gt;to(&#39;Secure#on_user_login&#39;);
+</code></pre>
+
+<p>to send the credentials to your controller. Or if you&#39;re cool with
+<a href="https://mojolicious.org/perldoc/Mojolicious/Guides/Routing#Named-routes">named routes</a>,
+your template might include this line</p>
+
+<pre><code>&lt;form action=&quot;&lt;%= url_for &#39;do_login&#39; %&gt;&quot; method=&quot;POST&quot;&gt;
+</code></pre>
+
+<p>Pro tip: You can even simplify it to</p>
+
+<pre><code>%= form_for &#39;do_login&#39;
+</code></pre>
+
+<p>which does it all for you including the <code>method</code> if the route only handles <code>POST</code>.</p>
+
+<h3>Controller - lib/MyApp/Controller/Secure.pm</h3>
+
+<p>Let&#39;s get started by cribbing from the
+<a href="https://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Basic-authentication1">Mojolicious Cookbook</a>.</p>
+
+<pre><code>package MyApp::Controller::Secure;
+use Mojo::Base &#39;Mojolicious::Controller&#39;;
+
+sub on_user_login {
+  my $self = shift;
+
+  my $username = $self-&gt;param(&#39;username&#39;);
+  my $password = $self-&gt;param(&#39;password&#39;);
+
+  if (check_credentials($username, $password)) {
+    $self-&gt;render(text =&gt; &#39;Hello Bender!&#39;);
+  }
+  else {
+    $self-&gt;render(
+        text =&gt; &#39;&lt;h2&gt;Login failed&lt;/h2&gt;&lt;a href=&quot;/login&quot;&gt;Try again&lt;/a&gt;&#39;,
+        format =&gt; &#39;html&#39;,
+        status =&gt; 401
+    );
+  }
+}
+
+sub check_credentials {
+  my ($username, $password) = @_;
+
+  return  $username eq &#39;Bender&#39; &amp;&amp; $password eq &#39;rocks&#39;;
+}
+</code></pre>
+
+<h2>Storing passwords - MojoX::Auth::Simple</h2>
+
+<p>We can agree that hard-coding usernames and passwords is not sustainable.
+If you can connect to a database, any database that your Perl
+<a href="https://metacpan.org/pod/DBI">DBI</a> module can connect to,
+then you might think that
+<a href="https://metacpan.org/pod/MojoX::Auth::Simple">MojoX::Auth::Simple</a>
+will solve your problems.  Further reading will tell you that it only
+provides the helper methods <code>log_in</code>, <code>is_logged_in</code> and <code>log_out</code>
+which are useful for everything around the authentication, but not the
+authentication itself.  But, since you&#39;re using a database now, you
+could change the <code>check_credentials</code> to something better than this
+(wot was cooked up on a Friday afternoon and not tested)</p>
+
+<pre><code>sub check_credentials {
+  my ($username, $password) = @_;
+
+  my $statement = &lt;&lt;&#39;SQL&#39;;      # NO! Don&#39;t do this!
+SELECT username FROM user_passwd
+WHERE username = ? AND password = ?
+SQL
+
+  my $sth = $dbh-&gt;prepare($statement);
+  $sth-&gt;execute($username, $password) or return;
+  my @row = $sth-&gt;fetchrow_array();
+  $sth-&gt;finish();
+
+  return $username eq $row[0];
+}
+</code></pre>
+
+<p>with the database connection and handle <code>$dbh</code> left as an exercise to the reader.
+And yes, you should prepare the SQL outside of the sub.
+The <code>?</code> in the SQL statement are bind parameters, placeholders that make the database call faster and safer.</p>
+
+<h4>Did you spot the HUGE mistake I made?</h4>
+
+<p>Never, never, NEVER store passwords in plain text!  (Blame it on Friday afternoon)
+You should encrypt the password before storing it with an algorithm like AES or SHA-2.
+So, how about this for a better untested example? You can encrypt with SQL</p>
+
+<pre><code>  my $statement = &lt;&lt;&#39;SQL&#39;;      # better
+SELECT username FROM user_passwd
+WHERE username = ? AND password = SHA2(?, 256)
+SQL
+</code></pre>
+
+<p>or encrypt with Perl</p>
+
+<pre><code>use Crypt::Digest::SHA256 qw/ sha256 /;
+
+sub check_credentials {
+  my ($username, $password) = @_;
+  my $encrypted = sha256($password);
+
+...
+
+  $sth-&gt;execute($username, $encrypted) or return;
+</code></pre>
+
+<p>Technically, AES is an encryption algorithm and SHA-2 is a hashing algorithm,
+meaning that the transformation is effectively one-way and is more secure.
+Here are a couple of modules that make it easier and safer:</p>
+
+<p>A nice module out there for handling passwords is, well,
+<a href="https://metacpan.org/pod/Passwords">Passwords</a>.
+It&#39;s just a wrapper around some other modules that gives you a simple API
+and will use <a href="https://metacpan.org/pod/Crypt::Eksblowfish::Bcrypt">Bcrypt</a> by default.
+So if you&#39;ve hashed your password with the <code>password_hash</code> function
+and stored the <code>$hash</code> value in your database like this</p>
+
+<pre><code>my $hash = password_hash($initial_password);
+
+my $sth = $dbh-&gt;prepare(&#39;INSERT INTO user_passwd (username, password) VALUES (?, ?)&#39;);
+$sth-&gt;do($username, $hash);
+</code></pre>
+
+<p>you should be ok to change the sub to</p>
+
+<pre><code>sub check_credentials {
+  my ($username, $password) = @_;
+
+  my $statement = &#39;SELECT password FROM user_passwd WHERE username = ?&#39;;
+
+  my $sth = $dbh-&gt;prepare($statement);
+  $sth-&gt;execute($username) or return;
+  my ($encoded) = $sth-&gt;fetchrow_array();
+  $sth-&gt;finish();
+
+  return password_verify($password, $encoded);
+}
+</code></pre>
+
+<p><a href="https://metacpan.org/pod/Mojolicious::Plugin::Scrypt">Mojolicious::Plugin::Scrypt</a>
+will use the Scrypt algorithm,
+but can also use Argon2 (which was recommended to me at LPW), Bcrypt and more.
+So, assuming that you&#39;ve stored your password with
+<code>my $encoded = $app-&gt;scrypt($password);</code>
+the <code>on_user_login</code> sub becomes</p>
+
+<pre><code>sub check_credentials {
+  my ($username, $password) = @_;
+
+  my $statement = &#39;SELECT password FROM user_passwd WHERE username = ?&#39;;
+
+  my $sth = $dbh-&gt;prepare($statement);
+  $sth-&gt;execute($username) or return;
+  my ($encoded) = $sth-&gt;fetchrow_array();
+  $sth-&gt;finish();
+
+  # WAIT! where did $self come from
+  return $self-&gt;scrypt_verify($password, $encoded);
+}
+</code></pre>
+
+<p>Oh, dear.  The above crashes because of a design decision made early on in the writing process.
+I invoked <code>check_credentials</code> as a plain sub, not the method of an object.
+Using a Plugin depends on having the controller available, so the following changes are necessary.</p>
+
+<pre><code>sub on_user_login {
+  my $self = shift;
+...
+
+  if ($self-&gt;check_credentials($username, $password)) {
+...
+}
+
+sub check_credentials {
+  my ($self, $username, $password) = @_;
+...
+  return $self-&gt;scrypt_verify($password, $encoded);
+}
+</code></pre>
+
+<p>Y&#39;know, I&#39;m sitting here on the Group W bench thinkin&#39; ...
+if I&#39;m going to re-write this whole tutorial, maybe I should&#39;ve started with
+<a href="https://metacpan.org/pod/Mojolicious::Plugin::Authentication">Mojolicious::Plugin::Authentication</a>
+and taken you through the code you needed for the <code>validate_user</code> option in the Plugin.
+But let&#39;s leave that for next year.</p>
+
+<p>Further reading on storing passwords:</p>
+
+<ul>
+<li><a href="https://crackstation.net/hashing-security.htm#properhashing">Secure Salted Password Hashing</a> by Defuse Security.</li>
+</ul>
+
+<h2>How to <a href="https://metacpan.org/pod/Net::LDAP">LDAP</a></h2>
+
+<p><em>remember LDAP?  ... this is a post about LDAP</em></p>
+
+<p>These are the steps to authenticating:</p>
+
+<ol>
+<li>Connect to the LDAP server</li>
+<li><strong>Bind</strong> to the server</li>
+<li>Search for the user&#39;s unique identifier in LDAP</li>
+<li><strong>Bind</strong> as the user with their password</li>
+<li>Check the result code from the server</li>
+</ol>
+
+<p>First, you need to make a network connection to the LDAP server.
+Next, you <a href="https://metacpan.org/pod/Net::LDAP#METHODS">bind</a> to the server.
+&quot;Bind&quot; is the term used in LDAP for connecting to a particular location
+in the LDAP tree.
+The LDAP server has a setting on whether it allows binding anonymously
+and determines whether you can search directory without a password
+as I&#39;ve done in the example.
+Then you search LDAP for the user (because the identifiers are <em>loooong</em>)
+and then you bind as the user with the password they&#39;ve provided.
+If this connection as the user with their password succeeds,
+then you must have used the correct password.
+LDAP hands you back a result from the <code>bind</code> as a
+<a href="https://metacpan.org/pod/distribution/perl-ldap/lib/Net/LDAP/Message.pod">Net::LDAP::Message</a>
+object on either success or failure,
+so check the Message <code>code</code> to find out whether you should authenticate the user.</p>
+
+<p>Here&#39;s the code</p>
+
+<pre><code>package MyApp::Controller::Secure;
+use Mojo::Base &#39;Mojolicious::Controller&#39;;
+use Net::LDAP qw/LDAP_INVALID_CREDENTIALS/;
+use YAML qw/LoadFile/;
+
+my $config_file = &#39;ldap_config.yml&#39;;
+my $config = LoadFile($config_file);
+
+my ($LDAP_server, $base_DN, $user_attr, $user_id, )
+        = @{$config}{ qw/server baseDN username id/ };
+
+...
+
+sub check_credentials {
+  my ($username, $password) = @_;
+  return unless $username;
+
+  my $ldap = Net::LDAP-&gt;new( $LDAP_server )
+        or warn(&quot;Couldn&#39;t connect to LDAP server $LDAP_server: $@&quot;), return;
+  my $message = $ldap-&gt;bind( $base_DN );
+
+  my $search = $ldap-&gt;search( base =&gt; $base_DN,
+                              filter =&gt; join(&#39;=&#39;, $user_attr, $username),
+                              attrs =&gt; [$user_id],
+                            );
+  my $user_id = $search-&gt;pop_entry();
+  return unless $user_id;                     # does this user exist in LDAP?
+
+  # this is where we check the password
+  my $login = $ldap-&gt;bind( $user_id, password =&gt; $password );
+
+  # return 1 on success, 0 on failure with the ternary operator
+  return $login-&gt;code == LDAP_INVALID_CREDENTIALS ? 0
+                                                  : 1;
+}
+</code></pre>
+
+<p>where you have a file <code>ldap_config.yml</code> in the top-level directory that looks a little like</p>
+
+<pre><code># config values for connecting to LDAP
+server:   ldap.example.com
+baseDN:   dc=users,dc=example,dc=com
+username:   userid
+id:     dn
+</code></pre>
+
+<p>where the values on the right match the attributes in your LDAP schema.</p>
+
+<p>Just making the logic clear in the last step, I&#39;ve imported a constant
+from Net::LDAP called <code>LDAP_INVALID_CREDENTIALS</code> and I use that to check
+against the result from the server.</p>
+
+<pre><code>use Net::LDAP qw/LDAP_INVALID_CREDENTIALS/;
+
+...
+
+  return ($login-&gt;code == LDAP_INVALID_CREDENTIALS) ? 0 : 1;
+}
+</code></pre>
+
+<p>The logic is a little back to front with the ternary operator, but
+if the code I get from the server is <code>LDAP_INVALID_CREDENTIALS</code>
+then I return <code>0</code>, a fail, otherwise I return <code>1</code>,
+which is a true value for the <code>if</code> in the body of the <code>on_user_login</code>
+function.</p>
+
+<p>Yes, you&#39;re right once again.  I probably should be using
+<a href="https://metacpan.org/pod/Mojolicious::Plugin::Config">Mojolicious::Plugin::Config</a>
+to handle config files.  It&#39;s on my TODO list.</p>
+
+<h2>Sessions</h2>
+
+<p>Want more power managing sessions?  Well then, you want
+<a href="https://metacpan.org/pod/MojoX::Session">MojoX::Session</a>
+which will store your sessions in a database as well as giving
+you a bunch of accessors to help you fine-tune how your session management.
+You can force the session to match on IP address to hinder session hijacking.
+or add more data to the session cookie.</p>
+
+<p>It works well with
+<a href="https://metacpan.org/pod/MojoX::Auth::Simple">MojoX::Auth::Simple</a>.
+The module documentation page gives you a great example.
+You just have to ensure that the name given to
+<a href="https://mojolicious.org/perldoc/Mojolicious/Controller#url_for">url_for</a> in</p>
+
+<pre><code>&lt;% } else { %&gt;
+      &lt;div&gt;Not logged in; &lt;form action=&quot;&lt;%= url_for &#39;login&#39; %&gt;&quot; method=&quot;POST&quot;&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;Login&quot;&gt;&lt;/form&gt;&lt;/div&gt;
+&lt;% } %&gt;
+</code></pre>
+
+<p>(here it&#39;s <em>login</em>) matches the name you used in your route</p>
+
+<pre><code>$r-&gt;post(&#39;/login&#39;)-&gt;name(&#39;do_login&#39;)-&gt;to(&#39;Secure#on_user_login&#39;);
+</code></pre>
+
+<p>which I named <em>do_login</em>.  Using
+<a href="https://mojolicious.io/blog/2017/12/03/day-3-using-named-routes/">named routes</a>
+gives you the flexibility of changing URLs without much hassle.</p>
+
+<h2>Where next?</h2>
+
+<p>I go through the whole process of authenticating and maintaining sessions at my
+<a href="https://github.com/duffee/Mojolicious_session_example">Mojolicious session tutorial</a>
+which will be getting some updates in the New Year to reflect what I&#39;ve learned.
+Contributions welcome!</p>
+
+              </section>
+              <small><p><a href="https://www.flickr.com/photos/maxlfly/1834725880/">Image</a> by <a href="https://www.flickr.com/people/85105517@N00">Alex Grech</a> <a href="https://creativecommons.org/licenses/by/2.0" title="Creative Commons Attribution 2.0">CC BY 2.0</a></p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/ldap/">LDAP</a>,
+                  <a href="/blog/tag/authentication/">authentication</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="/static/duffee.jpg">
+                      </div>
+                      <div class="about">
+                        <h5>Boyd Duffee</h5>
+                        <p>Boyd Duffee has been hanging around the <a href="https://metacpan.org/author/DUFFEE">edges</a> of the Perl ecosystem for many moons, picking up new bits of shiny to make SysAdmining more interesting.  He&#39;s interested in Data Science, Complex Networks and walks in the woods.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/07/openapi/index.html" rel="prev"><strong>Previous Article</strong> Day 7: MetaCPAN, Mojolicious and OpenAPI</a></li>
+                  <li class="next"><a href="/blog/2018/12/09/add-a-theme-system-to-your-mojolicious-app/index.html" rel="next"><strong>Next Article</strong> Day 9: Add a theme system to your Mojolicious app </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

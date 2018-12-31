@@ -15,6 +15,7 @@
 .git/index
 .git/info/exclude
 .git/logs/HEAD
+.git/logs/refs/heads/deparallelize-testing-20181229
 .git/logs/refs/heads/fix-validate-list-sequence
 .git/logs/refs/heads/limit_current_end_idx
 .git/logs/refs/heads/master
@@ -191,6 +192,7 @@
 .git/modules/t/lib/refs/heads/master
 .git/modules/t/lib/refs/remotes/origin/HEAD
 .git/ORIG_HEAD
+.git/refs/heads/deparallelize-testing-20181229
 .git/refs/heads/fix-validate-list-sequence
 .git/refs/heads/limit_current_end_idx
 .git/refs/heads/master
@@ -213,6 +215,7 @@
 .git/refs/tags/v0.06
 .git/refs/tags/v0.07
 .git/refs/tags/v0.08
+.git/refs/tags/v0.09
 .gitignore
 .gitmodules
 Changes
@@ -235,11 +238,8 @@ t/001-opts.t
 t/002-new.t
 t/003-get-commits-range.t
 t/004-set-targets.t
-t/005-run-test-files-on-one-commit.t
-t/006-run-test-files-on-all-commits.t
 t/007-auxiliary.t
-t/008-allcommits.t
-t/009-multisect.t
+t/010-run-test-files-combined.t
 t/lib/dummyrepo/.git
 t/lib/dummyrepo/.gitignore
 t/lib/dummyrepo/Changes
@@ -252,6 +252,7 @@ t/lib/dummyrepo/README.md
 t/lib/dummyrepo/t/001_load.t
 t/lib/dummyrepo/t/002_add.t
 t/lib/dummyrepo/Todo
+t/lib/Helpers.pm
 t/lib/list-compare/.git
 t/lib/list-compare/.gitignore
 t/lib/list-compare/Changes

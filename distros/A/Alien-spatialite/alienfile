@@ -1,0 +1,161 @@
+use 5.010;
+use alienfile;
+use Sort::Versions;
+
+my $on_windows = $^O =~ /mswin/i;
+my $on_automated_rig
+  =  $ENV{PERL_CPAN_REPORTER_DIR}
+  || $ENV{PERL_CPAN_REPORTER_CONFIG}
+  || $ENV{AUTOMATED_TESTING}
+  || $ENV{TRAVIS}
+  || $ENV{APPVEYOR};
+
+
+use Cwd;
+my $base_dir = getcwd();
+
+#  make sure we get spatialite support
+#use Alien::geos::af;
+use Alien::proj;
+use Alien::sqlite;
+use Alien::freexl;
+use Alien::geos::af;
+
+
+my $sep_char = $on_windows ? ';' : ':';
+$ENV{PATH} .= $sep_char
+           . join ($sep_char,
+                   Alien::sqlite->bin_dir,
+                   Alien::proj->bin_dir,
+                   Alien::freexl->bin_dir,
+                   Alien::geos::af->bin_dir,
+            );
+
+plugin 'Build::SearchDep' => (
+  aliens   => [qw( Alien::sqlite Alien::proj Alien::freexl Alien::geos::af )],
+  public_I => 1,
+  public_l => 1,
+);
+
+#  make libtool noisy for debug purposes
+#$ENV{LTFLAGS} = "--debug --verbose" if $on_windows;
+
+
+
+my $min_target_version = '4.3.0';
+
+plugin 'PkgConfig' => (
+    pkg_name => 'spatialite',
+    minimum_version => $min_target_version,
+);
+
+
+share {
+
+  my $with_local = '';
+  my $with_cpp11 = '';
+
+  start_url 'http://www.gaia-gis.it/gaia-sins/libspatialite-sources/';
+  #start_url "file://$base_dir";  #  debug
+  plugin Download => (
+    filter  => qr/^libspatialite-([0-9\.]+[a-z]?)\.tar\.gz$/,
+    version => qr/^libspatialite-([0-9\.]+[a-z]?)\.tar\.gz$/,
+  );
+
+  my $lib_version = get_lib_version() // 'not yet defined';
+  say "Downloaded spatialite version is $lib_version";
+  
+  plugin Extract => (format => 'tar.gz');
+
+
+  plugin 'Build::Autoconf' => ();
+
+  my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
+  $build_static = '';
+  $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
+  $build_static = '' if $ENV{FORCE_DYNAMIC};
+  
+  my $build_with_libxml2  = '--enable-libxml2=no';
+  my $build_with_examples = '--enable-examples=no';
+  my $build_target = $on_windows ? '--target=mingw32' : '';
+  
+  if ($^O =~ /bsd/) {
+    plugin 'Build::Make' => 'gmake';
+    if (-d '/usr/local') {
+        $with_local = ' --with-local=/usr/local ';
+    }
+  }
+  elsif ($^O =~ /dragonfly/) {
+    #  might need to be combined with bsd check above
+    #  but not sure if /usr/local is needed yet
+    plugin 'Build::Make' => 'gmake';
+  }
+
+  my $make_cmd = '%{make}';
+  my $make_inst_cmd = '%{make} install';
+  my @make_clean;
+  #  try not to exceed the cpan-testers log limits
+  if ($on_automated_rig) {
+    say "Running under CI or automated testing";
+    $make_cmd      .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|build.log|};   print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type build.log/;
+    $make_inst_cmd .= q/ | perl -ne "BEGIN {$|=1; open our $log, q|>|, q|install.log|}; print qq|\n| if 0 == ($. %% 100); print q|.|; print {$log} $_;" || type install.log/;
+    if (!$on_windows) {
+        $make_cmd =~ s/%%/%/;
+        $make_cmd =~ s/type/cat/;
+        $make_cmd =~ s/"/'/g;
+        $make_inst_cmd =~ s/%%/%/;
+        $make_inst_cmd =~ s/type/cat/;
+        $make_inst_cmd =~ s/"/'/g;
+    }
+    #if (! ($ENV{TRAVIS} || $ENV{APPVEYOR})) {
+    #    push @make_clean, '%{make} clean';
+    #}
+    #  clean up the build dir on cpan testers etc
+    plugin 'Cleanse::BuildDir';
+  }
+  
+  build [
+    "%{configure} $with_local $with_cpp11 $build_static $build_with_libxml2 $build_with_examples $build_target",
+    \&pause,
+    $make_cmd,
+    $make_inst_cmd,
+    #@make_clean
+  ];
+
+};
+
+
+sub pause {
+    return;  #  re-enable in case of debug
+    return if $on_automated_rig;
+    return if !$on_windows;
+
+    say "CONTINUE?";
+    my $response = <>;
+    while (not $response =~ /yes/) {
+        $response = <>;
+    }
+}
+
+
+sub get_lib_version {
+    my $h = get_alien_state_hash();
+    return $h->{runtime}{version};
+}
+
+sub get_alien_state_hash {
+    use JSON::PP;
+    my $root = "$base_dir/_alien";
+    my $f = "$root/state.json";
+    my $h = {};
+    if (-e $f) {
+        open my $fh, '<', $f or die $!;
+        my $d = do {
+            local $/ = undef;
+            <$fh>;
+        };
+        $h = JSON::PP::decode_json($d);
+    }
+    return $h;
+}
+

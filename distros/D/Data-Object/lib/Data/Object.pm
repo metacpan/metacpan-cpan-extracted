@@ -14,7 +14,7 @@ use Exporter qw(import);
 
 our $NAMESPACE = 'Data::Object';
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 my @CORE = grep !/^(data|type)_/, our @EXPORT_OK = qw(
   codify
@@ -467,7 +467,7 @@ Data::Object - Object Orientation for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -868,23 +868,13 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
-
-=head1 CONTRIBUTORS
-
-=for stopwords Al Newkirk Anthony Brummett
-
-=over 4
-
-=item *
-
 Al Newkirk <al@iamalnewkirk.com>
 
-=item *
+=head1 CONTRIBUTOR
+
+=for stopwords Anthony Brummett
 
 Anthony Brummett <abrummet@genome.wustl.edu>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

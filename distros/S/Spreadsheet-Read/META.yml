@@ -25,7 +25,7 @@ optional_features:
     description: Provides parsing of Microsoft Excel 2007 files
     requires: 
       Spreadsheet::ParseExcel::FmtDefault: 0
-      Spreadsheet::ParseXLSX: '0.13'
+      Spreadsheet::ParseXLSX: '0.24'
   opt_oo: 
     description: Provides parsing of OpenOffice spreadsheets
     requires: 
@@ -35,12 +35,12 @@ optional_features:
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.79'
+    version: '0.80'
 recommends: 
   Data::Peek: '0.48'
   File::Temp: '0.2308'
   IO::Scalar: 0
-  Test::More: '1.302140'
+  Test::More: '1.302141'
 requires: 
   Carp: 0
   Data::Dumper: 0
@@ -55,4 +55,4 @@ requires:
 resources: 
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.79'
+version: '0.80'

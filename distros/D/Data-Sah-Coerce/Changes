@@ -1,3 +1,10 @@
+0.031   2018-12-16 (PERLANCAR)
+
+	- timeofday: Tweak str_hms regex: allow hh:mm in addition to hh:mm:ss
+	  (e.g.: 11:00 instead of 11:00:00), allow h:m(:s)? in addition to
+	  hh:mm(:ss)? (e.g.: 1:15 instead of 01:15).
+
+
 0.030   2018-12-16 (PERLANCAR)
 
 	- [Bugfix] Default coerce_to for timeofday in perl should be

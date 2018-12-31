@@ -20,7 +20,7 @@ typedef struct GraphQL {
 /*
  * Helper to parse either a string or a file, with / without schema support.
  */
-static SV* graphql_parse(const char* string, const char* file, int schema)
+static SV* graphql_parse(pTHX_ const char* string, const char* file, int schema)
 {
     FILE* fp = 0;
     struct GraphQLAstNode* node = 0;
@@ -118,11 +118,11 @@ new(char* CLASS, HV* opt = NULL)
 SV*
 parse_string(GraphQL* graphql, const char* string, int schema = 1)
   CODE:
-    RETVAL = graphql_parse(string, 0, schema);
+    RETVAL = graphql_parse(aTHX_ string, 0, schema);
   OUTPUT: RETVAL
 
 SV*
 parse_file(GraphQL* graphql, const char* name, int schema = 1)
   CODE:
-    RETVAL = graphql_parse(0, name, schema);
+    RETVAL = graphql_parse(aTHX_ 0, name, schema);
   OUTPUT: RETVAL

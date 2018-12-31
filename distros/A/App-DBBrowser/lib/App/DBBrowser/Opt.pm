@@ -37,7 +37,6 @@ sub defaults {
     my ( $sf, $section, $key ) = @_;
     my $defaults = {
         G => {
-            alias                => 0,
             create_table_ok      => 0,
             delete_ok            => 0,
             drop_table_ok        => 0,
@@ -58,7 +57,13 @@ sub defaults {
             subqueries_w_h       => 0,
             thsd_sep             => ',', ###
             update_ok            => 0,
-
+        },
+        alias => {
+            aggregate            => 0,
+            functions            => 0,
+            join                 => 0,
+            union                => 0,
+            subqueries           => 0,
         },
         table => {
             binary_filter        => 0,
@@ -228,12 +233,12 @@ sub config_insert {
             elsif ( $opt eq '_options_csv' ) {
                 my $prompt = '"Text::CSV"';
                 my $sub_menu = [
-                    [ 'allow_loose_escapes', "- allow_loose_escapes", [ 'NO', 'YES' ] ],
-                    [ 'allow_loose_quotes',  "- allow_loose_quotes",  [ 'NO', 'YES' ] ],
-                    [ 'allow_whitespace',    "- allow_whitespace",    [ 'NO', 'YES' ] ],
-                    [ 'blank_is_undef',      "- blank_is_undef",      [ 'NO', 'YES' ] ],
-                    [ 'binary',              "- binary",              [ 'NO', 'YES' ] ],
-                    [ 'empty_is_undef',      "- empty_is_undef",      [ 'NO', 'YES' ] ],
+                    [ 'allow_loose_escapes', "- allow_loose_escapes", $no_yes ],
+                    [ 'allow_loose_quotes',  "- allow_loose_quotes",  $no_yes ],
+                    [ 'allow_whitespace',    "- allow_whitespace",    $no_yes ],
+                    [ 'blank_is_undef',      "- blank_is_undef",      $no_yes ],
+                    [ 'binary',              "- binary",              $no_yes ],
+                    [ 'empty_is_undef',      "- empty_is_undef",      $no_yes ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -264,8 +269,8 @@ sub __menus {
             { name => 'config_menu',     text => "- Menu"   },
             { name => 'config_sql',      text => "- SQL",   },
             { name => 'config_output',   text => "- Output" },
-            { name => 'config_insert',   text => "- Insert" },
-            { name => 'config_create',   text => "- Create" },
+            { name => 'config_insert',   text => "- Insert Into" },
+            { name => 'config_create',   text => "- Create Table" },
         ],
         config_database => [
             { name => 'plugins',      text => "- DB Plugins", section => 'G' },
@@ -281,11 +286,12 @@ sub __menus {
             { name => 'lock_stmt',          text => "- Lock Mode",    section => 'G' },
             { name => 'meta',               text => "- Metadata",     section => 'G' },
             { name => 'operators',          text => "- Operators",    section => 'G' },
-            { name => 'alias',              text => "- Alias",        section => 'G' },
+            { name => '_alias',             text => "- Alias",        section => 'alias' },
             { name => '_subqueries',        text => "- Subqueries",   section => 'G' },
             { name => '_sql_identifiers',   text => "- Identifiers",  section => 'G' },
             { name => '_write_access',      text => "- Write access", section => 'G' },
             { name => 'parentheses',        text => "- Parentheses",  section => 'G' },
+
         ],
         config_output => [
             { name => 'min_col_width',      text => "- Colwidth",          section => 'table' },
@@ -422,32 +428,27 @@ sub set_options {
             }
             elsif ( $opt eq 'grid' ) {
                 my $prompt = '"Grid"';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Grid", $list ] ];
+                my $sub_menu = [ [ $opt, "  Grid", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'keep_header' ) {
                 my $prompt = '"Header each Page"';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Keep header", $list ] ];
+                my $sub_menu = [ [ $opt, "  Keep header", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'color' ) {
                 my $prompt = '"ANSI color escapes"';
-                my $list = [ 'No', 'Yes' ];
-                my $sub_menu = [ [ $opt, "  ANSI color escapes", $list ] ];
+                my $sub_menu = [ [ $opt, "  ANSI color escapes", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'binary_filter' ) {
                 my $prompt = 'Print "BNRY" instead of binary data';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Binary filter", $list ] ];
+                my $sub_menu = [ [ $opt, "  Binary filter", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'squash_spaces' ) {
                 my $prompt = '"Remove leading and trailing spaces and squash consecutive spaces"';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Squash spaces", $list ] ];
+                my $sub_menu = [ [ $opt, "  Squash spaces", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'min_col_width' ) {
@@ -476,8 +477,9 @@ sub set_options {
             }
             elsif ( $opt eq 'file_find_warnings' ) {
                 my $prompt = '"SQLite database search"';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "Enable \"File::Find\" warnings", $list ] ];
+                my $sub_menu = [
+                    [ 'file_find_warnings', "Enable \"File::Find\" warnings", $no_yes ]
+                ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'max_rows' ) {
@@ -497,25 +499,34 @@ sub set_options {
                 my $sub_menu = [ [ $opt, "  Add metadata", $list ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
+            elsif ( $opt eq '_alias' ) {
+                my $prompt = 'Alias for:';
+                my $sub_menu = [
+                    [ 'aggregate',  "- Aggregate",  $no_yes ], # s - p
+                    [ 'functions',  "- Functions",  $no_yes ],
+                    [ 'join',       "- Join",       $no_yes ],
+                    [ 'subqueries', "- Subqueries", $no_yes ],
+                    [ 'union',      "- Union",      $no_yes ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
             elsif ( $opt eq '_subqueries' ) {
                 my $sub_menu = [
-                    [ 'subqueries_select', "- Subqueries in SELECT",       [ 'NO', 'YES' ] ],
-                    [ 'subqueries_w_h',    "- Subqueries in WHERE/HAVING", [ 'NO', 'YES' ] ],
-                    [ 'subqueries_set',    "- Subqueries as SET value",    [ 'NO', 'YES' ] ],
-                    [ 'subqueries_table',  "- Subqueries as table",        [ 'NO', 'YES' ] ],
+                    [ 'subqueries_select', "- Subqueries in SELECT",       $no_yes ],
+                    [ 'subqueries_w_h',    "- Subqueries in WHERE/HAVING", $no_yes ],
+                    [ 'subqueries_set',    "- Subqueries as SET value",    $no_yes ],
+                    [ 'subqueries_table',  "- Subqueries as table",        $no_yes ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu );
             }
             elsif ( $opt eq 'parentheses' ) {
                 my $prompt = 'Parentheses in WHERE/HAVING';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Enable parentheses", $list ] ];
+                my $sub_menu = [ [ $opt, "  Enable parentheses", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'alias' ) {
                 my $prompt = 'For complex columns:';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Add alias", $list ] ];
+                my $sub_menu = [ [ $opt, "  Add alias", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq 'operators' ) {
@@ -525,19 +536,19 @@ sub set_options {
             elsif ( $opt eq '_sql_identifiers' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
-                    [ 'qualified_table_name', "- Qualified table names", [ 'NO', 'YES' ] ],
-                    [ 'quote_identifiers',    "- Quote identifiers",     [ 'NO', 'YES' ] ],
+                    [ 'qualified_table_name', "- Qualified table names", $no_yes ],
+                    [ 'quote_identifiers',    "- Quote identifiers",     $no_yes ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_write_access' ) {
                 my $prompt = 'Write access: ';
                 my $sub_menu = [
-                    [ 'insert_ok',       "- Insert records", [ 'NO', 'YES' ] ],
-                    [ 'update_ok',       "- Update records", [ 'NO', 'YES' ] ],
-                    [ 'delete_ok',       "- Delete records", [ 'NO', 'YES' ] ],
-                    [ 'create_table_ok', "- Create table",   [ 'NO', 'YES' ] ],
-                    [ 'drop_table_ok',   "- Drop   table",   [ 'NO', 'YES' ] ],
+                    [ 'insert_ok',       "- Insert records", $no_yes ],
+                    [ 'update_ok',       "- Update records", $no_yes ],
+                    [ 'delete_ok',       "- Delete records", $no_yes ],
+                    [ 'create_table_ok', "- Create table",   $no_yes ],
+                    [ 'drop_table_ok',   "- Drop   table",   $no_yes ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -550,7 +561,7 @@ sub set_options {
             elsif ( $opt eq '_menu_memory' ) {
                 my $prompt = 'Choose: ';
                 my $sub_menu = [
-                    [ 'menu_memory',     "- Menu memory", [ 'NO', 'YES' ] ],
+                    [ 'menu_memory',     "- Menu memory", $no_yes ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
@@ -570,8 +581,7 @@ sub set_options {
             }
             elsif ( $opt eq 'data_type_guessing' ) {
                 my $prompt = 'Data type guessing';
-                my $list = [ 'NO', 'YES' ];
-                my $sub_menu = [ [ $opt, "  Enable data type guessing", $list ] ];
+                my $sub_menu = [ [ $opt, "  Enable data type guessing", $no_yes ] ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             else { die "Unknown option: $opt" }

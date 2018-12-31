@@ -1,13 +1,10 @@
-package Package::Stash;
-BEGIN {
-  $Package::Stash::AUTHORITY = 'cpan:DOY';
-}
-$Package::Stash::VERSION = '0.37';
+package Package::Stash; # git description: 5468b00
 use strict;
 use warnings;
 use 5.008001;
 # ABSTRACT: routines for manipulating stashes
 
+our $VERSION = '0.38';
 our $IMPLEMENTATION;
 
 use Module::Implementation 0.06;
@@ -50,7 +47,7 @@ Package::Stash - routines for manipulating stashes
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -209,24 +206,6 @@ variables:
   # No problem, modifying a copy, not the original
   $Some::Namespace::name .= " world";
 
-=head1 BUGS / CAVEATS
-
-=over 4
-
-=item * Prior to perl 5.10, scalar slots are only considered to exist if they are defined
-
-This is due to a shortcoming within perl itself. See
-L<perlref/Making References> point 7 for more information.
-
-=item * GLOB and FORMAT variables are not (yet) accessible through this module.
-
-=item * Also, see the BUGS section for the specific backends (L<Package::Stash::XS> and L<Package::Stash::PP>)
-
-=back
-
-Please report any bugs to GitHub Issues at
-L<https://github.com/doy/package-stash/issues>.
-
 =head1 SEE ALSO
 
 =over 4
@@ -253,7 +232,7 @@ L<https://metacpan.org/release/Package-Stash>
 
 =item * Github
 
-L<https://github.com/doy/package-stash>
+L<https://github.com/moose/Package-Stash>
 
 =item * RT: CPAN's request tracker
 
@@ -270,13 +249,75 @@ L<http://cpanratings.perl.org/d/Package-Stash>
 Based on code from L<Class::MOP::Package>, by Stevan Little and the Moose
 Cabal.
 
+=head1 BUGS / CAVEATS
+
+=over 4
+
+=item * Prior to perl 5.10, scalar slots are only considered to exist if they are defined
+
+This is due to a shortcoming within perl itself. See
+L<perlref/Making References> point 7 for more information.
+
+=item * GLOB and FORMAT variables are not (yet) accessible through this module.
+
+=item * Also, see the BUGS section for the specific backends (L<Package::Stash::XS> and L<Package::Stash::PP>)
+
+=back
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Package-Stash>
+(or L<bug-Package-Stash@rt.cpan.org|mailto:bug-Package-Stash@rt.cpan.org>).
+
 =head1 AUTHOR
 
 Jesse Luehrs <doy@tozt.net>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Karen Etheridge Carlos Lima Kent Fredric Justin Hunter Christian Walde Dave Rolsky Niko Tyni Renee Tim Bunce
+
+=over 4
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Carlos Lima <carlos@multi>
+
+=item *
+
+Kent Fredric <kentfredric@gmail.com>
+
+=item *
+
+Justin Hunter <justin.d.hunter@gmail.com>
+
+=item *
+
+Christian Walde <walde.christian@googlemail.com>
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Niko Tyni <ntyni@debian.org>
+
+=item *
+
+Renee <reb@perl-services.de>
+
+=item *
+
+Tim Bunce <Tim.Bunce@pobox.com>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Jesse Luehrs.
+This software is copyright (c) 2018 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

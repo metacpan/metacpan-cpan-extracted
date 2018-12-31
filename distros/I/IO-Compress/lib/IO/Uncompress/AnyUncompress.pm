@@ -4,16 +4,16 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.081 ();
+use IO::Compress::Base::Common 2.083 ();
 
-use IO::Uncompress::Base 2.081 ;
+use IO::Uncompress::Base 2.083 ;
 
 
 require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyUncompressError);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 $AnyUncompressError = '';
 
 @ISA = qw(IO::Uncompress::Base Exporter);
@@ -29,22 +29,25 @@ BEGIN
 {
    local @INC = @INC;
    pop @INC if $INC[-1] eq '.';
-   eval ' use IO::Uncompress::Adapter::Inflate 2.081 ;';
-   eval ' use IO::Uncompress::Adapter::Bunzip2 2.081 ;';
-   eval ' use IO::Uncompress::Adapter::LZO 2.081 ;';
-   eval ' use IO::Uncompress::Adapter::Lzf 2.081 ;';
-   eval ' use IO::Uncompress::Adapter::UnLzma 2.081 ;';
-   eval ' use IO::Uncompress::Adapter::UnXz 2.081 ;';
+   eval ' use IO::Uncompress::Adapter::Inflate 2.083 ;';
+   eval ' use IO::Uncompress::Adapter::Bunzip2 2.083 ;';
+   eval ' use IO::Uncompress::Adapter::LZO 2.083 ;';
+   eval ' use IO::Uncompress::Adapter::Lzf 2.083 ;';
+   eval ' use IO::Uncompress::Adapter::UnLzma 2.083 ;';
+   eval ' use IO::Uncompress::Adapter::UnXz 2.083 ;';
+   eval ' use IO::Uncompress::Adapter::UnZstd 2.083 ;';
 
-   eval ' use IO::Uncompress::Bunzip2 2.081 ;';
-   eval ' use IO::Uncompress::UnLzop 2.081 ;';
-   eval ' use IO::Uncompress::Gunzip 2.081 ;';
-   eval ' use IO::Uncompress::Inflate 2.081 ;';
-   eval ' use IO::Uncompress::RawInflate 2.081 ;';
-   eval ' use IO::Uncompress::Unzip 2.081 ;';
-   eval ' use IO::Uncompress::UnLzf 2.081 ;';
-   eval ' use IO::Uncompress::UnLzma 2.081 ;';
-   eval ' use IO::Uncompress::UnXz 2.081 ;';
+   eval ' use IO::Uncompress::Bunzip2 2.083 ;';
+   eval ' use IO::Uncompress::UnLzop 2.083 ;';
+   eval ' use IO::Uncompress::Gunzip 2.083 ;';
+   eval ' use IO::Uncompress::Inflate 2.083 ;';
+   eval ' use IO::Uncompress::RawInflate 2.083 ;';
+   eval ' use IO::Uncompress::Unzip 2.083 ;';
+   eval ' use IO::Uncompress::UnLzf 2.083 ;';
+   eval ' use IO::Uncompress::UnLzma 2.083 ;';
+   eval ' use IO::Uncompress::UnXz 2.083 ;';
+   eval ' use IO::Uncompress::UnZstd 2.083 ;';
+
 }
 
 sub new
@@ -191,6 +194,21 @@ sub mkUncomp
          return 1;
      }
 
+     if (defined $IO::Uncompress::UnZstd::VERSION and
+            $magic = $self->ckMagic('UnZstd')) {
+
+        *$self->{Info} = $self->readHeader($magic)
+            or return undef ;
+
+        my ($obj, $errstr, $errno) = IO::Uncompress::Adapter::Zstd::mkUncompObject();
+
+        return $self->saveErrorString(undef, $errstr, $errno)
+            if ! defined $obj;
+
+        *$self->{Uncomp} = $obj;
+
+         return 1;
+     }
      return 0 ;
 }
 
@@ -452,10 +470,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeOut => 0|1 >>
 
-When writing to a file or filehandle, set C<binmode> before writing to the
-file.
-
-Defaults to 0.
+This option is now a no-op. All files will be written  in binmode.
 
 =item C<< Append => 0|1 >>
 

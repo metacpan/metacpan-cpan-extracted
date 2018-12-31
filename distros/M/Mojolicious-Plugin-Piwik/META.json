@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "5.27",
+            "Mojolicious" : "8.02",
             "perl" : "5.010001"
          }
       }
@@ -51,6 +51,6 @@
          "web" : "https://github.com/Akron/Mojolicious-Plugin-Piwik"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

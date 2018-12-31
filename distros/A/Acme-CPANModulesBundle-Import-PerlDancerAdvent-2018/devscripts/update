@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use App::CreateAcmeCPANModulesImportModules;
+use Perinci::Sub::Util qw(gen_curried_sub);
+use Perinci::CmdLine::Any;
+
+my %add_modules = (
+    # not linked
+    #"14" => ["Foo"],
+);
+
+my %typos = (
+    #'Perl::PrereqScanner::NotSoLite' => 'Perl::PrereqScanner::NotQuiteLite',
+);
+
+gen_curried_sub(
+    'App::CreateAcmeCPANModulesImportModules::create_acme_cpanmodules_import_modules',
+    {
+        modules => [
+            {
+                name => '2018',
+                url => "http://advent.perldancer.org/2018",
+                extract_urls => [map {"http://advent.perldancer.org/2018/$_"} "13".."24"],
+                summary => 'Modules mentioned in Perl Dancer Advent Calendar 2018',
+                add_modules => [map {@$_} values %add_modules],
+            },
+            (map {
+                +{
+                    name => "2018_12_$_",
+                    url => "http://advent.perldancer.org/2018/$_",
+                    summary => "Modules mentioned in Perl Dancer Advent Calendar 2018 (day $_)",
+                    add_modules => [@{ $add_modules{$_} // [] }],
+                },
+            } "13".."24"),
+        ],
+        typos => \%typos,
+        ignore_empty => 1,
+        namespace => 'Acme::CPANModules::Import::PerlDancerAdvent',
+        user_agent => 'Mozilla/5.0',
+        dist_dir => "$Bin/..",
+    },
+    'app',
+);
+
+Perinci::CmdLine::Any->new(
+    url => '/main/app',
+    log => 1,
+)->run;

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@joelaberger" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/20/day-20-practical-testing/" property="og:url">
+  <meta content="Day 20: Practical Testing" property="og:title">
+    <meta content="Some practical tricks for testing real-world applications." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/20/day-20-practical-testing/lava.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 20: Practical Testing - mojolicious.io</title>
+  <meta content="Joel Berger" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 20: Practical Testing</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-20">Dec 20, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Taking a sample of lava at Kilauea" src="/blog/2017/12/20/day-20-practical-testing/lava.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>Back on <a href="/blog/2017/12/09/day-9-the-best-way-to-test">Day 9</a> we discussed testing and especially <a href="http://mojolicious.org/perldoc/Test/Mojo">Test::Mojo</a>.
+Today I want to just briefly talk about some practical things that can come up when testing real world applications.
+Once again the discussion will be motivated by the <a href="https://github.com/jberger/Wishlist">Wishlist</a> application that we&#39;ve been developing these past few days.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Configuration Overrides</h2>
+
+<p>In the Day 9 article I mentioned that the Test::Mojo <a href="http://mojolicious.org/perldoc/Test/Mojo#new">constructor</a> could be passed configuration overrides.
+In this example we can see how that override lets us ensure that we are testing on a fresh and isolated database.</p>
+
+<pre><code class="hljs"><span class="hljs-keyword">use</span> <span class="hljs-function">Mojo::Base</span> -strict;
+
+<span class="hljs-keyword">use</span> <span class="hljs-function">Test::More</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-function">Test::Mojo</span>;
+
+<span class="hljs-keyword">my</span> <span class="hljs-type">$t</span> = <span class="hljs-function">Test::Mojo</span>-&gt;new(
+  &#39;<span class="hljs-string">Wishlist</span>&#39;,
+  {database =&gt; &#39;<span class="hljs-string">:temp:</span>&#39;}
+);
+
+<span class="hljs-keyword">my</span> <span class="hljs-type">$model</span> = <span class="hljs-type">$t</span>-&gt;<span class="hljs-type">app</span>-&gt;<span class="hljs-type">model</span>;
+is_deeply <span class="hljs-type">$model</span>-&gt;<span class="hljs-type">list_user_names</span>, [], &#39;<span class="hljs-string">No existing users</span>&#39;;
+
+<span class="hljs-keyword">my</span> <span class="hljs-type">$user_id</span> = <span class="hljs-type">$model</span>-&gt;<span class="hljs-type">add_user</span>(&#39;<span class="hljs-string">Zoidberg</span>&#39;);
+ok <span class="hljs-type">$user_id</span>, &#39;<span class="hljs-string">add_user returned a value</span>&#39;;
+<span class="hljs-keyword">my</span> <span class="hljs-type">$user</span> = <span class="hljs-type">$model</span>-&gt;<span class="hljs-type">user</span>(&#39;<span class="hljs-string">Zoidberg</span>&#39;);
+is_deeply <span class="hljs-type">$user</span>, {
+  id =&gt; <span class="hljs-type">$user_id</span>,
+  name =&gt; &#39;<span class="hljs-string">Zoidberg</span>&#39;,
+  items =&gt; [],
+}, &#39;<span class="hljs-string">correct initial user state</span>&#39;;
+is_deeply <span class="hljs-type">$model</span>-&gt;<span class="hljs-type">list_user_names</span>, [&#39;<span class="hljs-string">Zoidberg</span>&#39;], &#39;<span class="hljs-string">user in list of names</span>&#39;;
+
+<span class="hljs-keyword">my</span> <span class="hljs-type">$item_id</span> = <span class="hljs-type">$model</span>-&gt;<span class="hljs-type">add_item</span>(<span class="hljs-type">$user</span>, {
+  title =&gt; &#39;<span class="hljs-string">Dark Matter</span>&#39;,
+  url   =&gt; &#39;<span class="hljs-string">lordnibbler.org</span>&#39;,
+});
+ok <span class="hljs-type">$item_id</span>, &#39;<span class="hljs-string">add_item returned a value</span>&#39;;
+<span class="hljs-type">$user</span> = <span class="hljs-type">$model</span>-&gt;<span class="hljs-type">user</span>(&#39;<span class="hljs-string">Zoidberg</span>&#39;);
+is_deeply <span class="hljs-type">$user</span>, {
+  id =&gt; <span class="hljs-type">$user_id</span>,
+  name =&gt; &#39;<span class="hljs-string">Zoidberg</span>&#39;,
+  items =&gt; [
+    {
+      id =&gt; <span class="hljs-type">$item_id</span>,
+      purchased =&gt; 0,
+      title =&gt; &#39;<span class="hljs-string">Dark Matter</span>&#39;,
+      url   =&gt; &#39;<span class="hljs-string">lordnibbler.org</span>&#39;,
+    },
+  ],
+}, &#39;<span class="hljs-string">correct initial user state</span>&#39;;
+
+done_testing;
+
+</code></pre>
+
+<p><small><a href="https://github.com/jberger/Wishlist/blob/blog_post/practical_testing/t/model.t">t/model.t</a></small></p>
+
+<p>When called this way the passed hashref is loaded into the configuration rather than any configuration file.
+Because of the way the <a href="https://github.com/jberger/Wishlist/blob/blog_post/practical_testing/lib/Wishlist.pm#L20-L26"><code>sqlite</code></a> attribute initializer was coded, the Mojo::SQLite special literal <code>:temp:</code> is passed through unchanged.
+Now I would never suggest that you write any code into your application that is specific to testing, however it is entirely reasonable to code around special literals that someone might need.
+You could of course start a Wishlist server using a temporary database.</p>
+
+<p>SQLite&#39;s in-memory (and Mojo::SQLite&#39;s on-disk temporary) databases are really handy for testing because they are automatically testing in isolation.
+You don&#39;t have to worry about overwriting the existing database nor clearing the data at the end of your test.
+Further, you can run your tests in <a href="https://metacpan.org/pod/Test::Harness#j&lt;n&gt;">parallel</a> to get a nice speedup in large test suites.</p>
+
+<p>For databases that require a running server you have to be a little more careful, however isolated testing is still very possible.
+For example, in Mojo::Pg you can set a <a href="http://mojolicious.org/perldoc/Mojo/Pg#search_path"><code>search_path</code></a> which isolates your test.</p>
+
+<pre><code>my $t = Test::Mojo-&gt;new(
+  &#39;MyApp&#39;,
+  {database =&gt; &#39;postgresql:///test?search_path=test_one&#39;}
+);
+$pg-&gt;db-&gt;query(&#39;drop schema if exists test_one cascade&#39;);
+$pg-&gt;db-&gt;query(&#39;create schema test_one&#39;);
+...
+$pg-&gt;db-&gt;query(&#39;drop schema test_one cascade&#39;);
+</code></pre>
+
+<p>You might have to be careful about when the migration happens too (ie disable <code>auto_migrate</code> and run it manually).
+Also this will only isolate the tests per-name, here <code>test_one</code>.
+Therefore I recommend you name the path for the name of the test file, this should be both descriptive and unique.
+And you have to clean up after yourself otherwise the next time the test is run it will be affected by the remaining data.</p>
+
+<h2>Mocking Helpers</h2>
+
+<p>If you have done any testing you&#39;ve probably dealt with mocking, but if you haven&#39;t, mocking is the act of replacing functionality from essentially unrelated code with test-specific code.
+Doing this lets you test one section of code (called a unit) in isolation from others.</p>
+
+<p>Everyone has their favorite mock library.
+There are so many tastes and styles that in the end Many people make their own, including <a href="https://metacpan.org/pod/Mock::MonkeyPatch">yours truly</a>.
+Of course you can use those libraries in Mojolicious when appropriate.
+As I mentioned before you can also mock out services by attaching tiny Mojolicious applications to a UserAgent&#39;s <a href="http://mojolicious.org/perldoc/Mojo/UserAgent#server"><code>server</code></a> attribute or making an entire external service as Doug showed us on <a href="https://mojolicious.io/blog/2017/12/08/day-8-mocking-a-rest-api/">Day 8</a>.</p>
+
+<p>In some cases however, the natural place to mock is in the place of a helper.
+When you think about it, this is actually rather obvious since helpers are often the glue used in Mojolicious applications to combine disparate code, like models or in this case the <a href="https://github.com/jberger/Wishlist/blob/blog_post/practical_testing/lib/Wishlist.pm#L55-L59">LinkEmbedder</a>.</p>
+
+<p>To test this we could actually do any of the mentioned options from mocking <a href="https://metacpan.org/pod/LinkEmbedder#get">LinkEmbedder-&gt;get</a> to attaching a mock service.
+That said it is sufficient here to just replace the helper, which is as easy as assigning over it.</p>
+
+<pre><code class="hljs"><span class="hljs-keyword">use</span> <span class="hljs-function">Mojo::Base</span> -strict;
+
+<span class="hljs-keyword">use</span> <span class="hljs-function">Test::More</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-function">Test::Mojo</span>;
+
+<span class="hljs-keyword">my</span> <span class="hljs-type">$t</span> = <span class="hljs-function">Test::Mojo</span>-&gt;new(
+  &#39;<span class="hljs-string">Wishlist</span>&#39;,
+  {database =&gt; &#39;<span class="hljs-string">:temp:</span>&#39;}
+);
+
+{
+  <span class="hljs-keyword">package</span> <span class="hljs-keyword">Local</span>::MockLink;
+  <span class="hljs-keyword">use</span> <span class="hljs-function">Mojo::Base</span> -base;
+  has [qw/title url html/];
+}
+
+<span class="hljs-comment"># &quot;mock&quot; the link helper</span><span class="hljs-comment">
+</span><span class="hljs-keyword">my</span> (<span class="hljs-type">$url</span>, <span class="hljs-type">$data</span>);
+<span class="hljs-type">$t</span>-&gt;<span class="hljs-type">app</span>-&gt;<span class="hljs-type">helper</span>(&#39;<span class="hljs-string">link</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  (<span class="hljs-function">undef</span>, <span class="hljs-type">$url</span>) = <span class="hljs-type">@_</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">Local</span>::MockLink-&gt;new(<span class="hljs-type">$data</span>);
+});
+
+<span class="hljs-type">$data</span> = {
+  title =&gt; &#39;<span class="hljs-string">Cool Beans</span>&#39;,
+  url =&gt; &#39;<span class="hljs-string">coolbeans.notasite</span>&#39;,
+  html =&gt; &#39;<span class="hljs-string">&lt;p&gt;Some really Cool Beans&lt;/p&gt;</span>&#39;,
+};
+
+<span class="hljs-type">$t</span>-&gt;<span class="hljs-type">get_ok</span>(&#39;<span class="hljs-string">/add?url=coolbeans.notasite</span>&#39;)
+  -&gt;status_is(<span class="hljs-number">200</span>)
+  -&gt;text_is(&#39;<span class="hljs-string">#item-detail p</span>&#39;, &#39;<span class="hljs-string">Some really Cool Beans</span>&#39;)
+  -&gt;element_exists(
+    &#39;<span class="hljs-string">form input[type=&quot;hidden&quot;][name=&quot;title&quot;][value=&quot;Cool Beans&quot;]</span>&#39;
+  )
+  -&gt;element_exists(
+    &#39;<span class="hljs-string">form input[type=&quot;hidden&quot;][name=&quot;url&quot;][value=&quot;coolbeans.notasite&quot;]</span>&#39;
+  );
+
+is <span class="hljs-type">$url</span>, &#39;<span class="hljs-string">coolbeans.notasite</span>&#39;, &#39;<span class="hljs-string">correct site was requested</span>&#39;;
+
+done_testing;
+
+</code></pre>
+
+<p><small><a href="https://github.com/jberger/Wishlist/blob/blog_post/practical_testing/t/embed.t">t/embed.t</a></small></p>
+
+<p>Because the template expects the result to be an object we have to build a tiny class to contain our mock results.
+Also whenever you are mocking, it is important to check the input your mock received as well as the results that the calling code derives from your mock return value.</p>
+
+<p>In the test you can also see some examples of how to use selectors to test for both text and attribute values.
+The text test is especially important because it shows that the html value that I got back from the LinkEmbedder isn&#39;t being escaped by the template and will render as HTML to the client.</p>
+
+<p>A few more tests and some documentation and our application will really be taking final shape!</p>
+
+              </section>
+              <small><p><a href="https://commons.wikimedia.org/w/index.php?curid=11337658">Image</a> by Hawaii Volcano Observatory, USGS - <a class="external text" href="http://hvo.wr.usgs.gov/kilauea/update/archive/2009/2009_Jun-Oct.html" rel="nofollow">Kilauea image archive for June-October 2009</a>: see entry for 26 June 2009., Public Domain.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/mocking/">mocking</a>,
+                  <a href="/blog/tag/testing/">testing</a>,
+                  <a href="/blog/tag/wishlist/">wishlist</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/cc767569f5863a7c261991ee5b23f147">
+                      </div>
+                      <div class="about">
+                        <h5>Joel Berger</h5>
+                        <p>Joel has Ph.D. in Physics from the University of Illinois at Chicago.
+He an avid Perl user and <a href="https://metacpan.org/author/JBERGER">author</a> and is a member of the Mojolicious Core Team.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/19/day-19-make-your-app-installable/index.html" rel="prev"><strong>Previous Article</strong> Day 19: Make Your App Installable</a></li>
+                  <li class="next"><a href="/blog/2017/12/21/day-21-virtually-a-lumberjack/index.html" rel="next"><strong>Next Article</strong> Day 21: Virtual(ly a) Lumberjack </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

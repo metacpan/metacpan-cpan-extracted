@@ -1,8 +1,11 @@
 use strict;
 use Test::More;
+
+use FindBin;
+use lib "$FindBin::Bin/..";
 require "t/lf.pl";
 
-BEGIN { plan tests => 15 + 2 }
+BEGIN { plan tests => 15 + 3 }
 
 foreach my $lang (qw(fr ja quotes)) {
     do5tests($lang, $lang);
@@ -23,6 +26,13 @@ EOF
 my $lf = Text::LineFold->new(ColMax => 72);
 is($lf->fold($in, 'FLOWED'), $out, 'CPAN RT 115146');
 is($lf->unfold($out, 'FLOWED'), $in, 'reversal');
+
+# Multiple Prep options (fixed on 2018.012).
+my $lf = Text::LineFold->new(ColMax => 7,
+    Prep=>"NONBREAKURI", Prep=>[qr/[-\w]+\@[-.\w]+/,sub{shift;@_}]);
+my $in = "https://www-www.example.org/, user-user\@example.org";
+my $out = "https://www-www.example.org/,\nuser-user\@example.org\n\n";
+is($lf->fold($in, 'FIXED'), $out, 'Multiple Prep options are allowed');
 
 1;
 

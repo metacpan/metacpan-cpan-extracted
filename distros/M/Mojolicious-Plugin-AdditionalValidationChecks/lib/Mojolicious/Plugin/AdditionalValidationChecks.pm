@@ -1,7 +1,10 @@
 package Mojolicious::Plugin::AdditionalValidationChecks;
+
+# ABSTRACT: Add addtional validation checks
+
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Email::Valid;
 use Scalar::Util qw(looks_like_number);
@@ -30,18 +33,17 @@ sub register {
 
     $validator->add_check( min => sub {
         return 1 if !looks_like_number( $_[2] );
-        return if !defined $_[3];
+        return if !length $_[3];
         return $_[2] < $_[3];
     });
 
     $validator->add_check( max => sub {
         return 1 if !looks_like_number( $_[2] );
-        return if !defined $_[3];
+        return if !length $_[3];
         return $_[2] > $_[3];
     });
 
     $validator->add_check( phone => sub {
-        return 1 if !$_[2];
         return 0 if $_[2] =~ m{\A
             ((?: \+ | 00 ) [1-9]{1}[0-9]{0,2})? # country
             \s*? [0-9]{2,5} \s*?      # local
@@ -55,14 +57,17 @@ sub register {
         my ($self, $field, $value, $min, $max) = @_;
 
         my $length = length $value;
-        return 0 if $length >= $min and !$max;
-        return 0 if $length >= $min and $length <= $max;
-        return 1;
+
+        return 0 if !$min && !$max;
+
+        return 1 if $min && $length < $min;
+        return 1 if $max && $length > $max;
+
+        return 0;
     });
 
     $validator->add_check( http_url => sub {
         my $url = Mojo::URL->new( $_[2] );
-        return 1 if !$url;
         return 1 if !$url->is_abs;
         return 1 if !grep{ $url->scheme eq $_ }qw(http https);
         return 0;
@@ -85,8 +90,6 @@ sub register {
 
     $validator->add_check( color => sub {
         my ($validation, $field, $value, $type) = @_;
-
-        return 1 if !defined $value;
 
         state $rgb_int = qr{
             \s* (?: 25[0-5] | 2[0-4][0-9] | 1[0-9][0-9] | [1-9][0-9] | [0-9] )
@@ -146,8 +149,6 @@ sub register {
     $validator->add_check( uuid => sub {
         my ($validation, $field, $value, $type) = @_;
 
-        return 1 if !defined $value;
-
         my %regexes = (
             3   => qr/\A[0-9A-F]{8}-[0-9A-F]{4}-3[0-9A-F]{3}-[0-9A-F]{4}-[0-9A-F]{12}\z/i,
             4   => qr/\A[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}\z/i,
@@ -156,7 +157,8 @@ sub register {
         );
 
         $type ||= 'all';
-        my $regex = $regexes{$type} || $regexes{all};
+        my $regex = $regexes{$type};
+        $regex    = $regexes{all} if !$regex;
 
         return $value !~ $regex;
     });
@@ -164,15 +166,11 @@ sub register {
     $validator->add_check( hex => sub {
         my ($validation, $field, $value, $type) = @_;
 
-        return 1 if !defined $value;
-
         return $value !~ m{\A [0-9A-Fa-f]+ \z}xms;
     });
 
     $validator->add_check( float => sub {
         my ($validation, $field, $value) = @_;
-
-        return 1 if !defined $value;
 
         return $value !~ m{
             \A
@@ -195,8 +193,6 @@ sub register {
 
     $validator->add_check( ip => sub {
         my ($validation, $field, $value, $type) = @_;
-
-        return 1 if !defined $value;
 
         $type //= 4;
 
@@ -227,7 +223,8 @@ sub register {
             6 => qr/\A$ipv6\z/,
         );
 
-        my $regex = $regexes{$type} || $regexes{4};
+        my $regex = $regexes{$type};
+        $regex    = $regexes{4} if !$regex;
 
         return $value !~ $regex;
     });
@@ -255,13 +252,14 @@ sub register {
         return 1 if !looks_like_number( $tmp[1] );
 
         my $field = $validation->topic;
-        $validation->int( @_ );
+        $validation->check( 'int', $tmp[1] );
 
         return 0 if !$validation->has_error($field);
 
+        $validation->output->{$field} = $tmp[1];
         delete $validation->{error}->{$field};
 
-        $validation->float( @_ );
+        $validation->check( 'float', $tmp[1] );
 
         return 0 if !$validation->has_error($field);
 
@@ -297,11 +295,11 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::AdditionalValidationChecks
+Mojolicious::Plugin::AdditionalValidationChecks - Add addtional validation checks
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -317,10 +315,6 @@ version 0.14
 
 L<Mojolicious::Plugin::AdditionalValidationChecks> adds a few validation checks to
 the L<Mojolicious validator|Mojolicious::Validator>.
-
-=head1 NAME
-
-Mojolicious::Plugin::AdditionalValidationChecks - Mojolicious Plugin
 
 =head1 CHECKS
 

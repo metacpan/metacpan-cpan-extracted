@@ -212,6 +212,8 @@ static const xs_error_t xs_errors[] =  {
     /* Syntax errors */
     { 1500, "PRM - Invalid/unsupported argument(s)"				},
     { 1501, "PRM - The key attribute is passed as an unsupported type"		},
+    { 1502, "PRM - The value attribute is passed without the key attribute"	},
+    { 1503, "PRM - The value attribute is passed as an unsupported type"	},
 
     /* Parse errors */
     { 2010, "ECR - QUO char inside quotes followed by CR not part of EOL"	},
@@ -254,6 +256,8 @@ static const xs_error_t xs_errors[] =  {
     { 3008, "EHR - unexpected error in bound fields"				},
     { 3009, "EHR - print_hr () called before column_names ()"			},
     { 3010, "EHR - print_hr () called with invalid arguments"			},
+
+    { 4001, "PRM - The key does not exist as field in the data"			},
 
     {    0, "" },
     };

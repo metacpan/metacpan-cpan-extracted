@@ -9,14 +9,14 @@ use warnings;
 use bytes;
 
 use IO::File;
-use IO::Uncompress::RawInflate  2.081 ;
-use IO::Compress::Base::Common  2.081 qw(:Status );
-use IO::Uncompress::Adapter::Inflate  2.081 ;
-use IO::Uncompress::Adapter::Identity 2.081 ;
-use IO::Compress::Zlib::Extra 2.081 ;
-use IO::Compress::Zip::Constants 2.081 ;
+use IO::Uncompress::RawInflate  2.083 ;
+use IO::Compress::Base::Common  2.083 qw(:Status );
+use IO::Uncompress::Adapter::Inflate  2.083 ;
+use IO::Uncompress::Adapter::Identity 2.083 ;
+use IO::Compress::Zlib::Extra 2.083 ;
+use IO::Compress::Zip::Constants 2.083 ;
 
-use Compress::Raw::Zlib  2.081 () ;
+use Compress::Raw::Zlib  2.083 () ;
 
 BEGIN
 {
@@ -31,7 +31,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnzipError, %headerLookup);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 $UnzipError = '';
 
 @ISA    = qw(IO::Uncompress::RawInflate Exporter);
@@ -171,25 +171,27 @@ sub readHeader
         # TODO - when Stream is off, use seek
         my $buffer;
         if (*$self->{ZipData}{Streaming}) {
-
             while (1) {
 
                 my $b;
                 my $status = $self->smartRead(\$b, 1024 * 16);
-                return undef
+
+                return $self->saveErrorString(undef, "Truncated file")
                     if $status <= 0 ;
 
-                my $temp_buf;
+                my $temp_buf ;
                 my $out;
+
                 $status = *$self->{Uncomp}->uncompr(\$b, \$temp_buf, 0, $out);
 
                 return $self->saveErrorString(undef, *$self->{Uncomp}{Error}, 
                                                      *$self->{Uncomp}{ErrorNo})
                     if $self->saveStatus($status) == STATUS_ERROR;                
 
+                $self->pushBack($b)  ;
+
                 if ($status == STATUS_ENDSTREAM) {
                     *$self->{Uncomp}->reset();
-                    $self->pushBack($b)  ;
                     last;
                 }
             }
@@ -460,6 +462,7 @@ sub skipEndCentralDirectory
 {
     my $self = shift;
     my $magic = shift ;
+
 
     my $buffer;
     $self->smartReadExact(\$buffer, 22 - 4)
@@ -1233,10 +1236,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeOut => 0|1 >>
 
-When writing to a file or filehandle, set C<binmode> before writing to the
-file.
-
-Defaults to 0.
+This option is now a no-op. All files will be written  in binmode.
 
 =item C<< Append => 0|1 >>
 

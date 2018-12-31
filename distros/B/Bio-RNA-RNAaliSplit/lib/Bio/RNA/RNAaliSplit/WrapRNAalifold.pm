@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2018-02-28 18:09:06 mtw>
+# Last changed Time-stamp: <2018-08-07 14:53:21 mtw>
 
 # Bio::RNA::RNAaliSplit::WrapRNAalifold.pm: A versatile object-oriented
 # wrapper for RNAalifold
@@ -9,7 +9,7 @@
 
 package Bio::RNA::RNAaliSplit::WrapRNAalifold;
 
-use version; our $VERSION = qv('0.06');
+use version; our $VERSION = qv('0.07');
 use Carp;
 use Data::Dumper;
 use Moose;
@@ -32,7 +32,14 @@ has 'ribosum' => (
 		  isa => 'Num',
 		  predicate => 'has_ribosum',
 		  documentation => q(Ribosum scoring),
-	     );
+		 );
+
+has 'SS_cons' => (
+		  is => 'rw',
+		  isa => 'Num',
+		  predicate => 'has_sscons',
+		  documentation => q(Use consensus structures from Stockholm file),
+		 );
 
 has 'sci' => (
 	      is => 'rw',
@@ -40,6 +47,14 @@ has 'sci' => (
 	      init_arg => undef,
 	      documentation => q(Structure conservation index),
 	     );
+
+has 'format' => (
+		 is => 'rw',
+		 isa => 'Str',
+		 default => 'C',
+		 predicate => 'has_format',
+		 documentation => q(File format of the input multiple sequence alignment (MSA)),
+		);
 
 has 'consensus_struc' => (
 			  is => 'rw',
@@ -128,11 +143,14 @@ sub run_rnaalifold {
   $alnps = file($oodir,$alnps_fn); # RNAalifold aln.ps
   $alirnaps = file($oodir,$alirnaps_fn); # RNAalifold alirna.ps
   $alidotps = file($oodir,$alidotps_fn); # RNAalifold alidot.ps
-  $alifoldstk = file($oodir,$stk_fn); # RNAalifold generated Stockholm file with new CS 
+  $alifoldstk = file($oodir,$stk_fn); # RNAalifold generated Stockholm file with new CS
 
   open my $fh, ">", $out;
-  my $alifold_options = " --aln --color --cfactor 0.6 --nfactor 0.5 -p --sci --aln-stk ";
+  my $alifold_options = " --aln --color -p --sci --aln-stk ";
+  #$alifold_options .= " --cfactor 0.6 --nfactor 0.5 ";
+  $alifold_options .= " -f ".$self->format." ";
   if ($self->has_ribosum){$alifold_options.=" -r "}
+  if ($self->has_sscons){$alifold_options.=" --SS_cons "}
   my $cmd = $rnaalifold.$alifold_options.$self->ifile;
   my ( $success, $error_message, $full_buf, $stdout_buf, $stderr_buf ) =
     run( command => $cmd, verbose => 0 );

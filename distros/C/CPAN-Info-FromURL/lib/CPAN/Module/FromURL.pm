@@ -1,7 +1,7 @@
 package CPAN::Module::FromURL;
 
-our $DATE = '2017-06-09'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2018-12-30'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,6 +47,11 @@ $SPEC{extract_cpan_module_from_url} = {
             result => 'ToolSet',
         },
         {
+            name => "mojo",
+            args => {url=>'https://mojolicious.org/perldoc/Mojo/DOM/CSS'},
+            result => 'Mojo::DOM::CSS',
+        },
+        {
             name => 'unknown',
             args => {url=>'https://www.google.com/'},
             result => undef,
@@ -82,7 +87,7 @@ CPAN::Module::FromURL - Extract/guess CPAN module from a URL
 
 =head1 VERSION
 
-This document describes version 0.08 of CPAN::Module::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2017-06-09.
+This document describes version 0.090 of CPAN::Module::FromURL (from Perl distribution CPAN-Info-FromURL), released on 2018-12-30.
 
 =head1 FUNCTIONS
 
@@ -111,7 +116,11 @@ Examples:
 
  extract_cpan_module_from_url("http://search.cpan.org/search?module=ToolSet"); # -> "ToolSet"
 
-=item * Example #4 (unknown):
+=item * Example #4 (mojo):
+
+ extract_cpan_module_from_url("https://mojolicious.org/perldoc/Mojo/DOM/CSS"); # -> "Mojo::DOM::CSS"
+
+=item * Example #5 (unknown):
 
  extract_cpan_module_from_url("https://www.google.com/"); # -> undef
 
@@ -161,7 +170,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

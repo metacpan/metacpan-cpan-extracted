@@ -17,6 +17,8 @@ subtest "coerce_to=float" => sub {
     };
 
     subtest "from hms string" => sub {
+        is_deeply($c->("1:2:3"), 3723);
+        is_deeply($c->("1:2"), 3720);
         is_deeply($c->("23:59:59"), 86399);
         is_deeply($c->("23:59:59.025"), 86399.025);
         is_deeply($c->("24:00:00"), undef); # invalid
@@ -38,6 +40,8 @@ subtest "coerce_to=str_hms" => sub {
     };
 
     subtest "from hms string" => sub {
+        is_deeply($c->("1:2:3"), "01:02:03");
+        is_deeply($c->("1:2"), "01:02:00");
         is_deeply($c->("23:59:59"), "23:59:59");
         is_deeply($c->("23:59:59.025"), "23:59:59.025");
         is_deeply($c->("24:00:00"), undef); # invalid

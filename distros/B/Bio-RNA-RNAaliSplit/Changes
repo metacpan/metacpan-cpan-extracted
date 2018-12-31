@@ -1,14 +1,16 @@
 Revision history for Bio::RNA::RNAaliSplit
 
-0.03    Fri Mar 03 2017
-	- initial release
-        - packaged for distribution as Perl module
+0.07	Sat Dec 29 2018
+	- catch & properly handle R-scape output status
+	- added 'format' and 'SS_cons' attributes to WrapRNAalifold.pm
+	- refactored WrapRscape tests
+	- updated shipped File::ShareDir::Install to v0.13 
 
-0.04	Sun Mar 12 2017
-	- fixed an error in MANIFEST; File::ShareDir::Install v0.11 is now
-	  shipped with the distribution
-	- strict depencency on ViennaRNA >=v2.3.4 
-	- use Test::Prereq for dependency testing
+0.06	Wed Feb 28 2018
+        - added R-scape wrapper
+	- added scripts/eval_alignment.pl
+	- added Path::Class::File dependency to Makefile.PL
+	- added WrapRscape test
 
 0.05	Sun May 28 2017
 	- ship with Version::Control for checking versions of third party
@@ -16,8 +18,12 @@ Revision history for Bio::RNA::RNAaliSplit
 	- remove obsolete symbols
 	- use FileDirUtil consistently instead of custom FileDir.pm 
 
-0.06	 Wed Feb 28 2018
-        - added R-scape wrapper
-	- added scripts/eval_alignment.pl
-	- added Path::Class::File dependency to Makefile.PL
-	- added WrapRscape test
+0.04	Sun Mar 12 2017
+	- fixed an error in MANIFEST; File::ShareDir::Install v0.11 is now
+	  shipped with the distribution
+	- strict depencency on ViennaRNA >=v2.3.4 
+	- use Test::Prereq for dependency testing
+
+0.03    Fri Mar 03 2017
+	- initial release
+        - packaged for distribution as Perl module

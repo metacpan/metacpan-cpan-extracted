@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@joelaberger" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/23/day-23-one-liners-for-fun-and-profit/" property="og:url">
+  <meta content="Day 23: One-Liners for Fun and Profit" property="og:title">
+    <meta content="For those times when you just need a quick check or example." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/23/day-23-one-liners-for-fun-and-profit/chess.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 23: One-Liners for Fun and Profit - mojolicious.io</title>
+  <meta content="Joel Berger" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 23: One-Liners for Fun and Profit</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-23">Dec 23, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Old man playing timed chess" src="/blog/2017/12/23/day-23-one-liners-for-fun-and-profit/chess.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>Perl is well-known for its <a href="http://www.catonmat.net/download/perl1line.txt">one-liners</a>: short programs written as part of the <a href="http://perldoc.perl.org/perlrun.html">command line invocation of the interpreter</a>.
+Certainly every programmer or sysadmin has the need, from time to time, to do a quick one-off task programmatically.
+Such tasks can be done with a full script, to be sure, but once you get the hang of writing them, one-liners can save the time and hassle of actually doing so.</p>
+
+<p>These tasks may include removing unwanted lines from files, collecting data from logs, or even a quick proof-of-concept of something that would become a script later.
+They can read lines in files, even multiple files, can operate on files in-place, can read from STDIN as a pipe.
+But while one-liners have been tools of the trade for these activities, certainly no such thing would be practical for web tasks, right?</p>
+
+<p>But of course, on <a href="https://mojolicious.io/blog/2017/12/05/day-5-your-apps-built-in-commands/">day 5</a> and <a href="https://mojolicious.io/blog/2017/12/06/day-6-adding-your-own-commands/">day 6</a> of this series that we saw that we can build command line tools with your app.
+We have even seen how to use the <a href="http://mojolicious.org/perldoc/Mojolicious/Command/eval">eval</a> command to run a one-liner against your app.
+So could we take this further?</p>
+
+<p>Could we do remote data fetching and manipulation as a one-liner?
+Could we build an entire web application as a one-liner?
+Would I be asking if the answer was no?</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>A Note on Readability</h2>
+
+<p>Almost always when I post articles on Mojolicious, I&#39;m keenly aware of Perl&#39;s reputation for readability.
+I firmly believe that Perl can be written to be easily read, it just takes awareness from the author.
+But every now and again you need to have a little fun!</p>
+
+<p>One-liners are not meant for too much reuse.
+Their value is the extreme rapidity of their creation and as such they are terse.
+If they were well-formed scripts, well, you&#39;d put them in a file.</p>
+
+<p>So please, if this is the first time you see Perl and Mojolicious, I want you to know that this is the exception and not the rule!</p>
+
+<h2>The Key ... words?</h2>
+
+<p>Mojo one-liners are just Perl one-liners.
+You will use <code>-E</code> (or <code>-e</code>) to write the program.
+You might use <code>-n</code> to loop over input, or <code>-p</code> to do the same while printing <code>$_</code> after each item, just like normal one-liners.</p>
+
+<p>To get the extra Mojo goodness, add <code>-Mojo</code>.
+The name itself is a cute hack.
+Since <code>-M</code> is what loads a module on the command line, the module name is therefore <a href="http://mojolicious.org/perldoc/ojo"><code>ojo</code></a>.</p>
+
+<p>This module imports many functions into the main namespace for your use.
+The names of these functions are (almost) all just one letter long: these are one-liners after all, brevity is key!
+I&#39;ll show you them below.</p>
+
+<p>Importantly, however, the main namepace also imports <a href="http://mojolicious.org/perldoc/Mojolicious/Lite">Mojolicious::Lite</a>.
+Whether you use it or not, you have a Lite app just waiting for you!
+One caveat is that this does import <code>strict</code>, so you must declare your variables unless you disable strict manually.</p>
+
+<h3>Output and Input</h3>
+
+<p>The first two functions we will look at are related to output.
+The function <code>r</code> takes an argument and formats it with <a href="http://mojolicious.org/perldoc/Mojo/Util#dumper">Mojo::Util&#39;s wrapper</a> for <a href="https://metacpan.org/pod/Data::Dumper">Data::Dumper</a>.
+Somewhat similarly the <code>j</code> function takes any Perl data structure and <a href="http://mojolicious.org/perldoc/Mojo/JSON#encode_json">return it as a JSON string</a>.</p>
+
+<pre><code>perl -Mojo -E &#39;print r({hello =&gt; &quot;world&quot;})&#39;
+perl -Mojo -E &#39;print j({hello =&gt; &quot;world&quot;})&#39;
+</code></pre>
+
+<p>The <code>j</code> function is more interesting in that if you give it a string, it will <a href="http://mojolicious.org/perldoc/Mojo/JSON#decode_json">decode it from JSON</a> and return a data structure.</p>
+
+<pre><code>echo &#39;{&quot;hello&quot;:&quot;world&quot;}&#39; | perl -Mojo -E &#39;print j(&lt;&gt;)-&gt;{hello}&#39;
+</code></pre>
+
+<p>On their own, these aren&#39;t that interesting.
+But when combined with others, you can start to have fun.</p>
+
+<h3>Making Requests</h3>
+
+<p>Most of the functions are dedicated to making HTTP requests.
+There are functions for</p>
+
+<ul>
+<li>get - <code>g</code></li>
+<li>head - <code>h</code></li>
+<li>post - <code>p</code></li>
+<li>put - <code>u</code></li>
+<li>patch - <code>t</code></li>
+<li>delete - <code>d</code></li>
+<li>options - <code>o</code></li>
+</ul>
+
+<p>These are just their respective calls on <a href="http://mojolicious.org/perldoc/Mojo/UserAgent">Mojo::UserAgent</a> with the one space-saving optimization that they return the <a href="http://mojolicious.org/perldoc/Mojo/Message/Response">Response</a> object rather than the transaction.</p>
+
+<p>A simple use could be to fetch the title from a webpage.</p>
+
+<pre><code>perl -Mojo -E &#39;print g(&quot;mojolicious.org&quot;)-&gt;dom-&gt;at(&quot;title&quot;)-&gt;text&#39;
+</code></pre>
+
+<p>This simple request is something you could have done with the <a href="http://mojolicious.org/perldoc/Mojolicious/Command/get">get</a> command,</p>
+
+<pre><code>mojo get mojolicious.org title text
+</code></pre>
+
+<p>however the one liner form can let you do much more, like complex mapping.
+For example, to get the text and link from each link on a site as a data structure.</p>
+
+<pre><code>perl -Mojo -E &#39;print r({ g(&quot;mojolicious.io/blog&quot;)-&gt;dom-&gt;find(&quot;a&quot;)-&gt;map(sub{ $_-&gt;text =&gt; $_-&gt;{href} })-&gt;each })&#39;
+</code></pre>
+
+<p>You can also use Perl&#39;s looping constructs.
+Perhaps you have a file full of sites for which you want to get some data.</p>
+
+<pre><code>$ cat sites
+mojolicious.org
+mojolicious.io
+mojocasts.com
+</code></pre>
+
+<p>You can then take each line, request it, and post-processes.</p>
+
+<pre><code>perl -Mojo -nlE &#39;say g($_)-&gt;dom-&gt;at(&quot;title&quot;)-&gt;text&#39; sites
+</code></pre>
+
+<h3>Object Constructors</h3>
+
+<p>The Mojo toolkit contains many helpful classes.
+The ojo functions provide quick constructors for them, so you can access their functionality without all the typing!</p>
+
+<ul>
+<li><a href="http://mojolicious.org/perldoc/Mojo/ByteStream">Mojo::ByteStream</a> - <code>b</code></li>
+<li><a href="http://mojolicious.org/perldoc/Mojo/Collection">Mojo::Collection</a> - <code>c</code></li>
+<li><a href="http://mojolicious.org/perldoc/Mojo/DOM">Mojo::DOM</a> - <code>x</code></li>
+<li><a href="http://mojolicious.org/perldoc/Mojo/File">Mojo::File</a> - <code>f</code></li>
+</ul>
+
+<p>So you can slurp an HTML file with <code>f</code>, then build DOM object with <code>x</code> and get its title</p>
+
+<pre><code>perl -Mojo -E &#39;say x(f(shift)-&gt;slurp)-&gt;at(&quot;title&quot;)-&gt;text&#39; test.html
+</code></pre>
+
+<p>or as we did earlier, get urls from a file, but this time <code>trim</code> unslightly whitespace from the output</p>
+
+<pre><code>perl -Mojo -nlE &#39;say b(g($_)-&gt;dom-&gt;at(&quot;title&quot;)-&gt;text)-&gt;trim&#39; sites
+</code></pre>
+
+<p>We can slurp the <code>sites</code> file itself, split the lines and ouput it as JSON.</p>
+
+<pre><code>perl -Mojo -E &#39;print j({sites =&gt; b(f(shift)-&gt;slurp)-&gt;split(&quot;\n&quot;)})&#39; sites
+</code></pre>
+
+<p>We can even <code>trim</code> and <code>sort</code> while we do it</p>
+
+<pre><code>perl -Mojo -E &#39;print j({sites =&gt; b(f(shift)-&gt;slurp)-&gt;split(&quot;\n&quot;)-&gt;map(&quot;trim&quot;)-&gt;sort})&#39; sites
+</code></pre>
+
+<h3>The Lite App</h3>
+
+<p>If all of that weren&#39;t enough for you, remember that your one-liner is also a Lite app.
+This means that you get all of the Lite app keywords.
+I like to show the Mojolicious error page, featuring the glorious Fail Raptor, to the uninitiated.
+While I could find the image in the repo, just making a &quot;fail app&quot; is so much easier!</p>
+
+<pre><code>perl -Mojo -E &#39;get &quot;/&quot; =&gt; sub { die }; app-&gt;start&#39; daemon -m production
+</code></pre>
+
+<p>If you haven&#39;t seen him, you need to run that one-liner to see him for yourself!</p>
+
+<p>You do still have to call <code>app-&gt;start</code> as ever, and the application gets called with commands, just like any application.
+Call it with <code>daemon</code> and since we want to show the production version of the page, force it into production mode.</p>
+
+<p>There is an even shorter way to declare a one-liner application too.
+Since one-liners are likely to be used immediately, and routing conditions aren&#39;t so important, there is one ojo keyword to shorten things.
+That keyword is <code>a</code>, whose name should cause you to think of Lite&#39;s <a href="http://mojolicious.org/perldoc/Mojolicious/Lite#any"><code>any</code></a> keyword.</p>
+
+<p>It has a one important differences besides just the shorter name: it returns the application rather than the route instance, allowing you to chain the call to <code>start</code>.
+Another handy trick is that, when using <code>ojo</code>, actions expose the controller instance as <code>$_</code> so you don&#39;t have to unpack the arguments to get access to it.
+(If you have a recent enough Perl, you can also use signatures on your functions automagically too.)</p>
+
+<pre><code>perl -Mojo -E &#39;a(&quot;/&quot; =&gt; sub { $_-&gt;render(text =&gt; scalar localtime) })-&gt;start&#39; get /
+</code></pre>
+
+<p>Since all the commands work, using the Lite app and the <code>get</code> command together can mean that you see the results of a request to your one-liner application right there on your terminal!</p>
+
+<p>I use this functionality all the time to quickly demonstrate some concept; sometimes to others or sometimes to myself.
+What happens if I set this stash parameter?
+Will a route condition do what I expect?
+Indeed the Mojolicious core team members often make one-liner applications to paste into IRC when we want to reproduce some bug or discuss some change.</p>
+
+<h3>Benchmarking</h3>
+
+<p>And speaking of development, there is one more ojo function, and it is quite unlike the others.
+The <code>n</code> function takes a block of code to run and optionally a number of times to run it and the function will output timing statistics over the runs.
+The heavy lifting here is done by the Perl core <a href="https://metacpan.org/pod/Benchmark">Benchmark</a> module.</p>
+
+<p>Say the Mojolicious core team is considering a change to the very performance sensitive Mojo::DOM parser.
+We can take a baseline and then make our changes and each time run something like</p>
+
+<pre><code>perl -Ilib -Mojo -E &#39;my $body = g(&quot;html.spec.whatwg.org&quot;)-&gt;body; n { x $body } 10&#39;
+</code></pre>
+
+<p>This fetches the rather large HTML document that defines HTML itself and then parses it 10 times.
+The more runs, the more consistent your data should be since variations are averaged out.
+Note especially how easily the fetching is excluded while what we care about is included.
+On my laptop this gives the output.</p>
+
+<pre><code>29.3775 wallclock secs (29.11 usr +  0.26 sys = 29.37 CPU) @  0.34/s (n=10)
+</code></pre>
+
+<p>Knowing that data taken with and without proposed changes we can have a better idea of the performance gains or impacts from that change.
+While there is no magic in this function, the ease-of-use of the benchmarker means we are actually likely to use it, even for what may seem like small and insignificant changes.
+This is a major reason for Mojolicious&#39; consistently blazing speeds.</p>
+
+<h2>Conclusion</h2>
+
+<p>Making <code>ojo</code> one-liners can be great to experiment with new concepts, demonstrate problems, fetch and work with data, and many other tasks.
+You might use them in non-web one-liners that need JSON or Data::Dumper or perhaps MMojo::Collection for chaining.
+(Speaking of chaining, for bonus points, check out <a href="https://metacpan.org/pod/ojoBox">ojoBox</a> for <a href="https://metacpan.org/pod/Mojo::Autobox">autoboxing Perl types</a>, making even cooler chains!)</p>
+
+<p>These one-liners are not going to be everyone&#39;s cup of tea.
+If these don&#39;t seem like your&#39;s you can completely ignore them.</p>
+
+<p>However, once you start using them, I think you&#39;ll find yourself using them often.</p>
+
+              </section>
+              <small><p><a href="https://commons.wikimedia.org/w/index.php?curid=21375125">Image</a> by Â© <a href="http://www.royan.com.ar" rel="nofollow">Jorge Royan</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/command/">command</a>,
+                  <a href="/blog/tag/debugging/">debugging</a>,
+                  <a href="/blog/tag/lite/">lite</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/cc767569f5863a7c261991ee5b23f147">
+                      </div>
+                      <div class="about">
+                        <h5>Joel Berger</h5>
+                        <p>Joel has Ph.D. in Physics from the University of Illinois at Chicago.
+He an avid Perl user and <a href="https://metacpan.org/author/JBERGER">author</a> and is a member of the Mojolicious Core Team.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/22/day-22-how-to-build-a-public-rest-api/index.html" rel="prev"><strong>Previous Article</strong> Day 22: A RESTful API with OpenAPI</a></li>
+                  <li class="next"><a href="/blog/2017/12/24/day-24-release-and-wrap-up/index.html" rel="next"><strong>Next Article</strong> Day 24: Release and Wrap-Up </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

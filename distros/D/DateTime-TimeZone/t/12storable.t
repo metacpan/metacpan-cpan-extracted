@@ -11,7 +11,7 @@ use DateTime::TimeZone::OffsetOnly;
 use Storable;
 
 {
-    my $tz1 = DateTime::TimeZone->new( name => 'America/Chicago' );
+    my $tz1    = DateTime::TimeZone->new( name => 'America/Chicago' );
     my $frozen = Storable::nfreeze($tz1);
 
     ok(

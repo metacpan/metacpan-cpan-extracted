@@ -25,7 +25,7 @@ use Unicode::GCString;
 ### Globals
 
 ### The package version
-our $VERSION = '2018.003';
+our $VERSION = '2019.001';
 
 ### Public Configuration Attributes
 our @Config = (
@@ -67,12 +67,12 @@ foreach my $p ((['EA', EAWidths()], ['LB', LBClasses()])) {
     my $prop = shift @{$p};
     my $idx = 0;
     foreach my $val (@{$p}) {
-	no strict;
-	my $const = "${prop}_${val}";
-	*{$const} = eval "sub { $idx }";
-	push @EXPORT_OK, $const;
-	push @{$EXPORT_TAGS{'all'}}, $const;
-	$idx++;
+        no strict;
+        my $const = "${prop}_${val}";
+        *{$const} = eval "sub { $idx }";
+        push @EXPORT_OK, $const;
+        push @{$EXPORT_TAGS{'all'}}, $const;
+        $idx++;
     }
 }
 
@@ -115,103 +115,103 @@ sub config ($@) {
 
     # Get config.
     if (scalar @_ == 1) {
-	my $k = shift;
-	my $ret;
+        my $k = shift;
+        my $ret;
 
-	if (uc $k eq uc 'CharactersMax') {
-	    return $self->_config('CharMax');
-	} elsif (uc $k eq uc 'ColumnsMax') {
-	    return $self->_config('ColMax');
-	} elsif (uc $k eq uc 'ColumnsMin') {
-	    return $self->_config('ColMin');
-	} elsif (uc $k eq uc 'SizingMethod') {
-	    return $self->_config('Sizing');
-	} elsif (uc $k eq uc 'TailorEA') {
-	    carp "$k is obsoleted.  Use EAWidth";
-	    $ret = $self->_config('EAWidth');
-	    if (! defined $ret) {
-		return [];
-	    } else {
-		return [map { ($_->[0] => $_->[1]) } @{$ret}];
-	    }
-	} elsif (uc $k eq uc 'TailorLB') {
-	    carp "$k is obsoleted.  Use LBClass";
-	    $ret = $self->_config('LBClass');
-	    if (! defined $ret) {
-		return [];
-	    } else {
-		return [map { ($_->[0] => $_->[1]) } @{$ret}];
-	    }
-	} elsif (uc $k eq uc 'UrgentBreaking') {
-	    return $self->_config('Urgent');
-	} elsif (uc $k eq uc 'UserBreaking') {
-	    carp "$k is obsoleted.  Use Prep";
-	    $ret = $self->_config('Prep');
-	    if (! defined $ret) {
-		return [];
-	    } else {
-		return $ret;
-	    }
-	} else {
-	    return $self->_config($k);
-	}
+        if (uc $k eq uc 'CharactersMax') {
+            return $self->_config('CharMax');
+        } elsif (uc $k eq uc 'ColumnsMax') {
+            return $self->_config('ColMax');
+        } elsif (uc $k eq uc 'ColumnsMin') {
+            return $self->_config('ColMin');
+        } elsif (uc $k eq uc 'SizingMethod') {
+            return $self->_config('Sizing');
+        } elsif (uc $k eq uc 'TailorEA') {
+            carp "$k is obsoleted.  Use EAWidth";
+            $ret = $self->_config('EAWidth');
+            if (! defined $ret) {
+                return [];
+            } else {
+                return [map { ($_->[0] => $_->[1]) } @{$ret}];
+            }
+        } elsif (uc $k eq uc 'TailorLB') {
+            carp "$k is obsoleted.  Use LBClass";
+            $ret = $self->_config('LBClass');
+            if (! defined $ret) {
+                return [];
+            } else {
+                return [map { ($_->[0] => $_->[1]) } @{$ret}];
+            }
+        } elsif (uc $k eq uc 'UrgentBreaking') {
+            return $self->_config('Urgent');
+        } elsif (uc $k eq uc 'UserBreaking') {
+            carp "$k is obsoleted.  Use Prep";
+            $ret = $self->_config('Prep');
+            if (! defined $ret) {
+                return [];
+            } else {
+                return $ret;
+            }
+        } else {
+            return $self->_config($k);
+        }
     }
 
     # Set config.
     my @config = ();
     while (0 < scalar @_) {
-	my $k = shift;
-	my $v = shift;
+        my $k = shift;
+        my $v = shift;
 
         if (uc $k eq uc 'CharactersMax') {
-	    push @config, 'CharMax' => $v;
-	} elsif (uc $k eq uc 'ColumnsMax') {
-	    push @config, 'ColMax' => $v;
-	} elsif (uc $k eq uc 'ColumnsMin') {
-	    push @config, 'ColMin' => $v;
-	} elsif (uc $k eq uc 'SizingMethod') {
-	    push @config, 'Sizing' => $v;
-	} elsif (uc $k eq uc 'TailorLB') {
-	    carp "$k is obsoleted.  Use LBClass";
-	    push @config, 'LBClass' => undef;
-	    if (! defined $v) {
-		;
-	    } else {
-		my @v = @{$v};
-		while (scalar(@v)) {
-		    my $k = shift @v;
-		    my $v = shift @v;
-		    push @config, 'LBClass' => [ $k => $v ];
-		}
-	    }
-	} elsif (uc $k eq uc 'TailorEA') {
-	    carp "$k is obsoleted.  Use EAWidth";
-	    push @config, 'EAWidth' => undef;
-	    if (! defined $v) {
-		;
-	    } else {
-		my @v = @{$v};
-		while (scalar(@v)) {
-		    my $k = shift @v;
-		    my $v = shift @v;
-		    push @config, 'EAWidth' => [ $k => $v ];
-		}
-	    }
-	} elsif (uc $k eq uc 'UserBreaking') {
-	    carp "$k is obsoleted.  Use Prep";
-	    push @config, 'Prep' => undef;
-	    if (! defined $v) {
-		;
-	    } elsif (ref $v eq 'ARRAY') {
-		push @config, map { ('Prep' => $_) } @{$v};
-	    } else {
-		push @config, 'Prep' => $v;
-	    }
-	} elsif (uc $k eq uc 'UrgentBreaking') {
-	    push @config, 'Urgent' => $v;
-	} else {
-	    push @config, $k => $v;
-	}
+            push @config, 'CharMax' => $v;
+        } elsif (uc $k eq uc 'ColumnsMax') {
+            push @config, 'ColMax' => $v;
+        } elsif (uc $k eq uc 'ColumnsMin') {
+            push @config, 'ColMin' => $v;
+        } elsif (uc $k eq uc 'SizingMethod') {
+            push @config, 'Sizing' => $v;
+        } elsif (uc $k eq uc 'TailorLB') {
+            carp "$k is obsoleted.  Use LBClass";
+            push @config, 'LBClass' => undef;
+            if (! defined $v) {
+                ;
+            } else {
+                my @v = @{$v};
+                while (scalar(@v)) {
+                    my $k = shift @v;
+                    my $v = shift @v;
+                    push @config, 'LBClass' => [ $k => $v ];
+                }
+            }
+        } elsif (uc $k eq uc 'TailorEA') {
+            carp "$k is obsoleted.  Use EAWidth";
+            push @config, 'EAWidth' => undef;
+            if (! defined $v) {
+                ;
+            } else {
+                my @v = @{$v};
+                while (scalar(@v)) {
+                    my $k = shift @v;
+                    my $v = shift @v;
+                    push @config, 'EAWidth' => [ $k => $v ];
+                }
+            }
+        } elsif (uc $k eq uc 'UserBreaking') {
+            carp "$k is obsoleted.  Use Prep";
+            push @config, 'Prep' => undef;
+            if (! defined $v) {
+                ;
+            } elsif (ref $v eq 'ARRAY') {
+                push @config, map { ('Prep' => $_) } @{$v};
+            } else {
+                push @config, 'Prep' => $v;
+            }
+        } elsif (uc $k eq uc 'UrgentBreaking') {
+            push @config, 'Urgent' => $v;
+        } else {
+            push @config, $k => $v;
+        }
     }
 
     $self->_config(@config) if scalar @config;
@@ -224,23 +224,23 @@ sub context (@) {
     my $language;
     my $context;
     foreach my $k (keys %opts) {
-	if (uc $k eq 'CHARSET') {
-	    if (ref $opts{$k}) {
-		$charset = $opts{$k}->as_string;
-	    } else {
-		$charset = MIME::Charset->new($opts{$k})->as_string;
-	    }
-	} elsif (uc $k eq 'LANGUAGE') {
-	    $language = uc $opts{$k};
-	    $language =~ s/_/-/;
-	}
+        if (uc $k eq 'CHARSET') {
+            if (ref $opts{$k}) {
+                $charset = $opts{$k}->as_string;
+            } else {
+                $charset = MIME::Charset->new($opts{$k})->as_string;
+            }
+        } elsif (uc $k eq 'LANGUAGE') {
+            $language = uc $opts{$k};
+            $language =~ s/_/-/;
+        }
     }
     if ($charset and $charset =~ /$EASTASIAN_CHARSETS/) {
         $context = 'EASTASIAN';
     } elsif ($language and $language =~ /$EASTASIAN_LANGUAGES/) {
-	$context = 'EASTASIAN';
+        $context = 'EASTASIAN';
     } else {
-	$context = 'NONEASTASIAN';
+        $context = 'NONEASTASIAN';
     }
     $context;
 }

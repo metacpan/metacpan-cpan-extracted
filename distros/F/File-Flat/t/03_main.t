@@ -328,7 +328,7 @@ ok( ! File::Flat->canOpen( $curdir ), "Static ->canOpen returns false for curren
 ok( ! File::Flat->canOpen( $f{gooddir} ), "Static ->canOpen returns false for readable subdirectory" );
 ok( ! File::Flat->canOpen( $f{baddir} ), "Static ->canOpen returns false for unreadable subdirectory" );
 
-# Test the existance of normal and/or binary files
+# Test the existence of normal and/or binary files
 ok( ! File::Flat->isText( $f{null} ), "Static ->isText returns false for missing file" );
 ok( ! File::Flat->isText( $f{ff_binary} ), "Static ->isText returns false for binary file" );
 ok( File::Flat->isText( $f{ff_text} ), "Static ->isText returns true for text file" );

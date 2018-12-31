@@ -1,7 +1,7 @@
 {
    "abstract" : "Object Orientation for Perl 5",
    "author" : [
-      "Al Newkirk <anewkirk@ana.io>"
+      "Al Newkirk <al@iamalnewkirk.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
@@ -24,7 +24,7 @@
             "Moo" : "2.000001",
             "Sub::Quote" : "2.005001",
             "Type::Tiny" : "1.000005",
-            "Type::Tiny::Signatures" : "0.07",
+            "Type::Tiny::Signatures" : "0.08",
             "perl" : "v5.14.0"
          }
       },
@@ -33,7 +33,7 @@
             "Moo" : "2.000001",
             "Sub::Quote" : "2.005001",
             "Type::Tiny" : "1.000005",
-            "Type::Tiny::Signatures" : "0.07",
+            "Type::Tiny::Signatures" : "0.08",
             "perl" : "v5.14.0"
          }
       }
@@ -41,19 +41,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/alnewkirk/Data-Object/issues"
+         "web" : "https://github.com/iamalnewkirk/data-object/issues"
       },
       "homepage" : "http://metacpan.org/release/Data-Object/",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/alnewkirk/Data-Object.git",
-         "web" : "https://github.com/alnewkirk/Data-Object"
+         "url" : "git://github.com/iamalnewkirk/data-object.git",
+         "web" : "https://github.com/iamalnewkirk/data-object"
       }
    },
-   "version" : "0.60",
+   "version" : "0.61",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
-      "Al Newkirk <al@iamalnewkirk.com>",
       "Anthony Brummett <abrummet@genome.wustl.edu>"
    ],
    "x_generated_by_perl" : "v5.14.1",

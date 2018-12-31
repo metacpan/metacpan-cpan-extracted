@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::float::str_percent;
 
 our $DATE = '2018-12-16'; # DATE
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Data::Sah::Coerce::perl::float::str_percent - Coerce float from percent string (
 
 =head1 VERSION
 
-This document describes version 0.030 of Data::Sah::Coerce::perl::float::str_percent (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
+This document describes version 0.031 of Data::Sah::Coerce::perl::float::str_percent (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
 
 =head1 DESCRIPTION
 

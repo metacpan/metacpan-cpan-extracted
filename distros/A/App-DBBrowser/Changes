@@ -1,6 +1,18 @@
 Revision history for App-DBBrowser
 
 
+2.036    2018-12-30
+        - Update subqueries.
+        - New file name for saved subqueries.
+        - SQLite: 'truncate' returns a numeric value.
+        - SQLite: 'truncate' returns the value without rounding.
+        - Bugfix in SQLite: the autoincrement column constraint could contain the keyword 'autoincrement'.
+        - Bugfix in SQLite's 'bit_length': return bits not bytes.
+        - Bugfix in HAVING clause with operator 'LIKE col': use group results as arguments.
+        - Bugfixes in 'col_function' and print history.
+        - Union "All tables": don't include system tables.
+
+
 2.035    2018-12-20
         - "DBD::MariaDB" database plugin.
 

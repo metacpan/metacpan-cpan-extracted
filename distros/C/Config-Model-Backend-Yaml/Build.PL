@@ -33,7 +33,8 @@ my $build = Module::Build->new(
     'Path::Tiny' => '0',
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
-    'lib' => '0'
+    'lib' => '0',
+    'utf8' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'

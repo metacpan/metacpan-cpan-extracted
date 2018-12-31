@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.21';
+our $VERSION = '2.23';
 
 use DateTime::TimeZone::Catalog;
 use DateTime::TimeZone::Floating;
@@ -21,7 +21,7 @@ use Specio::Library::String;
 use Try::Tiny;
 
 ## no critic (ValuesAndExpressions::ProhibitConstantPragma)
-use constant INFINITY => 100**1000;
+use constant INFINITY     => 100**1000;
 use constant NEG_INFINITY => -1 * ( 100**1000 );
 
 # the offsets for each span element
@@ -602,7 +602,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.21
+version 2.23
 
 =head1 SYNOPSIS
 

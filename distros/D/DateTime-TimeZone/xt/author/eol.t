@@ -221,6 +221,7 @@ my @files = (
     'lib/DateTime/TimeZone/Asia/Pontianak.pm',
     'lib/DateTime/TimeZone/Asia/Pyongyang.pm',
     'lib/DateTime/TimeZone/Asia/Qatar.pm',
+    'lib/DateTime/TimeZone/Asia/Qostanay.pm',
     'lib/DateTime/TimeZone/Asia/Qyzylorda.pm',
     'lib/DateTime/TimeZone/Asia/Riyadh.pm',
     'lib/DateTime/TimeZone/Asia/Sakhalin.pm',

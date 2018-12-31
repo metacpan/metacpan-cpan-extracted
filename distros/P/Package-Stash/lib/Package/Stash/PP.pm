@@ -1,11 +1,9 @@
 package Package::Stash::PP;
-BEGIN {
-  $Package::Stash::PP::AUTHORITY = 'cpan:DOY';
-}
-$Package::Stash::PP::VERSION = '0.37';
 use strict;
 use warnings;
 # ABSTRACT: pure perl implementation of the Package::Stash API
+
+our $VERSION = '0.38';
 
 use B;
 use Carp qw(confess);
@@ -424,7 +422,7 @@ Package::Stash::PP - pure perl implementation of the Package::Stash API
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -433,6 +431,52 @@ version 0.37
 =head1 DESCRIPTION
 
 This is a backend for L<Package::Stash> implemented in pure perl, for those without a compiler or who would like to use this inline in scripts.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Class::MOP::Package>
+
+This module is a factoring out of code that used to live here
+
+=back
+
+=head1 SUPPORT
+
+You can find this documentation for this module with the perldoc command.
+
+    perldoc Package::Stash
+
+You can also look for information at:
+
+=over 4
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Package-Stash>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Package-Stash>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Package-Stash>
+
+=back
+
+=for Pod::Coverage BROKEN_ISA_ASSIGNMENT
+add_symbol
+get_all_symbols
+get_or_add_symbol
+get_symbol
+has_symbol
+list_all_symbols
+name
+namespace
+new
+remove_glob
 
 =head1 BUGS
 
@@ -455,47 +499,8 @@ core perl bugs, it's hard to tell.
 
 =back
 
-Please report any bugs through RT: email
-C<bug-package-stash at rt.cpan.org>, or browse to
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Package-Stash>.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item * L<Class::MOP::Package>
-
-This module is a factoring out of code that used to live here
-
-=back
-
-=head1 SUPPORT
-
-You can find this documentation for this module with the perldoc command.
-
-    perldoc Package::Stash
-
-You can also look for information at:
-
-=over 4
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Package-Stash>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Package-Stash>
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Package-Stash>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Package-Stash>
-
-=back
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Package-Stash>
+(or L<bug-Package-Stash@rt.cpan.org|mailto:bug-Package-Stash@rt.cpan.org>).
 
 =head1 AUTHOR
 
@@ -504,25 +509,9 @@ Jesse Luehrs <doy at tozt dot net>
 Mostly copied from code from L<Class::MOP::Package>, by Stevan Little and the
 Moose Cabal.
 
-=for Pod::Coverage BROKEN_ISA_ASSIGNMENT
-add_symbol
-get_all_symbols
-get_or_add_symbol
-get_symbol
-has_symbol
-list_all_symbols
-name
-namespace
-new
-remove_glob
-
-=head1 AUTHOR
-
-Jesse Luehrs <doy@tozt.net>
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Jesse Luehrs.
+This software is copyright (c) 2018 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,5 @@
 use Test::More;
+BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' };
 use Test::Mojo;
 use Data::Dumper;
 use Mojo::File qw/path/;

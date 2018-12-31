@@ -50,7 +50,7 @@ package Text::Indent;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Params::Validate    qw|:all|;
 
@@ -300,7 +300,7 @@ sub indent
     my $self = shift;
     my @args = @_;
     
-    return ($self->spacechar x ($self->spaces * $self->level)) .
+    return ($self->spacechar x ($self->spaces * ($self->level < 0 ? 0 : $self->level))) .
            "@args" . ($self->add_newline ? "\n" : '');
     
 }

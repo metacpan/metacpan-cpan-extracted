@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> Spam and bot prevention without the use of CAPTCHAs | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="spam_and_bot_prevention_without_the_use_of_captchas"></a>Spam and bot prevention without the use of CAPTCHAs</h1>
+
+<h2><a name="the_problem"></a>The problem</h2>
+
+<p>I was writing a contact form for my LLC, and having been the victim of an automated form-filler in the
+past, I wanted to prevent getting spammed by my own contact form. My first instinct told me to add a CAPTCHA
+to the form as a means to ensure there's a human at the keyboard. But as it turns out, this isn't a great 
+solution for a variety of reasons.</p>
+<h2><a name="a_little_background"></a>A little background</h2>
+
+<p>I worked with my friend Job a few contracts back, and he is passionate about developing accessible software and
+educating other developers about accessibility issues. Job really opened my eyes to a lot of bad development 
+practices, and the problems they caused for users with accessibility needs. So when he heard I wanted to
+put a CAPTCHA on my form, he nearly had a stroke. When the initial shock wore off, we talked about how I could
+accomplish my goal, but do it in an accessible way.</p>
+<p>CAPTCHAs come in a number of shapes and sizes. At the time I wrote this, reCAPTCHA was the latest hotness. 
+It featured text that was really hard to read, and on occasion, featured audio for those who couldn't see or 
+read the text. They were also unfortunately stupidly easy to crack, and thanks to Mechanical Turk and other
+tricks, they quickly became a useless piece of nuisance for your average web user.</p>
+<p>Why are CAPTCHAs bad for accessibility? I don't know about you, but even with good vision, I have a really 
+hard time reading the text on many CAPTCHAs. I cannot begin to imagine how much more difficult it would be 
+for a sighted user to attempt to read one. But many have audio, you say! Have you listened to a CAPTCHA
+that's read to you? I am slightly hard of hearing, and I am unable to make them out many times. And some
+clever developers have even found ways to circumvent the audio CAPTCHAs now. With more modern CAPTCHAs, users
+with screen readers and other assistive devices/settings can often exhibit some of the same signs that bots
+do, but unfortunately, you're not allowed to declare or prove your humanity - it's all up to a machine
+learning algorithm, and once you're marked a bot, things are out of your control.</p>
+<p>Even before I learned about the accessibility issues with CAPTCHAs, I knew adding one to my form was just
+bad UX. It's shifting the burden of your problem onto your users. But when the only tool you think you possess 
+is a hammer, all of your problems start to look a lot like nails.</p>
+<p>The solution Job encouraged me to pursue was to have two form fields on my contact form that should never get 
+filled in: one that is a standard form field, but using CSS, is visually hidden from the user, and the other is
+to use a hidden form field. If any one of those fields is filled in, then you know you are dealing with a spambot,
+and you can take the appropriate action.</p>
+<h2><a name="backend_code"></a>Backend code</h2>
+
+<p>Making this work in Dancer2 is really, really easy:</p>
+<pre class="prettyprint">post '/contact' =&gt; sub {
+    my $spam_1 = body_parameters-&gt;get( 'spam_one' );
+    my $spam_2 = body_parameters-&gt;get( 'spam_two' );
+
+    redirect 'https://en.wikipedia.org/wiki/Three_Laws_of_Robotics'
+        if $spam_1 || $spam_2;
+
+    # Ok, we seem to be a real human, so do something...
+    my $contact;
+    my $name    = body_parameters-&gt;get( 'name'    );
+    my $email   = body_parameters-&gt;get( 'email'   );
+    my $subject = body_parameters-&gt;get( 'subject' );
+    my $message = body_parameters-&gt;get( 'message' );
+
+    # Now, your code to do something with the form info:
+    # - Put it in a database
+    # - email it
+    # - etc. etc.
+};</pre>
+
+<p>We look to see if either of the spam-catching form fields is populated. If either one of them is populated,
+we educate the bot in <a href="https://en.wikipedia.org/wiki/Three_Laws_of_Robotics">Asimov's Three Laws of Robotics</a>. 
+If not, we are reasonably certain we are dealing with a human, and we continue on our merry way.</p>
+<h2><a name="front_end_magic"></a>Front-end magic</h2>
+
+<p>The front end is where things get a little more interesting (note: I have deliberately omitted any styling for
+the sake of brevity):</p>
+<pre class="prettyprint">&lt;form method="post" action="/contact" id="contact"&gt;
+    &lt;label for="name"&gt;Name&lt;/label&gt;
+    &lt;input type="text" name="name" id="name" placeholder="First and last name"&gt;
+
+    &lt;label for="email"&gt;Email Address&lt;/label&gt;
+    &lt;input type="text" name="email" id="email" placeholder="someone@example.com"&gt;
+        
+    &lt;label for="subject"&gt;Subject&lt;/label&gt;
+    &lt;input type="text" name="subject" id="subject" placeholder="Nature of inquiry?"&gt;
+        
+    &lt;label for="message"&gt;Message&lt;/label&gt;
+    &lt;textarea name="message" id="message" placeholder="Message text"&gt;&lt;/textarea&gt;
+
+    &lt;label class="visuallyhidden"&gt;Don't fill this in!&lt;input type="text" name="spam_one" tabindex="-1"&gt;&lt;/label&gt;
+    &lt;input type="hidden" name="spam_two"&gt;
+
+    &lt;input type="submit"&gt;Send Request&lt;/input&gt;
+&lt;/form&gt;</pre>
+
+<p>For the most part, it's a standard HTML form with a couple of notable exceptions:</p>
+<pre class="prettyprint">&lt;label class="visuallyhidden"&gt;Don't fill this in!&lt;input type="text" name="spam_one" tabindex="-1"&gt;&lt;/label&gt;</pre>
+
+<p>This uses a special CSS class, <code>visuallyhidden</code>, to make this form field invisible to the user. By giving it 
+a <code>tabindex="-1"</code>, we make sure the user cannot accidentally tab to the field. There are still a few ways that 
+field could accidentally get focus however, so we help the user here by giving it a label that says "Don't fill 
+this in!"</p>
+<p>What does <code>visuallyhidden</code> look like?</p>
+<pre class="prettyprint">.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}</pre>
+
+<p>The second preventative measure simply puts a hidden field on the page:</p>
+<pre class="prettyprint">&lt;input type="hidden" name="spam_two"&gt;</pre>
+
+<p>Screen readers know to ignore this because it's hidden, and because it's hidden, the page won't show this field.
+As a user, you won't ever have to fill it in.</p>
+<p>Thankfully, a lot of spam bots are stupid, and blindly fill in any form field they see. They can't parse the CSS
+in such a way that they can tell one of the fields is unusably hidden, and they often don't pay attention to
+the hidden attribute... so they fall right into our trap. Enjoy your free education, spambot!</p>
+<h2><a name="final_thoughts"></a>Final thoughts</h2>
+
+<p>Is it foolproof? No, not by a longshot. Anyone who really wants to is going to find a way to spam you anyhow, 
+given a sufficient amount of time and motivation. But this will slow many down, and prevent a bunch, and 
+you won't drive sighted users away from your site. In the three and a half years I have used this, only two
+spambots have made it through, and my server logs indicate that many others have tried.</p>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Jason Crome (CromeDome) for the Perl Dancer 
+Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+<p>Jason A. Crome</p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

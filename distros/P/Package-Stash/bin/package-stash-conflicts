@@ -4,7 +4,7 @@ use strict;
 use warnings;
 # PODNAME: package-stash-conflicts
 
-# this script was generated with Dist::Zilla::Plugin::Conflicts 0.16
+# this script was generated with Dist::Zilla::Plugin::Conflicts 0.19
 
 use Getopt::Long;
 use Package::Stash::Conflicts;
@@ -33,7 +33,12 @@ package-stash-conflicts
 
 =head1 VERSION
 
-version 0.37
+version 0.38
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Package-Stash>
+(or L<bug-Package-Stash@rt.cpan.org|mailto:bug-Package-Stash@rt.cpan.org>).
 
 =head1 AUTHOR
 
@@ -41,7 +46,7 @@ Jesse Luehrs <doy@tozt.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Jesse Luehrs.
+This software is copyright (c) 2018 by Jesse Luehrs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

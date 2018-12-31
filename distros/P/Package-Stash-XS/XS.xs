@@ -157,24 +157,6 @@ static const char *vartype_to_string(vartype_t type)
     }
 }
 
-static I32 vartype_to_svtype(vartype_t type)
-{
-    switch (type) {
-    case VAR_SCALAR:
-        return SVt_PV; /* or whatever */
-    case VAR_ARRAY:
-        return SVt_PVAV;
-    case VAR_HASH:
-        return SVt_PVHV;
-    case VAR_CODE:
-        return SVt_PVCV;
-    case VAR_IO:
-        return SVt_PVIO;
-    default:
-        return SVt_NULL;
-    }
-}
-
 static vartype_t string_to_vartype(char *vartype)
 {
     if (strEQ(vartype, "SCALAR")) {
@@ -598,7 +580,7 @@ name(self)
   CODE:
     if (!sv_isobject(self))
         croak("Can't call name as a class method");
-    if (slot = hv_fetch_ent((HV*)SvRV(self), name_key, 0, name_hash)) {
+    if ((slot = hv_fetch_ent((HV*)SvRV(self), name_key, 0, name_hash))) {
         RETVAL = SvREFCNT_inc_simple_NN(HeVAL(slot));
     }
     else {

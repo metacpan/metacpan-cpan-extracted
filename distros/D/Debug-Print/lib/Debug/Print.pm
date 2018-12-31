@@ -1,8 +1,9 @@
 package Debug::Print;
 
-our $DATE = '2018-12-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2018-12-31'; # DATE
+our $VERSION = '0.002'; # VERSION
 
+use 5.010001;
 use strict;
 use warnings;
 
@@ -146,7 +147,7 @@ Debug::Print - Make debugging with print() more awesome
 
 =head1 VERSION
 
-This document describes version 0.001 of Debug::Print (from Perl distribution Debug-Print), released on 2018-12-20.
+This document describes version 0.002 of Debug::Print (from Perl distribution Debug-Print), released on 2019-12-31.
 
 =head1 SYNOPSIS
 

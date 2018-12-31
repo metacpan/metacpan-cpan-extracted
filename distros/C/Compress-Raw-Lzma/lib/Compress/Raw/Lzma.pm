@@ -12,7 +12,7 @@ use Carp ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.082';
+$VERSION = '2.083';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -726,8 +726,10 @@ sub Lzma::Filters::validateFilters
     my $encoding = shift; # not decoding
     my $lzma2 = shift; 
 
-    my $objType = $lzma2 ? "Lzma::Filter::Lzma2"
-                         : "Lzma::Filter::Lzma" ;
+    # my $objType = $lzma2 ? "Lzma::Filter::Lzma2"
+    #                      : "Lzma::Filter::Lzma" ;
+
+    my $objType =  "Lzma::Filter::Lzma" ;
 
     # if only one, convert into an array reference
     if (blessed $_[0] )  {

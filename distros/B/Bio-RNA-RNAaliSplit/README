@@ -1,4 +1,4 @@
-Bio-RNA-RNAaliSplit 0.06
+Bio-RNA-RNAaliSplit 0.07
 
 Bio::RNA::RNAaliSplit is a distribution of Perl modules for splitting and
 deconvoluting structural RNA multiple sequence alignments (MSA). Its
@@ -22,7 +22,7 @@ ViennaRNA are used by RNAaliSplit.
 RNAz (availale from http://www.tbi.univie.ac.at/~wash/RNAz) is used for
 classification of split subalignments.
 
-R-scape (availavle from http://www.eddylab.org/R-scape) is used for
+R-scape 0.6.1 (availavle from http://www.eddylab.org/R-scape) is used for
 computing statistically significant covariation in base pairs.
 
 Be sure to have all dependencies up and running on your system (and
@@ -47,18 +47,11 @@ perldoc command.
 
 You can also look for information at:
 
+    metaCPAN
+        https://metacpan.org/release/Bio-RNA-RNAaliSplit
+
     RT, CPAN's request tracker (report bugs here)
         http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-RNA-RNAaliSplit
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Bio-RNA-RNAaliSplit
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Bio-RNA-RNAaliSplit
-
-    Search CPAN
-        http://search.cpan.org/dist/Bio-RNA-RNAaliSplit
-
 
 LICENSE AND COPYRIGHT
 

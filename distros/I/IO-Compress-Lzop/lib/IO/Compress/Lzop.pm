@@ -5,16 +5,16 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.081 ;
+use IO::Compress::Base 2.083 ;
 
-use IO::Compress::Base::Common  2.081 qw(isaScalar createSelfTiedObject);
-use IO::Compress::Adapter::LZO  2.081 ;
+use IO::Compress::Base::Common  2.083 qw(isaScalar createSelfTiedObject);
+use IO::Compress::Adapter::LZO  2.083 ;
 use Compress::LZO qw(crc32 adler32 LZO_VERSION);
-use IO::Compress::Lzop::Constants  2.081 ;
+use IO::Compress::Lzop::Constants  2.083 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzopError);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 $LzopError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -411,9 +411,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeIn => 0|1 >>
 
-When reading from a file or filehandle, set C<binmode> before reading.
-
-Defaults to 0.
+This option is now a no-op. All files will be read in binmode.
 
 =item C<< Append => 0|1 >>
 

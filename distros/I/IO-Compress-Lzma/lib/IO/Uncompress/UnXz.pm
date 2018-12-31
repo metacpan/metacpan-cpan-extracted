@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.081 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.083 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.081 ;
-use IO::Uncompress::Adapter::UnXz 2.081 ;
+use IO::Uncompress::Base 2.083 ;
+use IO::Uncompress::Adapter::UnXz 2.083 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnXzError);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 $UnXzError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -357,10 +357,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeOut => 0|1 >>
 
-When writing to a file or filehandle, set C<binmode> before writing to the
-file.
-
-Defaults to 0.
+This option is now a no-op. All files will be written  in binmode.
 
 =item C<< Append => 0|1 >>
 

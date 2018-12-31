@@ -3,9 +3,11 @@ use strict;
 use warnings;
 
 use Music::Interval::Barycentric;
-print join(', ', Music::Interval::Barycentric::barycenter(3)), "\n";
+
 my @chords = ([3, 4, 5], [0, 4, 7]);
-printf "D: %.3f\n", Music::Interval::Barycentric::distance($chords[0], $chords[1]);
-print Music::Interval::Barycentric::evenness_index($chords[0]);
-print Music::Interval::Barycentric::orbit_distance(@chords), "\n";
-print Music::Interval::Barycentric::forte_distance(@chords), "\n";
+
+print 'Barycenter: ', join(', ', barycenter(3)), "\n";
+printf "Distance: %.3f\n", distance($chords[0], $chords[1]);
+print 'Evenness index: ', evenness_index($chords[0]), "\n";
+print 'Orbit distance: ', orbit_distance(@chords), "\n";
+print 'Forte distance: ', forte_distance(@chords), "\n";

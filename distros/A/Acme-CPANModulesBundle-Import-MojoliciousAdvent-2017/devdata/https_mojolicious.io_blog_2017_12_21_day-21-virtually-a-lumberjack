@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@CandyAngel_Nay" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/21/day-21-virtually-a-lumberjack/" property="og:url">
+  <meta content="Day 21: Virtual(ly a) Lumberjack" property="og:title">
+    <meta content="Using the Mojo toolkit to help reverse-engineer HMDs" property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/21/day-21-virtually-a-lumberjack/vr.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 21: Virtual(ly a) Lumberjack - mojolicious.io</title>
+  <meta content="CandyAngel" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 21: Virtual(ly a) Lumberjack</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-21">Dec 21, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Woman wearing VR goggles outside" src="/blog/2017/12/21/day-21-virtually-a-lumberjack/vr.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>What do you do when you want to split up a stream of data in real-time while
+giving the user instructions?</p>
+
+<p>This is just what I wanted to do to aid in reverse-engineering the USB
+protocol of Virtual Reality devices known as Head Mounted Displays (HMD), for
+the <a href="http://www.openhmd.net/">OpenHMD</a> project.</p>
+
+<p>HMDs are used to create virtual reality environments. When worn, two slightly
+different images are drawn to each side of the screen, with each side visible
+to only one eye. This imitates binocular vision and creates an image with a
+feeling of depth. By tracking the rotation of the unit, the user can then look
+around this environment.</p>
+
+<p>The recent resurgence of Virtual Reality devices can be attributed to the Rift
+DK1, released by Oculus in March 2013.</p>
+
+<p>By logging the packets generated during each movement, we can compare the
+content of each log to identify which bytes are related to which action. Such
+movements include roll (tilting head side-to-side), pitch (looking up and
+down) and yaw (turning left/right). Though position isn&#39;t tracked, we also
+look for sway (left-right translation), surge (back and forth) and heave (up
+and down) information as this is used in combination with the other values for
+accurate tracking of rotation.</p>
+
+<p>Mojo is an amazing toolkit for web development, as shown in previous
+calendar entries, but using components of it can also solve problems in other
+non-web spaces like these. Why use Mojo for this? Because it makes it <em>easy</em>.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Down By The Riverside</h2>
+
+<p>First of all, we need the stream of data.
+Initially, I used <code>tshark</code> for this, though another member of the OpenHMD team
+built another application, OpenHMD-Dumper, which has both a device selection
+interface and opens the device to read the packets, which makes this much
+easier.
+Doing so allows us to ask others who have HMDs to send us these logs, so we
+can add driver support for devices none of the team have access to!
+Otherwise, we use something else to open the device and read data and <code>tshark</code>
+to capture and output the packet data.</p>
+
+<pre><code>tshark -i usbmon1 -Y &#39;usb.src == &quot;1.22.1&quot;&#39; -T fields -e usb.capdata
+</code></pre>
+
+<p>You may need to change your buffering to line-mode. You can do so by prefixing
+<code>stdbuf -oL</code> like so:</p>
+
+<pre><code>stdbuf -oL tshark ...
+</code></pre>
+
+<p>This (and OpenHMD-Dumper) will output data that looks like this:</p>
+
+<pre><code>20:d6:00:1a:e0:4a:fe:d5:ff:12:00:66:00:be: ...
+20:c2:00:3c:e0:16:fe:d1:ff:04:00:62:00:d5: ...
+20:c2:00:3c:e0:16:fe:d1:ff:04:00:62:00:d5: ...
+</code></pre>
+
+<h2>Pretty Good Mojo</h2>
+
+<p>What we are going to do is get our Mojo-powered script to read this data and
+output it to a PGM file.
+PGM is an image format that can be created using plain text files and is
+pretty much perfect for our use as we can see it both visually and easily
+manipulate it with standard *nix tools like <em>cut</em>, <em>head</em> and <em>sed</em>.</p>
+
+<pre><code>#!/usr/bin/env perl
+use Mojo::Base &#39;-base&#39;;
+
+use Mojo::Asset::File;
+use Mojo::IOLoop;
+use Mojo::IOLoop::Stream;
+
+use Mojo::Loader &#39;data_section&#39;;
+
+has file_count =&gt; 0;
+
+has file  =&gt; sub { shift-&gt;file_start(&#39;0_START.pgm&#39;) };
+has loop  =&gt; sub { Mojo::IOLoop-&gt;singleton };
+has stdin =&gt; sub { Mojo::IOLoop::Stream-&gt;new(\*STDIN)-&gt;timeout(0) };
+
+__PACKAGE__-&gt;new-&gt;main;
+
+sub main {
+  my $self = shift;
+  $self-&gt;stdin-&gt;on(read =&gt; sub { $self-&gt;stdin_read(@_) });
+  $self-&gt;stdin-&gt;start;
+  $self-&gt;loop-&gt;start unless $self-&gt;loop-&gt;is_running;
+}
+
+sub file_start {
+  my ($self, $path) = @_;
+  $self-&gt;file_count($self-&gt;file_count + 1);
+  return Mojo::Asset::File-&gt;new(path =&gt; $path)-&gt;cleanup(0)-&gt;add_chunk(
+    data_section(__PACKAGE__, &#39;pgm_header&#39;),
+  );
+};
+
+sub stdin_read {
+  my ($self, $stream, $bytes) = @_;
+
+  foreach my $packet (split /\n/, $bytes) {
+    my $chunk = join &#39; &#39;, (
+      map { sprintf &#39;%03i&#39;, hex($_) } split /:/, $packet
+    );
+    $self-&gt;add_chunk($chunk . &quot;\n&quot;);
+  }
+}
+
+__DATA__
+
+@@ pgm_header
+P2
+00000000 00000000
+255
+</code></pre>
+
+<p>This script will create 0_START.pgm, add a PGM header to it (which will need
+fixing later) and writes the bytes it receives from STDIN into that file in
+the correct format.</p>
+
+<p>We have used various bits from the Mojolicious framework to achieve this.
+<a href="http://mojolicious.org/perldoc/Mojo/Loader">Mojo::Loader</a> lets us put our PGM
+header separate from the rest of the code, just like an inline template for a
+Lite app.
+Since it is usually used to receive file uploads,
+<a href="http://mojolicious.org/perldoc/Mojo/Asset/File">Mojo::Asset::File</a> gives us
+even simpler file creation and append mechanics than
+<a href="http://mojolicious.org/perldoc/Mojo/File">Mojo::File</a>, for outputting the
+re-formatted data input.
+We do have to tell Mojolicious not to <em>cleanup</em> the file once it is done with
+it, though this is small price to pay!
+The heavier price is the frowns of disapproval in IRC for such (ab)use.. :)</p>
+
+<p><a href="http://mojolicious.org/perldoc/Mojo/IOLoop">Mojo::IOLoop</a> and
+<a href="http://mojolicious.org/perldoc/Mojo/IOLoop/Stream">Mojo::IOLoop::Stream</a> give
+us a nice callback interface for reading STDIN.
+This doesn&#39;t seem too important right now, but the next stage will show why.
+It allows us to direct the information coming in from STDIN while we instruct
+the user which motion we want them to make with the HMD.</p>
+
+<h2>I bid you.. move!</h2>
+
+<p>Let&#39;s add some instructions to be shown to the user.
+To do this, we can just add in another section like <em>pgm_header</em>:</p>
+
+<pre><code>@@ instructions
+1 Prepare for instructions, cherished aide!
+3 Steady
+
+2 Prep Yaw
+5 Start Yaw
+1 Stop Yaw
+3 Steady
+
+2 Prep Pitch
+5 Start Pitch
+1 Stop Pitch
+3 Steady
+
+2 Prep Roll
+5 Start Roll
+1 Stop Roll
+3 Steady
+
+2 Prep Sway
+5 Start Sway
+1 Stop Sway
+3 Steady
+
+2 Prep Surge
+5 Start Surge
+1 Stop Surge
+3 Steady
+
+2 Prep Heave
+5 Start Heave
+1 Stop Heave
+3 Steady
+
+0 The End Of Instructions. Thank you, generous one!
+</code></pre>
+
+<p>This format is very simple.
+Leading number is how many seconds to wait on this instruction before moving
+to the next one.
+The text is what is output to the user.
+We also use it to get the name of the file to create.</p>
+
+<p>This could be formatted in a lot more of a structured way (e.g. YAML), but
+this works fine for our purpose!</p>
+
+<p>Let&#39;s make the instructions get loaded in, skipping any empty lines:</p>
+
+<pre><code>has instructions =&gt; sub {[
+  map {[split / /, $_, 2]}
+  grep { length $_ }
+  split /\n/, data_section(__PACKAGE__, &#39;instructions&#39;)
+]};
+</code></pre>
+
+<p>And add a method which progresses us through the script:</p>
+
+<pre><code>sub instruction_show {
+  my $self = shift;
+
+  my $instruction = shift @{$self-&gt;instructions};
+  return $self-&gt;loop-&gt;stop_gracefully unless defined $instruction;
+
+  say $instruction-&gt;[1];
+  $self-&gt;loop-&gt;timer(
+    $instruction-&gt;[0] =&gt; sub { $self-&gt;instruction_show },
+  );
+
+  $self-&gt;loop-&gt;timer($instruction-&gt;[0] / 2, sub {
+    my $type = (split / /, $self-&gt;instructions-&gt;[0][1])[1];
+    my $file_count = $self-&gt;file_count;
+    my $path = sprintf &#39;%i_%s.pgm&#39;, $file_count, uc $type;
+    $self-&gt;file( $self-&gt;file_start($path) );
+  }) if $instruction-&gt;[1] eq &#39;Steady&#39;;
+}
+</code></pre>
+
+<p>As you can see, we ask the loop to stop gracefully when there are no more
+instructions.
+Otherwise, we output the instruction and then schedule the next instruction
+to be done in the amount of seconds we specified in the script.</p>
+
+<p>If the action is to steady the HMD, we know we are going to start another
+action shortly so, in half of the wait time, we start a new file.
+This should mean that the end and start of each file, the HMD is not moving
+(much).</p>
+
+<p>Then we need to start walking through this script by adding this before
+starting the event loop in <em>main</em>:</p>
+
+<pre><code>$self-&gt;loop-&gt;timer(0 =&gt; sub { $self-&gt;instruction_show });
+</code></pre>
+
+<p>Running this now prompts the user to move the HMD while outputting the packet
+data in an image named after the movement that image represents!</p>
+
+<h2>Get Your Head(er) Checked</h2>
+
+<p>As mentioned, the PGM header is broken as it is supposed to contain the number
+of rows and columns in the image, but this isn&#39;t known in advance.
+We put an 8 character per value placeholder there and use this small shell
+script to fix it up:</p>
+
+<pre><code>#!/bin/sh
+
+FILE=&quot;$1&quot;;
+
+WIDTH=$(printf &quot;%08d&quot; $(tail -n+5 &quot;$FILE&quot; | head -n1 | tr -cd &#39; &#39; | wc -c));
+HEIGHT=$(printf &quot;%08d&quot; $(echo $(wc -l &quot;$FILE&quot; | cut -f1 -d&#39; &#39;) - 4 | bc));
+
+echo $WIDTH  | dd of=&quot;$FILE&quot; bs=1 seek=3  count=8 conv=notrunc
+echo $HEIGHT | dd of=&quot;$FILE&quot; bs=1 seek=12 count=8 conv=notrunc
+</code></pre>
+
+<p>Now these are valid PGM images and we can open them to see the data stream!</p>
+
+<p><img alt="Section of Yaw PGM" src="yaw.png"></p>
+
+<p>(The above has been rotated and flipped, the original image is a thin
+&quot;waterfall&quot;.)</p>
+
+<p>Some parts are immediately obvious.
+Very smooth gradients next to larger smooth blocks or gradients hints at a
+high-precision timer, which tend to be 32 bits (4 bytes) wide.
+This can be seen at the top of the example.</p>
+
+<p>Other aspects are only noticeable when compared to the other movements.
+The simple file format makes it very easy to graph the data with gnuplot.
+In the worst/simple case scenario, you can simply graph at each offset and
+various sizes until you see a (rough) sine wave, indicating you&#39;ve got the
+right offset and number of bytes for that part of the puzzle!</p>
+
+<h2>Moving On To Greater Things</h2>
+
+<p>This tool could easily be improved (and will be, when it is next called upon).
+For example, both the extraction and fixing of the headers could be made into
+commands, as demonstrated in
+<a href="https://mojolicious.io/blog/2017/12/06/day-6-adding-your-own-commands/">Day 6</a>.</p>
+
+<p>It could also be made into a proper web application where the user can select
+the action they want to do and an animation shows the movement that is wanted
+(not everyone is familiar with nautical terms after all!).
+Perhaps even with a device select?
+A UI that allows the user to select the offset, size and unpack method and
+render the graphs as appropriate could cut down the time to analyse.
+Better yet, if it could detect which combinations result in a rough sine wave,
+it could narrow down and present the user with likely candidates for each
+movement..</p>
+
+<p>.. but those are improvements for another day!</p>
+
+              </section>
+              <small><p><a href="https://www.pexels.com/photo/sky-woman-clouds-girl-123335/">Image</a> by Bradley Hook, in the Public Domain.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/non-web/">non-web</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="/static/avatar_candyangel.jpg">
+                      </div>
+                      <div class="about">
+                        <h5>CandyAngel</h5>
+                        <p>CandyAngel is a Perl developer who tends to demonstrate her love of any particular piece of software by making it do things it was never intended to do.. yet still do it well.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/20/day-20-practical-testing/index.html" rel="prev"><strong>Previous Article</strong> Day 20: Practical Testing</a></li>
+                  <li class="next"><a href="/blog/2017/12/22/day-22-how-to-build-a-public-rest-api/index.html" rel="next"><strong>Next Article</strong> Day 22: A RESTful API with OpenAPI </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

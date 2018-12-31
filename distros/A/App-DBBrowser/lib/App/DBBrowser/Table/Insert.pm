@@ -49,7 +49,7 @@ sub __insert_into_stmt_columns {
         my $qt_col   = $sf->{d}{dbh}->quote_identifier( $sf->{d}{cols}[0] );
         my $qt_table = $sf->{d}{dbh}->quote_identifier( $sf->{d}{table} );
         if ( $row =~ / ^ \s* CREATE \s+ TABLE \s+ (?: \Q$sf->{d}{table}\E | \Q$qt_table\E ) \s+
-                            \( \s* (?: \Q$sf->{d}{cols}[0]\E | \Q$qt_col\E ) \s+ INTEGER \s+ PRIMARY \s+ KEY \s* , /ix ) {
+                           \( \s* (?: \Q$sf->{d}{cols}[0]\E | \Q$qt_col\E ) \s+ INTEGER \s+ PRIMARY \s+ KEY [^,]* , /ix ) {
             shift @cols;
         }
     }

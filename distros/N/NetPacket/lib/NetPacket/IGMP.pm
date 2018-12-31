@@ -1,9 +1,7 @@
 package NetPacket::IGMP;
-BEGIN {
-  $NetPacket::IGMP::AUTHORITY = 'cpan:YANICK';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble IGMP (Internet Group Mangement Protocol) packets. 
-$NetPacket::IGMP::VERSION = '1.6.0';
+$NetPacket::IGMP::VERSION = '1.7.0';
 use strict;
 use warnings;
 
@@ -121,8 +119,9 @@ sub decode {
 # packets contain no encapsulated data.
 #
 
-undef &igmp_strip;
-*igmp_strip = \&strip;
+sub igmp_strip {
+  goto \&strip;
+}
 
 sub strip {
     return undef;
@@ -150,7 +149,7 @@ NetPacket::IGMP - Assemble and disassemble IGMP (Internet Group Mangement Protoc
 
 =head1 VERSION
 
-version 1.6.0
+version 1.7.0
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,10 @@
 Revision history for Package-Stash-XS
 
+0.29      2018-12-31 03:26:01Z
+      - quiet compiler warning (Jacques Germishuys, PR #2)
+      - canonical repository moved to
+        https://github.com/moose/Package-Stash=XS
+
 0.28  2013-07-16
       - fix test issue (Graham Knop)
 

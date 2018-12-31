@@ -7,17 +7,17 @@ use Carp ;
 use IO::Handle ;
 use Scalar::Util qw(dualvar);
 
-use IO::Compress::Base::Common 2.081 ;
-use Compress::Raw::Zlib 2.081 ;
-use IO::Compress::Gzip 2.081 ;
-use IO::Uncompress::Gunzip 2.081 ;
+use IO::Compress::Base::Common 2.083 ;
+use Compress::Raw::Zlib 2.083 ;
+use IO::Compress::Gzip 2.083 ;
+use IO::Uncompress::Gunzip 2.083 ;
 
 use strict ;
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -461,7 +461,7 @@ sub inflate
 
 package Compress::Zlib ;
 
-use IO::Compress::Gzip::Constants 2.081 ;
+use IO::Compress::Gzip::Constants 2.083 ;
 
 sub memGzip($)
 {
@@ -1161,7 +1161,7 @@ The default is Z_DEFAULT_STRATEGY.
 When a dictionary is specified I<Compress::Zlib> will automatically
 call C<deflateSetDictionary> directly after calling C<deflateInit>. The
 Adler32 value for the dictionary can be obtained by calling the method
-C<$d->dict_adler()>.
+C<< $d->dict_adler() >>.
 
 The default is no dictionary.
 

@@ -1,0 +1,129 @@
+NAME
+    List::Permute::Limit - Permute all items list, with limit of number of
+    items per result item
+
+VERSION
+    This document describes version 0.001 of List::Permute::Limit (from Perl
+    distribution List-Permute-Limit), released on 2019-12-31.
+
+SYNOPSIS
+     use List::Permute::Limit qw(permute_iter permute);
+
+     # iterator interface
+     my $iter = permute_iter(items=>["zero","one","two","three"], nitems=>2);
+     while (my $ary = $iter->()) {
+         print "@{$ary}\n";
+     }
+
+    will print:
+
+     zero zero
+     zero one
+     zero two
+     zero three
+     one zero
+     one one
+     one two
+     one three
+     two zero
+     two one
+     two two
+     two three
+     three zero
+     three one
+     three two
+     three three
+
+    To return the whole permutation in a list:
+
+     # array interface
+     my @res = permute(items=>["zero","one","two","three"], nitems=>2);
+     # => (
+     #   ["zero", "zero"],
+     #   ["zero", "one"],
+     #   ["zero", "two"],
+     #   ["zero", "three"],
+     #   ["one", "zero"],
+     #   ["one", "one"],
+     #   ["one", "two"],
+     #   ["one", "three"],
+     #   ["two", "zero"],
+     #   ["two", "one"],
+     #   ["two", "two"],
+     #   ["two", "three"],
+     #   ["three", "zero"],
+     #   ["three", "one"],
+     #   ["three", "two"],
+     #   ["three", "three"],
+     # )
+
+DESCRIPTION
+    This is just yet another list permutor module, with a limit on the
+    number of items per result.
+
+FUNCTIONS
+  permute
+    Usage:
+
+     permute(%args) -> any
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   items* => *array*
+
+    *   nitems => *posint*
+
+        Number of items of each permutation result.
+
+    Return value: (any)
+
+  permute_iter
+    Usage:
+
+     permute_iter(%args) -> any
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   items* => *array*
+
+    *   nitems => *posint*
+
+        Number of items of each permutation result.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/List-Permute-Limit>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-List-Permute-Limit>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=List-Permute-Limit>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    List::Permutor, Math::Permute::List
+
+    Algorithm::Permute and variants.
+
+    Permute::Named, Permute::Named::Iter
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

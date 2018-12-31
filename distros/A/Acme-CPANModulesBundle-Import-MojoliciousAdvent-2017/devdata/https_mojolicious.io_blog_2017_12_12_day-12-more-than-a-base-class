@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@joelaberger" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/12/day-12-more-than-a-base-class/" property="og:url">
+  <meta content="Day 12: More Than a Base Class" property="og:title">
+    <meta content="Mojo::Base is a streamlined base class with lots of extra goodies." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/12/day-12-more-than-a-base-class/1280px-GG-ftpoint-bridge-2.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 12: More Than a Base Class - mojolicious.io</title>
+  <meta content="Joel Berger" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 12: More Than a Base Class</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-12">Dec 12, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Golden Gate Bridge viewed and Fort Point" src="/blog/2017/12/12/day-12-more-than-a-base-class/1280px-GG-ftpoint-bridge-2.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>Through this series, you&#39;ve seen the module <a href="http://mojolicious.org/perldoc/Mojo/Base">Mojo::Base</a> referenced several times, though briefly and mostly in passing.
+It shouldn&#39;t be taken lightly however, it packs a lot of punch in one import statement!
+Nearly every file in the Mojolicious distribution uses it, either directly or indirectly.
+So what is it?</p>
+
+<p>First it imports several handy pragma that make your code safer and some features that are useful.
+Second, it can be a base class to the current package, or establish a parent class, or even define a role.
+Let&#39;s see how it does it.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Importing Pragma and Functionality</h2>
+
+<p>Most of the authors in the modern Perl commmunity recommend that all Perl code use the <a href="https://metacpan.org/pod/strict">strict</a> and <a href="https://metacpan.org/pod/warnings">warnings</a> pragmas.
+Like many of the major Perl object frameworks, <a href="https://metacpan.org/pod/Moose">Moose</a> and <a href="https://metacpan.org/pod/Moo">Moo</a> included, Mojo::Base feels these are important enough that it imports them for you.
+Unlike those others, it goes further.</p>
+
+<p>Since the modern web is trending towards UTF-8 encoding, the <a href="https://metacpan.org/pod/utf8">utf8</a> pragma is loaded; this enables you to use UTF-8 encoded characters right in your script.
+Mojolicious does much of your web-facing encoding for you so this <strong>almost</strong> means you don&#39;t have to think about character encoding at all!</p>
+
+<p>And because Mojolicious itself requires Perl 5.10, it also enables all of the <a href="https://metacpan.org/pod/feature">features</a> that came with that version.
+This includes <a href="https://www.effectiveperlprogramming.com/2009/12/perl-5-10-new-features/">handy functionality</a> like the <code>state</code> and <code>say</code> keywords as well as the defined-or operator <code>//</code>.
+Finally it imports IO::Handle so that all of your handles behave as objects (if you don&#39;t know what that means or why, don&#39;t worry about it).</p>
+
+<p>If this is the only thing you want from Mojo::Base, perhaps in a script or a test file, all you do is pass the <code>-strict</code> flag</p>
+
+<pre><code>use Mojo::Base -strict;
+</code></pre>
+
+<p>and you get everything listed above.
+Otherwise, if you use the class or roles functionality then these imports come along for free.</p>
+
+<h3>Experimental Signatures</h3>
+
+<p>In the past few years, Perl has added <a href="https://metacpan.org/pod/perlsub#Signatures">signatures</a> to subroutines as an <a href="https://metacpan.org/pod/perlexperiment">experimental</a> feature.
+With Mojolicious&#39; emphasis on non-blocking functionality, and the frequent use of callbacks that that entails, the Mojo community has been especially anxious to use them.
+However since these are still experimental, and are still subject to change, when Mojo::Base recently added this functionality, it was decided that it should be an additional opt-in flag.
+Using it, suddenly</p>
+
+<pre><code>use Mojo::Base -strict;
+$ua-&gt;get(&#39;/url&#39; =&gt; sub {
+  my ($ua, $tx) = @_;
+  ...
+});
+</code></pre>
+
+<p>becomes</p>
+
+<pre><code>use Mojo::Base -strict, -signatures;
+$ua-&gt;get(&#39;/url&#39; =&gt; sub ($ua, $tx) { ... });
+</code></pre>
+
+<h2>Establishing a Class</h2>
+
+<p>Now for the functionality that the name implies, setting up a class.
+The Mojo stack modules make LOTS of objects in the course of performing their tasks, from making or handling HTTP requests to processing HTML documents, object creation time is key.
+Therefore the primary feature of Mojo::Base classes is speed!</p>
+
+<p>The object system is spartan even when compared to Moo.
+You get a hash-based object with declarative read/write lazy accessors and a constructor.
+When considering Moose vs Moo, you trade lesser-used features for a noticable performance gain.
+Likewise when you consider Mojo::Base vs Moo, you strip down futher, this time to the bare essentials, but again get a performance gain.</p>
+
+<p>Now if you need more functionality, you are more than welcome to use Moo or other object systems in your applications (though the Mojo internals will of course continue to use Mojo::Base).
+That said, much of the real world usage of Moo is very similar to Mojo::Base: lazy accessor generation; this might be all you need.</p>
+
+<p>To declare a new class with Mojo::Base, one with no other parent classes, you use the <code>-base</code> flag.</p>
+
+<pre><code>package My::Class;
+use Mojo::Base -base;
+</code></pre>
+
+<p>This adds the <code>has</code> keyword to your package which, as we will see soon, declares the class&#39;s attributes.
+This will cause your new class to inherit from Mojo::Base, meaning it will get the methods from Mojo::Base as well, which you will also see.
+Of course, the module also acquires the pragmas and functionality listed above and may add <code>-signatures</code> if desired.</p>
+
+<p>If you want your class to derive from some other parent class, you can pass that name rather than <code>-base</code>.</p>
+
+<pre><code>package My::Class::Subclass;
+use Mojo::Base &#39;My::Class&#39;;
+</code></pre>
+
+<p>You saw this usage quite a bit in the Full app example on <a href="/blog/2017/12/06/day-6-adding-your-own-commands">Day 6</a>.
+Mojo::Base only supports single-inheritance because we don&#39;t want to encourage bad practices.
+If you know why you might want to use multipe-inheritance, you probably know how to get around this limitation as well.</p>
+
+<h3>Attributes and Constructor</h3>
+
+<p>Mojo::Base implements a class method which can be used to add attributes to the class (called <code>attr</code>).
+While this is necessary for the implementation, this isn&#39;t the preferred usage.</p>
+
+<p>The <code>has</code> keyword, added by the import above, gives us that nice declarative style that Perl users are familiar with from Moose and Moo.
+The usage is different from those, owing to the limited choices available in declaration.
+<code>has</code> takes a name or an array reference of name of the attribute(s) to declare.
+It then optionally takes either a simple (non-reference) scalar default value or a callback to be used as a lazy builder.
+When the lazy builder is called, it gets as an argument the instance itself.
+That&#39;s it, clean and simple.</p>
+
+<pre><code>package My::Class;
+use Mojo::Base -base;
+
+# attribute whose default is undef
+has &#39;foo&#39;;
+
+# two attribtues whose defaults are both 0
+has [&#39;min&#39;, &#39;max&#39;] =&gt; 0;
+
+# attribute that defaults to a new, empty hash reference
+has &#39;data&#39; =&gt; sub { {} };
+
+# attribute that uses its existing state to build
+has &#39;double_max&#39; =&gt; sub {
+  my $self = shift;
+  return 2 * $self-&gt;max;
+};
+</code></pre>
+
+<p>The callbacks are always lazy, meaning if the value of that attribute hasn&#39;t been established, either via the constructor or via a setter, then the default is used or the builder is run.</p>
+
+<p>The default constructor (<code>new</code>), inherited from Mojo::Base, takes a hash reference or key-value pairs and uses them as initialization for the defined attributes.</p>
+
+<pre><code>my $obj = My::Class-&gt;new(foo =&gt; &#39;bar&#39;, max =&gt; 10);
+my $obj = My::Class-&gt;new({foo =&gt; &#39;bar&#39;, max =&gt; 10}); # same
+</code></pre>
+
+<p>Note that there is nothing to prevent you from passing data that isn&#39;t for a defined attribute (ie, the constructor isn&#39;t <a href="https://metacpan.org/pod/MooX::StrictConstructor">strict</a>).
+Nor is there anything that declares a required attribute, though you can easily make one</p>
+
+<pre><code>has &#39;username&#39; =&gt; sub { die &#39;username is required&#39; };
+</code></pre>
+
+<h3>Accessor Methods</h3>
+
+<p>A read/write accessor method is installed into the class for each declared attribute.
+However, have one major difference from other common Perl object systems.
+While the getters return the value as expected,</p>
+
+<pre><code>my $foo = $self-&gt;foo;
+my $value = $self-&gt;data-&gt;{key};
+</code></pre>
+
+<p>the setters (ie, when passing an argument to change the stored value) return the object itself, not the value.
+The reason for this is to create what is called a <a href="https://en.wikipedia.org/wiki/Fluent_interface">fluent interface</a>, more commonly known as chaining.</p>
+
+<pre><code>my $ua = Mojo::UserAgent-&gt;new-&gt;max_redirects(10)-&gt;inactivity_timeout(1200);
+</code></pre>
+
+<p>Many of the Mojo modules support a fluent interface with their methods, so this this nicely consistent.</p>
+
+<pre><code>my $title = Mojo::UserAgent-&gt;new
+  -&gt;max_redirects(10)
+  -&gt;get(&#39;http://mojolicious.org&#39;)
+  -&gt;res
+  -&gt;dom
+  -&gt;at(&#39;title&#39;)
+  -&gt;text;
+</code></pre>
+
+<p>Frequent users of such Javascript libraries as <a href="https://jquery.com/">jQuery</a> or <a href="https://lodash.com/">lodash</a> will find this type of chaining very familiar.
+Once you get the hang of this style it is <a href="https://metacpan.org/pod/MooX::ChainedAttributes">hard to let go of it</a>.
+In a future post I intent to discuss several of the fluent interfaces that the Mojo stack provides.</p>
+
+<h3>The tap Method</h3>
+
+<p>Speaking of fluent interfaces, Mojo::Base provides an interesting method called <code>tap</code>, which is (in comp-sci terms) a <a href="https://en.wikipedia.org/wiki/SKI_combinator_calculus">K-combinator</a>.
+This is a more advanced feature, but it allows you to insert a non-chainable call into a method chain without breaking it.
+The first argument is the method or callback to be called, any additional arguments are passed to the tapped subroutine.
+Within that subroutine the invocant is available as the first argument (before any passed arguments) or as <code>$_</code>.</p>
+
+<p>If you had a proxy that you needed to setup before running the previous example, you could do</p>
+
+<pre><code>my $title = Mojo::UserAgent-&gt;new
+  -&gt;max_redirects(10)
+  -&gt;tap(sub { $_-&gt;proxy-&gt;detect })
+  -&gt;get(&#39;http://mojolicious.org&#39;)
+  -&gt;res
+  -&gt;dom
+  -&gt;at(&#39;title&#39;)
+  -&gt;text;
+</code></pre>
+
+<p>Perhaps this is too much adherence to fluent interfaces but as you progress, getting a nice long chain can really feel like an accomplishment!
+If you&#39;d rather pass on this method, that&#39;s fine too.</p>
+
+<h2>Roles</h2>
+
+<p>While Mojo::Base has always tacitly supported roles via external modules, just recently has it started to offer explicit functionality in this area.
+That said, I have lots ot say on the matter, so if you&#39;ll permit me, I&#39;m going to keep you in suspense until <a href="/blog/2017/12/13/day-13-more-about-roles">tomorrow</a>.</p>
+
+              </section>
+              <small><p><a href="https://commons.wikimedia.org/w/index.php?curid=1592390">Image</a> by <a href="https://en.wikipedia.org/wiki/User:Mactographer" title="en:User:Mactographer">David Ball</a> - Original work, <a href="http://creativecommons.org/licenses/by/2.5" title="Creative Commons Attribution 2.5">CC BY 2.5</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/fluent/">fluent</a>,
+                  <a href="/blog/tag/roles/">roles</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/cc767569f5863a7c261991ee5b23f147">
+                      </div>
+                      <div class="about">
+                        <h5>Joel Berger</h5>
+                        <p>Joel has Ph.D. in Physics from the University of Illinois at Chicago.
+He an avid Perl user and <a href="https://metacpan.org/author/JBERGER">author</a> and is a member of the Mojolicious Core Team.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/11/day-11-useragent-content-generators/index.html" rel="prev"><strong>Previous Article</strong> Day 11: UserAgent Content Generators</a></li>
+                  <li class="next"><a href="/blog/2017/12/13/day-13-more-about-roles/index.html" rel="next"><strong>Next Article</strong> Day 13: More About Roles </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

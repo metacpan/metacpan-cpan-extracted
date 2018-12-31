@@ -43,11 +43,11 @@ sub new {
 
     my $self;
     if (scalar @_ <= 2) {
-	$self = __PACKAGE__->_new(@_);
+        $self = __PACKAGE__->_new(@_);
     } else {
-	my $str = shift;
-	my $lb = Unicode::LineBreak->new(@_);
-	$self = __PACKAGE__->_new($str, $lb);
+        my $str = shift;
+        my $lb = Unicode::LineBreak->new(@_);
+        $self = __PACKAGE__->_new($str, $lb);
     }
     bless $self, $class;
 }

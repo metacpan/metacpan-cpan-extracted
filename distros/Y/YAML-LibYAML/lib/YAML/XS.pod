@@ -22,7 +22,7 @@ YAML::XS - Perl YAML Serialization using XS and libyaml
 
 =head1 DESCRIPTION
 
-Kirill Siminov's C<libyaml> is arguably the best YAML implementation. The C
+Kirill Simonov's C<libyaml> is arguably the best YAML implementation. The C
 library is written precisely to the YAML 1.1 specification. It was originally
 bound to Python and was later bound to Ruby.
 
@@ -108,6 +108,12 @@ add those to an existing data structure with pure perl.
 If you simply need to load "perl booleans" that are true or false in boolean
 context, you will be fine with the default setting.
 
+=item C<$YAML::XS::Indent> (since v0.76)
+
+Default is 2.
+
+Sets the number of spaces for indentation for C<Dump>.
+
 =back
 
 =head1 USING YAML::XS WITH UNICODE
@@ -125,11 +131,11 @@ having problems, use Devel::Peek on all the possible data points.
 
 =over
 
-=item * YAML.pm
+=item * L<YAML>.pm
 
-=item * YAML::Syck
+=item * L<YAML::Syck>
 
-=item * YAML::Tiny
+=item * L<YAML::Tiny>
 
 =back
 

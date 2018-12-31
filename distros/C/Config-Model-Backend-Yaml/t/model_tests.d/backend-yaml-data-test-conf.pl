@@ -8,6 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 use Config::Model::BackendMgr;
+use utf8;
 
 $conf_dir = '/etc';
 $conf_file_name = 'test.yaml';
@@ -22,10 +23,11 @@ $model->create_config_class(
     },
 
     element => [
-        true_bool  => { qw/type leaf value_type boolean/},
-        false_bool => { qw/type leaf value_type boolean/},
-        new_bool => { qw/type leaf value_type boolean/},
+        true_bool  => { qw/type leaf value_type boolean upstream_default 0/},
+        false_bool => { qw/type leaf value_type boolean upstream_default 0/},
+        new_bool => { qw/type leaf value_type boolean upstream_default 0/},
         null_value => { qw/type leaf value_type uniline/},
+        utf8_string => { qw/type leaf value_type uniline/},
     ]
 );
 
@@ -46,6 +48,15 @@ $model_to_test = "Master";
             "/etc/test.yaml" => "---\nfalse_bool: false\nnew_bool: true\ntrue_bool: true\n",
         }
     },
+    {
+        name => 'utf8_data',
+        check => [
+            utf8_string => "Марцел Mézigue"
+        ],
+        file_contents_like => {
+            "/etc/test.yaml" => [ qr/Марцел Mézigue/ ] ,
+        }
+    }
 );
 
 1;

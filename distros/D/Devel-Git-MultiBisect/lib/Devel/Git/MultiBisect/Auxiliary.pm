@@ -2,7 +2,7 @@ package Devel::Git::MultiBisect::Auxiliary;
 use strict;
 use warnings;
 use v5.10.0;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use base qw( Exporter );
 our @EXPORT_OK = qw(
     clean_outputfile

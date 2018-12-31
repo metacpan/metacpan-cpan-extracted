@@ -114,7 +114,7 @@ eval { WriteMakefile
              },
      META_MERGE => {
                     # write: git push git+ssh://repo.or.cz/srv/git/cpan-testers-parsereport.git master
-                    resources => { repository => "git://repo.or.cz/cpan-testers-parsereport.git" },
+                    resources => { repository => "https://repo.or.cz/cpan-testers-parsereport.git" },
                     provides => { "CPAN::Testers::ParseReport" => { version => $mmgenereatedversionfrom, file => $::version_from }},
                    },
      MIN_PERL_VERSION => '5.008', # Rule: _pragma_utf8

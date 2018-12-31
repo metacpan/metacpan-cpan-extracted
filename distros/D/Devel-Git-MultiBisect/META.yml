@@ -34,5 +34,5 @@ requires:
   List::Util: '0'
   strict: '0'
   warnings: '0'
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

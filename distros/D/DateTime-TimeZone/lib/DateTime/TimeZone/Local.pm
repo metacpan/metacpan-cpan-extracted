@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.21';
+our $VERSION = '2.23';
 
 use DateTime::TimeZone;
 use File::Spec;
@@ -45,7 +45,7 @@ sub TimeZone {
     sub _load_subclass {
         my $class = shift;
 
-        my $os_name = $subclass{$^O} || $^O;
+        my $os_name  = $subclass{$^O} || $^O;
         my $subclass = $class . '::' . $os_name;
 
         return $subclass if $subclass->can('Methods');
@@ -107,7 +107,7 @@ DateTime::TimeZone::Local - Determine the local system's time zone
 
 =head1 VERSION
 
-version 2.21
+version 2.23
 
 =head1 SYNOPSIS
 

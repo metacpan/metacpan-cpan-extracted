@@ -9,12 +9,12 @@ our (@ISA, $VERSION, @EXPORT_OK, %EXPORT_TAGS);
 @ISA    = qw(IO::File Exporter);
 
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 
 use constant G_EOF => 0 ;
 use constant G_ERR => -1 ;
 
-use IO::Compress::Base::Common 2.081 ;
+use IO::Compress::Base::Common 2.083 ;
 
 use IO::File ;
 use Symbol;
@@ -695,13 +695,13 @@ sub _singleTarget
             if $x->{Got}->getValue('append') ;
         $x->{fh} = new IO::File "$mode $output" 
             or return retErr($x, "cannot open file '$output': $!") ;
-        binmode $x->{fh} if $x->{Got}->valueOrDefault('binmodeout');
+        binmode $x->{fh} ;
 
     }
 
     elsif ($x->{outType} eq 'handle') {
         $x->{fh} = $output;
-        binmode $x->{fh} if $x->{Got}->valueOrDefault('binmodeout');
+        binmode $x->{fh} ;
         if ($x->{Got}->getValue('append')) {
                 seek($x->{fh}, 0, SEEK_END)
                     or return retErr($x, "Cannot seek to end of output filehandle: $!") ;

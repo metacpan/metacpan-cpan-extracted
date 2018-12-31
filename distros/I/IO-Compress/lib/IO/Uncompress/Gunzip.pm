@@ -9,12 +9,12 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Uncompress::RawInflate 2.081 ;
+use IO::Uncompress::RawInflate 2.083 ;
 
-use Compress::Raw::Zlib 2.081 () ;
-use IO::Compress::Base::Common 2.081 qw(:Status );
-use IO::Compress::Gzip::Constants 2.081 ;
-use IO::Compress::Zlib::Extra 2.081 ;
+use Compress::Raw::Zlib 2.083 () ;
+use IO::Compress::Base::Common 2.083 qw(:Status );
+use IO::Compress::Gzip::Constants 2.083 ;
+use IO::Compress::Zlib::Extra 2.083 ;
 
 require Exporter ;
 
@@ -28,7 +28,7 @@ Exporter::export_ok_tags('all');
 
 $GunzipError = '';
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 
 sub new
 {
@@ -477,10 +477,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeOut => 0|1 >>
 
-When writing to a file or filehandle, set C<binmode> before writing to the
-file.
-
-Defaults to 0.
+This option is now a no-op. All files will be written  in binmode.
 
 =item C<< Append => 0|1 >>
 

@@ -1,5 +1,13 @@
 Revision history for Perl extension Task::BeLike::BURAK
 
+0.23 2018-12-31 BURAK
+
+0.22 2018-12-31 BURAK
+    - Even more dzil
+
+0.21 2018-12-31 BURAK
+    - More dzil
+
 0.20 2018-12-25 BURAK
     - Migrate to dzil.
 

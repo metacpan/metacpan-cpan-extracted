@@ -26,7 +26,7 @@ use Bio::RNA::RNAaliSplit::WrapRNAalifold;
   my $aln1 = dist_file('Bio-RNA-RNAaliSplit','aln/all.SL.SPOVG.aln');
   my @arg1 = (ifile => $aln1, odir => ['t']);
   my $ro1 = new_ok('Bio::RNA::RNAaliSplit::WrapRNAalifold' => \@arg1);
-  diag(Dumper($ro1));
+  #diag(Dumper($ro1));
 
 }
 

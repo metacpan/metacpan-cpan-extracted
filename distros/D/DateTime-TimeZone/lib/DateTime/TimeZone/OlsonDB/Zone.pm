@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.21';
+our $VERSION = '2.23';
 
 use DateTime::TimeZone;
 use DateTime::TimeZone::OlsonDB;
@@ -66,7 +66,7 @@ sub expand_observances {
             last_offset_from_std => $last_offset_from_std,
         );
 
-        my $rule = $obs->first_rule;
+        my $rule   = $obs->first_rule;
         my $letter = $rule ? $rule->letter : q{};
 
         my $change = DateTime::TimeZone::OlsonDB::Change->new(

@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use App::CreateAcmeCPANModulesImportModules;
+use Perinci::Sub::Util qw(gen_curried_sub);
+use Perinci::CmdLine::Any;
+
+my %add_modules = (
+    # not linked
+    #"04" => ["Mojo::DOM"],
+);
+
+my %typos = (
+    #'Perl::PrereqScanner::NotSoLite' => 'Perl::PrereqScanner::NotQuiteLite',
+);
+
+my %daily_urls = (
+    "01" => "https://mojolicious.io/blog/2017/12/01/day-1-getting-started",
+    "02" => "https://mojolicious.io/blog/2017/12/02/day-2-the-stash",
+    "03" => "https://mojolicious.io/blog/2017/12/03/day-3-using-named-routes",
+    "04" => "https://mojolicious.io/blog/2017/12/04/day-4-dont-fear-the-full-app",
+    "05" => "https://mojolicious.io/blog/2017/12/05/day-5-your-apps-built-in-commands",
+    "06" => "https://mojolicious.io/blog/2017/12/06/day-6-adding-your-own-commands",
+    "07" => "https://mojolicious.io/blog/2017/12/07/day-7-using-template-variants-for-a-beta-landing-page",
+    "08" => "https://mojolicious.io/blog/2017/12/08/day-8-mocking-a-rest-api",
+    "09" => "https://mojolicious.io/blog/2017/12/09/day-9-the-best-way-to-test",
+    "10" => "https://mojolicious.io/blog/2017/12/10/day-10-give-the-customer-what-they-want",
+    "11" => "https://mojolicious.io/blog/2017/12/11/day-11-useragent-content-generators",
+    "12" => "https://mojolicious.io/blog/2017/12/12/day-12-more-than-a-base-class",
+    "13" => "https://mojolicious.io/blog/2017/12/13/day-13-more-about-roles",
+    "14" => "https://mojolicious.io/blog/2017/12/14/day-14-you-promised-to-call",
+    "15" => "https://mojolicious.io/blog/2017/12/15/day-15-start-a-new-yancy-app",
+    "16" => "https://mojolicious.io/blog/2017/12/16/day-16-the-secret-life-of-sessions",
+    "17" => "https://mojolicious.io/blog/2017/12/17/day-17-the-wishlist-app",
+    "18" => "https://mojolicious.io/blog/2017/12/18/day-18-the-wishlist-model",
+    "19" => "https://mojolicious.io/blog/2017/12/19/day-19-make-your-app-installable",
+    "20" => "https://mojolicious.io/blog/2017/12/20/day-20-practical-testing",
+    "21" => "https://mojolicious.io/blog/2017/12/21/day-21-virtually-a-lumberjack",
+    "22" => "https://mojolicious.io/blog/2017/12/22/day-22-how-to-build-a-public-rest-api",
+    "23" => "https://mojolicious.io/blog/2017/12/23/day-23-one-liners-for-fun-and-profit",
+    "24" => "https://mojolicious.io/blog/2017/12/24/day-24-release-and-wrap-up",
+);
+
+gen_curried_sub(
+    'App::CreateAcmeCPANModulesImportModules::create_acme_cpanmodules_import_modules',
+    {
+        modules => [
+            {
+                name => '2017',
+                url => "https://mojolicious.io/page/advent/2017/",
+                extract_urls => [map {$daily_urls{$_}} "01".."24"],
+                summary => 'Modules mentioned in Mojolicious Advent Calendar 2017',
+                add_modules => [map {@$_} values %add_modules],
+            },
+            (map {
+                +{
+                    name => "2017_12_$_",
+                    url => $daily_urls{$_},
+                    summary => "Modules mentioned in Mojolicious Advent Calendar 2017 (day $_)",
+                    add_modules => [@{ $add_modules{$_} // [] }],
+                },
+            } "01".."24"),
+        ],
+        typos => \%typos,
+        ignore_empty => 1,
+        namespace => 'Acme::CPANModules::Import::MojoliciousAdvent',
+        user_agent => 'Mozilla/5.0',
+        dist_dir => "$Bin/..",
+    },
+    'app',
+);
+
+Perinci::CmdLine::Any->new(
+    url => '/main/app',
+    log => 1,
+)->run;

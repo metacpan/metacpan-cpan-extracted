@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Yaml;
-$Config::Model::Backend::Yaml::VERSION = '2.132';
+$Config::Model::Backend::Yaml::VERSION = '2.133';
 use 5.10.1;
 use Carp;
 use strict;
@@ -52,7 +52,7 @@ sub read {
     return 0 unless $args{file_path}->exists;    # no file to read
 
     # load yaml file
-    my $yaml = $args{file_path}->slurp_utf8;
+    my $yaml = $args{file_path}->slurp_raw;
 
     # convert to perl data
     my $perl_data = Load($yaml) ;
@@ -97,7 +97,7 @@ sub write {
 
     my $yaml = Dump( $perl_data );
 
-    $args{file_path}->spew_utf8($yaml);
+    $args{file_path}->spew_raw($yaml);
 
     return 1;
 }
@@ -118,7 +118,7 @@ Config::Model::Backend::Yaml - Read and write config as a YAML data structure
 
 =head1 VERSION
 
-version 2.132
+version 2.133
 
 =head1 SYNOPSIS
 

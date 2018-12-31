@@ -8,3 +8,7 @@ Change History for Text::Indent
 0.02    22 September 2010
 
         fix warning when AddNewline is undefined.  Patch from Neil Hooey
+
+0.03	30 December 2018
+
+	fix warning for Negative repeat count.

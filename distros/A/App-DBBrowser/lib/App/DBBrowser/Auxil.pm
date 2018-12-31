@@ -5,7 +5,8 @@ use warnings;
 use strict;
 use 5.008003;
 
-use Encode qw( encode );
+use Encode       qw( encode );
+use Scalar::Util qw( looks_like_number );
 
 use Encode::Locale qw();
 use JSON           qw( decode_json );
@@ -93,28 +94,28 @@ sub get_stmt {
 
 sub __select_cols {
     my ( $sf, $sql ) = @_;
-    my @tmp;
+    my @combined_cols;
     if ( ! keys %{$sql->{alias}} ) {
-        @tmp = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} );
+        @combined_cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} );
     }
     else {
-        push @tmp, @{$sql->{group_by_cols}};
+        push @combined_cols, @{$sql->{group_by_cols}};
         for ( @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} ) {
             if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
-                push @tmp, $_ . " AS " . $sql->{alias}{$_};
+                push @combined_cols, $_ . " AS " . $sql->{alias}{$_};
             }
             else {
-                push @tmp, $_;
+                push @combined_cols, $_;
             }
         }
     }
-    if ( ! @tmp ) {
+    if ( ! @combined_cols ) {
         if ( $sf->{i}{multi_tbl} eq 'join' ) {
              return ' ' . join ', ', @{$sql->{cols}};
         }
         return " *";
     }
-    return ' ' . join ', ', @tmp;
+    return ' ' . join ', ', @combined_cols;
 }
 
 
@@ -145,24 +146,28 @@ sub print_sql {
 
 sub stmt_placeholder_to_value {
     my ( $sf, $stmt, $args, $quote ) = @_;
+    if ( ! @$args ) {
+        return $stmt;
+    }
     my $rx_placeholder = qr/(?<=(?:,|\s|\())\?(?=(?:,|\s|\)|$))/;
     for my $arg ( @$args ) {
-        $arg = $sf->{d}{dbh}->quote( $arg ) if $quote;
+        if( $quote && $arg && ! looks_like_number $arg ) {
+            $arg = $sf->{d}{dbh}->quote( $arg );
+        }
         $stmt =~ s/$rx_placeholder/$arg/;
     }
     if ( $stmt !~ $rx_placeholder ) {
         return $stmt;
     }
-    return;
 }
 
 
 sub alias {
-    my ( $sf, $raw, $default ) = @_;
+    my ( $sf, $type, $prompt, $default, $info ) = @_;
     my $alias;
-    if ( $sf->{o}{G}{alias} ) {
+    if ( $sf->{o}{alias}{$type} ) {
         my $tf = Term::Form->new();
-        $alias = $tf->readline( " AS ", { info => $raw } );
+        $alias = $tf->readline( $prompt, { info => $info } );
     }
     if ( ! defined $alias || ! length $alias ) {
         $alias = $default;
@@ -256,13 +261,13 @@ sub reset_sql {
 sub write_json {
     my ( $sf, $file, $h_ref ) = @_;
     if ( ! defined $h_ref || ! keys %$h_ref ) {
-        open my $fh, '>', encode( 'locale_fs', $file ) or die $!;
+        open my $fh, '>', encode( 'locale_fs', $file ) or die "$file: $!";
         print $fh;
         close $fh;
         return;
     }
     my $json = JSON->new->utf8( 1 )->pretty->canonical->encode( $h_ref );
-    open my $fh, '>', encode( 'locale_fs', $file ) or die $!;
+    open my $fh, '>', encode( 'locale_fs', $file ) or die "$file: $!";
     print $fh $json;
     close $fh;
 }
@@ -270,10 +275,10 @@ sub write_json {
 
 sub read_json {
     my ( $sf, $file ) = @_;
-    if ( ! -e $file ) {
+    if ( ! defined $file || ! -e $file ) {
         return {};
     }
-    open my $fh, '<', encode( 'locale_fs', $file ) or die $!;
+    open my $fh, '<', encode( 'locale_fs', $file ) or die "$file: $!";
     my $json = do { local $/; <$fh> };
     close $fh;
     my $h_ref = {};

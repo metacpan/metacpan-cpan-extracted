@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> Customizing and extending your Dancer2 application generation | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="customizing_and_extending_your_dancer2_application_generation"></a>Customizing and extending your Dancer2 application generation</h1>
+
+<p>Dancer2 provides a useful command line that helps you generate a
+Dancer2 application skeleton without having to write it yourself.</p>
+<p>For example, creating an app called <code>My::Web::App</code>, you can run the following:</p>
+<pre class="prettyprint">dancer2 gen -a My::Web::App</pre>
+
+<p>The <code>dancer2</code> command line has a few more options, which you can see, if
+you run <code>dancer2 gen --help</code>.</p>
+<h2><a name="changing_the_skeleton"></a>Changing the skeleton</h2>
+
+<p>Dancer2 generates a skeleton that it useful for most developers, but if
+you are a seasoned Dancer2 developer, you might have a set of
+preferences not represented in the default skeleton.</p>
+<p>If it's different file setup that you want to have, you could partially
+achieve it with the <code>dancer2 gen -s DIRECTORY</code>, indicating a different
+skeleton directory. But that doesn't fix all of it.</p>
+<p>To have full control over the entire scaffolding operation, you will
+need to have control of the command line implementation. Let me show
+you how.</p>
+<h2><a name="extending_in_a_class"></a>Extending in a class</h2>
+
+<p>To extend the application in a class, you will need to write a new
+class with a new command. That class will then need to be loaded in your
+environment for you to enjoy it.</p>
+<p>There are two options:</p>
+<ul>
+<li>
+<p>Write a new distribution with your new module and install it locally. Done.</p>
+</li>
+<li>
+<p>Write a new module and make the directory in which it sits available in
+your <code>$PERL5LIB</code> environment variable.</p>
+<p>This option is more useful for companies that have a big library
+directory that is always available in the include directories list.</p>
+<p>An example of this:</p>
+<pre class="prettyprint"># Creating the directory
+$ mkdir -p /opt/perl/lib/Dancer2/CLI/Command/
+$ cd /opt/perl/lib/Dancer2/CLI/Command/
+
+# Putting a mostly-empty file
+$ echo -e "package Dancer2::CLI::Command::new;\n1;" &gt;&gt; new.pm
+
+# Now making sure this path is in PERL5LIB
+# (replace the bashrc file path with your system's path)
+echo "export PERL5LIB="/opt/perl/lib/:$PERL5LIB" &gt;&gt; /etc/bash.bashrc</pre>
+
+</li>
+</ul>
+<h2><a name="writing_your_own_command"></a>Writing your own command</h2>
+
+<p><a href="https://metacpan.org/module/Dancer2">Dancer2</a> uses <a href="https://metacpan.org/module/App::Cmd">App::Cmd</a> to implement the <code>dancer2</code> command line
+utility. This means you can introduce additional commands by just implementing
+a class.</p>
+<h3><a name="writing_a_new_command"></a>Writing a new command</h3>
+
+<pre class="prettyprint">package Dancer2::CLI::Command::activate
+use strict;
+use warnings;
+use Path::Tiny qw&lt; path &gt;;
+use App::Cmd::Setup -command;
+
+sub description { 'Activating our application' }
+
+sub opt_desc {
+    return (
+        [ 'directory|d', 'Application directory' ],
+        # More options...
+    );
+}
+
+sub validate_args {
+    my ( $self, $opt, $args ) = @_;
+    $opts-&gt;{'directory'}
+        or $self-&gt;usage_error('You did not provide a directory');
+
+    path( $opt-&gt;{'directory'} )-&gt;is_dir
+        or $self-&gt;usage_error('Path provided is not a directory');
+}
+
+sub execute {
+    my ( $self, $opt, $args ) = @_;
+    my $dir = $opts-&gt;{'directory'};
+    # Implement the application activation
+    # (Whatever that means...)
+}
+
+1;</pre>
+
+<p>In this example, we introduce a new command to <code>dancer2</code>. As long as
+this class is available in your path (such as via your <code>$PERL5LIB</code>
+environment variable), you will be able to run the following:</p>
+<pre class="prettyprint">$ dancer2 activate --directory foo/</pre>
+
+<p>(The implementation of what "activation" means in this context is left
+to the reader.)</p>
+<p>But what if you want to provide an alteration of an existing command -
+the generation of the Dancer2 application?</p>
+<h3><a name="writing_a_new_command"></a>Writing a new command</h3>
+
+<p>Let's say you have a set of adjustments you keep doing to your
+[company's] Dancer2 applications and you want to make these a default.</p>
+<p>You can write it as a new command or you can subclass the existing
+command and do whatever alterations you want before, during, and after
+the generation of the skeleton.</p>
+<pre class="prettyprint">package Dancer2::CLI::Command::mygen;
+use strict;
+use warnings;
+use Cwd (); # Our own dependencies
+
+# Subclass the existing "gen" command
+use parent 'Dancer2::CLI::Command::gen';
+
+sub execute {
+  my ( $self, $opt, $args ) = @_;
+
+  # Do whatever you want in this area, before we generate
+
+  # For example, let's make sure the application
+  # matches a certain naming convention
+
+  my $app_name = $opt-&gt;{'application'};
+  $app_name =~ /^My::Company::App::/
+    or $self-&gt;usage_error('App must be prefixed by "My::Company::App");
+
+  # Maybe check we are only scaffolding in a particular directory
+  cwd() eq '/opt/my_company/webapps/'
+      or $self-&gt;usage_error('Only create apps in our webapps directory');
+
+  # At this point, we can run the original scaffolding
+  $self-&gt;SUPER::execute( $opt, $args );
+
+  # Now we finished generating, but we can contineu customizing what we have
+}
+
+1;</pre>
+
+<p>Writing your own generation on top of the existing generation allows
+you to manage the input (including additional validation) and the
+output, giving you full control over the scaffolding process.</p>
+<p>Some examples on which customizations you might want to perform:</p>
+<ul>
+<li><a name="item_Add_additional_default_imported_classes"></a><b>Add additional default imported classes</b>
+</li>
+<li><a name="item_Change_the_output_directory_name"></a><b>Change the output directory name</b>
+</li>
+<li><a name="item_Update_a_database_that_we_have_a_new_application"></a><b>Update a database that we have a new application</b>
+</li>
+<li><a name="item_Update_your_team_with_an_email_or_IRC_Slack_message"></a><b>Update your team with an email or IRC/Slack message</b>
+</li>
+<li><a name="item_Remove_files_that_are_not_applicable_for_your_setup_and_add_new_ones"></a><b>Remove files that are not applicable for your setup and add new ones</b>
+</li>
+<li><a name="item_Write_helpful_output_for_the_developer_who_scaffolded_the_app"></a><b>Write helpful output for the developer who scaffolded the app</b>
+</li>
+</ul>
+<h2><a name="conclusion"></a>Conclusion</h2>
+
+<p>I hope you find these techniques useful to introduce customization for
+your home-grown Dancer2 application setup. I know I do. :)</p>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Sawyer X for the Perl
+Dancer Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+<p>2018 // Sawyer X <code>&lt;xsawyerx@cpan.org&gt;</code></p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

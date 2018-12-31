@@ -96,7 +96,7 @@ use Carp;
 use File::Spec;
 
 my $Use4th; # Use 4th level (Unicode 6.2.0 or before)
-my $DEFAULT_LOCALE_VERSION = '1.25'; # should be same as $VERSION of Collate.pm
+my $DEFAULT_LOCALE_VERSION = '1.26'; # should be same as $VERSION of Collate.pm
 
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
@@ -278,6 +278,19 @@ my @OtherEquiv = split /\n=/, <<'OTHEREQUIV';
 1EEC;<01AF><0309>
 1EF1;<01B0><0323>
 1EF0;<01AF><0323>
+=0300= (grave)
+00E0;a<0300>
+00C0;A<0300>
+00E8;e<0300>
+00C8;E<0300>
+00EC;i<0300>
+00CC;I<0300>
+00F2;o<0300>
+00D2;O<0300>
+00F9;u<0300>
+00D9;U<0300>
+1EF3;y<0300>
+1EF2;Y<0300>
 =0301= (acute)
 00E1;a<0301>
 00C1;A<0301>
@@ -317,6 +330,19 @@ my @OtherEquiv = split /\n=/, <<'OTHEREQUIV';
 0168;U<0303>
 1EF9;y<0303>
 1EF8;Y<0303>
+=0308= (diaeresis)
+00E4;a<0308>
+00C4;A<0308>
+00EB;e<0308>
+00CB;E<0308>
+00EF;i<0308>
+00CF;I<0308>
+00F6;o<0308>
+00D6;O<0308>
+00FC;u<0308>
+00DC;U<0308>
+00FF;y<0308>
+0178;Y<0308>
 =0309= (hook-above)
 1EA3;a<0309>
 1EA2;A<0309>
@@ -343,6 +369,22 @@ my @OtherEquiv = split /\n=/, <<'OTHEREQUIV';
 1EE4;U<0323>
 1EF5;y<0323>
 1EF4;Y<0323>
+=0406= (Cyrillic-Byelorussian-Ukrainian-I)
+0457;<0456><0308>
+A676;<0456>+++2 <0308>+++2
+0407;<0406><0308>
+=041E= (Cyrillic-O)
+04E7;<043E><0308>
+04E6;<041E><0308>
+=0423= (Cyrillic-U)
+045E;<0443><0306>
+040E;<0423><0306>
+04F1;<0443><0308>
+04F0;<0423><0308>
+04F3;<0443><030B>
+04F2;<0423><030B>
+04EF;<0443><0304>
+04EE;<0423><0304>
 =0933= (Devanagari-LLA)
 0934;<0933><093C>
 =0A3C= (Gurmukhi-Nukta)

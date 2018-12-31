@@ -17,7 +17,7 @@ map with($_), our @ROLES = qw(
   Data::Object::Role::Item
 );
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 method all ($code, @args) {
 
@@ -642,7 +642,7 @@ Data::Object::Role::Array - Array Object Role for Perl 5
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -654,35 +654,6 @@ version 0.60
 
 Data::Object::Role::Array provides routines for operating on Perl 5 array
 references.
-
-=head1 CODIFICATION
-
-Certain methods provided by the this module support codification, a process
-which converts a string argument into a code reference which can be used to
-supply a callback to the method called. A codified string can access its
-arguments by using variable names which correspond to letters in the alphabet
-which represent the position in the argument list. For example:
-
-  $array->example('$a + $b * $c', 100);
-
-  # if the example method does not supply any arguments automatically then
-  # the variable $a would be assigned the user-supplied value of 100,
-  # however, if the example method supplies two arguments automatically then
-  # those arugments would be assigned to the variables $a and $b whereas $c
-  # would be assigned the user-supplied value of 100
-
-  # e.g.
-
-  $array->each('the value at $index is $value');
-
-  # or
-
-  $array->each_n_values(4, 'the value at $index0 is $value0');
-
-  # etc
-
-Any place a codified string is accepted, a coderef or L<Data::Object::Code>
-object is also valid. Arguments are passed through the usual C<@_> list.
 
 =head1 METHODS
 
@@ -1416,6 +1387,35 @@ The values method returns an array reference consisting of the elements in the
 array. This method essentially copies the content of the array into a new
 container. This method returns an array value.
 
+=head1 CODIFICATION
+
+Certain methods provided by the this module support codification, a process
+which converts a string argument into a code reference which can be used to
+supply a callback to the method called. A codified string can access its
+arguments by using variable names which correspond to letters in the alphabet
+which represent the position in the argument list. For example:
+
+  $array->example('$a + $b * $c', 100);
+
+  # if the example method does not supply any arguments automatically then
+  # the variable $a would be assigned the user-supplied value of 100,
+  # however, if the example method supplies two arguments automatically then
+  # those arugments would be assigned to the variables $a and $b whereas $c
+  # would be assigned the user-supplied value of 100
+
+  # e.g.
+
+  $array->each('the value at $index is $value');
+
+  # or
+
+  $array->each_n_values(4, 'the value at $index0 is $value0');
+
+  # etc
+
+Any place a codified string is accepted, a coderef or L<Data::Object::Code>
+object is also valid. Arguments are passed through the usual C<@_> list.
+
 =head1 ROLES
 
 This package is comprised of the following roles.
@@ -1552,7 +1552,7 @@ L<Data::Object::Signatures>
 
 =head1 AUTHOR
 
-Al Newkirk <anewkirk@ana.io>
+Al Newkirk <al@iamalnewkirk.com>
 
 =head1 COPYRIGHT AND LICENSE
 

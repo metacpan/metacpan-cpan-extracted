@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.21';
+our $VERSION = '2.23';
 
 our @ALL =
 qw(
@@ -228,6 +228,7 @@ qw(
   Asia/Pontianak
   Asia/Pyongyang
   Asia/Qatar
+  Asia/Qostanay
   Asia/Qyzylorda
   Asia/Riyadh
   Asia/Sakhalin
@@ -611,6 +612,7 @@ Oral
 Pontianak
 Pyongyang
 Qatar
+Qostanay
 Qyzylorda
 Riyadh
 Sakhalin
@@ -1223,6 +1225,7 @@ America/Cayman
   'kz' => [ qw(
 Asia/Almaty
 Asia/Qyzylorda
+Asia/Qostanay
 Asia/Aqtobe
 Asia/Aqtau
 Asia/Atyrau
@@ -1448,9 +1451,9 @@ Europe/Belgrade
 Europe/Kaliningrad
 Europe/Moscow
 Europe/Simferopol
-Europe/Volgograd
 Europe/Kirov
 Europe/Astrakhan
+Europe/Volgograd
 Europe/Saratov
 Europe/Ulyanovsk
 Europe/Samara
@@ -1897,7 +1900,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2018g' }
+sub OlsonVersion { '2018i' }
 
 
 1;
@@ -2132,6 +2135,7 @@ so that applications can easily present a list of timezones.
   Asia/Pontianak
   Asia/Pyongyang
   Asia/Qatar
+  Asia/Qostanay
   Asia/Qyzylorda
   Asia/Riyadh
   Asia/Samarkand
@@ -2245,10 +2249,10 @@ so that applications can easily present a list of timezones.
 
 =head3 Indian
 
+  Indian/Kerguelen
   Indian/Mahe
   Indian/Mauritius
   Indian/Reunion
-  Indian/Kerguelen
   Indian/Christmas
   Indian/Cocos
   Indian/Chagos
@@ -2840,6 +2844,7 @@ so that applications can easily present a list of timezones.
 
   Asia/Almaty - Kazakhstan (most areas)
   Asia/Qyzylorda - Qyzylorda/Kyzylorda/Kzyl-Orda
+  Asia/Qostanay - Qostanay/Kostanay/Kustanay
   Asia/Aqtobe - Aqtobe/Aktobe
   Asia/Aqtau - Mangghystau/Mankistau
   Asia/Atyrau - Atyrau/Atirau/Gur'yev
@@ -3141,9 +3146,9 @@ so that applications can easily present a list of timezones.
   Europe/Kaliningrad - MSK-01 - Kaliningrad
   Europe/Moscow - MSK+00 - Moscow area
   Europe/Simferopol - MSK+00 - Crimea
-  Europe/Volgograd - MSK+00 - Volgograd
   Europe/Kirov - MSK+00 - Kirov
   Europe/Astrakhan - MSK+01 - Astrakhan
+  Europe/Volgograd - MSK+01 - Volgograd
   Europe/Saratov - MSK+01 - Saratov
   Europe/Ulyanovsk - MSK+01 - Ulyanovsk
   Europe/Samara - MSK+01 - Samara, Udmurtia

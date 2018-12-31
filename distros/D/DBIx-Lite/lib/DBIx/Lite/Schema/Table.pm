@@ -1,5 +1,5 @@
 package DBIx::Lite::Schema::Table;
-$DBIx::Lite::Schema::Table::VERSION = '0.31';
+$DBIx::Lite::Schema::Table::VERSION = '0.32';
 use strict;
 use warnings;
 
@@ -36,10 +36,13 @@ sub new {
 
 sub pk {
     my $self = shift;
-    my $val = shift;
+    my @cols = @_;
     
-    if ($val) {
-        $self->{pk} = [ grep defined $_, (ref $val eq 'ARRAY' ? @$val : $val) ];
+    if (@cols) {
+        $self->{pk} = [
+            grep defined $_,
+                map { (ref $_ eq 'ARRAY') ? @$_ : $_ } @cols
+        ];
         return $self;
     }
     return @{$self->{pk}};
@@ -124,7 +127,7 @@ DBIx::Lite::Schema::Table
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 OVERVIEW
 
@@ -139,18 +142,19 @@ Table objects by calling the C<table()> method on a L<DBIx::Lite::Schema> object
 
 =head2 pk
 
-This method accepts a list of fields to be used as the table primary key. Setting
+This method accepts one or more fields to be used as the table primary key. Setting
 a primary key enables C<update()> and C<delete()> methods on L<DBIx::Lite::Row>
 objects.
 
     $dbix->schema->table('books')->pk('id');
+    $dbix->schema->table('books')->pk('foo', 'bar');
 
 =head2 autopk
 
-This method works like L<pk> but also marks the supplied column name as an 
+This method can be used as an alternative to L<pk> but it will only accept a 
+single column name, which will be marked as an 
 autoincrementing key. This will trigger the retrieval of the autoincremented
 id upon creation of new records with the C<insert()> method.
-C<autopk()> only accepts a single column.
 
     $dbix->schema->table('books')->autopk('id');
 
@@ -253,7 +257,7 @@ Alessandro Ranellucci <aar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alessandro Ranellucci.
+This software is copyright (c) 2018 by Alessandro Ranellucci.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

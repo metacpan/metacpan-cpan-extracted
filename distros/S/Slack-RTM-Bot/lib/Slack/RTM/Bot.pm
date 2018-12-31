@@ -9,7 +9,7 @@ use POSIX qw/sys_wait_h/;
 use JSON;
 use Slack::RTM::Bot::Client;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 pipe(READH, WRITEH);
 select(WRITEH);$|=1;
@@ -36,18 +36,30 @@ sub start_RTM {
 	if ($^O ne 'MSWin32') {
 		my @children = ();
 
-		push @children, fork;
-		unless ($children[0]) {
-			while (kill 0, $children[0]) {
+		my $pid = fork;
+		push @children, $pid;
+		unless ($pid) {
+			while (1) {
+				unless (kill 0, $pid) {
+					kill 9, $pid;
+					waitpid($pid, WUNTRACED);
+					last;
+				}
 				print WRITEH "\n";
 				sleep 1;
 			}
 		} else {
-			push @children, fork;
-			unless ($children[1]) {
+			my $pid = fork;
+			push @children, $pid;
+			unless ($pid) {
 				$self->{client}->{pids} = [$parent, @children];
 				my $i = 0;
-				while (kill 0, $parent) {
+				while (1) {
+					unless (kill 0, $parent) {
+						kill 9, $pid;
+						waitpid($pid, WUNTRACED);
+						last;
+					}
 					if ($self->{client}->read) {
 						print WRITEH2 "\n";
 					}

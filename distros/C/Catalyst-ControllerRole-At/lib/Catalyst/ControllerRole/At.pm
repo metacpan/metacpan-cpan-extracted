@@ -1,7 +1,7 @@
 package Catalyst::ControllerRole::At;
 
 use Moose::Role;
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 sub _parse_At_attr {
   my ($self, $app, $action_subname, $value) = @_;
@@ -20,7 +20,7 @@ sub _parse_At_attr {
     '$affix' =>  '/' . ($affix||''),
   );
 
-  $value = $value . '';
+  $value = ($value||'') . '';
   my ($path, $query) = ($value=~/^([^?]*)\??(.*)$/);
   my (@path_parts) = map { $expansions{$_} ? $expansions{$_} :$_ } split('/', ($path||''));
 

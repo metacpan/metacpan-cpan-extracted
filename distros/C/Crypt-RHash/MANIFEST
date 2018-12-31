@@ -15,7 +15,6 @@ librhash/algorithms.c
 librhash/algorithms.h
 librhash/byte_order.c
 librhash/byte_order.h
-librhash/config.h
 librhash/crc32.c
 librhash/crc32.h
 librhash/ed2k.c

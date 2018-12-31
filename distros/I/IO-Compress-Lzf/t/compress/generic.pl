@@ -18,7 +18,7 @@ BEGIN
     $extra = 1
         if $st ;
 
-    plan(tests => 794 + $extra) ;
+    plan(tests => 799 + $extra) ;
 }
 
 sub myGZreadFile
@@ -43,7 +43,7 @@ sub myGZreadFile
 sub run
 {
     my $CompressClass   = identify();
-    $UncompressClass = getInverse($CompressClass);
+    $UncompressClass    = getInverse($CompressClass);
     my $Error           = getErrorRef($CompressClass);
     my $UnError         = getErrorRef($UncompressClass);
 
@@ -525,7 +525,7 @@ EOM
             ok $x->binmode();
             1 while $x->read($uncomp) > 0 ;
 
-            ok $uncomp eq $hello ;
+            is $uncomp, $hello ;
             my $rest ;
             read($fh1, $rest, 5000);
             is $x->trailingData() . $rest, $trailer ;
@@ -1703,6 +1703,37 @@ EOT
             }
         }
     }
+
+    {
+        # Round trip binary data that happens to contain \r\n
+        # via the filesystem
+
+        my $original = join '', map { chr } 0x00 .. 0xff ;
+        $original .= "data1\r\ndata2\r\ndata3\r\n" ;
+        
+   
+        title "$UncompressClass -- round trip test";
+
+        my $string = $original;
+
+        my $lex = new LexFile( my $name, my $compressed) ;
+        my $input ;
+        writeFile ($name, $original);
+
+        my $c = new $CompressClass($compressed);
+        isa_ok $c, $CompressClass;
+        $c->print($string);
+        $c->close();
+
+        my $u = new $UncompressClass $compressed, Transparent => 0
+            or diag "$$UnError" ;
+        isa_ok $u, $UncompressClass;
+        my $buffer;
+        is $u->read($buffer), length($original), "read bytes";
+        is $buffer, $original, "  round tripped ok";
+
+        
+    }    
 }
 
 1;

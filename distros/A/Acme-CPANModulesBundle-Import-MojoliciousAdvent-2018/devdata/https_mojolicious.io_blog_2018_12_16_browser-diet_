@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+  <meta content="https://mojolicious.io/blog/2018/12/16/browser-diet/" property="og:url">
+  <meta content="Day 16: A pre-Christmas Diet for Mojolicious - A Children&#39;s Story" property="og:title">
+    <meta content="Setting the HTTP CacheControl header for your static files" property="og:description">
+    <meta content="https://mojolicious.io/blog/2018/12/16/browser-diet/squirrel.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 16: A pre-Christmas Diet for Mojolicious - A Children's Story - mojolicious.io</title>
+  <meta content="Boyd Duffee" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 16: A pre-Christmas Diet for Mojolicious - A Children&#39;s Story</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2018-12-16">Dec 16, 2018</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Too many nuts. I&#39;m gonna need to slim down" src="/blog/2018/12/16/browser-diet/squirrel.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>You&#39;ve just read
+<a href="https://browserdiet.com">How to lose Weight in the Browser</a>
+and you want to know to slim down your Mojo app.
+Part of that process is preventing the browser from requesting files
+that hardly change.
+I spent a well-caffeinated afternoon trying to do that with
+Mojolicious.
+I&#39;ve been &#39;round the houses, and <em>spoiler alert</em> I didn&#39;t find
+the answer until the very end, kind of like your favourite Christmas
+animated special with a small woodland creature narrating
+&quot;The Gruffalo&#39;s HTTP header&quot;.</p>
+
+<h1>A Children&#39;s Story</h1>
+
+<p>Our beloved small woodland creature needed to display a web calendar
+with forest events pulled from a database.
+Perl could get the event data and package it as a JSON feed.
+Mojolicious could prepare the webpages with the correct JSON feed for each user.
+With some JavaScript libraries to display the web calendar,
+all would be well in the forest.</p>
+
+<p>Everything except the JavaScript libraries are lightweight.
+And everyone knows a page reload goes <em>so</em> much faster if it doesn&#39;t have to download the
+JavaScript every time.  Those libraries won&#39;t change for months!
+If only the client browser knew that it could use the file that it had downloaded
+last time.</p>
+
+<p>The secret, of course, is to set the <code>Cache-Control</code> field of the HTTP header, but <em>how</em>?</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>First, there was a <a href="https://httpd.apache.org/">Horse</a> ...</h2>
+
+<p>Everybody using Apache would be thinking about using
+<a href="https://httpd.apache.org/docs/2.4/mod/mod_expires.html">mod_expires</a>
+which looks quite easy, except that Apache wasn&#39;t being used to serve the webpages.</p>
+
+<p>... but the Horse mentioned where there were some sweet
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control">Cache-Control directives</a>
+to munch on and while continuing to graze on some
+<a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching">HTTP Caching</a>
+pages that had been downloaded earlier.  The small creature moves on.</p>
+
+<h2>... and <em>then</em> there was a <a href="https://perlmaven.com/deploying-a-mojolicious-application">Toad</a></h2>
+
+<p>The forest creatures used the
+<a href="https://github.com/mojolicious/mojo/wiki/Hypnotoad-prefork-web-server">Hypnotoad</a>
+web server that comes with Mojolicious to serve their pages.
+They found it a good fit for their arboreal production environment.</p>
+
+<p><img class="align-center" src="Hypnotoad.gif" title="All glory to the Hypnotoad"></p>
+
+<p>It can set the HTTP headers to turn it into a
+<a href="https://mojolicious.org/perldoc/Mojolicious/Guides/Cookbook#Hypnotoad">reverse proxy</a>,
+but a popular setup is sitting Hypnotoad behind
+<a href="https://www.mind-it.info/2014/09/27/running-hypnotoad-behind-nginx/">Nginx</a>
+or Apache/mod_proxy.
+Those servers should let you play with the <code>Expires</code> header.
+But the Toad didn&#39;t <em>quite</em> have what this particular rodent was looking for.</p>
+
+<p><em>An aside</em> - No, I didn&#39;t mention
+<a href="https://metacpan.org/pod/Plack">Plack</a>.
+Maybe if I&#39;m good this year, Santa will
+<a href="http://blogs.perl.org/users/aristotle/2018/11/modern-perl-cgi.html">tell me how</a>
+I should be using it.  Probably something to do with</p>
+
+<pre><code>Plack::Response-&gt;header(&#39;Expires&#39; =&gt; &#39;Tue, 25 Dec 2018 07:28:00 GMT&#39;);
+</code></pre>
+
+<p>but I wouldn&#39;t know and neither did our narrator.</p>
+
+<h2>... and <em>then</em> there was a <a href="https://mojolicious.org">Unicorn</a></h2>
+
+<p>Well, that was easy.  Just use the standard
+<a href="https://mojolicious.org/perldoc/Mojo/Headers#expires">Mojo::Headers</a>
+module to set the <code>Expires</code> header.</p>
+
+<p>But, wait!  That sets it for a page which isn&#39;t that big at all.
+Our furry friend only wants to stop JavaScript files from reloading every single time
+which were killing the Sciuridae mobile experience.  Hmmmm.</p>
+
+<h2>...  and <em>then</em> there was a <a href="http://shop.oreilly.com/product/9780596805531.do">Rhino</a></h2>
+
+<p><img alt="JavaScript rhino image" class="pull-right" src="rhino.jpg"></p>
+
+<p>If the JavaScript lives in the <code>&lt;head&gt;</code> tag, then the page body won&#39;t be parsed
+until the script is downloaded.  Some people get around this by putting the script just
+before the end <code>&lt;/body&gt;</code> tag, but the JS still has to download.
+There are a couple of attributes that are hiding in the bushes.
+<code>Async</code> and <code>defer</code> tell the browser to continue parsing the HTML while the
+JavaScript is downloading.  These two
+<a href="https://flaviocopes.com/javascript-async-defer/">wise</a>
+<a href="https://bitsofco.de/async-vs-defer/">owls</a>
+can help decide which one to use.</p>
+
+<p>Tell your script to load after the main page
+with this
+<a href="https://mojolicious.org/perldoc/Mojolicious/Plugin/TagHelpers#javascript">tag helper</a>
+in your template</p>
+
+<pre><code>%= javascript &#39;/js/lib/jquery.min.js&#39;, defer =&gt; undef
+</code></pre>
+
+<p>which produces</p>
+
+<pre><code>&lt;script defer src=&quot;/path/to/script.js&quot;&gt;&lt;/script&gt;
+</code></pre>
+
+<p>If you want it in the <code>&lt;head&gt;</code>, you&#39;ll have to put it in your layout
+otherwise the template will do.</p>
+
+<h2>... and finally, there was a <a href="https://metacpan.org/author/LDIDRY">Man in a Hat</a></h2>
+
+<p><img alt="Luc Didry gravatar" class="pull-right" src="/static/ldidry.png"></p>
+
+<p>&quot;But the JavaScript needs to load <strong>FIRST</strong>!&quot;, squeaked the nut-botherer.</p>
+
+<p>Sigh - this really is one demanding Sciurus vulgaris.</p>
+
+<p>Well ... it <em>is</em> Christmas, but you&#39;ll need to install the
+<a href="https://metacpan.org/pod/Mojolicious::Plugin::StaticCache">StaticCache plugin</a>
+written for you only last year by
+<a href="https://fiat-tux.fr/">Luc Didry</a>.
+It sets the <code>Control-Cache</code> header for all static files served by Mojolicious.
+With the <strong>nut.js</strong> and <strong>nut.css</strong> files in the <code>public</code> directory
+(properly <a href="https://www.minifier.org/">minified</a> of course),
+they should only be downloaded once and use the cached version until it expires.
+The default <strong>max-age</strong> is 30 days and
+if you want you can even cache during development with <code>even_in_dev =&gt; 1</code>.</p>
+
+<p><img class="pull-right" src="speedtest_before_StaticCache.png"></p>
+
+<p>The magpies in the forest had cluttered the calendar with 3 JavaScript libraries,
+3 CSS files and 4 logos.  Sure, the biggest and shiniest was only 66 kB
+and the whole collection was a paltry 164 kB, but bandwidth is precious in the wilderness.
+Before using the StaticCache plugin, the calendar rated a
+<strong>92</strong> on Google&#39;s PageSpeed Insights.</p>
+
+<p>With the StaticCache plugin loaded</p>
+
+<pre><code>sub startup {
+    my $self = shift;
+
+    $self-&gt;plugin(&#39;StaticCache&#39; =&gt; { even_in_dev =&gt; 1 });
+    ...
+}
+</code></pre>
+
+<p><img class="pull-left" src="speedtest_with_StaticCache.png"></p>
+
+<p>page speeds are now <strong>93</strong> <strong>!!!!</strong>
+WOW!  It&#39;s <a href="https://xkcd.com/670">one faster!</a> said Nutgel Tufty-tail
+and everyone in the forest cheered.</p>
+
+<p>And <em>that</em>, dear readers, is how the squirrel learned to store nuts for the winter
+... in a <em>cache</em>.  Good night, little kids, good niiiight.</p>
+
+<h2>Try it out for yourself</h2>
+
+<p>The <a href="https://github.com/zenorocha/browser-calories">Browser calories</a>
+plugin for Firefox, Chrome and Opera breaks down the file sizes of your web page
+into a nice little traffic light report measuring the HTML, images, CSS, JavaScript
+and other parts of your page against
+user-configurable limits on what you think is acceptable.</p>
+
+<p>Google&#39;s <a href="https://developers.google.com/speed/pagespeed/insights">PageSpeed Insights</a>
+measures performance on both mobile and desktop.</p>
+
+<p>Hopefully, the increasingly awkward attempt at writing in a narrative style
+didn&#39;t get in the way of a new idea or two.  <a href="https://github.com/duffee/Mojolicious_session_example">Let me
+know</a> if I&#39;ve missed
+something.</p>
+
+              </section>
+              <small><p><a href="https://www.flickr.com/photos/55426027@N03/16915881989">Image</a> by <a href="https://www.flickr.com/photos/55426027@N03">Peter G Trimming</a> <a href="https://creativecommons.org/licenses/by/2.0"> CC BY 2.0 </a></p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/caching/">caching</a>,
+                  <a href="/blog/tag/headers/">headers</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="/static/duffee.jpg">
+                      </div>
+                      <div class="about">
+                        <h5>Boyd Duffee</h5>
+                        <p>Boyd Duffee has been hanging around the <a href="https://metacpan.org/author/DUFFEE">edges</a> of the Perl ecosystem for many moons, picking up new bits of shiny to make SysAdmining more interesting.  He&#39;s interested in Data Science, Complex Networks and walks in the woods.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2018/12/15/practical-web-content-munging/index.html" rel="prev"><strong>Previous Article</strong> Day 15: Practical Web Content Munging</a></li>
+                  <li class="next"><a href="/blog/2018/12/17/a-website-for-yancy/index.html" rel="next"><strong>Next Article</strong> Day 17: A Website For Yancy </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

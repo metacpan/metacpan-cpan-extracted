@@ -1,5 +1,5 @@
 #
-# $Id: 01_use.t 4553 2010-09-23 10:52:20Z james $
+# $Id$
 #
 
 use strict;
@@ -14,7 +14,7 @@ BEGIN {
 }
 
 use_ok('Text::Indent');
-is($Text::Indent::VERSION, '0.02', 'check module version');
+is($Text::Indent::VERSION, '0.03', 'check module version');
 
 #
 # EOF

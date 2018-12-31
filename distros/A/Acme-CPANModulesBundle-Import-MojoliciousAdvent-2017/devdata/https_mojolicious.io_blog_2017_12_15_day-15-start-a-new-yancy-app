@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@preaction" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/15/day-15-start-a-new-yancy-app/" property="og:url">
+  <meta content="Day 15: Start a New Yancy App" property="og:title">
+    <meta content="Rapid-prototype a data-backed application using Mojolicious and Yancy." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/15/day-15-start-a-new-yancy-app/scaffold.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 15: Start a New Yancy App - mojolicious.io</title>
+  <meta content="Doug Bell" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 15: Start a New Yancy App</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-15">Dec 15, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Workers on a scaffold" src="/blog/2017/12/15/day-15-start-a-new-yancy-app/scaffold.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p><a href="http://metacpan.org/pod/Yancy">Yancy</a> is a new content management
+plugin for the <a href="http://mojolicious.org">Mojolicious web framework</a>.
+Yancy allows you to easily administrate your siteâs content just by
+describing it using <a href="http://json-schema.org">JSON Schema</a>. Yancy
+supports <a href="http://metacpan.org/pod/Yancy::Backend">multiple backends</a>, so
+your site&#39;s content can be in
+<a href="http://metacpan.org/pod/Yancy::Backend::Pg">Postgres</a>,
+<a href="http://metacpan.org/pod/Yancy::Backend::Mysql">MySQL</a>, and
+<a href="http://metacpan.org/pod/Yancy::Backend::Dbic">DBIx::Class</a>.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Demonstration</h2>
+
+<p>For an demonstration application, letâs create a simple blog using
+<a href="http://mojolicious.org/perldoc/Mojolicious/Lite">Mojolicious::Lite</a>.
+First we need to create a database schema for our blog posts. Let&#39;s use
+<a href="http://metacpan.org/pod/Mojo::Pg">Mojo::Pg</a> and its <a href="http://metacpan.org/pod/Mojo::Pg::Migrations">migrations
+feature</a> to create a table
+called &quot;blog&quot; with fields for an ID, a title, a date, some markdown, and
+some HTML.</p>
+
+<pre><code class="hljs"><span class="hljs-comment"># myapp.pl</span><span class="hljs-comment">
+</span><span class="hljs-keyword">use</span> <span class="hljs-function">Mojolicious::Lite</span>;
+<span class="hljs-keyword">use</span> <span class="hljs-function">Mojo::Pg</span>;
+
+<span class="hljs-keyword">my</span> <span class="hljs-type">$pg</span> = <span class="hljs-function">Mojo::Pg</span>-&gt;new( &#39;<span class="hljs-string">postgres://localhost/blog</span>&#39; );
+<span class="hljs-type">$pg</span>-&gt;<span class="hljs-type">migrations</span>-&gt;<span class="hljs-type">from_data</span>-&gt;<span class="hljs-type">migrate</span>;
+
+<span class="hljs-keyword">__DATA__</span>
+@@ migrations
+-- 1 up
+CREATE TABLE blog (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT NOW(),
+    markdown TEXT NOT NULL,
+    html TEXT NOT NULL
+);
+-- 1 down
+DROP TABLE blog;
+</code></pre>
+
+<p>Next we add <a href="http://metacpan.org/pod/Mojolicious::Plugin::Yancy">the Yancy
+plugin</a> and tell it
+about our backend and data. Yancy deals with data as a set of
+collections which contain items. For a relational database like
+Postgres, a collection is a table, and an item is a row in that table.</p>
+
+<p>Yancy uses a JSON schema to describe each item in a collection.
+For our <code>blog</code> collection, we have five fields:</p>
+
+<ol>
+<li><code>id</code> which is an auto-generated integer and should be read-only</li>
+<li><code>title</code> which is a free-form string which is required</li>
+<li><code>created</code> which is an ISO8601 date/time string, auto-generated</li>
+<li><code>markdown</code> which is a required Markdown-formatted string</li>
+<li><code>html</code>, a string which holds the rendered Markdown and is also required</li>
+</ol>
+
+<p>Here&#39;s our configured Yancy <code>blog</code> collection:</p>
+
+<pre><code class="hljs">plugin Yancy =&gt; {
+    backend =&gt; &#39;<span class="hljs-string">pg://localhost/blog</span>&#39;,
+    collections =&gt; {
+        blog =&gt; {
+            required =&gt; [ &#39;<span class="hljs-string">title</span>&#39;, &#39;<span class="hljs-string">markdown</span>&#39;, &#39;<span class="hljs-string">html</span>&#39; ],
+            properties =&gt; {
+                id =&gt; {
+                    type =&gt; &#39;<span class="hljs-string">integer</span>&#39;,
+                    readOnly =&gt; <span class="hljs-number">1</span>,
+                },
+                title =&gt; {
+                    type =&gt; &#39;<span class="hljs-string">string</span>&#39;,
+                },
+                created =&gt; {
+                    type =&gt; &#39;<span class="hljs-string">string</span>&#39;,
+                    <span class="hljs-function">format</span> =&gt; &#39;<span class="hljs-string">date-time</span>&#39;,
+                    readOnly =&gt; <span class="hljs-number">1</span>,
+                },
+                markdown =&gt; {
+                    type =&gt; &#39;<span class="hljs-string">string</span>&#39;,
+                    <span class="hljs-function">format</span> =&gt; &#39;<span class="hljs-string">markdown</span>&#39;,
+                    &#39;<span class="hljs-string">x-html-field</span>&#39; =&gt; &#39;<span class="hljs-string">html</span>&#39;,
+                },
+                html =&gt; {
+                    type =&gt; &#39;<span class="hljs-string">string</span>&#39;,
+                },
+            },
+        },
+    },
+};
+</code></pre>
+
+<p>Yancy will build us a rich form for our collection from the field types
+we tell it. Some fields, like the <code>markdown</code> field, take additional
+configuration: <code>x-html-field</code> tells the Markdown field where to save the
+rendered HTML. There&#39;s plenty of customization options in <a href="http://metacpan.org/pod/Yancy#CONFIGURATION">the Yancy
+configuration documentation</a>.</p>
+
+<p>Now we can start up our app and go to <a href="http://127.0.0.1:3000/yancy">http://127.0.0.1:3000/yancy</a> to
+manage our site&#39;s content:</p>
+
+<pre><code>$ perl myapp.pl daemon
+Server available at http://127.0.0.1:3000
+</code></pre>
+
+<p><img alt="Screen shot of adding a new blog item with Yancy" src="adding-item.png">
+<img alt="Screen shot of Yancy after the new blog item is added" src="item-added.png"></p>
+
+<p>Finally, we need some way to display our blog posts.  <a href="http://metacpan.org/pod/Mojolicious::Plugin::Yancy#HELPERS">Yancy provides
+helpers to access our
+data</a>. Let&#39;s
+use the <code>list</code> helper to display a list of blog posts. This helper takes
+a collection name and gives us a list of items in that collection. It
+also allows us to search for items and order them to our liking. Since
+we&#39;ve got a blog, we will order by the creation date, descending.</p>
+
+<pre><code class="hljs">get &#39;<span class="hljs-string">/</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+    <span class="hljs-keyword">my</span> ( <span class="hljs-type">$c</span> ) = <span class="hljs-type">@_</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">render</span>(
+        &#39;<span class="hljs-string">index</span>&#39;,
+        posts =&gt; [ <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">yancy</span>-&gt;<span class="hljs-type">list</span>(
+            &#39;<span class="hljs-string">blog</span>&#39;, {}, { order_by =&gt; { -desc =&gt; &#39;<span class="hljs-string">created</span>&#39; } },
+        ) ],
+    );
+};
+</code></pre>
+
+<p>Now we just need an HTML template to go with our route! Here, I use the standard
+<a href="http://getbootstrap.com/docs/4.0/getting-started/introduction/#starter-template">Bootstrap 4 starter template</a>
+and add this short loop to render our blog posts:</p>
+
+<pre><code>&lt;main role=&quot;main&quot; class=&quot;container&quot;&gt;
+% for my $post ( @{ stash &#39;posts&#39; } ) {
+    &lt;%== $post-&gt;{html} %&gt;
+% }
+&lt;/main&gt;
+</code></pre>
+
+<p><a href="04-template.pl">Now we have our completed application</a> and we can test
+to see our blog post:</p>
+
+<pre><code>$ perl myapp.pl daemon
+Server available at http://127.0.0.1:3000
+</code></pre>
+
+<p><img alt="The rendered blog post with our template" src="blog-post.png"></p>
+
+<p>Yancy provides a rapid way to get started building a Mojolicious
+application (above Mojoliciousâs already rapid development). Yancy
+provides a basic level of content management so site developers can
+focus on what makes their site unique.</p>
+
+              </section>
+              <small><p><a href="http://www.publicdomainpictures.net/view-image.php?image=6416">Image</a> in the public domain.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/app/">app</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/4bdc4922059d58a0fcbf8f35652dc254.png">
+                      </div>
+                      <div class="about">
+                        <h5>Doug Bell</h5>
+                        <p>Doug (<a href="http://preaction.me">preaction</a>) is a long time Perl user.
+He is the current maintainer of <a href="http://www.cpantesters.org/">CPAN Testers</a> and the author of many <a href="https://metacpan.org/author/PREACTION">CPAN modules</a> including the <a href="http://preaction.me/statocles/">Statocles</a> blog engine that powers this site.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/14/day-14-you-promised-to-call/index.html" rel="prev"><strong>Previous Article</strong> Day 14: You Promised To Call!</a></li>
+                  <li class="next"><a href="/blog/2017/12/16/day-16-the-secret-life-of-sessions/index.html" rel="next"><strong>Next Article</strong> Day 16: The Secret Life of Sessions </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

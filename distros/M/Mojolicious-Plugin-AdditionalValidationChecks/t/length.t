@@ -21,9 +21,13 @@ get '/' => sub {
 
 my %words = (
     'abcd'  => [ 0, 5, 1 ],
-    'abcd'  => [ 3, undef, 1 ],
-    'abcd'  => [ 5, undef, 0 ],
-    'abcd'  => [ 5, 10, 0 ],
+    'abcde'  => [ 3, '', 1 ],
+    'abce'  => [ 5, '', 0 ],
+    'abed'  => [ 5, 10, 0 ],
+    'aecd'  => [ '', '', 1 ],
+    'ebcd'  => [ '', 5, 1 ],
+    'becd'  => [ 2, 3, 0 ],
+    'a'     => [ 2, 3, 0 ],
 );
 
 my $t = Test::Mojo->new;

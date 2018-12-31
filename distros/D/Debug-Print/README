@@ -2,8 +2,8 @@ NAME
     Debug::Print - Make debugging with print() more awesome
 
 VERSION
-    This document describes version 0.001 of Debug::Print (from Perl
-    distribution Debug-Print), released on 2018-12-20.
+    This document describes version 0.002 of Debug::Print (from Perl
+    distribution Debug-Print), released on 2019-12-31.
 
 SYNOPSIS
     Example script myscript.pl:

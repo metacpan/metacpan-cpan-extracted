@@ -80,7 +80,7 @@ sub __add_aggregate_substmt {
         }
         $tmp->{aggr_cols}[$i] .= $f_col . ")";
     }
-    my $alias = $ax->alias( $tmp->{aggr_cols}[$i] );
+    my $alias = $ax->alias( 'aggregate', 'AS: ', undef, $tmp->{aggr_cols}[$i] );
     if ( defined $alias && length $alias ) {
         $tmp->{alias}{$tmp->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
     }
@@ -124,14 +124,14 @@ sub columns {
         push @$bu, [ [ @{$tmp->{chosen_cols}} ], { %{$tmp->{alias}} } ];
         if ( $cols[0] eq $sq_col ) {
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type );
+            my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, 'select' );
             if ( ! defined $subquery ) {
                 ( $tmp->{chosen_cols}, $tmp->{alias} ) = @{pop @$bu};
                 next COLUMNS;
             }
             $subquery = "(" . $subquery . ")";
             push @{$tmp->{chosen_cols}}, $subquery;
-            my $alias = $ax->alias( $subquery );
+            my $alias = $ax->alias( 'subqueries', 'AS: ', undef, $subquery );
             if ( defined $alias && length $alias ) {
                 $tmp->{alias}{$subquery} = $ax->quote_col_qualified( [ $alias ] );
             }
@@ -243,7 +243,7 @@ sub where {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @cols = ( @{$sql->{cols}}, @{$sql->{modified_cols}} );
-    my $AND_OR = ' ';
+    my $AND_OR = '';
     my $tmp = {
         where_args => [],
         where_stmt => " WHERE",
@@ -284,13 +284,12 @@ sub where {
         }
         if ( $quote_col eq $sq_col ) {
             my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );  # sub
-            my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type );
+            my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, 'where' );
             if ( ! defined $subquery ) {
                 if ( @$bu ) {
                     ( $tmp->{where_args}, $tmp->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
-                    next WHERE;
                 }
-                return;
+                next WHERE;
             }
             $quote_col = "(" . $subquery . ")";
         }
@@ -309,17 +308,17 @@ sub where {
             if ( ! defined $AND_OR ) {
                 next WHERE;
             }
-            $AND_OR = ' ' . $AND_OR . ' ';
+            $AND_OR = ' ' . $AND_OR;
         }
         if ( $quote_col eq '(' ) {
             push @$bu, [ [@{$tmp->{where_args}}], $tmp->{where_stmt}, $AND_OR, $unclosed, $count ];
-            $tmp->{where_stmt} .= $AND_OR . "(";
+            $tmp->{where_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
             next WHERE;
         }
         push @$bu, [ [@{$tmp->{where_args}}], $tmp->{where_stmt}, $AND_OR, $unclosed, $count ];
-        $tmp->{where_stmt} .= $AND_OR . $quote_col;
+        $tmp->{where_stmt} .= $AND_OR . ' ' . $quote_col;
         my $ok = $sf->__set_operator_sql( $sql, $tmp, 'where', $quote_col, $stmt_type );
         if ( ! $ok ) {
             ( $tmp->{where_args}, $tmp->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
@@ -367,9 +366,9 @@ sub group_by {
 sub having {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $aggr_cols = $sql->{aggr_cols};
+    #my $aggr_cols = $sql->{aggr_cols};
     my @pre = ( undef, $sf->{i}{ok} );
-    my $AND_OR = ' ';
+    my $AND_OR = '';
     my $tmp = {
         having_args => [],
         having_stmt => " HAVING",
@@ -379,7 +378,7 @@ sub having {
     my $bu = [];
 
     HAVING: while ( 1 ) {
-        my @choices = ( @{$sf->{aggregate}}, map( '@' . $_, @$aggr_cols ) ); #
+        my @choices = ( @{$sf->{aggregate}}, map( '@' . $_, @{$sql->{aggr_cols}} ) ); #
         if ( $sf->{o}{G}{parentheses} == 1 ) {
             unshift @choices, $unclosed ? ')' : '(';
         }
@@ -420,42 +419,21 @@ sub having {
             if ( ! defined $AND_OR ) {
                 next HAVING;
             }
-            $AND_OR = ' ' . $AND_OR . ' ';
+            $AND_OR = ' ' . $AND_OR;
         }
         if ( $aggr eq '(' ) {
             push @$bu, [ [@{$tmp->{having_args}}], $tmp->{having_stmt}, $AND_OR, $unclosed, $count ];
-            $tmp->{having_stmt} .= $AND_OR . "(";
+            $tmp->{having_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
             next HAVING;
         }
         push @$bu, [ [@{$tmp->{having_args}}], $tmp->{having_stmt}, $AND_OR, $unclosed, $count ];
-        my $bu_AND_OR = $AND_OR;
-        my ( $quote_col, $quote_aggr);
-        if ( ( any { '@' . $_ eq $aggr } @$aggr_cols ) ) { #
-            ( $quote_aggr = $aggr ) =~ s/^\@//;
-            $tmp->{having_stmt} .= $AND_OR . $quote_aggr;
-        }
-        elsif ( $aggr eq 'COUNT(*)' ) {
-            $quote_col = '*';
-            $quote_aggr = $aggr;
-            $tmp->{having_stmt} .= $AND_OR . $quote_aggr;
-        }
-        else {
-            $aggr =~ s/\(\S\)\z//;
-            $tmp->{having_stmt} .= $AND_OR . $aggr . "(";
-            $quote_aggr          =           $aggr . "(";
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
-            # Choose
-            $quote_col = $stmt_h->choose(
-                [ undef, @{$sql->{cols}} ]
-            );
-            if ( ! defined $quote_col ) {
-                ( $tmp->{having_args}, $tmp->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
-                next HAVING;
-            }
-            $tmp->{having_stmt} .= $quote_col . ")";
-            $quote_aggr         .= $quote_col . ")";
+        $tmp->{having_stmt} .= $AND_OR;
+        my $quote_aggr = $sf->__build_having_col( $stmt_h, $sql, $stmt_type, $tmp, $aggr );
+        if ( ! defined $quote_aggr ) {
+            ( $tmp->{having_args}, $tmp->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            next HAVING;
         }
         my $ok = $sf->__set_operator_sql( $sql, $tmp, 'having', $quote_aggr, $stmt_type );
         if ( ! $ok ) {
@@ -464,6 +442,36 @@ sub having {
         }
         $count++;
     }
+}
+
+sub __build_having_col {
+    my ( $sf, $stmt_h, $sql, $stmt_type, $tmp, $aggr ) = @_;
+    my $quote_aggr;
+    if ( ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) ) { #
+        ( $quote_aggr = $aggr ) =~ s/^\@//;
+        $tmp->{having_stmt} .= ' ' . $quote_aggr;
+    }
+    elsif ( $aggr eq 'COUNT(*)' ) {
+        $quote_aggr = $aggr;
+        $tmp->{having_stmt} .= ' ' . $quote_aggr;
+    }
+    else {
+        $aggr =~ s/\(\S\)\z//;
+        $tmp->{having_stmt} .= ' ' . $aggr . "(";
+        $quote_aggr          =       $aggr . "(";
+        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        # Choose
+        my $quote_col = $stmt_h->choose(
+            [ undef, @{$sql->{cols}} ]
+        );
+        if ( ! defined $quote_col ) {
+            return;
+        }
+        $tmp->{having_stmt} .= $quote_col . ")";
+        $quote_aggr         .= $quote_col . ")";
+    }
+    return $quote_aggr;
 }
 
 
@@ -649,9 +657,29 @@ sub __set_operator_sql {
             $operator =~ s/^\s+//;
             $tmp->{$stmt} .= ' ' . $operator;
             $ax->print_sql( $sql, [ $stmt_type ], $tmp );
-            # Choose
-            #my $quote_col = $stmt_h->choose( $sql->{cols}, { prompt => "$operator:" } );
-            my $quote_col = $stmt_h->choose( $sql->{cols}, { prompt => 'Col:' } );
+            my $quote_col;
+            if ( $clause eq 'having' ) {
+                my @pre = ( undef, $sf->{i}{ok} );
+                my @choices = ( @{$sf->{aggregate}}, map( '@' . $_,  @{$sql->{aggr_cols}} ) );
+                # Choose
+                my $aggr = $stmt_h->choose(
+                    [ @pre, @choices ]
+                );
+                if ( ! defined $aggr ) {
+                    $tmp->{$stmt} = $bu_stmt;
+                    next OPERATOR;
+                }
+                if ( $aggr eq $sf->{i}{ok} ) {
+                }
+                my $backup_tmp = $tmp->{$stmt};
+                $quote_col =  $sf->__build_having_col( $stmt_h, $sql, $stmt_type, $tmp, $aggr );
+                $tmp->{$stmt} = $backup_tmp;
+            }
+            else {
+                # Choose
+                #$quote_col = $stmt_h->choose( $sql->{cols}, { prompt => "$operator:" } );
+                $quote_col = $stmt_h->choose( $sql->{cols}, { prompt => 'Col:' } );
+            }
             if ( ! defined $quote_col ) {
                 #$tmp->{$stmt} = '';
                 $tmp->{$stmt} = $bu_stmt;
@@ -710,7 +738,7 @@ sub __set_operator_sql {
             $tmp->{$stmt} .= ' ' . $operator;
             if ( $hist ) {
                 my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );  # sub
-                my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type );
+                my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, $clause );
                 if ( ! defined $subquery ) {
                     $tmp->{$stmt} = $bu_stmt;
                     next OPERATOR;
@@ -770,7 +798,7 @@ sub __set_operator_sql {
             $ax->print_sql( $sql, [ $stmt_type ], $tmp );
             if ( $hist ) {
                 my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );  # sub
-                my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type );
+                my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, $clause );
                 if ( ! defined $subquery ) {
                     $tmp->{$stmt} = $bu_stmt;
                     next OPERATOR;

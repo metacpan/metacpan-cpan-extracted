@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> Using Minion in Dancer Apps | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="using_minion_in_dancer_apps"></a>Using Minion in Dancer Apps</h1>
+
+<p>At <code>$work</code>, we have built an API with Dancer that generates PDF documents and XML files. This API is a critical component of an insurance enrollment system: PDFs are generated to deliver to the client in a web browser 
+immediately, and the XML is delivered to the carrier as soon as it becomes available. Since the XML often takes a significant amount of time to generate, the job is generated in the background so as not to tie up the 
+application server for an extended amount of time. When this was done, a homegrown process management system was developed, and works by <code>fork()</code>ing a process, tracking its pid, and hoping we can later successfully
+reap the completed process.</p>
+<p>There have been several problems with this approach:</p>
+<ul>
+<li><a name="item_it_s_fragile"></a><b>it's fragile</b>
+</li>
+<li><a name="item_it_doesn_t_scale"></a><b>it doesn't scale</b>
+</li>
+<li><a name="item_it_s_too_easy_to_screw_something_up_as_a_developer"></a><b>it's too easy to screw something up as a developer</b>
+</li>
+</ul>
+<p>In 2019, we have to ramp up to take on a significantly larger workload. The current solution simply will not handle the amount of work we anticipate needing to handle. Enter <a href="https://metacpan.org/pod/Minion">Minion</a>.</p>
+<p><b>Note:</b> The techniques used in this article work equally well with Dancer or Dancer2.</p>
+<h2><a name="why_minion"></a>Why Minion?</h2>
+
+<p>We looked at several alternatives to Minion, including <a href="https://beanstalkd.github.io/">beanstalkd</a> and <a href="http://www.celeryproject.org/">celeryd</a>. Using either one of these meant involving our already over-taxed
+infrastructure team, however; using Minion allowed us to use expertise that my team already has without having to burden someone else with assisting us. From a development standpoint, using a product that
+was developed in Perl gave us the quickest time to implementation.</p>
+<p>Scaling our existing setup was near impossible. It's not only difficult to get a handle on what resources are consumed by processes we've forked, but it was impossible to run the jobs on more than one server. 
+Starting over with Minion also gave us a much needed opportunity to clean up some code in sore need of refactoring. With a minimal amount of work, we were able to clean up our XML rendering code and make it work
+from Minion. This cleanup allowed us to more easily get information as to how much memory and CPU was consumed by an XML rendering job. This information is vital for us in planning future capacity.</p>
+<h2><a name="accessing_minion"></a>Accessing Minion</h2>
+
+<p>Since we are a Dancer shop, and not Mojolicious, a lot of things you'd get from Mojolicious for working with Minion isn't as available to us. Given we are also sharing some Minion-based
+code with our business models, we had to build some of our own plumbing around Minion:</p>
+<pre class="prettyprint">package MyJob::JobQueue;
+
+use Moose;
+use Minion;
+
+use MyJob::Models::FooBar;
+with 'MyJob::Roles::ConfigReader';
+
+has 'runner' =&gt; (
+    is      =&gt; 'ro',
+    isa     =&gt; 'Minion',
+    lazy    =&gt; 1,
+    default =&gt; sub( $self ) {
+        $ENV{ MOJO_PUBSUB_EXPERIMENTAL } = 1;
+        Minion-&gt;new( mysql =&gt; 
+          MyJob::DBConnectionManager-&gt;new-&gt;get_connection_uri({ 
+            db_type =&gt; 'feeds', 
+            io_type =&gt; 'rw',
+        }));
+    },
+);</pre>
+
+<p>We wrapped a simple Moose class around Minion to make it easy to add to any class or Dancer application with the extra functionality we wanted.</p>
+<p>We ran into an issue at one point where jobs weren't running since we added them to a queue that no worker was configured to handle. To prevent this from happening to us again,
+we added code to prevent us from adding code to a queue that didn't exist:</p>
+<pre class="prettyprint">my @QUEUE_TYPES = qw( default InstantXML PayrollXML ChangeRequest );
+
+sub has_invalid_queues( $self, @queues ) {
+    return 1 if $self-&gt;get_invalid_queues( @queues );
+    return 0;
+}
+
+sub get_invalid_queues( $self, @queues ) {
+    my %queue_map;
+    @queue_map{ @QUEUE_TYPES } = (); 
+    my @invalid_queues = grep !exists $queue_map{ $_ }, @queues;
+    return @invalid_queues;
+}</pre>
+
+<p>With that in place, it was easy for our <code>queue_job()</code> method to throw an error if the developer tried to add a job to an invalid queue:</p>
+<pre class="prettyprint">sub queue_job( $self, $args ) {
+    my $job_name = $args-&gt;{ name     } or die "queue_job(): must define job name!";
+    my $guid     = $args-&gt;{ guid     } or die "queue_job(): must have GUID to process!";
+    my $title    = $args-&gt;{ title    } // $job_name;
+    my $queue    = $args-&gt;{ queue    } // 'default';
+    my $job_args = $args-&gt;{ job_args };
+
+    die "queue_job(): Invalid job queue '$queue' specified" 
+        if $self-&gt;has_invalid_queues( $queue );
+
+    my %notes = ( title =&gt; $title, guid  =&gt; $guid );
+
+    return $self-&gt;runner-&gt;enqueue( $job_name =&gt; $job_args =&gt; 
+        { notes =&gt; \%notes, queue =&gt; $queue });
+}</pre>
+
+<h2><a name="creating_jobs"></a>Creating Jobs</h2>
+
+<p>In our base model class (Moose-based), we would create an attribute for our job runner:</p>
+<pre class="prettyprint">has 'job_runner' =&gt; (
+    is      =&gt; 'ro',
+    isa     =&gt; 'MyJob::JobQueue',
+    lazy    =&gt; 1,
+    default =&gt; sub( $self ) { return MyJob::JobQueue-&gt;new-&gt;runner; },
+);</pre>
+
+<p>And in the models themselves, creating a new queueable task was as easy as:</p>
+<pre class="prettyprint">$self-&gt;runner-&gt;add_task( InstantXML =&gt; 
+    sub( $job, $request_path, $guid, $company_db, $force, $die_on_error = 0 ) {
+        $job-&gt;note( 
+            request_path =&gt; $request_path,
+            feed_id      =&gt; 2098,
+            group        =&gt; $company_db,
+        );
+        MyJob::Models::FooBar-&gt;new( request_path =&gt; 
+          $request_path )-&gt;generate_xml({
+            pdf_guid     =&gt; $guid,
+            group        =&gt; $company_db,
+            force        =&gt; $force,
+            die_on_error =&gt; $die_on_error,
+        });
+});</pre>
+
+<h2><a name="running_jobs"></a>Running Jobs</h2>
+
+<p>Starting a job from Dancer was super easy:</p>
+<pre class="prettyprint">use Dancer2;
+use MyJob::JobQueue;
+
+sub job_queue {
+    return MyJob::JobQueue-&gt;new;
+}
+
+get '/my/api/route/:guid/:group/:force' =&gt; sub {
+    my $guid  = route_parameters-&gt;get( 'guid' );
+    my $group = route_parameters-&gt;get( 'group' );
+    my $force = route_parameters-&gt;get( 'force' );
+
+    debug "GENERATING XML ONLY FOR $guid";
+    job_queue-&gt;queue_job({
+        name     =&gt; "InstantXML",
+        guid     =&gt; $guid,
+        title    =&gt; "Instant XML Generator",
+        queue    =&gt; 'InstantXML',
+        job_args =&gt; [ $self-&gt;request_path, $guid, $group, $force ],
+    }); 
+}</pre>
+
+<h2><a name="creating_and_configuring_the_job_queue_worker"></a>Creating and Configuring the Job Queue Worker</h2>
+
+<p>We wanted to easily configure our Minions for all hosts and environments in one spot. Since we use a lot of YAML in Dancer, specifying the Minion configuration in YAML made a lot of sense
+to us:</p>
+<pre class="prettyprint"># What port does the dashboard listen on?
+dashboard_port: 4000
+
+# Add the rest later.
+dashboards:
+    UNKNOWN: http://localhost:3000/
+    DEV: http://my.development.host.tld:8001/
+
+# Hosts that have no entry assume the default configuration
+default:
+    max_children: 4
+    queues:
+        - default
+
+# Host-specific settings
+jcrome-precision-3510:
+    max_children: 8
+    queues:
+        - default
+        - InstantXML
+        - PayrollXML
+        - ChangeRequest</pre>
+
+<p>Our job queue workers look like:</p>
+<pre class="prettyprint">#!/usr/bin/env perl
+
+use MyJob::Base;
+use MyJob::JobQueue;
+use MyJob::Log4p;
+use MyJob::Util::Logger;
+use MyJob::Util::SysTools qw(get_hostname);
+
+my $config     = MyJob::Config-&gt;new-&gt;config;
+my $hostconfig = get_hostconfig();
+my $minion     = MyJob::JobQueue-&gt;new;
+my $worker     = $minion-&gt;runner-&gt;worker;
+
+my $log_eng = MyJob::Log4p-&gt;new({ logger_name =&gt; "Minion" });
+my $logger  = MyJob::Util::Logger-&gt;new-&gt;logger($log_eng);</pre>
+
+<p>The above is mostly typical boilerplate for us. Read our configuration, and create a logger the worker can use.</p>
+<p>Next, when a job is dequeued, we want to log that the worker picked up a job (needed for auditing purposes) and we alter the process name so if a process hangs, we know what that process
+was attempting to run. If an unchecked exception occurs in a job, the worker will catch it and log it for us:</p>
+<pre class="prettyprint">$worker-&gt;on( dequeue =&gt; sub( $worker, $job ) {
+    my $id    = $job-&gt;id;
+    my $notes = $job-&gt;info-&gt;{ notes };
+    my $title = $notes-&gt;{ title };
+    my $guid  = $notes-&gt;{ guid };
+
+    $job-&gt;on( spawn =&gt; sub( $job, $pid ) {  
+        $0 = "$title $guid";
+        $logger-&gt;info( 
+            "$title: Created child process $pid for job $id by parent $$ - $guid");
+    });
+        
+    $job-&gt;on( failed =&gt; sub( $job, $error ) {
+        chomp $error;
+        $logger-&gt;error( $error );
+    });
+});</pre>
+
+<p>To help us for future capacity planning, we want our workers to tell us if they are running at peak capacity, so log when this event occurs:</p>
+<pre class="prettyprint">$worker-&gt;on( busy =&gt; sub( $worker ) {
+    my $max = $worker-&gt;status-&gt;{ jobs };
+    $logger-&gt;log( "$0: Running at capacity (performing $max jobs)." );
+});</pre>
+
+<p>Now, we apply the configuration (read below) to the worker. When the worker starts, it tells us information about how it was configured (this was really useful during development):</p>
+<pre class="prettyprint">my $max_jobs = $hostconfig-&gt;{ max_children };
+my @queues   = @{ $hostconfig-&gt;{ queues }};
+
+if( $minion-&gt;has_invalid_queues( @queues ) ){
+    print "Invalid job queues specified: " . join( ',', 
+        $minion-&gt;get_invalid_queues( @queues ) );
+    say ". Aborting!";
+    exit 1;
+}
+
+say "Starting Job Queue Worker on " . get_hostname();
+say "- Configured to run a max of $max_jobs jobs";
+say "- Listening for jobs on queues: ", join(', ', @queues );
+$worker-&gt;status-&gt;{ jobs }   = $max_jobs;
+$worker-&gt;status-&gt;{ queues } = \@queues;
+$worker-&gt;run;</pre>
+
+<p>Remember the YAML file we used to configure things up above? This last bit pulls the information for the host this worker is running on (<code>get_hostname()</code> is a home-grown 
+hostname function):</p>
+<pre class="prettyprint">sub get_hostconfig {
+    my $minion_config = 
+        MyJob::Config-&gt;new({ filename =&gt; "environments/minions.yml" })-&gt;config;
+    my $hostname      = get_hostname();
+
+    if( exists $minion_config-&gt;{ $hostname }) {
+        return $minion_config-&gt;{ $hostname };
+    } else {
+        return $minion_config-&gt;{ default };
+    }
+}</pre>
+
+<h2><a name="monitoring_the_workers"></a>Monitoring the Workers</h2>
+
+<p>Our Minion dashboard was virtually identical to the one that @preaction posted in <a href="https://mojolicious.io/blog/2018/12/11/who-watches-the-minions/#section-2">Who Watches the Minions?</a>.
+If you'd like to know more, I highly recommend reading his article.</p>
+<h2><a name="outcome"></a>Outcome</h2>
+
+<p>Within about a two-week timespan, we went from having zero practical knowledge of Minion to having things up and running. We've made some refinements and improvements along the way, but the quick turnaround
+is a true testament to the simplicity of working with Minion.</p>
+<p>We now have all the necessary pieces in place to scale our XML rendering both horizontally and vertically: thanks to Minion, we can easily run XML jobs across multiple boxes, and can more efficiently run 
+more jobs concurrently on the same hardware as before. This setup allows us to grow as quickly as our customer base does.</p>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Jason Crome (CromeDome) for the Perl Dancer 
+Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+<p>Jason A. Crome</p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

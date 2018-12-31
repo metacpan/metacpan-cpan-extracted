@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Object Orientation for Perl 5",
-  "AUTHOR" => "Al Newkirk <anewkirk\@ana.io>",
+  "AUTHOR" => "Al Newkirk <al\@iamalnewkirk.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -20,17 +20,17 @@ my %WriteMakefileArgs = (
     "Moo" => "2.000001",
     "Sub::Quote" => "2.005001",
     "Type::Tiny" => "1.000005",
-    "Type::Tiny::Signatures" => "0.07"
+    "Type::Tiny::Signatures" => "0.08"
   },
   "TEST_REQUIRES" => {
     "Moo" => "2.000001",
     "Sub::Quote" => "2.005001",
     "Type::Tiny" => "1.000005",
-    "Type::Tiny::Signatures" => "0.07"
+    "Type::Tiny::Signatures" => "0.08"
   },
-  "VERSION" => "0.60",
+  "VERSION" => "0.61",
   "test" => {
-    "TESTS" => "t/data/*.t t/data/object/*.t t/data/object/class/*.t t/data/object/regexp/*.t t/data/object/role/*.t t/prev/data/*.t t/prev/data/object/*.t t/prev/data/object/array/*.t t/prev/data/object/class/*.t t/prev/data/object/code/*.t t/prev/data/object/float/*.t t/prev/data/object/hash/*.t t/prev/data/object/integer/*.t t/prev/data/object/library/*.t t/prev/data/object/number/*.t t/prev/data/object/regexp/*.t t/prev/data/object/role/*.t t/prev/data/object/scalar/*.t t/prev/data/object/signatures/*.t t/prev/data/object/string/*.t t/prev/data/object/undef/*.t t/prev/data/object/universal/*.t"
+    "TESTS" => "t/0.01/data/*.t t/0.01/data/object/*.t t/0.01/data/object/array/*.t t/0.01/data/object/class/*.t t/0.01/data/object/code/*.t t/0.01/data/object/float/*.t t/0.01/data/object/hash/*.t t/0.01/data/object/integer/*.t t/0.01/data/object/library/*.t t/0.01/data/object/number/*.t t/0.01/data/object/regexp/*.t t/0.01/data/object/role/*.t t/0.01/data/object/scalar/*.t t/0.01/data/object/signatures/*.t t/0.01/data/object/string/*.t t/0.01/data/object/undef/*.t t/0.01/data/object/universal/*.t t/0.50/data/*.t t/0.50/data/object/*.t t/0.50/data/object/class/*.t t/0.50/data/object/regexp/*.t t/0.50/data/object/role/*.t"
   }
 );
 
@@ -39,7 +39,7 @@ my %FallbackPrereqs = (
   "Moo" => "2.000001",
   "Sub::Quote" => "2.005001",
   "Type::Tiny" => "1.000005",
-  "Type::Tiny::Signatures" => "0.07"
+  "Type::Tiny::Signatures" => "0.08"
 );
 
 

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@joelaberger" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/09/day-9-the-best-way-to-test/" property="og:url">
+  <meta content="Day 9: The Best Way to Test" property="og:title">
+    <meta content="An introduction to Test::Mojo, the testing framework for Mojolicious." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/09/day-9-the-best-way-to-test/1280px-CSIRO_ScienceImage_2798_Testing_in_the_Laboratory.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 9: The Best Way to Test - mojolicious.io</title>
+  <meta content="Joel Berger" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 9: The Best Way to Test</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-09">Dec  9, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Woman using chemistry lab equipment" src="/blog/2017/12/09/day-9-the-best-way-to-test/1280px-CSIRO_ScienceImage_2798_Testing_in_the_Laboratory.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>Ok so it is a bit of a click-bait headline.
+But that doesn&#39;t mean I don&#39;t believe it.</p>
+
+<p><a href="http://mojolicious.org/perldoc/Test/Mojo">Test::Mojo</a> is a test framework for websites and related technologies.
+While its true that there are many such tools, this one gets its power comes from combining so many of the tools that Mojolicious provides.
+A full non-blocking web server, including websockets, an <a href="http://mojolicious.org/perldoc/Mojo/IOLoop">event loop</a>, an <a href="http://mojolicious.org/perldoc/Mojo/DOM">XML/HTML DOM parser</a>, <a href="http://mojolicious.org/perldoc/Mojo/JSON">JSON parser and emitter</a>, and more all come together to make incredibly detailed testing simple.
+Further, with the recent additions in support of <a href="http://mojolicious.org/perldoc/Mojo/Base#with_roles">roles</a> (which will be discussed in a future post), Test::Mojo is becoming an extensible testing platform.</p>
+
+<p>In this article, I&#39;ll give a quick overview of how to use Test::Mojo and some of its methods.
+Rest assured you&#39;ll see more of it as the series continues.</p>
+
+              </section>
+              <section id="section-2">
+                  <h2>Getting Started</h2>
+
+<p>The topmatter of a Test::Mojo script usually is fairly consistent.</p>
+
+<pre><code>use Mojo::Base -strict;
+use Test::More;
+use Test::Mojo;
+</code></pre>
+
+<p>Unlike the Mojolicious, Mojolicious::Lite or Mojo::Base modules, importing Test::Mojo does not import strict, warnings and other recommended pragma.
+Therefore we can import them via Mojo::Base with its <code>-strict</code> switch.
+Test::Mojo relies on the venerable Perl testing system, usually accessed via <a href="https://metacpan.org/pod/Test::More">Test::More</a>.
+We will need at least the <code>done_testing</code> keyword from that module so we import it too.</p>
+
+<p>If you only want to test external websites then that&#39;s all you need to do before instantiating.</p>
+
+<pre><code>my $t = Test::Mojo-&gt;new;
+</code></pre>
+
+<p>By convention, the tester object is stored in a variable named <code>$t</code>.</p>
+
+<p>If you want to test a local application, presumably one you are developing (as most users do) then you have to tell it how to do so.
+If you are testing a Mojolicious::Lite script, all you have to do is <code>require</code> the script into your test file.
+This is usually done with the help of <a href="https://metacpan.org/pod/FindBin">FindBin</a> which gives the location of the test script, from which you can derive where your application is.
+For example, if your script is <code>project/myapp.pl</code> and your test is <code>project/t/mytest.t</code> then you need to go up one directory to find your script, like so</p>
+
+<pre><code>use FindBin;
+require &quot;$FindBin::Bin/../myapp.pl&quot;;
+my $t = Test::Mojo-&gt;new;
+</code></pre>
+
+<p>One might also create a Lite app in the test file itself, especially when say testing a plugin on its own.</p>
+
+<pre><code>use Mojolicious::Lite;
+plugin &#39;MyCoolPlugin&#39;;
+my $t = Test::Mojo-&gt;new;
+</code></pre>
+
+<p>Testing a Full app couldn&#39;t be simpler, you just pass it a class name for it to instantiate.</p>
+
+<pre><code>my $t = Test::Mojo-&gt;new(&#39;MyApp&#39;);
+</code></pre>
+
+<p>When instantiating a Full app you can actually pass it a second argument, a hash reference of configuration overrides.
+This can be especially handy for overriding things like database parameters to access a test instance rather than your regular database.
+Of couse how you use your configuration might vary but if your app does something like</p>
+
+<pre><code>has pg =&gt; sub {
+  my $app = shift;
+  return Mojo::Pg-&gt;new($app-&gt;config-&gt;{pg});
+};
+</code></pre>
+
+<p>Then you could override whatever configuration might be present in your system by doing</p>
+
+<pre><code>my $t = Test::Mojo-&gt;new(&#39;MyApp&#39;, {pg =&gt; &#39;postgresql://testuser:testpass@/testdb&#39;});
+</code></pre>
+
+<p>If you use <a href="http://mojolicious.org/perldoc/Mojolicious/Plugin/Config">Mojolicious::Plugin::Config</a> or <a href="http://mojolicious.org/perldoc/Mojolicious/Plugin/JSONConfig">Mojolicious::Plugin::JSONConfig</a> or one of several other third-party config loaders on CPAN, this configuration will be loaded instead of what it would otherwise load.
+If you use some other loader on CPAN (that is Mojolicious aware) and it doesn&#39;t support this somewhat newish feature, please point it out to the author, it is easy to add.
+Note that this does not work for Lite apps because it has inject the configuration overrides as the application is being built, something which isn&#39;t possible for a Lite app.</p>
+
+<p>Finally you might find yourself in a situation where you already have an instantiated application.
+If that is the case just pass it to the constructor.</p>
+
+<pre><code>my $app = build_my_app();
+my $t = Test::Mojo-&gt;new($app);
+</code></pre>
+
+<h2>How It Works</h2>
+
+<p>Test::Mojo contains an instance of <a href="http://mojolicious.org/perldoc/Mojo/UserAgent">Mojo::UserAgent</a> which it uses to make requests.
+What many people don&#39;t know is that Mojo::UserAgent can act as a <a href="http://mojolicious.org/perldoc/Mojo/UserAgent#server">server</a> for a Mojo application!
+When the useragent gets a request for a relative url, (i.e. without a protocol or host), it uses this embedded server to fulfil the request.
+This isn&#39;t just useful for Test::Mojo, but that is its primary purpose.</p>
+
+<p>Many testing frameworks in Perl start some kind of fake server, mimicing the request/response cycle.
+That works in blocking scenarios, but once you add non-blocking to the mix there is no substitute for a real server.
+The useragent&#39;s server actually starts up on two different (local-only) ports, one for blocking requests and one for non-blocking.
+Most people don&#39;t need to worry about that but for doing very complex things, knowing that might help.</p>
+
+<p>When you make a request with Test::Mojo, its useragent will make the request, whether locally or externally and return to it the <a href="http://mojolicious.org/perldoc/Mojo/Transaction">transaction</a> object.
+Test::Mojo then keeps that object in its <a href="http://mojolicious.org/perldoc/Test/Mojo#tx">tx</a> attribute for subsequent tests until the next request is made.
+If none of the test methods that it provides will allow you to test what you need, you are welcome to fish the data out of that object.</p>
+
+<p>When you use Test::More, when a test fails the test function returns a false value, allowing you to take some action on failure.</p>
+
+<pre><code>is $answer, 42 or diag &#39;Deep Thought was wrong&#39;;
+</code></pre>
+
+<p>Test::Mojo uses a chaining method scheme so this doesn&#39;t work.
+Rather, whenever any test is run (methods ending in words like <code>_ok</code> or <code>_is</code> or <code>_like</code>) the result is stored in the <code>success</code> attribute.
+That value is checked by the <code>or</code> method allowing a similar functionality</p>
+
+<pre><code>$t-&gt;text_is(&#39;.answer&#39;, 42)-&gt;or(sub{ diag &#39;Deep Thought was wrong&#39; });
+</code></pre>
+
+<p>Getting ahead of myself, one of my favorite tester roles on CPAN, <a href="https://metacpan.org/pod/Test::Mojo::Role::Debug">Test::Mojo::Role::Debug</a> uses this to great effect, adding a method that acts like <code>or</code> but dumps part of a DOM structure on failure.</p>
+
+<pre><code>$t-&gt;text_is(&#39;.answer&#39;, 42)-&gt;d(&#39;.answer&#39;);
+</code></pre>
+
+<p>giving you context when a failure occurs.</p>
+
+<h2 id="making-requests">Making Requests</h2>
+
+<p>Now that we have a running application and a tester to test it, what can we do?
+The Mojolicious documentation has lots of examples both in the <a href="http://mojolicious.org/perldoc/Test/Mojo">class documenation</a> that we&#39;ve already seen and in the <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Testing">testing guide</a>.
+That said for the sake explication, let&#39;s see a few things.</p>
+
+<p>You can make requests with most of the same arguments as to <a href="http://mojolicious/perldoc/Mojo/UserAgent#METHODS">Mojo::UserAgent</a>.
+These can include headers as a hash reference:</p>
+
+<pre><code>$t-&gt;get_ok(&#39;/login&#39;, {&#39;X-Application-Auth&#39; =&gt; &#39;custom value&#39;});
+</code></pre>
+
+<p>Requests with JSON, form, for multipart data are built via <a href="http://mojolicious.org/perldoc/Mojo/UserAgent/Transactor#GENERATORS">content generators</a>.
+You can <a href="http://mojolicious.org/perldoc/Mojo/UserAgent/Transactor#add_generator">add your own</a> generator too; perhaps the subject of another article if there is interest.</p>
+
+<pre><code>$t-&gt;post_ok(&#39;/login&#39;, form =&gt; {user =&gt; &#39;me&#39;, pass =&gt; &#39;secr3t&#39;});
+$t-&gt;put_ok(&#39;/inventory/12345&#39;, json =&gt; {type =&gt; &#39;widget&#39;, value =&gt; &#39;tons&#39;});
+</code></pre>
+
+<p>Or you can submit raw data as a trailing argument</p>
+
+<pre><code>use Mojo::XMLRPC &#39;encode_xmlrpc&#39;; # from CPAN
+$t-&gt;post_ok(&#39;/xmlrpc&#39;, encode_xmlrpc(call =&gt; &#39;mymethod&#39;, &#39;myarg&#39;));
+</code></pre>
+
+<p>There are methods for all the standard HTTP methods.
+The result of these tests is essentially the succes of the transport.</p>
+
+<p>You&#39;ll also likely want to check the return status.</p>
+
+<pre><code>$t-&gt;get_ok(&#39;/&#39;)-&gt;status_is(200);
+</code></pre>
+
+<p>There is also a method one to open a websocket</p>
+
+<pre><code>$t-&gt;websocket_ok(&#39;/socket&#39;);
+</code></pre>
+
+<h2>Testing Results</h2>
+
+<p>For nearly every type of test, there are several forms.
+A method ending in <code>_is</code> checks for equality with some value, while <code>_isnt</code> checks for inequality.
+<code>_like</code> methods check for a pattern match, and <code>_unlike</code> checks that a pattern does not match.
+As we&#39;ve seen, methods that end in <code>_ok</code> check that something occured.</p>
+
+<p>So what can we check?
+We can check headers with <code>header_</code> etc, there is also a special <code>content_type_</code> family since that is often useful.
+The <code>content_</code> methods check the raw data of the response, raw websocket messages can be tested with <code>message_</code>.</p>
+
+<pre><code>$t-&gt;get_ok(&#39;/test.txt&#39;)
+  -&gt;status_is(200)
+  -&gt;content_like(qr/coal/);
+</code></pre>
+
+<p>There are methods for JSON.
+HTTP requests responding with JSON can be tested with <code>json_</code>, websocket messages received containing JSON use <code>json_message_</code>.
+The structure is tested using Test::More&#39;s <a href="https://metacpan.org/pod/Test::More#is_deeply"><code>is_deeply</code></a>.</p>
+
+<pre><code>$t-&gt;get_ok(&#39;/santa_list/joel.json&#39;)
+  -&gt;json_is({name =&gt; &#39;Joel Berger&#39;, status =&gt; &#39;nice&#39;});
+</code></pre>
+
+<p>These methods allow the (optional) first argument to be a <a href="http://mojolicious.org/perldoc/Mojo/JSON/Pointer">JSON Pointer</a> to &quot;dive in&quot; to the data structure.
+Very handy when you only care about subsets of the data.</p>
+
+<pre><code>$t-&gt;get_ok(&#39;/santa_list/joel.json&#39;)
+  -&gt;json_is(&#39;/status&#39;, &#39;nice&#39;);
+</code></pre>
+
+<p>Of course there are methods to test HTML responses.
+Since it makes little sense to test the whole thing (and if you wanted to you could use <code>content_</code>), these take a <a href="http://mojolicious.org/perldoc/Mojo/DOM/CSS">CSS3 Selector</a> to narrow their focus in a similar manner to the JSON Pointers.
+To inspect the textual portions of the HTML response, use the <code>text_</code> methods with a selector.
+For other tests, there might not be text to test, or the value doesn&#39;t matter.
+For those cases there are <code>element_exists</code>, <code>element_exists_not</code>, and <code>element_count_is</code>, which, as their names indicate, take a selector and tries to find if or how many elements match it.
+These really need a post of their own, but as a few examples</p>
+
+<pre><code>$t-&gt;text_is(&#39;div.main-content p:nth-of-type(2)&#39;, &#39;This is the third paragraph of the main-section of text&#39;);
+$t-&gt;element_exists(&#39;img[src=&quot;kitten.jpg&quot;]&#39;);
+</code></pre>
+
+<h2>Testing Websockets</h2>
+
+<p>Websockets are an intersting challenge to test, however Test::Mojo makes them easy.
+We&#39;ve already seen that you open a websocket with <code>websocket_ok</code>.</p>
+
+<p>You can then either send a message with <code>send_ok</code> (taking the same arguments as the controller&#39;s <a href="http://mojolicious.org/perldoc/Mojolicious/Controller#send">send</a> method) or you can wait for a message with <code>message_ok</code>.
+The test then waits for a message to arrive without blocking the application, so it can do its work.
+When it does arrive, you can test it with the <code>message_</code> and <code>json_message_</code> families of test methods.
+Then you can send and or wait again until you have tested sufficiently.</p>
+
+<p>To finish testing the websocket, you can&#39;t just request something else as with HTTP methods.
+A websocket is a persistent connection and so it must be closed to continue.
+You must be sure to call <code>finish_ok</code> or if you expect the websocket to close on its own, call <code>finished_ok</code>.</p>
+
+<pre><code>$t-&gt;websocket_ok(&#39;/socket&#39;)
+  -&gt;send_ok(&#39;echo me&#39;)
+  -&gt;message_ok
+  -&gt;message_is(&#39;ECHO: echo me&#39;)
+  -&gt;send_ok(&#39;quack&#39;)
+  -&gt;message_ok
+  -&gt;message_is(&#39;Ducks quacks do not echo, silly&#39;)
+  -&gt;finish_ok;
+</code></pre>
+
+<h2>To Be Continued</h2>
+
+<p>There is still so much to say on the topic of testing.
+Various tips and tricks.
+Extensions that make testing javascript possible, extensions that make testing Catalyst or Dancer apps possible.
+But this overview has gone plenty long and those should wait for another day.</p>
+
+<p>As I said before, the Mojolicious documentation has lots of examples both in the <a href="http://mojolicious.org/perldoc/Test/Mojo">class documenation</a> and in the <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Testing">testing guide</a>.
+Check those out while you wait, if you&#39;ve liked what you&#39;ve seen above.</p>
+
+              </section>
+              <small><p><a href="https://commons.wikimedia.org/w/index.php?curid=35474503">Image</a> by CSIRO, <a href="http://creativecommons.org/licenses/by/3.0" title="Creative Commons Attribution 3.0">CC BY 3.0</a>.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/testing/">testing</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/cc767569f5863a7c261991ee5b23f147">
+                      </div>
+                      <div class="about">
+                        <h5>Joel Berger</h5>
+                        <p>Joel has Ph.D. in Physics from the University of Illinois at Chicago.
+He an avid Perl user and <a href="https://metacpan.org/author/JBERGER">author</a> and is a member of the Mojolicious Core Team.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/08/day-8-mocking-a-rest-api/index.html" rel="prev"><strong>Previous Article</strong> Day 8: Mocking a REST API</a></li>
+                  <li class="next"><a href="/blog/2017/12/10/day-10-give-the-customer-what-they-want/index.html" rel="next"><strong>Next Article</strong> Day 10: Give the Customer What They Want </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

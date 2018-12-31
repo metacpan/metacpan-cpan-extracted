@@ -1,5 +1,5 @@
 package Task::BeLike::BURAK;
-$Task::BeLike::BURAK::VERSION = '0.20';
+$Task::BeLike::BURAK::VERSION = '0.23';
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ Task::BeLike::BURAK
 
 =head1 VERSION
 
-version 0.20
+version 0.23
 
 =head1 SYNOPSIS
 

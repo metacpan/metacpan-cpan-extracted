@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+  <meta charset="utf-8">
+  <meta content="" name="description">
+
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+
+  <link href="/theme/css/default.css" rel="stylesheet">
+  <link href="/theme/css/layout.css" rel="stylesheet">
+  <link href="/theme/css/media-queries.css" rel="stylesheet">
+  <link href="/theme/css/statocles.css" rel="stylesheet">
+
+  <!-- twitter and opengraph -->
+  <meta content="summary" name="twitter:card">
+      <meta content="@joelaberger" name="twitter:creator">
+  <meta content="https://mojolicious.io/blog/2017/12/17/day-17-the-wishlist-app/" property="og:url">
+  <meta content="Day 17: The Wishlist App" property="og:title">
+    <meta content="Introducing template concepts with a group wishlist app." property="og:description">
+    <meta content="https://mojolicious.io/blog/2017/12/17/day-17-the-wishlist-app/xmas_tree.jpg" property="og:image">
+    <meta content="summary_large_image" name="twitter:card">
+
+  <script src="/theme/js/modernizr.js"></script>
+
+      <link href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/sunburst.min.css" rel="stylesheet">
+
+  <title>Day 17: The Wishlist App - mojolicious.io</title>
+  <meta content="Joel Berger" name="author">
+  <meta content="Statocles 0.093" name="generator">
+  <link href="/static/favicon.ico" rel="shortcut icon">
+  
+  
+</head>
+
+<body>
+
+   <header>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <div class="logo">
+               <a href="/index.html">
+                 <h3 style="color: #fff">mojolicious.io</h3>
+               </a>
+            </div>
+
+            <nav id="nav-wrap">
+
+              <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+              <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+               <ul class="nav" id="nav">
+                 <!-- li.current is given a different styling -->
+                   <li><a href="/blog">Blog</a></li>
+                   <li><span><a href="/">Advent Calendar</a></span>
+                     <ul>
+                       <li><a href="/">2018</a></li>
+                       <li><a href="/page/advent/2017">2017</a></li>
+                      </ul>
+                   </li>
+                   <li><span><a href="https://mojolicious.org">mojolicious.org</a></span>
+                     <ul>
+                       <li><a href="http://mojolicious.org/perldoc">Documentation</a></li>
+                       <li><a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Tutorial">Tutorial</a></li>
+                      </ul>
+                   </li>
+
+               </ul>
+
+            </nav>
+
+         </div>
+
+      </div>
+
+   </header>
+
+     <div id="page-title">
+
+  <div class="row">
+
+      <div class="ten columns centered text-center">
+        <h1>Mojo Wonk Blog<span>.</span></h1>
+
+        <p>A semi-offical blog dedicated to the Mojolicious web framework</p>
+      </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="content-outer">
+
+  <div class="row" id="page-content">
+
+      <div class="eight columns" id="primary">
+
+        <article class="post">
+
+            <div class="entry-header cf">
+
+              <h1>Day 17: The Wishlist App</h1>
+
+              <p class="post-meta">
+
+                  <time class="date" datetime="2017-12-17">Dec 17, 2017</time>
+                  
+
+              </p>
+
+            </div>
+
+              <div class="post-thumb">
+                <!-- theme suggests 1300x500 -->
+                <img alt="Living room, Christmas tree, and presents" src="/blog/2017/12/17/day-17-the-wishlist-app/xmas_tree.jpg">
+              </div>
+
+            <div class="post-content">
+
+              <section id="section-1">
+                  <p>For today&#39;s article, I really wanted to demonstrate concepts using a practical example appliation.
+It is possible I let the exaxmple get away from me!</p>
+
+<p>In today&#39;s article I indend to show how to use template composition techniques to produce a wishlist app.
+We will cover <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Layouts">layouts</a>, <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Partial-templates">partial templates</a>, <a href="http://mojolicious.org/perldoc/Mojolicious/Guides/Rendering#Content-blocks">content blocks</a>.</p>
+
+<p>The data model is admittedly rough, however I think my plan will be to make that a feature and not a bug.
+Today we will example concepts mostly relating to the templates, then in tomorrows post I will migrate the model from using the simplistic persistence of <a href="https://metacpan.org/pod/DBM::Deep">DBM::Deep</a> that it uses now to <a href="https://metacpan.org/pod/Mojo::SQLite">Mojo::SQLite</a>.</p>
+
+              </section>
+              <section id="section-2">
+                  <p>At that point I hope to put the application into a repository of its own.
+In the meantime however, you can see the application in the source for this <a href="https://github.com/MojoliciousDotIO/mojolicious.io/tree/master/blog/2017/12/17/day-17-the-wishlist-app/wishlist">article</a>.
+To run it, you will need to install two additional modules, DBM::Deep and <a href="https://metacpan.org/pod/LinkEmbedder">LinkEmbedder</a>.</p>
+
+<pre><code>$ cpanm Mojolicious DBM::Deep LinkEmbedder
+</code></pre>
+
+<h2>Layouts</h2>
+
+<p>Most web sites have a defined style and layout between pages.
+A header bar, a sidebar for navigation, a footer.
+The content of each might change slightly between pages but the similarity is remarkable.</p>
+
+<p>Do the developers copy and paste this logic between pages?
+Certainly not!</p>
+
+<p>The first tool of the trade is a layout template.
+This is a template that will contain the results of rendering some inner template.
+This will usually contain the outermost tags, like <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, and <code>&lt;body&gt;</code>.
+They will likely also establish any structure that exists on all of the pages, like navigation and sidebar sections.</p>
+
+<p>Let&#39;s look at the layout that our wishlist application</p>
+
+<pre><code class="hljs">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;<span class="hljs-string">utf-8</span>&quot;&gt;
+    &lt;meta http-equiv=&quot;<span class="hljs-string">X-UA-Compatible</span>&quot; content=&quot;<span class="hljs-string">IE=edge</span>&quot;&gt;
+    &lt;meta name=&quot;<span class="hljs-string">viewport</span>&quot; content=&quot;<span class="hljs-string">width=device-width, initial-scale=1</span>&quot;&gt;
+
+    &lt;title&gt;&lt;%= title %&gt;&lt;/title&gt;
+    &lt;<span class="hljs-function">link</span> rel=&quot;<span class="hljs-string">stylesheet</span>&quot; type=&quot;<span class="hljs-string">text/css</span>&quot; href=&quot;<span class="hljs-string">//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css</span>&quot;&gt;
+    %= content &#39;<span class="hljs-string">head</span>&#39;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;nav class=&quot;<span class="hljs-string">navbar navbar-default</span>&quot;&gt;
+      &lt;div class=&quot;<span class="hljs-string">container</span>&quot;&gt;
+        &lt;div class=&quot;<span class="hljs-string">navbar-header</span>&quot;&gt;
+          &lt;a class=&quot;<span class="hljs-string">navbar-brand</span>&quot; href=&quot;<span class="hljs-string">/</span>&quot;&gt;
+            Mojo Wishlist
+          &lt;/a&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/nav&gt;
+    &lt;div class=&quot;<span class="hljs-string">container</span>&quot;&gt;
+      &lt;div id=&quot;<span class="hljs-string">sidebar</span>&quot; class=&quot;<span class="hljs-string">col-md-3</span>&quot;&gt;
+        %= content &#39;<span class="hljs-string">sidebar</span>&#39;
+      &lt;/div&gt;
+      &lt;div id=&quot;<span class="hljs-string">main</span>&quot; class=&quot;<span class="hljs-string">col-md-9</span>&quot;&gt;
+        %= content
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    %= content &#39;<span class="hljs-string">footer</span>&#39;
+    %= content &#39;<span class="hljs-string">end</span>&#39;
+  &lt;/body&gt;
+&lt;/html&gt;
+
+
+</code></pre>
+
+<p><small>templates/layouts/default.html.ep</small></p>
+
+<p>Here you can see that I include the <a href="https://getbootstrap.com/docs/3.3">Boostrap</a>.
+You can also see a few bits of templating.
+The first is that I use a <code>&lt;title&gt;</code> tag with the content <code>&lt;%= title %&gt;</code>.
+This is a shortcut helper to get the value of the <a href="http://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#title"><code>title</code> key of the stash</a>.
+Well shall see in a moment how this value gets set.</p>
+
+<p>The remaining template portions are each getting the contents of named content buffers.
+While I establish five such inclusions, I will only actually use three: <code>head</code>, <code>sidebar</code> and the default unnamed buffer.</p>
+
+<p>With the possible exception of <code>sidebar</code>, buffers like these are useful in almost all application layouts.
+The <code>head</code> and <code>end</code> buffers let you add contents to those locations, especially useful to include extra stylesheets and javascript respectively.
+The <code>footer</code> buffer would allow additions to be placed at the end of the body but before any javascript inclusions.</p>
+
+<p>It is interesting to note that if we rendered this template directly, those buffers would all be empty.
+Therefore the content put into them must come from someplace else.</p>
+
+<h2>A Primary Template</h2>
+
+<p>I mentioned before the the layout was like a container that would hold some inner content.
+Let&#39;s consider the simplest such case.</p>
+
+<p>When a user first accesses the site, the will be greeted with a login page.</p>
+
+<p><img alt="Screen shot of the login page" src="login.png"></p>
+
+<pre><code class="hljs">% title &#39;<span class="hljs-string">Welcome to the Wishlist!</span>&#39;;
+% layout &#39;<span class="hljs-string">default</span>&#39;;
+
+&lt;h2&gt;&lt;%= title %&gt;&lt;/h2&gt;
+
+%= form_for &#39;<span class="hljs-string">login</span>&#39; =&gt; (method =&gt; &#39;<span class="hljs-string">POST</span>&#39;, class =&gt; &#39;<span class="hljs-string">form-inline</span>&#39;) =&gt; <span class="hljs-keyword">begin</span>
+  &lt;div class=&quot;<span class="hljs-string">form-group</span>&quot;&gt;
+    &lt;label&gt;Please <span class="hljs-function">tell</span> us your name to get started&lt;/label&gt;
+    &lt;input name=&quot;<span class="hljs-string">name</span>&quot; class=&quot;<span class="hljs-string">form-control</span>&quot;&gt;
+  &lt;/div&gt;
+% <span class="hljs-keyword">end</span>
+
+
+</code></pre>
+
+<p><small>templates/login.html.ep</small></p>
+
+<p>Immediately you can see that there are a few statements at the top.
+These set the layout to our default one above and set the title key for the page.
+It is important to realize that this page is rendered <strong>first</strong> before any layout is rendered.</p>
+
+<p>After the template renders, Mojolicious will notice that a layout key was set and as a result it will render the layout with the result of the primary template rendering available as the default content buffer.
+As we saw before, that content will be placed inside the <code>#main</code> section of the page.
+However, in the process of rendering the primary template, the title was also set.
+Since the layout is rendered afterwards, this value is now available to set the <code>&lt;title&gt;</code> tag at the top of the page.</p>
+
+<p>While this may seem obvious, it is actually quite remarkable.
+If the page had been rendered all in order, the value would not have been set in time to be used there at the top of the page.
+Knowing the rendering order is therefore very important to understanding the rendering process.</p>
+
+<h2>The Application</h2>
+
+<p>I&#39;ve gone about as far as is practical without showing you, dear reader, what the actual application script looks like.</p>
+
+<pre><code class="hljs"><span class="hljs-keyword">use</span> <span class="hljs-function">Mojolicious::Lite</span>;
+
+<span class="hljs-keyword">use</span> <span class="hljs-function">DBM::Deep</span>;
+<span class="hljs-keyword">use</span> LinkEmbedder;
+
+helper <span class="hljs-function">link</span> =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  state <span class="hljs-type">$le</span> = LinkEmbedder-&gt;new;
+  <span class="hljs-keyword">return</span> <span class="hljs-type">$le</span>-&gt;<span class="hljs-type">get</span>(<span class="hljs-type">@_</span>);
+};
+
+helper users =&gt; <span class="hljs-keyword">sub </span>{
+  state <span class="hljs-type">$db</span> = <span class="hljs-function">DBM::Deep</span>-&gt;new(&#39;<span class="hljs-string">wishlist.db</span>&#39;);
+};
+
+helper user =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> (<span class="hljs-type">$c</span>, <span class="hljs-type">$name</span>) = <span class="hljs-type">@_</span>;
+  <span class="hljs-type">$name</span> ||= <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">stash</span>-&gt;{name} || <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">session</span>-&gt;{name};
+  <span class="hljs-keyword">return</span> {} <span class="hljs-keyword">unless</span> <span class="hljs-type">$name</span>;
+  <span class="hljs-keyword">return</span> <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">users</span>-&gt;{<span class="hljs-type">$name</span>} ||= {
+    name =&gt; <span class="hljs-type">$name</span>,
+    items =&gt; {},
+  };
+};
+
+get &#39;<span class="hljs-string">/</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$template</span> = <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">session</span>-&gt;{name} ? &#39;<span class="hljs-string">list</span>&#39; : &#39;<span class="hljs-string">login</span>&#39;;
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">render</span>(<span class="hljs-type">$template</span>);
+};
+
+get &#39;<span class="hljs-string">/list/:name</span>&#39; =&gt; &#39;<span class="hljs-string">list</span>&#39;;
+
+get &#39;<span class="hljs-string">/add</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$link</span> = <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">link</span>(<span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">url</span>&#39;));
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">render</span>(&#39;<span class="hljs-string">add</span>&#39;, <span class="hljs-function">link</span> =&gt; <span class="hljs-type">$link</span>);
+};
+
+post &#39;<span class="hljs-string">/add</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$title</span> = <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">title</span>&#39;);
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">user</span>-&gt;{items}{<span class="hljs-type">$title</span>} = {
+    title =&gt; <span class="hljs-type">$title</span>,
+    url =&gt; <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">url</span>&#39;),
+    purchased =&gt; 0,
+  };
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">redirect_to</span>(&#39;<span class="hljs-string">/</span>&#39;);
+};
+
+post &#39;<span class="hljs-string">/update</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$user</span> = <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">user</span>(<span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">user</span>&#39;));
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$item</span> = <span class="hljs-type">$user</span>-&gt;{items}{<span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">title</span>&#39;)};
+  <span class="hljs-type">$item</span>-&gt;{purchased} = <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">purchased</span>&#39;);
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">redirect_to</span>(&#39;<span class="hljs-string">list</span>&#39;, name =&gt; <span class="hljs-type">$user</span>-&gt;{name});
+};
+
+post &#39;<span class="hljs-string">/remove</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  <span class="hljs-function">delete</span> <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">user</span>-&gt;{items}{<span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">title</span>&#39;)};
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">redirect_to</span>(&#39;<span class="hljs-string">/</span>&#39;);
+};
+
+post &#39;<span class="hljs-string">/login</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  <span class="hljs-keyword">if</span> (<span class="hljs-keyword">my</span> <span class="hljs-type">$name</span> = <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">param</span>(&#39;<span class="hljs-string">name</span>&#39;)) {
+    <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">session</span>-&gt;{name} = <span class="hljs-type">$name</span>;
+  }
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">redirect_to</span>(&#39;<span class="hljs-string">/</span>&#39;);
+};
+
+any &#39;<span class="hljs-string">/logout</span>&#39; =&gt; <span class="hljs-keyword">sub </span>{
+  <span class="hljs-keyword">my</span> <span class="hljs-type">$c</span> = <span class="hljs-function">shift</span>;
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">session</span>(expires =&gt; <span class="hljs-number">1</span>);
+  <span class="hljs-type">$c</span>-&gt;<span class="hljs-type">redirect_to</span>(&#39;<span class="hljs-string">/</span>&#39;);
+};
+
+app-&gt;start;
+
+</code></pre>
+
+<p><small>wishlist.pl</small></p>
+
+<h3>Helpers</h3>
+
+<p>I won&#39;t go into great detail today as much of the model logic will be replaced in tomorrow&#39;s article.
+Still, in broad strokes, we define a persistent hash structure, the keys of which are users and the values are hashes of information.</p>
+
+<p>Once you login, your name is stored in the <a href="http://mojolicious.org/perldoc/Mojolicious/Controller#session"><code>session</code></a> and in this hash.
+While I haven&#39;t followed the <a href="https://mojolicious.io/blog/2017/12/16/day-16-the-secret-life-of-sessions/">best practices for sessions from yesterday</a>, you certainly could and should if this data mattered to you.
+But also, no authentication is attempted, this is a personal wishlist app, hopefully none of your friends are going to play the Grinch on you!</p>
+
+<p>The <code>user</code> helper is especially clever.
+You can pass it a name for lookup, if that isn&#39;t provided then a name is looked for in the stash and the session in turn.
+In this way you are looking up a specific user, the user being referenced by the page, or the logged in user.</p>
+
+<p>There is also a helper that uses <a href="https://metacpan.org/pod/LinkEmbedder">LinkEmbedder</a> to look up information about a link and return it.
+That is used when a user pastes a url that they want to add to their list.
+LinkEmbedder will fetch that page and scrape it for metadata using several open protocols and falling back onto heuristics if possible.
+It will then return the information and an short HTML representation of that resource.</p>
+
+<h3>Routes</h3>
+
+<p>The routes are mostly self explanatory, even if their code is not.
+The <code>/login</code> and <code>/logout</code> handlers, for example.</p>
+
+<p>There are two routes for <code>/add</code> a <code>GET</code> and a <code>POST</code>.
+<code>GET</code> requests are safe and will not change data, in this case the request triggers LinkEmbedder to fetch the information which is then displayed.</p>
+
+<h4>Adding Items</h4>
+
+<p><img alt="Screen shot of the add items page" src="add.png"></p>
+
+<pre><code class="hljs">% title &#39;<span class="hljs-string">Add an item</span>&#39;;
+% layout &#39;<span class="hljs-string">default</span>&#39;;
+
+% content_for &#39;<span class="hljs-string">head</span>&#39; =&gt; <span class="hljs-keyword">begin</span>
+  &lt;style&gt;
+    <span class="hljs-comment">#item-detail img {</span><span class="hljs-comment">
+</span>      max-width: 40%;
+      float: left;
+      margin: <span class="hljs-number">20</span>px;
+    }
+  &lt;/style&gt;
+% <span class="hljs-keyword">end</span>
+
+% content_for &#39;<span class="hljs-string">sidebar</span>&#39; =&gt; <span class="hljs-keyword">begin</span>
+  &lt;div class=&quot;<span class="hljs-string">panel panel-default</span>&quot;&gt;
+    &lt;div class=&quot;<span class="hljs-string">panel-heading</span>&quot;&gt;
+      Add this item to your list?
+    &lt;/div&gt;
+    &lt;div class=&quot;<span class="hljs-string">panel-body</span>&quot;&gt;
+      %= form_for &#39;<span class="hljs-string">add</span>&#39; =&gt; (method =&gt; &#39;<span class="hljs-string">POST</span>&#39;) =&gt; <span class="hljs-keyword">begin</span>
+        %= hidden_field title =&gt; <span class="hljs-type">$link</span>-&gt;<span class="hljs-type">title</span><span class="hljs-type">
+</span>        %= hidden_field url =&gt; <span class="hljs-type">$link</span>-&gt;<span class="hljs-type">url</span><span class="hljs-type">
+</span>        &lt;input type=&quot;<span class="hljs-string">submit</span>&quot; value=&quot;<span class="hljs-string">Yes</span>&quot; class=&quot;<span class="hljs-string">btn btn-default</span>&quot;&gt;
+        %= link_to &#39;<span class="hljs-string">No</span>&#39; =&gt; &#39;<span class="hljs-string">/</span>&#39;, (class =&gt; &#39;<span class="hljs-string">btn btn-default</span>&#39;)
+      % <span class="hljs-keyword">end</span>
+    &lt;/div&gt;
+  &lt;/div&gt;
+  %= include &#39;<span class="hljs-string">partial/log_out</span>&#39;
+% <span class="hljs-keyword">end</span>
+
+&lt;div class=&quot;<span class="hljs-string">panel panel-default</span>&quot;&gt;
+  &lt;div id=&quot;<span class="hljs-string">item-detail</span>&quot; class=&quot;<span class="hljs-string">panel-body</span>&quot;&gt;
+    &lt;%== <span class="hljs-type">$link</span>-&gt;<span class="hljs-type">html</span> %&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+</code></pre>
+
+<p><small>templates/add.html.ep</small></p>
+
+<p>Beyond being interesting to see how the link is used to embed HTML into the page, we also see our first uses of named content buffers via <a href="http://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#content_for"><code>content_for</code></a>.
+These add styling that is specific to the page into the <code>&lt;head&gt;</code> tag and inject a panel into the sidebar.
+Once this page renders, again before the layout is rendered, the content of that section is available in the <code>sidebar</code> buffer.</p>
+
+<p>The result is a tiny form that contains the data to be stored if the user wants to add it to their wishlist.
+Because the resulting main page might be quite large, and I want the user to have easy access to decide if they want to add the item, I&#39;ve placed it in the left hand column.
+Perhaps this is bad UX, but for educational purposes, it shows how these buffers can be used.</p>
+
+<p>We also see our first example of <a href="http://mojolicious.org/perldoc/Mojolicious/Plugin/DefaultHelpers#include"><code>include</code></a>.
+When called, the renderer immediately renders the template specified and returns the result.</p>
+
+<pre><code class="hljs">&lt;div class=&quot;<span class="hljs-string">panel panel-default</span>&quot;&gt;
+  &lt;div class=&quot;<span class="hljs-string">panel-body</span>&quot;&gt;
+    &lt;ul class=&quot;<span class="hljs-string">nav nav-pills nav-stacked</span>&quot;&gt;
+      %= t li =&gt; link_to &#39;<span class="hljs-string">Log Out</span>&#39; =&gt; &#39;<span class="hljs-string">logout</span>&#39;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+</code></pre>
+
+<p><small>templates/partial/log_out.html.ep</small></p>
+
+<p>While our application doesn&#39;t do so, calls to <code>include</code> can take arguments that they see in the stash.
+They can also add content to named content buffers, just like the primary template can.
+All our logout &quot;partial&quot; template does is generate a nicely formatted link to the log out route.
+The name partial indicates that, like layout, this template is not intended to be rendered on its own.
+The utility of making this its own template is that many pages can use that same partial to render that same log out link.</p>
+
+<h4>The List</h4>
+
+<p>There are two routes that might render a wishlist.
+The <code>/</code> route either allows the user to log in or if they are, displays their list.
+There is a also a <code>/list/:name</code> route that renders any user&#39;s list by name.</p>
+
+<p><img alt="Screen shot of the list page" src="list.png"></p>
+
+<pre><code class="hljs">% title user-&gt;{name} . &quot;<span class="hljs-string">&#39;s List</span>&quot;;
+% layout &#39;<span class="hljs-string">default</span>&#39;;
+
+% content_for &#39;<span class="hljs-string">sidebar</span>&#39; =&gt; <span class="hljs-keyword">begin</span>
+  %= include &#39;<span class="hljs-string">partial/user_list</span>&#39;
+  %= include &#39;<span class="hljs-string">partial/add_url</span>&#39;
+  %= include &#39;<span class="hljs-string">partial/log_out</span>&#39;
+% <span class="hljs-keyword">end</span>
+
+&lt;h2&gt;&lt;%= title %&gt;&lt;/h2&gt;
+
+&lt;table class=&quot;<span class="hljs-string">table</span>&quot;&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Title&lt;/td&gt;
+      &lt;td&gt;<span class="hljs-function">Link</span>&lt;/td&gt;
+      &lt;td&gt;Action&lt;/td&gt;
+    &lt;/td&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+  % <span class="hljs-keyword">for</span> <span class="hljs-keyword">my</span> <span class="hljs-type">$key</span> (<span class="hljs-function">sort</span> <span class="hljs-function">keys</span> <span class="hljs-type">%</span>{ user-&gt;{items} }) {
+    % <span class="hljs-keyword">my</span> <span class="hljs-type">$item</span> = user-&gt;{items}{<span class="hljs-type">$key</span>};
+    &lt;tr&gt;
+      %= t td =&gt; <span class="hljs-type">$item</span>-&gt;{title}
+      %= t td =&gt; link_to <span class="hljs-type">$item</span>-&gt;{url} =&gt; <span class="hljs-type">$item</span>-&gt;{url}
+      % <span class="hljs-keyword">if</span> (session-&gt;{name} eq user-&gt;{name}) {
+        %= t td =&gt; form_for &#39;<span class="hljs-string">remove</span>&#39; =&gt; <span class="hljs-keyword">begin</span>
+          %= hidden_field title =&gt; <span class="hljs-type">$key</span><span class="hljs-type">
+</span>          &lt;input type=&quot;<span class="hljs-string">submit</span>&quot; value=&quot;<span class="hljs-string">Remove</span>&quot; class=&quot;<span class="hljs-string">btn btn-default</span>&quot;&gt;
+        % <span class="hljs-keyword">end</span>
+      % } <span class="hljs-keyword">else</span> {
+        %= t td =&gt; form_for &#39;<span class="hljs-string">update</span>&#39; =&gt; <span class="hljs-keyword">begin</span>
+          %= hidden_field user  =&gt; user-&gt;{name}
+          %= hidden_field title =&gt; <span class="hljs-type">$key</span><span class="hljs-type">
+</span>          % <span class="hljs-keyword">if</span> (<span class="hljs-type">$item</span>-&gt;{purchased}) {
+            %= hidden_field purchased =&gt; 0
+            &lt;input type=&quot;<span class="hljs-string">submit</span>&quot; value=&quot;<span class="hljs-string">Mark Not Purchased</span>&quot; class=&quot;<span class="hljs-string">btn btn-default</span>&quot;&gt;
+          % } <span class="hljs-keyword">else</span> {
+            %= hidden_field purchased =&gt; <span class="hljs-number">1</span>
+            &lt;input type=&quot;<span class="hljs-string">submit</span>&quot; value=&quot;<span class="hljs-string">Mark Purchased</span>&quot; class=&quot;<span class="hljs-string">btn btn-default</span>&quot;&gt;
+          % }
+        % <span class="hljs-keyword">end</span>
+      % }
+    &lt;/tr&gt;
+  % }
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+
+</code></pre>
+
+<p><small>templates/list.html.ep</small></p>
+
+<p>The template itself is the most complex in the application.
+It includes three partial templates and places all of their content into the <code>sidebar</code> buffer.
+It then looks up the user by virtue of that clever <code>user</code> helper and loops over their items.</p>
+
+<p>The items are placed into a table, displaying the title and link to the item.
+The third column&#39;s contents depends if the list is being shown is the user&#39;s own page or not.</p>
+
+<p>If not, they are likely considering buying one of these gifts for their friend or family member.
+They are given the option to mark an item as purchased or not.
+This is done by calling the <code>/update</code> method, the result of which will change the item&#39;s status and re-render the page.o</p>
+
+<p>If it is their own page, they don&#39;t want to have the surprise spoiled see that someone has bought their present.
+So we don&#39;t show the purchase state.
+However perhaps they have changed their mind and no longer want that item.
+In that case, they are presented with a remove button which calls to the <code>/remove</code> route.</p>
+
+<p>Finally let&#39;s look at those last two partials.
+There is a sidebar list of the users, so you can see everyone&#39;s list.</p>
+
+<pre><code class="hljs">&lt;div class=&quot;<span class="hljs-string">panel panel-default</span>&quot;&gt;
+  &lt;div class=&quot;<span class="hljs-string">panel-heading</span>&quot;&gt;
+    Users&#39;<span class="hljs-string"> Lists</span><span class="hljs-string">
+</span><span class="hljs-string">  &lt;/div&gt;</span><span class="hljs-string">
+</span><span class="hljs-string">  &lt;div class=&quot;panel-body&quot;&gt;</span><span class="hljs-string">
+</span><span class="hljs-string">    &lt;ul class=&quot;nav nav-pills nav-stacked&quot;&gt;</span><span class="hljs-string">
+</span><span class="hljs-string">      % for my $name (sort keys %{ users() }) {</span><span class="hljs-string">
+</span><span class="hljs-string">        %= t li =&gt; link_to $name =&gt; list =&gt; {name =&gt; $name}</span><span class="hljs-string">
+</span><span class="hljs-string">      % }</span><span class="hljs-string">
+</span><span class="hljs-string">    &lt;/ul&gt;</span><span class="hljs-string">
+</span><span class="hljs-string">  &lt;/div&gt;</span><span class="hljs-string">
+</span><span class="hljs-string">&lt;/div&gt;</span><span class="hljs-string">
+</span><span class="hljs-string">
+</span></code></pre>
+
+<p><small>templates/partial/user_list.html.ep</small></p>
+
+<p>And an input box that allows the user to submit a link to add to their wishlist.</p>
+
+<pre><code class="hljs">&lt;div class=&quot;<span class="hljs-string">panel panel-default</span>&quot;&gt;
+  &lt;div class=&quot;<span class="hljs-string">panel-heading</span>&quot;&gt;
+    Add Item by URL
+  &lt;/div&gt;
+  &lt;div class=&quot;<span class="hljs-string">panel-body</span>&quot;&gt;
+    %= form_for &#39;<span class="hljs-string">add</span>&#39; =&gt; <span class="hljs-keyword">begin</span>
+      &lt;input name=&quot;<span class="hljs-string">url</span>&quot; class=&quot;<span class="hljs-string">form-control</span>&quot;&gt;
+    % <span class="hljs-keyword">end</span>
+  &lt;/div&gt;
+&lt;/div&gt;
+
+</code></pre>
+
+<p><small>templates/partial/add_url.html.ep</small></p>
+
+<p>This form calls back to the add template we saw earlier.</p>
+
+<h2>Moving On</h2>
+
+<p>As I said before, I&#39;m looking forward to making a more complete application with proper storage for tomorrow.
+That said, the code shown today already works and is quite useful, even for as small as it is!</p>
+
+              </section>
+              <small><p><a href="https://pxhere.com/en/photo/1056078">Image</a> in the Public Domain.</p>
+</small>
+
+              <p class="tags">
+                <span>Tagged in </span>:
+                  <a href="/blog/tag/advent/">advent</a>,
+                  <a href="/blog/tag/rendering/">rendering</a>,
+                  <a href="/blog/tag/templates/">templates</a>,
+                  <a href="/blog/tag/example/">example</a>,
+                  <a href="/blog/tag/wishlist/">wishlist</a>
+              </p>
+
+
+                  <div class="bio cf">
+
+                      <div class="gravatar">
+                        <img alt="author image" src="https://secure.gravatar.com/avatar/cc767569f5863a7c261991ee5b23f147">
+                      </div>
+                      <div class="about">
+                        <h5>Joel Berger</h5>
+                        <p>Joel has Ph.D. in Physics from the University of Illinois at Chicago.
+He an avid Perl user and <a href="https://metacpan.org/author/JBERGER">author</a> and is a member of the Mojolicious Core Team.</p>
+
+                      </div>
+
+                  </div>
+
+              <ul class="post-nav cf">
+                  <li class="prev"><a href="/blog/2017/12/16/day-16-the-secret-life-of-sessions/index.html" rel="prev"><strong>Previous Article</strong> Day 16: The Secret Life of Sessions</a></li>
+                  <li class="next"><a href="/blog/2017/12/18/day-18-the-wishlist-model/index.html" rel="next"><strong>Next Article</strong> Day 18: The Wishlist Model </a></li>
+              </ul>
+
+            </div>
+
+        </article>
+
+
+      </div>
+
+      <div class="four columns end" id="secondary">
+        <aside id="sidebar">
+          
+
+
+
+
+
+
+
+<div class="widget widget_tag_cloud">
+  <h5 class="widget-title">Tags</h5>
+  <div class="tagcloud cf">
+    <a href="/blog/tag/administration/">administration</a>
+    <a href="/blog/tag/advent/">advent</a>
+    <a href="/blog/tag/angular/">Angular</a>
+    <a href="/blog/tag/api/">api</a>
+    <a href="/blog/tag/app/">app</a>
+    <a href="/blog/tag/authentication/">authentication</a>
+    <a href="/blog/tag/caching/">caching</a>
+    <a href="/blog/tag/carton/">carton</a>
+    <a href="/blog/tag/command/">command</a>
+    <a href="/blog/tag/css/">css</a>
+    <a href="/blog/tag/dancer/">dancer</a>
+    <a href="/blog/tag/debugging/">debugging</a>
+    <a href="/blog/tag/deployment/">deployment</a>
+    <a href="/blog/tag/development/">development</a>
+    <a href="/blog/tag/documentation/">documentation</a>
+    <a href="/blog/tag/example/">example</a>
+    <a href="/blog/tag/fluent/">fluent</a>
+    <a href="/blog/tag/full/">full</a>
+    <a href="/blog/tag/graphql/">graphql</a>
+    <a href="/blog/tag/growing/">growing</a>
+    <a href="/blog/tag/headers/">headers</a>
+    <a href="/blog/tag/hello-world/">hello world</a>
+    <a href="/blog/tag/html/">html</a>
+    <a href="/blog/tag/installing/">installing</a>
+    <a href="/blog/tag/javascript/">JavaScript</a>
+    <a href="/blog/tag/ldap/">LDAP</a>
+    <a href="/blog/tag/lite/">lite</a>
+    <a href="/blog/tag/minion/">minion</a>
+    <a href="/blog/tag/mocking/">mocking</a>
+    <a href="/blog/tag/model/">model</a>
+    <a href="/blog/tag/mojoconf/">mojoconf</a>
+    <a href="/blog/tag/non-blocking/">non-blocking</a>
+    <a href="/blog/tag/non-web/">non-web</a>
+    <a href="/blog/tag/openapi/">openapi</a>
+    <a href="/blog/tag/promises/">promises</a>
+    <a href="/blog/tag/psgi/">psgi</a>
+    <a href="/blog/tag/rendering/">rendering</a>
+    <a href="/blog/tag/rest/">rest</a>
+    <a href="/blog/tag/roles/">roles</a>
+    <a href="/blog/tag/routing/">routing</a>
+    <a href="/blog/tag/session/">session</a>
+    <a href="/blog/tag/swagger/">swagger</a>
+    <a href="/blog/tag/templates/">templates</a>
+    <a href="/blog/tag/testing/">testing</a>
+    <a href="/blog/tag/theme/">theme</a>
+    <a href="/blog/tag/useragent/">useragent</a>
+    <a href="/blog/tag/wishlist/">wishlist</a>
+    <a href="/blog/tag/xml/">xml</a>
+    <a href="/blog/tag/yancy/">yancy</a>
+  </div>
+</div>
+
+
+
+        </aside>
+      </div>
+
+   </div>
+
+</div>
+
+
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="footer-nav">
+                <li><a href="/blog">Blog.</a></li>
+                <li><a href="/">Advent Calendar.</a></li>
+                <li><a href="https://mojolicious.org">mojolicious.org.</a></li>
+            </ul>
+
+            <ul class="footer-social">
+               <li><a href="https://github.com/mojolicious/mojo"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://twitter.com/search?q=%23mojolicious"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="/blog/index.rss"><i class="fa fa-rss"></i></a></li>
+            </ul>
+
+            <ul class="copyright">
+                 <li>Copyright Â© 2017 Joel Berger</li>
+                <li><a href="https://github.com/MojoliciousDotIO/mojolicious.io">Contribute to this site on Github</a></li>
+               <li>Design by <a href="http://www.styleshout.com/">Styleshout</a></li>
+               <li>Made with <a href="http://preaction.me/statocles">Statocles</a></li>
+               <li>Powered by <a href="http://www.perl.org">Perl</a></li>
+            </ul>
+
+         </div>
+
+         <div id="go-top" style="display: block;"><a href="#" title="Back to Top">Go To Top</a></div>
+
+      </div>
+
+   </footer>
+
+   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="/theme/js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script src="/theme/js/jquery-migrate-1.2.1.min.js" type="text/javascript"></script>
+
+   <script src="/theme/js/jquery.flexslider.js"></script>
+   <script src="/theme/js/doubletaptogo.js"></script>
+   <script src="/theme/js/init.js"></script>
+
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/perl.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/xml.min.js"></script>
+      <script>
+        hljs.configure({"languages":["perl","bash","yaml","xml"]});
+        hljs.initHighlightingOnLoad();
+      </script>
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-110569629-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+
+</body>
+
+</html>

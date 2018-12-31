@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::timeofday::str_hms;
 
 our $DATE = '2018-12-16'; # DATE
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,18 +26,18 @@ sub coerce {
 
     $res->{expr_match} = join(
         " && ",
-        "$dt =~ /\\A([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]{1,9})?\\z/",
+        "$dt =~ /\\A([0-9]{1,2}):([0-9]{1,2})(?::([0-9]{1,2})(\.[0-9]{1,9})?)?\\z/",
     );
 
-    my $code_check = qq(if (\$1 > 23) { ["Invalid hour '\$1', must be between 0-23"] } elsif (\$2 > 59) { ["Invalid minute '\$2', must be between 0-59"] } elsif (\$3 > 59) { ["Invalid second '\$3', must be between 0-59"] });
+    my $code_check = qq(if (\$1 > 23) { ["Invalid hour '\$1', must be between 0-23"] } elsif (\$2 > 59) { ["Invalid minute '\$2', must be between 0-59"] } elsif (defined \$3 && \$3 > 59) { ["Invalid second '\$3', must be between 0-59"] });
 
     if ($coerce_to eq 'float') {
-        $res->{expr_coerce} = qq(do { $code_check else { [undef, \$1*3600 + \$2*60 + \$3 + (defined \$4 ? \$4 : 0)] } });
+        $res->{expr_coerce} = qq(do { $code_check else { [undef, \$1*3600 + \$2*60 + (defined \$3 ? \$3 : 0) + (defined \$4 ? \$4 : 0)] } });
     } elsif ($coerce_to eq 'str_hms') {
-        $res->{expr_coerce} = qq(do { $code_check else { [undef, $dt] } });
+        $res->{expr_coerce} = qq(do { $code_check else { [undef, defined(\$4) && \$4 > 0 ? sprintf("%02d:%02d:%s%.11g", \$1, \$2, (!defined(\$3) || \$3 < 10 ? "0":""), (defined \$3 ? \$3:0)+\$4) : sprintf("%02d:%02d:%02d", \$1, \$2, (defined \$3 ? \$3 : 0))] } });
     } elsif ($coerce_to eq 'Date::TimeOfDay') {
         $res->{modules}{"Date::TimeOfDay"} //= 0.002;
-        $res->{expr_coerce} = qq([undef, Date::TimeOfDay->new(hour=>\$1, minute=>\$2, second=>\$3, nanosecond=>(defined \$4 ? \$4*1e9 : 0))]);
+        $res->{expr_coerce} = qq([undef, Date::TimeOfDay->new(hour=>\$1, minute=>\$2, second=>(defined \$3 ? \$3 : 0), nanosecond=>(defined \$4 ? \$4*1e9 : 0))]);
     } else {
         die "BUG: Unknown coerce_to value '$coerce_to', ".
             "please use float, str_hms, or Date::TimeOfDay";
@@ -61,7 +61,7 @@ Data::Sah::Coerce::perl::timeofday::str_hms - Coerce timeofday from string in th
 
 =head1 VERSION
 
-This document describes version 0.030 of Data::Sah::Coerce::perl::timeofday::str_hms (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
+This document describes version 0.031 of Data::Sah::Coerce::perl::timeofday::str_hms (from Perl distribution Data-Sah-Coerce), released on 2018-12-16.
 
 =head1 DESCRIPTION
 

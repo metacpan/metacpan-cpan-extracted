@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+<title> What's next for Dancer? (looking into the future) | PerlDancer Advent Calendar</title>
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="alternate" type="application/rss+xml" title="All Articles " href="/feed/2018" /> 
+
+
+<!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">/* <![CDATA[ */
+    !window.jQuery && document.write('<script src="/javascripts/jquery.js"><\/script>')
+/* ]]> */</script>
+
+<!-- Prettyfy -->
+<link href="/css/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="/javascripts/prettify.js"></script>
+
+</head>
+<body onload="prettyPrint()">
+<div id="page">
+
+<div id="sidebar">
+<a href="/" class="homelink">Dancer Advent Calendar</a><br />
+
+<p>
+The PerlDancer Advent Calendar is a community-driven project that aims 
+to showcase the Dancer Perl web framework.
+</p>
+
+<p>
+Each day of December until Christmas, one article about Dancer. Stay tuned for new moves!
+</p>
+
+<ul id="sidebar-items">
+<li>
+    <h3>About Dancer</h3>
+    <ul class="links">
+        <li><a href="http://www.perldancer.org/">Dancer homepage</a></li>
+        <li><a href="http://twitter.com/PerlDancer">Official Twitter</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer">Dancer on GitHub</a></li>
+        <li><a href="http://github.com/PerlDancer/Dancer2">Dancer 2 on GitHub</a></li>
+        <li><a class="feed" href="/feed/2018">RSS</a></li>
+    </ul>
+</li>
+</ul>
+</div>
+
+
+<div id="content">
+<div class="pod-document"><h1><a name="what_s_next_for_dancer__looking_into_the_future_"></a>What's next for Dancer? (looking into the future)</h1>
+
+<p>It's been a busy year, and we got a lot to be happy about. But there is always more work to
+be done, and always more improvements to be made.</p>
+<p>This list is by no means exhaustive, but it should give you a little glimpse for some of the 
+things we have in store for 2019:</p>
+<ul>
+<li><a name="item_New_Documentation"></a><b>New Documentation</b>
+<p>You asked for it, and I made reference to it on day 1, all new documentation is coming in
+2019. While many of you love the docs, a lot of you don't, and thanks to your comments in last
+year's survey, we think we have a good understanding of why.</p>
+<p>The new documentation branch is well underway, and addresses the shortcomings of the existing 
+documentation by explaining important concepts in a clear and simple way. You'll have a better
+understanding of how and why Dancer2 does the things it does.</p>
+<p>New users will get some grounding in web development techniques, too. There's a lot of great
+changes for everyone!</p>
+</li>
+<li><a name="item_New_Website"></a><b>New Website</b>
+<p>There's a lot of great information on the Dancer website, but it's looking tired. There's a 
+lot of new information to be added, and with a fresh coat of paint, Dancer's website will be as
+great as the software powering it.</p>
+</li>
+<li><a name="item_More_configuration_options"></a><b>More configuration options</b>
+<p>Configuration in Dancer2 leaves a lot to be desired (and I'll admit that I am a big part of 
+the reason for why that is). Look for an overhaul of the configuration system in 2019, which
+starts with a barebones configuration system and allows for pluggable configuration engines
+(much like loggers and sessions in Dancer2). Since we are dedicated to not breaking working 
+code, all of the existing configuration logic would be packaged as a plugin and enabled
+out of the box.</p>
+</li>
+<li><a name="item_Inline_parameter_type_checking"></a><b>Inline parameter type checking</b>
+<p>Very similar in many ways to Sawyer's <a href="https://metacpan.org/pod/Dancer2::Plugin::ParamTypes">Dancer2::Plugin::ParamTypes</a>
+plugin, but provided as core functionality. SysPete is actively developing a way to provide
+(optional) type checking of parameters within the core of Dancer2.</p>
+<p>In case you haven't read <a href="http://advent.perldancer.org/2018/22">Sawyer's article</a> 
+about type checking parameters passed to your Dancer applications, I highly recommend 
+it. It will change the way you do data validation.</p>
+</li>
+<li><a name="item_Continued_support_for_Dancer__1_"></a><b>Continued support for Dancer (1)</b>
+<p>While most all of our effort is spent on Dancer2 these days, there are no plans to sunset
+Dancer (1) as of now. Many of the core developers are still actively maintaining applications
+written in Dancer, as is much of our community.</p>
+<p>It is still our hope, however, that with an easy migration path from Dancer to Dancer2 that more
+of you will make the switch in 2019.</p>
+</li>
+</ul>
+<h2><a name="happy_holidays_"></a>Happy Holidays!</h2>
+
+<p>We hope all of you have a safe and happy holiday season, and we look forward to a great 2019! 
+Until then, keep on Dancing!</p>
+<h2><a name="author"></a>Author</h2>
+
+<p>This article has been written by Jason Crome (CromeDome) for the Perl Dancer 
+Advent Calendar 2018.</p>
+<h2><a name="copyright"></a>Copyright</h2>
+
+<p>No copyright retained. Enjoy.</p>
+<p>Jason A. Crome</p>
+</div>
+
+ <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'danceradvent'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+
+
+</div>
+
+
+
+<div id="footer">
+Powered by the  
+<a href="http://perldancer.org/" title="Perl Dancer - Perl web framework">
+Dancer Perl web framework</a>
+</div>
+</div>
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-25174467-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>

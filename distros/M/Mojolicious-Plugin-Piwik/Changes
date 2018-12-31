@@ -1,3 +1,6 @@
+0.26 2018-12-31
+        - Fixed Mojo dependency.
+
 0.25 2018-12-28
         - Added "piwik.api_p" method.
         - Make it possible to override dnt.

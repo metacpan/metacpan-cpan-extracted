@@ -25,7 +25,7 @@ use vars
     qw/$VERSION %FUNCS %GLOBALS %MIBS %MUNGE $AUTOLOAD $INIT $DEBUG %SPEED_MAP
     $NOSUCH $BIGINT $REPEATERS/;
 
-$VERSION = '3.63';
+$VERSION = '3.64';
 
 =head1 NAME
 
@@ -33,14 +33,14 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.63
+SNMP::Info - Version 3.64
 
 =head1 AUTHOR
 
 SNMP::Info is maintained by team of Open Source authors headed by Eric Miller,
 Bill Fenner, Max Baker, Jeroen van Ingen and Oliver Gorwits.
 
-Please visit L<http://sourceforge.net/projects/snmp-info/> for most up-to-date
+Please visit L<https://github.com/netdisco/snmp-info/> for the most up-to-date
 list of developers.
 
 SNMP::Info was originally created at UCSC for the Netdisco project L<http://netdisco.org>
@@ -171,7 +171,7 @@ install by hand.
 SNMP::Info operates on textual descriptors found in MIBs.
 
 If you are using SNMP::Info separate from Netdisco,
-download the Netdisco MIB package at L<http://sourceforge.net/projects/netdisco/files/netdisco-mibs/latest-snapshot/>
+download the Netdisco MIB package at L<https://github.com/netdisco/netdisco-mibs/releases/latest/>
 
 Make sure that your snmp.conf is updated to point to your MIB directory
 and that the MIBs are world-readable.
@@ -209,9 +209,9 @@ subroutine.
 
 See the section EXTENDING SNMP::INFO for more details.
 
-When you make a new subclass for a device, please be sure to send it back to
-the developers (via Source Forge or the mailing list) for inclusion in the
-next version.
+When you make a new subclass for a device, please be sure to send it back
+to the developers (via a github pull request or the mailing list) for inclusion
+in the next version.
 
 =back
 
@@ -593,9 +593,15 @@ Linksys.  This currently comprises the Sx300/500 line of switches.
 
 See documentation in L<SNMP::Info::Layer2::CiscoSB> for details.
 
+=item SNMP::Info::Layer2::Exinda
+
+Subclass for Exinda / GFI Network Orchestrator traffic shapers.
+
+See documentation in L<SNMP::Info::Layer2::Exinda> for details.
+
 =item SNMP::Info::Layer2::HP
 
-Subclass for more recent HP Procurve Switches
+Subclass for more recent HP Procurve Switches.
 
 Requires F<HP-ICF-OID> and F<ENTITY-MIB> downloaded from HP.
 
@@ -1040,7 +1046,7 @@ See documentation in L<SNMP::Info::Layer7::Arbor> for details.
 
 Subclass for Cisco IPS devices
 
-See documentation in L<SNMP::Info::Layer7::Cisco IPS> for details.
+See documentation in L<SNMP::Info::Layer7::CiscoIPS> for details.
 
 =item SNMP::Info::Layer7::Gigamon
 
@@ -1653,6 +1659,7 @@ sub device_type {
         14823 => 'SNMP::Info::Layer3::Aruba',
         14988 => 'SNMP::Info::Layer3::Mikrotik',
         17163 => 'SNMP::Info::Layer3::Steelhead',
+        21091 => 'SNMP::Info::Layer2::Exinda',
         25506 => 'SNMP::Info::Layer3::H3C',
         25461 => 'SNMP::Info::Layer3::PaloAlto',
         26543 => 'SNMP::Info::Layer3::IBMGbTor',
@@ -1695,6 +1702,7 @@ sub device_type {
         14823 => 'SNMP::Info::Layer3::Aruba',
         17163 => 'SNMP::Info::Layer3::Steelhead',
         20540 => 'SNMP::Info::Layer2::Sixnet',
+        21091 => 'SNMP::Info::Layer2::Exinda',
         26543 => 'SNMP::Info::Layer3::IBMGbTor',
         26928 => 'SNMP::Info::Layer2::Aerohive',
     );
@@ -3161,7 +3169,7 @@ implementation.
 
 =head2 Gathering MIB data for SNMP::Info Developers
 
-The preference is to open a feature request in the SourceForge project.  This
+The preference is to open a pull request in the github project. This
 allows all developers to have visibility into the request.  Please include
 pointers to the applicable platform MIBs.  For development we will need an
 C<snmpwalk> of the device.  There is a tool now included in the SNMP::Info
@@ -3178,10 +3186,10 @@ The utility is named C<make_snmpdata.pl>. Run it with a command line like:
 
 This will print to the file every MIB entry with data in a format that the
 developers can use to emulate read operations without needing access to the
-device.  Preference would be to mask any sensitive data in the output, zip the
-file, and upload as an attachment to the Sourceforge tracker.  However, if you
-do not feel comfortable  uploading the output to the tracker you could e-mail
-it to the developer that has claimed the ticket.
+device.  Preference would be to mask any sensitive data in the output, zip
+the file, and attach it to the github pull request. However, if you do not
+feel comfortable uploading the output to the tracker you could e-mail it
+to the developer that has claimed the ticket.
 
 =head2 Data Structures required in new Subclass
 
@@ -3468,8 +3476,6 @@ will inherit the Cisco Vlan module as an example.
  1; # don't forget this line
 ----------------------- snip --------------------------------
 
-Be sure and send the debugged version to snmp-info-users@lists.sourceforge.net to be
-included in the next version of SNMP::Info.
 
 =head1 SNMP::INFO INTERNALS
 

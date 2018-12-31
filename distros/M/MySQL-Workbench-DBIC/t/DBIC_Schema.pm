@@ -17,7 +17,9 @@ __PACKAGE__->load_namespaces(
 # ---
 # Put your own code below this comment
 # ---
-print "This is some custom code!";
+sub test {
+    print "This is some custom code!";
+}
 # ---
 
 1;

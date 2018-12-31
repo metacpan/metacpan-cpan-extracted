@@ -1,5 +1,281 @@
-SEE ALSO
+NAME
+    CPAN::Info::FromURL - Extract/guess information from a URL
 
+VERSION
+    This document describes version 0.090 of CPAN::Info::FromURL (from Perl
+    distribution CPAN-Info-FromURL), released on 2018-12-30.
+
+FUNCTIONS
+  extract_cpan_info_from_url
+    Usage:
+
+     extract_cpan_info_from_url($url) -> hash
+
+    Extract/guess information from a URL.
+
+    Examples:
+
+    *   Example #1 (mcpan/pod/MOD):
+
+         extract_cpan_info_from_url("https://metacpan.org/pod/Foo::Bar"); # -> { module => "Foo::Bar", site => "mcpan" }
+
+    *   Example #2 (mcpan/module/MOD):
+
+         extract_cpan_info_from_url("metacpan.org/module/Foo?"); # -> { module => "Foo", site => "mcpan" }
+
+    *   Example #3 (mcpan/pod/release/AUTHOR/DIST-VERSION/lib/MOD.pm):
+
+         extract_cpan_info_from_url("http://metacpan.org/pod/release/SRI/Mojolicious-6.46/lib/Mojo.pm");
+
+        Result:
+
+         {
+           author  => "SRI",
+           dist    => "Mojolicious",
+           module  => "Mojo",
+           site    => "mcpan",
+           version => 6.46,
+         }
+
+    *   Example #4 (mcpan/pod/release/AUTHOR/DIST-VERSION/bin/SCRIPT):
+
+         extract_cpan_info_from_url("http://metacpan.org/pod/release/PERLANCAR/App-PMUtils-1.23/bin/pmpath");
+
+        Result:
+
+         {
+           author  => "PERLANCAR",
+           dist    => "App-PMUtils",
+           script  => "pmpath",
+           site    => "mcpan",
+           version => 1.23,
+         }
+
+    *   Example #5 (mcpan/source/AUTHOR/DIST-VERSION/lib/MOD.pm):
+
+         extract_cpan_info_from_url("http://metacpan.org/source/SRI/Mojolicious-6.46/lib/Mojo.pm?");
+
+        Result:
+
+         {
+           author  => "SRI",
+           dist    => "Mojolicious",
+           module  => "Mojo",
+           site    => "mcpan",
+           version => 6.46,
+         }
+
+    *   Example #6 (api.mcpan/source/AUTHOR/DIST-VERSION):
+
+         extract_cpan_info_from_url("http://api.metacpan.org/source/SRI/Mojolicious-6.46?");
+
+        Result:
+
+         { author => "SRI", dist => "Mojolicious", site => "mcpan", version => 6.46 }
+
+    *   Example #7 (fastapi.mcpan/v1/module/MODULE):
+
+         extract_cpan_info_from_url("http://fastapi.metacpan.org/v1/module/Moose");
+
+        Result:
+
+         { module => "Moose", site => "mcpan" }
+
+    *   Example #8 (mcpan/release/DIST):
+
+         extract_cpan_info_from_url("https://metacpan.org/release/Foo-Bar"); # -> { dist => "Foo-Bar", site => "mcpan" }
+
+    *   Example #9 (mcpan/release/AUTHOR/DIST-VERSION):
+
+         extract_cpan_info_from_url("https://metacpan.org/release/FOO/Bar-1.23");
+
+        Result:
+
+         { author => "FOO", dist => "Bar", site => "mcpan", version => 1.23 }
+
+    *   Example #10 (mcpan/author/AUTHOR):
+
+         extract_cpan_info_from_url("https://metacpan.org/author/FOO"); # -> { author => "FOO", site => "mcpan" }
+
+    *   Example #11 (mcpan/changes/distribution/DIST):
+
+         extract_cpan_info_from_url("https://metacpan.org/changes/distribution/Module-XSOrPP");
+
+        Result:
+
+         { dist => "Module-XSOrPP", site => "mcpan" }
+
+    *   Example #12 (mcpan/requires/distribution/DIST):
+
+         extract_cpan_info_from_url("https://metacpan.org/requires/distribution/Module-XSOrPP?sort=[[2,1]]");
+
+        Result:
+
+         { dist => "Module-XSOrPP", site => "mcpan" }
+
+    *   Example #13 (sco/dist/DIST):
+
+         extract_cpan_info_from_url("http://search.cpan.org/dist/Foo-Bar/"); # -> { dist => "Foo-Bar", site => "sco" }
+
+    *   Example #14 (sco/perldoc?MOD):
+
+         extract_cpan_info_from_url("http://search.cpan.org/perldoc?Foo::Bar");
+
+        Result:
+
+         { module => "Foo::Bar", site => "sco" }
+
+    *   Example #15 (sco/search?mode=module&query=MOD):
+
+         extract_cpan_info_from_url("http://search.cpan.org/search?mode=module&query=DBIx%3A%3AClass");
+
+        Result:
+
+         { module => "DBIx::Class", site => "sco" }
+
+    *   Example #16 (sco/search?module=MOD):
+
+         extract_cpan_info_from_url("http://search.cpan.org/search?module=ToolSet");
+
+        Result:
+
+         { module => "ToolSet", site => "sco" }
+
+    *   Example #17 (sco/search?module=MOD (#2)):
+
+         extract_cpan_info_from_url("http://search.cpan.org/search?module=Acme::Don't");
+
+        Result:
+
+         { module => "Acme::Don::t", site => "sco" }
+
+    *   Example #18 (sco/~AUTHOR):
+
+         extract_cpan_info_from_url("http://search.cpan.org/~unera?"); # -> { author => "unera", site => "sco" }
+
+    *   Example #19 (sco/~AUTHOR/DIST-REL/lib/MOD.pm):
+
+         extract_cpan_info_from_url("http://search.cpan.org/~unera/DR-SunDown-0.02/lib/DR/SunDown.pm");
+
+        Result:
+
+         {
+           author  => "unera",
+           dist    => "DR-SunDown",
+           module  => "DR::SunDown",
+           site    => "sco",
+           version => 0.02,
+         }
+
+    *   Example #20 (sco/~AUTHOR/DIST-REL/bin/SCRIPT.pm):
+
+         extract_cpan_info_from_url("http://search.cpan.org/~perlancar/App-PMUtils-1.23/bin/pmpath");
+
+        Result:
+
+         {
+           author  => "perlancar",
+           dist    => "App-PMUtils",
+           script  => "pmpath",
+           site    => "sco",
+           version => 1.23,
+         }
+
+    *   Example #21 (cpan/authors/id/A/AU/AUTHOR):
+
+         extract_cpan_info_from_url("file:/cpan/authors/id/A/AU/AUTHOR?"); # -> { author => "AUTHOR", site => "cpan" }
+
+    *   Example #22 (cpan/authors/id/A/AU/AUTHOR/DIST-VERSION.tar.gz):
+
+         extract_cpan_info_from_url("file:/cpan/authors/id/A/AU/AUTHOR/Foo-Bar-1.0.tar.gz");
+
+        Result:
+
+         {
+           author  => "AUTHOR",
+           dist    => "Foo-Bar",
+           release => "Foo-Bar-1.0.tar.gz",
+           site    => "cpan",
+           version => "1.0",
+         }
+
+    *   Example #23 (cpanratings/dist/DIST):
+
+         extract_cpan_info_from_url("http://cpanratings.perl.org/dist/Submodules");
+
+        Result:
+
+         { dist => "Submodules", site => "cpanratings" }
+
+    *   Example #24 (perldoc.perl.org/MOD/SUBMOD.html):
+
+         extract_cpan_info_from_url("http://perldoc.perl.org/Module/CoreList.html");
+
+        Result:
+
+         { module => "Module::CoreList", site => "perldoc.perl.org" }
+
+    *   Example #25 (rt/(Public/)Dist/Display.html?Queue=DIST):
+
+         extract_cpan_info_from_url("https://rt.cpan.org/Dist/Display.html?Queue=Perinci-Sub-Gen-AccessTable-DBI");
+
+        Result:
+
+         { dist => "Perinci-Sub-Gen-AccessTable-DBI", site => "rt" }
+
+    *   Example #26 (mojo):
+
+         extract_cpan_info_from_url("https://mojolicious.org/perldoc/Mojo/DOM/CSS");
+
+        Result:
+
+         { module => "Mojo::DOM::CSS", site => "mojo" }
+
+    *   Example #27 (anchor in url):
+
+         extract_cpan_info_from_url("https://mojolicious.org/perldoc/Mojo/DOM/CSS#Foo");
+
+        Result:
+
+         { module => "Mojo::DOM::CSS", site => "mojo" }
+
+    *   Example #28 (unknown):
+
+         extract_cpan_info_from_url("https://www.google.com/"); # -> undef
+
+    Return a hash of information from a CPAN-related URL. Possible keys
+    include: "site" (site nickname, include: "mcpan" [metacpan.org,
+    api.metacpan.org, fastapi.metacpan.org], "sco" [search.cpan.org],
+    "cpanratings" [cpanratings.perl.org], "rt" ([rt.cpan.org]), "cpan" [any
+    normal CPAN mirror]), "author" (CPAN author ID), "module" (module name),
+    "dist" (distribution name), "version" (distribution version). Some keys
+    might not exist, depending on what information the URL provides. Return
+    undef if URL is not detected to be of some CPAN-related URL.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $url* => *str*
+
+    Return value: (hash)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CPAN-Info-FromURL>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-CPAN-Info-FromURL>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Info-FromURL>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     CPAN::Author::FromURL
 
     CPAN::Dist::FromURL
@@ -7,4 +283,13 @@ SEE ALSO
     CPAN::Module::FromURL
 
     CPAN::Release::FromURL
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

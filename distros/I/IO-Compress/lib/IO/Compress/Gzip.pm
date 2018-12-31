@@ -8,12 +8,12 @@ use bytes;
 
 require Exporter ;
 
-use IO::Compress::RawDeflate 2.081 () ; 
-use IO::Compress::Adapter::Deflate 2.081 ;
+use IO::Compress::RawDeflate 2.083 () ; 
+use IO::Compress::Adapter::Deflate 2.083 ;
 
-use IO::Compress::Base::Common  2.081 qw(:Status );
-use IO::Compress::Gzip::Constants 2.081 ;
-use IO::Compress::Zlib::Extra 2.081 ;
+use IO::Compress::Base::Common  2.083 qw(:Status );
+use IO::Compress::Gzip::Constants 2.083 ;
+use IO::Compress::Zlib::Extra 2.083 ;
 
 BEGIN
 {
@@ -25,7 +25,7 @@ BEGIN
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $GzipError);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 $GzipError = '' ;
 
 @ISA    = qw(IO::Compress::RawDeflate Exporter);
@@ -485,9 +485,7 @@ This parameter defaults to 0.
 
 =item C<< BinModeIn => 0|1 >>
 
-When reading from a file or filehandle, set C<binmode> before reading.
-
-Defaults to 0.
+This option is now a no-op. All files will be read in binmode.
 
 =item C<< Append => 0|1 >>
 

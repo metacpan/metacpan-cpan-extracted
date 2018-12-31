@@ -6,7 +6,7 @@ require 5.006 ;
 use strict ;
 use warnings;
 
-use IO::Compress::Base::Common 2.081 ;
+use IO::Compress::Base::Common 2.083 ;
 
 use IO::File (); ;
 use Scalar::Util ();
@@ -20,7 +20,7 @@ use Symbol();
 our (@ISA, $VERSION);
 @ISA    = qw(IO::File Exporter);
 
-$VERSION = '2.081';
+$VERSION = '2.083';
 
 #Can't locate object method "SWASHNEW" via package "utf8" (perhaps you forgot to load "utf8"?) at .../ext/Compress-Zlib/Gzip/blib/lib/Compress/Zlib/Common.pm line 16.
 
@@ -496,7 +496,7 @@ sub _wr2
             $fh = new IO::File "<$input"
                 or return $self->saveErrorString(undef, "cannot open file '$input': $!", $!) ;
         }
-        binmode $fh if *$self->{Got}->valueOrDefault('binmodein') ;
+        binmode $fh ;
 
         my $status ;
         my $buff ;

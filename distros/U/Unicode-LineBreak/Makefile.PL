@@ -65,13 +65,13 @@ sub postamble {
 copy_unidata :
 \tcd test-data; \\
 \t[ -f LineBreakTest.txt ] || \\
-\twget -q -N -O LineBreakTest.txt \\
-\tftp://unicode.org/Public/$unicode_num/ucd/auxiliary/LineBreakTest*.txt \\
+\twget -T 10 -q -N -O LineBreakTest.txt \\
+\thttps://www.unicode.org/Public/$unicode_num/ucd/auxiliary/LineBreakTest*.txt \\
 \t|| \$(NOOP)
 \tcd test-data; \\
 \t[ -f GraphemeBreakTest.txt ] || \\
-\twget -q -N -O GraphemeBreakTest.txt \\
-\tftp://unicode.org/Public/$unicode_num/ucd/auxiliary/GraphemeBreakTest*.txt \\
+\twget -T 10 -q -N -O GraphemeBreakTest.txt \\
+\thttps://www.unicode.org/Public/$unicode_num/ucd/auxiliary/GraphemeBreakTest*.txt \\
 \t|| \$(NOOP)
 
 preop :

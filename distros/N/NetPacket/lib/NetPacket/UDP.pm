@@ -1,9 +1,7 @@
 package NetPacket::UDP;
-BEGIN {
-  $NetPacket::UDP::AUTHORITY = 'cpan:YANICK';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Assemble and disassemble UDP (User Datagram Protocol) packets.
-$NetPacket::UDP::VERSION = '1.6.0';
+$NetPacket::UDP::VERSION = '1.7.0';
 use strict;
 use warnings;
 
@@ -49,8 +47,9 @@ sub decode {
 # Strip header from packet and return the data contained in it
 #
 
-undef &udp_strip;
-*udp_strip = \&strip;
+sub udp_strip {
+  goto \&strip;
+}
 
 sub strip {
     return decode(__PACKAGE__,shift)->{data};
@@ -87,15 +86,22 @@ sub checksum {
 
     # Pack pseudo-header for udp checksum
 
-    my $src_ip = gethostbyname($ip->{src_ip});
-    my $dest_ip = gethostbyname($ip->{dest_ip});
-
     no warnings;
 
-    my $packet = pack 'a4a4CCnnnnna*' =>
+    my $packet;
+    if ($ip->isa('NetPacket::IPv6')) {
+        $packet = $ip->pseudo_header($self->{len}, $proto);
+    } else {
+        my $src_ip = gethostbyname($ip->{src_ip});
+        my $dest_ip = gethostbyname($ip->{dest_ip});
 
-      # fake ip header part
-      $src_ip, $dest_ip, 0, $proto, $self->{len},
+        $packet = pack 'a4a4CCn' =>
+
+          # fake ip header part
+          $src_ip, $dest_ip, 0, $proto, $self->{len};
+    }
+
+    $packet .= pack 'nnnna*' =>
 
       # proper UDP part
       $self->{src_port}, $self->{dest_port}, $self->{len}, 0, $self->{data};
@@ -118,7 +124,7 @@ NetPacket::UDP - Assemble and disassemble UDP (User Datagram Protocol) packets.
 
 =head1 VERSION
 
-version 1.6.0
+version 1.7.0
 
 =head1 SYNOPSIS
 

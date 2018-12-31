@@ -1,4 +1,5 @@
-package File::Flat;
+package File::Flat; # git description: fabfdb3
+# ABSTRACT: Implements a flat filesystem
 
 # The File::Flat is a static class that provides a unified interface
 # to the filesystem in a way such that directories are abstracted away.
@@ -16,16 +17,14 @@ use prefork    'File::Copy';
 use prefork    'File::Copy::Recursive';
 use prefork    'File::Remove';
 
-use vars qw{$VERSION $errstr %modes $AUTO_PRUNE};
-BEGIN {
-	$VERSION = '1.04';
+our $VERSION = '1.05';
 
-	# The main error string
-	$errstr  = '';
+# The main error string
+our $errstr  = '';
 
-	# Create a map of all file open modes we support,
-	# and which ones will create a new file if needed.
-	%modes = ( 
+# Create a map of all file open modes we support,
+# and which ones will create a new file if needed.
+our %modes = ( 
 		'<'  => 0, 'r'  => 0, # Read
 		'+<' => 1, 'r+' => 1, # ReadWrite
 		'>'  => 1, 'w'  => 1, # Write
@@ -33,11 +32,7 @@ BEGIN {
 		'>>' => 1, 'a'  => 1  # Append
 		);
 
-	$AUTO_PRUNE = '';
-}
-
-
-
+our $AUTO_PRUNE = '';
 
 
 #####################################################################
@@ -518,7 +513,7 @@ sub _andRemove {
 
 
 
-package File::Flat::Object;
+package File::Flat::Object; # git description: fabfdb3
 
 # Instantiatable version of File::Flat.
 # 
@@ -833,25 +828,31 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 File::Flat - Implements a flat filesystem
 
-=head1 SYNOPSIS
+=head1 VERSION
+
+version 1.05
 
 =head1 DESCRIPTION
+
+=for stopwords FSI.pm VMS canExecute canOpen canRead canReadWrite canRemove canWrite cp getAppendHandle getReadHandle getReadWriteHandle getWriteHandle isaBinary isaDirectory isaFile isaText makeDirectory
 
 File::Flat implements a flat filesystem. A flat filesystem is a filesystem in
 which directories do not exist. It provides an abstraction over any normal
 filesystem which makes it appear as if directories do not exist. In effect,
 it will automatically create directories as needed. This is create for things
-like install scripts and such, as you never need to worry about the existance
+like install scripts and such, as you never need to worry about the existence
 of directories, just write to a file, no matter where it is.
 
 =head2 Comprehensive Implementation
 
 The implementation of File::Flat is extremely comprehensive in scope. It has
-methods for all stardard file interaction taks, the -X series of tests, and
+methods for all standard file interaction tasks, the -X series of tests, and
 some other things, such as slurp.
 
 All methods are statically called, for example, to write some stuff to a file.
@@ -905,7 +906,7 @@ platforms (such as VMS) are believed to work, but require confirmation.
 
 =head2 exists $filename 
 
-Tests for the existance of the file.
+Tests for the existence of the file.
 This is an exact duplicate of the -e function.
 
 =head2 isaFile $filename
@@ -1022,7 +1023,7 @@ The C<write> method is the main method for writing content to a file.
 It takes two arguments, the location to write to, and the content to write, 
 in several forms.
 
-If the file already exists, it will be clobered before writing starts.
+If the file already exists, it will be clobbered before writing starts.
 If the file doesn't exists, the file and any directories will be created as
 needed.
 
@@ -1082,7 +1083,7 @@ The C<remove> method will remove a file, or recursively remove a directory.
 
 If a second (true) argument is provided, then once the file or directory
 has been deleted, the method will the automatically work its way upwards
-pruning (deleting) empty and thus assumably useless directories.
+pruning (deleting) empty and thus presumably useless directories.
 
 Returns true if the deletion (and pruning if requested) was a success, or
 C<undef> otherwise.
@@ -1098,7 +1099,7 @@ Returns true, or C<undef> on error.
 
 =head2 truncate $filename [, $size ]
 
-The C<truncate> method will truncate an existing file to partular size.
+The C<truncate> method will truncate an existing file to a particular size.
 A size of 0 ( zero ) is used if no size is provided. If the file does not
 exists, it will be created, and set to 0. Attempting to truncate a 
 directory will fail.
@@ -1120,33 +1121,43 @@ Function interface to be written, like
 L<File::Spec::Functions>, to provide importable functions.
 
 There's something bigger here too, I'm not exactly sure what it is,
-but I think there might be the beginings of a unified filesystem
+but I think there might be the beginnings of a unified filesystem
 interface here... FSI.pm
-
-=head1 SUPPORT
-
-Bugs should be filed at via the CPAN bug tracker at:
-
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=File-Flat>
-
-For other issues or comments, contact the author
-
-=head1 AUTHORS
-
-Adam Kennedy E<lt>adamk@cpan.orgE<gt>
 
 =head1 SEE ALSO
 
 L<File::Spec>, L<http://ali.as/>
 
-=head1 COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2002 - 2008 Adam Kennedy.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=File-Flat>
+(or L<bug-File-Flat@rt.cpan.org|mailto:bug-File-Flat@rt.cpan.org>).
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+=head1 AUTHOR
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+Adam Kennedy <adamk@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Adam Kennedy Karen Etheridge
+
+=over 4
+
+=item *
+
+Adam Kennedy <adam@ali.as>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2002 by Adam Kennedy.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

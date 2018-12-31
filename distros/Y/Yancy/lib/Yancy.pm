@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.018';
+our $VERSION = '1.019';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -155,21 +155,11 @@ our $VERSION = '1.018';
 #pod =cut
 
 use Mojo::Base 'Mojolicious';
-use Mojo::File qw(path);
-use Mojo::JSON qw(decode_json);
 
 sub startup {
     my ( $app ) = @_;
     $app->plugin( Config => { default => { } } );
-    my %config = %{ $app->config };
-    if ( $config{openapi} and !ref $config{openapi} ) {
-        # assume a file in JSON format: load and parse it
-        $config{openapi} = decode_json path( ( $ENV{MOJO_HOME} || () ), $config{openapi} )->slurp;
-    }
-    $app->plugin( 'Yancy', {
-        %config,
-        route => $app->routes->any('/yancy'),
-    } );
+    $app->plugin( 'Yancy', $app->config );
 
     unshift @{$app->plugins->namespaces}, 'Yancy::Plugin';
     for my $plugin ( @{ $app->config->{plugins} } ) {
@@ -198,7 +188,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.018
+version 1.019
 
 =head1 SYNOPSIS
 
