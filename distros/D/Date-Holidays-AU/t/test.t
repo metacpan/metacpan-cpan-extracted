@@ -1,7 +1,7 @@
 #! /usr/bin/perl 
 
 use Date::Holidays::AU qw( is_holiday holidays );
-use Test::More(tests => 109 );
+use Test::More(tests => 126 );
 use strict;
 use warnings;
 
@@ -107,6 +107,19 @@ ok(is_holiday(2004, 10, 4, 'WA'), "WA Queens Birthday 2004");
 ok(is_holiday(2005, 9, 26, 'WA'), "WA Queens Birthday 2005");
 ok(is_holiday(2006, 10, 2, 'WA'), "WA Queens Birthday 2006");
 ok(is_holiday(2007, 10, 1, 'WA'), "WA Queens Birthday 2007");
+ok(is_holiday(2008, 9, 29, 'WA'), "WA Queens Birthday 2008");
+ok(is_holiday(2009, 9, 28, 'WA'), "WA Queens Birthday 2009");
+ok(is_holiday(2010, 9, 27, 'WA'), "WA Queens Birthday 2010");
+ok(is_holiday(2011, 9, 28, 'WA'), "WA Queens Birthday 2011");
+ok(is_holiday(2012, 10, 1, 'WA'), "WA Queens Birthday 2012");
+ok(is_holiday(2013, 9, 30, 'WA'), "WA Queens Birthday 2013");
+ok(is_holiday(2014, 9, 29, 'WA'), "WA Queens Birthday 2014");
+ok(is_holiday(2015, 9, 28, 'WA'), "WA Queens Birthday 2015");
+ok(is_holiday(2016, 9, 26, 'WA'), "WA Queens Birthday 2016");
+ok(is_holiday(2017, 9, 25, 'WA'), "WA Queens Birthday 2017");
+ok(is_holiday(2018, 9, 24, 'WA'), "WA Queens Birthday 2018");
+ok(is_holiday(2019, 9, 30, 'WA'), "WA Queens Birthday 2019");
+ok(is_holiday(2020, 9, 28, 'WA'), "WA Queens Birthday 2020");
 my ($year) = (localtime(time))[5] + 1900 + 1;
 eval { is_holiday($year, 1, 1, 'WA'); };
 ok($@ eq '', "WA Queens Birthday next year ($year)");
@@ -132,4 +145,8 @@ ok(is_holiday(2005, 11, 25, 'TAS', { 'holidays' => ['Devonport Show']}), "Devonp
 ok(is_holiday(2006, 12, 1, 'TAS', { 'holidays' => ['Devonport Show']}), "Devonport Show 2006");
 ok(not(is_holiday(2006, 12, 1, 'TAS', { 'holidays' => ['Recreation Day']})), "Not Devonport Show 2006");
 ok(is_holiday(2005, 12, 27, 'VIC'), "Extra Christmas 2005");
-ok(is_holiday(2015, 10, 2, 'VIC'), "Grand Final Eve");
+ok(is_holiday(2015, 10, 2, 'VIC'), "Grand Final Eve 2015");
+ok(is_holiday(2016, 9, 30, 'VIC'), "Grand Final Eve 2016");
+ok(is_holiday(2017, 9, 29, 'VIC'), "Grand Final Eve 2017");
+ok(is_holiday(2018, 9, 28, 'VIC'), "Grand Final Eve 2018");
+ok(is_holiday(2019, 9, 27, 'VIC'), "Grand Final Eve 2019");

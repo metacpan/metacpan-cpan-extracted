@@ -27,13 +27,15 @@ select STDERR; $|=1;
 select STDOUT; $|=1;
 
 
-# ARRRRR!.. there are _at_least_ 3 different UUID interfaces:
-# Free/NetBSD/MacOSX, Windows, and e2fsprogs.
+# ARRRRR!.. there are _at_least_ 4 different UUID interfaces:
+# Free/NetBSD/MacOSX, Windows, e2fsprogs, and OSSP.
 # ... this is gonna suck!
 warn "#\n" if DEBUG;
 
 
 my @hfiles;
+# Look for uuid/uuid.h first. uuid.h is known to contain the slower OSSP
+# interface on CentOS7.
 for my $try (qw{ uuid/uuid.h uuid.h rpc.h }) {
     warn "# ===> Checking for #include <${try}>\n" if DEBUG;
     eval { assert_lib(
@@ -56,9 +58,12 @@ my $defs = [];
 my $libs = [];
 
 HEADER: while ( $header = shift @hfiles ) {
-    for my $try_lib (qw{ rpcrt4 uuid c }) {
+    # Look for uuid interface before ossp-uuid.
+    # Our implementation with ossp is slower.
+    for my $try_lib (qw{ rpcrt4 uuid ossp-uuid c }) {
         try_rpc(  $header, $try_lib ) and last HEADER;
         try_e2fs( $header, $try_lib ) and last HEADER;
+        try_ossp( $header, $try_lib ) and last HEADER;
         try_win(  $header, $try_lib ) and last HEADER;
     }
 }
@@ -73,6 +78,7 @@ sub try_rpc {
         lib      => $tlib,
         header   => $hdr,
         debug    => DEBUG,
+        libpath  => '/lib64 /usr/lib64',
         function => qq/
             char *str,buff[37];
             uuid_t u1,u2;
@@ -103,6 +109,7 @@ sub try_e2fs {
         lib      => $tlib,
         header   => $hdr,
         debug    => DEBUG,
+        libpath  => '/lib64 /usr/lib64',
         function => qq/
             int i;
             char s[37];
@@ -127,6 +134,45 @@ sub try_e2fs {
     return 1;
 }
 
+sub try_ossp {
+    my ( $hdr, $tlib ) = @_;
+    warn "# ===> Checking for ossp interface in $hdr with -l$tlib\n" if DEBUG;
+    eval { assert_lib(
+        lib      => $tlib,
+        header   => $hdr,
+        debug    => DEBUG,
+        libpath  => '/lib64 /usr/lib64',
+        function => qq{
+            int i;
+            size_t len;
+            uuid_rc_t rc;
+            char s[37];
+            uuid_t *u,*uu;
+            uuid_create(&u);
+            uuid_create(&uu);
+            rc = uuid_make(u,UUID_MAKE_V1|UUID_MAKE_MC); /* uuid_generate */
+            rc = uuid_make(u,UUID_MAKE_V1); /* uuid_generate_time */
+            rc = uuid_make(u,UUID_MAKE_V4); /* for uuid_generate_random */
+            len = 36;
+            uuid_export(u,UUID_FMT_STR,s,&len);
+            uuid_import(u,UUID_FMT_STR,s,36);
+            rc = uuid_load(u,"nil");
+            rc = uuid_clone(uu,&u);
+            rc = uuid_compare(u,uu,&i);
+            rc = uuid_isnil(u,&i);
+            uuid_destroy(u);
+            uuid_destroy(uu);
+            return 0;
+        },
+    )};
+    if ($@) { my $L = length $@; warn "# ===> Err($L): \"$@\"\n" if DEBUG; return 0 }
+    push @$defs, '-DPERL__UUID__OSSP_INT';
+    push @$libs, "-l$tlib";
+    warn "# ===> Found!\n" if DEBUG;
+    warn "#\n" if DEBUG;
+    return 1;
+}
+
 sub try_win {
     my ( $hdr, $tlib ) = @_;
     warn "# ===> Checking for Win interface in $hdr with -l$tlib\n" if DEBUG;
@@ -134,6 +180,7 @@ sub try_win {
         lib      => $tlib,
         header   => [ $hdr, 'rpcdce.h' ],
         debug    => DEBUG,
+        libpath  => '/lib64 /usr/lib64',
         function => qq/
             int i;
             UUID u,uu;
@@ -161,17 +208,23 @@ sub try_win {
 
 sub get_struct_size {
     my ( $hdrs, $libs ) = @_;
-    warn "# ===> Checking binary size\n" if DEBUG;
+    my $rv;
+    warn "# ===> Checking binary struct size\n" if DEBUG;
     ( my $lib = $libs->[0] ) =~ s/-l//;
     check_lib(
         lib      => $lib,
         header   => $hdrs,
         debug    => DEBUG,
-        function => qq/
-            return sizeof(uuid_t);
-        /,
+        libpath  => '/lib64 /usr/lib64',
+        function => ( $lib =~ /ossp/ )
+            ? qq{
+                return 16;
+            }
+            : qq{
+                return sizeof(uuid_t);
+            },
     );
-    my $rv = $? >> 8;
+    $rv = $? >> 8;
     warn "# ===> $rv\n" if DEBUG;
     warn "#\n" if DEBUG;
     return $rv;
@@ -251,7 +304,8 @@ sub bail {
 # It's likely the UUID prerequisite library isn't installed.
 #
 # On some platforms you can use your package manager to install these.
-# In particular, the uuid-dev or uuid-devel packages on Linux.
+# In particular, the uuid-dev, libuuid-devel, or uuid-devel packages
+# on Linux.
 #
 # More information about this failure can be found with the UUID_DEBUG
 # flag.

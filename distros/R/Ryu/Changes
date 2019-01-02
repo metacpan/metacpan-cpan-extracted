@@ -1,5 +1,23 @@
 Revision history for Ryu
 
+0.035     2019-01-02 01:37:38+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - dist.ini file should now be included, thanks Grinnz
+
+0.034     2019-01-02 00:19:29+08:00 Asia/Kuala_Lumpur
+    Bugs fixed:
+
+    - better support for sync chains: we now call the `->{on_get}` callback
+    recursively if available.
+
+    Developer updates:
+
+    - moved from the old manual dist.ini content to a plugin bundle,
+    hopefully this doesn't cause too much breakage
+
 0.033     2018-12-21 15:35:22+08:00 Asia/Kuala_Lumpur
     Bugs fixed:
 

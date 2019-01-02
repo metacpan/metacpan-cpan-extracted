@@ -1,0 +1,72 @@
+Revision history for Test-NaiveStubs
+
+0.0701 2019-01-01 16:21:08
+    - Simplified the expected new unit test text.
+    - Improved documentation.
+
+0.0700 2019-01-01 15:51:08
+    - Added an is_oo attribute to prevent re-grep in unit_test().
+    - Fix non-oo test cases.
+
+0.0604 2019-01-01 14:11:55
+    - Improved documentation.
+
+0.0603 2019-01-01 13:06:13
+    - Added eg/stub example program.
+
+0.0602 2019-01-01 11:42:53
+    - Remove forgotten and no-longer necessary disclaimer.
+
+0.0601 2019-01-01 11:39:27
+    - Removed unneeded code.
+
+0.0600 2019-01-01 11:34:29
+    - Refactored the gather_subs() logic to exclude all but the module subroutines.
+    - Improved documentation.
+
+0.0503 2019-01-01 09:58:12
+    - Fixed SYNOPSIS section.
+
+0.0502 2019-01-01 09:34:16
+    - Improved documentation once again.
+
+0.0501 2019-01-01 09:25:23
+    - Improved documentation.
+
+0.0500 2019-01-01 08:44:11
+    - Rename the gather_methods() method to gather_subs().
+    - Hold the gathered subroutines in a new subs attribute.
+    - Handle unit_test() differently for non-object modules.
+
+0.0401 2019-01-01 07:51:47
+    - Improved documentation.
+
+0.0400 2019-01-01 07:31:47
+    - Renamed the "class" attribute to "module".
+    - Improved documentation.
+
+0.0300 2019-01-01 07:06:17
+    - Make the non-constructor unit tests be "ok can(method)" assertions.
+    - Improved documentation.
+
+0.0202 2019-01-01 03:59:00
+    - Improved documentation.
+
+0.0201 2019-01-01 03:50:58
+    - Added forgotten done_testing() call.
+
+0.0200 2019-01-01 00:58:54
+    - Improved documentation.
+    - Replaced name attribute default with a class name builder.
+    - Skip _methods().
+    - Improved test cases accordingly.
+
+0.0102 2019-01-01 00:21:14
+    - Added crucial usage line to the synopsis.
+
+0.0101 2019-01-01 00:12:08
+    - Improved documentation.
+    - Made the class attribute required.
+
+0.0100 2018-12-31 23:57:17
+    - Minted by Dist::Zilla.

@@ -79,6 +79,7 @@ sub run
     map{ $w8queue[0]->enqueue( $_ ) }@{ $self->{src} }, @{ $self->{dst} };
 
     my @queue = map { Thread::Queue->new() } 0, 1;
+    $thrc ||= 1;
     for my $i ( 1 .. $thrc )
     {
         threads::async

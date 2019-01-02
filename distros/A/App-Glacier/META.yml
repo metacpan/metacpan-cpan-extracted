@@ -38,4 +38,5 @@ requires:
   Scalar::Util: '1.47'
   Storable: '2.34'
   Term::ReadKey: '2.32'
-version: '2.00'
+  Text::Locus: '1.01'
+version: '2.10'

@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.072';
+  $VERSION = '0.074';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color

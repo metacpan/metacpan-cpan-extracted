@@ -13,6 +13,20 @@ This works by opening a WebSocket connection to a specific Mojolicious
 route. When the server restarts, the WebSocket is disconnected, which
 triggers a reload of the page.
 
+The AutoReload plugin will automatically add a "<script>" tag to your
+HTML pages while running in "development" mode. If you need to control
+where this script tag is written, use the "auto_reload" helper.
+
+To disable the plugin for a single page, set the
+"plugin.auto_reload.disable" stash value to a true value:
+
+    get '/' => sub {
+        my ( $c ) = @_;
+        # Don't auto-reload the home page
+        $c->stash( 'plugin.auto_reload.disable' => 1 );
+        ...
+    };
+
 INSTALLATION
 
 This is a Perl module distribution. It should be installed with whichever

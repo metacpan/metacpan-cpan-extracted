@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename;
+use MYDan::Util::OptConf;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'monitorv2';
+
+=head1 SYNOPSIS
+
+ $0 #show
+ $0 --stop appname
+ $0 --start appname
+ $0 --tail appname
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( start=s stop=s tail=s ) )->dump();
+
+my %bootstrap = $option->dump( 'bootstrap' );
+
+if( $o{start} )
+{
+    die "onfind service $o{start}" unless -f "$o{conf}/$o{start}";
+    exec "cp $o{scripts}/bootstrap.exec $bootstrap{exec}/monitorv2.collector.$o{start}";
+}
+elsif( $o{stop} )
+{
+    my $file = "$bootstrap{exec}/monitorv2.collector.$o{stop}";
+    die "onfind service $o{stop}" unless -f $file;
+    exec "rm '$file'";
+}
+elsif( $o{tail} )
+{
+    exec "tail -n 200 -F '$o{logs}/$o{tail}'";
+}
+else
+{
+    my ( %conf, %exec ) = map{ $_ => 1 }map{ basename $_ }glob "$o{conf}/*";
+    map{ $exec{$1} = 1 if $_ =~ /^monitorv2\.collector\.(.+)$/ }map{ basename $_ }glob "$bootstrap{exec}/*";
+    my %list = ( %exec, %conf );
+    map{ printf "$_: %s.\n", $exec{$_} ? 'started' : 'stoped'; }sort keys %list;
+}

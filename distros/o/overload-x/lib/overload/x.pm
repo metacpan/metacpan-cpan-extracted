@@ -1,5 +1,5 @@
 package overload::x;
-use 5.006; use strict; use warnings; our $VERSION = '1.0';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use base 'Import::Export';
 use Clone qw(clone);
 
@@ -39,7 +39,7 @@ overload::x - x on refs
 
 =head1 VERSION
 
-Version 1.0
+Version 1.01
 
 =cut
 
@@ -58,7 +58,15 @@ Version 1.0
 
 =head2 n
 
+Bless an integer into an overload::x object (So you have an object with x overloaded)
+
 =head2 x
+
+This function is fundermentally just a clone function which takes an integer index to replicate the passed object by.
+
+It is called when the overloaded x is triggered via n() or you can additionally instantiate this directly by passing in the index replication and object.
+
+	my ($one, $two, $three, $four) = x(4, [qw/1 2 3/])
 
 =head1 AUTHOR
 

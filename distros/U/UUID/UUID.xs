@@ -27,7 +27,6 @@ extern "C" {
 #endif
 */
 
-
 /* 2 hex digits per byte + 4 separators + 1 trailing null */
 #define UUID_BUF_SZ() (2 * PERL__UUID__STRUCT_SZ + 4 + 1)
 
@@ -46,9 +45,21 @@ extern "C" {
 #define UUID2SV(u) ((char*)&u)
 #define SV2UUID(s) ((UUID*)SvGROW(s, sizeof(UUID)+1))
 
+#elif PERL__UUID__OSSP_INT
+#define UUID_T uuid_t*
+#define UUID2SV(u) ((char*)&u)
+#define SV2UUID(s) ((uuid_t*)SvGROW(s, UUID_LEN_STR+1))
+
 #endif
 
 #define SV2STR(s)  (SvGROW(s, UUID_BUF_SZ()+1))
+
+
+#ifdef PERL__UUID__OSSP_INT
+void croak_ossp(uuid_rc_t st) {
+    croak("%s", uuid_error(st));
+}
+#endif
 
 
 void do_generate(SV *str) {
@@ -61,6 +72,16 @@ void do_generate(SV *str) {
 #elif PERL__UUID__WIN_INT
     RPC_STATUS st;
     st = UuidCreate(&uuid);
+#elif PERL__UUID__OSSP_INT
+    char *s = NULL;
+    size_t len = 0;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_make(uuid,UUID_MAKE_V1|UUID_MAKE_MC)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(uuid, UUID_FMT_BIN, &s, &len)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    sv_setpvn(str, s, len);
+    return;
 #endif
     sv_setpvn(str, UUID2SV(uuid), sizeof(UUID_T));
 }
@@ -75,6 +96,16 @@ void do_generate_random(SV *str) {
     uuid_create(&uuid, &s);
 #elif PERL__UUID__WIN_INT
     UuidCreate(&uuid);
+#elif PERL__UUID__OSSP_INT
+    char *s = NULL;
+    size_t len = 0;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_make(uuid,UUID_MAKE_V4)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(uuid, UUID_FMT_BIN, &s, &len)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    sv_setpvn(str, s, len);
+    return;
 #endif
     sv_setpvn(str, UUID2SV(uuid), sizeof(UUID_T));
 }
@@ -89,6 +120,17 @@ void do_generate_time(SV *str) {
     uuid_create(&uuid, &s);
 #elif PERL__UUID__WIN_INT
     UuidCreateSequential(&uuid);
+#elif PERL__UUID__OSSP_INT
+    char *s = NULL;
+    size_t len = 0;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_make(uuid,UUID_MAKE_V1)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(uuid, UUID_FMT_BIN, &s, &len)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    sv_setpvn(str, s, len);
+    return;
+    (void)st;
 #endif
     sv_setpvn(str, UUID2SV(uuid), sizeof(UUID_T));
 }
@@ -113,6 +155,18 @@ void do_unparse(SV *in, SV * out) {
         croak("UuidToString error: %i", st);
     sv_setpvn(out, str, UUID_BUF_SZ()-1);
     RpcStringFree(&str);
+#elif PERL__UUID__OSSP_INT
+    UUID_T uuid;
+    char *str = NULL;
+    size_t len = UUID_LEN_STR;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_import(uuid, UUID_FMT_BIN, SV2UUID(in), UUID_LEN_BIN)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(uuid, UUID_FMT_STR, &str, &len)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    sv_setpvn(out, str, len-1);
+    free(str);
+    (void)st;
 #endif
 }
 
@@ -141,6 +195,19 @@ void do_unparse_lower(SV *in, SV * out) {
     for(p=str; *p; ++p) *p = tolower(*p);
     sv_setpvn(out, str, UUID_BUF_SZ()-1);
     RpcStringFree(&str);
+#elif PERL__UUID__OSSP_INT
+    UUID_T uuid;
+    char *p;
+    char *str = NULL;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_import(uuid, UUID_FMT_BIN, SV2UUID(in), UUID_BUF_SZ()-1)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(SV2UUID(in), UUID_FMT_STR, &str, NULL)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    for(p=str; *p; ++p) *p = tolower(*p);
+    sv_setpv(out, str);
+    free(str);
+    (void)st;
 #endif
 }
 
@@ -169,11 +236,24 @@ void do_unparse_upper(SV *in, SV * out) {
     for(p=str; *p; ++p) *p = toupper(*p);
     sv_setpvn(out, str, UUID_BUF_SZ()-1);
     RpcStringFree(&str);
+#elif PERL__UUID__OSSP_INT
+    UUID_T uuid;
+    char *p;
+    char *str = NULL;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_import(uuid, UUID_FMT_BIN, SV2UUID(in), UUID_BUF_SZ()-1)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(SV2UUID(in), UUID_FMT_STR, &str, NULL)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    for(p=str; *p; ++p) *p = toupper(*p);
+    sv_setpv(out, str);
+    free(str);
+    (void)st;
 #endif
 }
 
 
-int do_parse(SV *in, SV * out) {
+int do_parse(SV *in, SV *out) {
     UUID_T uuid;
 #ifdef PERL__UUID__E2FS_INT
     int rc;
@@ -193,6 +273,22 @@ int do_parse(SV *in, SV * out) {
     if( rc == RPC_S_OK )
         sv_setpvn(out, UUID2SV(uuid), sizeof(UUID_T));
     return rc == RPC_S_OK ? 0 : -1;
+#elif PERL__UUID__OSSP_INT
+    char *str = NULL;
+    if (uuid_create(&uuid) != UUID_RC_OK)
+        return -1;
+    if (uuid_import(uuid, UUID_FMT_STR, SV2STR(in), UUID_LEN_STR) != UUID_RC_OK) {
+        uuid_destroy(uuid);
+        return -1;
+    }
+    if (uuid_export(uuid, UUID_FMT_BIN, &str, NULL) != UUID_RC_OK) {
+        uuid_destroy(uuid);
+        return -1;
+    }
+    uuid_destroy(uuid);
+    sv_setpvn(out, str, UUID_LEN_BIN);
+    free(str);
+    return 0;
 #endif
 }
 
@@ -206,6 +302,16 @@ void do_clear(SV *in) {
     uuid_create_nil(&uuid,&s);
 #elif PERL__UUID__WIN_INT
     UuidCreateNil(&uuid);
+#elif PERL__UUID__OSSP_INT
+    char *str = NULL;
+    size_t len = UUID_LEN_BIN;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_load(uuid, "nil")) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(uuid, UUID_FMT_BIN, &str, &len)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    sv_setpvn(in, str, len);
+    return;
 #endif
     sv_setpvn(in, UUID2SV(uuid), sizeof(UUID_T));
 }
@@ -224,6 +330,15 @@ int do_is_null(SV *in) {
     RPC_STATUS st;
     rc = UuidIsNil(SV2UUID(in), &st);
     return rc == TRUE ? 1 : 0;
+#elif PERL__UUID__OSSP_INT
+    UUID_T uuid;
+    int i;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_import(uuid, UUID_FMT_BIN, SV2STR(in), UUID_BUF_SZ()-1)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_isnil(uuid, &i)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    return i ? 1 : 0;
 #endif
 }
 
@@ -243,6 +358,7 @@ int do_compare(SV *uu1, SV *uu2) {
             return uuid_compare(SV2UUID(uu1), SV2UUID(uu2), &s);
 */
 #elif PERL__UUID__WIN_INT
+#elif PERL__UUID__OSSP_INT
 #endif
     return sv_cmp(uu1, uu2);
 }
@@ -267,6 +383,21 @@ void do_copy(SV *dst, SV *src) {
         UuidCreateNil(&uuid);
     else
         memcpy(&uuid, SV2UUID(src), sizeof(UUID));
+#elif PERL__UUID__OSSP_INT
+    size_t len = SvCUR(src);
+    if ( len != UUID_LEN_BIN ) {
+        char *str = NULL;
+        len = 0;
+        uuid_rc_t st;
+        if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+        if ((st = uuid_export(uuid, UUID_FMT_BIN, &str, &len)) != UUID_RC_OK) croak_ossp(st);
+        if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+        sv_setpvn(dst, str, len);
+        free(str);
+        return;
+    }
+    sv_copypv(dst, src);
+    return;
 #endif
     sv_setpvn(dst, UUID2SV(uuid), sizeof(UUID_T));
 }
@@ -299,6 +430,18 @@ SV* do_uuid() {
     sv = newSVpvn(str, UUID_BUF_SZ()-1);
     RpcStringFree(&str);
     return sv;
+#elif PERL__UUID__OSSP_INT
+    SV *rv;
+    char *str = NULL;
+    size_t len = UUID_LEN_STR;
+    uuid_rc_t st;
+    if ((st = uuid_create(&uuid)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_make(uuid, UUID_MAKE_V1|UUID_MAKE_MC)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_export(uuid, UUID_FMT_STR, &str, &len)) != UUID_RC_OK) croak_ossp(st);
+    if ((st = uuid_destroy(uuid)) != UUID_RC_OK) croak_ossp(st);
+    rv = newSVpvn(str, len-1);
+    free(str);
+    return rv;
 #endif
 }
 
@@ -319,6 +462,8 @@ void do_debug() {
     PerlIO_puts(PerlIO_stderr(), "# Interface: rpc\n");
 #elif PERL__UUID__WIN_INT
     PerlIO_puts(PerlIO_stderr(), "# Interface: win\n");
+#elif PERL__UUID__OSSP_INT
+    PerlIO_puts(PerlIO_stderr(), "# Interface: ossp\n");
 #endif
 
     bmsg = mess("# Buffer size: %i\n", UUID_BUF_SZ());

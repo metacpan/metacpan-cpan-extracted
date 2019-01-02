@@ -30,9 +30,10 @@ sub run {
     $self->abend(EX_USAGE, "one argument expected")
 	unless $self->command_line == 1;
     my $vault_name = ($self->command_line)[0];
-    $self->glacier_eval('delete_vault', $vault_name);
-    if ($self->lasterr) {
-	$self->abend(EX_FAILURE, "can't delete: ", $self->last_error_message);
+    $self->glacier->Delete_vault($vault_name);
+    if ($self->glacier->lasterr) {
+	$self->abend(EX_FAILURE, "can't delete: ",
+		     $self->glacier->last_error_message);
     } else {
 	my $dir = $self->directory($vault_name);
 	$dir->drop

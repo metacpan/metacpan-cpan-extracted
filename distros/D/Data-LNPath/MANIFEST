@@ -9,9 +9,12 @@ t/01-path.t
 t/02-escape.t
 t/03-alias.t
 t/04-return_undef.t
+t/05-import.t
+t/06-import2.t
+t/07-no-meth-keys.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-xt/boilerplate.t
+
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

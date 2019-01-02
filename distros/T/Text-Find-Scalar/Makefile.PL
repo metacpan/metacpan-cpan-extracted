@@ -17,14 +17,25 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.006002",
   "NAME" => "Text::Find::Scalar",
   "PREREQ_PM" => {},
-  "VERSION" => "0.09",
+  "TEST_REQUIRES" => {
+    "Pod::Coverage::TrustPod" => 0,
+    "Test::More" => 0,
+    "Test::Pod" => 0,
+    "Test::Pod::Coverage" => 0
+  },
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Pod::Coverage::TrustPod" => 0,
+  "Test::More" => 0,
+  "Test::Pod" => 0,
+  "Test::Pod::Coverage" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

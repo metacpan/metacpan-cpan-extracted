@@ -6,6 +6,7 @@ use parent qw(App::Glacier::Command);
 use Carp;
 use Data::Dumper;
 use App::Glacier::Timestamp;
+use App::Glacier::Job;
 
 =head1 NAME
 
@@ -107,7 +108,6 @@ sub new {
 
 sub run {
      my $self = shift;
-#     my $res = $self->glacier_eval('list_jobs');
      $self->list($self->command_line);
 }
 
@@ -116,43 +116,17 @@ sub list {
 
     my $db = $self->jobdb();
     $db->foreach(sub {
-	my ($key, $descr) = @_;
-	my $vault = $descr->{VaultARN};
-	$vault =~ s{.*:vaults/}{};
+	my ($key, $descr, $vault) = @_;
 
 	return if (@vault_names && ! grep { $_ eq $vault } @vault_names);
 
 	unless ($self->{_options}{cached}) {
-	    if ($descr->{StatusCode} eq 'Failed') {
-		$self->debug(1, "deleting failed $key $vault " .
-			     ($descr->{JobDescription} || $descr->{Action}) .
-			     $descr->{JobId});
-		$db->delete($key) unless $self->dry_run;
-		return;
-	    }
-	    
-	    my $res = $self->glacier_eval('describe_job',
-					  $vault,
-					  $descr->{JobId});
-	    if ($self->lasterr) {
-		if ($self->lasterr('code') == 404) {
-		    $self->debug(1, "deleting expired $key $vault " .
-			     ($descr->{JobDescription} || $descr->{Action}) .
-			     $descr->{JobId});
-		    $db->delete($key) unless $self->dry_run;
-		    return;
-		} else {
-		    $self->error("can't describe job $descr->{JobId}: ",
-				 $self->last_error_message);
-		}
-	    } elsif (ref($res) ne 'HASH') {
-		croak "describe_job returned wrong datatype (".ref($res).") for \"$descr->{JobId}\"";
-	    } else {
-		$res = timestamp_deserialize($res);
-		$self->debug(2, $res->{StatusCode});
-		$db->store($key, $res) unless $self->dry_run;
-		$descr = $res;
-	    }		
+	    my $res = $self->check_job($key, $descr, $vault)
+		or return;
+	    $res = timestamp_deserialize($res);
+	    $self->debug(2, $res->{StatusCode});
+	    $db->store($key, $res) unless $self->dry_run;
+	    $descr = $res;
 	}
 	
 	my $started = $self->format_date_time($descr, 'CreationDate');

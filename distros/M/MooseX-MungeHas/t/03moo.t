@@ -89,4 +89,21 @@ ok(
 	'$o->attr5 is now initialized',
 );
 
+{
+	package Local::Class2;
+	use Moo;
+	use MooseX::MungeHas qw( is_ro always_required );
+	has attr1 => $Even;
+	has attr2 => (isa => $Even, required => 0);
+	has attr3 => (isa => $Even, default => sub { 42 });
+}
+
+use Test::Fatal;
+
+my $e1 = exception { Local::Class2->new(attr1 => 2) };
+is($e1, undef, "attr2 and attr3 shouldn't be required");
+
+my $e2 = exception { Local::Class2->new(attr2 => 2) };
+like($e2, qr/required/i, "attr1 should be required");
+
 done_testing;

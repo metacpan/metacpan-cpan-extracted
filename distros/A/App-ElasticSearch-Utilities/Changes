@@ -1,9 +1,53 @@
 ==================================================
-Changes from 2016-12-21 00:00:00 +0000 to present.
+Changes from 2017-01-01 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.2 at 2018-12-21 02:56:27 +0000
+version 6.3 at 2019-01-01 01:15:22 +0000
+----------------------------------------
+
+  Change: 0a032698e44212328cb3bef1acae61812db12353
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-31 17:00:09 +0000
+
+    Fixes for the 6.x version of ElasticSearch
+
+    * Ensure we set a Content-Type header for requests sending JSON * Handle
+    special casing for index creation in ::Connection * Ensure all _bulk
+    requests end with a "\n" * Fix missing Ref::Util import in es-copy-index.pl
+    * es-copy-index.pl: only send _mappings if defined 
+
+  Change: 4683229bdb8811d7d1122f4a9bd665c61d84f23d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-31 16:49:20 +0000
+
+    Fix authordeps 
+
+  Change: 75b43dee4c8313e16891e2bb7bfe8e44b99593a9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-31 16:45:25 +0000
+
+    Reset author/copyright_holder because my git settings trip up the
+    auto-discovery. 
+
+  Change: 510aa532e05a9c2cb44af384145c2beaa06c65e2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-27 22:37:01 +0000
+
+    Fix up the AutoEscape plugin to run at the correct priority 
+
+  Change: 90d61d84d2c2ece75b7bc5d13690ca1b282c7ad7
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2018-12-27 22:20:31 +0000
+
+    Added an AutoEscape Query String Parser
+
+    While searching for UserAgents or file paths, you need to know the secret
+    Lucene handshakes to match as you expect. This plugin automatically
+    converts common characters users may not expect to cause special behavior. 
+
+----------------------------------------
+version 6.2 at 2018-12-21 02:53:52 +0000
 ----------------------------------------
 
   Change: 81bae677ac93da9eba1c2a3b4859eded645782f9
@@ -510,23 +554,6 @@ version 5.3 at 2017-03-23 01:49:52 +0000
 
     * es_master() and --master-only added, documentation clean up. 
 
-----------------------------------------
-version 5.2 at 2016-12-29 22:44:10 +0000
-----------------------------------------
-
-  Change: f9be6c93da4bb0d734440c5f5ccabef81888adc2
-  Author: Brad Lhotsky <blhotsky@craigslist.org>
-  Date : 2016-12-29 14:44:10 +0000
-
-    Fixes for 5.x
-
-    * <index>/_status deprecated since 1.2, make rewrite to _stats the
-
-    default * <index>/_stats no longer supports all parameter, it's the default
-
-    since 1.x * Replace the last call to <index>/_status in my tools with
-    <index>/stats 
-
 =================================================
-Plus 58 releases after 2016-12-21 00:00:00 +0000.
+Plus 59 releases after 2017-01-01 00:00:00 +0000.
 =================================================

@@ -46,4 +46,5 @@ sub file_version {
     my ($self) = @_;
     return $self->{_fileversion};
 }
-    
+
+1;

@@ -39,6 +39,8 @@ sub run
         for my $sync ( @{$task{sync}} )
         {
 	    next unless @{$sync->{dst}};
+            delete $ENV{MYDanExtractFile};
+            delete $ENV{MYDanExtractFileAim};
             my $mrsync = MYDan::Agent::Mrsync->new( %$sync, %path );
             map{ $failed{$_} = 1 } $mrsync->run( %o )->failed();
         }
@@ -64,6 +66,8 @@ sub run
             my $host = $task{load}[$i];
             print "$host => localhost: LOAD\n";
 
+            delete $ENV{MYDanExtractFile};
+            delete $ENV{MYDanExtractFileAim};
             eval{
                 MYDan::Agent::Load->new(
                     node => $host,
@@ -147,6 +151,8 @@ sub run
             {
 		my @dst = grep{ $_ ne $todo->{ok} }@{$todo->{dst}};
 		next unless @dst;
+                delete $ENV{MYDanExtractFile};
+                delete $ENV{MYDanExtractFileAim};
                 my $mrsync = MYDan::Agent::Mrsync->new( 
                     src => [ $todo->{ok} ], dst => \@dst, map{ $_ => $path{dp} }qw( sp dp ) );
                 map{ $failed{$_} = 1 }$mrsync->run( %o )->failed();

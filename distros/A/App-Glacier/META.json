@@ -51,10 +51,11 @@
             "Pod::Usage" : "1.51",
             "Scalar::Util" : "1.47",
             "Storable" : "2.34",
-            "Term::ReadKey" : "2.32"
+            "Term::ReadKey" : "2.32",
+            "Text::Locus" : "1.01"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.00"
+   "version" : "2.10"
 }

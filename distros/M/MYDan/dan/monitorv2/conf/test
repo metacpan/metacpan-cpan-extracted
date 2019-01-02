@@ -1,0 +1,6 @@
+---
+target: localhost,127.0.0.1
+interval: 60
+code: test
+param:
+  test:

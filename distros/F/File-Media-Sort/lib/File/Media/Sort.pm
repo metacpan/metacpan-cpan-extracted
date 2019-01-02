@@ -5,7 +5,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.044';
+  $VERSION = '0.062';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -13,54 +13,34 @@ BEGIN {
   );
 }
 
+my %media_re = (
+  tv    => {
+    regex => '(?i)([S0-9]+)?([E0-9]+)(.*TV)',
+#    location => \@episodes,
+  },
+  mvid  => {
+    regex => '.*([_-]+)x264-[0-9]{4}',
+#    location => \@mvids,
+  },
+  music => {
+    regex => '.+(?:-|_-_)\w+-(?:[0-9]+CD?-)?(?:[0-9]{4}-)?(?:\w+)?',
+#    location => \@music,
+  },
+);
 
 
 sub media_sort {
   my $type = shift;
+  die "Type not supported\n" unless exists($media_re{$type});
+  my @files = @_;
 
-  my @files;
-  if(ref($_[0]) eq 'ARRAY') {
-    push(@files, @{$_[0]});
-  }
-  else {
-    push(@files, @_);
-  }
-
-  return @files if(!defined($type));
-
-  my (@episodes, @mvids, @music);
-
-  my %re = (
-    tv    => {
-      regex => '(?i)([S0-9]+)?([E0-9]+)(.*TV)',
-      location => \@episodes,
-    },
-    mvids => {
-      regex => '.*([_-]+)x264-[0-9]{4}',
-      location => \@mvids,
-    },
-    music => {
-      regex => '.+(?:-|_-_)\w+-(?:[0-9]+CD?-)?(?:[0-9]{4}-)?(?:\w+)?',
-      location => \@music,
-    },
-  );
-
+  my @results;
   for my $file(@files) {
-    if($re{$type} eq 'music') {
-      if($file =~ m/$re{mvids}->{regex}/) {
-        push(@mvids, $file);
-      }
-      else {
-        push(@music, $file);
-      }
-      next;
-    }
-
-    if($file =~ m/$re{$type}{regex}/) {
-      push(@{$re{$type}{location}}, $file);
+    if($file =~ m/$media_re{$type}->{regex}/) {
+      push(@results, $file);
     }
   }
-  return(@{$re{$type}{location}});
+  return @results;
 }
 
 
@@ -78,7 +58,7 @@ File::Media::Sort - sort media based on their release names
 
     use File::Media::Sort qw(media_sort);
 
-    my @tv = media_sort('tv', [ glob("$ENV{HOME}/*") ]);
+    my @tv = media_sort('tv', glob("$ENV{HOME}/*"));
 
 =head1 DESCRIPTION
 
@@ -99,9 +79,9 @@ None by default.
 
 =head2 media_sort()
 
-Parameters: $type, @files | $type, \@files
+Parameters: $type, @files
 
-Returns:    @files;
+Returns:    @results;
 
 C<media_sort()> takes a list of files and a type. Type can be 'music', 'mvids'
 or 'tv'.
@@ -120,7 +100,7 @@ Patches and suggestions B<very welcome>.
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS
@@ -129,7 +109,7 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011 the B<File::Media::Sort>s L</AUTHOR> and L</CONTRIBUTORS>
+Copyright 2010, 2011, 2018- the B<File::Media::Sort>s L</AUTHOR> and L</CONTRIBUTORS>
 as listed above.
 
 =head1 LICENSE
@@ -139,6 +119,6 @@ the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Parse::Flexget>, L<File::PatternMatch>
+L<Parse::Flexget>, L<File::PatternMatch>, L<App::rel>
 
 =cut

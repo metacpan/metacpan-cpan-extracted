@@ -17,17 +17,17 @@ Ryu::Async - use L<Ryu> with L<IO::Async>
  #!/usr/bin/env perl
  use strict;
  use warnings;
- 
  use IO::Async::Loop;
  use Ryu::Async;
- 
+ # This will generate a lot of output, but is useful
+ # for demonstrating lifecycles. Drop this to 'info' or
+ # 'debug' to make it more realistic.
  use Log::Any::Adapter qw(Stdout), log_level => 'trace';
- 
+ #
  my $loop = IO::Async::Loop->new;
  $loop->add(
  	my $ryu = Ryu::Async->new
  );
- 
  {
  	my $timer = $ryu->timer(
  		interval => 0.10,
@@ -175,5 +175,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

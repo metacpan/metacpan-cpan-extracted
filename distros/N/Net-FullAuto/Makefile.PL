@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000460';
+our $VERSION='1.0000463';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1159,9 +1159,7 @@ END
       unless (-1<index $yins,'wget') {
          fa_system("sudo yum -y install 'wget'");
       }
-      fa_system('sudo yum -y localinstall --nogpgcheck '.
-         'https://download1.rpmfusion.org/free/el/'.
-         'rpmfusion-free-release-7.noarch.rpm');
+      fa_system('echo y | sudo amazon-linux-extras install epel');
    }
    unless (-1<index $yins,'figlet') {
       fa_system("sudo yum -y install 'figlet'");
@@ -1181,17 +1179,11 @@ END
    unless (-1<index $yins,'openssl-devel') {
       fa_system("sudo yum -y install 'openssl-devel'");
    }
-   my $new_wget=0;
    unless (-1<index $yins,'wget') {
-      $new_wget=1;
       fa_system("sudo yum -y install 'wget'");
    }
-   if ($new_wget) {
-      fa_system('sudo yum -y localinstall --nogpgcheck '.
-         'https://download1.rpmfusion.org/free/el/'.
-         'rpmfusion-free-release-7.noarch.rpm');
-   }
    unless (-1<index $yins,'figlet') {
+      fa_system('echo y | sudo amazon-linux-extras install epel');
       fa_system("sudo yum -y install 'figlet'");
       my $yins=`yum list installed`;
       unless (-1<index $yins,'figlet') {
@@ -2065,6 +2057,7 @@ END
    &fa_install_module('Email::Abstract','install','Makefile');
    &fa_install_module('Email::Sender','install','Makefile');
    &fa_install_module('URI::Escape::XS','install','Makefile');
+   &fa_install_module('Proc::ProcessTable','install','Makefile');
    &fa_install_module('Data::Password::Check','install','Makefile');
    &fa_install_module('Crypt::GeneratePassword','install','Makefile');
 

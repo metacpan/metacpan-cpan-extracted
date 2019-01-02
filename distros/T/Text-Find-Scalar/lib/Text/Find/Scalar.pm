@@ -6,7 +6,7 @@ use 5.006001;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub new {
     my ($class) = @_;
@@ -117,13 +117,13 @@ Text::Find::Scalar - Find scalar names in a text.
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
-  use Text::Find::Variable;
+  use Text::Find::Scalar;
   
-  my $finder = Text::Find::Variable->new();
+  my $finder = Text::Find::Scalar->new();
   my $arrayref = $finder->find($string);
   
   # or
@@ -164,8 +164,6 @@ Scalars that are not covered
 =item * single quoted
 
   '$foo'
-
-=item
 
 =back
 

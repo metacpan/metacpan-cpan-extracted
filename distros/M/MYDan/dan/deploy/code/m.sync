@@ -1,20 +1,18 @@
 #!# perl: deploy/code/m.sync
 use strict;
-use File::Spec;
 use Sys::Hostname;
 
 use Data::Dumper;
-use MYDan::Agent::Client;
 use MYDan::Node;
-use MYDan::Agent::Mrsync;
+use MYDan::Agent::GrsyncM;
 
-my ( $conf, $port );
+my ( $conf, $port, %agent );
 BEGIN{
-    my %agent = MYDan::Util::OptConf->load()->dump('agent');
+    %agent = MYDan::Util::OptConf->load()->dump('agent');
     ( $conf, $port ) = @agent{qw( conf port )};
 };
 
-my %run = ( timeout => 86400, max => 500, user => 'root' );
+my %run = ( timeout => 60 , max => 500, user => 'root' );
 
 return sub
 {
@@ -23,18 +21,29 @@ return sub
     my ( $batch, $param ) = @param{qw( batch param )};
 
     my $range = MYDan::Node->new( MYDan::Util::OptConf->load()->dump('range') );
-    my ( $sp, $dp ) = @$param{qw(sp dp)};
-    die "sp and dp undef.\n" if !$sp && !$dp;
+    %run = ( %run, %$param );
+    die "sp and dp undef.\n" if !$run{sp} && !$run{dp};
 
-    $sp = $dp unless $sp;
-    $dp = $sp unless $dp;
+    $run{sp} = $run{dp} unless $run{sp};
+    $run{dp} = $run{sp} unless $run{dp};
 
-    my $mrsync = MYDan::Agent::Mrsync->new ( sp => $sp, dp => $dp, dst => $batch,
-        src => [ $range->load( $param->{src} || hostname() )->list ]
+    my %sync = (
+        dst => $batch,
+        src => [ $range->load( delete $run{src} || hostname() )->list ],
+        agent => \%agent,
     );
 
+    if( $run{dp} eq $run{sp} )
+    {
+        my %src = map{ $_ => 1 }@{$sync{src}};
+        die "'$run{sp}' are the same file on same host.\n" 
+            unless grep{ ! $src{$_} }@{$sync{dst}};
+    }
+
+    my @failed = MYDan::Agent::GrsyncM->new( opt => \%run, sync => \%sync )->run();
+
     my %succ = map{ $_ => 'sync ok' }@$batch;
-    map{ delete $succ{$_} }my @failed = $mrsync->run( %run, %$param )->failed();
+    map{ delete $succ{$_} }@failed;
 
     printf "failed [%s]:%s\n", scalar @failed, $range->load( \@failed )->dump();
 

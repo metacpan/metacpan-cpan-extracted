@@ -1,0 +1,16 @@
+---
+target: localhost,127.0.0.1
+interval: 60
+code: sysinfo
+param:
+  test:
+    cpu:
+      - '{CPU}{all}{%idle} < 10'
+      - '{CPU}{all}{%idle} > 1'
+      - '{CPU}{all}{%user} > 90'
+    disk:
+      - '{DF}{/da10}{Use%} > 90'
+      - '{DF}{/da11}{Use%} > 90'
+      - '{DF}{/da12}{Use%} > 90'
+      - '{DF}{/da14}{Use%} > 90'
+      - '{DF}{/da1}{Use%} > 90'

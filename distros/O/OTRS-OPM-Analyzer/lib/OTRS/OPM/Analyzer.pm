@@ -8,7 +8,7 @@ use Moose::Util::TypeConstraints;
 use OTRS::OPM::Parser;
 use OTRS::OPM::Analyzer::Utils::Config;
 
-our $VERSION = 0.06;
+our $VERSION = '0.07';
 
 # define types
 subtype 'OPMFile' =>
@@ -142,7 +142,7 @@ OTRS::OPM::Analyzer - Analyze OTRS add-ons (.opm files)
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

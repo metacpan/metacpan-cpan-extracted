@@ -260,13 +260,17 @@ sub geocode {
 	}
 	my $ap;
 	if(($location =~ /USA$/) || ($location =~ /United States$/)) {
-		$ap = Lingua::EN::AddressParse->new(country => 'US', auto_clean => 1, force_case => 1, force_post_code => 0);
-	} elsif($location =~ /England$/) {
-		$ap = Lingua::EN::AddressParse->new(country => 'GB', auto_clean => 1, force_case => 1, force_post_code => 0);
+		$ap = $self->{'ap'}->{'us'} // Lingua::EN::AddressParse->new(country => 'US', auto_clean => 1, force_case => 1, force_post_code => 0);
+		$self->{'ap'}->{'us'} = $ap;
+	} elsif($location =~ /(England|Scotland|Wales|Northern Ireland|UK|GB)$/i) {
+		$ap = $self->{'ap'}->{'gb'} // Lingua::EN::AddressParse->new(country => 'GB', auto_clean => 1, force_case => 1, force_post_code => 0);
+		$self->{'ap'}->{'gb'} = $ap;
 	} elsif($location =~ /Canada$/) {
-		$ap = Lingua::EN::AddressParse->new(country => 'CA', auto_clean => 1, force_case => 1, force_post_code => 0);
+		$ap = $self->{'ap'}->{'ca'} // Lingua::EN::AddressParse->new(country => 'CA', auto_clean => 1, force_case => 1, force_post_code => 0);
+		$self->{'ap'}->{'ca'} = $ap;
 	} elsif($location =~ /Australia$/) {
-		$ap = Lingua::EN::AddressParse->new(country => 'AU', auto_clean => 1, force_case => 1, force_post_code => 0);
+		$ap = $self->{'ap'}->{'au'} // Lingua::EN::AddressParse->new(country => 'AU', auto_clean => 1, force_case => 1, force_post_code => 0);
+		$self->{'ap'}->{'au'} = $ap;
 	}
 	if($ap) {
 		if(my $error = $ap->parse($location)) {
@@ -391,12 +395,17 @@ sub geocode {
 		$state =~ s/\s$//g;
 		$country =~ s/\s$//g;
 
+		my $c;
+
 		if((uc($country) eq 'ENGLAND') ||
 		   (uc($country) eq 'SCOTLAND') ||
 		   (uc($country) eq 'WALES')) {
 			$country = 'Great Britain';
+			$c = 'gb';
+		} else {
+			$c = country2code($country);
 		}
-		if(my $c = country2code($country)) {
+		if($c) {
 			if($c eq 'us') {
 				if(length($state) > 2) {
 					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
@@ -463,13 +472,18 @@ sub geocode {
 					warn "Fast lookup of US location' $location' failed";
 				} else {
 					if($city =~ /^(\d.+),\s*([\w\s]+),\s*([\w\s]+)/) {
-						if(my $href = (Geo::StreetAddress::US->parse_address("$1, $2, $state") || Geo::StreetAddress::US->parse_location("$1, $2, $state"))) {
+						my $lookup = "$1, $2, $state";
+						if(my $href = (Geo::StreetAddress::US->parse_address($lookup) || Geo::StreetAddress::US->parse_location($lookup))) {
 							# Street, City, County
 							# 105 S. West Street, Spencer, Owen, Indiana, USA
 							# ::diag(Data::Dumper->new([\$href])->Dump());
 							$county = $3;
 							$county =~ s/\s*county$//i;
-							$state = $href->{'state'};
+							if($href->{'state'}) {
+								$state = $href->{'state'};
+							} else {
+								Carp::croak(__PACKAGE__, ": Geo::StreetAddress::US couldn't find the state in '$lookup'");
+							}
 							if(length($state) > 2) {
 								if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
 									$state = $twoletterstate;
@@ -658,6 +672,7 @@ sub geocode {
 					# City includes a street name
 					my $street = uc($1);
 					$city = uc($2);
+
 					# TODO: Configurable - or better still remove the need
 					if($city eq 'MINSTER, THANET') {
 						$city = 'RAMSGATE';

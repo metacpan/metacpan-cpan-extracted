@@ -97,6 +97,13 @@ is_deeply [<$handle>], ["test\n", "123\n"], 'right structure';
 $file->spurt(encode('UTF-8', '♥'));
 $handle = $file->open('<:encoding(UTF-8)');
 is_deeply [<$handle>], ['♥'], 'right structure';
+$dir = tempdir;
+eval { $dir->child('does_not_exist')->open('<') };
+like $@, qr/^Can't open file/, 'right error';
+eval { $dir->child('does_not_exist')->slurp };
+like $@, qr/^Can't open file/, 'right error';
+eval { $dir->child('foo')->make_path->spurt('fail') };
+like $@, qr/^Can't open file/, 'right error';
 
 # Make path
 $dir = tempdir;
@@ -107,6 +114,16 @@ ok -d $subdir, 'directory exists';
 my $nextdir = $dir->child('foo', 'foobar')->make_path({error => \my $error});
 ok -d $nextdir, 'directory exists';
 ok $error, 'directory already existed';
+
+# Remove
+$dir = tempdir;
+$dir->child('test.txt')->spurt('test!');
+ok -e $dir->child('test.txt'), 'file exists';
+is $dir->child('test.txt')->slurp, 'test!', 'right content';
+ok !-e $dir->child('test.txt')->remove->touch->remove->remove,
+  'file no longer exists';
+eval { $dir->child('foo')->make_path->remove };
+like $@, qr/^Can't remove file/, 'right error';
 
 # Remove tree
 $dir = tempdir;
@@ -163,6 +180,16 @@ like $@, qr/^Can't chmod file/, 'right error';
 # Stat
 $dir = tempdir;
 is $dir->child('test.txt')->spurt('1234')->stat->size, 4, 'right size';
+
+# Lstat
+$dir = tempdir;
+my $orig = $dir->child('test.txt')->spurt('');
+my $link = $orig->sibling('test.link');
+SKIP: {
+  skip 'symlinks unimplemented', 2 unless eval { symlink $orig, $link };
+  is $link->stat->size,    0, 'target file is empty';
+  isnt $link->lstat->size, 0, 'link is not empty';
+}
 
 # List
 is_deeply path('does_not_exist')->list->to_array, [], 'no files';

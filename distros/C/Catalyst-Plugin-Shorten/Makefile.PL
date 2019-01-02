@@ -22,7 +22,7 @@ WriteMakefile(
 	},
     PREREQ_PM => {
         'Catalyst::Runtime' => '5.80001',
-		'Bijection' => '0.04',
+		'Bijection' => '1.00',
 	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Catalyst-Plugin-Shorten-*' },

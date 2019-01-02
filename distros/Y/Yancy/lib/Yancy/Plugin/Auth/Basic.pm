@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.019';
+our $VERSION = '1.020';
 # ABSTRACT: A simple auth module for a site
 
 #pod =encoding utf8
@@ -381,7 +381,7 @@ Yancy::Plugin::Auth::Basic - A simple auth module for a site
 
 =head1 VERSION
 
-version 1.019
+version 1.020
 
 =head1 SYNOPSIS
 

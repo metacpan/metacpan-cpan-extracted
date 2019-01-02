@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Import::Export" : "0.08",
+            "Import::Export" : "1.00",
             "perl" : "5.006"
          }
       }
@@ -42,7 +42,7 @@
    "provides" : {
       "Bijection" : {
          "file" : "lib/Bijection.pm",
-         "version" : "0.04"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Bijection"
       }
    },
-   "version" : "0.04",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

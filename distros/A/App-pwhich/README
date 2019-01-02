@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.15
+    version 1.16
 
 SYNOPSIS
 
@@ -50,6 +50,8 @@ SUPPORT
 
 SEE ALSO
 
+    pwhere
+
     File::Which
 
       Perl API for pwhich
@@ -58,17 +60,10 @@ SEE ALSO
 
       Guts of this script.
 
-    Devel::CheckBin
-
-      This module purports to "check that a command is available", but does
-      not
-
-      provide any documentation on how you might use it.
-
 CAVEATS
 
     This module does not know about built-in shell commands, as the
-    built-in command which and where ususally do.
+    built-in command which and where usually do.
 
     This module is fully supported back to Perl 5.8.1. It may work on
     5.8.0.

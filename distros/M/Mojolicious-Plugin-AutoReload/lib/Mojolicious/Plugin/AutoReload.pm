@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoReload;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 # ABSTRACT: Automatically reload open browser windows when your application changes
 
 #pod =head1 SYNOPSIS
@@ -8,14 +8,8 @@ our $VERSION = '0.003';
 #pod     plugin AutoReload => {};
 #pod     get '/' => 'index';
 #pod     app->start;
-#pod
 #pod     __DATA__
-#pod     @@ layouts/default.html.ep
-#pod     %= auto_reload;
-#pod     %= content;
-#pod
 #pod     @@ index.html.ep
-#pod     % layout 'default';
 #pod     Hello world!
 #pod
 #pod =head1 DESCRIPTION
@@ -32,6 +26,22 @@ our $VERSION = '0.003';
 #pod route. When the server restarts, the WebSocket is disconnected, which
 #pod triggers a reload of the page.
 #pod
+#pod The AutoReload plugin will automatically add a C<< <script> >> tag to
+#pod your HTML pages while running in C<development> mode. If you need to
+#pod control where this script tag is written, use the L</auto_reload>
+#pod helper.
+#pod
+#pod To disable the plugin for a single page, set the C<<
+#pod plugin.auto_reload.disable >> stash value to a true value:
+#pod
+#pod
+#pod     get '/' => sub {
+#pod         my ( $c ) = @_;
+#pod         # Don't auto-reload the home page
+#pod         $c->stash( 'plugin.auto_reload.disable' => 1 );
+#pod         ...
+#pod     };
+#pod
 #pod =head1 HELPERS
 #pod
 #pod =head2 auto_reload
@@ -40,6 +50,9 @@ our $VERSION = '0.003';
 #pod automatically reload the page. This helper only works when the
 #pod application mode is C<development>, so you can leave this in all the
 #pod time and have it only appear during local development.
+#pod
+#pod This is only needed if you want to control where the C<< <script> >>
+#pod for automatically-reloading is rendered.
 #pod
 #pod =head1 ROUTES
 #pod
@@ -60,18 +73,32 @@ use Mojo::Util qw( unindent trim );
 sub register {
     my ( $self, $app, $config ) = @_;
 
-    $app->routes->websocket( '/auto_reload' => sub {
-        my ( $c ) = @_;
-        $c->inactivity_timeout( 60 );
-        my $timer_id = Mojo::IOLoop->recurring( 30, sub { $c->send( 'ping' ) } );
-        $c->on( finish => sub {
-            Mojo::IOLoop->remove( $timer_id );
-        } );
-    } )->name( 'auto_reload' );
+    if ( $app->mode eq 'development' ) {
+        $app->routes->websocket( '/auto_reload' => sub {
+            my ( $c ) = @_;
+            $c->inactivity_timeout( 60 );
+            my $timer_id = Mojo::IOLoop->recurring( 30, sub { $c->send( 'ping' ) } );
+            $c->on( finish => sub {
+                Mojo::IOLoop->remove( $timer_id );
+            } );
+        } )->name( 'auto_reload' );
+
+        $app->hook(after_render => sub {
+            my ( $c, $output, $format ) = @_;
+            return if $c->stash( 'plugin.auto_reload.disable' );
+            if ( $format eq 'html' ) {
+                my $dom = Mojo::DOM->new( $$output );
+                my $body = $dom->at( 'body' ) || $dom;
+                $body->append_content( $c->auto_reload );
+                $$output = "$dom";
+            }
+        });
+    }
 
     $app->helper( auto_reload => sub {
         my ( $c ) = @_;
-        if ( $app->mode eq 'development' ) {
+        if ( $app->mode eq 'development' && !$c->stash( 'plugin.auto_reload.disable' ) ) {
+            $c->stash( 'plugin.auto_reload.disable' => 1 );
             return $c->render_to_string( inline => unindent trim( <<'ENDHTML' ) );
                 <script>
                     // If we lose our websocket connection, the web server must
@@ -103,7 +130,7 @@ Mojolicious::Plugin::AutoReload - Automatically reload open browser windows when
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -111,14 +138,8 @@ version 0.003
     plugin AutoReload => {};
     get '/' => 'index';
     app->start;
-
     __DATA__
-    @@ layouts/default.html.ep
-    %= auto_reload;
-    %= content;
-
     @@ index.html.ep
-    % layout 'default';
     Hello world!
 
 =head1 DESCRIPTION
@@ -135,6 +156,21 @@ This works by opening a WebSocket connection to a specific Mojolicious
 route. When the server restarts, the WebSocket is disconnected, which
 triggers a reload of the page.
 
+The AutoReload plugin will automatically add a C<< <script> >> tag to
+your HTML pages while running in C<development> mode. If you need to
+control where this script tag is written, use the L</auto_reload>
+helper.
+
+To disable the plugin for a single page, set the C<<
+plugin.auto_reload.disable >> stash value to a true value:
+
+    get '/' => sub {
+        my ( $c ) = @_;
+        # Don't auto-reload the home page
+        $c->stash( 'plugin.auto_reload.disable' => 1 );
+        ...
+    };
+
 =head1 HELPERS
 
 =head2 auto_reload
@@ -143,6 +179,9 @@ The C<auto_reload> template helper inserts the JavaScript to
 automatically reload the page. This helper only works when the
 application mode is C<development>, so you can leave this in all the
 time and have it only appear during local development.
+
+This is only needed if you want to control where the C<< <script> >>
+for automatically-reloading is rendered.
 
 =head1 ROUTES
 

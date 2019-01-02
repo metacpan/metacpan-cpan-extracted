@@ -5,7 +5,7 @@ package Mojolicious::Plugin::BootstrapHelpers::Helpers;
 
 # ABSTRACT: Supporting module
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0204';
+our $VERSION = '0.0205';
 
 use List::Util qw/uniq/;
 use Mojo::ByteStream;
@@ -19,9 +19,11 @@ sub bootstraps_bootstraps {
     my $c = shift;
     my $arg = shift;
 
-    my $css   = q{<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">};
-    my $theme = q{<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">};
-    my $js    = q{<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>};
+    my $bs_version = '3.4.0';
+
+    my $css   = qq{<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/$bs_version/css/bootstrap.min.css">};
+    my $theme = qq{<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/$bs_version/css/bootstrap-theme.min.css">};
+    my $js    = qq{<script src="https://maxcdn.bootstrapcdn.com/bootstrap/$bs_version/js/bootstrap.min.js"></script>};
     my $jq    = q{<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>};
 
     return out(
@@ -964,7 +966,7 @@ Mojolicious::Plugin::BootstrapHelpers::Helpers - Supporting module
 
 =head1 VERSION
 
-Version 0.0204, released 2016-12-31.
+Version 0.0205, released 2019-12-31.
 
 =head1 SOURCE
 

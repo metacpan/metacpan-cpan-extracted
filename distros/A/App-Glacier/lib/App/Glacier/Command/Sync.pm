@@ -72,18 +72,17 @@ sub sync {
     my ($self, $vault_name, %opts) = @_;
 
     my $dir = $self->directory($vault_name);
-    $dir->invalidate if $opts{force};
     my $job = new App::Glacier::Job::InventoryRetrieval(
 	$self, $vault_name,
 	invalidate => $opts{force});
     if ($job->is_completed) {
-	my $res = $self->glacier_eval('get_job_output', $vault_name, $job->id);
-	if ($self->lasterr) {
-	    if ($self->lasterr('code') == 404 && !$opts{force})  {
+	my $res = $self->glacier->Get_job_output($vault_name, $job->id);
+	if ($self->glacier->lasterr) {
+	    if ($self->glacier->lasterr('code') == 404 && !$opts{force})  {
 		if ($opts{restart}) {
 		    $self->abend(EX_FAILURE,
 				 "unexpected error after restart:",
-				 $self->last_error_message);
+				 $self->glacier->last_error_message);
 		}
 		# Job expired, delete it
 		# ('mesg' => 'The job ID was not found...)
@@ -92,7 +91,7 @@ sub sync {
 	    } else {
 		# FIXME
 		$self->abend(EX_FAILURE, "can't list vault $vault_name: ",
-			     $self->last_error_message);
+			     $self->glacier->last_error_message);
 	    }
 	}
 	$res = decode_json($res);

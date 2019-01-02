@@ -9,10 +9,16 @@ my @OK = (
     # expression     => deparsed text
     'let $foo'       => 'my $foo',
     'let ($foo)'     => 'my $foo', # equivalent to 'my ($foo)'
-    'let $foo:Good'  => '\'attributes\'->import(\'main\', \$foo, \'Good\'), my $foo', # equivalent to 'my $foo:Good'
+
+    $] > 5.026003 ? (
+        'let $foo:Good' => 'my $foo :Good',
+    ) : (
+        'let $foo:Good'  => '\'attributes\'->import(\'main\', \$foo, \'Good\'), my $foo', # equivalent to 'my $foo:Good'
+    ),
+
     'let $foo = 123' => 'my $foo = 123',
     'let $foo = 0'   => 'my $foo = 0',
-    'let Str $foo'   => 'my $foo;croak(Str->get_message($foo)) unless Str->check($foo);ttie $foo, Str',
+    'let Str $foo'   => 'my $foo;Variable::Declaration::croak(Str->get_message($foo)) unless Str->check($foo);&Variable::Declaration::type_tie(\$foo, Str, $foo)',
 
     'static $foo'       => 'state $foo',
     'static ($foo)'     => 'state $foo', # equivalent to 'state ($foo)'
@@ -20,17 +26,23 @@ my @OK = (
     # https://rt.perl.org/Public/Bug/Display.html?id=68658
     $] =~ m{^5.012} ? (
         'static $foo:Good'  => '\'attributes\'->import(\'main\', \$foo, \'Good\'), my $foo', # equivalent to 'state $foo:Good'
+    ) : $] > 5.026003 ? (
+        'static $foo:Good'  => 'state $foo :Good',
     ) : (
         'static $foo:Good'  => '\'attributes\'->import(\'main\', \$foo, \'Good\'), state $foo', # equivalent to 'state $foo:Good'
     ),
-
+    
     'static $foo = 123' => 'state $foo = 123',
     'static $foo = 0'   => 'state $foo = 0',
-    'static Str $foo'   => 'state $foo;croak(Str->get_message($foo)) unless Str->check($foo);ttie $foo, Str',
+    'static Str $foo'   => 'state $foo;Variable::Declaration::croak(Str->get_message($foo)) unless Str->check($foo);&Variable::Declaration::type_tie(\$foo, Str, $foo)',
+    
+    'const $foo = 123'           => 'my $foo = 123;Variable::Declaration::data_lock($foo)',
+    'const $foo = 0'             => 'my $foo = 0;Variable::Declaration::data_lock($foo)',
+    'const Str $foo = \'hello\'' => 'my $foo = \'hello\';Variable::Declaration::croak(Str->get_message($foo)) unless Str->check($foo);&Variable::Declaration::type_tie(\$foo, Str, $foo);Variable::Declaration::data_lock($foo)',
+);
 
-    'const $foo = 123'           => 'my $foo = 123;dlock($foo)',
-    'const $foo = 0'             => 'my $foo = 0;dlock($foo)',
-    'const Str $foo = \'hello\'' => 'my $foo = \'hello\';croak(Str->get_message($foo)) unless Str->check($foo);ttie $foo, Str;dlock($foo)',
+my @TODO = (
+    'issue #2' => ['(let $foo)' => '(my $foo)'],
 );
 
 my @NG = (
@@ -63,17 +75,32 @@ my @NG = (
 
 sub check_ok {
     my ($expression, $expected) = @_;
-    my $deparse = B::Deparse->new();
 
     my $code = eval "sub { $expression }";
-    my $text = $deparse->coderef2text($code);
-    (my $got = $text) =~ s!^    !!mg;
-    $got =~ s!\n!!g;
+    note "EXPECTED: '$expected'";
+    if ($@) {
+        note 'EVAL FAILED';
+        note $@;
+        fail;
+    }
+    else {
+        my $deparse = B::Deparse->new();
+        my $text = $deparse->coderef2text($code);
+        (my $got = $text) =~ s!^    !!mg;
+        $got =~ s!\n!!g;
 
-    note "'$expected'";
-    note $text;
-    my $e = quotemeta $expected;
-    ok $got =~ m!$e!;
+        note "GOT:$text";
+        my $e = quotemeta $expected;
+        ok $got =~ m!$e!;
+    }
+}
+
+sub check_todo {
+    my ($message, $data) = @_;
+    TODO: {
+        local $TODO = $message;
+        check_ok(@$data);
+    };
 }
 
 sub check_ng {
@@ -83,15 +110,15 @@ sub check_ng {
     note "'$expected'";
     if ($@) {
         note $@;
+        my $e = quotemeta $expected;
+        ok $@ =~ m!$e!;
     }
     else {
         my $deparse = B::Deparse->new();
         my $text = $deparse->coderef2text($code);
         note $text;
+        fail;
     }
-
-    my $e = quotemeta $expected;
-    ok $@ =~ m!$e!;
 }
 
 sub Str() { ;; }
@@ -99,6 +126,12 @@ sub Str() { ;; }
 subtest 'case ok' => sub {
     while (@OK) {
         check_ok(shift @OK, shift @OK)
+    }
+};
+
+subtest 'case todo' => sub {
+    while (@TODO) {
+        check_todo(shift @TODO, shift @TODO)
     }
 };
 
@@ -115,8 +148,8 @@ subtest 'level 0' => sub {
 
 subtest 'level 1' => sub {
     Variable::Declaration->import(level => 1);
-    check_ok('let Str $foo', 'my $foo;croak(Str->get_message($foo)) unless Str->check($foo)');
-    check_ok('let Str $foo = \'hello\'', 'my $foo = \'hello\';croak(Str->get_message($foo)) unless Str->check($foo)');
+    check_ok('let Str $foo', 'my $foo;Variable::Declaration::croak(Str->get_message($foo)) unless Str->check($foo)');
+    check_ok('let Str $foo = \'hello\'', 'my $foo = \'hello\';Variable::Declaration::croak(Str->get_message($foo)) unless Str->check($foo)');
 };
 
 done_testing;

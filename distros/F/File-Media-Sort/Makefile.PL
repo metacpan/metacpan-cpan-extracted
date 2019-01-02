@@ -12,14 +12,14 @@ WriteMakefile1(
     },
     BUILD_REQUIRES      => { },
 
-    NAME                => q{File-Media-Sort},
-    AUTHOR              => q{Magnus Woldrich <trapd00r@trapd00r.se>},
+    NAME                => q{File::Media::Sort},
+    AUTHOR              => q{Magnus Woldrich <m@japh.se>},
     ABSTRACT            => q{Sort media files based on their filename pattern},
     VERSION_FROM        => q{lib/File/Media/Sort.pm},
     LICENSE             => q{perl},
 
     PL_FILES            => { },
-    EXE_FILES           => [ ],
+    EXE_FILES           => [glob('scripts/*') ],
     PREREQ_PM           => {
       q{Test::More}     => 0,
     },

@@ -3,7 +3,7 @@ package Ryu::Async::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =head1 NAME
 
@@ -31,4 +31,12 @@ A L<Ryu::Source> which can be used to L<Ryu::Source/emit> an event for each outg
 sub outgoing { shift->{outgoing} }
 
 1;
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

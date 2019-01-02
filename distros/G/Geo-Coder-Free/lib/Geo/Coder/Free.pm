@@ -17,11 +17,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 our $alternatives;
 
@@ -163,7 +163,7 @@ sub geocode {
 
 				}
 			}
-			return @rc if($rc[0]);
+			return @rc if(scalar(@rc) && $rc[0]);
 		} elsif(my $rc = $self->{'openaddr'}->geocode(\%param)) {
 			return $rc;
 		}
@@ -185,7 +185,12 @@ sub geocode {
 
 	# FIXME:  scantext only works if OPENADDR_HOME is set
 	if($param{'location'}) {
-		return $self->{'maxmind'}->geocode(\%param);
+		if(wantarray) {
+			my @rc = $self->{'maxmind'}->geocode(\%param);
+			return @rc;
+		} else {
+			return $self->{'maxmind'}->geocode(\%param);
+		}
 	}
 	if(!$param{'scantext'}) {
 		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
@@ -297,7 +302,7 @@ L<http://results.openaddresses.io/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Nigel Horne.
+Copyright 2017-2019 Nigel Horne.
 
 The program code is released under the following licence: GPL for personal use on a single computer.
 All other users (including Commercial, Charity, Educational, Government)
@@ -318,3 +323,4 @@ See L<https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.m
 __DATA__
 St Lawrence, Thanet, Kent = Ramsgate, Kent
 St Peters, Thanet, Kent = St Peters, Kent
+Minster, Thanet, Kent = Ramsgate, Kent

@@ -2,40 +2,51 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.006;
 
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "stream and data flow handling for async code",
   "AUTHOR" => "Tom Molesworth <TEAM\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Ryu",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Ryu",
   "PREREQ_PM" => {
     "Encode" => "1.98",
+    "Exporter" => 0,
     "Future" => "0.37",
+    "JSON::MaybeXS" => 0,
+    "List::Util" => 0,
     "List::UtilsBy" => "0.10",
     "Log::Any" => "1.045",
     "Log::Any::Adapter" => "1.045",
+    "MIME::Base64" => 0,
     "Ref::Util" => "0.111",
     "Scalar::Util" => "1.47",
     "Syntax::Keyword::Try" => "0.04",
+    "Text::CSV" => 0,
     "Variable::Disposition" => "0.004",
     "curry" => "1.001",
+    "curry::weak" => 0,
     "indirect" => 0,
     "namespace::clean" => "0.27",
-    "parent" => 0
+    "overload" => 0,
+    "parent" => 0,
+    "sort" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Log::Any::Adapter" => "1.045",
     "Log::Any::Adapter::TAP" => "0.003002",
     "Test::CheckDeps" => "0.010",
     "Test::Deep" => "1.124",
@@ -45,24 +56,28 @@ my %WriteMakefileArgs = (
     "Test::Refcount" => "0.07",
     "Test::Warnings" => "0.024"
   },
-  "VERSION" => "0.033",
+  "VERSION" => "0.035",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/source/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
   "Encode" => "1.98",
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Future" => "0.37",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "JSON::MaybeXS" => 0,
+  "List::Util" => 0,
   "List::UtilsBy" => "0.10",
   "Log::Any" => "1.045",
   "Log::Any::Adapter" => "1.045",
   "Log::Any::Adapter::TAP" => "0.003002",
+  "MIME::Base64" => 0,
   "Ref::Util" => "0.111",
   "Scalar::Util" => "1.47",
   "Syntax::Keyword::Try" => "0.04",
@@ -73,11 +88,17 @@ my %FallbackPrereqs = (
   "Test::More" => "0.98",
   "Test::Refcount" => "0.07",
   "Test::Warnings" => "0.024",
+  "Text::CSV" => 0,
   "Variable::Disposition" => "0.004",
   "curry" => "1.001",
+  "curry::weak" => 0,
   "indirect" => 0,
   "namespace::clean" => "0.27",
-  "parent" => 0
+  "overload" => 0,
+  "parent" => 0,
+  "sort" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

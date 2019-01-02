@@ -1,0 +1,36 @@
+#!/bin/usr/env perl
+use strict;
+use warnings;
+
+use POSIX;
+use File::Basename;
+use MYDan::Util::OptConf;
+
+=head1 SYNOPSIS
+
+ $0 
+    
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get()->dump( 'subscribe' );
+
+my ( @x, %x ) = map{ basename $_ }glob "$o{logs}/*";
+if( @x > 60 )
+{
+    splice( @x, - 60 );
+    %x = map{ $_ => 1 }@x;
+}
+
+while( 1 )
+{
+    for( grep{ ! $x{$_} }map{ basename $_ }glob "$o{logs}/*"  )
+    {
+        my ( $time ) = split /\./, $_;
+        $time = POSIX::strftime( "%Y-%m-%d %H:%M:%S", localtime( $time ) ) if $time && $time =~ /^\d+$/;
+        printf "%s\n%s\n$_\n", "-" x 30, $time ||'';
+        system "cat '$o{logs}/$_'";
+        $x{$_} = 1;
+    }
+    sleep 3;
+}

@@ -1,10 +1,9 @@
 use Test::More;
-
 BEGIN {
 	*CORE::GLOBAL::time = sub { 1531922097; }; 
-	use_ok(Time::Random);
 }
 	
+use Time::Random;
 {
 	my %okay = (
 		'18-07-18 13:54:57' => 1,

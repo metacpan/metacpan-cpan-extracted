@@ -13,45 +13,69 @@
       "version" : 2
    },
    "name" : "Ryu",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.014000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
       "runtime" : {
          "recommends" : {
-            "JSON::MaybeXS" : "0",
+            "JSON::MaybeUTF8" : "1.000",
             "MIME::Base64" : "0",
             "Text::CSV" : "0"
          },
          "requires" : {
             "Encode" : "1.98",
+            "Exporter" : "0",
             "Future" : "0.37",
+            "JSON::MaybeXS" : "0",
+            "List::Util" : "0",
             "List::UtilsBy" : "0.10",
             "Log::Any" : "1.045",
             "Log::Any::Adapter" : "1.045",
+            "MIME::Base64" : "0",
             "Ref::Util" : "0.111",
             "Scalar::Util" : "1.47",
             "Syntax::Keyword::Try" : "0.04",
+            "Text::CSV" : "0",
             "Variable::Disposition" : "0.004",
             "curry" : "1.001",
+            "curry::weak" : "0",
             "indirect" : "0",
             "namespace::clean" : "0.27",
-            "parent" : "0"
+            "overload" : "0",
+            "parent" : "0",
+            "sort" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          },
          "suggests" : {
             "JSON::SL" : "v1.0.6",
@@ -68,6 +92,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Log::Any::Adapter" : "1.045",
             "Log::Any::Adapter::TAP" : "0.003002",
             "Test::CheckDeps" : "0.010",
             "Test::Deep" : "1.124",
@@ -75,8 +100,43 @@
             "Test::Files" : "0.14",
             "Test::More" : "0.98",
             "Test::Refcount" : "0.07",
-            "Test::Warnings" : "0.024"
+            "Test::Warnings" : "0.024",
+            "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Ryu" : {
+         "file" : "lib/Ryu.pm",
+         "version" : "0.035"
+      },
+      "Ryu::Buffer" : {
+         "file" : "lib/Ryu/Buffer.pm",
+         "version" : "0.035"
+      },
+      "Ryu::Exception" : {
+         "file" : "lib/Ryu/Exception.pm",
+         "version" : "0.035"
+      },
+      "Ryu::Node" : {
+         "file" : "lib/Ryu/Node.pm",
+         "version" : "0.035"
+      },
+      "Ryu::Observable" : {
+         "file" : "lib/Ryu/Observable.pm",
+         "version" : "0.035"
+      },
+      "Ryu::Sink" : {
+         "file" : "lib/Ryu/Sink.pm",
+         "version" : "0.035"
+      },
+      "Ryu::Source" : {
+         "file" : "lib/Ryu/Source.pm",
+         "version" : "0.035"
+      },
+      "Ryu::Stream" : {
+         "file" : "lib/Ryu/Stream.pm",
+         "version" : "0.035"
       }
    },
    "release_status" : "stable",
@@ -84,14 +144,16 @@
       "bugtracker" : {
          "web" : "https://github.com/team-at-cpan/Ryu/issues"
       },
+      "homepage" : "https://github.com/team-at-cpan/Ryu",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/team-at-cpan/Ryu.git",
+         "url" : "https://github.com/team-at-cpan/Ryu.git",
          "web" : "https://github.com/team-at-cpan/Ryu"
       }
    },
-   "version" : "0.033",
-   "x_generated_by_perl" : "v5.28.0",
+   "version" : "0.035",
+   "x_authority" : "cpan:TEAM",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

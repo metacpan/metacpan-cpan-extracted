@@ -6,13 +6,13 @@ use Carp;
 use App::Glacier::Core;
 use parent 'App::Glacier::Core';
 use File::Basename;
+use File::Spec;
 use App::Glacier::EclatCreds;
 use App::Glacier::Config;
-use Net::Amazon::Glacier;
-use App::Glacier::HttpCatch;
-use App::Glacier::DB::GDBM;
+use App::Glacier::Bre;
 use App::Glacier::Timestamp;
 use App::Glacier::Directory;
+use App::Glacier::Roster;
 
 use Digest::SHA qw(sha256_hex);
 use File::Path qw(make_path);
@@ -69,24 +69,23 @@ my %parameters = (
 		    'single-part-size' => { check => \&ck_size },
 		    'jobs' => { check => \&ck_number },
 		    'retries' => { check => \&ck_number },
+		    'cachedir' => { default => '/var/lib/glacier/cache' }	
 		}
-	    } 
+	    }
 	}
     },
     database => {
 	section => {
 	    job => {
 		section => {
-		    file => { default => '/var/lib/glacier/job.db' },
-		    mode => { default => 0644 },
-		    ttl => { default => 72000, check => \&ck_number },
+		    backend => { default => 'GDBM' },
+		    '*' => '*'
 		},
 	    },
 	    inv => {
 		section => {
-		    directory => { default => '/var/lib/glacier/inv' },
-		    mode => { default => 0644 },
-		    ttl => { default => 72000, check => \&ck_number },
+		    backend => { default => 'GDBM' },
+		    '*' => '*'
 		}
 	    }
 	}
@@ -98,9 +97,11 @@ sub new {
     my $argref = shift;
     local %_ = @_;
 
-    my $config_file = delete $_{config}
-                      || $ENV{GLACIER_CONF}
-                      || "/etc/glacier.conf";
+    my $config_file = delete $_{config} || $ENV{GLACIER_CONF};
+    unless ($config_file) {
+	$config_file = -f '/etc/glacier.conf'
+	                ? '/etc/glacier.conf' : '/dev/null';
+    }
     my $account = delete $_{account};
     my $region = delete $_{region};
 
@@ -119,6 +120,13 @@ sub new {
 						parameters => \%parameters);
     exit(EX_CONFIG) unless $self->{_config}->parse();
 
+    App::Glacier::Roster->configtest($self->cfget(qw(database job backend)),
+				     $self->config, 'database', 'job')
+	or exit(EX_CONFIG);
+    App::Glacier::Directory->configtest($self->cfget(qw(database inv backend)),
+					$self->config, 'database', 'inv')
+	or exit(EX_CONFIG);
+
     unless ($self->{_config}->isset(qw(glacier access))
 	    && $self->{_config}->isset(qw(glacier secret))) {
 	if ($self->{_config}->isset(qw(glacier credentials))) {
@@ -133,23 +141,12 @@ sub new {
 		$region = $creds->region($account) unless defined $region;
 	    }
 	}
-	$self->abend(EX_CONFIG, "no access credentials found")
-	    unless ($self->{_config}->isset(qw(glacier access))
-		    && $self->{_config}->isset(qw(glacier secret)));
     }
 
-    if ($region) {
-	$self->{_config}->set(qw(glacier region), $region);
-    } elsif (!$self->{_config}->isset(qw(glacier region))) {
-	$self->{_config}->set(qw(glacier region), 'eu-west-1');
+    $self->{_glacier} = new App::Glacier::Bre($self->config->as_hash('glacier'));
+    if ($self->{_glacier}->lasterr) {
+	$self->abend(EX_CONFIG, $self->{_glacier}->last_error_message);
     }
-    
-    $self->{_glacier} = new Net::Amazon::Glacier(
-	$self->{_config}->get(qw(glacier region)),
-	$self->{_config}->get(qw(glacier access)),
-	$self->{_config}->get(qw(glacier secret))
-	);
-
     return $self;
 }
 
@@ -161,7 +158,16 @@ sub clone {
     my $self = $class->SUPER::clone($orig);
     $self->{_config} = $orig->config; 
     $self->{_glacier} = $orig->{_glacier};
+    $self->{_jobdb} = $orig->{_jobdb};
     $self
+}
+
+sub option {
+    my ($self, $opt, $val) = @_;
+    if (defined($val)) {
+	$self->{_options}{$opt} = $val;
+    }
+    return $self->{_options}{$opt};
 }
 
 sub touchdir {
@@ -182,61 +188,47 @@ sub touchdir {
 sub jobdb {
     my $self = shift;
     unless ($self->{_jobdb}) {
-	my $file = $self->cfget(qw(database job file));
-	$self->touchdir(dirname($file));
-	$self->{_jobdb} = new App::Glacier::DB::GDBM(
-	    $file,
-	    encoding => 'json',
-	    mode => $self->cfget(qw(database job mode))
-        );
+        my $be = $self->cfget(qw(database job backend));
+	$self->{_jobdb} = new App::Glacier::Roster(
+	    $be,
+	    $self->config->as_hash(qw(database job))
+	);
     }
     return $self->{_jobdb};
 }
 
 sub describe_vault {
     my ($self, $vault_name) = @_;
-    my $res = $self->glacier_eval('describe_vault', $vault_name);
-    if ($self->lasterr) {
-	if ($self->lasterr('code') == 404) {
+    my $res = $self->glacier->Describe_vault($vault_name);
+    if ($self->glacier->lasterr) {
+	if ($self->glacier->lasterr('code') == 404) {
 	    return undef;
 	} else {
 	    $self->abend(EX_FAILURE, "can't list vault: ",
-			 $self->last_error_message);
+			 $self->glacier->last_error_message);
 	}
     }
     return timestamp_deserialize($res);
 }
 
-sub _filename {
-    my ($self, $name) = @_;
-    $name =~ s/([^A-Za-z_0-9\.-])/sprintf("%%%02X", ord($1))/gex;
-    return $name;
-}
-
 sub directory {
     my ($self, $vault_name) = @_;
     unless (exists($self->{_dir}{$vault_name})) {
-	my $file = $self->cfget(qw(database inv directory))
-	           . '/' . $self->_filename($vault_name) . '.db';
-	unless (-e $file) {
-	    return undef unless $self->describe_vault($vault_name);
-	}
-	$self->touchdir($self->cfget(qw(database inv directory)));
+	my $be = $self->cfget(qw(database inv backend));
 	$self->{_dir}{$vault_name} =
 	    new App::Glacier::Directory(
-		$file,
-		encoding => 'json',
-		mode => $self->cfget(qw(database inv mode)),
-		ttl => $self->cfget(qw(database inv ttl))
+		$be,
+		$vault_name,
+		$self->glacier,
+		$self->config->as_hash(qw(database inv))
 	    );
     }
     return $self->{_dir}{$vault_name};
 }
 
-sub config {
-    my ($self) = @_;
-    return $self->{_config};
-}
+sub config { shift->{_config} }
+
+sub glacier { shift->{_glacier} }
 
 sub cfget {
     my ($self, @path) = @_;
@@ -252,37 +244,6 @@ sub cf_transfer_param {
 sub run {
     my $self = shift;
     $self->abend(EX_SOFTWARE, "command not implemented");
-}
-
-sub glacier_eval {
-    my $self = shift;
-    my $method = shift;
-    my $wantarray = wantarray;
-    my $ret = http_catch(sub {
-	                    $wantarray ? [ $self->{_glacier}->${\$method}(@_) ]
-				      : $self->{_glacier}->${\$method}(@_)
-			 },
-			 err => \my %err,
-			 args => \@_);
-    if (keys(%err)) {
-	$self->{_last_http_err} = \%err;
-    } else {
-	$self->{_last_http_err} = undef;
-    }
-    return (wantarray && ref($ret) eq 'ARRAY') ? @$ret : $ret;
-}
-
-sub lasterr {
-    my ($self, $key) = @_;
-    return undef unless defined $self->{_last_http_err};
-    return 1 unless defined $key;
-    return  $self->{_last_http_err}{$key};
-}
-
-sub last_error_message {
-    my ($self) = @_;
-    return "No error" unless $self->lasterr;
-    return $self->lasterr('mesg') || $self->lasterr('text');
 }
 
 sub getyn {
@@ -314,6 +275,48 @@ sub set_time_style_option {
 sub format_date_time {
     my ($self, $obj, $field) = @_;
     return $obj->{$field}->canned_format($self->{_options}{time_style});
+}
+
+sub archive_cache_filename {
+    my ($self, $vault_name, $archive_id) = @_;
+    return File::Spec->catfile($self->cfget(qw(transfer download cachedir)),
+			       $vault_name,
+			       $archive_id);
+}
+
+sub check_job {
+    my ($self, $key, $descr, $vault) = @_;
+
+    $self->debug(2, "$descr->{JobId} $descr->{Action} $vault");
+    if ($descr->{StatusCode} eq 'Failed') {
+	$self->debug(1,
+		     "deleting failed $key $vault "
+		     . ($descr->{JobDescription} || $descr->{Action})
+		     . ' '
+		     . $descr->{JobId});
+	$self->jobdb()->delete($key) unless $self->dry_run;
+	return;
+    }
+
+    my $res = $self->glacier->Describe_job($vault, $descr->{JobId});
+    if ($self->glacier->lasterr) {
+	if ($self->glacier->lasterr('code') == 404) {
+	    $self->debug(1,
+			 "deleting expired $key $vault "
+			 . ($descr->{JobDescription} || $descr->{Action})
+			 . ' '
+			 . $descr->{JobId});
+	    App::Glacier::Job->fromdb($self, $vault, $key, $res)->delete()
+		unless $self->dry_run;
+	} else {
+	    $self->error("can't describe job $descr->{JobId}: ",
+			 $self->glacier->last_error_message);
+	}
+	return;
+    } elsif (ref($res) ne 'HASH') {
+	croak "describe_job returned wrong datatype (".ref($res).") for \"$descr->{JobId}\"";
+    }
+    return $res;
 }
 
 1;

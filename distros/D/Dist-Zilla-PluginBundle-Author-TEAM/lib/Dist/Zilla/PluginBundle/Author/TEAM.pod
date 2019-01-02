@@ -1,0 +1,44 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Dist::Zilla::PluginBundle::Author::TEAM
+at lib/Dist/Zilla/PluginBundle/Author/TEAM.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Dist::Zilla::PluginBundle::Author::TEAM - yet another plugin bundle for Dist::Zilla
+
+=head1 DESCRIPTION
+
+See L<https://metacpan.org/author/TEAM> for modules which may possibly use this.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moose::Object>
+
+L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth C<< <TEAM@cpan.org> >>, but structure mostly taken from other plugin bundles such as:
+
+=over 4
+
+=item * L<Dist::Zilla::PluginBundle::Author::ETHER>
+
+=item * L<Dist::Zilla::Plugin::Author::Plicease>
+
+=back
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2019. Licensed under the same terms as Perl itself.
+

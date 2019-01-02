@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.29 {
+package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.31 {
 
   use 5.014;
   use Moose;
@@ -31,10 +31,12 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.29 {
     
     $self->$orig(@args);
     
-    my $file  = first { $_->name eq 'Makefile.PL' }       @{ $self->zilla->files };
-    my $mod   = first { $_->name eq 'inc/mymm.pl' }       @{ $self->zilla->files };
-    my $build = first { $_->name eq 'inc/mymm-build.pl' } @{ $self->zilla->files };
-    my $test  = first { $_->name eq 'inc/mymm-test.pl' }  @{ $self->zilla->files };
+    my $file   = first { $_->name eq 'Makefile.PL' }        @{ $self->zilla->files };
+    my $mod    = first { $_->name eq 'inc/mymm.pl' }        @{ $self->zilla->files };
+    my $config = first { $_->name eq 'inc/mymm-config.pl' } @{ $self->zilla->files };
+    my $build  = first { $_->name eq 'inc/mymm-build.pl' }  @{ $self->zilla->files };
+    my $test   = first { $_->name eq 'inc/mymm-test.pl' }   @{ $self->zilla->files };
+    my $clean  = first { $_->name eq 'inc/mymm-clean.pl' }  @{ $self->zilla->files };
 
     my @content = do {
       my $in  = $file->content;
@@ -128,8 +130,11 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.29 {
         
           push @new, $line;
         }
+
+        eval $mod->content;
+        $self->log_fatal("unable to eval inc/mymm.pl: $@") if $@;
         
-        if((eval $mod->content) && mymm->can('myWriteMakefile'))
+        if(mymm->can('myWriteMakefile'))
         {
           $last = "mymm::my$last";
         }
@@ -143,11 +148,19 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.29 {
     }
 
 
-    if($build || $test)
+    if($config || $build || $test || $clean)
     {
       push @content, "sub MY::postamble {";
       push @content, "  my \$postamble = '';";
       push @content, '';
+      if($config)
+      {
+        push @content, "  \$postamble .=";
+        push @content, "    \"config :: mymm_config\\n\" .";
+        push @content, "    \"mymm_config :\\n\" .";
+        push @content, "    \"\\t\\\$(FULLPERL) inc/mymm-config.pl\\n\\n\";";
+        push @content, '';
+      }
       if($build)
       {
         push @content, "  \$postamble .=";
@@ -162,6 +175,14 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.29 {
         push @content, "    \"subdirs-test_dynamic subdirs-test_static subdirs-test :: mymm_test\\n\" .";
         push @content, "    \"mymm_test :\\n\" .";
         push @content, "    \"\\t\\\$(FULLPERL) inc/mymm-test.pl\\n\\n\";";
+        push @content, '';
+      }
+      if($clean)
+      {
+        push @content, "  \$postamble .=";
+        push @content, "    \"clean :: mymm_clean\\n\" .";
+        push @content, "    \"mymm_clean : \\n\" . ";
+        push @content, "    \"\\t\\\$(FULLPERL) inc/mymm-clean.pl\\n\\n\";";
         push @content, '';
       }
       push @content, "  \$postamble;";
@@ -228,7 +249,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.29
+version 2.31
 
 =head1 SYNOPSIS
 

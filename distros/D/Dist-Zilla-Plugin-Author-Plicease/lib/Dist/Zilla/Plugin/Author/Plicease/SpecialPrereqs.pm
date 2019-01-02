@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.29 {
+package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.31 {
 
   use 5.014;
   use Moose;
@@ -35,7 +35,7 @@ package Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs 2.29 {
       Path::Class                           0.26
       Mojolicious                           4.31
       Role::Tiny                            1.003001
-      Test::More                            0.94
+      Test::More                            0.98
       Test::Exit                            0.11
       Clustericious                         1.20
       Test::Clustericious::Cluster          0.31
@@ -236,7 +236,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.29
+version 2.31
 
 =head1 SYNOPSIS
 

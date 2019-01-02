@@ -14,7 +14,7 @@ requires 'Encode', '>= 1.98';
 
 # Used for transcoding - not essential, but commonly used
 recommends 'MIME::Base64', 0;
-recommends 'JSON::MaybeXS', 0;
+recommends 'JSON::MaybeUTF8', '>= 1.000';
 recommends 'Text::CSV', 0;
 
 # Not so common

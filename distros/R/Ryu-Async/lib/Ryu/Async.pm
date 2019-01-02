@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 =head1 NAME
 
@@ -14,17 +14,17 @@ Ryu::Async - use L<Ryu> with L<IO::Async>
  #!/usr/bin/env perl
  use strict;
  use warnings;
- 
  use IO::Async::Loop;
  use Ryu::Async;
- 
+ # This will generate a lot of output, but is useful
+ # for demonstrating lifecycles. Drop this to 'info' or
+ # 'debug' to make it more realistic.
  use Log::Any::Adapter qw(Stdout), log_level => 'trace';
- 
+ #
  my $loop = IO::Async::Loop->new;
  $loop->add(
  	my $ryu = Ryu::Async->new
  );
- 
  {
  	my $timer = $ryu->timer(
  		interval => 0.10,
@@ -445,7 +445,7 @@ sub udp_server {
                 $log->debugf("UDP server [%s] had %s from %s", $uri->as_string, $msg, $addr);
                 $src->emit(
                     Ryu::Async::Packet->new(
-                        payload => $msg, 
+                        payload => $msg,
                         from    => $addr
                     )
                 )
@@ -549,5 +549,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

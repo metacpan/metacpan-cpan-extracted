@@ -21,11 +21,11 @@ WriteMakefile(
 	},
 	PREREQ_PM => {
  		'Carp' => '0',
-		'Import::Export' => '0.08',
+		'Import::Export' => '1.00',
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES => 'Bijection-*' },
-	 META_MERGE => {
+	META_MERGE => {
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {

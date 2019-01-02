@@ -1,5 +1,11 @@
 Revision history for Geo-Coder-Free
 
+0.16	Tue Jan  1 17:57:37 EST 2019
+	Import GeoName's allCountries data
+	Remember L:E:AddressParser objects to speed up parsing. RT#127814
+	Fix uninitialized variable
+	Error if G:S:P can't extract a state name
+
 0.15	Thu Nov 15 21:10:51 EST 2018
 	Added alternatives table, for when a place could be listed elsewhere
 	Support lookups of British counties e.g. 'Kent, England'

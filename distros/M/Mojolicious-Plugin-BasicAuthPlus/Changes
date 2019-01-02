@@ -1,5 +1,12 @@
 Revision history for Mojolicious-Plugin-BasicAuthPlus
 
+0.11.3 2018-12-31
+  - Parse username:password better, in case password contains a colon (patch
+    from Jan Paul Schmidt)
+  - Updated manifest
+  - Removed t/kwalitee.t (temporarily), as Test::Kwalitee v1.27 was acting
+    weird with my installation of perl-5.28.1
+
 0.11.2 2018-06-15
   - A small bit of cleanup
 

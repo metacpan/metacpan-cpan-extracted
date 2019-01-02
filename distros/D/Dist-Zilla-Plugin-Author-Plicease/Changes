@@ -1,5 +1,13 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.31      2019-01-02 09:02:53 -0500
+  - Add support for inc/mymm-clean.pl
+  - Add support for inc/mymm-config.pl
+
+2.30      2019-01-01 09:47:44 -0500
+  - bump minimum version of Test::More to 0.98
+  - New dists get new cip for CI instead of raw travis
+
 2.29      2018-12-05 16:30:28 -0500
   - Add support for PLICEASE_DZIL_NO_GIT
 

@@ -1,5 +1,5 @@
 package Time::Random;
-use 5.006; use strict; use warnings; our $VERSION = '0.05';
+use 5.006; use strict; use warnings; our $VERSION = '0.06';
 use Time::Piece;
 use base 'Import::Export';
 our %EX = (
@@ -8,15 +8,15 @@ our %EX = (
 
 sub time_random {
 	my %args = scalar @_ == 1 ? %{ $_[0] } : @_;
-	$args{$_} = $args{$_} 
-		? $args{strptime} 
+	$args{$_} = $args{$_}
+		? $args{strptime}
 			? Time::Piece->strptime($args{$_}, $args{strptime})->epoch
 			: ref $args{$_}
 				? $args{$_}->epoch()
 				: $args{$_}
 		: $_ eq 'to' ? time : ($args{to} - int(rand(86400)))
 	foreach qw/to from/;
-	$args{time} = gmtime($args{to} - int(rand($args{to} - $args{from}))); 
+	$args{time} = gmtime($args{to} - int(rand($args{to} - $args{from})));
 	$args{strftime} ? $args{time}->strftime($args{strftime}) : $args{time};
 }
 
@@ -30,7 +30,7 @@ Time::Random - Generate a random time in time.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -43,7 +43,7 @@ Version 0.05
 	);
 
 	# $time, 'Time::Piece';
-	
+
 	$time->epoch();
 	$time->strftime('%y-%m-%d %H:%M:%S');
 	...
@@ -58,7 +58,63 @@ Version 0.05
 =head1 EXPORT
 
 =head2 time_random
- 
+
+	time_random();
+
+=head3 params
+
+Params must be passed as a key/value list or reference.
+
+=over
+
+=item to
+
+Limit the maximum time that can be generated, This can be an epoch, a Time::Piece object or a string when passed with a strftime pattern. 
+
+If no param is passed then current epoch ("time()") is used.
+
+=item from
+
+Limit the minimum time that can be generated, This can be an epoch, a Time::Piece object or a string when passed with a strftime pattern. 
+
+If no param is passed then current "to" minus 1 day (time() - 86400) is used.
+
+=item strptime
+
+When strptime is passed this code will expect "from" and "to" to be strings that can be passed by the provided pattern. 
+
+Internally this module uses Time::Piece::strptime so please refer here for further documentation.
+
+=item strftime
+
+This should be a valid strftime pattern and when passed time_random will use this and return the relevant formatted time string.
+
+Internally this module uses Time::Piece::strftime so please refer here for further documentation.
+
+=cut
+
+=head3 returns
+
+By default time_random will return a Time::Piece object in scalar context this will overload to
+
+	Wed Jul 18 13:42:06 2018
+
+If you would like the epoch
+	
+	time_random()->epoch();
+
+If you would like any custom format I would look at passing the strftime param or using directly in your code.
+
+	time_random(
+		strftime => '%Y-%m-%d',
+	);
+
+	..............
+
+	time_random()->strftime('%Y-%m-%d');
+
+=cut
+
 =cut
 
 =head1 AUTHOR

@@ -1,24 +1,25 @@
---- #YAML:1.0
-name:               File-Media-Sort
-version:            0.044
-abstract:           Sort media files based on their filename pattern
+---
+abstract: 'Sort media files based on their filename pattern'
 author:
-    - Magnus Woldrich <trapd00r@trapd00r.se>
-license:            perl
-distribution_type:  module
+  - 'Magnus Woldrich <m@japh.se>'
+build_requires: {}
 configure_requires:
-    ExtUtils::MakeMaker:  0
-build_requires:  {}
-requires:
-    Test::More:  0
-resources:
-    bugtracker:  https://github.com/trapd00r/File-Media-Sort/issues
-    repository:  https://github.com/trapd00r/File-Media-Sort
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Media-Sort
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/trapd00r/File-Media-Sort/issues
+  repository: https://github.com/trapd00r/File-Media-Sort
+version: '0.062'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

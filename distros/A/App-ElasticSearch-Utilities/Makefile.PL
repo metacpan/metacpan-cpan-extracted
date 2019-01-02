@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.013002;
 
 use ExtUtils::MakeMaker;
 
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "scripts/es-storage-overview.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.013002",
   "NAME" => "App::ElasticSearch::Utilities",
   "PREREQ_PM" => {
     "CHI" => 0,
@@ -80,7 +80,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "6.2",
+  "VERSION" => "6.3",
   "test" => {
     "TESTS" => "t/*.t"
   }

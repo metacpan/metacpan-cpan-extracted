@@ -24,8 +24,8 @@ SCANTEXT: {
 			ok(scalar(@locations) == 1);
 			my $location = $locations[0];
 			ok(ref($location) eq 'HASH');
-			delta_within($location->{latitude}, 51.36, 1e-2);
-			delta_within($location->{longitude}, 1.42, 1e-2);
+			delta_within($location->{latitude}, 51.34, 1e-2);
+			delta_within($location->{longitude}, 1.41, 1e-2);
 			ok(defined($location->{'confidence'}));
 			ok($location->{'location'} eq 'Ramsgate, Kent, England');
 
@@ -50,11 +50,11 @@ SCANTEXT: {
 				next unless($location->{'location'} eq 'Newark, DE, USA');
 				$found++;
 				delta_within($location->{latitude}, 39.68, 1e-2);
-				delta_within($location->{longitude}, -75.76, 1e-2);
+				delta_within($location->{longitude}, -75.8, 1e-1);
 				ok(defined($location->{'confidence'}));
-
 			}
 			ok($found == 1);
+
 			my $s = 'From the Indianapolis Star, 25/4/2013:  "75, Indianapolis, died Apr. 21, 2013. Services: 1 p.m. Apr. 26 in Forest Lawn Funeral Home, Greenwood, with visitation from 11 a.m.".  Obituary from Forest Lawn Funeral Home:  "Sharlene C. Cloud, 75, of Indianapolis, passed away April 21, 2013. She was born May 21, 1937 in Noblesville, IN to Virgil and Josephine (Beaver) Day. She is survived by her mother; two sons, Christopher and Thomas Cloud; daughter, Marsha Cloud; three sisters, Mary Kirby, Sharon Lowery, and Doris Lyng; two grandchildren, Allison and Jamie Cloud. Funeral Services will be Friday at 1:00 pm at Forest Lawn Funeral Home, Greenwood, IN, with visitation from 11:00am till time of service Friday at the funeral home."';
 			@locations = $geocoder->geocode({ scantext => $s, region => 'US' });
 			my %found;

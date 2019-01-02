@@ -14,7 +14,7 @@ WriteMakefile1(
     #},
 
     NAME                => 'File::PatternMatch',
-    AUTHOR              => q{Magnus Woldrich <trapd00r@trapd00r.se>},
+    AUTHOR              => q{Magnus Woldrich <m@japh.se>},
     ABSTRACT_FROM       => 'lib/File/PatternMatch.pm',
     VERSION_FROM        => 'lib/File/PatternMatch.pm',
     'LICENSE'           => 'perl',

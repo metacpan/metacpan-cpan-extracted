@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.31      2019-01-02 09:05:59 -0500
+  - Add option copy_mm
+
+2.30      2019-01-01 09:49:23 -0500
+  - Allow maint/run- in addition to inc/run/
+  - after_build.pl and after_release.pl execute later than they used to
+
 2.29      2018-12-05 16:36:31 -0500
   - Update warnings about versions
   - Add support for PLICEASE_DZIL_NO_GIT

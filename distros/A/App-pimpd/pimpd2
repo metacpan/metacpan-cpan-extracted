@@ -1,0 +1,557 @@
+#!/usr/bin/perl
+# vim:ft=perl:et:sw=2:
+use lib 'lib';
+use strict;
+
+no warnings 'experimental::smartmatch';
+use vars qw($VERSION);
+my $APP;
+
+$APP     = 'pimpd2';
+$VERSION = '0.314';
+
+sub usage {
+  pod2usage(
+    msg     => "$APP v$VERSION\n",
+    verbose => 1,
+    exitval => 0,
+  );
+}
+
+BEGIN {
+  use Pod::Usage;
+  if( (!@ARGV) or ($ARGV[0] =~ m/--?h(?:elp)?\z/) ) {
+    usage();
+    exit;
+  }
+}
+
+use App::Pimpd;
+use App::Pimpd::Player;
+use App::Pimpd::Info;
+use App::Pimpd::Shell;
+use App::Pimpd::Commands;
+use App::Pimpd::Transfer;
+use App::Pimpd::Validate;
+use App::Pimpd::Collection::Search;
+use App::Pimpd::Collection::Album;
+use App::Pimpd::Playlist;
+use App::Pimpd::Playlist::Search;
+use App::Pimpd::Playlist::Favorite;
+use App::Pimpd::Playlist::Randomize;
+
+use Term::ExtendedColor qw(fg);
+use Getopt::Long;
+
+GetOptions(
+  'np|now-playing'       => sub { print current(), "\n"; },
+  'i|info'               => \&info,
+  'lsa|songs'            => sub { _lsa(@ARGV); },
+
+  'l|laa|albums'         => sub {
+    print "$_\n" for albums_by_artist(join(' ',@ARGV));
+  },
+
+  'randomize'            => sub { print "$_\n" for randomize(@ARGV); },
+  'ra|random-album'      => sub { print "$_\n" for randomize_albums(@ARGV); },
+  'rt|random-track'      => sub { _rt(); },
+
+  'af|add'               => sub { _add_files(@ARGV); },
+  'a|apl|add-playlist'   => sub { add_playlist(@ARGV); },
+  'lsplaylists'          => sub { print "$_\n" for list_all_playlists(); },
+  'pls|playlist'         => sub { show_playlist(); },
+  'da|delete-album'      => sub { delete_album(); },
+
+  'p|play'               => sub { play(@ARGV); },
+  's|stop'               => sub { stop(); },
+  'k|kill'               => sub { player_destruct(); },
+  'sh|shell'             => sub { \&spawn_shell(@ARGV); },
+  'rma|rmalbum'          => sub { remove_album_from_playlist(@ARGV); },
+
+  'cp|copy'              => sub { cp(@ARGV ? @ARGV : $config{target_directory}) },
+  'cpa|copy-album'       => sub {
+    cp_album(@ARGV ? @ARGV : $config{target_directory})
+  },
+
+  'fav|favorite|love'    => sub { add_to_favlist(@ARGV); }, # FIXME
+  'loved'                => sub {
+    if(already_loved($mpd->current->file)) {
+      printf("%s, %s by %s is loved.\n",
+        fg('bold', 'Yes'),
+        fg($c[10], $mpd->current->title),
+        fg($c[2],  fg('bold', $mpd->current->artist)),
+      );
+    }
+
+    else {
+      printf("%s, %s by %s is not loved yet.\n",
+        fg('bold', 'No'),
+        fg($c[10], $mpd->current->title),
+        fg($c[2],  fg('bold', $mpd->current->artist)),
+      );
+    }
+  },
+
+  'unlove'               => sub { remove_favorite(@ARGV); },
+
+  'aa|add-album'         => sub {
+    add_to_playlist( map{ $_->file } get_album_songs(@ARGV) );
+  },
+  'slove'                => sub {
+    my @files = search_favlist(@ARGV);
+    print "$_\n" for @files;
+  },
+
+  'spl|search-playlist|splaylist'  => sub { _search_playlist(@ARGV); },
+  'sap|search-all-pls'   => sub { search_all_playlists(@ARGV); },
+  'sdb|search-db'        => sub { print "$_\n" for search_db_quick(@ARGV); },
+
+  'sar|search-artist'    => sub { print "$_\n" for search_db_artist(@ARGV); },
+  'sal|search-album'     => sub { print "$_\n" for search_db_album(@ARGV); },
+  'set|search-title'     => sub { print "$_\n" for search_db_title(@ARGV); },
+
+  'next'                 => sub { next_track(); },
+  'prev'                 => sub { previous_track(); },
+  'clear'                => sub { clear_playlist(); },
+  'crop'                 => sub { crop(@ARGV); },
+  'crossfade|xfade'      => sub { crossfade(@ARGV); },
+  'pause'                => sub { toggle_pause; },
+  'repeat'               => sub { toggle_repeat; },
+  'random'               => sub { toggle_random; },
+
+  'status'               => sub { print status(), "\n"; },
+  'stats'                => sub { stats();  },
+
+
+  'host'                 => sub {
+    # FIXME one way, or another...
+    my($host, $port, $password, $stream) = @ARGV;
+    App::Pimpd::mpd_init($host, $port, $password);
+
+  },
+  'debug'                => sub { _debug(); },
+  'h|help'               => \&usage,
+  'version'              => sub { print "$APP v$VERSION\n" and exit 0; },
+  'man'                  => sub { pod2usage( verbose => 3 ); },
+);
+
+sub _rt {
+  play_pos_from_playlist(random_track_in_playlist());
+  print current(), "\n";
+
+  return;
+}
+
+# Wrapper for songs_on_album()
+sub _lsa {
+  my($album, $artist) = @_;
+
+  $album or $album = $mpd->current->album;
+  print $_->file, "\n" for songs_on_album($album, $artist);
+
+  return;
+}
+
+sub _search_playlist {
+  my $result = search_playlist(@_); # hashref
+
+  if( keys(%{$result}) < 2 ) {
+    play_pos_from_playlist( keys(%{$result}) );
+  }
+  queue(keys(%{$result})); #FIXME queue should take arrayref
+
+  return;
+}
+
+
+sub _add_files {
+  my @files = @_;
+
+  if(!-t STDIN) {
+    while(<STDIN>) {
+      push(@files, $_);
+    }
+  }
+  add_to_playlist(@files);
+
+  return;
+}
+
+
+sub _debug {
+  my $i = 0;
+  for(@c) {
+    print fg($_, "\$c[$i]"), "\n";
+    $i++;
+  }
+  return;
+}
+
+=pod
+
+=head1 NAME
+
+pimpd2 - Perl Interface for the Music Player Daemon 2
+
+=head1 DESCRIPTION
+
+pimpd2 is a command-line based MPD client that implements all the features
+the author was missing from the other awesome client, mpc.
+
+=head1 FEATURES
+
+
+=head2 -np, --now-playing
+
+Show basic song information on a single line.
+
+=head2 -i, --info
+
+Show all available song information and MPD server status.
+
+=head2 -cp, --copy
+
+Copy the currently playing song to destination.
+
+If destination is omitted, uses the C<target_directory> variable from the
+configuration file.
+
+=head2 -cpa, --copy-album
+
+Copy the currently playing album to destination.
+
+If destination is omitted, uses the C<target_directory> variable from the
+configuration file.
+
+=head2 -sh, --shell
+
+Spawn the interactive pimpd2 shell.
+
+All the regular features can be used. Commands that return data that can be
+added to the current playlist will do so automagically for convenience, since
+we can not read from standard input while being interactive.
+
+=head2 -q, --queue
+
+Queue tracks. Arguments must be valid playlist position IDs as shown in the
+C<--playlist> output.
+
+You can also use the C<--search-playlist> command if the tracks to be queued
+follows a pattern.
+
+=head1 PLAYLIST INTERACTION
+
+
+=head2 -pls, --playlist
+
+Show the current playlist.
+
+=head2 --playlists
+
+List all playlists known by MPD.
+
+=head2 -af, --add-files
+
+Add files to the current playlist.
+
+Can read from standard input:
+
+  pimpd2 --randomize 42 Nirvana | pimpd2 -af
+
+Accepts file arguments:
+
+  pimpd2 -af ~/music/Nirvana/Bleach/*.flac
+
+=head2 -a, --add-playlist
+
+Add playlist to the current playlist.
+
+If not given a full name, and the name partially matches existing playlists,
+prompts for input:
+
+  pimpd2 -a 2010
+
+    0 2010-12-indie
+    1 2010-12-other
+    2 2010-12-pop
+    3 2010-12-punk_rock
+    4 2010-12-rock
+    5 2010-12-undef
+  choice:
+
+If choice equals 'all', all matching playlists are added.
+
+=head2 -r, --randomize
+
+Return B<n> random songs from the collection.
+The first argument is the number of songs, the second argument is an optional
+artist name. If an artist name is specified, will only return random songs from
+that particular artist.
+
+If no arguments are specified, returns 100 random songs.
+
+If you want to add the results to the current playlist, pipe it to C<--add-files>:
+
+  pimpd2 -r 12 | pimpd2 -af
+
+Or use the interactive shell ( C<-sh> ) which does this for you automatically.
+
+=head2 -ra, --random-album
+
+Return B<n> random full albums.
+
+A pipe to C<--add-files> will add the results to the current playlist.
+
+=head2 -rma, --rmalbum
+
+Given a string, searches the current playlist for matching albums, and remove
+them from the playlist. The string can be a regular expression.
+
+=head2 -da, --delete-album
+
+Delete the current album from disk.
+
+=head2 -f, --love
+
+Favorize, or love, the current song.
+
+If called with zero arguments, the song will be saved to a playlist following
+this naming scheme:
+
+  %year-%month-%genre.m3u
+
+Else, the argument is used for the playlist name, thus:
+
+  pimpd2 --love lovesongs
+
+adds the song to lovesongs.m3u
+
+=head2 --loved
+
+Check if the currently playing song is already loved or not.
+
+=head2 --unlove
+
+Unlove songs matching given PATTERN.
+
+=head2  --lsplaylists
+
+Lists available playlists.
+
+=head2 --slove
+
+Search the database with loved songs for PATTERN.
+
+If PATTERN is omitted, returns all loved songs.
+
+=head2 -spl, --search-playlist
+
+Search the current playlist for string, possibly a regular expression.
+
+If more then one song is found, queues up the results. See C<--queue>.
+
+
+=head1 COLLECTION INTERACTION
+
+=head2 -lsa, --songs
+
+List all songs on album.
+
+If no argument is specified, use the album tag from the currently playing song.
+
+A pipe to C<--add-files> will add the results to the current playlist:
+
+  pimpd2 -lsa Stripped | pimpd2 -af
+
+=head2 -l, --albums
+
+List all albums where artist is featured.
+
+If no argument is specified, use the artist tag from the currently playing song.
+
+=head2 -sdb, --search-db
+
+Search the database for string, possibly a regular expression.
+
+A pipe to C<--add-files> will add the results to the current playlist:
+
+=head2 -sar, --search-artist
+
+Search the database for artist.
+
+A pipe to C<--add-files> will add the results to the current playlist:
+
+=head2 -sal, --search-album
+
+Search the database for album.
+
+A pipe to C<--add-files> will add the results to the current playlist:
+
+=head2 -set, --search-title
+
+Search the database for title.
+
+A pipe to C<--add-files> will add the results to the current playlist:
+
+=head2 --stats
+
+Display statistics about MPD
+
+=head2 --status
+
+Display MPD status
+
+=head1 CONTROLS
+
+=head2 -n, --next
+
+Play the next track in the playlist.
+
+=head2 -p, --previous
+
+Play the previous track in the playlist.
+
+=head2 -cl, --clear
+
+Clear the current playlist.
+
+=head2 -cr, --crop
+
+Remove all songs but the current one from the playlist.
+
+=head2 -x, --xfade
+
+Set crossfade.
+
+=head2 --pause
+
+Toggle playback status.
+
+=head2 --repeat
+
+Toggle repeat on/off
+
+=head2 --random
+
+Toggle random on/off
+
+=head2 --play
+
+Start playback.
+
+If a remote stream URL and an external player is specified in the
+configuration file, starts playback on the local machine as well as on the
+MPD server.
+
+=head2 --stop
+
+Stop playback, locally and remote.
+
+=head2 --kill
+
+Stop local playback.
+
+=head1 OPTIONS
+
+  -np,   --now-playing      basic song info on a single line
+  -i,    --info             full song info
+  -cp,   --copy             copy the current track to destination
+  -cpa,  --copy-album       copy the current album to destination
+  -sh,   --shell            spawn the interactive shell
+  -q,    --queue            queue tracks
+
+=head2 Playlist
+
+  -pls,  --playlist         show the current playlist
+         --playlists        list all known playlists
+  -af,   --add-files        add files to playlist
+  -a,    --add-playlist     add playlist
+         --randomize        randomize a new playlist with n tracks
+  -ra,   --random-album     add n random full albums
+  -rma,  --rmalbum          remove album matching pattern from playlist
+  -da,   --delete-album     delete the current album from disk
+  -f,    --love             love song
+         --loved            check if the current song is loved
+  -u,    --unlove           unlove songs matching pattern
+  -spl,  --search-playlist  search the current playlist for str
+
+=head2 Collection
+
+  -lsa,  --songs            list songs on album
+  -l,    --albums           list albums by artist
+  -sdb,  --search-db        search database for pattern
+  -sar,  --search-artist    search database for artist
+  -sal,  --search-album     search database for album
+  -set,  --search-title     search database for title
+         --slove            search the database with loved songs for pattern
+         --stats            display statistics about MPD
+         --status           display MPD status
+
+=head2 Controls
+
+  -n,    --next             next track in playlist
+  -p,    --previous         previous track in playlist
+  -cl,   --clear            clear the playlist
+  -cr,   --crop             remove all songs but the current one from playlist
+  -x,    --xfade            set crossfade
+         --pause            toggle playback status
+         --repeat           toggle repeat mode
+         --random           toggle random mode
+
+  -p,    --play             start playback (locally and remote)
+  -s,    --stop             stop playback (locally and remote)
+  -k,    --kill             stop playback (locally)
+
+  -h,    --help             show the help and exit
+  -m,    --man              show the manual and exit
+  -v,    --version          show version info and exit
+
+=head1 ENVIRONMENT
+
+pimpd2 will look for a configuration file in the following locations, in this
+order:
+
+  $XDG_CONFIG_HOME/pimpd2/pimpd2.conf
+  ~/.config/pimpd2/pimpd.conf
+  ~/.pimpd2.conf
+  ./pimpd2.conf
+  /etc/pimpd2.conf
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  magnus@trapd00r.se
+  http://japh.se
+
+=head1 CONTRIBUTORS
+
+None required yet.
+
+=head1 REPORTING BUGS
+
+Report bugs and/or feature requests to <magnus@trapd00r.se>, on L<rt.cpan.org>
+or L<http://github.com/trapd00r/pimpd2/issues>.
+
+=head1 COPYRIGHT
+
+Copyright 2009, 2010, 2011 the B<pimpd2> L</AUTHOR> and L</CONTRIBUTORS> as
+listed above.
+
+=head1 LICENSE
+
+This application is free software; you may redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<mpd(1)>
+
+L<App::Pimpd::Collection::Album>, L<App::Pimpd::Collection::Search>,
+L<App::Pimpd::Commands>, L<App::Pimpd::Doc>, L<App::Pimpd::Info>,
+L<App::Pimpd::Player>, L<App::Pimpd::Playlist>,
+L<App::Pimpd::Playlist::Favorite>, L<App::Pimpd::Playlist::Randomize>,
+L<App::Pimpd::Playlist::Search>, L<App::Pimpd::Shell>, L<App::Pimpd::Transfer>,
+L<App::Pimpd::Validate>
+
+=cut

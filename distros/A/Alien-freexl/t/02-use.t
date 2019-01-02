@@ -11,7 +11,7 @@ alien_ok 'Alien::freexl';
 $ENV{LD_LIBRARY_PATH}   = Alien::freexl->dist_dir . '/lib';
 $ENV{DYLD_LIBRARY_PATH} = Alien::freexl->dist_dir . '/lib';
 
-
+diag ('Install type: ' . Alien::freexl->install_type);
 diag ('libs: '   . Alien::freexl->libs);
 diag ('cflags: ' . Alien::freexl->cflags);
 eval {
@@ -21,7 +21,7 @@ warn $@ if $@;
 
 diag ('bin dir: ' . join (' ', Alien::freexl->bin_dir));
 my @bin = Alien::freexl->bin_dir;
-warn "no proj bin dir found via bin_dir method\n" if not @bin;
+warn "no bin dir found via bin_dir method\n" if not @bin;
 
 TODO: {
     local $TODO = 'leftover from gdal - might not need to be todo';

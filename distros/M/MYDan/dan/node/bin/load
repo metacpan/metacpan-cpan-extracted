@@ -64,5 +64,4 @@ for my $input ( YAML::XS::Load( <> ) )
     }
 }
 
-exec "$Bin/cache";
 exit 0;

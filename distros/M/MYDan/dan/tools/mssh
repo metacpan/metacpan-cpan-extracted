@@ -39,14 +39,24 @@ my $range = MYDan::Node->new( $option->dump( 'range' ) );
 my %cmd = map { $_ => \@ARGV } $range->load( delete $o{range} )->list();
 
 $o{user} = `id -un` and chop $o{user} unless $o{user};
-$o{pass} = +{ MYDan::Util::Pass->new( conf => "$o{conf}/pass", range => $range )
+$o{pass} = +{ MYDan::Util::Pass->new( conf => -e "$o{conf}/pass.private" ? "$o{conf}/pass.private" : "$o{conf}/pass", range => $range )
     ->pass( [ keys %cmd ] => $o{user} ) } unless $o{noop};
     
-my ( %result, %re )= MYDan::Util::MIO::SSH->new( %cmd )->run( %o );
+my ( %result, %re )= MYDan::Util::MIO::SSH->new( %cmd )->run( %o, verbose => !$o{verbose} );
 
 while( my ( $type, $result ) = each %result )
 {
     map{ my $t = $_; map{ $re{$_} .= $t } @{$result->{$t}};}keys %$result;
 }
 
-MYDan::VSSH::Print::result( 'mssh' => %re );
+unless( $o{verbose} )
+{
+    MYDan::VSSH::Print::result( 'mssh' => %re );
+    exit
+}
+for my $node ( sort keys %re )
+{
+    my $succ = 1 if $re{$node} =~ s/--- 0\n$//;
+    map{ $succ ? print( "$node:$_\n" ) : warn( "$node:$_\n" ) }split /\n/, $re{$node};
+}
+

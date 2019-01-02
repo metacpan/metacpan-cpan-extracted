@@ -1,5 +1,8 @@
 Revision history for MySQL-Util
 
+0.32    - fixed unit tests so they are skipped when a mysql connection
+          can't be established
+          
 0.31    - fixed 127712
 
 0.30    - added functionality to allow for a DBI handle to be passed in via

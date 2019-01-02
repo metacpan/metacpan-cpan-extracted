@@ -65,7 +65,7 @@ sub get_mysql_cmdline {
     my %conf = parse_conf();
     my %conn = parse_dsn();
 
-    my $cmd = sprintf "mysql -u %s %s -h %s -P %s",
+    my $cmd = sprintf "mysql -u %s %s -h %s ",
       $conf{DBI_USER},
       defined $conf{DBI_PASS} ? "-p$conf{DBI_PASS}" : '',
       $conn{host},

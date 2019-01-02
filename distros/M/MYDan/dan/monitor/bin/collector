@@ -2,12 +2,16 @@
 
 use strict;
 use warnings;
+use POSIX;
 use File::Spec;
+use Data::UUID;
 
 use MYDan::Node;
 use MYDan::Util::OptConf;
 use MYDan::Monitor::Collector;
 use MYDan::Monitor::Make;
+use MYDan::Node::DBI::Cache;
+use MYDan::Subscribe;
 
 $| ++;
 
@@ -20,19 +24,100 @@ $MYDan::Util::OptConf::THIS = 'monitor';
  $0 -r range
 
 =cut
+
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->set( range => '{==*==*??==*}' )->get( qw( range=s ) )->dump();
 
+my ( $time, $uuid ) = ( time, Data::UUID->new->create_str() );
+my $stime =  POSIX::strftime( "%Y-%m-%d %H:%M:%S", localtime( $time ) );
+my $mark = "$uuid $time $stime $o{range}";
+
+open my $LOG, ">>", "$o{logs}/collector.log" or die "open $o{logs}/collector.log fail: $!";
+print $LOG "$mark start.\n";
+
 my $range = MYDan::Node->new( $option->dump( 'range' ) );
+my $cache = MYDan::Node::DBI::Cache->new( $option->{range}{cache} );
 
 my $make = MYDan::Monitor::Make->new( %o, option => $option );
 my @node = $range->load( delete $o{range} )->list;
 $make->make( @node );
-my $client = MYDan::Monitor::Collector->new( 
-    @node
-);
+my $client = MYDan::Monitor::Collector->new( @node );
 
 my %result = $client->run( %o ); 
 
-YAML::XS::DumpFile \*STDERR, \%result if %result;
+#YAML::XS::DumpFile \*STDERR, \%result if %result;
+
+my @x = $cache->select( '*' );
+my ( %hostc, %count );
+map{ 
+    $hostc{$_->[2]}{$_->[0]}{$_->[1]} = 1;
+    $count{$_->[0]}{$_->[1]}{$_->[2]} = 1;
+}@x; 
+
+my ( $collectorerr, %err ) = 0 ;
+
+for my $node ( keys %result )
+{
+    print "NODE:$node\n";
+    my @test = eval{ YAML::XS::Load $result{$node} };
+    if( $@ )
+    {
+        warn "load error:$@\n";
+        $collectorerr ++;
+        next;
+    }
+
+    unless( defined $test[1] && ! $test[1] && $test[0] && ref $test[0] eq 'ARRAY' )
+    {
+        warn "result format error\n";
+        $collectorerr ++;
+        next;
+    }
+
+    for my $t ( @{$test[0][0]} )
+    {
+         next unless $t->[10] && $t->[10] eq 'err';
+         unless( $hostc{$node} )
+         {
+             $err{$t->[11]}{$t->[0]}{'null'}{'null'}{$node} ++;
+             next;
+         }
+         for my $name ( keys %{$hostc{$node}} )
+         {
+             map{ 
+                 $err{$t->[11]}{$t->[0]}{$name}{$_}{$node} ++; 
+             }keys %{$hostc{$node}{$name}}
+         }
+    }
+}
+
+my $subscribe = MYDan::Subscribe->new();
+
+for my $group ( keys %err )
+{
+    for my $err ( keys %{$err{$group}} )
+    {
+        for my $name ( keys %{$err{$group}{$err}} )
+        {
+            for my $attr ( keys %{$err{$group}{$err}{$name}} )
+            {
+                my @errhost = keys %{$err{$group}{$err}{$name}{$attr}};
+
+                my @attrhost = ( $name eq 'null' && $attr eq 'null' ) 
+                             ? ( @errhost ) : ( keys %{$count{$name}{$attr}} );
+
+                my $scale = sprintf "%d/%d", scalar( @errhost ), scalar( @attrhost );
+
+                $subscribe->input( "name:$name attr:$attr scale:($scale) strategy: $err node:"
+                    .join( ',', sort @errhost ), $name, $attr );
+            }
+        }
+    }
+}
+
+$subscribe->input( "collectorerr $collectorerr > 0", 'sys', 'monitor' ) if $collectorerr;
+
+my $usetime = time - $time;
+print $LOG "$mark $usetime finish.\n";
+
 exit 0;

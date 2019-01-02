@@ -3,7 +3,7 @@ package Ryu::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 =head1 NAME
 
@@ -76,11 +76,11 @@ Fails the given L<Future> with this exception.
 =cut
 
 sub fail {
-	use Scalar::Util qw(blessed);
-	use namespace::clean qw(blessed);
-	my ($self, $f) = @_;
-	die "expects a Future" unless blessed($f) && $f->isa('Future');
-	$self->as_future->on_ready($f);
+    use Scalar::Util qw(blessed);
+    use namespace::clean qw(blessed);
+    my ($self, $f) = @_;
+    die "expects a Future" unless blessed($f) && $f->isa('Future');
+    $self->as_future->on_ready($f);
     $f;
 }
 
@@ -92,8 +92,8 @@ this exception.
 =cut
 
 sub as_future {
-	my ($self) = @_;
-	return Future->fail($self->message, $self->type, $self->details);
+    my ($self) = @_;
+    return Future->fail($self->message, $self->type, $self->details);
 }
 
 # Legacy support - will be dropped in 1.0,
@@ -107,17 +107,17 @@ Extracts failure information from a L<Future> and instantiates accordingly.
 =cut
 
 sub from_future {
-	use Scalar::Util qw(blessed);
-	use namespace::clean qw(blessed);
-	my ($class, $f) = @_;
-	die "expects a Future" unless blessed($f) && $f->isa('Future');
-	die "Future is not ready" unless $f->is_ready;
-	my ($msg, $type, @details) = $f->failure or die "Future is not failed?";
-	$class->new(
-		message => $msg,
-		type    => $type,
-		details => \@details
-	)
+    use Scalar::Util qw(blessed);
+    use namespace::clean qw(blessed);
+    my ($class, $f) = @_;
+    die "expects a Future" unless blessed($f) && $f->isa('Future');
+    die "Future is not ready" unless $f->is_ready;
+    my ($msg, $type, @details) = $f->failure or die "Future is not failed?";
+    $class->new(
+        message => $msg,
+        type    => $type,
+        details => \@details
+    )
 }
 
 1;
@@ -130,5 +130,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

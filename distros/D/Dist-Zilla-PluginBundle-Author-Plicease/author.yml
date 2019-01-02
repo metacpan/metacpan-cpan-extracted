@@ -22,6 +22,7 @@ pod_spelling_system:
     - OurPkgVersion
     - appveyor
     - bakeini
+    - EUMM
 
 pod_coverage:
   private:

@@ -19,7 +19,7 @@ WriteMakefile(
 	},
     PREREQ_PM => {
 		'Clone' => '0',
-    	'Import::Export' => '0.08',
+    	'Import::Export' => '1.00',
 	},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'overload-x-*' },

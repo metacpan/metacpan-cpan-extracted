@@ -1,0 +1,55 @@
+#!# perl: code/http
+use strict;
+use warnings;
+
+use AnyEvent;
+use AnyEvent::HTTP;
+
+return sub
+{
+    my ( %param, %mesg ) = @_;
+    my ( $test, $node ) = @param{qw( test node )};
+
+    my $cv = AE::cv;
+    for my $group ( keys %$test )
+    {
+        for my $url ( keys %{$test->{$group}} )
+        {
+            my $conf = $test->{$group}{$url};
+
+            my $headers = ( $conf->{headers} && ref $conf->{headers} eq 'HASH' ) ? $conf->{headers} : +{};
+            my $threshold = $conf->{threshold} ? " $conf->{threshold}" : '';
+            my ( $timeout, $method, $check ) = @$conf{qw( timeout method check )};
+            $timeout ||= 5;
+            $method ||= 'GET';
+
+            for my $n ( @$node )
+            {
+                my $t = $url;
+                $t =~ s/\{\}/$n/;
+                $cv->begin;
+                http_request
+                   $method    => $t,
+                   headers => $headers,
+                   timeout => $timeout,
+                   sub {
+                      my ($body, $hdr) = @_;
+                        if( $check)
+                        {
+                            $mesg{"$n###$group###$url =~ /$check/$threshold"} = $hdr->{Reason} unless $hdr->{Status} eq '200' && $body =~ /$check/;
+                        }
+                        else
+                        {
+                            $mesg{"$n###$group###$url$threshold"} = $hdr->{Reason} unless $hdr->{Status} eq '200';
+                        }
+                		$cv->end;
+                   }
+                ;
+            }
+        }
+    }
+
+    $cv->recv;
+
+    return %mesg;
+};

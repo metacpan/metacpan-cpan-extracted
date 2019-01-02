@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 	$MooseX::MungeHas::AUTHORITY = 'cpan:TOBYINK';
-	$MooseX::MungeHas::VERSION   = '0.010';
+	$MooseX::MungeHas::VERSION   = '0.011';
 };
 
 use Carp qw(croak);
@@ -174,6 +174,13 @@ sub _compile_munger_code
 		push @code, '  }';
 	}
 	
+	if (delete $features{"always_required"})
+	{
+		push @code, '  if (!exists($_{required}) and !exists($_{default}) and !exists($_{builder})) {';
+		push @code, '    $_{required} = 1;';
+		push @code, '  }';
+	}
+
 	if (_detect_oo($caller) eq "Moo")
 	{
 		push @code, '  if (defined($_{coerce}) and !ref($_{coerce}) and $_{coerce} eq "1") {';
@@ -434,6 +441,11 @@ These mungers supply defaults for the C<< is >> option.
 
 Automatically provides C<< coerce => 1 >> if the type constraint provides
 coercions. (Unless you've explicitly specified C<< coerce => 0 >>.)
+
+=item C<< always_required >>
+
+Automatically provides C<< required => 1 >> unless there is a default or
+builder. (Unless you've explicitly specified C<< required => 0 >>.)
 
 =item C<< no_isa >>
 

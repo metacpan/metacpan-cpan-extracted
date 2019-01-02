@@ -10,7 +10,7 @@ use Carp();
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(is_holiday holidays);
-our $VERSION   = '0.19';
+our $VERSION   = '0.20';
 
 my %cached;
 
@@ -939,6 +939,7 @@ sub _compute_vic_grand_final_eve_day {    # i have no words ...
         2016 => { day => 30, month => 8 },
         2017 => { day => 29, month => 8 },
         2018 => { day => 28, month => 8 },
+        2019 => { day => 27, month => 8 },
     );
     if ( $year < 2015 ) {
         return ();
@@ -1191,6 +1192,7 @@ sub _compute_wa_queens_bday
         2017 => { day => 25, month => 8 },
         2018 => { day => 24, month => 8 },
         2019 => { day => 30, month => 8 },
+        2020 => { day => 28, month => 8 },
     );
     if ( $wa_queens_bday{$year} ) {
         $day   = $wa_queens_bday{$year}{day};
@@ -1345,7 +1347,7 @@ Date::Holidays::AU - Determine Australian Public Holidays
 
 =head1 VERSION
  
-Version 0.19
+Version 0.20
 
 =head1 SYNOPSIS
 

@@ -22,6 +22,7 @@ $MYDan::Util::ExpSSH::TIMEOUT = 86400;
 
 my $option = MYDan::Util::OptConf->load();
 my %o      = $option->dump();
+$option->assert() unless @ARGV;
 
 my $cmd = join ' ',map{ "'$_'" } @ARGV;
 
@@ -37,7 +38,7 @@ else
 die "nohost.\n" unless $o{host};
 
 MYDan::Util::ExpSSH->new()->conn(
-    pass  => "$o{conf}/pass",
+    pass  => -f "$o{conf}/pass.private" ? "$o{conf}/pass.private" : "$o{conf}/pass",
     user  => $o{user},
     host  => $o{host},
     rsync => $cmd,

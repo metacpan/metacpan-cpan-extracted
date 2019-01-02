@@ -21,12 +21,12 @@ no_index:
 provides:
   Bijection:
     file: lib/Bijection.pm
-    version: '0.04'
+    version: '1.00'
 requires:
   Carp: '0'
-  Import::Export: '0.08'
+  Import::Export: '1.00'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Bijection.git
-version: '0.04'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

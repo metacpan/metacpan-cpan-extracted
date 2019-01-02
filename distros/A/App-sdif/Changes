@@ -1,5 +1,10 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.7.0 2019-01-02T03:01:12Z
+
+    - Mecab command ignores trailing spaces.
+      Quick hack to fix it.
+
 4.6.1 2018-12-27T06:48:31Z
 
     - requires 'Getopt::EX', 'v1.13.1';

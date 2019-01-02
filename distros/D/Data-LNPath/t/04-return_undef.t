@@ -14,10 +14,12 @@ my $data = {
 	},
 	two => [qw/1 2 3/],
 	three => 0,
+	four => sub { return 'test' },
 };
 
 is(path($data, '/three'), 0, 'three');
 is(path($data, '/ten'), undef, 'ten');
+is(path($data, '/four/five')->(), 'test', 'code reference');
 
 done_testing();
 

@@ -6,7 +6,7 @@ use Authen::Simple::Password;
 use Authen::Simple::Passwd;
 use Net::LDAP;
 
-our $VERSION = '0.11.2';
+our $VERSION = '0.11.3';
 
 sub register {
     my ($plugin, $app) = @_;
@@ -42,16 +42,14 @@ sub _check_auth {
     # No credentials entered
     return {realm => $realm} if !$auth and !$callback and !$params;
 
-    # Split $auth into username and password (which may contain ":" )
-    my ($auth_username, $auth_password) = ($1, $2)
-        if $auth =~ /^([^:]+):(.*)/;
+    my ($auth_username, $auth_password) = _split_auth($auth);
 
     # Hash for return data
     my %data;
     $data{username} = $auth_username if $auth_username;
 
     # Verification within callback
-    return (\%data, 1) if $callback and $callback->(split /:/, $auth, 2);
+    return (\%data, 1) if $callback and $callback->(_split_auth($auth));
 
     # Verified with realm => username => password syntax
     return (\%data, 1) if $auth eq ($username || '') . ":$password";
@@ -98,7 +96,8 @@ sub _password_prompt {
 }
 
 sub _split_auth {
-    my ($username, $password) = split ':', $_[0];
+    # Split $auth into username and password (which may contain ":")
+    my ($username, $password) = split ':', $_[0], 2;
 
     $username = '' unless defined $username;
     $password = '' unless defined $password;
@@ -263,7 +262,7 @@ Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 =head1 VERSION
 
-Version 0.11.2
+Version 0.11.3
 
 =head1 SYNOPSIS
 
@@ -682,6 +681,8 @@ Jay Mortensen
 Mark Muldoon
 
 G.Y. Park
+
+Jan Paul Schmidt
 
 =back
 

@@ -30,7 +30,7 @@ sub input
 
     my %param = ( mesg => $mesg, name => $name, attr => $attr, time => $time );
     map{ 
-        $param{name} = 'unkown' unless $param{name} && $param{name} =~ /^[a-zA-Z0-9_\-]+$/ 
+        $param{name} = 'unkown' unless $param{name} && $param{name} =~ /^[a-zA-Z0-9_\-\.]+$/ 
     }qw( name attr );
 
     $param{time} ||= POSIX::strftime( "%Y-%m-%d_%H:%M:%S", localtime );

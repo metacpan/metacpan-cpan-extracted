@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.004';
+  $VERSION = '0.005';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     get_colorscheme
@@ -695,6 +695,44 @@ my %colorschemes = (
     8 => 709080,
     9 => 'dca3a3'
   },
+  facebook => {
+    0 => '003399',
+    1 => '5890ff',
+    10 => 'f25268',
+    11 => 'f0ba15',
+    12 => '9c87d1',
+    13 => 'f7714b',
+    14 => 'd3dae6',
+    15 => 'e9ebee',
+    16 => 'f6f7f9',
+    2 => 'dddfe2',
+    3 => 'c0c0c0',
+    4 => 'bec2c9',
+    5 => '666666',
+    6 => 'c4d2e7',
+    7 => 'd3d8e8',
+    8 => '0e385f',
+    9 => '3b5998',
+  },
+  wikipedia => {
+    0 => 'b94a48',
+    1 => '555555',
+    10 => 'cdcdcd',
+    11 => 'ebebeb',
+    12 => 'd9d9d9',
+    13 => '00af89',
+    14 => '1900ab',
+    15 => '005946',
+    16 => 'd11d13',
+    2 => '73100a',
+    3 => '19d11d',
+    4 => 'e9322d',
+    5 => '165c91',
+    6 => '18649e',
+    7 => '134e7b',
+    8 => '347bff',
+    9 => 'cad2d3',
+  },
 );
 
 
@@ -775,7 +813,7 @@ L<Term::ExtendedColor::TTY>
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS

@@ -20,6 +20,7 @@ no_index:
     - xt
 requires:
   AnyEvent: '0'
+  AnyEvent::HTTP: '0'
   AnyEvent::Handle: '0'
   AnyEvent::Impl::Perl: '0'
   AnyEvent::Socket: '0'
@@ -60,4 +61,4 @@ resources:
   bugtracker: https://github.com/mydan/mayi/issues
   homepage: https://github.com/mydan/mayi
   repository: https://github.com/mydan/mayi.git
-version: v0.1.53
+version: v0.1.54

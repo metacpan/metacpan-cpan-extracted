@@ -3,3 +3,4 @@ README.pod
 ^Makefile$
 ^blib
 ^pm_to_blib
+ignore.txt

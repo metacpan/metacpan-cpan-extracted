@@ -67,6 +67,8 @@ no Moose::Role;
 
 1;
 
+__END__
+
 =pod
 
 =encoding UTF-8
@@ -77,7 +79,16 @@ OTRS::OPM::Analyzer::Role::PerlTidy - Check if the code matches the OTRS coding 
 
 =head1 VERSION
 
-version 0.06
+version 0.07
+
+=head1 METHODS
+
+=head2 check
+
+See I<DESCRIPTION>
+
+__DATA__
+-l=100 -i=4 -ci=4 -vt=0 -vtc=0 -cti=0 -pt=1 -bt=1 -sbt=1 -bbt=1 -nsfs -nolq -bbao -nola -ndnl
 
 =head1 AUTHOR
 
@@ -92,6 +103,3 @@ This is free software, licensed under:
   The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-__DATA__
--l=100 -i=4 -ci=4 -vt=0 -vtc=0 -cti=0 -pt=1 -bt=1 -sbt=1 -bbt=1 -nsfs -nolq -bbao -nola -ndnl

@@ -13,8 +13,9 @@ BEGIN{
     %level = %{$o->{level}};
     for my $file ( glob "$o->{code}/*" )
     {
+        next if $file =~ /\.private$/;
         my $name = basename $file;
-        $code{$name} = do $file;
+        $code{$name} = do( -f "$file.private" ? "$file.private" : $file );
         die "notify load code $name fail"
             unless $code{$name} && ref $code{$name} eq 'CODE';
     }

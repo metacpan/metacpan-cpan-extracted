@@ -1,3 +1,62 @@
+2019-01-02T14:50:16+08:00 : 发布0.1.54到cpan.org
+2018-12-26T21:31:15+08:00 : dan/deploy/code/m.sync 改成使用grsync
+2018-12-26T21:28:42+08:00 : MYDan::Util::MIO::SSH verbose问题
+2018-12-26T21:27:15+08:00 : 修改tools/{mcmd,mssh},修改verbose变量输出，适用于文本处理
+2018-12-20T22:18:42+08:00 : update lib/MYDan/Agent/Client.pm AE超时默认加上5秒,等待代理上的任务超时
+2018-12-20T22:15:43+08:00 : update dan/agent/code/chpasswd
+2018-12-20T22:14:39+08:00 : MYDan::Util::Phasic修复dst为空的异常
+2018-12-17T21:57:34+08:00 : add dan/agent/code/chpasswd
+2018-12-17T21:56:16+08:00 : rcall 修改verbose参数
+2018-12-15T16:54:33+08:00 : update tools/access
+2018-12-15T16:41:04+08:00 : 修改tools/rsync
+2018-12-15T14:26:13+08:00 : tools/go 添加.private配置
+2018-12-15T14:07:55+08:00 : 修改node中bin
+2018-12-09T23:17:32+08:00 : monitorv2/bin/control 添加--tail
+2018-12-09T23:12:28+08:00 : monitorv2写单独的日志文件
+2018-12-09T22:56:19+08:00 : add Util::Debug
+2018-12-09T21:50:57+08:00 : 修改monitorv2/scripts/bootstrap.exec
+2018-12-09T21:10:03+08:00 : bootstrap: config -> control
+2018-12-09T21:07:51+08:00 : 添加monitorv2添加control
+2018-12-09T16:34:53+08:00 : 修改monitorv2.collector进程名
+2018-12-09T16:14:50+08:00 : Makefile.PL添加AnyEvent::HTTP
+2018-12-09T16:12:32+08:00 : 添加monitorv2监控平台
+2018-12-07T23:04:44+08:00 : Util::Go允许使用 .private
+2018-12-07T23:03:37+08:00 : Agent/Proxy.pm,Util/Proxy.pm允许使用private文件
+2018-12-07T22:47:09+08:00 : Notify 允许使用 .private的插件
+2018-12-07T22:43:27+08:00 : Util::Contact 允许读取.private 文件
+2018-12-07T22:17:42+08:00 : monitor.collector 分析机器分组情况,内容体现在报警中
+2018-12-07T19:51:59+08:00 : add monitor.supervisory
+2018-12-07T17:59:24+08:00 : monitor.collector 把运行记录写到日志中
+2018-12-07T16:34:55+08:00 : 修改subscribe/bin/show 显示时间和显示最后的60条信息
+2018-12-07T13:56:29+08:00 : Subscribe.pm中的信息运行有字符"."
+2018-12-06T13:52:54+08:00 : add subscribe/bin/show
+2018-12-06T13:52:04+08:00 : add monitor.collector
+2018-12-06T13:51:00+08:00 : monitor/bin/collector 信息写到subscribe
+2018-12-05T21:57:42+08:00 : rm deploy/service/watch2subscribe
+2018-12-05T21:53:34+08:00 : add bootstrap/exec.config/*
+2018-12-05T21:51:43+08:00 : add bootstrap/bin/config
+2018-12-05T21:41:28+08:00 : Collector 执行命令添加LANG=en
+2018-12-05T21:32:29+08:00 : update README.md
+2018-11-23T15:27:48+08:00 : 添加check小工具
+2018-11-22T14:30:02+08:00 : grsync,mrsync 源路径和目标路径一样的情况下,目标机器是源机器的子集则不同步
+2018-11-22T12:14:43+08:00 : 更新agent/code/tail2tcp 解决性能问题
+2018-11-20T21:28:20+08:00 : 修复Grsync/*中环境变量引起的bug
+2018-11-12T17:06:20+08:00 : Reborn 添加具体title和修改boot路径
+2018-11-12T14:32:56+08:00 : Reborn保留grub的配置备份
+2018-11-12T13:44:07+08:00 : 更新README.md
+2018-11-12T13:43:23+08:00 : 更新README.md
+2018-11-10T15:53:18+08:00 : 添加rtail工具,实时查看远程日志
+2018-11-08T17:13:33+08:00 : grsync 的dp默认等于sp
+2018-11-08T17:12:02+08:00 : fix GrsyncM 路径显示错误
+2018-11-08T09:52:17+08:00 : grsync 支持同步多文件和目录
+2018-11-08T09:50:29+08:00 : add agent/code/filelist
+2018-11-06T12:28:16+08:00 : ntpsync --daemon 提交到后台运行
+2018-11-05T20:12:12+08:00 : reborn 添加默认参数的读取
+2018-11-05T19:53:01+08:00 : reborn 获取默认参数
+2018-11-05T18:34:21+08:00 : add argv/reborn, code/reborn
+2018-11-04T01:59:16+08:00 : 添加重装系统工具
+2018-10-26T16:47:06+08:00 : fix Grsync::V4
+2018-10-26T16:10:34+08:00 : add Grsync::V4
 2018-08-24T14:42:58+08:00 : 发布0.1.53到cpan.org
 2018-08-24T14:40:49+08:00 : add tool: secure
 2018-07-10T13:47:07+08:00 : 发布0.1.52到cpan.org

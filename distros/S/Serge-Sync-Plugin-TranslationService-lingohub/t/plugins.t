@@ -87,7 +87,7 @@ sub delete_directory {
 }
 
 sub test_ts {
-    my ($ts, $plugin, $cfg, $name, $command) = @_;
+    my ($ts, $plugin, $cfg, $name, $command, $langs) = @_;
 
     my $ok = 1;
 
@@ -100,7 +100,12 @@ sub test_ts {
     my $command_result = 1;
 
     eval {
-        $command_result = $ts->$command();
+        if ($langs) {
+            $command_result = $ts->$command($langs);
+        }
+        else {
+            $command_result = $ts->$command();
+        }
     };
 
     output_errors($@, $cfg->errors_path, "$name.txt", $plugin) if $@;
@@ -170,9 +175,11 @@ for my $config_file (@confs) {
             output_errors($@, $cfg->errors_path, 'new.txt', $plugin) if $@;
 
             if (not $@ and $ts) {
-                $ok &= test_ts($ts, $plugin, $cfg, 'pull', 'pull_ts');
+                my $langs = $cfg->{data}->{sync}->{langs};
 
-                $ok &= test_ts($ts, $plugin, $cfg, 'push', 'push_ts');
+                $ok &= test_ts($ts, $plugin, $cfg, 'pull', 'pull_ts', $langs);
+
+                $ok &= test_ts($ts, $plugin, $cfg, 'push', 'push_ts', $langs);
             }
 
             if ($init_commands) {

@@ -13,22 +13,36 @@
       "version" : 2
    },
    "name" : "Ryu-Async",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.014000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
@@ -43,15 +57,33 @@
          "requires" : {
             "Future" : "0.37",
             "IO::Async" : "0.71",
+            "IO::Async::Handle" : "0",
+            "IO::Async::Listener" : "0",
+            "IO::Async::Notifier" : "0",
+            "IO::Async::Process" : "0",
+            "IO::Async::Resolver" : "0",
+            "IO::Async::Signal" : "0",
+            "IO::Async::Socket" : "0",
+            "IO::Async::Stream" : "0",
+            "IO::Async::Timer::Absolute" : "0",
+            "IO::Async::Timer::Countdown" : "0",
+            "IO::Async::Timer::Periodic" : "0",
             "IO::Socket::IP" : "0.37",
             "Log::Any" : "1.050",
-            "Ryu" : "0.030",
+            "Ryu" : "0.034",
+            "Ryu::Sink" : "0",
+            "Ryu::Source" : "0",
+            "Scalar::Util" : "0",
             "Syntax::Keyword::Try" : "0",
             "URI::tcp" : "0",
             "URI::udp" : "0",
             "curry" : "1.001",
+            "curry::weak" : "0",
+            "mro" : "0",
             "namespace::clean" : "0",
-            "parent" : "0"
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -61,6 +93,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "IO::Async::Loop" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
@@ -68,9 +101,33 @@
             "Test::Fatal" : "0.010",
             "Test::More" : "0.98",
             "Test::Refcount" : "0.07",
+            "Time::HiRes" : "0",
             "Variable::Disposition" : "0.004",
-            "indirect" : "0"
+            "indirect" : "0",
+            "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Ryu::Async" : {
+         "file" : "lib/Ryu/Async.pm",
+         "version" : "0.014"
+      },
+      "Ryu::Async::Client" : {
+         "file" : "lib/Ryu/Async/Client.pm",
+         "version" : "0.014"
+      },
+      "Ryu::Async::Packet" : {
+         "file" : "lib/Ryu/Async/Packet.pm",
+         "version" : "0.014"
+      },
+      "Ryu::Async::Process" : {
+         "file" : "lib/Ryu/Async/Process.pm",
+         "version" : "0.014"
+      },
+      "Ryu::Async::Server" : {
+         "file" : "lib/Ryu/Async/Server.pm",
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -78,14 +135,16 @@
       "bugtracker" : {
          "web" : "https://github.com/team-at-cpan/Ryu-Async/issues"
       },
+      "homepage" : "https://github.com/team-at-cpan/Ryu-Async",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/team-at-cpan/Ryu-Async.git",
+         "url" : "https://github.com/team-at-cpan/Ryu-Async.git",
          "web" : "https://github.com/team-at-cpan/Ryu-Async"
       }
    },
-   "version" : "0.013",
-   "x_generated_by_perl" : "v5.28.0",
+   "version" : "0.014",
+   "x_authority" : "cpan:TEAM",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

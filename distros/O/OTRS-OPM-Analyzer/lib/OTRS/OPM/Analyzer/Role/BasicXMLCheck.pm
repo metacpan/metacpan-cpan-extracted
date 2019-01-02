@@ -39,11 +39,17 @@ OTRS::OPM::Analyzer::Role::BasicXMLCheck - Check if the .xml files can be parsed
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
 All .xml files are checked if they can be parsed with C<XML::LibXML>
+
+=head1 METHODS
+
+=head2 check
+
+Checks if the document can be parsed by L<XML::LibXML>
 
 =head1 AUTHOR
 

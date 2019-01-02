@@ -92,6 +92,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

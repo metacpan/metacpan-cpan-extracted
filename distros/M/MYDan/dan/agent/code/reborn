@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use YAML::XS;
+use MYDan::Util::Reborn;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+MYDan::Util::Reborn->new( %param )->do();
+
+print "ok\n";
+exit 0;

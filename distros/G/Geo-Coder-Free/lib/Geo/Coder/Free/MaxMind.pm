@@ -129,7 +129,7 @@ sub geocode {
 		return $known_locations{$location};
 	}
 
-	# ::diag($location);
+	# ::diag(__LINE__, ": $location");
 	return unless(($location =~ /,/) || $param{'region'});	# Not well formed, or an attempt to find the location of an entire country
 
 	my $county;
@@ -174,7 +174,7 @@ sub geocode {
 		$location =~ s/^\s//g;
 		$location =~ s/\s$//g;
 		$country = uc($region);
-	} elsif($location =~ /^(\w+),\s*(\w+)$/) {
+	} elsif($location =~ /^([\w\s-]+),\s*(\w+)$/) {
 	# } elsif(0) {
 		$county = $1;
 		$country = $2;
@@ -192,15 +192,15 @@ sub geocode {
 			$concatenated_codes = 'GB';
 		}
 		my $countrycode = country2code($country);
+		# ::diag(__LINE__, ": country $countrycode, county $county, state $state, location $location");
 
 		if($state && $admin1cache{$state}) {
 			$concatenated_codes = $admin1cache{$state};
 		} elsif($admin1cache{$country} && !defined($state)) {
 			$concatenated_codes = $admin1cache{$country};
 		} else {
-			if(!defined($self->{'admin1'})) {
-				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new() or die "Can't open the admin1 database";
-			}
+			$self->{'admin1'} //= Geo::Coder::Free::DB::MaxMind::admin1->new() or die "Can't open the admin1 database";
+
 			if(my $admin1 = $self->{'admin1'}->fetchrow_hashref(asciiname => $country)) {
 				$concatenated_codes = $admin1->{'concatenated_codes'};
 				$admin1cache{$country} = $concatenated_codes;
@@ -230,15 +230,14 @@ sub geocode {
 	}
 	return unless(defined($concatenated_codes));
 
-	if(!defined($self->{'admin2'})) {
-		$self->{'admin2'} = Geo::Coder::Free::DB::MaxMind::admin2->new() or die "Can't open the admin2 database";
-	}
+	$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new() or die "Can't open the admin2 database";
+
 	my @admin2s;
 	my $region;
 	my @regions;
-	if(($country =~ /^(United States|USA|US)$/) && $state && (length($state) > 2)) {
-		if(my $twoletterstate = Locale::US->new()->{state2code}{uc($state)}) {
-			$state = $twoletterstate;
+	if(($country =~ /^(United States|USA|US)$/) && $county && (length($county) > 2)) {
+		if(my $twoletterstate = Locale::US->new()->{state2code}{uc($county)}) {
+			$county = $twoletterstate;
 		}
 	} elsif(($country eq 'Canada') && (length($county) > 2)) {
 		if(my $twoletterstate = Locale::CA->new()->{province2code}{uc($county)}) {
@@ -256,7 +255,11 @@ sub geocode {
 		} elsif(defined($state) && $admin2cache{$state} && !defined($county)) {
 			$region = $admin2cache{$state};
 		} else {
-			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $county);
+			if(defined($county) && ($county eq 'London')) {
+				@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
+			} else {
+				@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $county);
+			}
 			foreach my $admin2(@admin2s) {
 				if($admin2->{'concatenated_codes'} =~ $concatenated_codes) {
 					$region = $admin2->{'concatenated_codes'};
@@ -296,6 +299,8 @@ sub geocode {
 
 	if((scalar(@regions) == 0) && !defined($region)) {
 		# e.g. Unitary authorities in the UK
+		# admin[12].db columns are labelled ['concatenated_codes', 'name', 'asciiname', 'geonameId']
+		# ::diag(__LINE__, ": $location");
 		@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		if(scalar(@admin2s) && defined($admin2s[0]->{'concatenated_codes'})) {
 			foreach my $admin2(@admin2s) {
@@ -311,6 +316,9 @@ sub geocode {
 			}
 		} else {
 			# e.g. states in the US
+			if(!defined($self->{'admin1'})) {
+				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new() or die "Can't open the admin1 database";
+			}
 			my @admin1s = $self->{'admin1'}->selectall_hash(asciiname => $county);
 			foreach my $admin1(@admin1s) {
 				if($admin1->{'concatenated_codes'} =~ /^$concatenated_codes\./i) {
@@ -326,8 +334,13 @@ sub geocode {
 		$self->{'cities'} = Geo::Coder::Free::DB::MaxMind::cities->new();
 	}
 
-	my $options = { City => lc($location) };
-	$options->{'City'} =~ s/,\s*\w+$//;
+	my $options;
+	if(defined($county) && ($county =~ /^[A-Z]{2}$/) && ($country =~ /^(United States|USA|US)$/)) {
+		$options = {};
+	} else {
+		$options = { City => lc($location) };
+		$options->{'City'} =~ s/,\s*\w+$//;
+	}
 	if($region) {
 		if($region =~ /^.+\.(.+)$/) {
 			$region = $1;
@@ -352,7 +365,11 @@ sub geocode {
 	if(wantarray) {
 		my @rc = $self->{'cities'}->selectall_hash($options);
 		if(scalar(@rc) == 0) {
-			return;
+			@rc = $self->{'cities'}->selectall_hash('Region' => $options->{'Region'});
+			if(scalar(@rc) == 0) {
+				# ::diag(__LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
+				return;
+			}
 		}
 		# ::diag(__LINE__, Data::Dumper->new([\@rc])->Dump());
 		foreach my $city(@rc) {
@@ -447,6 +464,8 @@ Lots of lookups fail at the moment.
 The MaxMind data only contains cities.
 
 Can't parse and handle "London, England".
+
+The GeoNames admin databases are in this class, they should be in Geo::Coder::GeoNames.
 
 =head1 SEE ALSO
 

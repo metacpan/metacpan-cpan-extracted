@@ -25,22 +25,22 @@ optional_features: {}
 provides:
   Type::Nano:
     file: lib/Type/Nano.pm
-    version: '0.011'
+    version: '0.012'
   Type::Tie:
     file: lib/Type/Tie.pm
-    version: '0.011'
+    version: '0.012'
   Type::Tie::ARRAY:
     file: lib/Type/Tie.pm
-    version: '0.011'
+    version: '0.012'
   Type::Tie::BASE:
     file: lib/Type/Tie.pm
-    version: '0.011'
+    version: '0.012'
   Type::Tie::HASH:
     file: lib/Type/Tie.pm
-    version: '0.011'
+    version: '0.012'
   Type::Tie::SCALAR:
     file: lib/Type/Tie.pm
-    version: '0.011'
+    version: '0.012'
 recommends:
   Hash::FieldHash: '0'
 requires:
@@ -52,5 +52,5 @@ resources:
   homepage: https://metacpan.org/release/Type-Tie
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-type-tie.git
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

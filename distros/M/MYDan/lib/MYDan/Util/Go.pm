@@ -20,6 +20,7 @@ sub new
 {
     my ( $class, $path ) = @_;
 
+    $path = "$path.private" if -f "$path.private";
     my $conf = $path && -e $path ? eval{ YAML::XS::LoadFile $path } : +{};
     die "load $path fail:$@" if $@;
 

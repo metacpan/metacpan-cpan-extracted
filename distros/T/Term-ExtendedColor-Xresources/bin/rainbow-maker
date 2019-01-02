@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+# vim: ft=perl:fdm=marker:fmr=#<,#>:fen:et:sw=2:
+#
+# rainbow-maker
+use strict;
+use warnings;
+
+use Number::RGB;
+use Term::ExtendedColor::Xresources qw(set_xterm_color);
+
+my ($r, $g, $b) = (255, 0, 0);
+my $i = 0;
+
+while(($r + $g + $b) < 768) {
+  if($r > 0 && $b == 0) {
+    $r--;
+    $g++;
+  }
+  if($g > 0 && $r == 0) {
+    $g--;
+    $b++;
+  }
+  if($b > 0 && $g == 0) {
+    $r++;
+    $b--;
+  }
+
+  # method return hex with # so remove it for set_xterm_color
+  my $hex_color = Number::RGB->new(rgb => [$r, $g, $b])->hex;
+  $hex_color =~ s/^#//;
+
+  set_xterm_color({$i => $hex_color});
+
+  $i == 255 ? $i = 0 : $i++;
+}

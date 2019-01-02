@@ -1,5 +1,8 @@
 Release history for Email-Address
 
+1.912     2018-12-31 13:46:22-05:00 America/New_York
+        - include the doc updates from 1.911 changelog, oops!
+
 1.911     2018-12-22 11:30:28-05:00 America/New_York
         - just like 1.910, but with doc updates and undeprecation by Jim Brandt
 

@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::Sudo;
+use MYDan::Util::OptConf;
+use MYDan::MonitorV2::Collector;
+
+MYDan::Util::Sudo->sudo();
+
+$| ++;
+
+$MYDan::Util::OptConf::ARGC = 1;
+$MYDan::Util::OptConf::THIS = 'monitorv2';
+
+=head1 SYNOPSIS
+
+Launch monitorv2 collector.
+
+$0 name [--check]
+
+=cut
+my %o = MYDan::Util::OptConf->load()->get( qw( check ) )->dump();
+
+my $monitorv2 = MYDan::MonitorV2::Collector->new( %o, name => shift );
+
+$monitorv2->run() unless $o{check}; 
+exit 0;

@@ -20,7 +20,7 @@ WriteMakefile(
 	},
     PREREQ_PM => {
         'Time::Piece'	=> '0',
-        'Import::Export' => '0.04',
+        'Import::Export' => '1.00',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Time-Random-*' },

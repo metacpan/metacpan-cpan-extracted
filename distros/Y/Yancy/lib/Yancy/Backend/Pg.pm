@@ -1,5 +1,5 @@
 package Yancy::Backend::Pg;
-our $VERSION = '1.019';
+our $VERSION = '1.020';
 # ABSTRACT: A backend for Postgres using Mojo::Pg
 
 #pod =head1 SYNOPSIS
@@ -384,7 +384,7 @@ Yancy::Backend::Pg - A backend for Postgres using Mojo::Pg
 
 =head1 VERSION
 
-version 1.019
+version 1.020
 
 =head1 SYNOPSIS
 

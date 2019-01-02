@@ -1,5 +1,5 @@
 {
-   "abstract" : "(DEPRECATED) RFC 2822 Address Parsing and Creation",
+   "abstract" : "RFC 2822 Address Parsing and Creation",
    "author" : [
       "Casey West",
       "Ricardo SIGNES <rjbs@cpan.org>"
@@ -60,7 +60,7 @@
          "web" : "https://github.com/rjbs/Email-Address"
       }
    },
-   "version" : "1.911",
+   "version" : "1.912",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -432,7 +432,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.911",
+                  "tag" : "1.912",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },
@@ -543,6 +543,7 @@
       "David Golden <dagolden@cpan.org>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Glenn Fowler <cebjyre@cpan.org>",
+      "Jim Brandt <jbrandt@bestpractical.com>",
       "Kevin Falcone <kevin@jibsheet.com>",
       "Pali <pali@cpan.org>",
       "Ruslan Zakirov <ruz@bestpractical.com>",

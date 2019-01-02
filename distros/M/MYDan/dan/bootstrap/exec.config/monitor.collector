@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+while(1)
+{
+    my $t = time;
+    system "$ENV{MYDanPATH}/dan/monitor/bin/collector";
+    my $due = 60 + $t - time;
+    sleep $due if $due > 0;
+}

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 25 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 26 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ElasticSearch/Utilities.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'App/ElasticSearch/Utilities/HTTPRequest.pm',
     'App/ElasticSearch/Utilities/Query.pm',
     'App/ElasticSearch/Utilities/QueryString.pm',
+    'App/ElasticSearch/Utilities/QueryString/AutoEscape.pm',
     'App/ElasticSearch/Utilities/QueryString/BareWords.pm',
     'App/ElasticSearch/Utilities/QueryString/FileExpansion.pm',
     'App/ElasticSearch/Utilities/QueryString/IP.pm',

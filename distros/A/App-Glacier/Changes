@@ -1,3 +1,16 @@
+2.10 2019-01-02
+
+* The "periodic" subcommand
+
+The new subcommand "periodic" is responsible for maintaining the job database.
+It finishes up pending glacier jobs, dowloading the results (both inventory
+listings and requested files) and removes expired jobs. It should be run as a
+cronjob.
+
+* When run on an EC2 instance, credentials can be obtained from the EC2 metadata
+
+* Directory validity is controlled using the LastInventoryDate field
+
 2.00 2018-03-08
 
 * Redo the class system.

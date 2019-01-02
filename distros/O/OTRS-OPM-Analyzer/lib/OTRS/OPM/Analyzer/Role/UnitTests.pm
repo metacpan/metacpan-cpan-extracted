@@ -39,7 +39,13 @@ OTRS::OPM::Analyzer::Role::UnitTests - checks if the add on has unit tests
 
 =head1 VERSION
 
-version 0.06
+version 0.07
+
+=head1 METHODS
+
+=head2 check
+
+See I<DESCRIPTION>
 
 =head1 AUTHOR
 

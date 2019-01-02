@@ -1,0 +1,152 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use AnyEvent;
+use YAML::XS;
+use AnyEvent;
+use AnyEvent::Handle;
+use AnyEvent::Socket;
+use Time::HiRes qw(time);
+use Fcntl qw(:flock SEEK_END);
+use Sys::Hostname;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <STDIN> ) };
+my %argv = %{$param{argv}};
+
+#my %argv = 
+#(
+#    addr => "127.0.0.1",
+#    port => 9999,
+#    uuid => '5BCE1B5C-E499-11E8-BE16-5DA245FC8BCC'
+#    #file => [ '', '' ], or '/filelist'
+#    
+#);
+
+my @seek = $argv{seek} && $argv{seek} =~ /^([HT])(\d+)$/ ? ( $1, $2 ) :( 'T', 0 );
+$argv{addr} ||= $ENV{TCPREMOTEIP};
+
+warn sprintf "tail2tcp info: host:%s port:%s uuid:%s\n", map{ $argv{$_} ||'' }qw( addr port uuid );
+
+$0 = "mydan.tail2tcp.$argv{uuid}";
+
+my $idie = sub{ print shift;exit 1; };
+
+my @file;
+if( $argv{file} && ref $argv{file} eq 'ARRAY' )
+{
+    @file = @{$argv{file}};
+}
+elsif( $argv{file} && ! ref $argv{file} && -f $argv{file} )
+{
+    @file = split /\n/, `cat '$argv{file}'`;
+    map{ $_ =~ s/\n$// }@file;
+} 
+
+&$idie( 'nofile list' ) unless @file;
+
+my ( $index, $cv, %cv, %file, $hdl, @H, $w ) = ( 0, AE::cv );
+
+my $call = sub{
+    for my $file ( map{ glob $_ }  @file )
+    {
+        unless( -f $file )
+        {
+            print "nofile: $file;";
+            next;
+        }
+        next if $file{$file};
+        my $H;
+        unless( open $H, "<$file" )
+        {
+            print "open $file fail:$!";
+            next;
+        }
+        if( $seek[0] eq 'H' )
+        {
+            seek $H, $seek[1], 0;
+        }
+        else
+        {
+            seek $H, -$seek[1], SEEK_END;
+        }
+
+        my $buf;
+        while( sysread( $H, $buf, 102400 ) )
+        {
+            $hdl->push_write($buf);
+        }
+        $file{$file} = $H;
+    }
+    @H = values %file;
+
+};
+
+tcp_connect $argv{addr}, $argv{port}, sub {
+    my ( $fh ) = @_;
+    unless( $fh )
+    {
+        print "$argv{addr}:$argv{port} tcp_connect: $!";
+        $cv->send;
+        return;
+    }
+    $hdl = new AnyEvent::Handle(
+        fh => $fh,
+        rbuf_max => 10240000,
+        wbuf_max => 10240000,
+        autocork => 1,
+        on_read => sub {
+            my $self = shift;
+            $self->unshift_read (
+                chunk => length $self->{rbuf},
+                sub { print $_[1]; },
+            )
+        },
+        on_error => sub{
+            print 'tcp error';
+            undef $hdl;
+            $cv->send;
+        },
+        on_eof => sub{
+            print 'tcp close';
+            $cv->send;
+        },
+    );
+    $hdl->on_drain(
+        sub{
+	    for( 1 .. scalar @H )
+            {
+                my ( $i, $buf ) = $index % @H;
+                if( sysread( $H[$i], $buf, 102400 ) )
+                {
+                    $hdl->push_write($buf);
+		    return;
+                }
+	        $index ++;
+            }
+            $w = AnyEvent->timer ( after => 1, interval => 1, cb => sub{
+	    for( 1 .. scalar @H )
+	    {
+            my ( $i, $buf )= $index % @H;
+            if( sysread( $H[$i], $buf, 102400 ) )
+            {
+                $hdl->push_write($buf);
+		undef $w;
+		return;
+            }
+	    $index ++;
+            }
+        });
+
+    });
+
+    &$call();
+    exit if fork;
+    $hdl->push_write( $argv{uuid} . ':' . hostname . ':' );
+},  sub{ return 5; };
+
+$cv->recv;
+
+exit 1;

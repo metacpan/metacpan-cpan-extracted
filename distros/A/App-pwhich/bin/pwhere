@@ -1,0 +1,85 @@
+#!perl
+
+use strict;
+use warnings;
+#use lib::findbin '../lib'; # dev-only
+use App::pwhich;
+
+# PODNAME: pwhich
+# ABSTRACT: Pure Perl implementation of which
+our $VERSION = '1.16'; # VERSION
+
+exit App::pwhich::main('where', @ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pwhich - Pure Perl implementation of which
+
+=head1 VERSION
+
+version 1.16
+
+=head1 SYNOPSIS
+
+ $ pwhere perl
+
+=head1 DESCRIPTION
+
+C<pwhere> is a command-line utility program for finding paths to other
+programs based on the user's C<PATH>. It is similar to the usually Unix
+tool `where', and tries to emulate its functionality, but is written
+purely in Perl (uses the module C<File::Which>), so is portable.
+
+=head1 SUPPORT
+
+Bugs should be reported via the GitHub issue tracker
+L<https://github.com/plicease/App-pwhich/issues>
+For other issues, contact the maintainer.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<pwhich>
+
+=item L<File::Which>
+
+Perl API for L<pwhich>
+
+=item L<App::pwhich>
+
+Guts of this script.
+
+=back
+
+=head1 CAVEATS
+
+This module does not know about built-in shell commands, as the built-in
+command C<which> and C<where> usually do.
+
+This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
+
+=head1 AUTHOR
+
+Original author: Per Einar Ellefsen E<lt>pereinar@cpan.orgE<gt>
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2002 by Per Einar Ellefsen <pereinar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

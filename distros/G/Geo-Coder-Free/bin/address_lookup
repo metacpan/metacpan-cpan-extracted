@@ -16,7 +16,8 @@ if(scalar(@ARGV) == 0) {
 }
 
 # print join(' ', @ARGV), "\n";
-if(my $rc = Geo::Coder::Free->new()->geocode(location => join(' ', @ARGV))) {
+# if(my $rc = Geo::Coder::Free->new()->geocode(location => join(' ', @ARGV))) {
+if(my $rc = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode(location => join(' ', @ARGV))) {
 	print Data::Dumper->new([$rc])->Dump();
 } else {
 	exit(1);

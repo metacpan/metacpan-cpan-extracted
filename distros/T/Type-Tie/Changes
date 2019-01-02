@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Type-Tie>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tie>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.012	2019-01-02
+
+ [ Test Suite ]
+ - Check that Type::Nano type constraints work with Moo.
+
 0.011	2018-06-26
 
  [ Documentation ]

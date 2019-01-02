@@ -21,18 +21,18 @@ WriteMakefile(
         'HTTP::Request::Common' => 0,
     },
     PREREQ_PM => {
-        'Dancer2'          => '0.159002',
-        'Dancer2::Plugin'  => '0.159002',
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
+        'Dancer2'              => '0.159002',
+        'Dancer2::Plugin'      => '0.159002',
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Dancer2-Plugin-Chain-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Dancer2::Plugin::Chain'         => { file => 'lib/Dancer2/Plugin/Chain.pm',        version => '0.08' },
-            'Dancer2::Plugin::Chain::Router' => { file => 'lib/Dancer2/Plugin/Chain/Router.pm', version => '0.08' },
+            'Dancer2::Plugin::Chain'         => { file => 'lib/Dancer2/Plugin/Chain.pm',        version => '0.09' },
+            'Dancer2::Plugin::Chain::Router' => { file => 'lib/Dancer2/Plugin/Chain/Router.pm', version => '0.09' },
         },
         resources => {
             repository => {

@@ -1,0 +1,12 @@
+---
+target: localhost,127.0.0.1
+interval: 60
+code: grep
+param:
+  cmd: 'tail -n 200 /var/log/syslog'
+  test:
+    log:
+      'qr/abc/': 'abcFail'
+      'qr/device/': 'deviceFail'
+      'device': 'Fail'
+

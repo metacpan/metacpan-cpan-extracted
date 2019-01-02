@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.29 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.31 {
   
   use 5.014;
   use Moose;
@@ -253,25 +253,36 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.29 {
   
     my $file = Dist::Zilla::File::InMemory->new({
       name    => '.travis.yml',
-      content => join("\n", q{language: perl},
-                            q{sudo: false},
-                            q{dist: trusty},
-                            q{},
-                            q{install:},
-                            q{  - perlbrew list},
-                            q{  - cpanm -n Dist::Zilla},
-                            q{  - dzil authordeps --missing | cpanm -n},
-                            q{  - dzil listdeps   --missing | cpanm -n},
-                            q{},
-                            q{perl:},
-                            (map { "  - \"5.$_\""} qw( 14 16 18 20 22 24 26 )),
-                            q{},
-                            q{script:},
-                            q{  - dzil test -v},
-                            q{},
-                            q{env:},
-                            q{  global:},
-                            q{    - PERL_USE_UNSAFE_INC=0},
+      content => join("\n",
+        q{language: minimal},
+        q{dist: xenial},
+        q{services:},
+        q{  - docker},
+        q{before_install:},
+        q{  - curl https://raw.githubusercontent.com/plicease/cip/master/bin/travis-bootstrap | bash},
+        q{  - cip before-install},
+        q{install:},
+        q{  - cip diag},
+        q{  - cip install},
+        q{script:},
+        q{  - cip script},
+        q{jobs:},
+        q{  include:},
+        q{    - env: CIP_TAG=5.29},
+        q{    - env: CIP_TAG=5.28},
+        q{    - env: CIP_TAG=5.26},
+        q{    - env: CIP_TAG=5.24},
+        q{    - env: CIP_TAG=5.22},
+        q{    - env: CIP_TAG=5.20},
+        q{    - env: CIP_TAG=5.18},
+        q{    - env: CIP_TAG=5.16},
+        q{    - env: CIP_TAG=5.14},
+        q{    - env: CIP_TAG=5.12},
+        q{    - env: CIP_TAG=5.10},
+        q{    - env: CIP_TAG=5.8},
+        q{cache:},
+        q{  directories:},
+        q{    - "$HOME/.cip"},
       ),
     });
   
@@ -553,7 +564,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.29
+version 2.31
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Outthentic;
 
-our $VERSION = '0.4.6';
+our $VERSION = '0.4.7';
 
 1;
 
@@ -256,9 +256,9 @@ sub print_story_header {
     my $format = get_prop('format');
     my $data;
     if ($format eq 'production') {
-        $data = timestamp().' : '.($task_name || '').' '.(short_story_name($task_name))
+        $data = timestamp().':'.($task_name || '').''.(short_story_name($task_name))
     } elsif ($format ne 'concise') {
-        $data = timestamp().' : '.($task_name ||  '' ).' '.(nocolor() ? short_story_name($task_name) : colored(['yellow'],short_story_name($task_name)))
+        $data = timestamp().':'.($task_name ||  '' ).''.(nocolor() ? short_story_name($task_name) : colored(['yellow'],short_story_name($task_name)))
     }
     if ($format eq 'production'){
       note($data)
@@ -553,20 +553,20 @@ sub short_story_name {
     my $i;
 
     for my $l (split /\//, $story_dir){
-      $short_story_dir.=$l."/" unless $i++ < $cwd_size;
-
+      $short_story_dir.=$l. ( ($^O  =~ 'MSWin') ? "\\" : "/" ) unless $i++ < $cwd_size;
     }
 
     my $story_vars = story_vars_pretty();
 
-    $short_story_dir ||= "/";
+
+    $short_story_dir ||=  ($^O  =~ 'MSWin') ? "\\" : "/";
 
     my @ret;
 
-    push @ret, "[path] $short_story_dir" if $short_story_dir;
-    push @ret, "[params] $story_vars" if $story_vars;
+    push @ret, "$short_story_dir" if $short_story_dir;
+    push @ret, "{$story_vars}" if $story_vars;
 
-    join " ", @ret;
+    join "", @ret;
 
 }
 

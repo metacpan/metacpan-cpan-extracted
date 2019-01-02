@@ -28,7 +28,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -45,7 +45,7 @@
             "Dist::Zilla" : "6.00",
             "Dist::Zilla::App::Command::aliendeps" : "0.01",
             "Dist::Zilla::Plugin::Alien" : "0.023",
-            "Dist::Zilla::Plugin::Author::Plicease" : "2.29",
+            "Dist::Zilla::Plugin::Author::Plicease" : "2.31",
             "Dist::Zilla::Plugin::AutoMetaResources" : "1.20",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.150250",
             "Dist::Zilla::Plugin::InsertExample" : "0.04",
@@ -73,7 +73,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::Script" : "1.10",
             "perl" : "5.014"
          }
@@ -91,9 +91,9 @@
          "web" : "https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease"
       }
    },
-   "version" : "2.29",
-   "x_generated_by_perl" : "v5.29.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
+   "version" : "2.31",
+   "x_generated_by_perl" : "v5.29.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_use_unsafe_inc" : 0
 }
 

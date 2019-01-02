@@ -17,7 +17,9 @@ WriteMakefile1(
     ABSTRACT          => q{Get, set and modify X resources},
     VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
     LICENSE           => q{perl},
-    EXE_FILES         => [ q{./bin/set_single_color}, q{./bin/xcolor} ],
+    EXE_FILES         => [
+    glob('bin/*'),
+    ],
     PREREQ_PM => {
       q{Term::ReadKey}       => 0,
       q{Test::More}          => 0,

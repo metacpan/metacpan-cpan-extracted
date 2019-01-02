@@ -38,7 +38,13 @@ OTRS::OPM::Analyzer::Role::Documentation - check if .pod, .pdf or .xml files are
 
 =head1 VERSION
 
-version 0.06
+version 0.07
+
+=head1 METHODS
+
+=head2 check
+
+Check if some kind of documentation is included
 
 =head1 AUTHOR
 

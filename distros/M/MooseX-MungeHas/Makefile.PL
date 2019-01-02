@@ -35,7 +35,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "MooseX::MungeHas" => { file => "lib/MooseX/MungeHas.pm", version => "0.010" },
+                        "MooseX::MungeHas" => { file => "lib/MooseX/MungeHas.pm", version => 0.011 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -51,7 +51,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-MungeHas/project",
                       },
-  "version"        => "0.010",
+  "version"        => 0.011,
   "x_contributors" => [
                         "Andrew Rodland (ARODLAND) <arodland\@cpan.org>",
                         "Aaron Crane (ARC) <arc\@cpan.org>",

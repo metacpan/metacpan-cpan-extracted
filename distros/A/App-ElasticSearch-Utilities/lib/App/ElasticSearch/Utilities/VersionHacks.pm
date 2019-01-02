@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::VersionHacks;
 use strict;
 use warnings;
 
-our $VERSION = '6.2'; # VERSION
+our $VERSION = '6.3'; # VERSION
 
 use Const::Fast;
 use CLI::Helpers qw(:all);
@@ -162,7 +162,7 @@ App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all 
 
 =head1 VERSION
 
-version 6.2
+version 6.3
 
 =head1 AUTHOR
 

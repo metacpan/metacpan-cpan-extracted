@@ -7,21 +7,34 @@ use File::Which qw( which );
 use Getopt::Std qw( getopts );
 
 # ABSTRACT: Perl-only `which`
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 sub main
 {
-  local @ARGV = @_;
+  local @ARGV;
+  my $prog;
+  ($prog, @ARGV) = @_;
   
   my %opts;
-  getopts('avs', \%opts) || return _usage();
   
-  return _version() if $opts{v};
-  
-  return _usage() unless @ARGV;
+  if($prog eq 'which')
+  {
+    getopts('avs', \%opts) || return _usage();
+    return _version() if $opts{v};
+    return _usage() unless @ARGV;
+  }
+  else
+  {
+    $opts{a} = 1;
+  }
   
   foreach my $file (@ARGV)
   {
+    local $File::Which::IMPLICIT_CURRENT_DIR = $File::Which::IMPLICIT_CURRENT_DIR;
+    if($^O eq 'MSWin32' && eval { require Shell::Guess; 1 })
+    {
+      $File::Which::IMPLICIT_CURRENT_DIR = !Shell::Guess->running_shell->is_power;
+    }
     my @result = $opts{a}
     ? which($file)
     : scalar which($file);
@@ -88,7 +101,7 @@ App::pwhich - Perl-only `which`
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 
@@ -114,7 +127,7 @@ For other issues, contact the maintainer.
 =head1 CAVEATS
 
 This module does not know about built-in shell commands, as the built-in
-command C<which> and C<where> ususally do.
+command C<which> and C<where> usually do.
 
 This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
 
@@ -124,16 +137,15 @@ This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
 
 =item L<pwhich>
 
-Published interface (script) for this module.
+Public interface (script) for this module.
+
+=item L<pwhere>
+
+Another public interface for this module.
 
 =item L<File::Which>
 
 Implementation used by this module.
-
-=item L<Devel::CheckBin>
-
-This module purports to "check that a command is available", but does not
-provide any documentation on how you might use it.
 
 =back
 

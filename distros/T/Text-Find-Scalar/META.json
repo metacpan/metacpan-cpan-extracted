@@ -30,12 +30,20 @@
          "requires" : {
             "perl" : "5.006002"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
       }
    },
    "provides" : {
       "Text::Find::Scalar" : {
          "file" : "lib/Text/Find/Scalar.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -50,8 +58,9 @@
          "web" : "http://github.com/reneeb/Text-Find-Scalar"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],

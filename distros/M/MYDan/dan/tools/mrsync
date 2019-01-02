@@ -45,6 +45,12 @@ my $range = MYDan::Node->new( $option->dump( 'range' ) );
 
 map { $o{$_} = [ $range->load( delete $o{$_} || [] )->list ] } qw( src dst );
 
+if( ! defined $o{dp} || ( $o{dp} eq $o{sp} ) )
+{
+    my %src = map{ $_ => 1 }@{$o{src}};
+    die "'$o{sp}' are the same file on same host.\n" unless grep{ ! $src{$_} }@{$o{dst}};
+}
+
 my $mrsync = MYDan::Agent::Mrsync->new
 (
     ( map { $_ => delete $o{$_} } qw( sp dp src dst 1 2 ) ),

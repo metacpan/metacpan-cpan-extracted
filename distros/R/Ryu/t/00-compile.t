@@ -1,3 +1,4 @@
+use 5.006;
 use strict;
 use warnings;
 
@@ -5,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Ryu.pm',
+    'Ryu/Buffer.pm',
     'Ryu/Exception.pm',
     'Ryu/Node.pm',
     'Ryu/Observable.pm',

@@ -1,9 +1,11 @@
+scripts/media_sort
 lib/File/Media/Sort.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 t/00-load.t
 t/01-pod.t
-t/02-pod-coverage.t
 t/021-synopsis.t
+t/02-pod-coverage.t
 t/03-media_sort.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

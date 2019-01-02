@@ -5,7 +5,7 @@ package App::ElasticSearch::Utilities::Connection;
 use strict;
 use warnings;
 
-our $VERSION = '6.2'; # VERSION
+our $VERSION = '6.3'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:output);
@@ -125,7 +125,8 @@ sub request {
 
     # Build the Path
     $options->{command} ||= $url;
-    my @path = grep { defined && length } @{ $options }{qw(index command)};
+    my @path = grep { defined and length } @{ $options }{qw(index command)};
+
     my $path = join('/', @path);
 
     debug(sprintf "calling %s->request(%s)", ref $self, $path);
@@ -136,7 +137,7 @@ sub request {
         $self->host,
         $self->port,
     );
-    $uri->path( join('/', @path) );
+    $uri->path($path);
 
     # Query String
     if( exists $options->{uri_param} and is_hashref($options->{uri_param}) ) {
@@ -151,6 +152,12 @@ sub request {
 
     # Determine request method
     my $method = exists $options->{method} ? uc $options->{method} : 'GET';
+
+    # Special Case for Index Creation
+    if( $method eq 'PUT' && $options->{index} && $options->{command} eq '/' ) {
+        $uri->path($options->{index});
+    }
+
     debug({color=>'magenta'}, sprintf "Issuing %s with URI of '%s'", $method, $uri->as_string);
     if( defined $body ) {
         if( is_ref($body) )  {
@@ -218,7 +225,7 @@ App::ElasticSearch::Utilities::Connection - Abstract the connection element
 
 =head1 VERSION
 
-version 6.2
+version 6.3
 
 =head1 SYNOPSIS
 

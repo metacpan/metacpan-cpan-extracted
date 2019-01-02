@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use YAML::XS;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+local $/ = "\n";
+my ( %argv, $grep ) = %{$param{argv}};
+my ( $cmd, $test ) = @argv{qw( cmd test )};
+
+my @cmd = `$cmd`; chop @cmd;
+
+for my $group ( keys %$test )
+{
+    for my $regex ( keys %{$test->{$group}} )
+    {
+        my $mark = $test->{$group}{$regex};
+        my $reg = eval $regex;
+        if( ref $reg eq 'Regexp' )
+        {
+            map{ $grep{"$group###$mark"} = $_ if $_ =~ $reg }@cmd;
+        }
+        else
+        {
+            map{ $grep{"$group###$mark"} = $_ if $_ =~ /$regex/ }@cmd;
+        }
+    }
+}
+
+print( YAML::XS::Dump \%grep ) if %grep;
+
+exit 0;

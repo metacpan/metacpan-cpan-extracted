@@ -1,8 +1,8 @@
 App::Glacier
 ============
 
-Command line utility for working with Amazon Glacier, an online file storage 
-web service that provides storage for data archiving and backup.
+Command line utility for working with Amazon Glacier, an online service
+that provides storage for data archiving and backup.
 
 Usage:
 
@@ -41,6 +41,17 @@ Examples:
 
   glacier mkvault NEWNAME
 
+Installation
+============
+
+1. perl Makefile.PL
+2. Run "make install" as root.
+3. Install the following cronjob:
+
+  */4 * * * *  root  glacier periodic
+
+The exact schedule is entirely up to you. Running periodic maintenance each
+4 hours gives a sane default.
 
 Copying
 =======

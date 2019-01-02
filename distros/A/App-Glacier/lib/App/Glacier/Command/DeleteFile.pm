@@ -40,11 +40,11 @@ sub run {
     my $error = 0;
     my $success = 0;
     foreach my $ref (@{$self->get_vault_inventory($vault_name, @argv)}) {
-	$self->glacier_eval('delete_archive', $vault_name, $ref->{ArchiveId});
-	if ($self->lasterr) {
+	$self->glacier->Delete_archive($vault_name, $ref->{ArchiveId});
+	if ($self->glacier->lasterr) {
 	    $self->error(EX_FAILURE,
 		  "can't remove file \"$ref->{FileName};$ref->FileVersion}\":",
-			 $self->last_error_message);
+			 $self->glacier->last_error_message);
 	    $error++;
 	} else {
 	    $dir->delete_version($ref->{FileName}, $ref->{FileVersion});

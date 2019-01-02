@@ -1,3 +1,6 @@
-my $msg = prompt("enter commit message: ");
+#!perl6
 
-bash "git commit -a -m '$msg'";
+my $msg = prompt("message: ");
+
+task-run "commit my changes", "git-commit", %( message => $msg );
+

@@ -10,7 +10,7 @@ is(
 );
 
 is(
-  (media_sort('mvids', qw(Shapeshifter-Twin_Galaxies-x264-2010-FRAY)))[0],
+  (media_sort('mvid', qw(Shapeshifter-Twin_Galaxies-x264-2010-FRAY)))[0],
   q{Shapeshifter-Twin_Galaxies-x264-2010-FRAY}, q{MVID OK},
 );
 

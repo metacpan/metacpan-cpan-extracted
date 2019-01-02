@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.29 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.31 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.29 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.29
+    Author::Plicease.*   2.31
     OurPkgVersion        0.12
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -84,23 +84,20 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.29 {
       };
     }
 
-    $self->_my_add_plugin(['Run::AfterBuild'         => { run => "%x inc/run/after_build.pl      --name %n --version %v --dir %d" }])
-      if -r "inc/run/after_build.pl";
+    foreach my $prefix (qw( inc/run/ maint/run- ))
+    {
+      $self->_my_add_plugin(['Run::BeforeBuild'        => { run => "%x ${prefix}before_build.pl     --name %n --version %v" }])
+        if -r "${prefix}before_build.pl";
 
-    $self->_my_add_plugin(['Run::AfterRelease'       => { run => "%x inc/run/after_release.pl    --name %n --version %v --dir %d --archive %a" }])
-      if -r "inc/run/after_release.pl";
+      $self->_my_add_plugin(['Run::BeforeRelease'      => { run => "%x ${prefix}before_release.pl   ---name %n --version %v --dir %d --archive %a" }])
+        if -r "${prefix}before_release.pl";
 
-    $self->_my_add_plugin(['Run::BeforeBuild'        => { run => "%x inc/run/before_build.pl     --name %n --version %v" }])
-      if -r "inc/run/before_build.pl";
+      $self->_my_add_plugin(['Run::Release'            => { run => "%x ${prefix}release.pl          ---name %n --version %v --dir %d --archive %a" }])
+        if -r "${prefix}release.pl";
 
-    $self->_my_add_plugin(['Run::BeforeRelease'      => { run => "%x inc/run/before_release.pl   ---name %n --version %v --dir %d --archive %a" }])
-      if -r "inc/run/before_release.pl";
-
-    $self->_my_add_plugin(['Run::Release'            => { run => "%x inc/run/release.pl          ---name %n --version %v --dir %d --archive %a" }])
-      if -r "inc/run/release.pl";
-
-    $self->_my_add_plugin(['Run::Test'               => { run => "%x inc/run/test.pl             ---name %n --version %v --dir %d" }])
-      if -r "inc/run/test.pl";
+      $self->_my_add_plugin(['Run::Test'               => { run => "%x ${prefix}test.pl             ---name %n --version %v --dir %d" }])
+        if -r "${prefix}test.pl";
+    }
 
     $self->_my_add_plugin(
       ['GatherDir' => { exclude_filename => [qw( Makefile.PL Build.PL xt/release/changes.t xt/release/fixme.t )],
@@ -254,6 +251,15 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.29 {
         },
       ]);
     }
+
+    if($self->payload->{copy_mm})
+    {
+      $self->_my_add_plugin([
+        'CopyFilesFromBuild' => {
+          copy => [ 'Makefile.PL' ],
+        },
+      ]);
+    }
   
     unless('bakeini' eq (Dist::Zilla::Util::CurrentCmd::current_cmd() ||'') )
     {
@@ -347,6 +353,16 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.29 {
       [ 'Author::Plicease::NoUnsafeInc' ],
     );
 
+    foreach my $prefix (qw( inc/run/ maint/run- ))
+    {
+      $self->_my_add_plugin(['Run::AfterBuild'         => { run => "%x ${prefix}after_build.pl      --name %n --version %v --dir %d" }])
+        if -r "${prefix}after_build.pl";
+
+      $self->_my_add_plugin(['Run::AfterRelease'       => { run => "%x ${prefix}after_release.pl    --name %n --version %v --dir %d --archive %a" }])
+        if -r "${prefix}after_release.pl";
+
+    }
+
   }
 
   __PACKAGE__->meta->make_immutable;
@@ -366,7 +382,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.29
+version 2.31
 
 =head1 SYNOPSIS
 
@@ -564,6 +580,10 @@ Exclude them from gather.
 
 This allows other developers to use the dist from the git checkout, without needing
 to install L<Dist::Zilla> and L<Dist::Zilla::PluginBundle::Author::Plicease>.
+
+=head2 copy_mm
+
+Same as C<copy_mb> but for EUMM.
 
 =head2 allow_dirty
 

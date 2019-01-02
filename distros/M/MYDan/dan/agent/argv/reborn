@@ -1,0 +1,17 @@
+#!# perl: agent/argv/reborn
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+return sub
+{
+    local $/;
+    my %o;
+
+    my @c = qw( ks ipaddr netmask gateway hostname dns mac );
+    Getopt::Long::GetOptionsFromArray( \@_, \%o, map{ "$_=s" }@c );
+
+    map{ die( sprintf "Usage:\n\t\$0 -r range reborn %s\n", join ' ',map{ "--$_ '$_'" }@c ) unless $o{$_} }@c;
+    return \%o;
+};

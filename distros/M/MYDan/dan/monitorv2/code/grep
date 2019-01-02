@@ -1,0 +1,37 @@
+#!# perl: code/grep
+use strict;
+use warnings;
+
+use MYDan::Agent::Client;
+
+return sub
+{
+    my ( %param, %mesg ) = @_;
+
+    my ( $cmd, $test, $node ) = @param{qw( cmd test node )};
+    my $o = MYDan::Util::OptConf->load()->dump( 'agent' );
+
+    my %query = ( code => 'grep', argv => +{ cmd => $cmd, test => $test }, map{ $_ => 'root' }qw( user sudo ) );
+    my %result = MYDan::Agent::Client->new( @$node)->run( %$o, query => \%query ); 
+
+    for my $n ( keys %result )
+    {
+        if( $result{$n} =~ s/--- 0\n$// )
+        {
+            my $c = eval{ YAML::XS::Load $result{$n} };
+            if( $@ )
+            {
+                $mesg{"$n###sys###get_sysinfo_err"} ++;
+                next;
+            }
+            map{ $mesg{"$n###$_"} = $c->{$_}; }keys %$c;
+        }
+        else
+        {
+            $mesg{"$n###sys###get_sysinfo_err"} ++;
+        }
+    }
+
+    return keys %mesg;
+
+};

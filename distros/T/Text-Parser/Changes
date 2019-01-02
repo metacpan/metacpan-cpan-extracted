@@ -1,0 +1,64 @@
+Revision history for Text-Parser
+
+0.751     2019-01-01 20:30:37-08:00 America/Los_Angeles
+  - Documentation looks better. Made links where it makes sense. Re-arranged the information better.
+
+0.750     2019-01-01 19:37:50-08:00 America/Los_Angeles
+  - Correct problems in test for Win32 platform compatibility.
+  - Improve documentation to give examples of what all the functions do.
+  - Changed the spec for filehandle() and read()
+  - Added tests to cover the new spec.
+
+0.700     2019-01-01 13:20:43-08:00 America/Los_Angeles
+  - Some operating systems can read from STDOUT and some cannot. Same goes for output file handles.
+  - Improved documentation.
+  - Improved code coverage using Devel::Cover for the first time. We now have 99.5% coverage.
+  - Added a new method called abort_reading().
+
+0.502     2018-12-29 08:18:06-08:00 America/Los_Angeles
+  - STDOUT and other output files don't uniformly respond to the -r test on all operating systems. This will need more work.
+
+0.501     2018-12-23 20:51:09-08:00 America/Los_Angeles
+  - This will be a known issue for V0.500 and V0.501, until fixed:
+  - The test for checking that filehandle is read-only is actually not working. Fixing the tests for now to mark the test as TODO.
+
+0.500     2018-12-23 20:14:10-08:00 America/Los_Angeles
+  - Renamed this class as Text::Parser after RT#127067 by James Keenan
+  - Added the ability to parse text from filehandles, thus the name Text::Parser and not Text::File::Parser
+  - Added new method filehandle just to provide interface similar to filename.
+  - Indicated in POD that Text::Parser supersedes TextFileParser.
+
+0.204     2018-08-08 20:37:32-07:00 America/Los_Angeles
+  - Removed use of indirect method notation in POD
+
+0.203     2018-08-08 17:43:11-07:00 America/Los_Angeles
+  - Clearer documentation
+
+0.202     2018-08-08 00:03:52-07:00 America/Los_Angeles
+  - Added bugtracking info to POD
+
+0.201     2018-08-07 23:19:45-07:00 America/Los_Angeles
+  - Improved documentation
+  - Removed the use Role::Tiny from the tests
+
+0.200     2018-08-07 16:31:53-07:00 America/Los_Angeles
+  - Changed versioning scheme
+  - Updated documentation
+
+0.1821907 2018-08-07 14:37:11-07:00 America/Los_Angeles
+  - Removed record_list_pointer method
+  - Updated documentation
+  - Added tests using a Role::Tiny
+
+0.1821905 2018-08-07 09:22:12-07:00 America/Los_Angeles
+  - Added a new method pop_record
+  - Updated POD and simplified examples
+  - Added more tests
+
+0.1821902 2018-08-06 23:33:10-07:00 America/Los_Angeles
+  - Added the first tests
+  - Removed method make_sense_of_line. Derived classes override only save_record
+  - Updated documentation briefly.
+
+0.1821900 2018-08-06 20:41:42-07:00 America/Los_Angeles
+  - Put your comment here

@@ -1,6 +1,11 @@
 Change history for OTRS::OPM::Analyzer
 ======================================
 
+0.07 2019-01-02
+
+  + improve tests
+  + identified unecessary code and removed it
+
 0.06 2016-09-28
 
   + made an extra distribution for parser module (OTRS::OPM::Parser)

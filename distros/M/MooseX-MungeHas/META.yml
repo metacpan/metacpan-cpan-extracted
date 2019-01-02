@@ -27,7 +27,7 @@ optional_features: {}
 provides:
   MooseX::MungeHas:
     file: lib/MooseX/MungeHas.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Sub::Util: '1.40'
   perl: '5.008000'
@@ -37,7 +37,7 @@ resources:
   homepage: https://metacpan.org/release/MooseX-MungeHas
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moosex-mungehas.git
-version: '0.010'
+version: '0.011'
 x_contributors:
   - 'Andrew Rodland (ARODLAND) <arodland@cpan.org>'
   - 'Aaron Crane (ARC) <arc@cpan.org>'

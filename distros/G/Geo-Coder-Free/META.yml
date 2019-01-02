@@ -62,5 +62,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Coder-Free/issues
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -82,6 +82,10 @@ DESCRIPTION
         Automatically provides `coerce => 1` if the type constraint provides
         coercions. (Unless you've explicitly specified `coerce => 0`.)
 
+    `always_required`
+        Automatically provides `required => 1` unless there is a default or
+        builder. (Unless you've explicitly specified `required => 0`.)
+
     `no_isa`
         Switches off `isa` checks for attributes, unless they coerce.
 

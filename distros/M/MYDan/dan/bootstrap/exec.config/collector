@@ -1,0 +1,5 @@
+#!/bin/sh
+ulimit -n 655350;ulimit -u 102400;ulimit -s 10240;
+
+export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+exec $MYDanPATH/dan/collector/service/collector

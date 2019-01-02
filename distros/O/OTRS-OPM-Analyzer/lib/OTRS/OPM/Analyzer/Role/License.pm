@@ -50,7 +50,13 @@ OTRS::OPM::Analyzer::Role::License - Check if an appropriate License is used
 
 =head1 VERSION
 
-version 0.06
+version 0.07
+
+=head1 METHODS
+
+=head2 check
+
+Check if a license is used that is recognised by L<Software::License>
 
 =head1 AUTHOR
 

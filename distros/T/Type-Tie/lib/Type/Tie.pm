@@ -14,7 +14,7 @@ BEGIN
 {
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.011';
+	our $VERSION   = '0.012';
 	our @ISA       = qw( Exporter::Tiny );
 	our @EXPORT    = qw( ttie );
 	
@@ -45,7 +45,7 @@ BEGIN
 {
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.011';
+	our $VERSION   = '0.012';
 	
 	BEGIN {
 		my $impl;
@@ -134,7 +134,7 @@ BEGIN
 {
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.011';
+	our $VERSION   = '0.012';
 	our @ISA       = qw( Tie::StdArray Type::Tie::BASE );
 	
 	sub TIEARRAY
@@ -175,7 +175,7 @@ BEGIN
 {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.011';
+	our $VERSION   = '0.012';
 	our @ISA       = qw( Tie::StdHash Type::Tie::BASE );
 	
 	sub TIEHASH
@@ -197,7 +197,7 @@ BEGIN
 {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.011';
+	our $VERSION   = '0.012';
 	our @ISA       = qw( Tie::StdScalar Type::Tie::BASE );
 	
 	sub TIESCALAR
@@ -334,7 +334,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2018-2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

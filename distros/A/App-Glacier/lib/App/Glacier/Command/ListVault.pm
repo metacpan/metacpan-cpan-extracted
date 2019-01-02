@@ -217,10 +217,10 @@ sub get_vault_list {
     if ($glob->is_literal) {
 	return [$self->describe_vault(@_)];
     } else {
-	my $res = $self->glacier_eval('list_vaults');
-	if ($self->lasterr) {
+	my $res = $self->glacier->List_vaults();
+	if ($self->glacier->lasterr) {
 	    $self->abend(EX_FAILURE, "can't list vaults: ",
-			 $self->last_error_message);
+			 $self->glacier->last_error_message);
 	}
 	return [map { timestamp_deserialize($_) }
 	           $glob->filter(sub {
@@ -233,12 +233,12 @@ sub get_vault_list {
 sub list_vaults {
     my ($self, $ref) = @_;
 
-    foreach my $v (defined($self->{_options}{sort}) ?
-		        sort {
-			    &{$self->{_options}{sort}} 
+    foreach my $v (defined($self->{_options}{sort})
+		   ? sort {
+		       &{$self->{_options}{sort}} 
 			      ($self->{_options}{r} ? ($b, $a) : ($a, $b))
-		        } @$ref
-		      : @$ref) {
+		     } @$ref
+		   : @$ref) {
 	$self->show_vault($v);
     }
 }
@@ -260,11 +260,20 @@ sub format_size {
 sub show_vault {
     my ($self, $vault) = @_;
     if ($self->{_options}{l}) {
-	printf("%8s % 8u %s %-24s\n",
-	       $self->format_size($vault->{SizeInBytes}),
-	       $vault->{NumberOfArchives},
-	       $vault->{CreationDate}->canned_format($self->{_options}{time_style}),
-	       $vault->{VaultName});
+	if (defined($vault->{LastInventoryDate})) {
+	    printf("%s % 8u %s %-24s\n",
+		   $self->format_size($vault->{SizeInBytes}),
+		   $vault->{NumberOfArchives},
+	           $vault->{CreationDate}->canned_format($self->{_options}{time_style}),
+	           $vault->{VaultName});
+	} else {
+	    printf("%*s %8s %s %-24s\n",
+		   length($self->format_size(0)),
+		   "N/A",
+		   "N/A",
+	            $vault->{CreationDate}->canned_format($self->{_options}{time_style}),
+	            $vault->{VaultName});
+	}
     } else {
 	print $vault->{VaultName},"\n";
     }

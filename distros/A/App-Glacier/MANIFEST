@@ -1,6 +1,7 @@
 Changes
 glacier
 lib/App/Glacier.pm
+lib/App/Glacier/Bre.pm
 lib/App/Glacier/Command.pm
 lib/App/Glacier/Command/CreateVault.pm
 lib/App/Glacier/Command/DeleteFile.pm
@@ -8,16 +9,17 @@ lib/App/Glacier/Command/DeleteVault.pm
 lib/App/Glacier/Command/Get.pm
 lib/App/Glacier/Command/Jobs.pm
 lib/App/Glacier/Command/ListVault.pm
+lib/App/Glacier/Command/Periodic.pm
 lib/App/Glacier/Command/Purge.pm
 lib/App/Glacier/Command/Put.pm
 lib/App/Glacier/Command/Sync.pm
 lib/App/Glacier/Config.pm
-lib/App/Glacier/Config/Locus.pm
 lib/App/Glacier/Core.pm
 lib/App/Glacier/DateTime.pm
 lib/App/Glacier/DB.pm
 lib/App/Glacier/DB/GDBM.pm
 lib/App/Glacier/Directory.pm
+lib/App/Glacier/Directory/GDBM.pm
 lib/App/Glacier/EclatCreds.pm
 lib/App/Glacier/Glob.pm
 lib/App/Glacier/HttpCatch.pm
@@ -26,6 +28,9 @@ lib/App/Glacier/Job/ArchiveRetrieval.pm
 lib/App/Glacier/Job/FileRetrieval.pm
 lib/App/Glacier/Job/InventoryRetrieval.pm
 lib/App/Glacier/Progress.pm
+lib/App/Glacier/Roster.pm
+lib/App/Glacier/Roster/GDBM.pm
+lib/App/Glacier/Signature.pm
 lib/App/Glacier/Timestamp.pm
 LICENSE
 Makefile.PL

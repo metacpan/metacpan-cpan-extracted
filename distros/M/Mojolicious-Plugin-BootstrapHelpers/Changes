@@ -1,6 +1,26 @@
 Revision history for Mojolicious-Plugin-BootstrapHelpers
 
-0.0204 2016-12-31 16:43:08 UTC
+0.0205 2018-12-31 19:02:24 UTC
+ [Enhancements]
+ - Updated Bootstrap version to 3.4.0 (when included via the cdn helpers).
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 35 insertions(+), 33 deletions(-)
+ - (dev req) ~ Dist::Zilla 6.008 --> 6.012
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007 --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild 0.163040 -->
+   0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.041 --> 2.045
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.029 --> 0.034
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package 2.003001 -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PromptIfStale (any) --> 0.055
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.056 --> 2.057
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs 0.021 --> 0.027
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0313 --> 0.0322
+
+0.0204 2016-12-31T16:43:08Z UTC
  [Documentation]
  - Updated documentation regarding which versions of Bootstrap and jQuery
    are included when using those helpers.

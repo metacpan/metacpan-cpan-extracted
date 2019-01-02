@@ -6,7 +6,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -61,7 +61,9 @@
          "web" : "https://github.com/plicease/File-Which"
       }
    },
-   "version" : "1.22",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.23",
+   "x_generated_by_perl" : "v5.29.6",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_use_unsafe_inc" : 0
 }
 

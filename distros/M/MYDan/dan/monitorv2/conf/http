@@ -1,0 +1,16 @@
+---
+target: localhost,127.0.0.1
+interval: 60
+code: http
+param:
+  test:
+    app:
+      'http://{}:8080/health': 
+        method: GET
+        headers:
+          k1: v1
+          k2: v2
+        check: 'ok'
+        threshold: '2/3'
+        timeout: 5
+

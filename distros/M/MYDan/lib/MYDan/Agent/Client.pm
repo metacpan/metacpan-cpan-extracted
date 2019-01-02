@@ -103,7 +103,7 @@ sub run
     };
 
     $SIG{TERM} = $SIG{INT} = sub{ warn "sigaction exit.\n"; &$tocb();};
-    my $w = AnyEvent->timer ( after => $run{timeout},  cb => sub{ warn "timeout.\n";&$tocb(); });
+    my $w = AnyEvent->timer ( after => $run{timeout} + 5,  cb => sub{ warn "timeout.\n";&$tocb(); });
 
     my ( $md5, $aim, $efsize );
     if( my $ef = $ENV{MYDanExtractFile} )

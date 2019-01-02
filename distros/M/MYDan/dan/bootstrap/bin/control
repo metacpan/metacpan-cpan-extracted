@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Basename;
+use MYDan::Util::OptConf;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'bootstrap';
+
+=head1 SYNOPSIS
+
+ $0 #show
+ $0 --stop appname
+ $0 --start appname
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( start=s stop=s  ) )->dump();
+
+die "path undef" unless my $exec = $o{exec};
+
+if( $o{start} )
+{
+    die "onfind service $o{start}" unless -x "$exec.config/$o{start}";
+    exec "ln -fsn ../exec.config/$o{start} $exec/$o{start}";
+}
+elsif( $o{stop} )
+{
+    die "onfind service $o{stop}" unless -f "$exec/$o{stop}";
+    exec "rm $exec/$o{stop}"
+}
+else
+{
+    map{ 
+        printf "$_ : %s\n", -f "$exec/$_" ? 'started' : 'stoped'; 
+    }map{ basename $_ }grep{ -f $_ && -x $_ }glob "$exec.config/*";
+}

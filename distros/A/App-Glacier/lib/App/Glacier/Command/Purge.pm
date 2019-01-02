@@ -75,11 +75,10 @@ sub run {
 	foreach my $arch (@{$info}) {
 	    $self->debug(1, "deleting $file;$ver");
 	    return if $self->dry_run;
-	    $self->glacier_eval('delete_archive',
-				$vault_name, $arch->{ArchiveId});
-	    if ($self->lasterr) {
+	    $self->glacier->Delete_archive($vault_name, $arch->{ArchiveId});
+	    if ($self->glacier->lasterr) {
 		$self->error(EX_FAILURE, "can't remove file \"$file;$ver\":",
-			     $self->last_error_message);
+			     $self->glacier->last_error_message);
 		$error++;
 	    } else {
 		$dir->delete_version($file, $ver);

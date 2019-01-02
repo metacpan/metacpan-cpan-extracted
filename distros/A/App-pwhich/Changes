@@ -1,5 +1,9 @@
 Revision history for App-pwhich
 
+1.16      2018-12-31 14:30:24 -0500
+  - On Windows use Shell::Guess to determine if the current
+    directory ('.') should be included implicitly
+
 1.15      2017-09-12 22:20:43 -0400
   - Add -s option
 

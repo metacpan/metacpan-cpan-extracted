@@ -3,7 +3,7 @@ package Ryu;
 use strict;
 use warnings;
 
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 
 =encoding utf8
 
@@ -16,10 +16,8 @@ Ryu - asynchronous stream building blocks
  #!/usr/bin/env perl
  use strict;
  use warnings;
- 
  use Ryu qw($ryu);
- 
- my ($lines) = 
+ my ($lines) =
  	$ryu->from(\*STDIN)
  		->by_line
  		->filter(qr/\h/)
@@ -139,9 +137,9 @@ Helper method which returns a L<Ryu::Source> from a list of items.
 =cut
 
 sub from {
-	my $self = shift;
-	my $src = Ryu::Source->new;
-	$src->from(@_)
+    my $self = shift;
+    my $src = Ryu::Source->new;
+    $src->from(@_)
 }
 
 =head2 just
@@ -151,9 +149,9 @@ Helper method which returns a single-item L<Ryu::Source>.
 =cut
 
 sub just {
-	my $self = shift;
-	my $src = Ryu::Source->new;
-	$src->from(shift);
+    my $self = shift;
+    my $src = Ryu::Source->new;
+    $src->from(shift);
 }
 
 1;
@@ -180,7 +178,7 @@ Some perl modules of relevance:
 
 =item * L<Flow> - quite similar in concept to this module, maybe a bit short on documentation, doesn't provide integration with other sources such as files or L<IO::Async::Stream>
 
-=item * L<Flux> - more like the java8 streams API, sync-based 
+=item * L<Flux> - more like the java8 streams API, sync-based
 
 =item * L<Message::Passing> - on initial glance seemed more of a commandline tool, sadly based on L<AnyEvent>
 
@@ -221,5 +219,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

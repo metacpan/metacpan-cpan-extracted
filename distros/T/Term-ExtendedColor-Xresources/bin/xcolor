@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use strict;
+no warnings 'experimental::smartmatch';
 use Term::ExtendedColor::Xresources qw(set_xterm_color);
 use Term::ExtendedColor::Xresources::Colorscheme qw(
                                                     get_colorschemes

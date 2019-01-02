@@ -5,6 +5,7 @@ use warnings;
 use YAML::XS;
 
 use FindBin qw( $Bin );
+use File::Basename;
 
 use MYDan::Node;
 use MYDan::Node::DBI::Root;
@@ -27,9 +28,8 @@ my $range = MYDan::Node->new( $option->dump( 'range' ) );
 
 my ( $root, @data, %data, @empty ) = delete $o{root};
 
-die "cannot chdir $root" unless chdir $root;
 
-for my $cluster ( @ARGV ? map { $range->load( $_ )->list } @ARGV : glob '*' )
+for my $cluster ( @ARGV ? map { $range->load( $_ )->list } @ARGV : map{ basename $_ }glob "$root/*" )
 {
     my $db = File::Spec->join( $root, $cluster );
     my %datum;

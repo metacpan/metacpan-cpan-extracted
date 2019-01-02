@@ -1,0 +1,4 @@
+#!/bin/bash
+name=$(basename $0|sed 's/^monitorv2.collector.//')
+echo $name
+exec $MYDanPATH/dan/monitorv2/bin/collector "$name" >> "$MYDanPATH/var/logs/monitorv2/$name" 2>&1

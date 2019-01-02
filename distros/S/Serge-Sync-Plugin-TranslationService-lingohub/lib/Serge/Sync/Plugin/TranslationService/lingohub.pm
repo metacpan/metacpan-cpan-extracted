@@ -11,7 +11,7 @@ use Serge::Util qw(subst_macros);
 
 use version;
 
-our $VERSION = qv('0.900.1');
+our $VERSION = qv('0.901.3');
 
 sub name {
     return 'Lingohub translation server (https://www.lingohub.com) synchronization plugin';
@@ -47,9 +47,14 @@ sub validate_data {
     die "'project' not defined" unless defined $self->{data}->{project};
     die "'resource_directory' not defined" unless defined $self->{data}->{resource_directory};
     die "'root_directory', which is set to '$self->{data}->{root_directory}', does not point to a valid folder." unless -d $self->{data}->{root_directory};
-    if (!exists $self->{data}->{destination_locales} or scalar(@{$self->{data}->{destination_locales}}) == 0) {
-        die "the list of destination languages is empty";
+
+    my $destination_locales_count = 0;
+
+    if (defined $self->{data}->{destination_locales}) {
+        $destination_locales_count = scalar(@{$self->{data}->{destination_locales}});
     }
+
+    die "the list of destination languages is empty" unless $destination_locales_count != 0;
 
     $self->{data}->{source_language} = 'en' unless defined $self->{data}->{source_language};
 }

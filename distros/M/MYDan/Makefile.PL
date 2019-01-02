@@ -50,6 +50,7 @@ our %PREREQ_PM =
     'IO::Stty' => 0,
     'Term::ReadKey' => 0,
     'IO::Poll' => 0,
+    'AnyEvent::HTTP' => 0,
     'AnyEvent::Handle' => 0,
     'AnyEvent::Socket' => 0,
     'AnyEvent::Impl::Perl' => 0,

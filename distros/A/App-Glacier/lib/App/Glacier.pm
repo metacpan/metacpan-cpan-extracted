@@ -8,7 +8,7 @@ use App::Glacier::Command;
 use File::Basename;
 use Carp;
 
-our $VERSION = '2.00';
+our $VERSION = '2.10';
 
 
 my %comtab = (
@@ -47,7 +47,11 @@ my %comtab = (
     jobs => sub {
 	require App::Glacier::Command::Jobs;
 	return new App::Glacier::Command::Jobs(@_);
-    }
+    },
+    periodic => sub {
+	require App::Glacier::Command::Periodic;
+	return new App::Glacier::Command::Periodic(@_);
+    }	
 );
 
 sub getcom {
@@ -183,6 +187,11 @@ Removes the vault.  It must be empty for the command to succeed.
 
 Synchronizes the local vault directory with its latest inventory.    
 
+=head2 glacier periodic
+
+Periodic task for glacier job maintenance. It is recommended to run it
+each 4 hours as a cronjob.
+    
 =head1 OPTIONS
 
 =over 4
@@ -226,10 +235,17 @@ Displays a succint command line usage summary,
     
 =head1 CONFIGURATION
 
-Default configuration file is F</etc/glacier.conf>.  Its location is
-overridden by the value of the command line option B<--config-file> (B<-c>)
-and the environment variable B<GLACIER_CONF>.  The option takes precedence
-over the variable.
+Default configuration file is F</etc/glacier.conf>. This file is optional.
+If it does not exist, B<glacier> will attempt to start up with default
+values (optionally modified by the command line options). If you run
+glacier on a EC2 instance with an associated IAM profile, you can omit
+the configuration file, provided that the profile gives the necessary
+permissions on the Glacier storage. Please see
+L<https://docs.aws.amazon.com/amazonglacier/latest/dev/access-control-identity-based.html> for details on identity-based policies.
+
+Th configuration file can also be specified using the environment variable
+B<GLACIER_CONF>, or from the command line, using the B<--config-file> (B<-c>)
+option. If both are used, the option takes precedence over the variable.
 
 Configuration file consists of statements in the form
 I<variable> B<=> I<value>), grouped into sections.  Whitespace is ignored,
@@ -261,24 +277,28 @@ security reason.
 
 =item B<region => I<NAME>
 
-Sets the Amazon region.
+Sets the Amazon region.  If this setting is absent, B<glacier> will attempt
+to retrieve the region from the instance store (assuming it is run on an EC2
+AWS instance).    
     
 =back
 
-The preferred way for storing credentials is in the I<credentials file>.  This
-file allows you to store all security sensitive data in a single place and to
-tighten permissions accordingly.  In the simplest case, this file contains a
-single line with your access and secret keys separated by a semicolon, e.g.:
+If either of B<access> or B<secret> is not supplied, B<glacier> attemtps to
+obtain access and secret keys from the file named in the B<credentials>
+setting (if it is defined). If unable to find credentials, B<glacier> attempts
+to get credentials from the instance store, assuming it is run on an EC2
+instance. It will exit if this attempt fails.    
+
+The credentials file allows you to store all security sensitive data in a
+single place and to tighten permissions accordingly. In the simplest case,
+this file contains a single line with your access and secret keys separated
+by a semicolon, e.g.:
 
     AEBRGYTEBRET:RTFERYABNERTYR4HDDHEYRTWW
 
 Additionally, the default region can be specified after a second semicolon:
 
     AEBRGYTEBRET:RTFERYABNERTYR4HDDHEYRTWW:us-west-1
-
-The default region is B<eu-west-1>.
-
-=item Multiple accounts
     
 If you have several accounts, you can list their credentials on separate lines.
 In that case, B<glacier> will select the account with the access key supplied
@@ -320,6 +340,21 @@ selected.  The default value is 16.
 Sets the number of retries for failed transfers.  Defaults to 10.    
 
 =back
+
+=item B<[transfer download]>
+
+In addition to settings discussed above, the C<transfer download> section
+can contain the following:
+
+=over 8
+
+=item B<cachedir => I<DIR>
+
+Names the directory used to keep files downloaded after successful
+completion of archive retrieval jobs. This directory is managed by
+B<glacier periodic> subcommand. The default value is F</var/lib/glacier/cache>.
+    
+=back    
 
 =item B<[database job]>
 

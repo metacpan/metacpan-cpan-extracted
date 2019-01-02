@@ -138,13 +138,19 @@ OTRS::OPM::Analyzer::Role::Dependencies - Check that all dependencies were decla
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
 This role checks if all dependencies were declared. To achieve this, all modules that are
 C<use>d are compared to the modules OTRS ships and those that are shipped with the Perl
 core.
+
+=head1 METHODS
+
+=head2 check
+
+See I<DESCRIPTION>
 
 =head1 AUTHOR
 

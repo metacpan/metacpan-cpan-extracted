@@ -1,5 +1,5 @@
 use warnings;
-use Test::More tests => 35;
+use Test::More tests => 38;
 use UUID 'uuid';
 
 
@@ -16,7 +16,9 @@ UUID::generate_time( $bin );
 is length $bin, 16;
 
 UUID::unparse( $bin, $str );
+is length $str, 36;
 like $str, qr{^[-0-9a-f]+$}i;
+
 $rc = UUID::parse( $str, $bin2 );
 is $rc, 0;
 is $bin, $bin2;
@@ -43,6 +45,12 @@ is $rc, 0;
 UUID::clear( $bin );
 is length( $bin ), 16;
 is UUID::is_null( $bin ), 1;
+
+# does copy work?
+UUID::clear( $bin1 );
+is UUID::is_null( $bin1 ), 1;
+UUID::copy( $bin2, $bin1 );
+is UUID::is_null( $bin2 ), 1;
 
 $bin = 'bogus value';
 is UUID::is_null( $bin ), 0; # != the null uuid, right?

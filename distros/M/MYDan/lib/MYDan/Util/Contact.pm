@@ -29,7 +29,8 @@ sub new
     my ( $class, %this ) = @_;
 
     map{
-        $this{$_} = eval{ YAML::XS::LoadFile "$util{conf}/$_" };
+        my $file = "$util{conf}/$_";
+        $this{$_} = eval{ YAML::XS::LoadFile -f "$file.private" ? "$file.private" : $file };
         die "load config error:$@" if $@;
     }qw( contact team );
 

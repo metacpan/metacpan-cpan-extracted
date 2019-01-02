@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.019';
+our $VERSION = '1.020';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -17,10 +17,10 @@ our $VERSION = '1.019';
 #pod
 #pod <p>
 #pod   <img alt="Screenshot of list of Futurama characters"
-#pod     src="https://raw.github.com/preaction/Yancy/master/eg/screenshot.png?raw=true"
+#pod     src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot.png?raw=true"
 #pod     width="600px">
 #pod   <img alt="Screenshot of editing form for a person"
-#pod     src="https://raw.github.com/preaction/Yancy/master/eg/screenshot-edit.png?raw=true"
+#pod     src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-edit.png?raw=true"
 #pod     width="600px">
 #pod </p>
 #pod
@@ -188,7 +188,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.019
+version 1.020
 
 =head1 SYNOPSIS
 
@@ -203,10 +203,10 @@ version 1.019
 
 =for html <p>
   <img alt="Screenshot of list of Futurama characters"
-    src="https://raw.github.com/preaction/Yancy/master/eg/screenshot.png?raw=true"
+    src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot.png?raw=true"
     width="600px">
   <img alt="Screenshot of editing form for a person"
-    src="https://raw.github.com/preaction/Yancy/master/eg/screenshot-edit.png?raw=true"
+    src="https://raw.github.com/preaction/Yancy/master/eg/doc-site/public/screenshot-edit.png?raw=true"
     width="600px">
 </p>
 

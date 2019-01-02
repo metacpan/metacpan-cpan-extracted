@@ -13,6 +13,7 @@ pod_spelling_system:
     - Stas
     - Win32
     - XP
+    - PowerShell
 
 pod_coverage:
   skip: 0

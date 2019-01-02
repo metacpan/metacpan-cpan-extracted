@@ -8,9 +8,12 @@ use Scalar::Util ();
 package Type::Nano;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.011';
+our $VERSION   = '0.012';
 our @ISA       = qw( Exporter::Tiny );
-our @EXPORT_OK = qw( Any Defined Undef Ref ArrayRef HashRef CodeRef Object Str Bool Num Int );
+our @EXPORT_OK = qw(
+	Any Defined Undef Ref ArrayRef HashRef CodeRef Object Str Bool Num Int Object
+	class_type role_type duck_type union intersection enum type
+);
 
 # Built-in type constraints
 #
@@ -112,6 +115,80 @@ sub Int () {
 	);
 }
 
+sub class_type ($) {
+	my $class = shift;
+	$TYPES{CLASS}{$class} ||= __PACKAGE__->new(
+		name         => $class,
+		parent       => Object,
+		constraint   => sub { $_->isa($class) },
+		class        => $class,
+	);
+}
+
+sub role_type ($) {
+	my $role = shift;
+	$TYPES{ROLE}{$role} ||= __PACKAGE__->new(
+		name         => $role,
+		parent       => Object,
+		constraint   => sub { my $meth = $_->can('DOES') || $_->can('isa'); $_->$meth($role) },
+		role         => $role,
+	);
+}
+
+sub duck_type {
+	my $name    = ref($_[0]) ? '__ANON__' : shift;
+	my @methods = sort( ref($_[0]) ? @{+shift} : @_ );
+	my $methods = join "|", @methods;
+	$TYPES{DUCK}{$methods} ||= __PACKAGE__->new(
+		name         => $name,
+		parent       => Object,
+		constraint   => sub { my $obj = $_; $obj->can($_)||return !!0 for @methods; !!1 },
+		methods      => \@methods,
+	);
+}
+
+sub enum {
+	my $name   = ref($_[0]) ? '__ANON__' : shift;
+	my @values = sort( ref($_[0]) ? @{+shift} : @_ );
+	my $values = join "|", map quotemeta, @values;
+	my $regexp = qr/\A(?:$values)\z/;
+	$TYPES{ENUM}{$values} ||= __PACKAGE__->new(
+		name         => $name,
+		parent       => Str,
+		constraint   => sub { $_ =~ $regexp },
+		values       => \@values,
+	);
+}
+
+sub union {
+	my $name  = ref($_[0]) ? '__ANON__' : shift;
+	my @types = ref($_[0]) ? @{+shift} : @_;
+	__PACKAGE__->new(
+		name         => $name,
+		constraint   => sub { my $val = $_; $_->check($val) && return !!1 for @types; !!0 },
+		types        => \@types,
+	);
+}
+
+sub intersection {
+	my $name  = ref($_[0]) ? '__ANON__' : shift;
+	my @types = ref($_[0]) ? @{+shift} : @_;
+	__PACKAGE__->new(
+		name         => $name,
+		constraint   => sub { my $val = $_; $_->check($val) || return !!0 for @types; !!1 },
+		types        => \@types,
+	);
+}
+
+sub type {
+	my $name    = ref($_[0]) ? '__ANON__' : shift;
+	my $coderef = shift;
+	__PACKAGE__->new(
+		name         => $name,
+		constraint   => $coderef,
+	);
+}
+
 # OO interface
 #
 
@@ -129,7 +206,8 @@ sub new { # Type::API::Constraint::Constructor
 	my $class = ref($_[0]) ? ref(shift) : shift;
 	my $self  = bless { @_ == 1 ? %{+shift} : @_ } => $class;
 	
-	unless ($self->{name} and $self->{constraint}) {
+	$self->{constraint} ||= sub { !!1 };
+	unless ($self->{name}) {
 		require Carp;
 		Carp::croak("Requires both `name` and `constraint`");
 	}
@@ -258,6 +336,41 @@ Int
 
 =back
 
+It also optionally exports the following functions for creating new type
+constraints:
+
+=over
+
+=item *
+
+C<< type $name, $coderef >> or C<< type $coderef >>
+
+=item *
+
+C<< class_type $class >>
+
+=item *
+
+C<< role_type $role >>
+
+=item *
+
+C<< duck_type $name, \@methods >> or C<< duck_type \@methods >>
+
+=item *
+
+C<< enum $name, \@values >> or C<< enum \@values >>
+
+=item *
+
+C<< union $name, \@types >> or C<< union \@types >>
+
+=item *
+
+C<< intersection $name, \@types >> or C<< intersection \@types >>
+
+=back
+
 Types support the following methods:
 
 =over
@@ -283,6 +396,12 @@ L<Type::Tiny> while bigger than Type::Nano, will be I<much> faster at
 runtime, and offers better integration with Moo, Moose, Mouse, and a
 wide variety of other tools. Use that instead.
 
+All that having been said, L<Type::Nano> is compatible with:
+L<Type::Tie>, L<Moo>, L<Type::Tiny> (e.g. you can use Type::Tiny's
+implementation of C<ArrayRef> and Type::Nano's implementation of
+C<Int>, and combine them as C<< ArrayRef[Int] >>), L<Class::XSConstructor>,
+and L<Variable::Declaration>.
+
 =head1 BUGS
 
 Please report any bugs to
@@ -303,7 +422,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018 by Toby Inkster.
+This software is copyright (c) 2018-2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

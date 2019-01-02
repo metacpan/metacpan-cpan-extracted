@@ -12,7 +12,7 @@ use Exporter ();
 use vars qw($VERSION @ISA @EXPORT_OK);
 use Carp;
 
-$VERSION = '1.97';
+$VERSION = '1.99';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(csv);
 
@@ -52,6 +52,8 @@ my $ERRORS = {
         # Syntax errors
         1500 => "PRM - Invalid/unsupported arguments(s)",
         1501 => "PRM - The key attribute is passed as an unsupported type",
+        1502 => "PRM - The value attribute is passed without the key attribute",
+        1503 => "PRM - The value attribute is passed as an unsupported type",
 
         # Parse errors
         2010 => "ECR - QUO char inside quotes followed by CR not part of EOL",
@@ -95,10 +97,7 @@ my $ERRORS = {
         3009 => "EHR - print_hr () called before column_names ()",
         3010 => "EHR - print_hr () called with invalid arguments",
 
-        # PP Only Error
-        4002 => "EIQ - Unescaped ESC in quoted field",
-        4003 => "EIF - ESC CR",
-        4004 => "EUF - Field is terminated by the escape character (escape_char)",
+        4001 => "PRM - The key does not exist as field in the data",
 
         0    => "",
 };
@@ -567,6 +566,15 @@ sub strict {
     $self->{strict};
     }
 
+sub _SetDiagInfo {
+     my ($self, $err, $msg) = @_;
+     $self->SetDiag ($err);
+     my $em  = $self->error_diag;
+     $em =~ s/^\d+$// and $msg =~ s/^/# /;
+     my $sep = $em =~ m/[;\n]$/ ? "\n\t" : ": ";
+     join $sep => grep m/\S\S\S/ => $em, $msg;
+     }
+
 sub _supported_formula {
     my ($self, $f) = @_;
     defined $f or return 5;
@@ -576,10 +584,9 @@ sub _supported_formula {
     $f =~ m/^(?: 3 | diag    )$/xi ? 3 :
     $f =~ m/^(?: 4 | empty | )$/xi ? 4 :
     $f =~ m/^(?: 5 | undef   )$/xi ? 5 : do {
-	$self ||= "Text::CSV_PP";
-	$self->SetDiag (1500);
-	croak "formula-handling '$f' is not supported\n";
-	};
+        $self ||= "Text::CSV_PP";
+        croak ($self->_SetDiagInfo (1500, "formula-handling '$f' is not supported"));
+        };
     }
 
 sub formula {
@@ -940,6 +947,8 @@ sub header {
         croak (q{usage: $csv->header ($fh, [ seps ], { options })});
         }
 
+    defined $args{munge} && !defined $args{munge_column_names} and
+        $args{munge_column_names} = $args{munge}; # munge as alias
     defined $args{detect_bom}         or $args{detect_bom}         = 1;
     defined $args{set_column_names}   or $args{set_column_names}   = 1;
     defined $args{munge_column_names} or $args{munge_column_names} = "lc";
@@ -953,7 +962,7 @@ sub header {
 
     if (defined $args{sep_set}) {
         ref $args{sep_set} eq "ARRAY" or
-        croak ($self->SetDiag (1500, "sep_set should be an array ref"));
+            croak ($self->_SetDiagInfo (1500, "sep_set should be an array ref"));
         @seps =  @{$args{sep_set}};
     }
 
@@ -1030,9 +1039,12 @@ sub header {
         @hdr = map { $args{munge_column_names}->($_)       } @hdr;
     ref $args{munge_column_names} eq "HASH" and
         @hdr = map { $args{munge_column_names}->{$_} || $_ } @hdr;
-    my %hdr = map { $_ => 1 } @hdr;
-    exists $hdr{""}   and croak ($self->SetDiag (1012));
-    keys %hdr == @hdr or  croak ($self->SetDiag (1013));
+    my %hdr; $hdr{$_}++ for @hdr;
+    exists $hdr{""} and croak ($self->SetDiag (1012));
+    unless (keys %hdr == @hdr) {
+        croak ($self->_SetDiagInfo (1013, join ", " =>
+            map { "$_ ($hdr{$_})" } grep { $hdr{$_} > 1 } keys %hdr));
+        }
     $args{set_column_names} and $self->column_names (@hdr);
     wantarray ? @hdr : $self;
     }
@@ -1271,6 +1283,7 @@ sub _csv_attr {
     my $hdrs = delete $attr{headers};
     my $frag = delete $attr{fragment};
     my $key  = delete $attr{key};
+    my $val  = delete $attr{value};
     my $kh   = delete $attr{keep_headers}      ||
           delete $attr{keep_column_names}      ||
           delete $attr{kh};
@@ -1330,6 +1343,7 @@ sub _csv_attr {
         enc  => $enc,
         hdrs => $hdrs,
         key  => $key,
+        val  => $val,
         kh   => $kh,
         frag => $frag,
         fltr => $fltr,
@@ -1413,15 +1427,20 @@ sub csv {
         }
 
     if ($c->{kh}) {
-        ref $c->{kh} eq "ARRAY" or croak ($csv->SetDiag (1501, "1501 - PRM"));
+        ref $c->{kh} eq "ARRAY" or croak ($csv->SetDiag (1501));
         $hdrs ||= "auto";
         }
 
     my $key = $c->{key};
     if ($key) {
-        ref $key and croak ($csv->SetDiag (1501, "1501 - PRM"));
+       !ref $key or ref $key eq "ARRAY" && @$key > 1 or croak ($csv->SetDiag (1501));
         $hdrs ||= "auto";
         }
+    my $val = $c->{val};
+    if ($val) {
+       $key                                          or croak ($csv->SetDiag (1502));
+       !ref $val or ref $val eq "ARRAY" && @$val > 0 or croak ($csv->SetDiag (1503));
+       }
 
     $c->{fltr} && grep m/\D/ => keys %{$c->{fltr}} and $hdrs ||= "auto";
     if (defined $hdrs) {
@@ -1476,9 +1495,30 @@ sub csv {
     my $ref = ref $hdrs
         ? # aoh
           do {
-            $csv->column_names ($hdrs);
+            my @h = $csv->column_names ($hdrs);
+            my %h; $h{$_}++ for @h;
+            exists $h{""} and croak ($csv->SetDiag (1012));
+            unless (keys %h == @h) {
+                croak ($csv->_SetDiagInfo (1013, join ", " =>
+                    map { "$_ ($h{$_})" } grep { $h{$_} > 1 } keys %h));
+                }
             $frag ? $csv->fragment ($fh, $frag) :
-            $key  ? { map { $_->{$key} => $_ } @{$csv->getline_hr_all ($fh)} }
+            $key  ? do {
+                        my ($k, $j, @f) = ref $key ? (undef, @$key) : ($key);
+                        if (my @mk = grep { !exists $h{$_} } grep { defined } $k, @f) {
+                            croak ($csv->_SetDiagInfo (4001, join ", " => @mk));
+                            }
+                        +{ map {
+                            my $r = $_;
+                            my $K = defined $k ? $r->{$k} : join $j => @{$r}{@f};
+                            ( $K => (
+                            $val
+                                ? ref $val
+                                    ? { map { $_ => $r->{$_} } @$val }
+                                    : $r->{$val}
+                                : $r ));
+                            } @{$csv->getline_hr_all ($fh)} }
+                        }
                   : $csv->getline_hr_all ($fh);
             }
         : # aoa
@@ -1721,7 +1761,7 @@ sub _cache_diag {
     $self->__cache_show_char(escape_char => $cache->{escape_char});
     $self->__cache_show_char(sep_char => $cache->{sep});
     for (qw/
-        binary decode_utf8 allow_loose_escapes allow_loose_quotes
+        binary decode_utf8 allow_loose_escapes allow_loose_quotes allow_unquoted_escape
         allow_whitespace always_quote quote_empty quote_space
         escape_null quote_binary auto_diag diag_verbose formula strict
         has_error_input blank_is_undef empty_is_undef has_ahead
@@ -2874,33 +2914,39 @@ Text::CSV_PP - Text::CSV_XS compatible pure-Perl module
 
 =head1 SYNOPSIS
 
+This section is taken from Text::CSV_XS.
+
+ # Functional interface
+ use Text::CSV_PP qw( csv );
+
+ # Read whole file in memory
+ my $aoa = csv (in => "data.csv");    # as array of array
+ my $aoh = csv (in => "data.csv",
+                headers => "auto");   # as array of hash
+
+ # Write array of arrays as csv file
+ csv (in => $aoa, out => "file.csv", sep_char=> ";");
+
+ # Only show lines where "code" is odd
+ csv (in => "data.csv", filter => { code => sub { $_ % 2 }});
+
+ # Object interface
  use Text::CSV_PP;
 
- $csv = Text::CSV_PP->new();     # create a new object
- # If you want to handle non-ascii char.
- $csv = Text::CSV_PP->new({binary => 1});
+ my @rows;
+ # Read/parse CSV
+ my $csv = Text::CSV_PP->new ({ binary => 1, auto_diag => 1 });
+ open my $fh, "<:encoding(utf8)", "test.csv" or die "test.csv: $!";
+ while (my $row = $csv->getline ($fh)) {
+     $row->[2] =~ m/pattern/ or next; # 3rd field should match
+     push @rows, $row;
+     }
+ close $fh;
 
- $status = $csv->combine(@columns);    # combine columns into a string
- $line   = $csv->string();             # get the combined string
-
- $status  = $csv->parse($line);        # parse a CSV string into fields
- @columns = $csv->fields();            # get the parsed fields
-
- $status       = $csv->status ();      # get the most recent status
- $bad_argument = $csv->error_input (); # get the most recent bad argument
- $diag         = $csv->error_diag ();  # if an error occurred, explains WHY
-
- $status = $csv->print ($io, $colref); # Write an array of fields
-                                       # immediately to a file $io
- $colref = $csv->getline ($io);        # Read a line from file $io,
-                                       # parse it and return an array
-                                       # ref of fields
- $csv->column_names (@names);          # Set column names for getline_hr ()
- $ref = $csv->getline_hr ($io);        # getline (), but returns a hashref
- $eof = $csv->eof ();                  # Indicate if last parse or
-                                       # getline () hit End Of File
-
- $csv->types(\@t_array);               # Set column types
+ # and write as CSV
+ open $fh, ">:encoding(utf8)", "new.csv" or die "new.csv: $!";
+ $csv->say ($fh, $_) for @rows;
+ close $fh or die "new.csv: $!";
 
 =head1 DESCRIPTION
 
@@ -3018,7 +3064,7 @@ meaning of possible present BOM.
 
 =head1 METHODS
 
-This section is taken from Text::CSV_XS.
+This section is also taken from Text::CSV_XS.
 
 =head2 version
 
@@ -3528,6 +3574,8 @@ for this attribute is C<undef>, meaning no special treatment.
 This attribute is useful when exporting  CSV data  to be imported in custom
 loaders, like for MySQL, that recognize special sequences for C<NULL> data.
 
+This attribute has no meaning when parsing CSV data.
+
 =head3 verbatim
 
  my $csv = Text::CSV_PP->new ({ verbatim => 1 });
@@ -3604,6 +3652,8 @@ is equivalent to
      escape_null           => 1,
      quote_binary          => 1,
      keep_meta_info        => 0,
+     strict                => 0,
+     formula               => 0,
      verbatim              => 0,
      undef_str             => undef,
      types                 => undef,
@@ -4589,9 +4639,12 @@ C<munge_column_names> can be abbreviated to C<munge>.
 =head3 key
 
 If passed,  will default  L<C<headers>|/headers>  to C<"auto"> and return a
-hashref instead of an array of hashes.
+hashref instead of an array of hashes. Allowed values are simple scalars or
+array-references where the first element is the joiner and the rest are the
+fields to join to combine the key.
 
  my $ref = csv (in => "test.csv", key => "code");
+ my $ref = csv (in => "test.csv", key => [ ":" => "code", "color" ]);
 
 with test.csv like
 
@@ -4600,7 +4653,7 @@ with test.csv like
  2,keyboard,12,white
  3,mouse,5,black
 
-will return
+the first example will return
 
   { 1   => {
         code    => 1,
@@ -4622,6 +4675,28 @@ will return
         }
     }
 
+the second example will return
+
+  { "1:gray"    => {
+        code    => 1,
+        color   => 'gray',
+        price   => 850,
+        product => 'pc'
+        },
+    "2:white"   => {
+        code    => 2,
+        color   => 'white',
+        price   => 12,
+        product => 'keyboard'
+        },
+    "3:black"   => {
+        code    => 3,
+        color   => 'black',
+        price   => 5,
+        product => 'mouse'
+        }
+    }
+
 The C<key> attribute can be combined with L<C<headers>|/headers> for C<CSV>
 date that has no header line, like
 
@@ -4630,6 +4705,76 @@ date that has no header line, like
      headers => [qw( c_foo foo bar description stock )],
      key     =>     "c_foo",
      );
+
+=head3 value
+
+Used to create key-value hashes.
+
+Only allowed when C<key> is valid. A C<value> can be either a single column
+label or an anonymous list of column labels.  In the first case,  the value
+will be a simple scalar value, in the latter case, it will be a hashref.
+
+ my $ref = csv (in => "test.csv", key   => "code",
+                                  value => "price");
+ my $ref = csv (in => "test.csv", key   => "code",
+                                  value => [ "product", "price" ]);
+ my $ref = csv (in => "test.csv", key   => [ ":" => "code", "color" ],
+                                  value => "price");
+ my $ref = csv (in => "test.csv", key   => [ ":" => "code", "color" ],
+                                  value => [ "product", "price" ]);
+
+with test.csv like
+
+ code,product,price,color
+ 1,pc,850,gray
+ 2,keyboard,12,white
+ 3,mouse,5,black
+
+the first example will return
+
+  { 1 => 850,
+    2 =>  12,
+    3 =>   5,
+    }
+
+the second example will return
+
+  { 1   => {
+        price   => 850,
+        product => 'pc'
+        },
+    2   => {
+        price   => 12,
+        product => 'keyboard'
+        },
+    3   => {
+        price   => 5,
+        product => 'mouse'
+        }
+    }
+
+the third example will return
+
+  { "1:gray"    => 850,
+    "2:white"   =>  12,
+    "3:black"   =>   5,
+    }
+
+the fourth example will return
+
+  { "1:gray"    => {
+        price   => 850,
+        product => 'pc'
+        },
+    "2:white"   => {
+        price   => 12,
+        product => 'keyboard'
+        },
+    "3:black"   => {
+        price   => 5,
+        product => 'mouse'
+        }
+    }
 
 =head3 keep_headers
 
@@ -5186,6 +5331,16 @@ Function or method called with invalid argument(s) or parameter(s).
 1501 "PRM - The key attribute is passed as an unsupported type"
 
 The C<key> attribute is of an unsupported type.
+
+=item *
+1502 "PRM - The value attribute is passed without the key attribute"
+
+The C<value> attribute is only allowed when a valid key is given.
+
+=item *
+1503 "PRM - The value attribute is passed as an unsupported type"
+
+The C<value> attribute is of an unsupported type.
 
 =item *
 2010 "ECR - QUO char inside quotes followed by CR not part of EOL"

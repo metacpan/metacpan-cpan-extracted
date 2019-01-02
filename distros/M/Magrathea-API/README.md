@@ -4,7 +4,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 ## VERSION
 
-Version 1.5.1
+Version 1.6.0
 
 ## SYNOPSIS
 
@@ -84,6 +84,11 @@ to add the `_` characters.  If a number can be found, this routine
 will return a [Phone::Number](https://metacpan.org/pod/Phone::Number) object.  If no match is found, this
 routine will return `undef`. It will croak on any other error from
 Magrathea.
+
+### activate
+
+Passed a number as a string or a [Phone::Number](https://metacpan.org/pod/Phone::Number), this will
+activate that number.
 
 ### deactivate
 

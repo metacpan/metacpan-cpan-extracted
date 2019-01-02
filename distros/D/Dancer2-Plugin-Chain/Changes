@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Chain
 
+0.09  Wed Jan 02 06:20:00 2019
+      - Used namespace::autoclean instead.
+
 0.08  Sat Sep 17 07:25:00 2016
       - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
 

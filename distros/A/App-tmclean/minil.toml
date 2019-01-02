@@ -1,0 +1,10 @@
+name = "App-tmclean"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+readme_from="script/tmclean"
+
+[FileGatherer]
+exclude_match = ['^author/.*', '^tmclean$']

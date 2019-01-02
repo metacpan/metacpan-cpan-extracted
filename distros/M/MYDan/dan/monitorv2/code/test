@@ -1,0 +1,8 @@
+#!# perl: code/test
+use strict;
+use warnings;
+
+return sub
+{
+    return ( "hostname1###group1###{XX}{XX}{XX} > 1 2/3" => 'Reason' );
+};

@@ -17,39 +17,55 @@ use vars qw($Util);
 
 ########################
 
-if (!which('mysql')) {
+if ( !which('mysql') ) {
 	plan skip_all => 'mysql not found';
 }
+elsif ( !check_connection() ) {
+	plan skip_all => 'unable to connect to mysql';
+}
+else {
+	load_db();
+	constructor();
+	verify_auto_commit();
+	clone_dbh();
+	get_tables();
+	use_db_and_get_dbname();
+	get_depth();
+	table_exists();
+	has_ak();
+	has_fks();
+	get_indexes();
+	get_ak_constraint();
+	get_fk_constraints();
+	create_data();
+	drop_fks_and_apply_ddl();
+	get_ak_indexes();
+	get_ak_names();
+	get_fk_indexes();
+	get_max_depth();
+	get_other_constraints();
+	get_other_indexes();
+	get_pk_index();
+	is_column_nullable();
+	drop_db();
+}
 
-load_db();
-constructor();
-verify_auto_commit();
-clone_dbh();
-get_tables();
-use_db_and_get_dbname();
-get_depth();
-table_exists();
-has_ak();
-has_fks();
-get_indexes();
-get_ak_constraint();
-get_fk_constraints();
-create_data();
-drop_fks_and_apply_ddl();
-get_ak_indexes();
-get_ak_names();
-get_fk_indexes();
-get_max_depth();
-get_other_constraints();
-get_other_indexes();
-get_pk_index();
-is_column_nullable();
 done_testing();
 
 ##################################
 
-END {
-	drop_db();
+sub check_connection {
+
+	my $mysql_cmd = get_mysql_cmdline();
+	$mysql_cmd .= " -e 'show databases'";
+	$mysql_cmd .= " 1>/dev/null 2>/dev/null";
+
+	eval { system($mysql_cmd); };
+	if ( $@ or $? ) {
+		return 0;
+	}
+
+	return 1;
 }
 
 sub get_fk_indexes {
@@ -108,7 +124,8 @@ sub is_column_nullable {
 
 	ok( $Util->is_column_nullable( table => 'table_a', column => 'tester' ),
 		"$func - nullable column" );
-	ok( !$Util->is_column_nullable(
+	ok(
+		!$Util->is_column_nullable(
 			table  => 'table_a',
 			column => 'table_a_id'
 		),
@@ -213,7 +230,8 @@ sub create_data {
 	my $href = $dbh->selectrow_hashref($sql);
 	my $id   = $href->{ uc 'depth_0a_id' };
 
-	ok( $Util->create_data(
+	ok(
+		$Util->create_data(
 			table    => $table,
 			rows     => 50,
 			defaults => { depth_0a_id => $id }
@@ -275,7 +293,7 @@ sub get_fk_constraints {
 	#                       ]
 	#};
 
-	ok( ref $fks eq 'HASH', "$func - result is a hashref" );
+	ok( ref $fks eq 'HASH',      "$func - result is a hashref" );
 	ok( scalar keys(%$fks) == 2, "$func - result has 2 key" );
 
 	my @constraint_names = keys %$fks;
@@ -286,7 +304,7 @@ sub get_fk_constraints {
 
 		my $aref = $fks->{$constraint_name};
 		ok( ref $aref eq 'ARRAY', "$func - columns are an arrayref" );
-		ok( scalar @$aref == 1, "$func - array elements is 1" );
+		ok( scalar @$aref == 1,   "$func - array elements is 1" );
 
 		foreach my $href (@$aref) {
 			my $cnt = keys %$href;
@@ -344,7 +362,7 @@ sub get_ak_constraint {
 
 	my $aref = $aks_href->{'table_b_ak'};
 	ok( ref $aref eq 'ARRAY', "$func - columns are an arrayref" );
-	ok( @$aref == 2, "$func - array elements is 2" );
+	ok( @$aref == 2,          "$func - array elements is 2" );
 
 	foreach my $href (@$aref) {
 		my $cnt = keys %$href;
@@ -362,14 +380,15 @@ sub get_ak_constraint {
 		"$func - col_a ref table schema" );
 	ok( $col_a->{CONSTRAINT_TYPE} eq 'UNIQUE',
 		"$func - col_a constraint type" );
-	ok( !defined $col_a->{POSITION_IN_UNIQUE_CONSTRAINT},
+	ok(
+		!defined $col_a->{POSITION_IN_UNIQUE_CONSTRAINT},
 		"$func - col_a pos in uniq constraint"
 	);
 	ok( !defined $col_a->{REFERENCED_COLUMN_NAME},
 		"$func - col_a ref col name" );
 
 	my $col_b = shift @$aref;
-	ok( $col_b->{ORDINAL_POSITION} == 2, "$func - col_b ord position" );
+	ok( $col_b->{ORDINAL_POSITION} == 2,       "$func - col_b ord position" );
 	ok( $col_b->{COLUMN_NAME} eq 'table_a_id', "$func - col_b column name" );
 	ok( !defined $col_b->{REFERENCED_TABLE_NAME},
 		"$func - col_b ref table name" );
@@ -379,7 +398,8 @@ sub get_ak_constraint {
 		"$func - col_b ref table schema" );
 	ok( $col_b->{CONSTRAINT_TYPE} eq 'UNIQUE',
 		"$func - col_b constraint type" );
-	ok( !defined $col_b->{POSITION_IN_UNIQUE_CONSTRAINT},
+	ok(
+		!defined $col_b->{POSITION_IN_UNIQUE_CONSTRAINT},
 		"$func - col_b pos in uniq constraint"
 	);
 	ok( !defined $col_b->{REFERENCED_COLUMN_NAME},
@@ -461,7 +481,8 @@ sub clone_dbh {
 
 	my $dbh2;
 	ok( $dbh2 = $Util->clone_dbh, "$func - called without args " );
-	ok( $dbh->{AutoCommit} == $dbh2->{AutoCommit},
+	ok(
+		$dbh->{AutoCommit} == $dbh2->{AutoCommit},
 		"$func - AutoCommit is identical for both handles "
 	);
 
@@ -489,10 +510,10 @@ sub use_db_and_get_dbname {
 	ok( $@, "$func - called with garbage arg " );
 
 	my $orig_db = $Util->get_dbname;
-	ok( $Util->use_db('mysql'), "$func - use_db mysql " );
+	ok( $Util->use_db('mysql'),       "$func - use_db mysql " );
 	ok( $Util->get_dbname eq 'mysql', "$func - get_dbname = mysql " );
 
-	ok( $Util->use_db($orig_db), "$func - use_db $orig_db" );
+	ok( $Util->use_db($orig_db),       "$func - use_db $orig_db" );
 	ok( $Util->get_dbname eq $orig_db, "$func - get_dbname = $orig_db " );
 }
 
@@ -506,13 +527,15 @@ sub table_exists {
 	ok( $Util->table_exists($table), "$func - table $table exists " );
 
 	$table = $Util->get_dbname . '.table_a';
-	ok( $Util->table_exists($table), "$func -
+	ok(
+		$Util->table_exists($table), "$func -
           fq table $table exists( same db ) "
 	);
 
 	my $orig_db = $Util->get_dbname;
 	$Util->use_db('mysql');
-	ok( $Util->table_exists($table), "$func -
+	ok(
+		$Util->table_exists($table), "$func -
           fq table $table exists( mysql db ) "
 	);
 	$Util->use_db($orig_db);
@@ -540,7 +563,8 @@ sub get_depth {
 		my $d;
 		eval { $d = $Util->get_depth($t) };
 		ok( !$@, "$func - called with a valid table " );
-		ok( $d == $expected_depth, "$func - depth : got = $d, expected =
+		ok(
+			$d == $expected_depth, "$func - depth : got = $d, expected =
           $expected_depth "
 		);
 	}
@@ -562,8 +586,6 @@ sub constructor {
 	ok( $Util, "$func - with valid args " );
 
 	my $dbh = $Util->clone_dbh;
-	$Util = MySQL::Util->new(
-		dbh => $dbh,
-	);
-	ok( $Util, "$func - with dbh" );	
+	$Util = MySQL::Util->new( dbh => $dbh, );
+	ok( $Util, "$func - with dbh" );
 }

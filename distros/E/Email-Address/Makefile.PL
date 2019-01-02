@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "(DEPRECATED) RFC 2822 Address Parsing and Creation",
+  "ABSTRACT" => "RFC 2822 Address Parsing and Creation",
   "AUTHOR" => "Casey West, Ricardo SIGNES <rjbs\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Time::HiRes" => 0
   },
-  "VERSION" => "1.911",
+  "VERSION" => "1.912",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 no warnings 'uninitialized';
 
-our $VERSION = '6.2'; # VERSION
+our $VERSION = '6.3'; # VERSION
 
 use JSON::MaybeXS;
 use Ref::Util qw(is_ref is_arrayref is_hashref);
@@ -30,9 +30,11 @@ sub content {
         foreach my $entry (@{ $body }) {
             push @body, ref $entry ? encode_json($entry) : $entry;
         }
-        $body = join("\n", @body);
+        $body = join '', map { "$_\n" } @body;
+        $self->header('Content-Type' => 'application/x-ndjson');
     }
     elsif( is_hashref($body) ) {
+        $self->header('Content-Type' => 'application/json');
         $body = encode_json($body);
     }
     elsif( is_ref($body) ) {
@@ -58,7 +60,7 @@ App::ElasticSearch::Utilities::HTTPRequest - Allow for strange content elements 
 
 =head1 VERSION
 
-version 6.2
+version 6.3
 
 =head1 SYNOPSIS
 

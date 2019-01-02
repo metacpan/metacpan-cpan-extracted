@@ -31,7 +31,8 @@ WriteMakefile(NAME => 'App::Glacier',
 				  'Pod::Usage' => 1.51,
 				  'Scalar::Util' => 1.47,
 				  'Storable' => 2.34,
-				  'Term::ReadKey' => 2.32
+				  'Term::ReadKey' => 2.32,
+				  'Text::Locus' => 1.01
 	      } );
 
 sub pod_command_name {

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.10.0;
 
-use version 0.77; our $VERSION = qv('v1.5.1');
+use version 0.77; our $VERSION = qv('v1.6.0');
 
 use Net::Telnet;
 use Phone::Number;
@@ -26,7 +26,7 @@ Magrathea::API - Easier access to the Magrathea NTS API
 
 =head2 VERSION
 
-Version 1.5.1
+Version 1.6.0
 
 =head2 SYNOPSIS
 
@@ -81,6 +81,7 @@ sub sendline
     say ">> $message" if $self->{params}{debug} && $message;
     $self->{telnet}->print($message) if $message;
     my $response = $self->{telnet}->getline;
+    croak 'Error in getline' unless defined $response;
     chomp $response;
     my ($val, $msg) = $response =~ /^(\d)\s+(.*)/;
     croak qq(Unknown response: "$response") unless defined $val;
@@ -223,6 +224,20 @@ sub allocate
     return undef;   # Failed after 5 attempts.
 }
 
+=head3 activate
+
+Passed a number as a string or a L<Phone::Number>, this will
+activate that number.
+
+=cut
+
+sub activate
+{
+    my $self = shift;
+    my $number = new Phone::Number(shift);
+    $self->acti($number->uk ? $number->packed : $number->number);
+}
+
 =head3 deactivate
 
 Passed a number as a string or a L<Phone::Number>, this deactivates
@@ -234,7 +249,7 @@ sub deactivate
 {
     my $self = shift;
     my $number = new Phone::Number(shift);
-    $self->deac($number->packed);
+    $self->deac($number->uk ? $number->packed  : $number->number);
 }
 
 =head3 reactivate
@@ -247,7 +262,7 @@ sub reactivate
 {
     my $self = shift;
     my $number = new Phone::Number(shift);
-    $self->reac($number->packed);
+    $self->reac($number->uk ? $number->packed  : $number->number);
 }
 
 =head3 list
@@ -345,7 +360,7 @@ sub block_info
     my $self = shift;
     my $number = new Phone::Number(shift);
     my $block = eval {
-	$self->blkinfo($number->packed);
+	$self->blkinfo($number->uk ? $number->packed  : $number->number);
     };
     if (catch qr/^Account not ACTIve/) {
         return wantarray ? () : undef;
@@ -370,7 +385,7 @@ sub block_deactivate
 {
     my $self = shift;
     my $number = new Phone::Number(shift);
-    $self->blkdeac($number->packed);
+    $self->blkdeac($number->uk ? $number->packed  : $number->number);
 }
 
 =head3 block_reactivate
@@ -389,7 +404,7 @@ sub block_reactivate
 {
     my $self = shift;
     my $number = new Phone::Number(shift);
-    $self->blkreac($number->packed);
+    $self->blkreac($number->uk ? $number->packed  : $number->number);
 }
 
 =head2 Service Methods
@@ -409,7 +424,8 @@ sub fax2email
     my $email = shift;
     my @email = parse Email::Address($email);
     croak "One email address required" if @email != 1;
-    $self->set($number->packed, 1, "F:$email[0]");
+    my $num = $number->uk ? $number->packed  : $number->number;
+    $self->set($num, 1, "F:$email[0]");
 }
 
 =head3 voice2email
@@ -427,7 +443,8 @@ sub voice2email
     my $email = shift;
     my @email = parse Email::Address($email);
     croak "One email address required" if @email != 1;
-    $self->set($number->packed, 1, "V:$email[0]");
+    my $num = $number->uk ? $number->packed  : $number->number;
+    $self->set($num, 1, "V:$email[0]");
 }
 
 =head3 sip
@@ -450,7 +467,8 @@ sub sip
     croak "Domain required" unless $host;
     $username = $number->plain unless $username;
     my $sip = $inband ? "s" : "S";
-    $self->set($number->packed, 1, "$sip:$username\@$host");
+    my $num = $number->uk ? $number->packed  : $number->number;
+    $self->set($num, 1, "$sip:$username\@$host");
 }
 
 =head3 divert
@@ -464,7 +482,8 @@ sub divert
     my $self = shift;
     my $number = new Phone::Number(shift);
     my $to = new Phone::Number(shift);
-    $self->set($number->packed, 1, $to->plain);
+    my $num = $number->uk ? $number->packed  : $number->number;
+    $self->set($num, 1, $to->plain);
 }
 
 
@@ -524,7 +543,7 @@ sub status
     my $self = shift;
     my $number = new Phone::Number(shift);
     my $status = eval {
-	$self->stat($number->packed);
+	$self->stat($number->uk ? $number->packed  : $number->number);
     };
     return wantarray ? () : undef if $@;
     my @statuses = split /\|/, $status;

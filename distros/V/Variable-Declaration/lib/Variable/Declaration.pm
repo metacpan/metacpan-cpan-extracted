@@ -3,7 +3,7 @@ use v5.12.0;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.04";
 
 use Keyword::Simple;
 use PPR;
@@ -25,9 +25,6 @@ sub import {
            : $DEFAULT_LEVEL;
 
     feature->import::into($caller, 'state');
-    Carp->import::into($caller);
-    Type::Tie->import::into($caller, 'ttie');
-    Data::Lock->import::into($caller, 'dlock');
 
     Keyword::Simple::define 'let'    => \&define_let;
     Keyword::Simple::define 'static' => \&define_static;
@@ -54,19 +51,28 @@ sub define_declaration {
     substr($$ref, 0, length $match->{statement}) = _render_declaration($args);
 }
 
+sub croak { Carp::croak @_ }
+
+sub data_lock { Data::Lock::dlock @_ }
+
+sub type_tie(\[$@%]@);
+{
+    *type_tie = \&Type::Tie::ttie;
+}
+
 sub _valid {
     my ($declaration, $match) = @_;
 
-    Carp::croak "variable declaration is required'"
+    croak "variable declaration is required'"
         unless $match->{type_varlist};
 
     my ($eq, $assign) = ($match->{eq}, $match->{assign});
     if ($declaration eq 'const') {
-        Carp::croak "'const' declaration must be assigned"
+        croak "'const' declaration must be assigned"
             unless defined $eq && defined $assign;
     }
     else {
-        Carp::croak "illegal expression"
+        croak "illegal expression"
             unless (defined $eq && defined $assign) or (!defined $eq && !defined $assign);
     }
 
@@ -101,7 +107,7 @@ sub _lines_type_tie {
     for (@{$args->{type_vars}}) {
         my ($type, $var) = ($_->{type}, $_->{var});
         next unless $type;
-        push @lines => sprintf('ttie %s, %s', $var, $type);
+        push @lines => sprintf('Variable::Declaration::type_tie(%s, %s, %s)', $var, $type, $var);
     }
     return @lines;
 }
@@ -112,7 +118,7 @@ sub _lines_type_check {
     for (@{$args->{type_vars}}) {
         my ($type, $var) = ($_->{type}, $_->{var});
         next unless $type;
-        push @lines => sprintf('croak(%s->get_message(%s)) unless %s->check(%s)', $type, $var, $type, $var)
+        push @lines => sprintf('Variable::Declaration::croak(%s->get_message(%s)) unless %s->check(%s)', $type, $var, $type, $var)
     }
     return @lines;
 }
@@ -121,7 +127,7 @@ sub _lines_data_lock {
     my $args = shift;
     my @lines;
     for my $type_var (@{$args->{type_vars}}) {
-        push @lines => "dlock($type_var->{var})";
+        push @lines => "Variable::Declaration::data_lock($type_var->{var})";
     }
     return @lines;
 }
@@ -225,22 +231,59 @@ Variable::Declaration - declare with type constraint
 
 =head1 DESCRIPTION
 
-Variable::Declaration provides new variable declarations, i.e. `let`, `static`, and `const`.
+Warning: This module is still new and experimental. The API may change in future versions. The code may be buggy.
 
-`let` is equivalent to `my` with type constraint.
-`static` is equivalent to `state` with type constraint.
-`const` is equivalent to `let` with data lock.
+Variable::Declaration provides new variable declarations, i.e. C<let>, C<static>, and C<const>.
+
+C<let> is equivalent to C<my> with type constraint.
+C<static> is equivalent to C<state> with type constraint.
+C<const> is equivalent to C<let> with data lock.
+
+=head2 LEVEL
+
+You can specify the LEVEL in three stages of checking the specified type:
+
+C<LEVEL 0> does not check type,
+C<LEVEL 1> check type only at initializing variables,
+C<LEVEL 2> check type at initializing variables and reassignment.
+C<LEVEL 2> is default level.
+
+    # CASE: LEVEL 2 (DEFAULT)
+    use Variable::Declaration level => 2;
+
+    let Int $s = 'foo'; # => ERROR!
+    let Int $s = 123;
+    $s = 'bar'; # => ERROR!
+
+    # CASE: LEVEL 1
+    use Variable::Declaration level => 1;
+
+    let Int $s = 'foo'; # => ERROR!
+    let Int $s = 123;
+    $s = 'bar'; # => NO error!
+
+    # CASE: LEVEL 0
+    use Variable::Declaration level => 0;
+
+    let Int $s = 'foo'; # => NO error!
+    let Int $s = 123;
+    $s = 'bar'; # => NO error!
+
+There are three ways of specifying LEVEL.
+First, as shown in the example above, pass to the arguments of the module.
+Next, set environment variable C<$ENV{Variable::Declaration::LEVEL}>.
+Finally, set C<$Variable::Declaration::DEFAULT_LEVEL>.
 
 =head1 LICENSE
 
-Copyright (C) Kenta, Kobayashi.
+Copyright (C) kfly8.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Kenta, Kobayashi E<lt>kentafly88@gmail.comE<gt>
+kfly8 E<lt>kfly@cpan.orgE<gt>
 
 =cut
 

@@ -16,7 +16,7 @@ sub co
     my ( $interval, $flip, $flop, @data, @stat, $cmd ) = -t STDIN ? 1 : 6;
 
     eval{
-        confess "open: $!" unless open $cmd, "sar -A $interval 1 |";
+        confess "open: $!" unless open $cmd, "LANG=en sar -A $interval 1 |";
     };
 
     return () if $@;

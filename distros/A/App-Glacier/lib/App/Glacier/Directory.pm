@@ -1,9 +1,9 @@
 package App::Glacier::Directory;
 use strict;
 use warnings;
-require App::Glacier::DB::GDBM;
-use parent 'App::Glacier::DB::GDBM';
+use parent 'App::Glacier::DB';
 use Carp;
+use App::Glacier::Timestamp;
 
 our @EXPORT_OK = qw(DIR_UPTODATE DIR_PENDING DIR_OUTDATED);
 our %EXPORT_TAGS = ( status => [ qw(DIR_UPTODATE DIR_PENDING DIR_OUTDATED) ] );
@@ -11,12 +11,23 @@ our %EXPORT_TAGS = ( status => [ qw(DIR_UPTODATE DIR_PENDING DIR_OUTDATED) ] );
 use constant DB_INFO_KEY => ';00INFO';
 
 sub new {
-    my ($class, $file, %opts) = @_;
-    my $ttl = delete $opts{ttl};
-    my $self = $class->SUPER::new($file, %opts);
-    $self->{_ttl} = $ttl;
+    my ($class, $backend, $vault, $glacier, %opts) = @_;
+    (my $vault_name = $vault) =~
+	s/([^A-Za-z_0-9\.-])/sprintf("%%%02X", ord($1))/gex;
+    map { $opts{$_} =~ s/\$(?:vault|\{vault\})/$vault_name/g } keys %opts;
+    my $self = $class->SUPER::new($backend,
+				  %opts,
+		       create => sub { $glacier->describe_vault($vault_name) },
+    );
+    if ($self) {
+	$self->{_vault} = $vault;
+	$self->{_glacier} = $glacier;
+    }
     return $self;
 }
+
+sub vault { shift->{_vault} }
+sub glacier { shift->{_glacier} }
 
 # locate(FILE, VERSION)
 sub locate {
@@ -49,23 +60,7 @@ sub last_sync_time {
 sub update_sync_time {
     my ($self) = @_;
     $self->set_info('SyncTimeStamp', time);
-    $self->clear_dirty;    
 }
-
-sub is_dirty {
-    my ($self) = @_;
-    return $self->info('Dirty');
-}
-
-sub clear_dirty {
-    my ($self) = @_;
-    return $self->set_info('Dirty', 0);    
-}
-
-sub invalidate {
-    my ($self) = @_;
-    return $self->set_info('Dirty', 1);
-}    
 
 sub foreach {
     my ($self, $code) = @_;
@@ -143,8 +138,9 @@ sub status {
     my ($self) = @_;
     
     if (defined($self->last_sync_time)) {
-	if (time - $self->last_sync_time > $self->{_ttl}
-	    || $self->info('Dirty')) {
+	my $dsc = timestamp_deserialize($self->glacier->Describe_vault($self->vault));
+	unless ($dsc
+		&& $dsc->{LastInventoryDate}->epoch < $self->last_sync_time) {
 	    return DIR_OUTDATED;
 	}
     } else {
@@ -152,3 +148,5 @@ sub status {
     }
     return DIR_UPTODATE;
 }
+
+1;

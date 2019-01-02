@@ -10,6 +10,8 @@ use YAML::Tiny;
 use File::Spec;
 use File::Basename;
 
+our $ERROR;
+
 sub new{
     my ($class,$file) = @_;
     
@@ -20,8 +22,9 @@ sub new{
     my $default_file = File::Spec->catfile( $default_dir,  'conf', 'base.yml' );
        $default_file = File::Spec->rel2abs( $default_file );
     
-    $file ||= $default_file if -e $default_file;
-    $self->load( $file ) if defined $file;
+    $file = $default_file if !$file;
+    $self->load( $file );
+
     return $self;
 }
 
@@ -29,9 +32,13 @@ sub load{
     my ($self,$file) = @_;
     croak "no config file given" unless defined $file;
 
-    my $result = eval{
-        YAML::Tiny->read( $file );
+    my $result;
+    eval{
+        $result = YAML::Tiny->read( $file );
+        1;
     };
+
+    $ERROR = $@ if $@;
 
     $result ||= [];
 
@@ -43,25 +50,23 @@ sub load{
 sub get {
     my ($self,$key) = @_;
 
-    my $return;
+    return if !defined $key;
 
-    if( defined $key ){
-        my $config = $self->{_config} || {};
+    my $config = $self->{_config} || {};
 
-        my @keys = split /(?<!\\)\./, $key;
-        for my $subkey ( @keys ){
-            $subkey =~ s/\\\././g;
+    my @keys = split /(?<!\\)\./, $key;
+    for my $subkey ( @keys ){
+        next if !length $subkey;
 
-            return if $config and $subkey and ref $config ne 'HASH';
+        $subkey =~ s/\\\././g;
 
-            return if not exists $config->{$subkey};
-            $config = $config->{$subkey};
-        }
+        return if ref $config ne 'HASH';
+        return if not exists $config->{$subkey};
 
-        $return = $config;
+        $config = $config->{$subkey};
     }
 
-    $return;
+    return $config;
 }
 
 sub set {
@@ -69,25 +74,31 @@ sub set {
 
     $self->{_config} ||= {};
 
-    if( defined $key ){
-        my $config = $self->{_config} || {};
+    return if !defined $key;
 
-        my @keys = split /(?<!\\)\./, $key;
-        while ( my $subkey = shift @keys ){
-            $subkey =~ s/\\\././g;
+    my $config = $self->{_config};
 
-            last if $subkey and $config and ref $config ne 'HASH';
+    my @keys = split /(?<!\\)\./, $key;
+    while ( @keys ) {
+        my $subkey = shift @keys;
 
-            $config->{$subkey} = {} if not exists $config->{$subkey};
+        next if !length $subkey;
 
-            if ( !@keys ) {
-                $config->{$subkey} = $value;
-            }
-            else {
-                $config = $config->{$subkey};
-            }
+        $subkey =~ s/\\\././g;
+
+        return if ref $config ne 'HASH';
+
+        $config->{$subkey} = {} if not exists $config->{$subkey};
+
+        if ( !@keys ) {
+            $config->{$subkey} = $value;
+        }
+        else {
+            $config = $config->{$subkey};
         }
     }
+
+    return $value;
 }
 
 1;
@@ -104,7 +115,7 @@ OTRS::OPM::Analyzer::Utils::Config - class to parse a yaml config
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

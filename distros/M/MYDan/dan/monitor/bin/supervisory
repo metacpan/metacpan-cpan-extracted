@@ -1,0 +1,34 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use MYDan::Subscribe;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'monitor';
+
+=head1 SYNOPSIS
+
+ $0 
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get()->dump();
+
+sub mesg
+{
+    my @log = `tail -n 200 '$o{logs}/collector.log'`;
+    chomp @log;
+
+    @log = grep{ $_ =~ /\?\?/ && $_ =~ /finish\.$/ }@log;
+    my @col = split " ", pop @log;
+
+    return 'log format error' unless defined $col[1] && defined  $col[-2] &&  $col[1] =~ /^\d+$/ && $col[-2] =~ /^\d+$/;
+    return 'norun ontime' if $col[1] + 120 < time;
+    return "usetime $col[-2] > 60" if $col[-2] > 60;
+    return;
+}
+my $mesg = mesg();
+
+MYDan::Subscribe->new()->input( "monitor.collector $mesg", 'sys', 'monitor' ) if $mesg;

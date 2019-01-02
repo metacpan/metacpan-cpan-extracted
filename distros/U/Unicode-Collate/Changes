@@ -1,8 +1,14 @@
 Revision history for Perl module Unicode::Collate.
 
+1.27  Wed Jan  2 19:42:56 2019
+    - DUCET is updated (for Unicode 10.0.0) as Collate/allkeys.txt.
+    - The default UCA_Version is 36.
+    - Locale/*.pl and CJK/Korean.pm are updated.
+
 1.26  Mon Dec 31 14:32:07 2018
     - U::C::Locale newly supports locale: cu.
-    - modified locale: kk.
+    - tailoring Cyrillic YI as BYELORUSSIAN-UKRAINIAN I with DIAERESIS.
+      (affected locale: kk)
     - added loc_cu.t in t.
 
 1.25  Wed Nov 22 20:48:48 2017

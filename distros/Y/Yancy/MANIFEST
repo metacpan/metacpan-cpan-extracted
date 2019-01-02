@@ -18,8 +18,8 @@ eg/doc-site/deploy.sh
 eg/doc-site/docs.db
 eg/doc-site/myapp.pl
 eg/doc-site/myapp.preaction.conf
-eg/screenshot-edit.png
-eg/screenshot.png
+eg/doc-site/public/screenshot-edit.png
+eg/doc-site/public/screenshot.png
 eg/test-app/myapp.conf
 eg/test-app/myapp.null.conf
 eg/test-app/myapp.pl
@@ -29,7 +29,9 @@ eg/test-app/templates/people/index.html.ep
 eg/test-app/yancy.data.json
 eg/todo-app/.gitignore
 eg/todo-app/cpanfile
+eg/todo-app/deploy.sh
 eg/todo-app/myapp.pl
+eg/todo-app/todo-app.service
 lib/Mojolicious/Plugin/Yancy.pm
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/app.js
 lib/Mojolicious/Plugin/Yancy/resources/public/yancy/bootstrap.css

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.22
+    version 1.23
 
 SYNOPSIS
 
@@ -73,7 +73,7 @@ DESCRIPTION
     environment variable will NOT be discovered without the fully qualified
     name, however.
 
-  Windows 95, 98, ME, MS-DOS, OS/2
+  Windows ME, 98, 95, MS-DOS, OS/2
 
     This set of operating systems don't have the PATHEXT variable, and
     usually you will find executable files there with the extensions .exe,
@@ -119,8 +119,36 @@ FUNCTIONS
 
     Not exported by default.
 
-    Same as "which" in array context. Same as the where utility, will
-    return an array containing all the path names matching $short_exe_name.
+    Same as "which" in array context. Similar to the where csh built-in
+    command or which -a command for platforms that support the -a option.
+    Will return an array containing all the path names matching
+    $short_exe_name.
+
+GLOBALS
+
+ $IMPLICIT_CURRENT_DIR
+
+    True if the current directory is included in the search implicitly on
+    whatever platform you are using. Normally the default is reasonable,
+    but on Windows the current directory is included implicitly for older
+    shells like cmd.exe and command.com, but not for newer shells like
+    PowerShell. If you overrule this default, you should ALWAYS localize
+    the variable to the tightest scope possible, since setting this
+    variable from a module can affect other modules. Thus on Windows you
+    can get the correct result if the user is running either cmd.exe or
+    PowerShell on Windows you can do this:
+
+     use File::Which qw( which );
+     use Shell::Guess;
+    
+     my $path = do {
+       my $is_power = Shell::Guess->running_shell->is_power;
+       local $File::Which::IMPLICIT_CURRENT_DIR = !$is_power;
+       which 'foo';
+     };
+
+    For a variety of reasons it is difficult to accurately compute the
+    shell that a user is using, but Shell::Guess makes a reasonable effort.
 
 CAVEATS
 
@@ -151,10 +179,25 @@ SEE ALSO
 
     IPC::Cmd
 
-      Comes with a can_run function with slightly different semantics that
-      the traditional UNIX where. It will find executables in the current
-      directory, even though the current directory is not searched for by
-      default on Unix.
+      This module provides (among other things) a can_run function, which
+      is similar to which. It is a much heavier module since it does a lot
+      more, and if you use can_run it pulls in ExtUtils::MakeMaker. This
+      combination may be overkill for applications which do not need
+      IPC::Cmd's complicated interface for running programs, or do not need
+      the memory overhead required for installing Perl modules.
+
+      At least some older versions will find executables in the current
+      directory, even if the current directory is not in the search path
+      (which is the default on modern Unix).
+
+      can_run converts directory path name to the 8.3 version on Windows
+      using Win32::GetShortPathName in some cases. This is frequently
+      useful for tools that just need to run something using system in
+      scalar mode, but may be inconvenient for tools like App::pwhich where
+      user readability is a premium. Relying on Win32::GetShortPathName to
+      produce filenames without spaces is problematic, as 8.3 filenames can
+      be turned off with tweaks to the registry (see
+      https://technet.microsoft.com/en-us/library/cc959352.aspx).
 
     Devel::CheckBin
 

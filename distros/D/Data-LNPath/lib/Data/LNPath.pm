@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our (%ERROR, $caller);
 BEGIN {
@@ -21,26 +21,26 @@ sub import {
 	my ($pkg, $sub) = shift;
 	return unless my @export = @_;
 	my $opts = ref $export[scalar @export - 1] ? pop @export : {};
-	
 	$ERROR{no_error} = 1 if $opts->{return_undef};
 	%ERROR = (%ERROR, %{ $opts->{errors} }) if $opts->{errors};
-
 	@export = qw/lnpath/ if scalar @export == 1 && $export[0] eq 'all';
 	$caller = scalar caller();
 	{
 		no strict 'refs';
-		do { $sub = $pkg->can($_) ? $_ : $opts->{as} && $opts->{as}->{$_} } 
-			&& do { *{"${caller}::${_}"} = \&{"${pkg}::${sub}"} } 
-				foreach @export;
+		for ( @export ) {
+			if ( $sub = $pkg->can($_) ? $_ : $opts->{as} && $opts->{as}->{$_} ) {
+				*{"${caller}::${_}"} = \&{"${pkg}::${sub}"};
+			}
+		}
 	}
 }
 
 sub lnpath {
 	my ($data, $key) = @_;
 	my $val = eval { _extract_path('', 0, $data, split '/', _unescape($key)) };
-	if ($@) {
-		die $@ unless ($ERROR{no_error});
-	}	
+	if ($@ && !$ERROR{no_error}) {
+		die $@;
+	}
 	return $val;
 }
 
@@ -60,17 +60,18 @@ sub _extract_path {
 		if ($ref eq 'HASH') {
 			$data = $data->{$key};
 			_error('invalid_key', $key, $follow) if ! defined $data;
-		} 
+		}
 		elsif ( $ref eq 'ARRAY' ) {
 			$data = $data->[$key - 1];
 			_error('invalid_index', $key, $follow) if ! defined $data;
-		} 
+		}
 		elsif ( $ref && blessed $data ) {
 			my ($meth, $params) = _meth_params($key, $data);
 			$data = $data->$meth(@{ $params });
 			_error('invalid_method', $key, $follow) if ! defined $data;
-		} 
+		}
 		else {
+
 			_error('invalid_path', $key, $follow) if (exists $ERROR{invalid_path});
 			$end = 1;
 		}
@@ -102,12 +103,12 @@ sub _generate_params {
 		}
 		elsif ( ($_ =~ m/^\s*(\d+)\s*$/) || ($_ =~ m/^\s*[\'\"]+\s*(.*?)\s*[\'\"]+\s*$/) ) {
 			push @world, $1;
-		} 
+		}
 		else {
 			my $ex = $_ =~ s/^\s*\&//;
 			my ($method, $args) = $_ =~ /^\s*(.*?)\((.*)\)$/;
 			($method) = $_ =~ m/\s*(.*)\s*/ unless $method;
-			$args = $args ? _generate_params($args, $obj) : [];	
+			$args = $args ? _generate_params($args, $obj) : [];
 			push @world, $ex ? do { no strict 'refs'; *{"${caller}::${method}"}->(@{ $args }); } : $obj->$method(@{ $args });
 		}
 	}
@@ -117,7 +118,7 @@ sub _generate_params {
 sub _error {
 	my ($error) = @_;
 	my $find = $ERROR{$error};
-	return ref $find eq 'CODE' 
+	return ref $find eq 'CODE'
 		? $find->(@_)
 		: die sprintf $find, @_;
 }
@@ -128,19 +129,19 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
 =head1 SYNOPSIS
 
-	use Data::LNPath qw/lnpath/ => { 
-		errors => {  
+	use Data::LNPath qw/lnpath/ => {
+		errors => {
 			invalid_key => \&invalid_key,
 			invalid_index => \&invalid_index,
 			invalid_method => \&invalid_method,,
 			allow_meth_keys => undef
-		} 
+		}
 	};
 
 	my $data = {

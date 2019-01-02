@@ -29,7 +29,7 @@ my $option = MYDan::Util::OptConf->load();
 my %o = MYDan::Util::OptConf->load()->get( qw( range=s delete add ) )->dump();
 my @conf;
 
-exit unless $o{add} || $o{delete};
+$option->assert() unless $o{add} || $o{delete};
 
 for my $user ( @ARGV )
 {

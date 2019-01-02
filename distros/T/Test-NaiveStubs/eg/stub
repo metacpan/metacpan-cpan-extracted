@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Test::NaiveStubs;
+
+my $module = shift or die "Usage: perl $0 Some::Module\n";
+
+eval "require $module";
+die "Can't require $module: $@" if $@;
+
+my $t = Test::NaiveStubs->new( module => $module );
+
+#$t->gather_subs;
+#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$t->subs);
+
+$t->create_test;

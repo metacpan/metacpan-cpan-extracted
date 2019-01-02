@@ -7,9 +7,9 @@ use App::pwhich;
 
 # PODNAME: pwhich
 # ABSTRACT: Pure Perl implementation of which
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
-exit App::pwhich::main(@ARGV);
+exit App::pwhich::main('which', @ARGV);
 
 __END__
 
@@ -23,7 +23,7 @@ pwhich - Pure Perl implementation of which
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 
@@ -75,6 +75,8 @@ For other issues, contact the maintainer.
 
 =over 4
 
+=item L<pwhere>
+
 =item L<File::Which>
 
 Perl API for L<pwhich>
@@ -83,18 +85,12 @@ Perl API for L<pwhich>
 
 Guts of this script.
 
-=item L<Devel::CheckBin>
-
-This module purports to "check that a command is available", but does not
-
-provide any documentation on how you might use it.
-
 =back
 
 =head1 CAVEATS
 
 This module does not know about built-in shell commands, as the built-in
-command C<which> and C<where> ususally do.
+command C<which> and C<where> usually do.
 
 This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
 

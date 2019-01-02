@@ -55,11 +55,14 @@
             "GD::SecurityImage" : "1.70",
             "GD::Thumbnail" : "1.35",
             "HTML::Parser" : "0",
+            "HTML::TableParser" : "0",
+            "JSON::XS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "Lingua::TR::ASCII" : "0.11",
             "MP3::M3U::Parser" : "2.30",
             "Mojolicious" : "0",
+            "Net::GitHub" : "0",
             "Parse::HTTP::UserAgent" : "0.20",
             "Perl::Tidy" : "0",
             "Pod::Coverage::TrustPod" : "0",
@@ -109,7 +112,7 @@
          "web" : "https://github.com/burak/CPAN-Task-BeLike-BURAK"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_contributors" : [
       "Burak Gursoy <burak@cpan.org>"
    ],

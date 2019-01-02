@@ -23,7 +23,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 
 @EXPORT_OK = ( @{$EXPORT_TAGS{'all'}} );
 
-$VERSION = '0.27';
+$VERSION = '0.28';
 
 bootstrap UUID $VERSION;
 
@@ -185,9 +185,13 @@ throwing away the intermediate binary UUID.
 
 =head1 UUID LIBRARY
 
-Note that on some systems external packages will need to be installed
-first. Notably, uuid-dev or uuid-devel on Debian and RedHat Linux,
-respectively, and their derivatives.
+On some systems external packages will need to be installed first.
+Notably, uuid-dev, libuuid-devel, or uuid-devel, depending on your
+platform.
+
+Some may also have more than one package available. It should be safe to
+install all variations. The UUID installer will then opt towards the
+older, faster library.
 
 =head1 EXPORTS
 

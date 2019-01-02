@@ -317,6 +317,7 @@ our @EXPORT  = qw(%Hosts $localhost getpasswd
    use Net::Telnet;
    use Getopt::Long;
    use Pod::Usage;
+   use Proc::ProcessTable;
    use Term::ReadKey;
    use Term::RawInput;
    use LWP::UserAgent ();
@@ -2289,24 +2290,10 @@ print "localhost cleanup() LINE=$line<==\n"
       $dbenv->close();
       undef $dbenv;
    }
-   my $ps=$Net::FullAuto::FA_Core::gbp->('ps').'ps -ef';
-   my ($psout,$pserr)=Net::FullAuto::FA_Core::cmd($ps);
-   if ($pserr=~/password[: ]+$/si) {
-      $psout=`$ps 2>&1`;
+   my $proc_table=Proc::ProcessTable->new;
+   foreach (@{$proc_table->table()}) {
+      kill 15, $_->pid if ($_->ppid == $$);
    }
-   my %pid=();my %ppid=();
-   foreach my $line (split "\n", $psout) {
-      next if $line=~/\/ps$/;
-      $line=~/^I*\s*[^ ]+\s+(\d+)\s+(\d+).*$/;
-      my $pid=$1||0;my $ppid=$2||0;
-      $pid{$pid}=$ppid;
-      push @{$ppid{$ppid}},$pid;
-   }
-   #my $family=find_kids($$,[],\%ppid);
-   #foreach my $member (@{$family}) {
-   #   ($stdout,$stderr)=&kill($member,$kill_arg)
-   #      if &testpid($member);
-   #}
    if ((!$Net::FullAuto::FA_Core::cron
          || $Net::FullAuto::FA_Core::debug)
          && !$Net::FullAuto::FA_Core::quiet) {
@@ -2373,7 +2360,7 @@ print "localhost cleanup() LINE=$line<==\n"
    }
    if ($param_two eq 'ALRM') {
       my $pkill=$Net::FullAuto::FA_Core::gbp->('pkill');
-      `$pkill/pkill fullauto.pl`;
+      exec "$pkill/pkill fullauto.pl";
    }
    return 1 if $param_one eq '__return__';
    exit 1 if $param_one;
@@ -15321,20 +15308,20 @@ print $Net::FullAuto::FA_Core::LOG "BDB STATUS=$status<==\n"
                my $pspath=$Net::FullAuto::FA_Core::gbp->('ps');
                my $ps_out=`${pspath}ps -el`;
                print $Net::FullAuto::FA_Core::LOG
-                  "\nHERE IS THE PS CMD OUTPUT:\n       ",
+                  "\nHERE IS THE BEFORE PS CMD OUTPUT:\n       ",
                   "$ps_out\n"
                   if $Net::FullAuto::FA_Core::log &&
                   -1<index $Net::FullAuto::FA_Core::LOG,'*';
-               foreach my $line (reverse split "\n", $ps_out) {
-                  if (substr($line,-4) eq 'bash') {
-                     my $pid=$line;
-                     ($pid=$line)=~s/^(\d+) .*$/$1/;
-                     ($stdout,$stderr)=
-                        &Net::FullAuto::FA_Core::kill(
-                        $pid,$kill_arg);
-                     last;
-                  }
+               my $proc_table=Proc::ProcessTable->new;
+               foreach (@{$proc_table->table()}) {
+                  CORE::kill 15, $_->pid if ($_->ppid == $$);
                }
+               $ps_out=`${pspath}ps -el`;
+               print $Net::FullAuto::FA_Core::LOG
+                  "\nHERE IS THE AFTER PS CMD OUTPUT:\n       ",
+                  "$ps_out\n"
+                  if $Net::FullAuto::FA_Core::log &&
+                  -1<index $Net::FullAuto::FA_Core::LOG,'*';
             } else {
                ($stdout,$stderr)=
                   &Net::FullAuto::FA_Core::kill(

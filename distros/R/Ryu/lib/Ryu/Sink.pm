@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 =head1 NAME
 
@@ -29,11 +29,11 @@ use Future;
 =cut
 
 sub new {
-	my $class = shift;
-	$class->SUPER::new(
-		is_paused => 0,
-		@_
-	)
+    my $class = shift;
+    $class->SUPER::new(
+        is_paused => 0,
+        @_
+    )
 }
 
 =head2 from
@@ -43,17 +43,17 @@ Given a source, will attach it as the input for this sink.
 =cut
 
 sub from {
-	my ($self, $src, %args) = @_;
+    my ($self, $src, %args) = @_;
 
     die 'expected a subclass of Ryu::Source, received ' . $src . ' instead' unless $src->isa('Ryu::Source');
 
-	$self = $self->new unless ref $self;
+    $self = $self->new unless ref $self;
     $src->each_while_source(sub {
         $self->emit($_)
     }, $self->source);
     $src->completed->on_ready($self->source->completed);
 # $self->{source} = $src;
-	return $self
+    return $self
 }
 
 sub emit {
@@ -70,12 +70,12 @@ sub source {
 }
 
 sub new_future {
-	my $self = shift;
-	(
-		$self->{new_future} //= sub {
-			Future->new->set_label(shift)
-		}
-	)->(@_)
+    my $self = shift;
+    (
+        $self->{new_future} //= sub {
+            Future->new->set_label(shift)
+        }
+    )->(@_)
 }
 
 1;
@@ -88,5 +88,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

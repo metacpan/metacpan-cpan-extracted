@@ -15,7 +15,7 @@ sub co
         for ( '-l', '-i' )
         {
             die "exec df $_ fail.\n" unless my @df 
-                = MYDan::Collector::Util::qx( "df $_ 2>/dev/null" );
+                = MYDan::Collector::Util::qx( "LANG=en df $_ 2>/dev/null" );
             for my $df ( map { [ ( split /\s+/, $_, 7 )[ 5, 1..4 ] ] } @df )
             {
                 next unless my $t = shift @$df;

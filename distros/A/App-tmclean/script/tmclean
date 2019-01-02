@@ -1,0 +1,59 @@
+#!perl
+use strict;
+use warnings;
+use App::tmclean;
+App::tmclean->new_with_options(@ARGV)->run;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+tmclean - cleanup TimeMachine
+
+=head1 SYNOPSIS
+
+    % tmclean [--dry-run] [--days=300/--before=2018/01/01]
+
+=head2 Options
+
+=over
+
+=item --dry-run
+
+=item --days
+
+Delete backups that before the specified number of days (default: 366)
+
+=item --before
+
+Delete backups before the specified date
+
+=back
+
+=head1 DESCRIPTION
+
+tmclean is command line utility for cleanup TimeMachine.
+
+=head1 INSTALLATION
+
+    % cpanm App::tmclean
+
+or you can get single packed executable file.
+
+    % curl -L https://raw.githubusercontent.com/Songmu/App-tmclean/master/tmclean > /usr/local/bin/tmclean; chmod +x /usr/local/bin/tmclean
+
+=head1 LICENSE
+
+Copyright (C) Songmu.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Songmu E<lt>y.songmu@gmail.comE<gt>
+
+=cut
+

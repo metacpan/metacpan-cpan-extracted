@@ -54,6 +54,7 @@ sub new
         }
         else
         {
+            $conf = "$conf.private" if -f  "$conf.private";
             confess "no conf" unless $conf && -e $conf;
             $self{conf} = eval{ YAML::XS::LoadFile( $conf ) };
             confess "error: $@" if $@;

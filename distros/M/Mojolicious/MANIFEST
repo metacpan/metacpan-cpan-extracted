@@ -133,7 +133,6 @@ lib/Mojolicious/resources/public/mojo/prettify/prettify-mojo-dark.css
 lib/Mojolicious/resources/public/mojo/prettify/run_prettify.js
 lib/Mojolicious/resources/templates/mojo/debug.html.ep
 lib/Mojolicious/resources/templates/mojo/exception.html.ep
-lib/Mojolicious/resources/templates/mojo/menubar.html.ep
 lib/Mojolicious/resources/templates/mojo/not_found.html.ep
 lib/Mojolicious/resources/templates/mojo/perldoc.html.ep
 lib/Mojolicious/Routes.pm

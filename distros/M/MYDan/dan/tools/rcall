@@ -34,7 +34,6 @@ my %o = $option->set( timeout => 60 )->get(
 )->dump();
 
 $option->assert( 'range' );
-$o{verbose} = 1;
 
 my $code = shift;
 
@@ -65,9 +64,19 @@ my $range = MYDan::Node->new( $option->dump( 'range' ) );
 
 my %result = MYDan::Agent::Client->new( 
     $range->load( delete $o{range} )->list
-)->run( %o, query => \%query ); 
+)->run( %o, verbose => ! $o{verbose}, query => \%query ); 
 
-MYDan::VSSH::Print::result( 'rcal' => %result );
+unless( $o{verbose} )
+{
+    MYDan::VSSH::Print::result( 'rcal' => %result );
+    exit
+}
+
+for my $node ( sort keys %result )
+{
+    my $succ = 1 if $result{$node} =~ s/--- 0\n$//;
+    map{ $succ ? print( "$node:$_\n" ) : warn( "$node:$_\n" ) }split /\n/, $result{$node};
+}
 
 exit 0;
 

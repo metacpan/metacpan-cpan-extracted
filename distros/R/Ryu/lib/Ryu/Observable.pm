@@ -3,7 +3,7 @@ package Ryu::Observable;
 use strict;
 use warnings;
 
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.035'; # VERSION
 
 =encoding utf8
 
@@ -22,12 +22,12 @@ which notifies as per the aforementioned conditions.
 =cut
 
 use overload
-	'""'   => sub { shift->as_string },
-	'0+'   => sub { shift->as_number },
-	'++'   => sub { my $v = ++$_[0]->{value}; $_[0]->notify_all; $v },
-	'--'   => sub { my $v = --$_[0]->{value}; $_[0]->notify_all; $v },
-	'bool' => sub { shift->as_number },
-	fallback => 1;
+    '""'   => sub { shift->as_string },
+    '0+'   => sub { shift->as_number },
+    '++'   => sub { my $v = ++$_[0]->{value}; $_[0]->notify_all; $v },
+    '--'   => sub { my $v = --$_[0]->{value}; $_[0]->notify_all; $v },
+    'bool' => sub { shift->as_number },
+    fallback => 1;
 
 =head1 METHODS
 
@@ -36,7 +36,7 @@ Public API, such as it is.
 =head2 as_string
 
 Returns the string representation of this value.
-	
+
 =cut
 
 sub as_string { '' . shift->{value} }
@@ -86,11 +86,11 @@ sub unsubscribe {
     use Scalar::Util qw(refaddr);
     use List::UtilsBy qw(extract_by);
     use namespace::clean qw(refaddr extract_by);
-	my ($self, @code) = @_;
-	for my $addr (map refaddr($_), @code) {
-		extract_by { refaddr($_) == $addr } @{$self->{subscriptions}};
-	}
-	$self
+    my ($self, @code) = @_;
+    for my $addr (map refaddr($_), @code) {
+        extract_by { refaddr($_) == $addr } @{$self->{subscriptions}};
+    }
+    $self
 }
 
 =head2 set
@@ -120,11 +120,11 @@ Returns C<$self>.
 =cut
 
 sub set_numeric {
-	my ($self, $v) = @_;
-	my $prev = $self->{value};
-	return $self if defined($prev) && $prev == $v;
-	$self->{value} = $v;
-	$self->notify_all
+    my ($self, $v) = @_;
+    my $prev = $self->{value};
+    return $self if defined($prev) && $prev == $v;
+    $self->{value} = $v;
+    $self->notify_all
 }
 
 =head2 set_string
@@ -137,11 +137,11 @@ Returns C<$self>.
 =cut
 
 sub set_string {
-	my ($self, $v) = @_;
-	my $prev = $self->{value};
-	return $self if defined($prev) && $prev eq $v;
-	$self->{value} = $v;
-	$self->notify_all
+    my ($self, $v) = @_;
+    my $prev = $self->{value};
+    return $self if defined($prev) && $prev eq $v;
+    $self->{value} = $v;
+    $self->notify_all
 }
 
 =head2 source
@@ -154,18 +154,18 @@ until the observable is destroyed.
 sub source {
     use Scalar::Util qw(weaken);
     use namespace::clean qw(weaken);
-	my ($self) = @_;
-	my $src = Ryu::Source->new;
-	weaken(my $copy = $self);
-	$self->subscribe(my $code = sub {
-		return unless my $self = $copy;
-		$src->emit($self->value)
-	});
-	$src->completed->on_ready(sub {
-		$copy->unsubscribe($code) if $copy;
-		undef $code;
-	});
-	$src
+    my ($self) = @_;
+    my $src = Ryu::Source->new;
+    weaken(my $copy = $self);
+    $self->subscribe(my $code = sub {
+        return unless my $self = $copy;
+        $src->emit($self->value)
+    });
+    $src->completed->on_ready(sub {
+        $copy->unsubscribe($code) if $copy;
+        undef $code;
+    });
+    $src
 }
 
 =head1 METHODS - Internal
@@ -179,19 +179,19 @@ Notifies all currently-subscribed callbacks with the current value.
 =cut
 
 sub notify_all {
-	my $self = shift;
-	for my $sub (@{$self->{subscriptions}}) {
-		$sub->($_) for $self->{value}
-	}
-	$self
+    my $self = shift;
+    for my $sub (@{$self->{subscriptions}}) {
+        $sub->($_) for $self->{value}
+    }
+    $self
 }
 
 sub DESTROY {
-	my ($self) = @_;
-	return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-	$_->finish for splice @{$self->{sources} || []};
-	delete $self->{value};
-	return;
+    my ($self) = @_;
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    $_->finish for splice @{$self->{sources} || []};
+    delete $self->{value};
+    return;
 }
 
 1;
@@ -204,5 +204,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

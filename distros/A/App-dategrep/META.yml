@@ -20,7 +20,7 @@ configure_requires:
   parent: '0'
   perl: 5.010_001
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +39,7 @@ no_index:
 provides:
   App::dategrep:
     file: lib/App/dategrep.pm
-    version: '2.05'
+    version: '2.06'
   App::dategrep::Date:
     file: lib/App/dategrep/Date.pm
   App::dategrep::Iterator:
@@ -58,7 +58,7 @@ resources:
   bugtracker: https://github.com/mdom/dategrep/issues
   homepage: https://github.com/mdom/dategrep
   repository: git://github.com/mdom/dategrep.git
-version: '2.05'
+version: '2.06'
 x_contributors:
   - 'Mario Domgoergen <mario@domgoergen.com>'
   - 'Mario Domgoergen <mdom@taz.de>'

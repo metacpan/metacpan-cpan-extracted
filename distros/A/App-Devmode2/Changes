@@ -1,5 +1,14 @@
 Revision history for App-Devmode2
 
+0.9   2018-12-31
+        Updating for release of version 0.9
+        Adding vtide config (Ivan Wills)
+        Added perl 5.26 to .travis build (Ivan Wills)
+        Fixning config dependencies (Ivan Wills)
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
 0.8   2015-11-22
         Updating for release of version 0.8
         Added missing test config and documentation (Ivan Wills)

@@ -1,0 +1,135 @@
+#!/usr/bin/env perl
+use warnings;  
+use strict;  
+
+use AE;
+use Fcntl qw(:flock SEEK_END);
+
+use AnyEvent;  
+use AnyEvent::Socket;  
+use AnyEvent::Handle;  
+  
+use MYDan::Agent::Client;
+use MYDan::Util::OptConf;
+use Data::UUID;
+
+use MYDan::Node;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 --range range /file/1 /file/2
+ $0 --range range #default filelist in remote /etc/mydan.file 
+
+    tail file from remote machine
+
+ $0 --range range --listen 9999
+
+ $0 --range range --listen 9999 [--addr 10.10.10.1]\
+      [--user user(default `id -un`)] [--sudo sudoer]
+
+   --seek T0 (defaule) || --seek H0 || --seek T1024
+
+=cut
+
+$MYDan::Util::OptConf::THIS = 'agent';
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( range=s listen=i addr=s user=s sudo=s seek=s uuid=s ) )->dump();
+$option->assert( 'range' );
+$option->assert( ) if $o{seek} && $o{seek} !~ /^[HT]\d+$/;
+
+my $range = MYDan::Node->new( $option->dump( 'range' ) );
+exit unless my @node = $range->load( delete $o{range} )->list;
+
+my $listen = $o{listen};
+
+my $uuid = $o{uuid} || Data::UUID->new->create_str();
+warn "[MYDan]task uuid $uuid\n";
+
+unless( $listen )
+{
+    my $scan = `netstat  -tun|awk '{print \$4}'|awk -F: '{print \$2}'`;
+    my %open = map{ $_ => 1 }my @open = $scan =~ /(\d+)/g;
+    my %port = map{ $_ => 1 }65112 .. 65535;
+    ( $listen ) = grep{ ! $open{$_} }keys %port;
+}
+
+
+my ( $cv, $index, %index, %head ) = ( AE::cv, 0 );
+
+tcp_server undef, $listen, sub {
+    my ( $fh, $ip, $port ) = @_ or die "[MYDan]tcp_server: $!";
+
+    $index ++;
+    warn "[MYDan]tcp connet from $ip:$port\n";
+
+	my $handle; $handle = new AnyEvent::Handle(
+		fh => $fh,
+		rbuf_max => 10240000,
+		wbuf_max => 10240000,
+		autocork => 1,
+		on_read => sub {
+			my $self = shift;
+            $self->unshift_read (
+            	chunk => length $self->{rbuf},
+            	sub {
+                    if( $head{$ip} )
+                    {
+                        print $_[1];
+                    }
+                    else
+                    {
+                        my $x = $_[1];
+                        $x =~ s/^([^:]+):([^:]+)://;
+                        if( $1 ne $uuid )
+                        {
+                            $handle->push_shutdown;
+                            return;
+                        }
+            		    warn "[MYDan]host:$2 ip:$ip port:$port:\n";
+                        print $x;
+                        $head{$ip} = 1;
+                    }
+            	},
+            )
+		},
+
+		on_error => sub{
+			warn "[MYDan]tcp error: $ip:$port\n";
+		},
+		on_eof => sub{
+			warn "[MYDan]tcp close: $ip:$port\n";
+		},
+	);
+    $index{$index}{handle} = $handle;
+};
+
+$o{user} = `id -un` and chop $o{user}  unless $o{user};
+
+my %query = (
+    code => 'tail2tcp',
+    argv => +{ 
+        addr => $o{addr}, 
+        port => $listen, 
+        uuid => $uuid,
+        seek => $o{seek},
+        file => @ARGV ? \@ARGV : '/etc/mydan.file',
+    },
+    map{ $_ => $o{$_} }qw( user sudo )
+);
+
+my %result = MYDan::Agent::Client->new( 
+    @node
+)->run( %o, query => \%query ); 
+
+map
+{
+    chomp $result{$_};
+    my $stat = $result{$_} && $result{$_} =~ s/--- 0$// ? 'success' : 'fail';
+    warn "[MYDan]call $_ $stat $result{$_}\n";
+}@node;
+
+my $int = AnyEvent->signal( signal => "INT", cb => sub{ warn "kill.\n"; $cv->send; } );
+
+$cv->recv;

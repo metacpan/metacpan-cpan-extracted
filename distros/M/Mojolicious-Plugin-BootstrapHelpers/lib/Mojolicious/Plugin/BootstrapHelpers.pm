@@ -5,7 +5,7 @@ package Mojolicious::Plugin::BootstrapHelpers;
 
 # ABSTRACT: Type less bootstrap
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0204';
+our $VERSION = '0.0205';
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojolicious::Plugin::BootstrapHelpers::Helpers;
@@ -85,16 +85,15 @@ Mojolicious::Plugin::BootstrapHelpers - Type less bootstrap
 <p>
 <img src="https://img.shields.io/badge/perl-5.20+-blue.svg" alt="Requires Perl 5.20+" />
 <a href="https://travis-ci.org/Csson/p5-mojolicious-plugin-bootstraphelpers"><img src="https://api.travis-ci.org/Csson/p5-mojolicious-plugin-bootstraphelpers.svg?branch=master" alt="Travis status" /></a>
-<a href="http://cpants.cpanauthors.org/release/CSSON/Mojolicious-Plugin-BootstrapHelpers-0.0204"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Mojolicious-Plugin-BootstrapHelpers/0.0204" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=Mojolicious-Plugin-BootstrapHelpers%200.0204"><img src="http://badgedepot.code301.com/badge/cpantesters/Mojolicious-Plugin-BootstrapHelpers/0.0204" alt="CPAN Testers result" /></a>
-<img src="https://img.shields.io/badge/coverage-87.2%-orange.svg" alt="coverage 87.2%" />
+<a href="http://cpants.cpanauthors.org/release/CSSON/Mojolicious-Plugin-BootstrapHelpers-0.0205"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Mojolicious-Plugin-BootstrapHelpers/0.0205" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=Mojolicious-Plugin-BootstrapHelpers%200.0205"><img src="http://badgedepot.code301.com/badge/cpantesters/Mojolicious-Plugin-BootstrapHelpers/0.0205" alt="CPAN Testers result" /></a>
 </p>
 
 =end html
 
 =head1 VERSION
 
-Version 0.0204, released 2016-12-31.
+Version 0.0205, released 2019-12-31.
 
 =head1 SYNOPSIS
 

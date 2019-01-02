@@ -19,4 +19,11 @@ my %o = $option->set( try => 3, interval => 3600 )
 
 $0 = 'mydan.ntpsync';
 
+if( $o{daemon} )
+{
+    open(STDOUT, '>>/var/log/ntpsync.log') || die "STDOUT ERROR $!";
+    open(STDERR, '>>/var/log/ntpsync.log') || die "STDERR ERROR $!";
+    exit 0 if fork;
+}
+
 MYDan::Util::NTPSync->new(%o)->run();

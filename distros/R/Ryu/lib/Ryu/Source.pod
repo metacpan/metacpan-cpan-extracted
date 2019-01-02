@@ -485,6 +485,14 @@ The following methods are proxied to our completion L<Future>:
 
 =head1 METHODS - Internal
 
+=head2 prepare_await
+
+Run any pre-completion callbacks (recursively) before
+we go into an await cycle.
+
+Used for compatibility with sync bridges when there's
+no real async event loop available.
+
 =head2 chained
 
 Returns a new L<Ryu::Source> chained from this one.
@@ -524,5 +532,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

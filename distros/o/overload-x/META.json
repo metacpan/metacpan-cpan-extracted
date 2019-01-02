@@ -33,12 +33,12 @@
       "runtime" : {
          "requires" : {
             "Clone" : "0",
-            "Import::Export" : "0.08",
+            "Import::Export" : "1.00",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.0",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

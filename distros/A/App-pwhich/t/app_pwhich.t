@@ -94,7 +94,7 @@ subtest 'script can print version number' => sub {
 
 };
 
-subtest 'the -a option' => sub {
+subtest 'more than one' => sub {
 
   my $arg;
   
@@ -108,42 +108,69 @@ subtest 'the -a option' => sub {
     ],
   );
 
-  subtest 'loud' => sub {
-    undef $arg;
-    is(
-      [capture { (App::pwhich::main('-a','foo'),$arg) }],
-      array {
-        # stdout
-        item "/usr/bin/foo\n/bin/foo\n/usr/locla/bin\n";
-        # stderr
-        item '';
-        # exit
-        item 0;
-        # argument
-        item 'foo';
-        end;
-      },
-      'i/o',
-    );
+  subtest 'the -a option' => sub {
+
+    subtest 'loud' => sub {
+      undef $arg;
+      is(
+        [capture { (App::pwhich::main('which', '-a','foo'),$arg) }],
+        array {
+          # stdout
+          item "/usr/bin/foo\n/bin/foo\n/usr/locla/bin\n";
+          # stderr
+          item '';
+          # exit
+          item 0;
+          # argument
+          item 'foo';
+          end;
+        },
+        'i/o',
+      );
+    };
+
+    subtest 'silent' => sub {
+      undef $arg;
+      is(
+        [capture { (App::pwhich::main('which', '-a','-s','foo'),$arg) }],
+        array {
+          # stdout
+          item '';
+          # stderr
+          item '';
+          # exit
+          item 0;
+          # argument
+          item 'foo';
+          end;
+        },
+        'i/o',
+      );
+    };
+    
   };
 
-  subtest 'loud' => sub {
-    undef $arg;
-    is(
-      [capture { (App::pwhich::main('-a','-s','foo'),$arg) }],
-      array {
-        # stdout
-        item '';
-        # stderr
-        item '';
-        # exit
-        item 0;
-        # argument
-        item 'foo';
-        end;
-      },
-      'i/o',
-    );
+  subtest 'where' => sub {
+
+    subtest 'loud' => sub {
+      undef $arg;
+      is(
+        [capture { (App::pwhich::main('where', 'foo'),$arg) }],
+        array {
+          # stdout
+          item "/usr/bin/foo\n/bin/foo\n/usr/locla/bin\n";
+          # stderr
+          item '';
+          # exit
+          item 0;
+          # argument
+          item 'foo';
+          end;
+        },
+        'i/o',
+      );
+    };
+
   };
 
 };

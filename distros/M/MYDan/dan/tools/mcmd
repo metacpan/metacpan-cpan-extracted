@@ -33,11 +33,20 @@ $option->assert( 'range' );
 my $range = MYDan::Node->new( $option->dump( 'range' ) );
 my %cmd = map { $_ => \@ARGV } $range->load( delete $o{range} )->list();
 
-my ( %result, %re ) = MYDan::Util::MIO::CMD->new( %cmd )->run( %o );
+my ( %result, %re ) = MYDan::Util::MIO::CMD->new( %cmd )->run( %o, verbose => ! $o{verbose} );
 
 while( my ( $type, $result ) = each %result )
 {
     map{ my $t = $_; map{ $re{$_} .= $t } @{$result->{$t}};}keys %$result;
 }
 
-MYDan::VSSH::Print::result( 'mcmd' => %re );
+unless( $o{verbose} )
+{
+    MYDan::VSSH::Print::result( 'mcmd' => %re );
+    exit
+}
+for my $node ( sort keys %re )
+{
+    my $succ = 1 if $re{$node} =~ s/--- 0\n$//;
+    map{ $succ ? print( "$node:$_\n" ) : warn( "$node:$_\n" ) }split /\n/, $re{$node};
+}

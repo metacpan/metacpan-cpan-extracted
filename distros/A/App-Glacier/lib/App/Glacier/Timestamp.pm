@@ -12,21 +12,22 @@ sub _to_timestamp {
     my $ret;
     
     if (ref($obj) eq 'ARRAY') {
-	$ret = [ map { _to_timestamp($_) } @{$obj} ];
+        $ret = [ map { _to_timestamp($_) } @{$obj} ];
     } elsif (ref($obj) eq 'HASH') {
-	$ret = {};
-	while (my ($k, $val) = each %{$obj}) {
-	    if ($k =~ /Date$/ && $val) {
-		$ret->{$k} = bless DateTime::Format::ISO8601->
-		                     parse_datetime($val),
-		                   'App::Glacier::DateTime';
-	    } else {
-		$ret->{$k} = _to_timestamp($val);
-	    }
-	}
+        $ret = {map {
+            my $v = $obj->{$_};
+            if (/Date$/ && defined($v)) {
+                $_ => bless DateTime::Format::ISO8601->
+                                     parse_datetime($v),
+                                   'App::Glacier::DateTime';
+            } else {
+                $_ => _to_timestamp($v);
+            }
+        } keys %$obj};
     } else {
-	$ret = $obj;
+        $ret = $obj;
     }
+    
     return $ret;
 }
 

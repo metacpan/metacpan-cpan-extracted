@@ -1,10 +1,10 @@
 # MathML::itex2MML
 #
-# Copyright, Jacques Distler 2018.
+# Copyright, Jacques Distler 2018-19.
 # All Rights Reserved.
 # Licensed under the Perl Artistic License.
 #
-# Version: 1.5.8
+# Version: 1.5.9
 
 package MathML::itex2MML;
 
@@ -12,7 +12,7 @@ use strict;
 
 use base qw(Exporter);
 use base qw(DynaLoader);
-our $VERSION = '1.5.8';
+our $VERSION = '1.5.9';
 
 package MathML::itex2MMLc;
 bootstrap MathML::itex2MML;
@@ -102,18 +102,18 @@ MathML::itex2MML - Convert itex to MathML
  $text    = 'This is an inline equation: $\sin(\pi/2)=1$.';
 
  # convert embedded itex equations to MathML:
- $converted = itex_html_filter($text);    # C<<< This is an inline equation: <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math>. >>>
+ $converted = itex_html_filter($text);    E<35> C<<< This is an inline equation: <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math>. >>>
 
  # just the equations:
- $converted = itex_filter($text);    # C<<< <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math> >>>
+ $converted = itex_filter($text);    E<35> C<<< <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math> >>>
 
  $text    = '\sin(\pi/2)=1';
 
  # inline equation (without the $'s)
- $converted = itex_inline_filter($text);    # C<<< <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math> >>>
+ $converted = itex_inline_filter($text);    E<35> C<<< <math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math> >>>
 
  # block equation (without the $$'s)
- $converted = itex_block_filter($text);    # C<<< <math xmlns='http://www.w3.org/1998/Math/MathML' display='block'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math> >>>
+ $converted = itex_block_filter($text);    E<35> C<<< <math xmlns='http://www.w3.org/1998/Math/MathML' display='block'><semantics><mrow><mi>sin</mi><mo stretchy="false">(</mo><mi>&pi;</mi><mo stretchy="false">/</mo><mn>2</mn><mo stretchy="false">)</mo><mo>=</mo><mn>1</mn></mrow><annotation encoding='application/x-tex'>\sin(\pi/2)=1</annotation></semantics></math> >>>
 
 =head1 DESCRIPTION
 

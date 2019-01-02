@@ -152,7 +152,6 @@ sub _upload {
 				     Size => $size,
 				     CreationDate => new App::Glacier::DateTime,
 				     ArchiveDescription => $remotename });
-    $dir->invalidate;
 }
 
 sub _upload_simple {
@@ -165,22 +164,20 @@ sub _upload_simple {
 				       prefix => $localname,
 				       show_none => 1)
 	unless $self->{_options}{quiet};
-    my $archive_id = $self->glacier_eval('upload_archive',
-					 $vaultname,
-					 $localname,
-					 $remotename);
+    my $archive_id = $self->glacier->Upload_archive($vaultname, $localname,
+						    $remotename);	
     $p->finish('uploaded') if $p;
     
-    if ($self->lasterr) {
+    if ($self->glacier->lasterr) {
 	$self->abend(EX_FAILURE, "upload failed: ",
-		     $self->last_error_message);
+		     $self->glacier->last_error_message);
     }
     return $archive_id;
 }
 
 sub _upload_multipart {
     my ($self, $vaultname, $localname, $remotename) = @_;
-    my $glacier = $self->{_glacier};
+    my $glacier = $self->glacier;
     
     use threads;
     use threads::shared;
@@ -247,21 +244,21 @@ sub _upload_multipart {
 		
 		    my $res;
 		    for (my $try = 0;;) {
-			$res = $self->glacier_eval(
-			                 'multipart_upload_upload_part',
+			$res = $glacier->Multipart_upload_upload_part(
 			                 $vaultname,
 			                 $upload_id,
 			                 $part_size,
 			                 $part_idx,
-			                 \$part);
-			if ($self->lasterr) {
+			                 \$part
+			    );
+			if ($glacier->lasterr) {
 			    if (++$try < $retries) {
 				$self->debug(1, "part $part_idx: ",
-					     $self->last_error_message);
+					     $glacier->last_error_message);
 				$self->debug(1, "retrying");
 			    } else {
 				$self->error("failed to upload part $part_idx: ",
-					     $self->last_error_message);
+					     $glacier->last_error_message);
 				return 0;
 			    }
 			} else {
@@ -285,15 +282,15 @@ sub _upload_multipart {
     
     # Capture archive id or error code
     $self->debug(2, "finalizing the upload");
-    my $archive_id = $self->glacier_eval('multipart_upload_complete',
+    my $archive_id = $glacier->Multipart_upload_complete(
 					 $vaultname, $upload_id,
 					 \@part_hashes,
 					 $archive_size);
 
-    if ($self->lasterr) {
+    if ($glacier->lasterr) {
 	$glacier->multipart_upload_abort($vaultname, $upload_id);
 	$self->abend(EX_FAILURE, "upload failed: ",
-		     $self->last_error_message);
+		     $glacier->last_error_message);
     }
     
     # Check if we have a valid $archive_id

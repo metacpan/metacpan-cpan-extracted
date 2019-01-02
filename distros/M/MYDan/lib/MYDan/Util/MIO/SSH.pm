@@ -150,7 +150,7 @@ sub run
 
             next unless my $data = delete $busy{$pid};
 
-            $percent->add()->print();
+            $percent->add()->print() if $run{verbose};
 
             my ( $log, $node ) = @$data;
             tie my @log, 'Tie::File', $log;

@@ -29,6 +29,7 @@ use Fcntl 'O_RDONLY';
 sub new
 {
     my ( $class, $conf ) = @_;
+    $conf = "$conf.private" if -f  "$conf.private";
     confess "no conf" unless $conf && -e $conf;
 
     die "tie fail: $!" unless tie my @conf, 'Tie::File', $conf, mode => O_RDONLY;

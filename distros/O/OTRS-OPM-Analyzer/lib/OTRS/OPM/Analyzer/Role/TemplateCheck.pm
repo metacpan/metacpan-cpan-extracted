@@ -107,7 +107,13 @@ OTRS::OPM::Analyzer::Role::TemplateCheck - Basic check for templates
 
 =head1 VERSION
 
-version 0.06
+version 0.07
+
+=head1 METHODS
+
+=head2 check
+
+See I<DESCRIPTION>
 
 =head1 AUTHOR
 

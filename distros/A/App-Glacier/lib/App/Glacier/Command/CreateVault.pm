@@ -30,9 +30,10 @@ sub run {
     $self->abend(EX_USAGE, "only one argument expected")
 	unless $self->command_line == 1;
     my $vault_name = ($self->command_line)[0];
-    $self->glacier_eval('create_vault', $vault_name);
-    if ($self->lasterr) {
-	$self->abend(EX_FAILURE, "can't create: ", $self->last_error_message);
+    $self->glacier->Create_vault($vault_name);
+    if ($self->glacier->lasterr) {
+	$self->abend(EX_FAILURE, "can't create: ",
+		     $self->glacier->last_error_message);
     }
 }
 

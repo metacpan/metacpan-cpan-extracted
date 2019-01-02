@@ -12,6 +12,7 @@ my @files = (
     'lib/App/ElasticSearch/Utilities/HTTPRequest.pm',
     'lib/App/ElasticSearch/Utilities/Query.pm',
     'lib/App/ElasticSearch/Utilities/QueryString.pm',
+    'lib/App/ElasticSearch/Utilities/QueryString/AutoEscape.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/BareWords.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/FileExpansion.pm',
     'lib/App/ElasticSearch/Utilities/QueryString/IP.pm',

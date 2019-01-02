@@ -33,12 +33,12 @@
       "runtime" : {
          "requires" : {
             "Combine::Keys" : "0.09",
-            "Import::Export" : "0.04",
+            "Import::Export" : "1.00",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.05",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

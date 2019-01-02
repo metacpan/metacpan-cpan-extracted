@@ -24,13 +24,14 @@ $MYDan::Util::OptConf::THIS = 'util';
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->get( qw( user=s ) )->dump();
 
+my ( $go, $pass ) = map{ -f "$o{conf}/$_.private" ? "$_.private" : $_ }qw( go pass );
 
 if( ! @ARGV || $ARGV[0] =~ s/^\/// )
 {
-    $option->assert() unless "$o{conf}/go" && -e "$o{conf}/go";
-    MYDan::Util::Go->new( "$o{conf}/go" )->go( $ARGV[0] );
+    $option->assert() unless "$o{conf}/$go" && -e "$o{conf}/$go";
+    MYDan::Util::Go->new( "$o{conf}/$go" )->go( $ARGV[0] );
     exit;
 }
 
 die "cannot resolve host\n" unless MYDan::Util::ExpSSH->new()
-    ->conn( pass => "$o{conf}/pass", user => $o{user}, host => shift, sudo => shift );
+    ->conn( pass => "$o{conf}/$pass", user => $o{user}, host => shift, sudo => shift );

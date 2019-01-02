@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Chain;
 
-$Dancer2::Plugin::Chain::VERSION   = '0.08';
+$Dancer2::Plugin::Chain::VERSION   = '0.09';
 $Dancer2::Plugin::Chain::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Chain - Dancer2 add-on for route chaining.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

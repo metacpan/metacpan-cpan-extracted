@@ -1,5 +1,16 @@
 Revision history for Perl extension Variable-Declaration
 
+0.04 2019-01-02T14:02:10Z
+    - specify Keyword::Simple, Carp version
+
+0.03 2019-01-01T22:46:21Z
+    - specify Type::Tie version #6
+
+0.02 2019-01-01T14:22:50Z
+    - fixed test #3
+    - improved import modules #4
+    - added test and docs about LEVEL #5
+
 0.01 2018-02-28T09:40:17Z
 
     - original version

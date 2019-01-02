@@ -1,5 +1,11 @@
 Revision history for File-Which
 
+1.23      2018-12-31 14:28:16 -0500
+  - Internally use IS_WIN instead of IS_DOS for DOS/Windows style
+    operating systems.  This is 2018 (almost 2019) after all.
+    IS_DOS is now an alias for IS_WIN, although these are not public
+    interfaces so you shouldn't be using them anyway.
+
 1.22      2017-09-08 14:08:59 -0400
   - Support for MSYS2 ($^O eq 'msys')
 
@@ -122,4 +128,4 @@ Revision history for File-Which
 
 0.01 Sun 14 Apr 2002
 	- original version; extracted from DocSet. Only plain which() with
-	  docs and tests. 
+	  docs and tests.

@@ -78,6 +78,8 @@ sub list_tree {
   return Mojo::Collection->new(map { $self->new(canonpath $_) } sort keys %all);
 }
 
+sub lstat { File::stat::lstat(${shift()}) }
+
 sub make_path {
   my $self = shift;
   File::Path::make_path $$self, @_;
@@ -106,6 +108,12 @@ sub open {
 sub path { __PACKAGE__->new(@_) }
 
 sub realpath { $_[0]->new(Cwd::realpath ${$_[0]}) }
+
+sub remove {
+  my ($self, $mode) = @_;
+  unlink $$self or croak qq{Can't remove file "$$self": $!} if -e $$self;
+  return $self;
+}
 
 sub remove_tree {
   my $self = shift;
@@ -369,6 +377,18 @@ Maximum number of levels to descend when searching for files.
 
 =back
 
+=head2 lstat
+
+  my $stat = $path->lstat;
+
+Return a L<File::stat> object for the symlink.
+
+  # Get symlink size
+  say path('/usr/sbin/sendmail')->lstat->size;
+
+  # Get symlink modification time
+  say path('/usr/sbin/sendmail')->lstat->mtime;
+
 =head2 make_path
 
   $path = $path->make_path;
@@ -417,6 +437,12 @@ Open file with L<IO::File>.
   my $realpath = $path->realpath;
 
 Resolve the path with L<Cwd> and return the result as a L<Mojo::File> object.
+
+=head2 remove
+
+  $path = $path->remove;
+
+Delete file.
 
 =head2 remove_tree
 

@@ -21,7 +21,7 @@ use warnings;
 use Carp;
 use File::stat;
 use Storable qw(retrieve store);
-use App::Glacier::Config::Locus;
+use Text::Locus;
 use Data::Dumper;
 
 require Exporter;
@@ -262,7 +262,7 @@ sub DESTROY {
 =head2 $cfg->error($message, locus => $loc)
 
 Prints the B<$message> on STDERR.  If <locus> is given, its value must
-be a reference to a valid B<App::Glacier::Config::Locus>(3) object.  In that
+be a reference to a valid B<Text::Locus>(3) object.  In that
 case, the object will be formatted first, then followed by a ": " and the
 B<$message>.    
     
@@ -272,7 +272,7 @@ sub error {
     my $self = shift;
     my $err = shift;
     local %_ = @_;
-    $err = $_{locus}->format($err) if exists $_{locus};
+    $err = "$_{locus}: $err" if $_{locus};
     print STDERR "$err\n";
 }
 
@@ -378,7 +378,7 @@ sub check_mandatory {
     while (my ($k, $d) = each %{$kw}) {
 	if (ref($d) eq 'HASH') {	
 	    if ($d->{mandatory} && !exists($section->{$k})) {
-		$loc = $section->{-locus} if exists($section->{-locus});
+		$loc = $section->{-locus} if $section->{-locus};
 		$self->error(exists($d->{section})
 			     ? "mandatory section ["
 			        . join(' ', @_, $k)
@@ -457,7 +457,7 @@ sub readconfig {
 		$include = 1;
 	    } else {
 		($section, $kw) = $self->parse_section($conf, $1,
-						       new App::Glacier::Config::Locus($file, $line));
+						 new Text::Locus($file, $line));
 		if (exists($self->{parameters}) and !defined($kw)) {
 		    $self->error("unknown section",
 				 locus => $section->{-locus});
@@ -479,7 +479,7 @@ sub readconfig {
 		    }
 		} else {
 		    $self->error("keyword \"$k\" is unknown",
-				 locus => new App::Glacier::Config::Locus($file, $line));
+				 locus => new Text::Locus($file, $line));
 		    $self->{error_count}++;
 		}
 		next;
@@ -490,7 +490,7 @@ sub readconfig {
 		$x = $kw->{'*'} unless defined $x;
 		if (!defined($x)) {
 		    $self->error("keyword \"$k\" is unknown",
-				 locus => new App::Glacier::Config::Locus($file, $line));
+				 locus => new Text::Locus($file, $line));
 		    $self->{error_count}++;
 		    next;
 		} elsif (ref($x) eq 'HASH') {
@@ -505,7 +505,7 @@ sub readconfig {
 		    if (exists($x->{re})) {
 			if ($v !~ /$x->{re}/) {
 			    $self->error("invalid value for $k",
-					 locus => new App::Glacier::Config::Locus($file, $line));
+					 locus => new Text::Locus($file, $line));
 			    $self->{error_count}++;
 			    next;
 			}
@@ -514,7 +514,7 @@ sub readconfig {
 		    if (exists($x->{check})) {
 			if (defined($errstr = &{$x->{check}}(\$v, $prev_val))) {
 			    $self->error($errstr,
-					 locus => new App::Glacier::Config::Locus($file, $line));
+					 locus => new Text::Locus($file, $line));
 			    $self->{error_count}++;
 			    next;
 			}
@@ -532,14 +532,14 @@ sub readconfig {
 
 	    $section->{-locus}->add($file, $line);
 	    unless (exists($section->{$k})) {
-		$section->{$k}{-locus} = new App::Glacier::Config::Locus();
+		$section->{$k}{-locus} = new Text::Locus();
 	    }
 	    $section->{$k}{-locus}->add($file, $line);
 	    $section->{$k}{-order} = $self->{order}++;
 	    $section->{$k}{-value} = $v;
         } else {
     	    $self->error("malformed line",
-			 locus => new App::Glacier::Config::Locus($file, $line));
+			 locus => new Text::Locus($file, $line));
 	    $self->{error_count}++;
 	    next;
 	}
@@ -678,7 +678,7 @@ is completely equivalent to
 =item 'locus'
 
 If B<$cfg> was created with B<locations> enabled, returns the source
-location of this configuration setting (see B<App::Glacier::Config::Locus>(3)).
+location of this configuration setting (see B<Text::Locus>(3)).
 
 =item 'order'
 
@@ -693,7 +693,7 @@ and B<-order>.
     
 The B<$ret{-value}> contains the value of the setting.  The B<$ret{-order}>
 contains its ordinal number.  The B<$ret{-locus}> contains a reference to
-B<App::Glacier::Config::Locus>(3) describing the source location where the
+B<Text::Locus>(3) describing the source location where the
 setting was defined.  It is available only if the B<locations> mode is
 enabled.
     
@@ -735,6 +735,51 @@ sub get {
 	return %$ref;
     }
     return $ref;
+}
+
+=head2 $cfg->as_hashref(@path)
+
+If I<@path> represents a section, convert that section to a perl hash,
+and return a reference to that hash.
+
+If I<@path> does not exist or refers to a value, return C<undef>.
+
+=cut
+
+sub as_hashref {
+    my $self = shift;
+    my $ref = $self->getref(@_);
+    my $hroot = {};
+    my @ar;
+
+    push @ar, [ '', $ref, $hroot ];
+    while (my $elt = shift @ar) {
+	if (is_section_ref($elt->[1])) {
+	    my $hr = $elt->[2]{$elt->[0]} = {};
+	    while (my ($kw, $val) = each %{$elt->[1]}) {
+		next if $kw =~ /^-/;
+		push @ar, [ $kw, $val, $hr ];
+	    }
+	} else {
+	    $elt->[2]{$elt->[0]} = $elt->[1]->{-value};
+	}
+    }
+    my $r = $hroot->{''};
+    return ref($r) eq 'HASH' ? $r : undef;
+}
+
+=head2 $cfg->as_hashref(@path)
+
+If I<@path> represents a section, return that section converted to a
+perl hash.
+
+If I<@path> does not exist or refers to a value, the returned hash is
+empty.
+
+=cut
+
+sub as_hash {
+    return %{shift->as_hashref(@_) // {}}
 }
 
 =head2 $cfg->isset(@path)
@@ -886,7 +931,7 @@ The ordinal number of the setting.
 =item B<-locus>
 
 Location of the setting in the configuration file.  See
-B<App::Glacier::Config::Locus>(3).  It is available only if the B<locations>
+B<Text::Locus>(3).  It is available only if the B<locations>
 mode is enabled.
 
 =back
@@ -1057,6 +1102,7 @@ sub _lint {
 	} else {
 	    $self->error("keyword \"$var\" is unknown",
 			 locus => $value->{-locus});
+	    $self->{error_count}++;
 	}
     }
 }
@@ -1074,13 +1120,13 @@ after calling B<parse>.
 =cut
 
 sub lint {
-    my ($self, $synt) = @_;
-
+    my ($self, $synt, @path) = @_;
+    my $subtree = $self->getref(@path);
 #    $synt->{'*'} = { section => { '*' => 1 }} ;
-    $self->_lint($synt, $self->{conf});
-    $self->check_mandatory($synt, $self->{conf});
+    $self->_lint($synt, $subtree);
+    $self->check_mandatory($synt, $subtree);
     return 0 if $self->{error_count};
-    $self->fixup($synt);
+    $self->fixup($synt, @path);
     return $self->{error_count} == 0;
 }
 

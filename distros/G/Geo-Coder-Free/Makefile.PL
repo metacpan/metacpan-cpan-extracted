@@ -29,12 +29,16 @@ if(version->parse($File::Fetch::VERSION) < 0.56) {
 	die 'Install File::Fetch >= 0.56 first';
 }
 
+(-d 'lib/Geo/Coder/Free/GeoNames') || mkdir 'lib/Geo/Coder/Free/GeoNames';
+(-d 'lib/Geo/Coder/Free/GeoNames/databases') || mkdir 'lib/Geo/Coder/Free/GeoNames/databases';
+
 File::Fetch->import();
 my %urls = (
 	'http://download.geonames.org/export/dump/admin1CodesASCII.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin1.db',
 	'http://download.geonames.org/export/dump/admin2Codes.txt' => 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db',
 	# 'https://geocode.nigelhorne.com/lib/Geo/Coder/Free/MaxMind/databases/cities.sql' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql',
 	'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+	'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
 );
 
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
@@ -44,7 +48,8 @@ foreach my $url(keys %urls) {
 	print "Downloading $url\n";
 	my $ff = File::Fetch->new(uri => $url);
 	if(my $path = $ff->fetch($url)) {
-		rename $path, $urls{$url};
+		print "Moving $path to $urls{$url}\n";
+		rename $path, $urls{$url} or die "$urls{$url}: $!";
 	} elsif(my $err = $ff->error(1)) {
 		die $err;
 	} else {
@@ -52,9 +57,17 @@ foreach my $url(keys %urls) {
 	}
 }
 
+if(!(-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt')) {
+	system('unzip lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip');
+	rename 'allCountries.txt', 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt';
+}
+
+# London's areas are not complete within Maxmind.  Here are a few to get started
 if(open(my $admin2, '>>', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
-	print $admin2 "GB.ENG.E7\tLondon\tLondon\t2648110\n",
-		"GB.ENG.H1\tLondon\tLondon\t2648110\n";
+	print $admin2 "GB.ENG.E7\tWoolwich\tWoolwich\t2648110\n",
+		"GB.ENG.O5\tLondon\tLondon\t2648110\n",
+		"GB.ENG.I8\tLondon\tLondon\t2648110\n",
+		"GB.ENG.P5\tLondon\tLondon\t2648110\n";
 }
 
 WriteMakefile(

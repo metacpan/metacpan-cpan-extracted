@@ -2,7 +2,7 @@ NAME
     Mojolicious::Plugin::BasicAuthPlus - Basic HTTP Auth Helper Plus
 
 VERSION
-    Version 0.11.2
+    Version 0.11.3
 
 SYNOPSIS
       # Mojolicious::Lite
@@ -393,6 +393,8 @@ CONTRIBUTORS
       Mark Muldoon
 
       G.Y. Park
+
+      Jan Paul Schmidt
 
 SEE ALSO
     Mojolicious, Mojolicious::Guides, <http://mojolicio.us>,

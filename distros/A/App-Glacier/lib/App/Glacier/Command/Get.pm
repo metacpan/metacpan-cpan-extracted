@@ -10,6 +10,7 @@ use App::Glacier::Progress;
 use parent qw(App::Glacier::Command);
 use Carp;
 use Scalar::Util;
+use File::Copy;
 
 =head1 NAME
 
@@ -157,11 +158,21 @@ sub run {
     }
     
     if ($job->is_completed) {
-	my $tree_hash = $self->download($job, $localname);
-	if (!$self->dry_run
-	    && $tree_hash ne $job->get('ArchiveSHA256TreeHash')) {
-	    unlink $localname;
-	    $self->abend(EX_SOFTWARE, "downloaded file is corrupt");
+	my $cache_file = $job->cache_file;
+	if (-f $cache_file) {
+	    $self->debug(1, "$job: copying from $cache_file");
+	    return if $self->dry_run;
+	    unless (copy($cache_file, $localname)) {
+		$self->abend(EX_FAILURE,
+			     "can't copy $cache_file to $localname: $!");
+	    }
+	} else {
+	    my $tree_hash = $self->download($job, $localname);
+	    if (!$self->dry_run
+		&& $tree_hash ne $job->get('ArchiveSHA256TreeHash')) {
+		unlink $localname;
+		$self->abend(EX_SOFTWARE, "downloaded file is corrupt");
+	    }
 	}
     } else {
 	my ($status, $message) = $job->status;
@@ -184,6 +195,7 @@ use constant TWOMB => 2*MB;
 
 sub download {
     my ($self, $job, $localname) = @_;
+    
     my $archive_size = $job->get('ArchiveSizeInBytes');
     if ($archive_size < $self->cf_transfer_param(qw(download single-part-size))) {
 	# simple download 
@@ -205,14 +217,14 @@ sub _open_output {
 sub _download_simple {
     my ($self, $job, $localname) = @_;
 
-    $self->debug(1, "downloading", $job->file_name(1), "in single part");
+    $self->debug(1, "$job: downloading in single part");
     return if $self->dry_run;
     my $fd = $self->_open_output($localname);
-    my ($res, $tree_hash) = $self->glacier_eval('get_job_output',
-						$job->vault, $job->id);
-    if ($self->lasterr) {
+    my ($res, $tree_hash) = $self->glacier->Get_job_output($job->vault,
+							   $job->id);
+    if ($self->glacier->lasterr) {
 	$self->abend(EX_FAILURE, "downoad failed: ",
-		     $self->last_error_message);
+		     $self->glacier->last_error_message);
     }
     syswrite($fd, $res);
     close($fd);
@@ -245,8 +257,8 @@ sub _download_multipart {
     # Compute the number of parts per job
     my $job_parts = int(($total_parts + $njobs - 1) / $njobs);
 
-    $self->debug(1,
-		 "downloading", $job->file_name(1), "to $localname in chunks of $part_size bytes, in $njobs jobs, with $job_parts parts per job");
+    $self->debug(1, "$job: downloading in chunks of $part_size bytes, in $njobs jobs, with $job_parts parts per job");
+
     return if $self->dry_run;
 
     use Fcntl qw(SEEK_SET);
@@ -276,17 +288,17 @@ sub _download_multipart {
 		    my $range = 'bytes=' . $off . '-' . ($off + $part_size - 1);
 		    my ($res, $hash);
 		    for (my $try = 0;;) {
-			($res, $hash) = $self->glacier_eval('get_job_output',
-							    $job->vault,
-							    $job->id, $range);
-			if ($self->lasterr) {
+			($res, $hash) =
+			    $self->glacier->Get_job_output($job->vault,
+							   $job->id, $range);
+			if ($self->glacier->lasterr) {
 			    if (++$try < $retries) {
 				$self->debug(1, "part $part_idx: ",
-					     $self->last_error_message);
+					     $self->glacier->last_error_message);
 				$self->debug(1, "retrying");
 			    } else {
 				$self->error("failed to download part $part_idx: ",
-					     $self->last_error_message);
+					     $self->glacier->last_error_message);
 				return 0;
 			    }
 			} else {
