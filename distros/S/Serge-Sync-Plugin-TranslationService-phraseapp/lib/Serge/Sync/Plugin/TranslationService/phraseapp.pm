@@ -1,4 +1,4 @@
-# ABSTRACT: Serge PhraseApp translation server (https://phraseapp.com) synchronization plugin
+# ABSTRACT: PhraseApp (https://phraseapp.com) synchronization plugin for Serge
 
 package Serge::Sync::Plugin::TranslationService::phraseapp;
 use parent Serge::Sync::Plugin::Base::TranslationService, Serge::Interface::SysCmdRunner;
@@ -8,10 +8,10 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.900.2');
+our $VERSION = qv('0.900.3');
 
 sub name {
-    return 'PhraseApp translation server (https://phraseapp.com) synchronization plugin';
+    return 'PhraseApp translation software (https://phraseapp.com) synchronization plugin';
 }
 
 sub init {

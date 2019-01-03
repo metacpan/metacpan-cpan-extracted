@@ -1,21 +1,16 @@
 package Data::TableReader::Decoder::CSV;
-$Data::TableReader::Decoder::CSV::VERSION = '0.008';
+$Data::TableReader::Decoder::CSV::VERSION = '0.009';
 use Moo 2;
 use Try::Tiny;
 use Carp;
 use IO::Handle;
 extends 'Data::TableReader::Decoder';
 
-our @csv_probe_modules= qw( Text::CSV_XS Text::CSV );
-our %csv_probe_modules= ( 'Text::CSV_XS' => 1.06, 'Text::CSV' => 1.91 );
+our @csv_probe_modules= ( ['Text::CSV_XS' => 1.06], ['Text::CSV' => 1.91] );
 our $default_csv_module;
 sub default_csv_module {
-	$default_csv_module ||= do {
-		eval "use $_ $csv_probe_modules{$_}; 1" && return $_
-			for @csv_probe_modules;
-		croak "No CSV parser available or sufficient version; install one of: "
-			.join(', ', map "$_ >= $csv_probe_modules{$_}", @csv_probe_modules);
-	};
+	$default_csv_module ||=
+		Data::TableReader::Decoder::_first_sufficient_module('CSV parser', \@csv_probe_modules);
 }
 
 # ABSTRACT: Access rows of a comma-delimited text file
@@ -203,7 +198,7 @@ Data::TableReader::Decoder::CSV - Access rows of a comma-delimited text file
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -281,7 +276,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

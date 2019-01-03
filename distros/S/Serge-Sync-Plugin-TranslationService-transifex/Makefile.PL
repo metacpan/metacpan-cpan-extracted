@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Transifex translation server (https://www.transifex.com) synchronization plugin",
+  "ABSTRACT" => "Transifex (https://www.transifex.com) synchronization plugin for Serge",
   "AUTHOR" => "Dragos Varovici <dvarovici.work\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.900.3",
+  "VERSION" => "0.900.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

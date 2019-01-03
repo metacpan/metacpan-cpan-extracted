@@ -5,6 +5,8 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README.mkdn
+doc/pod/phraseapp.pod
 lib/Serge/Sync/Plugin/TranslationService/phraseapp.pm
 t/00-compile.t
 t/data/plugins/phraseapp/00/commands/pull.json

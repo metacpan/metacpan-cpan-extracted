@@ -1,5 +1,5 @@
 package Data::TableReader;
-$Data::TableReader::VERSION = '0.008';
+$Data::TableReader::VERSION = '0.009';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -110,7 +110,7 @@ sub _build_field_by_name {
 sub _build_header_row_combine {
 	my $self= shift;
 	# If headers contain "\n", we need to collect multiple cells per column
-	max map { 1+($_->header_regex =~ /\\n/g) } $self->field_list;
+	max map { 1+(()= ($_->header_regex =~ /\\n|\n/g)) } $self->field_list;
 }
 
 # 'log' can be a variety of things, but '_log' will always be a coderef
@@ -145,8 +145,11 @@ sub detect_input_format {
 	my ($self, $filename, $magic)= @_;
 
 	my $input= $self->input;
+	# As convenience to spreadsheet users, let input be a parsed workbook/worksheet object.
 	return ('XLSX', sheet => $input)
-		if ref($input) && (ref($input) eq "Spreadsheet::ParseExcel::Worksheet");
+		if ref($input) && ref($input)->can('get_cell');
+	return ('XLSX', workbook => $input)
+		if ref($input) && ref($input)->can('worksheets');
 
 	# Load first block of file, unless supplied
 	my $fpos;
@@ -176,23 +179,27 @@ sub detect_input_format {
 	return ( 'XLS'  ) if $magic =~ /^\xD0\xCF\x11\xE0/;
 
 	# Else trust the file extension, because TSV with commas can be very similar to CSV with
-	# tabs in the data.
-    my $suffix = do {
-        # Detect filename if not supplied
-        if (!defined $filename) {
-            $filename= '';
-            $filename= "$input" if defined $input and (!ref $input || ref($input) =~ /path|file/i);
-        }
-        my ($suffix)= ($filename =~ /\.([^.]+)$/);
-        defined $suffix? uc($suffix) : '';
-    };
-	return $suffix if length $suffix;
+	# tabs in the data, and some crazy person might store an HTML document as the first element
+	# of a CSV file.
+	# Detect filename if not supplied
+	if (!defined $filename) {
+		$filename= '';
+		$filename= "$input" if defined $input and (!ref $input || ref($input) =~ /path|file/i);
+	}
+	if ($filename =~ /\.([^.]+)$/) {
+		my $suffix= uc($1);
+		return 'HTML' if $suffix eq 'HTM';
+		return $suffix;
+	}
 
 	# Else probe some more...
 	$self->_log->('debug',"Probing file format because no filename suffix");
 	length $magic or croak "Can't probe format. No filename suffix, and "
 		.(!defined $fpos? "unseekable file handle" : "no content");
 
+	# HTML is pretty obvious
+	return 'HTML' if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?<(!DOCTYPE )HTML/i;
+	# Else guess between CSV and TSV
 	my ($probably_csv, $probably_tsv)= (0,0);
 	++$probably_csv if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?["']?[\w ]+["']?,/;
 	++$probably_tsv if $magic =~ /^(\xEF\xBB\xBF|\xFF\xFE|\xFE\xFF)?["']?[\w ]+["']?\t/;
@@ -301,7 +308,7 @@ sub _find_table_in_dataset {
 		}
 		if ($row_accum > 1) {
 			push @rows, $vals;
-			splice @rows, 0, @rows-$row_accum; # only need to retain $row_accum number of rows
+			shift @rows while @rows > $row_accum;
 			$vals= [ map { my $c= $_; join("\n", map $_->[$c], @rows) } 0 .. $#{$rows[-1]} ];
 			$stash->{context}= $row_accum.' rows ending at '.$data_iter->position;
 		} else {
@@ -682,7 +689,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -981,7 +988,7 @@ Christian Walde <walde.christian@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

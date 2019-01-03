@@ -1,5 +1,12 @@
 Revision history for Perl extension App-tmclean
 
+v0.0.3 2019-01-02T18:48:51Z
+    - trap exception around strptime
+
+v0.0.2 2019-01-02T18:31:11Z
+    - fix log prefix typo
+    - drop Hash::Rename dependency
+
 v0.0.1 2019-01-02T15:49:59Z
 
     - original version

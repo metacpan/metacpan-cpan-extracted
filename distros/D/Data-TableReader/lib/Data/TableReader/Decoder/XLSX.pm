@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::XLSX;
-$Data::TableReader::Decoder::XLSX::VERSION = '0.008';
+$Data::TableReader::Decoder::XLSX::VERSION = '0.009';
 use Moo 2;
 use Carp;
 use Try::Tiny;
@@ -8,10 +8,8 @@ extends 'Data::TableReader::Decoder::Spreadsheet';
 our @xlsx_probe_modules= qw( Spreadsheet::ParseXLSX Spreadsheet::XLSX );
 our $default_xlsx_module;
 sub default_xlsx_module {
-	$default_xlsx_module ||= do {
-		eval "require $_" && return $_ for @xlsx_probe_modules;
-		croak "No XLSX parser available; install one of: ".join(', ', @xlsx_probe_modules);
-	};
+	$default_xlsx_module ||=
+		Data::TableReader::Decoder::_first_sufficient_module('XLSX parser', \@xlsx_probe_modules);
 }
 
 # ABSTRACT: Access sheets/rows of a modern Microsoft Excel workbook
@@ -51,7 +49,7 @@ Data::TableReader::Decoder::XLSX - Access sheets/rows of a modern Microsoft Exce
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -74,7 +72,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

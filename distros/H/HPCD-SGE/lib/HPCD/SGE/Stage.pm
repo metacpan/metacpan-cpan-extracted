@@ -184,6 +184,8 @@ sub _vmem_usage {
 													  ? "found stderr: $last[-1]"
 		: ($last[-2] =~ /^Error: cannot allocate vector of size /
 			&& $last[-1] =~ /Execution halted/)       ? "found stderr: $last[-2]"
+		: ($last[-2] =~ /^Exception MemoryError/
+			&& $last[-1] =~ /Segmentation fault/)       ? "found stderr: $last[-2]"
 		: (  ($msg = `grep 'java.lang.OutOfMemoryError: GC overhead limit exceeded' $stderr`)
 		  || ($msg = `grep 'what():  std::bad_alloc' $stderr`) )
 													  ? "found stderr: $msg"

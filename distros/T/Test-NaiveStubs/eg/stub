@@ -2,16 +2,27 @@
 use strict;
 use warnings;
 
+# Create tests (or dump the subroutines) of a list of given modules.
+
 use Test::NaiveStubs;
 
-my $module = shift or die "Usage: perl $0 Some::Module\n";
+my @modules = @ARGV ? @ARGV : die "Usage: perl $0 Some::Module Foo::Bar ...\n";
 
-eval "require $module";
-die "Can't require $module: $@" if $@;
+for my $module ( @modules ) {
+    eval "require $module";
+    if ( $@ ) {
+        warn "Can't require $module: $@\n";
+        next;
+    }
 
-my $t = Test::NaiveStubs->new( module => $module );
+    my $t = Test::NaiveStubs->new( module => $module );
 
-#$t->gather_subs;
-#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$t->subs);
+#    $t->gather_subs;
+#    use Data::Dumper; warn Dumper [sort keys %{ $t->subs }]; next;
 
-$t->create_test;
+    $t->create_test;
+}
+
+__END__
+For example:
+perl -Ilib eg/stub Test::NaiveStubs

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Transifex translation server (https://www.transifex.com) synchronization plugin",
+   "abstract" : "Transifex (https://www.transifex.com) synchronization plugin for Serge",
    "author" : [
       "Dragos Varovici <dvarovici.work@gmail.com>"
    ],
@@ -51,7 +51,7 @@
          "web" : "https://github.com/dragosv/serge-plugins"
       }
    },
-   "version" : "0.900.3",
+   "version" : "0.900.4",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }

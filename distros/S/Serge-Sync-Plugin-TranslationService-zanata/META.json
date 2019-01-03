@@ -1,5 +1,5 @@
 {
-   "abstract" : "Serge Zanata translation server (http://zanata.org/) synchronization plugin",
+   "abstract" : "Zanata (http://zanata.org/) synchronization plugin for Serge",
    "author" : [
       "Dragos Varovici <dvarovici.work@gmail.com>"
    ],
@@ -51,7 +51,7 @@
          "web" : "https://github.com/dragosv/serge-plugins"
       }
    },
-   "version" : "0.905.3",
+   "version" : "0.905.5",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }

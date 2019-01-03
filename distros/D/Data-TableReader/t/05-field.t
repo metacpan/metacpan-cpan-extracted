@@ -26,6 +26,10 @@ subtest header_regex => sub {
 		name => 'ZipCode',
 		match => [ 'ZipCode', 'zip code', 'zip.code', 'ZIP CODE', '--ZIP CODE--' ],
 		nomatch => [ 'ZipCode(5)' ],
+	},{
+		name => 'ZipCode', header => "Zip\nCode",
+		match => ["Zip\nCode", "zip \n code"],
+		nomatch => [ 'zipcode' ],
 	});
 	plan tests => scalar @tests;
 	for my $t (@tests) {

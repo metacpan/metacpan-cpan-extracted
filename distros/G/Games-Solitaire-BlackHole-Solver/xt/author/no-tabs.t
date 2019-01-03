@@ -8,11 +8,14 @@ use Test::NoTabs;
 
 my @files = (
     'bin/black-hole-solve',
+    'bin/golf-solitaire-solve-perl',
     'lib/Games/Solitaire/BlackHole/Solver.pm',
     'lib/Games/Solitaire/BlackHole/Solver/App.pm',
+    'lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm',
     't/00-compile.t',
     't/00-load.t',
     't/01-run.t',
+    't/data/10.golf.board.txt',
     't/data/26464608654870335080.bh.board.txt'
 );
 

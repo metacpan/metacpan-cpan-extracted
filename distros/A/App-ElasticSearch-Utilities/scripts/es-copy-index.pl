@@ -227,7 +227,7 @@ es-copy-index.pl - Copy an index from one cluster to another
 
 =head1 VERSION
 
-version 6.3
+version 6.4
 
 =head1 SYNOPSIS
 
@@ -397,6 +397,26 @@ The B<incident-rt1234-2013.01.11> index will now hold all the data from both of 
 The search string is pre-analyzed before being sent to ElasticSearch.  The following plugins
 work to manipulate the query string and provide richer, more complete syntax for CLI applications.
 
+=head2 App::ElasticSearch::Utilities::AutoEscape
+
+Provide an '=' prefix to a query string parameter to promote that parameter to a C<term> filter.
+
+This allows for exact matches of a field without worrying about escaping Lucene special character filters.
+
+E.g.:
+
+    user_agent:"Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1"
+
+Is evaluated into a weird query that doesn't do what you want.   However:
+
+    =user_agent:"Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1"
+
+Is translated into:
+
+    { term => { user_agent => "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Mobile/15E148 Safari/604.1" } }
+
+Which provides an exact match to the term in the query.
+
 =head2 App::ElasticSearch::Utilities::Barewords
 
 The following barewords are transformed:
@@ -500,13 +520,19 @@ or:
 This option will iterate through the whole file and unique the elements of the list.  They will then be transformed into
 an appropriate L<terms query|http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/query-dsl-terms-query.html>.
 
+=head2 App::ElasticSearch::Utilities::QueryString::Nested
+
+Implement the proposed nested query syntax early.  Example:
+
+    nested_path:"field:match AND string"
+
 =head1 AUTHOR
 
 Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Brad Lhotsky.
+This software is Copyright (c) 2019 by Brad Lhotsky.
 
 This is free software, licensed under:
 

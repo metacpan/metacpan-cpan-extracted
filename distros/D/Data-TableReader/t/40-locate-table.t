@@ -95,12 +95,12 @@ subtest multiline_header => sub {
 			},
 			fields => [
 				{ name => 'a', header => "d g" },
-				{ name => 'b', header => 'b' },
-				{ name => 'c', header => qr/^f\nc$/ },
+				{ name => 'b', header => "b\ne\nb" },
+				{ name => 'c', header => qr/f\nc$/ },
 			],
 			log => $log,
 		], 'TableReader' );
-	is( $ex->header_row_combine, 2, 'header_row_combine' );
+	is( $ex->header_row_combine, 3, 'header_row_combine' );
 	ok( $ex->find_table, 'found table' );
 	is_deeply( $ex->field_map, { a => 0, b => 1, c => 2 }, 'field_map' );
 	is_deeply( $ex->iterator->all(), [{a=>'A',b=>'B',c=>'C'}], 'found row' );

@@ -4,7 +4,7 @@ author:
   - 'Todd Rinaldo <toddr@cpanel.net>'
 build_requires:
   File::Slurper: '0'
-  Test2::Bundle::Extended: '0'
+  Test2::Bundle::Extended: '0.000084'
   Test2::Plugin::NoWarnings: '0'
   Test2::Tools::Explain: '0'
   Test::More: '1.302133'
@@ -22,11 +22,11 @@ no_index:
     - t
     - inc
 requires:
-  Overload::FileCheck: '0.006'
+  Overload::FileCheck: '0.007'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/cpanelinc/Test-MockFile/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/cpanelinc/Test-MockFile
-version: '0.015'
+version: '0.017'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

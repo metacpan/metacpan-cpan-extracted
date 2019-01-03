@@ -1,0 +1,41 @@
+---
+abstract: 'HTML support for Data::TableReader'
+author:
+  - 'Michael Conrad <mike@nrdvana.net>'
+build_requires:
+  Data::TableReader: '0.09'
+  File::Spec::Functions: '0'
+  FindBin: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Log::Any::Adapter::TAP: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-TableReader-Decoder-HTML
+requires:
+  Carp: '0'
+  Data::TableReader: '0.09'
+  Data::TableReader::Decoder: '0'
+  Data::TableReader::Iterator: '0'
+  HTML::Parser: '0'
+  IO::Handle: '0'
+  Moo: '2'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/nrdvana/perl-Data-TableReader/issues
+  homepage: https://github.com/nrdvana/perl-Data-TableReader
+  repository: https://github.com/nrdvana/perl-Data-TableReader.git
+version: '0.009'
+x_contributors:
+  - 'Christian Walde <walde.christian@gmail.com>'
+x_generated_by_perl: v5.20.2
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Test-NaiveStubs
   repository: https://github.com/ology/Test-NaiveStubs
-version: '0.0701'
+version: '0.0702'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

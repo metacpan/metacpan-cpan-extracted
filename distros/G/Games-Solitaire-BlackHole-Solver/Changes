@@ -1,5 +1,14 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.2.1   2019-01-02
+        - Documentation fixes in bin/golf-solitaire-solve-perl .
+
+0.2.0   2019-01-02
+        - Add bin/golf-solitaire-solve-perl and
+        lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm - a solver for three variants
+        of Golf patience (see https://en.wikipedia.org/wiki/Golf_(patience) ).
+        - Reformatted the code using Perl::Tidy .
+
 0.0.4   2017-04-05
         - Convert dist.ini away from [VersionFromModule] and use [@SHLOMIF] .
 

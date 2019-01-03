@@ -1,9 +1,50 @@
 ==================================================
-Changes from 2017-01-01 00:00:00 +0000 to present.
+Changes from 2017-01-02 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.3 at 2019-01-01 01:15:22 +0000
+version 6.4 at 2019-01-02 22:25:09 +0000
+----------------------------------------
+
+  Change: 470feb7d6e00998906849cbfb49d1904eb79cf6b
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-01-02 14:20:36 +0000
+
+    Updated Documentation for the 6.4 release 
+
+  Change: 095da97cc9e9fb29ebcea13851d548e20c6166d6
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-01-02 13:40:05 +0000
+
+    Add in the new QueryString Extensions to the documentation 
+
+  Change: 714c9856d382bcc1ee95fc2ecd8ee7257e13aaec
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-01-02 12:12:56 +0000
+
+    Scroll search corrected to use the correct API
+
+    Finally migrated off the 0.x version of the scrolled search API which is no
+    longer supported in 6.5. 
+
+  Change: 4a9e798426a21f2ab3543317bea5a56937536b56
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2019-01-02 11:18:28 +0000
+
+    Convert ::QueryString::AutoEscape to use terms filter
+
+    Rather than attempting to escape characters, use the Elastic `terms` filter
+    to perform the lookup if the user specifies `=field:value`.
+
+    This will convert to:
+
+    { terms: { field: 'value' } }
+
+    And that will perform an exact match to the documents in a more predictable
+    and future-proof manner. 
+
+----------------------------------------
+version 6.3 at 2019-01-01 01:00:09 +0000
 ----------------------------------------
 
   Change: 0a032698e44212328cb3bef1acae61812db12353
@@ -555,5 +596,5 @@ version 5.3 at 2017-03-23 01:49:52 +0000
     * es_master() and --master-only added, documentation clean up. 
 
 =================================================
-Plus 59 releases after 2017-01-01 00:00:00 +0000.
+Plus 59 releases after 2017-01-02 00:00:00 +0000.
 =================================================

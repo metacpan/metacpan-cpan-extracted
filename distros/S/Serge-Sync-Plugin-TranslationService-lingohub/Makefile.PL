@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Lingohub translation server (https://www.lingohub.com) synchronization plugin",
+  "ABSTRACT" => "Lingohub (https://www.lingohub.com) synchronization plugin for Serge",
   "AUTHOR" => "Dragos Varovici <dvarovici.work\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.901.3",
+  "VERSION" => "0.901.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

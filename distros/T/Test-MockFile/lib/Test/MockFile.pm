@@ -43,11 +43,11 @@ Test::MockFile - Allows tests to validate code that can interact with files with
 
 =head1 VERSION
 
-Version 0.015
+Version 0.017
 
 =cut
 
-our $VERSION = '0.015';
+our $VERSION = '0.017';
 
 our %files_being_mocked;
 
@@ -71,7 +71,7 @@ This is useful for L<small tests|https://en.wikipedia.org/wiki/Google_Test#Small
 
 A strict mode is even provided which can throw a die when files are accessed during your tests!
 
-    # Loaded before Test::MockModule so uses the core perl functions without any hooks.
+    # Loaded before Test::MockFile so uses the core perl functions without any hooks.
     use Module::I::Dont::Want::To::Alter;
 
     use Test::MockFile;
@@ -344,7 +344,7 @@ sub dir {
 
 When creating mocked files or directories, we default their stats to:
 
-    Test::MockModule->new( $file, $contents, {
+    Test::MockFile->new( $file, $contents, {
             'dev'       => 0,        # stat[0]
             'inode'     => 0,        # stat[1]
             'mode'      => $mode,    # stat[2]
@@ -364,9 +364,9 @@ Size and blocks are calculated based on the size of 'contents' a.k.a. the fake f
 
 When you want to override one of the defaults, all you need to do is specify that when you declare the file or directory. The rest will continue to default.
 
-    Test::MockModule->file("/root/abc", "...", {inode => 65, uid => 123, mtime => int((2000-1970) * 365.25 * 24 * 60 * 60 }));
+    Test::MockFile->file("/root/abc", "...", {inode => 65, uid => 123, mtime => int((2000-1970) * 365.25 * 24 * 60 * 60 }));
 
-    Test::MockModule->dir("/sbin", "...", { mode => 0700 }));
+    Test::MockFile->dir("/sbin", "...", { mode => 0700 }));
 
 =head2 new
     
@@ -622,7 +622,7 @@ sub unlink {
     }
 
     if ( $self->is_dir ) {
-        if ( $^O eq 'darwin' or $^O =~ m/bsd/i ) {
+        if ( $] < 5.019 && ( $^O eq 'darwin' or $^O =~ m/bsd/i ) ) {
             $! = EPERM;
         }
         else {
@@ -950,7 +950,7 @@ sub _real_file_access_hook {
 
 =head2 How this mocking is done:
 
-Test::MockModule uses 2 methods to mock file access:
+Test::MockFile uses 2 methods to mock file access:
 
 =head3 -X via L<Overload::FileCheck>
 
@@ -967,7 +967,7 @@ Since 5.10, it has been possible to override function calls by defining them. li
     *CORE::GLOBAL::open = sub(*;$@) {...}
     
 Any code which is loaded B<AFTER> this happens will use the alternate open. This means you can place your C<use Test::MockFile> statement after statements you don't want to be mocked and
-there is no risk that the code will ever be altered by Test::MockModule.
+there is no risk that the code will ever be altered by Test::MockFile.
 
 We oveload the following statements and then return tied handles to enable the rest of the IO functions to work properly. Only B<open> / B<sysopen> are needed to address file operations.
 However B<opendir> file handles were never setup for tie so we have to override all of B<opendir>'s related functions.
@@ -1218,7 +1218,6 @@ BEGIN {
         my $mocked_dir = _get_file_object( $_[0] );
 
         if ( !$mocked_dir ) {
-            _real_file_access_hook( "readdir", \@_ );
             goto \&CORE::readdir if _goto_is_available();
             return CORE::readdir( $_[0] );
         }
@@ -1256,7 +1255,6 @@ BEGIN {
         my $mocked_dir = _get_file_object($fh);
 
         if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( "telldir", \@_ );
             goto \&CORE::telldir if _goto_is_available();
             return CORE::telldir($fh);
         }
@@ -1279,7 +1277,6 @@ BEGIN {
         my $mocked_dir = _get_file_object($fh);
 
         if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( "rewinddir", \@_ );
             goto \&CORE::rewinddir if _goto_is_available();
             return CORE::rewinddir( $_[0] );
         }
@@ -1303,7 +1300,6 @@ BEGIN {
         my $mocked_dir = _get_file_object($fh);
 
         if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( "seekdir", \@_ );
             goto \&CORE::seekdir if _goto_is_available();
             return CORE::seekdir( $fh, $goto );
         }
@@ -1326,7 +1322,6 @@ BEGIN {
         my $mocked_dir = _get_file_object($fh);
 
         if ( !$mocked_dir || !$mocked_dir->{'obj'} ) {
-            _real_file_access_hook( "closedir", \@_ );
             goto \&CORE::closedir if _goto_is_available();
             return CORE::closedir($fh);
         }

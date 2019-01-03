@@ -5,6 +5,8 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README.mkdn
+doc/pod/lingohub.pod
 lib/Serge/Sync/Plugin/TranslationService/lingohub.pm
 t/00-compile.t
 t/data/plugins/lingohub/00/commands/pull.json

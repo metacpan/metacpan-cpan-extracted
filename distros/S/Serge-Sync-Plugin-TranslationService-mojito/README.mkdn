@@ -1,0 +1,47 @@
+# NAME
+
+Serge::Sync::Plugin::TranslationService::mojito - [Mojito](http://www.mojito.global/) synchronization plugin for [Serge](https://serge.io/)
+
+# SYNOPSIS
+
+    ts
+    {
+        plugin                      mojito
+
+        data
+        {
+            project_id              MojitoProjectId
+            application_properties  ./files/config/mojito.properties
+            source_files_path       ./files/source
+            localized_files_path    ./files/target
+            destination_locales     de es fr-ca
+        }
+    }
+
+# DESCRIPTION
+
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Mojito (Open source automation platform that enables continuous localization).
+
+# ATTRIBUTES
+
+- _project\_id_
+
+    Mojito project id
+
+- _application\_properties_
+
+    Mojito configuration file
+
+# INSTALLATION
+
+    cpanm Serge::Sync::Plugin::TranslationService::mojito
+
+# AUTHOR
+
+Dragos Varovici <dvarovici.work@gmail.com>
+
+# COPYRIGHT AND LICENSE
+This software is copyright (c) 2018-2019 by Dragos Varovici.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bio-DB-USeq",
    "prereqs" : {
@@ -31,7 +31,7 @@
    "provides" : {
       "Bio::DB::USeq" : {
          "file" : "lib/Bio/DB/USeq.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "Bio::DB::USeq::Feature" : {
          "file" : "lib/Bio/DB/USeq.pm"
@@ -58,5 +58,5 @@
          "url" : "https://github.com/tjparnell/Bio-DB-USeq"
       }
    },
-   "version" : "0.24"
+   "version" : "0.25"
 }

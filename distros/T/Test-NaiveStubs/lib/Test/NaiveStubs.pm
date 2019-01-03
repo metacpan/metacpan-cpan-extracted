@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate test stubs for methods and functions
 
-our $VERSION = '0.0701';
+our $VERSION = '0.0702';
 
 use Moo;
 use strictures 2;
@@ -139,7 +139,7 @@ Test::NaiveStubs - Generate test stubs for methods and functions
 
 =head1 VERSION
 
-version 0.0701
+version 0.0702
 
 =head1 SYNOPSIS
 

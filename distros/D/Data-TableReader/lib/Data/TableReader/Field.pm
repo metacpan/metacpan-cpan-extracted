@@ -1,5 +1,5 @@
 package Data::TableReader::Field;
-$Data::TableReader::Field::VERSION = '0.008';
+$Data::TableReader::Field::VERSION = '0.009';
 use Moo 2;
 
 # ABSTRACT: Field specification for Data::TableReader
@@ -29,7 +29,7 @@ sub _build_header_regex {
 		$h =~ s/_/ /g;                              # then split on underscore
 	}
 	return $h if ref($h) eq 'Regexp';
-	my $pattern= join "[\\W_]*", map "\Q$_\E", grep { defined && length }
+	my $pattern= join "[\\W_]*", map { $_ eq "\n"? '\n' : "\Q$_\E" } grep { defined && length }
 		split /(\n)|\s+|(\W)/, $h; # capture newline or non-word, except for other whitespace
 	return qr/^[\W_]*$pattern[\W_]*$/im;
 }
@@ -48,7 +48,7 @@ Data::TableReader::Field - Field specification for Data::TableReader
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -179,7 +179,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

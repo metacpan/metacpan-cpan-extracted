@@ -2,11 +2,10 @@ package App::tmclean;
 use 5.010;
 use warnings;
 
-use version 0.77; our $VERSION = version->declare("v0.0.1");
+use version 0.77; our $VERSION = version->declare("v0.0.3");
 
 use Getopt::Long qw/GetOptions :config posix_default no_ignore_case bundling auto_help/;
 use Pod::Usage qw/pod2usage/;
-use Hash::Rename qw/hash_rename/;
 use Class::Accessor::Lite (
     new => 1,
     ro  => [qw/before days dry_run/],
@@ -18,7 +17,7 @@ use Time::Seconds ();
 sub logf {
     my $msg = shift;
        $msg = sprintf($msg, @_);
-    my $prefix = '[tmclan]' . Time::Piece->localtime->strftime('[%Y-%m-%d %H:%M:%S] ');
+    my $prefix = '[tmclean]' . Time::Piece->localtime->strftime('[%Y-%m-%d %H:%M:%S] ');
     $msg .= "\n" if $msg !~ /\n$/;
     print STDERR $prefix . $msg;
 }
@@ -40,7 +39,7 @@ sub parse_options {
         dry-run
     /) or pod2usage(2);
 
-    hash_rename %opt, code => sub {tr/-/_/};
+    $opt{dry_run} = delete $opt{'dry-run'};
     return (\%opt, \@ARGV);
 }
 
@@ -82,8 +81,8 @@ sub backups2delete {
     return grep {
         chomp;
         my @paths = split m!/!, $_;
-        my $backup_date = Time::Piece->strptime($paths[-1], '%Y-%m-%d-%H%M%S');
-        $self->before_tp > $backup_date;
+        my $backup_date = eval { Time::Piece->strptime($paths[-1], '%Y-%m-%d-%H%M%S') };
+        $backup_date && $self->before_tp > $backup_date;
     } @backups;
 }
 

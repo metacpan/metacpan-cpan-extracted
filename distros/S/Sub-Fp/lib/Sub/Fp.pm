@@ -4,6 +4,7 @@ use warnings;
 use Carp;
 use POSIX;
 use List::Util;
+use Data::Dumper qw(Dumper);
 use Exporter qw(import);
 our @EXPORT_OK = qw(
     incr        reduces  flatten
@@ -16,10 +17,11 @@ our @EXPORT_OK = qw(
     is_hash     every    noop        identity
     is_empty    is_sub   flow        eql
     to_pairs    for_each apply       get
-    second      range
+    second      range    pops        pushes
+    shifts      unshifts
 );
 
-our $VERSION = '0.23';
+our $VERSION = '0.27';
 
 use constant ARG_PLACE_HOLDER => {};
 
@@ -76,14 +78,6 @@ sub _is_nonsense_range {
     if ($start == $end &&
         $end == $step) {
         return 1;
-    }
-
-    #TODO Refactor this...;
-    if ($start > $end &&
-        $step == 0 &&
-        $start < 0 &&
-        $end < 0) {
-        return 0;
     }
 
     if ($start > $end &&
@@ -334,6 +328,30 @@ sub flatten {
     ];
 }
 
+sub pops {
+    my ($array, $val) = @_;
+
+    return pop @{$array};
+}
+
+sub pushes {
+    my ($array, $val) = @_;
+
+    return push @{$array}, $val;
+}
+
+sub shifts {
+    my ($array, $val) = @_;
+
+    return shift @{$array};
+}
+
+sub unshifts {
+    my ($array, $val) = @_;
+
+    return unshift @{$array}, $val;
+}
+
 sub drop {
     my $args     = [@_];
     my $count    = len($args) > 1 ? $args->[0] : 1;
@@ -465,22 +483,29 @@ sub partial {
     }
 }
 
+
+#Once again, forgive me for I have sinned...
 sub _fill_holders {
-    my ($oldArgs, $newArgs) = @_;
+    my ($old_args, $new_args) = @_;
 
-    if (none(sub { eql($_[0], __) }, $oldArgs)) {
-        return [@$oldArgs, @$newArgs];
-    }
+    my $filled_args  = [];
+    my $old_args_len = len($old_args);
 
-    return reduces(sub {
-        my ($args, $arg) = @_;
+    for (my $idx = 0; $idx < $old_args_len; $idx++) {
+        my $arg = shift @{ $old_args };
 
-        if (!eql($arg, __)) {
-            return [spread($args), $arg]
+        if (eql($arg, __)) {
+            push @{ $filled_args }, (shift @{ $new_args });
+        } else {
+            push @{ $filled_args }, $arg;
         }
 
-        return [spread($args), shift @{ $newArgs }]
-    }, [], [spread($oldArgs), spread($newArgs)]);
+        if ($old_args_len == ($idx + 1)) {
+            push @{ $filled_args }, @{ $new_args };
+        }
+    }
+
+    return $filled_args;
 }
 
 sub subarray {
@@ -512,8 +537,8 @@ sub chain {
 }
 
 sub eql {
-    my $arg1 = shift // __;
-    my $arg2 = shift // __;
+    my $arg1 = shift;
+    my $arg2 = shift;
 
     if (ref $arg1 ne ref $arg2) {
         return 0;
@@ -639,13 +664,11 @@ If end is not specified, it's set to start with start then set to 0.
     # [1, 1, 1]
 
 
-    range(-1, -4, 0);
-
-    # [-1, -1, -1]
-
-
     #Ranges that "dont make sense" will return empty arrays
 
+    range(-1, -4, 0);
+
+    # []
 
     range(100, 1, 0)
 
@@ -754,6 +777,25 @@ Flattens array a single level deep.
     flatten([1,1,1, [2,2,2]]);
 
     # [1,1,1,2,2,2];
+
+=cut
+
+=head2 pop / pushes / shifts / unshifts
+
+Works the same as builtin pop / push etc etc, with mutations,
+except it uses references instead of @ lists.
+
+    my $array = [1,2,3];
+
+    pops($array)
+
+    # 1
+
+    my $array = [1,2,3];
+
+    pushes($array, 4);
+
+    # [1,2,3,4]
 
 =cut
 

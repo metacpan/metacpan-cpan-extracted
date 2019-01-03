@@ -1,12 +1,12 @@
 package Games::Solitaire::BlackHole::Solver;
-$Games::Solitaire::BlackHole::Solver::VERSION = '0.0.4';
+$Games::Solitaire::BlackHole::Solver::VERSION = '0.2.1';
 use strict;
 use warnings;
 
 use 5.008;
 
 
-1; # End of Games::Solitaire::BlackHole::Solver
+1;    # End of Games::Solitaire::BlackHole::Solver
 
 __END__
 
@@ -20,7 +20,7 @@ Games::Solitaire::BlackHole::Solver - A solver for Black Hole Solitaire
 
 =head1 VERSION
 
-version 0.0.4
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ More information about Black Hole Solitaire can be found at:
 
 =head1 VERSION
 
-version 0.0.4
+version 0.2.1
 
 =head1 AUTHOR
 
@@ -135,12 +135,6 @@ feature.
 
 =head1 SUPPORT
 
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Games::Solitaire::BlackHole::Solver
-
 =head2 Websites
 
 The following websites have more information about this module, and may be of help to you. As always,
@@ -154,7 +148,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Games-Solitaire-BlackHole-Solver>
+L<https://metacpan.org/release/Games-Solitaire-BlackHole-Solver>
 
 =item *
 
@@ -190,14 +184,6 @@ L<http://cpanratings.perl.org/d/Games-Solitaire-BlackHole-Solver>
 
 =item *
 
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/Games-Solitaire-BlackHole-Solver>
-
-=item *
-
 CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
@@ -208,7 +194,7 @@ L<http://cpants.cpanauthors.org/dist/Games-Solitaire-BlackHole-Solver>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/G/Games-Solitaire-BlackHole-Solver>
 

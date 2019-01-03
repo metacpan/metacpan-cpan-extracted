@@ -1,5 +1,5 @@
 {
-   "abstract" : "Serge Mojito translation server (http://www.mojito.global/) synchronization plugin",
+   "abstract" : "Mojito (http://www.mojito.global/) synchronization plugin for Serge",
    "author" : [
       "Dragos Varovici <dvarovici.work@gmail.com>"
    ],
@@ -51,7 +51,7 @@
          "web" : "https://github.com/dragosv/serge-plugins"
       }
    },
-   "version" : "0.903.1",
+   "version" : "0.905.3",
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }

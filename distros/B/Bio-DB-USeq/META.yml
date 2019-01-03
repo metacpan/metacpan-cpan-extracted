@@ -15,7 +15,7 @@ name: Bio-DB-USeq
 provides:
   Bio::DB::USeq:
     file: lib/Bio/DB/USeq.pm
-    version: '0.24'
+    version: '0.25'
   Bio::DB::USeq::Feature:
     file: lib/Bio/DB/USeq.pm
   Bio::DB::USeq::Iterator:
@@ -34,4 +34,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/tjparnell/Bio-DB-USeq
-version: '0.24'
+version: '0.25'

@@ -16,6 +16,11 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-TableReader
+recommends:
+  Data::TableReader::Decoder::HTML: '0'
+  Spreadsheet::ParseExcel: '0'
+  Spreadsheet::ParseXLSX: '0'
+  Text::CSV_XS: '1.06'
 requires:
   Carp: '0'
   IO::Handle: '0'
@@ -32,7 +37,7 @@ resources:
   bugtracker: https://github.com/nrdvana/perl-Data-TableReader/issues
   homepage: https://github.com/nrdvana/perl-Data-TableReader
   repository: https://github.com/nrdvana/perl-Data-TableReader.git
-version: '0.008'
+version: '0.009'
 x_contributors:
   - 'Christian Walde <walde.christian@gmail.com>'
 x_generated_by_perl: v5.20.2

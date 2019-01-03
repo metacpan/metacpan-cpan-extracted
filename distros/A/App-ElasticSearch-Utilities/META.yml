@@ -9,10 +9,10 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.013002'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.013002'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: bsd
@@ -60,13 +60,13 @@ requires:
   feature: '0'
   namespace::autoclean: '0'
   parent: '0'
-  perl: '5.013002'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/reyjrar/es-utils/issues
   repository: git://github.com/reyjrar/es-utils.git
-version: '6.3'
+version: '6.4'
 x_Dist_Zilla:
   perl:
     version: '5.028000'
@@ -414,7 +414,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-6.3
+          tag: release-6.4
           tag_format: release-%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

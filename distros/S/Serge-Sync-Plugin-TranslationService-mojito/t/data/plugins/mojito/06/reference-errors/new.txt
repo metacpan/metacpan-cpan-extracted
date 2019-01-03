@@ -1,0 +1,1 @@
+Data validation failed for plugin 'Serge::Sync::Plugin::TranslationService::mojito': 'source_files_path', which is set to './files/not-found-source', does not point to a valid directory.

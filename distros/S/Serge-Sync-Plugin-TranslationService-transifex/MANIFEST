@@ -5,6 +5,8 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README.mkdn
+doc/pod/transifex.pod
 lib/Serge/Sync/Plugin/TranslationService/transifex.pm
 t/00-compile.t
 t/data/plugins/transifex/00/commands/pull.json

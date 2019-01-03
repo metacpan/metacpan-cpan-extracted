@@ -1,4 +1,4 @@
-# ABSTRACT: Serge Mojito translation server (http://www.mojito.global/) synchronization plugin
+# ABSTRACT: Mojito (http://www.mojito.global/) synchronization plugin for Serge
 
 package Serge::Sync::Plugin::TranslationService::mojito;
 
@@ -9,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros culture_from_lang locale_from_lang);
 use version;
 
-our $VERSION = qv('0.903.1');
+our $VERSION = qv('0.905.3');
 
 sub name {
     return 'Mojito translation server (http://www.mojito.global/) synchronization plugin';
@@ -26,7 +26,7 @@ sub init {
         project_id             => 'STRING',
         application_properties => 'STRING',
         source_files_path      => 'STRING',
-        source_language        => 'STRING',
+        source_locale          => 'STRING',
         localized_files_path   => 'STRING',
         import_translations    => 'BOOLEAN',
         inheritance_mode       => 'STRING',
@@ -67,11 +67,10 @@ sub validate_data {
     die "'localized_files_path', which is set to '$self->{data}->{localized_files_path}', does not point to a valid directory.\n" unless -d $self->{data}->{localized_files_path};
 
     $self->{data}->{import_translations} = 1 unless defined $self->{data}->{import_translations};
-    $self->{data}->{source_language} = 'en' unless defined $self->{data}->{source_language};
     $self->{data}->{inheritance_mode} = 'REMOVE_UNTRANSLATED' unless defined $self->{data}->{inheritance_mode};
     $self->{data}->{status_pull} = 'ACCEPTED' unless defined $self->{data}->{status_pull};
 
-    if (!exists $self->{data}->{destination_locales} or scalar(@{$self->{data}->{destination_locales}}) == 0) {
+    if (!defined $self->{data}->{destination_locales} or scalar(@{$self->{data}->{destination_locales}}) == 0) {
         die "the list of destination languages is empty";
     }
 }
@@ -87,10 +86,12 @@ sub run_mojito_cli {
         $command .= ' --spring.config.location='.$self->{data}->{application_properties};
     }
 
-    if ($langs) {
-        my @localizable_langs = grep { $_ ne $self->{data}->{source_language} } @$langs;
+    if (defined $self->{data}->{source_locale}) {
+        $command .= ' -sl '.$self->{data}->{source_locale};
+    }
 
-        my @locale_mapping = map {$self->get_mojito_locale_mapping($_)} @localizable_langs;
+    if ($langs) {
+        my @locale_mapping = map {$self->get_mojito_locale_mapping($_)} @$langs;
 
         my $locale_mapping_as_string = join(',', @locale_mapping);
 

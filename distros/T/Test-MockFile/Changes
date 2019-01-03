@@ -1,5 +1,13 @@
 Revision history for Test-MockFile
 
+0.017
+ - Require a newer Test2::Bundle::Extended (0.000084) to support named isa_ok
+
+0.016
+ - Bump Overload::FileCheck to 0.007 to address stack bug
+ - Try to get EISDIR handling for BSD working. Apparently something changed in perl 5.20?
+ - Do not do access hooks on filehandle interactions.
+
 0.015   12/21/2018
  - Remove errant debug messages from open
  - Pass 3 to fix t/touch.t on BSD.

@@ -3,7 +3,7 @@ NAME
     files without touching the file system.
 
 VERSION
-    Version 0.015
+    Version 0.017
 
 SYNOPSIS
     Intercepts file system calls for specific files so unit testing can take
@@ -16,7 +16,7 @@ SYNOPSIS
     A strict mode is even provided which can throw a die when files are
     accessed during your tests!
 
-        # Loaded before Test::MockModule so uses the core perl functions without any hooks.
+        # Loaded before Test::MockFile so uses the core perl functions without any hooks.
         use Module::I::Dont::Want::To::Alter;
 
         use Test::MockFile;
@@ -119,7 +119,7 @@ SUBROUTINES/METHODS
   Mock Stats
     When creating mocked files or directories, we default their stats to:
 
-        Test::MockModule->new( $file, $contents, {
+        Test::MockFile->new( $file, $contents, {
                 'dev'       => 0,        # stat[0]
                 'inode'     => 0,        # stat[1]
                 'mode'      => $mode,    # stat[2]
@@ -143,9 +143,9 @@ SUBROUTINES/METHODS
     specify that when you declare the file or directory. The rest will
     continue to default.
 
-        Test::MockModule->file("/root/abc", "...", {inode => 65, uid => 123, mtime => int((2000-1970) * 365.25 * 24 * 60 * 60 }));
+        Test::MockFile->file("/root/abc", "...", {inode => 65, uid => 123, mtime => int((2000-1970) * 365.25 * 24 * 60 * 60 }));
 
-        Test::MockModule->dir("/sbin", "...", { mode => 0700 }));
+        Test::MockFile->dir("/sbin", "...", { mode => 0700 }));
 
   new
     This class method is called by file/symlink/dir. There is no good reason
@@ -248,7 +248,7 @@ SUBROUTINES/METHODS
     add_file_access_hook
 
   How this mocking is done:
-    Test::MockModule uses 2 methods to mock file access:
+    Test::MockFile uses 2 methods to mock file access:
 
    -X via Overload::FileCheck
     It is currently not possible in pure perl to override stat
@@ -274,7 +274,7 @@ SUBROUTINES/METHODS
     Any code which is loaded AFTER this happens will use the alternate open.
     This means you can place your "use Test::MockFile" statement after
     statements you don't want to be mocked and there is no risk that the
-    code will ever be altered by Test::MockModule.
+    code will ever be altered by Test::MockFile.
 
     We oveload the following statements and then return tied handles to
     enable the rest of the IO functions to work properly. Only open /

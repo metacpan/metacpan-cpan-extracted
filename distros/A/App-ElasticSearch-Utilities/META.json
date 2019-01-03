@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.013002"
+            "perl" : "5.010"
          }
       },
       "develop" : {
@@ -72,7 +72,7 @@
             "feature" : "0",
             "namespace::autoclean" : "0",
             "parent" : "0",
-            "perl" : "5.013002",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -85,7 +85,7 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
-            "perl" : "5.013002"
+            "perl" : "5.010"
          }
       }
    },
@@ -100,7 +100,7 @@
          "web" : "https://github.com/reyjrar/es-utils"
       }
    },
-   "version" : "6.3",
+   "version" : "6.4",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -550,7 +550,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release-6.3",
+                  "tag" : "release-6.4",
                   "tag_format" : "release-%v",
                   "tag_message" : "v%v"
                },

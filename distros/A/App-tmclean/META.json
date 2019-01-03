@@ -45,7 +45,6 @@
          "requires" : {
             "Class::Accessor::Lite" : "0",
             "HTTP::Date" : "0",
-            "Hash::Rename" : "0",
             "perl" : "5.010"
          }
       },
@@ -58,7 +57,7 @@
    "provides" : {
       "App::tmclean" : {
          "file" : "lib/App/tmclean.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.3"
       }
    },
    "release_status" : "stable",
@@ -72,7 +71,7 @@
          "web" : "https://github.com/Songmu/App-tmclean"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.3",
    "x_authority" : "cpan:SONGMU",
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1

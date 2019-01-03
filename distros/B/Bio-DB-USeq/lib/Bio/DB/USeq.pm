@@ -1,6 +1,6 @@
 package Bio::DB::USeq;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 =head1 NAME
 
@@ -576,6 +576,8 @@ or interval. These support the following methods.
 =item get_seq_stream($type)
 
 =item scores
+
+=item observations
 
 Direct methods for returning features or scores. Coordinate information 
 need not be provided. See the corresponding Bio::DB::USeq methods for 
@@ -1347,9 +1349,22 @@ sub scores {
 	$self->_clear_buffer(\@slices);
 	
 	# collect the scores from each of the requested slices
-	my $scores = $self->_scores($start, $stop, \@slices);
+	my @scores;
+	foreach my $slice (@slices) {
+		
+		# load and unpack the data
+		$self->_load_slice($slice);
+		
+		# find the overlapping observations
+		my $results = $self->{'buffer'}{$slice}->fetch($start - 1, $stop);
+		
+		# record the scores
+		foreach my $r (@$results) {
+			push @scores, $r->[2] if defined $r->[2];
+		}
+	}
 	
-	return wantarray ? @$scores : $scores;
+	return wantarray ? @scores : \@scores;
 }
 
 sub observations {
@@ -2106,29 +2121,6 @@ sub _load_isft_slice {
 	$self->{buffer}{$slice} = $tree;
 }
 
-sub _scores {
-	my $self = shift;
-	my ($start, $stop, $slices) = @_;
-	return unless @$slices;
-	
-	# collect the scores from each of the requested slices
-	my @scores;
-	foreach my $slice (@$slices) {
-		
-		# load and unpack the data
-		$self->_load_slice($slice);
-		
-		# find the overlapping observations
-		my $results = $self->{'buffer'}{$slice}->fetch($start - 1, $stop);
-		
-		# record the scores
-		foreach my $r (@$results) {
-			push @scores, $r->[2] if defined $r->[2];
-		}
-	}
-	return \@scores;
-}
-
 sub _mean_score {
 	my $self = shift;
 	my ($start, $stop, $slices) = @_;
@@ -2394,6 +2386,16 @@ sub statistical_summary {
 	my $bins = shift;
 	$bins ||= 1;
 	return $self->features("summary:$bins");
+}
+
+sub observations {
+	my $self = shift;
+	return $self->{'useq'}->observations(
+		-seq_id => $self->seq_id,
+		-start  => $self->start,
+		-end    => $self->end,
+		-strand => $self->strand,
+	);
 }
 
 

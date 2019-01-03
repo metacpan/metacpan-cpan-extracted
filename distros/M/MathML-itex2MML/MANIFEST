@@ -4,7 +4,7 @@ README
 Todo
 Changes
 lib/MathML/itex2MML.pm
-t/test.pl
+t/test.t
 itex2MML.h
 itex2MML_perl.c
 lex.yy.c

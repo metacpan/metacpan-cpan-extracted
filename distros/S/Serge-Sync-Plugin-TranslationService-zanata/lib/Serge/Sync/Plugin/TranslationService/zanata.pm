@@ -1,5 +1,4 @@
-# ABSTRACT: Serge Zanata translation server (http://zanata.org/) synchronization plugin
-#           Tested with zanata-cli v4.6+
+# ABSTRACT: Zanata (http://zanata.org/) synchronization plugin for Serge
 
 package Serge::Sync::Plugin::TranslationService::zanata;
 
@@ -10,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.905.3');
+our $VERSION = qv('0.905.5');
 
 sub name {
     return 'Zanata translation server (http://zanata.org/) synchronization plugin';

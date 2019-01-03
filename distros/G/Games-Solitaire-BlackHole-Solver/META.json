@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "ai",
       "automated",
@@ -17,6 +17,7 @@
       "Parlett",
       "dfs",
       "games",
+      "golf",
       "hole",
       "patience",
       "solitaire",
@@ -46,8 +47,9 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
             "Test::EOL" : "0",
-            "Test::Kwalitee::Extra" : "0",
+            "Test::Kwalitee" : "1.21",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
@@ -59,7 +61,7 @@
          "requires" : {
             "Getopt::Long" : "2.36",
             "Pod::Usage" : "0",
-            "perl" : "5.008",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -69,19 +71,24 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.88",
-            "blib" : "1.01"
+            "Path::Tiny" : "0",
+            "Socket" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Games::Solitaire::BlackHole::Solver" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.2.1"
       },
       "Games::Solitaire::BlackHole::Solver::App" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/App.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.2.1"
+      },
+      "Games::Solitaire::BlackHole::Solver::Golf::App" : {
+         "file" : "lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm",
+         "version" : "v0.2.1"
       }
    },
    "release_status" : "stable",
@@ -96,10 +103,10 @@
          "web" : "https://github.com/shlomif/black-hole-solitaire"
       }
    },
-   "version" : "0.0.4",
+   "version" : "0.2.1",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.024001"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
@@ -111,17 +118,17 @@
                }
             },
             "name" : "@Filter/TestMoreDoneTesting",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@Filter/AutoPrereqs",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Filter/ExecDir",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -137,27 +144,27 @@
                }
             },
             "name" : "@Filter/GatherDir",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Filter/ManifestSkip",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Filter/MetaYAML",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
             "name" : "@Filter/PruneCruft",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Filter/Readme",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -172,32 +179,32 @@
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Filter/ShareDir",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
             "name" : "@Filter/CheckChangesHasContent",
-            "version" : "0.010"
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Filter/ConfirmRelease",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Filter/Manifest",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Filter/MetaConfig",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Filter/MetaJSON",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -207,29 +214,29 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.008"
+                        "version" : "6.012"
                      }
                   ],
                   "include_underscores" : 0
                },
                "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002003",
-                  "inherit_missing" : "1",
-                  "inherit_version" : "1",
-                  "meta_noindex" : "1"
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000031",
-                  "version" : "0.004"
+                  "Module::Metadata" : "1.000033",
+                  "version" : "0.006"
                }
             },
             "name" : "@Filter/MetaProvides::Package",
-            "version" : "2.004002"
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@Filter/MetaResources",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ModuleBuild",
@@ -239,33 +246,33 @@
                }
             },
             "name" : "@Filter/ModuleBuild",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PkgVersion",
             "name" : "@Filter/PkgVersion",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Filter/PodCoverageTests",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Filter/PodSyntaxTests",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodVersion",
             "name" : "@Filter/PodVersion",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
             "config" : {
                "Dist::Zilla::Plugin::Test::Compile" : {
-                  "bail_out_on_fail" : "0",
+                  "bail_out_on_fail" : 0,
                   "fail_on_warning" : "author",
                   "fake_home" : 0,
                   "filename" : "t/00-compile.t",
@@ -282,7 +289,7 @@
                }
             },
             "name" : "@Filter/Test::Compile",
-            "version" : "2.056"
+            "version" : "2.058"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
@@ -326,11 +333,6 @@
             "version" : "0.15"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Kwalitee::Extra",
-            "name" : "@Filter/Test::Kwalitee::Extra",
-            "version" : "v0.2.1"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::TrailingSpace",
             "name" : "@Filter/Test::TrailingSpace",
             "version" : "0.2.0"
@@ -338,7 +340,7 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Filter/TestRelease",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -432,7 +434,7 @@
                      {
                         "class" : "Pod::Weaver::Section::Support",
                         "name" : "Support",
-                        "version" : "1.007"
+                        "version" : "1.010"
                      }
                   ]
                }
@@ -443,12 +445,12 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "ExecDir",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Keywords",
@@ -466,6 +468,7 @@
                      "Parlett",
                      "dfs",
                      "games",
+                     "golf",
                      "hole",
                      "patience",
                      "solitaire",
@@ -486,72 +489,89 @@
                }
             },
             "name" : "Runtime",
-            "version" : "6.008"
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Kwalitee" : {
+                  "filename" : "xt/release/kwalitee.t",
+                  "skiptest" : []
+               }
+            },
+            "name" : "Test::Kwalitee",
+            "version" : "2.12"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::TidyAll",
+            "name" : "Test::TidyAll",
+            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.008"
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.008"
+            "version" : "6.012"
          }
       ],
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "0"
+            "is_trial" : 0
          },
-         "version" : "6.008"
+         "version" : "6.012"
       }
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

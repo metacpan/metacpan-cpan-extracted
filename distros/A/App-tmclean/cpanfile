@@ -1,6 +1,5 @@
 requires 'Class::Accessor::Lite';
 requires 'HTTP::Date';
-requires 'Hash::Rename';
 requires 'perl', '5.010';
 
 on configure => sub {

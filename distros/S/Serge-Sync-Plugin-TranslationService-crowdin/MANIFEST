@@ -5,6 +5,8 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+README.mkdn
+doc/pod/crowdin.pod
 lib/Serge/Sync/Plugin/TranslationService/crowdin.pm
 t/00-compile.t
 t/data/plugins/crowdin/00/commands/pull.json

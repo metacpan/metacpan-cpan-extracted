@@ -1,3 +1,18 @@
+Version 0.009 - 2019-01-02
+ - Fix several bugs related to multi-line headers
+ - Also allow 'input' to be a Spreadsheet::ParseExcel::Workbook
+ - Auto-detection support for ::Decoder::HTML companion module
+
+Version 0.008 - 2018-11-28
+ - 'input' attribute may now be a Spreadsheet::ParseExcel::Worksheet
+ - When specifying 'decoder' attribute as an arrayref or hashref,
+   the CLASS argument is now optional, allowing auto-detection while
+   still supplying extre optional attributes for the decoder.
+ - Wrokaround for Libre Office row-max bug
+ - New Decoder::XLSX attribute 'xls_formatter', useful for casting
+   local datetimes to a known time zone.
+ - Prevent loading Text::CSV_XS if its version is too old.
+
 Version 0.007 - 2018-03-15
  - Fix various bugs in detect_input_format relevant to CSV files
  - Enhanced debug-level logging during the table search algorighm

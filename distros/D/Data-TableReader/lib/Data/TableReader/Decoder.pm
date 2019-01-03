@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder;
-$Data::TableReader::Decoder::VERSION = '0.008';
+$Data::TableReader::Decoder::VERSION = '0.009';
 use Moo 2;
 
 # ABSTRACT: Base class for table decoders
@@ -9,6 +9,18 @@ has file_name   => ( is => 'ro', required => 1 );
 has file_handle => ( is => 'ro', required => 1 );
 has _log        => ( is => 'ro', required => 1 );
 *log= *_log; # back-compat, but deprecated since it doesn't match ->log on TableReader
+
+sub _first_sufficient_module {
+	my ($name, $modules, $req_versions)= @_;
+	require Module::Runtime;
+	for my $mod (@$modules) {
+		my ($pkg, $ver)= ref $mod eq 'ARRAY'? @$mod : ( $mod, 0 );
+		return $pkg if Module::Runtime::use_module($pkg, $ver);
+	}
+	require Carp;
+	Carp::croak "No $name available (or of sufficient version); install one of: "
+		.join(', ', map +(ref $_ eq 'ARRAY'? "$_->[0] >= $_->[1]" : $_), @$modules);
+}
 
 1;
 
@@ -24,7 +36,7 @@ Data::TableReader::Decoder - Base class for table decoders
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -62,7 +74,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

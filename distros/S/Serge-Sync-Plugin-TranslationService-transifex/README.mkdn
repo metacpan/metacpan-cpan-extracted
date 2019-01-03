@@ -1,0 +1,33 @@
+# NAME
+
+Serge::Sync::Plugin::TranslationService::transifex - [Transifex](https://www.transifex.com) synchronization plugin for [Serge](https://serge.io/)
+
+# SYNOPSIS
+
+    ts
+    {
+        plugin                      transifex
+
+        data
+        {
+            root_directory          ./files
+        }
+    }
+
+# DESCRIPTION
+
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Transifex (Localization Automation Platform that powers the process of launching digital products into multiple languages).
+
+# INSTALLATION
+
+    cpanm Serge::Sync::Plugin::TranslationService::transifex
+
+# AUTHOR
+
+Dragos Varovici <dvarovici.work@gmail.com>
+
+# COPYRIGHT AND LICENSE
+This software is copyright (c) 2018-2019 by Dragos Varovici.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

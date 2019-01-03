@@ -65,7 +65,7 @@
          "web" : "https://github.com/ology/Test-NaiveStubs"
       }
    },
-   "version" : "0.0701",
+   "version" : "0.0702",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

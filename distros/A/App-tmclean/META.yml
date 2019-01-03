@@ -26,17 +26,16 @@ no_index:
 provides:
   App::tmclean:
     file: lib/App/tmclean.pm
-    version: v0.0.1
+    version: v0.0.3
 requires:
   Class::Accessor::Lite: '0'
   HTTP::Date: '0'
-  Hash::Rename: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/Songmu/App-tmclean/issues
   homepage: https://github.com/Songmu/App-tmclean
   repository: git://github.com/Songmu/App-tmclean.git
-version: v0.0.1
+version: v0.0.3
 x_authority: cpan:SONGMU
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

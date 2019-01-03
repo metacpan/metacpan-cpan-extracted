@@ -1,5 +1,7 @@
 Bio::DB::USeq Change Log
 
+0.25    * Add observations convenience method to Segments objects.
+
 0.24    * Implemented Interval Trees for much faster lookup of slices and 
           observations when collecting data. The side effect is that observations 
           may not be returned in the original genomic order. This will not affect 

@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::TSV;
-$Data::TableReader::Decoder::TSV::VERSION = '0.008';
+$Data::TableReader::Decoder::TSV::VERSION = '0.009';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -36,7 +36,7 @@ Data::TableReader::Decoder::TSV - Access rows of a tab-delimited text file
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 DESCRIPTION
 
@@ -57,7 +57,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

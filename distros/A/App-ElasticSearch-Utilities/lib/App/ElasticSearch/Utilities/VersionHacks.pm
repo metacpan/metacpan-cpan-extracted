@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::VersionHacks;
 use strict;
 use warnings;
 
-our $VERSION = '6.3'; # VERSION
+our $VERSION = '6.4'; # VERSION
 
 use Const::Fast;
 use CLI::Helpers qw(:all);
@@ -162,7 +162,7 @@ App::ElasticSearch::Utilities::VersionHacks - Fix version issues to support all 
 
 =head1 VERSION
 
-version 6.3
+version 6.4
 
 =head1 AUTHOR
 
@@ -170,7 +170,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Brad Lhotsky.
+This software is Copyright (c) 2019 by Brad Lhotsky.
 
 This is free software, licensed under:
 
