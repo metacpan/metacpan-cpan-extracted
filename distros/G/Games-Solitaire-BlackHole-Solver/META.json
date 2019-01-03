@@ -80,15 +80,15 @@
    "provides" : {
       "Games::Solitaire::BlackHole::Solver" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       },
       "Games::Solitaire::BlackHole::Solver::App" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/App.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       },
       "Games::Solitaire::BlackHole::Solver::Golf::App" : {
          "file" : "lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -103,7 +103,7 @@
          "web" : "https://github.com/shlomif/black-hole-solitaire"
       }
    },
-   "version" : "0.2.1",
+   "version" : "0.2.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"

@@ -1,5 +1,10 @@
 Revision history for Text-Parser
 
+0.752     2019-01-02 20:25:16-08:00 America/Los_Angeles
+  - One test fails for superuser. Fixing that.
+  - Known issue in MSWin32 seems related to the same thing. Don't know if it gets fixed.
+  - Made POD less verbose.
+
 0.751     2019-01-01 20:30:37-08:00 America/Los_Angeles
   - Documentation looks better. Made links where it makes sense. Re-arranged the information better.
 

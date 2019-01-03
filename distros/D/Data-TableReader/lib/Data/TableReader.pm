@@ -1,5 +1,5 @@
 package Data::TableReader;
-$Data::TableReader::VERSION = '0.009';
+$Data::TableReader::VERSION = '0.010';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -689,7 +689,7 @@ Data::TableReader - Extract records from "dirty" tabular data sources
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

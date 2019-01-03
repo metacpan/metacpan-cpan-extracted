@@ -15,7 +15,7 @@ use XML::LibXML::PrettyPrint;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = 0.07;
+our $VERSION = '0.12';
 
 sub abstract {
     return "build index for an OPM repository";
@@ -30,6 +30,7 @@ sub validate_args {
     
     $self->usage_error( 'need path to directory that contains opm files' ) if
         !$args ||
+        'ARRAY' ne ref $args ||
         !$args->[0] ||
         !-d $args->[0];
 }
@@ -131,7 +132,7 @@ OTRS::OPM::Maker::Command::index - Build index for an OPM repository
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 AUTHOR
 

@@ -1,4 +1,18 @@
-1.53 (2018-10-2)
+1.54 (2019-01-03)
+  [ Damyan Ivanov ]
+  * comment out the test client config example of message-template
+  * use_ssl: 0 in the example test server configs
+
+  [ gregor herrmann ]
+  * script/kgb-bot: use $client_ip->ip in webhook error message
+    like in the debug message.
+    Thanks to James Clarke for the suggestion.
+
+  [ Damyan Ivanov ]
+  * kgb-bot: convert ::ffff:a.b.c.d to a.b.c.d before looking up client ip in
+    the white list
+
+1.53 (2018-10-13)
   [ Damyan Ivanov ]
   * drop port: option from default config
   * add port to the test server IRC config now that 6697 us the default

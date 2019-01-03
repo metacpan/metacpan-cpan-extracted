@@ -7,7 +7,7 @@ use 5.012;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Bundles common text reading tasks. Stop re-writing mundane code to parse your next text file. This module supersedes the older and now defunct TextFileParser.",
+  "ABSTRACT" => "Bare text parser, bundles other common \"mundane\" tasks.",
   "AUTHOR" => "Balaji Ramasubramanian <balajiram\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.751",
+  "VERSION" => "0.752",
   "test" => {
     "TESTS" => "t/*.t"
   }

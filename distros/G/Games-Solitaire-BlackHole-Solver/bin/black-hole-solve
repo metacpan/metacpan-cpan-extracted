@@ -19,7 +19,7 @@ black-hole-solve - a solver for Black Hole Solitaire deals.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ This is a solver for Black Hole solitaire.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SEE ALSO
 

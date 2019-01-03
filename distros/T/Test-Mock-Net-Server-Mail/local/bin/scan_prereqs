@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+package Perl::PrereqScanner::App;
+# ABSTRACT: scan your working dir for likely prereqs
+$Perl::PrereqScanner::App::VERSION = '1.023';
+use strict;
+use warnings;
+
+use File::Find;
+use File::Spec::Functions qw{ catdir updir };
+use FindBin qw{ $Bin };
+use lib catdir( $Bin, updir, 'lib' );
+
+use List::Util qw{ max };
+use Perl::PrereqScanner;
+use CPAN::Meta::Requirements ();
+
+use Getopt::Long qw{ GetOptions };
+my %options;
+GetOptions(
+  \%options,
+  'combine!',
+);
+my $combined = $options{combine} && CPAN::Meta::Requirements->new;
+
+foreach my $file ( @ARGV ? @ARGV : '.' ) {
+    -d $file ? scan_dir( $file ) : scan_file( $file );
+}
+
+sub scan_dir {
+    find( {
+        no_chdir => 1, 
+        wanted => sub { scan_file($_) if /\.(pl|pm|psgi|t)$/ && -f $_; }
+    }, shift );
+}
+
+sub scan_file {
+    my $file = shift;
+    my $prereqs = Perl::PrereqScanner->new->scan_file($file);
+    if( $options{combine} ){
+        $combined->add_requirements($prereqs);
+    }
+    else {
+        print "* $file\n";
+        print_prereqs($prereqs);
+    }
+}
+
+if( $options{combine} ){
+    print_prereqs($combined);
+}
+
+sub print_prereqs {
+    my $prereqs = shift->as_string_hash;
+    my $max = max map { length } keys %$prereqs;
+    printf( "%-${max}s = %s\n", $_, $prereqs->{$_} )
+        for sort keys %$prereqs;
+}
+
+exit;
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     scan_prereqs [--combine] [DIRS|FILES]
+#pod
+#pod Directories are traversed with L<File::Find> to collect all C<.pl>, C<.pm>,
+#pod C<.psgi> and C<.t> files. If no directories or files are specified, the current
+#pod working directory is scanned.
+#pod
+#pod =cut
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perl::PrereqScanner::App - scan your working dir for likely prereqs
+
+=head1 VERSION
+
+version 1.023
+
+=head1 SYNOPSIS
+
+    scan_prereqs [--combine] [DIRS|FILES]
+
+Directories are traversed with L<File::Find> to collect all C<.pl>, C<.pm>,
+C<.psgi> and C<.t> files. If no directories or files are specified, the current
+working directory is scanned.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Jerome Quelin
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2009 by Jerome Quelin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

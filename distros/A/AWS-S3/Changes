@@ -1,6 +1,9 @@
 
 Changelog for perl module AWS::S3
 
+0.16 2019-01-03
+  - Remove dependency on Iterator::Paged
+
 0.15 2018-04-20
   - More fixes for ->add_bucket. Fix an error when no location is provided or
     us-east-1 is explicitly asked for. Patch by Dave Rolsky. (GH #9)

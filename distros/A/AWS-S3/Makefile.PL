@@ -25,7 +25,6 @@ WriteMakefile(
         'MIME::Base64'               => 0,
         'URI::Escape'                => 0,
         'Digest::HMAC_SHA1'          => 0,
-        'Iterator::Paged'            => 0,
         'Test::Deep'                 => 0,
         'JSON::XS'                   => 0,
       },

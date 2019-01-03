@@ -5,15 +5,91 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
-our (%ERROR, $caller);
+our (%ERROR, %METH, $caller);
+
 BEGIN {
 	%ERROR = (
 		invalid_key => 'A miserable death %s - %s - %s',
 		invalid_index => 'A slightly more miserable death %s - %s - %s',
 		invalid_method => 'A horrible horrible miserable death %s - %s - %s',
 		allow_meth_keys => 'jump from a high building',
+	);
+	%METH = (
+		extract_path => sub {
+			my ($follow, $end, $data, @path) = @_;
+
+			if (scalar @path && !$end) {
+				my ($key, $ref) = (shift @path, ref $data);
+				$follow = sprintf "%s/%s", $follow, $key;
+				if ($ref eq 'HASH') {
+					$data = $data->{$key};
+					$METH{error}->('invalid_key', $key, $follow) if ! defined $data;
+				}
+				elsif ( $ref eq 'ARRAY' ) {
+					$data = $data->[$key - 1];
+					$METH{error}->('invalid_index', $key, $follow) if ! defined $data;
+				}
+				elsif ( $ref && blessed $data ) {
+					my ($meth, $params) = $METH{meth_params}->($key, $data);
+					$data = $data->$meth(@{ $params });
+					$METH{error}->('invalid_method', $key, $follow) if ! defined $data;
+				}
+				else {
+					$METH{error}->('invalid_path', $key, $follow) if (exists $ERROR{invalid_path});
+					$end = 1;
+				}
+				return $METH{extract_path}->($follow, $end, $data, @path);
+			}
+
+			return $data;
+		},
+		unescape => sub {
+			$_[0] =~ s/^\///g;
+			$_[0] =~ s/\+/ /g;
+			$_[0] =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+			return $_[0];
+		},
+		meth_params => sub {
+			my ($key, $obj) = @_;
+			my ($method, $args) = $key =~ /^(.*?)\((.*)\)$/;
+			$args = $METH{generate_params}->($args, $obj);
+			return ($method, $args);
+		},
+		generate_params => sub {
+			my ($string, $obj, @world, $current) = @_;
+			foreach ( split /(?![^\(\[\{]+[\]\}\)]),/, $string ) {
+				if ( $_ =~ m/^\s*\[\s*(.*)\]/ ) {
+					$current = $METH{generate_params}->($1, $obj);
+					push @world, $current;
+				}
+				elsif ( $_ =~ m/^\s*\{\s*(.*)\s*\}/ ) {
+					$current = {};
+					my %temp = split '=>', $1;
+					do { $current->{$METH{generate_params}->(defined $ERROR{allow_meth_keys} ? sprintf("'%s'", $_) : ($_, $obj))->[0] } = $METH{generate_params}->($temp{$_}, $obj)->[0] } for keys %temp;
+					push @world, $current;
+				}
+				elsif ( ($_ =~ m/^\s*(\d+)\s*$/) || ($_ =~ m/^\s*[\'\"]+\s*(.*?)\s*[\'\"]+\s*$/) ) {
+					push @world, $1;
+				}
+				else {
+					my $ex = $_ =~ s/^\s*\&//;
+					my ($method, $args) = $_ =~ /^\s*(.*?)\((.*)\)$/;
+					($method) = $_ =~ m/\s*(.*)\s*/ unless $method;
+					$args = $args ? $METH{generate_params}->($args, $obj) : [];
+					push @world, $ex ? do { no strict 'refs'; *{"${caller}::${method}"}->(@{ $args }); } : $obj->$method(@{ $args });
+				}
+			}
+			return \@world;
+		},
+		error => sub {
+			my ($error) = @_;
+			my $find = $ERROR{$error};
+			return ref $find eq 'CODE'
+				? $find->(@_)
+				: die sprintf $find, @_;
+		}
 	);
 }
 
@@ -37,90 +113,11 @@ sub import {
 
 sub lnpath {
 	my ($data, $key) = @_;
-	my $val = eval { _extract_path('', 0, $data, split '/', _unescape($key)) };
+	my $val = eval { $METH{extract_path}->('', 0, $data, split '/', $METH{unescape}->($key)) };
 	if ($@ && !$ERROR{no_error}) {
 		die $@;
 	}
 	return $val;
-}
-
-sub _unescape {
-	$_[0] =~ s/^\///g;
-	$_[0] =~ s/\+/ /g;
-	$_[0] =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
-	return $_[0];
-}
-
-sub _extract_path {
-	my ($follow, $end, $data, @path) = @_;
-
-	if (scalar @path && !$end) {
-		my ($key, $ref) = (shift @path, ref $data);
-		$follow = sprintf "%s/%s", $follow, $key;
-		if ($ref eq 'HASH') {
-			$data = $data->{$key};
-			_error('invalid_key', $key, $follow) if ! defined $data;
-		}
-		elsif ( $ref eq 'ARRAY' ) {
-			$data = $data->[$key - 1];
-			_error('invalid_index', $key, $follow) if ! defined $data;
-		}
-		elsif ( $ref && blessed $data ) {
-			my ($meth, $params) = _meth_params($key, $data);
-			$data = $data->$meth(@{ $params });
-			_error('invalid_method', $key, $follow) if ! defined $data;
-		}
-		else {
-
-			_error('invalid_path', $key, $follow) if (exists $ERROR{invalid_path});
-			$end = 1;
-		}
-		return _extract_path($follow, $end, $data, @path);
-	}
-
-	return $data;
-}
-
-sub _meth_params {
-	my ($key, $obj) = @_;
-	my ($method, $args) = $key =~ /^(.*?)\((.*)\)$/;
-	$args = _generate_params($args, $obj);
-	return ($method, $args);
-}
-
-sub _generate_params {
-	my ($string, $obj, @world, $current) = @_;
-	foreach ( split /(?![^\(\[\{]+[\]\}\)]),/, $string ) {
-		if ( $_ =~ m/^\s*\[\s*(.*)\]/ ) {
-			$current = _generate_params($1, $obj);
-			push @world, $current;
-		}
-		elsif ( $_ =~ m/^\s*\{\s*(.*)\s*\}/ ) {
-			$current = {};
-			my %temp = split '=>', $1;
-			do { $current->{_generate_params( defined $ERROR{allow_meth_keys} ? sprintf("'%s'", $_) : ($_, $obj))->[0] } = _generate_params($temp{$_}, $obj)->[0] } for keys %temp;
-			push @world, $current;
-		}
-		elsif ( ($_ =~ m/^\s*(\d+)\s*$/) || ($_ =~ m/^\s*[\'\"]+\s*(.*?)\s*[\'\"]+\s*$/) ) {
-			push @world, $1;
-		}
-		else {
-			my $ex = $_ =~ s/^\s*\&//;
-			my ($method, $args) = $_ =~ /^\s*(.*?)\((.*)\)$/;
-			($method) = $_ =~ m/\s*(.*)\s*/ unless $method;
-			$args = $args ? _generate_params($args, $obj) : [];
-			push @world, $ex ? do { no strict 'refs'; *{"${caller}::${method}"}->(@{ $args }); } : $obj->$method(@{ $args });
-		}
-	}
-	return \@world;
-}
-
-sub _error {
-	my ($error) = @_;
-	my $find = $ERROR{$error};
-	return ref $find eq 'CODE'
-		? $find->(@_)
-		: die sprintf $find, @_;
 }
 
 =head1 NAME
@@ -129,7 +126,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 

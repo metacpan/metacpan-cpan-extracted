@@ -82,6 +82,6 @@
          "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
       ]
    },
-   "version" : "1.53",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.54",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

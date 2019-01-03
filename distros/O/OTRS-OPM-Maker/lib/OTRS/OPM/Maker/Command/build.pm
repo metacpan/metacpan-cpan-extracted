@@ -12,7 +12,7 @@ use XML::LibXML;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = 0.07;
+our $VERSION = '0.12';
 
 sub abstract {
     return "build package files for OTRS";
@@ -33,9 +33,10 @@ sub validate_args {
     my ($self, $opt, $args) = @_;
     
     $self->usage_error( 'need path to .sopm' ) if
-        !$args ||
-        !$args->[0] ||
-        !$args->[0] =~ /\.sopm\z/ ||
+        !$args or 
+        'ARRAY' ne ref $args or
+        !defined $args->[0] or
+        $args->[0] !~ /\.sopm\z/ or
         !-f $args->[0];
 }
 
@@ -89,10 +90,14 @@ sub execute {
     my $package_name = $root_elem->findvalue( 'Name' );
     my $file_name    = sprintf "%s-%s.opm", $package_name, $version->textContent;
     
-    my $output_path = $opt->{output} || $path;
+    my $output_path = $opt->{output};
+    $output_path    = $path if !$output_path;
+
     my $opm_path    = Path::Class::File->new( $output_path, $file_name );
     my $fh          = $opm_path->openw;
     $fh->print( $tree->toString );
+
+    return $opm_path->stringify;
 }
 
 1;
@@ -109,7 +114,7 @@ OTRS::OPM::Maker::Command::build - Build OTRS packages
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 AUTHOR
 

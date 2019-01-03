@@ -486,9 +486,12 @@ BOOT:
 }
 
 void
-new(class)
+new(class, args)
         char *class
+        HV *args
     PPCODE:
+        dMY_CXT;
+
         (void)class;
         AnyEvent__YACurl *client;
 
@@ -507,7 +510,73 @@ new(class)
         curl_multi_setopt(client->multi, CURLMOPT_SOCKETDATA, (void*)client->weak_self_ref);
         curl_multi_setopt(client->multi, CURLMOPT_TIMERDATA, (void*)client->weak_self_ref);
 
-        curl_multi_setopt(client->multi, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX); /* XXX */
+        {
+            hv_iterinit(args);
+            HE *iterentry;
+            while ((iterentry = hv_iternext(args)) != NULL) {
+                long opt;
+                int opt_from_str;
+                SV *key = HeSVKEY_force(iterentry);
+                opt = option_from_sv_or_croak(aTHX_ aMY_CXT_ key, HeHASH(iterentry), &opt_from_str);
+
+                switch (opt) {
+                    /* Longs */
+                    case CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE:
+                    case CURLMOPT_CONTENT_LENGTH_PENALTY_SIZE:
+                    case CURLMOPT_MAX_HOST_CONNECTIONS:
+                    case CURLMOPT_MAX_PIPELINE_LENGTH:
+                    case CURLMOPT_MAX_TOTAL_CONNECTIONS:
+                    case CURLMOPT_MAXCONNECTS:
+                    case CURLMOPT_PIPELINING:
+                    {
+                        long value = SvIV(HeVAL(iterentry));
+                        CURLMcode mcode = curl_multi_setopt(client->multi, opt, value);
+                        if (mcode != CURLM_OK) {
+                            croak("Failed to set %d (%s): %s", opt, SvPV_nolen(key), curl_multi_strerror(mcode));
+                        }
+                        break;
+                    }
+
+                    /* String arrays */
+                    case CURLMOPT_PIPELINING_SITE_BL:
+                    case CURLMOPT_PIPELINING_SERVER_BL:
+                    {
+                        char **strings;
+                        if (!SvROK(HeVAL(iterentry)) || SvTYPE(SvRV(HeVAL(iterentry))) != SVt_PVAV) {
+                            croak("%d (%s): cannot convert value to ARRAYREF", opt, SvPV_nolen(key));
+                        }
+
+                        AV *array = (AV*)SvRV(HeVAL(iterentry));
+                        int arraylen = av_len(array) + 1;
+
+                        Newxz(strings, arraylen+1, char*);
+
+                        int i;
+                        for (i = 0; i < arraylen; i++) {
+                            char *strcopy, *pv;
+                            STRLEN pvlen;
+                            pv = SvPV(*av_fetch(array, i, TRUE), pvlen);
+
+                            Newxz(strcopy, pvlen+1, char);
+                            Copy(pv, strcopy, pvlen, char);
+                            strings[i] = strcopy;
+                        }
+
+                        CURLMcode mcode = curl_multi_setopt(client->multi, opt, strings);
+
+                        for (i = 0; i < arraylen; i++) {
+                            Safefree(strings[i]);
+                        }
+                        Safefree(strings);
+
+                        if (mcode != CURLM_OK) {
+                            croak("Failed to set %d (%s): %s", opt, SvPV_nolen(key), curl_multi_strerror(mcode));
+                        }
+                        break;
+                    }
+                }
+            }
+        }
 
         do_post_work(aTHX_ client);
 

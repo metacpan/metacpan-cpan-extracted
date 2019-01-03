@@ -2,7 +2,7 @@
 #
 # make_test_A_by_B_basic.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
@@ -27,24 +27,15 @@ for my $INPUT_encoding (@io_encoding) {
     for my $OUTPUT_encoding (@io_encoding) {
         my $filename = sprintf("%04d_${OUTPUT_encoding}_by_${INPUT_encoding}.t", $fileno++);
 print STDERR $filename, "\n";
-        mkdir('xt2',0777);
-        mkdir('t',0777);
-        if ($INPUT_encoding eq 'utf8jp') {
-            open(TEST,">t/$filename") || die;
-        }
-        elsif ($OUTPUT_encoding eq 'utf8jp') {
-            open(TEST,">t/$filename") || die;
-        }
-        else {
-            open(TEST,">xt2/$filename") || die;
-        }
+        mkdir('xt',0777);
+        open(TEST,">xt/$filename") || die;
         binmode(TEST);
         printf TEST (<<'END___________________________________________________________________',$filename);
 ######################################################################
 #
 # %s
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;

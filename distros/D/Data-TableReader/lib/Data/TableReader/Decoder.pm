@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder;
-$Data::TableReader::Decoder::VERSION = '0.009';
+$Data::TableReader::Decoder::VERSION = '0.010';
 use Moo 2;
 
 # ABSTRACT: Base class for table decoders
@@ -15,7 +15,7 @@ sub _first_sufficient_module {
 	require Module::Runtime;
 	for my $mod (@$modules) {
 		my ($pkg, $ver)= ref $mod eq 'ARRAY'? @$mod : ( $mod, 0 );
-		return $pkg if Module::Runtime::use_module($pkg, $ver);
+		return $pkg if eval { Module::Runtime::use_module($pkg, $ver) };
 	}
 	require Carp;
 	Carp::croak "No $name available (or of sufficient version); install one of: "
@@ -36,7 +36,7 @@ Data::TableReader::Decoder - Base class for table decoders
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 

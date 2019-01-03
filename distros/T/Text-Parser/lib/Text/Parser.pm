@@ -1,9 +1,9 @@
 use warnings;
 use strict;
 
-package Text::Parser 0.751;
+package Text::Parser 0.752;
 
-# ABSTRACT: Bundles common text reading tasks. Stop re-writing mundane code to parse your next text file. This module supersedes the older and now defunct TextFileParser.
+# ABSTRACT: Bare text parser, bundles other common "mundane" tasks.
 
 use Exporter 'import';
 our (@EXPORT_OK) = ();
@@ -240,11 +240,11 @@ __END__
 
 =head1 NAME
 
-Text::Parser - Bundles common text reading tasks. Stop re-writing mundane code to parse your next text file. This module supersedes the older and now defunct TextFileParser.
+Text::Parser - Bare text parser, bundles other common "mundane" tasks.
 
 =head1 VERSION
 
-version 0.751
+version 0.752
 
 =head1 SYNOPSIS
 
@@ -258,25 +258,23 @@ The above code reads the first command-line argument as a string, and assuming i
 
 =head1 RATIONALE
 
-A simple text file parser should have to only specify the "grammar" of the format it intends to read in the form of a few routines. Everything else, like opening a file handle, reading line by line, or tracking how many lines have been read, should be "automatic". Unfortunately, that's not how most programs seem to work. Most programmers spend (waste?) time writing code that calls C<open>, C<close>, etc., and must keep track of things that should have been simple features of every text file parser. And if they have to read multiple files, usually, the calls to C<open>, C<close>, and other things are repeated, and one has to repeat the checks for readability etc. This is an utter waste of time.
+A simple text file parser should have to only specify the "grammar" intends to interpret. Everything else, like opening a file handle, tracking how many lines have been read, etc., should be "automatic".
 
-C<Text::Parser> does all mundane operations like C<open> file, C<close> file, line-count, and storage/deletion/retrieval of records, etc. You don't have to bother with all that when you write a parser for your favorite text file format. Instead you can usually override just one method (C<L<save_record|/save_record>>) and voila! you have a parser. Look at L<these examples|/EXAMPLES> to see how easy this can be.
+Unfortunately, most programmers write code that calls C<open>, C<close>, etc., and keep track of things that should have been simple features of every text file parser. And if they have to read multiple files, usually, all these calls are repeated.
 
-Once you have used C<L<read|/read>> to successfully parse, you can parse another input. This means that your parser object is not "married" to what you parse ; it just parses and collects records, which must then be processed by another program to do what it needs to do with it. This allows you the flexibility to potentially write multi-threaded code: you can parse your input in one thread and create data structures in another thread.
+This class does all "mundane" operations like C<open>, C<close>, line-count, and storage/deletion/retrieval of records, etc. You don't have to bother with a lot of book-keeping when you write your next parser. Instead, just inherit this class and override one method (C<L<save_record|/save_record>>). And voila! you have a parser. Look at L<these examples|/EXAMPLES> to see how easy this can be.
 
 =head1 DESCRIPTION
 
-C<Text::Parser> is a bare-bones text parsing class. It is actually ignorant of the text format, and cannot recognize any grammars, but derived classes that inherit from it can specify this. They can do this by overriding some of the methods in this class.
+C<Text::Parser> is a bare-bones text parsing class. It is ignorant of the text format, and cannot recognize any grammars, but derived classes that inherit from it can specify this. They can do this by overriding some of the methods in this class.
 
-Future versions are also expected to include progress-bar support. All these software features are text-format independent and can be re-used in parsing any text format. Thus derived classes of C<Text::Parser> will be able to take advantage of these features without having to re-write the code again.
-
-At present this class handles files as input. You could either give filenames or filehandles (C<GLOB>s) as input to the parser. L<In the future|/"Future Enhancement"> the class may include the ability to read from other input sources. This will be especially useful if you have a series of files/sockets to read from.
+Future versions are expected to include progress-bar support, parsing text from sockets, or a chunk of memory. All these software features are text-format independent and can be re-used in parsing any text format. Derived classes of C<Text::Parser> will be able to take advantage of these features.
 
 =head1 METHODS
 
 =head2 new
 
-Takes no arguments. Returns a blessed reference of the object.
+Takes no arguments. Constructor.
 
     my $parser = Text::Parser->new();
 
@@ -316,11 +314,11 @@ When you do read a new file or input stream with this method, you will lose all 
     $parser->read(\*STDIN);
     my (@stdin) = $parser->get_records();
 
-B<Inheritance Recommendation:> When inheriting this class (which is what you should do if you want to write a parser for your favorite text file format), don't override this method. Override C<L<save_record|/save_record>> instead.
+B<Inheritance Recommendation:> To extend the class to other file formats, override C<L<save_record|/save_record>> instead of this one.
 
 =head3 Future Enhancement
 
-I<At present the C<read> method takes only two possible inputs argument types, either a file name, or a file handle. In near future this may be enhanced to read from sockets, subroutines, or even just a block of memory (a string reference). Suggestions for other forms of input are welcome.>
+I<At present the C<read> method takes only two possible inputs argument types, either a file name, or a file handle. In future this may be enhanced to read from sockets, subroutines, or even just a block of memory (a string reference). Suggestions for other forms of input are welcome.>
 
 =head2 filename
 
@@ -352,7 +350,7 @@ B<Note:> As such there is a check to ensure one is not supplying a write-only fi
 Like in the case of C<L<filename|/filename>> method, if after you C<read> with a filehandle, you call C<read> again, this time with a file name, the last filehandle is lost.
 
     my $lastfh = $parser->filehandle();
-    ## Will return \*STDOUT
+    ## Will return STDOUT
     
     $parser->read('another.txt');
     print "No filehandle saved any more\n" if not defined $parser->filehandle();
@@ -363,9 +361,9 @@ Takes no arguments. Returns the number of lines last parsed. A line is reckoned 
 
     print $parser->lines_parsed, " lines were parsed\n";
 
-This is also very useful for error message generation.
+The value is auto-updated during the execution of C<L<read|/read>>. See L<this example|/"Example 2 : Error checking"> of how this can be used in derived classes.
 
-Again the information in this is "persistent". Meaning, that after a C<L<read|/read>> operation, you can call it to get the number of lines parsed. You can also be assured that every time you call C<read>, the line count will be ways be reset first.
+Again the information in this is "persistent". You can also be assured that every time you call C<read>, the value be auto-reset before parsing.
 
 =head2 save_record
 
@@ -379,11 +377,11 @@ Derived classes can decide to store records in a different form. A derived class
 
 Takes no arguments. Returns C<1>. You will probably never call this method in your main program.
 
-This method is usually used only in the derived class. See L<this example|/"Example 3 : Aborting without errors">.
+This method is usually used only in the derived class. See L<this example|/"Example 3 : Aborting without errors"> for an example.
 
 =head2 get_records
 
-Takes no arguments. Returns an array containing all the records that were read by the parser.
+Takes no arguments. Returns an array containing all the records saved by the parser.
 
     foreach my $record ( $parser->get_records ) {
         $i++;

@@ -9,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros culture_from_lang locale_from_lang);
 use version;
 
-our $VERSION = qv('0.905.3');
+our $VERSION = qv('0.905.4');
 
 sub name {
     return 'Mojito translation server (http://www.mojito.global/) synchronization plugin';

@@ -1,6 +1,12 @@
 Changes file for OTRS::OPM::Maker
 =================================
 
+0.12 2019-01-03 09:33:00
+
+     + add more tests for the commands
+     + fix bug in all commands: the check if the filename ends with .sopm was wrong in validate_args
+     + updated dist.ini
+
 0.11 2017-01-31
 
      [MISC]

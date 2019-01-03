@@ -1,5 +1,5 @@
 {
-   "abstract" : "Bundles common text reading tasks. Stop re-writing mundane code to parse your next text file. This module supersedes the older and now defunct TextFileParser.",
+   "abstract" : "Bare text parser, bundles other common \"mundane\" tasks.",
    "author" : [
       "Balaji Ramasubramanian <balajiram@cpan.org>"
    ],
@@ -56,7 +56,7 @@
    "provides" : {
       "Text::Parser" : {
          "file" : "lib/Text/Parser.pm",
-         "version" : "0.751"
+         "version" : "0.752"
       }
    },
    "release_status" : "stable",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/balajirama/Text-Parser"
       }
    },
-   "version" : "0.751",
+   "version" : "0.752",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

@@ -125,63 +125,58 @@ EOF
     unlink($sol_fn);
 }
 
-my $GOLF_10_SOLUTION = <<'EOF';
+my $GOLF_35_SOLUTION = <<'EOF';
 Solved!
-KC
-QH
-KS
-Deal talon 3D
-4H
-3S
-Deal talon 4C
-Deal talon JS
-TD
-JH
-TS
+8D
 9H
-8H
-9S
-Deal talon 2C
+TC
+Deal talon 3S
+2H
+Deal talon 7C
+6D
+5D
+4D
 3C
 Deal talon KH
-QD
+QH
 JC
-Deal talon AD
-2S
-AH
-Deal talon 8S
-9D
-TC
-JD
+TD
+9S
+TS
+Deal talon QS
+KS
 QC
-KD
-Deal talon 7D
-6S
-7S
-6H
-7H
-6C
-7C
-Deal talon AC
-2D
-AS
-Deal talon 5C
-4D
-5D
-Deal talon 4S
-5H
+JD
+Deal talon AH
 Deal talon 8C
-9C
-Deal talon 8D
-Deal talon 6D
+7D
+6S
+7H
+Deal talon KD
+Deal talon AS
+2S
+AC
+2C
+AD
+Deal talon 6C
 5S
-Deal talon TH
-Deal talon 3H
-2H
+6H
+5H
+4H
+5C
+Deal talon 4S
+3D
+2D
+3H
+Deal talon 9D
+TH
+JH
+QD
+KC
 EOF
 
 {
-    my $sol_fn = _filename("10.golf.sol.txt");
+    my $sol_fn = _filename("35.golf.sol.txt");
 
     # TEST
     ok(
@@ -191,14 +186,14 @@ EOF
             ),
             "--queens-on-kings",
             "-o", $sol_fn,
-            _filename("10.golf.board.txt")
+            _filename("35.golf.board.txt")
         )
     );
 
     # TEST
     is(
         _normalize_lf( path($sol_fn)->slurp_utf8 ),
-        _normalize_lf($GOLF_10_SOLUTION),
+        _normalize_lf($GOLF_35_SOLUTION),
         "Testing for correct Golf solution.",
     );
 

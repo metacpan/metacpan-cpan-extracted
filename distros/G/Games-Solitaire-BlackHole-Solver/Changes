@@ -1,5 +1,9 @@
 Revision history for Games-Solitaire-BlackHole-Solver
 
+0.2.2   2019-01-03
+        - Optimize the tests' runtime by converting the Golf test to a seed that is
+        solved faster.
+
 0.2.1   2019-01-02
         - Documentation fixes in bin/golf-solitaire-solve-perl .
 

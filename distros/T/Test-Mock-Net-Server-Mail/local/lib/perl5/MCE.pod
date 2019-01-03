@@ -1,0 +1,292 @@
+
+=head1 NAME
+
+MCE - Many-Core Engine for Perl providing parallel processing capabilities
+
+=head1 VERSION
+
+This document describes MCE version 1.837
+
+Many-Core Engine (MCE) for Perl helps enable a new level of performance by
+maximizing all available cores.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/marioroy/mce-assets/master/images_README/MCE.png" width="630" height="444" alt="MCE" /></p>
+
+=end html
+
+=head1 DESCRIPTION
+
+MCE spawns a pool of workers and therefore does not fork a new process per
+each element of data. Instead, MCE follows a bank queuing model. Imagine the
+line being the data and bank-tellers the parallel workers. MCE enhances that
+model by adding the ability to chunk the next n elements from the input
+stream to the next available worker.
+
+=begin html
+
+<p><img src="https://raw.githubusercontent.com/marioroy/mce-assets/master/images_README/Bank_Queuing_Model.png" width="664" height="446" alt="Bank Queuing Model" /></p>
+
+=end html
+
+=head1 SYNOPSIS
+
+This is a simplistic use case of MCE running with 5 workers.
+
+ # Construction using the Core API
+
+ use MCE;
+
+ my $mce = MCE->new(
+    max_workers => 5,
+    user_func => sub {
+       my ($mce) = @_;
+       $mce->say("Hello from " . $mce->wid);
+    }
+ );
+
+ $mce->run;
+
+ # Construction using a MCE model
+
+ use MCE::Flow max_workers => 5;
+
+ mce_flow sub {
+    my ($mce) = @_;
+    MCE->say("Hello from " . MCE->wid);
+ };
+
+The following is a demonstration for parsing a huge log file in parallel.
+
+ use MCE::Loop;
+
+ MCE::Loop::init { max_workers => 8, use_slurpio => 1 };
+
+ my $pattern  = 'something';
+ my $hugefile = 'very_huge.file';
+
+ my @result = mce_loop_f {
+    my ($mce, $slurp_ref, $chunk_id) = @_;
+
+    # Quickly determine if a match is found.
+    # Process the slurped chunk only if true.
+
+    if ($$slurp_ref =~ /$pattern/m) {
+       my @matches;
+
+       # The following is fast on Unix, but performance degrades
+       # drastically on Windows beyond 4 workers.
+
+       open my $MEM_FH, '<', $slurp_ref;
+       binmode $MEM_FH, ':raw';
+       while (<$MEM_FH>) { push @matches, $_ if (/$pattern/); }
+       close   $MEM_FH;
+
+       # Therefore, use the following construction on Windows.
+
+       while ( $$slurp_ref =~ /([^\n]+\n)/mg ) {
+          my $line = $1; # save $1 to not lose the value
+          push @matches, $line if ($line =~ /$pattern/);
+       }
+
+       # Gather matched lines.
+
+       MCE->gather(@matches);
+    }
+
+ } $hugefile;
+
+ print join('', @result);
+
+The next demonstration loops through a sequence of numbers with MCE::Flow.
+
+ use MCE::Flow;
+
+ my $N = shift || 4_000_000;
+
+ sub compute_pi {
+    my ( $beg_seq, $end_seq ) = @_;
+    my ( $pi, $t ) = ( 0.0 );
+
+    foreach my $i ( $beg_seq .. $end_seq ) {
+       $t = ( $i + 0.5 ) / $N;
+       $pi += 4.0 / ( 1.0 + $t * $t );
+    }
+
+    MCE->gather( $pi );
+ }
+
+ # Compute bounds only, workers receive [ begin, end ] values
+
+ MCE::Flow::init(
+    chunk_size  => 200_000,
+    max_workers => 8,
+    bounds_only => 1
+ );
+
+ my @ret = mce_flow_s sub {
+    compute_pi( $_->[0], $_->[1] );
+ }, 0, $N - 1;
+
+ my $pi = 0.0;  $pi += $_ for @ret;
+
+ printf "pi = %0.13f\n", $pi / $N;  # 3.1415926535898
+
+=head1 CORE MODULES
+
+Three modules make up the core engine for MCE.
+
+=over 3
+
+=item L<MCE::Core>
+
+Provides the Core API for Many-Core Engine. The various MCE options are
+described here. It includes several demonstrations at the end of the page.
+
+=item L<MCE::Signal>
+
+Temporary directory creation, cleanup, and signal handling.
+
+=item L<MCE::Util>
+
+Utility functions for Many-Core Engine.
+
+=back
+
+=head1 MCE EXTRAS
+
+There are 4 add-on modules for use with MCE.
+
+=over 3
+
+=item L<MCE::Candy>
+
+Provides a collection of sugar methods and output iterators for preserving
+output order.
+
+=item L<MCE::Mutex>
+
+Provides a simple semaphore implementation supporting threads and processes.
+Two implementations are provided. One via pipes or socket depending on the
+platform. The other via Fcntl.
+
+=item L<MCE::Queue>
+
+Provides a hybrid queuing implementation for MCE supporting normal queues and
+priority queues from a single module. MCE::Queue exchanges data via the core
+engine to enable queuing to work for both children (spawned from fork) and
+threads.
+
+=item L<MCE::Relay>
+
+Enables workers to receive and pass on information orderly with zero
+involvement by the manager process while running.
+
+=back
+
+=head1 MCE MODELS
+
+The models take Many-Core Engine to a new level for ease of use. Two options
+(chunk_size and max_workers) are configured automatically as well as spawning
+and shutdown.
+
+=over 3
+
+=item L<MCE::Loop>
+
+Provides a MCE model for building parallel loops.
+
+=item L<MCE::Flow>
+
+A parallel flow model for building creative applications. This makes use of
+user_tasks in MCE. The author has full control when utilizing this model.
+MCE::Flow is similar to MCE::Loop, but allows for multiple code blocks to
+run in parallel with a slight change to syntax.
+
+=item L<MCE::Grep>
+
+Provides a parallel grep implementation similar to the native grep function.
+
+=item L<MCE::Map>
+
+Provides a parallel map model similar to the native map function.
+
+=item L<MCE::Step>
+
+Provides a parallel step implementation utilizing MCE::Queue between user
+tasks. MCE::Step is a spin off from MCE::Flow with a touch of MCE::Stream.
+This model, introduced in 1.506, allows one to pass data from one sub-task
+into the next transparently.
+
+=item L<MCE::Stream>
+
+Provides an efficient parallel implementation for chaining multiple maps
+and greps together through user_tasks and MCE::Queue. Like with MCE::Flow,
+MCE::Stream can run multiple code blocks in parallel with a slight change
+to syntax from MCE::Map and MCE::Grep.
+
+=back
+
+=head1 MISCELLANEOUS
+
+Miscellaneous additions included with the distribution.
+
+=over 3
+
+=item L<MCE::Examples>
+
+Describes various demonstrations for MCE including a Monte Carlo simulation.
+
+=item L<MCE::Subs>
+
+Exports functions mapped directly to MCE methods; e.g. mce_wid. The module
+allows 3 options; :manager, :worker, and :getter.
+
+=back
+
+=head1 REQUIREMENTS
+
+Perl 5.8.0 or later. PDL::IO::Storable is required in scripts running PDL.
+
+=head1 SOURCE AND FURTHER READING
+
+The source, cookbook, and examples are hosted at GitHub.
+
+=over 3
+
+=item * L<https://github.com/marioroy/mce-perl>
+
+=item * L<https://github.com/marioroy/mce-cookbook>
+
+=item * L<https://github.com/marioroy/mce-examples>
+
+=back
+
+=head1 SEE ALSO
+
+C<MCE::Shared> provides data sharing capabilities for C<MCE>. It includes
+C<MCE::Hobo> for running code asynchronously.
+
+=over 3
+
+=item * L<MCE::Shared>
+
+=item * L<MCE::Hobo>
+
+=back
+
+=head1 AUTHOR
+
+Mario E. Roy, S<E<lt>marioeroy AT gmail DOT comE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2018 by Mario E. Roy
+
+MCE is released under the same license as Perl.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+

@@ -8,7 +8,9 @@ use AnyEvent::YACurl ':constants';
 my $cv= AE::cv;
 my $cv2= AE::cv;
 do {
-    my $client= AnyEvent::YACurl->new;
+    my $client= AnyEvent::YACurl->new({
+        CURLMOPT_PIPELINING => CURLPIPE_MULTIPLEX
+    });
     $client->request(
         $cv,
         {

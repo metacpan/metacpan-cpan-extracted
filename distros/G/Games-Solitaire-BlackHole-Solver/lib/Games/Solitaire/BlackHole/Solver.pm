@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver;
-$Games::Solitaire::BlackHole::Solver::VERSION = '0.2.1';
+$Games::Solitaire::BlackHole::Solver::VERSION = '0.2.2';
 use strict;
 use warnings;
 
@@ -20,7 +20,7 @@ Games::Solitaire::BlackHole::Solver - A solver for Black Hole Solitaire
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ More information about Black Hole Solitaire can be found at:
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 AUTHOR
 

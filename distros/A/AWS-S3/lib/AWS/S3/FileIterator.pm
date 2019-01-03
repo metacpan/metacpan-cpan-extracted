@@ -1,12 +1,23 @@
-
 package AWS::S3::FileIterator;
 
 use strict;
 use warnings 'all';
-use base 'Iterator::Paged';
 use Carp 'confess';
 use AWS::S3::Owner;
 use AWS::S3::File;
+
+sub new {
+  my ($class, %args) = @_;
+
+  my $s = bless {
+    data        => [ ],
+    page_number => 0,
+    idx         => 0,
+    %args,
+  }, $class;
+  $s->_init;
+  return $s;
+}
 
 sub _init {
     my ( $s ) = @_;
@@ -36,6 +47,30 @@ sub has_prev {
 }    # end has_prev()
 
 sub has_next { shift->{has_next} }
+
+sub next {
+  my $s = shift;
+
+  if( exists( $s->{data}->[ $s->{idx} ] ) ) {
+    return $s->{data}->[ $s->{idx}++ ];
+  } else {
+    # End of the current resultset, see if we can get another page of records:
+    if( my $page = $s->next_page ) {
+      $s->{data} = $page;
+      $s->{idx} = 0;
+      return $s->{data}->[ $s->{idx}++ ];
+    } else {
+      # No more pages, no more data:
+      return;
+    }
+  }
+}
+
+sub reset {
+  my $s = shift;
+  $s->{idx} = 0;
+}
+
 
 sub page_number {
     my $s = shift;

@@ -7,7 +7,7 @@ use App::Cmd::Setup -app;
 
 # ABSTRACT: Module/App to build and test OTRS packages
 
-our $VERSION = 0.11;
+our $VERSION = '0.12';
 
 
 1;
@@ -24,11 +24,11 @@ OTRS::OPM::Maker - Module/App to build and test OTRS packages
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 
-If you do OTRS package development, you need to be able to check your package: Are all files of the package included in the file list in the sopm file? Is the sopm file valid? And you need to create the OPM file. There is otrs.PackageManager.pl included in OTRS installations, but sometimes you might not have an OTRS installation on the machine where you want to build the package (e.g. when you build the package in a Jenkins (http://jenkins-ci.org) job).
+If you do OTRS package development, you need to be able to check your package: Are all files of the package included in the file list in the sopm file? Is the sopm file valid? And you need to create the OPM file. There is otrs.PackageManager.pl included in OTRS installations, but sometimes you might not have an OTRS installation on the machine where you want to build the package (e.g. when you build the package in a L<Jenkins|http://jenkins-ci.org> job).
 
 C<OTRS::OPM::Maker> provides C<opmbuild> that is a small tool for several tasks. At the moment it supports:
 

@@ -5,7 +5,7 @@ use utf8;
 #
 # KGB - an IRC bot helping collaboration
 # Copyright © 2008 Martín Ferrari
-# Copyright © 2008,2009,2010,2011,2012,2013,2018 Damyan Ivanov
+# Copyright © 2008,2009,2010,2011,2012,2013,2018,2019 Damyan Ivanov
 # Copyright © 2010 gregor herrmann
 # Copyright © 2018 James Clarke
 #
@@ -1584,7 +1584,10 @@ sub webhook_request {
             HTTP::Status::HTTP_PRECONDITION_FAILED);
     }
 
-    my $client_ip = Net::IP->new($response->connection->remote_ip);
+    my $client_ip = $response->connection->remote_ip;
+    # fix ipv4-as-ipv6 represenation
+    $client_ip =~ s/^::ffff:(\d+\.\d+\.\d+\.\d+)$/$1/;
+    $client_ip = Net::IP->new($client_ip);
 
     my $allowed = 0;
 
@@ -1599,7 +1602,7 @@ sub webhook_request {
     }
 
     unless ($allowed) {
-        return webhook_error(@_, "Client IP $client_ip is not whitelisted",
+        return webhook_error(@_, 'Client IP ' . $client_ip->ip . ' is not whitelisted',
             HTTP::Status::HTTP_FORBIDDEN);
     }
 

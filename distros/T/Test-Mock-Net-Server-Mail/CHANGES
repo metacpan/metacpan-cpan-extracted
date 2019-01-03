@@ -1,41 +1,35 @@
 ==================================================
-Changes from 2014-09-01 00:00:00 +0000 to present.
+Changes from 2018-01-03 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1.00 at 2015-09-01 12:01:50 +0000
+version 1.01 at 2019-01-03 14:22:47 +0000
 -----------------------------------------
 
-  Change: 4258311177e124965225661145858dbf7327ca27
+  Change: b570faa5487d65fde908cdab06a7c7379ec2b45b
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-09-01 13:59:08 +0000
+  Date : 2019-01-03 15:20:16 +0000
 
-    fix POD 
+    README update 
 
-  Change: 34c323f5f9b17d035445f86e072279869109e97e
+  Change: 4e6c227e772b1fb569cb607b748fbcf169b46c0b
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-09-01 13:56:10 +0000
+  Date : 2019-01-03 15:17:24 +0000
 
-    run travis cpanm with --notest 
+    Add support for server logging and log testing 
 
-  Change: 8a768be258df0c9031e1a820084a5773c78254a8
+  Change: 891547293f1f3dc78de91e72042f9e9adcf328e7
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-09-01 13:51:35 +0000
+  Date : 2019-01-03 15:16:16 +0000
 
-    added travis file 
+    Add README generation with dist zilla module 
 
-  Change: b6feacd58d88215a91e64c6450882bec2895b826
+  Change: 67a9fb2edea70a73800e3cdd773220b03c639bf1
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-09-01 13:48:09 +0000
+  Date : 2019-01-02 14:27:45 +0000
 
-    link README.pod to Mail.pm 
+    Use cpanfile for depenencies 
 
-  Change: 19938927fb7d00fe69abedea44e9203e4d392146
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2015-09-01 13:47:01 +0000
-
-    initial checkin 
-
-================
-End of releases.
-================
+===============================================
+Plus 1 release after 2018-01-03 00:00:00 +0000.
+===============================================

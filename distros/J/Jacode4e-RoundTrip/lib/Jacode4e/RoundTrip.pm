@@ -1,10 +1,10 @@
 package Jacode4e::RoundTrip;
-$VERSION = '2.13.81.4';
+$VERSION = '2.13.81.5';
 ######################################################################
 #
 # Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 #
 # SYNOPSIS
@@ -79,7 +79,7 @@ $VERSION = '2.13.81.4';
 #   use FindBin;
 #   use lib "$FindBin::Bin/lib";
 #   use Jacode4e::RoundTrip;
-#   Jacode4e::RoundTrip::VERSION('2.13.81.4');
+#   Jacode4e::RoundTrip::VERSION('2.13.81.5');
 #   while (<>) {
 #       $return =
 #       Jacode4e::RoundTrip::convert(\$_, 'cp932x', 'cp00930', {
@@ -623,84 +623,84 @@ END
     'cp932x' => {
         'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef },
         'set_ctype' => sub { q!! },
-        'getoct'    => sub { s!^((?:\x9C\x5A)?[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^((?:\x9C\x5A)?[\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'cp932x'}{$Knowledge_Base_Article_ID_170559_prb_conversion_problem_between_shift_jis_and_unicode{$_[0]}||$_[0]} },
         'putc'      => sub { local $^W; $tr{'cp932x'}{'utf8jp'}{$_[0]} },
     },
     'cp932' => {
         'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef },
         'set_ctype' => sub { q!! },
-        'getoct'    => sub { s!^([\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'cp932'}{$Knowledge_Base_Article_ID_170559_prb_conversion_problem_between_shift_jis_and_unicode{$_[0]}||$_[0]} },
         'putc'      => sub { local $^W; $tr{'cp932'}{'utf8jp'}{$_[0]} },
     },
     'sjis2004' => {
         'get_ctype' => sub { m!^[^\x81-\x9F\xE0-\xFC]! ? 'SBCS' : m!^[\x81-\x9F\xE0-\xFC]! ? 'DBCS' : undef },
         'set_ctype' => sub { q!! },
-        'getoct'    => sub { s!^([\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x00-\xFF])!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'sjis2004'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'sjis2004'}{'utf8jp'}{$_[0]} },
     },
     'cp00930' => {
         'get_ctype' => sub { s!^\x0F!! ? 'SBCS' : s!^\x0E!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x0F", 'DBCS'=>"\x0E", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'cp00930'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'cp00930'}{'utf8jp'}{$_[0]} },
     },
     'keis78' => {
         'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x0A\x41", 'DBCS'=>"\x0A\x42", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!;                                   $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'keis78'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'keis78'}{'utf8jp'}{$_[0]} },
     },
     'keis83' => {
         'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x0A\x41", 'DBCS'=>"\x0A\x42", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'keis83'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'keis83'}{'utf8jp'}{$_[0]} },
     },
     'keis90' => {
         'get_ctype' => sub { s!^\x0A\x41!! ? 'SBCS' : s!^\x0A\x42!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x0A\x41", 'DBCS'=>"\x0A\x42", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'keis90'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'keis90'}{'utf8jp'}{$_[0]} },
     },
     'jef' => {
         'get_ctype' => sub { s!^\x29!! ? 'SBCS' : s!^[\x28\x38]!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x29", 'DBCS'=>"\x28", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'jef'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'jef'}{'utf8jp'}{$_[0]} },
     },
     'jef9p' => {
         'get_ctype' => sub { s!^\x29!! ? 'SBCS' : s!^[\x28\x38]!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x29", 'DBCS'=>"\x38", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'jef'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'jef'}{'utf8jp'}{$_[0]} },
     },
     'jipsj' => {
         'get_ctype' => sub { s!^\x1A\x71!! ? 'SBCS' : s!^\x1A\x70!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x1A\x71", 'DBCS'=>"\x1A\x70", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'jipsj'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'jipsj'}{'utf8jp'}{$_[0]} },
     },
     'jipse' => {
         'get_ctype' => sub { s!^\x3F\x76!! ? 'SBCS' : s!^\x3F\x75!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x3F\x76", 'DBCS'=>"\x3F\x75", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'jipse'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'jipse'}{'utf8jp'}{$_[0]} },
     },
     'letsj' => {
         'get_ctype' => sub { s!^\x93\xF1!! ? 'SBCS' : s!^\x93\x70!! ? 'DBCS' : undef },
         'set_ctype' => sub { {'SBCS'=>"\x93\xF1", 'DBCS'=>"\x93\x70", }->{$_[0]} },
-        'getoct'    => sub { s!^(${_[0]})!!; $1 },
+        'getoct'    => sub { $_[0] eq 'SBCS' ? s!^([\x00-\xFF])!! : s!^([\x00-\xFF]{1,2})!!; $1 },
         'getc'      => sub { local $^W; $tr{'utf8jp'}{'letsj'}{$_[0]} },
         'putc'      => sub { local $^W; $tr{'letsj'}{'utf8jp'}{$_[0]} },
     },
@@ -776,7 +776,7 @@ sub convert {
 
     my $INPUT_LAYOUT = undef;
     my @ctype = ();
-    if ($_{$INPUT_encoding}{'set_ctype'}->('DBCS') ne '') {
+    if ($INPUT_encoding =~ /^(?:cp932x|cp932|sjis2004|cp00930|keis78|keis83|keis90|jef|jef9p|jipsj|jipse|letsj)$/) {
         if (defined $option->{'INPUT_LAYOUT'}) {
             $INPUT_LAYOUT = $option->{'INPUT_LAYOUT'};
             $INPUT_LAYOUT =~ s/([SD])([0-9]+)/$1 x $2/ge;
@@ -805,7 +805,7 @@ sub convert {
             $last_ctype = $ctype;
         }
 
-        my $input_octets = $_{$INPUT_encoding}{'getoct'}->(($ctype eq 'DBCS') ? qr<[\x00-\xFF]{2}> : qr<[\x00-\xFF]>);
+        my $input_octets = $_{$INPUT_encoding}{'getoct'}->($ctype);
         if (defined $input_octets) {
             if (defined $option->{'OVERRIDE_MAPPING'}{$input_octets}) {
                 $output .= $option->{'OVERRIDE_MAPPING'}{$input_octets};
@@ -939,7 +939,7 @@ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
   use FindBin;
   use lib "$FindBin::Bin/lib";
   use Jacode4e::RoundTrip;
-  Jacode4e::RoundTrip::VERSION('2.13.81.4');
+  Jacode4e::RoundTrip::VERSION('2.13.81.5');
   while (<>) {
       $return =
       Jacode4e::RoundTrip::convert(\$_, 'cp932x', 'cp00930', {
@@ -970,26 +970,32 @@ Jacode4e::RoundTrip - Jacode4e for round-trip conversion in JIS X 0213
   Jacode4e::RoundTrip::convert() handle SI/SO(Shift In and Shift Out) code in
   $line automatically. If $line has no SI/SO code, we can use option
   INPUT_LAYOUT instead of SI/SO code.
+  
   Actually saying, we have to use option INPUT_LAYOUT almost always, if
   $INPUT_encoding is any of enterprise encodings.
+  
+  If $INPUT_encoding is cp932x or cp932 or sjis2004, the INPUT_LAYOUT option
+  is unnecessary. This is because SBCS and DBCS can be judged from the character
+  string itself. However, you can also use the INPUT_LAYOUT option to force
+  conversion as SBCS.
   
   ---------------------------------------------------------------------------
                      SO(Shift Out)       SI(Shift In)
   $INPUT_encoding    KI(KANJI In)        KO(KANJI Out)
-  mnemonic           switch to DBCS      switch to SBCS    note
+  mnemonic           switch to DBCS      switch to SBCS    %option
   ---------------------------------------------------------------------------
-  'cp932x'           (nothing)           (nothing)         
-  'cp932'            (nothing)           (nothing)         
-  'sjis2004'         (nothing)           (nothing)         
-  'cp00930'          "\x0E"              "\x0F"            
-  'keis78'           "\x0A\x42"          "\x0A\x41"        
-  'keis83'           "\x0A\x42"          "\x0A\x41"        
-  'keis90'           "\x0A\x42"          "\x0A\x41"        
-  'jef'              "\x28" or "\x38"    "\x29"            both 12 and 9 point size are ok
-  'jef9p'            "\x28" or "\x38"    "\x29"            both 12 and 9 point size are ok
-  'jipsj'            "\x1A\x70"          "\x1A\x71"        
-  'jipse'            "\x3F\x75"          "\x3F\x76"        
-  'letsj'            "\x93\x70"          "\x93\xF1"        
+  'cp932x'           (nothing)           (nothing)         also 'INPUT_LAYOUT' => ...
+  'cp932'            (nothing)           (nothing)         also 'INPUT_LAYOUT' => ...
+  'sjis2004'         (nothing)           (nothing)         also 'INPUT_LAYOUT' => ...
+  'cp00930'          "\x0E"              "\x0F"            xor 'INPUT_LAYOUT' => ...
+  'keis78'           "\x0A\x42"          "\x0A\x41"        xor 'INPUT_LAYOUT' => ...
+  'keis83'           "\x0A\x42"          "\x0A\x41"        xor 'INPUT_LAYOUT' => ...
+  'keis90'           "\x0A\x42"          "\x0A\x41"        xor 'INPUT_LAYOUT' => ...
+  'jef'              "\x28" or "\x38"    "\x29"            xor 'INPUT_LAYOUT' => ...
+  'jef9p'            "\x28" or "\x38"    "\x29"            xor 'INPUT_LAYOUT' => ...
+  'jipsj'            "\x1A\x70"          "\x1A\x71"        xor 'INPUT_LAYOUT' => ...
+  'jipse'            "\x3F\x75"          "\x3F\x76"        xor 'INPUT_LAYOUT' => ...
+  'letsj'            "\x93\x70"          "\x93\xF1"        xor 'INPUT_LAYOUT' => ...
   'utf8'             (nothing)           (nothing)         
   'utf8jp'           (nothing)           (nothing)         
   ---------------------------------------------------------------------------

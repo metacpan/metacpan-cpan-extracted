@@ -17,11 +17,12 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.01';
+$VERSIONE = '0.02';
 use strict;
+use FindBin;
 use File::Path;
 use File::Copy;
 use File::Basename;
@@ -73,11 +74,13 @@ close FH_MANIFEST;
 for my $target (@ARGV) {
     if ($target eq 'test') {
         my @test = grep m{ \A (?: test\.pl | t/.+\.t ) \z }xmsi, @file;
+        unshift @INC, "$FindBin::Bin/lib";
         runtests(@test);
         print STDERR "\a";
     }
     elsif ($target eq 'xtest') {
         my @test = grep m{ \A (?: test\.pl | t/.+\.t | xt/.+\.t ) \z }xmsi, @file;
+        unshift @INC, "$FindBin::Bin/lib";
         runtests(@test);
         print STDERR "\a";
     }
@@ -761,7 +764,9 @@ LICENSING
             my $gz = gzopen("$tardir.tar.gz", 'wb');
             open(FH_TAR, "$tardir.tar") || die "Can't open file: $tardir.tar\n";
             binmode FH_TAR;
-            $gz->gzwrite(join('',<FH_TAR>));
+            while (sysread(FH_TAR, $_, 1024*1024)) {
+                $gz->gzwrite($_);
+            }
             close FH_TAR;
             $gz->gzclose;
             unlink "$tardir.tar";
@@ -791,7 +796,7 @@ LICENSING
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -889,7 +894,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use Socket;

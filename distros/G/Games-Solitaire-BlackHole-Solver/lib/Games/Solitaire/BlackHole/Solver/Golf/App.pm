@@ -1,5 +1,5 @@
 package Games::Solitaire::BlackHole::Solver::Golf::App;
-$Games::Solitaire::BlackHole::Solver::Golf::App::VERSION = '0.2.1';
+$Games::Solitaire::BlackHole::Solver::Golf::App::VERSION = '0.2.2';
 use strict;
 use warnings;
 
@@ -282,7 +282,7 @@ implemented as a class to solve the “Golf” variant of solitaire.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -353,7 +353,7 @@ More information about Golf Solitaire can be found at:
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 METHODS
 

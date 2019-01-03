@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::HTML;
-$Data::TableReader::Decoder::HTML::VERSION = '0.009';
+$Data::TableReader::Decoder::HTML::VERSION = '0.010';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -184,7 +184,7 @@ Data::TableReader::Decoder::HTML - Access the tables of an HTML document
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 

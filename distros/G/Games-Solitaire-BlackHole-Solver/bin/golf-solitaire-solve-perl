@@ -19,7 +19,7 @@ golf-solitaire-solve-perl - a solver for Golf Solitaire deals.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 
@@ -33,7 +33,7 @@ This is a solver for L<https://en.wikipedia.org/wiki/Golf_(patience)>.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SEE ALSO
 

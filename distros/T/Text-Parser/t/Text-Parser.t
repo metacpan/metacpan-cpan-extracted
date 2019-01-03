@@ -31,14 +31,18 @@ lives_ok { $pars->read(''); } 'Reads no file ; returns doing nothing';
 is( $pars->filename(),     undef, 'No file name still' );
 is( $pars->lines_parsed(), 0,     'Nothing parsed again' );
 
-open OFILE, ">t/unreadable.txt";
-print OFILE "This is unreadable\n";
-close OFILE;
-chmod 0200, 't/unreadable.txt';
-throws_ok { $pars->filename('t/unreadable.txt'); } 'Text::Parser::Exception',
-    'This file cannot be read';
-is( $pars->filename(), undef, 'Still no file has been read so far' );
-unlink 't/unreadable.txt';
+SKIP: {
+    skip 'Tests not meant for root user', 2 unless $>;
+    open OFILE, ">t/unreadable.txt";
+    print OFILE "This is unreadable\n";
+    close OFILE;
+    chmod 0200, 't/unreadable.txt';
+    throws_ok { $pars->filename('t/unreadable.txt'); }
+    'Text::Parser::Exception',
+        'This file cannot be read';
+    is( $pars->filename(), undef, 'Still no file has been read so far' );
+    unlink 't/unreadable.txt';
+}
 
 my $content = "This is a file with one line\n";
 lives_ok { $pars->filename( 't/' . $fname ); } 'Now I can open the file';

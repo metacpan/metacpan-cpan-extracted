@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Games-Solitaire-BlackHole-Solver",
-  "dist_version" => "0.2.1",
+  "dist_version" => "0.2.2",
   "license" => "mit",
   "module_name" => "Games::Solitaire::BlackHole::Solver",
   "recursive_test_files" => 1,

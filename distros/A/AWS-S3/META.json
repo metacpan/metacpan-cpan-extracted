@@ -4,13 +4,13 @@
       "Lee Johnson <leejo@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AWS-S3",
    "no_index" : {
@@ -40,7 +40,6 @@
             "Digest::HMAC_SHA1" : "0",
             "HTTP::Date" : "0",
             "HTTP::Headers" : "6.07",
-            "Iterator::Paged" : "0",
             "JSON::XS" : "0",
             "LWP::UserAgent::Determined" : "0",
             "MIME::Base64" : "0",
@@ -68,5 +67,6 @@
          "url" : "https://github.com/leejo/AWS-S3"
       }
    },
-   "version" : "0.15"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

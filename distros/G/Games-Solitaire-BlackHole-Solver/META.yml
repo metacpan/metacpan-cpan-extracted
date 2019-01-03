@@ -40,13 +40,13 @@ name: Games-Solitaire-BlackHole-Solver
 provides:
   Games::Solitaire::BlackHole::Solver:
     file: lib/Games/Solitaire/BlackHole/Solver.pm
-    version: v0.2.1
+    version: v0.2.2
   Games::Solitaire::BlackHole::Solver::App:
     file: lib/Games/Solitaire/BlackHole/Solver/App.pm
-    version: v0.2.1
+    version: v0.2.2
   Games::Solitaire::BlackHole::Solver::Golf::App:
     file: lib/Games/Solitaire/BlackHole/Solver/Golf/App.pm
-    version: v0.2.1
+    version: v0.2.2
 requires:
   Getopt::Long: '2.36'
   Pod::Usage: '0'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/shlomif/games-solitaire-blackhole-solver/issues
   homepage: http://www.shlomifish.org/open-source/projects/black-hole-solitaire-solver/
   repository: https://github.com/shlomif/black-hole-solitaire
-version: 0.2.1
+version: 0.2.2
 x_Dist_Zilla:
   perl:
     version: '5.028001'

@@ -3,11 +3,16 @@ package Test::Mock::Net::Server::Mail;
 use Moose;
 
 # ABSTRACT: mock SMTP server for use in tests
-our $VERSION = '1.00'; # VERSION
+our $VERSION = '1.01'; # VERSION
+
 
 use Net::Server::Mail::ESMTP;
 use IO::Socket::INET;
+use IO::File;
+use Test::More;
 use Test::Exception;
+use JSON;
+use File::Temp;
 
 
 has 'bind_address' => ( is => 'ro', isa => 'Str', default => '127.0.0.1' );
@@ -48,7 +53,133 @@ has 'support_8bitmime' => ( is => 'ro', isa => 'Bool', default => 1 );
 has 'support_pipelining' => ( is => 'ro', isa => 'Bool', default => 1 );
 has 'support_starttls' => ( is => 'ro', isa => 'Bool', default => 1 );
 
-sub process_connection {
+has 'mock_verbs' => (
+  is => 'ro',
+  isa => 'ArrayRef[Str]',
+  default => sub { [ qw(
+    EHLO
+    HELO
+    MAIL
+    RCPT
+    DATA
+    QUIT
+  ) ] },
+);
+
+has 'logging' => (
+  is => 'ro',
+  isa => 'Bool',
+  default => 1,
+);
+
+sub BUILD {
+  my $self = shift;
+  if( $self->logging ) {
+    $self->_init_log;
+  }
+  return;
+}
+
+has '_log_fh' => (
+  is => 'rw',
+  isa => 'IO::Handle',
+);
+
+sub _init_log {
+  my $self = shift;
+  $self->_log_fh(File::Temp->new);
+  return;
+}
+
+sub _reopen_log {
+  my $self = shift;
+  my $fh = IO::File->new($self->_log_fh->filename, O_WRONLY|O_APPEND)
+    or die('cannot reopen temporary logfile: '.$!);
+  $self->_log_fh($fh);
+  return;
+}
+
+sub _write_log {
+  my $self = shift;
+  $self->_log_fh->print(join('',@_));
+  $self->_log_fh->flush;
+  return;
+}
+
+
+sub next_log {
+  my $self = shift;
+  my $line = $self->_log_fh->getline;
+  if($line) {
+    chomp $line;
+    return decode_json $line;
+  }
+  return;
+}
+
+
+sub next_log_ok {
+  my ($self, $verb, $params, $text) = @_;
+  my $log = $self->next_log;
+  if(!defined $log) {
+    fail($text);
+    diag('no more logs to read!');
+    return;
+  }
+
+  if($log->{'verb'} ne $verb) {
+    fail($text);
+    diag('expected verb '.$verb.' but got '.$log->{'verb'});
+    return;
+  }
+
+  if(defined $params) {
+    if(ref($params) eq 'Regexp') {
+      like($log->{'params'}, $params, $text);
+      return;
+    }
+    cmp_ok($log->{'params'}, 'eq', $params, $text);
+    return;
+  }
+
+  pass($text);
+  return;
+}
+
+sub _process_callback {
+  my ($self, $verb, $session, $params) = @_;
+
+  if($self->logging) {
+    $self->_log_callback($verb, $params);
+  }
+
+  my $method = "process_".lc($verb);
+  if($self->can($method)) {
+    return $self->$method($session, $params);
+  }
+  return;
+}
+
+sub _log_callback {
+  my ($self, $verb, $params) = @_;
+  my $params_out;
+  if(ref($params) eq '') {
+    $params_out = $params;
+  } elsif(ref($params) eq 'SCALAR') {
+    $params_out = $$params;
+  } else {
+    $params_out = $verb.' passed unprintable '.ref($params);
+  }
+  $self->_write_log(
+    encode_json( {
+      verb => $verb,
+      defined $params_out ? (params => $params_out) : (),
+    } )."\n"
+  );
+  return;
+}
+
+sub _process_connection {
   my ( $self, $conn ) = @_;
   my $smtp = Net::Server::Mail::ESMTP->new(
     socket => $conn,
@@ -61,26 +192,12 @@ sub process_connection {
   $self->support_starttls
     && $smtp->register('Net::Server::Mail::ESMTP::STARTTLS');
 
-  $smtp->set_callback(EHLO => sub {
-      my ( $session, $name ) = @_;
-      return $self->process_ehlo( $session, $name );
-  } );
-  $smtp->set_callback(HELO => sub {
-      my ( $session, $name ) = @_;
-      return $self->process_ehlo( $session, $name );
-  } );
-  $smtp->set_callback(MAIL => sub {
-      my ( $session, $addr ) = @_;
-      return $self->process_mail( $session, $addr );
-  } );
-  $smtp->set_callback(RCPT => sub {
-      my ( $session, $addr ) = @_;
-      return $self->process_rcpt( $session, $addr );
-  } );
-  $smtp->set_callback(DATA => sub {
-      my ( $session, $data ) = @_;
-      return $self->process_data( $session, $data );
-  } );
+  foreach my $verb (@{$self->mock_verbs}) {
+    $smtp->set_callback($verb => sub {
+        my ( $session, $params ) = @_;
+        return $self->_process_callback( $verb, $session, $params );
+    } );
+  }
 
   $self->before_process( $smtp );
   $smtp->process();
@@ -88,6 +205,7 @@ sub process_connection {
     
   return;
 };
+
 
 
 sub before_process {
@@ -133,10 +251,13 @@ sub process_data {
 sub main_loop {
   my $self = shift;
 
+  $self->_reopen_log;
+
   while( my $conn = $self->socket->accept ) {
-    $self->process_connection( $conn );
+    $self->_process_connection( $conn );
   }
 
+  exit 1;
   return;
 }
 
@@ -182,6 +303,13 @@ sub stop {
   return;
 }
 
+sub DESTROY {
+  my $self = shift;
+  # try to stop server when going out of scope
+  $self->stop;
+  return;
+}
+
 
 sub stop_ok {
   my ( $self, $text ) = @_;
@@ -205,7 +333,7 @@ Test::Mock::Net::Server::Mail - mock SMTP server for use in tests
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -236,7 +364,27 @@ It will accept all MAIL FROM and RCPT TO commands except they start
 with 'bad' in the user or domain part.
 And it will accept all mail except mail containing the string 'bad mail content'.
 
-If a different behaviour is need a subclass could be used to overwrite process_<cmd> methods.
+If a different behaviour is need a subclass could be used to overwrite process_<verb> methods.
+
+=head1 LOGGING
+
+If the logging option is enabled (by default) the mock server will log
+received commands in a temporary log file. The content of this log file
+can be inspected with the methods next_log() or tested with next_log_ok().
+
+  # setup server($s) and client($c)...
+
+  $c->ehlo('localhost');
+  $s->next_log;
+  # {"verb" => "EHLO","params" => "localhost"}
+  
+  $c->mail_from('user@domain.tld');
+  $s->next_log_ok('MAIL', 'user@domain.tld, 'server received MAIL cmd');
+  
+  $c->rcpt_to('targetuser@targetdomain.tld');
+  $s->next_log_ok('RCPT', qr/target/, 'server received RCPT cmd');
+
+  # shutdown...
 
 =head1 ATTRIBUTES
 
@@ -260,6 +408,25 @@ Load PIPELINING extension?
 
 Load STARTTLS extension?
 
+=head2 logging (default: 1)
+
+Log commands received by the server.
+
+=head2 mock_verbs (ArrayRef)
+
+Which verbs the server should add mockup to.
+
+By default:
+
+  qw(
+    EHLO
+    HELO
+    MAIL
+    RCPT
+    DATA
+    QUIT
+  )
+
 =head1 METHODS
 
 =head2 port
@@ -270,6 +437,31 @@ Retrieve the port of the running mock server.
 
 Retrieve the process id of the running mock server.
 
+=head2 next_log
+
+Reads one log from the servers log and returns a hashref.
+
+Example:
+
+  {"verb"=>"EHLO","params"=>"localhost"}
+
+=head2 next_log_ok($verb, $expect, $text)
+
+Will read a log using next_log() and test it.
+
+The logs 'verb' must exactly match $verb.
+
+The logs 'params' are checked against $expected. It must be a
+string,regexp or undef.
+
+Examples:
+
+  $s->next_log_ok('EHLO', 'localhost', 'server received EHLO command');
+  $s->next_log_ok('MAIL', 'gooduser@gooddomain', 'server received MAIL command');
+  $s->next_log_ok('RCPT', 'gooduser@gooddomain', 'server received RCPT command');
+  $s->next_log_ok('DATA', qr/bad mail content/, 'server received DATA command');
+  $s->next_log_ok('QUIT', undef, 'server received QUIT command');
+
 =head2 before_process( $smtp )
 
 Overwrite this method in a subclass if you need to register additional
@@ -279,9 +471,18 @@ Net::Server::Mail object is passed via $smtp.
 
 =head2 process_ehlo( $session, $name )
 
+Will refuse EHLO names containing the string 'bad'
+otherwise will accept any EHLO.
+
 =head2 process_mail( $session, $addr )
 
+Will accept all senders except senders where
+user or domain starts with 'bad'.
+
 =head2 process_rcpt( $session, $addr )
+
+Will accept all reciepients except recipients where
+user or domain starts with 'bad'.
 
 =head2 process_data( $session, \$data )
 

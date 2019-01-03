@@ -1,7 +1,7 @@
 This archive contains the distribution Text-Parser,
-version 0.751:
+version 0.752:
 
-  Bundles common text reading tasks. Stop re-writing mundane code to parse your next text file. This module supersedes the older and now defunct TextFileParser.
+  Bare text parser, bundles other common "mundane" tasks.
 
 This software is copyright (c) 2018 by Balaji Ramasubramanian.
 

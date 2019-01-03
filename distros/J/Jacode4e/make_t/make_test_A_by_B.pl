@@ -10,7 +10,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 my @data = ();
-open(JACODE4E,"$FindBin::Bin/../lib/jacode4e.pl") || die;
+open(JACODE4E,"$FindBin::Bin/../lib/Jacode4e.pm") || die;
 while (<JACODE4E>) {
     if (/^__DATA__$/) {
         chomp(@data = grep( ! /^#/, <JACODE4E>));
@@ -44,16 +44,7 @@ for my $INPUT_encoding (@io_encoding) {
         my $filename = sprintf("%04d_${OUTPUT_encoding}_by_${INPUT_encoding}.t", $fileno++);
 print STDERR $filename, "\n";
         mkdir('xt',0777);
-        mkdir('t',0777);
-        if ($INPUT_encoding eq 'utf8jp') {
-            open(TEST,">t/$filename") || die;
-        }
-        elsif ($OUTPUT_encoding eq 'utf8jp') {
-            open(TEST,">t/$filename") || die;
-        }
-        else {
-            open(TEST,">xt/$filename") || die;
-        }
+        open(TEST,">xt/$filename") || die;
         binmode(TEST);
         printf TEST (<<'END___________________________________________________________________',$filename);
 ######################################################################
@@ -114,11 +105,12 @@ for my $test (@test) {
 
     my $option_content = '';
     if (defined $option) {
-        $option_content .= qq{INPUT_LAYOUT=>$option->{'INPUT_LAYOUT'}}        if exists $option->{'INPUT_LAYOUT'};
-        $option_content .= qq{OUTPUT_SHIFTING=>$option->{'OUTPUT_SHIFTING'}}  if exists $option->{'OUTPUT_SHIFTING'};
-        $option_content .= qq{SPACE=>@{[uc unpack('H*',$option->{'SPACE'})]}} if exists $option->{'SPACE'};
-        $option_content .= qq{GETA=>@{[uc unpack('H*',$option->{'GETA'})]}}   if exists $option->{'GETA'};
-        $option_content = "{$option_content}";
+        my @option_content = ();
+        push(@option_content, qq{INPUT_LAYOUT=>$option->{'INPUT_LAYOUT'}})        if exists $option->{'INPUT_LAYOUT'};
+        push(@option_content, qq{OUTPUT_SHIFTING=>$option->{'OUTPUT_SHIFTING'}})  if exists $option->{'OUTPUT_SHIFTING'};
+        push(@option_content, qq{SPACE=>@{[uc unpack('H*',$option->{'SPACE'})]}}) if exists $option->{'SPACE'};
+        push(@option_content, qq{GETA=>@{[uc unpack('H*',$option->{'GETA'})]}})   if exists $option->{'GETA'};
+        $option_content = "{@option_content}";
     }
 
     ok(($return > 0) and ($got eq $want),

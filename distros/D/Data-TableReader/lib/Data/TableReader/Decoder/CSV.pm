@@ -1,5 +1,5 @@
 package Data::TableReader::Decoder::CSV;
-$Data::TableReader::Decoder::CSV::VERSION = '0.009';
+$Data::TableReader::Decoder::CSV::VERSION = '0.010';
 use Moo 2;
 use Try::Tiny;
 use Carp;
@@ -198,7 +198,7 @@ Data::TableReader::Decoder::CSV - Access rows of a comma-delimited text file
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 DESCRIPTION
 

@@ -52120,3 +52120,17 @@ D/DR/DRAGOSV/Serge-Sync-Plugin-TranslationService-zanata-0.905.5.tar.gz
 O/OD/ODDTUPLE/Sub-Fp-0.27.tar.gz
 T/TO/TODDR/Test-MockFile-0.017.tar.gz
 G/GE/GENE/Test-NaiveStubs-0.0702.tar.gz
+T/TV/TVDW/AnyEvent-YACurl-0.04.tar.gz
+D/DA/DAM/App-KGB-1.54.tar.gz
+L/LE/LEEJO/AWS-S3-0.16.tar.gz
+L/LN/LNATION/Data-LNPath-0.07.tar.gz
+N/NE/NERDVANA/Data-TableReader-0.010.tar.gz
+N/NE/NERDVANA/Data-TableReader-Decoder-HTML-0.010.tar.gz
+S/SH/SHLOMIF/Games-Solitaire-BlackHole-Solver-0.2.2.tar.gz
+I/IN/INA/Jacode4e/Jacode4e-2.13.6.11.tar.gz
+I/IN/INA/Jacode4e/RoundTrip/Jacode4e-RoundTrip-2.13.81.5.tar.gz
+L/LS/LSKATZ/Mashtree-0.36.tar.gz
+R/RE/RENEEB/OTRS-OPM-Maker-0.12.tar.gz
+D/DR/DRAGOSV/Serge-Sync-Plugin-TranslationService-mojito-0.905.4.tar.gz
+B/BE/BENNING/Test-Mock-Net-Server-Mail-1.01.tar.gz
+B/BA/BALAJIRAM/Text-Parser-0.752.tar.gz

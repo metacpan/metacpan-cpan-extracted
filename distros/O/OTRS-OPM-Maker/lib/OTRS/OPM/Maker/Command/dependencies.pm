@@ -9,23 +9,24 @@ use XML::LibXML;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = 0.07;
+our $VERSION = '0.12';
 
 sub abstract {
     return "list dependencies for OTRS packages";
 }
 
 sub usage_desc {
-    return "opmbuild dependencies <path_to_opm>";
+    return "opmbuild dependencies <path_to_sopm_or_opm>";
 }
 
 sub validate_args {
     my ($self, $opt, $args) = @_;
     
-    $self->usage_error( 'need path to .sopm' ) if
-        !$args ||
-        !$args->[0] ||
-        !$args->[0] =~ /\.sopm\z/ ||
+    $self->usage_error( 'need path to .sopm or .opm' ) if
+        !$args or
+        'ARRAY' ne ref $args or
+        !defined $args->[0] or
+        $args->[0] !~ /\.s?opm\z/ or
         !-f $args->[0];
 }
 
@@ -71,7 +72,7 @@ OTRS::OPM::Maker::Command::dependencies - List dependencies of OTRS packages
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 AUTHOR
 
