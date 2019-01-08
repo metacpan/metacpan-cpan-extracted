@@ -8,7 +8,7 @@ use Scalar::Util qw/blessed/;
 
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
 ## no critic (RequireFinalReturn, RequireArgUnpacking)
 
@@ -31,8 +31,8 @@ sub TIEHANDLE {
 	@_ and warnings::warnif("too many arguments to $class->TIEHANDLE");
 	return bless { __innerhandle=>$innerhandle }, $class;
 }
-sub UNTIE    { shift->{__innerhandle}=undef; return }
-sub DESTROY  { shift->{__innerhandle}=undef; return }
+sub UNTIE    { delete shift->{__innerhandle}; return }
+sub DESTROY  { delete shift->{__innerhandle}; return }
 
 sub innerhandle { shift->{__innerhandle} }
 sub set_inner_handle { $_[0]->{__innerhandle} = $_[1] }
@@ -100,6 +100,20 @@ sub inner_write { # can be called as function or method
 	return undef;  ## no critic (ProhibitExplicitReturnUndef)
 }
 
+sub open_parse {
+	croak "not enough arguments to open_parse" unless @_;
+	my $fnwm = shift;
+	carp "too many arguments to open_parse" if @_>1;
+	return ($fnwm, shift) if @_;  # passthru
+	if ( $fnwm =~ s{^\s* ( \| | \+? (?: < | >>? ) (?:&=?)? ) | ( \| ) \s*$}{}x ) {
+		my ($x,$y) = ($1,$2);  $fnwm =~ s/^\s+|\s+$//g;
+		if ( defined $y )      { return ('-|', $fnwm) }
+		elsif ( $x eq '|' )    { return ('|-', $fnwm) }
+		else                   { return ($x,   $fnwm) }
+	} else
+		{ $fnwm=~s/^\s+|\s+$//g; return ('<',  $fnwm) }
+}
+
 1;
 __END__
 
@@ -139,7 +153,7 @@ A few limitations that exist in L<Tie::StdHandle|Tie::StdHandle> (at least
 versions up to and including 4.4) have been lifted: C<BINMODE> accepts the
 C<LAYER> argument, and C<WRITE> will return the length of the string written.
 
-This documentation describes version 0.08 of this module.
+This documentation describes version 0.12 of this module.
 
 B<See Also:> L<perltie>, L<perlfunc/tie>, L<Tie::Handle>, L<Tie::StdHandle>
 
@@ -234,6 +248,23 @@ This implementation will first call the C<FILENO> method and check for
 C<defined>ness to see if the inner handle is still open, and if it is, call the
 C<CLOSE> method before calling Perl's C<open> to open the inner handle.
 
+=head3 C<open_parse>
+
+This is a simple utility method that tries to parse a two-argument C<open>
+and return arguments corresponding to a three-argument C<open>. It currently
+does I<not> do much validation, because it is assumed you will be implementing
+the code to act on the returned mode yourself.
+
+ sub OPEN {
+ 	my $self = shift;
+ 	croak "bad number of arguments to open" if @_<1||@_>2;
+ 	my ($mode,$filename) = Tie::Handle::Base::open_parse(@_);
+ 	...
+
+Note that if you pass C<open_parse> two arguments instead of just one, they
+will simply be passed through. An C<open> with no arguments or more than two
+arguments is not (yet) supported by this function.
+
 =head2 C<PRINT>, C<PRINTF>, and C<WRITE>
 
 The methods C<PRINT> and C<PRINTF> emulate the Perl functions by the same name
@@ -304,6 +335,11 @@ C<DESTROY>.
 L<prototype|perlfunc/prototype> function as of Perl 5.26. Note that C<print>
 and C<printf> get special handling by Perl and therefore do not report a
 standard prototype.
+
+=head1 See Also
+
+L<Tie::Handle::Argv> (part of this distribution),
+a base class for tying to Perl's magic C<ARGV> handle.
 
 =head1 Author, Copyright, and License
 

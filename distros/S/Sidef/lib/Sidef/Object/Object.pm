@@ -35,6 +35,7 @@ package Sidef::Object::Object {
       q{cmp} => sub {
         my ($obj1, $obj2, $swapped) = @_;
 
+        # Support for cyclic references
         if (    CORE::ref($obj1) eq CORE::ref($obj2)
             and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
             and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
@@ -54,14 +55,14 @@ package Sidef::Object::Object {
             }
         }
 
-#<<<
-        (CORE::ref($obj1) ? Scalar::Util::refaddr($obj1) : ('-inf' + 0)) <=>
-        (CORE::ref($obj2) ? Scalar::Util::refaddr($obj2) : ('-inf' + 0));
-#>>>
+        (CORE::ref($obj1) eq CORE::ref($obj2))
+          ? (Scalar::Util::refaddr($obj1) <=> Scalar::Util::refaddr($obj2))
+          : (CORE::ref($obj1) cmp CORE::ref($obj2));
       },
       q{eq} => sub {
         my ($obj1, $obj2) = @_;
 
+        # Support for cyclic references
         if (    CORE::ref($obj1) eq CORE::ref($obj2)
             and CORE::ref($obj1) ne 'Sidef::Types::Number::Number'
             and Scalar::Util::refaddr($obj1) == Scalar::Util::refaddr($obj2)) {
@@ -350,6 +351,27 @@ package Sidef::Object::Object {
             Sidef::Types::Hash::Hash->new(%methods);
         }
 
+        # Pipeline operator
+        *{__PACKAGE__ . '::' . '|>'} = sub {
+            my ($arg, $func, @args) = @_;
+
+            if (CORE::ref($func) eq 'Sidef::Types::Array::Array') {
+                @args = @$func;
+                $func = shift(@args);
+            }
+
+            if (CORE::ref($func) eq 'Sidef::Types::String::String') {
+                return $arg->$$func(@args);
+            }
+
+            $func->call($arg, @args);
+        };
+
+        # Pair operator
+        *{__PACKAGE__ . '::' . ':'} = sub {
+            Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
         # Logical AND
         *{__PACKAGE__ . '::' . '&&'} = sub {
             $_[0] ? $_[1] : $_[0];
@@ -378,6 +400,26 @@ package Sidef::Object::Object {
 
             if ($swapped) {
                 ($first, $second) = ($second, $first);
+            }
+
+            # Second is not an object (assuming it is a typename)
+            # Return true if `typeof(first)` is a subclass of `second`
+            if (!CORE::ref($second)) {
+                return (
+                        UNIVERSAL::isa(CORE::ref($first), $second)
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
+            }
+
+            # First is not an object (assuming it is a typename)
+            # Return true if `first` is a subclass of `typeof(second)`
+            if (!CORE::ref($first)) {
+                return (
+                        UNIVERSAL::isa($first, CORE::ref($second))
+                        ? Sidef::Types::Bool::Bool::TRUE
+                        : Sidef::Types::Bool::Bool::FALSE
+                       );
             }
 
             # First is String

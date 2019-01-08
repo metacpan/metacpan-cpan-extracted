@@ -1,10 +1,10 @@
-# $Id: SQLite.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: SQLite.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -98,7 +98,7 @@ CPAN::SQLite - maintain and search a minimal CPAN database
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 SYNOPSIS
 
@@ -112,9 +112,8 @@ version 0.212
 
 This package is used for setting up, maintaining, and
 searching a CPAN database consisting of the information
-stored in the three main CPAN indices:
-F<$CPAN/modules/03modlist.data.gz>,
-F<$CPAN/modules/02packages.details.txt.gz>, and
+stored in the two main CPAN indices:
+F<$CPAN/modules/02packages.details.txt.gz> and
 F<$CPAN/authors/01mailrc.txt.gz>. It should be
 considered at an alpha stage of development.
 
@@ -257,16 +256,11 @@ directory as the database file.
 
 =head1 SEE ALSO
 
-L<CPAN::SQLite::Index>, for setting up and maintaining
-the database, and L<CPAN::SQLite::Search> for an
-interface to querying the database. Some details
-of the interaction with L<CPAN> is available from
-L<CPAN::SQLite::META>. See also the L<cpandb> script for a
-command-line interface to the
-indexing and querying of the database.
-
-Development takes place on the CPAN-Search-Lite project
-at L<http://cpan-search.svn.sourceforge.net/viewvc/cpan-search/CPAN-SQLite/>.
+L<CPAN::SQLite::Index>, for setting up and maintaining the database, and
+L<CPAN::SQLite::Search> for an interface to querying the database. Some
+details of the interaction with L<CPAN> is available from
+L<CPAN::SQLite::META>. See also the L<cpandb> script for a command-line
+interface to the indexing and querying of the database.
 
 =head1 SUPPORT
 
@@ -324,6 +318,15 @@ If CPAN_SQLITE_NO_LOG_FILES is set, no log files will be created
 during the indexing procedures. Log files are deleted automatically
 in 30 days. To override this, set CPAN_SQLITE_LOG_FILES_CLEANUP.
 To stop automatic cleanup, set this variable to 0.
+
+If CPAN_SQLITE_DOWNLOAD variable are set, an already existing and
+up-to-date cpandb.sql file will be downloaded from
+http://cpansqlite.trouchelle.com/ where it's updated every hour. This
+greatly increases performance and decreases CPU and memory consumption
+during the indexing process.
+
+See L<CPAN::SQLite::Index> for more details, potential problems, and more
+configuration options.
 
 =head1 AUTHORS
 

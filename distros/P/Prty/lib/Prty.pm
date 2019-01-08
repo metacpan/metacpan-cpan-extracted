@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 =encoding utf8
 
@@ -41,6 +41,10 @@ L<Prty::AsciiTable> - ASCII-Tabelle parsen
 =item *
 
 L<Prty::Assert> - Zusicherungen
+
+=item *
+
+L<Prty::Cascm> - Schnittstelle zu CA Harvest SCM
 
 =item *
 
@@ -440,15 +444,15 @@ L<Prty::Math> - Mathematische Funktionen
 
 =item *
 
-L<Prty::MediaWiki::Client> - MediaWiki Client
+L<Prty::MediaWiki::Api> - Clientseitiger Zugriff auf MediaWiki API
+
+=item *
+
+L<Prty::MediaWiki::Loader> - MediaWiki Seiten-Lader
 
 =item *
 
 L<Prty::MediaWiki::Markup> - MediaWiki Code Generator
-
-=item *
-
-L<Prty::MediaWiki::Page> - MediaWiki Seite
 
 =item *
 
@@ -660,6 +664,14 @@ L<Prty::TeX::Code> - Generator für TeX Code
 
 =item *
 
+L<Prty::TempDir> - Temporäres Verzeichnis
+
+=item *
+
+L<Prty::TempFile> - Temporäre Datei
+
+=item *
+
 L<Prty::Template> - Klasse für HTML/XML/Text-Generierung
 
 =item *
@@ -738,7 +750,7 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -746,7 +758,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

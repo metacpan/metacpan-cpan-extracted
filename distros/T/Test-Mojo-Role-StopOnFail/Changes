@@ -1,0 +1,15 @@
+Changelog for Test-Mojo-Role-StopOnFail
+
+0.01 2019-01-07T14:08:03
+ - Do not copy changes to root (Junior Moraes)
+ - Update git ignore (Junior Moraes)
+ - Update dist.ini (Junior Moraes)
+ - Fix kwalitee tests (Junior Moraes)
+ - Fix tests after changes (Junior Moraes)
+ - Add POD documentation (Junior Moraes)
+ - Initial setup of Dist::Zilla (Junior Moraes)
+ - Bail out on fail (Junior Moraes)
+ - Test bail out (Junior Moraes)
+ - Test role (Junior Moraes)
+ - Add git ignore (Junior Moraes)
+ - Dzil init (Junior Moraes)

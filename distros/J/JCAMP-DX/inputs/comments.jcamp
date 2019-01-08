@@ -1,0 +1,10 @@
+##title=
+##= the first line with comments
+##jcamp-dx=4.24
+##= second line
+with more than one line
+of comments
+##color= yellow
+##=
+third line of comments
+##end=

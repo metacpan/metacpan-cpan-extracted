@@ -1,0 +1,22 @@
+$VAR1 = bless( {
+  'blocks' => [],
+  'data' => {
+    'COLOR' => bless( {
+      'label' => 'color',
+      'value' => 'yellow'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'JCAMPDX' => bless( {
+      'label' => 'jcamp-dx',
+      'value' => '4.24'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'TITLE' => bless( {
+      'label' => 'title',
+      'value' => ''
+    }, 'JCAMP::DX::LabelDataRecord' )
+  },
+  'labels' => [
+    $VAR1->{'data'}{'TITLE'},
+    $VAR1->{'data'}{'JCAMPDX'},
+    $VAR1->{'data'}{'COLOR'}
+  ]
+}, 'JCAMP::DX' );

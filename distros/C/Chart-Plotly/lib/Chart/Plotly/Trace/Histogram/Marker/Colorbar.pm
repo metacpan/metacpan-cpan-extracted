@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Histogram::Marker::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Histogram::Marker::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Histogram::Marker::Colorbar::Title;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace histogram.
 
@@ -274,7 +274,7 @@ Chart::Plotly::Trace::Histogram::Marker::Colorbar - This attribute is one of the
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

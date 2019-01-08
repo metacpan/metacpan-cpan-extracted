@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Hash;
 use Prty::Option;
@@ -63,7 +63,8 @@ Ein UDL hat den Aufbau:
     api#dbms:db%user:password@host:port;options
 
 Ein Objekt der Klasse kapselt einen UDL und bietet Methoden,
-um auf die einzelnen Komponenten zuzugreifen.
+um auf die einzelnen Komponenten zuzugreifen. Kommen Metazeichen
+im Passwort oder den Options vor, können diese mit \ maskiert werden.
 
 =head1 ATTRIBUTES
 
@@ -648,25 +649,57 @@ sub udl {
     if (@_ == 1) { # $udlStr
         my $udl = shift;
 
-        if ($udl =~ s|^([a-z]+)#||) {
-            $self->api($1);
+        # Zerlege UDL auf den Metazeichen: #%@;
+        # Mit \ können die Metazeichen maskiert werden.
+
+        my @arr = split /((?<!\\)[#%@;])/,$udl;
+        $self->api(shift @arr);
+
+        my ($dbms,$db,$user,$password,$host,$port,@options);
+        while (@arr) {
+            my $key = shift @arr;
+            my $val = shift @arr;
+            $val =~ s|\\([#%@;])|$1|g; # #%@; entmaskieren
+
+            if ($key eq '#') {
+                ($dbms,$db) = split /:/,$val,2;
+                if (!defined $dbms) {
+                    $dbms = '';
+                }
+            }
+            elsif ($key eq '%') {
+                ($user,$password) = split /:/,$val,2;
+            }
+            elsif ($key eq '@') {
+                ($host,$port) = split /:/,$val,2;
+            }
+            else { # ;
+                push @options,split /=/,$val,2;
+            }
         }
-        if ($udl =~ s|;(.*)||) {
-            $self->options($1);
-        }
-        if ($udl =~ s|\@([^%]+)||) {
-            my ($host,$port) = split(/:/,$1,2);
-            $self->host($host);
-            $self->port($port);
-        }
-        my ($dbms,$db,$user,$password);
-        if ($udl =~ s|%([^@]+)||) {
-            ($user,$password) = split(/:/,$1,2);
-        }
-        ($dbms,$db) = split(/:/,$udl,2);
-        if (!defined $dbms) {
-            $dbms = '';
-        }
+
+        # Alte Implementierung. Wegen neuer Möglichkeit zur Maskierung der Metazeichen
+        # durch \, durch obige Implementierung ersetzt.
+
+        #if ($udl =~ s|^([a-z]+)#||) {
+        #    $self->api($1);
+        #}
+        #if ($udl =~ s|;(.*)||) {
+        #    $self->options($1);
+        #}
+        #if ($udl =~ s|\@([^%]+)||) {
+        #    my ($host,$port) = split(/:/,$1,2);
+        #    $self->host($host);
+        #    $self->port($port);
+        #}
+        #my ($dbms,$db,$user,$password);
+        #if ($udl =~ s|%([^@]+)||) {
+        #    ($user,$password) = split(/:/,$1,2);
+        #}
+        #($dbms,$db) = split(/:/,$udl,2);
+        #if (!defined $dbms) {
+        #    $dbms = '';
+        #}
 
         # Rückwärtskompatibilität
 
@@ -678,6 +711,9 @@ sub udl {
         $self->password($password);
         $self->dbms($dbms);
         $self->db($db);
+        $self->host($host);
+        $self->port($port);
+        $self->options(@options);
     }
     else { # @keyVal
         while (@_) {
@@ -693,7 +729,7 @@ sub udl {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -701,7 +737,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

@@ -1,4 +1,4 @@
-package Pcore::Chrome v0.4.6;
+package Pcore::Chrome v0.4.7;
 
 use Pcore -dist, -class, -res;
 use Pcore::Chrome::Tab;

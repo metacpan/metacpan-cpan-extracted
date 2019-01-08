@@ -1,0 +1,76 @@
+NAME
+    Package::Util::Lite - Package-related utilities
+
+VERSION
+    This document describes version 0.001 of Package::Util::Lite (from Perl
+    distribution Package-Util-Lite), released on 2019-01-06.
+
+SYNOPSIS
+     use Package::Util::Lite qw(
+         package_exists
+         list_subpackages
+     );
+
+     print "Package Foo::Bar exists" if package_exists("Foo::Bar");
+
+     my @subpkg    = list_subpackages("Foo::Bar");
+     my @allsubpkg = list_subpackages("Foo::Bar", 1); # recursive
+
+DESCRIPTION
+    This module provides package-related utilities. You should check
+    Package::Stash first, then here.
+
+FUNCTIONS
+  package_exists
+    Usage:
+
+     package_exists($name) => bool
+
+    Return true if package "exists". By "exists", it means that the package
+    has been defined by "package" statement or some entries have been
+    created in the symbol table (e.g. "$Foo::var = 1;" will make the "Foo"
+    package "exist").
+
+    This function can be used e.g. for checking before aliasing one package
+    to another. Or to casually check whether a module has been loaded.
+
+  list_subpackages($name[, $recursive]) => @res
+    List subpackages, e.g.:
+
+     (
+         "Foo::Bar::Baz",
+         "Foo::Bar::Qux",
+         ...
+     )
+
+    If $recursive is true, will also list subpackages of subpackages, and so
+    on.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Package-Util-Lite>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Package-Util-Lite>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Package-Util-Lite>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Package::Stash
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

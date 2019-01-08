@@ -1,6 +1,16 @@
 Changes file for OTRS::OPM::Maker
 =================================
 
+0.14 2019-01-07 08:20:00
+
+     + add more tests for the commands
+     + updated dist.ini
+
+0.13 2019-01-06 08:45:00
+
+     + add more tests for the commands
+     + updated dist.ini
+
 0.12 2019-01-03 09:33:00
 
      + add more tests for the commands

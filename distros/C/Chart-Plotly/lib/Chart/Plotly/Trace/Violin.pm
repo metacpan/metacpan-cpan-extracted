@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Violin::Stream;
 use Chart::Plotly::Trace::Violin::Transform;
 use Chart::Plotly::Trace::Violin::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: In vertical (horizontal) violin plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one violin per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single violin is drawn. That violin position is then positioned with with `name` or with `x0` (`y0`) if provided.
 
@@ -78,7 +78,7 @@ has fillcolor => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -92,7 +92,8 @@ has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Violin::Hoverlabel", );
 
 has hoveron => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Do the hover effects highlight individual violins or sample points or the kernel density estimate or any combination of them?",
 );
@@ -309,7 +310,7 @@ Chart::Plotly::Trace::Violin - In vertical (horizontal) violin plots, statistics
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

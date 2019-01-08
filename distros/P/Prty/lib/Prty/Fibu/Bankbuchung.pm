@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Fibu::Buchung;
 
@@ -168,7 +168,7 @@ sub toBuchungen {
         my ($monat) = $self->buchungsdetails =~ m| (\d\d\.\d\d) |;
         push @arr,
             Prty::Fibu::Buchung->new(
-                vorgang => 'Sonstige Kosten / Internet',
+                vorgang => 'Sonstige Kosten / Internetkosten',
                 text => "wilhelm.tel ($monat)",
                 beleg => 1,
             ),
@@ -306,6 +306,16 @@ sub toBuchungen {
 
     # *** Einmalige Buchungen ***
 
+    elsif ($self->buchungsdatum eq '25.10.2018' &&
+            $self->empfaenger eq 'EBAY GMBH') {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                text => 'Privatentnahme',
+                beleg => 0,
+            ),
+        ;
+    }
     elsif ($self->buchungsdatum eq '27.08.2018' &&
             $self->empfaenger =~ /dubaro.de/) {
         push @arr,
@@ -329,6 +339,62 @@ sub toBuchungen {
                 vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
                 betrag => '-1465,50',
                 text => 'Nebenkosten Nachzahlung',
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /24.10.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-0,99',
+                text => 'Samsung Cloud Service (2018-09-26)',
+                beleg => 0,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,13',
+                text => 'github.com (2018-09-28)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,52',
+                text => 'Amazon Server (2018-10-04)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-24,20',
+                text => 'Privatentnahme',
+                beleg => 0,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-2,99',
+                text => 'Privatentnahme',
+                beleg => 0,
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /25.09.18 VISA CARD/) {
+        push @arr,
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-0,99',
+                text => 'Samsung Cloud Service (2018-08-27)',
+                beleg => 0,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,15',
+                text => 'github.com (2018-08-28)',
+                beleg => 1,
+            ),
+            Prty::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,80',
+                text => 'Amazon Server (2018-09-04)',
+                beleg => 1,
             ),
         ;
     }
@@ -1051,6 +1117,10 @@ sub betragZahl {
 
     $str = $bbu->buchungstag;
 
+=head4 Alias
+
+buchungsdatum()
+
 =head4 Returns
 
 String
@@ -1067,6 +1137,11 @@ sub buchungstag {
     }
 
     return $self->buchungsdatum;
+}
+
+{
+    no warnings 'once';
+    *buchungsdatum = \&buchungstag;
 }
 
 # -----------------------------------------------------------------------------
@@ -1198,7 +1273,7 @@ sub saldoZahl {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -1206,7 +1281,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

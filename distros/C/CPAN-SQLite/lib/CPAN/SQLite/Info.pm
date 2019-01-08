@@ -1,10 +1,10 @@
-# $Id: Info.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: Info.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::Info;
 use strict;
 use warnings;
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -32,7 +32,6 @@ sub fetch_info {
 
 sub dists_and_mods {
   my $self = shift;
-  my $modlist = $self->modlist();
   my ($packages, $cpan_files) = $self->packages();
 
   my ($dists, $mods);
@@ -85,38 +84,6 @@ sub dists_and_mods {
     $mods->{$mod_name}->{dist_name} = $dist_name;
     $dists->{$dist_name}->{modules}->{$mod_name}++;
     $mods->{$mod_name}->{mod_vers} = $packages->{$mod_name}->{mod_vers};
-    if (my $info = $modlist->{$mod_name}) {
-      if (my $mod_abs = $info->{description}) {
-            $mods->{$mod_name}->{mod_abs} =  $mod_abs;
-            (my $trial_dist = $mod_name) =~ s!::!-!g;
-            if ($trial_dist eq $dist_name) {
-              $dists->{$dist_name}->{dist_abs} = $mod_abs;
-            }
-      }
-      if (my $chapterid = $info->{chapterid} + 0) {
-            $mods->{$mod_name}->{chapterid} = $chapterid;
-            (my $sub_chapter = $mod_name) =~ s!^([^:]+).*!$1!;
-            $dists->{$dist_name}->{chapterid}->{$chapterid}->{$sub_chapter}++;
-      }
-      my %dslip = ();
-      for (qw(statd stats statl stati statp) ) {
-            next unless defined $info->{$_};
-            $dslip{$_} = $info->{$_};
-      }
-      if (%dslip) {
-            my $value = '';
-            foreach (qw(d s l i p)) {
-              my $key = 'stat' . $_;
-              $value .= (defined $dslip{$key} ?
-                         $dslip{$key} : '?');
-            }
-            $mods->{$mod_name}->{dslip} = $value;
-            (my $trial_dist = $mod_name) =~ s!::!-!g;
-            if ($trial_dist eq $dist_name) {
-              $dists->{$dist_name}->{dslip} = $value;
-            }
-      }
-    }
   }
   $self->{dists} = $dists;
   return $self->{mods} = $mods;
@@ -124,24 +91,8 @@ sub dists_and_mods {
 
 sub modlist {
   my $self = shift;
-  my $index = 'modules/03modlist.data.gz';
-  my $mod = $self->{keep_source_where} ?
-    CPAN::FTP->localize($index,
-                        catfile($self->{keep_source_where}, $index) ) :
-                          catfile($self->{CPAN}, $index);
-  return unless check_file('modules/03modlist.data.gz', $mod);
-  print_debug("Reading information from $mod\n");
-  my $lines = zcat($mod);
-  while (@$lines) {
-    my $shift = shift(@$lines);
-    last if $shift =~ /^\s*$/;
-  }
-  push @$lines, q{CPAN::Modulelist->data;};
-  my($comp) = Safe->new("CPAN::Safe1");
-  my($eval) = join("\n", @$lines);
-  my $ret = $comp->reval($eval);
-  die "Cannot eval $mod: $@" if $@;
-  return $ret;
+  warn 'Modlist does not contain any useful info anymore';
+  return;
 }
 
 sub packages {
@@ -243,13 +194,12 @@ CPAN::SQLite::Info - extract information from CPAN indices
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 
 This module extracts information from the CPAN indices
-F<$CPAN/modules/03modlist.data.gz>,
-F<$CPAN/modules/02packages.details.txt.gz>, and
+F<$CPAN/modules/02packages.details.txt.gz> and
 F<$CPAN/authors/01mailrc.txt.gz>.
 
 A C<CPAN::SQLite::Info> object is created with
@@ -287,16 +237,6 @@ hash reference with keys of
     print "Module: $module\n";
   }
 
-=item C<chapterid> - specifies the chapterid and the subchapter
-for the distribution:
-
-  for my $id (keys %{$info->{$distname}->{chapterid}}) {
-    print "For chapterid $id\n";
-    for my $sc (keys %{$info->{$distname}->{chapterid}->{$id}}) {
-      print "   Subchapter: $sc\n";
-    }
-  }
-
 =back
 
 =item * C<$info-E<gt>{mods}>
@@ -312,11 +252,6 @@ hash reference with keys of
 =item C<mod_vers> - the version
 
 =item C<mod_abs> - a description, if available
-
-=item C<chapterid> - the chapter id of the module, if present
-
-=item C<dslip> - a 5 character string specifying the dslip
-(development, support, language, interface, public licence) information.
 
 =back
 

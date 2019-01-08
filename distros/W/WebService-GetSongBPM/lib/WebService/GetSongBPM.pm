@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the getsongbpm.com API
 
-our $VERSION = '0.0101';
+our $VERSION = '0.0200';
 
 use Moo;
 use strictures 2;
@@ -53,6 +53,7 @@ sub fetch {
     my $type;
     my $lookup;
     my $id;
+
     if ( $self->artist && $self->song ) {
         $type   = 'both';
         $lookup = 'song:' . $self->song . '+artist:' . $self->artist;
@@ -71,6 +72,7 @@ sub fetch {
         unless $type;
 
     my $url = $self->base;
+
     if ( $self->artist_id or $self->song_id ) {
         $url .= "/$type/?api_key=" . $self->api_key
             . "&id=$id";
@@ -82,6 +84,7 @@ sub fetch {
     }
 
     my $ua = Mojo::UserAgent->new;
+
     my $tx = $ua->get($url);
 
     my $data = _handle_response($tx);
@@ -94,14 +97,13 @@ sub _handle_response {
 
     my $data;
 
-    if ( my $res = $tx->success ) {
+    my $res = $tx->result;
+
+    if ( $res->is_success ) {
         $data = decode_json( $res->body );
     }
     else {
-        my $err = $tx->error;
-        croak "$err->{code} response: $err->{message}"
-            if $err->{code};
-        croak "Connection error: $err->{message}";
+        croak "Connection error: ", $res->message;
     }
 
     return $data;
@@ -121,7 +123,7 @@ WebService::GetSongBPM - Access to the getsongbpm.com API
 
 =head1 VERSION
 
-version 0.0101
+version 0.0200
 
 =head1 SYNOPSIS
 

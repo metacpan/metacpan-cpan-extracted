@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Option;
 use Prty::Path;
@@ -83,7 +83,8 @@ open()
 
 =item -createDir => $bool (Default: 0)
 
-Erzeuge den Verzeichnispfad, falls er nicht existiert.
+Erzeuge den Verzeichnispfad einer Datei, die geschrieben wird,
+falls er nicht existiert.
 
 =item -lock => 'EX'|'SH'|'EXNB'|'SHNB' (Default: kein Lock)
 
@@ -168,7 +169,7 @@ sub new {
                 $path = \(my $tmp = $$path);
             }
 
-            if ($createDir) {
+            if ($mode eq '>' && $createDir) {
                 Prty::Path->mkdir($path,-createParent=>1);
             }
 
@@ -813,7 +814,7 @@ sub captureStderr {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -821,7 +822,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

@@ -15,8 +15,10 @@ use Module::Load;
 use Ref::Util;
 use HTML::Show;
 use UUID::Tiny ':std';
+use File::ShareDir;
+use Path::Tiny;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Generate html/javascript charts from perl data using javascript library plotly.js
 
@@ -60,11 +62,8 @@ sub _render_cell {
     if ( defined $layout ) {
         $layout = "," . $layout;
     }
-    my $load_plotly = '';
-    if ( ${$extra}{'load_plotly_using_script_tag'} ) {
-        $load_plotly = '<script src="https://cdn.plot.ly/plotly-' . plotlyjs_version() . '.min.js"></script>';
-    }
-    my $template = <<'TEMPLATE';
+    my $load_plotly = _load_plotly( ${$extra}{'load_plotly_using_script_tag'} );
+    my $template    = <<'TEMPLATE';
 <div id="{$chart_id}"></div>
 {$load_plotly}
 <script>
@@ -97,6 +96,23 @@ sub _process_data {
     }
     my $data_string = $json_formatter->encode($data);
     return $data_string;
+}
+
+sub _load_plotly {
+    my $how_to_load = shift;
+    if ($how_to_load) {
+        if ( $how_to_load eq "1" || $how_to_load eq 'cdn' ) {
+            return '<script src="https://cdn.plot.ly/plotly-' . plotlyjs_version() . '.min.js"></script>';
+        } elsif ( $how_to_load eq 'embed' ) {
+            my $minified_plotly = File::ShareDir::dist_file( 'Chart-Plotly', 'plotly.js/plotly.min.js' );
+            return '<script>' . Path::Tiny::path($minified_plotly)->slurp . '</script>';
+        } elsif ( $how_to_load eq 'module_dist' ) {
+            my $minified_plotly = File::ShareDir::dist_file( 'Chart-Plotly', 'plotly.js/plotly.min.js' );
+            return '<script src="file://' . $minified_plotly . '"></script>';
+        }
+    } else {
+        return '';
+    }
 }
 
 sub html_plot {
@@ -136,7 +152,7 @@ Chart::Plotly - Generate html/javascript charts from perl data using javascript 
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -277,10 +293,20 @@ This is free software, licensed under:
 
   The MIT (X11) License
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords weatherwax
+=for stopwords stphnlyd weatherwax
+
+=over 4
+
+=item *
+
+stphnlyd <stephanloyd9@gmail.com>
+
+=item *
 
 weatherwax <s.g.lobo@hotmail.com>
+
+=back
 
 =cut

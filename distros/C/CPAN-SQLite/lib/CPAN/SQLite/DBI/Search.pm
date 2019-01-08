@@ -1,4 +1,4 @@
-# $Id: Search.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: Search.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::DBI::Search;
 
@@ -6,9 +6,8 @@ use strict;
 use warnings;
 
 BEGIN {
-  our $VERSION = '0.212';
+  our $VERSION = '0.214';
   $CPAN::SQLite::DBI::Search::info::VERSION = $VERSION;
-  $CPAN::SQLite::DBI::Search::chaps::VERSION = $VERSION;
   $CPAN::SQLite::DBI::Search::mods::VERSION = $VERSION;
   $CPAN::SQLite::DBI::Search::dists::VERSION = $VERSION;
   $CPAN::SQLite::DBI::Search::auths::VERSION = $VERSION;
@@ -19,10 +18,6 @@ use CPAN::SQLite::DBI qw($tables $dbh);
 use CPAN::SQLite::Util qw($full_id);
 
 package CPAN::SQLite::DBI::Search::info;
-use parent 'CPAN::SQLite::DBI::Search';
-use CPAN::SQLite::DBI qw($dbh);
-
-package CPAN::SQLite::DBI::Search::chaps;
 use parent 'CPAN::SQLite::DBI::Search';
 use CPAN::SQLite::DBI qw($dbh);
 
@@ -41,7 +36,7 @@ use CPAN::SQLite::DBI qw($dbh);
 package CPAN::SQLite::DBI::Search;
 use parent 'CPAN::SQLite::DBI';
 use CPAN::SQLite::DBI qw($tables $dbh);
-use CPAN::SQLite::Util qw($full_id expand_dslip download %chaps);
+use CPAN::SQLite::Util qw($full_id download);
 
 sub fetch {
   my ($self, %args) = @_;
@@ -162,14 +157,6 @@ sub extra_info {
   if ($results->{cpanid} and $results->{dist_file}) {
     $results->{download} = download($results->{cpanid}, $results->{dist_file});
   }
-  my $what;
-  if ( ($what = $results->{dslip}) or ($what = $results->{dist_dslip}) ) {
-    $results->{dslip_info} = expand_dslip($what);
-  }
-  if (my $chapterid = $results->{chapterid}) {
-    $chapterid += 0;
-    $results->{chapter_desc} = $chaps{$chapterid};
-  }
   return;
 }
 
@@ -270,7 +257,7 @@ CPAN::SQLite::DBI::Search - DBI information for searching the CPAN::SQLite datab
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 

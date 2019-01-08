@@ -1,9 +1,13 @@
+## no critic: (Modules::ProhibitAutomaticExportation)
+
 package Test::Data::Unixish;
 
-use 5.010;
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '1.570'; # VERSION
+
+use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 
 use Data::Unixish qw(aiduxa);
 use File::Which qw(which);
@@ -12,9 +16,6 @@ use JSON::MaybeXS;
 use Module::Load;
 use String::ShellQuote;
 use Test::More 0.96;
-
-our $VERSION = '1.56'; # VERSION
-our $DATE = '2017-07-10'; # DATE
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -76,7 +77,7 @@ sub test_dux_func {
                         }
 
                         # if itemfunc, test against each item
-                        if ('itemfunc' ~~ @{$meta->{tags}} &&
+                        if ((grep {$_ eq 'itemfunc'} @{$meta->{tags}}) &&
                                 ref($in) eq 'ARRAY') {
                             if ($t->{skip_itemfunc}) {
                                 diag "itemfunc test skipped";
@@ -157,7 +158,7 @@ Test::Data::Unixish - Routines to test Data::Unixish
 
 =head1 VERSION
 
-This document describes version 1.56 of Test::Data::Unixish (from Perl distribution Data-Unixish), released on 2017-07-10.
+This document describes version 1.570 of Test::Data::Unixish (from Perl distribution Data-Unixish), released on 2019-01-06.
 
 =for Pod::Coverage .+
 
@@ -183,7 +184,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

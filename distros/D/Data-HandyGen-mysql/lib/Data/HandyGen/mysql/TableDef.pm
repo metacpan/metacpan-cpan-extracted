@@ -3,7 +3,7 @@ package Data::HandyGen::mysql::TableDef;
 use strict;
 use warnings;
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.5';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -18,15 +18,15 @@ Data::HandyGen::mysql::TableDef - Manages table definition in mysql
 
 =head1 VERSION
 
-This documentation refers to Data::HandyGen::mysql::TableDef version 0.0.2
+This documentation refers to Data::HandyGen::mysql::TableDef version 0.0.5
 
 
 =head1 SYNOPSIS
 
     use Data::HandyGen::mysql::TableDef;
     use DBI;
-   
-    my $dbh = DBI->connect('dbi:mysql:dbname=testdb', 'username', 'password');     
+
+    my $dbh = DBI->connect('dbi:mysql:dbname=testdb', 'username', 'password');
     my $table_def = Data::HandyGen::mysql::TableDef->new( dbh => $dbh, table_name => 'table1');
 
 
@@ -41,7 +41,7 @@ This module is not intended for use outside Data::HandyGen. Its interface may be
 This module manages a table definition in one table in Mysql.
 
 
-=head1 METHODS 
+=head1 METHODS
 
 =head2 new(%params)
 
@@ -225,9 +225,9 @@ sub _fk {
               AND referenced_column_name IS NOT NULL
         });
         $sth->execute( $self->_dbname, $self->table_name, $column_name )
-            or confess "Failed to retrieve foreign key info (" 
+            or confess "Failed to retrieve foreign key info ("
                         . $self->table_name . ", $column_name)";
-        
+
         my @res = ();
         while ( my $row = $sth->fetchrow_arrayref() ) {
             push @res, { table => $row->[0], column => $row->[1] };
@@ -240,7 +240,7 @@ sub _fk {
 }
 
 
-=head2 is_pk($colname) 
+=head2 is_pk($colname)
 
 Returns 1 if $colname is one of primary key columns. Otherwise returns 0.
 
@@ -249,7 +249,7 @@ Returns 1 if $colname is one of primary key columns. Otherwise returns 0.
 sub is_pk {
     my ($self, $colname) = @_;
 
-    return 
+    return
         ( grep { $_ eq $colname } @{ $self->pk_columns() } ) ? 1 : 0;
 }
 
@@ -263,7 +263,7 @@ If $colname is a foreign key, returns referenced table/column name like this:
         table   => 'table name',
         column  => 'column name'
     }
-    
+
     #  In case multiple foreign keys found
     $ret = [
         { table => 'table1', column => 'column1' },
@@ -287,7 +287,7 @@ sub is_fk {
     }
     else {
         return $const_key;
-    }       
+    }
 
 }
 
@@ -301,7 +301,7 @@ Returns arrayref of column names of primary keys.
 
 sub pk_columns {
     my ($self) = @_;
-   
+
     unless ( $self->{pk_columns} ) {
 
         my $sth = $self->_get_dbh->prepare(q{
@@ -313,7 +313,7 @@ sub pk_columns {
         });
         $sth->execute( $self->_dbname, $self->table_name )
             or confess "Failed to retrieve primary key info (" . $self->table_name . ")";
-        
+
         my @pk = ();
         while ( my $row = $sth->fetchrow_arrayref() ) {
             push @pk, $row->[0];
@@ -344,7 +344,7 @@ sub column_def {
     my $col_def = Data::HandyGen::mysql::ColumnDef->new($column_name, $self->def->{$column_name});
     $self->{column_def}{$column_name} = $col_def;
 
-    return $self->{column_def}{$column_name};    
+    return $self->{column_def}{$column_name};
 }
 
 
@@ -398,9 +398,9 @@ sub _get_table_definition {
 
         my $column_name = $ref_uc->{COLUMN_NAME} || confess "Failed to retrieve column name.";
         $res->{$column_name} = $ref_uc;
-    } 
+    }
 
-    return $res; 
+    return $res;
 }
 
 
@@ -412,8 +412,8 @@ sub _dbname {
         $self->{_dbname} = $res->[0]->[0]
             or confess "Failed to get dbname";
     }
-    
-    return $self->{_dbname}; 
+
+    return $self->{_dbname};
 }
 
 
@@ -439,5 +439,5 @@ modify it under the same terms as Perl itself. See L<perlartistic>.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 

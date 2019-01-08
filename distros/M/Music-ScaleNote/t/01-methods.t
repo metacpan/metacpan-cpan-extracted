@@ -1,6 +1,5 @@
 #!perl
 use Test::More;
-use Test::Exception;
 
 use_ok 'Music::ScaleNote';
 
@@ -12,9 +11,6 @@ my $msn = Music::ScaleNote->new(
 isa_ok $msn, 'Music::ScaleNote';
 
 my $x;
-
-throws_ok { $x = $msn->get_offset() }
-    qr/note_name, note_format or offset not provided/, 'invalid get_offset';
 
 my $format = 'midinum';
 $x = $msn->get_offset(

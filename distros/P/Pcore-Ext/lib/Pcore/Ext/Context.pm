@@ -173,9 +173,9 @@ sub to_js ( $self ) {
         }
     }
 
-    my $class_name = $self->{ctx}->{override} ? q[null] : qq["$self->{ctx}->{ext_class_name}"];
+    my $class_name = $self->{ctx}->{override} ? 'null' : qq["$self->{ctx}->{ext_class_name}"];
 
-    my $js = qq[Ext.define( $class_name, ] . P->data->to_json( $data, canonical => 1 )->$* . qq[@{[ defined $on_create_func ? ',"' . $on_create_func->TO_JSON . '"' : $EMPTY ]})];
+    my $js = qq[Ext.define( $class_name, ] . P->data->to_json( $data, canonical => 1 ) . qq[@{[ defined $on_create_func ? ',"' . $on_create_func->TO_JSON . '"' : $EMPTY ]})];
 
     my $js_gen_cache = $self->{_js_gen_cache};
 

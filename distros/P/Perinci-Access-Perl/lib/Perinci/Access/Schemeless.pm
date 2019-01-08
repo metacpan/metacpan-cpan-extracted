@@ -1,7 +1,7 @@
 package Perinci::Access::Schemeless;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.88'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.890'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,7 +17,7 @@ use Perinci::Sub::Normalize qw(normalize_function_metadata);
 use Perinci::Sub::Util qw(err);
 use Scalar::Util qw(blessed);
 use Module::Path::More qw(module_path);
-use Package::MoreUtil qw(package_exists);
+use Package::Util::Lite qw(package_exists);
 use Tie::Cache;
 use URI::Split qw(uri_split uri_join);
 
@@ -775,7 +775,7 @@ sub action_complete_arg_elem {
     [200, "OK (complete_arg_elem action)",
      Perinci::Sub::Complete::complete_arg_elem(
          meta=>$req->{-meta}, word=>$word, arg=>$arg, ci=>$ci, index=>$index,
-     ) // []],
+     ) // []];
 }
 
 sub actionmeta_child_metas { +{
@@ -1037,7 +1037,7 @@ Perinci::Access::Schemeless - Base class for Perinci::Access::Perl
 
 =head1 VERSION
 
-This document describes version 0.88 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2017-07-10.
+This document describes version 0.890 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2019-01-06.
 
 =head1 DESCRIPTION
 
@@ -1276,7 +1276,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

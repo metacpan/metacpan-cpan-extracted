@@ -32,7 +32,8 @@
             "Digest::MD5" : "0",
             "Digest::SHA" : "0",
             "File::Find" : "0",
-            "MIME::Base64" : "0"
+            "MIME::Base64" : "0",
+            "Math::Prime::Util" : "0.73"
          },
          "requires" : {
             "Algorithm::Combinatorics" : "0",
@@ -65,7 +66,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "3.50"
+         "version" : "3.60"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -129,6 +130,9 @@
       },
       "Sidef::Types::Array::Pair" : {
          "file" : "lib/Sidef/Types/Array/Pair.pm"
+      },
+      "Sidef::Types::Array::Vector" : {
+         "file" : "lib/Sidef/Types/Array/Vector.pm"
       },
       "Sidef::Types::Block::Block" : {
          "file" : "lib/Sidef/Types/Block/Block.pm"
@@ -225,6 +229,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "3.50",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "3.60",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

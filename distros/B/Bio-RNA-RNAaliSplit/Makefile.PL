@@ -7,23 +7,26 @@ use File::ShareDir::Install;
 
 install_share 'share';
 
+my $github    = 'https://github.com/mtw/Bio-RNA-RNAaliSplit';
 my @scripts = qw (RNAalisplit.pl eval_alignment.pl);
 
 WriteMakefile(
 	      NAME               => 'Bio::RNA::RNAaliSplit',
-	      AUTHOR             => q{Michael T. Wolfinger <michael@wolfinger.eu>},
 	      VERSION_FROM       => 'lib/Bio/RNA/RNAaliSplit.pm',
 	      ABSTRACT_FROM      => 'lib/Bio/RNA/RNAaliSplit.pm',
 	      LICENSE            => 'agpl_3',
-	      PL_FILES           => {},
+	      AUTHOR             => q{Michael T. Wolfinger <michael@wolfinger.eu>},
 	      MIN_PERL_VERSION   => 5.010,
 	      CONFIGURE_REQUIRES => {
-				     'ExtUtils::MakeMaker' => 0,
+				     'ExtUtils::MakeMaker' => '6.64',
 				    },
 	      BUILD_REQUIRES     => {
-				     'Test::More' => 0,
-				     'Test::Prereq' => 0,
 				    },
+	      "TEST_REQUIRES" => {
+				  'Test2::V0' => '0.000060',
+				  'Test::More' => 0,
+				  'Test::Prereq' => 0,
+				  },
 	      PREREQ_PM          => {
 				     "Cwd" => "0",
 				     "diagnostics" => "0",
@@ -55,13 +58,31 @@ WriteMakefile(
 				     "Pod::Usage" => '0',
 				     "RNA" => "2.3.4",
 				     "Storable" => '0',
+				     "Test::Script" => '1.25',
 				     "FileDirUtil" => '0',
 				     "namespace::autoclean" => '0',
 				    },
 	      'EXE_FILES'        => [ map { "scripts/$_" } @scripts ],
+	      'META_MERGE'       => {
+				     'meta-spec' => { version => 2 },
+				     resources => {
+						   repository => {
+								  type => 'git',
+								  url  => "https://github.com/mtw/Bio-RNA-RNAaliSplit.git",
+								  web  => "https://github.com/mtw/Bio-RNA-RNAaliSplit",
+								 },
+						   bugtracker => {
+								  web    => "https://github.com/mtw/Bio-RNA-RNAaliSplit/issues",
+								 },
+						   homepage => $github,
+						  },
+				    },
 	      dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	      clean => { FILES => 'Bio-RNA-AliSplit-*' },
 	     );
 
 package MY;
 use File::ShareDir::Install qw(postamble);
+
+no warnings;
+__PACKAGE__;

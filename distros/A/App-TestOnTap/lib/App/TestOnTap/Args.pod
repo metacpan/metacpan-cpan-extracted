@@ -7,7 +7,7 @@ Commandline options and arguments understood for TestOnTap processing
 =head1 SYNOPSIS
 
  testontap
- 	[ @argfile ] # I<see 'EXPANDING FILES IN ARGUMENT LIST' below for details> 
+ 	[ @argfile ]      (see 'EXPANDING FILES IN ARGUMENT LIST' below for details) 
     [
         --usage | -?
             |
@@ -24,6 +24,7 @@ Commandline options and arguments understood for TestOnTap processing
     [ --order <strategy> ]
     [ --timer || --no-timer ]
     [ --harness || --no-harness ]
+    [ --dryrun || --no-dryrun ]
     [ --merge || --no-merge ]
     [ --configuration <cfgfile> || --cfg <cfgfile> ]
     [ --archive ]
@@ -249,7 +250,14 @@ would start the some/test.pl file under the Perl debugger but run the rest norma
 Note that this renders several options and mechanisms useless:
 for example C<--verbose>, C<--jobs>, C<--timer>. Also, the work directory
 will miss most of the data normally seen, such as TAP output, aggregated
-test results etc. 
+test results etc. C<--no-harness> will be automatically used when C<--dryrun> is used
+
+=item B<--dryrun>, B<--no-dryrun>
+
+By using C<--dryrun>, C<--no-harness> is implied.
+
+No tests will be actually run, the tests will just be listed in the order they would have run in
+the C<--no-harness> format plus lists of what any dependency queries actually select.
 
 =item B<--merge>, B<--no-merge>
 

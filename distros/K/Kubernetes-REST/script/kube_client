@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use ARGV::Struct;
+use Kubernetes::REST::Result2Object;
+
+package T {
+  use Moo;
+  use Types::Standard qw/Str/;
+  has token => (is => 'ro', isa => Str, required => 1);
+}
+
+use Kubernetes::REST;
+
+my $method = shift @ARGV;
+die "Usage $0 method param1 param1value ... paramN paramNvalue" if (not defined $method);
+
+my $params = ARGV::Struct->new(argv => [ '{', @ARGV, '}' ])->parse;
+
+my $client = Kubernetes::REST->new(
+  result_parser => Kubernetes::REST::Result2Object->new,
+  credentials => T->new(token => ''),
+  server => {
+    endpoint => 'https://192.168.99.100:8443',
+    ssl_verify_server => 1,
+    ssl_cert_file => "$ENV{HOME}/.minikube/client.crt",
+    ssl_key_file => "$ENV{HOME}/.minikube/client.key",
+    ssl_ca_file => "$ENV{HOME}/.minikube/ca.crt",
+  },
+);
+
+my $result = $client->$method(%$params);
+
+use Data::Dumper;
+print Dumper($result);

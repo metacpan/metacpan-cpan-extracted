@@ -121,9 +121,9 @@ sub get_databases {
 }
 
 
-#sub primary_key_auto {
-#    return "INT NOT NULL AUTO_INCREMENT PRIMARY KEY";
-#}
+
+
+
 
 
 

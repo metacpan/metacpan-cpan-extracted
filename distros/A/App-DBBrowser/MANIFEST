@@ -10,14 +10,17 @@ lib/App/DBBrowser/DB/MariaDB.pm
 lib/App/DBBrowser/DB/mysql.pm
 lib/App/DBBrowser/DB/Pg.pm
 lib/App/DBBrowser/DB/SQLite.pm
-lib/App/DBBrowser/Join_Union.pm
+lib/App/DBBrowser/GetContent.pm
+lib/App/DBBrowser/GetContent/Filter.pm
+lib/App/DBBrowser/Join.pm
 lib/App/DBBrowser/Opt.pm
 lib/App/DBBrowser/OptDB.pm
 lib/App/DBBrowser/Subqueries.pm
 lib/App/DBBrowser/Table.pm
 lib/App/DBBrowser/Table/Functions.pm
-lib/App/DBBrowser/Table/Insert.pm
 lib/App/DBBrowser/Table/Substatements.pm
+lib/App/DBBrowser/Table/WriteAccess.pm
+lib/App/DBBrowser/Union.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

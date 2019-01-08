@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Scatterternary::Marker::Colorbar;
 use Chart::Plotly::Trace::Scatterternary::Marker::Gradient;
 use Chart::Plotly::Trace::Scatterternary::Marker::Line;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace scatterternary.
 
@@ -180,7 +180,7 @@ Chart::Plotly::Trace::Scatterternary::Marker - This attribute is one of the poss
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

@@ -105,7 +105,7 @@ if (defined $args{t}) {
         my $sidef = Sidef->new(opt  => \%args,
                                name => $script_name,);
 
-        my $code = read_script($script_name);
+        my $code     = read_script($script_name);
         my $deparsed = eval { $sidef->compile_code($code, 'Perl') };
 
         my $slept = 0;
@@ -289,7 +289,7 @@ sub help_interactive {
     my $term = Term::ReadLine->new("$name $version -- help interactive mode");
 
     print <<"HELP";
-Welcome to $name $version!  This is the interactive help utility.
+Welcome to $name $version! This is the interactive help utility.
 
 Enter the name of any object, keyword, or topic to get help on writing
 $name programs and using $name modules.  To quit this help utility, just
@@ -419,7 +419,7 @@ sub code_interactive {
     my ($vars, $ref_vars_refs);
 
     my $history_support = $term->can('ReadHistory') && $term->can('WriteHistory');
-    my $history_file = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
+    my $history_file    = File::Spec->catfile($sidef->get_sidef_config_dir(), 'sidef_history.txt');
 
     if ($history_support) {
         if (not -e $history_file) {
@@ -468,7 +468,7 @@ sub code_interactive {
             }
             elsif ($line eq 'copyright') {
                 print <<'EOT';
-Copyright © 2013-2018 Daniel Șuteu, Ioana Fălcușan
+Copyright © 2013-2019 Daniel Șuteu, Ioana Fălcușan
 All Rights Reserved.
 EOT
                 redo MAINLOOP;
@@ -527,7 +527,7 @@ EOT
             if (
                    $@ =~ /is not declared in the current scope/i
                 or $@ =~ /invalid \S+ declaration/i
-                or $@ =~ /attempt to call method/i
+                or $@ =~ /attempt to (?:use|call|delete) /i
                 or $@ =~ /not declared in the current scope/i
                 or $@ =~ /expected a block after/i
                 or $@ =~ /invalid module declaration/i

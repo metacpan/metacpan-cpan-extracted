@@ -39,3 +39,9 @@ Revision history for Perl module Devel::Git::MultiBisect
       in t/lib/.  Parallel testing disturbed these in unexpected ways.
       Thanks to Slaven Rezić and Andreas König
       (https://github.com/cpan-testers/cpantesters-web/issues/24).
+
+0.11 Fri Jan  4 09:52:27 EST 2019
+    - Introduce Devel::Git::Multisect::BuildTransitions:  Functionality for
+      identifying places where different build-time errors occurred in the
+      Perl 5 core distribution.  Considerable refactoring (e.g.,
+      Devel::Git::Multisect::Init) to avoid repeated code.

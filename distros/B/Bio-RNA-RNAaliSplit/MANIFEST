@@ -16,12 +16,13 @@ share/aln/all.SL.JEVG.aln
 share/aln/all.SL.SPOVG.aln
 share/aln/all.SL.SPOVG.stk
 share/aln/all.SL.YFVG.aln
+share/aln/RF00050.part.stk
 t/00-load.t
 t/01-prereq.t
 t/02-version.t
 t/11-WrapRNAalifold.t
 t/12-WrapRscape.t
-t/manifest.t
+t/20-executables.t
 t/pod-coverage.t
 t/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.58';
+$Map::Tube::VERSION   = '3.59';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.58
+Version 3.59
 
 =cut
 
@@ -76,7 +76,7 @@ documented in L<Map::Tube::Cookbook>.
     | Mohammad S Anwar    | MANWAR   | 7 (Barcelona, Delhi, Kolkatta, London,   |
     |                     |          | Madrid, NYC, Tokyo)                      |
     |                     |          |                                          |
-    | Gisbert W Selke     | GWS      | 4 (Beijing, Glasgow, KoeinBonn, Lyon)    |
+    | Gisbert W Selke     | GWS      | 4 (Beijing, Glasgow, KoelnBonn, Lyon)    |
     |                     |          |                                          |
     | Renee Baecker       | RENEEB   | 1 (Frankfurt)                            |
     |                     |          |                                          |

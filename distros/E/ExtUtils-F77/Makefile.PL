@@ -7,9 +7,12 @@ WriteMakefile(
   VERSION_FROM  => 'F77.pm',
   PREREQ_PM => {
     'Text::ParseWords' => 0,
+    'File::Which' => 0,
+    'List::Util' => 0,
   },
   META_MERGE => {
     "meta-spec" => { version => 2 },
+    dynamic_config => 0,
     resources => {
       bugtracker  => 'https://github.com/PDLPorters/extutils-f77/issues',
       repository => {

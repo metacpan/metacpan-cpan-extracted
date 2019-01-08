@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.330 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2017-08-10.
+    This document describes version 0.331 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2019-01-07.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run);
@@ -25,8 +25,12 @@ SYNOPSIS
      system({shell=>0}, "ls -lR"); # will fail, as there is no 'ls -lR' binary
 
      # force shell, even though there are multiple arguments (arguments will be
-     # quoted for you, including proper quoting on Win32)
-     system({shell=>1}, "ls", "-lR");
+     # quoted for you, including proper quoting on Win32).
+     system({shell=>1}, "ls", "-laR");
+
+     # note that to prevent the quoting mechanism from quoting some special
+     # characters (like ">") you can use scalar references, e.g.:
+     system({shell=>1}, "ls", "-laR", \">", "/root/ls-laR");
 
      # set LC_ALL/LANGUAGE/LANG environment variable
      $res = readpipe({lang=>"de_DE.UTF-8"}, "df");
@@ -304,7 +308,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

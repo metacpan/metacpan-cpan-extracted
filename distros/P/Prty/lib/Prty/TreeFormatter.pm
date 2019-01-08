@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Option;
 
@@ -80,19 +80,47 @@ produziert
 
 Ein Objekt der Klasse repräsentiert einen Baum, der mit
 Methoden der Klasse dargestellt (visualisiert) werden kann. Die
-Baumstruktur wird als eine Liste von Paaren an den Konstruktor
-übergeben. Ein Paar besteht aus der Angabe des Knotens und seiner
-Ebene [$level, $node]. Der Knoten $node kann ein Objekt oder ein
-Text sein. Die Ebene $level ist eine natürliche Zahl im
-Wertebereich von 0 (Wurzelknoten) bis n. Die Paar-Liste kann aus
-irgendeiner Baumstruktur mit einer rekursiven Funktion erzeugt werden
-(siehe Abschnitt L</EXAMPLE>).
+Baumstruktur wird als eine Liste von Tripeln an den Konstruktor
+übergeben. Ein Tripel besteht aus der Angabe des Knotens und seiner
+Ebene und einem Stop-Kennzeichen, ob der Subbaum des Knotens ausgeblendet
+wurde [$level, $node, $stop]. Der Subbaum eines Knotens wird
+typischerweise ausgeblendet, wenn die Ausgangsstruktur kein Baum sondern
+ein Netz ist. Diese Information kann in der getText-Callback-Methode
+genutzt werden, um den betreffenden Knoten besonders darzustellen.
+Der Knoten $node kann ein Objekt oder ein Text sein. Die Ebene $level
+ist eine natürliche Zahl im Wertebereich von 0 (Wurzelknoten) bis n.
+Die Paar-Liste kann aus irgendeiner Baumstruktur mit einer rekursiven
+Funktion erzeugt werden (siehe Abschnitt L</EXAMPLE>).
 
 =head1 EXAMPLE
 
 =head2 Baumknoten als Texte
 
-Siehe L</SYNOPSIS>.
+Siehe SYNOPSIS.
+
+=head2 Rekursive Methode mit Stop-Kennzeichen
+
+Die folgende Methode erkennt, wenn ein Knoten wiederholt auftritt,
+kennzeichnet diesen mit einem Stop-Kennzeichen und steigt dann
+nicht in den Subbaum ab. Dies verhindert redundante Baumteile
+und u.U. eine Endlos-Rekursion (wenn die Wiederholung auf einem
+Pfad vorkommt).
+
+    sub hierarchy {
+        my $self = shift;
+        my $stopH = shift || {};
+    
+        my $stop = $stopH->{$self}++;
+        if (!$stop) {
+            my @arr;
+            for my $node ($self->subNodes) {
+                push @arr,map {$_->[0]++; $_} $node->hierarchy($stopH);
+            }
+        }
+        unshift @arr,[0,$self,$stop];
+    
+        return wantarray? @arr: \@arr;
+    }
 
 =head2 Baumknoten als Objekte
 
@@ -122,7 +150,7 @@ Die Subroutine wird mittels der Option C<-getText> an $t->asText()
     my $arrA = $cls->classHierarchy;
     print Prty::TreeFormatter->new($arrA)->asText(
         -getText => sub {
-            my $cls = shift;
+            my ($cls,$stop) = @_;
     
             my $str = $cls->name."\n";
             for my $grp ($cls->groups) {
@@ -202,15 +230,16 @@ Ein Ausschnitt aus der produzierten Ausgabe:
 
 =head4 Synopsis
 
-    $t = $class->new(\@pairs);
+    $t = $class->new(\@triples);
 
 =head4 Arguments
 
 =over 4
 
-=item @pairs
+=item @triples
 
-Liste von Paaren [$level, $node].
+Liste von Tripeln [$level, $node, $stop]. Das Kennzeichen $stop
+kann auch weggelassen werden.
 
 =back
 
@@ -228,19 +257,19 @@ Objekt zurück.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$pairA) = @_;
+    my ($class,$tripleA) = @_;
 
-    # Paare in interne Liste umkopieren. Die interne Liste besitzt
+    # Tripel in interne Liste umkopieren. Die interne Liste besitzt
     # ein weiteres Feld mit einem "Verbindungskennzeichen". Die
-    # Felder: Level, Verbindungskennzeichen, Knoten (Objekt oder Text).
-    # Das Verbindungskennzeichen gibt an, ob ein Folgeknoten auf
-    # gleicher Ebene vorhanden ist. Wir initialisieren dessen Wert
-    # hier auf 0.
+    # Felder: Level, Verbindungskennzeichen, Knoten (Objekt oder Text),
+    # Stop-Kennzeichen. Das Verbindungskennzeichen gibt an, ob ein
+    # Folgeknoten auf gleicher Ebene vorhanden ist. Wir initialisieren
+    # dessen Wert hier auf 0.
 
     my @arr;
-    for my $p (@$pairA) {
+    for my $p (@$tripleA) {
         # [$level,$follow,$node]
-        push @arr,[$p->[0],0,$p->[1]];
+        push @arr,[$p->[0],0,$p->[1],$p->[2]//0];
     }
 
     # Setze die Kolumne mit Verbindungs-Kennzeichen auf 1, wenn
@@ -284,7 +313,7 @@ sub new {
 
 Format der Ausgabe (s.u.)
 
-=item -getText => sub { my $node = shift; ... return $text }
+=item -getText => sub { my ($node,$stop) = @_; ... return $text }
 
 Callback-Funktion zum Ermitteln des Textes des Knotens. Der Text
 kann mehrzeilig sein.
@@ -388,7 +417,7 @@ sub asText {
         my @follow;
 
         for (my $i = 0; $i < @$lineA; $i++) {
-            my ($level,$follow,$node) = @{$lineA->[$i]};
+            my ($level,$follow,$node,$stop) = @{$lineA->[$i]};
             $follow[$level] = $follow; # Verbindungskennzeichen für $level
 
             # Einrückungs-Block erzeugen. Der Einrückungs-Block
@@ -414,7 +443,7 @@ sub asText {
             # X existiert nicht beim ersten Knoten, sonst ist X
             # konstant ein |.
 
-            my ($line1,$rest) = split /\n/,$getText->($node),2;
+            my ($line1,$rest) = split /\n/,$getText->($node,$stop),2;
             my $block = sprintf "%s+--%s\n",$i? "|\n": '',$line1;
 
             if ($rest) {
@@ -435,18 +464,19 @@ sub asText {
     }
     elsif ($format eq 'debug') {
         for (@$lineA) {
-            my ($level,$follow,$node) = @$_;
-            $str .= sprintf "%d %d %s%s\n",
+            my ($level,$follow,$node,$stop) = @$_;
+            $str .= sprintf "%d %d %s%s%s\n",
                 $level,
                 $follow,
                 '  ' x $level,
-                $node;
+                $node,
+                $stop? ' ...': '';
         }
     }
     elsif ($format eq 'compact') {
         for (@$lineA) {
-            my ($level,$follow,$node) = @$_;
-            my ($line1,$rest) = split /\n/,$getText->($node),2;
+            my ($level,$follow,$node,$stop) = @$_;
+            my ($line1,$rest) = split /\n/,$getText->($node,$stop),2;
             $str .= sprintf "%s%s\n",'  ' x $level,$line1;
         }
     }
@@ -464,7 +494,7 @@ sub asText {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -472,7 +502,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

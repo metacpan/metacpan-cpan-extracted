@@ -1,4 +1,24 @@
 
+* v0.3.2
+
+- reset vocabulary and language model for each call
+- set locale to utf8 before calling external programs
+
+* v0.3.1
+
+- fixed lowercase option
+
+* v0.3.0 Sat Jan  5 14:02:06 EET 2019
+
+- moved options and functions to library
+- enable different output options
+- enabled calls to Apache Tika server if available
+
+* v0.2.8 Fri Aug 17 10:04:58 EEST 2018
+
+- update to Apache Tika 1.18
+- hide warnings and error messages from external tools
+
 * v0.2.7 Sat Jul  1 21:25:09 EEST 2017
 
 - added an ugly workaround to find java 1.6 for pdfxtk

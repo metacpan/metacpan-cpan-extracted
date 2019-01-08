@@ -2,22 +2,31 @@ package Mojolicious::Plugin::PromiseActions;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
+use Mojo::Promise;
 use Scalar::Util 'blessed';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub register {
   my ($elf, $app, $config) = @_;
   $app->hook(
     around_action => sub {
-      my ($next, $c) = @_;
-      my (@args) = $next->();
+      my ($next, $c, $action, $last) = @_;
+      my $want = wantarray;
+      my @args;
+      if ($want) { @args    = $next->() }
+      else       { $args[0] = $next->() }
       if (blessed($args[0]) && $args[0]->can('then')) {
-        my $tx = $c->render_later->tx;
-        $args[0]->then(undef, sub { $c->reply->exception(pop) and undef $tx });
-        $args[0]->can('wait') && $args[0]->wait;
+        my $tx = $c->tx;
+        $c->render_later if $last;
+        my $p = Mojo::Promise->resolve($args[0]);
+        $p->then(
+          ($last ? undef : sub { $c->continue if $_[0] }),
+          sub { $c->reply->exception($_[0]) and undef $tx },
+        )->wait;
+        return unless $last;
       }
-      return @args;
+      return $want ? @args : $args[0];
     }
   );
 }
@@ -49,10 +58,16 @@ actions return a L<Mojo::Promise>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018, Marcus Ramberg.
+Copyright (C) 2019, Marcus Ramberg.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
+
+=head1 AUTHORS
+
+Joel Berger, C<jberger@mojolicious.org>
+
+Marcus Ramberg, C<marcus@mojolicious.org>
 
 =head1 SEE ALSO
 

@@ -12,8 +12,8 @@ use Test::More;
 use WiringPi::API qw(:perl);
 
 sub check_pin_status {
-    ok 1==1;
-    return;
+#    ok 1==1;
+#    return;
     setup_gpio();
 
     # removed pins 4, 5, 6, 17, 22, 27 because of LCD

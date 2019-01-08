@@ -8,10 +8,8 @@ my %PREREQ_PM = (
 	'Proc::ProcessTable'=>'0.53',
 	'Term::ANSIColor'=>'4.06',
 	'Text::Table'=>'1.133',
+	'Term::Size'=>'0.207',
 	);
-if ( $^O =~ /bsd/ ){
-	$PREREQ_PM{'BSD::Process'}='0.07';
-}
 
 WriteMakefile(
     NAME             => 'Proc::ProcessTable::Colorizer',

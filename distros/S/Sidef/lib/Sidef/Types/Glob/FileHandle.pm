@@ -137,7 +137,7 @@ package Sidef::Types::Glob::FileHandle {
             do {
                 local $/;
                 CORE::readline($self->{fh});
-              }
+            }
         );
     }
 
@@ -237,7 +237,7 @@ package Sidef::Types::Glob::FileHandle {
              map { Sidef::Types::String::String->new($_) } do {
                  local $/;
                  split(//, scalar CORE::readline($self->{fh}));
-               }
+             }
             ]
         );
     }
@@ -382,9 +382,9 @@ package Sidef::Types::Glob::FileHandle {
     {
         no strict 'refs';
         *{__PACKAGE__ . '::' . '>>'} = \&read_to;
-        *{__PACKAGE__ . '::' . '»'} = \&read_to;
+        *{__PACKAGE__ . '::' . '»'}  = \&read_to;
         *{__PACKAGE__ . '::' . '<<'} = \&write_from;
-        *{__PACKAGE__ . '::' . '«'} = \&write_from;
+        *{__PACKAGE__ . '::' . '«'}  = \&write_from;
     }
 
 };

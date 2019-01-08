@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch::Bag;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0510';
+our $VERSION = '0.0511';
 
 use Moo;
 use Catmandu::Hits;
@@ -68,6 +68,7 @@ sub _build_bulk {
 
 sub generator {
     my ($self) = @_;
+    my $id_key = $self->id_key;
     sub {
         state $scroll = do {
             my %args = (
@@ -81,11 +82,13 @@ sub generator {
             }
             $self->store->es->scroll_helper(%args);
         };
-        my $data = $scroll->next // do {
+        my $doc = $scroll->next // do {
             $scroll->finish;
             return;
         };
-        $data->{_source};
+        my $data = $doc->{_source};
+        $data->{$id_key} = $doc->{_id};
+        $data;
     };
 }
 
@@ -100,11 +103,13 @@ sub count {
 sub get {
     my ($self, $id) = @_;
     try {
-        $self->store->es->get_source(
+        my $data = $self->store->es->get_source(
             index => $self->store->index_name,
             type  => $self->name,
             id    => $id,
         );
+        $data->{$self->id_key} = $id;
+        $data;
     }
     catch_case ['Search::Elasticsearch::Error::Missing' => sub {undef}];
 }
@@ -112,7 +117,7 @@ sub get {
 sub add {
     my ($self, $data) = @_;
     $data = {%$data};
-    my $id = $data->{$self->id_key};
+    my $id = delete($data->{$self->id_key});
     $self->_bulk->index({id => $id, source => $data,});
 }
 
@@ -199,13 +204,18 @@ sub search {
         = {start => $start, limit => $limit, total => $res->{hits}{total},};
 
     if ($bag) {
-        $hits->{hits} = [map {$bag->get($_->{$id_key})} @$docs];
+        $hits->{hits} = [map {$bag->get($_->{_id})} @$docs];
     }
     elsif ($args{fields}) {
+        # TODO check if fields includes id_key
         $hits->{hits} = [map {$_->{fields} || +{}} @$docs];
     }
     else {
-        $hits->{hits} = [map {$_->{_source}} @$docs];
+        $hits->{hits} = [map {
+            my $data = $_->{_source};
+            $data->{$id_key} = $_->{_id};
+            $data;
+        } @$docs];
     }
 
     $hits = Catmandu::Hits->new($hits);

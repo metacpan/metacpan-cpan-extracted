@@ -11,10 +11,8 @@ use Test::More;
 my $mod = 'RPi::WiringPi';
 
 if (! $ENV{PI_BOARD}){
-    warn "\n*** PI_BOARD is not set! ***\n";
     $ENV{NO_BOARD} = 1;
-    plan skip_all => "not on a pi board\n";
-    exit;
+    plan skip_all => "Not on a Pi board\n";
 }
 
 BEGIN {

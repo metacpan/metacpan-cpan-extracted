@@ -1,0 +1,7 @@
+# This file documents the revision history for Perl extension WebService-Auth0 
+
+0.002 - 03 January 2019
+  - Fix syntax compatibility for 5.10.1
+
+0.001 - 03 January 2019
+  - First Release 

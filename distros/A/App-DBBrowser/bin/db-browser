@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.036';
+our $VERSION = '2.040';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.036
+Version 2.040
 
 =cut
 
@@ -161,11 +161,11 @@ The menu entries of the table menu:
 
 =head3 Prompt Line
 
-Selecting the prompt line (the database name) opens a menu with this entries:
+Selecting the prompt line (the database name) opens a menu with these entries:
 
 =head4 Create Table
 
-Selecting I<Create Table> opens a sub-menu with this entries:
+Selecting I<Create Table> opens a sub-menu with these entries:
 
 =over
 
@@ -176,7 +176,7 @@ Create a table.
 =item Copy and Paste
 
 Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
-data. In I<Settings> one can configure to how the data is parsed.
+data. In the I<Settings> one can configure how the data is parsed.
 
 See also L</Create Table>.
 
@@ -186,7 +186,7 @@ Like I<Copy and Paste> with the difference that the data is read from a chosen f
 
 =item Settings
 
-Selecting I<Settings> allows one to set the options described in option group L</Insert Into> for the current
+Selecting I<Settings> allows one to set the options described in the option group L</Insert Into> for the current
 database.
 
 =back
@@ -212,7 +212,7 @@ Choosing a table leads to the I<SQL Menu>.
 
 Choosing this entry allows one to enter a subquery instead of table name.
 
-This entry is available only if L</Subqueries as table> is enabled.
+This entry is available only if enabled in L</Subqueries>.
 
 =head3 Join
 
@@ -259,20 +259,20 @@ Read the input from am file. Supported file formats: text files and file formats
 
 =back
 
-Setting the insert mode to I<From File> or to I<Copy and Paste> enables different filters: so it is possible to insert
-only selected columns or selected rows.
+Setting the insert mode to I<From File> or to I<Copy and Paste> enables different filters: one can select columns,
+select rows, select a range of rows or transpose rows to columns.
 
 If the input has rows with different numbers of columns, the filter I<choose_rows> sorts the rows in groups with the
 same number of columns. The user can then select the group which should be used.
 
-C<SQLite>: If the first column of a table is an auto-increment column, an C<INSERT INTO> statement is build without this
-first column.
+If the first column of a table is an auto-increment column, the C<INSERT INTO> statement is build without this first
+column. This feature is available if it is supported by the database plugin.
 
 =head4 Update
 
 Update records.
 
-See also L</Subqueries>
+See also L</Extended SET> and L</Extended WHERE>
 
 =head4 Delete
 
@@ -280,62 +280,62 @@ Delete records.
 
 =head3 Print TABLE
 
-Select I<Print TABLE> to show the result from the formed statement on the screen.
+Select I<Print TABLE> to show the result of the formed statement on the screen.
 
 =head3 The Sub-Statements
 
 To reset a SQL "sub-statement" (e.g C<WHERE>) re-enter into the respective menu and choose C<-OK->.
 
-See also L</Subqueries>, L</Parentheses>, L</Operators>
+See also L</Extensions>, L</Parentheses>, L</Operators>
+
+=head4 SELECT
+
+Choose the required columns for the C<SELECT> sub-statement.
+
+It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
+C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
+
+If an I<AGGREGATE> function or a I<GROUP BY> columns is selected, the available choices of this sub-statement are the
+selected aggregate functions and the selected group-by columns.
+
+=head4 AGGREGATE
 
 =over
 
-=item SELECT
+=item AVG
 
-Choose the required columns. It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If
-columns are marked with the C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
+=item COUNT
 
-=item AGGREGATE
+=item COUNT(*)
 
-Chosen aggregate functions are added automatically to the SELECT columns.
+=item GROUP_CONCAT / STRING_AGG
 
-=item DISTINCT
+=item MAX
 
-=item WHERE
+=item MIN
 
-=item GROUP BY Chosen C<GROUP BY> columns are added automatically to the SELECT columns.
-
-=item HAVING
-
-=item ORDER BY
-
-=item LIMIT
+=item SUM
 
 =back
 
-=head3 Func
+=head4 DISTINCT
 
-Opens the scalar functions menu.
+=head4 WHERE
 
-To reset a modified a column select the column with the function a second time.
+=head4 GROUP BY
 
-The available scalar functions are:
+It is possible to ad many columns at once by marking them with the C<SpaceBar> key. If columns are marked with the
+C<SpaceBar>, the highlighted column is not added to the chosen when C<Return> is pressed.
 
-=head4 Epoch_to_DateTime
+=head4 HAVING
 
-=head4 Epoch_to_Date
+=head4 ORDER BY
 
-=head4 Truncate
+=head4 LIMIT
 
-=head4 Bit_Length
+=head3 Reset
 
-=head4 Char_Length
-
-=head3 Lk1
-
-Changing the I<lock> mode (C<Lk0>,C<Lk1>) resets the entire SQL.
-
-See option L</Lock>.
+Reset the SQL statement.
 
 =head1 OPTIONS
 
@@ -437,14 +437,6 @@ There are two regexp entries: C<REGEXP> matches case sensitive while C<REGEXP_i>
 
 With C<MySQL> the sensitive match is achieved by enabling the C<BINARY> operator.
 
-=head3 Lock
-
-Set the default I<lock> value:
-
-- C<Lk0>: Reset the SQL-statement after each time a table is printed.
-
-- C<Lk1>: Reset the SQL-statement only when a table is selected.
-
 =head3 Max Rows
 
 Sets C<LIMIT> automatically to I<Max Rows>. This can be overwritten by setting a SQL C<LIMIT> statement manually.
@@ -452,45 +444,76 @@ Fetched table rows are kept in memory.
 
 To disable the automatic limit set I<Auto Limit> to C<0>.
 
-=head3 Subqueries
+=head3 Extensions
 
-Selecting a subquery menu-entry opens a subquery sub-menu which allows one the enter a subquery (I<Read-Line>).
+=over
 
-If saved or temporary saved subqueries are available, its is also possible the select one of those subqueries instead of
-entering a subquery.
+=item Extended SELECT
+
+Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+
+=item Extended WHERE
+
+Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+
+=item Extended HAVING
+
+Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+
+=item Extended SET
+
+Values: I<None>, I<Func>, I<SQ> and I<Func+SQ>
+
+=item Extended Table
+
+Values: I<None> and I<SQ>
+
+=back
+
+If set to I<None> no menu extension.
+
+If set to I<Func>, C<f()> is shown as additionally menu entry.
+
+If set to I<SQ>, C<SQ> is shown as additionally menu entry.
+
+If set to I<Func+SQ>, C<%%> is shown as additionally menu entry. Selecting C<%%> lets one choose between C<f()> and
+C<SQ>.
+
+If these additionally menu entries are prefixed with C<=>, it is required to select an operator before entering a subquery
+or before selecting a function.
+
+=head4 Functions
+
+=over
+
+=item Concatenate
+
+=item Truncate
+
+=item Bit_Length
+
+=item Char_Length
+
+=item Epoch_to_Date
+
+=item Epoch_to_DateTime
+
+=back
+
+=head4 Subqueries
+
+Selecting a subquery menu entry opens a subquery sub-menu which allows one the enter a subquery (I<Read-Line>).
+
+If stored or temporarily stored subqueries are available, it is also possible to select one of those subqueries instead
+of entering a subquery.
 
 A subquery can be saved or removed in the sub-menu which opens by selecting the prompt line of a subquery menu
 (I<Choose SQ:>).
 
-Temporary saved subqueries are the last subqueries entered previously in the subquery menu and the last statements
-printed with I<Print TABLE>.
+The last subqueries entered in the subquery menu and the last statements printed with I<Print TABLE> are stored
+temporarily.
 
-=over
-
-=item Subqueries in SELECT
-
-If this option is enabled, it is possible to add a subquery as a column in a C<SELECT> sub-statement by selecting
-C<(Q>.
-
-=item Subqueries in WHERE/HAVING
-
-C<WHERE>: If this option is enabled, one can use a subquery on the left side of an operator by selecting C<(Q> or/and
-on the right side of an operator by selecting C<=(Q>.
-
-C<HAVING>: If this option is enabled, one can use a subquery on the right side of an operator by selecting C<=(Q>.
-
-=item Subqueries as SET value
-
-If this option is enabled, one can choose C<=(Q> end enter/select a subquery as the C<SET> value in an C<UPDATE>.
-
-=item Subqueries as table
-
-If this option is enable, one can choose C<FROM(SQ)>. This allows one to enter/select a subquery which is then used as a
-derived table.
-
-=back
-
-=head3 I<Alias for complex columns>
+=head3 Aliases
 
 If enabled, it is asked for an alias. If entered nothing, no alias is added except for joined tables and unions and for
 derived tables which get then a default alias.
@@ -740,8 +763,6 @@ are then used as default values when the user is asked for the data types.
 
 =head3 Auto increment
 
-C<SQLite> only:
-
 Setting I<Auto increment> to a value which is not the empty string enables the option to set an auto increment column
 when creating a table. The value set here is then used as the default name for the auto increment column.
 
@@ -789,7 +810,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2018 Matthäus Kiem.
+Copyright 2012-2019 Matthäus Kiem.
 
 THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
 IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

@@ -1,4 +1,4 @@
-# $Id: 05meta_update.t 45 2014-12-09 07:52:52Z stro $
+# $Id: 05meta_update.t 70 2019-01-04 19:39:59Z stro $
 
 use strict;
 use warnings;
@@ -13,6 +13,9 @@ use CPAN::DistnameInfo;
 use CPAN::SQLite::Util qw(download);
 use lib 't/lib';
 use TestSQL qw($mods $auths $dists has_hash_data vcmp);
+
+$ENV{'CPAN_SQLITE_DOWNLOAD'} = $ENV{'CPAN_SQLITE_DOWNLOAD_URL'} = undef;
+
 my $cwd = cwd;
 my $path_sep = $Config{path_sep} || ':';
 $ENV{PERL5LIB} = join $path_sep,

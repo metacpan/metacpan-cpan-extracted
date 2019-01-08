@@ -2,8 +2,8 @@ NAME
     App::rimetadb - Manage a Rinci metadata database
 
 VERSION
-    This document describes version 0.21 of App::rimetadb (from Perl
-    distribution App-rimetadb), released on 2017-07-10.
+    This document describes version 0.220 of App::rimetadb (from Perl
+    distribution App-rimetadb), released on 2019-01-06.
 
 SYNOPSIS
     See the included CLI script rimetadb.
@@ -12,7 +12,7 @@ FUNCTIONS
   argument_stats
     Usage:
 
-     argument_stats(%args) -> [status, msg, result, meta]
+     argument_stats(%args) -> [status, msg, payload, meta]
 
     Show statistics on function arguments.
 
@@ -42,7 +42,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -51,7 +51,7 @@ FUNCTIONS
   arguments
     Usage:
 
-     arguments(%args) -> [status, msg, result, meta]
+     arguments(%args) -> [status, msg, payload, meta]
 
     List function arguments.
 
@@ -74,7 +74,7 @@ FUNCTIONS
 
         Select specific function only.
 
-    *   package => *str*
+    *   package => *perl::modname*
 
         Select specific package only.
 
@@ -97,7 +97,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -106,7 +106,7 @@ FUNCTIONS
   delete
     Usage:
 
-     delete(%args) -> [status, msg, result, meta]
+     delete(%args) -> [status, msg, payload, meta]
 
     Delete a package or function metadata.
 
@@ -125,7 +125,7 @@ FUNCTIONS
 
     *   function => *str*
 
-    *   package* => *str*
+    *   package* => *perl::modname*
 
     *   password => *str*
 
@@ -140,7 +140,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -149,7 +149,7 @@ FUNCTIONS
   function_stats
     Usage:
 
-     function_stats(%args) -> [status, msg, result, meta]
+     function_stats(%args) -> [status, msg, payload, meta]
 
     Show some statistics on functions.
 
@@ -179,7 +179,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -188,7 +188,7 @@ FUNCTIONS
   functions
     Usage:
 
-     functions(%args) -> [status, msg, result, meta]
+     functions(%args) -> [status, msg, payload, meta]
 
     List functions.
 
@@ -207,7 +207,7 @@ FUNCTIONS
 
         Note: has been tested with MySQL and SQLite only.
 
-    *   package => *str*
+    *   package => *perl::modname*
 
         Select specific package only.
 
@@ -226,7 +226,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -235,7 +235,7 @@ FUNCTIONS
   meta
     Usage:
 
-     meta(%args) -> [status, msg, result, meta]
+     meta(%args) -> [status, msg, payload, meta]
 
     Get package/function metadata.
 
@@ -269,7 +269,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -278,7 +278,7 @@ FUNCTIONS
   packages
     Usage:
 
-     packages(%args) -> [status, msg, result, meta]
+     packages(%args) -> [status, msg, payload, meta]
 
     List packages.
 
@@ -312,7 +312,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -321,7 +321,7 @@ FUNCTIONS
   stats
     Usage:
 
-     stats() -> [status, msg, result, meta]
+     stats() -> [status, msg, payload, meta]
 
     Show some statistics.
 
@@ -334,7 +334,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -343,7 +343,7 @@ FUNCTIONS
   update
     Usage:
 
-     update(%args) -> [status, msg, result, meta]
+     update(%args) -> [status, msg, payload, meta]
 
     Add/update a package or function metadata.
 
@@ -383,7 +383,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -392,7 +392,7 @@ FUNCTIONS
   update_from_modules
     Usage:
 
-     update_from_modules(%args) -> [status, msg, result, meta]
+     update_from_modules(%args) -> [status, msg, payload, meta]
 
     Update Rinci metadata database from local Perl modules.
 
@@ -455,7 +455,7 @@ FUNCTIONS
 
         *   a package prefix using "+Foo::Bar::" or "+Foo::Bar::*" syntax.
             Subpackages will be listed recursively (using
-            "Package::MoreUtil"'s "list_subpackages").
+            Package::Util::Lite's "list_subpackages").
 
     *   password => *str*
 
@@ -484,7 +484,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -512,7 +512,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

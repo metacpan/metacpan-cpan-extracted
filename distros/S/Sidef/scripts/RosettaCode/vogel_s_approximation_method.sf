@@ -33,8 +33,8 @@ while (g) {
         d.grep! { .[2] == dmax[2] }.min_by! { .[1] }
     }
 
-    with (s.max_by { .[2] }) { |dmax|
-        s.grep! { .[2] == dmax[2] }.min_by! { .[1] }
+    with (s.max_by { .[2] }) { |smax|
+        s.grep! { .[2] == smax[2] }.min_by! { .[1] }
     }
 
     var (t,f) = (d[2] == s[2] ? ((s[1], d[1])) : ((d[2], s[2])))

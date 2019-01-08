@@ -1,8 +1,10 @@
+.gitattributes
+.github/CONTRIBUTING.md
+.github/ISSUE_TEMPLATE.md
+.github/PULL_REQUEST_TEMPLATE.md
 .perltidyrc
-.ship.conf
 .travis.yml
 Changes
-cpanfile
 lib/JSON/Validator.pm
 lib/JSON/Validator/cache/10a5eeb37fcd5d829449028f7ceb0774
 lib/JSON/Validator/cache/36d1bd12eeed51e86c8695bd8876a9df
@@ -15,17 +17,16 @@ lib/JSON/Validator/cache/ea34d47d4e060a1c3b12d2287aff89a7
 lib/JSON/Validator/cache/eaa832720f36cff0abc20c05236a9cd9
 lib/JSON/Validator/Error.pm
 lib/JSON/Validator/Joi.pm
-lib/JSON/Validator/OpenAPI.pm
 lib/JSON/Validator/Ref.pm
 Makefile.PL
 MANIFEST			This list of files
-run-all-tests.sh
+README.md
 t/00-basic.t
 t/acceptance.t
 t/booleans-xs.t
 t/booleans.t
 t/bundle.t
-t/coerce-args.t
+t/coerce.t
 t/deep-mixed-ref.t
 t/definitions/age.json
 't/definitions/space age.json'
@@ -88,15 +89,12 @@ t/jv-object.t
 t/jv-oneof.t
 t/jv-required.t
 t/jv-string.t
-t/load-and-validate-spec.t
 t/load-data.t
-t/load-from-app.t
+t/load-file.t
 t/load-http.t
 t/load-json.t
 t/load-yaml.t
-t/openapi-formats.t
 t/random-errors.t
-t/recursion.t
 t/relative-ref.t
 t/remotes/folder/folderInteger.json
 t/remotes/integer.json

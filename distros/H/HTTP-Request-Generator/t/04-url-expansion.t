@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Data::Dumper;
 
 use HTTP::Request::Generator 'generate_requests';
@@ -87,3 +87,12 @@ my @urls = generate_requests(
 );
 is 0+@urls, 10, "We can limit the number of created items"
     or diag Dumper \@urls;
+
+my $iter = generate_requests(
+    pattern => 'https://[a..z][a..z][a..z].example.com',
+);
+my $count = 0;
+while( my $req = $iter->() ){
+    $count++
+};
+is $count, 26*26*26, "We enumerate all expansions";

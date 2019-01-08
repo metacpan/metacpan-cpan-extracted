@@ -1,6 +1,6 @@
 package Address::PostCode::UserAgent;
 
-$Address::PostCode::UserAgent::VERSION = '0.05';
+$Address::PostCode::UserAgent::VERSION = '0.08';
 
 =head1 NAME
 
@@ -8,7 +8,7 @@ Address::PostCode::UserAgent - User agent for Address::PostCode::* family.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.08
 
 =cut
 

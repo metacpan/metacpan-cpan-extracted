@@ -1,5 +1,9 @@
 Revision history for Perl extension Data::HandyGen::mysql.
 
+0.05  Web Jan 1 21:00:00 2019
+   -  Disable to use autofill of unsupported type.
+   -  Use default_storage_engine instead of storage_engine, which is removed since 5.7.
+
 0.04  Sat Sep 22 07:18:00 2018
    -  Enable to generate random string from regex
    -  Some refactoring

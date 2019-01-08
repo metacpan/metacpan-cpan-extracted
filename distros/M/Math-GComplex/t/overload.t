@@ -5,9 +5,9 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 74;
+plan tests => 94;
 
-use Math::GComplex qw(:overload acos cosh);
+use Math::GComplex qw(:overload acos cosh pown powmod);
 
 {
     my @A097691 = qw(8 56 551 6930 105937 1905632 39424240);    # https://oeis.org/A097691
@@ -87,11 +87,11 @@ use Math::GComplex qw(:overload acos cosh);
 }
 
 {
-    is((0)->pown(0),  1);
-    is((0)->pown(3),  0);
-    is((1)->pown(5),  1);
-    is((1)->pown(-5), 1);
-    is((2)->pown(-5), 0.03125);
+    is(pown(0, 0),  1);
+    is(pown(0, 3),  0);
+    is(pown(1, 5),  1);
+    is(pown(1, -5), 1);
+    is(pown(2, -5), 0.03125);
 
     my $n = 2 + 3 * i;
     is($n->pown('10'), -341525 - 145668 * i);
@@ -111,4 +111,40 @@ use Math::GComplex qw(:overload acos cosh);
     is($z | $t, 29 + 99 * i);
     is($z & $t, 8 + 32 * i);
     is($z ^ $t, 21 + 67 * i);
+}
+
+{
+    is(join(' ', powmod(2 + i,  100, 1234567)->reals), '498832 667730');
+    is(join(' ', powmod(-2 -i,  99,  1234567)->reals), '160748 820328');
+    is(join(' ', powmod(2 -i,   99,  1234567)->reals), '1073819 820328');
+    is(join(' ', powmod(-2 + i, 99,  1234567)->reals), '160748 414239');
+
+    is(powmod(2, 96, 97), 1);
+    is(powmod(2, 43, 43), 2);
+    is(powmod(i, 43, 43), 0 + 42 * i);
+    is(powmod(i, 42, 43), 42);
+
+    is(powmod(1 -i,  43 - 1, 43),         i);
+    is(powmod(1 -i,  43 - 1, 43 + 3 * i), 36 + 14 * i);
+    is(powmod(2 + i, 43,     43 + 3 * i), 39 + 44 * i);
+}
+
+is(join(' ', Math::GComplex::invmod(42,           2017)->reals),    '1969 0');
+is(join(' ', Math::GComplex::invmod(3 + 4 * i,    2017)->reals),    '1291 968');
+is(join(' ', Math::GComplex::invmod(91 + 23 * i,  2017)->reals),    '590 405');
+is(join(' ', Math::GComplex::invmod(43 + 99 * i,  1234567)->reals), '1019551 667302');
+is(join(' ', Math::GComplex::invmod(43 + 415 * i, 103)->reals),     '88 25');
+
+is(join(' ', Math::GComplex::gcd(135 - 14 * i, 155 + 34 * i)->reals), '5 12');
+is(join(' ', Math::GComplex::gcd(155 + 34 * i, 135 - 14 * i)->reals), '5 12');
+
+{
+    my $m = 2019;
+    my $x = 3 + 4 * i;
+
+    my $x1 = Math::GComplex::powmod($x, -42, $m);
+    my $x2 = Math::GComplex::powmod($x, 42,  $m);
+
+    is(join(' ', $x1->reals), '1520 1407');
+    is(join(' ', $x2->reals), '305 1212');
 }

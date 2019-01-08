@@ -18,7 +18,7 @@ my %module_build_args = (
     "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-Store-Elasticsearch",
-  "dist_version" => "0.0510",
+  "dist_version" => "0.0511",
   "license" => "perl",
   "module_name" => "Catmandu::Store::Elasticsearch",
   "recursive_test_files" => 1,

@@ -628,7 +628,7 @@ sub run
             {
                 title "Truncated file";
                 skip '', 7
-                    if $CompressClass =~ /lzop|lzf|lzma/i ;
+                    if $CompressClass =~ /lzop|lzf|lzma|zstd|lzip/i ;
 
                 my @in ;
                 push @in, "abcde" x 10;
@@ -697,9 +697,13 @@ sub run
         my $keep = $data ;
         my $extra = "after the main event";
 
+        SKIP:
         foreach my $fb ( qw( filehandle buffer ) )
         {
             title "Trailingdata with $TopType, from $fb";
+
+            skip "zstd doesn't support trailing data", 9
+                if $CompressClass =~ /zstd/i ;
 
             my $lex = new LexFile my $name ;
             my $input ;

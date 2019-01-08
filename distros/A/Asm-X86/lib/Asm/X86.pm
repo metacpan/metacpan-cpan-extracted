@@ -44,11 +44,11 @@ Asm::X86 - List of instructions and registers of x86-compatible processors, vali
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =head1 DESCRIPTION
 
@@ -4296,7 +4296,7 @@ Bogdan Drozdowski, C<< <bogdandr at op.pl> >>
 
 =head1 COPYRIGHT
 
-Copyright 2008-2018 Bogdan Drozdowski, all rights reserved.
+Copyright 2008-2019 Bogdan Drozdowski, all rights reserved.
 
 =head1 LICENSE
 

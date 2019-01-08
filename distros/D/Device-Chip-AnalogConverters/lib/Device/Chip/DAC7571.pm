@@ -9,9 +9,10 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
+use Future::AsyncAwait;
 
 use constant PROTOCOL => "I2C";
 
@@ -81,8 +82,8 @@ my %NAME_TO_POWERDOWN = (
 );
 
 # Chip has no config registers
-sub read_config { return Future->done( {} ) }
-sub change_config { return Future->done }
+async sub read_config { return {} }
+async sub change_config { }
 
 =head2 write_dac
 

@@ -1,5 +1,6 @@
 .gitignore
 Changes
+development/diagnose-connection.pl
 lib/Finance/Bank/Postbank_de.pm
 lib/Finance/Bank/Postbank_de/Account.pm
 lib/Finance/Bank/Postbank_de/APIv1.pm
@@ -22,6 +23,7 @@ scripts/dump-brokerage-account.pl
 scripts/serve-brokerage-account.pl
 scripts/test-hal.pl
 t/01-api-account.t
+t/01-api-apiv1.t
 t/01-api-postbank.t
 t/02-form-login.t
 t/02-maintenance.html

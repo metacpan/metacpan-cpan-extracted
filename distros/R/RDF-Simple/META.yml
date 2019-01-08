@@ -1,16 +1,18 @@
 ---
 abstract: 'read and write RDF without complication'
 author:
+  - 'Original author = Jo Walsh <jo@london.pm.org>'
   - 'Martin Thurn mthurn@cpan.org'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.36
   IO::CaptureOutput: 0
   Test::File: 0
   Test::Simple: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.36
 distribution_type: module
-generated_by: 'Module::Install version 0.91'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,7 +26,7 @@ no_index:
 recommends:
   XML::SAX::Expat: 0
 requires:
-  Class::MakeMethods: 0
+  Class::MethodMaker: 0
   File::Slurp: 0
   LWP::UserAgent: 0
   Regexp::Common: 0
@@ -33,4 +35,4 @@ requires:
   perl: 5.005
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.415
+version: 0.417

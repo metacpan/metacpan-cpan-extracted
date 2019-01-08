@@ -120,7 +120,7 @@ sub database_setting {
                 # Choose
                 my $idx_sec = choose(
                     $choices,
-                    { %{$sf->{i}{lyt_3}}, undef => $sf->{i}{back_config}, default => $old_idx_sec, index => 1 }
+                    { %{$sf->{i}{lyt_3}}, undef => $sf->{i}{back_v_no_ok}, default => $old_idx_sec, index => 1 }
                 );
                 if ( ! defined $idx_sec || ! defined $choices->[$idx_sec] ) {
                     return;
@@ -186,7 +186,7 @@ sub database_setting {
             my $idx_group = choose(
                 $choices,
                 { %{$sf->{i}{lyt_3}}, prompt => $prompt, index => 1,
-                  default => $old_idx_group, undef => $sf->{i}{back_config} }
+                  default => $old_idx_group, undef => $sf->{i}{back_v_no_ok} }
             );
             if ( ! defined $idx_group || ! defined $choices->[$idx_group] ) {
                 if ( $sf->{write_config} ) {

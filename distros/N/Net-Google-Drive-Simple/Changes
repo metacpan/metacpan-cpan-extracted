@@ -1,6 +1,20 @@
 ######################################################################
 Revision history for Perl extension Net::Google::Drive::Simple
 
+0.14 (2019/01/07)
+        MYMETA.{yml,json} must not be bundled (Nicolas R)
+        Adjust live test counter to be dynamic (Nicolas R)
+        Fix second return value for children (Tim Mullin)
+        Remove unsafe 'use lib' from scripts (Nicolas R)
+        Add a basic travis configuration file (Nicolas R)
+        Added cpanfile and README.pod (Peter Scott)
+        Minor documentation update (Arnaud (Arhuman) ASSAD)
+        Add file_metadata() method to Net::Google::Drive::Simple (Arnaud (Arhuman) ASSAD)
+        Label bug tracker as being on github for now on. (Todd Rinaldo)
+        updated readme (mschilli)
+        Refactor folder_create() to use file_create() (Emmanuel Rodriguez)
+        Add support for file_create() (Emmanuel Rodriguez)
+
 0.13 (2017/07/27)
     (ms) Added file_mvdir() to move files between folders.
 

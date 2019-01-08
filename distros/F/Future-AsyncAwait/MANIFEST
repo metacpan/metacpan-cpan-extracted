@@ -5,6 +5,7 @@ hax/block_start.c.inc
 hax/COP_SEQ_RANGE_HIGH_set.c.inc
 hax/cx_pushblock.c.inc
 hax/cx_pusheval.c.inc
+hax/docatch.c.inc
 hax/pad_block_start.c.inc
 hax/pad_leavemy.c.inc
 hax/README
@@ -30,6 +31,8 @@ t/12closure.t
 t/20context-block.t
 t/21context-while.t
 t/22context-foreach.t
+t/30stringeval.t
 t/40croak.t
+t/41end.t
 t/80await+try.t
 t/99pod.t

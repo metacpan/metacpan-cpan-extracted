@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Parcats::Line::Colorbar::Tickfont;
 use Chart::Plotly::Trace::Parcats::Line::Colorbar::Tickformatstop;
 use Chart::Plotly::Trace::Parcats::Line::Colorbar::Title;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace parcats.
 
@@ -273,7 +273,7 @@ Chart::Plotly::Trace::Parcats::Line::Colorbar - This attribute is one of the pos
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

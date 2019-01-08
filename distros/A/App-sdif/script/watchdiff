@@ -224,6 +224,14 @@ Kazumasa Utashiro
 L<https://github.com/kaz-utashiro/sdif-tools>
 
 
+=head1 LICENSE
+
+Copyright 2014-2019 Kazumasa Utashiro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
 =head1 SEE ALSO
 
 L<diff(1)>, L<cdif(1)>, L<sdif(1)>

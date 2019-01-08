@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
  */
 
 #include "EXTERN.h"
@@ -25,10 +25,6 @@
 
 #ifndef CX_CUR
 #  define CX_CUR() (&cxstack[cxstack_ix])
-#endif
-
-#ifndef unshare_hek
-#  define unshare_hek(a)          Perl_unshare_hek(aTHX_ a)
 #endif
 
 #ifdef SAVEt_CLEARPADRANGE
@@ -62,6 +58,17 @@ typedef SV PADNAME;
 #  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
 #  define PadnamelistMAX(pnl)     AvFILLp(pnl)
 #endif
+
+/* Currently no version of perl makes this visible, so we always want it. Maybe
+ * one day in the future we can make it version-dependent
+ */
+
+static void panic(char *fmt, ...);
+
+#ifndef NOT_REACHED
+#  define NOT_REACHED STMT_START { panic("Unreachable"); } STMT_END
+#endif
+#include "docatch.c.inc"
 
 typedef struct SuspendedFrame SuspendedFrame;
 struct SuspendedFrame {
@@ -116,6 +123,9 @@ struct SuspendedFrame {
 #ifdef HAVE_ITERVAR
   SV *itervar;
 #endif
+#ifdef DEBUGGING
+  const char *scopename;
+#endif
 };
 
 typedef struct {
@@ -165,6 +175,20 @@ static void debug_showstack(const char *name)
     fprintf(stderr, "\n");
   }
 #endif
+}
+
+static void vpanic(char *fmt, va_list args)
+{
+  fprintf(stderr, "Future::AsyncAwait panic: ");
+  vfprintf(stderr, fmt, args);
+  raise(SIGABRT);
+}
+
+static void panic(char *fmt, ...)
+{
+  va_list args;
+  va_start(args, fmt);
+  vpanic(fmt, args);
 }
 
 /*
@@ -319,7 +343,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
          * older than 5.20, this might be PL_tmps_floor
          */
         if(var != (int *)&PL_tmps_floor)
-          croak("TODO: Unsure how to handle a savestack entry of SAVEt_INT_SMALL with var != &PL_tmps_floor");
+          panic("TODO: Unsure how to handle a savestack entry of SAVEt_INT_SMALL with var != &PL_tmps_floor\n");
 
         saved->type    = SAVEt_INT;
         saved->u.iptr  = var;
@@ -358,7 +382,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
          * older than 5.24, this might be PL_tmps_floor
          */
         if(var != (STRLEN *)&PL_tmps_floor)
-          croak("TODO: Unsure how to handle a savestack entry of SAVEt_STRLEN with var != &PL_tmps_floor");
+          panic("TODO: Unsure how to handle a savestack entry of SAVEt_STRLEN with var != &PL_tmps_floor\n");
 
         saved->type      = SAVEt_STRLEN;
         saved->u.lenptr  = var;
@@ -385,7 +409,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
          * See also  https://rt.cpan.org/Ticket/Display.html?id=122793
          */
         if(gv != PL_errgv)
-          croak("TODO: Unsure how to handle a savestack entry of SAVEt_SV with gv != PL_errgv");
+          panic("TODO: Unsure how to handle a savestack entry of SAVEt_SV with gv != PL_errgv\n");
 
         saved->type     = SAVEt_SV;
         saved->u.gv     = gv;
@@ -405,7 +429,7 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         PADOFFSET padix = PL_savestack[PL_savestack_ix+2].any_uv;
 
         if(padav != PL_comppad)
-          croak("TODO: Unsure how to handle a savestack entry of SAVEt_PADSV_AND_MORTALIZE with padav != PL_comppad");
+          panic("TODO: Unsure how to handle a savestack entry of SAVEt_PADSV_AND_MORTALIZE with padav != PL_comppad\n");
 
         SvREFCNT_inc(PL_curpad[padix]); /* un-mortalize */
 
@@ -434,14 +458,14 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
       }
 
       default:
-        croak("TODO: Unsure how to handle savestack entry of %d", type);
+        panic("TODO: Unsure how to handle savestack entry of %d\n", type);
     }
 
     frame->savedlen++;
   }
 
   if(OLDSAVEIX(cx) != PL_savestack_ix)
-    croak("TODO: handle OLDSAVEIX");
+    panic("TODO: handle OLDSAVEIX\n");
 }
 
 static bool padname_is_normal_lexical(PADNAME *pname)
@@ -473,12 +497,20 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
   /* Parts of this code stolen from S_cv_clone() in pad.c
    */
   CV *new = MUTABLE_CV(newSV_type(SVt_PVCV));
-  CvFLAGS(new) = CvFLAGS(orig);
+  CvFLAGS(new) = CvFLAGS(orig) & ~CVf_CVGV_RC;
 
   CvFILE(new) = CvDYNFILE(orig) ? savepv(CvFILE(orig)) : CvFILE(orig);
 #if HAVE_PERL_VERSION(5, 18, 0)
-  if(CvNAMED(orig))
-    CvNAME_HEK_set(new, share_hek_hek(CvNAME_HEK(orig)));
+  if(CvNAMED(orig)) {
+    /* Perl core uses CvNAME_HEK_set() here, but that involves a call to a
+     * non-public function unshare_hek(). The latter is only needed in the
+     * case where an old value needs to be removed, but since we've only just
+     * created the CV we know it will be empty, so we can just set the field
+     * directly
+     */
+    ((XPVCV*)MUTABLE_PTR(SvANY(new)))->xcv_gv_u.xcv_hek = share_hek_hek(CvNAME_HEK(orig));
+    CvNAMED_on(new);
+  }
   else
 #endif
     CvGV_set(new, CvGV(orig));
@@ -496,7 +528,7 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
    */
 
   {
-    ENTER;
+    ENTER_with_name("cv_dup_for_suspend");
 
     SAVESPTR(PL_compcv);
     PL_compcv = new;
@@ -549,7 +581,7 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
           /* quiet any "Variable $FOO is not available" warnings about lexicals
            * yet to be introduced
            */
-          ENTER;
+          ENTER_with_name("find_cv_outside");
           SAVEINT(CvDEPTH(origproto));
           CvDEPTH(origproto) = 1;
 
@@ -560,7 +592,7 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
           SvREFCNT_dec(CvOUTSIDE(newproto));
           CvOUTSIDE(newproto) = MUTABLE_CV(SvREFCNT_inc_simple_NN(new));
 
-          LEAVE;
+          LEAVE_with_name("find_cv_outside");
 
           newval = MUTABLE_SV(newproto);
         }
@@ -578,7 +610,7 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
       PL_curpad[padix] = newval;
     }
 
-    LEAVE;
+    LEAVE_with_name("cv_dup_for_suspend");
   }
 
   return new;
@@ -607,6 +639,22 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
     state->frames = frame;
 
     suspend_block(frame, cx);
+
+    if(cx->blk_oldscopesp <= PL_scopestack_ix) {
+#ifdef DEBUGGING
+      frame->scopename = PL_scopestack_name[PL_scopestack_ix-1];
+#endif
+      /* We'll mutate PL_scopestack_ix but it doesn't matter as dounwind() will
+       * put it right at the end. Do this unconditionally to avoid divergent
+       * behaviour between -DDEBUGGING builds and non.
+       */
+      --PL_scopestack_ix;
+    }
+    else {
+#ifdef DEBUGGING
+      frame->scopename = NULL;
+#endif
+    }
 
     /* ref:
      *   https://perl5.git.perl.org/perl.git/blob/HEAD:/cop.h
@@ -646,48 +694,57 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 #ifdef HAVE_ITERVAR
 #  ifdef USE_ITHREADS
         if(cx->blk_loop.itervar_u.svp != (SV **)PL_comppad)
-          croak("TODO: Unsure how to handle a foreach loop with itervar != PL_comppad");
+          panic("TODO: Unsure how to handle a foreach loop with itervar != PL_comppad\n");
 #  else
         if(cx->blk_loop.itervar_u.svp != &PAD_SVl(cx->blk_loop.my_op->op_targ))
-          croak("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))");
+          panic("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))\n");
 #  endif
 
         frame->itervar = SvREFCNT_inc(*CxITERVAR(cx));
 #else
         if(CxITERVAR(cx) != &PAD_SVl(cx->blk_loop.my_op->op_targ))
-          croak("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))");
+          panic("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))\n");
         SvREFCNT_inc(cx->blk_loop.itersave);
 #endif
 
-        if(type == CXt_LOOP_LAZYSV) {
-          /* these two fields are refcounted, so we need to save them from
-           * dounwind() throwing them away
-           */
-          SvREFCNT_inc(frame->el.loop.state_u.lazysv.cur);
-          SvREFCNT_inc(frame->el.loop.state_u.lazysv.end);
-        }
-#if !HAVE_PERL_VERSION(5, 24, 0)
-        else if(type == CXt_LOOP_FOR) {
-          if(frame->el.loop.state_u.ary.ary)
-            SvREFCNT_inc(frame->el.loop.state_u.ary.ary);
-        }
+        switch(type) {
+          case CXt_LOOP_LAZYSV:
+            /* these two fields are refcounted, so we need to save them from
+             * dounwind() throwing them away
+             */
+            SvREFCNT_inc(frame->el.loop.state_u.lazysv.cur);
+            SvREFCNT_inc(frame->el.loop.state_u.lazysv.end);
+            break;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+          case CXt_LOOP_ARY:
+#else
+          case CXt_LOOP_FOR:
 #endif
+            /* this field is also refcounted, so we need to save it too */
+            if(frame->el.loop.state_u.ary.ary)
+              SvREFCNT_inc(frame->el.loop.state_u.ary.ary);
+            break;
+        }
 
         continue;
 
       case CXt_EVAL: {
         if(!(cx->cx_type & CXp_TRYBLOCK))
-          croak("TODO: handle CXt_EVAL without CXp_TRYBLOCK");
+          panic("TODO: handle CXt_EVAL without CXp_TRYBLOCK\n");
         if(cx->blk_eval.old_namesv)
-          croak("TODO: handle cx->blk_eval.old_namesv");
-        if(cx->blk_eval.old_eval_root)
-          croak("TODO: handle cx->blk_eval.old_eval_root");
-        if(cx->blk_eval.cur_text)
-          croak("TODO: handle cx->blk_eval.cur_text");
+          panic("TODO: handle cx->blk_eval.old_namesv\n");
         if(cx->blk_eval.cv)
-          croak("TODO: handle cx->blk_eval.cv");
+          panic("TODO: handle cx->blk_eval.cv\n");
         if(cx->blk_eval.cur_top_env != PL_top_env)
-          croak("TODO: handle cx->blk_eval.cur_top_env");
+          panic("TODO: handle cx->blk_eval.cur_top_env\n");
+
+        /*
+         * It seems we don't need to care about blk_eval.old_eval_root or
+         * blk_eval.cur_text, and if we ignore these then it works fine via
+         * string eval().
+         *   https://rt.cpan.org/Ticket/Display.html?id=126036
+         */
 
         frame->type = CXt_EVAL;
         frame->gimme = cx->blk_gimme;
@@ -698,7 +755,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
       }
 
       default:
-        croak("TODO: unsure how to handle a context frame of type %d", CxTYPE(cx));
+        panic("TODO: unsure how to handle a context frame of type %d\n", CxTYPE(cx));
     }
   }
 
@@ -828,7 +885,7 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         break;
 
       default:
-        croak("TODO: Unsure how to restore a %d savestack entry\n", saved->type);
+        panic("TODO: Unsure how to restore a %d savestack entry\n", saved->type);
     }
   }
 
@@ -858,6 +915,17 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     next = frame->next;
 
     PERL_CONTEXT *cx;
+
+#if defined(DEBUGGING) && HAVE_PERL_VERSION(5, 24, 0)
+    /* Apparently, we have to ENTER here on versions of perl before the Grand
+     * Context Stack Refactoring at 5.24, or else the scopename logic will get
+     * upset. See
+     *  https://rt.cpan.org/Ticket/Display.html?id=128164
+     */
+    if(frame->scopename) {
+      ENTER;
+    }
+#endif
 
     switch(frame->type) {
       case CXt_BLOCK:
@@ -900,6 +968,9 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
         break;
 
       case CXt_EVAL:
+        if(CATCH_GET)
+          panic("Too late to docatch()\n");
+
         cx = cx_pushblock(CXt_EVAL|CXp_TRYBLOCK, frame->gimme,
           PL_stack_sp, PL_savestack_ix);
         cx_pusheval(cx, frame->el.eval.retop, NULL);
@@ -908,10 +979,16 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
         break;
 
       default:
-        croak("TODO: Unsure how to restore a %d frame\n", frame->type);
+        panic("TODO: Unsure how to restore a %d frame\n", frame->type);
     }
 
     resume_block(frame, cx);
+
+#ifdef DEBUGGING
+    if(frame->scopename) {
+      PL_scopestack_name[PL_scopestack_ix-1] = frame->scopename;
+    }
+#endif
 
     Safefree(frame);
   }
@@ -929,7 +1006,7 @@ static SV *MY_future_done_from_stack(pTHX_ SV *f, SV **mark)
 
   EXTEND(SP, 1);
 
-  ENTER;
+  ENTER_with_name("future_done_from_stack");
   SAVETMPS;
 
   PUSHMARK(mark);
@@ -954,7 +1031,7 @@ static SV *MY_future_done_from_stack(pTHX_ SV *f, SV **mark)
   SV *ret = SvREFCNT_inc(POPs);
 
   FREETMPS;
-  LEAVE;
+  LEAVE_with_name("future_done_from_stack");
 
   return ret;
 }
@@ -964,7 +1041,7 @@ static SV *MY_future_fail(pTHX_ SV *f, SV *failure)
 {
   dSP;
 
-  ENTER;
+  ENTER_with_name("future_fail");
   SAVETMPS;
 
   PUSHMARK(SP);
@@ -982,7 +1059,7 @@ static SV *MY_future_fail(pTHX_ SV *f, SV *failure)
   SV *ret = SvREFCNT_inc(POPs);
 
   FREETMPS;
-  LEAVE;
+  LEAVE_with_name("future_fail");
 
   return ret;
 }
@@ -992,7 +1069,7 @@ static SV *MY_future_new_from_proto(pTHX_ SV *proto)
 {
   dSP;
 
-  ENTER;
+  ENTER_with_name("future_new_from_proto");
   SAVETMPS;
 
   PUSHMARK(SP);
@@ -1006,7 +1083,7 @@ static SV *MY_future_new_from_proto(pTHX_ SV *proto)
   SV *f = SvREFCNT_inc(POPs);
 
   FREETMPS;
-  LEAVE;
+  LEAVE_with_name("future_new_from_proto");
 
   if(!SvROK(f))
     croak("Expected Future->new to yield a new reference");
@@ -1021,7 +1098,7 @@ static int MY_future_is_ready(pTHX_ SV *f)
 {
   dSP;
 
-  ENTER;
+  ENTER_with_name("future_is_ready");
   SAVETMPS;
 
   PUSHMARK(SP);
@@ -1036,7 +1113,7 @@ static int MY_future_is_ready(pTHX_ SV *f)
 
   PUTBACK;
   FREETMPS;
-  LEAVE;
+  LEAVE_with_name("future_is_ready");
 
   return is_ready;
 }
@@ -1046,7 +1123,7 @@ static void MY_future_get_to_stack(pTHX_ SV *f, I32 gimme)
 {
   dSP;
 
-  ENTER;
+  ENTER_with_name("future_get_to_stack");
 
   PUSHMARK(SP);
   XPUSHs(f);
@@ -1054,7 +1131,7 @@ static void MY_future_get_to_stack(pTHX_ SV *f, I32 gimme)
 
   call_method("get", gimme);
 
-  LEAVE;
+  LEAVE_with_name("future_get_to_stack");
 }
 
 #define future_on_ready(f, code)  MY_future_on_ready(aTHX_ f, code)
@@ -1062,7 +1139,7 @@ static void MY_future_on_ready(pTHX_ SV *f, CV *code)
 {
   dSP;
 
-  ENTER;
+  ENTER_with_name("future_on_ready");
 
   PUSHMARK(SP);
   XPUSHs(f);
@@ -1071,7 +1148,7 @@ static void MY_future_on_ready(pTHX_ SV *f, CV *code)
 
   call_method("on_ready", G_VOID);
 
-  LEAVE;
+  LEAVE_with_name("future_on_ready");
 }
 
 /*
@@ -1134,6 +1211,13 @@ static OP *pp_await(pTHX)
   CV *origcv = curcv;
 
   SuspendedState *state = suspendedstate_get(curcv);
+
+  if(state && state->awaiting_future && CATCH_GET) {
+    /* If we don't do this we get all the mess that is
+     *   https://rt.cpan.org/Ticket/Display.html?id=126037
+     */
+    return docatch(pp_await);
+  }
 
   if(state && state->awaiting_future) {
     I32 orig_height;
@@ -1397,6 +1481,13 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 }
 
 MODULE = Future::AsyncAwait    PACKAGE = Future::AsyncAwait
+
+int
+__cxstack_ix()
+  CODE:
+    RETVAL = cxstack_ix;
+  OUTPUT:
+    RETVAL
 
 BOOT:
   XopENTRY_set(&xop_leaveasync, xop_name, "leaveasync");

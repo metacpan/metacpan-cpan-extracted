@@ -37,6 +37,8 @@ BEGIN {
 	@PODFILES = (
 		catfile($FindBin::Bin,qw/ .. lib File Replace.pm /),
 		catfile($FindBin::Bin,qw/ .. lib Tie Handle Base.pm /),
+		catfile($FindBin::Bin,qw/ .. lib Tie Handle Argv.pm /),
+		catfile($FindBin::Bin,qw/ .. lib File Replace Inplace.pm /),
 		catfile($FindBin::Bin,qw/ .. lib File Replace DualHandle.pm /),
 		catfile($FindBin::Bin,qw/ .. lib File Replace SingleHandle.pm /),
 	);
@@ -52,6 +54,8 @@ for my $podfile (@PODFILES) {
 }
 
 use Capture::Tiny qw/capture_merged/;
+use Cwd qw/getcwd/;
+use File::Temp qw/tempdir/;
 subtest 'verbatim code' => sub {
 	## no critic (ProhibitStringyEval, RequireBriefOpen, RequireCarping)
 	my $verb_thb = getverbatim($PODFILES[1], qr/\b(?:synopsis|examples)\b/i);
@@ -101,11 +105,46 @@ subtest 'verbatim code' => sub {
 	{
 		my $filename = newtempfn("Foo\nBar\nQuz\n");
 		eval("use warnings; use strict; $$verb_fr[0]; 1") or fail($@);
-		is slurp($filename), "X: Foo\nX: Bar\nX: Quz\n", 'synposis 1';
+		is slurp($filename), "X: Foo\nX: Bar\nX: Quz\n", 'File::Replace synposis 1';
 		eval("use warnings; use strict; $$verb_fr[1]; 1") or fail($@);
-		is slurp($filename), "Y: X: Foo\nY: X: Bar\nY: X: Quz\n", 'synposis 2';
+		is slurp($filename), "Y: X: Foo\nY: X: Bar\nY: X: Quz\n", 'File::Replace synposis 2';
 		eval("use warnings; use strict; $$verb_fr[2]; 1") or fail($@);
-		is slurp($filename), "Z: Y: X: Foo\nZ: Y: X: Bar\nZ: Y: X: Quz\n", 'synposis 3';
+		is slurp($filename), "Z: Y: X: Foo\nZ: Y: X: Bar\nZ: Y: X: Quz\n", 'File::Replace synposis 3';
+	}
+	
+	my $verb_av = getverbatim($PODFILES[2], qr/\b(?:synopsis)\b/i);
+	is @$verb_av, 2, 'Tie::Handle::Argv verbatim block count'
+		or diag explain $verb_av;
+	eval("use warnings; use strict; $$verb_av[0]; 1") or fail($@);
+	{
+		my $filename = newtempfn("Hello,\nWorld!");
+		is capture_merged {
+			local (*ARGV, $.);  ## no critic (RequireInitializationForLocalVars)
+			@ARGV = ($filename);  ## no critic (RequireLocalizedPunctuationVars)
+			eval("use warnings; use strict; $$verb_av[1]; 1") or fail($@);
+		}, "Debug: Open '$filename'\n<Hello,>\n<World!>\n", 'Tie::Handle::Argv synopsis - output ok';
+		is slurp($filename), "Hello,\nWorld!", 'Tie::Handle::Argv synopsis - file ok';
+	}
+	
+	my $verb_fri = getverbatim($PODFILES[3], qr/\b(?:synopsis)\b/i);
+	is @$verb_fri, 2, 'File::Replace::Inplace verbatim block count'
+		or diag explain $verb_fri;
+	{
+		my $prevdir = getcwd;
+		my $tmpdir = tempdir(DIR=>$TEMPDIR,CLEANUP=>1);
+		chdir($tmpdir) or die "chdir $tmpdir: $!";
+		spew("file1.txt", "Hello\nWorld");
+		spew("file2.txt", "Foo\nBar\n");
+		
+		is capture_merged {
+			local (*ARGV, *ARGVOUT, $.);  ## no critic (RequireInitializationForLocalVars)
+			eval("use warnings; use strict; $$verb_fri[0]; 1") or fail($@);
+		}, "", 'File::Replace::Inplace synopsis - output ok';
+		
+		is slurp("file1.txt"), "H_ll_\nW_rld\n", 'File::Replace::Inplace - file 1 ok';
+		is slurp("file2.txt"), "F__\nB_r\n", 'File::Replace::Inplace - file 2 ok';
+		
+		chdir($prevdir) or die "chdir $prevdir: $!";
 	}
 	## use critic
 };

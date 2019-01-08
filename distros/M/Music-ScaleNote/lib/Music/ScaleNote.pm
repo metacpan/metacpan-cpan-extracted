@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Manipulate the position of a note in a scale
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0500';
 
 use Carp;
 use Moo;
@@ -28,13 +28,15 @@ has scale_name => (
 
 
 has note_format => (
-    is => 'ro',
+    is      => 'ro',
+    default => sub { 'ISO' },
 );
 
 
 has offset => (
-    is  => 'ro',
-    isa => sub { die 'Not an integer' unless $_[0] =~ /^\d+$/ },
+    is      => 'ro',
+    isa     => sub { die 'Not a negative or positive integer' unless $_[0] =~ /^-?\d+$/ },
+    default => sub { 1 },
 );
 
 
@@ -125,35 +127,39 @@ Music::ScaleNote - Manipulate the position of a note in a scale
 
 =head1 VERSION
 
-version 0.0303
+version 0.0500
 
 =head1 SYNOPSIS
 
   use Music::ScaleNote;
   use Music::Note;
+
   my $msn = Music::ScaleNote->new(
     scale_note => 'C',
     scale_name => 'pminor',
     verbose    => 1,
   );
-  my $note = $msn->get_offset(
-    note_name   => 'C4',
-    note_format => 'ISO',
-    offset      => 1,
-  );
+
+  my $note = $msn->get_offset( note_name => 'C4' );
+
   print $note->format('ISO'), "\n"; # D#4
 
 =head1 DESCRIPTION
 
 A C<Music::ScaleNote> object manipulates the position of a note in a scale.
 
-Given a scale, a starting note, a scale note, and a scale position offset, this
-module computes the new note.
+Given a B<scale_name>, a B<scale_note>, a starting B<note_name>, the
+B<note_format>, and a scale position B<offset>, this module computes the new
+note.
 
-So for scale C<C D# F G A#> (C pentatonic minor), note C<C4>, and offset C<1>
-(move one note to the right), this module will return C<D#4>.
+So for scale C<C D# F G A#> (C pentatonic minor), note name C<C4> (given the
+ISO format), and offset C<1> (move one note to the right), this module will
+return C<D#4>.
 
 For offset C<-1>, C<A#3> is returned.
+
+The B<note_format> determines how the B<note_name> is given, and the default is
+C<ISO>.
 
 =head1 ATTRIBUTES
 
@@ -161,7 +167,7 @@ For offset C<-1>, C<A#3> is returned.
 
 This is the name of the note that starts the given scale.
 
-Default: C
+Default: C<C>
 
 =head2 scale_name
 
@@ -169,33 +175,49 @@ This is the name of the scale to use.
 
 Please see L<Music::Scales/SCALES> for the possible names.
 
-Default: major
+Default: C<major>
 
 =head2 note_format
 
 The format as given by L<Music::Note/STYLES>.  If given in the constructor, this
 is used as the default in the B<get_offset> method.
 
+Default: C<ISO>
+
 =head2 offset
 
 The integer offset of a new scale position.  If given in the constructor, this
 is used as the default in the B<get_offset> method.
 
+Default: C<1>
+
 =head2 verbose
 
 Show the progress of the B<get_offset> method.
+
+Default: C<0>
 
 =head1 METHODS
 
 =head2 new()
 
-  $msn = Music::ScaleNote->new(%arguments);
+  $msn = Music::ScaleNote->new(
+    scale_note  => $scale_start_note,
+    scale_name  => $scale_name,
+    verbose     => $boolean,
+    note_format => $format,
+    offset      => $integer,
+  );
 
 Create a new C<Music::ScaleNote> object.
 
 =head2 get_offset()
 
-  $note = $msn->get_offset(%arguments);
+  $note = $msn->get_offset(
+    note_name   => $formatted_note_name,
+    note_format => $format,
+    offset      => $integer,
+  );
 
 Return a new L<Music::Note> object based on the given B<note_name>,
 B<note_format> and B<offset>.

@@ -10,11 +10,13 @@ use lib 't/';
 my $mod = 'RPi::WiringPi';
 
 BEGIN {
+    if (! $ENV{RPI_ARDUINO}){
+        plan skip_all => "RPI_ARUDINO environment variable not set\n";
+    }
+
     if (! $ENV{PI_BOARD}){
-        warn "\n*** PI_BOARD is not set! ***\n";
         $ENV{NO_BOARD} = 1;
-        plan skip_all => "not on a pi board\n";
-        exit;
+        plan skip_all => "Not on a Pi board\n";
     }
 }
 

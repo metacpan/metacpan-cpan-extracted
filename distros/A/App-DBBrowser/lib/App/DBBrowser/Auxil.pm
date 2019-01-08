@@ -96,11 +96,10 @@ sub __select_cols {
     my ( $sf, $sql ) = @_;
     my @combined_cols;
     if ( ! keys %{$sql->{alias}} ) {
-        @combined_cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} );
+        @combined_cols = ( @{$sql->{chosen_cols}} );
     }
     else {
-        push @combined_cols, @{$sql->{group_by_cols}};
-        for ( @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} ) {
+        for ( @{$sql->{chosen_cols}} ) {
             if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
                 push @combined_cols, $_ . " AS " . $sql->{alias}{$_};
             }
@@ -113,25 +112,25 @@ sub __select_cols {
         if ( $sf->{i}{multi_tbl} eq 'join' ) {
              return ' ' . join ', ', @{$sql->{cols}};
         }
-        return " *";
+        elsif ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
+            return ' ' . join ', ', @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}};
+        }
+        else {
+            return " *";
+        }
     }
     return ' ' . join ', ', @combined_cols;
 }
 
 
 sub print_sql {
-    my ( $sf, $sql, $stmt_typeS, $tmp, $waiting ) = @_;
+    my ( $sf, $sql, $stmt_typeS, $waiting ) = @_;
     return if ! defined $stmt_typeS;
-    $tmp = {} if ! defined $tmp;
-    my $pr_sql = { %$sql };
-    for my $key ( keys %$tmp ) {
-        $pr_sql->{$key} = exists $tmp->{$key} ? $tmp->{$key} : $sql->{$key}; #
-    }
     my $str = '';
     for my $stmt_type ( @$stmt_typeS ) {
-         $str .= $sf->get_stmt( $pr_sql, $stmt_type, 'print' );
+         $str .= $sf->get_stmt( $sql, $stmt_type, 'print' );
     }
-    my $filled = $sf->stmt_placeholder_to_value( $str, [ @{$pr_sql->{set_args}}, @{$pr_sql->{where_args}}, @{$pr_sql->{having_args}} ] );
+    my $filled = $sf->stmt_placeholder_to_value( $str, [ @{$sql->{set_args}}, @{$sql->{where_args}}, @{$sql->{having_args}} ] );
     $str = $filled if defined $filled;
     $str .= "\n";
     print $sf->{i}{clear_screen};
@@ -141,6 +140,58 @@ sub print_sql {
         print HIDE_CURSOR;
         print $waiting;
     }
+}
+
+
+sub column_names_and_types {
+    my ( $sf, $tables ) = @_;
+    my ( $col_names, $col_types );
+    for my $table ( @$tables ) {
+        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
+        $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+        $col_names->{$table} ||= $sth->{NAME};
+        $col_types->{$table} ||= $sth->{TYPE};
+    }
+    return $col_names, $col_types;
+}
+
+
+sub tables_data {   # in App::DBBrowser::DB no 'quote_table'
+    my ( $sf, $schema, $db_attached ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $driver = $sf->{d}{driver};
+    my ( $user_tbls, $sys_tbls ) = ( [], [] );
+    my $table_data = {};
+    my ( $table_schem, $table_name );
+    if ( $driver eq 'Pg' ) {
+        $table_schem = 'pg_schema';
+        $table_name  = 'pg_table';
+    }
+    else {
+        $table_schem = 'TABLE_SCHEM';
+        $table_name  = 'TABLE_NAME';
+    }
+    my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
+    if ( $db_attached ) {
+        $schema = undef;
+        # More than one schema if a SQLite database has databases attached
+    }
+    my $sth = $sf->{d}{dbh}->table_info( undef, $schema, undef, undef );
+    my $info = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
+    for my $href ( @$info ) {
+        my $table = defined $schema ? $href->{$table_name} : $ax->quote_table( [ @{$href}{@keys} ] );
+        if ( $href->{TABLE_TYPE} =~ /SYSTEM/ ) {
+            #next if ! $sf->{add_metadata};
+            next if $href->{$table_name} eq 'sqlite_temp_master';
+            push @$sys_tbls, $table;
+        }
+        elsif ( $href->{TABLE_TYPE} ne 'INDEX' ) {
+        #elsif ( $href->{TABLE_TYPE} eq 'TABLE' || $href->{TABLE_TYPE} eq 'VIEW' || $href->{TABLE_TYPE} eq 'LOCAL TEMPORARY' ) {
+            push @$user_tbls, $table;
+        }
+        $table_data->{$table} = [ @{$href}{@keys} ];
+    }
+    return $table_data, $user_tbls, $sys_tbls;
 }
 
 
@@ -222,6 +273,29 @@ sub backup_href {
 }
 
 
+sub reset_sql {
+    my ( $sf, $sql ) = @_;
+    my $backup = {};
+    for my $y ( qw( db schema table cols ) ) {
+        $backup->{$y} = $sql->{$y} if exists $sql->{$y};
+    }
+    map { delete $sql->{$_} } keys %$sql; # not $sql = {} so $sql is still pointing to the outer $sql
+    my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
+    my @array  = qw( cols group_by_cols aggr_cols
+                     chosen_cols
+                     set_args where_args having_args
+                     insert_into_cols insert_into_args
+                     create_table_cols );
+    my @hash   = qw( alias );
+    @{$sql}{@string} = ( '' ) x  @string;
+    @{$sql}{@array}  = map{ [] } @array;
+    @{$sql}{@hash}   = map{ {} } @hash;
+    for my $y ( keys %$backup ) {
+        $sql->{$y} = $backup->{$y};
+    }
+}
+
+
 sub print_error_message {
     my ( $sf, $message, $title ) = @_;
     my $info;
@@ -232,29 +306,6 @@ sub print_error_message {
         [ 'Press ENTER to continue' ],
         { %{$sf->{i}{lyt_m}}, prompt => $message, info => $info }
     );
-}
-
-
-sub reset_sql {
-    my ( $sf, $sql ) = @_;
-    my $backup = {};
-    for my $y ( qw( db schema table cols ) ) {
-        $backup->{$y} = $sql->{$y} if exists $sql->{$y};
-    }
-    map { delete $sql->{$_} } keys %$sql; # not $sql = {} so $sql is still pointing to the outer $sql
-    my @string = qw( distinct_stmt set_stmt where_stmt group_by_stmt having_stmt order_by_stmt limit_stmt offset_stmt );
-    my @array  = qw(       chosen_cols      aggr_cols      group_by_cols
-                      orig_chosen_cols orig_aggr_cols orig_group_by_cols  modified_cols
-                      set_args where_args having_args
-                      insert_into_cols insert_into_args
-                      create_table_cols );
-    my @hash   = qw( alias );
-    @{$sql}{@string} = ( '' ) x  @string;
-    @{$sql}{@array}  = map{ [] } @array;
-    @{$sql}{@hash}   = map{ {} } @hash;
-    for my $y ( keys %$backup ) {
-        $sql->{$y} = $backup->{$y};
-    }
 }
 
 

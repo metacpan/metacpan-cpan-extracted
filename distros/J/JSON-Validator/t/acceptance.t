@@ -8,7 +8,8 @@ use JSON::Validator 'validate_json';
 
 my $test_suite = path(qw(t draft4-tests));
 my $remotes    = path(qw(t remotes));
-plan skip_all => 'Cannot find test files in t/draft4-tests' unless -d $test_suite;
+plan skip_all => 'Cannot find test files in t/draft4-tests'
+  unless -d $test_suite;
 
 use Mojolicious::Lite;
 app->static->paths(["$remotes"]);
@@ -17,12 +18,10 @@ $t->get_ok('/integer.json')->status_is(200);
 my $host_port = $t->ua->server->url->host_port;
 
 my $test_only_re = $ENV{TEST_ONLY} || '';
-my $todo_re = join(
-  '|', 'dependencies', 'change resolution scope - changed scope ref valid',
-  'remote ref, containing refs itself - remote ref invalid',
-  $ENV{AUTOMATED_TESTING}
-  ? ('remote ref')
-  : (),    # http://cpantesters.org/cpan/report/76ae6b92-af70-11e8-8fb1-ef5133556b3f
+my $todo_re = join('|',
+  'dependencies',
+  'change resolution scope - changed scope ref valid',
+  $ENV{TEST_ONLINE} ? () : ('remote ref'),
 );
 
 for my $file (sort $test_suite->list->each) {

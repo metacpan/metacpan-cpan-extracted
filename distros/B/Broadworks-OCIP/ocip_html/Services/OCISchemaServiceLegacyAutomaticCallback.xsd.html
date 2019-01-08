@@ -1,0 +1,2824 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>XML Schema Documentation</title>
+<meta content="text/xml; charset=iso-8859-1" http-equiv="Content-Type" />
+<style type="text/css">
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* More-configurable styles */
+
+/******** General ********/
+
+/* Document body */
+body {
+   color: Black;
+   background-color: White;
+   font-family: Arial, sans-serif;
+   font-size: 10pt;
+}
+/* Horizontal rules */
+hr {
+   color: black;
+}
+/* Document title */
+h1 {
+   font-size: 18pt;
+   letter-spacing: 2px;
+   border-bottom: 1px #ccc solid;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+/* Main section headers */
+h2 {
+   font-size: 14pt;
+   letter-spacing: 1px;
+}
+/* Sub-section headers */
+h3, h3 a, h3 span {
+   font-size: 12pt;
+   font-weight: bold;
+   color: black;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties th, table.properties th a {
+   color: black;
+   background-color: #F99; /* Pink */
+}
+table.properties td {
+   background-color: #eee; /* Gray */
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   color: #963; /* Orange-brown */
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   border: 2px solid #999;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+   background-color: #ccc;
+}
+table.namespaces td {
+   background-color: #eee;
+}
+/* Target namespace of the schema */
+span.targetNS {
+   color: #06C;
+   font-weight: bold;
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+   color: #F93; /* Orange */
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   border: 2px solid #999; /* Gray */
+}
+
+/* XML Instance Representation table */
+div.sample div.contents {
+   border: 2px dashed black;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent div.contents {
+   border: 2px black solid;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   color: #036; /* Blue */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Printer-version styles */
+
+@media print {
+
+/* Ensures that controls are hidden when printing */
+div#printerControls {
+   visibility: hidden;
+}
+div#globalControls {
+   visibility: hidden;
+}
+#legend {
+   display: none;
+}
+#legendTOC {
+   display: none;
+}
+#glossary {
+   display: none;
+}
+#glossaryTOC {
+   display: none;
+}
+
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Base styles */
+
+/******** General ********/
+
+/* Unordered lists */
+ul {
+   margin-left: 1.5em;
+   margin-bottom: 0em;
+}
+/* Tables */
+table {
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: 2px;
+   margin-right: 2px;
+}
+table th, table td {
+   font-size: 10pt;
+   vertical-align: top;
+   padding-top: 3px;
+   padding-bottom: 3px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+table th {
+   font-weight: bold;
+   text-align: left;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties {
+   width: 90%;
+}
+table.properties th {
+   width: 30%;
+}
+/* Boxes that can make its content appear and disappear*/
+div.box {
+   margin: 1em;
+}
+   /* Box caption */
+div.box span.caption {
+   font-weight: bold;
+}
+   /* Button to open and close the box */
+div.box input.control {
+   width: 1.4em;
+   height: 1.4em;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 11pt;
+}
+   /* Box contents */
+div.box div.contents {
+   margin-top: 3px;
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   white-space: nowrap;
+   font-weight: bold;
+   padding: 5px;
+   margin: 5px;
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   padding: 10px;
+   margin: 5px;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+}
+table.namespaces td {
+}
+/* Target namespace of the schema */
+span.targetNS {
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   width: 90%;
+}
+table.hierarchy th {
+   font-weight: normal;
+   font-style: italic;
+   width: 20%;
+}
+table.hierarchy th, table.hierarchy td {
+   padding: 5px;
+}
+
+/* XML Instance Representation table */
+div.sample {
+   width: 90%;
+}
+div.sample div.contents {
+   padding: 5px;
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+}
+   /* Normal elements and attributes */
+div.sample div.contents, div.sample div.contents a {
+   color: black;
+}
+   /* Group Headers */
+div.sample div.contents .group, div.sample div.contents .group a {
+   color: #999; /* Light gray */
+}
+   /* Type Information */
+div.sample div.contents .type, div.sample div.contents .type a {
+   color: #999; /* Light gray */
+}
+   /* Occurrence Information */
+div.sample div.contents .occurs, div.sample div.contents .occurs a {
+   color: #999; /* Light gray */
+}
+   /* Fixed values */
+div.sample div.contents .fixed {
+   color: #063; /* Green */
+   font-weight: bold;
+}
+   /* Simple type constraints */
+div.sample div.contents .constraint, div.sample div.contents .constraint a {
+   color: #999; /* Light gray */
+}
+   /* Elements and attributes inherited from base type */
+div.sample div.contents .inherited, div.sample div.contents .inherited a {
+   color: #666; /* Dark gray */
+}
+   /* Elements and attributes added to or changed from base type */
+div.sample div.contents .newFields {
+   font-weight: bold;
+}
+   /* Other type of information */
+div.sample div.contents .other, div.sample div.contents .other a {
+   color: #369; /* Blue */
+   font-style: italic;
+}
+   /* Link to open up window displaying documentation */
+div.sample div.contents a.documentation {
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   font-weight: bold;
+   font-size: 11pt;
+   background-color: #FFD;
+   color: #069;
+}
+   /* Invert colors when hovering over link to open up window 
+      displaying documentation */
+div.sample div.contents a.documentation:hover {
+   color: #FFD;
+   background-color: #069;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent {
+   width: 90%;
+}
+div.schemaComponent div.contents {
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+   padding: 5px;
+}
+   /* Syntax characters */
+div.schemaComponent div.contents {
+   color: #00f; /* blue */
+}
+   /* Element and attribute tags */
+div.schemaComponent div.contents .scTag {
+   color: #933; /* maroon */
+}
+   /* Element and attribute content */
+div.schemaComponent div.contents .scContent, div.schemaComponent div.contents .scContent a {
+   color: black;
+   font-weight: bold;
+}
+   /* Comments */
+div.schemaComponent div.contents .comment {
+   color: #999; /* Light gray */
+}
+
+/******** Legend Section ********/
+
+div#legend table, div#legend div {
+   margin-bottom: 3px;
+}
+div#legend div.hint {
+   color: #999; /* Light gray */
+   width: 90%;
+   margin-left: 1em;
+   margin-bottom: 2em;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   font-weight: bold;
+}
+
+
+/******** Footer ********/
+
+.footer {
+   font-size: 8pt;
+}
+</style>
+<script type="text/javascript">
+<!--
+/* IDs of XML Instance Representation boxes */
+var xiBoxes = new Array('type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_xibox', 'type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_xibox', 'type_SystemLegacyAutomaticCallbackGetRequest_xibox', 'type_SystemLegacyAutomaticCallbackGetResponse_xibox', 'type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_xibox', 'type_SystemLegacyAutomaticCallbackModifyRequest_xibox', 'type_UserLegacyAutomaticCallbackGetRequest_xibox', 'type_UserLegacyAutomaticCallbackGetResponse_xibox', 'type_UserLegacyAutomaticCallbackModifyRequest_xibox', 'type_LegacyAutomaticCallbackLineType_xibox', 'type_LegacyAutomaticCallbackLineMatchAction_xibox', 'type_LegacyAutomaticCallbackMaxMonitorsPerOriginator_xibox', 'type_LegacyAutomaticCallbackMaxMonitorsPerTerminator_xibox', 'type_LegacyAutomaticCallbackT10OMinutes_xibox', 'type_LegacyAutomaticCallbackT10TMinutes_xibox', 'type_LegacyAutomaticCallbackT2Minutes_xibox', 'type_LegacyAutomaticCallbackT4Seconds_xibox', 'type_LegacyAutomaticCallbackT5Seconds_xibox', 'type_LegacyAutomaticCallbackT6Minutes_xibox', 'type_LegacyAutomaticCallbackT7Minutes_xibox', 'type_LegacyAutomaticCallbackT8Seconds_xibox', 'type_LegacyAutomaticCallbackTRingSeconds_xibox');
+/* IDs of Schema Component Representation boxes */
+var scBoxes = new Array('schema_scbox', 'type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_scbox', 'type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_scbox', 'type_SystemLegacyAutomaticCallbackGetRequest_scbox', 'type_SystemLegacyAutomaticCallbackGetResponse_scbox', 'type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_scbox', 'type_SystemLegacyAutomaticCallbackModifyRequest_scbox', 'type_UserLegacyAutomaticCallbackGetRequest_scbox', 'type_UserLegacyAutomaticCallbackGetResponse_scbox', 'type_UserLegacyAutomaticCallbackModifyRequest_scbox', 'type_LegacyAutomaticCallbackLineType_scbox', 'type_LegacyAutomaticCallbackLineMatchAction_scbox', 'type_LegacyAutomaticCallbackMaxMonitorsPerOriginator_scbox', 'type_LegacyAutomaticCallbackMaxMonitorsPerTerminator_scbox', 'type_LegacyAutomaticCallbackT10OMinutes_scbox', 'type_LegacyAutomaticCallbackT10TMinutes_scbox', 'type_LegacyAutomaticCallbackT2Minutes_scbox', 'type_LegacyAutomaticCallbackT4Seconds_scbox', 'type_LegacyAutomaticCallbackT5Seconds_scbox', 'type_LegacyAutomaticCallbackT6Minutes_scbox', 'type_LegacyAutomaticCallbackT7Minutes_scbox', 'type_LegacyAutomaticCallbackT8Seconds_scbox', 'type_LegacyAutomaticCallbackTRingSeconds_scbox');
+
+/**
+ * Can get the ID of the button controlling
+ * a collapseable box by concatenating
+ * this string onto the ID of the box itself.
+ */
+var B_SFIX = "_button";
+
+/**
+ * Counter of documentation windows
+ * Used to give each window a unique name
+ */
+var windowCount = 0;
+
+/**
+ * Returns an element in the current HTML document.
+ * 
+ * @param elementID Identifier of HTML element
+ * @return               HTML element object
+ */
+function getElementObject(elementID) {
+    var elemObj = null;
+    if (document.getElementById) {
+        elemObj = document.getElementById(elementID);
+    }
+    return elemObj;
+}             
+
+/**
+ * Closes a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function closeBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="none";
+
+     // Change text of button 
+     if (boxObj.style.display=="none") {
+        buttonObj.value=" + ";
+     }
+  }
+}
+
+/**
+ * Opens a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function openBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="block";
+
+     // Change text of button
+     if (boxObj.style.display=="block") {
+        buttonObj.value=" - ";
+     }
+  }
+}
+
+/**
+ * Sets the state of a collapseable box.
+ * 
+ * @param boxID Identifier of box
+ * @param open If true, box is "opened",
+ *             Otherwise, box is "closed".
+ */
+function setState(boxID, open) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (open) {
+     openBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  } else {
+     closeBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  }
+}
+
+/**
+ * Switches the state of a collapseable box, e.g.
+ * if it's opened, it'll be closed, and vice versa.
+ * 
+ * @param boxID Identifier of box
+ */
+function switchState(boxID) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (boxObj.style.display=="none") {
+     // Box is closed, so open it
+     openBox(boxObj, buttonObj);
+  } else if (boxObj.style.display=="block") {
+     // Box is opened, so close it
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Closes all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function collapseAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Open all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function expandAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     openBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Makes all the control buttons of boxes appear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function viewControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "inline";
+        }
+    }
+}
+
+/**
+ * Makes all the control buttons of boxes disappear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function hideControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "none";
+        }
+    }
+}
+
+/**
+ * Sets the page for either printing mode
+ * or viewing mode. In printing mode, the page
+ * is made to be more readable when printing it out.
+ * In viewing mode, the page is more browsable.
+ *
+ * @param isPrinterVersion If true, display in
+ *                                 printing mode; otherwise, 
+ *                                 in viewing mode
+ */
+function displayMode(isPrinterVersion) {
+    var obj;
+    if (isPrinterVersion) {
+        // Hide global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "hidden";
+        }
+        // Hide Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        // Hide Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Expand all Schema Component Representation tables
+        expandAll(scBoxes);
+
+        // Hide Control buttons
+        hideControlButtons(xiBoxes);
+        hideControlButtons(scBoxes);
+    } else {
+        // View global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "visible";
+        }
+        // View Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        // View Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Collapse all Schema Component Representation tables
+        collapseAll(scBoxes);
+
+        // View Control buttons
+        viewControlButtons(xiBoxes);
+        viewControlButtons(scBoxes);
+    }
+}
+
+/**
+ * Opens up a window displaying the documentation
+ * of a schema component in the XML Instance
+ * Representation table.
+ * 
+ * @param compDesc      Description of schema component 
+ * @param compName      Name of schema component 
+ * @param docTextArray Array containing the paragraphs 
+ *                           of the new document
+ */
+function viewDocumentation(compDesc, compName, docTextArray) {
+  var width = 400;
+  var height = 200;
+  var locX = 100;
+  var locY = 200;
+
+  /* Generate content */
+  var actualText = "<html>";
+  actualText += "<head><title>";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": " + compName;
+  }
+  actualText += "</title></head>";
+  actualText += "<body bgcolor=\"#FFFFEE\">";
+  // Title
+  actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 12pt; font-weight: bold; letter-spacing:1px;\">";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": <span style=\"color:#006699\">" + compName + "</span>";
+  }
+  actualText += "</p>";
+  // Documentation
+  var idx;
+  for (idx = 0; idx < docTextArray.length; idx++) {
+     actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 10pt;\">" + docTextArray[idx] + "</p>";
+  }
+  // Link to close window
+  actualText += "<a href=\"javascript:void(0)\" onclick=\"window.close();\" style=\"font-family: Arial, sans-serif; font-size: 8pt;\">Close</a>";
+  actualText += "</body></html>";
+
+  /* Display window */
+  windowCount++;
+  var docWindow = window.open("", "documentation"+windowCount, "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable,alwaysRaised,dependent,titlebar=no,width="+width+",height="+height+",screenX="+locX+",left="+locX+",screenY="+locY+",top="+locY);
+  docWindow.document.write(actualText);
+}
+
+// -->
+</script>
+</head>
+<body>
+<h1>
+<a name="top">XML Schema Documentation</a>
+</h1>
+<div style="float: right;">
+<div style="display:none;" id="printerControls">
+<input onclick="displayMode(this.checked)" type="checkbox" />Printer-friendly Version</div>
+<script type="text/javascript">
+<!--
+
+var pc = getElementObject("printerControls");
+if (pc != null) {
+   pc.style.display="block";
+}
+               
+// -->
+</script>
+<div style="display:none" id="globalControls">
+<strong>XML Instance Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(xiBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(xiBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+<br />
+<br />
+<strong>Schema Component Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(scBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(scBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+</div>
+<script type="text/javascript">
+<!--
+
+var gc = getElementObject("globalControls");
+if (gc != null) {
+   gc.style.display="block";
+}
+               
+// -->
+</script>
+</div>
+<h2>Table of Contents</h2>
+<ul>
+<li>
+<a href="#SchemaProperties">Schema Document Properties</a>
+</li>
+<li>
+<a href="#SchemaDefinitions">Global Definitions</a>
+<ul>
+<li>
+<a href="#type_SystemLegacyAutomaticCallbackGetLineTypeListRequest">Complex Type: <strong>SystemLegacyAutomaticCallbackGetLineTypeListRequest</strong>
+</a>
+</li>
+<li>
+<a href="#type_SystemLegacyAutomaticCallbackGetLineTypeListResponse">Complex Type: <strong>SystemLegacyAutomaticCallbackGetLineTypeListResponse</strong>
+</a>
+</li>
+<li>
+<a href="#type_SystemLegacyAutomaticCallbackGetRequest">Complex Type: <strong>SystemLegacyAutomaticCallbackGetRequest</strong>
+</a>
+</li>
+<li>
+<a href="#type_SystemLegacyAutomaticCallbackGetResponse">Complex Type: <strong>SystemLegacyAutomaticCallbackGetResponse</strong>
+</a>
+</li>
+<li>
+<a href="#type_SystemLegacyAutomaticCallbackModifyLineTypeRequest">Complex Type: <strong>SystemLegacyAutomaticCallbackModifyLineTypeRequest</strong>
+</a>
+</li>
+<li>
+<a href="#type_SystemLegacyAutomaticCallbackModifyRequest">Complex Type: <strong>SystemLegacyAutomaticCallbackModifyRequest</strong>
+</a>
+</li>
+<li>
+<a href="#type_UserLegacyAutomaticCallbackGetRequest">Complex Type: <strong>UserLegacyAutomaticCallbackGetRequest</strong>
+</a>
+</li>
+<li>
+<a href="#type_UserLegacyAutomaticCallbackGetResponse">Complex Type: <strong>UserLegacyAutomaticCallbackGetResponse</strong>
+</a>
+</li>
+<li>
+<a href="#type_UserLegacyAutomaticCallbackModifyRequest">Complex Type: <strong>UserLegacyAutomaticCallbackModifyRequest</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackLineMatchAction">Simple Type: <strong>LegacyAutomaticCallbackLineMatchAction</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackLineType">Simple Type: <strong>LegacyAutomaticCallbackLineType</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerOriginator">Simple Type: <strong>LegacyAutomaticCallbackMaxMonitorsPerOriginator</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerTerminator">Simple Type: <strong>LegacyAutomaticCallbackMaxMonitorsPerTerminator</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT10OMinutes">Simple Type: <strong>LegacyAutomaticCallbackT10OMinutes</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT10TMinutes">Simple Type: <strong>LegacyAutomaticCallbackT10TMinutes</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT2Minutes">Simple Type: <strong>LegacyAutomaticCallbackT2Minutes</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT4Seconds">Simple Type: <strong>LegacyAutomaticCallbackT4Seconds</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT5Seconds">Simple Type: <strong>LegacyAutomaticCallbackT5Seconds</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT6Minutes">Simple Type: <strong>LegacyAutomaticCallbackT6Minutes</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT7Minutes">Simple Type: <strong>LegacyAutomaticCallbackT7Minutes</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackT8Seconds">Simple Type: <strong>LegacyAutomaticCallbackT8Seconds</strong>
+</a>
+</li>
+<li>
+<a href="#type_LegacyAutomaticCallbackTRingSeconds">Simple Type: <strong>LegacyAutomaticCallbackTRingSeconds</strong>
+</a>
+</li>
+</ul>
+</li>
+</ul>
+<ul style="margin-top: 0em" id="legendTOC">
+<li>
+<a href="#Legend">Legend</a>
+</li>
+</ul>
+<ul style="margin-top: 0em" id="glossaryTOC">
+<li>
+<a href="#Glossary">Glossary</a>
+</li>
+</ul>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaProperties">Schema Document Properties</a>
+</h2>
+<table class="properties">
+<tr>
+<th>
+<a href="#term_TargetNS" title="Look up 'Target Namespace' in glossary">Target Namespace</a>
+</th>
+<td>None</td>
+</tr>
+<tr>
+<th>Element and Attribute Namespaces</th>
+<td>
+<ul>
+<li>Global element and attribute declarations belong to this schema's target namespace.</li>
+<li>By default, local element declarations belong to this schema's target namespace.</li>
+<li>By default, local attribute declarations belong to this schema's target namespace.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<th>Schema Composition</th>
+<td>
+<ul>
+<li>This schema imports schema(s) from the following namespace(s):<ul>
+<li>
+<em>C</em> (at <a href="../OCISchemaBASE.xsd.html" title="Jump to schema documentation for '../OCISchemaBASE.xsd'.">../OCISchemaBASE.xsd</a>)</li>
+</ul>
+</li>
+<li>This schema includes components from the following schema document(s):<ul>
+<li>
+<a href="../OCISchemaDataTypes.xsd.html" title="Jump to schema documentation for '../OCISchemaDataTypes.xsd'.">../OCISchemaDataTypes.xsd</a>
+</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Declared Namespaces</h3>
+<table class="namespaces">
+<tr>
+<th>Prefix</th>
+<th>Namespace</th>
+</tr>
+<tr>
+<td>
+<a name="ns_">Default namespace</a>
+</td>
+<td></td>
+</tr>
+<tr>
+<td>
+<a name="ns_xml">xml</a>
+</td>
+<td>http://www.w3.org/XML/1998/namespace</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xs">xs</a>
+</td>
+<td>http://www.w3.org/2001/XMLSchema</td>
+</tr>
+<tr>
+<td>
+<a name="ns_core">core</a>
+</td>
+<td>C</td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('schema_scbox'); return false;" class="control" id="schema_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="schema_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:schema</span> <span class="scTag">attributeFormDefault</span>="<span class="scContent">qualified</span>" <span class="scTag">elementFormDefault</span>="<span class="scContent">qualified</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:import</span> <span class="scTag">namespace</span>="<span class="scContent">C</span>" <span class="scTag">schemaLocation</span>="<span class="scContent">../OCISchemaBASE.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">../OCISchemaDataTypes.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em" class="scContent">...</div>&lt;/<span class="scTag">xs:schema</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('schema_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaDefinitions">Global Definitions</a>
+</h2>
+<h3>Complex Type: <a class="name" name="type_SystemLegacyAutomaticCallbackGetLineTypeListRequest">SystemLegacyAutomaticCallbackGetLineTypeListRequest</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>SystemLegacyAutomaticCallbackGetLineTypeListRequest</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Request the system's legacy automatic callback line type settings.
+        The response is either a SystemLegacyAutomaticCallbackGetTypeLineListResponse or 
+        an ErrorResponse.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_xibox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCICommand&quot; type definition could not be found." onclick="alert('&quot;OCICommand&quot; type definition could not be found.');">OCICommand</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_scbox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">SystemLegacyAutomaticCallbackGetLineTypeListRequest</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>/&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetLineTypeListRequest_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_SystemLegacyAutomaticCallbackGetLineTypeListResponse">SystemLegacyAutomaticCallbackGetLineTypeListResponse</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIDataResponse" title="Jump to &quot;OCIDataResponse&quot; type definition(located in external schema documentation)." class="externalLink">OCIDataResponse</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>SystemLegacyAutomaticCallbackGetLineTypeListResponse</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Response to SystemLegacyAutomaticCallbackGetLineTypeListRequest. Returns a 3 column
+        table with column headings: "Line Type", "Match" and "No Match". The possible values
+        for the "Match" and "No Match" columns are "Accept" and "Deny".
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_xibox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCIResponse&quot; type definition could not be found." onclick="alert('&quot;OCIResponse&quot; type definition could not be found.');">OCIResponse</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;lineTypeTable&gt; <span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCITable" title="Jump to &quot;OCITable&quot; type definition(located in external schema documentation)." class="externalLink">OCITable</a>
+</span> &lt;/lineTypeTable&gt; <span class="occurs">[1]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_scbox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">SystemLegacyAutomaticCallbackGetLineTypeListResponse</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIDataResponse" title="Jump to &quot;OCIDataResponse&quot; type definition(located in external schema documentation)." class="externalLink">OCIDataResponse</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">lineTypeTable</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCITable" title="Jump to &quot;OCITable&quot; type definition(located in external schema documentation)." class="externalLink">OCITable</a>
+</span>
+</span>"/&gt;</div>&lt;/<span class="scTag">xs:sequence</span>&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetLineTypeListResponse_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_SystemLegacyAutomaticCallbackGetRequest">SystemLegacyAutomaticCallbackGetRequest</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>SystemLegacyAutomaticCallbackGetRequest</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Request the system's legacy automatic callback attributes.
+        The response is either a SystemLegacyAutomaticCallbackGetResponse or an ErrorResponse.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetRequest_xibox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetRequest_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetRequest_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCICommand&quot; type definition could not be found." onclick="alert('&quot;OCICommand&quot; type definition could not be found.');">OCICommand</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetRequest_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetRequest_scbox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetRequest_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetRequest_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">SystemLegacyAutomaticCallbackGetRequest</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>/&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetRequest_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_SystemLegacyAutomaticCallbackGetResponse">SystemLegacyAutomaticCallbackGetResponse</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIDataResponse" title="Jump to &quot;OCIDataResponse&quot; type definition(located in external schema documentation)." class="externalLink">OCIDataResponse</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>SystemLegacyAutomaticCallbackGetResponse</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Response to SystemLegacyAutomaticCallbackGetRequest.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetResponse_xibox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetResponse_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetResponse_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCIResponse&quot; type definition could not be found." onclick="alert('&quot;OCIResponse&quot; type definition could not be found.');">OCIResponse</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;maxMonitorsPerOriginator&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerOriginator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerOriginator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerOriginator</a>
+</span> &lt;/maxMonitorsPerOriginator&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;maxMonitorsPerTerminator&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerTerminator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerTerminator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerTerminator</a>
+</span> &lt;/maxMonitorsPerTerminator&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t2Minutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT2Minutes" title="Jump to &quot;LegacyAutomaticCallbackT2Minutes&quot; type definition.">LegacyAutomaticCallbackT2Minutes</a>
+</span> &lt;/t2Minutes&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t4Seconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT4Seconds" title="Jump to &quot;LegacyAutomaticCallbackT4Seconds&quot; type definition.">LegacyAutomaticCallbackT4Seconds</a>
+</span> &lt;/t4Seconds&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t5Seconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT5Seconds" title="Jump to &quot;LegacyAutomaticCallbackT5Seconds&quot; type definition.">LegacyAutomaticCallbackT5Seconds</a>
+</span> &lt;/t5Seconds&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t6Minutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT6Minutes" title="Jump to &quot;LegacyAutomaticCallbackT6Minutes&quot; type definition.">LegacyAutomaticCallbackT6Minutes</a>
+</span> &lt;/t6Minutes&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t7Minutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT7Minutes" title="Jump to &quot;LegacyAutomaticCallbackT7Minutes&quot; type definition.">LegacyAutomaticCallbackT7Minutes</a>
+</span> &lt;/t7Minutes&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t8Seconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT8Seconds" title="Jump to &quot;LegacyAutomaticCallbackT8Seconds&quot; type definition.">LegacyAutomaticCallbackT8Seconds</a>
+</span> &lt;/t8Seconds&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;tRingSeconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackTRingSeconds" title="Jump to &quot;LegacyAutomaticCallbackTRingSeconds&quot; type definition.">LegacyAutomaticCallbackTRingSeconds</a>
+</span> &lt;/tRingSeconds&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t10OMinutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT10OMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10OMinutes&quot; type definition.">LegacyAutomaticCallbackT10OMinutes</a>
+</span> &lt;/t10OMinutes&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t10TMinutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT10TMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10TMinutes&quot; type definition.">LegacyAutomaticCallbackT10TMinutes</a>
+</span> &lt;/t10TMinutes&gt; <span class="occurs">[1]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetResponse_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackGetResponse_scbox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackGetResponse_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackGetResponse_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">SystemLegacyAutomaticCallbackGetResponse</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIDataResponse" title="Jump to &quot;OCIDataResponse&quot; type definition(located in external schema documentation)." class="externalLink">OCIDataResponse</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">maxMonitorsPerOriginator</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerOriginator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerOriginator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerOriginator</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">maxMonitorsPerTerminator</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerTerminator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerTerminator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerTerminator</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t2Minutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT2Minutes" title="Jump to &quot;LegacyAutomaticCallbackT2Minutes&quot; type definition.">LegacyAutomaticCallbackT2Minutes</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t4Seconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT4Seconds" title="Jump to &quot;LegacyAutomaticCallbackT4Seconds&quot; type definition.">LegacyAutomaticCallbackT4Seconds</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t5Seconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT5Seconds" title="Jump to &quot;LegacyAutomaticCallbackT5Seconds&quot; type definition.">LegacyAutomaticCallbackT5Seconds</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t6Minutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT6Minutes" title="Jump to &quot;LegacyAutomaticCallbackT6Minutes&quot; type definition.">LegacyAutomaticCallbackT6Minutes</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t7Minutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT7Minutes" title="Jump to &quot;LegacyAutomaticCallbackT7Minutes&quot; type definition.">LegacyAutomaticCallbackT7Minutes</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t8Seconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT8Seconds" title="Jump to &quot;LegacyAutomaticCallbackT8Seconds&quot; type definition.">LegacyAutomaticCallbackT8Seconds</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">tRingSeconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackTRingSeconds" title="Jump to &quot;LegacyAutomaticCallbackTRingSeconds&quot; type definition.">LegacyAutomaticCallbackTRingSeconds</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t10OMinutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT10OMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10OMinutes&quot; type definition.">LegacyAutomaticCallbackT10OMinutes</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t10TMinutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT10TMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10TMinutes&quot; type definition.">LegacyAutomaticCallbackT10TMinutes</a>
+</span>
+</span>"/&gt;</div>&lt;/<span class="scTag">xs:sequence</span>&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackGetResponse_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_SystemLegacyAutomaticCallbackModifyLineTypeRequest">SystemLegacyAutomaticCallbackModifyLineTypeRequest</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>SystemLegacyAutomaticCallbackModifyLineTypeRequest</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Modifies the system's legacy automatic callback line type attributes.
+        The response is either a SuccessResponse or an ErrorResponse.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_xibox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCICommand&quot; type definition could not be found." onclick="alert('&quot;OCICommand&quot; type definition could not be found.');">OCICommand</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;lineType&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackLineType" title="Jump to &quot;LegacyAutomaticCallbackLineType&quot; type definition.">LegacyAutomaticCallbackLineType</a>
+</span> &lt;/lineType&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;matchAction&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackLineMatchAction" title="Jump to &quot;LegacyAutomaticCallbackLineMatchAction&quot; type definition.">LegacyAutomaticCallbackLineMatchAction</a>
+</span> &lt;/matchAction&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;noMatchAction&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackLineMatchAction" title="Jump to &quot;LegacyAutomaticCallbackLineMatchAction&quot; type definition.">LegacyAutomaticCallbackLineMatchAction</a>
+</span> &lt;/noMatchAction&gt; <span class="occurs">[0..1]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_scbox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">SystemLegacyAutomaticCallbackModifyLineTypeRequest</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">lineType</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackLineType" title="Jump to &quot;LegacyAutomaticCallbackLineType&quot; type definition.">LegacyAutomaticCallbackLineType</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">matchAction</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackLineMatchAction" title="Jump to &quot;LegacyAutomaticCallbackLineMatchAction&quot; type definition.">LegacyAutomaticCallbackLineMatchAction</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">noMatchAction</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackLineMatchAction" title="Jump to &quot;LegacyAutomaticCallbackLineMatchAction&quot; type definition.">LegacyAutomaticCallbackLineMatchAction</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>&lt;/<span class="scTag">xs:sequence</span>&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackModifyLineTypeRequest_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_SystemLegacyAutomaticCallbackModifyRequest">SystemLegacyAutomaticCallbackModifyRequest</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>SystemLegacyAutomaticCallbackModifyRequest</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Modifies the system's legacy automatic callback attributes.
+        The response is either a SuccessResponse or an ErrorResponse.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackModifyRequest_xibox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackModifyRequest_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackModifyRequest_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCICommand&quot; type definition could not be found." onclick="alert('&quot;OCICommand&quot; type definition could not be found.');">OCICommand</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;maxMonitorsPerOriginator&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerOriginator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerOriginator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerOriginator</a>
+</span> &lt;/maxMonitorsPerOriginator&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;maxMonitorsPerTerminator&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerTerminator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerTerminator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerTerminator</a>
+</span> &lt;/maxMonitorsPerTerminator&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t2Minutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT2Minutes" title="Jump to &quot;LegacyAutomaticCallbackT2Minutes&quot; type definition.">LegacyAutomaticCallbackT2Minutes</a>
+</span> &lt;/t2Minutes&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t4Seconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT4Seconds" title="Jump to &quot;LegacyAutomaticCallbackT4Seconds&quot; type definition.">LegacyAutomaticCallbackT4Seconds</a>
+</span> &lt;/t4Seconds&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t5Seconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT5Seconds" title="Jump to &quot;LegacyAutomaticCallbackT5Seconds&quot; type definition.">LegacyAutomaticCallbackT5Seconds</a>
+</span> &lt;/t5Seconds&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t6Minutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT6Minutes" title="Jump to &quot;LegacyAutomaticCallbackT6Minutes&quot; type definition.">LegacyAutomaticCallbackT6Minutes</a>
+</span> &lt;/t6Minutes&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t7Minutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT7Minutes" title="Jump to &quot;LegacyAutomaticCallbackT7Minutes&quot; type definition.">LegacyAutomaticCallbackT7Minutes</a>
+</span> &lt;/t7Minutes&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t8Seconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT8Seconds" title="Jump to &quot;LegacyAutomaticCallbackT8Seconds&quot; type definition.">LegacyAutomaticCallbackT8Seconds</a>
+</span> &lt;/t8Seconds&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;tRingSeconds&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackTRingSeconds" title="Jump to &quot;LegacyAutomaticCallbackTRingSeconds&quot; type definition.">LegacyAutomaticCallbackTRingSeconds</a>
+</span> &lt;/tRingSeconds&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t10OMinutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT10OMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10OMinutes&quot; type definition.">LegacyAutomaticCallbackT10OMinutes</a>
+</span> &lt;/t10OMinutes&gt; <span class="occurs">[0..1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;t10TMinutes&gt; <span class="type">
+<a href="#type_LegacyAutomaticCallbackT10TMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10TMinutes&quot; type definition.">LegacyAutomaticCallbackT10TMinutes</a>
+</span> &lt;/t10TMinutes&gt; <span class="occurs">[0..1]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackModifyRequest_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_SystemLegacyAutomaticCallbackModifyRequest_scbox'); return false;" class="control" id="type_SystemLegacyAutomaticCallbackModifyRequest_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_SystemLegacyAutomaticCallbackModifyRequest_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">SystemLegacyAutomaticCallbackModifyRequest</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">maxMonitorsPerOriginator</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerOriginator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerOriginator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerOriginator</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">maxMonitorsPerTerminator</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackMaxMonitorsPerTerminator" title="Jump to &quot;LegacyAutomaticCallbackMaxMonitorsPerTerminator&quot; type definition.">LegacyAutomaticCallbackMaxMonitorsPerTerminator</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t2Minutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT2Minutes" title="Jump to &quot;LegacyAutomaticCallbackT2Minutes&quot; type definition.">LegacyAutomaticCallbackT2Minutes</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t4Seconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT4Seconds" title="Jump to &quot;LegacyAutomaticCallbackT4Seconds&quot; type definition.">LegacyAutomaticCallbackT4Seconds</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t5Seconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT5Seconds" title="Jump to &quot;LegacyAutomaticCallbackT5Seconds&quot; type definition.">LegacyAutomaticCallbackT5Seconds</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t6Minutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT6Minutes" title="Jump to &quot;LegacyAutomaticCallbackT6Minutes&quot; type definition.">LegacyAutomaticCallbackT6Minutes</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t7Minutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT7Minutes" title="Jump to &quot;LegacyAutomaticCallbackT7Minutes&quot; type definition.">LegacyAutomaticCallbackT7Minutes</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t8Seconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT8Seconds" title="Jump to &quot;LegacyAutomaticCallbackT8Seconds&quot; type definition.">LegacyAutomaticCallbackT8Seconds</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">tRingSeconds</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackTRingSeconds" title="Jump to &quot;LegacyAutomaticCallbackTRingSeconds&quot; type definition.">LegacyAutomaticCallbackTRingSeconds</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t10OMinutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT10OMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10OMinutes&quot; type definition.">LegacyAutomaticCallbackT10OMinutes</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">t10TMinutes</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="#type_LegacyAutomaticCallbackT10TMinutes" title="Jump to &quot;LegacyAutomaticCallbackT10TMinutes&quot; type definition.">LegacyAutomaticCallbackT10TMinutes</a>
+</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>&lt;/<span class="scTag">xs:sequence</span>&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_SystemLegacyAutomaticCallbackModifyRequest_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_UserLegacyAutomaticCallbackGetRequest">UserLegacyAutomaticCallbackGetRequest</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>UserLegacyAutomaticCallbackGetRequest</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Request the user level data associated with Legacy Automatic Callback.
+        The response is either a UserLegacyAutomaticCallbackGetResponse or an
+        ErrorResponse.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_UserLegacyAutomaticCallbackGetRequest_xibox'); return false;" class="control" id="type_UserLegacyAutomaticCallbackGetRequest_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_UserLegacyAutomaticCallbackGetRequest_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCICommand&quot; type definition could not be found." onclick="alert('&quot;OCICommand&quot; type definition could not be found.');">OCICommand</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;userId&gt; <span class="type">
+<a href="../OCISchemaDataTypes.xsd.html#type_UserId" title="Jump to &quot;UserId&quot; type definition(located in external schema documentation)." class="externalLink">UserId</a>
+</span> &lt;/userId&gt; <span class="occurs">[1]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_UserLegacyAutomaticCallbackGetRequest_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_UserLegacyAutomaticCallbackGetRequest_scbox'); return false;" class="control" id="type_UserLegacyAutomaticCallbackGetRequest_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_UserLegacyAutomaticCallbackGetRequest_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">UserLegacyAutomaticCallbackGetRequest</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">userId</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="../OCISchemaDataTypes.xsd.html#type_UserId" title="Jump to &quot;UserId&quot; type definition(located in external schema documentation)." class="externalLink">UserId</a>
+</span>
+</span>"/&gt;</div>&lt;/<span class="scTag">xs:sequence</span>&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_UserLegacyAutomaticCallbackGetRequest_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_UserLegacyAutomaticCallbackGetResponse">UserLegacyAutomaticCallbackGetResponse</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIDataResponse" title="Jump to &quot;OCIDataResponse&quot; type definition(located in external schema documentation)." class="externalLink">OCIDataResponse</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>UserLegacyAutomaticCallbackGetResponse</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Response to UserLegacyAutomaticCallbackGetRequest.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_UserLegacyAutomaticCallbackGetResponse_xibox'); return false;" class="control" id="type_UserLegacyAutomaticCallbackGetResponse_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_UserLegacyAutomaticCallbackGetResponse_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCIResponse&quot; type definition could not be found." onclick="alert('&quot;OCIResponse&quot; type definition could not be found.');">OCIResponse</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;isActive&gt; <span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:boolean</span> &lt;/isActive&gt; <span class="occurs">[1]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_UserLegacyAutomaticCallbackGetResponse_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_UserLegacyAutomaticCallbackGetResponse_scbox'); return false;" class="control" id="type_UserLegacyAutomaticCallbackGetResponse_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_UserLegacyAutomaticCallbackGetResponse_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">UserLegacyAutomaticCallbackGetResponse</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIDataResponse" title="Jump to &quot;OCIDataResponse&quot; type definition(located in external schema documentation)." class="externalLink">OCIDataResponse</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">isActive</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:boolean</span>
+</span>"/&gt;</div>&lt;/<span class="scTag">xs:sequence</span>&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_UserLegacyAutomaticCallbackGetResponse_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Complex Type: <a class="name" name="type_UserLegacyAutomaticCallbackModifyRequest">UserLegacyAutomaticCallbackModifyRequest</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>UserLegacyAutomaticCallbackModifyRequest</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+<tr>
+<th>Documentation</th>
+<td>
+        Modify the user level data associated with Legacy Automatic Callback.
+        The response is either a SuccessResponse or an ErrorResponse.
+      </td>
+</tr>
+</table>
+<div class="sample box">
+<div>
+<input style="display: none" onclick="switchState('type_UserLegacyAutomaticCallbackModifyRequest_xibox'); return false;" class="control" id="type_UserLegacyAutomaticCallbackModifyRequest_xibox_button" type="button" /> <span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents" id="type_UserLegacyAutomaticCallbackModifyRequest_xibox">
+<div style="margin-left: 0em">&lt;...&gt; <br />
+<div style="margin-left: 1.5em;" class="other">&lt;!-- '<span class="type">
+<a href="javascript:void(0)" title="&quot;OCICommand&quot; type definition could not be found." onclick="alert('&quot;OCICommand&quot; type definition could not be found.');">OCICommand</a>
+</span>' super type was not found in this schema. Some elements and attributes may be missing. --&gt;</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;userId&gt; <span class="type">
+<a href="../OCISchemaDataTypes.xsd.html#type_UserId" title="Jump to &quot;UserId&quot; type definition(located in external schema documentation)." class="externalLink">UserId</a>
+</span> &lt;/userId&gt; <span class="occurs">[1]</span>
+</div>
+<div style="margin-left: 1.5em" class="newFields">&lt;isActive&gt; <span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:boolean</span> &lt;/isActive&gt; <span class="occurs">[0..1]</span>
+</div>&lt;/...&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_UserLegacyAutomaticCallbackModifyRequest_xibox', true);
+// -->
+</script>
+</div>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_UserLegacyAutomaticCallbackModifyRequest_scbox'); return false;" class="control" id="type_UserLegacyAutomaticCallbackModifyRequest_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_UserLegacyAutomaticCallbackModifyRequest_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:complexType</span> <span class="scTag">name</span>="<span class="scContent">UserLegacyAutomaticCallbackModifyRequest</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:complexContent</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:extension</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'core' prefix" href="#ns_core">core</a>:<a href="../OCISchemaBASE.xsd.html#type_OCIRequest" title="Jump to &quot;OCIRequest&quot; type definition(located in external schema documentation)." class="externalLink">OCIRequest</a>
+</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:sequence</span>&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">userId</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a href="../OCISchemaDataTypes.xsd.html#type_UserId" title="Jump to &quot;UserId&quot; type definition(located in external schema documentation)." class="externalLink">UserId</a>
+</span>
+</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:element</span> <span class="scTag">name</span>="<span class="scContent">isActive</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:boolean</span>
+</span>" <span class="scTag">minOccurs</span>="<span class="scContent">0</span>"/&gt;</div>&lt;/<span class="scTag">xs:sequence</span>&gt;</div>&lt;/<span class="scTag">xs:extension</span>&gt;</div>&lt;/<span class="scTag">xs:complexContent</span>&gt;</div>&lt;/<span class="scTag">xs:complexType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_UserLegacyAutomaticCallbackModifyRequest_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackLineMatchAction">LegacyAutomaticCallbackLineMatchAction</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:token</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackLineMatchAction</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: token</li>
+</ul>
+<ul>
+<li>
+<em>value</em> comes from list: {'Accept'|'Deny'}</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback line type match action.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackLineMatchAction_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackLineMatchAction_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackLineMatchAction_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackLineMatchAction</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:token</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Accept</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Deny</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackLineMatchAction_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackLineType">LegacyAutomaticCallbackLineType</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:token</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackLineType</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: token</li>
+</ul>
+<ul>
+<li>
+<em>value</em> comes from list: {'Individual'|'Coin'|'Series'|'Hunt'|'Unassigned'|'PBX'|'Multiparty'|'Choke'|'Oos'|'Nonspecific'|'Telecampus'|'ISDN'|'Telekibutz'|'Spare'}</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback line type.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackLineType_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackLineType_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackLineType_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackLineType</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:token</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Individual</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Coin</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Series</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Hunt</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Unassigned</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">PBX</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Multiparty</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Choke</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Oos</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Nonspecific</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Telecampus</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">ISDN</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Telekibutz</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:enumeration</span> <span class="scTag">value</span>="<span class="scContent">Spare</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackLineType_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackMaxMonitorsPerOriginator">LegacyAutomaticCallbackMaxMonitorsPerOriginator</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackMaxMonitorsPerOriginator</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>1 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 30</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Maximum monitors per originator.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackMaxMonitorsPerOriginator_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackMaxMonitorsPerOriginator_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackMaxMonitorsPerOriginator_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackMaxMonitorsPerOriginator</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">30</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackMaxMonitorsPerOriginator_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackMaxMonitorsPerTerminator">LegacyAutomaticCallbackMaxMonitorsPerTerminator</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackMaxMonitorsPerTerminator</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>1 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 30</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Maximum monitors per terminator.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackMaxMonitorsPerTerminator_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackMaxMonitorsPerTerminator_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackMaxMonitorsPerTerminator_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackMaxMonitorsPerTerminator</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">30</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackMaxMonitorsPerTerminator_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT10OMinutes">LegacyAutomaticCallbackT10OMinutes</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT10OMinutes</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>1 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 120</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T10_O timer in minutes.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT10OMinutes_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT10OMinutes_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT10OMinutes_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT10OMinutes</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">120</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT10OMinutes_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT10TMinutes">LegacyAutomaticCallbackT10TMinutes</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT10TMinutes</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>1 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 120</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T10_T timer in minutes.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT10TMinutes_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT10TMinutes_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT10TMinutes_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT10TMinutes</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">120</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT10TMinutes_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT2Minutes">LegacyAutomaticCallbackT2Minutes</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT2Minutes</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>1 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 20</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T2 timer in minutes.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT2Minutes_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT2Minutes_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT2Minutes_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT2Minutes</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">20</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT2Minutes_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT4Seconds">LegacyAutomaticCallbackT4Seconds</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT4Seconds</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>0 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 15</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T4 timer in seconds.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT4Seconds_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT4Seconds_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT4Seconds_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT4Seconds</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">15</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT4Seconds_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT5Seconds">LegacyAutomaticCallbackT5Seconds</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT5Seconds</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>2 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 10</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T5 timer in seconds.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT5Seconds_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT5Seconds_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT5Seconds_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT5Seconds</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">2</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">10</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT5Seconds_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT6Minutes">LegacyAutomaticCallbackT6Minutes</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT6Minutes</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>1 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 60</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T6 timer in minutes.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT6Minutes_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT6Minutes_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT6Minutes_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT6Minutes</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">60</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT6Minutes_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT7Minutes">LegacyAutomaticCallbackT7Minutes</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT7Minutes</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>5 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 180</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T7 timer in minutes.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT7Minutes_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT7Minutes_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT7Minutes_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT7Minutes</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">5</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">180</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT7Minutes_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackT8Seconds">LegacyAutomaticCallbackT8Seconds</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackT8Seconds</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>0 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 120</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback T8 timer in seconds.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackT8Seconds_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackT8Seconds_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackT8Seconds_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackT8Seconds</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">0</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">120</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackT8Seconds_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h3>Simple Type: <a class="name" name="type_LegacyAutomaticCallbackTRingSeconds">LegacyAutomaticCallbackTRingSeconds</a>
+</h3>
+<table class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span> (derivation method: restriction)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>None</td>
+</tr>
+</table>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>LegacyAutomaticCallbackTRingSeconds</td>
+</tr>
+<tr>
+<th>Content</th>
+<td>
+<ul>
+<li>Base XSD Type: int</li>
+</ul>
+<ul>
+<li>1 &lt;= <em xmlns="http://www.w3.org/1999/xhtml">value</em> &lt;= 120</li>
+</ul>
+</td>
+</tr>
+<tr xmlns="">
+<th>Documentation</th>
+<td>
+        Legacy Automatic Callback TRing timer in seconds.
+      </td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('type_LegacyAutomaticCallbackTRingSeconds_scbox'); return false;" class="control" id="type_LegacyAutomaticCallbackTRingSeconds_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="type_LegacyAutomaticCallbackTRingSeconds_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:simpleType</span> <span class="scTag">name</span>="<span class="scContent">LegacyAutomaticCallbackTRingSeconds</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:restriction</span> <span class="scTag">base</span>="<span class="scContent">
+<span class="type">
+<a title="Find out namespace of 'xs' prefix" href="#ns_xs">xs</a>:int</span>
+</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:minInclusive</span> <span class="scTag">value</span>="<span class="scContent">1</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:maxInclusive</span> <span class="scTag">value</span>="<span class="scContent">120</span>"/&gt;</div>&lt;/<span class="scTag">xs:restriction</span>&gt;</div>&lt;/<span class="scTag">xs:simpleType</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('type_LegacyAutomaticCallbackTRingSeconds_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<div id="legend">
+<h2>
+<a name="Legend">Legend</a>
+</h2>
+<div style="float: left; width: 15em;">
+<h3 style="margin-bottom: 0px;">Complex Type:</h3>
+<div style="margin-left: 0em;" class="hint">Schema Component Type</div>
+</div>
+<div style="float: left; width: 15em;">
+<h3 style="margin-bottom: 0px;">
+<span class="name">AusAddress</span>
+</h3>
+<div style="margin-left: 0em;" class="hint">Schema Component Name</div>
+</div>
+<table style="clear : both" class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span style="color: #0000FF; text-decoration:underline;" class="type">Address</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span style="color: #0000FF; text-decoration:underline;" class="type">QLDAddress</span> (by restriction)</li>
+</ul>
+</td>
+</tr>
+</table>
+<div class="hint">If this schema component is a type definition, its type hierarchy is shown in a gray-bordered box.</div>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>AusAddress</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+</table>
+<div class="hint">The table above displays the properties of this schema component.</div>
+<div class="sample box">
+<div>
+<span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents">
+<span style="margin-left: 0em">&lt;...</span>
+<span class="newFields">
+<span> country="<span class="fixed">Australia</span>"</span>
+</span>&gt; <br />
+<span class="inherited" style="margin-left: 1.5em">&lt;unitNo&gt; <span class="type">string</span> &lt;/unitNo&gt; <span class="occurs">[0..1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 1.5em">&lt;houseNo&gt; <span class="type">string</span> &lt;/houseNo&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 1.5em">&lt;street&gt; <span class="type">string</span> &lt;/street&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span style="margin-left: 1.5em" class="group">Start <a href="#term_Choice" title="Look up 'Choice' in glossary">Choice</a>
+<span class="occurs">[1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 3em">&lt;city&gt; <span class="type">string</span> &lt;/city&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 3em">&lt;town&gt; <span class="type">string</span> &lt;/town&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span style="margin-left: 1.5em" class="group">End Choice</span>
+<br />
+<span class="newFields">
+<span style="margin-left: 1.5em">&lt;state&gt; <span style="text-decoration:underline;" class="type">AusStates</span> &lt;/state&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span style="margin-left: 1.5em">&lt;postcode&gt; <span class="constraint">string &lt;&lt;<em>pattern</em> = [1-9][0-9]{3}&gt;&gt;</span> &lt;/postcode&gt; <span class="occurs">[1]</span>
+<a onclick="docArray = new Array('Post code must be a four-digit number.'); viewDocumentation('Element', 'postcode', docArray);" class="documentation" title="View Documentation" href="javascript:void(0)">?</a>
+</span>
+<br />
+</span>
+<span style="margin-left: 0em">&lt;/...&gt;</span>
+<br />
+</div>
+</div>
+<div class="hint">
+<p>The XML Instance Representation table above shows the schema component's content as an XML instance.</p>
+<ul>
+<li>The minimum and maximum occurrence of elements and attributes are provided in square brackets, e.g. [0..1].</li>
+<li>Model group information are shown in gray, e.g. Start Choice ... End Choice.</li>
+<li>For type derivations, the elements and attributes that have been added to or changed from the base type's content are shown in <span style="font-weight: bold">bold</span>.</li>
+<li>If an element/attribute has a fixed value, the fixed value is shown in green, e.g. country="Australia".</li>
+<li>Otherwise, the type of the element/attribute is displayed.
+               <ul>
+<li>If the element/attribute's type is in the schema, a link is provided to it.</li>
+<li>For local simple type definitions, the constraints are displayed in angle brackets, e.g. &lt;&lt;<em>pattern</em> = [1-9][0-9]{3}&gt;&gt;.</li>
+</ul>
+</li>
+<li>If a local element/attribute has documentation, it will be displayed in a window that pops up when the question mark inside the attribute or next to the element is clicked, e.g. &lt;postcode&gt;.</li>
+</ul>
+</div>
+<div class="schemaComponent box">
+<div>
+<span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents">
+<span style="margin-left: 0em">&lt;<span class="scTag">complexType</span>
+<span class="scTag">name</span>="<span class="scContent">AusAddress</span>"&gt;</span>
+<br />
+<span style="margin-left: 1.5em">&lt;<span class="scTag">complexContent</span>&gt;</span>
+<br />
+<span style="margin-left: 3em">&lt;<span class="scTag">extension</span>
+<span class="scTag">base</span>="<span class="scContent">
+<span style="text-decoration:underline;" class="type">Address</span>
+</span>"&gt;</span>
+<br />
+<span style="margin-left: 4.5em">&lt;<span class="scTag">sequence</span>&gt;</span>
+<br />
+<span style="margin-left: 6em">&lt;<span class="scTag">element</span>
+<span class="scTag">name</span>="<span class="scContent">state</span>" <span class="scTag">type</span>="<span class="scContent">
+<span style="text-decoration:underline;" class="type">AusStates</span>
+</span>"/&gt;</span>
+<br />
+<span style="margin-left: 6em">&lt;<span class="scTag">element</span>
+<span class="scTag">name</span>="<span class="scContent">postcode</span>"&gt;</span>
+<br />
+<span style="margin-left: 7.5em">&lt;<span class="scTag">simpleType</span>&gt;</span>
+<br />
+<span style="margin-left: 9em">&lt;<span class="scTag">restriction</span>
+<span class="scTag">base</span>="<span class="scContent">
+<span class="type">string</span>
+</span>"&gt;</span>
+<br />
+<span style="margin-left: 10.5em">&lt;<span class="scTag">pattern</span>
+<span class="scTag">value</span>="<span class="scContent">[1-9][0-9]{3}</span>"/&gt;</span>
+<br />
+<span style="margin-left: 9em">&lt;/<span class="scTag">restriction</span>&gt;</span>
+<br />
+<span style="margin-left: 7.5em">&lt;/<span class="scTag">simpleType</span>&gt;</span>
+<br />
+<span style="margin-left: 6em">&lt;/<span class="scTag">element</span>&gt;</span>
+<br />
+<span style="margin-left: 4.5em">&lt;/<span class="scTag">sequence</span>&gt;</span>
+<br />
+<span style="margin-left: 4.5em">&lt;<span class="scTag">attribute</span>
+<span class="scTag">name</span>="<span class="scContent">country</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">string</span>
+</span>" <span class="scTag">fixed</span>="<span class="scContent">Australia</span>"/&gt;</span>
+<br />
+<span style="margin-left: 3em">&lt;/<span class="scTag">extension</span>&gt;</span>
+<br />
+<span style="margin-left: 1.5em">&lt;/<span class="scTag">complexContent</span>&gt;</span>
+<br />
+<span style="margin-left: 0em">&lt;/<span class="scTag">complexType</span>&gt;</span>
+<br />
+</div>
+</div>
+<div class="hint">The Schema Component Representation table above displays the underlying XML representation of the schema component. (Annotations are not shown.)</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+</div>
+<div id="glossary">
+<h2>
+<a name="Glossary">Glossary</a>
+</h2>
+<p>
+<span class="glossaryTerm">
+<a name="term_Abstract">Abstract</a> </span>(Applies to complex type definitions and element declarations). An abstract element or complex type cannot used to validate an element instance. If there is a reference to an abstract element, only element declarations that can substitute the abstract element can be used to validate the instance. For references to abstract type definitions, only derived types can be used.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_All">All Model Group</a> </span>Child elements can be provided <em xmlns="http://www.w3.org/1999/xhtml">in any order</em> in instances. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#element-all" title="http://www.w3.org/TR/xmlschema-1/#element-all">http://www.w3.org/TR/xmlschema-1/#element-all</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Choice">Choice Model Group</a> </span>
+<em>Only one</em> from the list of child elements and model groups can be provided in instances. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#element-choice" title="http://www.w3.org/TR/xmlschema-1/#element-choice">http://www.w3.org/TR/xmlschema-1/#element-choice</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_CollapseWS">Collapse Whitespace Policy</a> </span>Replace tab, line feed, and carriage return characters with space character (Unicode character 32). Then, collapse contiguous sequences of space characters into single space character, and remove leading and trailing space characters.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_ElemBlock">Disallowed Substitutions</a> </span>(Applies to element declarations). If <em xmlns="http://www.w3.org/1999/xhtml">substitution</em> is specified, then <a xmlns="http://www.w3.org/1999/xhtml" href="#term_SubGroup" title="Look up 'substitution group' in glossary">substitution group</a> members cannot be used in place of the given element declaration to validate element instances. If <em xmlns="http://www.w3.org/1999/xhtml">derivation methods</em>, e.g. extension, restriction, are specified, then the given element declaration will not validate element instances that have types derived from the element declaration's type using the specified derivation methods. Normally, element instances can override their declaration's type by specifying an <code xmlns="http://www.w3.org/1999/xhtml">xsi:type</code> attribute.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_Key">Key Constraint</a> </span>Like <a xmlns="http://www.w3.org/1999/xhtml" href="#term_Unique" title="Look up 'Uniqueness Constraint' in glossary">Uniqueness Constraint</a>, but additionally requires that the specified value(s) must be provided. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions" title="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions">http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_KeyRef">Key Reference Constraint</a> </span>Ensures that the specified value(s) must match value(s) from a <a xmlns="http://www.w3.org/1999/xhtml" href="#term_Key" title="Look up 'Key Constraint' in glossary">Key Constraint</a> or <a xmlns="http://www.w3.org/1999/xhtml" href="#term_Unique" title="Look up 'Uniqueness Constraint' in glossary">Uniqueness Constraint</a>. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions" title="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions">http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_ModelGroup">Model Group</a> </span>Groups together element content, specifying the order in which the element content can occur and the number of times the group of element content may be repeated. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#Model_Groups" title="http://www.w3.org/TR/xmlschema-1/#Model_Groups">http://www.w3.org/TR/xmlschema-1/#Model_Groups</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Nillable">Nillable</a> </span>(Applies to element declarations). If an element declaration is nillable, instances can use the <code xmlns="http://www.w3.org/1999/xhtml">xsi:nil</code> attribute. The <code xmlns="http://www.w3.org/1999/xhtml">xsi:nil</code> attribute is the boolean attribute, <em xmlns="http://www.w3.org/1999/xhtml">nil</em>, from the <em xmlns="http://www.w3.org/1999/xhtml">http://www.w3.org/2001/XMLSchema-instance</em> namespace. If an element instance has an <code xmlns="http://www.w3.org/1999/xhtml">xsi:nil</code> attribute set to true, it can be left empty, even though its element declaration may have required content.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_Notation">Notation</a> </span>A notation is used to identify the format of a piece of data. Values of elements and attributes that are of type, NOTATION, must come from the names of declared notations. See: <a href="http://www.w3.org/TR/xmlschema-1/#cNotation_Declarations" title="http://www.w3.org/TR/xmlschema-1/#cNotation_Declarations">http://www.w3.org/TR/xmlschema-1/#cNotation_Declarations</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_PreserveWS">Preserve Whitespace Policy</a> </span>Preserve whitespaces exactly as they appear in instances.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_TypeFinal">Prohibited Derivations</a> </span>(Applies to type definitions). Derivation methods that cannot be used to create sub-types from a given type definition.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_TypeBlock">Prohibited Substitutions</a> </span>(Applies to complex type definitions). Prevents sub-types that have been derived using the specified derivation methods from validating element instances in place of the given type definition.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_ReplaceWS">Replace Whitespace Policy</a> </span>Replace tab, line feed, and carriage return characters with space character (Unicode character 32).</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Sequence">Sequence Model Group</a> </span>Child elements and model groups must be provided <em xmlns="http://www.w3.org/1999/xhtml">in the specified order</em> in instances. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#element-sequence" title="http://www.w3.org/TR/xmlschema-1/#element-sequence">http://www.w3.org/TR/xmlschema-1/#element-sequence</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_SubGroup">Substitution Group</a> </span>Elements that are <em xmlns="http://www.w3.org/1999/xhtml">members</em> of a substitution group can be used wherever the <em xmlns="http://www.w3.org/1999/xhtml">head</em> element of the substitution group is referenced.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_ElemFinal">Substitution Group Exclusions</a> </span>(Applies to element declarations). Prohibits element declarations from nominating themselves as being able to substitute a given element declaration, if they have types that are derived from the original element's type using the specified derivation methods.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_TargetNS">Target Namespace</a> </span>The target namespace identifies the namespace that components in this schema belongs to. If no target namespace is provided, then the schema components do not belong to any namespace.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Unique">Uniqueness Constraint</a> </span>Ensures uniqueness of an element/attribute value, or a combination of values, within a specified scope. See: <a href="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions" title="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions">http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions</a>.</p>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+</div>
+<p class="footer">Generated by <a href="http://xml.fiforms.org/xs3p/">xs3p</a> (<a href="http://titanium.dstc.edu.au/xml/xs3p">old link</a>)
+               . Last modified: <script type="text/javascript">
+<!--
+document.write(document.lastModified);
+// -->
+</script>
+</p>
+</body>
+</html>

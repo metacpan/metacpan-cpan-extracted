@@ -4,7 +4,6 @@
 # Mike Schilli, 2014 (m@perlmeister.com)
 ###########################################
 use strict;
-use lib 'lib';
 
 use OAuth::Cmdline::GoogleDrive;
 use OAuth::Cmdline::Mojo;

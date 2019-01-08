@@ -56,6 +56,7 @@ t/ffi_build_file_object.t
 t/ffi_build_mm.t
 t/ffi_build_platform.t
 t/lib/Test/Cleanup.pm
+t/lib/Test/Platypus.pm
 xt/author/eol.t
 xt/author/no_tabs.t
 xt/author/pod.t

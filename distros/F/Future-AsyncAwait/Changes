@@ -1,5 +1,37 @@
 Revision history for Future-AsyncAwait
 
+0.18    2019-01-05 20:08:38
+        [CHANGES]
+         * Declare threaded perls before version 5.22 as unsupported. The bug
+           remains open but for now I'm disinclined to look into it. (RT124351)
+
+        [BUGFIXES]
+         * Don't panic about blk_eval.old_eval_root or .cur_text fields, as it
+           seems we can safely ignore those (RT126036)
+
+0.17    2019-01-04 18:45:22
+        [BUGFIXES]
+         * Perl 5.26 and above still needs SvREFCNT_inc() on the state array
+           in CXt_LOOP_ARR (RT124353)
+         * Better fix for scopestack name tracking under -DDEBUGGING
+           (RT128164)
+         * Set -DNO_XSLOCKS in order to get working JMPENV on MSWin32
+           (RT128163)
+
+0.16    2019-01-03 22:09:28
+        [CHANGES]
+         * Use ENTER_with_name/LEAVE_with_name variants for easier debug (thanks
+           ilmari)
+         * Don't clone the CVf_CVGV_RC flag
+         * Unit-test that async/await also behaves fine through nested named
+           method calls
+         * Unit-test die after single await()
+
+        [BUGFIXES]
+         * Avoid call to non-public unshare_hek() function (RT125613)
+         * Remember to wrap pp_await in docatch() if CATCH_GET is true. Fixes
+           many failing test cases (double-nested await, RT126037, RT123062)
+
 0.15    2018-01-24 04:12:04
         [CHANGES]
          * Support older perls back to 5.16 (continues work on RT122252). Just

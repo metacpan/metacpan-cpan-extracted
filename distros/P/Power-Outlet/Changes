@@ -4,6 +4,9 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.20 2018-12-16
+  - Added Power::Outlet::iBootBarGroup
+
 0.19 2018-10-05
   - Fixed two type-Os in Home Assistant YAML
 

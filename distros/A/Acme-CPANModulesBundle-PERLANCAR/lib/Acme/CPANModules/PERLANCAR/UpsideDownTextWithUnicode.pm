@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::UpsideDownTextWithUnicode;
 
-our $DATE = '2018-09-20'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
     summary => 'Modules that can flip Latin text (make your text '.
@@ -33,7 +33,7 @@ Acme::CPANModules::PERLANCAR::UpsideDownTextWithUnicode - Modules that can flip 
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::PERLANCAR::UpsideDownTextWithUnicode (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-09-20.
+This document describes version 0.004 of Acme::CPANModules::PERLANCAR::UpsideDownTextWithUnicode (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2019-01-06.
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,11 @@
 CHANGES
 -------
 
+  2.084 5 January 2019
+
+      * Added support for lzip
+        with IO::Compress::Lzip and IO::Uncompress::UnLzip
+
   2.083 30 December 2018
 
       * No Changes

@@ -3,6 +3,8 @@
 use 5.24.0;
 use warnings;
 
+use constant SQRT2 => sqrt(2);
+
 use Test::Most;    # plan is down at bottom
 my $deeply = \&eq_or_diff;
 
@@ -25,17 +27,87 @@ dies_ok( sub { $dm->unconnected } );
 dies_ok( sub { $dm->update( [ 0, 0, 42 ] ) } );
 dies_ok( sub { $dm->values } );
 
-is( $dm->max_cost, ~0, 'cost attribute defaults' );
-is( $dm->min_cost, 0 );
-is( $dm->bad_cost, -1 );
+use constant {
+    BC => -2147483648,    # bad_cost (was -1 in previous versions)
+    GC => 0,              # min_cost (goals)
+    MC => 2147483647      # max_cost (was ~0 in previous versions)
+};
+
+is( $dm->max_cost, MC, 'cost attribute defaults' );
+is( $dm->min_cost, GC );
+is( $dm->bad_cost, BC );
 ok( ref $dm->costfn eq 'CODE' );
 is( $dm->next_m, 'next' );
+ok( ref $dm->normfn eq 'CODE' );
 
 is( $dm->iters, 0, 'iters default' );
 
 $dm->map( [ [qw(. . .)], [qw(. . .)], [qw(. . x)] ] );
 $deeply->( $dm->dimap, [ [qw(4 3 2)], [qw(3 2 1)], [qw(2 1 0)] ] );
 is( $dm->iters, 5 );
+
+$deeply->(
+    [   sort { $a <=> $b } Game::DijkstraMap::adjacent_values( $dm->dimap, 0, 0, 2, 2 )
+    ],
+    [qw(2 3 3)],
+    'adjacent_values to [0,0]'
+);
+$deeply->(
+    [   sort { $a <=> $b } Game::DijkstraMap::adjacent_values( $dm->dimap, 1, 1, 2, 2 )
+    ],
+    [qw(0 1 1 2 2 3 3 4)],
+    'adjacent_values to [1,1]'
+);
+$deeply->(
+    [   sort { $a <=> $b } Game::DijkstraMap::adjacent_values( $dm->dimap, 2, 2, 2, 2 )
+    ],
+    [qw(1 1 2)],
+    'adjacent_values to [2,2]'
+);
+
+$deeply->(
+    [   sort { $a <=> $b }
+          Game::DijkstraMap::adjacent_values_diag( $dm->dimap, 0, 0, 2, 2 )
+    ],
+    [qw(2)],
+    'adjacent_values_diag to [0,0]'
+);
+$deeply->(
+    [   sort { $a <=> $b }
+          Game::DijkstraMap::adjacent_values_diag( $dm->dimap, 1, 1, 2, 2 )
+    ],
+    [qw(0 2 2 4)],
+    'adjacent_values_diag to [1,1]'
+);
+$deeply->(
+    [   sort { $a <=> $b }
+          Game::DijkstraMap::adjacent_values_diag( $dm->dimap, 2, 2, 2, 2 )
+    ],
+    [qw(2)],
+    'adjacent_values_diag to [2,2]'
+);
+
+$deeply->(
+    [   sort { $a <=> $b }
+          Game::DijkstraMap::adjacent_values_sq( $dm->dimap, 0, 0, 2, 2 )
+    ],
+    [qw(3 3)],
+    'adjacent_values_sq to [0,0]'
+);
+$deeply->(
+    [   sort { $a <=> $b }
+          Game::DijkstraMap::adjacent_values_sq( $dm->dimap, 1, 1, 2, 2 )
+    ],
+    [qw(1 1 3 3)],
+    'adjacent_values_sq to [1,1]'
+);
+$deeply->(
+    [   sort { $a <=> $b }
+          Game::DijkstraMap::adjacent_values_sq( $dm->dimap, 2, 2, 2, 2 )
+    ],
+    [qw(1 1)],
+    'adjacent_values_sq to [2,2]'
+);
 
 my $level = $dm->str2map(<<'EOM');
 ,#####,
@@ -57,17 +129,17 @@ $deeply->(
 
 $deeply->(
     $dm->map($level)->dimap,
-    [   [ ~0, -1, -1, -1, -1, -1, ~0 ],
-        [ -1, -1, 4,  3,  2,  -1, -1 ],
-        [ -1, 6,  5,  -1, 1,  0,  -1 ],
-        [ -1, -1, 4,  3,  2,  -1, -1 ],
-        [ ~0, -1, -1, -1, -1, -1, ~0 ],
+    [   [ MC, BC, BC, BC, BC, BC, MC ],
+        [ BC, BC, 4,  3,  2,  BC, BC ],
+        [ BC, 6,  5,  BC, 1,  GC, BC ],
+        [ BC, BC, 4,  3,  2,  BC, BC ],
+        [ MC, BC, BC, BC, BC, BC, MC ],
     ],
     'level map in dimap'
 );
 
 $deeply->( $dm->unconnected, [ [ 0, 0 ], [ 0, 6 ], [ 4, 0 ], [ 4, 6 ] ] );
-$deeply->( $dm->values( [ 0, 0 ], [ 1, 1 ], [ 2, 2 ] ), [ ~0, -1, 5 ] );
+$deeply->( $dm->values( [ 0, 0 ], [ 1, 1 ], [ 2, 2 ] ), [ MC, BC, 5 ] );
 
 # 6 can go to 5 or either of the diagonal 4s. this test may fail if
 # sort() or how next() iterates over the coordinates change; a more
@@ -97,11 +169,11 @@ $dm->update( [ 2, 1, 0 ] );
 
 $deeply->(
     $dm->dimap,
-    [   [ ~0, -1, -1, -1, -1, -1, ~0 ],
-        [ -1, -1, 4,  3,  2,  -1, -1 ],
-        [ -1, 0,  5,  -1, 1,  0,  -1 ],
-        [ -1, -1, 4,  3,  2,  -1, -1 ],
-        [ ~0, -1, -1, -1, -1, -1, ~0 ],
+    [   [ MC, BC, BC, BC, BC, BC, MC ],
+        [ BC, BC, 4,  3,  2,  BC, BC ],
+        [ BC, GC, 5,  BC, 1,  GC, BC ],
+        [ BC, BC, 4,  3,  2,  BC, BC ],
+        [ MC, BC, BC, BC, BC, BC, MC ],
     ]
 );
 
@@ -114,11 +186,11 @@ $dm->recalc;
 
 $deeply->(
     $dm->dimap,
-    [   [ ~0, -1, -1, -1, -1, -1, ~0 ],
-        [ -1, -1, 2,  3,  2,  -1, -1 ],
-        [ -1, 0,  1,  -1, 1,  0,  -1 ],
-        [ -1, -1, 2,  3,  2,  -1, -1 ],
-        [ ~0, -1, -1, -1, -1, -1, ~0 ],
+    [   [ MC, BC, BC, BC, BC, BC, MC ],
+        [ BC, BC, 2,  3,  2,  BC, BC ],
+        [ BC, GC, 1,  BC, 1,  GC, BC ],
+        [ BC, BC, 2,  3,  2,  BC, BC ],
+        [ MC, BC, BC, BC, BC, BC, MC ],
     ]
 );
 
@@ -127,7 +199,7 @@ $deeply->(
     [ [ [ 2, 1 ], 0 ], [ [ 2, 2 ], 1 ], ],
 );
 
-# diagonals are not dealt with by normalize_costs. also condensed
+# diagonals are not dealt with by default. also tests the condensed
 # constructor form
 lives_ok {
     $dm = Game::DijkstraMap->new( str2map => <<'EOM' );
@@ -137,6 +209,44 @@ EOM
     $dm->recalc;
 };
 $deeply->( $dm->unconnected, [ [ 0, 0 ] ] );
+
+# diagonals should be possible with norm_8way (new in version 1.01)
+$dm = Game::DijkstraMap->new(
+    normfn  => \&Game::DijkstraMap::norm_8way,
+    str2map => <<'EOM' );
+.#
+#x
+EOM
+$deeply->( $dm->dimap, [ [ 1, BC ], [ BC, 0 ] ] );
+
+# also Euclidean diagonals (also new in version 1.01)
+$dm = Game::DijkstraMap->new(
+    normfn  => \&Game::DijkstraMap::norm_8way_euclid,
+    str2map => <<'EOM' );
+.#
+#x
+EOM
+$deeply->( $dm->dimap, [ [ SQRT2, BC ], [ BC, 0 ] ] );
+
+$dm = Game::DijkstraMap->new(
+    normfn  => \&Game::DijkstraMap::norm_8way_euclid,
+    str2map => <<'EOM' );
+....
+....
+..x.
+....
+EOM
+$deeply->(
+    rounded( $dm->dimap ),
+    rounded(
+        [   [ SQRT2 + SQRT2, 1 + SQRT2, 2, 1 + SQRT2 ],
+            [ 1 + SQRT2,     SQRT2,     1, SQRT2 ],
+            [ 2,             1,         0, 1 ],
+            [ 1 + SQRT2,     SQRT2,     1, 1 ]
+        ]
+    ),
+    "norm_8way_euclid rounded because floating point math"
+);
 
 # dimap_with, next_with
 #
@@ -150,7 +260,7 @@ $deeply->( $dm->unconnected, [ [ 0, 0 ] ] );
 ...
 EOM
     my $map1 = Game::DijkstraMap->new;
-    $map1->dimap( [ [qw(10 -1 0)], [qw(0 11 0)], [qw(0 0 0)] ] );
+    $map1->dimap( [ [ 10, BC, 0 ], [qw(0 11 0)], [qw(0 0 0)] ] );
     my $map2 = Game::DijkstraMap->new;
     $map2->dimap( [ [qw(0 0 0)], [qw(7 0 0)], [qw(0 0 0)] ] );
 
@@ -158,7 +268,7 @@ EOM
         $dm->dimap_with(
             { objs => [ $map1, $map2 ], weights => [ 3, 2 ], my_weight => 5 }
         ),
-        [ [ 40, -1, 0 ], [ 29, 43, 5 ], [ 20, 15, 10 ] ]
+        [ [ 40, BC, 0 ], [ 29, 43, 5 ], [ 20, 15, 10 ] ]
     );
 
     $deeply->(
@@ -172,4 +282,14 @@ EOM
 is( $dm->to_tsv, "2\t1\t0$/3\t2\t1$/4\t3\t2$/" );
 is( Game::DijkstraMap->to_tsv( [ [qw(a b)], [qw(c d)] ] ), "a\tb$/c\td$/" );
 
-plan tests => 44
+sub rounded {
+    my ($aref) = @_;
+    my $maxcol = $aref->[0]->$#*;
+    for my $r ( 0 .. $aref->$#* ) {
+        for my $c ( 0 .. $maxcol ) {
+            $aref->[$r][$c] = sprintf "%.3f", $aref->[$r][$c];
+        }
+    }
+}
+
+plan tests => 57

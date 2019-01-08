@@ -27,23 +27,27 @@ along with this program. If not, see L<http://www.gnu.org/licenses/>.
 
 =cut
 
+use Test::More tests=>11; # remember to keep in sync with done_testing
+
+BEGIN {
+	diag "This is Perl $] at $^X on $^O";
+	BAIL_OUT("Perl 5.8.1 is required") if $] lt '5.008001';
+}
+
 use FindBin ();
 use lib $FindBin::Bin;
 use File_Replace_Testlib;
 
-use Test::More tests=>11; # remember to keep in sync with done_testing
-
 ## no critic (RequireCarping)
 
-BEGIN { diag "This is Perl $] at $^X on $^O" }
 BEGIN {
 	use_ok('Tie::Handle::Base')
 		or BAIL_OUT("failed to use Tie::Handle::Base");
 	use_ok 'File::Replace', 'replace', 'replace2'
 		or BAIL_OUT("failed to use File::Replace");
 }
-is $Tie::Handle::Base::VERSION, '0.08', 'Tie::Handle::Base version matches tests';
-is $File::Replace::VERSION, '0.08', 'File::Replace version matches tests';
+is $Tie::Handle::Base::VERSION, '0.12', 'Tie::Handle::Base version matches tests';
+is $File::Replace::VERSION, '0.12', 'File::Replace version matches tests';
 
 $File::Replace::DISABLE_CHMOD and diag "\n",
 	"it appears a simple chmod failed on your system,\n",

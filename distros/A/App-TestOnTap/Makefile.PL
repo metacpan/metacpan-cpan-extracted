@@ -73,6 +73,7 @@ WriteMakefile(
 			'Archive::Zip'						=>	1.47,	# 1.30 misbehaves in t\21-verify_saved_archive.t
 			'Config'							=>  0,
 			'Config::Std'						=>	0,		# initial dev used: 0.901
+			'Cwd'								=>  0,
 			'Exporter'							=>	0,		# initial dev used: 5.72
 			'ExtUtils::Installed'				=>  0,
 			'File::Basename'					=>	0,		# initial dev used: 2.85

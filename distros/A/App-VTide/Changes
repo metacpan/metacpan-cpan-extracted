@@ -1,5 +1,11 @@
 Revision history for App-VTide
 
+0.1.7   2019-01-06
+        Updating for release of version 0.1.7
+        Fixning config dependencies (Ivan Wills)
+        Updated date (Ivan Wills)
+        Added getting absolute path for Perl 5.26 (Ivan Wills)
+
 0.1.6   2018-03-07
         Updating for release of version 0.1.6
         Added perl 5.26 to travis builds (Ivan Wills)

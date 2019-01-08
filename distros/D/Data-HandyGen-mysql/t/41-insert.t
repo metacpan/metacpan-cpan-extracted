@@ -15,11 +15,11 @@ main();
 exit(0);
 
 
-#   process_table 
+#   process_table
 
 
 sub main {
-    
+
     my $mysqld = Test::mysqld->new( my_cnf => { 'skip-networking' => '' } )
         or plan skip_all => $Test::mysqld::errstr;
 
@@ -32,7 +32,7 @@ sub main {
 
     for my $engine (qw/ INNODB MyISAM /) {
         diag "Testing $engine ...";
-        $dbh->do(qq{SET storage_engine=$engine});
+        $dbh->do(qq{SET default_storage_engine=$engine});
         test_nullable($hd);
         test_pk($hd);
         test_notnull_nofk($hd);
@@ -49,7 +49,7 @@ sub main {
 }
 
 
-#  No values will be assigned to nullable column. 
+#  No values will be assigned to nullable column.
 #  (Although default value will be assigned if exists)
 sub test_nullable {
     my ($hd) = @_;
@@ -73,7 +73,7 @@ sub test_nullable {
             CONSTRAINT FOREIGN KEY (col_with_fk) REFERENCES test_nullable_foreign(id)
         )
     });
-    
+
     my $id = $hd->insert('test_nullable');
     is($id, undef);
 
@@ -84,7 +84,7 @@ sub test_nullable {
     is($count, 0);
 
     my @cols = $dbh->selectrow_array(q{
-        SELECT col_with_default, col_without_default, col_with_fk 
+        SELECT col_with_default, col_without_default, col_with_fk
         FROM test_nullable
     });
     is($cols[0], 100);      #  col_with_default (default value will be assigned)
@@ -117,8 +117,8 @@ sub test_pk {
     is($id, 300);
     $id = $hd->insert('test_pk_ai');
     is($id, 301);
-    
-    #  Non-auto_increment primary key 
+
+    #  Non-auto_increment primary key
     $dbh->do(q{DROP TABLE IF EXISTS test_pk_nai});
     $dbh->do(q{
         CREATE TABLE test_pk_nai (
@@ -127,8 +127,8 @@ sub test_pk {
     #  Random value will be assigned.
     $id = $hd->insert('test_pk_nai');
     like($id, qr/^\d+$/, "(random id is $id)");
-   
-    
+
+
     #  Varchar primary key
     $dbh->do(q{DROP TABLE IF EXISTS test_pk_varchar});
     $dbh->do(q{
@@ -141,7 +141,7 @@ sub test_pk {
     like($id, qr/^\w{10}$/, "(random id is $id)");
 
     $id = $hd->insert('test_pk_varchar', { id => 'abcde12345' });
-    is($id, 'abcde12345');     
+    is($id, 'abcde12345');
 }
 
 
@@ -167,7 +167,7 @@ sub test_notnull_nofk {
     is($res->{default1}, 10);
     is($res->{default2}, 'Default');
 }
-        
+
 
 sub test_notnull_default_fk {
     my ($hd) = @_;
@@ -187,7 +187,7 @@ sub test_notnull_default_fk {
             default1 int not null default 10,
             constraint foreign key (default1) references foreign1 (id)
         )});
-    
+
     #  first time (referenced record doesn't exist)
     my $id;
     lives_ok { $id = $hd->insert('test1', {}); }
@@ -204,10 +204,10 @@ sub test_notnull_default_fk {
         or diag "Maybe failed to add record to referenced table";
     $res = $dbh->selectrow_hashref(q{SELECT * FROM test1 WHERE id = ?}, undef, $id);
     is($res->{default1}, 10);
-  
-    #  No additional records exist 
+
+    #  No additional records exist
     _check_row_count($dbh, 'foreign1', 1);
-     
+
 
     $hd->fk(0);
 }
@@ -246,7 +246,7 @@ sub test_notnull_nodefault_fk {
 
     $res = $dbh->selectrow_hashref(q{SELECT COUNT(*) as count FROM foreign2 WHERE id = ?}, undef, $default1);
     is($res->{count}, 1);
-    
+
     $dbh->do(q{DELETE FROM test2 WHERE id = ?}, undef, $test2_id);
     $dbh->do(q{DELETE FROM foreign2 WHERE id = ?}, undef, $default1);
 
@@ -267,7 +267,7 @@ sub test_notnull_nodefault_fk {
     #  No additional records exist
     _check_row_count($dbh, 'foreign2', $INSERT_COUNT);
 
-    
+
     #
     #  'default1' is specified as one of foreign2.id
     #
@@ -278,7 +278,7 @@ sub test_notnull_nodefault_fk {
     #  No additional records exist
     _check_row_count($dbh, 'foreign2', $INSERT_COUNT);
 
-    
+
     #
     #  'default1' is specified as a value which doesn't exist in foreign2.id
     #
@@ -293,7 +293,7 @@ sub test_notnull_nodefault_fk {
     _check_row_count($dbh, 'foreign2', $INSERT_COUNT);
     $res = $dbh->selectrow_hashref(q{SELECT COUNT(*) as count FROM foreign2 WHERE id = ?}, undef, 10007 * $INSERT_COUNT);
     is( $res->{count}, 1 );
-    
+
 
     #
     #  'default1' itself is not specified, instead foreign2.id is specified which already exists in foreign2
@@ -306,7 +306,7 @@ sub test_notnull_nodefault_fk {
 
     #  No additional records exist
     _check_row_count($dbh, 'foreign2', $INSERT_COUNT);
-    
+
 
     #
     #  'default1' itself is not specified, instead foreign2.id is specified which doesn't exist in foreign2
@@ -318,7 +318,7 @@ sub test_notnull_nodefault_fk {
     $res = $dbh->selectrow_hashref(q{SELECT * FROM test2 WHERE id = ?}, undef, $id);
     is( $res->{default1}, 10007 * $INSERT_COUNT );
 
-    #  Additional record has been created. 
+    #  Additional record has been created.
     _check_row_count($dbh, 'foreign2', $INSERT_COUNT);
     $res = $dbh->selectrow_hashref(q{SELECT COUNT(*) as count FROM foreign2 WHERE id = ?}, undef, 10007 * $INSERT_COUNT);
     is( $res->{count}, 1 );
@@ -350,9 +350,9 @@ sub test_error {
 
     #  table 'test_error2' does not exist.
     diag q{(NOTE) The following exception "Table ... doesn't exist" is an intended one.};
-    throws_ok( 
-        sub { $hd->insert('test_error2', { id => 'a' }) }, 
-        qr/Table 'test.test_error2' doesn't exist/, 
+    throws_ok(
+        sub { $hd->insert('test_error2', { id => 'a' }) },
+        qr/Table 'test.test_error2' doesn't exist/,
         "(expected error)"
     );
 }
@@ -360,9 +360,9 @@ sub test_error {
 
 sub test_nopk {
     my ($hd) = @_;
-    
+
     my $dbh = $hd->dbh;
-    
+
     $dbh->do(q{DROP TABLE IF EXISTS test_pk0});
     $dbh->do(q{
         CREATE TABLE test_pk0 (
@@ -370,10 +370,10 @@ sub test_nopk {
             col2 varchar(10) not null
         )
     });
-    
+
     my $id = $hd->insert('test_pk0', { col1 => 'abc' });
     is($id, undef);
-    
+
     my $row = $dbh->selectrow_hashref(q{
                 SELECT * FROM test_pk0 LIMIT 1
             });
@@ -395,10 +395,10 @@ sub test_pk2 {
             PRIMARY KEY (id1, id2)
         )
     });
-    
+
     my $id = $hd->insert('test_pk2', {});
     is($id, undef);
-    
+
     my $row = $dbh->selectrow_hashref(q{
                 SELECT * FROM test_pk2 LIMIT 1
             });
@@ -410,7 +410,7 @@ sub test_pk2 {
 
 
 
-     
+
 
 
 

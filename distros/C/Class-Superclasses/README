@@ -1,10 +1,10 @@
 NAME
 
-    Class::Superclasses
+    Class::Superclasses - Find all (direct) superclasses of a class
 
 VERSION
 
-    version 0.08
+    version 1.00
 
 SYNOPSIS
 
@@ -16,10 +16,13 @@ SYNOPSIS
       my @superclasses = $parser->superclasses();
       
       print $_,"\n" for(@superclasses);
-
-NAME
-
-    Class::Superclasses - Find all (direct) superclasses of a class
+    
+      # or pass a scalar ref that contains the code
+      my $class_code = q~package Test; use base 'Baseclass';~;
+      $parser->document(\$class_code);
+      @superclasses = $parser->superclasses();
+      
+      print $_,"\n" for(@superclasses);
 
  DESCRIPTION
 

@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
+  Test::Warn: '0'
   Text::Diff: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -21,5 +22,5 @@ no_index:
     - inc
 requires:
   Data::Dumper: '0'
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,11 +1,11 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2018-12-28 12:19:53 mtw>
+# Last changed Time-stamp: <2019-01-07 00:43:57 mtw>
 
 # Bio::RNA::RNAaliSplit.pm: Handler for horizontally splitting alignments
 
 package Bio::RNA::RNAaliSplit;
 
-use version; our $VERSION = qv('0.07');
+use version; our $VERSION = qv('0.09');
 use Carp;
 use Data::Dumper;
 use Moose;
@@ -40,6 +40,13 @@ has 'alignment' => (
 		    coerce => 1,
 		   );
 
+has 'alignment_stk' => (
+			is => 'rw',
+			isa => 'Path::Class::File',
+			predicate => 'has_stk',
+			init_arg => undef,
+		       );
+
 has 'next_aln' => (
 		   is => 'rw',
 		   isa => 'Bio::SimpleAlign',
@@ -69,6 +76,7 @@ has 'hammingdistX' => (
 		       init_arg => undef,
 		      );
 
+
 with 'FileDirUtil';
 with 'Bio::RNA::RNAaliSplit::Roles';
 
@@ -91,16 +99,24 @@ sub BUILD {
     $self->set_ifilebn;
 
     if ($self->has_dump_flag){
-      # dump ifile as aln in ClustalW format to odir/input
+      # dump ifile as aln ans stk in ClustalW format to odir/input
       my $iodir = $self->odir->subdir('input');
       mkdir($iodir);
       my $ialnfile = file($iodir,$self->ifilebn.".aln");
+      my $istkfile = file($iodir,$self->ifilebn.".stk");
       my $alnio = Bio::AlignIO->new(-file   => ">$ialnfile",
 				    -format => "ClustalW",
 				    -flush  => 0,
 				    -displayname_flat => 1 );
+      my $stkio = Bio::AlignIO->new(-file   => ">$istkfile",
+				    -format => "Stockholm",
+				    -flush  => 0,
+				    -displayname_flat => 1 );
       my $aln2 = $self->next_aln->select_noncont((1..$self->next_aln->num_sequences));
+      my $stk2 = $self->next_aln->select_noncont((1..$self->next_aln->num_sequences));
       $alnio->write_aln($aln2);
+      $stkio->write_aln($stk2);
+      $self->alignment_stk($istkfile);
       # end dump input aln file
     }
 
@@ -206,7 +222,7 @@ sequence alignments
 
 =head1 VERSION
 
-Version 0.07
+Version 0.09
 
 =cut
 
@@ -255,7 +271,7 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-RNA-RNAaliSplit>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Michael T. Wolfinger <michael@wolfinger.eu> and
+Copyright 2017-2019 Michael T. Wolfinger <michael@wolfinger.eu> and
 <michael.wolfinger@univie.ac.at>
 
 This program is free software; you can redistribute it and/or

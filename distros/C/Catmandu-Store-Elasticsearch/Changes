@@ -1,5 +1,8 @@
 Revision history for Catmandu-Store-ElasticSearch
 
+0.0511  2019-01-07 12:14:11 CET
+  - setting id_key or key_prefix is no longer necessary for Elasticsearch >= 2.0
+
 0.0510  2018-12-18 15:25:59 CET
   - on_error log, throw and ignore shortcuts for easier debugging
 

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,4 +32,7 @@ requires:
   Test::Warn: '0'
   Test::mysqld: '0'
   YAML: '0'
-version: v0.0.4
+resources:
+  repository: https://github.com/egawata/Data-HandyGen-mysql.git
+version: v0.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

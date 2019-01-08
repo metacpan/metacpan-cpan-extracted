@@ -1,7 +1,7 @@
 package App::rimetadb;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.220'; # VERSION
 
 use 5.010001;
 use strict;
@@ -325,7 +325,7 @@ For each entry, you can specify:
   e.g. by another module).
 
 * a package prefix using `+Foo::Bar::` or `+Foo::Bar::*` syntax. Subpackages
-  will be listed recursively (using `Package::MoreUtil`'s
+  will be listed recursively (using <pm:Package::Util::Lite>'s
   `list_subpackages`).
 
 _
@@ -405,7 +405,7 @@ _
 sub update_from_modules {
     require Module::List;
     require Module::Path::More;
-    require Package::MoreUtil;
+    require Package::Util::Lite;
 
     my %args = @_;
 
@@ -419,7 +419,7 @@ sub update_from_modules {
         if ($entry =~ /\A\+(.+)::\*?\z/) {
             # package prefix
             log_debug("Listing all packages under $1 ...");
-            for (Package::MoreUtil::list_subpackages($1, 1)) {
+            for (Package::Util::Lite::list_subpackages($1, 1)) {
                 next if $_ ~~ @pkgs || _is_excluded($_, $exc);
                 push @pkgs, $_;
             }
@@ -460,7 +460,7 @@ sub update_from_modules {
         my $rec = $dbh->selectrow_hashref("SELECT * FROM package WHERE name=?",
                                           {}, $pkg);
         my $mp = Module::Path::More::module_path(module=>$pkg);
-        my @st = stat($mp) if $mp;
+        my @st; @st = stat($mp) if $mp;
 
         unless ($args{force} || !$rec || !$rec->{mtime} || !@st || $rec->{mtime} < $st[9]) {
             log_debug("$pkg ($mp) hasn't changed since last recorded, skipped");
@@ -961,7 +961,7 @@ App::rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.21 of App::rimetadb (from Perl distribution App-rimetadb), released on 2017-07-10.
+This document describes version 0.220 of App::rimetadb (from Perl distribution App-rimetadb), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -974,7 +974,7 @@ See the included CLI script L<rimetadb>.
 
 Usage:
 
- argument_stats(%args) -> [status, msg, result, meta]
+ argument_stats(%args) -> [status, msg, payload, meta]
 
 Show statistics on function arguments.
 
@@ -1008,7 +1008,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1019,7 +1019,7 @@ Return value:  (any)
 
 Usage:
 
- arguments(%args) -> [status, msg, result, meta]
+ arguments(%args) -> [status, msg, payload, meta]
 
 List function arguments.
 
@@ -1044,7 +1044,7 @@ Note: has been tested with MySQL and SQLite only.
 
 Select specific function only.
 
-=item * B<package> => I<str>
+=item * B<package> => I<perl::modname>
 
 Select specific package only.
 
@@ -1069,7 +1069,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1080,7 +1080,7 @@ Return value:  (any)
 
 Usage:
 
- delete(%args) -> [status, msg, result, meta]
+ delete(%args) -> [status, msg, payload, meta]
 
 Delete a package or function metadata.
 
@@ -1101,7 +1101,7 @@ Note: has been tested with MySQL and SQLite only.
 
 =item * B<function> => I<str>
 
-=item * B<package>* => I<str>
+=item * B<package>* => I<perl::modname>
 
 =item * B<password> => I<str>
 
@@ -1118,7 +1118,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1129,7 +1129,7 @@ Return value:  (any)
 
 Usage:
 
- function_stats(%args) -> [status, msg, result, meta]
+ function_stats(%args) -> [status, msg, payload, meta]
 
 Show some statistics on functions.
 
@@ -1163,7 +1163,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1174,7 +1174,7 @@ Return value:  (any)
 
 Usage:
 
- functions(%args) -> [status, msg, result, meta]
+ functions(%args) -> [status, msg, payload, meta]
 
 List functions.
 
@@ -1195,7 +1195,7 @@ user's home directory.
 
 Note: has been tested with MySQL and SQLite only.
 
-=item * B<package> => I<str>
+=item * B<package> => I<perl::modname>
 
 Select specific package only.
 
@@ -1216,7 +1216,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1227,7 +1227,7 @@ Return value:  (any)
 
 Usage:
 
- meta(%args) -> [status, msg, result, meta]
+ meta(%args) -> [status, msg, payload, meta]
 
 Get package/function metadata.
 
@@ -1265,7 +1265,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1276,7 +1276,7 @@ Return value:  (any)
 
 Usage:
 
- packages(%args) -> [status, msg, result, meta]
+ packages(%args) -> [status, msg, payload, meta]
 
 List packages.
 
@@ -1314,7 +1314,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1325,7 +1325,7 @@ Return value:  (any)
 
 Usage:
 
- stats() -> [status, msg, result, meta]
+ stats() -> [status, msg, payload, meta]
 
 Show some statistics.
 
@@ -1338,7 +1338,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1349,7 +1349,7 @@ Return value:  (any)
 
 Usage:
 
- update(%args) -> [status, msg, result, meta]
+ update(%args) -> [status, msg, payload, meta]
 
 Add/update a package or function metadata.
 
@@ -1393,7 +1393,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1404,7 +1404,7 @@ Return value:  (any)
 
 Usage:
 
- update_from_modules(%args) -> [status, msg, result, meta]
+ update_from_modules(%args) -> [status, msg, payload, meta]
 
 Update Rinci metadata database from local Perl modules.
 
@@ -1469,7 +1469,7 @@ name will I<not> be made. This can be used to add an already-loaded package
 e.g. by another module).
 
 =item * a package prefix using C<+Foo::Bar::> or C<+Foo::Bar::*> syntax. Subpackages
-will be listed recursively (using C<Package::MoreUtil>'s
+will be listed recursively (using L<Package::Util::Lite>'s
 C<list_subpackages>).
 
 =back
@@ -1507,7 +1507,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1539,7 +1539,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

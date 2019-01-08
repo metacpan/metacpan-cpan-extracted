@@ -1,7 +1,7 @@
 package Log::ger::For::Package;
 
-our $DATE = '2017-07-30'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010;
 use strict;
@@ -10,8 +10,8 @@ use experimental 'smartmatch';
 use Log::ger;
 
 use Data::Clean::JSON;
-use Package::MoreUtil qw(package_exists list_package_contents
-                         list_subpackages);
+use Package::Stash;
+use Package::Util::Lite qw(package_exists list_subpackages);
 use Sub::Uplevel;
 
 our %SPEC;
@@ -253,11 +253,11 @@ sub add_logging_to_package {
     my $_add = sub {
         my ($package) = @_;
 
-        my %contents = list_package_contents($package);
+        my $contents = Package::Stash->new($package)->get_all_symbols("CODE");
+
         my @syms;
-        for my $sym (keys %contents) {
-            my $sub = $contents{$sym};
-            next unless ref($sub) eq 'CODE';
+        for my $sym (sort keys %$contents) {
+            my $sub = $contents->{$sym};
 
             my $name = "${package}::$sym";
             if (ref($filter) eq 'CODE') {
@@ -378,7 +378,7 @@ Log::ger::For::Package - Add logging to package
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::For::Package (from Perl distribution Log-ger-For-Class), released on 2017-07-30.
+This document describes version 0.003 of Log::ger::For::Package (from Perl distribution Log-ger-For-Class), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -591,7 +591,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

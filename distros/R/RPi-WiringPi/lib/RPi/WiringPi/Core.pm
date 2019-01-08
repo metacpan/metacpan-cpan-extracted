@@ -7,37 +7,38 @@ use parent 'WiringPi::API';
 use JSON;
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3629';
+our $VERSION = '2.3630';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;
 }
+sub identify {
+    my ($self, $time) = @_;
+
+    $time //= 5;
+
+    $self->io_led(1);
+    $self->pwr_led(1);
+
+    sleep $time;
+
+    $self->io_led(0);
+    $self->pwr_led(0);
+}
 sub io_led {
     my ($self, $tweak) = @_;
 
-    if (! $tweak){
-        # turn off the green LED from being on full-time
-        `echo 0 | sudo tee /sys/class/leds/led0/brightness`;
-        # start disk activity operating the green LED
-        `echo mmc0 | sudo tee /sys/class/leds/led0/trigger`;
-    }
-    else {
+    if ($tweak){
         # stop disk activity from operating the green LED
         `echo none | sudo tee /sys/class/leds/led0/trigger`;
         # turn on the green LED full-time
         `echo 1 | sudo tee /sys/class/leds/led0/brightness`;
     }
-}
-sub pwr_led {
-    my ($self, $tweak) = @_;
-
-    if (! $tweak){
-        # low power input to operate the red power LED
-        `echo input | sudo tee /sys/class/leds/led1/trigger`;
-    }
     else {
-        # turn off the red power LED
-        `echo 0 | sudo tee /sys/class/leds/led1/brightness`;
+        # turn off the green LED from being on full-time
+        `echo 0 | sudo tee /sys/class/leds/led0/brightness`;
+        # start disk activity operating the green LED
+        `echo mmc0 | sudo tee /sys/class/leds/led0/trigger`;
     }
 }
 sub label {
@@ -105,6 +106,18 @@ sub pin_scheme {
     return defined $ENV{RPI_PIN_MODE}
         ? $ENV{RPI_PIN_MODE}
         : RPI_MODE_UNINIT;
+}
+sub pwr_led {
+    my ($self, $tweak) = @_;
+
+    if ($tweak){
+        # turn off the red power LED
+        `echo 0 | sudo tee /sys/class/leds/led1/brightness`;
+    }
+    else {
+        # low power input to operate the red power LED
+        `echo input | sudo tee /sys/class/leds/led1/trigger`;
+    }
 }
 sub pwm_range {
     my ($self, $range) = @_;
@@ -269,6 +282,21 @@ Parameters:
 Optional: Sending in a true value (eg: C<1>) will turn the red power LED off.
 Sending in a false value (or omitting the parameter) will restore the power LED
 back to default state.
+
+=head2 identify($seconds)
+
+This method wraps the L<io_led()|/io_led($tweak)> and
+L<pwr_led()|/pwr_led($tweak)> methods.
+
+Parameters:
+
+    $seconds
+
+Optional, Integer: The number of seconds to remain in "identify" state. Defaults
+to C<5>.
+
+In "identify" state, the green disk I/O LED will remain on constantly, and the
+red power LED will stay off for the duration.
 
 =head2 label($label)
 

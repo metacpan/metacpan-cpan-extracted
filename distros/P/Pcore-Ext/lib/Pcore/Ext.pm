@@ -1,4 +1,4 @@
-package Pcore::Ext v0.19.0;
+package Pcore::Ext v0.19.1;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Base;
@@ -18,13 +18,13 @@ sub load_class ( $self, $module_path, $full_path, $reload ) {
 
         my $code = P->file->read_bin($full_path);
 
-        $code->$* =~ s/^use Pcore.+?$//smg;
+        $code =~ s/^use Pcore.+?$//smg;
 
         no warnings qw[redefine];
 
         *{"$namespace\::const"} = sub : prototype(\[$@%]@) { };
 
-        eval $code->$*;    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
+        eval $code;    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
     }
 
     # load

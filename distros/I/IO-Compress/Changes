@@ -1,6 +1,11 @@
 CHANGES
 -------
 
+  2.084 5 January 2019
+
+      * IO::Uncompress::AnyUncompress.pm
+        Added support for IO::Uncompress::Zstd and IO::Uncompress::UnLzip
+
   2.083 30 December 2018
 
       * IO::Compress::*

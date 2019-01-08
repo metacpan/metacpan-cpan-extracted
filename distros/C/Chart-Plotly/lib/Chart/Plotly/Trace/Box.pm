@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Box::Stream;
 use Chart::Plotly::Trace::Box::Transform;
 use Chart::Plotly::Trace::Box::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: In vertical (horizontal) box plots, statistics are computed using `y` (`x`) values. By supplying an `x` (`y`) array, one box per distinct x (y) value is drawn If no `x` (`y`) {array} is provided, a single box is drawn. That box position is then positioned with with `name` or with `x0` (`y0`) if provided. Each box spans from quartile 1 (Q1) to quartile 3 (Q3). The second quartile (Q2) is marked by a line inside the box. By default, the whiskers correspond to the box' edges +/- 1.5 times the interquartile range (IQR = Q3-Q1), see *boxpoints* for other options.
 
@@ -78,7 +78,7 @@ has fillcolor => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -92,7 +92,9 @@ has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Box::Hoverlabel", );
 
 has hoveron => ( is            => "rw",
-                 documentation => "Do the hover effects highlight individual boxes  or sample points or both?", );
+                 isa           => "Str",
+                 documentation => "Do the hover effects highlight individual boxes  or sample points or both?",
+);
 
 has ids => (
     is  => "rw",
@@ -299,7 +301,7 @@ Chart::Plotly::Trace::Box - In vertical (horizontal) box plots, statistics are c
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

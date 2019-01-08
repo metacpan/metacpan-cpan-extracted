@@ -9,6 +9,7 @@ use TestUtils;
 
 use File::Temp qw(tempdir);
 use Archive::Zip qw(:ERROR_CODES);
+use Cwd;
 
 use Test::More tests => 11;
 
@@ -31,8 +32,15 @@ my $savedarchive = $1;
 
 ok(-f $savedarchive, "Archive $savedarchive exists");
 
+# test failure caused by the tmpdir being under a symlink and A::Z apparently
+# having a security fix that invalidates extracting there...
+# we can work around it by chdir there and unpacking to '.'
+#
+my $pwd = getcwd();
+chdir($tmpdir) or die("Failed to chdir($tmpdir): $!");
 my $zip = Archive::Zip->new($savedarchive);
-ok($zip->extractTree('', $tmpdir) == AZ_OK, "Extract tree");
+ok($zip->extractTree('', '.') == AZ_OK, "Extract tree");
+chdir($pwd) or die("Failed to chdir($pwd): $!");
 
 my $saveddir = $savedarchive;
 $saveddir =~ s/\.zip$//;

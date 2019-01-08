@@ -20,15 +20,19 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'HTTP::Tiny'       => 0,
-        'Throwable'        => 0,
-        'Moo'              => 0,
-        'namespace::clean' => 0,
+        'HTTP::Tiny'           => 0,
+        'Throwable'            => 0,
+        'Moo'                  => 0,
+        'namespace::autoclean' => 0.28,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Address-PostCode-UserAgent-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'Address::PostCode::UserAgent'            => { file => 'lib/Address/PostCode/UserAgent.pm'          , version => '0.08' },
+            'Address::PostCode::UserAgent::Exception' => { file => 'lib/Address/PostCode/UserAgent/Exception.pm', version => '0.08' },
+        },
         resources => {
             repository => {
                 type => 'git',

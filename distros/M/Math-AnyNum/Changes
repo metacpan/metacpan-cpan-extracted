@@ -1,5 +1,21 @@
 Revision history for Math-AnyNum
 
+0.31    2019-01-07
+
+        [ADDITIONS]
+
+        - Added the `min(@list)` and `max(@list)` functions.
+        - Added the `base(n,b)` function, which returns a string-representation of `n` in base `b`.
+
+        [IMPROVEMENTS]
+
+        - Minor optimization in `kronecker(n,k)` when `n` is a native integer or when both `n` and `k` are native integers.
+
+        [FIXES]
+
+        - Fixed `fibmod(0, m)` and `lucasmod(0, m)`.
+        - Fixed `is_prime(n)` for negative `n` to always return 0.
+
 0.30    2018-12-13
 
         - Fixed an `:overload` issue for integers in the range [2^32, 2^64] on 32-bit systems with 64-bit Perl.

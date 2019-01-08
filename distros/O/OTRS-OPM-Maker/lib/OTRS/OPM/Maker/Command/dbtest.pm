@@ -7,7 +7,7 @@ use warnings;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = 0.12;
+our $VERSION = '0.14';
 
 sub abstract {
     return "Check if DatabaseInstall and DatabaseUninstall sections in the .sopm are correct";
@@ -46,7 +46,7 @@ OTRS::OPM::Maker::Command::dbtest - Test db definitions in .sopm files
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 AUTHOR
 

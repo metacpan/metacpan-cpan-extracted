@@ -34,6 +34,7 @@
          "requires" : {
             "HTTP::Tiny" : "0",
             "JSON" : "0",
+            "List::MoreUtils" : "0",
             "Net::SNMP" : "0",
             "Net::UPnP" : "0",
             "Package::New" : "0",
@@ -45,5 +46,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.19"
+   "version" : "0.20"
 }

@@ -650,7 +650,7 @@ sub test_sql_oracleTrigger : Test(2) {
 
     my $db = $self->get('db');
     if (!$db->isOracle) {
-        $self->skipTest('Test nur für Oracle');
+        $self->skipTest('Test nur fuer Oracle');
         return;
     }
 
@@ -1190,7 +1190,7 @@ sub test_modifyColumn : Test(2) {
     my $db = $self->get('db');
 
     if ($db->isSQLite || $db->isMySQL) {
-        $self->skipTest('SQLite: Kolumnen können nicht modifiziert werden');
+        $self->skipTest('SQLite: Kolumnen koennen nicht modifiziert werden');
         return;
     }
 
@@ -1317,7 +1317,7 @@ sub test_createTrigger : Test(1) {
     my $db = $self->get('db');
 
     if (!$db->isOracle && !$db->isPostgreSQL) {
-        $self->skipTest(sprintf 'Test für %s uebergehen',$db->dbms);
+        $self->skipTest(sprintf 'Test fuer %s uebergehen',$db->dbms);
         return;
     }
 

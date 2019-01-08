@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HackaMol",
    "prereqs" : {
@@ -57,7 +57,7 @@
          "web" : "https://github.com/demianriccardi/p5-HackaMol"
       }
    },
-   "version" : "0.050",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.051",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

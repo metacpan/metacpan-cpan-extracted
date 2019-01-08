@@ -9,7 +9,7 @@ use Chart::Plotly::Trace::Scatter;
 
 extends 'Chart::Plotly::Adapter';
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 has options => ( is  => 'ro',
                  isa => 'HashRef' );
@@ -41,7 +41,7 @@ Chart::Plotly::Adapter::Data::Table
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

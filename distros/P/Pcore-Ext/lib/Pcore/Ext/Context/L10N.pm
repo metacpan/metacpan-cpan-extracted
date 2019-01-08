@@ -58,12 +58,12 @@ sub to_js_func ($self) {
 
                 local $item->[2] = P->uuid->v1mc_str;
 
-                $json = to_json($item)->$*;
+                $json = to_json $item;
 
                 $json =~ s/"$item->[2]"/$num/sm;
             }
             else {
-                $json = to_json($item)->$*;
+                $json = to_json $item;
             }
 
             $buf .= qq[Ext.L10N.l10n($json)];
@@ -74,7 +74,7 @@ sub to_js_func ($self) {
 }
 
 sub to_js_object ( $self ) {
-    return \qq[new Ext.L10N.string(@{[ to_json($self->{buf})->$* ]})];
+    return \qq[new Ext.L10N.string(@{[ to_json $self->{buf} ]})];
 }
 
 1;

@@ -31,8 +31,8 @@
       "runtime" : {
          "requires" : {
             "DBD::mysql" : "4.042",
-            "Mojolicious" : "7.55",
-            "SQL::Abstract" : "1.81"
+            "Mojolicious" : "8.03",
+            "SQL::Abstract" : "1.86"
          }
       },
       "test" : {
@@ -53,6 +53,6 @@
          "web" : "https://github.com/jhthorsen/mojo-mysql"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

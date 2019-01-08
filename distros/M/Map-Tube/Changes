@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.59  2019-01-03T19:10:00+00:00
+      - Merged PR #6 (fix typo), thanks @reneeb.
+
 3.58  2018-12-20T11:00:00+00:00
       - Used Test::Exception catching error.
 

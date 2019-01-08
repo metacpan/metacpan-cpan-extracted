@@ -17,7 +17,7 @@ use Chart::Plotly::Trace::Scattergl::Textfont;
 use Chart::Plotly::Trace::Scattergl::Transform;
 use Chart::Plotly::Trace::Scattergl::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The data visualized as scatter point or lines is set in `x` and `y` using the WebGL plotting engine. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to a numerical arrays.
 
@@ -99,7 +99,7 @@ has fillcolor => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -162,7 +162,9 @@ has marker => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scattergl::Marker", );
 
 has mode => ( is            => "rw",
-              documentation => "Determines the drawing mode for this scatter trace.", );
+              isa           => "Str",
+              documentation => "Determines the drawing mode for this scatter trace.",
+);
 
 has name => ( is            => "rw",
               isa           => "Str",
@@ -336,7 +338,7 @@ Chart::Plotly::Trace::Scattergl - The data visualized as scatter point or lines 
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

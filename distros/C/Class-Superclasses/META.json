@@ -29,14 +29,23 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "0",
-            "PPI" : "0"
+            "PPI" : "0",
+            "Scalar::Util" : "1.39",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Class::Superclasses" : {
          "file" : "lib/Class/Superclasses.pm",
-         "version" : "0.08"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -51,7 +60,7 @@
          "web" : "http://github.com/reneeb/Class-Superclasses"
       }
    },
-   "version" : "0.08",
+   "version" : "1.00",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",

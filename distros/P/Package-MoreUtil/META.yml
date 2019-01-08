@@ -25,7 +25,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Package-MoreUtil
   homepage: https://metacpan.org/release/Package-MoreUtil
   repository: git://github.com/perlancar/perl-Package-MoreUtil.git
-version: '0.590'
+version: '0.591'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -332,7 +332,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

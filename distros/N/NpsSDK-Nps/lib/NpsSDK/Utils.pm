@@ -17,7 +17,7 @@ use XML::Parser;
 
 use Data::Dumper; use Data::UUID; $Data::Dumper::Terse = 1; 
 
-our $VERSION = '1.9'; # VERSION
+our $VERSION = '1.91'; # VERSION
 
 sub add_extra_info {
     my ($service, $ref_params) = @_;
@@ -44,15 +44,27 @@ sub add_extra_info {
 sub add_secure_hash {
     my ($secret_key, $ref_params) = @_;
     delete $ref_params->{"psp_SecureHash"} if (exists $ref_params->{"psp_SecureHash"});
-    my $secure_hash = create_secure_hash($secret_key, $ref_params);
+    my $secure_hash= create_hmac_sha256_hash($secret_key, order_collection(%{$ref_params}));
     $ref_params->{"psp_SecureHash"} = $secure_hash;
     return $ref_params;
 }
 
-sub create_secure_hash {
+sub create_md5_hash {
     my ($secret_key, $ref_params) = @_;
     my %params = %{$ref_params};
-    return md5_hex(order_collection(%params) . $secret_key);
+    return md5_hex(order_collection(%params).$secret_key);
+}
+
+sub create_hmac_sha256_hash {
+    use Digest::SHA qw(hmac_sha256_hex);
+    my ($secret_key, $ref_params) = @_;
+    return hmac_sha256_hex($ref_params, $secret_key);
+}
+
+sub create_hmac_sha512_hash {
+    use Digest::SHA qw(hmac_sha512_hex);
+    my ($secret_key, $ref_params) = @_;
+    return hmac_sha512_hex($ref_params, $secret_key);
 }
 
 sub order_collection {

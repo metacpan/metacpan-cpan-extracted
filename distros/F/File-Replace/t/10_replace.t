@@ -31,8 +31,9 @@ use FindBin ();
 use lib $FindBin::Bin;
 use File_Replace_Testlib;
 
-use Test::More tests=>9;
+use Test::More tests=>11;
 use File::Temp qw/tempfile/;
+use File::Basename qw/fileparse/;
 
 ## no critic (RequireCarping)
 
@@ -53,7 +54,7 @@ subtest 'basic test' => sub { plan tests=>7;
 	is slurp($fn), "World!", 'after finish';
 };
 
-subtest 'debug' => sub { plan tests=>5;
+subtest 'debug' => sub { plan tests=>6;
 	note "Expect some debug output here:";
 	my $db = Test::More->builder->output;
 	ok( File::Replace->new(newtempfn, debug=>$db)->finish, 'debug' );
@@ -66,17 +67,20 @@ subtest 'debug' => sub { plan tests=>5;
 		ok( !$repl1->cancel, 'debug cancel fail' );
 		local *STDERR = $db;
 		my $repl2 = File::Replace->new(newtempfn, debug=>1);
+		like exception { $repl2->_debug() },
+			qr/\bnot enough arguments\b/i, 'not enough args to _debug';
 		$repl2 = undef;
 		1; # don't return anything from this block
 	}, 'captured at least two warnings';
 };
 
 subtest 'options' => sub { plan tests=>3;
-	my $r = File::Replace->new(newtempfn(""), create=>'off', perms=>oct('640'));
+	my $r = File::Replace->new(newtempfn(""), create=>'off', perms=>oct('640'), backup=>'');
 	# chmod is a default option that we don't change
 	# create is a default option that we do change
 	# perms is not a default option that we explicitly set
-	my $exp = { chmod=>!$File::Replace::DISABLE_CHMOD, create=>'off', perms=>oct('640') };
+	# backup is not a default option, but it being zero length also means it is off
+	my $exp = { chmod=>!$File::Replace::DISABLE_CHMOD, create=>'off', perms=>oct('640'), backup=>'' };
 	is_deeply scalar($r->options), $exp, 'scalar opts';
 	is_deeply {$r->options}, $exp, 'list opts';
 	$r->finish;
@@ -147,6 +151,47 @@ subtest 'replace3' => sub { plan tests=>7;
 	is slurp($fn), "Yet Another\n", 'after write';
 	$r->finish;
 	is slurp($fn), "Feature", 'after finish';
+};
+
+subtest 'backup' => sub { plan tests=>7;
+	my $fn = newtempfn("Foo\nBar\nQuz");
+	my $bfn = do {
+		my ($filename, $dirs, $suffix) = fileparse($fn);
+		$suffix = '' unless defined $suffix; # for older versions of File::Basename (e.g. Perl 5.8.1 / module ver 2.72)
+		$dirs . $filename . $suffix . '.bak' };
+	ok !-e $bfn, 'backup file doesn\'t exist yet';
+	my ($ifh,$ofh,$r) = replace3($fn, backup=>'.bak');
+	is slurp($bfn), "Foo\nBar\nQuz", 'backup file before start';
+	while (<$ifh>) { print $ofh uc }
+	is slurp($fn), "Foo\nBar\nQuz", 'before finish';
+	$r->finish;
+	is slurp($fn), "FOO\nBAR\nQUZ", 'after finish';
+	is slurp($bfn), "Foo\nBar\nQuz", 'backup file after finish';
+	like exception { my $r2 = File::Replace->new($fn, backup=>'.bak'); 1 },
+		qr/\bbackup failed: file .* exists\b/i, 'don\'t back up over existing file';
+	like exception {
+			require Errno;
+			no warnings 'redefine';  ## no critic (ProhibitNoWarnings)
+			local *File::Copy::syscopy = sub {
+				$! = Errno::ENOENT;  ## no critic (RequireLocalizedPunctuationVars)
+				return 0 };
+			my $r3 = File::Replace->new($fn, backup=>'.bak2'); 1 },
+		qr/\bbackup failed: couldn't copy\b/i, 'back up copy fail';
+};
+subtest 'backup with *' => sub { plan tests=>5;
+	my $fn = newtempfn("Abc\nDef\nGhi\n");
+	my $bfn = do {
+		my ($filename, $dirs, $suffix) = fileparse($fn);
+		$suffix = '' unless defined $suffix; # for older versions of File::Basename (e.g. Perl 5.8.1 / module ver 2.72)
+		$dirs . 'orig_' . $filename . $suffix };
+	ok !-e $bfn, 'backup file doesn\'t exist yet';
+	my ($ifh,$ofh,$r) = replace3($fn, backup=>'orig_*');
+	is slurp($bfn), "Abc\nDef\nGhi\n", 'backup file before start';
+	while (<$ifh>) { print $ofh uc }
+	is slurp($fn), "Abc\nDef\nGhi\n", 'before finish';
+	$r->finish;
+	is slurp($fn), "ABC\nDEF\nGHI\n", 'after finish';
+	is slurp($bfn), "Abc\nDef\nGhi\n", 'backup file after finish';
 };
 
 subtest 'unclosed file, cancel, autocancel, autofinish' => sub { plan tests=>13;

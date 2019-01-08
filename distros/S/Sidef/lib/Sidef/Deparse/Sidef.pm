@@ -22,6 +22,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::DataTypes::Bool::Bool            Bool
                   Sidef::DataTypes::Array::Array          Array
                   Sidef::DataTypes::Array::Pair           Pair
+                  Sidef::DataTypes::Array::Vector         Vector
                   Sidef::DataTypes::Array::Matrix         Matrix
                   Sidef::DataTypes::Hash::Hash            Hash
                   Sidef::DataTypes::Set::Set              Set
@@ -64,6 +65,7 @@ package Sidef::Deparse::Sidef {
                   Sidef::Perl::Perl                       Perl
                   Sidef::Time::Time                       Time
                   Sidef::Sys::Sig                         Sig
+                  Sidef::Sys::Sys                         Sys
                   Sidef::Meta::Unimplemented              ...
                   )
             },
@@ -106,8 +108,8 @@ package Sidef::Deparse::Sidef {
     }
 
     sub _dump_init_vars {
-        my ($self, $init_obj, $type) = @_;
-        my $code = $type . '(' . $self->_dump_vars(@{$init_obj->{vars}}) . ')';
+        my ($self, $init_obj) = @_;
+        my $code = ($init_obj->{vars}[0]{type} // 'var') . '(' . $self->_dump_vars(@{$init_obj->{vars}}) . ')';
 
         if (exists $init_obj->{args}) {
             $code .= '=' . $self->deparse_args($init_obj->{args});
@@ -218,7 +220,8 @@ package Sidef::Deparse::Sidef {
             if (   $obj->{type} eq 'var'
                 or $obj->{type} eq 'static'
                 or $obj->{type} eq 'const'
-                or $obj->{type} eq 'has') {
+                or $obj->{type} eq 'has'
+                or $obj->{type} eq 'global') {
                 $code =
                   $obj->{name} =~ /^[0-9]+\z/
                   ? ('$' . $obj->{name})
@@ -232,14 +235,7 @@ package Sidef::Deparse::Sidef {
                       : (($obj->{class} ne $self->{class} ? $obj->{class} . '::' : '') . $obj->{name});
                 }
                 else {
-                    my $block     = $obj->{value};
-                    my $in_module = $obj->{class} ne $self->{class};
-
-                    if ($in_module) {
-                        $code = "module $obj->{class} {\n";
-                        $Sidef::SPACES += $Sidef::SPACES_INCR;
-                        $code .= ' ' x $Sidef::SPACES;
-                    }
+                    my $block = $obj->{value};
 
                     $code .= $obj->{type} . ' ' . $obj->{name};
                     local $self->{class} = $obj->{class};
@@ -259,16 +255,11 @@ package Sidef::Deparse::Sidef {
 
                     $code .= $self->deparse_expr({self => $block});
                     $block->{init_vars} = $var_obj;
-
-                    if ($in_module) {
-                        $code .= "\n}";
-                        $Sidef::SPACES -= $Sidef::SPACES_INCR;
-                    }
                 }
             }
         }
         elsif ($ref eq 'Sidef::Variable::ClassAttr') {
-            $code = $self->_dump_init_vars($obj, 'has');
+            $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::Struct') {
             if ($addr{refaddr($obj)}++) {
@@ -306,7 +297,7 @@ package Sidef::Deparse::Sidef {
             $code = $self->_dump_reftype($obj->{class}) . '!' . $obj->{name};
         }
         elsif ($ref eq 'Sidef::Variable::Init') {
-            $code = $self->_dump_init_vars($obj, 'var');
+            $code = $self->_dump_init_vars($obj);
         }
         elsif ($ref eq 'Sidef::Variable::ConstInit') {
             $code = join(
@@ -368,14 +359,7 @@ package Sidef::Deparse::Sidef {
                         );
             }
             else {
-                my $block     = $obj->{block};
-                my $in_module = $obj->{class} ne $self->{class};
-
-                if ($in_module) {
-                    $code = "module $obj->{class} {\n";
-                    $Sidef::SPACES += $Sidef::SPACES_INCR;
-                    $code .= ' ' x $Sidef::SPACES;
-                }
+                my $block = $obj->{block};
 
                 local $self->{class} = $obj->{class};
                 my $name = $self->_dump_class_name($obj->{name});
@@ -388,11 +372,6 @@ package Sidef::Deparse::Sidef {
                     }
                 }
                 $code .= $self->deparse_expr({self => $block});
-
-                if ($in_module) {
-                    $code .= "\n}";
-                    $Sidef::SPACES -= $Sidef::SPACES_INCR;
-                }
             }
         }
         elsif ($ref eq 'Sidef::Types::Block::BlockInit') {
@@ -441,9 +420,6 @@ package Sidef::Deparse::Sidef {
                 $code = 'Ref';
             }
         }
-        elsif ($ref eq 'Sidef::Sys::Sys') {
-            $code = exists($obj->{file_name}) ? '' : 'Sys';
-        }
         elsif ($ref eq 'Sidef::Meta::PrefixMethod') {
             $code = "::$obj->{name}" . $self->deparse_args($obj->{expr});
         }
@@ -455,6 +431,26 @@ package Sidef::Deparse::Sidef {
         }
         elsif ($ref eq 'Sidef::Meta::Warning') {
             $code = 'warn' . $self->deparse_args($obj->{arg});
+        }
+        elsif ($ref eq 'Sidef::Meta::Module') {
+            local $self->{class} = $obj->{name};
+            $code = "module $obj->{name} " . $self->deparse_bare_block($obj->{block}{code});
+        }
+        elsif ($ref eq 'Sidef::Meta::Included') {
+
+            my @statements;
+            foreach my $info (@{$obj->{included}}) {
+
+                if ($info->{name} ne '') {    # create a new namespace
+                    local $self->{class} = $info->{name};
+                    push @statements, "module $info->{name} " . $self->deparse_bare_block($info->{ast});
+                }
+                else {                        # included in the current namespace
+                    push @statements, join(";\n", $self->deparse_script($info->{ast}));
+                }
+            }
+
+            $code = join(";\n", @statements);
         }
         elsif ($ref eq 'Sidef::Eval::Eval') {
             $code = 'eval' . $self->deparse_args($obj->{expr});
@@ -682,18 +678,10 @@ package Sidef::Deparse::Sidef {
         my ($self, $struct) = @_;
 
         my @results;
-        foreach my $class (grep exists $struct->{$_}, @{$self->{namespaces}}, 'main') {
-            my $in_module = $class ne $self->{class};
-            local $self->{class} = $class;
+        foreach my $class (keys %$struct) {
             foreach my $i (0 .. $#{$struct->{$class}}) {
                 my $expr = $struct->{$class}[$i];
                 push @results, ref($expr) eq 'HASH' ? $self->deparse_expr($expr) : $self->deparse_expr({self => $expr});
-            }
-            if ($in_module) {
-                my $spaces = " " x $Sidef::SPACES_INCR;
-                s/^/$spaces/gm for @results;
-                $results[0] = "module $class {\n" . $results[0];
-                $results[-1] .= "\n}";
             }
         }
 
@@ -703,7 +691,7 @@ package Sidef::Deparse::Sidef {
     sub deparse {
         my ($self, $struct) = @_;
         my @statements = $self->deparse_script($struct);
-        $self->{before} . join($self->{between}, @statements) . $self->{after};
+        $self->{before} . join($self->{between}, grep { $_ ne '' } @statements) . $self->{after};
     }
 };
 

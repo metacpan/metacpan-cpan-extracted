@@ -1,6 +1,45 @@
 https://github.com/amaltsev/XAO-FS
 ----------------------------------
 
+commit 1559e4b2e6af6caab171278d5a57cd5f3fb670dc
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jan 4 17:49:55 2019 -0800
+
+    v1.23 Added auto updating maxlength on build_structure
+
+commit 9c8280b95ccc50ac6ab67e6c8371f9fe82fee559
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Dec 18 11:32:25 2018 -0800
+
+    "Consider scanning" warning only on lists
+    
+    It makes no sense on hashes, they can't be scanned.
+
+commit a12fd5a59ed074efe2b73c736c4ea99bfaf1b362
+Merge: 1831e0d 1ab1695
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Sep 14 16:31:43 2018 -0700
+
+    Merge branch 'master' of github.com:amaltsev/XAO-FS
+
+commit 1831e0d2a921e8ebd4818f1cc27052af7c0f28d7
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Sep 14 16:21:00 2018 -0700
+
+    v1.22 Added DBD::MariaDB support
+    
+    Newer versions of MariaDB don't compile with DBD::mysql, so now
+    it's possible to use them with DBD::MariaDB driver by passing
+    "dbi_driver=MariaDB" option on connection DSN.
+    
+    No code changes should be necessary.
+
+commit 1ab1695fedf7bc650ccd356a274e9e42d03a0144
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Aug 25 07:45:25 2018 -0700
+
+    Force ExtUtils::MakeMaker 6.64
+
 commit aa9473e424b1372e29e8c74b9071f904946fc296
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Jul 7 09:19:59 2018 -0700
@@ -35,55 +74,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Tue Dec 12 16:09:29 2017 -0800
 
     Version bump on XAO::FS to 1.17
-
-commit f905cd81b4e3caa88e5eacf7c4a9a471f39360ae
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Tue Dec 12 16:06:31 2017 -0800
-
-    Better support for default values
-    
-    * Fixing stored defaults if they are out of sync with the config
-    * New test case for defaults
-    * Validating default against other constraints
-    * Real/integer values are converted to such
-    
-    What started this is MariaDB not being able to store '' string in a
-    numeric field in version 10.2.9, which broke an existing db that had
-    empty defaults for numerics.
-
-commit 6cf445ae9cc13e795cef84fef19701545300ef4e
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Dec 9 20:30:58 2017 -0800
-
-    Updated for using in perlbrew environment
-    
-    No functional changes -- just replacing hard coded /usr/bin/perl path
-    with PATH based perl, wherever it might be.
-
-commit 023e531233909fad2d3c8d3e5900fafcc6fd6336
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Jun 26 18:18:21 2017 -0700
-
-    Removed STDERR redirect on reconnects
-    
-    If DBD wants to print a warning so be it, removed temporary redirect to
-    null. That's faster and cleaner.
-
-commit 4e9449da6fbece09729741e93bcd2909ae335500
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Jun 26 18:10:21 2017 -0700
-
-    Preserving layers when redirecting STDERR
-    
-    It's a bit of a hack, but should work for when STDERR has some
-    non-default encoding layers applied to it (like UTF-8).
-
-commit b3f13274e715ae67197264e5dd76e06b70760e9e
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri May 5 12:45:20 2017 -0700
-
-    Added 'objname' call to XAO::DO::Atom
-    
-    It's useful to have an all Atom derived objects and does not conflict
-    with anything.
 

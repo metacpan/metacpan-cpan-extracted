@@ -2,7 +2,7 @@ package Pcore::Core::Event::Listener::xmpp;
 
 use Pcore -class, -ansi, -const;
 use Pcore::XMPP;
-use Pcore::Util::Scalar qw[weaken];
+use Pcore::Util::Scalar qw[weaken is_ref];
 use Pcore::Util::Data qw[to_json];
 use Time::HiRes qw[];
 
@@ -53,7 +53,7 @@ sub forward_event ( $self, $ev ) {
         if ( defined $ev->{data} ) {
 
             # serialize reference
-            $ev->{text} = $LF . ( ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data} );
+            $ev->{text} = "\n" . ( is_ref $ev->{data} ? to_json $ev->{data}, readable => 1 : $ev->{data} );
 
             # indent
             $ev->{text} =~ s/^/$INDENT/smg;

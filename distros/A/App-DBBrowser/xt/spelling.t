@@ -41,3 +41,4 @@ subquery
 MERCHANTIBILITY
 SQ
 SGR
+AVG

@@ -51,6 +51,12 @@ C<--remote-debugging-port> option. Either stop all Chrome instances and
 launch a separate Chrome session using a separate data directory using
 the C<data_directory> option.
 
+=head2 Lost UI shared context
+
+When Chrome is run in headless mode, Chrome throws a C<Lost UI shared context>
+error. This error can be ignored and does not affect the operation of this
+module.
+
 =head1 REPORTING AN ISSUE
 
 Ideally you ask your question on the public support forum, as then other people
@@ -88,5 +94,5 @@ This module is released under the same terms as Perl itself.
 =cut
 
 package WWW::Mechanize::Chrome::Troubleshooting;
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 1;

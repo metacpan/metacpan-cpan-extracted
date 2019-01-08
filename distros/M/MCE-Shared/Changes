@@ -1,6 +1,10 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.840 Thu Jan 03 23:30:00 EST 2019
+
+  * Improved destroy and exit cleanup in MCE::Shared::Server.
+
 1.839 Sat Aug 25 13:00:00 EST 2018
 
   * Seeds the Math::Random::MT::Auto generator automatically when present

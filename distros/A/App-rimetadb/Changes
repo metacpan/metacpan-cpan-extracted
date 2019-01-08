@@ -1,3 +1,10 @@
+0.220   2019-01-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace the use of Package::MoreUtil with Package::Util::Lite.
+
+
 0.21    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

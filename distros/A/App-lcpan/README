@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.028 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2018-11-29.
+    This document describes version 1.031 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2019-01-08.
 
 SYNOPSIS
     See lcpan script.
@@ -56,6 +56,13 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
 
     Returns an enveloped result (an array).
 
@@ -159,13 +166,20 @@ FUNCTIONS
 
     *   modules* => *array[perl::modname]*
 
-    *   perl_version => *str* (default: "v5.26.0")
+    *   perl_version => *str* (default: "v5.26.1")
 
         Set base Perl version for determining core modules.
 
     *   phase => *str* (default: "runtime")
 
     *   rel => *str* (default: "requires")
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
 
     *   with_xs_or_pp => *bool*
 
@@ -256,6 +270,13 @@ FUNCTIONS
 
         Sort the result.
 
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -324,7 +345,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.0")
+    *   perl_version => *str* (default: "v5.26.1")
 
         Set base Perl version for determining core modules.
 
@@ -337,6 +358,13 @@ FUNCTIONS
     *   sort => *array[str]* (default: ["module"])
 
         Sort the result.
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
 
     Returns an enveloped result (an array).
 
@@ -397,6 +425,13 @@ FUNCTIONS
     *   sort => *str* (default: "name")
 
     *   to_level => *int*
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
 
     Returns an enveloped result (an array).
 
@@ -463,7 +498,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.26.0")
+    *   perl_version => *str* (default: "v5.26.1")
 
         Set base Perl version for determining core modules.
 
@@ -476,6 +511,13 @@ FUNCTIONS
     *   sort => *array[str]* (default: ["module"])
 
         Sort the result.
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
 
     Returns an enveloped result (an array).
 
@@ -540,6 +582,13 @@ FUNCTIONS
     *   phase => *str* (default: "ALL")
 
     *   rel => *str* (default: "ALL")
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
 
     Returns an enveloped result (an array).
 
@@ -618,6 +667,13 @@ FUNCTIONS
 
     *   sort => *array[str]* (default: ["name"])
 
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -655,6 +711,13 @@ FUNCTIONS
         contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
         the index will be located solely using the "index_name".
 
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -691,6 +754,13 @@ FUNCTIONS
         index will be located in the top-level of "cpan". If "index_name"
         contains a path, e.g. "./index.db" or "/home/ujang/lcpan.db" then
         the index will be located solely using the "index_name".
+
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
 
     Returns an enveloped result (an array).
 
@@ -779,6 +849,13 @@ FUNCTIONS
 
         Update the index.
 
+    *   use_bootstrap => *bool* (default: 1)
+
+        Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+        If you are indexing your private CPAN-like repository, you want to
+        turn this off.
+
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
@@ -823,7 +900,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

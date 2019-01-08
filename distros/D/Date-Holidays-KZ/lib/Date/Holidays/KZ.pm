@@ -1,7 +1,42 @@
 package Date::Holidays::KZ;
-$Date::Holidays::KZ::VERSION = '0.2018.0';
-# ABSTRACT: Determine Kazakhstan official holidays and business days.
+our $VERSION = '0.2019.0'; # VERSION
 
+=encoding utf8
+
+=head1 NAME
+
+Date::Holidays::KZ - Determine Kazakhstan official holidays and business days.
+
+=head1 SYNOPSIS
+
+    use Date::Holidays::KZ qw( is_holiday holidays is_business_day );
+
+    my ( $year, $month, $day ) = ( localtime )[ 5, 4, 3 ];
+    $year  += 1900;
+    $month += 1;
+
+    if ( my $holidayname = is_holiday( $year, $month, $day ) ) {
+        print "Today is a holiday: $holidayname\n";
+    }
+
+    my $ref = holidays( $year );
+    while ( my ( $md, $name ) = each %$ref ) {
+        print "On $md there is a holiday named $name\n";
+    }
+
+    if ( is_business_day( 2012, 03, 11 ) ) {
+        print "2012-03-11 is business day on weekend\n";
+    }
+
+    if ( is_short_business_day( 2015, 04, 30 ) ) {
+        print "2015-04-30 is short business day\n";
+    }
+
+    $Date::Holidays::KZ::strict=1;
+    # here we die because time outside from $HOLIDAYS_VALID_SINCE to $INACCURATE_TIMES_SINCE
+    holidays( 9001 );
+
+=cut
 
 use warnings;
 use strict;
@@ -15,23 +50,37 @@ our @EXPORT_OK = qw(
     is_business_day
     is_short_business_day
 );
+use vars qw($strict $HOLIDAYS_VALID_SINCE $INACCURATE_TIMES_SINCE);
+
+=head2 $Date::Holidays::KZ::HOLIDAYS_VALID_SINCE, $Date::Holidays::KZ::INACCURATE_TIMES_SINCE
+
+HOLIDAYS_VALID_SINCE before this year package doesn't matter
+INACCURATE_TIMES_SINCE after this year dates of holidays and working day shift are not accurate, but you can most likely be sure of historical holidays
+
+=cut
+
+$HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
+$INACCURATE_TIMES_SINCE = 2020;
+
+
+=head2 $Date::Holidays::KZ::strict
+
+Allows you to return an error if the requested date is outside the determined times.
+Default is 0.
+
+=cut
+
+$strict = 0;
 
 use Carp;
 use Time::Piece;
 use List::Util qw/ first /;
 
-
-my $HOLIDAYS_VALID_SINCE = 2018; # TODO
-my $BUSINESS_DAYS_VALID_SINCE = 2018;
-
-# sources:
-# https://ru.wikipedia.org/wiki/Праздники_Казахстана
-# https://online.zakon.kz/Document/?doc_id=33843977#pos=25;-101&sdoc_params=text%3D%25D0%259F%25D1%2580%25D0%25BE%25D0%25B8%25D0%25B7%25D0%25B2%25D0%25BE%25D0%25B4%25D1%2581%25D1%2582%25D0%25B2%25D0%25B5%25D0%25BD%25D0%25BD%25D1%258B%25D0%25B9%2520%25D0%25BA%25D0%25B0%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B4%25D0%25B0%25D1%2580%25D1%258C%25202018%26mode%3Dindoc%26topic_id%3D33843977%26spos%3D1%26tSynonym%3D1%26tShort%3D1%26tSuffix%3D1&sdoc_pos=0
-
+# internal date formatting alike ISO 8601: MMDD
 my @REGULAR_HOLIDAYS = (
     {
         name => 'Новый год',
-		days => [ qw( 0101 0102 ) ],
+                days => [ qw( 0101 0102 ) ],
     },
     {
         name => 'Православное рождество',
@@ -73,37 +122,53 @@ my @REGULAR_HOLIDAYS = (
         name => 'День Независимости',
         days => [ qw( 1216 1217 ) ],
     },
+    # Курбан-айта goes to HOLIDAYS_SPECIAL because based on the muslim calendar
 );
 
-
 my %HOLIDAYS_SPECIAL = (
+    2017 => [ qw( 0103 0320 0508 0707 0901 1218 1219 ) ],
     2018 => [ qw( 0821 0309 0508 0430 0831 1203 1218 1231 ) ],
+    2019 => [ qw( 0325 0510 0708 1202 0811 ) ],
 );
 
 
 my %BUSINESS_DAYS_ON_WEEKENDS = (
+    2017 => [ qw( 0318 0701 ) ],
     2018 => [ qw( 0303 0505 0825 1229 ) ],
+    2019 => [ qw( 0504 ) ],
 );
 
 my %SHORT_BUSINESS_DAYS = (
-    2018 => [ qw(  ) ],
 );
 
+=head2 is_holiday( $year, $month, $day )
 
+Determine whether this date is a KZ holiday. Returns holiday name or undef.
+
+=cut
 
 sub is_holiday {
     my ( $year, $month, $day ) = @_;
-
     croak 'Bad params'  unless $year && $month && $day;
 
     return holidays( $year )->{ _get_date_key($month, $day) };
 }
 
+=head2 is_kz_holiday( $year, $month, $day )
+
+Alias for is_holiday().
+
+=cut
 
 sub is_kz_holiday {
     goto &is_holiday;
 }
 
+=head2 holidays( $year )
+
+Returns hash ref of all KZ holidays in the year.
+
+=cut
 
 my %cache;
 sub holidays {
@@ -111,7 +176,7 @@ sub holidays {
 
     return $cache{ $year }  if $cache{ $year };
 
-    my $holidays = _get_regular_holidays_kz_year($year);
+    my $holidays = _get_regular_holidays_by_year($year);
 
     if ( my $spec = $HOLIDAYS_SPECIAL{ $year } ) {
         $holidays->{ $_ } = 'Перенос праздничного дня'  for @$spec;
@@ -120,9 +185,12 @@ sub holidays {
     return $cache{ $year } = $holidays;
 }
 
-sub _get_regular_holidays_kz_year {
+sub _get_regular_holidays_by_year {
     my ($year) = @_;
     croak "KZ holidays is not valid before $HOLIDAYS_VALID_SINCE"  if $year < $HOLIDAYS_VALID_SINCE;
+    if ($strict) {
+		croak "KZ holidays is not valid after @{[ $INACCURATE_TIMES_SINCE - 1 ]}"  if $year >= $INACCURATE_TIMES_SINCE;
+    }
 
     my %day;
     for my $holiday (@REGULAR_HOLIDAYS) {
@@ -150,6 +218,11 @@ sub _resolve_yhash_value {
 }
 
 
+=head2 is_business_day( $year, $month, $day )
+
+Returns true if date is a business day in KZ taking holidays and weekends into account.
+
+=cut
 
 sub is_business_day {
     my ( $year, $month, $day ) = @_;
@@ -174,6 +247,11 @@ sub is_business_day {
     return 0;
 }
 
+=head2 is_short_business_day( $year, $month, $day )
+
+Returns true if date is a shortened business day in KZ.
+
+=cut
 
 sub is_short_business_day {
     my ( $year, $month, $day ) = @_;
@@ -190,91 +268,29 @@ sub _get_date_key {
     return sprintf '%02d%02d', $month, $day;
 }
 
+=head1 LICENSE
 
-1;
+This software is copyright (c) 2019 by Vladimir Varlamov.
 
-__END__
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-=pod
+Terms of the Perl programming language system itself
 
-=encoding UTF-8
+a) the GNU General Public License as published by the Free
+   Software Foundation; either version 1, or (at your option) any
+   later version, or
+b) the "Artistic License"
 
-=head1 NAME
+=cut
 
-Date::Holidays::KZ - Determine Kazakhstan official holidays and business days.
-
-=head1 VERSION
-
-version 0.2018.0
-
-=head1 SYNOPSIS
-
-    use Date::Holidays::KZ qw( is_holiday holidays is_business_day );
-
-    binmode STDOUT, ':encoding(UTF-8)';
-   
-    my ( $year, $month, $day ) = ( localtime )[ 5, 4, 3 ];
-    $year  += 1900;
-    $month += 1;
-
-    if ( my $holidayname = is_holiday( $year, $month, $day ) ) {
-        print "Today is a holiday: $holidayname\n";
-    }
-    
-    my $ref = holidays( $year );
-    while ( my ( $md, $name ) = each %$ref ) {
-        print "On $md there is a holiday named $name\n";
-    }
-    
-    if ( is_business_day( 2012, 03, 11 ) ) {
-        print "2012-03-11 is business day on weekend\n";
-    }
-
-    if ( is_short_business_day( 2015, 04, 30 ) ) {
-        print "2015-04-30 is short business day\n";
-    }
-
-=head2 is_holiday( $year, $month, $day )
-
-Determine whether this date is a KZ holiday. Returns holiday name or undef.
-
-=head2 is_kz_holiday( $year, $month, $day )
-
-Alias for is_holiday().
-
-=head2 holidays( $year )
-
-Returns hash ref of all KZ holidays in the year.
-
-=head2 is_business_day( $year, $month, $day )
-
-Returns true if date is a business day in KZ taking holidays and weekends into account.
-
-=head2 is_short_business_day( $year, $month, $day )
-
-Returns true if date is a shortened business day in KZ.
-
-=head1 NAME
-
-Date::Holidays::KZ
-
-=head1 VERSION
-
-version 0.2018.0
 
 =head1 AUTHOR
 
 Vladimir Varlamov, C<< <bes.internal@gmail.com> >>
 
-=head1 AUTHOR
-
-Vladimir Varlamov <bes.internal@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by Vladimir Varlamov.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
+
+
+
+1;

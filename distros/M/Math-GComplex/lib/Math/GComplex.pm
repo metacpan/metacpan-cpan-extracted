@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use overload
   '""' => \&stringify,
@@ -98,15 +98,21 @@ use overload
                );
 
     my %special = (
-                   exp  => sub (_) { goto &exp },        # built-in function
-                   log  => sub (_) { goto &log },        # built-in function
-                   sqrt => sub (_) { goto &sqrt },       # built-in function
-                   cbrt => \&cbrt,
-                   logn => \&logn,
-                   root => \&root,
-                   pow  => \&pow,
-                   pown => \&pown,
-                  );
+
+        exp  => sub (_) { goto &exp },        # built-in function
+        log  => sub (_) { goto &log },        # built-in function
+        sqrt => sub (_) { goto &sqrt },       # built-in function
+
+        cbrt => \&cbrt,
+        logn => \&logn,
+        root => \&root,
+        pow  => \&pow,
+        pown => \&pown,
+
+        gcd    => \&gcd,
+        invmod => \&invmod,
+        powmod => \&powmod,
+    );
 
     my %misc = (
 
@@ -125,6 +131,7 @@ use overload
 
         floor => \&floor,
         ceil  => \&ceil,
+        round => \&round,
 
         reals => \&reals,
     );
@@ -344,8 +351,6 @@ sub mod {
 sub inv ($) {
     my ($x) = @_;
 
-    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
-
     state $one = __PACKAGE__->new(1, 0);
 
     $one->div($x);
@@ -541,7 +546,7 @@ sub exp {
 ## x^y = exp(log(x) * y)
 #
 
-sub pow {
+sub pow ($$) {
     my ($x, $y) = @_;
 
     $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
@@ -562,6 +567,10 @@ sub pow {
 
     $x->log->mul($y)->exp;
 }
+
+#
+## x^n using the exponentiation by squaring method
+#
 
 sub pown ($$) {
     my ($x, $y) = @_;
@@ -594,8 +603,131 @@ sub pown ($$) {
         ($ax, $bx) = ($ax * $ax - $bx * $bx, $ax * $bx + $bx * $ax);
     }
 
-    my $res = __PACKAGE__->new($rx, $ry);
-    $neg ? $res->inv : $res;
+    $neg ? __PACKAGE__->new($rx, $ry)->inv : __PACKAGE__->new($rx, $ry);
+}
+
+#
+## Greatest common divisor
+#
+
+sub gcd ($$) {
+    my ($n, $k) = @_;
+
+    $n = __PACKAGE__->new($n) if ref($n) ne __PACKAGE__;
+    $k = __PACKAGE__->new($k) if ref($k) ne __PACKAGE__;
+
+    my $norm_n = $n->{a} * $n->{a} + $n->{b} * $n->{b};
+    my $norm_k = $k->{a} * $k->{a} + $k->{b} * $k->{b};
+
+    if ($norm_n > $norm_k) {
+        ($n, $k) = ($k, $n);
+    }
+
+    while (!($k->{a} == 0 and $k->{b} == 0)) {
+
+        my $q = $n->div($k)->round;
+        my $r = $n->sub($q->mul($k));
+
+        ($n, $k) = ($k, $r);
+    }
+
+    $n;
+}
+
+#
+## Modular multiplicative inverse: 1/x (mod m)
+#
+
+sub invmod ($$) {
+    my ($x, $m) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    $m = __PACKAGE__->new($m) if ref($m) ne __PACKAGE__;
+
+    my $g = $x->gcd($m);
+
+    $g->abs == 1 or return undef;
+
+    state $zero = __PACKAGE__->new(0, 0);
+
+    my $inverse = sub {
+        my ($x, $m, $k) = @_;
+
+        my ($u, $w) = ($k, $zero);
+        my ($q, $r);
+
+        my $c = $m;
+
+        while (!($c->{a} == 0 and $c->{b} == 0)) {
+
+            $q = $x->div($c)->round;
+            $r = $x->sub($q->mul($c));
+
+            ($x, $c) = ($c, $r);
+            ($u, $w) = ($w, $u->sub($q->mul($w)));
+        }
+
+        return $u;
+    };
+
+    state $one  = __PACKAGE__->new(1,  0);
+    state $mone = __PACKAGE__->new(-1, 0);
+
+    state $i  = __PACKAGE__->new(0, 1);
+    state $mi = __PACKAGE__->new(0, -1);
+
+    foreach my $k ($g->conj, $one, $mone, $i, $mi) {
+
+        my $inv = $inverse->($x, $m, $k);
+        my $t   = $x->mul($inv)->mod($m);
+
+        if ($t->{a} == 1 and $t->{b} == 0) {
+            return $inv->mod($m);
+        }
+    }
+
+    return undef;
+}
+
+#
+## x^n mod m using the exponentiation by squaring method
+#
+
+sub powmod ($$$) {
+    my ($x, $y, $m) = @_;
+
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    $m = __PACKAGE__->new($m) if ref($m) ne __PACKAGE__;
+
+    $y = CORE::int($y);
+    my $neg = $y < 0;
+    $y = CORE::int(CORE::abs($y));
+
+    if ($x->{a} == 0 and $x->{b} == 0) {
+
+        if ($neg) {
+            return $x->invmod($m);
+        }
+
+        if ($y == 0) {
+            return __PACKAGE__->new($x->{a} + 1, $x->{b})->mod($m);
+        }
+
+        return $x->mod($m);
+    }
+
+    $x = $x->invmod($m) if $neg;
+    $x // return undef;
+
+    my $r = __PACKAGE__->new(1, 0);
+
+    while (1) {
+        $r = $r->mul($x)->mod($m) if ($y & 1);
+        ($y >>= 1) or last;
+        $x = $x->mul($x)->mod($m);
+    }
+
+    $r->mod($m);
 }
 
 #
@@ -662,6 +794,21 @@ sub int {
     my $t2 = CORE::int($x->{b});
 
     __PACKAGE__->new($t1, $t2);
+}
+
+#
+## round to the nearest Gaussian integer
+#
+
+sub _round ($) {
+    my ($n) = @_;
+    CORE::int(($n + $n + (($n < 0) ? -1 : 1)) / 2);
+}
+
+sub round ($) {
+    my ($x) = @_;
+    $x = __PACKAGE__->new($x) if ref($x) ne __PACKAGE__;
+    __PACKAGE__->new(_round($x->{a}), _round($x->{b}));
 }
 
 #

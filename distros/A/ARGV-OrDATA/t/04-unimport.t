@@ -6,6 +6,11 @@ use Test::More tests => 4;
 
 use FindBin;
 
+BEGIN {
+    open *STDIN, '<&', IO::Pty->new
+        if ! -t && eval { require IO::Pty };
+}
+
 use ARGV::OrDATA;
 
 SKIP: {

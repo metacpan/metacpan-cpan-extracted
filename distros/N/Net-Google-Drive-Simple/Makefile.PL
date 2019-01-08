@@ -1,14 +1,14 @@
 ######################################################################
 # Makefile.PL for Net::Google::Drive::Simple
-# 2012, Mike Schilli <cpan@perlmeister.com>
+# 2019, Mike Schilli <cpan@perlmeister.com>
 ######################################################################
 use ExtUtils::MakeMaker;
 
 my $meta_merge = {
     META_MERGE => {
         resources => {
-            repository  => 
-                'http://github.com/mschilli/net-google-drive-simple.git',
+            repository => 'http://github.com/mschilli/net-google-drive-simple.git',
+            bugtracker => 'https://github.com/mschilli/net-google-drive-simple/issues',
         },
     }
 };

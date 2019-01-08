@@ -2,7 +2,7 @@
 #$Author: andrius $
 #$Date: 2018-11-21 09:40:40 +0200 (Tr, 21 lapkr. 2018) $
 #$Revision: 32 $
-#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/jcamp-dx/trunk/lib/JCAMP/DX/ASDF.pm $
+#$URL: svn+ssh://www.crystallography.net/home/coder/svn-repositories/jcamp-dx/tags/v0.02/lib/JCAMP/DX/ASDF.pm $
 #------------------------------------------------------------------------------
 #*
 #  Encoder/decoder for ASDF formats.

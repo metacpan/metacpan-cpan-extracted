@@ -10,6 +10,11 @@ Fortran subroutines on your system.
 
 2. Install
 
+Run "cpanm ExtUtils::F77". To install cpanm, see
+https://metacpan.org/pod/App::cpanminus#INSTALLATION
+
+If you would like to install manually:
+
 Extract archive file.
 Change current directory to extraction directory (usually ExtUtils-F77-x.xx/ where "x.xx" is version
 number).

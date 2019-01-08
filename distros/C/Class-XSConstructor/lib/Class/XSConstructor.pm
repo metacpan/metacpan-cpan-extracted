@@ -6,7 +6,7 @@ use XSLoader ();
 package Class::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.008';
+our $VERSION   = '0.009';
 
 use Exporter::Tiny 1.000000 qw( mkopt );
 use Ref::Util 0.100 qw( is_plain_arrayref is_plain_hashref is_blessed_ref is_coderef );
@@ -212,6 +212,135 @@ Including C<< __no_BUILD__ >>.
 
 =back
 
+=head1 API
+
+This section documents the API of Class::XSConstructor for other modules
+that wish to wrap its functionality (to perhaps provide additional features
+like accessors). If you are just using Class::XSConstructor to install a
+constructor into your class, you can skip this section of the documentation.
+
+=head2 Functions and Methods
+
+None of the following functions are exported.
+
+=over
+
+=item C<< Class::XSConstructor->import(@optlist) >>
+
+Does all the setup for a class to install the constructor. Will determine which
+class to install the constructor into based on C<caller>. You can override this
+using:
+
+  local $Class::XSConstructor::SETUP_FOR = "Some::Class::Name";
+
+Returns nothing.
+
+=item C<< Class::XSConstructor::install_constructor($subname) >>
+
+Just installs the XS constructor without doing some of the necessary setup.
+C<< $subname >> is a fully qualified sub name, like "Foo::new".
+
+This is automatically done as part of C<import>, so if you're using C<import>,
+you don't need to do this.
+
+Returns nothing.
+
+=item C<< Class::XSConstructor::inheritance_stuff($classname) >>
+
+Checks the C<< @ISA >> variable in the class and makes Class::XSConstructor
+aware of any attributes declared by parent classes. (Though only if those
+parent classes use Class::XSConstructor.)
+
+This is automatically done as part of C<import>, so if you're using C<import>,
+you don't need to do this.
+
+Returns nothing.
+
+=item C<< ($ar_has, $ar_required, $hr_isa, $sr_build) = Class::XSConstructor::get_vars($classname) >>
+
+Returns references to the variables where Class::XSConstructor stores its
+configuration for the class.
+
+See L</Use of Package Variables>.
+
+=item C<< Class::XSConstructor::populate_build($classname) >>
+
+This will need to be called if the list of C<BUILD> methods that ought to be
+called when constructing an object of the given class changes at runtime.
+(Which would be pretty unusual.)
+
+Returns nothing.
+
+=back
+
+=head2 Use of Package Variables
+
+Class::XSConstructor stores its configuration for class Foo in the following
+global variables:
+
+=over
+
+=item C<< @Foo::__XSCON_HAS >>
+
+A list of all attributes which the constructor should accept (both required
+and optional), including attributes defined by parent classes.
+
+C<inheritance_stuff> will automatically populate this from parent classes,
+and C<import> (which calls C<inheritance_stuff>) will populate it based on
+C<< @optlist >>.
+
+=item C<< @Foo::__XSCON_REQUIRED >>
+
+A list of all attributes which the constructor should require, including
+attributes defined by parent classes.
+
+C<inheritance_stuff> will automatically populate this from parent classes,
+and C<import> (which calls C<inheritance_stuff>) will populate it based on
+C<< @optlist >>.
+
+=item C<< %Foo::__XSCON_ISA >>
+
+A map of attributes to type constraint coderefs, including attributes
+defined by parent classes. Type constraints must be coderefs, not
+L<Type::Tiny> objects.
+
+C<inheritance_stuff> will automatically populate this from parent classes,
+and C<import> (which calls C<inheritance_stuff>) will populate it based on
+C<< @optlist >>, including converting type constraint objects to coderefs.
+
+=item C<< $Foo::__XSCON_BUILD >>
+
+If set to "0", indicates that XSConstructor should not try to call
+C<BUILD> methods for the class (probably because there are none, so
+it would be a waste of time scanning through the inheritance tree
+looking for them).
+
+If set to an arrayref of coderefs, these will be the methods which
+the constructor calls.
+
+If set to undef, the constructor will populate this method with
+either the value "0" or an arrayref of coderefs next time it is
+called.
+
+Any other value is invalid.
+
+C<import> will set this to undef.
+
+=back
+
+If these package variables have not been declared, there is a very good
+chance that the constructor will segfault. C<import> will automatically
+declare and populate them for you. C<get_vars> will declare them and
+return a list of references to them.
+
+Although you I<can> set up Class::XSConstructor by fiddling with these
+package variables and then installing the constructor sub, it will
+probably be easier to use C<import>. For L<MooX::XSConstructor>, even
+though I'm obviously intimately familiar with the internals of
+Class::XSConstructor, I just translate the Moo attribute definitions
+into something suitable for C<< @optlist >>, set C<< $SETUP_FOR >>, then
+call C<import>.
+
 =head1 CAVEATS
 
 Inheritance will automatically work if you are inheriting from another
@@ -223,7 +352,7 @@ An easy way to do this is to use L<parent> before using Class::XSConstructor.
   package Employee {
     use parent "Person";
     use Class::XSConstructor qw( employee_id! );
-    use Class::XSAccessor { getters => [qw()] };
+    use Class::XSAccessor { getters => [qw(employee_id)] };
   }
 
 =head1 BUGS
@@ -245,7 +374,7 @@ To everybody in I<< #xs >> on irc.perl.org.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2018 by Toby Inkster.
+This software is copyright (c) 2018-2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

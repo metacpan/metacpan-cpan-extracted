@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Barpolar::Stream;
 use Chart::Plotly::Trace::Barpolar::Transform;
 use Chart::Plotly::Trace::Barpolar::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The data visualized by the radial span of the bars is set in `r`
 
@@ -83,7 +83,7 @@ has dtheta => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -262,7 +262,7 @@ Chart::Plotly::Trace::Barpolar - The data visualized by the radial span of the b
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

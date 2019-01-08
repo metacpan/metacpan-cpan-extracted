@@ -1,4 +1,105 @@
-1.125 2018-?-??
+1.128 2019-01-06
+================
+[Prty::MediaWiki::Markup]
+POD-Fehler behoben.
+
+[Prty::Test::Class]
+Durch skipTest() verursachte Meldungen à la "does not map to ascii" behoben.
+
+[Prty::TempDir]
+Test bei Setzung von TMPDIR korrigiert.
+
+[Prty::TempFile]
+Test bei Setzung von TMPDIR korrigiert.
+
+1.126 2019-01-06
+================
+[Prty::Confluence::Client]
+Doku bearbeitet.
+
+[Prty::Confluence::Markup]
+Doku bearbeitet.
+
+[Prty::Confluence::Page]
+Von Data::Printer auf Prty::Debug umgestellt.
+
+[Prty::Database::Resultset]
+Methode asString() um Option -info erweitert.
+
+[Prty::LaTeX::LongTable]
+Alignment-Erkennung auf erstes Zeichen beschränkt.
+
+[Prty::MediaWiki::Api]
+Klasse Prty::MediaWiki::Client Prty::MediaWiki::Api umbenannt.
+
+[Prty::MediaWiki::Loader]
+Klasse hinzugefügt.
+
+[Prty::MediaWiki::Markup]
+Tabellen und Listen hinzugefügt.
+
+[Prty::MediaWiki::Page]
+Klasse entfernt.
+
+[Prty::Test::Class]
+Doku bearbeitet.
+
+[Prty::AnsiColor]
+Default für Konstruktorargument.
+
+[Prty::AsciiTable]
+Von FileHandle auf split() umgestellt.
+
+[Prty::Cascm]
+Klasse hinzugefügt.
+
+[Prty::ColumnFormat]
+Formatstring für numerische Werte umgestellt, da Problem bei großen Werten.
+
+[Prty::Debug]
+Methode dump() zur Ausgabe von Datenstrukturen hinzugefügt.
+
+[Prty::FileHandle]
+Option -createDir auf Dateischreiben eingeschränkt.
+
+[Prty::Parameters]
+Methoden extractPropertiesToVariables(), extractToVariables() hinzugefügt.
+
+[Prty::Path]
+Methoden copyToDir(), encoding(), findProgram(), exists() hinzugefügt.
+Begonnen, Tilde-Expansion hinzuzufügen.
+
+[Prty::Process]
+Methoden-Alias cd() für cwd() hinzugefügt.
+
+[Prty::Program]
+Methode parameters() hinzugefügt.
+
+[Prty::Record]
+Behandlung von Encoding hinzugefügt.
+
+[Prty::Shell]
+Attribut cmdAnsiColor hinzugefügt.
+
+[Prty::Storable]
+Methode memoize() hinzugefügt.
+
+[Prty::TempDir]
+Klasse hinzugefügt.
+
+[Prty::TempFile]
+Klasse hinzugefügt.
+
+[Prty::Time]
+Zeitformat YYYYMMDD hinzugefügt.
+
+[Prty::TreeFormatter]
+Stop-Erkennung und -Formatierung hinzugefügt.
+
+[Prty::Udl]
+UDL-Zerlegung reimplementiert, damit Quoting von Metazeichen möglich ist.
+
+1.125 2018-10-21
 ================
 [Prty::Test::Class]
 Umlaute in Ausgabe von skipTest(), skipAllTests() konvertiert

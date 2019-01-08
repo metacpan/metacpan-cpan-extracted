@@ -7,7 +7,16 @@ use lib "$Bin/lib";
 
 use TestUtils;
 
-use Test::More tests => 6;
+use Test::More;
+
+if ($ENV{APP_TESTONTAP_SKIP_TEST_60})
+{
+	plan skip_all => 'Skipped to work around a problem when run in Travis and git commit message is more than one line long';
+}
+else
+{
+	plan tests => 6;
+}
 
 my $now = time();
 my $now1 = $now+1;

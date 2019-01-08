@@ -59,6 +59,8 @@ examples/cif/parse_dump.pl
 examples/cif/parse_dump_mols.pl
 examples/group_rot.pl
 examples/hackamol_synopsis.pl
+examples/kdtree_neigh/cys_neigh.pl
+examples/kdtree_neigh/sphere_carve.pl
 examples/store.pl
 examples/store_mol.pl
 examples/superpose/superpose_nmr.pl
@@ -102,6 +104,7 @@ t/HackaMol/Dihedral.t
 t/HackaMol/HackaMol_Hgbonds.t
 t/HackaMol/Molecule.t
 t/HackaMol/Roles/AtomGroupRole.t
+t/HackaMol/Roles/AtomGroupRole/centered_vector.t
 t/HackaMol/Roles/DirRole.t
 t/HackaMol/Roles/ExeRole.t
 t/HackaMol/Roles/FileFetchRole.t

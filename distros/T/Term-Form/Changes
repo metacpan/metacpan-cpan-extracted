@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.505   2019-01-05
+        - Bugfix in "read_line".
+
 0.504   2018-12-25
         - Bugfix "line_fold".
 

@@ -1,6 +1,5 @@
 #!/usr/local/bin/perl -w
 use strict;
-use lib 'lib';
 
 use Sysadm::Install qw(:all);
 use Net::Google::Drive::Simple;

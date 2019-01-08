@@ -1,10 +1,12 @@
-# $Id: 01basic.t 31 2011-06-12 22:56:18Z stro $
+# $Id: 01basic.t 70 2019-01-04 19:39:59Z stro $
 
 use strict;
 use warnings;
 use Test::More;
-BEGIN {plan tests => 4};
-for (qw(CPAN::SQLite::Index CPAN::SQLite::Search
-        CPAN::SQLite CPAN::SQLite::META)) {
-  require_ok($_);
-}
+
+plan tests => 4;
+
+require_ok('CPAN::SQLite::Index');
+require_ok('CPAN::SQLite::Search');
+require_ok('CPAN::SQLite');
+require_ok('CPAN::SQLite::META');

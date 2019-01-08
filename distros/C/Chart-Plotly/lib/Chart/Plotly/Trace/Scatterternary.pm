@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scatterternary::Textfont;
 use Chart::Plotly::Trace::Scatterternary::Transform;
 use Chart::Plotly::Trace::Scatterternary::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Provides similar functionality to the *scatter* type but on a ternary phase diagram. The data is provided by at least two arrays out of `a`, `b`, `c` triplets.
 
@@ -124,7 +124,7 @@ has fillcolor => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -138,7 +138,8 @@ has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scatterternary::Hoverlabel", );
 
 has hoveron => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.",
 );
@@ -181,7 +182,8 @@ has marker => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scatterternary::Marker", );
 
 has mode => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Determines the drawing mode for this scatter trace. If the provided `mode` includes *text* then the `text` elements appear at the coordinates. Otherwise, the `text` elements appear on hover. If there are less than 20 points and the trace is not stacked then the default is *lines+markers*. Otherwise, *lines*.",
 );
@@ -307,7 +309,7 @@ Chart::Plotly::Trace::Scatterternary - Provides similar functionality to the *sc
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

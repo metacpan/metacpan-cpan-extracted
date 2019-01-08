@@ -41,9 +41,9 @@ my %WriteMakefileArgs = (
     "YAML::XS" => "0.69",
     "namespace::autoclean" => 0
   },
-  "VERSION" => "0.050",
+  "VERSION" => "0.051",
   "test" => {
-    "TESTS" => "t/*.t t/HackaMol/*.t t/HackaMol/Roles/*.t"
+    "TESTS" => "t/*.t t/HackaMol/*.t t/HackaMol/Roles/*.t t/HackaMol/Roles/AtomGroupRole/*.t"
   }
 );
 

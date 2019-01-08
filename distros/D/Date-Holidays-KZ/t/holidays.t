@@ -1,17 +1,21 @@
 #!perl -T
 
 use utf8;
-use Test::More tests => 7;
+use Test::More tests => 8;
 
 BEGIN {
 	use_ok( 'Date::Holidays::KZ', qw( holidays ) );
 }
 
-my $ref = holidays( 2018 );
+is Date::Holidays::KZ::is_kz_holiday( 2017, 1, 1 ), Date::Holidays::KZ::is_holiday( 2017, 1, 1 ), 'alias';
 
-ok $ref->{ '0102' }, 'new year';
-ok $ref->{ '0508' }, 'holiday on business day';
-ok $ref->{ '0501' }, 'holiday';
+my $ref = holidays( 2017 );
 ok $ref->{ '0308' }, 'women day';
-ok $ref->{ '0831' }, 'holiday on business day';
-is $ref->{ '0312' }, undef, 'bad luck';
+ok $ref->{ '0509' }, 'women day afterparty';
+is $ref->{ '0310' }, undef, 'bad luck';
+
+my $ref = holidays( 9001 );
+ok $ref->{ '0308' }, 'women day';
+ok $ref->{ '0101' }, 'new year';
+is $ref->{ '0310' }, undef, 'bad luck';
+

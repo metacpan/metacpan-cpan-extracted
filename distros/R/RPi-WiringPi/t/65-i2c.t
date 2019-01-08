@@ -14,16 +14,13 @@ use constant MAX_BYTES => 4;
 my $mod = 'RPi::WiringPi';
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
-        warn "\n*** PI_BOARD is not set! ***\n";
-        $ENV{NO_BOARD} = 1;
-        plan skip_all => "not on a pi board\n";
-        exit;
+    if (! $ENV{RPI_ARDUINO}){
+        plan skip_all => "RPI_ARDUINO environment variable not set\n";
     }
 
-    if (! $ENV{RPI_ARDUINO}){
-        plan skip_all => "RPI_ARDUINO not set; no Arduino to test I2C\n";
-        exit;
+    if (! $ENV{PI_BOARD}){
+        $ENV{NO_BOARD} = 1;
+        plan skip_all => "Not on a Pi board\n";
     }
 }
 

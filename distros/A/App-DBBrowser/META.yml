@@ -40,7 +40,7 @@ requires:
   Term::Choose::Constants: '1.642'
   Term::Choose::LineFold: '1.642'
   Term::Choose::Util: '0.068'
-  Term::Form: '0.504'
+  Term::Form: '0.505'
   Term::TablePrint: '0.106'
   Text::CSV: '0'
   bytes: '0'
@@ -50,5 +50,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.036'
+version: '2.040'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

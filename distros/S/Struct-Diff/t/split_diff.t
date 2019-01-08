@@ -5,7 +5,7 @@ use warnings FATAL => 'all';
 
 use Storable qw(freeze);
 use Struct::Diff qw(diff split_diff);
-use Test::More tests => 15;
+use Test::More tests => 19;
 
 local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
 
@@ -23,6 +23,19 @@ $s = split_diff(diff(0, 1));
 is_deeply($s, {a => 0,b => 1}, "0 vs 1");
 
 ### arrays ###
+is_deeply(
+    split_diff(diff([], [0])),
+    {a => [], b => [0]},
+    'Old empty array should be preserved by split_diff()'
+);
+
+is_deeply(
+    split_diff(diff([0], [])),
+    {a => [0], b => []},
+    'New empty array should be preserved by split_diff()'
+);
+
+
 $d = diff([ 0 ], [ 0, 1 ]);
 
 $s = split_diff($d);
@@ -52,6 +65,18 @@ is_deeply($s, {a => [['a'],4],b => [['b'],5]}, "complex arrays, noU => 1");
 is($frozen_d, freeze($d), "original struct must remain unchanged");
 
 ### hashes ###
+is_deeply(
+    split_diff(diff({}, {'k' => 'v'})),
+    {a => {}, b => {'k' => 'v'}},
+    'Old empty hash should be preserved by split_diff()'
+);
+
+is_deeply(
+    split_diff(diff({'k' => 'v'}, {})),
+    {a => {'k' => 'v'}, b => {}},
+    'New empty hash should be preserved by split_diff()'
+);
+
 
 $x = { 'a' => 'a1', 'b' => { 'ba' => 'ba1', 'bb' => 'bb1' }, 'c' => 'c1' };
 $y = { 'a' => 'a1', 'b' => { 'ba' => 'ba2', 'bb' => 'bb1' }, 'd' => 'd1' };

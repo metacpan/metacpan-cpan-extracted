@@ -1,5 +1,12 @@
 See also the git repository.
 
+1.01    January  6 2019
+        Major interface changes to allow for both 4-way and 8-way map
+        normalization and path finding (probably did not break the
+        interface unless you were relying on something internal that
+        changed). Attributes max_cost and bad_cost changed to INT_MAX
+        and INT_MIN instead of ~0 and -1.
+
 0.08    Sat, 15 Sep 2018
         New BUILD code that calls map() xor str2map() for easier object
         setup. next* methods return array reference instead of list to

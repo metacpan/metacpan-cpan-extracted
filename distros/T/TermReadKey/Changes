@@ -1,3 +1,9 @@
+2.38	 - 2019-01-05
+	* Bundle up various changes including:
+		* Indexing improvements
+		* Makefile improvements for some make utils
+		* Various code cleanups and modernizations
+
 2.37	 - 2016-10-07
 
 	* Make minimum version of ExtUtils::MakeMaker 6.58

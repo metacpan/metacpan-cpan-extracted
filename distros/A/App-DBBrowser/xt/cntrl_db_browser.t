@@ -8,21 +8,26 @@ use Test::More;
 for my $file (
     'bin/db-browser',
     'lib/App/DBBrowser.pm',
-    'lib/App/DBBrowser/Opt.pm',
-    'lib/App/DBBrowser/OptDB.pm',
-    'lib/App/DBBrowser/DB.pm',
-    'lib/App/DBBrowser/CreateTable.pm',
-    'lib/App/DBBrowser/Auxil.pm',
     'lib/App/DBBrowser/AttachDB.pm',
-    'lib/App/DBBrowser/Join_Union.pm',
+    'lib/App/DBBrowser/Auxil.pm',
+    'lib/App/DBBrowser/CreateTable.pm',
     'lib/App/DBBrowser/Credentials.pm',
-    'lib/App/DBBrowser/DB/SQLite.pm',
+    'lib/App/DBBrowser/DB.pm',
+    'lib/App/DBBrowser/DB/MariaDB.pm',
     'lib/App/DBBrowser/DB/mysql.pm',
     'lib/App/DBBrowser/DB/Pg.pm',
+    'lib/App/DBBrowser/DB/SQLite.pm',
+    'lib/App/DBBrowser/GetContent.pm',
+    'lib/App/DBBrowser/GetContent/Filter.pm',
+    'lib/App/DBBrowser/Join.pm',
+    'lib/App/DBBrowser/Opt.pm',
+    'lib/App/DBBrowser/OptDB.pm',
     'lib/App/DBBrowser/Table.pm',
-    'lib/App/DBBrowser/Table/Insert.pm',
-    'lib/App/DBBrowser/Table/Functions.pm'
-                                              ) {
+    'lib/App/DBBrowser/Table/Functions.pm',
+    'lib/App/DBBrowser/Table/Substatements.pm',
+    'lib/App/DBBrowser/Table/WriteAccess.pm',
+    'lib/App/DBBrowser/Union.pm' ) {
+
     my $data_dumper   = 0;
     my $warnings      = 0;
     my $use_lib       = 0;

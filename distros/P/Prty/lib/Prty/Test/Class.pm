@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Test::Builder ();
 use Prty::Option;
@@ -649,17 +649,18 @@ sub skipAllTests {
 
 # -----------------------------------------------------------------------------
 
-=head3 skipTest() - Breche Test-Methode ab
+=head3 skipTest() - Brich Test-Methode ab
 
 =head4 Synopsis
 
     $test->skipTest($msg);
+    $test->skipTest($n,$msg);
 
 =head4 Description
 
 Setze Abbruchmeldung $msg auf dem Testobjekt und übergehe alle
-folgenden Tests der aktuellen Testmethode. Die Methode
-liefert keinen Wert zurück.
+folgenden Tests bzw. die nächsten $n Tests der aktuellen Testmethode.
+Die Methode liefert keinen Wert zurück.
 
 =cut
 
@@ -670,10 +671,11 @@ sub skipTest {
     # @_: $n,$msg -or- $msg
 
     if ($_[0] =~ /^\d+$/) {
-        # Um Warnungen à la "does not map to ascii" zu verhindern
-        $self->[5] = Prty::Converter->umlautToAscii(shift);
+        $self->[5] = shift;
     }
-    $self->[4] = shift;
+
+    # Um Warnungen à la "does not map to ascii" zu verhindern
+    $self->[4] = Prty::Converter->umlautToAscii(shift);
 
     return;
 }
@@ -1154,7 +1156,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -1162,7 +1164,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

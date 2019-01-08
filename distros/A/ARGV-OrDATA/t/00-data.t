@@ -6,6 +6,9 @@ use Test::More tests => 3;
 
 use FindBin;
 
+open *STDIN, '<&', IO::Pty->new
+    if ! -t && eval { require IO::Pty };
+
 SKIP: {
     skip "Can't run the test when stdin is not the terminal", 3
         unless -t;

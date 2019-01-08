@@ -54,6 +54,7 @@ my $opt_stat;
 my $opt_color = 1;
 my $opt_256 = 1;
 my @opt_colormap;
+my $opt_colordump;
 my $opt_commandcolor = 1;
 my $opt_markcolor = 1;
 my $opt_textcolor = 1;
@@ -104,6 +105,7 @@ my @optargs = (
     "textcolor|tc!" => \$opt_textcolor,
     "unknowncolor|uc!" => \$opt_unknowncolor,
     "colormap|cm=s" => \@opt_colormap,
+    "colordump" => \$opt_colordump,
     "h|help" => sub { usage() },
     "man" => sub { pod2usage({-verbose => 2}) },
     "env!" => \$opt_env,
@@ -193,6 +195,12 @@ grep { not $_->[0] }
 );
 
 warn 'colormap = ', Dumper \%colormap if $opt_d{c};
+
+if ($opt_colordump) {
+    print $color_handler->colormap(
+	name => '--changeme', option => '--colormap');
+    exit;
+}
 
 sub color {
     $color_handler->color(@_);
@@ -831,11 +839,9 @@ cdif - word context diff
 
 =head1 SYNOPSIS
 
-cdif [cdif option] file1 file2
+cdif [option] file1 file2
 
-cdif [rcs options] [cdif options] file
-
-cdif [cdif options] [diff-data]
+cdif [option] [diff-data]
 
 Options:
 
@@ -957,8 +963,8 @@ or combined with comma (,) :
 
     --cm FILED1=COLOR1,FIELD2=COLOR2, ...
 
-COLOR is combination of single character representing uppercase
-foreground color :
+Color specification is a combination of single uppercase character
+representing 8 colors :
 
     R  Red
     G  Green
@@ -976,27 +982,59 @@ and alternative (usually brighter) colors in lowercase :
 or RGB values and 24 grey levels if using ANSI 256 or full color
 terminal :
 
-    FORMAT:
-        foreground[/background]
+    (255,255,255)      : 24bit decimal RGB colors
+    #000000 .. #FFFFFF : 24bit hex RGB colors
+    #000    .. #FFF    : 12bit hex RGB 4096 colors
+    000 .. 555         : 6x6x6 RGB 216 colors
+    L00 .. L25         : Black (L00), 24 grey levels, White (L25)
 
-    COLOR:
-        000 .. 555       : 6 x 6 x 6 216 colors
-        000000 .. FFFFFF : 24bit RGB mapped to 216 colors
-        L00 .. L23       : 24 grey levels
+=over 4
 
-    Sample:
-        005     0000FF        : blue foreground
-           /505       /FF00FF : magenta background
-        000/555 000000/FFFFFF : black on white
-        500/050 FF0000/00FF00 : red on green
+Begining # can be omitted in 24bit RGB notation.
 
-and other effects :
+When values are all same in 24bit or 12bit RGB, it is converted to 24
+grey level, otherwise 6x6x6 216 color.
 
-    S  Stand-out (reverse video)
-    U  Underline
-    D  Double-struck (boldface)
-    F  Flash (blink)
-    E  Erase Line
+=back
+
+or color names enclosed by angle bracket :
+
+    <red> <blue> <green> <cyan> <magenta> <yellow>
+    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <medium_aqua_marine>
+
+with other special effects :
+
+    Z  0 Zero (reset)
+    D  1 Double-struck (boldface)
+    P  2 Pale (dark)
+    I  3 Italic
+    U  4 Underline
+    F  5 Flash (blink: slow)
+    Q  6 Quick (blink: rapid)
+    S  7 Stand-out (reverse video)
+    V  8 Vanish (concealed)
+    J  9 Junk (crossed out)
+
+    E    Erase Line
+
+    ;    No effect
+    X    No effect
+    /    Toggle foreground/background
+    ^    Reset to foreground
+
+At first the color is considered as foreground, and slash (C</>)
+switches foreground and background.  If multiple colors are given in
+the same spec, all indicators are produced in the order of their
+presence.  Consequently, the last one takes effect.
+
+If the spec start with plus (C<+>) or minus (C<->) character,
+following characters are appneded/deleted from previous value. Reset
+mark (C<^>) is inserted before appended string.
+
+Effect characters are case insensitive, and can be found anywhere and
+in any order in color spec string.  Because C<X> and C<;> takes no
+effect, you can use them to improve readability, like C<SxD;K/544>.
 
 Defaults are :
 
@@ -1083,6 +1121,14 @@ Environment variable B<CDIFOPTS> is used to set default options.
 =item L<https://github.com/kaz-utashiro/sdif-tools>
 
 =back
+
+=head1 LICENSE
+
+Copyright 1992-2019 Kazumasa Utashiro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
 
 =head1 SEE ALSO
 

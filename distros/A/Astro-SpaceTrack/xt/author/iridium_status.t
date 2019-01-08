@@ -25,10 +25,6 @@ my %known_inconsistent = (
 				# Kelso: Failed 16-Nov-2017
 				# Decayed: 24-Nov-2017
 				# Sladen removed 24-Nov-2017
-    24950 => { sladen => 1 },	# about 28-Aug-2017: Sladen declares failed
-				# Kelso: Backup 30-May-2018
-    24966 => { sladen => 1 },	# 14-Apr-2018: Sladen failed
-				# Kelso: Backup 30-May-2018
     25171 => { sladen => 1 },	# Sladen: Failed 09-Sep-2018
     25263 => { sladen => 1 },	# Sladen: operational; others: spare.
 				# Sladen: failed 09-Dec-2017 (Kelso: operational)
@@ -108,8 +104,7 @@ foreach (
  24945   Iridium 32     [+]      
  24946   Iridium 33     [-]      Tumbling
  24948   Iridium 28     [-]      Tumbling
- 24950   Iridium 31     [B]      
- 24966   Iridium 35     [B]      
+ 24966   Iridium 35     [-]      Tumbling
  24967   Iridium 36     [-]      Tumbling
  25042   Iridium 39     [-]      Tumbling
  25043   Iridium 38     [-]      Tumbling
@@ -125,7 +120,6 @@ foreach (
  25274   Iridium 58     [B]      
  25275   Iridium 59     [+]      
  25276   Iridium 60     [+]      
- 25285   Iridium 62     [-]      Tumbling
  25286   Iridium 63     [-]      Tumbling
  25287   Iridium 64     [B]      
  25319   Iridium 69     [-]      Tumbling
@@ -160,8 +154,6 @@ KELSO
  24945   Iridium 32     [+]      Plane 3
  24946   Iridium 33     [-]      Plane 3
  24948   Iridium 28     [-]      Plane 3 - Failed on station?
- 24950   Iridium 31     [-]      Plane 3
- 24966   Iridium 35     [-]      Plane 4
  24967   Iridium 36     [-]      Plane 4
  25042   Iridium 39     [-]      Plane 6 - Failed on station?
  25043   Iridium 38     [-]      Plane 6
@@ -222,9 +214,9 @@ SLADEN
  24947   Iridium 27     [D]      Decayed 2002-02-01
  24948   Iridium 28     [?]      SpaceTrack
  24949   Iridium 30     [D]      Decayed 2017-09-28
- 24950   Iridium 31     [?]      SpaceTrack
+ 24950   Iridium 31     [D]      Decayed 2018-12-20
  24965   Iridium 19     [D]      Decayed 2018-04-07
- 24966   Iridium 35     [?]      SpaceTrack
+ 24966   Iridium 35     [D]      Decayed 2018-12-26
  24967   Iridium 36     [?]      SpaceTrack
  24968   Iridium 37     [D]      Decayed 2018-05-26
  24969   Iridium 34     [D]      Decayed 2018-01-08

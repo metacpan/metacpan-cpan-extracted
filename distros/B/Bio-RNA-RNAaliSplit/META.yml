@@ -3,10 +3,11 @@ abstract: 'Split and deconvolute structural RNA multiple sequence alignments'
 author:
   - 'Michael T. Wolfinger <michael@wolfinger.eu>'
 build_requires:
+  Test2::V0: '0.000060'
   Test::More: '0'
   Test::Prereq: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: open_source
@@ -44,6 +45,7 @@ requires:
   Pod::Usage: '0'
   RNA: v2.3.4
   Storable: '0'
+  Test::Script: '1.25'
   constant: '0'
   diagnostics: '0'
   lib: '0'
@@ -52,5 +54,9 @@ requires:
   strict: '0'
   version: '0'
   warnings: '0'
-version: v0.07
+resources:
+  bugtracker: https://github.com/mtw/Bio-RNA-RNAaliSplit/issues
+  homepage: https://github.com/mtw/Bio-RNA-RNAaliSplit
+  repository: https://github.com/mtw/Bio-RNA-RNAaliSplit.git
+version: v0.09
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

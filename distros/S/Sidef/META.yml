@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '3.50'
+    version: '3.60'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -60,6 +60,8 @@ provides:
     file: lib/Sidef/Types/Array/Matrix.pm
   Sidef::Types::Array::Pair:
     file: lib/Sidef/Types/Array/Pair.pm
+  Sidef::Types::Array::Vector:
+    file: lib/Sidef/Types/Array/Vector.pm
   Sidef::Types::Block::Block:
     file: lib/Sidef/Types/Block/Block.pm
   Sidef::Types::Block::Fork:
@@ -121,6 +123,7 @@ recommends:
   Digest::SHA: '0'
   File::Find: '0'
   MIME::Base64: '0'
+  Math::Prime::Util: '0.73'
 requires:
   Algorithm::Combinatorics: '0'
   Algorithm::Loops: '0'
@@ -151,5 +154,5 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: '3.50'
+version: '3.60'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

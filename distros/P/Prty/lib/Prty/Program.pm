@@ -5,10 +5,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Perl;
 use Encode ();
+use Prty::Parameters;
 use Prty::Option;
 use Prty::FileHandle;
 use PerlIO::encoding;
@@ -472,9 +473,80 @@ sub encode {
 
 # -----------------------------------------------------------------------------
 
+=head2 Parameter
+
+=head3 parameters() - Argumente und Optionen des Programmaufrufs
+
+=head4 Synopsis
+
+    ($argA,$opt) = $prg->parameters($minArgs,$maxArgs,@optVal);
+
+=head4 Arguments
+
+=over 4
+
+=item $minArgs
+
+Mindestanzahl an Argumenten.
+
+=item $maxArgs
+
+Maximale Anzahl an Argumenten.
+
+=item @optVal
+
+Liste der Optionen und ihrer Defaultwerte.
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $opt
+
+Hash-Objekt mit den Optionen.
+
+=item $argA
+
+Referenz auf Array mit mindestens $minArgs und höchstens
+$maxArgs Argumenten.
+
+=back
+
+=head4 Description
+
+Liefere die Argumente und Optionen des Programmaufs. Sind weniger als
+$minArgs oder mehr als $maxArgs Argumente übergeben oder nicht deklarierte
+Optionen übergeben worden, wird eine Exception geworfen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub parameters {
+    my ($self,$minArgs,$maxArgs) = splice @_,0,3;
+
+    my ($argA,$opt) = Prty::Parameters->extract(0,0,
+        $self->encoding,\@ARGV,$maxArgs,@_);
+    if ($opt->help) {
+        $self->help;
+    }
+    elsif (@$argA < $minArgs) {
+        $self->help(11,'ERROR: Missing arguments');
+    }
+    elsif (@ARGV) {
+        $self->help(12,"ERROR: Unexpected parameter(s): @ARGV");
+    }
+
+    return ($argA,$opt);
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Optionen
 
-=head3 options() - Verarbeite Programmoptionen
+=head3 options() - Verarbeite Programmoptionen (DEPRECATED)
 
 =head4 Synopsis
 
@@ -772,7 +844,7 @@ sub new {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -780,7 +852,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

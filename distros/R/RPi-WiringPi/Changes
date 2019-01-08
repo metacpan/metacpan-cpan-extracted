@@ -1,5 +1,34 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3630  2019-01-04
+        - added new identify() method in Core (closes #82)
+        - added new binary "pidentify" that gets installed with the distribution
+        - update test files to exit if test file specific env vars aren't set
+          before checking for PI_BOARD
+        - added missing ICs and sensors to the test section in POD, and added
+          information on newly added test environment variables
+        - change a markdown format to POD format in FAQ (fixes #81)
+        - fix wire colour for the latch pin on the shift register in the test
+          platform diagrams (fixes #80)
+        - in t/15.pwm_spi_adc.t test file, we now set RPI_ADC=1 if we've
+          successfully reached the sudo load
+        - pinmap binary now uses "/usr/bin/env perl" as the shebang line instead
+          of "/usr/bin/perl"
+        - implemented a hard-wired and soldered (ie. more permanent) unit test
+          platform, replacing the breadboard. Tickets open to add further
+          sensors and ICs very soon
+        - removed "-T" (taint mode) in stock test files
+        - fix issue in Core.pm POD where we had broken links to internal
+          headings
+        - removed the "setup" test files. They were disabled ages ago, and since
+          we don't overtly advertise the various setup methods, we're no longer
+          testing them
+        - re-enabled the check_pin_status() test function in t/RPiTest.pm
+          (closes #88)
+        - removed the sudo requirement for t/75-serial.t tests
+        - t/75-serial.t puts()/gets() test updated due to non-printable char
+          (fixes #89)
+
 2.3629  2018-10-03
         - added io_led() and pwr_led() to modify the two LED status' for visual
           identification of which Pi hardware board we're currently working on

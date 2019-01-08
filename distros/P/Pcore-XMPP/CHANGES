@@ -1,3 +1,7 @@
+v0.10.13 2019-01-03T18:51:36Z
+ - $CR, $LF replaced with meta chars
+ - to_json return plain scalar
+
 v0.10.12 2018-12-21T13:00:45Z
  - $EMPTY, $SPACE const added
 

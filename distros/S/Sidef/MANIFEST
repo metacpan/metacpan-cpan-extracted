@@ -1,3 +1,4 @@
+_config.yml
 bin/sidef
 Build.PL
 Changes
@@ -39,6 +40,8 @@ lib/Sidef/Types/Array/Matrix.pm
 lib/Sidef/Types/Array/Matrix.pod
 lib/Sidef/Types/Array/Pair.pm
 lib/Sidef/Types/Array/Pair.pod
+lib/Sidef/Types/Array/Vector.pm
+lib/Sidef/Types/Array/Vector.pod
 lib/Sidef/Types/Block/Block.pm
 lib/Sidef/Types/Block/Block.pod
 lib/Sidef/Types/Block/Fork.pm
@@ -213,16 +216,15 @@ scripts/Graphical/honeycombs.sf
 scripts/Graphical/kronecker_fractal.sf
 scripts/Graphical/LSystem/LSystem.sf
 scripts/Graphical/LSystem/Turtle.sf
-scripts/Graphical/lsystem_complex.sf
 scripts/Graphical/lsystem_hilbert_curve.sf
 scripts/Graphical/lsystem_koch_snowflake.sf
+scripts/Graphical/lsystem_penrose_tiling.sf
 scripts/Graphical/lsystem_plant_1.sf
 scripts/Graphical/lsystem_plant_2.sf
 scripts/Graphical/lsystem_sierpinski_triangle.sf
 scripts/Graphical/lsystem_tree.sf
 scripts/Graphical/munching_squares.sf
 scripts/Graphical/pendulum_animation.sf
-scripts/Graphical/pentagram.sf
 scripts/Graphical/plasma_effect.sf
 scripts/Graphical/ppm_palette.sf
 scripts/Graphical/pythagoras_tree.sf
@@ -299,6 +301,7 @@ scripts/RosettaCode/catamorphism.sf
 scripts/RosettaCode/character_codes.sf
 scripts/RosettaCode/check_machin_like_formulas.sf
 scripts/RosettaCode/check_that_file_exists.sf
+scripts/RosettaCode/cheryl_s_birthday.sf
 scripts/RosettaCode/cholesky_decomposition.sf
 scripts/RosettaCode/cipolla_algorithm.sf
 scripts/RosettaCode/classes.sf
@@ -471,6 +474,7 @@ scripts/RosettaCode/non_decimal_radices_convert.sf
 scripts/RosettaCode/nth.sf
 scripts/RosettaCode/nth_root.sf
 scripts/RosettaCode/orbital_elements.sf
+scripts/RosettaCode/orbital_elements_2.sf
 scripts/RosettaCode/order_disjoint_list_items.sf
 scripts/RosettaCode/ordered_partitions.sf
 scripts/RosettaCode/pangram_checker.sf
@@ -601,6 +605,7 @@ scripts/RosettaCode/utf8_encode_decode.sf
 scripts/RosettaCode/van_der_corput_sequence.sf
 scripts/RosettaCode/variable_length_quantity.sf
 scripts/RosettaCode/vogel_s_approximation_method.sf
+scripts/RosettaCode/vogel_s_approximation_method_2.sf
 scripts/RosettaCode/walk_a_dir_non_recursively.sf
 scripts/RosettaCode/water_collected_between_towers.sf
 scripts/RosettaCode/word_wrap.sf
@@ -645,6 +650,7 @@ scripts/Tests/bags_3.sf
 scripts/Tests/balanced_brakets.sf
 scripts/Tests/bare_multiplication.sf
 scripts/Tests/base64_decoder.sf
+scripts/Tests/base_conversions.sf
 scripts/Tests/basic_interpreter.sf
 scripts/Tests/beadsort.sf
 scripts/Tests/best_shuffle.sf
@@ -663,12 +669,14 @@ scripts/Tests/call_an_object_method.sf
 scripts/Tests/cartesian.sf
 scripts/Tests/catalan_numbers.sf
 scripts/Tests/catalan_numbers_2.sf
+scripts/Tests/chebyshev_coefficients_test.sf
 scripts/Tests/class_attr_inheritance.sf
 scripts/Tests/class_attributes.sf
 scripts/Tests/class_field_inheritance.sf
 scripts/Tests/class_inheritance.sf
 scripts/Tests/class_inside_module.sf
 scripts/Tests/class_redefinition.sf
+scripts/Tests/class_slurpy_attributes.sf
 scripts/Tests/class_var_inheritance.sf
 scripts/Tests/classes.sf
 scripts/Tests/classes_and_objects.sf
@@ -727,12 +735,14 @@ scripts/Tests/gcd.sf
 scripts/Tests/get_value_cyclic_references.sf
 scripts/Tests/getopt.sf
 scripts/Tests/given_when.sf
+scripts/Tests/global_variables.sf
 scripts/Tests/greatest_subsequential_sum.sf
 scripts/Tests/group_precedence.sf
 scripts/Tests/hailstone.sf
 scripts/Tests/happy_2_years_old.sf
 scripts/Tests/hash_as_tree.sf
 scripts/Tests/hash_autovivification.sf
+scripts/Tests/hash_concat.sf
 scripts/Tests/hash_from_array.sf
 scripts/Tests/hash_grep.sf
 scripts/Tests/hash_sort.sf
@@ -807,6 +817,9 @@ scripts/Tests/module_inclusion.sf
 scripts/Tests/module_inclusion_2.sf
 scripts/Tests/module_inclusion_3.sf
 scripts/Tests/module_loading.sf
+scripts/Tests/modules_simple_test.sf
+scripts/Tests/modules_test_1.sf
+scripts/Tests/modules_test_2.sf
 scripts/Tests/modulo.sf
 scripts/Tests/multi_file_edit.sf
 scripts/Tests/multi_functions.sf
@@ -822,6 +835,7 @@ scripts/Tests/multisplit.sf
 scripts/Tests/named_block_arguments.sf
 scripts/Tests/named_parameters.sf
 scripts/Tests/names_to_numbers.sf
+scripts/Tests/nested_classes.sf
 scripts/Tests/nested_evals.sf
 scripts/Tests/non_continuous_seq.sf
 scripts/Tests/nth_prime.sf
@@ -842,6 +856,11 @@ scripts/Tests/permutations.sf
 scripts/Tests/permutations_2.sf
 scripts/Tests/pi_and_e.sf
 scripts/Tests/pi_machin_like_formula.sf
+scripts/Tests/pipeline_cross_operator.sf
+scripts/Tests/pipeline_map_operator.sf
+scripts/Tests/pipeline_operator.sf
+scripts/Tests/pipeline_zip_operator.sf
+scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf
 scripts/Tests/prefix_methods.sf

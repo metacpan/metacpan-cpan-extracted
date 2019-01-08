@@ -90,6 +90,7 @@ my @default_opt_cdifopts = qw(--no-cc --no-mc --no-tc --no-uc);
 my @opt_cdifopts;
 my $opt_env = 1;
 my @opt_colormap;
+my $opt_colordump;
 my @opt_diffopts;
 my $opt_diff = 'diff';
 my $opt_digit = 4;
@@ -143,6 +144,7 @@ my @optargs = (
     "color=s" => \$opt_color,
     "nocolor|no-color" => sub { $opt_color = 'never' },
     "colormap|cm=s" => \@opt_colormap,
+    "colordump" => \$opt_colordump,
     "256!" => \$opt_256,
     "i|ignore-case"         => sub { push @opt_diffopts, '-i'; push @opt_cdifopts, '-i' },
     "b|ignore-space-change" => sub { push @opt_diffopts, '-b'; push @opt_cdifopts, '-w' },
@@ -211,6 +213,12 @@ $colormap{OUMARK} ||= $colormap{UMARK} || $colormap{OMARK};
 $colormap{NUMARK} ||= $colormap{UMARK} || $colormap{NMARK};
 $colormap{OULINE} ||= $colormap{ULINE} || $colormap{OLINE};
 $colormap{NULINE} ||= $colormap{ULINE} || $colormap{NLINE};
+
+if ($opt_colordump) {
+    print $color_handler->colormap(
+	name => '--changeme', option => '--colormap');
+    exit;
+}
 
 my $painter = do {
     if (($opt_color eq 'always')
@@ -1136,9 +1144,11 @@ terminal :
         foreground[/background]
 
     COLOR:
-        000 .. 555       : 6 x 6 x 6 216 colors
-        000000 .. FFFFFF : 24bit RGB mapped to 216 colors
-        L00 .. L23       : 24 grey levels
+        (255,255,255)      : 24bit decimal RGB colors
+        #000000 .. #FFFFFF : 24bit hex RGB colors
+        #000    .. #FFF    : 12bit hex RGB 4096 colors
+        000 .. 555         : 6x6x6 RGB 216 colors
+        L00 .. L25         : Black (L00), 24 grey levels, White (L25)
 
     Sample:
         005     0000FF        : blue foreground
@@ -1146,46 +1156,72 @@ terminal :
         000/555 000000/FFFFFF : black on white
         500/050 FF0000/00FF00 : red on green
 
+or color names enclosed by angle bracket :
+
+    <red> <blue> <green> <cyan> <magenta> <yellow>
+    <aliceblue> <honeydue> <hotpink> <mooccasin>
+    <medium_aqua_marine>
+
 and other effects :
 
-    S  Stand-out (reverse video)
-    U  Underline
-    D  Double-struck (boldface)
-    F  Flash (blink)
-    E  Expand
+    Z  0 Zero (reset)
+    D  1 Double-struck (boldface)
+    P  2 Pale (dark)
+    I  3 Italic
+    U  4 Underline
+    F  5 Flash (blink: slow)
+    Q  6 Quick (blink: rapid)
+    S  7 Stand-out (reverse video)
+    V  8 Vanish (concealed)
+    J  9 Junk (crossed out)
 
-B<E> is effective for command, file and text line.  That line will be
-expanded to window width filling up by space characters.  Left column
-is expanded always.  You may want to use this to set background color
-for right column.
+    E    Erase Line
+
+    ;    No effect
+    X    No effect
+    /    Toggle foreground/background
+    ^    Reset to foreground
+
+At first the color is considered as foreground, and slash (C</>)
+switches foreground and background.  If multiple colors are given in
+the same spec, all indicators are produced in the order of their
+presence.  Consequently, the last one takes effect.
+
+If the spec start with plus (C<+>) or minus (C<->) character,
+following characters are appneded/deleted from previous value. Reset
+mark (C<^>) is inserted before appended string.
+
+Effect characters are case insensitive, and can be found anywhere and
+in any order in color spec string.  Because C<X> and C<;> takes no
+effect, you can use them to improve readability, like C<SxD;K/544>.
 
 Defaults are :
 
-    OCOMMAND => "555/010E"  or "GSE"
-    NCOMMAND => "555/010E"  or "GSE"
-    MCOMMAND => "555/010E"  or "GSE"
-    OFILE    => "555/010DE" or "GSDE"
-    NFILE    => "555/010DE" or "GSDE"
-    MFILE    => "555/010DE" or "GSDE"
-    OMARK    => "010/444"   or "G/W"
-    NMARK    => "010/444"   or "G/W"
-    MMARK    => "010/444"   or "G/W"
+    OCOMMAND => "555/010"  or "GS"
+    NCOMMAND => "555/010"  or "GS"
+    MCOMMAND => "555/010"  or "GS"
+    OFILE    => "555/010D" or "GDS"
+    NFILE    => "555/010D" or "GDS"
+    MFILE    => "555/010D" or "GDS"
+    OMARK    => "010/444"  or "G/W"
+    NMARK    => "010/444"  or "G/W"
+    MMARK    => "010/444"  or "G/W"
     UMARK    => ""
-    OLINE    => "220"       or  "Y"
-    NLINE    => "220"       or  "Y"
-    MLINE    => "220"       or  "Y"
+    OLINE    => "220"      or "Y"
+    NLINE    => "220"      or "Y"
+    MLINE    => "220"      or "Y"
     ULINE    => ""
-    OTEXT    => "KE/454"    or "G"
-    NTEXT    => "KE/454"    or "G"
-    MTEXT    => "KE/454"    or "G"
+    OTEXT    => "K/454"    or "G"
+    NTEXT    => "K/454"    or "G"
+    MTEXT    => "K/454"    or "G"
     UTEXT    => ""
 
 This is equivalent to :
 
-    sdif --cm '?COMMAND=555/010E,?FILE=555/010DE' \
+    sdif --cm '?COMMAND=555/010,?FILE=555/010D' \
          --cm '?MARK=010/444,UMARK=' \
          --cm '?LINE=220,ULINE=' \
-         --cm '?TEXT=KE/454,UTEXT='
+         --cm '?TEXT=K/454,UTEXT='
 
 =back
 
@@ -1228,6 +1264,14 @@ Environment variable B<SDIFOPTS> is used to set default options.
 =item L<https://github.com/kaz-utashiro/sdif-tools>
 
 =back
+
+
+=head1 LICENSE
+
+Copyright 1992-2019 Kazumasa Utashiro
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 
 =head1 SEE ALSO

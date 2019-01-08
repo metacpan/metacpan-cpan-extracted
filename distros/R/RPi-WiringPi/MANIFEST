@@ -1,3 +1,4 @@
+bin/pidentify
 bin/pinmap
 Changes
 docs/breadboard/adc_basic_example_bb.jpg
@@ -21,10 +22,6 @@ MANIFEST.SKIP
 README
 t/00-load.t
 t/01-identification_and_label.t
-t/01-setup.t.norun
-t/02-setup_wpi.t.norun
-t/03-setup_phys.t.norun
-t/04-setup_uninit.t.norun
 t/05-pin.t
 t/10-register.t
 t/15-pwm_spi_adc.t

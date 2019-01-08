@@ -39,11 +39,13 @@
             "Path::Class" : "0",
             "Sys::Hostname" : "0",
             "XML::LibXML" : "0",
-            "XML::LibXML::PrettyPrint" : "0"
+            "XML::LibXML::PrettyPrint" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Spec" : "0",
             "Test::LongString" : "0",
             "Test::More" : "0"
@@ -53,31 +55,31 @@
    "provides" : {
       "OTRS::OPM::Maker" : {
          "file" : "lib/OTRS/OPM/Maker.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "OTRS::OPM::Maker::Command::build" : {
          "file" : "lib/OTRS/OPM/Maker/Command/build.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "OTRS::OPM::Maker::Command::dbtest" : {
          "file" : "lib/OTRS/OPM/Maker/Command/dbtest.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "OTRS::OPM::Maker::Command::dependencies" : {
          "file" : "lib/OTRS/OPM/Maker/Command/dependencies.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "OTRS::OPM::Maker::Command::filetest" : {
          "file" : "lib/OTRS/OPM/Maker/Command/filetest.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "OTRS::OPM::Maker::Command::index" : {
          "file" : "lib/OTRS/OPM/Maker/Command/index.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "OTRS::OPM::Maker::Command::sopmtest" : {
          "file" : "lib/OTRS/OPM/Maker/Command/sopmtest.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -92,7 +94,7 @@
          "web" : "http://github.com/reneeb/OTRS-OPM-Maker"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_contributors" : [
       "Michiel Beijen <michiel.beijen@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

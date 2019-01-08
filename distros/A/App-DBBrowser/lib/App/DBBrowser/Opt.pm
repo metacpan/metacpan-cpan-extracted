@@ -8,7 +8,7 @@ use 5.008003;
 use File::Basename        qw( fileparse );
 use File::Spec::Functions qw( catfile );
 use FindBin               qw( $RealBin $RealScript );
-#use Pod::Usage            qw( pod2usage );  # "require"-d
+#use Pod::Usage            qw( pod2usage ); # required
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( insert_sep print_hash choose_a_number choose_a_subset settings_menu choose_a_dir );
@@ -42,7 +42,6 @@ sub defaults {
             drop_table_ok        => 0,
             file_find_warnings   => 0,
             insert_ok            => 0,
-            lock_stmt            => 0,
             max_rows             => 200_000,
             menu_memory          => 0,
             meta                 => 0,
@@ -51,66 +50,68 @@ sub defaults {
             plugins              => [ 'SQLite', 'mysql', 'Pg' ],
             qualified_table_name => 0,
             quote_identifiers    => 1,
-            subqueries_select    => 0,
-            subqueries_set       => 0,
-            subqueries_table     => 0,
-            subqueries_w_h       => 0,
+            extend_select        => 0,
+            extend_set           => 0,
+            extend_table         => 0,
+            extend_where         => 0,
+            extend_group_by      => 0,
+            extend_having        => 0,
             thsd_sep             => ',', ###
             update_ok            => 0,
         },
         alias => {
-            aggregate            => 0,
-            functions            => 0,
-            join                 => 0,
-            union                => 0,
-            subqueries           => 0,
+            aggregate  => 0,
+            functions  => 0,
+            join       => 0,
+            union      => 0,
+            subqueries => 0,
         },
         table => {
-            binary_filter        => 0,
-            binary_string        => 'BNRY',
-            codepage_mapping     => 0, # not an option, always 0
-            color                => 0,
-            decimal_separator    => '.',
-            grid                 => 0,
-            keep_header          => 0,
-            min_col_width        => 30,
-            mouse                => 0,
-            progress_bar         => 40_000,
-            squash_spaces        => 0,
-            tab_width            => 2,
-            table_expand         => 1,
-            undef                => '',
+            binary_filter     => 0,
+            binary_string     => 'BNRY',
+            codepage_mapping  => 0, # not an option, always 0
+            color             => 0,
+            decimal_separator => '.',
+            grid              => 0,
+            keep_header       => 0,
+            min_col_width     => 30,
+            mouse             => 0,
+            progress_bar      => 40_000,
+            squash_spaces     => 0,
+            tab_width         => 2,
+            table_expand      => 1,
+            undef             => '',
         },
         insert => {
-            copy_parse_mode      => 1,
-            file_encoding        => 'UTF-8',
-            file_parse_mode      => 0,
-            #files_dir            => undef,
-            #input_modes          => [ 'Cols', 'Rows', 'Multi-row', 'File' ],
-            max_files            => 15,
+            copy_parse_mode => 1,
+            file_encoding   => 'UTF-8',
+            file_parse_mode => 0,
+            #files_dir       => undef,
+            #input_modes     => [ 'Cols', 'Rows', 'Multi-row', 'File' ],
+            max_files       => 15,
         },
         create => {
-            auto_inc_col_name    => 'Id',
-            data_type_guessing   => 1,
+            autoincrement_col_name => 'Id',
+            data_type_guessing     => 1,
         },
         split => {
-            i_f_s                => ',',
-            i_r_s                => '\n',
-            trim_leading         => '\s+',
-            trim_trailing        => '\s+',
+            i_f_s         => ',',
+            i_r_s         => '\n',
+            trim_leading  => '\s+',
+            trim_trailing => '\s+',
         },
         csv => {
-            allow_loose_escapes  => 0,
-            allow_loose_quotes   => 0,
-            allow_whitespace     => 0,
-            auto_diag            => 1,
-            blank_is_undef       => 1,
-            binary               => 1,
-            empty_is_undef       => 0,
-            eol                  => '',
-            escape_char          => '"',
-            quote_char           => '"',
-            sep_char             => ',',
+            allow_loose_escapes => 0,
+            allow_loose_quotes  => 0,
+            allow_whitespace    => 0,
+            auto_diag           => 1,
+            blank_is_undef      => 1,
+            binary              => 1,
+            empty_is_undef      => 0,
+            eol                 => '',
+            escape_char         => '"',
+            quote_char          => '"',
+            sep_char            => ',',
         }
     };
     return $defaults                   if ! $section;
@@ -160,7 +161,7 @@ sub config_insert {
             $ENV{TC_RESET_AUTO_UP} = 0;
             my $idx = choose(
                 $choices,
-                { %{$sf->{i}{lyt_3}}, index => 1, default => $old_idx, undef => $sf->{i}{back_config}, prompt => $prompt }
+                { %{$sf->{i}{lyt_3}}, index => 1, default => $old_idx, undef => $sf->{i}{back_v_no_ok}, prompt => $prompt }
             );
             if ( ! defined $idx || ! defined $choices->[$idx] ) {
                 if ( $group =~ /^_module_/ ) {
@@ -283,11 +284,10 @@ sub __menus {
         ],
         config_sql => [
             { name => 'max_rows',           text => "- Max Rows",     section => 'G' },
-            { name => 'lock_stmt',          text => "- Lock Mode",    section => 'G' },
             { name => 'meta',               text => "- Metadata",     section => 'G' },
             { name => 'operators',          text => "- Operators",    section => 'G' },
             { name => '_alias',             text => "- Alias",        section => 'alias' },
-            { name => '_subqueries',        text => "- Subqueries",   section => 'G' },
+            { name => '_extended_cols',     text => "- Extentions",     section => 'G' },
             { name => '_sql_identifiers',   text => "- Identifiers",  section => 'G' },
             { name => '_write_access',      text => "- Write access", section => 'G' },
             { name => 'parentheses',        text => "- Parentheses",  section => 'G' },
@@ -307,8 +307,8 @@ sub __menus {
             { name => 'file_find_warnings', text => "- Warnings",          section => 'G' },
         ],
         config_create => [
-            { name => 'auto_inc_col_name',  text => "Auto increment column", section => 'create' },
-            { name => 'data_type_guessing', text => "Data type guessing",    section => 'create' },
+            { name => 'autoincrement_col_name', text => "Auto increment column", section => 'create' },
+            { name => 'data_type_guessing',     text => "Data type guessing",    section => 'create' },
         ],
     };
     return $menus->{$group};
@@ -326,7 +326,7 @@ sub set_options {
         my $menu = $sf->__menus( $group );
 
         OPTION: while ( 1 ) {
-            my $back =          $group eq 'main' ? $sf->{i}{_quit}     : $sf->{i}{back_config};
+            my $back =          $group eq 'main' ? $sf->{i}{_quit}     : $sf->{i}{back_v_no_ok};
             my @pre  = ( undef, $group eq 'main' ? $sf->{i}{_continue} : () );
             my $choices = [ @pre, map( $_->{text}, @$menu ) ];
             # Choose
@@ -487,12 +487,6 @@ sub set_options {
                 my $prompt = 'Set the SQL auto LIMIT: ';
                 $sf->__choose_a_number_wrap( $section, $opt, $prompt, $digits );
             }
-            elsif ( $opt eq 'lock_stmt' ) {
-                my $prompt = 'SQL statement: ';
-                my $list = [ 'Lk0', 'Lk1' ];
-                my $sub_menu = [ [ $opt, "  Lock mode", $list ] ];
-                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
-            }
             elsif ( $opt eq 'meta' ) {
                 my $prompt = 'DB/schemas/tables: ';
                 my $list = $no_yes;
@@ -510,12 +504,15 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq '_subqueries' ) {
+            elsif ( $opt eq '_extended_cols' ) {
+                my $ext_val = [ 'None', 'Func', 'SQ', 'Func+SQ' ];
                 my $sub_menu = [
-                    [ 'subqueries_select', "- Subqueries in SELECT",       $no_yes ],
-                    [ 'subqueries_w_h',    "- Subqueries in WHERE/HAVING", $no_yes ],
-                    [ 'subqueries_set',    "- Subqueries as SET value",    $no_yes ],
-                    [ 'subqueries_table',  "- Subqueries as table",        $no_yes ],
+                    [ 'extend_select',   "- Extend SELECT",   $ext_val         ],
+                    [ 'extend_where',    "- Extend WHERE",    $ext_val         ],
+                    [ 'extend_group_by', "- Extend GROUB BY", $ext_val         ],
+                    [ 'extend_having',   "- Extend HAVING",   $ext_val         ],
+                    [ 'extend_set',      "- Extend SET",      $ext_val         ],
+                    [ 'extend_table',    "- Extend Table",    [ 'None', 'SQ' ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu );
             }
@@ -572,9 +569,9 @@ sub set_options {
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
-            elsif ( $opt eq 'auto_inc_col_name' ) {
+            elsif ( $opt eq 'autoincrement_col_name' ) {
                 my $items = [
-                    { name => 'auto_inc_col_name', prompt => "AI column name" },
+                    { name => 'autoincrement_col_name', prompt => "AI column name" },
                 ];
                 my $prompt = 'Default auto increment column name';
                 $sf->__group_readline( $section, $items, $prompt );

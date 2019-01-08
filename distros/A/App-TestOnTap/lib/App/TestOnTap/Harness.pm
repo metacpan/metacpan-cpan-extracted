@@ -95,11 +95,20 @@ sub runtests
 				my $desc = $job->description();
 				my $filename = $job->filename;
 				my $cmdline = $self->exec()->($self, $filename);
+				my $dryrun = $self->{testontap}->{args}->doDryRun();
+				my $parallelizable = ($self->{testontap}->{args}->getConfig()->parallelizable($desc) ? '' : 'not ') . 'parallelizable'; 
 				print "$topDelimLine\n";
-				print "Run test '$desc' using:\n";
+				print "Run test '$desc' ($parallelizable) using:\n";
 				print "  $_\n" foreach (@$cmdline);
 				print "$bottomDelimLine\n";
-				$failed++ if system(@$cmdline) >> 8;
+				if ($dryrun)
+				{
+					print "(dry run only, actual test not executed)\n";
+				}
+				else
+				{	 
+					$failed++ if system(@$cmdline) >> 8;
+				}
 				$job->finish();
 			}	
 		}

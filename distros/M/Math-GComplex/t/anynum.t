@@ -9,11 +9,11 @@ BEGIN {
     eval { require Math::AnyNum };
     plan skip_all => "Math::AnyNum is not installed"
       if $@;
-    plan skip_all => "Math::AnyNum >= 0.20 is needed"
-      if ($Math::AnyNum::VERSION < 0.20);
+    plan skip_all => "Math::AnyNum >= 0.30 is needed"
+      if ($Math::AnyNum::VERSION < 0.30);
 }
 
-plan tests => 343;
+plan tests => 370;
 
 use Math::GComplex;
 use Math::AnyNum qw(:overload);
@@ -505,7 +505,62 @@ is(join(' ', Math::GComplex->new(0)->pown(10)->reals), '0 0');
 is(join(' ', Math::GComplex->new(0, 1)->pown(3)->reals), '0 -1');
 is(join(' ', Math::GComplex->new(0, 1)->pown(4)->reals), '1 0');
 
+#<<<
 is(join(' ', Math::GComplex->new(3, 4)->pown(10)->reals),  '-9653287 1476984');
 is(join(' ', Math::GComplex->new(3, 4)->pown(-10)->reals), '-9653287/95367431640625 -1476984/95367431640625');
-is(join(' ', Math::GComplex->new(-9, -12)->pown(-13)->reals),
-    '-354815761/791908800601959228515625 -597551756/2375726401805877685546875');
+is(join(' ', Math::GComplex->new(-9, -12)->pown(-13)->reals), '-354815761/791908800601959228515625 -597551756/2375726401805877685546875');
+#>>>
+
+is(join(' ', Math::GComplex::powmod(Math::GComplex->new(2,  1),  100, 1234567)->reals), '498832 667730');
+is(join(' ', Math::GComplex::powmod(Math::GComplex->new(-2, -1), 99,  1234567)->reals), '160748 820328');
+is(join(' ', Math::GComplex::powmod(Math::GComplex->new(2,  -1), 99,  1234567)->reals), '1073819 820328');
+is(join(' ', Math::GComplex::powmod(Math::GComplex->new(-2, 1),  99,  1234567)->reals), '160748 414239');
+
+is(join(' ', Math::GComplex::invmod(42, 2017)->reals), '1969 0');
+is(join(' ', Math::GComplex::invmod(Math::GComplex::cplx(3,  4),   2017)->reals),    '1291 968');
+is(join(' ', Math::GComplex::invmod(Math::GComplex::cplx(91, 23),  2017)->reals),    '590 405');
+is(join(' ', Math::GComplex::invmod(Math::GComplex::cplx(43, 99),  1234567)->reals), '1019551 667302');
+is(join(' ', Math::GComplex::invmod(Math::GComplex::cplx(43, 415), 103)->reals),     '88 25');
+
+ok(!defined(Math::GComplex::cplx(43, 99)->invmod(1234)));
+
+is(join(' ', Math::GComplex::cplx(43, 99)->invmod(2017)->reals), "1709 1272");
+is(join(' ', Math::GComplex::gcd(2017, Math::GComplex::cplx(43, 99))->reals), '0 -1');
+
+is(join(' ', Math::GComplex::gcd(54054, 1235234)->reals), '-2002 0');
+is(join(' ', Math::GComplex::cplx(3,  4)->gcd(25)->reals),    '3 4');
+is(join(' ', Math::GComplex::cplx(43, 99)->gcd(1234)->reals), '-1 -1');
+is(join(' ', Math::GComplex::gcd(1234, Math::GComplex::cplx(43, 99))->reals), '-1 -1');
+is(join(' ', Math::GComplex::cplx(1413, -194)->gcd(Math::GComplex::cplx(13, -34))->reals), '-2 1');
+is(join(' ', Math::GComplex::gcd(Math::GComplex::cplx(11, 12), Math::GComplex::cplx(6, 21))->reals), '-2 -7');
+
+{
+    my $k = 10**5;     # coefficient of x
+    my $r = -19541;    # congruent to this
+    my $m = 19543;     # modulo this number
+
+    ok(((Math::GComplex::invmod($k, $m) * $r) % $m) == 10785);
+}
+
+{
+    my $m = 2019;
+    my $x = Math::GComplex->new(3, 4);
+
+    my $x1 = Math::GComplex::powmod($x, -42, $m);
+    my $x2 = Math::GComplex::powmod($x, 42,  $m);
+
+    is(join(' ', $x1->reals), '1520 1407');
+    is(join(' ', $x2->reals), '305 1212');
+
+    ok((($x1 * $x2) % $m) == 1);
+
+    my $t = $x->pown(42)->mod($m);
+
+    ok(ref($t->{a}) eq 'Math::AnyNum');
+    ok(ref($t->{b}) eq 'Math::AnyNum');
+
+    ok(ref(${$t->{a}}) eq 'Math::GMPz');
+    ok(ref(${$t->{b}}) eq 'Math::GMPz');
+
+    is(join(' ', $x2->reals), join(' ', $t->reals));
+}

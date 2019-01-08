@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.014;
 
-    our $VERSION = '3.50';
+    our $VERSION = '3.60';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -29,6 +29,8 @@ package Sidef {
         my ($class, %opt) = @_;
         bless \%opt, $class;
     }
+
+    *call = \&new;
 
     sub parse_code {
         my ($self, $code) = @_;
@@ -346,7 +348,7 @@ package Sidef {
         foreach my $i (0 .. $s_len - 1) {
 
             my $start = List::Util::max(0, $i - $match_distance);
-            my $end = List::Util::min($i + $match_distance + 1, $t_len);
+            my $end   = List::Util::min($i + $match_distance + 1, $t_len);
 
             foreach my $j ($start .. $end - 1) {
                 $t_matches[$j] and next;
@@ -448,11 +450,11 @@ package Sidef {
     my $from   = Sidef::normalize_method($caller[3]);
     $from = $from eq '.' ? 'main()' : "$from()";
 
-    my $table = \%{$self . '::'};
+    my $table   = \%{$self . '::'};
     my @methods = grep { !ref($table->{$_}) and defined(&{$table->{$_}}) } keys(%$table);
 
     my $method = Sidef::normalize_method($AUTOLOAD);
-    my $name = substr($method, rindex($method, '.') + 1);
+    my $name   = substr($method, rindex($method, '.') + 1);
 
     my @candidates = Sidef::best_matches($name, \@methods);
 

@@ -1,71 +1,99 @@
-$VAR1 = {
+$VAR1 = bless( {
   'blocks' => [
-    {
+    bless( {
+      'blocks' => [],
       'data' => {
-        'DATATYPE' => [
-          ' Chromatogram'
-        ],
-        'JCAMPDX' => [
-          ' 4.24'
-        ]
+        'DATATYPE' => bless( {
+          'label' => 'DATA TYPE',
+          'value' => 'Chromatogram'
+        }, 'JCAMP::DX::LabelDataRecord' ),
+        'JCAMPDX' => bless( {
+          'label' => 'JCAMP-DX',
+          'value' => '4.24'
+        }, 'JCAMP::DX::LabelDataRecord' ),
+        'TITLE' => bless( {
+          'label' => 'title',
+          'value' => 'Chromatogram XYZ'
+        }, 'JCAMP::DX::LabelDataRecord' )
       },
       'labels' => [
-        'JCAMPDX',
-        'DATATYPE'
-      ],
-      'title' => ' Chromatogram XYZ'
-    },
-    {
+        $VAR1->{'blocks'}[0]{'data'}{'TITLE'},
+        $VAR1->{'blocks'}[0]{'data'}{'JCAMPDX'},
+        $VAR1->{'blocks'}[0]{'data'}{'DATATYPE'}
+      ]
+    }, 'JCAMP::DX' ),
+    bless( {
+      'blocks' => [],
       'data' => {
-        'DATATYPE' => [
-          ' Infrared Spectrum'
-        ],
-        'JCAMPDX' => [
-          ' 4.24'
-        ]
+        'DATATYPE' => bless( {
+          'label' => 'DATA TYPE',
+          'value' => 'Infrared Spectrum'
+        }, 'JCAMP::DX::LabelDataRecord' ),
+        'JCAMPDX' => bless( {
+          'label' => 'JCAMP-DX',
+          'value' => '4.24'
+        }, 'JCAMP::DX::LabelDataRecord' ),
+        'TITLE' => bless( {
+          'label' => 'title',
+          'value' => 'IR Spectrum of Fraction XYZ-1'
+        }, 'JCAMP::DX::LabelDataRecord' )
       },
       'labels' => [
-        'JCAMPDX',
-        'DATATYPE'
-      ],
-      'title' => ' IR Spectrum of Fraction XYZ-1'
-    },
-    {
+        $VAR1->{'blocks'}[1]{'data'}{'TITLE'},
+        $VAR1->{'blocks'}[1]{'data'}{'JCAMPDX'},
+        $VAR1->{'blocks'}[1]{'data'}{'DATATYPE'}
+      ]
+    }, 'JCAMP::DX' ),
+    bless( {
+      'blocks' => [],
       'data' => {
-        'DATATYPE' => [
-          ' Infrared Spectrum'
-        ],
-        'JCAMPDX' => [
-          ' 4.24'
-        ]
+        'DATATYPE' => bless( {
+          'label' => 'DATA TYPE',
+          'value' => 'Infrared Spectrum'
+        }, 'JCAMP::DX::LabelDataRecord' ),
+        'JCAMPDX' => bless( {
+          'label' => 'JCAMP-DX',
+          'value' => '4.24'
+        }, 'JCAMP::DX::LabelDataRecord' ),
+        'TITLE' => bless( {
+          'label' => 'title',
+          'value' => 'IR Spectrum of Fraction XYZ-N'
+        }, 'JCAMP::DX::LabelDataRecord' )
       },
       'labels' => [
-        'JCAMPDX',
-        'DATATYPE'
-      ],
-      'title' => ' IR Spectrum of Fraction XYZ-N'
-    }
+        $VAR1->{'blocks'}[2]{'data'}{'TITLE'},
+        $VAR1->{'blocks'}[2]{'data'}{'JCAMPDX'},
+        $VAR1->{'blocks'}[2]{'data'}{'DATATYPE'}
+      ]
+    }, 'JCAMP::DX' )
   ],
   'data' => {
-    'BLOCKS' => [
-      ' N + 1'
-    ],
-    'DATATYPE' => [
-      ' LINK'
-    ],
-    'JCAMPDX' => [
-      ' 4.24'
-    ],
-    'SAMPLEDESCRIPTION' => [
-      ' '
-    ]
+    'BLOCKS' => bless( {
+      'label' => 'BLOCKS',
+      'value' => 'N + 1'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'DATATYPE' => bless( {
+      'label' => 'DATA TYPE',
+      'value' => 'LINK'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'JCAMPDX' => bless( {
+      'label' => 'JCAMP-DX',
+      'value' => '4.24'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'SAMPLEDESCRIPTION' => bless( {
+      'label' => 'SAMPLE DESCRIPTION',
+      'value' => ''
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'TITLE' => bless( {
+      'label' => 'title',
+      'value' => 'GCIR Test XYZ'
+    }, 'JCAMP::DX::LabelDataRecord' )
   },
   'labels' => [
-    'JCAMPDX',
-    'DATATYPE',
-    'BLOCKS',
-    'SAMPLEDESCRIPTION'
-  ],
-  'title' => ' GCIR Test XYZ
-'
-};
+    $VAR1->{'data'}{'TITLE'},
+    $VAR1->{'data'}{'JCAMPDX'},
+    $VAR1->{'data'}{'DATATYPE'},
+    $VAR1->{'data'}{'BLOCKS'},
+    $VAR1->{'data'}{'SAMPLEDESCRIPTION'}
+  ]
+}, 'JCAMP::DX' );

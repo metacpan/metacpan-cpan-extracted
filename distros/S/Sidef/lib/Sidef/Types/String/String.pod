@@ -18,10 +18,9 @@ var obj = String(...)
 
 Inherits methods from:
 
-	* Sidef::Object::Object
+       * Sidef::Object::Object
 
 =head1 METHODS
-
 
 =head2 %
 
@@ -100,16 +99,6 @@ I<Obj> B</> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<÷>, I<div>
-
-=cut
-
-=head2 :
-
-I<Obj> B<:> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<pair_with>
 
 =cut
 
@@ -920,6 +909,14 @@ String.rtrim() -> I<Obj>
 Return the
 
 Aliases: I<rstrip>, I<trim_end>, I<strip_end>, I<trim_right>, I<strip_right>
+
+=cut
+
+=head2 run
+
+String.run() -> I<Obj>
+
+Return the
 
 =cut
 

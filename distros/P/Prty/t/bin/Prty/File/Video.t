@@ -47,16 +47,16 @@ sub test_unitTest : Test(10) {
     $self->is($aspectRatio=>'16:9');
 
     my $bitrate = $vid->bitrate;
-    $self->is($bitrate=>6455);
+    $self->is($bitrate=>669);
 
     my $framerate = $vid->framerate;
     $self->is($framerate=>12);
 
     my $duration = $vid->duration;
-    $self->is($duration=>8.417);
+    $self->is($duration=>1);
 
     my $frames = $vid->frames;
-    $self->is($frames=>101);
+    $self->is($frames=>12);
 }
 
 # -----------------------------------------------------------------------------

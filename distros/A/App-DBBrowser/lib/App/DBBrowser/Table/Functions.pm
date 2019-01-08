@@ -5,10 +5,9 @@ use warnings;
 use strict;
 use 5.008003;
 
-use List::MoreUtils qw( first_index );
-
 use Term::Choose       qw( choose );
-use Term::Choose::Util qw( choose_a_number );
+use Term::Choose::Util qw( choose_a_number choose_a_subset );
+use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
@@ -25,105 +24,78 @@ sub new {
 
 
 sub col_function {
-    my ( $sf, $sql, $stmt_type ) = @_;
-    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my @functions = ( qw( Epoch_to_Date Bit_Length Truncate Char_Length Epoch_to_DateTime ) );
-    if ( @{$sql->{group_by_cols}} + @{$sql->{aggr_cols}} + @{$sql->{chosen_cols}} == 0 ) {
-        @{$sql->{chosen_cols}} = @{$sql->{cols}};
-    }
-    for my $col_type ( qw( chosen_cols aggr_cols group_by_cols ) ) {
-        my $col_type_orig = 'orig_' . $col_type;
-        if ( @{$sql->{$col_type}} && ! @{$sql->{$col_type_orig}} ) {
-            @{$sql->{$col_type_orig}} = @{$sql->{$col_type}};
-        }
-    }
+    my ( $sf, $sql, $stmt_type, $clause ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $changed = 0;
+    my $cols;
+    if ( $clause eq 'select' && ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) ) {
+        $cols = [ @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
+    }
+    elsif ( $clause eq 'having' ) {
+        $cols = [ @{$sql->{aggr_cols}} ];
+    }
+    else {
+        $cols = [ @{$sql->{cols}} ];
+    }
+    my $functions_args = {
+        Bit_Length          => 1,
+        Char_Length         => 1,
+        Concat              => 9, # Concatenate
+        Epoch_to_Date       => 1,
+        Epoch_to_DateTime   => 1,
+        Truncate            => 1,
+    };
+    my @functions_sorted = qw( Concat Truncate Bit_Length Char_Length Epoch_to_Date Epoch_to_DateTime );
 
-    COL_SCALAR_FUNC: while ( 1 ) {
-        my $default = 0;
-        my @pre = ( undef, $sf->{i}{_confirm} );
-        my @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}}, @{$sql->{chosen_cols}} );
-        my $choices = [ @pre, map( "- $_", @cols ) ];
-        $ax->print_sql( $sql, [ $stmt_type ] );
-        # Choose
-        my $idx = choose(
-            $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, index => 1, default => $default }
-        );
-        if ( ! defined $idx || ! defined $choices->[$idx] ) {
-            return;
-        }
-        if ( $choices->[$idx] eq $sf->{i}{_confirm} ) {
-            if ( ! $changed ) {
-                return;
-            }
-            return 1; # return $tmp
-        }
-        ( my $qt_col = $choices->[$idx] ) =~ s/^\-\s//;
-        $idx -= @pre;
-        my $cols_type;
-        if ( $idx <= $#{$sql->{group_by_cols}} ) {
-            $cols_type = 'group_by_cols';
-        }
-        elsif ( $idx <= @{$sql->{group_by_cols}} + $#{$sql->{aggr_cols}} ) {
-            $idx -= @{$sql->{group_by_cols}};
-            $cols_type = 'aggr_cols';
-        }
-        else {
-            $idx -= @{$sql->{group_by_cols}} + @{$sql->{aggr_cols}};
-            $cols_type = 'chosen_cols';
-        }
-        # reset col to original, if __col_function is called on a already modified col:
-        if ( $sql->{$cols_type}[$idx] ne $sql->{'orig_' . $cols_type}[$idx] ) {
-            if ( $cols_type ne 'aggr_cols' ) {
-                my $i = first_index { $sql->{$cols_type}[$idx] eq $_ } @{$sql->{modified_cols}};
-                splice( @{$sql->{modified_cols}}, $i, 1 );
-            }
-            $sql->{$cols_type}[$idx] = $sql->{'orig_' . $cols_type}[$idx];
-            if ( $cols_type eq 'group_by_cols' ) {
-                $sql->{group_by_stmt} = " GROUP BY " . join( ', ', @{$sql->{$cols_type}} );
-            }
-            $changed++;
-            next COL_SCALAR_FUNC;
-        }
+    SCALAR_FUNC: while ( 1 ) {
         $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $function = choose(
-            [ undef, map( "  $_", @functions ) ],
-            { %{$sf->{i}{lyt_stmt_v}} }
+            [ undef, map( "  $_", @functions_sorted ) ],
+            { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Function:', undef => '  <=' } # <= BACK
         );
         if ( ! defined $function ) {
-            next COL_SCALAR_FUNC;
+            return;
         }
         $function =~ s/^\s\s//;
+        my $arg_count = $functions_args->{$function};
         $ax->print_sql( $sql, [ $stmt_type ] );
-        my $col_with_func = $sf->__prepare_col_func( $function, $qt_col );
+        my $col = $sf->__choose_columns( $sql, $stmt_type, $function, $arg_count, $cols ); # cols - col
+        if ( ! defined $col ) {
+            next SCALAR_FUNC;
+        }
+        $ax->print_sql( $sql, [ $stmt_type ] );
+        my $col_with_func = $sf->__prepare_col_func( $function, $col );
         if ( ! defined $col_with_func ) {
-            next COL_SCALAR_FUNC;
+            next SCALAR_FUNC;
         }
-        # modify columns:
-        $sql->{$cols_type}[$idx] = $col_with_func;
-        my $alias = $ax->alias( 'functions', 'AS: ', undef, $col_with_func );
-        #if ( defined $alias && length $alias ) {
-            $sql->{alias}{$col_with_func} = $ax->quote_col_qualified( [ $alias ] );
-        #}
-        if ( $cols_type eq 'group_by_cols' ) {
-            $sql->{group_by_stmt} = " GROUP BY " . join( ', ', @{$sql->{group_by_cols}} );
-        }
-        if ( $cols_type ne 'aggr_cols' ) {
-            # $sql->{modified_cols}: make the modified columns available in WHERE and ORDER BY
-            # skip aggregate functions because aggregate are not allowed in WHERE clauses
-            # no problem for ORDER BY because it doesn't use the $sql->{modified_cols} in aggregate mode
-            push @{$sql->{modified_cols}}, $col_with_func;
-        }
-        $changed++;
-        next COL_SCALAR_FUNC;
+        return $col_with_func;
+    }
+}
+
+sub __choose_columns {
+    my ( $sf, $sql, $stmt_type, $function, $arg_count, $cols ) = @_;
+    my $ax  = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    $ax->print_sql( $sql, [ $stmt_type ] );
+    if ( ! $arg_count ) {
+        return;
+    }
+    elsif ( $arg_count == 1 ) {
+        # Choose
+        return choose( [ undef, @$cols ], { %{$sf->{i}{lyt_stmt_h}}, prompt => $function . ': ', undef => '<<' } );
+    }
+    else {
+        # Choose
+        return choose_a_subset( # option: list separator
+            $cols,
+            { layout => 1, name => $function . ': ', mouse => $sf->{o}{table}{mouse}, remove_chosen => 0 }
+        );
     }
 }
 
 
 sub __prepare_col_func {
-    my ( $sf, $func, $qt_col ) = @_;
+    my ( $sf, $func, $qt_col ) = @_; # $qt_col -> $arg
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $quote_f;
     if ( $func =~ /^Epoch_to_Date(?:Time)?\z/ ) {
@@ -150,7 +122,7 @@ sub __prepare_col_func {
         }
     }
     elsif ( $func eq 'Truncate' ) {
-        my $info = "TRUNC $qt_col";
+        my $info = $func . ': ' . $qt_col;
         my $name = "Decimal places: ";
         my $precision = choose_a_number( 2,
             { info => $info, name => $name, small_on_top => 1, mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
@@ -163,6 +135,13 @@ sub __prepare_col_func {
     }
     elsif ( $func eq 'Char_Length' ) {
         $quote_f = $plui->char_length( $qt_col );
+    }
+    elsif ( $func eq 'Concat' ) {
+        my $info = "\n" . 'Concat( ' . join( ', ', @$qt_col ) . ' )';
+        my $trs = Term::Form->new();
+        my $sep = $trs->readline( 'Separator: ', { info => $info } );
+        return if ! defined $sep;
+        $quote_f = $plui->concatenate( $qt_col, $sep );
     }
     return $quote_f;
 }

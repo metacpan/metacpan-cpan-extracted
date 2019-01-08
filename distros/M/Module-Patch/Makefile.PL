@@ -19,7 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Log::ger" => "0.023",
     "Monkey::Patch::Action" => "0.060",
-    "Package::MoreUtil" => "0.590",
+    "Package::Stash" => 0,
+    "Package::Util::Lite" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.274",
+  "VERSION" => "0.275",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +52,8 @@ my %FallbackPrereqs = (
   "Log::ger" => "0.023",
   "Module::Load" => 0,
   "Monkey::Patch::Action" => "0.060",
-  "Package::MoreUtil" => "0.590",
+  "Package::Stash" => 0,
+  "Package::Util::Lite" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.96",
   "lib" => 0,

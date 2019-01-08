@@ -1,5 +1,9 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.05    2019-01-04 21:49:33
+        [CHANGES]
+         * Rewrite logic back to Future::AsyncAwait again
+
 0.06    2018-11-18 01:14:00
         [CHANGES]
          * Revert Future::AsyncAwait experimentation

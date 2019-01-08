@@ -12,8 +12,7 @@ use strict;
 
 use lib qw(../lib);
 
-use List::Util qw(max);
-use Math::AnyNum qw(irand invmod powmod gcd);
+use Math::AnyNum qw(max irand invmod powmod gcd);
 use Math::Prime::Util qw(random_strong_prime);
 
 my $message = "Hello, world!";

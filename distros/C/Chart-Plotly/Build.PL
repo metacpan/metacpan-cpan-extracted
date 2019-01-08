@@ -3,18 +3,18 @@
 use strict;
 use warnings;
 
-use Module::Build 0.28;
+use Module::Build 0.3601;
 
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.28"
+    "Module::Build" => "0.3601"
   },
   "configure_requires" => {
     "Const::Fast" => 0,
     "Data::Dump" => 0,
     "Getopt::Long::Descriptive" => 0,
-    "Module::Build" => "0.28",
+    "Module::Build" => "0.3601",
     "Path::Tiny" => 0,
     "Text::Template" => 0
   },
@@ -23,12 +23,14 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "Chart-Plotly",
-  "dist_version" => "0.021",
+  "dist_version" => "0.022",
   "license" => "mit",
   "module_name" => "Chart::Plotly",
   "recursive_test_files" => 1,
   "requires" => {
     "Exporter" => 0,
+    "File::ShareDir" => 0,
+    "File::Which" => 0,
     "HTML::Show" => 0,
     "JSON" => 0,
     "Module::Load" => 0,
@@ -36,6 +38,7 @@ my %module_build_args = (
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::ExtraArgs" => 0,
     "Params::Validate" => 0,
+    "Path::Tiny" => 0,
     "Ref::Util" => 0,
     "Text::Template" => 0,
     "UUID::Tiny" => 0,
@@ -46,6 +49,9 @@ my %module_build_args = (
     "vars" => 0,
     "warnings" => 0
   },
+  "share_dir" => {
+    "dist" => "share"
+  },
   "test_requires" => {
     "Test::More" => 0,
     "Test::Most" => 0
@@ -54,7 +60,7 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
-  "Module::Build" => "0.28",
+  "Module::Build" => "0.3601",
   "Test::More" => 0,
   "Test::Most" => 0
 );

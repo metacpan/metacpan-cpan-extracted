@@ -1,6 +1,6 @@
 package Address::PostCode::UK::Location;
 
-$Address::PostCode::UK::Location::VERSION   = '0.14';
+$Address::PostCode::UK::Location::VERSION   = '0.15';
 $Address::PostCode::UK::Location::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::UK::Location - Represent 'location' for Address::PostCode::UK
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 

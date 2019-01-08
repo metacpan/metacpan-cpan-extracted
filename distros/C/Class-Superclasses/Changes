@@ -1,6 +1,15 @@
 Revision history for Perl extension Class::Superclass.
 ======================================================
 
+1.00  2019-01-05 09:30:00
+
+     * now you can pass a PPI::Document object to document()
+
+0.09  2019-01-04 08:40:00
+
+     * fix test failure
+     * inlined test modules
+
 0.08  2018-12-23 11:26:00
 
      * added support for several Moo-like frameworks

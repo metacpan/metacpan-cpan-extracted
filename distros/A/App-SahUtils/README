@@ -2,8 +2,8 @@ NAME
     App::SahUtils - Collection of CLI utilities for Sah and Data::Sah
 
 VERSION
-    This document describes version 0.461 of App::SahUtils (from Perl
-    distribution App-SahUtils), released on 2018-06-03.
+    This document describes version 0.462 of App::SahUtils (from Perl
+    distribution App-SahUtils), released on 2019-01-06.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -61,7 +61,7 @@ FUNCTIONS
   get_sah_type
     Usage:
 
-     get_sah_type(%args) -> [status, msg, result, meta]
+     get_sah_type(%args) -> [status, msg, payload, meta]
 
     Extract type from a Sah string or array schema.
 
@@ -79,7 +79,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -88,7 +88,7 @@ FUNCTIONS
   is_sah_builtin_type
     Usage:
 
-     is_sah_builtin_type(%args) -> [status, msg, result, meta]
+     is_sah_builtin_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a Sah builtin type.
 
@@ -106,7 +106,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -115,7 +115,7 @@ FUNCTIONS
   is_sah_collection_builtin_type
     Usage:
 
-     is_sah_collection_builtin_type(%args) -> [status, msg, result, meta]
+     is_sah_collection_builtin_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a Sah collection builtin type.
 
@@ -133,7 +133,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -142,7 +142,7 @@ FUNCTIONS
   is_sah_collection_type
     Usage:
 
-     is_sah_collection_type(%args) -> [status, msg, result, meta]
+     is_sah_collection_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a collection Sah type.
 
@@ -161,7 +161,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -170,7 +170,7 @@ FUNCTIONS
   is_sah_numeric_builtin_type
     Usage:
 
-     is_sah_numeric_builtin_type(%args) -> [status, msg, result, meta]
+     is_sah_numeric_builtin_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a Sah numeric builtin type.
 
@@ -188,7 +188,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -197,7 +197,7 @@ FUNCTIONS
   is_sah_numeric_type
     Usage:
 
-     is_sah_numeric_type(%args) -> [status, msg, result, meta]
+     is_sah_numeric_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a numeric Sah type.
 
@@ -216,7 +216,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -225,7 +225,7 @@ FUNCTIONS
   is_sah_ref_builtin_type
     Usage:
 
-     is_sah_ref_builtin_type(%args) -> [status, msg, result, meta]
+     is_sah_ref_builtin_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a Sah ref builtin type.
 
@@ -243,7 +243,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -252,7 +252,7 @@ FUNCTIONS
   is_sah_ref_type
     Usage:
 
-     is_sah_ref_type(%args) -> [status, msg, result, meta]
+     is_sah_ref_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a ref Sah type.
 
@@ -271,7 +271,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -280,7 +280,7 @@ FUNCTIONS
   is_sah_simple_builtin_type
     Usage:
 
-     is_sah_simple_builtin_type(%args) -> [status, msg, result, meta]
+     is_sah_simple_builtin_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a Sah simple builtin type.
 
@@ -298,7 +298,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -307,7 +307,7 @@ FUNCTIONS
   is_sah_simple_type
     Usage:
 
-     is_sah_simple_type(%args) -> [status, msg, result, meta]
+     is_sah_simple_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a simple Sah type.
 
@@ -326,7 +326,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -335,7 +335,7 @@ FUNCTIONS
   is_sah_type
     Usage:
 
-     is_sah_type(%args) -> [status, msg, result, meta]
+     is_sah_type(%args) -> [status, msg, payload, meta]
 
     Check that a string or array schema is a Sah type.
 
@@ -354,7 +354,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -382,7 +382,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

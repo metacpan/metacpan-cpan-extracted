@@ -1,5 +1,5 @@
 package Selenium::CanStartBinary;
-$Selenium::CanStartBinary::VERSION = '1.30';
+$Selenium::CanStartBinary::VERSION = '1.31';
 use strict;
 use warnings;
 
@@ -9,6 +9,8 @@ use Selenium::CanStartBinary::ProbePort qw/find_open_port_above find_open_port p
 use Selenium::Firefox::Binary qw/setup_firefox_binary_env/;
 use Selenium::Waiter qw/wait_until/;
 use Moo::Role;
+
+use constant IS_WIN => $^O eq 'MSWin32';
 
 
 requires 'binary';
@@ -140,7 +142,14 @@ has '_command' => (
     }
 );
 
-use constant IS_WIN => $^O eq 'MSWin32';
+
+has 'logfile' => (
+    is => 'lazy',
+    default => sub {
+        return '/nul' if IS_WIN;
+        return '/dev/null';
+    }
+);
 
 sub BUILDARGS {
     # There's a bit of finagling to do to since we can't ensure the
@@ -245,6 +254,22 @@ sub shutdown_binary {
 
         # Close the orphaned command windows on windows
         $self->shutdown_windows_binary;
+        $self->shutdown_unix_binary;
+    }
+
+}
+
+sub shutdown_unix_binary {
+    my ($self) = @_;
+    if (!IS_WIN) {
+        my $cmd = "lsof -t -i :".$self->port();
+        my $pid = `$cmd`;
+        chomp $pid;
+        if ($pid) {
+            print "Killing Driver PID $pid listening on port ".$self->port."...\n";
+            eval { kill 'KILL', $pid };
+            warn "Could not kill driver process! you may have to clean up manually." if $@;
+        }
     }
 }
 
@@ -320,15 +345,9 @@ sub _cmd_prefix {
 }
 
 sub _cmd_suffix {
-    # TODO: allow users to specify whether & where they want driver
-    # output to go
-
-    if (IS_WIN) {
-        return ' > /nul 2>&1 ';
-    }
-    else {
-        return ' > /dev/null 2>&1 &';
-    }
+    my ($self) = @_;
+    return " > ".$self->logfile." 2>&1 " if IS_WIN;
+    return " > ".$self->logfile." 2>&1 &";
 }
 
 
@@ -346,7 +365,7 @@ Selenium::CanStartBinary - Teach a WebDriver how to start its own binary aka no 
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 DESCRIPTION
 
@@ -492,6 +511,11 @@ was run to start the webdriver server.
     my $f = Selenium::Firefox->new;
     say $f->_command;
 
+=head2 logfile
+
+Normally we log what occurs in the driver to /dev/null (or /nul on windows).
+Setting this will redirect it to the provided file.
+
 =for Pod::Coverage *EVERYTHING*
 
 =head1 SEE ALSO
@@ -521,7 +545,7 @@ L<Selenium::PhantomJS|Selenium::PhantomJS>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/teodesian/Selenium-Remote-Driver/issues
+L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

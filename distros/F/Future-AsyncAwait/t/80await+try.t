@@ -17,6 +17,9 @@ BEGIN {
 
    Future::AsyncAwait->import;
    Syntax::Keyword::Try->import;
+
+   diag( "Future::AsyncAwait $Future::AsyncAwait::VERSION, " .
+         "Syntax::Keyword::Try $Syntax::Keyword::Try::VERSION" );
 }
 
 # await in try/catch

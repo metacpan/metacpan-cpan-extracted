@@ -1,0 +1,27 @@
+0.08      2018-06-25 17:03:25+01:00 Europe/London
+    - Updated for more recent dependancies
+
+0.07      2016-06-30 10:46:21+01:00 Europe/London
+    - Add role to be consumed by users
+    - Ensured that data is decoded on receive
+
+0.06      2016-04-22 14:45:38+01:00 Europe/London
+    - Updated to Broadworks Release 20 SP1
+
+0.05      2015-10-19 11:09:00+01:00 Europe/London
+    - Fixed the correct return value for commands, so checking works.
+
+0.04      2014-11-07 10:46:31+00:00 Europe/London
+    - Removed weaken of tables which did very much the wrong thing
+    - Fixed Throwable to stop stack trace objects leaking
+
+0.03      2014-11-06 16:20:02+00:00 Europe/London
+    - Weaken some internal references to prevent leaks
+
+0.02      2014-09-01 14:54:53+01:00 Europe/London
+    - Fixed a batch of parameter mishandling
+    - Better type handling
+
+0.01      2014-07-18 17:05:12+01:00 Europe/London
+    - Initial package creation
+

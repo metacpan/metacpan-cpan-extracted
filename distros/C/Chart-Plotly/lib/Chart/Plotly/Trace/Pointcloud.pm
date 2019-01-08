@@ -10,7 +10,7 @@ use Chart::Plotly::Trace::Pointcloud::Hoverlabel;
 use Chart::Plotly::Trace::Pointcloud::Marker;
 use Chart::Plotly::Trace::Pointcloud::Stream;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The data visualized as a point cloud set in `x` and `y` using the WebGl plotting engine.
 
@@ -56,7 +56,7 @@ has customdatasrc => ( is            => "rw",
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -240,7 +240,7 @@ Chart::Plotly::Trace::Pointcloud - The data visualized as a point cloud set in `
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

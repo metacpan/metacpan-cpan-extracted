@@ -15,7 +15,6 @@ var obj = Range(...)
 
 =head1 METHODS
 
-
 =head2 *
 
 I<Obj> B<*> I<Obj> -> I<Obj>
@@ -73,6 +72,16 @@ I<Obj> B<==> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<eq>
+
+=cut
+
+=head2 accumulate
+
+Range.accumulate() -> I<Obj>
+
+Return the
+
+Aliases: I<accumulate_by>
 
 =cut
 
@@ -200,6 +209,16 @@ Return the
 
 =cut
 
+=head2 kv
+
+Range.kv() -> I<Obj>
+
+Return the
+
+Aliases: I<pairs>, I<zip_indices>
+
+=cut
+
 =head2 last
 
 Range.last() -> I<Obj>
@@ -283,6 +302,14 @@ Range.new() -> I<Obj>
 Return the
 
 Aliases: I<call>
+
+=cut
+
+=head2 none
+
+Range.none() -> I<Obj>
+
+Return the
 
 =cut
 

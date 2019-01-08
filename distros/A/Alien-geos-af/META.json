@@ -54,11 +54,13 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "1.41",
-            "Alien::Build" : "0.25"
+            "Alien::Build" : "0.25",
+            "FFI::CheckLib" : "0.23"
          }
       },
       "test" : {
          "requires" : {
+            "FFI::CheckLib" : "0.23",
             "Test::Alien" : "0"
          }
       }
@@ -73,7 +75,7 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-geos"
       }
    },
-   "version" : "1.005",
+   "version" : "1.007",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 1.49",
       "requires" : {

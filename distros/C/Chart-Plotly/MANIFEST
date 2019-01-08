@@ -12,10 +12,13 @@ examples/anscombe.pl
 examples/anscombe.png
 examples/basic.pl
 examples/data_frame.pl
+examples/distribution_js.pl
+examples/embed_js.pl
 examples/layout.pl
 examples/montage_all_traces.png
 examples/morley.csv
 examples/multiple.pl
+examples/orca.pl
 examples/pdl.pl
 examples/plot.pl
 examples/plot_object.pl
@@ -132,6 +135,7 @@ lib/Chart/Plotly.pm
 lib/Chart/Plotly/Adapter.pm
 lib/Chart/Plotly/Adapter/Data/Frame.pm
 lib/Chart/Plotly/Adapter/Data/Table.pm
+lib/Chart/Plotly/Image/Orca.pm
 lib/Chart/Plotly/Plot.pm
 lib/Chart/Plotly/Trace/Area.pm
 lib/Chart/Plotly/Trace/Area/Hoverlabel.pm
@@ -758,6 +762,8 @@ lib/Chart/Plotly/Trace/Violin/Stream.pm
 lib/Chart/Plotly/Trace/Violin/Transform.pm
 lib/Chart/Plotly/Trace/Violin/Unselected.pm
 lib/Chart/Plotly/Trace/Violin/Unselected/Marker.pm
+share/plotly.js/LICENSE
+share/plotly.js/plotly.min.js
 t/00-load.t
 t/author-critic.t
 t/author-pod-coverage.t

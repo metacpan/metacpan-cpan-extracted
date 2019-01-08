@@ -25,6 +25,7 @@ script/sdif
 script/watchdiff
 t/00_compile.t
 t/01_run.t
+t/10_mecab.t
 t/cdif/arabic.01.new.txt
 t/cdif/arabic.01.old.txt
 t/cdif/ch.01.new.txt

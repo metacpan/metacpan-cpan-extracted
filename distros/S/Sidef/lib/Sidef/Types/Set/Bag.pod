@@ -18,10 +18,9 @@ var obj = Bag(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Set::Set
+       * Sidef::Types::Set::Set
 
 =head1 METHODS
-
 
 =head2 &
 
@@ -49,7 +48,7 @@ I<Obj> B<-> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<∖>, I<diff>, I<difference>
+Aliases: I<∖>, I<sub>, I<diff>, I<difference>
 
 =cut
 
@@ -246,6 +245,8 @@ Aliases: I<select>
 Bag.has() -> I<Obj>
 
 Return the
+
+Aliases: I<exists>, I<has_key>, I<haskey>, I<contain>, I<include>, I<contains>, I<includes>
 
 =cut
 
@@ -485,7 +486,7 @@ I<Obj> B<≤> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<⊆>, I<E<lt>=>, I<is_subset>, I<contained_in>
+Aliases: I<⊆>, I<E<lt>=>, I<is_subset>
 
 =cut
 
@@ -495,6 +496,6 @@ I<Obj> B<≥> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<⊇>, I<E<gt>=>, I<contain>, I<include>, I<contains>, I<includes>, I<is_superset>
+Aliases: I<⊇>, I<E<gt>=>, I<is_superset>
 
 =cut

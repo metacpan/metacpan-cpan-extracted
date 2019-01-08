@@ -9,9 +9,10 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
+use Future::AsyncAwait;
 use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 use List::Util qw( first );
 
@@ -26,7 +27,7 @@ C<Device::Chip::MAX11200> - chip driver for F<MAX11200>
  use Device::Chip::MAX11200;
 
  my $chip = Device::Chip::MAX11200->new;
- $chip->mound( Device::Chip::Adapter::...->new )->get;
+ $chip->mount( Device::Chip::Adapter::...->new )->get;
 
  $chip->trigger->get;
 
@@ -70,27 +71,26 @@ use constant {
    REG_SCGC  => 8,
 };
 
-sub read_register
+async sub read_register
 {
    my $self = shift;
    my ( $reg, $len ) = @_;
 
    $len //= 1;
 
-   $self->protocol->readwrite(
+   my $bytes = await $self->protocol->readwrite(
       pack "C a*", 0xC1 | ( $reg << 1 ), "\0" x $len
-   )->then( sub {
-      my ( $bytes ) = @_;
-      Future->done( substr $bytes, 1 );
-   });
+   );
+
+   return substr $bytes, 1;
 }
 
-sub write_register
+async sub write_register
 {
    my $self = shift;
    my ( $reg, $val ) = @_;
 
-   $self->protocol->write(
+   await $self->protocol->write(
       pack "C a*", 0xC0 | ( $reg << 1 ), $val
    );
 }
@@ -105,12 +105,12 @@ use constant {
    CMD_CONV      => 0,
 };
 
-sub command
+async sub command
 {
    my $self = shift;
    my ( $cmd ) = @_;
 
-   $self->protocol->write( pack "C", 0x80 | $cmd );
+   await $self->protocol->write( pack "C", 0x80 | $cmd );
 }
 
 =head2 read_status
@@ -136,14 +136,13 @@ bitfield { format => "bytes-LE" }, STAT =>
    RATE  => enumfield(4, @RATES),
    SYSOR => boolfield(7);
 
-sub read_status
+async sub read_status
 {
    my $self = shift;
 
-   $self->read_register( REG_STAT )->then( sub {
-      my ( $bytes ) = @_;
-      return Future->done( unpack_STAT( $bytes ) );
-   });
+   my $bytes = await $self->read_register( REG_STAT );
+
+   return unpack_STAT( $bytes );
 }
 
 =head2 read_config
@@ -184,17 +183,15 @@ bitfield { format => "bytes-LE" }, CONFIG =>
    NOSYSG => boolfield(8+4),
    DGAIN  => enumfield(8+5, qw( 1 2 4 8 16 ));
 
-sub read_config
+async sub read_config
 {
    my $self = shift;
 
-   Future->needs_all(
-      $self->read_register( REG_CTRL1 ),
-      $self->read_register( REG_CTRL3 ),
-   )->then( sub {
-      my ( $ctrl1, $ctrl3 ) = @_;
-      Future->done( $self->{config} = { unpack_CONFIG( $ctrl1 . $ctrl3 ) } );
-   });
+   my ( $ctrl1, $ctrl3 ) = await Future->needs_all(
+      $self->read_register( REG_CTRL1 ), $self->read_register( REG_CTRL3 )
+   );
+
+   return $self->{config} = { unpack_CONFIG( $ctrl1 . $ctrl3 ) };
 }
 
 =head2 change_config
@@ -206,23 +203,20 @@ their existing values.
 
 =cut
 
-sub change_config
+async sub change_config
 {
    my $self = shift;
    my %changes = @_;
 
-   ( $self->{config} ? Future->done( $self->{config} ) : $self->read_config )
-   ->then( sub {
-      my ( $config ) = @_;
+   my $config = $self->{config} // await $self->read_config;
 
-      $self->{config} = { %$config, %changes };
-      my $ctrlb = pack_CONFIG( %{ $self->{config} } );
+   $self->{config} = { %$config, %changes };
+   my $ctrlb = pack_CONFIG( %{ $self->{config} } );
 
-      Future->needs_all(
-         $self->write_register( REG_CTRL1, substr $ctrlb, 0, 1 ),
-         $self->write_register( REG_CTRL3, substr $ctrlb, 1, 1 ),
-      );
-   });
+   await Future->needs_all(
+      $self->write_register( REG_CTRL1, substr $ctrlb, 0, 1 ),
+      $self->write_register( REG_CTRL3, substr $ctrlb, 1, 1 ),
+   );
 }
 
 =head2 selfcal
@@ -233,11 +227,11 @@ Requests the chip perform a self-calibration.
 
 =cut
 
-sub selfcal
+async sub selfcal
 {
    my $self = shift;
 
-   $self->command( CMD_SELFCAL );
+   await $self->command( CMD_SELFCAL );
 }
 
 =head2 syscal_offset
@@ -248,11 +242,11 @@ Requests the chip perform the offset part of system calibration.
 
 =cut
 
-sub syscal_offset
+async sub syscal_offset
 {
    my $self = shift;
 
-   $self->command( CMD_SYSOCAL );
+   await $self->command( CMD_SYSOCAL );
 }
 
 =head2 syscal_gain
@@ -263,11 +257,11 @@ Requests the chip perform the gain part of system calibration.
 
 =cut
 
-sub syscal_gain
+async sub syscal_gain
 {
    my $self = shift;
 
-   $self->command( CMD_SYSGCAL );
+   await $self->command( CMD_SYSGCAL );
 }
 
 =head2 trigger
@@ -281,7 +275,7 @@ it can be read using the C<read_adc> method.
 
 =cut
 
-sub trigger
+async sub trigger
 {
    my $self = shift;
    my ( $rate ) = @_;
@@ -291,7 +285,7 @@ sub trigger
    defined( my $rateidx = first { $RATES[$_] == $rate } 0 .. $#RATES )
       or croak "Unrecognised conversion rate $rate";
 
-   $self->command( CMD_CONV | $rateidx );
+   await $self->command( CMD_CONV | $rateidx );
 }
 
 =head2 read_adc
@@ -307,14 +301,13 @@ either signed or unsigned as per the C<FORMAT> configuration.
 
 =cut
 
-sub read_adc
+async sub read_adc
 {
    my $self = shift;
 
-   $self->read_register( REG_DATA, 3 )->then( sub {
-      my ( $bytes ) = @_;
-      return Future->done( unpack "L>", "\0$bytes" );
-   });
+   my $bytes = await $self->read_register( REG_DATA, 3 );
+
+   return unpack "L>", "\0$bytes";
 }
 
 =head2 read_adc_ratio
@@ -370,22 +363,21 @@ low to put it into input mode.
 
 =cut
 
-sub write_gpios
+async sub write_gpios
 {
    my $self = shift;
    my ( $values, $dir ) = @_;
 
-   $self->write_register( REG_CTRL2, pack "C", ( $dir << 4 ) | $values );
+   await $self->write_register( REG_CTRL2, pack "C", ( $dir << 4 ) | $values );
 }
 
-sub read_gpios
+async sub read_gpios
 {
    my $self = shift;
 
-   $self->read_register( REG_CTRL2 )->then( sub {
-      my ( $bytes ) = @_;
-      return Future->done( 0x0F & unpack "C", $bytes );
-   });
+   my $bytes = await $self->read_register( REG_CTRL2 );
+
+   return 0x0F & unpack "C", $bytes;
 }
 
 =head2 Calibration Registers
@@ -415,15 +407,13 @@ foreach (
 
    no strict 'refs';
 
-   *{"read_$name"} = sub {
-      $_[0]->read_register( $reg, 3 )->then( sub {
-         my ( $bytes ) = @_;
-         Future->done( unpack "I>", "\0" . $bytes );
-      });
+   *{"read_$name"} = async sub {
+      my $bytes = await $_[0]->read_register( $reg, 3 );
+      return unpack "I>", "\0" . $bytes;
    };
 
-   *{"write_$name"} = sub {
-      $_[0]->write_register( $reg,
+   *{"write_$name"} = async sub {
+      await $_[0]->write_register( $reg,
          substr( pack( "I>", $_[1] ), 1 )
       );
    };

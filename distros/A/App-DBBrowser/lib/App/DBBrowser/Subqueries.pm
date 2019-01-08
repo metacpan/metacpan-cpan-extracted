@@ -35,55 +35,68 @@ sub __stmt_history {
     my $db = $sf->{d}{db};
     my $sq_history = [];
     for my $stmt ( @{$sf->{i}{history}{$db}{$clause}} ) {
+        if ( any { $_ eq $stmt } @$sq_history ) {
+            next;
+        }
         push @$sq_history, $stmt;
         if ( @$sq_history == 6 ) {
             last;
         }
     }
-    my $tmp_history_print = [];
-    my $tmp_history_filled = [];
+    my $space = 10 - @$sq_history;
+
+    my $print_history_raw = [];
+    my $print_history_filled = [];
     for my $stmt ( @{$sf->{i}{history}{$db}{print}} ) {
         my $filled_stmt = $ax->stmt_placeholder_to_value( @$stmt, 1 );
         if ( $filled_stmt =~ /^[^\(]+FROM\s*\(\s*(\S.+\S)\s*\)[^\)]*\z/ ) { # Union, Join
             $filled_stmt = $1;
         }
-        if ( any { $_ eq $filled_stmt } @$tmp_history_filled ) {
+        if ( any { $_ eq $filled_stmt } @$print_history_filled ) {
             next;
         }
-        if ( @$tmp_history_print == 7 ) {
-            $sf->{i}{history}{$db}{print} = $tmp_history_print;
+        if ( @$print_history_raw == 7 ) {
+            $sf->{i}{history}{$db}{print} = $print_history_raw;
             last;
         }
-        push @$tmp_history_print, $stmt;
-        push @$tmp_history_filled, $filled_stmt;
+        push @$print_history_raw,    $stmt;
+        push @$print_history_filled, $filled_stmt;
     }
-    my $space = 10 - @$sq_history;
-    if ( @$tmp_history_filled > $space ) {
-        $#{$tmp_history_filled} = $space - 1;
+
+    if ( @$print_history_filled > $space ) {
+        $#{$print_history_filled} = $space - 1;
     }
-    push @$sq_history, @$tmp_history_filled;
+    push @$sq_history, @$print_history_filled;
     return $sq_history;
 }
 
 
 sub choose_subquery {
-    my ( $sf, $sql, $tmp, $stmt_type, $clause ) = @_;
+    my ( $sf, $sql, $stmt_type, $clause ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $db = $sf->{d}{db};
-    my $readline = '  Read-Line';
-    my $edit_sq_file = 'Choose SQ:';
-    my @pre = ( $edit_sq_file, undef, $readline );
     my $h_ref = $ax->read_json( $sf->{subquery_file} );
     my $subqueries = $h_ref->{ $sf->{d}{driver} }{ $sf->{d}{db} }{ $clause } || [];
     my $history = $sf->__stmt_history( $clause );
-    my $choices = [ @pre, map( '- ' . $_->[-1], @$subqueries ), map( '- ' . $_, @$history ) ];
+    my $edit_sq_file = 'Choose SQ:';
+    my $readline     = '  Read-Line';
+    my @pre = ( $edit_sq_file, undef, $readline );
     my $old_idx = 1;
+    my $prefix = '- ';
 
     SUBQUERY: while ( 1 ) {
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
+        my $choices = [
+            @pre,
+            map( $prefix . $_->[-1], @$subqueries ),
+            map( $prefix . $_, @$history )
+        ];
         $ENV{TC_RESET_AUTO_UP} = 0;
         # Choose
-        my $idx = choose( $choices, { %{$sf->{i}{lyt_stmt_v}}, index => 1, prompt => '', default => $old_idx } );
+        my $idx = choose(
+            $choices,
+            { %{$sf->{i}{lyt_stmt_v}}, index => 1, prompt => '', default => $old_idx, undef => $sf->{i}{back_v_no_ok} }
+        );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
         }
@@ -102,29 +115,37 @@ sub choose_subquery {
             if ( $any_change ) {
                 $h_ref = $ax->read_json( $sf->{subquery_file} );
                 $subqueries = $h_ref->{ $sf->{d}{driver} }{ $sf->{d}{db} }{ $clause } || [];
-                $choices = [ @pre, map( '- ' . $_->[-1], @$subqueries ), map( '- ' . $_, @$history ) ];
+                $choices = [
+                    @pre,
+                    map( $prefix . $_->[-1], @$subqueries ),
+                    map( $prefix . $_, @$history )
+                ];
             }
             next SUBQUERY;
         }
-        elsif ( $choices->[$idx] eq $readline ) {
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
-            my $tf = Term::Form->new();
-            my $stmt = $tf->readline( 'Stmt: ' );
-            if ( defined $stmt && length $stmt ) {
-                push @{$sf->{i}{history}{$db}{$clause}}, $stmt;
-                return $stmt;
-            }
+
+        my ( $prompt, $default, $info );
+        if ( $choices->[$idx] eq $readline ) {
+            $prompt = 'Stmt: ';
         }
         else {
-            $idx -= @pre;
-            my $default;
+            $info = "\nPress 'Enter'";
+            $prompt = '|';
+             $idx -= @pre;
             if ( $idx <= $#$subqueries ) {
-                return $subqueries->[$idx][0];
+                $default = $subqueries->[$idx][0];
             }
             else {
                 $idx -= @$subqueries;
-                return $history->[$idx];
+                $default = $history->[$idx];
             }
+        }
+        $ax->print_sql( $sql, [ $stmt_type ] );
+        my $tf = Term::Form->new();
+        my $stmt = $tf->readline( $prompt, { default => $default, info => $info } );
+        if ( defined $stmt && length $stmt ) {
+            unshift @{$sf->{i}{history}{$db}{$clause}}, $stmt;
+            return $stmt;
         }
     }
 }
@@ -140,7 +161,7 @@ sub edit_sq_file {
     my $any_change = 0;
 
     while ( 1 ) {
-        my $top_lines = [ uc( $clause ) . '-clause SQs:' ];
+        my $top_lines = [ $db, sprintf( 'Stored Subqueries "%s"', ucfirst $clause ) ];
         my $h_ref = $ax->read_json( $sf->{subquery_file} );
         my $subqueries = $h_ref->{$driver}{$db}{$clause} || [];
         my @tmp_info = (
@@ -152,7 +173,7 @@ sub edit_sq_file {
         # Choose
         my $choice = choose(
             [ @pre, $add, $edit, $remove ],
-            { %{$sf->{i}{lyt_stmt_v}}, undef => $sf->{i}{back_config}, info => $info, clear_screen => 1 }
+            { %{$sf->{i}{lyt_3}}, undef => $sf->{i}{back_v_no_ok}, info => $info }
         );
         my $changed = 0;
         if ( ! defined $choice ) {
@@ -189,13 +210,14 @@ sub __add_subqueries {
     my $readline = '  Read-Line';
     my @pre = ( undef, $sf->{i}{_confirm}, $readline );
     my $bu = [];
+    my $tmp_new = [];
 
     while ( 1 ) {
-        my @tmp_info = (
-            @$top_lines,
-            map( line_fold( $_->[-1], term_width(), '  ', '    ' ), @$subqueries ),
-            ' '
-        );
+        my @tmp_info = ( @$top_lines, map( line_fold( $_->[-1], term_width(), '  ', '    ' ), @$subqueries ) );
+        if ( @$tmp_new ) {
+            push @tmp_info, map( line_fold( $_->[-1], term_width(), '| ', '    ' ), @$tmp_new );
+        }
+        push @tmp_info, ' ';
         my $info = join "\n", @tmp_info;
         my $choices = [ @pre, map { '- ' . $_ } @$history ];
         # Choose
@@ -205,32 +227,33 @@ sub __add_subqueries {
         );
         if ( ! $idx ) {
             if ( @$bu ) {
-                ( $subqueries, $history, $used ) = @{pop @$bu};
+                ( $tmp_new, $history, $used ) = @{pop @$bu};
                 next;
             }
             return;
         }
         elsif ( $choices->[$idx] eq $sf->{i}{_confirm} ) {
+            push @$subqueries, @$tmp_new;
             return 1;
         }
         elsif ( $choices->[$idx] eq $readline ) {
             my $tf = Term::Form->new();
             my $stmt = $tf->readline( 'Stmt: ', { info => $info, clear_screen => 1  } );
             if ( defined $stmt && length $stmt ) {
-                push @$bu, [ [ @$subqueries ], [ @$history ], [ @$used ] ];
+                push @$bu, [ [ @$tmp_new ], [ @$history ], [ @$used ] ];
                 my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, term_width(), '', ' ' x length( 'Stmt: ' ) );
                 my $name = $tf->readline( 'Name: ', { info => $info . $folded_stmt } );
-                push @$subqueries, [ $stmt, length $name ? $name : () ]; #
+                push @$tmp_new, [ $stmt, length $name ? $name : () ];
             }
         }
         else {
-            push @$bu, [ [ @$subqueries ], [ @$history ], [ @$used ] ]; #
+            push @$bu, [ [ @$tmp_new ], [ @$history ], [ @$used ] ];
             push @$used, splice @$history, $idx-@pre, 1;
             my $stmt = $used->[-1];
             my $folded_stmt = "\n" . line_fold( 'Stmt: ' . $stmt, term_width(), '', ' ' x length( 'Stmt: ' ) );
             my $tf = Term::Form->new();
             my $name = $tf->readline( 'Name: ', { info => $info . $folded_stmt } );
-            push @$subqueries, [ $stmt, length $name ? $name : () ];
+            push @$tmp_new, [ $stmt, length $name ? $name : () ];
         }
     }
 }

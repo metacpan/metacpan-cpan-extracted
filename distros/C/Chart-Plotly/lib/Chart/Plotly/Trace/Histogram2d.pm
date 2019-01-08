@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Histogram2d::Transform;
 use Chart::Plotly::Trace::Histogram2d::Xbins;
 use Chart::Plotly::Trace::Histogram2d::Ybins;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` and `y` (where `x` and `y` represent marginal distributions, binning is set in `xbins` and `ybins` in this case) or `z` (where `z` represent the 2D distribution and binning set, binning is set by `x` and `y` in this case). The resulting distribution is visualized as a heatmap.
 
@@ -104,7 +104,7 @@ has histnorm => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -332,7 +332,7 @@ Chart::Plotly::Trace::Histogram2d - The sample data from which statistics are co
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

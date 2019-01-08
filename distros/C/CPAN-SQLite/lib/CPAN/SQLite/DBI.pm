@@ -1,10 +1,10 @@
-# $Id: DBI.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: DBI.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -32,8 +32,6 @@ $tables = {
                               dist_id => q{INTEGER NOT NULL},
                               mod_abs => q{TEXT},
                               mod_vers => q{VARCHAR(10)},
-                              dslip => q{VARCHAR(5)},
-                              chapterid => q{INTEGER},
                              },
                     key => [qw/dist_id mod_name/],
                     name => 'mod_name',
@@ -48,14 +46,12 @@ $tables = {
                                dist_file => q{VARCHAR(110) NOT NULL},
                                dist_vers => q{VARCHAR(20)},
                                dist_abs => q{TEXT},
-                               dist_dslip => q{VARCHAR(5)},
                               },
                      key => [qw/auth_id dist_name/],
                      name => 'dist_name',
                      id => 'dist_id',
                      has_a => {auths => 'auth_id'},
                      has_many => {mods => 'dist_id',
-                                  chaps => 'dist_id',
                                  },
                     },
            auths => {
@@ -69,18 +65,6 @@ $tables = {
                      has_many => {dists => 'dist_id'},
                      name => 'cpanid',
                      id => 'auth_id',
-                    },
-           chaps => {
-                     primary => {chap_id => q{INTEGER NOT NULL PRIMARY KEY}},
-                     other => {
-                               dist_id => q{INTEGER NOT NULL},
-                               chapterid => q{INTEGER},
-                               subchapter => q{TEXT},
-                              },
-                     key => [qw/dist_id/],
-                     id => 'chap_id',
-                     name => 'chapterid',
-                     has_a => {dists => 'dist_id'},
                     },
           };
 
@@ -150,7 +134,7 @@ CPAN::SQLite::DBI - DBI information for the CPAN::SQLite database
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 

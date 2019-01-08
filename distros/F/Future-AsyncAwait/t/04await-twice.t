@@ -9,6 +9,8 @@ use Future;
 
 use Future::AsyncAwait;
 
+my $orig_cxstack_ix = Future::AsyncAwait::__cxstack_ix;
+
 # await twice from function
 {
    my @futures;
@@ -55,5 +57,8 @@ use Future::AsyncAwait;
 
    is( scalar $fret->get, "result", '$fret->get from double await by pad' );
 }
+
+is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,
+   'cxstack_ix did not grow during the test' );
 
 done_testing;

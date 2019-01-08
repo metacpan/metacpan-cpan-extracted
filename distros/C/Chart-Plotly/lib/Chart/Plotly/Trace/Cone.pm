@@ -12,7 +12,7 @@ use Chart::Plotly::Trace::Cone::Lighting;
 use Chart::Plotly::Trace::Cone::Lightposition;
 use Chart::Plotly::Trace::Cone::Stream;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Use cone traces to visualize vector fields.  Specify a vector field using 6 1D arrays, 3 position arrays `x`, `y` and `z` and 3 vector component arrays `u`, `v`, `w`. The cones are drawn exactly at the positions given by `x`, `y` and `z`.
 
@@ -102,7 +102,7 @@ has customdatasrc => ( is            => "rw",
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -301,7 +301,7 @@ Chart::Plotly::Trace::Cone - Use cone traces to visualize vector fields.  Specif
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

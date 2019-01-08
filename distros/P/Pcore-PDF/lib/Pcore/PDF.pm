@@ -1,4 +1,4 @@
-package Pcore::PDF v0.5.10;
+package Pcore::PDF v0.5.11;
 
 use Pcore -dist, -class, -const, -res;
 use Config;
@@ -218,11 +218,11 @@ sub _run_task ( $self, $task, $proc ) {
     # write job
     my $json = to_json $job;
 
-    $proc->{stdin}->write( 'job ' . length( $json->$* ) . $LF . $json->$* . $LF );
+    $proc->{stdin}->write( 'job ' . length($json) . "\n$json\n" );
 
     if ($resources) {
         for my $resource ( $resources->@* ) {
-            $proc->{stdin}->write( 'dat ' . length( $resource->$* ) . $LF . $resource->$* . $LF );
+            $proc->{stdin}->write( 'dat ' . length( $resource->$* ) . "\n$resource->$*\n" );
         }
     }
 

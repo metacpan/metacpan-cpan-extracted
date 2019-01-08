@@ -27,5 +27,5 @@ resources:
   bugtracker: https://github.com/Robertof/perl-www-telegram-botapi/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/Robertof/perl-www-telegram-botapi
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

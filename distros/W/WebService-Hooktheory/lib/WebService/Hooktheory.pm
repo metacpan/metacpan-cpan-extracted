@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the Hooktheory API
 
-our $VERSION = '0.0202';
+our $VERSION = '0.0300';
 
 use Moo;
 use strictures 2;
@@ -64,11 +64,11 @@ sub fetch {
         $query = join '&', map { "$_=$args{query}->{$_}" } keys %{ $args{query} };
     }
 
-    my $ua = Mojo::UserAgent->new;
-
     my $url = $self->base . $args{endpoint};
     $url .= '?' . $query
         if $query;
+
+    my $ua = Mojo::UserAgent->new;
 
     my $tx = $ua->get( $url, { Authorization => 'Bearer ' . $self->activkey } );
 
@@ -82,7 +82,9 @@ sub _handle_response {
 
     my $data;
 
-    if ( my $res = $tx->success ) {
+    my $res = $tx->result;
+
+    if ( $res->is_success ) {
         my $body = $res->body;
         if ( $body =~ /{/ ) {
             $data = decode_json( $res->body );
@@ -92,10 +94,7 @@ sub _handle_response {
         }
     }
     else {
-        my $err = $tx->error;
-        croak "$err->{code} response: $err->{message}"
-            if $err->{code};
-        croak "Connection error: $err->{message}";
+        croak "Connection error: ", $res->message;
     }
 
     return $data;
@@ -115,7 +114,7 @@ WebService::Hooktheory - Access to the Hooktheory API
 
 =head1 VERSION
 
-version 0.0202
+version 0.0300
 
 =head1 SYNOPSIS
 

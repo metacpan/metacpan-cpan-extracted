@@ -10,10 +10,37 @@ my $on_automated_rig
   || $ENV{TRAVIS}
   || $ENV{APPVEYOR};
 
-#  make sure we get GEOS support
+#  make sure we get GEOS, PROJ and other support
 use Alien::geos::af;
+use Alien::proj;
+use Alien::spatialite;
+use Alien::sqlite;
 my $sep_char = $on_windows ? ';' : ':';
-$ENV{PATH} .= $sep_char . join ($sep_char, Alien::geos::af->bin_dir);
+$ENV{PATH} .= $sep_char
+  . join (
+    $sep_char,
+    Alien::geos::af->bin_dir,
+    Alien::proj->bin_dir,
+    Alien::spatialite->bin_dir,
+    Alien::sqlite->bin_dir,
+  );
+
+plugin 'Build::SearchDep' => (
+  aliens   => [qw(
+        Alien::geos::af
+        Alien::proj
+        Alien::sqlite
+        Alien::spatialite
+  )],
+  public_I => 1,
+  public_l => 1,
+);
+
+#  configure script does not seem to detect the proj lib distributed with Strawberry perl
+#use FFI::CheckLib;
+#my $proj_lib = FFI::CheckLib::find_lib (lib => 'proj');
+#say "PROJ_LIB FILE IS $proj_lib";
+
 
 #  make libtool noisy for debug purposes
 #$ENV{LTFLAGS} = "--debug --verbose" if $on_windows;
@@ -127,8 +154,18 @@ share {
     plugin 'Cleanse::BuildDir';
   }
   
+  my $with_sqlite3    = '';
+  my $with_spatialite = '';
+  #  system installs won't necessarily have dist dirs
+  if (Alien::sqlite->install_type eq 'share') {
+    $with_sqlite3 = '--with-sqlite3=' . Alien::sqlite->dist_dir;
+  }
+  if (Alien::spatialite->install_type eq 'share') {
+    $with_spatialite = '--with-spatialite=' . Alien::spatialite->dist_dir;
+  }
+
   build [
-    "%{configure} --with-libtiff=internal $with_local $with_cpp11 $build_static",
+    "%{configure} --with-libtiff=internal $with_local $with_cpp11 $with_sqlite3 $with_spatialite $build_static",
     \&update_makefile,
     \&pause,
     $make_cmd,

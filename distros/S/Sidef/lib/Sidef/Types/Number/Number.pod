@@ -7,27 +7,28 @@ Sidef::Types::Number::Number
 
 =head1 DESCRIPTION
 
-This class implements ...
+The C<Number> class implements support for numerical operations, supporting integers, rationals, floating-points and complex numbers at arbitrary precision.
+
+This class also implements many useful mathematical methods, from basic arithmetical operations, to advanced number-theoretic functions, including primality testing and prime factorization methods.
 
 =head1 SYNOPSIS
 
-var obj = Number(...)
-
+    var a = Num(string)
+    var b = Number(string, base)
 
 =head1 INHERITS
 
 Inherits methods from:
 
-	* Sidef::Object::Object
+       * Sidef::Object::Object
 
 =head1 METHODS
 
-
 =head2 !
 
-I<Obj> B<!> I<Obj> -> I<Obj>
+    n!
 
-Return the
+Factorial of C<n>. (C<1*2*3*...*n>)
 
 Aliases: I<fac>, I<factorial>
 
@@ -35,9 +36,9 @@ Aliases: I<fac>, I<factorial>
 
 =head2 !!
 
-I<Obj> B<!!> I<Obj> -> I<Obj>
+    n!!
 
-Return the
+Double-factorial of C<n>.
 
 Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
 
@@ -45,9 +46,9 @@ Aliases: I<dfac>, I<dfactorial>, I<double_factorial>
 
 =head2 %
 
-I<Obj> B<%> I<Obj> -> I<Obj>
+    n % k
 
-Return the
+Remainder of C<n/k>.
 
 Aliases: I<mod>
 
@@ -55,9 +56,9 @@ Aliases: I<mod>
 
 =head2 %%
 
-I<Obj> B<%%> I<Obj> -> I<Obj>
+    n %% k
 
-Return the
+Returns true if C<n> is divisible by C<k>. False otherwise.
 
 Aliases: I<is_div>
 
@@ -65,9 +66,9 @@ Aliases: I<is_div>
 
 =head2 &
 
-I<Obj> B<&> I<Obj> -> I<Obj>
+    a & b
 
-Return the
+Bitwise AND operation.
 
 Aliases: I<and>
 
@@ -75,9 +76,9 @@ Aliases: I<and>
 
 =head2 *
 
-I<Obj> B<*> I<Obj> -> I<Obj>
+    a * b
 
-Return the
+Multiplication of C<a> and C<b>.
 
 Aliases: I<mul>
 
@@ -85,9 +86,9 @@ Aliases: I<mul>
 
 =head2 **
 
-I<Obj> B<**> I<Obj> -> I<Obj>
+    a**b
 
-Return the
+Exponentiation: C<a> to power C<b>.
 
 Aliases: I<pow>
 
@@ -95,9 +96,9 @@ Aliases: I<pow>
 
 =head2 +
 
-I<Obj> B<+> I<Obj> -> I<Obj>
+    a + b
 
-Return the
+Addition of C<a> and C<b>.
 
 Aliases: I<add>
 
@@ -105,9 +106,9 @@ Aliases: I<add>
 
 =head2 ++
 
-I<Obj> B<++> I<Obj> -> I<Obj>
+    n.inc
 
-Return the
+Increment C<n> by C<1> and return the result.
 
 Aliases: I<inc>
 
@@ -115,9 +116,9 @@ Aliases: I<inc>
 
 =head2 -
 
-I<Obj> B<-> I<Obj> -> I<Obj>
+    a - b
 
-Return the
+Subtraction of C<a> and C<b>.
 
 Aliases: I<sub>
 
@@ -125,9 +126,9 @@ Aliases: I<sub>
 
 =head2 --
 
-I<Obj> B<--> I<Obj> -> I<Obj>
+    n.dec
 
-Return the
+Decrement C<n> by C<1> and return the result.
 
 Aliases: I<dec>
 
@@ -135,9 +136,13 @@ Aliases: I<dec>
 
 =head2 ..
 
-I<Obj> B<..> I<Obj> -> I<Obj>
+    a .. b
 
-Return the
+Create an inclusive-inclusive C<RangeNum> object, from C<a> to C<b>.
+
+Equivalent with:
+
+    RangeNum(a, b)
 
 Aliases: I<to>, I<upto>
 
@@ -145,9 +150,13 @@ Aliases: I<to>, I<upto>
 
 =head2 ..^
 
-I<Obj> B<..^> I<Obj> -> I<Obj>
+    a ..^ b
 
-Return the
+Create an inclusive-exclusive C<RangeNum> object, from C<a> to C<b-1>.
+
+Equivalent with:
+
+    RangeNum(a, b-1)
 
 Aliases: I<xto>, I<xupto>
 
@@ -155,9 +164,9 @@ Aliases: I<xto>, I<xupto>
 
 =head2 /
 
-I<Obj> B</> I<Obj> -> I<Obj>
+    a / b
 
-Return the
+Division of C<a> by C<b>.
 
 Aliases: I<÷>, I<div>
 
@@ -165,9 +174,9 @@ Aliases: I<÷>, I<div>
 
 =head2 //
 
-I<Obj> B<//> I<Obj> -> I<Obj>
+    a // b
 
-Return the
+Integer division of C<a> and C<b>.
 
 Aliases: I<idiv>
 
@@ -175,9 +184,13 @@ Aliases: I<idiv>
 
 =head2 :
 
-I<Obj> B<:> I<Obj> -> I<Obj>
+    a : b
 
-Return the
+Create a new complex number.
+
+Equivalent with:
+
+    Complex(a, b)
 
 Aliases: I<pair>
 
@@ -185,9 +198,9 @@ Aliases: I<pair>
 
 =head2 <
 
-I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+    a < b
 
-Return the
+Returns true if C<a> is less than C<b>.
 
 Aliases: I<lt>
 
@@ -195,9 +208,11 @@ Aliases: I<lt>
 
 =head2 <<
 
-I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+    a << b
 
-Return the
+Bitwise left-shift, equivalent with (assuming C<a> and C<b> are integers):
+
+    int(a * 2**b)
 
 Aliases: I<lsft>, I<shift_left>
 
@@ -205,9 +220,9 @@ Aliases: I<lsft>, I<shift_left>
 
 =head2 <=>
 
-I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+    a <=> b
 
-Return the
+Comparison of C<a> with C<b>. Returns C<-1> if C<a> is less than C<b>, C<0> if C<a> and C<b> are equal and C<+1> if C<a> is greater than C<b>.
 
 Aliases: I<cmp>
 
@@ -215,9 +230,9 @@ Aliases: I<cmp>
 
 =head2 ==
 
-I<Obj> B<==> I<Obj> -> I<Obj>
+    a == b
 
-Return the
+Equality check. Returns true if C<a> and C<b> are equal.
 
 Aliases: I<eq>
 
@@ -225,9 +240,9 @@ Aliases: I<eq>
 
 =head2 >
 
-I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+    a > b
 
-Return the
+Returns true if C<a> is greater than C<b>. False otherwise.
 
 Aliases: I<gt>
 
@@ -235,9 +250,11 @@ Aliases: I<gt>
 
 =head2 >>
 
-I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+    a >> b
 
-Return the
+Bitwise right-shift, equivalent with (assuming C<a> and C<b> are integers):
+
+    int(a / 2**b)
 
 Aliases: I<rsft>, I<shift_right>
 
@@ -245,9 +262,9 @@ Aliases: I<rsft>, I<shift_right>
 
 =head2 ^
 
-I<Obj> B<^> I<Obj> -> I<Obj>
+    a ^ b
 
-Return the
+Bitwise XOR operation.
 
 Aliases: I<xor>
 
@@ -255,9 +272,13 @@ Aliases: I<xor>
 
 =head2 ^..
 
-I<Obj> B<^..> I<Obj> -> I<Obj>
+    a ^.. b
 
-Return the
+Creates a reversed exclusive-inclusive C<RangeNum> object, from C<a-1> down to C<b>.
+
+Equivalent with:
+
+    RangeNum(a-1, b, -1)
 
 Aliases: I<xdownto>
 
@@ -265,73 +286,74 @@ Aliases: I<xdownto>
 
 =head2 abs
 
-Number.abs() -> I<Obj>
+    n.abs
 
-Return the
+Absolute value of C<n>.
 
 =cut
 
 =head2 acos
 
-Number.acos() -> I<Obj>
+    n.acos
 
-Return the
+Inverse cosine of C<n> in radians.
 
 =cut
 
 =head2 acosh
 
-Number.acosh() -> I<Obj>
+    n.acosh
 
-Return the
+Inverse hyperbolic cosine of C<n>.
 
 =cut
 
 =head2 acot
 
-Number.acot() -> I<Obj>
+    n.acot
 
-Return the
+Inverse cotangent of C<n> in radians.
 
 =cut
 
 =head2 acoth
 
-Number.acoth() -> I<Obj>
+    n.acoth
 
-Return the
+Inverse hyperbolic cotangent of C<n>.
 
 =cut
 
 =head2 acsc
 
-Number.acsc() -> I<Obj>
+    n.acsc
 
-Return the
+Inverse cosecant of C<n> in radians.
 
 =cut
 
 =head2 acsch
 
-Number.acsch() -> I<Obj>
+    n.acsch
 
-Return the
+Inverse hyperbolic cosecant of C<n>.
 
 =cut
 
 =head2 agm
 
-Number.agm() -> I<Obj>
+    agm(a, b)
 
-Return the
+Arithmetic-geometric mean of C<a> and C<b>.
 
 =cut
 
 =head2 ai
 
-Number.ai() -> I<Obj>
+    x.ai
+    Ai(x)
 
-Return the
+Airy function of the first kind: C<Ai(x)>.
 
 Aliases: I<airy>
 
@@ -339,73 +361,126 @@ Aliases: I<airy>
 
 =head2 approx_cmp
 
-Number.approx_cmp() -> I<Obj>
+    approx_cmp(a, b)
+    approx_cmp(a, b, k)
 
-Return the
+Approximate comparison of C<a> and C<b>.
+
+Equivalent with:
+
+    a.round(k) <=> b.round(k)
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
 =cut
 
 =head2 approx_ge
 
-Number.approx_ge() -> I<Obj>
+    approx_ge(a, b)
+    approx_ge(a, b, k)
 
-Return the
+True if C<a> is approximately greater than or equal to C<b>.
+
+Equivalent with:
+
+    a.round(k) >= b.round(k)
 
 =cut
 
 =head2 approx_gt
 
-Number.approx_gt() -> I<Obj>
+    approx_gt(a, b)
+    approx_gt(a, b, k)
 
-Return the
+True if C<a> is approximately greater than C<b>.
+
+Equivalent with:
+
+    a.round(k) > b.round(k)
 
 =cut
 
 =head2 approx_le
 
-Number.approx_le() -> I<Obj>
+    approx_le(a, b)
+    approx_le(a, b, k)
 
-Return the
+True if C<a> is approximately less than or equal to C<b>.
+
+Equivalent with:
+
+    a.round(k) <= b.round(k)
 
 =cut
 
 =head2 approx_lt
 
-Number.approx_lt() -> I<Obj>
+    approx_lt(a, b)
+    approx_lt(a, b, k)
 
-Return the
+True if C<a> is approximately less than C<b>.
+
+Equivalent with:
+
+    a.round(k) < b.round(k)
 
 =cut
 
 =head2 approx_ne
 
-Number.approx_ne() -> I<Obj>
+    approx_ne(a, b)
+    approx_ne(a, b, k)
 
-Return the
+True if C<a> is approximately different than C<b>.
+
+Equivalent with:
+
+    a.round(k) != b.round(k)
 
 =cut
 
 =head2 as_bin
 
-Number.as_bin() -> I<Obj>
+    n.as_bin
 
-Return the
+Returns a C<String> with the binary representation of C<n>.
+
+Example:
+
+    say 42.as_bin     # "101011"
 
 =cut
 
 =head2 as_cfrac
 
-Number.as_cfrac() -> I<Obj>
+    n.as_cfrac
+    n.as_cfrac(k)
 
-Return the
+Compute C<k> terms of the continued-fraction expansion of C<n>.
+
+Example:
+
+    say sqrt(12).as_cfrac(6)    # [3, 2, 6, 2, 6, 2]
+
+Can also be used to compute very good rational approximations to a given real number:
+
+    say Num.pi.as_cfrac(10).flip.reduce{|a,b| b + 1/a }.as_rat      # 1146408/364913
+
+When C<k> is omitted, it uses the default floating-point precision to deduce C<k>.
 
 =cut
 
 =head2 as_dec
 
-Number.as_dec() -> I<Obj>
+    n.as_dec
+    n.as_dec(k)
 
-Return the
+Given a rational number C<n>, it returns its decimal expansion as a C<String> object, expanded at C<k> decimal places.
+
+Example:
+
+    say (1/17 -> as_dec(10))      # 0.05882352941
+    say (1/17 -> as_dec(30))      # 0.0588235294117647058823529411765
 
 Aliases: I<as_float>
 
@@ -413,105 +488,147 @@ Aliases: I<as_float>
 
 =head2 asec
 
-Number.asec() -> I<Obj>
+    n.asec
 
-Return the
+Inverse secant of C<n> in radians.
 
 =cut
 
 =head2 asech
 
-Number.asech() -> I<Obj>
+    n.asech
 
-Return the
+Inverse hyperbolic secant of C<n>.
 
 =cut
 
 =head2 as_frac
 
-Number.as_frac() -> I<Obj>
+    n.as_frac
+    n.as_frac(base)
 
-Return the
+String-representation of C<n> as fraction.
+
+Example:
+
+    say 24.as_frac                 # 24/1
+    say bernoulli(10).as_frac      # 5/66
+    say bernoulli(12).as_frac(36)  # -j7/23u
+
+If C<n> is an integer, it uses C<1> for the denominator.
 
 =cut
 
 =head2 as_hex
 
-Number.as_hex() -> I<Obj>
+    n.as_hex
 
-Return the
+Returns a String representing the integer part of C<n> in hexadecimal (base 16).
+
+Example:
+
+    say 42.as_hex       # "2a"
+
+Returns C<nil> when C<n> cannot be converted to an integer.
 
 =cut
 
 =head2 asin
 
-Number.asin() -> I<Obj>
+    n.asin
 
-Return the
+Inverse sine of C<n> in radians.
 
 =cut
 
 =head2 asinh
 
-Number.asinh() -> I<Obj>
+    n.asinh
 
-Return the
+Inverse hyperbolic sine of C<n>.
 
 =cut
 
 =head2 as_int
 
-Number.as_int() -> I<Obj>
+    n.as_int
+    n.as_int(base)
 
-Return the
+Returns a String representing the integer part of C<n> in a given base, where the base must be between 2 and 62.
+
+When the base is omitted, it defaults to base 10.
+
+Example:
+
+    say 255.as_int      # "255"
+    say 255.as_int(16)  # "ff"
+
+Returns C<nil> when C<n> cannot be converted to an integer.
 
 =cut
 
 =head2 as_oct
 
-Number.as_oct() -> I<Obj>
+    n.as_oct
 
-Return the
+Returns a String representing the integer part of C<n> in octal (base 8).
+
+Example:
+
+    say 42.as_oct   # 52
+
+Returns C<nil> when C<n> cannot be converted to an integer.
 
 =cut
 
 =head2 as_rat
 
-Number.as_rat() -> I<Obj>
+    n.as_rat
+    n.as_rat(base)
 
-Return the
+Returns a rational string-representation of C<n> in a given base, where the base must be between 2 and 62.
+
+When the base is omitted, it defaults to base 10.
+
+Example:
+
+    say as_rat(42)          # "42"
+    say as_rat(2/4)         # "1/2"
+    say as_rat(255, 16)     # "ff"
+
+Returns C<nil> when C<n> cannot be converted to a rational number.
 
 =cut
 
 =head2 atan
 
-Number.atan() -> I<Obj>
+    n.atan
 
-Return the
+Inverse tangent of C<n> in radians.
 
 =cut
 
 =head2 atan2
 
-Number.atan2() -> I<Obj>
+    atan2(a, b)
 
-Return the
+Four-quadrant inverse tangent of C<a> and C<b>.
 
 =cut
 
 =head2 atanh
 
-Number.atanh() -> I<Obj>
+    n.atanh
 
-Return the
+Inverse hyperbolic tangent of C<n>.
 
 =cut
 
 =head2 base
 
-Number.base() -> I<Obj>
+    n.base(b)
 
-Return the
+Returns a String-representation of C<n> in a given base C<b>, which must be between 2 and 62.
 
 Aliases: I<in_base>
 
@@ -519,9 +636,9 @@ Aliases: I<in_base>
 
 =head2 bell
 
-Number.bell() -> I<Obj>
+    n.bell
 
-Return the
+Returns the n-th Bell number.
 
 Aliases: I<bell_number>
 
@@ -529,9 +646,16 @@ Aliases: I<bell_number>
 
 =head2 bern
 
-Number.bern() -> I<Obj>
+    n.bern
+    bernoulli(n)
+    bernoulli(n, x)
 
-Return the
+Returns the n-th Bernoulli number. When an additional argument is provided, it returns the n-th Bernoulli polynomial.
+
+Example:
+
+    say bernoulli(10).as_rat       # B_10    = 5/66
+    say bernoulli(10, 2).as_rat    # B_10(2) = 665/66
 
 Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
@@ -539,49 +663,61 @@ Aliases: I<bernfrac>, I<bernoulli>, I<bernoulli_number>
 
 =head2 bernoulli_polynomial
 
-Number.bernoulli_polynomial() -> I<Obj>
+    bernoulli_polynomial(n, x)
 
-Return the
+Returns the n-th Bernoulli polynomial: C<B_n(x)>.
 
 =cut
 
 =head2 bernreal
 
-Number.bernreal() -> I<Obj>
+    n.bernreal
 
-Return the
+Return an approximation to the n-th Bernoulli number as a floating-point number.
 
 =cut
 
 =head2 bessel_j
 
-Number.bessel_j() -> I<Obj>
+    bessel_j(x, n)
 
-Return the
+First order Bessel function: C<J_n(x)>.
 
 =cut
 
 =head2 bessel_y
 
-Number.bessel_y() -> I<Obj>
+    bessel_y(x, n)
 
-Return the
+Second order Bessel function: C<Y_n(x)>.
 
 =cut
 
 =head2 beta
 
-Number.beta() -> I<Obj>
+    beta(a, b)
 
-Return the
+The beta function (also called the Euler integral of the first kind).
+
+Defined as:
+
+    beta(a, b) = gamma(a)*gamma(b) / gamma(a+b)
 
 =cut
 
 =head2 bit
 
-Number.bit() -> I<Obj>
+    n.bit(k)
+    n.getbit(k)
 
-Return the
+Returns 1 if bit C<k> of C<n> is set, and 0 if it is not set.
+
+Return C<nil> when C<n> cannot be truncated to an integer or when C<k> is negative.
+
+Example:
+
+    say getbit(0b1001, 0)   # 1
+    say getbit(0b1000, 0)   # 0
 
 Aliases: I<getbit>, I<testbit>
 
@@ -589,49 +725,84 @@ Aliases: I<getbit>, I<testbit>
 
 =head2 bit_scan0
 
-Number.bit_scan0() -> I<Obj>
+    n.bit_scan0
+    n.bit_scan0(k)
 
-Return the
+Scan C<n>, starting from bit index C<k>, towards more significant bits, until a 0-bit is found.
+
+When C<k> is omitted, C<k=0> is assumed.
+
+Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
 =cut
 
 =head2 bit_scan1
 
-Number.bit_scan1() -> I<Obj>
+    n.bit_scan1
+    n.bit_scan1(k)
 
-Return the
+Scan C<n>, starting from bit index C<k>, towards more significant bits, until a 1-bit is found.
+
+When C<k> is omitted, C<k=0> is assumed.
+
+Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
 
 =cut
 
 =head2 bsearch
 
-Number.bsearch() -> I<Obj>
+    bsearch(n, {...})
+    bsearch(a, b, {...})
 
-Return the
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
+
+The last argument is a block which does the comparisons.
+
+This function finds a value C<k> such that f(k) = 0. Returns C<nil> otherwise.
+
+    say bsearch(20,      {|k| k*k  <=> 49   })   #=> 7   (7*7  = 49)
+    say bsearch(3, 1000, {|k| k**k <=> 3125 })   #=> 5   (5**5 = 3125)
 
 =cut
 
 =head2 bsearch_ge
 
-Number.bsearch_ge() -> I<Obj>
+    bsearch_ge(n, {...})
+    bsearch_ge(a, b, {...})
 
-Return the
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
+
+The last argument is a block which does the comparisons.
+
+This function finds a value C<k> such that f(k-1) < 0 and f(k) >= 0. Returns C<nil> otherwise.
+
+    bsearch_ge(1e6,       { .exp <=> 1e+9 })  #  21   (exp( 21) >= 1e+9)
+    bsearch_ge(-1e6, 1e6, { .exp <=> 1e-9 })  # -20   (exp(-20) >= 1e-9)
 
 =cut
 
 =head2 bsearch_le
 
-Number.bsearch_le() -> I<Obj>
+    bsearch_le(n, {...})
+    bsearch_le(a, b, {...})
 
-Return the
+Binary search from to C<0> to C<n>, or from C<a> to C<b>, which can be any arbitrary large integers.
+
+The last argument is a block which does the comparisons.
+
+This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<nil> otherwise.
+
+    bsearch_le(1e6,       { .exp <=> 1e+9 })  #  20   (exp( 20) <= 1e+9)
+    bsearch_le(-1e6, 1e6, { .exp <=> 1e-9 })  # -21   (exp(-21) <= 1e-9)
 
 =cut
 
 =head2 C
 
-Number.C() -> I<Obj>
+    Num.C
+    Num.catalan_G
 
-Return the
+Returns the Catalan constant: 0.915965594177...
 
 Aliases: I<catalan_G>
 
@@ -639,41 +810,56 @@ Aliases: I<catalan_G>
 
 =head2 carmichael_lambda
 
-Number.carmichael_lambda() -> I<Obj>
+    carmichael_lambda(n)
 
-Return the
+Carmichael lambda function: C<λ(n)>, defined as the smallest positive integer C<m> such that:
+
+    aᵐ ≡ 1 (mod n)
+
+for every integer C<a> between C<1> and C<n> that is coprime to C<n>.
 
 =cut
 
 =head2 catalan
 
-Number.catalan() -> I<Obj>
+    n.catalan
+    n.catalan(k)
 
-Return the
+Returns the n-th Catalan number.
+
+If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's triangle.
 
 =cut
 
 =head2 cbrt
 
-Number.cbrt() -> I<Obj>
+    n.cbrt
 
-Return the
+Cube root of C<n>.
 
 =cut
 
 =head2 ceil
 
-Number.ceil() -> I<Obj>
+    n.ceil
 
-Return the
+Round C<n> towards positive Infinity.
+
+Aliases: I<ceiling>
 
 =cut
 
 =head2 chebyshev_T
 
-Number.chebyshev_T() -> I<Obj>
+    chebyshevT(n, x)
 
-Return the
+Compute the Chebyshev polynomials of the first kind: C<T_n(x)>, where C<n> must be a native integer.
+
+Defined as:
+
+    T(0, x) = 1
+    T(1, x) = x
+    T(n, x) = 2*x*T(n-1, x) - T(n-2, x)
 
 Aliases: I<chebyshevt>, I<chebyshevT>
 
@@ -681,9 +867,15 @@ Aliases: I<chebyshevt>, I<chebyshevT>
 
 =head2 chebyshev_U
 
-Number.chebyshev_U() -> I<Obj>
+    chebyshevU(n, x)
 
-Return the
+Compute the Chebyshev polynomials of the second kind: C<U_n(x)>, where C<n> must be a native integer.
+
+Defined as:
+
+    U(0, x) = 1
+    U(1, x) = 2*x
+    U(n, x) = 2*x*U(n-1, x) - U(n-2, x)
 
 Aliases: I<chebyshevu>, I<chebyshevU>
 
@@ -691,9 +883,14 @@ Aliases: I<chebyshevu>, I<chebyshevU>
 
 =head2 chr
 
-Number.chr() -> I<Obj>
+    n.chr
 
-Return the
+Convert the integer C<n> into a character.
+
+Example:
+
+    say 97.chr      # "a"
+    say 9786.chr    # "☺"
 
 =cut
 
@@ -927,9 +1124,33 @@ Return the
 
 =cut
 
+=head2 divisor_map
+
+Number.divisor_map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 divisor_prod
+
+Number.divisor_prod() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 divisors
 
 Number.divisors() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 divisor_sum
+
+Number.divisor_sum() -> I<Obj>
 
 Return the
 
@@ -1104,6 +1325,30 @@ Number.factorial_sum() -> I<Obj>
 Return the
 
 Aliases: I<left_factorial>
+
+=cut
+
+=head2 factor_map
+
+Number.factor_map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 factor_prod
+
+Number.factor_prod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 factor_sum
+
+Number.factor_sum() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1367,6 +1612,34 @@ Return the
 
 =cut
 
+=head2 inverse_polygonal
+
+Number.inverse_polygonal() -> I<Obj>
+
+Return the
+
+Aliases: I<polygonal_inverse>
+
+=cut
+
+=head2 inverse_totient
+
+Number.inverse_totient() -> I<Obj>
+
+Return the
+
+Aliases: I<inverse_euler_phi>
+
+=cut
+
+=head2 inverse_totient_len
+
+Number.inverse_totient_len() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 invmod
 
 Number.invmod() -> I<Obj>
@@ -1374,16 +1647,6 @@ Number.invmod() -> I<Obj>
 Return the
 
 Aliases: I<modinv>
-
-=cut
-
-=head2 inv_totient
-
-Number.inv_totient() -> I<Obj>
-
-Return the
-
-Aliases: I<inv_euler_phi>, I<inverse_totient>, I<inverse_euler_phi>
 
 =cut
 
@@ -1464,6 +1727,14 @@ Return the
 =head2 is_aks_prime
 
 Number.is_aks_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_between
+
+Number.is_between() -> I<Obj>
 
 Return the
 
@@ -1820,6 +2091,14 @@ Return the
 =head2 is_smooth
 
 Number.is_smooth() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_smooth_over_prod
+
+Number.is_smooth_over_prod() -> I<Obj>
 
 Return the
 
@@ -2211,6 +2490,14 @@ Return the
 
 =cut
 
+=head2 mertens
+
+Number.mertens() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 mfac
 
 Number.mfac() -> I<Obj>
@@ -2579,6 +2866,14 @@ Return the
 
 =cut
 
+=head2 prime_power_count
+
+Number.prime_power_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 prime_power_divisors
 
 Number.prime_power_divisors() -> I<Obj>
@@ -2634,6 +2929,16 @@ Return the
 Number.prime_sigma() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 primes_sum
+
+Number.primes_sum() -> I<Obj>
+
+Return the
+
+Aliases: I<sum_primes>
 
 =cut
 
@@ -2952,6 +3257,14 @@ Return the
 =head2 solve_pell
 
 Number.solve_pell() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sopfr
+
+Number.sopfr() -> I<Obj>
 
 Return the
 
@@ -3350,6 +3663,16 @@ Number.Γ() -> I<Obj>
 Return the
 
 Aliases: I<gamma>
+
+=cut
+
+=head2 δ
+
+Number.δ() -> I<Obj>
+
+Return the
+
+Aliases: I<kronecker_delta>
 
 =cut
 

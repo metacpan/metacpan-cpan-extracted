@@ -15,7 +15,7 @@ use XML::LibXML::PrettyPrint;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub abstract {
     return "build index for an OPM repository";
@@ -132,7 +132,7 @@ OTRS::OPM::Maker::Command::index - Build index for an OPM repository
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 AUTHOR
 

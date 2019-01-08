@@ -22,7 +22,7 @@ sub test_extract_varMode_on : Test(4) {
     my $verbose = 0;
 
     my @params = qw/--log-level=2 --verbose --remove a b c/;
-    my $argA = Prty::Parameters->extract(1,undef,\@params,2,
+    my $argA = Prty::Parameters->extract(1,0,undef,\@params,2,
         -logLevel => \$logLevel,
         -verbose => \$verbose,
     );
@@ -36,7 +36,7 @@ sub test_extract_varMode_off : Test(4) {
     my $self = shift;
 
     my @params = qw/--log-level=2 --verbose --remove a b c/;
-    my ($argA,$opt) = Prty::Parameters->extract(0,undef,\@params,2,
+    my ($argA,$opt) = Prty::Parameters->extract(0,0,undef,\@params,2,
         -logLevel => 1,
         -verbose => 0,
     );

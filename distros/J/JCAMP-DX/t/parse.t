@@ -14,7 +14,7 @@ use Test::More tests => 1;
 my $input_dir = 'inputs';
 my $output_dir = 'outputs';
 
-opendir my $dir, $input_dir || die "Can not open directory: $!";
+opendir my $dir, $input_dir || die "Cannot open directory: $!";
 my @inputs = sort grep { /\.jcamp$/ } readdir $dir;
 closedir $dir;
 
@@ -29,7 +29,7 @@ for my $case (@inputs) {
     my $output = join '', <$out>;
     close $out;
 
-    my $input = Dumper JCAMP::DX::parse_jcamp_dx( $input_file );
+    my $input = Dumper( JCAMP::DX->new_from_file( $input_file ) );
     if( $input eq $output ) {
         $n_ok++;
     } else {

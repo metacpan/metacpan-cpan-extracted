@@ -1,5 +1,8 @@
 Revision history for WebService-GetSongBPM
 
+0.0200 2019-01-06 16:08:19
+    - Use the new tx->result way of things.
+
 0.0101 2018-04-01 13:46:38
     - Improved documentation.
     - Cleaned up code a bit.

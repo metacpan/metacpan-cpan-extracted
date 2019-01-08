@@ -250,6 +250,10 @@ PUBLIC METHODS
     functions performed may change from version to version. You should never
     use the following methods in your applications.
 
+    _maxlength_change (%)
+        Upgrades 'maxlength' information for the given text fields both in
+        memory structures AND in the database tables.
+
     _charset_change (%)
         Upgrades charset information for the given text fields both in
         memory structures AND in the database tables.

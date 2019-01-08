@@ -1,0 +1,45 @@
+NAME
+    Bencher::Scenarios::ManipulatingSymbolTable - Benchmark symbol table
+    manipulation actions
+
+VERSION
+    This document describes version 0.001 of
+    Bencher::Scenarios::ManipulatingSymbolTable (from Perl distribution
+    Bencher-Scenarios-ManipulatingSymbolTable), released on 2019-01-06.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::ManipulatingSymbolTable::Startup
+
+    *   Bencher::Scenario::ManipulatingSymbolTable::CheckingSymbolExists
+
+    *   Bencher::Scenario::ManipulatingSymbolTable::ListingSymbols
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-ManipulatingSymbolTable>
+    .
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-ManipulatingSymbolT
+    able>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Man
+    ipulatingSymbolTable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

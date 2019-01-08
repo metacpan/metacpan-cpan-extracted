@@ -6,8 +6,8 @@ use WebService::AcousticBrainz;
 
 my $mbid = shift || 'c51f788f-f2ac-4d4e-aa72-205f002b8752';
 
+# Fetch the AcousticBrainz response
 my $w = WebService::AcousticBrainz->new;
-
 my $r = $w->fetch(
     mbid     => $mbid,
     endpoint => 'high-level',
@@ -15,15 +15,18 @@ my $r = $w->fetch(
 
 my $stats = {};
 
+# Collect the metadata
 for my $stat ( keys %{ $r->{metadata}{tags} } ) {
+    #next unless $stat eq 'title';
     my $val = ref($r->{metadata}{tags}{$stat}) eq 'ARRAY'
         ? $r->{metadata}{tags}{$stat}[0]
         : $r->{metadata}{tags}{$stat};
     $stats->{$stat} = $val;
 }
 
-for my $stat ( keys %{ $r->{'highlevel'} } ) {
-    $stats->{$stat} = $r->{'highlevel'}{$stat}{value};
+# Collect the highlevel values
+for my $stat ( keys %{ $r->{highlevel} } ) {
+    $stats->{$stat} = $r->{highlevel}{$stat}{value};
 }
 
-use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$stats);
+use Data::Dumper;$Data::Dumper::Sortkeys = 1; warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper$stats);

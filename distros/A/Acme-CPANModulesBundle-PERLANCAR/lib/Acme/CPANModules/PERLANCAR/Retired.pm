@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::Retired;
 
-our $DATE = '2018-09-20'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $LIST = {
     summary => 'Retired modules',
@@ -79,6 +79,19 @@ I've written <pm:Log::ger::App> to be its successor.
 
 _
             'x.date' => '2017-09-08',
+            alternate_modules => ['Log::ger::App'],
+        },
+        {
+            module => 'Package::MoreUtil',
+            description => <<'_',
+
+I didn't know about <pm:Package::Stash>, which does things more properly and
+performantly. But I've spun routines not yet covered by Package::Stash to
+<pm:Package::Util::Lite>.
+
+_
+            'x.date' => '2019-01-06',
+            alternate_modules => ['Package::Stash', 'Package::Util::Lite'],
         },
     ],
 };
@@ -98,7 +111,7 @@ Acme::CPANModules::PERLANCAR::Retired - Retired modules
 
 =head1 VERSION
 
-This document describes version 0.003 of Acme::CPANModules::PERLANCAR::Retired (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2018-09-20.
+This document describes version 0.004 of Acme::CPANModules::PERLANCAR::Retired (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2019-01-06.
 
 =head1 DESCRIPTION
 
@@ -163,6 +176,17 @@ I didn't know about the C<fallocate> command.
 I've written L<Log::ger::App> to be its successor.
 
 
+Alternate modules: L<Log::ger::App>
+
+=item * L<Package::MoreUtil>
+
+I didn't know about L<Package::Stash>, which does things more properly and
+performantly. But I've spun routines not yet covered by Package::Stash to
+L<Package::Util::Lite>.
+
+
+Alternate modules: L<Package::Stash>, L<Package::Util::Lite>
+
 =back
 
 =head1 HOMEPAGE
@@ -193,7 +217,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

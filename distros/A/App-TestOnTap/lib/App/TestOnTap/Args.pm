@@ -63,6 +63,7 @@ sub __parseArgv
 			v => 0,						# don't let through output from tests
 			harness => 1,				# use the normal test harness
 			merge => undef,				# ask the harness to merge stdout/stderr of tests
+			dryrun => 0,				# don't actually run tests
 			
 			# hidden
 			#
@@ -92,6 +93,7 @@ sub __parseArgv
 			'v|verbose+',
 			'harness!',
 			'merge!',
+			'dryrun!',
 			
 			# hidden
 			#
@@ -125,7 +127,7 @@ sub __parseArgv
 
 	# simple copies
 	#
-	$self->{$_} = $rawOpts{$_} foreach (qw(v archive timer harness));
+	$self->{$_} = $rawOpts{$_} foreach (qw(v archive timer harness dryrun));
 	$self->{defines} = $rawOpts{define};
 
 	# help with the hidden flags...
@@ -398,7 +400,14 @@ sub useHarness
 {
 	my $self = shift;
 	
-	return $self->{harness};
+	return $self->{harness} && !$self->doDryRun();
+}
+
+sub doDryRun
+{
+	my $self = shift;
+	
+	return $self->{dryrun};
 }
 
 sub include

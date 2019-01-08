@@ -1,5 +1,14 @@
 Revision history for Proc-ProcessTable-Colorizer
 
+0.3.0	 2019-01-07/20:00
+		 -No longer uses BSD::Processes.
+
+0.2.2	 2019-01-05/12:20
+		 -Add the missing depend Term::Size.
+
+0.2.1	 2019-01-05/12:00
+		 -Fix a typo that causes errors if the process was started last year.
+
 0.2.0	 2017-11-08/02:00
 		 -Fix numeric search string checking involving numbers with decimal points.
 		 -Move self ignore check to the end so it works properly.

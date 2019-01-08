@@ -210,6 +210,9 @@ METHODS
         setting (pointing to the old folder) and then adds the new folder as
         a new parent.
 
+    "my $metadata_hash_ref = $gd->file_metadata( file_id )"
+        Return metadata about the file with the specified ID from Google Drive.
+
 Error handling
     In case of an error while retrieving information from the Google Drive
     API, the methods above will return "undef" and a more detailed error
@@ -225,10 +228,10 @@ LOGGING/DEBUGGING
         Log::Log4perl->easy_init($DEBUG);
 
 LEGALESE
-    Copyright 2012 by Mike Schilli, all rights reserved. This program is
+    Copyright 2019 by Mike Schilli, all rights reserved. This program is
     free software, you can redistribute it and/or modify it under the same
     terms as Perl itself.
 
 AUTHOR
-    2012, Mike Schilli <cpan@perlmeister.com>
+    2012-2019, Mike Schilli <cpan@perlmeister.com>
 

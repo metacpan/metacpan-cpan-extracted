@@ -1,4 +1,4 @@
-# $Id: 03info.t 42 2013-06-29 20:44:17Z stro $
+# $Id: 03info.t 70 2019-01-04 19:39:59Z stro $
 
 use strict;
 use warnings;
@@ -58,21 +58,11 @@ foreach my $dist_name (keys %$dists) {
       is($info_dists->{$dist_name}->{modules}->{$key}, $modules->{$key});
     }
   }
-  my $chapterid = $dists->{$dist_name}->{chapterid};
-  if (has_hash_data($chapterid)) {
-    foreach my $key(keys %$chapterid) {
-      ok(exists $info_dists->{$dist_name}->{chapterid}->{$key});
-      foreach my $subchapter (keys %{$chapterid->{$key}}) {
-        is($info_dists->{$dist_name}->{chapterid}->{$key}->{$subchapter},
-           $chapterid->{$key}->{$subchapter});
-      }
-    }
-  }
 }
 
 foreach my $mod_name (keys %$mods) {
   ok(defined $info_mods->{$mod_name});
-  foreach (qw(mod_abs chapterid dist_name dslip mod_vers)) {
+  foreach (qw(mod_abs dist_name mod_vers)) {
     next unless $mods->{$mod_name}->{$_};
     is($info_mods->{$mod_name}->{$_}, $mods->{$mod_name}->{$_});
   }

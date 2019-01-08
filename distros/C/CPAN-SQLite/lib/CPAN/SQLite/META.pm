@@ -1,9 +1,9 @@
-# $Id: META.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: META.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::META;
 use strict;
 use warnings;
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -229,13 +229,6 @@ sub set_module {
   my ($self, $id, $results) = @_;
   my $class = 'CPAN::Module';
   my $cpan_meta = $self->{cpan_meta};
-  my %dslip;
-  if (my $dslip = $results->{dslip}) {
-    my @values = split '', $dslip;
-    for (qw(d s l i p)) {
-      $dslip{'stat' . $_} = shift @values;
-    }
-  }
   my $d = $cpan_meta->instance(
                                $class => $id
                               );
@@ -245,8 +238,6 @@ sub set_module {
           'CPAN_VERSION' => $results->{mod_vers},
           'CPAN_FILE' => $results->{download},
           'CPAN_USERID' => $results->{cpanid},
-          'chapterid' => $results->{chapterid},
-          %dslip,
          );
 }
 
@@ -254,13 +245,6 @@ sub set_bundle {
   my ($self, $id, $results) = @_;
   my $class = 'CPAN::Bundle';
   my $cpan_meta = $self->{cpan_meta};
-  my %dslip;
-  if (my $dslip = $results->{dslip}) {
-    my @values = split '', $dslip;
-    for (qw(d s l i p)) {
-      $dslip{'stat' . $_} = shift @values;
-    }
-  }
   my $d = $cpan_meta->instance(
                                $class => $id
                               );
@@ -270,8 +254,6 @@ sub set_bundle {
           'CPAN_VERSION' => $results->{mod_vers},
           'CPAN_FILE' => $results->{download},
           'CPAN_USERID' => $results->{cpanid},
-          'chapterid' => $results->{chapterid},
-          %dslip,
          );
 }
 
@@ -416,7 +398,7 @@ CPAN::SQLite::META - helper module for CPAN.pm integration
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 
@@ -497,13 +479,8 @@ The attributes are
         'CPAN_VERSION' => $results->{mod_vers},
         'CPAN_FILE' => $results->{download},
         'CPAN_USERID' => $results->{cpanid},
-        'chapterid' => $results->{chapterid},
-        %dslip,
 
 where C<$results> are the results returned from C<CPAN::SQLite>.
-Here, C<%dslip> is a hash containing keys C<statd>, C<stats>,
-C<statl>, C<stati>, and C<statp>, with corresponding values
-being the registered dslip entries for the module, if present.
 
 =item dist
 

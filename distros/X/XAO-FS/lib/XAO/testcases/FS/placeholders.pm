@@ -488,18 +488,52 @@ sub test_build_structure {
                       "Field ($name) doesn't exist after build_structure()");
     }
 
-# TODO:
-# We need to re-load database structure from disk at this
-# point. Otherwise index and unique are not really tested.
-# am@xao.com, 10/1/2001
-#
+    # Reconnecting to the database, getting a new database object with a
+    # new structure loaded from disk.
+    #
+    $odb=$self->reconnect();
+    $cust=$odb->fetch('/Customers/c1');
 
+    # Checking how field length and charset changes work
+    #
+    $structure{'name'}->{'charset'}='latin1';
+    $structure{'name'}->{'_force'}=1;
+
+    $cust->build_structure(\%structure);
+
+    $odb=$self->reconnect();
+    $cust=$odb->fetch('/Customers/c1');
+
+    $self->assert($cust->describe('name')->{'charset'} eq 'latin1',
+        "Failed to change charset to 'latin1' on 'name'");
+
+    $structure{'name'}->{'maxlength'}=50;
+    $structure{'name'}->{'charset'}='utf8';
+    $structure{'text'}->{'charset'}='utf8';
+
+    $cust->build_structure(\%structure);
+
+    $odb=$self->reconnect();
+    $cust=$odb->fetch('/Customers/c1');
+
+    $self->assert($cust->describe('name')->{'maxlength'} == 50,
+        "Failed to change maxlength to 50 on 'name'");
+
+    $self->assert($cust->describe('name')->{'charset'} eq 'utf8',
+        "Failed to change charset to 'utf8' on 'name'");
+
+    $self->assert($cust->describe('text')->{'charset'} eq 'utf8',
+        "Failed to change charset to 'utf8' on 'text'");
+
+    # A new field
+    #
     $structure{newf}={
         type => 'real',
         minvalue => 123,
         maxvalue => 234,
         index => 1,
     };
+
     $cust->build_structure(\%structure);
 
     foreach my $name (qw(newf name text integer uns Orders)) {

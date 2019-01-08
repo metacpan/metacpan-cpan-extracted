@@ -2,7 +2,7 @@ package Catmandu::Store::ElasticSearch;
 
 use Catmandu::Sane;
 
-our $VERSION = '0.0510';
+our $VERSION = '0.0511';
 
 use Moo;
 use Search::Elasticsearch;
@@ -84,6 +84,10 @@ Catmandu::Store::ElasticSearch - A searchable store backed by Elasticsearch
 
     # Export using a CQL query (needs a CQL mapping)
     $ catmandu export ElasticSearch --index-name 'catmandu' --q "name any college"
+
+    # You need to specify the client version if your Elasticsearch server version is
+    # not the same as your default Search::Elasticsearch client version
+    $ catmandu import JSON to ElasticSearch --index-name 'catmandu' --client '5_0::Direct' < data.json
 
     # From Perl
 
@@ -284,16 +288,13 @@ Also this configuration can be added to a catmandu.yml configuration file like:
         search:
            package: ElasticSearch
            options:
+             client: 6_0::Direct
              index_name: catmandu
-             index_mappings
+             index_mappings:
                data:
                  properties:
-                     _id:
-                         type: string
-                         include_in_all: true
-                         index: not_analyzed
                      title:
-                         type: string
+                         type: text
              bags:
                data:
                   cql_mapping:
@@ -318,52 +319,19 @@ name of the store, C<search> in this case:
 
 =head1 COMPATIBILITY
 
-This store expects version 1.0 or higher of the Elasticsearch server.
+The appropriate client should be installed:
 
-To talk to older versions of Elasticsearch the appropriate client should be installed.
-
-    # Elasticsearch 2.x
-    cpanm Search::Elasticsearch::Client::2_0::Direct
+    # Elasticsearch 6.x
+    cpanm Search::Elasticsearch::Client::6_0::Direct
     # Elasticsearch 1.x
     cpanm Search::Elasticsearch::Client::1_0::Direct
 
-And the client version should be specified in the options:
+And specified in the options:
 
     Catmandu::Store::ElasticSearch->new(index_name => 'myindex', client => '1_0::Direct')
 
-Note that Elasticsearch >= 2.0 doesn't allow keys that start with an underscore such as
-C<_id>. You can use the C<key_prefix> option at store level or C<id_key> at
-bag level to handle this.
-
-    # in your catmandu.yml
-    store:
-      yourstore:
-        package: ElasticSearch
-        options:
-          # use my_id instead of _id
-          key_prefix: my_
-
 If you want to use the C<delete_by_query> method with Elasticsearch >= 2.0 you
-need have to L<install the delete by query plugin|https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html>.
-
-=head1 MIGRATING A STORE FROM ELASTICSEARCH 1.0 TO 2.0 OR HIGHER
-
-1. backup your data as JSON
-
-    catmandu export yourstore --bag yourbag to --file /path/to/yourbag.json -v
-
-2. drop the store
-
-    catmandu drop yourstore
-
-3. upgrade the Elasticsearch server
-
-4. update your catmandu.yml with a C<key_prefix> or C<id_prefix> (see COMPATIBILITY)
-
-5. import your data using the new keys specified in your catmandu.yml
-
-    catmandu import --file /path/to/yourbag.json --fix 'move_field(_id, my_id)' \
-    to yourstore --bag yourbag -v
+have to L<install the delete by query plugin|https://www.elastic.co/guide/en/elasticsearch/plugins/current/plugins-delete-by-query.html>.
 
 =head1 ERROR HANDLING
 

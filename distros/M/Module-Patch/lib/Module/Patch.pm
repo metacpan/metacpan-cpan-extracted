@@ -1,7 +1,7 @@
 package Module::Patch;
 
-our $DATE = '2018-10-07'; # DATE
-our $VERSION = '0.274'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.275'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -9,7 +9,8 @@ use warnings;
 use Log::ger;
 
 use Monkey::Patch::Action qw();
-use Package::MoreUtil qw(list_package_contents package_exists);
+use Package::Stash;
+use Package::Util::Lite qw(package_exists);
 
 our @EXPORT_OK = qw(patch_package);
 
@@ -222,13 +223,7 @@ sub patch_package {
             for my $sub_name (@$sub_names) {
                 if (ref($sub_name) eq 'Regexp') {
                     unless ($target_subs) {
-                        $target_subs = [];
-                        my %tp = list_package_contents($target);
-                        for (keys %tp) {
-                            if (ref($tp{$_}) eq 'CODE' && !/^\*/) {
-                                push @$target_subs, $_;
-                            }
-                        }
+                        $target_subs = [Package::Stash->new($target)->list_all_symbols("CODE")];
                     }
                     for (@$target_subs) {
                         push @s, $_ if $_ !~~ @s && $_ =~ $sub_name;
@@ -291,7 +286,7 @@ Module::Patch - Patch package with a set of patches
 
 =head1 VERSION
 
-This document describes version 0.274 of Module::Patch (from Perl distribution Module-Patch), released on 2018-10-07.
+This document describes version 0.275 of Module::Patch (from Perl distribution Module-Patch), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -647,7 +642,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package HackaMol::Roles::AtomGroupRole;
-$HackaMol::Roles::AtomGroupRole::VERSION = '0.050';
+$HackaMol::Roles::AtomGroupRole::VERSION = '0.051';
 #ABSTRACT: Role for a group of atoms
 use Moose::Role;
 use Carp;
@@ -53,37 +53,64 @@ has 'qcat_print' => (
 );
 
 has 'info' => (
-	is  => 'rw',
-	isa => 'Str',
-	lazy => 1,
-    default   => "",
+    is      => 'rw',
+    isa     => 'Str',
+    lazy    => 1,
+    default => "",
 );
 
+sub _lsq_slope {
+    # private function used for each coordinate 
+    # translation of tcl function written by Justin Gullingsrud @ uiuc.edu 
+    # algorithm reference: Bevington
+    # Fit the points x to x = ai + b, i=0...N-1, and return the value of a 
+    # a = 12/( (N(N^2 - 1)) ) sum[ (i-(N-1)/2) * xi]    
+    my $xis = shift || die "expecting array_ref of cartesian coordinate [x y or z]";
+    my $n = @$xis;
+    my $sum = 0;
+    my $d = ($n-1)/2;
+    my $i = 0;
+    $sum += ($i++ - $d)*$_ foreach @$xis; 
+    return $sum * 12 / ($n * ( $n * $n - 1)) ;
+} 
+
+sub centered_vector {
+    my $self = shift;
+    my $centered_flag = shift;
+    my @mvrs = map {$_->xyz} $self->all_atoms;
+    die "2 atoms needed for a centered_vector" unless @mvrs > 1;
+    my @x = map { $_->[0] } @mvrs;
+    my @y = map { $_->[1] } @mvrs;
+    my @z = map { $_->[2] } @mvrs;
+    my $mvr = V( map { _lsq_slope($_) } \@x,\@y,\@z);
+    return $mvr->versor;
+}
+
 sub calc_bfps {
+
     # this should be rerun for each selection
     #10.1016/j.jmb.2015.09.024
     my $self = shift;
-    unless ($self->count_atoms > 1){
-      warn "calc_bfps> group not large enough\n";
-      return;
+    unless ( $self->count_atoms > 1 ) {
+        warn "calc_bfps> group not large enough\n";
+        return;
     }
-    my @atoms = $self->all_atoms;
-    my @bfacts = map {$_->bfact} @atoms;
-    my $bfact_mean = sum(@bfacts)/@bfacts;
-    my $sd = 0;
-    $sd += ($_ - $bfact_mean)**2 foreach @bfacts;
-    unless ($sd > 0){
-      warn "calc_bfps> no variance in the group bfactors\n";
-      return;
+    my @atoms      = $self->all_atoms;
+    my @bfacts     = map { $_->bfact } @atoms;
+    my $bfact_mean = sum(@bfacts) / @bfacts;
+    my $sd         = 0;
+    $sd += ( $_ - $bfact_mean )**2 foreach @bfacts;
+    unless ( $sd > 0 ) {
+        warn "calc_bfps> no variance in the group bfactors\n";
+        return;
     }
-    my $bfact_std = sqrt($sd / (@bfacts - 1));
-    foreach my $atom (@atoms){
-        my $bfp = ($atom->bfact - $bfact_mean)/$bfact_std;
-        $atom->bfp( $bfp );
+    my $bfact_std = sqrt( $sd / ( @bfacts - 1 ) );
+    foreach my $atom (@atoms) {
+        my $bfp = ( $atom->bfact - $bfact_mean ) / $bfact_std;
+        $atom->bfp($bfp);
     }
-    return map{$_->bfp} @atoms;
+    return map { $_->bfp } @atoms;
 }
-
 
 sub dipole {
     my $self = shift;
@@ -114,11 +141,11 @@ sub COM {
 sub center {
     my $self = shift;
     return ( V(0) ) unless ( $self->count_atoms );
-    my @atoms     = $self->all_atoms;
+    my @atoms   = $self->all_atoms;
     my @vectors = map { $_->get_coords( $_->t ) } @atoms;
-    my $center       = V( 0, 0, 0 );
+    my $center  = V( 0, 0, 0 );
     $center += $_ foreach @vectors;
-    return ( $center / $self->count_atoms);
+    return ( $center / $self->count_atoms );
 }
 
 sub COZ {
@@ -250,32 +277,35 @@ sub rotate {
     $atoms[$_]->set_coords( $tf, $rcor[$_] + $orig ) foreach 0 .. $#rcor;
 }
 
-sub rotate_translate{
-  # args: 
-  #      1. rotation matrix (3x3): ar, each column (cx,cy,cz, below) is a Math::Vector::Real
-  #      2. translate vector, MVR 
-  #               r' = x*cx + y*cy + z*cz + v_trans
-  #      3. t final, the final t location for transformed coordinates [defaults to current t]
-  my $self = shift;
-  my $rmat = shift;
-  my $trns = shift;
-  my $tf   = shift;
-  my @atoms = $self->all_atoms;
-  my ($cx,$cy,$cz) = @{$rmat};
+sub rotate_translate {
 
-  my $t     = $atoms[0]->t;
-  $tf = $t unless ( defined($tf) );
+# args:
+#      1. rotation matrix (3x3): ar, each column (cx,cy,cz, below) is a Math::Vector::Real
+#      2. translate vector, MVR
+#               r' = x*cx + y*cy + z*cz + v_trans
+#      3. t final, the final t location for transformed coordinates [defaults to current t]
+    my $self  = shift;
+    my $rmat  = shift;
+    my $trns  = shift;
+    my $tf    = shift;
+    my @atoms = $self->all_atoms;
+    my ( $cx, $cy, $cz ) = @{$rmat};
 
-  foreach my $atom (@atoms){
-     my $xyz = $atom->xyz;
-     #my ($x,$y,$z) = @{$xyz};
-     my $xr = $cx*$xyz; 
-     my $yr = $cy*$xyz; 
-     my $zr = $cz*$xyz; 
-     #my $xyz_new = $x*$cx + $y*$cy + $z*$cz + $trns;  
-     my $xyz_new = V($xr,$yr,$zr) + $trns; 
-     $atom->set_coords($tf,$xyz_new);
-  }  
+    my $t = $atoms[0]->t;
+    $tf = $t unless ( defined($tf) );
+
+    foreach my $atom (@atoms) {
+        my $xyz = $atom->xyz;
+
+        #my ($x,$y,$z) = @{$xyz};
+        my $xr = $cx * $xyz;
+        my $yr = $cy * $xyz;
+        my $zr = $cz * $xyz;
+
+        #my $xyz_new = $x*$cx + $y*$cy + $z*$cz + $trns;
+        my $xyz_new = V( $xr, $yr, $zr ) + $trns;
+        $atom->set_coords( $tf, $xyz_new );
+    }
 
 }
 
@@ -367,19 +397,17 @@ sub what_time {
 }
 
 sub string_xyz {
-	my $self              = shift;
-	my $add_info_to_blank = shift;
+    my $self              = shift;
+    my $add_info_to_blank = shift;
 
-	my $string;
+    my $string;
     $string .= $self->count_atoms . "\n" unless $self->qcat_print;
-    $string .= $add_info_to_blank if (defined($add_info_to_blank)); 
+    $string .= $add_info_to_blank if ( defined($add_info_to_blank) );
     $string .= "\n";
 
-    foreach my $at ($self->all_atoms) {
-        $string .= sprintf (
-            "%3s %10.6f %10.6f %10.6f\n",
-            $at->symbol, @{ $at->get_coords( $at->t ) }
-        );
+    foreach my $at ( $self->all_atoms ) {
+        $string .= sprintf( "%3s %10.6f %10.6f %10.6f\n",
+            $at->symbol, @{ $at->get_coords( $at->t ) } );
     }
     return $string;
 }
@@ -399,28 +427,31 @@ sub print_xyz {
     #    );
     #}
 
-    return ($fh);           # returns filehandle for future writing
+    return ($fh);    # returns filehandle for future writing
 
 }
 
-sub string_pdb  {
+sub string_pdb {
     my $self = shift;
 
-	my $t = $self->what_time;
-	my @atoms = $self->all_atoms;
-    
-	my $string;
-	$string .= sprintf( "MODEL       %2i\n", $t + 1 ) unless $self->qcat_print;
+    my $t     = $self->what_time;
+    my @atoms = $self->all_atoms;
 
-    my $atform = "%-6s%5i  %-3s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
+    my $string;
+    $string .= sprintf( "MODEL       %2i\n", $t + 1 ) unless $self->qcat_print;
+
+    my $atform =
+      "%-6s%5i  %-3s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
 
     foreach my $at (@atoms) {
+
         # front pad one space if name length is < 4
         my $form = $atform;
-        if (length $at->name > 3){
-          $form = "%-6s%5i %4s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n"
+        if ( length $at->name > 3 ) {
+            $form =
+"%-6s%5i %4s%1s%3s %1s%4s%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
         }
-        $string .= sprintf (
+        $string .= sprintf(
             $form,
             (
                 map { $at->$_ }
@@ -443,7 +474,7 @@ sub string_pdb  {
         );
     }
     $string .= "ENDMDL\n" unless $self->qcat_print;
-	return $string;
+    return $string;
 }
 
 sub print_pdb {
@@ -454,13 +485,13 @@ sub print_pdb {
 
 #   my @atoms = $self->all_atoms;
 #   printf $fh ( "MODEL       %2i\n", $atoms[0]->t + 1 ) unless $self->qcat_print;
-#   my $atform = "%-6s%5i  %-3s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";        
+#   my $atform = "%-6s%5i  %-3s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n";
 
 #   foreach my $at (@atoms) {
 #       # front pad one space if name length is < 4
-#       my $form = $atform; 
+#       my $form = $atform;
 #       if (length $at->name > 3){
-#         $form = "%-6s%5i %4s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n" 
+#         $form = "%-6s%5i %4s%1s%3s %1s%4i%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n"
 #       }
 #       printf $fh (
 #           $form,
@@ -484,18 +515,18 @@ sub print_pdb {
 #           $at->symbol,    # $at->charge
 #       );
 
-#   }
-#   print $fh "ENDMDL\n" unless $self->qcat_print;
+    #   }
+    #   print $fh "ENDMDL\n" unless $self->qcat_print;
 
-    return ($fh);           # returns filehandle for future writing
+    return ($fh);    # returns filehandle for future writing
 }
 
 sub _open_file_unless_fh {
 
-    my $file = shift;       # could be file or filehandle
+    my $file = shift;    # could be file or filehandle
 
-    my $fh = \*STDOUT;      # default to standard out
-                            # if argument is passed, check if filehandle
+    my $fh = \*STDOUT;   # default to standard out
+                         # if argument is passed, check if filehandle
     if ( defined($file) ) {
         if ( ref($file) ) {
             if ( reftype($file) eq "GLOB" ) {
@@ -528,7 +559,7 @@ HackaMol::Roles::AtomGroupRole - Role for a group of atoms
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 SYNOPSIS
 
@@ -711,6 +742,16 @@ argument, optional: Int, offset for resetting the serial number of atoms.
 Returns the offset. 
 
   $group->fix_serial(0); # serial starts from zero
+
+=head2 centered_vector 
+
+calculates least squares fitted vector for the AtomGroup. Returns normalized Math::Vector::Real 
+object with origin V(0,0,0). 
+
+  $mvr = $group->centered_vector; # unit vector origin 0,0,0 
+  # place two mercury atoms along the vector to visualize the fit 
+  my $hg_1 = HackaMol::Atom->new(Z => 80, coords => [$group->center]);
+  my $hg_2 = HackaMol::Atom->new(Z => 80, coords => [$group->center + $mvr]);
 
 =head1 ARRAY METHODS
 

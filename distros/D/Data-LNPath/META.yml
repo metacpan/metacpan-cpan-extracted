@@ -20,7 +20,7 @@ no_index:
 requires:
   Scalar::Util: '0'
   perl: '5.006'
-version: '0.07'
+version: '0.08'
 x_contributors:
   - 'Stavros Vachtsevanos (svacht)'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

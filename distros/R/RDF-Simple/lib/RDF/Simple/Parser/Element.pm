@@ -1,17 +1,15 @@
 
-# $Id: Element.pm,v 1.3 2009/04/11 15:37:34 Martin Exp $
-
 package RDF::Simple::Parser::Element;
 
 use Data::Dumper;
 
-# Use a hash to implement objects of this type:
-use Class::MakeMethods::Standard::Hash (
-                                        scalar => [ qw( base subject language URI qname attrs parent children xtext text )],
-                                       );
+use Class::MethodMaker [
+                        
+                        scalar => [ qw/ base subject language URI qname attrs parent children xtext text / ],
+                       ];
 
 our
-$VERSION = do { my @r = (q$Revision: 1.3 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+$VERSION = 1.31;
 
 sub new {
     my ($class,$ns,$prefix,$name,$parent,$attrs,%p) = @_;

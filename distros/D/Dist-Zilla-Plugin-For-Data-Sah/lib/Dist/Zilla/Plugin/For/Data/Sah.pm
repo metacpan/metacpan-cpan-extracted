@@ -1,13 +1,13 @@
 package Dist::Zilla::Plugin::For::Data::Sah;
 
-our $DATE = '2016-06-02'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Package::MoreUtil qw(list_package_contents);
+use Package::Stash;
 
 use Moose;
 use namespace::autoclean;
@@ -42,9 +42,8 @@ sub munge_files {
                     require $package_pm;
                 }
 
-                my $pkg_contents = { list_package_contents($package) };
                 my @clauses;
-                for (sort keys %$pkg_contents) {
+                for (Package::Stash->new($package)->list_all_symbols("CODE")) {
                     next unless /^clausemeta_(.+)/;
                     push @clauses, $1;
                 }
@@ -90,7 +89,7 @@ Dist::Zilla::Plugin::For::Data::Sah - Plugin for building Data-Sah distribution
 
 =head1 VERSION
 
-This document describes version 0.003 of Dist::Zilla::Plugin::For::Data::Sah (from Perl distribution Dist-Zilla-Plugin-For-Data-Sah), released on 2016-06-02.
+This document describes version 0.004 of Dist::Zilla::Plugin::For::Data::Sah (from Perl distribution Dist-Zilla-Plugin-For-Data-Sah), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -139,7 +138,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

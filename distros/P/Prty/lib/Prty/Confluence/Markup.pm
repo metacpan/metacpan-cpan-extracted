@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Unindent;
 
@@ -820,7 +820,7 @@ sub lineBreak {
 =head4 Description
 
 Generiere eine Seite mit Wiki-Markup. Das Markup kann nach Confluence
-übertragen und dort visuell begutachtet werden.
+übertragen und dort optisch begutachtet werden.
 
 =head4 Examples
 
@@ -949,7 +949,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -957,7 +957,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

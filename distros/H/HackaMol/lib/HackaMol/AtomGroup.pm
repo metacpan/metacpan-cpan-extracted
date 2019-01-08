@@ -1,16 +1,17 @@
 package HackaMol::AtomGroup;
-$HackaMol::AtomGroup::VERSION = '0.050';
+$HackaMol::AtomGroup::VERSION = '0.051';
 #ABSTRACT: HackaMol AtomGroup class
 use 5.008;
 use Moose;
 use namespace::autoclean;
 use Carp;
 use MooseX::StrictConstructor;
+
 #use MooseX::Storage;
-#with Storage( 'io' => 'StorableFile' ), 
-with  'HackaMol::Roles::NameRole', 
-      'HackaMol::Roles::AtomGroupRole',
-      'HackaMol::Roles::SelectionRole';
+#with Storage( 'io' => 'StorableFile' ),
+with 'HackaMol::Roles::NameRole',
+  'HackaMol::Roles::AtomGroupRole',
+  'HackaMol::Roles::SelectionRole';
 
 sub Rg {
 
@@ -41,7 +42,7 @@ HackaMol::AtomGroup - HackaMol AtomGroup class
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 SYNOPSIS
 

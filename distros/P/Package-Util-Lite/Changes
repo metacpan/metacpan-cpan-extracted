@@ -1,0 +1,4 @@
+0.001   2019-01-06 (PERLANCAR)
+
+        - First release. Spun off from Package-MoreUtil. Now only contains
+          routines not already covered by Package::Stash.

@@ -398,6 +398,63 @@ sub charset_change_execute ($$) {
 
 ###############################################################################
 
+=item maxlength_change_prepare ($)
+
+Prepares an internal structure for a later one-shot modification of
+maxlength in a table.
+
+=cut
+
+sub maxlength_change_prepare ($$) {
+    my ($self,$table)=@_;
+
+    $table || throw $self "- no 'table' given";
+
+    return {
+        sql     => '',
+        table   => $table,
+        defaults=> [ ],
+    };
+}
+
+###############################################################################
+
+=item maxlength_change_field
+
+Adds a field to the list of things to alter on maxlength_change_execute()
+
+=cut
+
+sub maxlength_change_field ($$$$$$) {
+    my ($self,$csh,$name,$maxlength,$fdesc)=@_;
+
+    my $def=$self->text_field_definition($fdesc->{'charset'},$maxlength);
+
+    $csh->{'sql'}.=', ' if $csh->{'sql'};
+    $csh->{'sql'}.="CHANGE ".
+                   $self->mangle_field_name($name)." ".
+                   $self->mangle_field_name($name)." ".$def;
+
+    push(@{$csh->{'defaults'}},$fdesc->{'default'});
+}
+
+###############################################################################
+
+=item maxlength_change_execute
+
+Executes actual SQL collected from maxlength_change_field()
+
+=cut
+
+sub maxlength_change_execute ($$) {
+    my ($self,$csh)=@_;
+
+    my $sql="ALTER TABLE ".$csh->{'table'}." ".$csh->{'sql'};
+    $self->connector->sql_do($sql,$csh->{'defaults'});
+}
+
+###############################################################################
+
 =item scale_change_prepare ($)
 
 Prepares an internal structure for a later one-shot modification of

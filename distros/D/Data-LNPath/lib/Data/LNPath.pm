@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 our (%ERROR, %METH, $caller);
 
@@ -46,6 +46,7 @@ BEGIN {
 			return $data;
 		},
 		unescape => sub {
+			return unless defined $_[0];
 			$_[0] =~ s/^\///g;
 			$_[0] =~ s/\+/ /g;
 			$_[0] =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
@@ -113,7 +114,7 @@ sub import {
 
 sub lnpath {
 	my ($data, $key) = @_;
-	my $val = eval { $METH{extract_path}->('', 0, $data, split '/', $METH{unescape}->($key)) };
+	my $val = eval { $METH{extract_path}->('', 0, $data, split '/', $METH{unescape}->($key) // "") };
 	if ($@ && !$ERROR{no_error}) {
 		die $@;
 	}
@@ -126,7 +127,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 

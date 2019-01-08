@@ -4,7 +4,7 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,15 +32,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Blessed::Merge" : "0.05",
+            "Blessed::Merge" : "0.07",
             "Carp" : "0",
-            "Data::LNPath" : "0.04",
+            "Data::LNPath" : "0.08",
             "YAML::XS" : "0.66",
             "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

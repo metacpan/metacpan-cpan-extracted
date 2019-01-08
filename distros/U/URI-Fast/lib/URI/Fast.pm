@@ -1,6 +1,6 @@
 package URI::Fast;
 
-our $XS_VERSION = our $VERSION = '0.45';
+our $XS_VERSION = our $VERSION = '0.46';
 $VERSION =~ tr/_//;
 
 use utf8;
@@ -10,6 +10,7 @@ no strict 'refs';
 
 use Carp;
 use Exporter;
+use Scalar::Util qw(refaddr);
 
 require XSLoader;
 XSLoader::load('URI::Fast', $XS_VERSION);
@@ -246,6 +247,70 @@ sub relative {
   $rel->clear_auth;
 
   return $rel;
+}
+
+sub _walk {
+  my ($ref, $sub) = @_;
+  my @stack = ($ref);
+  my %seen;
+
+  while (my $elt = shift @stack) {
+    my $ref = ref $elt;
+
+    if (defined $ref) {
+      my $addr = refaddr $elt;
+      next if exists $seen{ $addr };
+      $seen{ $addr } = 1;
+
+      if ($ref eq 'ARRAY') {
+        for (0 .. @$elt - 1) {
+          if (ref $elt->[$_]) {
+            push @stack, $elt->[$_];
+          }
+          elsif (defined $elt->[$_]) {
+            $elt->[$_] = $sub->( $elt->[$_] );
+          }
+        }
+      }
+      elsif ($ref eq 'HASH') {
+        foreach (keys %$elt) {
+          if (ref $elt->{$_}) {
+            push @stack, $elt->{$_};
+          }
+          elsif (defined $elt->{$_}) {
+            $elt->{$_} = $sub->( $elt->{$_} );
+          }
+        }
+      }
+      elsif ($ref eq 'SCALAR') {
+        push @stack, $$elt;
+      }
+    }
+  }
+
+  $ref;
+}
+
+sub escape_tree {
+  my ($ref, @args) = @_;
+
+  my $sub = sub{
+    push @_, @args;
+    goto \&encode;
+  };
+
+  _walk($ref, $sub);
+}
+
+sub unescape_tree {
+  my ($ref, @args) = @_;
+
+  my $sub = sub{
+    push @_, @args;
+    goto \&decode;
+  };
+
+  _walk($ref, $sub);
 }
 
 =encoding UTF8
@@ -649,6 +714,43 @@ due to some pedantic whining on the part of
 L<BGRIMM|https://metacpan.org/author/BGRIMM>, they have been renamed to
 C<uri_encode> and C<uri_decode>.
 
+=head2 escape_tree
+
+=head2 unescape_tree
+
+Traverses a data structure, escaping or unescaping I<defined> scalar values in
+place. Accepts a reference to be traversed. Any further parameters are passed
+unchanged to L</encode> or L</decode>.
+
+  my $obj = {
+    foo => ['bar baz', 'bat%fnord'],
+    bar => {baz => 'bat%bat'},
+    baz => undef,
+    bat => '',
+  };
+
+  URI::Fast::escape_tree($obj);
+
+  # $obj is now:
+  {
+    foo => ['bar%20baz', 'bat%25fnord'],
+    bar => {baz => 'bat%25bat'},
+    baz => undef,
+    bat => '',
+  }
+
+  URI::Fast::unescape_tree($obj); # $obj returned to original form
+
+  URI::Fast::escape_tree($obj, '%'); # escape but allow "%"
+
+  # $obj is now:
+  {
+    foo => ['bar%20baz', 'bat%fnord'],
+    bar => {baz => 'bat%bat'},
+    baz => undef,
+    bat => '',
+  }
+
 =head1 SPEED
 
 See L<URI::Fast::Benchmarks>.
@@ -716,6 +818,10 @@ fun of me for naming certain methods too generically.
 =item Sara Siegal (SSIEGAL)
 
 =item Tim Vroom (VROOM)
+
+=item Des Daignault (NAWGLAN)
+
+=item Josh Rosenbaum
 
 =back
 

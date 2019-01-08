@@ -30,6 +30,13 @@ my %module = (
                 type => 'git',
             }
         },
+        prereqs => {
+            develop => {
+                requires => {
+                    'LWP::ConsoleLogger' => '0.000039', # for convenient diagnosis
+                },
+            },
+        },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },

@@ -31,16 +31,33 @@ subtest system => sub {
         system({capture_stdout=>\$stdout}, $^X, "-e", "print 123");
         is_deeply($stdout, "123");
     };
-
     subtest "opt:capture_stderr" => sub {
         my $stderr;
         system({capture_stderr=>\$stderr}, $^X, "-e", "warn 123");
         like($stderr, qr/123/);
     };
-
     subtest "opt:capture_merged" => sub {
         my $merged;
         system({capture_merged=>\$merged}, $^X, "-e", "\$|++; print 123; print STDERR 456; print 789");
+        is_deeply($merged, "123456789");
+    };
+
+    subtest "opt:tee_stdout" => sub {
+        my $stdout;
+        # XXX use Capture::Tiny to capture output
+        system({tee_stdout=>\$stdout}, $^X, "-e", "print 123");
+        is_deeply($stdout, "123");
+    };
+    subtest "opt:tee_stderr" => sub {
+        my $stderr;
+        # XXX use Capture::Tiny to capture output
+        system({tee_stderr=>\$stderr}, $^X, "-e", "warn 123");
+        like($stderr, qr/123/);
+    };
+    subtest "opt:tee_merged" => sub {
+        my $merged;
+        # XXX use Capture::Tiny to capture output
+        system({tee_merged=>\$merged}, $^X, "-e", "\$|++; print 123; print STDERR 456; print 789");
         is_deeply($merged, "123456789");
     };
 

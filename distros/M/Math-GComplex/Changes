@@ -1,5 +1,12 @@
 Revision history for Math-GComplex
 
+0.12    2019-01-07
+
+        - Added the `round(z)` method to round `z` to the nearest Gaussian integer.
+        - Added the `gcd(a, b)` method for computing the greatest common divisors of two complex numbers.
+        - Added the `invmod(n, m)` method for computing the modular multiplicative inverse of two complex numbers.
+        - Added the `powmod(x, n, m)` method for efficiently computing `x**n % m`, using the exponentiation by squaring method.
+
 0.11    2018-12-13
 
         - Added the `pown` method for computing `x**n` where `n` is a native integer (using the exponentiation by squaring method).

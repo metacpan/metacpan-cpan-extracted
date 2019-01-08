@@ -1,5 +1,5 @@
 package Selenium::Remote::Driver;
-$Selenium::Remote::Driver::VERSION = '1.30';
+$Selenium::Remote::Driver::VERSION = '1.31';
 use strict;
 use warnings;
 
@@ -740,17 +740,25 @@ sub set_timeout {
         croak "Expecting type";
     }
     $ms = _coerce_timeout_ms( $ms );
+    $type = 'pageLoad' if $type eq 'page load' && $self->browser_name ne 'MicrosoftEdge'; #XXX SHIM they changed the WC3 standard mid stream
 
     my $res = { 'command' => 'setTimeout' };
-    my $params = { 'type' => $type, 'ms' => $ms, $type => $ms };
+    my $params = { $type => $ms };
+    #XXX edge still follows earlier versions of the WC3 standard
+    if ($self->browser_name eq 'MicrosoftEdge') {
+        $params->{ms}   = $ms;
+        $params->{type} = $type;
+    }
     return $self->_execute_command( $res, $params );
 }
 
 
 sub set_async_script_timeout {
     my ( $self, $ms ) = @_;
-    $ms = _coerce_timeout_ms( $ms );
 
+    return $self->set_timeout('script',$ms) if $self->{is_wd3};
+
+    $ms = _coerce_timeout_ms( $ms );
     my $res    = { 'command' => 'setAsyncScriptTimeout' };
     my $params = { 'ms'      => $ms };
     return $self->_execute_command( $res, $params );
@@ -759,8 +767,9 @@ sub set_async_script_timeout {
 
 sub set_implicit_wait_timeout {
     my ( $self, $ms ) = @_;
-    $ms = _coerce_timeout_ms( $ms );
+    return $self->set_timeout('implicit',$ms) if $self->{is_wd3};
 
+    $ms = _coerce_timeout_ms( $ms );
     my $res    = { 'command' => 'setImplicitWaitTimeout' };
     my $params = { 'ms'      => $ms };
     return $self->_execute_command( $res, $params );
@@ -1075,6 +1084,10 @@ sub set_window_position {
     if ( not defined $x and not defined $y ) {
         croak "X & Y co-ordinates are required";
     }
+    croak qq{Error: In set_window_size, argument x "$x" isn't numeric} unless Scalar::Util::looks_like_number($x);
+    croak qq{Error: In set_window_size, argument y "$y" isn't numeric} unless Scalar::Util::looks_like_number($y);
+    $x += 0;            # convert to numeric if a string, otherwise they'll be sent as strings
+    $y += 0;
     my $res = { 'command' => 'setWindowPosition', 'window_handle' => $window };
     my $params = { 'x' => $x, 'y' => $y };
     if ( $self->{is_wd3} && $self->browser_name ne 'chrome') {
@@ -1091,7 +1104,9 @@ sub set_window_size {
     if ( not defined $height and not defined $width ) {
         croak "height & width of browser are required";
     }
-    $height += 0;
+    croak qq{Error: In set_window_size, argument height "$height" isn't numeric} unless Scalar::Util::looks_like_number($height);
+    croak qq{Error: In set_window_size, argument width "$width" isn't numeric} unless Scalar::Util::looks_like_number($width);
+    $height += 0;               # convert to numeric if a string, otherwise they'll be sent as strings
     $width += 0;
     my $res = { 'command' => 'setWindowSize', 'window_handle' => $window };
     my $params = { 'height' => $height, 'width' => $width };
@@ -1745,7 +1760,7 @@ Selenium::Remote::Driver - Perl Client for Selenium Remote Driver
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 SYNOPSIS
 
@@ -3521,7 +3536,7 @@ L<Wight|Wight>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/teodesian/Selenium-Remote-Driver/issues
+L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -3569,7 +3584,7 @@ Aditya Ivaturi <ivaturi@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Allen Lew A.MacLeay Andy Jack Bas Bloemsaat Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Eric Johnson Gabor Szabo Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Max O'Cull Michael Prokop Peter Mottram (SysPete) Phil Kania Mitchell Richard Sailer Robert Utter rouzier Tetsuya Tatsumi Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal Yves Lavoie
+=for stopwords Allen Lew A.MacLeay Andy Jack Bas Bloemsaat Brian Horakh Charles Howes Chris Davies Daniel Fackrell Dave Rolsky Dmitry Karasik Eric Johnson Gabor Szabo Gerhard Jungwirth Gordon Child GreatFlamingFoo Ivan Kurmanov Joe Higton Jon Hermansen Keita Sugama Ken Swanson lembark Luke Closs Martin Gruner Max O'Cull Michael Prokop Peter Mottram (SysPete) Phil Kania Mitchell Richard Sailer Robert Utter rouzier Tetsuya Tatsumi Tod Hagan Tom Hukins Vangelis Katsikaros Vishwanath Janmanchi Viťas Strádal Yves Lavoie
 
 =over 4
 
@@ -3704,6 +3719,10 @@ rouzier <rouzier@gmail.com>
 =item *
 
 Tetsuya Tatsumi <ttatsumi@ra2.so-net.ne.jp>
+
+=item *
+
+Tod Hagan <42418406+tod222@users.noreply.github.com>
 
 =item *
 

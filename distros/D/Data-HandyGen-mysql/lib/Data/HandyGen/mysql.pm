@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use 5.008;
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 $VERSION = eval $VERSION;
 
 
@@ -94,7 +94,7 @@ Data::HandyGen::mysql - Generates test data for mysql easily.
 
 =head1 VERSION
 
-This documentation refers to Data::HandyGen::mysql version 0.0.2
+This documentation refers to Data::HandyGen::mysql version 0.0.5
 
 
 =head1 SYNOPSIS
@@ -406,10 +406,9 @@ sub process_table {
             my $type = $col_def->data_type;
             my $func = $VALUE_DEF_FUNC{$type};
 
-            #  If this data type is not supported, leave it NULL.
+            #  Die if the data type is not supported.
             unless ($func) {
-                warn "Type $type for $col is not supported.";
-                next;
+                die "Type $type for $col is not supported.";
             }
 
             $value = $self->$func($col_def, $exp_id);
@@ -1196,7 +1195,7 @@ Takashi Egawa (C<< egawa.takashi at gmail com >>)
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c)2012-2014 Takashi Egawa (C<< egawa.takashi at gmail com >>). All rights reserved.
+Copyright (c)2012-2018 Takashi Egawa (C<< egawa.takashi at gmail com >>). All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.

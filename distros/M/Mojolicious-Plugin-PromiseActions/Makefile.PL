@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
 }
 ,
   PREREQ_PM      => {
-  'Mojolicious' => '7.75',
+  'Mojolicious' => '8.04',
+  'Scalar::Util' => '0',
   'perl' => 'v5.10.0'
 }
 ,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
       },
     },
   },
-  test => {S => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
+  test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.63_03') }) {

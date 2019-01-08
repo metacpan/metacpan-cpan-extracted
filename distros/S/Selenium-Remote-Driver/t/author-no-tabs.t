@@ -1,7 +1,7 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    print "1..0 # SKIP these tests are for testing by the author\n";
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
     exit
   }
 }
@@ -66,12 +66,12 @@ my @files = (
     't/Test-Selenium-Remote-Driver-google.t',
     't/Test-Selenium-Remote-Driver.t',
     't/Test-Selenium-Remote-WebElement.t',
-    't/Waiter.t',
     't/author-critic.t',
     't/author-eol.t',
     't/author-mojibake.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
+    't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-synopsis.t',
@@ -96,7 +96,6 @@ my @files = (
     't/release-kwalitee.t',
     't/release-meta-json.t',
     't/release-minimum-version.t',
-    't/release-pod-linkcheck.t',
     't/release-unused-vars.t',
     't/uploadTest',
     't/www/404.html',

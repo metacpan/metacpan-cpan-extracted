@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.839';
+our $VERSION = '1.840';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -456,10 +456,9 @@ sub _destroy {
       elsif ($_obj{ $_id }->can('sync'))      { $_obj{ $_id }->sync();    }
       elsif ($_obj{ $_id }->can('db_sync'))   { $_obj{ $_id }->db_sync(); }
       elsif ($_obj{ $_id }->can('close'))     { $_obj{ $_id }->close();   }
+      elsif ($_obj{ $_id }->can('DESTROY'))   { $_obj{ $_id }->DESTROY(); }
       elsif (reftype $_obj{ $_id } eq 'GLOB') {
-         $_obj{ $_id }->can('DESTROY') ? $_obj{ $_id }->DESTROY() : do {
-            close $_obj{ $_id } if defined(fileno $_obj{ $_id });
-         };
+         close $_obj{ $_id } if defined(fileno $_obj{ $_id });
       }
    }
 
@@ -488,10 +487,9 @@ sub _exit {
       elsif ($_o->can('sync'))      { $_o->sync();    }
       elsif ($_o->can('db_sync'))   { $_o->db_sync(); }
       elsif ($_o->can('close'))     { $_o->close();   }
+      elsif ($_o->can('DESTROY'))   { $_o->DESTROY(); }
       elsif (reftype $_o eq 'GLOB') {
-         $_o->can('DESTROY') ? $_o->DESTROY() : do {
-            close $_o if defined(fileno $_o);
-         };
+         close $_o if defined(fileno $_o);
       }
    }
 
@@ -1832,7 +1830,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.839
+This document describes MCE::Shared::Server version 1.840
 
 =head1 DESCRIPTION
 

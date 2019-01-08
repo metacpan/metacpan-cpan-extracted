@@ -1,3 +1,10 @@
+0.07 2019-01-03
+    * Do not pre-generate values that we can iterate over later
+      This reduces the memory usage and allows better resource limiting using
+      the 'limit' parameter
+      Query strings are still potentially expanding the memory usage
+      exponentially
+
 0.06 2018-12-22
     * Fixed query parameters not being generated/appended/kept when using
       a pattern to generate them

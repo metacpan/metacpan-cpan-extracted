@@ -23,6 +23,7 @@ lib/Pcore/API/SCM/Const.pm
 lib/Pcore/API/SCM/Git.pm
 lib/Pcore/API/SCM/Hg.pm
 lib/Pcore/API/SCM/Upstream.pm
+lib/Pcore/API/SMTP.pm
 lib/Pcore/App.pm
 lib/Pcore/App/API.pm
 lib/Pcore/App/API/Auth.pm
@@ -61,6 +62,7 @@ lib/Pcore/Core/Event.pm
 lib/Pcore/Core/Event/Listener.pm
 lib/Pcore/Core/Event/Listener/Common.pm
 lib/Pcore/Core/Event/Listener/file.pm
+lib/Pcore/Core/Event/Listener/smtp.pm
 lib/Pcore/Core/Event/Listener/stderr.pm
 lib/Pcore/Core/Exception.pm
 lib/Pcore/Core/Exception/Object.pm

@@ -14,7 +14,7 @@ use Cwd;
 use File::Temp;
 use List::Util qw(first sum);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -308,30 +308,13 @@ sub _multisect_one_target {
         #         index j   has a different md5_hex, we have to do a run on
         #         j-1 as well.
 
-        if ($target_h_md5_hex ne $current_start_md5_hex) {
-            my $g = $h - 1;
-            $self->_run_one_commit_and_assign($g);
-            my $target_g_md5_hex  = $self->{multisected_outputs}->{$stub}->[$g]->{md5_hex};
-            if ($target_g_md5_hex eq $current_start_md5_hex) {
-                if ($target_h_md5_hex eq $overall_end_md5_hex) {
-                }
-                else {
-                    $current_start_idx  = $h;
-                    $current_end_idx    = $max_idx;
-                }
-                $n++;
-            }
-            else {
-                # Bisection should continue downwards
-                $current_end_idx = $h;
-                $n++;
-            }
-        }
-        else {
-            # Bisection should continue upwards
-            $current_start_idx = $h;
-            $n++;
-        }
+        ($current_start_idx, $current_end_idx, $n) =
+            $self->_bisection_decision(
+                $target_h_md5_hex, $current_start_md5_hex, $h,
+                $self->{multisected_outputs}->{$stub},
+                $overall_end_md5_hex, $current_start_idx, $current_end_idx,
+                $max_idx, $n,
+            );
         $this_target_status = $self->_evaluate_status_one_target_run($target_idx);
     }
     return 1;

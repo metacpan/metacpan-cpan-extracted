@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use POSIX ();
 use Time::Local ();
@@ -201,6 +201,9 @@ sub set {
     }
     elsif ($_[0] eq 'ymd') {
         ($y,$mo,$d) = $_[1] =~ /^(\d+)\D+(\d+)\D+(\d+)$/;
+        if (!$y) {
+            ($y,$mo,$d) = $_[1] =~ /^(\d{4})(\d{2})(\d{2})$/;
+        }
         $h = $mi = $s = 0;
     }
     elsif ($_[0] eq 'ymdhm') {
@@ -1444,7 +1447,7 @@ sub monthAbbrToNum {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -1452,7 +1455,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

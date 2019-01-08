@@ -1,3 +1,12 @@
+0.331   2019-01-07 (PERLANCAR)
+
+	- Introduce escaping mechanism via scalar reference to avoid a
+	  special character from being quoted from the shell, e.g.
+	  system({shell=>1}, 'ls', '-laR', \'>', '/root/ls-laR.txt').
+
+	- Add tests for tee_* options.
+
+
 0.330   2017-08-10 (PERLANCAR)
 
 	- Add options: tee_stdout, tee_stderr, tee_merged.

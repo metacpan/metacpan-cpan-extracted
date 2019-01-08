@@ -272,10 +272,7 @@ sub getMatchesAndDependenciesForRule
 	my $tests = shift;
 	
 	my @matches = $self->{deprules}->{$depRuleName}->{match}->qgrep(@$tests);
-	die("No tests selected by 'match' in dependency rule '$depRuleName'\n") unless @matches;
-
 	my @dependencies = $self->{deprules}->{$depRuleName}->{dependson}->qgrep(@$tests);
-	die("No tests selected by 'dependson' in dependency rule '$depRuleName'\n") unless @dependencies;
 	 
 	return (\@matches, \@dependencies);
 }

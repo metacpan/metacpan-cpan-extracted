@@ -6,7 +6,7 @@ Math::GComplex - Generic complex number library.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -44,11 +44,12 @@ The following functions are exportable:
         atan2 deg2rad rad2deg
 
     :special
+        gcd invmod powmod
         log logn exp pow pown sqrt cbrt root
 
     :misc
-        cplx abs acmp sgn conj norm
-        inv real imag reals floor ceil
+        cplx abs acmp sgn conj norm inv
+        real imag reals floor ceil round
 
 Multiple functions can be exported as:
 
@@ -248,6 +249,30 @@ Raises C<$x> to power C<$y> and returns the result, defined as:
 
 Raises C<$x> to power C<$n> and returns the result, where C<$n> is a native integer.
 
+=head2 powmod
+
+    $x->powmod($n, $m)
+
+Modular exponentiation C<$x**$n % $m>, where C<$n> is a native integer.
+
+=head2 gcd
+
+    $n->gcd($k)
+
+Greatest common divisors of two complex numbers.
+
+=head2 invmod
+
+    $n->invmod($m)
+
+Modular multiplicative inverse of two complex numbers.
+
+The returned value is the solution to C<x> in:
+
+    n*x = 1 (mod m)
+
+Returns C<undef> when a multiplicative inverse mod C<m> does not exist.
+
 =head2 root
 
     $x->root($y)
@@ -419,6 +444,17 @@ The floor function, defined as:
 The ceil function, defined as:
 
     ceil(a + b*i) = ceil(a) + ceil(b)*i
+
+=head2 round
+
+    $x->round
+
+Round C<$x> to the nearest Gaussian integer.
+
+The half away from zero tie-breaking method is used, such that:
+
+    round(+0.5) = +1
+    round(-0.5) = -1
 
 =head2 int
 
@@ -656,7 +692,7 @@ L<Math::Complex> - complex numbers and associated mathematical functions.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Daniel Șuteu.
+Copyright 2018-2019 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

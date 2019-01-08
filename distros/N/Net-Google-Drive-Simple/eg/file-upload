@@ -1,7 +1,5 @@
 #!/usr/local/bin/perl -w
 use strict;
-use FindBin qw( $Bin );
-use lib "$Bin/../lib";
 
 use Net::Google::Drive::Simple;
 use Log::Log4perl qw(:easy);

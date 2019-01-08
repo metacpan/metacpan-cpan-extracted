@@ -25,7 +25,8 @@ name: Module-Patch
 requires:
   Log::ger: '0.023'
   Monkey::Patch::Action: '0.060'
-  Package::MoreUtil: '0.590'
+  Package::Stash: '0'
+  Package::Util::Lite: '0'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Patch
   homepage: https://metacpan.org/release/Module-Patch
   repository: git://github.com/perlancar/perl-Module-Patch.git
-version: '0.274'
+version: '0.275'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -340,7 +341,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

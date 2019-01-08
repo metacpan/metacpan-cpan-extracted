@@ -1,10 +1,10 @@
 NAME
 
-    FFI::Build - Build shared libraries for use with FFI::Platypus
+    FFI::Build - Build shared libraries for use with FFI
 
 VERSION
 
-    version 0.11
+    version 0.12
 
 SYNOPSIS
 

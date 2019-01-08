@@ -6,7 +6,7 @@ use strict;
 use NpsSDK::Constants;
 use NpsSDK::Errors;
 
-our $VERSION = '1.9'; # VERSION
+our $VERSION = '1.91'; # VERSION
 
 our ($logger, $environment, $secret_key, $timeout, $sanitize, $proxy_url, $proxy_port,
      $proxy_user, $proxy_pass, $certificate, $certificate_key, $cert_verify_peer);

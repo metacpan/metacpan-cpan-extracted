@@ -5,9 +5,10 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Storable ();
+use Prty::Path;
 
 # -----------------------------------------------------------------------------
 
@@ -84,9 +85,62 @@ sub thaw {
 
 # -----------------------------------------------------------------------------
 
+=head3 memoize() - Cache Datenstruktur in Datei
+
+=head4 Synopsis
+
+    $ref = Prty::Storable->memoize($file,$sub);
+
+=head4 Description
+
+Existiert Datei $file, deserialisiere die enthaltene Datenstruktur.
+Andernfalls erzeuge die Datenstruktur durch Aufruf der Subroutine $sub
+und speichere sie in Datei $file. In beiden Fällen liefere eine
+Referenz auf die Datenstuktur zurück.
+
+Soll die Datenstuktur erneut generiert werden, genügt es, die Datei
+zuvor zu löschen.
+
+=head4 Example
+
+Cache Hash mit zyklischer Struktur:
+
+    my $cacheFile = '~/tmp/test5674';
+    my $objectH = Prty::Storable->memoize($cacheFile,sub {
+        my $h;
+        $h->{'A'} = [1,undef];
+        $h->{'B'} = [2,undef];
+        $h->{'A'}[1] = \$h->{'B'};
+        $h->{'B'}[1] = \$h->{'A'};
+        return $h;
+    });
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub memoize {
+    my ($class,$file,$sub) = @_;
+
+    my $p = Prty::Path->new;
+
+    my $ref;
+    if ($p->exists($file)) {
+        $ref = $class->thaw($p->read($file));
+    }
+    else {
+        $ref = $sub->();
+        $p->write($file,$class->freeze($ref));
+    }
+
+    return $ref;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -94,7 +148,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

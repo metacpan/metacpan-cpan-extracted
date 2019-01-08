@@ -1,4 +1,4 @@
-package Pcore::SMTP v0.6.6;
+package Pcore::SMTP v0.6.8;
 
 use Pcore -dist, -const, -class, -res;
 use Pcore::Handle qw[:TLS_CTX];
@@ -136,7 +136,7 @@ sub _read_response ( $self, $h ) {
     my $data = [];
 
     while () {
-        my $line = $h->read_line($CRLF);
+        my $line = $h->read_line("\r\n");
 
         return res [ $h->{status}, $h->{reason} ] if !$line;
 
@@ -156,7 +156,7 @@ sub _read_response ( $self, $h ) {
 }
 
 sub _EHLO ( $self, $h ) {
-    $h->write(qq[EHLO localhost.localdomain$CRLF]);
+    $h->write("EHLO localhost.localdomain\r\n");
 
     my $res = $self->_read_response($h);
 
@@ -223,7 +223,7 @@ sub _AUTH ( $self, $h, $mechanisms ) {
     my $cmd = 'AUTH ' . $client->mechanism . ( defined $str and length $str ? $SPACE . to_b64 $str, $EMPTY : $EMPTY );
 
     while () {
-        $h->write( $cmd . $CRLF );
+        $h->write("$cmd\r\n");
 
         my $res = $self->_read_response($h);
 
@@ -239,7 +239,7 @@ sub _AUTH ( $self, $h, $mechanisms ) {
 }
 
 sub _MAIL_FROM ( $self, $h, $from ) {
-    $h->write(qq[MAIL FROM:<$from>$CRLF]);
+    $h->write("MAIL FROM:<$from>\r\n");
 
     return $self->_read_response($h);
 }
@@ -248,7 +248,7 @@ sub _RCPT_TO ( $self, $h, $to ) {
     while () {
         my $addr = shift $to->@*;
 
-        $h->write(qq[RCPT TO:<$addr>$CRLF]);
+        $h->write("RCPT TO:<$addr>\r\n");
 
         my $res = $self->_read_response($h);
 
@@ -270,7 +270,7 @@ sub _RCPT_TO ( $self, $h, $to ) {
 }
 
 sub _DATA ( $self, $h, $args ) {
-    $h->write(qq[DATA$CRLF]);
+    $h->write("DATA\r\n");
 
     my $res = $self->_read_response($h);
 
@@ -279,29 +279,29 @@ sub _DATA ( $self, $h, $args ) {
     # send headers
     my $buf;
 
-    $buf .= qq[From: $args->{from}$CRLF] if $args->{from};
+    $buf .= "From: $args->{from}\r\n" if $args->{from};
 
-    $buf .= qq[Reply-To: $args->{reply_to}$CRLF] if $args->{reply_to};
+    $buf .= "Reply-To: $args->{reply_to}\r\n" if $args->{reply_to};
 
-    $buf .= qq[To: @{[ join q[, ], $args->{to}->@* ]}$CRLF] if $args->{to};
+    $buf .= "To: @{[ join ', ', $args->{to}->@* ]}\r\n" if $args->{to};
 
-    $buf .= qq[Cc: @{[ join q[, ], $args->{cc}->@* ]}$CRLF] if $args->{cc};
+    $buf .= "Cc: @{[ join ', ', $args->{cc}->@* ]}\r\n" if $args->{cc};
 
-    $buf .= 'Subject: ' . encode_utf8 $args->{subject} . $CRLF if defined $args->{subject};
+    $buf .= 'Subject: ' . encode_utf8 $args->{subject} . "\r\n" if defined $args->{subject};
 
-    $buf .= join( $CRLF, $args->{headers}->@* ) . $CRLF if $args->{headers} && $args->{headers}->@*;
+    $buf .= join( "\r\n", $args->{headers}->@* ) . "\r\n" if $args->{headers} && $args->{headers}->@*;
 
     my $boundary;
 
     if ( defined $args->{body} && is_plain_arrayref $args->{body} ) {
         $boundary = P->random->bytes_hex(64);
 
-        $buf .= qq[MIME-Version: 1.0$CRLF];
+        $buf .= "MIME-Version: 1.0\r\n";
 
-        $buf .= qq[Content-Type: multipart/mixed; BOUNDARY="$boundary"$CRLF];
+        $buf .= qq[Content-Type: multipart/mixed; BOUNDARY="$boundary"\r\n];
     }
 
-    $buf .= $CRLF;
+    $buf .= "\r\n";
 
     $h->write($buf);
 
@@ -317,19 +317,19 @@ sub _DATA ( $self, $h, $args ) {
         }
         elsif ( is_plain_arrayref $args->{body} ) {
             state $pack_mime = sub ( $boundary, $headers, $body ) {
-                my $part = '--' . $boundary . $CRLF;
+                my $part = "--$boundary\r\n";
 
-                $part .= join( $CRLF, map { encode_utf8 $_} $headers->@* ) . $CRLF if defined $headers;
+                $part .= join( "\r\n", map { encode_utf8 $_} $headers->@* ) . "\r\n" if defined $headers;
 
-                $part .= 'Content-Transfer-Encoding: base64' . $CRLF;
+                $part .= "Content-Transfer-Encoding: base64\r\n";
 
-                $part .= $CRLF;
+                $part .= "\r\n";
 
                 $part .= to_b64 encode_utf8 $body->$*;
 
-                $part .= $CRLF;
+                $part .= "\r\n";
 
-                $part .= '--' . $boundary . $CRLF;
+                $part .= "--$boundary\r\n";
 
                 return \$part;
             };
@@ -366,10 +366,10 @@ sub _DATA ( $self, $h, $args ) {
     if ( defined $buf ) {
         $buf =~ s/\x0A[.]/\x0A../smg;
 
-        $buf .= $CRLF;
+        $buf .= "\r\n";
     }
 
-    $buf .= qq[.$CRLF];
+    $buf .= ".\r\n";
 
     $h->write($buf);
 
@@ -377,14 +377,14 @@ sub _DATA ( $self, $h, $args ) {
 }
 
 sub _QUIT ( $self, $h ) {
-    $h->write(qq[QUIT$CRLF]);
+    $h->write("QUIT\r\n");
 
     # do not read QUIT response
     return res [ 221, $STATUS_REASON ];
 }
 
 sub _RSET ( $self, $h ) {
-    $h->write(qq[RSET$CRLF]);
+    $h->write("RSET\r\n");
 
     return $self->_read_response($h);
 }
@@ -396,7 +396,7 @@ sub _VRFY ( $self, $h, $email, $cb ) {
 }
 
 sub _NOOP ( $self, $h, $cb ) {
-    $h->write(qq[NOOP$CRLF]);
+    $h->write("NOOP\r\n");
 
     return $self->_read_response($h);
 }

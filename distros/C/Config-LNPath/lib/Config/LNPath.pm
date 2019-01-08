@@ -4,10 +4,12 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use YAML::XS qw/LoadFile/;
-use Data::LNPath qw/lnpath/;
+use Data::LNPath qw/lnpath/, {
+	return_undef => 1	
+};
 use Carp qw/croak/;
 use Blessed::Merge;
 
@@ -23,13 +25,13 @@ sub new {
 }
 
 sub find {
-	return lnpath($_[0]->{data}, $_[1])
-		|| croak sprintf "Could not find value from config using path -> %s", $_[1];
+	lnpath($_[0]->{data}, $_[1]) 
+		or croak sprintf "Could not find value from config using path -> %s", $_[1];
 }
 
 sub section_find {
-	return lnpath($_[0]->{data}->{$_[1]}, $_[2])
-		|| croak sprintf "Could not find value from config section -> %s using path -> %s", $_[1], $_[2];
+	lnpath($_[0]->{data}->{$_[1]}, $_[2])
+		or croak sprintf "Could not find value from config section -> %s", $_[1];
 }
 
 1; # End of Config::LNPath
@@ -42,7 +44,7 @@ Config::LNPath - Currently just a Simple YAML Config Reader.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -51,7 +53,7 @@ Version 0.01
 	use Config::LNPath;
 
 	our $conf = Config::LNPath->new({ 
-	config => ['one.yml', 'two.yml'], 
+		config => ['one.yml', 'two.yml'], 
 		merge => { 
 			unique_hash => 1,
 			unique_array => 1,
@@ -64,11 +66,15 @@ Version 0.01
 
 =head1 SUBROUTINES/METHODS
 
+=head2 new
+
 =head2 find
 
 find path in config file.
 
 	$conf->find('/path/to/important/thing');
+
+=head2 section_find 
 
 =head1 AUTHOR
 

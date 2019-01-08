@@ -1,4 +1,4 @@
-package Pcore::XMPP v0.10.12;
+package Pcore::XMPP v0.10.13;
 
 use Pcore -dist, -res;
 use AnyEvent::XMPP::Client;
@@ -132,7 +132,7 @@ sub _send_queued ( $self ) {
 
         AnyEvent::XMPP::IM::Message->new(
             to         => $msg->{to},
-            body       => join( $LF . $LF, $msg->{body}->@* ),
+            body       => join( "\n\n", $msg->{body}->@* ),
             connection => $msg->{from}->connection,
         )->send;
     }

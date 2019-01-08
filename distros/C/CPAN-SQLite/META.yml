@@ -13,7 +13,6 @@ build_requires:
   FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Scalar::Util: '0'
   Test::More: '0.94'
   base: '0'
   lib: '0'
@@ -43,11 +42,12 @@ requires:
   Getopt::Long: '0'
   HTTP::Tiny: '0'
   Safe: '0'
+  Scalar::Util: '0'
   constant: '0'
   parent: '0'
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '0.212'
-x_generated_by_perl: v5.26.2
+version: '0.214'
+x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -21,7 +21,7 @@ Version 0.29
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.35';
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,10 @@ sub BUILD {
 
 		$dbh->{AutoCommit} = 1;                  # dbd::mysql workarounda
 	}
-
+	else {
+		$dbh->{FetchHashKeyName} = 'NAME_uc';
+	}
+	
 	my $schema = $dbh->selectrow_arrayref("select schema()")->[0];
 	if ($schema) {
 		$self->_schema($schema);

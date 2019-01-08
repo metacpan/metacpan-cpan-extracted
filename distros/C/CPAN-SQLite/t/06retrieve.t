@@ -1,4 +1,4 @@
-# $Id: 06retrieve.t 58 2018-08-03 20:06:35Z stro $
+# $Id: 06retrieve.t 70 2019-01-04 19:39:59Z stro $
 
 use strict;
 use warnings;
@@ -12,7 +12,9 @@ use lib "$FindBin::Bin/lib";
 use CPAN::SQLite::Index;
 use TestShell;
 
-plan tests => 5;
+$ENV{'CPAN_SQLITE_DOWNLOAD'} = $ENV{'CPAN_SQLITE_DOWNLOAD_URL'} = undef;
+
+plan tests => 4;
 
 my $cwd = getcwd;
 my $CPAN = catdir $cwd, 't', 'cpan-t-06';
@@ -30,10 +32,8 @@ my $info = CPAN::SQLite::Index->new(
 isa_ok($info, 'CPAN::SQLite::Index');
 
 SKIP: {
-  skip 'Potential connection problems', 3 unless $info->fetch_cpan_indices();
+  skip 'Potential connection problems', 2 unless $info->fetch_cpan_indices();
 
   ok(-e catfile($CPAN, 'authors', '01mailrc.txt.gz'));
   ok(-e catfile($CPAN, 'modules', '02packages.details.txt.gz'));
-  ok(-e catfile($CPAN, 'modules', '03modlist.data.gz'));
-
 };

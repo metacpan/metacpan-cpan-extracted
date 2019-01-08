@@ -1,9 +1,0 @@
-Things that can be done
-=======================
-
- * Check if Compiler::Lexer might be a candidate to replace PPI
-   * Write a benchmark that compares Compiler::Lexer with PPI
- * Check if all possible ways to create an inheritance tree are covered
- * Is test coverage ok?
- * Does the documentation cover all the stuff?
-

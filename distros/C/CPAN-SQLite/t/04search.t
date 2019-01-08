@@ -1,4 +1,4 @@
-# $Id: 04search.t 31 2011-06-12 22:56:18Z stro $
+# $Id: 04search.t 70 2019-01-04 19:39:59Z stro $
 
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ foreach my $mod_name (keys %$mods) {
   $results = $query->{results};
   ok(defined $results);
   is($results->{mod_name}, $mod_name);
-  foreach (qw(mod_abs chapterid dist_name dslip)) {
+  foreach (qw(mod_abs dist_name)) {
     next unless $mods->{$mod_name}->{$_};
     is($results->{$_}, $mods->{$mod_name}->{$_});
   }

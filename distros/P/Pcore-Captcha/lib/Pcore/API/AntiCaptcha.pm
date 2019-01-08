@@ -187,10 +187,10 @@ sub resolve ( $self, $captcha, $cb = undef ) {
 sub report_invalid ( $self, $captcha ) {
     my $res = P->http->post(
         'https://api.anti-captcha.com/reportIncorrectImageCaptcha',
-        data => to_json( {    #
+        data => to_json {    #
             clientKey => $self->{api_key},
             taskId    => $captcha->{id},
-        } )
+        }
     );
 
     if ($res) {
@@ -215,9 +215,9 @@ sub report_invalid ( $self, $captcha ) {
 sub get_balance ( $self ) {
     my $res = P->http->post(
         'https://api.anti-captcha.com/getBalance',
-        data => to_json( {    #
+        data => to_json {    #
             clientKey => $self->{api_key},
-        } )
+        }
     );
 
     if ($res) {
@@ -240,10 +240,10 @@ sub get_balance ( $self ) {
 sub get_queue_stats ( $self, $queue_id ) {
     my $res = P->http->post(
         'https://api.anti-captcha.com/getQueueStats',
-        data => to_json( {    #
+        data => to_json {
             clientKey => $self->{api_key},
             queueId   => $queue_id,
-        } )
+        }
     );
 
     if ($res) {

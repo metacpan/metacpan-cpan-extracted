@@ -193,7 +193,7 @@ package Sidef::Types::Range::Range {
         my ($self, $value) = @_;
 
         my $step = $self->{step};
-        my $asc = ($self->{_asc} //= !!$step->is_pos);
+        my $asc  = ($self->{_asc} //= !!$step->is_pos);
 
         my ($from, $to) = (
                            $asc
@@ -273,6 +273,18 @@ package Sidef::Types::Range::Range {
 
     *select = \&grep;
 
+    sub any {
+        my ($self, $code) = @_;
+
+        my $iter = $self->iter->{code};
+        while (defined(my $obj = $iter->())) {
+            $code->run($obj)
+              && return Sidef::Types::Bool::Bool::TRUE;
+        }
+
+        Sidef::Types::Bool::Bool::FALSE;
+    }
+
     sub all {
         my ($self, $code) = @_;
 
@@ -285,16 +297,16 @@ package Sidef::Types::Range::Range {
         Sidef::Types::Bool::Bool::TRUE;
     }
 
-    sub any {
+    sub none {
         my ($self, $code) = @_;
 
         my $iter = $self->iter->{code};
         while (defined(my $obj = $iter->())) {
             $code->run($obj)
-              && return Sidef::Types::Bool::Bool::TRUE;
+              && return Sidef::Types::Bool::Bool::FALSE;
         }
 
-        Sidef::Types::Bool::Bool::FALSE;
+        Sidef::Types::Bool::Bool::TRUE;
     }
 
     sub to_array {
@@ -327,6 +339,21 @@ package Sidef::Types::Range::Range {
         my ($self, $sep) = @_;
         Sidef::Types::String::String->new(CORE::join("$sep", $self->to_list));
     }
+
+    sub kv {
+        my ($self) = @_;
+        $self->to_array->kv;
+    }
+
+    *pairs       = \&kv;
+    *zip_indices = \&kv;
+
+    sub accumulate {
+        my ($self, $arg) = @_;
+        $self->to_array->accumulate($arg);
+    }
+
+    *accumulate_by = \&accumulate;
 
     sub rand {
         my ($self, $n) = @_;
@@ -453,27 +480,27 @@ package Sidef::Types::Range::Range {
 
     sub map_operator {
         my ($self, @args) = @_;
-        $self->to_a->map_operator(@args);
+        $self->to_array->map_operator(@args);
     }
 
     sub pam_operator {
         my ($self, @args) = @_;
-        $self->to_a->pam_operator(@args);
+        $self->to_array->pam_operator(@args);
     }
 
     sub unroll_operator {
         my ($self, @args) = @_;
-        $self->to_a->unroll_operator(@args);
+        $self->to_array->unroll_operator(@args);
     }
 
     sub cross_operator {
         my ($self, @args) = @_;
-        $self->to_a->cross_operator(@args);
+        $self->to_array->cross_operator(@args);
     }
 
     sub zip_operator {
         my ($self, @args) = @_;
-        $self->to_a->zip_operator(@args);
+        $self->to_array->zip_operator(@args);
     }
 
     sub add {
@@ -519,10 +546,10 @@ package Sidef::Types::Range::Range {
         *{__PACKAGE__ . '::' . '-'}   = \&sub;
         *{__PACKAGE__ . '::' . '*'}   = \&mul;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
-        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
     }
 

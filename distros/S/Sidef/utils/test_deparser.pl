@@ -42,12 +42,12 @@ sub parse_deparse {
     my $deparser = Sidef::Deparse::Sidef->new(namespaces => $sidef->{namespaces});
 
     my @statements = $deparser->deparse_script($ast);
-    my $deparsed   = $deparser->{before} . join($deparser->{between}, @statements) . $deparser->{after};
+    my $deparsed   = $deparser->{before} . join($deparser->{between}, grep { $_ ne '' }@statements) . $deparser->{after};
 
     return ($deparsed, \@statements);
 }
 
-my %ignore = ();
+my %ignore = ('matrix_class.sf' => 1);
 my $dir = catdir(updir, 'scripts');
 
 find {

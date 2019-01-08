@@ -1,12 +1,15 @@
 #!usr/bin/perl -w
 
-# $Id: cpandb 45 2014-12-09 07:52:52Z stro $
+# $Id: cpandb 70 2019-01-04 19:39:59Z stro $
 
 use strict;
 use warnings;
+
 use CPAN::SQLite;
-use CPAN::SQLite::Util qw(%chaps);
 use Getopt::Long;
+
+our $VERSION = 0.214;
+
 my ($CPAN, $setup, $help, $reindex, $index, $query,
     $db_name, $db_dir, $module, $dist, $cpanid, $update);
 
@@ -74,25 +77,15 @@ else {
       }
       else {
         my $abs = $results->{mod_abs} || '';
-        my $dslip = '';
-        if (my $dslip_info = $results->{dslip_info}) {
-          foreach my $entry (@$dslip_info) {
-            $dslip .= "  $entry->{desc}: $entry->{what}\n";
-          }
-        }
-        my $chapter_desc = $results->{chapter_desc} || '';
         print << "EOI";
 
 Module: $results->{mod_name}
 Abstract: $abs
 Version: $results->{mod_vers}
-Chapter: $chapter_desc
 Distribution: $results->{dist_name}
 CPAN author: $results->{cpanid}
 CPAN file: $results->{dist_file}
 Download: $results->{download}
-dslip info:
-$dslip
 EOI
       }
       last RESULTS;
@@ -106,12 +99,6 @@ EOI
       }
       else {
         my $abs = $results->{dist_abs} || '';
-        my $dslip = '';
-        if (my $dslip_info = $results->{dslip_info}) {
-          foreach my $entry (@$dslip_info) {
-            $dslip .= "  $entry->{desc}: $entry->{what}\n";
-          }
-        }
         print << "EOI";
 
 Distribution: $results->{dist_name}
@@ -120,8 +107,6 @@ Version: $results->{dist_vers}
 CPAN author: $results->{cpanid}
 CPAN file: $results->{dist_file}
 Download: $results->{download}
-dslip info:
-$dslip
 EOI
       }
       my $mods = $results->{mods};
@@ -170,7 +155,7 @@ cpandb - interface to C<CPAN::SQLite>
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 

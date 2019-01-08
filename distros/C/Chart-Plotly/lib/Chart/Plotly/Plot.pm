@@ -5,7 +5,7 @@ use utf8;
 
 use UUID::Tiny ':std';
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 use Chart::Plotly;
 
@@ -38,6 +38,17 @@ sub html {
                                    { load_plotly_using_script_tag => $load_plotly_using_script_tag } );
 }
 
+sub TO_JSON {
+    my $self   = shift;
+    my $layout = $self->layout;
+    my $json   = '{ "data": ' . Chart::Plotly::_process_data( $self->traces() );
+    if ( defined $layout ) {
+        $layout = Chart::Plotly::_process_data($layout);
+        $json .= ', "layout": ' . $layout;
+    }
+    return $json . " }";
+}
+
 1;
 
 __END__
@@ -52,7 +63,7 @@ Chart::Plotly::Plot
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -88,6 +99,10 @@ Chart::Plotly::Plot - Set of traces with their options and data
 Returns the html corresponding to the plot
 
 =head3 Parameters
+
+=head2 TO_JSON
+
+Returns the json corresponding to the plot
 
 =head1 AUTHOR
 

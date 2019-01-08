@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.504';
+our $VERSION = '0.505';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -559,8 +559,10 @@ sub __print_readline {
     for ( @{$m->{p_str}}[0..$m->{p_pos}-1] ) {
         $pre_pos_w += $_->[1];
     }
-    $self->{pg}->__right( $tmp_prompt_w + $pre_pos_w );
-
+    my $right = $tmp_prompt_w + $pre_pos_w;
+    if ( $right ) {
+        $self->{pg}->__right( $right );
+    }
 }
 
 
@@ -1053,7 +1055,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.504
+Version 0.505
 
 =cut
 
@@ -1297,7 +1299,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2018 Matthäus Kiem.
+Copyright 2014-2019 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

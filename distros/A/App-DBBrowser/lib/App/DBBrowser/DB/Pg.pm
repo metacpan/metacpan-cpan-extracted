@@ -121,9 +121,9 @@ sub get_databases {
 }
 
 
-#sub primary_key_auto {
-#    return "SERIAL PRIMARY KEY";
-#}
+
+
+
 
 
 

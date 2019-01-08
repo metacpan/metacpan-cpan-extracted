@@ -22,14 +22,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.64",
             "Pod::Usage" : "1.12",
             "XAO::Base" : "1.20"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -42,5 +41,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.22"
+   "version" : "1.23"
 }

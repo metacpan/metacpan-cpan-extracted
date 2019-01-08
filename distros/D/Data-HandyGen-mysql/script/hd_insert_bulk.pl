@@ -22,7 +22,7 @@ hd_insert_bulk.pl - Inserts records into mysql tables, using Data::HandyGen.
 
 =head1 VERSION
 
-This documentation refers to hd_insert_bulk.pl 0.0.2
+This documentation refers to hd_insert_bulk.pl 0.0.5
 
 =cut
 
@@ -45,7 +45,7 @@ sub main {
         'n|number=i'    => \$number,
         'required=s'    => \$required_fields,
     );
-   
+
     ($infile) or ($target_table and $number) or usage();
 
     my $dsn = "dbi:mysql:dbname=$dbname";
@@ -92,7 +92,7 @@ sub insert_from_file {
     for my $table (keys %$req) {
 
         my $list = $req->{$table};
-        
+
         #  When arrayref is passed instead of hashref, IDs in the arrayref will be assigned to each elements.
         if ( ref $list eq 'ARRAY' ) {
             $list = {};
@@ -121,7 +121,7 @@ sub insert_to_table {
 
     for ( 1 .. $num ) {
         $hd->insert($table, \%user_val);
-    } 
+    }
 }
 
 
@@ -244,9 +244,9 @@ I<< (Optional) >> a list of column names which require value. Multiple columns s
 
 =back
 
- 
+
 =head1 DESCRIPTION
- 
+
 This application inserts a collection of data into tables. You don't need to specify values to every required fields. You only need to specify values what you're really interested in. If you don't want to consider foreign key constraints, nor the order of insertion (usually you would insert a referenced record at first), it's ok. This application automatically determines values for required fields in the right order.
 
 
@@ -264,7 +264,7 @@ This application inserts a collection of data into tables. You don't need to spe
         id integer primary key auto_increment,
         name varchar(50) not null
     );
-        
+
     create table purchase (
         id integer primary key auto_increment,
         customer_id integer not null,
@@ -306,7 +306,7 @@ EXAMPLE: Save the following as C<example.json>
             "3": { "customer_id" : "##customer.2", "item_id" : "##item.2" }
         }
     }
-    
+
     * If a value references foreign key, its format is "##(table name).(ID)".
 
 
@@ -329,8 +329,8 @@ This will make
         |  50 | name_50 |
         |  51 | name_51 |
         +-----+---------+
-        * No values in table 'customer' has been specified, so required values in the table will be determined automatically. 
-    
+        * No values in table 'customer' has been specified, so required values in the table will be determined automatically.
+
     [purchase] (Assuming next auto_increment value is 501)
         +-----+-------------+---------+
         | id  | customer_id | item_id |
@@ -340,7 +340,7 @@ This will make
         | 503 |          51 |     101 |
         +-----+-------------+---------+
 
-NOTE: ID can be omitted if it starts with 1 and is incremented one by one. 
+NOTE: ID can be omitted if it starts with 1 and is incremented one by one.
 
         "purchase" : {
             "1": { "customer_id" : "##customer.1", "item_id" : "##item.1" },
@@ -378,7 +378,7 @@ It will output all table names and IDs to STDOUT with YAML format like the follo
 You can use those values to delete test data. If you redirect the output to a file, you may later pass it to hd_delete_all.pl (included in this package) as an argument to delete those records.
 
     $ hd_insert_bulk.pl --infile example.json -d testdb -u myuser -p mypasswd > inserted.yml
-    
+
     #  ...later
 
     $ hd_delete_all inserted.yml --i inserted.yml -d testdb -u myuser -p mypasswd
@@ -393,7 +393,7 @@ You can use those values to delete test data. If you redirect the output to a fi
 
 
 =back
- 
+
 =head1 BUGS AND LIMITATIONS
 
 Please report problems to Takashi Egawa (C<< egawa.takashi at gmail com >>)
@@ -420,5 +420,5 @@ modify it under the same terms as Perl itself. See L<perlartistic>.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 

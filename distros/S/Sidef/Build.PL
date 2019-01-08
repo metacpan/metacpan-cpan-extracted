@@ -1,7 +1,3 @@
-#!/usr/bin/perl
-
-eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
-  if 0;    # not running under some shell
 
 use utf8;
 use 5.006;
@@ -26,6 +22,8 @@ my $builder = Module::Build->new(
     build_requires => {
                        'Test::More' => 0,
                       },
+
+    extra_manify_args => { utf8 => 1 },
 
     meta_merge => {
                    resources => {
@@ -63,12 +61,13 @@ my $builder = Module::Build->new(
                 },
 
     recommends => {
-                   'File::Find'           => 0,    # for: `sidef -c`
-                   'Digest::MD5'          => 0,    # for: File.md5(), Str.md5()
-                   'Digest::SHA'          => 0,    # for: File.sha*(), Str.sha*()
-                   'MIME::Base64'         => 0,    # for: Str.encode_base64(), Str.decode_base64()
-                   'Data::Dump'           => 0,    # for: `sidef -D`
-                   'Data::Dump::Filtered' => 0,    # for: Block.ffork()
+                   'File::Find'           => 0,    # `sidef -c`
+                   'Digest::MD5'          => 0,    # File.md5(), Str.md5()
+                   'Digest::SHA'          => 0,    # File.sha*(), Str.sha*()
+                   'MIME::Base64'         => 0,    # Str.encode_base64(), Str.decode_base64()
+                   'Data::Dump'           => 0,    # `sidef -D`
+                   'Data::Dump::Filtered' => 0,    # Block.ffork()
+                   'Math::Prime::Util'    => 0.73, # used in some Number methods, if available
                   },
 
     add_to_cleanup     => ['Sidef-*'],

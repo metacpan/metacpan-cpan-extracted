@@ -1,15 +1,15 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2018-12-29 00:06:57 mtw>
+# Last changed Time-stamp: <2019-01-07 00:39:42 mtw>
 # place of birth: somewhere over Newfoundland
 
 # Bio::RNA::RNAaliSplit::WrapRscape.pm: A versatile object-oriented
 # wrapper for R-scape
 #
-# Requires R-scape executable available to the Perl interpreter.
+# Requires R-scape v1.2.2 or above available to the Perl interpreter.
 
 package Bio::RNA::RNAaliSplit::WrapRscape;
 
-use version; our $VERSION = qv('0.07');
+use version; our $VERSION = qv('0.09');
 use Carp;
 use Data::Dumper;
 use Moose;
@@ -200,32 +200,34 @@ sub _count_seq {
 sub run_rscape {
   my $self = shift;
   my $this_function = (caller(0))[3];
-  my ($out_fn,$sout_fn,$out,$sout);
+  my ($out_fn,$sout_fn,$out,$sout,$sum);
+  my ($rscape_out,$rscape_sout,$rscape_sum);
   my $tag = "";
   if ($self->has_statistic){$tag = ".".$self->statistic};
 
   if ($self->has_basename){
-    $out_fn = $self->basename.$tag."."."rscape.out";
+    $out_fn  = $self->basename.$tag."."."rscape.out";
     $sout_fn = $self->basename.$tag."."."rscape.sorted.out";
   }
   elsif ($self->has_ifilebn){
-    $out_fn = $self->ifilebn.$tag."."."rscape.out";
+    $out_fn  = $self->ifilebn.$tag."."."rscape.out";
     $sout_fn = $self->ifilebn.$tag."."."rscape.sorted.out";
   }
   else{
-    $out_fn = $tag."rscape.out";
+    $out_fn  = $tag."rscape.out";
     $sout_fn = $tag."rscape.sorted.out";
   }
-  $out = file($oodir,$out_fn); # R-scape stdout
+  $out  = file($oodir,$out_fn);  # R-scape stdout
   $sout = file($oodir,$sout_fn); # R-scape sorted stdout
 
-  # open my $fh, ">", $out;
-  my $rscape_out = "rscape.out";
+  $rscape_out = "rscape.out";
+  $rscape_sout = $rscape_out.".sorted";
+
   my $rscape_options = " -o $rscape_out --rna --outdir $oodir ";
   if ($self->has_nofigures && $self->nofigures == 1){$rscape_options.=" --nofigures "};
   if ($self->has_statistic){$rscape_options.=" --".$self->statistic." "  }
   my $cmd = $rscape.$rscape_options.$self->ifile;
- # print "+++ $cmd\n";
+
   my ( $success, $error_message, $full_buf, $stdout_buf, $stderr_buf ) =
     run( command => $cmd, verbose => 0 );
   if( !$success ) {
@@ -235,19 +237,11 @@ sub run_rscape {
     print join "", @$full_buf;
     croak $!;
   }
-  #my $stdout_buffer = join "", @$stdout_buf;
-  #my @rscapestdout = split /\n/, $stdout_buffer;
-  #foreach my $line( @rscapestdout){
-  #  print $fh $line,"\n";
-  #}
-  #close($fh);
 
   $self->_parse_rscape($rscape_out);
 
   rename $rscape_out, $out;
-  rename $rscape_out.".sorted", $sout;
-  #print " >>> rename $rscape_out -> $out\n";
-  # TODO: rename the remeaining R-scape output files in $oodir
+  rename $rscape_sout, $sout;
 }
 
 # parse R-scape output
@@ -270,6 +264,7 @@ sub _parse_rscape {
   my @buffer = ();
   my $parse1 = 0;
   my $parse2 = 0;
+  my $nosbp = 0;
   open my $file, "<", $out or croak "ERROR: [$this_function] Cannot open file $out";
   while(<$file>){
     chomp;
@@ -299,16 +294,33 @@ sub _parse_rscape {
 		evalue => $4);
       push @{$self->sigBP}, \%bp;
     }
+    if (m/^no significant pairs$/){
+      $nosbp=1;
+    }
   }
   close ($file);
-  carp "WARNING: [$this_function] could not reliably parse MSA line from R-scape output"
-    unless ($parse1 == 1);
-  carp "WARNING: [$this_function] could not reliably parse summary line from R-scape output"
-    unless ($parse2 == 1);
+  #carp "INFO: [$this_function] parse1:".eval($parse1);
+  #carp "INFO: [$this_function] parse2:".eval($parse2);
+
+  if ($nosbp == 1){
+    $self->status(1); # no significant basepairs
+    $self->_check_attributes();
+    return;
+  }
   if ($parse1 == 1 && $parse2 == 1){
     $self->_check_attributes();
-    $self->status(0);}
-  else{$self->status(1)}
+    $self->status(0); # all OK
+    return;
+  }
+  elsif ($parse1 == 1 && $parse2 == 0){
+    $self->status(2); # covariation scores are almost constant, no further analysis
+    return;
+  }
+  else{
+    croak "ERROR: [$this_function] ambiguous status when parsing rscape output file. parse1:".eval($parse1)." parse2:".eval($parse2)." This shouldn't happen ...";
+    $self->status(3);
+    return;
+  }
 }
 
 sub _check_attributes {

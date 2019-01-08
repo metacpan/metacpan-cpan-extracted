@@ -50,7 +50,7 @@ As your normal, every day user, install L<perlbrew|http://perlbrew.pl>:
     \wget -O - https://install.perlbrew.pl | bash
     echo "source /home/pi/perl5/perlbrew/etc/bashrc" >> ~/.bashrc
 
-First thing to do is to install the appropriate `cpanm` version:
+First thing to do is to install the appropriate C<cpanm> version:
 
     perlbrew install-cpanm
 
@@ -161,29 +161,51 @@ The board revision is the same as the GPIO pin layout on the board:
 
 =head2 Identifying which Raspberry Pi hardware you're working on
 
-We've got a couple of methods that are helpers that allow you to physically see
-which Raspberry Pi board you're currently working on.
-
-WARNING: These methods call system command line commands using C<sudo>
+WARNING: This methods call system command line commands using C<sudo>
 internally!
 
-    # turn off the red power LED
+In addition to the following methods, we also install a pre-written command-line
+script C<pidentify> that can be used.
 
-    $pi->pwr_led(1);
+    pidentify [20]
 
-    # turn the green disk IO activity light on full-time
+The C<20> is optional. By default, we stay in "identify" state for 5 seconds.
+The argument specifies that we'll stay in "identify" state for 20 seconds.
+
+While in "identify" state, the green disk I/O LED will stay on completely, and
+the red power LED will remain off completely.
+
+Turn the green activity LED on full-time, and turn off the red power LED for
+the default 5 seconds:
+
+    $pi->identify;
+
+Send in an integer as the number of seconds to hold the leds in identify mode:
+
+    $pi->identify(10);
+
+The above C<identify()> method sleeps the duration. If you wish to enable or
+disable the above LEDs indefinitely without sleeping in the meantime:
+
+=head3 Disk I/O LED toggling
+
+Turn the disk I/O LED on permanently:
 
     $pi->io_led(1);
 
-    sleep 10;
+Return it to default state of acting as disk I/O indicator:
 
-    # restore the red power LED back to normal operation
+    $pi->io_led(0); # or just $pi->io_led;
 
-    $pi->pwr_led;
+=head3 Power LED toggling
 
-    # restore the green disk IO activity LED back to normal operation
+Turn the power LED off permanently:
 
-    $pi->io_led;
+    $pi->pwr_led(1);
+
+Turn it back to indicate power:
+
+    $pi->pwr_led(0); # or just $pi->pwr_led;
 
 =head2 Setting a label/name for your Pi object
 
@@ -895,12 +917,34 @@ environment variable:
 
     export RPI_RTC=1
 
-=head2 MCP23017 GPIO Expander Testing
+=head3 MCP23017 GPIO Expander Testing
 
 To test the L<RPi::GPIOExpander::MCP23017> distribution, set the following
 environment variable:
 
     export RPI_MCP23017=1
+
+=head3 PWM/SPI Testing
+
+In order to run tests for PWM and SPI, the following environment variable is
+required to be set:
+
+    export RPI_ADC=1
+
+=head3 Shift Register Testing
+
+To test the shift register functionality, the following environment variables
+need to be set:
+
+    export RPI_SHIFTREG=1
+    export RPI_MCP3008=1
+
+=head3 Digital Potentiometer Testing
+
+To test the functionality of the L<RPi::DAC::MCP4922>, set the following
+environment variable:
+
+    export RPI_MCP4922=1
 
 =head2 Automated with L<Test::BrewBuild>
 
@@ -954,11 +998,15 @@ a feature that most likely I'll be the only consumer of.
 
 Here's the contents of my C</etc/environment> file, setting the various testing
 environment variables for the full test platform. For LCD, the last two digits
-(4, 20) are for four row, 20 column units. If you only have a two row by four
+(4, 20) are for four row, 20 column units. If you only have a two row by 16
 column unit, leave those last two digits off.
 
     PI_BOARD=1
     RPI_ARDUINO=1
+    RPI_ADC=1
+    RPI_MCP3008=1
+    RPI_MCP4922=1
+    RPI_SHIFTREG=1
     RPI_LCD=1
     RPI_SERIAL=1
     RPI_HCSR04=1

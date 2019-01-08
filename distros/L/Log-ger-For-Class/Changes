@@ -1,3 +1,11 @@
+0.003   2019-01-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace the use of Package::MoreUtil with Package::Stash &
+	  Package::Util::Lite.
+
+
 0.002   2017-07-30 (PERLANCAR)
 
 	- [Bugfix] Fix logger subroutine name.

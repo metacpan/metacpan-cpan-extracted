@@ -9,6 +9,8 @@ use Future;
 
 use Future::AsyncAwait;
 
+my $orig_cxstack_ix = Future::AsyncAwait::__cxstack_ix;
+
 my $before;
 my $after;
 
@@ -70,6 +72,20 @@ async sub makelist
    is( $fret->failure, "It failed\n", '$fret->failure for fail' );
 }
 
+# die
+{
+   my $f1 = Future->new;
+   async sub dies {
+      await $f1;
+      die "Oopsie\n";
+   }
+
+   my $fret = dies();
+   $f1->done;
+
+   is( $fret->failure, "Oopsie\n", '$fret->failure for dies' );
+}
+
 # ANON sub
 {
    my $func = async sub {
@@ -124,5 +140,8 @@ async sub makelist
 
    ok( $ok, 'await in non-async sub inside async sub fails to compile' );
 }
+
+is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,
+   'cxstack_ix did not grow during the test' );
 
 done_testing;

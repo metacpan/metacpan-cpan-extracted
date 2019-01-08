@@ -18,7 +18,7 @@ use Data::Dumper;
 use File::MMagic;
 use OAuth::Cmdline::GoogleDrive;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 
 ###########################################
 sub new {
@@ -178,12 +178,20 @@ sub folder_create {
 ###########################################
     my( $self, $title, $parent ) = @_;
 
+    return $self->file_create( $title, "application/vnd.google-apps.folder", $parent );
+}
+
+###########################################
+sub file_create {
+###########################################
+    my( $self, $title, $mime_type, $parent ) = @_;
+
     my $url = URI->new( $self->{ api_file_url } );
 
     my $data = $self->http_json( $url, {
         title    => $title,
         parents  => [ { id => $parent } ],
-        mimeType => "application/vnd.google-apps.folder",
+        mimeType => $mime_type,
     } );
 
     if( ! defined $data ) {
@@ -476,7 +484,7 @@ sub children {
     }
 
     if( wantarray ) {
-        return( $children, $parent );
+        return( $children, $folder_id );
     } else {
         return $children;
     }
@@ -688,6 +696,34 @@ sub item_iterator {
     };
 }
 
+###########################################
+sub file_metadata {
+###########################################
+    my( $self, $file_id ) = @_;
+
+    LOGDIE 'Deletion requires file_id' if( ! defined $file_id );
+
+    my $url = URI->new( $self->{ api_file_url } . "/$file_id" );
+
+    my $req = &HTTP::Request::Common::GET(
+        $url->as_string,
+        $self->{ oauth }->authorization_headers(),
+    );
+
+	my $ua = LWP::UserAgent->new();
+	my $resp = $ua->request( $req );
+
+	if( $resp->is_error ) {
+        $self->error( $resp->message() );
+        return undef;
+    }
+
+    my $data = from_json( $resp->content() );
+
+    # return $self->data_factory( $data );
+    return $data;
+}
+
 1;
 
 __END__
@@ -829,6 +865,15 @@ Drive item's fields, according to the API (see C<children()>).
 Create a new folder as a child of the folder with the id C<$parent_id>.
 Returns the ID of the new folder or undef in case of an error.
 
+=item C<my $id = $gd-E<gt>file_create( "folder-name", "mime-type", $parent_id )>
+
+Create a new file with the given mime type as a child of the folder with the id C<$parent_id>.
+Returns the ID of the new file or undef in case of an error.
+
+Example to create an empty google spreadsheet:
+
+    my $id = $gd->file_create( "Quarter Results", "application/vnd.google-apps.spreadsheet", "root" );
+
 =item C<$gd-E<gt>file_upload( $file, $dir_id )>
 
 Uploads the content of the file C<$file> into the directory with the ID
@@ -909,6 +954,10 @@ Move an existing file to a new folder. Removes the file's "parent"
 setting (pointing to the old folder) and then adds the new folder as a 
 new parent.
 
+=item C<my $metadata_hash_ref = $gd-E<gt>file_metadata( file_id )>
+
+Return metadata about the file with the specified ID from Google Drive.
+
 =back
 
 =head1 Error handling
@@ -929,10 +978,10 @@ To find out what's going on under the hood, turn on Log4perl:
 
 =head1 LEGALESE
 
-Copyright 2012 by Mike Schilli, all rights reserved.
+Copyright 2012-2019 by Mike Schilli, all rights reserved.
 This program is free software, you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-2012, Mike Schilli <cpan@perlmeister.com>
+2012-2019, Mike Schilli <cpan@perlmeister.com>

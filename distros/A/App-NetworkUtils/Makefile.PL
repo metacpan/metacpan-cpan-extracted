@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Return true when networking is on, or 0 otherwise",
+  "ABSTRACT" => "Command-line utilities related to networking",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Exporter::Rinci" => 0,
     "File::Which" => 0,
-    "IPC::System::Options" => "0.330",
+    "IPC::System::Options" => "0.331",
     "Log::ger" => "0.023",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.816",
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +53,7 @@ my %FallbackPrereqs = (
   "File::Which" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "IPC::System::Options" => "0.330",
+  "IPC::System::Options" => "0.331",
   "Log::ger" => "0.023",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Base" => "1.816",

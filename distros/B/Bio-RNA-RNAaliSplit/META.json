@@ -21,14 +21,11 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Test::Prereq" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -58,6 +55,7 @@
             "Pod::Usage" : "0",
             "RNA" : "v2.3.4",
             "Storable" : "0",
+            "Test::Script" : "1.25",
             "constant" : "0",
             "diagnostics" : "0",
             "lib" : "0",
@@ -67,9 +65,27 @@
             "version" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "Test::More" : "0",
+            "Test::Prereq" : "0"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.07",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mtw/Bio-RNA-RNAaliSplit/issues"
+      },
+      "homepage" : "https://github.com/mtw/Bio-RNA-RNAaliSplit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mtw/Bio-RNA-RNAaliSplit.git",
+         "web" : "https://github.com/mtw/Bio-RNA-RNAaliSplit"
+      }
+   },
+   "version" : "v0.09",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

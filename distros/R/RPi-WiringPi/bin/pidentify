@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Getopt::Long;
+use RPi::WiringPi;
+
+if (@ARGV) {
+    _help() if $ARGV[0] eq '-h' || $ARGV[0] eq '--help';
+}
+
+my $pi = RPi::WiringPi->new;
+
+$pi->identify($ARGV[0]);
+
+sub _help {
+    print <DATA>;
+    exit;
+}
+
+__DATA__
+
+pidentify - Identify which Raspberry Pi we're working on by turning the green
+disk I/O on steady and turning the red power LED off for a set number of
+seconds.
+
+By default, we stay in "identify" state for 5 seconds. Send in an integer
+argument to the program to stay in "identify" mode for that long.

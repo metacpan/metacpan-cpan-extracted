@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 # -----------------------------------------------------------------------------
 
@@ -280,6 +280,12 @@ sub latex {
     # Anzahl Kolumnen
     my $width = @$alignA;
 
+    # Alignment
+
+    if ($align) {
+        $align = substr $align,0,1; # nur erstes Zeichen
+    }
+
     # Default-Umrandung
 
     if (!defined $border) {
@@ -427,7 +433,7 @@ sub latex {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -435,7 +441,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

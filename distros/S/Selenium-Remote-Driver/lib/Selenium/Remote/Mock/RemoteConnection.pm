@@ -1,5 +1,5 @@
 package Selenium::Remote::Mock::RemoteConnection;
-$Selenium::Remote::Mock::RemoteConnection::VERSION = '1.30';
+$Selenium::Remote::Mock::RemoteConnection::VERSION = '1.31';
 # ABSTRACT: utility class to mock the responses from Selenium server
 
 use strict;
@@ -182,7 +182,7 @@ Selenium::Remote::Mock::RemoteConnection - utility class to mock the responses f
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 SYNOPSIS
 
@@ -351,7 +351,7 @@ L<Selenium::Remote::Driver|Selenium::Remote::Driver>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/teodesian/Selenium-Remote-Driver/issues
+L<https://github.com/teodesian/Selenium-Remote-Driver/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

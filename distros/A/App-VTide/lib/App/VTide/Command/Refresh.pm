@@ -15,7 +15,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.6');
+our $VERSION = version->new('0.1.7');
 our $NAME    = 'refresh';
 our $OPTIONS = [
     'force|f',
@@ -72,7 +72,7 @@ App::VTide::Command::Refresh - Refresh App::VTide configurations
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Refresh version 0.1.6
+This documentation refers to App::VTide::Command::Refresh version 0.1.7
 
 =head1 SYNOPSIS
 

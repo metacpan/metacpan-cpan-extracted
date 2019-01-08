@@ -1,7 +1,7 @@
 package IPC::System::Options;
 
-our $DATE = '2017-08-10'; # DATE
-our $VERSION = '0.330'; # VERSION
+our $DATE = '2019-01-07'; # DATE
+our $VERSION = '0.331'; # VERSION
 
 use strict;
 use warnings;
@@ -40,9 +40,13 @@ sub _quote {
 
     if ($^O eq 'MSWin32') {
         require Win32::ShellQuote;
-        return Win32::ShellQuote::quote_system_string(@_);
+        return Win32::ShellQuote::quote_system_string(
+            map { ref($_) eq 'SCALAR' ? $$_ : $_ } @_);
     } else {
-        return shell_quote(@_);
+        return join(
+            " ",
+            map { ref($_) eq 'SCALAR' ? $$_ : shell_quote($_) } @_
+        );
     }
 }
 
@@ -397,7 +401,7 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.330 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2017-08-10.
+This document describes version 0.331 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2019-01-07.
 
 =head1 SYNOPSIS
 
@@ -419,8 +423,12 @@ This document describes version 0.330 of IPC::System::Options (from Perl distrib
  system({shell=>0}, "ls -lR"); # will fail, as there is no 'ls -lR' binary
 
  # force shell, even though there are multiple arguments (arguments will be
- # quoted for you, including proper quoting on Win32)
- system({shell=>1}, "ls", "-lR");
+ # quoted for you, including proper quoting on Win32).
+ system({shell=>1}, "ls", "-laR");
+
+ # note that to prevent the quoting mechanism from quoting some special
+ # characters (like ">") you can use scalar references, e.g.:
+ system({shell=>1}, "ls", "-laR", \">", "/root/ls-laR");
 
  # set LC_ALL/LANGUAGE/LANG environment variable
  $res = readpipe({lang=>"de_DE.UTF-8"}, "df");
@@ -714,7 +722,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

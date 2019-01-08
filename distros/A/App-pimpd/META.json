@@ -52,6 +52,6 @@
          "url" : "https://github.com/trapd00r/pimpd2"
       }
    },
-   "version" : "0.314",
+   "version" : "0.316",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

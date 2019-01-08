@@ -8,10 +8,12 @@ use IO::Handle; # allow method calls on filehandles on older Perls
 use File::Temp qw/tempfile/;
 use File::Basename qw/fileparse/;
 use File::Spec::Functions qw/devnull/;
+use File::Copy ();
 use Fcntl qw/S_IMODE/;
-use Exporter 'import';
+use Exporter ();
 use File::Replace::SingleHandle ();
 use File::Replace::DualHandle ();
+use File::Replace::Inplace ();
 BEGIN {
 	require Hash::Util;
 	# apparently this wasn't available until 0.06 / Perl 5.8.9
@@ -29,15 +31,33 @@ BEGIN {
 
 ## no critic (RequireArgUnpacking)
 
-our $VERSION = '0.08';
+our $VERSION = '0.12';
 
-our @EXPORT_OK = qw/ replace replace2 replace3 /;
-our @CARP_NOT = qw/ File::Replace::SingleHandle File::Replace::DualHandle /;
+our @EXPORT_OK = qw/ replace replace2 replace3 inplace /;
+our @CARP_NOT = qw/ File::Replace::SingleHandle File::Replace::DualHandle File::Replace::Inplace /;
+
+our $GlobalInplace;  ## no critic (ProhibitPackageVars)
+sub import {
+	my @mine;
+	for my $i (reverse 1..$#_)
+		{ unshift @mine, splice @_, $i, 1 if $_[$i]=~/^-i|^-D$/ }
+	if ( @mine and my @i = grep {/^-i/} @mine ) {
+		croak "$_[0]: can't specify more than one -i switch" if @i>1;
+		# the following double-check is currently just paranoia, so ignore it in code coverage:
+		# uncoverable branch true
+		my ($ext) = $i[0]=~/^-i(.*)$/ or croak "failed to parse '$i[0]'";
+		my $debug = grep {/^-D$/} @mine;
+		$GlobalInplace = File::Replace::Inplace->new(backup=>$ext, debug=>$debug);
+	}
+	goto &Exporter::import;
+}
+
+sub inplace { return File::Replace::Inplace->new(@_) }
 
 our $DISABLE_CHMOD;
 
 my %NEW_KNOWN_OPTS = map {$_=>1} qw/ debug layers create chmod
-	perms autocancel autofinish in_fh /;
+	perms autocancel autofinish in_fh backup /;
 sub new {  ## no critic (ProhibitExcessComplexity)
 	my $class = shift;
 	@_ or croak "$class->new: not enough arguments";
@@ -74,6 +94,7 @@ sub new {  ## no critic (ProhibitExcessComplexity)
 		".${basename}_XXXXXXXXXX", DIR=>$path, SUFFIX=>'.tmp', UNLINK=>1 );
 	binmode $self->{ofh}, $self->{layers} if defined $self->{layers};
 	# input file
+	#TODO Later: A "noopen" option where the input file just isn't opened?
 	my $openmode = defined $self->{layers} ? '<'.$self->{layers} : '<';
 	if ( defined $self->{in_fh} ) {
 		croak "in_fh appears to be closed" unless defined fileno($self->{in_fh});
@@ -109,11 +130,26 @@ sub new {  ## no critic (ProhibitExcessComplexity)
 		}
 	}
 	$self->{ifn} = $filename;
+	# backup
+	my $debug_backup='';
+	if (defined($self->{backup}) && length($self->{backup})) {
+		my $bakfile = $filename . $self->{backup};
+		if ( $self->{backup}=~/\*/ ) {
+			($bakfile = $self->{backup}) =~ s/\*/$basename/;
+			$bakfile = $path.$bakfile;
+		}
+		croak "backup failed: file '$bakfile' exists" if -e $bakfile;
+		#TODO Later: Maybe a backup_link option that uses hard links instead of copy?
+		File::Copy::syscopy($filename, $bakfile)
+			or croak "backup failed: couldn't copy '$filename' to '$bakfile': $!";
+		$debug_backup = ', backup to \''.$bakfile."'";
+	}
 	# finish init
 	$self->{is_open} = 1;
 	$self->_debug("$class->new: input '", $self->{ifn},
 		"', output '", $self->{ofn}, "', layers ",
-		(defined $self->{layers} ? "'".$self->{layers}."'" : 'undef'), "\n");
+		(defined $self->{layers} ? "'".$self->{layers}."'" : 'undef'),
+		$debug_backup, "\n");
 	return $self;
 }
 
@@ -249,9 +285,10 @@ sub DESTROY {
 	return;
 }
 
-sub _debug {
+sub _debug {  ## no critic (RequireArgUnpacking)
 	my $self = shift;
 	return 1 unless $self->{debug};
+	confess "not enough arguments to _debug" unless @_;
 	local ($",$,,$\) = (' ');
 	return print {$self->{debug}} @_;
 }
@@ -340,7 +377,7 @@ B<no guarantees> as to whether it will be atomic or not.
 
 =head2 Version
 
-This documentation describes version 0.08 of this module.
+This documentation describes version 0.12 of this module.
 
 =head1 Constructors and Overview
 
@@ -455,6 +492,37 @@ filehandles via C<< tied(*$handle)->in_fh >> and C<< tied(*$handle)->out_fh >>,
 but please don't C<close> or re-C<open> these handles as this may lead to
 confusion.
 
+=head2 C<inplace>
+
+This is a shorthand for the constructor of
+L<File::Replace::Inplace|File::Replace::Inplace>. That is:
+
+ use File::Replace qw/inplace/;
+ my $inplace = inplace(...);
+
+is the same as
+
+ use File::Replace::Inplace;
+ my $inplace = File::Replace::Inplace->new(...);
+
+As a special feature, if the import list contains a string beginning with
+C<-i>, then a global L<File::Replace::Inplace|File::Replace::Inplace>
+object will be set up, so C<ARGV> will be tied from the beginning of the
+script. Anything following the C<-i> will be used for the L</backup> option.
+The purpose of this feature is to provide a replacement for Perl's C<-i>
+command-line switch in oneliners. For example, you can say:
+
+ perl -MFile::Replace=-i.bak -pe 's/foo/bar/g' file1.txt file2.txt
+
+and those files will be edited in-place using this module. In addition,
+you may specify a C<-D> "switch" in the import list to enable debugging
+output, as in:
+
+ perl -MFile::Replace=-i,-D -pe 's/x/y/g' foo.txt bar.txt
+
+The C<-D> switch currently only affects the "inplace" operations described here,
+but this may be expanded upon in the future to enable debugging everywhere.
+
 =head1 Constructor Options
 
 =head2 Filename
@@ -519,6 +587,29 @@ unrecognized options will result in a fatal error. Note that in 0.06,
 specifying C<undef> for the C<create> option resulted in a deprecation warning,
 that behavior has now been changed so that C<undef> is equivalent to the
 C<create> option not being set.
+
+=head2 C<backup>
+
+If you set this option to a non-empty string, then immediately after successfully
+opening the input file, it is copied to a file with the same name and the
+extension specified by this option (unless you use C<*> characters in the string,
+see below). For example, C<< File::Replace->new("test.txt", backup=>".bak") >>
+results in a copy of F<test.txt> being made to F<test.txt.bak>. If that file
+already exists or something goes wrong with the copy operation, then the
+constructor will C<die>.
+
+As with Perl's C<-i> option, if the string contains C<*> characters, then
+instead of the string being appended to the filename, each C<*> character is
+replaced with the original filename. So for example, if you specify
+C<< backup=>'orig_*' >>, then the backup of F<test.txt> will be
+F<orig_test.txt> in the same path - I<unlike> Perl's C<-i> option, this
+feature cannot be used to move files into a different directory.
+
+B<Warning:> If there is another process writing to the input file or creating files
+in the same directory as the input file, there is a potential for race conditions
+when using this option!
+
+This option was introduced in version 0.10.
 
 =head2 C<in_fh>
 

@@ -13,11 +13,19 @@ WriteMakefile(
 		provides     => {
 			'File::Replace' => {
 				file    => 'lib/File/Replace.pm',
-				version => '0.08',
+				version => '0.12',
+			},
+			'File::Replace::Inplace' => {
+				file    => 'lib/File/Replace/Inplace.pm',
+				version => '0.12',
 			},
 			'Tie::Handle::Base' => {
 				file    => 'lib/Tie/Handle/Base.pm',
-				version => '0.08',
+				version => '0.12',
+			},
+			'Tie::Handle::Argv' => {
+				file    => 'lib/Tie/Handle/Argv.pm',
+				version => '0.12',
 			},
 		},
 		no_index     => {
@@ -61,11 +69,13 @@ WriteMakefile(
 		'File::Temp'             => 0,
 		'File::Basename'         => 0,
 		'File::Spec::Functions'  => 0,
+		'File::Copy'             => 0,
 		'Fcntl'                  => 0,
 		'Exporter'               => 0,
 	},
 	TEST_REQUIRES  => {
-		# CPAN - none
+		# CPAN
+		'IPC::Run3::Shell'       => '0.56',
 		# Perl core modules
 		'Encode'                 => 0,
 		'Test::More'             => '1.302096',
@@ -74,3 +84,11 @@ WriteMakefile(
 		# note I haven't included modules needed for author tests here
 	},
 );
+sub MY::postamble {
+	return <<'MAKE_FRAG';
+.PHONY: authorcover
+authorcover: test
+	cpanm Devel::Cover
+	cover -test -coverage default,-pod
+MAKE_FRAG
+}

@@ -11,8 +11,8 @@ use List::Util 1.45 ();
 use Capture::Tiny ();
 use File::Path ();
 
-# ABSTRACT: Build shared libraries for use with FFI::Platypus
-our $VERSION = '0.11'; # VERSION
+# ABSTRACT: Build shared libraries for use with FFI
+our $VERSION = '0.12'; # VERSION
 
 
 sub _native_name
@@ -242,11 +242,11 @@ __END__
 
 =head1 NAME
 
-FFI::Build - Build shared libraries for use with FFI::Platypus
+FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 

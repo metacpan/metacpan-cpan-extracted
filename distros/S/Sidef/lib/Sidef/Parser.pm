@@ -63,6 +63,7 @@ package Sidef::Parser {
                      | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
+                     | Vector\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Vector') })
                      | Matrix\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Matrix') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
@@ -86,10 +87,10 @@ package Sidef::Parser {
                      | Regexp?\b                      (?{ state $x = bless({}, 'Sidef::DataTypes::Regex::Regex') })
                      | Object\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Object') })
                      | Sidef\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Sidef::Sidef') })
-                     | Sig\b                          (?{ state $x = Sidef::Sys::Sig->new })
-                     | Sys\b                          (?{ state $x = Sidef::Sys::Sys->new })
-                     | Perl\b                         (?{ state $x = Sidef::Perl::Perl->new })
-                     | Math\b                         (?{ state $x = Sidef::Math::Math->new })
+                     | Sig\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sig') })
+                     | Sys\b                          (?{ state $x = bless({}, 'Sidef::Sys::Sys') })
+                     | Perl\b                         (?{ state $x = bless({}, 'Sidef::Perl::Perl') })
+                     | Math\b                         (?{ state $x = bless({}, 'Sidef::Math::Math') })
                      | Time\b                         (?{ state $x = Sidef::Time::Time->new })
                      | \$\.                           (?{ state $x = bless({name => '$.'}, 'Sidef::Variable::Magic') })
                      | \$\?                           (?{ state $x = bless({name => '$?'}, 'Sidef::Variable::Magic') })
@@ -192,6 +193,7 @@ package Sidef::Parser {
                   DirHandle
                   Arr Array
                   Pair
+                  Vector
                   Matrix
                   Enumerator
                   Hash
@@ -254,6 +256,7 @@ package Sidef::Parser {
                   local
                   global
                   var
+                  del
                   const
                   func
                   enum
@@ -303,6 +306,7 @@ package Sidef::Parser {
                   <=> =~=
                   <<= >>=
                   << >>
+                  |>> |> |X> |Z>
                   |= |
                   &= &
                   == =~
@@ -389,10 +393,29 @@ package Sidef::Parser {
     sub fatal_error {
         my ($self, %opt) = @_;
 
-        my $start      = rindex($opt{code}, "\n", $opt{pos}) + 1;
-        my $point      = $opt{pos} - $start;
-        my $line       = $opt{line} // $self->{line};
-        my $error_line = (split(/\R/, substr($opt{code}, $start, 80)))[0];
+        my $start  = rindex($opt{code}, "\n", $opt{pos}) + 1;
+        my $point  = $opt{pos} - $start;
+        my $line   = $opt{line} // $self->{line};
+        my $column = $point;
+
+        my $error_line = (split(/\R/, substr($opt{code}, $start, $point + 80)))[0];
+
+        if (length($error_line) >= 80) {
+
+            if ($point > 60) {
+
+                my $from = $point - 40;
+                my $rem  = $point + 40 - length($error_line);
+
+                $from -= $rem;
+                $point = 40 + $rem;
+
+                $error_line = substr($error_line, $from, 80);
+            }
+            else {
+                $error_line = substr($error_line, 0, 80);
+            }
+        }
 
         my @lines = (
                      "HAHA! That's really funny! You got me!",
@@ -422,11 +445,11 @@ package Sidef::Parser {
                      "Invalid code. Feel ashamed for yourself and try again.",
                     );
 
-        my $error = sprintf("%s: %s\n\nFile : %s\nLine : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
+        my $error = sprintf("%s: %s\n\nFile : %s\nLine : %s : %s\nError: %s\n\n" . ("~" x 80) . "\n%s\n",
                             'sidef',
                             $lines[rand @lines],
                             $self->{file_name} // '-',
-                            $line, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);
+                            $line, $column, join(', ', grep { defined } $opt{error}, $opt{reason}), $error_line);
 
         $error .= ' ' x ($point) . '^' . "\n" . ('~' x 80) . "\n";
 
@@ -450,8 +473,15 @@ package Sidef::Parser {
                 }
             }
 
-            if (my @candidates = Sidef::best_matches($name, \@names)) {
-                $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), sort(@candidates)) . "\n");
+            if ($class eq 'main') {
+                $class = '';
+            }
+            else {
+                $class .= '::';
+            }
+
+            if (my @candidates = Sidef::best_matches($name, [grep { $_ ne $name } @names])) {
+                $error .= ("[?] Did you mean: " . join("\n" . (' ' x 18), map { $class . $_ } sort(@candidates)) . "\n");
             }
         }
 
@@ -489,7 +519,7 @@ package Sidef::Parser {
                 if (ref $variable eq 'ARRAY') {
                     $self->check_declarations({$class => $variable});
                 }
-                elsif ($self->{interactive}) {
+                elsif ($self->{interactive} or $self->{eval_mode}) {
                     ## Everything is OK in interactive mode
                 }
                 elsif (   $variable->{count} == 0
@@ -499,6 +529,7 @@ package Sidef::Parser {
                        && $variable->{type} ne 'global'
                        && $variable->{name} ne 'self'
                        && $variable->{name} ne ''
+                       && $variable->{type} ne 'del'
                        && chr(ord $variable->{name}) ne '_') {
 
                     warn '[WARNING] '
@@ -512,12 +543,12 @@ package Sidef::Parser {
     sub get_name_and_class {
         my ($self, $var_name) = @_;
 
-        $var_name // return ('', $self->{class});
+        $var_name // return ('', $self->{module} // $self->{class});
 
         my $rindex = rindex($var_name, '::');
         $rindex != -1
           ? (substr($var_name, $rindex + 2), substr($var_name, 0, $rindex))
-          : ($var_name, $self->{class});
+          : ($var_name, $self->{module} // $self->{class});
     }
 
     sub get_quoted_words {
@@ -557,7 +588,7 @@ package Sidef::Parser {
                               );
         }
 
-        my $beg_delim = quotemeta $delim;
+        my $beg_delim  = quotemeta $delim;
         my $pair_delim = exists($self->{delim_pairs}{$delim}) ? $self->{delim_pairs}{$delim} : ();
 
         my $string = '';
@@ -756,7 +787,7 @@ package Sidef::Parser {
             my $ref_type;
             if (defined($+{type})) {
                 my $type = $+{type};
-                my $obj = $self->parse_expr(code => \$type);
+                my $obj  = $self->parse_expr(code => \$type);
 
                 if (not defined($obj) or ref($obj) eq 'HASH') {
                     $self->fatal_error(
@@ -771,6 +802,19 @@ package Sidef::Parser {
             }
 
             my ($var_name, $class_name) = $self->get_name_and_class($name);
+
+            if ($opt{type} eq 'del') {
+                my $var = $self->find_var($var_name, $class_name);
+
+                if (not defined($var)) {
+                    $self->fatal_error(
+                                       code  => $_,
+                                       pos   => pos($_) - length($name),
+                                       var   => ($class_name . '::' . $var_name),
+                                       error => "attempt to delete non-existent variable `$name`",
+                                      );
+                }
+            }
 
             if (exists($self->{keywords}{$var_name}) or exists($self->{built_in_classes}{$var_name})) {
                 $self->fatal_error(
@@ -791,7 +835,7 @@ package Sidef::Parser {
                                                   );
 
                 my $code = $subset_name;
-                my $obj = $self->parse_expr(code => \$code);
+                my $obj  = $self->parse_expr(code => \$code);
 
                 (defined($obj) and ref($obj) ne 'HASH')
                   || $self->fatal_error(
@@ -1099,13 +1143,13 @@ package Sidef::Parser {
 
             if (/\G([^\W\d]\w*+):(?![=:])/gc) {
                 my $name = $1;
-                my $obj = $self->parse_obj(code => $opt{code});
+                my $obj  = $self->parse_obj(code => $opt{code});
                 return Sidef::Variable::NamedParam->new($name, $obj);
             }
 
-            # Declaration of variables
-            if (/\Gvar\b\h*/gc) {
-                my $type     = 'var';
+            # Declaration of variables (global and lexical)
+            if (/\G(var|global|del)\b\h*/gc) {
+                my $type     = $1;
                 my $vars     = $self->parse_init_vars(code => $opt{code}, type => $type);
                 my $init_obj = bless({vars => $vars}, 'Sidef::Variable::Init');
 
@@ -1118,6 +1162,10 @@ package Sidef::Parser {
 
                     $init_obj->{args} = $args;
                 }
+
+                #if ($type eq 'del') {
+                #    return bless {vars => []}, 'Sidef::Variable::Init';
+                #}
 
                 return $init_obj;
             }
@@ -1160,7 +1208,7 @@ package Sidef::Parser {
             }
 
             # Declaration of constants and static variables
-            if (/\G(define|const|static|global)\b\h*/gc) {
+            if (/\G(define|const|static)\b\h*/gc) {
                 my $type = $1;
                 my $vars = $self->parse_init_vars(
                                                   code    => $opt{code},
@@ -1200,8 +1248,6 @@ package Sidef::Parser {
                       ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
                       : $type eq 'const'
                       ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
-                      : $type eq 'global'
-                      ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Global')
                       : die "[PARSER ERROR] Invalid variable type: $type";
 #>>>
 
@@ -1232,8 +1278,6 @@ package Sidef::Parser {
                                ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Static')
                                : $type eq 'const'
                                ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Const')
-                               : $type eq 'global'
-                               ? bless({name => $name, class => $class_name, expr => $obj}, 'Sidef::Variable::Global')
                                : die "[PARSER ERROR] Invalid variable type: $type"
                               );
 #>>>
@@ -1500,9 +1544,10 @@ package Sidef::Parser {
                                       );
 
                 if ($name ne '') {
-                    my ($var) = $self->find_var($name, $class_name);
+                    my $var = $self->find_var($name, $class_name);
 
                     if (defined($var) and $var->{type} eq 'class') {
+                        $obj->{parent} = $var->{obj};
                         push @{$obj->{inherit}}, ref($var->{obj}{name}) ? $var->{obj}{name} : $var->{obj};
                     }
                 }
@@ -1589,7 +1634,7 @@ package Sidef::Parser {
                                 $self->fatal_error(
                                                    error  => "can't find `$name` class",
                                                    reason => "expected an existent class name",
-                                                   var    => $name,
+                                                   var    => ($class_name . '::' . $name),
                                                    code   => $_,
                                                    pos    => pos($_) - length($name) - 1,
                                                   );
@@ -1611,7 +1656,7 @@ package Sidef::Parser {
                     #~ $obj->{name} = $built_in_obj->{name};
                     #~ }
 
-                    local $self->{class_name} = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
+                    local $self->{class_name}    = (defined($built_in_obj) ? ref($built_in_obj) : $obj->{name});
                     local $self->{current_class} = $built_in_obj // $obj;
                     my $block = $self->parse_block(code => $opt{code});
 
@@ -1706,7 +1751,7 @@ package Sidef::Parser {
                     my $args = '|' . join(',', $type eq 'method' ? 'self' : (), @{$var_names}) . ' |';
 
                     my $code = '{' . $args . substr($_, pos);
-                    my $block = $self->parse_block(code => \$code);
+                    my $block = $self->parse_block(code => \$code, with_vars => 1);
                     pos($_) += pos($code) - length($args) - 1;
 
                     # Set the block of the function/method
@@ -1765,7 +1810,7 @@ package Sidef::Parser {
 
                 my $block = (
                              /\G\h*(?=\{)/gc
-                             ? $self->parse_block(code => $opt{code})
+                             ? $self->parse_block(code => $opt{code}, with_vars => 1)
                              : $self->fatal_error(
                                                   error => "expected a block after `when(expr)`",
                                                   code  => $_,
@@ -1793,7 +1838,7 @@ package Sidef::Parser {
 
                 my $block = (
                              /\G\h*(?=\{)/gc
-                             ? $self->parse_block(code => $opt{code})
+                             ? $self->parse_block(code => $opt{code}, with_vars => 1)
                              : $self->fatal_error(
                                                   error => "expected a block after `case(expr)`",
                                                   code  => $_,
@@ -1851,6 +1896,258 @@ package Sidef::Parser {
                 return bless({expr => $obj, gather => $self->{current_gather}}, 'Sidef::Types::Block::Take');
             }
 
+            # Declaration of a module
+            if (/\Gmodule\b\h*/gc) {
+                my $name =
+                  /\G($self->{var_name_re})\h*/goc
+                  ? $1
+                  : $self->fatal_error(
+                                       error  => "invalid module declaration",
+                                       reason => "expected a name",
+                                       code   => $_,
+                                       pos    => pos($_)
+                                      );
+
+                $self->parse_whitespace(code => $opt{code});
+
+                if (/\G(?=\{)/) {
+                    local $self->{module} = $name;
+                    my $obj = $self->parse_block(code => $opt{code});
+
+                    return
+                      bless {
+                             name  => $name,
+                             block => $obj
+                            },
+                      'Sidef::Meta::Module';
+                }
+                else {
+                    $self->fatal_error(
+                                       error  => "invalid module declaration",
+                                       reason => "expected: module $name {...}",
+                                       code   => $_,
+                                       pos    => pos($_)
+                                      );
+                }
+            }
+
+            if (/\Gimport\b\h*/gc) {
+
+                my $var_names =
+                  $self->get_init_vars(code      => $opt{code},
+                                       with_vals => 0);
+
+                @{$var_names}
+                  || $self->fatal_error(
+                                        code  => $_,
+                                        pos   => (pos($_)),
+                                        error => "expected a variable-like name for importing!",
+                                       );
+
+                foreach my $var_name (@{$var_names}) {
+                    my ($name, $class) = $self->get_name_and_class($var_name);
+
+                    if ($class eq ($self->{module} // $self->{class})) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => pos($_),
+                                           error => "can't import '${class}::${name}' into the same namespace",
+                                          );
+                    }
+
+                    my $var = $self->find_var($name, $class);
+
+                    if (not defined $var) {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => pos($_),
+                                           error => "variable '${class}::${name}' does not exists",
+                                          );
+                    }
+
+                    $var->{count}++;
+
+                    unshift @{$self->{vars}{$self->{module} // $self->{class}}},
+                      {
+                        obj   => $var->{obj},
+                        name  => $name,
+                        count => 0,
+                        type  => $var->{type},
+                        line  => $self->{line},
+                      };
+                }
+
+                return 1;
+            }
+
+            if (/\Ginclude\b\h*/gc) {
+
+                state $x = do {
+                    require File::Spec;
+                    require Cwd;
+                };
+
+                my @abs_filenames;
+                if (/\G($self->{var_name_re})/gc) {
+                    my $var_name = $1;
+
+                    # The module is defined in the current file -- skip
+                    if (exists $self->{ref_vars}{$var_name}) {
+                        redo;
+                    }
+
+                    # The module was already included -- skip
+                    if (exists $Sidef::INCLUDED{$var_name}) {
+                        redo;
+                    }
+
+                    my @path     = split(/::/, $var_name);
+                    my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
+
+                    $Sidef::INCLUDED{$var_name} = $mod_path;
+
+                    if (@{$self->{inc}} == 0) {
+                        state $y = require File::Basename;
+                        push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
+
+                        push @{$self->{inc}},
+                          File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
+
+                        if (-f $self->{script_name}) {
+                            push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
+                        }
+
+                        push @{$self->{inc}}, File::Spec->curdir;
+                    }
+
+                    my ($full_path, $found_module);
+                    foreach my $inc_dir (@{$self->{inc}}) {
+                        if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
+                            and -f _
+                            and -r _ ) {
+                            $found_module = 1;
+                            last;
+                        }
+                    }
+
+                    $found_module // $self->fatal_error(
+                          code  => $_,
+                          pos   => pos($_),
+                          error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
+                    );
+
+                    push @abs_filenames, [$full_path, $var_name];
+                }
+                else {
+
+                    my $orig_dir  = Cwd::getcwd();
+                    my $orig_file = Cwd::abs_path($self->{file_name});
+                    my $file_dir  = File::Basename::dirname($orig_file);
+
+                    my $chdired = 0;
+                    if ($orig_dir ne $file_dir) {
+                        if (chdir($file_dir)) {
+                            $chdired = 1;
+                        }
+                    }
+
+                    my $expr = do {
+                        my ($obj) = $self->parse_expr(code => $opt{code});
+                        $obj;
+                    };
+
+                    my @files = (
+                        ref($expr) eq 'HASH'
+                        ? do {
+                            map   { $_->{self} }
+                              map { @{$_->{self}->{$self->{class}}} }
+                              map { @{$expr->{$_}} }
+                              keys %{$expr};
+                          }
+                        : $expr
+                    );
+
+                    push @abs_filenames, map {
+                        my $filename = $_;
+
+                        if (index(ref($filename), 'Sidef::') == 0) {
+                            $filename = $filename->get_value;
+                        }
+
+                        ref($filename) ne ''
+                          and $self->fatal_error(
+                                  code  => $_,
+                                  pos   => pos($_),
+                                  error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
+                          );
+
+                        my @files;
+                        foreach my $file (glob($filename)) {
+                            my $abs = Cwd::abs_path($file);
+
+                            if (!defined($abs) or $abs eq '') {
+                                $self->fatal_error(
+                                          code  => $_,
+                                          pos   => pos($_),
+                                          error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
+                                );
+                            }
+
+                            push @files, $abs;
+                        }
+
+                        foreach my $file (@files) {
+                            if (exists $Sidef::INCLUDED{$file}) {
+                                $self->fatal_error(
+                                                   code  => $_,
+                                                   pos   => pos($_),
+                                                   error => "include-error: circular inclusion of file: $file",
+                                                  );
+                            }
+                        }
+
+                        map { [$_] } @files
+                    } @files;
+
+                    if ($chdired) { chdir($orig_dir) }
+                }
+
+                my @included;
+
+                foreach my $pair (@abs_filenames) {
+
+                    my ($full_path, $name) = @{$pair};
+
+                    open(my $fh, '<:utf8', $full_path)
+                      || $self->fatal_error(
+                                            code  => $_,
+                                            pos   => pos($_),
+                                            error => "can't open file `$full_path`: $!"
+                                           );
+
+                    my $content = do { local $/; <$fh> };
+                    close $fh;
+
+                    next if $Sidef::INCLUDED{$full_path};
+
+                    local $self->{module}              = $name if defined $name;    # new namespace
+                    local $self->{line}                = 1;
+                    local $self->{file_name}           = $full_path;
+                    local $Sidef::INCLUDED{$full_path} = 1;
+
+                    my $ast = $self->parse_script(code => \$content);
+
+                    push @included,
+                      {
+                        name => $name,
+                        file => $full_path,
+                        ast  => $ast,
+                      };
+                }
+
+                return bless({included => \@included}, 'Sidef::Meta::Included');
+            }
+
             # Super-script power
             if (/\G([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/gc) {
                 my $num = ($1 =~ tr/⁰¹²³⁴⁵⁶⁷⁸⁹/0-9/r);
@@ -1906,8 +2203,9 @@ package Sidef::Parser {
                                   );
             }
 
-            # Quoted words or numbers (%w/a b c/)
-            if (/\G%([wWin])\b/gc || /\G(?=(«|<(?!<)))/) {
+            # Quoted words, numbers, vectors and matrices
+            # %w(...), %i(...), %n(...), %v(...), %m(...), «...», <...>
+            if (/\G%([wWinvm])\b/gc || /\G(?=(«|<(?!<)))/) {
                 my ($type) = $1;
                 my $strings = $self->get_quoted_words(code => $opt{code});
 
@@ -1922,6 +2220,20 @@ package Sidef::Parser {
                 elsif ($type eq 'n') {
                     return Sidef::Types::Array::Array->new(
                                                 [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
+                }
+                elsif ($type eq 'v') {
+                    return Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                            @{$strings});
+                }
+                elsif ($type eq 'm') {
+                    my @matrix;
+                    my $data = join(' ', @$strings);
+                    foreach my $line (split(/\s*;\s*/, $data)) {
+                        push @matrix,
+                          Sidef::Types::Array::Array->new(
+                                     [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } split(/[\s,]+/, $line)]);
+                    }
+                    return Sidef::Types::Array::Matrix->new(@matrix);
                 }
 
                 my ($inline_expression, @objs);
@@ -2017,21 +2329,24 @@ package Sidef::Parser {
 
             # Eval keyword
             if (/\Geval\b\h*/gc) {
+
                 my $obj = (
                            /\G(?=\()/
                            ? $self->parse_arg(code => $opt{code})
                            : $self->parse_obj(code => $opt{code})
                           );
 
-                return
-                  bless(
-                        {
-                         expr          => $obj,
-                         vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
-                         ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
-                        },
-                        'Sidef::Eval::Eval'
-                       );
+#<<<
+                return bless(
+                    {
+                     expr   => $obj,
+                     parser => Sidef::Object::Object::dclone(scalar {%$self}),
+
+                     #vars          => {$self->{class} => [@{$self->{vars}{$self->{class}}}]},
+                     #ref_vars_refs => {$self->{class} => [@{$self->{ref_vars_refs}{$self->{class}}}]},
+
+                    }, 'Sidef::Eval::Eval');
+#>>>
             }
 
             if (/\GParser\b/gc) {
@@ -2098,7 +2413,7 @@ package Sidef::Parser {
                 return (
                     $self->{static_objects}{'__DATA__'} //= do {
                         bless({data => \$self->{'__DATA__'}}, 'Sidef::Meta::Glob::DATA');
-                      }
+                    }
                 );
             }
 
@@ -2162,19 +2477,29 @@ package Sidef::Parser {
                 /\G__METHOD_NAME__\b/gc && return Sidef::Types::String::String->new($self->{current_method}{name});
             }
 
-            # Variable call
+            # Variable access
             if (/\G($self->{var_name_re})/goc) {
                 my $len_var = length($1);
                 my ($name, $class) = $self->get_name_and_class($1);
 
                 if (defined(my $var = $self->find_var($name, $class))) {
+
+                    if ($var->{type} eq 'del') {
+                        $self->fatal_error(
+                                           code  => $_,
+                                           pos   => (pos($_) - length($name)),
+                                           var   => ($class . '::' . $name),
+                                           error => "attempt to use the deleted variable <$name>",
+                                          );
+                    }
+
                     $var->{count}++;
                     return $var->{obj};
                 }
 
                 if ($name eq 'ARGV' or $name eq 'ENV') {
 
-                    my $type = 'var';
+                    my $type     = 'var';
                     my $variable = bless({name => $name, type => $type, class => $class}, 'Sidef::Variable::Variable');
 
                     unshift @{$self->{vars}{$class}},
@@ -2262,7 +2587,7 @@ package Sidef::Parser {
                 }
 
                 # Method call in functional style (deprecated -- use `::name()` instead)
-                if ($class eq $self->{class} and $len_var == length($name)) {
+                if ($len_var == length($name)) {
 
                     if ($self->{opt}{k}) {
                         print STDERR
@@ -2280,7 +2605,7 @@ package Sidef::Parser {
                                : $self->fatal_error(
                                                     code  => $_,
                                                     pos   => ($pos - length($name)),
-                                                    var   => $name,
+                                                    var   => ($class . '::' . $name),
                                                     error => "variable <$name> is not declared in the current scope",
                                                    )
                               );
@@ -2305,9 +2630,9 @@ package Sidef::Parser {
                 # Undeclared variable
                 $self->fatal_error(
                                    code  => $_,
-                                   var   => $name,
                                    pos   => (pos($_) - length($name)),
-                                   error => "variable <$name> is not declared in the current scope",
+                                   var   => ($class . '::' . $name),
+                                   error => "variable <$class\::$name> is not declared in the current scope",
                                   );
             }
 
@@ -2407,7 +2732,7 @@ package Sidef::Parser {
             my $p = pos($_);
             local $self->{curly_brackets} = 1;
 
-            my $ref = $self->{vars}{$self->{class}} //= [];
+            my $ref   = $self->{vars}{$self->{class}} //= [];
             my $count = scalar(@{$self->{vars}{$self->{class}}});
 
             unshift @{$self->{ref_vars_refs}{$self->{class}}}, @{$ref};
@@ -2422,7 +2747,8 @@ package Sidef::Parser {
 
             my $has_vars;
             my $var_objs = [];
-            if (/\G(?=\|)/) {
+
+            if (($opt{topic_var} || $opt{with_vars}) && /\G(?=\|)/) {
                 $has_vars = 1;
                 $var_objs = $self->parse_init_vars(
                                                    params => 1,
@@ -2850,7 +3176,7 @@ package Sidef::Parser {
                     elsif (ref($obj) eq 'Sidef::Types::Block::If') {
 
                         if (/\G\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code});
+                            my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
                             push @{$obj->{if}}, {expr => $arg, block => $block};
 
                           ELSIF: {
@@ -2861,7 +3187,7 @@ package Sidef::Parser {
                                     my $arg = $self->parse_arg(code => $opt{code});
                                     $self->parse_whitespace(code => $opt{code});
 
-                                    my $block = $self->parse_block(code => $opt{code}) // $self->fatal_error(
+                                    my $block = $self->parse_block(code => $opt{code}, with_vars => 1) // $self->fatal_error(
                                                                           code  => $_,
                                                                           pos   => pos($_) - 1,
                                                                           error => "invalid declaration of the `if` statement",
@@ -2933,7 +3259,7 @@ package Sidef::Parser {
                     }
                     elsif (ref($obj) eq 'Sidef::Types::Block::While') {
                         if (/\G\h*(?=\{)/gc) {
-                            my $block = $self->parse_block(code => $opt{code});
+                            my $block = $self->parse_block(code => $opt{code}, with_vars => 1);
                             $obj->{expr}  = $arg;
                             $obj->{block} = $block;
                         }
@@ -3081,317 +3407,8 @@ package Sidef::Parser {
       MAIN: {
             $self->parse_whitespace(code => $opt{code});
 
-            # Module declaration
-            if (/\Gmodule\b\h*/gc) {
-                my $name =
-                  /\G($self->{var_name_re})\h*/goc
-                  ? $1
-                  : $self->fatal_error(
-                                       error  => "invalid module declaration",
-                                       reason => "expected a name",
-                                       code   => $_,
-                                       pos    => pos($_)
-                                      );
-
-                /\G\h*\{\h*/gc
-                  || $self->fatal_error(
-                                        error  => "invalid module declaration",
-                                        reason => "expected: module $name {...}",
-                                        code   => $_,
-                                        pos    => pos($_)
-                                       );
-
-                my $parser = __PACKAGE__->new(
-                                              opt         => $self->{opt},
-                                              file_name   => $self->{file_name},
-                                              script_name => $self->{script_name},
-                                             );
-                local $parser->{line}  = $self->{line};
-                local $parser->{class} = $name;
-                local $parser->{ref_vars}{$name} = $self->{ref_vars}{$name} if exists($self->{ref_vars}{$name});
-                local $parser->{_in_module}      = 1;
-                local $parser->{_parent}         = $self;
-
-                if ($name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
-                    if ($self->{_in_module}) {
-                        unshift @Sidef::NAMESPACES, $name;
-                    }
-                    else {
-                        push @Sidef::NAMESPACES, $name;
-                    }
-                }
-
-                my $data = {parser => $parser};
-                push @{$self->{_modules}{$name}}, $data;
-
-                my $code = '{' . substr($_, pos);
-                my ($struct, $pos) = $parser->parse_block(code => \$code);
-
-                pos($_) += pos($code) - 1;
-
-                $self->{line}   = $parser->{line};
-                $data->{struct} = $struct;
-
-                foreach my $class (keys %{$struct->{code}}) {
-                    push @{$struct{$class}}, @{$struct->{code}{$class}};
-                    if (exists $self->{ref_vars}{$class}) {
-                        unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}[0]};
-                    }
-                    else {
-                        push @{$self->{ref_vars}{$class}},
-                          @{
-                              $#{$parser->{ref_vars}{$class}} == 0 && ref($parser->{ref_vars}{$class}[0]) eq 'ARRAY'
-                            ? $parser->{ref_vars}{$class}[0]
-                            : $parser->{ref_vars}{$class}
-                           };
-                    }
-                }
-
-                redo;
-            }
-
-            if (/\Gimport\b\h*/gc) {
-
-                my $var_names =
-                  $self->get_init_vars(code      => $opt{code},
-                                       with_vals => 0);
-
-                @{$var_names}
-                  || $self->fatal_error(
-                                        code  => $_,
-                                        pos   => (pos($_)),
-                                        error => "expected a variable-like name for importing!",
-                                       );
-
-                foreach my $var_name (@{$var_names}) {
-                    my ($name, $class) = $self->get_name_and_class($var_name);
-
-                    if ($class eq $self->{class}) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => pos($_),
-                                           error => "can't import '${class}::${name}' inside the same namespace",
-                                          );
-                    }
-
-                    my $var = $self->find_var($name, $class);
-
-                    if (not defined $var) {
-                        $self->fatal_error(
-                                           code  => $_,
-                                           pos   => pos($_),
-                                           error => "variable '${class}::${name}' hasn't been declared",
-                                          );
-                    }
-
-                    $var->{count}++;
-
-                    unshift @{$self->{vars}{$self->{class}}},
-                      {
-                        obj   => $var->{obj},
-                        name  => $name,
-                        count => 0,
-                        type  => $var->{type},
-                        line  => $self->{line},
-                      };
-                }
-
-                redo;
-            }
-
             if (/\G\@:([^\W\d]\w*+)/gc) {
                 push @{$struct{$self->{class}}}, {self => bless({name => $1}, 'Sidef::Variable::Label')};
-                redo;
-            }
-
-            if (/\Ginclude\b\h*/gc) {
-
-                state $x = do {
-                    require File::Spec;
-                    require Cwd;
-                };
-
-                my @abs_filenames;
-                if (/\G($self->{var_name_re})/gc) {
-                    my $var_name = $1;
-
-                    if (exists $self->{_parent}{_modules}{$var_name}) {
-
-                        foreach my $info (@{$self->{_parent}{_modules}{$var_name}}) {
-
-                            my $parser = $info->{parser};
-                            my $struct = $info->{struct};
-
-                            foreach my $class (keys %{$struct->{code}}) {
-                                push @{$self->{ref_vars}{$class}},
-                                  @{
-                                      $#{$parser->{ref_vars}{$class}} == 0 && ref($parser->{ref_vars}{$class}[0]) eq 'ARRAY'
-                                    ? $parser->{ref_vars}{$class}[0]
-                                    : $parser->{ref_vars}{$class}
-                                   };
-                            }
-                        }
-                        redo;
-                    }
-
-                    next if exists $Sidef::INCLUDED{$var_name};
-
-                    my @path = split(/::/, $var_name);
-                    my $mod_path = File::Spec->catfile(@path[0 .. $#path - 1], $path[-1] . '.sm');
-
-                    $Sidef::INCLUDED{$var_name} = $mod_path;
-
-                    if (@{$self->{inc}} == 0) {
-                        state $y = require File::Basename;
-                        push @{$self->{inc}}, split(':', $ENV{SIDEF_INC}) if exists($ENV{SIDEF_INC});
-
-                        push @{$self->{inc}},
-                          File::Spec->catdir(File::Basename::dirname(Cwd::abs_path($0)), File::Spec->updir, 'share', 'sidef');
-
-                        if (-f $self->{script_name}) {
-                            push @{$self->{inc}}, File::Basename::dirname(Cwd::abs_path($self->{script_name}));
-                        }
-
-                        push @{$self->{inc}}, File::Spec->curdir;
-                    }
-
-                    my ($full_path, $found_module);
-                    foreach my $inc_dir (@{$self->{inc}}) {
-                        if (    -e ($full_path = File::Spec->catfile($inc_dir, $mod_path))
-                            and -f _
-                            and -r _ ) {
-                            $found_module = 1;
-                            last;
-                        }
-                    }
-
-                    $found_module // $self->fatal_error(
-                          code  => $_,
-                          pos   => pos($_),
-                          error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
-                    );
-
-                    push @abs_filenames, [$full_path, $var_name];
-                }
-                else {
-
-                    my $orig_dir  = Cwd::getcwd();
-                    my $orig_file = Cwd::abs_path($self->{file_name});
-                    my $file_dir  = File::Basename::dirname($orig_file);
-
-                    my $chdired = 0;
-                    if ($orig_dir ne $file_dir) {
-                        if (chdir($file_dir)) {
-                            $chdired = 1;
-                        }
-                    }
-
-                    my $expr = do {
-                        my ($obj) = $self->parse_expr(code => $opt{code});
-                        $obj;
-                    };
-
-                    my @files = (
-                        ref($expr) eq 'HASH'
-                        ? do {
-                            map   { $_->{self} }
-                              map { @{$_->{self}->{$self->{class}}} }
-                              map { @{$expr->{$_}} }
-                              keys %{$expr};
-                          }
-                        : $expr
-                    );
-
-                    push @abs_filenames, map {
-                        my $filename = $_;
-
-                        if (index(ref($filename), 'Sidef::') == 0) {
-                            $filename = $filename->get_value;
-                        }
-
-                        ref($filename) ne ''
-                          and $self->fatal_error(
-                                  code  => $_,
-                                  pos   => pos($_),
-                                  error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
-                          );
-
-                        my @files;
-                        foreach my $file (glob($filename)) {
-                            my $abs = Cwd::abs_path($file);
-
-                            if (!defined($abs) or $abs eq '') {
-                                $self->fatal_error(
-                                          code  => $_,
-                                          pos   => pos($_),
-                                          error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
-                                );
-                            }
-
-                            push @files, $abs;
-                        }
-
-                        foreach my $file (@files) {
-                            if (exists $Sidef::INCLUDED{$file}) {
-                                $self->fatal_error(
-                                                   code  => $_,
-                                                   pos   => pos($_),
-                                                   error => "include-error: circular inclusion of file: $file",
-                                                  );
-                            }
-                        }
-
-                        map { [$_] } @files
-                    } @files;
-
-                    if ($chdired) { chdir($orig_dir) }
-                }
-
-                foreach my $pair (@abs_filenames) {
-
-                    my ($full_path, $name) = @{$pair};
-
-                    open(my $fh, '<:utf8', $full_path)
-                      || $self->fatal_error(
-                                            code  => $_,
-                                            pos   => pos($_),
-                                            error => "can't open file `$full_path`: $!"
-                                           );
-
-                    my $content = do { local $/; <$fh> };
-                    close $fh;
-
-                    local $Sidef::INCLUDED{$full_path} = 1;
-                    my $parser = defined($name) ? __PACKAGE__->new() : $self;
-
-                    local $parser->{opt}         = $self->{opt};
-                    local $parser->{script_name} = $self->{script_name};
-                    local $parser->{file_name}   = $full_path;
-                    local $parser->{class}       = $name if defined $name;
-                    local $parser->{line}        = 1;
-
-                    if (defined($name) and $name ne 'main' and not grep $_ eq $name, @Sidef::NAMESPACES) {
-                        if ($self->{_in_module}) {
-                            unshift @Sidef::NAMESPACES, $name;
-                        }
-                        else {
-                            push @Sidef::NAMESPACES, $name;
-                        }
-                    }
-                    my $struct = $parser->parse_script(code => \$content);
-
-                    foreach my $class (keys %{$struct}) {
-                        if (defined $name) {
-                            $struct{$class} = $struct->{$class};
-                            $self->{ref_vars}{$class} = $parser->{ref_vars}{$class};
-                        }
-                        else {
-                            push @{$struct{$class}}, @{$struct->{$class}};
-                            unshift @{$self->{ref_vars}{$class}}, @{$parser->{ref_vars}{$class}};
-                        }
-                    }
-                }
-
                 redo;
             }
 
@@ -3471,7 +3488,7 @@ package Sidef::Parser {
                             $methods = $self->parse_methods(code => $opt{code});
                         }
                         else {
-                            my $code = substr($_, pos);
+                            my $code   = substr($_, pos);
                             my $dot_op = $code =~ /^\./;
                             if   ($dot_op) { $code = ". $code" }
                             else           { $code = ".$code" }
@@ -3495,7 +3512,7 @@ package Sidef::Parser {
                     }
                     elsif (/\G(if|while|and|or)\b\h*/gc) {
                         my $keyword = $1;
-                        my $obj = $self->parse_obj(code => $opt{code});
+                        my $obj     = $self->parse_obj(code => $opt{code});
                         push @{$struct{$self->{class}}[-1]{call}}, {keyword => $keyword, arg => [$obj]};
                         redo;
                     }

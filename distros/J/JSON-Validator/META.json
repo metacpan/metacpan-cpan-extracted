@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -30,7 +34,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.28"
+            "Mojolicious" : "7.28",
+            "perl" : "5.010001"
          }
       },
       "test" : {
@@ -42,15 +47,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/jhthorsen/json-validator/issues"
+         "web" : "https://github.com/mojolicious/json-validator/issues"
       },
-      "homepage" : "https://github.com/jhthorsen/json-validator",
+      "homepage" : "https://mojolicious.org",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/jhthorsen/json-validator.git",
-         "web" : "https://github.com/jhthorsen/json-validator"
-      }
+         "url" : "https://github.com/mojolicious/json-validator.git",
+         "web" : "https://github.com/mojolicious/json-validator"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "2.19",
+   "version" : "3.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

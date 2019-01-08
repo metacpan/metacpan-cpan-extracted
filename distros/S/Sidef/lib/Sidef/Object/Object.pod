@@ -18,10 +18,9 @@ var obj = Object(...)
 
 Inherits methods from:
 
-	* Sidef::Object::Convert
+       * Sidef::Object::Convert
 
 =head1 METHODS
-
 
 =head2 !~
 
@@ -34,6 +33,14 @@ Return the
 =head2 &&
 
 I<Obj> B<&&> I<Obj> -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 :
+
+I<Obj> B<:> I<Obj> -> I<Obj>
 
 Return the
 
@@ -228,6 +235,14 @@ Aliases: I<println>
 =head2 undef_method
 
 Object.undef_method() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 |>
+
+I<Obj> B<|E<gt>> I<Obj> -> I<Obj>
 
 Return the
 

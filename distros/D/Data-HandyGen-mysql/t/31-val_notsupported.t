@@ -14,11 +14,8 @@ use Data::HandyGen::mysql;
 main();
 exit(0);
 
-
-# 
-
 sub main {
-    
+
     my $mysqld = Test::mysqld->new( my_cnf => { 'skip-networking' => '' } )
         or plan skip_all => $Test::mysqld::errstr;
 
@@ -30,26 +27,41 @@ sub main {
     $dbh->do(q{
         CREATE TABLE test_notsupported (
             id integer primary key auto_increment,
-            value set('foo', 'bar') not null
+            value1 set('foo', 'bar') not null,
+            value2 set('magu', 'nanase') null
         )
     });
 
     my $hd = Data::HandyGen::mysql->new(dbh => $dbh);
 
-    my ($id, $row);
-    SKIP: {
-        eval { use Test::Warn };
-        skip 'Test::Warn is not installed.', 1 if $@;
+    subtest 'Not supported type' => sub {
+        subtest 'Not nullable' => sub {
+            subtest 'Does not have a value' => sub {
+                throws_ok { $hd->insert('test_notsupported', { value2 => 'magu' }) }
+                    qr/^Type set for value1 is not supported./;
+            };
 
-        warnings_exist { $id = $hd->insert('test_notsupported', {}) }
-            qr/^Type set for value is not supported./;
-    }
-    $row = $dbh->selectrow_hashref(q{SELECT * FROM test_notsupported WHERE id = ?}, undef, $id);
-    is($row->{value}, '');    
+            subtest 'Have a value' => sub {
+                my $id = $hd->insert('test_notsupported', { value1 => 'foo', value2 => 'nanase' });
+                my $row = $dbh->selectrow_hashref(q{SELECT * FROM test_notsupported WHERE id = ?}, undef, $id);
+                is($row->{value1}, 'foo');
+            };
+        };
 
-    $id = $hd->insert('test_notsupported', { value => 'bar' });
-    $row = $dbh->selectrow_hashref(q{SELECT * FROM test_notsupported WHERE id = ?}, undef, $id);
-    is($row->{value}, 'bar');    
+        subtest 'Nullable' => sub {
+            subtest 'Does not have a value' => sub {
+                my $id = $hd->insert('test_notsupported', { value1 => 'bar' });
+                my $row = $dbh->selectrow_hashref(q{SELECT * FROM test_notsupported WHERE id = ?}, undef, $id);
+                is($row->{value2}, undef);
+            };
+
+            subtest 'Have a value' => sub {
+                my $id = $hd->insert('test_notsupported', { value1 => 'bar', value2 => 'nanase' });
+                my $row = $dbh->selectrow_hashref(q{SELECT * FROM test_notsupported WHERE id = ?}, undef, $id);
+                is($row->{value2}, 'nanase');
+            };
+        };
+    };
 
     $dbh->disconnect();
 

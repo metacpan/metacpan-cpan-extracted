@@ -40,7 +40,7 @@ package Sidef::Types::Set::Bag {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            exists($addr{$refaddr})
+            CORE::exists($addr{$refaddr})
               && return $addr{$refaddr};
 
             my @bag;
@@ -84,6 +84,10 @@ package Sidef::Types::Set::Bag {
     sub union {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
+
         my %C = map { $_ => {%{$A->{$_}}} } CORE::keys(%$A);
 
         foreach my $key (CORE::keys(%$B)) {
@@ -109,6 +113,10 @@ package Sidef::Types::Set::Bag {
 
     sub intersection {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
 
         my %C;
 
@@ -136,6 +144,10 @@ package Sidef::Types::Set::Bag {
     sub difference {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
+
         my %C;
 
         foreach my $key (CORE::keys(%$A)) {
@@ -162,10 +174,15 @@ package Sidef::Types::Set::Bag {
         bless \%C, ref($A);
     }
 
+    *sub  = \&difference;
     *diff = \&difference;
 
     sub symmetric_difference {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
 
         my %C;
 
@@ -495,7 +512,7 @@ package Sidef::Types::Set::Bag {
         my ($self, $n) = @_;
 
         my @sorted = sort { $b->{count} <=> $a->{count} } CORE::values(%$self);
-        my @top = splice(@sorted, 0, CORE::int($n));
+        my @top    = splice(@sorted, 0, CORE::int($n));
 
         Sidef::Types::Array::Array->new(
             map {
@@ -620,8 +637,20 @@ package Sidef::Types::Set::Bag {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *haskey   = \&has;
+    *has_key  = \&has;
+    *exists   = \&has;
+    *include  = \&has;
+    *includes = \&has;
+    *contain  = \&has;
+    *contains = \&has;
+
     sub is_subset {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
 
         foreach my $key (CORE::keys(%$A)) {
             if (!CORE::exists($B->{$key}) or $B->{$key}{count} < $A->{$key}{count}) {
@@ -632,10 +661,12 @@ package Sidef::Types::Set::Bag {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    *contained_in = \&is_subset;
-
     sub is_superset {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_bag;
+        }
 
         foreach my $key (CORE::keys(%$B)) {
             if (!CORE::exists($A->{$key}) or $A->{$key}{count} < $B->{$key}{count}) {
@@ -645,11 +676,6 @@ package Sidef::Types::Set::Bag {
 
         return Sidef::Types::Bool::Bool::TRUE;
     }
-
-    *include  = \&is_superset;
-    *includes = \&is_superset;
-    *contain  = \&is_superset;
-    *contains = \&is_superset;
 
     sub contains_all {
         my ($self, @objects) = @_;
@@ -778,7 +804,7 @@ package Sidef::Types::Set::Bag {
 
             my $refaddr = Scalar::Util::refaddr($obj);
 
-            exists($addr{$refaddr})
+            CORE::exists($addr{$refaddr})
               and return $addr{$refaddr};
 
             my @values = CORE::values(%$obj);
@@ -786,7 +812,7 @@ package Sidef::Types::Set::Bag {
             $addr{$refaddr} = "Bag(#`($refaddr)...)";
 
             my ($s, $v);
-            "Bag(" . join(
+            "Bag(" . CORE::join(
                 ', ',
                 map {
                     ((ref($v = $_->{value}) && ($s = UNIVERSAL::can($v, 'dump'))) ? $s->($v) : ($v // 'nil')) x $_->{count}
@@ -807,23 +833,23 @@ package Sidef::Types::Set::Bag {
         no strict 'refs';
 
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
-        *{__PACKAGE__ . '::' . '∪'} = \&union;
+        *{__PACKAGE__ . '::' . '∪'}   = \&union;
         *{__PACKAGE__ . '::' . '|'}   = \&union;
         *{__PACKAGE__ . '::' . '&'}   = \&intersection;
-        *{__PACKAGE__ . '::' . '∩'} = \&intersection;
+        *{__PACKAGE__ . '::' . '∩'}   = \&intersection;
         *{__PACKAGE__ . '::' . '-'}   = \&difference;
-        *{__PACKAGE__ . '::' . '∖'} = \&difference;
+        *{__PACKAGE__ . '::' . '∖'}   = \&difference;
         *{__PACKAGE__ . '::' . '^'}   = \&symmetric_difference;
         *{__PACKAGE__ . '::' . '<='}  = \&is_subset;
-        *{__PACKAGE__ . '::' . '≤'} = \&is_subset;
+        *{__PACKAGE__ . '::' . '≤'}   = \&is_subset;
         *{__PACKAGE__ . '::' . '>='}  = \&is_superset;
-        *{__PACKAGE__ . '::' . '≥'} = \&is_superset;
-        *{__PACKAGE__ . '::' . '⊆'} = \&is_subset;
-        *{__PACKAGE__ . '::' . '⊇'} = \&is_superset;
+        *{__PACKAGE__ . '::' . '≥'}   = \&is_superset;
+        *{__PACKAGE__ . '::' . '⊆'}   = \&is_subset;
+        *{__PACKAGE__ . '::' . '⊇'}   = \&is_superset;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
-        *{__PACKAGE__ . '::' . '≡'} = \&eq;
+        *{__PACKAGE__ . '::' . '≡'}   = \&eq;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
     }

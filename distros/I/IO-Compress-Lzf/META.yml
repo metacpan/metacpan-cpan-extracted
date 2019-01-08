@@ -21,7 +21,7 @@ no_index:
     - private
 requires:
   Compress::LZF: '0'
-  IO::Compress::Base: '2.083'
-  IO::Uncompress::Base: '2.083'
-version: '2.083'
+  IO::Compress::Base: '2.084'
+  IO::Uncompress::Base: '2.084'
+version: '2.084'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

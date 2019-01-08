@@ -16,9 +16,9 @@ use DBI ();
 sub initMethod : Init(1) {
     my $self = shift;
 
-    eval { require DBI };
+    eval {require DBI};
     if ($@) {
-        $self->skipAllTests('DBI nicht installiert');
+        $self->skipAllTests('DBI not installed');
         return;
     }
     $self->ok(1);

@@ -1,5 +1,5 @@
 package HackaMol::Roles::ReadPdbxRole;
-$HackaMol::Roles::ReadPdbxRole::VERSION = '0.050';
+$HackaMol::Roles::ReadPdbxRole::VERSION = '0.051';
 # ABSTRACT: parse PDBx/mmCIF files
 use Moose::Role;
 use HackaMol::PeriodicTable qw(_element_name _trim _qstring_num);
@@ -272,7 +272,7 @@ sub read_cif_info {
             else {
                 while (my $line = <$fh>){
                     last if $line =~ /^#/;
-                    if ($line =~ /_exptl\.method\s+(?:\'(.+)\')?/) {
+                    if ($line =~ /^_exptl\.method\s+(?:\'(.+)\')?/) {
                         die "unable to parse exp_method" unless($1);
                         $info->{exp_method} = $1;
                         last;
@@ -281,18 +281,18 @@ sub read_cif_info {
                 }
             }
         }
-        if (/_refine_hist\.d_res_high\s+(\d+\.\d+)/) {
+        if (/^_refine_hist\.d_res_high\s+(\d+\.\d+)/) {
             $info->{resolution} = sprintf("%s",$1);
         }
-        if (/_em_3d_reconstruction.resolution\s+(\d+\.\d+)/) {
+        if (/^_em_3d_reconstruction.resolution\s+(\d+\.\d+)/) {
             $info->{resolution} = $1;
         }
-        if (/_citation.pdbx_database_id_DOI\s+(\S+)/) {
+        if (/^_citation.pdbx_database_id_DOI\s+(\S+)/) {
             $info->{doi} = $1;
         }
-        if (/_atom_site.group_PDB/){
-            $atom_site_position = $.;
-            $info->{fh_position_atom_site} = $atom_site_position;
+        if (/^_atom_site.group_PDB/){
+            $atom_site_position = $. - 2 ;
+            $info->{fh_position_atom_site} = $atom_site_position ;
         }
     }
    
@@ -335,6 +335,82 @@ sub read_cif_atoms {
     wantarray ? return @sets : return $sets[0];
 }
 
+my %line_parser_dp = (
+    'def' => sub {
+        my (
+            $record_name, $serial,       $element,      $name,
+            $altloc,      $res_name,     $chain_id,     $entity_id,
+            $res_id,      $icod,         $x,            $y,
+            $z,           $occ,          $B,            $charge,
+            $auth_seq_id, $auth_comp_id, $auth_asym_id, $auth_atom_id,
+            $model_num
+        ) = split;
+
+        $element = ucfirst( lc($element) );
+        my $xyz = V( $x, $y, $z );
+
+        my $atom = HackaMol::Atom->new(
+            name         => $name,
+            record_name  => $record_name,
+            serial       => $serial,
+            chain        => $chain_id,
+            symbol       => $element,
+            coords       => [$xyz],
+            occ          => $occ * 1,
+            bfact        => $B * 1,
+            resname      => $res_name,
+            resid        => $res_id,
+            auth_seq_id  => $auth_seq_id,
+            auth_comp_id => $auth_comp_id,
+            auth_asym_id => $auth_asym_id,
+            auth_atom_id => $auth_atom_id,
+            entity_id    => $entity_id,
+            model_num    => $model_num,
+        );
+        $atom->altloc($altloc) if ( $altloc ne '.' );
+        $atom->icode($icod)    if ( $icod ne '?' );
+        return ($atom, $model_num);
+    },
+    'esd' => sub {
+        my (
+            $record_name, $serial,       $element,      $name,
+            $altloc,      $res_name,     $chain_id,     $entity_id,
+            $res_id,      $icod,         $x,            $y,
+            $z,           $occ,          $B, 
+            undef, undef, undef, undef, undef, # ignor esd for now
+            $charge,
+            $auth_seq_id, $auth_comp_id, $auth_asym_id, $auth_atom_id,
+            $model_num
+        ) = split;
+
+        $element = ucfirst( lc($element) );
+        my $xyz = V( $x, $y, $z );
+
+        my $atom = HackaMol::Atom->new(
+            name         => $name,
+            record_name  => $record_name,
+            serial       => $serial,
+            chain        => $chain_id,
+            symbol       => $element,
+            coords       => [$xyz],
+            occ          => $occ * 1,
+            bfact        => $B * 1,
+            resname      => $res_name,
+            resid        => $res_id,
+            auth_seq_id  => $auth_seq_id,
+            auth_comp_id => $auth_comp_id,
+            auth_asym_id => $auth_asym_id,
+            auth_atom_id => $auth_atom_id,
+            entity_id    => $entity_id,
+            model_num    => $model_num,
+        );
+        $atom->altloc($altloc) if ( $altloc ne '.' );
+        $atom->icode($icod)    if ( $icod ne '?' );
+        return ($atom, $model_num);
+    },
+
+);
+
 sub _read_cif_atoms {
 
     # read pdb file and generate list of Atom objects
@@ -344,70 +420,62 @@ sub _read_cif_atoms {
     my @atoms;
     my %track_models;
 
+    my @expected_labels = (
+        "_atom_site.group_PDB",#            (record_name)   _atom_site.group_PDB           
+        "_atom_site.id",#                   (serial)        _atom_site.id                 
+        "_atom_site.type_symbol",#          (element)       _atom_site.type_symbol        
+        "_atom_site.label_atom_id",#        (name)          _atom_site.label_atom_id      
+        "_atom_site.label_alt_id",#         (altloc)        _atom_site.label_alt_id       
+        "_atom_site.label_comp_id",#        (res_name)      _atom_site.label_comp_id      
+        "_atom_site.label_asym_id",#        (chain_id)      _atom_site.label_asym_id      
+        "_atom_site.label_entity_id",#      (entity_id)     _atom_site.label_entity_id    
+        "_atom_site.label_seq_id",#         (res_id)        _atom_site.label_seq_id      
+        "_atom_site.pdbx_PDB_ins_code",#    (icod)          _atom_site.pdbx_PDB_ins_code  
+        "_atom_site.Cartn_x",#              (x)             _atom_site.Cartn_x            
+        "_atom_site.Cartn_y",#              (y)             _atom_site.Cartn_y            
+        "_atom_site.Cartn_z",#              (z)             _atom_site.Cartn_z            
+        "_atom_site.occupancy",#            (occ)           _atom_site.occupancy          
+        "_atom_site.B_iso_or_equiv",#       (B)             _atom_site.B_iso_or_equiv     
+        "_atom_site.pdbx_formal_charge",#   (charge)       #_atom_site.Cartn_x_esd            #       
+        "_atom_site.auth_seq_id",#          (auth_seq_id)  #_atom_site.Cartn_y_esd            #
+        "_atom_site.auth_comp_id",#         (auth_comp_id) #_atom_site.Cartn_z_esd            #
+        "_atom_site.auth_asym_id",#         (auth_asym_id) #_atom_site.occupancy_esd          #
+        "_atom_site.auth_atom_id",#         (auth_atom_id) #_atom_site.B_iso_or_equiv_esd     #
+        "_atom_site.pdbx_PDB_model_num",#   (model_num)    #_atom_site.pdbx_formal_charge 
+                                                           #_atom_site.auth_seq_id        
+    );                                                     #_atom_site.auth_comp_id       
+                                                           #_atom_site.auth_asym_id       
+                                                           #_atom_site.auth_atom_id       
+                                                           #_atom_site.pdbx_PDB_model_num 
+                                 
+    # look for the labels to determine order of attrs
+    my $site_type = 'def'; # 'esd' 
+    LABEL: while (<$fh>){
+        if (/^_atom_site.Cartn_x_esd/){
+            $site_type = 'esd';
+            last;
+        }
+        last if (/^_atom_site.pdbx_PDB_model_num/);
+
+        if (/^_atom_site.group_PDB/){
+            my $i = 1;
+            while (my $line = <$fh>){
+                die "labels out of order $. $line $expected_labels[$i]" unless $line =~ /$expected_labels[$i]\s?/;
+                last if ($line =~ /^_atom_site.B_iso_or_equiv/);
+                $i++;
+            }
+        }
+    }
+
     while (<$fh>) {
         if ( $self->has_readline_func ) {
             next if $self->readline_func->($_) eq 'PDB_SKIP';
         }
 
-# assuming order of columns, e.g.
-#loop_
-#_atom_site.group_PDB            (record_name)
-#_atom_site.id                   (serial)
-#_atom_site.type_symbol          (element)
-#_atom_site.label_atom_id        (name)
-#_atom_site.label_alt_id         (altloc)
-#_atom_site.label_comp_id        (res_name)
-#_atom_site.label_asym_id        (chain_id)
-#_atom_site.label_entity_id      (entity_id)
-#_atom_site.label_seq_id         (res_id)
-#_atom_site.pdbx_PDB_ins_code    (icod)
-#_atom_site.Cartn_x              (x)
-#_atom_site.Cartn_y              (y)
-#_atom_site.Cartn_z              (z)
-#_atom_site.occupancy            (occ)
-#_atom_site.B_iso_or_equiv       (B)
-#_atom_site.pdbx_formal_charge   (charge)
-#_atom_site.auth_seq_id          (auth_seq_id)
-#_atom_site.auth_comp_id         (auth_comp_id)
-#_atom_site.auth_asym_id         (auth_asym_id)
-#_atom_site.auth_atom_id         (auth_atom_id)
-#_atom_site.pdbx_PDB_model_num   (model_num)
-#ATOM 1       N N   . PRO A   1 1   ? 393.230 1016.300 385.017 1.0 0.00 ? 1   PRO g8 N   1
-        if (/^(?:HETATM|ATOM)/) {
-            my (
-                $record_name, $serial,       $element,      $name,
-                $altloc,      $res_name,     $chain_id,     $entity_id,
-                $res_id,      $icod,         $x,            $y,
-                $z,           $occ,          $B,            $charge,
-                $auth_seq_id, $auth_comp_id, $auth_asym_id, $auth_atom_id,
-                $model_num
-            ) = split;
+        last if (/^#/); # this works in combination with order search above
 
-            # ignore charge for now...
-
-            $element = ucfirst( lc($element) );
-            my $xyz = V( $x, $y, $z );
-
-            my $atom = HackaMol::Atom->new(
-                name         => $name,
-                record_name  => $record_name,
-                serial       => $serial,
-                chain        => $chain_id,
-                symbol       => $element,
-                coords       => [$xyz],
-                occ          => $occ * 1,
-                bfact        => $B * 1,
-                resname      => $res_name,
-                resid        => $res_id,
-                auth_seq_id  => $auth_seq_id,
-                auth_comp_id => $auth_comp_id,
-                auth_asym_id => $auth_asym_id,
-                auth_atom_id => $auth_atom_id,
-                entity_id    => $entity_id,
-                model_num    => $model_num,
-            );
-            $atom->altloc($altloc) if ( $altloc ne '.' );
-            $atom->icode($icod)    if ( $icod ne '?' );
+        if (/^(?:HETATM|ATOM)\s/) {
+            my ($atom, $model_num) = $line_parser_dp{$site_type}->($_); 
             $track_models{$model_num}++;
             push @atoms, $atom;
         }
@@ -437,7 +505,7 @@ HackaMol::Roles::ReadPdbxRole - parse PDBx/mmCIF files
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 SYNOPSIS
 

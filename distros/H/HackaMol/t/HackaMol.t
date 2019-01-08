@@ -138,7 +138,30 @@ my $benz = $hack->read_string_mol($benzene,'xyz');
 is($benz->count_atoms, 12, '12 atoms read in using a string!' );
 
 my $viral_3j3q_cif =
-'ATOM 5385    N N   . VAL C   1 230 ? 324.140 958.751  380.503 1.0 0.00 ? 230 VAL ga N   1
+'
+_loop
+_atom_site.group_PDB 
+_atom_site.id 
+_atom_site.type_symbol 
+_atom_site.label_atom_id 
+_atom_site.label_alt_id 
+_atom_site.label_comp_id 
+_atom_site.label_asym_id 
+_atom_site.label_entity_id 
+_atom_site.label_seq_id 
+_atom_site.pdbx_PDB_ins_code 
+_atom_site.Cartn_x 
+_atom_site.Cartn_y 
+_atom_site.Cartn_z 
+_atom_site.occupancy 
+_atom_site.B_iso_or_equiv 
+_atom_site.pdbx_formal_charge 
+_atom_site.auth_seq_id 
+_atom_site.auth_comp_id 
+_atom_site.auth_asym_id 
+_atom_site.auth_atom_id 
+_atom_site.pdbx_PDB_model_num 
+ATOM 5385    N N   . VAL C   1 230 ? 324.140 958.751  380.503 1.0 0.00 ? 230 VAL ga N   1
 ATOM 5386    C CA  . VAL C   1 230 ? 325.000 959.272  379.469 1.0 0.00 ? 230 VAL ga CA  1
 ATOM 5387    C C   . VAL C   1 230 ? 324.380 959.228  378.117 1.0 0.00 ? 230 VAL ga C   1
 ATOM 5388    O O   . VAL C   1 230 ? 323.760 958.294  377.715 1.0 0.00 ? 230 VAL ga O   1
@@ -201,6 +224,7 @@ ATOM 5413    C CG1 . ILE D   1 2   ? 275.710 948.961  347.008 1.0 0.00 ? 2   ILE
 ATOM 5414    C CG2 . ILE D   1 2   ? 276.010 951.525  346.925 1.0 0.00 ? 2   ILE gb CG2 2
 ATOM 5415    C CD1 . ILE D   1 2   ? 275.950 948.634  345.500 1.0 0.00 ? 2   ILE gb CD1 2';
 
+print "DMRok\n";
 my $viral_chunk = $hack->read_string_mol($viral_3j3q_cif,'cif');
 is($viral_chunk->count_atoms, 31, '12 atoms read in viral_chunk a string!' );
 is($viral_chunk->get_atoms(30)->entity_id, 1, 'entity_id');

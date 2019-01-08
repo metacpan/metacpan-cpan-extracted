@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Ohlc::Line;
 use Chart::Plotly::Trace::Ohlc::Stream;
 use Chart::Plotly::Trace::Ohlc::Transform;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The ohlc (short for Open-High-Low-Close) is a style of financial chart describing open, high, low and close for a given `x` coordinate (most likely time). The tip of the lines represent the `low` and `high` values and the horizontal segments represent the `open` and `close` values. Sample points where the close value is higher (lower) then the open value are called increasing (decreasing). By default, increasing items are drawn in green whereas decreasing are drawn in red.
 
@@ -82,7 +82,7 @@ has highsrc => ( is            => "rw",
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -248,7 +248,7 @@ Chart::Plotly::Trace::Ohlc - The ohlc (short for Open-High-Low-Close) is a style
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

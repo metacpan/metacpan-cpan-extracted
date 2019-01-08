@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Scatterpolar::Textfont;
 use Chart::Plotly::Trace::Scatterpolar::Transform;
 use Chart::Plotly::Trace::Scatterpolar::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The scatterpolar trace type encompasses line charts, scatter charts, text charts, and bubble charts in polar coordinates. The data visualized as scatter point or lines is set in `r` (radial) and `theta` (angular) coordinates Text (appearing either on the chart or on hover only) is via `text`. Bubble charts are achieved by setting `marker.size` and/or `marker.color` to numerical arrays.
 
@@ -100,7 +100,7 @@ has fillcolor => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -114,7 +114,8 @@ has hoverlabel => ( is  => "rw",
                     isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scatterpolar::Hoverlabel", );
 
 has hoveron => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Do the hover effects highlight individual points (markers or line points) or do they highlight filled regions? If the fill is *toself* or *tonext* and there are no markers or text, then the default is *fills*, otherwise it is *points*.",
 );
@@ -157,7 +158,8 @@ has marker => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Scatterpolar::Marker", );
 
 has mode => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Determines the drawing mode for this scatter trace. If the provided `mode` includes *text* then the `text` elements appear at the coordinates. Otherwise, the `text` elements appear on hover. If there are less than 20 points and the trace is not stacked then the default is *lines+markers*. Otherwise, *lines*.",
 );
@@ -316,7 +318,7 @@ Chart::Plotly::Trace::Scatterpolar - The scatterpolar trace type encompasses lin
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

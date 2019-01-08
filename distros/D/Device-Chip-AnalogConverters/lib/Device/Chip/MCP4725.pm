@@ -9,9 +9,10 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
+use Future::AsyncAwait;
 
 use constant PROTOCOL => "I2C";
 
@@ -93,25 +94,23 @@ Returns a C<HASH> reference containing the chip's current configuration
 
 =cut
 
-sub read_config
+async sub read_config
 {
    my $self = shift;
 
-   $self->protocol->read( 5 )->then( sub {
-      my ( $bytes ) = @_;
-      my ( $status, $dac, $eeprom ) = unpack( "C S> S>", $bytes );
+   my $bytes = await $self->protocol->read( 5 );
+   my ( $status, $dac, $eeprom ) = unpack( "C S> S>", $bytes );
 
-      Future->done({
-         RDY => !!( $status & 0x80 ),
-         POR => !!( $status & 0x40 ),
-         PD  => $POWERDOWN_TO_NAME[ ( $status & 0x06 ) >> 1 ],
+   return {
+      RDY => !!( $status & 0x80 ),
+      POR => !!( $status & 0x40 ),
+      PD  => $POWERDOWN_TO_NAME[ ( $status & 0x06 ) >> 1 ],
 
-         DAC => $dac >> 4,
+      DAC => $dac >> 4,
 
-         EEPROM_PD  => $POWERDOWN_TO_NAME[ ( $eeprom & 0x6000 ) >> 13 ],
-         EEPROM_DAC => ( $eeprom & 0x0FFF ),
-      });
-   });
+      EEPROM_PD  => $POWERDOWN_TO_NAME[ ( $eeprom & 0x6000 ) >> 13 ],
+      EEPROM_DAC => ( $eeprom & 0x0FFF ),
+   };
 }
 
 =head1 METHODS

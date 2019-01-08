@@ -3,7 +3,7 @@ use Moose;
 use MooseX::ExtraArgs;
 use Moose::Util::TypeConstraints qw(enum union);
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 sub TO_JSON {
     my $self       = shift;
@@ -45,7 +45,7 @@ Chart::Plotly::Trace::Scattercarpet::Marker::Colorbar::Tickformatstops
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

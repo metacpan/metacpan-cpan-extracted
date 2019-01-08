@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =head1 SYNOPSIS
 
@@ -247,6 +247,9 @@ Additionally, each Math::AnyNum object is B<immutable>.
     bit_scan0(n,k)      index of the first 0-bit of n with index >= k
     bit_scan1(n,k)      index of the first 1-bit of n with index >= k
 
+    min(@list)          minimum value from a given list of numbers
+    max(@list)          maximum value from a given list of numbers
+
     sum(@list)          sum of a list of numbers
     prod(@list)         product of a list of numbers
 
@@ -257,6 +260,7 @@ Additionally, each Math::AnyNum object is B<immutable>.
     bsearch_ge(n,\&f)   binary search from 0 to n (greater than or equal to)
     bsearch_ge(a,b,\&f) binary search from a to b (greater than or equal to)
 
+    base(n,b)           string-representation of n in base b
     as_bin(n)           binary string-representation of n
     as_oct(n)           octal string-representation of n
     as_hex(n)           hexadecimal string-representation of n
@@ -794,7 +798,7 @@ Raises 2 to the power C<x>. (i.e.: C<2**x>)
 
 Raises 10 to the power C<x>. (i.e.: C<10**x>)
 
-=head2 ln / log
+=head2 ln | log
 
     ln(x)                                         #=> Float | Complex
     log(x)                                        #=> Float | Complex
@@ -804,7 +808,7 @@ Logarithm of C<x> to base C<y> (or base I<e> when C<y> is omitted).
 
 B<NOTE:> C<log(x, y)> is equivalent with C<log(x) / log(y)>.
 
-=head2 log2 / log10
+=head2 log2 | log10
 
     log2(x)                                       #=> Float | Complex
     log10(x)                                      #=> Float | Complex
@@ -1003,7 +1007,7 @@ The dilogarithm function, defined as the integral of C<-log(1-t)/t> from C<0> to
 
 =head1 TRIGONOMETRIC FUNCTIONS
 
-=head2 sin / sinh / asin / asinh
+=head2 sin | sinh | asin | asinh
 
     sin(x)                                        #=> Float | Complex
     sinh(x)                                       #=> Float | Complex
@@ -1012,7 +1016,7 @@ The dilogarithm function, defined as the integral of C<-log(1-t)/t> from C<0> to
 
 Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
 
-=head2 cos / cosh / acos / acosh
+=head2 cos | cosh | acos | acosh
 
     cos(x)                                        #=> Float | Complex
     cosh(x)                                       #=> Float | Complex
@@ -1021,7 +1025,7 @@ Sine, hyperbolic sine, inverse sine and inverse hyperbolic sine.
 
 Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
 
-=head2 tan / tanh / atan / atanh
+=head2 tan | tanh | atan | atanh
 
     tan(x)                                        #=> Float | Complex
     tanh(x)                                       #=> Float | Complex
@@ -1030,7 +1034,7 @@ Cosine, hyperbolic cosine, inverse cosine and inverse hyperbolic cosine.
 
 Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
 
-=head2 cot / coth / acot / acoth
+=head2 cot | coth | acot | acoth
 
     cot(x)                                        #=> Float | Complex
     coth(x)                                       #=> Float | Complex
@@ -1039,7 +1043,7 @@ Tangent, hyperbolic tangent, inverse tangent and inverse hyperbolic tangent.
 
 Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotangent.
 
-=head2 sec / sech / asec / asech
+=head2 sec | sech | asec | asech
 
     sec(x)                                        #=> Float | Complex
     sech(x)                                       #=> Float | Complex
@@ -1048,7 +1052,7 @@ Cotangent, hyperbolic cotangent, inverse cotangent and inverse hyperbolic cotang
 
 Secant, hyperbolic secant, inverse secant and inverse hyperbolic secant.
 
-=head2 csc / csch / acsc / acsch
+=head2 csc | csch | acsc | acsch
 
     csc(x)                                        #=> Float | Complex
     csch(x)                                       #=> Float | Complex
@@ -1089,7 +1093,7 @@ Example:
 
 All operations in this section are done with integers.
 
-=head2 iadd / isub / imul / idiv / ipow
+=head2 iadd | isub | imul | idiv | ipow
 
     iadd(x, y)                                    #=> Int | NaN
     isub(x, y)                                    #=> Int | NaN
@@ -1142,7 +1146,7 @@ Computes C<(x ** y) % z>, where all three values are integers.
 
 Returns NaN when the third argument is 0, or when C<y> is negative and C<gcd(x, z) != 1>.
 
-=head2 isqrt / icbrt
+=head2 isqrt | icbrt
 
     isqrt(n)                                      #=> Int | NaN
     icbrt(n)                                      #=> Int | NaN
@@ -1178,14 +1182,14 @@ The integer part of the logarithm of C<n> to base C<m> or base I<e> when C<m> is
 
 C<n> must be greater than 0 and C<m> must be greater than 1. Returns NaN otherwise.
 
-=head2 ilog2 / ilog10
+=head2 ilog2 | ilog10
 
     ilog2(n)                                      #=> Int | NaN
     ilog10(n)                                     #=> Int | NaN
 
 The integer part of the logarithm of C<n> to base C<2> or base C<10>, respectively.
 
-=head2 and / or / xor / not / lsft / rsft
+=head2 and | or | xor | not | lsft | rsft
 
     x & y                                         #=> Int
     x | y                                         #=> Int
@@ -1262,7 +1266,7 @@ Example:
 
     geometric_sum(5, 8) = 8^0 + 8^1 + 8^2 + 8^3 + 8^4 + 8^5 = 37449
 
-=head2 harmonic / harmfrac
+=head2 harmonic | harmfrac
 
     harmonic(n)                                   #=> Rat | NaN
 
@@ -1295,7 +1299,7 @@ Returns the n-th Bernoulli polynomial: C<B_n(x)>.
 
 Returns the n-th Euler polynomial: C<E_n(x)>.
 
-=head2 bernoulli / bernfrac
+=head2 bernoulli | bernfrac
 
     bernoulli(n)                                  #=> Rat | NaN
     bernoulli(n, x)                               #=> Any
@@ -1709,17 +1713,21 @@ Example:
 
 This section includes various useful methods.
 
-=head2 sum
+=head2 min | max
 
-    sum(@list)                                    #=>  Any
+    min(@list)                                    #=> Any
+    max(@list)                                    #=> Any
 
-Sum of a list of numbers.
+Smallest and greatest value, respectively, from a given list of numbers.
 
-=head2 prod
+Returns C<undef> if the list contains C<NaN> or if the list is empty.
 
+=head2 sum | prod
+
+    sum(@list)                                    #=> Any
     prod(@list)                                   #=> Any
 
-Product of a list of numbers.
+Sum and product of a given list of numbers.
 
 =head2 bsearch
 
@@ -1841,7 +1849,7 @@ Example:
     irand(10)        # a pseudorandom integer in the interval [0, 10]
     irand(10, 20)    # a pseudorandom integer in the interval [10, 20]
 
-=head2 seed / iseed
+=head2 seed | iseed
 
     seed(n)                                       #=> Int
     iseed(n)                                      #=> Int
@@ -1960,7 +1968,7 @@ Example:
     clearbit(0b1001, 0) = 0b1000
     clearbit(0b1100, 2) = 0b1000
 
-=head2 bit_scan0 / bit_scan1
+=head2 bit_scan0 | bit_scan1
 
     bit_scan0(n, k)                               #=> Scalar
     bit_scan1(n, k)                               #=> Scalar
@@ -2183,6 +2191,24 @@ If C<x> is an integer that fits inside a native signed or unsigned integer, the 
 otherwise the result is returned as a double, with possible truncation.
 
 If C<x> is a complex number, only the real part is considered.
+
+=head2 base
+
+    base(n, b)                                    #=> Scalar
+
+Returns a string-representation of C<n> in a given base C<b> (between 2 and 62), where C<n> can be any type of number, including a floating-point or a complex number.
+
+Example:
+
+    base(42, 2)         = "101010"
+    base(17.5, 36)      = "h.i"
+    base("99/43", 16)   = "63/2b"
+    base("17.5+5i", 36) = "(h.i 5)"
+
+The output of this function can be passed to I<new()>, along with the base-number, which converts it back to the original number:
+
+    say Math::AnyNum->new("101010", 2);    #=> 42
+    say Math::AnyNum->new("h.i", 36);      #=> 17.5
 
 =head2 as_bin
 
@@ -2590,7 +2616,7 @@ L<Math::GComplex> - Generic library for complex number operations, with support 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Daniel Șuteu.
+Copyright 2017-2019 Daniel Șuteu.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

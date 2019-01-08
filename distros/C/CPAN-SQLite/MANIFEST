@@ -23,10 +23,11 @@ t/04search_everything.t
 t/05meta_new.t
 t/05meta_update.t
 t/06retrieve.t
+t/07download.t
 t/cpan/authors/01mailrc.txt.gz
 t/cpan/modules/02packages.details.txt.gz
-t/cpan/modules/03modlist.data.gz
 t/dot-cpan/CPAN/TestConfig.pm
 t/lib/TestShell.pm
+t/lib/TestShellDiag.pm
 t/lib/TestSQL.pm
 t/testrules.yml

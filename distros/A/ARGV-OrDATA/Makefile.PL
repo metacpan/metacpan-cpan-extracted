@@ -25,4 +25,7 @@ WriteMakefile(
     macro => { TARFLAGS => '--format=ustar -cvf' },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'ARGV-OrDATA-*' },
+    META_MERGE => {
+        resources => { repository => 'https://github.com/choroba/argv-ordata' },
+    },
 );

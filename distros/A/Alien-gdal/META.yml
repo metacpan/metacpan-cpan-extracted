@@ -9,8 +9,13 @@ build_requires:
   Alien::MSYS: '0.07'
   Alien::geos::af: '1.005'
   Alien::patch: '0'
+  Alien::proj: '1.02'
+  Alien::spatialite: '1.03'
+  Alien::sqlite: '1.02'
   Archive::Tar: '0'
+  Env::ShellWords: '0.01'
   ExtUtils::MakeMaker: '6.52'
+  FFI::CheckLib: '0.23'
   File::Find::Rule: '0'
   HTML::LinkExtor: '0'
   HTTP::Tiny: '0.044'
@@ -24,10 +29,15 @@ build_requires:
 configure_requires:
   Alien::Build: '1.41'
   Alien::Build::MM: '1.41'
+  Alien::Build::Plugin::Build::SearchDep: '0.53'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
   Alien::geos::af: '1.005'
   Alien::patch: '0'
+  Alien::proj: '1.02'
+  Alien::spatialite: '1.03'
+  Alien::sqlite: '1.02'
   ExtUtils::MakeMaker: '6.52'
+  FFI::CheckLib: '0.23'
   File::Find::Rule: '0'
   HTTP::Tiny: '0.044'
   PkgConfig: '0'
@@ -50,13 +60,18 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-gdal/issues/
   repository: https://github.com/shawnlaffan/perl-alien-gdal
-version: '1.13'
+version: '1.14'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 1.49'
   requires:
     share:
       Alien::MSYS: '0.07'
+      Alien::geos::af: '0'
+      Alien::proj: '0'
+      Alien::spatialite: '0'
+      Alien::sqlite: '0'
       Archive::Tar: '0'
+      Env::ShellWords: '0.01'
       HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Zlib: '0'

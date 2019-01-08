@@ -1,14 +1,17 @@
 
-# $Id: Makefile.PL,v 1.27 2009-07-04 14:54:22 Martin Exp $
+use warnings;
+use strict;
+
+my $VERSION = 1.28;
 
 use inc::Module::Install;
 
+version(0.417);
 all_from('lib/RDF/Simple.pm');
 author('Martin Thurn mthurn@cpan.org');
-version(0.415);
 perl_version(5.005);
 
-requires('Class::MakeMethods');
+requires('Class::MethodMaker');
 requires('File::Slurp');
 test_requires('IO::CaptureOutput');
 requires('LWP::UserAgent');
@@ -18,8 +21,6 @@ test_requires('Test::Simple');
 requires('URI::Escape');
 requires('XML::SAX');
 recommends('XML::SAX::Expat');  # Need this for Solaris and Linux?
-
-WriteAll;
 
 sub MY::postamble
   {
@@ -34,5 +35,34 @@ coverage :
 PART0
   return $ret;
   } # MY::postamble
+
+use Env;
+if ($ENV{MTHURN_PERL_DEV})
+  {
+  warn "DDD This is author's development environment\n";
+  use_ptar();
+  } # if
+
+WriteAll;
+
+if ($ENV{MTHURN_PERL_DEV})
+  {
+  my $sFnameMakefile = q{Makefile};
+  eval "use File::Slurp";
+  my $s = read_file($sFnameMakefile);
+  if ($s !~ s/(DIRFILESEP\s*=\s*).+$/$1\//m)
+    {
+    warn " EEE did not find DIRFILESEP in Makefile\n";
+    } # if
+  if ($s !~ s/(pm_to_blib\()\{\{\@ARGV}}/$1 . '{@ARGV}'/e)
+    {
+    warn " EEE did not find pm_to_blib@ARGV in Makefile\n";
+    } # if
+  if ($s !~ s/(from_to\s+=>\s+)\{\{\@ARGV}}/$1 . '{@ARGV}'/e)
+    {
+    warn " EEE did not find from_to@ARGV in Makefile\n";
+    } # if
+  write_file($sFnameMakefile, $s);
+  } # if
 
 __END__

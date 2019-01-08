@@ -7,7 +7,7 @@ It consists of:
 RDF::Simple::Parser
 RDF::Simple::Serialiser
     
-The parser requires XML::SAX,
+The parser requires XML::SAX and likes to have XML::SAX::Expat.
 
 The aim here is to keep things Simple.
 The parser does not differentiate between literal and resource values in the model.
@@ -15,8 +15,9 @@ All you get back is a bucket-o-triples (array of arrays).
 The serialiser does its best to do DWYM.
 
 If you get error messages like "Unable to provide required features",
-that means XML::SAX is not installed properly.
-Use CPAN or CPANPLUS to install XML::SAX,
-or on a Unix system you can try to do something like this (adjust for your perl version / location):
+that means XML::SAX and/or XML::SAX::Expat is/are not installed properly.
+Use CPAN or CPANPLUS to install XML::SAX and XML::SAX::Expat;
+or on a Unix system,
+you can try to do something like this (adjust for your perl version / location):
 
 ln -s /usr/lib/perl/XML/SAX/ParserDetails.ini /usr/local/lib/perl/site/5.10.0/XML/SAX/ParserDetails.ini

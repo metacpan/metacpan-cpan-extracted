@@ -30,6 +30,12 @@ expect_error('/home/user/foo.thirty_nine_is_the_limit_for_files_onVMS', 'vms_len
 expect_error('/home/user/dos_eight.txt', 'dos_length');
 expect_error('/home/user/dos_eight.txtx', 'dos_length');
 
+expect_error('/home/user/con', 'windows_reserved');
+expect_error('/home/user/com1.txt', 'windows_reserved');
+expect_error('/home/user/prn.dat.zip', 'windows_reserved');
+
+expect_error('/home/user/CONTRIB', undef);
+
 # symlink and dir_noext tests actually use the file system, so they can only
 # be tested on certain systems
 my $tempdir;

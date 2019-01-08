@@ -1,3 +1,73 @@
+1.302156  2019-01-07 11:13:07-08:00 America/Los_Angeles
+
+    - No changes from last trial
+
+1.302155  2019-01-04 11:25:17-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix test not to fail in non-english locales
+
+1.302154  2019-01-04 10:20:54-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix SHM pid checking for some platforms in Instance.t
+    - Add SHM errno/msg to warning about SHM going away
+
+1.302153  2019-01-03 08:39:42-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Improve SHM verification and state awareness
+
+1.302152  2018-12-26 12:21:32-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - More Instance.t improvements
+    - Add trace to SHM error when possible
+
+1.302151  2018-12-20 11:05:47-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix another locale error in Instance.t
+
+1.302150  2018-12-20 10:57:09-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix locale error in Instance.t
+    - Windows test fixes
+    - perl 5.6 test fixes
+
+1.302149  2018-12-20 09:47:31-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Even more SHM error improvements
+
+1.302148  2018-12-17 13:08:23-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Further Improve SHM error message
+
+1.302147  2018-12-17 12:59:14-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Improve SHM error message
+
+1.302146  2018-12-17 09:06:44-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix SHM test to work on machines without SHM
+
+1.302145  2018-12-12 11:26:32-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix localization error in new test (#820)
+
+1.302144  2018-12-12 09:51:25-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Add tests for shmwrite fix (#815)
+
+1.302143  2018-12-11 19:10:37-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix failure to check error code on shmwrite (#815)
+
+1.302142  2018-12-11 11:55:22-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix #814 Windows fork+test failure
+    - Fix #819 Documentation updates
+    - Fix #810 Verbose TAP newline regression
+    - Fix #817 local $TODO bug
+    - Fix #812 Another local $TODO bug
+    - Fix #815 shm read warning
+    - Merge doc fix PR's from magnolia-k (thanks!)
+
 1.302141  2018-11-30 14:27:19-08:00 America/Los_Angeles
 
     - Fix bug where IPC init failed in preload+fork environments

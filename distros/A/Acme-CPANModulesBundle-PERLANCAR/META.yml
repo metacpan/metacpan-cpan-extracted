@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModulesBundle-PERLANCAR
   homepage: https://metacpan.org/release/Acme-CPANModulesBundle-PERLANCAR
   repository: git://github.com/perlancar/perl-Acme-CPANModulesBundle-PERLANCAR.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -112,7 +112,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -335,7 +335,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

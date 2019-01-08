@@ -407,7 +407,7 @@ STATIC int setnodelay _((pTHX_ PerlIO * file, int mode));
 
 STATIC int selectfile _((pTHX_ PerlIO * file, double delay));
 
-STATIC int Win32PeekChar _((pTHX_ PerlIO * file, U32 delay, char * key));
+STATIC int Win32PeekChar _((pTHX_ PerlIO * file, double delay, char * key));
 
 STATIC int getspeed _((pTHX_ PerlIO * file, I32 *in, I32 * out ));
 
@@ -1574,7 +1574,7 @@ typedef struct {
              goto again;                \
     } while (0)
 
-int Win32PeekChar(pTHX_ PerlIO *file,U32 delay,char *key)
+int Win32PeekChar(pTHX_ PerlIO *file,double delay,char *key)
 {
 	int handle;
 	HANDLE whnd;
@@ -1710,7 +1710,7 @@ again:
 
 } 
 #else
-int Win32PeekChar(pTHX_ PerlIO *file, U32 delay,char *key)
+int Win32PeekChar(pTHX_ PerlIO *file, double delay,char *key)
 {
 	croak("Win32PeekChar is not supported on this architecture");
 	return 0;
@@ -1799,7 +1799,7 @@ OUTPUT:
 SV *
 Win32PeekChar(file, delay)
 	InputStream	file
-	U32	delay
+	double	delay
 	CODE:
 	{
 		char key;

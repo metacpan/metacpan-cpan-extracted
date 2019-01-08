@@ -1,5 +1,11 @@
 Revision history for Alien::gdal
 
+1.14 2019-01-05
+    - Add Alien::spatialite, Alien::proj, Alien::sqlite and Alien::freexl as dependencies.
+      This allows GDAL access to spatialite support, and also helps with Proj linkages.
+    - Set the Proj library name as an environemnt variable under Windows.
+      Otherwise the DLL provided with Strawberry perl is not found by GDAL.
+
 1.13 2018-11-27
     - Add Alien::geos::af as a dependency.  This gives us access to the GEOS library.
     

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '1.028'; # VERSION
+our $DATE = '2019-01-08'; # DATE
+our $VERSION = '1.031'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,13 +63,18 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.028 of lcpan (from Perl distribution App-lcpan), released on 2018-11-29.
+This document describes version 1.031 of lcpan (from Perl distribution App-lcpan), released on 2019-01-08.
 
 =head1 SYNOPSIS
 
 =head2 Creating/updating your local CPAN mirror
 
-The first step to use C<lcpan> is to create/update your local CPAN mirror:
+The first step to use C<lcpan> is to create/update your local CPAN mirror. You
+can install the bootstrap database first to avoid doing indexing from scratch:
+
+ % cpanm -n App::lcpan::Bootstrap
+
+Then run:
 
  % lcpan update --trace
 
@@ -83,11 +88,12 @@ C<~/cpan/index.db> which will contain information about authors,
 modules/packages, distributions. This database will be used to answer queries
 you might issue later. During this "indexing" process, release files will be
 extracted to temporary directory and the source codes will be scanned. This
-process will again take a while for the first time, e.g. a few hours, depending
-on your computer and disk speed, but subsequent updates will be much faster.
+process will again take a while for the first time, e.g. under an hour (if you
+are using a fairly recent bootstrap database) or a few hours (if you are
+indexing from scratch). Subsequent updates will be much faster.
 
-You can run the above command e.g. daily to keep your mirror up-to-date. Omit
-the C<--trace> option to see less debugging messages.
+You can run the above "update" command e.g. daily to keep your mirror
+up-to-date. Omit the C<--trace> option to see less debugging messages.
 
 =head2 Using your local CPAN mirror to install modules
 
@@ -865,6 +871,12 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--no-use-bootstrap>
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
+
 =item B<--quiet>
 
 Shortcut for --log-level=error.
@@ -980,7 +992,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1064,7 +1076,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1441,7 +1453,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1515,7 +1527,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.0"
+ "v5.26.1"
 
 =item B<--phase>=I<s>
 
@@ -1673,13 +1685,13 @@ Can be specified multiple times.
 
 =item B<-n>
 
-Shortcut --query-type name.
+Shortcut for --query-type name.
 
 See C<--query-type>.
 
 =item B<-x>
 
-Shortcut --query-type exact-name.
+Shortcut for --query-type exact-name.
 
 See C<--query-type>.
 
@@ -2323,7 +2335,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.0"
+ "v5.26.1"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2479,7 +2491,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.26.0"
+ "v5.26.1"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -2767,13 +2779,13 @@ Can be specified multiple times.
 
 =item B<-n>
 
-Shortcut --query-type name.
+Shortcut for --query-type name.
 
 See C<--query-type>.
 
 =item B<-x>
 
-Shortcut --query-type exact-name.
+Shortcut for --query-type exact-name.
 
 See C<--query-type>.
 
@@ -2843,13 +2855,13 @@ Can be specified multiple times.
 
 =item B<-n>
 
-Shortcut --query-type name.
+Shortcut for --query-type name.
 
 See C<--query-type>.
 
 =item B<-x>
 
-Shortcut --query-type exact-name.
+Shortcut for --query-type exact-name.
 
 See C<--query-type>.
 
@@ -2960,6 +2972,18 @@ Valid values:
 Search query.
 
 Can be specified multiple times.
+
+=item B<-n>
+
+Shortcut for --query-type name.
+
+See C<--query-type>.
+
+=item B<-x>
+
+Shortcut for --query-type exact-name.
+
+See C<--query-type>.
 
 =back
 
@@ -3312,6 +3336,7 @@ List of available configuration parameters:
  index_name (see --index-name)
  log_level (see --log-level)
  naked_res (see --naked-res)
+ use_bootstrap (see --no-use-bootstrap)
 
 =head2 Configuration for subcommand author-deps
 
@@ -3849,7 +3874,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

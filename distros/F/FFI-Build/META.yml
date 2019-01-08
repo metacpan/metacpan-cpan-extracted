@@ -1,10 +1,9 @@
 ---
-abstract: 'Build shared libraries for use with FFI::Platypus'
+abstract: 'Build shared libraries for use with FFI'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  FFI::Platypus: '0.51'
-  Test::More: '0.94'
+  Test::More: '0.98'
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -28,7 +27,7 @@ resources:
   bugtracker: https://github.com/Perl5-FFI/FFI-Build/issues
   homepage: https://metacpan.org/pod/FFI::Build
   repository: git://github.com/Perl5-FFI/FFI-Build.git
-version: '0.11'
-x_generated_by_perl: v5.29.4
+version: '0.12'
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

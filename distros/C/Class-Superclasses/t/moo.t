@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use FindBin ();
 
 use_ok "Class::Superclasses";
 
@@ -13,8 +12,12 @@ my $parser = Class::Superclasses->new();
 isa_ok $parser, 'Class::Superclasses';
 
 {
-    my $testfile = $FindBin::Bin . '/test_moo.pm';
-    $parser->document($testfile);
+    my $code = q~package test_moo;
+        use Moo;
+        extends 'Moo::Base';
+        1;
+    ~;
+    $parser->document(\$code);
 
     my @superclasses = $parser->superclasses();
     my @parents      = qw(Moo::Base);
@@ -23,8 +26,12 @@ isa_ok $parser, 'Class::Superclasses';
 }
 
 {
-    my $testfile = $FindBin::Bin . '/test_moo_func.pm';
-    $parser->document($testfile);
+    my $code = q~package test_moo;
+        use Moo;
+        extends( 'Moo::Base' );
+        1;
+    ~;
+    $parser->document(\$code);
 
     my @superclasses = $parser->superclasses();
     my @parents      = qw(Moo::Base);
@@ -33,8 +40,12 @@ isa_ok $parser, 'Class::Superclasses';
 }
 
 {
-    my $testfile = $FindBin::Bin . '/test_moo_multi.pm';
-    $parser->document($testfile);
+    my $code = q~package test_moo;
+        use Moo;
+        extends 'Moo::Base', 'Base2';
+        1;
+    ~;
+    $parser->document(\$code);
 
     my @superclasses = $parser->superclasses();
     my @parents      = qw(Moo::Base Base2);
@@ -43,8 +54,12 @@ isa_ok $parser, 'Class::Superclasses';
 }
 
 {
-    my $testfile = $FindBin::Bin . '/test_moo_multi_qw.pm';
-    $parser->document($testfile);
+    my $code = q~package test_moo;
+        use Moo;
+        extends qw/Moo::Base Base2/;
+        1;
+    ~;
+    $parser->document(\$code);
 
     my @superclasses = $parser->superclasses();
     my @parents      = qw(Moo::Base Base2);

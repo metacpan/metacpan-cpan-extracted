@@ -23,6 +23,7 @@ Serge::Sync::Plugin::TranslationService::mojito - L<Mojito|http://www.mojito.glo
 =head1 DESCRIPTION
 
 Integration between Serge (Free, Open Source Solution for Continuous Localization) and Mojito (Open source automation platform that enables continuous localization).
+Uses the command-line tool for the Mojito API. See L<Mojito CLI|http://www.mojito.global/docs/guides/install/>.
 
 =head1 ATTRIBUTES
 

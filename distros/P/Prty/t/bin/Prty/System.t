@@ -85,7 +85,7 @@ sub test_searchProgram : Test(1) {
     my $self = shift;
 
     my $path = Prty::System->searchProgram('ls');
-    $self->isTest($path,'/bin/ls','ls gefunden');
+    $self->like($path,qr|/ls$|,'ls gefunden');
 }
 
 # -----------------------------------------------------------------------------

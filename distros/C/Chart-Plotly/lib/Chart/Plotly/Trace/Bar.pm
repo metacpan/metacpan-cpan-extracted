@@ -18,7 +18,7 @@ use Chart::Plotly::Trace::Bar::Textfont;
 use Chart::Plotly::Trace::Bar::Transform;
 use Chart::Plotly::Trace::Bar::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The data visualized by the span of the bars is set in `y` if `orientation` is set th *v* (the default) and the labels are set in `x`. By setting `orientation` to *h*, the roles are interchanged.
 
@@ -105,7 +105,7 @@ has error_y => ( is  => "rw",
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -380,7 +380,7 @@ Chart::Plotly::Trace::Bar - The data visualized by the span of the bars is set i
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

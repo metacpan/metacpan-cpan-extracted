@@ -22,6 +22,8 @@ WriteMakefile(
 		'DBI'                  => 0,
 		'DBD::mysql'           => 0,
 		'Test::More'           => 0,
+		'Method::Signatures'   => 0,
+		'Data::Printer'        => 0,
 		'Moose'                => 1.24,
 		'Moose::Role'          => 0,
 		'namespace::autoclean' => 0,
@@ -44,5 +46,5 @@ WriteMakefile(
 		"bin/myutil_dump_tables.pl"
 	],
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean => { FILES    => 'Foo-Bar-*' },
+	clean => { FILES    => 'MySQL-Util-*' },
 );

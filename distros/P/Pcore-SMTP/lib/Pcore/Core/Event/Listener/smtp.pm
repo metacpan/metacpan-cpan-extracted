@@ -64,7 +64,7 @@ sub forward_event ( $self, $ev ) {
         if ( defined $ev->{data} ) {
 
             # serialize reference
-            $body = $LF . ( is_ref $ev->{data} ? to_json( $ev->{data}, readable => 1 )->$* : $ev->{data} );
+            $body = "\n" . ( is_ref $ev->{data} ? to_json $ev->{data}, readable => 1 : $ev->{data} );
 
             # remove all trailing "\n"
             local $/ = $EMPTY;

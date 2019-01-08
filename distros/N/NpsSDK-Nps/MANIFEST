@@ -9,6 +9,8 @@ lib/NpsSDK/Version.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+NpsSDK-Nps-1.10.tar.gz
+NpsSDK-Nps-1.11.tar.gz
 NpsSDK-Nps-1.7.tar.gz
 NpsSDK-Nps-1.8.tar.gz
 README.md

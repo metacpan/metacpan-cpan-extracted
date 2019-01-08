@@ -8,7 +8,6 @@ META.json
 META.yml
 Makefile.PL
 README
-TODO
 dist.ini
 lib/Class/Superclasses.pm
 t/Class-Superclasses_01.t
@@ -28,17 +27,7 @@ t/get_moose_values.t
 t/moo.t
 t/parse_expression.t
 t/parse_quotelike.t
+t/ppi_doc.t
 t/superclasses.t
-t/test_expression_base.pm
-t/test_expression_isa.pm
-t/test_expression_parent.pm
-t/test_moo.pm
-t/test_moo_func.pm
-t/test_moo_multi.pm
-t/test_moo_multi_qw.pm
-t/test_norequire_expression.pm
-t/test_parent_01.pm
 t/test_parent_01.t
-t/test_quote_base.pm
-t/test_quotelike_base.pm
-t/test_quotelike_isa.pm
+t/wrong_object.t

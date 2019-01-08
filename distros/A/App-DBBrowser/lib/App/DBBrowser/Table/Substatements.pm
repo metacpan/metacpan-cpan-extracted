@@ -12,7 +12,8 @@ use Term::Choose::Util qw( choose_a_number );
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
-use App::DBBrowser::Subqueries;
+#use App::DBBrowser::Table::Functions; # required
+#use App::DBBrowser::Subqueries;       # required
 
 
 sub new {
@@ -21,26 +22,32 @@ sub new {
         i => $info,
         o => $options,
         d => $data,
-        aggregate    => [ "AVG(X)", "COUNT(X)", "COUNT(*)", "MAX(X)", "MIN(X)", "SUM(X)" ],
-        opr_subquery => [ "IN", "NOT IN", " = ", " != ", " < ", " > ", " >= ", " <= " ],
-        distinct => "DISTINCT",
-        all     => "ALL",
-        asc     => "ASC",
-        desc    => "DESC",
-        and     => "AND",
-        or      => "OR",
+        aggregate     => [ "AVG(X)", "COUNT(X)", "COUNT(*)", "GROUP_CONCAT(X)", "MAX(X)", "MIN(X)", "SUM(X)" ],
+        distinct      => "DISTINCT",
+        all           => "ALL",
+        asc           => "ASC",
+        desc          => "DESC",
+        and           => "AND",
+        or            => "OR",
+        extended_sign => [ '',  'f()', '(SQ)', '%%' ],
     };
+    if ( $data->{driver} eq 'Pg' ) {
+        $sf->{aggregate}[3] = "STRING_AGG(X)";
+    }
     bless $sf, $class;
 }
+# pg:      STRING_AGG(DISTINCT, "Col", ',') # sep mandatory
+# mysql:   GROUP_CONCAT(DISTINCT `Col` SEPARATOR ',')
+# SQLite:  GROUP_CONCAT(DISTINCT "Col")  or  GROUP_CONCAT("Col",",");
 
 
 sub __add_aggregate_substmt {
-    my ( $sf, $sql, $tmp,  $stmt_type ) = @_;
+    my ( $sf, $sql, $stmt_type ) = @_;
     my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @pre = ( undef, $sf->{i}{ok} );
-    my $i = @{$tmp->{aggr_cols}};
-    $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+    my $i = @{$sql->{aggr_cols}};
+    $ax->print_sql( $sql, [ $stmt_type ] );
     # Choose
     my $aggr = $stmt_h->choose(
         [ @pre, @{$sf->{aggregate}} ]
@@ -52,13 +59,13 @@ sub __add_aggregate_substmt {
         return $aggr;
     }
     if ( $aggr eq 'COUNT(*)' ) {
-        $tmp->{aggr_cols}[$i] = $aggr;
+        $sql->{aggr_cols}[$i] = $aggr;
     }
     else {
         $aggr =~ s/\(\S\)\z//; #
-        $tmp->{aggr_cols}[$i] = $aggr . "(";
-        if ( $aggr eq 'COUNT' ) {
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $sql->{aggr_cols}[$i] = $aggr . "(";
+        if ( $aggr =~ /^(?:COUNT|GROUP_CONCAT|STRING_AGG)\z/ ) {
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose
             my $all_or_distinct = $stmt_h->choose(
                 [ undef, $sf->{all}, $sf->{distinct} ]
@@ -67,10 +74,10 @@ sub __add_aggregate_substmt {
                 return;
             }
             if ( $all_or_distinct eq $sf->{distinct} ) {
-                $tmp->{aggr_cols}[$i] .= $sf->{distinct} . ' '; #
+                $sql->{aggr_cols}[$i] .= $sf->{distinct};
             }
         }
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $f_col = $stmt_h->choose(
             [ undef, @{$sql->{cols}} ]
@@ -78,68 +85,115 @@ sub __add_aggregate_substmt {
         if ( ! defined $f_col ) {
             return;
         }
-        $tmp->{aggr_cols}[$i] .= $f_col . ")";
+        if ( $aggr eq 'STRING_AGG' ) {
+            $sql->{aggr_cols}[$i] .= ' ' . $f_col . ", ',')";
+        }
+        else {
+            $sql->{aggr_cols}[$i] .= ' ' . $f_col . ")";
+        }
     }
-    my $alias = $ax->alias( 'aggregate', 'AS: ', undef, $tmp->{aggr_cols}[$i] );
+    my $alias = $ax->alias( 'aggregate', $sql->{aggr_cols}[$i] . ' AS: ', undef, ' ' );
     if ( defined $alias && length $alias ) {
-        $tmp->{alias}{$tmp->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
+        $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
     }
     return 1;
 }
 
-
-sub columns {
-    my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
+sub extended_col {
+    my ( $sf, $sql, $stmt_type, $clause ) = @_;
+    my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $tmp = {
-        chosen_cols => [],
-        alias       => { %{$sql->{alias}} },
-    };
-    my $sq_col = '(Q';
+    my ( $function, $subquery ) = ( 'f()', 'SQ' );
+    my @values = ( undef, [ $function ], [ $subquery ], [ $function, $subquery ] );
+    my @types = @{$values[$sf->{o}{G}{"extend_$clause"}]};
+    my $type;
+    if ( @types == 1 ) {
+        $type = $types[0];
+    }
+    else {
+        # Choose
+        $type = $stmt_h->choose( [ undef, @types ], { undef => '<<' } );
+        if ( ! defined $type ) {
+            return;
+        }
+    }
+    my $ext_col;
+    if ( $type eq $subquery ) {
+        require App::DBBrowser::Subqueries;
+        my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $subq = $new_sq->choose_subquery( $sql, $stmt_type, $clause );
+        if ( ! defined $subq ) {
+            return;
+        }
+        $ext_col = '(' . $subq . ')';
+    }
+    elsif ( $type eq $function ) {
+        require App::DBBrowser::Table::Functions;
+        my $new_func = App::DBBrowser::Table::Functions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+        my $func = $new_func->col_function( $sql, $stmt_type, $clause );
+        if ( ! defined $func ) {
+            return;
+        }
+        $ext_col = $func;
+    }
+    $ax->print_sql( $sql, [ $stmt_type ] );
+    my $alias = $ax->alias( 'subqueries', $ext_col . ' AS: ', undef, ' ' );
+    if ( defined $alias && length $alias ) {
+        $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
+    }
+    $ax->print_sql( $sql, [ $stmt_type ] );
+    return $ext_col;
+}
+
+
+sub select {
+    my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
+    my $clause = 'select';
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $choices = [];
+    my $extended_sign = $sf->{extended_sign}[ $sf->{o}{G}{"extend_$clause"} ];
+    my @pre = ( undef, $sf->{i}{ok}, $extended_sign ? $extended_sign : () );
+    my $type;
+    if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
+        $choices = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
+    }
+    else {
+        $choices = [ @pre, @{$sql->{cols}} ];
+    }
+    $sql->{chosen_cols} = [];
+    $sql->{alias} = { %{$sql->{alias}} };
     my $bu = [];
-    my @pre = ( undef, $sf->{i}{ok} );
-    push @pre, $sq_col if $sf->{o}{G}{subqueries_select};
 
     COLUMNS: while ( 1 ) {
-        my $choices = [ @pre, @{$sql->{cols}} ];
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
-        my @cols = $stmt_h->choose(
-            $choices, { meta_items => [ 0 .. $#pre - 1 ], no_spacebar => [ $#pre ], include_highlighted => 2 }
+        my @idx = $stmt_h->choose(
+            $choices, { meta_items => [ 0 .. $#pre - 1 ], index => 1, no_spacebar => [ $#pre ], include_highlighted => 2 }
         );
-        if ( ! defined $cols[0] ) {
+        if ( ! $idx[0] ) {
             if ( @$bu ) {
-                ( $tmp->{chosen_cols}, $tmp->{alias} ) = @{pop @$bu};
+                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @$bu};
                 next COLUMNS;
             }
             return;
         }
-        elsif ( $cols[0] eq $sf->{i}{ok} ) {
-            shift @cols;
-            push @{$tmp->{chosen_cols}}, @cols;
-            $tmp->{orig_chosen_cols} = []; # keys of $tmp overwrite keys of $sql in Table.pm:
-            $tmp->{modified_cols}    = []; #     $sql->{$_} = $tmp->{$_} for keys;
-            return $tmp;
+        push @$bu, [ [ @{$sql->{chosen_cols}} ], { %{$sql->{alias}} } ];
+        if ( $choices->[$idx[0]] eq $sf->{i}{ok} ) {
+            shift @idx;
+            push @{$sql->{chosen_cols}}, @{$choices}[@idx];
+            return 1;
         }
-        push @$bu, [ [ @{$tmp->{chosen_cols}} ], { %{$tmp->{alias}} } ];
-        if ( $cols[0] eq $sq_col ) {
-            my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, 'select' );
-            if ( ! defined $subquery ) {
-                ( $tmp->{chosen_cols}, $tmp->{alias} ) = @{pop @$bu};
-                next COLUMNS;
+        elsif ( $choices->[ $idx[0] ] eq $extended_sign ) {
+            my $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            if ( ! defined $ext_col ) {
+                ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @$bu}; ###
             }
-            $subquery = "(" . $subquery . ")";
-            push @{$tmp->{chosen_cols}}, $subquery;
-            my $alias = $ax->alias( 'subqueries', 'AS: ', undef, $subquery );
-            if ( defined $alias && length $alias ) {
-                $tmp->{alias}{$subquery} = $ax->quote_col_qualified( [ $alias ] );
+            else {
+                push @{$sql->{chosen_cols}}, $ext_col;
             }
             next COLUMNS;
         }
-        else {
-            push @{$tmp->{chosen_cols}}, @cols;
-        }
+        push @{$sql->{chosen_cols}}, @{$choices}[@idx];
     }
 }
 
@@ -148,49 +202,47 @@ sub distinct {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @pre = ( undef, $sf->{i}{ok} );
-    my $tmp = { distinct_stmt => '' };
+    $sql->{distinct_stmt} = '';
 
     DISTINCT: while ( 1 ) {
         my $choices = [ @pre, $sf->{distinct}, $sf->{all} ];
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $select_distinct = $stmt_h->choose(
             $choices
         );
         if ( ! defined $select_distinct ) {
-            if ( $tmp->{distinct_stmt} ) {
-                $tmp->{distinct_stmt} = '';
+            if ( $sql->{distinct_stmt} ) {
+                $sql->{distinct_stmt} = '';
                 next DISTINCT;
             }
             return;
         }
         elsif ( $select_distinct eq $sf->{i}{ok} ) {
-            return $tmp;
+            return 1;
         }
-        $tmp->{distinct_stmt} = ' ' . $select_distinct;
+        $sql->{distinct_stmt} = ' ' . $select_distinct;
     }
 }
 
 
 sub aggregate {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
-    my $tmp = {
-        aggr_cols => [],
-    };
+    $sql->{aggr_cols} = [];
+    $sql->{chosen_cols} = [];
 
     AGGREGATE: while ( 1 ) {
-        my $ret = $sf->__add_aggregate_substmt( $sql, $tmp, $stmt_type );
+        my $ret = $sf->__add_aggregate_substmt( $sql, $stmt_type );
         if ( ! $ret ) {
-            if ( @{$tmp->{aggr_cols}} ) {
-                my $aggr = pop @{$tmp->{aggr_cols}};
-                delete $tmp->{alias}{$aggr} if exists $tmp->{alias}{$aggr};
+            if ( @{$sql->{aggr_cols}} ) {
+                my $aggr = pop @{$sql->{aggr_cols}};
+                delete $sql->{alias}{$aggr} if exists $sql->{alias}{$aggr};
                 next AGGREGATE;
             }
             return;
         }
         elsif ( $ret eq $sf->{i}{ok} ) {
-            $tmp->{orig_aggr_cols} = [];
-            return $tmp;
+            return 1;
         }
     }
 }
@@ -198,40 +250,39 @@ sub aggregate {
 
 sub set {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
+    my $clause = 'set';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $trs = Term::Form->new();
     my $col_sep = ' ';
-    my $tmp = {
-        set_args => [],
-        set_stmt => " SET",
-    };
+    $sql->{set_args} = [];
+    $sql->{set_stmt} = " SET";
     my $bu = [];
     my @pre = ( undef, $sf->{i}{ok} );
 
     SET: while ( 1 ) {
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $col = $stmt_h->choose(
             [ @pre, @{$sql->{cols}} ]
         );
         if ( ! defined $col ) {
             if ( @$bu ) {
-                ( $tmp->{set_args}, $tmp->{set_stmt}, $col_sep ) = @{pop @$bu};
+                ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @$bu};
                 next SET;
             }
             return;
         }
         if ( $col eq $sf->{i}{ok} ) {
             if ( $col_sep eq ' ' ) {
-                $tmp->{set_stmt} = '';
+                $sql->{set_stmt} = '';
             }
-            return $tmp;
+            return 1;
         }
-        push @$bu, [ [@{$tmp->{set_args}}], $tmp->{set_stmt}, $col_sep ];
-        $tmp->{set_stmt} .= $col_sep . $col;
-        my $ok = $sf->__set_operator_sql( $sql, $tmp, 'set', $col, $stmt_type );
+        push @$bu, [ [@{$sql->{set_args}}], $sql->{set_stmt}, $col_sep ];
+        $sql->{set_stmt} .= $col_sep . $col;
+        my $ok = $sf->__set_operator_sql( $sql, $clause, $col, $stmt_type );
         if ( ! $ok ) {
-            ( $tmp->{set_args}, $tmp->{set_stmt}, $col_sep ) = @{pop @$bu};
+            ( $sql->{set_args}, $sql->{set_stmt}, $col_sep ) = @{pop @$bu};
             next SET;
         }
         $col_sep = ', ';
@@ -241,66 +292,63 @@ sub set {
 
 sub where {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
+    my $clause = 'where';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my @cols = ( @{$sql->{cols}}, @{$sql->{modified_cols}} );
+    my @cols = @{$sql->{cols}};
     my $AND_OR = '';
-    my $tmp = {
-        where_args => [],
-        where_stmt => " WHERE",
-    };
+    $sql->{where_args} = [];
+    $sql->{where_stmt} = " WHERE";
     my $unclosed = 0;
     my $count = 0;
     my $bu = [];
-    my $sq_col = '(Q';
-    my @pre = ( undef, $sf->{i}{ok} );
-    push @pre, $sq_col if $sf->{o}{G}{subqueries_w_h};
+    my $extended_sign = $sf->{extended_sign}[ $sf->{o}{G}{"extend_$clause"} ];
+    my @pre = ( undef, $sf->{i}{ok}, $extended_sign ? $extended_sign : () );
 
     WHERE: while ( 1 ) {
         my @choices = ( @cols );
         if ( $sf->{o}{G}{parentheses} == 1 ) {
             unshift @choices, $unclosed ? ')' : '(';
         }
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $quote_col = $stmt_h->choose(
             [ @pre, @choices ]
         );
         if ( ! defined $quote_col ) {
             if ( @$bu ) {
-                ( $tmp->{where_args}, $tmp->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+                ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
                 next WHERE;
             }
             return;
         }
         if ( $quote_col eq $sf->{i}{ok} ) {
             if ( $count == 0 ) {
-                $tmp->{where_stmt} = '';
+                $sql->{where_stmt} = '';
             }
             if ( $unclosed == 1 ) { # close an open parentheses automatically on OK
-                $tmp->{where_stmt} .= ")";
+                $sql->{where_stmt} .= ")";
                 $unclosed = 0;
             }
-            return $tmp;
+            return 1;
         }
-        if ( $quote_col eq $sq_col ) {
-            my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );  # sub
-            my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, 'where' );
-            if ( ! defined $subquery ) {
+        if ( $quote_col eq $extended_sign ) {
+            my $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            if ( ! defined $ext_col ) {
                 if ( @$bu ) {
-                    ( $tmp->{where_args}, $tmp->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+                    ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
                 }
                 next WHERE;
             }
-            $quote_col = "(" . $subquery . ")";
+            $quote_col = $ext_col;
         }
         if ( $quote_col eq ')' ) {
-            push @$bu, [ [@{$tmp->{where_args}}], $tmp->{where_stmt}, $AND_OR, $unclosed, $count ];
-            $tmp->{where_stmt} .= ")";
+            push @$bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+            $sql->{where_stmt} .= ")";
             $unclosed--;
             next WHERE;
         }
-        if ( $count > 0 && $tmp->{where_stmt} !~ /\(\z/ ) { #
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        if ( $count > 0 && $sql->{where_stmt} !~ /\(\z/ ) { #
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose
             $AND_OR = $stmt_h->choose(
                 [ undef, $sf->{and}, $sf->{or} ]
@@ -311,17 +359,17 @@ sub where {
             $AND_OR = ' ' . $AND_OR;
         }
         if ( $quote_col eq '(' ) {
-            push @$bu, [ [@{$tmp->{where_args}}], $tmp->{where_stmt}, $AND_OR, $unclosed, $count ];
-            $tmp->{where_stmt} .= $AND_OR . " (";
+            push @$bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+            $sql->{where_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
             next WHERE;
         }
-        push @$bu, [ [@{$tmp->{where_args}}], $tmp->{where_stmt}, $AND_OR, $unclosed, $count ];
-        $tmp->{where_stmt} .= $AND_OR . ' ' . $quote_col;
-        my $ok = $sf->__set_operator_sql( $sql, $tmp, 'where', $quote_col, $stmt_type );
+        push @$bu, [ [@{$sql->{where_args}}], $sql->{where_stmt}, $AND_OR, $unclosed, $count ];
+        $sql->{where_stmt} .= $AND_OR . ' ' . $quote_col;
+        my $ok = $sf->__set_operator_sql( $sql, $clause, $quote_col, $stmt_type );
         if ( ! $ok ) {
-            ( $tmp->{where_args}, $tmp->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
             next WHERE;
         }
         $count++;
@@ -331,87 +379,104 @@ sub where {
 
 sub group_by {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
+    my $clause = 'group_by';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my @pre = ( undef, $sf->{i}{ok} );
-    my $tmp = {
-        group_by_stmt => " GROUP BY",
-        group_by_cols => [],
-    };
+    $sql->{group_by_stmt} = " GROUP BY";
+    $sql->{group_by_cols} = [];
+    $sql->{chosen_cols} = [];
+    my $extended_sign = $sf->{extended_sign}[ $sf->{o}{G}{"extend_$clause"} ];
+    my @pre = ( undef, $sf->{i}{ok}, $extended_sign ? $extended_sign : () );
+    my $choices = [ @pre, @{$sql->{cols}} ];
 
     GROUP_BY: while ( 1 ) {
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
-        my $col = $stmt_h->choose( [ @pre, @{$sql->{cols}} ] );
-        if ( ! defined $col ) {
-            if ( @{$tmp->{group_by_cols}} ) {
-                pop @{$tmp->{group_by_cols}};
-                $tmp->{group_by_stmt} = " GROUP BY " . join ', ', @{$tmp->{group_by_cols}};
+        my @idx = $stmt_h->choose(
+            [ @pre, @{$sql->{cols}} ],
+            { meta_items => [ 0 .. $#pre - 1 ], index => 1, no_spacebar => [ $#pre ], include_highlighted => 2 }
+        );
+        if ( ! $idx[0] ) {
+            if ( @{$sql->{group_by_cols}} ) {
+                pop @{$sql->{group_by_cols}};
                 next GROUP_BY;
             }
+            $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
             return;
         }
-        if ( $col eq $sf->{i}{ok} ) {
-            if ( ! @{$tmp->{group_by_cols}} ) {
-                $tmp->{group_by_stmt} = '';
+        elsif ( $choices->[$idx[0]] eq $sf->{i}{ok} ) {
+            shift @idx;
+            push @{$sql->{group_by_cols}}, @{$choices}[@idx];
+            if ( ! @{$sql->{group_by_cols}} ) {
+                $sql->{group_by_stmt} = '';
             }
-            $tmp->{orig_group_by_cols} = [];
-            return $tmp;
+            else {
+                $sql->{group_by_stmt} = " GROUP BY " . join ', ', @{$sql->{group_by_cols}};
+            }
+            return 1;
         }
-        push @{$tmp->{group_by_cols}}, $col;
-        $tmp->{group_by_stmt} = " GROUP BY " . join ', ', @{$tmp->{group_by_cols}};
+        elsif ( $choices->[ $idx[0] ] eq $extended_sign ) {
+            my $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            if ( defined $ext_col ) {
+                push @{$sql->{group_by_cols}}, $ext_col;
+            }
+            next GROUP_BY;
+        }
+        push @{$sql->{group_by_cols}}, @{$choices}[@idx];
     }
 }
 
 
 sub having {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
+    my $clause = 'having';
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    #my $aggr_cols = $sql->{aggr_cols};
     my @pre = ( undef, $sf->{i}{ok} );
     my $AND_OR = '';
-    my $tmp = {
-        having_args => [],
-        having_stmt => " HAVING",
-    };
+    $sql->{having_args} = [];
+    $sql->{having_stmt} = " HAVING";
     my $unclosed = 0;
     my $count = 0;
     my $bu = [];
 
     HAVING: while ( 1 ) {
-        my @choices = ( @{$sf->{aggregate}}, map( '@' . $_, @{$sql->{aggr_cols}} ) ); #
+        my @choices = (
+            @{$sf->{aggregate}},
+            map( '@' . $_, @{$sql->{aggr_cols}} )
+        );
         if ( $sf->{o}{G}{parentheses} == 1 ) {
             unshift @choices, $unclosed ? ')' : '(';
         }
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $aggr = $stmt_h->choose(
             [ @pre, @choices ]
         );
         if ( ! defined $aggr ) {
             if ( @$bu ) {
-                ( $tmp->{having_args}, $tmp->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+                ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
                 next HAVING;
             }
             return;
         }
         if ( $aggr eq $sf->{i}{ok} ) {
             if ( $count == 0 ) {
-                $tmp->{having_stmt} = '';
+                $sql->{having_stmt} = '';
             }
             if ( $unclosed == 1 ) { # close an open parentheses automatically on OK
-                $tmp->{having_stmt} .= ")";
+                $sql->{having_stmt} .= ")";
                 $unclosed = 0;
             }
-            return $tmp;
+            return 1;
         }
         if ( $aggr eq ')' ) {
-            push @$bu, [ [@{$tmp->{having_args}}], $tmp->{having_stmt}, $AND_OR, $unclosed, $count ];
-            $tmp->{having_stmt} .= ")";
+            push @$bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+            $sql->{having_stmt} .= ")";
             $unclosed--;
             next HAVING;
         }
-        if ( $count > 0 && $tmp->{having_stmt} !~ /\(\z/ ) {
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        if ( $count > 0 && $sql->{having_stmt} !~ /\(\z/ ) {
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose
             $AND_OR = $stmt_h->choose(
                 [ undef, $sf->{and}, $sf->{or} ]
@@ -422,22 +487,22 @@ sub having {
             $AND_OR = ' ' . $AND_OR;
         }
         if ( $aggr eq '(' ) {
-            push @$bu, [ [@{$tmp->{having_args}}], $tmp->{having_stmt}, $AND_OR, $unclosed, $count ];
-            $tmp->{having_stmt} .= $AND_OR . " (";
+            push @$bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+            $sql->{having_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
             next HAVING;
         }
-        push @$bu, [ [@{$tmp->{having_args}}], $tmp->{having_stmt}, $AND_OR, $unclosed, $count ];
-        $tmp->{having_stmt} .= $AND_OR;
-        my $quote_aggr = $sf->__build_having_col( $stmt_h, $sql, $stmt_type, $tmp, $aggr );
+        push @$bu, [ [@{$sql->{having_args}}], $sql->{having_stmt}, $AND_OR, $unclosed, $count ];
+        $sql->{having_stmt} .= $AND_OR;
+        my $quote_aggr = $sf->__build_having_col( $stmt_h, $sql, $stmt_type, $aggr );
         if ( ! defined $quote_aggr ) {
-            ( $tmp->{having_args}, $tmp->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
             next HAVING;
         }
-        my $ok = $sf->__set_operator_sql( $sql, $tmp, 'having', $quote_aggr, $stmt_type );
+        my $ok = $sf->__set_operator_sql( $sql, $clause, $quote_aggr, $stmt_type );
         if ( ! $ok ) {
-            ( $tmp->{having_args}, $tmp->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
+            ( $sql->{having_args}, $sql->{having_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
             next HAVING;
         }
         $count++;
@@ -445,22 +510,22 @@ sub having {
 }
 
 sub __build_having_col {
-    my ( $sf, $stmt_h, $sql, $stmt_type, $tmp, $aggr ) = @_;
+    my ( $sf, $stmt_h, $sql, $stmt_type, $aggr ) = @_;
     my $quote_aggr;
-    if ( ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) ) { #
+    if ( any { '@' . $_ eq $aggr } @{$sql->{aggr_cols}} ) {
         ( $quote_aggr = $aggr ) =~ s/^\@//;
-        $tmp->{having_stmt} .= ' ' . $quote_aggr;
+        $sql->{having_stmt} .= ' ' . $quote_aggr;
     }
     elsif ( $aggr eq 'COUNT(*)' ) {
         $quote_aggr = $aggr;
-        $tmp->{having_stmt} .= ' ' . $quote_aggr;
+        $sql->{having_stmt} .= ' ' . $quote_aggr;
     }
     else {
         $aggr =~ s/\(\S\)\z//;
-        $tmp->{having_stmt} .= ' ' . $aggr . "(";
+        $sql->{having_stmt} .= ' ' . $aggr . "(";
         $quote_aggr          =       $aggr . "(";
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $quote_col = $stmt_h->choose(
             [ undef, @{$sql->{cols}} ]
@@ -468,7 +533,7 @@ sub __build_having_col {
         if ( ! defined $quote_col ) {
             return;
         }
-        $tmp->{having_stmt} .= $quote_col . ")";
+        $sql->{having_stmt} .= $quote_col . ")";
         $quote_aggr         .= $quote_col . ")";
     }
     return $quote_aggr;
@@ -482,54 +547,45 @@ sub order_by {
     my @cols;
     if ( @{$sql->{aggr_cols}} || @{$sql->{group_by_cols}} ) {
         @cols = ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
-        for my $stmt_type ( qw/group_by_cols aggr_cols/ ) {
-            # offer also the unmodified columns:
-            next if ! @{$sql->{'orig_' . $stmt_type}};
-            for my $i ( 0 .. $#{$sql->{$stmt_type}} ) {
-                if ( $sql->{'orig_' . $stmt_type}[$i] ne $sql->{$stmt_type}[$i] ) {
-                    push @cols, $sql->{'orig_' . $stmt_type}[$i];
-                }
-            }
-        }
     }
     else {
-        @cols = ( @{$sql->{cols}}, @{$sql->{modified_cols}} );
+        @cols = @{$sql->{cols}};
     }
     my $col_sep = ' ';
-    my $tmp = { order_by_stmt => " ORDER BY" };
+    $sql->{order_by_stmt} = " ORDER BY";
     my $bu = [];
 
     ORDER_BY: while ( 1 ) {
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $col = $stmt_h->choose(
             [ @pre, @cols ]
         );
         if ( ! defined $col ) {
             if ( @$bu ) {
-                ( $tmp->{order_by_stmt}, $col_sep ) = @{pop @$bu};
+                ( $sql->{order_by_stmt}, $col_sep ) = @{pop @$bu};
                 next ORDER_BY;
             }
             return
         }
         if ( $col eq $sf->{i}{ok} ) {
             if ( $col_sep eq ' ' ) {
-                $tmp->{order_by_stmt} = '';
+                $sql->{order_by_stmt} = '';
             }
-            return $tmp;
+            return 1;
         }
-        push @$bu, [ $tmp->{order_by_stmt}, $col_sep ];
-        $tmp->{order_by_stmt} .= $col_sep . $col;
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        push @$bu, [ $sql->{order_by_stmt}, $col_sep ];
+        $sql->{order_by_stmt} .= $col_sep . $col;
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $direction = $stmt_h->choose(
             [ undef, $sf->{asc}, $sf->{desc} ]
         );
         if ( ! defined $direction ){
-            ( $tmp->{order_by_stmt}, $col_sep ) = @{pop @$bu}; #
+            ( $sql->{order_by_stmt}, $col_sep ) = @{pop @$bu}; #
             next ORDER_BY;
         }
-        $tmp->{order_by_stmt} .= ' ' . $direction;
+        $sql->{order_by_stmt} .= ' ' . $direction;
         $col_sep = ', ';
     }
 }
@@ -539,115 +595,126 @@ sub limit_offset {
     my ( $sf, $stmt_h, $sql, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @pre = ( undef, $sf->{i}{ok} );
-    my $tmp = {
-        limit_stmt  => '',
-        offset_stmt => '',
-    };
+    $sql->{limit_stmt}  = '';
+    $sql->{offset_stmt} = '';
     my $bu = [];
 
     LIMIT: while ( 1 ) {
         my ( $limit, $offset ) = ( 'LIMIT', 'OFFSET' );
-        $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+        $ax->print_sql( $sql, [ $stmt_type ] );
         # Choose
         my $choice = $stmt_h->choose(
             [ @pre, $limit, $offset ]
         );
         if ( ! defined $choice ) {
             if ( @$bu ) {
-                ( $tmp->{limit_stmt}, $tmp->{offset_stmt} )  = @{pop @$bu};
+                ( $sql->{limit_stmt}, $sql->{offset_stmt} )  = @{pop @$bu};
                 next LIMIT;
             }
             return;
         }
         if ( $choice eq $sf->{i}{ok} ) {
-            return $tmp;
+            return 1;
         }
-        push @$bu, [ $tmp->{limit_stmt}, $tmp->{offset_stmt} ];
+        push @$bu, [ $sql->{limit_stmt}, $sql->{offset_stmt} ];
         my $digits = 7;
         if ( $choice eq $limit ) {
-            $tmp->{limit_stmt} = " LIMIT";
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            $sql->{limit_stmt} = " LIMIT";
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose_a_number
             my $limit = choose_a_number( $digits,
                 { name => 'LIMIT: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
             );
             if ( ! defined $limit ) {
-                ( $tmp->{limit_stmt}, $tmp->{offset_stmt} ) = @{pop @$bu};
+                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @$bu};
                 next LIMIT;
             }
-            $tmp->{limit_stmt} .=  sprintf ' %d', $limit;
+            $sql->{limit_stmt} .=  sprintf ' %d', $limit;
         }
         if ( $choice eq $offset ) {
-            if ( ! $tmp->{limit_stmt} ) {
-                $tmp->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '9223372036854775807'  ) if $sf->{d}{driver} eq 'SQLite';   # 2 ** 63 - 1
+            if ( ! $sql->{limit_stmt} ) {
+                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '9223372036854775807'  ) if $sf->{d}{driver} eq 'SQLite';   # 2 ** 63 - 1
                 # MySQL 5.7 Reference Manual - SELECT Syntax - Limit clause: SELECT * FROM tbl LIMIT 95,18446744073709551615;
-                $tmp->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '18446744073709551615' ) if $sf->{d}{driver} eq 'mysql';    # 2 ** 64 - 1
+                $sql->{limit_stmt} = " LIMIT " . ( $sf->{o}{G}{max_rows} || '18446744073709551615' ) if $sf->{d}{driver} eq 'mysql';    # 2 ** 64 - 1
             }
-            $tmp->{offset_stmt} = " OFFSET";
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            $sql->{offset_stmt} = " OFFSET";
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose_a_number
             my $offset = choose_a_number( $digits,
                 { name => 'OFFSET: ', mouse => $sf->{o}{table}{mouse}, clear_screen => 0 }
             );
             if ( ! defined $offset ) {
-                ( $tmp->{limit_stmt}, $tmp->{offset_stmt} ) = @{pop @$bu}; #
+                ( $sql->{limit_stmt}, $sql->{offset_stmt} ) = @{pop @$bu}; #
                 next LIMIT;
             }
-            $tmp->{offset_stmt} .= sprintf ' %d', $offset;
+            $sql->{offset_stmt} .= sprintf ' %d', $offset;
         }
     }
 }
 
 
 sub __set_operator_sql {
-    my ( $sf, $sql, $tmp, $clause, $quote_col, $stmt_type ) = @_;
+    my ( $sf, $sql, $clause, $quote_col, $stmt_type ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
     my $trs = Term::Form->new();
     my $stmt = $clause . '_stmt';
     my $args = $clause . '_args';
-    my $op_query = '=(Q';
-    my @pre = ( undef );
     my @operators;
-    my @opr_subquery;
+    my @operators_ext;
     if ( $clause eq 'set' ) {
-        @operators    = ( ' = ' );
-        @opr_subquery = ( ' = ' );
-        unshift @operators, $op_query if $sf->{o}{G}{subqueries_set};
+        @operators     = ( ' = ' );
+        @operators_ext = ( " = " );
     }
     else {
-        @operators    = @{$sf->{o}{G}{operators}};
-        @opr_subquery = @{$sf->{opr_subquery}};
-        unshift @operators, $op_query if $sf->{o}{G}{subqueries_w_h};
+        @operators     = @{$sf->{o}{G}{operators}};
+        @operators_ext = ( "IN", "NOT IN", " = ", " != ", " < ", " > ", " >= ", " <= " );
     }
+    my $extended_sign = '=' . $sf->{extended_sign}[ $sf->{o}{G}{"extend_$clause"} ];
+    if ( $extended_sign ) {
+        unshift @operators, $extended_sign;
+    }
+    my $ext_col;
 
     OPERATOR: while( 1 ) {
-        my $hist = 0;
         my $operator;
         if ( @operators == 1 ) {
             $operator = $operators[0];
         }
         else {
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            my @pre = ( undef );
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Choose
             $operator = $stmt_h->choose( [ @pre, @operators ] );
             if ( ! defined $operator ) {
                 return;
             }
-            elsif ( $operator eq $op_query ) {
-                $hist = 1;
-                if ( @opr_subquery == 1 ) {
-                    $operator = $opr_subquery[0];
-                }
-                else {
-                    $operator = $stmt_h->choose( [ undef, @opr_subquery ] );
-                    if ( ! defined $operator ) {
-                        return;
-                    }
-                }
-            }
         }
-        my $bu_stmt = $tmp->{$stmt};
+        if ( $operator eq $extended_sign ) {
+            my $bu_stmt = $sql->{$stmt};
+            if ( @operators_ext == 1 ) {
+                $operator = $operators_ext[0];
+            }
+            else {
+                my @pre = ( undef );
+                $sql->{$stmt} .= ' ? Func/SQ';
+                $ax->print_sql( $sql, [ $stmt_type ] );
+                # Choose
+                $operator = $stmt_h->choose( [ @pre, @operators_ext ] );
+                if ( ! defined $operator ) {
+                    next OPERATOR;
+                }
+                $operator =~ s/^\s+|\s+\z//g;
+                $sql->{$stmt} = $bu_stmt . ' ' . $operator;
+                $ax->print_sql( $sql, [ $stmt_type ] );
+            }
+            $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            if ( ! defined $ext_col ) {
+                next OPERATOR;
+            }
+            $sql->{$stmt} = $bu_stmt;
+        }
+        my $bu_stmt = $sql->{$stmt};
         if ( $operator =~ /\s%?col%?\z/ ) {
             my $arg;
             if ( $operator =~ /^(.+)\s(%?col%?)\z/ ) {
@@ -655,38 +722,43 @@ sub __set_operator_sql {
                 $arg = $2;
             }
             $operator =~ s/^\s+//;
-            $tmp->{$stmt} .= ' ' . $operator;
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            $sql->{$stmt} .= ' ' . $operator;
+            $ax->print_sql( $sql, [ $stmt_type ] );
             my $quote_col;
-            if ( $clause eq 'having' ) {
-                my @pre = ( undef, $sf->{i}{ok} );
-                my @choices = ( @{$sf->{aggregate}}, map( '@' . $_,  @{$sql->{aggr_cols}} ) );
-                # Choose
-                my $aggr = $stmt_h->choose(
-                    [ @pre, @choices ]
-                );
-                if ( ! defined $aggr ) {
-                    $tmp->{$stmt} = $bu_stmt;
+            if ( defined $ext_col ) {   #
+                $quote_col = $ext_col;  #
+            }                           #
+            else {                      #
+                if ( $clause eq 'having' ) {
+                    my @pre = ( undef, $sf->{i}{ok} );
+                    my @choices = ( @{$sf->{aggregate}}, map( '@' . $_,  @{$sql->{aggr_cols}} ) );
+                    # Choose
+                    my $aggr = $stmt_h->choose(
+                        [ @pre, @choices ]
+                    );
+                    if ( ! defined $aggr ) {
+                        $sql->{$stmt} = $bu_stmt;
+                        next OPERATOR;
+                    }
+                    if ( $aggr eq $sf->{i}{ok} ) {
+                    }
+                    my $backup_tmp = $sql->{$stmt};
+                    $quote_col =  $sf->__build_having_col( $stmt_h, $sql, $stmt_type, $aggr );
+                    $sql->{$stmt} = $backup_tmp;
+                }
+                else {
+                    # Choose
+                    #$quote_col = $stmt_h->choose( $sql->{cols}, { prompt => "$operator:" } );
+                    $quote_col = $stmt_h->choose( $sql->{cols}, { prompt => 'Col:' } );
+                }
+                if ( ! defined $quote_col ) {
+                    #$sql->{$stmt} = '';
+                    $sql->{$stmt} = $bu_stmt;
                     next OPERATOR;
                 }
-                if ( $aggr eq $sf->{i}{ok} ) {
-                }
-                my $backup_tmp = $tmp->{$stmt};
-                $quote_col =  $sf->__build_having_col( $stmt_h, $sql, $stmt_type, $tmp, $aggr );
-                $tmp->{$stmt} = $backup_tmp;
-            }
-            else {
-                # Choose
-                #$quote_col = $stmt_h->choose( $sql->{cols}, { prompt => "$operator:" } );
-                $quote_col = $stmt_h->choose( $sql->{cols}, { prompt => 'Col:' } );
-            }
-            if ( ! defined $quote_col ) {
-                #$tmp->{$stmt} = '';
-                $tmp->{$stmt} = $bu_stmt;
-                next OPERATOR;
-            }
+            }                           #
             if ( $arg !~ /%/ ) {
-                $tmp->{$stmt} .= ' ' . $quote_col;
+                $sql->{$stmt} .= ' ' . $quote_col;
             }
             else {
                 if ( ! eval {
@@ -694,133 +766,131 @@ sub __set_operator_sql {
                     my @el = map { "'$_'" } grep { length $_ } $arg =~ /^(%?)(col)(%?)\z/g;
                     my $qt_arg = $plui->concatenate( \@el );
                     $qt_arg =~ s/'col'/$quote_col/;
-                    $tmp->{$stmt} .= ' ' . $qt_arg;
+                    $sql->{$stmt} .= ' ' . $qt_arg;
                     1 }
                 ) {
                     $ax->print_error_message( $@, $operator . ' ' . $arg );
-                    $tmp->{$stmt} = $bu_stmt;
+                    $sql->{$stmt} = $bu_stmt;
                     next OPERATOR;
                 }
             }
         }
         elsif ( $operator =~ /REGEXP(_i)?\z/ ) {
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
-            $tmp->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$quote_col\E\z//x;
+            $ax->print_sql( $sql, [ $stmt_type ] );
+            $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$quote_col\E\z//x;
             my $do_not_match_regexp = $operator =~ /^NOT/       ? 1 : 0;
             my $case_sensitive      = $operator =~ /REGEXP_i\z/ ? 0 : 1;
+            my $regex_op;
             if ( ! eval {
                 my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
-                my $regex_op = $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
-                $regex_op =~ s/^\s// if $tmp->{$stmt} =~ /\(\z/;
-                $tmp->{$stmt} .= $regex_op;
-                push @{$tmp->{$args}}, '...';
+                $regex_op = $plui->regexp( $quote_col, $do_not_match_regexp, $case_sensitive );
                 1 }
             ) {
                 $ax->print_error_message( $@, $operator );
-                $tmp->{$stmt} = $bu_stmt;
+                $sql->{$stmt} = $bu_stmt;
                 next OPERATOR;
             }
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            if ( $ext_col ) {                       #
+                $regex_op =~ s/\?/$ext_col/;        #
+                $sql->{$stmt} .= $regex_op;         #
+                last OPERATOR;                      #
+            }                                       #
+            $regex_op =~ s/^\s// if $sql->{$stmt} =~ /\(\z/;
+            $sql->{$stmt} .= $regex_op;
+            push @{$sql->{$args}}, '...';
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Readline
             my $value = $trs->readline( 'Pattern: ' );
             if ( ! defined $value ) {
-                $tmp->{$stmt} = $bu_stmt;
+                $sql->{$stmt} = $bu_stmt;
                 next OPERATOR;
             }
             $value = '^$' if ! length $value;
-            pop @{$tmp->{$args}};
-            push @{$tmp->{$args}}, $value;
+            pop @{$sql->{$args}};
+            push @{$sql->{$args}}, $value;
         }
         elsif ( $operator =~ /^IS\s(?:NOT\s)?NULL\z/ ) {
-            $tmp->{$stmt} .= ' ' . $operator;
+            $sql->{$stmt} .= ' ' . $operator;
         }
         elsif ( $operator =~ /^(?:NOT\s)?IN\z/ ) {
-            $tmp->{$stmt} .= ' ' . $operator;
-            if ( $hist ) {
-                my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );  # sub
-                my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, $clause );
-                if ( ! defined $subquery ) {
-                    $tmp->{$stmt} = $bu_stmt;
+            $sql->{$stmt} .= ' ' . $operator;
+            if ( $ext_col ) {                           #
+                $ext_col =~ s/^\s*\(|\)\s*\z//g;        #
+                $sql->{$stmt} .= '(' . $ext_col . ')';  #
+                last OPERATOR;                          #
+            }                                           #
+            my $col_sep = '';
+            $sql->{$stmt} .= '(';
+
+            IN: while ( 1 ) {
+                $ax->print_sql( $sql, [ $stmt_type ] );
+                # Readline
+                my $value = $trs->readline( 'Value: ' );
+                if ( ! defined $value ) {
+                    $sql->{$stmt} = $bu_stmt;
                     next OPERATOR;
                 }
-                $tmp->{$stmt} .= " (" . $subquery . ")";
-            }
-            else {
-                my $col_sep = '';
-                $tmp->{$stmt} .= '(';
-
-                IN: while ( 1 ) {
-                    $ax->print_sql( $sql, [ $stmt_type ], $tmp );
-                    # Readline
-                    my $value = $trs->readline( 'Value: ' );
-                    if ( ! defined $value ) {
-                        $tmp->{$stmt} = $bu_stmt;
+                if ( $value eq '' ) {
+                    if ( $col_sep eq '' ) {
+                        $sql->{$stmt} = $bu_stmt;
                         next OPERATOR;
                     }
-                    if ( $value eq '' ) {
-                        if ( $col_sep eq '' ) {
-                            $tmp->{$stmt} = $bu_stmt;
-                            next OPERATOR;
-                        }
-                        $tmp->{$stmt} .= ')';
-                        last IN;
-                    }
-                    $tmp->{$stmt} .= $col_sep . '?';
-                    push @{$tmp->{$args}}, $value;
-                    $col_sep = ',';
+                    $sql->{$stmt} .= ')';
+                    last IN;
                 }
+                $sql->{$stmt} .= $col_sep . '?';
+                push @{$sql->{$args}}, $value;
+                $col_sep = ',';
             }
         }
         elsif ( $operator =~ /^(?:NOT\s)?BETWEEN\z/ ) {
-            $tmp->{$stmt} .= ' ' . $operator;
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            $sql->{$stmt} .= ' ' . $operator;
+            if ( $ext_col ) {                       #
+                $sql->{$stmt} .= ' ' . $ext_col;    #
+                last OPERATOR;                      #
+            }                                       #
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Readline
             my $value_1 = $trs->readline( 'Value 1: ' );
             if ( ! defined $value_1 ) {
-                $tmp->{$stmt} = $bu_stmt;
+                $sql->{$stmt} = $bu_stmt;
                 next OPERATOR;
             }
-            $tmp->{$stmt} .= ' ' . '?' .      ' AND';
-            push @{$tmp->{$args}}, $value_1;
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
+            $sql->{$stmt} .= ' ' . '?' .      ' AND';
+            push @{$sql->{$args}}, $value_1;
+            $ax->print_sql( $sql, [ $stmt_type ] );
             # Readline
             my $value_2 = $trs->readline( 'Value 2: ' );
             if ( ! defined $value_2 ) {
-                $tmp->{$stmt} = $bu_stmt;
+                $sql->{$stmt} = $bu_stmt;
                 next OPERATOR;
             }
-            $tmp->{$stmt} .= ' ' . '?';
-            push @{$tmp->{$args}}, $value_2;
+            $sql->{$stmt} .= ' ' . '?';
+            push @{$sql->{$args}}, $value_2;
         }
         else {
             $operator =~ s/^\s+|\s+\z//g;
-            $tmp->{$stmt} .= ' ' . $operator;
-            $ax->print_sql( $sql, [ $stmt_type ], $tmp );
-            if ( $hist ) {
-                my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );  # sub
-                my $subquery = $sq->choose_subquery( $sql, $tmp, $stmt_type, $clause );
-                if ( ! defined $subquery ) {
-                    $tmp->{$stmt} = $bu_stmt;
-                    next OPERATOR;
-                }
-                $tmp->{$stmt} .= " (" . $subquery . ")";
+            $sql->{$stmt} .= ' ' . $operator;
+            if ( $ext_col ) {                       #
+                $sql->{$stmt} .= ' ' . $ext_col;    #
+                last OPERATOR;                      #
+            }                                       #
+            $ax->print_sql( $sql, [ $stmt_type ] );
+            my $prompt = $operator =~ /^(?:NOT\s)?LIKE\z/ ? 'Pattern: ' : 'Value: '; #
+            # Readline
+            my $value = $trs->readline( $prompt );
+            if ( ! defined $value ) {
+                $sql->{$stmt} = $bu_stmt;
+                next OPERATOR;
             }
-            else {
-                my $prompt = $operator =~ /^(?:NOT\s)?LIKE\z/ ? 'Pattern: ' : 'Value: '; #
-                # Readline
-                my $value = $trs->readline( $prompt );
-                if ( ! defined $value ) {
-                    $tmp->{$stmt} = $bu_stmt;
-                    next OPERATOR;
-                }
-                $tmp->{$stmt} .= ' ' . '?';
-                push @{$tmp->{$args}}, $value;
-            }
+            $sql->{$stmt} .= ' ' . '?';
+            push @{$sql->{$args}}, $value;
         }
         last OPERATOR; #
     }
     return 1; #
 }
+
 
 
 

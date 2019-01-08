@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 # -----------------------------------------------------------------------------
 
@@ -133,7 +133,10 @@ sub asFixedWidthString {
         $value = sprintf '%-*s',$width,$value;
     }
     elsif ($type eq 'd') {
-        $value = sprintf '%*d',$width,$value;
+        # %d funktioniert bei großen Zahlen mit z.B. 24 Stellen nicht.
+        # Es wird dann fälschlicherweise -1 als Wert angezeigt.
+        # $value = sprintf '%*d',$width,$value;
+        $value = sprintf '%*s',$width,$value;
     }
     elsif ($type eq 'f') {
         $value = sprintf '%*.*f',$width,$scale,$value;
@@ -210,7 +213,7 @@ sub htmlAlign {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -218,7 +221,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

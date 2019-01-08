@@ -181,6 +181,15 @@ sub test_find : Test(5) {
 
 # -----------------------------------------------------------------------------
 
+sub test_findProgram : Test(1) {
+    my $self = shift;
+
+    my $path = Prty::Path->findProgram('ls',1);
+    $self->like($path,qr|/ls$|);
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_mkdir : Test(2) {
     my $self = shift;
 

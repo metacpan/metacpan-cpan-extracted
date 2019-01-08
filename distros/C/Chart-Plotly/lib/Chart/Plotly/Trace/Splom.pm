@@ -15,7 +15,7 @@ use Chart::Plotly::Trace::Splom::Stream;
 use Chart::Plotly::Trace::Splom::Transform;
 use Chart::Plotly::Trace::Splom::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Splom traces generate scatter plot matrix visualizations. Each splom `dimensions` items correspond to a generated axis. Values for each of those dimensions are set in `dimensions[i].values`. Splom traces support all `scattergl` marker style attributes. Specify `layout.grid` attributes and/or layout x-axis and y-axis attributes for more control over the axis positioning and style.
 
@@ -67,7 +67,7 @@ has dimensions => ( is  => "rw",
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -206,7 +206,7 @@ Chart::Plotly::Trace::Splom - Splom traces generate scatter plot matrix visualiz
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

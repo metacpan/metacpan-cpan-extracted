@@ -8,7 +8,7 @@ use 5.008003;
 use File::Basename qw( basename );
 use List::Util     qw( none any );
 
-#use SQL::Type::Guess  qw(); # "require"d
+#use SQL::Type::Guess  qw(); # required
 
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_number insert_sep );
@@ -17,9 +17,9 @@ use Term::TablePrint   qw( print_table );
 
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
+use App::DBBrowser::GetContent;
 use App::DBBrowser::Opt;
-use App::DBBrowser::Table;
-#use App::DBBrowser::Table::Insert; # "require"(d)
+use App::DBBrowser::Table::WriteAccess;
 
 
 sub new {
@@ -59,7 +59,7 @@ sub delete_table {
     if ( ! $ok ) {
         return;
     }
-    $ax->print_sql( $sql, [ $Drop_table ], undef, 'Computing: ... ' );
+    $ax->print_sql( $sql, [ $Drop_table ], 'Computing: ... ' );
     my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sql->{table} );
     $sth->execute();
     my $col_names = $sth->{NAME}; # mysql: $sth->{NAME} before fetchall_arrayref
@@ -90,6 +90,7 @@ sub delete_table {
 sub create_new_table {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $gc = App::DBBrowser::GetContent->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sql = {};
     $ax->reset_sql( $sql );
     my @cu_keys = ( qw/create_table_plain create_table_form_file create_table_form_copy settings/ );
@@ -133,18 +134,14 @@ sub create_new_table {
         }
         if ( $custom eq $cu{create_table_form_copy} ) {
             push @$stmt_typeS, 'Insert';
-            require App::DBBrowser::Table::Insert;
-            my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $ok = $tbl_in->from_copy_and_paste( $sql, $stmt_typeS );
+            my $ok = $gc->from_copy_and_paste( $sql, $stmt_typeS );
             if ( ! $ok ) {
                 next MENU;
             }
         }
         elsif ( $custom eq $cu{create_table_form_file} ) {
             push @$stmt_typeS, 'Insert';
-            require App::DBBrowser::Table::Insert;
-            my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $file_name = $tbl_in->from_file( $sql, $stmt_typeS );
+            my $file_name = $gc->from_file( $sql, $stmt_typeS );
             if ( ! $file_name ) {
                 next MENU;
             }
@@ -155,11 +152,12 @@ sub create_new_table {
             next MENU;
         }
         $ax->print_sql( $sql, $stmt_typeS );
-        if ( $sf->{d}{driver} eq 'SQLite' ) {
-            $sf->{col_name_auto_inc} = $sf->{o}{create}{auto_inc_col_name};
+        my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
+        if ( $sf->{constraint_auto} = $plui->primary_key_autoincrement_constraint( $sf->{d}{dbh} ) ) {
+            $sf->{col_auto} = $sf->{o}{create}{autoincrement_col_name};
         }
         else {
-            $sf->{col_name_auto_inc} = '';
+            $sf->{col_auto} = '';
         }
         my $ok_columns = $sf->__set_columns( $sql, $stmt_typeS );
         if ( ! $ok_columns ) {
@@ -171,15 +169,13 @@ sub create_new_table {
         # quote col names
         $sql->{create_table_cols} = $ax->quote_simple_many( $sql->{create_table_cols} );
         $sql->{insert_into_cols} = [ @{$sql->{create_table_cols}} ];
-        if ( $sf->{col_name_auto_inc} ) {
+        if ( $sf->{col_auto} ) {
             shift @{$sql->{insert_into_cols}};
         }
         $ax->print_sql( $sql, $stmt_typeS );
         if ( $custom eq $cu{create_table_plain} ) {
-            require App::DBBrowser::Table::Insert;
-            my $tbl_in = App::DBBrowser::Table::Insert->new( $sf->{i}, $sf->{o}, $sf->{d} );
             push @$stmt_typeS, 'Insert';
-            my $ok = $tbl_in->__from_col_by_col( $sql, $stmt_typeS );
+            my $ok = $gc->from_col_by_col( $sql, $stmt_typeS );
             if ( ! $ok ) {
                 pop @$stmt_typeS;
             }
@@ -202,18 +198,17 @@ sub create_new_table {
         my $stmt = $ax->get_stmt( $sql, 'Create_table', 'prepare' );
         $sf->{d}{dbh}->do( $stmt ) or die "$stmt failed!";
         delete $sql->{create_table_cols};
-        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM $qt_table LIMIT 0" );
-        $sth->execute() if $sf->{d}{driver} ne 'SQLite';
         if ( $stmt_typeS->[-1] eq 'Insert' ) {
             $stmt_typeS = [ $stmt_typeS->[-1] ];
+            my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM $qt_table LIMIT 0" );
+            $sth->execute() if $sf->{d}{driver} ne 'SQLite';
             my @columns = @{$sth->{NAME}};
-            $sth->finish();
-            if ( length $sf->{col_name_auto_inc} ) {
+            if ( length $sf->{col_auto} ) {
                 shift @columns;
             }
             $sql->{insert_into_cols} = $ax->quote_simple_many( \@columns );
-            my $tbl = App::DBBrowser::Table->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            my $commit_ok = $tbl->commit_sql( $sql, $stmt_typeS );
+            my $tw = App::DBBrowser::Table::WriteAccess->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $commit_ok = $tw->commit_sql( $sql, $stmt_typeS );
         }
         return 1;
     }
@@ -295,25 +290,25 @@ sub __set_columns {
         }
     }
     $sql->{insert_into_cols} = [ @{$sql->{create_table_cols}} ];
-    if ( $sf->{col_name_auto_inc} ) {
-        my ( $add, $skip ) = ( '- Add ai-column', '- Skip' );
+    if ( $sf->{col_auto} ) {
+        my ( $skip, $add ) = ( '- Skip', '- Add ai-column' );
         $ax->print_sql( $sql, $stmt_typeS );
         # Choose
         my $choice = choose(
-            [ undef, $add, $skip ],
+            [ undef, $skip, $add  ],
             { %{$sf->{i}{lyt_stmt_v}}, prompt => 'Auto increment column:' }
         );
         if ( ! defined $choice ) {
             return;
         }
         elsif ( $choice eq $skip ) {
-            $sf->{col_name_auto_inc} = '';
+            $sf->{col_auto} = '';
         }
     }
     my $c = 0;
     my $fields = [ map { [ ++$c, defined $_ ? "$_" : '' ] } @{$sql->{create_table_cols}} ];
-    if ( length $sf->{col_name_auto_inc} ) {
-        unshift @$fields, [ 'ai', $sf->{col_name_auto_inc} ];
+    if ( length $sf->{col_auto} ) {
+        unshift @$fields, [ 'ai', $sf->{col_auto} ];
     }
     my $trs = Term::Form->new( 'cols' );
     $ax->print_sql( $sql, $stmt_typeS );
@@ -327,9 +322,9 @@ sub __set_columns {
     }
     $sql->{create_table_cols} = [ map { $_->[1] } @$form ]; # not quoted
     $sql->{insert_into_cols} = [ @{$sql->{create_table_cols}} ];
-    if ( length $sf->{col_name_auto_inc} ) {
+    if ( length $sf->{col_auto} ) {
         my $auto_col = shift @{$sql->{insert_into_cols}};
-        $sf->{col_name_auto_inc} = $auto_col; # the user could have changed or removed the name
+        $sf->{col_auto} = $auto_col; # the user could have changed or removed the name
     }
     $ax->print_sql( $sql, $stmt_typeS );
     return 1;
@@ -342,7 +337,7 @@ sub __set_data_types {
     my $data_types;
     my $fields;
     if ( $sf->{o}{create}{data_type_guessing} ) {
-        $ax->print_sql( $sql, $stmt_typeS, undef, 'Guessing data types ... ' );
+        $ax->print_sql( $sql, $stmt_typeS, 'Guessing data types ... ' );
         $data_types = $sf->__guess_data_type( $sql );
     }
     if ( defined $data_types ) {
@@ -352,8 +347,8 @@ sub __set_data_types {
         $fields = [ map { [ $_, '' ] } @{$sql->{insert_into_cols}} ];
     }
     my $read_only = [];
-    if ( length $sf->{col_name_auto_inc} ) {
-        unshift @$fields, [ $ax->quote_col_qualified( [ $sf->{col_name_auto_inc} ] ), 'INTEGER PRIMARY KEY' ];
+    if ( length $sf->{col_auto} ) {
+        unshift @$fields, [ $ax->quote_col_qualified( [ $sf->{col_auto} ] ), $sf->{constraint_auto} ];
         $read_only = [ 0 ];
     }
     my $trs = Term::Form->new( 'cols' );

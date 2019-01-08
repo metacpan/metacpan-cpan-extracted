@@ -1,8 +1,7 @@
 # -*- Perl -*-
 #
-# a numeric grid of weights plus some related functions
-#
-# run perldoc(1) on this file for additional documentation
+# Dijkstra Map path finding. run perldoc(1) on this file for additional
+# documentation
 
 package Game::DijkstraMap;
 
@@ -15,12 +14,15 @@ use Moo;
 use namespace::clean;
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.08';
+our $VERSION = '1.01';
 
-has max_cost => ( is => 'rw', default => sub { ~0 } );
+use constant SQRT2 => sqrt(2);
+
+has bad_cost => ( is => 'rw', default => sub { -2147483648 } );
 has min_cost => ( is => 'rw', default => sub { 0 } );
-has bad_cost => ( is => 'rw', default => sub { -1 } );
-has costfn   => (
+has max_cost => ( is => 'rw', default => sub { 2147483647 } );
+
+has costfn => (
     is      => 'rw',
     default => sub {
         return sub {
@@ -29,22 +31,60 @@ has costfn   => (
             if ( $c eq 'x' ) { return $self->min_cost }
             return $self->max_cost;
         };
-    },
+    }
 );
-has next_m => ( is => 'rw', default => sub { 'next' }, );
-has dimap  => ( is => 'rw', );
+has dimap  => ( is => 'rw' );
 has iters  => ( is => 'rwp', default => sub { 0 } );
+has next_m => ( is => 'rw', default => sub { 'next' } );
+has normfn => ( is => 'rw', default => sub { \&norm_4way } );
 
 sub BUILD {
     my ( $self, $param ) = @_;
     croak "cannot have both map and str2map arguments"
       if exists $param->{'map'} and exists $param->{'str2map'};
-    if ( exists $param->{'map'} ) {
-        $self->map( $param->{'map'} );
+    $self->map( $param->{'map'} )
+      if exists $param->{'map'};
+    $self->map( $self->str2map( $param->{'str2map'} ) )
+      if exists $param->{'str2map'};
+}
+
+sub adjacent_values {
+    my ( $dimap, $r, $c, $maxrow, $maxcol ) = @_;
+    my @values;
+    for my $i ( -1, 1 ) {
+        my $x = $c + $i;
+        push @values, $dimap->[$r][$x] if $x >= 0 and $x <= $maxcol;
+        for my $j ( -1 .. 1 ) {
+            $x = $r + $i;
+            my $y = $c + $j;
+            push @values, $dimap->[$x][$y]
+              if $x >= 0
+              and $x <= $maxrow
+              and $y >= 0
+              and $y <= $maxcol;
+        }
     }
-    if ( exists $param->{'str2map'} ) {
-        $self->map( $self->str2map( $param->{'str2map'} ) );
-    }
+    return @values;
+}
+
+sub adjacent_values_diag {
+    my ( $dimap, $r, $c, $maxrow, $maxcol ) = @_;
+    my @values;
+    push @values, $dimap->[ $r - 1 ][ $c - 1 ] if $r > 0       and $c > 0;
+    push @values, $dimap->[ $r - 1 ][ $c + 1 ] if $r > 0       and $c < $maxcol;
+    push @values, $dimap->[ $r + 1 ][ $c - 1 ] if $r < $maxrow and $c > 0;
+    push @values, $dimap->[ $r + 1 ][ $c + 1 ] if $r < $maxrow and $c < $maxcol;
+    return @values;
+}
+
+sub adjacent_values_sq {
+    my ( $dimap, $r, $c, $maxrow, $maxcol ) = @_;
+    my @values;
+    push @values, $dimap->[$r][ $c - 1 ] if $c > 0;
+    push @values, $dimap->[$r][ $c + 1 ] if $c < $maxcol;
+    push @values, $dimap->[ $r - 1 ][$c] if $r > 0;
+    push @values, $dimap->[ $r + 1 ][$c] if $r < $maxrow;
+    return @values;
 }
 
 sub dimap_with {
@@ -91,7 +131,8 @@ sub map {
             $dimap->[$r][$c] = $self->costfn->( $self, $map->[$r][$c] );
         }
     }
-    $self->normalize_costs($dimap);
+    $self->_set_iters(
+        $self->normfn->( $dimap, $self->min_cost, $self->max_cost ) );
     $self->dimap($dimap);
     return $self;
 }
@@ -135,7 +176,8 @@ sub next_best {
 
 # next() but only in square directions or "orthogonal" (but diagonals
 # are orthogonal to one another) or in the "cardinal directions" (NSEW)
-# but that term also seems unsatisfactory
+# but that term also seems unsatisfactory. "4-way" is also used for this
+# with the assumption of cardinal directions
 sub next_sq {
     my ( $self, $r, $c, $value ) = @_;
     my $dimap = $self->dimap;
@@ -204,49 +246,82 @@ sub next_with {
     return $ret[0]->[0];
 }
 
-sub normalize_costs {
-    my ( $self, $dimap ) = @_;
-    my $badcost = $self->bad_cost;
-    my $mincost = $self->min_cost;
-    my $maxcost = $self->max_cost;
-    my $iters   = 0;
+# 4-way "square" normalization as seen in the Brogue article (was called
+# normalize_costs and used to be a method). one could possibly also
+# normalize only in the diagonal directions...
+sub norm_4way {
+    my ( $dimap, $mincost, $maxcost, $avfn ) = @_;
+    $avfn //= \&adjacent_values_sq;
+    my $iters  = 0;
+    my $maxrow = $dimap->$#*;
+    my $maxcol = $dimap->[0]->$#*;
+    my $stable;
     while (1) {
-        my $stable = 1;
+        $stable = 1;
         $iters++;
-        my $maxrow = $dimap->$#*;
-        my $maxcol = $dimap->[0]->$#*;
         for my $r ( 0 .. $maxrow ) {
             for my $c ( 0 .. $maxcol ) {
                 my $value = $dimap->[$r][$c];
                 next if $value <= $mincost;
-                my $min = $maxcost;
-                my $tmp;
-                if ( $c > 0 ) {
-                    $tmp = $dimap->[$r][ $c - 1 ];
-                    $min = $tmp if $tmp != $badcost and $tmp < $min;
+                my $best = $maxcost;
+                for my $nv ( $avfn->( $dimap, $r, $c, $maxrow, $maxcol ) ) {
+                    $best = $nv if $nv < $best and $nv >= $mincost;
+                    last if $best == $mincost;
                 }
-                if ( $c < $maxcol ) {
-                    $tmp = $dimap->[$r][ $c + 1 ];
-                    $min = $tmp if $tmp != $badcost and $tmp < $min;
-                }
-                if ( $r > 0 ) {
-                    $tmp = $dimap->[ $r - 1 ][$c];
-                    $min = $tmp if $tmp != $badcost and $tmp < $min;
-                }
-                if ( $r < $maxrow ) {
-                    $tmp = $dimap->[ $r + 1 ][$c];
-                    $min = $tmp if $tmp != $badcost and $tmp < $min;
-                }
-                if ( $value > $min + 2 ) {
-                    $dimap->[$r][$c] = $min + 1;
+                if ( $value > $best + 2 ) {
+                    $dimap->[$r][$c] = $best + 1;
                     $stable = 0;
                 }
             }
         }
         last if $stable;
     }
-    $self->_set_iters($iters);
-    return $self;
+    return $iters;
+}
+
+# 8-way normalization could either be done with small integers where
+# diagonals cost the same as square motion (this is non-Euclidean though
+# traditional in roguelikes) ...
+sub norm_8way {
+    push @_, \&adjacent_values;
+    &norm_4way;    # perldoc perlsub explains this calling form
+}
+
+# ... or one could instead use floating point values to better
+# approximate diagonals costing sqrt(2) but this is more complicated,
+# which is perhaps why many roguelikes use 4-way or non-Euclidean 8-way
+sub norm_8way_euclid {
+    my ( $dimap, $mincost, $maxcost ) = @_;
+    my $iters  = 0;
+    my $maxrow = $dimap->$#*;
+    my $maxcol = $dimap->[0]->$#*;
+    my $stable;
+    while (1) {
+        $stable = 1;
+        $iters++;
+        for my $r ( 0 .. $maxrow ) {
+            for my $c ( 0 .. $maxcol ) {
+                my $value = $dimap->[$r][$c];
+                next if $value <= $mincost;
+                my $best = [ $maxcost, 0 ];
+                for my $nr (
+                    map( [ $_, 1 ], adjacent_values_sq( $dimap, $r, $c, $maxrow, $maxcol ) ),
+                    map( [ $_, SQRT2 ], adjacent_values_diag( $dimap, $r, $c, $maxrow, $maxcol ) )
+                ) {
+                    $best = $nr if $nr->[0] < $best->[0] and $nr->[0] >= $mincost;
+                    last if $best->[0] == $mincost;
+                }
+                # TODO should this be + 2 like the others or is + SQRT2
+                # a better check?
+                if ( $value > $best->[0] + SQRT2 ) {
+                    $dimap->[$r][$c] = $best->[0] + $best->[1];
+                    $stable = 0;
+                }
+            }
+        }
+        last if $stable;
+    }
+    return $iters;
 }
 
 sub path_best {
@@ -271,7 +346,7 @@ sub recalc {
             $dimap->[$r][$c] = $maxcost if $dimap->[$r][$c] > $mincost;
         }
     }
-    $self->normalize_costs($dimap);
+    $self->_set_iters( $self->normfn->( $dimap, $mincost, $maxcost ) );
     $self->dimap($dimap);
     return $self;
 }
@@ -406,6 +481,15 @@ Game::DijkstraMap - a numeric grid of weights plus some related functions
 
   $dm->unconnected;   # [[3,3]]
 
+  # custom costfn example -- search in the walls
+  $dm = Game::DijkstraMap->new(
+      costfn => sub {
+          my ( $self, $c ) = @_;
+          if ( $c eq '#' ) { return $self->max_cost }
+          return $self->bad_cost;
+      }
+  );
+
 =head1 DESCRIPTION
 
 This module implements code described by "The Incredible Power of
@@ -432,23 +516,12 @@ reduce object construction verbosity:
 
 =over 4
 
-=item B<max_cost>
-
-Cost for non-goal non-wall points. A large number by default. These
-points are reduced to appropriate weights (steps from the nearest goal
-point) by B<normalize_costs> which is called by B<map> or B<recalc>.
-
-=item B<min_cost>
-
-Cost for points that are goals (there can be one or more goals on a
-grid). Zero by default.
-
 =item B<bad_cost>
 
 Cost for cells through which motion is illegal (walls, typically, though
-a map for cats may also treat water as impassable). C<-1> by default,
-and ignored when updating the map. This value for optimization purposes
-is assumed to be lower than B<min_cost>.
+a map for cats may also treat water as impassable). C<INT_MIN> by
+default (previously C<-1>) and ignored when updating the map. This value
+for optimization purposes is assumed to be lower than B<min_cost>.
 
 =item B<costfn>
 
@@ -465,22 +538,48 @@ cell contains that a custom B<costfn> then calls.
 =item B<dimap>
 
 The Dijkstra Map, presently an array reference of array references of
-integer values. Do not change this reference unless you know what you
+numeric values. Do not change this reference unless you know what you
 are doing. It can also be assigned to directly, for better or worse.
 
-Most method calls will fail if this is not set; be sure to load a level
-map first with the B<map> method (or manually).
+Most method calls will fail if this is not set; be sure to load a map
+first e.g. with B<map> or B<str2map>.
 
 =item B<iters>
 
-This is set after the B<map> and B<recalc> method calls and indicates
-how many iterations it took B<normalize_costs> to stabilize the map.
+This is set during the B<map> and B<recalc> method calls and indicates
+how many iterations it took the B<normfn> to stabilize the map.
+
+=item B<max_cost>
+
+Cost for non-goal (B<min_cost>) non-wall (B<bad_cost>) cells. C<INT_MAX>
+by default. These are reduced to appropriate weights (steps from the
+nearest goal point) by the B<normfn> that is called by B<map> or
+B<recalc>.
+
+=item B<min_cost>
+
+Cost for points that are goals (there can be one or more goals on a
+grid). Zero by default.
 
 =item B<next_m>
 
 A string used by various B<next_*> methods to use as a method to find
 adjacent squares to move to, C<next> by default (which allows for
 diagonal motions) but could instead be C<next_sq>.
+
+=item B<normfn>
+
+A code reference that is called during B<map> and B<recalc> to weight
+the Dijkstra Map as appropriate. The default B<norm_4way> calculates
+weights using square or 4-way motion as seen in Brogue; other roguelikes
+will need an 8-way cost function if diagonal moves are in general
+permitted; this is possible with the B<norm_8way> function:
+
+    Game::DijkstraMap->new(
+        normfn  => \&Game::DijkstraMap::norm_8way,
+        str2map => <<'EOM' );
+    ...
+    EOM
 
 =back
 
@@ -510,10 +609,10 @@ Returns the object so can be chained with other calls.
 =item B<next> I<row> I<col> [ I<value> ]
 
 Returns the adjacent points with lower values than the given cell. Both
-square and diagonal moves are considered, unlike in B<normalize_costs>.
-The return format is an array reference to a (possibly empty) list of
-array references in the form of C<[[row,col],value],...> in no order
-that should be relied on.
+square and diagonal moves are considered by default, unlike in the
+default B<normfn>. The return format is an array reference to a
+(possibly empty) list of array references in the form of
+C<[[row,col],value],...> in no order that should be relied on.
 
 L</THE DREADED DIAGONAL> has a longer discussion of such moves.
 
@@ -558,23 +657,6 @@ See also B<dimap_with>.
 A custom version of this method may need to be written--this
 implementation will for example not leave a local minimum point.
 
-=item B<normalize_costs> I<dimap>
-
-Mostly an internal routine called by B<map> or B<recalc> that reduces
-cells as appropriate relative to B<min_cost> cells. Changes the B<iters>
-attribute. Note that this method has a square move bias and will not
-connect areas joined only by a diagonal; C<@> would not be able to reach
-the goal C<x> in the following map:
-
-  ######
-  #@.#x#
-  #.##.#
-  ##...#
-  ######
-
-The B<next> method is able to walk diagonal paths but only where a
-adjacent square cell was available during B<normalize_costs>.
-
 =item B<path_best> I<row> I<col> [ I<next-method> ]
 
 Finds a best path to a goal via repeated calls to B<next> or optionally
@@ -583,9 +665,8 @@ reference of array references (a reference to a list of points).
 
 =item B<recalc>
 
-Resets the weights of all non-wall non-goal cells and then calls
-B<normalize_costs>. See below for a discussion of B<update> and
-B<recalc>.
+Resets the weights of all non-wall non-goal cells and then calls the
+B<normfn>. See below for a discussion of B<update> and B<recalc>.
 
 Returns the object so can be chained with other calls.
 
@@ -629,6 +710,60 @@ Returns the values for the given list of points.
 
 =back
 
+=head1 SUBROUTINES
+
+These are mostly for internal use.
+
+=over 4
+
+=item B<adjacent_values> I<dimap> I<row> I<col> I<maxrow> I<maxcol>
+
+Returns the values for valid cells surrounding the given I<row> and
+I<col>. The order of the values must not be relied on. Shuffle the order
+to avoid any bias in cases where that may matter (e.g. with C<shuffle>
+of L<List::Util>).
+
+=item B<adjacent_values_diag> I<dimap> I<row> I<col> I<maxrow> I<maxcol>
+
+Returns the values for valid cells diagonal to the given I<row>
+and I<col>.
+
+=item B<adjacent_values_sq> I<dimap> I<row> I<col> I<maxrow> I<maxcol>
+
+Returns the values for valid cells square (4-way) to the given I<row>
+and I<col>.
+
+=item B<norm_4way> I<dimap> I<mincost> I<maxcost>
+
+This is called by B<map> or B<recalc> via the B<normfn> attribute and
+reduces cell cost values relative to the B<min_cost> cells. Returns a
+value that is set to the B<iters> attribute. This method onlu considers
+square (4-way) moves in the compass directions and will not connect
+areas joined only by a diagonal; C<@> would not be able to reach the
+goal C<x> in the following map:
+
+  ######
+  #@.#x#
+  #.##.#
+  ##...#
+  ######
+
+The B<next> method is able to walk diagonal paths but only where a
+adjacent square cell was available during B<norm_4way>.
+
+=item B<norm_8way> I<dimap> I<mincost> I<maxcost>
+
+Like B<norm_4way> though assigns the same cost to all surrounding cells.
+Should allow for diagonal path finding.
+
+=item B<norm_8way_euclid> I<dimap> I<mincost> I<maxcost>
+
+A more complicated version of B<norm_8way> that tries to assign a cost
+of C<sqrt(2)> to diagonals instead of the more typical non-Euclidean
+treatment.
+
+=back
+
 =head1 CONSIDERATIONS
 
 Given the map where C<h> represents a hound, C<@> our doomed yet somehow
@@ -642,8 +777,10 @@ still optimistic hero, C<'> an open door, and so forth,
   3|#.#####@#
   4|#########
 
-A Dijkstra Map with the player as the only goal would be the following
-grid of integers that outline the corridor leading to the player
+A Dijkstra Map with the player as the only goal might be the following
+grid of numbers that outline the corridor leading to the player; the
+impassable walls here are represented with C<-1> (the B<bad_cost> is
+now a much lower value by default).
 
      0  1  2  3  4  5  6  7  8
   -+--------------------------
@@ -653,9 +790,9 @@ grid of integers that outline the corridor leading to the player
   3|-1|10|-1|-1|-1|-1|-1| 0|-1
   4|-1|-1|-1|-1|-1|-1|-1|-1|-1
 
-which allows the hound to move towards the player by trotting down the
-positive integers, or to flee by going the other way. This map may need
-to be updated when the player moves or changes the map; for example the
+This allows the hound to move towards the player by trotting down the
+positive numbers, or to flee by going the other way. The map will need
+to be updated when the player moves or the map changes; for example the
 player could close the door:
 
   ######### turn 2
@@ -699,13 +836,14 @@ is a new and longer path around to the player that should be followed:
   $map->update(...)           # case 1
   $map->update(...)->recalc;  # case 2
 
-Case 1 would have the hound move to the door while case 2 would instead
-cause the hound to move around the long way. If the door after case 2 is
-opened and only an B<update> is done, the new shorter route would only
-be considered by monsters directly adjacent to the now open door (weight
-path 34, 1, 0 and also 33, 1, 0 if diagonal moves are permitted) and not
-those at 32, 31, etc. along the longer route; for those to see the
-change of the door another B<recalc> would need to be done.
+Case 1 would have the hound move to the door while case 2 might
+instead cause the hound to start moving around the long way. If the
+door after case 2 is opened and only an B<update> is done, the new
+shorter route would only be considered by monsters directly adjacent
+to the now open door (weight path 34, 1, 0 and also 33, 1, 0 if
+diagonal moves are permitted) and not those at 32, 31, etc. along the
+longer route; for those to see the change of the door another
+B<recalc> would need to be done.
 
 =head1 THE DREADED DIAGONAL
 
@@ -719,14 +857,17 @@ deny the player the ability to move to the lower right cell
 
 while Angband or Dungeon Crawl Stone Soup allow the move. POWDER does
 not allow the player to move diagonally to the upper left cell (unless
-polymorphed) while all the others mentioned would. Also the best square
-to move to could be occupied by another monster, magically conjured
-flames, etc. This is why B<next> and B<next_sq> are fairly generic;
-B<next_best> may not return an ideal move given other considerations.
+polymorphed, or when dressed as a Barbarian) while all the others
+mentioned would. Also the best square to move to could be occupied by
+another monster, magically conjured flames, etc. This is why B<next> and
+B<next_sq> are fairly generic; B<next_best> may not return an ideal move
+given other considerations.
 
-In this module B<normalize_costs> (like in Brogue, where the algorithm
+The default B<normfn>, B<norm_4way> (like in Brogue, where the algorithm
 comes from) only considers square moves when calculating the costs so
-will not find solely diagonal paths that Andband or DCSS consider legal.
+will not find various diagonal paths that Andband or DCSS consider
+legal; use one of the B<norm_8way*> functions to allow path finding
+along diagonals.
 
 =head1 GRID BUGS
 
@@ -742,16 +883,13 @@ L<https://github.com/thrig/Game-DijkstraMap>
 
 =head2 Known Issues
 
-New code that is not much battle-tested. Also a first implementation
-that suffers from hmm, how should this work? design.
+New code that is not much battle-tested, especially B<norm_8way_euclid>.
+Also a first implementation that suffers from "hmm, how should this
+work?" design.
 
-B<normalize_costs> is not very good with long and mostly unconnected
-corridors; this could be improved on by considering adjacent unseen
-cells after a cell changes in addition to full map iterations.
-
-B<normalize_costs> needs a version that supports counting costs along
-diagonals, not just square moves (and either costing diagonals as 1 or
-better yet C<sqrt(2)>).
+B<norm_4way> is not very good with long and mostly unconnected
+corridors; this might be improved on by considering adjacent unseen
+cells after a cell changes in addition to full map iterations?
 
 =head1 SEE ALSO
 
@@ -772,7 +910,7 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Jeremy Mates
+Copyright (C) 2018,2019 by Jeremy Mates
 
 This program is distributed under the (Revised) BSD License:
 L<http://www.opensource.org/licenses/BSD-3-Clause>

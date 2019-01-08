@@ -1,6 +1,29 @@
 Revision history for App-DBBrowser
 
 
+2.040    2019-01-07
+        - MySQL and Pg databases: added 'autoincrement' options.
+        - Bugfix in 'get_schemas'.
+
+2.039    2019-01-06
+        - Bugfix in Join.
+
+2.038    2019-01-06
+        - Tables: filter out tables of the type 'index'.
+        - New: choose the join type.
+        - Bugfix in parse mode split: add negative limit to preserve trailing empty fields.
+        - Parse mode split: empty fields to 'undef' to avoid conflicts with non-string data types.
+
+2.037    2019-01-06
+        - Update aggregate/group by.
+        - Update subqueries/functions.
+        - Update options.
+        - Allow self join.
+        - New function: 'concatenate'.
+        - New aggregate function: 'group_concat'.
+        - Replaced 'lock' with 'reset'.
+        - Tables: don't filter out views.
+
 2.036    2018-12-30
         - Update subqueries.
         - New file name for saved subqueries.

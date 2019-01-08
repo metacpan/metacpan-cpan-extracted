@@ -9,7 +9,7 @@ if ( !defined Moose::Util::TypeConstraints::find_type_constraint('PDL') ) {
 use Chart::Plotly::Trace::Sankey::Node::Hoverlabel;
 use Chart::Plotly::Trace::Sankey::Node::Line;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: This attribute is one of the possible options for the trace sankey.
 
@@ -111,7 +111,7 @@ Chart::Plotly::Trace::Sankey::Node - This attribute is one of the possible optio
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

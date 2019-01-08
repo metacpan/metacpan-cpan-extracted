@@ -18,7 +18,7 @@ use Chart::Plotly::Trace::Histogram::Unselected;
 use Chart::Plotly::Trace::Histogram::Xbins;
 use Chart::Plotly::Trace::Histogram::Ybins;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The sample data from which statistics are computed is set in `x` for vertically spanning histograms and in `y` for horizontally spanning histograms. Binning options are set `xbins` and `ybins` respectively if no aggregation data is provided.
 
@@ -101,7 +101,7 @@ has histnorm => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -303,7 +303,7 @@ Chart::Plotly::Trace::Histogram - The sample data from which statistics are comp
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

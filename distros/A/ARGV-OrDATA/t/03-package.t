@@ -8,6 +8,12 @@ use FindBin;
 use lib $FindBin::Bin;
 
 use My;
+
+BEGIN {
+    open *STDIN, '<&', IO::Pty->new
+        if ! -t && eval { require IO::Pty };
+}
+
 use ARGV::OrDATA qw{ My };
 
 SKIP: {

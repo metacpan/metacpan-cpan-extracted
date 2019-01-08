@@ -1,6 +1,4 @@
 
-# $Id: Handler.pm,v 1.16 2009-07-03 18:16:08 Martin Exp $
-
 package RDF::Simple::Parser::Handler;
 
 use strict;
@@ -14,13 +12,12 @@ use RDF::Simple::Parser::Element;
 
 use constant DEBUG => 0;
 
-# Use a hash to implement objects of this type:
-use Class::MakeMethods::Standard::Hash (
-                                        scalar => [ qw( stack base genID disallowed qnames result bnode_absolute_prefix )],
-                                       );
+use Class::MethodMaker [
+                        scalar => [ qw/ stack base genID disallowed qnames result bnode_absolute_prefix / ],
+                       ];
 
-our
-$VERSION = do { my @r = (q$Revision: 1.16 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+my
+$VERSION = 1.17;
 
 sub new
   {

@@ -1,14 +1,14 @@
 package Data::Unixish;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '1.56'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '1.570'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Module::Load;
-use Package::MoreUtil qw(package_exists);
+use Package::Util::Lite qw(package_exists);
 
 require Exporter;
 our @ISA       = qw(Exporter);
@@ -208,7 +208,7 @@ sub _idux {
     my @res;
     {
         no strict 'refs';
-        my @bres = $funcname_b->(\%args) if defined &$funcname_b;
+        my @bres; @bres = $funcname_b->(\%args) if defined &$funcname_b;
         for (@items) {
             push @res, $funcname_i->($_, \%args);
         }
@@ -253,7 +253,7 @@ Data::Unixish - Implementation for Unixish, a data transformation framework
 
 =head1 VERSION
 
-This document describes version 1.56 of Data::Unixish (from Perl distribution Data-Unixish), released on 2017-07-10.
+This document describes version 1.570 of Data::Unixish (from Perl distribution Data-Unixish), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -431,7 +431,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

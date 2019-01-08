@@ -118,7 +118,7 @@ sub set_runtime_props_from_config {
           ? File::Find::Rule
                 ->file()
                 ->name( 'geos-config' )
-                ->in( $base_dir )
+                ->in( getcwd() )
           : 'geos-config';
     
     my $bin_sh = '';

@@ -17,6 +17,7 @@ lib/Class/XSConstructor.pm
 ppport.h
 t/01basic.t
 t/02types.t
+t/03typenano.t
 t/03typetiny.t
 t/04build.t
 xshelper.h

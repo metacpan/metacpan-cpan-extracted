@@ -69,15 +69,24 @@ requires 'HTML::TreeBuilder::LibXML', v0.26.0;
 requires 'HTTP::Parser::XS',          v0.17.0;
 requires 'Protocol::HTTP2',           v1.9.0;
 requires 'HTTP::Message',             v6.13.0;
-feature linux => sub {    #
+feature linux => sub {
     requires 'IO::Uncompress::Brotli';
 };
 
+# Pcore::API::SMTP
+requires 'Authen::SASL', v2.16.0;
+
+# TODO https://github.com/gbarr/perl-authen-sasl-xs/issues/1
+feature linux => sub {
+    requires 'Devel::CheckLib',  v1.13.0;
+    suggests 'Authen::SASL::XS', v1.0.0;
+};
+
 # Pcore::Util::Class
-requires 'Sub::Util';
+requires 'Sub::Util', v1.50.0;
 
 # Pcore::Util::Data
-requires 'YAML::XS';
+requires 'YAML::XS',         v0.76.0;
 requires 'Cpanel::JSON::XS', v4.7.0;
 requires 'CBOR::XS',         v1.7.0;
 requires 'XML::Hash::XS',    v0.53.0;

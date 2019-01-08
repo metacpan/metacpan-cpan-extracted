@@ -5,6 +5,8 @@ package Sidef::Types::Array::Matrix {
 
     use parent qw(Sidef::Types::Array::Array);
 
+    use overload q{""} => \&_dump;
+
     require List::Util;
 
     my %array_like = (
@@ -15,10 +17,28 @@ package Sidef::Types::Array::Matrix {
 
     sub new {
         my (undef, @rows) = @_;
-        bless [map { bless [@$_] } @rows];
+        bless [map { bless [@$_], 'Sidef::Types::Array::Array' } @rows];
     }
 
     *call = \&new;
+
+    sub is_square {
+        my ($self) = @_;
+
+        my $rows = $#{$self};
+        $rows < 0 and return Sidef::Types::Bool::Bool::TRUE;
+
+        ($rows == $#{$self->[0]})
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub size {
+        my ($self) = @_;
+        my $rows = $#{$self};
+        $rows < 0 and return ((Sidef::Types::Number::Number::ZERO) x 2);
+        (Sidef::Types::Number::Number->_set_uint($rows + 1), Sidef::Types::Number::Number->_set_uint($#{$self->[0]} + 1));
+    }
 
     sub build {
         my (undef, $n, $m, $block) = @_;
@@ -51,21 +71,37 @@ package Sidef::Types::Array::Matrix {
 
         $n = CORE::int($n);
 
-#<<<
         bless [
             map {
-                my $i = $_;
-                bless([map {
-                        $i == $_
-                            ? Sidef::Types::Number::Number::ONE
-                            : Sidef::Types::Number::Number::ZERO
-                } 1 .. $n], 'Sidef::Types::Array::Array')
+                bless(
+                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
+                       Sidef::Types::Number::Number::ONE,
+                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+                      ],
+                      'Sidef::Types::Array::Array'
+                     )
               } 1 .. $n
         ];
-#>>>
     }
 
     *I = \&identity;
+
+    sub column {
+        my ($self, $n) = @_;
+        $n = CORE::int($n);
+        bless [map { $_->[$n] } @$self], 'Sidef::Types::Array::Array';
+    }
+
+    *col        = \&column;
+    *get_column = \&column;
+
+    sub row {
+        my ($self, $n) = @_;
+        $n = CORE::int($n);
+        bless [@{$self->[$n]}], 'Sidef::Types::Array::Array';
+    }
+
+    *get_row = \&row;
 
     sub zero {
         my (undef, $n, $m) = @_;
@@ -104,18 +140,17 @@ package Sidef::Types::Array::Matrix {
 
         $n = CORE::int($n);
 
-#<<<
         bless [
             map {
-                my $i = $_;
-                bless([map {
-                            $i == $_
-                                ? $value
-                                : Sidef::Types::Number::Number::ZERO
-                    } 1 .. $n], 'Sidef::Types::Array::Array')
+                bless(
+                      [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
+                       $value,
+                       (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+                      ],
+                      'Sidef::Types::Array::Array'
+                     )
               } 1 .. $n
         ];
-#>>>
     }
 
     sub row_vector {
@@ -130,45 +165,84 @@ package Sidef::Types::Array::Matrix {
 
     *col_vector = \&column_vector;
 
-    sub diagonal {
+    sub _new_diagonal {
         my (undef, @diag) = @_;
-
         my $n = scalar(@diag);
+        __PACKAGE__->new(
+            [
+             map {
+                 [(Sidef::Types::Number::Number::ZERO) x ($_ - 1),
+                  shift(@diag),
+                  (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+                 ]
+               } 1 .. $n
+            ]
+        );
+    }
 
-#<<<
-        bless [
-            map {
-                my $i = $_;
-                bless([map {
-                    $i == $_
-                        ? shift(@diag)
-                        : Sidef::Types::Number::Number::ZERO
-                } 1 .. $n], 'Sidef::Types::Array::Array')
-            } 1 .. $n
-        ];
-#>>>
+    sub _new_anti_diagonal {
+        my (undef, @diag) = @_;
+        my $n = scalar(@diag);
+        __PACKAGE__->new(
+            [
+             map {
+                 [(Sidef::Types::Number::Number::ZERO) x ($n - $_),
+                  shift(@diag),
+                  (Sidef::Types::Number::Number::ZERO) x ($_ - 1)
+                 ]
+               } 1 .. $n
+            ]
+        );
+    }
+
+    sub diagonal {
+        my ($self) = @_;
+        ref($self) || goto &_new_diagonal;
+        bless [map { $self->[$_][$_] } 0 .. $#{$self}], 'Sidef::Types::Array::Array';
+    }
+
+    sub anti_diagonal {
+        my ($self) = @_;
+        ref($self) || goto &_new_anti_diagonal;
+        bless [map { my $row = $self->[$_]; $row->[$#{$row} - $_] } 0 .. $#{$self}], 'Sidef::Types::Array::Array';
     }
 
     sub rows {
-        my (undef, @rows) = @_;
-
+        my ($self, @rows) = @_;
+        ref($self) && return $self->to_a;
         bless [map { bless([@$_], 'Sidef::Types::Array::Array') } @rows];
     }
 
+    *from_rows = \&rows;
+
     sub columns {
-        my (undef, @cols) = @_;
+        my ($self, @cols) = @_;
+
+        ref($self) && return $self->transpose->to_a;
 
         my $max = List::Util::max(map { scalar(@$_) } @cols);
 
         bless [
             map {
                 my $i = $_;
-                bless [map { $_->[$i] } @cols]
+                bless [map { $_->[$i] } @cols], 'Sidef::Types::Array::Array'
               } 0 .. $max - 1
         ];
     }
 
-    *cols = \&columns;
+    *cols         = \&columns;
+    *from_cols    = \&columns;
+    *from_columns = \&columns;
+
+    sub neg {
+        my ($m1) = @_;
+        bless($m1->scalar_operator('neg'));
+    }
+
+    sub abs {
+        my ($m1) = @_;
+        bless($m1->scalar_operator('abs'));
+    }
 
     sub add {
         my ($m1, $m2) = @_;
@@ -236,17 +310,112 @@ package Sidef::Types::Array::Matrix {
         bless \@c;
     }
 
+    sub floor {
+        my ($self) = @_;
+
+        bless [
+            map {
+                bless [map { $_->floor } @$_], 'Sidef::Types::Array::Array'
+              } @$self
+        ];
+    }
+
+    sub ceil {
+        my ($self) = @_;
+
+        bless [
+            map {
+                bless [map { $_->ceil } @$_], 'Sidef::Types::Array::Array'
+              } @$self
+        ];
+    }
+
+    sub mod {
+        my ($m1, $m2) = @_;
+
+        if (exists $array_like{ref($m2)}) {
+            return $m1->sub($m2->mul($m1->div($m2)->floor));
+        }
+
+        bless($m1->scalar_operator('%', $m2));
+    }
+
+    sub and {
+        my ($m1, $m2) = @_;
+
+        if (exists $array_like{ref($m2)}) {
+            return bless($m1->wise_operator('&', $m2));
+        }
+
+        bless($m1->scalar_operator('&', $m2));
+    }
+
+    sub or {
+        my ($m1, $m2) = @_;
+
+        if (exists $array_like{ref($m2)}) {
+            return bless($m1->wise_operator('|', $m2));
+        }
+
+        bless($m1->scalar_operator('|', $m2));
+    }
+
+    sub xor {
+        my ($m1, $m2) = @_;
+
+        if (exists $array_like{ref($m2)}) {
+            return bless($m1->wise_operator('^', $m2));
+        }
+
+        bless($m1->scalar_operator('^', $m2));
+    }
+
+    sub map {
+        my ($A, $block) = @_;
+
+        my %indices;
+
+        my @new;
+        foreach my $i (0 .. $#{$A}) {
+
+            my @row;
+            my $r = $A->[$i];
+
+            $indices{$i} //= Sidef::Types::Number::Number->_set_uint($i);
+
+            foreach my $j (0 .. $#{$A->[$i]}) {
+                $indices{$j} //= Sidef::Types::Number::Number->_set_uint($j);
+                push @row, $block->run($r->[$j], $indices{$i}, $indices{$j});
+            }
+
+            CORE::push(@new, bless(\@row, 'Sidef::Types::Array::Array'));
+        }
+
+        bless \@new;
+    }
+
+    sub sum {
+        my ($A, $block) = @_;
+        Sidef::Types::Array::Array->new([map { @$_ } @$A])->sum($block);
+    }
+
+    *sum_by = \&sum;
+
+    sub prod {
+        my ($A, $block) = @_;
+        Sidef::Types::Array::Array->new([map { @$_ } @$A])->prod($block);
+    }
+
+    *prod_by = \&prod;
+
     sub pow {
         my ($A, $pow) = @_;
 
         $pow = CORE::int($pow);
+        my $neg = ($pow < 0);
+        $pow = CORE::int(CORE::abs($pow));
 
-        my $neg = 0;
-
-        if ($pow < 0) {
-            $neg = 1;
-            $pow = -$pow;
-        }
+        return $A->inv if ($neg and $pow == 1);
 
 #<<<
         my $n = $#$A;
@@ -269,6 +438,28 @@ package Sidef::Types::Array::Matrix {
         }
 
         $neg ? $B->inv : $B;
+    }
+
+    sub powmod {
+        my ($A, $pow, $mod) = @_;
+
+        if ($pow->is_neg) {
+            $A   = $A->inv;     # TODO: implement invmod
+            $pow = $pow->abs;
+        }
+
+        my $B = __PACKAGE__->identity($#{$A} + 1);
+
+        return $B->mod($mod) if $pow->is_zero;
+
+        while (1) {
+            $B   = $B->mul($A)->mod($mod) if $pow->is_odd;
+            $pow = $pow->rsft(Sidef::Types::Number::Number::ONE);
+            last if $pow->is_zero;
+            $A = $A->mul($A)->mod($mod);
+        }
+
+        $B->mod($mod);
     }
 
     # Code translated from Wikipedia (+ minor tweaks):
@@ -424,18 +615,23 @@ package Sidef::Types::Array::Matrix {
 
             @m[$i, $r] = @m[$r, $i];
 
-            my $t = $m[$r][$j];
+            my $mr  = $m[$r];
+            my $mrj = $mr->[$j];
+
             foreach my $k (0 .. $cols - 1) {
-                $m[$r][$k] = $m[$r][$k]->div($t);
+                $mr->[$k] = $mr->[$k]->div($mrj);
             }
 
             foreach my $i (0 .. $rows - 1) {
 
                 $i == $r and next;
 
-                my $t = $m[$i][$j];
+                my $mr  = $m[$r];
+                my $mi  = $m[$i];
+                my $mij = $mi->[$j];
+
                 foreach my $k (0 .. $cols - 1) {
-                    $m[$i][$k] = $m[$i][$k]->sub($t->mul($m[$r][$k]));
+                    $mi->[$k] = $mi->[$k]->sub($mij->mul($mr->[$k]));
                 }
             }
 
@@ -453,17 +649,12 @@ package Sidef::Types::Array::Matrix {
 
         my $n = $#$self;
 
-#<<<
         my @I = map {
-            my $i = $_;
-            [map {
-                $i == $_
-                    ? Sidef::Types::Number::Number::ONE
-                    : Sidef::Types::Number::Number::ZERO
-            } 0 .. $n]
+            [(Sidef::Types::Number::Number::ZERO) x $_,
+             Sidef::Types::Number::Number::ONE,
+             (Sidef::Types::Number::Number::ZERO) x ($n - $_)
+            ]
         } 0 .. $n;
-#>>>
-
         my @A = map { [@{$self->[$_]}, @{$I[$_]}] } 0 .. $n;
 
         my $r = rref(\@A);
@@ -495,7 +686,7 @@ package Sidef::Types::Array::Matrix {
             my $prev_pivot = $pivot;
             $pivot = $m[$k][$k] // return Sidef::Types::Number::Number::ONE;
 
-            if ($pivot eq Sidef::Types::Number::Number::ZERO) {
+            if ($pivot->is_zero) {
                 my $i = List::Util::first(sub { $m[$_][$k] }, @r) // return Sidef::Types::Number::Number::ZERO;
                 @m[$i, $k] = @m[$k, $i];
                 $pivot = $m[$k][$k];
@@ -517,6 +708,48 @@ package Sidef::Types::Array::Matrix {
     sub transpose {
         my ($matrix) = @_;
         bless($matrix->SUPER::transpose);
+    }
+
+    *t   = \&transpose;
+    *not = \&transpose;
+
+    sub concat {
+        my ($m1, $m2) = @_;
+
+        if (exists $array_like{ref($m2)}) {
+
+            my $end = List::Util::min($#{$m1}, $#{$m2});
+
+            my @m3;
+            foreach my $i (0 .. $end) {
+                push @m3, bless [@{$m1->[$i]}, @{$m2->[$i]}], 'Sidef::Types::Array::Array';
+            }
+
+            return bless \@m3;
+        }
+
+        # Scalar concatenation
+        my @m3;
+        foreach my $i (0 .. $#{$m1}) {
+            push @m3, bless [@{$m1->[$i]}, $m2], 'Sidef::Types::Array::Array';
+        }
+
+        bless \@m3;
+    }
+
+    sub horizontal_flip {
+        my ($self) = @_;
+        bless [map { bless [reverse(@$_)], 'Sidef::Types::Array::Array' } @{$self}];
+    }
+
+    sub vertical_flip {
+        my ($self) = @_;
+        bless [reverse @{$self}];
+    }
+
+    sub flip {
+        my ($self) = @_;
+        bless [reverse map { bless [reverse(@$_)], 'Sidef::Types::Array::Array' } @{$self}];
     }
 
     sub set_row {
@@ -560,6 +793,24 @@ package Sidef::Types::Array::Matrix {
     *row_len  = \&row_count;
     *row_size = \&row_count;
 
+    sub to_array {
+        my ($A) = @_;
+        Sidef::Types::Array::Array->new(@$A);
+    }
+
+    *to_a = \&to_array;
+
+    sub _dump {
+        "Matrix(\n  " . join(",\n  ", @{$_[0]}) . "\n)";
+    }
+
+    sub dump {
+        Sidef::Types::String::String->new($_[0]->_dump);
+    }
+
+    *to_s   = \&dump;
+    *to_str = \&dump;
+
     {
         no strict 'refs';
 
@@ -568,7 +819,11 @@ package Sidef::Types::Array::Matrix {
         *{__PACKAGE__ . '::' . '+'}  = \&add;
         *{__PACKAGE__ . '::' . '-'}  = \&sub;
         *{__PACKAGE__ . '::' . '/'}  = \&div;
-        *{__PACKAGE__ . '::' . '÷'} = \&div;
+        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '&'}  = \&and;
+        *{__PACKAGE__ . '::' . '|'}  = \&or;
+        *{__PACKAGE__ . '::' . '^'}  = \&xor;
+        *{__PACKAGE__ . '::' . '%'}  = \&mod;
     }
 };
 

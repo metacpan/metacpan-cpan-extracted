@@ -4,7 +4,7 @@
       "Vladimir Varlamov <bes.internal@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -26,9 +26,8 @@
       },
       "develop" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
-            "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::More" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -38,8 +37,10 @@
             "List::Util" : "0",
             "Time::Piece" : "0",
             "base" : "0",
+            "perl" : "5.008",
             "strict" : "0",
             "utf8" : "0",
+            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -53,11 +54,13 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
+         "type" : "git",
          "url" : "https://github.com/bes-internal/Date-Holidays-KZ.git",
          "web" : "https://github.com/bes-internal/Date-Holidays-KZ"
       }
    },
-   "version" : "0.2018.0",
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "version" : "0.2019.0",
+   "x_generated_by_perl" : "v5.24.3",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

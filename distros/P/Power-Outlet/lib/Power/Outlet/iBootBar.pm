@@ -4,7 +4,7 @@ use warnings;
 use base qw{Power::Outlet::Common::IP::SNMP};
 use Time::HiRes qw{sleep};
 
-our $VERSION='0.16';
+our $VERSION='0.20';
 our $_oid_outletEntry='1.3.6.1.4.1.1418.4.3.1'; #enterprises.dataprobe.iBootBarAgent.outletTable.outletEntry
 
 =head1 NAME
@@ -149,7 +149,7 @@ sub _name_default {
 
 =head2 query
 
-Sends a TCP/IP message to the iBoot device to query the current state
+Sends a TCP/IP message to the iBootBar device to query the current state
 
 =cut
 

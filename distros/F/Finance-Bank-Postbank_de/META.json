@@ -30,6 +30,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "LWP::ConsoleLogger" : "0.000039"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Encode" : "0",
@@ -69,7 +74,7 @@
          "web" : "https://github.com/Corion/Finance-Bank-Postbank_de"
       }
    },
-   "version" : "0.55",
+   "version" : "0.56",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

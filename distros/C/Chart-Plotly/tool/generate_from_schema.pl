@@ -15,7 +15,7 @@ use Scalar::Util;
 
 # TODO Use enum names
 # TODO Use enums with JSON::false and JSON::true and number
-# TODO Types: color, subplotid, flaglist, angle, colorscale
+# TODO Types: color, subplotid, angle, colorscale
 # TODO Add defaults?
 # TODO Add support for items
 
@@ -23,6 +23,7 @@ my $moose_type_for = {
     any        => 'Any',
     number     => 'Num',
     string     => 'Str',
+    flaglist   => 'Str',
     boolean    => 'Bool',
     integer    => 'Int',
     info_array => 'ArrayRef|PDL',

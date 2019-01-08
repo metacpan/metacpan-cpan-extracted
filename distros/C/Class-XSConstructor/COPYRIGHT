@@ -19,15 +19,14 @@ Files: README
  t/02types.t
  t/03typetiny.t
  t/04build.t
-Copyright: This software is copyright (c) 2018 by Toby Inkster.
+Copyright: This software is copyright (c) 2018-2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
-Copyright: Copyright 2018 Toby Inkster.
+Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -36,15 +35,23 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: t/03typenano.t
+Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2018 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

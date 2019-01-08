@@ -311,14 +311,14 @@ package Sidef::Types::String::String {
 
     sub decode_base64 {
         state $x = require MIME::Base64;
-        MIME::Base64::decode_base64(${$_[0]});
+        bless \MIME::Base64::decode_base64(${$_[0]});
     }
 
     *base64_decode = \&decode_base64;
 
     sub encode_base64 {
         state $x = require MIME::Base64;
-        MIME::Base64::encode_base64(${$_[0]});
+        bless \MIME::Base64::encode_base64(${$_[0]});
     }
 
     *base64_encode = \&encode_base64;
@@ -421,7 +421,7 @@ package Sidef::Types::String::String {
     sub ord {
         my ($self) = @_;
         $$self eq ''
-          ? Sidef::Types::Number::Number->nan
+          ? undef
           : Sidef::Types::Number::Number->_set_uint(CORE::ord($$self));
     }
 
@@ -1004,7 +1004,7 @@ package Sidef::Types::String::String {
         foreach my $i (0 .. $#s) {
 
             my $start = List::Util::max(0, $i - $match_distance);
-            my $end = List::Util::min($i + $match_distance + 1, $t_len);
+            my $end   = List::Util::min($i + $match_distance + 1, $t_len);
 
             foreach my $j ($start .. $end - 1) {
                 $t_matches[$j] and next;
@@ -1210,6 +1210,11 @@ package Sidef::Types::String::String {
         Sidef::Module::Func->__NEW__($self->_require);
     }
 
+    sub run {
+        my ($method, $self, @args) = @_;
+        $self->$$method(@args);
+    }
+
     sub unescape {
         my ($self) = @_;
         $self->new($$self =~ s{\\(.)}{$1}grs);
@@ -1379,7 +1384,7 @@ package Sidef::Types::String::String {
 
             state %cache;
             my $type = (ref($self) =~ s/::Types::/::DataTypes::/r);
-            my $dt = ($cache{$type} //= bless({}, $type));
+            my $dt   = ($cache{$type} //= bless({}, $type));
 
             my $expr = {
                         $parser->{class} => [
@@ -1437,10 +1442,6 @@ package Sidef::Types::String::String {
     }
 
     *drop_right = \&shift_right;
-
-    sub pair_with {
-        Sidef::Types::Array::Pair->new($_[0], $_[1]);
-    }
 
     sub to_str {
         $_[0];
@@ -1503,15 +1504,15 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '-'}   = \&diff;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
         *{__PACKAGE__ . '::' . '<'}   = \&lt;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
-        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
-        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '≤'}   = \&le;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
-        *{__PACKAGE__ . '::' . '÷'}  = \&div;
+        *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '..'}  = \&to;
         *{__PACKAGE__ . '::' . '^'}   = \&xor;
@@ -1520,7 +1521,6 @@ package Sidef::Types::String::String {
         *{__PACKAGE__ . '::' . '<<'}  = \&shift_left;
         *{__PACKAGE__ . '::' . '>>'}  = \&shift_right;
         *{__PACKAGE__ . '::' . '%'}   = \&sprintf;
-        *{__PACKAGE__ . '::' . ':'}   = \&pair_with;
         *{__PACKAGE__ . '::' . '~'}   = \&not;
     }
 };

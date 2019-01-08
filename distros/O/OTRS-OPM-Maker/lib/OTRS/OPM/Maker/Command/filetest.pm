@@ -11,7 +11,7 @@ use XML::LibXML;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub abstract {
     return "Check if filelist in .sopm includes the files on your disk";
@@ -93,7 +93,7 @@ OTRS::OPM::Maker::Command::filetest - check if filelist in .sopm includes the fi
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 AUTHOR
 

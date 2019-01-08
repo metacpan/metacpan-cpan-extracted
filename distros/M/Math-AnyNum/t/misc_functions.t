@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 503;
+plan tests => 577;
 
 use Math::AnyNum qw(:misc lngamma ipow10 log);
 use List::Util qw();
@@ -66,6 +66,27 @@ foreach my $i (1 .. 1000) {
     }
 }
 ok($end_inclusive, 'rand is end-inclusive');
+
+ok(!defined(min()));
+ok(!defined(max()));
+
+is(max(0), 0);
+is(min(0), 0);
+
+is(max(5, 2), '5');
+is(min(2, 5), '2');
+
+is(max(2, 5), '5');
+is(min(5, 2), '2');
+
+is(max(3, 5, 2), 5);
+is(min(3, 1, 2), 1);
+
+is(max('-43/9', '-19/2', '-9', '-3.4', '-3-10i', '-4'), '-3-10i');
+is(min('43/9', '-19/2', 42, '-9', '-3.4', '-3-10i', '9.1'), '-19/2');
+
+ok(!defined(max(5, 'NaN', 42)));
+ok(!defined(min(5, 'NaN', 42)));
 
 is(sum(),  0);
 is(prod(), 1);
@@ -441,6 +462,66 @@ is(as_hex(42), '2a');
 is(as_bin(complex(42)), '101010');
 is(as_oct(rat(42)),     '52');
 is(as_hex(float(42)),   '2a');
+
+is(base('255',   16), 'ff');
+is(base(rat(42), 8),  '52');
+
+is(base(42,        2),  "101010");
+is(base(17.5,      36), "h.i");
+is(base("99/43",   16), "63/2b");
+is(base("17.5+5i", 36), "(h.i 5)");
+
+is(Math::AnyNum->new("101010",  2),  42);
+is(Math::AnyNum->new("h.i",     36), "17.5");
+is(Math::AnyNum->new("63/2b",   16), "99/43");
+is(Math::AnyNum->new("(h.i 5)", 36), "17.5+5i");
+
+is(Math::AnyNum->new(42)->base(2), '101010');
+is(Math::AnyNum->new(base(float(42),   16), 16), '42');
+is(Math::AnyNum->new(base(complex(42), 2),  2),  '42');
+
+is(Math::AnyNum->new(Math::AnyNum->new("23.34375",   10)->base(2),  10), "10111.01011");
+is(Math::AnyNum->new(Math::AnyNum->new("1011.11101", 10)->base(10), 2),  "11.90625");
+
+sub dec2bin {
+    my ($n) = @_;
+    Math::AnyNum->new($n->base(2), 10);
+}
+
+sub bin2dec {
+    my ($n) = @_;
+    Math::AnyNum->new($n->base(10), 2);
+}
+
+is(dec2bin(rat("23.34375")),   rat("10111.01011"));
+is(bin2dec(rat("1011.11101")), rat("11.90625"));
+
+is(dec2bin(float("23.34375")),   float("10111.01011"));
+is(bin2dec(float("1011.11101")), float("11.90625"));
+
+is(dec2bin(complex("23.34375")),   complex("10111.01011"));
+is(bin2dec(complex("1011.11101")), complex("11.90625"));
+
+foreach my $t (Math::AnyNum::bernoulli(42),
+               sqrt(float(2)), -sqrt(float(5)),
+               complex(Math::AnyNum->pi, Math::AnyNum->e),
+               -complex(sqrt(float(2)), log(float(2))),
+               complex(0, sqrt(float(6))),
+               complex(0, -sqrt(float(13))),
+  ) {
+    is(Math::AnyNum->new($t->base(2),  2),  $t);
+    is(Math::AnyNum->new($t->base(10), 10), $t);
+    is(Math::AnyNum->new($t->base(12), 12), $t);
+    is(Math::AnyNum->new($t->base(33), 33), $t);
+    is(Math::AnyNum->new($t->base(36), 36), $t);
+}
+
+is(Math::AnyNum->new(complex("23.34375")->base(2),    10), "10111.01011");
+is(Math::AnyNum->new(complex("1011.11101")->base(10), 2),  "11.90625");
+
+is(Math::AnyNum->new(sqrt(float(2))->base(34), 34), sqrt(float(2)));
+is(Math::AnyNum->new((sqrt(float(2)) + sqrt(float(3)) * sqrt(float(-1)))->base(34), 34),
+    sqrt(float(2)) + sqrt(float(3)) * sqrt(float(-1)));
 
 is(as_int('255',          16), 'ff');
 is(as_int(rat('255'),     16), 'ff');

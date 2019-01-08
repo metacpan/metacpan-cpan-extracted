@@ -1,11 +1,11 @@
-# $Id: Populate.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: Populate.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::Populate;
 use strict;
 use warnings;
 no warnings qw(redefine);
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -21,7 +21,7 @@ our $dbh = $CPAN::SQLite::DBI::dbh;
 my ($setup);
 
 my %tbl2obj;
-$tbl2obj{$_} = __PACKAGE__ . '::' . $_  foreach (qw(dists mods auths chaps info));
+$tbl2obj{$_} = __PACKAGE__ . '::' . $_  foreach (qw(dists mods auths info));
 my %obj2tbl  = reverse %tbl2obj;
 
 sub new {
@@ -74,7 +74,7 @@ sub populate {
 
 sub create_objs {
   my $self = shift;
-  my @tables = qw(dists auths mods chaps info);
+  my @tables = qw(dists auths mods info);
 
   foreach my $table (@tables) {
     my $obj;
@@ -126,7 +126,7 @@ sub populate_tables {
     return;
   }
 
-  my @tables = qw(auths dists mods chaps);
+  my @tables = qw(auths dists mods);
   for my $method (@methods) {
     for my $table (@tables) {
       my $obj = $self->{obj}->{$table};
@@ -313,7 +313,7 @@ sub insert {
   }
 
   my $dist_ids = $self->{ids};
-  my @fields = qw(auth_id dist_name dist_file dist_vers dist_abs dist_dslip);
+  my @fields = qw(auth_id dist_name dist_file dist_vers dist_abs);
   my $sth = $cdbi->sth_insert(\@fields) or do {
     $self->{error_msg} = $cdbi->{error_msg};
     return;
@@ -325,7 +325,7 @@ sub insert {
     print_debug("Inserting $distname of $cpanid\n");
     $sth->execute($auth_ids->{$values->{cpanid}}, $distname,
                     $values->{dist_file}, $values->{dist_vers},
-                    $values->{dist_abs}, $values->{dslip}) or do {
+                    $values->{dist_abs}) or do {
                       $cdbi->db_error($sth);
                       $self->{error_msg} = $cdbi->{error_msg};
                       return;
@@ -366,7 +366,7 @@ sub update {
     return;
   }
 
-  my @fields = qw(auth_id dist_name dist_file dist_vers dist_abs dist_dslip);
+  my @fields = qw(auth_id dist_name dist_file dist_vers dist_abs);
   foreach my $distname (keys %$data) {
     next unless $data->{$distname};
     my $sth = $cdbi->sth_update(\@fields, $data->{$distname});
@@ -376,7 +376,7 @@ sub update {
     print_debug("Updating $distname of $cpanid\n");
     $sth->execute($auth_ids->{$values->{cpanid}}, $distname,
                   $values->{dist_file}, $values->{dist_vers},
-                  $values->{dist_abs}, $values->{dslip}) or do {
+                  $values->{dist_abs}) or do {
                     $cdbi->db_error($sth);
                     $self->{error_msg} = $cdbi->{error_msg};
                     return;
@@ -471,7 +471,7 @@ sub insert {
 
   my $mod_ids = $self->{ids};
   my @fields = qw(dist_id mod_name mod_abs
-                  mod_vers dslip chapterid);
+                  mod_vers);
 
   my $sth = $cdbi->sth_insert(\@fields) or do {
     $self->{error_msg} = $cdbi->{error_msg};
@@ -481,8 +481,7 @@ sub insert {
     my $values = $mods->{$modname};
     next unless ($values and $dist_ids->{$values->{dist_name}});
     $sth->execute($dist_ids->{$values->{dist_name}}, $modname,
-                  $values->{mod_abs}, $values->{mod_vers},
-                  $values->{dslip}, $values->{chapterid})
+                  $values->{mod_abs}, $values->{mod_vers})
       or do {
           $cdbi->db_error($sth);
           $self->{error_msg} = $cdbi->{error_msg};
@@ -525,7 +524,7 @@ sub update {
   }
 
   my @fields = qw(dist_id mod_name mod_abs
-                  mod_vers dslip chapterid);
+                  mod_vers);
 
   foreach my $modname (keys %$data) {
     next unless $data->{$modname};
@@ -534,8 +533,7 @@ sub update {
     my $values = $mods->{$modname};
     next unless ($values and $dist_ids->{$values->{dist_name}});
     $sth->execute($dist_ids->{$values->{dist_name}}, $modname,
-                  $values->{mod_abs}, $values->{mod_vers},
-                  $values->{dslip}, $values->{chapterid})
+                  $values->{mod_abs}, $values->{mod_vers})
       or do {
         $cdbi->db_error($sth);
         $self->{error_msg} = $cdbi->{error_msg};
@@ -588,166 +586,6 @@ sub delete {
     $sth->finish;
     undef $sth;
   }
-  $dbh->commit() or do {
-    $cdbi->db_error();
-    $self->{error_msg} = $cdbi->{error_msg};
-    return;
-  };
-  return 1;
-}
-
-package CPAN::SQLite::Populate::chaps;
-use parent 'CPAN::SQLite::Populate';
-use CPAN::SQLite::Util qw(has_hash_data print_debug);
-
-sub new {
-  my ($class, %args) = @_;
-  my $cdbi = $args{cdbi};
-  die "No dbi object available"
-    unless ($cdbi and ref($cdbi) eq 'CPAN::SQLite::DBI::Index::chaps');
-  my $self = {
-              obj => {},
-              cdbi => $cdbi,
-              error_msg => '',
-              info_msg => '',
-             };
-  return bless $self, $class;
-}
-
-sub insert {
-  my $self = shift;
-  unless ($dbh) {
-    $self->{error_msg} = q{No db handle available};
-    return;
-  }
-  return unless my $dist_obj = $self->{obj}->{dists};
-  my $cdbi = $self->{cdbi};
-  my $dist_insert = $dist_obj->{insert};
-  my $dists = $dist_obj->{info};
-  my $dist_ids = $dist_obj->{ids};
-  my $data = $setup ? $dists : $dist_insert;
-  unless (has_hash_data($data)) {
-    $self->{info_msg} = q{No chap data to insert};
-    return;
-  }
-  unless ($dists and $dist_ids) {
-    $self->{error_msg} = q{No chap index data available};
-    return;
-  }
-
-  my @fields = qw(chapterid dist_id subchapter);
-  my $sth = $cdbi->sth_insert(\@fields) or do {
-    $self->{error_msg} = $cdbi->{error_msg};
-    return;
-  };
-  foreach my $dist (keys %$data) {
-    my $values = $dists->{$dist};
-    next unless defined $values->{chapterid};
-    foreach my $chap_id(keys %{$values->{chapterid}}) {
-      foreach my $sub_chap(keys %{$values->{chapterid}->{$chap_id}}) {
-        next unless $dist_ids->{$dist};
-        $sth->execute($chap_id, $dist_ids->{$dist}, $sub_chap)
-          or do {
-            $cdbi->db_error($sth);
-            $self->{error_msg} = $cdbi->{error_msg};
-            return;
-          };
-      }
-    }
-  }
-  $sth->finish();
-  undef $sth;
-  $dbh->commit() or do {
-    $cdbi->db_error();
-    $self->{error_msg} = $cdbi->{error_msg};
-    return;
-  };
-  return 1;
-}
-
-sub update {
-  my $self = shift;
-  unless ($dbh) {
-    $self->{error_msg} = q{No db handle available};
-    return;
-  }
-  my $cdbi = $self->{cdbi};
-  return unless my $dist_obj = $self->{obj}->{dists};
-  my $dists = $dist_obj->{info};
-  my $dist_ids = $dist_obj->{ids};
-  my $data = $dist_obj->{update};
-  unless (has_hash_data($data)) {
-    $self->{info_msg} = q{No chap data to update};
-    return;
-  }
-  unless ($dist_ids and $dists) {
-    $self->{error_msg} = q{No chap index data available};
-    return;
-  }
-
-  my $sth = $cdbi->sth_delete('dist_id');
-  foreach my $distname(keys %$data) {
-      next unless $data->{$distname};
-      $sth->execute($data->{$distname}) or do {
-          $cdbi->db_error($sth);
-          $self->{error_msg} = $cdbi->{error_msg};
-          return;
-      };
-  }
-  $sth->finish();
-  undef $sth;
-
-  my @fields = qw(chapterid dist_id subchapter);
-  $sth = $cdbi->sth_insert(\@fields);
-  foreach my $dist (keys %$data) {
-    my $values = $dists->{$dist};
-    next unless defined $values->{chapterid};
-    foreach my $chap_id(keys %{$values->{chapterid}}) {
-      foreach my $sub_chap(keys %{$values->{chapterid}->{$chap_id}}) {
-        next unless $dist_ids->{$dist};
-        $sth->execute($chap_id, $dist_ids->{$dist}, $sub_chap)
-          or do {
-            $cdbi->db_error($sth);
-            $self->{error_msg} = $cdbi->{error_msg};
-            return;
-          };
-      }
-    }
-  }
-  $sth->finish();
-  undef $sth;
-  $dbh->commit() or do {
-    $cdbi->db_error();
-    $self->{error_msg} = $cdbi->{error_msg};
-    return;
-  };
-  return 1;
-}
-
-sub delete {
-  my $self = shift;
-  unless ($dbh) {
-    $self->{error_msg} = q{No db handle available};
-        return;
-  }
-  return unless my $dist_obj = $self->{obj}->{dists};
-  my $cdbi = $self->{cdbi};
-  my $data = $dist_obj->{delete};
-  unless (has_hash_data($data)) {
-    $self->{info_msg} = q{No chap data to delete};
-    return;
-  }
-
-  my $sth = $cdbi->sth_delete('dist_id');
-  foreach my $distname(keys %$data) {
-    $sth->execute($data->{$distname}) or do {
-      $cdbi->db_error($sth);
-      $self->{error_msg} = $cdbi->{error_msg};
-      return;
-    };
-  }
-  $sth->finish();
-  undef $sth;
   $dbh->commit() or do {
     $cdbi->db_error();
     $self->{error_msg} = $cdbi->{error_msg};
@@ -852,7 +690,7 @@ CPAN::SQLite::Populate - create and populate database tables
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 
@@ -885,8 +723,6 @@ This table contains module information, and is created as
   dist_id INTEGER NOT NULL
   mod_abs TEXT
   mod_vers VARCHAR(10)
-  dslip VARCHAR(5)
-  chapterid INTEGER
 
 =over 3
 
@@ -911,17 +747,6 @@ This is a description, if available, of the module.
 
 This value, if present, gives the version of the module.
 
-=item * dslip
-
-This is a 5 character string expressing the dslip
-(development, support, language, interface, public
-license) information.
-
-=item * chapterid
-
-This number corresponds to the chapter id of the module,
-if present.
-
 =back
 
 =head2 dists
@@ -934,7 +759,6 @@ This table contains distribution information, and is created as
   dist_file VARCHAR(110) NOT NULL
   dist_vers VARCHAR(20)
   dist_abs TEXT
-  dist_dslip VARCHAR(5)
 
 =over 3
 
@@ -967,16 +791,6 @@ This is a description of the distribution. If not directly
 supplied, the description for, eg, C<Foo::Bar>, if present, will
 be used for the C<Foo-Bar> distribution.
 
-=item * dist_dslip
-
-This is a 5 character string expressing the dslip
-(development, support, language, interface, public
-license) information. Normally this comes from the
-module name; this value for the distribution name
-comes in simple cases where the module name
-matches the distribution name by a substitution of
-C<::> by C<->.
-
 =back
 
 =head2 auths
@@ -1005,49 +819,6 @@ This is the full name of the author.
 =item * email
 
 This is the supplied email address of the author.
-
-=back
-
-=head2 chaps
-
-This table contains chapter information associated with
-distributions. PAUSE allows one, when registering modules,
-to associate a chapter id with each module (see the C<mods>
-table). This information is used here to associate chapters
-(and subchapters) with distributions in the following manner.
-Suppose a distribution C<Quantum-Theory> contains a module
-C<Beta::Decay> with chapter id C<55>, and
-another module C<Laser> with chapter id C<87>. The
-C<Quantum-Theory> distribution will then have two
-entries in this table - C<chapterid> of I<55> and
-C<subchapter> of I<Beta>, and C<chapterid> of I<87> and
-C<subchapter> of I<Laser>.
-
-The table is created as follows.
-
-  chap_id INTEGER NOT NULL PRIMARY KEY
-  chapterid INTEGER
-  dist_id INTEGER NOT NULL
-  subchapter TEXT
-
-=over 3
-
-=item * chap_id
-
-This is the primary (unique) key of the table.
-
-=item * chapterid
-
-This number corresponds to the chapter id.
-
-=item * dist_id
-
-This is the id corresponding to the distribution in the
-C<dists> table.
-
-=item * subchapter
-
-This is the subchapter.
 
 =back
 

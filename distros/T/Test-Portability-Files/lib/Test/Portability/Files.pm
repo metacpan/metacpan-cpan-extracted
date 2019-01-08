@@ -1,5 +1,5 @@
 package Test::Portability::Files;
-$Test::Portability::Files::VERSION = '0.09';
+$Test::Portability::Files::VERSION = '0.10';
 # ABSTRACT: Check file names portability
 use strict;
 use warnings;
@@ -85,6 +85,10 @@ my %errors_text =
     case => "The name of these files differ only by the case, which can\n"
         . "cause real problems on case-insensitive filesystems:",
 
+    windows_reserved =>
+        "These files have names that correspond to reserved character devices\n"
+         . "on Windows, and can cause unexpected problems:",
+
     'symlink' => "The following files are symbolic links, which are not\n"
         . "supported on several operating systems:",
     );
@@ -151,7 +155,7 @@ sub test_name_portability {
 
     # check if the name is a Windows Reserved Filename
     if ( $tests{'windows_reserved'} ) {
-        $file_name =~ /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i
+        $file_name =~ /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\..*)*$/i
             and $bad_names{$file} .= 'windows_reserved,';
     }
 
@@ -271,15 +275,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 Test::Portability::Files - Check file names portability
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -357,11 +359,13 @@ C<test_vms_length> is enabled
 
 =item *
 
-C<windows_reserved> is enabled
+C<test_windows_reserved> is enabled
 
 =back
 
 To change any option, please see C<options()>.
+
+=encoding utf8
 
 =head1 EXPORT
 
@@ -458,6 +462,10 @@ C<test_symlink> - check that the file is not a symbolic link.
 C<test_vms_length> - check that the name fits within VMS name length limitations
 (39 characters max for the base name, 39 characters max for the extension).
 
+C<test_windows_reserved> - check that the file name is not one of the
+reserved Windows filenames that correspond to character devices, such
+as F<con> or F<com1>.
+
 =back
 
 B<Example>
@@ -480,12 +488,21 @@ Execute the tests selected by C<options()>.
 
 L<perlport>
 
+=head1 SOURCE
+
+The development version is on github at L<https://https://github.com/abraxxa/Test-Portability-Files>
+and may be cloned from L<git://https://github.com/abraxxa/Test-Portability-Files.git>
+
 =head1 BUGS
 
-Please report any bugs or feature requests to
-C<bug-test-portability-files@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org>.  I will be notified, and then you'll automatically
-be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests on the bugtracker website
+L<https://rt.cpan.org/Dist/Display.html?Queue=Test-Portability-Files> or by
+email to
+L<bug-test-portability-files@rt.cpan.org|mailto:bug-test-portability-files@rt.cpan.org>.
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHORS
 
@@ -501,9 +518,37 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =back
 
+=head1 CONTRIBUTORS
+
+=for stopwords Graham Knop Karen Etheridge Nathan Glenn Patrice Clement Robert Rothenberg
+
+=over 4
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Nathan Glenn <garfieldnate@gmail.com>
+
+=item *
+
+Patrice Clement <monsieurp@gentoo.org>
+
+=item *
+
+Robert Rothenberg <rrwo@cpan.org>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Sébastien Aperghis-Tramoni, Alexander Hartmaier.
+This software is copyright (c) 2019 by Sébastien Aperghis-Tramoni, Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

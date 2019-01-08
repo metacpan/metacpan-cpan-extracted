@@ -365,6 +365,7 @@ sub build_structure ($%) {
     my %changed_charset;
     my %changed_scale;
     my %changed_default;
+    my %changed_maxlength;
 
     $self->_consistency_checked ||
         throw $self "- can't build_structure without 'check_consistency' on loading";
@@ -385,6 +386,7 @@ sub build_structure ($%) {
             while(my ($n,$v)=each %ph) {
                 next if $n eq 'name';
                 next if $n eq 'structure';
+                next if $n =~ /^_/;
                 next if !defined $v;
 
                 my $dbv=$desc->{$n};
@@ -416,6 +418,15 @@ sub build_structure ($%) {
                         dprint "..changed default for '$name': '$dbv' => '$v'";
                     }
                 }
+                elsif($n eq 'maxlength') {
+                    my $match=defined $dbv && $v==$dbv;
+                    if(!$match) {
+                        $type eq 'text' || $type eq 'blob' ||
+                            throw $self "- 'maxlength' only makes sense for 'text' and 'blob' fields";
+                        $changed_maxlength{$name}=$v;
+                        dprint "..changed maxlength for '$name': '$dbv' => '$v'";
+                    }
+                }
                 elsif(!defined $dbv || (defined $dbv && $dbv ne $v)) {
                     throw $self "- structure mismatch, property=$name, ($n,$v) <> ($n,".(defined $dbv ? $dbv : '<undef>').")";
                 }
@@ -434,42 +445,74 @@ sub build_structure ($%) {
         }
     }
 
-    if(%changed_charset) {
-        my $debug_status=XAO::Utils::get_debug();
-        XAO::Utils::set_debug(1);
+    $self->_build_structure_change(
+        changes     => \%changed_maxlength,
+        structure   => $args,
+        param       => 'maxlength',
+    );
 
-        dprint "Some text fields in ".$$self->{'class'}." have changed charset values (".join(', ',sort keys %changed_charset).").";
-        dprint "An automatic conversion will be attempted in 10 seconds. Interrupt to abort.";
-        sleep 10;
-        dprint "Converting...";
-        $self->_charset_change(\%changed_charset);
+    $self->_build_structure_change(
+        changes     => \%changed_charset,
+        structure   => $args,
+        param       => 'charset',
+    );
 
-        XAO::Utils::set_debug($debug_status);
+    $self->_build_structure_change(
+        changes     => \%changed_scale,
+        structure   => $args,
+        param       => 'scale',
+    );
+
+    $self->_build_structure_change(
+        changes     => \%changed_default,
+        structure   => $args,
+        param       => 'default',
+    );
+}
+
+###############################################################################
+
+sub _build_structure_change($@) {
+    my $self=shift;
+    my $args=get_args(\@_);
+
+    my $changes=$args->{'changes'};
+    my $structure=$args->{'structure'};
+    my $param=$args->{'param'};
+
+    return unless $changes && %$changes;
+
+    my $notice=$args->{'notice'};
+    if(!$notice && $param) {
+        $notice="Some '$param' values in ".$$self->{'class'}." have changed (".join(', ',sort keys %$changes).").";
     }
 
-    if(%changed_scale) {
-        my $debug_status=XAO::Utils::get_debug();
-        XAO::Utils::set_debug(1);
-
-        dprint "Some 'real' fields in ".$$self->{'class'}." have changed scale values (".join(', ',sort keys %changed_scale).").";
-        dprint "An automatic conversion will be attempted in 10 seconds. Interrupt to abort.";
-        sleep 10;
-        dprint "Converting...";
-        $self->_scale_change(\%changed_scale);
-
-        XAO::Utils::set_debug($debug_status);
+    my $code=$args->{'code'};
+    if(!$code) {
+        $param || throw $self "- no code and no param";
+        $code=$self->can('_'.$param.'_change') ||
+            throw $self "- no _${param}_change implementation";
     }
 
-    if(%changed_default) {
-        my $debug_status=XAO::Utils::get_debug();
+    # Convenience to avoid waiting
+    #
+    my $forced=grep { $structure->{$_}->{'_force'} } keys %$changes;
+
+    # Applying the changes
+    #
+    my $debug_status=XAO::Utils::get_debug();
+    if(!$forced) {
         XAO::Utils::set_debug(1);
 
-        dprint "Some 'default' values in ".$$self->{'class'}." have changed (".join(', ',sort keys %changed_default).").";
+        dprint $notice if $notice;
         dprint "An automatic conversion will be attempted in 10 seconds. Interrupt to abort.";
         sleep 10;
         dprint "Converting...";
-        $self->_default_change(\%changed_default);
+    }
 
+    $code->($self,$changes);
+
+    if(!$forced) {
         XAO::Utils::set_debug($debug_status);
     }
 }

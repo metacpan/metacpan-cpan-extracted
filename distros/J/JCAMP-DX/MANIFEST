@@ -1,14 +1,25 @@
 bin/jcamp-dump
+Changes
 COPYING
+inputs/comments.jcamp
 inputs/McDonald1988_IIa.jcamp
 inputs/McDonald1988_XI.jcamp
+inputs/multiline-title.jcamp
+inputs/pclanilIR.jcamp
 lib/JCAMP/DX.pm
 lib/JCAMP/DX/ASDF.pm
+lib/JCAMP/DX/LabelDataRecord.pm
 Makefile.PL
 MANIFEST			This list of files
+outputs/comments.out
 outputs/McDonald1988_IIa.out
 outputs/McDonald1988_XI.out
+outputs/multiline-title.out
+outputs/pclanilIR.out
 t/ASDF.t
+t/duplicate.t
 t/parse.t
+t/print.t
+t/store_file.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

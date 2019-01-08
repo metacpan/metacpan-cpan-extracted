@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
 package Future::AsyncAwait;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.18';
 
 use Carp;
 
@@ -339,11 +339,37 @@ L<https://rt.cpan.org/Ticket/Display.html?id=123465>
 
 =back
 
+=head1 KNOWN BUGS
+
+This is not a complete list of all known issues, but rather a summary of the
+most notable ones that currently prevent the module from working correctly in
+a variety of situations. For a complete list of known bugs, see the RT queue
+at L<https://rt.cpan.org/Dist/Display.html?Name=Future-AsyncAwait>.
+
+=over 4
+
+=item *
+
+Various failures on threaded perls version 5.20 and earlier. These don't seem
+to be happening on non-threaded builds of the same versions, nor at any
+version 5.22 or later.
+
+L<https://rt.cpan.org/Ticket/Display.html?id=124351>
+
+=back
+
+=cut
+
 =head1 ACKNOWLEDGEMENTS
 
 With thanks to C<Zefram>, C<ilmari> and others from C<irc.perl.org/#p5p> for
-assisting with trickier bits of XS logic. Thanks to C<genio> for project
-management and actually reminding me to write some code.
+assisting with trickier bits of XS logic.
+
+Thanks to C<genio> for project management and actually reminding me to write
+some code.
+
+Thanks to The Perl Foundation for sponsoring me to continue working on the
+implementation.
 
 =head1 AUTHOR
 

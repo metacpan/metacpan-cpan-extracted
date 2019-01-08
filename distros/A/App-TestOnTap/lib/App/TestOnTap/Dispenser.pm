@@ -7,7 +7,7 @@ use App::TestOnTap::Util qw(slashify);
 use App::TestOnTap::OrderStrategy;
 
 use File::Find;
-use List::Util qw(shuffle);
+use List::Util qw(shuffle max);
 
 # CTOR
 #
@@ -35,11 +35,48 @@ sub __analyze
 	#
 	my %graph = map { $_ => [] } @$tests;
 	
+	# figure out the longest dep rule name with some extra to produce some
+	# nice delimiters...
+	#
+	my @depRuleNames = $self->{args}->getConfig()->getDependencyRuleNames();
+	my $longestDepRuleName = 0;
+	$longestDepRuleName = max($longestDepRuleName, length($_)) foreach (@depRuleNames);
+	$longestDepRuleName += 18;
+	my $topDelimLine = '*' x $longestDepRuleName;
+
 	# iterate over all dependency rules and add edges from => to vertices
 	#
-	foreach my $depRuleName ($self->{args}->getConfig()->getDependencyRuleNames())
+	foreach my $depRuleName (@depRuleNames)
 	{
 		my ($fromVertices, $toVertices) = $self->{args}->getConfig()->getMatchesAndDependenciesForRule($depRuleName, $tests);
+		if ($self->{args}->doDryRun())
+		{
+			print "$topDelimLine\n";
+			print "Dependency rule '$depRuleName'\n";
+			print "Query for 'match' matches:\n";
+			if (@$fromVertices)
+			{
+				print "  $_\n" foreach (@$fromVertices);
+			}
+			else
+			{
+				print "  (nothing)\n";
+			}
+			print "Query for 'dependson' matches:\n";
+			if (@$toVertices)
+			{
+				print "  $_\n" foreach (@$toVertices);
+			}
+			else
+			{
+				print "(nothing)\n";
+			}
+		}
+		else
+		{		
+			warn("WARNING: No tests selected by 'match' in dependency rule '$depRuleName'\n") unless @$fromVertices;
+			warn("WARNING: No tests selected by 'dependson' in dependency rule '$depRuleName'\n") unless @$toVertices;
+		}
 		push(@{$graph{$_}}, @$toVertices) foreach (@$fromVertices);
 	}
 	

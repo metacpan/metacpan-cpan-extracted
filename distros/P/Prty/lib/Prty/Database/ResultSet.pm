@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Object;
 use Time::HiRes ();
@@ -825,6 +825,30 @@ sub asString {
 
 =over 4
 
+=item -info => $n (Default: 3)
+
+Umfang an Information, die über die Daten hinaus ausgegeben wird:
+
+=over 4
+
+=item Z<>0
+
+Nur Daten.
+
+=item Z<>1
+
+Numerierung der Kolumnen, Anzahl Zeilen, Ausführungszeit.
+
+=item Z<>2
+
+Inforationsumfang 1 plus Liste der Kolumnennamen.
+
+=item Z<>3
+
+Inforationsumfang 2 plus SQL-Statement.
+
+=back
+
 =item -msg => $msg
 
 Füge $msg zur Statistik-Zeile hinzu.
@@ -878,15 +902,15 @@ sub asTable {
     # Optionen
 
     my $msg = '';
-    my $noHeader = 0;
+    my $info = 3;
 
     if (@_) {
         Prty::Option->extract(\@_,
             -msg=>\$msg,
-            -noHeader=>\$noHeader,
+            -info=>\$info,
         );
         if ($msg) {
-            $msg = " - $msg";
+            $msg = $info? " - $msg": $msg;
         }
     }
 
@@ -894,10 +918,11 @@ sub asTable {
 
     # Statement
 
-    if (!$noHeader) {
+    if ($info >= 3) {
         $str .= $self->stmt;
         $str .= "\n\n";
-
+    }
+    if ($info >= 2) {
         # Kolumnenbezeichnungen
 
         my @titles = $self->titles;
@@ -908,16 +933,19 @@ sub asTable {
     }
 
     if ($self->count) {
-        # Kolumnenzeile
-
-        $str .= "\n";
         my @fmt = $self->formats;
-        for (my $i = 0; $i < @fmt; $i++) {
-            my $numWidth = length $i+1;
-            my $width = $fmt[$i]->width+3;
-            $str .= sprintf '%d%s',$i+1,(' ' x ($width-$numWidth));
+
+        if ($info) {
+            # Kolumnenzeile
+
+            $str .= "\n";
+            for (my $i = 0; $i < @fmt; $i++) {
+                my $numWidth = length $i+1;
+                my $width = $fmt[$i]->width+3;
+                $str .= sprintf '%d%s',$i+1,(' ' x ($width-$numWidth));
+            }
+            $str .= "\n";
         }
-        $str .= "\n";
 
         # Tabelle
 
@@ -934,12 +962,20 @@ sub asTable {
         }
     }
 
-    # Statistik
+    if ($info) {
+        # Statistik
 
-    my $duration = $self->execTime + $self->fetchTime;
-    $str .= sprintf "\n%s, %s rows%s\n",
-        Prty::Duration->new($duration)->asShortString(-precision=>3),
-        $self->count,$msg;
+        my $duration = $self->execTime + $self->fetchTime;
+        $str .= sprintf "\n%s, %s rows",
+            Prty::Duration->new($duration)->asShortString(-precision=>3),
+            $self->count;
+    }
+    if ($msg) {
+        $str .= $msg;
+    }
+    if ($info || $msg) {
+        $str .= "\n";
+    }
 
     return $str;
 }
@@ -1019,7 +1055,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -1027,7 +1063,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

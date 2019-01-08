@@ -7,7 +7,7 @@ use App::Cmd::Setup -app;
 
 # ABSTRACT: Module/App to build and test OTRS packages
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 
 1;
@@ -24,7 +24,7 @@ OTRS::OPM::Maker - Module/App to build and test OTRS packages
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 DESCRIPTION
 

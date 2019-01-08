@@ -1,36 +1,51 @@
-$VAR1 = {
+$VAR1 = bless( {
+  'blocks' => [],
   'data' => {
-    'DATATYPE' => [
-      ' INFRARED SPECTRUM'
-    ],
-    'FIRSTX' => [
-      ' 450. '
-    ],
-    'FIRSTY' => [
-      ' 0.058 '
-    ],
-    'JCAMPDX' => [
-      ' 4.24'
-    ],
-    'LASTX' => [
-      ' 4000. '
-    ],
-    'NPOINTS' => [
-      ' 1776'
-    ],
-    'ORIGIN' => [
-      ' Sadtler Research Laboratories '
-    ],
-    'OWNER' => [
-      ' EPA/Public Domain '
-    ],
-    'XFACTOR' => [
-      ' 1.0 '
-    ],
-    'XUNITS' => [
-      ' 1/CM '
-    ],
-    'XYDATA' => {
+    'DATATYPE' => bless( {
+      'label' => 'DATA TYPE',
+      'value' => 'INFRARED SPECTRUM'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'FIRSTX' => bless( {
+      'label' => 'FIRSTX',
+      'value' => '450.'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'FIRSTY' => bless( {
+      'label' => 'FIRSTY',
+      'value' => '0.058'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'JCAMPDX' => bless( {
+      'label' => 'JCAMP-DX',
+      'value' => '4.24'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'LASTX' => bless( {
+      'label' => 'LASTX',
+      'value' => '4000.'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'NPOINTS' => bless( {
+      'label' => 'NPOINTS',
+      'value' => '1776'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'ORIGIN' => bless( {
+      'label' => 'ORIGIN',
+      'value' => 'Sadtler Research Laboratories'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'OWNER' => bless( {
+      'label' => 'OWNER',
+      'value' => 'EPA/Public Domain'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'TITLE' => bless( {
+      'label' => 'title',
+      'value' => 'Epichlorohydrin vapor'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'XFACTOR' => bless( {
+      'label' => 'XFACTOR',
+      'value' => '1.0'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'XUNITS' => bless( {
+      'label' => 'XUNITS',
+      'value' => '1/CM'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'XYDATA' => bless( {
       'X' => [
         450,
         '686.533333333333',
@@ -71,30 +86,35 @@ $VAR1 = {
         15,
         14
       ],
-      'variable_list' => '(X++(Y..Y))'
-    },
-    'YFACTOR' => [
-      ' 0.001 '
-    ],
-    'YUNITS' => [
-      ' ABSORBANCE '
-    ]
+      'label' => 'XYDATA',
+      'variables' => [
+        'X',
+        'Y'
+      ]
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'YFACTOR' => bless( {
+      'label' => 'YFACTOR',
+      'value' => '0.001'
+    }, 'JCAMP::DX::LabelDataRecord' ),
+    'YUNITS' => bless( {
+      'label' => 'YUNITS',
+      'value' => 'ABSORBANCE'
+    }, 'JCAMP::DX::LabelDataRecord' )
   },
   'labels' => [
-    'JCAMPDX',
-    'DATATYPE',
-    'ORIGIN',
-    'OWNER',
-    'XUNITS',
-    'YUNITS',
-    'XFACTOR',
-    'YFACTOR',
-    'FIRSTX',
-    'LASTX',
-    'NPOINTS',
-    'FIRSTY',
-    'XYDATA'
-  ],
-  'title' => ' Epichlorohydrin vapor
-'
-};
+    $VAR1->{'data'}{'TITLE'},
+    $VAR1->{'data'}{'JCAMPDX'},
+    $VAR1->{'data'}{'DATATYPE'},
+    $VAR1->{'data'}{'ORIGIN'},
+    $VAR1->{'data'}{'OWNER'},
+    $VAR1->{'data'}{'XUNITS'},
+    $VAR1->{'data'}{'YUNITS'},
+    $VAR1->{'data'}{'XFACTOR'},
+    $VAR1->{'data'}{'YFACTOR'},
+    $VAR1->{'data'}{'FIRSTX'},
+    $VAR1->{'data'}{'LASTX'},
+    $VAR1->{'data'}{'NPOINTS'},
+    $VAR1->{'data'}{'FIRSTY'},
+    $VAR1->{'data'}{'XYDATA'}
+  ]
+}, 'JCAMP::DX' );

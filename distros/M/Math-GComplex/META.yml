@@ -16,7 +16,7 @@ name: Math-GComplex
 provides:
   Math::GComplex:
     file: lib/Math/GComplex.pm
-    version: '0.11'
+    version: '0.12'
 recommends:
   Math::AnyNum: '0.20'
 requires:
@@ -26,5 +26,5 @@ resources:
   homepage: https://github.com/trizen/Math-GComplex
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Math-GComplex
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

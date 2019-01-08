@@ -20,6 +20,7 @@
 .git/logs/refs/heads/limit_current_end_idx
 .git/logs/refs/heads/master
 .git/logs/refs/heads/multisect-builds-20181224
+.git/logs/refs/heads/multisect-builds-20190103
 .git/logs/refs/heads/no_objects
 .git/logs/refs/heads/outwit_cpantesters
 .git/logs/refs/heads/subtree_experiment_2
@@ -27,6 +28,7 @@
 .git/logs/refs/remotes/origin/fix-validate-list-sequence
 .git/logs/refs/remotes/origin/master
 .git/logs/refs/remotes/origin/multisect-builds-20181224
+.git/logs/refs/remotes/origin/multisect-builds-20190103
 .git/logs/refs/remotes/origin/subtree_experiment_2
 .git/logs/refs/remotes/origin/weirdcase
 .git/logs/refs/stash
@@ -197,6 +199,7 @@
 .git/refs/heads/limit_current_end_idx
 .git/refs/heads/master
 .git/refs/heads/multisect-builds-20181224
+.git/refs/heads/multisect-builds-20190103
 .git/refs/heads/no_objects
 .git/refs/heads/outwit_cpantesters
 .git/refs/heads/subtree_experiment_2
@@ -204,6 +207,7 @@
 .git/refs/remotes/origin/fix-validate-list-sequence
 .git/refs/remotes/origin/master
 .git/refs/remotes/origin/multisect-builds-20181224
+.git/refs/remotes/origin/multisect-builds-20190103
 .git/refs/remotes/origin/subtree_experiment_2
 .git/refs/remotes/origin/weirdcase
 .git/refs/stash
@@ -216,6 +220,7 @@
 .git/refs/tags/v0.07
 .git/refs/tags/v0.08
 .git/refs/tags/v0.09
+.git/refs/tags/v0.10
 .gitignore
 .gitmodules
 Changes
@@ -227,6 +232,8 @@ examples/transitions_full_lib_locale.pl
 lib/Devel/Git/MultiBisect.pm
 lib/Devel/Git/MultiBisect/AllCommits.pm
 lib/Devel/Git/MultiBisect/Auxiliary.pm
+lib/Devel/Git/MultiBisect/BuildTransitions.pm
+lib/Devel/Git/MultiBisect/Init.pm
 lib/Devel/Git/MultiBisect/Opts.pm
 lib/Devel/Git/MultiBisect/Transitions.pm
 LICENSE
@@ -321,5 +328,8 @@ t/lib/list-compare/t/IO/CaptureOutput.pm
 t/lib/list-compare/t/Test/ListCompareSpecial.pm
 t/lib/output1.txt
 t/lib/output2.txt
+xt/101-clang-build-transitions.t
+xt/102-gcc-build-transitions.t
+xt/103-g++-build-transitions.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

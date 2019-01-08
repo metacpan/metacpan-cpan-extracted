@@ -1,12 +1,15 @@
 package Class::Superclasses;
 
+# ABSTRACT: Find all (direct) superclasses of a class
+
 use strict;
 use warnings;
 
 use List::Util qw(first);
 use PPI;
+use Scalar::Util qw(blessed);
 
-our $VERSION = '0.08';
+our $VERSION = '1.00';
 
 sub new{
     my ($class,$doc) = @_,
@@ -27,10 +30,7 @@ sub superclasses{
 sub document{
     my ($self,$doc) = @_;
 
-    if(defined $doc){
-        $self->{document} = $doc;
-        $self->{super}    = $self->_find_super($doc);
-    }
+    $self->{super} = $self->_find_super($doc) if defined $doc;
 
     return $self;
 }
@@ -38,7 +38,14 @@ sub document{
 sub _find_super{
     my ($self,$doc) = @_;
 
-    my $ppi    = PPI::Document->new($doc) or die $!;
+    my $ppi;
+    if ( blessed $doc && $doc->isa('PPI::Document') ) {
+        $ppi = $doc;
+    }
+    else {
+        $ppi = PPI::Document->new($doc) or die $!;
+    }
+
     my $varref = $ppi->find('PPI::Statement::Variable');
     my @vars   = ();
 
@@ -201,11 +208,11 @@ __END__
 
 =head1 NAME
 
-Class::Superclasses
+Class::Superclasses - Find all (direct) superclasses of a class
 
 =head1 VERSION
 
-version 0.08
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -218,9 +225,12 @@ version 0.08
   
   print $_,"\n" for(@superclasses);
 
-=head1 NAME
-
-Class::Superclasses - Find all (direct) superclasses of a class
+  # or pass a scalar ref that contains the code
+  my $class_code = q~package Test; use base 'Baseclass';~;
+  $parser->document(\$class_code);
+  @superclasses = $parser->superclasses();
+  
+  print $_,"\n" for(@superclasses);
 
 =head2 DESCRIPTION
 

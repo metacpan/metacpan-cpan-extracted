@@ -1,5 +1,5 @@
 
-# $Id: Parser.pm,v 1.13 2009/06/18 02:34:01 Martin Exp $
+# $Id: Parser.pm,v 1.14 2010-12-02 23:41:29 Martin Exp $
 
 use strict;
 use warnings;
@@ -37,14 +37,14 @@ use LWP::UserAgent;
 use RDF::Simple::Parser::Handler;
 use XML::SAX qw(Namespaces Validation);
 
-our
-$VERSION = do { my @r = (q$Revision: 1.13 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+my
+$VERSION = 1.15;
 
 # Use a hash to implement objects of this type:
-use Class::MakeMethods::Standard::Hash (
-                                        new => 'new',
-                                        scalar => [ qw( base http_proxy )],
-                                       );
+use Class::MethodMaker [
+                        new => 'new',
+                        scalar => [ qw/ base http_proxy /, ],
+                       ];
 
 =item new( [ base => 'http://example.com/foo.rdf' ])
 
@@ -118,6 +118,8 @@ sub parse_uri
   my $rdf;
   eval
     {
+    # TODO: Just use LWP::Simple->get() and tell user if that's not
+    # sufficient, do it themselves
     $rdf = $self->ua->get($uri)->content;
     };
   warn ($@) if $@;
@@ -142,6 +144,8 @@ sub getns
   my $ns = $handler->ns or return;
   return $ns->{_lookup};
   } # getns
+
+# TODO: get rid of this!  Just use LWP
 
 sub ua
   {

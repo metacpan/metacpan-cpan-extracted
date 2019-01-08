@@ -4,7 +4,7 @@ use warnings;
 use Getopt::Std qw{getopts};
 use Power::Outlet;
 
-my $syntax="Syntax: power-outlet [-v] type [SWITCH|ON|OFF|CYCLE|QUERY] [opt1 val1 opt2 val2 ...]";
+my $syntax="Syntax: power-outlet [-v] [-d] type [SWITCH|ON|OFF|CYCLE|QUERY] [opt1 val1 opt2 val2 ...]";
 my %flags=();
 getopts('vd', \%flags);
 
@@ -48,16 +48,18 @@ power-outlet - Control and query a Power::Outlet device from command line
 =head1 SYNOPSIS
 
   power-outlet -v
-  power-outlet iBoot    ON   host mylamp
-  power-outlet iBoot    OFF  host mylamp
-  power-outlet iBootBar ON   host mybar   outlet 1
-  power-outlet iBootBar OFF  host mybar   outlet 1
-  power-outlet WeMo     ON   host mywemo
-  power-outlet WeMo     OFF  host mywemo
+  power-outlet WeMo          ON   host mywemo
+  power-outlet WeMo          OFF  host mywemo
+  power-outlet iBoot         ON   host mylamp
+  power-outlet iBoot         OFF  host mylamp
+  power-outlet iBootBar      ON   host mybar   outlet  1
+  power-outlet iBootBar      OFF  host mybar   outlet  1
+  power-outlet iBootBarGroup ON   host mybar   outlets 1,2,3,4
+  power-outlet iBootBarGroup OFF  host mybar   outlets 1,2,3,4
 
 =head1 DESCRIPTION
 
-This script provide a command line interface to Power::Outlet devices
+This script provide a command line interface for Power::Outlet devices
 
 =head1 COPYRIGHT
 

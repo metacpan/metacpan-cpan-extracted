@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Parcats::Stream;
 use Chart::Plotly::Trace::Parcats::Tickfont;
 use Chart::Plotly::Trace::Parcats::Transform;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Parallel categories diagram for multidimensional categorical data.
 
@@ -77,7 +77,8 @@ has domain => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Parcats::Domain", );
 
 has hoverinfo => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -147,7 +148,7 @@ Chart::Plotly::Trace::Parcats - Parallel categories diagram for multidimensional
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

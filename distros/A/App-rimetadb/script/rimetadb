@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.220'; # VERSION
 
 use 5.010001;
 use strict;
@@ -45,7 +45,7 @@ rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.21 of rimetadb (from Perl distribution App-rimetadb), released on 2017-07-10.
+This document describes version 0.220 of rimetadb (from Perl distribution App-rimetadb), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -161,13 +161,11 @@ C<*> marks required options.
 
 =over
 
-=item B<--config-path>=I<filename>
+=item B<--config-path>=I<filename>, B<-c>
 
 Set path to configuration file.
 
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -226,7 +224,7 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
-=item B<--no-config>
+=item B<--no-config>, B<-C>
 
 Do not use any configuration file.
 
@@ -403,7 +401,7 @@ For each entry, you can specify:
   e.g. by another module).
 
 * a package prefix using `+Foo::Bar::` or `+Foo::Bar::*` syntax. Subpackages
-  will be listed recursively (using `Package::MoreUtil`'s
+  will be listed recursively (using <pm:Package::Util::Lite>'s
   `list_subpackages`).
 
 
@@ -591,7 +589,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

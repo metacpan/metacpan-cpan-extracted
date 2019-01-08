@@ -47,6 +47,23 @@ sub test_new_string : Test(9) {
     $self->isDeeply($obj->options,{file=>'/tmp/xyz',name=>'gaga'});
 }
 
+sub test_new_metachar_in_password : Test(9) {
+    my $self = shift;
+
+    my $udlStr = 'dbi#oracle:xyz%xyz_admin:ko\@la3@pluto.gaga.de;'.
+        'file=/tmp/xyz;name=gaga';
+    my $obj = Prty::Udl->new($udlStr);
+    $self->is(ref($obj),'Prty::Udl');
+    $self->is($obj->api,'dbi');
+    $self->is($obj->dbms,'oracle');
+    $self->is($obj->db,'xyz');
+    $self->is($obj->user,'xyz_admin');
+    $self->is($obj->password,'ko@la3');
+    $self->is($obj->host,'pluto.gaga.de');
+    $self->is($obj->port,'');
+    $self->isDeeply($obj->options,{file=>'/tmp/xyz',name=>'gaga'});
+}
+
 sub test_new_string_order : Test(9) {
     my $self = shift;
 

@@ -2,7 +2,10 @@
 abstract: 'Find all (direct) superclasses of a class'
 author:
   - 'Renee Baecker <module@renee-baecker.de>'
-build_requires: {}
+build_requires:
+  FindBin: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,15 +18,17 @@ name: Class-Superclasses
 provides:
   Class::Superclasses:
     file: lib/Class/Superclasses.pm
-    version: '0.08'
+    version: '1.00'
 requires:
   List::Util: '0'
   PPI: '0'
+  Scalar::Util: '1.39'
+  perl: '5.008'
 resources:
   bugtracker: http://github.com/reneeb/Class-Superclasses/issues
   homepage: http://github.com/reneeb/Class-Superclasses
   repository: http://github.com/reneeb/Class-Superclasses.git
-version: '0.08'
+version: '1.00'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'

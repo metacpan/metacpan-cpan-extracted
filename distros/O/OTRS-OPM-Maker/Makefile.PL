@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
     "bin/opmbuild"
   ],
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "OTRS::OPM::Maker",
   "PREREQ_PM" => {
     "App::Cmd" => 0,
@@ -30,11 +31,12 @@ my %WriteMakefileArgs = (
     "XML::LibXML::PrettyPrint" => 0
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "File::Spec" => 0,
     "Test::LongString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.14",
   "test" => {
     "TESTS" => "t/*.t t/build/*.t t/dbtest/*.t t/dependencies/*.t t/filetest/*.t t/index/*.t t/sopmtest/*.t"
   }
@@ -43,6 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::Cmd" => 0,
+  "Capture::Tiny" => 0,
   "File::Basename" => 0,
   "File::Find::Rule" => 0,
   "File::Spec" => 0,

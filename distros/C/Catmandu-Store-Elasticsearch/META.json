@@ -70,7 +70,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Store-Elasticsearch"
       }
    },
-   "version" : "0.0510",
+   "version" : "0.0511",
    "x_contributors" : [
       "Dave Sherohman <Dave.Sherohman@ub.lu.se>",
       "Mirko Tietgen <mirko@abunchofthings.net>",
@@ -79,7 +79,7 @@
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Robin Sheat <robin@catalyst.net.nz>"
    ],
-   "x_generated_by_perl" : "v5.28.0",
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_static_install" : 0
 }

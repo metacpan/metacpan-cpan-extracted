@@ -7,6 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::stat: '0'
   FindBin: '0'
+  IPC::Run3::Shell: '0.56'
   Test::More: '1.302096'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -27,16 +28,23 @@ no_index:
 provides:
   File::Replace:
     file: lib/File/Replace.pm
-    version: '0.08'
+    version: '0.12'
+  File::Replace::Inplace:
+    file: lib/File/Replace/Inplace.pm
+    version: '0.12'
+  Tie::Handle::Argv:
+    file: lib/Tie/Handle/Argv.pm
+    version: '0.12'
   Tie::Handle::Base:
     file: lib/Tie/Handle/Base.pm
-    version: '0.08'
+    version: '0.12'
 recommends: {}
 requires:
   Carp: '0'
   Exporter: '0'
   Fcntl: '0'
   File::Basename: '0'
+  File::Copy: '0'
   File::Spec::Functions: '0'
   File::Temp: '0'
   Hash::Util: '0'
@@ -48,5 +56,5 @@ resources:
   bugtracker: https://bitbucket.org/haukex/file-replace/issues
   homepage: https://bitbucket.org/haukex/file-replace
   repository: https://bitbucket.org/haukex/file-replace.git
-version: '0.08'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

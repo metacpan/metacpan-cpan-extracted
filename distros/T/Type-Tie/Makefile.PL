@@ -34,12 +34,12 @@ my $meta = {
                         },
                       },
   "provides"       => {
-                        "Type::Nano"        => { file => "lib/Type/Nano.pm", version => 0.012 },
-                        "Type::Tie"         => { file => "lib/Type/Tie.pm", version => 0.012 },
-                        "Type::Tie::ARRAY"  => { file => "lib/Type/Tie.pm", version => 0.012 },
-                        "Type::Tie::BASE"   => { file => "lib/Type/Tie.pm", version => 0.012 },
-                        "Type::Tie::HASH"   => { file => "lib/Type/Tie.pm", version => 0.012 },
-                        "Type::Tie::SCALAR" => { file => "lib/Type/Tie.pm", version => 0.012 },
+                        "Type::Nano"        => { file => "lib/Type/Nano.pm", version => 0.013 },
+                        "Type::Tie"         => { file => "lib/Type/Tie.pm", version => 0.013 },
+                        "Type::Tie::ARRAY"  => { file => "lib/Type/Tie.pm", version => 0.013 },
+                        "Type::Tie::BASE"   => { file => "lib/Type/Tie.pm", version => 0.013 },
+                        "Type::Tie::HASH"   => { file => "lib/Type/Tie.pm", version => 0.013 },
+                        "Type::Tie::SCALAR" => { file => "lib/Type/Tie.pm", version => 0.013 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -53,7 +53,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Type-Tie/project",
                       },
-  "version"        => 0.012,
+  "version"        => 0.013,
 };
 
 my %dynamic_config;

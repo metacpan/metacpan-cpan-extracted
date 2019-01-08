@@ -8,7 +8,7 @@ use Scalar::Util ();
 package Type::Nano;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.012';
+our $VERSION   = '0.013';
 our @ISA       = qw( Exporter::Tiny );
 our @EXPORT_OK = qw(
 	Any Defined Undef Ref ArrayRef HashRef CodeRef Object Str Bool Num Int Object
@@ -277,12 +277,70 @@ Type::Nano - simple type constraint library for testing
   
   Int->check("42");  # true
 
-=head1 DESCRIPTION
+=head1 RATIONALE
 
 This is a really basic implementation of L<Type::API::Constraint> for
 testing modules that make use of type constraints, such as L<Type::Tie>.
 
-It optionally exports the following type constraints:
+I'll stress that this module is I<only> intended for use in testing. It was
+created to eliminate Type::Tie's testing dependency on L<Types::Standard>.
+If your code supports Type::Nano, then your code should also B<automatically>
+support L<Type::Tiny>, L<Specio>, L<MooseX::Types>, and L<MouseX::Types>
+with no extra effort. (Of course, some of those libraries do have some more
+features you may want to make extra effort to use! Inlining, for example.)
+
+Type::Nano is not recommended for use in regular application code.
+L<Type::Tiny> while bigger than Type::Nano, will be I<much> faster at
+runtime, and offers better integration with Moo, Moose, Mouse, and a
+wide variety of other tools. Use that instead.
+
+All that having been said, L<Type::Nano> is compatible with:
+L<Type::Tie>, L<Moo>, L<Type::Tiny> (e.g. you can use Type::Tiny's
+implementation of C<ArrayRef> and Type::Nano's implementation of
+C<Int>, and combine them as C<< ArrayRef[Int] >>), L<Class::XSConstructor>,
+and L<Variable::Declaration>.
+
+=head1 DESCRIPTION
+
+=head2 Object-Oriented Interface
+
+=head3 Constructor
+
+=over
+
+=item C<< Type::Nano->new(%parameters) >>
+
+The constructor supports named parameters called C<name> (a string),
+C<constraint> (a coderef expected to return a boolean), and C<parent>
+(a blessed Type::Nano object). Any other parameters passed to the
+constructor will be stored in the blessed hashred returned, but are ignored
+by Type::Nano.
+
+=back
+
+=head3 Methods
+
+Types support the following methods:
+
+=over
+
+=item C<< $type->check($value) >>
+
+Checks the value against the constraint; returns a boolean.
+
+=item C<< $type->get_message($failing_value) >>
+
+Returns an error message. Does not check the value.
+
+=back
+
+Types overload C<< &{} >> to do something like:
+
+  $type->check($value) or croak($type->get_message($value))
+
+=head2 Exports
+
+This module optionally exports the following type constraints:
 
 =over
 
@@ -370,37 +428,6 @@ C<< union $name, \@types >> or C<< union \@types >>
 C<< intersection $name, \@types >> or C<< intersection \@types >>
 
 =back
-
-Types support the following methods:
-
-=over
-
-=item C<< $type->check($value) >>
-
-Checks the value against the constraint; returns a boolean.
-
-=item C<< $type->get_message($failing_value) >>
-
-Returns an error message. Does not check the value.
-
-=back
-
-Types overload C<< &{} >> to do something like:
-
-  $type->check($value) or croak($type->get_message($value))
-
-I'll stress that this module is I<only> intended for use in testing.
-It eliminates Type::Tie's testing dependency on L<Types::Standard>.
-
-L<Type::Tiny> while bigger than Type::Nano, will be I<much> faster at
-runtime, and offers better integration with Moo, Moose, Mouse, and a
-wide variety of other tools. Use that instead.
-
-All that having been said, L<Type::Nano> is compatible with:
-L<Type::Tie>, L<Moo>, L<Type::Tiny> (e.g. you can use Type::Tiny's
-implementation of C<ArrayRef> and Type::Nano's implementation of
-C<Int>, and combine them as C<< ArrayRef[Int] >>), L<Class::XSConstructor>,
-and L<Variable::Declaration>.
 
 =head1 BUGS
 

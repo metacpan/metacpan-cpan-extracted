@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Mesh3d::Lighting;
 use Chart::Plotly::Trace::Mesh3d::Lightposition;
 use Chart::Plotly::Trace::Mesh3d::Stream;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Draws sets of triangles with coordinates given by three 1-dimensional arrays in `x`, `y`, `z` and (1) a sets of `i`, `j`, `k` indices (2) Delaunay triangulation or (3) the Alpha-shape algorithm or (4) the Convex-hull algorithm
 
@@ -133,7 +133,7 @@ has flatshading => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -377,7 +377,7 @@ Chart::Plotly::Trace::Mesh3d - Draws sets of triangles with coordinates given by
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

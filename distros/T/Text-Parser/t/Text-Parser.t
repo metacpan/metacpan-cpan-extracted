@@ -33,13 +33,13 @@ is( $pars->lines_parsed(), 0,     'Nothing parsed again' );
 
 SKIP: {
     skip 'Tests not meant for root user', 2 unless $>;
+    skip 'Tests wont work on MSWin32',    2 unless $^O ne 'MSWin32';
     open OFILE, ">t/unreadable.txt";
     print OFILE "This is unreadable\n";
     close OFILE;
     chmod 0200, 't/unreadable.txt';
     throws_ok { $pars->filename('t/unreadable.txt'); }
-    'Text::Parser::Exception',
-        'This file cannot be read';
+    'Text::Parser::Exception', 'This file cannot be read';
     is( $pars->filename(), undef, 'Still no file has been read so far' );
     unlink 't/unreadable.txt';
 }

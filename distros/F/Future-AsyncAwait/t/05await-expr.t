@@ -9,6 +9,8 @@ use Future;
 
 use Future::AsyncAwait;
 
+my $orig_cxstack_ix = Future::AsyncAwait::__cxstack_ix;
+
 {
    async sub await_within_expr
    {
@@ -22,5 +24,8 @@ use Future::AsyncAwait;
 
    is( scalar $fret->get, 6, '$fret yields correct result for mid-expression await' );
 }
+
+is( Future::AsyncAwait::__cxstack_ix, $orig_cxstack_ix,
+   'cxstack_ix did not grow during the test' );
 
 done_testing;

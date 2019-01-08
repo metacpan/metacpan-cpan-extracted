@@ -153,9 +153,9 @@ sub _return_locale ( $self, $req ) {
         my $js = <<"JS";
             Ext.L10N.addLocale(
                 '$locale',
-                {   messages: @{[ to_json( $messages, canonical => 1 )->$* ]},
+                {   messages: @{[ to_json $messages, canonical => 1 ]},
                     pluralFormExp: function (n) { return $plural_form_exp; },
-                    settings: @{[ to_json( $locale_settings->{$locale}, canonical => 1 )->$* ]}
+                    settings: @{[ to_json $locale_settings->{$locale}, canonical => 1 ]}
                 }
             );
 JS
@@ -214,7 +214,7 @@ sub _return_app ( $self, $req ) {
             Ext.ariaWarn = Ext.emptyFn;
 
             // ExtDirect api
-            Ext.direct.Manager.addProvider($data->{api_map}->$*);
+            Ext.direct.Manager.addProvider($data->{api_map});
 
             Ext.application({
                 name: 'APP',

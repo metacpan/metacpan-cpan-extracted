@@ -1,4 +1,9 @@
-Revision history for Dist-Zilla-Plugin-For-Data-Sah
+0.004   2019-01-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace the use of Package::MoreUtil with Package::Stash.
+
 
 0.003   2016-06-02 (PERLANCAR)
 

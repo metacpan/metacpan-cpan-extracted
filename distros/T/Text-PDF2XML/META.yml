@@ -20,14 +20,18 @@ no_index:
     - share
     - t
 recommends:
-  File::ShareDir: 0
   Lingua::Identify::Blacklists: '0.04'
 requires:
+  Encode: 0
+  Encode::Locale: 0
+  File::ShareDir: 0
   FindBin: 0
   Getopt::Std: 0
-  IPC::Open2: 0
+  IO::File: 0
+  IPC::Open3: 0
+  LWP::UserAgent: 0
   XML::Parser: 0
   XML::Writer: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: 0.2.7
+version: 0.3.2

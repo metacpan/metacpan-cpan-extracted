@@ -14,7 +14,7 @@ use Chart::Plotly::Trace::Choropleth::Stream;
 use Chart::Plotly::Trace::Choropleth::Transform;
 use Chart::Plotly::Trace::Choropleth::Unselected;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: The data that describes the choropleth value-to-color mapping is set in `z`. The geographic locations corresponding to each value in `z` are set in `locations`.
 
@@ -82,7 +82,7 @@ has geo => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -252,7 +252,7 @@ Chart::Plotly::Trace::Choropleth - The data that describes the choropleth value-
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

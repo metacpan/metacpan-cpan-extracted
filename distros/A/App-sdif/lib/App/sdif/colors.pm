@@ -73,40 +73,41 @@ option	--mono \
 	--cm    ?MARK=000/333	\
 	--cm    UMARK=		\
 	--cm    ?LINE=222	\
-	--cm    ?TEXT=000/L23	\
+	--cm    ?TEXT=000/L24	\
 	--cm    UTEXT=111	\
 	--cdifopts='--mono'
 
-define {DARK_BG1} L10
-define {DARK_BG2} L04
+define {DARK_BG1} L11
+define {DARK_BG2} L05
 
 expand	--dark-screen \
 	--cm    ?MARK=000/{DARK_BG1}	\
 	--cm    UMARK=			\
-	--cm    ?TEXT=L23/{DARK_BG2}	\
-	--cm    UTEXT=L22
+	--cm    ?TEXT=L24/{DARK_BG2}	\
+	--cm    UTEXT=L23
 
 option	--dark-green \
 	--dark-screen 			\
-	--cm ?COMMAND=K/232;		\
-	--cm    ?FILE=K/232;D		\
+	--cm OTEXT=NTEXT=MTEXT=+353	\
+	--cm ?COMMAND=000/232;		\
+	--cm    ?FILE=000/232;D		\
 	--cm    ?LINE=220		\
-	--cdifopts='--dark-green'
+	--cdifopts='--dark-green --cm APPEND=DELETE=?CHANGE=+353'
 
 option	--dark-cmy \
 	--dark-screen			\
-	--cm OCOMMAND=K/122		\
-	--cm    OFILE=K/122;D		\
-	--cm NCOMMAND=K/313		\
-	--cm    NFILE=K/313;D		\
-	--cm MCOMMAND=K/332		\
-	--cm    MFILE=K/332;D		\
+	--cm OCOMMAND=000/122		\
+	--cm    OFILE=000/122;D		\
+	--cm NCOMMAND=000/313		\
+	--cm    NFILE=000/313;D		\
+	--cm MCOMMAND=000/332		\
+	--cm    MFILE=000/332;D		\
 	--cm    ?LINE=220		\
 	--cdifopts='--dark-cmy'
 
 option	--dark-mono \
 	--dark-screen			\
-	--cm ?COMMAND=/{DARK_BG1}	\
+	--cm ?COMMAND=555/{DARK_BG1}	\
 	--cm    ?FILE=D/{DARK_BG1}	\
 	--cm    ?LINE=111		\
 	--cdifopts='--dark-mono'

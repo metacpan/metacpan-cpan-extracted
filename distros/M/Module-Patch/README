@@ -2,8 +2,8 @@ NAME
     Module::Patch - Patch package with a set of patches
 
 VERSION
-    This document describes version 0.274 of Module::Patch (from Perl
-    distribution Module-Patch), released on 2018-10-07.
+    This document describes version 0.275 of Module::Patch (from Perl
+    distribution Module-Patch), released on 2019-01-06.
 
 SYNOPSIS
     In this example, we're patching HTTP::Tiny to add automatic retrying.
@@ -326,8 +326,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012
-    by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013,
+    2012 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

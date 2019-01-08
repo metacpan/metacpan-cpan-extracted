@@ -3,7 +3,7 @@ package NpsSDK::Constants;
 use warnings; 
 use strict;
 
-our $VERSION = '1.9'; # VERSION
+our $VERSION = '1.91'; # VERSION
 our $LANGUAGE = "Perl";
 
 our $SANDBOX_ENV = 2;

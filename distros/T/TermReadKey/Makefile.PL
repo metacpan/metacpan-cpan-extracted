@@ -1,13 +1,15 @@
+use strict;
+use warnings;
 
 use ExtUtils::MakeMaker;
 use Carp;
 
-my $mm_version = $ExtUtils::MakeMaker::VERSION || $ExtUtils::MakeMaker::Version;
+my $mm_version = $ExtUtils::MakeMaker::VERSION;
 if ( $mm_version < 6.58 ) {
     croak("Sorry, but MakeMaker 6.58 or better is needed to build this package.");
 }
 
-&WriteMakefile(
+WriteMakefile(
     NAME       => 'Term::ReadKey',
     DISTNAME   => 'TermReadKey',
     LICENSE    => 'perl',
@@ -27,8 +29,8 @@ if ( $mm_version < 6.58 ) {
         },
         provides  => {
             'Term::ReadKey' => {
-                file    => 'META.yml',
-                version => '2.37',
+                file    => 'ReadKey.pm.PL',
+                version => '2.38',
             },
         },
         'meta-spec' => { version => 2 },
@@ -40,9 +42,9 @@ if ( $mm_version < 6.58 ) {
             },
         },
     },
-    VERSION_FROM    => 'ReadKey_pm.PL',
+    VERSION_FROM    => 'ReadKey.pm.PL',
     XSPROTOARG      => '-noprototypes',
-    PL_FILES	    => { 'ReadKey_pm.PL' => 'ReadKey.pm' },
+    PL_FILES	    => { 'ReadKey.pm.PL' => 'ReadKey.pm' },
     PM              => { 'ReadKey.pm' => '$(INST_ARCHLIBDIR)/ReadKey.pm' },
     clean           => { FILES => 'cchars.h ReadKey.pm' },
     SIGN            => 1,
@@ -66,30 +68,30 @@ sgtty cchars.h: genchars.pl
 distcc: genchars.pl
 	\$(PERLRUN) genchars.pl dist
 
-ReadKey.c: cchars.h
+ReadKey\$(OBJ_EXT): ReadKey.c cchars.h
 
 ";
-    $_
+    return $_;
 }
 
 # The template needs DynaLoader. don't use miniperl (dual-life only)
 sub MY::processPL {
     my $self = shift;
     $_ = $self->MM::processPL();
-    s/ReadKey.pm :: ReadKey_pm.PL/ReadKey.pm :: ReadKey_pm.PL dynamic/;
+    s/ReadKey.pm :: ReadKey.pm.PL/ReadKey.pm :: ReadKey.pm.PL dynamic/;
     s/\$\(PERLRUN\)/\$(FULLPERLRUNINST)/;
-    $_
+    return $_;
 }
 
 sub MY::test {
     my $self = shift;
     $_ = $self->MM::test();
     s#example/test.pl#-w example/test.pl#;
-    $_
+    return $_;
 }
 
 sub MY::test_interactive {
-    "Fooo"
+    return "Fooo";
 }
 
 sub MY::pure_site_install {
@@ -97,5 +99,5 @@ sub MY::pure_site_install {
     my $new = $self->MM::test();
 
     $new .= "\n\t./register_module Term::ReadKey";
-    $new
+    return $new;
 }

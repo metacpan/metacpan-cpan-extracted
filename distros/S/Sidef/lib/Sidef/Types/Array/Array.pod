@@ -18,10 +18,9 @@ var obj = Array(...)
 
 Inherits methods from:
 
-	* Sidef::Object::Object
+       * Sidef::Object::Object
 
 =head1 METHODS
-
 
 =head2 &
 
@@ -90,16 +89,6 @@ I<Obj> B</> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<÷>, I<div>
-
-=cut
-
-=head2 :
-
-I<Obj> B<:> I<Obj> -> I<Obj>
-
-Return the
-
-Aliases: I<pair_with>
 
 =cut
 
@@ -893,14 +882,6 @@ Return the
 
 =cut
 
-=head2 join_insert
-
-Array.join_insert() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 keys
 
 Array.keys() -> I<Obj>
@@ -921,13 +902,23 @@ Aliases: I<indices_by>
 
 =cut
 
+=head2 keys_of
+
+Array.keys_of() -> I<Obj>
+
+Return the
+
+Aliases: I<indices_of>
+
+=cut
+
 =head2 kv
 
 Array.kv() -> I<Obj>
 
 Return the
 
-Aliases: I<pairs>
+Aliases: I<pairs>, I<zip_indices>
 
 =cut
 
@@ -1023,6 +1014,14 @@ Return the
 
 =cut
 
+=head2 make_by
+
+Array.make_by() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 map
 
 Array.map() -> I<Obj>
@@ -1058,6 +1057,14 @@ Array.map_op() -> I<Obj>
 Return the
 
 Aliases: I<map_operator>
+
+=cut
+
+=head2 map_reduce
+
+Array.map_reduce() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1159,6 +1166,14 @@ Aliases: I<call>
 
 =cut
 
+=head2 none
+
+Array.none() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 nth_perm
 
 Array.nth_perm() -> I<Obj>
@@ -1177,11 +1192,13 @@ Return the
 
 =cut
 
-=head2 pairmap
+=head2 pair_map
 
-Array.pairmap() -> I<Obj>
+Array.pair_map() -> I<Obj>
 
 Return the
+
+Aliases: I<pairmap>
 
 =cut
 
@@ -1234,16 +1251,6 @@ Return the
 Array.pick() -> I<Obj>
 
 Return the
-
-=cut
-
-=head2 pop
-
-Array.pop() -> I<Obj>
-
-Return the
-
-Aliases: I<drop_last>, I<drop_right>
 
 =cut
 
@@ -1583,11 +1590,13 @@ Aliases: I<to_hash>
 
 =cut
 
-=head2 to_matrix
+=head2 to_m
 
-Array.to_matrix() -> I<Obj>
+Array.to_m() -> I<Obj>
 
 Return the
+
+Aliases: I<to_matrix>
 
 =cut
 
@@ -1606,6 +1615,16 @@ Aliases: I<dump>, I<to_str>
 Array.to_set() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 to_v
+
+Array.to_v() -> I<Obj>
+
+Return the
+
+Aliases: I<to_vector>
 
 =cut
 
@@ -1733,6 +1752,36 @@ Aliases: I<or>
 
 =cut
 
+=head2 |>>
+
+I<Obj> B<|E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_map_op>
+
+=cut
+
+=head2 |X>
+
+Array.|XE<gt>() -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_cross_op>
+
+=cut
+
+=head2 |Z>
+
+Array.|ZE<gt>() -> I<Obj>
+
+Return the
+
+Aliases: I<pipeline_zip_op>
+
+=cut
+
 =head2 «
 
 I<Obj> B<«> I<Obj> -> I<Obj>
@@ -1749,7 +1798,7 @@ I<Obj> B<»> I<Obj> -> I<Obj>
 
 Return the
 
-Aliases: I<E<gt>E<gt>>, I<assign_to>
+Aliases: I<E<gt>E<gt>>, I<pop>, I<drop_last>, I<drop_right>
 
 =cut
 

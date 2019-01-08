@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Last changed Time-stamp: <2017-05-28 17:03:26 mtw>
+# Last changed Time-stamp: <2019-01-07 00:40:43 mtw>
 # -*-CPerl-*-
 #
 # usage: RNAalisplit.pl -a myfile.aln
@@ -7,17 +7,19 @@
 # NB: Display ID handling in Bio::AlignIO is broken for Stockholm
 # format. Use ClustalW format instead !!!
 
-use version; our $VERSION = qv('0.05');
+use version; our $VERSION = qv('0.09');
 use strict;
 use warnings;
 use Bio::RNA::RNAaliSplit;
 use Bio::RNA::RNAaliSplit::WrapRNAz;
+use Bio::RNA::RNAaliSplit::WrapRscape;
 use Bio::RNA::RNAaliSplit::WrapRNAalifold;
 use Bio::RNA::RNAaliSplit::WrapAnalyseDists;
 use Getopt::Long qw( :config posix_default bundling no_ignore_case );
 use Data::Dumper;
 use Pod::Usage;
 use Path::Class;
+use File::Basename;
 use Carp;
 use RNA;
 #use diagnostics;
@@ -28,25 +30,30 @@ use RNA;
 
 my $format = "ClustalW";
 my $method = "dHn"; # SCI | dHn | dHx | dBp | dHB
+my $rscape_stat = "GTp";
 my $outdir = "as";
 my $verbose = undef;
+my $rnaz=undef;
 my @nseqs=();
-my ($dim,$alifile,$fi);
+my ($alifile,$fi);
 my $scaleH = 1.;
 my $scaleB = 1.;
+my $ribosum = 1;
 my $show_version = 0;
 my %foldme = (); # HoH of folded input sequences for dBp computation
 
 Getopt::Long::config('no_ignore_case');
-pod2usage(-verbose => 1) unless GetOptions("aln|a=s"    => \$alifile,
-                                           "method|m=s" => \$method,
-					   "out|o=s"    => \$outdir,
-					   "scaleH"     => \$scaleH,
-					   "scaleB"     => \$scaleB,
-					   "verbose|v"  => sub{$verbose = 1},
-					   "version"    => sub{$show_version = 1},
-                                           "man"        => sub{pod2usage(-verbose => 2)},
-                                           "help|h"     => sub{pod2usage(1)}
+pod2usage(-verbose => 1) unless GetOptions("aln|a=s"      => \$alifile,
+                                           "method|m=s"   => \$method,
+					   "noribosum"    => sub{$ribosum=0},
+					   "out|o=s"      => \$outdir,
+					   "rscapestat=s" => \$rscape_stat,
+					   "scaleH"       => \$scaleH,
+					   "scaleB"       => \$scaleB,
+					   "verbose|v"    => sub{$verbose = 1},
+					   "version"      => sub{$show_version = 1},
+                                           "man"          => sub{pod2usage(-verbose => 2)},
+                                           "help|h"       => sub{pod2usage(1)}
                                            );
 
 if ($show_version == 1){
@@ -83,82 +90,87 @@ while ($done != 1){
 
 sub alisplit {
   my ($alnfile,$odirn) = @_;
+  my ($what,$alifold,$rscape);
   my $AlignSplitObject = Bio::RNA::RNAaliSplit->new(ifile => $alnfile,
 						    format => $format,
 						    odir => $odirn,
 						    dump => 1);
   #print Dumper($AlignSplitObject);
-  #print Dumper(${$AlignSplitObject->next_aln}{_order});
-  #die;
-  $dim = $AlignSplitObject->next_aln->num_sequences;
-
+  my $dim = $AlignSplitObject->next_aln->num_sequences;
+  my $stkfile = $AlignSplitObject->alignment_stk;
   my $dmfile = make_distance_matrix($AlignSplitObject,$method,$odirn);
 
   # compute Neighbor Joining tree and do split decomposition
   print STDERR "Perform Split Decomposition ...\n";
   my $sd = Bio::RNA::RNAaliSplit::WrapAnalyseDists->new(ifile => $dmfile,
 							odir => $AlignSplitObject->odir);
-						#	basename => $AlignSplitObject->ifilebn);
   print STDERR "Identified ".$sd->count." splits\n";
-  # run RNAalifold for the input alignment
-  my $alifold = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $alnfile,
-							   odir => $AlignSplitObject->odir);
-  my $alifold_ribosum = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $alnfile,
-								   odir => $AlignSplitObject->odir,
-								   ribosum => 1);
-  # print Dumper($alifold);die;
-  # run RNAz for the input alignment
-  my $rnaz = Bio::RNA::RNAaliSplit::WrapRNAz->new(ifile => $alnfile,
-						  odir => $AlignSplitObject->odir);
-  # print Dumper($rnaz);die;
-  print join "\t", "#hit","RNAz prob","z-score","SCI","seqs","consensus structure","alignment\n";
-  print join "\t", "-",$rnaz->P,$rnaz->z,$alifold->sci,$dim,$alifold_ribosum->consensus_struc,$alnfile."\n";
+  print join "\t", ("#hint","RNAz prob","z-score","SCI","seqs","statistic","SSCBP","consensus structure","alignment"), "\n";
 
-  # extract split sets and run RNAz on each of them
+  # run RNAalifold for the input alignment
+  $alifold = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $alnfile,
+							odir => $AlignSplitObject->odir,
+							ribosum => $ribosum);
+
+  # run RNAz for the input alignment
+  $rnaz = Bio::RNA::RNAaliSplit::WrapRNAz->new(ifile => $alnfile,
+					       odir => $AlignSplitObject->odir);
+
+  # run R-scape for the input alignment
+  $rscape = Bio::RNA::RNAaliSplit::WrapRscape->new(ifile => $alifold->alignment_stk, # use RNAalifold-generated stk
+						   odir => $AlignSplitObject->odir,
+						   statistic => $rscape_stat,
+						   nofigures => 1);
+  $rscape->status == 0 ? $what = $rscape->TP : $what = "n/a";
+
+  print join "\t", "-",$rnaz->P,$rnaz->z,$alifold->sci,$dim,$rscape->statistic,$what,
+    $alifold->consensus_struc,$alnfile."\n";
+
+  # extract split sets and run RNAz/RNAalifold/R-scape on each of them
   my $splitnr=1;
   while (my $sets = $sd->pop()){
-    my ($rnazo1,$rnazo2,$have_rnazo1,$have_rnazo2,$hint) = (0)x5;
-    my ($ao1,$ao2,$ao1_ribosum,$ao2_ribosum) = (0)x4;
-    my ($cs,$sa1_c,$sa1_s,$sa2_c,$sa2_s); # subalignments in Clustal and Stockholm
+    my ($sa1_c,$sa1_s,$sa2_c,$sa2_s); # subalignments in Clustal and Stockholm
     my $set1 = $$sets{S1};
     my $set2 = $$sets{S2};
     my $token = "split".$splitnr;
-    #  print "set1: @$set1\n";
-    #  print "set2: @$set2\n";
+    #print "set1: @$set1\n"; #print "set2: @$set2\n";
     ($sa1_c,$sa1_s) = $AlignSplitObject->dump_subalignment("splits", $token.".set1", $set1);
     ($sa2_c,$sa2_s) = $AlignSplitObject->dump_subalignment("splits", $token.".set2", $set2);
-    if( scalar(@$set1) > 1){
-      $rnazo1 = Bio::RNA::RNAaliSplit::WrapRNAz->new(ifile => $sa1_c,
-						     odir => $AlignSplitObject->odir);
-      $have_rnazo1 = 1;
-      ($rnazo1->P > $rnaz->P) ? ($hint = "?") : ($hint = "-");
-      if($rnazo1->P > 1.2*$rnaz->P){$hint = "x"};
-      if($rnazo1->P > 1.3*$rnaz->P){$hint = "X"};
-      $ao1 = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $sa1_c,
-							odir => $AlignSplitObject->odir);
-      $ao1_ribosum = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $sa1_c,
-								odir => $AlignSplitObject->odir,
-								ribosum => 1);
-      $cs = $ao1_ribosum->consensus_struc;
-      print join "\t",$hint,$rnazo1->P,$rnazo1->z,$ao1->sci,scalar(@$set1),$cs,$sa1_c."\n";
-    }
-    if( scalar(@$set2) > 1){
-      $rnazo2 = Bio::RNA::RNAaliSplit::WrapRNAz->new(ifile => $sa2_c,
-						     odir => $AlignSplitObject->odir);
-      $have_rnazo2 = 1;
-      ($rnazo2->P > $rnaz->P) ? ($hint = "?") : ($hint = "-");
-      if($rnazo2->P > 1.2*$rnaz->P){$hint = "x"};
-      if($rnazo2->P > 1.3*$rnaz->P){$hint = "X"};
-      $ao2 = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $sa2_c,
-							odir => $AlignSplitObject->odir);
-      $ao2_ribosum = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $sa2_c,
-								odir => $AlignSplitObject->odir,
-								ribosum => 1);
-      $cs = $ao2_ribosum->consensus_struc;
-      print join "\t",$hint,$rnazo2->P,$rnazo2->z,$ao2->sci,scalar(@$set2),$cs,$sa2_c."\n";
-    }
+    if( scalar(@$set1) > 1){evaluate_alignment($sa1_c,$sa1_s,$AlignSplitObject->odir,scalar(@$set1))}
+    if( scalar(@$set2) > 1){evaluate_alignment($sa2_c,$sa2_s,$AlignSplitObject->odir,scalar(@$set2))}
     $splitnr++;
   }
+}
+
+sub evaluate_alignment {
+  my ($aln, $stk, $odir, $count) = @_;
+  my ($hint,$rnazo,$alifoldo,$rscapeo,$cs,$what);
+
+  $rnazo =  Bio::RNA::RNAaliSplit::WrapRNAz->new(ifile => $aln,
+						 odir => $odir);
+  ($rnazo->P > $rnaz->P) ? ($hint = "?") : ($hint = "-");
+  if($rnazo->P > 1.2*$rnaz->P){$hint = "x"};
+  if($rnazo->P > 1.3*$rnaz->P){$hint = "X"};
+  $alifoldo = Bio::RNA::RNAaliSplit::WrapRNAalifold->new(ifile => $aln,
+							 odir => $odir,
+							 ribosum => $ribosum);
+  $cs = $alifoldo->consensus_struc;
+  $rscapeo =  Bio::RNA::RNAaliSplit::WrapRscape->new(ifile => $alifoldo->alignment_stk, # use RNAalifold-generated stk
+						     odir => $odir,
+						     statistic => $rscape_stat,
+						     nofigures => 1);
+  if ($rscapeo->status == 0){ # all OK
+    $what = $rscapeo->TP;
+  }
+  elsif ($rscapeo->status == 1){  # no significant basepairs
+    $what = "0:no_sign";
+  }
+  elsif ($rscapeo->status == 2){  # covariation scores are almost constant, no further analysis
+    $what = "0:no_data";
+  }
+  else { $what = "n/a" }
+
+  print join "\t",($hint,$rnazo->P,$rnazo->z,$alifoldo->sci,$count,$rscapeo->statistic,$what,$cs,$aln), "\n";
 }
 
 sub make_distance_matrix {
@@ -428,6 +440,19 @@ however, is not a metric and therefore often results in negative
 branch lengths in Neighbor Joining trees. Use with caution. [default:
 'dHn']
 
+=item B<--noribosum>
+
+Turn off ribosum scoring for RNAalifold computation. Default: ribosum
+scoring on
+
+=item B<--rscapestat>
+
+R-scape covariation statistic. Allowed values are: 'GT', 'MI', 'MIr',
+'MIg', 'CHI', 'OMES', 'RAF', 'RAFS'. Appending either 'p' or 'a' to
+any of them calculates its average product correction and average sum
+correction, respctively (e.g. GTp or GTa). See the R-scape manual for
+details.
+
 =item B<--out|-o>
 
 Output base directory. Temporary data and results will be written to
@@ -441,7 +466,8 @@ Show RNAalisplit version and exit
 
 =head1 AUTHOR
 
-Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt> and E<lt>michael.wolfinger@univie.ac.atE<gt>
+Michael T. Wolfinger E<lt>michael@wolfinger.euE<gt> and
+E<lt>michael.wolfinger@univie.ac.atE<gt>
 
 =cut
 (END)

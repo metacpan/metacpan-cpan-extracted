@@ -1,20 +1,20 @@
-# $Id: Util.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: Util.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
 use parent 'Exporter';
-our (@EXPORT_OK, %chaps, %modes,
-     $table_id, $query_info, $mode_info, $full_id, $dslip);
-@EXPORT_OK = qw(%chaps $repositories %modes
+our (@EXPORT_OK, %modes,
+     $table_id, $query_info, $mode_info, $full_id);
+@EXPORT_OK = qw($repositories %modes
                 vcmp $table_id $query_info $mode_info $full_id
-                has_hash_data has_array_data $dslip
-                expand_dslip download chap_desc print_debug);
+                has_hash_data has_array_data
+                download print_debug);
 
 make_ids();
 
@@ -34,11 +34,6 @@ $mode_info = {
                          name => 'cpanid',
                          text => 'fullname',
                         },
-              chapter => {id => 'chapterid',
-                          table => 'chaps',
-                          name => 'subchapter',
-                          text => 'subchapter',
-                         },
              };
 
 %modes = map {$_ => 1} keys %$mode_info;
@@ -52,83 +47,6 @@ $query_info = { module => {mode => 'module', type => 'name'},
                 auth_id => {mode => 'author', type => 'id'},
               };
 
-%chaps = (
-          2 => 'Perl Core Modules',
-          3 => 'Development Support',
-          4 => 'Operating System Interfaces',
-          5 => 'Networking Devices IPC',
-          6 => 'Data Type Utilities',
-          7 => 'Database Interfaces',
-          8 => 'User Interfaces',
-          9 => 'Language Interfaces',
-          10 => 'File Names Systems Locking',
-          11 => 'String Lang Text Proc',
-          12 => 'Opt Arg Param Proc',
-          13 => 'Internationalization Locale',
-          14 => 'Security and Encryption',
-          15 => 'World Wide Web HTML HTTP CGI',
-          16 => 'Server and Daemon Utilities',
-          17 => 'Archiving and Compression',
-          18 => 'Images Pixmaps Bitmaps',
-          19 => 'Mail and Usenet News',
-          20 => 'Control Flow Utilities',
-          21 => 'File Handle Input Output',
-          22 => 'Microsoft Windows Modules',
-          23 => 'Miscellaneous Modules',
-          24 => 'Commercial Software Interfaces',
-          26 => 'Documentation',
-          27 => 'Pragma',
-          28 => 'Perl6',
-          99 => 'Not In Modulelist',
-         );
-
-$dslip = {
-    d => {
-      M => q{Mature (no rigorous definition)},
-      R => q{Released},
-      S => q{Standard, supplied with Perl 5},
-      a => q{Alpha testing},
-      b => q{Beta testing},
-      c => q{Under construction but pre-alpha (not yet released)},
-      desc => q{Development Stage (Note: *NO IMPLIED TIMESCALES*)},
-      i => q{Idea, listed to gain consensus or as a placeholder},
-    },
-    s => {
-      a => q{Abandoned, the module has been abandoned by its author},
-      d => q{Developer},
-      desc => q{Support Level},
-      m => q{Mailing-list},
-      n => q{None known, try comp.lang.perl.modules},
-      u => q{Usenet newsgroup comp.lang.perl.modules},
-    },
-    l => {
-      '+' => q{C++ and perl, a C++ compiler will be needed},
-      c => q{C and perl, a C compiler will be needed},
-      desc => q{Language Used},
-      h => q{Hybrid, written in perl with optional C code, no compiler needed},
-      o => q{perl and another language other than C or C++},
-      p => q{Perl-only, no compiler needed, should be platform independent},
-    },
-    i => {
-      O => q{Object oriented using blessed references and/or inheritance},
-      desc => q{Interface Style},
-      f => q{plain Functions, no references used},
-      h => q{hybrid, object and function interfaces available},
-      n => q{no interface at all (huh?)},
-      r => q{some use of unblessed References or ties},
-    },
-    p => {
-      a => q{Artistic license alone},
-      b => q{BSD: The BSD License},
-      desc => q{Public License},
-      g => q{GPL: GNU General Public License},
-      l => q{LGPL: "GNU Lesser General Public License" (previously known as "GNU Library General Public License")},
-      o => q{other (but distribution allowed without restrictions)},
-      p => q{Standard-Perl: user may choose between GPL and Artistic},
-    },
-};
-
-
 sub make_ids {
   my @tables = qw(mods dists auths);
   foreach my $table (@tables) {
@@ -136,7 +54,6 @@ sub make_ids {
     $table_id->{$table} = $id;
     $full_id->{$id} = $table . '.' . $id;
   }
-#    $full_id->{chapterid} = 'chaps.chapterid';
   return;
 }
 
@@ -162,34 +79,12 @@ sub has_array_data {
   return (scalar @$data > 0) ? 1 : 0;
 }
 
-sub expand_dslip {
-  my ($string) = @_;
-  my $entries = [];
-  my @info = split '', $string;
-  my @given = qw(d s l i p);
-  for (0 .. 4) {
-    my $entry;
-    my $given = $given[$_];
-    my $info = $info[$_];
-    $entry->{desc} = $dslip->{$given}->{desc};
-    $entry->{what} = (not $info or $info eq '?') ?
-      'not specified' : $dslip->{$given}->{$info};
-    push @$entries, $entry;
-  }
-  return $entries;
-}
-
 sub download {
   my ($cpanid, $dist_file) = @_;
   return unless ($cpanid and $dist_file);
   (my $fullid = $cpanid) =~ s!^(\w)(\w)(.*)!$1/$1$2/$1$2$3!;
   my $download = $fullid . '/' . $dist_file;
   return $download;
-}
-
-sub chap_desc {
-  my ($id) = @_;
-  return $chaps{$id};
 }
 
 sub print_debug {
@@ -209,7 +104,7 @@ sub vcmp {
 package CPAN::SQLite::Version;
 
 use strict;
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 no warnings;
 
 # CPAN::Version::vcmp courtesy Jost Krieger
@@ -315,7 +210,7 @@ CPAN::SQLite::Util - export some common data structures used by CPAN::SQLite::*
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 
@@ -323,16 +218,6 @@ This module exports some common data structures used by other
 I<CPAN::Search::Lite::*> modules. At present these are
 
 =over 3
-
-=item * C<%chaps>
-
-This is hash whose keys are the CPAN chapter ids with associated
-values being the corresponding chapter descriptions.
-
-=item * C<$dslip>
-
-This contains a description of the meaning of the
-various C<dslip> codes.
 
 =item * C<$table_id>
 

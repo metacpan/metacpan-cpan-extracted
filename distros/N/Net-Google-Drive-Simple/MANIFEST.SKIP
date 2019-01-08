@@ -1,5 +1,4 @@
 blib
-^Simple.pm
 ^Makefile$
 ^Makefile.old$
 CVS
@@ -8,3 +7,5 @@ CVS
 MANIFEST.bak
 adm/release
 .gz$
+MYMETA.json
+MYMETA.yml

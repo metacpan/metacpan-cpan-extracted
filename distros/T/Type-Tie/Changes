@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Type-Tie>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tie>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.013	2019-01-06
+
+ [ Documentation ]
+ - Clarify rationale and use of Type::Nano.
+
 0.012	2019-01-02
 
  [ Test Suite ]

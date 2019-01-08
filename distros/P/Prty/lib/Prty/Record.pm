@@ -5,11 +5,11 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::String;
-use Prty::Path;
 use Prty::Option;
+use Prty::Path;
 use Prty::String;
 
 # -----------------------------------------------------------------------------
@@ -131,7 +131,27 @@ sub fromString {
 
 =head4 Synopsis
 
-    @keyVal | $keyValA = $class->fromFile($file);
+    @keyVal | $keyValA = $class->fromFile($file,@opt);
+
+=head4 Arguments
+
+=over 4
+
+=item $file
+
+Datei, die den Record enthält.
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -encoding => $encoding
+
+Character Encoding, z.B. 'UTF-8'.
+
+=back
 
 =head4 Description
 
@@ -142,8 +162,18 @@ Wie L</fromString>, nur dass der Record aus Datei $file gelesen wird.
 # -----------------------------------------------------------------------------
 
 sub fromFile {
-    my ($class,$file) = @_;
-    return $class->fromString(Prty::Path->read($file));
+    my ($class,$file) = splice @_,0,2;
+    # @_: @opt
+
+    # Optionen
+
+    my $encoding = undef;
+
+    Prty::Option->extract(\@_,
+        -encoding => \$encoding,
+    );
+
+    return $class->fromString(Prty::Path->read($file,-decode=>$encoding));
 }
 
 # -----------------------------------------------------------------------------
@@ -269,7 +299,7 @@ sub toFile {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -277,7 +307,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

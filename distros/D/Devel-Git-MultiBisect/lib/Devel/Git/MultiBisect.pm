@@ -2,7 +2,7 @@ package Devel::Git::MultiBisect;
 use strict;
 use warnings;
 use v5.10.0;
-use Devel::Git::MultiBisect::Opts qw( process_options );
+use Devel::Git::MultiBisect::Init;
 use Devel::Git::MultiBisect::Auxiliary qw(
     clean_outputfile
     hexdigest_one_file
@@ -14,11 +14,11 @@ use File::Spec;
 use File::Temp;
 use List::Util qw(sum);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
-Devel::Git::MultiBisect - Study test output over a range of F<git> commits
+Devel::Git::MultiBisect - Study build and test output over a range of F<git> commits
 
 =head1 SYNOPSIS
 
@@ -53,15 +53,16 @@ parent package may be called from either child class.
 
 Given a Perl library or application kept in F<git> for version control, it is
 often useful to be able to compare the output collected from running one or
-several test files over a range of F<git> commits.  If that range is sufficiently
+more test files over a range of F<git> commits.  If that range is sufficiently
 large, a test may fail in B<more than one way> over that range.
 
 If that is the case, then simply asking, I<"When did this file start to
-fail?"> is insufficient.  We may want to (a) capture the test output for each
-commit; or, (b) capture the test output only at those commits where the output
-changed.  The output of a run of a test file may change for a variety of
-reasons:  test failures, segfaults, changes in the number or content of tests,
-etc.)
+fail?"> -- a question which C<git bisect> is designed to answer -- is
+insufficient.  In order to identify more than one point of failure, we may
+need to (a) capture the test output for each commit; or, (b) capture the test
+output only at those commits where the output changed.  The output of a run of
+a test file may change for a variety of reasons:  test failures, segfaults,
+changes in the number or content of tests, etc.
 
 F<Devel::Git::MultiBisect> provides methods to achieve that objective.  Its
 child classes, F<Devel::Git::MultiBisect::AllCommits> and
@@ -159,58 +160,10 @@ Object of Devel::Git::MultiBisect child class.
 
 sub new {
     my ($class, $params) = @_;
-    my %data;
 
-    while (my ($k,$v) = each %{$params}) {
-        $data{$k} = $v;
-    }
+    my $data = Devel::Git::MultiBisect::Init::init($params);
 
-    my @missing_dirs = ();
-    for my $dir ( qw| gitdir workdir outputdir | ) {
-        push @missing_dirs, $data{$dir}
-            unless (-d $data{$dir});
-    }
-    if (@missing_dirs) {
-        croak "Cannot find directory(ies): @missing_dirs";
-    }
-
-    $data{last_short} = substr($data{last}, 0, $data{short});
-    $data{commits} = _get_commits(\%data);
-    $data{targets} //= [];
-    $data{commit_counter} = 0;
-
-    return bless \%data, $class;
-}
-
-sub _get_commits {
-    my $dataref = shift;
-    my $cwd = cwd();
-    chdir $dataref->{gitdir} or croak "Unable to chdir";
-    my @commits = ();
-    my ($older, $cmd);
-    my ($fh, $err) = File::Temp::tempfile();
-    if ($dataref->{last_before}) {
-        $older = '^' . $dataref->{last_before};
-        $cmd = "git rev-list --reverse $older $dataref->{last} 2>$err";
-    }
-    else {
-        $older = $dataref->{first} . '^';
-        $cmd = "git rev-list --reverse ${older}..$dataref->{last} 2>$err";
-    }
-    chomp(@commits = `$cmd`);
-    if (! -z $err) {
-        open my $FH, '<', $err or croak "Unable to open $err for reading";
-        my $error = <$FH>;
-        chomp($error);
-        close $FH or croak "Unable to close $err after reading";
-        croak $error;
-    }
-    my @extended_commits = map { {
-        sha     => $_,
-        short   => substr($_, 0, $dataref->{short}),
-    } } @commits;
-    chdir $cwd or croak "Unable to return to original directory";
-    return [ @extended_commits ];
+    return bless $data, $class;
 }
 
 =head2 C<get_commits_range()>
@@ -503,7 +456,7 @@ sub run_test_files_on_one_commit {
     return $outputsref;
 }
 
-sub _configure_build_one_commit {
+sub _configure_one_commit {
     my ($self, $commit) = @_;
     chdir $self->{gitdir} or croak "Unable to change to $self->{gitdir}";
     system(qq|git clean --quiet -dfx|) and croak "Unable to 'git clean --quiet -dfx'";
@@ -512,8 +465,17 @@ sub _configure_build_one_commit {
     system(qq|git checkout --quiet $commit|) and croak "Unable to 'git checkout --quiet $commit'";
     say "Running '$self->{configure_command}'" if $self->{verbose};
     system($self->{configure_command}) and croak "Unable to run '$self->{configure_command})'";
+    return $starting_branch;
+}
+
+sub _configure_build_one_commit {
+    my ($self, $commit) = @_;
+
+    my $starting_branch = $self->_configure_one_commit($commit);
+
     say "Running '$self->{make_command}'" if $self->{verbose};
     system($self->{make_command}) and croak "Unable to run '$self->{make_command})'";
+
     return $starting_branch;
 }
 
@@ -552,6 +514,36 @@ sub _test_one_commit {
         say "Created $outputfile" if $self->{verbose};
     }
     return \@outputs;
+}
+
+sub _bisection_decision {
+    my ($self, $target_h_md5_hex, $current_start_md5_hex, $h, $relevant_self,
+        $overall_end_md5_hex, $current_start_idx, $current_end_idx, $max_idx, $n) = @_;
+    if ($target_h_md5_hex ne $current_start_md5_hex) {
+        my $g = $h - 1;
+        $self->_run_one_commit_and_assign($g);
+        my $target_g_md5_hex  = $relevant_self->[$g]->{md5_hex};
+        if ($target_g_md5_hex eq $current_start_md5_hex) {
+            if ($target_h_md5_hex eq $overall_end_md5_hex) {
+            }
+            else {
+                $current_start_idx  = $h;
+                $current_end_idx    = $max_idx;
+            }
+            $n++;
+        }
+        else {
+            # Bisection should continue downwards
+            $current_end_idx = $h;
+            $n++;
+        }
+    }
+    else {
+        # Bisection should continue upwards
+        $current_start_idx = $h;
+        $n++;
+    }
+    return ($current_start_idx, $current_end_idx, $n);
 }
 
 =head2 C<get_timings()>
@@ -602,7 +594,7 @@ or through the web interface at L<http://rt.cpan.org>.
 James E. Keenan (jkeenan at cpan dot org).  When sending correspondence, please
 include 'Devel::Git::MultiBisect' or 'Devel-Git-MultiBisect' in your subject line.
 
-Creation date:  October 12 2016. Last modification date:  December 29 2018.
+Creation date:  October 12 2016. Last modification date:  January 03 2019.
 
 Development repository: L<https://github.com/jkeenan/devel-git-multibisect>
 

@@ -1,5 +1,8 @@
 Revision history for Struct-Diff
 
+0.98    2019-01-06
+        - fix rt #128169 (empty hashes and arrays preserved by split_diff)
+
 0.97    2018-10-23
         - patch: croak if passed structure doesn't match
         - dist and docs corrected

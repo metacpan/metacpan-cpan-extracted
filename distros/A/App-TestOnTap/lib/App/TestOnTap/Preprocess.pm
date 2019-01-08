@@ -1,8 +1,7 @@
 package App::TestOnTap::Preprocess;
 
-use App::TestOnTap::Util qw(runprocess);
-
 use POSIX;
+use App::TestOnTap::Util qw(runprocess);
 
 use strict;
 use warnings;
@@ -46,30 +45,30 @@ sub __execPreprocess
 	my @preproc;	
 	my $xit = runprocess
 				(
-					sub { push(@preproc, $_[0])},
+					sub
+						{
+							my $l = shift;
+							chomp($l);
+							$l =~ s/^\s+|\s+$//g;
+							push(@preproc, $l) if $l;
+						},
 					$args->getSuiteRoot(),
 					(
 						@$cmd,
 						@{$self->getArgv()}
 					)
-				);
+				);	 
+	
 	die("ERROR: exit code '$xit' when running preprocess command\n") if $xit;
 
 	$args->getWorkDirManager()->recordPreprocess([ @preproc ]);
 
 	my %types =
 		(
-			ENV => sub
-					{
-						$self->__parseEnvLines(@_)
-					},
-			ARGV => sub
-					{
-						$self->__parseArgvLines(@_)
-					}
+			ENV => sub { $self->__parseEnvLines(@_) },
+			ARGV => sub { $self->__parseArgvLines(@_) }
 		);
 
-	chomp(@preproc);
 	while (my $line = shift(@preproc))
 	{
 		if ($line =~ /^\s*#\s*BEGIN\s+([^\s]+)\s*$/ && exists($types{$1}))

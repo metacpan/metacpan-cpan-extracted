@@ -1,3 +1,7 @@
+2019-01-07  Kingpin  <martin@martin-M17x>
+
+	* Changed from Class::MakeMethods to Class::MethodMaker
+
 2009-07-04  Kingpin  <Martin@BLUEMAX>
 
 	* lib/RDF/Simple/Serialiser.pm (_make_object): don't require object to be a full URI

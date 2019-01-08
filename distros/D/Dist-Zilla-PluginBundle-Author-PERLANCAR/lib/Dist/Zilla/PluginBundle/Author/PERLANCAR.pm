@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2018-06-26'; # DATE
-our $VERSION = '0.593'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.594'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -48,7 +48,7 @@ sub configure {
         'Test::Rinci',
         'StaticInstall', # by default enable static install because 99% of the time my dist is pure-perl
         'EnsureSQLSchemaVersionedTest',
-        ['Acme::CPANModules::Blacklist' => {module=>[q[PERLANCAR::Avoided]]}],
+        ['Acme::CPANModules::Blacklist' => {module=>[q[PERLANCAR::Avoided], q[PERLANCAR::Retired]]}],
         'Prereqs::EnsureVersion',
         'Prereqs::CheckCircular',
         'UploadToCPAN::WWWPAUSESimple',
@@ -72,7 +72,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.593 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2018-06-26.
+This document describes version 0.594 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

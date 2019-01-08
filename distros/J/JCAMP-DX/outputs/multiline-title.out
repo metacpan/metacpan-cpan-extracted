@@ -1,0 +1,14 @@
+$VAR1 = bless( {
+  'blocks' => [],
+  'data' => {
+    'TITLE' => bless( {
+      'label' => 'title',
+      'value' => 'this is a multiline title
+it is spanned through several lines
+this line is the last one.'
+    }, 'JCAMP::DX::LabelDataRecord' )
+  },
+  'labels' => [
+    $VAR1->{'data'}{'TITLE'}
+  ]
+}, 'JCAMP::DX' );

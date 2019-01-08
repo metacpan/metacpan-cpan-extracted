@@ -7,6 +7,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
+use Prty::Path;
 use Prty::Unindent;
 
 # -----------------------------------------------------------------------------
@@ -19,6 +20,11 @@ sub test_loadClass : Init(1) {
 
 sub test_unitTest : Test(4) {
     my $self = shift;
+
+    if (!Prty::Path->findProgram('pygmentize',1)) {
+        $self->skipAllTests('Program pygmentize not found');
+        return;
+    }
 
     # CSS
 

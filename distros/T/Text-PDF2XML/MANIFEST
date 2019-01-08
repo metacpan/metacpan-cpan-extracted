@@ -37,13 +37,13 @@ share/lib/pdfxtk/readme.pdf
 share/lib/pdfxtk/TGWikiBrowser.jar
 share/lib/pdfxtk/touchgraph-modified.jar
 share/lib/pdfxtk/xercesImpl.jar
-share/lib/tika-app-1.3.jar
+share/lib/tika-app-1.18.jar
 t/10_pdf2xml.t
 t/data/french.dehyphenated.xml
+t/data/french.lm.xml
 t/data/french.pdfxtk.xml
 t/data/french.raw.xml
 t/data/french.tika.xml
 t/data/french.voc.xml
 t/french.pdf
 t/word-list.txt
-Text-PDF2XML-0.2.7.tar.gz

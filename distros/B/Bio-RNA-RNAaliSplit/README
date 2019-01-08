@@ -1,14 +1,17 @@
-Bio-RNA-RNAaliSplit 0.07
+Bio-RNA-RNAaliSplit 0.09
 
-Bio::RNA::RNAaliSplit is a distribution of Perl modules for splitting and
-deconvoluting structural RNA multiple sequence alignments (MSA). Its
-primary purpose is to partition a MSA into subsets of sequences that have a
-common consensus structure which is different from the consesus structure
-of the other set. Another application is cleaning MSA from sequence that do
-not fold into or prohibit folding into a common consensus structure.
+Bio::RNA::RNAaliSplit is a distribution of Perl modules for splitting
+and deconvoluting structural RNA multiple sequence alignments
+(MSAs). Its primary purpose is to partition a MSA into subsets of
+sequences that have a common consensus structure which is different
+from the consesus structure of the other set. Another application is
+cleaning MSAs from sequence that do not fold into or prohibit folding
+into a common consensus structure.
 
-This distribution is shipped with an executable script, RNAalisplit.pl,
-which takes a RNA MSA in ClustalW format and performs the deconvolution.
+This distribution is shipped with a set of executables within the
+'scripts' folder. RNAalisplit.pl, takes a RNA MSA in ClustalW format
+and performs the deconvolution. The eval_alignment.pl executable is a
+lightweight evaluator for structural alignments of RNA.
 
 THIRD PARTY DEPENDENCIES
 
@@ -19,15 +22,16 @@ http://www.tbi.univie.ac.at/RNA ). Specifically, the 'RNAalifold',
 'AnalyseDists' executables as well as the RNA Perl module shipped with
 ViennaRNA are used by RNAaliSplit.
 
-RNAz (availale from http://www.tbi.univie.ac.at/~wash/RNAz) is used for
-classification of split subalignments.
+RNAz v2.1 (availale from http://www.tbi.univie.ac.at/~wash/RNAz) is
+used for classification of split subalignments.
 
-R-scape 0.6.1 (availavle from http://www.eddylab.org/R-scape) is used for
-computing statistically significant covariation in base pairs.
+R-scape v1.2.2 or above is used for computing statistically
+significant covariation in base pairs. Download R-scape from
+http://www.eddylab.org/R-scape .
 
 Be sure to have all dependencies up and running on your system (and
-available to the Perl interpreter) before continuing the installation
-process.
+available to the Perl interpreter) priot to installation of
+Bio::RNA::RNAaliSplit.
 
 INSTALLATION
 
@@ -55,7 +59,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2018 Michael T. Wolfinger
+Copyright (C) 2017-2019 Michael T. Wolfinger
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU Affero General Public

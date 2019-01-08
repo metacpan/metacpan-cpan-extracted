@@ -16,7 +16,7 @@ use Chart::Plotly::Trace::Pie::Textfont;
 use Chart::Plotly::Trace::Pie::Title;
 use Chart::Plotly::Trace::Pie::Transform;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: A data visualized by the sectors of the pie is set in `values`. The sector labels are set in `labels`. The sector colors are set in `marker.colors`
 
@@ -80,7 +80,7 @@ has hole => ( is            => "rw",
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -230,7 +230,9 @@ has textfont => ( is  => "rw",
                   isa => "Maybe[HashRef]|Chart::Plotly::Trace::Pie::Textfont", );
 
 has textinfo => ( is            => "rw",
-                  documentation => "Determines which trace information appear on the graph.", );
+                  isa           => "Str",
+                  documentation => "Determines which trace information appear on the graph.",
+);
 
 has textposition => ( is            => "rw",
                       isa           => union( [ enum( [ "inside", "outside", "auto", "none" ] ), "ArrayRef" ] ),
@@ -295,7 +297,7 @@ Chart::Plotly::Trace::Pie - A data visualized by the sectors of the pie is set i
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

@@ -45,6 +45,25 @@ sub list_tests ($) {
     }
 }
 
+sub reconnect ($) {
+    my $self=shift;
+
+    my $dbconfig=$self->{'dbconfig'};
+
+    $self->assert($dbconfig->{'test_dsn'},
+                  "No test configuration available (no .config)");
+
+    $self->{'odb'}=XAO::Objects->new(
+        objname             => 'FS::Glue',
+        dsn                 => $dbconfig->{'test_dsn'},
+        user                => $dbconfig->{'test_user'},
+        password            => $dbconfig->{'test_password'},
+        check_consistency   => 1,
+    );
+
+    return $self->get_odb;
+}
+
 sub set_up ($) {
     my $self=shift;
 

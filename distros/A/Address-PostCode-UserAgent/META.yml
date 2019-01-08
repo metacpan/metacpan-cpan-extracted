@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,12 +17,20 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Address::PostCode::UserAgent:
+    file: lib/Address/PostCode/UserAgent.pm
+    version: '0.08'
+  Address::PostCode::UserAgent::Exception:
+    file: lib/Address/PostCode/UserAgent/Exception.pm
+    version: '0.08'
 requires:
   HTTP::Tiny: '0'
   Moo: '0'
   Throwable: '0'
-  namespace::clean: '0'
+  namespace::autoclean: '0.28'
   perl: '5.006'
 resources:
   repository: https://github.com/Manwar/Address-PostCode-UserAgent.git
-version: '0.05'
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

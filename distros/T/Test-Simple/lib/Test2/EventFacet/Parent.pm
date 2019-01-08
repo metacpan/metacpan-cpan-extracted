@@ -2,7 +2,7 @@ package Test2::EventFacet::Parent;
 use strict;
 use warnings;
 
-our $VERSION = '1.302141';
+our $VERSION = '1.302156';
 
 use Carp qw/confess/;
 
@@ -26,7 +26,7 @@ __END__
 
 =head1 NAME
 
-Test2::EventFacet::Parent - Base class for all event facets.
+Test2::EventFacet::Parent - Facet for events contains other events
 
 =head1 DESCRIPTION
 

@@ -12,7 +12,7 @@ use Chart::Plotly::Trace::Contourcarpet::Hoverlabel;
 use Chart::Plotly::Trace::Contourcarpet::Line;
 use Chart::Plotly::Trace::Contourcarpet::Stream;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Plots contours on either the first carpet axis or the carpet axis with a matching `carpet` attribute. Data `z` is interpreted as matching that of the corresponding carpet axis.
 
@@ -153,7 +153,7 @@ has fillcolor => (
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -322,7 +322,7 @@ Chart::Plotly::Trace::Contourcarpet - Plots contours on either the first carpet 
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

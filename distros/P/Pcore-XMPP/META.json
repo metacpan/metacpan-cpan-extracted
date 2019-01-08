@@ -48,6 +48,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-xmpp/overview"
       }
    },
-   "version" : "v0.10.12",
+   "version" : "v0.10.13",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

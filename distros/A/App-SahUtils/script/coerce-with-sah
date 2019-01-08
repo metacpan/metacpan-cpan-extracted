@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-06-03'; # DATE
-our $VERSION = '0.461'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.462'; # VERSION
 
 use 5.010;
 use strict;
@@ -311,7 +311,7 @@ coerce-with-sah - Coerce data
 
 =head1 VERSION
 
-This document describes version 0.461 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2018-06-03.
+This document describes version 0.462 of coerce-with-sah (from Perl distribution App-SahUtils), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -351,20 +351,20 @@ Examples:
                                                              "Ed"                => "d E",
                                                              "EHm"               => "E HH:mm",
                                                              "Ehm"               => "E h:mm a",
-                                                             "Ehms"              => "E h:mm:ss a",
                                                              "EHms"              => "E HH:mm:ss",
+                                                             "Ehms"              => "E h:mm:ss a",
                                                              "Gy"                => "y G",
                                                              "GyMMM"             => "MMM y G",
                                                              "GyMMMd"            => "MMM d, y G",
                                                              "GyMMMEd"           => "E, MMM d, y G",
                                                              "H"                 => "HH",
                                                              "h"                 => "h a",
-                                                             "hm"                => "h:mm a",
                                                              "Hm"                => "HH:mm",
+                                                             "hm"                => "h:mm a",
                                                              "hms"               => "h:mm:ss a",
                                                              "Hms"               => "HH:mm:ss",
-                                                             "hmsv"              => "h:mm:ss a v",
                                                              "Hmsv"              => "HH:mm:ss v",
+                                                             "hmsv"              => "h:mm:ss a v",
                                                              "hmv"               => "h:mm a v",
                                                              "Hmv"               => "HH:mm v",
                                                              "M"                 => "L",
@@ -699,7 +699,7 @@ Set path to configuration file.
 
 Can be specified multiple times.
 
-=item B<--config-profile>=I<s>
+=item B<--config-profile>=I<s>, B<-P>
 
 Set configuration profile to use.
 
@@ -912,7 +912,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

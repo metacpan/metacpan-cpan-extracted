@@ -1,10 +1,10 @@
-# $Id: Index.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: Index.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::Index;
 use strict;
 use warnings;
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -17,12 +17,15 @@ use File::Basename;
 use File::Path;
 use HTTP::Tiny;
 
+use Scalar::Util 'weaken';
+
 unless ($ENV{CPAN_SQLITE_NO_LOG_FILES}) {
   $ENV{CPAN_SQLITE_DEBUG} = 1;
 }
 
 our ($oldout);
 my $log_file = 'cpan_sqlite_log.' . time;
+
 
 # This is usually already defined in real life, but tests need it to be set
 $CPAN::FrontEnd ||= "CPAN::Shell";
@@ -35,6 +38,31 @@ sub new {
 
   my $self = {index => undef, state => undef, %args};
   return bless $self, $class;
+}
+
+sub download_index {
+  my $self = shift;
+
+  if ($ENV{'CPAN_SQLITE_DOWNLOAD'}) {
+    $ENV{'CPAN_SQLITE_DOWNLOAD_URL'} = 'http://cpansqlite.trouchelle.com/' unless $ENV{'CPAN_SQLITE_DOWNLOAD_URL'};
+  }
+
+  return 0 unless $ENV{'CPAN_SQLITE_DOWNLOAD_URL'};
+
+  $CPAN::FrontEnd->myprint("Downloading the compiled index db ... ");
+
+  if (my $response = HTTP::Tiny->new->mirror($ENV{'CPAN_SQLITE_DOWNLOAD_URL'} => catfile($self->{'db_dir'}, $self->{'db_name'}))) {
+    if ($response->{'success'} and $response->{'status'} and $response->{'status'} eq '200') {
+      if (my $type = $response->{'headers'}->{'content-type'}) {
+        if ($type eq 'application/x-sqlite3') {
+          return 1;
+        }
+      }
+    }
+  }
+
+  $CPAN::FrontEnd->mywarn('Cannot download the compiled index db');
+  return 0;
 }
 
 sub index {
@@ -74,6 +102,10 @@ sub index {
           $CPAN::FrontEnd->myprint("Done.\n");
         }
       }
+    }
+
+    if ($self->download_index()) {
+        return 1;
     }
 
     if ($self->{'update_indices'}) {
@@ -122,7 +154,6 @@ sub fetch_cpan_indices {
   my $indices = {
     '01mailrc.txt.gz' => 'authors',
     '02packages.details.txt.gz' => 'modules',
-    '03modlist.data.gz' => 'modules',
   };
 
   foreach my $index (keys %$indices) {
@@ -216,7 +247,7 @@ CPAN::SQLite::Index - set up or update database tables.
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 SYNOPSIS
 
@@ -264,14 +295,28 @@ are not captured, and will appear in I<STDERR>.
 
 The steps of the indexing procedure are as follows.
 
-=over 3
+=over 4
+
+=item * download existing pre-compiled index (optional)
+
+If CPAN_SQLITE_DOWNLOAD or CPAN_SQLITE_DOWNLOAD_URL variables are set, an
+already existing and up-to-date cpandb.sql file will be downloaded from
+either specified URL or http://cpansqlite.trouchelle.com/ where it's
+updated every hour. This greatly increases performance and decreases CPU
+and memory consumption during the indexing process but if your CPAN
+mirror is out-of-sync or you're using DarkPAN, it obviously wouldn't
+work. It also wouldn't work without an internet connection.
+
+See L<WWW::CPAN::SQLite> if you want to setup your own service for
+pre-compiling the database.
+
+If neither variable is set, this step is skipped.
 
 =item * fetch index data
 
 The necessary CPAN index files
-F<$CPAN/authors/01mailrc.txt.gz>,
-F<$CPAN/modules/02packages.details.txt.gz>, and
-F<$CPAN/modules/03modlist.data.gz> will be fetched
+F<$CPAN/authors/01mailrc.txt.gz> and
+F<$CPAN/modules/02packages.details.txt.gz> will be fetched
 from the CPAN mirror specified by the C<$cpan> variable
 at the beginning of L<CPAN::SQLite::Index>. If you are
 using this option, it is recommended to use the

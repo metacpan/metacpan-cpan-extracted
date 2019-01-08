@@ -12,14 +12,13 @@ $SIG{__DIE__} = sub {
     like shift, qr/Maximum number of LCD/, "initializing too many LCDs error ok";
 };
 
-if (! $ENV{PI_BOARD}){
-    warn "\n*** PI_BOARD is not set! ***\n";
-    plan skip_all => "not on a pi board\n";
+if (! $ENV{RPI_LCD}){
+    plan skip_all => "RPI_LCD environment variable not set\n";
 }
 
-if (! $ENV{RPI_LCD}){
-    warn "\n*** RPI_LCD is not set***\n";
-    plan skip_all => "skipping LCD tests\n";
+if (! $ENV{PI_BOARD}){
+    $ENV{NO_BOARD} = 1;
+    plan skip_all => "Not on a Pi board\n";
 }
 
 my $continue = 1;

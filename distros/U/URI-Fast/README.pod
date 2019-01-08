@@ -399,6 +399,43 @@ due to some pedantic whining on the part of
 L<BGRIMM|https://metacpan.org/author/BGRIMM>, they have been renamed to
 C<uri_encode> and C<uri_decode>.
 
+=head2 escape_tree
+
+=head2 unescape_tree
+
+Traverses a data structure, escaping or unescaping I<defined> scalar values in
+place. Accepts a reference to be traversed. Any further parameters are passed
+unchanged to L</encode> or L</decode>.
+
+  my $obj = {
+    foo => ['bar baz', 'bat%fnord'],
+    bar => {baz => 'bat%bat'},
+    baz => undef,
+    bat => '',
+  };
+
+  URI::Fast::escape_tree($obj);
+
+  # $obj is now:
+  {
+    foo => ['bar%20baz', 'bat%25fnord'],
+    bar => {baz => 'bat%25bat'},
+    baz => undef,
+    bat => '',
+  }
+
+  URI::Fast::unescape_tree($obj); # $obj returned to original form
+
+  URI::Fast::escape_tree($obj, '%'); # escape but allow "%"
+
+  # $obj is now:
+  {
+    foo => ['bar%20baz', 'bat%fnord'],
+    bar => {baz => 'bat%bat'},
+    baz => undef,
+    bat => '',
+  }
+
 =head1 SPEED
 
 See L<URI::Fast::Benchmarks>.
@@ -466,6 +503,10 @@ fun of me for naming certain methods too generically.
 =item Sara Siegal (SSIEGAL)
 
 =item Tim Vroom (VROOM)
+
+=item Des Daignault (NAWGLAN)
+
+=item Josh Rosenbaum
 
 =back
 

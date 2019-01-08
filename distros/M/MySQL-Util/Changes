@@ -1,5 +1,13 @@
 Revision history for MySQL-Util
 
+0.35    - several enhancements for MySQL::Util::Lite
+
+0.34    - fixed 128180
+		- fixed 128182
+		
+0.33    - first version of MySQL::Util::Lite
+		- added connection check to t/20-util.t
+		
 0.32    - fixed unit tests so they are skipped when a mysql connection
           can't be established
           

@@ -59,7 +59,7 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request);
 
 sub unwrap($item,$default) {
@@ -125,17 +125,32 @@ sub _extract_enum( $name, $item ) {
 
     if( $item ) {
         # Expand all ranges into the enumerated lists
-        $item =~ s!\[([^.]+)\.\.([^.]+)\]!"{" . join(",", $1..$2 )."}"!ge;
+        $item =~ s!\[([^.\]]+?)\.\.([^.\]]+?)\]!"{" . join(",", $1..$2 )."}"!ge;
 
         # Explode all enumerated items into their list
-        if( $item =~ /^([^{]*)\{([^}]+)\}([^{]*)$/ ) {
-            my($pre, $post) = ($1,$3);
-            @res = map { "$pre$_$post" } split /,/, $2, -1;
+        # We should punt this into a(nother) iterator, maybe?!
+        if( $item =~ /\{.*\}/ ) {
+            my $changed = 1;
+            @res = $item;
+            while ($changed) {
+                undef $changed;
+                @res = map {
+                    my $i = $_;
+                    my @r;
+                    if( $i =~ /^([^{]*)\{([^}]+)\}([^{]*)/ ) {
+                        my($pre, $m, $post) = ($1,$2,$3);
+                        $changed = 1;
+                        @r = map { "$pre$_$post" } split /,/, $m, -1;
+                    } else {
+                        @r = $i
+                    };
+                    @r
+                } @res;
+            }
         } else {
             @res = $item;
         };
     };
-
     return \@res
 }
 
@@ -170,16 +185,32 @@ sub expand_pattern( $pattern ) {
     # Explicitly enumerate all ranges
     my $idx = 0;
 
-    $path =~ s!\[([^.]+)\.\.([^.]+)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+    if( $scheme ) {
+        $scheme =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        $scheme =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
 
-    # Move all explicitly enumerated parts into lists:
-    $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    if( $host ) {
+        $host =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        $host =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
+
+    if( $port ) {
+        $port =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        $port =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
+
+    if( $path ) {
+        $path =~ s!\[([^.\]]+?)\.\.([^.\[]+?)\]!$ranges{$idx} = [$1..$2]; ":".$idx++!ge;
+        # Move all explicitly enumerated parts into lists:
+        $path =~ s!\{([^\}]*)\}!$ranges{$idx} = [split /,/, $1, -1]; ":".$idx++!ge;
+    };
 
     my %res = (
         url_params   => \%ranges,
-        host         => _extract_enum( 'host', $host ),
-        scheme       => _extract_enum( 'scheme', $scheme ),
-        port         => _extract_enum( 'port', $port ),
+        host         => $host,
+        scheme       => $scheme,
+        port         => $port,
         path         => $path,
         query_params => _extract_enum_query( $query ),
         raw_params   => 1,
@@ -189,7 +220,7 @@ sub expand_pattern( $pattern ) {
 }
 
 sub _generate_requests_iter(%options) {
-    my $wrapper = delete $options{ wrap } || sub {@_};
+    my $wrapper = delete $options{ wrap } || sub { wantarray ? @_ : $_[0]};
     my @keys = sort keys %defaults;
 
     if( my $pattern = delete $options{ pattern }) {
@@ -259,7 +290,9 @@ sub _generate_requests_iter(%options) {
             my %v;
             @v{ @url_params } = splice @v, 0, 0+@url_params;
             #use Data::Dumper; warn Dumper \%values;
-            $values{ path } = fill_url($values{ path }, \%v, $options{ raw_params });
+            for my $key (qw(scheme host port path )) {
+                $values{ $key } = fill_url($values{ $key }, \%v, $options{ raw_params });
+            };
         };
 
         $values{ url } = _build_uri( \%values );

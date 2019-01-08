@@ -21,5 +21,8 @@ is(path($data, '/three'), 0, 'three');
 is(path($data, '/ten'), undef, 'ten');
 is(path($data, '/four/five')->(), 'test', 'code reference');
 
+is(path(undef, undef), undef, 'code reference');
+
+
 done_testing();
 

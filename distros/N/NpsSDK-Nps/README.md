@@ -106,6 +106,7 @@ NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
 
 The INFO level will write concise information of the request and will mask sensitive data of the request. 
 The DEBUG level will write information about the request to let developers debug it in a more detailed way.
+You can change the level in Log4perl init method.
 
 Simple debug screen logging example:
 
@@ -117,7 +118,7 @@ use strict;
 use Log::Log4perl;
 
 Log::Log4perl->init(\<<CONFIG);
-log4perl.rootLogger = DEBUG, screen
+log4perl.rootLogger = INFO, screen
 
 log4perl.appender.screen = Log::Log4perl::Appender::Screen
 log4perl.appender.screen.stderr = 0
@@ -125,6 +126,8 @@ log4perl.appender.screen.layout = PatternLayout
 log4perl.appender.screen.layout.ConversionPattern = %d %p %m%n
 
 CONFIG
+
+my $logger = Log::Log4perl::get_logger();
 
 NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  secret_key  => "_YOUR_SECRET_KEY_",
@@ -154,6 +157,8 @@ log4perl.appender.file.mode = append
 log4perl.appender.file.layout = PatternLayout
 log4perl.appender.file.layout.ConversionPattern = %d %p %m%n
 CONFIG
+
+my $logger = Log::Log4perl::get_logger();
 
 NpsSDK::Configuration::configure(environment => $NpsSDK::Constants::SANDBOX_ENV,
                                  secret_key  => "_YOUR_SECRET_KEY_",

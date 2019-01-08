@@ -6,6 +6,11 @@ Home page:    <https://metacpan.org/release/Class-XSConstructor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Class-XSConstructor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.009	2019-01-07
+
+ [ Test Suite ]
+ - Add tests for Type::Nano support.
+
 0.008	2018-06-21
 
  [ Packaging ]

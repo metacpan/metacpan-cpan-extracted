@@ -1,11 +1,11 @@
-# $Id: Search.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: Search.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::Search;
 use strict;
 use warnings;
 no warnings qw(redefine);
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -155,8 +155,8 @@ sub search {
   my $cdbi = $self->{cdbi};
   my $meta_obj = $args{meta_obj};
 
-  $args{fields} = [ qw(mod_id mod_name mod_abs mod_vers chapterid
-                       dslip dist_id dist_name dist_file dist_vers dist_abs
+  $args{fields} = [ qw(mod_id mod_name mod_abs mod_vers
+                       dist_id dist_name dist_file dist_vers dist_abs
                        auth_id cpanid fullname email) ];
   $args{table} = 'dists';
   $args{join} = { mods => 'dist_id',
@@ -213,7 +213,7 @@ sub search {
   my $cdbi = $self->{cdbi};
   my $meta_obj = $args{meta_obj};
 
-  $args{fields} = [ qw(dist_id dist_name dist_abs dist_vers dist_dslip
+  $args{fields} = [ qw(dist_id dist_name dist_abs dist_vers
                        dist_file auth_id cpanid fullname email) ];
   $args{table} = 'dists';
   $args{join} = {auths => 'auth_id'};
@@ -256,21 +256,6 @@ sub search {
   return 1;
 }
 
-package CPAN::SQLite::Search;
-
-sub mod_subchapter {
-  my ($self, $mod_name) = @_;
-  (my $sc = $mod_name) =~ s{^([^:]+).*}{$1};
-  return $sc;
-}
-
-sub dist_subchapter {
-  my ($self, $dist_name) = @_;
-  (my $sc = $dist_name) =~ s{^([^-]+).*}{$1};
-  return $sc;
-}
-
-
 1;
 
 =head1 NAME
@@ -279,7 +264,7 @@ CPAN::SQLite::Search - perform queries on the database
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 SYNOPSIS
 
@@ -431,7 +416,7 @@ matched C<cpanid> is performed.
 =item * C<name> or C<id> query
 
 This returns the C<mod_id>, C<mod_name>, C<mod_abs>, C<mod_vers>,
-C<dslip>, C<chapterid>, C<dist_id>, C<dist_name>, C<dist_file>,
+C<dist_id>, C<dist_name>, C<dist_file>,
 C<auth_id>, C<cpanid>, C<fullname>, and C<email>
 of the C<auths>, C<mods>, and C<dists> tables.
 As well, the following entries may be present.
@@ -442,14 +427,6 @@ As well, the following entries may be present.
 
 This can be used as C<$CPAN/authors/id/$download>
 to specify the url of the distribution.
-
-=item * C<dslip_info>
-
-If C<dslip> is available, an array reference C<dslip_info> is supplied,
-each entry being a hash reference. The hash reference contains
-two keys - C<desc>, whose value is a general description of the
-what the dslip entry represents, and C<what>, whose value is
-a description of the entry itself.
 
 =back
 
@@ -489,14 +466,8 @@ to specify the url of the distribution.
 
 This is an array reference containing information on the
 modules present. Each entry is a hash reference containing the
-C<mod_id>, C<mod_name>, C<mod_abs>, C<mod_vers>, and C<dslip>
+C<mod_id>, C<mod_name>, C<mod_abs>, and C<mod_vers>
 fields for the module.
-
-=item * C<dslip> and C<dslip_info>
-
-If the module name and distribution name are related by
-C<s/::/->, the C<dslip> and C<dslip_info> entries for
-that module are returned.
 
 =back
 

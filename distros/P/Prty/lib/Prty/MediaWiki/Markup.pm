@@ -6,9 +6,10 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Unindent;
+use Prty::Parameters;
 
 # -----------------------------------------------------------------------------
 
@@ -36,24 +37,30 @@ nach Bedarf erweitert.
 
 =item *
 
-MediaWiki-Homepage: L<https://m.mediawiki.org>
+Das lokale MediaWiki ist erreichbar unter:
+L<http://localhost/mediawiki/> (anmelden als
+Benutzer fs, ggf. apache2ctl start)
 
 =item *
 
-Als Grundlage für die Implementierung dieser Klasse diente die
-Dokumentation der Wiki-Syntax:
-L<https://m.mediawiki.org/wiki/Help:Formatting/en>
+Homepage: L<https://www.mediawiki.org/>
+
+=item *
+
+Handbuch: L<https://www.mediawiki.org/wiki/Help:Contents>
+
+=item *
+
+Markup: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=item *
+
+CSS-Regeln: L<https://www.mediawiki.org/wiki/Manual:CSS>
 
 =item *
 
 Globale Community Site für Wikimedia-Projekte:
-L<https://meta.wikimedia.org/wiki/Help:Comment_tags>
-
-=item *
-
-Das lokale MediaWiki ist erreichbar unter:
-L<http://localhost/mediawiki/> (anmelden als
-Benutzer fs, ggf. apache2ctl start)
+L<https://meta.wikimedia.org/>
 
 =back
 
@@ -61,7 +68,7 @@ Benutzer fs, ggf. apache2ctl start)
 
 =head2 Konstruktor
 
-=head3 new() - Instantiiere MediaWiki Markup-Generator
+=head3 new() - Instantiiere Markup-Generator
 
 =head4 Synopsis
 
@@ -99,7 +106,6 @@ dass alle Blöcke einfach konkateniert werden können.
 
 =head4 Synopsis
 
-    $code = $gen->code($text);
     $code = $gen->code($text,$withFormatting);
 
 =head4 Arguments
@@ -112,7 +118,7 @@ Der Text des Code-Blocks
 
 =item $withFormatting
 
-Wenn wahr, sind Inline-Formatierungen bold und italic möglich.
+Wenn wahr, erlaube Formatierung im Code-Abschnitt.
 
 =back
 
@@ -130,7 +136,13 @@ zwei Leerzeichen eingerückt wird.
 
 =head4 See Also
 
-Quelle: L<https://www.mediawiki.org/wiki/Help:Formatting>
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
 
 =head4 Examples
 
@@ -144,8 +156,8 @@ Text:
 
 erzeugt
 
-    |  <nowiki>Dies ist
-    |  ein Test.</nowiki>
+    |  Dies ist
+    |  ein Test.
 
 =item *
 
@@ -158,7 +170,7 @@ Eine Einrückung der Quelle wird automatisch entfernt:
 
 erzeugt
 
-    |  <nowiki>Dies ist
+    |  Dies ist
     |  ein Test.
 
 =back
@@ -172,10 +184,12 @@ sub code {
 
     $text = Prty::Unindent->trim($text);
     if ($text ne '') {
-        if (!$withFormatting) {
-            $text = "<nowiki>$text</nowiki>";
+        if ($withFormatting) {
+            $text =~ s/^/  /mg;
         }
-        $text =~ s/^/  /mg;
+        else {
+            $text = "<pre>$text</pre>";
+        }
         $text .= "\n\n";
     }
 
@@ -226,7 +240,13 @@ eingerückt:
 
 =head4 See Also
 
-Quelle: L<https://www.mediawiki.org/wiki/Help:Formatting>
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
 
 =head4 Examples
 
@@ -279,7 +299,7 @@ sub comment {
             # Einzeilige Kommentar
             $code = "<!-- $code -->\n";
         }
-        $code .= "\n";
+        # $code .= "\n";
     }
 
     return $code;
@@ -304,7 +324,13 @@ und liefere diesen zurück.
 
 =head4 See Also
 
-Quelle: L<https://www.mediawiki.org/wiki/Help:Formatting>
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
 
 =head4 Example
 
@@ -325,6 +351,181 @@ sub horizontalRule {
 
 # -----------------------------------------------------------------------------
 
+=head3 item() - Erzeuge Listenelement
+
+=head4 Synopsis
+
+    $code = $gen->item($type,$val);
+    $code = $gen->item($type,$key,$val);
+
+=head4 Arguments
+
+=over 4
+
+=item $type
+
+Typ der Liste. Mögliche Typen einer Liste:
+
+=over 4
+
+=item Zeichen: *
+
+Punktliste.
+
+=item Zeichen: #
+
+Nummerierungsliste.
+
+=item Zeichen: ;
+
+Definitionsliste.
+
+=back
+
+Die Typangabe kann auch aus mehreren Typangaben zusammengesetzt
+sein, wie es bei geschachtelten Listen benötigt wird, z.B. "*#*".
+
+=item $key
+
+Definitionsterm (nur Definitionsliste).
+
+=item $val
+
+Wert des Elements (alle Listen).
+
+=back
+
+=head4 Returns
+
+Markup-Code (String)
+
+=head4 Description
+
+Erzeuge den MediaWiki Markup-Code für ein Listenelement des Typs
+$type und mit Wert $val. Im Falle einer Definitonsliste verwende
+den Definitionsterm $key.
+
+=head4 See Also
+
+=over 2
+
+=item *
+
+L<https://www.mediawiki.org/wiki/Help:Lists>
+
+=back
+
+=head4 Examples
+
+=over 2
+
+=item *
+
+Punktliste
+
+    $gen->item('*','Apfel');
+
+produziert
+
+    * Apfel
+
+=item *
+
+Nummerierungsliste
+
+    $gen->item('#','Apfel');
+
+produziert
+
+    # Apfel
+
+=item *
+
+Definitionsliste
+
+    $gen->item(';',A=>'Apfel);
+
+produziert
+
+    ; A : Apfel
+
+=item *
+
+Item einer untergeordneten Liste
+
+    $gen->item('#*','Apfel');
+
+produziert
+
+    *#* Apfel
+
+=item *
+
+Item mit einer untergeordneten Liste als Wert
+
+    $gen->item('#',"* Apfel\n* Birne\n*Pflaume");
+
+produziert
+
+    #* Apfel
+    #* Birne
+    #* Pflaume
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub item {
+    my $self = shift;
+    my $type = shift;
+    # @_: $val -or- $key,$val
+
+    # Der übergebene Typ kann aus mehreren Typ-Zeichen bestehen.
+    # Das letzte Zeichen ist das entscheidende. 
+
+    # Term im Falle einer Definitonsliste
+
+    my $key;
+    if (substr($type,-1,1) eq ';') {
+        $key = shift;
+    }
+
+    # Wert
+
+    my $val = Prty::Unindent->trim(shift);
+
+    # Sonderbehandlung für Sublisten
+
+    # Enthält der Wert eine Subliste, stellen wir dessen Elementen den
+    # eigenen Typ voran. Im Falle einer Definitionsliste (;) fügen wir
+    # außerdem einen Doppelpunkt (:) ein, damit die Definitionsliste
+    # tief genug eingerückt ist.
+
+    $val =~ s/^([*#])/$type$1/mg;
+    $val =~ s/^(;)/$type:$1/mg;
+
+    # Besteht der Wert allein aus der Subliste, liefern wir diese zurück.
+    # Andernfalls erzeugen wir ein Listenelement (das in $val eine
+    # Subliste enthalten kann).
+
+    my $code;
+    if ($val !~ /^[*#;]/) {
+        # Listenelement generieren
+
+        $code = "$type ";
+        if ($key) {
+            $code .= "$key : ";
+        }
+    }
+    $code .= $val;
+
+    return "$code\n";
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 list() - Erzeuge Liste
 
 =head4 Synopsis
@@ -341,15 +542,15 @@ Typ der Liste. Mögliche Werte:
 
 =over 4
 
-=item *
+=item Zeichen: *
 
 Punktliste.
 
-=item #
+=item Zeichen: #
 
 Numerierungsliste.
 
-=item ;
+=item Zeichen: ;
 
 Definitionsliste.
 
@@ -370,15 +571,12 @@ Markup-Code (String)
 =head4 Description
 
 Erzeuge den MediaWiki Markup-Code für eine Liste des Typs $type
-mit den Elementen @items und liefere diesen zurück.
+mit den Elementen @items und liefere diesen zurück. Listen
+können auch geschachtelt werden. Siehe Examples.
 
 =head4 See Also
 
 =over 2
-
-=item *
-
-L<https://www.mediawiki.org/wiki/Help:Formatting>
 
 =item *
 
@@ -428,6 +626,34 @@ produziert
 
 =back
 
+    * Geschachtelte Liste:
+    
+         $code .= $gen->list('#',[
+             'Obst',
+             $gen->list('*',[
+                 'Apfel',
+                 'Birne',
+                 'Pflaume',
+             ]),
+             'Gemüse',
+             $gen->list('*',[
+                 'Gurke',
+                 'Spinat',
+                 'Tomate',
+             ]),
+         ]);
+    
+       produziert
+    
+         # Obst
+         #* Apfel
+         #* Birne
+         #* Pflaume
+         # Gemüse
+         #* Gurke
+         #* Spinat
+         #* Tomate
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -437,22 +663,13 @@ sub list {
 
     my $code = '';
     for (my $i = 0; $i < @$itemA; $i++) {
-        my $key;
+        my @args;
         if ($type eq ';') {
-            $key = $itemA->[$i++];
+            push @args,$itemA->[$i++];
         }
-        my $val = $itemA->[$i];
+        push @args,$itemA->[$i];
 
-        $code .= $type.' ';
-        if ($key) {
-            $code .= $key.' : ';
-        }
-        
-        # Etwaige Einrückung entfernen
-        $val = Prty::Unindent->trim($val);
-        
-        $val =~ s/\n+/ /g;
-        $code .= $val."\n";
+        $code .= $self->item($type,@args);
     }
 
     return $code."\n";
@@ -489,7 +706,13 @@ per trim() von einer etwaigen Einrückung befreit.
 
 =head4 See Also
 
-Quelle: L<https://www.mediawiki.org/wiki/Help:Formatting>
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
 
 =head4 Examples
 
@@ -571,7 +794,13 @@ zurück.
 
 =head4 See Also
 
-Quelle: L<https://www.mediawiki.org/wiki/Help:Formatting>
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
 
 =head4 Example
 
@@ -590,6 +819,257 @@ sub section {
 
     my $eqSigns = '=' x $level;
     return sprintf "%s %s %s\n\n",$eqSigns,$title,$eqSigns;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 table() - Erzeuge Tabelle
+
+=head4 Synopsis
+
+    $code = $gen->table(@keyVal);
+
+=head4 Arguments
+
+Die Argumentliste @keyVal wird gebildet über folgenden
+Schlüssel/Wert-Paaren:
+
+=over 4
+
+=item alignments => \@alignments (Default: [])
+
+Liste der Kolumnen-Ausrichtungen. Mögliche Werte je Kolumne: 'left',
+'right', 'center'.
+
+=item bodyBackground => $color (Default: '#ffffff')
+
+Hintergrundfarbe der Rumpfzeilen.
+
+=item caption => $str
+
+Unterschrift der Tabelle.
+
+=item rows => \@rows (Default: [])
+
+Liste der Tabellenzeilen.
+
+=item titleBackground => $color (Default: '#e8e8e8')
+
+Hintergrundfarbe der Titelzeile.
+
+=item titles => \@titles (Default: [])
+
+Liste der Kolumnentitel.
+
+=item valueCallback => sub {...} (Default: keiner)
+
+Subroutine, die für I<jeden> Wert (caption, title, row value) aufgerufen
+wird:
+
+    valueCallback => sub {
+        my $val = shift;
+        ...
+        return $val;
+    }
+
+Die Subroutine wird z.B. von Sdoc verwendet, um Segmente zu expandieren:
+
+    valueCallback => sub {
+        return $self->expandText($m,\shift);
+    }
+
+=back
+
+=head4 Returns
+
+Markup-Code (String)
+
+=head4 Description
+
+Erzeuge den MediaWiki Markup-Code für eine Tabelle und liefere diesen
+zurück.
+
+Das Aussehen der MediaWiki-Tabelle wird durch CSS-Angaben bestimmt,
+die in den Wiki-Code eingestreut werden. Die Grundlage hierfür bietet
+die Standard-CSS-Klasse "wikitable" (siehe Link unten).
+
+=head4 See Also
+
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Tables>
+
+=item *
+
+CSS der Klasse "wikitable": L<https://www.mediawiki.org/wiki/Manual:CSS>
+
+=back
+
+=head4 Example
+
+Der Code
+
+    use Prty::MediaWiki::Markup;
+    use Prty::MediaWiki::Markup;
+    
+    my $tab = Prty::MediaWiki::Markup->new(
+        alignments => ['left','right','center'],
+        caption => 'Eine Tabelle',
+        titles => ['L','R','Z'],
+        rows => [
+            ['A',1,'ABCDEFG'],
+            ['AB',12,'HIJKL'],
+            ['ABC',123,'MNO'],
+            ['ABCD',1234,'P'],
+        ],
+    );
+    
+    my $m = Prty::MediaWiki::Markup->new;
+    my $code = $tab->mediawiki($m);
+
+produziert
+
+    {| class="wikitable"
+    |+ style="caption-side: bottom; font-weight: normal"|Eine Tabelle
+    |-
+    ! style="background-color: #e8e8e8; text-align: left" |L
+    ! style="background-color: #e8e8e8; text-align: right" |R
+    ! style="background-color: #e8e8e8" |Z
+    |-
+    | style="background-color: #ffffff" |A
+    | style="background-color: #ffffff; text-align: right" |1
+    | style="background-color: #ffffff; text-align: center" |ABCDEFG
+    |-
+    | style="background-color: #ffffff" |AB
+    | style="background-color: #ffffff; text-align: right" |12
+    | style="background-color: #ffffff; text-align: center" |HIJKL
+    |-
+    | style="background-color: #ffffff" |ABC
+    | style="background-color: #ffffff; text-align: right" |123
+    | style="background-color: #ffffff; text-align: center" |MNO
+    |-
+    | style="background-color: #ffffff" |ABCD
+    | style="background-color: #ffffff; text-align: right" |1234
+    | style="background-color: #ffffff; text-align: center" |P
+    |}
+
+was in der Darstellung in etwa so aussieht
+
+    +-------+--------------------+
+    | L     |      R |     Z     |
+    +----------------------------+
+    | A     |      1 |  ABCDEFG  |
+    +----------------------------+
+    | AB    |     12 |   HIJKL   |
+    +----------------------------+
+    | ABC   |    123 |    MNO    |
+    +----------------------------+
+    | ABCD  |   1234 |     P     |
+    +----------------------------+
+              Eine Tabelle
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub table {
+    my $self = shift;
+    # @_: @keyVal
+
+    my $alignA = [];
+    my $bodyBackground = '#ffffff';
+    my $caption = undef;
+    my $rowA = [];
+    my $titleBackground = '#e8e8e8';
+    my $titleA = [];
+    my $valueCb = undef;
+
+    Prty::Parameters->extractPropertiesToVariables(\@_,
+        alignments => \$alignA,
+        bodyBackground => \$bodyBackground,
+        caption => \$caption,
+        rows => \$rowA,
+        titleBackground => \$titleBackground,
+        titles => \$titleA,
+        valueCallback => \$valueCb,
+    );
+
+    if (!@$titleA && !@$rowA) {
+        return '';
+    }
+
+    # Tabellenanfang
+    my $code = qq~{| class="wikitable"\n~;
+
+    # Tabellen-Unterschrift
+
+    if ($caption) {
+        if ($valueCb) {
+            $caption = $valueCb->($caption);
+        }
+        $code .= qq{|+ style="caption-side: bottom; font-weight: normal"}.
+            qq{|$caption\n};
+    }
+
+    # Titelzeile
+
+    my $titleLine = '';
+    if (@$titleA) {
+        $code .= "|-\n";
+        for (my $i = 0; $i < @$titleA; $i++) {
+            # Style
+
+            my $style = "background-color: $titleBackground";
+            if (my $align = $alignA->[$i] || 'left') {
+                if ($align ne 'center') {
+                    $style .= "; text-align: $align";
+                }
+            }
+
+            # Wert
+
+            my $val = $titleA->[$i];
+            if ($valueCb) {
+                $val = $valueCb->($val);
+            }
+
+            # Code
+            $code .= qq{! style="$style" |$val\n};
+        }
+    }
+
+    # Datenzeilen
+
+    for my $valA (@$rowA) {
+        $code .= "|-\n";
+        for (my $i = 0; $i < @$valA; $i++) {
+            # Style
+
+            my $style = "background-color: $bodyBackground";
+            if (my $align = $alignA->[$i]) {
+                if ($align ne 'left') {
+                    $style .= "; text-align: $align";
+                }
+            }
+
+            # Wert
+
+            my $val = $valA->[$i];
+            if ($valueCb) {
+                $val = $valueCb->($val);
+            }
+
+            # Code
+            $code .= qq{| style="$style" |$val\n};
+        }
+    }
+
+    # Tabellenende
+    $code .= '|}';
+
+    return "$code\n\n";
 }
 
 # -----------------------------------------------------------------------------
@@ -623,7 +1103,13 @@ des Inhaltsverzeichnisses und liefere diesen zurück.
 
 =head4 See Also
 
-Quelle: L<https://www.mediawiki.org/wiki/Manual:Table_of_contents>
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Manual:Table_of_contents>
+
+=back
 
 =head4 Examples
 
@@ -662,7 +1148,7 @@ sub tableOfContents {
 
 # -----------------------------------------------------------------------------
 
-=head2 Segmente
+=head2 Inline Code
 
 =head3 fmt() - Inline-Formatierung
 
@@ -724,11 +1210,29 @@ Erzeugt:
 
     <nowiki>TEXT</nowiki>
 
+=item nl
+
+Erzeugt:
+
+    <br />
+
+=item quote
+
+Erzeugt:
+
+    <q>TEXT</q>
+
 =back
 
 =head4 See Also
 
-Quelle: L<https://www.mediawiki.org/wiki/Help:Formatting>
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
 
 =cut
 
@@ -763,6 +1267,12 @@ sub fmt {
         elsif ($type eq 'nowiki') {
             $code = "<nowiki>$code</nowiki>";
         }
+        elsif ($type eq 'quote') {
+            $code = "<q>$code</q>";
+        }
+        elsif ($type eq 'nl') {
+            $code = '<br />';
+        }
         else {
             $self->throw(
                 q~MEDIAWIKI-00001: Unknown inline format~,
@@ -772,6 +1282,170 @@ sub fmt {
     }
 
     return $code;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 indent() - Erzeuge Einrückung
+
+=head4 Synopsis
+
+    $code = $gen->indent($n);
+
+=head4 Returns
+
+Markup-Code (String)
+
+=head4 Description
+
+Erzeuge den MediaWiki Markup-Code für eine Einrückung der Tiefe $n
+und liefere diesen zurück.
+
+=head4 See Also
+
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
+
+=head4 Example
+
+    $gen->indent(2);
+
+erzeugt
+
+    ::
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub indent {
+    my ($self,$n) = @_;
+    return ':' x $n;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 link() - Erzeuge internen oder externen Link
+
+=head4 Synopsis
+
+    $code = $gen->link($type,$destination,$text);
+
+=head4 Arguments
+
+=over 4
+
+=item $type
+
+Art des Link. Mögliche Werte: 'internal', 'external'.
+
+=item $destination
+
+Link-Ziel.
+
+=item $text
+
+Link-Text.
+
+=back
+
+=head4 Returns
+
+Markup-Code (String)
+
+=head4 Description
+
+Erzeuge den MediaWiki Markup-Code für einen internen oder externen
+Link und liefere diesen zurück.
+
+=head4 See Also
+
+=over 2
+
+=item *
+
+Syntax: L<https://www.mediawiki.org/wiki/Help:Formatting>
+
+=back
+
+=head4 Examples
+
+=over 2
+
+=item *
+
+Interner Link
+
+    $gen->link('internal','Transaktionssicherheit',
+        'Abschnitt Transaktiossicherheit');
+
+erzeugt
+
+    [[#Transaktionssicherheit|Abschnitt Transaktiossicherheit]]
+
+=item *
+
+Externer Link
+
+    $gen->link('external','http::/fseitz.de','Homepage Frank Seitz');
+
+erzeugt
+
+    [http::/fseitz.de/ Homepage Frank Seitz]
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub link {
+    my ($self,$type,$destination,$text) = @_;
+
+    if ($type eq 'internal') {
+        return sprintf '[[#%s|%s]]',$destination,$text;
+    }
+    elsif ($type eq 'external') {
+        return sprintf '[%s %s]',$destination,$text;
+    }
+
+    $self->throw;
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Sonstiges
+
+=head3 protect() - Schütze Metazeichen
+
+=head4 Synopsis
+
+    $code = $gen->protect($text);
+
+=head4 Description
+
+Schütze alle Metazeichen in Text $text, so dass das Resultat als Inhalt
+in eine MediaWiki-Seite eingesetzt werden kann.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub protect {
+    my ($self,$text) = @_;
+
+    if (defined $text) {
+        #$text =~ s/&/&amp;/g;
+        #$text =~ s/</&lt;/g;
+        #$text =~ s/>/&gt;/g;
+    }
+    
+    return $text;
 }
 
 # -----------------------------------------------------------------------------
@@ -787,7 +1461,7 @@ sub fmt {
 =head4 Description
 
 Erzeuge eine Seite mit MediaWiki-Markup. Diese Seite kann in ein
-MediaWiki übertragen und dort visuell begutachtet werden.
+MediaWiki übertragen und dort optisch begutachtet werden.
 
 =head4 Example
 
@@ -852,10 +1526,67 @@ sub testPage {
     $code .= $gen->list('*',['Apfel','Birne','Pflaume']);
 
     $code .= $gen->section(2,'Nummerierungsliste');
-    $code .= $gen->list('#',['Apfel','Birne','Pflaume']);
+    $code .= $gen->list('#',['Gurke','Spargel','Tomate']);
 
     $code .= $gen->section(2,'Definitionsliste');
-    $code .= $gen->list(';',[A=>'Apfel',B=>'Birne',C=>'Pflaume']);
+    $code .= $gen->list(';',[A=>'Apfel',B=>'Birne',P=>'Pflaume']);
+
+    $code .= $gen->section(2,'Geschachtelte Listen');
+
+    $code .= $gen->section(3,'Verschachtelte Punktlisten');
+
+    $code .= $gen->list('*',[
+        'A',
+        $gen->list('*',[
+            'B',
+            $gen->list('*',[
+                'C',
+                'D',
+                'E',
+            ]),
+            'F',
+            'G',
+        ]),
+        'H',
+        $gen->list('*',[
+            'I',
+            'J',
+            'K',
+        ]),
+        'L',
+        'M',
+    ]);
+
+    $code .= $gen->section(3,'Punktliste in Nummerierungsliste');
+
+    $code .= $gen->list('#',[
+        'Obst',
+        $gen->list('*',[
+            'Apfel',
+            'Birne',
+            'Pflaume',
+        ]),
+        'Gemüse',
+        $gen->list('*',[
+            'Gurke',
+            'Spinat',
+            'Tomate',
+        ]),
+    ]);
+
+    $code .= $gen->section(1,'Tabelle');
+
+    $code .= $gen->table(
+        alignments => ['left','right','center'],
+        caption => 'Eine Tabelle',
+        titles => ['L','R','Z'],
+        rows => [
+            ['A',1,'ABCDEFG'],
+            ['AB',12,'HIJKL'],
+            ['ABC',123,'MNO'],
+            ['ABCD',1234,'P'],
+        ],            
+    );
 
     # Code
 
@@ -927,6 +1658,9 @@ sub testPage {
     $code .= 'geschachtelt: '.
         $gen->fmt('italic','Kursive und '.
             $gen->fmt('bold','fette').' Schrift'
+        ).', '.
+        $gen->fmt('bold','Fette und '.
+            $gen->fmt('italic','kursive').' Schrift'
         )."\n\n";
 
     # Kommentar-Segment
@@ -941,7 +1675,7 @@ sub testPage {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -949,7 +1683,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

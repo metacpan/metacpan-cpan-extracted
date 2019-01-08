@@ -22,7 +22,7 @@ no_index:
 provides:
   Astro::Coord::ECI::TLE::Iridium:
     file: lib/Astro/Coord/ECI/TLE/Iridium.pm
-    version: '0.113'
+    version: '0.114'
 requires:
   Astro::Coord::ECI::TLE: '0.091'
   Astro::Coord::ECI::Utils: '0.091'
@@ -38,5 +38,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium.git
-version: '0.113'
+version: '0.114'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

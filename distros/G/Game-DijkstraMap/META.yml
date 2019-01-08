@@ -1,5 +1,5 @@
 ---
-abstract: 'a numeric grid of weights plus some related functions'
+abstract: 'Dijkstra Map path finding'
 author:
   - 'Jeremy Mates <jmates@cpan.org>'
 build_requires:
@@ -24,13 +24,11 @@ requires:
   List::Util: '1.26'
   Moo: '0'
   Scalar::Util: '0'
+  constant: '0'
   namespace::clean: '0'
   perl: '5.024000'
   strict: '0'
-version: '0.08'
-x_homepageresources:
-  repository:
-    type: git
-    url: git://github.com/thrig/Game-DijkstraMap.git
-    web: https://github.com/thrig/Game-DijkstraMap
+resources:
+  repository: https://github.com/thrig/Game-DijkstraMap
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

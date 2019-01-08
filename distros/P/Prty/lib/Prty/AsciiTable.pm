@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Unindent;
 use Prty::FileHandle;
@@ -66,7 +66,8 @@ sind die Werte weder eindeutig links noch rechts ausgerichtet.
 
 Der Tabellen-Kopf, also die Titel, können mehrzeilig sein:
 
-      Right Left
+    Right Left
+
     Aligned Aligned Centered
     ------- ------- --------
           1 A          A
@@ -84,7 +85,8 @@ Die Titel sind optional, können also auch fehlen:
 
 Die Kolumnenwerte können mehrzeilig sein:
 
-      Right   Left
+    Right   Left
+
     Aligned   Aligned          Centered
     -------   --------------   --------
           1   This is             A
@@ -102,7 +104,8 @@ Zeile 2). Die Trennzeile kann eine einfache Leerzeile sein oder
 Bindestriche enthalten wie die Trennzeile zwischen Tabellen-Kopf
 und -Körper:
 
-      Right   Left
+    Right   Left
+
     Aligned   Aligned          Centered
     -------   --------------   --------
           1   This is             A
@@ -179,10 +182,12 @@ sub new {
     my $multiLine = -1; # Multizeilen-Tabelle, wenn > 0
     my $tabLineLength;  # Logische Breite einer ASCII-Tabellenzeile
 
-    my $fh = Prty::FileHandle->new('<',\$str);
-    while (<$fh>) {
-        chomp;
-        if (/^[- ]*$/) { # Bindestrich-Zeile, Whitespace-Zeile, Leerzeile
+    # my $fh = Prty::FileHandle->new('<',\$str);
+    # while (<$fh>) {
+    #   chomp;
+
+    for (split /\n/,$str) {
+       if (/^[- ]*$/) { # Bindestrich-Zeile, Whitespace-Zeile, Leerzeile
             if (!@lines) {
                 $titles = 0;
             }
@@ -201,7 +206,7 @@ sub new {
             push @lines,[1,$_];
         }
     }
-    $fh->close;
+    # $fh->close;
 
     # Prüfe, ob die Eingabedaten eine Tabelle darstellen
 
@@ -621,7 +626,7 @@ sub asText {
 
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -629,7 +634,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

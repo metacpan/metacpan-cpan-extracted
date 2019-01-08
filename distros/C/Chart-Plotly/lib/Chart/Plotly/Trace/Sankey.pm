@@ -13,7 +13,7 @@ use Chart::Plotly::Trace::Sankey::Node;
 use Chart::Plotly::Trace::Sankey::Stream;
 use Chart::Plotly::Trace::Sankey::Textfont;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Sankey plots for network flow data analysis. The nodes are specified in `nodes` and the links between sources and targets in `links`. The colors are set in `nodes[i].color` and `links[i].color`; otherwise defaults are used.
 
@@ -68,7 +68,8 @@ has domain => ( is  => "rw",
                 isa => "Maybe[HashRef]|Chart::Plotly::Trace::Sankey::Domain", );
 
 has hoverinfo => (
-    is => "rw",
+    is  => "rw",
+    isa => "Str",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired. Note that this attribute is superseded by `node.hoverinfo` and `node.hoverinfo` for nodes and links respectively.",
 );
@@ -180,7 +181,7 @@ Chart::Plotly::Trace::Sankey - Sankey plots for network flow data analysis. The 
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

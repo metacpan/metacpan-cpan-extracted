@@ -1,7 +1,7 @@
 package App::NetworkUtils;
 
-our $DATE = '2018-12-15'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-01-08'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,6 +13,11 @@ use File::Which qw(which);
 use IPC::System::Options 'system', 'readpipe', -log=>1;
 
 our %SPEC;
+
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'Command-line utilities related to networking',
+};
 
 $SPEC{'turn_on_networking'} = {
     v => 1.1,
@@ -161,7 +166,7 @@ sub networking_is_on {
 }
 
 1;
-# ABSTRACT: Return true when networking is on, or 0 otherwise
+# ABSTRACT: Command-line utilities related to networking
 
 __END__
 
@@ -171,11 +176,11 @@ __END__
 
 =head1 NAME
 
-App::NetworkUtils - Return true when networking is on, or 0 otherwise
+App::NetworkUtils - Command-line utilities related to networking
 
 =head1 VERSION
 
-This document describes version 0.002 of App::NetworkUtils (from Perl distribution App-NetworkUtils), released on 2018-12-15.
+This document describes version 0.003 of App::NetworkUtils (from Perl distribution App-NetworkUtils), released on 2019-01-08.
 
 =head1 DESCRIPTION
 
@@ -359,7 +364,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

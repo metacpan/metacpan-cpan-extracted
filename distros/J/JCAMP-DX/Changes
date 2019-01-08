@@ -1,0 +1,11 @@
+0.02
+
+        - Switched from functional style to object-oriented style.
+        - Implemented JCAMP-DX writing.
+        - Implemented (XY..XY) and (XYZ..XYZ) variable reading.
+        - Fixed processing of comments, multiline titles and ##END=.
+        - Retaining original order of LDRs.
+
+0.01
+
+        - Initial release.

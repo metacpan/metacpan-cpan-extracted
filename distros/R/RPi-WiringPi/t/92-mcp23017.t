@@ -5,7 +5,12 @@ use Test::More;
 BEGIN {
 
     if (! $ENV{RPI_MCP23017}){
-        plan(skip_all => "Skipping: RPI_MCP23017 environment variable not set");
+        plan(skip_all => "RPI_MCP23017 environment variable not set");
+    }
+
+    if (! $ENV{PI_BOARD}){
+        $ENV{NO_BOARD} = 1;
+        plan skip_all => "Not on a Pi board\n";
     }
 
     use_ok( 'RPi::GPIOExpander::MCP23017' ) || print "Bail out!\n";

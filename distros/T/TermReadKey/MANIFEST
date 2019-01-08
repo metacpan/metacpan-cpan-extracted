@@ -3,7 +3,7 @@ MANIFEST
 MANIFEST.SKIP
 Makefile.PL
 README
-ReadKey_pm.PL
+ReadKey.pm.PL
 ReadKey.xs
 genchars.pl
 ppport.h

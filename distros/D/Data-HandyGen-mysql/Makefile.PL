@@ -28,4 +28,15 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Data/HandyGen/mysql.pm', # retrieve abstract from module
        AUTHOR         => 'Takashi Egawa <egawa.takashi@gmail.com>') : ()),
+    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/egawata/Data-HandyGen-mysql.git',
+                 web  => 'https://github.com/egawata/Data-HandyGen-mysql.git',
+             },
+         }})
+         : ()
+    ),
 );

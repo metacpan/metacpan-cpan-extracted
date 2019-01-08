@@ -1,5 +1,11 @@
 Revision history for Perl extension Finance::Bank::Postbank_de.
 
+0.56 2019-01-06
+  * Made buildtool and few others not executable (MANWAR)
+  * Send the "device-signature" header again
+  * (Developer) diagnostics are now available in the code proper
+  * Better error handling in case of credential failures
+
 0.55 2018-12-03
   * Adapt to site (well, API-data) changes
     BAUFINANZIERUNG accounts will not be returned for the time being

@@ -1,14 +1,14 @@
 package CPAN::Critic::Module::Abstract;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 use Log::ger;
 
-use Package::MoreUtil qw(list_package_contents);
+use Package::Stash;
 use Perinci::Sub::DepChecker qw(check_deps);
 
 use Exporter;
@@ -243,7 +243,7 @@ declare_policy
 $PROFILES{all} = {
     policies => [],
 };
-for (keys %{ { list_package_contents(__PACKAGE__) } }) {
+for (Package::Stash->new(__PACKAGE__)->list_all_symbols("CODE")) {
     next unless /^policy_(.+)/;
     push @{$PROFILES{all}{policies}}, $1;
 }
@@ -325,7 +325,7 @@ CPAN::Critic::Module::Abstract - Critic CPAN module abstract
 
 =head1 VERSION
 
-This document describes version 0.08 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2017-07-10.
+This document describes version 0.090 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -347,7 +347,7 @@ Dist::Zilla plugin coming shortly.
 
 Usage:
 
- critique_cpan_module_abstract(%args) -> [status, msg, result, meta]
+ critique_cpan_module_abstract(%args) -> [status, msg, payload, meta]
 
 Critic CPAN module abstract.
 
@@ -368,7 +368,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -379,7 +379,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_empty(%args) -> [status, msg, result, meta]
+ policy_prohibit_empty(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -398,7 +398,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -409,7 +409,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_ends_with_full_stop(%args) -> [status, msg, result, meta]
+ policy_prohibit_ends_with_full_stop(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -428,7 +428,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -439,7 +439,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_just_module_name(%args) -> [status, msg, result, meta]
+ policy_prohibit_just_module_name(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -458,7 +458,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -469,7 +469,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_multiline(%args) -> [status, msg, result, meta]
+ policy_prohibit_multiline(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -488,7 +488,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -499,7 +499,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_redundancy(%args) -> [status, msg, result, meta]
+ policy_prohibit_redundancy(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -518,7 +518,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -529,7 +529,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_shouting(%args) -> [status, msg, result, meta]
+ policy_prohibit_shouting(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -548,7 +548,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -559,7 +559,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_starts_with_lowercase_letter(%args) -> [status, msg, result, meta]
+ policy_prohibit_starts_with_lowercase_letter(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -578,7 +578,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -589,7 +589,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_template(%args) -> [status, msg, result, meta]
+ policy_prohibit_template(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -608,7 +608,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -619,7 +619,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_too_long(%args) -> [status, msg, result, meta]
+ policy_prohibit_too_long(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -640,7 +640,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -651,7 +651,7 @@ Return value:  (any)
 
 Usage:
 
- policy_prohibit_too_short(%args) -> [status, msg, result, meta]
+ policy_prohibit_too_short(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -672,7 +672,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -683,7 +683,7 @@ Return value:  (any)
 
 Usage:
 
- policy_require_english(%args) -> [status, msg, result, meta]
+ policy_require_english(%args) -> [status, msg, payload, meta]
 
 This function is not exported.
 
@@ -702,7 +702,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -732,7 +732,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

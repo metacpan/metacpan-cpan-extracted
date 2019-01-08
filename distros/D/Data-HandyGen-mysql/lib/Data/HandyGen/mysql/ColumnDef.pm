@@ -3,7 +3,7 @@ package Data::HandyGen::mysql::ColumnDef;
 use strict;
 use warnings;
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.5';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -11,26 +11,26 @@ use Carp;
 
 =head1 NAME
 
-Data::HandyGen::mysql::ColumnDef - Manages one column definition 
+Data::HandyGen::mysql::ColumnDef - Manages one column definition
 
 
 =head1 VERSION
 
-This documentation refers to Data::HandyGen::mysql::ColumnDef version 0.0.2
+This documentation refers to Data::HandyGen::mysql::ColumnDef version 0.0.5
 
 
 =head1 SYNOPSIS
 
     use Data::HandyGen::mysql::ColumnDef;
-    
+
     my $cd = Data::HandyGen::mysql::ColumnDef->new('colname', %column_definition);
 
     #  true if 'colname' is auto_increment
     my $res = $cd->is_auto_increment();
-    
-    #  get column type 
+
+    #  get column type
     my $type = $cd->data_type();
-    
+
 
 =head1 CAUTION
 
@@ -42,14 +42,14 @@ This module is not intended for use outside Data::HandyGen. Its interface may be
 This class is a container of column definition retrieved from information_schema.columns.
 
 
-=head1 METHODS 
+=head1 METHODS
 
 
 =head2 new($colname, %params)
 
 Constructor.
 
-%params is a hash which contains a column definition retrieved from information_schema.columns. 
+%params is a hash which contains a column definition retrieved from information_schema.columns.
 
 
 =cut
@@ -140,7 +140,7 @@ __END__
 
 =head1 AUTHOR
 
-Egawata 
+Egawata
 
 
 =head1 LICENCE AND COPYRIGHT
@@ -152,4 +152,4 @@ modify it under the same terms as Perl itself. See L<perlartistic>.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

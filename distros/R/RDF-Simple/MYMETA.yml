@@ -1,0 +1,38 @@
+---
+abstract: 'read and write RDF without complication'
+author:
+  - 'Original author = Jo Walsh <jo@london.pm.org>'
+  - 'Martin Thurn mthurn@cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  IO::CaptureOutput: '0'
+  Test::File: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.19, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RDF-Simple
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  XML::SAX::Expat: '0'
+requires:
+  Class::MethodMaker: '0'
+  File::Slurp: '0'
+  LWP::UserAgent: '0'
+  Regexp::Common: '0'
+  URI::Escape: '0'
+  XML::SAX: '0'
+  perl: '5.005'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.416'
+x_module_name: RDF::Simple
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,6 +3,7 @@ abstract: 'Validate data against a JSON schema'
 author:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '1.30'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -17,11 +18,16 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
   Mojolicious: '7.28'
+  perl: '5.010001'
 resources:
-  bugtracker: https://github.com/jhthorsen/json-validator/issues
-  homepage: https://github.com/jhthorsen/json-validator
-  repository: https://github.com/jhthorsen/json-validator.git
-version: '2.19'
+  IRC: irc://irc.freenode.net/#mojo
+  bugtracker: https://github.com/mojolicious/json-validator/issues
+  homepage: https://mojolicious.org
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/mojolicious/json-validator.git
+version: '3.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

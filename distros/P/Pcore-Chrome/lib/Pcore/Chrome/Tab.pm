@@ -46,11 +46,13 @@ sub _cmd ( $self, $cmd, @args ) {
 
     $self->{_cb}->{$id} = sub ( $res ) { $cv->( $cb ? $cb->($res) : $res ) };
 
-    $self->{_ws}->send_text( to_json {
-        id     => $id,
-        method => $cmd,
-        params => {@args},
-    } );
+    $self->{_ws}->send_text(
+        \to_json {
+            id     => $id,
+            method => $cmd,
+            params => {@args},
+        }
+    );
 
     return defined wantarray ? $cv->recv : ();
 }

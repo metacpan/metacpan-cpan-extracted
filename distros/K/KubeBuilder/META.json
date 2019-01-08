@@ -1,0 +1,46 @@
+{
+   "abstract" : "Module to help build the Perl Kubernetes client",
+   "author" : [
+      "Jose Luis Martinez <jlmartinez@capside.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "KubeBuilder",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Path::Class" : "0",
+            "Swagger::Schema::Kubernetes" : "0",
+            "Template" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pplu/kubernetes-builder/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pplu/kubernetes-builder.git",
+         "web" : "https://github.com/pplu/kubernetes-builder"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

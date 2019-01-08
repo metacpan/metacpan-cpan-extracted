@@ -28,10 +28,11 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0,
     "Test::Output" => 0,
+    "Text::CSV" => 0,
     "constant" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.752",
+  "VERSION" => "0.753",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => 0,
   "Test::Output" => 0,
+  "Text::CSV" => 0,
   "Try::Tiny" => 0,
   "constant" => 0,
   "parent" => 0,

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 549;
+plan tests => 582;
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -100,6 +100,44 @@ is(join(' ', map { fibonacci(Math::AnyNum->new_ui($_), Math::AnyNum->new_ui(4)) 
     is(fibmod(105, $t), fibonacci(105) % $t);
     is(lucasmod(105, $t), lucas(105) % $t);
 }
+
+is(fibmod(0, 100), 0);
+is(fibmod(1, 100), 1);
+is(lucasmod(0, 100), 2);
+is(lucasmod(1, 100), 1);
+
+is(lucasUmod(1, -1, 0, 100), 0);
+is(lucasUmod(1, -1, 1, 100), 1);
+
+is(lucasVmod(1, -1, 0, 100), 2);
+is(lucasVmod(1, -1, 1, 100), 1);
+
+is(lucasUmod(4, 4, 0, 100), 0);
+is(lucasUmod(4, 4, 1, 100), 1);
+
+is(lucasUmod(4, 4,  50, 1000), lucasU(4, 4,  50) % 1000);
+is(lucasUmod(4, -4, 50, 1000), lucasU(4, -4, 50) % 1000);
+
+is(lucasVmod(4, 4, 0, 100), 2);
+is(lucasVmod(4, 4, 1, 100), 4);
+
+is(lucasVmod(4, 4, 0, 100), lucasV(4, 4, 0) % 100);
+is(lucasVmod(4, 4, 1, 100), lucasV(4, 4, 1) % 100);
+
+is(lucasVmod(4,  4, 50, 1000), 248);
+is(lucasVmod(-4, 4, 50, 1000), 248);
+
+is(lucasVmod(4,  4, 50, 1000), lucasV(4, 4, 50) % 1000);
+is(lucasVmod(-4, 4, 50, 1000), lucasV(4, 4, 50) % 1000);
+
+is(lucasVmod(4,  4, 50, 1001), lucasV(4,  4, 50) % 1001);
+is(lucasVmod(-4, 4, 50, 1001), lucasV(-4, 4, 50) % 1001);
+
+is(lucasVmod(4,  -4, 50, 1000), 624);
+is(lucasVmod(-4, -4, 50, 1000), 624);
+
+is(lucasVmod(4,  -4, 50, 1000), lucasV(4,  -4, 50) % 1000);
+is(lucasVmod(-4, -4, 50, 1000), lucasV(-4, -4, 50) % 1000);
 
 is(fibmod(1234, 987654), fibonacci(1234) % 987654);
 is(lucasmod(1234, 987654), lucas(1234) % 987654);
@@ -715,6 +753,13 @@ ok(!is_square(-1), 'is_square(-1)');
 ok(is_square(1),   'is_square(-1)');
 ok(is_square(0),   'is_square(0)');
 
+ok(is_prime(2),   '2 is prime');
+ok(!is_prime(1),  '1 is not prime');
+ok(!is_prime(0),  '0 is not prime');
+ok(!is_prime(-1), '-1 is not prime');
+ok(!is_prime(-2), '-2 is not prime');
+ok(!is_prime(-3), '-3 is not prime');
+
 ok(is_prime('165001'),          'is_prime');
 ok(is_prime($o->new('165001')), 'is_prime');
 ok(is_prime($o->new('165001'), 30), 'is_prime');
@@ -774,6 +819,7 @@ ok(!is_smooth_over_prod(Math::AnyNum->new(13 * 5 * 7 * 8 * 3), 12));
 ok(!is_smooth_over_prod(Math::AnyNum->new(2),                  Math::AnyNum->new(1)));
 ok(!is_smooth_over_prod(1,                                     Math::AnyNum->new(0)));
 
+is(next_prime(-10),               '2');
 is(next_prime('165001'),          '165037');
 is(next_prime($o->new('165001')), '165037');
 

@@ -9,10 +9,17 @@ use RPi::Const qw(:all);
 use Test::More;
 use WiringPi::API qw(:all);
 
+if (! $ENV{RPI_MCP4922}){
+    plan skip_all => "RPI_MCP4922 environment variable not set\n";
+}
+
+if (! $ENV{RPI_MCP3008}){
+    plan skip_all => "RPI_MCP3008 environment variable not set\n";
+}
+
 if (! $ENV{PI_BOARD}){
-    warn "\n*** PI_BOARD is not set! ***\n";
     $ENV{NO_BOARD} = 1;
-    plan skip_all => "not on a pi board\n";
+    plan skip_all => "Not on a Pi board\n";
 }
 
 my ($adc_cs_pin, $dac_cs_pin) = (26, 12);
@@ -69,7 +76,6 @@ my @output = (
 
         if ($_ % 1000 == 0 || $_ == 4095){
             my $r = $adc->percent($adc_dac1_in);
-
             is 
                 $r >= $output[$c]->[0] && $r <= $output[$c]->[1], 
                 1,

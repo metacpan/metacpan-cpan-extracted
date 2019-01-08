@@ -5,6 +5,7 @@ lib/Prty/ApplicationPaths.pm
 lib/Prty/Array.pm
 lib/Prty/AsciiTable.pm
 lib/Prty/Assert.pm
+lib/Prty/Cascm.pm
 lib/Prty/ClassConfig.pm
 lib/Prty/ClassLoader.pm
 lib/Prty/Color.pm
@@ -104,9 +105,9 @@ lib/Prty/LineProcessor.pm
 lib/Prty/LineProcessor/Line.pm
 lib/Prty/LockedCounter.pm
 lib/Prty/Math.pm
-lib/Prty/MediaWiki/Client.pm
+lib/Prty/MediaWiki/Api.pm
+lib/Prty/MediaWiki/Loader.pm
 lib/Prty/MediaWiki/Markup.pm
-lib/Prty/MediaWiki/Page.pm
 lib/Prty/ModelCache.pm
 lib/Prty/Mojolicious/Plugin/Log/Parameters.pm
 lib/Prty/Object.pm
@@ -158,6 +159,8 @@ lib/Prty/Stopwatch.pm
 lib/Prty/Storable.pm
 lib/Prty/String.pm
 lib/Prty/System.pm
+lib/Prty/TempDir.pm
+lib/Prty/TempFile.pm
 lib/Prty/Template.pm
 lib/Prty/Terminal.pm
 lib/Prty/Test/Class.pm
@@ -186,6 +189,7 @@ t/bin/Prty/ApplicationPaths.t
 t/bin/Prty/Array.t
 t/bin/Prty/AsciiTable.t
 t/bin/Prty/Assert.t
+t/bin/Prty/Cascm.t
 t/bin/Prty/ClassConfig.t
 t/bin/Prty/ClassLoader.t
 t/bin/Prty/Color.t
@@ -285,9 +289,9 @@ t/bin/Prty/LineProcessor.t
 t/bin/Prty/LineProcessor/Line.t
 t/bin/Prty/LockedCounter.t
 t/bin/Prty/Math.t
-t/bin/Prty/MediaWiki/Client.t
+t/bin/Prty/MediaWiki/Api.t
+t/bin/Prty/MediaWiki/Loader.t
 t/bin/Prty/MediaWiki/Markup.t
-t/bin/Prty/MediaWiki/Page.t
 t/bin/Prty/ModelCache.t
 t/bin/Prty/Mojolicious/Plugin/Log/Parameters.t
 t/bin/Prty/Object.t
@@ -339,6 +343,8 @@ t/bin/Prty/Stopwatch.t
 t/bin/Prty/Storable.t
 t/bin/Prty/String.t
 t/bin/Prty/System.t
+t/bin/Prty/TempDir.t
+t/bin/Prty/TempFile.t
 t/bin/Prty/Template.t
 t/bin/Prty/Terminal.t
 t/bin/Prty/Test/Class.t

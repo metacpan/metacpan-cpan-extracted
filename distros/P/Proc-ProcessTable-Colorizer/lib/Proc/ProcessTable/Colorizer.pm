@@ -9,21 +9,17 @@ use Term::ANSIColor;
 use Text::Table;
 use Term::Size;
 
-if ( $^O =~ /bsd/ ){
-	require BSD::Process;
-}
-
 =head1 NAME
 
 Proc::ProcessTable::Colorizer - Like ps, but with colored columns and enhnaced functions for searching.
 
 =head1 VERSION
 
-Version 0.2.0
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 
 =head1 SYNOPSIS
@@ -37,9 +33,6 @@ This module uses L<Error::Helper> for error reporting.
 
 As of right now this module is not really user friend and will likely be going through lots of changes as it grows.
 
-Linux is also not as well supported given the limitations of Proc::ProcessTable and there is nothig similar to
-L<BSD::Process> for Linux.
-
 =head1 METHODS
 
 =head2 new
@@ -51,7 +44,7 @@ Creates a new object. This method will never error.
 =cut
 
 sub new {
-        my $self={
+	my $self={
 			perror=>undef,
 			error=>undef,
 			errorString=>'',
@@ -98,9 +91,16 @@ sub new {
 			swapped_out_search=>0,
 			time_search=>[],
 			pctcpu_search=>[],
-        };
-        bless $self;
-        return $self;
+	};
+	bless $self;
+
+	if ($^O =~ /bsd/){
+		$self->{physmem}=`/sbin/sysctl -a hw.physmem`;
+		chomp($self->{physmem});
+		$self->{physmem}=~s/^.*\: //;
+	}
+
+	return $self;
 }
 
 =head2 colorize
@@ -165,11 +165,6 @@ sub colorize{
 	
 	#goes through it all and gathers the information
 	foreach my $proc ( @{$pt->table} ){
-
-		my $bproc;
-		if ($^O =~ /bsd/){
-			$bproc=BSD::Process::info( $proc->pid );
-		}
 		
 		#process the requested fields
 		$fieldInt=0;
@@ -179,40 +174,15 @@ sub colorize{
 			
 			if (
 				($^O =~ /bsd/) &&
-				 ( $field =~ /pctcpu/ )
-				){
-				my $pctcpu=$bproc->{pctcpu};
-
-				if ( ! defined( $pctcpu ) ){
-					$values{pctcpu}=0
-				}else{
-					my $fscale=`/sbin/sysctl -a kern.fscale`;
-					$fscale=~s/^.*\: //;
-					chomp($fscale);
-					
-					$values{pctcpu}= 100 * ( $pctcpu / $fscale );
-				}
-			}elsif(
-				($^O =~ /bsd/) &&
 				( $field =~ /pctmem/ )
 				){
-				my $rss=$bproc->{rssize};
+				my $rss=$proc->{rssize};
 				if ( defined( $rss ) ){
 					$rss=$rss*1024*4;
-					
-					my $physmem=`/sbin/sysctl -a hw.physmem`;
-					chomp($physmem);
-					$physmem=~s/^.*\: //;
-					
-					$values{pctmem}=($rss / $physmem)*100;
+					$values{pctmem}=($rss / $self->{physmem})*100;
 				}else{
 					$values{pctmem}=0;
 				}
-			}elsif(
-				($^O =~ /bsd/) &&
-				( $field =~ /size/ )
-				){
-				$values{size}=$bproc->{size};
 			}elsif(
 				($^O =~ /bsd/) &&
 				( $field =~ /rss/ )
@@ -239,12 +209,15 @@ sub colorize{
 					my $kernel_proc=1; #just assuming yet, unless it is otherwise
 
 					#may possible be a zombie, run checks for on FreeBSD
-					if ($^O =~ /bsd/){
-						$kernel_proc=$bproc->{kthread};
+					if (
+						($^O =~ /bsd/) &&
+						( hex($proc->flags) & 0x00200000 )
+						){
+						$kernel_proc=1;
 					}
 
 					#need to find something similar as above for Linux
-					
+
 					#
 					if ( $kernel_proc ){
 						$values{'proc'}='['.$fname.']';
@@ -269,15 +242,23 @@ sub colorize{
 				$values{state}=$proc->state;
 
 				if ($^O =~ /bsd/){
-					$values{controlling_tty_active}=$bproc->{isctty};
-					$values{is_session_leader}=$bproc->{issleader};
-					$values{is_being_forked}=$bproc->{stat_1};
-					$values{working_on_exiting}=$bproc->{wexit};
-					$values{has_controlling_terminal}=$bproc->{controlt};
-					$values{is_locked}=$bproc->{locked};
-					$values{traced_by_debugger}=$bproc->{traced};
-					$values{is_stopped}=$bproc->{stat_4};
-					$values{posix_advisory_lock}=$bproc->{advlock};
+					$values{is_session_leader}=0;
+					$values{is_being_forked}=0;
+					$values{working_on_exiting}=0;
+					$values{has_controlling_terminal}=0;
+					$values{is_locked}=0;
+					$values{traced_by_debugger}=0;
+					#$values{is_stopped}=0;
+					$values{posix_advisory_lock}=0;
+
+					if ( hex($proc->flags) & 0x00002 ){ $values{controlling_tty_active}=1; }
+					if ( hex($proc->flags) & 0x00000002 ){$values{is_session_leader}=1; }
+					#if ( hex($proc->flags) &  ){$values{is_being_forked}=1; }
+					if ( hex($proc->flags) & 0x02000 ){$values{working_on_exiting}=1; }
+					if ( hex($proc->flags) & 0x00002 ){$values{has_controlling_terminal}=1; }
+					if ( hex($proc->flags) & 0x00000004 ){$values{is_locked}=1; }
+					if ( hex($proc->flags) & 0x00800 ){$values{traced_by_debugger}=1; }
+					if ( hex($proc->flags) & 0x00001 ){$values{posix_advisory_lock}=1; }
 				}
 				
 			}else{
@@ -305,7 +286,7 @@ sub colorize{
 		$values{size}=$values{size}/1024;
 
 		push( @procs, \%values );
-		
+
 	}
 
 	#sort by CPU percent and then RAM
@@ -327,7 +308,7 @@ sub colorize{
 		my $show=0;
 
 		#checks if it is the idle proc and if it should show it
-		if ( 
+		if (
 			defined ( $proc->{idle} ) &&
 			( ! $self->{showIdle} )
 			){
@@ -1219,7 +1200,7 @@ sub startString{
 	
 	#find the most common one and return it
 	if ( $year ne $cyear ){
-		return $year.sprintf('%02d', $mon).sprintf('%02d', $mday).'-'/sprintf('%02d', $hour).':'.sprintf('%02d', $min);
+		return $year.sprintf('%02d', $mon).sprintf('%02d', $mday).'-'.sprintf('%02d', $hour).':'.sprintf('%02d', $min);
 	}
 	if ( $mon ne $cmon ){
 		return sprintf('%02d', $mon).sprintf('%02d', $mday).'-'.sprintf('%02d', $hour).':'.sprintf('%02d', $min);

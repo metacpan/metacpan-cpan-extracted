@@ -1,20 +1,41 @@
 Date-Holidays-KZ
 
-Determine Kazakhstan official holidays and business days 2018
+Determine Kazakhstan official holidays and business days
 
+Sources:
+- 2018 https://online.zakon.kz/Document/?doc_id=33843977#pos=25;-101&sdoc_params=text%3D%25D0%259F%25D1%2580%25D0%25BE%25D0%25B8%25D0%25B7%25D0%25B2%25D0%25BE%25D0%25B4%25D1%2581%25D1%2582%25D0%25B2%25D0%25B5%25D0%25BD%25D0%25BD%25D1%258B%25D0%25B9%2520%25D0%25BA%25D0%25B0%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B4%25D0%25B0%25D1%2580%25D1%258C%25202018%26mode%3Dindoc%26topic_id%3D33843977%26spos%3D1%26tSynonym%3D1%26tShort%3D1%26tSuffix%3D1&sdoc_pos=0
+- 2019 https://online.zakon.kz/Document/?doc_id=34186053#pos=10;-245&sdoc_params=text%3D%25D0%259F%25D1%2580%25D0%25BE%25D0%25B8%25D0%25B7%25D0%25B2%25D0%25BE%25D0%25B4%25D1%2581%25D1%2582%25D0%25B2%25D0%25B5%25D0%25BD%25D0%25BD%25D1%258B%25D0%25B9%2520%25D0%25BA%25D0%25B0%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B4%25D0%25B0%25D1%2580%25D1%258C%26mode%3Dindoc%26topic_id%3D34186053%26spos%3D1%26tSynonym%3D1%26tShort%3D1%26tSuffix%3D1&sdoc_pos=0
 
 INSTALLATION
 
-To install this module, run the following commands:
+Install from CPAN:
+
+	cpan Date::Holidays::KZ
+
+or use cpanminus:
+
+	cpanm Date::Holidays::KZ
+
+
+To install this package from source:
 
 	perl Build.PL
 	./Build
-	./Build test
 	./Build install
 
-Or using cpanminus:
+or use cpanminus:
 
-	cpanm Date::Holidays::KZ
+	cpanm .
+
+
+DEVELOP CPAN RELEASE
+
+Install Carton ( https://metacpan.org/pod/Carton ), then dependencies:
+	perl dev/dev.pl
+Do something with code and test:
+	carton exec dzil (test/build/clean)
+Clean dependencies:
+	perl dev/clean-dev.pl
 
 
 SUPPORT AND DOCUMENTATION
@@ -25,13 +46,13 @@ After installing, you can find documentation for this module with the perldoc co
 
 You can also look for information at:
 
-    GitHub https://github.com/nalobin/Date-Holidays-KZ
+    GitHub https://github.com/bes-internal/Date-Holidays-KZ
     MetaCPAN https://metacpan.org/pod/Date::Holidays::KZ
 
 
 COPYRIGHT AND LICENCE
 
-Copyright © 2017 Vladimir Varlamov <bes.internal@gmail.com>
+Copyright © 2017-2019 Vladimir Varlamov <bes.internal@gmail.com>
 This module is adapted copy of Date-Holidays-RU:
 Copyright © 2014 Alexander Nalobin <alexander@nalobin.ru>
 

@@ -1,6 +1,6 @@
 Revision history for Perl extension voiceIt::voiceIt2.
 
-0.01  Thu Aug 23 17:58:41 2018
+3.8  Thu Jan  3 18:19:56 2019
 	- original version; created by h2xs 1.23 with options
-		-AX --skip-exporter --use-new-tests voiceIt::voiceIt2
+		-AX --use-new-tests voiceIt::voiceIt2 -v 3.8 -n voiceIt::voiceIt2
 

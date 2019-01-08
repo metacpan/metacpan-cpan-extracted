@@ -210,16 +210,6 @@ sub flow__returns_empty_sub_when_args_empty :Tests {
     is($func->(), undef);
 }
 
-sub flow__throws_warning_when_not_given_sub_as_argument :Tests {
-    local $SIG{__WARN__} = sub { die $_[0] };
-
-    eval {
-        flow()
-    };
-
-    like($@, qr/Expected a function/);
-}
-
 sub flow__returns_func_ref_composed_of_passed_in_args :Tests {
     my $func = flow(\&incr, \&incr);
 

@@ -94,16 +94,18 @@ WriteMakefile(
     'VERSION_FROM'      => 'FS.pm',
     'MIN_PERL_VERSION'  => '5.10.1',
     'PREREQ_PM'         => {
-        'DBI'               => '1.13',
-        'Error'             => '0.15',
-        'XAO::Base'         => '1.20',
+        'DBI'                   => '1.13',
+        'Error'                 => '0.15',
+        'XAO::Base'             => '1.20',
+    },
+    'CONFIGURE_REQUIRES' => {
+        'ExtUtils::MakeMaker'   => '6.64',
     },
     'BUILD_REQUIRES' => {
-        'ExtUtils::MakeMaker' => '6.64',
-        'Pod::Usage'        => '1.12',
+        'Pod::Usage'            => '1.12',
     },
     'TEST_REQUIRES' => {
-        'XAO::Base'         => '1.20',
+        'XAO::Base'             => '1.20',
     },
     'EXE_FILES'     => [
         'scripts/xao-fs',

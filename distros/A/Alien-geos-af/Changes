@@ -1,5 +1,10 @@
 Revision history for Alien::geos::af
 
+1.007 2019-01-06
+    - Require FFI::CheckLib 0.23 so dynamic_libs calls find geos-3-7-0.dll
+    - Ensure we use the correct geos-config when setting alien props
+      (some systems tried using the non-executable versions)
+
 1.005 2018-11-15
     - More updates to the dynamic_libs method to find
       geos and geos_c libs for shared installs on windows

@@ -15,8 +15,8 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'DBD::mysql' => '4.042',
-  'Mojolicious' => '7.55',
-  'SQL::Abstract' => '1.81'
+  'Mojolicious' => '8.03',
+  'SQL::Abstract' => '1.86'
 }
 ,
   META_MERGE     => {

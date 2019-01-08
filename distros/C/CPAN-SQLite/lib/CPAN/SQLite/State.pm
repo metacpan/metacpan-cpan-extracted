@@ -1,11 +1,11 @@
-# $Id: State.pm 58 2018-08-03 20:06:35Z stro $
+# $Id: State.pm 70 2019-01-04 19:39:59Z stro $
 
 package CPAN::SQLite::State;
 use strict;
 use warnings;
 no warnings qw(redefine);
 
-our $VERSION = '0.212';
+our $VERSION = '0.214';
 
 use English qw/-no_match_vars/;
 
@@ -399,7 +399,7 @@ CPAN::SQLite::State - get state information on the database
 
 =head1 VERSION
 
-version 0.212
+version 0.214
 
 =head1 DESCRIPTION
 

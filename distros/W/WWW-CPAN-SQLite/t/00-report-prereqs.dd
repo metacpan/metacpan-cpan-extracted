@@ -1,0 +1,54 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'FindBin::Real' => '0',
+                                      'MIME::Types' => '0',
+                                      'Plack::MIME' => '0',
+                                      'Plack::Middleware::Static' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Carp' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTTP::Request::Common' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Plack::Loader' => '0',
+                                   'Plack::Test' => '0',
+                                   'Plack::Util' => '0',
+                                   'Scalar::Util' => '0',
+                                   'Test::More' => '0.94',
+                                   'lib' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

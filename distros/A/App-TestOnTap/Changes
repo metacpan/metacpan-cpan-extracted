@@ -1,5 +1,46 @@
 Revision history for App-TestOnTap
 
+0.059	2019-01-07
+
+	Debugging complete
+
+0.058	2019-01-07
+
+	title
+	
+	Debugging of weird test failures in travis
+	*do not use as release*
+	
+
+0.057	2019-01-07
+
+	Debugging of weird test failures in travis
+	*do not use as release*
+	
+
+0.056	2019-01-07
+
+	Debugging of weird test failures in travis
+	*do not use as release*
+	
+
+0.055	2019-01-07
+
+	Debugging of weird test failures in travis
+	*do not use as release*
+	
+
+0.054	2019-01-06
+
+	Test failure fixes:
+	Travis randomly failed on test 60-preprocess; possibly linked to using POSIX/getcwd instead of Cwd/getcwd
+	Archive::Zip has a security feature where a zip can't extract to a path with symlinks in it, exposed through a cpan tester who has that setup
+
+0.053	2019-01-03
+
+	Added option --dryrun and improved output during --no-harness/--dryrun
+	Only warn (don't die!) about 'meaningless' match/dependson queries
+
 0.052	2018-12-19
 
 	Need a minimum version on List::MoreUtils

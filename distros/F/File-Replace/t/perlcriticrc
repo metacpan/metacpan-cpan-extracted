@@ -11,3 +11,6 @@ severity = 2
 [Variables::ProhibitReusedNames]
 severity = 4
 
+[Modules::ProhibitExcessMainComplexity]
+severity = 2
+

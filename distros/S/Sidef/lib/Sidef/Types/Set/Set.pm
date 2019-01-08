@@ -62,6 +62,10 @@ package Sidef::Types::Set::Set {
     sub union {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
+
         my %C = %$A;
         foreach my $key (CORE::keys(%$B)) {
             if (!CORE::exists($C{$key})) {
@@ -76,6 +80,10 @@ package Sidef::Types::Set::Set {
 
     sub intersection {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
 
         my %C;
 
@@ -93,6 +101,10 @@ package Sidef::Types::Set::Set {
     sub difference {
         my ($A, $B) = @_;
 
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
+
         my %C;
 
         foreach my $key (CORE::keys(%$A)) {
@@ -104,10 +116,15 @@ package Sidef::Types::Set::Set {
         bless \%C, ref($A);
     }
 
+    *sub  = \&difference;
     *diff = \&difference;
 
     sub symmetric_difference {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
 
         my %C;
 
@@ -313,8 +330,20 @@ package Sidef::Types::Set::Set {
           : (Sidef::Types::Bool::Bool::FALSE);
     }
 
+    *haskey   = \&has;
+    *has_key  = \&has;
+    *exists   = \&has;
+    *include  = \&has;
+    *includes = \&has;
+    *contain  = \&has;
+    *contains = \&has;
+
     sub is_subset {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
 
         foreach my $key (CORE::keys(%$A)) {
             if (!CORE::exists($B->{$key})) {
@@ -325,10 +354,12 @@ package Sidef::Types::Set::Set {
         return Sidef::Types::Bool::Bool::TRUE;
     }
 
-    *contained_in = \&is_subset;
-
     sub is_superset {
         my ($A, $B) = @_;
+
+        if (ref($B) ne __PACKAGE__) {
+            $B = $B->to_set;
+        }
 
         foreach my $key (CORE::keys(%$B)) {
             if (!CORE::exists($A->{$key})) {
@@ -338,11 +369,6 @@ package Sidef::Types::Set::Set {
 
         return Sidef::Types::Bool::Bool::TRUE;
     }
-
-    *include  = \&is_superset;
-    *includes = \&is_superset;
-    *contain  = \&is_superset;
-    *contains = \&is_superset;
 
     sub contains_all {
         my ($self, @objects) = @_;
@@ -378,7 +404,8 @@ package Sidef::Types::Set::Set {
 
             my $s;
             "Set("
-              . join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @values) . ')';
+              . CORE::join(', ', map { (ref($_) && ($s = UNIVERSAL::can($_, 'dump'))) ? $s->($_) : ($_ // 'nil') } @values)
+              . ')';
         };
 
         local *Sidef::Types::Set::Set::dump = $sub;
@@ -416,21 +443,21 @@ package Sidef::Types::Set::Set {
 
         *{__PACKAGE__ . '::' . '+'}   = \&concat;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
-        *{__PACKAGE__ . '::' . '∪'} = \&union;
+        *{__PACKAGE__ . '::' . '∪'}   = \&union;
         *{__PACKAGE__ . '::' . '|'}   = \&union;
         *{__PACKAGE__ . '::' . '&'}   = \&intersection;
-        *{__PACKAGE__ . '::' . '∩'} = \&intersection;
+        *{__PACKAGE__ . '::' . '∩'}   = \&intersection;
         *{__PACKAGE__ . '::' . '-'}   = \&difference;
-        *{__PACKAGE__ . '::' . '∖'} = \&difference;
+        *{__PACKAGE__ . '::' . '∖'}   = \&difference;
         *{__PACKAGE__ . '::' . '^'}   = \&symmetric_difference;
         *{__PACKAGE__ . '::' . '<='}  = \&is_subset;
-        *{__PACKAGE__ . '::' . '≤'} = \&is_subset;
+        *{__PACKAGE__ . '::' . '≤'}   = \&is_subset;
         *{__PACKAGE__ . '::' . '>='}  = \&is_superset;
-        *{__PACKAGE__ . '::' . '≥'} = \&is_superset;
-        *{__PACKAGE__ . '::' . '⊆'} = \&is_subset;
-        *{__PACKAGE__ . '::' . '⊇'} = \&is_superset;
+        *{__PACKAGE__ . '::' . '≥'}   = \&is_superset;
+        *{__PACKAGE__ . '::' . '⊆'}   = \&is_subset;
+        *{__PACKAGE__ . '::' . '⊇'}   = \&is_superset;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
-        *{__PACKAGE__ . '::' . '≡'} = \&Sidef::Types::Hash::Hash::eq;
+        *{__PACKAGE__ . '::' . '≡'}   = \&Sidef::Types::Hash::Hash::eq;
     }
 };
 

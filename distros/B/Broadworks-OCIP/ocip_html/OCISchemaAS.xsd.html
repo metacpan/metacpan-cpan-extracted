@@ -1,0 +1,1603 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>XML Schema Documentation</title>
+<meta content="text/xml; charset=iso-8859-1" http-equiv="Content-Type" />
+<style type="text/css">
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* More-configurable styles */
+
+/******** General ********/
+
+/* Document body */
+body {
+   color: Black;
+   background-color: White;
+   font-family: Arial, sans-serif;
+   font-size: 10pt;
+}
+/* Horizontal rules */
+hr {
+   color: black;
+}
+/* Document title */
+h1 {
+   font-size: 18pt;
+   letter-spacing: 2px;
+   border-bottom: 1px #ccc solid;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+/* Main section headers */
+h2 {
+   font-size: 14pt;
+   letter-spacing: 1px;
+}
+/* Sub-section headers */
+h3, h3 a, h3 span {
+   font-size: 12pt;
+   font-weight: bold;
+   color: black;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties th, table.properties th a {
+   color: black;
+   background-color: #F99; /* Pink */
+}
+table.properties td {
+   background-color: #eee; /* Gray */
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   color: #963; /* Orange-brown */
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   border: 2px solid #999;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+   background-color: #ccc;
+}
+table.namespaces td {
+   background-color: #eee;
+}
+/* Target namespace of the schema */
+span.targetNS {
+   color: #06C;
+   font-weight: bold;
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+   color: #F93; /* Orange */
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   border: 2px solid #999; /* Gray */
+}
+
+/* XML Instance Representation table */
+div.sample div.contents {
+   border: 2px dashed black;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent div.contents {
+   border: 2px black solid;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   color: #036; /* Blue */
+}
+
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Printer-version styles */
+
+@media print {
+
+/* Ensures that controls are hidden when printing */
+div#printerControls {
+   visibility: hidden;
+}
+div#globalControls {
+   visibility: hidden;
+}
+#legend {
+   display: none;
+}
+#legendTOC {
+   display: none;
+}
+#glossary {
+   display: none;
+}
+#glossaryTOC {
+   display: none;
+}
+
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+/* Base styles */
+
+/******** General ********/
+
+/* Unordered lists */
+ul {
+   margin-left: 1.5em;
+   margin-bottom: 0em;
+}
+/* Tables */
+table {
+   margin-top: 10px;
+   margin-bottom: 10px;
+   margin-left: 2px;
+   margin-right: 2px;
+}
+table th, table td {
+   font-size: 10pt;
+   vertical-align: top;
+   padding-top: 3px;
+   padding-bottom: 3px;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+table th {
+   font-weight: bold;
+   text-align: left;
+}
+/* Table displaying the properties of the schema components or the
+   schema document itself */
+table.properties {
+   width: 90%;
+}
+table.properties th {
+   width: 30%;
+}
+/* Boxes that can make its content appear and disappear*/
+div.box {
+   margin: 1em;
+}
+   /* Box caption */
+div.box span.caption {
+   font-weight: bold;
+}
+   /* Button to open and close the box */
+div.box input.control {
+   width: 1.4em;
+   height: 1.4em;
+   text-align: center;
+   vertical-align: middle;
+   font-size: 11pt;
+}
+   /* Box contents */
+div.box div.contents {
+   margin-top: 3px;
+}
+
+
+/******** Table of Contents Section ********/
+
+/* Controls for switching between printing and viewing modes */
+div#printerControls {
+   white-space: nowrap;
+   font-weight: bold;
+   padding: 5px;
+   margin: 5px;
+}
+/* Controls that can collapse or expand all XML Instance
+   Representation and Schema Component Representation boxes */
+div#globalControls {
+   padding: 10px;
+   margin: 5px;
+}
+
+
+/******** Schema Document Properties Section ********/
+
+/* Table displaying the namespaces declared in the schema */
+table.namespaces th {
+}
+table.namespaces td {
+}
+/* Target namespace of the schema */
+span.targetNS {
+}
+
+
+/******** Schema Components' Sections ********/
+
+/* Name of schema component */
+.name {
+}
+
+/* Hierarchy table */
+table.hierarchy {
+   width: 90%;
+}
+table.hierarchy th {
+   font-weight: normal;
+   font-style: italic;
+   width: 20%;
+}
+table.hierarchy th, table.hierarchy td {
+   padding: 5px;
+}
+
+/* XML Instance Representation table */
+div.sample {
+   width: 90%;
+}
+div.sample div.contents {
+   padding: 5px;
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+}
+   /* Normal elements and attributes */
+div.sample div.contents, div.sample div.contents a {
+   color: black;
+}
+   /* Group Headers */
+div.sample div.contents .group, div.sample div.contents .group a {
+   color: #999; /* Light gray */
+}
+   /* Type Information */
+div.sample div.contents .type, div.sample div.contents .type a {
+   color: #999; /* Light gray */
+}
+   /* Occurrence Information */
+div.sample div.contents .occurs, div.sample div.contents .occurs a {
+   color: #999; /* Light gray */
+}
+   /* Fixed values */
+div.sample div.contents .fixed {
+   color: #063; /* Green */
+   font-weight: bold;
+}
+   /* Simple type constraints */
+div.sample div.contents .constraint, div.sample div.contents .constraint a {
+   color: #999; /* Light gray */
+}
+   /* Elements and attributes inherited from base type */
+div.sample div.contents .inherited, div.sample div.contents .inherited a {
+   color: #666; /* Dark gray */
+}
+   /* Elements and attributes added to or changed from base type */
+div.sample div.contents .newFields {
+   font-weight: bold;
+}
+   /* Other type of information */
+div.sample div.contents .other, div.sample div.contents .other a {
+   color: #369; /* Blue */
+   font-style: italic;
+}
+   /* Link to open up window displaying documentation */
+div.sample div.contents a.documentation {
+   text-decoration: none;
+   padding-left: 3px;
+   padding-right: 3px;
+   padding-top: 0px;
+   padding-bottom: 0px;
+   font-weight: bold;
+   font-size: 11pt;
+   background-color: #FFD;
+   color: #069;
+}
+   /* Invert colors when hovering over link to open up window 
+      displaying documentation */
+div.sample div.contents a.documentation:hover {
+   color: #FFD;
+   background-color: #069;
+}
+
+/* Schema Component Representation table */
+div.schemaComponent {
+   width: 90%;
+}
+div.schemaComponent div.contents {
+   font-family: Courier New, sans-serif;
+   font-size: 10pt;
+   padding: 5px;
+}
+   /* Syntax characters */
+div.schemaComponent div.contents {
+   color: #00f; /* blue */
+}
+   /* Element and attribute tags */
+div.schemaComponent div.contents .scTag {
+   color: #933; /* maroon */
+}
+   /* Element and attribute content */
+div.schemaComponent div.contents .scContent, div.schemaComponent div.contents .scContent a {
+   color: black;
+   font-weight: bold;
+}
+   /* Comments */
+div.schemaComponent div.contents .comment {
+   color: #999; /* Light gray */
+}
+
+/******** Legend Section ********/
+
+div#legend table, div#legend div {
+   margin-bottom: 3px;
+}
+div#legend div.hint {
+   color: #999; /* Light gray */
+   width: 90%;
+   margin-left: 1em;
+   margin-bottom: 2em;
+}
+
+
+/******** Glossary Section ********/
+
+/* Glossary Terms */
+.glossaryTerm {
+   font-weight: bold;
+}
+
+
+/******** Footer ********/
+
+.footer {
+   font-size: 8pt;
+}
+</style>
+<script type="text/javascript">
+<!--
+/* IDs of XML Instance Representation boxes */
+var xiBoxes = new Array();
+/* IDs of Schema Component Representation boxes */
+var scBoxes = new Array('schema_scbox');
+
+/**
+ * Can get the ID of the button controlling
+ * a collapseable box by concatenating
+ * this string onto the ID of the box itself.
+ */
+var B_SFIX = "_button";
+
+/**
+ * Counter of documentation windows
+ * Used to give each window a unique name
+ */
+var windowCount = 0;
+
+/**
+ * Returns an element in the current HTML document.
+ * 
+ * @param elementID Identifier of HTML element
+ * @return               HTML element object
+ */
+function getElementObject(elementID) {
+    var elemObj = null;
+    if (document.getElementById) {
+        elemObj = document.getElementById(elementID);
+    }
+    return elemObj;
+}             
+
+/**
+ * Closes a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function closeBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="none";
+
+     // Change text of button 
+     if (boxObj.style.display=="none") {
+        buttonObj.value=" + ";
+     }
+  }
+}
+
+/**
+ * Opens a collapseable box.
+ * 
+ * @param boxObj       Collapseable box
+ * @param buttonObj Button controlling box
+ */
+function openBox(boxObj, buttonObj) {
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else {
+     // Change 'display' CSS property of box
+     boxObj.style.display="block";
+
+     // Change text of button
+     if (boxObj.style.display=="block") {
+        buttonObj.value=" - ";
+     }
+  }
+}
+
+/**
+ * Sets the state of a collapseable box.
+ * 
+ * @param boxID Identifier of box
+ * @param open If true, box is "opened",
+ *             Otherwise, box is "closed".
+ */
+function setState(boxID, open) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (open) {
+     openBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  } else {
+     closeBox(boxObj, buttonObj);
+     // Make button visible
+     buttonObj.style.display="inline";
+  }
+}
+
+/**
+ * Switches the state of a collapseable box, e.g.
+ * if it's opened, it'll be closed, and vice versa.
+ * 
+ * @param boxID Identifier of box
+ */
+function switchState(boxID) {
+  var boxObj = getElementObject(boxID);
+  var buttonObj = getElementObject(boxID+B_SFIX);
+  if (boxObj == null || buttonObj == null) {
+     // Box or button not found
+  } else if (boxObj.style.display=="none") {
+     // Box is closed, so open it
+     openBox(boxObj, buttonObj);
+  } else if (boxObj.style.display=="block") {
+     // Box is opened, so close it
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Closes all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function collapseAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     closeBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Open all boxes in a given list.
+ * 
+ * @param boxList Array of box IDs
+ */
+function expandAll(boxList) {
+  var idx;
+  for (idx = 0; idx < boxList.length; idx++) {
+     var boxObj = getElementObject(boxList[idx]);
+     var buttonObj = getElementObject(boxList[idx]+B_SFIX);
+     openBox(boxObj, buttonObj);
+  }
+}
+
+/**
+ * Makes all the control buttons of boxes appear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function viewControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "inline";
+        }
+    }
+}
+
+/**
+ * Makes all the control buttons of boxes disappear.
+ * 
+ * @param boxList Array of box IDs
+ */
+function hideControlButtons(boxList) {
+    var idx;
+    for (idx = 0; idx < boxList.length; idx++) {
+        buttonObj = getElementObject(boxList[idx]+B_SFIX);
+        if (buttonObj != null) {
+            buttonObj.style.display = "none";
+        }
+    }
+}
+
+/**
+ * Sets the page for either printing mode
+ * or viewing mode. In printing mode, the page
+ * is made to be more readable when printing it out.
+ * In viewing mode, the page is more browsable.
+ *
+ * @param isPrinterVersion If true, display in
+ *                                 printing mode; otherwise, 
+ *                                 in viewing mode
+ */
+function displayMode(isPrinterVersion) {
+    var obj;
+    if (isPrinterVersion) {
+        // Hide global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "hidden";
+        }
+        // Hide Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        // Hide Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "none";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Expand all Schema Component Representation tables
+        expandAll(scBoxes);
+
+        // Hide Control buttons
+        hideControlButtons(xiBoxes);
+        hideControlButtons(scBoxes);
+    } else {
+        // View global control buttons
+        obj = getElementObject("globalControls");
+        if (obj != null) {
+            obj.style.visibility = "visible";
+        }
+        // View Legend
+        obj = getElementObject("legend");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("legendTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        // View Glossary
+        obj = getElementObject("glossary");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+        obj = getElementObject("glossaryTOC");
+        if (obj != null) {
+            obj.style.display = "block";
+        }
+
+        // Expand all XML Instance Representation tables
+        expandAll(xiBoxes);
+        // Collapse all Schema Component Representation tables
+        collapseAll(scBoxes);
+
+        // View Control buttons
+        viewControlButtons(xiBoxes);
+        viewControlButtons(scBoxes);
+    }
+}
+
+/**
+ * Opens up a window displaying the documentation
+ * of a schema component in the XML Instance
+ * Representation table.
+ * 
+ * @param compDesc      Description of schema component 
+ * @param compName      Name of schema component 
+ * @param docTextArray Array containing the paragraphs 
+ *                           of the new document
+ */
+function viewDocumentation(compDesc, compName, docTextArray) {
+  var width = 400;
+  var height = 200;
+  var locX = 100;
+  var locY = 200;
+
+  /* Generate content */
+  var actualText = "<html>";
+  actualText += "<head><title>";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": " + compName;
+  }
+  actualText += "</title></head>";
+  actualText += "<body bgcolor=\"#FFFFEE\">";
+  // Title
+  actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 12pt; font-weight: bold; letter-spacing:1px;\">";
+  actualText += compDesc;
+  if (compName != '') {
+     actualText += ": <span style=\"color:#006699\">" + compName + "</span>";
+  }
+  actualText += "</p>";
+  // Documentation
+  var idx;
+  for (idx = 0; idx < docTextArray.length; idx++) {
+     actualText += "<p style=\"font-family: Arial, sans-serif; font-size: 10pt;\">" + docTextArray[idx] + "</p>";
+  }
+  // Link to close window
+  actualText += "<a href=\"javascript:void(0)\" onclick=\"window.close();\" style=\"font-family: Arial, sans-serif; font-size: 8pt;\">Close</a>";
+  actualText += "</body></html>";
+
+  /* Display window */
+  windowCount++;
+  var docWindow = window.open("", "documentation"+windowCount, "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable,alwaysRaised,dependent,titlebar=no,width="+width+",height="+height+",screenX="+locX+",left="+locX+",screenY="+locY+",top="+locY);
+  docWindow.document.write(actualText);
+}
+
+// -->
+</script>
+</head>
+<body>
+<h1>
+<a name="top">XML Schema Documentation</a>
+</h1>
+<div style="float: right;">
+<div style="display:none;" id="printerControls">
+<input onclick="displayMode(this.checked)" type="checkbox" />Printer-friendly Version</div>
+<script type="text/javascript">
+<!--
+
+var pc = getElementObject("printerControls");
+if (pc != null) {
+   pc.style.display="block";
+}
+               
+// -->
+</script>
+<div style="display:none" id="globalControls">
+<strong>XML Instance Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(xiBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(xiBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+<br />
+<br />
+<strong>Schema Component Representation:</strong>
+<br />
+<span style="margin-left: 1em; white-space: nowrap">[ <a onclick="expandAll(scBoxes)" href="javascript:void(0)">Expand All</a> | <a onclick="collapseAll(scBoxes)" href="javascript:void(0)">Collapse All</a> ]</span>
+</div>
+<script type="text/javascript">
+<!--
+
+var gc = getElementObject("globalControls");
+if (gc != null) {
+   gc.style.display="block";
+}
+               
+// -->
+</script>
+</div>
+<h2>Table of Contents</h2>
+<ul>
+<li>
+<a href="#SchemaProperties">Schema Document Properties</a>
+</li>
+</ul>
+<ul style="margin-top: 0em" id="legendTOC">
+<li>
+<a href="#Legend">Legend</a>
+</li>
+</ul>
+<ul style="margin-top: 0em" id="glossaryTOC">
+<li>
+<a href="#Glossary">Glossary</a>
+</li>
+</ul>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<h2>
+<a name="SchemaProperties">Schema Document Properties</a>
+</h2>
+<table class="properties">
+<tr>
+<th>
+<a href="#term_TargetNS" title="Look up 'Target Namespace' in glossary">Target Namespace</a>
+</th>
+<td>None</td>
+</tr>
+<tr>
+<th>Element and Attribute Namespaces</th>
+<td>
+<ul>
+<li>Global element and attribute declarations belong to this schema's target namespace.</li>
+<li>By default, local element declarations belong to this schema's target namespace.</li>
+<li>By default, local attribute declarations belong to this schema's target namespace.</li>
+</ul>
+</td>
+</tr>
+<tr>
+<th>Schema Composition</th>
+<td>
+<ul>
+<li>This schema imports schema(s) from the following namespace(s):<ul>
+<li>
+<em>C</em> (at <a href="OCISchemaBASE.xsd.html" title="Jump to schema documentation for 'OCISchemaBASE.xsd'.">OCISchemaBASE.xsd</a>)</li>
+</ul>
+</li>
+<li>This schema includes components from the following schema document(s):<ul>
+<li>
+<a href="OCISchemaDataTypes.xsd.html" title="Jump to schema documentation for 'OCISchemaDataTypes.xsd'.">OCISchemaDataTypes.xsd</a>
+</li>
+<li>
+<a href="OCISchemaSearchCriteria.xsd.html" title="Jump to schema documentation for 'OCISchemaSearchCriteria.xsd'.">OCISchemaSearchCriteria.xsd</a>
+</li>
+<li>
+<a href="OCISchemaEnterprise.xsd.html" title="Jump to schema documentation for 'OCISchemaEnterprise.xsd'.">OCISchemaEnterprise.xsd</a>
+</li>
+<li>
+<a href="OCISchemaGroup.xsd.html" title="Jump to schema documentation for 'OCISchemaGroup.xsd'.">OCISchemaGroup.xsd</a>
+</li>
+<li>
+<a href="OCISchemaLogin.xsd.html" title="Jump to schema documentation for 'OCISchemaLogin.xsd'.">OCISchemaLogin.xsd</a>
+</li>
+<li>
+<a href="OCISchemaServiceProvider.xsd.html" title="Jump to schema documentation for 'OCISchemaServiceProvider.xsd'.">OCISchemaServiceProvider.xsd</a>
+</li>
+<li>
+<a href="OCISchemaSystem.xsd.html" title="Jump to schema documentation for 'OCISchemaSystem.xsd'.">OCISchemaSystem.xsd</a>
+</li>
+<li>
+<a href="OCISchemaUser.xsd.html" title="Jump to schema documentation for 'OCISchemaUser.xsd'.">OCISchemaUser.xsd</a>
+</li>
+<li>
+<a href="OCISchemaASDeprecatedSpecialExceptions.xsd.html" title="Jump to schema documentation for 'OCISchemaASDeprecatedSpecialExceptions.xsd'.">OCISchemaASDeprecatedSpecialExceptions.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaService3G4GContinuity.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaService3G4GContinuity.xsd'.">Services/OCISchemaService3G4GContinuity.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAccountAuthorizationCodes.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAccountAuthorizationCodes.xsd'.">Services/OCISchemaServiceAccountAuthorizationCodes.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAdviceOfCharge.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAdviceOfCharge.xsd'.">Services/OCISchemaServiceAdviceOfCharge.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAlternateNumbers.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAlternateNumbers.xsd'.">Services/OCISchemaServiceAlternateNumbers.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAnonymousCallRejection.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAnonymousCallRejection.xsd'.">Services/OCISchemaServiceAnonymousCallRejection.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAttendantConsole.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAttendantConsole.xsd'.">Services/OCISchemaServiceAttendantConsole.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAuthentication.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAuthentication.xsd'.">Services/OCISchemaServiceAuthentication.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAutoAttendant.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAutoAttendant.xsd'.">Services/OCISchemaServiceAutoAttendant.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAutomaticCallback.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAutomaticCallback.xsd'.">Services/OCISchemaServiceAutomaticCallback.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceAutomaticHoldRetrieve.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceAutomaticHoldRetrieve.xsd'.">Services/OCISchemaServiceAutomaticHoldRetrieve.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceBargeInExempt.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceBargeInExempt.xsd'.">Services/OCISchemaServiceBargeInExempt.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceBasicCallLogs.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceBasicCallLogs.xsd'.">Services/OCISchemaServiceBasicCallLogs.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceBroadWorksAnywhere.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceBroadWorksAnywhere.xsd'.">Services/OCISchemaServiceBroadWorksAnywhere.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceBroadWorksMobility.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceBroadWorksMobility.xsd'.">Services/OCISchemaServiceBroadWorksMobility.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceGroupPaging.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceGroupPaging.xsd'.">Services/OCISchemaServiceGroupPaging.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceBusyLampField.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceBusyLampField.xsd'.">Services/OCISchemaServiceBusyLampField.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallCapacityManagement.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallCapacityManagement.xsd'.">Services/OCISchemaServiceCallCapacityManagement.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallCenter.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallCenter.xsd'.">Services/OCISchemaServiceCallCenter.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallCenterMonitoring.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallCenterMonitoring.xsd'.">Services/OCISchemaServiceCallCenterMonitoring.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallForwardingAlways.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallForwardingAlways.xsd'.">Services/OCISchemaServiceCallForwardingAlways.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallForwardingBusy.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallForwardingBusy.xsd'.">Services/OCISchemaServiceCallForwardingBusy.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallForwardingNoAnswer.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallForwardingNoAnswer.xsd'.">Services/OCISchemaServiceCallForwardingNoAnswer.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallForwardingNotReachable.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallForwardingNotReachable.xsd'.">Services/OCISchemaServiceCallForwardingNotReachable.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallingLineIDBlockingOverride.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallingLineIDBlockingOverride.xsd'.">Services/OCISchemaServiceCallingLineIDBlockingOverride.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallingLineIDDeliveryBlocking.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallingLineIDDeliveryBlocking.xsd'.">Services/OCISchemaServiceCallingLineIDDeliveryBlocking.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallingNameDelivery.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallingNameDelivery.xsd'.">Services/OCISchemaServiceCallingNameDelivery.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallingNameRetrieval.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallingNameRetrieval.xsd'.">Services/OCISchemaServiceCallingNameRetrieval.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallingNumberDelivery.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallingNumberDelivery.xsd'.">Services/OCISchemaServiceCallingNumberDelivery.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallingPartyCategory.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallingPartyCategory.xsd'.">Services/OCISchemaServiceCallingPartyCategory.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallingPlan.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallingPlan.xsd'.">Services/OCISchemaServiceCallingPlan.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallForwardingSelective.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallForwardingSelective.xsd'.">Services/OCISchemaServiceCallForwardingSelective.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallMeNow.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallMeNow.xsd'.">Services/OCISchemaServiceCallMeNow.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallNotify.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallNotify.xsd'.">Services/OCISchemaServiceCallNotify.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallPark.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallPark.xsd'.">Services/OCISchemaServiceCallPark.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallPickup.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallPickup.xsd'.">Services/OCISchemaServiceCallPickup.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallReturn.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallReturn.xsd'.">Services/OCISchemaServiceCallReturn.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallRecording.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallRecording.xsd'.">Services/OCISchemaServiceCallRecording.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallTransfer.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallTransfer.xsd'.">Services/OCISchemaServiceCallTransfer.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCallWaiting.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCallWaiting.xsd'.">Services/OCISchemaServiceCallWaiting.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceChargeNumber.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceChargeNumber.xsd'.">Services/OCISchemaServiceChargeNumber.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceClassMark.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceClassMark.xsd'.">Services/OCISchemaServiceClassMark.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCommPilotCallManager.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCommPilotCallManager.xsd'.">Services/OCISchemaServiceCommPilotCallManager.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCommPilotExpress.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCommPilotExpress.xsd'.">Services/OCISchemaServiceCommPilotExpress.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCommPilotExpressSR.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCommPilotExpressSR.xsd'.">Services/OCISchemaServiceCommPilotExpressSR.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCommunicationBarringUserControl.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCommunicationBarringUserControl.xsd'.">Services/OCISchemaServiceCommunicationBarringUserControl.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCommunicator.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCommunicator.xsd'.">Services/OCISchemaServiceCommunicator.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceConnectedLineIdentificationRestriction.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceConnectedLineIdentificationRestriction.xsd'.">Services/OCISchemaServiceConnectedLineIdentificationRestriction.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceConnectedLineIdentificationPresentation.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceConnectedLineIdentificationPresentation.xsd'.">Services/OCISchemaServiceConnectedLineIdentificationPresentation.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCustomRingback.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCustomRingback.xsd'.">Services/OCISchemaServiceCustomRingback.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceDirectedCallPickupWithBargeIn.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceDirectedCallPickupWithBargeIn.xsd'.">Services/OCISchemaServiceDirectedCallPickupWithBargeIn.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceDirectoryNumberHunting.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceDirectoryNumberHunting.xsd'.">Services/OCISchemaServiceDirectoryNumberHunting.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceDoNotDisturb.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceDoNotDisturb.xsd'.">Services/OCISchemaServiceDoNotDisturb.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceDualModeVCC.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceDualModeVCC.xsd'.">Services/OCISchemaServiceDualModeVCC.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceEmergencyZones.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceEmergencyZones.xsd'.">Services/OCISchemaServiceEmergencyZones.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceEnhancedCallLogs.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceEnhancedCallLogs.xsd'.">Services/OCISchemaServiceEnhancedCallLogs.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceExecutive.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceExecutive.xsd'.">Services/OCISchemaServiceExecutive.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceExecutiveAssistant.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceExecutiveAssistant.xsd'.">Services/OCISchemaServiceExecutiveAssistant.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceExternalCallingLineIDDelivery.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceExternalCallingLineIDDelivery.xsd'.">Services/OCISchemaServiceExternalCallingLineIDDelivery.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceExternalCustomRingback.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceExternalCustomRingback.xsd'.">Services/OCISchemaServiceExternalCustomRingback.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceFaxMessaging.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceFaxMessaging.xsd'.">Services/OCISchemaServiceFaxMessaging.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceFindMeFollowMe.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceFindMeFollowMe.xsd'.">Services/OCISchemaServiceFindMeFollowMe.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceFlexibleSeatingGuest.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceFlexibleSeatingGuest.xsd'.">Services/OCISchemaServiceFlexibleSeatingGuest.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceGroupNightForwarding.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceGroupNightForwarding.xsd'.">Services/OCISchemaServiceGroupNightForwarding.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceHotelingGuest.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceHotelingGuest.xsd'.">Services/OCISchemaServiceHotelingGuest.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceHotelingHost.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceHotelingHost.xsd'.">Services/OCISchemaServiceHotelingHost.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceHuntGroup.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceHuntGroup.xsd'.">Services/OCISchemaServiceHuntGroup.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceInCallServiceActivation.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceInCallServiceActivation.xsd'.">Services/OCISchemaServiceInCallServiceActivation.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceINIntegration.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceINIntegration.xsd'.">Services/OCISchemaServiceINIntegration.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceIncomingCallingPlan.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceIncomingCallingPlan.xsd'.">Services/OCISchemaServiceIncomingCallingPlan.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceInstantGroupCall.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceInstantGroupCall.xsd'.">Services/OCISchemaServiceInstantGroupCall.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceIntegratedIMP.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceIntegratedIMP.xsd'.">Services/OCISchemaServiceIntegratedIMP.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceIntelligentNetworkServiceControl.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceIntelligentNetworkServiceControl.xsd'.">Services/OCISchemaServiceIntelligentNetworkServiceControl.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceInternalCallingLineIDDelivery.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceInternalCallingLineIDDelivery.xsd'.">Services/OCISchemaServiceInternalCallingLineIDDelivery.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceInventoryReport.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceInventoryReport.xsd'.">Services/OCISchemaServiceInventoryReport.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceIntercept.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceIntercept.xsd'.">Services/OCISchemaServiceIntercept.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceLegacyAutomaticCallback.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceLegacyAutomaticCallback.xsd'.">Services/OCISchemaServiceLegacyAutomaticCallback.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceLDAPIntegration.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceLDAPIntegration.xsd'.">Services/OCISchemaServiceLDAPIntegration.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceLocationBasedCallingRestrictions.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceLocationBasedCallingRestrictions.xsd'.">Services/OCISchemaServiceLocationBasedCallingRestrictions.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceMaliciousCallTrace.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceMaliciousCallTrace.xsd'.">Services/OCISchemaServiceMaliciousCallTrace.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceMeetMeConferencing.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceMeetMeConferencing.xsd'.">Services/OCISchemaServiceMeetMeConferencing.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceMusicOnHold.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceMusicOnHold.xsd'.">Services/OCISchemaServiceMusicOnHold.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceMWIDeliveryToMobileEndpoint.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceMWIDeliveryToMobileEndpoint.xsd'.">Services/OCISchemaServiceMWIDeliveryToMobileEndpoint.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceNumberPortabilityAnnouncement.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceNumberPortabilityAnnouncement.xsd'.">Services/OCISchemaServiceNumberPortabilityAnnouncement.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceOutlookIntegration.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceOutlookIntegration.xsd'.">Services/OCISchemaServiceOutlookIntegration.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceOutgoingCallingPlan.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceOutgoingCallingPlan.xsd'.">Services/OCISchemaServiceOutgoingCallingPlan.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceOutlookIntegration.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceOutlookIntegration.xsd'.">Services/OCISchemaServiceOutlookIntegration.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePhysicalLocation.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePhysicalLocation.xsd'.">Services/OCISchemaServicePhysicalLocation.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePreAlertingAnnouncement.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePreAlertingAnnouncement.xsd'.">Services/OCISchemaServicePreAlertingAnnouncement.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePreferredCarrier.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePreferredCarrier.xsd'.">Services/OCISchemaServicePreferredCarrier.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePolycomPhoneServices.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePolycomPhoneServices.xsd'.">Services/OCISchemaServicePolycomPhoneServices.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePriorityAlert.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePriorityAlert.xsd'.">Services/OCISchemaServicePriorityAlert.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePrepaid.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePrepaid.xsd'.">Services/OCISchemaServicePrepaid.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePrivacy.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePrivacy.xsd'.">Services/OCISchemaServicePrivacy.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServicePushToTalk.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServicePushToTalk.xsd'.">Services/OCISchemaServicePushToTalk.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceReceptionistEnterprise.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceReceptionistEnterprise.xsd'.">Services/OCISchemaServiceReceptionistEnterprise.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceReceptionistOffice.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceReceptionistOffice.xsd'.">Services/OCISchemaServiceReceptionistOffice.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceReceptionistSmallBusiness.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceReceptionistSmallBusiness.xsd'.">Services/OCISchemaServiceReceptionistSmallBusiness.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceRemoteOffice.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceRemoteOffice.xsd'.">Services/OCISchemaServiceRemoteOffice.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceRoutePoint.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceRoutePoint.xsd'.">Services/OCISchemaServiceRoutePoint.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSecurityClassification.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSecurityClassification.xsd'.">Services/OCISchemaServiceSecurityClassification.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSelectiveCallAcceptance.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSelectiveCallAcceptance.xsd'.">Services/OCISchemaServiceSelectiveCallAcceptance.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSelectiveCallRejection.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSelectiveCallRejection.xsd'.">Services/OCISchemaServiceSelectiveCallRejection.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSequentialRing.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSequentialRing.xsd'.">Services/OCISchemaServiceSequentialRing.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSeriesCompletion.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSeriesCompletion.xsd'.">Services/OCISchemaServiceSeriesCompletion.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceServiceScripts.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceServiceScripts.xsd'.">Services/OCISchemaServiceServiceScripts.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSharedCallAppearance.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSharedCallAppearance.xsd'.">Services/OCISchemaServiceSharedCallAppearance.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSimultaneousRingFamily.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSimultaneousRingFamily.xsd'.">Services/OCISchemaServiceSimultaneousRingFamily.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSimultaneousRingPersonal.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSimultaneousRingPersonal.xsd'.">Services/OCISchemaServiceSimultaneousRingPersonal.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSMDIMessageDesk.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSMDIMessageDesk.xsd'.">Services/OCISchemaServiceSMDIMessageDesk.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSpeedDial8.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSpeedDial8.xsd'.">Services/OCISchemaServiceSpeedDial8.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceSpeedDial100.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceSpeedDial100.xsd'.">Services/OCISchemaServiceSpeedDial100.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceThirdPartyIMP.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceThirdPartyIMP.xsd'.">Services/OCISchemaServiceThirdPartyIMP.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceThirdPartyVoiceMailSupport.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceThirdPartyVoiceMailSupport.xsd'.">Services/OCISchemaServiceThirdPartyVoiceMailSupport.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceTrunkGroup.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceTrunkGroup.xsd'.">Services/OCISchemaServiceTrunkGroup.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceTwoStageDialing.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceTwoStageDialing.xsd'.">Services/OCISchemaServiceTwoStageDialing.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceVideoAddOn.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceVideoAddOn.xsd'.">Services/OCISchemaServiceVideoAddOn.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceVirtualOnNetEnterpriseExtensions.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceVirtualOnNetEnterpriseExtensions.xsd'.">Services/OCISchemaServiceVirtualOnNetEnterpriseExtensions.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceVoiceMessaging.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceVoiceMessaging.xsd'.">Services/OCISchemaServiceVoiceMessaging.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceVoicePortalCalling.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceVoicePortalCalling.xsd'.">Services/OCISchemaServiceVoicePortalCalling.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceVoiceXml.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceVoiceXml.xsd'.">Services/OCISchemaServiceVoiceXml.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceZoneCallingRestrictions.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceZoneCallingRestrictions.xsd'.">Services/OCISchemaServiceZoneCallingRestrictions.xsd</a>
+</li>
+<li>
+<a href="Services/OCISchemaServiceCustomerOriginatedTrace.xsd.html" title="Jump to schema documentation for 'Services/OCISchemaServiceCustomerOriginatedTrace.xsd'.">Services/OCISchemaServiceCustomerOriginatedTrace.xsd</a>
+</li>
+<li>
+<a href="OCISchemaDeprecated14.xsd.html" title="Jump to schema documentation for 'OCISchemaDeprecated14.xsd'.">OCISchemaDeprecated14.xsd</a>
+</li>
+<li>
+<a href="OCISchemaDeprecated15.xsd.html" title="Jump to schema documentation for 'OCISchemaDeprecated15.xsd'.">OCISchemaDeprecated15.xsd</a>
+</li>
+<li>
+<a href="OCISchemaDeprecated16.xsd.html" title="Jump to schema documentation for 'OCISchemaDeprecated16.xsd'.">OCISchemaDeprecated16.xsd</a>
+</li>
+<li>
+<a href="OCISchemaDeprecated17.xsd.html" title="Jump to schema documentation for 'OCISchemaDeprecated17.xsd'.">OCISchemaDeprecated17.xsd</a>
+</li>
+<li>
+<a href="OCISchemaDeprecated18.xsd.html" title="Jump to schema documentation for 'OCISchemaDeprecated18.xsd'.">OCISchemaDeprecated18.xsd</a>
+</li>
+<li>
+<a href="OCISchemaDeprecated19.xsd.html" title="Jump to schema documentation for 'OCISchemaDeprecated19.xsd'.">OCISchemaDeprecated19.xsd</a>
+</li>
+<li>
+<a href="OCISchemaDeprecated20.xsd.html" title="Jump to schema documentation for 'OCISchemaDeprecated20.xsd'.">OCISchemaDeprecated20.xsd</a>
+</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</table>
+<h3>Declared Namespaces</h3>
+<table class="namespaces">
+<tr>
+<th>Prefix</th>
+<th>Namespace</th>
+</tr>
+<tr>
+<td>
+<a name="ns_xml">xml</a>
+</td>
+<td>http://www.w3.org/XML/1998/namespace</td>
+</tr>
+<tr>
+<td>
+<a name="ns_xs">xs</a>
+</td>
+<td>http://www.w3.org/2001/XMLSchema</td>
+</tr>
+<tr>
+<td>
+<a name="ns_core">core</a>
+</td>
+<td>C</td>
+</tr>
+</table>
+<div class="schemaComponent box">
+<div>
+<input style="display: none" onclick="switchState('schema_scbox'); return false;" class="control" id="schema_scbox_button" type="button" /> <span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents" id="schema_scbox">
+<div style="margin-left: 0em">&lt;<span class="scTag">xs:schema</span> <span class="scTag">attributeFormDefault</span>="<span class="scContent">qualified</span>" <span class="scTag">elementFormDefault</span>="<span class="scContent">qualified</span>"&gt;<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:import</span> <span class="scTag">namespace</span>="<span class="scContent">C</span>" <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaBASE.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDataTypes.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaSearchCriteria.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaEnterprise.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaGroup.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaLogin.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaServiceProvider.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaSystem.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaUser.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaASDeprecatedSpecialExceptions.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaService3G4GContinuity.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAccountAuthorizationCodes.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAdviceOfCharge.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAlternateNumbers.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAnonymousCallRejection.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAttendantConsole.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAuthentication.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAutoAttendant.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAutomaticCallback.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceAutomaticHoldRetrieve.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceBargeInExempt.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceBasicCallLogs.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceBroadWorksAnywhere.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceBroadWorksMobility.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceGroupPaging.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceBusyLampField.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallCapacityManagement.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallCenter.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallCenterMonitoring.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallForwardingAlways.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallForwardingBusy.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallForwardingNoAnswer.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallForwardingNotReachable.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallingLineIDBlockingOverride.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallingLineIDDeliveryBlocking.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallingNameDelivery.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallingNameRetrieval.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallingNumberDelivery.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallingPartyCategory.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallingPlan.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallForwardingSelective.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallMeNow.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallNotify.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallPark.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallPickup.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallReturn.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallRecording.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallTransfer.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCallWaiting.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceChargeNumber.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceClassMark.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCommPilotCallManager.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCommPilotExpress.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCommPilotExpressSR.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCommunicationBarringUserControl.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCommunicator.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceConnectedLineIdentificationRestriction.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceConnectedLineIdentificationPresentation.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCustomRingback.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceDirectedCallPickupWithBargeIn.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceDirectoryNumberHunting.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceDoNotDisturb.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceDualModeVCC.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceEmergencyZones.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceEnhancedCallLogs.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceExecutive.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceExecutiveAssistant.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceExternalCallingLineIDDelivery.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceExternalCustomRingback.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceFaxMessaging.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceFindMeFollowMe.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceFlexibleSeatingGuest.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceGroupNightForwarding.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceHotelingGuest.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceHotelingHost.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceHuntGroup.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceInCallServiceActivation.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceINIntegration.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceIncomingCallingPlan.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceInstantGroupCall.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceIntegratedIMP.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceIntelligentNetworkServiceControl.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceInternalCallingLineIDDelivery.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceInventoryReport.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceIntercept.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceLegacyAutomaticCallback.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceLDAPIntegration.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceLocationBasedCallingRestrictions.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceMaliciousCallTrace.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceMeetMeConferencing.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceMusicOnHold.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceMWIDeliveryToMobileEndpoint.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceNumberPortabilityAnnouncement.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceOutlookIntegration.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceOutgoingCallingPlan.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceOutlookIntegration.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePhysicalLocation.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePreAlertingAnnouncement.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePreferredCarrier.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePolycomPhoneServices.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePriorityAlert.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePrepaid.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePrivacy.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServicePushToTalk.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceReceptionistEnterprise.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceReceptionistOffice.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceReceptionistSmallBusiness.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceRemoteOffice.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceRoutePoint.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSecurityClassification.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSelectiveCallAcceptance.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSelectiveCallRejection.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSequentialRing.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSeriesCompletion.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceServiceScripts.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSharedCallAppearance.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSimultaneousRingFamily.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSimultaneousRingPersonal.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSMDIMessageDesk.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSpeedDial8.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceSpeedDial100.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceThirdPartyIMP.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceThirdPartyVoiceMailSupport.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceTrunkGroup.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceTwoStageDialing.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceVideoAddOn.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceVirtualOnNetEnterpriseExtensions.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceVoiceMessaging.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceVoicePortalCalling.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceVoiceXml.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceZoneCallingRestrictions.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">Services/OCISchemaServiceCustomerOriginatedTrace.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDeprecated14.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDeprecated15.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDeprecated16.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDeprecated17.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDeprecated18.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDeprecated19.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em">&lt;<span class="scTag">xs:include</span> <span class="scTag">schemaLocation</span>="<span class="scContent">OCISchemaDeprecated20.xsd</span>"/&gt;</div>
+<div style="margin-left: 1.5em" class="scContent">...</div>&lt;/<span class="scTag">xs:schema</span>&gt;</div>
+</div>
+<script type="text/javascript">
+<!--
+setState('schema_scbox', false);
+// -->
+</script>
+</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+<div id="legend">
+<h2>
+<a name="Legend">Legend</a>
+</h2>
+<div style="float: left; width: 15em;">
+<h3 style="margin-bottom: 0px;">Complex Type:</h3>
+<div style="margin-left: 0em;" class="hint">Schema Component Type</div>
+</div>
+<div style="float: left; width: 15em;">
+<h3 style="margin-bottom: 0px;">
+<span class="name">AusAddress</span>
+</h3>
+<div style="margin-left: 0em;" class="hint">Schema Component Name</div>
+</div>
+<table style="clear : both" class="hierarchy">
+<tr>
+<th>Parent type:</th>
+<td>
+<span style="color: #0000FF; text-decoration:underline;" class="type">Address</span> (derivation method: extension)</td>
+</tr>
+<tr>
+<th>Sub-types:</th>
+<td>
+<ul>
+<li>
+<span style="color: #0000FF; text-decoration:underline;" class="type">QLDAddress</span> (by restriction)</li>
+</ul>
+</td>
+</tr>
+</table>
+<div class="hint">If this schema component is a type definition, its type hierarchy is shown in a gray-bordered box.</div>
+<table class="properties">
+<tr>
+<th>Name</th>
+<td>AusAddress</td>
+</tr>
+<tr>
+<th>
+<a href="#term_Abstract" title="Look up 'Abstract' in glossary">Abstract</a>
+</th>
+<td>no</td>
+</tr>
+</table>
+<div class="hint">The table above displays the properties of this schema component.</div>
+<div class="sample box">
+<div>
+<span class="caption">XML Instance Representation</span>
+</div>
+<div class="contents">
+<span style="margin-left: 0em">&lt;...</span>
+<span class="newFields">
+<span> country="<span class="fixed">Australia</span>"</span>
+</span>&gt; <br />
+<span class="inherited" style="margin-left: 1.5em">&lt;unitNo&gt; <span class="type">string</span> &lt;/unitNo&gt; <span class="occurs">[0..1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 1.5em">&lt;houseNo&gt; <span class="type">string</span> &lt;/houseNo&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 1.5em">&lt;street&gt; <span class="type">string</span> &lt;/street&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span style="margin-left: 1.5em" class="group">Start <a href="#term_Choice" title="Look up 'Choice' in glossary">Choice</a>
+<span class="occurs">[1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 3em">&lt;city&gt; <span class="type">string</span> &lt;/city&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span class="inherited" style="margin-left: 3em">&lt;town&gt; <span class="type">string</span> &lt;/town&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span style="margin-left: 1.5em" class="group">End Choice</span>
+<br />
+<span class="newFields">
+<span style="margin-left: 1.5em">&lt;state&gt; <span style="text-decoration:underline;" class="type">AusStates</span> &lt;/state&gt; <span class="occurs">[1]</span>
+</span>
+<br />
+<span style="margin-left: 1.5em">&lt;postcode&gt; <span class="constraint">string &lt;&lt;<em>pattern</em> = [1-9][0-9]{3}&gt;&gt;</span> &lt;/postcode&gt; <span class="occurs">[1]</span>
+<a onclick="docArray = new Array('Post code must be a four-digit number.'); viewDocumentation('Element', 'postcode', docArray);" class="documentation" title="View Documentation" href="javascript:void(0)">?</a>
+</span>
+<br />
+</span>
+<span style="margin-left: 0em">&lt;/...&gt;</span>
+<br />
+</div>
+</div>
+<div class="hint">
+<p>The XML Instance Representation table above shows the schema component's content as an XML instance.</p>
+<ul>
+<li>The minimum and maximum occurrence of elements and attributes are provided in square brackets, e.g. [0..1].</li>
+<li>Model group information are shown in gray, e.g. Start Choice ... End Choice.</li>
+<li>For type derivations, the elements and attributes that have been added to or changed from the base type's content are shown in <span style="font-weight: bold">bold</span>.</li>
+<li>If an element/attribute has a fixed value, the fixed value is shown in green, e.g. country="Australia".</li>
+<li>Otherwise, the type of the element/attribute is displayed.
+               <ul>
+<li>If the element/attribute's type is in the schema, a link is provided to it.</li>
+<li>For local simple type definitions, the constraints are displayed in angle brackets, e.g. &lt;&lt;<em>pattern</em> = [1-9][0-9]{3}&gt;&gt;.</li>
+</ul>
+</li>
+<li>If a local element/attribute has documentation, it will be displayed in a window that pops up when the question mark inside the attribute or next to the element is clicked, e.g. &lt;postcode&gt;.</li>
+</ul>
+</div>
+<div class="schemaComponent box">
+<div>
+<span class="caption">Schema Component Representation</span>
+</div>
+<div class="contents">
+<span style="margin-left: 0em">&lt;<span class="scTag">complexType</span>
+<span class="scTag">name</span>="<span class="scContent">AusAddress</span>"&gt;</span>
+<br />
+<span style="margin-left: 1.5em">&lt;<span class="scTag">complexContent</span>&gt;</span>
+<br />
+<span style="margin-left: 3em">&lt;<span class="scTag">extension</span>
+<span class="scTag">base</span>="<span class="scContent">
+<span style="text-decoration:underline;" class="type">Address</span>
+</span>"&gt;</span>
+<br />
+<span style="margin-left: 4.5em">&lt;<span class="scTag">sequence</span>&gt;</span>
+<br />
+<span style="margin-left: 6em">&lt;<span class="scTag">element</span>
+<span class="scTag">name</span>="<span class="scContent">state</span>" <span class="scTag">type</span>="<span class="scContent">
+<span style="text-decoration:underline;" class="type">AusStates</span>
+</span>"/&gt;</span>
+<br />
+<span style="margin-left: 6em">&lt;<span class="scTag">element</span>
+<span class="scTag">name</span>="<span class="scContent">postcode</span>"&gt;</span>
+<br />
+<span style="margin-left: 7.5em">&lt;<span class="scTag">simpleType</span>&gt;</span>
+<br />
+<span style="margin-left: 9em">&lt;<span class="scTag">restriction</span>
+<span class="scTag">base</span>="<span class="scContent">
+<span class="type">string</span>
+</span>"&gt;</span>
+<br />
+<span style="margin-left: 10.5em">&lt;<span class="scTag">pattern</span>
+<span class="scTag">value</span>="<span class="scContent">[1-9][0-9]{3}</span>"/&gt;</span>
+<br />
+<span style="margin-left: 9em">&lt;/<span class="scTag">restriction</span>&gt;</span>
+<br />
+<span style="margin-left: 7.5em">&lt;/<span class="scTag">simpleType</span>&gt;</span>
+<br />
+<span style="margin-left: 6em">&lt;/<span class="scTag">element</span>&gt;</span>
+<br />
+<span style="margin-left: 4.5em">&lt;/<span class="scTag">sequence</span>&gt;</span>
+<br />
+<span style="margin-left: 4.5em">&lt;<span class="scTag">attribute</span>
+<span class="scTag">name</span>="<span class="scContent">country</span>" <span class="scTag">type</span>="<span class="scContent">
+<span class="type">string</span>
+</span>" <span class="scTag">fixed</span>="<span class="scContent">Australia</span>"/&gt;</span>
+<br />
+<span style="margin-left: 3em">&lt;/<span class="scTag">extension</span>&gt;</span>
+<br />
+<span style="margin-left: 1.5em">&lt;/<span class="scTag">complexContent</span>&gt;</span>
+<br />
+<span style="margin-left: 0em">&lt;/<span class="scTag">complexType</span>&gt;</span>
+<br />
+</div>
+</div>
+<div class="hint">The Schema Component Representation table above displays the underlying XML representation of the schema component. (Annotations are not shown.)</div>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+</div>
+<div id="glossary">
+<h2>
+<a name="Glossary">Glossary</a>
+</h2>
+<p>
+<span class="glossaryTerm">
+<a name="term_Abstract">Abstract</a> </span>(Applies to complex type definitions and element declarations). An abstract element or complex type cannot used to validate an element instance. If there is a reference to an abstract element, only element declarations that can substitute the abstract element can be used to validate the instance. For references to abstract type definitions, only derived types can be used.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_All">All Model Group</a> </span>Child elements can be provided <em xmlns="http://www.w3.org/1999/xhtml">in any order</em> in instances. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#element-all" title="http://www.w3.org/TR/xmlschema-1/#element-all">http://www.w3.org/TR/xmlschema-1/#element-all</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Choice">Choice Model Group</a> </span>
+<em>Only one</em> from the list of child elements and model groups can be provided in instances. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#element-choice" title="http://www.w3.org/TR/xmlschema-1/#element-choice">http://www.w3.org/TR/xmlschema-1/#element-choice</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_CollapseWS">Collapse Whitespace Policy</a> </span>Replace tab, line feed, and carriage return characters with space character (Unicode character 32). Then, collapse contiguous sequences of space characters into single space character, and remove leading and trailing space characters.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_ElemBlock">Disallowed Substitutions</a> </span>(Applies to element declarations). If <em xmlns="http://www.w3.org/1999/xhtml">substitution</em> is specified, then <a xmlns="http://www.w3.org/1999/xhtml" href="#term_SubGroup" title="Look up 'substitution group' in glossary">substitution group</a> members cannot be used in place of the given element declaration to validate element instances. If <em xmlns="http://www.w3.org/1999/xhtml">derivation methods</em>, e.g. extension, restriction, are specified, then the given element declaration will not validate element instances that have types derived from the element declaration's type using the specified derivation methods. Normally, element instances can override their declaration's type by specifying an <code xmlns="http://www.w3.org/1999/xhtml">xsi:type</code> attribute.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_Key">Key Constraint</a> </span>Like <a xmlns="http://www.w3.org/1999/xhtml" href="#term_Unique" title="Look up 'Uniqueness Constraint' in glossary">Uniqueness Constraint</a>, but additionally requires that the specified value(s) must be provided. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions" title="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions">http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_KeyRef">Key Reference Constraint</a> </span>Ensures that the specified value(s) must match value(s) from a <a xmlns="http://www.w3.org/1999/xhtml" href="#term_Key" title="Look up 'Key Constraint' in glossary">Key Constraint</a> or <a xmlns="http://www.w3.org/1999/xhtml" href="#term_Unique" title="Look up 'Uniqueness Constraint' in glossary">Uniqueness Constraint</a>. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions" title="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions">http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_ModelGroup">Model Group</a> </span>Groups together element content, specifying the order in which the element content can occur and the number of times the group of element content may be repeated. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#Model_Groups" title="http://www.w3.org/TR/xmlschema-1/#Model_Groups">http://www.w3.org/TR/xmlschema-1/#Model_Groups</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Nillable">Nillable</a> </span>(Applies to element declarations). If an element declaration is nillable, instances can use the <code xmlns="http://www.w3.org/1999/xhtml">xsi:nil</code> attribute. The <code xmlns="http://www.w3.org/1999/xhtml">xsi:nil</code> attribute is the boolean attribute, <em xmlns="http://www.w3.org/1999/xhtml">nil</em>, from the <em xmlns="http://www.w3.org/1999/xhtml">http://www.w3.org/2001/XMLSchema-instance</em> namespace. If an element instance has an <code xmlns="http://www.w3.org/1999/xhtml">xsi:nil</code> attribute set to true, it can be left empty, even though its element declaration may have required content.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_Notation">Notation</a> </span>A notation is used to identify the format of a piece of data. Values of elements and attributes that are of type, NOTATION, must come from the names of declared notations. See: <a href="http://www.w3.org/TR/xmlschema-1/#cNotation_Declarations" title="http://www.w3.org/TR/xmlschema-1/#cNotation_Declarations">http://www.w3.org/TR/xmlschema-1/#cNotation_Declarations</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_PreserveWS">Preserve Whitespace Policy</a> </span>Preserve whitespaces exactly as they appear in instances.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_TypeFinal">Prohibited Derivations</a> </span>(Applies to type definitions). Derivation methods that cannot be used to create sub-types from a given type definition.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_TypeBlock">Prohibited Substitutions</a> </span>(Applies to complex type definitions). Prevents sub-types that have been derived using the specified derivation methods from validating element instances in place of the given type definition.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_ReplaceWS">Replace Whitespace Policy</a> </span>Replace tab, line feed, and carriage return characters with space character (Unicode character 32).</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Sequence">Sequence Model Group</a> </span>Child elements and model groups must be provided <em xmlns="http://www.w3.org/1999/xhtml">in the specified order</em> in instances. See: <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.w3.org/TR/xmlschema-1/#element-sequence" title="http://www.w3.org/TR/xmlschema-1/#element-sequence">http://www.w3.org/TR/xmlschema-1/#element-sequence</a>.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_SubGroup">Substitution Group</a> </span>Elements that are <em xmlns="http://www.w3.org/1999/xhtml">members</em> of a substitution group can be used wherever the <em xmlns="http://www.w3.org/1999/xhtml">head</em> element of the substitution group is referenced.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_ElemFinal">Substitution Group Exclusions</a> </span>(Applies to element declarations). Prohibits element declarations from nominating themselves as being able to substitute a given element declaration, if they have types that are derived from the original element's type using the specified derivation methods.</p>
+<p xmlns="">
+<span class="glossaryTerm">
+<a name="term_TargetNS">Target Namespace</a> </span>The target namespace identifies the namespace that components in this schema belongs to. If no target namespace is provided, then the schema components do not belong to any namespace.</p>
+<p>
+<span class="glossaryTerm">
+<a name="term_Unique">Uniqueness Constraint</a> </span>Ensures uniqueness of an element/attribute value, or a combination of values, within a specified scope. See: <a href="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions" title="http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions">http://www.w3.org/TR/xmlschema-1/#cIdentity-constraint_Definitions</a>.</p>
+<div style="text-align: right; clear: both;">
+<a href="#top">top</a>
+</div>
+<hr />
+</div>
+<p class="footer">Generated by <a href="http://xml.fiforms.org/xs3p/">xs3p</a> (<a href="http://titanium.dstc.edu.au/xml/xs3p">old link</a>)
+               . Last modified: <script type="text/javascript">
+<!--
+document.write(document.lastModified);
+// -->
+</script>
+</p>
+</body>
+</html>

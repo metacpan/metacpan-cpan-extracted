@@ -14,6 +14,7 @@ WriteMakefile(
                      'HTTP::Tiny'               => 0, #for Hue
                      'JSON'                     => 0, #for Hue
                      'Path::Class'              => 0, #for Virtual
+                     'List::MoreUtils'          => 0, #for iBootBarMulti
                     },
     EXE_FILES    => [
                     qw{

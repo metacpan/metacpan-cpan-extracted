@@ -1,5 +1,13 @@
 Revision history for Asm-X86
 
+2019-01-03	Bogdan Drozdowski <bogdandr@op.pl>
+
+	* Version 0.27
+	* Makefile.PL: remove hardcoded INSTALLDIRS, allowing it to be set
+	  during the RPM package build or manual installation.
+	* X86.pm: Updated copyright inside the module.
+	* README: updated copyright inside the file.
+
 2018-11-18	Bogdan Drozdowski <bogdandr@op.pl>
 
 	* Version 0.26

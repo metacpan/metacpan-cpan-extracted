@@ -29,9 +29,11 @@ my %WriteMakefileArgs = (
     },
     "TEST_REQUIRES" => {
         "Test::Alien" => 0,
+        "FFI::CheckLib" => "0.23",
     },
     "PREREQ_PM" => {
-        "Alien::Base" => "1.41",
+        "Alien::Base"   => "1.41",
+        "FFI::CheckLib" => "0.23",
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },

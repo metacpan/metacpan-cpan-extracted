@@ -1,5 +1,5 @@
 package HackaMol::Roles::SelectionRole;
-$HackaMol::Roles::SelectionRole::VERSION = '0.050';
+$HackaMol::Roles::SelectionRole::VERSION = '0.051';
 #ABSTRACT: Atom selections in molecules
 use Moose::Role;
 use HackaMol::AtomGroup;
@@ -19,6 +19,7 @@ has 'selection' => (
     traits  => ['Hash'],
     is      => 'ro',
     isa     => 'HashRef[Str]',
+    lazy    => 1,
     default => sub { {} },
     handles => {
         get_selection    => 'get',
@@ -36,6 +37,7 @@ has 'selections_cr' => (
     is      => 'ro',
     isa     => 'HashRef[CodeRef]',
     default => sub { {} },
+    lazy    => 1,
     handles => {
         get_selection_cr    => 'get',
         set_selection_cr    => 'set',
@@ -123,7 +125,7 @@ HackaMol::Roles::SelectionRole - Atom selections in molecules
 
 =head1 VERSION
 
-version 0.050
+version 0.051
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for ARGV-OrDATA
 
+0.004   2019-01-05
+        Use IO::Pty if available instead of skipping tests.
+
 0.003   2018-12-28
         Skip tests when stdin is not a terminal.
 

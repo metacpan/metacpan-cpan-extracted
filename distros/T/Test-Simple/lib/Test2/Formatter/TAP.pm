@@ -2,7 +2,7 @@ package Test2::Formatter::TAP;
 use strict;
 use warnings;
 
-our $VERSION = '1.302141';
+our $VERSION = '1.302156';
 
 use Test2::Util qw/clone_io/;
 
@@ -104,10 +104,9 @@ sub write {
 
         print $io "\n"
             if $ENV{HARNESS_ACTIVE}
-            && !$ENV{HARNESS_IS_VERBOSE}
             && $hid == OUT_ERR
             && $self->{+_LAST_FH} != $io
-            && $msg =~ m/^#\s*Failed test /;
+            && $msg =~ m/^#\s*Failed( \(TODO\))? test /;
 
         $msg =~ s/^/$indent/mg if $nesting;
         print $io $msg;

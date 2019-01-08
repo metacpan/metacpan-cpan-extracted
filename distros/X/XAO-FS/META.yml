@@ -3,11 +3,10 @@ abstract: 'XAO Database Layer'
 author:
   - 'Andrew Maltsev, https://ejelta.com/xao/'
 build_requires:
-  ExtUtils::MakeMaker: '6.64'
   Pod::Usage: '1.12'
   XAO::Base: '1.20'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
 license: unknown
@@ -24,4 +23,4 @@ requires:
   Error: '0.15'
   XAO::Base: '1.20'
   perl: '5.010001'
-version: '1.22'
+version: '1.23'

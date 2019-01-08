@@ -48,7 +48,7 @@ my @TESTS = (
     {
         a       => undef,
         b       => {},
-        name    => 'undef_vs_empty_hash_noOU',
+        name    => 'undef_vs_empty_hash_noNO',
         diff    => {},
         opts    => {noN => 1, noO => 1},
     },

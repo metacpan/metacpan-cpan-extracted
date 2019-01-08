@@ -5,4 +5,4 @@ A Perl Alien package to install [GEOS, the Geometry Engine, Open Source](http://
 
 [![Build status](https://ci.appveyor.com/api/projects/status/s4c5nmnrk0m1kpkr?svg=true)](https://ci.appveyor.com/project/shawnlaffan/perl-alien-geos)
 
-[![CPAN version](https://badge.fury.io/pl/Alien-geos.svg)](http://badge.fury.io/pl/Alien-geos)
+[![CPAN version](https://badge.fury.io/pl/Alien-geos-af.svg)](http://badge.fury.io/pl/Alien-geos-af)

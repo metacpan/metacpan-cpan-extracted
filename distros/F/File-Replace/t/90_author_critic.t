@@ -8,16 +8,11 @@ Tests for the Perl module File::Replace.
 
 =begin comment
 
-How to run coverage tests:
+How to run coverage tests (there is a custom target in F<Makefile.PL>):
 
- which cover  # make sure it's the one for the current Perl
- perl Makefile.PL
- make
- make test
- cover -test -coverage default,-pod
+ perl Makefile.PL && make authorcover
  firefox cover_db/coverage.html
- make distclean
- rm -rf cover_db/
+ git clean -dxn  # change to -dxf to actually clean
 
 Running tests on all Perl versions: Install the required Perl versions (see
 list below), note that some test failures in Perl <5.10 can be ignored. In each
@@ -26,7 +21,9 @@ manually on Perls <5.8.9), then upgrade L<Test::More|Test::More> as well as
 L<App::Prove|App::Prove> for ease of testing (can use C<perlbrew exec> as shown
 below for this). Then:
 
- perlbrew exec --with 5.8.1,5.8.9,5.10.1,5.12.5,5.14.4,5.16.3,5.18.4,5.20.3,5.22.4,5.24.2,5.26.0 prove -lQ
+ perlbrew exec prove -lQ
+
+(Tests will fail fairly gracefully on 5.6 and older.)
 
 =end comment
 
@@ -61,9 +58,11 @@ our @PERLFILES;
 BEGIN {
 	@PERLFILES = (
 		catfile($FindBin::Bin,qw/ .. lib File Replace.pm /),
+		catfile($FindBin::Bin,qw/ .. lib File Replace Inplace.pm /),
 		catfile($FindBin::Bin,qw/ .. lib File Replace DualHandle.pm /),
 		catfile($FindBin::Bin,qw/ .. lib File Replace SingleHandle.pm /),
 		catfile($FindBin::Bin,qw/ .. lib Tie Handle Base.pm /),
+		catfile($FindBin::Bin,qw/ .. lib Tie Handle Argv.pm /),
 		bsd_glob("$FindBin::Bin/*.t"),
 		bsd_glob("$FindBin::Bin/*.pm"),
 	);
@@ -78,7 +77,7 @@ use Test::MinimumVersion;
 my @tasks;
 for my $file (@PERLFILES) {
 	critic_ok($file);
-	minimum_version_ok($file, '5.008');
+	minimum_version_ok($file, '5.008001');
 	open my $fh, '<', $file or die $!;  ## no critic (RequireCarping)
 	while (<$fh>) {
 		s/\A\s+|\s+\z//g;

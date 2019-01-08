@@ -6,27 +6,44 @@ use JSON::Validator;
 use Mojo::JSON qw(false true);
 use Mojo::Util;
 
+has enum => sub { +[] };
 has [qw(format max min multiple_of regex)] => undef;
 has type => 'object';
 
 for my $attr (qw(required strict unique)) {
-  Mojo::Util::monkey_patch(__PACKAGE__, $attr => sub { $_[0]->{$attr} = $_[1] // 1; $_[0]; });
+  Mojo::Util::monkey_patch(__PACKAGE__,
+    $attr => sub { $_[0]->{$attr} = $_[1] // 1; $_[0]; });
 }
 
-sub alphanum  { shift->_type('string')->regex('^\w*$') }
-sub boolean   { shift->type('boolean') }
-sub compile   { $_[0]->${\('_compile_' . $_[0]->type)} }
+sub alphanum { shift->_type('string')->regex('^\w*$') }
+sub boolean  { shift->type('boolean') }
+
+sub compile {
+  my $self   = shift;
+  my $merged = {};
+
+  for (ref $self->type eq 'ARRAY' ? @{$self->type} : $self->type) {
+    my $method   = "_compile_$_";
+    my $compiled = $self->$method;
+    @$merged{keys %$compiled} = values %$compiled;
+  }
+
+  return $merged;
+}
+
 sub date_time { shift->_type('string')->format('date-time') }
 sub email     { shift->_type('string')->format('email') }
 
 sub extend {
   my ($self, $by) = @_;
-  die "Cannot extend joi '@{[$self->type]}' by '@{[$by->type]}'" unless $self->type eq $by->type;
+  die "Cannot extend joi '@{[$self->type]}' by '@{[$by->type]}'"
+    unless $self->type eq $by->type;
 
   my $clone = shift->new(%$self, %$by);
 
   if ($self->type eq 'object') {
-    $clone->{properties}{$_} ||= $self->{properties}{$_} for keys %{$self->{properties} || {}};
+    $clone->{properties}{$_} ||= $self->{properties}{$_}
+      for keys %{$self->{properties} || {}};
   }
 
   return $clone;
@@ -63,7 +80,8 @@ sub uri       { shift->_type('string')->format('uri') }
 
 sub validate {
   my ($self, $data) = @_;
-  return JSON::Validator->new->validate($data, $self->compile);
+  state $validator = JSON::Validator->new->coerce(1);
+  return $validator->validate($data, $self->compile);
 }
 
 sub _compile_array {
@@ -83,10 +101,13 @@ sub _compile_boolean { +{type => 'boolean'} }
 
 sub _compile_integer { shift->_compile_number }
 
+sub _compile_null { {type => shift->type} }
+
 sub _compile_number {
   my $self = shift;
   my $json = {type => $self->type};
 
+  $json->{enum} = $self->{enum} if defined $self->{enum} and @{$self->{enum}};
   $json->{maximum}    = $self->{max}         if defined $self->{max};
   $json->{minimum}    = $self->{min}         if defined $self->{min};
   $json->{multipleOf} = $self->{multiple_of} if defined $self->{multiple_of};
@@ -98,12 +119,13 @@ sub _compile_object {
   my $self = shift;
   my $json = {type => $self->type};
 
-  $json->{additionalProperties}   = false               if $self->{strict};
-  $json->{maxProperties}     = $self->{max}        if defined $self->{max};
-  $json->{minProperties}     = $self->{min}        if defined $self->{min};
-  $json->{patternProperties} = $self->{regex}      if $self->{regex};
-  $json->{properties}        = $self->{properties} if ref $self->{properties} eq 'HASH';
-  $json->{required}          = $self->{required}   if ref $self->{required} eq 'ARRAY';
+  $json->{additionalProperties} = false          if $self->{strict};
+  $json->{maxProperties}        = $self->{max}   if defined $self->{max};
+  $json->{minProperties}        = $self->{min}   if defined $self->{min};
+  $json->{patternProperties}    = $self->{regex} if $self->{regex};
+  $json->{properties}           = $self->{properties}
+    if ref $self->{properties} eq 'HASH';
+  $json->{required} = $self->{required} if ref $self->{required} eq 'ARRAY';
 
   return $json;
 }
@@ -112,6 +134,7 @@ sub _compile_string {
   my $self = shift;
   my $json = {type => $self->type};
 
+  $json->{enum} = $self->{enum} if defined $self->{enum} and @{$self->{enum}};
   $json->{format}    = $self->{format} if defined $self->{format};
   $json->{maxLength} = $self->{max}    if defined $self->{max};
   $json->{minLength} = $self->{min}    if defined $self->{min};
@@ -133,7 +156,7 @@ sub TO_JSON { shift->compile }
 
 =head1 NAME
 
-JSON::Validator::Joi - Joi adapter for JSON::Validator
+JSON::Validator::Joi - Joi validation sugar for JSON::Validator
 
 =head1 SYNOPSIS
 
@@ -156,26 +179,31 @@ JSON::Validator::Joi - Joi adapter for JSON::Validator
 
 =head1 DESCRIPTION
 
-L<JSON::Validator::Joi> tries to mimic the JavaScript library
-L<https://github.com/hapijs/joi>.
-
-This module is EXPERIMENTAL and can change without warning. Let me know if you
-find it useful.
+L<JSON::Validator::Joi> is an elegant DSL schema-builder. The main purpose is
+to build a L<JSON Schema|https://json-schema.org/> for L<JSON::Validator>, but
+it can also validate data directly with sane defaults.
 
 =head1 ATTRIBUTES
 
+=head2 enum
+
+  my $joi       = $joi->enum(["foo", "bar"]);
+  my $array_ref = $joi->enum;
+
+Defines a list of enum values for L</integer>, L</number> and L</string>.
+
 =head2 format
 
-  $self = $self->format("email");
-  $str = $self->format;
+  my $joi = $joi->format("email");
+  my $str = $joi->format;
 
 Used to set the format of the L</string>.
 See also L</iso_date>, L</email> and L</uri>.
 
 =head2 max
 
-  $self = $self->max(10);
-  $int = $self->max;
+  my $joi = $joi->max(10);
+  my $int = $joi->max;
 
 =over 2
 
@@ -199,8 +227,8 @@ Defines how long the string can be.
 
 =head2 min
 
-  $self = $self->min(10);
-  $int = $self->min;
+  my $joi = $joi->min(10);
+  my $int = $joi->min;
 
 =over 2
 
@@ -224,24 +252,28 @@ Defines how short the string can be.
 
 =head2 multiple_of
 
-  $self = $self->multiple_of(3);
-  $int = $self->multiple_of;
+  my $joi = $joi->multiple_of(3);
+  my $int = $joi->multiple_of;
 
 Used by L</integer> and L</number> to define what the number must be a multiple
 of.
 
 =head2 regex
 
-  $self = $self->regex("^\w+$");
-  $str = $self->regex;
+  my $joi = $joi->regex("^\w+$");
+  my $str = $joi->regex;
 
 Defines a pattern that L</string> will be validated against.
 
 =head2 type
 
-  $str = $self->type;
+  my $joi = $joi->type("string");
+  my $joi = $joi->type([qw(null integer)]);
+  my $any = $joi->type;
 
-Set by L</array>, L</integer>, L</object> or L</string>.
+Sets the required type. This attribute is set by the convenience methods
+L</array>, L</integer>, L</object> and L</string>, but can be set manually if
+you need to check against a list of type.
 
 =head1 METHODS
 
@@ -251,46 +283,46 @@ Alias for L</compile>.
 
 =head2 alphanum
 
-  $self = $self->alphanum;
+  my $joi = $joi->alphanum;
 
 Sets L</regex> to "^\w*$".
 
 =head2 array
 
-  $self = $self->array;
+  my $joi = $joi->array;
 
 Sets L</type> to "array".
 
 =head2 boolean
 
-  $self = $self->boolean;
+  my $joi = $joi->boolean;
 
 Sets L</type> to "boolean".
 
 =head2 compile
 
-  $hash_ref = $self->compile;
+  my $hash_ref = $joi->compile;
 
 Will convert this object into a JSON-Schema data structure that
 L<JSON::Validator/schema> understands.
 
 =head2 date_time
 
-  $self = $self->date_time;
+  my $joi = $joi->date_time;
 
 Sets L</format> to L<date-time|JSON::Validator/date-time>.
 
 =head2 email
 
-  $self = $self->email;
+  my $joi = $joi->email;
 
 Sets L</format> to L<email|JSON::Validator/email>.
 
 =head2 extend
 
-  $new_self = $self->extend($joi);
+  my $new_joi = $joi->extend($joi);
 
-Will extend C<$self> with the definitions in C<$joi> and return a new object.
+Will extend C<$joi> with the definitions in C<$joi> and return a new object.
 
 =head2 iso_date
 
@@ -298,44 +330,44 @@ Alias for L</date_time>.
 
 =head2 integer
 
-  $self = $self->integer;
+  my $joi = $joi->integer;
 
 Sets L</type> to "integer".
 
 =head2 items
 
-  $self = $self->items($joi);
-  $self = $self->items([$joi, ...]);
+  my $joi = $joi->items($joi);
+  my $joi = $joi->items([$joi, ...]);
 
 Defines a list of items for the L</array> type.
 
 =head2 length
 
-  $self = $self->length(10);
+  my $joi = $joi->length(10);
 
 Sets both L</min> and L</max> to the number provided.
 
 =head2 lowercase
 
-  $self = $self->lowercase;
+  my $joi = $joi->lowercase;
 
 Will set L</regex> to only match lower case strings.
 
 =head2 negative
 
-  $self = $self->negative;
+  my $joi = $joi->negative;
 
 Sets L</max> to C<0>.
 
 =head2 number
 
-  $self = $self->number;
+  my $joi = $joi->number;
 
 Sets L</type> to "number".
 
 =head2 object
 
-  $self = $self->object;
+  my $joi = $joi->object;
 
 Sets L</type> to "object".
 
@@ -345,44 +377,44 @@ Alias for L</regex>.
 
 =head2 positive
 
-  $self = $self->positive;
+  my $joi = $joi->positive;
 
 Sets L</min> to C<0>.
 
 =head2 props
 
-  $self = $self->props(name => JSON::Validator::Joi->new->string, ...);
+  my $joi = $joi->props(name => JSON::Validator::Joi->new->string, ...);
 
 Used to define properties for an L</object> type. Each key is the name of the
 parameter and the values must be a L<JSON::Validator::Joi> object.
 
 =head2 required
 
-  $self = $self->required;
+  my $joi = $joi->required;
 
 Marks the current property as required.
 
 =head2 strict
 
-  $self = $self->strict;
+  my $joi = $joi->strict;
 
 Sets L</array> and L</object> to not allow any more items/keys than what is defined.
 
 =head2 string
 
-  $self = $self->string;
+  my $joi = $joi->string;
 
 Sets L</type> to "string".
 
 =head2 token
 
-  $self = $self->token;
+  my $joi = $joi->token;
 
 Sets L</regex> to C<^[a-zA-Z0-9_]+$>.
 
 =head2 validate
 
-  @errors = $self->validate($data);
+  my @errors = $joi->validate($data);
 
 Used to validate C<$data> using L<JSON::Validator/validate>. Returns a list of
 L<JSON::Validator::Error|JSON::Validator/ERROR OBJECT> objects on invalid
@@ -390,24 +422,26 @@ input.
 
 =head2 unique
 
-  $self = $self->unique;
+  my $joi = $joi->unique;
 
 Used to force the L</array> to only contain unique items.
 
 =head2 uppercase
 
-  $self = $self->uppercase;
+  my $joi = $joi->uppercase;
 
 Will set L</regex> to only match upper case strings.
 
 =head2 uri
 
-  $self = $self->uri;
+  my $joi = $joi->uri;
 
 Sets L</format> to L<uri|JSON::Validator/uri>.
 
 =head1 SEE ALSO
 
 L<JSON::Validator>
+
+L<https://github.com/hapijs/joi>.
 
 =cut

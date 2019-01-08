@@ -1,7 +1,7 @@
 package <: $module_name ~ "::Util" :>;
 
 use Pcore -class, -res;
-use Pcore::SMTP;
+use Pcore::API::SMTP;
 use Pcore::API::ReCaptcha;
 use <: $module_name ~ "::Const qw[:CONST]" :>;
 
@@ -9,7 +9,7 @@ has tmpl     => ( init_arg => undef );    # InstanceOf ['Pcore::Util::Tmpl']
 has dbh      => ( init_arg => undef );    # ConsumerOf ['Pcore::Handle::DBI']
 has settings => ( init_arg => undef );    # HashRef
 
-has _smtp     => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::SMTP'] ]
+has _smtp     => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::SMTP'] ]
 has recaptcha => ( is => 'lazy', init_arg => undef );    # Maybe [ InstanceOf ['Pcore::API::Recaptcha'] ]
 
 sub BUILD ( $self, $args ) {
@@ -130,7 +130,7 @@ sub _build__smtp ($self) {
 
     return if !$cfg->{smtp_host} || !$cfg->{smtp_port} || !$cfg->{smtp_username} || !$cfg->{smtp_password};
 
-    return Pcore::SMTP->new( {
+    return Pcore::API::SMTP->new( {
         host     => $cfg->{smtp_host},
         port     => $cfg->{smtp_port},
         username => $cfg->{smtp_username},

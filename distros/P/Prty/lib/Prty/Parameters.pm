@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.125;
+our $VERSION = 1.128;
 
 use Prty::Converter;
 use Prty::Hash;
@@ -25,17 +25,19 @@ L<Prty::Object>
 
 =head1 METHODS
 
-=head2 Klassenmethoden
+=head2 Universelle Methode
 
 =head3 extract() - Extrahiere Optionen und Argumente
 
 =head4 Synopsis
 
-    # Optionswerte an Variablen zuweisen
-    $argA = $class->extract(1,$encoding,\@params,$n,@optRef);
+    # Options/Property-Werte an Variablen zuweisen
+    $argA = $class->extract(1,$properties,$encoding,\@params,
+        $maxArgs,@optRef);
     
-    # Optionen und Werte per Optionsobjekt zurückgeben
-    ($argA,$opt) = $class->extract(0,$encoding,\@params,$n,@optVal);
+    # Options/Property-Wertpaare per Optionsobjekt zurückgeben
+    ($argA,$opt) = $class->extract(0,$properties,$encoding,\@params,
+        $maxArgs,@optVal);
 
 =head4 Arguments
 
@@ -45,6 +47,11 @@ L<Prty::Object>
 
 Der erste Parameter entscheidet, ob die Optionswerte an ein
 Optionsobjekt (0) oder an Variablen (1) zugewiesen werden.
+
+=item $properties (0 oder 1)
+
+Die Parameter sind Attribut/Wert-Paare, die in @optRef bzw. @optVal
+spezifiziert sind. Argumente gibt es nicht.
 
 =item $encoding
 
@@ -58,7 +65,7 @@ angegeben.
 
 Parameterliste, z.B. @ARGV oder @_.
 
-=item $n
+=item $maxArgs
 
 Anzahl der maximal zu extrahierenden Argumente (Argument =
 Parameter, der nicht mit einem Bindestrich beginnt). Die Anzahl
@@ -91,7 +98,7 @@ Hash-Objekt mit den Optionen aus @params gemäß @optVal.
 
 =item $argA
 
-Array-Objekt mit den (maximal $n) Argumenten aus @params.
+Array-Objekt mit den (maximal $maxArgs) Argumenten aus @params.
 
 =back
 
@@ -107,8 +114,8 @@ B<Fehlerbehandlung>
 
 Die Methode kennt keine Fehler. Überzählige Argumente oder Optionen,
 die nicht in der Optionsliste @optVal (bzw. @optRef) vorkommen, bleiben
-in @params, werden also nicht extrahiert. Die Anzahl der Argumente $n
-ist eine maximale Anzahl, die unterschritten werden kann.
+in @params, werden also nicht extrahiert. Die Anzahl der Argumente
+$maxArgs ist eine I<maximale> Anzahl, die unterschritten werden kann.
 
 Es obliegt dem Aufrufer, durch Tests auf @params und @$argA zu
 prüfen, ob beim Aufruf des Programms oder der Methode zu viele
@@ -120,10 +127,10 @@ die bei zu wenig/zu vielen Argumenten oder nicht vereinbarten
 Optionen eine Exception wirft:
 
     sub parameters {
-        my ($self,$varMode,$encoding,$paramA,$minArgs,$maxArgs) =
-            splice @_,0,6;
+        my ($self,$varMode,$properties,$encoding,$paramA,$minArgs,
+            $maxArgs) = splice @_,0,6;
     
-        my ($argA,$opt) = Prty::Parameters->extract($varMode,
+        my ($argA,$opt) = Prty::Parameters->extract($varMode,$properties,
             $encoding,$paramA,$maxArgs,@_);
         if (@$paramA) {
             die "ERROR: Unexpected parameter(s): @$paramA\n";
@@ -144,7 +151,8 @@ Optionen eine Exception wirft:
 # -----------------------------------------------------------------------------
 
 sub extract {
-    my ($class,$varMode,$encoding,$paramA,$n) = splice @_,0,5;
+    my ($class,$varMode,$properties,$encoding,$paramA,$maxArgs) =
+        splice @_,0,6;
     # @_: @optVal -or- @optRef
 
     my @args;
@@ -175,11 +183,11 @@ sub extract {
         }
 
         my $remove = 0;
-        if ($noMoreOptions || !defined($param) || $param eq '-' ||
-                substr($param,0,1) ne '-') {
+        if (!$properties && ($noMoreOptions || !defined($param) ||
+                $param eq '-' || substr($param,0,1) ne '-')) {
             # Parameter ist Argument
 
-            if (!defined($n) || $n > @args) {
+            if (!defined($maxArgs) || $maxArgs > @args) {
                 # Die maximale Argumentanzahl ist noch nicht erreicht.
                 # Wir schieben den Parameter von @$paramA nach @args.
 
@@ -264,9 +272,183 @@ sub extract {
 
 # -----------------------------------------------------------------------------
 
+=head2 Spezialisierte Methoden
+
+Die nachfolgenden Methoden sind auf Basis der Methode extract()
+implementiert. Sie realsieren Vereinfachungen für bestimmte
+Anwendungsfälle.
+
+=head3 extractPropertiesToVariables() - Extrahiere Properties und weise sie an Variablen zu
+
+=head4 Synopsis
+
+    $class->extractPropertiesToVariables(\@params,@optRef);
+
+=head4 Arguments
+
+=over 4
+
+=item @params
+
+Parameterliste, z.B. @_.
+
+=item @optRef
+
+Liste der Properties (und Optionen) und ihrer Variablenreferenzen.
+
+=back
+
+=head4 Returns
+
+Nichts.
+
+=head4 Description
+
+Extrahiere Properties (und Optionen) aus der Parameterliste @params.
+Enthält die Parameterliste unbekannte Properties (oder Optionen),
+wird eine Exception geworfen. Die Methode wird typischerweise
+zur Verarbeitung von Methodenparametern genutzt.
+
+=head4 Example
+
+Methode, die eine WikiMedia-Tabelle generiert. Die Tabelleneigenschaften
+werden als Property/Wert-Paare übergeben:
+
+    sub table {
+        my $self = shift;
+        # @_: @keyVal
+    
+        my $alignA = [];
+        my $bodyBackground = '#ffffff';
+        my $caption = undef;
+        my $rowA = [];
+        my $titleBackground = '#e8e8e8';
+        my $titleA = [];
+        my $valueCb = undef;
+    
+        Prty::Parameters->extractPropertiesToVariables(\@_,
+            alignments => \$alignA,
+            bodyBackground => \$bodyBackground,
+            caption => \$caption,
+            rows => \$rowA,
+            titleBackground => \$titleBackground,
+            titles => \$titleA,
+            valueCallback => \$valueCb,
+        );
+        ...
+    }
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub extractPropertiesToVariables {
+    my ($class,$paramA) = splice @_,0,2;
+
+    $class->extract(1,1,undef,$paramA,0,@_);
+    if (@$paramA) {
+        $class->throw(
+            q~PARAM-00099: Unexpected parameter(s)~,
+            Parameters => "@$paramA",
+        );
+    }
+
+    return;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 extractToVariables() - Extrahiere Parameter und weise sie Variablen zu
+
+=head4 Synopsis
+
+    @args | $argA = $class->extractToVariables(\@params,$minArgs,$maxArgs,@optRef);
+
+=head4 Arguments
+
+=over 4
+
+=item @params
+
+Parameterliste, z.B. @_.
+
+=item $minArgs
+
+Mindestanzahl an Argumenten.
+
+$ maxArgs
+Maximale Anzahl an Argumenten, C<undef> bedeutet beliebig viele.
+
+=item @optRef
+
+Liste der Optionen und ihrer Variablenreferenzen.
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $argA
+
+Referenz auf die Liste der extrahierten Argumente.
+
+=back
+
+=head4 Description
+
+Extrahiere Argumente und Optionen aus der Parameterliste @params.
+Enthält die Parameterliste unbekannte Optionen oder zu wenige
+oder zu viele Argumente, wird eine Exception geworfen.
+
+=head4 Example
+
+Konstruktor mit einer variablen Anzahl an Argumenten und zwei Optionen:
+
+    sub new {
+        my $class = shift;
+        # @_: $url,@opt -or- $url,$user,$passw,@opt
+    
+    
+        my $color = 1;
+        my $debug = 0;
+    
+        my $argA = Prty::Parameters->extractToVariables(\@_,1,3,
+            -color => \$color,
+            -debug => \$debug,
+        );
+        my ($url,$user,$password) = @$argA;
+        ...
+    }
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub extractToVariables {
+    my ($class,$paramA,$minArgs,$maxArgs) = splice @_,0,4;
+
+    my $argA = $class->extract(1,0,undef,$paramA,$maxArgs,@_);
+    if (@$argA < $minArgs) {
+        $class->throw(
+            q~PARAM-00099: not enough arguments~,
+        );
+    }
+    elsif (@$paramA) {
+        $class->throw(
+            q~PARAM-00099: Unexpected parameter(s)~,
+            Parameters => "@_",
+        );
+    }
+
+    return wantarray? @$argA: $argA;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.125
+1.128
 
 =head1 AUTHOR
 
@@ -274,7 +456,7 @@ Frank Seitz, L<http://fseitz.de/>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2018 Frank Seitz
+Copyright (C) 2019 Frank Seitz
 
 =head1 LICENSE
 

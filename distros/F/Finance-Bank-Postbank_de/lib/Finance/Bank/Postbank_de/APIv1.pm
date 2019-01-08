@@ -18,7 +18,7 @@ use Finance::Bank::Postbank_de::APIv1::Account;
 use Finance::Bank::Postbank_de::APIv1::Depot;
 use Finance::Bank::Postbank_de::APIv1::Position;
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 =head1 NAME
 
@@ -32,19 +32,32 @@ Finance::Bank::Postbank_de::APIv1 - Postbank connection
 
 =cut
 
-#my $logger;
+has diagnostics => (
+    is => 'ro',
+    default => undef,
+);
+
+has logger => (
+    is => 'rw',
+    default => undef,
+);
+
 has ua => (
     is => 'ro',
-    default => sub( $class ) {
+    default => sub( $self ) {
         my $ua = WWW::Mechanize->new(
-            autocheck  => 1,
+            autocheck  => 0,
             keep_alive => 1,
             cookie_jar => HTTP::CookieJar::LWP->new(),
         );
-#use LWP::ConsoleLogger::Easy qw( debug_ua );
-#$logger = debug_ua($ua);
-#$logger->dump_content(0);
-#$logger->dump_text(0);
+
+        if( $self->diagnostics ) {
+            require LWP::ConsoleLogger::Easy;
+            my $logger = LWP::ConsoleLogger::Easy::debug_ua( $ua );
+            $logger->dump_content(0);
+            $logger->dump_text(0);
+            $self->logger($logger);
+        };
         $ua
     }
 );
@@ -116,7 +129,7 @@ sub configure_ua_ssl( $self, $ua=$self->ua ) {
         @verify = ();
     } elsif( Net::SSLeay::SSLeay() <= 0x100010bf ) { # 1.0.1k
         @verify = (
-            SSL_fingerprint => 'sha256$C0F407E7D1562B52D8896B4A00DFF538CBC84407E95D8E0A7E5BFC6647B98967',
+            SSL_fingerprint => 'sha256$99043D1F58197BDDFAEA3F914A8693588B067D7DC85BF532D7B773A9ED98F915',
             SSL_ocsp_mode => IO::Socket::SSL::SSL_OCSP_NO_STAPLE(),
         );
     } else {
@@ -142,7 +155,7 @@ sub configure_ua( $self, $config = $self->fetch_config ) {
 
     $ua->add_header(
         'api-key' => $config->{'iob5-base'}->{apiKey},
-        #'device-signature' => '494f423500225fd9',
+        'device-signature' => $config->{'iob5-base'}->{apiKey},
         accept => ['application/hal+json', '*/*'],
         keep_alive => 1,
         #                            /                businessCategory =Private Organization/                                jurisdictionC                         =DE/                                jurisdictionST                                 =Hessen/                                jurisdictionL                          =Frankfurt am Main/serialNumber=HRB 47141/C=DE/ST=Nordrhein-Westfalen/L=Bonn/O=DB Privat- und Firmenkundenbank AG/OU=Postbank Systems AG/CN=(?:banking|bankapi-public).postbank.de
@@ -161,14 +174,14 @@ sub login( $self, $username, $password ) {
     my $ua = $self->ua;
     my $loginUrl = $self->login_url();
 
-    my $r =
-    $ua->post(
+    local $ua->{autocheck};
+    my $r = $ua->post(
         $loginUrl,
-        #content => sprintf 'dummy=value&password=%s&username=%s', $password, $username
-        #content => sprintf 'password=%s&username=%s', $password, $username
         content => sprintf 'username=%s&password=%s', $username, $password
     );
-
+    if( ! $r->is_success ) {
+        die sprintf "HTTP Error: %03d %s", $r->code, $r->message;
+    };
     my $postbank = HAL::Resource->new(
         ua => $ua,
         %{ decode_json($ua->content)}

@@ -2,7 +2,7 @@ package Test2::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.302141';
+our $VERSION = '1.302156';
 
 use POSIX();
 use Config qw/%Config/;
@@ -183,7 +183,7 @@ my %PERLIO_SKIP = (
 
 sub clone_io {
     my ($fh) = @_;
-    my $fileno = fileno($fh);
+    my $fileno = eval { fileno($fh) };
 
     return $fh if !defined($fileno) || !length($fileno) || $fileno < 0;
 

@@ -143,9 +143,9 @@ sub get_databases {
 }
 
 
-#sub primary_key_auto {
-#    return "INTEGER PRIMARY KEY";
-#}
+
+
+
 
 
 

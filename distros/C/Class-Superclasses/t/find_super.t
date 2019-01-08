@@ -31,6 +31,6 @@ eval {
     1;
 } or $error = $@;
 
-like $error, qr/No such file or directory/;
+ok $error;
 
 done_testing();

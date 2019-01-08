@@ -1,6 +1,4 @@
 
-# $Id: Serialiser.pm,v 1.12 2009-07-04 14:55:24 Martin Exp $
-
 package RDF::Simple::Serialiser;
 
 use strict;
@@ -57,13 +55,13 @@ Accepts an array of triples, returns a serialised RDF document.
 use Data::Dumper;
 use RDF::Simple::NS;
 use Regexp::Common qw(URI);
-use Class::MakeMethods::Standard::Hash (
-                                        new => 'new',
-                                        scalar => [ qw( baseuri path nodeid_prefix qqq ) ],
-                                       );
+use Class::MethodMaker [
+                        new => 'new',
+                        scalar => [ qw/ baseuri path nodeid_prefix / ],
+                       ];
 
-our
-$VERSION = do { my @r = (q$Revision: 1.12 $ =~ /\d+/g); sprintf "%d."."%03d" x $#r, @r };
+my
+$VERSION = 1.13;
 
 =item new()
 

@@ -5,7 +5,6 @@ use Test::Mojo;
 use Mojolicious::Lite;
 use Mojo::Promise;
 
-plugin 'PromiseActions';
 my @values;
 
 app->hook(around_action => sub {
@@ -13,8 +12,9 @@ app->hook(around_action => sub {
     my ($res, $text) = $next->();
     push @values, $res,$text;
     return ($res, $text);
-
 });
+
+plugin 'PromiseActions';
 
 get '/' => sub {
   my $c=shift;
@@ -31,6 +31,27 @@ get '/normal' => sub {
   $c->render(text=>'NO');
   return 1;
 };
+get '/reject' => sub {
+  my $c=shift;
+  my $p=Mojo::Promise->new;
+  Mojo::IOLoop->timer(0.1,sub { $p->reject('HI'); });
+  $p->then(sub {
+    $c->render(text=>'Hello');
+  });
+  return $p;
+};
+
+get '/reject_rendered' => sub {
+  my $c=shift;
+
+  my $p=Mojo::Promise->new;
+  Mojo::IOLoop->timer(0.1,sub { $p->reject('HI'); });
+  $p->then(sub {
+    $c->render(text=>'Hello');
+  });
+  $c->reply->not_found;
+  return $p;
+};
 
 my $t=Test::Mojo->new;
 $t->get_ok('/')->status_is('200')->content_is('Hello');
@@ -39,6 +60,8 @@ is($values[1],'hello', 'Second argument passed through ok');
 $t->get_ok('/normal')->status_is('200')->content_is('NO');
 is($values[2],'1', 'Got return');
 is($values[3],undef, 'No second argument');
+$t->get_ok('/reject')->status_is('500');
+$t->get_ok('/reject_rendered')->status_is('404');
 
 
 done_testing;

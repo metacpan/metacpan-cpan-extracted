@@ -1,7 +1,7 @@
 package Package::MoreUtil;
 
-our $DATE = '2018-10-07'; # DATE
-our $VERSION = '0.590'; # VERSION
+our $DATE = '2019-01-06'; # DATE
+our $VERSION = '0.591'; # VERSION
 
 use 5.010001;
 use strict;
@@ -135,7 +135,7 @@ Package::MoreUtil - Package-related utilities
 
 =head1 VERSION
 
-This document describes version 0.590 of Package::MoreUtil (from Perl distribution Package-MoreUtil), released on 2018-10-07.
+This document describes version 0.591 of Package::MoreUtil (from Perl distribution Package-MoreUtil), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -153,6 +153,9 @@ This document describes version 0.590 of Package::MoreUtil (from Perl distributi
  my @allsubpkg = list_subpackages("Foo::Bar", 1); # recursive
 
 =head1 DESCRIPTION
+
+B<DEPRECATION NOTICE:> This module is deprecated in favor of L<Package::Stash>
+and L<Package::Util::Lite>.
 
 =head1 FUNCTIONS
 
@@ -221,6 +224,10 @@ feature.
 
 =head1 SEE ALSO
 
+L<Package::Stash>
+
+L<Package::Util::Lite>
+
 L<perlmod>
 
 L<Package::Util> (currently empty/placeholder at the time of this writing)
@@ -231,7 +238,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

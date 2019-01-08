@@ -11,7 +11,7 @@ use Chart::Plotly::Trace::Area::Marker;
 use Chart::Plotly::Trace::Area::Stream;
 use Chart::Plotly::Trace::Area::Transform;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT:
 
@@ -57,7 +57,7 @@ has customdatasrc => ( is            => "rw",
 
 has hoverinfo => (
     is  => "rw",
-    isa => "Maybe[ArrayRef]",
+    isa => "Str|ArrayRef[Str]",
     documentation =>
       "Determines which trace information appear on hover. If `none` or `skip` are set, no information is displayed upon hovering. But, if `none` is set, click and hover events are still fired.",
 );
@@ -176,7 +176,7 @@ Chart::Plotly::Trace::Area -
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

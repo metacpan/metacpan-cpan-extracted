@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.008;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,19 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Class-Superclasses",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Class::Superclasses",
   "PREREQ_PM" => {
     "List::Util" => 0,
-    "PPI" => 0
+    "PPI" => 0,
+    "Scalar::Util" => "1.39"
   },
-  "VERSION" => "0.08",
+  "TEST_REQUIRES" => {
+    "FindBin" => 0,
+    "Pod::Coverage::TrustPod" => 0,
+    "Test::More" => 0
+  },
+  "VERSION" => "1.00",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -27,8 +34,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "FindBin" => 0,
   "List::Util" => 0,
-  "PPI" => 0
+  "PPI" => 0,
+  "Pod::Coverage::TrustPod" => 0,
+  "Scalar::Util" => "1.39",
+  "Test::More" => 0
 );
 
 

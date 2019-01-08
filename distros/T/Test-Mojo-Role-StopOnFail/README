@@ -1,0 +1,44 @@
+NAME
+
+    Test::Mojo::Role::StopOnFail - Stop Mojolicious tests after first
+    failure
+
+VERSION
+
+    v0.001
+
+SYNOPSIS
+
+      my $t = Test::Mojo->with_roles('+StopOnFail')->new('MyApp');
+    
+      $t->get_ok('/')->status_is(200);
+
+DESCRIPTION
+
+    When you have many tests, you may want to stop the test suite after the
+    first failure. This modules does a Test::More::BAIL_OUT, like the
+    die_on_fail on Test::Most behavior.
+
+CAVEATS
+
+    The Test::Mojo::or() function only run when $t->success is FALSE.
+    Unconsciously, this module removed the purpose of this function, after
+    all, a BAIL_OUT would be threw before.
+
+SEE ALSO
+
+      * Mojolicious
+
+      * Mojo::Role
+
+      * Test::Mojo
+
+      * Test::More
+
+LICENSE
+
+    This software is copyright (c) 2019 by Junior Moraes.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

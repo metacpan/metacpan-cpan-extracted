@@ -1,5 +1,12 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.214 Jan 4, 2019
+  - Removed 03modlist-related code as that file is not updated anymore
+  - Made sure tests pass when CPAN_SQLITE_DOWNLOAD variable is set
+
+0.213 Jan 3, 2019
+  - Added ability to download precompiled database to save even more memory/CPU
+
 0.212 Aug 3, 2018
   - Fixed a long-standing bug with missing CPAN::Shell on some systems
 
@@ -93,7 +100,7 @@ Revision history for Perl extension CPAN::SQLite.
     via setting $ENV{CPAN_SQLITE_NO_LOG_FILES}, as suggested
     by DAGOLDEN:
         http://rt.cpan.org/Ticket/Display.html?id=36411
-        
+
 0.195 Feb 16, 2008
   - fix further bugs where sometimes a regex search for
     distributions and/or modules, followed by a distribution

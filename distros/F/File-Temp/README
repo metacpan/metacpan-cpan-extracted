@@ -1,9 +1,9 @@
 This archive contains the distribution File-Temp,
-version 0.2308:
+version 0.2309:
 
   return name and handle of a temporary file safely
 
-This software is copyright (c) 2018 by Tim Jenness and the UK Particle Physics and Astronomy Research Council.
+This software is copyright (c) 2019 by Tim Jenness and the UK Particle Physics and Astronomy Research Council.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use Future;
 
 use Carp qw(croak);
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 =head1 NAME
 

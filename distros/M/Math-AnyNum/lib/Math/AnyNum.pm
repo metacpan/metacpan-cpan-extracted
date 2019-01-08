@@ -17,7 +17,7 @@ use constant {
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -291,6 +291,9 @@ use overload
         rand  => \&rand,
         irand => \&irand,
 
+        min => \&min,
+        max => \&max,
+
         sum  => \&sum,
         prod => \&prod,
 
@@ -331,6 +334,7 @@ use overload
         bsearch_le => \&bsearch_le,
         bsearch_ge => \&bsearch_ge,
 
+        base    => \&base,
         as_bin  => \&as_bin,
         as_hex  => \&as_hex,
         as_oct  => \&as_oct,
@@ -1019,20 +1023,19 @@ sub _binsplit {
 sub new {
     my ($class, $num, $base) = @_;
 
+    if (ref($base)) {
+        if (ref($base) eq __PACKAGE__) {
+            $base = _any2ui($$base) // 0;
+        }
+        else {
+            $base = CORE::int($base);
+        }
+    }
+
     my $ref = ref($num);
 
-    # Special string values
-    if (!$ref and (!defined($base) or CORE::int($base) == 10)) {
-        return bless \_str2obj($num), $class;
-    }
-
-    # Special case
-    if (!defined($base) and $ref eq __PACKAGE__) {
-        return $num;
-    }
-
     # Number with base
-    if (defined($base) and CORE::int($base) != 10) {
+    if (defined($base)) {
 
         my $int_base = CORE::int($base);
 
@@ -1048,7 +1051,7 @@ sub new {
 
         if (index($num, '/') != -1) {
             my $r = Math::GMPq::Rmpq_init();
-            eval { Math::GMPq::Rmpq_set_str($r, "$num", $int_base); 1 } // goto &nan;
+            eval { Math::GMPq::Rmpq_set_str($r, $num, $int_base); 1 } // goto &nan;
 
             if (Math::GMPq::Rmpq_get_str($r, 10) !~ m{^\s*[-+]?[0-9]+\s*(?:/\s*[-+]?[1-9]+[0-9]*\s*)?\z}) {
                 goto &nan;
@@ -1057,16 +1060,31 @@ sub new {
             Math::GMPq::Rmpq_canonicalize($r);
             return bless \$r, $class;
         }
+        elsif (substr($num, 0, 1) eq '(' and substr($num, -1) eq ')') {
+            my $r = Math::MPC::Rmpc_init2($PREC);
+            eval { Math::MPC::Rmpc_set_str($r, $num, $int_base, $ROUND); 1 } // goto &nan;
+            return bless \$r;
+        }
         elsif (index($num, '.') != -1) {
             my $r = Math::MPFR::Rmpfr_init2($PREC);
-            if (Math::MPFR::Rmpfr_set_str($r, "$num", $int_base, $ROUND)) {
-                Math::MPFR::Rmpfr_set_nan($r);
+            if (Math::MPFR::Rmpfr_set_str($r, $num, $int_base, $ROUND) < 0) {
+                goto &nan;
             }
             return bless \$r, $class;
         }
         else {
-            return bless \(eval { Math::GMPz::Rmpz_init_set_str("$num", $int_base) } // goto &nan), $class;
+            return bless \(eval { Math::GMPz::Rmpz_init_set_str($num, $int_base) } // goto &nan), $class;
         }
+    }
+
+    # Special string values
+    if (!$ref) {
+        return bless \_str2obj($num), $class;
+    }
+
+    # Special case
+    if ($ref eq __PACKAGE__) {
+        return $num;
     }
 
     bless \_star2obj($num), $class;
@@ -7084,8 +7102,12 @@ sub fibmod ($$) {
         $m = _star2mpz($m) // goto &nan;
     }
 
-    Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+    my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+    $sgn < 0  and goto &nan;
+    $sgn == 0 and goto &zero;
 
 #<<<
     my ($f, $g, $w) = (
@@ -7144,8 +7166,12 @@ sub lucasmod ($$) {
         $m = _star2mpz($m) // goto &nan;
     }
 
-    Math::GMPz::Rmpz_sgn($n) < 0  and goto &nan;
     Math::GMPz::Rmpz_sgn($m) == 0 and goto &nan;
+
+    my $sgn = Math::GMPz::Rmpz_sgn($n);
+
+    $sgn < 0  and goto &nan;
+    $sgn == 0 and return bless \Math::GMPz::Rmpz_init_set_ui(2);
 
 #<<<
     my ($f, $g, $w) = (
@@ -7452,6 +7478,36 @@ sub primorial ($) {
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_primorial_ui($r, $n);
     bless \$r;
+}
+
+sub min {
+    my @terms = map { ref($_) eq __PACKAGE__ ? $$_ : _star2obj($_) } @_;
+
+    @terms || return undef;
+
+    my $min = shift(@terms);
+    foreach my $curr (@terms) {
+        if ((__cmp__($curr, $min) // return undef) < 0) {
+            $min = $curr;
+        }
+    }
+
+    bless \$min;
+}
+
+sub max {
+    my @terms = map { ref($_) eq __PACKAGE__ ? $$_ : _star2obj($_) } @_;
+
+    @terms || return undef;
+
+    my $max = shift(@terms);
+    foreach my $curr (@terms) {
+        if ((__cmp__($curr, $max) // return undef) > 0) {
+            $max = $curr;
+        }
+    }
+
+    bless \$max;
 }
 
 sub sum {
@@ -8629,6 +8685,7 @@ sub is_prime ($;$) {
         $n = _any2mpz($n) // return 0;
     }
 
+    Math::GMPz::Rmpz_sgn($n) > 0 or return 0;
     $r = defined($r) ? (CORE::abs(CORE::int($r)) || 20) : 20;
     Math::GMPz::Rmpz_probab_prime_p($n, $r);
 }
@@ -9362,6 +9419,29 @@ sub is_power ($;$) {
 
 sub kronecker ($$) {
     my ($n, $k) = @_;
+
+    if (!ref($n) and CORE::int($n) eq $n and $n < ULONG_MAX and $n > LONG_MIN) {
+
+        if (!ref($k) and CORE::int($k) eq $k and $k < ULONG_MAX and $k > LONG_MIN) {
+            $k =
+              ($k < 0)
+              ? Math::GMPz::Rmpz_init_set_si($k)
+              : Math::GMPz::Rmpz_init_set_ui($k);
+        }
+        else {
+            $k = $$k if (ref($k) eq __PACKAGE__);
+
+            if (ref($k) ne 'Math::GMPz') {
+                $k = _star2mpz($k) // goto &nan;
+            }
+        }
+
+        return (
+                $n < 0
+                ? Math::GMPz::Rmpz_si_kronecker($n, $k)
+                : Math::GMPz::Rmpz_ui_kronecker($n, $k)
+               );
+    }
 
     $n = $$n if (ref($n) eq __PACKAGE__);
 
@@ -10256,6 +10336,63 @@ sub as_dec ($;$) {
 
     local $PREC = $prec;
     __stringify__(_star2mpfr_mpc($n));
+}
+
+sub __base__ {
+    my ($x, $base) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
+
+  Math_GMPz: {
+        return Math::GMPz::Rmpz_get_str($x, $base);
+    }
+
+  Math_GMPq: {
+        return Math::GMPq::Rmpq_get_str($x, $base);
+    }
+
+  Math_MPFR: {
+        return Math::MPFR::Rmpfr_get_str($x, $base, 0, $ROUND);
+    }
+
+  Math_MPC: {
+
+        # return Math::MPC::Rmpc_get_str($base, 0, $x, $ROUND);       # not OK
+
+        my $fr = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        Math::MPC::RMPC_RE($fr, $x);
+        my $real = __base__($fr, $base);
+        Math::MPC::RMPC_IM($fr, $x);
+        return $real if Math::MPFR::Rmpfr_zero_p($fr);
+        my $imag = __base__($fr, $base);
+        return "($real $imag)";
+    }
+}
+
+sub base {
+    my ($n, $k) = @_;
+
+    $n = ref($n) eq __PACKAGE__ ? $$n : _star2obj($n);
+
+    my $base = 10;
+    if (defined($k)) {
+
+        if (!ref($k) and CORE::int($k) eq $k) {
+            $base = $k;
+        }
+        elsif (ref($k) eq __PACKAGE__) {
+            $base = _any2ui($$k) // 0;
+        }
+        else {
+            $base = _any2ui(_star2obj($k)) // 0;
+        }
+
+        if ($base < 2 or $base > 62) {
+            require Carp;
+            Carp::croak("base must be between 2 and 62, got $k");
+        }
+    }
+
+    __base__($n, $base);
 }
 
 sub rat_approx ($) {

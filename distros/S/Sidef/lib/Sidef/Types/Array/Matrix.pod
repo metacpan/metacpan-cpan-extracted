@@ -18,10 +18,29 @@ var obj = Matrix(...)
 
 Inherits methods from:
 
-	* Sidef::Types::Array::Array
+       * Sidef::Types::Array::Array
 
 =head1 METHODS
 
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
 
 =head2 *
 
@@ -73,11 +92,55 @@ Aliases: I<÷>, I<div>
 
 =cut
 
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 abs
+
+Matrix.abs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 anti_diagonal
+
+Matrix.anti_diagonal() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 build
 
 Matrix.build() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 ceil
+
+Matrix.ceil() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 col
+
+Matrix.col() -> I<Obj>
+
+Return the
+
+Aliases: I<column>, I<get_column>
 
 =cut
 
@@ -97,7 +160,7 @@ Matrix.cols() -> I<Obj>
 
 Return the
 
-Aliases: I<columns>
+Aliases: I<columns>, I<from_cols>, I<from_columns>
 
 =cut
 
@@ -108,6 +171,14 @@ Matrix.col_vector() -> I<Obj>
 Return the
 
 Aliases: I<column_vector>
+
+=cut
+
+=head2 concat
+
+Matrix.concat() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -137,6 +208,22 @@ Return the
 
 =cut
 
+=head2 flip
+
+Matrix.flip() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Matrix.floor() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 gauss_jordan_invert
 
 Matrix.gauss_jordan_invert() -> I<Obj>
@@ -148,6 +235,14 @@ Return the
 =head2 gauss_jordan_solve
 
 Matrix.gauss_jordan_solve() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 horizontal_flip
+
+Matrix.horizontal_flip() -> I<Obj>
 
 Return the
 
@@ -173,6 +268,30 @@ Aliases: I<invert>, I<inverse>
 
 =cut
 
+=head2 is_square
+
+Matrix.is_square() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 map
+
+Matrix.map() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 neg
+
+Matrix.neg() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 new
 
 Matrix.new() -> I<Obj>
@@ -183,11 +302,39 @@ Aliases: I<call>
 
 =cut
 
+=head2 powmod
+
+Matrix.powmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 prod
+
+Matrix.prod() -> I<Obj>
+
+Return the
+
+Aliases: I<prod_by>
+
+=cut
+
 =head2 rand
 
 Matrix.rand() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 row
+
+Matrix.row() -> I<Obj>
+
+Return the
+
+Aliases: I<get_row>
 
 =cut
 
@@ -206,6 +353,8 @@ Aliases: I<row_size>, I<row_count>
 Matrix.rows() -> I<Obj>
 
 Return the
+
+Aliases: I<from_rows>
 
 =cut
 
@@ -253,6 +402,14 @@ Return the
 
 =cut
 
+=head2 size
+
+Matrix.size() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 solve
 
 Matrix.solve() -> I<Obj>
@@ -261,9 +418,49 @@ Return the
 
 =cut
 
-=head2 transpose
+=head2 sum
 
-Matrix.transpose() -> I<Obj>
+Matrix.sum() -> I<Obj>
+
+Return the
+
+Aliases: I<sum_by>
+
+=cut
+
+=head2 t
+
+Matrix.t() -> I<Obj>
+
+Return the
+
+Aliases: I<not>, I<transpose>
+
+=cut
+
+=head2 to_a
+
+Matrix.to_a() -> I<Obj>
+
+Return the
+
+Aliases: I<to_array>
+
+=cut
+
+=head2 to_s
+
+Matrix.to_s() -> I<Obj>
+
+Return the
+
+Aliases: I<dump>, I<to_str>
+
+=cut
+
+=head2 vertical_flip
+
+Matrix.vertical_flip() -> I<Obj>
 
 Return the
 
@@ -274,5 +471,15 @@ Return the
 Matrix.zero() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
 
 =cut

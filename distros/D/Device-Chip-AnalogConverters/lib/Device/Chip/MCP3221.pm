@@ -9,7 +9,9 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
+
+use Future::AsyncAwait;
 
 use constant PROTOCOL => "I2C";
 
@@ -69,6 +71,10 @@ L<Future> instances.
 
 =cut
 
+# Chip has no config registers
+async sub read_config { return {} }
+async sub change_config { }
+
 =head2 read_adc
 
    $value = $chip->read_adc->get
@@ -78,14 +84,13 @@ integer.
 
 =cut
 
-sub read_adc
+async sub read_adc
 {
    my $self = shift;
 
-   return $self->protocol->read( 2 )->then( sub {
-      my ( $buf ) = @_;
-      Future->done( unpack "S>", $buf );
-   });
+   my $buf = await $self->protocol->read( 2 );
+
+   return unpack "S>", $buf;
 }
 
 =head2 read_adc_ratio
@@ -97,15 +102,12 @@ between 0 and 1.
 
 =cut
 
-sub read_adc_ratio
+async sub read_adc_ratio
 {
    my $self = shift;
 
-   $self->read_adc->then( sub {
-      my ( $value ) = @_;
-      # MCP3221 is 12-bit
-      return Future->done( $value / 2**12 );
-   });
+   # MCP3221 is 12-bit
+   return ( await $self->read_adc ) / 2**12;
 }
 
 =head1 AUTHOR

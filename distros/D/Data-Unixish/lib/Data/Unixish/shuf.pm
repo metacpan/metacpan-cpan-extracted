@@ -9,7 +9,7 @@ use warnings;
 use Data::Unixish::Util qw(%common_args);
 use List::Util qw(shuffle);
 
-our $VERSION = '1.56'; # VERSION
+our $VERSION = '1.570'; # VERSION
 
 our %SPEC;
 
@@ -49,7 +49,7 @@ Data::Unixish::shuf - Shuffle items
 
 =head1 VERSION
 
-This document describes version 1.56 of Data::Unixish::shuf (from Perl distribution Data-Unixish), released on 2017-07-10.
+This document describes version 1.570 of Data::Unixish::shuf (from Perl distribution Data-Unixish), released on 2019-01-06.
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ In command line:
 
 Usage:
 
- shuf(%args) -> [status, msg, result, meta]
+ shuf(%args) -> [status, msg, payload, meta]
 
 Shuffle items.
 
@@ -97,7 +97,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -129,7 +129,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

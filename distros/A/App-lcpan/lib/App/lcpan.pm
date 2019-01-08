@@ -1,7 +1,7 @@
 package App::lcpan;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '1.028'; # VERSION
+our $DATE = '2019-01-08'; # DATE
+our $VERSION = '1.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -98,6 +98,18 @@ _
                 {path_sep=>'/'},
             );
         },
+    },
+    use_bootstrap => {
+        summary => 'Whether to use bootstrap database from App-lcpan-Bootstrap',
+        schema => 'bool*',
+        default => 1,
+        description => <<'_',
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
+_
+        tags => ['common'],
     },
 );
 
@@ -896,12 +908,40 @@ sub _db_path {
     $index_name =~ m!/|\\! ? $index_name : "$cpan/$index_name";
 }
 
+sub _use_db_bootstrap {
+    require File::ShareDir;
+    require File::Which;
+    require IPC::System::Options;
+
+    my $db_path = shift;
+    return if -f $db_path;
+
+    my $dist_dir;
+    eval { $dist_dir = File::ShareDir::dist_dir("App-lcpan-Bootstrap") };
+    if ($@) {
+        log_warn "Could not find bootstrap database, consider installing ".
+            "App::lcpan::Bootstrap for faster index creation";
+        return;
+    }
+    unless (File::Which::which("xz")) {
+        log_warn "Could not use bootstrap database, the 'xz' utility ".
+            "is not available to decompress the bootstrap";
+        return;
+    }
+    log_info "Decompressing bootstrap database ...";
+    IPC::System::Options::system(
+        {shell=>1, die=>1, log=>1},
+        "xz", "-cd", "$dist_dir/db/index.db.xz", \">", $db_path,
+    );
+}
+
 sub _connect_db {
     require DBI;
 
-    my ($mode, $cpan, $index_name) = @_;
+    my ($mode, $cpan, $index_name, $use_bootstrap) = @_;
 
     my $db_path = _db_path($cpan, $index_name);
+    _use_db_bootstrap($db_path) if $use_bootstrap;
     log_trace("Connecting to SQLite database at %s ...", $db_path);
     if ($mode eq 'ro') {
         # avoid creating the index file automatically if we are only in
@@ -925,7 +965,7 @@ sub _init {
     unless ($App::lcpan::state) {
         _set_args_default($args);
         my $state = {
-            dbh => _connect_db($mode, $args->{cpan}, $args->{index_name}),
+            dbh => _connect_db($mode, $args->{cpan}, $args->{index_name}, $args->{use_bootstrap}),
             cpan => $args->{cpan},
             index_name => $args->{index_name},
         };
@@ -1156,7 +1196,7 @@ sub _update_files {
         @cmd,
     );
 
-    my $dbh = _connect_db('rw', $cpan, $index_name);
+    my $dbh = _connect_db('rw', $cpan, $index_name, $args{use_bootstrap});
     $dbh->do("INSERT OR REPLACE INTO meta (name,value) VALUES (?,?)",
              {}, 'last_mirror_time', time());
 
@@ -1340,7 +1380,7 @@ sub _update_index {
               or return [500, "Copy $db_path.1 -> $db_path failed: $!"];
     }
 
-    my $dbh  = _connect_db('rw', $cpan, $index_name);
+    my $dbh  = _connect_db('rw', $cpan, $index_name, $args{use_bootstrap});
 
     # check whether we need to reindex if a sufficiently old (and possibly
     # incorrect) version of us did the reindexing
@@ -2241,7 +2281,7 @@ sub _complete_mod {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2294,7 +2334,7 @@ sub _complete_mod_or_dist {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2364,7 +2404,7 @@ sub _complete_mod_or_dist_or_script {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2441,7 +2481,7 @@ sub _complete_ns {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2488,7 +2528,7 @@ sub _complete_script {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2529,7 +2569,7 @@ sub _complete_dist {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2576,7 +2616,7 @@ sub _complete_cpanid {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2617,7 +2657,7 @@ sub _complete_rel {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -2658,7 +2698,7 @@ sub _complete_content_package_or_script {
     _set_args_default($res->[2]);
 
     my $dbh;
-    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}) };
+    eval { $dbh = _connect_db('ro', $res->[2]{cpan}, $res->[2]{index_name}, 0) };
 
     # if we can't connect (probably because database is not yet setup), bail
     if ($@) {
@@ -3033,12 +3073,12 @@ $SPEC{dists} = {
             default => 'any',
             cmdline_aliases => {
                 x => {
-                    summary => 'Shortcut --query-type exact-name',
+                    summary => 'Shortcut for --query-type exact-name',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'exact-name' },
                 },
                 n => {
-                    summary => 'Shortcut --query-type name',
+                    summary => 'Shortcut for --query-type name',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'name' },
                 },
@@ -3267,12 +3307,12 @@ $SPEC{'releases'} = {
             default => 'any',
             cmdline_aliases => {
                 x => {
-                    summary => 'Shortcut --query-type exact-name',
+                    summary => 'Shortcut for --query-type exact-name',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'exact-name' },
                 },
                 n => {
-                    summary => 'Shortcut --query-type name',
+                    summary => 'Shortcut for --query-type name',
                     is_flag => 1,
                     code => sub { $_[0]{query_type} = 'name' },
                 },
@@ -4013,7 +4053,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.028 of App::lcpan (from Perl distribution App-lcpan), released on 2018-11-29.
+This document describes version 1.031 of App::lcpan (from Perl distribution App-lcpan), released on 2019-01-08.
 
 =head1 SYNOPSIS
 
@@ -4076,6 +4116,13 @@ When there are more than one query, perform OR instead of AND logic.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 =back
 
@@ -4184,13 +4231,20 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules>* => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.26.0")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
 =item * B<phase> => I<str> (default: "runtime")
 
 =item * B<rel> => I<str> (default: "requires")
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 =item * B<with_xs_or_pp> => I<bool>
 
@@ -4291,6 +4345,13 @@ Search query.
 
 Sort the result.
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
 =back
 
 Returns an enveloped result (an array).
@@ -4366,7 +4427,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.0")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4379,6 +4440,13 @@ Search query.
 =item * B<sort> => I<array[str]> (default: ["module"])
 
 Sort the result.
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 =back
 
@@ -4446,6 +4514,13 @@ Search query.
 =item * B<sort> => I<str> (default: "name")
 
 =item * B<to_level> => I<int>
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 =back
 
@@ -4518,7 +4593,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.26.0")
+=item * B<perl_version> => I<str> (default: "v5.26.1")
 
 Set base Perl version for determining core modules.
 
@@ -4531,6 +4606,13 @@ Search query.
 =item * B<sort> => I<array[str]> (default: ["module"])
 
 Sort the result.
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 =back
 
@@ -4602,6 +4684,13 @@ Recurse for a number of levels (-1 means unlimited).
 =item * B<phase> => I<str> (default: "ALL")
 
 =item * B<rel> => I<str> (default: "ALL")
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 =back
 
@@ -4685,6 +4774,13 @@ Search query.
 
 =item * B<sort> => I<array[str]> (default: ["name"])
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
 =back
 
 Returns an enveloped result (an array).
@@ -4728,6 +4824,13 @@ be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
 =back
 
 Returns an enveloped result (an array).
@@ -4770,6 +4873,13 @@ If C<index_name> is a filename without any path, e.g. C<index.db> then index wil
 be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
+
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
 
 =back
 
@@ -4864,6 +4974,13 @@ Update the files.
 
 Update the index.
 
+=item * B<use_bootstrap> => I<bool> (default: 1)
+
+Whether to use bootstrap database from App-lcpan-Bootstrap.
+
+If you are indexing your private CPAN-like repository, you want to turn this
+off.
+
 =back
 
 Returns an enveloped result (an array).
@@ -4914,7 +5031,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

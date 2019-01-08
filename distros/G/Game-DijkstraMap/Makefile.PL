@@ -14,7 +14,7 @@ sub merge_key_into {
 
 my %params = (
     NAME         => 'Game::DijkstraMap',
-    ABSTRACT     => 'a numeric grid of weights plus some related functions',
+    ABSTRACT     => 'Dijkstra Map path finding',
     AUTHOR       => 'Jeremy Mates <jmates@cpan.org>',
     VERSION_FROM => 'lib/Game/DijkstraMap.pm',
 
@@ -36,20 +36,14 @@ my %params = (
         'Carp'             => 0,
         'List::Util'       => 1.26,
         'Moo'              => 0,
-        'namespace::clean' => 0,
         'Scalar::Util'     => 0,
+        'constant'         => 0,
+        'namespace::clean' => 0,
         'strict'           => 0,
     },
 
     META_MERGE => {
-        'meta-spec'         => { version => 2 },
-        'homepageresources' => {
-            repository => {
-                url  => 'git://github.com/thrig/Game-DijkstraMap.git',
-                web  => 'https://github.com/thrig/Game-DijkstraMap',
-                type => 'git',
-            },
-        },
+        'resources' => { repository => 'https://github.com/thrig/Game-DijkstraMap', },
     },
 );
 

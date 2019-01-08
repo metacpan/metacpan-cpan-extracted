@@ -46,6 +46,12 @@ my $index = OTRS::OPM::Maker::Command::index->new({
 
 {
     my $error;
+    eval { $index->validate_args( undef, [__FILE__] ); 1;} or $error = $@;;
+    like $error, qr/Error: need path to directory that contains opm files/;
+}
+
+{
+    my $error;
     eval { $index->validate_args( undef, ['.'] ); 1;} or $error = $@;;
     is $error, undef;
 }
