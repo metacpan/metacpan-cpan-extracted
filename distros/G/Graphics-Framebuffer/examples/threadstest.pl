@@ -44,7 +44,7 @@ foreach my $thr (0 .. $Threads) {
 } ## end foreach my $thr (0 .. $Threads)
 my ($screen_width, $screen_height) = $framebuffer[0]->screen_dimensions();
 
-my $top = 16 * $Threads;    # Font height * # of threads
+my $top = 16 * ($Threads + 1);    # Font height * # of threads
 my ($mw, $mh) = $framebuffer[0]->screen_dimensions();
 my $clw = $mw / ($Threads / $two);
 my $clx : shared = 0;
@@ -64,7 +64,8 @@ foreach my $page (1 .. $Threads) {
             my $top  = shift;
             my ($screen_width, $screen_height) = $framebuffer[$Page]->screen_dimensions();
             if ($framebuffer[$Page]->{'FB_DEVICE'} eq '/dev/fb0') {
-                $framebuffer[$page]->clip_set({ 'x' => $clx, 'y' => $top, 'xx' => $clx + $clw, 'yy' => $screen_height });
+#                $framebuffer[$page]->clip_set({ 'x' => $clx, 'y' => $top, 'xx' => $clx + $clw, 'yy' => $screen_height });
+                $framebuffer[$page]->clip_set({ 'x' => 0, 'y' => $top, 'xx' => $screen_width, 'yy' => $screen_height });
                 {
                     lock($clx);
                     $clx += $clw;

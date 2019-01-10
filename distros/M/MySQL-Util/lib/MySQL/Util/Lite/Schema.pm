@@ -52,6 +52,7 @@ method _build_tables {
 		push @ret,
 		  MySQL::Util::Lite::Table->new(
 			name        => $table,
+			schema_name => $self->name,
 			_util       => $self->_util
 		  );
 	}

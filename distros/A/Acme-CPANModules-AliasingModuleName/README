@@ -1,0 +1,52 @@
+NAME
+    Acme::CPANModules::AliasingModuleName - Aliasing a (long) module name to
+    another (shorter) name
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::AliasingModuleName (from Perl distribution
+    Acme-CPANModules-AliasingModuleName), released on 2019-01-09.
+
+DESCRIPTION
+    Aliasing a (long) module name to another (shorter) name.
+
+INCLUDED MODULES
+    *   Package::Alias
+
+    *   alias::module
+
+        I used to use Package::Alias but later I created alias::module that
+        is more lightweight (avoids using Carp) and has a simpler interface.
+
+    *   abbreviation
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-AliasingModuleName>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-AliasingModuleName>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Alia
+    singModuleName>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

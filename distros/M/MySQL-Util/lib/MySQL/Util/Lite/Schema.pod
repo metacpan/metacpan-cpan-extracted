@@ -1,0 +1,47 @@
+=head1 NAME
+
+MySQL::Util::Lite::Schema
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 name
+
+=cut
+
+=head3 tables
+
+=cut
+
+
+=head1 METHODS
+
+=head2 get_table
+
+
+=head3 parameters
+
+  Str $name!
+
+=cut
+
+=head2 get_tables
+
+
+=head3 parameters
+
+none
+
+=cut
+

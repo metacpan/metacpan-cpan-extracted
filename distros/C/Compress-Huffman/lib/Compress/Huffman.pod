@@ -45,18 +45,20 @@ produces output
     a: <2> b: <1> c: <02> d: <01> 
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.07/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/XS-Check-0.08/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.07 of Compress-Huffman corresponding to
-L<git commit 70439e9c1749bc36e8a0a404cf7cf7e418ff16d0|https://github.com/benkasminbullock/compress-huffman/commit/70439e9c1749bc36e8a0a404cf7cf7e418ff16d0> released on Fri Sep 1 14:55:57 2017 +0900.
+This documents version 0.08 of Compress-Huffman corresponding to
+L<git commit 2232ae39b5afa66e9e150706e07747447cd72ea2|https://github.com/benkasminbullock/compress-huffman/commit/2232ae39b5afa66e9e150706e07747447cd72ea2> released on Thu Jan 10 15:25:30 2019 +0900.
 
 =head1 DESCRIPTION
 
 Compress::Huffman converts a table of symbols and probabilities to a
-Huffman encoded form.
+Huffman encoded form. The Huffman encoding is output as strings using
+a restricted alphabet, so binary encoding is a string of the form
+C<0101> rather than genuine binary.
 
 =head1 METHODS
 
@@ -87,7 +89,7 @@ initial hash reference:
 
     $cf->symbols (\%symbols, size => 3);
 
-This specifies the size of the output alphabet. Without any symbols
+This specifies the size of the output alphabet. If the size is not
 specified, the default is binary output, in other words the default
 value for C<size> is two. For values of C<size> up to 10, the numerals
 0 to 9 are used to encode the output. If C<size> is greater than 10,
@@ -368,16 +370,10 @@ L<POSIX/ceil> to calculate the size of tables needed in encoding.
 
 Perl extension that implements the Huffman algorithm
 
-Unfortunately this is 15 years old and L<seems to
+Unfortunately this is 17 years old and L<seems to
 fail all its
 tests|http://matrix.cpantesters.org/?dist=Algorithm-Huffman+0.09> on
 most platforms.
-
-=item L<Compress::Huffman::Binary>
-
-This module is by the same author as Compress::Huffman. It is intended
-to compute the binary case of Huffman encoding. It's written in C and
-should be faster than this module, but as of version 0.07, it is not complete.
 
 =back
 
@@ -409,6 +405,7 @@ I<Elements of Information Theory> by Thomas Cover and Joy Thomas,
 =back
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
@@ -416,7 +413,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2015-2017
+2015-2019
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

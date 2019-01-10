@@ -17,7 +17,10 @@ sub build_ORF_regex {
 
     my ($mode, $min_len) = @_;
 
-    die "Missing arguments" if (! defined $min_len);
+    die "Missing mode"
+        if (! defined $mode);
+    die "Missing minimum length"
+        if (! defined $min_len);
     
     # mode 0 : any set of codons not STOP
     # mode 1 : must end with STOP codon

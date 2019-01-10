@@ -1,3 +1,7 @@
+Version 0.042 - 2019-01-09
+  - Loading -V1 now adds implied glLoadIdentity to next_frame()
+  - Reworked for new export system of OpenGL::Sandbox 0.04
+
 Version 0.03 - 2018-07-09
   - Use Inline::Module, to avoid depending on Inline at runtime
   - Improved implementation of setup_projection, with tests

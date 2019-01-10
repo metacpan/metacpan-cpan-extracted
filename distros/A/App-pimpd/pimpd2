@@ -8,7 +8,7 @@ use vars qw($VERSION);
 my $APP;
 
 $APP     = 'pimpd2';
-$VERSION = '0.316';
+$VERSION = '0.334';
 
 sub usage {
   pod2usage(
@@ -41,6 +41,7 @@ use App::Pimpd::Playlist::Favorite;
 use App::Pimpd::Playlist::Randomize;
 
 use Term::ExtendedColor qw(fg);
+use File::LsColor qw(ls_color);
 use Getopt::Long;
 
 GetOptions(
@@ -150,8 +151,14 @@ sub _lsa {
   my($album, $artist) = @_;
 
   $album or $album = $mpd->current->album;
-  print $_->file, "\n" for songs_on_album($album, $artist);
 
+  # no colors if not connected to a terminal
+  if(!-t STDOUT) {
+    print $_->file, "\n" for songs_on_album($album, $artist);
+  }
+  else {
+    printf "%s\n", ls_color($_->file) for songs_on_album($album, $artist);
+  }
   return;
 }
 
@@ -458,8 +465,10 @@ Stop local playback.
 
   -np,   --now-playing      basic song info on a single line
   -i,    --info             full song info
-  -cp,   --copy             copy the current track to destination
-  -cpa,  --copy-album       copy the current album to destination
+  -cp,   --copy             copy the current track
+                            optional argument: destination
+  -cpa,  --copy-album       copy the current album
+                            optional argument: destination
   -sh,   --shell            spawn the interactive shell
   -q,    --queue            queue tracks
 
@@ -469,8 +478,10 @@ Stop local playback.
          --playlists        list all known playlists
   -af,   --add-files        add files to playlist
   -a,    --add-playlist     add playlist
-         --randomize        randomize a new playlist with n tracks
-  -ra,   --random-album     add n random full albums
+         --randomize        randomize a new playlist with n tracks.
+                            optional arguments: quantity, artist
+  -ra,   --random-album     add n random full albums.
+                            optional arguments: quantity, artist
   -rma,  --rmalbum          remove album matching pattern from playlist
   -da,   --delete-album     delete the current album from disk
   -f,    --love             love song
@@ -482,6 +493,7 @@ Stop local playback.
 
   -lsa,  --songs            list songs on album
   -l,    --albums           list albums by artist
+                            optional argument: artist
   -sdb,  --search-db        search database for pattern
   -sar,  --search-artist    search database for artist
   -sal,  --search-album     search database for album
@@ -502,8 +514,8 @@ Stop local playback.
          --random           toggle random mode
 
   -p,    --play             start playback (locally and remote)
-  -s,    --stop             stop playback (locally and remote)
-  -k,    --kill             stop playback (locally)
+  -s,    --stop             stop playback  (locally and remote)
+  -k,    --kill             stop playback  (locally)
 
   -h,    --help             show the help and exit
   -m,    --man              show the manual and exit
@@ -524,7 +536,7 @@ order:
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS
@@ -533,7 +545,7 @@ None required yet.
 
 =head1 REPORTING BUGS
 
-Report bugs and/or feature requests to <magnus@trapd00r.se>, on L<rt.cpan.org>
+Report bugs and/or feature requests to <m@japh.se>, on L<rt.cpan.org>
 or L<http://github.com/trapd00r/pimpd2/issues>.
 
 =head1 COPYRIGHT

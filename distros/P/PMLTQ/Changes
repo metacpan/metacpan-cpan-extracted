@@ -1,5 +1,20 @@
 Revision history for PMLTQ
 
+2.0.2
+ - Released: 2019-01-10 10:18:09 UTC
+
+2.0.1
+ - Released: 2019-01-10 07:42:19 UTC
+
+2.0.0
+ - Released: 2019-01-07 16:20:36 UTC
+
+ [API CHANGES]
+ - move commands to independent cpan module PMLTQ::Commands
+
+ [STATISTICS]
+ - code churn: 1 file changed, 1 insertion(+), 1 deletion(-)
+
 1.5.0
  - Released: 2018-12-07 09:21:28 UTC
 

@@ -19,25 +19,25 @@ name: OTRS-OPM-Maker
 provides:
   OTRS::OPM::Maker:
     file: lib/OTRS/OPM/Maker.pm
-    version: '0.14'
+    version: '0.16'
   OTRS::OPM::Maker::Command::build:
     file: lib/OTRS/OPM/Maker/Command/build.pm
-    version: '0.14'
+    version: '0.16'
   OTRS::OPM::Maker::Command::dbtest:
     file: lib/OTRS/OPM/Maker/Command/dbtest.pm
-    version: '0.14'
+    version: '0.16'
   OTRS::OPM::Maker::Command::dependencies:
     file: lib/OTRS/OPM/Maker/Command/dependencies.pm
-    version: '0.14'
+    version: '0.16'
   OTRS::OPM::Maker::Command::filetest:
     file: lib/OTRS/OPM/Maker/Command/filetest.pm
-    version: '0.14'
+    version: '0.16'
   OTRS::OPM::Maker::Command::index:
     file: lib/OTRS/OPM/Maker/Command/index.pm
-    version: '0.14'
+    version: '0.16'
   OTRS::OPM::Maker::Command::sopmtest:
     file: lib/OTRS/OPM/Maker/Command/sopmtest.pm
-    version: '0.14'
+    version: '0.16'
 requires:
   App::Cmd: '0'
   File::Basename: '0'
@@ -53,7 +53,7 @@ resources:
   bugtracker: http://github.com/reneeb/OTRS-OPM-Maker/issues
   homepage: http://github.com/reneeb/OTRS-OPM-Maker
   repository: http://github.com/reneeb/OTRS-OPM-Maker.git
-version: '0.14'
+version: '0.16'
 x_contributors:
   - 'Michiel Beijen <michiel.beijen@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

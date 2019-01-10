@@ -12,7 +12,7 @@
                                              
 
 
-This is the README for Compress::Huffman version 0.07.
+This is the README for Compress::Huffman version 0.08.
 
 Compress::Huffman is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -33,19 +33,20 @@ contains four sections:
 Compress::Huffman - Huffman encode a symbol table
 
 Compress::Huffman converts a table of symbols and probabilities to a
-Huffman encoded form.
+Huffman encoded form. The Huffman encoding is output as strings using
+a restricted alphabet, so binary encoding is a string of the form
+"0101" rather than genuine binary.
 
 -----------------------------------------------------------------------------
 
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Compress::Huffman
     * http://metacpan.org/release/Compress-Huffman
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -66,11 +67,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Compress::Huffman
 
-To install the module from the source file, Compress-Huffman-0.07.tar.gz,
+To install the module from the source file, Compress-Huffman-0.08.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Compress-Huffman-0.07.tar.gz
-    cd Compress-Huffman-0.07
+    tar xfz Compress-Huffman-0.08.tar.gz
+    cd Compress-Huffman-0.08
     perl Makefile.PL
     make
     make install
@@ -95,6 +96,6 @@ public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Fri Sep  1 15:07:14 2017.
+This README was written on Thu Jan 10 15:26:20 2019.
 
 -----------------------------------------------------------------------------

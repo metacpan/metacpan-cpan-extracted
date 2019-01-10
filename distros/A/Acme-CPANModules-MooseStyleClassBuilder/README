@@ -1,0 +1,58 @@
+NAME
+    Acme::CPANModules::MooseStyleClassBuilder - Moose-style (Perl 6-style)
+    class builders
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::MooseStyleClassBuilder (from Perl distribution
+    Acme-CPANModules-MooseStyleClassBuilder), released on 2019-01-09.
+
+DESCRIPTION
+    Moose-style (Perl 6-style) class builders.
+
+INCLUDED MODULES
+    *   Class::Accessor - Supports basic form of "has"
+
+    *   Moo
+
+    *   MooX::BuildClass - Utility to build Moo class at runtime
+
+    *   Moos
+
+    *   Moose
+
+    *   Mouse
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-MooseStyleClassBuilder>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-MooseStyleClassBuild
+    er>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Moos
+    eStyleClassBuilder>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+    Acme::CPANModules::NonMooseStyleClassBuilder
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

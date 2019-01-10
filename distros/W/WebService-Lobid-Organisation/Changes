@@ -1,17 +1,14 @@
 Changelog for WebService-Lobid-Organisation
 
-0.0031 2016-12-14T20:40:34
- - prereqs (Peter Mayr)
- - URLs and email addresses as objects, parse 'provides' (Peter Mayr)
- - removed unused Data::Dumper (Peter Mayr)
- - remove modules (Peter Mayr)
- - added prereq 'warnings' and 'strict' (Peter Mayr)
- - indent example code (Peter Mayr)
- - differnetn min perl version for travis because of Dist::Zilla (Peter
-   Mayr)
- - another try for .travis.yml (Peter Mayr)
- - declar minimum perl version manually (Peter Mayr)
- - fix .travis.yml (Peter Mayr)
+0.0041 2019-01-09
+ - new attribute "provides"
+
+0.004 2019-01-09
+ -  new lobid.org API, use https, new format and names
+    (lon, addressCountry, addressLocality)
+    no more Wikipedia Entry in API result (Peter Mayr)
+
+0.001 2016-11-16T12:24:01
  - nue Plugin InstallGuide, remove TravisYML (Peter Mayr)
  - aktuelles dist::zill installieren (Peter Mayr)
  - added ChangelogFromGit::CPAN::Changes (Peter Mayr)

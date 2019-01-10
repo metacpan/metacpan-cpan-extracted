@@ -7,7 +7,7 @@ package App::Pods2Site::Args;
 use strict;
 use warnings;
 
-use App::Pods2Site::Util qw(slashify trim readData writeData expandAts $IS_PACKED $IS_WINDOWS $SHELL_ARG_DELIM);
+use App::Pods2Site::Util qw(slashify trim readData writeData expandAts $IS_PACKED $IS_WINDOWS $SHELL_ARG_DELIM $PATH_SEP);
 use App::Pods2Site::SiteBuilderFactory;
 
 use Config;
@@ -456,6 +456,10 @@ sub __getBinLocations
 				if ($loc eq ':std')
 				{
 					push(@locs, $self->__getDefaultBinLocations());
+				}
+				elsif ($loc eq ':path')
+				{
+					push(@locs, split(/\Q$PATH_SEP\E/, $ENV{PATH}));
 				}
 				elsif ($loc eq ':none')
 				{

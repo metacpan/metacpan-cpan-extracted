@@ -1,0 +1,51 @@
+NAME
+    Acme::CPANModules::UpsideDownTextWithUnicode - Modules that can flip
+    Latin text (make your text look upside down) using Unicode characters
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::UpsideDownTextWithUnicode (from Perl distribution
+    Acme-CPANModules-UpsideDownTextWithUnicode), released on 2019-01-09.
+
+DESCRIPTION
+    Modules that can flip Latin text (make your text look upside down) using
+    Unicode characters.
+
+INCLUDED MODULES
+    *   Text::UpsideDown - First released in 2008, comes with a CLI called
+        `ud`
+
+    *   Acme::Flip - A 2009 reinvention of Text::UpsideDown, without any CLI
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-UpsideDownTextWithUnicode
+    >.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-UpsideDownTextWithUn
+    icode>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Upsi
+    deDownTextWithUnicode>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

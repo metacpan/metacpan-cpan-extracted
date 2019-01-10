@@ -16,6 +16,8 @@ my $delay         = 1/20;       # For double-buffering, use smaller numbers
 
 our ($PFB,$DFB); # The framebuffer objects MUST be as global as possible
 
+# $PFB = Physical framebuffer
+# $DFB = Double-buffered framebuffer
 # We will always draw to $DFB
 
 unless ($double_buffer) {

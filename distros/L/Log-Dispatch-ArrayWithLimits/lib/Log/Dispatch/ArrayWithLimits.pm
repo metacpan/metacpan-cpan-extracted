@@ -6,8 +6,8 @@ use strict;
 
 use parent qw(Log::Dispatch::Output);
 
-our $DATE = '2015-01-03'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '0.050'; # VERSION
 
 sub new {
     my ($class, %args) = @_;
@@ -54,7 +54,7 @@ Log::Dispatch::ArrayWithLimits - Log to array, with some limits applied
 
 =head1 VERSION
 
-This document describes version 0.04 of Log::Dispatch::ArrayWithLimits (from Perl distribution Log-Dispatch-ArrayWithLimits), released on 2015-01-03.
+This document describes version 0.050 of Log::Dispatch::ArrayWithLimits (from Perl distribution Log-Dispatch-ArrayWithLimits), released on 2019-01-09.
 
 =head1 SYNOPSIS
 
@@ -110,19 +110,13 @@ Send a message to the appropriate output. Generally this shouldn't be called
 directly but should be called through the C<log()> method (in
 LLog::Dispatch::Output>).
 
-=head1 SEE ALSO
-
-L<Log::Dispatch>
-
-L<Log::Dispatch::Array>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Log-Dispatch-ArrayWithLimits>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Log-Dispatch-ArrayWithLimits>.
+Source repository is at L<https://github.com/perlancar/perl-Log-Dispatch-ArrayWithLimits>.
 
 =head1 BUGS
 
@@ -132,13 +126,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Log::Dispatch>
+
+L<Log::Dispatch::Array>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

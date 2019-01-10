@@ -1696,13 +1696,21 @@ Here below is shown an example of multivatiate dataseries of 3 parameters assumi
 
 
 1,1,1,1.234
+
 1,2,3,2,1.500
+
 1,3,3,3
+
 2,1,3,1,1.534
+
 2,2,3,2,0.000
+
 2,3,3,0.550
+
 3,1,3,1
+
 3,2,3,2,0.670
+
 3,3,3,3
 
 
@@ -1711,13 +1719,21 @@ The program converts this format into the one liked by Sim::OPTS, which is the f
 
 
 1-1_2-1_3-1,9.234
+
 1-1_2-2_3-2,4.500
+
 1-1_2-3_3-3
+
 1-2_2-1_3-1,7.534
+
 1-2_2-2_3-2,0.000
+
 1-2_2-3_3-3,0.550
+
 1-3_2-1_3-1
+
 1-3_2-2_3-2,0.670
+
 1-3_2-3_3-3
 
 

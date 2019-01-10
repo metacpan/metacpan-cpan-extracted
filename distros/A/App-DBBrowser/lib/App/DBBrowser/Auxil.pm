@@ -83,6 +83,31 @@ sub get_stmt {
             push @tmp, "  )";
         }
     }
+    elsif ( $stmt_type eq 'Join' ) {
+        @tmp = map { $in . $_ } split /(?=\s(?:INNER|LEFT\sOUTER|RIGHT\sOUTER|FULL\sOUTER|CROSS)\sJOIN)/, $sql->{stmt};
+        $tmp[0] =~ s/^\s//;
+    }
+    elsif ( $stmt_type eq 'Union' ) {
+        @tmp = $used_for eq 'print' ? "SELECT * FROM (" :"(";
+        my $count = 0;
+        for my $table ( @{$sql->{used_tables}} ) {
+            ++$count;
+            my $str = $in x 2 . "SELECT ";
+            if ( defined $sql->{used_cols}{$table} && @{$sql->{used_cols}{$table}} ) { #
+                my $qt_cols = $sf->quote_simple_many( $sql->{used_cols}{$table} );
+                $str .= join( ', ', @$qt_cols );
+            }
+            else {
+                $str .= '*';
+            }
+            $str .= " FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} );
+            if ( $count < @{$sql->{used_tables}} ) {
+                $str .= " UNION ALL ";
+            }
+            push @tmp, $str;
+        }
+        push @tmp, ")";
+    }
     if ( $used_for eq 'prepare' ) {
         return join '', @tmp;
     }
@@ -109,7 +134,7 @@ sub __select_cols {
         }
     }
     if ( ! @combined_cols ) {
-        if ( $sf->{i}{multi_tbl} eq 'join' ) {
+        if ( $sf->{i}{special_table} eq 'join' ) {
              return ' ' . join ', ', @{$sql->{cols}};
         }
         elsif ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
@@ -130,68 +155,18 @@ sub print_sql {
     for my $stmt_type ( @$stmt_typeS ) {
          $str .= $sf->get_stmt( $sql, $stmt_type, 'print' );
     }
-    my $filled = $sf->stmt_placeholder_to_value( $str, [ @{$sql->{set_args}}, @{$sql->{where_args}}, @{$sql->{having_args}} ] );
-    $str = $filled if defined $filled;
+    if ( ! $sf->{i}{special_table} ) {
+        my $filled = $sf->stmt_placeholder_to_value( $str, [ @{$sql->{set_args}}, @{$sql->{where_args}}, @{$sql->{having_args}} ] );
+        $str = $filled if defined $filled;
+    }
     $str .= "\n";
-    print $sf->{i}{clear_screen};
-    print line_fold( $str, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} );
+    print CLEAR_SCREEN;
+    print line_fold( $str, term_width() - 2, '', ' ' x 4 );
     if ( defined $waiting ) {
         local $| = 1;
         print HIDE_CURSOR;
         print $waiting;
     }
-}
-
-
-sub column_names_and_types {
-    my ( $sf, $tables ) = @_;
-    my ( $col_names, $col_types );
-    for my $table ( @$tables ) {
-        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
-        $sth->execute() if $sf->{d}{driver} ne 'SQLite';
-        $col_names->{$table} ||= $sth->{NAME};
-        $col_types->{$table} ||= $sth->{TYPE};
-    }
-    return $col_names, $col_types;
-}
-
-
-sub tables_data {   # in App::DBBrowser::DB no 'quote_table'
-    my ( $sf, $schema, $db_attached ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $driver = $sf->{d}{driver};
-    my ( $user_tbls, $sys_tbls ) = ( [], [] );
-    my $table_data = {};
-    my ( $table_schem, $table_name );
-    if ( $driver eq 'Pg' ) {
-        $table_schem = 'pg_schema';
-        $table_name  = 'pg_table';
-    }
-    else {
-        $table_schem = 'TABLE_SCHEM';
-        $table_name  = 'TABLE_NAME';
-    }
-    my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
-    if ( $db_attached ) {
-        $schema = undef;
-        # More than one schema if a SQLite database has databases attached
-    }
-    my $sth = $sf->{d}{dbh}->table_info( undef, $schema, undef, undef );
-    my $info = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
-    for my $href ( @$info ) {
-        my $table = defined $schema ? $href->{$table_name} : $ax->quote_table( [ @{$href}{@keys} ] );
-        if ( $href->{TABLE_TYPE} =~ /SYSTEM/ ) {
-            #next if ! $sf->{add_metadata};
-            next if $href->{$table_name} eq 'sqlite_temp_master';
-            push @$sys_tbls, $table;
-        }
-        elsif ( $href->{TABLE_TYPE} ne 'INDEX' ) {
-        #elsif ( $href->{TABLE_TYPE} eq 'TABLE' || $href->{TABLE_TYPE} eq 'VIEW' || $href->{TABLE_TYPE} eq 'LOCAL TEMPORARY' ) {
-            push @$user_tbls, $table;
-        }
-        $table_data->{$table} = [ @{$href}{@keys} ];
-    }
-    return $table_data, $user_tbls, $sys_tbls;
 }
 
 
@@ -306,6 +281,19 @@ sub print_error_message {
         [ 'Press ENTER to continue' ],
         { %{$sf->{i}{lyt_m}}, prompt => $message, info => $info }
     );
+}
+
+
+sub column_names_and_types {
+    my ( $sf, $tables ) = @_;
+    my ( $col_names, $col_types );
+    for my $table ( @$tables ) {
+        my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $sf->quote_table( $sf->{d}{tables_info}{$table} ) . " LIMIT 0" );
+        $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+        $col_names->{$table} ||= $sth->{NAME};
+        $col_types->{$table} ||= $sth->{TYPE};
+    }
+    return $col_names, $col_types;
 }
 
 

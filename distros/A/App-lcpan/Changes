@@ -1,3 +1,8 @@
+1.032   2019-01-09 (PERLANCAR)
+
+	- Add subcommand: extract-dist.
+
+
 1.031   2019-01-08 (PERLANCAR)
 
 	- Add option --no-use-bootstrap to prevent using bootstrap database

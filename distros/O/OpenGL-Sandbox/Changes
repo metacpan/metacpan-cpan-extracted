@@ -1,3 +1,10 @@
+Version 0.042 - 2019-01-09
+  - New API functions: next_frame, current_context, log_gl_errors
+  - New Import Syntax: -V1 loads ::V1 module, ":V1:all" is no longer allowed
+  - Support for OpenGL::GLFW contexts
+  - Clean up GL contexts before global destruction
+  - Fix some dist version problems that cpanm didn't like
+
 Version 0.03 - 2018-07-09
   - Removed accidental dependency on X11::GLX
   - Added more options to make_context

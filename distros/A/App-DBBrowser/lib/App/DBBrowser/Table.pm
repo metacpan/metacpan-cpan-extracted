@@ -133,12 +133,12 @@ sub on_table {
         }
         elsif ( $custom eq $cu{'print_tbl'} ) {
             local $| = 1;
-            print $sf->{i}{clear_screen};
+            print CLEAR_SCREEN;
             print HIDE_CURSOR;
             print 'Computing:' . "\r" if $sf->{o}{table}{progress_bar};
             my $statement = $ax->get_stmt( $sql, $stmt_type, 'prepare' );
             my @arguments = ( @{$sql->{where_args}}, @{$sql->{having_args}} );
-            if ( $sf->{i}{multi_tbl} ne 'subquery' ) { ##
+            if ( $sf->{i}{special_table} ne 'subquery' ) { ##
                 unshift @{$sf->{i}{history}{ $sf->{d}{db} }{print}}, [ $statement, \@arguments ];
                 if ( $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} > 50 ) {
                     $#{$sf->{i}{history}{ $sf->{d}{db} }{print}} = 50;

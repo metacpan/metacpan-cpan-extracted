@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+die "OS unsupported" unless $^O eq 'darwin';
+
 WriteMakefile(
     NAME             => 'Mac::OSA::Dialog::Tiny',
     AUTHOR           => q{LNATION <thisusedtobeanemail@gmail.com>},

@@ -117,7 +117,7 @@ subtest 'Check for valid cache and key names' => sub {
 
     # And now without throws.
     # No, we're not gonna do that!
-    # It would require a net connection, 
+    # It would require a net connection,
     # and that won't do in this test!
     #$item_key = 'item_01_001';
     #my $item_put = $created_cache->put(

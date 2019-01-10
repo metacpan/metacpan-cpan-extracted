@@ -1,0 +1,83 @@
+NAME
+    Acme::CPANModules::PickingRandomLinesFromFile - Picking random lines
+    from a file
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::PickingRandomLinesFromFile (from Perl distribution
+    Acme-CPANModules-PickingRandomLinesFromFile), released on 2019-01-09.
+
+DESCRIPTION
+    Picking random lines from a file.
+
+INCLUDED MODULES
+    *   File::Random
+
+        The "random_line()" function from this module picks one or more
+        random lines from a specified file. The whole content of the file
+        need not be slurped into memory, but the routine requires a
+        single-pass of reading all lines from the file. The algorithm is as
+        described in perlfaq (See: "perldoc -q "random line"").
+
+        If you pick more than one lines, then there might be duplicates.
+
+    *   File::RandomLine - Recommended for large files
+
+        This module gives you a choice of two algorithms. The first is
+        similar to File::Random (the scan method), giving each line of the
+        file equal weight. The second algorithm is more interesting: it
+        works by random seeking the file, discarding the line fragment
+        (a.k.a. searching forward for the next newline character), reading
+        the next line, then repeating the process until the desired number
+        of lines is reached. This means one doesn't have to read the whole
+        file and the picking process is much faster than the scan method. It
+        might be preferred for very large files.
+
+        Note that due to the nature of the algorithm, lines are weighted by
+        the number of characters. In other words, lines that have long lines
+        immediately preceding them will have a greater probability of being
+        picked. Depending on your use case or the line length variation of
+        your file, this algorithm might or might not be acceptable to you.
+
+    *   File::Random::Pick
+
+        This module is an alternative to File::Random. It offers a
+        "random_line()" routine that avoids duplication.
+
+    *   App::PickRandomLines
+
+        A CLI that allows you to use File::Random::Pick or File::RandomLine
+        on the command-line.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-PickingRandomLinesFromFil
+    e>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-PickingRandomLinesFr
+    omFile>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Pick
+    ingRandomLinesFromFile>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

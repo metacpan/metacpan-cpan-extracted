@@ -1,0 +1,71 @@
+NAME
+    Acme::CPANModules::HidingModules - Simulate the unavailability of
+    modules
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::HidingModules (from Perl distribution
+    Acme-CPANModules-HidingModules), released on 2019-01-10.
+
+DESCRIPTION
+    Simulate the unavailability of modules.
+
+    The tools listed here can simulate the absence of modules, usually for
+    testing purposes. For example, you have Foo::Bar installed but want to
+    test how your code would behave when Foo::Bar is not installed.
+
+    These tools usually work by installing a require() hook in @INC. If the
+    hook sees that you are trying to load one of the target modules, it dies
+    instead.
+
+INCLUDED MODULES
+    *   lib::filter
+
+    *   lib::disallow
+
+    *   Devel::Hide
+
+    *   Test::Without::Module
+
+    *   Module::Path::Patch::Hide - This only hides modules from
+        Module::Path
+
+    *   Module::Path::More::Patch::Hide - This only hides modules from
+        Module::Path::More
+
+    *   Module::List::Patch::Hide - This only hides modules from
+        Module::List
+
+    *   PERLANCAR::Module::List::Patch::Hide - This only hides modules from
+        PERLANCAR::Module::List
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-HidingModules>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-HidingModules>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Hidi
+    ngModules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

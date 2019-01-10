@@ -11,6 +11,16 @@ use Data::Dumper;
 
 use parent "App::cdif::Tmpfile";
 
+our $debug;
+sub debug {
+    my $obj = shift;
+    if (@_) {
+	$debug = shift;
+    } else {
+	$debug;
+    }
+}
+
 sub new {
     my $class = shift;
     my $obj = SUPER::new $class;
@@ -81,16 +91,16 @@ sub stdin {
 sub setstdin {
     my $obj = shift;
     my $data = shift;
-    my $fh = $obj->{STDIN} //= do {
-	my $stdin = new_tmpfile IO::File or die "new_tmpfile: $!\n";
-	$stdin->fcntl(F_SETFD, 0) or die "fcntl F_SETFD: $!\n";
-	binmode $stdin, ':encoding(utf8)';
-	$stdin;
+    my $stdin = $obj->{STDIN} //= do {
+	my $fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
+	$fh->fcntl(F_SETFD, 0) or die "fcntl F_SETFD: $!\n";
+	binmode $fh, ':encoding(utf8)';
+	$fh;
     };
-    $fh->seek(0, 0)  or die "seek: $!\n";
-    $fh->truncate(0) or die "truncate: $!\n";
-    $fh->print($data);
-    $fh->seek(0, 0)  or die "seek: $!\n";
+    $stdin->seek(0, 0)  or die "seek: $!\n";
+    $stdin->truncate(0) or die "truncate: $!\n";
+    $stdin->print($data);
+    $stdin->seek(0, 0)  or die "seek: $!\n";
     $obj;
 }
 

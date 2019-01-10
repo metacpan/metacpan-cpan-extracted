@@ -1,5 +1,10 @@
 Revision history for Future-AsyncAwait
 
+0.19    2019-01-08 23:49:03
+        [BUGFIXES]
+         * Replace stolen array or hash pad lexicals with newAV() / newHV() to
+           maintain the expected SvTYPE() invariants (RT128176)
+
 0.18    2019-01-05 20:08:38
         [CHANGES]
          * Declare threaded perls before version 5.22 as unsupported. The bug

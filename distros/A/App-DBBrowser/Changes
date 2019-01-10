@@ -1,12 +1,18 @@
 Revision history for App-DBBrowser
 
 
+2.041    2019-01-09
+        - Bugfix in join: backup aliases.
+        - Update join menus.
+        - Attached databases: make menus less noisy.
+        - Code refactoring.
+
 2.040    2019-01-07
         - MySQL and Pg databases: added 'autoincrement' options.
         - Bugfix in 'get_schemas'.
 
 2.039    2019-01-06
-        - Bugfix in Join.
+        - Bugfix in join.
 
 2.038    2019-01-06
         - Tables: filter out tables of the type 'index'.

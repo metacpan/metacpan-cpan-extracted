@@ -21,6 +21,7 @@ Brendan
 Byrd
 Chase
 David
+Dorian
 Dubois
 Escape
 Etheridge
@@ -80,6 +81,7 @@ Stosberg
 TCP
 TLS
 Tatsuhiko
+Taylor
 Torsten
 UDP
 UNC
@@ -106,6 +108,7 @@ capoeirab
 carnil
 data
 davewood
+dorian
 ether
 etype
 evalue

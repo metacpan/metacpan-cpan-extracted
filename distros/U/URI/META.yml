@@ -27,7 +27,7 @@ no_index:
 provides:
   URI:
     file: lib/URI.pm
-    version: '1.74'
+    version: '1.76'
   URI::Escape:
     file: lib/URI/Escape.pm
     version: '3.31'
@@ -36,13 +36,13 @@ provides:
     version: '4.20'
   URI::IRI:
     file: lib/URI/IRI.pm
-    version: '1.74'
+    version: '1.76'
   URI::QueryParam:
     file: lib/URI/QueryParam.pm
-    version: '1.74'
+    version: '1.76'
   URI::Split:
     file: lib/URI/Split.pm
-    version: '1.74'
+    version: '1.76'
   URI::URL:
     file: lib/URI/URL.pm
     version: '5.04'
@@ -51,109 +51,109 @@ provides:
     version: '2.20'
   URI::data:
     file: lib/URI/data.pm
-    version: '1.74'
+    version: '1.76'
   URI::file:
     file: lib/URI/file.pm
     version: '4.21'
   URI::file::Base:
     file: lib/URI/file/Base.pm
-    version: '1.74'
+    version: '1.76'
   URI::file::FAT:
     file: lib/URI/file/FAT.pm
-    version: '1.74'
+    version: '1.76'
   URI::file::Mac:
     file: lib/URI/file/Mac.pm
-    version: '1.74'
+    version: '1.76'
   URI::file::OS2:
     file: lib/URI/file/OS2.pm
-    version: '1.74'
+    version: '1.76'
   URI::file::QNX:
     file: lib/URI/file/QNX.pm
-    version: '1.74'
+    version: '1.76'
   URI::file::Unix:
     file: lib/URI/file/Unix.pm
-    version: '1.74'
+    version: '1.76'
   URI::file::Win32:
     file: lib/URI/file/Win32.pm
-    version: '1.74'
+    version: '1.76'
   URI::ftp:
     file: lib/URI/ftp.pm
-    version: '1.74'
+    version: '1.76'
   URI::gopher:
     file: lib/URI/gopher.pm
-    version: '1.74'
+    version: '1.76'
   URI::http:
     file: lib/URI/http.pm
-    version: '1.74'
+    version: '1.76'
   URI::https:
     file: lib/URI/https.pm
-    version: '1.74'
+    version: '1.76'
   URI::ldap:
     file: lib/URI/ldap.pm
-    version: '1.74'
+    version: '1.76'
   URI::ldapi:
     file: lib/URI/ldapi.pm
-    version: '1.74'
+    version: '1.76'
   URI::ldaps:
     file: lib/URI/ldaps.pm
-    version: '1.74'
+    version: '1.76'
   URI::mailto:
     file: lib/URI/mailto.pm
-    version: '1.74'
+    version: '1.76'
   URI::mms:
     file: lib/URI/mms.pm
-    version: '1.74'
+    version: '1.76'
   URI::news:
     file: lib/URI/news.pm
-    version: '1.74'
+    version: '1.76'
   URI::nntp:
     file: lib/URI/nntp.pm
-    version: '1.74'
+    version: '1.76'
   URI::pop:
     file: lib/URI/pop.pm
-    version: '1.74'
+    version: '1.76'
   URI::rlogin:
     file: lib/URI/rlogin.pm
-    version: '1.74'
+    version: '1.76'
   URI::rsync:
     file: lib/URI/rsync.pm
-    version: '1.74'
+    version: '1.76'
   URI::rtsp:
     file: lib/URI/rtsp.pm
-    version: '1.74'
+    version: '1.76'
   URI::rtspu:
     file: lib/URI/rtspu.pm
-    version: '1.74'
+    version: '1.76'
   URI::sftp:
     file: lib/URI/sftp.pm
-    version: '1.74'
+    version: '1.76'
   URI::sip:
     file: lib/URI/sip.pm
-    version: '1.74'
+    version: '1.76'
   URI::sips:
     file: lib/URI/sips.pm
-    version: '1.74'
+    version: '1.76'
   URI::snews:
     file: lib/URI/snews.pm
-    version: '1.74'
+    version: '1.76'
   URI::ssh:
     file: lib/URI/ssh.pm
-    version: '1.74'
+    version: '1.76'
   URI::telnet:
     file: lib/URI/telnet.pm
-    version: '1.74'
+    version: '1.76'
   URI::tn3270:
     file: lib/URI/tn3270.pm
-    version: '1.74'
+    version: '1.76'
   URI::urn:
     file: lib/URI/urn.pm
-    version: '1.74'
+    version: '1.76'
   URI::urn::isbn:
     file: lib/URI/urn/isbn.pm
-    version: '1.74'
+    version: '1.76'
   URI::urn::oid:
     file: lib/URI/urn/oid.pm
-    version: '1.74'
+    version: '1.76'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -177,10 +177,10 @@ resources:
   bugtracker: https://github.com/libwww-perl/URI/issues
   homepage: https://github.com/libwww-perl/URI
   repository: https://github.com/libwww-perl/URI.git
-version: '1.74'
+version: '1.76'
 x_Dist_Zilla:
   perl:
-    version: '5.027011'
+    version: '5.026001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -202,7 +202,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
@@ -228,7 +228,7 @@ x_Dist_Zilla:
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.006'
+          version: '0.004'
       name: MetaProvides::Package
       version: '2.004003'
     -
@@ -251,17 +251,17 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.14.2
+          git_version: 2.20.0
           include_authors: 0
           include_releaser: 1
           order_by: commits
           paths: []
       name: Git::Contributors
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
-      version: '0.54'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Authority
       name: Authority
@@ -394,15 +394,15 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.20.0
           repo_root: .
       name: Git::Check
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.20.0
           repo_root: .
       name: Git::CheckFor::MergeConflicts
       version: '0.014'
@@ -410,7 +410,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.20.0
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -453,7 +453,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000033'
-          version: '0.006'
+          version: '0.004'
       name: '@Git::VersionManager/VersionFromMainModule'
       version: '0.04'
     -
@@ -468,7 +468,7 @@ x_Dist_Zilla:
             - Changes
           match: []
       name: '@Git::VersionManager/CopyFilesFromRelease'
-      version: '0.007'
+      version: '0.006'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -483,12 +483,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.20.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/release snapshot'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -496,16 +496,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.74
+          tag: v1.76
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.20.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/Git::Tag'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -536,12 +536,12 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.20.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git::VersionManager/post-release commit'
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -550,10 +550,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.14.2
+          git_version: 2.20.0
           repo_root: .
       name: Git::Push
-      version: '2.043'
+      version: '2.045'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
@@ -611,13 +611,14 @@ x_authority: cpan:LWWWP
 x_contributors:
   - 'Gisle Aas <gisle@aas.no>'
   - 'Karen Etheridge <ether@cpan.org>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Chase Whitener <capoeirab@cpan.org>'
   - 'Ville Skyttä <ville.skytta@iki.fi>'
   - 'Mark Stosberg <mark@stosberg.com>'
-  - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Michael G. Schwern <schwern@pobox.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'Slaven Rezic <slaven@rezic.de>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
   - 'Kent Fredric <kentfredric@gmail.com>'
   - 'Masahiro Honma <hiratara@cpan.org>'
   - 'Matt Lawrence <matthewlawrence@venda.com>'
@@ -631,10 +632,10 @@ x_contributors:
   - 'Alex Kapranoff <kapranoff@gmail.com>'
   - 'Brendan Byrd <Perl@ResonatorSoft.org>'
   - 'David Schmidt <davewood@gmx.at>'
+  - 'Dorian Taylor <dorian.taylor.lists@gmail.com>'
   - 'Jan Dubois <jand@activestate.com>'
   - 'John Karr <brainbuz@brainbuz.org>'
   - 'John Miller <john@rimmkaufman.com>'
   - 'Kaitlyn Parkhurst <symkat@symkat.com>'
-  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
-x_generated_by_perl: v5.27.11
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

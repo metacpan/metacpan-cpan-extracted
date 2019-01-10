@@ -1,3 +1,6 @@
+4.06
+ - Fix bug (https://bugs.debian.org/918673) in t/subnormal_doubles.t
+
 4.05
  - Add atodouble() function
  - Fix atonv to correctly handle subnormal double-doubles

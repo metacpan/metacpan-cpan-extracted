@@ -1,3 +1,17 @@
+0.31   2019-01-09
+
+- No changes from 0.30.
+
+
+0.30   2018-10-08 (TRIAL RELEASE)
+
+- Added an optional feature to track path attribute changes (permissions,
+  ownership) as well as to provide the old vs new attributes and/or content in
+  modify events. Both of these features are off by default since they can use
+  a lot more CPU or memory, especially when using otherwise low-overhead
+  kernel-based watchers.
+
+
 0.29   2018-09-25
 
 - The change to Module::Runtime in 0.25 wasn't complete so this distro still

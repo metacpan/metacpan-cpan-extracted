@@ -136,5 +136,13 @@ is($j->firstlevelnode->secondlevelnode->a->[1]->r, '14', 'replacing leaf deep va
 
 $j->firstlevelnode->secondlevelnode->b->d->[1]->l(8);
 
+$j->raiseError('kapow');
+
+is_deeply($j->errors, ['kapow'], 'call raiseError with a string - result an arrayref - kapow');
+
+$j->raiseError([qw/zonk bam/], 404);
+
+is_deeply($j->errors, ['kapow', 'zonk', 'bam'], 'call raiseError with an arrayref - result an arrayref - kapow, zonk, bam');
+is($j->{_status_code}, 404, 'call raiseError with two arguments, check that status code was set - result string - 404');
 
 done_testing();

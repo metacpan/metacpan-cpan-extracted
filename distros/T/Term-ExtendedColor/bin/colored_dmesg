@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# nowadays dmesg is already colored so this is kinda obsolete. :)
 
 use strict;
 use Term::ExtendedColor qw(fg bg);

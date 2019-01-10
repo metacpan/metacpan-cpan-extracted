@@ -1,5 +1,5 @@
 ---
-abstract: 'Fiat currency exchange rate library'
+abstract: 'Currency exchange rate library'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -21,6 +21,7 @@ name: Finance-Currency-FiatX
 requires:
   Complete::Module: '0'
   Complete::Util: '0.57'
+  Exporter: '5.57'
   Finance::Currency::Convert::BCA: '0'
   Finance::Currency::Convert::BI: '0.05'
   Finance::Currency::Convert::GMC: '0.004'
@@ -37,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-FiatX
   homepage: https://metacpan.org/release/Finance-Currency-FiatX
   repository: git://github.com/perlancar/perl-Finance-Currency-FiatX.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -113,7 +114,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -125,11 +126,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.05'
+      version: '0.060'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -336,7 +337,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

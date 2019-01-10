@@ -1,5 +1,12 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.27 2018-01-08
+
+ - Fix crash on conflicting options continuefootnotes and nocoverpage
+ - Permit empty format_id and treat as DEFAULT
+ - Set "overflow: auto" CSS property on "pre" elements for standalone
+   HTMLs (thanks to @link2xt)
+
 1.26 2018-11-04
 
  - Remove Crimson Text from the default font list

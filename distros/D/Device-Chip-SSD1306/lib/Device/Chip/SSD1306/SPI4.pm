@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::SSD1306::SPI4;
 
@@ -9,7 +9,9 @@ use strict;
 use warnings;
 use base qw( Device::Chip::SSD1306 );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+use Future::AsyncAwait;
 
 =head1 NAME
 
@@ -66,24 +68,22 @@ sub set_dc
    $self->protocol->write_gpios( { $self->{dc} => $dc } );
 }
 
-sub send_cmd
+async sub send_cmd
 {
    my $self = shift;
    my @vals = @_;
 
-   $self->set_dc(0)->then( sub {
-      $self->protocol->readwrite( join "", map { chr } @vals )
-   });
+   await $self->set_dc( 0 );
+   await $self->protocol->readwrite( join "", map { chr } @vals );
 }
 
-sub send_data
+async sub send_data
 {
    my $self = shift;
    my ( $bytes ) = @_;
 
-   $self->set_dc(1)->then( sub {
-      $self->protocol->readwrite( $bytes );
-   });
+   await $self->set_dc( 1 );
+   await $self->protocol->readwrite( $bytes );
 }
 
 =head1 AUTHOR

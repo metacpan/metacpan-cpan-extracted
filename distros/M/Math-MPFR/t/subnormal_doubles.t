@@ -8,10 +8,10 @@ use warnings;
 use Math::MPFR qw(:mpfr);
 
 
-if($Config::Config{nvtype} eq 'double' ||
+if(
+    $Config::Config{nvtype} eq 'double' ||
     ($Config::Config{nvtype} eq 'long double' &&
-      ($Config::Config{nvsize} == 8 ||  Math::MPFR::_required_ldbl_mant_dig() == 2098)
-    )
+    ($Config::Config{nvsize} == 8 ||  Math::MPFR::_required_ldbl_mant_dig() == 2098))
   ) {
 
   my $have_atodouble = MPFR_VERSION <= 196869 ? 0 : 1;
@@ -56,7 +56,9 @@ if($Config::Config{nvtype} eq 'double' ||
       # Specifically, the least significant double in 10 + $val should
       # be identical to $d.
 
-      if(Math::MPFR::_required_ldbl_mant_dig() == 2098 && $exp <= -300) {
+      if($Config::Config{nvtype} eq 'long double' &&
+         Math::MPFR::_required_ldbl_mant_dig() == 2098 &&
+         $exp <= -300) {
         my $prefix = "1" . ("0" x ($exp * -1));
         my $nv = atonv($ws, $prefix . $val);
 

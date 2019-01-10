@@ -7,8 +7,9 @@ use Time::HiRes 'sleep';
 use Test::More;
 use Try::Tiny;
 use Log::Any::Adapter 'TAP';
-use OpenGL::Sandbox qw/ make_context get_gl_errors glFlush GL_TRIANGLES GL_MODELVIEW_MATRIX /;
-use OpenGL::Sandbox::V1 qw/ local_matrix load_identity rotate scale trans trans_scale get_matrix /;
+BEGIN { $OpenGL::Sandbox::V1::VERSION= $ENV{ASSUME_V1_VERSION} } # for testing before release
+use OpenGL::Sandbox qw/ next_frame make_context get_gl_errors glFlush GL_TRIANGLES GL_MODELVIEW_MATRIX
+ -V1 local_matrix load_identity rotate scale trans trans_scale get_matrix /;
 
 my $c= try { make_context; }
 	or plan skip_all => "Can't test without context";
@@ -211,6 +212,25 @@ sub test_local_matrix {
 		0, -1, 0, 0,
 		0, 0, 0, 1
 	], 'only X is rotated');
+}
+
+subtest next_frame_loads_identity => \&test_next_frame_loads_identity;
+sub test_next_frame_loads_identity {
+	load_identity;
+	scale 2,3;
+	matrix_ok([
+		2, 0, 0, 0,
+		0, 3, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	], 'scale xy by 2,3');
+	next_frame;
+	matrix_ok([
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	], 'next_frame calls glLoadIdentity');
 }
 
 done_testing;

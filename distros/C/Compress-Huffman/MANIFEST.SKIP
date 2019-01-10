@@ -12,3 +12,4 @@ MYMETA..*
 ^make-pod\.pl$
 ^lib/Compress/Huffman\.pod\.tmpl$
 ^examples/.*-out\.txt$
+^xt/.*\.t$

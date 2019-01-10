@@ -1,0 +1,69 @@
+{
+   "abstract" : "Find a Date in Text",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTime-Format-Text",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "WWW::RT::CPAN" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-DateTime-Format-Text@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Text"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/DateTime-Format-Text.git",
+         "web" : "https://github.com/nigelhorne/DateTime-Format-Text"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

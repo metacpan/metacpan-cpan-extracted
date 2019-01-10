@@ -1,5 +1,4 @@
 package OpenGL::Sandbox::Texture;
-BEGIN { $OpenGL::Sandbox::Texture::VERSION = '0.03'; }
 use Moo;
 use Carp;
 use Try::Tiny;
@@ -10,6 +9,9 @@ use OpenGL::Sandbox qw(
 use OpenGL::Sandbox::MMap;
 
 # ABSTRACT: Wrapper object for OpenGL texture
+BEGIN {
+our $VERSION = '0.042'; # VERSION
+}
 
 
 has filename   => ( is => 'rw' );
@@ -170,7 +172,7 @@ OpenGL::Sandbox::Texture - Wrapper object for OpenGL texture
 
 =head1 VERSION
 
-version 0.03
+version 0.042
 
 =head1 ATTRIBUTES
 
@@ -367,7 +369,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

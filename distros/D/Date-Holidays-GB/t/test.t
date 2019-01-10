@@ -34,7 +34,7 @@ is $st_andrews_day, "St Andrew\x{2019}s Day (Scotland)", "St Andrew's Day name o
 note "holidays";
 
 is_deeply holidays(2000), {}, "No data for year 2000 - outside range";
-is_deeply holidays(2020), {}, "No data for year 2020 - outside range";
+is_deeply holidays(2025), {}, "No data for year 2025 - outside range";
 
 #like exception { holidays(2000) }, qr/No holiday data for year 2000/, "dies ok outside date range";
 #like exception { holidays(2020) }, qr/No holiday data for year 2020/, "dies ok outside date range";

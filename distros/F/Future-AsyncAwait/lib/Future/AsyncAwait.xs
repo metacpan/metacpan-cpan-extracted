@@ -135,11 +135,49 @@ typedef struct {
 
   U32 padlen;
   SV **padslots;
+
+#ifdef DEBUG
+  COP *curcop;
+#endif
 } SuspendedState;
+
+#ifdef DEBUG
+#  define TRACEPRINT S_traceprint
+static void S_traceprint(char *fmt, ...)
+{
+  /* TODO: make conditional */
+  va_list args;
+  va_start(args, fmt);
+  vfprintf(stderr, fmt, args);
+  va_end(args);
+}
+#else
+#  define TRACEPRINT(...)
+#endif
 
 static void debug_sv_summary(const SV *sv)
 {
-  fprintf(stderr, "SV{type=%d,refcnt=%d", SvTYPE(sv), SvREFCNT(sv));
+  const char *type;
+
+  switch(SvTYPE(sv)) {
+    case SVt_NULL: type = "NULL"; break;
+    case SVt_IV:   type = "IV";   break;
+    case SVt_NV:   type = "NV";   break;
+    case SVt_PV:   type = "PV";   break;
+    case SVt_PVGV: type = "PVGV"; break;
+    case SVt_PVAV: type = "PVAV"; break;
+    default: {
+      char buf[16];
+      sprintf(buf, "(%d)", SvTYPE(sv));
+      type = buf;
+      break;
+    }
+  }
+
+  if(SvROK(sv))
+    type = "RV";
+
+  fprintf(stderr, "SV{type=%s,refcnt=%d", type, SvREFCNT(sv));
 
   if(SvROK(sv))
     fprintf(stderr, ",ROK");
@@ -151,7 +189,6 @@ static void debug_sv_summary(const SV *sv)
 
 static void debug_showstack(const char *name)
 {
-#ifdef DEBUG_SHOW_STACKS
   SV **sp;
 
   fprintf(stderr, "%s:\n", name ? name : "Stack");
@@ -174,7 +211,6 @@ static void debug_showstack(const char *name)
       fprintf(stderr, " [*M]"), mark++;
     fprintf(stderr, "\n");
   }
-#endif
 }
 
 static void vpanic(char *fmt, va_list args)
@@ -782,7 +818,20 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 
     /* Don't fiddle refcount */
     state->padslots[i-1] = PadARRAY(pad)[i];
-    PadARRAY(pad)[i] = newSV(0);
+    switch(PadnamePV(pname)[0]) {
+      case '@':
+        PadARRAY(pad)[i] = MUTABLE_SV(newAV());
+        break;
+      case '%':
+        PadARRAY(pad)[i] = MUTABLE_SV(newHV());
+        break;
+      case '$':
+        PadARRAY(pad)[i] = newSV(0);
+        break;
+      default:
+        panic("TODO: unsure how to steal and switch pad slot with pname %s\n",
+          PadnamePV(pname));
+      }
   }
 
   dounwind(cxix);
@@ -1209,8 +1258,14 @@ static OP *pp_await(pTHX)
 
   CV *curcv = find_runcv(0);
   CV *origcv = curcv;
+  COP *curcop = PL_curcop; /* just for debug printing purposes */
 
   SuspendedState *state = suspendedstate_get(curcv);
+
+#ifdef DEBUG
+  if(state && state->curcop)
+    curcop = state->curcop;
+#endif
 
   if(state && state->awaiting_future && CATCH_GET) {
     /* If we don't do this we get all the mess that is
@@ -1219,8 +1274,12 @@ static OP *pp_await(pTHX)
     return docatch(pp_await);
   }
 
+  TRACEPRINT("ENTER await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
+
   if(state && state->awaiting_future) {
     I32 orig_height;
+
+    TRACEPRINT("  RESUME\n");
 
     f = state->awaiting_future;
     state->awaiting_future = NULL;
@@ -1243,7 +1302,9 @@ static OP *pp_await(pTHX)
 
     suspendedstate_resume(state, curcv);
 
+#ifdef DEBUG_SHOW_STACKS
     debug_showstack("Stack after resume");
+#endif
   }
   else {
     f = POPs;
@@ -1255,18 +1316,35 @@ static OP *pp_await(pTHX)
 
   if(future_is_ready(f)) {
     assert(CvDEPTH(curcv) > 0);
+    TRACEPRINT("  READY\n");
+#ifdef DEBUG
+    if(state)
+      state->curcop = NULL;
+#endif
     /* This might throw */
     future_get_to_stack(f, GIMME_V);
+    TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
     return PL_op->op_next;
   }
 
+#ifdef DEBUG_SHOW_STACKS
   debug_showstack("Stack before suspend");
+#endif
 
   if(!state) {
     /* Clone the CV and then attach suspendedstate magic to it */
     curcv = cv_dup_for_suspend(curcv);
     state = suspendedstate_new(curcv);
+
+    TRACEPRINT("  SUSPEND cloned CV->%p\n", curcv);
   }
+  else {
+    TRACEPRINT("  SUSPEND reuse CV\n");
+  }
+
+#ifdef DEBUG
+    state->curcop = curcop;
+#endif
 
   suspendedstate_suspend(state, origcv);
 
@@ -1281,6 +1359,8 @@ static OP *pp_await(pTHX)
   PUSHMARK(SP);
   PUSHs(state->returning_future);
   PUTBACK;
+
+  TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
 
   return PL_ppaddr[OP_RETURN](aTHX);
 }

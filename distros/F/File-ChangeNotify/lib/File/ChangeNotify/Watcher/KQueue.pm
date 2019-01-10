@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
-use File::Find ();
+use File::Find qw( find );
 use IO::KQueue;
 use Types::Standard qw( HashRef Int );
 use Type::Utils qw( class_type );
@@ -41,26 +41,36 @@ with 'File::ChangeNotify::Watcher';
 sub sees_all_events {0}
 
 sub BUILD {
-    my ($self) = @_;
+    my $self = shift;
+
     $self->_watch_dir($_) for @{ $self->directories };
+
+    $self->_set_map( $self->_current_map )
+        if $self->modify_includes_file_attributes
+        || $self->modify_includes_content;
+
+    return;
 }
 
 sub wait_for_events {
-    my ($self) = @_;
+    my $self = shift;
 
     while (1) {
-        my @events = $self->_get_events;
+        my @events = $self->_interesting_events;
         return @events if @events;
     }
 }
 
-sub new_events {
-    my ($self) = @_;
-    my @events = $self->_get_events(0);
-}
+around new_events => sub {
+    my $orig = shift;
+    my $self = shift;
 
-sub _get_events {
-    my ( $self, $timeout ) = @_;
+    return $self->$orig(0);
+};
+
+sub _interesting_events {
+    my $self    = shift;
+    my $timeout = shift;
 
     my @kevents = $self->_kqueue->kevent( defined $timeout ? $timeout : () );
 
@@ -69,12 +79,21 @@ sub _get_events {
     push @kevents, $self->_kqueue->kevent( $self->absorb_delay )
         if $self->absorb_delay;
 
+    my ( $old_map, $new_map );
+    if (   $self->modify_includes_file_attributes
+        || $self->modify_includes_content ) {
+        $old_map = $self->_map;
+        $new_map = $self->_current_map;
+    }
+
     my @events;
-    foreach my $kevent (@kevents) {
+    for my $kevent (@kevents) {
         my $path = $kevent->[KQ_UDATA];
         next if $self->_path_is_excluded($path);
 
         my $flags = $kevent->[KQ_FFLAGS];
+
+        ## no critic (ControlStructures::ProhibitCascadingIfElse)
 
         # Delete - this works reasonably well with KQueue
         if ( $flags & NOTE_DELETE ) {
@@ -90,7 +109,7 @@ sub _get_events {
             # and remove any filehandles we're storing to its contents
             my $fh = $self->_files->{$path};
             if ( -d $fh ) {
-                foreach my $stored_path ( keys %{ $self->_files } ) {
+                for my $stored_path ( keys %{ $self->_files } ) {
                     next unless index( $stored_path, $path ) == 0;
                     delete $self->_files->{$stored_path};
                     push @events, $self->_event( $stored_path, 'delete' );
@@ -111,7 +130,8 @@ sub _get_events {
         elsif ( $flags & NOTE_WRITE ) {
 
             if ( -f $path ) {
-                push @events, $self->_event( $path, 'modify' );
+                push @events,
+                    $self->_event( $path, 'modify', $old_map, $new_map );
             }
             elsif ( -d $path ) {
                 push @events,
@@ -119,18 +139,52 @@ sub _get_events {
                     $self->_watch_dir($path);
             }
         }
+        elsif ( $flags & NOTE_ATTRIB ) {
+            push @events,
+                $self->_event( $path, 'modify', $old_map, $new_map );
+        }
     }
+
+    $self->_set_map($new_map)
+        if $self->_has_map;
 
     return @events;
 }
 
 sub _event {
-    my ( $self, $path, $type ) = @_;
-    return $self->event_class->new( path => $path, type => $type );
+    my $self    = shift;
+    my $path    = shift;
+    my $type    = shift;
+    my $old_map = shift;
+    my $new_map = shift;
+
+    my @extra;
+    if (
+        $type eq 'modify'
+        && (   $self->modify_includes_file_attributes
+            || $self->modify_includes_content )
+    ) {
+
+        @extra = (
+            $self->_modify_event_maybe_file_attribute_changes(
+                $path, $old_map, $new_map
+            ),
+            $self->_modify_event_maybe_content_changes(
+                $path, $old_map, $new_map
+            ),
+        );
+    }
+
+    return $self->event_class->new(
+        path => $path,
+        type => $type,
+        @extra,
+    );
 }
 
 sub _watch_dir {
-    my ( $self, $dir ) = @_;
+    my $self = shift;
+    my $dir  = shift;
 
     my @new_files;
 
@@ -150,7 +204,7 @@ sub _watch_dir {
             # Skip if we're watching it already
             return if $self->_files->{$path};
 
-            $self->_watch_file($path);
+            $self->_watch_path($path);
             push @new_files, $path;
         }
     );
@@ -159,49 +213,62 @@ sub _watch_dir {
 }
 
 sub _is_included_file {
-    my ( $self, $path ) = @_;
+    my $self = shift;
+    my $path = shift;
 
     return 1 if -d $path;
 
     my $filter   = $self->filter;
     my $filename = ( File::Spec->splitpath($path) )[2];
+
     return 1 if $filename =~ m{$filter};
+    return 0;
 }
 
 sub _find {
-    my ( $self, $dir, $wanted ) = @_;
-    File::Find::find(
+    my $self   = shift;
+    my $dir    = shift;
+    my $wanted = shift;
+
+    find(
         {
             wanted      => $wanted,
             no_chdir    => 1,
-            follow_fast => ( $self->follow_symlinks ? 1 : 0 ),,
+            follow_fast => ( $self->follow_symlinks ? 1 : 0 ),
             follow_skip => 2,
         },
         $dir,
     );
 }
 
-sub _watch_file {
-    my ( $self, $file ) = @_;
+sub _watch_path {
+    my $self = shift;
+    my $path = shift;
 
     ## no critic (InputOutput::RequireBriefOpen)
 
     # Don't panic if we can't open a file
-    open my $fh, '<', $file or warn "Can't open '$file': $!";
+    open my $fh, '<', $path or warn "Can't open '$path': $!";
     return unless $fh && defined fileno $fh;
 
     # Store this filehandle (this will automatically nuke any existing events
     # assigned to the file)
-    $self->_files->{$file} = $fh;
+    $self->_files->{$path} = $fh;
 
-    # Watch it for changes
+    my $filter = NOTE_DELETE | NOTE_WRITE | NOTE_RENAME | NOTE_REVOKE;
+    $filter |= NOTE_ATTRIB
+        if $self->_path_matches(
+        $self->modify_includes_file_attributes,
+        $path
+        );
+
     $self->_kqueue->EV_SET(
         fileno($fh),
         EVFILT_VNODE,
         EV_ADD | EV_CLEAR,
-        NOTE_DELETE | NOTE_WRITE | NOTE_RENAME | NOTE_REVOKE,
+        $filter,
         0,
-        $file,
+        $path,
     );
 }
 
@@ -218,7 +285,7 @@ File::ChangeNotify::Watcher::KQueue - KQueue-based watcher subclass
 =head1 DESCRIPTION
 
 This class implements watching using L<IO::KQueue>, which must be installed
-for it to work. This is a BSD alternative to Linux's Inotify and similar
+for it to work. This is a BSD alternative to Linux's Inotify and other
 event-based systems.
 
 =head1 CAVEATS
@@ -237,12 +304,6 @@ open with C<kern.openfiles>.
 On OpenBSD, the C<sysctl> keys are C<kern.maxfiles> and C<kern.nfiles>.
 Per-process limits are set in F</etc/login.conf>. See L<login.conf(5)> for
 details.
-
-=head1 SUPPORT
-
-I (Dave Rolsky) cannot test this class, as I have no BSD systems. Reasonable
-patches will be applied as-is, and when possible I will consult with Dan
-Thomas or other BSD users before releasing.
 
 =head1 AUTHOR
 

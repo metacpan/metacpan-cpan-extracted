@@ -1,4 +1,4 @@
-package BioX::Seq 0.006007;
+package BioX::Seq 0.007002;
 
 use 5.012;
 use strict;
@@ -96,11 +96,18 @@ my %genetic_code = (
 sub new {
 
     my ($class, $seq, $id, $desc, $qual) = @_;
+
+    if ( defined $seq && defined $qual
+      && (length($seq) != length($qual))) {
+        die "Sequence/quality length mismatch";
+    }
+
     my $self = bless {}, $class;
     $self->{seq}  = $seq  // '';
     $self->{id}   = $id   // undef;
     $self->{desc} = $desc // undef;
     $self->{qual} = $qual // undef;
+
     return $self;
 
 }
@@ -163,7 +170,7 @@ sub as_fasta {
     my $l = $line_length // 60;
     if (! defined $self->{id}) {
         warn "Can't write FASTA with undefined ID\n";
-        return 0;
+        return undef;
     }
     my $string = '>' . $self->{id};
     $string .= ' ' . $self->{desc} if (defined $self->{desc});
@@ -180,10 +187,9 @@ sub as_fasta {
 sub as_fastq {
 
     my ($self, $qual) = @_;
-    $qual = $qual // 20;
     if (! defined $self->{id}) {
         warn "Can't write FASTQ with undefined ID\n";
-        return 0;
+        return undef;
     }
     my $string = '@' . $self->{id};
     $string .= ' ' . $self->{desc} if (defined $self->{desc});
@@ -191,8 +197,21 @@ sub as_fastq {
     $string .= $self->{seq};
     $string .= "\n+\n";
 
+    # check string lengths
+    if (defined $self->{qual}) {
+        if (length $self->{qual} != length $self->{seq}) {
+            die "Sequence/quality length mismatch";
+        }
+    }
+    # check that quality is defined somewhere
+    elsif (! defined $qual) {
+        die "Attempt to write FASTQ with undefined quality";
+    }
+
     # populate qual with constant quality if not defined
-    $string .= $self->{qual} // chr($qual+33) x length($self->{seq});
+    $string .= defined $qual
+        ? chr($qual+33) x length($self->{seq})
+        : $self->{qual};
     $string .= "\n";
     return $string;
 
@@ -206,7 +225,7 @@ sub rev_com {
     $seq =~ tr/Xx/Nn/;
      if (! _is_nucleic($seq) ) {
         warn "Bad input sequence\n";
-        return;
+        return undef;
     }
     $seq = reverse $seq;
     $seq =~ tr
@@ -336,9 +355,10 @@ C<BioX::Seq> is a simple sequence class that can be used to represent
 biological sequences. It was designed as a compromise between using simple
 strings and hashes to hold sequences and using the rather bloated objects of
 Bioperl. Features (or, depending on your viewpoint, bugs) include
-auto-stringification and context-dependent transformations. It is meant
-be used primarily as the return object of the C<BioX::Seq::Fastx> parser, but
-there may be occasions where it is useful in its own right.
+auto-stringification and context-dependent transformations. It is meant be
+used primarily as the return object of the C<BioX::Seq::Stream> and
+C<BioX::Seq::Fetch> parsers, but there may be occasions where it is useful in
+its own right.
 
 C<BioX::Seq> current implements a small subset of the transformations most
 commonly used by the author (reverse complement, translate, subrange) - more

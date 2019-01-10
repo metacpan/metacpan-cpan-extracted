@@ -19,6 +19,12 @@ has name => (
 	required => 1,
 );
 
+has schema_name => (
+	is => 'ro',
+	isa => 'Str',
+	required => 1,
+);
+
 has columns => (
 	is => 'rw',
 	isa => 'ArrayRef[MySQL::Util::Lite::Column]',
@@ -31,6 +37,11 @@ has _util => (
 	isa      => 'MySQL::Util',
 	required => 1,
 );
+
+method get_fq_name {
+
+	return sprintf('%s.%s', $self->schema_name, $self->name);	
+}
 
 method get_parent_tables {
 
@@ -56,7 +67,7 @@ method get_parent_tables {
 			$seen{$fq_table_name}++;
 		}
 	}
-
+	
 	return @ret;
 }
 
@@ -86,6 +97,16 @@ method has_parents {
 	return 0;
 }
 
+method get_autoinc_column {
+	
+	my $cols = $self->columns;
+	foreach my $col (@$cols) {
+		if ( $col->is_autoinc ) {
+			return $col;
+		}
+	}	
+}
+
 method get_column (Str :$name) {
 
 	my $cols = $self->columns;
@@ -102,6 +123,7 @@ method get_primary_key () {
 	if ($pk_name) {
 		return MySQL::Util::Lite::PrimaryKey->new(
 			name => $pk_name,
+			table_name => $self->name,
 			_util => $self->_util,
 			);			
 	}	

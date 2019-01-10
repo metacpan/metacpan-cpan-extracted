@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::dist_contents;
 
-our $DATE = '2019-01-08'; # DATE
-our $VERSION = '1.031'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '1.032'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,7 +63,7 @@ App::lcpan::Cmd::dist_contents - List contents inside a distribution
 
 =head1 VERSION
 
-This document describes version 1.031 of App::lcpan::Cmd::dist_contents (from Perl distribution App-lcpan), released on 2019-01-08.
+This document describes version 1.032 of App::lcpan::Cmd::dist_contents (from Perl distribution App-lcpan), released on 2019-01-09.
 
 =head1 FUNCTIONS
 

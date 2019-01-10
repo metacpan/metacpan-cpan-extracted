@@ -944,8 +944,8 @@ If the B<BRIGHTNESS> environment variable is set in a range of 0 to
 100 digit, it is used as a screen brightness.
 
 Currently automatic setting by B<-Mautocolor> module works only on
-macOS Terminal.app.  If you are using other terminal application, set
-the B<BRIGHTNESS> or write a module.
+macOS Terminal.app and iTerm.app.  If you are using other terminal
+application, set the B<BRIGHTNESS> or write a module.
 
 Option B<--autocolor> is set by default, so override it to do nothing
 to disable.

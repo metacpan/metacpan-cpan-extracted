@@ -7,7 +7,7 @@ Attean::QuadModel - RDF model backed by a quad-store
 
 =head1 VERSION
 
-This document describes Attean::QuadModel version 0.019
+This document describes Attean::QuadModel version 0.020
 
 =head1 SYNOPSIS
 
@@ -38,7 +38,7 @@ quad-store.
 
 =cut
 
-package Attean::QuadModel 0.019 {
+package Attean::QuadModel 0.020 {
 	use Moo;
 	use Scalar::Util qw(reftype);
 	use namespace::clean;
@@ -47,7 +47,7 @@ package Attean::QuadModel 0.019 {
 		is => 'ro',
 		does => 'Attean::API::QuadStore',
 		required => 1,
-		handles	=> [qw(size count_quads get_graphs)],
+		handles	=> [qw(size count_quads count_quads_estimate get_graphs holds)],
 	);
 	
 =item C<< get_quads ( $subject, $predicate, $object, $graph ) >>
@@ -123,7 +123,7 @@ Delegates to the underlying store if the store consumes Attean::API::CostPlanner
 }
 
 
-package Attean::MutableQuadModel 0.019 {
+package Attean::MutableQuadModel 0.020 {
 	use Moo;
 	extends 'Attean::QuadModel';
 	
@@ -131,7 +131,7 @@ package Attean::MutableQuadModel 0.019 {
 		is => 'ro',
 		does => 'Attean::API::MutableQuadStore',
 		required => 1,
-		handles	=> [qw(size count_quads add_quad remove_quad get_graphs create_graph drop_graph clear_graph add_iter)],
+		handles	=> [qw(size count_quads count_quads_estimate add_quad remove_quad get_graphs create_graph drop_graph clear_graph add_iter)],
 	);
 
 	with 'Attean::API::MutableModel';

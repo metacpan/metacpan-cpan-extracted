@@ -8,7 +8,7 @@ use warnings;
 use Text::Amuse::Compile;
 use Path::Tiny;
 use Data::Dumper;
-use Test::More tests => 16;
+use Test::More tests => 31;
 
 my $muse = <<'MUSE';
 #title My title
@@ -30,7 +30,7 @@ END
 
 MUSE
 
-foreach my $id (qw/DEFAULT c111 c1 c9/) {
+foreach my $id (qw/DEFAULT c111 c1 c9/, '', 'test me', '\\') {
     my $wd = Path::Tiny->tempdir(CLEANUP => !$ENV{NOCLEANUP});
     my $file = $wd->child("text.muse");
     $file->spew_utf8($muse);
@@ -59,4 +59,8 @@ foreach my $id (qw/DEFAULT c111 c1 c9/) {
         like $tex, qr{^\%.*?\\textbackslash\{\}vskip 10mm\s*\n}ms;
     }
     unlike $tex, qr{\\sloppy 10};
+
+    if ($id eq '' or $id eq '\\' or $id eq 'test me') {
+        like $tex, qr{START.*\\sloppy.*Done.*\\fussy.*END}ms;
+    }
 }

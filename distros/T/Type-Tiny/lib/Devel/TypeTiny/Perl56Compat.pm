@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '1.004002';
+our $VERSION   = '1.004004';
 
 #### B doesn't provide perlstring() in 5.6. Monkey patch it.
 
@@ -70,7 +70,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

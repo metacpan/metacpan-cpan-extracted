@@ -47,11 +47,11 @@
    "provides" : {
       "OData::QueryParams::DBIC" : {
          "file" : "lib/OData/QueryParams/DBIC.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "OData::QueryParams::DBIC::FilterUtils" : {
          "file" : "lib/OData/QueryParams/DBIC/FilterUtils.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "http://github.com/reneeb/OData-QueryParams-DBIC"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <info@perl-services.de>"

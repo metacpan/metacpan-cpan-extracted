@@ -401,7 +401,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.11';
+    our $VERSION   = '6.13';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -476,10 +476,10 @@ DESTROY {
 
 use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
 
-/* Copyright 2018 Richard Kelsch, All Rights Reserved
+/* Copyright 2018-2019 Richard Kelsch, All Rights Reserved
  * See the Perl documentation for Graphics::Framebuffer for licensing information.
  * 
- * Version:  5.00
+ * Version:  6.13
 */
 
 #include <stdlib.h>
@@ -626,14 +626,6 @@ void c_plot(
                             *((unsigned short*)(framebuffer + index)) = (short) color;
                         }
                         break;
-                    case 8 :
-                        {
-                        }
-                        break;
-                    case 1 :
-                        {
-                        }
-                        break;
                 }
             break;
             case XOR_MODE :
@@ -700,7 +692,7 @@ void c_plot(
                 }
             break;
             case MASK_MODE :
-                switch(bytes_per_pixel) {
+                switch(bits_per_pixel) {
                     case 32 :
                         {
                             if ((*((unsigned int*)(framebuffer + index )) & 0xFFFFFF00) != (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
@@ -813,7 +805,7 @@ void c_plot(
                 }
             break;
             case ADD_MODE :
-                switch(bytes_per_pixel) {
+                switch(bits_per_pixel) {
                     case 32 :
                         {
                             *((unsigned int*)(framebuffer + index)) += color;
@@ -975,7 +967,6 @@ void c_blit_read(
     short x, short y,
     unsigned short w, unsigned short h,
     unsigned char bytes_per_pixel,
-    unsigned char bits_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
@@ -1003,16 +994,14 @@ void c_blit_read(
                     unsigned int vhz       = vbl + hzpixel;
                     unsigned int yvhz      = yvbl + hzpixel;
                     unsigned int xhbp_yvbl = xhbp + yvbl;
-                    if (bits_per_pixel == 32) {
+                    if (bytes_per_pixel == 4) {
                         *((unsigned int*)(blit_data + vhz)) = *((unsigned int*)(framebuffer + xhbp_yvbl));
-                    } else if (bits_per_pixel == 24) {
+                    } else if (bytes_per_pixel == 3) {
                         *(blit_data + vhz ) = *(framebuffer + xhbp_yvbl );
                         *(blit_data + vhz  + 1) = *(framebuffer + xhbp_yvbl  + 1);
                         *(blit_data + vhz  + 2) = *(framebuffer + xhbp_yvbl  + 2);
-                    } else if (bits_per_pixel == 16) {
+                    } else {
                         *((unsigned short*)(blit_data + vhz )) = *((unsigned short*)(framebuffer + xhbp_yvbl ));
-                    } else if (bits_per_pixel == 8) {
-                    } else if (bits_per_pixel == 1) {
                     }
                 }
             }
@@ -1032,7 +1021,6 @@ void c_blit_write(
     short x, short y,
     unsigned short w, unsigned short h,
     unsigned char bytes_per_pixel,
-    unsigned char bits_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
@@ -1058,8 +1046,8 @@ void c_blit_write(
     } else {
         switch(draw_mode) {
             case NORMAL_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1079,7 +1067,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1101,7 +1089,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1124,8 +1112,8 @@ void c_blit_write(
                 }
                 break;
             case XOR_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1145,7 +1133,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1167,7 +1155,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1190,8 +1178,8 @@ void c_blit_write(
                 }
                 break;
             case OR_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1211,7 +1199,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1233,7 +1221,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1256,8 +1244,8 @@ void c_blit_write(
                 }
                 break;
             case AND_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1277,7 +1265,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1299,7 +1287,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1322,8 +1310,8 @@ void c_blit_write(
                 }
                 break;
             case MASK_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1346,7 +1334,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1370,7 +1358,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1396,8 +1384,8 @@ void c_blit_write(
                 }
                 break;
             case UNMASK_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1419,7 +1407,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1443,7 +1431,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1468,8 +1456,8 @@ void c_blit_write(
                 }
                 break;
             case ALPHA_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1506,7 +1494,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1541,7 +1529,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1579,8 +1567,8 @@ void c_blit_write(
                 }
                 break;
             case ADD_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1600,7 +1588,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1622,7 +1610,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1645,8 +1633,8 @@ void c_blit_write(
                 }
                 break;
             case SUBTRACT_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1666,7 +1654,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1688,7 +1676,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1711,8 +1699,8 @@ void c_blit_write(
                 }
                 break;
             case MULTIPLY_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1732,7 +1720,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1754,7 +1742,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1777,8 +1765,8 @@ void c_blit_write(
                 }
                 break;
             case DIVIDE_MODE :
-                switch(bits_per_pixel) {
-                    case 32 :
+                switch(bytes_per_pixel) {
+                    case 4 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1798,7 +1786,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 24 :
+                    case 3 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1820,7 +1808,7 @@ void c_blit_write(
                             }
                         }
                         break;
-                    case 16 :
+                    case 2 :
                         for (vertical = 0; vertical < h; vertical++) {
                             unsigned int vbl  = vertical * bline;
                             unsigned short yv = fb_y + vertical;
@@ -1854,8 +1842,7 @@ void c_rotate(
     unsigned short height,
     unsigned short wh,
     double degrees,
-    unsigned char bytes_per_pixel,
-    unsigned char bits_per_pixel)
+    unsigned char bytes_per_pixel)
 {
     unsigned int hwh        = floor(wh / 2 + 0.5);
     unsigned int bbline     = wh * bytes_per_pixel;
@@ -1887,7 +1874,7 @@ void c_rotate(
                             *(new_img + (x * bytes_per_pixel) + (y * bbline) + 2) = *(image + (xs * bytes_per_pixel) + (ys * bline) + 2);
                         }
                         break;
-                    default :
+                    case 2 :
                         {
                             *((unsigned short*)(new_img + (x * bytes_per_pixel) + (y * bbline))) = *((unsigned short*)(image + (xs * bytes_per_pixel) + (ys * bline)));
                         }
@@ -1937,237 +1924,139 @@ void c_flip_vertical(char *pixels, unsigned short width, unsigned short height, 
 }
 
 /* bitmap conversions */
-void c_convert(unsigned char from, unsigned char to, char* buf_from, unsigned size_from, char* buf_to, unsigned char color_order) {
-   switch (from) {
-       case 32 :
-           {
-               switch (to) {
-                   case 24 :
-                       {
-                          unsigned int loc24 = 0;
-                          unsigned int loc32 = 0;
-                          while(loc32 < size_from) {
-                             *(buf_to + loc24++) = *(buf_from + loc32++);
-                             *(buf_to + loc24++) = *(buf_from + loc32++);
-                             *(buf_to + loc24++) = *(buf_from + loc32++);
-                             loc32++; // Toss the alpha
-                          }
-                       }
-                       break;
-                   case 16 :
-                       {
-                          unsigned int loc16    = 0;
-                          unsigned int loc32    = 0;
-                          unsigned short rgb565 = 0;
-                          while(loc32 < size_from) {
-                             unsigned int crgb = *((unsigned int*)(buf_from + loc32));
-                             unsigned char r8 = crgb & 255;
-                             unsigned char g8 = (crgb >> 8) & 255;
-                             unsigned char b8 = (crgb >> 16) & 255;
-                             //        unsigned char a8 = (crgb >> 24) & 255; // This is not used, but is needed
-                             unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
-                             unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
-                             unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-                             if (color_order == 0) {
-                                rgb565 = (b5 << 11) | (g6 << 5) | r5;
-                                *((unsigned short*)(buf_to + loc16)) = rgb565;
-                             } else {
-                                rgb565 = (r5 << 11) | (g6 << 5) | b5;
-                                *((unsigned short*)(buf_to + loc16)) = rgb565;
-                             }
-                             loc16 += 2;
-                          }
-                       }
-                       break;
-                   case 8 :
-                       {
-                       }
-                       break;
-                   case 1 :
-                       {
-                       }
-                       break;
-               }
-           }
-           break;
-       case 24 :
-           {
-               switch (to) {
-                   case 32 :
-                       {
-                          unsigned int loc32 = 0;
-                          unsigned int loc24 = 0;
-                          while(loc24 < size_from) {
-                             unsigned char r = *(buf_from + loc24++);
-                             unsigned char g = *(buf_from + loc24++);
-                             unsigned char b = *(buf_from + loc24++);
-                             *((unsigned int*)(buf_to + loc32++)) = r | (g << 8) | (b << 16);
-                             loc32 += 3;
-                             if (r == 0 && g == 0 && b == 0) {
-                                *(buf_to + loc32++) = 0;
-                             } else {
-                                *(buf_to + loc32++) = 255;
-                             }
-                          }
-                       }
-                       break;
-                   case 16 :
-                       {
-                          unsigned int loc16 = 0;
-                          unsigned int loc24 = 0;
-                          unsigned short rgb565 = 0;
-                          while(loc24 < size_from) {
-                             unsigned char r8 = *(buf_from + loc24++);
-                             unsigned char g8 = *(buf_from + loc24++);
-                             unsigned char b8 = *(buf_from + loc24++);
-                             unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
-                             unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
-                             unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-                             if (color_order == 0) {
-                                rgb565 = (b5 << 11) | (g6 << 5) | r5;
-                                *((unsigned short*)(buf_to + loc16)) = rgb565;
-                             } else {
-                                rgb565 = (r5 << 11) | (g6 << 5) | b5;
-                                *((unsigned short*)(buf_to + loc16)) = rgb565;
-                             }
-                             loc16 += 2;
-                          }
-                       }
-                       break;
-                   case 8 :
-                       {
-                       }
-                       break;
-                   case 1 :
-                       {
-                       }
-                       break;
-               }
-           }
-           break;
-       case 16 :
-           {
-               switch (to) {
-                   case 32 :
-                       {
-                          unsigned int loc16 = 0;
-                          unsigned int loc32 = 0;
-                          unsigned char r5;
-                          unsigned char g6;
-                          unsigned char b5;
+void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned char color_order ) {
+    unsigned int loc16 = 0;
+    unsigned int loc24 = 0;
+    unsigned char r5;
+    unsigned char g6;
+    unsigned char b5;
 
-                          while(loc16 < size_from) {
-                             unsigned short rgb565 = *((unsigned short*)(buf_from + loc16));
-                             loc16 += 2;
-                             if (color_order == 0) {
-                                b5 = (rgb565 >> 11) & 31;
-                                r5 = rgb565         & 31;
-                             } else {
-                                r5 = (rgb565 >> 11) & 31;
-                                b5 = rgb565         & 31;
-                             }
-                             g6 = (rgb565 >> 5)  & 63;
-                             unsigned char r8 = (r5 * 527 + 23) >> 6;
-                             unsigned char g8 = (g6 * 259 + 33) >> 6;
-                             unsigned char b8 = (b5 * 527 * 23) >> 6;
-                             *((unsigned int*)(buf_to + loc32)) = r8 | (g8 << 8) | (b8 << 16);
-                             loc32 += 3;
-                             if (r8 == 0 && g8 == 0 && b8 ==0) {
-                                *((unsigned char*)(buf_to + loc32++)) = 0;
-                             } else {
-                                *((unsigned char*)(buf_to + loc32++)) = 255;
-                             }
-                          }
-                       }
-                       break;
-                   case 24 :
-                       {
-                          unsigned int loc16 = 0;
-                          unsigned int loc24 = 0;
-                          unsigned char r5;
-                          unsigned char g6;
-                          unsigned char b5;
-
-                          while(loc16 < size_from) {
-                             unsigned short rgb565 = *((unsigned short*)(buf_from + loc16));
-                             loc16 += 2;
-                             if (color_order == 0) {
-                                b5 = (rgb565 >> 11) & 31;
-                                r5 = rgb565         & 31;
-                             } else {
-                                r5 = (rgb565 >> 11) & 31;
-                                b5 = rgb565         & 31;
-                             }
-                             g6 = (rgb565 >> 5)  & 63;
-                             unsigned char r8 = (r5 * 527 + 23) >> 6;
-                             unsigned char g8 = (g6 * 259 + 33) >> 6;
-                             unsigned char b8 = (b5 * 527 * 23) >> 6;
-                             *((unsigned char*)(buf_to + loc24++)) = r8;
-                             *((unsigned char*)(buf_to + loc24++)) = g8;
-                             *((unsigned char*)(buf_to + loc24++)) = b8;
-                          }
-                       }
-                       break;
-                   case 8 :
-                       {
-                       }
-                       break;
-                   case 1 :
-                       {
-                       }
-                       break;
-               }
-           }
-           break;
-       case 8 :
-           {
-               switch (to) {
-                   case 32 :
-                       {
-                       }
-                       break;
-                   case 24 :
-                       {
-                       }
-                       break;
-                   case 16 :
-                       {
-                       }
-                       break;
-                   case 1 :
-                       {
-                       }
-                       break;
-               }
-           }
-           break;
-       case 1 :
-           {
-               switch (to) {
-                   case 32 :
-                       {
-                       }
-                       break;
-                   case 24 :
-                       {
-                       }
-                       break;
-                   case 16 :
-                       {
-                       }
-                       break;
-                   case 8 :
-                       {
-                       }
-                       break;
-               }
-           }
-           break;
-   }
-   
+    while(loc16 < size16) {
+        unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
+        loc16 += 2;
+        if (color_order == 0) {
+            b5 = (rgb565 >> 11) & 31;
+            r5 = rgb565         & 31;
+        } else {
+            r5 = (rgb565 >> 11) & 31;
+            b5 = rgb565         & 31;
+        }
+        g6 = (rgb565 >> 5)  & 63;
+        unsigned char r8 = (r5 * 527 + 23) >> 6;
+        unsigned char g8 = (g6 * 259 + 33) >> 6;
+        unsigned char b8 = (b5 * 527 * 23) >> 6;
+        *((unsigned char*)(buf24 + loc24++)) = r8;
+        *((unsigned char*)(buf24 + loc24++)) = g8;
+        *((unsigned char*)(buf24 + loc24++)) = b8;
+    }
 }
 
-void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, unsigned char bytes_per_pixel, unsigned char bits_per_pixel) {
+void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned char color_order ) {
+    unsigned int loc16 = 0;
+    unsigned int loc32 = 0;
+    unsigned char r5;
+    unsigned char g6;
+    unsigned char b5;
+
+    while(loc16 < size16) {
+        unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
+        loc16 += 2;
+        if (color_order == 0) {
+            b5 = (rgb565 >> 11) & 31;
+            r5 = rgb565         & 31;
+        } else {
+            r5 = (rgb565 >> 11) & 31;
+            b5 = rgb565         & 31;
+        }
+        g6 = (rgb565 >> 5)  & 63;
+        unsigned char r8 = (r5 * 527 + 23) >> 6;
+        unsigned char g8 = (g6 * 259 + 33) >> 6;
+        unsigned char b8 = (b5 * 527 * 23) >> 6;
+        *((unsigned int*)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
+        loc32 += 3;
+        if (r8 == 0 && g8 == 0 && b8 ==0) {
+            *((unsigned char*)(buf32 + loc32++)) = 0;
+        } else {
+            *((unsigned char*)(buf32 + loc32++)) = 255;
+        }
+    }
+}
+
+void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned char color_order) {
+    unsigned int loc16 = 0;
+    unsigned int loc24 = 0;
+    unsigned short rgb565 = 0;
+    while(loc24 < size24) {
+        unsigned char r8 = *(buf24 + loc24++);
+        unsigned char g8 = *(buf24 + loc24++);
+        unsigned char b8 = *(buf24 + loc24++);
+        unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
+        unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
+        unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
+        if (color_order == 0) {
+            rgb565 = (b5 << 11) | (g6 << 5) | r5;
+            *((unsigned short*)(buf16 + loc16)) = rgb565;
+        } else {
+            rgb565 = (r5 << 11) | (g6 << 5) | b5;
+            *((unsigned short*)(buf16 + loc16)) = rgb565;
+        }
+        loc16 += 2;
+    }
+}
+
+void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned char color_order) {
+    unsigned int loc16    = 0;
+    unsigned int loc32    = 0;
+    unsigned short rgb565 = 0;
+    while(loc32 < size32) {
+        unsigned int crgb = *((unsigned int*)(buf32 + loc32));
+        unsigned char r8 = crgb & 255;
+        unsigned char g8 = (crgb >> 8) & 255;
+        unsigned char b8 = (crgb >> 16) & 255;
+//        unsigned char a8 = (crgb >> 24) & 255; // This is not used, but is needed
+        unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
+        unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
+        unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
+        if (color_order == 0) {
+            rgb565 = (b5 << 11) | (g6 << 5) | r5;
+            *((unsigned short*)(buf16 + loc16)) = rgb565;
+        } else {
+            rgb565 = (r5 << 11) | (g6 << 5) | b5;
+            *((unsigned short*)(buf16 + loc16)) = rgb565;
+        }
+        loc16 += 2;
+    }
+}
+
+void c_convert_32_24(char* buf32, unsigned int size32, char* buf24, unsigned char color_order) {
+    unsigned int loc24 = 0;
+    unsigned int loc32 = 0;
+    while(loc32 < size32) {
+        *(buf24 + loc24++) = *(buf32 + loc32++);
+        *(buf24 + loc24++) = *(buf32 + loc32++);
+        *(buf24 + loc24++) = *(buf32 + loc32++);
+        loc32++; // Toss the alpha
+    }
+}
+
+void c_convert_24_32(char* buf24, unsigned int size24, char* buf32, unsigned char color_order) {
+    unsigned int loc32 = 0;
+    unsigned int loc24 = 0;
+    while(loc24 < size24) {
+        unsigned char r = *(buf24 + loc24++);
+        unsigned char g = *(buf24 + loc24++);
+        unsigned char b = *(buf24 + loc24++);
+        *((unsigned int*)(buf32 + loc32++)) = r | (g << 8) | (b << 16);
+        loc32 += 3;
+        if (r == 0 && g == 0 && b == 0) {
+            *(buf32 + loc32++) = 0;
+        } else {
+            *(buf32 + loc32++) = 255;
+        }
+    }
+}
+
+void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, unsigned char bytes_per_pixel) {
     unsigned int idx;
     unsigned char r;
     unsigned char g;
@@ -2176,7 +2065,7 @@ void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, u
     unsigned short rgb565;
 
     for (idx = 0; idx < size; idx += bytes_per_pixel) {
-        if (bits_per_pixel >= 24) {
+        if (bytes_per_pixel >= 3) {
             switch(color_order) {
                 case RBG :  // RBG
                     r = *(pixels + idx);
@@ -2208,7 +2097,7 @@ void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, u
                     g = *(pixels + idx + 1);
                     b = *(pixels + idx + 2);
             }
-        } else if (bits_per_pixel == 16) {
+        } else {
             rgb565 = *((unsigned short*)(pixels + idx));
             g      = (rgb565 >> 6) & 31;
             if (color_order == 0) { // RGB
@@ -2218,124 +2107,21 @@ void c_monochrome(char *pixels, unsigned int size, unsigned short color_order, u
                 b = rgb565 & 31;
                 r = (rgb565 >> 11) & 31;
             }
-        } else if (bits_per_pixel == 8) {
-        } else if (bits_per_pixel == 1) {
         }
         m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
 
-        if (bits_per_pixel >= 24) {
+        if (bytes_per_pixel >= 3) {
             *(pixels + idx)     = m;
             *(pixels + idx + 1) = m;
             *(pixels + idx + 2) = m;
-        } else if (bits_per_pixel == 16) {
+        } else { // 2
             rgb565                             = 0;
             rgb565                             = (m << 11) | (m << 6) | m;
             *((unsigned short*)(pixels + idx)) = rgb565;
-        } else if (bits_per_pixel == 8) {
-        } else if (bits_per_pixel == 1) {
         }
     }
 }
 
-/* Antialiased line drawing 
-   NOT READY YET
- 
-// draws a pixel on screen of given brightness
-// 0<=brightness<=1. We can use your own library
-// to draw on screen
-void drawPixel( int x , int y , float brightness) {
-    int c = 255*brightness;
-    SDL_SetRenderDrawColor(pRenderer, c, c, c, 255);
-    SDL_RenderDrawPoint(pRenderer, x, y);
-}
- 
-void drawAALine(int x0 , int y0 , int x1 , int y1) {
-    int steep = absolute(y1 - y0) > absolute(x1 - x0) ;
- 
-    // swap the co-ordinates if slope > 1 or we
-    // draw backwards
-    if (steep) {
-        swap(&x0 , &y0);
-        swap(&x1 , &y1);
-    }
-    if (x0 > x1) {
-        swap(&x0 ,&x1);
-        swap(&y0 ,&y1);
-    }
- 
-    //compute the slope
-    float dx = x1-x0;
-    float dy = y1-y0;
-    float gradient = dy/dx;
-    if (dx == 0.0)
-        gradient = 1;
- 
-    int xpxl1 = x0;
-    int xpxl2 = x1;
-    float intersectY = y0;
- 
-    // main loop
-    if (steep) {
-        int x;
-        for (x = xpxl1 ; x <=xpxl2 ; x++) {
-            // pixel coverage is determined by fractional
-            // part of y co-ordinate
-            drawPixel(iPartOfNumber(intersectY), x,
-                        rfPartOfNumber(intersectY));
-            drawPixel(iPartOfNumber(intersectY)-1, x,
-                        fPartOfNumber(intersectY));
-            intersectY += gradient;
-        }
-    } else {
-        int x;
-        for (x = xpxl1 ; x <=xpxl2 ; x++) {
-            // pixel coverage is determined by fractional
-            // part of y co-ordinate
-            drawPixel(x, iPartOfNumber(intersectY),
-                        rfPartOfNumber(intersectY));
-            drawPixel(x, iPartOfNumber(intersectY)-1,
-                          fPartOfNumber(intersectY));
-            intersectY += gradient;
-        }
-    }
- 
-}
-
-// swaps two numbers
-void swap(int* a , int*b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
- 
-// returns absolute value of number
-float absolute(float x ) {
-    if (x < 0) return -x;
-    else return x;
-}
- 
-//returns integer part of a floating point number
-int iPartOfNumber(float x) {
-    return (int)x;
-}
- 
-//rounds off a number
-int roundNumber(float x) {
-    return iPartOfNumber(x + 0.5) ;
-}
- 
-//returns fractional part of a number
-float fPartOfNumber(float x) {
-    if (x>0) return x - iPartOfNumber(x);
-    else return x - (iPartOfNumber(x)+1); 
-}
- 
-//returns 1 - fractional part of number
-float rfPartOfNumber(float x) {
-    return 1 - fPartOfNumber(x);
-}
-
-*/
 
 C_CODE
 
@@ -4320,7 +4106,6 @@ Draws an arc/pie/poly arc of a circle at point x,y.
 =cut
 
 sub draw_arc {
-
     # This isn't exactly the fastest routine out there, hence the "granularity" parameter, but it is pretty neat.  Drawing lines between points smooths and compensates for high granularity settings.
     my $self   = shift;
     my $params = shift;
@@ -4445,7 +4230,7 @@ sub draw_arc {
                     $self->{'DRAW_MODE'} = MASK_MODE;
                 } else {
                     $saved = $self->blit_read($saved);
-                    $saved->{'image'} = $self->_convert(16, 24, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+                    $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
                     $img->read(
                         'xsize'             => $w,
                         'ysize'             => $w,
@@ -4510,7 +4295,7 @@ sub draw_arc {
                         $params->{'gradient'}->{'direction'} || 'vertical'
                     );
                 }
-                $pattern = $self->_convert(16, 24, $pattern, RGB) if ($self->{'BITS'} == 16);
+                $pattern = $self->_convert_16_to_24($pattern, RGB) if ($self->{'BITS'} == 16);
                 $image = Imager->new(
                     'xsize'             => $w,
                     'ysize'             => $w,
@@ -4538,7 +4323,7 @@ sub draw_arc {
                 'interleave'    => 0,
                 'data'          => \$saved->{'image'},
             );
-            $saved->{'image'} = $self->_convert(24, 16, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+            $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
         $self->blit_write($saved);
@@ -4742,7 +4527,6 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
 =cut
 
 sub ellipse {
-
     # The routine even works properly for XOR mode when filled ellipses are drawn as well.  This was solved by drawing only if the X or Y position changed.
     my $self   = shift;
     my $params = shift;
@@ -4756,9 +4540,9 @@ sub ellipse {
     $YRadius = 1 if ($YRadius < 1);
 
     my $filled = int($params->{'filled'} || 0);
-    my $fact = $params->{'factor'} || 1;
-    my $size = int($params->{'pixel_size'} || 1);
-    $size = 1 if ($filled);
+    my $fact   = $params->{'factor'} || 1;
+    my $size   = int($params->{'pixel_size'} || 1);
+    $size      = 1 if ($filled);
 
     my ($old_cyy, $old_cy_y) = (0, 0);
     if ($fact == 0) {    # We don't allow zero values for this
@@ -4776,7 +4560,7 @@ sub ellipse {
     my $StoppingX    = $TwoBSquare * $XRadius;
     my $StoppingY    = 0;
     my $history_on   = FALSE;
-    $history_on = TRUE if (exists($self->{'history'}));
+    $history_on      = TRUE if (exists($self->{'history'}));
 
     $self->{'history'} = {} unless ($history_on || !$filled || $size > 1);
     my ($red, $green, $blue, @rc, @gc, @bc);
@@ -5037,9 +4821,9 @@ sub circle {
                 $wdth, $hgth,
                 {
                     'red'   => [$params->{'gradient'}->{'start'}->{'red'},   $params->{'gradient'}->{'end'}->{'red'}],
-                      'green' => [$params->{'gradient'}->{'start'}->{'green'}, $params->{'gradient'}->{'end'}->{'green'}],
-                      'blue'  => [$params->{'gradient'}->{'start'}->{'blue'},  $params->{'gradient'}->{'end'}->{'blue'}],
-                      'alpha' => (exists($params->{'gradient'}->{'start'}->{'alpha'})) ? [$params->{'gradient'}->{'start'}->{'alpha'},$params->{'gradient'}->{'end'}->{'alpha'}] : [$self->{'COLOR_ALPHA'},$self->{'COLOR_ALPHA'}],
+                    'green' => [$params->{'gradient'}->{'start'}->{'green'}, $params->{'gradient'}->{'end'}->{'green'}],
+                    'blue'  => [$params->{'gradient'}->{'start'}->{'blue'},  $params->{'gradient'}->{'end'}->{'blue'}],
+                    'alpha' => (exists($params->{'gradient'}->{'start'}->{'alpha'})) ? [$params->{'gradient'}->{'start'}->{'alpha'},$params->{'gradient'}->{'end'}->{'alpha'}] : [$self->{'COLOR_ALPHA'},$self->{'COLOR_ALPHA'}],
                 },
                 $params->{'gradient'}->{'direction'}
             );
@@ -5384,7 +5168,7 @@ sub _fill_polygon {
             $self->{'DRAW_MODE'} = MASK_MODE;
         } else {
             $saved = $self->blit_read($saved);
-            $saved->{'image'} = $self->_convert(16, 24, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+            $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         }
     }
     my $img;
@@ -5447,7 +5231,7 @@ sub _fill_polygon {
             'interleave'    => 0,
             'data'          => \$saved->{'image'},
         );
-        $saved->{'image'} = $self->_convert(24, 16, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+        $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
     };
     warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
     $self->blit_write($saved);
@@ -5681,7 +5465,7 @@ sub _generate_fill {
                 );
             };
             warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
-            $gradient = $self->_convert(24, 16, $gradient, RGB) if ($self->{'BITS'} == 16);
+            $gradient = $self->_convert_24_to_16($gradient, RGB) if ($self->{'BITS'} == 16);
         }
     }
     return ($gradient);
@@ -6187,7 +5971,7 @@ sub fill {
                 'height' => $height,
             }
         );
-        $saved->{'image'} = $self->_convert(16, 24, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+        $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         eval {
             my $img = Imager->new(
                 'xsize'             => $width,
@@ -6244,7 +6028,7 @@ sub fill {
                 'interleave'    => 0,
                 'data'          => \$saved->{'image'},
             );
-            $saved->{'image'} = $self->_convert(24, 16, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+            $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
 
@@ -6461,23 +6245,23 @@ sub blit_flip {
         if ($self->{'BITS'} == 32) {
             substr($self->{'SCREEN'}, 0) = $them->{'SCREEN'};    # Simple copy
         } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(32, 24, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_24($them->{'SCREEN'}, RGB);
         } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(32, 16, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_16($them->{'SCREEN'}, RGB);
         }
     } elsif ($them->{'BITS'} == 24) {
         if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(24, 32, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_32($them->{'SCREEN'}, RGB);
         } elsif ($self->{'BITS'} == 24) {
             substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
         } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(24, 16, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_16($them->{'SCREEN'}, RGB);
         }
     } else {
         if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(16, 32, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_32($them->{'SCREEN'}, RGB);
         } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(16, 24, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_24($them->{'SCREEN'}, RGB);
         } else {
             substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
         }
@@ -6702,7 +6486,7 @@ sub blit_read {
 #    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     if ($h > 1 && $self->{'ACCELERATED'}) {
         $scrn = chr(0) x ($W * $h);
-        c_blit_read($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $self->{'BITS'}, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
+        c_blit_read($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
     } else {
         foreach my $line ($y .. ($yend - 1)) {
             $index = ($bytes_per_line * ($line + $yoffset)) + $XX;
@@ -6754,7 +6538,7 @@ sub blit_write {
 #    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     if ($self->{'ACCELERATED'}) { # && $h > 1) {
-        c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $params->{'image'}, $x, $y, $w, $h, $bytes, $self->{'BITS'}, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
+        c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $params->{'image'}, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
         return;
     }
 
@@ -7070,7 +6854,7 @@ sub blit_transform {
     my $data;
 
     if (exists($params->{'merge'})) {
-        $image = $self->_convert(16, 24, $image, RGB) if ($self->{'BITS'} == 16);
+        $image = $self->_convert_16_to_24($image, RGB) if ($self->{'BITS'} == 16);
         eval {
             my $img = Imager->new();
             $img->read(
@@ -7111,7 +6895,7 @@ sub blit_transform {
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
 
-        $data = $self->_convert(24, 16, $data, RGB) if ($self->{'BITS'} == 16);
+        $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
         return (
             {
                 'x'      => $params->{'merge'}->{'dest_blit_data'}->{'x'},
@@ -7187,7 +6971,7 @@ sub blit_transform {
                 # Try to define as much as possible before the loop to optimize
                 $data = $self->{'B_COLOR'} x (($wh**2) * $bytes);
 
-                c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes, $self->{'BITS'});
+                c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes);
                 return (
                     {
                         'x'      => $params->{'blit_data'}->{'x'},
@@ -7201,7 +6985,7 @@ sub blit_transform {
         } else {
             eval {
                 my $img = Imager->new();
-                $image = $self->_convert(16, 24, $image, RGB) if ($self->{'BITS'} == 16);
+                $image = $self->_convert_16_to_24($image, RGB) if ($self->{'BITS'} == 16);
                 $img->read(
                     'xsize'             => $width,
                     'ysize'             => $height,
@@ -7227,7 +7011,7 @@ sub blit_transform {
                     'interleave'    => 0,
                     'data'          => \$data
                 );
-                $data = $self->_convert(24, 16, $data, RGB) if ($self->{'BITS'} == 16);
+                $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
             };
             warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
         }
@@ -7241,7 +7025,7 @@ sub blit_transform {
             }
         );
     } elsif (exists($params->{'scale'})) {
-        $image = $self->_convert(16, 24, $image, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
+        $image = $self->_convert_16_to_24($image, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
 
         eval {
             my $img = Imager->new();
@@ -7274,7 +7058,7 @@ sub blit_transform {
             );
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
-        $data = $self->_convert(24, 16, $data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
+        $data = $self->_convert_24_to_16($data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -7452,13 +7236,11 @@ sub monochrome {
         $inc = 3;
     } elsif ($params->{'bits'} == 16) {
         $inc = 2;
-    } elsif ($params->{'bits'} == 8) {
-        $inc = 1;
     } else {    # Only 32, 24, or 16 bits allowed
         return ();
     }
     if ($self->{'ACCELERATED'}) {
-        c_monochrome($params->{'image'}, $size, $color_order, $inc, $params->{'bits'});
+        c_monochrome($params->{'image'}, $size, $color_order, $inc);
         return ($params->{'image'});
     } else {
         for (my $byte = 0; $byte < length($params->{'image'}); $byte += $inc) {
@@ -7545,7 +7327,8 @@ Here's a shortcut:
          'bounding_box' => 1,
          'rotate'       => 45,    # optonal
          'center'       => CENTER_X,
-         'antialias'    => 1
+         'antialias'    => 1,
+         'shadow'       => shadow size
      })
  );
 
@@ -7681,7 +7464,7 @@ sub ttf_print {
                 my $ty = $TTF_y - abs($global_ascent);
                 $ty = 0 if ($ty < 0);
                 $image = $self->blit_read({ 'x' => $TTF_x, 'y' => $ty, 'width' => $TTF_pw, 'height' => $TTF_ph });
-                $image->{'image'} = $self->_convert(16, 24, $image->{'image'}, RGB) if ($self->{'BITS'} == 16);
+                $image->{'image'} = $self->_convert_16_to_24($image->{'image'}, RGB) if ($self->{'BITS'} == 16);
                 $img->read(
                     'data'              => $image->{'image'},
                     'type'              => 'raw',
@@ -7714,7 +7497,7 @@ sub ttf_print {
         warn __LINE__ . " ERROR $@\n", Imager->errstr() . "\n$TTF_pw,$TTF_ph\n" if ($self->{'SHOW_ERRORS'});
         return (undef);
     }
-    $data = $self->_convert(24, 16, $data, RGB) if ($self->{'BITS'} == 16);
+    $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
     $self->blit_write({ 'x' => $TTF_x, 'y' => ($TTF_y - abs($global_ascent)), 'width' => $TTF_pw, 'height' => $TTF_ph, 'image' => $data });
     $self->{'DRAW_MODE'} = $draw_mode if (defined($draw_mode));
     return ($params);
@@ -7985,16 +7768,16 @@ sub load_image {
                 $scale{'type'}         = $params->{'scale_type'} || 'min';
                 $img                   = $img->scale(%scale);
             } else {
-                $scale{'xpixels'} = int($params->{'width'});
-                $scale{'ypixels'} = int($params->{'height'});
-                $scale{'type'}    = $params->{'scale_type'} || 'min';
+                $scale{'xpixels'}  = int($params->{'width'});
+                $scale{'ypixels'}  = int($params->{'height'});
+                $scale{'type'}     = $params->{'scale_type'} || 'min';
                 ($xs, $ys, $w, $h) = $img->scale_calculate(%scale);
                 $img = $img->scale(%scale);
             }
-            $w           = int($img->getwidth());
-            $h           = int($img->getheight());
-            $bench_scale = sprintf('%.03f', time - $bench_scale);
-            my $data = '';
+            $w             = int($img->getwidth());
+            $h             = int($img->getheight());
+            $bench_scale   = sprintf('%.03f', time - $bench_scale);
+            my $data       = '';
             $bench_convert = time;
 
             # Remap colors
@@ -8009,31 +7792,29 @@ sub load_image {
             } elsif ($color_order == GBR) {
                 $img = $img->convert('matrix' => [[0, 1, 0, 0], [0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 0, 1]]);
             }
-            if ($self->{'BITS'} >= 24) {
+            if ($self->{'BITS'} == 32) {
                 $img = $img->convert('preset' => 'addalpha') if ($channels == 3);
-                if ($self->{'BITS'} == 32) {
-                    $img->write(
-                        'type'          => 'raw',
-                        'interleave'    => 0,
-                        'datachannels'  => 4,
-                        'storechannels' => 4,
-                        'data'          => \$data
-                    );
-                    if ($params->{'convertalpha'}) {
-                        my $oback = substr($self->{'B_COLOR'}, 0, 3);
-                        my $nback = $self->{'B_COLOR'};
-                        $data =~ s/$oback./$nback/g;
-                    }
-                } else {
-                    $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
-                    $img->write(
-                        'type'          => 'raw',
-                        'interleave'    => 0,
-                        'datachannels'  => 3,
-                        'storechannels' => 3,
-                        'data'          => \$data
-                    );
+                $img->write(
+                    'type'          => 'raw',
+                    'interleave'    => 0,
+                    'datachannels'  => 4,
+                    'storechannels' => 4,
+                    'data'          => \$data
+                );
+                if ($params->{'convertalpha'}) {
+                    my $oback = substr($self->{'B_COLOR'}, 0, 3);
+                    my $nback = $self->{'B_COLOR'};
+                    $data =~ s/$oback./$nback/g;
                 }
+            } elsif ($self->{'BITS'} == 24 ) {
+                $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
+                $img->write(
+                    'type'          => 'raw',
+                    'interleave'    => 0,
+                    'datachannels'  => 3,
+                    'storechannels' => 3,
+                    'data'          => \$data
+                );
             } else {    # 16 bit
                 $channels = $img->getchannels();
                 $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
@@ -8044,7 +7825,7 @@ sub load_image {
                     'storechannels' => 3,
                     'data'          => \$data
                 );
-                $data = $self->_convert(24, 16, $data, RGB);
+                $data = $self->_convert_24_to_16($data, RGB);
             }
 
             if (exists($params->{'center'})) {    # Only accepted values are processed
@@ -8056,21 +7837,19 @@ sub load_image {
                     $x = ($w < $self->{'W_CLIP'}) ? int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'} : $self->{'X_CLIP'};
                     $y = ($h < $self->{'H_CLIP'}) ? int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'} : $self->{'Y_CLIP'};
                 }
+            } elsif (defined($params->{'x'}) && defined($params->{'y'})) {
+                $x = int($params->{'x'});
+                $y = int($params->{'y'});
             } else {
-                if (defined($params->{'x'}) && defined($params->{'y'})) {
-                    $x = int($params->{'x'});
-                    $y = int($params->{'y'});
+                if ($w < $self->{'W_CLIP'}) {
+                    $x = int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'};
+                    $y = 0;
+                } elsif ($h < $self->{'H_CLIP'}) {
+                    $x = 0;
+                    $y = int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'};
                 } else {
-                    if ($w < $self->{'W_CLIP'}) {
-                        $x = int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'};
-                        $y = 0;
-                    } elsif ($h < $self->{'H_CLIP'}) {
-                        $x = 0;
-                        $y = int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'};
-                    } else {
-                        $x = 0;
-                        $y = 0;
-                    }
+                    $x = 0;
+                    $y = 0;
                 }
             }
             if (exists($tags->{'gif_left'})) {
@@ -8180,7 +7959,7 @@ sub screen_dump {
     my ($width, $height) = ($self->{'XRES'}, $self->{'YRES'});
     my $scrn = $self->blit_read({ 'x' => 0, 'y' => 0, 'width' => $width, 'height' => $height });
 
-    $scrn->{'image'} = $self->_convert(16, 24, $scrn->{'image'}, $self->{'COLOR_MODE'}) if ($self->{'BITS'} == 16);
+    $scrn->{'image'} = $self->_convert_16_to_24($scrn->{'image'}, $self->{'COLOR_MODE'}) if ($self->{'BITS'} == 16);
 
     my $type = lc($params->{'format'} || 'jpeg');
     $type =~ s/jpg/jpeg/;
@@ -8213,77 +7992,228 @@ sub screen_dump {
     $img->write(%p);
 }
 
-sub _convert {
+# Convert 16 bit bitmap to 24 bit bitmap
+
+sub _convert_16_to_24 {
     my $self        = shift;
-    my $from        = shift;
-    my $to          = shift;
     my $img         = shift;
     my $color_order = shift;
 
-    my $new_img = '';
-    my $size    = length($img);
-    my $from_bytes = $from / 8;
-    my $to_bytes   = $to / 8;
+    my $size = length($img);
     if ($self->{'ACCELERATED'}) {
-        $new_img = chr(0) x int(($size / $from_bytes) * $to_bytes);
-        c_convert($from, $to, $img, $size, $new_img, $color_order);
-    } else {
-        $from_bytes    = 1 if ($from_bytes < 1);
-        $to_bytes      = 1 if ($to_bytes < 1);
-        my $black_from = chr(0)   x $from_bytes;
-        my $white_from = chr(255) x $from_bytes;
-        my $black_to   = chr(0)   x $to_bytes;
-        my $white_to  = chr(255) x $to_bytes;
-        my $idx        = 0;
+        my $new_img = chr(0) x (($size / 2) * 3);
+        c_convert_16_24($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black24 = chr(0) x 3;
+    my $black16 = chr(0) x 2;
+    my $white24 = chr(255) x 3;
+    my $white16 = chr(255) x 2;
+    my $idx     = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 2);
 
-        while ($idx < $size) {
-            my $color = substr($img, $idx, $from_bytes);
-            if ($color eq $black_from) {
-                $new_img .= $black_to;
-            } elsif ($color eq $white_from) {
-                $new_img .= $white_to;
-            } elsif ($from == 32) {
-                if ($to == 24) {
-                    $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 16) {
-                    $color = $self->RGBA8888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 8) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 24) {
-                if ($to == 32) {
-                    $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 16) {
-                    $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 8) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 16) {
-                if ($to == 32) {
-                    $color = $self->RGB565_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 24) {
-                    $color = $self->RGB565_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 8) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 8) {
-                if ($to == 32) {
-                } elsif ($to == 24) {
-                } elsif ($to == 16) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 1) {
-                if ($to == 32) {
-                } elsif ($to == 24) {
-                } elsif ($to == 16) {
-                } elsif ($to == 8) {
-                }
-            }
+        # Black and white can be optimized
+        if ($color eq $black16) {
+            $new_img .= $black24;
+        } elsif ($color eq $white16) {
+            $new_img .= $white24;
+        } else {
+            $color = $self->RGB565_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
             $new_img .= $color->{'color'};
         }
+        $idx += 2;
+    }
+    return ($new_img);
+}
+
+# Convert 16 bit bitmap to 32 bit bitmap
+
+sub _convert_16_to_32 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size * 4);
+        c_convert_16_32($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black16 = chr(0) x 2;
+    my $white32 = chr(255) x 4;
+    my $white16 = chr(255) x 2;
+    my $idx     = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 2);
+
+        # Black and white can be optimized
+        if ($color eq $black16) {
+            $new_img .= $black32;
+        } elsif ($color eq $white16) {
+            $new_img .= $white32;
+        } else {
+            $color = $self->RGB565_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 2;
+    }
+    return ($new_img);
+}
+
+# Convert 24 bit bitmap to 16 bit bitmap
+
+sub _convert_24_to_16 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x (($size / 3) * 2);
+        c_convert_24_16($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black24 = chr(0) x 3;
+    my $black16 = chr(0) x 2;
+    my $white24 = chr(255) x 3;
+    my $white16 = chr(255) x 2;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 3);
+
+        # Black and white can be optimized
+        if ($color eq $black24) {
+            $new_img .= $black16;
+        } elsif ($color eq $white24) {
+            $new_img .= $white16;
+        } else {
+            $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 3;
     }
 
-    return($new_img);
+    return ($new_img);
+}
+
+# Convert 32 bit bitmap to a 16 bit bitmap
+
+sub _convert_32_to_16 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size / 2);
+        c_convert_32_16($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black16 = chr(0) x 2;
+    my $white32 = chr(255) x 4;
+    my $white16 = chr(255) x 2;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 4);
+
+        # Black and white can be optimized
+        if ($color eq $black32) {
+            $new_img .= $black16;
+        } elsif ($color eq $white32) {
+            $new_img .= $white16;
+        } else {
+            $color = $self->RGBA8888_to_RGB565({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 4;
+    }
+
+    return ($new_img);
+}
+
+# Convert a 32 bit bitmap to a 24 bit bitmap.
+
+sub _convert_32_to_24 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size / 4) * 3;
+        c_convert_32_24($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black24 = chr(0) x 3;
+    my $white32 = chr(255) x 4;
+    my $white24 = chr(255) x 3;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 4);
+
+        # Black and white can be optimized
+        if ($color eq $black32) {
+            $new_img .= $black24;
+        } elsif ($color eq $white32) {
+            $new_img .= $white24;
+        } else {
+            $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 4;
+    }
+
+    return ($new_img);
+}
+
+# Convert a 24 bit bitmap to a 32 bit bipmap
+
+sub _convert_24_to_32 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size / 3) * 4;
+        c_convert_24_32($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black24 = chr(0) x 3;
+    my $white32 = chr(255) x 4;
+    my $white24 = chr(255) x 3;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 4);
+
+        # Black and white can be optimized
+        if ($color eq $black24) {
+            $new_img .= $black32;
+        } elsif ($color eq $white24) {
+            $new_img .= $white32;
+        } else {
+            $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 3;
+    }
+
+    return ($new_img);
 }
 
 =head2 RGB565_to_RGB888
@@ -8878,13 +8808,13 @@ Richard Kelsch <rich@rk-internet.com>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2018 Richard Kelsch, All Rights Reserved.
+Copyright 2003-2019 Richard Kelsch, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 VERSION
 
-Version 6.11 (Dec 23, 2018)
+Version 6.13 (Jan 10, 2019)
 
 =head1 THANKS
 

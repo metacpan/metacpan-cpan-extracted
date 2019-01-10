@@ -5,9 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-use Term::Choose           qw( choose );
-use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util     qw( term_width );
+use Term::Choose qw( choose );
 
 use App::DBBrowser::Auxil;
 
@@ -47,7 +45,7 @@ sub union_tables {
             map( "- $_", @{$union->{unused_tables}} ),
             @post_tbl
         ];
-        $sf->__print_union_statement( $u, $union );
+        $ax->print_sql( $union, [ 'Union' ] );
         # Choose
         my $idx_tbl = choose(
             $choices,
@@ -91,11 +89,11 @@ sub union_tables {
             }
         }
     }
-    $sf->__print_union_statement( $u, $union );
+    $ax->print_sql( $union, [ 'Union' ] );
     # column names in the result-set of a UNION are taken from the first query.
     my $first_table = $union->{used_tables}[0];
     my $qt_columns = $ax->quote_simple_many( $union->{used_cols}{$first_table} );
-    my $qt_table = $sf->__get_union_statement( $u, $union );
+    my $qt_table = $ax->get_stmt( $union, 'Union', 'prepare' );
     # alias: required if mysql, Pg, ...
     my $alias = $ax->alias( 'union', 'AS: ', "TABLES_UNION" );
     $qt_table .= " AS " . $ax->quote_col_qualified( [ $alias ] );
@@ -105,6 +103,7 @@ sub union_tables {
 
 sub __union_all_tables {
     my ( $sf, $u, $union ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     $union->{unused_tables} = [];
     $union->{used_tables}   = [ @{$u->{user_tables}} ];
     $union->{used_cols}{$_} = [ '?' ] for @{$u->{user_tables}};
@@ -113,7 +112,7 @@ sub __union_all_tables {
     my $choices  = [ undef, map( "- $_", @{$u->{user_tables}} ) ];
 
     while ( 1 ) {
-        $sf->__print_union_statement( $u, $union );
+        $ax->print_sql( $union, [ 'Union' ] );
         # Choose
         my $idx_tbl = choose(
             $choices,
@@ -142,12 +141,13 @@ sub __union_all_tables {
 
 sub __union_table_columns {
     my ( $sf, $u, $union, $union_table ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my ( $privious_cols, $void ) = ( q['^'], q[' '] );
     delete $union->{used_cols}{$union_table}; #
 
     while ( 1 ) {
         my @pre_col = ( undef, $sf->{i}{ok}, @{$union->{saved_cols}} ? $privious_cols : $void );
-        $sf->__print_union_statement( $u, $union );
+        $ax->print_sql( $union, [ 'Union' ] );
         # Choose
         my @col = choose(
             [ @pre_col, @{$u->{col_names}{$union_table}} ],
@@ -182,42 +182,6 @@ sub __union_table_columns {
         }
     }
 }
-
-
-sub __get_union_statement {
-    my ( $sf, $u, $union ) = @_;
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my $str = "(";
-    my $count = 0;
-    for my $table ( @{$union->{used_tables}} ) {
-        ++$count;
-        $str .= " SELECT ";
-        if ( defined $union->{used_cols}{$table} && @{$union->{used_cols}{$table}} ) { #
-            my $qt_cols = $ax->quote_simple_many( $union->{used_cols}{$table} );
-            $str .= join( ', ', @$qt_cols );
-        }
-        else {
-            $str .= '*';
-        }
-        $str.= " FROM " . $ax->quote_table( $u->{tables_info}{$table} );
-        $str .= $count < @{$union->{used_tables}} ? " UNION ALL " : " )";
-    }
-    return $str;
-}
-
-
-sub __print_union_statement {
-    my ( $sf, $u, $union ) = @_;
-    my $str = $sf->__get_union_statement( $u, $union );
-    $str =~ s/ SELECT /  SELECT /g;
-    $str =~ s/UNION ALL /UNION ALL\n/g;
-    $str =~ s/^\(/SELECT * FROM (\n/;
-    $str =~ s/ \)/\n)\n\n/;
-    print $sf->{i}{clear_screen};
-    print line_fold( $str, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} ); #
-}
-
-
 
 
 

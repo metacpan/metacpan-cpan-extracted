@@ -1,6 +1,6 @@
 package PMLTQ::Relation::OrderIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::OrderIterator::VERSION = '1.5.0';
+$PMLTQ::Relation::OrderIterator::VERSION = '2.0.2';
 # ABSTRACT: Interates nodes based on their order
 
 use 5.006;
@@ -83,7 +83,7 @@ PMLTQ::Relation::OrderIterator - Interates nodes based on their order
 
 =head1 VERSION
 
-version 1.5.0
+version 2.0.2
 
 =head1 AUTHORS
 

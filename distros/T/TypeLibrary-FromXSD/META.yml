@@ -2,29 +2,40 @@
 abstract: 'create a Type::Tiny library of simpleTypes in .xsd files.'
 author:
   - 'Renee Baecker <github@renee-baecker.de>'
-build_requires: {}
+build_requires:
+  Capture::Tiny: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: TypeLibrary-FromXSD
+provides:
+  TypeLibrary::FromXSD:
+    file: lib/TypeLibrary/FromXSD.pm
+    version: '0.04'
+  TypeLibrary::FromXSD::Element:
+    file: lib/TypeLibrary/FromXSD/Element.pm
+    version: '0.04'
 requires:
-  Capture::Tiny: 0
-  DateTime: 0
-  File::Basename: 0
-  File::Spec: 0
-  Getopt::Long: 0
-  Moo: 0
-  Test::More: 0
-  Type::Tiny: 0
-  XML::LibXML: 0
-  perl: 5.008009
+  DateTime: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Moo: '0'
+  Type::Tiny: '0'
+  XML::LibXML: '0'
+  perl: '5.008009'
 resources:
   bugtracker: http://github.com/reneeb/TypeLibrary-FromXSD/issues
   homepage: http://github.com/reneeb/TypeLibrary-FromXSD
   repository: http://github.com/reneeb/TypeLibrary-FromXSD.git
-version: 0.03
+version: '0.04'
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

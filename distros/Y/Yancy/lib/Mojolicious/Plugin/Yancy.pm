@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.020';
+our $VERSION = '1.021';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -405,7 +405,7 @@ use Mojo::Loader qw( load_class );
 use Mojo::Util qw( url_escape );
 use Sys::Hostname qw( hostname );
 use Yancy::Util qw( load_backend curry );
-use JSON::Validator::OpenAPI;
+use JSON::Validator::OpenAPI::Mojolicious;
 
 has _filters => sub { {} };
 
@@ -459,7 +459,8 @@ sub register {
     my $spec;
     if ( $config->{openapi} ) {
         $spec = $config->{openapi};
-    } else {
+    }
+    else {
         # Merge configuration
         if ( $config->{read_schema} ) {
             my $schema = $app->yancy->backend->read_schema;
@@ -506,9 +507,9 @@ sub register {
 
     # Add supported formats to silence warnings from JSON::Validator
     my $formats = $openapi->validator->formats;
-    $formats->{ password } = sub { 1 };
-    $formats->{ markdown } = sub { 1 };
-    $formats->{ tel } = sub { 1 };
+    $formats->{ password } = sub { undef };
+    $formats->{ markdown } = sub { undef };
+    $formats->{ tel } = sub { undef };
 }
 
 # if false or a ref, just returns same
@@ -520,60 +521,105 @@ sub _ensure_json_data {
     decode_json $app->home->child( $data )->slurp;
 }
 
+sub _openapi_find_collection_name {
+    my ( $self, $path, $pathspec ) = @_;
+    return $pathspec->{'x-collection'} if $pathspec->{'x-collection'};
+    my $collection;
+    for my $method ( grep !/^(parameters$|x-)/, keys %{ $pathspec } ) {
+        my $op_spec = $pathspec->{ $method };
+        my $schema;
+        if ( $method eq 'get' ) {
+            # d is in case only has "default" response
+            my ($response) = grep /^[2d]/, sort keys %{ $op_spec->{responses} };
+            my $response_spec = $op_spec->{responses}{$response};
+            next unless $schema = $response_spec->{schema};
+        } elsif ( $method =~ /^(put|post)$/ ) {
+            my @body_params = grep 'body' eq ($_->{in} // ''),
+                @{ $op_spec->{parameters} || [] },
+                @{ $pathspec->{parameters} || [] },
+                ;
+            die "No more than 1 'body' parameter allowed" if @body_params > 1;
+            next unless $schema = $body_params[0]->{schema};
+        }
+        next unless my $this_ref =
+            $schema->{'$ref'} ||
+            ( $schema->{items} && $schema->{items}{'$ref'} ) ||
+            ( $schema->{properties} && $schema->{properties}{items} && $schema->{properties}{items}{'$ref'} );
+        next unless $this_ref =~ s:^#/definitions/::;
+        die "$method '$path' = $this_ref but also '$collection'"
+            if $this_ref and $collection and $this_ref ne $collection;
+        $collection = $this_ref;
+    }
+    if ( !$collection ) {
+        ($collection) = $path =~ m#^/([^/]+)#;
+        die "No collection found in '$path'" if !$collection;
+    }
+    $collection;
+}
+
 # mutates $spec
 sub _openapi_spec_add_mojo {
     my ( $self, $spec, $config ) = @_;
     for my $path ( keys %{ $spec->{paths} } ) {
-        my ($name) = $path =~ m#^/([^/]+)#;
-        die "No 'name' found in '$path'" if !length $name;
         my $pathspec = $spec->{paths}{ $path };
-        my $parameters = $pathspec->{parameters} || [];
-        my @path_params = grep 'path' eq ($_->{in} // ''), @$parameters;
-        die "No more than one path param handled" if @path_params > 1;
-        for my $method ( grep $_ ne 'parameters', keys %{ $pathspec } ) {
+        my $collection = $self->_openapi_find_collection_name( $path, $pathspec );
+        die "Path '$path' had non-existent collection '$collection'"
+            if !$spec->{definitions}{$collection};
+        for my $method ( grep !/^(parameters$|x-)/, keys %{ $pathspec } ) {
             my $op_spec = $pathspec->{ $method };
-            if ( $method eq 'get' ) {
-                # heuristic: is per-item if have a param in path
-                if ( @path_params ) {
-                    # per-item - GET = "read"
-                    $op_spec->{ 'x-mojo-to' } = {
-                        controller => $config->{api_controller},
-                        action => 'get_item',
-                        collection => $name,
-                        id_field => $path_params[0]{name},
-                    };
-                } else {
-                    # per-collection - GET = "list"
-                    $op_spec->{ 'x-mojo-to' } = {
-                        controller => $config->{api_controller},
-                        action => 'list_items',
-                        collection => $name,
-                    };
-                }
-            } elsif ( $method eq 'post' ) {
-                $op_spec->{ 'x-mojo-to' } = {
-                    controller => $config->{api_controller},
-                    action => 'add_item',
-                    collection => $name,
-                };
-            } elsif ( $method eq 'put' ) {
-                die "'$method' method needs path-param" if !@path_params;
-                $op_spec->{ 'x-mojo-to' } = {
-                    controller => $config->{api_controller},
-                    action => 'set_item',
-                    collection => $name,
-                    id_field => $path_params[0]{name},
-                };
-            } elsif ( $method eq 'delete' ) {
-                die "'$method' method needs path-param" if !@path_params;
-                $op_spec->{ 'x-mojo-to' } = {
-                    controller => $config->{api_controller},
-                    action => 'delete_item',
-                    collection => $name,
-                    id_field => $path_params[0]{name},
-                };
-            }
+            my $mojo = $self->_openapi_spec_infer_mojo( $path, $pathspec, $method, $op_spec );
+            $mojo->{controller} = $config->{api_controller};
+            $mojo->{collection} = $collection;
+            $op_spec->{ 'x-mojo-to' } = $mojo;
         }
+    }
+}
+
+# for a given OpenAPI operation, figures out right values for 'x-mojo-to'
+# to hook it up to the correct CRUD operation
+sub _openapi_spec_infer_mojo {
+    my ( $self, $path, $pathspec, $method, $op_spec ) = @_;
+    my @path_params = grep 'path' eq ($_->{in} // ''),
+        @{ $pathspec->{parameters} || [] },
+        @{ $op_spec->{parameters} || [] },
+        ;
+    my ($id_field) = grep defined,
+        (map $_->{'x-id-field'}, $op_spec, $pathspec),
+        (@path_params && $path_params[-1]{name});
+    if ( $method eq 'get' ) {
+        # heuristic: is per-item if have a param in path
+        if ( $id_field ) {
+            # per-item - GET = "read"
+            return {
+                action => 'get_item',
+                id_field => $id_field,
+            };
+        }
+        else {
+            # per-collection - GET = "list"
+            return {
+                action => 'list_items',
+            };
+        }
+    } elsif ( $method eq 'post' ) {
+        return {
+            action => 'add_item',
+        };
+    } elsif ( $method eq 'put' ) {
+        die "'$method' $path needs id_field" if !$id_field;
+        return {
+            action => 'set_item',
+            id_field => $id_field,
+        };
+    } elsif ( $method eq 'delete' ) {
+        die "'$method' $path needs id_field" if !$id_field;
+        return {
+            action => 'delete_item',
+            id_field => $id_field,
+        };
+    }
+    else {
+        die "Unknown method '$method'";
     }
 }
 
@@ -789,16 +835,16 @@ sub _openapi_spec_from_schema {
 #
 sub _build_validator {
     my ( $schema ) = @_;
-    my $v = JSON::Validator::OpenAPI->new(
+    my $v = JSON::Validator::OpenAPI::Mojolicious->new(
         # This fixes HTML forms submitting the string "20" not being
         # detected as a number, or the number 1 not being detected as
         # a boolean
         coerce => { booleans => 1, numbers => 1 },
     );
     my $formats = $v->formats;
-    $formats->{ password } = sub { 1 };
-    $formats->{ markdown } = sub { 1 };
-    $formats->{ tel } = sub { 1 };
+    $formats->{ password } = sub { undef };
+    $formats->{ markdown } = sub { undef };
+    $formats->{ tel } = sub { undef };
     $v->schema( $schema );
     return $v;
 }
@@ -940,9 +986,12 @@ sub _helper_validate {
             ;
         if ( $is_boolean && defined $item->{ $prop_name } ) {
             my $value = $item->{ $prop_name };
-            if ( $value ne 'true' && $value ne 'false' ) {
-                $item->{ $prop_name } = $value ? "true" : "false";
+            if ( $value eq 'false' or !$value ) {
+                $value = false;
+            } else {
+                $value = true;
             }
+            $item->{ $prop_name } = $value;
         }
     }
 
@@ -1013,7 +1062,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.020
+version 1.021
 
 =head1 SYNOPSIS
 

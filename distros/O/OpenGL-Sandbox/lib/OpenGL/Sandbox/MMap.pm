@@ -1,10 +1,10 @@
 package OpenGL::Sandbox::MMap;
-BEGIN { $OpenGL::Sandbox::MMap::VERSION = '0.03'; }
 use strict;
 use warnings;
 use File::Map 'map_file';
 
 # ABSTRACT: Wrapper around a memory-mapped scalar ref
+our $VERSION = '0.042'; # VERSION
 
 
 sub size { length(${(shift)}) }
@@ -31,7 +31,7 @@ OpenGL::Sandbox::MMap - Wrapper around a memory-mapped scalar ref
 
 =head1 VERSION
 
-version 0.03
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

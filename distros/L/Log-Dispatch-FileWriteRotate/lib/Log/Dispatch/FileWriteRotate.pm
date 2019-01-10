@@ -1,7 +1,7 @@
 package Log::Dispatch::FileWriteRotate;
 
-our $DATE = '2016-10-02'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -58,7 +58,7 @@ Log::Dispatch::FileWriteRotate - Log to files that archive/rotate themselves, w/
 
 =head1 VERSION
 
-This document describes version 0.05 of Log::Dispatch::FileWriteRotate (from Perl distribution Log-Dispatch-FileWriteRotate), released on 2016-10-02.
+This document describes version 0.060 of Log::Dispatch::FileWriteRotate (from Perl distribution Log-Dispatch-FileWriteRotate), released on 2019-01-09.
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Log-Dispat
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Log-Dispatch-FileWriteRotate>.
+Source repository is at L<https://github.com/perlancar/perl-Log-Dispatch-FileWriteRotate>.
 
 =head1 BUGS
 
@@ -130,7 +130,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

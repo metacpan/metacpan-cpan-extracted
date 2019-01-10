@@ -16,11 +16,13 @@ $want_float128   = undef; # Default value
 #$use_64_bit_int  = -1; # Uncomment to Force exclusion of 64-bit 'long long' support
 #$use_long_double = -1; # Uncomment to Force exclusion of 'long double' support
 #$have_decimal64  = -1; # Uncomment to Force exclusion of _Decimal64 support
+#$have_decimal128  = -1; # Uncomment to Force exclusion of _Decimal128 support
 #$have_float128   = -1; # Uncomment to Force exclusion of __float128/_Float128 support
 
 #$use_64_bit_int  = 1; # Uncomment to Force inclusion of 64-bit 'long long' support
 #$use_long_double = 1; # Uncomment to Force inclusion of 'long double' support
 #$have_decimal64  = 1; # Uncomment to Force inclusion of _Decimal64 support
+#$have_decimal128  = 1; # Uncomment to Force inclusion of _Decimal128 support
 #$have_float128   = 1; # Uncomment to Force inclusion of __float128/_Float128 support
 
 $save = open SAVE, '>', 'save_config.txt';
@@ -85,8 +87,8 @@ else { # we still need to determine whether_Decimal64 should be supported
   }
 }
 
-my $d64_message = $have_decimal64 ? "Attempting to build with _Decimal64 support\n"
-                                  : "Building without _Decimal64 support\n";
+my $d64_message = $have_decimal64 ? "Attempting to build with Math::Decimal64 support\n"
+                                  : "Building without Math::Decimal64 support\n";
 
 #############################################
 
@@ -150,8 +152,8 @@ else { # we still need to determine whether_Decimal128 should be supported
   }
 }
 
-my $d128_message = $have_decimal128 ? "Attempting to build with _Decimal128 support\n"
-                                    : "Building without _Decimal128 support\n";
+my $d128_message = $have_decimal128 ? "Attempting to build with Math::Decimal128 support\n"
+                                    : "Building without Math::Decimal128 support\n";
 
 ###########################################
 
@@ -216,8 +218,8 @@ else { # we still need to determine whether__float128 should be supported.
   }
 }
 
-my $float128_message = $have_float128 ? "Attempting to build with __float128 support\n"
-                                      : "Building without __float128 support\n";
+my $float128_message = $have_float128 ? "Attempting to build with Math::Float128 support\n"
+                                      : "Building without Math::Float128 support\n";
 
 ####################################
 
@@ -256,13 +258,13 @@ print " gmp-4.2.0 (or later)\n mpfr-3.0.0 (or later)\n\n";
 $defines =~ /\-DMATH_MPFR_NEED_LONG_LONG_INT/ ? print "Building with 'long long' support\n" :
                                  print "Building without 'long long' support\n";
 
-print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
+print "If this is wrong, see the \"64-bit-int and long double support\" section in the README\n\n";
 
 ($defines =~ /\-DNV_IS_LONG_DOUBLE/ || $defines =~ /\-DNV_IS_FLOAT128/)
                                     ? print "Building with 'long double' support\n"
                                     : print "Building without 'long double' support\n";
 
-print "If this is wrong, see the \"64-bit support\" section in the README\n\n";
+print "If this is wrong, see the \"64-bit-int and long double support\" section in the README\n\n";
 
 ($defines =~ /\-DNV_IS_FLOAT128/) ? print "Building with support for a __float128 NV\n"
                                   : print "Building without support for a __float128 NV\n";

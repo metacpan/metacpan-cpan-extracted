@@ -7,7 +7,7 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Fiat currency exchange rate library",
+  "ABSTRACT" => "Currency exchange rate library",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Module" => 0,
     "Complete::Util" => "0.57",
+    "Exporter" => "5.57",
     "Finance::Currency::Convert::BCA" => 0,
     "Finance::Currency::Convert::BI" => "0.05",
     "Finance::Currency::Convert::GMC" => "0.004",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => 0,
     "Test::WithDB" => "0.100"
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,6 +50,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Complete::Module" => 0,
   "Complete::Util" => "0.57",
+  "Exporter" => "5.57",
   "File::Spec" => 0,
   "Finance::Currency::Convert::BCA" => 0,
   "Finance::Currency::Convert::BI" => "0.05",

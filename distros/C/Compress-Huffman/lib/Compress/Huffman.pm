@@ -12,7 +12,7 @@ use Scalar::Util 'looks_like_number';
 use POSIX qw/ceil/;
 use JSON::Create '0.22', 'create_json';
 use JSON::Parse '0.42', 'parse_json';
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # eps is the allowed floating point error for summing the values of
 # the symbol table to ensure they form a probability distribution.
@@ -93,13 +93,11 @@ sub symbols
     # If this is supposed to be a probability distribution, check
     my $notprob = $options{notprob};
     if ($notprob) {
-	my $total = 0.0;
 	for my $k (keys %$s) {
 	    my $value = $s->{$k};
 	    if ($value < 0.0) {
 		croak "Negative weight $value for symbol $k";
 	    }
-	    $total += $value;
 	}
     }
     else {
@@ -128,7 +126,6 @@ sub symbols
     if ($o->{verbose}) {
 	print "This symbol table requires $t Huffman tables of size $size.\n";
     }
-    my $ndummies = 0;
     if ($size > 2) {
 	# The number of dummy entries we need is
 	my $ndummies = $t * ($size - 1) - $nentries + 1;
@@ -161,7 +158,6 @@ sub symbols
 
 	# Find the $size keys with the minimum value and go through,
 	# picking them out.
-
 	for my $i (0..$size - 1) {
 	    # This method is from
 	    # https://stackoverflow.com/questions/1185822/how-do-i-create-or-test-for-nan-or-infinity-in-perl/1185828#1185828

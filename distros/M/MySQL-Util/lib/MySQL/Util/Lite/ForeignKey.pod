@@ -1,0 +1,38 @@
+=head1 NAME
+
+MySQL::Util::Lite::ForeignKey
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 column_constraints
+
+=cut
+
+=head3 name
+
+=cut
+
+
+=head1 METHODS
+
+=head2 get_column_constraints
+
+
+=head3 parameters
+
+none
+
+=cut
+

@@ -1,0 +1,33 @@
+=head1 NAME
+
+MySQL::Util::Lite::Roles::NewColumn
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+=head2 OPTIONAL
+
+none
+
+=cut
+
+
+=head1 METHODS
+
+=head2 new_column
+
+
+=head3 parameters
+
+  HashRef $column_descript!
+
+=cut
+

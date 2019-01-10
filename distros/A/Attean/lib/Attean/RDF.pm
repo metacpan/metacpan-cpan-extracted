@@ -4,7 +4,7 @@ Attean::RDF - Utility package for exporting shorthand functions for constructing
 
 =head1 VERSION
 
-This document describes Attean::RDF version 0.019
+This document describes Attean::RDF version 0.020
 
 =head1 SYNOPSIS
 
@@ -31,17 +31,17 @@ by default).
 
 =cut
 
-package Attean::RDF 0.019 {
+package Attean::RDF 0.020 {
 	use v5.14;
 	use warnings;
 
 	use Attean;
 	use List::MoreUtils qw(zip);
-	require Exporter;
+	require Exporter::Tiny;
 	use namespace::clean;
 
-	our @ISA	= qw(Exporter);
-	our @EXPORT	= qw(iri blank literal dtliteral langliteral variable triple quad triplepattern quadpattern);
+	our @ISA	= qw(Exporter::Tiny);
+	our @EXPORT	= qw(iri blank literal dtliteral langliteral variable triple quad triplepattern quadpattern bgp);
 
 =item C<< variable( $value ) >>
 
@@ -143,6 +143,16 @@ C<< Attean::QuadPattern->new( @terms ) >>
 
 	sub quadpattern {
 		return Attean::QuadPattern->new(@_);
+	}
+
+=item C<< bgp( @triplepatterns ) >>
+
+C<< Attean::Algebra::BGP->new( triples => \@triplepatterns ) >>
+
+=cut
+
+	sub bgp {
+	  return Attean::Algebra::BGP->new(triples => \@_);
 	}
 }
 	

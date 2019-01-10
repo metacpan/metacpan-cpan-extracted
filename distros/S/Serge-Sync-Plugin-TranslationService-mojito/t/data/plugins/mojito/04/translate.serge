@@ -6,7 +6,7 @@ sync
 
         data
         {
-            project_id              SergeTest
+            repository_name              SergeTest
             application_properties  ./files/config/serge_test.properties
             localized_files_path    ./files/target
             file_type               XLIFF

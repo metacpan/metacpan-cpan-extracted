@@ -1,0 +1,114 @@
+NAME
+    Acme::CPANModules::WorkingWithTree - Working with tree data structure in
+    Perl
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::WorkingWithTree (from Perl distribution
+    Acme-CPANModules-WorkingWithTree), released on 2019-01-09.
+
+DESCRIPTION
+    Working with tree data structure in Perl.
+
+    Basics
+
+    Perl classes to represent tree (node) structure: Tree::Object and
+    Tree::ObjectXS (comes with several varieties). They provide methods like
+    walking a tree, checking whether a node is the first child, getting
+    sibling nodes, and so on.
+
+    Perl modules to manipulate tree: Data::Tree, Tree::Simple.
+
+    Memory-efficient tree nodes in Perl: Tree::Node.
+
+    Creating
+
+    Tree::FromStruct, Tree::FromText, Tree::FromTextLines,
+    Tree::Create::Callback, Tree::Create::Callback::ChildrenPerLevel,
+    Tree::Create::Size, Tree::FromFS.
+
+    Data::Random::Tree.
+
+    Visualizing as text
+
+    Tree::ToText, Tree::ToTextLines.
+
+    Visualizing as graphic
+
+    TODO
+
+    Other modules
+
+    Tree::ToFS.
+
+    Special kinds of trees: TODO.
+
+    Roles
+
+    Role::TinyCommons::Tree.
+
+INCLUDED MODULES
+    *   Tree::Object
+
+    *   Tree::ObjectXS
+
+    *   Data::Tree
+
+    *   Tree::Simple
+
+    *   Tree::Node
+
+    *   Tree::FromStruct
+
+    *   Tree::FromText
+
+    *   Tree::FromTextLines
+
+    *   Tree::Create::Callback
+
+    *   Tree::Create::Callback::ChildrenPerLevel
+
+    *   Tree::Create::Size
+
+    *   Tree::FromFS
+
+    *   Data::Random::Tree
+
+    *   Tree::ToText
+
+    *   Tree::ToTextLines
+
+    *   Tree::ToFS
+
+    *   Role::TinyCommons::Tree
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-WorkingWithTree>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-WorkingWithTree>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Work
+    ingWithTree>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

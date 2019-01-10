@@ -117,6 +117,31 @@ describe "Array::FIFO" => sub {
 
     };
 
+    describe "test with negative values" => sub {
+        my $ar;
+
+        before each => sub {
+            $ar = Array::FIFO->new( limit => 5 );
+            $ar->add( -3 );
+            $ar->add( -8 );
+            $ar->add( 2 );
+            $ar->add( -1 );
+        };
+
+        it "size is 4" => sub {
+            is( $ar->size, 4 );
+        };
+
+        it "average is -2.5" => sub {
+            is( $ar->average, -2.5 );
+        };
+
+        it "sum is -10" => sub {
+            is( $ar->sum, -10 );
+        };
+
+    };
+
 };
 
 runtests unless caller;

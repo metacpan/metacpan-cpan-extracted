@@ -1,0 +1,54 @@
+=head1 NAME
+
+MySQL::Util::Lite::Column
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 default
+
+=cut
+
+=head3 is_autoinc
+
+=cut
+
+=head3 is_null
+
+=cut
+
+=head3 key
+
+=cut
+
+=head3 name
+
+=cut
+
+=head3 type
+
+=cut
+
+
+=head1 METHODS
+
+=head2 get_moose_type
+
+
+=head3 parameters
+
+none
+
+=cut
+

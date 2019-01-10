@@ -3,8 +3,8 @@ NAME
     rotate options
 
 VERSION
-    This document describes version 0.15 of Log::Dispatch::Dir (from Perl
-    distribution Log-Dispatch-Dir), released on 2017-07-11.
+    This document describes version 0.160 of Log::Dispatch::Dir (from Perl
+    distribution Log-Dispatch-Dir), released on 2019-01-09.
 
 SYNOPSIS
         use Log::Dispatch::Dir;
@@ -190,7 +190,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015, 2014, 2013, 2011 by
+    This software is copyright (c) 2019, 2017, 2015, 2014, 2013, 2011 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

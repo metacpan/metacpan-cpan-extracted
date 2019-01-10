@@ -1,3 +1,13 @@
+0.003 - 08 Jan 2018
+
+ - remove ULOC_REQUESTED_LOCALE, this was deprecated and removed by
+   libicu. (cpan #124946)
+
+ - if your version of ICU is recent enough, collation now uses
+   ucol_strcollUTF8() instead ucol_strcollIter().  Since this fetches
+   the UTF8 form of a SV, this may upgrade supplied SVs to a UTF-8
+   representation.
+
 0.002 - 02 Feb 2012
 
  - fix the content of the NAME section, Unicode was spelled incorrectly.

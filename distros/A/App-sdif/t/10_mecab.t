@@ -24,6 +24,15 @@ sub mecab {
     is_deeply (	[ mecab_words $text ], $expect, $name );
 }
 
+my $mecab = "mecab";
+eval {
+     system "$mecab --version";
+     $? == 0;
+}
+or do {
+    plan skip_all => "No `$mecab' command available.";
+};
+
 mecab "a b c\n",
     [ "a", " ", "b", " ", "c", "\n" ];
 

@@ -15,6 +15,7 @@ use File::Basename qw/fileparse/;
 # if these are not available
 our $GZIP_BIN = which('pigz')   // which('gzip');
 our $BZIP_BIN = which('pbzip2') // which('bzip2');
+our $ZSTD_BIN = which('pzstd')  // which('zstd');
 our $DSRC_BIN = which('dsrc2')  // which('dsrc');
 our $FQZC_BIN = which('fqz_comp');
 
@@ -24,6 +25,7 @@ use constant MAGIC_BZIP => 'BZh';
 use constant MAGIC_FQZC => '.fqz';
 use constant MAGIC_BAM  => pack('C4', 0x42, 0x41, 0x4d, 0x01);
 use constant MAGIC_2BIT => pack('C4', 0x1a, 0x41, 0x27, 0x43);
+use constant MAGIC_ZSTD => pack('C4', 0x28, 0xB5, 0x2F, 0xFD);
 
 sub new {
 
@@ -71,6 +73,12 @@ sub new {
                     open $fh, '-|', "$BZIP_BIN -dc $fn"
                         or die "Error opening bzip2 stream: $!\n";
                 }
+            }
+            elsif (substr($magic,0,4) eq MAGIC_ZSTD) {
+                die "no zstd backend found\n" if (! defined $ZSTD_BIN);
+                close $fh;
+                open $fh, '-|', "$ZSTD_BIN -dc $fn"
+                    or die "Error opening zstd stream: $!\n";
             }
             elsif (substr($magic,0,2) eq MAGIC_DSRC) {
                 die "no dsrc backend found\n" if (! defined $DSRC_BIN);

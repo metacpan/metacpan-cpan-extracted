@@ -2,9 +2,12 @@
 Changes
 LICENSE
 MANIFEST
+META.json
+META.yml
 Makefile.PL
 README
 README.md
+TODO
 integ_t/Iron/iron_all.t
 integ_t/IronCache/cache.t
 integ_t/IronMQ/client_all.t
@@ -43,6 +46,8 @@ lib/IO/Iron/IronWorker/Task.pm
 lib/IO/Iron/PolicyBase.pm
 lib/IO/Iron/PolicyBase/CharacterGroup.pm
 perlcritic.rc
+t/00-report-prereqs.dd
+t/00-report-prereqs.t
 t/Iron/client_readconfig.t
 t/Iron/common.t
 t/Iron/load.t
@@ -51,9 +56,12 @@ t/IronCache/cache_policy2.t
 t/IronCache/load.t
 t/IronMQ/load.t
 t/IronWorker/load.t
+xt/author/00-compile.t
+xt/author/eol.t
 xt/author/pod-coverage.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t
 xt/author/test-version.t
+xt/release/distmeta.t
 xt/release/kwalitee.t

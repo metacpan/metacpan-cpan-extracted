@@ -9,7 +9,7 @@ use strict;
 use Serge::Util qw(subst_macros culture_from_lang locale_from_lang);
 use version;
 
-our $VERSION = qv('0.905.5');
+our $VERSION = qv('0.906.0');
 
 sub name {
     return 'Mojito translation server (http://www.mojito.global/) synchronization plugin';
@@ -23,7 +23,7 @@ sub init {
     $self->{optimizations} = 1;
 
     $self->merge_schema({
-        project_id             => 'STRING',
+        repository_name        => 'STRING',
         application_properties => 'STRING',
         source_files_path      => 'STRING',
         source_locale          => 'STRING',
@@ -43,7 +43,7 @@ sub validate_data {
     $self->SUPER::validate_data;
 
     $self->{data}->{application_properties} = subst_macros($self->{data}->{application_properties});
-    $self->{data}->{project_id} = subst_macros($self->{data}->{project_id});
+    $self->{data}->{repository_name} = subst_macros($self->{data}->{repository_name});
     $self->{data}->{source_files_path} = subst_macros($self->{data}->{source_files_path});
     $self->{data}->{localized_files_path} = subst_macros($self->{data}->{localized_files_path});
     $self->{data}->{import_translations} = subst_macros($self->{data}->{import_translations});
@@ -54,7 +54,7 @@ sub validate_data {
     $self->{data}->{status_pull} = subst_macros($self->{data}->{status_pull});
     $self->{data}->{destination_locales} = subst_macros($self->{data}->{destination_locales});
 
-    die "'project_id' not defined" unless defined $self->{data}->{project_id};
+    die "'repository_name' not defined" unless defined $self->{data}->{repository_name};
 
     if ($self->{data}->{application_properties} ne '') {
         die "'application_properties', which is set to '$self->{data}->{application_properties}', does not point to a valid file.\n" unless -f $self->{data}->{application_properties};
@@ -80,7 +80,7 @@ sub run_mojito_cli {
 
     my $command = $action;
 
-    $command .= ' -r '.$self->{data}->{project_id};
+    $command .= ' -r '.$self->{data}->{repository_name};
     $command .= ' -s '.$self->{data}->{source_files_path};
     if ($self->{data}->{application_properties} ne '') {
         $command .= ' --spring.config.location='.$self->{data}->{application_properties};

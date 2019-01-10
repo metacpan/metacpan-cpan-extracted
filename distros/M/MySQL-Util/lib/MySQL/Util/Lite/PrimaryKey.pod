@@ -1,0 +1,51 @@
+=head1 NAME
+
+MySQL::Util::Lite::PrimaryKey
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 columns
+
+=cut
+
+=head3 name
+
+=cut
+
+=head3 table_name
+
+=cut
+
+
+=head1 METHODS
+
+=head2 get_columns
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 is_autoinc
+
+
+=head3 parameters
+
+none
+
+=cut
+

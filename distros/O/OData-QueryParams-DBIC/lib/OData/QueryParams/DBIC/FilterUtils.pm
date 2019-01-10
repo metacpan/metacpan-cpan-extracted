@@ -13,7 +13,7 @@ no warnings 'experimental::signatures';
 use parent 'Exporter';
 
 our @EXPORT_OK = qw(parser);
-our $VERSION   = '0.08';
+our $VERSION   = '0.09';
 
 use constant Operators => {
     EQUALS             => 'eq',
@@ -130,6 +130,9 @@ sub parser {
                     elsif ( $match[2] =~ m{\A[0-9]+(?:\.[0-9]+)?\z} ) {
                         $obj->{val_type} = 'numeric';
                     }
+                    else { # datetimeoffset
+                        $obj->{val_type} = 'function';
+                    }
 
                     #if(typeof obj.value === 'string') {
                     #    var quoted = obj.value.match(/^'(.*)'$/);
@@ -186,7 +189,7 @@ OData::QueryParams::DBIC::FilterUtils - parse filter param
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,8 @@
-Revision history for Dist-Zilla-Plugin-PatchModule
+0.002   2019-01-10 (PERLANCAR)
+
+	- Replace the use of InstallTool phase with AfterBuild phase to
+	  avoid breaking static install.
+
 
 0.001   2016-05-28 (PERLANCAR)
 

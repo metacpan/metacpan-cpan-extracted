@@ -35,4 +35,5 @@ t/30stringeval.t
 t/40croak.t
 t/41end.t
 t/80await+try.t
+t/90rt128176.t
 t/99pod.t

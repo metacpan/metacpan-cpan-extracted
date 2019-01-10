@@ -82,6 +82,7 @@ t/missing-fonts.t
 t/nobold-option.t
 t/nofinalpage.t
 t/notoc.t
+t/option-clashes.t
 t/options-2.t
 t/options-f/dir1/1/options1.muse
 t/options-f/dir2/2/options2.muse

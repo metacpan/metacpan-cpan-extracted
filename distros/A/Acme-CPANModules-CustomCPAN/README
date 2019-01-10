@@ -1,0 +1,87 @@
+NAME
+    Acme::CPANModules::CustomCPAN - Creating your own CPAN-like repository
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::CustomCPAN
+    (from Perl distribution Acme-CPANModules-CustomCPAN), released on
+    2019-01-09.
+
+DESCRIPTION
+    Creating your own CPAN-like repository.
+
+    You can create a CPAN-like repository which contains your own modules.
+    Look at the modules in this list to see what tools you can use to do
+    this.
+
+    Keywords: DarkPAN
+
+INCLUDED MODULES
+    *   CPAN::Mini::Inject
+
+        If you just want to add one to a few of your own modules to your own
+        CPAN, you can start with a regular CPAN (or mini CPAN) mirror, then
+        inject your modules into it using this module.
+
+    *   OrePAN
+
+        With this tool, you can create a CPAN-like repository from scratch,
+        by adding your modules one at a time.
+
+    *   WorePAN
+
+        A flavor of OrePAN that works under Windows.
+
+    *   OrePAN2
+
+        The next generation of OrePAN, although I personally still use
+        OrePAN (version 1).
+
+    *   CPAN::Mirror::Tiny
+
+        Like OrePAN/OrePAN2/CPAN::Mini::Inject, but the goal is not to
+        depend on XS modules (thus, the use of HTTP::Tinyish which uses
+        curl/wget to download https pages instead of LWP).
+
+    *   Pinto
+
+        Pinto allows you to create custom CPAN-like repository of Perl
+        modules with features like stacking, version pinning, and so on.
+
+    *   App::lcpan
+
+        Not a CPAN-like repository creator/builder, but once you have your
+        CPAN-like repository, you can also index it like you would a regular
+        CPAN mirror/mini mirror using this tool.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-CustomCPAN>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-CustomCPAN>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Cust
+    omCPAN>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+    Acme::CPANModules::LocalCPANMirror
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

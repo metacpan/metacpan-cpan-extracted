@@ -63,6 +63,9 @@
       "App::cdif::Command::Mecab" : {
          "file" : "lib/App/cdif/Command/Mecab.pm"
       },
+      "App::cdif::Command::OSAscript" : {
+         "file" : "lib/App/cdif/Command/OSAscript.pm"
+      },
       "App::cdif::Tmpfile" : {
          "file" : "lib/App/cdif/Tmpfile.pm"
       },
@@ -77,7 +80,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.7.3"
+         "version" : "v4.8.0"
       },
       "App::sdif::LabelStack" : {
          "file" : "lib/App/sdif/LabelStack.pm"
@@ -87,6 +90,9 @@
       },
       "App::sdif::autocolor::Apple_Terminal" : {
          "file" : "lib/App/sdif/autocolor/Apple_Terminal.pm"
+      },
+      "App::sdif::autocolor::iTerm" : {
+         "file" : "lib/App/sdif/autocolor/iTerm.pm"
       },
       "App::sdif::colors" : {
          "file" : "lib/App/sdif/colors.pm"
@@ -109,7 +115,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.7.3",
+   "version" : "4.8.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>",

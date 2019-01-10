@@ -1,5 +1,4 @@
 package OpenGL::Sandbox::ResMan;
-BEGIN { $OpenGL::Sandbox::ResMan::VERSION = '0.03'; }
 use Moo;
 use Try::Tiny;
 use Carp;
@@ -10,6 +9,7 @@ use File::Find ();
 use Scalar::Util ();
 
 # ABSTRACT: Resource manager for OpenGL prototyping
+our $VERSION = '0.042'; # VERSION
 
 
 has resource_root_dir => ( is => 'rw', default => sub { '.' } );
@@ -225,7 +225,7 @@ OpenGL::Sandbox::ResMan - Resource manager for OpenGL prototyping
 
 =head1 VERSION
 
-version 0.03
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -365,7 +365,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

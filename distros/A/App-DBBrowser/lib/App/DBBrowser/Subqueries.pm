@@ -95,7 +95,7 @@ sub choose_subquery {
         # Choose
         my $idx = choose(
             $choices,
-            { %{$sf->{i}{lyt_stmt_v}}, index => 1, prompt => '', default => $old_idx, undef => $sf->{i}{back_v_no_ok} }
+            { %{$sf->{i}{lyt_stmt_v}}, index => 1, prompt => '', default => $old_idx, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;
@@ -173,7 +173,7 @@ sub edit_sq_file {
         # Choose
         my $choice = choose(
             [ @pre, $add, $edit, $remove ],
-            { %{$sf->{i}{lyt_3}}, undef => $sf->{i}{back_v_no_ok}, info => $info }
+            { %{$sf->{i}{lyt_v_clear}}, undef => '  <=', info => $info }
         );
         my $changed = 0;
         if ( ! defined $choice ) {
@@ -223,7 +223,7 @@ sub __add_subqueries {
         # Choose
         my $idx = choose(
             $choices,
-            { %{$sf->{i}{lyt_3}}, prompt => 'Add:', info => $info, index => 1, undef => $sf->{i}{_back} }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Add:', info => $info, index => 1 }
         );
         if ( ! $idx ) {
             if ( @$bu ) {
@@ -282,7 +282,7 @@ sub __edit_subqueries {
         # Choose
         my $idx = choose(
             $choices,
-            { %{$sf->{i}{lyt_3}}, prompt => 'Edit:', info => $info, index => 1, default => $old_idx }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Edit:', info => $info, index => 1, default => $old_idx }
         );
         if ( ! $idx ) {
             if ( @$bu ) {

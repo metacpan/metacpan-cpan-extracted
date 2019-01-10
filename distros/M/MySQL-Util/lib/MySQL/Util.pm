@@ -21,12 +21,12 @@ Version 0.29
 
 =cut
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 SYNOPSIS
 
 =for text
-
+tmpdir/Testmysqlorm.pm
  my $util = MySQL::Util->new( dsn  => $ENV{DBI_DSN}, 
                               user => $ENV{DBI_USER} );
 
@@ -202,7 +202,10 @@ sub BUILD {
 	if ($schema) {
 		$self->_schema($schema);
 	}
-
+	else {
+		confess "unable to determine database name";		
+	}
+	
 	$self->_set_dbh($dbh);
 }
 

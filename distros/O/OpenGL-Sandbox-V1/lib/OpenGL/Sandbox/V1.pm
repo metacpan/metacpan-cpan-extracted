@@ -1,20 +1,21 @@
 package OpenGL::Sandbox::V1;
-BEGIN { $OpenGL::Sandbox::V1::VERSION = '0.03'; }
 use v5.14;
-use strict;
-use warnings;
+use Exporter::Extensible -exporter_setup => 1;
 use Carp;
-use parent 'Exporter';
 use Try::Tiny;
 use Math::Trig;
 use Cwd;
+use OpenGL::Sandbox 0.04;
 use OpenGL::Sandbox qw/
 	glLoadIdentity glPushAttrib glPopAttrib glEnable glDisable glOrtho glFrustum glMatrixMode
-	glFrontFace glTranslated
+	glFrontFace glTranslated glClear
 	GL_CURRENT_BIT GL_ENABLE_BIT GL_TEXTURE_2D GL_PROJECTION GL_CW GL_CCW GL_MODELVIEW
-	GL_LIGHTING GL_LIGHT0
+	GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT GL_LIGHTING GL_LIGHT0
 /;
-our @EXPORT_OK= qw(
+# Loading the V1 package makes extra stuff available from the main module
+unshift @OpenGL::Sandbox::ISA, __PACKAGE__;
+export qw/
+	next_frame
 	local_matrix load_identity setup_projection scale trans trans_scale rotate mirror local_gl
 	lines line_strip quads quad_strip triangles triangle_strip triangle_fan
 	vertex plot_xy plot_xyz plot_st_xy plot_st_xyz plot_norm_st_xyz plot_rect plot_rect3
@@ -24,10 +25,10 @@ our @EXPORT_OK= qw(
 	set_light_position setup_sunlight
 	draw_axes_xy draw_axes_xyz draw_boundbox
 	get_viewport_rect get_matrix
-);
-our %EXPORT_TAGS= (
-	all => \@EXPORT_OK,
-);
+/;
+BEGIN {
+our $VERSION = '0.042'; # VERSION
+}
 
 use OpenGL::Sandbox::V1::Inline
 	CPP => do { my $x= __FILE__; $x =~ s|\.pm|\.cpp|; Cwd::abs_path($x) },
@@ -39,6 +40,12 @@ use OpenGL::Sandbox::V1::DisplayList;
 # use OpenGL::Sandbox::V1::Quadric;
 
 # ABSTRACT: Various OpenGL tools and utilities that depend on the OpenGL 1.x API
+
+
+sub next_frame {
+	glLoadIdentity();
+	($_[0] // __PACKAGE__)->maybe::next::method();
+}
 
 
 sub setup_projection {
@@ -104,7 +111,7 @@ sub setup_projection {
 
 
 sub local_matrix(&) { goto &_local_matrix }
-*load_identity= *glLoadIdentity;
+BEGIN { *load_identity= *glLoadIdentity; }
 
 
 sub local_gl(&) { goto &_local_gl }
@@ -130,7 +137,7 @@ END { undef $default_quadric; } # cleanup before global destruction
 
 sub compile_list(&) { OpenGL::Sandbox::V1::DisplayList->new->compile(shift); }
 
-*call_list= *_displaylist_call;
+BEGIN { *call_list= *_displaylist_call; }
 
 
 sub setup_sunlight {
@@ -302,16 +309,27 @@ OpenGL::Sandbox::V1 - Various OpenGL tools and utilities that depend on the Open
 
 =head1 VERSION
 
-version 0.03
+version 0.042
 
 =head1 DESCRIPTION
 
-This module is separated from OpenGL::Sandbox in order to keep the OpenGL API dependencies
+This module is seperate from OpenGL::Sandbox in order to keep the OpenGL API dependencies
 less tangled.  Everything specific to OpenGL 1.x that I would have otherwise included in
 OpenGL::Sandbox is located here, instead.  The main OpenGL::Sandbox module can automatically
-load this module using the import tag of C<:V1> or C<:V1:all>.
+load this module using the import tag of C<-V1>.  After doing so, all these additional
+symbols are made available from the main L<OpenGL::Sandbox> module.
 
 =head1 EXPORTABLE FUNCTIONS
+
+=head2 WINDOW FUNCTIONS
+
+=head3 next_frame
+
+Loading OpenGL::Sandbox::V1 causes the L<OpenGL::Sandbox/next_frame> function to also call
+
+  glLoadIdentity();
+
+This is excluded by default since glLoadIdentity isn't applicable to newer GL programs.
 
 =head2 MATRIX FUNCTIONS
 
@@ -679,7 +697,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

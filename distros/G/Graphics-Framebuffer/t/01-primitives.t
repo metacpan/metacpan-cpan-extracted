@@ -28,7 +28,7 @@ unless (defined($ENV{'DISPLAY'})) {
                 'center'       => CENTER_XY,
                 'antialias'    => 1
             }));
-            sleep 3;
+            sleep 2;
             $F->cls();
         } else {
             diag("If Testing Failed, it's because you are either:\n\n1> Are installing from within X-Windows\n2> You don't have a Framebuffer to test with (/dev/fb0)\n3> Or your a CPAN tester that's not reading the instructions, and improperly marking this module failed.\n");

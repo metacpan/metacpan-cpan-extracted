@@ -3,15 +3,14 @@ abstract: 'Watch for changes to files, cross-platform style'
 author:
   - 'Dave Rolsky <autarch@urth.org>'
 build_requires:
-  Data::Dumper: '0'
   Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Path: '0'
   File::Spec: '0'
   File::Temp: '0'
   FindBin: '0'
-  Test::Exception: '0'
-  Test::More: '0.96'
+  Test2::V0: '0'
+  Test::More: '1.302015'
   Test::Requires: '0'
   Test::Without::Module: '0'
   base: '0'
@@ -37,24 +36,25 @@ optional_features:
 provides:
   File::ChangeNotify:
     file: lib/File/ChangeNotify.pm
-    version: '0.29'
+    version: '0.31'
   File::ChangeNotify::Event:
     file: lib/File/ChangeNotify/Event.pm
-    version: '0.29'
+    version: '0.31'
   File::ChangeNotify::Watcher:
     file: lib/File/ChangeNotify/Watcher.pm
-    version: '0.29'
+    version: '0.31'
   File::ChangeNotify::Watcher::Default:
     file: lib/File/ChangeNotify/Watcher/Default.pm
-    version: '0.29'
+    version: '0.31'
   File::ChangeNotify::Watcher::Inotify:
     file: lib/File/ChangeNotify/Watcher/Inotify.pm
-    version: '0.29'
+    version: '0.31'
   File::ChangeNotify::Watcher::KQueue:
     file: lib/File/ChangeNotify/Watcher/KQueue.pm
-    version: '0.29'
+    version: '0.31'
 requires:
   Carp: '0'
+  Fcntl: '0'
   File::Find: '0'
   File::Spec: '0'
   Module::Pluggable::Object: '0'
@@ -71,7 +71,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=File-ChangeNotify
   homepage: http://metacpan.org/release/File-ChangeNotify
   repository: git://github.com/houseabsolute/File-ChangeNotify.git
-version: '0.29'
+version: '0.31'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -214,7 +214,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Prereqs:
           phase: test
           type: requires
-      name: '@DROLSKY/Test::More with subtest'
+      name: '@DROLSKY/Test::More with Test2'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -374,7 +374,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.19.0
+          git_version: 2.20.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -543,7 +543,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@DROLSKY/InstallGuide'
-      version: '1.200011'
+      version: '1.200012'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
@@ -575,7 +575,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
       version: '1.01'
@@ -587,7 +587,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -613,7 +613,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.045'
@@ -636,7 +636,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -649,11 +649,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.29
+          tag: v0.31
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -667,7 +667,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.045'
@@ -696,7 +696,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -710,7 +710,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.0
+          git_version: 2.20.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.045'

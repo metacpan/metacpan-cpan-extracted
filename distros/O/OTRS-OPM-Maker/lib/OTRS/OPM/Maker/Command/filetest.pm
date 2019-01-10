@@ -11,7 +11,7 @@ use XML::LibXML;
 
 use OTRS::OPM::Maker -command;
 
-our $VERSION = '0.14';
+our $VERSION = '0.16';
 
 sub abstract {
     return "Check if filelist in .sopm includes the files on your disk";
@@ -62,7 +62,7 @@ sub execute {
     
     FILE:
     for my $file ( @files ) {
-        my $name         = $file->findvalue( '@Location' );
+        my $name = $file->findvalue( '@Location' );
         
         push @not_found, $name if !delete $fs{$name};
     }
@@ -70,12 +70,11 @@ sub execute {
     if ( @not_found ) {
         print "Files listed in .sopm but not found on disk:\n",
             map{ "    - $_\n" }@not_found;
-        exit 1;
     }
     
     if ( %fs ) {
         print "Files found on disk but not listed in .sopm:\n",
-            map{ "    - $_\n" }keys %fs;
+            map{ "    - $_\n" }sort keys %fs;
     }
 }
 
@@ -93,7 +92,7 @@ OTRS::OPM::Maker::Command::filetest - check if filelist in .sopm includes the fi
 
 =head1 VERSION
 
-version 0.14
+version 0.16
 
 =head1 AUTHOR
 

@@ -20,7 +20,7 @@ use Getopt::Long;
 
 use PMLTQ;
 use PMLTQ::SQLEvaluator;
-use PMLTQ::Command;
+use YAML::Tiny;
 
 binmode STDOUT, ':encoding(UTF-8)';
 
@@ -58,12 +58,10 @@ my %db = (
   password => '',
 );
 
-my $CommandsMock = Test::MockModule->new('PMLTQ::Commands');
-$CommandsMock->mock(
-  _load_config => sub {
+sub load_config {
     my $filename = abs_path(shift);
     return $config_cache{$filename} if exists $config_cache{$filename};
-    my $config = $CommandsMock->original('_load_config')->($filename);
+    my $config = YAML::Tiny->read($filename)->[0];
 
     # tamper db connection
     while ( my ( $key, $value ) = each %db ) {
@@ -73,7 +71,8 @@ $CommandsMock->mock(
     $config->{sys_db} = 'postgres';
     $config->{db}->{name} = random_string();    # Randomize database name to allow running concurrent tests
     return $config_cache{$filename} = $config;
-  } );
+}
+
 
 sub treebanks {
   return @treebanks if (@treebanks);
@@ -82,7 +81,7 @@ sub treebanks {
     $_ => {
       name   => $_,
       dir    => File::Spec->catdir( $treebanks_dir, $_ ),
-      config => PMLTQ::Commands::_load_config( File::Spec->catdir( $treebanks_dir, $_, 'pmltq.yml' ) ),
+      config => load_config( File::Spec->catdir( $treebanks_dir, $_, 'pmltq.yml' ) ),
       dump   => File::Spec->catdir( $treebanks_dir, $_, 'database.dump' ),
       }
   } read_dir $treebanks_dir;

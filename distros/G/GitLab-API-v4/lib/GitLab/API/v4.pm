@@ -1,5 +1,5 @@
 package GitLab::API::v4;
-$GitLab::API::v4::VERSION = '0.14';
+$GitLab::API::v4::VERSION = '0.15';
 =encoding utf8
 
 =head1 NAME
@@ -10260,6 +10260,10 @@ gregor herrmann <gregoaE<64>debian.org>
 =item *
 
 Luc Didry <lucE<64>framasoft.org>
+
+=item *
+
+Kieren Diment <kieren.dimentE<64>staples.com.au>
 
 =back
 

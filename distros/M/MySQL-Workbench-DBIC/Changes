@@ -1,6 +1,10 @@
 Change history for MySQL::Workbench::DBIC
 =========================================
 
+1.15 2019-01-10 17:11:00
+
+  * avoid growing number of newlines in custom code
+
 1.13 2018-12-28 08:43:00
 
   * Allow custom codes in schema file (fix #9)

@@ -30,6 +30,7 @@ requires:
   Algorithm::Combinatorics: 0
   Data::UUID: 0
   DateTime::Format::W3CDTF: 0
+  Exporter::Tiny: 1
   File::Slurp: 0
   HTTP::Negotiate: 0
   IRI: 0.005
@@ -61,4 +62,4 @@ resources:
   homepage: http://search.cpan.org/dist/Attean/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/attean/
-version: '0.019'
+version: '0.020'

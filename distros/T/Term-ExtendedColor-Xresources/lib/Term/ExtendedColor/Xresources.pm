@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.074';
+  $VERSION = '0.075';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color
@@ -304,7 +304,7 @@ L<Term::ExtendedColor>
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS

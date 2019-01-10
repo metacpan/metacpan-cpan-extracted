@@ -1430,6 +1430,8 @@ sub login ($;%) {
         my $key_obj;
         my $key_id;
 
+        my $now=time;
+
         unless($without_cookies) {
             my $vf_key_cookie=$config->{'vf_key_cookie'};
             if($id_cookie_type eq 'key') {
@@ -1465,10 +1467,13 @@ sub login ($;%) {
             if($key_obj) {
                 my $key_renew_mode=$config->{'key_renew_mode'} || 'replace';
                 if($key_renew_mode eq 'replace') {
-                    $key_list->delete($key_id);
+                    $key_obj->put($key_expire_prop => $now - 1);
                     $key_obj=$key_id=undef;
                 }
-                elsif($key_renew_mode ne 'update') {
+                elsif($key_renew_mode eq 'update') {
+                    # no-op
+                }
+                else {
                     throw $self "- invalid key_renew_mode '$key_renew_mode'";
                 }
             }
@@ -1476,7 +1481,6 @@ sub login ($;%) {
 
         # Creating or updating the key
         #
-        my $now=time;
         my %key_data=(
             $key_expire_prop    => $now+$vf_expire_time,
             $vf_time_prop       => $now,

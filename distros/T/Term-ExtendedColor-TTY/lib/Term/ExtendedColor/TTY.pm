@@ -5,7 +5,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.028';
+  $VERSION = '0.030';
   @ISA     = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -134,7 +134,7 @@ L<Term::ExtendedColor>, L<Term::ExtendedColor::Xresources>
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  magnus@trapd00r.se
+  m@japh.se
   http://japh.se
 
 =head1 CONTRIBUTORS

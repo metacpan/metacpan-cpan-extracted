@@ -8,8 +8,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/compress-huffman.t
+t/long.t
 t/save-load.t
-xt/checkpod.t
-xt/git.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,9 @@
 Revision history for App-Pods2Site
 
+0.015	2019-01-08
+
+	Support the use of ':path' as an argument to --bindir in order to pick up scripts in the PATH
+
 0.014	2017-09-02
 
 	Minor beautification

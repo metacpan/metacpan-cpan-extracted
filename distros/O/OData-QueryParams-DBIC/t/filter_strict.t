@@ -48,8 +48,8 @@ my %tests = (
     q!$filter=Price ge 10!                                              => { Price => { '>=' => 10 } },
     q!$filter=Price gt 20!                                              => { Price => { '>' => 20 } },
     q!$filter=Address/City ne 'London'!                                 => { 'Address.City' => { '!=' => 'London' } },
-    q!$filter=Address/City eq 'Redmond'!                                => { 'Address.City' => { '==' => 'Redmond' } },
-    q!$filter=((name eq 'Serena') and (age lt 5))!                      => { -and => [ { name => { '==' => 'Serena' } }, { age => { '<' => 5 } } ] },
+    q!$filter=Address/City eq 'Redmond'!                                => { 'Address.City' => { '=' => 'Redmond' } },
+    q!$filter=((name eq 'Serena') and (age lt 5))!                      => { -and => [ { name => { '=' => 'Serena' } }, { age => { '<' => 5 } } ] },
     q!$filter=user_id gt 20!                                            => { user_id => { '>' => 20 } },
     q!$filter=!                                                         => {},
 );

@@ -98,7 +98,7 @@ sub flush_write_queue {
 
 =head2 I<OBJ>->send_call( %OPTS )
 
-Send a METHOD_CALL message to the server.
+Send a METHOD_CALL message.
 
 %OPTS are C<path>, C<interface>, C<member>, C<destination>, C<signature>,
 C<body>, and C<on_return>. These do as you’d expect, with the following
@@ -135,25 +135,70 @@ sub send_call {
     return $ret;
 }
 
+=head2 I<OBJ>->send_return( $ORIG_MSG, %OPTS )
+
+Send a METHOD_RETURN message.
+
+Arguments are similar to C<send_call()> except for the header differences
+that the D-Bus specification describes. Also:
+
+=over
+
+=item * C<destination> is taken from the $ORIG_MSG. (Behavior is
+undefined if this parameter is given directly.)
+
+=item * There is no C<on_return> parameter.
+
+=back
+
+=cut
+
 sub send_return {
     my ($self, $orig_msg, @opts_kv) = @_;
 
     return $self->_send_msg(
-        @opts_kv,
-        reply_serial => $orig_msg->get_serial(),
+        _response_fields_from_orig_msg($orig_msg, \@opts_kv),
         type => 'METHOD_RETURN',
     );
 }
+
+=head2 I<OBJ>->send_error( $ORIG_MSG, %OPTS )
+
+Like C<send_return()>, but sends an error instead. The
+C<error_name> parameter is required.
+
+=cut
 
 sub send_error {
     my ($self, $orig_msg, @opts_kv) = @_;
 
     return $self->_send_msg(
-        @opts_kv,
-        reply_serial => $orig_msg->get_serial(),
+        _response_fields_from_orig_msg($orig_msg, \@opts_kv),
         type => 'ERROR',
     );
 }
+
+sub _response_fields_from_orig_msg {
+
+    return (
+
+        # This has to honor a passed “destination”
+        # so that we can implement a D-Bus server in tests.
+        destination => $_[0]->get_header('SENDER'),
+
+        @{ $_[1] },
+
+        # Reject callers’ attempts to set this one.
+        reply_serial => $_[0]->get_serial(),
+    );
+}
+
+=head2 I<OBJ>->send_signal( %OPTS )
+
+Like C<send_call()> but sends a signal rather than a method call.
+There is no C<on_return> parameter.
+
+=cut
 
 sub send_signal {
     my ($self, @opts_kv) = @_;
@@ -171,7 +216,8 @@ sub send_signal {
 Same interface as C<blocking()>, but this sets/gets/toggles whether to send
 big-endian messages instead of little-endian.
 
-(I’m not sure why it would matter?)
+By default this library uses the system’s native byte order, so you probably
+have little need for this function.
 
 =cut
 
@@ -292,7 +338,9 @@ sub _send_msg {
         serial => $serial,
     );
 
-    $self->{'_endian'} ||= 'le';
+    # Use native byte order by default.
+    $self->{'_endian'} ||= (pack 'n', 1) eq (pack 'l', 1) ? 'be' : 'le';
+
     $self->{'_to_str_fn'} ||= "to_string_$self->{'_endian'}";
 
     my ($buf_sr, $fds_ar) = $msg->can($self->{'_to_str_fn'})->($msg);

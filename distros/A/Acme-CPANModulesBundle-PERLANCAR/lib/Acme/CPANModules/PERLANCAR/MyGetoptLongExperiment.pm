@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $LIST = {
     summary => 'My experiments writing Getopt::Long replacements/alternatives',
@@ -38,7 +38,7 @@ Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment - My experiments writing Ge
 
 =head1 VERSION
 
-This document describes version 0.004 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2019-01-06.
+This document describes version 0.005 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2019-01-09.
 
 =head1 DESCRIPTION
 

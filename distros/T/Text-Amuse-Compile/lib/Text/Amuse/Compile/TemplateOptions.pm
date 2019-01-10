@@ -695,7 +695,7 @@ has fussy_last_word => (is => 'rw',
                         default => sub { 0 });
 
 has format_id => (is => 'rw',
-                  isa => StrMatch[ qr{\A[a-zA-Z][a-zA-Z0-9_]+\z} ],
+                  isa => StrMatch[ qr{\A([a-zA-Z][a-zA-Z0-9_]+)?\z} ],
                   default => sub { 'DEFAULT' });
 
 =head1 METHODS

@@ -141,7 +141,7 @@ sub __choose_rows {
             # Choose
             my $idx = $stmt_v->choose(
                 [ @pre, @choices_groups ],
-                { prompt => 'Choose group:', index => 1, undef => $sf->{i}{back_v_no_ok} }
+                { prompt => 'Choose group:', index => 1, undef => '  <=' }
             );
             if ( ! $idx ) {
                 $sql->{insert_into_args} = $aoa;

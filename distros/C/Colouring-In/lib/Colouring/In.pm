@@ -4,29 +4,18 @@ use 5.006;
 use strict;
 use warnings;
 
-=head1 NAME
-
-Colouring::In - color or colour.
-
-=head1 VERSION
-
-Version 0.10
-
-=cut
-
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 our %TOOL;
 
 BEGIN {
 	%TOOL = (
-		clamp => sub { return $TOOL{min}( $TOOL{max}( $_[0], 0 ), $_[1] ); },
-		max => sub { $_[ $_[0] < $_[1] ] },
-		min => sub { $_[ $_[0] > $_[1] ] },
+		clamp => sub { return $TOOL{min}( $TOOL{max}( $_[0], 0 ), $_[1]); },
+		max => sub { $_[ ($_[0] || 0) < ($_[1] || 0) ] || 0 },
+		min => sub { $_[ ($_[0] || 0) > ($_[1] || 0) ] || 0 },
 		round => sub {
 			return sprintf '%.' . ( $_[1] // 0 ) . 'f', $_[0];
 		},
-		num => sub { return $_[0] + 0; },
 		numIs => sub { return defined $_[0] && $_[0] =~ /^[0-9]+/; },
 		percent => sub { return ( $_[0] * 100 ) . '%'; },
 		depercent => sub { my $p = shift; $p =~ s/%$//; return $p / 100; },
@@ -53,7 +42,7 @@ BEGIN {
 		scaled => sub {
 			my ( $n, $size ) = @_;
 			return ( $n =~ s/%// )
-				? sprintf( '%.f2', $n * $size / 100 )
+				? sprintf( '%.f2', (($n * $size) / 100 ))
 				: return sprintf( "%d", $n );
 		},
 		convertColour => sub {
@@ -68,7 +57,7 @@ BEGIN {
 			if ( $colour =~ s/^($reg)// ) {
 				return $TOOL{ $converter{$1} }($colour);
 			}
-			die 'a misserable death';
+			die 'Cannot convert the colour format';
 		},
 		rgb2rgb => sub {
 			return $TOOL{numbers}(shift);
@@ -79,7 +68,7 @@ BEGIN {
 			return $l != 6
 				? $l == 3
 					? map { hex( $_ . $_ ) } $hex =~ m/./g
-					: die 'a misserable death',
+					: die 'hex length must be 3 or 6'
 				: map { hex($_) } $hex =~ m/../g;
 		},
 		hsl2rgb => sub {
@@ -161,13 +150,12 @@ sub new {
 	my ( $pkg, $rgb, $a ) = @_;
 
 	my $self = bless {}, $pkg;
-
 	# The end goal here, is to parse the arguments
 	# into an integer triplet, such as `128, 255, 0`
 	if ( ref $rgb eq 'ARRAY' ) {
 		scalar @$rgb == 4 and $a = pop @$rgb;
 		$self->{colour} = $rgb;
-	} elsif ( ref \$rgb eq 'SCALAR' ) {
+	} else {
 		$self->{colour} = [ $TOOL{convertColour}($rgb) ];
 		scalar @{ $self->{colour} } == 4 and $a = pop @{$self->{colour}};
 	}
@@ -210,7 +198,6 @@ sub asHSL {
 	my ( $r, $g, $b, $max, $min, $d, $h, $s, $l ) = $TOOL{rgb2hs}( $_[0]->colour );
 
 	$l = ( $max + $min ) / 2;
-
 	if ( $max == $min ) {
 		$h = $s = 0;
 	}
@@ -267,13 +254,11 @@ sub toHSV {
 
 sub lighten {
 	my ( $colour, $amt, $meth, $hsl ) = @_;
-
 	( $hsl, $colour ) = $TOOL{hsl}($colour);
-
 	$amt = $TOOL{depercent}($amt);
 	$hsl->{l} += $TOOL{clamp}(
 		( $meth && $meth eq 'relative' )
-			? $hsl->{l} * $amt
+			? (($hsl->{l} || 1) * $amt)
 			: $amt, 1
 	);
 
@@ -338,6 +323,16 @@ sub colour {
 
 __END__
 
+=head1 NAME
+
+Colouring::In - color or colour.
+
+=head1 VERSION
+
+Version 0.12
+
+=cut
+
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -372,6 +367,80 @@ Perhaps a little code snippet.
 	my $transparent = fadeout('#fff', '100%');
 
 	my $colour = fadein('rgba(125,125,125,0'), '100%');
+
+=head1 SUBROUTINES/METHODS
+
+=head2 new
+
+=cut
+
+=head2 rgb 
+
+=cut
+
+=head2 rgba
+
+=cut
+
+=head2 hsl
+
+=cut
+
+=head2 hsla
+
+=cut
+
+=head2 toCSS
+
+=cut
+
+=head2 toRGB
+
+=cut
+
+=head2 toRGBA
+
+=cut
+
+=head2 toHEX
+
+=cut
+
+=head2 asHSL
+
+=cut
+
+=head2 toHSL
+
+=cut
+
+=head2 toHSV
+
+=cut
+
+=head2 lighten
+
+=cut
+
+=head2 darken
+
+=cut
+
+=head2 fade
+
+=cut
+
+=head2 fadeout
+
+=cut
+
+=head2 fadein
+
+=cut
+
+=head2 colour
+
+=cut
 
 =head1 AUTHOR
 

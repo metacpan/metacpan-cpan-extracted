@@ -77,7 +77,7 @@ can submit an issue report [via the web](http://rt.cpan.org/Public/Dist/Display.
 ## Continuous Integration
 
 All pull requests for this distribution will be automatically tested
-on Linux by [Travis](https://travis-ci.org/houseabsolute/File-ChangeNotify).
+on Linux by [Travis](https://travis-ci.org/houseabsolute/File-ChangeNotify) and on Windows by [AppVeyor](https://ci.appveyor.com/project/autarch/File-ChangeNotify).
 
 All CI results will be visible in the pull request on GitHub. Follow the
 appropriate links for details when tests fail.

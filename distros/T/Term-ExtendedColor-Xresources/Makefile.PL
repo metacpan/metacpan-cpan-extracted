@@ -13,7 +13,7 @@ WriteMakefile1(
     #},
 
     NAME              => q{Term::ExtendedColor::Xresources},
-    AUTHOR            => q{Magnus Woldrich <trapd00r@trapd00r.se>},
+    AUTHOR            => q{Magnus Woldrich <m@japh.se>},
     ABSTRACT          => q{Get, set and modify X resources},
     VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
     LICENSE           => q{perl},

@@ -1,6 +1,6 @@
 package Catmandu::BagIt::Payload;
 
-our $VERSION = '0.233';
+our $VERSION = '0.234';
 
 use Moo;
 use IO::File;

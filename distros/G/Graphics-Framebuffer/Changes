@@ -1270,6 +1270,8 @@ Revision history for Graphics-Framebuffer
 
 6.11   Dec 23, 2018
 
+       *** DO NOT USE THIS VERSION.  IT'S BROKEN ***
+
        I consolidated a lot of Perl and C code to make things for efficient and
        to make more sense (in the source code).  Blitting and converting for
        example.
@@ -1278,3 +1280,20 @@ Revision history for Graphics-Framebuffer
        did this to make ready for adding single bit pixel sizes (for monochrome
        screens).  Someone asked if the module was capable of working in
        single bit monochrome, and currently it does not, but will be soon!
+
+6.12  Jan 08, 2019
+
+      Ok, the last version was a fiasco.  Far too many changes, and they broke
+      everything.  I'll proceed a bit more carefully from now on.  The codebase
+      is restored back to the 6.10 state.
+
+      Actual changes are the example scripts.  While finding the issues with
+      6.11, I noticed that the example scripts did not support double-buffering.
+      They do now, and should better run on Raspberry Pi machines if still in
+      16 bit color mode.
+
+6.13  Jan 10, 2019
+
+      Changes to the splash screen.
+
+      Changes to the C plotting routines to make way for 1 bit graphics.

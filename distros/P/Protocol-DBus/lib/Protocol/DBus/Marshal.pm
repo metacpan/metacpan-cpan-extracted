@@ -58,6 +58,10 @@ sub _marshal {
 
         my $datum = $_data_are_not_list ? $data : $data->[$si];
 
+        if (!defined $datum) {
+            die "Undefined datum (SCT=“$sct”)!";
+        }
+
         # Arrays
         if (index($sct, 'a') == 0) {
             _marshal_array( $sct, $datum, $buf_sr);

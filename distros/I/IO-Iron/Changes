@@ -1,9 +1,25 @@
 Revision history for IO-Iron
 
-0.12      2017-03-28 16:37:22+02:00 Europe/Stockholm
+0.13      2019-01-09 00:32:48+01:00 Europe/Stockholm
+
+    [Fixes]
+
+    - Content-type header is left undef.
+
+0.12_01   2019-01-07 22:47:27+01:00 Europe/Stockholm (TRIAL RELEASE)
+
+    [Fixes]
+
+    - Start using PodWeaver.
+    - Move TODO list from lib/IO/Iron.pm to its own file TODO.
+    - Start use [Test::EOL].
+    - Cleaning Dist::Zilla config.
+    - Add missing Meta files.
+
+0.12
    Conversion to IronMQ v3 done.
 
-0.12_02
+0.11_02
    Add method for API function /stacks in IronWorker.
    Start conversion to IronMQ v3.
 

@@ -40,6 +40,7 @@ lib/App/lcpan/Cmd/dist_scripts.pm
 lib/App/lcpan/Cmd/dists.pm
 lib/App/lcpan/Cmd/dists_by_dep_count.pm
 lib/App/lcpan/Cmd/doc.pm
+lib/App/lcpan/Cmd/extract_dist.pm
 lib/App/lcpan/Cmd/extract_mod.pm
 lib/App/lcpan/Cmd/extract_rel.pm
 lib/App/lcpan/Cmd/extract_script.pm

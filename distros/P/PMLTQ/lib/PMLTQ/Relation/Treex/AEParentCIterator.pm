@@ -1,6 +1,6 @@
 package PMLTQ::Relation::Treex::AEParentCIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::Treex::AEParentCIterator::VERSION = '1.5.0';
+$PMLTQ::Relation::Treex::AEParentCIterator::VERSION = '2.0.2';
 # ABSTRACT: Different implementation of effective parent relation iterator on a-nodes for Treex treebanks
 
 
@@ -56,7 +56,7 @@ PMLTQ::Relation::Treex::AEParentCIterator - Different implementation of effectiv
 
 =head1 VERSION
 
-version 1.5.0
+version 2.0.2
 
 =head1 DESCRIPTION
 

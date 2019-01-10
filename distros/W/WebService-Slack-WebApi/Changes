@@ -1,5 +1,8 @@
 Revision history for Perl extension WebService-Slack-WebApi
 
+0.14 2019-01-09T14:01:25Z
+    - add conversations and dnd (thx poptix)
+
 0.13 2018-01-20T08:11:30Z
     - add users.profile methods
 

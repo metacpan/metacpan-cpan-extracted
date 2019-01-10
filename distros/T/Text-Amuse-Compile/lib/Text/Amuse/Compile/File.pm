@@ -1226,9 +1226,6 @@ sub _prepare_tex_tokens {
         foreach my $method ($template_options->config_setters) {
             if (exists $options{$method}) {
                 eval { $template_options->$method($options{$method}) };
-                if ($@) {
-                    print "Error on $method: $@\n";
-                }
             }
         }
     }
@@ -1287,6 +1284,7 @@ sub _prepare_tex_tokens {
 
 sub _interpolate_magic_comments {
     my ($self, $format, $doc) = @_;
+    $format ||= 'DEFAULT';
     my $latex = $doc->as_latex;
     # format is validated.
     my $re = qr{^

@@ -55,3 +55,30 @@ Revision history for Perl extension Perl6::Form.
 
     - Made compatible with Perl 5.25+ (Thanks Slaven)
 
+
+
+0.007  Thu Jan 26 10:17:16 2017
+
+    - Fixed misbehaviour on decimals that start with 0
+      (Thanks, Stuart!)
+
+
+0.008  Fri Feb 10 06:59:17 2017
+
+    - Changed "..." to '...' in examples
+      for Perl 6 (pseudo-)compatibility.
+      (thanks, Joel!)
+
+
+0.009  Mon Jan  7 21:53:48 2019
+
+    - Fixed warnings on zero-width fills under recent Perls
+      (thanks, Florian!)
+
+    - Fixed infinite loops when insufficient room for computed-width fields
+      (partial fix, but may be sufficient for real-world usages)
+
+
+0.090  Wed Jan  9 11:22:34 2019
+
+    - Fixed version numbering scheme (thanks, Florian!)

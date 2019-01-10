@@ -84,6 +84,7 @@ public:
 			font->Outset( SvNV(Inline_Stack_Item(1)) );
 		} else
 			croak("Require one or two arguments to outset");
+		Inline_Stack_Void;
 	}
 	void use_display_list(bool en) {
 		font->UseDisplayList(en);
@@ -105,7 +106,7 @@ void FTFontWrapper::render(const char *text, ...) {
 	if (Inline_Stack_Items & 1)
 		/* stack items includes $self and $text, and key=>value after that */
 		croak("Odd number of parameters passed to ->render");
-
+	
 	for (i= 2; i < Inline_Stack_Items-1; i+= 2) {
 		key= SvPV_nolen(Inline_Stack_Item(i));
 		value= Inline_Stack_Item(i+1);
@@ -187,6 +188,8 @@ void FTFontWrapper::render(const char *text, ...) {
 	
 	if (alter_matrix)
 		glPopMatrix();
+	
+	Inline_Stack_Void;
 }
 
 static const char * next_utf8(const char *str) {
@@ -199,7 +202,7 @@ static const char * next_utf8(const char *str) {
 static int count_utf8(const char *str) {
 	int n= 0;
 	while (*str) {
-		if ((*str & 0xC0) != 0x80) n++;
+		if ((*str++ & 0xC0) != 0x80) n++;
 	}
 	return n;
 }

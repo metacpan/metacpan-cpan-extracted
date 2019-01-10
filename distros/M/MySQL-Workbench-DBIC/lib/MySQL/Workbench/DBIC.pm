@@ -13,7 +13,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 has output_path              => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                     => ( is => 'ro', required => 1 );
@@ -143,7 +143,7 @@ sub _custom_code {
         ^[#] \s+ --- \s*
         ^[#] \s+ Put \s+ your \s+ own \s+ code \s+ below \s+ this \s+ comment \s*
         ^[#] \s+ --- \s*
-        (.*?)
+        (.*?) \s+
         ^[#] \s+ --- \s*
     }xms;
 
@@ -658,7 +658,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

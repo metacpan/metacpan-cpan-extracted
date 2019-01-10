@@ -1,8 +1,9 @@
 package OpenGL::Sandbox::V1::Quadric;
-BEGIN { $OpenGL::Sandbox::V1::Quadric::VERSION = '0.03'; }
+
 require OpenGL::Sandbox::V1; # automatically loads Quadric via XS
 
-# ABSTRACT - Rendering parameters for various geometric shapes
+# ABSTRACT: Rendering parameters for various geometric shapes
+our $VERSION = '0.042'; # VERSION
 
 __END__
 
@@ -12,11 +13,11 @@ __END__
 
 =head1 NAME
 
-OpenGL::Sandbox::V1::Quadric
+OpenGL::Sandbox::V1::Quadric - Rendering parameters for various geometric shapes
 
 =head1 VERSION
 
-version 0.03
+version 0.042
 
 =head1 SYNOPSIS
 
@@ -26,7 +27,7 @@ version 0.03
 
 GLU Quadrics are a funny name for a small object that holds a few rendering parameters for
 another few geometry-plotting functions.  They provide a quick/convenient way to render some
-simple solids without messing with a bunch of trigonometry and loops.
+simple polygon surfaces without messing with a bunch of trigonometry and loops.
 
 =head1 CONFIGURATION
 
@@ -117,7 +118,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

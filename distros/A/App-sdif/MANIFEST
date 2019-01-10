@@ -8,6 +8,7 @@ cdif.el
 cpanfile
 lib/App/cdif/Command.pm
 lib/App/cdif/Command/Mecab.pm
+lib/App/cdif/Command/OSAscript.pm
 lib/App/cdif/Tmpfile.pm
 lib/App/cdif/colors.pm
 lib/App/cdif/debug.pm
@@ -16,6 +17,7 @@ lib/App/sdif.pm
 lib/App/sdif/LabelStack.pm
 lib/App/sdif/autocolor.pm
 lib/App/sdif/autocolor/Apple_Terminal.pm
+lib/App/sdif/autocolor/iTerm.pm
 lib/App/sdif/colors.pm
 lib/App/sdif/debug.pm
 lib/App/sdif/default.pm

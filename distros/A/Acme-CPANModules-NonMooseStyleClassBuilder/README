@@ -1,0 +1,73 @@
+NAME
+    Acme::CPANModules::NonMooseStyleClassBuilder - Non-Moose-style class
+    builders
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::NonMooseStyleClassBuilder (from Perl distribution
+    Acme-CPANModules-NonMooseStyleClassBuilder), released on 2019-01-09.
+
+DESCRIPTION
+    Non-Moose-style class builders.
+
+    This list catalogs class builders with interface that is different than
+    the Moose family.
+
+    See also a whole host of Class::Accessor::* modules.
+
+INCLUDED MODULES
+    *   Class::Meta::AccessorBuilder - Part of the Class::Meta framework
+
+    *   Class::Struct
+
+    *   Class::Builder
+
+    *   Class::GenSource - This is more like code generator, it generates
+        Perl code source for the entire class definition, not just accessors
+
+    *   Object::Declare
+
+    *   Object::Tiny
+
+    *   Class::Tiny
+
+    *   Object::New - Only provides a new() constructor method
+
+    *   Class::Accessor - Also supports Moose-style "has"
+
+    *   Class::XSAccessor - Fast version of Class::Accessor, used by Moo
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-NonMooseStyleClassBuilder
+    >.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-NonMooseStyleClassBu
+    ilder>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-NonM
+    ooseStyleClassBuilder>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+    Acme::CPANModules::MooseStyleClassBuilder
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

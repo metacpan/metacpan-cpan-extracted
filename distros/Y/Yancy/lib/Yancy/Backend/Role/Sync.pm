@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Sync;
-our $VERSION = '1.020';
+our $VERSION = '1.021';
 # ABSTRACT: A role to give a synchronous backend useful Promises methods
 
 #pod =head1 SYNOPSIS
@@ -53,7 +53,7 @@ Yancy::Backend::Role::Sync - A role to give a synchronous backend useful Promise
 
 =head1 VERSION
 
-version 1.020
+version 1.021
 
 =head1 SYNOPSIS
 

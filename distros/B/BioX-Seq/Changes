@@ -1,5 +1,15 @@
 Revision history for BioX-Seq
 
+0.007002 2019-01-10
+         Write FASTA index files in raw mode for consistency on all platforms
+         Expanded test coverage
+
+0.007001 2019-01-10
+         Skip advanced compression tests if binaries are missing
+
+0.007 2018-12-28
+         Added support for streaming zstd-compressed files
+
 0.006007 2018-06-19
          Removed CPAN::Uploader as hard dependency
 

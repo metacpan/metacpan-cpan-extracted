@@ -42,16 +42,18 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Data::Dumper" => 0,
+    "ExtUtils::MakeMaker" => 0,
     "File::Copy" => 0,
     "File::Remove" => 0,
+    "File::Spec" => 0,
     "Log::Any::Test" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.13",
   "test" => {
-    "TESTS" => "t/Iron/*.t t/IronCache/*.t t/IronMQ/*.t t/IronWorker/*.t"
+    "TESTS" => "t/*.t t/Iron/*.t t/IronCache/*.t t/IronMQ/*.t t/IronWorker/*.t"
   }
 );
 
@@ -66,6 +68,7 @@ my %FallbackPrereqs = (
   "English" => 0,
   "Exception::Class" => 0,
   "Exporter" => 0,
+  "ExtUtils::MakeMaker" => 0,
   "File::Copy" => 0,
   "File::HomeDir" => 0,
   "File::Remove" => 0,

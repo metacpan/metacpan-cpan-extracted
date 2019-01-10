@@ -1,7 +1,7 @@
 {
    "abstract" : "Get, set and modify X resources",
    "author" : [
-      "Magnus Woldrich <trapd00r@trapd00r.se>"
+      "Magnus Woldrich <m@japh.se>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
@@ -46,6 +46,6 @@
          "url" : "https://github.com/trapd00r/Term-ExtendedColor-Xresources"
       }
    },
-   "version" : "0.074",
+   "version" : "0.075",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.020';
+our $VERSION = '1.021';
 # ABSTRACT: A simple framework and editor for content-driven Mojolicious websites
 
 #pod =head1 SYNOPSIS
@@ -188,7 +188,7 @@ Yancy - A simple framework and editor for content-driven Mojolicious websites
 
 =head1 VERSION
 
-version 1.020
+version 1.021
 
 =head1 SYNOPSIS
 

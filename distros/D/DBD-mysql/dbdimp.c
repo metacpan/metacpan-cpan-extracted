@@ -604,9 +604,9 @@ static char *parse_params(
       /*
         it would be good to be able to handle any number of cases and orders
       */
-      if ((*statement_ptr == 'l' || *statement_ptr == 'L') &&
-          (!strncmp(statement_ptr+1, "imit ", 5) ||
-           !strncmp(statement_ptr+1, "IMIT ", 5)))
+      if (((*statement_ptr == ' ') || (*statement_ptr == '\n') || (*statement_ptr == '\t')) &&
+          (!strncmp(statement_ptr+1, "limit ", 5) ||
+           !strncmp(statement_ptr+1, "LIMIT ", 5)))
       {
         limit_flag = 1;
       }
@@ -780,6 +780,7 @@ static char *parse_params(
 
 	/* in case this is a nested LIMIT */
       case ')':
+      case '=':
         limit_flag = 0;
 	*ptr++ = *statement_ptr++;
         break;
@@ -1908,7 +1909,7 @@ MYSQL *mysql_dr_connect(
         }
 
 #ifndef MARIADB_BASE_VERSION
-#if (MYSQL_VERSION_ID >= 50723)
+#ifdef MYSQL_OPT_GET_SERVER_PUBLIC_KEY
         if ((svp = hv_fetch(hv, "mysql_get_server_pubkey", 23, FALSE)) && *svp && SvTRUE(*svp)) {
           my_bool server_get_pubkey = 1;
           mysql_options(sock, MYSQL_OPT_GET_SERVER_PUBLIC_KEY, &server_get_pubkey);
@@ -2036,7 +2037,11 @@ MYSQL *mysql_dr_connect(
     #endif
 
 	    if (ssl_verify) {
+    #ifdef HAVE_SSL_VERIFY
 	      if (!ssl_verify_usable() && ssl_enforce && ssl_verify_set) {
+    #else
+	      if (!ssl_verify_usable() && ssl_enforce) {
+    #endif
 	        set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is broken by current version of MySQL client");
 	        return NULL;
 	      }
@@ -4050,7 +4055,12 @@ int dbd_describe(SV* sth, imp_sth_t* imp_sth)
         break;
 
       default:
+#if MYSQL_VERSION_ID > 100300
+        // https://jira.mariadb.org/browse/MDEV-18143
+        buffer->buffer_length= fields[i].max_length ? fields[i].max_length : 2;
+#else
         buffer->buffer_length= fields[i].max_length ? fields[i].max_length : 1;
+#endif
         Newz(908, fbh->data, buffer->buffer_length, char);
         buffer->buffer= (char *) fbh->data;
       }
@@ -4436,7 +4446,7 @@ process:
         case MYSQL_TYPE_DOUBLE:
           if (!(fields[i].flags & ZEROFILL_FLAG))
           {
-            /* Coerce to dobule and set scalar as NV */
+            /* Coerce to double and set scalar as NV */
             (void) SvNV(sv);
             SvNOK_only(sv);
           }
@@ -5307,6 +5317,16 @@ int mysql_db_reconnect(SV* h)
   }
   else
     imp_dbh= (imp_dbh_t*) imp_xxh;
+
+  /* reconnect a closed connection, used in do() for implicit reconnect */
+  if (!DBIc_has(imp_dbh, DBIcf_ACTIVE) && DBIc_has(imp_dbh, DBIcf_AutoCommit)) {
+    if (my_login(aTHX_ h, imp_dbh)) {
+      DBIc_ACTIVE_on(imp_dbh);
+      DBIc_set(imp_dbh, DBIcf_AutoCommit, TRUE);
+      return TRUE;
+    }
+    return FALSE;
+  }
 
   if (mysql_errno(imp_dbh->pmysql) != CR_SERVER_GONE_ERROR &&
           mysql_errno(imp_dbh->pmysql) != CR_SERVER_LOST)

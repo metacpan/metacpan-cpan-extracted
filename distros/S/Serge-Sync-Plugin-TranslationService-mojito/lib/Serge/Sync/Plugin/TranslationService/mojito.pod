@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::mojito - L<Mojito|http://www.mojito.global/> synchronization plugin for L<Serge|https://serge.io/>
+Serge::Sync::Plugin::TranslationService::mojito - L<Mojito|http://www.mojito.global/> synchronization plugin for L<Serge|https://serge.io/> based on L<Mojito CLI|http://www.mojito.global/docs/guides/install/>
 
 =head1 SYNOPSIS
 
@@ -12,30 +12,37 @@ Serge::Sync::Plugin::TranslationService::mojito - L<Mojito|http://www.mojito.glo
 
         data
         {
-            project_id              MojitoProjectId
+            repository_name         MojitoRepositoryName
             application_properties  ./files/config/mojito.properties
             source_files_path       ./files/source
             localized_files_path    ./files/target
-            destination_locales     de es fr-ca
         }
     }
 
 =head1 DESCRIPTION
 
-Integration between Serge (Free, Open Source Solution for Continuous Localization) and Mojito (Open source automation platform that enables continuous localization).
-Uses the command-line tool for the Mojito API. See L<Mojito CLI|http://www.mojito.global/docs/guides/install/>.
+Integration between Serge (Free, Open Source Solution for Continuous Localization) and Mojito (Open source automation platform that enables continuous localization)
+implemented using the command-line tool for the Mojito API.
 
 =head1 ATTRIBUTES
 
 =over
 
-=item I<project_id>
+=item I<repository_name>
 
-Mojito project id
+Mojito Repository name
 
 =item I<application_properties>
 
-Mojito configuration file
+Mojito CLI configuration file (server connection properties)
+
+=item I<source_files_path>
+
+Directory of the source resource files
+
+=item I<localized_files_path>
+
+Directory of the localized resource files
 
 =back
 

@@ -11,4 +11,5 @@ t/20cmp.t
 t/90podcover.t
 t/95pod.t
 typemap
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

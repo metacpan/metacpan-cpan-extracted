@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
 ,
   PREREQ_PM      => {
   'Class::Method::Modifiers' => '2.00',
-  'Mojolicious' => '7.42',
+  'Mojolicious' => '7.66',
   'Selenium::Remote::WebElement' => '1.00'
 }
 ,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
       },
     },
   },
-  test => {S => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
+  test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION('6.63_03') }) {

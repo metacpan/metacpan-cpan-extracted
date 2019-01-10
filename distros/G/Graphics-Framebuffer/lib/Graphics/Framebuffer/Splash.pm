@@ -11,9 +11,7 @@ use constant {
 
 use List::Util qw(min max);
 
-BEGIN {
-    our $VERSION = 1.06;
-}
+my $VERSION = '1.07';
 
 sub _perl_logo {
     my $self = shift;
@@ -28,7 +26,7 @@ sub _perl_logo {
     $self->ellipse(
         {
             'x'       => (965 * $hf) + $X,
-            'y'       => (70 * $vf) + $Y,
+            'y'       => (96 * $vf) + $Y,
             'xradius' => 140 * $hf,
             'yradius' => 65 * $vf,
             'filled'  => TRUE
@@ -38,7 +36,7 @@ sub _perl_logo {
     $self->ellipse(
         {
             'x'       => (960 * $hf) + $X,
-            'y'       => (65 * $vf) + $Y,
+            'y'       => (91 * $vf) + $Y,
             'xradius' => 140 * $hf,
             'yradius' => 65 * $vf,
             'filled'  => TRUE
@@ -50,7 +48,7 @@ sub _perl_logo {
         $self->ttf_print(
             {
                 'bounding_box' => TRUE,
-                'y'            => (126 * $vf) + $Y,                              # 85 * $vf,
+                'y'            => (152 * $vf) + $Y,                              # 85 * $vf,
                 'height'       => 80 * $vf,
                 'wscale'       => 1,
                 'color'        => '0040FFFF',
@@ -209,7 +207,19 @@ sub splash {
     } else {
         $self->normal_mode();
         # Draws the main boxes
-        $self->set_color({ 'red' => 128, 'green' => 0, 'blue' => 128, 'alpha' => 255 });
+        $self->set_color({'red' => 0, 'green' => 32, 'blue' => 0, 'alpha' => 255});
+        $self->rbox(
+            {
+                'x'      => $X,
+                'y'      => $Y,
+                'width'  => $W,
+                'height' => $H, 
+                'filled' => TRUE,
+                'hatch'  => 'dots16'
+            }
+        );
+        $self->alpha_mode();
+        $self->set_color({ 'red' => 0, 'green' => 0, 'blue' => 128, 'alpha' => 255 });
         $self->polygon(
             {
                 'coordinates' => [(400 * $hf) + $X, (80 * $vf) + $Y, (20 * $hf) + $X, (800 * $vf) + $Y, (1600 * $hf) + $X, (1078 * $vf) + $Y, (1900 * $hf) + $X, (5 * $vf) + $Y],
@@ -218,14 +228,14 @@ sub splash {
                     'colors' => {
                         'red'   => [0,0],
                         'green' => [0,0],
-                        'blue'  => [16,255],
+                        'blue'  => [128,255],
+                        'alpha' => [128,255],
                     },
                 }
             }
         );
 
         $self->set_color({ 'red' => 255, 'green' => 0, 'blue' => 0, 'alpha' => 100 });
-        $self->alpha_mode();
         $self->rbox(
             {
                 'x'      => (150 * $hf) + $X,
@@ -240,17 +250,15 @@ sub splash {
                         'red'   => [32,200],
                         'green' => [0,0],
                         'blue'  => [0,0],
-                        'alpha' => [96,255],
+                        'alpha' => [96,220],
                     },
                 },
             }
         );
 
-        $self->normal_mode();
-
         ### Draws the Circle with GFB in it ###
         # The dark shadow circle
-        $self->set_color({ 'red' => 32, 'green' => 0, 'blue' => 0, 'alpha' => 255 });
+        $self->set_color({ 'red' => 32, 'green' => 0, 'blue' => 0, 'alpha' => 200 });
         $self->circle(
             {
                 'x'      => (207 * $hf) + $X,
@@ -259,6 +267,8 @@ sub splash {
                 'filled' => TRUE
             }
         );
+
+        $self->normal_mode();
 
         # The "coin"
         $self->set_color({ 'red' => 255, 'green' => 255, 'blue' => 255, 'alpha' => 255 });
@@ -412,6 +422,7 @@ sub splash {
                 'filled' => TRUE
             }
         );
+        # Accelerated shadow
         $self->set_color({ 'red' => 32, 'green' => 0, 'blue' => 0, 'alpha' => 255 });
         $self->rbox(
             {
@@ -419,25 +430,26 @@ sub splash {
                 'y'      => (208 * $vf) + $Y,
                 'width'  => (1230 * $hf),
                 'height' => (150 * $vf),
-                'radius' => 20 * $vf,
+                'radius' => 30 * $vf,
                 'filled' => TRUE,
             }
         );
+        # Accelerated green-yellow
         $self->rbox(
             {
                 'x'        => (470 * $hf) + $X,
                 'y'        => (200 * $vf) + $Y,
                 'width'    => (1230 * $hf),
                 'height'   => (150 * $vf),
-                'radius'   => 10 * $vf,
+                'radius'   => 30 * $vf,
                 'filled'   => TRUE,
                 'gradient' => {
                     'direction' => 'vertical',
                     'colors' => {
-                        'red'   => [0,255],
-                        'green' => [255,255],
-                        'blue'  => [0,0],
-                        'alpha' => [255,255],
+                        'red'   => [0,255,255,255],
+                        'green' => [255,255,255,0],
+                        'blue'  => [0,0,0,255],
+                        'alpha' => [255,255,255,255],
                     },
                 }
             }
@@ -451,9 +463,9 @@ sub splash {
                         'x'            => (510 * $hf) + $X,
                         'y'            => (351 * $vf) + $Y,
                         'height'       => 110 * $vf,
-                        'wscale'       => 1.3,
+                        'wscale'       => .9,
                         'color'        => '0101FFFF',
-                        'text'         => ($self->{'ACCELERATED'} == 2) ? 'GPU Accelerated' : 'C Accelerated',
+                        'text'         => ($self->{'ACCELERATED'} == 2) ? 'GPU Zippy-Zoom Mode' : 'C Zippy-Zoom Mode',
                         'bounding_box' => TRUE,
                         'center'       => 0,
                         'antialias'    => ($self->{'BITS'} >= 24) ? TRUE : FALSE
@@ -466,10 +478,10 @@ sub splash {
                 {
                     'bounding_box' => TRUE,
                     'x'            => 0,
-                    'y'            => (641 * $vf) + $Y,
+                    'y'            => (621 * $vf) + $Y,
                     'height'       => 200 * $vf,
                     'wscale'       => 1,
-                    'color'        => '221100FF',
+                    'color'        => '221100A0',
                     'text'         => 'Graphics-Framebuffer',
                     'bounding_box' => TRUE,
                     'center'       => $self->{'CENTER_X'},
@@ -481,8 +493,8 @@ sub splash {
                 $shadow->{'wscale'}       = int(1500 * $hf) / $shadow->{'pwidth'};
                 $shadow                   = $self->ttf_print($shadow);
             }
-            $shadow->{'x'} += max(1, 6 * $hf);
-            $shadow->{'y'} += max(1, 6 * $vf);
+            $shadow->{'x'} += max(1, 8 * $hf);
+            $shadow->{'y'} += max(1, 8 * $vf);
             delete($shadow->{'center'});
             $self->ttf_print($shadow);
         }
@@ -490,7 +502,7 @@ sub splash {
             {
                 'bounding_box' => TRUE,
                 'x'            => 0,
-                'y'            => (641 * $vf) + $Y,
+                'y'            => (621 * $vf) + $Y,
                 'height'       => 200 * $vf,
                 'wscale'       => 1,
                 'color'        => 'FFFF00FF',
@@ -511,7 +523,7 @@ sub splash {
             {
                 'bounding_box' => TRUE,
                 'x'            => 0,
-                'y'            => (651 * $vf) + $Y,
+                'y'            => (632 * $vf) + $Y,
                 'height'       => 50 * $vf,
                 'wscale'       => 1,
                 'color'        => '00EE00FF',
@@ -524,12 +536,35 @@ sub splash {
         $rk->{'x'} = (1710 * $hf) - $rk->{'pwidth'};
         $self->ttf_print($rk);
 
+        $self->alpha_mode();
+
+        $self->rbox(
+            {
+                'x'      => (188 * $hf) + $X,
+                'y'      => (640 * $vf) + $Y,
+                'width'  => (1580 * $hf),
+                'height' => (280 * $vf),
+#                'radius' => 30 * $vf,
+                'filled' => TRUE,
+                'gradient' => {
+                    'direction' => 'horizontal',
+                    'colors' => {
+                        'red'   => [32,0,32],
+                        'green' => [0,0,0],
+                        'blue'  => [0,255,0],
+                        'alpha' => [64,128,64]
+                    }
+                }
+            }
+        );
+
+        $self->normal_mode();
         $self->ttf_print(
             $self->ttf_print(
                 {
                     'bounding_box' => TRUE,
                     'x'            => 0,
-                    'y'            => (771 * $vf) + $Y,
+                    'y'            => (801 * $vf) + $Y,
                     'height'       => 120 * $vf,
                     'wscale'       => 1,
                     'color'        => 'FFFFFFFF',
@@ -544,7 +579,7 @@ sub splash {
             {
                 'bounding_box' => TRUE,
                 'x'            => 0,
-                'y'            => (901 * $vf) + $Y,
+                'y'            => (931 * $vf) + $Y,
                 'height'       => 120 * $vf,
                 'wscale'       => 1,
                 'color'        => 'FFFFFFFF',

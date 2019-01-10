@@ -1,6 +1,6 @@
 package Mac::OSA::Dialog::Tiny;
 
-use 5.006; use strict; use warnings;our $VERSION = '0.02';
+use 5.010; use strict; use warnings;our $VERSION = '0.04';
 
 use base 'Import::Export';
 
@@ -8,11 +8,9 @@ our %EX = (
 		dialog => [qw/all/]
 );
 
-sub qqx { qx($_[0]) } #lame
-
 sub dialog {
 	my %params = ref $_[0] ? %{ $_[0] } : @_;
-	qqx(sprintf q|osascript -e "display dialog \"%s\"%s%s%s"|, $params{m} || 'No message param passed - m',
+	readpipe(sprintf q|osascript -e "display dialog \"%s\"%s%s%s"|, $params{m} || 'No message param passed - m',
 		( $params{t} ? sprintf q| with title \"%s\"|, $params{t} : ''),
 		( $params{i} ? sprintf q| with icon POSIX file \"${PWD}/%s\"|, $params{i} : ''),
 		( $params{b} ? sprintf q| buttons { %s }|, join ",", map { sprintf '\"%s\"', $_ } @{ $params{b} } : ''));
@@ -28,7 +26,7 @@ Mac::OSA::Dialog::Tiny - The great new Mac::OSA::Dialog::Tiny!
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
@@ -38,7 +36,7 @@ Version 0.02
 
 	dialog(
 		m => 'Going to die young',
-		t => 'Its okay it's been an hour',
+		t => 'Its okay it\'s been an hour',
 		i => 'view.jpg',
 		b => ['smoked'],
 	);

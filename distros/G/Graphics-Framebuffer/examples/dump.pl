@@ -13,7 +13,7 @@ print "Using /dev/fb$dev\n";
 sleep 1;
 if (open(my $FILE,'>','dump.log')) {
     eval {
-        my $fb = Graphics::Framebuffer->new('SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$dev");
+        my ($fb,$f) = Graphics::Framebuffer->new('SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$dev");
         $fb->cls();
 
         my $copy = $fb;

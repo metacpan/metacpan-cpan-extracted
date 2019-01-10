@@ -1,7 +1,7 @@
 package Finance::Currency::FiatX;
 
-our $DATE = '2018-08-01'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2019-01-10'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -10,11 +10,14 @@ use Log::ger;
 
 use List::Util qw(max);
 
+use Exporter qw(import);
+our @EXPORT_OK = qw(get_spot_rate get_all_spot_rates list_rate_sources);
+
 our %SPEC;
 
 $SPEC{':package'} = {
     v => 1.1,
-    summary => 'Fiat currency exchange rate library',
+    summary => 'Currency exchange rate library',
 };
 
 our %args_db = (
@@ -215,6 +218,18 @@ sub _init {
 $SPEC{get_all_spot_rates} = {
     v => 1.1,
     summary => 'Get all spot rates from a source',
+    description => <<'_',
+
+This routine will retrieve all available spot rates from a source. You can
+either pick a specific source (e.g. `bi` for "Bank of Indonesia") or one of the
+special/"pseudo" sources: ':any', ':highest', ':lowest', 'newest', ':oldest',
+':average'.
+
+Some source provide rates for a large number of currency pairs, not all of which
+you might need. For retrieving rates for a specific currency pair only, use
+`get_spot_rate`.
+
+_
     args => {
         %args_db,
         %args_caching,
@@ -229,7 +244,23 @@ sub get_all_spot_rates {
 
 $SPEC{get_spot_rate} = {
     v => 1.1,
-    summary => 'Get spot (latest) rate',
+    summary => 'Get spot rate for a currency pair',
+    description => <<'_',
+
+This routine will retrieve spot rate(s) for a specific currency pair from a
+source. You can either let the routine pick any one source that is new enough
+(':any') or pick a specific source (e.g. `bi` for "Bank of Indonesia"), or one
+of the other special/"pseudo" sources: ':highest', ':lowest', 'newest',
+':oldest', ':average'.
+
+Note that there might be multiple spot rates for a single currency pair, because
+there might be different types of rates, for example: "buy", "sell", or more
+specific types or buy and sell rates.
+
+See also `get_all_spot_rates` to retrieve rates for all currency pairs available
+from a specific source.
+
+_
     args => {
         %args_db,
         %args_caching,
@@ -240,6 +271,36 @@ $SPEC{get_spot_rate} = {
 sub get_spot_rate {
     my %args = @_;
     _get_all_spot_rates_or_get_spot_rate('get_spot_rate', %args);
+}
+
+$SPEC{list_rate_sources} = {
+    v => 1.1,
+    summary => 'List exchange rate sources installed on the system',
+    description => <<'_',
+
+Sources are modules under the namespace `Finance::Currency::FiatX::Source::*`,
+for example the source `bi` ("Bank of Indonesia") is implemented in
+<pm:Finance::Currency::FiatX::Source::bi>. This routine lists the installed
+sources without the namespace prefix.
+
+_
+    args => {},
+};
+sub list_rate_sources {
+    my %args = @_;
+
+    require PERLANCAR::Module::List;
+    my @res;
+    my $mods = PERLANCAR::Module::List::list_modules(
+        'Finance::Currency::FiatX::Source::', {list_modules=>1});
+    unless (keys %$mods) {
+        return [412, "No source modules available"];
+    }
+    for my $src (sort keys %$mods) {
+        $src =~ s/^Finance::Currency::FiatX::Source:://;
+        push @res, $src;
+    }
+    return [200, "OK", \@res];
 }
 
 sub _get_all_spot_rates_or_get_spot_rate {
@@ -660,7 +721,7 @@ sub _get_all_spot_rates_or_get_spot_rate {
 }
 
 1;
-# ABSTRACT: Fiat currency exchange rate library
+# ABSTRACT: Currency exchange rate library
 
 __END__
 
@@ -670,22 +731,31 @@ __END__
 
 =head1 NAME
 
-Finance::Currency::FiatX - Fiat currency exchange rate library
+Finance::Currency::FiatX - Currency exchange rate library
 
 =head1 VERSION
 
-This document describes version 0.010 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2018-08-01.
+This document describes version 0.011 of Finance::Currency::FiatX (from Perl distribution Finance-Currency-FiatX), released on 2019-01-10.
 
 =head1 SYNOPSIS
 
-See L<fiatx> from L<App::fiatx> for an example on how to use this module.
+The easiest way to use this module is via CLI L<fiatx> from L<App::fiatx>. To
+use this module directly, first create a MySQL database, then:
+
+ use Finance::Currency::FiatX qw(get_spot_rate get_all_spot_rates);
+
+ # connect to database
+ my $dbh = DBI->connect(...);
+
+ # create a database# get a single spot rate from any source
+ my $res = get_spot_rate(dbh => $dbh, from => "USD", to => "IDR");
 
 =head1 DESCRIPTION
 
-FiatX is a library/application to convert one fiat currency to another using
-several backend modules ("sources", C<Finance::Currency::FiatX::Source::*>,
-which in turns usually utilize C<Finance::Currency::Convert::*>) and store the
-rates in L<DBI> database for caching.
+FiatX is a library/application to convert one currency to another using several
+backend modules ("sources", C<Finance::Currency::FiatX::Source::*>, which in
+turns usually utilize C<Finance::Currency::Convert::*>) and store the rates in
+L<DBI> database for caching.
 
 =head1 FUNCTIONS
 
@@ -694,11 +764,20 @@ rates in L<DBI> database for caching.
 
 Usage:
 
- get_all_spot_rates(%args) -> [status, msg, result, meta]
+ get_all_spot_rates(%args) -> [status, msg, payload, meta]
 
 Get all spot rates from a source.
 
-This function is not exported.
+This routine will retrieve all available spot rates from a source. You can
+either pick a specific source (e.g. C<bi> for "Bank of Indonesia") or one of the
+special/"pseudo" sources: ':any', ':highest', ':lowest', 'newest', ':oldest',
+':average'.
+
+Some source provide rates for a large number of currency pairs, not all of which
+you might need. For retrieving rates for a specific currency pair only, use
+C<get_spot_rate>.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -733,7 +812,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -744,11 +823,24 @@ Return value:  (any)
 
 Usage:
 
- get_spot_rate(%args) -> [status, msg, result, meta]
+ get_spot_rate(%args) -> [status, msg, payload, meta]
 
-Get spot (latest) rate.
+Get spot rate for a currency pair.
 
-This function is not exported.
+This routine will retrieve spot rate(s) for a specific currency pair from a
+source. You can either let the routine pick any one source that is new enough
+(':any') or pick a specific source (e.g. C<bi> for "Bank of Indonesia"), or one
+of the other special/"pseudo" sources: ':highest', ':lowest', 'newest',
+':oldest', ':average'.
+
+Note that there might be multiple spot rates for a single currency pair, because
+there might be different types of rates, for example: "buy", "sell", or more
+specific types or buy and sell rates.
+
+See also C<get_all_spot_rates> to retrieve rates for all currency pairs available
+from a specific source.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -791,7 +883,36 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 list_rate_sources
+
+Usage:
+
+ list_rate_sources() -> [status, msg, payload, meta]
+
+List exchange rate sources installed on the system.
+
+Sources are modules under the namespace C<Finance::Currency::FiatX::Source::*>,
+for example the source C<bi> ("Bank of Indonesia") is implemented in
+L<Finance::Currency::FiatX::Source::bi>. This routine lists the installed
+sources without the namespace prefix.
+
+This function is not exported by default, but exportable.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -805,13 +926,15 @@ Please report all bug reports or feature requests to L<mailto:stevenharyanto@gma
 
 C<Finance::Currency::Convert::*> modules.
 
+L<App::fiatx> and L<fiatx> which provides CLI for this module.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

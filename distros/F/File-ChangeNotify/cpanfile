@@ -1,4 +1,5 @@
 requires "Carp" => "0";
+requires "Fcntl" => "0";
 requires "File::Find" => "0";
 requires "File::Spec" => "0";
 requires "Module::Pluggable::Object" => "0";
@@ -15,15 +16,14 @@ suggests "IO::KQueue" => "0";
 suggests "Linux::Inotify2" => "1.2";
 
 on 'test' => sub {
-  requires "Data::Dumper" => "0";
   requires "Exporter" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Path" => "0";
   requires "File::Spec" => "0";
   requires "File::Temp" => "0";
   requires "FindBin" => "0";
-  requires "Test::Exception" => "0";
-  requires "Test::More" => "0.96";
+  requires "Test2::V0" => "0";
+  requires "Test::More" => "1.302015";
   requires "Test::Requires" => "0";
   requires "Test::Without::Module" => "0";
   requires "base" => "0";

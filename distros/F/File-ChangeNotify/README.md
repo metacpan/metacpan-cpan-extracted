@@ -4,7 +4,7 @@ File::ChangeNotify - Watch for changes to files, cross-platform style
 
 # VERSION
 
-version 0.29
+version 0.31
 
 # SYNOPSIS
 
@@ -16,10 +16,10 @@ version 0.29
               filter      => qr/\.(?:pm|conf|yml)$/,
             );
 
-    if ( my @events = $watcher->new_events() ) { ... }
+    if ( my @events = $watcher->new_events ) { ... }
 
     # blocking
-    while ( my @events = $watcher->wait_for_events() ) { ... }
+    while ( my @events = $watcher->wait_for_events ) { ... }
 
 # DESCRIPTION
 
@@ -44,7 +44,7 @@ It always tries to use the [File::ChangeNotify::Watcher::Default](https://metacp
 class last, on the assumption that any other class that is available
 is a better option.
 
-## File::ChangeNotify->usable\_classes()
+## File::ChangeNotify->usable\_classes
 
 Returns a list of all the loadable [File::ChangeNotify::Watcher](https://metacpan.org/pod/File::ChangeNotify::Watcher) subclasses
 except for [File::ChangeNotify::Watcher::Default](https://metacpan.org/pod/File::ChangeNotify::Watcher::Default), which is always usable.
@@ -88,7 +88,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2009 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

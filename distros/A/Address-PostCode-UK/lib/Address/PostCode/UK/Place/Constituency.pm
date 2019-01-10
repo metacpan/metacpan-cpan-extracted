@@ -1,6 +1,6 @@
 package Address::PostCode::UK::Place::Constituency;
 
-$Address::PostCode::UK::Place::Constituency::VERSION   = '0.15';
+$Address::PostCode::UK::Place::Constituency::VERSION   = '0.16';
 $Address::PostCode::UK::Place::Constituency::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Address::PostCode::UK::Place::Constituency - Placeholder for 'constituency' of t
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 

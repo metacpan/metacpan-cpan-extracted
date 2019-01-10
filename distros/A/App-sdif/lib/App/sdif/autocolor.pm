@@ -26,9 +26,9 @@ L<App::sdif::autocolor::Apple_Terminal>
 
 package App::sdif::autocolor;
 
+use v5.14;
 use strict;
 use warnings;
-use v5.14;
 use Data::Dumper;
 
 use Exporter 'import';
@@ -43,6 +43,7 @@ sub rgb_to_brightness {
 
 my %TERM_PROGRAM = qw(
     Apple_Terminal	Apple_Terminal
+    iTerm.app		iTerm
     );
 
 sub initialize {

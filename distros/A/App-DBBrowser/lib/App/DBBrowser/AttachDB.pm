@@ -47,7 +47,7 @@ sub attach_db {
             my $prompt = "ATTACH DATABASE"; # \n
             my $db = choose(
                 $choices,
-                { %{$sf->{i}{lyt_3}}, info => $info, prompt => $prompt, undef => $sf->{i}{back} } # <<
+                { %{$sf->{i}{lyt_v_clear}}, info => $info, prompt => $prompt, undef => $sf->{i}{back} }
             );
             if ( ! defined $db ) {
                 if ( @$new ) {
@@ -124,34 +124,46 @@ sub detach_db {
         my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
         $attached_db = $h_ref->{$sf->{d}{db}} || [];
     }
-    my @tmp = ( $sf->{d}{db_string}, 'Chosen:' );
-    my $info = join "\n", @tmp;
-    my @choices;
-    for my $elem ( @$attached_db ) {
-        push @choices, sprintf 'DETACH DATABASE %s  (%s)', @$elem[1,0];
+    my @chosen;
+
+    while ( 1 ) {
+        my @tmp = ( $sf->{d}{db_string}, 'Detach databases:' );
+
+        for my $detach ( @chosen ) {
+            push @tmp, sprintf 'DETACH DATABASE %s (%s)', $detach->[1], $detach->[0];
+        }
+        my $info = join "\n", @tmp;
+        my @choices;
+        for my $elem ( @$attached_db ) {
+            push @choices, sprintf '- %s  (%s)', @$elem[1,0];
+        }
+        my @pre = ( undef, $sf->{i}{_confirm} );
+        my $prompt = "\n" . 'Choose:';
+        # Choose
+        my $idx = choose(
+            [ @pre, @choices ],
+            { %{$sf->{i}{lyt_v_clear}}, info => $info, index => 1, prompt => $prompt }
+        );
+        if ( ! $idx ) {
+            return;
+        }
+        elsif ( $idx == 1 ) {
+            my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
+            if ( @$attached_db ) {
+                $h_ref->{$sf->{d}{db}} = $attached_db;
+            }
+            else {
+                delete $h_ref->{$sf->{d}{db}};
+            }
+            $ax->write_json( $sf->{i}{file_attached_db}, $h_ref );
+            return 1;
+        }
+        push @chosen, splice( @$attached_db, $idx - @pre, 1 );
     }
-    my $prompt = "\n" . 'Choose:';
-    my $idx = choose_a_subset(
-        [ @choices ],
-        { mouse => $sf->{o}{table}{mouse}, info => $info, index => 1, fmt_chosen => 1, remove_chosen => 1,
-         prompt => $prompt, info => $info, back => '  BACK', confirm => '  CONFRIM', prefix => '  '}
-    );
-    if ( ! defined $idx || ! @$idx ) {
-        return;
-    }
-    for my $i ( sort { $b <=> $a } @$idx ) {
-        my $ref = splice( @$attached_db, $i, 1 );
-    }
-    my $h_ref = $ax->read_json( $sf->{i}{file_attached_db} );
-    if ( @$attached_db ) {
-        $h_ref->{$sf->{d}{db}} = $attached_db;
-    }
-    else {
-        delete $h_ref->{$sf->{d}{db}};
-    }
-    $ax->write_json( $sf->{i}{file_attached_db}, $h_ref );
-    return 1;
 }
+
+
+
 
 
 

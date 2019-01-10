@@ -1,7 +1,7 @@
 package Perl6::Form;
 use 5.008;
 
-our $VERSION = '0.06';
+our $VERSION = '0.090';
 
 use Perl6::Export;
 use Scalar::Util qw( readonly );
@@ -262,7 +262,7 @@ sub update(\%\%;$) {
 sub fillpat {
     my ($pos, $fill, $len) = @_;
     return "" if $len < 0;
-    return substr($fill x (($pos+$len)/length($fill)+1), $pos, $len);
+    return substr($fill x max(0,($pos+$len)/length($fill)+1), $pos, $len);
 }
 
 sub jhorlit {}  # literals don't need any justification
@@ -382,20 +382,21 @@ sub jleft {
             $post =~ s/^[)-]|[)-]$/ /g;
         }
         my ($fail, $str);
+        my ($w, $p);
         if ($integral) {
             local $SIG{__WARN__} = sub { $fail = 1 };
             $str = sprintf('%*d',$val{width},int($orig));
+            ($w,$p) = ($str =~ /^\s*(.*)$/,"");          # integer
         }
         else {
             local $SIG{__WARN__} = sub { $fail = 1 };
             $str = sprintf('%*.*f',$val{width},$places,$orig);
+            ($w,$p) = ($str =~ /^\s*(.*)\.(.*)$/g);      # floating point
         }
         if ($fail) {
             $_[0] = $huh;
         }
         else {
-            my ($w,$p) = ($str =~ /^\s*(.*)\.(.*)$/g);      # floating point
-               ($w,$p) = ($str =~ /^\s*(.*)$/,"") if !$w;   # integer
             if ($grouping) {
                 my @groups = @$grouping;
                 my $group = shift @groups;
@@ -424,7 +425,7 @@ sub jleft {
                 $str =~ s/^(?:\Q$pre\E)?/$pre/;
                 if ($val{pre} =~ /^0+$/) {
                     $str =~ s{^((\D*)(\d.*))\.}
-                             {$2 . ("0"  x ($whole-length $1)) . "$3."}e;
+                             {$2 . ("0"  x max(0,$whole-length $1)) . "$3."}e;
                     $val{pre} = " ";
                 }
                 my $postlen = length($post);
@@ -435,7 +436,7 @@ sub jleft {
                     jright($str, %val, precropped=>1);
                 }
                 if ($integral) {
-                    $str = substr((q{ } x $width) . $str . $post, -$width);
+                    $str = substr((q{ } x max(0,$width)) . $str . $post, -$width);
                     $str =~ s/(?:[ ]{$postlen}([ ]*))$/$post$+/;
                 }
                 elsif ($postlen) {
@@ -805,7 +806,13 @@ sub make_col {
                 last if $tabular && $bulleted && @col;
             }
         }
+        my $prev_pos = pos(${$str_ref}) // -1;
         ($text,$more,$eol) = $f->{break}->($str_ref,$width,$f->{opts}{ws});
+        if ($text eq q{} && $more && (pos(${$str_ref})//-1) == $prev_pos) {
+            $text = substr(${$str_ref}, pos(${$str_ref}), 1);
+            pos(${$str_ref})++;
+            $more = pos(${$str_ref}) < length(${$str_ref});
+        }
         if ($f->{opts}{ws}) {
             $text =~ s{($f->{opts}{ws})}
                       { @caps = grep { defined $$_ } 2..$#+;
@@ -1184,7 +1191,7 @@ sub form is export(:MANDATORY) {
                         if $page->{body}{last};
                 }
             }
-            my $fill = $pagelen < $unlimited ? [("\n") x ($bodylen-@$pagetext)]
+            my $fill = $pagelen < $unlimited ? [("\n") x max(0,$bodylen-@$pagetext)]
                                              : [];
 
             my $body = $bodyfn->($pagetext, $fill, \%opts);
@@ -1223,7 +1230,7 @@ sub make_page {
             }
             for my $col (0..$#parts) {
                 my $f = $formatters->[$col];
-                push @{$parts[$col]}, ("") x (($f->{height}{min}||0)-@{$parts[$col]});
+                push @{$parts[$col]}, ("") x max(0,($f->{height}{min}||0)-@{$parts[$col]});
                 my $fopts = $f->{opts};
                 my $tfill = first {defined $_} @{$fopts}{qw(tfill vfill fill)}, " ";
                 my $bfill = first {defined $_} @{$fopts}{qw(bfill vfill fill)}, " ";
@@ -1418,17 +1425,17 @@ Perl6::Form - Implements the Perl 6 'form' built-in
 
     use Perl6::Form;
 
-    $text = form " =================================== ",
-                 "| NAME     |    AGE     | ID NUMBER |",
-                 "|----------+------------+-----------|",
-                 "| {<<<<<<} | {||||||||} | {>>>>>>>} |",
+    $text = form ' =================================== ',
+                 '| NAME     |    AGE     | ID NUMBER |',
+                 '|----------+------------+-----------|',
+                 '| {<<<<<<} | {||||||||} | {>>>>>>>} |',
                     $name,     $age,        $ID,
-                 "|===================================|",
-                 "| COMMENTS                          |",
-                 "|-----------------------------------|",
-                 "| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |",
+                 '|===================================|',
+                 '| COMMENTS                          |',
+                 '|-----------------------------------|',
+                 '| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
                     $comments,
-                 " =================================== ";
+                 ' =================================== ';
 
 
 =head1 DESCRIPTION
@@ -1483,17 +1490,17 @@ in Perl 6 we could write:
     # Perl 6 code...
 
     print form
-        " =================================== ",
-        "| NAME     |    AGE     | ID NUMBER |",
-        "|----------+------------+-----------|",
-        "| {<<<<<<} | {||||||||} | {>>>>>>>} |",
+        ' =================================== ',
+        '| NAME     |    AGE     | ID NUMBER |',
+        '|----------+------------+-----------|',
+        '| {<<<<<<} | {||||||||} | {>>>>>>>} |',
            $name,     $age,        $ID,
-        "|===================================|",
-        "| COMMENTS                          |",
-        "|-----------------------------------|",
-        "| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |",
+        '|===================================|',
+        '| COMMENTS                          |',
+        '|-----------------------------------|',
+        '| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
            $comments,
-        " =================================== ";
+        ' =================================== ';
 
 And both of them would print something like:
 
@@ -1712,7 +1719,7 @@ as will fit on one lime. For example:
     my $data2 = 'A horse! A horse! My kingdom for a horse!';
 
     print form
-        "...{<<<<<<<<<<<<<<<<<}...{>>>>>>>}...",
+        '...{<<<<<<<<<<<<<<<<<}...{>>>>>>>}...',
             $data1,               $data2;
 
 prints:
@@ -1724,7 +1731,7 @@ fields would extract one line of data at a time, repeating that process as
 many times as necessary to display all the available data. So:
 
     print form
-        "...{[[[[[[[[[[[[[[[[[}...{]]]]]]]}...",
+        '...{[[[[[[[[[[[[[[[[[}...{]]]]]]]}...',
             $data1,               $data2;
 
 would produce:
@@ -1741,7 +1748,7 @@ We can mix line fields and block fields in the same format and C<form> will
 extract and interpolate only as much data as each field requires. For example:
 
     print form
-        "...{<<<<<<<<<<<<<<<<<}...{]]]]]]]}...",
+        '...{<<<<<<<<<<<<<<<<<}...{]]]]]]]}...',
             $data1,               $data2;
 
 which produces:
@@ -1766,9 +1773,9 @@ allow numbered or bulleted points:
     my $index = 0;
     for my $reason (@reasons) {
         my $n = @reasons - $index . '.';
-        print form "   {>}  {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+        print form '   {>}  {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}',
                        $n,  $reason,
-                   "";
+                   '';
     }
 
 which might produce:
@@ -1963,7 +1970,7 @@ extract a maximal substring and then distribute any padding as evenly as
 possible into the existing whitespace gaps in that data. For example:
 
     print form '({<<<<<<<<<>>>>>>>>>>>})',
-               "A fellow of infinite jest, of most excellent fancy";
+               'A fellow of infinite jest, of most excellent fancy';
 
 would print:
 
@@ -1974,7 +1981,7 @@ multiple lines, except that the very last line is always left-justified.
 Hence, this:
 
     print form '({[[[[[[[[]]]]]]]})',
-               "All the world's a stage, And all the men and women merely players."
+               'All the world's a stage, And all the men and women merely players.'
 
 would print:
 
@@ -2184,9 +2191,9 @@ handle the five major formatting conventions:
     my @nums = (0, 1, 1.1, 1.23, 4567.89, 34567.89, 234567.89, 1234567.89);
 
     print form
-        "Brittannic      Continental     Subcontinental   Tyrolean        Asiatic",
-        "_____________   _____________   ______________   _____________   _____________",
-        "{],]]],]]].[}   {].]]].]]],[}    {]],]],]]].[}   {]']]]']]],[}   {]]]],]]]].[}",
+        'Brittannic      Continental     Subcontinental   Tyrolean        Asiatic',
+        '_____________   _____________   ______________   _____________   _____________',
+        '{],]]],]]].[}   {].]]].]]],[}    {]],]],]]].[}   {]']]]']]],[}   {]]]],]]]].[}',
          \@nums,         \@nums,          \@nums,         \@nums,         \@nums;
 
 to produce:
@@ -2206,9 +2213,9 @@ It also accepts a space character as a "thousands separator" (with, of
 course, any decimal marker we might like):
 
     print form
-        "Hyperspatial",
-        "_____________",
-        "{] ]]] ]]]:[}",
+        'Hyperspatial',
+        '_____________',
+        '{] ]]] ]]]:[}',
          \@nums;
 
 to produce:
@@ -2228,9 +2235,9 @@ You can also put separators in a regular C<{>>>>>>>}> or C<{]]]]]]]}> field,
 to print integers with (say) commas:
 
     print form
-        "Integral",
-        "___________",
-        "{]],]]],]]}",
+        'Integral',
+        '___________',
+        '{]],]]],]]}',
          \@nums;
 
 which produces:
@@ -2262,7 +2269,7 @@ example, if we wrote:
     @nums = ( 1, -1.2,  1.23, -11.234,  111.235, -12345.67);
 
     print form
-            "{],]]],]]].[[}",
+            '{],]]],]]].[[}',
             \@nums;
 
 then we'd get:
@@ -2278,7 +2285,7 @@ wherever the program was run. But if we had written:
 
     print form
             {locale=>1},
-            "{],]]],]]].[[}",
+            '{],]]],]]].[[}',
             \@nums;
 
 then we'd get:
@@ -2330,14 +2337,14 @@ formats it that way. For example:
     my @amounts = (0, 1, 1.2345, 1234.56, -1234.56, 1234567.89);
 
     my %format = (
-        "Canadian (English)"    => q/   {-$],]]],]]].[}/,
-        "Canadian (French)"     => q/    {-] ]]] ]]],[ $}/,
-        "Dutch"                 => q/     {],]]],]]].[-EUR}/,
-        "German (pre-euro)"     => q/    {-].]]].]]],[DM}/,
-        "Indian"                => q/    {-]],]],]]].[ Rs}/,
-        "Norwegian"             => q/ {kr -].]]].]]],[}/,
-        "Portuguese (pre-euro)" => q/    {-].]]].]]]$[ Esc}/,
-        "Swiss"                 => q/{Sfr -]']]]']]].[}/,
+        'Canadian (English)'    => q/   {-$],]]],]]].[}/,
+        'Canadian (French)'     => q/    {-] ]]] ]]],[ $}/,
+        'Dutch'                 => q/     {],]]],]]].[-EUR}/,
+        'German (pre-euro)'     => q/    {-].]]].]]],[DM}/,
+        'Indian'                => q/    {-]],]],]]].[ Rs}/,
+        'Norwegian'             => q/ {kr -].]]].]]],[}/,
+        'Portuguese (pre-euro)' => q/    {-].]]].]]]$[ Esc}/,
+        'Swiss'                 => q/{Sfr -]']]]']]].[}/,
     );
 
     for my $nationality (keys %format) {
@@ -2790,14 +2797,14 @@ in another column without introducing ugly gaps. For example, because
 the C<{VVVVVVVVV}> fields in:
 
     print form
-        "Name:                                                  ",
-        "  {[[[[[[[[[[[[}                                       ", $name,
-        "                  Biography:                           ",
-        "Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}", $bio,
-        "  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $status,
-        "                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $comments;
+        'Name:                                                  ',
+        '  {[[[[[[[[[[[[}                                       ', $name,
+        '                  Biography:                           ',
+        'Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}', $bio,
+        '  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}', $status,
+        '                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        'Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        '  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}', $comments;
 
 only consume as much of the overflowing C<$bio> field as necessary,
 the result is something like:
@@ -3003,7 +3010,7 @@ For example, if we always wanted to break at the exact width of the field
 
     print form
         {break=>\&break_width},
-        "|{[[[[[}|",
+        '|{[[[[[}|',
           $data;
 
 producing:
@@ -3040,7 +3047,7 @@ Or we might prefer to break on every single whitespace-separated word:
 
     print form
         {break=>\&break_word},
-        "|{[[[[[}|",
+        '|{[[[[[}|',
           $data;
 
 producing:
@@ -3076,17 +3083,17 @@ interpolate, with each datum aligned directly under the field into
 which it is to be fitted. Like so:
 
     print form
-        "Name:                                                  ",
-        "  {[[[[[[[[[[[[}                                       ",
+        'Name:                                                  ',
+        '  {[[[[[[[[[[[[}                                       ',
            $name,
-        "                  Biography:                           ",
-        "Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}",
+        '                  Biography:                           ',
+        'Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}',
                              $bio,
-        "  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
+        '  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
            $status,
-        "                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
+        '                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        'Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        '  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
            $comments;
 
 This approach has the advantage that it self-documents: to know what
@@ -3099,14 +3106,14 @@ formatted text will look like. So some people prefer to put all the data
 to the right of the formats:
 
     print form
-        "Name:                                                  ",
-        "  {[[[[[[[[[[[[}                                       ", $name,
-        "                  Biography:                           ",
-        "Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}", $bio,
-        "  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $status,
-        "                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}", $comments;
+        'Name:                                                  ',
+        '  {[[[[[[[[[[[[}                                       ', $name,
+        '                  Biography:                           ',
+        'Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}', $bio,
+        '  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}', $status,
+        '                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        'Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        '  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}', $comments;
 
 And that's perfectly acceptable too.
 
@@ -3119,14 +3126,14 @@ cases it's a nuisance to have to tease that data out into separate
 variables (or hash accesses) and then sprinkle them through the formats:
 
     print form
-        "Name:                                                  ",
-        "  {[[[[[[[[[[[[}                                       ",$person{name},
-        "                  Biography:                           ",
-        "Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}",$person{biog},
-        "  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",$person{stat},
-        "                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",
-        "  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}",$person{comm};
+        'Name:                                                  ',
+        '  {[[[[[[[[[[[[}                                       ',$person{name},
+        '                  Biography:                           ',
+        'Status:             {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<}',$person{biog},
+        '  {[[[[[[[[[[[[}    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',$person{stat},
+        '                    {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        'Comments:           {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',
+        '  {[[[[[[[[[[[}     {VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV}',$person{comm};
 
 So C<form> has an option that lets us put a single, multi-line format
 at the start of the argument list, place all the data together
@@ -3214,11 +3221,11 @@ then the call produces:
 because that second version is really equivalent to:
 
     print form
-         "Name:    {[[[[[[[[[[[[[[[}   Role: {[[[[[[[[[[}",
+         'Name:    {[[[[[[[[[[[[[[[}   Role: {[[[[[[[[[[}',
                    \@names,                  \@roles,
-         "Address: {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+         'Address: {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}',
                    \@addresses,
-         "_______________________________________________";
+         '_______________________________________________';
 
 
 That's not much use in this particular example, but it was exactly what
@@ -3234,7 +3241,7 @@ is perfectly happy to have several fields in a single format that
 are all fed by the same data source. For example:
 
     print form
-        "{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}",
+        '{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}',
              $soliloquy,             $soliloquy,              $soliloquy;
 
 In fact, that kind of format is particularly useful for creating
@@ -3302,19 +3309,19 @@ or C<"balanced">. So, for example, to produce three versions of Richard III's
 famous monologue in the order shown above, we'd use:
 
     print form {layout=>"down"},
-        "{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}",
+        '{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}',
              $soliloquy,             $soliloquy,              $soliloquy;
 
 then:
 
     print form {layout=>"across"},
-        "{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}",
+        '{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}',
              $soliloquy,             $soliloquy,              $soliloquy;
 
 then:
 
     print form {layout=>"balanced"},
-        "{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}",
+        '{[[[[[[[[]]]]]]]]]]:}   {:[[[[[[[]]]]]]]]]]:}   {:[[[[[[[[]]]]]]]]]]}',
              $soliloquy,             $soliloquy,              $soliloquy;
 
 By the way, the default value for the C<layout> option is C<"balanced">
@@ -3337,9 +3344,9 @@ So, a table generator like this:
     my @name = map {"$_\r"}  ( "Iago",    "Henry",       "Claudius" );
 
     print form
-         "Character       Appears in  ",
-         "____________    ____________",
-         "{[[[[[[[[[[}    {[[[[[[[[[[}",
+         'Character       Appears in  ',
+         '____________    ____________',
+         '{[[[[[[[[[[}    {[[[[[[[[[[}',
           \@name,         \@play;
 
 correctly produces:
@@ -3401,9 +3408,9 @@ tell C<form> that the data in the various columns should be laid out
 like a table:
 
     print form {layout=>"tabular"},
-         "Character       Appears in  ",
-         "____________    ____________",
-         "{[[[[[[[[[[}    {[[[[[[[[[[}",
+         'Character       Appears in  ',
+         '____________    ____________',
+         '{[[[[[[[[[[}    {[[[[[[[[[[}',
           \@name,         \@play;
 
 which then produces the desired result:
@@ -3556,7 +3563,7 @@ is shared equally between them. So, for example, to create two equal columns
     use Perl6::Slurp;
 
     print form
-         "{[[[[{*}[[[[}   {[[[[{*}[[[[}",
+         '{[[[[{*}[[[[}   {[[[[{*}[[[[}',
           slurp($file1),  slurp($file2);
 
 (And, yes, Perl 6 does have a built-in C<slurp> function that takes a filename,
@@ -3621,7 +3628,7 @@ functionality of C<form> and that of C<(s)printf>. For example, the call:
 
     for (@procs) {
         print form
-            "{>>>}  {<<<<<<<(20)<<<<<<<}  {>>>>>>}  {>>.}%",
+            '{>>>}  {<<<<<<<(20)<<<<<<<}  {>>>>>>}  {>>.}%',
             $_->{pid}, $_->{cmd},         $_->{time}, $_->{cpu};
     }
 
@@ -3671,7 +3678,7 @@ instead:
 
     for (@procs) {
         print form
-            "{>>>}  {<<<<<<<(19)<<<<<<}  {]]]]]]}  {>>.%}",
+            '{>>>}  {<<<<<<<(19)<<<<<<}  {]]]]]]}  {>>.%}',
             $_->{pid}, $_->{cmd},        $_->{time},  $_->{cpu};
     }
 
@@ -3699,7 +3706,7 @@ should actually look like this:
 
     for (@procs) {
         print form
-            "{>>>}  {<<<<<<<(20)<<<<<<<}  {>>>>>+}  {>>.}%",
+            '{>>>}  {<<<<<<<(20)<<<<<<<}  {>>>>>+}  {>>.}%',
             $_->{pid}, $_->{cmd},        $_->{time},  $_->{cpu};
     }
 
@@ -3718,7 +3725,7 @@ could let that field stretch too:
 
     for (@procs) {
         print form
-            "{>>>}  {<<<<<<<(20+)<<<<<<}  {>>>>>+}  {>>.}%",
+            '{>>>}  {<<<<<<<(20+)<<<<<<}  {>>>>>+}  {>>.}%',
             $_->{pid}, $_->{cmd},        $_->{time},  $_->{cpu};
     }
 
@@ -3766,7 +3773,7 @@ If we interpolate that string, with its extra spaces and its embedded
 newlines, into a C<form> field:
 
     print form
-         "| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |",
+         '| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
             eulogize('Caesar', 'Romans', 'Brutus');
 
 we'd get:
@@ -3791,7 +3798,7 @@ are preserved in the resulting text.
 But, if we told C<form> to squeeze all whitespaces:
 
     print form {ws => qr/\s+/},
-         "| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |",
+         '| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
             eulogize('Caesar', 'Romans', 'Brutus');
 
 we'd get:
@@ -3813,7 +3820,7 @@ On the other hand, if we wanted to preserve the newlines and squeeze
 only horizontal whitespace, that would be:
 
     print form {ws => qr/[ \t]+/},
-         "| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |",
+         '| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
             eulogize('Caesar', 'Romans', 'Brutus');
 
 which produces:
@@ -3849,7 +3856,7 @@ That means we can completely eliminate any whitespace before a punctuation
 character with:
 
     print form {ws => qr/[ \t]+ ([.!?,:;])?/},
-         "| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |",
+         '| {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
             eulogize('Caesar', 'Romans', 'Brutus');
 
 which produces the desired:
@@ -3885,8 +3892,8 @@ fillers. For example:
 
     print form
         {hfill=>"=-"},                  # Fill next fields with "=-"
-        "{|{*}|}\n",                    # Full width field for title
-        "[ Table of Contents ]",        # Title
+        '{|{*}|}',                      # Full width field for title
+        '[ Table of Contents ]',        # Title
         {hfill=>" ."},                  # Fill next fields with spaced dots
         '   {[[[[[{*}[[[[[}{]]]}   ',   # Two indented block fields
             \@contents,    \@page;      # Data for those blocks
@@ -3989,7 +3996,7 @@ with zeros. For example:
     my @nums = (0, 1, -1.2345, 1234.56, -1234.56, 1234567.89);
 
     print form
-        "{]]]].[[}     {]]]].[0}     {0]]].[[}     {0]]].[0}",
+        '{]]]].[[}     {]]]].[0}     {0]]].[[}     {0]]].[0}',
          \@nums,       \@nums,       \@nums,       \@nums;
 
 prints:
@@ -4578,10 +4585,10 @@ to the headers or footers or filler lines):
                   length => 12,
                 },
         # Left-justify the Briton...
-        "{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+        '{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}',
         $soliloquy{RichardIII},
                          # Right-justify the Dane...
-        "                 {]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]}",
+        '                 {]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]}',
                           $soliloquy{Hamlet};
 
 which produces:
@@ -4665,7 +4672,7 @@ bowdlerization:
 
     print form
         "[Ye following tranfcript hath been cenfored by Order of ye King]\n\n",
-        "         {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+        '         {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}',
                   $censor->($speech);
 
 to produce:
@@ -4783,7 +4790,7 @@ trample on free speech I<much> more easily:
 
     print form
         "[Ye following tranfcript hath been cenfored by Order of ye King]\n\n",
-        "        {XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}",
+        '        {XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX}',
                   $speech;
 
 And we'd get the same carefully XXXX'ed output as before.
@@ -4915,7 +4922,7 @@ by interpolating the bullet as well:
 
     for my $item (@items) {
         print form
-            "{''{*}''} {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+            q[{''{*}''} {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}],
              $bullet,  $item;
     }
 
@@ -4936,7 +4943,7 @@ call C<form> separately for each element of C<@items>. After all, if we
 didn't need to bullet our list we could just write:
 
     print form
-        "{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+        '{[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}',
         \@items;
 
 and C<form> would take care of iterating over the C<@items> for us. It
@@ -4953,7 +4960,7 @@ To tell C<form> all that we use the C<bullet> option:
 
     print form
         {bullet => "<>"},
-        "<> {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}",
+        '<> {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}',
             \@items;
 
 The presence of this C<bullet> option causes C<form> to treat the sequence
@@ -4972,7 +4979,7 @@ to handle multi-line character names, like so:
 
     print form
         {bullet => "* "},
-        "   * {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}   *{[[[[[[[[]]]]]]]]}*",
+        '   * {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[}   *{[[[[[[[[]]]]]]]]}*',
               \@roles,                                \$disclaimer;
 
 This could then produce something like:
@@ -4999,7 +5006,7 @@ in a single format. For example:
 
     print form
         {bullet => '+'},
-        "+ {[[[[[[[[[[[[[[[[[[[:}       + {:[[[[[[[[[[[[[[[[[[[}",
+        '+ {[[[[[[[[[[[[[[[[[[[:}       + {:[[[[[[[[[[[[[[[[[[[}',
             \@items,                      \@items;
 
 would print:

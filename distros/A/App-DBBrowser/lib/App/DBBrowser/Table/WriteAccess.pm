@@ -32,12 +32,12 @@ sub table_write_access {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $sb = App::DBBrowser::Table::Substatements->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @stmt_types;
-    if ( ! $sf->{i}{multi_tbl} ) {
+    if ( ! $sf->{i}{special_table} ) {
         push @stmt_types, 'Insert' if $sf->{o}{G}{insert_ok};
         push @stmt_types, 'Update' if $sf->{o}{G}{update_ok};
         push @stmt_types, 'Delete' if $sf->{o}{G}{delete_ok};
     }
-    elsif ( $sf->{i}{multi_tbl} eq 'join' && $sf->{d}{driver} eq 'mysql' ) {
+    elsif ( $sf->{i}{special_table} eq 'join' && $sf->{d}{driver} eq 'mysql' ) {
         push @stmt_types, 'Update' if $sf->{o}{G}{update_ok};
     }
     if ( ! @stmt_types ) {
@@ -47,7 +47,7 @@ sub table_write_access {
         # Choose
         my $stmt_type = choose(
             [ undef, map( "- $_", @stmt_types ) ],
-            { %{$sf->{i}{lyt_3}}, prompt => 'Choose SQL type:' }
+            { %{$sf->{i}{lyt_v_clear}}, prompt => 'Choose SQL type:' }
         );
         if ( ! defined $stmt_type ) {
             return;
@@ -317,7 +317,7 @@ sub __build_insert_stmt {
         $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
             $choices,
-            { %{$sf->{i}{lyt_3}}, index => 1, default => $old_idx, prompt => 'Choose:' }
+            { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx, prompt => 'Choose:', undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;

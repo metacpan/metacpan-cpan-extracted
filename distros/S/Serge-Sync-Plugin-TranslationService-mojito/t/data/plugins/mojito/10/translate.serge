@@ -6,7 +6,7 @@ sync
 
         data
         {
-            project_id              SergeTest
+            repository_name              SergeTest
             source_files_path       ./files/source
             localized_files_path    ./files/target
             file_type               PO

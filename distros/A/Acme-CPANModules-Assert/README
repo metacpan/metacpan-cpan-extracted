@@ -1,0 +1,75 @@
+NAME
+    Acme::CPANModules::Assert - Assertion
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::Assert (from
+    Perl distribution Acme-CPANModules-Assert), released on 2019-01-09.
+
+DESCRIPTION
+    Assertion.
+
+    Assertion is a check statement that must evaluate to true or it will
+    abort program's execution. It is useful during development/debugging:
+
+     assert("there must be >3 arguments", sub { @args > 3 });
+
+    In production code, compilers ideally do not generate code for assertion
+    statements so they do not have any impact on runtime performance.
+
+    In the old days, you only have this alternative to do it in Perl:
+
+     assert(...) if DEBUG;
+
+    where "DEBUG" is a constant subroutine, declared using:
+
+     use constant DEBUG => 0;
+
+    or:
+
+     sub DEBUG() { 0 }
+
+    The perl compiler will optimize away and remove the code entirely when
+    "DEBUG" is false. But having to add "if DEBUG" to each assertion is
+    annoying and error-prone.
+
+    Nowadays, you have several alternatives to have a true, C-like
+    assertions. One technique is using Devel::Declare (e.g. PerlX::Assert).
+    Another technique is using B::CallChecker (e.g. Assert::Conditional).
+
+INCLUDED MODULES
+    *   Assert::Conditional
+
+    *   PerlX::Assert
+
+    *   Devel::Assert
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-Assert>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-Assert>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Asse
+    rt>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

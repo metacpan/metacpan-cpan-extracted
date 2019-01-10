@@ -9,6 +9,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+appveyor.yml
 cpanfile
 dist.ini
 lib/File/ChangeNotify.pm

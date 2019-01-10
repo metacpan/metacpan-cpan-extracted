@@ -1,10 +1,14 @@
 Revision history for Catmandu-Z3950
 
+0.06  2019-01-08 09:41:10 CET
+  - fixing UNIMARC processing (edipretoro)
+  - fixing authentication issues (edipretoro)
+  
 0.05  2016-05-26 16:02:24 CEST
   - adding support for default MARC parsed output
   - adding support adding Z3950 parser
   - more POD
-  
+
 0.04    2013-11-12
   - fix depdencies
 
@@ -16,4 +20,3 @@ Revision history for Catmandu-Z3950
 
 0.01    2012-08-02
   - initial release
-

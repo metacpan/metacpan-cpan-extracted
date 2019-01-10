@@ -1,7 +1,7 @@
 package Log::Dispatch::Dir;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.15'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '0.160'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -219,7 +219,7 @@ Log::Dispatch::Dir - Log messages to separate files in a directory, with rotate 
 
 =head1 VERSION
 
-This document describes version 0.15 of Log::Dispatch::Dir (from Perl distribution Log-Dispatch-Dir), released on 2017-07-11.
+This document describes version 0.160 of Log::Dispatch::Dir (from Perl distribution Log-Dispatch-Dir), released on 2019-01-09.
 
 =head1 SYNOPSIS
 
@@ -428,7 +428,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

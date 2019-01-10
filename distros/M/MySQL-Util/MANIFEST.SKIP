@@ -8,3 +8,5 @@ Makefile.old
 MANIFEST.bak
 Makefile$
 blib/
+cover_db/
+.includepath

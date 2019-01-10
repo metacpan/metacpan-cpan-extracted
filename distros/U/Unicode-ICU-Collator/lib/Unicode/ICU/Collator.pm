@@ -3,14 +3,14 @@ use strict;
 use Exporter qw(import);
 
 BEGIN {
-  our $VERSION = '0.002';
+  our $VERSION = '0.003';
   use XSLoader;
   XSLoader::load('Unicode::ICU::Collator' => $VERSION);
 }
 
 {
   my @loc_constants =
-    qw(ULOC_ACTUAL_LOCALE ULOC_VALID_LOCALE ULOC_REQUESTED_LOCALE);
+    qw(ULOC_ACTUAL_LOCALE ULOC_VALID_LOCALE);
   my @attr_constants =
     (
      qw(UCOL_FRENCH_COLLATION UCOL_ALTERNATE_HANDLING UCOL_CASE_FIRST
@@ -206,15 +206,15 @@ not provided, this is the default.
 
 ULOC_VALID_LOCALE - the most specific locale supported by ICU.
 
-=item *
-
-ULOC_REQUESTED_LOCALE - the locale name supplied to C<new()>.
-
 =back
 
   my $name = $coll->getLocale();
   use Unicode::ICU::Collator ':locale';
   my $name = $coll->getLocale(ULOC_VALID_LOCALE());
+
+Previously you could supply C<ULOC_REQUESTED_LOCALE> to get the locale
+name supplied to C<new()>, but this was deprecated in ICU and current
+versions of ICU return an error, so I've removed it.
 
 =item setAttribute($attr, $value)
 

@@ -6,6 +6,7 @@ use warnings;
 our $IS_WINDOWS = $^O eq 'MSWin32'; 
 our $IS_PACKED = $ENV{PAR_0} ? 1 : 0;
 our $SHELL_ARG_DELIM = $IS_WINDOWS ? '"' : "'";
+our $PATH_SEP = $IS_WINDOWS ? ';' : ':';
 
 use Exporter qw(import);
 our @EXPORT_OK =
@@ -14,6 +15,7 @@ our @EXPORT_OK =
 			$IS_WINDOWS
 			$IS_PACKED
 			$SHELL_ARG_DELIM
+			$PATH_SEP
 			slashify
 			trim
 			readData

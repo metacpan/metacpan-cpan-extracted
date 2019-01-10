@@ -1,5 +1,5 @@
 package Sim::OPT::Descend;
-# Copyright (C) 2008-2017 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Descend of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -117,7 +117,7 @@ sub descend
 
   my $exitname = $dirfiles{exitname};
 
-  say $tee "IN ENTRY DESCEND3  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
+  #say $tee "IN ENTRY DESCEND3  \$dirfiles{starsign} " . dump( $dirfiles{starsign} );
 
   my %d = %{ $instances[0] }; #say $tee "IN ENTRY DESCEND3 \%d : " . dump( \%d );
   my $countcase = $d{countcase}; #say $tee "IN ENTRY DESCEND \$countcase : " . dump( $countcase );
@@ -223,7 +223,7 @@ sub descend
   my $tottot = $dirfiles{tottot}; #say $tee "IN ENTRY DESCEND \$tottot: " . dump( $tottot );
   my $ordtot = $dirfiles{ordtot}; #say $tee "IN ENTRY DESCEND \$ordtot: " . dump( $ordtot );
 
-  my $confinterlinear = "$mypath/" . $dowhat{confinterlinear} ; say $tee "IN DESCEND5 \$confinterlinear: " . dump( $confinterlinear );
+  my $confinterlinear = "$mypath/" . $dowhat{confinterlinear} ; #say $tee "IN DESCEND5 \$confinterlinear: " . dump( $confinterlinear );
 
   my $repfile = $dirfiles{repfile}; #say $tee "IN DESCEND \$repfile: " . dump( $repfile );
   if ( not( $repfile ) ){ die; }
@@ -287,7 +287,7 @@ sub descend
     exit(say $tee "4 #END RUN.");
   }
 
-  say $tee " \$repfile " . dump($repfile);
+  #say $tee " \$repfile " . dump($repfile);
   if ( not( -e $repfile ) ){ die "There isn't \$repfile: $repfile"; };
 
 
@@ -749,7 +749,7 @@ sub descend
       my $thoselines;
       if ( ( $entryfile ne "" ) and ( -e $entryfile ) )
       {
-        open( ENTRYFILE, "$entryfile" ) or die; say $tee "IN DESCENT OPENING \$entryfile" . dump( $entryfile );
+        open( ENTRYFILE, "$entryfile" ) or die; #say $tee "IN DESCENT OPENING \$entryfile" . dump( $entryfile );
         $thoselines = <ENTRYFILE>;
         close ENTRYFILE;
       }
@@ -1346,7 +1346,7 @@ sub descend
 
         #say $tee "CARRIER " . dump( %carrier );
 
-        my @blockelts = @{ Sim::OPT::getblockelts( \@sweeps, $countcase, $countblock ) }; say $tee "IN callblock \@blockelts " . dump( @blockelts );
+        my @blockelts = @{ Sim::OPT::getblockelts( \@sweeps, $countcase, $countblock ) }; #say $tee "IN callblock \@blockelts " . dump( @blockelts );
 
         #say $tee "ABOUT TO CALL METAMODEL WITH COUNT EQUAL TO MAX; \$countblock: $countblock";
         metamodel( \%dowhat, $sortmixed, $file, \%dirfiles, \@blockelts, \%carrier, $metafile,

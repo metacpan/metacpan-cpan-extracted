@@ -1,0 +1,87 @@
+NAME
+    Acme::CPANModules::CheckingModuleInstalledLoadable - Checking if a
+    module is installed or loadable
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::CheckingModuleInstalledLoadable (from Perl
+    distribution Acme-CPANModules-CheckingModuleInstalledLoadable), released
+    on 2019-01-09.
+
+DESCRIPTION
+    Checking if a module is installed or loadable.
+
+    If you simply want to check that a module's ".pm" file is locatable in
+    @INC, you can just do something like:
+
+     my $mod = "Foo/Bar.pm";
+     for my $dir (@INC) {
+         next if ref $dir;
+         if (-f "$dir/$mod") {
+             print "Module $mod is installed";
+             last;
+         }
+     }
+
+    Or you can use something like Module::Path or Module::Path::More which
+    does similar to the above.
+
+    A module can also be loaded from a require hook in ~@INC~ (like in the
+    case of fatpacked or datapacked script) and the above methods does not
+    handle it. Instead, you'll need to use Module::Load::Conditional's
+    "check_install" or Module::Installed::Tiny's "module_installed":
+
+     use Module::Load::Conditional qw(check_install);
+     if (check_install(module => "Foo::Bar")) {
+         # Foo::Bar is installed
+     }
+
+    The above does not guarantee that the module will be loaded
+    successfully. To check that, there's no other way but to actually try to
+    load it:
+
+     if (eval { require Foo::Bar; 1 }) {
+         # Foo::Bar can be loaded (and was loaded!)
+     }
+
+INCLUDED MODULES
+    *   Module::Path
+
+    *   Module::Path::More
+
+    *   Module::Load::Conditional
+
+    *   Module::Installed::Tiny
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-CheckingModuleInstalledLo
+    adable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-CheckingModuleInstal
+    ledLoadable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Chec
+    kingModuleInstalledLoadable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

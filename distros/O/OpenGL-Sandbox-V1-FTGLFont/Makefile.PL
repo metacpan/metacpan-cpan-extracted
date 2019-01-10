@@ -34,6 +34,7 @@ my %WriteMakefileArgs = (
     "Cwd" => 0,
     "Moo" => 0,
     "OpenGL::Sandbox::MMap" => 0,
+    "OpenGL::Sandbox::V1" => "0.04",
     "strict" => 0,
     "warnings" => 0
   },
@@ -47,7 +48,7 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.042",
   "postamble" => {
     "inline" => {
       "bundle" => 1,
@@ -76,6 +77,7 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "OpenGL::Sandbox" => 0,
   "OpenGL::Sandbox::MMap" => 0,
+  "OpenGL::Sandbox::V1" => "0.04",
   "Test::More" => 0,
   "Time::HiRes" => 0,
   "Try::Tiny" => 0,

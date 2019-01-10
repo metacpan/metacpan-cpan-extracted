@@ -1,3 +1,9 @@
+0.005   2019-01-09 (PERLANCAR)
+
+	- Split non-PERLANCAR-specific lists to their own dists, remove the
+	  PERLANCAR:: part from name.
+
+
 0.004   2019-01-06 (PERLANCAR)
 
 	- Add Package::MoreUtil to list of retired modules.

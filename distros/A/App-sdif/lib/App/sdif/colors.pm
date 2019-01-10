@@ -52,16 +52,19 @@ option	--green \
 	--cm    ?TEXT=K/454		\
 	--cm    UTEXT=
 
+define <C> 033
+define <M> 303
+define <Y> 330
 option	--cmy \
-	--cm OCOMMAND=C/555;S		\
-	--cm NCOMMAND=M/555;S		\
-	--cm MCOMMAND=Y/555;S		\
-	--cm    OFILE=C/555;SD		\
-	--cm    NFILE=M/555;SD		\
-	--cm    MFILE=Y/555;SD		\
-	--cm    OMARK=C/444		\
-	--cm    NMARK=M/444		\
-	--cm    MMARK=Y/444		\
+	--cm OCOMMAND=<C>/555;S		\
+	--cm NCOMMAND=<M>/555;S		\
+	--cm MCOMMAND=<Y>/555;S		\
+	--cm    OFILE=<C>/555;SD	\
+	--cm    NFILE=<M>/555;SD	\
+	--cm    MFILE=<Y>/555;SD	\
+	--cm    OMARK=<C>/444		\
+	--cm    NMARK=<M>/444		\
+	--cm    MMARK=<Y>/444		\
 	--cm    UMARK=/444		\
 	--cm    ?LINE=220		\
 	--cm    ?TEXT=K/554		\

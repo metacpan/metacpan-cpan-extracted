@@ -18,6 +18,10 @@ $res->tex_config({
 	default => '8x8',
 });
 
+my $imported_res= eval 'package Test::Ns1; use OpenGL::Sandbox q{$res}; $res';
+is( $imported_res, $res, 'can import resource manager' )
+	or diag $@;
+
 # Can't run font tests without a separate font module
 #$res->font_config({
 #	default => 'squada',

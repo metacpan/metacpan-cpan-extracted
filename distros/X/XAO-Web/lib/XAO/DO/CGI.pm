@@ -168,7 +168,7 @@ sub multi_param ($;$) {
 1;
 __END__
 
-=over
+=back
 
 =head1 AUTHORS
 

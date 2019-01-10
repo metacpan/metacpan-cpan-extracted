@@ -9,6 +9,9 @@ get '/app' => 'app';
 my $t = t::Helper->t->setup_or_skip_all;
 
 $t->navigate_ok('/');
+$t->live_element_exists('.logo');
+$t->live_element_exists('#not_found');
+$t->live_element_exists('[name=agree]');
 $t->live_element_exists({class => 'logo'});
 $t->live_element_exists({id    => 'not_found'});
 $t->live_element_exists({link  => '/hidden'});

@@ -190,6 +190,10 @@ The 'location' is generally a normal path, but some special values have special 
 Since the default locations are automatically searched if no '--bindirectory' option is given, this code is provided to
 completely turn off searching any locations for scripts - just give a single invocation of '--bindirectory :none'. 
 
+=item * :path
+
+Search paths in the PATH environment variable in order to find possible scripts with pod.
+
 =item * :std
 
 This will insert the default locations. Useful if you want insert one or more custom paths first, and then add 'all the 

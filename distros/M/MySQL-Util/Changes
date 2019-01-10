@@ -1,5 +1,9 @@
 Revision history for MySQL-Util
 
+0.36    - implemented MySQL::Util::Lite::PrimaryKey and 
+			MySQL::Util::Lite::AlternateKey
+		- added basic documentation for ::Lite*
+			
 0.35    - several enhancements for MySQL::Util::Lite
 
 0.34    - fixed 128180

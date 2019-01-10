@@ -27,11 +27,11 @@ http://www.mpfr.org
 
 Minimum required version of gmp is gmp-4.2.0.
 Minimum required version of mpfr is mpfr-3.0.0.
-Some features of Math::MPFR require later versions
-of the gmp and mpfr libraries.
-
 You'll get errors if you try to build Math::MPFR against an
 insufficiently recent version of the mpfr library.
+Some features of Math::MPFR require later versions of the gmp and mpfr
+libraries. If the versions are not sufficiently recent, then those
+features will not be available.
 
 To build this module you need perl 5.6.0 or later. I'm not sure of all
 the requirements to get it to build with earlier versions of perl, but

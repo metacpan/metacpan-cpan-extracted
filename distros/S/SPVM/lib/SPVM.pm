@@ -18,7 +18,7 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0406';
+our $VERSION = '0.0407';
 
 my $SPVM_ENV;
 my $BUILDER;
@@ -178,7 +178,7 @@ L<SPVM::CORE> - Standard Functions
 
 =head2 Standard Modules
 
-L<SPVM::Byte>, L<SPVM::Short>, L<SPVM::Int>, L<SPVM::Long>, L<SPVM::Float>, L<SPVM::Double>, L<SPVM::Bool>
+L<SPVM::Byte>, L<SPVM::Short>, L<SPVM::Int>, L<SPVM::Long>, L<SPVM::Float>, L<SPVM::Double>
 
 =head2 Exchange API
 

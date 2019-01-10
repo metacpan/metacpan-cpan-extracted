@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,20 +20,20 @@ no_index:
 provides:
   Address::PostCode::Australia:
     file: lib/Address/PostCode/Australia.pm
-    version: '0.09'
+    version: '0.10'
   Address::PostCode::Australia::Params:
     file: lib/Address/PostCode/Australia/Params.pm
-    version: '0.09'
+    version: '0.10'
   Address::PostCode::Australia::Place:
     file: lib/Address/PostCode/Australia/Place.pm
-    version: '0.09'
+    version: '0.10'
 requires:
-  Address::PostCode::UserAgent: '0.05'
+  Address::PostCode::UserAgent: '0.08'
   JSON: '0'
   Moo: '0'
   namespace::clean: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Address-PostCode-Australia.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

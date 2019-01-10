@@ -1,6 +1,6 @@
 package Catmandu::BagIt;
 
-our $VERSION = '0.233';
+our $VERSION = '0.234';
 
 use Catmandu::Sane;
 use Catmandu;
@@ -1323,7 +1323,7 @@ sub _md5_sum {
 sub _is_legal_file_name {
     my ($self, $filename) = @_;
 
-    return 0 unless ($filename =~ /^[[:alnum:]._-]+$/);
+    return 0 unless ($filename =~ /^[[:alnum:]._%-]+$/);
     return 0 if ($filename =~ m{(^\.|\/\.+\/)});
     return 1;
 }

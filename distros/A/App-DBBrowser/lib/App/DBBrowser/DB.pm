@@ -5,12 +5,10 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.040';
+our $VERSION = '2.041';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
-
-use List::MoreUtils qw( zip );
 
 
 sub new {
@@ -146,8 +144,6 @@ sub get_schemas {
         }
         elsif( $driver eq 'Pg' ) {
             my $sth = $dbh->table_info( undef, '%', undef, undef );
-            # DBD::Pg  3.7.0:
-            # The TABLE_SCHEM and TABLE_NAME will be quoted via quote_ident().
             # pg_schema: the unquoted name of the schema
             my $info = $sth->fetchall_hashref( 'pg_schema' );
             my $qr = qr/^(?:pg_|information_schema$)/;
@@ -169,6 +165,48 @@ sub get_schemas {
     $user_schema = [] if ! defined $user_schema;
     $sys_schema  = [] if ! defined $sys_schema;
     return $user_schema, $sys_schema;
+}
+
+
+sub tables_data { # documentation
+    my ( $sf, $dbh, $schema ) = @_;
+    my $table_data = {};
+    my ( $table_schem, $table_name );
+    if ( $sf->get_db_driver eq 'Pg' ) {
+        $table_schem = 'pg_schema';
+        $table_name  = 'pg_table';
+        # DBD::Pg  3.7.4:
+        # The TABLE_SCHEM and TABLE_NAME will be quoted via quote_ident().
+        # Two additional fields specific to DBD::Pg are returned:
+        # pg_schema: the unquoted name of the schema
+        # pg_table: the unquoted name of the table
+    }
+    else {
+        $table_schem = 'TABLE_SCHEM';
+        $table_name  = 'TABLE_NAME';
+    }
+    my @keys = ( 'TABLE_CAT', $table_schem, $table_name, 'TABLE_TYPE' );
+    my $sth = $dbh->table_info( undef, $schema, undef, undef );
+    my $info = $sth->fetchall_arrayref( { map { $_ => 1 } @keys } );
+    my %duplicates;
+    for my $href ( @$info ) {
+        next if $href->{TABLE_TYPE} eq 'INDEX';
+        #if ( $href->{TABLE_TYPE} =~ /SYSTEM/ || $href->{TABLE_TYPE} =~ /^(?:TABLE|VIEW|LOCAL TEMPORARY)\z/ ) {
+        my $table = $href->{$table_name};
+        if ( ! defined $schema && $duplicates{$table}++ ) {
+            if ( $duplicates{$table} == 2 ) {
+                my $tmp = delete $table_data->{$table};
+                my $first = '[' . join ']', grep { defined && length } @{$tmp}[0..2];
+                $table_data->{$first} = $tmp;
+            }
+            $table = '[' . join ']', grep { defined && length } @{$href}{@keys[0..2]};
+            $table_data->{$table} = [ @{$href}{@keys} ];
+        }
+        else {
+            $table_data->{$table} = [ @{$href}{@keys} ];
+        }
+    }
+    return $table_data;
 }
 
 
@@ -284,12 +322,13 @@ sub regexp {
 
 
 sub concatenate {
-    my ( $sf, $arguments, $separator ) = @_;
-
+    my ( $sf, $arguments, $sep ) = @_;
     my $arg;
-    if ( defined $separator && length $separator ) {
-        my @sep = ( "'" . $separator . "'" ) x @$arguments;
-        $arg = [ zip( @$arguments, @sep ) ];
+    if ( defined $sep && length $sep ) {
+        my $qt_sep = "'" . $sep . "'";
+        for ( @$arguments ) {
+            push @$arg, $_, $qt_sep;
+        }
         pop @$arg;
     }
     else {
@@ -380,7 +419,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.040
+Version 2.041
 
 =head1 DESCRIPTION
 

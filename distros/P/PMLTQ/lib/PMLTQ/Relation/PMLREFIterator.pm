@@ -1,6 +1,6 @@
 package PMLTQ::Relation::PMLREFIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::PMLREFIterator::VERSION = '1.5.0';
+$PMLTQ::Relation::PMLREFIterator::VERSION = '2.0.2';
 # ABSTRACT: Iterates over PML reference
 
 use 5.006;
@@ -66,7 +66,7 @@ PMLTQ::Relation::PMLREFIterator - Iterates over PML reference
 
 =head1 VERSION
 
-version 1.5.0
+version 2.0.2
 
 =head1 AUTHORS
 

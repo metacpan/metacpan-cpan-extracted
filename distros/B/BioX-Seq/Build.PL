@@ -32,7 +32,8 @@ my $builder = $deployer->new(
         'Module::Build' => 0,
     },
     build_requires => {
-        'Test::More' => 0,
+        'Test::More'  => 0,
+        'File::Which' => 0,
     },
     requires => {
         'Compress::BGZF' => 0,

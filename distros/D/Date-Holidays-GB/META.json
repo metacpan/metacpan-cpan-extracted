@@ -4,13 +4,13 @@
       "Michael Jemmeson <mjemmeson@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Date-Holidays-GB",
    "no_index" : {
@@ -80,19 +80,19 @@
    "provides" : {
       "Date::Holidays::GB" : {
          "file" : "lib/Date/Holidays/GB.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Date::Holidays::GB::EAW" : {
          "file" : "lib/Date/Holidays/GB/EAW.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Date::Holidays::GB::NIR" : {
          "file" : "lib/Date/Holidays/GB/NIR.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Date::Holidays::GB::SCT" : {
          "file" : "lib/Date/Holidays/GB/SCT.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -107,11 +107,12 @@
          "web" : "https://github.com/mjemmeson/Date-Holidays-GB"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_contributors" : [
       "Michael Jemmeson <michael.jemmeson@cpan.org>",
       "Peter Newman <peternewman@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::XS version 2.34"
+   "x_generated_by_perl" : "v5.22.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.04"
 }
 

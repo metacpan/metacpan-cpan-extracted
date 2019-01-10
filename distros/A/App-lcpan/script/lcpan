@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-08'; # DATE
-our $VERSION = '1.031'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '1.032'; # VERSION
 
 use 5.010;
 use strict;
@@ -63,7 +63,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.031 of lcpan (from Perl distribution App-lcpan), released on 2019-01-08.
+This document describes version 1.032 of lcpan (from Perl distribution App-lcpan), released on 2019-01-09.
 
 =head1 SYNOPSIS
 
@@ -503,6 +503,10 @@ Note that currently this command has trouble finding documentation for core
 modules because those are contained in perl release tarballs instead of release
 tarballs of modules, and C<lcpan> is currently not designed to work with those.
 
+
+=head2 B<extract-dist>
+
+Extract a distribution's latest release file to current directory.
 
 =head2 B<extract-mod>
 
@@ -1028,11 +1032,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
-=item B<--author-arg>=I<s>*
-
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
+
+=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -1766,6 +1770,14 @@ Look for script first.
 Same as --raw.
 
 See C<--format-arg>.
+
+=back
+
+=head2 Options for subcommand extract-dist
+
+=over
+
+=item B<--dist>=I<s>*
 
 =back
 
@@ -3354,7 +3366,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author-arg)
+ author (see --author)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --no-include-core)
@@ -3546,6 +3558,10 @@ List of available configuration parameters:
  format (see --format-arg)
  name (see --name)
  script (see --script)
+
+=head2 Configuration for subcommand extract-dist
+
+ dist (see --dist)
 
 =head2 Configuration for subcommand extract-mod
 

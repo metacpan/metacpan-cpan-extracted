@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.047, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,11 +36,12 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-Z3950/issues
   homepage: https://github.com/LibreCat/Catmandu-Z3950
   repository: https://github.com/LibreCat/Catmandu-Z3950.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
+  - 'Emmanuel Di Pretoro <edipretoro@gmail.com>'
   - 'Fedora Application User <fedora@gide.ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <Patrick.Hochstenbach@UGent.be>'
-  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'wouterw <wouter.willaert@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

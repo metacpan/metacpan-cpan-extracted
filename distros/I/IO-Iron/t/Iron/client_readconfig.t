@@ -26,7 +26,7 @@ diag('test ReadIronMQConfig');
 # File in homedir
 # (Can't be tested; we don't write to user's home dir!)
 #my $iron_global_file_hash = {
-#       'project_id' => 'Global_file_project_id', 'token' => 'Global_file_token', 
+#       'project_id' => 'Global_file_project_id', 'token' => 'Global_file_token',
 #       'host' => 'Global_file_host', 'protocol' => 'Global_file_protocol',
 #       'port' => '10001', 'api_version' => '1',
 #       };

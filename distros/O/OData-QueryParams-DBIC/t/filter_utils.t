@@ -254,6 +254,22 @@ my %tests = (
             value    =>  10,
             val_type =>  'numeric',
         },
+    "avg_age ge 2.3" =>
+        {
+            operator =>  "ge",
+            subject  =>  "avg_age",
+            sub_type =>  "field",
+            value    =>  2.3,
+            val_type =>  'numeric',
+        },
+    "avg_age ge datetimeoffset'2019-01-08'" =>
+        {
+            operator =>  "ge",
+            subject  =>  "avg_age",
+            sub_type =>  "field",
+            value    =>  q~datetimeoffset'2019-01-08'~,
+            val_type =>  'function',
+        },
 );
 
 

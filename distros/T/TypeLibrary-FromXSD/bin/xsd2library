@@ -36,13 +36,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 xsd2library
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

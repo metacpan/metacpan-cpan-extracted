@@ -65,7 +65,7 @@
    "provides" : {
       "WebService::Slack::WebApi" : {
          "file" : "lib/WebService/Slack/WebApi.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Slack::WebApi::Api" : {
          "file" : "lib/WebService/Slack/WebApi/Api.pm"
@@ -85,8 +85,14 @@
       "WebService::Slack::WebApi::Client" : {
          "file" : "lib/WebService/Slack/WebApi/Client.pm"
       },
+      "WebService::Slack::WebApi::Conversations" : {
+         "file" : "lib/WebService/Slack/WebApi/Conversations.pm"
+      },
       "WebService::Slack::WebApi::Dialog" : {
          "file" : "lib/WebService/Slack/WebApi/Dialog.pm"
+      },
+      "WebService::Slack::WebApi::Dnd" : {
+         "file" : "lib/WebService/Slack/WebApi/Dnd.pm"
       },
       "WebService::Slack::WebApi::Emoji" : {
          "file" : "lib/WebService/Slack/WebApi/Emoji.pm"
@@ -148,10 +154,11 @@
          "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "Askar Timirgazin <anotheroneackap@gmail.com>",
       "Ivan Wills <Ivan.Wills2@optus.com.au>",
+      "Matt Hallacy <mhallacy+github@haproxy.com>",
       "Sterling Hanenkamp <sterling@hanenkamp.com>",
       "Sterling Hanenkamp <sterling@ziprecruiter.com>",
       "Steven Arnott <steven.arnott@grantstreet.com>",

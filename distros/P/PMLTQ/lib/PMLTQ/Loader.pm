@@ -1,10 +1,14 @@
 package PMLTQ::Loader;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Loader::VERSION = '1.5.0';
+$PMLTQ::Loader::VERSION = '2.0.2';
 # ABSTRACT: Module loader for L<PMLTQ::Relation|PMLTQ::Relation>s inspired by L<Mojo::Loader>
 
 
-use PMLTQ::Base -strict;
+#use PMLTQ::Base -strict;
+use strict;
+use warnings;
+use utf8;
+use feature ":5.10";
 
 use Exporter 'import';
 use File::Basename 'fileparse';
@@ -67,7 +71,7 @@ PMLTQ::Loader - Module loader for L<PMLTQ::Relation|PMLTQ::Relation>s inspired b
 
 =head1 VERSION
 
-version 1.5.0
+version 2.0.2
 
 =head1 SYNOPSIS
 

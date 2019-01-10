@@ -1,14 +1,16 @@
 package Catmandu::Importer::Z3950::Parser::USMARC;
- 
+
 use Catmandu::Sane;
 use MARC::File::USMARC;
 use Moo;
+
+our $VERSION = '0.06';
 
 has 'id' => (is => 'ro' , default => sub { '001'} );
 
 sub parse {
     my ($self,$str) = @_;
- 
+
     return undef unless defined $str;
 
     my $record = MARC::File::USMARC->decode($str);

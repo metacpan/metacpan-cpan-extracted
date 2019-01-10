@@ -1,0 +1,95 @@
+NAME
+    Acme::CPANModules::StructuredDATA - Modules that give some structure to
+    DATA
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::StructuredDATA (from Perl distribution
+    Acme-CPANModules-StructuredDATA), released on 2019-01-09.
+
+DESCRIPTION
+    Modules that give some structure to DATA.
+
+    The DATA file handle is a convenient feature provided by Perl to let
+    scripts access its own source code (specifically the part after END or
+    DATA). Scripts can usually put some data so they can run without
+    additional data files.
+
+    Instead of just a stream of bytes, some modules allow you to access the
+    DATA as some kind of structured storage.
+
+INCLUDED MODULES
+    *   Data::Section
+
+        With this module, you can put several strings in your DATA section,
+        each prepended with a header line containing the label for each. For
+        example:
+
+         __[ content1 ]__
+         content for content1.
+ 
+         __[ content2 ]__
+         content
+         for
+         content2
+
+        and access each string by referring to its label.
+
+    *   Data::Section::Seekable
+
+        This module is similar to Data::Section in letting you put several
+        multipart content in DATA with the exception that it writes a table
+        of content (TOC) of all parts at the beginning of DATA, e.g.:
+
+         __DATA__
+         Data::Section::Seekable v1
+         part1,0,14
+         part2,14,17,important
+ 
+         This is part1
+         This is part
+         two
+
+        The first paragraph after DATA is called the TOC which lists all the
+        parts along with their offsets and lengths. It is therefore possible
+        to locate any part just from reading the TOC instead of scanning for
+        headers on the whole data. It is useful when the amount of data is
+        quite large and you need quick access to random parts.
+
+    *   Inline::Files
+
+        This is a prior art for Data::Section but more magical (using source
+        filters) and allows writing in addition to reading your parts. It
+        completely replaces DATA with an unlimited number of LABEL's. I'd be
+        wary in using it, and the module itself gives such warning.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-StructuredDATA>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-StructuredDATA>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Stru
+    cturedDATA>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

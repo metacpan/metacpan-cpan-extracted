@@ -13,10 +13,14 @@ $t->driver_args({driver_class => 'Selenium::Chrome'});
 $t->set_window_size([1024, 768])->navigate_ok('/')->if_tx(status_is => 200)
   ->text_is('a.logo' => 'Logo')->live_text_is('a.logo' => 'Logo')->live_element_exists('nav')
   ->element_is_displayed('nav')->element_is_hidden('a[href="/hidden"]')
-  ->active_element_is('input[name=q]')->send_keys_ok('input[name=q]', 'Mojo');
+  ->active_element_is('input[name=q]')->send_keys_ok('input[name=q]', 'Whatever');
+
+$t->live_element_exists_not('[name=c]:checked')->toggle_checked_ok('[name=c]')
+  ->active_element_is('[name=c]')->live_element_exists('[name=c]:checked')
+  ->live_value_is('[name=c]', 42)->live_value_like('[name=c]', qr{^\d+$});
 
 $t->window_size_is([1024, 768])->submit_ok('form')->status_is(200)
-  ->current_url_like(qr{\bq=Mojo\b})->live_element_exists('input[name=q][value=Mojo]')
+  ->current_url_like(qr{\bq=Whatever\b})->live_element_exists('input[name=q][value=Whatever]')
   ->live_element_exists_not('abbr')->live_text_like('a.logo', qr{logo}i);
 
 $t->click_ok('nav a.logo')->status_is(200)->live_element_count_is('a', 3);
@@ -49,6 +53,7 @@ __DATA__
 </nav>
 %= form_for '', begin
   %= text_field 'q'
+  %= check_box 'c', 42
 % end
 %= javascript '/app.js'
 </body>

@@ -8,7 +8,7 @@ use Test::More;
 use Try::Tiny;
 use Log::Any::Adapter 'TAP';
 use OpenGL::Sandbox qw/
-	make_context get_gl_errors $res :V1:all
+	make_context get_gl_errors $res -V1 :all
 	glClear GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT glClearColor
 /;
 
@@ -107,5 +107,15 @@ show {
 	draw_boundbox( -50, $font->descender, 50, $font->ascender );
 	$font->render("monospaced", x => -100, monospace => 15);
 };
+show {
+	draw_boundbox( -50, $font->descender, 50, $font->ascender );
+	$font->render("monospaced Right", xalign => 1, monospace => 15);
+};
+show {
+	draw_boundbox( -50, $font->descender, 50, $font->ascender );
+	$font->render("monospaced Left", xalign => 0, monospace => 15);
+};
+
+undef $c;
 
 done_testing;

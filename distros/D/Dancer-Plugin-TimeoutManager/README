@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Dancer-Plugin-TimeoutManager,
-version 0.09:
+version 0.10:
 
   Plugin to define route handlers with a timeout
 

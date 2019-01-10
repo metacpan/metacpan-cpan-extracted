@@ -1,7 +1,7 @@
 package Log::Any::App;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.53'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '0.540'; # VERSION
 
 # i need this to run on centos 5.x. otherwise all my other servers are debian
 # 5.x and 6.x+ (perl 5.010).
@@ -1153,7 +1153,7 @@ Log::Any::App - An easy way to use Log::Any in applications
 
 =head1 VERSION
 
-This document describes version 0.53 of Log::Any::App (from Perl distribution Log-Any-App), released on 2016-03-16.
+This document describes version 0.540 of Log::Any::App (from Perl distribution Log-Any-App), released on 2019-01-09.
 
 =head1 SYNOPSIS
 
@@ -2252,7 +2252,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Log-Any-Ap
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Log-Any-App>.
+Source repository is at L<https://github.com/perlancar/perl-Log-Any-App>.
 
 =head1 BUGS
 
@@ -2276,7 +2276,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,67 +1,86 @@
-SYNOPSIS
+NAME
+    Log::Any::IfLOG - Load Log::Any only if "logging is enabled"
 
+VERSION
+    This document describes version 0.090 of Log::Any::IfLOG (from Perl
+    distribution Log-Any-IfLOG), released on 2019-01-09.
+
+SYNOPSIS
      use Log::Any::IfLOG '$log';
 
 DESCRIPTION
-
     This module is a drop-in replacement/wrapper for Log::Any to be used
     from your modules. This is a quick-hack solution to avoid the cost of
     loading Log::Any under "normal condition". Since Log::Any 1.00, startup
     overhead increases to about 7-10ms on my PC/laptop (from under 1ms for
     the previous version). Because I want to keep startup overhead of CLI
-    apps under 50ms (see Perinci::CmdLine::Lite) to keep tab completion
-    from getting a noticeable lag, every millisecond counts.
+    apps under 50ms (see Perinci::CmdLine::Lite) to keep tab completion from
+    getting a noticeable lag, every millisecond counts.
 
     This module will only load Log::Any when "logging is enabled".
     Otherwise, it will just return without loading anything. If $log is
     requested in import, a fake object is returned that responds to methods
-    like debug, is_debug and so on but will do nothing when called and just
-    return 0.
+    like "debug", "is_debug" and so on but will do nothing when called and
+    just return 0.
 
     To determine "logging is enabled":
 
-      * Is $ENABLE_LOG defined?
+    *   Is $ENABLE_LOG defined?
 
-      This package variable can be used to force "logging enabled" (if
-      true) or "logging disabled" (if false). Normally, you don't need to
-      do this except for testing.
+        This package variable can be used to force "logging enabled" (if
+        true) or "logging disabled" (if false). Normally, you don't need to
+        do this except for testing.
 
-      * Is Log::Any is already loaded (from %INC)?
+    *   Is Log::Any is already loaded (from %INC)?
 
-      If Log::Any is already loaded, it means we have taken the overhead
-      hit anyway so logging is enabled.
+        If Log::Any is already loaded, it means we have taken the overhead
+        hit anyway so logging is enabled.
 
-      * Is one of log-related environment variables true?
+    *   Is one of log-related environment variables true?
 
-      If one of LOG, TRACE, or DEBUG, or VERBOSE, or QUIET, or LOG_LEVEL is
-      true then logging is enabled. These variables are used by
-      Perinci::CmdLine.
+        If one of LOG, "TRACE", or "DEBUG", or "VERBOSE", or "QUIET", or
+        "LOG_LEVEL" is true then logging is enabled. These variables are
+        used by Perinci::CmdLine.
 
-      Otherwise, logging is disabled.
-
-ENVIRONMENT
-
- LOG => bool
-
- TRACE => bool
-
- DEBUG => bool
-
- VERBOSE => bool
-
- QUIET => bool
-
- LOG_LEVEL => str
+        Otherwise, logging is disabled.
 
 VARIABLES
-
- $ENABLE_LOG => bool
-
+  $ENABLE_LOG => bool
     This setting can be forced to force loading Log::Any or not.
 
-SEE ALSO
+ENVIRONMENT
+  LOG => bool
+  TRACE => bool
+  DEBUG => bool
+  VERBOSE => bool
+  QUIET => bool
+  LOG_LEVEL => str
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-Any-IfLOG>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-Any-IfLOG>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-IfLOG>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Log::Any
 
-    http://github.com/dagolden/Log-Any/issues/24
+    <http://github.com/dagolden/Log-Any/issues/24>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

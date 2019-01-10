@@ -1,11 +1,11 @@
 package OpenGL::Sandbox::V1::DisplayList;
-BEGIN { $OpenGL::Sandbox::V1::DisplayList::VERSION = '0.03'; }
 use strict;
 use warnings;
 use overload '""' => sub { ${ shift() } };
 use OpenGL::Sandbox 'glDeleteLists';
 
 # ABSTRACT: Wrapper class for display lists
+our $VERSION = '0.042'; # VERSION
 
 
 sub id { ${$_[0]} }
@@ -42,7 +42,7 @@ OpenGL::Sandbox::V1::DisplayList - Wrapper class for display lists
 
 =head1 VERSION
 
-version 0.03
+version 0.042
 
 =head1 ATTRIBUTES
 
@@ -78,7 +78,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

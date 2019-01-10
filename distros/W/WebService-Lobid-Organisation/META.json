@@ -4,7 +4,7 @@
       "Peter Mayr <at.peter.mayr@posteo.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -26,13 +26,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Email::Address" : "1.908",
             "HTTP::Tiny" : "0.070",
             "JSON" : "2.90",
             "Log::Any" : "1.032",
             "Moo" : "2.000002",
             "Try::Tiny" : "0.22",
-            "URI" : "1.71",
             "perl" : "v5.10.0",
             "strict" : "0",
             "version" : "0",
@@ -50,11 +48,11 @@
    "provides" : {
       "WebService::Lobid" : {
          "file" : "lib/WebService/Lobid.pm",
-         "version" : "0.0031"
+         "version" : "0.0041"
       },
       "WebService::Lobid::Organisation" : {
          "file" : "lib/WebService/Lobid/Organisation.pm",
-         "version" : "0.0031"
+         "version" : "0.0041"
       }
    },
    "release_status" : "stable",
@@ -69,7 +67,8 @@
          "web" : "https://github.com/hatorikibble/webservice-lobid-organisations"
       }
    },
-   "version" : "0.0031",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.0041",
+   "x_generated_by_perl" : "v5.20.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

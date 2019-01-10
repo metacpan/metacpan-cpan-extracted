@@ -1653,18 +1653,6 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             var_id_in1 = SPVM_OP_get_var_id(compiler, op_assign_src->first);
                             var_id_in2 = SPVM_OP_get_var_id(compiler, op_assign_src->last);
                             break;
-                          case SPVM_BASIC_TYPE_C_ID_FLOAT:
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REMAINDER_FLOAT);
-                            var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
-                            var_id_in1 = SPVM_OP_get_var_id(compiler, op_assign_src->first);
-                            var_id_in2 = SPVM_OP_get_var_id(compiler, op_assign_src->last);
-                            break;
-                          case SPVM_BASIC_TYPE_C_ID_DOUBLE:
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_REMAINDER_DOUBLE);
-                            var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
-                            var_id_in1 = SPVM_OP_get_var_id(compiler, op_assign_src->first);
-                            var_id_in2 = SPVM_OP_get_var_id(compiler, op_assign_src->last);
-                            break;
                           default:
                             assert(0);
                         }
@@ -1714,7 +1702,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                       }
-                      else if (op_assign_src->id == SPVM_OP_C_ID_RIGHT_SHIFT) {
+                      else if (op_assign_src->id == SPVM_OP_C_ID_RIGHT_ARITHMETIC_SHIFT) {
                         SPVM_OPCODE opcode;
                         memset(&opcode, 0, sizeof(SPVM_OPCODE));
                         
@@ -1723,12 +1711,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         int32_t var_id_out;
                         switch (type_dist->basic_type->id) {
                           case SPVM_BASIC_TYPE_C_ID_INT:
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_SHIFT_INT);
+                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_ARITHMETIC_SHIFT_INT);
                             var_id_in1 = SPVM_OP_get_var_id(compiler, op_assign_src->first);
                             var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
                             break;
                           case SPVM_BASIC_TYPE_C_ID_LONG:
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_SHIFT_LONG);
+                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_ARITHMETIC_SHIFT_LONG);
                             var_id_in1 = SPVM_OP_get_var_id(compiler, op_assign_src->first);
                             var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
                             break;
@@ -1744,7 +1732,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
 
                         SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                       }
-                      else if (op_assign_src->id == SPVM_OP_C_ID_RIGHT_SHIFT_UNSIGNED) {
+                      else if (op_assign_src->id == SPVM_OP_C_ID_RIGHT_LOGICAL_SHIFT) {
 
                         
 
@@ -1756,12 +1744,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                         int32_t var_id_in1;
                         switch (type_dist->basic_type->id) {
                           case SPVM_BASIC_TYPE_C_ID_INT:
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_SHIFT_UNSIGNED_INT);
+                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_LOGICAL_SHIFT_INT);
                             var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
                             var_id_in1 = SPVM_OP_get_var_id(compiler, op_assign_src->first);
                             break;
                           case SPVM_BASIC_TYPE_C_ID_LONG:
-                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_SHIFT_UNSIGNED_LONG);
+                            SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_RIGHT_LOGICAL_SHIFT_LONG);
                             var_id_out = SPVM_OP_get_var_id(compiler, op_assign_dist);
                             var_id_in1 = SPVM_OP_get_var_id(compiler, op_assign_src->first);
                             break;
@@ -2598,9 +2586,9 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                               var_id_out = SPVM_OP_get_var_id(compiler, op_dist_term);
                               var_id_in = SPVM_OP_get_var_id(compiler, op_src_term);
                             }
-                            // CHECK_INTERFACE_TYPE
+                            // CHECK_INTERFACE
                             else if (SPVM_TYPE_is_interface_type(compiler, dist_type->basic_type->id, dist_type->dimension, dist_type->flag)) {
-                              SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CHECK_INTERFACE_TYPE);
+                              SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_CHECK_INTERFACE);
                               var_id_out = SPVM_OP_get_var_id(compiler, op_dist_term);
                               var_id_in = SPVM_OP_get_var_id(compiler, op_src_term);
                             }

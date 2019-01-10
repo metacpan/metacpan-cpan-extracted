@@ -23,6 +23,7 @@ use_ok $_ for qw/
     WebService::Slack::WebApi::Groups
     WebService::Slack::WebApi::Search
     WebService::Slack::WebApi::Channels
+    WebService::Slack::WebApi::Conversations
 /;
 
 done_testing;

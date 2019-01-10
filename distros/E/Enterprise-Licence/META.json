@@ -1,0 +1,47 @@
+{
+   "abstract" : "The great new Enterprise::Licence!",
+   "author" : [
+      "LNATION <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Enterprise-Licence",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bijection" : "1.00",
+            "Compress::Huffman" : "0.08",
+            "DateTime" : "1.50",
+            "Math::BigInt" : "1.999816",
+            "Shannon::Entropy" : "1.101011",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

@@ -59,7 +59,7 @@ sub write_index {
     }
 
     #warn "Creating index at $fn_idx\n";
-    open my $idx, '>', $fn_idx or die "Error opening $fn_idx for writing: $!\n";
+    open my $idx, '>:raw', $fn_idx or die "Error opening $fn_idx for writing: $!\n";
 
     my $fh = $self->{fh};
 

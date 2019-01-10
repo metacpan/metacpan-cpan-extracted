@@ -1,10 +1,13 @@
 package OpenGL::Sandbox::V1::FTGLFont;
-BEGIN { $OpenGL::Sandbox::V1::FTGLFont::VERSION = '0.03'; }
 use Moo;
 use Cwd;
+use OpenGL::Sandbox::V1 0.04;
 use OpenGL::Sandbox::MMap;
 
 # ABSTRACT: Wrapper object for FTGL Fonts
+BEGIN {
+our $VERSION = '0.042'; # VERSION
+}
 
 
 has filename => ( is => 'ro' );
@@ -36,8 +39,13 @@ our %v_align_map= ( top => 4, center => 3, base => 2, bottom => 1 );
 
 
 sub render {
-	my ($self, $text)= (shift, shift);
-	$self->_ftgl_wrapper->render($text, @_ == 1 && ref $_[0] eq 'HASH'? %{$_[0]} : @_);
+	my $self= shift;
+	if (@_ == 2 && ref $_[1] eq 'HASH') {
+		my $opts= pop;
+		push @_, %$opts;
+	}
+	unshift @_, $self->_ftgl_wrapper;
+	goto $_[0]->can('render');
 }
 
 use OpenGL::Sandbox::V1::FTGLFont::Inline
@@ -60,7 +68,7 @@ OpenGL::Sandbox::V1::FTGLFont - Wrapper object for FTGL Fonts
 
 =head1 VERSION
 
-version 0.03
+version 0.042
 
 =head1 DESCRIPTION
 
@@ -95,7 +103,7 @@ object.
 
 =head2 filename
 
-The name this data was loaded from, for reference purposes only.
+The name this data was loaded from, for informational purposes only.
 
 =head2 face_size
 
@@ -185,7 +193,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Michael Conrad.
+This software is copyright (c) 2019 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

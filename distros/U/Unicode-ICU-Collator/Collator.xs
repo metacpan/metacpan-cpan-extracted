@@ -215,11 +215,21 @@ from_uchar(pTHX_ const UChar *src, int32_t len) {
 
 static UCollationResult
 ucol_cmp(pTHX_ UCollator *col, SV *sv1, SV *sv2) {
+  UCollationResult result;
+#if U_ICU_VERSION_MAJOR_NUM >= 50 && !defined(USE_ITERATORS)
+  const char *s1, *s2;
+  STRLEN len1, len2;
+  UErrorCode status = U_ZERO_ERROR;
+
+  s1 = SvPVutf8(sv1, len1);
+  s2 = SvPVutf8(sv2, len2);
+
+  result = ucol_strcollUTF8(col, s1, len1, s2, len2, &status);
+#else
   UCharIterator c1, c2;
   const char *s1, *s2;
   STRLEN len1, len2;
   UErrorCode status = U_ZERO_ERROR;
-  UCollationResult result;
 
   s1 = SvPV(sv1, len1);
   s2 = SvPV(sv2, len2);
@@ -232,6 +242,7 @@ ucol_cmp(pTHX_ UCollator *col, SV *sv1, SV *sv2) {
   else
     uiter_setByteString(&c2, s2, len2);
   result = ucol_strcollIter(col, &c1, &c2, &status);
+#endif
 
   if (!U_SUCCESS(status)) {
     croak("Error comparing: %d", (int)status);

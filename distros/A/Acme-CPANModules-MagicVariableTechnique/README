@@ -1,0 +1,85 @@
+NAME
+    Acme::CPANModules::MagicVariableTechnique - Modules which employ magic
+    variable technique to do stuffs
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::MagicVariableTechnique (from Perl distribution
+    Acme-CPANModules-MagicVariableTechnique), released on 2019-01-09.
+
+DESCRIPTION
+    Modules which employ magic variable technique to do stuffs.
+
+    This is a list of modules which provide some "magic" variable which you
+    can get/set to perform stuffs. I personally find this technique is
+    mostly useful to "temporarily set" stuffs, by combining it with Perl's
+    "local()".
+
+INCLUDED MODULES
+    *   File::chdir
+
+        Provides $CWD which you can use to change directory. By doing:
+
+         local $CWD = ...;
+
+        in a subroutine or block, you can safely change directory
+        temporarily without messing current directory and breaking code in
+        other parts. Very handy and convenient.
+
+        This is the first module I found/use where I realized the technique.
+        Since then I've been looking for other modules using similar
+        technique, and have even created a few myself.
+
+    *   File::umask
+
+        Provides $UMASK to get/set umask.
+
+    *   Umask::Local
+
+        Like File::umask, but instead of using a tied variable, uses an
+        object with its "DESTROY" method restoring original umask. I find
+        the interface a bit more awkward.
+
+        Alternate modules: File::umask
+
+    *   Locale::Tie
+
+        Provides $LANG, $LC_ALL, $LC_TIME, and few others to let you
+        (temporarily) set locale settings.
+
+    *   Locale::Scope
+
+        Like Locale::Tie, but instead of using a tied variable, uses an
+        object with its "DESTROY" method restoring original settings.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-MagicVariableTechnique>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-MagicVariableTechniq
+    ue>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Magi
+    cVariableTechnique>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

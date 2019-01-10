@@ -15,7 +15,7 @@ use XAO::Errors qw(XAO::Web);
 # XAO::Web version number. Hand changed with every release!
 #
 use vars qw($VERSION);
-$VERSION='1.74';
+$VERSION='1.75';
 
 ###############################################################################
 
@@ -591,8 +591,8 @@ sub process ($%) {
     else {
         if(defined($CGI::VERSION) && $CGI::VERSION>=2.80) {
             $active_url=$cgi->url(-base => 1, -full => 0);
-            my $pinfo=$ENV{PATH_INFO} || '';
-            my $uri=$ENV{REQUEST_URI} || '';
+            my $pinfo=$cgi->path_info || '';
+            my $uri=$cgi->request_uri || '';
             $uri=~s/^(.*?)\?.*$/$1/;
             if($pinfo =~ /^\/\Q$sitename\E(\/.+)?\Q$uri\E/) {
                 # mod_rewrite

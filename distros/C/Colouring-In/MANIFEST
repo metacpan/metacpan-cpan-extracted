@@ -5,6 +5,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+README.md
 t/00-load.t
 t/01-basics.t
 t/03-new-colours.t
@@ -14,6 +15,8 @@ t/06-fade.t
 t/07-white-black.t
 t/08-fadeout.t
 t/09-fadein.t
+t/10-tools.t
+t/11-rest.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

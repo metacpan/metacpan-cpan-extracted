@@ -72,7 +72,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "4.049",
+   "version" : "4.050",
    "x_contributors" : [
       "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>",
       "Alexandr Ciornii <alexchorny@gmail.com>",

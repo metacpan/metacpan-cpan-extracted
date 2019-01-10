@@ -18,6 +18,7 @@ t/filter.t
 t/filter_me.t
 t/filter_strict.t
 t/filter_utils.t
+t/flatten_filter.t
 t/mix.t
 t/mix_strict.t
 t/orderby.t

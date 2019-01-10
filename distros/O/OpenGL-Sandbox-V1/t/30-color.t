@@ -7,8 +7,8 @@ use Time::HiRes 'sleep';
 use Test::More;
 use Try::Tiny;
 use Log::Any::Adapter 'TAP';
-use OpenGL::Sandbox qw/ make_context get_gl_errors /;
-use OpenGL::Sandbox::V1 'color_parts';
+BEGIN { $OpenGL::Sandbox::V1::VERSION= $ENV{ASSUME_V1_VERSION} } # for testing before release
+use OpenGL::Sandbox qw/ make_context get_gl_errors -V1 color_parts /;
 
 is_deeply( [ color_parts([ .25, .5, .75, 1 ]) ], [ .25, .5, .75, 1 ], 'read array' );
 is_deeply( [ color_parts(.75, .5, .25, .5) ], [ .75, .5, .25, .5 ], 'read list' );

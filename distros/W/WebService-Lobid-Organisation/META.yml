@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,18 +18,16 @@ name: WebService-Lobid-Organisation
 provides:
   WebService::Lobid:
     file: lib/WebService/Lobid.pm
-    version: '0.0031'
+    version: '0.0041'
   WebService::Lobid::Organisation:
     file: lib/WebService/Lobid/Organisation.pm
-    version: '0.0031'
+    version: '0.0041'
 requires:
-  Email::Address: '1.908'
   HTTP::Tiny: '0.070'
   JSON: '2.90'
   Log::Any: '1.032'
   Moo: '2.000002'
   Try::Tiny: '0.22'
-  URI: '1.71'
   perl: v5.10.0
   strict: '0'
   version: '0'
@@ -38,5 +36,6 @@ resources:
   bugtracker: https://github.com/hatorikibble/webservice-lobid-organisations/issues
   homepage: https://github.com/hatorikibble/webservice-lobid-organisations
   repository: https://github.com/hatorikibble/webservice-lobid-organisations.git
-version: '0.0031'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.0041'
+x_generated_by_perl: v5.20.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

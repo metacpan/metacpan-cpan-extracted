@@ -1,22 +1,30 @@
 Revision history for Perl extension Dancer::Plugin::TimeoutManager.
+0.10 Tue Jan 08 12:21:00 2019 
+    - add max_timeout config variable and DISABLE_DANCER_TIMEOUT environment variable
+
+0.09 Mon Jan 12 11:15:00 2015
+    - improve code management of variable $timeout
+
+0.08 Tue Jan 8 14:35:00 2015
+    - use try tiny instead of eval in code
 
 0.07 Thu Jan 5 12:35:00 2015
-        - Update Changes
+    - Update Changes
 
 0.06 Thu Jan 5 12:35:00 2015
-        - Add missing dependencie
+    - Add missing dependencie
 
 0.05 Fri Dec 19 12:00:00
-        - Manage version number
+    - Manage version number
 
 0.04 Thu Dec 18 12:00:00
-        - Update documentation
+    - Update documentation
 
 0.03 Thu Dec 16 14:00:00 2015
-        - Manage empty timeout and manage header X-Dancer-Timeout
+    - Manage empty timeout and manage header X-Dancer-Timeout
 
 0.02  Mon Dec 15 17:05:00 2014
-	-  when timeout is set to 0, the behavior is exactly the same that without timeout
+    -  when timeout is set to 0, the behavior is exactly the same that without timeout
 
 0.01  Thu Dec 11 14:38:37 2014
-	- First version of Dancer::Plugin::TimeoutManager
+    - First version of Dancer::Plugin::TimeoutManager

@@ -18,7 +18,6 @@ examples/benchmarking/benchmark-coercions.pl
 examples/benchmarking/benchmark-constraints.pl
 examples/benchmarking/benchmark-named-param-validation.pl
 examples/benchmarking/benchmark-param-validation.pl
-examples/benchmarking/formvalidatorlite.pl
 examples/benchmarking/versus-scalar-validation.pl
 examples/datetime-coercions.pl
 examples/nonempty.pl

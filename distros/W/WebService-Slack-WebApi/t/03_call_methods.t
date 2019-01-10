@@ -78,6 +78,84 @@ my %tests = (
             channel => 'hoge',
         },
     },
+    conversations => {
+        archive => {
+            channel => 'hoge',
+        },
+        close => {
+            channel => 'hoge',
+        },
+        create => {
+            name       => 'hoge',
+            is_private => 1,
+            user_ids   => 'D32U5321',
+        },
+        history => {
+            channel   => 'hoge',
+            cursor    => 'dXNlcjpVMDYxTkZUVDI=',
+            inclusive => 1,
+            latest    => '1234567890.123456',
+            oldest    => '1234567890.123456',
+        },
+        info => {
+            channel        => 'hoge',
+            include_locale => '1',
+        },
+        invite => {
+            channel => 'hoge',
+            user    => 'hoge',
+        },
+        join => {
+            name     => 'hoge',
+        },
+        kick => {
+            channel => 'hoge',
+            user    => 'hoge',
+        },
+        leave => {
+            channel => 'hoge',
+        },
+        list => {
+            cursor           => 'dXNlcjpVMDYxTkZUVDI=',
+            exclude_archived => 1,
+            limit            => 20,
+            types            => 'public_channel,private_channel' 
+        },
+        members => {
+            channel => 'hoge',
+            cursor  => 'dXNlcjpVMDYxTkZUVDI=',
+            types   => 'public_channel,private_channel' 
+        },
+        open => {
+            channel => 'hoge',
+            return_im => 1,
+            users => 1,
+        },
+        rename => {
+            channel => 'hoge',
+            name    => 'hoge',
+        },
+        replies => {
+            channel   => 'hoge',
+            ts        => '1234567890.123456',
+            cursor    => 'dXNlcjpVMDYxTkZUVDI=',
+            inclusive => 1,
+            latest    => '1234567890.123456',
+            limit     => 100,
+            oldest    => '1234567890.123456',
+        },
+        set_purpose => {
+            channel => 'hoge',
+            purpose => 'hoge',
+        },
+        set_topic => {
+            channel => 'hoge',
+            topic   => 'hoge',
+        },
+        unarchive => {
+            channel => 'hoge',
+        },
+    },
     chat => {
         delete => {
             channel => 'hoge',
@@ -424,6 +502,19 @@ my %tests = (
         set_active => +{},
         set_presence => {
             presence => 'hoge',
+        },
+    },
+    dnd => {
+        endDnd => +{},
+        endSnooze => +{},
+        info => {
+            user => 'hoge',
+        },
+        setSnooze => {
+            num_minutes => '60',
+        },
+        teamInfo => {
+            users => 'hoge,fugo',
         },
     },
 );

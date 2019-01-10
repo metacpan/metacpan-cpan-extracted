@@ -1,7 +1,7 @@
 package Log::Any::IfLOG;
 
-our $DATE = '2016-06-16'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2019-01-09'; # DATE
+our $VERSION = '0.090'; # VERSION
 
 our $DEBUG;
 our $ENABLE_LOG;
@@ -75,7 +75,7 @@ Log::Any::IfLOG - Load Log::Any only if "logging is enabled"
 
 =head1 VERSION
 
-This document describes version 0.08 of Log::Any::IfLOG (from Perl distribution Log-Any-IfLOG), released on 2016-06-16.
+This document describes version 0.090 of Log::Any::IfLOG (from Perl distribution Log-Any-IfLOG), released on 2019-01-09.
 
 =head1 SYNOPSIS
 
@@ -171,7 +171,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

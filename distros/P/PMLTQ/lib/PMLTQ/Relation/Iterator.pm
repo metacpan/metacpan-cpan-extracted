@@ -1,6 +1,6 @@
 package PMLTQ::Relation::Iterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::Iterator::VERSION = '1.5.0';
+$PMLTQ::Relation::Iterator::VERSION = '2.0.2';
 # ABSTRACT: Base Iterator class
 
 use 5.006;
@@ -47,7 +47,7 @@ PMLTQ::Relation::Iterator - Base Iterator class
 
 =head1 VERSION
 
-version 1.5.0
+version 2.0.2
 
 =head1 AUTHORS
 

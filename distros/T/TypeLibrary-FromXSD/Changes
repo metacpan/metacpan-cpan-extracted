@@ -1,6 +1,12 @@
 Change history for TypeLibrary::FromXSD
 =======================================
 
+0.04 2019-01-10 12:30:00
+
+     + updated dist.ini
+     + added travis config
+     + more tests
+
 0.03 2014-01-03T11:47:13
 
      + added MetaResource in dist.ini

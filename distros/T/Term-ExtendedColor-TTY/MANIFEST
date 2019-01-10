@@ -8,4 +8,5 @@ t/02-pod-coverage.t
 t/021-synopsis.t
 t/03-set_tty_color.t
 t/04-get_colorscheme.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

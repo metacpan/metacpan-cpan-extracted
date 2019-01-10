@@ -1,0 +1,114 @@
+=head1 NAME
+
+MySQL::Util::Lite::Table
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 columns
+
+=cut
+
+=head3 name
+
+=cut
+
+=head3 schema_name
+
+=cut
+
+
+=head1 METHODS
+
+=head2 get_alternate_keys
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_autoinc_column
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_column
+
+
+=head3 parameters
+
+  Str :$name
+
+=cut
+
+=head2 get_columns
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_foreign_keys
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_fq_name
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_parent_tables
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 get_primary_key
+
+
+=head3 parameters
+
+none
+
+=cut
+
+=head2 has_parents
+
+
+=head3 parameters
+
+none
+
+=cut
+

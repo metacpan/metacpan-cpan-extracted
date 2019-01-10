@@ -7,12 +7,12 @@ use warnings;
 use utf8;
 use Time::HiRes qw(gettimeofday);
 use Scalar::Util qw(reftype);
-use CGI qw(-utf8);
+use CGI qw();
 use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.88';
+our $VERSION = '1.92';
 
 =encoding utf8
 
@@ -207,9 +207,9 @@ this will enable you to discard I<second> leaf value and append to it whatever d
 =head1 DESCRIPTION
 
 The purpose of JSONP is to give an easy and fast way to build JSON-only web services that can be used even from a different domain from which one they are hosted on. It is supplied only the object interface: this module does not export any symbol, apart the optional pointer to its own instance in the CGI environment (not possible in mod_perl environment).
-Once you have the instance of JSONP, you can build a response hash tree, containing whatever data structure, that will be automatically sent back as JSON object to the calling page. The built-in automatic cookie session keeping uses a secure SHA256 to build the session key. The related cookie is HttpOnly, Secure (only SSL) and with path set way down the one of current script (keep the authentication script in the root of your scripts path to share session among all scripts). For high trusted intranet environments a method to disable the Secure flag has been supplied. The automatically built cookie key will be long exactly 64 chars (hex format). 
+Once you have the instance of JSONP, you can build a response hash tree, containing whatever data structure, that will be automatically sent back as JSON object to the calling page. The built-in automatic cookie session keeping uses a secure SHA256 to build the session key. The related cookie is HttpOnly, Secure (only SSL) and with path set way down the one of current script (keep the authentication script in the root of your scripts path to share session among all scripts). For high trusted intranet environments a method to disable the Secure flag has been supplied. The automatically built cookie key will be long exactly 64 chars (hex format).
 You can retrieve parameters supplied from browser either via GET, POST, PUT, or DELETE by accessing the reserved I<params> key of JSONP object. For example the value of a parameter named I<test> will be accessed via $j->params->test. In case of POSTs or PUTs of application/json requests (JSONP application/javascript requests are always loaded as GETs) the JSONP module will transparently detect them and populate the I<params> key with the deserialization of posted JSON, note that in this case the JSON being P(OS|U)Ted must be an object and not an array, having a I<req> param key on the first level of the structure in order to point out the corresponding function to be invoked.
-You have to provide the string name or sub ref (the module accepts either way) of your own I<aaa> and I<login> functions. The AAA (aaa) function will get called upon every request with the session key (retrieved from session cookie or newly created for brand new sessions) as argument. That way you will be free to implement routines for authentication, authorization, access, and session tracking that most suit your needs, together with rules for user/groups to access the methods you expose. Your AAA function must return the session string (if you previously saved it, read on) if a valid session exists under the given key. A return value evaluated as false by perl will result in a 'forbidden' response (you can add as much errors as you want in the I<errors> array of response object). B<Be sure you return a false value if the user is not authenticated!> otherwise you will give access to all users. If you want you can check the invoked method under the req parameter (see query method) in order to implement your own access policies. The AAA function will be called a second time just before the response to client will be sent out, with the session key as first argument, and a serialized string of the B<session> branch as second (as you would have modified it inside your called function). This way if your AAA function gets called with only one paramenter it is the begin of the request cycle, and you have to retrieve and check the session saved in your storage of chose (memcached, database, whatever), if it gets called with two arguments you can save the updated session object (already serialized as UTF-8 JSON) to the storage under the given key. The B<session> key of JSONP object will be reserved for session tracking, everything you will save in that branch will be passed serialized to your AAA function right before the response to client. It will be also populated after the serialized string you will return from your AAA function at the beginning of the request cycle. The login function will get called with the current session key (from cookie or newly created) as parameter, you can retrieve the username and password passed by the query method, as all other parameters. This way you will be free to give whatever name you like to those two parameters. Return the outcome of login attempt in order to pass back to login javascript call the state of authentication. Whatever value that evaluates to true will be seen as "authentication ok", whatever value that Perl evaluates to false will be seen as "authentication failed". Subsequent calls (after authentication) will track the authentication status by mean of the session string you return from AAA function.
+You have to provide the string name or sub ref (the module accepts either way) of your own I<aaa> and I<login> functions. The AAA (aaa) function will get called upon every request with the session key (retrieved from session cookie or newly created for brand new sessions) as argument. That way you will be free to implement routines for authentication, authorization, access, and session tracking that most suit your needs, together with rules for user/groups to access the methods you expose. Your AAA function must return the session string (if you previously saved it, read on) if a valid session exists under the given key. A return value evaluated as false by perl will result in a 'forbidden' response (you can add as much errors as you want in the I<errors> array of response object). B<Be sure you return a false value if the user is not authenticated!> otherwise you will give access to all users. If you want you can check the invoked method under the req parameter (see query method) in order to implement your own access policies. B<If> the request has been B<a POST or PUT> (B<but not a GET>)The AAA function will be called a second time just before the response to client will be sent out, the module checks for changes in session by concurrent requests that would have executed in meanwhile, and merges their changes with current one by a smart recursive data structure merge routine. Then it will call the AAA function again with the session key as first argument, and a serialized string of the B<session> branch as second (as you would have modified it inside your called function). This way if your AAA function gets called with only one paramenter it is the begin of the request cycle, and you have to retrieve and check the session saved in your storage of chose (memcached, database, whatever), if it gets called with two arguments you can save the updated session object (already serialized as UTF-8 JSON) to the storage under the given key. The B<session> key of JSONP object will be reserved for session tracking, everything you will save in that branch will be passed serialized to your AAA function right before the response to client. It will be also populated after the serialized string you will return from your AAA function at the beginning of the request cycle. The login function will get called with the current session key (from cookie or newly created) as parameter, you can retrieve the username and password passed by the query method, as all other parameters. This way you will be free to give whatever name you like to those two parameters. Return the outcome of login attempt in order to pass back to login javascript call the state of authentication. Whatever value that evaluates to true will be seen as "authentication ok", whatever value that Perl evaluates to false will be seen as "authentication failed". Subsequent calls (after authentication) will track the authentication status by mean of the session string you return from AAA function.
 If you need to add a method/call/feature to your application you have only to add a sub with same name you will pass under I<req> parameter from frontend.
 
 =head2 METHODS
@@ -246,6 +246,22 @@ sub new
 executes the subroutine specified by req paramenter, if it exists, and returns the JSON output object to the calling browser. This have to be the last method called from JSONP object, because it will call the requested function and return the set object as JSON one.
 
 =cut
+
+sub _auth
+{
+	my ($self, $sid, $session) = @_;
+	my $authenticated = eval {
+			$self->{_aaa_sub}->($sid, $session);
+	};
+
+	if($@){
+		$self->{eval} = $@ if $self->{_debug};
+		$self->raiseError('unclassified error');
+		$authenticated = 0;
+	}
+
+	$authenticated;
+}
 
 sub run
 {
@@ -287,7 +303,7 @@ sub run
 		$self->params = \%params;
 	}
 
-	unless(reftype $self->params eq 'HASH'){
+	unless((reftype $self->params // '') eq 'HASH'){
 		$self->params = {};
 		$self->raiseError('invalid input JSON type (array)');
 	}
@@ -304,7 +320,7 @@ sub run
 	my $sid = $r->cookie('sid');
 
 	my $map = caller() . '::' . $req;
-	my $session = $self->{_aaa_sub}->($sid);
+	my $session = $self->_auth($sid);
 	$self->{_authenticated} = ! ! $session;
 	if($self->{_authenticated}){
 		$self->session = {} unless $self->graft('session', $session);
@@ -342,11 +358,29 @@ sub run
 			my $outcome = &$map($sid);
 			$self->{_authenticated} = $outcome if $isloginsub;
 		};
+
 		if($@){
 			$self->{eval} = $@ if $self->{_debug};
 			$self->raiseError('unclassified error');
 		}
-		$self->{_aaa_sub}->($sid, $self->session->serialize) if $self->{_authenticated};
+
+		# save back the session only during responses to PUT and POST HTTP methods
+		if($self->{_authenticated} && ($method eq 'POST' || $method eq 'PUT')){
+			# get session last changes made by concurrent requests
+			# and merge them with current session right before to
+			# pass it back to aaa sub that will save it to storage
+			# note that current session keys/values will override
+			# concurrent ones, see _merge function for details
+			my $concurrentSession = $self->_auth($sid);
+			my $thisSession = $self->session->serialize;
+			$self->graft('thisSession', $thisSession);
+			delete $self->{session};
+			$self->graft('session', $concurrentSession);
+			$self->_merge($self->session, $self->thisSession);
+			delete $self->{thisSession};
+			$self->_auth($sid, $self->session->serialize);
+		}
+
 	} elsif (! $req) {
 		$self->raiseError('invalid request');
 	} else {
@@ -355,7 +389,7 @@ sub run
 
 	# give a nice JSON "true"/"false" output for authentication
 	$self->authenticated = $self->{_authenticated} ? \1 : \0;
-
+	$header->{'-status'} = $self->{_status_code} || 200;
 	my $callback;
 	unless($self->{_passthrough}){
 		$callback = $self->params->callback if $self->{_request_method} eq 'GET';
@@ -383,16 +417,55 @@ sub run
 			}
 			print $r->header($header);
 			print $self->_slurp($self->{_sendfile});
+			unlink $self->{_sendfile} if $self->{_delete_after_download}
 		}
 	}
+
+	if($self->{_mod_perl}){
+		my $rh = $r->r;
+		# suppress default Apache response
+		$rh->custom_response($self->{_status_code}, '');
+		$rh->rflush;
+	}
+
 	$self;
 }
 
-sub _slurp{
+sub _slurp
+{
 	my ($self, $filename) = @_;
 	open my $fh, '<', $filename;
 	local $/;
 	<$fh>;
+}
+
+sub _merge
+{
+	# merge $_[2] into $_[1]
+	# you must use params directly to make changes
+	# directly on referenced objects, otherwise
+	# perl will work on local copies of them
+
+	unless((reftype $_[1] // '') eq 'HASH'){
+		$_[1] = $_[2];
+		return;
+	} # if $_[0] points to a scalar or array, $_[1] will prevail
+
+	unless(scalar keys %{$_[1]}){
+		$_[1] = $_[2];
+		return;
+	} # if $_[0] is an empty hash, $_[1] will prevail
+
+	my @keys = keys %{$_[1]};
+	push @keys, keys %{$_[2]};
+	my $resultOK = 1;
+	for(@keys){
+		if((reftype $_[1]->{$_} // '') ne 'HASH' || (reftype $_[2]->{$_} // '') ne 'HASH'){
+			$_[1]->{$_} = defined $_[2]->{$_} ? $_[2]->{$_} : $_[1]->{$_};
+			next;
+		}
+		$_[0]->_merge($_[1]->{$_}, $_[2]->{$_});
+	}
 }
 
 =head3 html
@@ -417,40 +490,42 @@ sub html
 
 =head3 sendfile
 
-use this method if you need to return a file instead of JSON, pass the full file path as as argument. MIME type will be set always to I<application/octet-stream>.
+use this method if you need to return a file instead of JSON, pass the full file path as as argument. MIME type will be set always to I<application/octet-stream>. The last parameter is evaluated as boolean and if true will make JSONP to delete the passed file after it has been downloaded.
 
 	yoursubname
 	{
 		...
-		$j->sendfile($fullfilepath);
+		$j->sendfile($fullfilepath, $isTmpFileToDelete);
 	}
 
 =cut
 
 sub sendfile
 {
-	my ($self, $filepath) = @_;
+	my ($self, $filepath, $isTmpFileToDelete) = @_;
 	$self->{_passthrough} = 1;
 	$self->{_mimetype} = 'application/octet-stream';
 	$self->{_sendfile} = $filepath;
+	$self->{_delete_after_download} = ! ! $isTmpFileToDelete;
 	$self;
 }
 
 =head3 file
 
-call this method to send a file with custom MIME type and/or if you want to set it as inline.
+call this method to send a file with custom MIME type and/or if you want to set it as inline. The last parameter is evaluated as boolean and if true will make JSONP to delete the passed file after it has been downloaded.
 
-	$j->file('path to file', $mimetype, $isInline);
+	$j->file('path to file', $mimetype, $isInline, $isTmpFileToDelete);
 
 =cut
 
 sub file
 {
-	my ($self, $filepath, $mime, $inline) = @_;
+	my ($self, $filepath, $mime, $inline, $isTmpFileToDelete) = @_;
 	$self->{_passthrough} = 1;
 	$self->{_mimetype} = $mime;
 	$self->{_sendfile} = $filepath;
-	$self->{_inline} = $inline;
+	$self->{_inline} = ! ! $inline;
+	$self->{_delete_after_download} = ! ! $isTmpFileToDelete;
 	$self;
 }
 
@@ -640,22 +715,22 @@ sub logout
 
 =head3 raiseError
 
-call this method in order to return an error message to the calling page. You can add as much messages you want, calling the method several times, it will be returned an array of messages to the calling page.
+call this method in order to return an error message to the calling page. You can add as much messages you want, calling the method several times, it will be returned an array of messages to the calling page. The first argument could be either a string or a <B strings array reference>. The second argument is an optional HTTP status code, the default will be 200.
 
 =cut
 
 sub raiseError
 {
-	my ($self, $message) = @_;
+	my ($self, $message, $code) = @_;
 	$self->error = \1;
-	push @{$self->{errors}}, $message;
+	push @{$self->{errors}}, (reftype $message // '') eq 'ARRAY' ? @$message : $message;
+	$self->{_status_code} = $code if defined $code;
 	$self;
 }
 
 =head3 graft
 
 call this method to append a JSON object as a perl subtree on a node. This is a native method, only function notation is supported, lvalue assignment notation is reserved to autovivification shortcut feature. Examples:
-
 	$j->subtree->graft('newbranchname', '{"name" : "JSON object", "count" : 2}');
 	print $j->subtree->newbranchname->name; # will print "JSON object"
 	$j->sublist->graft->('newbranchname', '[{"name" : "first one"}, {"name" : "second one"}]');
@@ -702,7 +777,7 @@ sub stack
 {
 	my ($self, $json) = @_;
 
-	return 0 unless reftype $self eq 'ARRAY';
+	return 0 unless (reftype $self // '') eq 'ARRAY';
 
 	eval{
 		push @$self, JSON->new->allow_nonref->decode($json // '');
@@ -737,7 +812,7 @@ sub append
 {
 	my ($self, $el) = @_;
 
-	return 0 unless reftype $self eq 'ARRAY';
+	return 0 unless (reftype $self // '') eq 'ARRAY';
 
 	eval{
 		push @$self, $el;
@@ -771,7 +846,7 @@ sub serialize
 {
 	my ($self) = @_;
 	my $out;
-	my $pretty = reftype $self eq 'HASH' && $self->{_pretty} ? 1 : 0;
+	my $pretty = (reftype $self // '') eq 'HASH' && $self->{_pretty} ? 1 : 0;
 	eval{
 		$out = JSON->new->pretty($pretty)->allow_nonref->allow_unknown->allow_blessed->convert_blessed->encode($self);
 	} || $@;
@@ -797,7 +872,7 @@ sub TO_JSON
 	my $self = shift;
 	my $output;
 
-	return [@$self] if reftype $self eq 'ARRAY';
+	return [@$self] if (reftype $self // '') eq 'ARRAY';
 
 	$output = {};
 	for(keys %$self){
@@ -876,7 +951,7 @@ This library is free software and is distributed under same terms as Perl itself
 
 =head1 COPYRIGHT
 
-Copyright 2014-2017 by Anselmo Canfora.
+Copyright 2014-2019 by Anselmo Canfora.
 
 =cut
 

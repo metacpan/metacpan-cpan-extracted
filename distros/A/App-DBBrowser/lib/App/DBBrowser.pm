@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.040';
+our $VERSION = '2.041';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -40,7 +40,7 @@ sub new {
     my ( $class ) = @_;
     my $info = {
         lyt_m         => { undef => '<<'                                                                 },
-        lyt_3         => { undef => '  BACK', layout => 3,                      clear_screen => 1        },
+        lyt_v_clear   => { undef => '  BACK', layout => 3,                      clear_screen => 1        },
         lyt_stmt_h    => { undef => '<<',     layout => 1, prompt => 'Choose:', order => 0, justify => 2 },
         lyt_stmt_v    => { undef => '  BACK', layout => 3, prompt => 'Choose:'                           },
         quit          => 'QUIT',
@@ -51,10 +51,6 @@ sub new {
         _confirm      => '  CONFIRM',
         _reset        => '  RESET',
         ok            => '-OK-',
-        back_s        => '<<',
-        back_v_no_ok  => '  <=',
-        clear_screen  => "\e[H\e[J", #
-        stmt_init_tab => 4,
     };
     return bless { i => $info }, $class;
 }
@@ -136,7 +132,7 @@ sub __init {
 sub run {
     my ( $sf ) = @_;
     $sf->__init();
-    my $lyt_3 = Term::Choose->new( $sf->{i}{lyt_3} );
+    my $lyt_v_clear = Term::Choose->new( $sf->{i}{lyt_v_clear} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $auto_one = 0;
 
@@ -226,7 +222,7 @@ sub run {
                 my $choices_db = [ undef, @databases ];
                 # Choose
                 $ENV{TC_RESET_AUTO_UP} = 0;
-                my $idx_db = $lyt_3->choose(
+                my $idx_db = $lyt_v_clear->choose(
                     $choices_db,
                     { prompt => $prompt, index => 1, default => $old_idx_db, undef => $back }
                 );
@@ -257,7 +253,7 @@ sub run {
             if ( ! eval {
                 $dbh = $plui->get_db_handle( $db, $odb->connect_parameter( $db_opt, $db) );
                 #$sf->{i}{quote_char} = $dbh->get_info(29)  || '"', # SQL_IDENTIFIER_QUOTE_CHAR
-                $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR
+                $sf->{i}{sep_char}   = $dbh->get_info(41)  || '.'; # SQL_CATALOG_NAME_SEPARATOR # name
                 1 }
             ) {
                 $ax->print_error_message( $@, 'Get database handle' );
@@ -297,6 +293,7 @@ sub run {
                 $sf->{o}{G}{qualified_table_name} = delete $sf->{backup_qtn};
             }
             $sf->{i}{stmt_history} = [];
+            $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
 
             # SCHEMAS
 
@@ -333,7 +330,7 @@ sub run {
                     my $choices_schema = [ undef, @schemas ];
                     # Choose
                     $ENV{TC_RESET_AUTO_UP} = 0;
-                    my $idx_sch = $lyt_3->choose(
+                    my $idx_sch = $lyt_v_clear->choose(
                         $choices_schema,
                         { prompt => $prompt, index => 1, default => $old_idx_sch, undef => $back }
                     );
@@ -367,9 +364,11 @@ sub run {
 
                 # TABLES
 
-                my ( $tables_info, $user_tables, $sys_tables );
+                my $tables_info;
                 if ( ! eval {
-                    ( $tables_info, $user_tables, $sys_tables ) = $ax->tables_data( $schema, $sf->{db_attached} );
+                    # if a SQLite database has databases attached, set $schema to undef so 'table_info' in 'tables_data'
+                    # returns also the tables from the attached databases
+                    $tables_info = $plui->tables_data( $dbh, $sf->{db_attached} ? undef : $schema );
                     1 }
                 ) {
                     $ax->print_error_message( $@, 'Get table names' );
@@ -379,6 +378,22 @@ sub run {
                     next DB_PLUGIN if @{$sf->{o}{G}{plugins}} > 1;
                     last DB_PLUGIN;
                 }
+                my ( $user_tables, $sys_tables );
+                for my $table ( keys %$tables_info ) {
+                    if ( $tables_info->{$table}[3] =~ /SYSTEM/ ) {
+                        push @$sys_tables, $table;
+                    }
+                    else {
+                        push @$user_tables, $table;
+                    }
+                }
+                #if ( $sf->{backup_qtn} ) {
+                #    for my $table ( @user_tables ) {
+                #        my $tmp = delete $tables_info->{$table};
+                #        $table = '['. $tmp->[1] . ']' . $tmp->[2];
+                #        $tables_info->{$table} = $tmp;
+                #    }
+                #}
                 $sf->{d}{tables_info} = $tables_info;
                 $sf->{d}{user_tables} = $user_tables;
                 $sf->{d}{sys_tables}  = $sys_tables;
@@ -401,7 +416,7 @@ sub run {
                         my $back = $auto_one == 3 ? $sf->{i}{_quit} : $sf->{i}{_back};
                         # Choose
                         $ENV{TC_RESET_AUTO_UP} = 0;
-                        my $idx_tbl = $lyt_3->choose(
+                        my $idx_tbl = $lyt_v_clear->choose(
                             $choices_table,
                             { prompt => '', index => 1, default => $old_idx_tbl, undef => $back }
                         );
@@ -445,7 +460,7 @@ sub run {
                         next TABLE;
                     }
                     if ( $table eq $hidden ) {
-                        $sf->__create_drop_attach( $lyt_3, $table );
+                        $sf->__create_drop_attach( $lyt_v_clear, $table );
                         if ( $sf->{redo_db} ) {
                             $dbh->disconnect();
                             next DATABASE;
@@ -459,7 +474,7 @@ sub run {
                     if ( $table eq $join ) {
                         require App::DBBrowser::Join;
                         my $new_j = App::DBBrowser::Join->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $sf->{i}{multi_tbl} = 'join';
+                        $sf->{i}{special_table} = 'join';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $new_j->join_tables(); 1 } ) {
                             $ax->print_error_message( $@, 'Join tables' );
                             next TABLE;
@@ -469,7 +484,7 @@ sub run {
                     elsif ( $table eq $union ) {
                         require App::DBBrowser::Union;
                         my $new_u = App::DBBrowser::Union->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        $sf->{i}{multi_tbl} = 'union';
+                        $sf->{i}{special_table} = 'union';
                         if ( ! eval { ( $qt_table, $qt_columns ) = $new_u->union_tables(); 1 } ) {
                             $ax->print_error_message( $@, 'Union tables' );
                             next TABLE;
@@ -477,35 +492,15 @@ sub run {
                         next TABLE if ! defined $qt_table;
                     }
                     elsif ( $table eq $from_subquery ) {
-                        $sf->{i}{multi_tbl} = 'subquery'; ##
-                        my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        require App::DBBrowser::Subqueries;
-                        my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-                        my $tmp = { table => '(SQ)' };
-                        $ax->reset_sql( $tmp );
-                        my $subquery = $sq->choose_subquery( $tmp, 'Select', 'from' );
-                        if ( ! defined $subquery ) {
+                        $sf->{i}{special_table} = 'subquery'; ##
+                        if ( ! eval { ( $qt_table, $qt_columns ) = $sf->__derived_table(); 1 } ) {
+                            $ax->print_error_message( $@, 'Derived table' );
                             next TABLE;
                         }
-                        $qt_table = "(" . $subquery . ")"; ###
-                        $tmp->{table} = $qt_table;
-                        $ax->print_sql( $tmp, [ 'Select' ] );
-                        my $alias = $ax->alias( 'subqueries', 'AS: ', 'From_SQ' ); ##
-                        if ( defined $alias && length $alias ) {
-                            $qt_table .= " AS " . $alias;
-                        }
-                        if ( ! eval {
-                            my $sth = $dbh->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
-                            $sth->execute() if $driver ne 'SQLite';
-                            $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
-                            1 }
-                        ) {
-                            $ax->print_error_message( $@, 'Subquery table' );
-                            next TABLE;
-                        }
+                        next TABLE if ! defined $qt_table;
                     }
                     else {
-                        $sf->{i}{multi_tbl} = '';
+                        $sf->{i}{special_table} = '';
                         if ( ! eval {
                             $table =~ s/^[-\ ]\s//;
                             $sf->{d}{table} = $table;
@@ -521,13 +516,7 @@ sub run {
                             next TABLE;
                         }
                     }
-                    #if ( ! eval {
                     $sf->__browse_the_table( $qt_table, $qt_columns );
-                    #    1 }
-                    #) {
-                    #    $ax->print_error_message( $@, 'Browse table' );
-                    #    next TABLE;
-                    #}
                 }
             }
         }
@@ -565,7 +554,7 @@ sub __browse_the_table {
 
 
 sub __create_drop_attach {
-    my ( $sf, $lyt_3, $table ) = @_;
+    my ( $sf, $lyt_v_clear, $table ) = @_;
     my $old_idx = exists $sf->{old_idx_hidden} ? delete $sf->{old_idx_hidden} : 0;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
 
@@ -586,9 +575,9 @@ sub __create_drop_attach {
         my @pre = ( undef );
         # Choose
         $ENV{TC_RESET_AUTO_UP} = 0;
-        my $idx = $lyt_3->choose(
+        my $idx = $lyt_v_clear->choose(
             [ @pre, @choices ],
-            { prompt => $sf->{d}{db_string}, index => 1, default => $old_idx, undef => $sf->{i}{_back} }
+            { prompt => $sf->{d}{db_string}, index => 1, default => $old_idx, undef => '  <=' }
         );
         if ( ! $idx ) {
             return;
@@ -608,11 +597,6 @@ sub __create_drop_attach {
         if ( $choice eq $create_table || $choice eq $drop_table ) {
             require App::DBBrowser::CreateTable;
             my $ct = App::DBBrowser::CreateTable->new( $sf->{i}, $sf->{o}, $sf->{d} );
-            #if ( $sf->{d}{driver} eq 'SQLite' ) {
-            #    $sf->{d}{dbh}->disconnect();
-            #    $dbh = $plui->get_db_handle( $sf->{d}{db}, $odb->connect_parameter( $db_opt, $sf->{d}{db} ) );
-            #    $sf->{d}{dbh} = $dbh; # new $dbh
-            #}
             my $changed;
             if ( $choice eq $create_table ) {
                 if ( ! eval { $changed = $ct->create_new_table(); 1 } ) {
@@ -667,6 +651,34 @@ sub __create_drop_attach {
 }
 
 
+sub __derived_table {
+    my ( $sf ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    require App::DBBrowser::Subqueries;
+    my $sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $tmp = { table => '(SQ)' };
+    $ax->reset_sql( $tmp );
+    my $subquery = $sq->choose_subquery( $tmp, 'Select', 'from' );
+    if ( ! defined $subquery ) {
+        return;
+    }
+    my $qt_table = "(" . $subquery . ")"; ###
+    $tmp->{table} = $qt_table;
+    $ax->print_sql( $tmp, [ 'Select' ] );
+    my $alias = $ax->alias( 'subqueries', 'AS: ', 'From_SQ' ); ##
+    if ( defined $alias && length $alias ) {
+        $qt_table .= " AS " . $alias;
+    }
+    my $sth = $sf->{d}{dbh}->prepare( "SELECT * FROM " . $qt_table . " LIMIT 0" );
+    $sth->execute() if $sf->{d}{driver} ne 'SQLite';
+    my $qt_columns = $ax->quote_simple_many( $sth->{NAME} );
+    return $qt_table, $qt_columns;
+}
+
+
+
+
+
 1;
 
 
@@ -682,7 +694,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.040
+Version 2.041
 
 =head1 DESCRIPTION
 

@@ -15,6 +15,9 @@ helper sqlite => sub {
 };
 app->sqlite->auto_migrate(1)->migrations->from_data;
 
+# Login sessions expire after one week
+app->sessions->default_expiration( 60 * 60 * 24 * 7 );
+
 if ( my $path = $ENV{MOJO_REVERSE_PROXY} ) {
     my @parts = grep { $_ } split m{/}, $path;
     app->hook( before_dispatch => sub {
@@ -135,7 +138,7 @@ helper ensure_log_item_exists => sub {
 
 helper build_todo_log => sub {
     my ( $c, $dt ) = @_;
-    $dt //= DateTime->today;
+    $dt //= DateTime->today( time_zone => 'US/Central' );
 
     # Fetch all to-do items
     my $sql = 'SELECT * FROM todo_item WHERE start_date <= ?';
@@ -212,15 +215,7 @@ __DATA__
 <div class="row">
     <div class="col-md-12">
 
-        <div class="d-flex justify-content-between align-items-center">
-            <a class="btn btn-outline-dark" href="<%= url_for 'todo.list' => ( date => $prev_date->ymd ) %>">
-                &lt; <%= $prev_date->ymd %>
-            </a>
-            <h1><%= $date->ymd %></h1>
-            <a class="btn btn-outline-dark" href="<%= url_for 'todo.list' => ( date => $next_date->ymd ) %>">
-                <%= $next_date->ymd %> &gt;
-            </a>
-        </div>
+        <h1 class="text-center"><%= $date->ymd %></h1>
 
         <ul class="list-group">
         % for my $item ( @$items ) {
@@ -244,6 +239,16 @@ __DATA__
         % }
         </ul>
 
+        <div class="d-flex flex-wrap mt-2 justify-content-between align-items-center">
+            <a class="btn btn-outline-dark" href="<%= url_for 'todo.list' => ( date => $prev_date->ymd ) %>">
+                &lt; <%= $prev_date->ymd %>
+            </a>
+            <a href="<%= url_for '/' %>" class="btn btn-secondary">Today</a>
+            <a class="btn btn-outline-dark" href="<%= url_for 'todo.list' => ( date => $next_date->ymd ) %>">
+                <%= $next_date->ymd %> &gt;
+            </a>
+        </div>
+
     </div>
 </div>
 
@@ -252,15 +257,15 @@ __DATA__
 <html>
     <head>
         <title><%= title %></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         %= stylesheet '/yancy/bootstrap.css'
     </head>
     <body>
         <main class="container">
             <%= content %>
         </main>
-        <footer class="container mt-2 d-flex justify-content-between">
-            <a href="<%= url_for '/' %>" class="btn btn-secondary">Today</a>
-            <a href="<%= url_for '/yancy' %>" class="btn btn-secondary">Edit</a>
+        <footer class="container mt-4 mb-2 d-flex justify-content-center">
+            <a href="<%= url_for '/yancy' %>">Edit Content</a>
         </footer>
     </body>
 </html>

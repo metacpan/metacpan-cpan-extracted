@@ -1,5 +1,5 @@
 package Sim::OPT::Morph;
-# Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Morph of Sim::OPT.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -58,7 +58,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.093'; # our $VERSION = '';
+$VERSION = '0.095'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH
@@ -286,9 +286,9 @@ sub morph
 		my @blockelts = @{ $d{blockelts} };
 		my @blocks = @{ $d{blocks} };
 
-		my $origin = $d{origin}; say $tee "IN MORPH, \$origin: " . dump( $origin );
-		my %to = %{ $d{to} }; say $tee "IN MORPH, \%to: " . dump( \%to );
-		my %inst = %{ $d{inst} }; say $tee "IN MORPH, \%inst: " . dump( \%inst );
+		my $origin = $d{origin}; #say $tee "IN MORPH, \$origin: " . dump( $origin );
+		my %to = %{ $d{to} }; #say $tee "IN MORPH, \%to: " . dump( \%to );
+		my %inst = %{ $d{inst} }; #say $tee "IN MORPH, \%inst: " . dump( \%inst );
 
 		my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
 		my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
@@ -392,9 +392,9 @@ sub morph
 							$target = $inst{$dirfiles{starter}}; #say $tee "FIRSTTARGET IN MORPH1: \$target " .dump( $target );
 							`cp -R $mypath/$file $target`;
 						}
-						say $tee "LEVEL 0: cp -R $mypath/$file $target\n";
+						#say $tee "LEVEL 0: cp -R $mypath/$file $target\n";
 						#my $cleartarget = $dirfiles{starter}; #say $tee "FIRST CLEAR TARGET IN MORPH1: \$cleartarget " .dump( $cleartarget );
-						say $tee "THAT IS TO SAY, LEVEL 0: cp -R $mypath/$file $cleartarget\n";
+						#say $tee "THAT IS TO SAY, LEVEL 0: cp -R $mypath/$file $cleartarget\n";
 					}
 				}
 			}
@@ -416,13 +416,13 @@ sub morph
 					{
 						unless ($exeonfiles eq "n")
 						{
-							my $target = $to{crypto}; say $tee "TARGET IN MORPH: \$target " .dump( $target );
-							my $orig = $inst{$origin}; say $tee "ORIGIN IN MORPH: \$orig " .dump( $orig );
+							my $target = $to{crypto}; #say $tee "TARGET IN MORPH: \$target " .dump( $target );
+							my $orig = $inst{$origin}; #say $tee "ORIGIN IN MORPH: \$orig " .dump( $orig );
 							`cp -R $orig $target\n`;
-							print $tee "LEVEL 1: cp -R $orig $target\n\n";
+							#print $tee "LEVEL 1: cp -R $orig $target\n\n";
 
 							my $cleartarget = $to{to}; #say $tee "CLEAR TARGET IN MORPH: \$cleartarget " .dump( $cleartarget );
-							print $tee "THAT IS TO SAY, LEVEL 1: cp -R $origin $cleartarget\n\n";
+							#print $tee "THAT IS TO SAY, LEVEL 1: cp -R $origin $cleartarget\n\n";
 						}
 					}
 
@@ -432,8 +432,8 @@ sub morph
 						my $countop = 0; # "$countop" IS THE COUNTER OF THE OPERATIONS
 						foreach my $op ( @applytype ) # "$op" MEANS OPERATION
 						{
-							my $to = $to{crypto}; say $tee "IN MORPH: REASSIGNIMENT!!! \$to " .dump( $to ); ### TAKE CARE!!! REASSIGNIMENT!!!
-							my $origin = $inst{$origin}; say $tee "IN MORPH: REASSIGNIMENT!!! \$origin " .dump( $origin ); ### TAKE CARE!!! REASSIGNIMENT!!!
+							my $to = $to{crypto}; say #$tee "IN MORPH: REASSIGNMENT!!! \$to " .dump( $to ); ### TAKE CARE!!! REASSIGNMENT!!!
+							my $origin = $inst{$origin}; #say $tee "IN MORPH: REASSIGNMENT!!! \$origin " .dump( $origin ); ### TAKE CARE!!! REASSIGNMENT!!!
 							my $skip = $skipop->[ $countop ]	;
 							my $modification_type = $applytype[$countop][0]; #say $tee "\$modification_type: $modification_type"; #
 							if ( ( $applytype[$countop][1] ne $applytype[$countop][2] ) and ( $modification_type ne "changeconfig" ) )
@@ -455,14 +455,14 @@ sub morph
 								{
 									`cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n`;
 								}
-								print $tee "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
+								#print $tee "LEVEL 2b: cp -f $to/cfg/$applytype[$countop][1] $to/cfg/$applytype[$countop][2]\n";
 							}
 
 
 							`cd $to`;
 							say $tee "cd $to\n";
 
-							my $launchline = " -file $to/cfg/$fileconfig -mode script"; say $tee "SO, LAUNCHLINE! " . dump( $launchline );
+							my $launchline = " -file $to/cfg/$fileconfig -mode script"; #say $tee "SO, LAUNCHLINE! " . dump( $launchline );
 							#say $tee "NOW MODIFICATION TYPE! $modification_type ";
 
 							if ( ( $stepsvar > 1) and ( not ( eval ( $skip ) ) ) )
@@ -902,7 +902,7 @@ sub morph
 														}
 
 														if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
-														{   say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
+														{   #say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
 															recalculateish
 															( $to, $stepsvar, $countop,
 																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
@@ -917,7 +917,7 @@ sub morph
 
 
 														if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
-														{   say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
+														{   #say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
 															use_modish
 															( $to, $stepsvar, $countop,
 																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
@@ -1303,8 +1303,6 @@ sub translate
 
 my $printthis =
 "prj $launchline<<YYY
-b
-m
 c
 a
 $zone_letter
@@ -1391,7 +1389,6 @@ sub translate_surfaces
 
 				my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -1481,7 +1478,6 @@ $printthis";
 
 				my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -1576,7 +1572,6 @@ sub rotate_surface
 		{
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -1622,7 +1617,7 @@ sub translate_vertices
 		$countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 
 	my @applytype = @$applytype_ref;
-	my @translate_vertices = @$translate_vertices_ref; say $tee "IN MORPH \@translate_vertices: " . dump( @translate_vertices );
+	my @translate_vertices = @$translate_vertices_ref; #say $tee "IN MORPH \@translate_vertices: " . dump( @translate_vertices );
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -1666,15 +1661,15 @@ sub translate_vertices
 		}
 	}
 
-	say $tee "IN MORPH RECEIVED VERTS: " . dump( @v );
-	say $tee "SOURCEADDRESS: " . dump( $sourceaddress );
+	#say $tee "IN MORPH RECEIVED VERTS: " . dump( @v );
+	#say $tee "SOURCEADDRESS: " . dump( $sourceaddress );
 
 	my $countvertex = 0;
 	foreach my $base_coordinates_ref ( @transform_coordinates )
 	{
 		( $x_swing, $y_swing, $z_swing, $x_base, $y_base, $z_base );
 		my $vertex_letter = $verts{ $verts_to_transl[ $countvertex ] };
-		my @basevs = @{ $v[ $countvertex ] }; say $tee "\@basevs: " . dump( @basevs );
+		my @basevs = @{ $v[ $countvertex ] }; #say $tee "\@basevs: " . dump( @basevs );
 		my ( $x_base, $y_base, $z_base, $vertexletter ) = ( $basevs[0], $basevs[1], $basevs[2], $basevs[3] );
 
 		my @base_coordinates = @{ $base_coordinates_ref };
@@ -1736,7 +1731,6 @@ sub translate_vertices
 
 		my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -1821,7 +1815,6 @@ sub shift_vertices
 
 				my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -1865,7 +1858,6 @@ $printthis";
 			{
 				my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -1956,7 +1948,6 @@ sub rotate    # generic zone rotation
 
 		my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2187,7 +2178,6 @@ sub reassign_construction
 
 		my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2249,22 +2239,21 @@ sub change_thickness
 	if ( $stepsvar > 1 )
 	{
 		foreach $entry_to_change ( @entries_to_change )
-		{   say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; say $tee "\$countstep: " . dump( $countstep ) ; say $tee "\$stepsvar: " . dump( $stepsvar ) ;
+		{   #say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; say $tee "\$countstep: " . dump( $countstep ) ; say $tee "\$stepsvar: " . dump( $stepsvar ) ;
 			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; #say $tee "\@strata_to_change: " . dump( @strata_to_change ) ;
 			$countstrata = 0;
 			foreach $stratum_to_change ( @strata_to_change )
-			{   say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ;
-				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; say $tee "\@min_max_values: " . dump( @min_max_values ) ;
-				my $min   = $min_max_values[0]; say $tee "\$min: " . dump( $min ) ;
-				my $max   = $min_max_values[1]; say $tee "\$max: " . dump( $max ) ;
-				my $swing = $max - $min; say $tee "\$swing: " . dump( $swing ) ;
-				my $pace  = ( $swing / ( $stepsvar - 1 ) ); say $tee "\$pace: " . dump( $pace ) ;
-				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); say $tee "\$thickness: " . dump( $thickness ) ;
+			{   #say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ;
+				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; #say $tee "\@min_max_values: " . dump( @min_max_values ) ;
+				my $min   = $min_max_values[0]; #say $tee "\$min: " . dump( $min ) ;
+				my $max   = $min_max_values[1]; #say $tee "\$max: " . dump( $max ) ;
+				my $swing = $max - $min; #say $tee "\$swing: " . dump( $swing ) ;
+				my $pace  = ( $swing / ( $stepsvar - 1 ) ); #say $tee "\$pace: " . dump( $pace ) ;
+				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); #say $tee "\$thickness: " . dump( $thickness ) ;
 				my $layers = ( i => 1, j => 2, k => 3, l => 4, m => 5, n => 6, o => 7, p => 8, q => 9, r => 10, s => 11, t => 12, u => 13, v => 14, w => 15 );
 
 
                 my $printthis = "prj $launchline<<YYY
-b
 b
 e
 a
@@ -2461,7 +2450,6 @@ sub obs_modify
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2520,7 +2508,6 @@ $printthis"; say  "\$printthis : " . dump( $printthis );
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2560,7 +2547,6 @@ $printthis";
 			my $alternative = $alternatives[ $countstep - 1 ];
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2602,7 +2588,6 @@ $printthis";
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2683,7 +2668,6 @@ YYY
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2723,7 +2707,6 @@ $printthis";
 
 			my $printthis = #THIS IS WHAT HAPPEN INSIDE SUB KEEP_SOME_OBSTRUCTIONS
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -2788,7 +2771,6 @@ sub recalculateish
 	{
 	  $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 f
@@ -2810,7 +2792,6 @@ YYY
 	  {
 		$printthis =
 "prj $launchline<<YYY
-b
 m
 c
 f
@@ -3407,7 +3388,6 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 			{
 				my $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -3455,7 +3435,6 @@ $printthis";
 				{
 					my $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -3506,7 +3485,6 @@ $printthis";
 		{
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -3548,7 +3526,6 @@ $printthis";
 		{
 			MY $printthis =
 "prj $launchline<<YYY
-b
 m
 e
 c
@@ -3951,7 +3928,6 @@ sub apply_constraints
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4003,7 +3979,6 @@ YYY
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4035,7 +4010,6 @@ c
 YYY
 
 prj $launchline<<YYY
-b
 m
 c
 a
@@ -4400,7 +4374,6 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 						{
 							my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4497,7 +4470,6 @@ sub warp #
 		{
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4596,7 +4568,6 @@ $printthis";
 
 			my $printthis =
 "prj $launchline<<YYY
-b
 m
 c
 a
@@ -4670,7 +4641,6 @@ sub export_toenergyplus
 
 	my $printthis =
 "prj $launchline<<YYY
-b
 
 o
 g
@@ -5517,7 +5487,6 @@ sub change_groundreflectance
 
 	my $printthis =
 "prj $launchline<<YYY
-b
 m
 b
 d

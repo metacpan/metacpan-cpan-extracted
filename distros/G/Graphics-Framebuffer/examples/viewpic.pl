@@ -7,7 +7,7 @@
 use strict;
 
 use Graphics::Framebuffer;
-use Time::HiRes qw(sleep time);
+use Time::HiRes qw(sleep time alarm);
 use Getopt::Long;
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1;
@@ -26,11 +26,30 @@ GetOptions(
     'alpha=i' => \$alpha,
 );
 
-my $f = Graphics::Framebuffer->new(
+my ($fr,$f) = Graphics::Framebuffer->new(
     'SPLASH'      => 0,
     'SHOW_ERRORS' => 0,
     'RESET'       => 1 - $noclear,
 );
+
+my $DB    = 0;
+my $DIRTY = 1;
+
+my $info = $fr->screen_dimensions();
+
+if ($info->{'bits_per_pixel'} == 16 && $fr->{'ACCELERATED'}) {
+    $DB = 1;
+    $SIG{'ALRM'} = sub {
+        alarm(0);
+        if ($DIRTY) {
+            $DIRTY = 0;
+            $fr->blit_flip($f);
+        }
+        alarm(1/15);
+    };
+} else {
+    $f = $fr;
+}
 
 system('clear');
 $f->cls('OFF');
@@ -62,6 +81,7 @@ if (ref($image) eq 'ARRAY') {
         $f->normal_mode();
     }
     $f->blit_write($image);
+    $DIRTY = 1;
     sleep $delay if ($delay);
 }
 
@@ -75,15 +95,23 @@ Single image (or animation) viewer
 
 =head1 SYNOPISIS
 
- perl viewpic.pl [--full] "path to image"
+ perl viewpic.pl [options] "path to image"
 
 =head1 OPTIONS
 
 =over 2
 
-=item C<--full>
+=item B<--full>
 
 Tells it to scale (proportionally) all images (and animations) to full screen.
+
+=item B<--alpha>=1-254
+
+Alpha value to overlay an image on what is already there.  Usually used to just dim the image.
+
+=item B<--wait>=seconds
+
+Wait number of seconds before returning (0=don't wait)
 
 =back
 

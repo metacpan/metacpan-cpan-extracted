@@ -3,7 +3,7 @@
 use strict;
 
 use Graphics::Framebuffer;
-use Time::HiRes qw(sleep time);
+use Time::HiRes qw(sleep time alarm);
 use List::Util qw(shuffle);
 use Getopt::Long;
 use Pod::Usage;
@@ -19,35 +19,69 @@ my $delay      = 3;
 my $nosplash   = 0;
 
 GetOptions(
-    'auto'        => \$auto,
-    'errors'      => \$errors,
-    'full'        => \$fullscreen,
-    'showall|all' => \$showall,
-    'help'        => \$help,
-    'delay|wait=i'     => \$delay,
-    'nosplash'    => \$nosplash,
+    'auto'         => \$auto,
+    'errors'       => \$errors,
+    'full'         => \$fullscreen,
+    'showall|all'  => \$showall,
+    'help'         => \$help,
+    'delay|wait=i' => \$delay,
+    'nosplash'     => \$nosplash,
 );
+my @paths      = @ARGV;
 
-unless (scalar(@ARGV) && ! $help) {
+unless (scalar(@paths) && ! $help) {
     $help = 2;
 }
 
 if ($help) {
-    pod2usage('-exitstatus' => 0,'-verbose' => $help);
+    pod2usage('-exitstatus' => 1,'-verbose' => $help);
 }
 
 my $splash = ($nosplash) ? 0 : 2;
 
-my $FB = Graphics::Framebuffer->new(
+print qq{
+AUTO     = $auto
+ERRORS   = $errors
+FULL     = $fullscreen
+SHOWALL  = $showall
+DELAY    = $delay
+NOSPLASH = $nosplash
+PATH(s)  = }, join('; ',@paths),"\n";
+
+sleep 1;
+
+# Double buffering now supported
+my ($F,$FB) = Graphics::Framebuffer->new(
     'SHOW_ERRORS' => $errors,
     'RESET'       => 1,
     'SPLASH'      => $splash,
 );
 
+my $info  = $F->screen_dimensions();
+my $DB    = 0;
+my $DIRTY = 1;
+
+if ($info->{'bits_per_pixel'} == 16 && $F->{'ACCELERATED'}) {
+    $DB = 1;
+} else {
+    $FB = $F;
+}
+
+if ($DB) {
+    $SIG{'ALRM'} = sub {
+        alarm(0);
+        if ($DIRTY) {
+            $DIRTY = 0;
+            $F->blit_flip($FB);
+        }
+        alarm(1/15);
+    };
+}
+
 system('clear');
 $FB->cls('OFF');
 
-my $p = gather($FB,@ARGV);
+my $p = gather($FB,@paths);
 
 $FB->cls();
 
@@ -143,6 +177,7 @@ sub show {
                 } else {
                     $FB->blit_write($image);
                 }
+                $DIRTY = 1;
                 sleep $delay;
             }
         } ## end if (defined($image))
@@ -174,8 +209,13 @@ sub print_it {
     } else {
         print "$message\n";
     }
+    $DIRTY = 1;
     $fb->normal_mode();
 } ## end sub print_it
+
+__END__
+
+=pod
 
 =head1 NAME
 
@@ -190,6 +230,8 @@ This automatically detects all of the framebuffer devices in your system, and sh
 =head1 SYNOPSIS
 
  perl slideshow [options] "/path/to/scan"
+
+More than one path can be used.  Just separate each path by a space.
 
 =head2 OPTIONS
 

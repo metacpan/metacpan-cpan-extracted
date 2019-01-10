@@ -1,5 +1,12 @@
 Revision history for Perl extension JSONP.
 
+1.92
+	- prevent warnings when reftype is null
+	- save session only when request is POST or PUT
+	- add option to delete sent files after being downloaded from remote user
+	- add ability to send custom HTTP return code
+	- puth auth function call under eval
+
 1.88
 	- prevent error on failed saved session graft
 

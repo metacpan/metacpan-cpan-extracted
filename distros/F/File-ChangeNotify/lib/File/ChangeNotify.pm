@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 use Carp qw( confess );
 
@@ -19,7 +19,7 @@ use Moo 1.006 ();
 sub instantiate_watcher {
     my $class = shift;
 
-    my @usable = $class->usable_classes();
+    my @usable = $class->usable_classes;
     return $usable[0]->new(@_) if @usable;
 
     return File::ChangeNotify::Watcher::Default->new(@_);
@@ -28,14 +28,14 @@ sub instantiate_watcher {
 {
     my $finder = Module::Pluggable::Object->new(
         search_path => 'File::ChangeNotify::Watcher' );
-    my $loaded         = 0;
-    my @usable_classes = ();
+    my $loaded;
+    my @usable_classes;
 
     sub usable_classes {
         return @usable_classes if $loaded;
         @usable_classes = grep { _try_load($_) }
             sort grep { $_ ne 'File::ChangeNotify::Watcher::Default' }
-            $finder->plugins();
+            $finder->plugins;
         $loaded = 1;
 
         return @usable_classes;
@@ -46,7 +46,7 @@ sub _try_load {
     my $module = shift;
 
     my $ok = eval { use_module($module) };
-    my $e = $@;
+    my $e  = $@;
     return $module if $ok;
 
     die $e
@@ -70,7 +70,7 @@ File::ChangeNotify - Watch for changes to files, cross-platform style
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -82,10 +82,10 @@ version 0.29
               filter      => qr/\.(?:pm|conf|yml)$/,
             );
 
-    if ( my @events = $watcher->new_events() ) { ... }
+    if ( my @events = $watcher->new_events ) { ... }
 
     # blocking
-    while ( my @events = $watcher->wait_for_events() ) { ... }
+    while ( my @events = $watcher->wait_for_events ) { ... }
 
 =head1 DESCRIPTION
 
@@ -110,7 +110,7 @@ It always tries to use the L<File::ChangeNotify::Watcher::Default>
 class last, on the assumption that any other class that is available
 is a better option.
 
-=head2 File::ChangeNotify->usable_classes()
+=head2 File::ChangeNotify->usable_classes
 
 Returns a list of all the loadable L<File::ChangeNotify::Watcher> subclasses
 except for L<File::ChangeNotify::Watcher::Default>, which is always usable.
@@ -168,7 +168,7 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2009 - 2018 by Dave Rolsky.
+This software is Copyright (c) 2009 - 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 

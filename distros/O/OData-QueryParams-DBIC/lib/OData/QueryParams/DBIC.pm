@@ -20,7 +20,7 @@ use Scalar::Util qw(blessed);
 
 our @EXPORT = qw(params_to_dbic);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub params_to_dbic ( $query_string, %opts ) {
     my $query;
@@ -121,7 +121,7 @@ sub _flatten_filter ($obj, %opt) {
         'le'  => '<=',
         'gt'  => '>',
         'ge'  => '>=',
-        'eq'  => '==',
+        'eq'  => '=',
         'ne'  => '!=',
         'and' => \&_build_bool,
         'or'  => \&_build_bool,
@@ -200,7 +200,7 @@ OData::QueryParams::DBIC - parse OData style query params and provide info for D
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

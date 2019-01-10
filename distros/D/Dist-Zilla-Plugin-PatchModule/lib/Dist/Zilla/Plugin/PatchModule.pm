@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::PatchModule;
 
-our $DATE = '2016-05-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-01-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,7 +12,7 @@ use namespace::autoclean;
 
 with (
     'Dist::Zilla::Role::BeforeBuild',
-    'Dist::Zilla::Role::InstallTool',
+    'Dist::Zilla::Role::AfterBuild',
 );
 
 sub before_build {
@@ -24,7 +24,7 @@ sub before_build {
     }
 }
 
-sub setup_installer {
+sub after_build {
     my ($self) = @_;
     my $name  = $self->zilla->name;
 
@@ -60,7 +60,7 @@ Dist::Zilla::Plugin::PatchModule - Plugin to use when building patch modules
 
 =head1 VERSION
 
-This document describes version 0.001 of Dist::Zilla::Plugin::PatchModule (from Perl distribution Dist-Zilla-Plugin-PatchModule), released on 2016-05-28.
+This document describes version 0.002 of Dist::Zilla::Plugin::PatchModule (from Perl distribution Dist-Zilla-Plugin-PatchModule), released on 2019-01-10.
 
 =head1 SYNOPSIS
 
@@ -115,7 +115,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

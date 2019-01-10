@@ -96,7 +96,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan
   homepage: https://metacpan.org/release/App-lcpan
   repository: git://github.com/perlancar/perl-App-lcpan.git
-version: '1.031'
+version: '1.032'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

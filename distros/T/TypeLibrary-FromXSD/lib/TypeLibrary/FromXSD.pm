@@ -12,7 +12,7 @@ use XML::LibXML;
 
 use TypeLibrary::FromXSD::Element;
 
-our $VERSION = 0.03;
+our $VERSION = '0.04';
 
 has types       => (is => 'rwp');
 has xsd         => (is => 'ro', required => 1);
@@ -31,7 +31,7 @@ sub run {
 
     if ( $self->output ) {
         open $out_fh, '>', $self->output;
-        $namespace = $self->namespace || basename $self->output;
+        $namespace = basename $self->output if !$self->namespace;
         $namespace =~ s/\.pm\z//;
     }
 
@@ -151,13 +151,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 TypeLibrary::FromXSD - create a Type::Tiny library of simpleTypes in .xsd files.
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -174,6 +176,22 @@ version 0.03
 
 This module helps to create a library for types (using C<Type::Tiny>) based on a XML schema.
 It searches for I<simpleType>s in the I<.xsd> file and creates a type for it.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item * types
+
+=item * xsd
+
+=item * output
+
+=item * namespace
+
+=item * version_add
+
+=back
 
 =head1 METHODS
 

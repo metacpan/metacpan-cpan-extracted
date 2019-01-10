@@ -1774,7 +1774,15 @@ sub pageurl ($;%) {
         throw $self "- no Web context, needs clipboard->'pagedesc'";
 
     my $url=$self->base_url(@_);
-    my $uri=$self->cgi->url(-absolute => 1);
+
+    # This works in both CGI and PSGI environments, but simply
+    # requesting $cgi->url(-absolute => 1) does not work for PSGI
+    # because it sets PATH_INFO and REQUEST_URI to the same value,
+    # making them cancel each other.
+    #
+    my $uri=$self->cgi->request_uri();
+    $uri =~ s/\?.*$//s;
+    $uri = $self->cgi->unescape($uri);
 
     return $url.$uri;
 }

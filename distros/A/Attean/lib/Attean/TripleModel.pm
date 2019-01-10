@@ -7,7 +7,7 @@ Attean::TripleModel - RDF model backed by a set of triple-stores
 
 =head1 VERSION
 
-This document describes Attean::TripleModel version 0.019
+This document describes Attean::TripleModel version 0.020
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ objects representing the backing triple-store for that graph.
 
 =cut
 
-package Attean::TripleModel 0.019 {
+package Attean::TripleModel 0.020 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf HashRef);
 	use Scalar::Util qw(reftype blessed);
@@ -51,7 +51,7 @@ package Attean::TripleModel 0.019 {
 	with 'Attean::API::Model';
 	with 'Attean::API::CostPlanner';
 
-	has 'stores'	=> (
+	has 'stores' => (
 		is => 'ro',
 		isa => HashRef[ConsumerOf['Attean::API::TripleStore']],
 		required => 1,
@@ -87,6 +87,33 @@ package Attean::TripleModel 0.019 {
 		return $count;
 	}
 
+=item C<< count_quads_estimate >>
+
+=cut
+
+	sub count_quads_estimate {
+		my $self	= shift;
+		my ($s, $p, $o, $g)	= @_;
+		if (blessed($g) and $g->does('Attean::API::IRI')) {
+			if (my $store = $self->stores->{ $g->value }) {
+				return $store->count_quads_estimate(@_);
+			} else {
+				return 0;
+			}
+		} else {
+			return $self->count_quads(@_);
+		}
+	}
+	
+=item C<< holds >>
+
+=cut
+
+	sub holds {
+		my $self	= shift;
+		return ($self->count_quads_estimate(@_) > 0)
+	}
+	
 =item C<< get_graphs >>
 
 =cut
@@ -211,7 +238,7 @@ Attempts to delegate to all the underlying stores if that store consumes Attean:
 	}
 }
 
-package Attean::AddativeTripleModelRole 0.019 {
+package Attean::AddativeTripleModelRole 0.020 {
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(CodeRef);
 
@@ -275,7 +302,7 @@ Removes the store associated with the given C<< $graph >>.
 }
 
 
-package Attean::MutableTripleModel 0.019 {
+package Attean::MutableTripleModel 0.020 {
 	use Moo;
 	use Types::Standard qw(ArrayRef ConsumerOf HashRef);
 	use Scalar::Util qw(reftype);
@@ -358,7 +385,7 @@ Removes all quads with the given C<< $graph >>.
 	}
 }
 
-package Attean::AddativeTripleModel 0.019 {
+package Attean::AddativeTripleModel 0.020 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(CodeRef);
@@ -368,7 +395,7 @@ package Attean::AddativeTripleModel 0.019 {
 	with 'Attean::AddativeTripleModelRole';
 }
 
-package Attean::AddativeMutableTripleModel 0.019 {
+package Attean::AddativeMutableTripleModel 0.020 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Types::Standard qw(CodeRef);

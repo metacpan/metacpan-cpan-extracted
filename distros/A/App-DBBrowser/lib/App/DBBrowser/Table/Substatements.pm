@@ -12,8 +12,7 @@ use Term::Choose::Util qw( choose_a_number );
 use Term::Form         qw();
 
 use App::DBBrowser::Auxil;
-#use App::DBBrowser::Table::Functions; # required
-#use App::DBBrowser::Subqueries;       # required
+#use App::DBBrowser::Table::Extensions; # required
 
 
 sub new {
@@ -22,6 +21,7 @@ sub new {
         i => $info,
         o => $options,
         d => $data,
+        # SQLite: GROUP_CONCAT(DISTINCT "Col")  or  GROUP_CONCAT("Col",",");
         aggregate     => [ "AVG(X)", "COUNT(X)", "COUNT(*)", "GROUP_CONCAT(X)", "MAX(X)", "MIN(X)", "SUM(X)" ],
         distinct      => "DISTINCT",
         all           => "ALL",
@@ -36,9 +36,6 @@ sub new {
     }
     bless $sf, $class;
 }
-# pg:      STRING_AGG(DISTINCT, "Col", ',') # sep mandatory
-# mysql:   GROUP_CONCAT(DISTINCT `Col` SEPARATOR ',')
-# SQLite:  GROUP_CONCAT(DISTINCT "Col")  or  GROUP_CONCAT("Col",",");
 
 
 sub __add_aggregate_substmt {
@@ -86,6 +83,7 @@ sub __add_aggregate_substmt {
             return;
         }
         if ( $aggr eq 'STRING_AGG' ) {
+            # pg: the separator is mandatory in STRING_AGG(DISTINCT, "Col", ',')
             $sql->{aggr_cols}[$i] .= ' ' . $f_col . ", ',')";
         }
         else {
@@ -97,52 +95,6 @@ sub __add_aggregate_substmt {
         $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
     }
     return 1;
-}
-
-sub extended_col {
-    my ( $sf, $sql, $stmt_type, $clause ) = @_;
-    my $stmt_h = Term::Choose->new( $sf->{i}{lyt_stmt_h} );
-    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
-    my ( $function, $subquery ) = ( 'f()', 'SQ' );
-    my @values = ( undef, [ $function ], [ $subquery ], [ $function, $subquery ] );
-    my @types = @{$values[$sf->{o}{G}{"extend_$clause"}]};
-    my $type;
-    if ( @types == 1 ) {
-        $type = $types[0];
-    }
-    else {
-        # Choose
-        $type = $stmt_h->choose( [ undef, @types ], { undef => '<<' } );
-        if ( ! defined $type ) {
-            return;
-        }
-    }
-    my $ext_col;
-    if ( $type eq $subquery ) {
-        require App::DBBrowser::Subqueries;
-        my $new_sq = App::DBBrowser::Subqueries->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $subq = $new_sq->choose_subquery( $sql, $stmt_type, $clause );
-        if ( ! defined $subq ) {
-            return;
-        }
-        $ext_col = '(' . $subq . ')';
-    }
-    elsif ( $type eq $function ) {
-        require App::DBBrowser::Table::Functions;
-        my $new_func = App::DBBrowser::Table::Functions->new( $sf->{i}, $sf->{o}, $sf->{d} );
-        my $func = $new_func->col_function( $sql, $stmt_type, $clause );
-        if ( ! defined $func ) {
-            return;
-        }
-        $ext_col = $func;
-    }
-    $ax->print_sql( $sql, [ $stmt_type ] );
-    my $alias = $ax->alias( 'subqueries', $ext_col . ' AS: ', undef, ' ' );
-    if ( defined $alias && length $alias ) {
-        $sql->{alias}{$ext_col} = $ax->quote_col_qualified( [ $alias ] );
-    }
-    $ax->print_sql( $sql, [ $stmt_type ] );
-    return $ext_col;
 }
 
 
@@ -184,7 +136,9 @@ sub select {
             return 1;
         }
         elsif ( $choices->[ $idx[0] ] eq $extended_sign ) {
-            my $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            require App::DBBrowser::Table::Extensions;
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( ! defined $ext_col ) {
                 ( $sql->{chosen_cols}, $sql->{alias} ) = @{pop @$bu}; ###
             }
@@ -332,7 +286,9 @@ sub where {
             return 1;
         }
         if ( $quote_col eq $extended_sign ) {
-            my $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            require App::DBBrowser::Table::Extensions;
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( ! defined $ext_col ) {
                 if ( @$bu ) {
                     ( $sql->{where_args}, $sql->{where_stmt}, $AND_OR, $unclosed, $count ) = @{pop @$bu};
@@ -416,7 +372,9 @@ sub group_by {
             return 1;
         }
         elsif ( $choices->[ $idx[0] ] eq $extended_sign ) {
-            my $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            require App::DBBrowser::Table::Extensions;
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            my $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( defined $ext_col ) {
                 push @{$sql->{group_by_cols}}, $ext_col;
             }
@@ -708,7 +666,9 @@ sub __set_operator_sql {
                 $sql->{$stmt} = $bu_stmt . ' ' . $operator;
                 $ax->print_sql( $sql, [ $stmt_type ] );
             }
-            $ext_col = $sf->extended_col( $sql, $stmt_type, $clause );
+            require App::DBBrowser::Table::Extensions;
+            my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
+            $ext_col = $ext->extended_col( $sql, $stmt_type, $clause );
             if ( ! defined $ext_col ) {
                 next OPERATOR;
             }
@@ -725,10 +685,10 @@ sub __set_operator_sql {
             $sql->{$stmt} .= ' ' . $operator;
             $ax->print_sql( $sql, [ $stmt_type ] );
             my $quote_col;
-            if ( defined $ext_col ) {   #
-                $quote_col = $ext_col;  #
-            }                           #
-            else {                      #
+            #if ( defined $ext_col ) {   #
+            #    $quote_col = $ext_col;  #
+            #}                           #
+            #else {                      #
                 if ( $clause eq 'having' ) {
                     my @pre = ( undef, $sf->{i}{ok} );
                     my @choices = ( @{$sf->{aggregate}}, map( '@' . $_,  @{$sql->{aggr_cols}} ) );
@@ -748,7 +708,6 @@ sub __set_operator_sql {
                 }
                 else {
                     # Choose
-                    #$quote_col = $stmt_h->choose( $sql->{cols}, { prompt => "$operator:" } );
                     $quote_col = $stmt_h->choose( $sql->{cols}, { prompt => 'Col:' } );
                 }
                 if ( ! defined $quote_col ) {
@@ -756,7 +715,7 @@ sub __set_operator_sql {
                     $sql->{$stmt} = $bu_stmt;
                     next OPERATOR;
                 }
-            }                           #
+            #}                           #
             if ( $arg !~ /%/ ) {
                 $sql->{$stmt} .= ' ' . $quote_col;
             }
@@ -790,11 +749,11 @@ sub __set_operator_sql {
                 $sql->{$stmt} = $bu_stmt;
                 next OPERATOR;
             }
-            if ( $ext_col ) {                       #
-                $regex_op =~ s/\?/$ext_col/;        #
-                $sql->{$stmt} .= $regex_op;         #
-                last OPERATOR;                      #
-            }                                       #
+            #if ( $ext_col ) {                       #
+            #    $regex_op =~ s/\?/$ext_col/;        #
+            #    $sql->{$stmt} .= $regex_op;         #
+            #    last OPERATOR;                      #
+            #}                                       #
             $regex_op =~ s/^\s// if $sql->{$stmt} =~ /\(\z/;
             $sql->{$stmt} .= $regex_op;
             push @{$sql->{$args}}, '...';
@@ -845,10 +804,10 @@ sub __set_operator_sql {
         }
         elsif ( $operator =~ /^(?:NOT\s)?BETWEEN\z/ ) {
             $sql->{$stmt} .= ' ' . $operator;
-            if ( $ext_col ) {                       #
-                $sql->{$stmt} .= ' ' . $ext_col;    #
-                last OPERATOR;                      #
-            }                                       #
+            #if ( $ext_col ) {                       #
+            #    $sql->{$stmt} .= ' ' . $ext_col;    #
+            #    last OPERATOR;                      #
+            #}                                       #
             $ax->print_sql( $sql, [ $stmt_type ] );
             # Readline
             my $value_1 = $trs->readline( 'Value 1: ' );
@@ -886,9 +845,9 @@ sub __set_operator_sql {
             $sql->{$stmt} .= ' ' . '?';
             push @{$sql->{$args}}, $value;
         }
-        last OPERATOR; #
+        last OPERATOR;
     }
-    return 1; #
+    return 1;
 }
 
 

@@ -60,13 +60,13 @@ and attributes stripped.
 =head1 REPORTING BUGS
 
 Report bugs and/or feature requests on rt.cpan.org, the repository issue tracker
-or directly to L<m@japh.se>
+or directly to L<magnus@trapd00r.se>
 
 =head1 AUTHOR
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  m@japh.se
+  magnus@trapd00r.se
   http://japh.se
 
 =head1 CONTRIBUTORS

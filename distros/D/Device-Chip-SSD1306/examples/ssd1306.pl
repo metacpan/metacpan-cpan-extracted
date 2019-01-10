@@ -5,7 +5,7 @@ use warnings;
 
 use Device::Chip::Adapter;
 
-use Getopt::Long;
+use Getopt::Long qw( :config no_ignore_case );
 use Time::HiRes qw( sleep );
 
 GetOptions(

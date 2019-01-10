@@ -94,8 +94,8 @@ enum {
   SPVM_OP_C_ID_BIT_NOT,
   SPVM_OP_C_ID_REMAINDER,
   SPVM_OP_C_ID_LEFT_SHIFT,
-  SPVM_OP_C_ID_RIGHT_SHIFT,
-  SPVM_OP_C_ID_RIGHT_SHIFT_UNSIGNED,
+  SPVM_OP_C_ID_RIGHT_ARITHMETIC_SHIFT,
+  SPVM_OP_C_ID_RIGHT_LOGICAL_SHIFT,
   SPVM_OP_C_ID_LOGICAL_AND,
   SPVM_OP_C_ID_LOGICAL_OR,
   SPVM_OP_C_ID_LOGICAL_NOT,
@@ -197,8 +197,8 @@ enum {
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_DIVIDE,
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_REMAINDER,
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_LEFT_SHIFT,
-  SPVM_OP_C_FLAG_SPECIAL_ASSIGN_RIGHT_SHIFT,
-  SPVM_OP_C_FLAG_SPECIAL_ASSIGN_RIGHT_SHIFT_UNSIGNED,
+  SPVM_OP_C_FLAG_SPECIAL_ASSIGN_RIGHT_ARITHMETIC_SHIFT,
+  SPVM_OP_C_FLAG_SPECIAL_ASSIGN_RIGHT_LOGICAL_SHIFT,
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_BIT_XOR,
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_BIT_OR,
   SPVM_OP_C_FLAG_SPECIAL_ASSIGN_BIT_AND,
@@ -326,7 +326,7 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_whil
 SPVM_OP* SPVM_OP_build_if_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if, SPVM_OP* op_term, SPVM_OP* op_block, SPVM_OP* op_else_statement);
 SPVM_OP* SPVM_OP_build_array_length(SPVM_COMPILER* compiler, SPVM_OP* op_array_length, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_malloc_object(SPVM_COMPILER* compiler, SPVM_OP* op_malloc, SPVM_OP* op_type);
-SPVM_OP* SPVM_OP_build_binop(SPVM_COMPILER* compiler, SPVM_OP* op_call_op, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_call_op, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_basic_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_name);
 SPVM_OP* SPVM_OP_build_array_type(SPVM_COMPILER* compiler, SPVM_OP* op_type, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_ref_type(SPVM_COMPILER* compiler, SPVM_OP* op_type_original);
@@ -343,7 +343,7 @@ SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op
 SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, SPVM_OP* op_subname, SPVM_OP* op_terms);
 SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block);
-SPVM_OP* SPVM_OP_build_unop(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first);
+SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first);
 SPVM_OP* SPVM_OP_build_array_access(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken, SPVM_OP* op_field_access);

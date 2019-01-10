@@ -17,6 +17,12 @@ has name => (
 	required => 1,
 );
 
+has table_name => (
+	is       => 'ro',
+	isa      => 'Str',
+	required => 1,
+);
+
 has columns => (
 	is      => 'rw',
 	isa     => 'ArrayRef[MySQL::Util::Lite::Column]',
@@ -31,21 +37,43 @@ has _util => (
 );
 
 method get_columns {
-
+	
 	return @{ $self->columns };	
 }
+
+=head2 is_autoinc
+
+Checks if the primary key is a single column and it has autoinc.  
+
+Returns: Bool
+ 
+=cut
+
+method is_autoinc {
+
+	my @cols = $self->get_columns();
+	if (@cols == 1) {
+		my $col = shift @cols;
+		if ($col->is_autoinc) {
+			return 1;	
+		}	
+	}	
 	
+	return 0;
+}
+
 method _build_columns {
 
 	my $aref = $self->_util->get_constraint( name => $self->name );
-
+	
 	my @cols;
 	foreach my $col (@$aref) {
 		my $href = $self->_util->describe_column(
 			table  => $col->{TABLE_NAME},
 			column => $col->{COLUMN_NAME}
 		);
-		push @cols, $self->new_column($href);
+		my $new = $self->new_column($href);
+		push @cols, $new;
 	}
 
 	return \@cols;

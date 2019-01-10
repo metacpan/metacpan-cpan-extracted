@@ -33,6 +33,9 @@ WriteMakefile (
             },
 #           homepage => 'http://',
         },
+	x_contributors => [
+	    'LNATION <lnation@cpan.org>',
+	],
     },
     MIN_PERL_VERSION => '5.006001',
 );

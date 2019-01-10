@@ -41,7 +41,7 @@ sub delete_table {
     # Choose
     my $table = choose( #
         [ undef, map { "- $_" } @{$sf->{d}{user_tables}} ],
-        { %{$sf->{i}{lyt_3}}, prompt => $prompt }
+        { %{$sf->{i}{lyt_v_clear}}, prompt => $prompt, undef => '  <=' }
     );
     if ( ! defined $table || ! length $table ) {
         return;
@@ -113,7 +113,7 @@ sub create_new_table {
         $ENV{TC_RESET_AUTO_UP} = 0;
         my $idx = choose(
             $choices,
-            { %{$sf->{i}{lyt_3}}, index => 1, default => $old_idx, prompt => $prompt }
+            { %{$sf->{i}{lyt_v_clear}}, index => 1, default => $old_idx, prompt => $prompt, undef => '  <=' }
         );
         if ( ! defined $idx || ! defined $choices->[$idx] ) {
             return;

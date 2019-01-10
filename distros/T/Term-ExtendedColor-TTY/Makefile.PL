@@ -13,7 +13,7 @@ WriteMakefile1(
     #},
 
     NAME                => 'Term::ExtendedColor::TTY',
-    AUTHOR              => 'Magnus Woldrich <trapd00r@trapd00r.se>',
+    AUTHOR              => 'Magnus Woldrich <m@japh.se>',
     ABSTRACT           =>  'Set colors in the Linux VC/TTY',
     VERSION_FROM        => 'lib/Term/ExtendedColor/TTY.pm',
     'LICENSE'           => 'perl',

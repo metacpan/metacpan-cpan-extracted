@@ -31,7 +31,6 @@ my $a_over_under = "a\x{030A}\x{0325}";
   ok($col, "make de phonebook collator");
   print "# actual: ", $col->getLocale(ULOC_ACTUAL_LOCALE()), "\n";
   print "# valid: ", $col->getLocale(ULOC_VALID_LOCALE()), "\n";
-  print "# req: ", $col->getLocale(ULOC_REQUESTED_LOCALE()), "\n";
   my @names = reverse @sorted_names;
   my @sorted = sort { $col->cmp($a, $b) } @names;
   is_deeply(\@sorted, \@sorted_names, "check sorted names (cmp)");

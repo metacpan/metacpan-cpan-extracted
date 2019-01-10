@@ -79,13 +79,13 @@ A color matrix showing the available colors in the Perl module L<Term::ExtendedC
 
 =head1 REPORTING BUGS
 
-Report bugs on rt.cpan.org or to m@japh.se
+Report bugs on rt.cpan.org or to magnus@trapd00r.se
 
 =head1 AUTHOR
 
   Magnus Woldrich
   CPAN ID: WOLDRICH
-  m@japh.se
+  magnus@trapd00r.se
   http://japh.se
 
 =head1 CONTRIBUTORS

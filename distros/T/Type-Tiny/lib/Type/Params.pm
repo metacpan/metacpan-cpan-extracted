@@ -10,7 +10,7 @@ BEGIN {
 
 BEGIN {
 	$Type::Params::AUTHORITY = 'cpan:TOBYINK';
-	$Type::Params::VERSION   = '1.004002';
+	$Type::Params::VERSION   = '1.004004';
 }
 
 use B qw();
@@ -1288,7 +1288,7 @@ objects.
  use Type::Params qw( compile Invocant );
  
  sub my_method {
-   state $check = compile(Instance, ArrayRef, Int);
+   state $check = compile(Invocant, ArrayRef, Int);
    my ($self_or_class, $arr, $ix) = $check->(@_);
    
    return $arr->[ $ix ];
@@ -1429,7 +1429,7 @@ any other Type::Tiny type constraints.
 
 =back
 
-=head1 Params::ValidationCompiler
+=head2 Params::ValidationCompiler
 
 L<Params::ValidationCompiler> does basically the same thing as
 L<Type::Params>.
@@ -1481,7 +1481,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013-2014, 2017-2018 by Toby Inkster.
+This software is copyright (c) 2013-2014, 2017-2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

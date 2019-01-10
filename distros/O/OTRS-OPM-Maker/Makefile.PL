@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::LongString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.16",
   "test" => {
     "TESTS" => "t/*.t t/build/*.t t/dbtest/*.t t/dependencies/*.t t/filetest/*.t t/index/*.t t/sopmtest/*.t"
   }

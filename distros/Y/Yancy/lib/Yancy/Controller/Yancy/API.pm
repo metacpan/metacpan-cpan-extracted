@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy::API;
-our $VERSION = '1.020';
+our $VERSION = '1.021';
 # ABSTRACT: An OpenAPI REST controller for the Yancy editor
 
 #pod =head1 DESCRIPTION
@@ -46,8 +46,9 @@ use Mojo::Base 'Mojolicious::Controller';
 #pod =method list_items
 #pod
 #pod List the items in a collection. The collection name should be in the
-#pod stash key C<collection>. C<$limit>, C<$offset>, and C<$order_by> may be
-#pod provided as query parameters.
+#pod stash key C<collection>.
+#pod
+#pod C<$limit>, C<$offset>, and C<$order_by> may be provided as query parameters.
 #pod
 #pod =cut
 
@@ -88,8 +89,11 @@ sub list_items {
 
 #pod =method add_item
 #pod
-#pod Add a new item to the collection. The new item should be in the request
-#pod body as JSON. The collection name should be in the stash key C<collection>.
+#pod Add a new item to the collection. The collection name should be in the
+#pod stash key C<collection>.
+#pod
+#pod The new item is extracted from the OpenAPI input, under parameter name
+#pod C<newItem>, and must be a hash/JSON "object".
 #pod
 #pod =cut
 
@@ -107,7 +111,10 @@ sub add_item {
 #pod =method get_item
 #pod
 #pod Get a single item from a collection. The collection should be in the
-#pod stash key C<collection>, and the item's ID in the stash key C<id>.
+#pod stash key C<collection>.
+#pod
+#pod The item's ID field-name is in the stash key C<id_field>. The ID itself
+#pod is extracted from the OpenAPI input, under a parameter of that name.
 #pod
 #pod =cut
 
@@ -125,8 +132,10 @@ sub get_item {
 #pod =method set_item
 #pod
 #pod Update an item in a collection. The collection should be in the stash
-#pod key C<collection>, and the item's ID in the stash key C<id>. The updated
-#pod item should be in the request body as JSON.
+#pod key C<collection>.
+#pod
+#pod The item to be updated is determined as with L</get_item>, and what to
+#pod update it with is determined as with L</add_item>.
 #pod
 #pod =cut
 
@@ -151,8 +160,9 @@ sub set_item {
 #pod =method delete_item
 #pod
 #pod Delete an item from a collection. The collection name should be in the
-#pod stash key C<collection>. The ID of the item should be in the stash key
-#pod C<id>.
+#pod stash key C<collection>.
+#pod
+#pod The item to be deleted is determined as with L</get_item>.
 #pod
 #pod =cut
 
@@ -195,7 +205,7 @@ Yancy::Controller::Yancy::API - An OpenAPI REST controller for the Yancy editor
 
 =head1 VERSION
 
-version 1.020
+version 1.021
 
 =head1 DESCRIPTION
 
@@ -207,30 +217,40 @@ backend data. This API is used by the Yancy editor.
 =head2 list_items
 
 List the items in a collection. The collection name should be in the
-stash key C<collection>. C<$limit>, C<$offset>, and C<$order_by> may be
-provided as query parameters.
+stash key C<collection>.
+
+C<$limit>, C<$offset>, and C<$order_by> may be provided as query parameters.
 
 =head2 add_item
 
-Add a new item to the collection. The new item should be in the request
-body as JSON. The collection name should be in the stash key C<collection>.
+Add a new item to the collection. The collection name should be in the
+stash key C<collection>.
+
+The new item is extracted from the OpenAPI input, under parameter name
+C<newItem>, and must be a hash/JSON "object".
 
 =head2 get_item
 
 Get a single item from a collection. The collection should be in the
-stash key C<collection>, and the item's ID in the stash key C<id>.
+stash key C<collection>.
+
+The item's ID field-name is in the stash key C<id_field>. The ID itself
+is extracted from the OpenAPI input, under a parameter of that name.
 
 =head2 set_item
 
 Update an item in a collection. The collection should be in the stash
-key C<collection>, and the item's ID in the stash key C<id>. The updated
-item should be in the request body as JSON.
+key C<collection>.
+
+The item to be updated is determined as with L</get_item>, and what to
+update it with is determined as with L</add_item>.
 
 =head2 delete_item
 
 Delete an item from a collection. The collection name should be in the
-stash key C<collection>. The ID of the item should be in the stash key
-C<id>.
+stash key C<collection>.
+
+The item to be deleted is determined as with L</get_item>.
 
 =head1 SUBCLASSING
 

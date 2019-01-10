@@ -1,6 +1,10 @@
 Revision history for Perl module Protocol::DBus
 
-0.07
+0.08 Wed 9 Jan 2019
+- Document the send_return(), send_error(), and send_signal() methods.
+- Switch to native byte order as default rather than little-endian.
+
+0.07 Thu 20 Dec 2018
 - Rename do_authn() to initialize(), and make it return falsy until the
   “Hello” response arrives back. This removes the workflow state where
   authn is done but the connection name is not yet established. I don’t

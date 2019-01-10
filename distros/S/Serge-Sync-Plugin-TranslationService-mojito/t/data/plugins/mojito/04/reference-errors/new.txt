@@ -1,1 +1,0 @@
-Data validation failed for plugin 'Serge::Sync::Plugin::TranslationService::mojito': 'source_files_path' not defined

@@ -1,0 +1,45 @@
+=head1 NAME
+
+MySQL::Util::Lite::ColumnConstraint
+
+=cut
+
+
+=head1 ATTRIBUTES
+
+=head2 REQUIRED
+
+none
+
+=cut
+
+
+=head2 OPTIONAL
+
+=head3 column_name
+
+=cut
+
+=head3 parent_column_name
+
+=cut
+
+=head3 parent_schema_name
+
+=cut
+
+=head3 parent_table_name
+
+=cut
+
+=head3 schema_name
+
+=cut
+
+=head3 table_name
+
+=cut
+
+
+=head1 METHODS
+

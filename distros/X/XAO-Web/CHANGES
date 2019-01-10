@@ -1,6 +1,31 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit 5ee03eea8570a7e74911f2a836c44c503d719d9e
+Merge: 3eb6edc 87175f5
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Nov 26 17:59:14 2018 -0800
+
+    Merge branch 'master' of github.com:amaltsev/XAO-Web
+
+commit 3eb6edc62b576970cfc21c4f2da563217d693cbf
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Nov 26 17:38:32 2018 -0800
+
+    Expiring obsolete keys instead of deleting
+    
+    There could be a race condition with deleting if multiple sessions run
+    in parallel.
+
+commit 87175f502aa8b61f6eb0e64d03519bafd1214255
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Oct 29 18:20:43 2018 -0700
+
+    1.74 Minor Web::Benchmark test case update
+    
+    Conputers are becoming too fast, a couple if iterations can
+    still result in a zero time spent...
+
 commit 2cc30fd5b807363a490084db5327b358022e3fb0
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Thu Oct 25 12:11:09 2018 -0700
@@ -62,24 +87,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Aug 25 07:44:01 2018 -0700
 
     Force ExtUtils::MakeMaker 6.64
-
-commit 542690459f31d9bbcaf2b656cfe37f8495d1e294
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Jul 30 07:03:17 2018 -0700
-
-    Better compatibility with Perl 5.10.1
-
-commit b4eb5ad7f99ce64ebc4649eed23b1ea2a43f2409
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Mon Jul 30 06:28:03 2018 -0700
-
-    Added Vars() method proxy to XAO::DO::CGI
-    
-    Now calls to Vars are also charset aware.
-
-commit 5707134fce103e393d48a57b07b10de7146cbcd8
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Jul 7 10:30:15 2018 -0700
-
-    Cleaner testing, no DESTROY warnings
 

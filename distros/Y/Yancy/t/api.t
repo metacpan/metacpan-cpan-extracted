@@ -93,19 +93,19 @@ my %data = (
             name => 'Doug Bell',
             email => 'doug@example.com',
             age => 35,
-            contact => 1,
+            contact => true,
         },
         {
             id => 2,
             name => 'Joel Berger',
             email => 'joel@example.com',
             age => 51,
-            contact => 0,
+            contact => false,
         },
         {
             id => 3,
             name => 'Secret Person',
-            contact => 0,
+            contact => false,
             age => undef, # exercise the deleting of nulls from returns
         },
     ],
@@ -152,6 +152,36 @@ subtest 'pass openapi' => \&test_api,
         openapi => $openapi,
     } ),
     '/yancy/api';
+
+$openapi = decode_json path ( $Bin, 'share', 'openapi-spec.json' )->slurp;
+$openapi->{paths}{"/people"}{"badmethod"} = {};
+subtest 'exception on unknown HTTP method' => sub {
+    eval {Test::Mojo->new( 'Yancy', {
+        backend => $backend_url,
+        openapi => $openapi,
+    } ) };
+    isnt $@, '', 'threw exception ok';
+};
+
+$openapi = decode_json path ( $Bin, 'share', 'openapi-spec.json' )->slurp;
+$openapi->{paths}{"/nonexistent"} = {};
+subtest 'exception on non-inferrable collection' => sub {
+    eval {Test::Mojo->new( 'Yancy', {
+        backend => $backend_url,
+        openapi => $openapi,
+    } ) };
+    isnt $@, '', 'threw exception ok';
+};
+
+$openapi = decode_json path ( $Bin, 'share', 'openapi-spec.json' )->slurp;
+$openapi->{paths}{"/people"} = {};
+subtest 'inferrable collection' => sub {
+    eval {Test::Mojo->new( 'Yancy', {
+        backend => $backend_url,
+        openapi => $openapi,
+    } ) };
+    is $@, '', 'no exception';
+};
 
 done_testing;
 
@@ -267,23 +297,25 @@ sub test_api {
                     name => 'Doug Bell',
                     email => 'doug@example.com',
                     age => 35,
-                    contact => 1,
+                    contact => true,
                 },
                 {
                     id => $items{people}[1]{id},
                     name => 'Joel Berger',
                     email => 'joel@example.com',
                     age => 51,
-                    contact => 0,
+                    contact => false,
                 },
                 {
                     id => $items{people}[2]{id},
                     name => 'Secret Person',
-                    contact => 0,
+                    contact => 0, # Why is this not a JSON::PP::Boolean?
                 },
             ],
             total => 3,
-          } );
+          } )
+          ->or( sub { diag explain shift->tx->res->json } )
+          ;
 
         subtest 'limit/offset' => sub {
             $t->get_ok( $api_path . '/people?$limit=1' )
@@ -295,7 +327,7 @@ sub test_api {
                         name => 'Doug Bell',
                         email => 'doug@example.com',
                         age => 35,
-                        contact => 1,
+                        contact => true,
                     },
                 ],
                 total => 3,
@@ -310,7 +342,7 @@ sub test_api {
                         name => 'Joel Berger',
                         email => 'joel@example.com',
                         age => 51,
-                        contact => 0,
+                        contact => false,
                     },
                     {
                         id => $items{people}[2]{id},
@@ -334,14 +366,14 @@ sub test_api {
                         name => 'Doug Bell',
                         email => 'doug@example.com',
                         age => 35,
-                        contact => 1,
+                        contact => true,
                     },
                     {
                         id => $items{people}[1]{id},
                         name => 'Joel Berger',
                         email => 'joel@example.com',
                         age => 51,
-                        contact => 0,
+                        contact => false,
                     },
                     {
                         id => $items{people}[2]{id},
@@ -359,7 +391,7 @@ sub test_api {
                     {
                         id => $items{people}[2]{id},
                         name => 'Secret Person',
-                        contact => 0,
+                        contact => false,
                     },
                     {
                         id => $items{people}[1]{id},
@@ -373,7 +405,7 @@ sub test_api {
                         name => 'Doug Bell',
                         email => 'doug@example.com',
                         age => 35,
-                        contact => 1,
+                        contact => true,
                     },
                 ],
                 total => 3,
@@ -391,7 +423,7 @@ sub test_api {
                         name => 'Doug Bell',
                         email => 'doug@example.com',
                         age => 35,
-                        contact => 1,
+                        contact => true,
                     },
                 ],
                 total => 1,
@@ -406,7 +438,7 @@ sub test_api {
                         name => 'Doug Bell',
                         email => 'doug@example.com',
                         age => 35,
-                        contact => 1,
+                        contact => true,
                     },
                 ],
                 total => 1,
@@ -421,7 +453,7 @@ sub test_api {
                         name => 'Joel Berger',
                         email => 'joel@example.com',
                         age => 51,
-                        contact => 0,
+                        contact => false,
                     },
                     {
                         id => $items{people}[2]{id},
@@ -445,7 +477,7 @@ sub test_api {
                 name => 'Doug Bell',
                 email => 'doug@example.com',
                 age => 35,
-                contact => 1,
+                contact => true,
             },
           );
         $t->get_ok( $api_path . '/people/' . $items{people}[2]{id} )
@@ -454,7 +486,7 @@ sub test_api {
             {
                 id => $items{people}[2]{id},
                 name => 'Secret Person',
-                contact => 0,
+                contact => false,
             },
           );
         $t->get_ok( $api_path . '/user/doug' )
@@ -492,12 +524,13 @@ sub test_api {
             email => 'doug@example.com',
             id => 1,
             age => 35,
-            contact => 1,
+            contact => true,
             phone => '555 555-0199',
         };
         $t->put_ok( $api_path . '/people/' . $items{people}[0]{id} => json => $new_person )
           ->status_is( 200 )
           ->json_is( $new_person );
+        $new_person->{ contact } = 1;
         is_deeply $backend->get( people => $items{people}[0]{id} ), $new_person;
 
         my $new_user = {

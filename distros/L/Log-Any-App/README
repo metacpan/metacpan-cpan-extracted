@@ -1,12 +1,18 @@
-SYNOPSIS
+NAME
+    Log::Any::App - An easy way to use Log::Any in applications
 
+VERSION
+    This document describes version 0.540 of Log::Any::App (from Perl
+    distribution Log-Any-App), released on 2019-01-09.
+
+SYNOPSIS
     Most of the time you only need to do this:
 
      # in your script.pl
      use Log::Any::App '$log';
      $log->warn("blah ...");
      if ($log->is_debug) { ... }
-    
+
      # or, in command line
      % perl -MLog::Any::App -MModuleThatUsesLogAny -e'...'
 
@@ -40,7 +46,6 @@ SYNOPSIS
     and init().
 
 DESCRIPTION
-
     IMPORTANT: Please read "ROAD TO 1.0" on some incompatibilities in the
     near future, before 1.0 is released.
 
@@ -50,9 +55,9 @@ DESCRIPTION
     Log::Any first, so please do a read up on that first.
 
     The goal of Log::Any::App is to provide developers an easy and concise
-    way to add logging to their *applications*. That is, instead of
-    modules; modules remain using Log::Any to produce logs. Applications
-    can upgrade to full Log4perl later when necessary, although in my
+    way to add logging to their **applications**. That is, instead of
+    modules; modules remain using Log::Any to produce logs. Applications can
+    upgrade to full Log4perl later when necessary, although in my
     experience, they usually don't.
 
     With Log::Any::App, you can replace this code in your application:
@@ -77,7 +82,6 @@ DESCRIPTION
     your application.
 
 USING AND EXAMPLES
-
     To use Log::Any::App, just do:
 
      use Log::Any::App '$log';
@@ -88,8 +92,8 @@ USING AND EXAMPLES
 
     This will send logs to screen as well as file (unless -e scripts, which
     only log to screen). Default log file is ~/$SCRIPT_NAME.log, or
-    /var/log/$SCRIPT_NAME.log if script is running as root. Default level
-    is 'warn'.
+    /var/log/$SCRIPT_NAME.log if script is running as root. Default level is
+    'warn'.
 
     The 'use Log::Any::App' statement can be issued before or after the
     modules that use Log::Any, it doesn't matter. Logging will be
@@ -98,23 +102,22 @@ USING AND EXAMPLES
     You are not required to import '$log', and don't need to if you do not
     produce logs in your application (only in the modules).
 
- Changing logging level
-
+  Changing logging level
     Since one of the most commonly tweaked logging setting is level (for
     example: increasing level when debugging problems), Log::Any::App
     provides several mechanisms to change log level, either from the script
     or from outside the script, for your convenience. Below are the
     mechanisms, ordered from highest priority:
 
-      * import argument (inside the script)
+    *   import argument (inside the script)
 
-      * command line arguments (outside the script)
+    *   command line arguments (outside the script)
 
-      * environment variables (outside the script)
+    *   environment variables (outside the script)
 
-      * level flag files (outside the script)
+    *   level flag files (outside the script)
 
-      * variables in 'main' package (inside the script)
+    *   variables in 'main' package (inside the script)
 
     These mechanisms are explained in more details in the documentation for
     the init() function. But below are some examples.
@@ -151,11 +154,9 @@ USING AND EXAMPLES
     command-line processing modules like Getopt::Long or App::Options. If
     you use a command-line processing module and plan to use command-line
     options to set level, you might want to define these level options, or
-    your command-line processing module will complain about unknown
-    options.
+    your command-line processing module will complain about unknown options.
 
- Changing default level
-
+  Changing default level
     The default log level is 'warn'. To change the default level, you can
     use 'main' package variables (since they have the lowest priority):
 
@@ -165,8 +166,7 @@ USING AND EXAMPLES
     Then you will still be able to use level flag files or environment
     variables or command-line options to override this setting.
 
- Changing per-output level
-
+  Changing per-output level
     Logging level can also be specified on a per-output level. For example,
     if you want your script to be chatty on the screen but still logs to
     file at the default 'warn' level:
@@ -175,7 +175,7 @@ USING AND EXAMPLES
      SCREEN_DEBUG=1 script.pl
      SCREEN_TRACE=1 script.pl
      SCREEN_LOG_LEVEL=info script.pl
-    
+
      script.pl --screen_verbose
      script.pl --screen-debug
      script.pl --screen-trace=1
@@ -184,8 +184,7 @@ USING AND EXAMPLES
     Similarly, to set only file level, use FILE_VERBOSE, FILE_LOG_LEVEL,
     --file-trace, and so on.
 
- Setting default per-output level
-
+  Setting default per-output level
     As with setting default level, you can also set default level on a
     per-output basis:
 
@@ -199,8 +198,7 @@ USING AND EXAMPLES
     If a per-output level is not specified, it will default to the general
     log level.
 
- Enabling/disabling output
-
+  Enabling/disabling output
     To disable a certain output, you can do this:
 
      use Log::Any::App '$log', -file => 0;
@@ -220,15 +218,14 @@ USING AND EXAMPLES
     variables or command-line options (SCREEN_DEBUG, --screen-verbose, and
     so on).
 
- Changing log level of cron scripts
-
+  Changing log level of cron scripts
     Environment variables and command-line options allow changing log level
-    without modifying the script. But for scripts specified in crontab,
-    they still require changing crontab entries, e.g.:
+    without modifying the script. But for scripts specified in crontab, they
+    still require changing crontab entries, e.g.:
 
      # turn on debugging
      */5 * * * * DEBUG=1 foo
-    
+
      # be silent
      */5 * * * * bar --quiet
 
@@ -239,8 +236,7 @@ USING AND EXAMPLES
 
     you can also change log levels without modifying your crontab.
 
- Changing log file name/location
-
+  Changing log file name/location
     By default Log::Any::App will log to file to ~/$NAME.log (or
     /var/log/$NAME.log if script is running as root), where $NAME is taken
     from the basename of $0. But this can be changed using:
@@ -251,8 +247,7 @@ USING AND EXAMPLES
 
      use Log::Any::App '$log', -file => '/path/to/file';
 
- Changing other output parameters
-
+  Changing other output parameters
     Each output argument can accept a hashref to specify various options.
     For example:
 
@@ -265,16 +260,15 @@ USING AND EXAMPLES
 
     For all the available options of each output, see the init() function.
 
- Logging to syslog
-
+  Logging to syslog
     Logging to syslog is enabled by default if your script looks like or
     declare that it is a daemon, e.g.:
 
      use Net::Daemon; # this indicate your program is a daemon
      use Log::Any::App; # syslog logging will be turned on by default
-    
+
      use Log::Any::App -daemon => 1; # script declares that it is a daemon
-    
+
      # idem
      package main;
      our $IS_DAEMON = 1;
@@ -283,8 +277,7 @@ USING AND EXAMPLES
 
      use Log::Any::App -syslog => 0;
 
- Logging to directory
-
+  Logging to directory
     This is done using Log::Dispatch::Dir where each log message is logged
     to a different file in a specified directory. By default logging to dir
     is not turned on, to turn it on:
@@ -294,8 +287,7 @@ USING AND EXAMPLES
     For all the available options of directory output, see the init()
     function.
 
- Multiple outputs
-
+  Multiple outputs
     Each output argument can accept an arrayref to specify more than one
     output. For example below is a code to log to three files:
 
@@ -304,8 +296,7 @@ USING AND EXAMPLES
                    "/var/log/log1",
                    {path=>"/var/log/debug_foo", category=>'Foo', level=>'debug'}];
 
- Changing level of certain module(s)
-
+  Changing level of certain module(s)
     Suppose you want to shut up logs from modules Foo, Bar::Baz, and Qux
     (and their submodules as well, e.g. Foo::Alpha, Bar::Baz::Beta::Gamma)
     because they are too noisy:
@@ -343,15 +334,13 @@ USING AND EXAMPLES
        LOG_CATEGORY_ALIAS='{"-noisy":["Foo","Bar::Baz","Quz"]}' \
        LOG_CATEGORY_LEVEL='{"-noisy":"off"}' script.pl ...
 
- Only displaying log from certain module(s)
-
+  Only displaying log from certain module(s)
     Use a combination of LOG_LEVEL and LOG_CATEGORY_LEVEL. For example:
 
      % LOG_LEVEL=off LOG_CATEGORY_LEVEL='{"Foo.Bar":"trace", "Baz":"info"}' \
        script.pl ...
 
- Displaying category name
-
+  Displaying category name
      % LOG_SHOW_CATEGORY=1 script.pl ...
 
     Now instead of:
@@ -362,8 +351,7 @@ USING AND EXAMPLES
 
      [cat Foo.Bar][25] Starting baz ritual ...
 
- Displaying location name
-
+  Displaying location name
      % LOG_SHOW_LOCATION=1 script.pl ...
 
     Now log messages will be prefixed with location (function/file/line
@@ -371,11 +359,10 @@ USING AND EXAMPLES
 
      [loc Foo::Bar lib/Foo/Bar.pm (12)][25] Starting baz ritual ...
 
- Preventing logging level to be changed from outside the script
-
+  Preventing logging level to be changed from outside the script
     Sometimes, for security/audit reasons, you don't want to allow script
-    caller to change logging level. As explained previously, you can use
-    the 'level' import argument (the highest priority of level-setting):
+    caller to change logging level. As explained previously, you can use the
+    'level' import argument (the highest priority of level-setting):
 
      use Log::Any::App '$log', -level => 'debug'; # always use debug level
 
@@ -384,21 +371,142 @@ USING AND EXAMPLES
     mechanisms to decrease level but not increase it. And finally
     'debug,trace' to specify allowable levels (is this necessary?)
 
- Debugging
+  Debugging
+    To see the Log4perl configuration that is generated by Log::Any::App and
+    how it came to be, set environment LOGANYAPP_DEBUG to true.
 
-    To see the Log4perl configuration that is generated by Log::Any::App
-    and how it came to be, set environment LOGANYAPP_DEBUG to true.
+PATTERN STYLES
+    Log::Any::App provides some styles for Log4perl patterns. You can
+    specify "pattern_style" instead of directly specifying "pattern".
+    example:
+
+     use Log::Any::App -screen => {pattern_style=>"script_long"};
+
+     Name           Description                        Example output
+     ----           -----------                        --------------
+     plain          The message, the whole message,    Message
+                    and nothing but the message.
+                    Used by dir logging.
+
+                    Equivalent to pattern: '%m'
+
+     plain_nl       Message plus newline. The default  Message
+                    for screen without
+                    LOG_ELAPSED_TIME_IN_SCREEN.
+
+                    Equivalent to pattern: '%m%n'
+
+     script_short   For scripts that run for a short   [234] Message
+                    time (a few seconds). Shows just
+                    the number of milliseconds. This
+                    is the default for screen under
+                    LOG_ELAPSED_TIME_IN_SCREEN.
+
+                    Equivalent to pattern:
+                    '[%r] %m%n'
+
+     script_long    Scripts that will run for a        [2010-04-22 18:01:02] Message
+                    while (more than a few seconds).
+                    Shows date/time.
+
+                    Equivalent to pattern:
+                    '[%d] %m%n'
+
+     daemon         For typical daemons. Shows PID     [pid 1234] [2010-04-22 18:01:02] Message
+                    and date/time. This is the
+                    default for file logging.
+
+                    Equivalent to pattern:
+                    '[pid %P] [%d] %m%n'
+
+     syslog         Style suitable for syslog          [pid 1234] Message
+                    logging.
+
+                    Equivalent to pattern:
+                    '[pid %p] %m'
+
+    For each of the above there are also "cat_XXX" (e.g. "cat_script_long")
+    which are the same as XXX but with "[cat %c]" in front of the pattern.
+    It is used mainly to show categories and then filter by categories. You
+    can turn picking default pattern style with category using environment
+    variable LOG_SHOW_CATEGORY.
+
+    And for each of the above there are also "loc_XXX" (e.g. "loc_syslog")
+    which are the same as XXX but with "[loc %l]" in front of the pattern.
+    It is used to show calling location (file, function/method, and line
+    number). You can turn picking default pattern style with location prefix
+    using environment variable LOG_SHOW_LOCATION.
+
+    If you have a favorite pattern style, please do share them.
+
+BUGS/TODOS
+    Need to provide appropriate defaults for Windows/other OS.
+
+ROAD TO 1.0
+    Here are some planned changes/development before 1.0 is reached. There
+    might be some incompatibilities, please read this section carefully.
+
+    *   Everything is configurable via environment/command-line/option file
+
+        As I *love* specifying log options from environment, I will make
+        *every* init() options configurable from outside the script
+        (environment/command-line/control file). Of course, init() arguments
+        still take precedence for authors that do not want some/all options
+        to be overridden from outside.
+
+    *   Reorganization of command-line/environment names
+
+        Aside from the handy and short TRACE (--trace), DEBUG, VERBOSE,
+        QUIET, all the other environment names will be put under LOG_
+        prefix. This means FILE_LOG_LEVEL will be changed to LOG_FILE_LEVEL,
+        and so on. SCREEN_VERBOSE will be changed to VERBOSE_SCREEN.
+
+        This is meant to reduce "pollution" of the environment variables
+        namespace.
+
+        Log option file (option file for short, previously "flag file") will
+        be searched in <PROG>.log_options. Its content is in JSON and will
+        become init() arguments. For example:
+
+         {"file": 1, "screen":{"level":"trace"}}
+
+        or more akin to init() (both will be supported):
+
+         ["-file": 1, "-screen":{"level":"trace"}]
+
+    *   Possible reorganization of package variable names
+
+        To be more strict and reduce confusion, case variation might not be
+        searched.
+
+    *   Pluggable backend
+
+        This is actually the main motivator to reach 1.0 and all these
+        changes. Backends will be put in Log::Any::App::Backend::Log4perl,
+        and so on.
+
+    *   Pluggable output
+
+        Probably split to Log::Any::App::Output::file, and so on. Each
+        output needs its backend support.
+
+    *   App::Options support will probably be dropped
+
+        I no longer use App::Options these days, and I don't know of any
+        Log::Any::App user who does.
+
+    *   Probably some hooks to allow for more flexibility.
+
+        For example, if user wants to parse or detect levels/log file
+        paths/etc from some custom logic.
 
 FUNCTIONS
-
     None is exported.
 
- init(\@args)
-
+  init(\@args)
     This is the actual function that implements the setup and configuration
-    of logging. You normally need not call this function explicitly (but
-    see below), it will be called once in an INIT block. In fact, when you
-    do:
+    of logging. You normally need not call this function explicitly (but see
+    below), it will be called once in an INIT block. In fact, when you do:
 
      use Log::Any::App 'a', 'b', 'c';
 
@@ -416,553 +524,389 @@ FUNCTIONS
     Arguments to init can be one or more of:
 
     -log => BOOL
-
-      Whether to do log at all. Default is from LOG environment variable,
-      or 1. This option is only to allow users to disable Log::Any::App
-      (thus speeding up startup by avoiding loading Log4perl, etc) by
-      passing LOG=1 environment when running programs. However, if you
-      explicitly set this option to 1, Log::Any::App cannot be disabled
-      this way.
+        Whether to do log at all. Default is from LOG environment variable,
+        or 1. This option is only to allow users to disable Log::Any::App
+        (thus speeding up startup by avoiding loading Log4perl, etc) by
+        passing LOG=1 environment when running programs. However, if you
+        explicitly set this option to 1, Log::Any::App cannot be disabled
+        this way.
 
     -init => BOOL
-
-      Whether to call Log::Log4perl->init() after setting up the Log4perl
-      configuration. Default is true. You can set this to false, and you
-      can initialize Log4perl yourself (but then there's not much point in
-      using this module, right?)
+        Whether to call Log::Log4perl->init() after setting up the Log4perl
+        configuration. Default is true. You can set this to false, and you
+        can initialize Log4perl yourself (but then there's not much point in
+        using this module, right?)
 
     -name => STRING
-
-      Change the program name. Default is taken from $0.
+        Change the program name. Default is taken from $0.
 
     -level_flag_paths => ARRAY OF STRING
-
-      Edit level flag file locations. The default is [$homedir, "/etc"].
+        Edit level flag file locations. The default is [$homedir, "/etc"].
 
     -daemon => BOOL
-
-      Declare that script is a daemon. Default is no. Aside from this, to
-      declare that your script is a daemon you can also set
-      $main::IS_DAEMON to true.
+        Declare that script is a daemon. Default is no. Aside from this, to
+        declare that your script is a daemon you can also set
+        $main::IS_DAEMON to true.
 
     -category_alias => {ALIAS=>CATEGORY, ...}
+        Create category aliases so the ALIAS can be used in place of real
+        categories in each output's category specification. For example,
+        instead of doing this:
 
-      Create category aliases so the ALIAS can be used in place of real
-      categories in each output's category specification. For example,
-      instead of doing this:
+         init(
+             -file   => [category=>[qw/Foo Bar Baz/], ...],
+             -screen => [category=>[qw/Foo Bar Baz/]],
+         );
 
-       init(
-           -file   => [category=>[qw/Foo Bar Baz/], ...],
-           -screen => [category=>[qw/Foo Bar Baz/]],
-       );
+        you can do this instead:
 
-      you can do this instead:
+         init(
+             -category_alias => {-fbb => [qw/Foo Bar Baz/]},
+             -file   => [category=>'-fbb', ...],
+             -screen => [category=>'-fbb', ...],
+         );
 
-       init(
-           -category_alias => {-fbb => [qw/Foo Bar Baz/]},
-           -file   => [category=>'-fbb', ...],
-           -screen => [category=>'-fbb', ...],
-       );
+        You can also specify this from the environment variable
+        LOG_CATEGORY_ALIAS using JSON encoding, e.g.
 
-      You can also specify this from the environment variable
-      LOG_CATEGORY_ALIAS using JSON encoding, e.g.
-
-       LOG_CATEGORY_ALIAS='{"-fbb":["Foo","Bar","Baz"]}'
+         LOG_CATEGORY_ALIAS='{"-fbb":["Foo","Bar","Baz"]}'
 
     -category_level => {CATEGORY=>LEVEL, ...}
+        Specify per-category level. Categories not mentioned on this will
+        use the general level (-level). This can be used to increase or
+        decrease logging on certain categories/modules.
 
-      Specify per-category level. Categories not mentioned on this will use
-      the general level (-level). This can be used to increase or decrease
-      logging on certain categories/modules.
+        You can also specify this from the environment variable
+        LOG_CATEGORY_LEVEL using JSON encoding, e.g.
 
-      You can also specify this from the environment variable
-      LOG_CATEGORY_LEVEL using JSON encoding, e.g.
-
-       LOG_CATEGORY_LEVEL='{"-fbb":"off"}'
+         LOG_CATEGORY_LEVEL='{"-fbb":"off"}'
 
     -level => 'trace'|'debug'|'info'|'warn'|'error'|'fatal'|'off'
+        Specify log level for all outputs. Each output can override this
+        value. The default log level is determined as follow:
 
-      Specify log level for all outputs. Each output can override this
-      value. The default log level is determined as follow:
+        Search in command-line options. If App::Options is present, these
+        keys are checked in %App::options: log_level, trace (if true then
+        level is "trace"), debug (if true then level is "debug"), verbose
+        (if true then level is "info"), quiet (if true then level is
+        "error").
 
-      Search in command-line options. If App::Options is present, these
-      keys are checked in %App::options: log_level, trace (if true then
-      level is trace), debug (if true then level is debug), verbose (if
-      true then level is info), quiet (if true then level is error).
+        Otherwise, it will try to scrape @ARGV for the presence of
+        --log-level, --trace, --debug, --verbose, or --quiet (this usually
+        works because Log::Any::App does this in the INIT phase, before you
+        call Getopt::Long's GetOptions() or the like).
 
-      Otherwise, it will try to scrape @ARGV for the presence of
-      --log-level, --trace, --debug, --verbose, or --quiet (this usually
-      works because Log::Any::App does this in the INIT phase, before you
-      call Getopt::Long's GetOptions() or the like).
+        Search in environment variables. Otherwise, it will look for
+        environment variables: LOG_LEVEL, QUIET. VERBOSE, DEBUG, TRACE.
 
-      Search in environment variables. Otherwise, it will look for
-      environment variables: LOG_LEVEL, QUIET. VERBOSE, DEBUG, TRACE.
+        Search in level flag files. Otherwise, it will look for existence of
+        files with one of these names "$NAME.QUIET", "$NAME.VERBOSE",
+        "$NAME.TRACE", "$NAME.DEBUG", or content of "$NAME.log_level" in ~
+        or /etc.
 
-      Search in level flag files. Otherwise, it will look for existence of
-      files with one of these names $NAME.QUIET, $NAME.VERBOSE,
-      $NAME.TRACE, $NAME.DEBUG, or content of $NAME.log_level in ~ or /etc.
+        Search in main package variables. Otherwise, it will try to search
+        for package variables in the "main" namespace with names like
+        $Log_Level or $LOG_LEVEL or $log_level, $Quiet or $QUIET or $quiet,
+        $Verbose or $VERBOSE or $verbose, $Trace or $TRACE or $trace, $Debug
+        or $DEBUG or $debug.
 
-      Search in main package variables. Otherwise, it will try to search
-      for package variables in the main namespace with names like
-      $Log_Level or $LOG_LEVEL or $log_level, $Quiet or $QUIET or $quiet,
-      $Verbose or $VERBOSE or $verbose, $Trace or $TRACE or $trace, $Debug
-      or $DEBUG or $debug.
-
-      If everything fails, it defaults to 'warn'.
+        If everything fails, it defaults to 'warn'.
 
     -filter_text => STR
-
-      Only show log lines matching STR. Default from LOG_FILTER_TEXT
-      environment.
+        Only show log lines matching STR. Default from "LOG_FILTER_TEXT"
+        environment.
 
     -filter_no_text => STR
-
-      Only show log lines not matching STR. Default from LOG_FILTER_NO_TEXT
-      environment.
+        Only show log lines not matching STR. Default from
+        "LOG_FILTER_NO_TEXT" environment.
 
     -filter_citext => STR
-
-      Only show log lines matching STR (case insensitive). Default from
-      LOG_FILTER_CITEXT environment.
+        Only show log lines matching STR (case insensitive). Default from
+        "LOG_FILTER_CITEXT" environment.
 
     -filter_no_citext => STR
-
-      Only show log lines not matching STR (case insensitive). Default from
-      LOG_FILTER_NO_CITEXT environment.
+        Only show log lines not matching STR (case insensitive). Default
+        from "LOG_FILTER_NO_CITEXT" environment.
 
     -filter_re => RE
-
-      Only show log lines matching regex pattern RE. Default from
-      LOG_FILTER_RE environment.
+        Only show log lines matching regex pattern RE. Default from
+        "LOG_FILTER_RE" environment.
 
     -filter_no_re => RE
-
-      Only show log lines not matching regex pattern RE. Default from
-      LOG_FILTER_NO_RE environment.
+        Only show log lines not matching regex pattern RE. Default from
+        "LOG_FILTER_NO_RE" environment.
 
     -file => 0 | 1|yes|true | PATH | {opts} | [{opts}, ...]
+        Specify output to one or more files, using
+        Log::Dispatch::FileWriteRotate.
 
-      Specify output to one or more files, using
-      Log::Dispatch::FileWriteRotate.
+        If the argument is a false boolean value, file logging will be
+        turned off. If argument is a true value that matches
+        /^(1|yes|true)$/i, file logging will be turned on with default path,
+        etc. If the argument is another scalar value then it is assumed to
+        be a path. If the argument is a hashref, then the keys of the
+        hashref must be one of: "level", "path", "max_size" (maximum size
+        before rotating, in bytes, 0 means unlimited or never rotate),
+        "histories" (number of old files to keep, excluding the current
+        file), "suffix" (will be passed to Log::Dispatch::FileWriteRotate's
+        constructor), "period" (will be passed to
+        Log::Dispatch::FileWriteRotate's constructor), "buffer_size" (will
+        be passed to Log::Dispatch::FileWriteRotate's constructor),
+        "category" (a string of ref to array of strings), "category_level"
+        (a hashref, similar to -category_level), "pattern_style" (see
+        "PATTERN STYLES"), "pattern" (Log4perl pattern), "filter_text",
+        "filter_no_text", "filter_citext", "filter_no_citext", "filter_re",
+        "filter_no_re".
 
-      If the argument is a false boolean value, file logging will be turned
-      off. If argument is a true value that matches /^(1|yes|true)$/i, file
-      logging will be turned on with default path, etc. If the argument is
-      another scalar value then it is assumed to be a path. If the argument
-      is a hashref, then the keys of the hashref must be one of: level,
-      path, max_size (maximum size before rotating, in bytes, 0 means
-      unlimited or never rotate), histories (number of old files to keep,
-      excluding the current file), suffix (will be passed to
-      Log::Dispatch::FileWriteRotate's constructor), period (will be passed
-      to Log::Dispatch::FileWriteRotate's constructor), buffer_size (will
-      be passed to Log::Dispatch::FileWriteRotate's constructor), category
-      (a string of ref to array of strings), category_level (a hashref,
-      similar to -category_level), pattern_style (see "PATTERN STYLES"),
-      pattern (Log4perl pattern), filter_text, filter_no_text,
-      filter_citext, filter_no_citext, filter_re, filter_no_re.
+        If the argument is an arrayref, it is assumed to be specifying
+        multiple files, with each element of the array as a hashref.
 
-      If the argument is an arrayref, it is assumed to be specifying
-      multiple files, with each element of the array as a hashref.
+        How Log::Any::App determines defaults for file logging:
 
-      How Log::Any::App determines defaults for file logging:
+        If program is a one-liner script specified using "perl -e", the
+        default is no file logging. Otherwise file logging is turned on.
 
-      If program is a one-liner script specified using "perl -e", the
-      default is no file logging. Otherwise file logging is turned on.
+        If the program runs as root, the default path is
+        "/var/log/$NAME.log", where $NAME is taken from $0 (or "-name").
+        Otherwise the default path is ~/$NAME.log. Intermediate directories
+        will be made with File::Path.
 
-      If the program runs as root, the default path is /var/log/$NAME.log,
-      where $NAME is taken from $0 (or -name). Otherwise the default path
-      is ~/$NAME.log. Intermediate directories will be made with
-      File::Path.
+        If specified "path" ends with a slash (e.g. "/my/log/"), it is
+        assumed to be a directory and the final file path is directory
+        appended with $NAME.log.
 
-      If specified path ends with a slash (e.g. "/my/log/"), it is assumed
-      to be a directory and the final file path is directory appended with
-      $NAME.log.
+        Default rotating behaviour is no rotate (max_size = 0).
 
-      Default rotating behaviour is no rotate (max_size = 0).
+        Default level for file is the same as the global level set by
+        -level. But App::options, command line, environment, level flag
+        file, and package variables in main are also searched first (for
+        FILE_LOG_LEVEL, FILE_TRACE, FILE_DEBUG, FILE_VERBOSE, FILE_QUIET,
+        and the similars).
 
-      Default level for file is the same as the global level set by -level.
-      But App::options, command line, environment, level flag file, and
-      package variables in main are also searched first (for
-      FILE_LOG_LEVEL, FILE_TRACE, FILE_DEBUG, FILE_VERBOSE, FILE_QUIET, and
-      the similars).
-
-      You can also specify category level from environment
-      FILE_LOG_CATEGORY_LEVEL.
+        You can also specify category level from environment
+        FILE_LOG_CATEGORY_LEVEL.
 
     -dir => 0 | 1|yes|true | PATH | {opts} | [{opts}, ...]
+        Log messages using Log::Dispatch::Dir. Each message is logged into
+        separate files in the directory. Useful for dumping content (e.g.
+        HTML, network dumps, or temporary results).
 
-      Log messages using Log::Dispatch::Dir. Each message is logged into
-      separate files in the directory. Useful for dumping content (e.g.
-      HTML, network dumps, or temporary results).
+        If the argument is a false boolean value, dir logging will be turned
+        off. If argument is a true value that matches /^(1|yes|true)$/i, dir
+        logging will be turned on with defaults path, etc. If the argument
+        is another scalar value then it is assumed to be a directory path.
+        If the argument is a hashref, then the keys of the hashref must be
+        one of: "level", "path", "max_size" (maximum total size of files
+        before deleting older files, in bytes, 0 means unlimited), "max_age"
+        (maximum age of files to keep, in seconds, undef means unlimited).
+        "histories" (number of old files to keep, excluding the current
+        file), "category", "category_level" (a hashref, similar to
+        -category_level), "pattern_style" (see "PATTERN STYLES"), "pattern"
+        (Log4perl pattern), "filename_pattern" (pattern of file name),
+        "filter_text", "filter_no_text", "filter_citext",
+        "filter_no_citext", "filter_re", "filter_no_re".
 
-      If the argument is a false boolean value, dir logging will be turned
-      off. If argument is a true value that matches /^(1|yes|true)$/i, dir
-      logging will be turned on with defaults path, etc. If the argument is
-      another scalar value then it is assumed to be a directory path. If
-      the argument is a hashref, then the keys of the hashref must be one
-      of: level, path, max_size (maximum total size of files before
-      deleting older files, in bytes, 0 means unlimited), max_age (maximum
-      age of files to keep, in seconds, undef means unlimited). histories
-      (number of old files to keep, excluding the current file), category,
-      category_level (a hashref, similar to -category_level), pattern_style
-      (see "PATTERN STYLES"), pattern (Log4perl pattern), filename_pattern
-      (pattern of file name), filter_text, filter_no_text, filter_citext,
-      filter_no_citext, filter_re, filter_no_re.
+        If the argument is an arrayref, it is assumed to be specifying
+        multiple directories, with each element of the array as a hashref.
 
-      If the argument is an arrayref, it is assumed to be specifying
-      multiple directories, with each element of the array as a hashref.
+        How Log::Any::App determines defaults for dir logging:
 
-      How Log::Any::App determines defaults for dir logging:
+        Directory logging is by default turned off. You have to explicitly
+        turn it on.
 
-      Directory logging is by default turned off. You have to explicitly
-      turn it on.
+        If the program runs as root, the default path is "/var/log/$NAME/",
+        where $NAME is taken from $0. Otherwise the default path is
+        ~/log/$NAME/. Intermediate directories will be created with
+        File::Path. Program name can be changed using "-name".
 
-      If the program runs as root, the default path is /var/log/$NAME/,
-      where $NAME is taken from $0. Otherwise the default path is
-      ~/log/$NAME/. Intermediate directories will be created with
-      File::Path. Program name can be changed using -name.
+        Default rotating parameters are: histories=1000, max_size=0,
+        max_age=undef.
 
-      Default rotating parameters are: histories=1000, max_size=0,
-      max_age=undef.
+        Default level for dir logging is the same as the global level set by
+        -level. But App::options, command line, environment, level flag
+        file, and package variables in main are also searched first (for
+        DIR_LOG_LEVEL, DIR_TRACE, DIR_DEBUG, DIR_VERBOSE, DIR_QUIET, and the
+        similars).
 
-      Default level for dir logging is the same as the global level set by
-      -level. But App::options, command line, environment, level flag file,
-      and package variables in main are also searched first (for
-      DIR_LOG_LEVEL, DIR_TRACE, DIR_DEBUG, DIR_VERBOSE, DIR_QUIET, and the
-      similars).
-
-      You can also specify category level from environment
-      DIR_LOG_CATEGORY_LEVEL.
+        You can also specify category level from environment
+        DIR_LOG_CATEGORY_LEVEL.
 
     -screen => 0 | 1|yes|true | {opts}
+        Log messages using Log::Log4perl::Appender::ScreenColoredLevels.
 
-      Log messages using Log::Log4perl::Appender::ScreenColoredLevels.
+        If the argument is a false boolean value, screen logging will be
+        turned off. If argument is a true value that matches
+        /^(1|yes|true)$/i, screen logging will be turned on with default
+        settings. If the argument is a hashref, then the keys of the hashref
+        must be one of: "color" (default is true, set to 0 to turn off
+        color), "stderr" (default is true, set to 0 to log to stdout
+        instead), "level", "category", "category_level" (a hashref, similar
+        to -category_level), "pattern_style" (see "PATTERN STYLE"),
+        "pattern" (Log4perl string pattern), "filter_text",
+        "filter_no_text", "filter_citext", "filter_no_citext", "filter_re",
+        "filter_no_re".
 
-      If the argument is a false boolean value, screen logging will be
-      turned off. If argument is a true value that matches
-      /^(1|yes|true)$/i, screen logging will be turned on with default
-      settings. If the argument is a hashref, then the keys of the hashref
-      must be one of: color (default is true, set to 0 to turn off color),
-      stderr (default is true, set to 0 to log to stdout instead), level,
-      category, category_level (a hashref, similar to -category_level),
-      pattern_style (see "PATTERN STYLE"), pattern (Log4perl string
-      pattern), filter_text, filter_no_text, filter_citext,
-      filter_no_citext, filter_re, filter_no_re.
+        How Log::Any::App determines defaults for screen logging:
 
-      How Log::Any::App determines defaults for screen logging:
+        Screen logging is turned on by default.
 
-      Screen logging is turned on by default.
+        Default level for screen logging is the same as the global level set
+        by -level. But App::options, command line, environment, level flag
+        file, and package variables in main are also searched first (for
+        SCREEN_LOG_LEVEL, SCREEN_TRACE, SCREEN_DEBUG, SCREEN_VERBOSE,
+        SCREEN_QUIET, and the similars).
 
-      Default level for screen logging is the same as the global level set
-      by -level. But App::options, command line, environment, level flag
-      file, and package variables in main are also searched first (for
-      SCREEN_LOG_LEVEL, SCREEN_TRACE, SCREEN_DEBUG, SCREEN_VERBOSE,
-      SCREEN_QUIET, and the similars).
+        Color can also be turned on/off using environment variable COLOR (if
+        color argument is not set).
 
-      Color can also be turned on/off using environment variable COLOR (if
-      color argument is not set).
-
-      You can also specify category level from environment
-      SCREEN_LOG_CATEGORY_LEVEL.
+        You can also specify category level from environment
+        SCREEN_LOG_CATEGORY_LEVEL.
 
     -syslog => 0 | 1|yes|true | {opts}
+        Log messages using Log::Dispatch::Syslog.
 
-      Log messages using Log::Dispatch::Syslog.
+        If the argument is a false boolean value, syslog logging will be
+        turned off. If argument is a true value that matches
+        /^(1|yes|true)$/i, syslog logging will be turned on with default
+        level, ident, etc. If the argument is a hashref, then the keys of
+        the hashref must be one of: "level", "ident", "facility",
+        "category", "category_level" (a hashref, similar to
+        -category_level), "pattern_style" (see "PATTERN STYLES"), "pattern"
+        (Log4perl pattern), "filter_text", "filter_no_text",
+        "filter_citext", "filter_no_citext", "filter_re", "filter_no_re".
 
-      If the argument is a false boolean value, syslog logging will be
-      turned off. If argument is a true value that matches
-      /^(1|yes|true)$/i, syslog logging will be turned on with default
-      level, ident, etc. If the argument is a hashref, then the keys of the
-      hashref must be one of: level, ident, facility, category,
-      category_level (a hashref, similar to -category_level), pattern_style
-      (see "PATTERN STYLES"), pattern (Log4perl pattern), filter_text,
-      filter_no_text, filter_citext, filter_no_citext, filter_re,
-      filter_no_re.
+        How Log::Any::App determines defaults for syslog logging:
 
-      How Log::Any::App determines defaults for syslog logging:
+        If a program is a daemon (determined by detecting modules like
+        Net::Server or Proc::PID::File, or by checking if -daemon or
+        $main::IS_DAEMON is true) then syslog logging is turned on by
+        default and facility is set to "daemon", otherwise the default is
+        off.
 
-      If a program is a daemon (determined by detecting modules like
-      Net::Server or Proc::PID::File, or by checking if -daemon or
-      $main::IS_DAEMON is true) then syslog logging is turned on by default
-      and facility is set to daemon, otherwise the default is off.
+        Ident is program's name by default ($0, or "-name").
 
-      Ident is program's name by default ($0, or -name).
+        Default level for syslog logging is the same as the global level set
+        by -level. But App::options, command line, environment, level flag
+        file, and package variables in main are also searched first (for
+        SYSLOG_LOG_LEVEL, SYSLOG_TRACE, SYSLOG_DEBUG, SYSLOG_VERBOSE,
+        SYSLOG_QUIET, and the similars).
 
-      Default level for syslog logging is the same as the global level set
-      by -level. But App::options, command line, environment, level flag
-      file, and package variables in main are also searched first (for
-      SYSLOG_LOG_LEVEL, SYSLOG_TRACE, SYSLOG_DEBUG, SYSLOG_VERBOSE,
-      SYSLOG_QUIET, and the similars).
-
-      You can also specify category level from environment
-      SYSLOG_LOG_CATEGORY_LEVEL.
+        You can also specify category level from environment
+        SYSLOG_LOG_CATEGORY_LEVEL.
 
     -unixsock => 0 | 1|yes|true | PATH | {opts} | [{opts}, ...]
+        Specify output to one or more existing, listening, datagram Unix
+        domain sockets, using Log::Log4perl::Appender::Socket::UNIX.
 
-      Specify output to one or more existing, listening, datagram Unix
-      domain sockets, using Log::Log4perl::Appender::Socket::UNIX.
+        The listening end might be a different process, or the same process
+        using a different thread of nonblocking I/O. It usually makes little
+        sense to make the same program the listening end. If you want, for
+        example, to let a client connects to your program to see logs being
+        produced, you might want to setup an in-memory output ("-array") and
+        create another thread or non-blocking I/O to listen to client
+        requests and show them the content of the array when requested.
 
-      The listening end might be a different process, or the same process
-      using a different thread of nonblocking I/O. It usually makes little
-      sense to make the same program the listening end. If you want, for
-      example, to let a client connects to your program to see logs being
-      produced, you might want to setup an in-memory output (-array) and
-      create another thread or non-blocking I/O to listen to client
-      requests and show them the content of the array when requested.
+        If the argument is a false boolean value, Unix domain socket logging
+        will be turned off. If argument is a true value that matches
+        /^(1|yes|true)$/i, Unix domain socket logging will be turned on with
+        default path, etc. If the argument is another scalar value then it
+        is assumed to be a path. If the argument is a hashref, then the keys
+        of the hashref must be one of: "level", "path", "filter_text",
+        "filter_no_text", "filter_citext", "filter_no_citext", "filter_re",
+        "filter_no_re".
 
-      If the argument is a false boolean value, Unix domain socket logging
-      will be turned off. If argument is a true value that matches
-      /^(1|yes|true)$/i, Unix domain socket logging will be turned on with
-      default path, etc. If the argument is another scalar value then it is
-      assumed to be a path. If the argument is a hashref, then the keys of
-      the hashref must be one of: level, path, filter_text, filter_no_text,
-      filter_citext, filter_no_citext, filter_re, filter_no_re.
+        If the argument is an arrayref, it is assumed to be specifying
+        multiple sockets, with each element of the array as a hashref.
 
-      If the argument is an arrayref, it is assumed to be specifying
-      multiple sockets, with each element of the array as a hashref.
+        How Log::Any::App determines defaults for Unix domain socket
+        logging:
 
-      How Log::Any::App determines defaults for Unix domain socket logging:
+        By default Unix domain socket logging is off.
 
-      By default Unix domain socket logging is off.
+        If the program runs as root, the default path is
+        "/var/run/$NAME-log.sock", where $NAME is taken from $0 (or
+        "-name"). Otherwise the default path is ~/$NAME-log.sock.
 
-      If the program runs as root, the default path is
-      /var/run/$NAME-log.sock, where $NAME is taken from $0 (or -name).
-      Otherwise the default path is ~/$NAME-log.sock.
+        If specified "path" ends with a slash (e.g. "/my/log/"), it is
+        assumed to be a directory and the final socket path is directory
+        appended with $NAME-log.sock.
 
-      If specified path ends with a slash (e.g. "/my/log/"), it is assumed
-      to be a directory and the final socket path is directory appended
-      with $NAME-log.sock.
+        Default level is the same as the global level set by -level. But
+        App::options, command line, environment, level flag file, and
+        package variables in main are also searched first (for
+        UNIXSOCK_LOG_LEVEL, UNIXSOCK_TRACE, UNIXSOCK_DEBUG,
+        UNIXSOCK_VERBOSE, UNIXSOCK_QUIET, and the similars).
 
-      Default level is the same as the global level set by -level. But
-      App::options, command line, environment, level flag file, and package
-      variables in main are also searched first (for UNIXSOCK_LOG_LEVEL,
-      UNIXSOCK_TRACE, UNIXSOCK_DEBUG, UNIXSOCK_VERBOSE, UNIXSOCK_QUIET, and
-      the similars).
-
-      You can also specify category level from environment
-      UNIXSOCK_LOG_CATEGORY_LEVEL.
+        You can also specify category level from environment
+        UNIXSOCK_LOG_CATEGORY_LEVEL.
 
     -array => 0 | {opts} | [{opts}, ...]
+        Specify output to one or more Perl arrays. Logging will be done
+        using Log::Dispatch::ArrayWithLimits. Note that the syntax is:
 
-      Specify output to one or more Perl arrays. Logging will be done using
-      Log::Dispatch::ArrayWithLimits. Note that the syntax is:
+         -array => {array=>$ary}
 
-       -array => {array=>$ary}
+        and not just:
 
-      and not just:
+         -array => $ary
 
-       -array => $ary
+        because that will be interpreted as multiple array outputs:
 
-      because that will be interpreted as multiple array outputs:
+         -array => [{output1}, ...]
 
-       -array => [{output1}, ...]
+        If the argument is a false boolean value, array logging will be
+        turned off. Otherwise argument must be a hashref or an arrayref (to
+        specify multiple outputs). If the argument is a hashref, then the
+        keys of the hashref must be one of: "level", "array" (defaults to
+        new anonymous array []), "filter_text", "filter_no_text",
+        "filter_citext", "filter_no_citext", "filter_re", "filter_no_re". If
+        the argument is an arrayref, it is assumed to be specifying multiple
+        sockets, with each element of the array as a hashref.
 
-      If the argument is a false boolean value, array logging will be
-      turned off. Otherwise argument must be a hashref or an arrayref (to
-      specify multiple outputs). If the argument is a hashref, then the
-      keys of the hashref must be one of: level, array (defaults to new
-      anonymous array []), filter_text, filter_no_text, filter_citext,
-      filter_no_citext, filter_re, filter_no_re. If the argument is an
-      arrayref, it is assumed to be specifying multiple sockets, with each
-      element of the array as a hashref.
+        How Log::Any::App determines defaults for array logging:
 
-      How Log::Any::App determines defaults for array logging:
+        By default array logging is off.
 
-      By default array logging is off.
+        Default level is the same as the global level set by -level. But
+        App::options, command line, environment, level flag file, and
+        package variables in main are also searched first (for
+        ARRAY_LOG_LEVEL, ARRAY_TRACE, ARRAY_DEBUG, ARRAY_VERBOSE,
+        ARRAY_QUIET, and the similars).
 
-      Default level is the same as the global level set by -level. But
-      App::options, command line, environment, level flag file, and package
-      variables in main are also searched first (for ARRAY_LOG_LEVEL,
-      ARRAY_TRACE, ARRAY_DEBUG, ARRAY_VERBOSE, ARRAY_QUIET, and the
-      similars).
-
-      You can also specify category level from environment
-      ARRAY_LOG_CATEGORY_LEVEL.
+        You can also specify category level from environment
+        ARRAY_LOG_CATEGORY_LEVEL.
 
     -dump => BOOL
-
-      If set to true then Log::Any::App will dump the generated Log4perl
-      config. Useful for debugging the logging.
-
-PATTERN STYLES
-
-    Log::Any::App provides some styles for Log4perl patterns. You can
-    specify pattern_style instead of directly specifying pattern. example:
-
-     use Log::Any::App -screen => {pattern_style=>"script_long"};
-    
-     Name           Description                        Example output
-     ----           -----------                        --------------
-     plain          The message, the whole message,    Message
-                    and nothing but the message.
-                    Used by dir logging.
-    
-                    Equivalent to pattern: '%m'
-    
-     plain_nl       Message plus newline. The default  Message
-                    for screen without
-                    LOG_ELAPSED_TIME_IN_SCREEN.
-    
-                    Equivalent to pattern: '%m%n'
-    
-     script_short   For scripts that run for a short   [234] Message
-                    time (a few seconds). Shows just
-                    the number of milliseconds. This
-                    is the default for screen under
-                    LOG_ELAPSED_TIME_IN_SCREEN.
-    
-                    Equivalent to pattern:
-                    '[%r] %m%n'
-    
-     script_long    Scripts that will run for a        [2010-04-22 18:01:02] Message
-                    while (more than a few seconds).
-                    Shows date/time.
-    
-                    Equivalent to pattern:
-                    '[%d] %m%n'
-    
-     daemon         For typical daemons. Shows PID     [pid 1234] [2010-04-22 18:01:02] Message
-                    and date/time. This is the
-                    default for file logging.
-    
-                    Equivalent to pattern:
-                    '[pid %P] [%d] %m%n'
-    
-     syslog         Style suitable for syslog          [pid 1234] Message
-                    logging.
-    
-                    Equivalent to pattern:
-                    '[pid %p] %m'
-
-    For each of the above there are also cat_XXX (e.g. cat_script_long)
-    which are the same as XXX but with [cat %c] in front of the pattern. It
-    is used mainly to show categories and then filter by categories. You
-    can turn picking default pattern style with category using environment
-    variable LOG_SHOW_CATEGORY.
-
-    And for each of the above there are also loc_XXX (e.g. loc_syslog)
-    which are the same as XXX but with [loc %l] in front of the pattern. It
-    is used to show calling location (file, function/method, and line
-    number). You can turn picking default pattern style with location
-    prefix using environment variable LOG_SHOW_LOCATION.
-
-    If you have a favorite pattern style, please do share them.
-
-ENVIRONMENT
-
-    Below is summary of environment variables used.
-
- Turning on/off logging
-
-     LOG (bool)
-
- Setting general level
-
-     TRACE (bool)       setting general level to trace
-     DEBUG (bool)       setting general level to debug
-     VERBOSE (bool)     setting general level to info
-     QUIET (bool)       setting general level to error (turn off warnings)
-     LOG_LEVEL (str)
-
- Setting per-output level
-
-     FILE_TRACE, FILE_DEBUG, FILE_VERBOSE, FILE_QUIET, FILE_LOG_LEVEL
-     SCREEN_TRACE and so on
-     DIR_TRACE and so on
-     SYSLOG_TRACE and so on
-     UNIXSOCK_TRACE and so on
-     ARRAY_TRACE and so on
-
- Setting per-category level
-
-     LOG_CATEGORY_LEVEL (hash, json)
-     LOG_CATEGORY_ALIAS (hash, json)
-
- Setting per-output, per-category level
-
-     FILE_LOG_CATEGORY_LEVEL
-     SCREEN_LOG_CATEGORY_LEVEL
-     and so on
-
- Controlling extra fields to log
-
-     LOG_SHOW_LOCATION
-     LOG_SHOW_CATEGORY
-
- Force-enable or disable color
-
-     COLOR (bool)
-
- Turn on Log::Any::App's debugging
-
-     LOGANYAPP_DEBUG (bool)
-
- Turn on showing elapsed time in screen
-
-     LOG_ELAPSED_TIME_IN_SCREEN (bool)
-
-    Note that elapsed time is currently produced using Log::Log4perl's %r
-    (number of milliseconds since the program started, where program
-    started means when Log::Log4perl starts counting time).
-
- Filtering
-
-     LOG_FILTER_TEXT (str)
-     LOG_FILTER_NO_TEXT (str)
-     LOG_FILTER_CITEXT (str)
-     LOG_FILTER_NO_CITEXT (str)
-     LOG_FILTER_RE (str)
-     LOG_FILTER_NO_RE (str)
-
- Per-output filtering
-
-     {FILE,DIR,SCREEN,SYSLOG,UNIXSOCK,ARRAY}_LOG_FILTER_TEXT (str)
-     and so on
-
- Extra things to log
-
-      * LOG_ENV (bool)
-
-      If set to 1, will dump environment variables at the start of program.
-      Useful for debugging e.g. CGI or git hook scripts. You might also
-      want to look at Log::Any::Adapter::Core::Patch::UseDataDump to make
-      the dump more readable.
-
-      Logging will be done under category main and at level trace.
+        If set to true then Log::Any::App will dump the generated Log4perl
+        config. Useful for debugging the logging.
 
 FAQ
-
- Why?
-
+  Why?
     I initially wrote Log::Any::App because I'm sick of having to parse
     command-line options to set log level like --verbose, --log-level=debug
-    for every script. Also, before using Log::Any I previously used
-    Log4perl directly and modules which produce logs using Log4perl cannot
-    be directly use'd in one-liners without Log4perl complaining about
+    for every script. Also, before using Log::Any I previously used Log4perl
+    directly and modules which produce logs using Log4perl cannot be
+    directly use'd in one-liners without Log4perl complaining about
     uninitialized configuration or some such. Thus, I like Log::Any's
     default null adapter and want to settle using Log::Any for any kind of
     logging. Log::Any::App makes it easy to output Log::Any logs in your
     scripts and even one-liners.
 
- What's the benefit of using Log::Any::App?
+  What's the benefit of using Log::Any::App?
+    You get all the benefits of Log::Any, as what Log::Any::App does is just
+    wrap Log::Any and Log4perl with some nice defaults. It provides you with
+    an easy way to consume Log::Any logs and customize level/some other
+    options via various ways.
 
-    You get all the benefits of Log::Any, as what Log::Any::App does is
-    just wrap Log::Any and Log4perl with some nice defaults. It provides
-    you with an easy way to consume Log::Any logs and customize level/some
-    other options via various ways.
-
- And what's the benefit of using Log::Any?
-
+  And what's the benefit of using Log::Any?
     This is better described in the Log::Any documentation itself, but in
     short: Log::Any frees your module users to use whatever logging
     framework they want. It increases the reusability of your modules.
 
- Do I need Log::Any::App if I am writing modules?
-
+  Do I need Log::Any::App if I am writing modules?
     No, if you write modules just use Log::Any.
 
- Why use Log4perl?
-
+  Why use Log4perl?
     Log::Any::App uses the Log4perl adapter to display the logs because it
     is mature, flexible, featureful. The other alternative adapter is
     Log::Dispatch, but you can use Log::Dispatch::* output modules in
@@ -972,11 +916,9 @@ FAQ
     satisfied with Log4perl. It does have a slightly heavy startup cost for
     my taste, but it is still bearable.
 
- Are you coupling adapter with Log::Any (thus defeating Log::Any's
- purpose)?
-
-    No, producing logs are still done with Log::Any as usual and not tied
-    to Log4perl in any way. Your modules, as explained above, only 'use
+  Are you coupling adapter with Log::Any (thus defeating Log::Any's purpose)?
+    No, producing logs are still done with Log::Any as usual and not tied to
+    Log4perl in any way. Your modules, as explained above, only 'use
     Log::Any' and do not depend on Log::Any::App at all.
 
     Should portions of your application code get refactored into modules
@@ -985,38 +927,35 @@ FAQ
     custom logging needs anymore, you can just replace 'use Log::Any::App'
     line with something more adequate.
 
- How do I create extra logger objects?
-
+  How do I create extra logger objects?
     The usual way as with Log::Any:
 
      my $other_log = Log::Any->get_logger(category => $category);
 
- My needs are not met by the simple configuration system of Log::Any::App!
-
+  My needs are not met by the simple configuration system of Log::Any::App!
     You can use the Log4perl adapter directly and write your own Log4perl
-    configuration (or even other adapters). Log::Any::App is meant for
-    quick and simple logging output needs anyway (but do tell me if your
-    logging output needs are reasonably simple and should be supported by
+    configuration (or even other adapters). Log::Any::App is meant for quick
+    and simple logging output needs anyway (but do tell me if your logging
+    output needs are reasonably simple and should be supported by
     Log::Any::App).
 
- What is array output for?
-
+  What is array output for?
     Logging to a Perl array might be useful for testing/debugging, or (one
     use-case I can think of) for letting users of your program connect to
     your program directly to request viewing the logs being produced
     (although logging to other outputs doesn't preclude this ability). For
-    example, here is a program that uses a separate thread to listen to
-    Unix socket for requests to view the (last 100) logs. Requires perl
-    built with threads enabled.
+    example, here is a program that uses a separate thread to listen to Unix
+    socket for requests to view the (last 100) logs. Requires perl built
+    with threads enabled.
 
      use threads;
      use threads::shared;
      BEGIN { our @buf :shared }
      use IO::Socket::UNIX::Util qw(create_unix_stream_socket);
      use Log::Any::App '$log', -array => [{array => 'main::buf', max_elems=>100}];
-    
+
      my $sock = create_unix_stream_socket('/tmp/app-logview.sock');
-    
+
      # thread to listen to unix socket and receive log viewing instruction
      my $thr = threads->create(
         sub {
@@ -1034,7 +973,7 @@ FAQ
                 }
             }
         });
-    
+
      # main thread, application which produces logs
      $|++;
      while (1) {
@@ -1053,74 +992,104 @@ FAQ
      [2014/07/06 23:34:51] Log (4) ...
      [2014/07/06 23:34:51] Log (5) ...
 
-BUGS/TODOS
+ENVIRONMENT
+    Below is summary of environment variables used.
 
-    Need to provide appropriate defaults for Windows/other OS.
+  Turning on/off logging
+     LOG (bool)
 
-ROAD TO 1.0
+  Setting general level
+     TRACE (bool)       setting general level to trace
+     DEBUG (bool)       setting general level to debug
+     VERBOSE (bool)     setting general level to info
+     QUIET (bool)       setting general level to error (turn off warnings)
+     LOG_LEVEL (str)
 
-    Here are some planned changes/development before 1.0 is reached. There
-    might be some incompatibilities, please read this section carefully.
+  Setting per-output level
+     FILE_TRACE, FILE_DEBUG, FILE_VERBOSE, FILE_QUIET, FILE_LOG_LEVEL
+     SCREEN_TRACE and so on
+     DIR_TRACE and so on
+     SYSLOG_TRACE and so on
+     UNIXSOCK_TRACE and so on
+     ARRAY_TRACE and so on
 
-      * Everything is configurable via environment/command-line/option file
+  Setting per-category level
+     LOG_CATEGORY_LEVEL (hash, json)
+     LOG_CATEGORY_ALIAS (hash, json)
 
-      As I love specifying log options from environment, I will make every
-      init() options configurable from outside the script
-      (environment/command-line/control file). Of course, init() arguments
-      still take precedence for authors that do not want some/all options
-      to be overridden from outside.
+  Setting per-output, per-category level
+     FILE_LOG_CATEGORY_LEVEL
+     SCREEN_LOG_CATEGORY_LEVEL
+     and so on
 
-      * Reorganization of command-line/environment names
+  Controlling extra fields to log
+     LOG_SHOW_LOCATION
+     LOG_SHOW_CATEGORY
 
-      Aside from the handy and short TRACE (--trace), DEBUG, VERBOSE,
-      QUIET, all the other environment names will be put under LOG_ prefix.
-      This means FILE_LOG_LEVEL will be changed to LOG_FILE_LEVEL, and so
-      on. SCREEN_VERBOSE will be changed to VERBOSE_SCREEN.
+  Force-enable or disable color
+     COLOR (bool)
 
-      This is meant to reduce "pollution" of the environment variables
-      namespace.
+  Turn on Log::Any::App's debugging
+     LOGANYAPP_DEBUG (bool)
 
-      Log option file (option file for short, previously "flag file") will
-      be searched in <PROG>.log_options. Its content is in JSON and will
-      become init() arguments. For example:
+  Turn on showing elapsed time in screen
+     LOG_ELAPSED_TIME_IN_SCREEN (bool)
 
-       {"file": 1, "screen":{"level":"trace"}}
+    Note that elapsed time is currently produced using Log::Log4perl's %r
+    (number of milliseconds since the program started, where program started
+    means when Log::Log4perl starts counting time).
 
-      or more akin to init() (both will be supported):
+  Filtering
+     LOG_FILTER_TEXT (str)
+     LOG_FILTER_NO_TEXT (str)
+     LOG_FILTER_CITEXT (str)
+     LOG_FILTER_NO_CITEXT (str)
+     LOG_FILTER_RE (str)
+     LOG_FILTER_NO_RE (str)
 
-       ["-file": 1, "-screen":{"level":"trace"}]
+  Per-output filtering
+     {FILE,DIR,SCREEN,SYSLOG,UNIXSOCK,ARRAY}_LOG_FILTER_TEXT (str)
+     and so on
 
-      * Possible reorganization of package variable names
+  Extra things to log
+    *   LOG_ENV (bool)
 
-      To be more strict and reduce confusion, case variation might not be
-      searched.
+        If set to 1, will dump environment variables at the start of
+        program. Useful for debugging e.g. CGI or git hook scripts. You
+        might also want to look at
+        Log::Any::Adapter::Core::Patch::UseDataDump to make the dump more
+        readable.
 
-      * Pluggable backend
+        Logging will be done under category "main" and at level "trace".
 
-      This is actually the main motivator to reach 1.0 and all these
-      changes. Backends will be put in Log::Any::App::Backend::Log4perl,
-      and so on.
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-Any-App>.
 
-      * Pluggable output
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Log-Any-App>.
 
-      Probably split to Log::Any::App::Output::file, and so on. Each output
-      needs its backend support.
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-App>
 
-      * App::Options support will probably be dropped
-
-      I no longer use App::Options these days, and I don't know of any
-      Log::Any::App user who does.
-
-      * Probably some hooks to allow for more flexibility.
-
-      For example, if user wants to parse or detect levels/log file
-      paths/etc from some custom logic.
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Log::Any and Log::Log4perl
 
     Some alternative logging modules: Log::Dispatchouli (based on
     Log::Dispatch), Log::Fast, Log::Log4perl::Tiny. Really, there are 7,451
     of them (roughly one third of CPAN) at the time of this writing.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014, 2013, 2012, 2011, 2010
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

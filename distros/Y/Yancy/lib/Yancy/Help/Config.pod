@@ -11,7 +11,7 @@ Yancy::Help::Config - How to configure Yancy
 
 =head1 VERSION
 
-version 1.020
+version 1.021
 
 =head1 SYNOPSIS
 
@@ -455,6 +455,38 @@ based on the HTTP method.
 
 The C</definitions> of the spec will be used as the C<collections>
 property of the L<backend|Yancy::Backend>.
+
+All of the operations on each path under C</paths> of the spec must,
+in line with REST convention, refer to only a single "collection". If
+any path has operations referring to more than one collection, that is
+an error. To derive which collection, these things are considered:
+
+=over
+
+=item *
+
+a key C<x-collection> with string-value under the path
+
+=item *
+
+within the path's operations, looks up the C<$ref> of either the C<body>
+parameter (for mutations) or either the first 2XX, or default, response
+
+=item *
+
+the first path-component, so C</user> would operate on C<user>
+
+=back
+
+Each operation infers from the HTTP method plus other information which
+method of L<Yancy::Controller::Yancy::API> it should connect to.
+
+The C<id_field> stash parameter is either the value of the C<x-id-field>
+key in the operation or path spec, or if not given, the C<name> of the
+last C<in: "path"> parameter specified in the operation's spec. These
+methods need an C<id_field> parameter: C<get> in "read" mode, C<put>,
+and C<delete>. This is what the controller will pass as the C<id>
+to the relevant L<Yancy::Backend> method.
 
 =head1 Additional Configuration
 

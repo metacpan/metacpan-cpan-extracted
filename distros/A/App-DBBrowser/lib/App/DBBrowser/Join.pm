@@ -7,10 +7,8 @@ use 5.008003;
 
 use List::MoreUtils qw( any );
 
-use Term::Choose           qw( choose );
-use Term::Choose::LineFold qw( line_fold );
-use Term::Choose::Util     qw( term_width );
-use Term::TablePrint       qw( print_table );
+use Term::Choose     qw( choose );
+use Term::TablePrint qw( print_table );
 
 use App::DBBrowser::Auxil;
 
@@ -51,10 +49,11 @@ sub join_tables {
         $join->{primary_keys} = [];
         $join->{foreign_keys} = [];
         $join->{used_tables}  = [];
+        $join->{aliases}      = [];
+        $ax->print_sql( $join, [ 'Join' ] );
         my $info   = '  INFO';
         my @pre = ( undef );
         my $choices = [ @pre, map( "- $_", @$tables ), $info ];
-        $sf->__print_join_statement( $join->{stmt} );
         # Choose
         my $master = $stmt_v->choose(
             $choices,
@@ -73,68 +72,54 @@ sub join_tables {
         $join->{default_alias} = $sf->{d}{driver} eq 'Pg' ? 'a' : 'A';
         my $qt_master = $ax->quote_table( $j->{tables_info}{$master} );
         $join->{stmt} = "SELECT * FROM " . $qt_master;
-        $sf->__print_join_statement( $join->{stmt} );
+        $ax->print_sql( $join, [ 'Join' ] );
+        # Readline
         my $alias = $ax->alias( 'join', $qt_master . ' AS: ', $join->{default_alias}, ' ' );
-        # delete $join->{alias}{$master} if exits $join->{alias}{$master}; # if no default alias
-        push @{$join->{alias}{$master}}, $alias; ##
+        push @{$join->{aliases}}, [ $master, $alias ];
         $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $alias ] );
         my @bu;
 
         JOIN: while ( 1 ) {
-            $sf->__print_join_statement( $join->{stmt} );
+            $ax->print_sql( $join, [ 'Join' ] );
             my $backup_join = $ax->backup_href( $join );
             my $enough_tables = '  Enough TABLES';
             my @pre = ( undef, $enough_tables );
             # Choose
-            my $JOIN_type = $stmt_v->choose(
+            my $join_type = $stmt_v->choose(
                 [ @pre, map { "- $_" } @{$sf->{join_types}} ],
                 { prompt => 'Choose Join Type:' }
             );
-            if ( ! defined $JOIN_type ) {
+            if ( ! defined $join_type ) {
                 if ( @bu ) {
-                    ( $join->{stmt}, $join->{default_alias}, $join->{used_tables} ) = @{pop @bu};
+                    ( $join->{stmt}, $join->{default_alias}, $join->{aliases}, $join->{used_tables} ) = @{pop @bu};
                     next JOIN;
                 }
                 next MASTER;
             }
-            elsif ( $JOIN_type eq $enough_tables ) {
+            elsif ( $join_type eq $enough_tables ) {
                 if ( @{$join->{used_tables}} == 1 ) {
                     return;
                 }
                 last JOIN;
             }
-            push @bu, [ $join->{stmt}, $join->{default_alias}, [ @{$join->{used_tables}} ] ];
-            $JOIN_type =~ s/^-\s//;
-            $join->{stmt} .= " " . $JOIN_type;
-            $sf->__print_join_statement( $join->{stmt} );
-            # Choose
-            my $slave = $sf->__choose_slave_table( $join, $tables, $info );
-            if ( ! defined $slave ) {
-                ( $join->{stmt}, $join->{default_alias}, $join->{used_tables} ) = @{pop @bu};
-                next JOIN;
+            $join_type =~ s/^-\s//;
+            push @bu, [ $join->{stmt}, $join->{default_alias}, [ @{$join->{aliases}} ], [ @{$join->{used_tables}} ] ];
+            $join->{stmt} .= " " . $join_type;
+            my $ok = $sf->__add_slave_and_condition( $j, $join, $tables, $join_type, $info );
+            if ( ! $ok ) {
+                ( $join->{stmt}, $join->{default_alias}, $join->{aliases}, $join->{used_tables} ) = @{pop @bu};
             }
-            my $qt_slave = $ax->quote_table( $j->{tables_info}{$slave} );
-            $join->{stmt} .= " " . $qt_slave;
-            $sf->__print_join_statement( $join->{stmt} );
-            my $alias = $ax->alias( 'join', $qt_slave . ' AS: ', ++$join->{default_alias}, ' ' );
-            #delete $join->{alias}{$slave} if exits $join->{alias}{$slave}; # if no default alias
-            push @{$join->{alias}{$slave}}, $alias;
-            $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $alias ] );
-            if ( $JOIN_type ne 'CROSS JOIN' ) {
-                my $ok = $sf->__add_join_predicate( $j, $join, $tables, $slave, $alias );
-                if ( ! $ok ) {
-                    ( $join->{stmt}, $join->{default_alias}, $join->{used_tables} ) = @{pop @bu};
-                    next JOIN;
-                }
-            }
-            push @{$join->{used_tables}}, $slave;
         }
         last MASTER;
     }
 
+    my $alias = {};
+    for my $ref ( @{$join->{aliases}} ) {
+        push @{$alias->{$ref->[0]}}, $ref->[1];
+    }
     my $qt_columns = [];
     for my $table ( @{$join->{used_tables}} ) {
-        for my $alias ( @{$join->{alias}{$table}} ) {
+        for my $alias ( @{$alias->{$table}} ) {
             for my $col ( @{$j->{col_names}{$table}} ) {
                 my $col_qt = $ax->quote_col_qualified( [ undef, $alias, $col ] );
                 #if ( any { $_ eq $col_qt } @{$join->{foreign_keys}} ) {
@@ -152,30 +137,36 @@ sub join_tables {
 }
 
 
-sub __choose_slave_table {
-    my ( $sf, $join, $tables, $info ) = @_;
+sub __add_slave_and_condition {
+    my ( $sf, $j, $join, $tables, $join_type, $info ) = @_;
+    my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
+    my $used = ' (used)';
+    my @tmp;
+    for my $table ( @$tables ) {
+        if ( any { $_ eq $table } @{$join->{used_tables}} ) {
+            push @tmp, $table . $used;
+        }
+        else {
+            push @tmp, $table;
+        }
+    }
+    my @pre = ( undef );
+    my $choices = [ @pre, map( "- $_", @tmp ), $info ];
+    my @bu;
 
     SLAVE: while ( 1 ) {
-        my @tmp;
-        my $used = ' (used)';
-        for my $table ( @$tables ) {
-            if ( any { $_ eq $table } @{$join->{used_tables}} ) {
-                push @tmp, $table . $used;
-            }
-            else {
-                push @tmp, $table;
-            }
-        }
-        my @pre = ( undef );
-        my $choices = [ @pre, map( "- $_", @tmp ), $info ];
-        $sf->__print_join_statement( $join->{stmt} );
+        $ax->print_sql( $join, [ 'Join' ] );
         # Choose
         my $slave = $stmt_v->choose(
             $choices,
             { prompt => 'Add a SLAVE table:', undef => $sf->{i}{_reset} }
         );
         if ( ! defined $slave ) {
+            if ( @bu ) {
+                ( $join->{stmt}, $join->{default_alias}, $join->{aliases}, $join->{used_tables} ) = @{pop @bu};
+                next SLAVE;
+            }
             return;
         }
         elsif ( $slave eq $info ) {
@@ -183,92 +174,118 @@ sub __choose_slave_table {
             $sf->__print_join_info();
             next SLAVE;
         }
-        else {
-            $slave =~ s/^-\s//;
-            $slave =~ s/\Q$used\E\z//;
-            push @{$join->{used_tables}}, $slave;
-            return $slave;
+        $slave =~ s/^-\s//;
+        $slave =~ s/\Q$used\E\z//;
+        push @bu, [ $join->{stmt}, $join->{default_alias}, [ @{$join->{aliases}} ], [ @{$join->{used_tables}} ] ];
+        push @{$join->{used_tables}}, $slave;
+        my $qt_slave = $ax->quote_table( $j->{tables_info}{$slave} );
+        $join->{stmt} .= " " . $qt_slave;
+        $ax->print_sql( $join, [ 'Join' ] );
+        # Readline
+        my $slave_alias = $ax->alias( 'join', $qt_slave . ' AS: ', ++$join->{default_alias}, ' ' );
+        $join->{stmt} .= " AS " . $ax->quote_col_qualified( [ $slave_alias ] );
+        push @{$join->{aliases}}, [ $slave, $slave_alias ];
+        $ax->print_sql( $join, [ 'Join' ] );
+        if ( $join_type ne 'CROSS JOIN' ) {
+            my $ok = $sf->__add_join_condition( $j, $join, $tables, $slave, $slave_alias );
+            if ( ! $ok ) {
+                ( $join->{stmt}, $join->{default_alias}, $join->{aliases}, $join->{used_tables} ) = @{pop @bu};
+                next SLAVE;
+            }
         }
+        push @{$join->{used_tables}}, $slave;
+        $ax->print_sql( $join, [ 'Join' ] );
+        return 1;
     }
 }
 
 
-sub __add_join_predicate {
-    my ( $sf, $j, $join, $tables, $slave, $slave_alias ) = @_; #slave_alias
+
+
+sub __add_join_condition {
+    my ( $sf, $j, $join, $tables, $slave, $slave_alias ) = @_;
     my $stmt_v = Term::Choose->new( $sf->{i}{lyt_stmt_v} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
+    my $alias = {};
+    for my $ref ( @{$join->{aliases}} ) {
+        push @{$alias->{$ref->[0]}}, $ref->[1];
+    }
     my %avail_pk_cols;
     for my $used_table ( @{$join->{used_tables}} ) {
-        for my $alias ( @{$join->{alias}{$used_table}} ) {
-            #next if $used_table eq $slave && $alias eq $slave_alias;
-            for my $col ( @{$j->{col_names}{$used_table}} ) {
-                $avail_pk_cols{ $alias . '.' . $col } = $ax->quote_col_qualified( [undef, $alias, $col ] ); #
-            }
+        for my $alias ( @{$alias->{$used_table}} ) {
+            #if ( $used_table eq $slave && $alias eq $slave_alias ) {
+            #    # if not next but kept, I can see matching column names when choosing the primary key
+            #    next; # or make the key look a little different
+            #}
+            #else {
+                for my $col ( @{$j->{col_names}{$used_table}} ) {
+                    $avail_pk_cols{ $alias . '.' . $col } = $ax->quote_col_qualified( [ undef, $alias, $col ] );
+                }
+            #}
         }
     }
     my %avail_fk_cols;
     for my $col ( @{$j->{col_names}{$slave}} ) {
-        $avail_fk_cols{ $slave_alias . '.' . $col } = $ax->quote_col_qualified( [ $slave_alias, $col ] );
+        $avail_fk_cols{ $slave_alias . '.' . $col } = $ax->quote_col_qualified( [ undef, $slave_alias, $col ] );
     }
-    my $AND = '';
     $join->{stmt} .= " ON";
-    my @bu;
+    my $AND = '';
+    my @bu_primary_key;
+    my @bu_foreign_key;
 
-    ON: while ( 1 ) {
-        $sf->__print_join_statement( $join->{stmt} );
+    JOIN_PREDICATE: while ( 1 ) {
         my @pre = ( undef );
         if ( $AND && @{$join->{primary_keys}} == @{$join->{foreign_keys}} ) {
             push @pre, $sf->{i}{_confirm};
         }
-        # Choose
-        my $pk_col = $stmt_v->choose(
-            [ @pre, map( "- $_", sort keys %avail_pk_cols ) ],
-            { prompt => 'Choose PRIMARY KEY column:', index => 0, undef => $sf->{i}{_back} }
-        );
-        if ( ! defined $pk_col ) {
-            if ( @bu ) {
-                ( $join->{stmt}, $join->{primary_keys}, $join->{foreign_keys}, $AND ) = @{pop @bu};
-                next ON;
-            }
-            return;
-        }
-        if ( $pk_col eq $sf->{i}{_confirm} ) {
-            if ( ! $AND ) {
+
+        PRIMARY_KEY: while ( 1 ) {
+            $ax->print_sql( $join, [ 'Join' ] );
+            # Choose
+            my $pk_col = $stmt_v->choose(
+                [ @pre, map( "- $_", sort keys %avail_pk_cols ) ],
+                { prompt => 'Choose PRIMARY KEY column:', index => 0, undef => $sf->{i}{_back} }
+            );
+            if ( ! defined $pk_col ) {
+                if ( @bu_foreign_key ) {
+                    ( $join->{stmt}, $join->{primary_keys}, $join->{foreign_keys}, $AND ) = @{pop @bu_foreign_key};
+                    last PRIMARY_KEY;
+                }
                 return;
             }
-            return 1;
+            if ( $pk_col eq $sf->{i}{_confirm} ) {
+                if ( ! $AND ) {
+                    return;
+                }
+                return 1;
+            }
+            $pk_col =~ s/^-\s//;
+            push @bu_primary_key, [ $join->{stmt}, [ @{$join->{primary_keys}} ], [ @{$join->{foreign_keys}} ], $AND ];
+            push @{$join->{primary_keys}}, $avail_pk_cols{$pk_col};
+            $join->{stmt} .= $AND;
+            $join->{stmt} .= " " . $avail_pk_cols{$pk_col};
+            last PRIMARY_KEY;
         }
-        push @bu, [ $join->{stmt}, [ @{$join->{primary_keys}} ], [ @{$join->{foreign_keys}} ], $AND ];
-        $pk_col =~ s/^-\s//;
-        push @{$join->{primary_keys}}, $avail_pk_cols{$pk_col};
-        $join->{stmt} .= $AND;
-        $join->{stmt} .= " " . $avail_pk_cols{$pk_col};
-        $sf->__print_join_statement( $join->{stmt} );
-        # Choose
-        my $fk_col = $stmt_v->choose(
-            [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
-            { prompt => 'Choose FOREIGN KEY column:', index => 0, undef => $sf->{i}{_back} }
-        );
-        if ( ! defined $fk_col ) {
-            ( $join->{stmt}, $join->{primary_keys}, $join->{foreign_keys}, $AND ) = @{pop @bu};
-            next ON;
+
+        FOREIGN_KEY: while ( 1 ) {
+            $ax->print_sql( $join, [ 'Join' ] );
+            # Choose
+            my $fk_col = $stmt_v->choose(
+                [ undef, map( "- $_", sort keys %avail_fk_cols ) ],
+                { prompt => 'Choose FOREIGN KEY column:', index => 0, undef => $sf->{i}{_back} }
+            );
+            if ( ! defined $fk_col ) {
+                ( $join->{stmt}, $join->{primary_keys}, $join->{foreign_keys}, $AND ) = @{pop @bu_primary_key};
+                next JOIN_PREDICATE;
+            }
+            $fk_col =~ s/^-\s//;
+            push @bu_foreign_key, [ $join->{stmt}, [ @{$join->{primary_keys}} ], [ @{$join->{foreign_keys}} ], $AND ];
+            push @{$join->{foreign_keys}}, $avail_fk_cols{$fk_col};
+            $join->{stmt} .= " = " . $avail_fk_cols{$fk_col};
+            $AND = " AND";
+            next JOIN_PREDICATE;
         }
-        push @bu, [ $join->{stmt}, [ @{$join->{primary_keys}} ], [ @{$join->{foreign_keys}} ], $AND ];
-        $fk_col =~ s/^-\s//;
-        push @{$join->{foreign_keys}}, $avail_fk_cols{$fk_col};
-        $join->{stmt} .= " = " . $avail_fk_cols{$fk_col};
-        $AND = " AND";
     }
-}
-
-
-
-sub __print_join_statement {
-    my ( $sf, $join_stmt_pr ) = @_;
-    $join_stmt_pr =~ s/(?=\s(?:$sf->{joined_join_types}))/\n\ /g; ##
-    $join_stmt_pr .= "\n\n";
-    print $sf->{i}{clear_screen};
-    print line_fold( $join_stmt_pr, term_width() - 2, '', ' ' x $sf->{i}{stmt_init_tab} );
 }
 
 
@@ -329,6 +346,8 @@ sub __get_join_info {
     $sf->{d}{pk_info} = $pk;
     $sf->{d}{fk_info} = $fk;
 }
+
+
 
 
 

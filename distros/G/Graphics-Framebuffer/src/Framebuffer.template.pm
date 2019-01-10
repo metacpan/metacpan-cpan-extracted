@@ -1,4 +1,4 @@
-6.11 Dec 23, 2018
+6.13 Jan 10, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -2458,7 +2458,6 @@ Draws an arc/pie/poly arc of a circle at point x,y.
 =cut
 
 sub draw_arc {
-
     # This isn't exactly the fastest routine out there, hence the "granularity" parameter, but it is pretty neat.  Drawing lines between points smooths and compensates for high granularity settings.
     my $self   = shift;
     my $params = shift;
@@ -2583,7 +2582,7 @@ sub draw_arc {
                     $self->{'DRAW_MODE'} = MASK_MODE;
                 } else {
                     $saved = $self->blit_read($saved);
-                    $saved->{'image'} = $self->_convert(16, 24, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+                    $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
                     $img->read(
                         'xsize'             => $w,
                         'ysize'             => $w,
@@ -2648,7 +2647,7 @@ sub draw_arc {
                         $params->{'gradient'}->{'direction'} || 'vertical'
                     );
                 }
-                $pattern = $self->_convert(16, 24, $pattern, RGB) if ($self->{'BITS'} == 16);
+                $pattern = $self->_convert_16_to_24($pattern, RGB) if ($self->{'BITS'} == 16);
                 $image = Imager->new(
                     'xsize'             => $w,
                     'ysize'             => $w,
@@ -2676,7 +2675,7 @@ sub draw_arc {
                 'interleave'    => 0,
                 'data'          => \$saved->{'image'},
             );
-            $saved->{'image'} = $self->_convert(24, 16, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+            $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
         $self->blit_write($saved);
@@ -2880,7 +2879,6 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
 =cut
 
 sub ellipse {
-
     # The routine even works properly for XOR mode when filled ellipses are drawn as well.  This was solved by drawing only if the X or Y position changed.
     my $self   = shift;
     my $params = shift;
@@ -2894,9 +2892,9 @@ sub ellipse {
     $YRadius = 1 if ($YRadius < 1);
 
     my $filled = int($params->{'filled'} || 0);
-    my $fact = $params->{'factor'} || 1;
-    my $size = int($params->{'pixel_size'} || 1);
-    $size = 1 if ($filled);
+    my $fact   = $params->{'factor'} || 1;
+    my $size   = int($params->{'pixel_size'} || 1);
+    $size      = 1 if ($filled);
 
     my ($old_cyy, $old_cy_y) = (0, 0);
     if ($fact == 0) {    # We don't allow zero values for this
@@ -2914,7 +2912,7 @@ sub ellipse {
     my $StoppingX    = $TwoBSquare * $XRadius;
     my $StoppingY    = 0;
     my $history_on   = FALSE;
-    $history_on = TRUE if (exists($self->{'history'}));
+    $history_on      = TRUE if (exists($self->{'history'}));
 
     $self->{'history'} = {} unless ($history_on || !$filled || $size > 1);
     my ($red, $green, $blue, @rc, @gc, @bc);
@@ -3175,9 +3173,9 @@ sub circle {
                 $wdth, $hgth,
                 {
                     'red'   => [$params->{'gradient'}->{'start'}->{'red'},   $params->{'gradient'}->{'end'}->{'red'}],
-                      'green' => [$params->{'gradient'}->{'start'}->{'green'}, $params->{'gradient'}->{'end'}->{'green'}],
-                      'blue'  => [$params->{'gradient'}->{'start'}->{'blue'},  $params->{'gradient'}->{'end'}->{'blue'}],
-                      'alpha' => (exists($params->{'gradient'}->{'start'}->{'alpha'})) ? [$params->{'gradient'}->{'start'}->{'alpha'},$params->{'gradient'}->{'end'}->{'alpha'}] : [$self->{'COLOR_ALPHA'},$self->{'COLOR_ALPHA'}],
+                    'green' => [$params->{'gradient'}->{'start'}->{'green'}, $params->{'gradient'}->{'end'}->{'green'}],
+                    'blue'  => [$params->{'gradient'}->{'start'}->{'blue'},  $params->{'gradient'}->{'end'}->{'blue'}],
+                    'alpha' => (exists($params->{'gradient'}->{'start'}->{'alpha'})) ? [$params->{'gradient'}->{'start'}->{'alpha'},$params->{'gradient'}->{'end'}->{'alpha'}] : [$self->{'COLOR_ALPHA'},$self->{'COLOR_ALPHA'}],
                 },
                 $params->{'gradient'}->{'direction'}
             );
@@ -3522,7 +3520,7 @@ sub _fill_polygon {
             $self->{'DRAW_MODE'} = MASK_MODE;
         } else {
             $saved = $self->blit_read($saved);
-            $saved->{'image'} = $self->_convert(16, 24, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+            $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         }
     }
     my $img;
@@ -3585,7 +3583,7 @@ sub _fill_polygon {
             'interleave'    => 0,
             'data'          => \$saved->{'image'},
         );
-        $saved->{'image'} = $self->_convert(24, 16, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+        $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
     };
     warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
     $self->blit_write($saved);
@@ -3819,7 +3817,7 @@ sub _generate_fill {
                 );
             };
             warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
-            $gradient = $self->_convert(24, 16, $gradient, RGB) if ($self->{'BITS'} == 16);
+            $gradient = $self->_convert_24_to_16($gradient, RGB) if ($self->{'BITS'} == 16);
         }
     }
     return ($gradient);
@@ -4325,7 +4323,7 @@ sub fill {
                 'height' => $height,
             }
         );
-        $saved->{'image'} = $self->_convert(16, 24, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+        $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         eval {
             my $img = Imager->new(
                 'xsize'             => $width,
@@ -4382,7 +4380,7 @@ sub fill {
                 'interleave'    => 0,
                 'data'          => \$saved->{'image'},
             );
-            $saved->{'image'} = $self->_convert(24, 16, $saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+            $saved->{'image'} = $self->_convert_24_to_16($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
 
@@ -4599,23 +4597,23 @@ sub blit_flip {
         if ($self->{'BITS'} == 32) {
             substr($self->{'SCREEN'}, 0) = $them->{'SCREEN'};    # Simple copy
         } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(32, 24, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_24($them->{'SCREEN'}, RGB);
         } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(32, 16, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_32_to_16($them->{'SCREEN'}, RGB);
         }
     } elsif ($them->{'BITS'} == 24) {
         if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(24, 32, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_32($them->{'SCREEN'}, RGB);
         } elsif ($self->{'BITS'} == 24) {
             substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
         } else {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(24, 16, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_24_to_16($them->{'SCREEN'}, RGB);
         }
     } else {
         if ($self->{'BITS'} == 32) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(16, 32, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_32($them->{'SCREEN'}, RGB);
         } elsif ($self->{'BITS'} == 24) {
-            substr($self->{'SCREEN'}, 0) = $self->_convert(16, 24, $them->{'SCREEN'}, RGB);
+            substr($self->{'SCREEN'}, 0) = $self->_convert_16_to_24($them->{'SCREEN'}, RGB);
         } else {
             substr($self->{'SCREEN'}, 0) = substr($them->{'SCREEN'}, 0);    # Simple copy
         }
@@ -4840,7 +4838,7 @@ sub blit_read {
 #    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     if ($h > 1 && $self->{'ACCELERATED'}) {
         $scrn = chr(0) x ($W * $h);
-        c_blit_read($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $self->{'BITS'}, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
+        c_blit_read($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $scrn, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
     } else {
         foreach my $line ($y .. ($yend - 1)) {
             $index = ($bytes_per_line * ($line + $yoffset)) + $XX;
@@ -4892,7 +4890,7 @@ sub blit_write {
 #    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
 
     if ($self->{'ACCELERATED'}) { # && $h > 1) {
-        c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $params->{'image'}, $x, $y, $w, $h, $bytes, $self->{'BITS'}, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
+        c_blit_write($self->{'SCREEN'}, $self->{'XRES'}, $self->{'YRES'}, $bytes_per_line, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $params->{'image'}, $x, $y, $w, $h, $bytes, $draw_mode, $self->{'COLOR_ALPHA'}, $self->{'B_COLOR'}, $self->{'X_CLIP'}, $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},);
         return;
     }
 
@@ -5208,7 +5206,7 @@ sub blit_transform {
     my $data;
 
     if (exists($params->{'merge'})) {
-        $image = $self->_convert(16, 24, $image, RGB) if ($self->{'BITS'} == 16);
+        $image = $self->_convert_16_to_24($image, RGB) if ($self->{'BITS'} == 16);
         eval {
             my $img = Imager->new();
             $img->read(
@@ -5249,7 +5247,7 @@ sub blit_transform {
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
 
-        $data = $self->_convert(24, 16, $data, RGB) if ($self->{'BITS'} == 16);
+        $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
         return (
             {
                 'x'      => $params->{'merge'}->{'dest_blit_data'}->{'x'},
@@ -5325,7 +5323,7 @@ sub blit_transform {
                 # Try to define as much as possible before the loop to optimize
                 $data = $self->{'B_COLOR'} x (($wh**2) * $bytes);
 
-                c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes, $self->{'BITS'});
+                c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes);
                 return (
                     {
                         'x'      => $params->{'blit_data'}->{'x'},
@@ -5339,7 +5337,7 @@ sub blit_transform {
         } else {
             eval {
                 my $img = Imager->new();
-                $image = $self->_convert(16, 24, $image, RGB) if ($self->{'BITS'} == 16);
+                $image = $self->_convert_16_to_24($image, RGB) if ($self->{'BITS'} == 16);
                 $img->read(
                     'xsize'             => $width,
                     'ysize'             => $height,
@@ -5365,7 +5363,7 @@ sub blit_transform {
                     'interleave'    => 0,
                     'data'          => \$data
                 );
-                $data = $self->_convert(24, 16, $data, RGB) if ($self->{'BITS'} == 16);
+                $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
             };
             warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
         }
@@ -5379,7 +5377,7 @@ sub blit_transform {
             }
         );
     } elsif (exists($params->{'scale'})) {
-        $image = $self->_convert(16, 24, $image, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
+        $image = $self->_convert_16_to_24($image, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
 
         eval {
             my $img = Imager->new();
@@ -5412,7 +5410,7 @@ sub blit_transform {
             );
         };
         warn __LINE__ . " $@\n", Imager->errstr(), "\n" if ($@ && $self->{'SHOW_ERRORS'});
-        $data = $self->_convert(24, 16, $data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
+        $data = $self->_convert_24_to_16($data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -5590,13 +5588,11 @@ sub monochrome {
         $inc = 3;
     } elsif ($params->{'bits'} == 16) {
         $inc = 2;
-    } elsif ($params->{'bits'} == 8) {
-        $inc = 1;
     } else {    # Only 32, 24, or 16 bits allowed
         return ();
     }
     if ($self->{'ACCELERATED'}) {
-        c_monochrome($params->{'image'}, $size, $color_order, $inc, $params->{'bits'});
+        c_monochrome($params->{'image'}, $size, $color_order, $inc);
         return ($params->{'image'});
     } else {
         for (my $byte = 0; $byte < length($params->{'image'}); $byte += $inc) {
@@ -5683,7 +5679,8 @@ Here's a shortcut:
          'bounding_box' => 1,
          'rotate'       => 45,    # optonal
          'center'       => CENTER_X,
-         'antialias'    => 1
+         'antialias'    => 1,
+         'shadow'       => shadow size
      })
  );
 
@@ -5819,7 +5816,7 @@ sub ttf_print {
                 my $ty = $TTF_y - abs($global_ascent);
                 $ty = 0 if ($ty < 0);
                 $image = $self->blit_read({ 'x' => $TTF_x, 'y' => $ty, 'width' => $TTF_pw, 'height' => $TTF_ph });
-                $image->{'image'} = $self->_convert(16, 24, $image->{'image'}, RGB) if ($self->{'BITS'} == 16);
+                $image->{'image'} = $self->_convert_16_to_24($image->{'image'}, RGB) if ($self->{'BITS'} == 16);
                 $img->read(
                     'data'              => $image->{'image'},
                     'type'              => 'raw',
@@ -5852,7 +5849,7 @@ sub ttf_print {
         warn __LINE__ . " ERROR $@\n", Imager->errstr() . "\n$TTF_pw,$TTF_ph\n" if ($self->{'SHOW_ERRORS'});
         return (undef);
     }
-    $data = $self->_convert(24, 16, $data, RGB) if ($self->{'BITS'} == 16);
+    $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
     $self->blit_write({ 'x' => $TTF_x, 'y' => ($TTF_y - abs($global_ascent)), 'width' => $TTF_pw, 'height' => $TTF_ph, 'image' => $data });
     $self->{'DRAW_MODE'} = $draw_mode if (defined($draw_mode));
     return ($params);
@@ -6123,16 +6120,16 @@ sub load_image {
                 $scale{'type'}         = $params->{'scale_type'} || 'min';
                 $img                   = $img->scale(%scale);
             } else {
-                $scale{'xpixels'} = int($params->{'width'});
-                $scale{'ypixels'} = int($params->{'height'});
-                $scale{'type'}    = $params->{'scale_type'} || 'min';
+                $scale{'xpixels'}  = int($params->{'width'});
+                $scale{'ypixels'}  = int($params->{'height'});
+                $scale{'type'}     = $params->{'scale_type'} || 'min';
                 ($xs, $ys, $w, $h) = $img->scale_calculate(%scale);
                 $img = $img->scale(%scale);
             }
-            $w           = int($img->getwidth());
-            $h           = int($img->getheight());
-            $bench_scale = sprintf('%.03f', time - $bench_scale);
-            my $data = '';
+            $w             = int($img->getwidth());
+            $h             = int($img->getheight());
+            $bench_scale   = sprintf('%.03f', time - $bench_scale);
+            my $data       = '';
             $bench_convert = time;
 
             # Remap colors
@@ -6147,31 +6144,29 @@ sub load_image {
             } elsif ($color_order == GBR) {
                 $img = $img->convert('matrix' => [[0, 1, 0, 0], [0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 0, 1]]);
             }
-            if ($self->{'BITS'} >= 24) {
+            if ($self->{'BITS'} == 32) {
                 $img = $img->convert('preset' => 'addalpha') if ($channels == 3);
-                if ($self->{'BITS'} == 32) {
-                    $img->write(
-                        'type'          => 'raw',
-                        'interleave'    => 0,
-                        'datachannels'  => 4,
-                        'storechannels' => 4,
-                        'data'          => \$data
-                    );
-                    if ($params->{'convertalpha'}) {
-                        my $oback = substr($self->{'B_COLOR'}, 0, 3);
-                        my $nback = $self->{'B_COLOR'};
-                        $data =~ s/$oback./$nback/g;
-                    }
-                } else {
-                    $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
-                    $img->write(
-                        'type'          => 'raw',
-                        'interleave'    => 0,
-                        'datachannels'  => 3,
-                        'storechannels' => 3,
-                        'data'          => \$data
-                    );
+                $img->write(
+                    'type'          => 'raw',
+                    'interleave'    => 0,
+                    'datachannels'  => 4,
+                    'storechannels' => 4,
+                    'data'          => \$data
+                );
+                if ($params->{'convertalpha'}) {
+                    my $oback = substr($self->{'B_COLOR'}, 0, 3);
+                    my $nback = $self->{'B_COLOR'};
+                    $data =~ s/$oback./$nback/g;
                 }
+            } elsif ($self->{'BITS'} == 24 ) {
+                $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
+                $img->write(
+                    'type'          => 'raw',
+                    'interleave'    => 0,
+                    'datachannels'  => 3,
+                    'storechannels' => 3,
+                    'data'          => \$data
+                );
             } else {    # 16 bit
                 $channels = $img->getchannels();
                 $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
@@ -6182,7 +6177,7 @@ sub load_image {
                     'storechannels' => 3,
                     'data'          => \$data
                 );
-                $data = $self->_convert(24, 16, $data, RGB);
+                $data = $self->_convert_24_to_16($data, RGB);
             }
 
             if (exists($params->{'center'})) {    # Only accepted values are processed
@@ -6194,21 +6189,19 @@ sub load_image {
                     $x = ($w < $self->{'W_CLIP'}) ? int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'} : $self->{'X_CLIP'};
                     $y = ($h < $self->{'H_CLIP'}) ? int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'} : $self->{'Y_CLIP'};
                 }
+            } elsif (defined($params->{'x'}) && defined($params->{'y'})) {
+                $x = int($params->{'x'});
+                $y = int($params->{'y'});
             } else {
-                if (defined($params->{'x'}) && defined($params->{'y'})) {
-                    $x = int($params->{'x'});
-                    $y = int($params->{'y'});
+                if ($w < $self->{'W_CLIP'}) {
+                    $x = int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'};
+                    $y = 0;
+                } elsif ($h < $self->{'H_CLIP'}) {
+                    $x = 0;
+                    $y = int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'};
                 } else {
-                    if ($w < $self->{'W_CLIP'}) {
-                        $x = int(($self->{'W_CLIP'} - $w) / 2) + $self->{'X_CLIP'};
-                        $y = 0;
-                    } elsif ($h < $self->{'H_CLIP'}) {
-                        $x = 0;
-                        $y = int(($self->{'H_CLIP'} - $h) / 2) + $self->{'Y_CLIP'};
-                    } else {
-                        $x = 0;
-                        $y = 0;
-                    }
+                    $x = 0;
+                    $y = 0;
                 }
             }
             if (exists($tags->{'gif_left'})) {
@@ -6318,7 +6311,7 @@ sub screen_dump {
     my ($width, $height) = ($self->{'XRES'}, $self->{'YRES'});
     my $scrn = $self->blit_read({ 'x' => 0, 'y' => 0, 'width' => $width, 'height' => $height });
 
-    $scrn->{'image'} = $self->_convert(16, 24, $scrn->{'image'}, $self->{'COLOR_MODE'}) if ($self->{'BITS'} == 16);
+    $scrn->{'image'} = $self->_convert_16_to_24($scrn->{'image'}, $self->{'COLOR_MODE'}) if ($self->{'BITS'} == 16);
 
     my $type = lc($params->{'format'} || 'jpeg');
     $type =~ s/jpg/jpeg/;
@@ -6351,77 +6344,228 @@ sub screen_dump {
     $img->write(%p);
 }
 
-sub _convert {
+# Convert 16 bit bitmap to 24 bit bitmap
+
+sub _convert_16_to_24 {
     my $self        = shift;
-    my $from        = shift;
-    my $to          = shift;
     my $img         = shift;
     my $color_order = shift;
 
-    my $new_img = '';
-    my $size    = length($img);
-    my $from_bytes = $from / 8;
-    my $to_bytes   = $to / 8;
+    my $size = length($img);
     if ($self->{'ACCELERATED'}) {
-        $new_img = chr(0) x int(($size / $from_bytes) * $to_bytes);
-        c_convert($from, $to, $img, $size, $new_img, $color_order);
-    } else {
-        $from_bytes    = 1 if ($from_bytes < 1);
-        $to_bytes      = 1 if ($to_bytes < 1);
-        my $black_from = chr(0)   x $from_bytes;
-        my $white_from = chr(255) x $from_bytes;
-        my $black_to   = chr(0)   x $to_bytes;
-        my $white_to  = chr(255) x $to_bytes;
-        my $idx        = 0;
+        my $new_img = chr(0) x (($size / 2) * 3);
+        c_convert_16_24($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black24 = chr(0) x 3;
+    my $black16 = chr(0) x 2;
+    my $white24 = chr(255) x 3;
+    my $white16 = chr(255) x 2;
+    my $idx     = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 2);
 
-        while ($idx < $size) {
-            my $color = substr($img, $idx, $from_bytes);
-            if ($color eq $black_from) {
-                $new_img .= $black_to;
-            } elsif ($color eq $white_from) {
-                $new_img .= $white_to;
-            } elsif ($from == 32) {
-                if ($to == 24) {
-                    $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 16) {
-                    $color = $self->RGBA8888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 8) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 24) {
-                if ($to == 32) {
-                    $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 16) {
-                    $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 8) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 16) {
-                if ($to == 32) {
-                    $color = $self->RGB565_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 24) {
-                    $color = $self->RGB565_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
-                } elsif ($to == 8) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 8) {
-                if ($to == 32) {
-                } elsif ($to == 24) {
-                } elsif ($to == 16) {
-                } elsif ($to == 1) {
-                }
-            } elsif ($from == 1) {
-                if ($to == 32) {
-                } elsif ($to == 24) {
-                } elsif ($to == 16) {
-                } elsif ($to == 8) {
-                }
-            }
+        # Black and white can be optimized
+        if ($color eq $black16) {
+            $new_img .= $black24;
+        } elsif ($color eq $white16) {
+            $new_img .= $white24;
+        } else {
+            $color = $self->RGB565_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
             $new_img .= $color->{'color'};
         }
+        $idx += 2;
+    }
+    return ($new_img);
+}
+
+# Convert 16 bit bitmap to 32 bit bitmap
+
+sub _convert_16_to_32 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size * 4);
+        c_convert_16_32($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black16 = chr(0) x 2;
+    my $white32 = chr(255) x 4;
+    my $white16 = chr(255) x 2;
+    my $idx     = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 2);
+
+        # Black and white can be optimized
+        if ($color eq $black16) {
+            $new_img .= $black32;
+        } elsif ($color eq $white16) {
+            $new_img .= $white32;
+        } else {
+            $color = $self->RGB565_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 2;
+    }
+    return ($new_img);
+}
+
+# Convert 24 bit bitmap to 16 bit bitmap
+
+sub _convert_24_to_16 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x (($size / 3) * 2);
+        c_convert_24_16($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black24 = chr(0) x 3;
+    my $black16 = chr(0) x 2;
+    my $white24 = chr(255) x 3;
+    my $white16 = chr(255) x 2;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 3);
+
+        # Black and white can be optimized
+        if ($color eq $black24) {
+            $new_img .= $black16;
+        } elsif ($color eq $white24) {
+            $new_img .= $white16;
+        } else {
+            $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 3;
     }
 
-    return($new_img);
+    return ($new_img);
+}
+
+# Convert 32 bit bitmap to a 16 bit bitmap
+
+sub _convert_32_to_16 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size / 2);
+        c_convert_32_16($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black16 = chr(0) x 2;
+    my $white32 = chr(255) x 4;
+    my $white16 = chr(255) x 2;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 4);
+
+        # Black and white can be optimized
+        if ($color eq $black32) {
+            $new_img .= $black16;
+        } elsif ($color eq $white32) {
+            $new_img .= $white16;
+        } else {
+            $color = $self->RGBA8888_to_RGB565({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 4;
+    }
+
+    return ($new_img);
+}
+
+# Convert a 32 bit bitmap to a 24 bit bitmap.
+
+sub _convert_32_to_24 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size / 4) * 3;
+        c_convert_32_24($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black24 = chr(0) x 3;
+    my $white32 = chr(255) x 4;
+    my $white24 = chr(255) x 3;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 4);
+
+        # Black and white can be optimized
+        if ($color eq $black32) {
+            $new_img .= $black24;
+        } elsif ($color eq $white32) {
+            $new_img .= $white24;
+        } else {
+            $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 4;
+    }
+
+    return ($new_img);
+}
+
+# Convert a 24 bit bitmap to a 32 bit bipmap
+
+sub _convert_24_to_32 {
+    my $self        = shift;
+    my $img         = shift;
+    my $color_order = shift;
+
+    my $size = length($img);
+    if ($self->{'ACCELERATED'}) {
+        my $new_img = chr(0) x ($size / 3) * 4;
+        c_convert_24_32($img, $size, $new_img, $color_order);
+        return ($new_img);
+    }
+    my $new_img = '';
+    my $black32 = chr(0) x 4;
+    my $black24 = chr(0) x 3;
+    my $white32 = chr(255) x 4;
+    my $white24 = chr(255) x 3;
+
+    my $idx = 0;
+    while ($idx < $size) {
+        my $color = substr($img, $idx, 4);
+
+        # Black and white can be optimized
+        if ($color eq $black24) {
+            $new_img .= $black32;
+        } elsif ($color eq $white24) {
+            $new_img .= $white32;
+        } else {
+            $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $co });
+            $new_img .= $color->{'color'};
+        }
+        $idx += 3;
+    }
+
+    return ($new_img);
 }
 
 =head2 RGB565_to_RGB888

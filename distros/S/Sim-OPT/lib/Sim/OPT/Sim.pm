@@ -1,5 +1,5 @@
 package Sim::OPT::Sim;
-# Copyright (C) 2008-2015 by Gian Luca Brunetti and Politecnico di Milano.
+# Copyright (C) 2008-2018 by Gian Luca Brunetti and Politecnico di Milano.
 # This is the module Sim::OPT::Sim of Sim::OPT, a program for detailed metadesign managing parametric explorations through the ESP-r building performance simulation platform and performing optimization by block coordinate descent.
 # This is free software.  You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3.
 
@@ -169,9 +169,9 @@ sub sim    # This function launch the simulations in ESP-r
     my $countstep = $dt{countstep}; #say $tee "IN SIM \$countstep : " . dump( $countstep );
     my $c = $dt{c}; #say $tee "IN SIM1 \$c : " . dump( $c );
 
-		my %to = %{ $dt{to} }; say $tee " IN SIM \%to " . dump( \%to );
+		my %to = %{ $dt{to} }; #say $tee " IN SIM \%to " . dump( \%to );
 		my %inst = %{ $dt{inst} };
-    my $instn = $dt{instn}; say $tee " IN SIM \$instn " . dump( $instn );
+    my $instn = $dt{instn}; #say $tee " IN SIM \$instn " . dump( $instn );
 
 		my $from = $dt{from}; #say $tee " IN SIM \$from $from ";
 		my $toitem = $dt{toitem}; #say $tee " IN SIM \$toitem $toitem ";

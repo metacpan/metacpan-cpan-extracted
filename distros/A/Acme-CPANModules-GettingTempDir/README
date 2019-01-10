@@ -1,0 +1,64 @@
+NAME
+    Acme::CPANModules::GettingTempDir - Getting system-wide temporary
+    directory in a portable way
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::GettingTempDir (from Perl distribution
+    Acme-CPANModules-GettingTempDir), released on 2019-01-09.
+
+DESCRIPTION
+    Getting system-wide temporary directory in a portable way.
+
+    There's the good ol' File::Spec which has a "tmpdir" function. On Unix
+    it looks at "TMPDIR" environment variable before falling back to "/tmp".
+    File::Temp uses this for its "tempdir" when a template is not specified.
+
+    Then there's File::Util::Tempdir which tries a little harder. On Unix,
+    its "get_tempdir" will look at "TMPDIR", then also "TEMPDIR", "TMP",
+    "TEMP". If none of those are set, it will return the first existing
+    directory from the list: "/tmp", "/var/tmp". If everything fails, will
+    die.
+
+    File::Util::Tempdir also provides "get_user_tempdir" which returns a
+    user-private temporary directory, which can be useful if you want to
+    create temporary file with predetermined names. It will return temporary
+    directory pointed by "XDG_RUNTIME_DIR" (e.g. "/run/user/1000") or, if
+    unavailable, will create a subdirectory under the world-writable
+    temporary directory (e.g. "/tmp/1000").
+
+INCLUDED MODULES
+    *   File::Spec
+
+    *   File::Util::Tempdir
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-GettingTempDir>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-GettingTempDir>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Gett
+    ingTempDir>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

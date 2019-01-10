@@ -52,14 +52,15 @@ my $role_class = $result_path . '/Role.pm';
 
 ok -e $role_class;
 
-my $check = q~print "This is some custom code!";~;
+my $check = qq~print "This is some custom code!";\n# ---~;
 
 my $content = do{ local (@ARGV, $/) = $role_class; <> };
 like $content, qr/\Q$check\E/;
 
+my $schema_check = qq~print "This is some custom code!";\n}\n# ---~;
 my $schema_content = do { local (@ARGV, $/) = $subpath . '/DBIC_Schema.pm'; <> };
 like $schema_content, qr/VERSION = 0.02/;
-like $schema_content, qr/\Q$check\E/;
+like $schema_content, qr/\Q$schema_check\E/;
 
 eval{
     rmtree( $output_path );

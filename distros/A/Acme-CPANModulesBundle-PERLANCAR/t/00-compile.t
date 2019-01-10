@@ -6,28 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 21 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Acme/CPANModules/PERLANCAR/ArrayClassBuilder.pm',
-    'Acme/CPANModules/PERLANCAR/Assert.pm',
     'Acme/CPANModules/PERLANCAR/Avoided.pm',
-    'Acme/CPANModules/PERLANCAR/CLIWithUndo.pm',
-    'Acme/CPANModules/PERLANCAR/CustomCPAN.pm',
-    'Acme/CPANModules/PERLANCAR/LocalCPANMirror.pm',
-    'Acme/CPANModules/PERLANCAR/MagicVariableTechnique.pm',
-    'Acme/CPANModules/PERLANCAR/MooseStyleClassBuilder.pm',
     'Acme/CPANModules/PERLANCAR/MyGetoptLongExperiment.pm',
-    'Acme/CPANModules/PERLANCAR/NonMooseStyleClassBuilder.pm',
-    'Acme/CPANModules/PERLANCAR/OneLetter.pm',
     'Acme/CPANModules/PERLANCAR/Retired.pm',
-    'Acme/CPANModules/PERLANCAR/Task/AliasingModuleName.pm',
-    'Acme/CPANModules/PERLANCAR/Task/CheckingModuleInstalledLoadable.pm',
-    'Acme/CPANModules/PERLANCAR/Task/GettingTempDir.pm',
-    'Acme/CPANModules/PERLANCAR/Task/PickingRandomLinesFromFile.pm',
-    'Acme/CPANModules/PERLANCAR/Task/WorkingWithTree.pm',
-    'Acme/CPANModules/PERLANCAR/Unbless.pm',
-    'Acme/CPANModules/PERLANCAR/UpsideDownTextWithUnicode.pm',
     'Acme/CPANModules/PERLANCAR/Weird.pm',
     'Acme/CPANModulesBundle/PERLANCAR.pm'
 );

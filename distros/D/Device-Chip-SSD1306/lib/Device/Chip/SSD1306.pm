@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::SSD1306;
 
@@ -9,9 +9,10 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
+use Future::AsyncAwait;
 
 =encoding UTF-8
 
@@ -238,23 +239,23 @@ Initialise the display after reset to some sensible defaults.
 # This initialisation sequence is inspired by the Adafruit driver
 #   https://github.com/adafruit/Adafruit_SSD1306
 
-sub init
+async sub init
 {
    my $self = shift;
 
-   $self->display( 0 )
-      ->then( sub { $self->send_cmd( CMD_SET_CLOCKDIV,     ( 8 << 4 ) | 0x80 ) })
-      ->then( sub { $self->send_cmd( CMD_SET_MUX_RATIO,    $self->rows - 1 ) })
-      ->then( sub { $self->send_cmd( CMD_SET_DISPLAY_OFFS, 0 ) })
-      ->then( sub { $self->send_cmd( CMD_SET_DISPLAY_START | 0 ) })
-      ->then( sub { $self->send_cmd( CMD_SET_CHARGEPUMP,   0x14 ) })
-      ->then( sub { $self->send_cmd( CMD_SET_ADDR_MODE,    MODE_HORIZONTAL ) })
-      ->then( sub { $self->send_cmd( CMD_SET_SEGMENT_REMAP | ( $self->{xflip} ? 1 : 0 ) ) })
-      ->then( sub { $self->send_cmd( CMD_SET_COM_SCAN_DIR  | ( $self->{yflip} ? 1<<3 : 0 ) ) })
-      ->then( sub { $self->send_cmd( CMD_SET_COM_PINS,     $self->{set_com_pins_arg} ) })
-      ->then( sub { $self->send_cmd( CMD_SET_CONTRAST,     0x9F ) })
-      ->then( sub { $self->send_cmd( CMD_SET_PRECHARGE,    ( 0x0f << 4 ) | ( 1 ) ) })
-      ->then( sub { $self->send_cmd( CMD_SET_VCOMH_LEVEL,  ( 4 << 4 ) ) });
+   await $self->display( 0 );
+   await $self->send_cmd( CMD_SET_CLOCKDIV,     ( 8 << 4 ) | 0x80 );
+   await $self->send_cmd( CMD_SET_MUX_RATIO,    $self->rows - 1 );
+   await $self->send_cmd( CMD_SET_DISPLAY_OFFS, 0 );
+   await $self->send_cmd( CMD_SET_DISPLAY_START | 0 );
+   await $self->send_cmd( CMD_SET_CHARGEPUMP,   0x14 );
+   await $self->send_cmd( CMD_SET_ADDR_MODE,    MODE_HORIZONTAL );
+   await $self->send_cmd( CMD_SET_SEGMENT_REMAP | ( $self->{xflip} ? 1 : 0 ) );
+   await $self->send_cmd( CMD_SET_COM_SCAN_DIR  | ( $self->{yflip} ? 1<<3 : 0 ) );
+   await $self->send_cmd( CMD_SET_COM_PINS,     $self->{set_com_pins_arg} );
+   await $self->send_cmd( CMD_SET_CONTRAST,     0x9F );
+   await $self->send_cmd( CMD_SET_PRECHARGE,    ( 0x0f << 4 ) | ( 1 ) );
+   await $self->send_cmd( CMD_SET_VCOMH_LEVEL,  ( 4 << 4 ) );
 }
 
 =head2 display
@@ -265,11 +266,12 @@ Turn on or off the display.
 
 =cut
 
-sub display
+async sub display
 {
    my $self = shift;
    my ( $on ) = @_;
-   $self->send_cmd( $on ? CMD_DISPLAY_ON : CMD_DISPLAY_OFF );
+
+   await $self->send_cmd( $on ? CMD_DISPLAY_ON : CMD_DISPLAY_OFF );
 }
 
 =head2 display_lamptest
@@ -280,12 +282,12 @@ Turn on or off the all-pixels-lit lamptest mode.
 
 =cut
 
-sub display_lamptest
+async sub display_lamptest
 {
    my $self = shift;
    my ( $enable ) = @_;
 
-   $self->send_cmd( CMD_DISPLAY_LAMPTEST + !!$enable );
+   await $self->send_cmd( CMD_DISPLAY_LAMPTEST + !!$enable );
 }
 
 =head2 display_invert
@@ -296,12 +298,12 @@ Turn on or off the inverted output mode.
 
 =cut
 
-sub display_invert
+async sub display_invert
 {
    my $self = shift;
    my ( $enable ) = @_;
 
-   $self->send_cmd( CMD_DISPLAY_INVERT + !!$enable );
+   await $self->send_cmd( CMD_DISPLAY_INVERT + !!$enable );
 }
 
 =head2 send_display
@@ -313,7 +315,7 @@ packed binary string containing one byte per 8 pixels.
 
 =cut
 
-sub send_display
+async sub send_display
 {
    my $self = shift;
    my ( $pixels ) = @_;
@@ -322,20 +324,16 @@ sub send_display
    # it happens to work on both the SSD1306 and the SH1106, whereas other code
    # based on SET_COLUMN_ADDR + SET_PAGE_ADDR do not
 
-   my $f = Future->done;
-
    my $pagewidth = $self->columns;
 
    my $column = $self->{column_offset};
 
    foreach my $page ( 0 .. ( $self->rows / 8 ) - 1 ) {
-      $f = $f->then( sub { $self->send_cmd( CMD_SET_PAGE_START + $page ) } )
-         ->then( sub { $self->send_cmd( CMD_SET_LOW_COLUMN | $column & 0x0f ) } )
-         ->then( sub { $self->send_cmd( CMD_SET_HIGH_COLUMN | $column >> 4 ) } )
-         ->then( sub { $self->send_data( substr $pixels, $page * $pagewidth, $pagewidth ) } );
+      await $self->send_cmd( CMD_SET_PAGE_START + $page );
+      await $self->send_cmd( CMD_SET_LOW_COLUMN | $column & 0x0f );
+      await $self->send_cmd( CMD_SET_HIGH_COLUMN | $column >> 4 );
+      await $self->send_data( substr $pixels, $page * $pagewidth, $pagewidth );
    }
-
-   return $f;
 }
 
 =head1 DRAWING METHODS
@@ -493,15 +491,13 @@ Sends the framebuffer to the display chip.
 
 =cut
 
-sub refresh
+async sub refresh
 {
    my $self = shift;
 
    my $display = $self->{display};
    my $maxcol = $self->columns - 1;
    my $column = $self->{column_offset} + $self->{display_dirty_xlo};
-
-   my $f = Future->done;
 
    foreach my $page ( 0 .. ( $self->rows / 8 ) - 1 ) {
       next unless $self->{display_dirty} & ( 1 << $page );
@@ -514,18 +510,16 @@ sub refresh
          $data .= chr $v;
       }
 
-      $f = $f->then( sub { $self->send_cmd( CMD_SET_PAGE_START + $page ) } )
-         ->then( sub { $self->send_cmd( CMD_SET_LOW_COLUMN | $column & 0x0f ) } )
-         ->then( sub { $self->send_cmd( CMD_SET_HIGH_COLUMN | $column >> 4 ) } )
-         ->then( sub { $self->send_data( $data ) } );
+      await $self->send_cmd( CMD_SET_PAGE_START + $page );
+      await $self->send_cmd( CMD_SET_LOW_COLUMN | $column & 0x0f );
+      await $self->send_cmd( CMD_SET_HIGH_COLUMN | $column >> 4 );
+      await $self->send_data( $data );
 
       $self->{display_dirty} &= ~( 1 << $page );
    }
 
    $self->{display_dirty_xlo} = $self->columns;
    $self->{display_dirty_xhi} = -1;
-
-   return $f;
 }
 
 =head1 TODO

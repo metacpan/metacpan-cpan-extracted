@@ -94,8 +94,8 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "BIT_NOT",
   "REMAINDER",
   "LEFT_SHIFT",
-  "RIGHT_SHIFT",
-  "RIGHT_SHIFT_UNSIGNED",
+  "RIGHT_ARITHMETIC_SHIFT",
+  "RIGHT_LOGICAL_SHIFT",
   "LOGICAL_AND",
   "LOGICAL_OR",
   "LOGICAL_NOT",
@@ -1157,8 +1157,8 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_ID_PRE_DEC:
     case SPVM_OP_C_ID_POST_DEC:
     case SPVM_OP_C_ID_LEFT_SHIFT:
-    case SPVM_OP_C_ID_RIGHT_SHIFT:
-    case SPVM_OP_C_ID_RIGHT_SHIFT_UNSIGNED:
+    case SPVM_OP_C_ID_RIGHT_ARITHMETIC_SHIFT:
+    case SPVM_OP_C_ID_RIGHT_LOGICAL_SHIFT:
     case SPVM_OP_C_ID_BIT_XOR:
     case SPVM_OP_C_ID_BIT_OR:
     case SPVM_OP_C_ID_BIT_AND:
@@ -1477,7 +1477,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
       SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
       switch (descriptor->id) {
-        case SPVM_DESCRIPTOR_C_ID_INTERFACE:
+        case SPVM_DESCRIPTOR_C_ID_INTERFACE_T:
           package->category = SPVM_PACKAGE_C_CATEGORY_INTERFACE;
           category_descriptors_count++;
           break;
@@ -2453,12 +2453,21 @@ SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, S
   return op_call_sub;
 }
 
-SPVM_OP* SPVM_OP_build_unop(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first) {
+SPVM_OP* SPVM_OP_build_unary_op(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first) {
   
   // Build op
   SPVM_OP_insert_child(compiler, op_unary, op_unary->last, op_first);
   
   return op_unary;
+}
+
+SPVM_OP* SPVM_OP_build_binary_op(SPVM_COMPILER* compiler, SPVM_OP* op_bin, SPVM_OP* op_first, SPVM_OP* op_last) {
+  
+  // Build op
+  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_first);
+  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_last);
+  
+  return op_bin;
 }
 
 SPVM_OP* SPVM_OP_build_inc(SPVM_COMPILER* compiler, SPVM_OP* op_inc, SPVM_OP* op_first) {
@@ -2493,15 +2502,6 @@ SPVM_OP* SPVM_OP_build_isa(SPVM_COMPILER* compiler, SPVM_OP* op_isa, SPVM_OP* op
   SPVM_OP_insert_child(compiler, op_isa, op_isa->last, op_type);
   
   return op_isa;
-}
-
-SPVM_OP* SPVM_OP_build_binop(SPVM_COMPILER* compiler, SPVM_OP* op_bin, SPVM_OP* op_first, SPVM_OP* op_last) {
-  
-  // Build op
-  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_first);
-  SPVM_OP_insert_child(compiler, op_bin, op_bin->last, op_last);
-  
-  return op_bin;
 }
 
 SPVM_OP* SPVM_OP_build_concat(SPVM_COMPILER* compiler, SPVM_OP* op_cancat, SPVM_OP* op_first, SPVM_OP* op_last) {
